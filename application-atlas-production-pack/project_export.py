@@ -13,6 +13,7 @@ import uuid
 import zipfile
 
 from project_baseline import latest_project_baseline
+from handoff_bundle import build_handoff, render_markdown as render_handoff_markdown
 
 
 DOCUMENT_ORDER = {
@@ -32,6 +33,9 @@ def export_project(store, project_id: str) -> dict:
     requirements = store.list_requirements(project_id)
     decisions = store.list_decisions(project_id)
     documents = store.list_documents(project_id)
+    iterations = store.list_iterations(project_id)
+    tasks = store.list_tasks(project_id)
+    executions = store.list_executions(project_id)
     baseline = latest_project_baseline(store, project_id)
     root = store.path.parent / "exports" / project_id
     root.mkdir(parents=True, exist_ok=True)
@@ -42,7 +46,8 @@ def export_project(store, project_id: str) -> dict:
     temp_archive = root / f".{name}.zip.tmp"
     try:
         files = _build_files(
-            project, references, requirements, decisions, documents, baseline)
+            store, project, references, requirements, decisions, documents,
+            iterations, tasks, executions, baseline)
         hashes = {}
         for relative, content in files.items():
             path = temp / relative
@@ -50,7 +55,7 @@ def export_project(store, project_id: str) -> dict:
             path.write_text(content, encoding="utf-8")
             hashes[relative] = hashlib.sha256(content.encode("utf-8")).hexdigest()
         manifest = {
-            "schema": 2,
+            "schema": 3,
             "exported_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "project_id": project_id,
             "project_updated_at": project["updated_at"],
@@ -58,6 +63,8 @@ def export_project(store, project_id: str) -> dict:
                 "references": len(references), "requirements": len(requirements),
                 "decisions": len(decisions), "documents": len(documents),
                 "workspace_baselines": 1 if baseline else 0,
+                "iterations": len(iterations), "tasks": len(tasks),
+                "executions": len(executions),
             },
             "workspace_baseline_id": baseline["id"] if baseline else None,
             "workspace_baseline_fingerprint": baseline["fingerprint"] if baseline else None,
@@ -65,6 +72,10 @@ def export_project(store, project_id: str) -> dict:
                 item["id"] for item in requirements if item["confirmed_scope"] is None],
             "documents_needing_review": [
                 item["id"] for item in documents if item["review"]["status"] == "needs_review"],
+            "active_iteration_id": next(
+                (item["id"] for item in iterations if item["status"] == "active"), None),
+            "unaccepted_task_ids": [
+                item["id"] for item in tasks if item["acceptance_status"] == "pending"],
             "files": hashes,
         }
         (temp / "manifest.json").write_text(
@@ -90,7 +101,8 @@ def export_project(store, project_id: str) -> dict:
     }
 
 
-def _build_files(project, references, requirements, decisions, documents, baseline=None):
+def _build_files(store, project, references, requirements, decisions, documents,
+                 iterations, tasks, executions, baseline=None):
     files = {}
     reference_links = []
     for index, reference in enumerate(references, 1):
@@ -107,17 +119,29 @@ def _build_files(project, references, requirements, decisions, documents, baseli
     files["requirements.md"] = _requirements_markdown(requirements)
     files["decisions.md"] = _decisions_markdown(decisions)
     files["sources.md"] = _sources_index(reference_links)
+    files["iterations.md"] = _iterations_markdown(iterations, tasks, executions)
+    files["execution-records.json"] = json.dumps({
+        "schema": 1, "project_id": project["id"], "iterations": iterations,
+        "tasks": tasks, "executions": executions,
+    }, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    for task in tasks:
+        handoff = build_handoff(store, task["id"])
+        stem = f"handoffs/{task['id']}"
+        files[stem + ".json"] = json.dumps(
+            handoff, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+        files[stem + ".md"] = render_handoff_markdown(handoff)
     if baseline:
         files["workspace-baseline.md"] = _baseline_markdown(baseline)
         files["workspace-baseline.json"] = json.dumps(
             baseline, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
     files["INDEX.md"] = _index_markdown(
-        project, reference_links, document_links, requirements, decisions, baseline)
+        project, reference_links, document_links, requirements, decisions,
+        iterations, tasks, executions, baseline)
     return files
 
 
 def _index_markdown(project, reference_links, document_links, requirements, decisions,
-                    baseline=None):
+                    iterations, tasks, executions, baseline=None):
     unresolved = [item for item in requirements if item["confirmed_scope"] is None]
     review = [item for item, _ in document_links if item["review"]["status"] == "needs_review"]
     lines = [
@@ -136,6 +160,10 @@ def _index_markdown(project, reference_links, document_links, requirements, deci
                   f"- [Requirements](requirements.md): {len(requirements)}",
                   f"- [Decisions](decisions.md): {len(decisions)}",
                   f"- [Sources](sources.md): {len(reference_links)}", "",
+                  "## Delivery state", "",
+                  f"- [Iterations and tasks](iterations.md): {len(iterations)} iteration(s), {len(tasks)} task(s)",
+                  f"- [Machine-readable execution records](execution-records.json): {len(executions)} execution(s)",
+                  f"- Portable task handoffs: {len(tasks)} JSON/Markdown pair(s) under `handoffs/`", "",
                   "## Open review", ""])
     if baseline:
         lines.insert(lines.index("## Open review") - 1,
@@ -145,6 +173,48 @@ def _index_markdown(project, reference_links, document_links, requirements, deci
     if not unresolved and not review:
         lines.append("- No unresolved requirements or stale document dependencies")
     return "\n".join(lines) + "\n"
+
+
+def _iterations_markdown(iterations, tasks, executions):
+    lines = ["# Iterations and execution tasks", ""]
+    tasks_by_iteration = {}
+    for task in tasks:
+        tasks_by_iteration.setdefault(task.get("iteration_id"), []).append(task)
+    executions_by_task = {}
+    for execution in executions:
+        executions_by_task.setdefault(execution["task_id"], []).append(execution)
+    for iteration in sorted(iterations, key=lambda item: (item["sequence"], item["id"])):
+        lines.extend([
+            f"## Iteration {iteration['sequence']}: {iteration['title']}", "",
+            iteration["objective"], "", f"- ID: `{iteration['id']}`",
+            f"- Status: `{iteration['status']}`",
+            f"- Fixed document versions: {', '.join(iteration['input_document_versions']) or 'none'}",
+            f"- Confirmed requirements: {', '.join(iteration['requirement_ids']) or 'none'}", "",
+        ])
+        for task in tasks_by_iteration.get(iteration["id"], []):
+            lines.extend([
+                f"### {task['title']}", "", task["objective"], "",
+                f"- Task ID: `{task['id']}`", f"- Kind: `{task['kind']}`",
+                f"- Execution: `{task['execution_status']}`",
+                f"- Acceptance: `{task['acceptance_status']}`",
+                f"- Write scope: {', '.join(f'`{value}`' for value in task['write_paths']) or 'read-only'}",
+                f"- Verification commands: {', '.join(f'`{value}`' for value in task['verification_commands']) or 'none'}",
+                f"- Portable handoff: [Markdown](handoffs/{task['id']}.md) · [JSON](handoffs/{task['id']}.json)", "",
+            ])
+            for execution in executions_by_task.get(task["id"], []):
+                verification = (execution.get("raw_state") or {}).get("evidence", {}).get(
+                    "verification") or {}
+                filesystem = (execution.get("raw_state") or {}).get("evidence", {}).get(
+                    "filesystem") or {}
+                lines.extend([
+                    f"- Execution `{execution['id']}`: `{execution['status']}` via `{execution['engine']}`",
+                    f"  - Planned verification passed: `{verification.get('all_planned_passed', False)}`",
+                    f"  - File scope compliant: `{filesystem.get('scope_compliant', 'unknown')}`",
+                ])
+            lines.append("")
+    if not iterations:
+        lines.append("No iteration has been recorded.\n")
+    return "\n".join(lines)
 
 
 def _document_markdown(item):

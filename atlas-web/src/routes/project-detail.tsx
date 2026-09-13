@@ -16,8 +16,11 @@ import {
   confirmProjectRequirement,
   createProjectDecision,
   createProjectDocument,
+  createProjectIteration,
   createProjectRequirement,
+  createProjectTask,
   exportProject,
+  getProjectExecution,
   getProjectDocumentDiff,
   getProjectDocumentVersions,
   getProjectGeneration,
@@ -25,16 +28,24 @@ import {
   invalidateAtlasCache,
   listProjectGenerations,
   listWorkspaceBaselines,
+  recordProjectTaskAcceptance,
+  replyProjectExecutionPermission,
+  replyProjectExecutionQuestion,
+  startProjectExecution,
   startProjectGeneration,
+  stopProjectExecution,
+  updateProjectIterationStatus,
   updateProjectRequirement,
   type DocumentBasis,
   type ProjectDocument,
   type ProjectDocumentKind,
   type ProjectExport,
+  type ProjectExecution,
   type ProjectGenerationRun,
   type ProjectReference,
   type ProjectRequirement,
   type ProjectScope,
+  type ProjectTask,
   type ProjectWorkspace,
   type WorkspaceBaselineCheck,
   type WorkspaceBaselineSummary,
@@ -79,7 +90,7 @@ export function ProjectDetail() {
       </Link>
       <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-medium tracking-wide text-primary">U17 · M3</p>
+          <p className="text-sm font-medium tracking-wide text-primary">U17 · M4</p>
           <h1 className="mt-2 font-serif text-3xl font-medium">{data.project.name}</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">{data.project.objective}</p>
         </div>
@@ -150,8 +161,158 @@ export function ProjectDetail() {
           <DocumentForm projectId={projectId} workspace={data} onSaved={refresh} />
         </div>
       </section>
+
+      <ExecutionPanel projectId={projectId} workspace={data} onSaved={refresh} />
     </main>
   );
+}
+
+function ExecutionPanel({ projectId, workspace, onSaved }: {
+  projectId: string; workspace: ProjectWorkspace; onSaved: () => void;
+}) {
+  const { lang } = useLang();
+  const active = workspace.iterations.find((item) => item.status === "active") || null;
+  const tasks = active ? workspace.tasks.filter((item) => item.iteration_id === active.id) : [];
+  const [busy, setBusy] = useState("");
+  const [error, setError] = useState("");
+  const changeIteration = async (status: "completed" | "abandoned") => {
+    if (!active) return;
+    setBusy(status); setError("");
+    try { await updateProjectIterationStatus(projectId, active.id, status); onSaved(); }
+    catch (cause) { setError(String(cause)); } finally { setBusy(""); }
+  };
+  return <section className="mt-10">
+    <SectionTitle icon={Bot} title={lang === "zh" ? "迭代与开发执行" : "Iterations & development execution"}
+      description={lang === "zh" ? "把已确认需求、固定文档版本和已接受代码基线绑定为任务；OpenCode 负责执行，Atlas 独立记录状态、权限、文件变化和产品验收。" : "Bind confirmed requirements, fixed document versions, and an accepted code baseline into tasks. OpenCode executes while Atlas independently records state, permissions, file changes, and product acceptance."} />
+    <div className="mt-5 space-y-5">
+      {!active ? <IterationForm projectId={projectId} workspace={workspace} onSaved={onSaved} /> : <>
+        <article className="rounded-xl bg-surface p-5 shadow-card">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div><div className="flex flex-wrap items-center gap-2"><Badge tone="ok">{lang === "zh" ? `活动迭代 ${active.sequence}` : `Active iteration ${active.sequence}`}</Badge><span className="font-mono text-[11px] text-subtle">{active.id}</span></div><h3 className="mt-2 font-medium">{active.title}</h3><p className="mt-1 text-sm leading-6 text-muted">{active.objective}</p></div>
+            <div className="flex gap-2"><Button size="sm" variant="outline" disabled={Boolean(busy)} onClick={() => changeIteration("abandoned")}>{lang === "zh" ? "放弃迭代" : "Abandon"}</Button><Button size="sm" disabled={Boolean(busy) || !tasks.length} onClick={() => changeIteration("completed")}><CheckCircle2 className="size-4" />{lang === "zh" ? "完成迭代" : "Complete iteration"}</Button></div>
+          </div>
+          <IdLinks ids={active.input_document_versions} prefix={lang === "zh" ? "固定文档版本" : "Fixed document versions"} />
+          <IdLinks ids={active.requirement_ids} prefix={lang === "zh" ? "本版需求" : "Current requirements"} />
+          {error ? <p className="mt-3 text-xs text-danger">{error}</p> : null}
+        </article>
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <div className="space-y-4">
+            {tasks.map((task) => <ExecutionTaskCard key={`${task.id}:${task.updated_at}`} projectId={projectId} task={task} executions={workspace.executions.filter((item) => item.task_id === task.id)} onSaved={onSaved} />)}
+            {!tasks.length ? <Empty text={lang === "zh" ? "本迭代还没有执行任务。" : "This iteration has no execution tasks yet."} /> : null}
+          </div>
+          <TaskForm projectId={projectId} workspace={workspace} iteration={active} onSaved={onSaved} />
+        </div>
+      </>}
+      {workspace.iterations.filter((item) => item.status !== "active").length ? <details className="rounded-xl bg-surface p-5 shadow-card"><summary className="cursor-pointer text-sm text-primary">{lang === "zh" ? "历史迭代" : "Iteration history"}</summary><div className="mt-3 space-y-3">{workspace.iterations.filter((item) => item.status !== "active").map((item) => { const historicalTasks = workspace.tasks.filter((task) => task.iteration_id === item.id); return <details key={item.id} className="rounded-md bg-bg-elevated p-3"><summary className="cursor-pointer text-sm"><span className="font-medium">#{item.sequence} · {item.title}</span><span className="ml-2 text-xs text-subtle">{item.status} · {historicalTasks.length} {lang === "zh" ? "个任务" : "task(s)"}</span></summary><div className="mt-3 space-y-3">{historicalTasks.map((task) => <ExecutionTaskCard key={`${task.id}:${task.updated_at}`} projectId={projectId} task={task} executions={workspace.executions.filter((execution) => execution.task_id === task.id)} onSaved={onSaved} />)}{!historicalTasks.length ? <p className="text-xs text-subtle">{lang === "zh" ? "没有任务记录。" : "No task records."}</p> : null}</div></details>; })}</div></details> : null}
+    </div>
+  </section>;
+}
+
+function IterationForm({ projectId, workspace, onSaved }: {
+  projectId: string; workspace: ProjectWorkspace; onSaved: () => void;
+}) {
+  const { lang } = useLang();
+  const current = workspace.requirements.filter((item) => item.confirmed_scope === "current");
+  const [title, setTitle] = useState(""); const [objective, setObjective] = useState("");
+  const [documents, setDocuments] = useState<string[]>(workspace.documents.map((item) => item.version_id));
+  const [requirements, setRequirements] = useState<string[]>(current.map((item) => item.id));
+  const [saving, setSaving] = useState(false); const [error, setError] = useState("");
+  const submit = async (event: FormEvent) => { event.preventDefault(); setSaving(true); setError(""); try {
+    await createProjectIteration(projectId, { title, objective, input_document_versions: documents, requirement_ids: requirements }); onSaved();
+  } catch (cause) { setError(String(cause)); } finally { setSaving(false); } };
+  return <article className="rounded-xl bg-surface p-5 shadow-card"><form onSubmit={submit}>
+    <div className="grid gap-5 lg:grid-cols-2"><div className="space-y-4"><h3 className="font-medium">{lang === "zh" ? "建立活动迭代" : "Create active iteration"}</h3><Field label={lang === "zh" ? "迭代标题" : "Iteration title"} value={title} onChange={setTitle} required /><TextArea label={lang === "zh" ? "本轮目标" : "Iteration objective"} value={objective} onChange={setObjective} required /></div><div className="grid gap-4 sm:grid-cols-2"><Picker label={lang === "zh" ? "固定当前文档版本" : "Pin current document versions"} options={workspace.documents.map((item) => ({ key: item.version_id, label: `${item.title} · v${item.current_version}${item.review.status === "needs_review" ? ` · ${lang === "zh" ? "待复核" : "needs review"}` : ""}` }))} selected={documents} onChange={setDocuments} /><Picker label={lang === "zh" ? "固定已确认本版需求" : "Pin confirmed current requirements"} options={current.map((item) => ({ key: item.id, label: item.content }))} selected={requirements} onChange={setRequirements} /></div></div>
+    {error ? <p className="mt-3 text-xs text-danger">{error}</p> : null}<Button className="mt-5" disabled={saving || !title.trim() || !objective.trim()}><Plus className="size-4" />{lang === "zh" ? "创建并启动迭代" : "Create and activate iteration"}</Button>
+  </form></article>;
+}
+
+function TaskForm({ projectId, workspace, iteration, onSaved }: {
+  projectId: string; workspace: ProjectWorkspace; iteration: ProjectWorkspace["iterations"][number]; onSaved: () => void;
+}) {
+  const { lang } = useLang();
+  const docs = workspace.documents.filter((item) => iteration.input_document_versions.includes(item.version_id));
+  const requirements = workspace.requirements.filter((item) => iteration.requirement_ids.includes(item.id));
+  const [kind, setKind] = useState<ProjectTask["kind"]>("code"); const [title, setTitle] = useState("");
+  const [objective, setObjective] = useState(""); const [writePaths, setWritePaths] = useState("");
+  const [commands, setCommands] = useState(""); const [documentIds, setDocumentIds] = useState(docs.map((item) => item.version_id));
+  const [requirementIds, setRequirementIds] = useState(requirements.map((item) => item.id));
+  const [saving, setSaving] = useState(false); const [error, setError] = useState("");
+  const submit = async (event: FormEvent) => { event.preventDefault(); setSaving(true); setError(""); try {
+    await createProjectTask(projectId, { iteration_id: iteration.id, kind, title, objective, input_document_versions: documentIds, requirement_ids: requirementIds, write_paths: kind === "analysis" ? [] : lines(writePaths), verification_commands: lines(commands) }); setTitle(""); setObjective(""); setWritePaths(""); setCommands(""); onSaved();
+  } catch (cause) { setError(String(cause)); } finally { setSaving(false); } };
+  return <SideForm title={lang === "zh" ? "添加执行任务" : "Add execution task"} icon={Plus}><form className="space-y-4" onSubmit={submit}>
+    <label className="block text-sm"><span className="text-muted">{lang === "zh" ? "任务类型" : "Task kind"}</span><select value={kind} onChange={(event) => setKind(event.target.value as ProjectTask["kind"])} className={inputClass}><option value="code">{lang === "zh" ? "代码修改" : "Code change"}</option><option value="document">{lang === "zh" ? "项目文档" : "Project document"}</option><option value="analysis">{lang === "zh" ? "只读分析" : "Read-only analysis"}</option></select></label>
+    <Field label={lang === "zh" ? "任务标题" : "Task title"} value={title} onChange={setTitle} required /><TextArea label={lang === "zh" ? "明确目标" : "Concrete objective"} value={objective} onChange={setObjective} required />
+    {kind !== "analysis" ? <TextArea label={lang === "zh" ? "允许写入路径（每行一个）" : "Allowed write paths (one per line)"} value={writePaths} onChange={setWritePaths} required /> : null}
+    <TextArea label={lang === "zh" ? "固定验证命令（每行一个）" : "Fixed verification commands (one per line)"} value={commands} onChange={setCommands} />
+    <Picker label={lang === "zh" ? "任务文档" : "Task documents"} options={docs.map((item) => ({ key: item.version_id, label: `${item.title} v${item.current_version}` }))} selected={documentIds} onChange={setDocumentIds} /><Picker label={lang === "zh" ? "任务需求" : "Task requirements"} options={requirements.map((item) => ({ key: item.id, label: item.content }))} selected={requirementIds} onChange={setRequirementIds} />
+    {error ? <p className="text-xs text-danger">{error}</p> : null}<Button className="w-full" disabled={saving || !title.trim() || !objective.trim() || (kind !== "analysis" && !lines(writePaths).length)}>{lang === "zh" ? "保存任务" : "Save task"}</Button>
+  </form></SideForm>;
+}
+
+function ExecutionTaskCard({ projectId, task, executions, onSaved }: {
+  projectId: string; task: ProjectTask; executions: ProjectExecution[]; onSaved: () => void;
+}) {
+  const { lang } = useLang();
+  const [execution, setExecution] = useState<ProjectExecution | null>(executions[0] || null);
+  const [working, setWorking] = useState(""); const [error, setError] = useState("");
+  const active = execution && ["queued", "running", "waiting_permission", "waiting_input"].includes(execution.status);
+  useEffect(() => { setExecution(executions[0] || null); }, [executions[0]?.id]);
+  useEffect(() => {
+    if (!active || !execution) return;
+    let alive = true;
+    const timer = window.setInterval(() => getProjectExecution(projectId, execution.id).then((next) => { if (!alive) return; setExecution(next); if (["completed", "failed", "stopped", "unknown"].includes(next.status)) onSaved(); }, (cause) => { if (alive) setError(String(cause)); }), 1500);
+    return () => { alive = false; window.clearInterval(timer); };
+  }, [active, execution?.id, projectId]);
+  const start = async () => { setWorking("start"); setError(""); try { setExecution(await startProjectExecution(projectId, task.id)); onSaved(); } catch (cause) { setError(String(cause)); } finally { setWorking(""); } };
+  const stop = async () => { if (!execution) return; setWorking("stop"); setError(""); try { setExecution(await stopProjectExecution(projectId, execution.id)); onSaved(); } catch (cause) { setError(String(cause)); } finally { setWorking(""); } };
+  const filesystem = execution?.raw_state.evidence?.filesystem;
+  const verification = execution?.raw_state.evidence?.verification;
+  const commandEvidence = execution?.raw_state.evidence?.tool_calls?.commands || [];
+  return <article className="rounded-xl bg-surface p-5 shadow-card">
+    <div className="flex flex-wrap items-start justify-between gap-3"><div><div className="flex flex-wrap items-center gap-2"><Badge tone={task.execution_status === "completed" ? "ok" : task.execution_status === "failed" || task.execution_status === "unknown" ? "danger" : active ? "warn" : "default"}>{executionStatus(task.execution_status, lang)}</Badge><Badge tone={task.acceptance_status === "passed" ? "ok" : task.acceptance_status === "failed" ? "danger" : "default"}>{lang === "zh" ? `验收 ${task.acceptance_status}` : `Acceptance ${task.acceptance_status}`}</Badge><span className="font-mono text-[11px] text-subtle">{task.id}</span></div><h3 className="mt-2 font-medium">{task.title}</h3><p className="mt-1 text-sm leading-6 text-muted">{task.objective}</p></div><div className="flex gap-2">{!active && task.acceptance_status === "pending" ? <Button size="sm" onClick={start} disabled={Boolean(working)}><Bot className="size-4" />{execution ? (lang === "zh" ? "新建重试执行" : "Start retry") : (lang === "zh" ? "启动 OpenCode" : "Start OpenCode")}</Button> : null}{active ? <Button size="sm" variant="outline" onClick={stop} disabled={Boolean(working)}>{lang === "zh" ? "停止" : "Stop"}</Button> : null}</div></div>
+    <div className="mt-3 grid gap-2 text-xs sm:grid-cols-3"><div className="rounded bg-bg-elevated p-3"><span className="text-subtle">{lang === "zh" ? "类型" : "Kind"}</span><p className="mt-1">{task.kind}</p></div><div className="rounded bg-bg-elevated p-3"><span className="text-subtle">{lang === "zh" ? "写入范围" : "Write scope"}</span><p className="mt-1 break-all">{task.write_paths.join(" · ") || (lang === "zh" ? "只读" : "Read only")}</p></div><div className="rounded bg-bg-elevated p-3"><span className="text-subtle">{lang === "zh" ? "验证命令" : "Verification"}</span><p className="mt-1">{task.verification_commands.length}</p></div></div>
+    {execution ? <ExecutionResult projectId={projectId} task={task} execution={execution} onChange={setExecution} onSaved={onSaved} /> : null}
+    {verification ? <div className={`mt-4 rounded-md p-4 ${verification.all_planned_passed ? "bg-ok/10" : "bg-warn/10"}`}><p className={`text-sm font-medium ${verification.all_planned_passed ? "text-ok" : "text-warn"}`}>{verification.all_planned_passed ? (lang === "zh" ? "所有固定验证命令已通过" : "All fixed verification commands passed") : (lang === "zh" ? "验证未完整通过或证据不足" : "Verification is incomplete or did not pass")}</p>{commandEvidence.map((item, index) => <details key={`${item.command}:${index}`} className="mt-2"><summary className="cursor-pointer font-mono text-xs">{item.exit === 0 ? "✓" : "!"} {item.command}</summary><pre className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap rounded bg-surface p-3 font-mono text-[11px] text-muted">{item.output || (lang === "zh" ? "没有记录输出" : "No output recorded")}</pre></details>)}</div> : null}
+    {filesystem ? <div className={`mt-4 rounded-md p-4 ${filesystem.scope_compliant ? "bg-ok/10" : "bg-danger/10"}`}><p className={`text-sm font-medium ${filesystem.scope_compliant ? "text-ok" : "text-danger"}`}>{filesystem.scope_compliant ? (lang === "zh" ? "文件变化位于声明范围内" : "File changes stayed within scope") : (lang === "zh" ? "发现超出声明范围的文件变化" : "File changes exceeded the declared scope")}</p><ChangePaths title={lang === "zh" ? "新增" : "Added"} paths={filesystem.added} /><ChangePaths title={lang === "zh" ? "修改" : "Modified"} paths={filesystem.modified} /><ChangePaths title={lang === "zh" ? "删除" : "Removed"} paths={filesystem.removed} />{filesystem.out_of_scope_changes.length ? <ChangePaths title={lang === "zh" ? "越界变化" : "Out-of-scope changes"} paths={filesystem.out_of_scope_changes} /> : null}</div> : null}
+    {execution?.raw_state.evidence?.assistant_text ? <details className="mt-4"><summary className="cursor-pointer text-sm text-primary">{lang === "zh" ? "查看引擎结果" : "View engine result"}</summary><div className="mt-3 rounded-md bg-bg-elevated p-4"><Prose md={execution.raw_state.evidence.assistant_text} /></div></details> : null}
+    {error ? <p className="mt-3 text-xs text-danger">{error}</p> : null}
+  </article>;
+}
+
+function ExecutionResult({ projectId, task, execution, onChange, onSaved }: {
+  projectId: string; task: ProjectTask; execution: ProjectExecution; onChange: (value: ProjectExecution) => void; onSaved: () => void;
+}) {
+  const { lang } = useLang(); const [working, setWorking] = useState(""); const [error, setError] = useState(""); const [evidence, setEvidence] = useState("");
+  const interaction = execution.raw_state.interaction;
+  useEffect(() => {
+    const verification = execution.raw_state.evidence?.verification;
+    if (!evidence && verification?.all_planned_passed) setEvidence(
+      lang === "zh" ? `Atlas 已记录 ${verification.successful_commands.length} 条固定验证命令通过：${verification.successful_commands.join("；")}` : `Atlas recorded ${verification.successful_commands.length} fixed verification command(s) passing: ${verification.successful_commands.join("; ")}`);
+  }, [execution.updated_at]);
+  const permission = async (reply: "once" | "always" | "reject") => { if (!interaction?.request.id) return; setWorking(reply); setError(""); try { onChange(await replyProjectExecutionPermission(projectId, execution.id, { request_id: interaction.request.id, reply })); } catch (cause) { setError(String(cause)); } finally { setWorking(""); } };
+  const accept = async (status: "passed" | "failed" | "waived") => { setWorking(status); setError(""); try { await recordProjectTaskAcceptance(projectId, task.id, { status, evidence: status === "waived" ? [] : [{ kind: "review", summary: evidence }] }); onSaved(); } catch (cause) { setError(String(cause)); } finally { setWorking(""); } };
+  return <div className="mt-4 border-t border-border pt-4">
+    <div className="flex flex-wrap items-center gap-2 text-xs"><span className="font-mono text-subtle">{execution.id}</span><span className="text-muted">OpenCode · {execution.input_state.model || "unknown model"}</span><span className="text-subtle">{execution.raw_state.engine_status || execution.status}</span></div>
+    {interaction?.type === "permission" ? <div className="mt-3 rounded-md bg-warn/10 p-4"><p className="text-sm font-medium text-warn">{lang === "zh" ? "OpenCode 等待工具权限" : "OpenCode is waiting for tool permission"}</p><p className="mt-2 break-all font-mono text-xs text-muted">{interaction.request.permission || "tool"} · {(interaction.request.patterns || []).join(" · ")}</p><div className="mt-3 flex flex-wrap gap-2"><Button size="sm" disabled={Boolean(working)} onClick={() => permission("once")}>{lang === "zh" ? "仅本次允许" : "Allow once"}</Button><Button size="sm" variant="outline" disabled={Boolean(working)} onClick={() => permission("always")}>{lang === "zh" ? "后续同类允许" : "Always allow"}</Button><Button size="sm" variant="outline" disabled={Boolean(working)} onClick={() => permission("reject")}>{lang === "zh" ? "拒绝" : "Reject"}</Button></div></div> : null}
+    {interaction?.type === "question" ? <ExecutionQuestionForm projectId={projectId} execution={execution} onChange={onChange} /> : null}
+    {["completed", "failed", "stopped"].includes(execution.status) && task.acceptance_status === "pending" ? <div className="mt-4 rounded-md border border-border p-4"><p className="text-sm font-medium">{lang === "zh" ? "产品验收仍待独立确认" : "Product acceptance still needs a separate decision"}</p><TextArea label={lang === "zh" ? "验收证据或失败原因" : "Acceptance evidence or failure reason"} value={evidence} onChange={setEvidence} /><div className="mt-3 flex flex-wrap gap-2"><Button size="sm" disabled={Boolean(working) || !evidence.trim()} onClick={() => accept("passed")}>{lang === "zh" ? "验收通过" : "Pass"}</Button><Button size="sm" variant="outline" disabled={Boolean(working) || !evidence.trim()} onClick={() => accept("failed")}>{lang === "zh" ? "验收失败" : "Fail"}</Button><Button size="sm" variant="outline" disabled={Boolean(working)} onClick={() => accept("waived")}>{lang === "zh" ? "明确免验" : "Waive"}</Button></div></div> : null}
+    {error ? <p className="mt-3 text-xs text-danger">{error}</p> : null}
+  </div>;
+}
+
+function ExecutionQuestionForm({ projectId, execution, onChange }: {
+  projectId: string; execution: ProjectExecution; onChange: (value: ProjectExecution) => void;
+}) {
+  const { lang } = useLang(); const questions = execution.raw_state.interaction?.request.questions || [];
+  const [answers, setAnswers] = useState<string[]>(questions.map(() => "")); const [working, setWorking] = useState(false); const [error, setError] = useState("");
+  const submit = async () => { const requestId = execution.raw_state.interaction?.request.id; if (!requestId) return; setWorking(true); setError(""); try { onChange(await replyProjectExecutionQuestion(projectId, execution.id, { request_id: requestId, answers: answers.map((value) => value.split(",").map((item) => item.trim()).filter(Boolean)) })); } catch (cause) { setError(String(cause)); } finally { setWorking(false); } };
+  return <div className="mt-3 rounded-md bg-warn/10 p-4"><p className="text-sm font-medium text-warn">{lang === "zh" ? "OpenCode 需要你的输入" : "OpenCode needs your input"}</p><div className="mt-3 space-y-3">{questions.map((question, index) => <div key={`${question.header}:${index}`}><p className="text-sm">{question.question}</p>{question.options.length ? <p className="mt-1 text-xs leading-5 text-muted">{question.options.map((item) => `${item.label}：${item.description}`).join(" · ")}</p> : null}<Field label={question.multiple ? (lang === "zh" ? "答案（多选用逗号分隔）" : "Answer (comma-separated for multiple)") : (lang === "zh" ? "答案" : "Answer")} value={answers[index] || ""} onChange={(value) => setAnswers((items) => items.map((item, offset) => offset === index ? value : item))} required /></div>)}</div><div className="mt-3 flex gap-2"><Button size="sm" disabled={working || answers.some((value) => !value.trim())} onClick={submit}>{lang === "zh" ? "提交答案" : "Submit answers"}</Button></div>{error ? <p className="mt-2 text-xs text-danger">{error}</p> : null}</div>;
+}
+
+function executionStatus(status: ProjectTask["execution_status"], lang: "zh" | "en") {
+  const zh: Record<ProjectTask["execution_status"], string> = { planned: "待执行", queued: "排队中", running: "执行中", waiting_permission: "等待权限", waiting_input: "等待输入", completed: "执行完成", failed: "执行失败", stopped: "已停止", unknown: "待核对" };
+  return lang === "zh" ? zh[status] : status.replaceAll("_", " ");
 }
 
 function WorkspaceBaselinePanel({ projectId, onSaved }: {

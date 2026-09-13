@@ -21,6 +21,9 @@ def project_workspace(store, project_id):
         "requirements": store.list_requirements(project_id),
         "decisions": store.list_decisions(project_id),
         "documents": store.list_documents(project_id),
+        "iterations": store.list_iterations(project_id),
+        "tasks": store.list_tasks(project_id),
+        "executions": store.list_executions(project_id),
     }
 
 

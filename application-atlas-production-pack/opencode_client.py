@@ -88,6 +88,23 @@ class OpenCodeClient:
             body["message"] = message
         return self._request("POST", f"/permission/{_identifier(request_id, 'per')}/reply", body)
 
+    def pending_questions(self):
+        return self._request("GET", "/question")
+
+    def reply_question(self, request_id: str, answers: list[list[str]]):
+        if not isinstance(answers, list) or not answers or not all(
+                isinstance(answer, list) and answer and all(
+                    isinstance(value, str) and value.strip() for value in answer)
+                for answer in answers):
+            raise ValueError("answers must contain one or more non-empty text selections")
+        return self._request(
+            "POST", f"/question/{_identifier(request_id, 'que')}/reply",
+            {"answers": answers})
+
+    def reject_question(self, request_id: str):
+        return self._request(
+            "POST", f"/question/{_identifier(request_id, 'que')}/reject", {})
+
     def reconcile(self, session_id: str, message_limit: int = 20):
         """Read current engine state after connecting or reconnecting.
 
@@ -103,6 +120,10 @@ class OpenCodeClient:
             "engine_diff": self.diff(session_id),
             "pending_permissions": [
                 item for item in self.pending_permissions()
+                if item.get("sessionID") == session_id
+            ],
+            "pending_questions": [
+                item for item in self.pending_questions()
                 if item.get("sessionID") == session_id
             ],
         }

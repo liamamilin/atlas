@@ -23,8 +23,13 @@ import draft_new
 import gate_check
 import promote_draft as promote
 from atlas_sources import SourceError, read_source, source_manifest
-from opencode_client import OpenCodeClient, iter_sse
+from opencode_client import OpenCodeClient, OpenCodeError, iter_sse
 from execution_state import project_execution
+from execution_service import (
+    create_iteration as create_execution_iteration,
+    create_task as create_execution_task,
+    reconcile_execution, start_execution,
+)
 from project_store import ProjectStore, ProjectStoreError
 from project_export import export_project
 from project_generation import (
@@ -120,10 +125,12 @@ class OpenCodeClientTests(unittest.TestCase):
             [{'info': {'id': 'msg_one'}, 'parts': []}],
             [],
             [{'id': 'per_one', 'sessionID': 'ses_abc'}, {'id': 'per_two', 'sessionID': 'ses_other'}],
+            [{'id': 'que_one', 'sessionID': 'ses_abc'}, {'id': 'que_two', 'sessionID': 'ses_other'}],
         ])
         result = self.client.reconcile('ses_abc')
         self.assertEqual(result['status']['type'], 'busy')
         self.assertEqual([item['id'] for item in result['pending_permissions']], ['per_one'])
+        self.assertEqual([item['id'] for item in result['pending_questions']], ['que_one'])
         self.assertEqual(result['engine_diff'], [])
 
     def test_permission_reply_uses_current_nondeprecated_endpoint(self):
@@ -140,6 +147,15 @@ class OpenCodeClientTests(unittest.TestCase):
         request, _ = self.requests[0]
         self.assertIn('/session/ses_abc/prompt_async', request.full_url)
         self.assertEqual(json.loads(request.data)['tools'], {'bash': True})
+
+    def test_question_reply_uses_current_endpoint_and_answer_shape(self):
+        self.responses.append(True)
+        self.assertTrue(self.client.reply_question('que_abc', [['Use SQLite'], ['Keep both']]))
+        request, _ = self.requests[0]
+        self.assertIn('/question/que_abc/reply', request.full_url)
+        self.assertEqual(json.loads(request.data), {
+            'answers': [['Use SQLite'], ['Keep both']],
+        })
 
     def test_sse_parser_and_session_filter(self):
         raw = io.BytesIO(
@@ -364,7 +380,7 @@ class ProjectStoreTests(unittest.TestCase):
         self.assertEqual(migrated.get_task('tsk_legacy')['title'], 'Task')
         self.assertIsNone(migrated.get_task('tsk_legacy')['iteration_id'])
         with sqlite3.connect(path) as con:
-            self.assertEqual(con.execute('PRAGMA user_version').fetchone()[0], 3)
+            self.assertEqual(con.execute('PRAGMA user_version').fetchone()[0], 4)
 
     def test_version_two_store_adds_document_authorship(self):
         path = self.root / 'version-two.sqlite'
@@ -396,7 +412,7 @@ class ProjectStoreTests(unittest.TestCase):
         self.assertEqual(document['author'], 'unknown')
         self.assertEqual(document['change_summary'], '')
         with sqlite3.connect(path) as con:
-            self.assertEqual(con.execute('PRAGMA user_version').fetchone()[0], 3)
+            self.assertEqual(con.execute('PRAGMA user_version').fetchone()[0], 4)
 
     def test_document_versions_are_immutable_and_conflicts_are_explicit(self):
         document = self.store.create_document(
@@ -1001,6 +1017,22 @@ class ProjectStoreTests(unittest.TestCase):
             task['id'], 'passed', [{'kind': 'test', 'summary': '42 tests passed'}])
         self.assertEqual(accepted['acceptance_status'], 'passed')
 
+    def test_workspace_allows_only_one_active_execution(self):
+        first = self.store.create_task(self.project['id'], 'First', 'First change')
+        second = self.store.create_task(self.project['id'], 'Second', 'Second change')
+        workdir = str((self.root / 'workspace').resolve())
+        active = self.store.create_execution(
+            first['id'], 'opencode', 'ses_first', workdir=workdir)
+        with self.assertRaisesRegex(ProjectStoreError, 'active execution'):
+            self.store.create_execution(
+                second['id'], 'opencode', 'ses_second', workdir=workdir)
+        self.store.update_execution(active['id'], {
+            'state': 'stopped', 'engine_status': 'idle', 'evidence': {},
+        })
+        created = self.store.create_execution(
+            second['id'], 'opencode', 'ses_second', workdir=workdir)
+        self.assertEqual(created['status'], 'queued')
+
     def test_iteration_freezes_scope_and_allows_only_one_active_iteration(self):
         requirement = self.store.create_requirement(
             self.project['id'], 'Keep exported state portable', 'current', 'Recovery')
@@ -1299,6 +1331,188 @@ class ProjectStoreTests(unittest.TestCase):
         self.assertEqual(code, 201)
         self.assertTrue(Path(exported['archive']).is_file())
         self.assertEqual(exported['manifest']['documents_needing_review'], [document['id']])
+
+
+class ExecutionServiceTests(unittest.TestCase):
+    class Client:
+        def __init__(self):
+            self.prompt = ''
+            self.mode = 'running'
+            self.permission_replies = []
+            self.created = 0
+
+        def create_session(self, title):
+            self.created += 1
+            return {'id': 'ses_execution'}
+
+        def send_message_async(self, session_id, text, provider_id, model_id, **kwargs):
+            self.prompt = text
+            self.tools = kwargs['tools']
+
+        def reconcile(self, session_id):
+            user = {'info': {'id': 'msg_user', 'role': 'user'},
+                    'parts': [{'type': 'text', 'text': self.prompt}]}
+            assistant = {'info': {'id': 'msg_answer', 'parentID': 'msg_user',
+                                  'role': 'assistant'},
+                         'parts': [{'type': 'text', 'text': 'Implemented and checked.'}]}
+            permissions = []
+            status = {'type': 'busy'}
+            if self.mode == 'completed':
+                status = {'type': 'idle'}
+                assistant['info'].update({'finish': 'stop', 'time': {'completed': 123}})
+                assistant['parts'].append({
+                    'type': 'tool', 'tool': 'bash',
+                    'state': {
+                        'status': 'completed',
+                        'input': {'command': 'python3 -m unittest'},
+                        'output': 'Ran 1 test\nOK\n',
+                        'metadata': {'exit': 0, 'truncated': False},
+                    },
+                })
+            elif self.mode == 'permission':
+                permissions = [{
+                    'id': 'per_execution', 'sessionID': session_id,
+                    'tool': {'messageID': 'msg_answer'},
+                    'permission': 'bash', 'patterns': ['python3 -m unittest'],
+                }]
+            return {'session': {'id': session_id}, 'status': status,
+                    'messages': [user, assistant], 'engine_diff': [],
+                    'pending_permissions': permissions, 'pending_questions': []}
+
+        def reply_permission(self, request_id, reply, message=None):
+            self.permission_replies.append((request_id, reply, message))
+            self.mode = 'running'
+            return True
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.workspace = self.root / 'workspace'
+        (self.workspace / 'src').mkdir(parents=True)
+        (self.workspace / 'README.md').write_text('# Pilot\n')
+        (self.workspace / 'src/app.py').write_text('VALUE = 1\n')
+        self.store = ProjectStore(self.root / 'state/projects.sqlite')
+        self.project = self.store.create_project(
+            'Execution pilot', 'Ship one bounded change', self.workspace, 'existing')
+        self.baseline = capture_project_baseline(
+            self.store, self.project['id'], ['src'])
+        self.requirement = self.store.create_requirement(
+            self.project['id'], 'Value becomes two', 'current', 'Pilot scope',
+            ['The value is two'])
+        self.store.confirm_requirement(self.requirement['id'], 'current', 'Approved')
+        self.document = self.store.create_document(
+            self.project['id'], 'current-state', 'Change plan', 'Update `src/app.py`.',
+            [{'kind': 'workspace_baseline', 'id': self.baseline['id']}])
+        self.iteration = create_execution_iteration(self.store, self.project['id'], {
+            'title': 'Iteration one', 'objective': 'Update the value',
+            'input_document_versions': [self.document['version_id']],
+            'requirement_ids': [self.requirement['id']],
+        })
+        self.task = create_execution_task(self.store, self.project['id'], {
+            'iteration_id': self.iteration['id'], 'kind': 'code',
+            'title': 'Update value', 'objective': 'Set VALUE to 2.',
+            'input_document_versions': [self.document['version_id']],
+            'requirement_ids': [self.requirement['id']],
+            'write_paths': ['src'],
+            'verification_commands': ['python3 -m unittest'],
+        })
+        self.client = self.Client()
+
+    def test_execution_freezes_inputs_and_reconciles_real_file_changes(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        self.assertEqual(execution['status'], 'running')
+        self.assertEqual(execution['input_state']['workspace_baseline']['id'],
+                         self.baseline['id'])
+        self.assertEqual(execution['input_state']['document_version_ids'],
+                         [self.document['version_id']])
+        self.assertEqual(execution['workdir'], str(self.workspace.resolve()))
+        self.assertTrue(self.client.tools['bash'])
+        self.assertIn('Allowed write paths: `src`', self.client.prompt)
+        (self.workspace / 'src/app.py').write_text('VALUE = 2\n')
+        self.client.mode = 'completed'
+        completed = reconcile_execution(
+            self.store, self.project['id'], execution['id'], self.client)
+        self.assertEqual(completed['status'], 'completed')
+        self.assertIsNotNone(completed['after_snapshot_id'])
+        self.assertEqual(completed['raw_state']['evidence']['filesystem']['modified'],
+                         ['src/app.py'])
+        self.assertTrue(completed['raw_state']['evidence']['filesystem']['scope_compliant'])
+        self.assertTrue(completed['raw_state']['evidence']['verification']['all_planned_passed'])
+        self.assertEqual(completed['raw_state']['evidence']['tool_calls']['commands'][0]['exit'], 0)
+        self.assertEqual(self.store.get_task(self.task['id'])['acceptance_status'], 'pending')
+        exported = export_project(self.store, self.project['id'])
+        self.assertEqual(exported['manifest']['schema'], 3)
+        self.assertEqual(exported['manifest']['counts']['executions'], 1)
+        with zipfile.ZipFile(exported['archive']) as bundle:
+            self.assertIn('iterations.md', bundle.namelist())
+            records = json.loads(bundle.read('execution-records.json'))
+            self.assertTrue(records['executions'][0]['raw_state']['evidence']
+                            ['verification']['all_planned_passed'])
+            self.assertIn(f"handoffs/{self.task['id']}.md", bundle.namelist())
+
+    def test_reconcile_keeps_permission_as_first_class_interaction(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        self.client.mode = 'permission'
+        waiting = reconcile_execution(
+            self.store, self.project['id'], execution['id'], self.client)
+        self.assertEqual(waiting['status'], 'waiting_permission')
+        self.assertEqual(waiting['raw_state']['interaction']['request']['id'],
+                         'per_execution')
+
+    def test_missing_engine_session_does_not_rewrite_terminal_execution(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        self.client.mode = 'completed'
+        completed = reconcile_execution(
+            self.store, self.project['id'], execution['id'], self.client)
+        projection = dict(completed['raw_state'])
+        projection['evidence'] = dict(projection['evidence'])
+        projection['evidence'].pop('verification')
+        with sqlite3.connect(self.store.path) as con:
+            con.execute(
+                'UPDATE execution SET raw_state_json=? WHERE id=?',
+                (json.dumps(projection), completed['id']))
+
+        class MissingClient:
+            def reconcile(self, _session_id):
+                raise OpenCodeError(404, 'session unavailable')
+
+        recovered = reconcile_execution(
+            self.store, self.project['id'], execution['id'], MissingClient())
+        self.assertEqual(recovered['status'], 'completed')
+        self.assertEqual(recovered['after_snapshot_id'], completed['after_snapshot_id'])
+
+    def test_out_of_scope_change_is_preserved_and_flagged(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        (self.workspace / 'README.md').write_text('# Changed outside scope\n')
+        self.client.mode = 'completed'
+        completed = reconcile_execution(
+            self.store, self.project['id'], execution['id'], self.client)
+        filesystem = completed['raw_state']['evidence']['filesystem']
+        self.assertFalse(filesystem['scope_compliant'])
+        self.assertEqual(filesystem['out_of_scope_changes'], ['README.md'])
+        self.assertEqual((self.workspace / 'README.md').read_text(),
+                         '# Changed outside scope\n')
+
+    def test_workspace_change_blocks_execution_before_engine_session(self):
+        (self.workspace / 'src/app.py').write_text('VALUE = 9\n')
+        with self.assertRaisesRegex(ProjectStoreError, 'accepted baseline'):
+            start_execution(
+                self.store, self.project['id'], self.task['id'], {}, self.client)
+        self.assertEqual(self.client.created, 0)
+
+    def test_task_boundaries_reject_analysis_writes_and_parent_paths(self):
+        with self.assertRaisesRegex(ValueError, 'analysis tasks'):
+            self.store.create_task(
+                self.project['id'], 'Inspect', 'Read only', kind='analysis',
+                write_paths=['src'])
+        with self.assertRaisesRegex(ValueError, 'inside'):
+            self.store.create_task(
+                self.project['id'], 'Escape', 'Invalid', write_paths=['../other'])
 
 
 class SamplePackageTests(unittest.TestCase):

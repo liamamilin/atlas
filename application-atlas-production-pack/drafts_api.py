@@ -43,6 +43,13 @@ Endpoints:
   GET    /api/projects/<id>/workspace-baselines
   POST   /api/projects/<id>/workspace-baselines
   GET    /api/projects/<id>/workspace-baselines/<snapshot-id>
+  POST   /api/projects/<id>/iterations
+  POST   /api/projects/<id>/iterations/<iteration-id>/status
+  POST   /api/projects/<id>/tasks
+  POST   /api/projects/<id>/tasks/<task-id>/executions
+  GET    /api/projects/<id>/executions/<execution-id>
+  POST   /api/projects/<id>/executions/<execution-id>/reconcile|stop|permission|question
+  POST   /api/projects/<id>/tasks/<task-id>/acceptance
 
 Run alongside `npm run dev` (vite proxies /api -> :5199).
 """
@@ -77,6 +84,12 @@ from project_generation import (
 from project_baseline import (
     capture_project_baseline, check_project_changes, get_project_baseline,
     list_project_baselines,
+)
+from execution_service import (
+    create_iteration as create_project_iteration,
+    create_task as create_execution_task,
+    reconcile_execution, reply_permission as reply_execution_permission,
+    reply_question as reply_execution_question, start_execution, stop_execution,
 )
 PACK = str(DATA_PACK)
 sys.path.insert(0, PACK)
@@ -166,6 +179,11 @@ def create_project(body, store=None):
         raise ValueError("workspace must be a path")
     return (store or get_project_store()).create_project(
         body["name"], body["objective"], body.get("workspace"), body["mode"])
+
+
+def _project_error_code(error):
+    message = str(error)
+    return 404 if "not found" in message or "does not belong" in message else 409
 
 
 def collect_atlas_reference(project_id, body, store=None, pack=None):
@@ -683,6 +701,17 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"error": str(error)}, 404)
             except (ValueError, json.JSONDecodeError) as error:
                 return self._json({"error": str(error)}, 400)
+        m = re.match(
+            r"^/api/projects/(prj_[A-Za-z0-9]+)/executions/(exe_[A-Za-z0-9]+)$",
+            path)
+        if m:
+            try:
+                return self._json(reconcile_execution(
+                    get_project_store(), m.group(1), m.group(2)))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, _project_error_code(error))
+            except (ValueError, RuntimeError, OSError) as error:
+                return self._json({"error": str(error)}, 503)
         m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/references$", path)
         if m:
             try:
@@ -749,6 +778,102 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = unquote(urlparse(self.path).path)
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/iterations$", path)
+        if m:
+            try:
+                return self._json(create_project_iteration(
+                    get_project_store(), m.group(1), self._body()), 201)
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, _project_error_code(error))
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
+        m = re.match(
+            r"^/api/projects/(prj_[A-Za-z0-9]+)/iterations/(itr_[A-Za-z0-9]+)/status$",
+            path)
+        if m:
+            try:
+                body = self._body()
+                if not isinstance(body, dict) or set(body) != {"status"}:
+                    raise ValueError("status is required")
+                iteration = get_project_store().get_iteration(m.group(2))
+                if iteration["project_id"] != m.group(1):
+                    raise ProjectStoreError("iteration does not belong to project")
+                return self._json(get_project_store().update_iteration_status(
+                    m.group(2), body["status"]))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, _project_error_code(error))
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/tasks$", path)
+        if m:
+            try:
+                return self._json(create_execution_task(
+                    get_project_store(), m.group(1), self._body()), 201)
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, _project_error_code(error))
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
+        m = re.match(
+            r"^/api/projects/(prj_[A-Za-z0-9]+)/tasks/(tsk_[A-Za-z0-9]+)/executions$",
+            path)
+        if m:
+            try:
+                return self._json(start_execution(
+                    get_project_store(), m.group(1), m.group(2), self._body()), 202)
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, _project_error_code(error))
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
+            except (RuntimeError, OSError) as error:
+                return self._json({"error": str(error)}, 503)
+        m = re.match(
+            r"^/api/projects/(prj_[A-Za-z0-9]+)/tasks/(tsk_[A-Za-z0-9]+)/acceptance$",
+            path)
+        if m:
+            try:
+                body = self._body()
+                if not isinstance(body, dict) or set(body) != {"status", "evidence"}:
+                    raise ValueError("status and evidence are required")
+                task = get_project_store().get_task(m.group(2))
+                if task["project_id"] != m.group(1):
+                    raise ProjectStoreError("task does not belong to project")
+                return self._json(get_project_store().record_acceptance(
+                    m.group(2), body["status"], body["evidence"]))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, _project_error_code(error))
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
+        m = re.match(
+            r"^/api/projects/(prj_[A-Za-z0-9]+)/executions/(exe_[A-Za-z0-9]+)/"
+            r"(reconcile|stop|permission|question)$", path)
+        if m:
+            try:
+                action = m.group(3)
+                if action == "reconcile":
+                    body = self._body()
+                    if body:
+                        raise ValueError("reconcile does not accept fields")
+                    result = reconcile_execution(
+                        get_project_store(), m.group(1), m.group(2))
+                elif action == "stop":
+                    body = self._body()
+                    if body:
+                        raise ValueError("stop does not accept fields")
+                    result = stop_execution(
+                        get_project_store(), m.group(1), m.group(2))
+                elif action == "permission":
+                    result = reply_execution_permission(
+                        get_project_store(), m.group(1), m.group(2), self._body())
+                else:
+                    result = reply_execution_question(
+                        get_project_store(), m.group(1), m.group(2), self._body())
+                return self._json(result)
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, _project_error_code(error))
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
+            except (RuntimeError, OSError) as error:
+                return self._json({"error": str(error)}, 503)
         m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/workspace-baselines$", path)
         if m:
             try:

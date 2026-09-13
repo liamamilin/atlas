@@ -23,12 +23,13 @@ U17 面向新想法和已有项目改进：搜索与阅读类型、应用资料�
 - [M2 生成验证](docs/U17_M2_GENERATION_VALIDATION.md)：固定输入分析、OpenCode 文档生成、严格校验和审阅后采用的实际验证结果。
 - [M3 基线验证](docs/U17_M3_BASELINE_VALIDATION.md)：项目工作区指纹、证据分层、变化范围与审阅后采用的实际验证结果。
 - [M3 改进方案验证](docs/U17_M3_IMPROVEMENT_VALIDATION.md)：改进目标、工作区证据与 Atlas 资料的固定输入，以及真实 OpenCode/浏览器闭环。
+- [M4 集成执行验证](docs/U17_M4_EXECUTION_VALIDATION.md)：项目迭代、范围化 OpenCode 任务、文件/命令证据、独立验收、重启恢复与交接导出。
 - [双场景样例](docs/u17-samples/)：新想法与已有项目改进的关联文档包。
 - [下游应用路线图](USAGE_ROADMAP.md)：U17 与其他功能的关系及历史记录。
 
-截至 2026-09-13，U17 的 M0 核心验证、M1 项目资料集、M2 固定输入分析和关联文档生成闭环，以及 M3 已有项目基线与目标驱动改进方案已完成：资料全文读取、OpenCode 可替换执行器、执行状态投影、独立项目/迭代存储、双场景文档样例和离线任务交接包已落地；网页支持项目创建与切换、统一搜索、正式资料阅读与收藏、需求推荐/确认、决定、固定输入分析、逐条采用候选、按类型生成文档草案、不可变版本、上游/基线变化复核、独立 Markdown ZIP 导出、工作区文件/Git 指纹、证据分层、变化范围、审阅后采用，以及基于局部目标的改进方案生成。M2 的批量生成/自然语言修改与 M4 正式开发执行仍在开发。当前应用的运行功能以本 README 其余章节为准。
+截至 2026-09-13，U17 的 M0–M3 与 M4 首个真实执行闭环已实现。网页除搜索、资料、需求、决定、关联文档、项目基线和改进方案外，现在可建立迭代和范围化任务，启动 OpenCode，处理权限/提问/停止状态，核对 Atlas 自有文件快照和结构化验证命令，并将产品验收与 agent 完成分开记录。项目导出包含迭代、执行证据和不依赖旧会话的交接材料。M4 的独立工作副本、结果回收和更完整的中断边界仍在实施；M2 批量生成/自然语言修改仍未完成。
 
-U17 的本地 API 提供 `GET /api/sources/<slug>` 查询正式类型资料清单，通过 `GET /api/sources/<kind>/<slug>` 按完整文档或章节分页读取；项目 API 管理项目、固定资料、需求、用户确认、决定、关联文档版本、生成运行、工作区基线、差异与导出。网页的“项目”入口可进入完整项目工作区。MCP 同步提供 `get_atlas_source_manifest` 与 `read_atlas_source`。`project_generation.py` 负责 Atlas 资料分析、按类型文档和项目改进方案的固定输入、OpenCode 隔离调用、结果校验和逐条采用；`workspace_snapshot.py` 提供文件指纹，`project_baseline.py` 负责读取覆盖范围、Git 状态、证据分层及审阅后采用。正式开发执行流程尚未实现。
+U17 的本地 API 提供正式资料全文读取，并管理项目、固定资料、需求、决定、文档版本、项目基线、生成运行、迭代、执行任务、验收与导出。`project_generation.py` 负责固定输入分析和文档/改进方案候选；`execution_service.py` 与 `opencode_runtime.py` 负责短期 OpenCode 执行后端；项目、基线、任务、文件证据和验收仍由 Atlas 独立持久化。
 
 ## 启动
 
@@ -71,7 +72,7 @@ npm run gen
 
 阅读网页、导出、离线测试不需要模型凭据。语义检索需要本地 Ollama；分类、查重及翻译会使用外部模型 API。凭据按需从 `ATLAS_API_KEY` 环境变量读取，未设置时读取本机 OpenCode 的 `~/.local/share/opencode/auth.json`。不要把凭据提交到仓库。
 
-分类模型通过 `ATLAS_ADJUDICATOR` 配置，默认 `qwen3.8-flash`；查重默认 `mimo-v2.5`。草稿生成还需要 OpenCode CLI。
+分类模型通过 `ATLAS_ADJUDICATOR` 配置，默认 `qwen3.8-flash`；查重默认 `mimo-v2.5`。草稿生成和 U17 执行还需要 OpenCode CLI。U17 默认使用 `opencode-go/mimo-v2.5`，可用 `ATLAS_EXECUTION_MODEL=provider/model` 覆盖；默认由 API 启动只监听本机的 OpenCode 子进程，也可用 `ATLAS_OPENCODE_URL=http://127.0.0.1:<port>` 连接已有本机服务。
 
 ## 入库规则
 

@@ -13,8 +13,9 @@ import uuid
 from atlas_runtime import PACK
 
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 PROJECT_MODES = {"new", "existing"}
+TASK_KINDS = {"analysis", "document", "code"}
 TASK_STATES = {"planned", "queued", "running", "waiting_permission",
                "waiting_input", "completed", "failed", "stopped", "unknown"}
 EXECUTION_STATES = TASK_STATES - {"planned"}
@@ -161,10 +162,18 @@ class ProjectStore:
     def create_task(self, project_id: str, title: str, objective: str,
                     input_document_versions: list[str] | None = None,
                     requirement_ids: list[str] | None = None,
-                    iteration_id: str | None = None) -> dict:
+                    iteration_id: str | None = None,
+                    kind: str = "code", write_paths: list[str] | None = None,
+                    verification_commands: list[str] | None = None) -> dict:
         task_id, now = _id("tsk"), _now()
         versions = input_document_versions or []
         requirements = requirement_ids or []
+        if kind not in TASK_KINDS:
+            raise ValueError("task kind must be analysis, document, or code")
+        normalized_write_paths = _relative_paths(write_paths or [], "write_paths")
+        commands = _text_list(verification_commands or [], "verification_commands", 20)
+        if kind == "analysis" and normalized_write_paths:
+            raise ValueError("analysis tasks cannot declare write paths")
         with self._transaction() as con:
             self._require_project(con, project_id)
             for version_id in versions:
@@ -192,13 +201,16 @@ class ProjectStore:
                 if not set(requirements).issubset(iteration_requirements):
                     raise ProjectStoreError("task requirement is outside iteration scope")
             con.execute("""INSERT INTO task
-                (id,project_id,iteration_id,title,objective,execution_status,acceptance_status,
+                (id,project_id,iteration_id,kind,title,objective,write_paths_json,
+                 verification_commands_json,execution_status,acceptance_status,
                  acceptance_evidence_json,input_versions_json,requirement_ids_json,
                  created_at,updated_at)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
-                (task_id, project_id, iteration_id, _required(title, "title"),
-                 _required(objective, "objective"), "planned", "pending", "[]",
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                (task_id, project_id, iteration_id, kind, _required(title, "title"),
+                 _required(objective, "objective"), _json(normalized_write_paths),
+                 _json(commands), "planned", "pending", "[]",
                  _json(versions), _json(requirements), now, now))
+            con.execute("UPDATE project SET updated_at=? WHERE id=?", (now, project_id))
         return self.get_task(task_id)
 
     def get_task(self, task_id: str) -> dict:
@@ -210,7 +222,25 @@ class ProjectStore:
         result["input_document_versions"] = json.loads(result.pop("input_versions_json"))
         result["requirement_ids"] = json.loads(result.pop("requirement_ids_json"))
         result["acceptance_evidence"] = json.loads(result.pop("acceptance_evidence_json"))
+        result["write_paths"] = json.loads(result.pop("write_paths_json"))
+        result["verification_commands"] = json.loads(
+            result.pop("verification_commands_json"))
         return result
+
+    def list_tasks(self, project_id: str, iteration_id: str | None = None) -> list[dict]:
+        with self._connect() as con:
+            self._require_project(con, project_id)
+            if iteration_id:
+                row = con.execute("SELECT 1 FROM iteration WHERE id=? AND project_id=?",
+                                  (iteration_id, project_id)).fetchone()
+                if not row:
+                    raise ProjectStoreError("iteration does not belong to project")
+                rows = con.execute("""SELECT id FROM task WHERE project_id=? AND iteration_id=?
+                    ORDER BY created_at,id""", (project_id, iteration_id)).fetchall()
+            else:
+                rows = con.execute("""SELECT id FROM task WHERE project_id=?
+                    ORDER BY created_at,id""", (project_id,)).fetchall()
+        return [self.get_task(row["id"]) for row in rows]
 
     def add_reference(self, project_id: str, source_kind: str, source_ref: str,
                       source_version: str, locator: str = "", excerpt: str = "",
@@ -437,6 +467,13 @@ class ProjectStore:
         result["requirement_ids"] = json.loads(result.pop("requirement_ids_json"))
         return result
 
+    def list_iterations(self, project_id: str) -> list[dict]:
+        with self._connect() as con:
+            self._require_project(con, project_id)
+            rows = con.execute("""SELECT id FROM iteration WHERE project_id=?
+                ORDER BY sequence DESC,id DESC""", (project_id,)).fetchall()
+        return [self.get_iteration(row["id"]) for row in rows]
+
     def update_iteration_status(self, iteration_id: str, status: str) -> dict:
         if status not in ITERATION_STATES - {"planned"}:
             raise ValueError("iteration status must be active, completed, or abandoned")
@@ -467,20 +504,31 @@ class ProjectStore:
                 if status == "active":
                     raise ProjectStoreError("project already has an active iteration") from None
                 raise
+            con.execute("UPDATE project SET updated_at=? WHERE id=?",
+                        (now, row["project_id"]))
         return self.get_iteration(iteration_id)
 
     def record_acceptance(self, task_id: str, status: str, evidence: list[dict]) -> dict:
         """Record product acceptance separately from engine execution completion."""
         if status not in ACCEPTANCE_STATES - {"pending"}:
             raise ValueError("acceptance status must be passed, failed, or waived")
+        if not isinstance(evidence, list) or not all(
+                isinstance(item, dict)
+                and isinstance(item.get("kind"), str) and item["kind"].strip()
+                and isinstance(item.get("summary"), str) and item["summary"].strip()
+                for item in evidence):
+            raise ValueError("acceptance evidence must contain kind and summary")
         if status != "waived" and not evidence:
             raise ValueError("acceptance evidence is required")
         now = _now()
         with self._transaction() as con:
-            if not con.execute("SELECT 1 FROM task WHERE id=?", (task_id,)).fetchone():
+            task = con.execute("SELECT project_id FROM task WHERE id=?", (task_id,)).fetchone()
+            if not task:
                 raise ProjectStoreError("task not found")
             con.execute("""UPDATE task SET acceptance_status=?,acceptance_evidence_json=?,
                 updated_at=? WHERE id=?""", (status, _json(evidence), now, task_id))
+            con.execute("UPDATE project SET updated_at=? WHERE id=?",
+                        (now, task["project_id"]))
         return self.get_task(task_id)
 
     def save_snapshot(self, project_id: str, snapshot: dict, phase: str,
@@ -524,12 +572,21 @@ class ProjectStore:
         return result
 
     def create_execution(self, task_id: str, engine: str, engine_session_id: str,
-                         before_snapshot_id: str | None = None) -> dict:
+                         before_snapshot_id: str | None = None,
+                         workdir: str = "", input_state: dict | None = None,
+                         capabilities: dict | None = None) -> dict:
         execution_id, now = _id("exe"), _now()
+        if (input_state is not None and not isinstance(input_state, dict)) or \
+                (capabilities is not None and not isinstance(capabilities, dict)):
+            raise ValueError("execution input_state and capabilities must be objects")
         with self._transaction() as con:
-            task = con.execute("SELECT project_id FROM task WHERE id=?", (task_id,)).fetchone()
+            task = con.execute("SELECT project_id,execution_status FROM task WHERE id=?",
+                               (task_id,)).fetchone()
             if not task:
                 raise ProjectStoreError("task not found")
+            if task["execution_status"] in {
+                    "queued", "running", "waiting_permission", "waiting_input"}:
+                raise ProjectStoreError("task already has an active execution")
             requirement_ids = json.loads(con.execute(
                 "SELECT requirement_ids_json FROM task WHERE id=?", (task_id,)).fetchone()[0])
             for requirement_id in requirement_ids:
@@ -539,18 +596,28 @@ class ProjectStore:
                     raise ProjectStoreError("task has a requirement not confirmed for current scope")
             if before_snapshot_id:
                 row = con.execute("""SELECT 1 FROM workspace_snapshot
-                    WHERE id=? AND project_id=?""", (before_snapshot_id, task["project_id"])).fetchone()
+                    WHERE id=? AND project_id=? AND task_id=? AND phase='before'""",
+                    (before_snapshot_id, task["project_id"], task_id)).fetchone()
                 if not row:
-                    raise ProjectStoreError("snapshot does not belong to project")
-            con.execute("""INSERT INTO execution
+                    raise ProjectStoreError("before snapshot does not belong to task")
+            try:
+                con.execute("""INSERT INTO execution
                 (id,task_id,engine,engine_session_id,status,before_snapshot_id,
-                 raw_state_json,created_at,updated_at)
-                VALUES (?,?,?,?,?,?,?,?,?)""",
+                 workdir,input_state_json,capabilities_json,raw_state_json,created_at,updated_at)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (execution_id, task_id, _required(engine, "engine"),
                  _required(engine_session_id, "engine_session_id"), "queued",
-                 before_snapshot_id, "{}", now, now))
+                 before_snapshot_id, _absolute_path(workdir, "workdir") if workdir else "",
+                 _json(input_state or {}), _json(capabilities or {}), "{}", now, now))
+            except sqlite3.IntegrityError as error:
+                if workdir and "execution.workdir" in str(error):
+                    raise ProjectStoreError(
+                        "workspace already has an active execution") from None
+                raise
             con.execute("UPDATE task SET execution_status='queued',updated_at=? WHERE id=?",
                         (now, task_id))
+            con.execute("UPDATE project SET updated_at=? WHERE id=?",
+                        (now, task["project_id"]))
         return self.get_execution(execution_id)
 
     def update_execution(self, execution_id: str, projection: dict,
@@ -561,15 +628,28 @@ class ProjectStore:
             raise ValueError("invalid execution state")
         now = _now()
         with self._transaction() as con:
-            row = con.execute("""SELECT e.task_id,t.project_id FROM execution e
+            row = con.execute("""SELECT e.task_id,e.status,t.project_id FROM execution e
                 JOIN task t ON t.id=e.task_id WHERE e.id=?""", (execution_id,)).fetchone()
             if not row:
                 raise ProjectStoreError("execution not found")
+            allowed = {
+                "queued": EXECUTION_STATES,
+                "running": EXECUTION_STATES - {"queued"},
+                "waiting_permission": EXECUTION_STATES - {"queued"},
+                "waiting_input": EXECUTION_STATES - {"queued"},
+                "unknown": EXECUTION_STATES - {"queued"},
+                "completed": {"completed"},
+                "failed": {"failed"},
+                "stopped": {"stopped"},
+            }
+            if state not in allowed[row["status"]]:
+                raise ProjectStoreError("invalid execution state transition")
             if after_snapshot_id:
                 owned = con.execute("""SELECT 1 FROM workspace_snapshot
-                    WHERE id=? AND project_id=?""", (after_snapshot_id, row["project_id"])).fetchone()
+                    WHERE id=? AND project_id=? AND task_id=? AND phase='after'""",
+                    (after_snapshot_id, row["project_id"], row["task_id"])).fetchone()
                 if not owned:
-                    raise ProjectStoreError("snapshot does not belong to project")
+                    raise ProjectStoreError("after snapshot does not belong to task")
             finished_at = now if state in {"completed", "failed", "stopped"} else None
             con.execute("""UPDATE execution SET status=?,engine_message_id=COALESCE(?,engine_message_id),
                 after_snapshot_id=COALESCE(?,after_snapshot_id),raw_state_json=?,
@@ -578,6 +658,8 @@ class ProjectStore:
                  finished_at, execution_id))
             con.execute("UPDATE task SET execution_status=?,updated_at=? WHERE id=?",
                         (state, now, row["task_id"]))
+            con.execute("UPDATE project SET updated_at=? WHERE id=?",
+                        (now, row["project_id"]))
         return self.get_execution(execution_id)
 
     def get_execution(self, execution_id: str) -> dict:
@@ -587,7 +669,23 @@ class ProjectStore:
             raise ProjectStoreError("execution not found")
         result = dict(row)
         result["raw_state"] = json.loads(result.pop("raw_state_json"))
+        result["input_state"] = json.loads(result.pop("input_state_json"))
+        result["capabilities"] = json.loads(result.pop("capabilities_json"))
         return result
+
+    def list_executions(self, project_id: str, task_id: str | None = None) -> list[dict]:
+        with self._connect() as con:
+            self._require_project(con, project_id)
+            if task_id:
+                self._require_task(con, task_id, project_id)
+                rows = con.execute("""SELECT e.id FROM execution e JOIN task t ON t.id=e.task_id
+                    WHERE t.project_id=? AND e.task_id=? ORDER BY e.created_at DESC,e.id DESC""",
+                    (project_id, task_id)).fetchall()
+            else:
+                rows = con.execute("""SELECT e.id FROM execution e JOIN task t ON t.id=e.task_id
+                    WHERE t.project_id=? ORDER BY e.created_at DESC,e.id DESC""",
+                    (project_id,)).fetchall()
+        return [self.get_execution(row["id"]) for row in rows]
 
     def task_context(self, task_id: str) -> dict:
         """Return only Atlas-owned records needed to hand a task to a new engine."""
@@ -637,7 +735,7 @@ class ProjectStore:
     def _initialize(self):
         with self._transaction() as con:
             version = con.execute("PRAGMA user_version").fetchone()[0]
-            if version not in {0, 1, 2, SCHEMA_VERSION}:
+            if version not in {0, 1, 2, 3, SCHEMA_VERSION}:
                 raise ProjectStoreError(f"unsupported project store schema {version}")
             if version == 1:
                 _execute_statements(con, """
@@ -677,7 +775,10 @@ class ProjectStore:
                 CREATE TABLE IF NOT EXISTS task (
                     id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES project(id),
                     iteration_id TEXT REFERENCES iteration(id),
-                    title TEXT NOT NULL, objective TEXT NOT NULL, execution_status TEXT NOT NULL,
+                    kind TEXT NOT NULL DEFAULT 'code', title TEXT NOT NULL, objective TEXT NOT NULL,
+                    write_paths_json TEXT NOT NULL DEFAULT '[]',
+                    verification_commands_json TEXT NOT NULL DEFAULT '[]',
+                    execution_status TEXT NOT NULL,
                     acceptance_status TEXT NOT NULL, acceptance_evidence_json TEXT NOT NULL,
                     input_versions_json TEXT NOT NULL, requirement_ids_json TEXT NOT NULL,
                     created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
@@ -704,11 +805,32 @@ class ProjectStore:
                     id TEXT PRIMARY KEY, task_id TEXT NOT NULL REFERENCES task(id), engine TEXT NOT NULL,
                     engine_session_id TEXT NOT NULL, engine_message_id TEXT,
                     status TEXT NOT NULL, before_snapshot_id TEXT REFERENCES workspace_snapshot(id),
-                    after_snapshot_id TEXT REFERENCES workspace_snapshot(id), raw_state_json TEXT NOT NULL,
+                    after_snapshot_id TEXT REFERENCES workspace_snapshot(id),
+                    workdir TEXT NOT NULL DEFAULT '', input_state_json TEXT NOT NULL DEFAULT '{}',
+                    capabilities_json TEXT NOT NULL DEFAULT '{}', raw_state_json TEXT NOT NULL,
                     created_at TEXT NOT NULL, updated_at TEXT NOT NULL, finished_at TEXT);
                 CREATE UNIQUE INDEX IF NOT EXISTS one_active_iteration_per_project
                     ON iteration(project_id) WHERE status='active';
             """)
+            task_columns = {
+                row[1] for row in con.execute("PRAGMA table_info(task)").fetchall()}
+            for name, declaration in (
+                    ("kind", "TEXT NOT NULL DEFAULT 'code'"),
+                    ("write_paths_json", "TEXT NOT NULL DEFAULT '[]'"),
+                    ("verification_commands_json", "TEXT NOT NULL DEFAULT '[]'")):
+                if name not in task_columns:
+                    con.execute(f"ALTER TABLE task ADD COLUMN {name} {declaration}")
+            execution_columns = {
+                row[1] for row in con.execute("PRAGMA table_info(execution)").fetchall()}
+            for name, declaration in (
+                    ("workdir", "TEXT NOT NULL DEFAULT ''"),
+                    ("input_state_json", "TEXT NOT NULL DEFAULT '{}'"),
+                    ("capabilities_json", "TEXT NOT NULL DEFAULT '{}'")):
+                if name not in execution_columns:
+                    con.execute(f"ALTER TABLE execution ADD COLUMN {name} {declaration}")
+            con.execute("""CREATE UNIQUE INDEX IF NOT EXISTS one_active_execution_per_workdir
+                ON execution(workdir) WHERE workdir != '' AND status IN
+                ('queued','running','waiting_permission','waiting_input')""")
             version_columns = {
                 row[1] for row in con.execute("PRAGMA table_info(document_version)").fetchall()}
             if "author" not in version_columns:
@@ -919,6 +1041,39 @@ def _required(value: str, name: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{name} is required")
     return value.strip()
+
+
+def _text_list(values, name: str, maximum: int) -> list[str]:
+    if not isinstance(values, list) or len(values) > maximum:
+        raise ValueError(f"{name} must be a list of at most {maximum} entries")
+    result = []
+    for value in values:
+        text = _required(value, name)
+        if text not in result:
+            result.append(text)
+    return result
+
+
+def _relative_paths(values, name: str) -> list[str]:
+    result = []
+    for value in _text_list(values, name, 50):
+        normalized = value.replace("\\", "/").rstrip("/") or "."
+        path = Path(normalized)
+        if path.is_absolute() or ".." in path.parts:
+            raise ValueError(f"{name} must stay inside the execution workspace")
+        normalized = path.as_posix()
+        if normalized not in result:
+            result.append(normalized)
+    return result
+
+
+def _absolute_path(value: str, name: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{name} is required")
+    path = Path(value).expanduser()
+    if not path.is_absolute():
+        raise ValueError(f"{name} must be an absolute path")
+    return str(path.resolve())
 
 
 def _execute_statements(con: sqlite3.Connection, script: str):

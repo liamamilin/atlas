@@ -261,6 +261,121 @@ export interface ProjectWorkspace {
   requirements: ProjectRequirement[];
   decisions: ProjectDecision[];
   documents: ProjectDocument[];
+  iterations: ProjectIteration[];
+  tasks: ProjectTask[];
+  executions: ProjectExecution[];
+}
+
+export interface ProjectIteration {
+  id: string;
+  project_id: string;
+  sequence: number;
+  title: string;
+  objective: string;
+  status: "planned" | "active" | "completed" | "abandoned";
+  input_document_versions: string[];
+  requirement_ids: string[];
+  created_at: string;
+  updated_at: string;
+  completed_at: string | null;
+}
+
+export interface ProjectTask {
+  id: string;
+  project_id: string;
+  iteration_id: string | null;
+  kind: "analysis" | "document" | "code";
+  title: string;
+  objective: string;
+  write_paths: string[];
+  verification_commands: string[];
+  execution_status: "planned" | "queued" | "running" | "waiting_permission" | "waiting_input" | "completed" | "failed" | "stopped" | "unknown";
+  acceptance_status: "pending" | "passed" | "failed" | "waived";
+  acceptance_evidence: { kind: string; summary: string; [key: string]: unknown }[];
+  input_document_versions: string[];
+  requirement_ids: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ExecutionFilesystemEvidence {
+  added: string[];
+  modified: string[];
+  removed: string[];
+  changed: boolean;
+  write_scope: string[];
+  out_of_scope_changes: string[];
+  scope_compliant: boolean;
+}
+
+export interface ExecutionQuestion {
+  question: string;
+  header: string;
+  options: { label: string; description: string }[];
+  multiple?: boolean;
+  custom?: boolean;
+}
+
+export interface ProjectExecution {
+  id: string;
+  task_id: string;
+  engine: "opencode";
+  engine_session_id: string;
+  engine_message_id: string | null;
+  status: Exclude<ProjectTask["execution_status"], "planned">;
+  before_snapshot_id: string | null;
+  after_snapshot_id: string | null;
+  workdir: string;
+  input_state: {
+    schema?: number;
+    project_id?: string;
+    iteration_id?: string;
+    task_id?: string;
+    task_kind?: ProjectTask["kind"];
+    document_version_ids?: string[];
+    requirement_ids?: string[];
+    workspace_baseline?: { id: string; fingerprint: string; content_fingerprint: string };
+    write_paths?: string[];
+    verification_commands?: string[];
+    model?: string;
+  };
+  capabilities: Record<string, boolean>;
+  raw_state: {
+    state?: ProjectExecution["status"];
+    engine_status?: string;
+    evidence?: {
+      message_ids?: string[];
+      assistant_text?: string;
+      engine_diff?: unknown[];
+      filesystem?: ExecutionFilesystemEvidence;
+      verification?: {
+        planned_commands: string[];
+        successful_commands: string[];
+        missing_or_failed_commands: string[];
+        all_planned_passed: boolean;
+      };
+      tool_calls?: {
+        commands: { command: string; planned: boolean; status: string; exit: number | null; output: string; truncated: boolean }[];
+        file_edits: { tool: string; path: string; status: string; additions: number | null; deletions: number | null }[];
+      };
+      usage?: { cost: number; tokens: Record<string, number> };
+      error?: string;
+      detail?: string;
+    };
+    interaction?: null | {
+      type: "permission" | "question";
+      request: {
+        id: string;
+        permission?: string;
+        patterns?: string[];
+        metadata?: Record<string, unknown>;
+        questions?: ExecutionQuestion[];
+      };
+    };
+  };
+  created_at: string;
+  updated_at: string;
+  finished_at: string | null;
 }
 
 export interface WorkspaceGitState {
@@ -365,6 +480,8 @@ export interface ProjectExport {
     counts: Record<string, number>;
     workspace_baseline_id: string | null;
     workspace_baseline_fingerprint: string | null;
+    active_iteration_id: string | null;
+    unaccepted_task_ids: string[];
     unresolved_requirement_ids: string[];
     documents_needing_review: string[];
   };
@@ -706,6 +823,122 @@ export async function applyProjectGenerationItem(
 ) {
   const result = await requestJson<{ run: ProjectGenerationRun; created: ProjectRequirement | ProjectDocument }>(
     `/api/projects/${encodeURIComponent(projectId)}/generation-runs/${encodeURIComponent(runId)}/apply`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+
+export async function createProjectIteration(projectId: string, input: {
+  title: string;
+  objective: string;
+  input_document_versions: string[];
+  requirement_ids: string[];
+  activate?: boolean;
+}) {
+  const result = await requestJson<ProjectIteration>(
+    `/api/projects/${encodeURIComponent(projectId)}/iterations`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+
+export async function updateProjectIterationStatus(
+  projectId: string,
+  iterationId: string,
+  status: "active" | "completed" | "abandoned",
+) {
+  const result = await requestJson<ProjectIteration>(
+    `/api/projects/${encodeURIComponent(projectId)}/iterations/${encodeURIComponent(iterationId)}/status`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+
+export async function createProjectTask(projectId: string, input: {
+  iteration_id: string;
+  kind: ProjectTask["kind"];
+  title: string;
+  objective: string;
+  input_document_versions: string[];
+  requirement_ids: string[];
+  write_paths: string[];
+  verification_commands: string[];
+}) {
+  const result = await requestJson<ProjectTask>(
+    `/api/projects/${encodeURIComponent(projectId)}/tasks`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+
+export async function startProjectExecution(
+  projectId: string,
+  taskId: string,
+  input: { model?: string } = {},
+) {
+  const result = await requestJson<ProjectExecution>(
+    `/api/projects/${encodeURIComponent(projectId)}/tasks/${encodeURIComponent(taskId)}/executions`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+
+export async function getProjectExecution(projectId: string, executionId: string) {
+  return requestJson<ProjectExecution>(
+    `/api/projects/${encodeURIComponent(projectId)}/executions/${encodeURIComponent(executionId)}`,
+    { method: "GET" });
+}
+
+export async function stopProjectExecution(projectId: string, executionId: string) {
+  const result = await requestJson<ProjectExecution>(
+    `/api/projects/${encodeURIComponent(projectId)}/executions/${encodeURIComponent(executionId)}/stop`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: "{}",
+    });
+  invalidateAtlasCache();
+  return result;
+}
+
+export async function replyProjectExecutionPermission(
+  projectId: string,
+  executionId: string,
+  input: { request_id: string; reply: "once" | "always" | "reject"; message?: string },
+) {
+  return requestJson<ProjectExecution>(
+    `/api/projects/${encodeURIComponent(projectId)}/executions/${encodeURIComponent(executionId)}/permission`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+}
+
+export async function replyProjectExecutionQuestion(
+  projectId: string,
+  executionId: string,
+  input: { request_id: string; answers?: string[][]; reject?: boolean },
+) {
+  return requestJson<ProjectExecution>(
+    `/api/projects/${encodeURIComponent(projectId)}/executions/${encodeURIComponent(executionId)}/question`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+}
+
+export async function recordProjectTaskAcceptance(
+  projectId: string,
+  taskId: string,
+  input: { status: "passed" | "failed" | "waived"; evidence: { kind: string; summary: string }[] },
+) {
+  const result = await requestJson<ProjectTask>(
+    `/api/projects/${encodeURIComponent(projectId)}/tasks/${encodeURIComponent(taskId)}/acceptance`, {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
     });
