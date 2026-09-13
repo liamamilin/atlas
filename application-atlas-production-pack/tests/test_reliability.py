@@ -295,7 +295,7 @@ class ProjectStoreTests(unittest.TestCase):
 
     def test_project_delete_removes_owned_records_preserves_workspace_and_blocks_active_run(self):
         workspace = Path(self.project['workspace'])
-        workspace.mkdir(parents=True)
+        workspace.mkdir(parents=True, exist_ok=True)
         (workspace / 'keep.txt').write_text('source workspace stays\n')
         reference = self.store.add_reference(
             self.project['id'], 'atlas:application', 'sample', 'source-v1',
@@ -336,6 +336,12 @@ class ProjectStoreTests(unittest.TestCase):
             self.store.create_project('Invalid', 'No workspace', '  ', 'existing')
         generated = self.store.create_project('Idea', 'Start with an idea', '', 'new')
         self.assertTrue(generated['workspace'].endswith('/workspaces/' + generated['id']))
+        self.assertTrue(Path(generated['workspace']).is_dir())
+        baseline = capture_project_baseline(self.store, generated['id'])
+        self.assertEqual(baseline['inventory']['file_count'], 0)
+        explicit = self.store.create_project(
+            'Explicit idea', 'Create the requested workspace', self.root / 'new-workspace', 'new')
+        self.assertTrue(Path(explicit['workspace']).is_dir())
 
     def test_workspace_baseline_separates_evidence_and_adopts_reviewed_changes(self):
         workspace = self.root / 'workspace'
@@ -402,7 +408,7 @@ class ProjectStoreTests(unittest.TestCase):
 
     def test_workspace_focus_paths_must_exist_and_remain_inside_root(self):
         workspace = self.root / 'workspace'
-        workspace.mkdir(parents=True)
+        workspace.mkdir(parents=True, exist_ok=True)
         (workspace / 'README.md').write_text('# Pilot\n')
         with self.assertRaisesRegex(ValueError, 'inside'):
             capture_project_baseline(self.store, self.project['id'], ['../secret'])
@@ -1514,6 +1520,7 @@ class ProjectStoreTests(unittest.TestCase):
     def test_project_http_create_list_get_and_validation(self):
         import drafts_api
         handler = object.__new__(drafts_api.Handler)
+        (self.root / 'existing').mkdir()
         body = {
             'name': 'Existing code', 'objective': 'Improve it',
             'workspace': str(self.root / 'existing'), 'mode': 'existing',
@@ -1551,6 +1558,16 @@ class ProjectStoreTests(unittest.TestCase):
             idea, code = handler.do_POST()
         self.assertEqual(code, 201)
         self.assertTrue(idea['workspace'].endswith('/workspaces/' + idea['id']))
+        self.assertTrue(Path(idea['workspace']).is_dir())
+
+        handler._body = lambda: {
+            'name': 'Missing project', 'objective': 'Inspect it', 'mode': 'existing',
+            'workspace': str(self.root / 'does-not-exist'),
+        }
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            invalid_workspace, code = handler.do_POST()
+        self.assertEqual(code, 400)
+        self.assertIn('existing directory', invalid_workspace['error'])
 
     def test_project_http_starter_reference_and_confirmed_delete(self):
         import drafts_api
@@ -1589,7 +1606,7 @@ class ProjectStoreTests(unittest.TestCase):
         self.assertIn('confirm', error['error'])
 
         workspace = Path(created['workspace'])
-        workspace.mkdir(parents=True)
+        workspace.mkdir(parents=True, exist_ok=True)
         (workspace / 'keep.txt').write_text('keep\n')
         generation_root = (self.store.path.parent / 'generation-runs' /
                            created['id'] / 'gen_finished')
@@ -1605,12 +1622,15 @@ class ProjectStoreTests(unittest.TestCase):
         with self.assertRaisesRegex(ProjectStoreError, 'project not found'):
             self.store.get_project(created['id'])
 
+        workspaces_before = set((self.store.path.parent / 'workspaces').iterdir())
         with self.assertRaises(FileNotFoundError):
             drafts_api.create_project({
                 'name': 'Missing starter', 'objective': 'Must roll back', 'mode': 'new',
                 'starter_reference': {'kind': 'application', 'slug': 'missing'},
             }, store=self.store, pack=pack)
         self.assertNotIn('Missing starter', [item['name'] for item in self.store.list_projects()])
+        self.assertEqual(
+            set((self.store.path.parent / 'workspaces').iterdir()), workspaces_before)
 
     def test_workspace_baseline_http_capture_check_list_and_conflict(self):
         import drafts_api
@@ -1902,6 +1922,43 @@ class ExecutionServiceTests(unittest.TestCase):
             'verification_commands': ['python3 -m unittest'],
         })
         self.client = self.Client()
+
+    def test_iteration_requires_core_inputs_and_workspace_baseline(self):
+        with self.assertRaisesRegex(ProjectStoreError, 'document version'):
+            create_execution_iteration(self.store, self.project['id'], {
+                'title': 'Missing document', 'objective': 'Must stay blocked',
+                'input_document_versions': [],
+                'requirement_ids': [self.requirement['id']],
+            })
+        with self.assertRaisesRegex(ProjectStoreError, 'confirmed current requirement'):
+            create_execution_iteration(self.store, self.project['id'], {
+                'title': 'Missing requirement', 'objective': 'Must stay blocked',
+                'input_document_versions': [self.document['version_id']],
+                'requirement_ids': [],
+            })
+
+        no_baseline = self.store.create_project(
+            'No baseline', 'Require workspace review', self.root / 'no-baseline', 'new')
+        requirement = self.store.create_requirement(
+            no_baseline['id'], 'Keep scope explicit', 'current', 'Required')
+        self.store.confirm_requirement(requirement['id'], 'current', 'Approved')
+        document = self.store.create_document(
+            no_baseline['id'], 'development-plan', 'Plan', 'Approved plan')
+        with self.assertRaisesRegex(ProjectStoreError, 'workspace baseline'):
+            create_execution_iteration(self.store, no_baseline['id'], {
+                'title': 'Missing baseline', 'objective': 'Must stay blocked',
+                'input_document_versions': [document['version_id']],
+                'requirement_ids': [requirement['id']],
+            })
+
+    def test_failed_product_acceptance_can_start_a_new_execution(self):
+        failed = self.store.record_acceptance(
+            self.task['id'], 'failed',
+            [{'kind': 'review', 'summary': 'The visible behavior is still incorrect'}])
+        self.assertEqual(failed['acceptance_status'], 'failed')
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        self.assertEqual(execution['status'], 'running')
 
     def test_execution_freezes_inputs_and_reconciles_real_file_changes(self):
         execution = start_execution(

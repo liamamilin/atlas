@@ -187,6 +187,12 @@ def create_project(body, store=None, pack=None):
         raise ValueError("workspace is required for an existing project")
     if body.get("workspace") is not None and not isinstance(body["workspace"], str):
         raise ValueError("workspace must be a path")
+    requested_workspace = (body.get("workspace") or "").strip()
+    workspace_existed = bool(
+        requested_workspace and Path(requested_workspace).expanduser().exists())
+    if body["mode"] == "existing" and not (
+            requested_workspace and Path(requested_workspace).expanduser().is_dir()):
+        raise ValueError("workspace must be an existing directory")
     starter = body.get("starter_reference")
     if starter is not None and not isinstance(starter, dict):
         raise ValueError("starter_reference must be an object")
@@ -199,6 +205,8 @@ def create_project(body, store=None, pack=None):
                 project["id"], starter, store=project_store, pack=pack or PACK)
         except Exception:
             project_store.delete_project(project["id"])
+            if body["mode"] == "new" and not workspace_existed:
+                shutil.rmtree(project["workspace"], ignore_errors=True)
             raise
     return project
 

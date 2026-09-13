@@ -50,17 +50,30 @@ class ProjectStore:
             workspace_value = os.fspath(workspace) if workspace is not None else ""
         except TypeError:
             raise ValueError("workspace must be a path") from None
-        if not workspace_value.strip():
+        generated_workspace = not workspace_value.strip()
+        if generated_workspace:
             if mode == "existing":
                 raise ValueError("workspace is required for an existing project")
             workspace_value = str(self.path.parent / "workspaces" / project_id)
-        workspace = str(Path(workspace_value).expanduser().resolve())
-        with self._transaction() as con:
-            con.execute("""INSERT INTO project
-                (id,name,objective,workspace,mode,created_at,updated_at)
-                VALUES (?,?,?,?,?,?,?)""",
-                (project_id, _required(name, "name"), _required(objective, "objective"),
-                 workspace, mode, now, now))
+        workspace_path = Path(workspace_value).expanduser().resolve()
+        created_workspace = False
+        if mode == "new" and not workspace_path.exists():
+            workspace_path.mkdir(parents=True)
+            created_workspace = True
+        if workspace_path.exists() and not workspace_path.is_dir():
+            raise ValueError("workspace must be a directory")
+        workspace = str(workspace_path)
+        try:
+            with self._transaction() as con:
+                con.execute("""INSERT INTO project
+                    (id,name,objective,workspace,mode,created_at,updated_at)
+                    VALUES (?,?,?,?,?,?,?)""",
+                    (project_id, _required(name, "name"), _required(objective, "objective"),
+                     workspace, mode, now, now))
+        except BaseException:
+            if created_workspace:
+                workspace_path.rmdir()
+            raise
         return self.get_project(project_id)
 
     def get_project(self, project_id: str) -> dict:

@@ -2,7 +2,7 @@
 
 > 当前状态（2026-09-13）：正式语料 1,805 类型、29 大域、270 目录节点。已开始工程稳定性修复，运行与验证说明见根目录 README.md。
 > 下文保留历史方案与实验记录；历史 94.2% 不能视为当前验收结果。现有回归原始标签为 44/52，计入已确认替代标签后为 46/52（88.5%），本轮尚未重跑在线分类。
-> U17 当前设计（2026-09-13）：[产品设计](docs/U17_DESIGN.md)、[开发规划](docs/U17_DEVELOPMENT_PLAN.md)与 [M5 试点计划](docs/U17_M5_PILOT_PLAN.md)。M0–M4 已完成，下一阶段为 M5 三类完整试点；新想法与已有项目改进均纳入首版，集成现有 agent 引擎并由 Atlas 管理项目编排与验收。下文相关旧规则已修订，历史工期估算不作为本次承诺。
+> U17 当前设计（2026-09-13）：[产品设计](docs/U17_DESIGN.md)、[开发规划](docs/U17_DEVELOPMENT_PLAN.md)与 [M5 试点计划](docs/U17_M5_PILOT_PLAN.md)。M0–M4 已完成；下一步先完成最小真实开发冒烟并修复主线阻塞，再进入 M5 三类评估试点。新想法与已有项目改进均纳入首版，集成现有 agent 引擎并由 Atlas 管理项目编排与验收。下文相关旧规则已修订，历史工期估算不作为本次承诺。
 
 
 ---
@@ -482,7 +482,8 @@ atlas.json (U1 导出)
 - [x] M2：分析取舍、关联文档、人工修改、范围检查、版本、价值建议与独立导出。过程见 [M2 验证记录](docs/U17_M2_FOUNDATION_VALIDATION.md)。
 - [x] M3：已有项目基线、变更规划、外部修改核对与后续迭代。过程见 [M3 验证记录](docs/U17_M3_BASELINE_VALIDATION.md)。
 - [x] M4：一个 agent 引擎的集成、执行范围、恢复与成果回收；模拟旧会话不可访问并验证任务交接。过程见 [M4 验证记录](docs/U17_M4_EXECUTION_VALIDATION.md)。
-- [ ] M5：按 [试点计划](docs/U17_M5_PILOT_PLAN.md)完成简单新想法、已有项目改进、多类型需求三个案例和至少一次后续修改，保留普通生成对照与真实问题。
+- [ ] 核心主线：先完成一次最小真实开发冒烟并修复所有阻塞，再进入效果评估。
+- [ ] M5：按 [试点计划](docs/U17_M5_PILOT_PLAN.md)完成简单新想法、已有项目改进、多类型需求三个评估案例和至少一次后续修改，保留普通生成对照与真实问题。
 
 ### 阶段 5：产品基座 atlas-web（基于 software-map 二次开发，§3e）
 - [x] **里程碑 1：类型轴跑进 MVP 壳（✅ 2026-09-11）**：新建独立 `atlas-web/`（Vite+React+react-router，复刻 software-map 设计语言：米色纸感 token/衬线标题/Button+Badge），剥离 auth/pglite/nitro 等后端件。数据管线 `scripts/gen-data.py`：atlas.sqlite + 33 app 分类 → `public/data/`（meta.json 含 29 域导航+检索索引 / sections/*.json 113 子域 / leaves/*.json 1804 全量档案按需加载 / apps.json）。5 个页面：首页（统计+域导航）/ 浏览类型树（29 域折叠展开）/ 类型详情页（定义核心+概览+工作结构+规则+变体+关系分界+真实产品）/ 搜索 / 应用实证（33 app→类型互链）。typecheck+build 通过，dev 跑在 :5188。语料更新后 `npm run gen` 重新生成

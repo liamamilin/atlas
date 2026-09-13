@@ -42,6 +42,13 @@ def create_iteration(store, project_id: str, body: dict) -> dict:
     if not isinstance(activate, bool):
         raise ValueError("activate must be true or false")
     versions = _strings(body.get("input_document_versions"), "input_document_versions")
+    requirements = _strings(body.get("requirement_ids"), "requirement_ids")
+    if not versions:
+        raise ProjectStoreError("iteration requires at least one current document version")
+    if not requirements:
+        raise ProjectStoreError("iteration requires at least one confirmed current requirement")
+    if not latest_project_baseline(store, project_id):
+        raise ProjectStoreError("iteration requires an accepted workspace baseline")
     current = {item["version_id"]: item for item in store.list_documents(project_id)}
     for version_id in versions:
         document = current.get(version_id)
@@ -54,7 +61,7 @@ def create_iteration(store, project_id: str, body: dict) -> dict:
     return store.create_iteration(
         project_id, body.get("title"), body.get("objective"),
         versions,
-        _strings(body.get("requirement_ids"), "requirement_ids"),
+        requirements,
         activate)
 
 
@@ -77,7 +84,7 @@ def start_execution(store, project_id: str, task_id: str, body: dict,
     task, project = _task_project(store, project_id, task_id)
     previous_executions = store.list_executions(project_id, task_id)
     previous_result = previous_executions[0] if previous_executions else None
-    if task["acceptance_status"] != "pending":
+    if task["acceptance_status"] in {"passed", "waived"}:
         raise ProjectStoreError("accepted tasks cannot start another execution")
     if task["kind"] in {"code", "document"} and not task["write_paths"]:
         raise ProjectStoreError("a mutating execution requires at least one write path")
@@ -241,7 +248,7 @@ def continue_execution(store, project_id: str, execution_id: str, body: dict,
     previous, task, project = _execution_context(store, project_id, execution_id)
     if previous["status"] not in TERMINAL_STATES or not previous.get("after_snapshot_id"):
         raise ProjectStoreError("only a finished execution can be continued")
-    if task["acceptance_status"] != "pending":
+    if task["acceptance_status"] in {"passed", "waived"}:
         raise ProjectStoreError("accepted tasks cannot continue execution")
     newest = store.list_executions(project_id, task["id"])
     if not newest or newest[0]["id"] != execution_id:
