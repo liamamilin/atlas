@@ -12,13 +12,13 @@ import threading
 import time
 import urllib.request
 
-PACK = os.path.dirname(os.path.abspath(__file__))
+from atlas_runtime import PACK as DATA_PACK, api_key, corpus_lock
+PACK = str(DATA_PACK)
 DB = os.path.join(PACK, "atlas", "atlas.sqlite")
 OUT = os.path.join(PACK, "atlas", "rels-zh.jsonl")
 STATE = os.path.join(PACK, "atlas", "relszh-state.json")
 OLLAMA = "http://localhost:11434/api/chat"
 API = "https://opencode.ai/zen/go/v1/chat/completions"
-KEY = json.load(open(os.path.expanduser("~/.local/share/opencode/auth.json")))["opencode-go"]["key"]
 PROMPT_V = "v2"
 
 PROMPT = """把下列关系分界说明翻译成中文，只输出一个JSON对象 {{"items":[...]}}，不要输出思考过程。
@@ -43,7 +43,7 @@ def call_api(prompt):
             "temperature": 0.1, "max_tokens": 4000}
     r = json.load(urllib.request.urlopen(urllib.request.Request(
         API, json.dumps(body).encode(),
-        {"Authorization": f"Bearer {KEY}", "Content-Type": "application/json",
+        {"Authorization": f"Bearer {api_key()}", "Content-Type": "application/json",
          "x-opencode-session": "atlas-rels", "User-Agent": "atlas/1.0"}), timeout=600))
     return (r["choices"][0]["message"].get("content") or "").strip()
 
@@ -68,7 +68,7 @@ def parse_out(txt):
     return items
 
 
-def main():
+def _main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--engine", choices=["local", "api"], required=True)
     ap.add_argument("--start", type=int, default=1)
@@ -136,6 +136,11 @@ def main():
     log.write(f"=== {args.engine} DONE {n[0]} in {(time.time()-t0)/60:.1f}min ===\n")
     log.close()
     print("DONE", n[0])
+
+
+def main():
+    with corpus_lock(PACK):
+        _main()
 
 
 if __name__ == "__main__":

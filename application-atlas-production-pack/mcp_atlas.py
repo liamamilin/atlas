@@ -13,9 +13,9 @@ import urllib.request
 import numpy as np
 from mcp.server.fastmcp import FastMCP
 
-PACK = os.path.dirname(os.path.abspath(__file__))
+from atlas_runtime import PACK as DATA_PACK
+PACK = str(DATA_PACK)
 DB = os.path.join(PACK, "atlas", "atlas.sqlite")
-KEY = json.load(open(os.path.expanduser("~/.local/share/opencode/auth.json")))["opencode-go"]["key"]
 
 mcp = FastMCP("application-atlas")
 

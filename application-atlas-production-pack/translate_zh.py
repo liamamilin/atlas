@@ -11,7 +11,8 @@ import threading
 import time
 import urllib.request
 
-PACK = os.path.dirname(os.path.abspath(__file__))
+from atlas_runtime import PACK as DATA_PACK, api_key, corpus_lock
+PACK = str(DATA_PACK)
 DB = os.path.join(PACK, "atlas", "atlas.sqlite")
 STATE = os.path.join(PACK, "atlas", "translate-state.json")
 OUTL = os.path.join(PACK, "atlas", "translations.jsonl")
@@ -20,8 +21,6 @@ API = "https://opencode.ai/zen/go/v1/chat/completions"
 MODEL = "mimo-v2.5"
 WORKERS = 12
 
-with open(os.path.expanduser("~/.local/share/opencode/auth.json")) as f:
-    KEY = json.load(f)["opencode-go"]["key"]
 
 PROMPT = """你是软件分类学翻译。将以下软件应用类型的信息翻译成中文，只输出JSON，不要输出思考过程：
 {{"name_zh": "类型名的中文市场通用叫法，保留英文缩写如CRM", "aliases_zh": ["中文市场别名1", "别名2"], "l0_zh": "defining core 的忠实中文翻译，保留精确性与结构"}}
@@ -46,7 +45,7 @@ def translate(name, dc, retries=2):
     body = {"model": MODEL,
             "messages": [{"role": "user", "content": PROMPT.format(name=name, dc=dc)}],
             "temperature": 0.1, "max_tokens": 2500}
-    headers = {"Authorization": f"Bearer {KEY}", "Content-Type": "application/json",
+    headers = {"Authorization": f"Bearer {api_key()}", "Content-Type": "application/json",
                "x-opencode-session": "atlas-translate",
                "User-Agent": "atlas-translate/1.0 (curl-compatible)"}
     for attempt in range(retries + 1):
@@ -67,7 +66,7 @@ def translate(name, dc, retries=2):
     return None
 
 
-def main():
+def _main():
     con = sqlite3.connect(DB)
     rows = con.execute("SELECT slug, name, defining_core, overview FROM leaf ORDER BY order_idx").fetchall()
     con.close()
@@ -127,6 +126,11 @@ def main():
     save_state(st)
     out_f.close()
     print(f"ALL DONE. ok {len(st['done'])}, failed {len(st['failed'])}", flush=True)
+
+
+def main():
+    with corpus_lock(PACK):
+        _main()
 
 
 if __name__ == "__main__":

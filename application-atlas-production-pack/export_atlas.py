@@ -18,9 +18,13 @@ import os
 import re
 import sqlite3
 import sys
+import tempfile
+from datetime import datetime, timezone
+from atlas_runtime import corpus_lock, publish_files, recover_publication
 from collections import Counter, defaultdict
 
-PACK = os.path.dirname(os.path.abspath(__file__))
+from atlas_runtime import PACK as DATA_PACK, api_key
+PACK = str(DATA_PACK)
 APPS = os.path.join(PACK, "applications")
 RESEARCH = os.path.join(PACK, "research")
 LOGS = os.path.join(PACK, "logs")
@@ -284,24 +288,33 @@ def parse_status():
 
 
 # ---------------------------------------------------------------- build
-def main():
+def build(output_dir):
     tree, dir_leaves, dups = parse_directory()
     print(f"directory: {len(tree)} sections, {len(dir_leaves)} leaf entries, {len(dups)} duplicate names")
 
     status = parse_status()
+    old_models = {}
+    live_db = os.path.join(OUT, "atlas.sqlite")
+    if os.path.exists(live_db):
+        with sqlite3.connect(live_db) as old:
+            old_models = dict(old.execute("SELECT slug, model FROM leaf"))
 
     docs = {}
     files = sorted(f for f in os.listdir(APPS) if f.endswith(".md"))
     for f in files:
         slug = f[:-3]
         docs[slug] = parse_leaf(slug, read(os.path.join(APPS, f)))
+        docs[slug]["model"] = docs[slug]["model"] or old_models.get(slug, "")
     print(f"parsed {len(docs)} leaf documents")
 
     # match directory entries to slugs
     unresolved = []
     dir_index = {}
     for e in dir_leaves:
-        slug = slugify(e["name"])
+        parts = [part.strip() for part in e["name"].split(" / ")]
+        options = [slugify(" / ".join(parts[:n])) for n in range(len(parts), 0, -1)]
+        options += [slugify(part) for part in parts]
+        slug = next((s for s in options if s in docs), options[0])
         if slug in docs:
             e["slug"] = slug
             dir_index[slug] = e
@@ -317,6 +330,9 @@ def main():
         print(f"orphan docs (no directory node): {len(orphans)}")
         for o in orphans[:20]:
             print("  ORPHAN:", o)
+
+    if unresolved or orphans or dups or len(dir_index) != len(dir_leaves):
+        raise ValueError("目录与正文不一致，停止导出；请修正缺失、孤立或重复条目")
 
     # relation histogram (raw + canonical closed enumeration)
     rel_counter = Counter()
@@ -356,9 +372,7 @@ def main():
     print(f"relations total {total_rel}, resolved {resolved_rel}, unmapped {total_rel - resolved_rel}")
 
     # ---------------------------------------------------------------- sqlite
-    db_path = os.path.join(OUT, "atlas.sqlite")
-    if os.path.exists(db_path):
-        os.remove(db_path)
+    db_path = os.path.join(output_dir, "atlas.sqlite")
     con = sqlite3.connect(db_path)
     cur = con.cursor()
     cur.executescript("""
@@ -459,9 +473,14 @@ def main():
         ("relations_unmapped", sum(unmapped.values())),
         ("duplicate_directory_names", json.dumps(dups)),
         ("model_counts", json.dumps(Counter(d["model"] or "unknown" for d in docs.values()))),
-        ("generated", "2026-09-10"),
+        ("generated", datetime.now(timezone.utc).isoformat()),
     ])
+    preserve_aux(con, live_db)
+    from import_zh import import_translations
+    import_translations(con, PACK)
     con.commit()
+    if con.execute("PRAGMA quick_check").fetchone()[0] != "ok":
+        raise RuntimeError("新数据库完整性检查失败")
     con.close()
 
     # ---------------------------------------------------------------- json
@@ -487,7 +506,7 @@ def main():
     j["meta"] = {"leaves": len(docs), "relations": len(j["relations"]),
                  "unmapped_directory_names": unresolved,
                  "model_counts": Counter(d["model"] or "unknown" for d in docs.values())}
-    with open(os.path.join(OUT, "atlas.json"), "w") as f:
+    with open(os.path.join(output_dir, "atlas.json"), "w") as f:
         json.dump(j, f, ensure_ascii=False)
 
     # unmapped targets for the dangling-reference register
@@ -495,7 +514,39 @@ def main():
         for name, c in unmapped.most_common():
             f.write(f"{c:6d}  {name}\n")
 
-    print(f"sqlite -> {db_path}")
+    return db_path, os.path.join(output_dir, "atlas.json")
+
+
+def preserve_aux(con, old_path):
+    """Keep vectors only when their input fields are unchanged."""
+    if not os.path.exists(old_path):
+        return
+    con.commit()
+    con.execute("ATTACH DATABASE ? AS previous", (old_path,))
+    tables = {r[0] for r in con.execute("SELECT name FROM previous.sqlite_master WHERE type='table'")}
+    if "embedding" in tables:
+        con.execute("CREATE TABLE embedding (slug TEXT PRIMARY KEY, model TEXT, dim INTEGER, vec BLOB)")
+        con.execute("""INSERT INTO embedding
+            SELECT e.* FROM previous.embedding e JOIN previous.leaf old ON e.slug=old.slug
+            JOIN leaf new ON new.slug=e.slug
+            WHERE coalesce(old.name,'')=coalesce(new.name,'')
+              AND coalesce(old.name_zh,'')=coalesce(new.name_zh,'')
+              AND coalesce(old.overview,'')=coalesce(new.overview,'')
+              AND coalesce(old.defining_core,'')=coalesce(new.defining_core,'')
+              AND coalesce(old.l0_zh,'')=coalesce(new.l0_zh,'')""")
+    con.commit()
+    con.execute("DETACH DATABASE previous")
+
+
+def main():
+    os.makedirs(LOGS, exist_ok=True)
+    with corpus_lock(PACK):
+        recover_publication(PACK)
+        with tempfile.TemporaryDirectory(prefix=".export-", dir=OUT) as temp:
+            db, graph = build(temp)
+            publish_files([(graph, os.path.join(OUT, "atlas.json")),
+                           (db, os.path.join(OUT, "atlas.sqlite"))], PACK)
+    print(f"sqlite -> {os.path.join(OUT, 'atlas.sqlite')}")
     print(f"json   -> {os.path.join(OUT, 'atlas.json')}")
 
 

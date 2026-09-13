@@ -18,9 +18,11 @@ import os
 import re
 import sys
 
-PACK = os.path.dirname(os.path.abspath(__file__))
+from atlas_runtime import PACK as DATA_PACK
+PACK = str(DATA_PACK)
 sys.path.insert(0, PACK)
 from leaf_lint import lint
+from atlas_runtime import atomic_write
 
 DRAFTS = os.path.join(PACK, "drafts")
 PROMPT = os.path.join(PACK, "drafts_prompt.md")
@@ -46,9 +48,8 @@ def collision(desc):
     """Free vector top-5 against the corpus (no LLM). Returns [(slug, name_zh, sim)]."""
     try:
         from classify import candidates
-        import numpy as np
         pool, sims = candidates(desc, k=10)
-        return [(s, float(sims[i])) for i, s in enumerate(pool[:5])]
+        return [(s, float(sims[s])) for s in pool[:5]]
     except Exception as e:
         print(f"[collision check unavailable: {e}]", file=sys.stderr)
         return []
@@ -88,7 +89,7 @@ def refresh_front(slug, status, extra=""):
     text = re.sub(r"^status: .*$", f"status: {status}", text, count=1, flags=re.M)
     if extra:
         text = re.sub(r"^---\n", f"---\n{extra}\n", text, count=1)
-    open(p, "w", encoding="utf-8").write(text)
+    atomic_write(p, text)
 
 
 def assemble(slug):

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Prose } from "@/components/prose";
 import { Loading, ErrorBox } from "@/components/loaders";
 import { useLang, t, type Lang } from "@/lib/lang";
+import { invalidateAtlasCache } from "@/lib/atlas";
 import { cn } from "@/lib/utils";
 
 interface DraftItem {
@@ -41,6 +42,8 @@ interface DraftDetail {
   };
   collision: [string, number][];
   review: {
+    current?: boolean;
+    final_slug?: string;
     verdict?: string;
     best?: string | null;
     reason?: string;
@@ -78,7 +81,7 @@ function useDrafts() {
       alive = false;
     };
   }, [reload]);
-  const generating = state.data?.some((d) => d.status === "generating") ?? false;
+  const generating = state.data?.some((d) => ["generating", "promoting"].includes(d.status)) ?? false;
   useEffect(() => {
     if (!generating) return;
     const id = setInterval(() => {
@@ -292,6 +295,9 @@ function CreateForm({ onDone }: { onDone: () => void }) {
 export function DraftDetailPage({ slug }: { slug: string }) {
   const { lang } = useLang();
   const { data, error, loading, refetch } = useAsyncDraft(slug);
+  useEffect(() => {
+    if (data?.review.promoted) invalidateAtlasCache();
+  }, [data?.review.promoted]);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const [msg, setMsg] = useState("");
   if (loading) return <Loading />;
@@ -305,6 +311,7 @@ export function DraftDetailPage({ slug }: { slug: string }) {
       body: JSON.stringify({ body: bodyRef.current.value }),
     });
     setMsg(r.ok ? t("draftSaved", lang) : `HTTP ${r.status}`);
+    if (r.ok) refetch();
   };
   const del = async () => {
     if (!confirm(t("draftDelConfirm", lang))) return;
@@ -472,11 +479,14 @@ function VerdictPanel({
   onChanged: () => void;
 }) {
   const rv = data.review;
-  const canPromote = data.front.status === "draft" && data.lint.ok;
-  const [action, setAction] = useState<"new" | "merge">("new");
+  const ready = data.front.status === "draft" && data.lint.ok;
+  const [action, setAction] = useState<"new" | "merge">(rv.verdict === "same" || rv.verdict === "variant" ? "merge" : "new");
   const { data: sections } = useAsyncSections();
   const [section, setSection] = useState(rv.section_hint ?? "");
   const [into, setInto] = useState(rv.best ?? "");
+  const canPromote = ready && rv.current && (action === "new"
+    ? rv.verdict === "new" && Boolean(section)
+    : (rv.verdict === "same" || rv.verdict === "variant") && into === rv.best);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const verdictLabel: Record<string, { zh: string; en: string }> = {
@@ -508,7 +518,7 @@ function VerdictPanel({
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-muted">{t("draftVerdict", lang)}</p>
         {rv.promoted ? (
-          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+          <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", rv.gate_ok === false ? "bg-danger/10 text-danger" : "bg-primary/10 text-primary")}>
             {t("draftPromoted", lang)} {rv.gate ? `· gate ${rv.gate}` : ""}
           </span>
         ) : (
@@ -518,7 +528,9 @@ function VerdictPanel({
         )}
       </div>
       {!canPromote && !rv.promoted ? (
-        <p className="mt-1 text-xs text-subtle">{t("draftPromoteLocked", lang)}</p>
+        <p className="mt-1 text-xs text-subtle">{!ready ? t("draftPromoteLocked", lang) : !rv.current
+          ? (lang === "zh" ? "请先对当前正文重新查重。" : "Run deduplication on the current draft first.")
+          : (lang === "zh" ? "请选择与查重裁决一致的操作和目标。" : "Choose the action and target approved by deduplication.")}</p>
       ) : null}
       {rv.verdict ? (
         <div className="mt-2 text-xs text-muted">
@@ -534,13 +546,13 @@ function VerdictPanel({
             </>
           ) : null}
           {rv.reason ? <span> — {rv.reason}</span> : null}
-          {rv.promote_error ? <p className="mt-1 text-danger">{rv.promote_error}</p> : null}
-          {err ? <p className="mt-1 text-danger">{err}</p> : null}
         </div>
       ) : (
         <p className="mt-1 text-xs text-subtle">{t("draftNoVerdict", lang)}</p>
       )}
-      {!rv.promoted && canPromote ? (
+      {rv.promote_error || err ? <p className="mt-2 text-xs text-danger">{err || rv.promote_error}</p> : null}
+      {rv.promoted && rv.final_slug ? <Link className="mt-2 block text-sm text-primary" to={`/types/${rv.final_slug}`}>{lang === "zh" ? "查看正式类型" : "View published type"}</Link> : null}
+      {!rv.promoted && ready ? (
         <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
           <label className="flex items-center gap-1">
             <input
@@ -628,7 +640,7 @@ function useAsyncDraft(slug: string) {
       alive = false;
     };
   }, [slug, reload]);
-  const generating = state.data?.front.status === "generating";
+  const generating = ["generating", "promoting"].includes(state.data?.front.status ?? "");
   useEffect(() => {
     if (!generating) return;
     const id = setInterval(() => {

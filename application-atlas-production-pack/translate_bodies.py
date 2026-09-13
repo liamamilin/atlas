@@ -17,7 +17,8 @@ import threading
 import time
 import urllib.request
 
-PACK = os.path.dirname(os.path.abspath(__file__))
+from atlas_runtime import PACK as DATA_PACK, api_key, corpus_lock
+PACK = str(DATA_PACK)
 DB = os.path.join(PACK, "atlas", "atlas.sqlite")
 OUT = os.path.join(PACK, "atlas", "body-zh.jsonl")
 STATE = os.path.join(PACK, "atlas", "bodyzh-state.json")
@@ -25,7 +26,6 @@ LOG = os.path.join(PACK, "logs", "translate-bodies.log")
 PROMPT_V = "v2"
 OLLAMA = "http://localhost:11434/api/chat"
 API = "https://opencode.ai/zen/go/v1/chat/completions"
-KEY = json.load(open(os.path.expanduser("~/.local/share/opencode/auth.json")))["opencode-go"]["key"]
 
 PROMPT = """把下列软件类型档案翻译成中文，只输出一个JSON对象（键与输入完全相同），不要输出思考过程。
 规则：
@@ -79,7 +79,7 @@ def call_local(prompt):
 def call_api(prompt):
     body = {"model": "mimo-v2.5", "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.1, "max_tokens": 6000}
-    headers = {"Authorization": f"Bearer {KEY}", "Content-Type": "application/json",
+    headers = {"Authorization": f"Bearer {api_key()}", "Content-Type": "application/json",
                "x-opencode-session": "atlas-translate-body",
                "User-Agent": "atlas-translate/1.0 (curl-compatible)"}
     r = json.load(urllib.request.urlopen(urllib.request.Request(
@@ -108,7 +108,7 @@ def translate_one(slug, fields, engine, tries):
     return None
 
 
-def main():
+def _main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--engine", choices=["local", "api"], required=True)
     ap.add_argument("--start", type=int, default=1)
@@ -173,6 +173,11 @@ def main():
     log.write(f"=== {args.engine} DONE {n[0]} in {(time.time()-t0)/60:.1f}min ===\n")
     log.close()
     print("DONE", n[0])
+
+
+def main():
+    with corpus_lock(PACK):
+        _main()
 
 
 if __name__ == "__main__":

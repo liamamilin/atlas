@@ -10,14 +10,15 @@ import re
 import sys
 import urllib.request
 
-PACK = os.path.dirname(os.path.abspath(__file__))
+from atlas_runtime import PACK as DATA_PACK
+PACK = str(DATA_PACK)
 sys.path.insert(0, PACK)
 import classify as C
 from draft_new import DRAFTS
 from leaf_lint import parse_front
 from drafts_api import draft_path
 
-KEY = C.KEY
+from atlas_runtime import api_key
 MODEL = os.environ.get("ATLAS_DEDUP_MODEL", "mimo-v2.5")
 
 PROMPT = """你是软件类型语料库的查重裁决者。判断「新提案」与已有类型的关系。
@@ -51,12 +52,13 @@ def dc_excerpt(body, n=900):
 def judge(slug):
     front, body = parse_front(open(os.path.join(DRAFTS, slug + ".md"), encoding="utf-8").read())
     desc = front.get("desc", "")
-    pool, sims = C.candidates(desc + "\n" + body[:400], k=10)
+    state = C.snapshot()
+    pool, sims = C.candidates(desc + "\n" + body[:400], k=10, state=state)
     cands = []
     for s in pool:
-        nz, txt = C._leaf_info.get(s) or ("", "")
-        cands.append(f"- {s} [子域 {con_sec(s)}]（{nz}）: {txt[:160]}")
-    bd = C._pairwise(pool)
+        nz, txt = state.leaf_info.get(s) or ("", "")
+        cands.append(f"- {s} [子域 {state.sections.get(s, '')}]（{nz}）: {txt[:160]}")
+    bd = C._pairwise(pool, state)
     prompt = PROMPT.format(
         name=front.get("name", slug), name_zh=front.get("name_zh", ""), desc=desc,
         dc=dc_excerpt(body), cands="\n".join(cands), bounds=("\n" + bd if bd else "（无）"))
@@ -65,7 +67,7 @@ def judge(slug):
                 "temperature": 0.1, "max_tokens": 3000}
     r = json.load(urllib.request.urlopen(urllib.request.Request(
         "https://opencode.ai/zen/go/v1/chat/completions", json.dumps(body_msg).encode(),
-        {"Authorization": f"Bearer {KEY}", "Content-Type": "application/json",
+        {"Authorization": f"Bearer {api_key()}", "Content-Type": "application/json",
          "x-opencode-session": "atlas-dedupe", "User-Agent": "atlas-dedupe/1.0"}), timeout=300))
     msg = r["choices"][0]["message"]
     txt = (msg.get("content") or "").strip()
@@ -76,16 +78,6 @@ def judge(slug):
                                             "reason": txt[:200], "section_hint": None}
     out["pool"] = pool[:5]
     return out
-
-
-_con = None
-def con_sec(slug):
-    global _con
-    if _con is None:
-        import sqlite3
-        _con = sqlite3.connect(C.DB, check_same_thread=False)
-    row = _con.execute("SELECT section_id FROM leaf WHERE slug=?", (slug,)).fetchone()
-    return row[0] if row else ""
 
 
 if __name__ == "__main__":

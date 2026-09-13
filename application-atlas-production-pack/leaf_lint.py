@@ -7,11 +7,13 @@ the structure export_atlas.py can parse. Exit 0 = lint clean, 1 = errors.
 Usage: python3 leaf_lint.py <file.md> [--json]
 """
 import json
+from pathlib import Path
 import os
 import re
 import sys
 
-PACK = os.path.dirname(os.path.abspath(__file__))
+from atlas_runtime import PACK as DATA_PACK
+PACK = str(DATA_PACK)
 RESEARCH = os.path.join(PACK, "research")
 
 SECTION_RE = re.compile(r"^##\s+(.+)$", re.M)
@@ -53,7 +55,7 @@ def parse_front(text):
 
 def lint(path):
     errors, warnings = [], []
-    raw = open(path, encoding="utf-8").read()
+    raw = Path(path).read_text(encoding="utf-8")
     front, body = parse_front(raw)
 
     for k in REQUIRED_FRONT:
@@ -123,7 +125,7 @@ def lint(path):
     if not rp:
         warnings.append("无 Boundary Findings/Uncertainties 文件（建议补 research/<slug>.md 或 drafts/<slug>.research.md）")
     else:
-        rt = open(rp, encoding="utf-8").read()
+        rt = Path(rp).read_text(encoding="utf-8")
         if "Boundary Findings" not in rt:
             warnings.append("research 文件缺 Boundary Findings")
         if "Uncertainties" not in rt:

@@ -28,7 +28,9 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, unquote
 
-PACK = os.path.dirname(os.path.abspath(__file__))
+from atlas_runtime import PACK as DATA_PACK, api_key, atomic_write, corpus_lock, recover_publication
+from review_store import load_review, update_review, fingerprint, corpus_revision, review_current, valid_slug
+PACK = str(DATA_PACK)
 sys.path.insert(0, PACK)
 from leaf_lint import lint, parse_front
 import draft_new as dn
@@ -40,6 +42,8 @@ REVIEW = os.path.join(DRAFTS, "review.json")
 
 GEN_LOCK = threading.Semaphore(2)          # max concurrent engine runs
 GEN_THREADS = {}
+PROMOTE_LOCK = threading.Lock()
+PROMOTE_THREADS = set()
 
 # ---- 模型生成身份（英文名/中文名/一句话想法，创建时 name/desc 可不填） ----
 ID_MODEL = os.environ.get("ATLAS_DEDUP_MODEL", "mimo-v2.5")
@@ -80,8 +84,7 @@ def gen_identity(desc, link):
                     desc=desc or "（无）", link=link or "（无）", extra=extra)}],
                 "temperature": 0.3, "max_tokens": 3000}
     try:
-        key = json.load(open(os.path.expanduser(
-            "~/.local/share/opencode/auth.json")))["opencode-go"]["key"]
+        key = api_key()
         r = json.load(urllib.request.urlopen(urllib.request.Request(
             "https://opencode.ai/zen/go/v1/chat/completions", json.dumps(body_msg).encode(),
             {"Authorization": f"Bearer {key}", "Content-Type": "application/json",
@@ -104,12 +107,12 @@ def gen_identity(desc, link):
 
 
 def draft_path(slug):
-    return os.path.join(DRAFTS, slug + ".md")
+    return os.path.join(DRAFTS, valid_slug(slug) + ".md")
 
 
 def list_drafts():
     out = []
-    rv_all = load_review()
+    rv_all = load_review(PACK)
     for f in sorted(os.listdir(DRAFTS)):
         if not f.endswith(".md") or f.endswith(".research.md") or \
                 f.endswith(".body.md") or f.endswith(".zh.md"):
@@ -171,22 +174,16 @@ def read_draft(slug):
             zh = json.load(open(zp, encoding="utf-8"))
         except Exception:
             zh = None
-    desc = (front.get("desc") or "").strip()
-    rv = load_review().get(slug, {})
+    rv = load_review(PACK).get(slug, {})
     ident = rv.get("identity") or {}
     if ident.get("verdict") in ("same", "variant") and not rv.get("verdict"):
         rv = {**rv, "verdict": ident["verdict"], "best": ident.get("best"),
               "reason": ident.get("reason")}
-    if desc:
-        top = dn.collision(desc)
-    elif rv.get("collision"):
-        top = rv["collision"]
-    else:
-        top = []
+    top = rv.get("top") or rv.get("collision") or []
     return {"slug": slug, "front": front, "body": body, "research": research,
             "research_zh": research_zh, "zh": zh,
             "lint": lint(p), "collision": top or [],
-            "review": rv, "progress": draft_progress(slug)}
+            "review": {**rv, "current": review_current(slug, rv, PACK)}, "progress": draft_progress(slug)}
 
 
 def list_sections():
@@ -218,8 +215,7 @@ def translate_research(slug):
     if not os.path.exists(rp):
         return False
     research = open(rp, encoding="utf-8").read()
-    key = json.load(open(os.path.expanduser(
-        "~/.local/share/opencode/auth.json")))["opencode-go"]["key"]
+    key = api_key()
     body_msg = {"model": ID_MODEL,
                 "messages": [{"role": "user",
                               "content": RESEARCH_PROMPT.format(research=research)}],
@@ -275,26 +271,14 @@ def translate_draft(slug):
 def run_promote(slug, action, kw):
     try:
         import promote_draft as pd
-        if os.path.exists(draft_path(slug)):
-            front, _ = parse_front(open(draft_path(slug), encoding="utf-8").read())
-            final = dn.slugify(front.get("name") or slug)
-            if final != slug and not dn.slug_taken(final):
-                dn.rename_draft(slug, final)
-                rv = load_review()
-                if slug in rv:
-                    rv[final] = rv.pop(slug)
-                    save_review(rv)
-                slug = final
-        if action == "new":
-            pd.promote_new(slug, kw["section"])
-        else:
-            pd.promote_merge(slug, kw["into"])
-    except Exception as e:
-        rv = load_review()
-        rv[slug] = {**rv.get(slug, {}), "promote_error": str(e)}
-        save_review(rv)
+        pd.promote(slug, action, kw["section"] if action == "new" else kw["into"])
+    except Exception as error:
+        update_review(slug, {"promote_error": str(error)}, PACK)
         if os.path.exists(draft_path(slug)):
             dn.refresh_front(slug, "draft")
+    finally:
+        PROMOTE_THREADS.discard(slug)
+        PROMOTE_LOCK.release()
 
 
 def save_body(slug, body):
@@ -303,18 +287,8 @@ def save_body(slug, body):
         return False
     text = open(p, encoding="utf-8").read()
     m = re.match(r"\A---\n.*?\n---\n", text, re.S)
-    open(p, "w", encoding="utf-8").write((m.group(0) if m else "") + body)
+    atomic_write(p, (m.group(0) if m else "") + body)
     return True
-
-
-def load_review():
-    if os.path.exists(REVIEW):
-        return json.load(open(REVIEW, encoding="utf-8"))
-    return {}
-
-
-def save_review(rv):
-    json.dump(rv, open(REVIEW, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
 
 def apply_identity(slug):
@@ -326,10 +300,8 @@ def apply_identity(slug):
             ident = json.load(open(ip, encoding="utf-8"))
         except Exception:
             ident = {}
-    rv = load_review()
     if ident.get("verdict") in ("same", "variant"):
-        rv[slug] = {**rv.get(slug, {}), "identity": ident}
-        save_review(rv)
+        update_review(slug, {"identity": ident}, PACK)
         dn.refresh_front(slug, "failed",
                          extra=f"dedupe: 引擎调研判定 {ident.get('verdict')} / {ident.get('best')}: "
                                f"{ident.get('reason', '')[:120]}")
@@ -362,8 +334,7 @@ def apply_identity(slug):
         text = re.sub(r"^# .*$", f"# {m.group(1).strip()}", text, count=1, flags=re.M)
     open(draft_path(slug), "w", encoding="utf-8").write(text)
     top = dn.collision(desc) if desc else []
-    rv[slug] = {**rv.get(slug, {}), "identity": ident or None, "collision": top}
-    save_review(rv)
+    update_review(slug, {"identity": ident or None, "collision": top}, PACK)
     if os.path.exists(ip):
         os.remove(ip)
     return None
@@ -382,11 +353,13 @@ def _run_engine(slug):
     idea = {"slug": slug, "name": front.get("name", slug), "name_zh": front.get("name_zh", ""),
             "desc": front.get("desc", ""), "link": front.get("link", "")}
     from drafts_engines import get_engine
-    eng, _ = get_engine(front.get("engine") or None)
+    cfg = json.load(open(dn.ENGINES_CFG)) if os.path.exists(dn.ENGINES_CFG) else {}
+    eng, _ = get_engine(front.get("engine") or cfg.get("engine"))
+    model = front.get("model") or cfg.get("model")
     log_path = os.path.join(DRAFTS, slug + ".opencode.log")
     try:
         with GEN_LOCK:
-            ok = eng.generate(idea, PROMPT, WORKDIR, log_path, model=front.get("model") or None)
+            ok = eng.generate(idea, PROMPT, WORKDIR, log_path, model=model)
     except Exception as e:
         ok = False
         with open(log_path, "ab") as log:
@@ -428,13 +401,13 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = unquote(urlparse(self.path).path)
         if path == "/api/health":
-            return self._json({"ok": True, "generating": sorted(GEN_THREADS)})
+            return self._json({"ok": True, "generating": sorted(GEN_THREADS), "promoting": sorted(PROMOTE_THREADS)})
         if path == "/api/drafts":
             return self._json(list_drafts())
         if path == "/api/sections":
             return self._json(list_sections())
         if path == "/api/review":
-            return self._json(load_review())
+            return self._json(load_review(PACK))
         m = re.match(r"^/api/drafts/([\w-]+)$", path)
         if m:
             d = read_draft(m.group(1))
@@ -449,6 +422,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(res, code)
         if path == "/api/dedupe":
             slug = self._body().get("slug", "")
+            try:
+                valid_slug(slug)
+            except ValueError as error:
+                return self._json({"error": str(error)}, 400)
             p = draft_path(slug)
             if not os.path.exists(p):
                 return self._json({"error": "not found"}, 404)
@@ -456,6 +433,10 @@ class Handler(BaseHTTPRequestHandler):
             if not (front.get("desc") or "").strip():
                 return self._json(
                     {"error": "主张（desc）为空：等引擎调研定名后再查重"}, 409)
+            if front.get("status") in ("promoting", "generating"):
+                return self._json({"error": "等待当前任务结束后再查重"}, 409)
+            before = fingerprint(slug, PACK)
+            revision = corpus_revision(PACK)
             top = dn.collision(front["desc"])
             verdict = {}
             try:
@@ -463,12 +444,11 @@ class Handler(BaseHTTPRequestHandler):
                 verdict = judge(slug)
             except Exception as e:
                 verdict = {"verdict": "error", "reason": str(e)}
-            rv = load_review()
             import datetime
-            rv[slug] = {**rv.get(slug, {}), "deduped_at":
-                        datetime.datetime.now().strftime("%Y-%m-%dT%H:%M"),
-                        "top": top, **verdict}
-            save_review(rv)
+            if before != fingerprint(slug, PACK) or revision != corpus_revision(PACK):
+                return self._json({"error": "查重期间草稿或语料已更新，请重试"}, 409)
+            update_review(slug, {"deduped_at": datetime.datetime.now().isoformat(),
+                "top": top, **verdict, "draft_fingerprint": before, "corpus_revision": revision}, PACK)
             return self._json({"slug": slug, "top": top, "verdict": verdict})
         m = re.match(r"^/api/drafts/([\w-]+)/translate$", path)
         if m:
@@ -480,24 +460,24 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"slug": slug, "translating": True}, 202)
         if path == "/api/promote":
             b = self._body()
-            slug = b.get("slug", "")
-            action = b.get("action", "")
-            p = draft_path(slug)
-            if not os.path.exists(p):
-                return self._json({"error": "not found"}, 404)
-            if action not in ("new", "merge"):
-                return self._json({"error": "action 必须是 new|merge"}, 400)
-            if action == "new" and not b.get("section"):
-                return self._json({"error": "缺少目标子域 section"}, 400)
-            if action == "merge" and not b.get("into"):
-                return self._json({"error": "缺少并入目标 into"}, 400)
-            front, _ = parse_front(open(p, encoding="utf-8").read())
-            r = lint(p)
-            if r["errors"]:
-                return self._json({"error": "lint 未通过，先修正正文", "errors": r["errors"]}, 409)
-            dn.refresh_front(slug, "promoting")
-            th = threading.Thread(target=run_promote, args=(slug, action, b), daemon=True)
-            th.start()
+            slug, action = b.get("slug", ""), b.get("action", "")
+            import promote_draft as pd
+            try:
+                front, _, _ = pd.validate_promotion(slug, action, b.get("section") if action == "new" else b.get("into"))
+                if front.get("status") != "draft":
+                    return self._json({"error": "该草稿已有入库任务正在运行"}, 409)
+            except (ValueError, FileNotFoundError) as error:
+                return self._json({"error": str(error)}, 409)
+            if not PROMOTE_LOCK.acquire(blocking=False):
+                return self._json({"error": "已有入库任务正在运行"}, 409)
+            try:
+                dn.refresh_front(slug, "promoting")
+                PROMOTE_THREADS.add(slug)
+                threading.Thread(target=run_promote, args=(slug, action, b), daemon=True).start()
+            except Exception:
+                PROMOTE_THREADS.discard(slug)
+                PROMOTE_LOCK.release()
+                raise
             return self._json({"slug": slug, "status": "promoting"}, 202)
         self._json({"error": "no route"}, 404)
 
@@ -536,11 +516,17 @@ class Handler(BaseHTTPRequestHandler):
     def do_PUT(self):
         path = unquote(urlparse(self.path).path)
         m = re.match(r"^/api/drafts/([\w-]+)$", path)
-        if m and save_body(m.group(1), self._body().get("body", "")):
+        if m:
             slug = m.group(1)
-            r = lint(draft_path(slug))
-            front, _ = parse_front(open(draft_path(slug), encoding="utf-8").read())
-            status = "failed" if r["errors"] else front.get("status", "draft")
+            path = draft_path(slug)
+            if not os.path.exists(path):
+                return self._json({"error": "not found"}, 404)
+            front, _ = parse_front(open(path, encoding="utf-8").read())
+            if front.get("status") in ("promoting", "generating", "promoted"):
+                return self._json({"error": "当前状态不允许编辑"}, 409)
+            save_body(slug, self._body().get("body", ""))
+            r = lint(path)
+            status = "failed" if r["errors"] else "draft"
             dn.refresh_front(slug, status,
                              extra=f"lint_errors: {len(r['errors'])}\nlint_warnings: {len(r['warnings'])}")
             return self._json({"slug": slug, "lint": r, "status": status})
@@ -551,9 +537,14 @@ class Handler(BaseHTTPRequestHandler):
         m = re.match(r"^/api/drafts/([\w-]+)$", path)
         if m:
             slug = m.group(1)
+            path = draft_path(slug)
+            if os.path.exists(path):
+                front, _ = parse_front(open(path, encoding="utf-8").read())
+                if front.get("status") in ("promoting", "generating"):
+                    return self._json({"error": "任务执行期间不能删除草稿"}, 409)
             removed = []
             for suffix in (".md", ".research.md", ".zh.json", ".opencode.log",
-                           ".identity.json"):
+                           ".identity.json", ".research.zh.md", ".body.md"):
                 p = os.path.join(DRAFTS, slug + suffix)
                 if os.path.exists(p):
                     os.remove(p)
@@ -566,5 +557,11 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=5199)
     args = ap.parse_args()
+    with corpus_lock(PACK):
+        recover_publication(PACK)
+        for item in list_drafts():
+            if item["status"] == "promoting":
+                dn.refresh_front(item["slug"], "draft")
+                update_review(item["slug"], {"promote_error": "上次入库中断，请重新查重后重试"}, PACK)
     print(f"drafts API on :{args.port}  (drafts dir: {DRAFTS})")
     ThreadingHTTPServer(("127.0.0.1", args.port), Handler).serve_forever()

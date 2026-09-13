@@ -1,15 +1,21 @@
-const cache = new Map<string, Promise<unknown>>();
+const cache = new Map<string, { promise: Promise<unknown>; expires: number }>();
+
+export function invalidateAtlasCache() {
+  cache.clear();
+}
 
 export function fetchJson<T>(url: string): Promise<T> {
-  let p = cache.get(url);
-  if (!p) {
-    p = fetch(url).then((r) => {
-      if (!r.ok) throw new Error(`${r.status} ${url}`);
-      return r.json() as Promise<T>;
-    });
-    cache.set(url, p);
-  }
-  return p as Promise<T>;
+  const entry = cache.get(url);
+  if (entry && entry.expires > Date.now()) return entry.promise as Promise<T>;
+  const promise = fetch(url, { cache: "no-cache" }).then((response) => {
+    if (!response.ok) throw new Error(`${response.status} ${url}`);
+    return response.json() as Promise<T>;
+  });
+  cache.set(url, { promise, expires: Date.now() + 15000 });
+  promise.catch(() => {
+    if (cache.get(url)?.promise === promise) cache.delete(url);
+  });
+  return promise;
 }
 
 export interface LeafIndexItem {
@@ -73,6 +79,8 @@ export interface LeafDetail {
   variants_zh?: string;
   products: string;
   products_zh?: string;
+  sources?: string;
+  full_md?: string;
   relations: { to: string; toName: string; kind: string; distinction: string; distinction_zh?: string }[];
   apps: { slug: string; name: string }[];
 }

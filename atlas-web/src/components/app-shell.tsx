@@ -1,9 +1,13 @@
-import { NavLink, Link, Outlet } from "react-router-dom";
+import { NavLink, Link, Outlet, useLocation } from "react-router-dom";
+import { getMeta } from "@/lib/atlas";
+import { useAsync } from "@/components/loaders";
 import { cn } from "@/lib/utils";
 import { useLang, t } from "@/lib/lang";
 
 export function AppShell() {
   const { lang, setLang } = useLang();
+  const location = useLocation();
+  const { data: meta } = useAsync(getMeta, [location.pathname]);
   return (
     <div className="min-h-dvh">
       <header className="sticky top-0 z-20 border-b border-border bg-bg/90 backdrop-blur">
@@ -30,7 +34,7 @@ export function AppShell() {
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-3 text-xs text-subtle">
-            <span>{t("headerNote", lang)}</span>
+            <span>{t("headerNote", lang, { n: meta?.leafCount ?? "…" })}</span>
             <button
               type="button"
               onClick={() => setLang(lang === "zh" ? "en" : "zh")}
@@ -43,7 +47,7 @@ export function AppShell() {
       </header>
       <Outlet />
       <footer className="mt-16 border-t border-border py-8 text-center text-xs text-subtle">
-        Application Atlas · {t("footer", lang)}
+        {t("footer", lang, { n: meta?.leafCount ?? "…" })}
       </footer>
     </div>
   );

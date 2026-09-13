@@ -7,7 +7,8 @@ import time
 import urllib.request
 import numpy as np
 
-PACK = os.path.dirname(os.path.abspath(__file__))
+from atlas_runtime import PACK as DATA_PACK, api_key, corpus_lock
+PACK = str(DATA_PACK)
 DB = os.path.join(PACK, "atlas", "atlas.sqlite")
 OLLAMA = "http://localhost:11434/api/embed"
 BATCH = 32
@@ -35,7 +36,7 @@ def compose(name, name_zh, ov, dc, l0):
     return text[:6000]
 
 
-def main():
+def _main():
     con = sqlite3.connect(DB)
     cur = con.cursor()
     cur.execute("""CREATE TABLE IF NOT EXISTS embedding (
@@ -59,6 +60,11 @@ def main():
             print(f"[{i+len(chunk)}/{len(todo)}] rate {rate*60:.0f}/min ETA {eta:.1f}min", flush=True)
     con.close()
     print(f"EMBED DONE in {(time.time()-t0)/60:.1f} min", flush=True)
+
+
+def main():
+    with corpus_lock(PACK):
+        _main()
 
 
 if __name__ == "__main__":

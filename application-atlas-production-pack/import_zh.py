@@ -1,49 +1,49 @@
 #!/usr/bin/env python3
-"""Import zh translations (body-zh.jsonl, rels-zh.jsonl, section-zh.json) into atlas.sqlite.
-Idempotent: drops & recreates tables. Rerun after batches complete."""
+"""Import persisted translations. Safe to import as a module; no API calls."""
 import json
-import os
 import sqlite3
+from pathlib import Path
+from atlas_runtime import PACK, corpus_lock
 
-PACK = os.path.dirname(os.path.abspath(__file__))
-DB = os.path.join(PACK, "atlas", "atlas.sqlite")
-con = sqlite3.connect(DB)
-cols = [r[1] for r in con.execute("PRAGMA table_info(section)")]
-if "name_zh" not in cols:
-    con.execute("ALTER TABLE section ADD COLUMN name_zh TEXT")
-con.execute("DROP TABLE IF EXISTS leaf_zh_body")
-con.execute("DROP TABLE IF EXISTS rel_zh")
-con.execute("""CREATE TABLE leaf_zh_body (slug TEXT PRIMARY KEY, overview_zh TEXT, how_zh TEXT,
-               rules_zh TEXT, variants_zh TEXT, products_zh TEXT, engine TEXT)""")
-con.execute("""CREATE TABLE rel_zh (from_slug TEXT, to_name TEXT, distinction_zh TEXT, PRIMARY KEY(from_slug, to_name))""")
 
-n_ok = n_err = 0
-for line in open(os.path.join(PACK, "atlas", "body-zh.jsonl"), encoding="utf-8"):
-    r = json.loads(line)
-    if "error" in r:
-        n_err += 1
-        continue
-    con.execute("INSERT OR REPLACE INTO leaf_zh_body VALUES (?,?,?,?,?,?,?)",
-                (r["slug"], r["overview"], r["how"], r["rules"], r["variants"], r["products"], r["engine"]))
-    n_ok += 1
-
-n_rel = 0
-rels_path = os.path.join(PACK, "atlas", "rels-zh.jsonl")
-if os.path.exists(rels_path):
-    for line in open(rels_path, encoding="utf-8"):
-        r = json.loads(line)
-        if "error" in r:
-            n_err += 1
+def import_translations(con, pack=PACK):
+    atlas = Path(pack) / "atlas"
+    if "name_zh" not in {r[1] for r in con.execute("PRAGMA table_info(section)")}:
+        con.execute("ALTER TABLE section ADD COLUMN name_zh TEXT")
+    con.execute("""CREATE TABLE IF NOT EXISTS leaf_zh_body
+        (slug TEXT PRIMARY KEY, overview_zh TEXT, how_zh TEXT, rules_zh TEXT,
+         variants_zh TEXT, products_zh TEXT, engine TEXT)""")
+    con.execute("""CREATE TABLE IF NOT EXISTS rel_zh
+        (from_slug TEXT, to_name TEXT, distinction_zh TEXT, PRIMARY KEY(from_slug,to_name))""")
+    slugs = {r[0] for r in con.execute("SELECT slug FROM leaf")}
+    for path, kind in [(atlas / "body-zh.jsonl", "body"), (atlas / "rels-zh.jsonl", "relations")]:
+        if not path.exists():
             continue
-        for it in r["items"]:
-            con.execute("INSERT OR REPLACE INTO rel_zh VALUES (?,?,?)", (r["slug"], it["to"], it["zh"]))
-            n_rel += 1
+        with path.open(encoding="utf-8") as stream:
+            for line in stream:
+                r = json.loads(line)
+                if "error" in r or r["slug"] not in slugs:
+                    continue
+                if kind == "body":
+                    con.execute("INSERT OR REPLACE INTO leaf_zh_body VALUES (?,?,?,?,?,?,?)",
+                        (r["slug"], r["overview"], r["how"], r["rules"], r["variants"], r["products"], r["engine"]))
+                else:
+                    con.executemany("INSERT OR REPLACE INTO rel_zh VALUES (?,?,?)",
+                        [(r["slug"], it["to"], it["zh"]) for it in r["items"]])
+    sections = atlas / "section-zh.json"
+    if sections.exists():
+        for section in json.loads(sections.read_text()):
+            con.execute("UPDATE section SET name_zh=? WHERE id=?", (section.get("name_zh"), section["id"]))
+    con.execute("DELETE FROM leaf_zh_body WHERE slug NOT IN (SELECT slug FROM leaf)")
+    con.execute("DELETE FROM rel_zh WHERE from_slug NOT IN (SELECT slug FROM leaf)")
 
-sec_n = 0
-sec_path = os.path.join(PACK, "atlas", "section-zh.json")
-if os.path.exists(sec_path):
-    for s in json.load(open(sec_path)):
-        con.execute("UPDATE section SET name_zh=? WHERE id=?", (s.get("name_zh"), s["id"]))
-        sec_n += 1
-con.commit()
-print(f"leaf_zh_body={n_ok} (err {n_err}), rel_zh={n_rel}, sections={sec_n}")
+
+def main():
+    with corpus_lock(PACK):
+        with sqlite3.connect(PACK / "atlas/atlas.sqlite") as con:
+            import_translations(con)
+            print("Translations imported")
+
+
+if __name__ == "__main__":
+    main()

@@ -97,6 +97,18 @@ export function Leaf() {
       ) : null}
 
       {relKindsBlock(data.relations, relKinds, lang)}
+      {data.sources ? (
+        <section className="mt-8">
+          <h2 className="font-serif text-xl font-medium">{lang === "zh" ? "资料来源" : "Sources"}</h2>
+          <Prose md={data.sources} className="mt-3 text-sm" />
+        </section>
+      ) : null}
+      {data.full_md ? (
+        <details className="mt-8 rounded-xl bg-surface p-5 shadow-card">
+          <summary className="cursor-pointer font-medium">{lang === "zh" ? "完整英文档案" : "Complete English document"}</summary>
+          <Prose md={data.full_md} className="mt-4" />
+        </details>
+      ) : null}
     </main>
   );
 }

@@ -18,7 +18,7 @@ export function Home() {
         <div className="mx-auto max-w-3xl px-4 py-16 md:py-24">
           <p className="text-sm font-medium tracking-wide text-primary">{t("heroKicker", lang)}</p>
           <h1 className="mt-3 font-serif text-4xl font-medium leading-[1.15] tracking-tight md:text-5xl">
-            {t("heroTitle", lang)}
+            {t("heroTitle", lang, { n: meta?.leafCount ?? "…" })}
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-muted md:text-lg">
             {t("heroP", lang)}
