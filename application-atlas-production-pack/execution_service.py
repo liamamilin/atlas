@@ -1,6 +1,7 @@
 """Project-scoped execution orchestration for U17's OpenCode backend."""
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 import shutil
@@ -184,12 +185,14 @@ def reconcile_execution(store, project_id: str, execution_id: str,
             current.get("messages") or [], execution_id)
         projection = project_execution(current, message_id)
         projection["interaction"] = _interaction(current, projection)
-        projection["evidence"]["assistant_text"] = _assistant_text(
-            current.get("messages") or [], message_id)
+        assistant_text = _assistant_text(current.get("messages") or [], message_id)
+        projection["evidence"]["assistant_text"] = assistant_text
         projection["evidence"]["engine_diff"] = current.get("engine_diff") or []
         projection["evidence"].update(_execution_evidence(
             current.get("messages") or [], message_id,
             task["verification_commands"]))
+        projection["evidence"]["completion_report"] = _completion_report(
+            assistant_text, task["requirement_ids"])
         if projection["state"] in TERMINAL_STATES:
             return _finish(store, project_id, execution, projection, message_id)
         return store.update_execution(execution_id, projection, message_id)
@@ -401,6 +404,16 @@ def render_execution_prompt(execution_id: str, context: dict, workdir: str) -> s
             ])
     else:
         lines.extend(["No document version is bound to this task.", ""])
+    lines.extend([
+        "## Required structured completion report", "",
+        "End the final response with one compact JSON line beginning exactly `ATLAS_RESULT: `.",
+        "Use this schema and do not wrap the line in a code fence:", "",
+        '`ATLAS_RESULT: {"schema":1,"requirements":[{"id":"req_...","status":"satisfied|unsatisfied|not_checked","evidence":["concrete evidence"]}],"unfinished":["item"],"deviations":["item"]}`',
+        "", "Include every bound requirement exactly once and no other requirement IDs.",
+        "Use empty arrays when there are no unfinished items or deviations.",
+        "This report is agent-supplied evidence; Atlas will validate its shape but will not treat it as product acceptance.",
+        "",
+    ])
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -517,6 +530,58 @@ def _execution_evidence(messages: list[dict], task_message_id: str | None,
         },
         "usage": {"cost": cost, "tokens": tokens},
     }
+
+
+def _completion_report(text: str, requirement_ids: list[str]) -> dict:
+    empty = {"reported": False, "valid": False, "error": "missing",
+             "requirements": [], "unfinished": [], "deviations": []}
+    line = next((value.strip() for value in reversed(text.splitlines())
+                 if value.strip().startswith("ATLAS_RESULT: ")), None)
+    if not line:
+        return empty
+    result = {**empty, "reported": True}
+    try:
+        payload = json.loads(line[len("ATLAS_RESULT: "):])
+    except (TypeError, ValueError):
+        result["error"] = "invalid_json"
+        return result
+    if not isinstance(payload, dict) or set(payload) != {
+            "schema", "requirements", "unfinished", "deviations"} \
+            or payload.get("schema") != 1:
+        result["error"] = "invalid_shape"
+        return result
+    requirements = payload.get("requirements")
+    unfinished, deviations = payload.get("unfinished"), payload.get("deviations")
+    if not isinstance(requirements, list) or not _short_strings(unfinished) \
+            or not _short_strings(deviations):
+        result["error"] = "invalid_shape"
+        return result
+    normalized = []
+    for item in requirements:
+        if not isinstance(item, dict) or set(item) != {"id", "status", "evidence"} \
+                or item.get("status") not in {"satisfied", "unsatisfied", "not_checked"} \
+                or not isinstance(item.get("id"), str) \
+                or not _short_strings(item.get("evidence")) \
+                or (item.get("status") != "not_checked" and not item.get("evidence")):
+            result["error"] = "invalid_requirement"
+            return result
+        normalized.append({"id": item["id"], "status": item["status"],
+                           "evidence": item["evidence"]})
+    reported_ids = [item["id"] for item in normalized]
+    if len(reported_ids) != len(set(reported_ids)) or set(reported_ids) != set(requirement_ids):
+        result["error"] = "requirement_ids_mismatch"
+        return result
+    result.update({
+        "valid": True, "error": "", "requirements": normalized,
+        "unfinished": unfinished, "deviations": deviations,
+    })
+    return result
+
+
+def _short_strings(value) -> bool:
+    return isinstance(value, list) and len(value) <= 100 and all(
+        isinstance(item, str) and item.strip() and len(item) <= 4000
+        for item in value)
 
 
 def _task_message_id(messages: list[dict], execution_id: str) -> str | None:

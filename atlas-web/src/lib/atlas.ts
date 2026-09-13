@@ -373,6 +373,14 @@ export interface ProjectExecution {
         missing_or_failed_commands: string[];
         all_planned_passed: boolean;
       };
+      completion_report?: {
+        reported: boolean;
+        valid: boolean;
+        error: string;
+        requirements: { id: string; status: "satisfied" | "unsatisfied" | "not_checked"; evidence: string[] }[];
+        unfinished: string[];
+        deviations: string[];
+      };
       tool_calls?: {
         commands: { command: string; planned: boolean; status: string; exit: number | null; output: string; truncated: boolean }[];
         file_edits: { tool: string; path: string; status: string; additions: number | null; deletions: number | null }[];
@@ -503,6 +511,7 @@ export interface ProjectExport {
     active_iteration_id: string | null;
     unaccepted_task_ids: string[];
     unapplied_execution_ids: string[];
+    invalid_completion_report_execution_ids: string[];
     unresolved_requirement_ids: string[];
     documents_needing_review: string[];
   };

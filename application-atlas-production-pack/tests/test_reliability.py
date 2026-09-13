@@ -4,6 +4,7 @@ import io
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import sqlite3
 import subprocess
@@ -27,6 +28,7 @@ from opencode_client import OpenCodeClient, OpenCodeError, iter_sse
 from execution_state import project_execution
 from execution_workspace import prepare_execution_workspace
 from execution_service import (
+    _completion_report,
     apply_execution_result,
     create_iteration as create_execution_iteration,
     create_task as create_execution_task,
@@ -1365,6 +1367,18 @@ class ExecutionServiceTests(unittest.TestCase):
             if self.mode == 'completed':
                 status = {'type': 'idle'}
                 assistant['info'].update({'finish': 'stop', 'time': {'completed': 123}})
+                requirement_ids = re.findall(r"### `(req_[A-Za-z0-9]+)`", self.prompt)
+                report = {
+                    'schema': 1,
+                    'requirements': [
+                        {'id': requirement_id, 'status': 'satisfied',
+                         'evidence': ['Value changed and fixed verification passed']}
+                        for requirement_id in requirement_ids
+                    ],
+                    'unfinished': [], 'deviations': [],
+                }
+                assistant['parts'][0]['text'] = (
+                    'Implemented and checked.\nATLAS_RESULT: ' + json.dumps(report))
                 assistant['parts'].append({
                     'type': 'tool', 'tool': 'bash',
                     'state': {
@@ -1452,6 +1466,9 @@ class ExecutionServiceTests(unittest.TestCase):
                          ['src/app.py'])
         self.assertTrue(completed['raw_state']['evidence']['filesystem']['scope_compliant'])
         self.assertTrue(completed['raw_state']['evidence']['verification']['all_planned_passed'])
+        completion = completed['raw_state']['evidence']['completion_report']
+        self.assertTrue(completion['valid'])
+        self.assertEqual(completion['requirements'][0]['status'], 'satisfied')
         self.assertEqual(completed['raw_state']['evidence']['tool_calls']['commands'][0]['exit'], 0)
         self.assertEqual((self.workspace / 'src/app.py').read_text(), 'VALUE = 1\n')
         with self.assertRaisesRegex(ProjectStoreError, 'isolated execution result'):
@@ -1474,8 +1491,10 @@ class ExecutionServiceTests(unittest.TestCase):
             })
         self.assertEqual(self.store.get_task(self.task['id'])['acceptance_status'], 'pending')
         exported = export_project(self.store, self.project['id'])
-        self.assertEqual(exported['manifest']['schema'], 4)
+        self.assertEqual(exported['manifest']['schema'], 5)
         self.assertEqual(exported['manifest']['unapplied_execution_ids'], [])
+        self.assertEqual(
+            exported['manifest']['invalid_completion_report_execution_ids'], [])
         self.assertEqual(exported['manifest']['workspace_baseline_id'],
                          accepted_baseline['id'])
         self.assertEqual(exported['manifest']['counts']['executions'], 1)
@@ -1647,6 +1666,22 @@ class ExecutionServiceTests(unittest.TestCase):
         with self.assertRaisesRegex(ProjectStoreError, 'symlink'):
             prepare_execution_workspace(
                 self.root / 'isolated-state', self.project['id'], source, manifest)
+
+    def test_completion_report_rejects_missing_or_mismatched_requirements(self):
+        self.assertEqual(
+            _completion_report('ordinary final text', [self.requirement['id']])['error'],
+            'missing')
+        report = {
+            'schema': 1,
+            'requirements': [{'id': 'req_other', 'status': 'satisfied',
+                              'evidence': ['claimed']}],
+            'unfinished': [], 'deviations': [],
+        }
+        parsed = _completion_report(
+            'ATLAS_RESULT: ' + json.dumps(report), [self.requirement['id']])
+        self.assertTrue(parsed['reported'])
+        self.assertFalse(parsed['valid'])
+        self.assertEqual(parsed['error'], 'requirement_ids_mismatch')
 
     def test_execution_rejects_a_project_database_inside_the_source(self):
         store = ProjectStore(self.workspace / 'atlas-project-state.sqlite')

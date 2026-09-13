@@ -55,7 +55,7 @@ def export_project(store, project_id: str) -> dict:
             path.write_text(content, encoding="utf-8")
             hashes[relative] = hashlib.sha256(content.encode("utf-8")).hexdigest()
         manifest = {
-            "schema": 4,
+            "schema": 5,
             "exported_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "project_id": project_id,
             "project_updated_at": project["updated_at"],
@@ -79,6 +79,11 @@ def export_project(store, project_id: str) -> dict:
             "unapplied_execution_ids": [
                 item["id"] for item in executions
                 if item["application_status"] in {"pending", "conflict", "failed"}],
+            "invalid_completion_report_execution_ids": [
+                item["id"] for item in executions
+                if item["status"] in {"completed", "failed", "stopped"}
+                and not ((item.get("raw_state") or {}).get("evidence") or {}).get(
+                    "completion_report", {}).get("valid")],
             "files": hashes,
         }
         (temp / "manifest.json").write_text(
@@ -209,12 +214,20 @@ def _iterations_markdown(iterations, tasks, executions):
                     "verification") or {}
                 filesystem = (execution.get("raw_state") or {}).get("evidence", {}).get(
                     "filesystem") or {}
+                completion = (execution.get("raw_state") or {}).get("evidence", {}).get(
+                    "completion_report") or {}
                 lines.extend([
                     f"- Execution `{execution['id']}`: `{execution['status']}` via `{execution['engine']}`",
                     f"  - Result application: `{execution['application_status']}`",
                     f"  - Isolated work copy: `{execution['workdir']}`",
                     f"  - Planned verification passed: `{verification.get('all_planned_passed', False)}`",
                     f"  - File scope compliant: `{filesystem.get('scope_compliant', 'unknown')}`",
+                    f"  - Structured completion report valid: `{completion.get('valid', False)}`",
+                    f"  - Requirements satisfied/reported: "
+                    f"`{sum(1 for item in completion.get('requirements', []) if item.get('status') == 'satisfied')}/"
+                    f"{len(completion.get('requirements', []))}`",
+                    f"  - Unfinished items: `{len(completion.get('unfinished', []))}`; "
+                    f"deviations: `{len(completion.get('deviations', []))}`",
                 ])
             lines.append("")
     if not iterations:
