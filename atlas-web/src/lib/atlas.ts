@@ -276,6 +276,62 @@ export interface ProjectExport {
   };
 }
 
+export interface GeneratedQuestion {
+  question: string;
+  why: string;
+  affects: ProjectDocumentKind[];
+}
+
+export interface GeneratedRequirement {
+  key: string;
+  content: string;
+  recommended_scope: ProjectScope;
+  recommendation_reason: string;
+  acceptance_conditions: string[];
+  reference_ids: string[];
+}
+
+export interface GeneratedSignal {
+  summary: string;
+  impact?: string;
+  reason?: string;
+  evidence: { kind: NonNullable<DocumentBasis["kind"]>; id: string }[];
+}
+
+export interface GeneratedDocument {
+  document_id: string | null;
+  kind: ProjectDocumentKind;
+  title: string;
+  content: string;
+  basis: { kind: NonNullable<DocumentBasis["kind"]>; id: string }[];
+}
+
+export interface ProjectGenerationResult {
+  input_fingerprint: string;
+  questions: GeneratedQuestion[];
+  requirements: GeneratedRequirement[];
+  conflicts: GeneratedSignal[];
+  suggestions: GeneratedSignal[];
+  documents: GeneratedDocument[];
+}
+
+export interface ProjectGenerationRun {
+  id: string;
+  project_id: string;
+  mode: "analysis" | "documents";
+  document_kinds: ProjectDocumentKind[];
+  engine: "opencode";
+  model: string;
+  status: "queued" | "running" | "completed" | "failed";
+  input_fingerprint: string;
+  result: ProjectGenerationResult | null;
+  applied: { requirements: Record<string, string>; documents: Record<string, string> };
+  error: string;
+  engine_session_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export const REL_KIND_ZH: Record<string, string> = {
   adjacent: "相邻",
   related: "相关",
@@ -500,4 +556,39 @@ export async function exportProject(projectId: string) {
   return requestJson<ProjectExport>(`/api/projects/${encodeURIComponent(projectId)}/export`, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: "{}",
   });
+}
+
+export async function listProjectGenerations(projectId: string) {
+  return fetchJson<ProjectGenerationRun[]>(
+    `/api/projects/${encodeURIComponent(projectId)}/generation-runs`);
+}
+
+export async function getProjectGeneration(projectId: string, runId: string) {
+  return fetchJson<ProjectGenerationRun>(
+    `/api/projects/${encodeURIComponent(projectId)}/generation-runs/${encodeURIComponent(runId)}`);
+}
+
+export async function startProjectGeneration(
+  projectId: string,
+  input: { mode: "analysis" | "documents"; document_kinds?: ProjectDocumentKind[]; model?: string },
+) {
+  return requestJson<ProjectGenerationRun>(
+    `/api/projects/${encodeURIComponent(projectId)}/generation-runs`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+}
+
+export async function applyProjectGenerationItem(
+  projectId: string,
+  runId: string,
+  input: { item_kind: "requirement" | "document"; index: number },
+) {
+  const result = await requestJson<{ run: ProjectGenerationRun; created: ProjectRequirement | ProjectDocument }>(
+    `/api/projects/${encodeURIComponent(projectId)}/generation-runs/${encodeURIComponent(runId)}/apply`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+  invalidateAtlasCache();
+  return result;
 }

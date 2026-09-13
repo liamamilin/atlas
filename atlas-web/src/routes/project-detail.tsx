@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import {
-  AlertTriangle, ArrowLeft, CheckCircle2, Download, FileClock,
-  FileText, Lightbulb, Plus, Scale, Save,
+  AlertTriangle, ArrowLeft, Bot, CheckCircle2, Download, FileClock,
+  FileText, Lightbulb, Plus, Scale, Save, Sparkles,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { ErrorBox, Loading, useAsync } from "@/components/loaders";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   addProjectDocumentVersion,
+  applyProjectGenerationItem,
   confirmProjectRequirement,
   createProjectDecision,
   createProjectDocument,
@@ -17,13 +18,17 @@ import {
   exportProject,
   getProjectDocumentDiff,
   getProjectDocumentVersions,
+  getProjectGeneration,
   getProjectWorkspace,
   invalidateAtlasCache,
+  listProjectGenerations,
+  startProjectGeneration,
   updateProjectRequirement,
   type DocumentBasis,
   type ProjectDocument,
   type ProjectDocumentKind,
   type ProjectExport,
+  type ProjectGenerationRun,
   type ProjectReference,
   type ProjectRequirement,
   type ProjectScope,
@@ -46,6 +51,7 @@ export function ProjectDetail() {
   const { projectId = "" } = useParams<{ projectId: string }>();
   const { lang } = useLang();
   const [revision, setRevision] = useState(0);
+  const [analysisRun, setAnalysisRun] = useState<ProjectGenerationRun | null>(null);
   const { data, error, loading } = useAsync(
     () => getProjectWorkspace(projectId), [projectId, revision]);
 
@@ -82,7 +88,10 @@ export function ProjectDetail() {
         <Stat value={data.documents.length} label={lang === "zh" ? "关联文档" : "Documents"} />
       </div>
 
-      <ConsistencyPanel workspace={data} />
+      <GenerationPanel projectId={projectId} workspace={data} onSaved={refresh}
+        onAnalysis={setAnalysisRun} />
+
+      <ConsistencyPanel workspace={data} analysisRun={analysisRun} />
 
       <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div>
@@ -138,23 +147,146 @@ export function ProjectDetail() {
   );
 }
 
-function ConsistencyPanel({ workspace }: { workspace: ProjectWorkspace }) {
+function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
+  projectId: string; workspace: ProjectWorkspace; onSaved: () => void;
+  onAnalysis: (run: ProjectGenerationRun | null) => void;
+}) {
+  const { lang } = useLang();
+  const [run, setRun] = useState<ProjectGenerationRun | null>(null);
+  const [kind, setKind] = useState<ProjectDocumentKind>("product-requirements");
+  const [error, setError] = useState("");
+  const [starting, setStarting] = useState(false);
+  const [applying, setApplying] = useState("");
+  const hasConfirmedScope = workspace.requirements.some((item) => item.confirmed_scope === "current");
+  const active = run?.status === "queued" || run?.status === "running";
+
+  useEffect(() => {
+    let alive = true;
+    listProjectGenerations(projectId).then(
+      (items) => {
+        if (!alive) return;
+        if (items[0]) setRun(items[0]);
+        onAnalysis(items.find((item) => item.mode === "analysis" && item.status === "completed") || null);
+      },
+      (cause) => { if (alive) setError(String(cause)); },
+    );
+    return () => { alive = false; };
+  }, [projectId]);
+
+  useEffect(() => {
+    if (!active || !run) return;
+    let alive = true;
+    const timer = window.setInterval(() => {
+      getProjectGeneration(projectId, run.id).then(
+        (next) => {
+          if (!alive) return;
+          setRun(next);
+          if (next.mode === "analysis" && next.status === "completed") onAnalysis(next);
+        },
+        (cause) => { if (alive) setError(String(cause)); },
+      );
+    }, 1500);
+    return () => { alive = false; window.clearInterval(timer); };
+  }, [active, projectId, run?.id]);
+
+  const start = async (mode: "analysis" | "documents") => {
+    setStarting(true); setError("");
+    try {
+      setRun(await startProjectGeneration(projectId, {
+        mode, ...(mode === "documents" ? { document_kinds: [kind] } : {}),
+      }));
+    } catch (cause) { setError(String(cause)); } finally { setStarting(false); }
+  };
+  const apply = async (itemKind: "requirement" | "document", index: number) => {
+    if (!run) return;
+    const key = `${itemKind}:${index}`; setApplying(key); setError("");
+    try {
+      const result = await applyProjectGenerationItem(
+        projectId, run.id, { item_kind: itemKind, index });
+      setRun(result.run); onSaved();
+    } catch (cause) { setError(String(cause)); } finally { setApplying(""); }
+  };
+  const result = run?.result;
+  return <section className="mt-8 rounded-xl bg-surface p-5 shadow-card">
+    <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex max-w-2xl items-start gap-3"><Bot className="mt-0.5 size-5 text-primary" /><div>
+        <h2 className="font-serif text-xl font-medium">{lang === "zh" ? "资料分析与文档草案" : "Source analysis & document drafts"}</h2>
+        <p className="mt-1 text-xs leading-5 text-subtle">{lang === "zh" ? "OpenCode 只读取本项目已固定的依据。输出先作为 AI 建议供审阅，需求不会自动获得用户确认，文档也不会自动覆盖现有版本。" : "OpenCode reads only this project's pinned input. Results remain reviewable AI proposals; requirements are never user-confirmed automatically and documents never overwrite a newer version."}</p>
+      </div></div>
+      <div className="flex flex-wrap items-end gap-2">
+        <Button size="sm" variant="outline" disabled={starting || active} onClick={() => start("analysis")}><Sparkles className="size-4" />{lang === "zh" ? "分析固定资料" : "Analyze pinned sources"}</Button>
+        <label className="text-xs text-muted"><span className="block">{lang === "zh" ? "文档类型" : "Document kind"}</span><select value={kind} onChange={(event) => setKind(event.target.value as ProjectDocumentKind)} className={`${inputClass} mt-1 h-9 min-w-40`}>
+          {DOCUMENT_KINDS.map((item) => <option key={item.value} value={item.value}>{lang === "zh" ? item.zh : item.en}</option>)}
+        </select></label>
+        <Button size="sm" disabled={starting || active || !hasConfirmedScope} onClick={() => start("documents")}><FileText className="size-4" />{lang === "zh" ? "生成文档草案" : "Generate document draft"}</Button>
+      </div>
+    </div>
+    {!hasConfirmedScope ? <p className="mt-3 text-xs text-warn">{lang === "zh" ? "生成产品与开发文档前，至少确认一条本版需求。资料分析可以先运行。" : "Confirm at least one current requirement before generating product or development documents. Source analysis can run first."}</p> : null}
+    {run ? <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4 text-xs text-subtle">
+      <Badge tone={run.status === "completed" ? "ok" : run.status === "failed" ? "warn" : "default"}>{run.status}</Badge>
+      <span className="font-mono">{run.id}</span><span>{run.engine}{run.model ? ` · ${run.model}` : ""}</span>
+      <span className="font-mono">input {run.input_fingerprint.slice(0, 12)}</span>
+      {run.engine_session_id ? <span className="font-mono">{run.engine_session_id}</span> : null}
+    </div> : null}
+    {active ? <p className="mt-4 text-sm text-muted">{lang === "zh" ? (run?.status === "queued" ? "等待文档执行器…" : "正在分析固定输入…") : (run?.status === "queued" ? "Waiting for the document runner…" : "Analyzing fixed input…")}</p> : null}
+    {run?.status === "failed" ? <p className="mt-4 rounded-md bg-danger/10 p-3 text-xs text-danger">{run.error}</p> : null}
+    {error ? <p className="mt-4 text-xs text-danger">{error}</p> : null}
+    {result ? <div className="mt-5 grid gap-5 border-t border-border pt-5 lg:grid-cols-2">
+      <div className="space-y-4">
+        <ProposalList title={lang === "zh" ? "需要用户回答" : "Questions for the user"} items={result.questions.map((item) => ({ title: item.question, text: item.why }))} empty={lang === "zh" ? "没有生成新的关键问题。" : "No new critical questions."} />
+        <ProposalList title={lang === "zh" ? "明确冲突" : "Explicit conflicts"} items={result.conflicts.map((item) => ({ title: item.summary, text: item.impact || "" }))} empty={lang === "zh" ? "生成结果没有报告有依据的明确冲突。" : "The result reports no evidence-backed explicit conflicts."} />
+        <ProposalList title={lang === "zh" ? "参考建议" : "Suggestions"} items={result.suggestions.map((item) => ({ title: item.summary, text: item.reason || "" }))} empty={lang === "zh" ? "没有额外参考建议。" : "No additional suggestions."} />
+      </div>
+      <div className="space-y-4">
+        {result.requirements.map((item, index) => {
+          const applied = run.applied.requirements[String(index)];
+          return <article key={item.key} className="rounded-lg bg-bg-elevated p-4"><div className="flex items-start justify-between gap-3"><div><p className="text-[11px] text-primary">{lang === "zh" ? "AI 候选需求" : "AI candidate requirement"} · {scopeLabel(item.recommended_scope, lang)}</p><h3 className="mt-1 text-sm font-medium leading-6">{item.content}</h3></div><Button size="sm" variant="outline" disabled={Boolean(applied) || applying === `requirement:${index}`} onClick={() => apply("requirement", index)}>{applied ? (lang === "zh" ? "已加入" : "Added") : (lang === "zh" ? "加入候选" : "Add candidate")}</Button></div><p className="mt-2 text-xs leading-5 text-muted">{item.recommendation_reason}</p></article>;
+        })}
+        {result.documents.map((item, index) => {
+          const applied = run.applied.documents[String(index)];
+          return <article key={`${item.kind}:${index}`} className="rounded-lg bg-bg-elevated p-4"><div className="flex items-start justify-between gap-3"><div><p className="text-[11px] text-primary">{lang === "zh" ? "AI 文档草案" : "AI document draft"} · {documentKind(item.kind, lang)}</p><h3 className="mt-1 text-sm font-medium">{item.title}</h3></div><Button size="sm" variant="outline" disabled={Boolean(applied) || applying === `document:${index}`} onClick={() => apply("document", index)}>{applied ? (lang === "zh" ? "已保存" : "Saved") : item.document_id ? (lang === "zh" ? "保存为新版本" : "Save new version") : (lang === "zh" ? "创建关联文档" : "Create document")}</Button></div><div className="mt-3 max-h-80 overflow-auto rounded-md bg-surface p-3"><Prose md={item.content} /></div></article>;
+        })}
+      </div>
+    </div> : null}
+  </section>;
+}
+
+function ProposalList({ title, items, empty }: { title: string; items: { title: string; text: string }[]; empty: string }) {
+  return <div><h3 className="text-sm font-medium">{title}</h3><div className="mt-2 space-y-2">{items.map((item, index) => <div key={`${item.title}:${index}`} className="rounded-md bg-bg-elevated p-3"><p className="text-sm">{item.title}</p>{item.text ? <p className="mt-1 text-xs leading-5 text-muted">{item.text}</p> : null}</div>)}{!items.length ? <p className="text-xs text-subtle">{empty}</p> : null}</div></div>;
+}
+
+function ConsistencyPanel({ workspace, analysisRun }: {
+  workspace: ProjectWorkspace; analysisRun: ProjectGenerationRun | null;
+}) {
   const { lang } = useLang();
   const pending = workspace.requirements.filter((item) => !item.confirmed_scope);
   const review = workspace.documents.filter((item) => item.review.status === "needs_review");
   const recommended = workspace.requirements.filter((item) => item.recommended_scope && !item.confirmed_scope);
+  const analysis = analysisRun?.result;
+  const openCandidates = analysis?.requirements.filter(
+    (_item, index) => !analysisRun?.applied.requirements[String(index)]) || [];
+  const decisions = pending.length + (analysis?.questions.length || 0);
+  const suggestions = recommended.length + openCandidates.length + (analysis?.suggestions.length || 0);
   return (
     <section className="mt-6 rounded-xl bg-primary/[0.06] p-5 ring-1 ring-primary/15">
       <h2 className="font-medium">{lang === "zh" ? "一致性信号" : "Consistency signals"}</h2>
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <Signal title={lang === "zh" ? "明确冲突" : "Explicit conflicts"} count={lang === "zh" ? "未检查" : "Not checked"}
-          text={lang === "zh" ? "当前只报告可定位的冲突；尚未运行内容分析，不能推断为“没有冲突”。" : "Only evidence-backed conflicts are reported. Content analysis has not run, so zero is not proof of absence."} muted />
-        <Signal title={lang === "zh" ? "需要决定" : "Needs a decision"} count={pending.length}
-          text={pending.length ? pending.map((item) => item.id).join(" · ") : (lang === "zh" ? "当前需求均已有用户确认。" : "All current requirements have user confirmation.")} />
-        <Signal title={lang === "zh" ? "参考建议" : "Suggestions"} count={recommended.length}
-          text={recommended.length
-            ? (lang === "zh" ? "推荐仍需用户决定，不会自动进入本版。" : "Recommendations still need a user decision and never enter the current scope automatically.")
-            : (lang === "zh" ? "当前没有未确认的范围建议。" : "There are no unconfirmed scope suggestions.")} />
+        <Signal title={lang === "zh" ? "明确冲突" : "Explicit conflicts"}
+          count={analysis ? analysis.conflicts.length : (lang === "zh" ? "未检查" : "Not checked")}
+          text={analysis
+            ? (analysis.conflicts.length
+              ? (lang === "zh" ? "最近一次固定输入分析发现了可定位的明确冲突。" : "The latest fixed-input analysis found evidence-backed explicit conflicts.")
+              : (lang === "zh" ? "最近一次固定输入分析未报告明确冲突；这不代表未来输入也没有冲突。" : "The latest fixed-input analysis reported no explicit conflict; future input may differ."))
+            : (lang === "zh" ? "尚未完成固定输入分析，不能推断为“没有冲突”。" : "No fixed-input analysis has completed, so absence of conflict cannot be inferred.")}
+          muted={!analysis} />
+        <Signal title={lang === "zh" ? "需要决定" : "Needs a decision"} count={decisions}
+          text={decisions
+            ? (lang === "zh" ? `${pending.length} 条需求待确认，${analysis?.questions.length || 0} 个分析问题待回答。` : `${pending.length} requirements await confirmation and ${analysis?.questions.length || 0} analysis questions await answers.`)
+            : (lang === "zh" ? "当前没有待确认需求或分析问题。" : "No requirements or analysis questions await a decision.")} />
+        <Signal title={lang === "zh" ? "参考建议" : "Suggestions"} count={suggestions}
+          text={suggestions
+            ? (lang === "zh" ? `${recommended.length} 条已保存范围建议，${openCandidates.length} 条未加入候选，${analysis?.suggestions.length || 0} 条分析建议。` : `${recommended.length} saved scope recommendations, ${openCandidates.length} unapplied candidates, and ${analysis?.suggestions.length || 0} analysis suggestions.`)
+            : (lang === "zh" ? "当前没有未处理的参考建议。" : "There are no pending suggestions.")} />
         <Signal title={lang === "zh" ? "关联复核" : "Linked reviews"} count={review.length}
           text={review.length
             ? (lang === "zh" ? `${review.length} 份文档因上游变化待复核。` : `${review.length} documents need review after upstream changes.`)

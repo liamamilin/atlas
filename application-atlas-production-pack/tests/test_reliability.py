@@ -27,6 +27,10 @@ from opencode_client import OpenCodeClient, iter_sse
 from execution_state import project_execution
 from project_store import ProjectStore, ProjectStoreError
 from project_export import export_project
+from project_generation import (
+    apply_generation_item, execute_generation, prepare_generation,
+    read_generation,
+)
 from handoff_bundle import build_handoff, validate_handoff, write_handoff
 from sample_package import validate_package
 from workspace_snapshot import compare_snapshots, snapshot_workspace
@@ -395,6 +399,215 @@ class ProjectStoreTests(unittest.TestCase):
         self.assertIn('User confirmation: `pending`', requirements)
         self.assertIn('AI recommendation: `current`', requirements)
         self.assertIn('Fixed evidence', source)
+
+    def test_analysis_generation_is_grounded_reviewable_and_applied_once(self):
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'source-v1',
+            excerpt='Fixed local evidence', note='Use the fixed boundary', read_status='reviewed')
+        run = prepare_generation(self.store, self.project['id'], 'analysis')
+        directory = (self.store.path.parent / 'generation-runs' /
+                     self.project['id'] / run['id'])
+        request = json.loads((directory / 'input.json').read_text())
+        self.assertEqual(request['references'][0]['excerpt'], 'Fixed local evidence')
+        self.assertNotIn('workspace', request['project'])
+        prompt = (directory / 'prompt.md').read_text()
+        self.assertIn('Do not browse the web', prompt)
+        self.assertIn('background evidence, not the project', prompt)
+        self.assertIn('Fixed local evidence', (directory / 'input.md').read_text())
+
+        def fake_runner(_directory, _run):
+            return ({
+                'input_fingerprint': request['input_fingerprint'],
+                'questions': [{
+                    'question': 'Who owns review?', 'why': 'The evidence does not say.',
+                    'affects': ['analysis'],
+                    'evidence': [{'kind': 'reference', 'id': 'ref_non_contract'}],
+                }],
+                'requirements': [{
+                    'key': 'keep-local', 'content': 'Keep the workflow local',
+                    'recommended_scope': 'current',
+                    'recommendation_reason': 'The fixed evidence supports it',
+                    'acceptance_conditions': ['The flow works without a remote account'],
+                    'reference_ids': [reference['id']],
+                }],
+                'conflicts': [],
+                'suggestions': [{
+                    'summary': 'Show the source version', 'reason': 'It keeps review traceable',
+                    'evidence': [{'kind': 'reference', 'id': reference['id']}],
+                }],
+                'documents': [{
+                    'document_id': None, 'kind': 'analysis', 'title': 'Analysis',
+                    'content': '# Analysis\n\nFixed evidence and an open ownership question.',
+                    'basis': [{'kind': 'reference', 'id': reference['id']}],
+                }],
+            }, {'engine_session_id': 'ses_fake'})
+
+        completed = execute_generation(
+            self.store, self.project['id'], run['id'], runner=fake_runner)
+        self.assertEqual(completed['status'], 'completed')
+        self.assertEqual(completed['engine_session_id'], 'ses_fake')
+        self.assertNotIn('evidence', completed['result']['questions'][0])
+        applied_requirement = apply_generation_item(
+            self.store, self.project['id'], run['id'], 'requirement', 0)
+        self.assertIsNone(applied_requirement['created']['confirmed_scope'])
+        self.assertEqual(applied_requirement['created']['recommended_scope'], 'current')
+        applied_document = apply_generation_item(
+            self.store, self.project['id'], run['id'], 'document', 0)
+        self.assertEqual(applied_document['created']['author'], 'ai')
+        with self.assertRaisesRegex(ProjectStoreError, 'already applied'):
+            apply_generation_item(
+                self.store, self.project['id'], run['id'], 'document', 0)
+
+    def test_generation_rejects_wrong_input_fingerprint_and_unknown_evidence(self):
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'v1', excerpt='Evidence')
+        run = prepare_generation(self.store, self.project['id'], 'analysis')
+
+        def wrong_fingerprint(_directory, _run):
+            return ({
+                'input_fingerprint': 'wrong', 'questions': [], 'requirements': [],
+                'conflicts': [], 'suggestions': [], 'documents': [],
+            }, {})
+
+        with self.assertRaisesRegex(ValueError, 'fingerprint'):
+            execute_generation(
+                self.store, self.project['id'], run['id'], runner=wrong_fingerprint)
+        self.assertEqual(
+            read_generation(self.store, self.project['id'], run['id'])['status'], 'failed')
+
+        second = prepare_generation(self.store, self.project['id'], 'analysis')
+        directory = (self.store.path.parent / 'generation-runs' /
+                     self.project['id'] / second['id'])
+        request = json.loads((directory / 'input.json').read_text())
+
+        def unknown_evidence(_directory, _run):
+            return ({
+                'input_fingerprint': request['input_fingerprint'],
+                'questions': [], 'requirements': [], 'conflicts': [],
+                'suggestions': [],
+                'documents': [{
+                    'document_id': None, 'kind': 'analysis', 'title': 'Analysis',
+                    'content': '# Analysis',
+                    'basis': [{'kind': 'reference', 'id': 'ref_unknown'}],
+                }],
+            }, {})
+
+        with self.assertRaisesRegex(ValueError, 'unknown input'):
+            execute_generation(
+                self.store, self.project['id'], second['id'], runner=unknown_evidence)
+
+        third = prepare_generation(self.store, self.project['id'], 'analysis')
+        directory = (self.store.path.parent / 'generation-runs' /
+                     self.project['id'] / third['id'])
+        tampered = json.loads((directory / 'input.json').read_text())
+        tampered['references'][0]['excerpt'] = 'Changed after fingerprinting'
+        (directory / 'input.json').write_text(json.dumps(tampered))
+        with self.assertRaisesRegex(ValueError, 'fixed content'):
+            execute_generation(
+                self.store, self.project['id'], third['id'], runner=unknown_evidence)
+
+        fourth = prepare_generation(self.store, self.project['id'], 'analysis')
+        directory = (self.store.path.parent / 'generation-runs' /
+                     self.project['id'] / fourth['id'])
+        (directory / 'input.md').write_text('Changed after fingerprinting')
+        with self.assertRaisesRegex(ValueError, 'Markdown input'):
+            execute_generation(
+                self.store, self.project['id'], fourth['id'], runner=unknown_evidence)
+
+    def test_generation_markdown_keeps_long_fixed_evidence_readable(self):
+        evidence = 'A' * 2505
+        self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'v1', excerpt=evidence)
+        run = prepare_generation(self.store, self.project['id'], 'analysis')
+        directory = (self.store.path.parent / 'generation-runs' /
+                     self.project['id'] / run['id'])
+        markdown = (directory / 'input.md').read_text()
+        self.assertIn(evidence, markdown.replace('\n', ''))
+        self.assertLessEqual(max(map(len, markdown.splitlines())), 1200)
+
+    def test_document_generation_uses_confirmed_scope_and_will_not_overwrite_newer_edit(self):
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'v1', excerpt='Evidence')
+        pending = self.store.create_requirement(
+            self.project['id'], 'Pending idea', 'current', 'Model advice',
+            ['Pending acceptance'], [reference['id']])
+        confirmed = self.store.create_requirement(
+            self.project['id'], 'Confirmed requirement', 'current', 'Source support',
+            ['Observable result'], [reference['id']])
+        self.store.confirm_requirement(confirmed['id'], 'current', 'User approved')
+        document = self.store.create_document(
+            self.project['id'], 'product-requirements', 'PRD', '# PRD\n\nHuman text',
+            [{'kind': 'requirement', 'id': confirmed['id']}], author='human')
+
+        duplicate = prepare_generation(
+            self.store, self.project['id'], 'documents', ['product-requirements'])
+        duplicate_directory = (self.store.path.parent / 'generation-runs' /
+                               self.project['id'] / duplicate['id'])
+        duplicate_request = json.loads((duplicate_directory / 'input.json').read_text())
+
+        def duplicate_runner(_directory, _run):
+            return ({
+                'input_fingerprint': duplicate_request['input_fingerprint'],
+                'questions': [], 'requirements': [], 'conflicts': [], 'suggestions': [],
+                'documents': [{
+                    'document_id': None, 'kind': 'product-requirements',
+                    'title': 'Parallel PRD', 'content': '# Parallel PRD',
+                    'basis': [{'kind': 'requirement', 'id': confirmed['id']}],
+                }],
+            }, {})
+
+        with self.assertRaisesRegex(ValueError, 'target an existing document'):
+            execute_generation(
+                self.store, self.project['id'], duplicate['id'], runner=duplicate_runner)
+
+        run = prepare_generation(
+            self.store, self.project['id'], 'documents', ['product-requirements'])
+        directory = (self.store.path.parent / 'generation-runs' /
+                     self.project['id'] / run['id'])
+        request = json.loads((directory / 'input.json').read_text())
+        self.assertEqual([item['id'] for item in request['requirements']], [confirmed['id']])
+        self.assertNotIn(pending['id'], json.dumps(request))
+        prompt = (directory / 'prompt.md').read_text()
+        self.assertIn('requirements` array MUST be exactly empty', prompt)
+        self.assertIn('"requirements": []', prompt)
+        markdown_input = (directory / 'input.md').read_text()
+        self.assertIn(f"requirement:{confirmed['id']}", markdown_input)
+        self.assertIn('Human text', markdown_input)
+
+        def fake_runner(_directory, _run):
+            return ({
+                'input_fingerprint': request['input_fingerprint'],
+                'questions': [], 'requirements': [], 'conflicts': [],
+                'suggestions': [{
+                    'summary': 'Keep scope fixed', 'reason': 'Use the confirmed input only',
+                    'evidence': [{'kind': 'reference', 'id': confirmed['id']}],
+                }],
+                'documents': [{
+                    'document_id': document['id'], 'kind': 'product-requirements',
+                    'title': 'PRD', 'content': '# PRD\n\nHuman text retained.\n\nGenerated detail.',
+                    'basis': [
+                        {'kind': 'reference', 'id': reference['id']},
+                        {'kind': 'requirement', 'id': confirmed['id']},
+                        {'kind': 'document_version', 'id': document['version_id']},
+                    ],
+                }],
+            }, {})
+
+        completed = execute_generation(
+            self.store, self.project['id'], run['id'], runner=fake_runner)
+        self.assertEqual(
+            completed['result']['suggestions'][0]['evidence'][0]['kind'], 'requirement')
+        self.assertNotIn(
+            document['version_id'],
+            [item['id'] for item in completed['result']['documents'][0]['basis']])
+        self.store.add_document_version(
+            document['id'], '# PRD\n\nNewer human edit', document['basis'],
+            expected_current_version=1, author='human', change_summary='Edited while AI ran')
+        with self.assertRaisesRegex(ProjectStoreError, 'version conflict'):
+            apply_generation_item(
+                self.store, self.project['id'], run['id'], 'document', 0)
+        self.assertEqual(self.store.get_document(document['id'])['content'],
+                         '# PRD\n\nNewer human edit')
 
     def test_task_inputs_must_belong_to_same_project(self):
         other = self.store.create_project('Other', 'Other goal', self.root / 'other', 'existing')

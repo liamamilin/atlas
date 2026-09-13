@@ -35,6 +35,10 @@ Endpoints:
   POST   /api/projects/<id>/documents/<document-id>/versions
   GET    /api/projects/<id>/documents/<document-id>/diff?from=1&to=2
   POST   /api/projects/<id>/export       create self-contained Markdown bundle
+  GET    /api/projects/<id>/generation-runs
+  POST   /api/projects/<id>/generation-runs
+  GET    /api/projects/<id>/generation-runs/<generation-id>
+  POST   /api/projects/<id>/generation-runs/<generation-id>/apply
 
 Run alongside `npm run dev` (vite proxies /api -> :5199).
 """
@@ -62,6 +66,10 @@ from project_workflow import (
     document_diff, document_versions, export_bundle, project_workspace,
     update_requirement as update_project_requirement,
 )
+from project_generation import (
+    apply_generation_item, execute_generation, list_generations,
+    mark_generation_interrupted, prepare_generation, read_generation,
+)
 PACK = str(DATA_PACK)
 sys.path.insert(0, PACK)
 from leaf_lint import lint, parse_front
@@ -78,6 +86,8 @@ PROMOTE_LOCK = threading.Lock()
 PROMOTE_THREADS = set()
 PROJECT_STORE = None
 PROJECT_STORE_LOCK = threading.Lock()
+PROJECT_GENERATION_LOCK = threading.Semaphore(1)
+PROJECT_GENERATION_THREADS = {}
 
 
 def get_project_store():
@@ -87,6 +97,51 @@ def get_project_store():
             if PROJECT_STORE is None:
                 PROJECT_STORE = ProjectStore()
     return PROJECT_STORE
+
+
+def start_project_generation(project_id, body, store=None):
+    if not isinstance(body, dict):
+        raise ValueError("request body must be an object")
+    allowed = {"mode", "document_kinds", "model"}
+    unknown = set(body) - allowed
+    if unknown:
+        raise ValueError(f"unknown generation fields: {', '.join(sorted(unknown))}")
+    store = store or get_project_store()
+    run = prepare_generation(
+        store, project_id, body.get("mode"), body.get("document_kinds"),
+        body.get("model", os.environ.get("ATLAS_PROJECT_MODEL", "")))
+    thread = threading.Thread(
+        target=_run_project_generation, args=(store, project_id, run["id"]), daemon=True)
+    PROJECT_GENERATION_THREADS[run["id"]] = thread
+    try:
+        thread.start()
+    except BaseException:
+        PROJECT_GENERATION_THREADS.pop(run["id"], None)
+        mark_generation_interrupted(store, project_id, run["id"])
+        raise
+    return run
+
+
+def _run_project_generation(store, project_id, run_id):
+    try:
+        with PROJECT_GENERATION_LOCK:
+            execute_generation(store, project_id, run_id)
+    except BaseException as error:
+        print(f"[project-generation] {run_id}: {error}")
+    finally:
+        PROJECT_GENERATION_THREADS.pop(run_id, None)
+
+
+def project_generation_status(store, project_id, run_id):
+    run = read_generation(store, project_id, run_id)
+    if run["status"] in {"queued", "running"} and run_id not in PROJECT_GENERATION_THREADS:
+        return mark_generation_interrupted(store, project_id, run_id)
+    return run
+
+
+def project_generation_list(store, project_id):
+    return [project_generation_status(store, project_id, run["id"])
+            for run in list_generations(store, project_id)]
 
 
 def create_project(body, store=None):
@@ -587,6 +642,23 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(project_workspace(get_project_store(), m.group(1)))
             except ProjectStoreError as error:
                 return self._json({"error": str(error)}, 404)
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/generation-runs$", path)
+        if m:
+            try:
+                return self._json(project_generation_list(get_project_store(), m.group(1)))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
+        m = re.match(
+            r"^/api/projects/(prj_[A-Za-z0-9]+)/generation-runs/(gen_[A-Za-z0-9]+)$",
+            path)
+        if m:
+            try:
+                return self._json(project_generation_status(
+                    get_project_store(), m.group(1), m.group(2)))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
         m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/references$", path)
         if m:
             try:
@@ -653,6 +725,32 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = unquote(urlparse(self.path).path)
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/generation-runs$", path)
+        if m:
+            try:
+                return self._json(start_project_generation(
+                    m.group(1), self._body()), 202)
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
+            except (ValueError, json.JSONDecodeError, FileExistsError) as error:
+                return self._json({"error": str(error)}, 400)
+        m = re.match(
+            r"^/api/projects/(prj_[A-Za-z0-9]+)/generation-runs/"
+            r"(gen_[A-Za-z0-9]+)/apply$", path)
+        if m:
+            try:
+                body = self._body()
+                return self._json(apply_generation_item(
+                    get_project_store(), m.group(1), m.group(2),
+                    body.get("item_kind"), body.get("index")), 201)
+            except ProjectStoreError as error:
+                code = 409 if str(error) in {
+                    "generation item already applied", "document version conflict",
+                    "generation run is not completed",
+                } else 404
+                return self._json({"error": str(error)}, code)
+            except (ValueError, json.JSONDecodeError, AttributeError) as error:
+                return self._json({"error": str(error)}, 400)
         m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/requirements$", path)
         if m:
             try:
