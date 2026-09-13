@@ -172,9 +172,108 @@ export interface ProjectReference {
   read_status: "unread" | "read" | "reviewed";
   created_at: string;
   updated_at: string;
-  source_available: boolean;
-  current_version: string | null;
-  stale: boolean;
+  source_available?: boolean;
+  current_version?: string | null;
+  stale?: boolean;
+}
+
+export type ProjectScope = "current" | "later" | "excluded";
+
+export interface ProjectRequirement {
+  id: string;
+  project_id: string;
+  content: string;
+  recommended_scope: ProjectScope | null;
+  recommendation_reason: string;
+  confirmed_scope: ProjectScope | null;
+  confirmation_reason: string;
+  acceptance_conditions: string[];
+  reference_ids: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProjectDecision {
+  id: string;
+  project_id: string;
+  statement: string;
+  rationale: string;
+  reference_ids: string[];
+  created_at: string;
+}
+
+export type ProjectDocumentKind =
+  | "analysis"
+  | "product-requirements"
+  | "interaction"
+  | "technical-plan"
+  | "development-plan"
+  | "acceptance-plan"
+  | "current-state";
+
+export interface DocumentBasis {
+  kind?: "reference" | "requirement" | "decision" | "document_version";
+  id?: string;
+  source?: string;
+  version?: string | number;
+  fingerprint?: string;
+}
+
+export interface DocumentReview {
+  status: "current" | "needs_review";
+  reasons: { kind: "requirement_changed" | "upstream_document_changed"; id: string; document_id?: string }[];
+}
+
+export interface ProjectDocument {
+  id: string;
+  project_id: string;
+  kind: ProjectDocumentKind;
+  title: string;
+  current_version: number;
+  version_id: string;
+  content: string;
+  content_sha256: string;
+  basis: DocumentBasis[];
+  author: "ai" | "human" | "import" | "unknown";
+  change_summary: string;
+  review: DocumentReview;
+  created_at: string;
+  updated_at: string;
+  version_created_at: string;
+}
+
+export interface ProjectDocumentVersion {
+  version_id: string;
+  document_id: string;
+  version: number;
+  content: string;
+  content_sha256: string;
+  basis: DocumentBasis[];
+  author: ProjectDocument["author"];
+  change_summary: string;
+  review: DocumentReview;
+  created_at: string;
+}
+
+export interface ProjectWorkspace {
+  project: AtlasProject;
+  references: ProjectReference[];
+  requirements: ProjectRequirement[];
+  decisions: ProjectDecision[];
+  documents: ProjectDocument[];
+}
+
+export interface ProjectExport {
+  project_id: string;
+  directory: string;
+  archive: string;
+  archive_sha256: string;
+  manifest: {
+    schema: number;
+    counts: Record<string, number>;
+    unresolved_requirement_ids: string[];
+    documents_needing_review: string[];
+  };
 }
 
 export const REL_KIND_ZH: Record<string, string> = {
@@ -302,4 +401,103 @@ export async function updateProjectReference(
   );
   invalidateAtlasCache();
   return reference;
+}
+export async function getProjectWorkspace(projectId: string) {
+  return fetchJson<ProjectWorkspace>(`/api/projects/${encodeURIComponent(projectId)}/workspace`);
+}
+export async function createProjectRequirement(projectId: string, input: {
+  content: string;
+  recommended_scope?: ProjectScope;
+  recommendation_reason?: string;
+  acceptance_conditions?: string[];
+  reference_ids?: string[];
+}) {
+  const result = await requestJson<ProjectRequirement>(
+    `/api/projects/${encodeURIComponent(projectId)}/requirements`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+export async function updateProjectRequirement(
+  projectId: string,
+  requirementId: string,
+  input: Partial<Pick<ProjectRequirement, "content" | "recommended_scope" | "recommendation_reason" | "acceptance_conditions" | "reference_ids">>,
+) {
+  const result = await requestJson<ProjectRequirement>(
+    `/api/projects/${encodeURIComponent(projectId)}/requirements/${encodeURIComponent(requirementId)}`, {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+export async function confirmProjectRequirement(
+  projectId: string,
+  requirementId: string,
+  input: { scope: ProjectScope; reason: string },
+) {
+  const result = await requestJson<ProjectRequirement>(
+    `/api/projects/${encodeURIComponent(projectId)}/requirements/${encodeURIComponent(requirementId)}/confirm`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+export async function createProjectDecision(projectId: string, input: {
+  statement: string;
+  rationale: string;
+  reference_ids?: string[];
+}) {
+  const result = await requestJson<ProjectDecision>(
+    `/api/projects/${encodeURIComponent(projectId)}/decisions`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+export async function createProjectDocument(projectId: string, input: {
+  kind: ProjectDocumentKind;
+  title: string;
+  content: string;
+  basis?: DocumentBasis[];
+  author?: ProjectDocument["author"];
+  change_summary?: string;
+}) {
+  const result = await requestJson<ProjectDocument>(
+    `/api/projects/${encodeURIComponent(projectId)}/documents`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+export async function addProjectDocumentVersion(
+  projectId: string,
+  documentId: string,
+  input: { content: string; basis?: DocumentBasis[]; expected_current_version: number; author?: ProjectDocument["author"]; change_summary: string },
+) {
+  const result = await requestJson<ProjectDocument>(
+    `/api/projects/${encodeURIComponent(projectId)}/documents/${encodeURIComponent(documentId)}/versions`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+export async function getProjectDocumentVersions(projectId: string, documentId: string) {
+  return fetchJson<ProjectDocumentVersion[]>(
+    `/api/projects/${encodeURIComponent(projectId)}/documents/${encodeURIComponent(documentId)}/versions`);
+}
+export async function getProjectDocumentDiff(projectId: string, documentId: string) {
+  return fetchJson<{ document_id: string; from_version: number; to_version: number; diff: string }>(
+    `/api/projects/${encodeURIComponent(projectId)}/documents/${encodeURIComponent(documentId)}/diff`);
+}
+export async function exportProject(projectId: string) {
+  return requestJson<ProjectExport>(`/api/projects/${encodeURIComponent(projectId)}/export`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: "{}",
+  });
 }

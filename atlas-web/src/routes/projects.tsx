@@ -74,11 +74,14 @@ export function Projects() {
                         </div>
                         <p className="mt-2 text-sm leading-6 text-muted">{project.objective}</p>
                         <p className="mt-3 break-all font-mono text-xs text-subtle">{project.workspace}</p>
-                        <div className="mt-4 flex items-center justify-between gap-3">
+                        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                           <span className="text-xs text-subtle">
                             {project.mode === "new" ? t("projectModeNew", lang) : t("projectModeExisting", lang)}
                           </span>
-                          {!selected ? <Button size="sm" variant="outline" onClick={() => select(project.id)}>{t("projectSelect", lang)}</Button> : null}
+                          <div className="flex gap-2">
+                            {!selected ? <Button size="sm" variant="outline" onClick={() => select(project.id)}>{t("projectSelect", lang)}</Button> : null}
+                            <Button size="sm" asChild><Link to={`/projects/${project.id}`}>{lang === "zh" ? "打开工作区" : "Open workspace"}</Link></Button>
+                          </div>
                         </div>
                       </div>
                     </div>

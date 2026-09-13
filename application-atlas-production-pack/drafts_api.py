@@ -25,6 +25,16 @@ Endpoints:
                                         kind=application|research|app
   PATCH  /api/projects/<id>/references/<reference-id>
                                         update {note?,read_status?}
+  GET    /api/projects/<id>/workspace    requirements, decisions, documents
+  POST   /api/projects/<id>/requirements
+  PATCH  /api/projects/<id>/requirements/<requirement-id>
+  POST   /api/projects/<id>/requirements/<requirement-id>/confirm
+  POST   /api/projects/<id>/decisions
+  POST   /api/projects/<id>/documents
+  GET    /api/projects/<id>/documents/<document-id>/versions
+  POST   /api/projects/<id>/documents/<document-id>/versions
+  GET    /api/projects/<id>/documents/<document-id>/diff?from=1&to=2
+  POST   /api/projects/<id>/export       create self-contained Markdown bundle
 
 Run alongside `npm run dev` (vite proxies /api -> :5199).
 """
@@ -45,6 +55,13 @@ from atlas_runtime import PACK as DATA_PACK, api_key, atomic_write, corpus_lock,
 from review_store import load_review, update_review, fingerprint, corpus_revision, review_current, valid_slug
 from atlas_sources import SourceError, read_source, source_manifest
 from project_store import ProjectStore, ProjectStoreError
+from project_workflow import (
+    add_document_version, confirm_requirement, create_decision,
+    create_document as create_project_document,
+    create_requirement as create_project_requirement,
+    document_diff, document_versions, export_bundle, project_workspace,
+    update_requirement as update_project_requirement,
+)
 PACK = str(DATA_PACK)
 sys.path.insert(0, PACK)
 from leaf_lint import lint, parse_front
@@ -564,12 +581,41 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(load_review(PACK))
         if path == "/api/projects":
             return self._json(get_project_store().list_projects())
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/workspace$", path)
+        if m:
+            try:
+                return self._json(project_workspace(get_project_store(), m.group(1)))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
         m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/references$", path)
         if m:
             try:
                 return self._json(list_project_references(m.group(1)))
             except ProjectStoreError as error:
                 return self._json({"error": str(error)}, 404)
+        m = re.match(
+            r"^/api/projects/(prj_[A-Za-z0-9]+)/documents/(doc_[A-Za-z0-9]+)/versions$",
+            path)
+        if m:
+            try:
+                return self._json(document_versions(
+                    get_project_store(), m.group(1), m.group(2)))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
+        m = re.match(
+            r"^/api/projects/(prj_[A-Za-z0-9]+)/documents/(doc_[A-Za-z0-9]+)/diff$",
+            path)
+        if m:
+            query = parse_qs(parsed.query)
+            try:
+                before = int(query["from"][0]) if query.get("from") else None
+                after = int(query["to"][0]) if query.get("to") else None
+                return self._json(document_diff(
+                    get_project_store(), m.group(1), m.group(2), before, after))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
+            except ValueError as error:
+                return self._json({"error": str(error)}, 400)
         m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)$", path)
         if m:
             try:
@@ -607,6 +653,62 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = unquote(urlparse(self.path).path)
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/requirements$", path)
+        if m:
+            try:
+                return self._json(create_project_requirement(
+                    get_project_store(), m.group(1), self._body()), 201)
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
+        m = re.match(
+            r"^/api/projects/(prj_[A-Za-z0-9]+)/requirements/(req_[A-Za-z0-9]+)/confirm$",
+            path)
+        if m:
+            try:
+                return self._json(confirm_requirement(
+                    get_project_store(), m.group(1), m.group(2), self._body()))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/decisions$", path)
+        if m:
+            try:
+                return self._json(create_decision(
+                    get_project_store(), m.group(1), self._body()), 201)
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/documents$", path)
+        if m:
+            try:
+                return self._json(create_project_document(
+                    get_project_store(), m.group(1), self._body()), 201)
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
+        m = re.match(
+            r"^/api/projects/(prj_[A-Za-z0-9]+)/documents/(doc_[A-Za-z0-9]+)/versions$",
+            path)
+        if m:
+            try:
+                return self._json(add_document_version(
+                    get_project_store(), m.group(1), m.group(2), self._body()), 201)
+            except ProjectStoreError as error:
+                code = 409 if str(error) == "document version conflict" else 404
+                return self._json({"error": str(error)}, code)
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/export$", path)
+        if m:
+            try:
+                return self._json(export_bundle(get_project_store(), m.group(1)), 201)
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
         m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/references$", path)
         if m:
             try:
@@ -690,6 +792,17 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_PATCH(self):
         path = unquote(urlparse(self.path).path)
+        m = re.match(
+            r"^/api/projects/(prj_[A-Za-z0-9]+)/requirements/(req_[A-Za-z0-9]+)$",
+            path)
+        if m:
+            try:
+                return self._json(update_project_requirement(
+                    get_project_store(), m.group(1), m.group(2), self._body()))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
         m = re.match(
             r"^/api/projects/(prj_[A-Za-z0-9]+)/references/(ref_[A-Za-z0-9]+)$", path)
         if m:

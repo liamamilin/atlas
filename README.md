@@ -19,12 +19,13 @@ U17 面向新想法和已有项目改进：搜索与阅读类型、应用资料�
 - [开发规划](docs/U17_DEVELOPMENT_PLAN.md)：M0–M5 的验证任务、实现顺序和完成条件。
 - [M0 验证记录](docs/U17_M0_VALIDATION.md)：完整资料读取与 OpenCode 接口的实际验证结果。
 - [M1 验证记录](docs/U17_M1_VALIDATION.md)：统一搜索、正式资料阅读、收藏与版本提示的实际验证结果。
+- [M2 基础闭环验证](docs/U17_M2_FOUNDATION_VALIDATION.md)：需求、决定、关联文档、版本传播与独立导出的实际验证结果。
 - [双场景样例](docs/u17-samples/)：新想法与已有项目改进的关联文档包。
 - [下游应用路线图](USAGE_ROADMAP.md)：U17 与其他功能的关系及历史记录。
 
-截至 2026-09-13，U17 的 M0 核心验证和 M1 项目资料集已完成：资料全文读取、OpenCode 核心适配、执行状态投影、工作区基线、独立项目/迭代存储、双场景文档样例和离线任务交接包已落地；网页支持项目创建与切换、类型与应用统一搜索、正式正文/研究笔记阅读、类型全文/章节及应用目录资料收藏、备注/阅读状态和来源版本变化提示。M2 关联文档流程仍在开发。当前应用的运行功能以本 README 其余章节为准。
+截至 2026-09-13，U17 的 M0 核心验证、M1 项目资料集和 M2 关联文档基础闭环已完成：资料全文读取、OpenCode 核心适配、执行状态投影、工作区基线、独立项目/迭代存储、双场景文档样例和离线任务交接包已落地；网页支持项目创建与切换、统一搜索、正式资料阅读与收藏，以及需求推荐/确认、决定、关联文档、不可变版本、上游变化复核和独立 Markdown ZIP 导出。M2 的自动资料分析、关联文档生成、自然语言修改和内容冲突检查仍在开发。当前应用的运行功能以本 README 其余章节为准。
 
-U17 的本地 API 提供 `GET /api/sources/<slug>` 查询正式类型资料清单，通过 `GET /api/sources/<kind>/<slug>` 按完整文档或章节分页读取；`GET/POST /api/projects` 与 `GET /api/projects/<id>` 管理项目；`GET/POST /api/projects/<id>/references` 和 `PATCH /api/projects/<id>/references/<reference-id>` 管理固定版本的项目资料。网页的“项目”入口可创建、列出和切换项目。MCP 同步提供 `get_atlas_source_manifest` 与 `read_atlas_source`。`opencode_client.py` 是首个执行引擎适配模块，`workspace_snapshot.py` 提供独立于引擎的文件基线与变化核对。关联文档生成和正式开发执行流程尚未实现。
+U17 的本地 API 提供 `GET /api/sources/<slug>` 查询正式类型资料清单，通过 `GET /api/sources/<kind>/<slug>` 按完整文档或章节分页读取；项目 API 管理项目、固定资料、需求、用户确认、决定、关联文档版本、差异与导出。网页的“项目”入口可进入完整项目工作区。MCP 同步提供 `get_atlas_source_manifest` 与 `read_atlas_source`。`opencode_client.py` 是首个执行引擎适配模块，`workspace_snapshot.py` 提供独立于引擎的文件基线与变化核对。自动分析与文档生成、已有项目分析和正式开发执行流程尚未实现。
 
 ## 启动
 

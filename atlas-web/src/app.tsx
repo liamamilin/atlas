@@ -7,6 +7,7 @@ import { Search } from "@/routes/search";
 import { Apps } from "@/routes/apps";
 import { Drafts, DraftDetailPage } from "@/routes/drafts";
 import { Projects } from "@/routes/projects";
+import { ProjectDetail } from "@/routes/project-detail";
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/drafts" element={<Drafts />} />
         <Route path="/drafts/:slug" element={<DraftDetailRoute />} />
         <Route path="/projects" element={<Projects />} />
+        <Route path="/projects/:projectId" element={<ProjectDetail />} />
         <Route path="*" element={<Home />} />
       </Route>
     </Routes>

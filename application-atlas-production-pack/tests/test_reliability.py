@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import zipfile
 from unittest.mock import patch
 
 import numpy as np
@@ -25,6 +26,7 @@ from atlas_sources import SourceError, read_source, source_manifest
 from opencode_client import OpenCodeClient, iter_sse
 from execution_state import project_execution
 from project_store import ProjectStore, ProjectStoreError
+from project_export import export_project
 from handoff_bundle import build_handoff, validate_handoff, write_handoff
 from sample_package import validate_package
 from workspace_snapshot import compare_snapshots, snapshot_workspace
@@ -282,7 +284,39 @@ class ProjectStoreTests(unittest.TestCase):
         self.assertEqual(migrated.get_task('tsk_legacy')['title'], 'Task')
         self.assertIsNone(migrated.get_task('tsk_legacy')['iteration_id'])
         with sqlite3.connect(path) as con:
-            self.assertEqual(con.execute('PRAGMA user_version').fetchone()[0], 2)
+            self.assertEqual(con.execute('PRAGMA user_version').fetchone()[0], 3)
+
+    def test_version_two_store_adds_document_authorship(self):
+        path = self.root / 'version-two.sqlite'
+        with sqlite3.connect(path) as con:
+            con.executescript('''
+                CREATE TABLE project (
+                    id TEXT PRIMARY KEY, name TEXT NOT NULL, objective TEXT NOT NULL,
+                    workspace TEXT NOT NULL, mode TEXT NOT NULL,
+                    created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
+                CREATE TABLE document (
+                    id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES project(id),
+                    kind TEXT NOT NULL, title TEXT NOT NULL, current_version INTEGER NOT NULL,
+                    created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
+                CREATE TABLE document_version (
+                    id TEXT PRIMARY KEY, document_id TEXT NOT NULL REFERENCES document(id),
+                    version INTEGER NOT NULL, content TEXT NOT NULL, content_sha256 TEXT NOT NULL,
+                    basis_json TEXT NOT NULL, created_at TEXT NOT NULL,
+                    UNIQUE(document_id,version));
+                INSERT INTO project VALUES
+                    ('prj_v2','V2','Migrate','/tmp/v2','existing','now','now');
+                INSERT INTO document VALUES
+                    ('doc_v2','prj_v2','analysis','Analysis',1,'now','now');
+                INSERT INTO document_version VALUES
+                    ('dver_v2','doc_v2',1,'legacy','sha','[]','now');
+                PRAGMA user_version=2;
+            ''')
+        migrated = ProjectStore(path)
+        document = migrated.get_document('doc_v2')
+        self.assertEqual(document['author'], 'unknown')
+        self.assertEqual(document['change_summary'], '')
+        with sqlite3.connect(path) as con:
+            self.assertEqual(con.execute('PRAGMA user_version').fetchone()[0], 3)
 
     def test_document_versions_are_immutable_and_conflicts_are_explicit(self):
         document = self.store.create_document(
@@ -295,6 +329,72 @@ class ProjectStoreTests(unittest.TestCase):
         with self.assertRaises(ProjectStoreError):
             self.store.add_document_version(
                 document['id'], 'stale update', expected_current_version=1)
+
+    def test_document_basis_tracks_authorship_and_upstream_changes(self):
+        requirement = self.store.create_requirement(
+            self.project['id'], 'Keep work local', 'current', 'User constraint',
+            ['No network is required'])
+        analysis = self.store.create_document(
+            self.project['id'], 'analysis', 'Analysis', 'Initial analysis',
+            [{'kind': 'requirement', 'id': requirement['id']}],
+            author='ai', change_summary='Generated from confirmed research')
+        self.assertEqual(analysis['author'], 'ai')
+        self.assertEqual(analysis['review']['status'], 'current')
+        self.assertEqual(analysis['basis'][0]['id'], requirement['id'])
+        self.assertIn('fingerprint', analysis['basis'][0])
+        self.store.confirm_requirement(requirement['id'], 'current', 'Approved')
+        self.assertEqual(
+            self.store.get_document(analysis['id'])['review']['reasons'][0]['kind'],
+            'requirement_changed')
+        revised = self.store.add_document_version(
+            analysis['id'], 'Human revision',
+            [{'kind': 'requirement', 'id': requirement['id']}],
+            expected_current_version=1, author='human', change_summary='Kept manual nuance')
+        self.assertEqual(revised['review']['status'], 'current')
+        downstream = self.store.create_document(
+            self.project['id'], 'technical-plan', 'Technical plan', 'Plan v1',
+            [{'kind': 'document_version', 'id': revised['version_id']}], author='ai')
+        self.store.add_document_version(
+            analysis['id'], 'Human revision two',
+            [{'kind': 'requirement', 'id': requirement['id']}], author='human')
+        self.assertEqual(
+            self.store.get_document(downstream['id'])['review']['reasons'][0]['kind'],
+            'upstream_document_changed')
+        changed = self.store.update_requirement(
+            self.project['id'], requirement['id'], content='Keep data and execution local')
+        self.assertIsNone(changed['confirmed_scope'])
+
+    def test_project_export_is_self_contained_and_keeps_confirmation_separate(self):
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'source-v1',
+            locator='core-model', excerpt='## Core Model\nFixed evidence',
+            note='Use the record boundary', read_status='reviewed')
+        requirement = self.store.create_requirement(
+            self.project['id'], 'Keep the record boundary', 'current', 'Matches the evidence',
+            ['The boundary is visible'], [reference['id']])
+        self.store.record_decision(
+            self.project['id'], 'Use a fixed excerpt', 'Prevents silent source changes',
+            [reference['id']])
+        self.store.create_document(
+            self.project['id'], 'product-requirements', 'Product requirements',
+            '# Product requirements\n\nKeep the boundary.',
+            [{'kind': 'reference', 'id': reference['id']},
+             {'kind': 'requirement', 'id': requirement['id']}],
+            author='ai', change_summary='Initial document')
+        exported = export_project(self.store, self.project['id'])
+        archive = Path(exported['archive'])
+        self.assertTrue(archive.is_file())
+        self.assertEqual(exported['manifest']['unresolved_requirement_ids'], [requirement['id']])
+        with zipfile.ZipFile(archive) as bundle:
+            names = bundle.namelist()
+            index = bundle.read('INDEX.md').decode()
+            requirements = bundle.read('requirements.md').decode()
+            source_name = next(name for name in names if name.startswith('sources/'))
+            source = bundle.read(source_name).decode()
+        self.assertIn('Product requirements', index)
+        self.assertIn('User confirmation: `pending`', requirements)
+        self.assertIn('AI recommendation: `current`', requirements)
+        self.assertIn('Fixed evidence', source)
 
     def test_task_inputs_must_belong_to_same_project(self):
         other = self.store.create_project('Other', 'Other goal', self.root / 'other', 'existing')
@@ -598,6 +698,92 @@ class ProjectStoreTests(unittest.TestCase):
         self.assertEqual(code, 200)
         self.assertEqual(updated['note'], 'Confirmed evidence')
         self.assertEqual(updated['read_status'], 'reviewed')
+
+    def test_project_workflow_http_keeps_recommendation_confirmation_and_versions_distinct(self):
+        import drafts_api
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'v1',
+            excerpt='Fixed evidence', read_status='reviewed')
+        handler = object.__new__(drafts_api.Handler)
+        handler._json = lambda value, code=200: (value, code)
+
+        handler.path = f"/api/projects/{self.project['id']}/requirements"
+        handler._body = lambda: {
+            'content': 'Keep the core record visible',
+            'recommended_scope': 'current',
+            'recommendation_reason': 'Supported by the source',
+            'acceptance_conditions': ['The record remains visible'],
+            'reference_ids': [reference['id']],
+        }
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            requirement, code = handler.do_POST()
+        self.assertEqual(code, 201)
+        self.assertEqual(requirement['recommended_scope'], 'current')
+        self.assertIsNone(requirement['confirmed_scope'])
+
+        handler.path += '/' + requirement['id'] + '/confirm'
+        handler._body = lambda: {'scope': 'current', 'reason': 'Approved for the pilot'}
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            confirmed, code = handler.do_POST()
+        self.assertEqual(code, 200)
+        self.assertEqual(confirmed['confirmed_scope'], 'current')
+
+        handler.path = f"/api/projects/{self.project['id']}/documents"
+        handler._body = lambda: {
+            'kind': 'product-requirements', 'title': 'Product requirements',
+            'content': '# Product requirements\n\nInitial human-reviewed scope.',
+            'basis': [{'kind': 'requirement', 'id': requirement['id']},
+                      {'kind': 'reference', 'id': reference['id']}],
+            'author': 'ai', 'change_summary': 'Initial linked draft',
+        }
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            document, code = handler.do_POST()
+        self.assertEqual(code, 201)
+        self.assertEqual(document['review']['status'], 'current')
+
+        handler.path = (f"/api/projects/{self.project['id']}/documents/"
+                        f"{document['id']}/versions")
+        handler._body = lambda: {
+            'content': '# Product requirements\n\nPreserve the manual constraint.',
+            'basis': document['basis'], 'expected_current_version': 1,
+            'author': 'human', 'change_summary': 'Clarified the accepted wording',
+        }
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            revised, code = handler.do_POST()
+        self.assertEqual(code, 201)
+        self.assertEqual(revised['current_version'], 2)
+        self.assertEqual(revised['author'], 'human')
+
+        handler.path = (f"/api/projects/{self.project['id']}/documents/"
+                        f"{document['id']}/diff?from=1&to=2")
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            diff, code = handler.do_GET()
+        self.assertEqual(code, 200)
+        self.assertIn('+Preserve the manual constraint.', diff['diff'])
+        self.assertIn(
+            '-Initial human-reviewed scope.\n+Preserve the manual constraint.',
+            diff['diff'])
+
+        handler.path = (f"/api/projects/{self.project['id']}/requirements/"
+                        f"{requirement['id']}")
+        handler._body = lambda: {'content': 'Keep the core record and its source visible'}
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            changed, code = handler.do_PATCH()
+        self.assertEqual(code, 200)
+        self.assertIsNone(changed['confirmed_scope'])
+
+        handler.path = f"/api/projects/{self.project['id']}/workspace"
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            workspace, code = handler.do_GET()
+        self.assertEqual(code, 200)
+        self.assertEqual(workspace['documents'][0]['review']['status'], 'needs_review')
+
+        handler.path = f"/api/projects/{self.project['id']}/export"
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            exported, code = handler.do_POST()
+        self.assertEqual(code, 201)
+        self.assertTrue(Path(exported['archive']).is_file())
+        self.assertEqual(exported['manifest']['documents_needing_review'], [document['id']])
 
 
 class SamplePackageTests(unittest.TestCase):

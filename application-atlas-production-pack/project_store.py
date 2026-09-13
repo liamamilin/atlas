@@ -13,7 +13,7 @@ import uuid
 from atlas_runtime import PACK
 
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 PROJECT_MODES = {"new", "existing"}
 TASK_STATES = {"planned", "queued", "running", "waiting_permission",
                "waiting_input", "completed", "failed", "stopped", "unknown"}
@@ -22,6 +22,7 @@ ACCEPTANCE_STATES = {"pending", "passed", "failed", "waived"}
 SCOPE_STATES = {"current", "later", "excluded"}
 READ_STATES = {"unread", "read", "reviewed"}
 ITERATION_STATES = {"planned", "active", "completed", "abandoned"}
+DOCUMENT_AUTHORS = {"ai", "human", "import", "unknown"}
 
 
 class ProjectStoreError(RuntimeError):
@@ -72,41 +73,53 @@ class ProjectStore:
         return [dict(row) for row in rows]
 
     def create_document(self, project_id: str, kind: str, title: str, content: str,
-                        basis: list[dict] | None = None) -> dict:
+                        basis: list[dict] | None = None, author: str = "human",
+                        change_summary: str = "") -> dict:
         document_id, version_id = _id("doc"), _id("dver")
         now = _now()
         with self._transaction() as con:
             self._require_project(con, project_id)
+            normalized_basis = self._normalize_basis(con, project_id, basis or [])
             con.execute("""INSERT INTO document
                 (id,project_id,kind,title,current_version,created_at,updated_at)
                 VALUES (?,?,?,?,1,?,?)""",
                 (document_id, project_id, _required(kind, "kind"),
                  _required(title, "title"), now, now))
-            self._insert_version(con, version_id, document_id, 1, content, basis, now)
+            self._insert_version(con, version_id, document_id, 1, content, normalized_basis, now,
+                                 author, change_summary)
+            con.execute("UPDATE project SET updated_at=? WHERE id=?", (now, project_id))
         return self.get_document(document_id)
 
     def add_document_version(self, document_id: str, content: str,
                              basis: list[dict] | None = None,
-                             expected_current_version: int | None = None) -> dict:
+                             expected_current_version: int | None = None,
+                             author: str = "human", change_summary: str = "") -> dict:
         now, version_id = _now(), _id("dver")
         with self._transaction() as con:
             document = con.execute(
-                "SELECT current_version FROM document WHERE id=?", (document_id,)).fetchone()
+                "SELECT current_version,project_id FROM document WHERE id=?",
+                (document_id,)).fetchone()
             if not document:
                 raise ProjectStoreError("document not found")
             current = document["current_version"]
             if expected_current_version is not None and current != expected_current_version:
                 raise ProjectStoreError("document version conflict")
             number = current + 1
-            self._insert_version(con, version_id, document_id, number, content, basis, now)
+            normalized_basis = self._normalize_basis(
+                con, document["project_id"], basis or [])
+            self._insert_version(con, version_id, document_id, number, content,
+                                 normalized_basis, now,
+                                 author, change_summary)
             con.execute("UPDATE document SET current_version=?,updated_at=? WHERE id=?",
                         (number, now, document_id))
+            con.execute("UPDATE project SET updated_at=? WHERE id=?",
+                        (now, document["project_id"]))
         return self.get_document(document_id)
 
     def get_document(self, document_id: str) -> dict:
         with self._connect() as con:
             row = con.execute("""SELECT d.*,v.id AS version_id,v.content,v.content_sha256,
-                v.basis_json,v.created_at AS version_created_at
+                v.basis_json,v.author,v.change_summary,v.created_at AS version_created_at
                 FROM document d JOIN document_version v
                 ON v.document_id=d.id AND v.version=d.current_version WHERE d.id=?""",
                 (document_id,)).fetchone()
@@ -114,6 +127,35 @@ class ProjectStore:
             raise ProjectStoreError("document not found")
         result = dict(row)
         result["basis"] = json.loads(result.pop("basis_json"))
+        result["review"] = self._document_review(result["project_id"], result["basis"],
+                                                  result["version_created_at"])
+        return result
+
+    def list_documents(self, project_id: str) -> list[dict]:
+        with self._connect() as con:
+            self._require_project(con, project_id)
+            ids = [row[0] for row in con.execute(
+                "SELECT id FROM document WHERE project_id=? ORDER BY updated_at DESC,id",
+                (project_id,)).fetchall()]
+        return [self.get_document(document_id) for document_id in ids]
+
+    def list_document_versions(self, project_id: str, document_id: str) -> list[dict]:
+        with self._connect() as con:
+            row = con.execute("SELECT 1 FROM document WHERE id=? AND project_id=?",
+                              (document_id, project_id)).fetchone()
+            if not row:
+                raise ProjectStoreError("document not found")
+            rows = con.execute("""SELECT id AS version_id,document_id,version,content,
+                content_sha256,basis_json,author,change_summary,created_at
+                FROM document_version WHERE document_id=? ORDER BY version DESC""",
+                (document_id,)).fetchall()
+        result = []
+        for row in rows:
+            item = dict(row)
+            item["basis"] = json.loads(item.pop("basis_json"))
+            item["review"] = self._document_review(
+                project_id, item["basis"], item["created_at"])
+            result.append(item)
         return result
 
     def create_task(self, project_id: str, title: str, objective: str,
@@ -250,6 +292,51 @@ class ProjectStore:
                 (requirement_id, project_id, _required(content, "content"), recommended_scope,
                  recommendation_reason, _json(acceptance_conditions or []),
                  _json(references), now, now))
+            con.execute("UPDATE project SET updated_at=? WHERE id=?", (now, project_id))
+        return self.get_requirement(requirement_id)
+
+    def update_requirement(self, project_id: str, requirement_id: str,
+                           content: str | None = None,
+                           recommended_scope: str | None = None,
+                           recommendation_reason: str | None = None,
+                           acceptance_conditions: list[str] | None = None,
+                           reference_ids: list[str] | None = None) -> dict:
+        if all(value is None for value in (content, recommended_scope, recommendation_reason,
+                                           acceptance_conditions, reference_ids)):
+            raise ValueError("at least one requirement field is required")
+        if recommended_scope is not None and recommended_scope not in SCOPE_STATES:
+            raise ValueError("invalid recommended scope")
+        if recommendation_reason is not None and not isinstance(recommendation_reason, str):
+            raise ValueError("recommendation_reason must be text")
+        now = _now()
+        with self._transaction() as con:
+            row = con.execute("SELECT * FROM requirement WHERE id=? AND project_id=?",
+                              (requirement_id, project_id)).fetchone()
+            if not row:
+                raise ProjectStoreError("requirement not found")
+            references = reference_ids if reference_ids is not None \
+                else json.loads(row["reference_ids_json"])
+            self._require_references(con, project_id, references)
+            new_content = _required(content, "content") if content is not None else row["content"]
+            new_acceptance = acceptance_conditions if acceptance_conditions is not None \
+                else json.loads(row["acceptance_json"])
+            if not isinstance(new_acceptance, list) or not all(
+                    isinstance(value, str) and value.strip() for value in new_acceptance):
+                raise ValueError("acceptance_conditions must contain non-empty text")
+            meaning_changed = (new_content != row["content"] or
+                               _json(new_acceptance) != row["acceptance_json"] or
+                               _json(references) != row["reference_ids_json"])
+            con.execute("""UPDATE requirement SET content=?,recommended_scope=?,
+                recommendation_reason=?,acceptance_json=?,reference_ids_json=?,
+                confirmed_scope=?,confirmation_reason=?,updated_at=? WHERE id=?""",
+                (new_content,
+                 recommended_scope if recommended_scope is not None else row["recommended_scope"],
+                 recommendation_reason if recommendation_reason is not None
+                 else row["recommendation_reason"],
+                 _json(new_acceptance), _json(references),
+                 None if meaning_changed else row["confirmed_scope"],
+                 "" if meaning_changed else row["confirmation_reason"], now, requirement_id))
+            con.execute("UPDATE project SET updated_at=? WHERE id=?", (now, project_id))
         return self.get_requirement(requirement_id)
 
     def confirm_requirement(self, requirement_id: str, scope: str, reason: str) -> dict:
@@ -257,10 +344,14 @@ class ProjectStore:
             raise ValueError("invalid confirmed scope")
         now = _now()
         with self._transaction() as con:
-            if not con.execute("SELECT 1 FROM requirement WHERE id=?", (requirement_id,)).fetchone():
+            requirement = con.execute(
+                "SELECT project_id FROM requirement WHERE id=?", (requirement_id,)).fetchone()
+            if not requirement:
                 raise ProjectStoreError("requirement not found")
             con.execute("""UPDATE requirement SET confirmed_scope=?,confirmation_reason=?,
                 updated_at=? WHERE id=?""", (scope, _required(reason, "reason"), now, requirement_id))
+            con.execute("UPDATE project SET updated_at=? WHERE id=?",
+                        (now, requirement["project_id"]))
         return self.get_requirement(requirement_id)
 
     def get_requirement(self, requirement_id: str) -> dict:
@@ -268,6 +359,14 @@ class ProjectStore:
         result["acceptance_conditions"] = json.loads(result.pop("acceptance_json"))
         result["reference_ids"] = json.loads(result.pop("reference_ids_json"))
         return result
+
+    def list_requirements(self, project_id: str) -> list[dict]:
+        with self._connect() as con:
+            self._require_project(con, project_id)
+            ids = [row[0] for row in con.execute(
+                "SELECT id FROM requirement WHERE project_id=? ORDER BY created_at,id",
+                (project_id,)).fetchall()]
+        return [self.get_requirement(requirement_id) for requirement_id in ids]
 
     def record_decision(self, project_id: str, statement: str, rationale: str,
                         reference_ids: list[str] | None = None) -> dict:
@@ -281,8 +380,22 @@ class ProjectStore:
                 VALUES (?,?,?,?,?,?)""",
                 (decision_id, project_id, _required(statement, "statement"),
                  _required(rationale, "rationale"), _json(references), now))
+            con.execute("UPDATE project SET updated_at=? WHERE id=?", (now, project_id))
         result = self._row("decision", decision_id)
         result["reference_ids"] = json.loads(result.pop("reference_ids_json"))
+        return result
+
+    def list_decisions(self, project_id: str) -> list[dict]:
+        with self._connect() as con:
+            self._require_project(con, project_id)
+            rows = con.execute(
+                "SELECT * FROM decision WHERE project_id=? ORDER BY created_at,id",
+                (project_id,)).fetchall()
+        result = []
+        for row in rows:
+            item = dict(row)
+            item["reference_ids"] = json.loads(item.pop("reference_ids_json"))
+            result.append(item)
         return result
 
     def create_iteration(self, project_id: str, title: str, objective: str,
@@ -502,7 +615,7 @@ class ProjectStore:
     def _initialize(self):
         with self._transaction() as con:
             version = con.execute("PRAGMA user_version").fetchone()[0]
-            if version not in {0, 1, SCHEMA_VERSION}:
+            if version not in {0, 1, 2, SCHEMA_VERSION}:
                 raise ProjectStoreError(f"unsupported project store schema {version}")
             if version == 1:
                 _execute_statements(con, """
@@ -529,7 +642,8 @@ class ProjectStore:
                 CREATE TABLE IF NOT EXISTS document_version (
                     id TEXT PRIMARY KEY, document_id TEXT NOT NULL REFERENCES document(id),
                     version INTEGER NOT NULL, content TEXT NOT NULL, content_sha256 TEXT NOT NULL,
-                    basis_json TEXT NOT NULL, created_at TEXT NOT NULL,
+                    basis_json TEXT NOT NULL, author TEXT NOT NULL, change_summary TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
                     UNIQUE(document_id,version));
                 CREATE TABLE IF NOT EXISTS iteration (
                     id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES project(id),
@@ -573,6 +687,12 @@ class ProjectStore:
                 CREATE UNIQUE INDEX IF NOT EXISTS one_active_iteration_per_project
                     ON iteration(project_id) WHERE status='active';
             """)
+            version_columns = {
+                row[1] for row in con.execute("PRAGMA table_info(document_version)").fetchall()}
+            if "author" not in version_columns:
+                con.execute("ALTER TABLE document_version ADD COLUMN author TEXT NOT NULL DEFAULT 'unknown'")
+            if "change_summary" not in version_columns:
+                con.execute("ALTER TABLE document_version ADD COLUMN change_summary TEXT NOT NULL DEFAULT ''")
             con.execute(f"PRAGMA user_version={SCHEMA_VERSION}")
 
     @contextmanager
@@ -597,14 +717,20 @@ class ProjectStore:
                 raise
 
     @staticmethod
-    def _insert_version(con, version_id, document_id, number, content, basis, now):
+    def _insert_version(con, version_id, document_id, number, content, basis, now,
+                        author, change_summary):
         if not isinstance(content, str):
             raise ValueError("content must be text")
+        if author not in DOCUMENT_AUTHORS:
+            raise ValueError("invalid document author")
+        if not isinstance(change_summary, str):
+            raise ValueError("change_summary must be text")
         con.execute("""INSERT INTO document_version
-            (id,document_id,version,content,content_sha256,basis_json,created_at)
-            VALUES (?,?,?,?,?,?,?)""",
+            (id,document_id,version,content,content_sha256,basis_json,author,
+             change_summary,created_at) VALUES (?,?,?,?,?,?,?,?,?)""",
             (version_id, document_id, number, content,
-             hashlib.sha256(content.encode()).hexdigest(), _json(basis or []), now))
+             hashlib.sha256(content.encode()).hexdigest(), _json(basis or []),
+             author, change_summary, now))
 
     @staticmethod
     def _require_project(con, project_id):
@@ -631,6 +757,91 @@ class ProjectStore:
                     ON d.id=v.document_id WHERE v.id=? AND d.project_id=?""",
                     (version_id, project_id)).fetchone():
                 raise ProjectStoreError("document version does not belong to project")
+
+    @staticmethod
+    def _normalize_basis(con, project_id, basis):
+        if not isinstance(basis, list):
+            raise ValueError("basis must be a list")
+        seen = set()
+        normalized = []
+        for item in basis:
+            if not isinstance(item, dict):
+                raise ValueError("basis entries must be objects")
+            if "source" in item and "fingerprint" in item:
+                if not isinstance(item["source"], str) or not isinstance(item["fingerprint"], str):
+                    raise ValueError("external basis source and fingerprint must be text")
+                normalized.append(dict(item))
+                continue
+            kind, item_id = item.get("kind"), item.get("id")
+            if kind not in {"reference", "requirement", "decision", "document_version"} \
+                    or not isinstance(item_id, str):
+                raise ValueError("invalid basis entry")
+            key = (kind, item_id)
+            if key in seen:
+                raise ValueError("duplicate basis entry")
+            seen.add(key)
+            if kind == "document_version":
+                row = con.execute("""SELECT v.content_sha256,v.version FROM document_version v
+                    JOIN document d
+                    ON d.id=v.document_id WHERE v.id=? AND d.project_id=?""",
+                    (item_id, project_id)).fetchone()
+                value = {"kind": kind, "id": item_id, "version": row["version"],
+                         "fingerprint": row["content_sha256"]} if row else None
+            elif kind == "reference":
+                row = con.execute("""SELECT source_version FROM reference
+                    WHERE id=? AND project_id=?""", (item_id, project_id)).fetchone()
+                value = {"kind": kind, "id": item_id,
+                         "version": row["source_version"]} if row else None
+            elif kind == "requirement":
+                row = con.execute("""SELECT content,recommended_scope,recommendation_reason,
+                    confirmed_scope,confirmation_reason,acceptance_json,reference_ids_json,updated_at
+                    FROM requirement WHERE id=? AND project_id=?""",
+                    (item_id, project_id)).fetchone()
+                if row:
+                    payload = _json({key: row[key] for key in row.keys() if key != "updated_at"})
+                    value = {"kind": kind, "id": item_id, "version": row["updated_at"],
+                             "fingerprint": hashlib.sha256(payload.encode()).hexdigest()}
+                else:
+                    value = None
+            else:
+                row = con.execute("""SELECT created_at FROM decision
+                    WHERE id=? AND project_id=?""", (item_id, project_id)).fetchone()
+                value = {"kind": kind, "id": item_id,
+                         "version": row["created_at"]} if row else None
+            if value is None:
+                raise ProjectStoreError(f"basis {kind} does not belong to project")
+            normalized.append(value)
+        return normalized
+
+    def _document_review(self, project_id, basis, version_created_at):
+        reasons = []
+        with self._connect() as con:
+            for item in basis:
+                if not isinstance(item, dict):
+                    continue
+                if item.get("kind") == "requirement":
+                    row = con.execute("""SELECT content,recommended_scope,recommendation_reason,
+                        confirmed_scope,confirmation_reason,acceptance_json,reference_ids_json,
+                        updated_at FROM requirement WHERE id=? AND project_id=?""",
+                        (item.get("id"), project_id)).fetchone()
+                    if row and item.get("fingerprint"):
+                        payload = _json({key: row[key] for key in row.keys() if key != "updated_at"})
+                        changed = item["fingerprint"] != hashlib.sha256(payload.encode()).hexdigest()
+                    else:
+                        changed = row and (
+                            (item.get("version") is not None and item["version"] != row["updated_at"])
+                            or (item.get("version") is None and row["updated_at"] > version_created_at))
+                    if changed:
+                        reasons.append({"kind": "requirement_changed", "id": item["id"]})
+                elif item.get("kind") == "document_version":
+                    row = con.execute("""SELECT d.current_version,v.version,d.id AS document_id
+                        FROM document_version v JOIN document d ON d.id=v.document_id
+                        WHERE v.id=? AND d.project_id=?""",
+                        (item.get("id"), project_id)).fetchone()
+                    if row and row["version"] != row["current_version"]:
+                        reasons.append({"kind": "upstream_document_changed",
+                                        "id": item["id"], "document_id": row["document_id"]})
+        return {"status": "needs_review" if reasons else "current", "reasons": reasons}
 
     def _row(self, table: str, item_id: str) -> dict:
         if table not in {"reference", "requirement", "decision", "iteration"}:
