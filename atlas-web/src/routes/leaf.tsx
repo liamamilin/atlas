@@ -1,11 +1,15 @@
-import { Link, useParams } from "react-router-dom";
-import { getLeaf, type LeafDetail } from "@/lib/atlas";
+import { useState } from "react";
+import { ArrowRight, FolderKanban, Plus } from "lucide-react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { getLeaf, saveProjectReference, type LeafDetail } from "@/lib/atlas";
 import { useAsync, Loading, ErrorBox } from "@/components/loaders";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { REL_KIND_ZH } from "@/lib/atlas";
 import { Prose } from "@/components/prose";
 import { SourceReader } from "@/components/source-reader";
 import { useLang, pick, t, type Lang } from "@/lib/lang";
+import { useCurrentProjectId } from "@/lib/project-selection";
 
 export function Leaf() {
   const { slug } = useParams<{ slug: string }>();
@@ -35,6 +39,8 @@ export function Leaf() {
           ))}
         </div>
       ) : null}
+
+      <TypeProjectActions leaf={data} />
 
       {data.dc ? (
         <section className="mt-8 rounded-xl bg-primary/[0.06] p-5 ring-1 ring-primary/15">
@@ -106,6 +112,72 @@ export function Leaf() {
       ) : null}
       <SourceReader slug={data.slug} />
     </main>
+  );
+}
+
+function TypeProjectActions({ leaf }: { leaf: LeafDetail }) {
+  const { lang } = useLang();
+  const [projectId] = useCurrentProjectId();
+  const navigate = useNavigate();
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const projectLink = `/projects?fromType=${encodeURIComponent(leaf.slug)}`;
+
+  const addToCurrentProject = async () => {
+    if (!projectId) return;
+    setSaving(true);
+    setError("");
+    try {
+      await saveProjectReference(projectId, {
+        kind: "application",
+        slug: leaf.slug,
+        note: lang === "zh" ? "从类型详情页加入，作为项目开发起点。" : "Added from the type page as a project starting point.",
+        read_status: "read",
+      });
+      navigate(`/projects/${projectId}`);
+    } catch (cause) {
+      if (String(cause).includes("already saved")) navigate(`/projects/${projectId}`);
+      else setError(String(cause));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <section className="mt-8 rounded-xl bg-primary/[0.06] p-5 ring-1 ring-primary/15">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="max-w-2xl">
+          <h2 className="flex items-center gap-2 font-serif text-xl font-medium">
+            <FolderKanban className="size-5 text-primary" />
+            {lang === "zh" ? "基于这个类型开发项目" : "Build a project from this type"}
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-muted">
+            {lang === "zh"
+              ? "把完整类型正文固定为项目依据，然后进入项目工作区继续分析、生成文档和开发。"
+              : "Pin the complete type document as project evidence, then continue analysis, documentation, and development in the workspace."}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {projectId ? (
+            <Button onClick={addToCurrentProject} disabled={saving}>
+              <ArrowRight className="size-4" />
+              {saving
+                ? (lang === "zh" ? "加入中…" : "Adding…")
+                : (lang === "zh" ? "加入当前项目并开发" : "Add to current project")}
+            </Button>
+          ) : null}
+          <Button asChild variant={projectId ? "outline" : "default"}>
+            <Link to={projectLink}>
+              <Plus className="size-4" />
+              {projectId
+                ? (lang === "zh" ? "创建新项目" : "Create a new project")
+                : (lang === "zh" ? "基于此类型创建项目" : "Create a project from this type")}
+            </Link>
+          </Button>
+        </div>
+      </div>
+      {error ? <p className="mt-3 text-sm text-danger">{error}</p> : null}
+    </section>
   );
 }
 

@@ -49,7 +49,7 @@ export const T = {
   projectMode: { zh: "项目类型", en: "Project type" },
   projectModeNew: { zh: "新想法", en: "New idea" },
   projectModeExisting: { zh: "已有项目改进", en: "Existing project" },
-  projectCreate: { zh: "保存并选中", en: "Save and select" },
+  projectCreate: { zh: "创建并进入工作区", en: "Create and open workspace" },
   projectCreating: { zh: "保存中…", en: "Saving…" },
   projectCurrent: { zh: "当前项目", en: "Current project" },
   projectSelect: { zh: "切换到此项目", en: "Select project" },

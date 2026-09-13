@@ -1,11 +1,13 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { AlertTriangle, BookMarked, FolderKanban, Plus, RefreshCw, Save } from "lucide-react";
-import { Link } from "react-router-dom";
+import { AlertTriangle, BookMarked, FolderKanban, Plus, RefreshCw, Save, Trash2 } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ErrorBox, Loading, useAsync } from "@/components/loaders";
 import { Prose } from "@/components/prose";
 import {
   createProject,
+  deleteProject,
+  getLeaf,
   getProject,
   getProjectReferences,
   getProjects,
@@ -14,17 +16,39 @@ import {
   type AtlasProject,
   type ProjectReference,
 } from "@/lib/atlas";
-import { t, useLang } from "@/lib/lang";
+import { pick, t, useLang } from "@/lib/lang";
 import { useCurrentProjectId } from "@/lib/project-selection";
 
 export function Projects() {
   const { lang } = useLang();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const starterSlug = searchParams.get("fromType")?.trim() || "";
+  const starterState = useAsync(
+    () => starterSlug ? getLeaf(starterSlug) : Promise.resolve(null),
+    [starterSlug],
+  );
   const [revision, setRevision] = useState(0);
   const { data: projects, error, loading } = useAsync(getProjects, [revision]);
   const [selectedId, select] = useCurrentProjectId();
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState("");
+  const [deleteError, setDeleteError] = useState("");
   const [form, setForm] = useState({ name: "", objective: "", workspace: "", mode: "new" as AtlasProject["mode"] });
+
+  useEffect(() => {
+    if (!starterState.data) return;
+    const name = pick(lang, starterState.data.name_zh, starterState.data.name);
+    setForm((current) => ({
+      ...current,
+      name: current.name || (lang === "zh" ? `${name}项目` : `${name} project`),
+      objective: current.objective || (lang === "zh"
+        ? `基于${name}类型资料，形成项目方案并开发首个可验收范围。`
+        : `Use the ${name} type evidence to define the project and build its first acceptable scope.`),
+      mode: "new",
+    }));
+  }, [starterState.data?.slug, lang]);
 
   useEffect(() => {
     if (!selectedId) return;
@@ -40,14 +64,39 @@ export function Projects() {
     setSaving(true);
     setSaveError(null);
     try {
-      const project = await createProject(form);
+      const project = await createProject({
+        ...form,
+        starter_reference: starterState.data ? {
+          kind: "application",
+          slug: starterState.data.slug,
+          note: lang === "zh" ? "从类型详情页创建项目并固定完整类型正文。" : "Project created from the type page with the complete type document pinned.",
+          read_status: "read",
+        } : undefined,
+      });
       select(project.id);
-      setForm({ name: "", objective: "", workspace: "", mode: "new" });
-      setRevision((value) => value + 1);
+      navigate(`/projects/${project.id}`);
     } catch (cause) {
       setSaveError(String(cause));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const remove = async (project: AtlasProject) => {
+    const message = lang === "zh"
+      ? `删除项目“${project.name}”及其 Atlas 文档、需求和执行记录？\n\n本地工作区和源码不会删除。此操作不可撤销。`
+      : `Delete “${project.name}” and its Atlas documents, requirements, and execution records?\n\nThe local workspace and source files will be preserved. This cannot be undone.`;
+    if (!window.confirm(message)) return;
+    setDeletingId(project.id);
+    setDeleteError("");
+    try {
+      await deleteProject(project.id);
+      if (selectedId === project.id) select("");
+      setRevision((value) => value + 1);
+    } catch (cause) {
+      setDeleteError(String(cause));
+    } finally {
+      setDeletingId("");
     }
   };
 
@@ -59,6 +108,7 @@ export function Projects() {
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <section>
+          {deleteError ? <p className="mb-3 rounded-md bg-danger/10 p-3 text-sm text-danger">{deleteError}</p> : null}
           {loading ? <Loading /> : error ? <ErrorBox message={error} /> : projects?.length ? (
             <div className="grid gap-3">
               {projects.map((project) => {
@@ -78,9 +128,21 @@ export function Projects() {
                           <span className="text-xs text-subtle">
                             {project.mode === "new" ? t("projectModeNew", lang) : t("projectModeExisting", lang)}
                           </span>
-                          <div className="flex gap-2">
+                          <div className="flex flex-wrap gap-2">
                             {!selected ? <Button size="sm" variant="outline" onClick={() => select(project.id)}>{t("projectSelect", lang)}</Button> : null}
                             <Button size="sm" asChild><Link to={`/projects/${project.id}`}>{lang === "zh" ? "打开工作区" : "Open workspace"}</Link></Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-danger hover:bg-danger/10"
+                              disabled={deletingId === project.id}
+                              onClick={() => remove(project)}
+                            >
+                              <Trash2 className="size-3.5" />
+                              {deletingId === project.id
+                                ? (lang === "zh" ? "删除中…" : "Deleting…")
+                                : (lang === "zh" ? "删除" : "Delete")}
+                            </Button>
                           </div>
                         </div>
                       </div>
@@ -94,6 +156,26 @@ export function Projects() {
 
         <section className="h-fit rounded-xl bg-surface p-5 shadow-card">
           <h2 className="flex items-center gap-2 font-medium"><Plus className="size-4" />{t("projectNew", lang)}</h2>
+          {starterSlug ? (
+            <div className="mt-4 rounded-lg bg-primary/[0.06] p-3 ring-1 ring-primary/15">
+              {starterState.loading ? (
+                <p className="text-xs text-muted">{lang === "zh" ? "读取类型资料…" : "Loading type evidence…"}</p>
+              ) : starterState.error || !starterState.data ? (
+                <div className="text-xs leading-5 text-danger">
+                  <p>{lang === "zh" ? "无法读取作为起点的类型。" : "The starting type could not be loaded."}</p>
+                  <Link to="/projects" className="underline">{lang === "zh" ? "不使用该类型" : "Continue without it"}</Link>
+                </div>
+              ) : (
+                <div className="text-xs leading-5 text-muted">
+                  <p>{lang === "zh" ? "项目起点" : "Project starting point"}</p>
+                  <Link to={`/types/${starterState.data.slug}`} className="font-medium text-primary hover:underline">
+                    {pick(lang, starterState.data.name_zh, starterState.data.name)}
+                  </Link>
+                  <p>{lang === "zh" ? "创建时将自动固定完整类型正文。" : "The complete type document will be pinned when the project is created."}</p>
+                </div>
+              )}
+            </div>
+          ) : null}
           <form className="mt-5 space-y-4" onSubmit={submit}>
             <Field label={t("projectName", lang)} value={form.name} onChange={(name) => setForm({ ...form, name })} />
             <Field label={t("projectObjective", lang)} value={form.objective} onChange={(objective) => setForm({ ...form, objective })} multiline />
@@ -107,7 +189,7 @@ export function Projects() {
               </select>
             </label>
             {saveError ? <p className="text-sm text-danger">{saveError}</p> : null}
-            <Button className="w-full" disabled={saving}>{saving ? t("projectCreating", lang) : t("projectCreate", lang)}</Button>
+            <Button className="w-full" disabled={saving || Boolean(starterSlug && !starterState.data)}>{saving ? t("projectCreating", lang) : t("projectCreate", lang)}</Button>
           </form>
         </section>
       </div>

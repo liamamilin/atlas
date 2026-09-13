@@ -117,6 +117,21 @@ export interface CreateProjectInput {
   objective: string;
   workspace?: string;
   mode: AtlasProject["mode"];
+  starter_reference?: {
+    kind: AtlasSourceKind;
+    slug: string;
+    section?: string;
+    note?: string;
+    read_status?: ProjectReference["read_status"];
+  };
+}
+
+export interface DeleteProjectResult {
+  id: string;
+  deleted: boolean;
+  workspace: string;
+  workspace_preserved: boolean;
+  deleted_records: Record<string, number>;
 }
 
 export type AtlasSourceKind = "application" | "research";
@@ -687,6 +702,18 @@ export async function createProject(input: CreateProjectInput) {
   });
   invalidateAtlasCache();
   return project;
+}
+export async function deleteProject(projectId: string) {
+  const result = await requestJson<DeleteProjectResult>(
+    `/api/projects/${encodeURIComponent(projectId)}`,
+    {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ confirm: projectId }),
+    },
+  );
+  invalidateAtlasCache();
+  return result;
 }
 export async function getProjectReferences(projectId: string) {
   return fetchJson<ProjectReference[]>(

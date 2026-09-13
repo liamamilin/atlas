@@ -76,6 +76,67 @@ class ProjectStore:
                 "SELECT * FROM project ORDER BY updated_at DESC,id").fetchall()
         return [dict(row) for row in rows]
 
+    def delete_project(self, project_id: str) -> dict:
+        """Delete Atlas-owned project records while preserving the source workspace."""
+        with self._transaction() as con:
+            project = con.execute(
+                "SELECT * FROM project WHERE id=?", (project_id,)).fetchone()
+            if not project:
+                raise ProjectStoreError("project not found")
+            active = con.execute("""SELECT e.id FROM execution e JOIN task t ON t.id=e.task_id
+                WHERE t.project_id=? AND e.status IN
+                ('queued','running','waiting_permission','waiting_input') LIMIT 1""",
+                                 (project_id,)).fetchone()
+            if active:
+                raise ProjectStoreError("project has an active execution")
+
+            counts = {
+                "executions": con.execute("""SELECT COUNT(*) FROM execution e JOIN task t
+                    ON t.id=e.task_id WHERE t.project_id=?""", (project_id,)).fetchone()[0],
+                "snapshots": con.execute(
+                    "SELECT COUNT(*) FROM workspace_snapshot WHERE project_id=?",
+                    (project_id,)).fetchone()[0],
+                "tasks": con.execute(
+                    "SELECT COUNT(*) FROM task WHERE project_id=?", (project_id,)).fetchone()[0],
+                "iterations": con.execute(
+                    "SELECT COUNT(*) FROM iteration WHERE project_id=?",
+                    (project_id,)).fetchone()[0],
+                "document_versions": con.execute("""SELECT COUNT(*) FROM document_version v
+                    JOIN document d ON d.id=v.document_id WHERE d.project_id=?""",
+                    (project_id,)).fetchone()[0],
+                "documents": con.execute(
+                    "SELECT COUNT(*) FROM document WHERE project_id=?",
+                    (project_id,)).fetchone()[0],
+                "references": con.execute(
+                    "SELECT COUNT(*) FROM reference WHERE project_id=?",
+                    (project_id,)).fetchone()[0],
+                "requirements": con.execute(
+                    "SELECT COUNT(*) FROM requirement WHERE project_id=?",
+                    (project_id,)).fetchone()[0],
+                "decisions": con.execute(
+                    "SELECT COUNT(*) FROM decision WHERE project_id=?",
+                    (project_id,)).fetchone()[0],
+            }
+            con.execute("""DELETE FROM execution WHERE task_id IN
+                (SELECT id FROM task WHERE project_id=?)""", (project_id,))
+            con.execute("DELETE FROM workspace_snapshot WHERE project_id=?", (project_id,))
+            con.execute("DELETE FROM task WHERE project_id=?", (project_id,))
+            con.execute("DELETE FROM iteration WHERE project_id=?", (project_id,))
+            con.execute("""DELETE FROM document_version WHERE document_id IN
+                (SELECT id FROM document WHERE project_id=?)""", (project_id,))
+            con.execute("DELETE FROM document WHERE project_id=?", (project_id,))
+            con.execute("DELETE FROM reference WHERE project_id=?", (project_id,))
+            con.execute("DELETE FROM requirement WHERE project_id=?", (project_id,))
+            con.execute("DELETE FROM decision WHERE project_id=?", (project_id,))
+            con.execute("DELETE FROM project WHERE id=?", (project_id,))
+        return {
+            "id": project_id,
+            "deleted": True,
+            "workspace": project["workspace"],
+            "workspace_preserved": True,
+            "deleted_records": counts,
+        }
+
     def create_document(self, project_id: str, kind: str, title: str, content: str,
                         basis: list[dict] | None = None, author: str = "human",
                         change_summary: str = "") -> dict:

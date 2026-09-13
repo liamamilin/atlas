@@ -19,7 +19,9 @@ Endpoints:
                                         ?section=<outline-id>&offset=0&limit=12000
   GET    /api/projects                   list U17 projects
   POST   /api/projects                   create {name,objective,mode,workspace?}
+                                         optional starter_reference pins a type source
   GET    /api/projects/<id>              read one U17 project
+  DELETE /api/projects/<id>              delete Atlas records; preserve local workspace
   GET    /api/projects/<id>/references   list saved source excerpts + version state
   POST   /api/projects/<id>/references   save canonical {kind,slug,section?,note?};
                                         kind=application|research|app
@@ -60,6 +62,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 import threading
@@ -173,7 +176,7 @@ def project_generation_list(store, project_id):
             for run in list_generations(store, project_id)]
 
 
-def create_project(body, store=None):
+def create_project(body, store=None, pack=None):
     if not isinstance(body, dict):
         raise ValueError("request body must be an object")
     for field in ("name", "objective", "mode"):
@@ -184,8 +187,38 @@ def create_project(body, store=None):
         raise ValueError("workspace is required for an existing project")
     if body.get("workspace") is not None and not isinstance(body["workspace"], str):
         raise ValueError("workspace must be a path")
-    return (store or get_project_store()).create_project(
+    starter = body.get("starter_reference")
+    if starter is not None and not isinstance(starter, dict):
+        raise ValueError("starter_reference must be an object")
+    project_store = store or get_project_store()
+    project = project_store.create_project(
         body["name"], body["objective"], body.get("workspace"), body["mode"])
+    if starter is not None:
+        try:
+            collect_atlas_reference(
+                project["id"], starter, store=project_store, pack=pack or PACK)
+        except Exception:
+            project_store.delete_project(project["id"])
+            raise
+    return project
+
+
+def delete_project(project_id, body, store=None):
+    if not isinstance(body, dict):
+        raise ValueError("request body must be an object")
+    if body.get("confirm") != project_id:
+        raise ValueError("confirm must match the project id")
+    project_store = store or get_project_store()
+    active_generations = [
+        run for run in project_generation_list(project_store, project_id)
+        if run["status"] in {"queued", "running"}
+    ]
+    if active_generations:
+        raise ProjectStoreError("project has an active generation")
+    result = project_store.delete_project(project_id)
+    generation_root = project_store.path.parent / "generation-runs" / project_id
+    shutil.rmtree(generation_root, ignore_errors=True)
+    return result
 
 
 def _project_error_code(error):
@@ -1169,6 +1202,15 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_DELETE(self):
         path = unquote(urlparse(self.path).path)
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)$", path)
+        if m:
+            try:
+                return self._json(delete_project(
+                    m.group(1), self._body(), get_project_store()))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, _project_error_code(error))
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
         m = re.match(r"^/api/drafts/([\w-]+)$", path)
         if m:
             slug = m.group(1)

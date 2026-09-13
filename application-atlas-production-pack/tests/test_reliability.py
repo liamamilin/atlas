@@ -293,6 +293,44 @@ class ProjectStoreTests(unittest.TestCase):
                          'Build the approved pilot')
         self.assertEqual(reopened.list_projects()[0]['id'], self.project['id'])
 
+    def test_project_delete_removes_owned_records_preserves_workspace_and_blocks_active_run(self):
+        workspace = Path(self.project['workspace'])
+        workspace.mkdir(parents=True)
+        (workspace / 'keep.txt').write_text('source workspace stays\n')
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'source-v1',
+            excerpt='Fixed evidence', read_status='read')
+        requirement = self.store.create_requirement(
+            self.project['id'], 'Keep the evidence', 'current', 'Relevant source',
+            ['Evidence remains visible'], [reference['id']])
+        self.store.record_decision(
+            self.project['id'], 'Use the source', 'It is relevant', [reference['id']])
+        document = self.store.create_document(
+            self.project['id'], 'analysis', 'Analysis', 'Version one',
+            [{'kind': 'reference', 'id': reference['id']}])
+        self.store.add_document_version(document['id'], 'Version two')
+        self.store.save_snapshot(
+            self.project['id'], {'root': str(workspace), 'files': []}, 'observed')
+        task = self.store.create_task(
+            self.project['id'], 'Read it', 'Inspect the source', kind='analysis')
+        execution = self.store.create_execution(task['id'], 'opencode', 'ses_delete')
+
+        with self.assertRaisesRegex(ProjectStoreError, 'active execution'):
+            self.store.delete_project(self.project['id'])
+        self.store.update_execution(execution['id'], {'state': 'stopped'})
+        result = self.store.delete_project(self.project['id'])
+
+        self.assertTrue(result['deleted'])
+        self.assertTrue(result['workspace_preserved'])
+        self.assertEqual((workspace / 'keep.txt').read_text(), 'source workspace stays\n')
+        self.assertEqual(result['deleted_records']['document_versions'], 2)
+        with self.assertRaisesRegex(ProjectStoreError, 'project not found'):
+            self.store.get_project(self.project['id'])
+        with sqlite3.connect(self.store.path) as con:
+            for table in ('project', 'reference', 'requirement', 'decision', 'document',
+                          'document_version', 'task', 'execution', 'workspace_snapshot'):
+                self.assertEqual(con.execute(f'SELECT COUNT(*) FROM {table}').fetchone()[0], 0)
+
     def test_empty_workspace_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'workspace'):
             self.store.create_project('Invalid', 'No workspace', '  ', 'existing')
@@ -1513,6 +1551,66 @@ class ProjectStoreTests(unittest.TestCase):
             idea, code = handler.do_POST()
         self.assertEqual(code, 201)
         self.assertTrue(idea['workspace'].endswith('/workspaces/' + idea['id']))
+
+    def test_project_http_starter_reference_and_confirmed_delete(self):
+        import drafts_api
+        pack = self.root / 'corpus'
+        (pack / 'applications').mkdir(parents=True)
+        (pack / 'research').mkdir()
+        (pack / 'applications/sample.md').write_text(
+            '# Sample type\n\n## Core Model\nFixed type evidence.\n')
+        created = drafts_api.create_project({
+            'name': 'From a type',
+            'objective': 'Build from fixed type evidence',
+            'mode': 'new',
+            'starter_reference': {
+                'kind': 'application', 'slug': 'sample',
+                'note': 'Started from the type page', 'read_status': 'read',
+            },
+        }, store=self.store, pack=pack)
+        references = self.store.list_references(created['id'])
+        self.assertEqual(len(references), 1)
+        self.assertEqual(references[0]['source_kind'], 'atlas:application')
+        self.assertIn('Fixed type evidence', references[0]['excerpt'])
+
+        with patch.object(drafts_api, 'project_generation_list',
+                          return_value=[{'id': 'gen_active', 'status': 'running'}]):
+            with self.assertRaisesRegex(ProjectStoreError, 'active generation'):
+                drafts_api.delete_project(
+                    created['id'], {'confirm': created['id']}, store=self.store)
+
+        handler = object.__new__(drafts_api.Handler)
+        handler.path = f"/api/projects/{created['id']}"
+        handler._json = lambda value, code=200: (value, code)
+        handler._body = lambda: {'confirm': 'wrong'}
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            error, code = handler.do_DELETE()
+        self.assertEqual(code, 400)
+        self.assertIn('confirm', error['error'])
+
+        workspace = Path(created['workspace'])
+        workspace.mkdir(parents=True)
+        (workspace / 'keep.txt').write_text('keep\n')
+        generation_root = (self.store.path.parent / 'generation-runs' /
+                           created['id'] / 'gen_finished')
+        generation_root.mkdir(parents=True)
+        (generation_root / 'run.json').write_text('{}')
+        handler._body = lambda: {'confirm': created['id']}
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            deleted, code = handler.do_DELETE()
+        self.assertEqual(code, 200)
+        self.assertTrue(deleted['workspace_preserved'])
+        self.assertEqual((workspace / 'keep.txt').read_text(), 'keep\n')
+        self.assertFalse(generation_root.parent.exists())
+        with self.assertRaisesRegex(ProjectStoreError, 'project not found'):
+            self.store.get_project(created['id'])
+
+        with self.assertRaises(FileNotFoundError):
+            drafts_api.create_project({
+                'name': 'Missing starter', 'objective': 'Must roll back', 'mode': 'new',
+                'starter_reference': {'kind': 'application', 'slug': 'missing'},
+            }, store=self.store, pack=pack)
+        self.assertNotIn('Missing starter', [item['name'] for item in self.store.list_projects()])
 
     def test_workspace_baseline_http_capture_check_list_and_conflict(self):
         import drafts_api

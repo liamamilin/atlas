@@ -155,7 +155,7 @@ export function SourceReader({ slug }: { slug: string }) {
         ) : (
           <p className="text-sm text-muted">
             {lang === "zh" ? "先在" : "Select a project in "}
-            <Link to="/projects" className="mx-1 text-primary hover:underline">
+            <Link to={`/projects?fromType=${encodeURIComponent(slug)}`} className="mx-1 text-primary hover:underline">
               {lang === "zh" ? "项目工作台" : "Projects"}
             </Link>
             {lang === "zh" ? "选择项目，再收藏全文或当前章节。" : "before saving a document or section."}
