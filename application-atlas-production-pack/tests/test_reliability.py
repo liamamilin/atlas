@@ -534,6 +534,175 @@ class ProjectStoreTests(unittest.TestCase):
             apply_generation_item(
                 self.store, self.project['id'], run['id'], 'document', 0)
 
+    def test_improvement_generation_binds_goal_workspace_evidence_and_review(self):
+        workspace = self.root / 'workspace'
+        (workspace / 'src').mkdir(parents=True)
+        (workspace / 'README.md').write_text(
+            '# Dashboard\n\nThe document claims saved filters are visible.\n')
+        (workspace / 'src/app.py').write_text(
+            'def filters():\n    return []\n')
+        baseline = capture_project_baseline(self.store, self.project['id'], ['src'])
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'dashboard', 'source-v1',
+            excerpt='A dashboard can preserve a user-defined view.',
+            note='Use only to assess the saved-view interaction.', read_status='reviewed')
+        goal = '保存并恢复用户的过滤条件'
+        run = prepare_generation(
+            self.store, self.project['id'], 'improvement', improvement_goal=goal)
+        directory = (self.store.path.parent / 'generation-runs' /
+                     self.project['id'] / run['id'])
+        request = json.loads((directory / 'input.json').read_text())
+        self.assertEqual(request['improvement_goal'], goal)
+        self.assertEqual(request['workspace_baseline']['id'], baseline['id'])
+        self.assertNotIn('root', request['workspace_baseline'])
+        self.assertEqual(
+            {item['path'] for item in request['workspace_baseline']['evidence_files']},
+            {'README.md', 'src/app.py'})
+        markdown = (directory / 'input.md').read_text()
+        self.assertIn('## Improvement goal', markdown)
+        self.assertIn('`src/app.py`', markdown)
+        prompt = (directory / 'prompt.md').read_text()
+        self.assertIn('Current behavior / 当前行为', prompt)
+        self.assertIn('workspace_baseline', prompt)
+        self.assertIn('untrusted project evidence', prompt)
+
+        sections = [
+            ('Current behavior / 当前行为',
+             '`src/app.py` currently returns an empty list; no runtime check was run.'),
+            ('Expected behavior / 期望行为', '用户可保存并恢复过滤条件。'),
+            ('Adoption rationale / 采用理由', '目标与固定资料中的用户自定义视图一致。'),
+            ('Impact scope / 影响范围', '过滤状态和恢复入口。'),
+            ('Compatibility requirements / 兼容要求', '现有默认视图保持可用。'),
+            ('Tasks and dependencies / 任务与依赖', '1. 定义状态。2. 实现保存。3. 实现恢复。'),
+            ('Regression conditions / 回归条件', '默认过滤和空状态行为不变。'),
+            ('Unknowns and required validation / 未知与待验证', '待运行现有测试并验证交互。'),
+        ]
+        content = '# 项目现状与改进\n\n' + '\n\n'.join(
+            f'## {title}\n\n{text}' for title, text in sections)
+
+        def fake_runner(_directory, _run):
+            return ({
+                'input_fingerprint': request['input_fingerprint'],
+                'questions': [],
+                'requirements': [{
+                    'key': 'saved-filters', 'content': '用户可恢复已保存的过滤条件',
+                    'recommended_scope': 'current',
+                    'recommendation_reason': '本轮目标明确，固定资料提供了交互依据',
+                    'acceptance_conditions': ['重新打开视图后恢复已保存条件'],
+                    'reference_ids': [reference['id']],
+                }],
+                'conflicts': [], 'suggestions': [],
+                'documents': [{
+                    'document_id': None, 'kind': 'current-state',
+                    'title': '项目现状与改进', 'content': content,
+                    'basis': [
+                        {'kind': 'workspace_baseline', 'id': baseline['id']},
+                        {'kind': 'reference', 'id': reference['id']},
+                    ],
+                }],
+            }, {'engine_session_id': 'ses_improvement'})
+
+        completed = execute_generation(
+            self.store, self.project['id'], run['id'], runner=fake_runner)
+        self.assertEqual(completed['status'], 'completed')
+        requirement = apply_generation_item(
+            self.store, self.project['id'], run['id'], 'requirement', 0)['created']
+        self.assertIsNone(requirement['confirmed_scope'])
+        document = apply_generation_item(
+            self.store, self.project['id'], run['id'], 'document', 0)['created']
+        self.assertEqual(document['basis'][0]['kind'], 'workspace_baseline')
+        self.assertEqual(document['review']['status'], 'current')
+        exported = export_project(self.store, self.project['id'])
+        self.assertEqual(exported['manifest']['workspace_baseline_id'], baseline['id'])
+        with zipfile.ZipFile(exported['archive']) as bundle:
+            self.assertIn('workspace-baseline.md', bundle.namelist())
+            exported_baseline = json.loads(bundle.read('workspace-baseline.json'))
+        self.assertEqual(exported_baseline['id'], baseline['id'])
+        self.assertIn('src/app.py', exported_baseline['manifest']['evidence_files'])
+
+        (workspace / 'src/app.py').write_text(
+            'def filters():\n    return ["external-change"]\n')
+        changed = check_project_changes(self.store, self.project['id'])
+        new_baseline = capture_project_baseline(
+            self.store, self.project['id'], ['src'], baseline['id'],
+            changed['current']['content_fingerprint'])
+        reviewed = self.store.get_document(document['id'])['review']
+        self.assertEqual(reviewed['status'], 'needs_review')
+        self.assertEqual(reviewed['reasons'][0]['kind'], 'workspace_baseline_changed')
+        self.assertEqual(reviewed['reasons'][0]['current_baseline_id'], new_baseline['id'])
+
+    def test_improvement_generation_rejects_workspace_change_after_preparation(self):
+        workspace = self.root / 'workspace'
+        (workspace / 'src').mkdir(parents=True)
+        (workspace / 'src/app.py').write_text('print("before")\n')
+        capture_project_baseline(self.store, self.project['id'], ['src'])
+        self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'v1', excerpt='Evidence')
+        run = prepare_generation(
+            self.store, self.project['id'], 'improvement',
+            improvement_goal='Improve the current behavior')
+        (workspace / 'src/app.py').write_text('print("after")\n')
+        called = []
+
+        def should_not_run(_directory, _run):
+            called.append(True)
+            return ({}, {})
+
+        with self.assertRaisesRegex(ProjectStoreError, 'workspace changed'):
+            execute_generation(
+                self.store, self.project['id'], run['id'], runner=should_not_run)
+        self.assertEqual(called, [])
+        self.assertEqual(
+            read_generation(self.store, self.project['id'], run['id'])['status'], 'failed')
+
+    def test_improvement_result_requires_baseline_basis_and_complete_plan(self):
+        workspace = self.root / 'workspace'
+        (workspace / 'src').mkdir(parents=True)
+        (workspace / 'src/app.py').write_text('print("observed")\n')
+        baseline = capture_project_baseline(self.store, self.project['id'], ['src'])
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'v1', excerpt='Evidence')
+
+        def result_for(request, basis, content):
+            return ({
+                'input_fingerprint': request['input_fingerprint'],
+                'questions': [], 'requirements': [], 'conflicts': [], 'suggestions': [],
+                'documents': [{
+                    'document_id': None, 'kind': 'current-state', 'title': 'Plan',
+                    'content': content, 'basis': basis,
+                }],
+            }, {})
+
+        complete = '# Plan\n\n' + '\n\n'.join(
+            f'## {title}\n\n`src/app.py` evidence.' for title in (
+                'Current behavior / 当前行为', 'Expected behavior / 期望行为',
+                'Adoption rationale / 采用理由', 'Impact scope / 影响范围',
+                'Compatibility requirements / 兼容要求',
+                'Tasks and dependencies / 任务与依赖',
+                'Regression conditions / 回归条件',
+                'Unknowns and required validation / 未知与待验证'))
+        run = prepare_generation(
+            self.store, self.project['id'], 'improvement', improvement_goal='Improve it')
+        request = json.loads((self.store.path.parent / 'generation-runs' /
+                              self.project['id'] / run['id'] / 'input.json').read_text())
+        with self.assertRaisesRegex(ValueError, 'workspace baseline'):
+            execute_generation(
+                self.store, self.project['id'], run['id'],
+                runner=lambda *_: result_for(
+                    request, [{'kind': 'reference', 'id': reference['id']}], complete))
+
+        second = prepare_generation(
+            self.store, self.project['id'], 'improvement', improvement_goal='Improve it')
+        request = json.loads((self.store.path.parent / 'generation-runs' /
+                              self.project['id'] / second['id'] / 'input.json').read_text())
+        with self.assertRaisesRegex(ValueError, 'missing section'):
+            execute_generation(
+                self.store, self.project['id'], second['id'],
+                runner=lambda *_: result_for(request, [
+                    {'kind': 'workspace_baseline', 'id': baseline['id']},
+                    {'kind': 'reference', 'id': reference['id']},
+                ], '# Plan\n\n## Current behavior / 当前行为\n\n`src/app.py`'))
+
     def test_generation_rejects_wrong_input_fingerprint_and_unknown_evidence(self):
         reference = self.store.add_reference(
             self.project['id'], 'atlas:application', 'sample', 'v1', excerpt='Evidence')
@@ -999,6 +1168,17 @@ class ProjectStoreTests(unittest.TestCase):
             conflict, code = handler.do_POST()
         self.assertEqual(code, 409)
         self.assertIn('baseline changed', conflict['error'])
+
+        self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'v1', excerpt='Evidence')
+        (workspace / 'src/app.py').write_text('print("v2")\n')
+        handler.path = f"/api/projects/{self.project['id']}/generation-runs"
+        handler._body = lambda: {
+            'mode': 'improvement', 'improvement_goal': 'Improve the current behavior'}
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            stale, code = handler.do_POST()
+        self.assertEqual(code, 409)
+        self.assertIn('workspace differs', stale['error'])
 
     def test_project_reference_http_create_list_and_update(self):
         import drafts_api

@@ -37,6 +37,7 @@ Endpoints:
   POST   /api/projects/<id>/export       create self-contained Markdown bundle
   GET    /api/projects/<id>/generation-runs
   POST   /api/projects/<id>/generation-runs
+                                        {mode,document_kinds?,improvement_goal?,model?}
   GET    /api/projects/<id>/generation-runs/<generation-id>
   POST   /api/projects/<id>/generation-runs/<generation-id>/apply
   GET    /api/projects/<id>/workspace-baselines
@@ -109,14 +110,15 @@ def get_project_store():
 def start_project_generation(project_id, body, store=None):
     if not isinstance(body, dict):
         raise ValueError("request body must be an object")
-    allowed = {"mode", "document_kinds", "model"}
+    allowed = {"mode", "document_kinds", "model", "improvement_goal"}
     unknown = set(body) - allowed
     if unknown:
         raise ValueError(f"unknown generation fields: {', '.join(sorted(unknown))}")
     store = store or get_project_store()
     run = prepare_generation(
         store, project_id, body.get("mode"), body.get("document_kinds"),
-        body.get("model", os.environ.get("ATLAS_PROJECT_MODEL", "")))
+        body.get("model", os.environ.get("ATLAS_PROJECT_MODEL", "")),
+        body.get("improvement_goal", ""))
     thread = threading.Thread(
         target=_run_project_generation, args=(store, project_id, run["id"]), daemon=True)
     PROJECT_GENERATION_THREADS[run["id"]] = thread
@@ -786,7 +788,9 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(start_project_generation(
                     m.group(1), self._body()), 202)
             except ProjectStoreError as error:
-                return self._json({"error": str(error)}, 404)
+                message = str(error)
+                code = 409 if "workspace" in message or "baseline" in message else 404
+                return self._json({"error": message}, code)
             except (ValueError, json.JSONDecodeError, FileExistsError) as error:
                 return self._json({"error": str(error)}, 400)
         m = re.match(

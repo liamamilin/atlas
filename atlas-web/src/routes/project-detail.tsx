@@ -93,7 +93,7 @@ export function ProjectDetail() {
         <Stat value={data.documents.length} label={lang === "zh" ? "关联文档" : "Documents"} />
       </div>
 
-      <WorkspaceBaselinePanel projectId={projectId} />
+      <WorkspaceBaselinePanel projectId={projectId} onSaved={refresh} />
 
       <GenerationPanel projectId={projectId} workspace={data} onSaved={refresh}
         onAnalysis={setAnalysisRun} />
@@ -154,7 +154,9 @@ export function ProjectDetail() {
   );
 }
 
-function WorkspaceBaselinePanel({ projectId }: { projectId: string }) {
+function WorkspaceBaselinePanel({ projectId, onSaved }: {
+  projectId: string; onSaved: () => void;
+}) {
   const { lang } = useLang();
   const [baselines, setBaselines] = useState<WorkspaceBaselineSummary[]>([]);
   const [check, setCheck] = useState<WorkspaceBaselineCheck | null>(null);
@@ -195,6 +197,7 @@ function WorkspaceBaselinePanel({ projectId }: { projectId: string }) {
       setBaselines((items) => [created, ...items]);
       setFocus(created.coverage.focus_paths.join("\n"));
       setCheck(null);
+      onSaved();
     } catch (cause) { setError(String(cause)); } finally { setWorking(""); }
   };
 
@@ -273,6 +276,7 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
   const { lang } = useLang();
   const [run, setRun] = useState<ProjectGenerationRun | null>(null);
   const [kind, setKind] = useState<ProjectDocumentKind>("product-requirements");
+  const [improvementGoal, setImprovementGoal] = useState("");
   const [error, setError] = useState("");
   const [starting, setStarting] = useState(false);
   const [applying, setApplying] = useState("");
@@ -285,7 +289,9 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
       (items) => {
         if (!alive) return;
         if (items[0]) setRun(items[0]);
-        onAnalysis(items.find((item) => item.mode === "analysis" && item.status === "completed") || null);
+        onAnalysis(items.find((item) =>
+          (item.mode === "analysis" || item.mode === "improvement")
+          && item.status === "completed") || null);
       },
       (cause) => { if (alive) setError(String(cause)); },
     );
@@ -300,7 +306,8 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
         (next) => {
           if (!alive) return;
           setRun(next);
-          if (next.mode === "analysis" && next.status === "completed") onAnalysis(next);
+          if ((next.mode === "analysis" || next.mode === "improvement")
+              && next.status === "completed") onAnalysis(next);
         },
         (cause) => { if (alive) setError(String(cause)); },
       );
@@ -308,11 +315,12 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
     return () => { alive = false; window.clearInterval(timer); };
   }, [active, projectId, run?.id]);
 
-  const start = async (mode: "analysis" | "documents") => {
+  const start = async (mode: "analysis" | "documents" | "improvement") => {
     setStarting(true); setError("");
     try {
       setRun(await startProjectGeneration(projectId, {
         mode, ...(mode === "documents" ? { document_kinds: [kind] } : {}),
+        ...(mode === "improvement" ? { improvement_goal: improvementGoal.trim() } : {}),
       }));
     } catch (cause) { setError(String(cause)); } finally { setStarting(false); }
   };
@@ -322,7 +330,11 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
     try {
       const result = await applyProjectGenerationItem(
         projectId, run.id, { item_kind: itemKind, index });
-      setRun(result.run); onSaved();
+      setRun(result.run);
+      if (result.run.mode === "analysis" || result.run.mode === "improvement") {
+        onAnalysis(result.run);
+      }
+      onSaved();
     } catch (cause) { setError(String(cause)); } finally { setApplying(""); }
   };
   const result = run?.result;
@@ -340,10 +352,16 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
         <Button size="sm" disabled={starting || active || !hasConfirmedScope} onClick={() => start("documents")}><FileText className="size-4" />{lang === "zh" ? "生成文档草案" : "Generate document draft"}</Button>
       </div>
     </div>
+    <div className="mt-4 grid gap-3 rounded-lg border border-border p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+      <TextArea label={lang === "zh" ? "本轮局部改进目标" : "Improvement goal for this iteration"} value={improvementGoal} onChange={setImprovementGoal} rows={2} />
+      <Button size="sm" disabled={starting || active || !improvementGoal.trim() || !workspace.references.length} onClick={() => start("improvement")}><FolderGit2 className="size-4" />{lang === "zh" ? "生成项目改进方案" : "Generate improvement plan"}</Button>
+      <p className="text-[11px] leading-5 text-subtle md:col-span-2">{lang === "zh" ? "使用已接受工作区基线和已固定 Atlas 资料，输出当前/期望行为、影响范围、任务依赖与回归条件。工作区有未采用变化时会拒绝启动。" : "Uses the accepted workspace baseline and pinned Atlas sources to produce current/expected behavior, impact, task dependencies, and regression conditions. A changed workspace must be reviewed and adopted first."}</p>
+    </div>
+    {!workspace.references.length ? <p className="mt-3 text-xs text-warn">{lang === "zh" ? "改进方案需要至少一份已固定的类型或应用资料。" : "An improvement plan requires at least one pinned type or application source."}</p> : null}
     {!hasConfirmedScope ? <p className="mt-3 text-xs text-warn">{lang === "zh" ? "生成产品与开发文档前，至少确认一条本版需求。资料分析可以先运行。" : "Confirm at least one current requirement before generating product or development documents. Source analysis can run first."}</p> : null}
     {run ? <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4 text-xs text-subtle">
       <Badge tone={run.status === "completed" ? "ok" : run.status === "failed" ? "warn" : "default"}>{run.status}</Badge>
-      <span className="font-mono">{run.id}</span><span>{run.engine}{run.model ? ` · ${run.model}` : ""}</span>
+      <span className="font-mono">{run.id}</span><span>{run.mode} · {run.engine}{run.model ? ` · ${run.model}` : ""}</span>
       <span className="font-mono">input {run.input_fingerprint.slice(0, 12)}</span>
       {run.engine_session_id ? <span className="font-mono">{run.engine_session_id}</span> : null}
     </div> : null}
@@ -408,7 +426,7 @@ function ConsistencyPanel({ workspace, analysisRun }: {
             : (lang === "zh" ? "当前没有未处理的参考建议。" : "There are no pending suggestions.")} />
         <Signal title={lang === "zh" ? "关联复核" : "Linked reviews"} count={review.length}
           text={review.length
-            ? (lang === "zh" ? `${review.length} 份文档因上游变化待复核。` : `${review.length} documents need review after upstream changes.`)
+            ? (lang === "zh" ? `${review.length} 份文档因依据变化待复核。` : `${review.length} documents need review after basis changes.`)
             : (lang === "zh" ? "关联文档的固定依据均为当前版本。" : "All linked documents use current pinned basis versions.")} />
       </div>
     </section>
@@ -574,7 +592,7 @@ function DocumentCard({ projectId, document, onSaved }: { projectId: string; doc
   return <article className={`rounded-xl bg-surface p-5 shadow-card ${document.review.status === "needs_review" ? "ring-2 ring-warn/25" : ""}`}>
     <div className="flex flex-wrap items-start justify-between gap-3"><div><div className="flex flex-wrap items-center gap-2"><h3 className="font-medium">{document.title}</h3><Badge tone={document.review.status === "current" ? "ok" : "warn"}>{document.review.status === "current" ? (lang === "zh" ? "依据为当前" : "Current") : (lang === "zh" ? "需要复核" : "Needs review")}</Badge></div>
       <p className="mt-1 text-xs text-subtle">{documentKind(document.kind, lang)} · v{document.current_version} · {document.author} · {document.version_id}</p></div></div>
-    {document.review.status === "needs_review" ? <p className="mt-3 flex gap-2 rounded-md bg-warn/10 p-3 text-xs leading-5 text-warn"><AlertTriangle className="mt-0.5 size-4 shrink-0" />{lang === "zh" ? "关联需求或上游文档已有变化。正文未被自动改写，请比较后保存新版本。" : "A linked requirement or upstream document changed. The content was preserved; review it before saving a new version."}</p> : null}
+    {document.review.status === "needs_review" ? <p className="mt-3 flex gap-2 rounded-md bg-warn/10 p-3 text-xs leading-5 text-warn"><AlertTriangle className="mt-0.5 size-4 shrink-0" />{lang === "zh" ? "关联需求、上游文档或工作区基线已有变化。正文未被自动改写，请比较后保存新版本。" : "A linked requirement, upstream document, or workspace baseline changed. The content was preserved; review it before saving a new version."}</p> : null}
     <details className="mt-4"><summary className="cursor-pointer text-sm text-primary">{lang === "zh" ? "查看正文、编辑和版本" : "View, edit, and versions"}</summary>
       <div className="mt-4 rounded-md border border-border bg-bg-elevated p-4"><Prose md={document.content} /></div>
       <div className="mt-5 grid gap-4 lg:grid-cols-2"><div><TextArea label={lang === "zh" ? "编辑完整 Markdown（从当前版开始）" : "Edit full Markdown (starts from current)"} value={content} onChange={setContent} required rows={12} /><Field label={lang === "zh" ? "修改说明" : "Change summary"} value={summary} onChange={setSummary} required /><Button className="mt-3" size="sm" onClick={save} disabled={saving || !summary.trim()}><Save className="size-4" />{lang === "zh" ? "保存新版本" : "Save new version"}</Button></div>

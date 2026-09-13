@@ -12,6 +12,8 @@ import tempfile
 import uuid
 import zipfile
 
+from project_baseline import latest_project_baseline
+
 
 DOCUMENT_ORDER = {
     "analysis": 10,
@@ -30,6 +32,7 @@ def export_project(store, project_id: str) -> dict:
     requirements = store.list_requirements(project_id)
     decisions = store.list_decisions(project_id)
     documents = store.list_documents(project_id)
+    baseline = latest_project_baseline(store, project_id)
     root = store.path.parent / "exports" / project_id
     root.mkdir(parents=True, exist_ok=True)
     name = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:8]
@@ -38,7 +41,8 @@ def export_project(store, project_id: str) -> dict:
     archive = root / f"{name}.zip"
     temp_archive = root / f".{name}.zip.tmp"
     try:
-        files = _build_files(project, references, requirements, decisions, documents)
+        files = _build_files(
+            project, references, requirements, decisions, documents, baseline)
         hashes = {}
         for relative, content in files.items():
             path = temp / relative
@@ -46,14 +50,17 @@ def export_project(store, project_id: str) -> dict:
             path.write_text(content, encoding="utf-8")
             hashes[relative] = hashlib.sha256(content.encode("utf-8")).hexdigest()
         manifest = {
-            "schema": 1,
+            "schema": 2,
             "exported_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "project_id": project_id,
             "project_updated_at": project["updated_at"],
             "counts": {
                 "references": len(references), "requirements": len(requirements),
                 "decisions": len(decisions), "documents": len(documents),
+                "workspace_baselines": 1 if baseline else 0,
             },
+            "workspace_baseline_id": baseline["id"] if baseline else None,
+            "workspace_baseline_fingerprint": baseline["fingerprint"] if baseline else None,
             "unresolved_requirement_ids": [
                 item["id"] for item in requirements if item["confirmed_scope"] is None],
             "documents_needing_review": [
@@ -83,7 +90,7 @@ def export_project(store, project_id: str) -> dict:
     }
 
 
-def _build_files(project, references, requirements, decisions, documents):
+def _build_files(project, references, requirements, decisions, documents, baseline=None):
     files = {}
     reference_links = []
     for index, reference in enumerate(references, 1):
@@ -100,12 +107,17 @@ def _build_files(project, references, requirements, decisions, documents):
     files["requirements.md"] = _requirements_markdown(requirements)
     files["decisions.md"] = _decisions_markdown(decisions)
     files["sources.md"] = _sources_index(reference_links)
+    if baseline:
+        files["workspace-baseline.md"] = _baseline_markdown(baseline)
+        files["workspace-baseline.json"] = json.dumps(
+            baseline, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
     files["INDEX.md"] = _index_markdown(
-        project, reference_links, document_links, requirements, decisions)
+        project, reference_links, document_links, requirements, decisions, baseline)
     return files
 
 
-def _index_markdown(project, reference_links, document_links, requirements, decisions):
+def _index_markdown(project, reference_links, document_links, requirements, decisions,
+                    baseline=None):
     unresolved = [item for item in requirements if item["confirmed_scope"] is None]
     review = [item for item, _ in document_links if item["review"]["status"] == "needs_review"]
     lines = [
@@ -125,6 +137,9 @@ def _index_markdown(project, reference_links, document_links, requirements, deci
                   f"- [Decisions](decisions.md): {len(decisions)}",
                   f"- [Sources](sources.md): {len(reference_links)}", "",
                   "## Open review", ""])
+    if baseline:
+        lines.insert(lines.index("## Open review") - 1,
+                     f"- [Workspace baseline](workspace-baseline.md): `{baseline['id']}`")
     lines.extend(f"- Unconfirmed requirement `{item['id']}`: {item['content']}" for item in unresolved)
     lines.extend(f"- Document needs review `{item['id']}`: {item['title']}" for item in review)
     if not unresolved and not review:
@@ -158,6 +173,18 @@ def _reference_markdown(item):
         "## Fixed excerpt", "", item["excerpt"].rstrip(), "",
     ]
     return "\n".join(lines)
+
+
+def _baseline_markdown(item):
+    manifest = item["manifest"]
+    header = [
+        "# Accepted workspace baseline", "",
+        f"- Baseline ID: `{item['id']}`",
+        f"- Record fingerprint: `{item['fingerprint']}`",
+        f"- Captured: `{item['created_at']}`",
+        f"- Full evidence manifest: [workspace-baseline.json](workspace-baseline.json)", "",
+    ]
+    return "\n".join(header) + manifest.get("report_markdown", "").rstrip() + "\n"
 
 
 def _sources_index(links):

@@ -795,7 +795,8 @@ class ProjectStore:
                 normalized.append(dict(item))
                 continue
             kind, item_id = item.get("kind"), item.get("id")
-            if kind not in {"reference", "requirement", "decision", "document_version"} \
+            if kind not in {"reference", "requirement", "decision", "document_version",
+                            "workspace_baseline"} \
                     or not isinstance(item_id, str):
                 raise ValueError("invalid basis entry")
             key = (kind, item_id)
@@ -809,6 +810,17 @@ class ProjectStore:
                     (item_id, project_id)).fetchone()
                 value = {"kind": kind, "id": item_id, "version": row["version"],
                          "fingerprint": row["content_sha256"]} if row else None
+            elif kind == "workspace_baseline":
+                row = con.execute("""SELECT fingerprint,created_at,manifest_json
+                    FROM workspace_snapshot WHERE id=? AND project_id=? AND phase='observed'""",
+                    (item_id, project_id)).fetchone()
+                try:
+                    is_baseline = row and json.loads(row["manifest_json"]).get("purpose") \
+                        == "project-baseline"
+                except (TypeError, ValueError):
+                    is_baseline = False
+                value = {"kind": kind, "id": item_id, "version": row["created_at"],
+                         "fingerprint": row["fingerprint"]} if is_baseline else None
             elif kind == "reference":
                 row = con.execute("""SELECT source_version FROM reference
                     WHERE id=? AND project_id=?""", (item_id, project_id)).fetchone()
@@ -863,6 +875,22 @@ class ProjectStore:
                     if row and row["version"] != row["current_version"]:
                         reasons.append({"kind": "upstream_document_changed",
                                         "id": item["id"], "document_id": row["document_id"]})
+                elif item.get("kind") == "workspace_baseline":
+                    rows = con.execute("""SELECT id,manifest_json FROM workspace_snapshot
+                        WHERE project_id=? AND phase='observed'
+                        ORDER BY created_at DESC,id DESC""", (project_id,)).fetchall()
+                    current_id = None
+                    for row in rows:
+                        try:
+                            if json.loads(row["manifest_json"]).get("purpose") == "project-baseline":
+                                current_id = row["id"]
+                                break
+                        except (TypeError, ValueError):
+                            continue
+                    if current_id and current_id != item.get("id"):
+                        reasons.append({"kind": "workspace_baseline_changed",
+                                        "id": item["id"],
+                                        "current_baseline_id": current_id})
         return {"status": "needs_review" if reasons else "current", "reasons": reasons}
 
     def _row(self, table: str, item_id: str) -> dict:

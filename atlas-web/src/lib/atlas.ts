@@ -212,7 +212,7 @@ export type ProjectDocumentKind =
   | "current-state";
 
 export interface DocumentBasis {
-  kind?: "reference" | "requirement" | "decision" | "document_version";
+  kind?: "reference" | "requirement" | "decision" | "document_version" | "workspace_baseline";
   id?: string;
   source?: string;
   version?: string | number;
@@ -221,7 +221,7 @@ export interface DocumentBasis {
 
 export interface DocumentReview {
   status: "current" | "needs_review";
-  reasons: { kind: "requirement_changed" | "upstream_document_changed"; id: string; document_id?: string }[];
+  reasons: { kind: "requirement_changed" | "upstream_document_changed" | "workspace_baseline_changed"; id: string; document_id?: string; current_baseline_id?: string }[];
 }
 
 export interface ProjectDocument {
@@ -363,6 +363,8 @@ export interface ProjectExport {
   manifest: {
     schema: number;
     counts: Record<string, number>;
+    workspace_baseline_id: string | null;
+    workspace_baseline_fingerprint: string | null;
     unresolved_requirement_ids: string[];
     documents_needing_review: string[];
   };
@@ -410,7 +412,8 @@ export interface ProjectGenerationResult {
 export interface ProjectGenerationRun {
   id: string;
   project_id: string;
-  mode: "analysis" | "documents";
+  mode: "analysis" | "documents" | "improvement";
+  improvement_goal?: string;
   document_kinds: ProjectDocumentKind[];
   engine: "opencode";
   model: string;
@@ -680,13 +683,14 @@ export async function listProjectGenerations(projectId: string) {
 }
 
 export async function getProjectGeneration(projectId: string, runId: string) {
-  return fetchJson<ProjectGenerationRun>(
-    `/api/projects/${encodeURIComponent(projectId)}/generation-runs/${encodeURIComponent(runId)}`);
+  return requestJson<ProjectGenerationRun>(
+    `/api/projects/${encodeURIComponent(projectId)}/generation-runs/${encodeURIComponent(runId)}`,
+    { method: "GET" });
 }
 
 export async function startProjectGeneration(
   projectId: string,
-  input: { mode: "analysis" | "documents"; document_kinds?: ProjectDocumentKind[]; model?: string },
+  input: { mode: "analysis" | "documents" | "improvement"; document_kinds?: ProjectDocumentKind[]; improvement_goal?: string; model?: string },
 ) {
   return requestJson<ProjectGenerationRun>(
     `/api/projects/${encodeURIComponent(projectId)}/generation-runs`, {
