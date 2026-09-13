@@ -1,0 +1,250 @@
+# Personalized Content Feed
+
+## Overview
+
+A **Personalized Content Feed** is a content-consumption application that assembles, for each individual user, a personal flow of content items drawn from a standing corpus — selecting and ordering the items through its own machinery, weighted by signals about that user (what they have done in the product and what interests they have declared), and re-assembling the flow as those signals accumulate.
+
+Its purpose is discovery without a query and without a managed list: the user opens the feed to find things worth their attention, and the product does the finding — differently for every user. Two people opening the same product see two different flows, and the same person's flow changes over time as their behavior and stated interests change.
+
+The defining structure is small:
+
+```text
+Standing corpus of content items the product can draw on
+└── Per-user selection
+    (the product's selection machinery weighs items by signals
+     about the individual user — behavior + declared interests —
+     so each user's flow is their own)
+    └── The personal flow
+        (a standing consumption surface, re-assembled as signals accumulate)
+```
+
+Everything else commonly associated with modern feeds — machine-learning ranking, short-video format, likes and reactions, "not interested" buttons, accounts, advertising — is widespread but not part of the defining core. An analog personal clipping service that cuts each subscriber a daily digest according to a stated interest profile satisfies the same structure with no software at all.
+
+When the user's own list of sources does the selecting with faithful delivery, the product is a **Feed Reader**. When the product assembles one flow shared by everyone, it is a **Content Aggregator**. When a curator selects items into persistent collections, it is a **Content Curation Platform**. These seams are described under Related Application Types.
+
+## Users & Context
+
+The primary user is an **individual consuming content as an audience member**. Unlike social networks, where the user joins as a member of a network whose ties distribute content, the feed user needs no connections to anyone: the flow works from the first session. The user's role is to consume and react — watch, read, like, hide, follow — and every reaction is also an input to the next assembly of their flow.
+
+Typical reasons to open the application:
+
+- fill unstructured attention time — a stream of things likely to interest *me*, chosen for me;
+- keep up with a topic space without managing sources or issuing queries;
+- rediscover the product after an absence and find the flow updated to match recent behavior.
+
+A secondary constituency is **creators and publishers** whose items fill the corpus (in products where the corpus is member- or publisher-supplied, being selected into feeds is the distribution that matters to them), and, in some products, operators who tune the selection machinery — though that work lives in separate business tools, not in this surface.
+
+The typical context is short, frequent sessions on mobile and web, usually without a goal beyond "show me something good."
+
+## Core Model
+
+### The Defining Core
+
+Three structures. If any one is removed, the product is no longer recognizable as a personalized content feed:
+
+- **A standing corpus** — a body of content items the product can draw on: items the platform hosts (creators' videos, members' posts), items it collects from external sources, or items its publishers supply. Without a corpus there is nothing to select from, and the product is not a content feed at all.
+- **Per-user selection** — the product's selection machinery weighs corpus items by signals about the individual user: **behavior the user generates** (what they open, like, comment on, dwell on, hide) and **interests the user declares** (topics, tags, or sources they follow). Selection happens *between items across the corpus* — the product decides which items this user sees, and the user did not enumerate the candidates. Without this, the flow is either shared by everyone (an aggregator), a faithful delivery of the user's own list (a reader), or the answer to a query (search).
+- **The personal flow as a standing, updating surface** — each user's flow persists between sessions and is re-assembled as signals accumulate. Without this, personalization degrades into a one-shot personal edition or a per-query result list; the *feed* is gone.
+
+### The Objects
+
+- **Content item** — the flowing unit: a piece of content with its origin (creator, publisher, or site), usually a title or preview, and the actions available on it (open, react, save, hide). Items are not authored in the feed surface; they arrive from the corpus.
+- **Corpus** — the candidate universe. It is deliberately larger than any user's flow: its breadth is what makes selection valuable.
+- **Signals** — the user's trace in the product. Behavior signals are generated by consuming; declaration signals are set by following topics, tags, or sources. Signals accumulate on a persistent per-user identity, which is why the flow can improve over time.
+- **Selection machinery** — whatever weighs corpus items against signals to produce the flow. It ranges from learned ranking models to simple rules ("popular posts in the topics you follow"); the Type does not require any particular technique — it requires that the *product* selects *for this user* from *that user's signals*.
+- **The flow** — the assembled artifact each user sees. It is standing (present before and between visits), personal (different per user), and never complete: items not selected are simply not seen.
+
+### Standard Capabilities
+
+These are widespread in mature products. They make the feed work well, but they are not what makes a feed personalized.
+
+- **Origin attribution** — every item shows where it came from (creator, channel, publication).
+- **Explicit interest inputs** — follow topics, tags, or sources; the declarations join the behavior signals as model input. In one documented implementation, a personalized surface is literally "popular posts based on the tags you follow."
+- **Feedback controls** — react, save, hide, and less-of-this controls; consuming and reacting visibly shapes later content (documented implementations state plainly that your likes and comments influence what you are recommended next).
+- **Cold-start handling** — until signals exist, the feed falls back to defaults: generic popular content, or topics picked during onboarding.
+- **Per-user eligibility filtering** — the candidate pool is filtered for each user (safety and spam exclusions, content not in the user's language).
+- **Explanation surfaces** — some products explain why items appear, either as documentation of the machinery or as per-item "why am I seeing this" controls.
+- **Search beside the flow** — query results as a separate surface in the same product; the query is transient, the flow is standing.
+- **Freshness fallback views** — recency-ordered or chronological views beside the selected flow, sometimes themselves personalized (a per-user filter with chronological order is still per-user selection).
+- **A retention handoff** — save and share actions move items out of the flow toward read-later and bookmarking tools.
+
+### One Structure, Many Implementations
+
+The core is written conceptually; the Variants section enumerates how products realize it.
+
+```text
+Concept:   Selection machinery
+Implementations:  learned ranking models, popularity rules over declared
+                  interests, collaborative filtering, hybrid editorial+algorithm
+
+Concept:   Signals
+Implementations:  views/likes/comments/hides (behavior), followed topics and
+                  sources (declaration), profile attributes (where offered)
+
+Concept:   Corpus
+Implementations:  platform-hosted creator content, collected web content,
+                  member-published posts, publisher-supplied articles
+
+Concept:   Packaging
+Implementations:  standalone feed-first applications; named feed surfaces
+                  inside readers, search engines, video platforms, social products
+```
+
+## How It Works
+
+### Signal accumulation and the personal flow
+
+The defining loop runs continuously and is invisible as a "workflow" — the user just consumes:
+
+```text
+First session: no signals yet
+→ the feed falls back to defaults (popular or onboarding-picked topics)
+→ the user consumes and reacts
+→ signals accumulate on the user's identity
+→ the next assembly of the flow weighs corpus items against those signals
+→ the flow the user returns to is different from the one they left
+```
+
+Two properties follow from this loop and distinguish the surface from every neighbor. First, the flow is **never complete** — the product promises attention-worthiness, not coverage; items outside the selection are simply absent. Second, the flow is **re-computed, not fixed** — what a user saw this morning is not what they see tonight, and no other user sees the same sequence.
+
+### Declaring interests
+
+Where declaration is supported, the user follows topics, tags, or sources, and the machinery treats these as strong signals alongside behavior. Declaration does not turn the surface into a subscription list: following a topic in a personalized feed *shapes selection* across the whole corpus — it does not guarantee delivery of everything published under that topic. The documented contrast inside one product: the subscription view delivers *all* posts from followed sites in publication order; the recommendation view selects *some* posts based on followed tags and recent likes, promising nothing complete.
+
+### Steering the model
+
+The user can steer what the model sees: react more or less, hide items, follow or unfollow topics, and in some products manage interests directly or consult explanations of why content appears. Documented implementations expose the reasoning — telling users which recent activity influences their recommendations, and letting users exclude their own activity from the signals.
+
+### Core vs Common vs Optional
+
+**Defining core** — without these, not a personalized content feed:
+
+- standing corpus of content items
+- per-user selection from that user's signals
+- the personal flow: standing, updating, individual
+
+**Common mature structure** — present in most modern products:
+
+- origin attribution on items
+- explicit interest inputs (follow topics/tags/sources)
+- feedback controls (react, save, hide)
+- cold-start defaults
+- per-user eligibility filtering (safety, language)
+- search beside the flow
+- freshness/chronological fallback views
+- retention handoff (save/share outward)
+
+**Variant / optional** — depends on product, packaging, and audience:
+
+- learned ranking vs simple rules vs hybrid editorial+algorithm
+- standalone feed-first app vs feed surface inside a larger product
+- content kind and scope (video, articles, web content; general vs domain-scoped)
+- explanation surfaces and interest-management controls
+- creator/publishing side attached to the corpus
+- advertising against the flow
+
+## Interfaces
+
+The following surfaces are described conceptually. Exact layouts and names vary by product.
+
+### The personal feed (home)
+
+The primary surface.
+
+- Purpose: present this user's assembled flow.
+- Typical information: an ordered stream of item cards — preview media or title excerpt, origin (creator/publisher), and interaction affordances.
+- Primary actions: open/consume the item, react, save, hide or request less of this, follow the origin.
+
+### Item view
+
+- Purpose: consume one item fully.
+- Typical information: the item's content, its origin and related items ("more like this") where offered.
+- Primary actions: react, save, share, hide, open the origin.
+
+### Interest / follows management
+
+- Purpose: declare and adjust what the model should treat as signals.
+- Typical information: followed topics, tags, sources; sometimes a view of recent activity that feeds recommendations.
+- Primary actions: follow/unfollow, sometimes review or exclude activity from signals.
+
+### Search / explore
+
+- Purpose: transient query results and browsable topic spaces beside the standing flow.
+- Typical information: results for an entered query; popular or fresh content by topic.
+- Primary actions: search, browse topics, open items.
+
+### Settings / privacy
+
+- Purpose: control how signals are collected and used — ad personalization settings, activity exclusions, language and safety filters.
+
+## Important Rules / Behaviors
+
+### Selection replaces completeness
+
+The feed never promises to show everything from anywhere. Completeness belongs to the reader (which delivers all posts from the user's subscriptions) — its absence here is a defining behavioral contrast. What the feed promises is *relevance to this user*, and it keeps that promise by omitting.
+
+### Signals persist and act on the user's behalf
+
+Behavior in the product is recorded against the user's identity and influences later assemblies of the flow. Documented implementations are explicit about this ("your likes and comments influence recommendations… see what similar content you might see"), and identity-bound signals mean the flow follows the account across sessions and devices. The same mechanism creates a privacy surface: products that bind signals to accounts typically offer ways to exclude activity or manage interests.
+
+### Cold start is a real state
+
+A new user has no signals; the product must still render a flow. Documented fallbacks include generic popular content and fixed default topics until the user behaves or declares interests. The existence of cold-start fallback is itself evidence of the Type's structure: the surface cannot work without per-user signals, so it must substitute something for their absence.
+
+### Eligibility is per user
+
+What may enter a flow is filtered per user — spam and safety exclusions apply to the corpus, and language scoping is applied per user (a documented implementation excludes "content not in your language" from recommendations). The candidate pool is therefore not the corpus; it is the corpus intersected with this user's eligibility.
+
+### Reaction is input
+
+Likes, comments, hides, and follows are simultaneously user actions and model inputs. This dual nature is the Type's characteristic interaction pattern: consuming *is* configuring, whether or not the product makes it visible.
+
+## Variants
+
+- **Feed-first applications** — the personal feed *is* the product; the whole corpus and interaction loop exist to fill it (the commonly cited extreme is short-video apps, where interest inference requires no follows at all).
+- **Feed surfaces inside larger products** — a named personalized surface inside a reader (recommendation feeds beside subscription feeds), inside a search engine (query-free discovery beside query results), inside a video platform (home/recommended beside search and channels), inside social and e-commerce products.
+- **Content-kind variants** — short video, articles and blogs, web pages, mixed media; domain-scoped feeds (news-scoped implementations shade toward the Personalized News Feed type).
+- **Signal-model variants** — behavior-led (consume and the flow adapts), declaration-led (follow topics and the flow follows), hybrid; profile attributes where they exist.
+- **Governance variants** — products that document or explain their selection machinery and offer interest management, vs products that treat the machinery as opaque; opt-outs from signal use where offered.
+- **Editorial hybrids** — a human-curated surface living beside the algorithmic feed in the same product, kept separate (curated picks as a distinct tab or section).
+
+A variant remains a variant unless it changes users, core objects, or rules so much that the core model no longer applies — as when the user's own list becomes the sole selector (Feed Reader) or member ties become the distribution substrate (social network types).
+
+## Related Application Types
+
+| Application Type | Distinction |
+|---|---|
+| Feed Reader | the user's subscription list is the sole selector and the app faithfully delivers what those sources publish, complete and in order; here the product selects *between* items across a corpus the user never enumerated, promising relevance rather than coverage |
+| Content Aggregator | the product's machinery assembles one flow shared by everyone (personal feeds at most an optional tuning layer); here per-user assembly is the core, and the product must fall back to defaults when a user has no signals |
+| Content Curation Platform | a curator selects items into persistent named collections with added context, presented to an audience; here there is no curator and no collection artifact — a standing per-user flow |
+| News Aggregator / Personalized News Feed | the same machinery with news-only scope; personalized feeds span content kinds, and news-scoped ones shade toward that sibling |
+| General Web Search Engine | query-first transient results vs query-free standing personal flow; a personalized surface renders without any query, and search inside the same product stays a separate surface |
+| Recommendation / Personalization Engine | the B2B decision machinery sold to operators that powers such surfaces; here the surface is where an end consumer receives the output |
+| Marketing Personalization Platform | the operator tool deciding what audiences see across their touchpoints; this Type is the consumer-facing surface, not the tool |
+| General Social Network / Microblogging / Short-form Video Social Platform | in social types, member identity and the personal connection graph are the primary distribution substrate and the user joins as a member; here the user is an audience member whose signals select items from a corpus — social ties may exist as inputs but are not the substrate |
+| Information Portal | a navigational entry surface organizing content, services, and routing; keep only the personalized article stream and it becomes this Type |
+| Bookmark Manager / Read-it-later | personal retention of deliberately saved items; the feed is the consumption surface whose save actions feed those tools |
+
+The most important boundary inside the feeds-and-curation family is with the **Feed Reader**, because products legitimately host both regimes side by side. The structural test is whether *selection between items* happens at all: faithful delivery of the user's list is a reader; per-user selection across a corpus, weighted by that user's signals, is a personalized content feed.
+
+## Representative Products
+
+- **WordPress.com Reader (Discover / Recommended / Post Recommendations)** — directly documented for this research: a subscription reader that also operates a per-user recommendation feed ("a feed of recommendations based on what you've recently liked or commented on"), with published selection factors, cold-start defaults, per-user language exclusion, and a separate hand-curated surface beside the algorithmic one.
+- **Short-form video apps (TikTok-class "For You" feeds)** — the market's most cited feed-first pole: interest-driven flows that work without following anyone. Not directly verifiable during this research; described structurally.
+- **Video-platform home/recommended feeds (YouTube-class)** — personalized discovery surfaces inside content platforms. Not directly verifiable during this research; described structurally.
+- **Search-engine discovery surfaces (Google Discover-class)** — query-free standing content feeds beside query engines. Not directly verifiable during this research; described structurally.
+
+## Sources
+
+Research date: **2026-09-08**
+
+Fetched directly:
+
+- WordPress.com — "Use the WordPress.com Reader" — https://wordpress.com/support/reader/ (subscription-feed semantics; Reader surfaces)
+- WordPress.com — "Learn about Reader recommendations" — https://wordpress.com/support/reader/reader-recommendations/ (recommendation surfaces; documented selection factors; cold-start defaults; exclusions; identity-bound signals; editorial layer)
+
+Family and boundary evidence recorded at first-hand in the processed sibling passes (Feed Reader, Content Aggregator, Content Curation Platform, Recommendation / Personalization Engine, Hiking/Trail Application, Job Board, Information Portal, General Social Network, Microblogging Platform), including vendor positioning that defines the reader pole against the algorithmic pole.
+
+> Sourcing limitation: the market's flagship implementations of this Type — short-video feed-first apps, video-platform home feeds, search-engine discovery surfaces — and all encyclopedic/historical references (Wikipedia) were unreachable from the research environment on 2026-09-08 (repeated timeouts; abandoned after the standard retry limit). No operational claims about those products are made in this document; they are described structurally, and claims resting on the single directly documented product are qualified in place ("some products", "documented implementations"). The historical argument (personal clipping services; early collaborative-filtering discovery products) is conceptual for the same reason.
+
+Detailed evidence, product-by-product observations, the cross-product comparison, and the full boundary analysis — including the joint-review conclusions for the feeds-and-curation family — are recorded in the paired Research Notes.

@@ -1,0 +1,173 @@
+{
+ "cli-accounting-tool": {
+  "deduped_at": "2026-09-12T20:01",
+  "top": [
+   [
+    "accounting-software",
+    0.44352278113365173
+   ],
+   [
+    "general-ledger-system",
+    0.44518333673477173
+   ],
+   [
+    "net-worth-tracker",
+    0.44316577911376953
+   ],
+   [
+    "bookkeeping-application",
+    0.44228434562683105
+   ],
+   [
+    "spreadsheet-application",
+    0.4350525438785553
+   ]
+  ],
+  "verdict": "variant",
+  "best": "bookkeeping-application",
+  "reason": "核心功能相同：复式记账、科目表、报表生成；但命令行和纯文本界面是记账应用的变体形态，不足以独立成叶。",
+  "section_hint": null,
+  "pool": [
+   "accounting-software",
+   "bookkeeping-application",
+   "general-ledger-system",
+   "financial-close-management",
+   "net-worth-tracker"
+  ],
+  "promoted": true,
+  "action": "new",
+  "section": "08.07",
+  "gate": "84.6%",
+  "gate_ok": false,
+  "gate_attribution": "cli-accounting-tool 不在任何 MISS 案例检索池中（无盗类证据）；MISS 集中在已知的边界摇摆项（钉钉/简道云/synthetic-20 曾人工裁决），与裁决器波动相关，非新叶所致"
+ },
+ "wip-github-com-anomalyco-opencode": {
+  "identity": {
+   "verdict": "variant",
+   "best": "ai-coding-agent",
+   "reason": "opencode 是开源终端编码代理，核心（任务→自主循环→可审查改动）与 ai-coding-agent 相同，属 CLI 变体，不另立新叶。"
+  }
+ },
+ "wip-draft": {
+  "identity": null,
+  "collision": [
+   [
+    "elearning-authoring-tool",
+    0.45348119735717773
+   ],
+   [
+    "author-management-platform",
+    0.45195361971855164
+   ],
+   [
+    "distraction-free-writing-application",
+    0.47831490635871887
+   ],
+   [
+    "life-planning-application",
+    0.45616787672042847
+   ],
+   [
+    "document-editor",
+    0.47702130675315857
+   ]
+  ],
+  "deduped_at": "2026-09-13T01:19",
+  "top": [
+   [
+    "desktop-publishing-application",
+    0.4426484704017639
+   ],
+   [
+    "book-publishing-management",
+    0.4845021069049835
+   ],
+   [
+    "book-distribution-management",
+    0.471510648727417
+   ],
+   [
+    "press-release-distribution-platform",
+    0.5069228410720825
+   ],
+   [
+    "elearning-authoring-tool",
+    0.5187349319458008
+   ]
+  ],
+  "verdict": "new",
+  "reason": "提案核心是项目式书籍写作与多格式编译，现有类型要么聚焦页面布局，要么聚焦出版管理或阅读，无直接覆盖。",
+  "best": null,
+  "section_hint": null,
+  "pool": [
+   "e-book-library-application",
+   "desktop-publishing-application",
+   "news-application",
+   "page-layout-application",
+   "project-management-application"
+  ]
+ },
+ "wip-draft-2": {
+  "identity": {
+   "name": "Novel Writing Application",
+   "name_zh": "小说创作应用",
+   "desc": "以结构化手稿树与故事设定库为核心的长篇虚构写作工具，覆盖构思、起草、修订到编译成稿，不承担排版与出版流程"
+  },
+  "collision": [
+   [
+    "distraction-free-writing-application",
+    0.48131173849105835
+   ],
+   [
+    "press-release-distribution-platform",
+    0.5004675388336182
+   ],
+   [
+    "resume-builder",
+    0.48684966564178467
+   ],
+   [
+    "general-reference-database",
+    0.5138806700706482
+   ],
+   [
+    "template-based-design-platform",
+    0.5049645900726318
+   ]
+  ],
+  "deduped_at": "2026-09-13T10:56",
+  "top": [
+   [
+    "distraction-free-writing-application",
+    0.48131173849105835
+   ],
+   [
+    "press-release-distribution-platform",
+    0.5004675388336182
+   ],
+   [
+    "resume-builder",
+    0.48684966564178467
+   ],
+   [
+    "general-reference-database",
+    0.5138806700706482
+   ],
+   [
+    "template-based-design-platform",
+    0.5049645900726318
+   ]
+  ],
+  "verdict": "new",
+  "best": null,
+  "reason": "新提案以结构化手稿树和故事设定库为核心，专用于长篇虚构写作，现有候选均无此特定核心。",
+  "section_hint": "03.01",
+  "pool": [
+   "news-application",
+   "news-publishing-platform",
+   "page-layout-application",
+   "distraction-free-writing-application",
+   "desktop-publishing-application"
+  ]
+ }
+}

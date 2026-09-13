@@ -1,0 +1,39 @@
+# ---- 大型可再生数据（markdown 语料是源头）----
+application-atlas-production-pack/atlas/*.sqlite
+application-atlas-production-pack/atlas/atlas.json
+application-atlas-production-pack/atlas/e_*.npy
+application-atlas-production-pack/atlas/*-state.json
+application-atlas-production-pack/atlas/*.bak
+application-atlas-production-pack/logs/*
+!application-atlas-production-pack/logs/*.md
+application-atlas-production-pack/__pycache__/
+application-atlas-production-pack/batch.log
+
+# ---- atlas-web（npm i + npm run gen 可再生）----
+atlas-web/node_modules/
+atlas-web/dist/
+atlas-web/public/data/
+
+# ---- 参照库（嵌套 git 仓库）----
+_ref-software-map/
+
+# ---- 临时/杂项 ----
+*.zip
+bug1_912.png
+bug2-912.png
+leaves.txt
+.DS_Store
+__pycache__/
+
+# ---- atlas 启动器 ----
+apps/launcher.log
+
+# Runtime state and isolated validation workspaces
+*.tsbuildinfo
+application-atlas-production-pack/atlas/*.log
+application-atlas-production-pack/atlas/*.lock
+application-atlas-production-pack/atlas/.staging-*/
+application-atlas-production-pack/atlas/.export-*/
+application-atlas-production-pack/drafts/*.opencode.log
+application-atlas-production-pack/drafts/*.body.md
+.venv/
