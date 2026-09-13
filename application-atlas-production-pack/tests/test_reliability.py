@@ -885,6 +885,103 @@ class ProjectStoreTests(unittest.TestCase):
         self.assertEqual(self.store.get_document(document['id'])['content'],
                          '# PRD\n\nNewer human edit')
 
+    def test_document_bundle_is_complete_ordered_and_applied_by_dependency(self):
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:type', 'sample', 'v1', excerpt='Fixed evidence')
+        requirement = self.store.create_requirement(
+            self.project['id'], 'Ship the approved workflow', 'current', 'Source support',
+            ['The workflow is observable'], [reference['id']])
+        self.store.confirm_requirement(requirement['id'], 'current', 'Approved')
+
+        incomplete = prepare_generation(
+            self.store, self.project['id'], 'documents',
+            ['acceptance-plan', 'product-requirements'])
+        incomplete_directory = (self.store.path.parent / 'generation-runs' /
+                                self.project['id'] / incomplete['id'])
+        incomplete_request = json.loads((incomplete_directory / 'input.json').read_text())
+
+        def incomplete_runner(_directory, _run):
+            return ({
+                'input_fingerprint': incomplete_request['input_fingerprint'],
+                'questions': [], 'requirements': [], 'conflicts': [], 'suggestions': [],
+                'documents': [{
+                    'document_id': None, 'kind': 'product-requirements', 'title': 'PRD',
+                    'content': '# PRD',
+                    'basis': [{'kind': 'requirement', 'id': requirement['id']}],
+                }],
+            }, {})
+
+        with self.assertRaisesRegex(ValueError, 'missing: acceptance-plan'):
+            execute_generation(
+                self.store, self.project['id'], incomplete['id'], runner=incomplete_runner)
+
+        run = prepare_generation(
+            self.store, self.project['id'], 'documents',
+            ['acceptance-plan', 'technical-plan', 'product-requirements'])
+        directory = (self.store.path.parent / 'generation-runs' /
+                     self.project['id'] / run['id'])
+        request = json.loads((directory / 'input.json').read_text())
+        self.assertEqual(request['document_kinds'], [
+            'product-requirements', 'technical-plan', 'acceptance-plan'])
+        self.assertEqual(request['document_dependencies']['acceptance-plan'], [
+            'product-requirements', 'technical-plan'])
+
+        def bundle_runner(_directory, _run):
+            documents = []
+            for kind, title in (
+                    ('acceptance-plan', 'Acceptance'), ('technical-plan', 'Technical'),
+                    ('product-requirements', 'PRD')):
+                documents.append({
+                    'document_id': None, 'kind': kind, 'title': title,
+                    'content': f'# {title}',
+                    'basis': [{'kind': 'requirement', 'id': requirement['id']}],
+                })
+            return ({
+                'input_fingerprint': request['input_fingerprint'],
+                'questions': [], 'requirements': [], 'conflicts': [], 'suggestions': [],
+                'documents': documents,
+            }, {})
+
+        completed = execute_generation(
+            self.store, self.project['id'], run['id'], runner=bundle_runner)
+        self.assertEqual([item['kind'] for item in completed['result']['documents']], [
+            'product-requirements', 'technical-plan', 'acceptance-plan'])
+        self.assertEqual(completed['result']['documents'][1]['depends_on'], [
+            'product-requirements'])
+        import drafts_api
+        handler = object.__new__(drafts_api.Handler)
+        handler.path = (f"/api/projects/{self.project['id']}/generation-runs/"
+                        f"{run['id']}/apply")
+        handler._body = lambda: {'item_kind': 'document', 'index': 2}
+        handler._json = lambda value, code=200: (value, code)
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            dependency_error, code = handler.do_POST()
+        self.assertEqual(code, 409)
+        self.assertIn('product-requirements', dependency_error['error'])
+        with self.assertRaisesRegex(ProjectStoreError, 'dependency.*product-requirements'):
+            apply_generation_item(
+                self.store, self.project['id'], run['id'], 'document', 2)
+
+        product = apply_generation_item(
+            self.store, self.project['id'], run['id'], 'document', 0)
+        self.assertEqual(product['run']['applied']['documents']['0']['version_id'],
+                         product['created']['version_id'])
+        with self.assertRaisesRegex(ProjectStoreError, 'dependency.*technical-plan'):
+            apply_generation_item(
+                self.store, self.project['id'], run['id'], 'document', 2)
+
+        technical = apply_generation_item(
+            self.store, self.project['id'], run['id'], 'document', 1)
+        self.assertIn(
+            product['created']['version_id'],
+            [item['id'] for item in technical['created']['basis']])
+        acceptance = apply_generation_item(
+            self.store, self.project['id'], run['id'], 'document', 2)
+        self.assertEqual(
+            {product['created']['version_id'], technical['created']['version_id']},
+            {item['id'] for item in acceptance['created']['basis']
+             if item['kind'] == 'document_version'})
+
     def test_task_inputs_must_belong_to_same_project(self):
         other = self.store.create_project('Other', 'Other goal', self.root / 'other', 'existing')
         document = self.store.create_document(other['id'], 'plan', 'Plan', 'content')

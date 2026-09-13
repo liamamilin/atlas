@@ -24,6 +24,28 @@ from project_workflow import DOCUMENT_KINDS
 RUN_STATES = {"queued", "running", "completed", "failed"}
 MODES = {"analysis", "documents", "improvement"}
 SCOPES = {"current", "later", "excluded"}
+DOCUMENT_ORDER = (
+    "analysis", "current-state", "product-requirements", "interaction",
+    "technical-plan", "development-plan", "acceptance-plan",
+)
+# Atlas owns this dependency model. The model writes each draft independently;
+# validation adds only the selected upstream kinds and application resolves them
+# to immutable document-version IDs.
+DOCUMENT_DEPENDENCIES = {
+    "analysis": (),
+    "current-state": (),
+    "product-requirements": ("analysis",),
+    "interaction": ("analysis", "product-requirements"),
+    "technical-plan": ("analysis", "current-state", "product-requirements"),
+    "development-plan": (
+        "analysis", "current-state", "product-requirements", "interaction",
+        "technical-plan",
+    ),
+    "acceptance-plan": (
+        "analysis", "current-state", "product-requirements", "interaction",
+        "technical-plan", "development-plan",
+    ),
+}
 MAX_INPUT_CHARS = 500_000
 MAX_RESULT_BYTES = 2_000_000
 _STATE_LOCK = threading.RLock()
@@ -62,11 +84,13 @@ def prepare_generation(store, project_id: str, mode: str,
     atomic_write(directory / "prompt.md", render_generation_prompt(request))
     now = _now()
     run = {
+        "schema": 2,
         "id": run_id,
         "project_id": project_id,
         "mode": mode,
         "improvement_goal": improvement_goal.strip(),
         "document_kinds": targets,
+        "document_dependencies": request["document_dependencies"],
         "engine": "opencode",
         "model": model.strip(),
         "status": "queued",
@@ -108,13 +132,14 @@ def build_generation_input(store, project_id: str, mode: str,
                 "workspace differs from the accepted baseline; check and adopt changes first")
         workspace_baseline = _workspace_baseline_input(baseline)
     payload = {
-        "schema": 1,
+        "schema": 2,
         "mode": mode,
         "project": {
             "id": project["id"], "name": project["name"],
             "objective": project["objective"], "mode": project["mode"],
         },
         "document_kinds": document_kinds,
+        "document_dependencies": _document_dependencies(document_kinds),
         "improvement_goal": improvement_goal,
         "workspace_baseline": workspace_baseline,
         "references": [{
@@ -191,6 +216,8 @@ defines the task and output contract.
 
 Requested document kinds: {targets}
 
+Atlas dependency order: {_canonical(request['document_dependencies'])}
+
 Write the final result to `result.json` as UTF-8 JSON with this exact top-level shape:
 
 ```json
@@ -238,8 +265,10 @@ Rules:
     for recommendations and documents. Preserve
    source identifiers and short quotations in their original language.
 11. Prefer a small set of high-confidence outputs: at most 6 questions, 8 candidate requirements,
-    4 conflicts and 6 suggestions. Write one concise complete document for each requested kind. After writing
-    `result.json`, stop without running a separate validation command; Atlas validates the file.
+    4 conflicts and 6 suggestions. Write exactly one concise complete document for every requested kind.
+    Draft them in Atlas dependency order and make downstream content consistent with upstream drafts in this
+    result. Atlas records the resolved immutable version links after review. After writing `result.json`, stop
+    without running a separate validation command; Atlas validates the file.
 {improvement_rules}
 """
 
@@ -254,6 +283,11 @@ def render_generation_input(request: dict) -> str:
         "## Requested document kinds", "",
     ]
     lines.extend(f"- `{kind}`" for kind in request["document_kinds"])
+    lines.extend(["", "Dependency order within this run:", ""])
+    for kind in request["document_kinds"]:
+        dependencies = request["document_dependencies"].get(kind) or []
+        rendered = ", ".join(f"`{value}`" for value in dependencies) or "none"
+        lines.append(f"- `{kind}` depends on: {rendered}")
     if request.get("improvement_goal"):
         lines.extend(["", "## Improvement goal", "", request["improvement_goal"]])
     lines.extend([
@@ -435,21 +469,44 @@ def apply_generation_item(store, project_id: str, run_id: str,
                 item["recommendation_reason"], item["acceptance_conditions"],
                 item["reference_ids"])
         else:
+            if request is None:
+                request = json.loads((directory / "input.json").read_text())
+                _verify_request(request, run["input_fingerprint"])
+            basis = [dict(value) for value in item["basis"]]
+            for dependency in item.get("depends_on", []):
+                dependency_index = next(
+                    (position for position, candidate in enumerate(items)
+                     if candidate["kind"] == dependency), None)
+                applied = run["applied"]["documents"].get(str(dependency_index)) \
+                    if dependency_index is not None else None
+                if not isinstance(applied, dict) or not applied.get("version_id"):
+                    raise ProjectStoreError(
+                        f"document dependency must be applied first: {dependency}")
+                dependency_item = items[dependency_index]
+                if dependency_item.get("document_id"):
+                    source = next(
+                        value for value in request["documents"]
+                        if value["id"] == dependency_item["document_id"])
+                    basis = [value for value in basis if not (
+                        value.get("kind") == "document_version"
+                        and value.get("id") == source["version_id"])]
+                resolved = {"kind": "document_version", "id": applied["version_id"]}
+                if resolved not in basis:
+                    basis.append(resolved)
             if item["document_id"]:
-                if request is None:
-                    request = json.loads((directory / "input.json").read_text())
-                    _verify_request(request, run["input_fingerprint"])
                 source = next(value for value in request["documents"]
                               if value["id"] == item["document_id"])
                 created = store.add_document_version(
-                    item["document_id"], item["content"], item["basis"],
+                    item["document_id"], item["content"], basis,
                     expected_current_version=source["current_version"], author="ai",
                     change_summary=f"Generated by {run_id}")
             else:
                 created = store.create_document(
-                    project_id, item["kind"], item["title"], item["content"], item["basis"],
+                    project_id, item["kind"], item["title"], item["content"], basis,
                     author="ai", change_summary=f"Generated by {run_id}")
-        run["applied"][plural][key] = created["id"]
+        run["applied"][plural][key] = (
+            {"document_id": created["id"], "version_id": created["version_id"]}
+            if item_kind == "document" else created["id"])
         run["updated_at"] = _now()
         atomic_json(directory / "run.json", run)
     return {"run": run, "created": created}
@@ -471,7 +528,8 @@ def validate_generation_result(request: dict, result: dict) -> dict:
     workspace_baseline = request.get("workspace_baseline")
     baselines = {workspace_baseline["id"]} if workspace_baseline else set()
     existing_documents = {item["id"]: item for item in request["documents"]}
-    targets = set(request["document_kinds"])
+    target_order = request["document_kinds"]
+    targets = set(target_order)
     questions = _objects(result["questions"], "questions")
     for item in questions:
         _keys(item, {"question", "why", "affects"}, "question")
@@ -544,8 +602,17 @@ def validate_generation_result(request: dict, result: dict) -> dict:
             if not any(kind == "reference" for kind, _ in cited):
                 raise ValueError("improvement document must cite an Atlas reference")
             _validate_improvement_document(content, workspace_baseline)
-    if request["mode"] == "improvement" and len(documents) != 1:
-        raise ValueError("improvement generation must return one current-state document")
+    if seen_kinds != targets:
+        missing = ", ".join(kind for kind in target_order if kind not in seen_kinds)
+        raise ValueError(f"generation must return exactly one document per requested kind; missing: {missing}")
+    by_kind = {item["kind"]: item for item in documents}
+    ordered = []
+    dependencies = request.get("document_dependencies") or _document_dependencies(target_order)
+    for kind in target_order:
+        item = by_kind[kind]
+        item["depends_on"] = list(dependencies.get(kind) or [])
+        ordered.append(item)
+    result["documents"] = ordered
     return result
 
 
@@ -676,7 +743,17 @@ def _document_kinds(value):
         raise ValueError("document_kinds contains an invalid kind")
     if len(value) != len(set(value)):
         raise ValueError("document_kinds contains duplicates")
-    return value
+    selected = set(value)
+    return [kind for kind in DOCUMENT_ORDER if kind in selected]
+
+
+def _document_dependencies(kinds):
+    selected = set(kinds)
+    return {
+        kind: [dependency for dependency in DOCUMENT_DEPENDENCIES[kind]
+               if dependency in selected]
+        for kind in kinds
+    }
 
 
 def _objects(value, label):

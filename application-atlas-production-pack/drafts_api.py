@@ -939,11 +939,12 @@ class Handler(BaseHTTPRequestHandler):
                     get_project_store(), m.group(1), m.group(2),
                     body.get("item_kind"), body.get("index")), 201)
             except ProjectStoreError as error:
-                code = 409 if str(error) in {
+                message = str(error)
+                code = 409 if message in {
                     "generation item already applied", "document version conflict",
                     "generation run is not completed",
-                } else 404
-                return self._json({"error": str(error)}, code)
+                } or message.startswith("document dependency must be applied first:") else 404
+                return self._json({"error": message}, code)
             except (ValueError, json.JSONDecodeError, AttributeError) as error:
                 return self._json({"error": str(error)}, 400)
         m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/requirements$", path)

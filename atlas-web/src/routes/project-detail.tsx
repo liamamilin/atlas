@@ -25,7 +25,6 @@ import {
   getProjectExecution,
   getProjectDocumentDiff,
   getProjectDocumentVersions,
-  getProjectGeneration,
   getProjectWorkspace,
   invalidateAtlasCache,
   listProjectGenerations,
@@ -64,6 +63,14 @@ const DOCUMENT_KINDS: { value: ProjectDocumentKind; zh: string; en: string }[] =
   { value: "acceptance-plan", zh: "验收方案", en: "Acceptance plan" },
   { value: "current-state", zh: "项目现状与变更", en: "Current state & changes" },
 ];
+const DOCUMENT_BUNDLE_KINDS = DOCUMENT_KINDS.filter((item) => item.value !== "current-state");
+const CORE_DOCUMENT_BUNDLE: ProjectDocumentKind[] = [
+  "product-requirements", "technical-plan", "development-plan", "acceptance-plan",
+];
+const FULL_DOCUMENT_BUNDLE: ProjectDocumentKind[] = [
+  "analysis", "product-requirements", "interaction", "technical-plan",
+  "development-plan", "acceptance-plan",
+];
 
 export function ProjectDetail() {
   const { projectId = "" } = useParams<{ projectId: string }>();
@@ -92,7 +99,7 @@ export function ProjectDetail() {
       </Link>
       <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-medium tracking-wide text-primary">U17 · M4</p>
+          <p className="text-sm font-medium tracking-wide text-primary">{lang === "zh" ? "U17 · 项目工作台" : "U17 · Project workspace"}</p>
           <h1 className="mt-2 font-serif text-3xl font-medium">{data.project.name}</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">{data.project.objective}</p>
         </div>
@@ -105,6 +112,8 @@ export function ProjectDetail() {
         <Stat value={data.decisions.length} label={lang === "zh" ? "项目决定" : "Decisions"} />
         <Stat value={data.documents.length} label={lang === "zh" ? "关联文档" : "Documents"} />
       </div>
+
+      <LifecycleOverview workspace={data} />
 
       <WorkspaceBaselinePanel projectId={projectId} onSaved={refresh} />
 
@@ -167,6 +176,32 @@ export function ProjectDetail() {
       <ExecutionPanel projectId={projectId} workspace={data} onSaved={refresh} />
     </main>
   );
+}
+
+function LifecycleOverview({ workspace }: { workspace: ProjectWorkspace }) {
+  const { lang } = useLang();
+  const confirmed = workspace.requirements.some((item) => item.confirmed_scope === "current");
+  const documentsReady = CORE_DOCUMENT_BUNDLE.every((kind) =>
+    workspace.documents.some((item) => item.kind === kind && item.review.status === "current"));
+  const accepted = workspace.tasks.length > 0
+    && workspace.tasks.every((item) => item.acceptance_status !== "pending");
+  const steps = [
+    { done: workspace.references.length > 0, zh: "收集资料", en: "Sources" },
+    { done: confirmed, zh: "确认需求", en: "Scope" },
+    { done: documentsReady, zh: "形成文档", en: "Documents" },
+    { done: workspace.iterations.length > 0, zh: "建立迭代", en: "Iteration" },
+    { done: workspace.executions.length > 0, zh: "执行改动", en: "Execution" },
+    { done: accepted, zh: "产品验收", en: "Acceptance" },
+  ];
+  const next = steps.find((item) => !item.done);
+  return <section className="mt-5 rounded-xl border border-border bg-surface p-4 shadow-card">
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <div><p className="text-sm font-medium">{lang === "zh" ? "项目路径" : "Project path"}</p><p className="mt-1 text-xs text-subtle">{next ? (lang === "zh" ? `建议下一步：${next.zh}` : `Recommended next: ${next.en}`) : (lang === "zh" ? "当前流程已经走到产品验收。" : "The current path has reached product acceptance.")}</p></div>
+      <div className="flex flex-wrap gap-2">{steps.map((item, index) => <div key={item.en} className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] ${item.done ? "bg-primary/10 text-primary" : item === next ? "bg-warn/10 text-warn" : "bg-bg-elevated text-subtle"}`}>
+        {item.done ? <CheckCircle2 className="size-3.5" /> : <span>{index + 1}</span>}<span>{lang === "zh" ? item.zh : item.en}</span>
+      </div>)}</div>
+    </div>
+  </section>;
 }
 
 function ExecutionPanel({ projectId, workspace, onSaved }: {
@@ -448,21 +483,26 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
   onAnalysis: (run: ProjectGenerationRun | null) => void;
 }) {
   const { lang } = useLang();
-  const [run, setRun] = useState<ProjectGenerationRun | null>(null);
-  const [kind, setKind] = useState<ProjectDocumentKind>("product-requirements");
+  const [runs, setRuns] = useState<ProjectGenerationRun[]>([]);
+  const [selectedRunId, setSelectedRunId] = useState("");
+  const [selectedKinds, setSelectedKinds] = useState<ProjectDocumentKind[]>(CORE_DOCUMENT_BUNDLE);
+  const [compact, setCompact] = useState(true);
   const [improvementGoal, setImprovementGoal] = useState("");
   const [error, setError] = useState("");
   const [starting, setStarting] = useState(false);
   const [applying, setApplying] = useState("");
+  const run = runs.find((item) => item.id === selectedRunId) || null;
   const hasConfirmedScope = workspace.requirements.some((item) => item.confirmed_scope === "current");
   const active = run?.status === "queued" || run?.status === "running";
+  const hasActiveRun = runs.some((item) => item.status === "queued" || item.status === "running");
 
   useEffect(() => {
     let alive = true;
     listProjectGenerations(projectId).then(
       (items) => {
         if (!alive) return;
-        if (items[0]) setRun(items[0]);
+        setRuns(items);
+        setSelectedRunId(items[0]?.id || "");
         onAnalysis(items.find((item) =>
           (item.mode === "analysis" || item.mode === "improvement")
           && item.status === "completed") || null);
@@ -473,29 +513,33 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
   }, [projectId]);
 
   useEffect(() => {
-    if (!active || !run) return;
+    if (!hasActiveRun) return;
     let alive = true;
     const timer = window.setInterval(() => {
-      getProjectGeneration(projectId, run.id).then(
-        (next) => {
+      listProjectGenerations(projectId).then(
+        (items) => {
           if (!alive) return;
-          setRun(next);
-          if ((next.mode === "analysis" || next.mode === "improvement")
-              && next.status === "completed") onAnalysis(next);
+          setRuns(items);
+          const latestAnalysis = items.find((item) =>
+            (item.mode === "analysis" || item.mode === "improvement")
+            && item.status === "completed");
+          if (latestAnalysis) onAnalysis(latestAnalysis);
         },
         (cause) => { if (alive) setError(String(cause)); },
       );
     }, 1500);
     return () => { alive = false; window.clearInterval(timer); };
-  }, [active, projectId, run?.id]);
+  }, [hasActiveRun, projectId]);
 
   const start = async (mode: "analysis" | "documents" | "improvement") => {
     setStarting(true); setError("");
     try {
-      setRun(await startProjectGeneration(projectId, {
-        mode, ...(mode === "documents" ? { document_kinds: [kind] } : {}),
+      const created = await startProjectGeneration(projectId, {
+        mode, ...(mode === "documents" ? { document_kinds: selectedKinds } : {}),
         ...(mode === "improvement" ? { improvement_goal: improvementGoal.trim() } : {}),
-      }));
+      });
+      setRuns((items) => [created, ...items.filter((item) => item.id !== created.id)]);
+      setSelectedRunId(created.id);
     } catch (cause) { setError(String(cause)); } finally { setStarting(false); }
   };
   const apply = async (itemKind: "requirement" | "document", index: number) => {
@@ -504,7 +548,7 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
     try {
       const result = await applyProjectGenerationItem(
         projectId, run.id, { item_kind: itemKind, index });
-      setRun(result.run);
+      setRuns((items) => items.map((item) => item.id === result.run.id ? result.run : item));
       if (result.run.mode === "analysis" || result.run.mode === "improvement") {
         onAnalysis(result.run);
       }
@@ -512,6 +556,11 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
     } catch (cause) { setError(String(cause)); } finally { setApplying(""); }
   };
   const result = run?.result;
+  const choosePreset = (value: ProjectDocumentKind[]) => setSelectedKinds([...value]);
+  const toggleKind = (kind: ProjectDocumentKind) => setSelectedKinds((items) =>
+    items.includes(kind) ? items.filter((item) => item !== kind)
+      : DOCUMENT_BUNDLE_KINDS.map((item) => item.value).filter(
+        (item) => [...items, kind].includes(item)));
   return <section className="mt-8 rounded-xl bg-surface p-5 shadow-card">
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div className="flex max-w-2xl items-start gap-3"><Bot className="mt-0.5 size-5 text-primary" /><div>
@@ -519,21 +568,26 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
         <p className="mt-1 text-xs leading-5 text-subtle">{lang === "zh" ? "OpenCode 只读取本项目已固定的依据。输出先作为 AI 建议供审阅，需求不会自动获得用户确认，文档也不会自动覆盖现有版本。" : "OpenCode reads only this project's pinned input. Results remain reviewable AI proposals; requirements are never user-confirmed automatically and documents never overwrite a newer version."}</p>
       </div></div>
       <div className="flex flex-wrap items-end gap-2">
-        <Button size="sm" variant="outline" disabled={starting || active} onClick={() => start("analysis")}><Sparkles className="size-4" />{lang === "zh" ? "分析固定资料" : "Analyze pinned sources"}</Button>
-        <label className="text-xs text-muted"><span className="block">{lang === "zh" ? "文档类型" : "Document kind"}</span><select value={kind} onChange={(event) => setKind(event.target.value as ProjectDocumentKind)} className={`${inputClass} mt-1 h-9 min-w-40`}>
-          {DOCUMENT_KINDS.map((item) => <option key={item.value} value={item.value}>{lang === "zh" ? item.zh : item.en}</option>)}
-        </select></label>
-        <Button size="sm" disabled={starting || active || !hasConfirmedScope} onClick={() => start("documents")}><FileText className="size-4" />{lang === "zh" ? "生成文档草案" : "Generate document draft"}</Button>
+        <Button size="sm" variant="outline" disabled={starting || hasActiveRun} onClick={() => start("analysis")}><Sparkles className="size-4" />{lang === "zh" ? "分析固定资料" : "Analyze pinned sources"}</Button>
       </div>
+    </div>
+    <div className="mt-4 rounded-lg border border-border p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-sm font-medium">{lang === "zh" ? "按依赖生成文档集合" : "Generate a dependency-aware document set"}</p><p className="mt-1 text-[11px] leading-5 text-subtle">{lang === "zh" ? "Atlas 固定生成顺序；保存下游草案时会引用本轮已保存上游的不可变版本。" : "Atlas fixes generation order and links saved downstream drafts to immutable upstream versions from this run."}</p></div><div className="flex gap-2">
+        <Button size="sm" variant={sameKinds(selectedKinds, CORE_DOCUMENT_BUNDLE) ? "default" : "outline"} onClick={() => choosePreset(CORE_DOCUMENT_BUNDLE)}>{lang === "zh" ? "核心 4 份" : "Core 4"}</Button>
+        <Button size="sm" variant={sameKinds(selectedKinds, FULL_DOCUMENT_BUNDLE) ? "default" : "outline"} onClick={() => choosePreset(FULL_DOCUMENT_BUNDLE)}>{lang === "zh" ? "完整 6 份" : "Full 6"}</Button>
+      </div></div>
+      <fieldset className="mt-3"><legend className="sr-only">{lang === "zh" ? "选择文档类型" : "Choose document kinds"}</legend><div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{DOCUMENT_BUNDLE_KINDS.map((item) => <label key={item.value} className="flex items-center gap-2 rounded-md bg-bg-elevated px-3 py-2 text-xs text-muted"><input type="checkbox" checked={selectedKinds.includes(item.value)} onChange={() => toggleKind(item.value)} /><span>{lang === "zh" ? item.zh : item.en}</span></label>)}</div></fieldset>
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3"><p className="text-[11px] text-subtle">{lang === "zh" ? `已选 ${selectedKinds.length} 份；可逐份审阅，必须按依赖顺序保存。` : `${selectedKinds.length} selected; review individually and save in dependency order.`}</p><Button size="sm" disabled={starting || hasActiveRun || !hasConfirmedScope || !selectedKinds.length} onClick={() => start("documents")}><FileText className="size-4" />{lang === "zh" ? `生成 ${selectedKinds.length} 份草案` : `Generate ${selectedKinds.length} drafts`}</Button></div>
     </div>
     <div className="mt-4 grid gap-3 rounded-lg border border-border p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
       <TextArea label={lang === "zh" ? "本轮局部改进目标" : "Improvement goal for this iteration"} value={improvementGoal} onChange={setImprovementGoal} rows={2} />
-      <Button size="sm" disabled={starting || active || !improvementGoal.trim() || !workspace.references.length} onClick={() => start("improvement")}><FolderGit2 className="size-4" />{lang === "zh" ? "生成项目改进方案" : "Generate improvement plan"}</Button>
+      <Button size="sm" disabled={starting || hasActiveRun || !improvementGoal.trim() || !workspace.references.length} onClick={() => start("improvement")}><FolderGit2 className="size-4" />{lang === "zh" ? "生成项目改进方案" : "Generate improvement plan"}</Button>
       <p className="text-[11px] leading-5 text-subtle md:col-span-2">{lang === "zh" ? "使用已接受工作区基线和已固定 Atlas 资料，输出当前/期望行为、影响范围、任务依赖与回归条件。工作区有未采用变化时会拒绝启动。" : "Uses the accepted workspace baseline and pinned Atlas sources to produce current/expected behavior, impact, task dependencies, and regression conditions. A changed workspace must be reviewed and adopted first."}</p>
     </div>
     {!workspace.references.length ? <p className="mt-3 text-xs text-warn">{lang === "zh" ? "改进方案需要至少一份已固定的类型或应用资料。" : "An improvement plan requires at least one pinned type or application source."}</p> : null}
     {!hasConfirmedScope ? <p className="mt-3 text-xs text-warn">{lang === "zh" ? "生成产品与开发文档前，至少确认一条本版需求。资料分析可以先运行。" : "Confirm at least one current requirement before generating product or development documents. Source analysis can run first."}</p> : null}
-    {run ? <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4 text-xs text-subtle">
+    {runs.length ? <div className="mt-4 flex flex-wrap items-end justify-between gap-3 border-t border-border pt-4"><label className="text-xs text-muted"><span className="block">{lang === "zh" ? "生成历史" : "Generation history"}</span><select value={selectedRunId} onChange={(event) => setSelectedRunId(event.target.value)} className={`${inputClass} mt-1 h-9 min-w-72`}>{runs.map((item) => <option key={item.id} value={item.id}>{new Date(item.created_at).toLocaleString(lang === "zh" ? "zh-CN" : "en")} · {item.mode} · {item.status}</option>)}</select></label><div className="flex gap-2"><Button size="sm" variant={compact ? "default" : "outline"} onClick={() => setCompact(true)}>{lang === "zh" ? "简要" : "Compact"}</Button><Button size="sm" variant={!compact ? "default" : "outline"} onClick={() => setCompact(false)}>{lang === "zh" ? "完整" : "Full"}</Button></div></div> : null}
+    {run ? <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-subtle">
       <Badge tone={run.status === "completed" ? "ok" : run.status === "failed" ? "warn" : "default"}>{run.status}</Badge>
       <span className="font-mono">{run.id}</span><span>{run.mode} · {run.engine}{run.model ? ` · ${run.model}` : ""}</span>
       <span className="font-mono">input {run.input_fingerprint.slice(0, 12)}</span>
@@ -555,7 +609,13 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
         })}
         {result.documents.map((item, index) => {
           const applied = run.applied.documents[String(index)];
-          return <article key={`${item.kind}:${index}`} className="rounded-lg bg-bg-elevated p-4"><div className="flex items-start justify-between gap-3"><div><p className="text-[11px] text-primary">{lang === "zh" ? "AI 文档草案" : "AI document draft"} · {documentKind(item.kind, lang)}</p><h3 className="mt-1 text-sm font-medium">{item.title}</h3></div><Button size="sm" variant="outline" disabled={Boolean(applied) || applying === `document:${index}`} onClick={() => apply("document", index)}>{applied ? (lang === "zh" ? "已保存" : "Saved") : item.document_id ? (lang === "zh" ? "保存为新版本" : "Save new version") : (lang === "zh" ? "创建关联文档" : "Create document")}</Button></div><div className="mt-3 max-h-80 overflow-auto rounded-md bg-surface p-3"><Prose md={item.content} /></div></article>;
+          const dependencies = item.depends_on || [];
+          const unmet = dependencies.filter((dependency) => {
+            const dependencyIndex = result.documents.findIndex((candidate) => candidate.kind === dependency);
+            return dependencyIndex < 0 || !run.applied.documents[String(dependencyIndex)];
+          });
+          const content = <div className="mt-3 max-h-80 overflow-auto rounded-md bg-surface p-3"><Prose md={item.content} /></div>;
+          return <article key={`${item.kind}:${index}`} className="rounded-lg bg-bg-elevated p-4"><div className="flex items-start justify-between gap-3"><div><p className="text-[11px] text-primary">{lang === "zh" ? `第 ${index + 1}/${result.documents.length} 份` : `${index + 1} of ${result.documents.length}`} · {documentKind(item.kind, lang)}</p><h3 className="mt-1 text-sm font-medium">{item.title}</h3>{dependencies.length ? <p className="mt-1 text-[11px] text-subtle">{lang === "zh" ? "依赖" : "Depends on"}: {dependencies.map((value) => documentKind(value, lang)).join(" · ")}</p> : null}{unmet.length ? <p className="mt-1 text-[11px] text-warn">{lang === "zh" ? "请先保存" : "Save first"}: {unmet.map((value) => documentKind(value, lang)).join(" · ")}</p> : null}</div><Button size="sm" variant="outline" disabled={Boolean(applied) || Boolean(unmet.length) || applying === `document:${index}`} onClick={() => apply("document", index)}>{applied ? (lang === "zh" ? "已保存" : "Saved") : item.document_id ? (lang === "zh" ? "保存为新版本" : "Save new version") : (lang === "zh" ? "创建关联文档" : "Create document")}</Button></div>{compact ? <details className="mt-3"><summary className="cursor-pointer text-xs text-primary">{lang === "zh" ? "查看完整草案" : "View full draft"}</summary>{content}</details> : content}</article>;
         })}
       </div>
     </div> : null}
@@ -803,6 +863,7 @@ function Picker({ label, options, selected, onChange }: { label: string; options
 }
 
 function basisFromKeys(keys: string[]): DocumentBasis[] { return keys.map((key) => { const [kind, id] = key.split(":", 2); return { kind: kind as NonNullable<DocumentBasis["kind"]>, id }; }); }
+function sameKinds(left: ProjectDocumentKind[], right: ProjectDocumentKind[]) { return left.length === right.length && left.every((item) => right.includes(item)); }
 function lines(value: string) { return value.split("\n").map((item) => item.trim()).filter(Boolean); }
 function scopeLabel(scope: ProjectScope | null, lang: "zh" | "en") { if (!scope) return lang === "zh" ? "无" : "None"; const labels = { current: { zh: "本版", en: "Current" }, later: { zh: "以后", en: "Later" }, excluded: { zh: "不做", en: "Excluded" } }; return labels[scope][lang]; }
 function documentKind(kind: ProjectDocumentKind, lang: "zh" | "en") { const item = DOCUMENT_KINDS.find((candidate) => candidate.value === kind); return item ? (lang === "zh" ? item.zh : item.en) : kind; }

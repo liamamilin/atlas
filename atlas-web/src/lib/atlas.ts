@@ -550,6 +550,12 @@ export interface GeneratedDocument {
   title: string;
   content: string;
   basis: { kind: NonNullable<DocumentBasis["kind"]>; id: string }[];
+  depends_on: ProjectDocumentKind[];
+}
+
+export interface AppliedGeneratedDocument {
+  document_id: string;
+  version_id: string;
 }
 
 export interface ProjectGenerationResult {
@@ -567,12 +573,16 @@ export interface ProjectGenerationRun {
   mode: "analysis" | "documents" | "improvement";
   improvement_goal?: string;
   document_kinds: ProjectDocumentKind[];
+  document_dependencies?: Partial<Record<ProjectDocumentKind, ProjectDocumentKind[]>>;
   engine: "opencode";
   model: string;
   status: "queued" | "running" | "completed" | "failed";
   input_fingerprint: string;
   result: ProjectGenerationResult | null;
-  applied: { requirements: Record<string, string>; documents: Record<string, string> };
+  applied: {
+    requirements: Record<string, string>;
+    documents: Record<string, AppliedGeneratedDocument | string>;
+  };
   error: string;
   engine_session_id: string | null;
   created_at: string;
