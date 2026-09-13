@@ -48,7 +48,7 @@ Endpoints:
   POST   /api/projects/<id>/tasks
   POST   /api/projects/<id>/tasks/<task-id>/executions
   GET    /api/projects/<id>/executions/<execution-id>
-  POST   /api/projects/<id>/executions/<execution-id>/reconcile|stop|apply|permission|question
+  POST   /api/projects/<id>/executions/<execution-id>/reconcile|continue|stop|apply|permission|question
   POST   /api/projects/<id>/tasks/<task-id>/acceptance
 
 Run alongside `npm run dev` (vite proxies /api -> :5199).
@@ -87,6 +87,7 @@ from project_baseline import (
 )
 from execution_service import (
     apply_execution_result,
+    continue_execution,
     create_iteration as create_project_iteration,
     create_task as create_execution_task,
     reconcile_execution, reply_permission as reply_execution_permission,
@@ -846,7 +847,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"error": str(error)}, 400)
         m = re.match(
             r"^/api/projects/(prj_[A-Za-z0-9]+)/executions/(exe_[A-Za-z0-9]+)/"
-            r"(reconcile|stop|apply|permission|question)$", path)
+            r"(reconcile|continue|stop|apply|permission|question)$", path)
         if m:
             try:
                 action = m.group(3)
@@ -856,6 +857,9 @@ class Handler(BaseHTTPRequestHandler):
                         raise ValueError("reconcile does not accept fields")
                     result = reconcile_execution(
                         get_project_store(), m.group(1), m.group(2))
+                elif action == "continue":
+                    result = continue_execution(
+                        get_project_store(), m.group(1), m.group(2), self._body())
                 elif action == "stop":
                     body = self._body()
                     if body:
@@ -874,7 +878,7 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     result = reply_execution_question(
                         get_project_store(), m.group(1), m.group(2), self._body())
-                return self._json(result)
+                return self._json(result, 202 if action == "continue" else 200)
             except ProjectStoreError as error:
                 return self._json({"error": str(error)}, _project_error_code(error))
             except (ValueError, json.JSONDecodeError) as error:

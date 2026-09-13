@@ -59,6 +59,9 @@ def project_execution(reconcile: dict, task_message_id: str | None = None) -> di
         return _result("completed", engine_status, relevant,
                        message_id=completed[-1]["info"].get("id"))
 
+    if not any(item.get("info", {}).get("role") == "assistant" for item in relevant) \
+            and any(item.get("info", {}).get("role") == "user" for item in relevant):
+        return _result("queued", engine_status, relevant)
     if task_message_id and not relevant:
         return _result("queued", engine_status, relevant)
     return _result("unknown", engine_status, relevant)

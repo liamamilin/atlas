@@ -30,9 +30,10 @@ from execution_workspace import prepare_execution_workspace
 from execution_service import (
     _completion_report,
     apply_execution_result,
+    continue_execution,
     create_iteration as create_execution_iteration,
     create_task as create_execution_task,
-    reconcile_execution, start_execution,
+    reconcile_execution, start_execution, stop_execution,
 )
 from project_store import ProjectStore, ProjectStoreError
 from project_export import export_project
@@ -246,6 +247,16 @@ class ExecutionStateTests(unittest.TestCase):
 
     def test_idle_alone_is_not_completion(self):
         result = project_execution({'status': {'type': 'idle'}, 'messages': []}, 'msg_missing')
+        self.assertEqual(result['state'], 'queued')
+
+    def test_user_message_without_assistant_response_stays_queued(self):
+        result = project_execution({
+            'status': {'type': 'idle'},
+            'messages': [{
+                'info': {'id': 'msg_user', 'role': 'user'},
+                'parts': [{'type': 'text', 'text': 'Start'}],
+            }],
+        }, 'msg_user')
         self.assertEqual(result['state'], 'queued')
 
     def test_abort_and_other_errors_are_distinct(self):
@@ -1344,6 +1355,9 @@ class ExecutionServiceTests(unittest.TestCase):
     class Client:
         def __init__(self):
             self.prompt = ''
+            self.prompts = []
+            self.session_ids = []
+            self.user_messages = []
             self.mode = 'running'
             self.permission_replies = []
             self.created = 0
@@ -1354,12 +1368,22 @@ class ExecutionServiceTests(unittest.TestCase):
 
         def send_message_async(self, session_id, text, provider_id, model_id, **kwargs):
             self.prompt = text
+            self.prompts.append(text)
+            self.session_ids.append(session_id)
+            self.user_messages.append({
+                'info': {'id': f'msg_user_{len(self.user_messages) + 1}',
+                         'role': 'user'},
+                'parts': [{'type': 'text', 'text': text}],
+            })
             self.tools = kwargs['tools']
 
+        def messages(self, session_id):
+            return list(self.user_messages)
+
         def reconcile(self, session_id):
-            user = {'info': {'id': 'msg_user', 'role': 'user'},
-                    'parts': [{'type': 'text', 'text': self.prompt}]}
-            assistant = {'info': {'id': 'msg_answer', 'parentID': 'msg_user',
+            user = self.user_messages[-1]
+            user_id = user['info']['id']
+            assistant = {'info': {'id': 'msg_answer', 'parentID': user_id,
                                   'role': 'assistant'},
                          'parts': [{'type': 'text', 'text': 'Implemented and checked.'}]}
             permissions = []
@@ -1514,6 +1538,122 @@ class ExecutionServiceTests(unittest.TestCase):
         self.assertEqual(waiting['status'], 'waiting_permission')
         self.assertEqual(waiting['raw_state']['interaction']['request']['id'],
                          'per_execution')
+
+    def test_follow_up_reuses_session_and_creates_a_new_snapshot_boundary(self):
+        first = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        workdir = Path(first['workdir'])
+        (workdir / 'src/app.py').write_text('VALUE = 2\n')
+        self.client.mode = 'completed'
+        first = reconcile_execution(
+            self.store, self.project['id'], first['id'], self.client)
+
+        second = continue_execution(
+            self.store, self.project['id'], first['id'],
+            {'instruction': 'Change VALUE to 3 and rerun the fixed check.'},
+            self.client)
+
+        self.assertEqual(self.client.created, 1)
+        self.assertEqual(second['engine_session_id'], first['engine_session_id'])
+        self.assertEqual(second['workdir'], first['workdir'])
+        self.assertEqual(second['input_state']['continuation_of'], first['id'])
+        self.assertEqual(second['status'], 'running')
+        self.assertEqual(self.store.get_execution(first['id'])['application_status'],
+                         'superseded')
+        self.assertIn(f"Atlas execution ID: `{second['id']}`", self.client.prompt)
+        self.assertIn('Change VALUE to 3', self.client.prompt)
+        self.assertEqual(self.client.session_ids,
+                         [first['engine_session_id'], first['engine_session_id']])
+        second_before = self.store.get_snapshot(
+            self.project['id'], second['before_snapshot_id'])
+        first_after = self.store.get_snapshot(
+            self.project['id'], first['after_snapshot_id'])
+        self.assertEqual(second_before['manifest']['files'],
+                         first_after['manifest']['files'])
+        with self.assertRaisesRegex(ProjectStoreError, 'superseded'):
+            apply_execution_result(self.store, self.project['id'], first['id'])
+
+        (workdir / 'src/app.py').write_text('VALUE = 3\n')
+        second = reconcile_execution(
+            self.store, self.project['id'], second['id'], self.client)
+        self.assertEqual(second['status'], 'completed')
+        self.assertEqual(second['raw_state']['evidence']['filesystem']['modified'],
+                         ['src/app.py'])
+        applied = apply_execution_result(
+            self.store, self.project['id'], second['id'])
+        self.assertEqual(applied['application_status'], 'applied')
+        self.assertEqual((self.workspace / 'src/app.py').read_text(), 'VALUE = 3\n')
+
+    def test_follow_up_rejects_an_unrecorded_change_in_the_isolated_copy(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        self.client.mode = 'completed'
+        execution = reconcile_execution(
+            self.store, self.project['id'], execution['id'], self.client)
+        (Path(execution['workdir']) / 'src/app.py').write_text('VALUE = 9\n')
+        with self.assertRaisesRegex(ProjectStoreError, 'changed after'):
+            continue_execution(
+                self.store, self.project['id'], execution['id'],
+                {'instruction': 'Continue.'}, self.client)
+        self.assertEqual(self.client.created, 1)
+
+    def test_new_retry_supersedes_the_previous_unapplied_result(self):
+        first = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        self.client.mode = 'completed'
+        first = reconcile_execution(
+            self.store, self.project['id'], first['id'], self.client)
+        retry = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        self.assertEqual(retry['status'], 'running')
+        replaced = self.store.get_execution(first['id'])
+        self.assertEqual(replaced['application_status'], 'superseded')
+        self.assertEqual(
+            replaced['application_state']['superseded_by_execution_id'], retry['id'])
+        self.assertEqual(replaced['application_state']['reason'],
+                         'replaced_by_new_execution')
+
+    def test_missing_session_can_be_closed_as_a_stopped_execution(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+
+        class MissingClient:
+            def reconcile(self, _session_id):
+                raise OpenCodeError(404, 'session unavailable')
+            def abort(self, _session_id):
+                raise OpenCodeError(404, 'session unavailable')
+
+        unknown = reconcile_execution(
+            self.store, self.project['id'], execution['id'], MissingClient())
+        self.assertEqual(unknown['status'], 'unknown')
+        stopped = stop_execution(
+            self.store, self.project['id'], execution['id'], MissingClient())
+        self.assertEqual(stopped['status'], 'stopped')
+        self.assertEqual(stopped['raw_state']['engine_status'],
+                         'session_unavailable_confirmed')
+        self.assertIsNotNone(stopped['after_snapshot_id'])
+
+    def test_http_continue_route_uses_the_existing_execution(self):
+        import drafts_api
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        self.client.mode = 'completed'
+        execution = reconcile_execution(
+            self.store, self.project['id'], execution['id'], self.client)
+        handler = object.__new__(drafts_api.Handler)
+        handler.path = (f"/api/projects/{self.project['id']}/executions/"
+                        f"{execution['id']}/continue")
+        handler._body = lambda: {'instruction': 'Check the implementation again.'}
+        handler._json = lambda value, code=200: (value, code)
+        real_continue = drafts_api.continue_execution
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store), \
+                patch.object(drafts_api, 'continue_execution',
+                             side_effect=lambda store, project_id, execution_id, body:
+                             real_continue(store, project_id, execution_id, body,
+                                           self.client)):
+            continued, code = handler.do_POST()
+        self.assertEqual(code, 202)
+        self.assertEqual(continued['input_state']['continuation_of'], execution['id'])
 
     def test_missing_engine_session_does_not_rewrite_terminal_execution(self):
         execution = start_execution(

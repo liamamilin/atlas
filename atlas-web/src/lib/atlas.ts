@@ -328,7 +328,7 @@ export interface ProjectExecution {
   applied_snapshot_id: string | null;
   workdir: string;
   source_workdir: string;
-  application_status: "not_applicable" | "pending" | "applied" | "conflict" | "failed";
+  application_status: "not_applicable" | "pending" | "applied" | "conflict" | "failed" | "superseded";
   application_state: {
     strategy?: "isolated_copy";
     source_workdir?: string;
@@ -340,6 +340,8 @@ export interface ProjectExecution {
     modified?: string[];
     removed?: string[];
     error?: string;
+    superseded_by_execution_id?: string;
+    reason?: string;
   };
   input_state: {
     schema?: number;
@@ -357,6 +359,9 @@ export interface ProjectExecution {
     write_paths?: string[];
     verification_commands?: string[];
     model?: string;
+    continuation_of?: string;
+    follow_up_instruction?: string;
+    session_user_message_ids_before?: string[];
   };
   capabilities: Record<string, boolean>;
   raw_state: {
@@ -933,6 +938,20 @@ export async function stopProjectExecution(projectId: string, executionId: strin
   const result = await requestJson<ProjectExecution>(
     `/api/projects/${encodeURIComponent(projectId)}/executions/${encodeURIComponent(executionId)}/stop`, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: "{}",
+    });
+  invalidateAtlasCache();
+  return result;
+}
+
+export async function continueProjectExecution(
+  projectId: string,
+  executionId: string,
+  instruction: string,
+) {
+  const result = await requestJson<ProjectExecution>(
+    `/api/projects/${encodeURIComponent(projectId)}/executions/${encodeURIComponent(executionId)}/continue`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ instruction }),
     });
   invalidateAtlasCache();
   return result;

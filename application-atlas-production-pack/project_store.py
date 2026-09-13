@@ -20,7 +20,9 @@ TASK_STATES = {"planned", "queued", "running", "waiting_permission",
                "waiting_input", "completed", "failed", "stopped", "unknown"}
 EXECUTION_STATES = TASK_STATES - {"planned"}
 ACCEPTANCE_STATES = {"pending", "passed", "failed", "waived"}
-APPLICATION_STATES = {"not_applicable", "pending", "applied", "conflict", "failed"}
+APPLICATION_STATES = {
+    "not_applicable", "pending", "applied", "conflict", "failed", "superseded",
+}
 SCOPE_STATES = {"current", "later", "excluded"}
 READ_STATES = {"unread", "read", "reviewed"}
 ITERATION_STATES = {"planned", "active", "completed", "abandoned"}
@@ -642,7 +644,8 @@ class ProjectStore:
                                      state: dict,
                                      applied_snapshot_id: str | None = None) -> dict:
         if status not in APPLICATION_STATES - {"not_applicable", "pending"}:
-            raise ValueError("application status must be applied, conflict, or failed")
+            raise ValueError(
+                "application status must be applied, conflict, failed, or superseded")
         if not isinstance(state, dict):
             raise ValueError("application state must be an object")
         now = _now()
@@ -653,10 +656,11 @@ class ProjectStore:
             if not row:
                 raise ProjectStoreError("execution not found")
             allowed = {
-                "pending": {"applied", "conflict", "failed"},
-                "conflict": {"applied", "conflict", "failed"},
-                "failed": {"applied", "conflict", "failed"},
+                "pending": {"applied", "conflict", "failed", "superseded"},
+                "conflict": {"applied", "conflict", "failed", "superseded"},
+                "failed": {"applied", "conflict", "failed", "superseded"},
                 "applied": {"applied"},
+                "superseded": {"superseded"},
                 "not_applicable": set(),
             }
             if status not in allowed[row["application_status"]]:
