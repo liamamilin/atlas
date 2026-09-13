@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "scenario": "new-idea",
+  "title": "本地优先的个人日计划器",
+  "repository_root": "../../..",
+  "documents": {
+    "research": "01-research-analysis.md",
+    "product": "02-product-requirements.md",
+    "technical": "03-technical-plan.md",
+    "tasks": "04-development-tasks.md",
+    "acceptance": "05-acceptance.md"
+  },
+  "sources": [
+    {
+      "id": "NI-S1",
+      "path": "application-atlas-production-pack/applications/task-management-application.md",
+      "fingerprint": "816ab50adb110ae50fd8df449c7437b434bb8970266b1196385b1116e623899c"
+    },
+    {
+      "id": "NI-S2",
+      "path": "application-atlas-production-pack/applications/time-blocking-application.md",
+      "fingerprint": "2cd9eca2093ad136f27e9c517f6a071c5c1bdb7272936b00237a325c644e1263"
+    },
+    {
+      "id": "NI-S3",
+      "path": "application-atlas-production-pack/applications/personal-organizer.md",
+      "fingerprint": "a781dba79a92a53df7d84ee9521286ed8f2537abb1d2a57ab5e2d405b1baaaf7"
+    },
+    {
+      "id": "NI-S4",
+      "path": "application-atlas-production-pack/mvp_apps_classified.json",
+      "fingerprint": "531f5f344b1bf81f584181acbbca15276532104d04c20cbd688460e25495b426"
+    }
+  ],
+  "search": {
+    "type_hits": ["task-management-application", "time-blocking-application", "personal-organizer"],
+    "application_hits": ["Todoist", "Things 3", "Sunsama", "Akiflow", "Motion", "Any.do"]
+  },
+  "requirements": [
+    {
+      "id": "NI-R1",
+      "scope": "current",
+      "text": "用户可以把多个项目中的候选任务加入某一天，并明确选出当天承诺完成的任务。",
+      "source_ids": ["NI-S1", "NI-S4"],
+      "acceptance_ids": ["NI-A1"]
+    },
+    {
+      "id": "NI-R2",
+      "scope": "current",
+      "text": "用户可以为当天任务手动安排时间块，并看见重叠与超出可用时段的冲突。",
+      "source_ids": ["NI-S2", "NI-S4"],
+      "acceptance_ids": ["NI-A2", "NI-A3"]
+    },
+    {
+      "id": "NI-R3",
+      "scope": "current",
+      "text": "计划保存在本地，重新打开应用后仍保留项目、任务和时间块关系。",
+      "source_ids": ["NI-S3"],
+      "acceptance_ids": ["NI-A4"]
+    },
+    {
+      "id": "NI-R4",
+      "scope": "current",
+      "text": "首版只提示排程冲突，不自动移动用户已经安排的时间块。",
+      "source_ids": ["NI-S2"],
+      "acceptance_ids": ["NI-A3"]
+    },
+    {
+      "id": "NI-R5",
+      "scope": "later",
+      "text": "连接外部日历并根据变化自动重新排程。",
+      "source_ids": ["NI-S2", "NI-S4"],
+      "acceptance_ids": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "NI-T1",
+      "title": "建立项目、候选任务与日计划数据模型",
+      "requirement_ids": ["NI-R1", "NI-R3"],
+      "acceptance_ids": ["NI-A1", "NI-A4"]
+    },
+    {
+      "id": "NI-T2",
+      "title": "实现手动时间块与冲突计算",
+      "requirement_ids": ["NI-R2", "NI-R4"],
+      "acceptance_ids": ["NI-A2", "NI-A3"]
+    },
+    {
+      "id": "NI-T3",
+      "title": "实现日计划界面与持久化恢复",
+      "requirement_ids": ["NI-R1", "NI-R2", "NI-R3"],
+      "acceptance_ids": ["NI-A1", "NI-A2", "NI-A4"]
+    }
+  ],
+  "acceptance": [
+    {"id": "NI-A1", "text": "可从两个项目选择候选任务并形成当天承诺列表。"},
+    {"id": "NI-A2", "text": "可创建、调整和删除当天的手动时间块。"},
+    {"id": "NI-A3", "text": "重叠或越界时间块显示冲突，系统不改写用户输入。"},
+    {"id": "NI-A4", "text": "重启后项目、任务、当天选择和时间块保持一致。"}
+  ],
+  "uncertainties": [
+    {
+      "id": "NI-U1",
+      "status": "open",
+      "owner": "产品试点",
+      "next_step": "用 5 名个人开发者测试当天承诺列表是否需要硬数量限制。"
+    },
+    {
+      "id": "NI-U2",
+      "status": "deferred",
+      "owner": "后续迭代",
+      "next_step": "首版验证后再选择系统日历协议和冲突写回规则。"
+    }
+  ]
+}

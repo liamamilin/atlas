@@ -18,11 +18,12 @@ U17 面向新想法和已有项目改进：搜索与阅读类型、应用资料�
 - [产品设计](docs/U17_DESIGN.md)：用户流程、资料与文档体系、项目版本、agent 编排边界和验收场景。
 - [开发规划](docs/U17_DEVELOPMENT_PLAN.md)：M0–M5 的验证任务、实现顺序和完成条件。
 - [M0 验证记录](docs/U17_M0_VALIDATION.md)：完整资料读取与 OpenCode 接口的实际验证结果。
+- [双场景样例](docs/u17-samples/)：新想法与已有项目改进的关联文档包。
 - [下游应用路线图](USAGE_ROADMAP.md)：U17 与其他功能的关系及历史记录。
 
-截至 2026-09-13，U17 已从设计进入 M0 验证与基础能力开发；资料全文读取、OpenCode 核心适配、执行状态投影、工作区基线、独立项目存储和离线任务交接包已落地，项目工作台尚未形成完整可用流程。当前应用的运行功能以本 README 其余章节为准。
+截至 2026-09-13，U17 的 M0 核心验证已完成，M1 已开始：资料全文读取、OpenCode 核心适配、执行状态投影、工作区基线、独立项目/迭代存储、双场景文档样例和离线任务交接包已落地；项目工作台已支持创建、保存与切换项目，完整资料和文档流程仍在开发。当前应用的运行功能以本 README 其余章节为准。
 
-U17 的基础能力已经开始开发：本地 API 提供 `GET /api/sources/<slug>` 查询正式类型资料清单，并通过 `GET /api/sources/<kind>/<slug>` 按完整文档或章节分页读取；MCP 同步提供 `get_atlas_source_manifest` 与 `read_atlas_source`。`opencode_client.py` 是首个执行引擎适配模块，已验证实际读取、文档写入、代码修改、中断及重启对账；`workspace_snapshot.py` 提供独立于引擎的文件基线与变化核对。项目工作台、文档生成和正式开发执行流程尚未实现。
+U17 的本地 API 提供 `GET /api/sources/<slug>` 查询正式类型资料清单，通过 `GET /api/sources/<kind>/<slug>` 按完整文档或章节分页读取，并提供 `GET/POST /api/projects` 与 `GET /api/projects/<id>` 管理项目；网页的“项目”入口可创建、列出和切换项目。MCP 同步提供 `get_atlas_source_manifest` 与 `read_atlas_source`。`opencode_client.py` 是首个执行引擎适配模块，`workspace_snapshot.py` 提供独立于引擎的文件基线与变化核对。资料收藏、文档生成和正式开发执行流程尚未实现。
 
 ## 启动
 

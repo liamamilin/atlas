@@ -17,6 +17,9 @@ Endpoints:
   GET    /api/sources/<slug>             canonical source manifest + outlines
   GET    /api/sources/<kind>/<slug>      canonical Markdown, optionally paged
                                         ?section=<outline-id>&offset=0&limit=12000
+  GET    /api/projects                   list U17 projects
+  POST   /api/projects                   create {name,objective,mode,workspace?}
+  GET    /api/projects/<id>              read one U17 project
 
 Run alongside `npm run dev` (vite proxies /api -> :5199).
 """
@@ -34,6 +37,7 @@ from urllib.parse import parse_qs, urlparse, unquote
 from atlas_runtime import PACK as DATA_PACK, api_key, atomic_write, corpus_lock, recover_publication
 from review_store import load_review, update_review, fingerprint, corpus_revision, review_current, valid_slug
 from atlas_sources import SourceError, read_source, source_manifest
+from project_store import ProjectStore, ProjectStoreError
 PACK = str(DATA_PACK)
 sys.path.insert(0, PACK)
 from leaf_lint import lint, parse_front
@@ -48,6 +52,32 @@ GEN_LOCK = threading.Semaphore(2)          # max concurrent engine runs
 GEN_THREADS = {}
 PROMOTE_LOCK = threading.Lock()
 PROMOTE_THREADS = set()
+PROJECT_STORE = None
+PROJECT_STORE_LOCK = threading.Lock()
+
+
+def get_project_store():
+    global PROJECT_STORE
+    if PROJECT_STORE is None:
+        with PROJECT_STORE_LOCK:
+            if PROJECT_STORE is None:
+                PROJECT_STORE = ProjectStore()
+    return PROJECT_STORE
+
+
+def create_project(body, store=None):
+    if not isinstance(body, dict):
+        raise ValueError("request body must be an object")
+    for field in ("name", "objective", "mode"):
+        if not isinstance(body.get(field), str) or not body[field].strip():
+            raise ValueError(f"{field} is required")
+    if body["mode"] == "existing" and (
+            not isinstance(body.get("workspace"), str) or not body["workspace"].strip()):
+        raise ValueError("workspace is required for an existing project")
+    if body.get("workspace") is not None and not isinstance(body["workspace"], str):
+        raise ValueError("workspace must be a path")
+    return (store or get_project_store()).create_project(
+        body["name"], body["objective"], body.get("workspace"), body["mode"])
 
 # ---- 模型生成身份（英文名/中文名/一句话想法，创建时 name/desc 可不填） ----
 ID_MODEL = os.environ.get("ATLAS_DEDUP_MODEL", "mimo-v2.5")
@@ -413,6 +443,14 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(list_sections())
         if path == "/api/review":
             return self._json(load_review(PACK))
+        if path == "/api/projects":
+            return self._json(get_project_store().list_projects())
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)$", path)
+        if m:
+            try:
+                return self._json(get_project_store().get_project(m.group(1)))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
         m = re.match(r"^/api/sources/([\w-]+)$", path)
         if m:
             try:
@@ -444,6 +482,11 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = unquote(urlparse(self.path).path)
+        if path == "/api/projects":
+            try:
+                return self._json(create_project(self._body()), 201)
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
         if path == "/api/drafts":
             b = self._body()
             res, code = self._create(b)

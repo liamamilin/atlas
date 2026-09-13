@@ -21,6 +21,7 @@ export function AppShell() {
               { to: "/", label: t("home", lang) },
               { to: "/browse", label: t("browse", lang) },
               { to: "/apps", label: t("apps", lang) },
+              { to: "/projects", label: t("projects", lang) },
               { to: "/drafts", label: t("drafts", lang) },
             ].map((l) => (
               <NavLink

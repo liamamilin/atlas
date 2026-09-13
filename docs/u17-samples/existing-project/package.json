@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "scenario": "existing-project",
+  "title": "为 Application Atlas 增加项目创建与切换入口",
+  "repository_root": "../../..",
+  "documents": {
+    "research": "01-current-state-analysis.md",
+    "product": "02-product-requirements.md",
+    "technical": "03-technical-plan.md",
+    "tasks": "04-development-tasks.md",
+    "acceptance": "05-acceptance.md"
+  },
+  "sources": [
+    {
+      "id": "EP-S1",
+      "path": "application-atlas-production-pack/project_store.py",
+      "fingerprint": "a92c8506b9a3f925e00f757224686a81492e75c472204ccd2933b587056e5ed5",
+      "version": "git:83de6b2"
+    },
+    {
+      "id": "EP-S2",
+      "path": "application-atlas-production-pack/drafts_api.py",
+      "fingerprint": "a2ea7eba1b8c53450415557521df4f7742a324bca07be1dffffefa9a1665f76a",
+      "version": "git:83de6b2"
+    },
+    {
+      "id": "EP-S3",
+      "path": "atlas-web/src/lib/atlas.ts",
+      "fingerprint": "fbf337c07e1cb48bfa9d11fd337fdb0f40340ce8a38a08e07d29ad271326ae69",
+      "version": "git:83de6b2"
+    },
+    {
+      "id": "EP-S4",
+      "path": "atlas-web/src/routes/search.tsx",
+      "fingerprint": "ce5cec2446be476b61a0ffb5f962f21b60491e44783604947152c23613f4b67a",
+      "version": "git:83de6b2"
+    },
+    {
+      "id": "EP-S5",
+      "path": "docs/U17_DESIGN.md",
+      "fingerprint": "c1d3321f389195d9c227b4357896371e8d2b30feeb5cd304f50a10fdbf2bbd22",
+      "version": "git:83de6b2"
+    }
+  ],
+  "baseline": {
+    "observed": [
+      "ProjectStore 已有 create_project/get_project 和独立 SQLite 项目库。",
+      "drafts_api.py 已有本地 JSON API 路由，但没有 /api/projects。",
+      "前端数据层和搜索页没有项目列表、当前项目或创建项目入口。"
+    ],
+    "unknown": [
+      "macOS 目录选择器是否进入首版，当前 Python HTTP 服务没有对应能力。",
+      "项目入口最终位于全局侧栏还是搜索页上方，尚未经过界面试用。"
+    ]
+  },
+  "requirements": [
+    {
+      "id": "EP-R1",
+      "scope": "current",
+      "text": "用户可以用名称、目标、模式和工作区创建项目；服务返回 Atlas 项目标识。",
+      "source_ids": ["EP-S1", "EP-S2", "EP-S5"],
+      "acceptance_ids": ["EP-A1", "EP-A4"]
+    },
+    {
+      "id": "EP-R2",
+      "scope": "current",
+      "text": "用户可以列出并重新打开已有项目，服务重启后数据仍存在。",
+      "source_ids": ["EP-S1", "EP-S3"],
+      "acceptance_ids": ["EP-A2"]
+    },
+    {
+      "id": "EP-R3",
+      "scope": "current",
+      "text": "当前项目选择只引用项目 ID；不存在或跨项目的记录不能被当作当前项目。",
+      "source_ids": ["EP-S1", "EP-S3"],
+      "acceptance_ids": ["EP-A3"]
+    },
+    {
+      "id": "EP-R4",
+      "scope": "current",
+      "text": "项目输入错误返回明确的 4xx 与字段信息，不启动后台 agent。",
+      "source_ids": ["EP-S2"],
+      "acceptance_ids": ["EP-A4"]
+    },
+    {
+      "id": "EP-R5",
+      "scope": "later",
+      "text": "使用原生目录选择器创建或重绑工作区。",
+      "source_ids": ["EP-S2", "EP-S5"],
+      "acceptance_ids": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "EP-T1",
+      "title": "补充项目列表查询和输入校验",
+      "requirement_ids": ["EP-R1", "EP-R2", "EP-R4"],
+      "acceptance_ids": ["EP-A1", "EP-A2", "EP-A4"]
+    },
+    {
+      "id": "EP-T2",
+      "title": "增加项目 REST API",
+      "requirement_ids": ["EP-R1", "EP-R2", "EP-R3", "EP-R4"],
+      "acceptance_ids": ["EP-A1", "EP-A2", "EP-A3", "EP-A4"]
+    },
+    {
+      "id": "EP-T3",
+      "title": "增加前端项目选择与创建入口",
+      "requirement_ids": ["EP-R1", "EP-R2", "EP-R3"],
+      "acceptance_ids": ["EP-A1", "EP-A2", "EP-A3"]
+    },
+    {
+      "id": "EP-T4",
+      "title": "验证重启持久化和项目隔离",
+      "requirement_ids": ["EP-R2", "EP-R3", "EP-R4"],
+      "acceptance_ids": ["EP-A2", "EP-A3", "EP-A4"]
+    }
+  ],
+  "acceptance": [
+    {"id": "EP-A1", "text": "创建请求返回 prj_ 标识，随后能按 ID 读取相同项目。"},
+    {"id": "EP-A2", "text": "服务重启后项目仍出现在列表中，字段与创建时一致。"},
+    {"id": "EP-A3", "text": "切换项目只改变当前选择，不混用其他项目的资料、任务或文档。"},
+    {"id": "EP-A4", "text": "缺少字段、非法模式和不存在项目均返回明确 4xx，不创建残缺记录。"}
+  ],
+  "uncertainties": [
+    {
+      "id": "EP-U1",
+      "status": "open",
+      "owner": "界面原型",
+      "next_step": "实现最小入口后比较全局侧栏与搜索页入口的任务完成时间。"
+    },
+    {
+      "id": "EP-U2",
+      "status": "deferred",
+      "owner": "M3 工作区接入",
+      "next_step": "确定桌面壳能力后设计目录选择与重新绑定权限。"
+    }
+  ]
+}

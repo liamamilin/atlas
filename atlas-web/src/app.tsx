@@ -6,6 +6,7 @@ import { Leaf } from "@/routes/leaf";
 import { Search } from "@/routes/search";
 import { Apps } from "@/routes/apps";
 import { Drafts, DraftDetailPage } from "@/routes/drafts";
+import { Projects } from "@/routes/projects";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/apps" element={<Apps />} />
         <Route path="/drafts" element={<Drafts />} />
         <Route path="/drafts/:slug" element={<DraftDetailRoute />} />
+        <Route path="/projects" element={<Projects />} />
         <Route path="*" element={<Home />} />
       </Route>
     </Routes>

@@ -35,6 +35,7 @@ def write_handoff(store: ProjectStore, task_id: str, output_dir: str | Path) -> 
 
 def render_markdown(bundle: dict) -> str:
     project, task = bundle["project"], bundle["task"]
+    iteration = bundle.get("iteration")
     lines = [
         f"# Task handoff: {task['title']}", "",
         "## Project", "",
@@ -42,6 +43,9 @@ def render_markdown(bundle: dict) -> str:
         f"- Name: {project['name']}",
         f"- Objective: {project['objective']}",
         f"- Workspace: `{project['workspace']}`",
+        "", "## Iteration", "",
+        (f"- `{iteration['id']}` · {iteration['title']} · `{iteration['status']}`"
+         if iteration else "- No iteration is bound to this task."),
         "", "## Task", "",
         f"- Task ID: `{task['id']}`",
         f"- Objective: {task['objective']}",
@@ -100,6 +104,14 @@ def validate_handoff(bundle: dict) -> dict:
     project, task = bundle.get("project") or {}, bundle.get("task") or {}
     if not project.get("id") or task.get("project_id") != project.get("id"):
         errors.append("task is not bound to the exported project")
+    iteration = bundle.get("iteration")
+    if task.get("iteration_id"):
+        if not iteration or iteration.get("id") != task.get("iteration_id"):
+            errors.append("task iteration is missing or mismatched")
+        elif iteration.get("project_id") != project.get("id"):
+            errors.append("iteration is not bound to the exported project")
+    elif iteration:
+        errors.append("handoff includes an iteration not bound to the task")
 
     expected_versions = task.get("input_document_versions") or []
     documents = bundle.get("documents") or []

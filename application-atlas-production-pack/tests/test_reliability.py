@@ -26,6 +26,7 @@ from opencode_client import OpenCodeClient, iter_sse
 from execution_state import project_execution
 from project_store import ProjectStore, ProjectStoreError
 from handoff_bundle import build_handoff, validate_handoff, write_handoff
+from sample_package import validate_package
 from workspace_snapshot import compare_snapshots, snapshot_workspace
 from review_store import fingerprint, corpus_revision, update_review, load_review
 
@@ -249,6 +250,39 @@ class ProjectStoreTests(unittest.TestCase):
         reopened = ProjectStore(self.root / 'state/projects.sqlite')
         self.assertEqual(reopened.get_project(self.project['id'])['objective'],
                          'Build the approved pilot')
+        self.assertEqual(reopened.list_projects()[0]['id'], self.project['id'])
+
+    def test_empty_workspace_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'workspace'):
+            self.store.create_project('Invalid', 'No workspace', '  ', 'existing')
+        generated = self.store.create_project('Idea', 'Start with an idea', '', 'new')
+        self.assertTrue(generated['workspace'].endswith('/workspaces/' + generated['id']))
+
+    def test_version_one_store_migrates_without_losing_tasks(self):
+        path = self.root / 'legacy.sqlite'
+        with sqlite3.connect(path) as con:
+            con.executescript('''
+                CREATE TABLE project (
+                    id TEXT PRIMARY KEY, name TEXT NOT NULL, objective TEXT NOT NULL,
+                    workspace TEXT NOT NULL, mode TEXT NOT NULL,
+                    created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
+                CREATE TABLE task (
+                    id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES project(id),
+                    title TEXT NOT NULL, objective TEXT NOT NULL, execution_status TEXT NOT NULL,
+                    acceptance_status TEXT NOT NULL, acceptance_evidence_json TEXT NOT NULL,
+                    input_versions_json TEXT NOT NULL, requirement_ids_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
+                INSERT INTO project VALUES
+                    ('prj_legacy','Legacy','Keep state','/tmp/legacy','existing','now','now');
+                INSERT INTO task VALUES
+                    ('tsk_legacy','prj_legacy','Task','Do it','planned','pending','[]','[]','[]','now','now');
+                PRAGMA user_version=1;
+            ''')
+        migrated = ProjectStore(path)
+        self.assertEqual(migrated.get_task('tsk_legacy')['title'], 'Task')
+        self.assertIsNone(migrated.get_task('tsk_legacy')['iteration_id'])
+        with sqlite3.connect(path) as con:
+            self.assertEqual(con.execute('PRAGMA user_version').fetchone()[0], 2)
 
     def test_document_versions_are_immutable_and_conflicts_are_explicit(self):
         document = self.store.create_document(
@@ -324,6 +358,40 @@ class ProjectStoreTests(unittest.TestCase):
             task['id'], 'passed', [{'kind': 'test', 'summary': '42 tests passed'}])
         self.assertEqual(accepted['acceptance_status'], 'passed')
 
+    def test_iteration_freezes_scope_and_allows_only_one_active_iteration(self):
+        requirement = self.store.create_requirement(
+            self.project['id'], 'Keep exported state portable', 'current', 'Recovery')
+        self.store.confirm_requirement(requirement['id'], 'current', 'Approved')
+        document = self.store.create_document(self.project['id'], 'plan', 'Plan', 'version one')
+        iteration = self.store.create_iteration(
+            self.project['id'], 'Iteration one', 'Ship portable state',
+            [document['version_id']], [requirement['id']])
+        newer = self.store.add_document_version(document['id'], 'version two')
+        with self.assertRaises(ProjectStoreError):
+            self.store.create_task(
+                self.project['id'], 'Use new plan', 'Out of scope', [newer['version_id']],
+                [requirement['id']], iteration['id'])
+        task = self.store.create_task(
+            self.project['id'], 'Use fixed plan', 'In scope', [document['version_id']],
+            [requirement['id']], iteration['id'])
+        self.assertEqual(task['iteration_id'], iteration['id'])
+        with self.assertRaises(ProjectStoreError):
+            self.store.create_iteration(
+                self.project['id'], 'Another active iteration', 'Must wait',
+                [document['version_id']], [requirement['id']])
+
+    def test_iteration_completion_requires_task_acceptance(self):
+        iteration = self.store.create_iteration(
+            self.project['id'], 'Iteration one', 'Complete one task', [], [])
+        task = self.store.create_task(
+            self.project['id'], 'Implement', 'Do work', iteration_id=iteration['id'])
+        with self.assertRaises(ProjectStoreError):
+            self.store.update_iteration_status(iteration['id'], 'completed')
+        self.store.record_acceptance(task['id'], 'passed', [{'kind': 'review', 'summary': 'Accepted'}])
+        completed = self.store.update_iteration_status(iteration['id'], 'completed')
+        self.assertEqual(completed['status'], 'completed')
+        self.assertIsNotNone(completed['completed_at'])
+
     def test_failed_transaction_does_not_leave_partial_task(self):
         with self.assertRaises(ProjectStoreError):
             self.store.create_task(self.project['id'], 'Implement', 'Do work', ['dver_missing'])
@@ -342,9 +410,12 @@ class ProjectStoreTests(unittest.TestCase):
             'Preserve Atlas-owned state', [reference['id']])
         document = self.store.create_document(
             self.project['id'], 'product-requirements', 'PRD', 'Must keep user edits')
+        iteration = self.store.create_iteration(
+            self.project['id'], 'Portable handoff', 'Preserve accepted intent',
+            [document['version_id']], [requirement['id']])
         task = self.store.create_task(
             self.project['id'], 'Implement', 'Implement the accepted scope',
-            [document['version_id']], [requirement['id']])
+            [document['version_id']], [requirement['id']], iteration['id'])
         before = self.store.save_snapshot(self.project['id'], {
             'schema': 1, 'root': str(self.root / 'workspace'), 'files': {}, 'errors': []},
             'before', task['id'])
@@ -356,6 +427,7 @@ class ProjectStoreTests(unittest.TestCase):
         bundle = build_handoff(self.store, task['id'])
         self.assertFalse(bundle['recovery']['old_engine_session_required'])
         self.assertEqual(bundle['documents'][0]['version_id'], document['version_id'])
+        self.assertEqual(bundle['iteration']['id'], iteration['id'])
         self.assertEqual(bundle['requirements'][0]['confirmed_scope'], 'current')
         self.assertEqual(len(bundle['decisions']), 1)
         self.assertIn('workspace snapshot after execution', bundle['recovery']['missing'])
@@ -366,6 +438,60 @@ class ProjectStoreTests(unittest.TestCase):
         markdown = Path(written['markdown_path']).read_text()
         self.assertIn('Must keep user edits', markdown)
         self.assertIn('do not replay prior operations blindly', markdown)
+
+    def test_project_http_create_list_get_and_validation(self):
+        import drafts_api
+        handler = object.__new__(drafts_api.Handler)
+        body = {
+            'name': 'Existing code', 'objective': 'Improve it',
+            'workspace': str(self.root / 'existing'), 'mode': 'existing',
+        }
+        handler.path = '/api/projects'
+        handler._body = lambda: body
+        handler._json = lambda value, code=200: (value, code)
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            created, code = handler.do_POST()
+        self.assertEqual(code, 201)
+        self.assertTrue(created['id'].startswith('prj_'))
+
+        handler.path = '/api/projects'
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            projects, code = handler.do_GET()
+        self.assertEqual(code, 200)
+        self.assertEqual({item['id'] for item in projects}, {self.project['id'], created['id']})
+
+        handler.path = '/api/projects/' + created['id']
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            opened, code = handler.do_GET()
+        self.assertEqual(code, 200)
+        self.assertEqual(opened['mode'], 'existing')
+
+        handler.path = '/api/projects'
+        handler._body = lambda: {'name': 'bad'}
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            invalid, code = handler.do_POST()
+        self.assertEqual(code, 400)
+        self.assertIn('objective', invalid['error'])
+
+        handler._body = lambda: {
+            'name': 'Idea only', 'objective': 'Explore the idea', 'mode': 'new'}
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            idea, code = handler.do_POST()
+        self.assertEqual(code, 201)
+        self.assertTrue(idea['workspace'].endswith('/workspaces/' + idea['id']))
+
+
+class SamplePackageTests(unittest.TestCase):
+    def test_new_idea_and_existing_project_samples_have_complete_links(self):
+        root = CODE.parent / 'docs/u17-samples'
+        new_idea = validate_package(root / 'new-idea/package.json')
+        existing = validate_package(root / 'existing-project/package.json')
+        self.assertEqual(new_idea['errors'], [])
+        self.assertEqual(existing['errors'], [])
+        self.assertEqual(new_idea['counts'], {
+            'documents': 5, 'requirements': 5, 'tasks': 3, 'acceptance': 4})
+        self.assertEqual(existing['counts'], {
+            'documents': 5, 'requirements': 5, 'tasks': 4, 'acceptance': 4})
 
 
 class RetrievalTests(unittest.TestCase):

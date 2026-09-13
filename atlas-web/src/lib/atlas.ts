@@ -18,6 +18,13 @@ export function fetchJson<T>(url: string): Promise<T> {
   return promise;
 }
 
+async function requestJson<T>(url: string, init: RequestInit): Promise<T> {
+  const response = await fetch(url, { ...init, cache: "no-cache" });
+  const value = await response.json().catch(() => null) as { error?: string } | null;
+  if (!response.ok) throw new Error(value?.error || `${response.status} ${url}`);
+  return value as T;
+}
+
 export interface LeafIndexItem {
   slug: string;
   name: string;
@@ -95,6 +102,23 @@ export interface AppEntry {
   leafName: string;
 }
 
+export interface AtlasProject {
+  id: string;
+  name: string;
+  objective: string;
+  workspace: string;
+  mode: "new" | "existing";
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateProjectInput {
+  name: string;
+  objective: string;
+  workspace?: string;
+  mode: AtlasProject["mode"];
+}
+
 export const REL_KIND_ZH: Record<string, string> = {
   adjacent: "相邻",
   related: "相关",
@@ -125,4 +149,19 @@ export async function getLeaf(slug: string) {
 }
 export async function getApps() {
   return fetchJson<AppEntry[]>("/data/apps.json");
+}
+export async function getProjects() {
+  return fetchJson<AtlasProject[]>("/api/projects");
+}
+export async function getProject(id: string) {
+  return fetchJson<AtlasProject>(`/api/projects/${encodeURIComponent(id)}`);
+}
+export async function createProject(input: CreateProjectInput) {
+  const project = await requestJson<AtlasProject>("/api/projects", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  invalidateAtlasCache();
+  return project;
 }
