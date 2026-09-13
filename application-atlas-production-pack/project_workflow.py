@@ -8,7 +8,7 @@ from project_store import ProjectStoreError
 
 
 DOCUMENT_KINDS = {
-    "analysis", "product-requirements", "interaction", "technical-plan",
+    "analysis", "value-analysis", "product-requirements", "interaction", "technical-plan",
     "development-plan", "acceptance-plan", "current-state",
 }
 SCOPE_STATES = {"current", "later", "excluded"}

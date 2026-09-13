@@ -23,10 +23,10 @@ from project_workflow import DOCUMENT_KINDS
 
 
 RUN_STATES = {"queued", "running", "completed", "failed"}
-MODES = {"analysis", "documents", "improvement", "revision"}
+MODES = {"analysis", "value", "documents", "improvement", "revision"}
 SCOPES = {"current", "later", "excluded"}
 DOCUMENT_ORDER = (
-    "analysis", "current-state", "product-requirements", "interaction",
+    "analysis", "value-analysis", "current-state", "product-requirements", "interaction",
     "technical-plan", "development-plan", "acceptance-plan",
 )
 # Atlas owns this dependency model. The model writes each draft independently;
@@ -34,6 +34,7 @@ DOCUMENT_ORDER = (
 # to immutable document-version IDs.
 DOCUMENT_DEPENDENCIES = {
     "analysis": (),
+    "value-analysis": (),
     "current-state": (),
     "product-requirements": ("analysis",),
     "interaction": ("analysis", "product-requirements"),
@@ -60,6 +61,15 @@ IMPROVEMENT_SECTIONS = (
     "Regression conditions / 回归条件",
     "Unknowns and required validation / 未知与待验证",
 )
+VALUE_SECTIONS = (
+    "Evidence-backed observations / 有依据的观察",
+    "User and problem unknowns / 用户与问题未知",
+    "Existing alternatives / 现有替代",
+    "Differentiation hypotheses / 差异化假设",
+    "Cost and risk signals / 成本与风险信号",
+    "Small validation experiments / 小型验证实验",
+    "Advisory summary / 建议摘要",
+)
 
 
 def prepare_generation(store, project_id: str, mode: str,
@@ -68,7 +78,7 @@ def prepare_generation(store, project_id: str, mode: str,
                        document_id: str = "", section_heading: str = "",
                        revision_instruction: str = "") -> dict:
     if mode not in MODES:
-        raise ValueError("mode must be analysis, documents, improvement, or revision")
+        raise ValueError("mode must be analysis, value, documents, improvement, or revision")
     if not isinstance(model, str):
         raise ValueError("model must be text")
     if not isinstance(improvement_goal, str):
@@ -81,7 +91,8 @@ def prepare_generation(store, project_id: str, mode: str,
             store, project_id, document_id, section_heading, revision_instruction)
         targets = [revision["kind"]]
     else:
-        targets = (["analysis"] if mode == "analysis" else ["current-state"]
+        targets = (["analysis"] if mode == "analysis" else ["value-analysis"]
+                   if mode == "value" else ["current-state"]
                    if mode == "improvement" else _document_kinds(document_kinds))
     request = build_generation_input(
         store, project_id, mode, targets, improvement_goal.strip(), revision)
@@ -192,6 +203,14 @@ def render_generation_prompt(request: dict) -> str:
         mode_rules = (
             "Analyze the evidence. Return candidate requirements with recommendations, open questions, "
             "evidence-backed conflicts and optional suggestions. Also draft one analysis document.")
+    elif request["mode"] == "value":
+        mode_rules = (
+            "VALUE MODE: produce one advisory value-analysis document from the fixed project goal, "
+            "references, recorded requirements, and decisions. Return no candidate requirements. "
+            "Separate observations, unknowns, alternatives, hypotheses, risks, experiments, and advice. "
+            "Do not score, approve, reject, block, or decide whether the idea should be built. CRITICAL "
+            "FORMAT CHECK: every paragraph must start with the marker allowed for its section; the "
+            "observations section permits only [Evidence: exact input ID], never [Inference] or [Advice].")
     elif request["mode"] == "improvement":
         mode_rules = (
             "IMPROVEMENT MODE: analyze the stated improvement goal against both the accepted workspace "
@@ -233,6 +252,32 @@ def render_generation_prompt(request: dict) -> str:
     every byte before it and after its section boundary must remain exact; change only that section body.
 13. Return exactly one document with the fixed target `document_id`, kind, and title. Its `basis` may be an
     empty array because Atlas restores the target version's fixed basis during validation.
+"""
+    value_rules = ""
+    if request["mode"] == "value":
+        value_rules = """
+12. The value-analysis document basis MUST cite at least one fixed Atlas reference. Use these exact
+    bilingual level-2 sections, in this order: `Evidence-backed observations / 有依据的观察`,
+    `User and problem unknowns / 用户与问题未知`, `Existing alternatives / 现有替代`,
+    `Differentiation hypotheses / 差异化假设`, `Cost and risk signals / 成本与风险信号`,
+    `Small validation experiments / 小型验证实验`, and `Advisory summary / 建议摘要`.
+13. Observations must be traceable to fixed input. Put uncertain comparisons in alternatives or
+    hypotheses and label missing market, user, price, demand, and operating data as unknown. Experiments
+    must be small ways to collect evidence. The summary is optional advice for the user to weigh; it must
+    not contain a score, pass/fail status, go/no-go verdict, automatic rejection, or claim that the idea
+    is worth or not worth building. Value analysis never changes scope and never blocks later work.
+14. Prefix every substantive paragraph or list item in the seven sections with its classification:
+    `[Evidence: exact input ID]`
+    for observations; `[Unknown]` for unknowns; `[Evidence: exact input ID]` or `[Inference]` for
+    alternatives; `[Hypothesis]` for differentiation; `[Risk signal]` or `[Unknown]` for costs and risks;
+    `[Validation advice]` for experiments; and `[Advice]` for the summary. The summary may be prose but
+    must begin with `[Advice]`. Do not name a product, service, market fact, price, or user behavior that
+    is absent from the fixed input. The evidence-backed observations section cannot introduce examples
+    with “such as”, “for example”, “e.g.”, “如”, “例如”, or “比如”. Generic examples elsewhere must
+    carry that section's uncertainty or advice marker.
+15. `recommended_scope` is earlier AI advice and `confirmed_scope` is the user's decision. Never call a
+    pending requirement confirmed, and never use an AI `later` or `excluded` recommendation as evidence
+    to proceed, delay, or stop. Report its exact status and leave the choice to the user.
 """
     return f"""# Atlas U17 generation task
 
@@ -291,6 +336,8 @@ Rules:
 8. `conflicts` contains only explicit contradictions with locatable evidence. Put unresolved choices
    in `questions` and optional practices in `suggestions`. Ask only questions that materially affect
    this project's scope or requested document, not missing details of the reference product itself.
+   Every conflict and suggestion MUST cite at least one exact fixed-input evidence ID; omit an item
+   rather than returning an empty `evidence` array.
 9. Write valid JSON, without Markdown fences or text outside `result.json`.
 10. Use the language of the improvement goal when present, otherwise the project name and objective,
     for recommendations and documents. Preserve
@@ -300,7 +347,7 @@ Rules:
     Draft them in Atlas dependency order and make downstream content consistent with upstream drafts in this
     result. Atlas records the resolved immutable version links after review. After writing `result.json`, stop
     without running a separate validation command; Atlas validates the file.
-{improvement_rules}{revision_rules}
+{improvement_rules}{revision_rules}{value_rules}
 """
 
 
@@ -583,7 +630,7 @@ def validate_generation_result(request: dict, result: dict) -> dict:
         if not set(affects).issubset(targets):
             raise ValueError("question affects an unrequested document kind")
     generated_requirements = _objects(result["requirements"], "requirements")
-    if request["mode"] in {"documents", "revision"} and generated_requirements:
+    if request["mode"] in {"value", "documents", "revision"} and generated_requirements:
         raise ValueError("requirements are only allowed in analysis or improvement mode")
     seen_keys = set()
     for item in generated_requirements:
@@ -658,6 +705,13 @@ def validate_generation_result(request: dict, result: dict) -> dict:
             if not any(kind == "reference" for kind, _ in cited):
                 raise ValueError("improvement document must cite an Atlas reference")
             _validate_improvement_document(content, workspace_baseline)
+        if request["mode"] == "value":
+            if not any(value["kind"] == "reference" for value in item["basis"]):
+                raise ValueError("value analysis must cite an Atlas reference")
+            _validate_value_document(
+                content, references | requirements | decisions | versions
+                | {request["project"]["id"]},
+                any(value["confirmed_scope"] for value in request["requirements"]))
     if seen_kinds != targets:
         missing = ", ".join(kind for kind in target_order if kind not in seen_kinds)
         raise ValueError(f"generation must return exactly one document per requested kind; missing: {missing}")
@@ -790,6 +844,63 @@ def _validate_improvement_document(content: str, baseline: dict | None):
     paths = [item["path"] for item in (baseline or {}).get("evidence_files", [])]
     if paths and not any(f"`{path}`" in content for path in paths):
         raise ValueError("improvement document must cite an observed workspace path")
+
+
+def _validate_value_document(content: str, evidence_ids: set[str],
+                             has_confirmed_requirement: bool):
+    positions = []
+    bodies = {}
+    parsed = _markdown_sections(content)
+    for section in VALUE_SECTIONS:
+        matches = list(re.finditer(rf"(?m)^##\s+{re.escape(section)}\s*$", content))
+        if len(matches) != 1:
+            raise ValueError(f"value analysis must contain exactly one section: {section}")
+        positions.append(matches[0].start())
+        parsed_section = next(
+            item for item in parsed if item["heading"] == f"## {section}")
+        bodies[section] = content[parsed_section["body_start"]:parsed_section["end"]]
+    if positions != sorted(positions):
+        raise ValueError("value analysis sections are out of order")
+    allowed_markers = {
+        VALUE_SECTIONS[0]: (r"\[Evidence:\s*(?:prj_|ref_|req_|dec_)[^\]]+\]",),
+        VALUE_SECTIONS[1]: (r"\[Unknown\]",),
+        VALUE_SECTIONS[2]: (
+            r"\[Evidence:\s*(?:prj_|ref_|req_|dec_)[^\]]+\]", r"\[Inference\]"),
+        VALUE_SECTIONS[3]: (r"\[Hypothesis\]",),
+        VALUE_SECTIONS[4]: (r"\[Risk signal\]", r"\[Unknown\]"),
+        VALUE_SECTIONS[5]: (r"\[Validation advice\]",),
+        VALUE_SECTIONS[6]: (r"\[Advice\]",),
+    }
+    for section, body in bodies.items():
+        markers = allowed_markers[section]
+        if not any(re.search(pattern, body) for pattern in markers):
+            raise ValueError(f"value analysis section lacks its classification: {section}")
+        blocks = [value.strip() for value in re.split(r"\n\s*\n", body) if value.strip()]
+        for block in blocks:
+            first_line = re.sub(r"^(?:[-*+]|\d+[.)])\s+", "", block.splitlines()[0])
+            if not any(re.match(pattern, first_line) for pattern in markers):
+                raise ValueError(
+                    f"value analysis paragraph lacks its classification: {section}")
+            evidence = re.match(r"\[Evidence:\s*([^\]]+)\]", first_line)
+            if evidence and evidence.group(1).strip() not in evidence_ids:
+                raise ValueError("value analysis cites an unknown evidence marker")
+    if not has_confirmed_requirement and re.search(
+            r"(?i)(?:\bconfirmed\s+requirements?\b|已确认.{0,6}需求|需求.{0,6}已确认)",
+            content):
+        raise ValueError("value analysis misstates a pending requirement as confirmed")
+    observations = bodies[VALUE_SECTIONS[0]]
+    if re.search(
+            r"(?i)(?:\b(?:such as|for example)\b|e\.g\.|(?:如|例如|比如))", observations):
+        raise ValueError("value analysis observations must not introduce unstated examples")
+    verdict_patterns = (
+        r"(?i)\b(?:score|rating)\s*[:：]", r"\b\d{1,3}\s*/\s*100\b",
+        r"(?:评分|得分)\s*[:：]", r"(?:通过|否决)\s*[:：]",
+        r"(?i)\b(?:go|no-go)\s+(?:decision|verdict)\b",
+        r"(?i)\b(?:should|should not|shouldn't)\s+(?:build|be\s+built)\b",
+        r"(?:值得|不值得)(?:开发|构建|做)",
+    )
+    if any(re.search(pattern, content) for pattern in verdict_patterns):
+        raise ValueError("value analysis must not contain a score or build verdict")
 
 
 def _prepare_revision(store, project_id, document_id, section_heading, instruction):

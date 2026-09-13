@@ -204,6 +204,7 @@ export interface ProjectDecision {
 
 export type ProjectDocumentKind =
   | "analysis"
+  | "value-analysis"
   | "product-requirements"
   | "interaction"
   | "technical-plan"
@@ -571,7 +572,7 @@ export interface ProjectGenerationResult {
 export interface ProjectGenerationRun {
   id: string;
   project_id: string;
-  mode: "analysis" | "documents" | "improvement" | "revision";
+  mode: "analysis" | "value" | "documents" | "improvement" | "revision";
   improvement_goal?: string;
   revision?: {
     document_id: string;
@@ -864,7 +865,7 @@ export async function getProjectGeneration(projectId: string, runId: string) {
 export async function startProjectGeneration(
   projectId: string,
   input: {
-    mode: "analysis" | "documents" | "improvement" | "revision";
+    mode: "analysis" | "value" | "documents" | "improvement" | "revision";
     document_kinds?: ProjectDocumentKind[];
     improvement_goal?: string;
     document_id?: string;

@@ -57,6 +57,7 @@ import { setCurrentProjectId } from "@/lib/project-selection";
 
 const DOCUMENT_KINDS: { value: ProjectDocumentKind; zh: string; en: string }[] = [
   { value: "analysis", zh: "调研与分析", en: "Research & analysis" },
+  { value: "value-analysis", zh: "价值分析", en: "Value analysis" },
   { value: "product-requirements", zh: "产品需求", en: "Product requirements" },
   { value: "interaction", zh: "交互与页面", en: "Interaction & screens" },
   { value: "technical-plan", zh: "技术方案", en: "Technical plan" },
@@ -64,7 +65,8 @@ const DOCUMENT_KINDS: { value: ProjectDocumentKind; zh: string; en: string }[] =
   { value: "acceptance-plan", zh: "验收方案", en: "Acceptance plan" },
   { value: "current-state", zh: "项目现状与变更", en: "Current state & changes" },
 ];
-const DOCUMENT_BUNDLE_KINDS = DOCUMENT_KINDS.filter((item) => item.value !== "current-state");
+const DOCUMENT_BUNDLE_KINDS = DOCUMENT_KINDS.filter(
+  (item) => item.value !== "current-state" && item.value !== "value-analysis");
 const CORE_DOCUMENT_BUNDLE: ProjectDocumentKind[] = [
   "product-requirements", "technical-plan", "development-plan", "acceptance-plan",
 ];
@@ -532,7 +534,7 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
     return () => { alive = false; window.clearInterval(timer); };
   }, [hasActiveRun, projectId]);
 
-  const start = async (mode: "analysis" | "documents" | "improvement") => {
+  const start = async (mode: "analysis" | "value" | "documents" | "improvement") => {
     setStarting(true); setError("");
     try {
       const created = await startProjectGeneration(projectId, {
@@ -572,6 +574,10 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
         <Button size="sm" variant="outline" disabled={starting || hasActiveRun} onClick={() => start("analysis")}><Sparkles className="size-4" />{lang === "zh" ? "分析固定资料" : "Analyze pinned sources"}</Button>
       </div>
     </div>
+    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/20 bg-primary/[0.04] p-4">
+      <div className="max-w-2xl"><p className="text-sm font-medium">{lang === "zh" ? "可选价值分析" : "Optional value analysis"}</p><p className="mt-1 text-[11px] leading-5 text-subtle">{lang === "zh" ? "整理有依据的观察、未知、替代方案、差异化假设、成本风险和小型验证实验。结果只供判断和取舍，不评分、不通过或否决想法，也不改变需求范围或阻止后续工作。" : "Organizes evidence-backed observations, unknowns, alternatives, differentiation hypotheses, cost and risk signals, and small validation experiments. It offers advice only: no score, approval, rejection, scope change, or development block."}</p></div>
+      <Button size="sm" variant="outline" disabled={starting || hasActiveRun || !workspace.references.length} onClick={() => start("value")}><Sparkles className="size-4" />{lang === "zh" ? "评估想法价值（仅建议）" : "Analyze value (advice only)"}</Button>
+    </div>
     <div className="mt-4 rounded-lg border border-border p-4">
       <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-sm font-medium">{lang === "zh" ? "按依赖生成文档集合" : "Generate a dependency-aware document set"}</p><p className="mt-1 text-[11px] leading-5 text-subtle">{lang === "zh" ? "Atlas 固定生成顺序；保存下游草案时会引用本轮已保存上游的不可变版本。" : "Atlas fixes generation order and links saved downstream drafts to immutable upstream versions from this run."}</p></div><div className="flex gap-2">
         <Button size="sm" variant={sameKinds(selectedKinds, CORE_DOCUMENT_BUNDLE) ? "default" : "outline"} onClick={() => choosePreset(CORE_DOCUMENT_BUNDLE)}>{lang === "zh" ? "核心 4 份" : "Core 4"}</Button>
@@ -593,6 +599,7 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
       <span className="font-mono">{run.id}</span><span>{run.mode} · {run.engine}{run.model ? ` · ${run.model}` : ""}</span>
       <span className="font-mono">input {run.input_fingerprint.slice(0, 12)}</span>
       {run.engine_session_id ? <span className="font-mono">{run.engine_session_id}</span> : null}
+      {run.mode === "value" ? <span className="rounded bg-primary/10 px-2 py-1 text-primary">{lang === "zh" ? "仅供参考，不改变范围" : "Advisory only; scope unchanged"}</span> : null}
     </div> : null}
     {active ? <p className="mt-4 text-sm text-muted">{lang === "zh" ? (run?.status === "queued" ? "等待文档执行器…" : "正在分析固定输入…") : (run?.status === "queued" ? "Waiting for the document runner…" : "Analyzing fixed input…")}</p> : null}
     {run?.status === "failed" ? <p className="mt-4 rounded-md bg-danger/10 p-3 text-xs text-danger">{run.error}</p> : null}

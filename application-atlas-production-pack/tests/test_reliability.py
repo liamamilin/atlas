@@ -565,6 +565,154 @@ class ProjectStoreTests(unittest.TestCase):
             apply_generation_item(
                 self.store, self.project['id'], run['id'], 'document', 0)
 
+    def test_value_analysis_is_advisory_grounded_and_never_changes_scope(self):
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'source-v1',
+            excerpt='Teams compare alternatives before committing to a workflow.',
+            note='Use only as an alternative pattern', read_status='reviewed')
+        requirement = self.store.create_requirement(
+            self.project['id'], 'Let a user review the proposed workflow', 'later',
+            'Unconfirmed idea', ['A review view is visible'], [reference['id']])
+        original_requirements = self.store.list_requirements(self.project['id'])
+        run = prepare_generation(self.store, self.project['id'], 'value')
+        directory = (self.store.path.parent / 'generation-runs' /
+                     self.project['id'] / run['id'])
+        request = json.loads((directory / 'input.json').read_text())
+        self.assertEqual(request['document_kinds'], ['value-analysis'])
+        self.assertIsNone(requirement['confirmed_scope'])
+        prompt = (directory / 'prompt.md').read_text()
+        self.assertIn('advice for the user to weigh', prompt)
+        self.assertIn('never changes scope', prompt)
+
+        sections = (
+            ('Evidence-backed observations / 有依据的观察',
+             f'- [Evidence: {reference["id"]}] The fixed reference describes comparing alternatives.'),
+            ('User and problem unknowns / 用户与问题未知',
+             '- [Unknown] Target users, demand, price, and frequency remain unknown.'),
+            ('Existing alternatives / 现有替代',
+             '- [Inference] A manual comparison workflow is a possible alternative.'),
+            ('Differentiation hypotheses / 差异化假设',
+             '- [Hypothesis] Review traceability may reduce rework.'),
+            ('Cost and risk signals / 成本与风险信号',
+             '- [Unknown] Integration and maintenance cost are unknown.'),
+            ('Small validation experiments / 小型验证实验',
+             '- [Validation advice] Interview five target users and test a paper workflow.'),
+            ('Advisory summary / 建议摘要',
+             '[Advice] Consider testing the problem and workflow before expanding scope.'),
+        )
+        content = '# Value analysis\n\n' + '\n\n'.join(
+            f'## {heading}\n\n{body}' for heading, body in sections)
+
+        def value_runner(_directory, _run):
+            return ({
+                'input_fingerprint': request['input_fingerprint'],
+                'questions': [], 'requirements': [], 'conflicts': [], 'suggestions': [],
+                'documents': [{
+                    'document_id': None, 'kind': 'value-analysis',
+                    'title': 'Value analysis', 'content': content,
+                    'basis': [{'kind': 'reference', 'id': reference['id']}],
+                }],
+            }, {'engine_session_id': 'ses_value'})
+
+        completed = execute_generation(
+            self.store, self.project['id'], run['id'], runner=value_runner)
+        self.assertEqual(completed['result']['requirements'], [])
+        saved = apply_generation_item(
+            self.store, self.project['id'], run['id'], 'document', 0)['created']
+        self.assertEqual(saved['kind'], 'value-analysis')
+        self.assertEqual(self.store.list_requirements(self.project['id']), original_requirements)
+
+        invalid = prepare_generation(self.store, self.project['id'], 'value')
+        invalid_directory = (self.store.path.parent / 'generation-runs' /
+                             self.project['id'] / invalid['id'])
+        invalid_request = json.loads((invalid_directory / 'input.json').read_text())
+        existing = self.store.get_document(saved['id'])
+
+        def verdict_runner(_directory, _run):
+            return ({
+                'input_fingerprint': invalid_request['input_fingerprint'],
+                'questions': [], 'requirements': [], 'conflicts': [], 'suggestions': [],
+                'documents': [{
+                    'document_id': existing['id'], 'kind': 'value-analysis',
+                    'title': 'Value analysis',
+                    'content': content.replace(
+                        'Consider testing the problem and workflow before expanding scope.',
+                        '评分：92/100。值得开发。'),
+                    'basis': [{'kind': 'reference', 'id': reference['id']}],
+                }],
+            }, {})
+
+        with self.assertRaisesRegex(ValueError, 'score or build verdict'):
+            execute_generation(
+                self.store, self.project['id'], invalid['id'], runner=verdict_runner)
+
+        evidence_run = prepare_generation(self.store, self.project['id'], 'value')
+        evidence_directory = (self.store.path.parent / 'generation-runs' /
+                              self.project['id'] / evidence_run['id'])
+        evidence_request = json.loads((evidence_directory / 'input.json').read_text())
+
+        def evidence_runner(_directory, _run):
+            return ({
+                'input_fingerprint': evidence_request['input_fingerprint'],
+                'questions': [], 'requirements': [], 'conflicts': [], 'suggestions': [],
+                'documents': [{
+                    'document_id': existing['id'], 'kind': 'value-analysis',
+                    'title': 'Value analysis',
+                    'content': content.replace(
+                        f'[Evidence: {reference["id"]}]',
+                        '[Evidence: ref_unknown]'),
+                    'basis': [{'kind': 'reference', 'id': reference['id']}],
+                }],
+            }, {})
+
+        with self.assertRaisesRegex(ValueError, 'unknown evidence marker'):
+            execute_generation(
+                self.store, self.project['id'], evidence_run['id'], runner=evidence_runner)
+
+        status_run = prepare_generation(self.store, self.project['id'], 'value')
+        status_directory = (self.store.path.parent / 'generation-runs' /
+                            self.project['id'] / status_run['id'])
+        status_request = json.loads((status_directory / 'input.json').read_text())
+
+        def status_runner(_directory, _run):
+            return ({
+                'input_fingerprint': status_request['input_fingerprint'],
+                'questions': [], 'requirements': [], 'conflicts': [], 'suggestions': [],
+                'documents': [{
+                    'document_id': existing['id'], 'kind': 'value-analysis',
+                    'title': 'Value analysis',
+                    'content': content.replace(
+                        'Consider testing the problem',
+                        'The confirmed requirement suggests testing the problem'),
+                    'basis': [{'kind': 'reference', 'id': reference['id']}],
+                }],
+            }, {})
+
+        with self.assertRaisesRegex(ValueError, 'misstates a pending requirement'):
+            execute_generation(
+                self.store, self.project['id'], status_run['id'], runner=status_runner)
+
+        requirement_run = prepare_generation(self.store, self.project['id'], 'value')
+        requirement_directory = (self.store.path.parent / 'generation-runs' /
+                                 self.project['id'] / requirement_run['id'])
+        requirement_request = json.loads((requirement_directory / 'input.json').read_text())
+
+        def requirement_runner(_directory, _run):
+            result, metadata = value_runner(_directory, _run)
+            result['input_fingerprint'] = requirement_request['input_fingerprint']
+            result['documents'][0]['document_id'] = existing['id']
+            result['requirements'] = [{
+                'key': 'auto-scope', 'content': 'Build it now',
+                'recommended_scope': 'current', 'recommendation_reason': 'Advice',
+                'acceptance_conditions': ['It exists'], 'reference_ids': [reference['id']],
+            }]
+            return result, metadata
+
+        with self.assertRaisesRegex(ValueError, 'only allowed in analysis or improvement'):
+            execute_generation(
+                self.store, self.project['id'], requirement_run['id'],
+                runner=requirement_runner)
+
     def test_improvement_generation_binds_goal_workspace_evidence_and_review(self):
         workspace = self.root / 'workspace'
         (workspace / 'src').mkdir(parents=True)

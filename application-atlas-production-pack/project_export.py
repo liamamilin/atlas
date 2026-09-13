@@ -18,6 +18,7 @@ from handoff_bundle import build_handoff, render_markdown as render_handoff_mark
 
 DOCUMENT_ORDER = {
     "analysis": 10,
+    "value-analysis": 15,
     "product-requirements": 20,
     "interaction": 30,
     "technical-plan": 40,
