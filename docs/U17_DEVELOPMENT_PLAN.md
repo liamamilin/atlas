@@ -30,7 +30,7 @@ M0 验证关键不确定性，M1 建立项目与资料，M2 形成文档，M3 �
 
 M0 不要求实现完整聊天界面或全部后端接口。如果引擎某项能力不满足，先缩小适配范围或提出替代方案，不能直接把重写通用 agent 作为默认下一步。
 
-当前验证过程与证据记录在 [U17_M0_VALIDATION.md](U17_M0_VALIDATION.md)。
+当前验证过程与证据记录在 [M0 历史验证档案](archive/u17/U17_M0_VALIDATION.md)。
 
 ## 3. M1：项目、搜索与资料集
 
@@ -44,7 +44,7 @@ M0 不要求实现完整聊天界面或全部后端接口。如果引擎某项�
 
 验收：用户不填写完整需求就能从搜索或类型叶子进入项目，收集多个类型和应用资料；刷新后资料与备注保留；不同项目互不混用；项目可安全删除且不会删除本地工作区。
 
-验证记录：[U17_M1_VALIDATION.md](U17_M1_VALIDATION.md)。
+验证记录：[M1 历史验证档案](archive/u17/U17_M1_VALIDATION.md)。
 
 复用位置：[搜索页面](../atlas-web/src/routes/search.tsx)、[类型详情](../atlas-web/src/routes/leaf.tsx)、[应用页面](../atlas-web/src/routes/apps.tsx)、[数据层](../atlas-web/src/lib/atlas.ts)、[MCP](../application-atlas-production-pack/mcp_atlas.py)。
 
@@ -64,7 +64,7 @@ M0 不要求实现完整聊天界面或全部后端接口。如果引擎某项�
 
 不能依靠各文档独立生成后“看起来相似”保证一致性，也不以 JSON 结构正确代替内容核对。
 
-基础闭环的实现与浏览器验收记录见 [U17_M2_FOUNDATION_VALIDATION.md](U17_M2_FOUNDATION_VALIDATION.md)，固定输入分析和文档集合见 [U17_M2_GENERATION_VALIDATION.md](U17_M2_GENERATION_VALIDATION.md)，章节修改见 [U17_M2_REVISION_VALIDATION.md](U17_M2_REVISION_VALIDATION.md)，可选价值分析见 [U17_M2_VALUE_VALIDATION.md](U17_M2_VALUE_VALIDATION.md)。
+基础闭环的实现与浏览器验收记录见 [M2 基础闭环档案](archive/u17/U17_M2_FOUNDATION_VALIDATION.md)，固定输入分析和文档集合见 [M2 生成档案](archive/u17/U17_M2_GENERATION_VALIDATION.md)，章节修改见 [M2 章节修改档案](archive/u17/U17_M2_REVISION_VALIDATION.md)，可选价值分析见 [M2 价值分析档案](archive/u17/U17_M2_VALUE_VALIDATION.md)。
 
 ## 5. M3：已有项目基线与变更规划
 
@@ -78,7 +78,7 @@ M0 不要求实现完整聊天界面或全部后端接口。如果引擎某项�
 
 验收：对一个真实已有项目提出局部改进，能定位已有实现及本次影响；外部修改相关文件后，待执行计划显示需要核对；无关变更不强制重做整个项目分析。
 
-基线实现与变化检查见 [U17_M3_BASELINE_VALIDATION.md](U17_M3_BASELINE_VALIDATION.md)，改进方案、真实 OpenCode 和浏览器验收见 [U17_M3_IMPROVEMENT_VALIDATION.md](U17_M3_IMPROVEMENT_VALIDATION.md)。
+基线实现与变化检查见 [M3 基线档案](archive/u17/U17_M3_BASELINE_VALIDATION.md)，改进方案、真实 OpenCode 和浏览器验收见 [M3 改进方案档案](archive/u17/U17_M3_IMPROVEMENT_VALIDATION.md)。
 
 ## 6. M4：集成执行与成果回收
 
@@ -99,7 +99,7 @@ M4-08 依赖 M0-05 的材料定义。首版不因此新增第二个正式执行�
 
 复用现有[草稿引擎](../application-atlas-production-pack/drafts_engines/__init__.py)的接入经验；不得直接把它的布尔返回值作为 U17 执行结果模型。
 
-首个真实执行闭环、重启恢复和导出证据见 [U17_M4_EXECUTION_VALIDATION.md](U17_M4_EXECUTION_VALIDATION.md)。
+首个真实执行闭环、重启恢复和导出证据见 [M4 执行验证档案](archive/u17/U17_M4_EXECUTION_VALIDATION.md)。
 
 ## 7. 核心主线收口
 

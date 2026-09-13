@@ -2,7 +2,7 @@
 
 日期：2026-09-13  
 状态：核心主线最小真实开发冒烟已通过，评估型试点尚未开始
-依据：[U17 设计稿](U17_DESIGN.md) · [开发规划](U17_DEVELOPMENT_PLAN.md) · [M4 执行验证](U17_M4_EXECUTION_VALIDATION.md)
+依据：[U17 设计稿](U17_DESIGN.md) · [开发规划](U17_DEVELOPMENT_PLAN.md) · [M4 执行验证档案](archive/u17/U17_M4_EXECUTION_VALIDATION.md)
 
 ## 1. 目标与顺序
 

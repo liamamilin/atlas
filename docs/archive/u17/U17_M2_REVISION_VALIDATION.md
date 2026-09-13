@@ -2,7 +2,7 @@
 
 日期：2026-09-13
 状态：M2-04 完成。完整 Markdown 人工编辑、章节级自然语言候选、差异审阅、不可变版本、并发保护和下游待复核传播均已连通。
-依据：[产品设计](U17_DESIGN.md) · [开发规划](U17_DEVELOPMENT_PLAN.md) · [M2 生成验证](U17_M2_GENERATION_VALIDATION.md)
+依据：[产品设计](../../U17_DESIGN.md) · [开发规划](../../U17_DEVELOPMENT_PLAN.md) · [M2 生成验证](U17_M2_GENERATION_VALIDATION.md)
 
 ## 1. 用户流程
 

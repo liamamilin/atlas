@@ -477,11 +477,11 @@ atlas.json (U1 导出)
 ### 阶段 4：U17 项目设计与持续开发（2026-09-13 修订）
 
 - [x] 明确产品方向并形成 [设计稿](docs/U17_DESIGN.md) 与 [开发规划](docs/U17_DEVELOPMENT_PLAN.md)。
-- [x] M0：完整类型资料读取、OpenCode 异步执行/权限恢复/状态投影、工作区文件基线、含来源/需求/决定/迭代的独立项目存储、双场景关联文档样例及不依赖旧会话的交接包已实现。过程见 [验证记录](docs/U17_M0_VALIDATION.md)。
-- [x] M1：多项目、类型与应用统一搜索、正式正文/研究笔记阅读、应用目录深度说明、项目资料收藏与固定来源版本。过程见 [M1 验证记录](docs/U17_M1_VALIDATION.md)。
-- [x] M2：分析取舍、关联文档、人工修改、范围检查、版本、价值建议与独立导出。过程见 [M2 验证记录](docs/U17_M2_FOUNDATION_VALIDATION.md)。
-- [x] M3：已有项目基线、变更规划、外部修改核对与后续迭代。过程见 [M3 验证记录](docs/U17_M3_BASELINE_VALIDATION.md)。
-- [x] M4：一个 agent 引擎的集成、执行范围、恢复与成果回收；模拟旧会话不可访问并验证任务交接。过程见 [M4 验证记录](docs/U17_M4_EXECUTION_VALIDATION.md)。
+- [x] M0：完整类型资料读取、OpenCode 异步执行/权限恢复/状态投影、工作区文件基线、含来源/需求/决定/迭代的独立项目存储、双场景关联文档样例及不依赖旧会话的交接包已实现。过程见 [验证档案](docs/archive/u17/U17_M0_VALIDATION.md)。
+- [x] M1：多项目、类型与应用统一搜索、正式正文/研究笔记阅读、应用目录深度说明、项目资料收藏与固定来源版本。过程见 [M1 验证档案](docs/archive/u17/U17_M1_VALIDATION.md)。
+- [x] M2：分析取舍、关联文档、人工修改、范围检查、版本、价值建议与独立导出。过程见 [M2 验证档案](docs/archive/u17/U17_M2_FOUNDATION_VALIDATION.md)。
+- [x] M3：已有项目基线、变更规划、外部修改核对与后续迭代。过程见 [M3 验证档案](docs/archive/u17/U17_M3_BASELINE_VALIDATION.md)。
+- [x] M4：一个 agent 引擎的集成、执行范围、恢复与成果回收；模拟旧会话不可访问并验证任务交接。过程见 [M4 验证档案](docs/archive/u17/U17_M4_EXECUTION_VALIDATION.md)。
 - [x] 核心主线：最小真实开发冒烟已从类型入口连续走到迭代完成，阻塞问题已修复并完成最终全绿复验。过程见[核心主线验证](docs/U17_CORE_PATH_VALIDATION.md)。
 - [ ] M5：按 [试点计划](docs/U17_M5_PILOT_PLAN.md)完成简单新想法、已有项目改进、多类型需求三个评估案例和至少一次后续修改，保留普通生成对照与真实问题。
 

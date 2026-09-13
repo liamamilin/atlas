@@ -2,7 +2,7 @@
 
 日期：2026-09-13  
 状态：M4 的集成执行、隔离工作副本、同会话续作、结构化结果、审阅后写回、新基线、失败收口与交接闭环完成
-依据：[U17 设计稿](U17_DESIGN.md) · [开发规划](U17_DEVELOPMENT_PLAN.md) · [M0 引擎验证](U17_M0_VALIDATION.md)
+依据：[U17 设计稿](../../U17_DESIGN.md) · [开发规划](../../U17_DEVELOPMENT_PLAN.md) · [M0 引擎验证](U17_M0_VALIDATION.md)
 
 ## 1. 本轮实现
 

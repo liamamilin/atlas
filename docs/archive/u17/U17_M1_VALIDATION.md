@@ -2,7 +2,7 @@
 
 日期：2026-09-13  
 状态：完成  
-依据：[产品设计](U17_DESIGN.md) · [开发规划](U17_DEVELOPMENT_PLAN.md)
+依据：[产品设计](../../U17_DESIGN.md) · [开发规划](../../U17_DEVELOPMENT_PLAN.md)
 
 ## 已实现流程
 

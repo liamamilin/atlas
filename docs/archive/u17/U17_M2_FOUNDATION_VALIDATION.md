@@ -2,7 +2,7 @@
 
 日期：2026-09-13
 状态：基础闭环完成；自动资料分析与文档集合见 [生成验证](U17_M2_GENERATION_VALIDATION.md)，章节级自然语言修改见 [章节修改验证](U17_M2_REVISION_VALIDATION.md)。
-依据：[产品设计](U17_DESIGN.md) · [开发规划](U17_DEVELOPMENT_PLAN.md)
+依据：[产品设计](../../U17_DESIGN.md) · [开发规划](../../U17_DEVELOPMENT_PLAN.md)
 
 ## 1. 本阶段完成的能力
 

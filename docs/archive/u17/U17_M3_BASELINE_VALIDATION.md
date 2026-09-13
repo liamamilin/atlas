@@ -2,7 +2,7 @@
 
 日期：2026-09-13  
 状态：项目接入、证据分层和外部变化核对已完成；目标驱动改进方案随后已完成，见 [M3 改进方案验证](U17_M3_IMPROVEMENT_VALIDATION.md)。
-依据：[产品设计](U17_DESIGN.md) · [开发规划](U17_DEVELOPMENT_PLAN.md) · [M2 生成验证](U17_M2_GENERATION_VALIDATION.md)
+依据：[产品设计](../../U17_DESIGN.md) · [开发规划](../../U17_DEVELOPMENT_PLAN.md) · [M2 生成验证](U17_M2_GENERATION_VALIDATION.md)
 
 ## 1. 本轮完成范围
 

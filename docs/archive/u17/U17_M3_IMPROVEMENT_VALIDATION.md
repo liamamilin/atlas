@@ -2,7 +2,7 @@
 
 日期：2026-09-13
 状态：M3-03 完成；正式代码执行与验收进入 M4。
-依据：[产品设计](U17_DESIGN.md) · [开发规划](U17_DEVELOPMENT_PLAN.md) · [M3 基线验证](U17_M3_BASELINE_VALIDATION.md)
+依据：[产品设计](../../U17_DESIGN.md) · [开发规划](../../U17_DEVELOPMENT_PLAN.md) · [M3 基线验证](U17_M3_BASELINE_VALIDATION.md)
 
 ## 1. 用户流程
 
