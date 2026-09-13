@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { getApps } from "@/lib/atlas";
 import { useAsync, Loading, ErrorBox } from "@/components/loaders";
 import { Badge } from "@/components/ui/badge";
+import { AppReferenceButton } from "@/components/app-reference-button";
 import { useLang, t } from "@/lib/lang";
 
 export function Apps() {
@@ -23,6 +24,9 @@ export function Apps() {
               <span className="truncate text-xs text-subtle">{a.vendor}</span>
             </div>
             <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-muted">{a.tagline}</p>
+            <p className="mt-2 text-[11px] text-subtle">
+              {lang === "zh" ? "资料深度：目录级（名称、简介、任务标签、Atlas 归类）" : "Coverage: catalog-level (name, description, task tags, Atlas classification)"}
+            </p>
             {a.leaf ? (
               <div className="mt-3 border-t border-border pt-3">
                 <div className="text-[11px] text-subtle">{t("classified", lang)}</div>
@@ -33,6 +37,7 @@ export function Apps() {
             ) : (
               <Badge tone="warn" className="mt-3">{t("unclassified", lang)}</Badge>
             )}
+            <div className="mt-4"><AppReferenceButton slug={a.slug} /></div>
           </div>
         ))}
       </div>

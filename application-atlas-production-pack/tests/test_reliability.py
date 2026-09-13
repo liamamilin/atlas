@@ -328,6 +328,91 @@ class ProjectStoreTests(unittest.TestCase):
             self.store.record_decision(
                 self.project['id'], 'Use local execution', 'User constraint', [reference['id']])
 
+    def test_references_are_unique_editable_and_project_scoped(self):
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'sha256:one',
+            locator='core-model', excerpt='Fixed source text', read_status='read')
+        self.assertEqual(self.store.list_references(self.project['id'])[0]['id'], reference['id'])
+        with self.assertRaisesRegex(ProjectStoreError, 'already saved'):
+            self.store.add_reference(
+                self.project['id'], 'atlas:application', 'sample', 'sha256:one',
+                locator='core-model', excerpt='Client cannot replace it')
+        updated = self.store.update_reference(
+            self.project['id'], reference['id'], note='Use this boundary', read_status='reviewed')
+        self.assertEqual(updated['note'], 'Use this boundary')
+        self.assertEqual(updated['read_status'], 'reviewed')
+        other = self.store.create_project('Other', 'Other goal', self.root / 'other', 'existing')
+        with self.assertRaises(ProjectStoreError):
+            self.store.get_reference(other['id'], reference['id'])
+        with self.assertRaises(ProjectStoreError):
+            self.store.update_reference(other['id'], reference['id'], note='Wrong project')
+        import drafts_api
+        external = self.store.add_reference(
+            self.project['id'], 'user', 'interview-1', 'notes-v1', excerpt='User evidence')
+        projected = drafts_api.list_project_references(
+            self.project['id'], self.store, self.root / 'missing-pack')
+        external_projection = next(item for item in projected if item['id'] == external['id'])
+        self.assertFalse(external_projection['stale'])
+
+    def test_atlas_reference_keeps_excerpt_and_reports_source_update(self):
+        import drafts_api
+        pack = self.root / 'pack'
+        (pack / 'applications').mkdir(parents=True)
+        (pack / 'research').mkdir()
+        application = '# Sample\nIntro\n\n## Core Model\nCore text\n\n### Detail\nNested text\n\n## Rules\nRule text\n'
+        (pack / 'applications/sample.md').write_text(application)
+        saved = drafts_api.collect_atlas_reference(self.project['id'], {
+            'kind': 'application', 'slug': 'sample', 'section': 'core-model',
+            'note': 'Initial note',
+        }, self.store, pack)
+        self.assertIn('### Detail', saved['excerpt'])
+        self.assertNotIn('## Rules', saved['excerpt'])
+        self.assertEqual(saved['locator'], 'core-model')
+        original_excerpt, original_version = saved['excerpt'], saved['source_version']
+        current = drafts_api.list_project_references(self.project['id'], self.store, pack)[0]
+        self.assertFalse(current['stale'])
+        (pack / 'applications/sample.md').write_text(application + '\n## New Evidence\nChanged\n')
+        stale = drafts_api.list_project_references(self.project['id'], self.store, pack)[0]
+        self.assertTrue(stale['stale'])
+        self.assertNotEqual(stale['current_version'], original_version)
+        self.assertEqual(stale['excerpt'], original_excerpt)
+
+    def test_app_catalog_reference_declares_depth_and_tracks_its_record(self):
+        import drafts_api
+        pack = self.root / 'pack'
+        pack.mkdir()
+        apps = [{
+            'slug': 'sample-app', 'name': 'Sample App', 'aliases': ['Sample'],
+            'vendor': 'Example', 'tagline': 'Keeps a sample record.',
+            'tasks': ['capture', 'review'],
+        }]
+        classified = [{
+            'slug': 'sample-app', 'desc': 'Sample App description',
+            'leaf': 'sample-type', 'scores': {'sample-type': 10},
+        }]
+        (pack / 'mvp_apps.json').write_text(json.dumps(apps))
+        (pack / 'mvp_apps_classified.json').write_text(json.dumps(classified))
+        saved = drafts_api.collect_atlas_reference(self.project['id'], {
+            'kind': 'app', 'slug': 'sample-app', 'note': 'Compare its capture flow',
+        }, self.store, pack)
+        self.assertEqual(saved['source_kind'], 'atlas:app')
+        self.assertIn('Catalog-level evidence only', saved['excerpt'])
+        self.assertIn('sample-type', saved['excerpt'])
+        projected = drafts_api.list_project_references(
+            self.project['id'], self.store, pack)[0]
+        self.assertFalse(projected['stale'])
+        original_excerpt = projected['excerpt']
+        apps[0]['tagline'] = 'Updated catalog description.'
+        (pack / 'mvp_apps.json').write_text(json.dumps(apps))
+        stale = drafts_api.list_project_references(
+            self.project['id'], self.store, pack)[0]
+        self.assertTrue(stale['stale'])
+        self.assertEqual(stale['excerpt'], original_excerpt)
+        with self.assertRaisesRegex(ValueError, 'do not have sections'):
+            drafts_api.collect_atlas_reference(self.project['id'], {
+                'kind': 'app', 'slug': 'sample-app', 'section': 'details',
+            }, self.store, pack)
+
     def test_execution_updates_task_and_keeps_raw_projection(self):
         document = self.store.create_document(self.project['id'], 'plan', 'Plan', 'content')
         task = self.store.create_task(self.project['id'], 'Implement', 'Do work',
@@ -479,6 +564,40 @@ class ProjectStoreTests(unittest.TestCase):
             idea, code = handler.do_POST()
         self.assertEqual(code, 201)
         self.assertTrue(idea['workspace'].endswith('/workspaces/' + idea['id']))
+
+    def test_project_reference_http_create_list_and_update(self):
+        import drafts_api
+        pack = self.root / 'pack'
+        (pack / 'applications').mkdir(parents=True)
+        (pack / 'research').mkdir()
+        (pack / 'applications/sample.md').write_text(
+            '# Sample\n\n## Core Model\nCanonical evidence\n')
+        handler = object.__new__(drafts_api.Handler)
+        handler._json = lambda value, code=200: (value, code)
+        handler.path = f"/api/projects/{self.project['id']}/references"
+        handler._body = lambda: {
+            'kind': 'application', 'slug': 'sample', 'section': 'core-model',
+            'note': 'Read during discovery',
+        }
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store), \
+                patch.object(drafts_api, 'PACK', str(pack)):
+            created, code = handler.do_POST()
+        self.assertEqual(code, 201)
+        self.assertEqual(created['excerpt'], '## Core Model\nCanonical evidence\n')
+
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store), \
+                patch.object(drafts_api, 'PACK', str(pack)):
+            rows, code = handler.do_GET()
+        self.assertEqual(code, 200)
+        self.assertFalse(rows[0]['stale'])
+
+        handler.path += '/' + created['id']
+        handler._body = lambda: {'note': 'Confirmed evidence', 'read_status': 'reviewed'}
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            updated, code = handler.do_PATCH()
+        self.assertEqual(code, 200)
+        self.assertEqual(updated['note'], 'Confirmed evidence')
+        self.assertEqual(updated['read_status'], 'reviewed')
 
 
 class SamplePackageTests(unittest.TestCase):

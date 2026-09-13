@@ -4,6 +4,7 @@ import { useAsync, Loading, ErrorBox } from "@/components/loaders";
 import { Badge } from "@/components/ui/badge";
 import { REL_KIND_ZH } from "@/lib/atlas";
 import { Prose } from "@/components/prose";
+import { SourceReader } from "@/components/source-reader";
 import { useLang, pick, t, type Lang } from "@/lib/lang";
 
 export function Leaf() {
@@ -103,12 +104,7 @@ export function Leaf() {
           <Prose md={data.sources} className="mt-3 text-sm" />
         </section>
       ) : null}
-      {data.full_md ? (
-        <details className="mt-8 rounded-xl bg-surface p-5 shadow-card">
-          <summary className="cursor-pointer font-medium">{lang === "zh" ? "完整英文档案" : "Complete English document"}</summary>
-          <Prose md={data.full_md} className="mt-4" />
-        </details>
-      ) : null}
+      <SourceReader slug={data.slug} />
     </main>
   );
 }

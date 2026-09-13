@@ -178,13 +178,58 @@ class ProjectStore:
         reference_id, now = _id("ref"), _now()
         with self._transaction() as con:
             self._require_project(con, project_id)
+            existing = con.execute("""SELECT id FROM reference WHERE project_id=?
+                AND source_kind=? AND source_ref=? AND source_version=? AND locator=?""",
+                (project_id, source_kind, source_ref, source_version, locator)).fetchone()
+            if existing:
+                raise ProjectStoreError("reference already saved")
             con.execute("""INSERT INTO reference
                 (id,project_id,source_kind,source_ref,source_version,locator,excerpt,note,
                  read_status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
                 (reference_id, project_id, _required(source_kind, "source_kind"),
                  _required(source_ref, "source_ref"), _required(source_version, "source_version"),
                  locator, excerpt, note, read_status, now, now))
+            con.execute("UPDATE project SET updated_at=? WHERE id=?", (now, project_id))
         return self._row("reference", reference_id)
+
+    def get_reference(self, project_id: str, reference_id: str) -> dict:
+        with self._connect() as con:
+            row = con.execute("SELECT * FROM reference WHERE id=? AND project_id=?",
+                              (reference_id, project_id)).fetchone()
+        if not row:
+            raise ProjectStoreError("reference not found")
+        return dict(row)
+
+    def list_references(self, project_id: str) -> list[dict]:
+        with self._connect() as con:
+            self._require_project(con, project_id)
+            rows = con.execute("""SELECT * FROM reference WHERE project_id=?
+                ORDER BY updated_at DESC,id""", (project_id,)).fetchall()
+        return [dict(row) for row in rows]
+
+    def update_reference(self, project_id: str, reference_id: str,
+                         note: str | None = None,
+                         read_status: str | None = None) -> dict:
+        if note is None and read_status is None:
+            raise ValueError("note or read_status is required")
+        if note is not None and not isinstance(note, str):
+            raise ValueError("note must be text")
+        if read_status is not None and read_status not in READ_STATES:
+            raise ValueError("invalid read status")
+        now = _now()
+        with self._transaction() as con:
+            self._require_project(con, project_id)
+            if not con.execute("SELECT 1 FROM reference WHERE id=? AND project_id=?",
+                               (reference_id, project_id)).fetchone():
+                raise ProjectStoreError("reference not found")
+            if note is not None:
+                con.execute("UPDATE reference SET note=?,updated_at=? WHERE id=?",
+                            (note, now, reference_id))
+            if read_status is not None:
+                con.execute("UPDATE reference SET read_status=?,updated_at=? WHERE id=?",
+                            (read_status, now, reference_id))
+            con.execute("UPDATE project SET updated_at=? WHERE id=?", (now, project_id))
+        return self.get_reference(project_id, reference_id)
 
     def create_requirement(self, project_id: str, content: str,
                            recommended_scope: str | None = None,

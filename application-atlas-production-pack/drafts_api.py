@@ -20,12 +20,19 @@ Endpoints:
   GET    /api/projects                   list U17 projects
   POST   /api/projects                   create {name,objective,mode,workspace?}
   GET    /api/projects/<id>              read one U17 project
+  GET    /api/projects/<id>/references   list saved source excerpts + version state
+  POST   /api/projects/<id>/references   save canonical {kind,slug,section?,note?};
+                                        kind=application|research|app
+  PATCH  /api/projects/<id>/references/<reference-id>
+                                        update {note?,read_status?}
 
 Run alongside `npm run dev` (vite proxies /api -> :5199).
 """
 import argparse
+import hashlib
 import json
 import os
+from pathlib import Path
 import re
 import subprocess
 import sys
@@ -78,6 +85,118 @@ def create_project(body, store=None):
         raise ValueError("workspace must be a path")
     return (store or get_project_store()).create_project(
         body["name"], body["objective"], body.get("workspace"), body["mode"])
+
+
+def collect_atlas_reference(project_id, body, store=None, pack=None):
+    if not isinstance(body, dict):
+        raise ValueError("request body must be an object")
+    kind, slug = body.get("kind"), body.get("slug")
+    if kind not in {"application", "research", "app"}:
+        raise ValueError("kind must be application, research, or app")
+    if not isinstance(slug, str) or not slug:
+        raise ValueError("slug is required")
+    section = body.get("section")
+    if section is not None and not isinstance(section, str):
+        raise ValueError("section must be an outline id")
+    note = body.get("note", "")
+    if not isinstance(note, str):
+        raise ValueError("note must be text")
+    if kind == "app":
+        if section:
+            raise ValueError("app catalog references do not have sections")
+        saved = _read_app_catalog(slug, pack or PACK)
+    else:
+        saved = _read_complete_source(slug, kind, section or None, pack or PACK)
+    return (store or get_project_store()).add_reference(
+        project_id, f"atlas:{kind}", slug, saved["fingerprint"],
+        locator=(saved["section"] or {}).get("id", ""), excerpt=saved["content"],
+        note=note, read_status=body.get("read_status", "read"))
+
+
+def list_project_references(project_id, store=None, pack=None):
+    result = []
+    for item in (store or get_project_store()).list_references(project_id):
+        current_version = None
+        available = False
+        tracked = item["source_kind"].startswith("atlas:")
+        if tracked:
+            kind = item["source_kind"].split(":", 1)[1]
+            try:
+                if kind == "app":
+                    current_version = _read_app_catalog(
+                        item["source_ref"], pack or PACK)["fingerprint"]
+                else:
+                    manifest = source_manifest(item["source_ref"], pack or PACK)
+                    current = next(source for source in manifest["sources"] if source["kind"] == kind)
+                    current_version = current["fingerprint"]
+                available = True
+            except (FileNotFoundError, StopIteration, ValueError):
+                pass
+        result.append({**item, "source_available": available,
+                       "current_version": current_version,
+                       "stale": tracked and current_version != item["source_version"]})
+    return result
+
+
+def _read_complete_source(slug, kind, section, pack):
+    offset, chunks, fingerprint, first = 0, [], None, None
+    for _ in range(200):
+        page = read_source(slug, kind, section=section, offset=offset,
+                           limit=50_000, pack=pack)
+        if fingerprint is not None and page["fingerprint"] != fingerprint:
+            raise SourceError("source changed while reading; retry")
+        fingerprint = page["fingerprint"]
+        first = first or page
+        chunks.append(page["content"])
+        if page["complete"]:
+            return {**first, "content": "".join(chunks), "complete": True,
+                    "returned_chars": sum(len(chunk) for chunk in chunks),
+                    "next_offset": None}
+        offset = page["next_offset"]
+    raise SourceError("source exceeds safe pagination limit")
+
+
+def _read_app_catalog(slug, pack):
+    valid_slug(slug)
+    root = Path(pack)
+    apps = json.loads((root / "mvp_apps.json").read_text(encoding="utf-8"))
+    classified_path = root / "mvp_apps_classified.json"
+    classified = json.loads(classified_path.read_text(encoding="utf-8")) \
+        if classified_path.is_file() else []
+    app = next((item for item in apps if item.get("slug") == slug), None)
+    if app is None:
+        raise FileNotFoundError(f"app/{slug}")
+    classification = next(
+        (item for item in classified if item.get("slug") == slug), {})
+    record = {"app": app, "classification": classification}
+    canonical = json.dumps(
+        record, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    fingerprint = hashlib.sha256(
+        ("atlas-app-catalog-v1\n" + canonical).encode("utf-8")).hexdigest()
+    lines = [
+        f"# {app.get('name') or slug}", "", "## Catalog Record", "",
+        f"- **Vendor:** {app.get('vendor') or 'Not recorded'}",
+    ]
+    aliases = app.get("aliases") or []
+    if aliases:
+        lines.append(f"- **Aliases:** {', '.join(str(value) for value in aliases)}")
+    lines.extend(["", app.get("tagline") or "No description recorded.", "",
+                  "## Indexed Tasks", ""])
+    tasks = app.get("tasks") or []
+    lines.extend(f"- {task}" for task in tasks)
+    if not tasks:
+        lines.append("- No task tags recorded")
+    lines.extend(["", "## Atlas Classification", "",
+                  f"- **Type:** {classification.get('leaf') or 'Unclassified'}"])
+    if classification.get("desc"):
+        lines.extend(["", classification["desc"]])
+    lines.extend([
+        "", "## Coverage", "",
+        "Catalog-level evidence only: name, vendor, short description, task tags, and Atlas classification. This record is not a deep product analysis.",
+        "",
+    ])
+    return {"slug": slug, "kind": "app", "fingerprint": fingerprint,
+            "section": None, "content": "\n".join(lines), "complete": True}
 
 # ---- 模型生成身份（英文名/中文名/一句话想法，创建时 name/desc 可不填） ----
 ID_MODEL = os.environ.get("ATLAS_DEDUP_MODEL", "mimo-v2.5")
@@ -445,6 +564,12 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(load_review(PACK))
         if path == "/api/projects":
             return self._json(get_project_store().list_projects())
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/references$", path)
+        if m:
+            try:
+                return self._json(list_project_references(m.group(1)))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
         m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)$", path)
         if m:
             try:
@@ -482,6 +607,17 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = unquote(urlparse(self.path).path)
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/references$", path)
+        if m:
+            try:
+                return self._json(collect_atlas_reference(m.group(1), self._body()), 201)
+            except FileNotFoundError:
+                return self._json({"error": "source not found"}, 404)
+            except ProjectStoreError as error:
+                code = 404 if str(error) == "project not found" else 409
+                return self._json({"error": str(error)}, code)
+            except (ValueError, SourceError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
         if path == "/api/projects":
             try:
                 return self._json(create_project(self._body()), 201)
@@ -550,6 +686,22 @@ class Handler(BaseHTTPRequestHandler):
                 PROMOTE_LOCK.release()
                 raise
             return self._json({"slug": slug, "status": "promoting"}, 202)
+        self._json({"error": "no route"}, 404)
+
+    def do_PATCH(self):
+        path = unquote(urlparse(self.path).path)
+        m = re.match(
+            r"^/api/projects/(prj_[A-Za-z0-9]+)/references/(ref_[A-Za-z0-9]+)$", path)
+        if m:
+            try:
+                body = self._body()
+                return self._json(get_project_store().update_reference(
+                    m.group(1), m.group(2), note=body.get("note"),
+                    read_status=body.get("read_status")))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
+            except (ValueError, json.JSONDecodeError, AttributeError) as error:
+                return self._json({"error": str(error)}, 400)
         self._json({"error": "no route"}, 404)
 
     def _create(self, b):

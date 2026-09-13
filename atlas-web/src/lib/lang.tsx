@@ -56,10 +56,10 @@ export const T = {
   projectsEmpty: { zh: "还没有项目。创建后会保存在本地项目库。", en: "No projects yet. New projects are kept in the local project store." },
   browseTitle: { zh: "浏览类型树", en: "Browse the Type Tree" },
   searchPlaceholder: {
-    zh: "例如：任务管理、看板、律师事务所计费、siem",
-    en: "e.g. task management, kanban, law firm billing, siem",
+    zh: "搜索类型或应用，例如：任务管理、看板、Notion、siem",
+    en: "Search types or apps, e.g. task management, kanban, Notion, siem",
   },
-  searchBtn: { zh: "搜索类型", en: "Search Types" },
+  searchBtn: { zh: "搜索类型与应用", en: "Search Types & Apps" },
   browseAll: { zh: "浏览全部 29 个域", en: "Browse all 29 domains" },
   heroP: {
     zh: "从「这类软件管什么」出发组织全部软件世界：每个类型有定义核心、工作结构、变体谱系和与相邻类型的分界。找到类型，再看类型下的真实产品。",
@@ -101,7 +101,7 @@ export const T = {
     zh: "{n} 个匹配类型（M1 为名称/别名/定义文本匹配，语义检索见 MCP 工具）",
     en: "{n} matching types (M1 matches names/aliases/defining text; semantic search available via MCP tools)",
   },
-  searchNone: { zh: "没有匹配的类型", en: "No matching types" },
+  searchNone: { zh: "没有匹配的类型或应用", en: "No matching types or applications" },
   appsTitle: { zh: "应用实证", en: "Case Studies" },
   appsP: {
     zh: "{n} 个真实软件产品，经 atlas 分类管线自动归位到类型图谱中。每个产品卡片可跳转到它所属的类型页（含分界逻辑）。",

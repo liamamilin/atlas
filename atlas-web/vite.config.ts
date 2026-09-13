@@ -10,7 +10,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/api": "http://localhost:5199",
+      "/api": process.env.ATLAS_API_TARGET || "http://localhost:5199",
     },
   },
 });
