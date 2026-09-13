@@ -27,7 +27,7 @@ U17 面向新想法和已有项目改进：搜索与阅读类型、应用资料�
 - [双场景样例](docs/u17-samples/)：新想法与已有项目改进的关联文档包。
 - [下游应用路线图](USAGE_ROADMAP.md)：U17 与其他功能的关系及历史记录。
 
-截至 2026-09-13，U17 的 M0–M3 与 M4 首个真实执行闭环已实现。网页除搜索、资料、需求、决定、关联文档、项目基线和改进方案外，现在可建立迭代和范围化任务，启动 OpenCode，处理权限/提问/停止状态，核对 Atlas 自有文件快照和结构化验证命令，并将产品验收与 agent 完成分开记录。项目导出包含迭代、执行证据和不依赖旧会话的交接材料。M4 的独立工作副本、结果回收和更完整的中断边界仍在实施；M2 批量生成/自然语言修改仍未完成。
+截至 2026-09-13，U17 的 M0–M3 与 M4 核心执行闭环已实现。网页除搜索、资料、需求、决定、关联文档、项目基线和改进方案外，现在可建立迭代和范围化任务，让 OpenCode 在隔离工作副本中执行，处理权限/提问/停止状态，核对 Atlas 自有文件快照和结构化验证命令，再以冲突检查和失败回滚把审阅结果写回源项目。精确写回状态成为新项目基线，产品验收仍与 agent 完成分开记录。schema 4 项目导出包含迭代、执行/应用证据和不依赖旧会话的交接材料。M4 的结构化需求覆盖和完整失败收口仍在实施；M2 批量生成/自然语言修改仍未完成。
 
 U17 的本地 API 提供正式资料全文读取，并管理项目、固定资料、需求、决定、文档版本、项目基线、生成运行、迭代、执行任务、验收与导出。`project_generation.py` 负责固定输入分析和文档/改进方案候选；`execution_service.py` 与 `opencode_runtime.py` 负责短期 OpenCode 执行后端；项目、基线、任务、文件证据和验收仍由 Atlas 独立持久化。
 
@@ -72,7 +72,7 @@ npm run gen
 
 阅读网页、导出、离线测试不需要模型凭据。语义检索需要本地 Ollama；分类、查重及翻译会使用外部模型 API。凭据按需从 `ATLAS_API_KEY` 环境变量读取，未设置时读取本机 OpenCode 的 `~/.local/share/opencode/auth.json`。不要把凭据提交到仓库。
 
-分类模型通过 `ATLAS_ADJUDICATOR` 配置，默认 `qwen3.8-flash`；查重默认 `mimo-v2.5`。草稿生成和 U17 执行还需要 OpenCode CLI。U17 默认使用 `opencode-go/mimo-v2.5`，可用 `ATLAS_EXECUTION_MODEL=provider/model` 覆盖；默认由 API 启动只监听本机的 OpenCode 子进程，也可用 `ATLAS_OPENCODE_URL=http://127.0.0.1:<port>` 连接已有本机服务。
+分类模型通过 `ATLAS_ADJUDICATOR` 配置，默认 `qwen3.8-flash`；查重默认 `mimo-v2.5`。草稿生成和 U17 执行还需要 OpenCode CLI。U17 默认使用 `opencode-go/mimo-v2.5`，可用 `ATLAS_EXECUTION_MODEL=provider/model` 覆盖；默认由 API 启动只监听本机的 OpenCode 子进程，也可用 `ATLAS_OPENCODE_URL=http://127.0.0.1:<port>` 连接已有本机服务。隔离副本默认存到项目数据库旁；若该目录位于源项目内则改用系统临时目录，可用 `ATLAS_EXECUTION_ROOT` 指定持久且位于项目外的目录。项目状态库本身不能位于待执行的源目录内；此类项目需用 `ATLAS_PROJECT_STORE` 把数据库放到项目外。
 
 ## 入库规则
 

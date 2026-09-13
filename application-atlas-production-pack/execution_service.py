@@ -3,11 +3,16 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+import shutil
 
 from execution_state import project_execution
 from opencode_client import OpenCodeError
 from opencode_runtime import get_opencode_runtime
-from project_baseline import baseline_summary, check_project_changes, latest_project_baseline
+from execution_workspace import apply_execution_workspace, prepare_execution_workspace
+from project_baseline import (
+    baseline_summary, capture_project_baseline, check_project_changes,
+    latest_project_baseline,
+)
 from project_store import ProjectStoreError
 from workspace_snapshot import compare_snapshots, snapshot_workspace
 
@@ -24,6 +29,8 @@ CAPABILITIES = {
     "snapshot_reconcile": True,
     "session_resume_after_api_restart": True,
     "engine_diff_reliable": False,
+    "isolated_workspace": True,
+    "review_before_apply": True,
 }
 
 
@@ -33,9 +40,19 @@ def create_iteration(store, project_id: str, body: dict) -> dict:
     activate = body.get("activate", True)
     if not isinstance(activate, bool):
         raise ValueError("activate must be true or false")
+    versions = _strings(body.get("input_document_versions"), "input_document_versions")
+    current = {item["version_id"]: item for item in store.list_documents(project_id)}
+    for version_id in versions:
+        document = current.get(version_id)
+        if not document:
+            raise ProjectStoreError(
+                "new iterations require current document versions")
+        if document["review"]["status"] != "current":
+            raise ProjectStoreError(
+                "review document dependencies before starting a new iteration")
     return store.create_iteration(
         project_id, body.get("title"), body.get("objective"),
-        _strings(body.get("input_document_versions"), "input_document_versions"),
+        versions,
         _strings(body.get("requirement_ids"), "requirement_ids"),
         activate)
 
@@ -57,11 +74,24 @@ def start_execution(store, project_id: str, task_id: str, body: dict,
                     client=None) -> dict:
     _body(body, {"model"})
     task, project = _task_project(store, project_id, task_id)
+    if task["acceptance_status"] != "pending":
+        raise ProjectStoreError("accepted tasks cannot start another execution")
+    if task["kind"] in {"code", "document"} and not task["write_paths"]:
+        raise ProjectStoreError("a mutating execution requires at least one write path")
     if not task.get("iteration_id"):
         raise ProjectStoreError("execution task must belong to an iteration")
     iteration = store.get_iteration(task["iteration_id"])
     if iteration["status"] != "active":
         raise ProjectStoreError("execution task requires an active iteration")
+    source_workdir = Path(project["workspace"]).resolve()
+    try:
+        store.path.relative_to(source_workdir)
+    except ValueError:
+        pass
+    else:
+        raise ProjectStoreError(
+            "project state database is inside the source workspace; set "
+            "ATLAS_PROJECT_STORE to a path outside the project")
     baseline = latest_project_baseline(store, project_id)
     if not baseline:
         raise ProjectStoreError("execution requires an accepted workspace baseline")
@@ -70,14 +100,23 @@ def start_execution(store, project_id: str, task_id: str, body: dict,
             checked["baseline"]["content_fingerprint"]:
         raise ProjectStoreError(
             "workspace differs from the accepted baseline; check and adopt changes first")
-    workdir = Path(project["workspace"]).resolve()
-    before_manifest = snapshot_workspace(workdir)
+    workdir, before_manifest = prepare_execution_workspace(
+        store.path.parent, project_id, source_workdir, baseline["manifest"])
     before = store.save_snapshot(project_id, before_manifest, "before", task_id)
-    engine = client or get_opencode_runtime(store.path.parent).client(workdir)
+    try:
+        engine = client or get_opencode_runtime(store.path.parent).client(workdir)
+    except BaseException:
+        shutil.rmtree(workdir, ignore_errors=True)
+        raise
     model = _model(body.get("model"))
-    session = engine.create_session(f"Atlas U17 · {task['title']}")
+    try:
+        session = engine.create_session(f"Atlas U17 · {task['title']}")
+    except BaseException:
+        shutil.rmtree(workdir, ignore_errors=True)
+        raise
     session_id = session.get("id") if isinstance(session, dict) else None
     if not session_id:
+        shutil.rmtree(workdir, ignore_errors=True)
         raise RuntimeError("OpenCode did not return a session ID")
     input_state = {
         "schema": 1,
@@ -91,7 +130,11 @@ def start_execution(store, project_id: str, task_id: str, body: dict,
             "id": baseline["id"], "fingerprint": baseline["fingerprint"],
             "content_fingerprint": baseline_summary(baseline)["content_fingerprint"],
         },
+        "source_workdir": str(source_workdir),
         "workdir": str(workdir),
+        "workspace_strategy": "isolated_copy",
+        "omitted_dependency_names": [
+            ".git", ".hg", ".svn", ".venv", "__pycache__", "node_modules", "dist"],
         "write_paths": task["write_paths"],
         "verification_commands": task["verification_commands"],
         "model": model,
@@ -99,17 +142,19 @@ def start_execution(store, project_id: str, task_id: str, body: dict,
     try:
         execution = store.create_execution(
             task_id, "opencode", session_id, before["id"], str(workdir),
-            input_state, CAPABILITIES)
+            input_state, CAPABILITIES, str(source_workdir),
+            "not_applicable" if task["kind"] == "analysis" else "pending")
     except BaseException:
         try:
             engine.delete_session(session_id)
         except BaseException:
             pass
+        shutil.rmtree(workdir, ignore_errors=True)
         raise
     try:
         context = store.task_context(task_id)
         engine.send_message_async(
-            session_id, render_execution_prompt(execution["id"], context),
+            session_id, render_execution_prompt(execution["id"], context, str(workdir)),
             *model.split("/", 1), agent="build", tools=_tools(task["kind"]))
         projection = {
             "state": "running", "engine_status": "submitted",
@@ -176,6 +221,112 @@ def stop_execution(store, project_id: str, execution_id: str, client=None) -> di
                    execution.get("engine_message_id"))
 
 
+def apply_execution_result(store, project_id: str, execution_id: str) -> dict:
+    execution, task, project = _execution_context(store, project_id, execution_id)
+    if task["kind"] == "analysis":
+        raise ProjectStoreError("analysis executions do not produce an applicable file result")
+    if execution["status"] != "completed" or not execution.get("after_snapshot_id"):
+        raise ProjectStoreError("only a completed execution result can be applied")
+    if execution["application_status"] == "applied":
+        return _adopt_applied_baseline(store, project_id, execution, project)
+    evidence = (execution.get("raw_state") or {}).get("evidence") or {}
+    filesystem = evidence.get("filesystem") or {}
+    if not filesystem.get("scope_compliant"):
+        raise ProjectStoreError("execution result has out-of-scope changes")
+    baseline_id = (execution.get("input_state") or {}).get(
+        "workspace_baseline", {}).get("id")
+    latest = latest_project_baseline(store, project_id)
+    if not latest or latest["id"] != baseline_id:
+        state = {"error": "baseline_changed", "expected_baseline_id": baseline_id,
+                 "current_baseline_id": latest["id"] if latest else None}
+        store.record_execution_application(execution_id, "conflict", state)
+        raise ProjectStoreError(
+            "accepted workspace baseline changed after execution started")
+    checked = check_project_changes(store, project_id)
+    expected_fingerprint = (execution.get("input_state") or {}).get(
+        "workspace_baseline", {}).get("content_fingerprint")
+    if checked["current"]["content_fingerprint"] != expected_fingerprint:
+        state = {"error": "source_workspace_changed",
+                 "baseline_id": baseline_id,
+                 "expected_content_fingerprint": expected_fingerprint,
+                 "current_content_fingerprint": checked["current"]["content_fingerprint"]}
+        store.record_execution_application(execution_id, "conflict", state)
+        raise ProjectStoreError(
+            "project workspace changed since execution started; review and rebase the result")
+    before = store.get_snapshot(project_id, execution["before_snapshot_id"])
+    after = store.get_snapshot(project_id, execution["after_snapshot_id"])
+    difference = compare_snapshots(before["manifest"], after["manifest"])
+    changed = difference["added"] + difference["modified"] + difference["removed"]
+    violations = [path for path in changed if not _within(path, task["write_paths"])]
+    if violations:
+        raise ProjectStoreError("execution result has out-of-scope changes")
+    try:
+        applied_manifest = apply_execution_workspace(
+            project["workspace"], execution["workdir"], latest["manifest"],
+            after["manifest"], difference, execution_id)
+    except ProjectStoreError as error:
+        store.record_execution_application(
+            execution_id, "conflict", {"error": str(error),
+                                       "baseline_id": baseline_id})
+        raise
+    except OSError as error:
+        store.record_execution_application(
+            execution_id, "failed", {"error": str(error),
+                                     "baseline_id": baseline_id})
+        raise
+    applied = store.save_snapshot(
+        project_id, applied_manifest, "applied", task["id"])
+    state = {
+        "strategy": "isolated_copy", "source_workdir": project["workspace"],
+        "execution_workdir": execution["workdir"],
+        "baseline_id": baseline_id,
+        "added": difference["added"], "modified": difference["modified"],
+        "removed": difference["removed"], "accepted_baseline_id": None,
+    }
+    store.record_execution_application(
+        execution_id, "applied", state, applied["id"])
+    return _adopt_applied_baseline(
+        store, project_id,
+        store.get_execution(execution_id), project, latest)
+
+
+def _adopt_applied_baseline(store, project_id: str, execution: dict,
+                            project: dict, previous=None) -> dict:
+    state = dict(execution.get("application_state") or {})
+    if state.get("accepted_baseline_id"):
+        return execution
+    baseline_id = state.get("baseline_id") or (execution.get("input_state") or {}).get(
+        "workspace_baseline", {}).get("id")
+    previous = previous or latest_project_baseline(store, project_id)
+    try:
+        applied = store.get_snapshot(project_id, execution["applied_snapshot_id"])
+        current = snapshot_workspace(project["workspace"])
+        if current.get("errors") or current["files"] != applied["manifest"].get("files", {}):
+            raise ProjectStoreError(
+                "project workspace changed after the result was applied")
+        if previous and previous["id"] != baseline_id and \
+                previous["manifest"].get("files", {}) == current["files"]:
+            state["accepted_baseline_id"] = previous["id"]
+            state.pop("baseline_adoption_error", None)
+            return store.record_execution_application(
+                execution["id"], "applied", state,
+                execution.get("applied_snapshot_id"))
+        if not previous or previous["id"] != baseline_id:
+            raise ProjectStoreError(
+                "accepted workspace baseline changed before result adoption")
+        checked = check_project_changes(store, project_id)
+        adopted = capture_project_baseline(
+            store, project_id,
+            previous["manifest"].get("coverage", {}).get("focus_paths", []),
+            previous["id"], checked["current"]["content_fingerprint"])
+        state["accepted_baseline_id"] = adopted["id"]
+        state.pop("baseline_adoption_error", None)
+    except (ProjectStoreError, OSError) as error:
+        state["baseline_adoption_error"] = str(error)
+    return store.record_execution_application(
+        execution["id"], "applied", state, execution.get("applied_snapshot_id"))
+
+
 def reply_permission(store, project_id: str, execution_id: str, body: dict,
                      client=None) -> dict:
     _body(body, {"request_id", "reply", "message"})
@@ -209,7 +360,7 @@ def reply_question(store, project_id: str, execution_id: str, body: dict,
     return reconcile_execution(store, project_id, execution_id, engine)
 
 
-def render_execution_prompt(execution_id: str, context: dict) -> str:
+def render_execution_prompt(execution_id: str, context: dict, workdir: str) -> str:
     project, task, iteration = context["project"], context["task"], context["iteration"]
     writes = ", ".join(f"`{value}`" for value in task["write_paths"]) or "none"
     checks = "\n".join(f"- `{value}`" for value in task["verification_commands"]) or \
@@ -222,7 +373,8 @@ def render_execution_prompt(execution_id: str, context: dict) -> str:
         f"Task: `{task['id']}` · {task['title']}",
         f"Task kind: `{task['kind']}`", "", "## Objective", "", task["objective"], "",
         "## Execution boundary", "",
-        f"- Work only in the current OpenCode directory: `{project['workspace']}`.",
+        f"- Work only in the current isolated OpenCode directory: `{workdir}`.",
+        f"- The source project `{project['workspace']}` is outside this run. Atlas applies reviewed results separately.",
         f"- Allowed write paths: {writes}.",
         "- Do not write outside the allowed paths. Analysis tasks must not write files.",
         "- Do not commit, push, deploy, publish, delete repositories, or change external systems.",
@@ -400,7 +552,7 @@ def _within(path: str, scopes: list[str]) -> bool:
 def _tools(kind: str) -> dict:
     return {
         "read": True, "glob": True, "grep": True, "list": True, "question": True,
-        "edit": kind != "analysis", "bash": kind == "code", "webfetch": False,
+        "edit": kind != "analysis", "bash": kind != "analysis", "webfetch": False,
         "websearch": False, "task": False,
     }
 

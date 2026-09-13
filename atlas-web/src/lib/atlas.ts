@@ -325,7 +325,22 @@ export interface ProjectExecution {
   status: Exclude<ProjectTask["execution_status"], "planned">;
   before_snapshot_id: string | null;
   after_snapshot_id: string | null;
+  applied_snapshot_id: string | null;
   workdir: string;
+  source_workdir: string;
+  application_status: "not_applicable" | "pending" | "applied" | "conflict" | "failed";
+  application_state: {
+    strategy?: "isolated_copy";
+    source_workdir?: string;
+    execution_workdir?: string;
+    baseline_id?: string;
+    accepted_baseline_id?: string | null;
+    baseline_adoption_error?: string;
+    added?: string[];
+    modified?: string[];
+    removed?: string[];
+    error?: string;
+  };
   input_state: {
     schema?: number;
     project_id?: string;
@@ -335,6 +350,10 @@ export interface ProjectExecution {
     document_version_ids?: string[];
     requirement_ids?: string[];
     workspace_baseline?: { id: string; fingerprint: string; content_fingerprint: string };
+    source_workdir?: string;
+    workdir?: string;
+    workspace_strategy?: "isolated_copy";
+    omitted_dependency_names?: string[];
     write_paths?: string[];
     verification_commands?: string[];
     model?: string;
@@ -376,6 +395,7 @@ export interface ProjectExecution {
   created_at: string;
   updated_at: string;
   finished_at: string | null;
+  applied_at: string | null;
 }
 
 export interface WorkspaceGitState {
@@ -482,6 +502,7 @@ export interface ProjectExport {
     workspace_baseline_fingerprint: string | null;
     active_iteration_id: string | null;
     unaccepted_task_ids: string[];
+    unapplied_execution_ids: string[];
     unresolved_requirement_ids: string[];
     documents_needing_review: string[];
   };
@@ -902,6 +923,18 @@ export async function getProjectExecution(projectId: string, executionId: string
 export async function stopProjectExecution(projectId: string, executionId: string) {
   const result = await requestJson<ProjectExecution>(
     `/api/projects/${encodeURIComponent(projectId)}/executions/${encodeURIComponent(executionId)}/stop`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: "{}",
+    });
+  invalidateAtlasCache();
+  return result;
+}
+
+export async function applyProjectExecutionResult(
+  projectId: string,
+  executionId: string,
+) {
+  const result = await requestJson<ProjectExecution>(
+    `/api/projects/${encodeURIComponent(projectId)}/executions/${encodeURIComponent(executionId)}/apply`, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: "{}",
     });
   invalidateAtlasCache();

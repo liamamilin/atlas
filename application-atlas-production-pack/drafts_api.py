@@ -48,7 +48,7 @@ Endpoints:
   POST   /api/projects/<id>/tasks
   POST   /api/projects/<id>/tasks/<task-id>/executions
   GET    /api/projects/<id>/executions/<execution-id>
-  POST   /api/projects/<id>/executions/<execution-id>/reconcile|stop|permission|question
+  POST   /api/projects/<id>/executions/<execution-id>/reconcile|stop|apply|permission|question
   POST   /api/projects/<id>/tasks/<task-id>/acceptance
 
 Run alongside `npm run dev` (vite proxies /api -> :5199).
@@ -86,6 +86,7 @@ from project_baseline import (
     list_project_baselines,
 )
 from execution_service import (
+    apply_execution_result,
     create_iteration as create_project_iteration,
     create_task as create_execution_task,
     reconcile_execution, reply_permission as reply_execution_permission,
@@ -845,7 +846,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"error": str(error)}, 400)
         m = re.match(
             r"^/api/projects/(prj_[A-Za-z0-9]+)/executions/(exe_[A-Za-z0-9]+)/"
-            r"(reconcile|stop|permission|question)$", path)
+            r"(reconcile|stop|apply|permission|question)$", path)
         if m:
             try:
                 action = m.group(3)
@@ -860,6 +861,12 @@ class Handler(BaseHTTPRequestHandler):
                     if body:
                         raise ValueError("stop does not accept fields")
                     result = stop_execution(
+                        get_project_store(), m.group(1), m.group(2))
+                elif action == "apply":
+                    body = self._body()
+                    if body:
+                        raise ValueError("apply does not accept fields")
+                    result = apply_execution_result(
                         get_project_store(), m.group(1), m.group(2))
                 elif action == "permission":
                     result = reply_execution_permission(

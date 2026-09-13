@@ -25,7 +25,9 @@ import promote_draft as promote
 from atlas_sources import SourceError, read_source, source_manifest
 from opencode_client import OpenCodeClient, OpenCodeError, iter_sse
 from execution_state import project_execution
+from execution_workspace import prepare_execution_workspace
 from execution_service import (
+    apply_execution_result,
     create_iteration as create_execution_iteration,
     create_task as create_execution_task,
     reconcile_execution, start_execution,
@@ -38,7 +40,7 @@ from project_generation import (
 )
 from project_baseline import (
     capture_project_baseline, check_project_changes, get_project_baseline,
-    list_project_baselines,
+    latest_project_baseline, list_project_baselines,
 )
 from handoff_bundle import build_handoff, validate_handoff, write_handoff
 from sample_package import validate_package
@@ -380,7 +382,7 @@ class ProjectStoreTests(unittest.TestCase):
         self.assertEqual(migrated.get_task('tsk_legacy')['title'], 'Task')
         self.assertIsNone(migrated.get_task('tsk_legacy')['iteration_id'])
         with sqlite3.connect(path) as con:
-            self.assertEqual(con.execute('PRAGMA user_version').fetchone()[0], 4)
+            self.assertEqual(con.execute('PRAGMA user_version').fetchone()[0], 5)
 
     def test_version_two_store_adds_document_authorship(self):
         path = self.root / 'version-two.sqlite'
@@ -412,7 +414,7 @@ class ProjectStoreTests(unittest.TestCase):
         self.assertEqual(document['author'], 'unknown')
         self.assertEqual(document['change_summary'], '')
         with sqlite3.connect(path) as con:
-            self.assertEqual(con.execute('PRAGMA user_version').fetchone()[0], 4)
+            self.assertEqual(con.execute('PRAGMA user_version').fetchone()[0], 5)
 
     def test_document_versions_are_immutable_and_conflicts_are_explicit(self):
         document = self.store.create_document(
@@ -1020,17 +1022,20 @@ class ProjectStoreTests(unittest.TestCase):
     def test_workspace_allows_only_one_active_execution(self):
         first = self.store.create_task(self.project['id'], 'First', 'First change')
         second = self.store.create_task(self.project['id'], 'Second', 'Second change')
-        workdir = str((self.root / 'workspace').resolve())
+        source = str((self.root / 'workspace').resolve())
         active = self.store.create_execution(
-            first['id'], 'opencode', 'ses_first', workdir=workdir)
+            first['id'], 'opencode', 'ses_first',
+            workdir=str((self.root / 'run-one').resolve()), source_workdir=source)
         with self.assertRaisesRegex(ProjectStoreError, 'active execution'):
             self.store.create_execution(
-                second['id'], 'opencode', 'ses_second', workdir=workdir)
+                second['id'], 'opencode', 'ses_second',
+                workdir=str((self.root / 'run-two').resolve()), source_workdir=source)
         self.store.update_execution(active['id'], {
             'state': 'stopped', 'engine_status': 'idle', 'evidence': {},
         })
         created = self.store.create_execution(
-            second['id'], 'opencode', 'ses_second', workdir=workdir)
+            second['id'], 'opencode', 'ses_second',
+            workdir=str((self.root / 'run-two').resolve()), source_workdir=source)
         self.assertEqual(created['status'], 'queued')
 
     def test_iteration_freezes_scope_and_allows_only_one_active_iteration(self):
@@ -1390,8 +1395,10 @@ class ExecutionServiceTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.workspace = self.root / 'workspace'
         (self.workspace / 'src').mkdir(parents=True)
+        (self.workspace / 'node_modules/example').mkdir(parents=True)
         (self.workspace / 'README.md').write_text('# Pilot\n')
         (self.workspace / 'src/app.py').write_text('VALUE = 1\n')
+        (self.workspace / 'node_modules/example/index.js').write_text('module.exports = 1\n')
         self.store = ProjectStore(self.root / 'state/projects.sqlite')
         self.project = self.store.create_project(
             'Execution pilot', 'Ship one bounded change', self.workspace, 'existing')
@@ -1427,10 +1434,15 @@ class ExecutionServiceTests(unittest.TestCase):
                          self.baseline['id'])
         self.assertEqual(execution['input_state']['document_version_ids'],
                          [self.document['version_id']])
-        self.assertEqual(execution['workdir'], str(self.workspace.resolve()))
+        self.assertNotEqual(execution['workdir'], str(self.workspace.resolve()))
+        self.assertEqual(execution['source_workdir'], str(self.workspace.resolve()))
+        self.assertEqual(execution['application_status'], 'pending')
+        self.assertEqual(execution['input_state']['workspace_strategy'], 'isolated_copy')
         self.assertTrue(self.client.tools['bash'])
         self.assertIn('Allowed write paths: `src`', self.client.prompt)
-        (self.workspace / 'src/app.py').write_text('VALUE = 2\n')
+        execution_workspace = Path(execution['workdir'])
+        self.assertFalse((execution_workspace / 'node_modules').exists())
+        (execution_workspace / 'src/app.py').write_text('VALUE = 2\n')
         self.client.mode = 'completed'
         completed = reconcile_execution(
             self.store, self.project['id'], execution['id'], self.client)
@@ -1441,9 +1453,31 @@ class ExecutionServiceTests(unittest.TestCase):
         self.assertTrue(completed['raw_state']['evidence']['filesystem']['scope_compliant'])
         self.assertTrue(completed['raw_state']['evidence']['verification']['all_planned_passed'])
         self.assertEqual(completed['raw_state']['evidence']['tool_calls']['commands'][0]['exit'], 0)
+        self.assertEqual((self.workspace / 'src/app.py').read_text(), 'VALUE = 1\n')
+        with self.assertRaisesRegex(ProjectStoreError, 'isolated execution result'):
+            self.store.record_acceptance(
+                self.task['id'], 'passed', [{'kind': 'review', 'summary': 'Looks good'}])
+        applied = apply_execution_result(
+            self.store, self.project['id'], execution['id'])
+        self.assertEqual(applied['application_status'], 'applied')
+        self.assertIsNotNone(applied['applied_snapshot_id'])
+        self.assertEqual((self.workspace / 'src/app.py').read_text(), 'VALUE = 2\n')
+        accepted_baseline = latest_project_baseline(self.store, self.project['id'])
+        self.assertNotEqual(accepted_baseline['id'], self.baseline['id'])
+        self.assertEqual(applied['application_state']['accepted_baseline_id'],
+                         accepted_baseline['id'])
+        with self.assertRaisesRegex(ProjectStoreError, 'review document dependencies'):
+            create_execution_iteration(self.store, self.project['id'], {
+                'title': 'Stale follow-up', 'objective': 'Must review the old plan',
+                'input_document_versions': [self.document['version_id']],
+                'requirement_ids': [self.requirement['id']],
+            })
         self.assertEqual(self.store.get_task(self.task['id'])['acceptance_status'], 'pending')
         exported = export_project(self.store, self.project['id'])
-        self.assertEqual(exported['manifest']['schema'], 3)
+        self.assertEqual(exported['manifest']['schema'], 4)
+        self.assertEqual(exported['manifest']['unapplied_execution_ids'], [])
+        self.assertEqual(exported['manifest']['workspace_baseline_id'],
+                         accepted_baseline['id'])
         self.assertEqual(exported['manifest']['counts']['executions'], 1)
         with zipfile.ZipFile(exported['archive']) as bundle:
             self.assertIn('iterations.md', bundle.namelist())
@@ -1488,15 +1522,104 @@ class ExecutionServiceTests(unittest.TestCase):
     def test_out_of_scope_change_is_preserved_and_flagged(self):
         execution = start_execution(
             self.store, self.project['id'], self.task['id'], {}, self.client)
-        (self.workspace / 'README.md').write_text('# Changed outside scope\n')
+        execution_workspace = Path(execution['workdir'])
+        (execution_workspace / 'README.md').write_text('# Changed outside scope\n')
         self.client.mode = 'completed'
         completed = reconcile_execution(
             self.store, self.project['id'], execution['id'], self.client)
         filesystem = completed['raw_state']['evidence']['filesystem']
         self.assertFalse(filesystem['scope_compliant'])
         self.assertEqual(filesystem['out_of_scope_changes'], ['README.md'])
-        self.assertEqual((self.workspace / 'README.md').read_text(),
-                         '# Changed outside scope\n')
+        self.assertEqual((self.workspace / 'README.md').read_text(), '# Pilot\n')
+        with self.assertRaisesRegex(ProjectStoreError, 'out-of-scope'):
+            apply_execution_result(
+                self.store, self.project['id'], execution['id'])
+
+    def test_result_application_detects_source_workspace_conflict(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        (Path(execution['workdir']) / 'src/app.py').write_text('VALUE = 2\n')
+        self.client.mode = 'completed'
+        reconcile_execution(
+            self.store, self.project['id'], execution['id'], self.client)
+        (self.workspace / 'src/app.py').write_text('VALUE = 9\n')
+        with self.assertRaisesRegex(ProjectStoreError, 'changed since execution'):
+            apply_execution_result(
+                self.store, self.project['id'], execution['id'])
+        recorded = self.store.get_execution(execution['id'])
+        self.assertEqual(recorded['application_status'], 'conflict')
+        self.assertEqual((self.workspace / 'src/app.py').read_text(), 'VALUE = 9\n')
+
+    def test_http_apply_route_uses_the_recorded_isolated_result(self):
+        import drafts_api
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        (Path(execution['workdir']) / 'src/app.py').write_text('VALUE = 2\n')
+        self.client.mode = 'completed'
+        reconcile_execution(
+            self.store, self.project['id'], execution['id'], self.client)
+        handler = object.__new__(drafts_api.Handler)
+        handler.path = (f"/api/projects/{self.project['id']}/executions/"
+                        f"{execution['id']}/apply")
+        handler._body = lambda: {}
+        handler._json = lambda value, code=200: (value, code)
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            applied, code = handler.do_POST()
+        self.assertEqual(code, 200)
+        self.assertEqual(applied['application_status'], 'applied')
+        self.assertEqual((self.workspace / 'src/app.py').read_text(), 'VALUE = 2\n')
+
+    def test_result_application_rolls_back_a_partial_filesystem_failure(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        (Path(execution['workdir']) / 'src/app.py').write_text('VALUE = 2\n')
+        self.client.mode = 'completed'
+        reconcile_execution(
+            self.store, self.project['id'], execution['id'], self.client)
+        import execution_workspace
+        replace = execution_workspace.os.replace
+        calls = 0
+
+        def fail_second(source, target):
+            nonlocal calls
+            calls += 1
+            if calls == 2:
+                raise OSError('simulated write failure')
+            return replace(source, target)
+
+        with patch.object(execution_workspace.os, 'replace', side_effect=fail_second):
+            with self.assertRaisesRegex(OSError, 'simulated write failure'):
+                apply_execution_result(
+                    self.store, self.project['id'], execution['id'])
+        self.assertEqual((self.workspace / 'src/app.py').read_text(), 'VALUE = 1\n')
+        self.assertEqual(
+            self.store.get_execution(execution['id'])['application_status'], 'failed')
+
+    def test_applied_result_recovers_an_interrupted_baseline_adoption(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        (Path(execution['workdir']) / 'src/app.py').write_text('VALUE = 2\n')
+        self.client.mode = 'completed'
+        reconcile_execution(
+            self.store, self.project['id'], execution['id'], self.client)
+        with patch('execution_service.capture_project_baseline',
+                   side_effect=ProjectStoreError('simulated baseline interruption')):
+            applied = apply_execution_result(
+                self.store, self.project['id'], execution['id'])
+        self.assertEqual(applied['application_status'], 'applied')
+        self.assertIsNone(applied['application_state']['accepted_baseline_id'])
+        self.assertIn('baseline_adoption_error', applied['application_state'])
+        self.assertEqual(
+            latest_project_baseline(self.store, self.project['id'])['id'],
+            self.baseline['id'])
+
+        recovered = apply_execution_result(
+            self.store, self.project['id'], execution['id'])
+        self.assertNotEqual(
+            recovered['application_state']['accepted_baseline_id'], self.baseline['id'])
+        self.assertEqual(
+            latest_project_baseline(self.store, self.project['id'])['id'],
+            recovered['application_state']['accepted_baseline_id'])
 
     def test_workspace_change_blocks_execution_before_engine_session(self):
         (self.workspace / 'src/app.py').write_text('VALUE = 9\n')
@@ -1513,6 +1636,29 @@ class ExecutionServiceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'inside'):
             self.store.create_task(
                 self.project['id'], 'Escape', 'Invalid', write_paths=['../other'])
+
+    def test_isolated_copy_rejects_symlinks_outside_the_project(self):
+        source = self.root / 'linked-workspace'
+        source.mkdir()
+        secret = self.root / 'outside.txt'
+        secret.write_text('outside\n')
+        (source / 'outside-link').symlink_to(secret)
+        manifest = snapshot_workspace(source)
+        with self.assertRaisesRegex(ProjectStoreError, 'symlink'):
+            prepare_execution_workspace(
+                self.root / 'isolated-state', self.project['id'], source, manifest)
+
+    def test_execution_rejects_a_project_database_inside_the_source(self):
+        store = ProjectStore(self.workspace / 'atlas-project-state.sqlite')
+        project = store.create_project(
+            'Nested state', 'Reject self-changing state', self.workspace, 'existing')
+        iteration = store.create_iteration(
+            project['id'], 'Iteration', 'Keep state outside', [], [])
+        task = store.create_task(
+            project['id'], 'Change', 'Change one file', iteration_id=iteration['id'],
+            write_paths=['src'])
+        with self.assertRaisesRegex(ProjectStoreError, 'state database is inside'):
+            start_execution(store, project['id'], task['id'], {}, self.client)
 
 
 class SamplePackageTests(unittest.TestCase):

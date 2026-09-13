@@ -55,7 +55,7 @@ def export_project(store, project_id: str) -> dict:
             path.write_text(content, encoding="utf-8")
             hashes[relative] = hashlib.sha256(content.encode("utf-8")).hexdigest()
         manifest = {
-            "schema": 3,
+            "schema": 4,
             "exported_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "project_id": project_id,
             "project_updated_at": project["updated_at"],
@@ -76,6 +76,9 @@ def export_project(store, project_id: str) -> dict:
                 (item["id"] for item in iterations if item["status"] == "active"), None),
             "unaccepted_task_ids": [
                 item["id"] for item in tasks if item["acceptance_status"] == "pending"],
+            "unapplied_execution_ids": [
+                item["id"] for item in executions
+                if item["application_status"] in {"pending", "conflict", "failed"}],
             "files": hashes,
         }
         (temp / "manifest.json").write_text(
@@ -208,6 +211,8 @@ def _iterations_markdown(iterations, tasks, executions):
                     "filesystem") or {}
                 lines.extend([
                     f"- Execution `{execution['id']}`: `{execution['status']}` via `{execution['engine']}`",
+                    f"  - Result application: `{execution['application_status']}`",
+                    f"  - Isolated work copy: `{execution['workdir']}`",
                     f"  - Planned verification passed: `{verification.get('all_planned_passed', False)}`",
                     f"  - File scope compliant: `{filesystem.get('scope_compliant', 'unknown')}`",
                 ])

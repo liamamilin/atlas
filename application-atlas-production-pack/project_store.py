@@ -13,13 +13,14 @@ import uuid
 from atlas_runtime import PACK
 
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 PROJECT_MODES = {"new", "existing"}
 TASK_KINDS = {"analysis", "document", "code"}
 TASK_STATES = {"planned", "queued", "running", "waiting_permission",
                "waiting_input", "completed", "failed", "stopped", "unknown"}
 EXECUTION_STATES = TASK_STATES - {"planned"}
 ACCEPTANCE_STATES = {"pending", "passed", "failed", "waived"}
+APPLICATION_STATES = {"not_applicable", "pending", "applied", "conflict", "failed"}
 SCOPE_STATES = {"current", "later", "excluded"}
 READ_STATES = {"unread", "read", "reviewed"}
 ITERATION_STATES = {"planned", "active", "completed", "abandoned"}
@@ -522,9 +523,18 @@ class ProjectStore:
             raise ValueError("acceptance evidence is required")
         now = _now()
         with self._transaction() as con:
-            task = con.execute("SELECT project_id FROM task WHERE id=?", (task_id,)).fetchone()
+            task = con.execute(
+                "SELECT project_id,kind FROM task WHERE id=?", (task_id,)).fetchone()
             if not task:
                 raise ProjectStoreError("task not found")
+            if status == "passed" and task["kind"] in {"code", "document"}:
+                execution = con.execute("""SELECT application_status FROM execution
+                    WHERE task_id=? ORDER BY created_at DESC,id DESC LIMIT 1""",
+                    (task_id,)).fetchone()
+                if execution and execution["application_status"] in {
+                        "pending", "conflict", "failed"}:
+                    raise ProjectStoreError(
+                        "apply the isolated execution result before passing acceptance")
             con.execute("""UPDATE task SET acceptance_status=?,acceptance_evidence_json=?,
                 updated_at=? WHERE id=?""", (status, _json(evidence), now, task_id))
             con.execute("UPDATE project SET updated_at=? WHERE id=?",
@@ -533,8 +543,8 @@ class ProjectStore:
 
     def save_snapshot(self, project_id: str, snapshot: dict, phase: str,
                       task_id: str | None = None) -> dict:
-        if phase not in {"before", "after", "observed"}:
-            raise ValueError("phase must be before, after, or observed")
+        if phase not in {"before", "after", "applied", "observed"}:
+            raise ValueError("phase must be before, after, applied, or observed")
         payload = _json(snapshot)
         snapshot_id, now = _id("snap"), _now()
         with self._transaction() as con:
@@ -574,11 +584,15 @@ class ProjectStore:
     def create_execution(self, task_id: str, engine: str, engine_session_id: str,
                          before_snapshot_id: str | None = None,
                          workdir: str = "", input_state: dict | None = None,
-                         capabilities: dict | None = None) -> dict:
+                         capabilities: dict | None = None,
+                         source_workdir: str = "",
+                         application_status: str = "not_applicable") -> dict:
         execution_id, now = _id("exe"), _now()
         if (input_state is not None and not isinstance(input_state, dict)) or \
                 (capabilities is not None and not isinstance(capabilities, dict)):
             raise ValueError("execution input_state and capabilities must be objects")
+        if application_status not in APPLICATION_STATES:
+            raise ValueError("invalid execution application status")
         with self._transaction() as con:
             task = con.execute("SELECT project_id,execution_status FROM task WHERE id=?",
                                (task_id,)).fetchone()
@@ -603,14 +617,18 @@ class ProjectStore:
             try:
                 con.execute("""INSERT INTO execution
                 (id,task_id,engine,engine_session_id,status,before_snapshot_id,
-                 workdir,input_state_json,capabilities_json,raw_state_json,created_at,updated_at)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
+                 workdir,source_workdir,application_status,input_state_json,
+                 capabilities_json,raw_state_json,created_at,updated_at)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (execution_id, task_id, _required(engine, "engine"),
                  _required(engine_session_id, "engine_session_id"), "queued",
                  before_snapshot_id, _absolute_path(workdir, "workdir") if workdir else "",
+                 _absolute_path(source_workdir, "source_workdir") if source_workdir else "",
+                 application_status,
                  _json(input_state or {}), _json(capabilities or {}), "{}", now, now))
             except sqlite3.IntegrityError as error:
-                if workdir and "execution.workdir" in str(error):
+                if (workdir and "execution.workdir" in str(error)) or \
+                        (source_workdir and "execution.source_workdir" in str(error)):
                     raise ProjectStoreError(
                         "workspace already has an active execution") from None
                 raise
@@ -618,6 +636,44 @@ class ProjectStore:
                         (now, task_id))
             con.execute("UPDATE project SET updated_at=? WHERE id=?",
                         (now, task["project_id"]))
+        return self.get_execution(execution_id)
+
+    def record_execution_application(self, execution_id: str, status: str,
+                                     state: dict,
+                                     applied_snapshot_id: str | None = None) -> dict:
+        if status not in APPLICATION_STATES - {"not_applicable", "pending"}:
+            raise ValueError("application status must be applied, conflict, or failed")
+        if not isinstance(state, dict):
+            raise ValueError("application state must be an object")
+        now = _now()
+        with self._transaction() as con:
+            row = con.execute("""SELECT e.application_status,e.task_id,t.project_id
+                FROM execution e JOIN task t ON t.id=e.task_id WHERE e.id=?""",
+                (execution_id,)).fetchone()
+            if not row:
+                raise ProjectStoreError("execution not found")
+            allowed = {
+                "pending": {"applied", "conflict", "failed"},
+                "conflict": {"applied", "conflict", "failed"},
+                "failed": {"applied", "conflict", "failed"},
+                "applied": {"applied"},
+                "not_applicable": set(),
+            }
+            if status not in allowed[row["application_status"]]:
+                raise ProjectStoreError("invalid execution application transition")
+            if applied_snapshot_id:
+                owned = con.execute("""SELECT 1 FROM workspace_snapshot
+                    WHERE id=? AND project_id=? AND task_id=? AND phase='applied'""",
+                    (applied_snapshot_id, row["project_id"], row["task_id"])).fetchone()
+                if not owned:
+                    raise ProjectStoreError("applied snapshot does not belong to task")
+            con.execute("""UPDATE execution SET application_status=?,
+                application_state_json=?,applied_snapshot_id=COALESCE(?,applied_snapshot_id),
+                applied_at=?,updated_at=? WHERE id=?""",
+                (status, _json(state), applied_snapshot_id,
+                 now if status == "applied" else None, now, execution_id))
+            con.execute("UPDATE project SET updated_at=? WHERE id=?",
+                        (now, row["project_id"]))
         return self.get_execution(execution_id)
 
     def update_execution(self, execution_id: str, projection: dict,
@@ -671,6 +727,7 @@ class ProjectStore:
         result["raw_state"] = json.loads(result.pop("raw_state_json"))
         result["input_state"] = json.loads(result.pop("input_state_json"))
         result["capabilities"] = json.loads(result.pop("capabilities_json"))
+        result["application_state"] = json.loads(result.pop("application_state_json"))
         return result
 
     def list_executions(self, project_id: str, task_id: str | None = None) -> list[dict]:
@@ -720,6 +777,10 @@ class ProjectStore:
                     WHERE task_id=? ORDER BY created_at,id""", (task_id,)).fetchall():
                 item = dict(row)
                 item["raw_state"] = json.loads(item.pop("raw_state_json"))
+                item["input_state"] = json.loads(item.pop("input_state_json"))
+                item["capabilities"] = json.loads(item.pop("capabilities_json"))
+                item["application_state"] = json.loads(
+                    item.pop("application_state_json"))
                 executions.append(item)
             requirements = [self.get_requirement(item) for item in task["requirement_ids"]]
             decisions = []
@@ -735,7 +796,7 @@ class ProjectStore:
     def _initialize(self):
         with self._transaction() as con:
             version = con.execute("PRAGMA user_version").fetchone()[0]
-            if version not in {0, 1, 2, 3, SCHEMA_VERSION}:
+            if version not in {0, 1, 2, 3, 4, SCHEMA_VERSION}:
                 raise ProjectStoreError(f"unsupported project store schema {version}")
             if version == 1:
                 _execute_statements(con, """
@@ -806,7 +867,11 @@ class ProjectStore:
                     engine_session_id TEXT NOT NULL, engine_message_id TEXT,
                     status TEXT NOT NULL, before_snapshot_id TEXT REFERENCES workspace_snapshot(id),
                     after_snapshot_id TEXT REFERENCES workspace_snapshot(id),
-                    workdir TEXT NOT NULL DEFAULT '', input_state_json TEXT NOT NULL DEFAULT '{}',
+                    applied_snapshot_id TEXT REFERENCES workspace_snapshot(id),
+                    workdir TEXT NOT NULL DEFAULT '', source_workdir TEXT NOT NULL DEFAULT '',
+                    application_status TEXT NOT NULL DEFAULT 'not_applicable',
+                    application_state_json TEXT NOT NULL DEFAULT '{}', applied_at TEXT,
+                    input_state_json TEXT NOT NULL DEFAULT '{}',
                     capabilities_json TEXT NOT NULL DEFAULT '{}', raw_state_json TEXT NOT NULL,
                     created_at TEXT NOT NULL, updated_at TEXT NOT NULL, finished_at TEXT);
                 CREATE UNIQUE INDEX IF NOT EXISTS one_active_iteration_per_project
@@ -824,12 +889,20 @@ class ProjectStore:
                 row[1] for row in con.execute("PRAGMA table_info(execution)").fetchall()}
             for name, declaration in (
                     ("workdir", "TEXT NOT NULL DEFAULT ''"),
+                    ("source_workdir", "TEXT NOT NULL DEFAULT ''"),
+                    ("application_status", "TEXT NOT NULL DEFAULT 'not_applicable'"),
+                    ("application_state_json", "TEXT NOT NULL DEFAULT '{}'"),
+                    ("applied_snapshot_id", "TEXT REFERENCES workspace_snapshot(id)"),
+                    ("applied_at", "TEXT"),
                     ("input_state_json", "TEXT NOT NULL DEFAULT '{}'"),
                     ("capabilities_json", "TEXT NOT NULL DEFAULT '{}'")):
                 if name not in execution_columns:
                     con.execute(f"ALTER TABLE execution ADD COLUMN {name} {declaration}")
             con.execute("""CREATE UNIQUE INDEX IF NOT EXISTS one_active_execution_per_workdir
                 ON execution(workdir) WHERE workdir != '' AND status IN
+                ('queued','running','waiting_permission','waiting_input')""")
+            con.execute("""CREATE UNIQUE INDEX IF NOT EXISTS one_active_execution_per_source
+                ON execution(source_workdir) WHERE source_workdir != '' AND status IN
                 ('queued','running','waiting_permission','waiting_input')""")
             version_columns = {
                 row[1] for row in con.execute("PRAGMA table_info(document_version)").fetchall()}
