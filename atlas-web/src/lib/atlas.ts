@@ -551,6 +551,7 @@ export interface GeneratedDocument {
   content: string;
   basis: { kind: NonNullable<DocumentBasis["kind"]>; id: string }[];
   depends_on: ProjectDocumentKind[];
+  diff?: string;
 }
 
 export interface AppliedGeneratedDocument {
@@ -570,8 +571,18 @@ export interface ProjectGenerationResult {
 export interface ProjectGenerationRun {
   id: string;
   project_id: string;
-  mode: "analysis" | "documents" | "improvement";
+  mode: "analysis" | "documents" | "improvement" | "revision";
   improvement_goal?: string;
+  revision?: {
+    document_id: string;
+    version_id: string;
+    current_version: number;
+    kind: ProjectDocumentKind;
+    title: string;
+    content_sha256: string;
+    section_heading: string;
+    instruction: string;
+  } | null;
   document_kinds: ProjectDocumentKind[];
   document_dependencies?: Partial<Record<ProjectDocumentKind, ProjectDocumentKind[]>>;
   engine: "opencode";
@@ -852,7 +863,15 @@ export async function getProjectGeneration(projectId: string, runId: string) {
 
 export async function startProjectGeneration(
   projectId: string,
-  input: { mode: "analysis" | "documents" | "improvement"; document_kinds?: ProjectDocumentKind[]; improvement_goal?: string; model?: string },
+  input: {
+    mode: "analysis" | "documents" | "improvement" | "revision";
+    document_kinds?: ProjectDocumentKind[];
+    improvement_goal?: string;
+    document_id?: string;
+    section_heading?: string;
+    revision_instruction?: string;
+    model?: string;
+  },
 ) {
   return requestJson<ProjectGenerationRun>(
     `/api/projects/${encodeURIComponent(projectId)}/generation-runs`, {

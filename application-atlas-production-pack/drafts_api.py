@@ -37,7 +37,8 @@ Endpoints:
   POST   /api/projects/<id>/export       create self-contained Markdown bundle
   GET    /api/projects/<id>/generation-runs
   POST   /api/projects/<id>/generation-runs
-                                        {mode,document_kinds?,improvement_goal?,model?}
+                                        {mode,document_kinds?,improvement_goal?,model?,
+                                         document_id?,section_heading?,revision_instruction?}
   GET    /api/projects/<id>/generation-runs/<generation-id>
   POST   /api/projects/<id>/generation-runs/<generation-id>/apply
   GET    /api/projects/<id>/workspace-baselines
@@ -125,7 +126,10 @@ def get_project_store():
 def start_project_generation(project_id, body, store=None):
     if not isinstance(body, dict):
         raise ValueError("request body must be an object")
-    allowed = {"mode", "document_kinds", "model", "improvement_goal"}
+    allowed = {
+        "mode", "document_kinds", "model", "improvement_goal",
+        "document_id", "section_heading", "revision_instruction",
+    }
     unknown = set(body) - allowed
     if unknown:
         raise ValueError(f"unknown generation fields: {', '.join(sorted(unknown))}")
@@ -133,7 +137,8 @@ def start_project_generation(project_id, body, store=None):
     run = prepare_generation(
         store, project_id, body.get("mode"), body.get("document_kinds"),
         body.get("model", os.environ.get("ATLAS_PROJECT_MODEL", "")),
-        body.get("improvement_goal", ""))
+        body.get("improvement_goal", ""), body.get("document_id", ""),
+        body.get("section_heading", ""), body.get("revision_instruction", ""))
     thread = threading.Thread(
         target=_run_project_generation, args=(store, project_id, run["id"]), daemon=True)
     PROJECT_GENERATION_THREADS[run["id"]] = thread

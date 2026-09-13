@@ -982,6 +982,102 @@ class ProjectStoreTests(unittest.TestCase):
             {item['id'] for item in acceptance['created']['basis']
              if item['kind'] == 'document_version'})
 
+    def test_section_revision_preserves_outside_content_and_checks_version(self):
+        original = (
+            '# Plan\n\nHuman introduction.\n\n## Scope\n\nKeep this manual sentence.\n\n'
+            '### Details\n\nOld detail.\n\n## Constraints\n\nHuman constraint.\n')
+        document = self.store.create_document(
+            self.project['id'], 'development-plan', 'Delivery plan', original,
+            [{'source': 'user-import', 'fingerprint': 'sha256:manual'}],
+            author='human', change_summary='Manual plan')
+        run = prepare_generation(
+            self.store, self.project['id'], 'revision', document_id=document['id'],
+            section_heading='## Scope',
+            revision_instruction='Clarify the detail while retaining the manual sentence.')
+        directory = (self.store.path.parent / 'generation-runs' /
+                     self.project['id'] / run['id'])
+        request = json.loads((directory / 'input.json').read_text())
+        self.assertEqual(request['revision']['version_id'], document['version_id'])
+        self.assertIn('## Scope', (directory / 'input.md').read_text())
+
+        revised = original.replace('Old detail.', 'New detail with an observable outcome.')
+
+        def revision_runner(_directory, _run):
+            return ({
+                'input_fingerprint': request['input_fingerprint'],
+                'questions': [], 'requirements': [], 'conflicts': [], 'suggestions': [],
+                'documents': [{
+                    'document_id': document['id'], 'kind': 'development-plan',
+                    'title': 'Delivery plan', 'content': revised, 'basis': [],
+                }],
+            }, {})
+
+        completed = execute_generation(
+            self.store, self.project['id'], run['id'], runner=revision_runner)
+        candidate = completed['result']['documents'][0]
+        self.assertIn('-Old detail.', candidate['diff'])
+        self.assertIn('+New detail with an observable outcome.', candidate['diff'])
+        saved = apply_generation_item(
+            self.store, self.project['id'], run['id'], 'document', 0)['created']
+        self.assertEqual(saved['content'], revised)
+        self.assertEqual(saved['author'], 'ai')
+        self.assertEqual(saved['basis'], document['basis'])
+        self.assertIn('## Scope', saved['change_summary'])
+
+        outside = prepare_generation(
+            self.store, self.project['id'], 'revision', document_id=document['id'],
+            section_heading='## Constraints', revision_instruction='Clarify the constraint.')
+        outside_directory = (self.store.path.parent / 'generation-runs' /
+                             self.project['id'] / outside['id'])
+        outside_request = json.loads((outside_directory / 'input.json').read_text())
+
+        def outside_runner(_directory, _run):
+            return ({
+                'input_fingerprint': outside_request['input_fingerprint'],
+                'questions': [], 'requirements': [], 'conflicts': [], 'suggestions': [],
+                'documents': [{
+                    'document_id': document['id'], 'kind': 'development-plan',
+                    'title': 'Delivery plan',
+                    'content': revised.replace('Human introduction.', 'Changed outside.')
+                    .replace('Human constraint.', 'Clarified constraint.'),
+                    'basis': [],
+                }],
+            }, {})
+
+        with self.assertRaisesRegex(ValueError, 'outside the selected section'):
+            execute_generation(
+                self.store, self.project['id'], outside['id'], runner=outside_runner)
+
+        stale = prepare_generation(
+            self.store, self.project['id'], 'revision', document_id=document['id'],
+            section_heading='## Constraints', revision_instruction='Clarify the constraint.')
+        stale_directory = (self.store.path.parent / 'generation-runs' /
+                           self.project['id'] / stale['id'])
+        stale_request = json.loads((stale_directory / 'input.json').read_text())
+        stale_source = self.store.get_document(document['id'])
+
+        def stale_runner(_directory, _run):
+            return ({
+                'input_fingerprint': stale_request['input_fingerprint'],
+                'questions': [], 'requirements': [], 'conflicts': [], 'suggestions': [],
+                'documents': [{
+                    'document_id': document['id'], 'kind': 'development-plan',
+                    'title': 'Delivery plan',
+                    'content': stale_source['content'].replace(
+                        'Human constraint.', 'Clarified constraint.'),
+                    'basis': [],
+                }],
+            }, {})
+
+        execute_generation(self.store, self.project['id'], stale['id'], runner=stale_runner)
+        self.store.add_document_version(
+            document['id'], stale_source['content'] + '\nExternal edit.\n', stale_source['basis'],
+            expected_current_version=stale_source['current_version'], author='human',
+            change_summary='Edited while revision ran')
+        with self.assertRaisesRegex(ProjectStoreError, 'version conflict'):
+            apply_generation_item(
+                self.store, self.project['id'], stale['id'], 'document', 0)
+
     def test_task_inputs_must_belong_to_same_project(self):
         other = self.store.create_project('Other', 'Other goal', self.root / 'other', 'existing')
         document = self.store.create_document(other['id'], 'plan', 'Plan', 'content')

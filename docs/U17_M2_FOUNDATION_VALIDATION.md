@@ -1,7 +1,7 @@
 # U17 M2 关联文档基础闭环验证
 
 日期：2026-09-13
-状态：基础闭环完成；自动资料分析与文档生成随后已完成，见 [生成验证](U17_M2_GENERATION_VALIDATION.md)；自然语言修改未完成。
+状态：基础闭环完成；自动资料分析与文档集合见 [生成验证](U17_M2_GENERATION_VALIDATION.md)，章节级自然语言修改见 [章节修改验证](U17_M2_REVISION_VALIDATION.md)。
 依据：[产品设计](U17_DESIGN.md) · [开发规划](U17_DEVELOPMENT_PLAN.md)
 
 ## 1. 本阶段完成的能力

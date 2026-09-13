@@ -25,6 +25,7 @@ import {
   getProjectExecution,
   getProjectDocumentDiff,
   getProjectDocumentVersions,
+  getProjectGeneration,
   getProjectWorkspace,
   invalidateAtlasCache,
   listProjectGenerations,
@@ -818,11 +819,46 @@ function DocumentForm({ projectId, workspace, onSaved }: { projectId: string; wo
 function DocumentCard({ projectId, document, onSaved }: { projectId: string; document: ProjectDocument; onSaved: () => void }) {
   const { lang } = useLang(); const [content, setContent] = useState(document.content); const [summary, setSummary] = useState("");
   const [saving, setSaving] = useState(false); const [error, setError] = useState(""); const [diff, setDiff] = useState<string | null>(null);
+  const headings = markdownHeadings(document.content);
+  const [sectionHeading, setSectionHeading] = useState(headings[0] || "");
+  const [revisionInstruction, setRevisionInstruction] = useState("");
+  const [revisionRun, setRevisionRun] = useState<ProjectGenerationRun | null>(null);
+  const [revisionBusy, setRevisionBusy] = useState("");
+  const [revisionError, setRevisionError] = useState("");
   const versions = useAsync(() => getProjectDocumentVersions(projectId, document.id), [projectId, document.id, document.current_version]);
+  const revisionActive = revisionRun?.status === "queued" || revisionRun?.status === "running";
+  useEffect(() => {
+    if (!revisionActive || !revisionRun) return;
+    let alive = true;
+    const timer = window.setInterval(() => getProjectGeneration(projectId, revisionRun.id).then(
+      (next) => { if (alive) setRevisionRun(next); },
+      (cause) => { if (alive) setRevisionError(String(cause)); },
+    ), 1200);
+    return () => { alive = false; window.clearInterval(timer); };
+  }, [projectId, revisionActive, revisionRun?.id]);
   const save = async () => { setSaving(true); setError(""); try {
     await addProjectDocumentVersion(projectId, document.id, { content, basis: document.basis, expected_current_version: document.current_version, author: "human", change_summary: summary }); onSaved();
   } catch (cause) { setError(String(cause)); } finally { setSaving(false); } };
   const compare = async () => { setError(""); try { setDiff((await getProjectDocumentDiff(projectId, document.id)).diff || (lang === "zh" ? "两个版本正文相同。" : "The two versions have identical content.")); } catch (cause) { setError(String(cause)); } };
+  const startRevision = async () => {
+    setRevisionBusy("start"); setRevisionError("");
+    try {
+      setRevisionRun(await startProjectGeneration(projectId, {
+        mode: "revision", document_id: document.id, section_heading: sectionHeading,
+        revision_instruction: revisionInstruction.trim(),
+      }));
+    } catch (cause) { setRevisionError(String(cause)); } finally { setRevisionBusy(""); }
+  };
+  const applyRevision = async () => {
+    if (!revisionRun) return;
+    setRevisionBusy("apply"); setRevisionError("");
+    try {
+      const result = await applyProjectGenerationItem(
+        projectId, revisionRun.id, { item_kind: "document", index: 0 });
+      setRevisionRun(result.run); onSaved();
+    } catch (cause) { setRevisionError(String(cause)); } finally { setRevisionBusy(""); }
+  };
+  const revisionCandidate = revisionRun?.result?.documents[0];
   return <article className={`rounded-xl bg-surface p-5 shadow-card ${document.review.status === "needs_review" ? "ring-2 ring-warn/25" : ""}`}>
     <div className="flex flex-wrap items-start justify-between gap-3"><div><div className="flex flex-wrap items-center gap-2"><h3 className="font-medium">{document.title}</h3><Badge tone={document.review.status === "current" ? "ok" : "warn"}>{document.review.status === "current" ? (lang === "zh" ? "依据为当前" : "Current") : (lang === "zh" ? "需要复核" : "Needs review")}</Badge></div>
       <p className="mt-1 text-xs text-subtle">{documentKind(document.kind, lang)} · v{document.current_version} · {document.author} · {document.version_id}</p></div></div>
@@ -833,6 +869,13 @@ function DocumentCard({ projectId, document, onSaved }: { projectId: string; doc
         <div><h4 className="text-sm font-medium">{lang === "zh" ? "版本历史" : "Version history"}</h4>{versions.loading ? <p className="mt-2 text-xs text-subtle">…</p> : versions.data?.map((version) => <div key={version.version_id} className="mt-2 rounded-md bg-chip p-3 text-xs"><div>v{version.version} · {version.author} · {version.change_summary || (lang === "zh" ? "无说明" : "No summary")}</div><div className="mt-1 font-mono text-[10px] text-subtle">{version.content_sha256.slice(0, 12)}</div></div>)}
           <Button className="mt-3" size="sm" variant="outline" disabled={document.current_version < 2} onClick={compare}><FileClock className="size-4" />{lang === "zh" ? "比较最近两版" : "Compare latest two"}</Button></div></div>
       {diff ? <pre className="mt-4 max-h-96 overflow-auto whitespace-pre-wrap rounded-md bg-fg p-4 font-mono text-xs text-bg">{diff}</pre> : null}{error ? <p className="mt-3 text-xs text-danger">{error}</p> : null}
+      <div className="mt-5 border-t border-border pt-5"><h4 className="text-sm font-medium">{lang === "zh" ? "用自然语言修改一个章节" : "Revise one section in natural language"}</h4><p className="mt-1 text-[11px] leading-5 text-subtle">{lang === "zh" ? "Atlas 固定当前版本；AI 只能改所选章节正文，章节标题与其它人工内容必须逐字保持。结果先显示差异，确认后才保存。" : "Atlas pins the current version. AI may change only the selected section body; the heading and all other content must remain byte-for-byte identical. Review the diff before saving."}</p>
+        {headings.length ? <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,16rem)_minmax(0,1fr)_auto] lg:items-end"><label className="block text-sm"><span className="text-muted">{lang === "zh" ? "目标章节" : "Target section"}</span><select value={sectionHeading} onChange={(event) => setSectionHeading(event.target.value)} className={inputClass}>{headings.map((heading) => <option key={heading} value={heading}>{heading}</option>)}</select></label><TextArea label={lang === "zh" ? "修改要求" : "Revision instruction"} value={revisionInstruction} onChange={setRevisionInstruction} rows={2} /><Button size="sm" variant="outline" disabled={Boolean(revisionBusy) || revisionActive || !revisionInstruction.trim()} onClick={startRevision}><Sparkles className="size-4" />{lang === "zh" ? "生成修改候选" : "Generate revision"}</Button></div> : <p className="mt-3 text-xs text-warn">{lang === "zh" ? "正文没有 Markdown 标题，请先用完整编辑加入章节结构。" : "This document has no Markdown headings. Add section structure with the full editor first."}</p>}
+        {revisionActive ? <p className="mt-3 text-xs text-muted">{lang === "zh" ? "正在生成章节修改候选…" : "Generating a section revision…"}</p> : null}
+        {revisionRun?.status === "failed" ? <p className="mt-3 rounded-md bg-danger/10 p-3 text-xs text-danger">{revisionRun.error}</p> : null}
+        {revisionCandidate ? <div className="mt-4 rounded-md border border-border p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><Badge tone="ok">{lang === "zh" ? "修改候选" : "Revision candidate"}</Badge><p className="mt-2 text-xs text-muted">{revisionRun?.revision?.section_heading}</p></div><Button size="sm" disabled={Boolean(revisionRun?.applied.documents["0"]) || revisionBusy === "apply"} onClick={applyRevision}>{revisionRun?.applied.documents["0"] ? (lang === "zh" ? "已保存" : "Saved") : (lang === "zh" ? "保存为新版本" : "Save as new version")}</Button></div>{revisionCandidate.diff ? <pre className="mt-3 max-h-80 overflow-auto whitespace-pre-wrap rounded-md bg-fg p-4 font-mono text-xs text-bg">{revisionCandidate.diff}</pre> : null}<details className="mt-3"><summary className="cursor-pointer text-xs text-primary">{lang === "zh" ? "查看候选全文" : "View full candidate"}</summary><div className="mt-3 max-h-80 overflow-auto rounded-md bg-bg-elevated p-3"><Prose md={revisionCandidate.content} /></div></details></div> : null}
+        {revisionError ? <p className="mt-3 text-xs text-danger">{revisionError}</p> : null}
+      </div>
     </details>
   </article>;
 }
@@ -864,6 +907,7 @@ function Picker({ label, options, selected, onChange }: { label: string; options
 
 function basisFromKeys(keys: string[]): DocumentBasis[] { return keys.map((key) => { const [kind, id] = key.split(":", 2); return { kind: kind as NonNullable<DocumentBasis["kind"]>, id }; }); }
 function sameKinds(left: ProjectDocumentKind[], right: ProjectDocumentKind[]) { return left.length === right.length && left.every((item) => right.includes(item)); }
+function markdownHeadings(content: string) { const values = Array.from(content.matchAll(/^(#{1,6})[ \t]+(.+?)[ \t]*$/gm), (match) => match[0].trim()); return values.filter((value, index) => values.indexOf(value) === index && values.lastIndexOf(value) === index); }
 function lines(value: string) { return value.split("\n").map((item) => item.trim()).filter(Boolean); }
 function scopeLabel(scope: ProjectScope | null, lang: "zh" | "en") { if (!scope) return lang === "zh" ? "无" : "None"; const labels = { current: { zh: "本版", en: "Current" }, later: { zh: "以后", en: "Later" }, excluded: { zh: "不做", en: "Excluded" } }; return labels[scope][lang]; }
 function documentKind(kind: ProjectDocumentKind, lang: "zh" | "en") { const item = DOCUMENT_KINDS.find((candidate) => candidate.value === kind); return item ? (lang === "zh" ? item.zh : item.en) : kind; }

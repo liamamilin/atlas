@@ -6,6 +6,7 @@ replaceable runner used to produce a proposal from that input.
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import difflib
 import hashlib
 import json
 import os
@@ -22,7 +23,7 @@ from project_workflow import DOCUMENT_KINDS
 
 
 RUN_STATES = {"queued", "running", "completed", "failed"}
-MODES = {"analysis", "documents", "improvement"}
+MODES = {"analysis", "documents", "improvement", "revision"}
 SCOPES = {"current", "later", "excluded"}
 DOCUMENT_ORDER = (
     "analysis", "current-state", "product-requirements", "interaction",
@@ -63,19 +64,27 @@ IMPROVEMENT_SECTIONS = (
 
 def prepare_generation(store, project_id: str, mode: str,
                        document_kinds: list[str] | None = None,
-                       model: str = "", improvement_goal: str = "") -> dict:
+                       model: str = "", improvement_goal: str = "",
+                       document_id: str = "", section_heading: str = "",
+                       revision_instruction: str = "") -> dict:
     if mode not in MODES:
-        raise ValueError("mode must be analysis, documents, or improvement")
+        raise ValueError("mode must be analysis, documents, improvement, or revision")
     if not isinstance(model, str):
         raise ValueError("model must be text")
     if not isinstance(improvement_goal, str):
         raise ValueError("improvement_goal must be text")
     if mode == "improvement" and not improvement_goal.strip():
         raise ValueError("improvement_goal is required for improvement mode")
-    targets = (["analysis"] if mode == "analysis" else ["current-state"]
-               if mode == "improvement" else _document_kinds(document_kinds))
+    revision = None
+    if mode == "revision":
+        revision = _prepare_revision(
+            store, project_id, document_id, section_heading, revision_instruction)
+        targets = [revision["kind"]]
+    else:
+        targets = (["analysis"] if mode == "analysis" else ["current-state"]
+                   if mode == "improvement" else _document_kinds(document_kinds))
     request = build_generation_input(
-        store, project_id, mode, targets, improvement_goal.strip())
+        store, project_id, mode, targets, improvement_goal.strip(), revision)
     run_id = "gen_" + uuid.uuid4().hex
     directory = _run_root(store, project_id) / run_id
     directory.mkdir(parents=True)
@@ -89,6 +98,7 @@ def prepare_generation(store, project_id: str, mode: str,
         "project_id": project_id,
         "mode": mode,
         "improvement_goal": improvement_goal.strip(),
+        "revision": request.get("revision"),
         "document_kinds": targets,
         "document_dependencies": request["document_dependencies"],
         "engine": "opencode",
@@ -107,16 +117,17 @@ def prepare_generation(store, project_id: str, mode: str,
 
 
 def build_generation_input(store, project_id: str, mode: str,
-                           document_kinds: list[str], improvement_goal: str = "") -> dict:
+                           document_kinds: list[str], improvement_goal: str = "",
+                           revision: dict | None = None) -> dict:
     project = store.get_project(project_id)
     references = store.list_references(project_id)
-    if not references:
+    if not references and mode != "revision":
         raise ValueError("at least one fixed project reference is required")
     requirements = store.list_requirements(project_id)
-    if mode == "documents":
+    if mode in {"documents", "revision"}:
         requirements = [item for item in requirements
                         if item["confirmed_scope"] == "current"]
-        if not requirements:
+        if mode == "documents" and not requirements:
             raise ValueError("document generation requires a confirmed current-scope requirement")
     decisions = store.list_decisions(project_id)
     documents = store.list_documents(project_id)
@@ -141,6 +152,7 @@ def build_generation_input(store, project_id: str, mode: str,
         "document_kinds": document_kinds,
         "document_dependencies": _document_dependencies(document_kinds),
         "improvement_goal": improvement_goal,
+        "revision": revision,
         "workspace_baseline": workspace_baseline,
         "references": [{
             "id": item["id"], "source_kind": item["source_kind"],
@@ -185,6 +197,15 @@ def render_generation_prompt(request: dict) -> str:
             "IMPROVEMENT MODE: analyze the stated improvement goal against both the accepted workspace "
             "baseline and the fixed Atlas references. Return only requirements needed for this goal, "
             "then draft one current-state document using the required sections below.")
+    elif request["mode"] == "revision":
+        revision = request["revision"]
+        mode_rules = (
+            "REVISION MODE: revise only the selected Markdown section of the target document according "
+            "to the user's revision instruction. Return no candidate requirements. Copy the target title, "
+            "document ID, and every byte outside the selected section unchanged. Return the complete "
+            f"document, not a fragment. Target: {revision['document_id']} / {revision['version_id']}; "
+            f"selected heading: {revision['section_heading']!r}; instruction: "
+            f"{revision['instruction']!r}.")
     else:
         mode_rules = (
             "DOCUMENTS MODE: draft only the requested document kinds from confirmed current-scope "
@@ -203,6 +224,15 @@ def render_generation_prompt(request: dict) -> str:
     not runtime proof. Do not claim a test or interaction passed unless Runtime verified says so.
 13. The improvement goal is user intent, not proof of the current implementation. Atlas references
     provide patterns and reasons, not evidence that this project already implements those patterns.
+"""
+    revision_rules = ""
+    if request["mode"] == "revision":
+        revision_rules = """
+12. The revision instruction is user intent. Do not treat it as evidence for unrelated factual claims.
+    Preserve the target document's existing basis and useful human content. The selected heading line and
+    every byte before it and after its section boundary must remain exact; change only that section body.
+13. Return exactly one document with the fixed target `document_id`, kind, and title. Its `basis` may be an
+    empty array because Atlas restores the target version's fixed basis during validation.
 """
     return f"""# Atlas U17 generation task
 
@@ -248,7 +278,8 @@ Rules:
 5. Requirements are allowed only in analysis or improvement mode. Give each a unique local key, at least one fixed
    reference, a concrete reason and observable acceptance conditions. Do not re-propose an existing
    requirement. If a proposal depends on an open question, omit it or recommend `later`, never `current`.
-6. Documents must use only requested kinds and cite non-empty basis IDs present in the fixed input.
+6. Documents must use only requested kinds and cite non-empty basis IDs present in the fixed input, except that
+   revision mode may return an empty basis because Atlas restores the target's fixed basis.
    If the fixed input already contains a document of that kind, `document_id` MUST select one such
    document as the new-version target; use null only when no document of that kind exists. In
    documents mode, product scope comes only from confirmed current-scope requirements. Citation
@@ -269,7 +300,7 @@ Rules:
     Draft them in Atlas dependency order and make downstream content consistent with upstream drafts in this
     result. Atlas records the resolved immutable version links after review. After writing `result.json`, stop
     without running a separate validation command; Atlas validates the file.
-{improvement_rules}
+{improvement_rules}{revision_rules}
 """
 
 
@@ -290,6 +321,15 @@ def render_generation_input(request: dict) -> str:
         lines.append(f"- `{kind}` depends on: {rendered}")
     if request.get("improvement_goal"):
         lines.extend(["", "## Improvement goal", "", request["improvement_goal"]])
+    if request.get("revision"):
+        revision = request["revision"]
+        lines.extend([
+            "", "## Section revision", "",
+            f"- Target document: `{revision['document_id']}`",
+            f"- Target version: `{revision['version_id']}` (v{revision['current_version']})",
+            f"- Selected heading: `{revision['section_heading']}`", "",
+            "User instruction:", "", revision["instruction"],
+        ])
     lines.extend([
         "", "## Citation ID rules", "",
         "- `ref_…` uses kind `reference`.",
@@ -496,10 +536,14 @@ def apply_generation_item(store, project_id: str, run_id: str,
             if item["document_id"]:
                 source = next(value for value in request["documents"]
                               if value["id"] == item["document_id"])
+                change_summary = (
+                    f"AI section revision {request['revision']['section_heading']}: "
+                    f"{request['revision']['instruction']}"
+                    if run["mode"] == "revision" else f"Generated by {run_id}")
                 created = store.add_document_version(
                     item["document_id"], item["content"], basis,
                     expected_current_version=source["current_version"], author="ai",
-                    change_summary=f"Generated by {run_id}")
+                    change_summary=change_summary)
             else:
                 created = store.create_document(
                     project_id, item["kind"], item["title"], item["content"], basis,
@@ -539,7 +583,7 @@ def validate_generation_result(request: dict, result: dict) -> dict:
         if not set(affects).issubset(targets):
             raise ValueError("question affects an unrequested document kind")
     generated_requirements = _objects(result["requirements"], "requirements")
-    if request["mode"] == "documents" and generated_requirements:
+    if request["mode"] in {"documents", "revision"} and generated_requirements:
         raise ValueError("requirements are only allowed in analysis or improvement mode")
     seen_keys = set()
     for item in generated_requirements:
@@ -586,8 +630,20 @@ def validate_generation_result(request: dict, result: dict) -> dict:
         content = _nonempty(item["content"], "document content")
         if len(content) > 200_000:
             raise ValueError("generated document is too large")
-        _basis(item["basis"], references, requirements, decisions, versions, baselines)
-        if document_id:
+        if request["mode"] == "revision":
+            _objects(item["basis"], "document basis")
+            revision = request["revision"]
+            if document_id != revision["document_id"]:
+                raise ValueError("revision must target the fixed document")
+            source = existing_documents[document_id]
+            if item["title"] != source["title"]:
+                raise ValueError("revision must preserve the document title")
+            item["basis"] = [dict(value) for value in source["basis"]]
+            item["diff"] = _validate_revision_content(
+                source["content"], content, revision["section_heading"])
+        else:
+            _basis(item["basis"], references, requirements, decisions, versions, baselines)
+        if document_id and request["mode"] != "revision":
             own_version = existing_documents[document_id]["version_id"]
             item["basis"] = [
                 value for value in item["basis"]
@@ -734,6 +790,73 @@ def _validate_improvement_document(content: str, baseline: dict | None):
     paths = [item["path"] for item in (baseline or {}).get("evidence_files", [])]
     if paths and not any(f"`{path}`" in content for path in paths):
         raise ValueError("improvement document must cite an observed workspace path")
+
+
+def _prepare_revision(store, project_id, document_id, section_heading, instruction):
+    if not isinstance(document_id, str) or not document_id.strip():
+        raise ValueError("document_id is required for revision mode")
+    if not isinstance(section_heading, str) or not section_heading.strip():
+        raise ValueError("section_heading is required for revision mode")
+    if not isinstance(instruction, str) or not instruction.strip():
+        raise ValueError("revision_instruction is required for revision mode")
+    if len(section_heading) > 500 or len(instruction) > 4_000:
+        raise ValueError("revision section or instruction is too large")
+    document = store.get_document(document_id)
+    if document["project_id"] != project_id:
+        raise ProjectStoreError("document not found")
+    heading = section_heading.strip()
+    matches = [item for item in _markdown_sections(document["content"])
+               if item["heading"] == heading]
+    if len(matches) != 1:
+        raise ValueError("section_heading must identify exactly one Markdown heading")
+    return {
+        "document_id": document["id"],
+        "version_id": document["version_id"],
+        "current_version": document["current_version"],
+        "kind": document["kind"],
+        "title": document["title"],
+        "content_sha256": document["content_sha256"],
+        "section_heading": heading,
+        "instruction": instruction.strip(),
+    }
+
+
+def _markdown_sections(content):
+    matches = list(re.finditer(r"(?m)^(#{1,6})[ \t]+(.+?)[ \t]*$", content))
+    sections = []
+    for index, match in enumerate(matches):
+        level = len(match.group(1))
+        end = len(content)
+        for following in matches[index + 1:]:
+            if len(following.group(1)) <= level:
+                end = following.start()
+                break
+        body_start = match.end()
+        if body_start < len(content) and content[body_start] == "\n":
+            body_start += 1
+        sections.append({
+            "heading": match.group(0).rstrip(), "level": level,
+            "start": match.start(), "body_start": body_start, "end": end,
+        })
+    return sections
+
+
+def _validate_revision_content(before, after, section_heading):
+    matches = [item for item in _markdown_sections(before)
+               if item["heading"] == section_heading]
+    if len(matches) != 1:
+        raise ValueError("fixed revision section is no longer unique")
+    section = matches[0]
+    prefix = before[:section["body_start"]]
+    suffix = before[section["end"]:]
+    if not after.startswith(prefix) or (suffix and not after.endswith(suffix)):
+        raise ValueError("revision changed content outside the selected section")
+    if after == before:
+        raise ValueError("revision did not change the selected section")
+    diff = difflib.unified_diff(
+        before.splitlines(), after.splitlines(), fromfile="current", tofile="candidate",
+        n=3, lineterm="")
+    return "\n".join(diff) + "\n"
 
 
 def _document_kinds(value):
