@@ -674,16 +674,16 @@ def _execution_evidence(messages: list[dict], task_message_id: str | None,
                 })
     successful = {item["command"] for item in commands
                   if item["status"] == "completed" and item["exit"] == 0}
-    failed = [item for item in commands if item["status"] in {"completed", "error"}
-              and item["exit"] != 0]
     missing = [command for command in planned_commands if command not in successful]
+    successful_planned = [command for command in planned_commands
+                          if command in successful]
     return {
         "tool_calls": {"commands": commands, "file_edits": file_edits},
         "verification": {
             "planned_commands": planned_commands,
-            "successful_commands": sorted(successful),
+            "successful_commands": successful_planned,
             "missing_or_failed_commands": missing,
-            "all_planned_passed": bool(planned_commands) and not missing and not failed,
+            "all_planned_passed": bool(planned_commands) and not missing,
         },
         "usage": {"cost": cost, "tokens": tokens},
     }

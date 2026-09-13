@@ -220,7 +220,7 @@ function LifecycleOverview({ workspace, hasBaseline }: {
   const next = steps.find((item) => !item.done);
   return <section className="mt-5 rounded-xl border border-border bg-surface p-4 shadow-card">
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <div><p className="text-sm font-medium">{lang === "zh" ? "项目路径" : "Project path"}</p><p className="mt-1 text-xs text-subtle">{next ? (lang === "zh" ? `建议下一步：${next.zh}` : `Recommended next: ${next.en}`) : (lang === "zh" ? "当前流程已经走到产品验收。" : "The current path has reached product acceptance.")}</p></div>
+      <div><p className="text-sm font-medium">{lang === "zh" ? "项目路径" : "Project path"}</p><p className="mt-1 text-xs text-subtle">{next ? (lang === "zh" ? `建议下一步：${next.zh}` : `Recommended next: ${next.en}`) : (lang === "zh" ? "当前迭代已完成。" : "The current iteration is complete.")}</p></div>
       <div className="flex flex-wrap gap-2">{steps.map((item, index) => <div key={item.en} className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] ${item.done ? "bg-primary/10 text-primary" : item === next ? "bg-warn/10 text-warn" : "bg-bg-elevated text-subtle"}`}>
         {item.done ? <CheckCircle2 className="size-3.5" /> : <span>{index + 1}</span>}<span>{lang === "zh" ? item.zh : item.en}</span>
       </div>)}</div>
@@ -281,6 +281,14 @@ function IterationForm({ projectId, workspace, hasBaseline, onSaved }: {
   const [title, setTitle] = useState(""); const [objective, setObjective] = useState("");
   const [documents, setDocuments] = useState<string[]>(currentDocuments.map((item) => item.version_id));
   const [requirements, setRequirements] = useState<string[]>(current.map((item) => item.id));
+  const documentOptionsKey = currentDocuments.map((item) => item.version_id).join("\0");
+  const requirementOptionsKey = current.map((item) => item.id).join("\0");
+  useEffect(() => {
+    setDocuments(currentDocuments.map((item) => item.version_id));
+  }, [documentOptionsKey]);
+  useEffect(() => {
+    setRequirements(current.map((item) => item.id));
+  }, [requirementOptionsKey]);
   const [saving, setSaving] = useState(false); const [error, setError] = useState("");
   const missing: string[] = [];
   if (hasBaseline === false) missing.push(lang === "zh" ? "已接受的工作区基线" : "an accepted workspace baseline");
@@ -292,7 +300,7 @@ function IterationForm({ projectId, workspace, hasBaseline, onSaved }: {
   return <article className="rounded-xl bg-surface p-5 shadow-card"><form onSubmit={submit}>
     <div className="grid gap-5 lg:grid-cols-2"><div className="space-y-4"><h3 className="font-medium">{lang === "zh" ? "建立活动迭代" : "Create active iteration"}</h3><Field label={lang === "zh" ? "迭代标题" : "Iteration title"} value={title} onChange={setTitle} required /><TextArea label={lang === "zh" ? "本轮目标" : "Iteration objective"} value={objective} onChange={setObjective} required /></div><div className="grid gap-4 sm:grid-cols-2"><Picker label={lang === "zh" ? "固定已复核文档版本" : "Pin reviewed document versions"} options={currentDocuments.map((item) => ({ key: item.version_id, label: `${item.title} · v${item.current_version}` }))} selected={documents} onChange={setDocuments} /><Picker label={lang === "zh" ? "固定已确认本版需求" : "Pin confirmed current requirements"} options={current.map((item) => ({ key: item.id, label: item.content }))} selected={requirements} onChange={setRequirements} /></div></div>
     {missing.length ? <p className="mt-4 rounded-md bg-warn/10 p-3 text-xs leading-5 text-warn">{lang === "zh" ? `开始迭代前还需要：${missing.join("、")}。` : `Before starting an iteration, add ${missing.join(", ")}.`}</p> : null}
-    {error ? <p className="mt-3 text-xs text-danger">{error}</p> : null}<Button className="mt-5" disabled={saving || hasBaseline !== true || !currentDocuments.length || !current.length || !title.trim() || !objective.trim()}><Plus className="size-4" />{lang === "zh" ? "创建并启动迭代" : "Create and activate iteration"}</Button>
+    {error ? <p className="mt-3 text-xs text-danger">{error}</p> : null}<Button className="mt-5" disabled={saving || hasBaseline !== true || !documents.length || !requirements.length || !title.trim() || !objective.trim()}><Plus className="size-4" />{lang === "zh" ? "创建并启动迭代" : "Create and activate iteration"}</Button>
   </form></article>;
 }
 

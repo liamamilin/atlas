@@ -355,7 +355,13 @@ def _git_state(root: Path) -> dict:
     top = _git(root, ["rev-parse", "--show-toplevel"])
     head = _git(root, ["rev-parse", "HEAD"])
     branch = _git(root, ["branch", "--show-current"])
-    status = _git(root, ["status", "--porcelain=v1", "--untracked-files=all"])
+    # A project workspace may be a subdirectory of a larger repository (new
+    # Atlas projects use this layout by default).  Only workspace-local Git
+    # changes belong to its baseline; sibling runtime files or edits elsewhere
+    # in the parent repository must not create a false execution conflict.
+    status = _git(root, [
+        "status", "--porcelain=v1", "--untracked-files=all", "--", ".",
+    ])
     raw = status["stdout"]
     truncated = len(raw.encode("utf-8")) > MAX_GIT_OUTPUT
     if truncated:

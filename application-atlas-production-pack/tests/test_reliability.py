@@ -28,7 +28,7 @@ from opencode_client import OpenCodeClient, OpenCodeError, iter_sse
 from execution_state import project_execution
 from execution_workspace import prepare_execution_workspace
 from execution_service import (
-    _completion_report,
+    _completion_report, _execution_evidence,
     apply_execution_result,
     continue_execution,
     create_iteration as create_execution_iteration,
@@ -391,6 +391,36 @@ class ProjectStoreTests(unittest.TestCase):
         with self.assertRaisesRegex(ProjectStoreError, 'baseline changed'):
             capture_project_baseline(
                 self.store, self.project['id'], ['src'], baseline['id'])
+
+    def test_nested_workspace_git_state_ignores_parent_repository_siblings(self):
+        workspace = Path(self.project['workspace'])
+        workspace.mkdir(parents=True, exist_ok=True)
+        (workspace / 'tracked.txt').write_text('stable\n')
+        subprocess.run(['git', 'init'], cwd=self.root, check=True,
+                       capture_output=True)
+        subprocess.run(['git', 'config', 'user.name', 'Atlas Test'],
+                       cwd=self.root, check=True)
+        subprocess.run(['git', 'config', 'user.email', 'atlas@example.test'],
+                       cwd=self.root, check=True)
+        subprocess.run(['git', 'add', 'workspace/tracked.txt'], cwd=self.root,
+                       check=True)
+        subprocess.run(['git', 'commit', '-m', 'baseline'], cwd=self.root,
+                       check=True, capture_output=True)
+
+        baseline = capture_project_baseline(self.store, self.project['id'])
+        (self.root / 'unrelated-runtime.txt').write_text('outside project\n')
+        checked = check_project_changes(self.store, self.project['id'])
+
+        self.assertEqual(checked['current']['content_fingerprint'],
+                         baseline['content_fingerprint'])
+        self.assertFalse(checked['changes']['git_state_changed'])
+        self.assertEqual(checked['current']['git']['changes'], [])
+
+        (workspace / 'local.txt').write_text('inside project\n')
+        local_change = check_project_changes(self.store, self.project['id'])
+        self.assertNotEqual(local_change['current']['content_fingerprint'],
+                            baseline['content_fingerprint'])
+        self.assertTrue(local_change['changes']['git_worktree_state_changed'])
 
     def test_outside_scope_change_is_visible_without_forcing_focus_review(self):
         workspace = self.root / 'workspace'
@@ -1885,6 +1915,33 @@ class ExecutionServiceTests(unittest.TestCase):
             self.permission_replies.append((request_id, reply, message))
             self.mode = 'running'
             return True
+
+    def test_fixed_verification_excludes_unplanned_commands(self):
+        messages = [{
+            'info': {'role': 'assistant', 'parentID': 'msg_task'},
+            'parts': [
+                {'type': 'tool', 'tool': 'bash', 'state': {
+                    'input': {'command': 'python3 -m unittest -v'},
+                    'status': 'completed', 'metadata': {'exit': 0}}},
+                {'type': 'tool', 'tool': 'bash', 'state': {
+                    'input': {'command': 'ls -la'},
+                    'status': 'completed', 'metadata': {'exit': 0}}},
+                {'type': 'tool', 'tool': 'bash', 'state': {
+                    'input': {'command': 'optional-probe'},
+                    'status': 'completed', 'metadata': {'exit': 1}}},
+            ],
+        }]
+
+        evidence = _execution_evidence(
+            messages, 'msg_task', ['python3 -m unittest -v'])
+
+        self.assertEqual(evidence['verification']['successful_commands'],
+                         ['python3 -m unittest -v'])
+        self.assertEqual(evidence['verification']['missing_or_failed_commands'], [])
+        self.assertTrue(evidence['verification']['all_planned_passed'])
+        self.assertEqual(
+            [item['planned'] for item in evidence['tool_calls']['commands']],
+            [True, False, False])
 
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
