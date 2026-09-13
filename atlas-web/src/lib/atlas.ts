@@ -263,6 +263,98 @@ export interface ProjectWorkspace {
   documents: ProjectDocument[];
 }
 
+export interface WorkspaceGitState {
+  repository: boolean;
+  root: string | null;
+  head: string | null;
+  branch: string | null;
+  dirty: boolean | null;
+  changes: string[];
+  truncated: boolean;
+  error: string;
+}
+
+export interface WorkspaceInventory {
+  file_count: number;
+  symlink_count: number;
+  total_bytes: number;
+  document_paths: string[];
+  document_paths_truncated: boolean;
+  manifest_paths: string[];
+  test_paths: string[];
+  test_paths_truncated: boolean;
+  suffix_counts: Record<string, number>;
+  code_suffix_counts: Record<string, number>;
+}
+
+export interface WorkspaceCoverage {
+  ignore_names: string[];
+  focus_paths: string[];
+  hashed_paths: number;
+  read_paths: string[];
+  partial_paths: string[];
+  skipped_count: number;
+  skipped: { path: string; reason: string }[];
+  skipped_truncated: boolean;
+  read_chars: number;
+  limits: { files: number; total_chars: number; per_file_chars: number };
+}
+
+export interface WorkspaceObservation {
+  category: "document_claim" | "code_clue" | "runtime_verified" | "unknown";
+  summary: string;
+  path?: string;
+  evidence?: { path: string; sha256: string; complete: boolean };
+}
+
+export interface WorkspaceBaselineSummary {
+  id: string;
+  project_id: string;
+  phase: "observed";
+  workspace_root: string;
+  fingerprint: string;
+  created_at: string;
+  root: string;
+  git: WorkspaceGitState;
+  inventory: WorkspaceInventory;
+  coverage: WorkspaceCoverage;
+  observations: {
+    document_claims: WorkspaceObservation[];
+    code_clues: WorkspaceObservation[];
+    runtime_verified: WorkspaceObservation[];
+    unknown: WorkspaceObservation[];
+  };
+  report_markdown: string;
+  snapshot_errors: { path: string; error: string }[];
+  content_fingerprint: string;
+  changes_from_previous?: WorkspaceChangeSet | null;
+}
+
+export interface WorkspaceChangeSet {
+  root: string;
+  added: string[];
+  removed: string[];
+  modified: string[];
+  changed: boolean;
+  before_errors: { path: string; error: string }[];
+  after_errors: { path: string; error: string }[];
+  changed_paths: string[];
+  reviewed_scope_changes: string[];
+  outside_review_scope_changes: string[];
+  git_state_changed: boolean;
+  git_revision_changed: boolean;
+  git_worktree_state_changed: boolean;
+  requires_focused_review: boolean;
+  has_unread_changes: boolean;
+  comparison_limited_by_errors: boolean;
+}
+
+export interface WorkspaceBaselineCheck {
+  baseline: WorkspaceBaselineSummary;
+  current: Omit<WorkspaceBaselineSummary, "id" | "project_id" | "phase" | "workspace_root" | "fingerprint" | "created_at">;
+  changes: WorkspaceChangeSet;
+}
+
 export interface ProjectExport {
   project_id: string;
   directory: string;
@@ -460,6 +552,30 @@ export async function updateProjectReference(
 }
 export async function getProjectWorkspace(projectId: string) {
   return fetchJson<ProjectWorkspace>(`/api/projects/${encodeURIComponent(projectId)}/workspace`);
+}
+export async function listWorkspaceBaselines(projectId: string) {
+  return fetchJson<WorkspaceBaselineSummary[]>(
+    `/api/projects/${encodeURIComponent(projectId)}/workspace-baselines`);
+}
+export async function captureWorkspaceBaseline(projectId: string, input: {
+  focus_paths: string[];
+  expected_baseline_id?: string;
+  expected_content_fingerprint?: string;
+}) {
+  const result = await requestJson<WorkspaceBaselineSummary>(
+    `/api/projects/${encodeURIComponent(projectId)}/workspace-baselines`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "capture", ...input }),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+export async function checkWorkspaceChanges(projectId: string) {
+  return requestJson<WorkspaceBaselineCheck>(
+    `/api/projects/${encodeURIComponent(projectId)}/workspace-baselines`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "check" }),
+    });
 }
 export async function createProjectRequirement(projectId: string, input: {
   content: string;

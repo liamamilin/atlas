@@ -498,8 +498,30 @@ class ProjectStore:
                 VALUES (?,?,?,?,?,?,?,?)""",
                 (snapshot_id, project_id, task_id, phase, snapshot.get("root"),
                  hashlib.sha256(payload.encode()).hexdigest(), payload, now))
-        return {"id": snapshot_id, "phase": phase,
-                "fingerprint": hashlib.sha256(payload.encode()).hexdigest()}
+            con.execute("UPDATE project SET updated_at=? WHERE id=?", (now, project_id))
+        return self.get_snapshot(project_id, snapshot_id)
+
+    def get_snapshot(self, project_id: str, snapshot_id: str) -> dict:
+        with self._connect() as con:
+            row = con.execute("""SELECT * FROM workspace_snapshot
+                WHERE id=? AND project_id=?""", (snapshot_id, project_id)).fetchone()
+        if not row:
+            raise ProjectStoreError("workspace snapshot not found")
+        result = dict(row)
+        result["manifest"] = json.loads(result.pop("manifest_json"))
+        return result
+
+    def list_snapshots(self, project_id: str) -> list[dict]:
+        with self._connect() as con:
+            self._require_project(con, project_id)
+            rows = con.execute("""SELECT * FROM workspace_snapshot
+                WHERE project_id=? ORDER BY created_at DESC,id DESC""", (project_id,)).fetchall()
+        result = []
+        for row in rows:
+            item = dict(row)
+            item["manifest"] = json.loads(item.pop("manifest_json"))
+            result.append(item)
+        return result
 
     def create_execution(self, task_id: str, engine: str, engine_session_id: str,
                          before_snapshot_id: str | None = None) -> dict:

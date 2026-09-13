@@ -31,6 +31,10 @@ from project_generation import (
     apply_generation_item, execute_generation, prepare_generation,
     read_generation,
 )
+from project_baseline import (
+    capture_project_baseline, check_project_changes, get_project_baseline,
+    list_project_baselines,
+)
 from handoff_bundle import build_handoff, validate_handoff, write_handoff
 from sample_package import validate_package
 from workspace_snapshot import compare_snapshots, snapshot_workspace
@@ -263,6 +267,78 @@ class ProjectStoreTests(unittest.TestCase):
             self.store.create_project('Invalid', 'No workspace', '  ', 'existing')
         generated = self.store.create_project('Idea', 'Start with an idea', '', 'new')
         self.assertTrue(generated['workspace'].endswith('/workspaces/' + generated['id']))
+
+    def test_workspace_baseline_separates_evidence_and_adopts_reviewed_changes(self):
+        workspace = self.root / 'workspace'
+        (workspace / 'src').mkdir(parents=True)
+        (workspace / 'assets').mkdir()
+        (workspace / 'README.md').write_text(
+            '# Pilot\n\n## Claimed behavior\nThe project claims to serve a dashboard.\n')
+        (workspace / 'package.json').write_text('{"scripts":{"test":"vitest"}}')
+        (workspace / 'src/app.py').write_text('def dashboard():\n    return "v1"\n')
+        (workspace / 'assets/logo.bin').write_bytes(b'v1')
+
+        baseline = capture_project_baseline(self.store, self.project['id'], ['src'])
+        self.assertEqual(baseline['coverage']['focus_paths'], ['src'])
+        self.assertIn('README.md', baseline['coverage']['read_paths'])
+        self.assertIn('package.json', baseline['coverage']['read_paths'])
+        self.assertIn('src/app.py', baseline['coverage']['read_paths'])
+        self.assertTrue(baseline['observations']['document_claims'])
+        self.assertTrue(baseline['observations']['code_clues'])
+        self.assertEqual(baseline['observations']['runtime_verified'], [])
+        self.assertIn('没有执行项目命令', baseline['report_markdown'])
+        self.assertEqual(get_project_baseline(
+            self.store, self.project['id'], baseline['id'])['id'], baseline['id'])
+
+        (workspace / 'src/app.py').write_text('def dashboard():\n    return "v2"\n')
+        (workspace / 'assets/logo.bin').write_bytes(b'v2')
+        checked = check_project_changes(self.store, self.project['id'])
+        self.assertEqual(checked['changes']['reviewed_scope_changes'], ['src/app.py'])
+        self.assertEqual(checked['changes']['outside_review_scope_changes'],
+                         ['assets/logo.bin'])
+        self.assertTrue(checked['changes']['requires_focused_review'])
+        self.assertTrue(checked['changes']['has_unread_changes'])
+        self.assertEqual(len(list_project_baselines(self.store, self.project['id'])), 1)
+
+        adopted = capture_project_baseline(
+            self.store, self.project['id'], ['src'], baseline['id'],
+            checked['current']['content_fingerprint'])
+        self.assertEqual(adopted['changes_from_previous']['reviewed_scope_changes'],
+                         ['src/app.py'])
+        self.assertEqual([item['id'] for item in list_project_baselines(
+            self.store, self.project['id'])], [adopted['id'], baseline['id']])
+        reviewed_again = check_project_changes(self.store, self.project['id'])
+        (workspace / 'README.md').write_text('# Pilot\n\nChanged after review.\n')
+        with self.assertRaisesRegex(ProjectStoreError, 'workspace changed after review'):
+            capture_project_baseline(
+                self.store, self.project['id'], ['src'], adopted['id'],
+                reviewed_again['current']['content_fingerprint'])
+        with self.assertRaisesRegex(ProjectStoreError, 'baseline changed'):
+            capture_project_baseline(
+                self.store, self.project['id'], ['src'], baseline['id'])
+
+    def test_outside_scope_change_is_visible_without_forcing_focus_review(self):
+        workspace = self.root / 'workspace'
+        (workspace / 'src').mkdir(parents=True)
+        (workspace / 'assets').mkdir()
+        (workspace / 'src/app.py').write_text('print("stable")\n')
+        (workspace / 'assets/photo.bin').write_bytes(b'before')
+        capture_project_baseline(self.store, self.project['id'], ['src'])
+        (workspace / 'assets/photo.bin').write_bytes(b'after')
+
+        changes = check_project_changes(self.store, self.project['id'])['changes']
+        self.assertEqual(changes['outside_review_scope_changes'], ['assets/photo.bin'])
+        self.assertTrue(changes['has_unread_changes'])
+        self.assertFalse(changes['requires_focused_review'])
+
+    def test_workspace_focus_paths_must_exist_and_remain_inside_root(self):
+        workspace = self.root / 'workspace'
+        workspace.mkdir(parents=True)
+        (workspace / 'README.md').write_text('# Pilot\n')
+        with self.assertRaisesRegex(ValueError, 'inside'):
+            capture_project_baseline(self.store, self.project['id'], ['../secret'])
+        with self.assertRaisesRegex(ValueError, 'does not exist'):
+            capture_project_baseline(self.store, self.project['id'], ['missing'])
 
     def test_version_one_store_migrates_without_losing_tasks(self):
         path = self.root / 'legacy.sqlite'
@@ -877,6 +953,52 @@ class ProjectStoreTests(unittest.TestCase):
             idea, code = handler.do_POST()
         self.assertEqual(code, 201)
         self.assertTrue(idea['workspace'].endswith('/workspaces/' + idea['id']))
+
+    def test_workspace_baseline_http_capture_check_list_and_conflict(self):
+        import drafts_api
+        workspace = self.root / 'workspace'
+        (workspace / 'src').mkdir(parents=True)
+        (workspace / 'notes').mkdir()
+        (workspace / 'README.md').write_text('# Existing project\n')
+        (workspace / 'src/app.py').write_text('print("v1")\n')
+        (workspace / 'notes/private.txt').write_text('v1\n')
+        handler = object.__new__(drafts_api.Handler)
+        handler._json = lambda value, code=200: (value, code)
+        handler.path = f"/api/projects/{self.project['id']}/workspace-baselines"
+        handler._body = lambda: {'action': 'capture', 'focus_paths': ['src']}
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            baseline, code = handler.do_POST()
+        self.assertEqual(code, 201)
+
+        handler._body = lambda: {'action': 'check'}
+        (workspace / 'notes/private.txt').write_text('v2\n')
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            checked, code = handler.do_POST()
+        self.assertEqual(code, 200)
+        self.assertEqual(checked['changes']['outside_review_scope_changes'],
+                         ['notes/private.txt'])
+        self.assertFalse(checked['changes']['requires_focused_review'])
+
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            listed, code = handler.do_GET()
+        self.assertEqual(code, 200)
+        self.assertEqual([item['id'] for item in listed], [baseline['id']])
+
+        handler._body = lambda: {
+            'action': 'capture', 'focus_paths': ['src'],
+            'expected_baseline_id': baseline['id'],
+            'expected_content_fingerprint': checked['current']['content_fingerprint'],
+        }
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            adopted, code = handler.do_POST()
+        self.assertEqual(code, 201)
+        self.assertEqual(adopted['changes_from_previous']['outside_review_scope_changes'],
+                         ['notes/private.txt'])
+
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            conflict, code = handler.do_POST()
+        self.assertEqual(code, 409)
+        self.assertIn('baseline changed', conflict['error'])
 
     def test_project_reference_http_create_list_and_update(self):
         import drafts_api

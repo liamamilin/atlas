@@ -39,6 +39,9 @@ Endpoints:
   POST   /api/projects/<id>/generation-runs
   GET    /api/projects/<id>/generation-runs/<generation-id>
   POST   /api/projects/<id>/generation-runs/<generation-id>/apply
+  GET    /api/projects/<id>/workspace-baselines
+  POST   /api/projects/<id>/workspace-baselines
+  GET    /api/projects/<id>/workspace-baselines/<snapshot-id>
 
 Run alongside `npm run dev` (vite proxies /api -> :5199).
 """
@@ -69,6 +72,10 @@ from project_workflow import (
 from project_generation import (
     apply_generation_item, execute_generation, list_generations,
     mark_generation_interrupted, prepare_generation, read_generation,
+)
+from project_baseline import (
+    capture_project_baseline, check_project_changes, get_project_baseline,
+    list_project_baselines,
 )
 PACK = str(DATA_PACK)
 sys.path.insert(0, PACK)
@@ -648,6 +655,21 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(project_generation_list(get_project_store(), m.group(1)))
             except ProjectStoreError as error:
                 return self._json({"error": str(error)}, 404)
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/workspace-baselines$", path)
+        if m:
+            try:
+                return self._json(list_project_baselines(get_project_store(), m.group(1)))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
+        m = re.match(
+            r"^/api/projects/(prj_[A-Za-z0-9]+)/workspace-baselines/(snap_[A-Za-z0-9]+)$",
+            path)
+        if m:
+            try:
+                return self._json(get_project_baseline(
+                    get_project_store(), m.group(1), m.group(2)))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, 404)
         m = re.match(
             r"^/api/projects/(prj_[A-Za-z0-9]+)/generation-runs/(gen_[A-Za-z0-9]+)$",
             path)
@@ -725,6 +747,39 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = unquote(urlparse(self.path).path)
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/workspace-baselines$", path)
+        if m:
+            try:
+                body = self._body()
+                if not isinstance(body, dict):
+                    raise ValueError("request body must be an object")
+                action = body.get("action")
+                if action == "capture":
+                    unknown = set(body) - {
+                        "action", "focus_paths", "expected_baseline_id",
+                        "expected_content_fingerprint",
+                    }
+                    if unknown:
+                        raise ValueError(
+                            f"unknown baseline fields: {', '.join(sorted(unknown))}")
+                    return self._json(capture_project_baseline(
+                        get_project_store(), m.group(1), body.get("focus_paths"),
+                        body.get("expected_baseline_id"),
+                        body.get("expected_content_fingerprint")), 201)
+                if action == "check":
+                    if set(body) != {"action"}:
+                        raise ValueError("change checks do not accept additional fields")
+                    return self._json(check_project_changes(
+                        get_project_store(), m.group(1)))
+                raise ValueError("action must be capture or check")
+            except ProjectStoreError as error:
+                message = str(error)
+                code = 409 if any(value in message for value in (
+                    "baseline changed", "workspace changed", "expected_baseline_id",
+                    "expected_content_fingerprint")) else 404
+                return self._json({"error": message}, code)
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
         m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/generation-runs$", path)
         if m:
             try:
