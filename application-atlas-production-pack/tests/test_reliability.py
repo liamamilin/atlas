@@ -21,7 +21,351 @@ import classify as classifier
 import draft_new
 import gate_check
 import promote_draft as promote
+from atlas_sources import SourceError, read_source, source_manifest
+from opencode_client import OpenCodeClient, iter_sse
+from execution_state import project_execution
+from project_store import ProjectStore, ProjectStoreError
+from handoff_bundle import build_handoff, validate_handoff, write_handoff
+from workspace_snapshot import compare_snapshots, snapshot_workspace
 from review_store import fingerprint, corpus_revision, update_review, load_review
+
+
+class SourceReadingTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.pack = Path(self.temp.name)
+        (self.pack / 'applications').mkdir()
+        (self.pack / 'research').mkdir()
+        self.application = '# Sample\nIntro\n\n## Core Model\nCore text\n\n### Detail\nNested text\n\n## Rules\nRule text\n'
+        self.research = '## Boundary Findings\n\n### vs Other\nBoundary detail\n\n## Uncertainties\nUnknown\n'
+        (self.pack / 'applications/sample.md').write_text(self.application)
+        (self.pack / 'research/sample.md').write_text(self.research)
+
+    def test_manifest_reports_both_sources_with_stable_outlines(self):
+        result = source_manifest('sample', self.pack)
+        self.assertEqual([item['kind'] for item in result['sources']], ['application', 'research'])
+        research = result['sources'][1]
+        self.assertEqual(research['outline'][0]['id'], 'boundary-findings')
+        self.assertEqual(research['outline'][1]['id'], 'vs-other')
+        self.assertEqual(len(research['fingerprint']), 64)
+
+    def test_heading_read_includes_nested_sections_and_stops_at_peer(self):
+        result = read_source('sample', 'application', 'core-model', pack=self.pack)
+        self.assertTrue(result['complete'])
+        self.assertIn('### Detail', result['content'])
+        self.assertNotIn('## Rules', result['content'])
+        self.assertEqual(result['line_start'], 4)
+
+    def test_pagination_never_hides_truncation(self):
+        first = read_source('sample', 'research', limit=24, pack=self.pack)
+        self.assertFalse(first['complete'])
+        self.assertEqual(first['next_offset'], first['returned_chars'])
+        second = read_source('sample', 'research', offset=first['next_offset'], limit=500, pack=self.pack)
+        self.assertTrue(second['complete'])
+        self.assertEqual(first['content'] + second['content'], self.research)
+        self.assertEqual(first['fingerprint'], second['fingerprint'])
+
+    def test_invalid_paths_and_offsets_fail_closed(self):
+        with self.assertRaises(SourceError):
+            read_source('../sample', 'application', pack=self.pack)
+        with self.assertRaises(SourceError):
+            read_source('sample', 'other', pack=self.pack)
+        with self.assertRaises(SourceError):
+            read_source('sample', 'application', offset=10000, pack=self.pack)
+
+
+class OpenCodeClientTests(unittest.TestCase):
+    class Response:
+        def __init__(self, value):
+            self.value = value
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+        def read(self):
+            return json.dumps(self.value).encode()
+
+    def setUp(self):
+        self.requests = []
+        self.responses = []
+        def opener(request, timeout):
+            self.requests.append((request, timeout))
+            return self.Response(self.responses.pop(0))
+        self.client = OpenCodeClient('http://127.0.0.1:4098', '/tmp/project', opener=opener)
+
+    def test_client_scopes_session_requests_to_directory(self):
+        self.responses.append({'id': 'ses_abc'})
+        result = self.client.create_session('Probe')
+        request, _ = self.requests[0]
+        self.assertEqual(result['id'], 'ses_abc')
+        self.assertIn('directory=%2Ftmp%2Fproject', request.full_url)
+        self.assertEqual(json.loads(request.data), {'title': 'Probe'})
+
+    def test_reconcile_reads_authoritative_endpoints_and_filters_permissions(self):
+        self.responses.extend([
+            {'ses_abc': {'type': 'busy'}},
+            {'id': 'ses_abc'},
+            [{'info': {'id': 'msg_one'}, 'parts': []}],
+            [],
+            [{'id': 'per_one', 'sessionID': 'ses_abc'}, {'id': 'per_two', 'sessionID': 'ses_other'}],
+        ])
+        result = self.client.reconcile('ses_abc')
+        self.assertEqual(result['status']['type'], 'busy')
+        self.assertEqual([item['id'] for item in result['pending_permissions']], ['per_one'])
+        self.assertEqual(result['engine_diff'], [])
+
+    def test_permission_reply_uses_current_nondeprecated_endpoint(self):
+        self.responses.append(True)
+        self.assertTrue(self.client.reply_permission('per_abc', 'once'))
+        request, _ = self.requests[0]
+        self.assertIn('/permission/per_abc/reply', request.full_url)
+        self.assertEqual(json.loads(request.data), {'reply': 'once'})
+
+    def test_async_message_uses_nonblocking_endpoint(self):
+        self.responses.append(None)
+        self.assertIsNone(self.client.send_message_async(
+            'ses_abc', 'Run tests', 'opencode', 'big-pickle', tools={'bash': True}))
+        request, _ = self.requests[0]
+        self.assertIn('/session/ses_abc/prompt_async', request.full_url)
+        self.assertEqual(json.loads(request.data)['tools'], {'bash': True})
+
+    def test_sse_parser_and_session_filter(self):
+        raw = io.BytesIO(
+            b'data: {"type":"server.connected","properties":{}}\n\n'
+            b'data: {"type":"session.status","properties":{"sessionID":"ses_abc"}}\n\n'
+            b'data: {"type":"session.status","properties":{"sessionID":"ses_other"}}\n\n')
+        events = list(self.client.events(raw, 'ses_abc'))
+        self.assertEqual([event['type'] for event in events], ['server.connected', 'session.status'])
+        self.assertEqual(len(list(iter_sse(io.BytesIO(b'data: {"ok":true}\n\n')))), 1)
+
+    def test_rejects_remote_servers_and_invalid_ids(self):
+        with self.assertRaises(ValueError):
+            OpenCodeClient('https://example.com', '/tmp/project')
+        with self.assertRaises(ValueError):
+            self.client.get_session('../bad')
+
+
+class WorkspaceSnapshotTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name).resolve()
+        (self.root / 'keep.txt').write_text('before')
+        (self.root / 'remove.txt').write_text('remove')
+        (self.root / 'node_modules').mkdir()
+        (self.root / 'node_modules/ignored.js').write_text('large dependency')
+
+    def test_detects_added_removed_and_modified_files(self):
+        before = snapshot_workspace(self.root)
+        (self.root / 'keep.txt').write_text('after')
+        (self.root / 'remove.txt').unlink()
+        (self.root / 'added.txt').write_text('new')
+        after = snapshot_workspace(self.root)
+        diff = compare_snapshots(before, after)
+        self.assertEqual(diff['added'], ['added.txt'])
+        self.assertEqual(diff['removed'], ['remove.txt'])
+        self.assertEqual(diff['modified'], ['keep.txt'])
+        self.assertTrue(diff['changed'])
+        self.assertNotIn('node_modules/ignored.js', before['files'])
+
+    def test_unchanged_content_is_not_modified(self):
+        before = snapshot_workspace(self.root)
+        os.utime(self.root / 'keep.txt', None)
+        after = snapshot_workspace(self.root)
+        self.assertFalse(compare_snapshots(before, after)['changed'])
+
+    def test_symlink_target_is_recorded_without_following_it(self):
+        try:
+            (self.root / 'link').symlink_to('keep.txt')
+        except OSError:
+            self.skipTest('symlinks unavailable')
+        result = snapshot_workspace(self.root)
+        self.assertEqual(result['files']['link']['kind'], 'symlink')
+        self.assertEqual(result['files']['link']['target'], 'keep.txt')
+
+    def test_different_roots_cannot_be_compared(self):
+        before = snapshot_workspace(self.root)
+        with tempfile.TemporaryDirectory() as other:
+            after = snapshot_workspace(other)
+        with self.assertRaises(ValueError):
+            compare_snapshots(before, after)
+
+
+class ExecutionStateTests(unittest.TestCase):
+    def test_permission_has_precedence_over_busy(self):
+        result = project_execution({
+            'status': {'type': 'busy'},
+            'messages': [{'info': {'id': 'msg_assistant', 'parentID': 'msg_user', 'role': 'assistant'}}],
+            'pending_permissions': [{'id': 'per_one', 'tool': {'messageID': 'msg_assistant'}}],
+        }, 'msg_user')
+        self.assertEqual(result['state'], 'waiting_permission')
+        self.assertEqual(result['evidence']['permission_id'], 'per_one')
+
+    def test_completed_requires_a_completed_stop_message(self):
+        result = project_execution({
+            'status': {'type': 'idle'},
+            'messages': [{'info': {
+                'id': 'msg_answer', 'parentID': 'msg_user', 'role': 'assistant',
+                'finish': 'stop', 'time': {'completed': 123},
+            }}],
+        }, 'msg_user')
+        self.assertEqual(result['state'], 'completed')
+        self.assertEqual(result['evidence']['message_id'], 'msg_answer')
+
+    def test_idle_alone_is_not_completion(self):
+        result = project_execution({'status': {'type': 'idle'}, 'messages': []}, 'msg_missing')
+        self.assertEqual(result['state'], 'queued')
+
+    def test_abort_and_other_errors_are_distinct(self):
+        base = {'status': {'type': 'idle'}, 'messages': [{'info': {
+            'id': 'msg_answer', 'parentID': 'msg_user', 'role': 'assistant',
+            'error': {'name': 'MessageAbortedError'},
+        }}]}
+        self.assertEqual(project_execution(base, 'msg_user')['state'], 'stopped')
+        base['messages'][0]['info']['error'] = {'name': 'ProviderError'}
+        self.assertEqual(project_execution(base, 'msg_user')['state'], 'failed')
+
+    def test_unrelated_permission_does_not_capture_task(self):
+        result = project_execution({
+            'status': {'type': 'busy'},
+            'messages': [{'info': {'id': 'msg_answer', 'parentID': 'msg_user', 'role': 'assistant'}}],
+            'pending_permissions': [{'id': 'per_other', 'tool': {'messageID': 'msg_other'}}],
+        }, 'msg_user')
+        self.assertEqual(result['state'], 'running')
+
+
+class ProjectStoreTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.store = ProjectStore(self.root / 'state/projects.sqlite')
+        self.project = self.store.create_project(
+            'Pilot', 'Build the approved pilot', self.root / 'workspace', 'new')
+
+    def test_project_data_is_separate_and_persistent(self):
+        self.assertTrue((self.root / 'state/projects.sqlite').exists())
+        reopened = ProjectStore(self.root / 'state/projects.sqlite')
+        self.assertEqual(reopened.get_project(self.project['id'])['objective'],
+                         'Build the approved pilot')
+
+    def test_document_versions_are_immutable_and_conflicts_are_explicit(self):
+        document = self.store.create_document(
+            self.project['id'], 'product-requirements', 'PRD', 'version one',
+            [{'source': 'application/sample.md', 'fingerprint': 'abc'}])
+        updated = self.store.add_document_version(
+            document['id'], 'version two', expected_current_version=1)
+        self.assertEqual(updated['current_version'], 2)
+        self.assertEqual(updated['content'], 'version two')
+        with self.assertRaises(ProjectStoreError):
+            self.store.add_document_version(
+                document['id'], 'stale update', expected_current_version=1)
+
+    def test_task_inputs_must_belong_to_same_project(self):
+        other = self.store.create_project('Other', 'Other goal', self.root / 'other', 'existing')
+        document = self.store.create_document(other['id'], 'plan', 'Plan', 'content')
+        with self.assertRaises(ProjectStoreError):
+            self.store.create_task(self.project['id'], 'Implement', 'Do work',
+                                   [document['version_id']])
+
+    def test_ai_scope_recommendation_is_not_user_confirmation(self):
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas', 'applications/sample.md', 'sha256:abc',
+            locator='core-model', read_status='reviewed')
+        requirement = self.store.create_requirement(
+            self.project['id'], 'Export the current project state', 'current',
+            'Useful for recovery', ['The bundle validates offline'], [reference['id']])
+        self.assertEqual(requirement['recommended_scope'], 'current')
+        self.assertIsNone(requirement['confirmed_scope'])
+        task = self.store.create_task(
+            self.project['id'], 'Export', 'Build export', requirement_ids=[requirement['id']])
+        with self.assertRaises(ProjectStoreError):
+            self.store.create_execution(task['id'], 'opencode', 'ses_example')
+        self.store.confirm_requirement(requirement['id'], 'current', 'Approved for this release')
+        self.assertEqual(
+            self.store.create_execution(task['id'], 'opencode', 'ses_example')['status'], 'queued')
+
+    def test_decisions_and_references_cannot_cross_projects(self):
+        other = self.store.create_project('Other', 'Other goal', self.root / 'other', 'existing')
+        reference = self.store.add_reference(
+            other['id'], 'user', 'interview-1', 'v1', excerpt='Need local execution')
+        with self.assertRaises(ProjectStoreError):
+            self.store.record_decision(
+                self.project['id'], 'Use local execution', 'User constraint', [reference['id']])
+
+    def test_execution_updates_task_and_keeps_raw_projection(self):
+        document = self.store.create_document(self.project['id'], 'plan', 'Plan', 'content')
+        task = self.store.create_task(self.project['id'], 'Implement', 'Do work',
+                                      [document['version_id']])
+        snapshot = self.store.save_snapshot(self.project['id'], {
+            'schema': 1, 'root': str(self.root / 'workspace'), 'files': {}, 'errors': []},
+            'before', task['id'])
+        execution = self.store.create_execution(task['id'], 'opencode', 'ses_example', snapshot['id'])
+        projection = {'state': 'waiting_permission', 'engine_status': 'busy',
+                      'evidence': {'permission_id': 'per_example'}}
+        updated = self.store.update_execution(execution['id'], projection, 'msg_example')
+        self.assertEqual(updated['raw_state'], projection)
+        stored_task = self.store.get_task(task['id'])
+        self.assertEqual(stored_task['execution_status'], 'waiting_permission')
+        self.assertEqual(stored_task['acceptance_status'], 'pending')
+
+    def test_execution_completion_does_not_imply_acceptance(self):
+        task = self.store.create_task(self.project['id'], 'Implement', 'Do work')
+        execution = self.store.create_execution(task['id'], 'opencode', 'ses_example')
+        self.store.update_execution(execution['id'], {
+            'state': 'completed', 'engine_status': 'idle',
+            'evidence': {'message_id': 'msg_answer'},
+        })
+        task = self.store.get_task(task['id'])
+        self.assertEqual(task['execution_status'], 'completed')
+        self.assertEqual(task['acceptance_status'], 'pending')
+        accepted = self.store.record_acceptance(
+            task['id'], 'passed', [{'kind': 'test', 'summary': '42 tests passed'}])
+        self.assertEqual(accepted['acceptance_status'], 'passed')
+
+    def test_failed_transaction_does_not_leave_partial_task(self):
+        with self.assertRaises(ProjectStoreError):
+            self.store.create_task(self.project['id'], 'Implement', 'Do work', ['dver_missing'])
+        with sqlite3.connect(self.store.path) as con:
+            self.assertEqual(con.execute('SELECT count(*) FROM task').fetchone()[0], 0)
+
+    def test_handoff_uses_fixed_inputs_and_flags_missing_recovery_evidence(self):
+        reference = self.store.add_reference(
+            self.project['id'], 'user', 'approved-brief', 'v1', excerpt='Keep user edits')
+        requirement = self.store.create_requirement(
+            self.project['id'], 'Keep user edits', 'current', 'Required by the brief',
+            ['Existing prose remains'], [reference['id']])
+        self.store.confirm_requirement(requirement['id'], 'current', 'User approved')
+        self.store.record_decision(
+            self.project['id'], 'Use a replaceable execution backend',
+            'Preserve Atlas-owned state', [reference['id']])
+        document = self.store.create_document(
+            self.project['id'], 'product-requirements', 'PRD', 'Must keep user edits')
+        task = self.store.create_task(
+            self.project['id'], 'Implement', 'Implement the accepted scope',
+            [document['version_id']], [requirement['id']])
+        before = self.store.save_snapshot(self.project['id'], {
+            'schema': 1, 'root': str(self.root / 'workspace'), 'files': {}, 'errors': []},
+            'before', task['id'])
+        execution = self.store.create_execution(task['id'], 'opencode', 'ses_unavailable', before['id'])
+        self.store.update_execution(execution['id'], {
+            'state': 'stopped', 'engine_status': 'idle',
+            'evidence': {'error': 'MessageAbortedError'},
+        })
+        bundle = build_handoff(self.store, task['id'])
+        self.assertFalse(bundle['recovery']['old_engine_session_required'])
+        self.assertEqual(bundle['documents'][0]['version_id'], document['version_id'])
+        self.assertEqual(bundle['requirements'][0]['confirmed_scope'], 'current')
+        self.assertEqual(len(bundle['decisions']), 1)
+        self.assertIn('workspace snapshot after execution', bundle['recovery']['missing'])
+        self.assertTrue(validate_handoff(bundle)['valid'])
+        bundle['documents'][0]['content'] = 'tampered'
+        self.assertFalse(validate_handoff(bundle)['valid'])
+        written = write_handoff(self.store, task['id'], self.root / 'handoff')
+        markdown = Path(written['markdown_path']).read_text()
+        self.assertIn('Must keep user edits', markdown)
+        self.assertIn('do not replay prior operations blindly', markdown)
 
 
 class RetrievalTests(unittest.TestCase):

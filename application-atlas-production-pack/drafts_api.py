@@ -14,6 +14,9 @@ Endpoints:
   DELETE /api/drafts/<slug>              delete draft + research files
   POST   /api/dedupe                     {slug} -> vector top-5 stored in review.json
   GET    /api/review                     full review.json
+  GET    /api/sources/<slug>             canonical source manifest + outlines
+  GET    /api/sources/<kind>/<slug>      canonical Markdown, optionally paged
+                                        ?section=<outline-id>&offset=0&limit=12000
 
 Run alongside `npm run dev` (vite proxies /api -> :5199).
 """
@@ -26,10 +29,11 @@ import sys
 import threading
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import urlparse, unquote
+from urllib.parse import parse_qs, urlparse, unquote
 
 from atlas_runtime import PACK as DATA_PACK, api_key, atomic_write, corpus_lock, recover_publication
 from review_store import load_review, update_review, fingerprint, corpus_revision, review_current, valid_slug
+from atlas_sources import SourceError, read_source, source_manifest
 PACK = str(DATA_PACK)
 sys.path.insert(0, PACK)
 from leaf_lint import lint, parse_front
@@ -399,7 +403,8 @@ class Handler(BaseHTTPRequestHandler):
         return json.loads(self.rfile.read(n) or b"{}")
 
     def do_GET(self):
-        path = unquote(urlparse(self.path).path)
+        parsed = urlparse(self.path)
+        path = unquote(parsed.path)
         if path == "/api/health":
             return self._json({"ok": True, "generating": sorted(GEN_THREADS), "promoting": sorted(PROMOTE_THREADS)})
         if path == "/api/drafts":
@@ -408,6 +413,29 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(list_sections())
         if path == "/api/review":
             return self._json(load_review(PACK))
+        m = re.match(r"^/api/sources/([\w-]+)$", path)
+        if m:
+            try:
+                return self._json(source_manifest(m.group(1), PACK))
+            except SourceError as error:
+                return self._json({"error": str(error)}, 400)
+            except FileNotFoundError:
+                return self._json({"error": "not found"}, 404)
+        m = re.match(r"^/api/sources/(application|research)/([\w-]+)$", path)
+        if m:
+            query = parse_qs(parsed.query)
+            try:
+                return self._json(read_source(
+                    m.group(2), m.group(1),
+                    section=(query.get("section") or [None])[0],
+                    offset=int((query.get("offset") or [0])[0]),
+                    limit=int((query.get("limit") or [12000])[0]),
+                    pack=PACK,
+                ))
+            except (SourceError, ValueError) as error:
+                return self._json({"error": str(error)}, 400)
+            except FileNotFoundError:
+                return self._json({"error": "not found"}, 404)
         m = re.match(r"^/api/drafts/([\w-]+)$", path)
         if m:
             d = read_draft(m.group(1))

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Application Atlas MCP server.
 
-Exposes the atlas corpus (1804 software application types, bilingual,
+Exposes the atlas corpus (1805 software application types, bilingual,
 with relation graph + vector search + classifier) as MCP tools.
 """
 import json
@@ -14,6 +14,7 @@ import numpy as np
 from mcp.server.fastmcp import FastMCP
 
 from atlas_runtime import PACK as DATA_PACK
+from atlas_sources import SourceError, read_source, source_manifest
 PACK = str(DATA_PACK)
 DB = os.path.join(PACK, "atlas", "atlas.sqlite")
 
@@ -84,6 +85,29 @@ def get_leaf(slug: str) -> str:
         "products": (r[11] or "")[:1500], "sources": (r[12] or "")[:800],
         "relations": [{"to": x[0], "slug": x[1], "kind": x[2], "distinction": x[3][:200]} for x in rels],
     }, ensure_ascii=False, indent=1)
+
+
+@mcp.tool()
+def read_atlas_source(slug: str, kind: str = "application", section: str = "",
+                      offset: int = 0, limit: int = 12000) -> str:
+    """Read canonical Atlas Markdown with fingerprint, line numbers, and
+    explicit pagination. Use an outline id to read one heading subtree. If
+    complete is false, continue from next_offset."""
+    try:
+        result = read_source(slug, kind, section or None, offset, limit, PACK)
+    except (SourceError, FileNotFoundError) as error:
+        result = {"error": str(error)}
+    return json.dumps(result, ensure_ascii=False, indent=1)
+
+
+@mcp.tool()
+def get_atlas_source_manifest(slug: str) -> str:
+    """List canonical application/research documents and outlines for a type."""
+    try:
+        result = source_manifest(slug, PACK)
+    except (SourceError, FileNotFoundError) as error:
+        result = {"error": str(error)}
+    return json.dumps(result, ensure_ascii=False, indent=1)
 
 
 @mcp.tool()

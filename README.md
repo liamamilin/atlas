@@ -9,6 +9,21 @@
 - `atlas-web/`：React + TypeScript + Vite 前端。
 - `application-atlas-production-pack/drafts_api.py`：本地草稿 API（127.0.0.1:5199）。
 
+## U17 设计与开发规划
+
+U17 面向新想法和已有项目改进：搜索与阅读类型、应用资料，形成关联的开发文档，通过现有 agent 引擎执行并支持后续迭代。
+
+长期架构：Atlas 独立管理项目知识、编排与验收状态，OpenCode 作为首个可替换的执行后端；允许长期复用，后续依据实际限制和收益决定自研范围。
+
+- [产品设计](docs/U17_DESIGN.md)：用户流程、资料与文档体系、项目版本、agent 编排边界和验收场景。
+- [开发规划](docs/U17_DEVELOPMENT_PLAN.md)：M0–M5 的验证任务、实现顺序和完成条件。
+- [M0 验证记录](docs/U17_M0_VALIDATION.md)：完整资料读取与 OpenCode 接口的实际验证结果。
+- [下游应用路线图](USAGE_ROADMAP.md)：U17 与其他功能的关系及历史记录。
+
+截至 2026-09-13，U17 已从设计进入 M0 验证与基础能力开发；资料全文读取、OpenCode 核心适配、执行状态投影、工作区基线、独立项目存储和离线任务交接包已落地，项目工作台尚未形成完整可用流程。当前应用的运行功能以本 README 其余章节为准。
+
+U17 的基础能力已经开始开发：本地 API 提供 `GET /api/sources/<slug>` 查询正式类型资料清单，并通过 `GET /api/sources/<kind>/<slug>` 按完整文档或章节分页读取；MCP 同步提供 `get_atlas_source_manifest` 与 `read_atlas_source`。`opencode_client.py` 是首个执行引擎适配模块，已验证实际读取、文档写入、代码修改、中断及重启对账；`workspace_snapshot.py` 提供独立于引擎的文件基线与变化核对。项目工作台、文档生成和正式开发执行流程尚未实现。
+
 ## 启动
 
 需要 Python 3.10+、Node.js 22，以及安装了 bge-m3 的 Ollama（向量检索时需要）。Python 依赖版本来自已验证的本地环境。
