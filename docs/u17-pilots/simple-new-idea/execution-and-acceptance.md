@@ -64,3 +64,12 @@ Atlas 已将两轮执行标记为 `applied`、产品验收标记为 `passed`，�
 - Agent 报告存在 requirement_ids mismatch/格式不一致；Atlas 以快照、独立页面行为和测试输出作为验收依据。
 
 运行时临时 `planner.db`、缓存和验收数据已清理。
+
+## 第五轮：项目与任务生命周期
+
+- 需求：`req_2f7f4298f21e44968d22c4e4866212de`（编辑名称/标题；确认删除并级联清理；移除承诺保留源任务）。
+- 迭代：`itr_a6fea3387b5944d8ac0e02cc5ebd3f78`；任务：`tsk_dcf4f91a5ec04148b0b25297cbf436d6`。
+- 执行：`exe_1f6b30e226864348b9c2a5d9ab6f2e58`，隔离副本应用成功；写入范围为 `app.py`、`static/index.html`、`static/styles.css`、`static/app.js`、`tests/test_app.py`、`README.md`。
+- 独立验证：`python3 -m unittest discover -s tests -v` 共 80/80 通过；`node --check static/app.js` 通过。页面实测项目和任务重命名持久化，删除 Confirm/Cancel 取消不变更、确认后项目消失。
+- 复核修复：应用后发现前端模板字符串语法错误，修复 `renderProjects()` 结束反引号并重新验证；OpenCode 机器报告 JSON 无效，未作为验收依据。
+- Atlas 已记录产品验收通过并完成第五轮迭代；最终工作区基线为 `snap_7bbf94af74674512a06b59b6d2bc8b5a`。

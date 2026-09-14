@@ -63,6 +63,12 @@
       "case_id": "NI-R4",
       "status": "confirmed",
       "round": 2
+    },
+    {
+      "id": "req_2f7f4298f21e44968d22c4e4866212de",
+      "case_id": "NI-R5",
+      "status": "confirmed",
+      "round": 5
     }
   ],
   "decisions": [
@@ -100,6 +106,12 @@
       "technical_plan": "dver_5d0f6d09f58642248627995831095ca0",
       "development_plan": "dver_fafff2de0228481889297809307c4faf",
       "acceptance_plan": "dver_9b73be6d0ff84a49b584b7cbbf3ccc6e"
+    },
+    "fifth_round": {
+      "product_requirements": "dver_98222036049746f288c11b8dcaca18b0",
+      "technical_plan": "dver_0e02c00fe19e4f7ba91a47fedbcfd409",
+      "development_plan": "dver_7af2140775154737af222b2f686f8cbc",
+      "acceptance_plan": "dver_08a71a799b444d759efbb036a5028ae6"
     }
   },
   "generation_runs": [
@@ -186,6 +198,24 @@
       "round": 4,
       "accepted": true,
       "role": "第四轮冲突提示修正应用后"
+    },
+    {
+      "id": "snap_8c86328fd155463db0d3bdbebcea80e6",
+      "round": 5,
+      "accepted": true,
+      "role": "第五轮应用前复核基线"
+    },
+    {
+      "id": "snap_b39fe9b40f8e4330bee7c2c0c19ce0c",
+      "round": 5,
+      "accepted": true,
+      "role": "第五轮代码应用后基线"
+    },
+    {
+      "id": "snap_7bbf94af74674512a06b59b6d2bc8b5a",
+      "round": 5,
+      "accepted": true,
+      "role": "第五轮前端语法修复与临时数据移出后最终基线"
     }
   ],
   "iterations": [
@@ -232,6 +262,17 @@
       ],
       "acceptance": "passed",
       "superseded_task_id": "tsk_8fae0c06724a415c94d702eef326fd25"
+    },
+    {
+      "id": "itr_a6fea3387b5944d8ac0e02cc5ebd3f78",
+      "round": 5,
+      "status": "completed",
+      "task_id": "tsk_dcf4f91a5ec04148b0b25297cbf436d6",
+      "execution_ids": [
+        "exe_1f6b30e226864348b9c2a5d9ab6f2e58"
+      ],
+      "acceptance": "passed",
+      "superseded_task_id": null
     }
   ],
   "second_round_evidence": {
@@ -279,10 +320,10 @@
     }
   },
   "verification": {
-    "rounds": "3",
-    "latest": "第四轮完成并通过产品验收；页面错误反馈和冲突提示已验证",
-    "tests": "54/54 workspace tests passed; node --check static/app.js passed; repository reliability suite previously 101/101",
-    "scope": "仅修改 app.py、tests/test_app.py，运行产物清理，未纳入预存无关改动。"
+    "rounds": "5",
+    "latest": "第五轮完成并通过产品验收；项目/任务编辑、二次确认删除及级联清理已验证",
+    "tests": "80/80 workspace tests passed; node --check static/app.js passed; 真实页面编辑、取消删除和确认删除通过",
+    "scope": "第五轮修改 app.py、static/index.html、static/styles.css、static/app.js、tests/test_app.py；修复一处前端模板字符串语法错误后重新验证。"
   },
   "fourth_round_evidence": {
     "iteration_id": "itr_fac58c9b9791487eb5587c11a09e04ea",
@@ -310,5 +351,15 @@
     ],
     "product_acceptance": "停止服务后点击 Load 显示“加载当天承诺失败: Failed to fetch”；恢复服务并加载两个重叠时间块，页面在独立 conflicts-banner 区显示 1 条冲突及两个 Overlap 标记。",
     "agent_report": "主执行报告存在 requirement_ids_mismatch，重试执行报告结构有效但固定命令带 2>&1 未被计划命令计入；Atlas 依据独立页面验收与 54/54 测试通过完成验收。"
+  },
+  "fifth_round_evidence": {
+    "iteration": "itr_a6fea3387b5944d8ac0e02cc5ebd3f78",
+    "task": "tsk_dcf4f91a5ec04148b0b25297cbf436d6",
+    "execution": "exe_1f6b30e226864348b9c2a5d9ab6f2e58",
+    "acceptance": "passed",
+    "tests": "80/80",
+    "node_check": "passed",
+    "ui": "项目名称和任务标题点击编辑后持久化；删除 Confirm/Cancel 弹窗取消不变更，确认后项目及任务消失。",
+    "note": "OpenCode 机器报告 JSON 无效且初始测试曾出现两条测试夹具错误；应用后独立修正前端语法错误并以独立测试和真实页面证据完成验收。"
   }
 }
