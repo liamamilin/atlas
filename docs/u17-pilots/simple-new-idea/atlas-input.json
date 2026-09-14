@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "case_id": "simple-new-idea",
+  "language": "zh",
+  "project_name": "M5 试点 · 本地优先个人日计划器",
+  "goal": "为同时推进多个个人项目的个人开发者制作一个本地优先的个人日计划器。首轮只验证用户能创建多个项目和任务，从不同项目选择任务形成某一天的承诺清单；数据持久保存在本地，进程重启后保持项目、任务和当天选择关系。",
+  "source_slugs": [
+    "task-management-application",
+    "time-blocking-application",
+    "personal-organizer"
+  ],
+  "confirmed_requirements": [
+    {
+      "external_id": "NI-R1",
+      "text": "用户可以创建多个项目及其任务，从不同项目选择任务形成指定日期的当天承诺清单；移除当天承诺不会删除原项目任务。",
+      "acceptance": [
+        "建立两个项目并分别创建至少一个任务",
+        "把两个项目中的任务加入同一日期后，当天清单保留各自稳定任务标识",
+        "移除一个当天承诺后，原项目任务仍然存在"
+      ],
+      "source_ids": ["NI-S1", "NI-S3"]
+    },
+    {
+      "external_id": "NI-R3",
+      "text": "项目、任务和当天选择关系保存在本地；进程停止并重新启动后，对象标识、字段和关系保持一致。",
+      "acceptance": [
+        "记录项目、任务和当天承诺标识",
+        "停止并重新启动应用",
+        "重新读取后所有标识、字段和关系保持一致"
+      ],
+      "source_ids": ["NI-S1", "NI-S3"]
+    }
+  ],
+  "excluded_scope": [
+    "手动时间块",
+    "冲突提示",
+    "外部日历",
+    "自动排程",
+    "账号与云同步",
+    "团队协作"
+  ],
+  "document_mode": "core",
+  "fixed_verification_commands": [
+    "python3 -m unittest discover -s tests -v"
+  ]
+}

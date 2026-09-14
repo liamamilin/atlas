@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "case_id": "simple-new-idea",
+  "title": "本地优先的个人日计划器",
+  "protocol_frozen_at": "2026-09-14T00:52:27Z",
+  "status": "protocol_frozen",
+  "atlas_revision": "050bf884716eb7d87380d86ee9494b7a97e990d2",
+  "atlas_working_tree": {
+    "clean": false,
+    "preexisting_change_fingerprint": "f267d28fe7b76ced6866a5379563a3c8602c703ed54a3ecff71b3775378873ab",
+    "excluded_paths": [
+      ".commandcode/",
+      "apps/Atlas.app/",
+      "apps/Atlas 停止.app/",
+      "apps/Atlas 启动.app/",
+      "apps/watchdog.sh",
+      "atlas-web/src/lib/lang.tsx",
+      "atlas-web/src/routes/home.tsx"
+    ],
+    "note": "这些改动在 M5 案例开始前已存在，不属于试点提交，也不作为产品效果证据。"
+  },
+  "model": {
+    "provider_model": "opencode-go/mimo-v2.5",
+    "client": "OpenCode 1.18.30",
+    "variant": null
+  },
+  "initial_goal": "为同时推进多个个人项目的个人开发者制作一个本地优先的个人日计划器。首轮只验证用户能创建多个项目和任务，从不同项目选择任务形成某一天的承诺清单；数据持久保存在本地，进程重启后保持项目、任务和当天选择关系。",
+  "first_iteration": {
+    "requirement_ids": ["NI-R1", "NI-R3"],
+    "excluded_scope": [
+      "手动时间块",
+      "冲突提示",
+      "外部日历",
+      "自动排程",
+      "账号与云同步",
+      "团队协作"
+    ],
+    "acceptance_ids": ["NI-A1", "NI-A4"]
+  },
+  "second_iteration_disclosure": "第一轮普通生成和 Atlas 文档生成完成后，才提出 NI-R2 与 NI-R4；第一轮输入不预告第二轮功能。",
+  "sources": [
+    {
+      "id": "NI-S1",
+      "path": "application-atlas-production-pack/applications/task-management-application.md",
+      "sha256": "816ab50adb110ae50fd8df449c7437b434bb8970266b1196385b1116e623899c"
+    },
+    {
+      "id": "NI-S2",
+      "path": "application-atlas-production-pack/applications/time-blocking-application.md",
+      "sha256": "2cd9eca2093ad136f27e9c517f6a071c5c1bdb7272936b00237a325c644e1263"
+    },
+    {
+      "id": "NI-S3",
+      "path": "application-atlas-production-pack/applications/personal-organizer.md",
+      "sha256": "a781dba79a92a53df7d84ee9521286ed8f2537abb1d2a57ab5e2d405b1baaaf7"
+    }
+  ],
+  "ordinary_run": {
+    "mode": "single_response_without_atlas_workflow",
+    "pure": true,
+    "message": "请阅读附件 ordinary-input.md 以及三份来源文档，并严格按照 ordinary-input.md 中的要求生成结果。只使用这些附件，不读取其他文件，不搜索网络，不执行代码。",
+    "input_file": "ordinary-input.md",
+    "output_file": "ordinary-output.md",
+    "raw_events_file": "ordinary-events.jsonl"
+  },
+  "atlas_run": {
+    "input_file": "atlas-input.json",
+    "document_mode": "core",
+    "required_document_types": [
+      "product-requirements",
+      "technical-plan",
+      "development-plan",
+      "acceptance-plan"
+    ]
+  },
+  "timing": {
+    "ordinary_start": "CLI 请求发出",
+    "ordinary_end": "完整 assistant 响应写入原始事件文件",
+    "atlas_start": "网页首次提交固定资料分析",
+    "atlas_scope_end": "首轮需求和开发范围完成人工确认",
+    "atlas_iteration_end": "产品验收通过并完成首轮迭代"
+  },
+  "comparison_fields": [
+    "重要遗漏",
+    "无依据结论或错误建议",
+    "开发前仍需追问的问题",
+    "范围确认耗时",
+    "计划外改动与返工",
+    "生成首次通过率与重试"
+  ]
+}
