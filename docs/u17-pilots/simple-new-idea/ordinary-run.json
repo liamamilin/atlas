@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "status": "completed",
+  "attempts": [
+    {
+      "number": 1,
+      "model_called": false,
+      "exit_code": 1,
+      "reason": "relative attachment path resolved from isolated --dir and was not found",
+      "stderr_file": "ordinary-attempt-1-stderr.log"
+    },
+    {
+      "number": 2,
+      "model_called": false,
+      "exit_code": 1,
+      "reason": "CLI -f array consumed the trailing message as an attachment path",
+      "stderr_file": "ordinary-attempt-2-stderr.log"
+    },
+    {
+      "number": 3,
+      "model_called": true,
+      "exit_code": 0,
+      "session_id": "ses_f62929a96ffee3yClKolshRUzo",
+      "request_started_at": "2026-09-14T01:00:32.378Z",
+      "model_started_at": "2026-09-14T01:00:41.159Z",
+      "completed_at": "2026-09-14T01:01:33.399Z",
+      "request_duration_ms": 61021,
+      "model_duration_ms": 52218,
+      "tokens": {
+        "total": 27315,
+        "input": 22185,
+        "output": 3338,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 1792
+        }
+      },
+      "cost_usd": 0.0040455576
+    }
+  ],
+  "client": "OpenCode 1.18.30",
+  "model": "opencode-go/mimo-v2.5",
+  "pure": true,
+  "isolated_workdir": "/private/tmp/u17-ordinary-simple-new-idea.2dc9g8",
+  "artifacts": {
+    "input": {
+      "path": "ordinary-input.md",
+      "sha256": "84bc540d3c8316d5d670e21fbfb78db6fef8a84926f36b8649f133787ad5575f"
+    },
+    "raw_events": {
+      "path": "ordinary-events.jsonl",
+      "sha256": "9f101d34f843c727be8717980cbe9cfb2f62465932472968ba12f54c1c82dd7f"
+    },
+    "output": {
+      "path": "ordinary-output.md",
+      "sha256": "6465281beb327678e9e4c38f7dba70d95dd6f7d047bf2d8984c8ac6aea0c4a54"
+    }
+  },
+  "stderr_bytes": 0
+}
