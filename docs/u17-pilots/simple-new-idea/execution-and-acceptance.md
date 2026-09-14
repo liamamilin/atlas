@@ -37,3 +37,17 @@
 ## 验收结论
 
 Atlas 已将两轮执行标记为 `applied`、产品验收标记为 `passed`，并完成迭代。运行时生成的 `planner.db` 和缓存已从工作区清理，未写入项目源码提交。
+
+## 第三轮：时间输入校验
+
+- 决策：`dec_37ae97d9c936467e85e8afabffaa7dea`
+- 迭代：`itr_b65caaa42ac740118e59cadfd4c650b6`
+- 任务：`tsk_d9a38819f16d4e96bbcb68333f770cda`
+- 执行：`exe_3a952e7bf30944a890cec951ff063fc2`
+- 应用前基线：`snap_f6635684824b4bf4b695e9507496e1b0`；执行结果已应用并更新基线。
+- 改动范围：工作区内仅 `app.py`、`tests/test_app.py`，实现 `HH:MM` 校验、结束晚于开始校验及 HTTP 400 错误响应。
+- 固定验证：首次运行因沙箱禁止临时 HTTP 端口绑定出现 5 个 HTTP 测试错误；在允许本地 HTTP 端口的环境复跑 `python3 -m unittest discover -s tests -v`，43/43 tests OK。
+- 产品验收：直接调用真实服务验证 `9:00` 返回 400（`invalid HH:MM`）、`11:00` 到 `10:00` 返回 400（结束早于开始），两次非法请求均未写入数据库；`09:00` 到 `10:00` 返回 201 且可读取。第三轮验收已通过并完成迭代。
+- Agent 报告仍为缺失/无效 JSON；Atlas 依据快照、测试输出和独立 API 证据完成验收。
+
+运行时生成的 `planner.db` 与 `__pycache__` 已清理，未写入项目源码提交。

@@ -4,7 +4,7 @@
   "title": "本地优先的个人日计划器",
   "protocol_frozen_at": "2026-09-14T00:52:27Z",
   "status": "completed",
-  "atlas_revision": "16060f741119",
+  "atlas_revision": "454f3a334bb307ce6cc807a9bc9e95c8e158f99a",
   "project": {
     "id": "prj_e6299aa777e645b4a8c9157a31364e0c",
     "name": "M5 试点 · 本地优先个人日计划器",
@@ -80,6 +80,11 @@
       "id": "dec_0b095d5461fb4981bb0d4ecc59b9fc47",
       "round": 2,
       "summary": "第二轮只做用户手工时间块和只读重叠提醒；不自动排程或移动；外部日历、云同步、账号、完成状态、项目删除后续再议。"
+    },
+    {
+      "id": "dec_37ae97d9c936467e85e8afabffaa7dea",
+      "round": 3,
+      "summary": "第三轮固化时间输入契约：API 只接受 HH:MM 格式的本地时间，结束时间必须晚于开始时间；非法输入返回明确 400，不写入数据库；继续保留用户手工时间块、只读冲突提醒和离线本地持久化边界。"
     }
   ],
   "documents": {
@@ -155,6 +160,13 @@
       "round": 2,
       "accepted": true,
       "role": "applied snapshot"
+    },
+    {
+      "id": "snap_f6635684824b4bf4b695e9507496e1b0",
+      "round": 3,
+      "accepted": true,
+      "files": 5,
+      "head": "454f3a334bb3"
     }
   ],
   "iterations": [
@@ -177,6 +189,16 @@
       "task_id": "tsk_750fc1cd26eb47a1b67f8ee5613a9201",
       "execution_ids": [
         "exe_42658fe3cf424ada998b9b47c4ef57a2"
+      ],
+      "acceptance": "passed"
+    },
+    {
+      "id": "itr_b65caaa42ac740118e59cadfd4c650b6",
+      "round": 3,
+      "status": "completed",
+      "task_id": "tsk_d9a38819f16d4e96bbcb68333f770cda",
+      "execution_ids": [
+        "exe_3a952e7bf30944a890cec951ff063fc2"
       ],
       "acceptance": "passed"
     }
@@ -204,5 +226,31 @@
     "status": "completed",
     "model_calls": 1,
     "preflight_failures": 2
+  },
+  "third_round_evidence": {
+    "decision_id": "dec_37ae97d9c936467e85e8afabffaa7dea",
+    "iteration_id": "itr_b65caaa42ac740118e59cadfd4c650b6",
+    "task_id": "tsk_d9a38819f16d4e96bbcb68333f770cda",
+    "execution": {
+      "id": "exe_3a952e7bf30944a890cec951ff063fc2",
+      "model": "opencode-go/mimo-v2.5",
+      "status": "completed",
+      "application_status": "applied",
+      "workspace": "application-atlas-production-pack/projects/execution-workspaces/prj_e6299aa777e645b4a8c9157a31364e0c/run_fffda5bb5499473ebfd8ad2958a8303e",
+      "before_snapshot_id": "snap_f6635684824b4bf4b695e9507496e1b0",
+      "verification": "python3 -m unittest discover -s tests -v passed (43/43) after rerun with local HTTP port permission",
+      "agent_report": "invalid_json",
+      "independent_note": "首次固定命令尝试因沙箱禁止临时 HTTP 端口绑定失败；在允许本地端口的环境复跑通过。"
+    },
+    "product_acceptance": {
+      "status": "passed",
+      "evidence": "真实 API：9:00 返回 400 invalid HH:MM；11:00→10:00 返回 400 start_time must be before end_time；数据库未写入非法时间块；09:00→10:00 返回 201 且可读取。既有跨项目承诺、时间块、冲突和持久化回归用例通过。"
+    }
+  },
+  "verification": {
+    "rounds": "3",
+    "latest": "第三轮完成并通过产品验收",
+    "tests": "43/43 workspace tests passed with local HTTP port permission; repository reliability suite passed previously (101 tests)",
+    "scope": "仅修改 app.py、tests/test_app.py，运行产物清理，未纳入预存无关改动。"
   }
 }
