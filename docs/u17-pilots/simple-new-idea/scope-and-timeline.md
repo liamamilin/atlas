@@ -63,7 +63,7 @@
 - 迭代：`itr_a6fea3387b5944d8ac0e02cc5ebd3f78`
 - 任务：`tsk_dcf4f91a5ec04148b0b25297cbf436d6`
 - 执行：`exe_1f6b30e226864348b9c2a5d9ab6f2e58`
-- 最终基线：`snap_7bbf94af74674512a06b59b6d2bc8b5a`
+- 功能验收基线：`snap_7bbf94af74674512a06b59b6d2bc8b5a`；文档提交后同步基线：`snap_46b6a5392ee840d2af7251dcb7b62c19`
 - 验收：80/80 workspace tests、`node --check static/app.js` 和真实页面编辑/取消删除/确认删除均通过。
 
 独立复核发现代理结果中的 `renderProjects()` 模板字符串缺少结束反引号，导致页面脚本无法解析；已在应用后修复并重新进行语法、测试和页面验收。验收测试产生的 `planner.db` 已可逆移出工作区，未删除未知用户数据。
