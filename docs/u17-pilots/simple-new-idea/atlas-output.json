@@ -4,7 +4,7 @@
   "title": "本地优先的个人日计划器",
   "protocol_frozen_at": "2026-09-14T00:52:27Z",
   "status": "completed",
-  "atlas_revision": "454f3a334bb307ce6cc807a9bc9e95c8e158f99a",
+  "atlas_revision": "354a98f06722c6cc807a9bc9e95c8e158f99a",
   "project": {
     "id": "prj_e6299aa777e645b4a8c9157a31364e0c",
     "name": "M5 试点 · 本地优先个人日计划器",
@@ -167,6 +167,25 @@
       "accepted": true,
       "files": 5,
       "head": "454f3a334bb3"
+    },
+    {
+      "id": "snap_bad1ff0fac4445ff8747ff369e0dd244",
+      "round": 4,
+      "accepted": true,
+      "head": "354a98f06722",
+      "note": "第四轮应用前复核基线"
+    },
+    {
+      "id": "snap_59016ad043474166bdcce77550331198",
+      "round": 4,
+      "accepted": true,
+      "role": "第四轮错误反馈改动应用后"
+    },
+    {
+      "id": "snap_c2f2237c461141daa46e8a456e3a7143",
+      "round": 4,
+      "accepted": true,
+      "role": "第四轮冲突提示修正应用后"
     }
   ],
   "iterations": [
@@ -201,6 +220,18 @@
         "exe_3a952e7bf30944a890cec951ff063fc2"
       ],
       "acceptance": "passed"
+    },
+    {
+      "id": "itr_fac58c9b9791487eb5587c11a09e04ea",
+      "round": 4,
+      "status": "completed",
+      "task_id": "tsk_217606c362c14ad9a7c8498676336c27",
+      "execution_ids": [
+        "exe_e8b798c1704444a69712c18f77197b45",
+        "exe_ad6ea0ce2f184e549f8ae08a20bbd4e0"
+      ],
+      "acceptance": "passed",
+      "superseded_task_id": "tsk_8fae0c06724a415c94d702eef326fd25"
     }
   ],
   "second_round_evidence": {
@@ -249,8 +280,35 @@
   },
   "verification": {
     "rounds": "3",
-    "latest": "第三轮完成并通过产品验收",
-    "tests": "43/43 workspace tests passed with local HTTP port permission; repository reliability suite passed previously (101 tests)",
+    "latest": "第四轮完成并通过产品验收；页面错误反馈和冲突提示已验证",
+    "tests": "54/54 workspace tests passed; node --check static/app.js passed; repository reliability suite previously 101/101",
     "scope": "仅修改 app.py、tests/test_app.py，运行产物清理，未纳入预存无关改动。"
+  },
+  "fourth_round_evidence": {
+    "iteration_id": "itr_fac58c9b9791487eb5587c11a09e04ea",
+    "tasks": [
+      {
+        "id": "tsk_217606c362c14ad9a7c8498676336c27",
+        "execution_id": "exe_e8b798c1704444a69712c18f77197b45",
+        "status": "applied",
+        "acceptance": "passed",
+        "verification": "54/54 tests passed",
+        "changes": [
+          "static/app.js",
+          "static/index.html",
+          "static/styles.css",
+          "tests/test_app.py"
+        ]
+      },
+      {
+        "id": "tsk_8fae0c06724a415c94d702eef326fd25",
+        "execution_id": "exe_ad6ea0ce2f184e549f8ae08a20bbd4e0",
+        "status": "applied",
+        "acceptance": "waived",
+        "note": "重复任务的核查与冲突提示修正；实际产品验收由同轮主任务完成"
+      }
+    ],
+    "product_acceptance": "停止服务后点击 Load 显示“加载当天承诺失败: Failed to fetch”；恢复服务并加载两个重叠时间块，页面在独立 conflicts-banner 区显示 1 条冲突及两个 Overlap 标记。",
+    "agent_report": "主执行报告存在 requirement_ids_mismatch，重试执行报告结构有效但固定命令带 2>&1 未被计划命令计入；Atlas 依据独立页面验收与 54/54 测试通过完成验收。"
   }
 }

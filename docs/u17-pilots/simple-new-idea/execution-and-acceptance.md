@@ -51,3 +51,16 @@ Atlas 已将两轮执行标记为 `applied`、产品验收标记为 `passed`，�
 - Agent 报告仍为缺失/无效 JSON；Atlas 依据快照、测试输出和独立 API 证据完成验收。
 
 运行时生成的 `planner.db` 与 `__pycache__` 已清理，未写入项目源码提交。
+
+## 第四轮：页面错误反馈与冲突提示
+
+- 迭代：`itr_fac58c9b9791487eb5587c11a09e04ea`
+- 主任务：`tsk_217606c362c14ad9a7c8498676336c27`
+- 主执行：`exe_e8b798c1704444a69712c18f77197b45`，应用后产品验收通过。
+- 主执行改动：`static/app.js`、`static/index.html`、`static/styles.css`、`tests/test_app.py`；固定命令 54/54 tests OK。
+- 页面验收：停止本地服务后点击 `Load`，页面显示 `加载当天承诺失败: Failed to fetch`；恢复服务后加载两个重叠时间块，独立冲突区域显示 1 条冲突和两个 `Overlap` 标记，项目来源信息仍可见。
+- 首次同轮任务 `tsk_8fae0c06724a415c94d702eef326fd25` 的执行 `exe_664b8e8eb6cc4de7ac7958bf73259c6c` 因遗漏 `static/index.html` 越界而未应用；随后主任务以完整写入范围成功完成。
+- 冲突提示修正重试 `exe_ad6ea0ce2f184e549f8ae08a20bbd4e0` 已应用；由于其固定命令带 `2>&1` 未被 Atlas 计划命令识别，且产品行为已由主任务独立验证，对该重复任务明确免验。
+- Agent 报告存在 requirement_ids mismatch/格式不一致；Atlas 以快照、独立页面行为和测试输出作为验收依据。
+
+运行时临时 `planner.db`、缓存和验收数据已清理。
