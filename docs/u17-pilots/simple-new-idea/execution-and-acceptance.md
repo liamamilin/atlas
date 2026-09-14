@@ -73,3 +73,12 @@ Atlas 已将两轮执行标记为 `applied`、产品验收标记为 `passed`，�
 - 独立验证：`python3 -m unittest discover -s tests -v` 共 80/80 通过；`node --check static/app.js` 通过。页面实测项目和任务重命名持久化，删除 Confirm/Cancel 取消不变更、确认后项目消失。
 - 复核修复：应用后发现前端模板字符串语法错误，修复 `renderProjects()` 结束反引号并重新验证；OpenCode 机器报告 JSON 无效，未作为验收依据。
 - Atlas 已记录产品验收通过并完成第五轮迭代；功能验收基线为 `snap_7bbf94af74674512a06b59b6d2bc8b5a`；文档提交后同步为 `snap_46b6a5392ee840d2af7251dcb7b62c19`。
+
+## 第六轮：任务完成状态
+
+- 需求：`req_d0b828bdb2514772846ffeccac3435c1`。
+- 迭代：`itr_72ef18b19de7449685b16486f5361d06`；任务：`tsk_a86b7a9ec8eb4f1da54be6ec6347e204`。
+- 执行：`exe_b692ead5c9f242e38b55e8f8b6f4aeb4`，隔离副本应用成功；固定写入范围为 `app.py`、`static/index.html`、`static/styles.css`、`static/app.js`、`tests/test_app.py`、`README.md`。
+- 改动：`tasks.completed` 数据迁移、`PUT /api/tasks/{id}/completion`、项目任务和当天承诺的 Done/Undo 控件与完成样式。
+- 独立验证：`node --check static/app.js` 通过；`python3 -m unittest discover -s tests -v` 共 103/103 通过，覆盖跨连接持久化以及完成状态不删除任务/承诺/时间块。
+- 产品验收：真实页面创建任务后显示 Done，点击变为 Undo；加入当天承诺后完成状态可见，恢复后承诺仍保留。Atlas 已标记验收通过并完成第六轮。

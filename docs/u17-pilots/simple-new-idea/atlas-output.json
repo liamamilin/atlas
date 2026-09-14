@@ -4,7 +4,7 @@
   "title": "本地优先的个人日计划器",
   "protocol_frozen_at": "2026-09-14T00:52:27Z",
   "status": "completed",
-  "atlas_revision": "98e6364",
+  "atlas_revision": "a531bd1",
   "project": {
     "id": "prj_e6299aa777e645b4a8c9157a31364e0c",
     "name": "M5 试点 · 本地优先个人日计划器",
@@ -69,6 +69,12 @@
       "case_id": "NI-R5",
       "status": "confirmed",
       "round": 5
+    },
+    {
+      "id": "req_d0b828bdb2514772846ffeccac3435c1",
+      "case_id": "NI-R6",
+      "status": "confirmed",
+      "round": 6
     }
   ],
   "decisions": [
@@ -112,6 +118,12 @@
       "technical_plan": "dver_0e02c00fe19e4f7ba91a47fedbcfd409",
       "development_plan": "dver_7af2140775154737af222b2f686f8cbc",
       "acceptance_plan": "dver_08a71a799b444d759efbb036a5028ae6"
+    },
+    "sixth_round": {
+      "product_requirements": "dver_ba829a3bdca744d1aee1a0e4513b1c75",
+      "technical_plan": "dver_b80b7617be64496fb782b466ea0e2c7d",
+      "development_plan": "dver_597e34731e2242e8a49ef889a8c03c00",
+      "acceptance_plan": "dver_187dd2c742014f1e9f8129b6387db8d4"
     }
   },
   "generation_runs": [
@@ -222,6 +234,12 @@
       "round": 5,
       "accepted": true,
       "role": "第五轮文档提交后同步仓库 HEAD 的最终基线"
+    },
+    {
+      "id": "snap_df59bde63f29454885c562fd28a5c57f",
+      "round": 6,
+      "accepted": true,
+      "role": "第六轮应用后最终工作区基线"
     }
   ],
   "iterations": [
@@ -279,6 +297,17 @@
       ],
       "acceptance": "passed",
       "superseded_task_id": null
+    },
+    {
+      "id": "itr_72ef18b19de7449685b16486f5361d06",
+      "round": 6,
+      "status": "completed",
+      "task_id": "tsk_a86b7a9ec8eb4f1da54be6ec6347e204",
+      "execution_ids": [
+        "exe_b692ead5c9f242e38b55e8f8b6f4aeb4"
+      ],
+      "acceptance": "passed",
+      "superseded_task_id": null
     }
   ],
   "second_round_evidence": {
@@ -326,10 +355,10 @@
     }
   },
   "verification": {
-    "rounds": "5",
-    "latest": "第五轮完成并通过产品验收；项目/任务编辑、二次确认删除及级联清理已验证",
-    "tests": "80/80 workspace tests passed; node --check static/app.js passed; 真实页面编辑、取消删除和确认删除通过",
-    "scope": "第五轮修改 app.py、static/index.html、static/styles.css、static/app.js、tests/test_app.py；修复一处前端模板字符串语法错误后重新验证。"
+    "rounds": "6",
+    "latest": "第六轮完成并通过产品验收；任务完成状态已加入并验证无副作用",
+    "tests": "103/103 workspace tests passed; node --check static/app.js passed; 真实页面完成/恢复状态和承诺保留通过",
+    "scope": "第六轮修改 app.py、static/index.html、static/styles.css、static/app.js、tests/test_app.py；完成状态迁移、API、项目列表和当天承诺展示均在声明范围内。"
   },
   "fourth_round_evidence": {
     "iteration_id": "itr_fac58c9b9791487eb5587c11a09e04ea",
@@ -367,5 +396,19 @@
     "node_check": "passed",
     "ui": "项目名称和任务标题点击编辑后持久化；删除 Confirm/Cancel 弹窗取消不变更，确认后项目及任务消失。",
     "note": "OpenCode 机器报告 JSON 无效且初始测试曾出现两条测试夹具错误；应用后独立修正前端语法错误并以独立测试和真实页面证据完成验收。"
+  },
+  "sixth_round_evidence": {
+    "iteration": "itr_72ef18b19de7449685b16486f5361d06",
+    "task": "tsk_a86b7a9ec8eb4f1da54be6ec6347e204",
+    "execution": "exe_b692ead5c9f242e38b55e8f8b6f4aeb4",
+    "acceptance": "passed",
+    "tests": "103/103",
+    "node_check": "passed",
+    "ui": "任务显示 Done/Undo；加入当天承诺后完成状态可见，恢复后承诺仍保留。",
+    "boundaries": [
+      "完成或恢复不删除任务",
+      "完成或恢复不移除当天承诺",
+      "完成或恢复不删除或移动时间块"
+    ]
   }
 }
