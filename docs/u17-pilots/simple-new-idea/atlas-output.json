@@ -1,0 +1,208 @@
+{
+  "schema": 1,
+  "case_id": "simple-new-idea",
+  "title": "本地优先的个人日计划器",
+  "protocol_frozen_at": "2026-09-14T00:52:27Z",
+  "status": "completed",
+  "atlas_revision": "16060f741119",
+  "project": {
+    "id": "prj_e6299aa777e645b4a8c9157a31364e0c",
+    "name": "M5 试点 · 本地优先个人日计划器",
+    "workspace": "application-atlas-production-pack/projects/workspaces/prj_e6299aa777e645b4a8c9157a31364e0c",
+    "sources": [
+      {
+        "ref_id": "ref_14697a67b1da46dfa0169818220eca3d",
+        "case_id": "NI-S1",
+        "path": "application-atlas-production-pack/applications/task-management-application.md",
+        "sha256": "816ab50adb110ae50fd8df449c7437b434bb8970266b1196385b1116e623899c"
+      },
+      {
+        "ref_id": "ref_c0ef5971273142c7bdbfe84315eac554",
+        "case_id": "NI-S2",
+        "path": "application-atlas-production-pack/applications/time-blocking-application.md",
+        "sha256": "2cd9eca2093ad136f27e9c517f6a071c5c1bdb7272936b00237a325c644e1263"
+      },
+      {
+        "ref_id": "ref_b9772f981da1470b8edc7e446692a8cd",
+        "case_id": "NI-S3",
+        "path": "application-atlas-production-pack/applications/personal-organizer.md",
+        "sha256": "a781dba79a92a53df7d84ee9521286ed8f2537abb1d2a57ab5e2d405b1baaaf7"
+      }
+    ]
+  },
+  "preexisting_changes_excluded": [
+    ".commandcode/",
+    "apps/Atlas.app/",
+    "apps/Atlas 停止.app/",
+    "apps/Atlas 启动.app/",
+    "apps/watchdog.sh",
+    "atlas-web/src/lib/lang.tsx",
+    "atlas-web/src/routes/home.tsx"
+  ],
+  "requirements": [
+    {
+      "id": "req_e3e86690c6b243c9b66a0212050a1e64",
+      "case_id": "NI-R1",
+      "status": "confirmed",
+      "round": 1
+    },
+    {
+      "id": "req_7a01df362ee948bab6d3d8b5999a8b54",
+      "case_id": "NI-R3",
+      "status": "confirmed",
+      "round": 1
+    },
+    {
+      "id": "req_88519236900a480796fe5e51f6668d6b",
+      "case_id": "NI-R2",
+      "status": "confirmed",
+      "round": 2
+    },
+    {
+      "id": "req_6fd25888bbe942418b97c34e3e42d09e",
+      "case_id": "NI-R4",
+      "status": "confirmed",
+      "round": 2
+    }
+  ],
+  "decisions": [
+    {
+      "id": "dec_2b3c2237aa04477790bbdbae173932e8",
+      "round": 1,
+      "summary": "当天承诺是用户手工选择的任务集合；支持任意日期；同一任务同日一次；完全离线无账号；首轮不做时间块、完成状态、删除和联网。"
+    },
+    {
+      "id": "dec_bec519efc02b426abb4a2ec6be8481f1",
+      "round": 1,
+      "summary": "Python 标准库 HTTP 服务、sqlite3、原生 HTML/CSS/JavaScript、单一 SQLite 文件、无第三方运行依赖。"
+    },
+    {
+      "id": "dec_0b095d5461fb4981bb0d4ecc59b9fc47",
+      "round": 2,
+      "summary": "第二轮只做用户手工时间块和只读重叠提醒；不自动排程或移动；外部日历、云同步、账号、完成状态、项目删除后续再议。"
+    }
+  ],
+  "documents": {
+    "analysis": "dver_cb4c506c99c94289809d7bc23a0267a8",
+    "first_round": {
+      "product_requirements": "dver_a7e7cd18e5fc477c938b32c69cfe297e",
+      "technical_plan": "dver_254a8e10a59d4a42959730f06d31bd1c",
+      "development_plan": "dver_20797b45492f40b8b30350b998b263ec",
+      "acceptance_plan": "dver_db4727187b6d4bfcbe7e7f46046dfc9f"
+    },
+    "second_round": {
+      "product_requirements": "dver_f5dc218d10e94f9cb59c41caf7ccaacb",
+      "technical_plan": "dver_5d0f6d09f58642248627995831095ca0",
+      "development_plan": "dver_fafff2de0228481889297809307c4faf",
+      "acceptance_plan": "dver_9b73be6d0ff84a49b584b7cbbf3ccc6e"
+    }
+  },
+  "generation_runs": [
+    {
+      "id": "gen_2db285126ab546589d9d8b634be56531",
+      "mode": "analysis",
+      "model": "opencode-go/mimo-v2.5",
+      "status": "completed"
+    },
+    {
+      "id": "gen_7fb98215dd574755afe71952acb5d517",
+      "mode": "documents",
+      "model": "opencode-go/mimo-v2.5",
+      "status": "completed"
+    },
+    {
+      "id": "gen_88815f478f844927b0b6836c56569132",
+      "mode": "documents",
+      "model": "opencode-go/mimo-v2.5",
+      "status": "completed"
+    },
+    {
+      "id": "ordinary",
+      "mode": "ordinary",
+      "session": "ses_f62929a96ffee3yClKolshRUzo",
+      "model": "opencode-go/mimo-v2.5",
+      "status": "completed",
+      "model_calls": 1,
+      "preflight_failures": 2
+    }
+  ],
+  "baselines": [
+    {
+      "id": "snap_efda11b92aa048ee85120a66853320aa",
+      "round": 1,
+      "accepted": false,
+      "note": "初始空工作区记录"
+    },
+    {
+      "id": "snap_cb9a633ac9bf4d75a9411df1a7df4b59",
+      "round": 1,
+      "accepted": true,
+      "files": 5,
+      "head": "16060f741119"
+    },
+    {
+      "id": "snap_c5415c9a0c0f4839bb352718ba9ffbdf",
+      "round": 2,
+      "role": "execution before snapshot"
+    },
+    {
+      "id": "snap_c35b24771d044e6c9877ae815dbe35e9",
+      "round": 2,
+      "role": "execution after snapshot"
+    },
+    {
+      "id": "snap_dbed725011724770931e4d1b34fdf661",
+      "round": 2,
+      "accepted": true,
+      "role": "applied snapshot"
+    }
+  ],
+  "iterations": [
+    {
+      "id": "itr_ecbd111407454226b8af1a08710c24c5",
+      "round": 1,
+      "status": "completed",
+      "task_id": "tsk_28db1b2cb6fd458a9be24e905b1a4d75",
+      "execution_ids": [
+        "exe_9c7bbcb0b1ba48a8a1fb1d28d64ab613",
+        "exe_41e8f69e73c4440c8dad6cbad9ee4b09",
+        "exe_67db9e9be3e640d5be4f206310f82029"
+      ],
+      "acceptance": "passed"
+    },
+    {
+      "id": "itr_d3c5db27de464816a8c0c60d25826477",
+      "round": 2,
+      "status": "completed",
+      "task_id": "tsk_750fc1cd26eb47a1b67f8ee5613a9201",
+      "execution_ids": [
+        "exe_42658fe3cf424ada998b9b47c4ef57a2"
+      ],
+      "acceptance": "passed"
+    }
+  ],
+  "second_round_evidence": {
+    "execution": {
+      "id": "exe_42658fe3cf424ada998b9b47c4ef57a2",
+      "session": "ses_f609e6601ffe7RaPV2GyEVaZt1",
+      "model": "opencode-go/mimo-v2.5",
+      "status": "completed",
+      "application_status": "applied",
+      "before_snapshot_id": "snap_c5415c9a0c0f4839bb352718ba9ffbdf",
+      "after_snapshot_id": "snap_c35b24771d044e6c9877ae815dbe35e9",
+      "applied_snapshot_id": "snap_dbed725011724770931e4d1b34fdf661",
+      "verification": "python3 -m unittest discover -s tests -v passed (9/9)",
+      "independent_post_apply_verification": "python3 -m unittest discover -s tests -v passed (17/17, including time block and conflict tests)"
+    },
+    "product_acceptance": "真实页面创建两个项目和任务；跨项目加入同日承诺；创建 09:00-10:00 与 09:30-10:30 时间块后显示 1 条冲突和两个 Overlap 标记；手工改为 11:00-12:00 后提醒消失；删除时间块；停止并重启后项目、任务、承诺和剩余时间块保持。"
+  },
+  "ordinary_run": {
+    "input_file": "ordinary-input.md",
+    "output_file": "ordinary-output.md",
+    "raw_events_file": "ordinary-events.jsonl",
+    "session": "ses_f62929a96ffee3yClKolshRUzo",
+    "status": "completed",
+    "model_calls": 1,
+    "preflight_failures": 2
+  }
+}

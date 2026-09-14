@@ -3,7 +3,7 @@
   "case_id": "simple-new-idea",
   "title": "本地优先的个人日计划器",
   "protocol_frozen_at": "2026-09-14T00:52:27Z",
-  "status": "protocol_frozen",
+  "status": "completed",
   "atlas_revision": "050bf884716eb7d87380d86ee9494b7a97e990d2",
   "atlas_working_tree": {
     "clean": false,
@@ -26,7 +26,10 @@
   },
   "initial_goal": "为同时推进多个个人项目的个人开发者制作一个本地优先的个人日计划器。首轮只验证用户能创建多个项目和任务，从不同项目选择任务形成某一天的承诺清单；数据持久保存在本地，进程重启后保持项目、任务和当天选择关系。",
   "first_iteration": {
-    "requirement_ids": ["NI-R1", "NI-R3"],
+    "requirement_ids": [
+      "NI-R1",
+      "NI-R3"
+    ],
     "excluded_scope": [
       "手动时间块",
       "冲突提示",
@@ -35,7 +38,10 @@
       "账号与云同步",
       "团队协作"
     ],
-    "acceptance_ids": ["NI-A1", "NI-A4"]
+    "acceptance_ids": [
+      "NI-A1",
+      "NI-A4"
+    ]
   },
   "second_iteration_disclosure": "第一轮普通生成和 Atlas 文档生成完成后，才提出 NI-R2 与 NI-R4；第一轮输入不预告第二轮功能。",
   "sources": [
@@ -87,5 +93,18 @@
     "范围确认耗时",
     "计划外改动与返工",
     "生成首次通过率与重试"
+  ],
+  "atlas_project_id": "prj_e6299aa777e645b4a8c9157a31364e0c",
+  "rounds_completed": 2,
+  "ordinary_comparison_archived": true,
+  "atlas_output": "atlas-output.json",
+  "excluded_preexisting_changes": [
+    ".commandcode/",
+    "apps/Atlas.app/",
+    "apps/Atlas 停止.app/",
+    "apps/Atlas 启动.app/",
+    "apps/watchdog.sh",
+    "atlas-web/src/lib/lang.tsx",
+    "atlas-web/src/routes/home.tsx"
   ]
 }
