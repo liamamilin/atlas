@@ -402,6 +402,12 @@
       "round": 10,
       "accepted": true,
       "role": "第十轮文档提交后同步 Git HEAD 066e2f8 的最终基线"
+    },
+    {
+      "id": "snap_325462ab56c64d3291439aa2084596ec",
+      "round": 11,
+      "accepted": true,
+      "role": "第十一轮备份 schema 迁移入口实现后代码基线"
     }
   ],
   "iterations": [
@@ -551,9 +557,9 @@
   },
   "verification": {
     "rounds": "11",
-    "latest": "第十一轮完成代码实现和测试；导入恢复新增 schema 迁移准备管线，当前 1.0 格式保持不变，未知版本集中拒绝，未来 schema 扩展有明确入口。",
-    "tests": "182/182 workspace tests passed; TestImportValidation 28/28; TestImportBackupDataLayer 6/6; node --check static/app.js passed; 临时数据库直接验收通过。",
-    "scope": "第十一轮修改 app.py、static/app.js、tests/test_app.py；补齐备份版本常量、支持版本列表、迁移准备入口、当前结构校验和前端迁移提示。Atlas 新基线待本地服务恢复后同步。"
+    "latest": "第十一轮完成代码实现、测试、真实 HTTP 验收和 Atlas 代码基线同步；导入恢复新增 schema 迁移准备管线，当前 1.0 格式保持不变，未知版本集中拒绝，未来 schema 扩展有明确入口。",
+    "tests": "182/182 workspace tests passed; TestImportValidation 28/28; TestImportBackupDataLayer 6/6; node --check static/app.js passed; 临时数据库直接验收通过；真实 HTTP 临时端口验收通过。",
+    "scope": "第十一轮修改 app.py、static/app.js、tests/test_app.py；补齐备份版本常量、支持版本列表、迁移准备入口、当前结构校验和前端迁移提示。Atlas 已采用第十一轮代码基线。"
   },
   "fourth_round_evidence": {
     "iteration_id": "itr_fac58c9b9791487eb5587c11a09e04ea",
@@ -688,7 +694,7 @@
       "req_014a9d585ccc482580389031c4e93545",
       "req_24667b37cb2e4d6085efd614cb4df918"
     ],
-    "atlas_baseline_status": "待同步：localhost:5188 当前不可用；第十一轮代码变化尚未采用 Atlas 新基线。上一份已接受基线为 snap_be884d28192b4f00a3f9b30334bdcdba。",
+    "atlas_baseline_status": "已同步：第十一轮代码变化已采用 Atlas 新基线 snap_325462ab56c64d3291439aa2084596ec。上一份已接受基线为 snap_be884d28192b4f00a3f9b30334bdcdba。",
     "changed_files": [
       "app.py",
       "static/app.js",
@@ -700,11 +706,12 @@
       "targeted": "TestImportValidation 28/28 and TestImportBackupDataLayer 6/6 passed",
       "full_suite": "python3 -m unittest discover -s tests -v passed (182/182)",
       "direct_acceptance": "临时 SQLite 数据库直接验收通过：导出 schema_version=1.0；prepare_import_backup 返回 source_schema_version=1.0 和 migration_applied=false；schema_version=2.0 被拒绝；安全快照包含覆盖前项目；恢复后项目和 completed 状态正确。",
-      "http_acceptance_status": "未执行新的真实 HTTP 临时端口验收；自动审批因用量限制拒绝本机端口升级。全量测试中的 HTTP API 用例已通过。"
+      "http_acceptance_status": "真实 HTTP 临时端口验收已补跑通过：导出 schema_version=1.0；预览返回 source_schema_version=1.0、migration_applied=false；schema_version=2.0 返回 400；确认恢复先生成安全快照，再写入恢复数据。"
     },
     "runtime_artifacts": [
       "/private/tmp/atlas-round11-runtime-20260915/",
-      "/private/tmp/atlas-round11-direct-acceptance-20260915/"
+      "/private/tmp/atlas-round11-direct-acceptance-20260915/",
+      "/private/tmp/atlas-round11-http-acceptance-20260915/"
     ]
   }
 }
