@@ -4,7 +4,7 @@
   "title": "本地优先的个人日计划器",
   "protocol_frozen_at": "2026-09-14T00:52:27Z",
   "status": "completed",
-  "atlas_revision": "8a0476c",
+  "atlas_revision": "7a2423f",
   "project": {
     "id": "prj_e6299aa777e645b4a8c9157a31364e0c",
     "name": "M5 试点 · 本地优先个人日计划器",
@@ -87,6 +87,12 @@
       "case_id": "NI-R8",
       "status": "confirmed",
       "round": 8
+    },
+    {
+      "id": "req_24667b37cb2e4d6085efd614cb4df918",
+      "case_id": "NI-R9",
+      "status": "confirmed",
+      "round": 9
     }
   ],
   "decisions": [
@@ -168,6 +174,12 @@
       "technical_plan": "dver_2171109624e94aa79bbd5f2a2a48ee8a",
       "development_plan": "dver_19c693b944454a18822ca7241ed69be3",
       "acceptance_plan": "dver_a396277c69e24a478bf2402a48bb7cf"
+    },
+    "ninth_round": {
+      "product_requirements": "dver_90df58b1b62e41b492c97b20009e4fc8",
+      "technical_plan": "dver_5e445b54bbec4660847024786728511b",
+      "development_plan": "dver_aeca773bcaa84887938ac6ec6184b232",
+      "acceptance_plan": "dver_9f7aab95ec3b45a493e240105f513d3d"
     }
   },
   "generation_runs": [
@@ -203,6 +215,13 @@
       "mode": "documents",
       "model": "opencode-go/mimo-v2.5",
       "status": "completed"
+    },
+    {
+      "id": "gen_fd21802ec4914e55a4bf06a44d885147",
+      "mode": "documents",
+      "model": "opencode-go/mimo-v2.5",
+      "status": "completed",
+      "round": 9
     }
   ],
   "baselines": [
@@ -342,6 +361,29 @@
       "round": 8,
       "accepted": true,
       "role": "第八轮文档提交后同步仓库 HEAD 的最终基线"
+    },
+    {
+      "id": "snap_9fe3a1187bd04813b925bedcbcfefe62",
+      "round": 9,
+      "accepted": true,
+      "role": "第九轮文档生成前工作区基线"
+    },
+    {
+      "id": "snap_c97a7a752a9242f785c86ab3fe6fd829",
+      "round": 9,
+      "role": "第九轮执行结果应用前快照"
+    },
+    {
+      "id": "snap_723cd05b16a8438c954b97feca146cdd",
+      "round": 9,
+      "accepted": true,
+      "role": "第九轮完成迭代后自动记录基线"
+    },
+    {
+      "id": "snap_00660443ec2f4fb4a87d324a0d9ab054",
+      "round": 9,
+      "accepted": true,
+      "role": "第九轮独立修复和临时数据库移出后最终代码基线"
     }
   ],
   "iterations": [
@@ -432,6 +474,17 @@
       ],
       "acceptance": "passed",
       "superseded_task_id": null
+    },
+    {
+      "id": "itr_3ec5a7963d0248acacdcc6fcc52a9daf",
+      "round": 9,
+      "status": "completed",
+      "task_id": "tsk_71fcbd88003e498c80bc19c56707ab48",
+      "execution_ids": [
+        "exe_cd5bffd24ec04900bdd9c78753b8ae8b"
+      ],
+      "acceptance": "passed",
+      "superseded_task_id": null
     }
   ],
   "second_round_evidence": {
@@ -479,10 +532,10 @@
     }
   },
   "verification": {
-    "rounds": "8",
-    "latest": "第八轮完成并通过产品验收；备份导入预览、明确确认恢复、校验失败不写库和事务回滚已验证",
-    "tests": "149/149 workspace tests passed; node --check static/app.js passed; 真实服务 API 和页面导入预览/取消/确认恢复验证通过",
-    "scope": "第八轮修改 app.py、static/index.html、static/app.js、static/styles.css、tests/test_app.py；新增 schema_version=1.0 备份校验、预览、完整替换恢复和回滚，不包含合并导入、云同步或静默覆盖。"
+    "rounds": "9",
+    "latest": "第九轮完成并通过产品验收；备份恢复 API 的服务层确认门禁、重复标识校验、completed 类型校验、真实日期校验、HH:MM 与结束顺序校验均已验证",
+    "tests": "177/177 workspace tests passed; node --check static/app.js passed; 真实服务 API 验收覆盖失败不写库、预览不写库和 confirm=true 恢复成功",
+    "scope": "第九轮修改 app.py、static/app.js、tests/test_app.py；补齐服务层 confirm=true 门禁、导入字段完整性校验和前端确认请求标记，不改变完整替换恢复语义。"
   },
   "fourth_round_evidence": {
     "iteration_id": "itr_fac58c9b9791487eb5587c11a09e04ea",
@@ -566,6 +619,25 @@
     "boundaries": [
       "完整替换，不做合并导入",
       "不连接云端，不静默覆盖"
+    ]
+  },
+  "ninth_round_evidence": {
+    "requirement": "req_24667b37cb2e4d6085efd614cb4df918",
+    "iteration": "itr_3ec5a7963d0248acacdcc6fcc52a9daf",
+    "task": "tsk_71fcbd88003e498c80bc19c56707ab48",
+    "execution": "exe_cd5bffd24ec04900bdd9c78753b8ae8b",
+    "application_status": "applied",
+    "final_baseline_id": "snap_00660443ec2f4fb4a87d324a0d9ab054",
+    "acceptance": "passed",
+    "tests": "177/177",
+    "node_check": "passed",
+    "api": "真实 127.0.0.1:8080 验收通过：缺少 confirm、confirm=false、重复 project id、completed 非布尔、非法真实日期 2026-99-99、非法 HH:MM 和结束不晚于开始均返回 400，且每次导出快照不变；/api/import/preview 200 且不写库；confirm=true 的有效备份 200 恢复并保留 completed=true。",
+    "ui": "static/app.js 的 Confirm Restore 按钮请求体改为 {...pendingImportData, confirm: true}，继续保留页面确认对话框；后端真实门禁证明旧请求会被拒绝。",
+    "independent_fix": "执行应用后独立复核补齐前端 confirm 标记，并将日期校验从 YYYY-MM-DD 正则升级为标准库真实日期解析；新增 invalid calendar date 测试。",
+    "boundaries": [
+      "恢复接口服务层强制 confirm=true",
+      "导入前拒绝重复标识和非法字段，失败不写库",
+      "继续完整替换，不做合并导入、云同步或静默覆盖"
     ]
   }
 }

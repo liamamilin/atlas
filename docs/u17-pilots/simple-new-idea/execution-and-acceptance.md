@@ -1,6 +1,6 @@
 # 执行与验收记录
 
-状态：两轮 Atlas 执行、应用和产品验收均完成；普通生成对照已封存。
+状态：九轮 Atlas 执行、应用和产品验收均完成；普通生成对照已封存。
 
 ## 项目
 
@@ -36,7 +36,7 @@
 
 ## 验收结论
 
-Atlas 已将两轮执行标记为 `applied`、产品验收标记为 `passed`，并完成迭代。运行时生成的 `planner.db` 和缓存已从工作区清理，未写入项目源码提交。
+Atlas 已将前两轮执行标记为 `applied`、产品验收标记为 `passed`，并完成迭代。运行时生成的 `planner.db` 和缓存已从工作区清理，未写入项目源码提交。
 
 ## 第三轮：时间输入校验
 
@@ -114,3 +114,15 @@ Atlas 已将两轮执行标记为 `applied`、产品验收标记为 `passed`，�
 - 回滚与边界：数据层测试覆盖事务异常回滚；不做合并导入、云同步或静默覆盖。
 
 Atlas 已将第八轮任务验收标记为 passed，并完成迭代。
+
+## 第九轮：备份恢复 API 安全加固
+
+- 需求：`req_24667b37cb2e4d6085efd614cb4df918`。
+- 迭代：`itr_3ec5a7963d0248acacdcc6fcc52a9daf`；任务：`tsk_71fcbd88003e498c80bc19c56707ab48`。
+- 执行：`exe_cd5bffd24ec04900bdd9c78753b8ae8b`，应用后经独立复核补齐前端确认请求和真实日期校验。
+- 最终基线：`snap_00660443ec2f4fb4a87d324a0d9ab054`。
+- 改动：`POST /api/import` 在服务层强制 `confirm=true`；导入校验拒绝重复项目/任务/承诺/时间块 ID、非布尔 `completed`、非法真实日期、非法 `HH:MM` 和结束时间不晚于开始；`Confirm Restore` 按钮请求体补充 `confirm: true`。
+- 固定验证：`node --check static/app.js` 通过；`python3 -m unittest discover -s tests -v` 共 177/177 通过。
+- 真实 API 验收：在 `127.0.0.1:8080` 上直接验证缺少 `confirm`、`confirm=false`、重复 ID、`completed` 非布尔、`2026-99-99`、`9:00`、结束早于开始均返回 400，且每次导出快照与失败前一致；`/api/import/preview` 返回 200 且不写库；`confirm=true` 的有效备份恢复成功并保留 `completed=true`。
+
+运行时验收数据库已可逆移出工作区至 `/private/tmp/atlas-planner-round9-clean-acceptance-20260915.db`；修复前被旧服务写入坏日期的运行库也已归档至 `/private/tmp/atlas-planner-round9-dirty-date-20260915.db`。
