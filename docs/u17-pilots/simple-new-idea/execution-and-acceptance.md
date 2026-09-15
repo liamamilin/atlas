@@ -1,6 +1,6 @@
 # 执行与验收记录
 
-状态：十二轮代码实现和产品验收已完成；普通生成对照已封存；当天承诺来源项目分组和 Atlas 代码基线已同步。
+状态：十三轮代码实现和产品验收已完成；普通生成对照已封存；项目/任务删除最近删除与恢复和 Atlas 代码基线已同步。
 
 ## 项目
 
@@ -157,3 +157,14 @@ Atlas 已将第八轮任务验收标记为 passed，并完成迭代。
 - 浏览器验收：临时产品实例使用 `/private/tmp/atlas-round12-ui-acceptance.db`，打开 `http://127.0.0.1:8127/` 后加载 `2026-09-15`，页面返回两个当天承诺项目组：Alpha Project/Plan API 与 Beta Project/Fix UI；可加入任务区显示 Alpha Project/Write docs。
 
 临时验收产物已移至 `/private/tmp/atlas-round12-ui-acceptance-20260915/`。
+
+
+## 第十三轮：项目/任务最近删除与恢复
+
+- 范围：围绕第五轮删除功能补安全恢复，不改变项目/任务删除确认、不扩展云同步、不改变导出备份 `schema_version=1.0`。最近删除记录是本地撤销历史，导入备份时会清空。
+- Atlas 状态：上一份已接受基线为 `snap_d3deba5d80d24900ae51dc75372a1422`；第十三轮代码实现后采用基线 `snap_79397bd065374386b8020432678c3597`。
+- 改动：`app.py` 新增 `delete_events` 表、删除前快照、`GET /api/deleted-items`、`POST /api/deleted-items/{id}/restore`、恢复前冲突检查和导入清理；修复项目删除 API 重复调用 `delete_project` 的冗余 bug。`static/index.html`、`static/app.js`、`static/styles.css` 新增 Recently Deleted 区域、恢复按钮和删除/恢复/导入后的页面刷新。`tests/test_app.py` 增加项目恢复、任务恢复、源项目缺失、ID 冲突、导入清理和 HTTP API 覆盖。
+- 固定验证：`python3 -m py_compile app.py tests/test_app.py` 通过；`node --check static/app.js` 通过；`python3 -m unittest tests.test_app.TestDeletedItemRestore tests.test_app.TestEditDeleteAPI -v` 中数据层 5/5 通过，HTTP 用例在允许本地端口环境下 17/17 通过；`python3 -m unittest discover -s tests -v` 共 192/192 通过。
+- 浏览器验收：临时产品实例 `http://127.0.0.1:8128/` 使用 `/private/tmp/atlas-round13-ui-acceptance-20260916/planner.db`；通过 API 删除预置项目后页面显示 Recently Deleted 记录：Restore UI Project，包含 1 project、1 task、1 commitment、1 time block；点击 Restore 后项目和任务回到工作台，最近删除清空；切换到 `2026-09-16` 后当天承诺和 `09:00`–`10:00` 时间块可见。
+
+临时服务已关闭，`__pycache__` 已清理；验收数据保留在 `/private/tmp/atlas-round13-ui-acceptance-20260916/` 作为可丢弃证据。

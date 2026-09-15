@@ -414,6 +414,12 @@
       "round": 12,
       "accepted": true,
       "role": "第十二轮当天承诺按来源项目分组实现后代码基线"
+    },
+    {
+      "id": "snap_79397bd065374386b8020432678c3597",
+      "round": 13,
+      "accepted": true,
+      "role": "第十三轮项目/任务删除最近删除与恢复实现后代码基线"
     }
   ],
   "iterations": [
@@ -562,10 +568,10 @@
     }
   },
   "verification": {
-    "rounds": "12",
-    "latest": "第十二轮完成当天承诺清单和可加入任务列表的来源项目分组；跨项目扫描从平铺任务升级为项目块，并保留任务完成、移除和时间块操作。",
-    "tests": "182/182 workspace tests passed; TestCrossProjectCommitments 5/5; node --check static/app.js passed; Node frontend render acceptance passed; browser UI acceptance passed.",
-    "scope": "第十二轮修改 static/app.js、static/styles.css、tests/test_app.py；后端数据结构保持兼容，仅补项目名断言。Atlas 已采用第十二轮代码基线。"
+    "rounds": "13",
+    "latest": "第十三轮完成项目/任务删除后的最近删除与恢复闭环；级联删除前保存快照，用户可从工作台恢复项目或任务，恢复会做 ID 冲突与源项目存在性检查。",
+    "tests": "192/192 workspace tests passed; TestDeletedItemRestore 5/5; TestEditDeleteAPI 17/17; python3 -m py_compile app.py tests/test_app.py passed; node --check static/app.js passed; browser UI acceptance passed.",
+    "scope": "第十三轮修改 app.py、static/app.js、static/index.html、static/styles.css、tests/test_app.py；导出备份 schema_version=1.0 保持不变，最近删除作为本地撤销历史不进入备份，导入备份时清空。"
   },
   "fourth_round_evidence": {
     "iteration_id": "itr_fac58c9b9791487eb5587c11a09e04ea",
@@ -741,6 +747,30 @@
     },
     "runtime_artifacts": [
       "/private/tmp/atlas-round12-ui-acceptance-20260915/"
+    ]
+  },
+  "thirteenth_round_evidence": {
+    "scope": "为项目/任务级联删除增加本地最近删除与恢复能力，降低误删风险，同时不改变导出备份格式或导入恢复语义。",
+    "related_requirement_ids": [
+      "req_2f7f4298f21e44968d22c4e4866212de"
+    ],
+    "atlas_baseline_status": "已同步：第十三轮代码变化已采用 Atlas 新基线 snap_79397bd065374386b8020432678c3597。上一份已接受基线为 snap_d3deba5d80d24900ae51dc75372a1422。",
+    "changed_files": [
+      "app.py",
+      "static/app.js",
+      "static/index.html",
+      "static/styles.css",
+      "tests/test_app.py"
+    ],
+    "implementation": "新增 delete_events 本地表；删除项目或任务前保存项目、任务、当天承诺和时间块快照；GET /api/deleted-items 返回未恢复记录；POST /api/deleted-items/{id}/restore 在无 ID 冲突且任务源项目存在时恢复快照并标记 restored_at。工作台新增 Recently Deleted 区域和 Restore 按钮；删除、恢复和导入后刷新项目、当天承诺和最近删除列表。修复项目删除 API 重复调用 delete_project 的冗余 bug。",
+    "validation": {
+      "syntax": "python3 -m py_compile app.py tests/test_app.py passed; node --check static/app.js passed",
+      "targeted": "TestDeletedItemRestore 5/5 passed; TestEditDeleteAPI 17/17 passed",
+      "full_suite": "python3 -m unittest discover -s tests -v passed (192/192)",
+      "browser_acceptance": "临时产品实例 http://127.0.0.1:8128 使用 /private/tmp 临时数据库验收通过：Recently Deleted 显示 Restore UI Project 及 1 project/1 task/1 commitment/1 time block；点击 Restore 后项目和任务回到工作台，最近删除清空；切换到 2026-09-16 后当天承诺和 09:00-10:00 时间块可见。"
+    },
+    "runtime_artifacts": [
+      "/private/tmp/atlas-round13-ui-acceptance-20260916/"
     ]
   }
 }
