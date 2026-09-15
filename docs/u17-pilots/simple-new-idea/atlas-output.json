@@ -466,7 +466,7 @@
     "tests": "117/117",
     "node_check": "passed",
     "api": "GET /api/export 返回 200 application/json，schema_version=1.0，包含 projects、tasks、day_commitments、time_blocks 和 completed 状态。",
-    "ui": "真实产品页面可见 Export JSON Backup 入口，点击后无页面错误。",
+    "ui": "真实产品页面可见 Export JSON Backup 入口，Chrome 实际下载 planner-backup.json，点击入口后无页面错误。",
     "readonly": "导出前后 GET /api/projects 响应一致，未修改源数据。",
     "boundaries": [
       "仅用户主动触发单文件 JSON 导出",

@@ -90,6 +90,6 @@ Atlas 已将两轮执行标记为 `applied`、产品验收标记为 `passed`，�
 - 执行：`exe_dac822354f244c0786132cb74f9125ac`，应用后基线 `snap_959f76e7099044d2a154492ba1e6bf58`。
 - 改动：`app.py` 新增 `export_backup()` 与 `GET /api/export`；`static/index.html` 增加 Export JSON Backup 入口；`static/app.js` 生成并下载 `planner-backup.json`，失败显示错误；补充导出数据层和 API 回归测试。
 - 独立验证：`node --check static/app.js` 通过；`python3 -m unittest discover -s tests -v` 共 117/117 通过。真实服务返回 `200 application/json`，`schema_version=1.0`，包含四类集合和 `completed`；导出前后项目 API 响应一致。
-- 产品验收：真实产品页面可见 `Export JSON Backup` 按钮，点击入口后无页面错误；验收通过并完成第七轮。
+- 产品验收：真实产品页面可见 `Export JSON Backup` 按钮，Chrome 实际生成并下载 `planner-backup.json`（下载事件在扩展桥接中不可见，但 Downloads 目录已出现文件）；点击入口后无页面错误，验收通过并完成第七轮。
 
 运行时验收数据库已可逆移出工作区至 `/private/tmp/atlas-planner-export-20260915.db`，未写入源码提交。

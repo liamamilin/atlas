@@ -88,6 +88,6 @@
 - 任务：`tsk_ff1250adc2484974bef41c899fdbeffc`
 - 执行：`exe_dac822354f244c0786132cb74f9125ac`
 - 基线：`snap_959f76e7099044d2a154492ba1e6bf58`
-- 验收：117/117 workspace tests、`node --check static/app.js` 通过；真实服务返回 200 JSON，真实页面显示导出入口；导出前后项目 API 数据一致。
+- 验收：117/117 workspace tests、`node --check static/app.js` 通过；真实服务返回 200 JSON，Chrome 实际下载 `planner-backup.json`，真实页面显示导出入口；导出前后项目 API 数据一致。
 
 第七轮 OpenCode 完成报告缺失且 requirement IDs 不完整，Atlas 未把 agent 自报当作完成事实；独立测试、接口结构、只读比对和页面入口证据均已补足，产品验收通过。
