@@ -1,6 +1,6 @@
 # 范围与时间记录
 
-状态：十轮核心闭环已完成并通过产品验收。
+状态：十一轮核心闭环已完成并通过产品验收；第十一轮 Atlas 新代码基线待本地工作台服务恢复后同步。
 
 ## 固定边界
 
@@ -140,11 +140,24 @@
 
 第十轮验收产生的 `planner.db`、`backups/` 和 `__pycache__` 已可逆移出工作区至 `/private/tmp/atlas-round10-runtime-20260915/`。
 
+## 第十一轮：备份 schema 迁移入口
+
+第十一轮不改变当前对外备份格式，导出仍固定为 `schema_version=1.0`，导入仍只接受受支持版本。变化是把版本识别、未来迁移和当前结构校验拆成明确管线：导入预览和确认恢复都先进入 `prepare_import_backup()`，由它调用 `migrate_backup_to_current()` 得到标准化备份，再用当前 schema 校验函数检查字段、引用和时间边界。这样以后增加 `schema_version=1.1` 时，可以新增迁移分支，而不用重写恢复事务和已有校验。
+
+- 需求来源：围绕 `req_014a9d585ccc482580389031c4e93545` 和 `req_24667b37cb2e4d6085efd614cb4df918` 的版本兼容增强；本轮未新增 Atlas 候选需求 ID。
+- Atlas 基线：上一份已接受基线为第十轮提交后同步 Git HEAD 的 `snap_be884d28192b4f00a3f9b30334bdcdba`；第十一轮代码基线待 `localhost:5188` 工作台服务恢复后同步。
+- 改动：`app.py` 新增 `BACKUP_SCHEMA_VERSION`、`SUPPORTED_IMPORT_SCHEMA_VERSIONS`、`migrate_backup_to_current()`、`validate_current_import_backup()` 和 `prepare_import_backup()`；恢复写库改用标准化后的备份对象。`static/app.js` 在未来实际发生迁移时显示源版本到目标版本的提示。`tests/test_app.py` 增加当前版本深拷贝迁移、支持版本列表、预览标准化和缺失/未知版本拒绝测试。
+- 验收：`node --check static/app.js` 通过；`TestImportValidation` 28/28、`TestImportBackupDataLayer` 6/6、全量 182/182 workspace tests 通过；临时 SQLite 数据库直接验收通过，覆盖导出 1.0、预览 source/current 版本、未知 2.0 拒绝、安全快照和恢复后 completed 状态。
+
+新的真实 HTTP 临时端口验收未在本轮执行：自动审批因用量限制拒绝本机端口升级。已有全量回归中的 HTTP API 用例通过，且本轮补充了不绑定端口的临时数据库端到端验收。
+
+第十一轮产生的空运行库、缓存和临时直接验收产物已可逆移出工作区至 `/private/tmp/atlas-round11-runtime-20260915/` 与 `/private/tmp/atlas-round11-direct-acceptance-20260915/`。
+
 ## 下一步计划
 
-核心功能当前已经完整到“本地项目计划器可日常使用，并具备手动导出、校验恢复、恢复确认、安全快照和失败回滚”的程度。后续建议按必要性排序：
+核心功能当前已经完整到“本地项目计划器可日常使用，并具备手动导出、校验恢复、恢复确认、安全快照、失败回滚和 schema 迁移入口”的程度。后续建议按必要性排序：
 
-1. 固定备份 schema 迁移策略，为未来 `schema_version=1.1` 或字段扩展做兼容入口。
+1. 恢复 Atlas 工作台服务后，检查第十一轮外部变化并采用当前代码基线。
 2. 在当天承诺清单中强化来源项目展示或分组，提升跨项目扫描效率。
 3. 为项目/任务删除增加撤销、审计或最近删除列表，降低级联删除风险。
 4. 处理导出与导入期间的并发写入策略；本版仍按单用户本地使用假设。

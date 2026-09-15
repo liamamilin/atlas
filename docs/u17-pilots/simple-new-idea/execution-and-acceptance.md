@@ -1,6 +1,6 @@
 # 执行与验收记录
 
-状态：十轮 Atlas 执行、应用和产品验收均完成；普通生成对照已封存。
+状态：十一轮代码实现和产品验收已完成；普通生成对照已封存；第十一轮 Atlas 新代码基线待本地工作台服务恢复后同步。
 
 ## 项目
 
@@ -136,3 +136,13 @@ Atlas 已将第八轮任务验收标记为 passed，并完成迭代。
 - 真实 API 验收：在 `127.0.0.1:8080` 上验证 `/api/import/preview`、缺少 `confirm`、重复 project id 的确认导入均不会创建 `backups`；有效 `confirm=true` 恢复返回 `safety_backup_path`，生成的安全快照包含覆盖前项目 `Before Restore` 和任务 `Existing Task`，恢复后当前数据为 `After Restore` 且 `completed=true` 保持。
 
 运行时验收产生的 `planner.db`、`backups/` 和 `__pycache__` 已可逆移出工作区至 `/private/tmp/atlas-round10-runtime-20260915/`，工作区清理后再采用第十轮代码基线。
+
+## 第十一轮：备份 schema 迁移入口
+
+- 范围：第十一轮直接围绕第八轮导入恢复和第九轮 API 安全边界补版本迁移入口，当前对外备份格式仍为 `schema_version=1.0`，未新增 Atlas 候选需求 ID。
+- Atlas 状态：上一份已接受基线为 `snap_be884d28192b4f00a3f9b30334bdcdba`。本轮因 `localhost:5188` 工作台服务不可用，尚未采用第十一轮代码基线。
+- 改动：`app.py` 新增备份版本常量、支持版本列表、`migrate_backup_to_current()`、`validate_current_import_backup()` 和 `prepare_import_backup()`；`/api/import/preview` 与 `/api/import` 都先准备标准化备份，再校验和恢复；未知版本集中返回 `unsupported schema_version`。`static/app.js` 仅在未来 `migration_applied=true` 时显示版本迁移提示。`tests/test_app.py` 增加迁移深拷贝、支持版本、标准化预览和缺失/未知版本拒绝测试。
+- 固定验证：`node --check static/app.js` 通过；`python3 -m unittest tests.test_app.TestImportValidation -v` 共 28/28 通过；`python3 -m unittest tests.test_app.TestImportBackupDataLayer -v` 共 6/6 通过；`python3 -m unittest discover -s tests -v` 共 182/182 通过。
+- 直接验收：临时 SQLite 数据库中创建旧数据后导出，确认导出 `schema_version=1.0`；`prepare_import_backup()` 返回 `source_schema_version=1.0` 和 `migration_applied=false`；`schema_version=2.0` 被拒绝；恢复前安全快照包含覆盖前项目 `Schema Existing`；恢复后项目为 `Schema Restored` 且 `completed=true`。
+
+新的真实 HTTP 临时端口验收未执行：自动审批因用量限制拒绝本机端口升级。已有全量测试中的 HTTP API 用例通过，直接验收覆盖了本轮新增的版本迁移与恢复路径。运行时产物已移至 `/private/tmp/atlas-round11-runtime-20260915/` 和 `/private/tmp/atlas-round11-direct-acceptance-20260915/`。

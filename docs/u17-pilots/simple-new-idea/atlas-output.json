@@ -396,6 +396,12 @@
       "round": 10,
       "accepted": true,
       "role": "第十轮导入恢复前自动安全快照实现后代码基线"
+    },
+    {
+      "id": "snap_be884d28192b4f00a3f9b30334bdcdba",
+      "round": 10,
+      "accepted": true,
+      "role": "第十轮文档提交后同步 Git HEAD 066e2f8 的最终基线"
     }
   ],
   "iterations": [
@@ -544,10 +550,10 @@
     }
   },
   "verification": {
-    "rounds": "10",
-    "latest": "第十轮完成并通过产品验收；导入恢复在确认和校验通过后、覆盖前自动保存本地安全快照，快照失败会中止恢复并保留原数据。",
-    "tests": "178/178 workspace tests passed; python3 -m unittest tests.test_app.TestImportAPI -v passed (31/31); node --check static/app.js passed; 真实服务 API 验收覆盖预览/失败不创建快照、确认恢复创建覆盖前快照。",
-    "scope": "第十轮修改 app.py、static/app.js、tests/test_app.py；补齐导入恢复前自动安全快照与快照路径提示，不改变 schema_version=1.0、完整替换、失败回滚、无云同步的恢复语义。"
+    "rounds": "11",
+    "latest": "第十一轮完成代码实现和测试；导入恢复新增 schema 迁移准备管线，当前 1.0 格式保持不变，未知版本集中拒绝，未来 schema 扩展有明确入口。",
+    "tests": "182/182 workspace tests passed; TestImportValidation 28/28; TestImportBackupDataLayer 6/6; node --check static/app.js passed; 临时数据库直接验收通过。",
+    "scope": "第十一轮修改 app.py、static/app.js、tests/test_app.py；补齐备份版本常量、支持版本列表、迁移准备入口、当前结构校验和前端迁移提示。Atlas 新基线待本地服务恢复后同步。"
   },
   "fourth_round_evidence": {
     "iteration_id": "itr_fac58c9b9791487eb5587c11a09e04ea",
@@ -675,5 +681,30 @@
       "api": "真实 127.0.0.1:8080 验收通过：预览、缺少 confirm 和重复 ID 均不创建 backups；confirm=true 有效恢复创建 safety_backup_path，快照包含覆盖前项目 Before Restore 和任务 Existing Task，恢复后项目 After Restore 且 completed=true 保持。"
     },
     "runtime_artifacts": "/private/tmp/atlas-round10-runtime-20260915/"
+  },
+  "eleventh_round_evidence": {
+    "scope": "固定备份 schema 迁移入口；当前对外备份格式仍为 schema_version=1.0，不新增 1.1 数据字段。",
+    "related_requirement_ids": [
+      "req_014a9d585ccc482580389031c4e93545",
+      "req_24667b37cb2e4d6085efd614cb4df918"
+    ],
+    "atlas_baseline_status": "待同步：localhost:5188 当前不可用；第十一轮代码变化尚未采用 Atlas 新基线。上一份已接受基线为 snap_be884d28192b4f00a3f9b30334bdcdba。",
+    "changed_files": [
+      "app.py",
+      "static/app.js",
+      "tests/test_app.py"
+    ],
+    "implementation": "新增 BACKUP_SCHEMA_VERSION、SUPPORTED_IMPORT_SCHEMA_VERSIONS、migrate_backup_to_current()、validate_current_import_backup() 和 prepare_import_backup()。导入预览与确认恢复都先执行版本识别和迁移准备，再校验当前结构；恢复写库使用 normalized_backup。当前 1.0 备份会深拷贝并标记 source_schema_version=1.0，未知版本返回 unsupported schema_version。前端预览只在 migration_applied=true 时显示迁移提示。",
+    "validation": {
+      "syntax": "node --check static/app.js passed",
+      "targeted": "TestImportValidation 28/28 and TestImportBackupDataLayer 6/6 passed",
+      "full_suite": "python3 -m unittest discover -s tests -v passed (182/182)",
+      "direct_acceptance": "临时 SQLite 数据库直接验收通过：导出 schema_version=1.0；prepare_import_backup 返回 source_schema_version=1.0 和 migration_applied=false；schema_version=2.0 被拒绝；安全快照包含覆盖前项目；恢复后项目和 completed 状态正确。",
+      "http_acceptance_status": "未执行新的真实 HTTP 临时端口验收；自动审批因用量限制拒绝本机端口升级。全量测试中的 HTTP API 用例已通过。"
+    },
+    "runtime_artifacts": [
+      "/private/tmp/atlas-round11-runtime-20260915/",
+      "/private/tmp/atlas-round11-direct-acceptance-20260915/"
+    ]
   }
 }
