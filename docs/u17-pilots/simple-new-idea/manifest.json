@@ -84,7 +84,7 @@
     "ordinary_end": "完整 assistant 响应写入原始事件文件",
     "atlas_start": "网页首次提交固定资料分析",
     "atlas_scope_end": "首轮需求和开发范围完成人工确认",
-    "atlas_iteration_end": "第九轮产品验收通过并完成迭代（2026-09-15）"
+    "atlas_iteration_end": "第十轮导入恢复前自动安全快照开发与验收完成（2026-09-15）"
   },
   "comparison_fields": [
     "重要遗漏",
@@ -95,7 +95,7 @@
     "生成首次通过率与重试"
   ],
   "atlas_project_id": "prj_e6299aa777e645b4a8c9157a31364e0c",
-  "rounds_completed": 9,
+  "rounds_completed": 10,
   "ordinary_comparison_archived": true,
   "atlas_output": "atlas-output.json",
   "excluded_preexisting_changes": [
@@ -108,6 +108,6 @@
     "atlas-web/src/routes/home.tsx"
   ],
   "completion_revision": "7a2423f",
-  "latest_atlas_baseline": "snap_00660443ec2f4fb4a87d324a0d9ab054",
-  "latest_verification": "第九轮：177/177 workspace tests、node --check static/app.js、真实 127.0.0.1:8080 API 验收通过；服务层 confirm=true 门禁和失败不写库已验证。"
+  "latest_atlas_baseline": "snap_087b8a93d7c44310beada6857533ea16",
+  "latest_verification": "第十轮：178/178 workspace tests、TestImportAPI 31/31、node --check static/app.js、真实 127.0.0.1:8080 API 验收通过；确认恢复前自动写入覆盖前 JSON 安全快照，预览和失败路径不创建快照，快照失败时恢复中止且原数据不变。"
 }

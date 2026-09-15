@@ -1,6 +1,6 @@
 # 执行与验收记录
 
-状态：九轮 Atlas 执行、应用和产品验收均完成；普通生成对照已封存。
+状态：十轮 Atlas 执行、应用和产品验收均完成；普通生成对照已封存。
 
 ## 项目
 
@@ -126,3 +126,13 @@ Atlas 已将第八轮任务验收标记为 passed，并完成迭代。
 - 真实 API 验收：在 `127.0.0.1:8080` 上直接验证缺少 `confirm`、`confirm=false`、重复 ID、`completed` 非布尔、`2026-99-99`、`9:00`、结束早于开始均返回 400，且每次导出快照与失败前一致；`/api/import/preview` 返回 200 且不写库；`confirm=true` 的有效备份恢复成功并保留 `completed=true`。
 
 运行时验收数据库已可逆移出工作区至 `/private/tmp/atlas-planner-round9-clean-acceptance-20260915.db`；修复前被旧服务写入坏日期的运行库也已归档至 `/private/tmp/atlas-planner-round9-dirty-date-20260915.db`。
+
+## 第十轮：导入恢复前自动安全快照
+
+- 范围：第十轮直接围绕第八轮导入恢复和第九轮 API 安全边界补安全快照，未新增 Atlas 候选需求 ID。
+- Atlas 基线：第九轮文档提交后基线 `snap_c85e368eac3841bca2192f6bcae93480`；第十轮代码实现后采用基线 `snap_087b8a93d7c44310beada6857533ea16`。
+- 改动：`app.py` 新增 `backup_dir_for_db()` 与 `save_safety_backup()`；`POST /api/import` 在 `confirm=true` 和导入校验通过后、事务替换前写入 `backups/<db-name>/pre-import-<timestamp>-<suffix>.json`，并在恢复响应中返回 `safety_backup_path`；如果快照写入失败则返回 500 并保持原数据不变。`static/app.js` 在恢复成功摘要中显示安全快照路径。`tests/test_app.py` 增加安全快照成功、失败不创建、快照写入失败中止恢复的回归覆盖。
+- 固定验证：`node --check static/app.js` 通过；`python3 -m unittest tests.test_app.TestImportAPI -v` 共 31/31 通过；`python3 -m unittest discover -s tests -v` 共 178/178 通过。
+- 真实 API 验收：在 `127.0.0.1:8080` 上验证 `/api/import/preview`、缺少 `confirm`、重复 project id 的确认导入均不会创建 `backups`；有效 `confirm=true` 恢复返回 `safety_backup_path`，生成的安全快照包含覆盖前项目 `Before Restore` 和任务 `Existing Task`，恢复后当前数据为 `After Restore` 且 `completed=true` 保持。
+
+运行时验收产生的 `planner.db`、`backups/` 和 `__pycache__` 已可逆移出工作区至 `/private/tmp/atlas-round10-runtime-20260915/`，工作区清理后再采用第十轮代码基线。

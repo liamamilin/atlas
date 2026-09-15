@@ -384,6 +384,18 @@
       "round": 9,
       "accepted": true,
       "role": "第九轮独立修复和临时数据库移出后最终代码基线"
+    },
+    {
+      "id": "snap_c85e368eac3841bca2192f6bcae93480",
+      "round": 9,
+      "accepted": true,
+      "role": "第九轮文档提交后同步仓库 HEAD 的最终基线"
+    },
+    {
+      "id": "snap_087b8a93d7c44310beada6857533ea16",
+      "round": 10,
+      "accepted": true,
+      "role": "第十轮导入恢复前自动安全快照实现后代码基线"
     }
   ],
   "iterations": [
@@ -532,10 +544,10 @@
     }
   },
   "verification": {
-    "rounds": "9",
-    "latest": "第九轮完成并通过产品验收；备份恢复 API 的服务层确认门禁、重复标识校验、completed 类型校验、真实日期校验、HH:MM 与结束顺序校验均已验证",
-    "tests": "177/177 workspace tests passed; node --check static/app.js passed; 真实服务 API 验收覆盖失败不写库、预览不写库和 confirm=true 恢复成功",
-    "scope": "第九轮修改 app.py、static/app.js、tests/test_app.py；补齐服务层 confirm=true 门禁、导入字段完整性校验和前端确认请求标记，不改变完整替换恢复语义。"
+    "rounds": "10",
+    "latest": "第十轮完成并通过产品验收；导入恢复在确认和校验通过后、覆盖前自动保存本地安全快照，快照失败会中止恢复并保留原数据。",
+    "tests": "178/178 workspace tests passed; python3 -m unittest tests.test_app.TestImportAPI -v passed (31/31); node --check static/app.js passed; 真实服务 API 验收覆盖预览/失败不创建快照、确认恢复创建覆盖前快照。",
+    "scope": "第十轮修改 app.py、static/app.js、tests/test_app.py；补齐导入恢复前自动安全快照与快照路径提示，不改变 schema_version=1.0、完整替换、失败回滚、无云同步的恢复语义。"
   },
   "fourth_round_evidence": {
     "iteration_id": "itr_fac58c9b9791487eb5587c11a09e04ea",
@@ -639,5 +651,29 @@
       "导入前拒绝重复标识和非法字段，失败不写库",
       "继续完整替换，不做合并导入、云同步或静默覆盖"
     ]
+  },
+  "tenth_round_evidence": {
+    "scope": "围绕第八轮导入恢复与第九轮服务层安全边界做恢复前自动安全快照；本轮未新增 Atlas 候选需求 ID。",
+    "related_requirement_ids": [
+      "req_014a9d585ccc482580389031c4e93545",
+      "req_24667b37cb2e4d6085efd614cb4df918"
+    ],
+    "baselines": {
+      "prior_final_baseline_id": "snap_c85e368eac3841bca2192f6bcae93480",
+      "final_code_baseline_id": "snap_087b8a93d7c44310beada6857533ea16"
+    },
+    "changed_files": [
+      "app.py",
+      "static/app.js",
+      "tests/test_app.py"
+    ],
+    "implementation": "POST /api/import 在 confirm=true 和完整导入校验通过后、完整替换前调用 save_safety_backup，把当前数据写入 backups/<db-name>/pre-import-*.json；快照写入失败时恢复中止且原数据库保持不变。恢复成功响应返回 safety_backup_path，前端在 Restore complete 摘要中显示该路径。",
+    "validation": {
+      "unit_targeted": "python3 -m unittest tests.test_app.TestImportAPI -v passed (31/31)",
+      "full_suite": "python3 -m unittest discover -s tests -v passed (178/178)",
+      "syntax": "node --check static/app.js passed",
+      "api": "真实 127.0.0.1:8080 验收通过：预览、缺少 confirm 和重复 ID 均不创建 backups；confirm=true 有效恢复创建 safety_backup_path，快照包含覆盖前项目 Before Restore 和任务 Existing Task，恢复后项目 After Restore 且 completed=true 保持。"
+    },
+    "runtime_artifacts": "/private/tmp/atlas-round10-runtime-20260915/"
   }
 }
