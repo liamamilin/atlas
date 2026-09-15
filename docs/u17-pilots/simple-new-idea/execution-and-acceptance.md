@@ -100,3 +100,17 @@ Atlas 已将两轮执行标记为 `applied`、产品验收标记为 `passed`，�
 - 固化备份恢复边界：导出格式使用 `schema_version=1.0` 与 `exported_at`；导入/恢复另立需求，必须校验、预览并明确确认，不静默覆盖。
 - 依据决定：`dec_7d04691fc1bc4c5389d580ad58d69659`、`dec_0872de402eec48b8a75cae9763a6ba92`。
 - 基于决定保存产品、技术、开发、验收文档 v6；本次没有代码改动和新增测试。
+
+
+## 第八轮：本地备份导入预览与恢复
+
+- 需求：`req_014a9d585ccc482580389031c4e93545`。
+- 迭代：`itr_8755e0e9381c497eadfcd729cd707b34`；任务：`tsk_d40dab4317e84b579cad686c6adc6a39`。
+- 执行：`exe_e731755dd05e4aabb16ffd9276b33637`，应用后基线 `snap_a368c546998c4be3bf0a9c1353ea309b`。
+- 改动：`app.py` 新增导入备份结构/版本/引用校验、预览接口和事务完整替换；`static/index.html`、`static/app.js`、`static/styles.css` 增加文件选择、摘要、确认对话框、取消和错误反馈；`tests/test_app.py` 增加 29 项导入回归测试。
+- 固定验证：`python3 -m unittest discover -s tests -v`，149/149 tests OK；`node --check static/app.js` OK。
+- API 验收：真实服务中预览返回 `schema_version=1.0` 与四类记录数量，预览前后数据不变；错误版本返回 400；确认恢复后四类记录和 `completed` 状态可读取。
+- 页面验收：选择有效 JSON 显示导入摘要；确认对话框取消后保持原数据；明确确认后显示 `Restore complete` 并刷新项目和当天承诺。
+- 回滚与边界：数据层测试覆盖事务异常回滚；不做合并导入、云同步或静默覆盖。
+
+Atlas 已将第八轮任务验收标记为 passed，并完成迭代。

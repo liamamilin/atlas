@@ -4,7 +4,7 @@
   "title": "本地优先的个人日计划器",
   "protocol_frozen_at": "2026-09-14T00:52:27Z",
   "status": "completed",
-  "atlas_revision": "c84cdc9",
+  "atlas_revision": "1ed48f8",
   "project": {
     "id": "prj_e6299aa777e645b4a8c9157a31364e0c",
     "name": "M5 试点 · 本地优先个人日计划器",
@@ -81,6 +81,12 @@
       "case_id": "NI-R7",
       "status": "confirmed",
       "round": 7
+    },
+    {
+      "id": "req_014a9d585ccc482580389031c4e93545",
+      "case_id": "NI-R8",
+      "status": "confirmed",
+      "round": 8
     }
   ],
   "decisions": [
@@ -104,8 +110,16 @@
       "round": 3,
       "summary": "第三轮固化时间输入契约：API 只接受 HH:MM 格式的本地时间，结束时间必须晚于开始时间；非法输入返回明确 400，不写入数据库；继续保留用户手工时间块、只读冲突提醒和离线本地持久化边界。"
     },
-    "dec_7d04691fc1bc4c5389d580ad58d69659",
-    "dec_0872de402eec48b8a75cae9763a6ba92"
+    {
+      "id": "dec_7d04691fc1bc4c5389d580ad58d69659",
+      "round": 7,
+      "summary": "时间块关系采用一条当天承诺可有多个时间块；移除承诺级联删除其时间块；冲突只比较同日且首尾相接不算重叠。"
+    },
+    {
+      "id": "dec_0872de402eec48b8a75cae9763a6ba92",
+      "round": 7,
+      "summary": "本地备份固定 schema_version=1.0 和 exported_at；导入/恢复独立成需求，必须先校验、预览并明确确认，不静默覆盖。"
+    }
   ],
   "documents": {
     "analysis": "dver_cb4c506c99c94289809d7bc23a0267a8",
@@ -148,6 +162,12 @@
         "development_plan": "dver_c2ed5370d4a34d2da56d0435cdd99308",
         "acceptance_plan": "dver_ea4be5da72414d578173555028cef3ad"
       }
+    },
+    "eighth_round": {
+      "product_requirements": "dver_a4dc6fa86769422d927b7d1bd04b2a93",
+      "technical_plan": "dver_2171109624e94aa79bbd5f2a2a48ee8a",
+      "development_plan": "dver_19c693b944454a18822ca7241ed69be3",
+      "acceptance_plan": "dver_a396277c69e24a478bf2402a48bb7cf"
     }
   },
   "generation_runs": [
@@ -177,6 +197,12 @@
       "status": "completed",
       "model_calls": 1,
       "preflight_failures": 2
+    },
+    {
+      "id": "gen_6b787c209f8044f08ecf099b604b14df",
+      "mode": "documents",
+      "model": "opencode-go/mimo-v2.5",
+      "status": "completed"
     }
   ],
   "baselines": [
@@ -288,6 +314,28 @@
       "round": 7,
       "accepted": true,
       "role": "第七轮文档提交后同步仓库 HEAD 的最终基线"
+    },
+    {
+      "id": "snap_a5ff874dab8c4a27bd7b6a4cfc1ec8fa",
+      "round": 8,
+      "accepted": true,
+      "role": "第八轮执行前同步文档提交后的仓库 HEAD"
+    },
+    {
+      "id": "snap_29475dc62ef441c782220f63d642c1f9",
+      "round": 8,
+      "role": "第八轮执行前基线"
+    },
+    {
+      "id": "snap_213f289e7571455fa83b54a838c5c763",
+      "round": 8,
+      "role": "第八轮执行结果基线"
+    },
+    {
+      "id": "snap_a368c546998c4be3bf0a9c1353ea309b",
+      "round": 8,
+      "accepted": true,
+      "role": "第八轮备份导入恢复应用后最终工作区基线"
     }
   ],
   "iterations": [
@@ -367,6 +415,17 @@
       ],
       "acceptance": "passed",
       "superseded_task_id": null
+    },
+    {
+      "id": "itr_8755e0e9381c497eadfcd729cd707b34",
+      "round": 8,
+      "status": "completed",
+      "task_id": "tsk_d40dab4317e84b579cad686c6adc6a39",
+      "execution_ids": [
+        "exe_e731755dd05e4aabb16ffd9276b33637"
+      ],
+      "acceptance": "passed",
+      "superseded_task_id": null
     }
   ],
   "second_round_evidence": {
@@ -414,10 +473,10 @@
     }
   },
   "verification": {
-    "rounds": "7",
-    "latest": "第七轮完成并通过产品验收；时间块关系、冲突边界和备份恢复边界已记录为决定",
-    "tests": "117/117 workspace tests passed; node --check static/app.js passed; 真实服务 JSON 导出接口与产品页面入口验证通过",
-    "scope": "第七轮修改 app.py、static/index.html、static/app.js、static/styles.css、tests/test_app.py；新增 schema_version/exported_at 和四类数据集合导出，不包含导入覆盖、自动备份或云同步。"
+    "rounds": "8",
+    "latest": "第八轮完成并通过产品验收；备份导入预览、明确确认恢复、校验失败不写库和事务回滚已验证",
+    "tests": "149/149 workspace tests passed; node --check static/app.js passed; 真实服务 API 和页面导入预览/取消/确认恢复验证通过",
+    "scope": "第八轮修改 app.py、static/index.html、static/app.js、static/styles.css、tests/test_app.py；新增 schema_version=1.0 备份校验、预览、完整替换恢复和回滚，不包含合并导入、云同步或静默覆盖。"
   },
   "fourth_round_evidence": {
     "iteration_id": "itr_fac58c9b9791487eb5587c11a09e04ea",
@@ -483,6 +542,24 @@
     "boundaries": [
       "仅用户主动触发单文件 JSON 导出",
       "不实现导入覆盖、自动备份或云同步"
+    ]
+  },
+  "eighth_round_evidence": {
+    "requirement": "req_014a9d585ccc482580389031c4e93545",
+    "iteration": "itr_8755e0e9381c497eadfcd729cd707b34",
+    "task": "tsk_d40dab4317e84b579cad686c6adc6a39",
+    "execution": "exe_e731755dd05e4aabb16ffd9276b33637",
+    "application_status": "applied",
+    "applied_snapshot_id": "snap_a368c546998c4be3bf0a9c1353ea309b",
+    "acceptance": "passed",
+    "tests": "149/149",
+    "node_check": "passed",
+    "api": "POST /api/import/preview 校验 schema_version=1.0、结构和引用且不写数据库；错误版本返回 400；POST /api/import 完整替换四类记录并保留 completed 状态。",
+    "ui": "真实页面选择有效 JSON 显示 schema_version 和四类记录数量；确认对话框取消不变更，明确确认后显示 Restore complete 并重新加载数据。",
+    "rollback": "数据层回归测试覆盖异常事务回滚；校验失败和预览路径均不写库。",
+    "boundaries": [
+      "完整替换，不做合并导入",
+      "不连接云端，不静默覆盖"
     ]
   }
 }
