@@ -91,3 +91,11 @@
 - 验收：117/117 workspace tests、`node --check static/app.js` 通过；真实服务返回 200 JSON，Chrome 实际下载 `planner-backup.json`，真实页面显示导出入口；导出前后项目 API 数据一致。
 
 第七轮 OpenCode 完成报告缺失且 requirement IDs 不完整，Atlas 未把 agent 自报当作完成事实；独立测试、接口结构、只读比对和页面入口证据均已补足，产品验收通过。
+
+## 第七轮后的边界决策固化
+
+为避免下一轮恢复功能返工，Atlas 追加两条决定：一条承诺允许多个时间块，移除承诺级联清理时间块，冲突只比较同日且首尾相接不算重叠；另一条固定备份 `schema_version=1.0`，导入/恢复必须独立确认，先校验和预览，不允许静默覆盖。基于这两条决定重新生成并保存产品、技术、开发和验收文档 v6；未新增代码范围，轮次计数仍为七轮。
+
+- 时间块边界决定：`dec_7d04691fc1bc4c5389d580ad58d69659`
+- 备份恢复边界决定：`dec_0872de402eec48b8a75cae9763a6ba92`
+- 文档版本：产品 `dver_b159c1cb4b19454eae59a49ab12571f2`；技术 `dver_3e3770b71fdd441fb3efb3daa9e17d6c`；开发 `dver_c2ed5370d4a34d2da56d0435cdd99308`；验收 `dver_ea4be5da72414d578173555028cef3ad`。
