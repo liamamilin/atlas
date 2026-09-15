@@ -408,6 +408,12 @@
       "round": 11,
       "accepted": true,
       "role": "第十一轮备份 schema 迁移入口实现后代码基线"
+    },
+    {
+      "id": "snap_e238025089d34efaa9739d984910d0c0",
+      "round": 12,
+      "accepted": true,
+      "role": "第十二轮当天承诺按来源项目分组实现后代码基线"
     }
   ],
   "iterations": [
@@ -556,10 +562,10 @@
     }
   },
   "verification": {
-    "rounds": "11",
-    "latest": "第十一轮完成代码实现、测试、真实 HTTP 验收和 Atlas 代码基线同步；导入恢复新增 schema 迁移准备管线，当前 1.0 格式保持不变，未知版本集中拒绝，未来 schema 扩展有明确入口。",
-    "tests": "182/182 workspace tests passed; TestImportValidation 28/28; TestImportBackupDataLayer 6/6; node --check static/app.js passed; 临时数据库直接验收通过；真实 HTTP 临时端口验收通过。",
-    "scope": "第十一轮修改 app.py、static/app.js、tests/test_app.py；补齐备份版本常量、支持版本列表、迁移准备入口、当前结构校验和前端迁移提示。Atlas 已采用第十一轮代码基线。"
+    "rounds": "12",
+    "latest": "第十二轮完成当天承诺清单和可加入任务列表的来源项目分组；跨项目扫描从平铺任务升级为项目块，并保留任务完成、移除和时间块操作。",
+    "tests": "182/182 workspace tests passed; TestCrossProjectCommitments 5/5; node --check static/app.js passed; Node frontend render acceptance passed; browser UI acceptance passed.",
+    "scope": "第十二轮修改 static/app.js、static/styles.css、tests/test_app.py；后端数据结构保持兼容，仅补项目名断言。Atlas 已采用第十二轮代码基线。"
   },
   "fourth_round_evidence": {
     "iteration_id": "itr_fac58c9b9791487eb5587c11a09e04ea",
@@ -712,6 +718,29 @@
       "/private/tmp/atlas-round11-runtime-20260915/",
       "/private/tmp/atlas-round11-direct-acceptance-20260915/",
       "/private/tmp/atlas-round11-http-acceptance-20260915/"
+    ]
+  },
+  "twelfth_round_evidence": {
+    "scope": "在当天承诺清单和可加入任务列表中强化来源项目：按项目分组展示任务，帮助用户在跨项目日计划中快速扫描来源上下文。",
+    "related_requirement_ids": [
+      "req_e3e86690c6b243c9b66a0212050a1e64"
+    ],
+    "atlas_baseline_status": "已同步：第十二轮代码变化已采用 Atlas 新基线 snap_e238025089d34efaa9739d984910d0c0。上一份已接受基线为 snap_0924043d4e8b42d2b38b471d7cb9c3c3。",
+    "changed_files": [
+      "static/app.js",
+      "static/styles.css",
+      "tests/test_app.py"
+    ],
+    "implementation": "新增 groupCommitmentsByProject()、renderProjectGroupHeader() 和 renderCommitmentItem()，将已承诺任务按 project_id 保持首次出现顺序分组；可加入任务列表也按项目分组，只显示当前日期尚未承诺的任务。每组展示项目名和任务数量；承诺项内部保留完成切换、移除、时间块新增/编辑/删除和冲突标记。",
+    "validation": {
+      "syntax": "node --check static/app.js passed",
+      "targeted": "TestCrossProjectCommitments 5/5 passed，新增断言确保 list_commitments 持续返回 project_name。",
+      "frontend_render": "Node VM 渲染验收通过：两个项目生成两个 commitment-project-group，Alpha/Beta 顺序保持，数量显示为 1 task/2 tasks，可加入任务在全部已承诺时显示空状态。",
+      "full_suite": "python3 -m unittest discover -s tests -v passed (182/182)",
+      "browser_acceptance": "临时产品实例 http://127.0.0.1:8127 使用 /private/tmp 临时数据库验收通过：Alpha Project 与 Beta Project 分别显示为当天承诺分组，Alpha Project 的未承诺任务 Write docs 显示在可加入任务分组。"
+    },
+    "runtime_artifacts": [
+      "/private/tmp/atlas-round12-ui-acceptance-20260915/"
     ]
   }
 }

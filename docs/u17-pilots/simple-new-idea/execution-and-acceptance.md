@@ -1,6 +1,6 @@
 # 执行与验收记录
 
-状态：十一轮代码实现和产品验收已完成；普通生成对照已封存；第十一轮真实 HTTP 验收和 Atlas 代码基线已同步。
+状态：十二轮代码实现和产品验收已完成；普通生成对照已封存；当天承诺来源项目分组和 Atlas 代码基线已同步。
 
 ## 项目
 
@@ -146,3 +146,14 @@ Atlas 已将第八轮任务验收标记为 passed，并完成迭代。
 - 直接验收：临时 SQLite 数据库中创建旧数据后导出，确认导出 `schema_version=1.0`；`prepare_import_backup()` 返回 `source_schema_version=1.0` 和 `migration_applied=false`；`schema_version=2.0` 被拒绝；恢复前安全快照包含覆盖前项目 `Schema Existing`；恢复后项目为 `Schema Restored` 且 `completed=true`。
 
 真实 HTTP 临时端口验收已补跑通过：导出 schema_version=1.0；导入预览返回 source_schema_version=1.0、migration_applied=false；schema_version=2.0 返回 400；确认恢复先生成安全快照，再写入恢复数据。运行时产物已移至 `/private/tmp/atlas-round11-runtime-20260915/`、`/private/tmp/atlas-round11-direct-acceptance-20260915/` 和 `/private/tmp/atlas-round11-http-acceptance-20260915/`。
+
+
+## 第十二轮：当天承诺按来源项目分组
+
+- 范围：第十二轮直接围绕跨项目当天承诺清单的可扫描性，不新增后端数据字段，不改变承诺、时间块、完成状态、导出或导入行为。
+- Atlas 状态：上一份已接受基线为 `snap_0924043d4e8b42d2b38b471d7cb9c3c3`。本轮已采用第十二轮代码基线 `snap_e238025089d34efaa9739d984910d0c0`。
+- 改动：`static/app.js` 将当天承诺按 `project_id` 分组，并为每组显示来源项目名和任务数量；可加入任务列表按项目分组，只展示未加入当前日期的任务。`static/styles.css` 增加分组样式。`tests/test_app.py` 增加承诺返回 `project_name` 的回归断言。
+- 固定验证：`node --check static/app.js` 通过；Node VM 前端渲染验收通过；`python3 -m unittest tests.test_app.TestCrossProjectCommitments -v` 共 5/5 通过；`python3 -m unittest discover -s tests -v` 共 182/182 通过。
+- 浏览器验收：临时产品实例使用 `/private/tmp/atlas-round12-ui-acceptance.db`，打开 `http://127.0.0.1:8127/` 后加载 `2026-09-15`，页面返回两个当天承诺项目组：Alpha Project/Plan API 与 Beta Project/Fix UI；可加入任务区显示 Alpha Project/Write docs。
+
+临时验收产物已移至 `/private/tmp/atlas-round12-ui-acceptance-20260915/`。
