@@ -4,7 +4,7 @@
   "title": "本地优先的个人日计划器",
   "protocol_frozen_at": "2026-09-14T00:52:27Z",
   "status": "completed",
-  "atlas_revision": "f916354",
+  "atlas_revision": "23e66ab",
   "project": {
     "id": "prj_e6299aa777e645b4a8c9157a31364e0c",
     "name": "M5 试点 · 本地优先个人日计划器",
@@ -75,6 +75,12 @@
       "case_id": "NI-R6",
       "status": "confirmed",
       "round": 6
+    },
+    {
+      "id": "req_93d609a3079a493ea8196aa5620c4769",
+      "case_id": "NI-R7",
+      "status": "confirmed",
+      "round": 7
     }
   ],
   "decisions": [
@@ -124,6 +130,12 @@
       "technical_plan": "dver_b80b7617be64496fb782b466ea0e2c7d",
       "development_plan": "dver_597e34731e2242e8a49ef889a8c03c00",
       "acceptance_plan": "dver_187dd2c742014f1e9f8129b6387db8d4"
+    },
+    "seventh_round": {
+      "product_requirements": "dver_cf64a0139f384fcd90cb74ddb9c7454a",
+      "technical_plan": "dver_30d71ddd16884e4786072df0ef52fb64",
+      "development_plan": "dver_34b80696b11c426f8d562bb07b7d5179",
+      "acceptance_plan": "dver_6902c6b7f9a447e2a6feb4ddaa02efe6"
     }
   },
   "generation_runs": [
@@ -246,6 +258,18 @@
       "round": 6,
       "accepted": true,
       "role": "第六轮文档提交后同步仓库 HEAD 的最终基线"
+    },
+    {
+      "id": "snap_20f0c5ebd33c4646a7f89222a5b3a65c",
+      "round": 7,
+      "accepted": true,
+      "role": "第七轮执行前同步文档提交后的仓库 HEAD"
+    },
+    {
+      "id": "snap_959f76e7099044d2a154492ba1e6bf58",
+      "round": 7,
+      "accepted": true,
+      "role": "第七轮 JSON 导出应用后最终工作区基线"
     }
   ],
   "iterations": [
@@ -314,6 +338,17 @@
       ],
       "acceptance": "passed",
       "superseded_task_id": null
+    },
+    {
+      "id": "itr_219bfad06719402a9f316e8f4fec74a7",
+      "round": 7,
+      "status": "completed",
+      "task_id": "tsk_ff1250adc2484974bef41c899fdbeffc",
+      "execution_ids": [
+        "exe_dac822354f244c0786132cb74f9125ac"
+      ],
+      "acceptance": "passed",
+      "superseded_task_id": null
     }
   ],
   "second_round_evidence": {
@@ -361,10 +396,10 @@
     }
   },
   "verification": {
-    "rounds": "6",
-    "latest": "第六轮完成并通过产品验收；任务完成状态已加入并验证无副作用",
-    "tests": "103/103 workspace tests passed; node --check static/app.js passed; 真实页面完成/恢复状态和承诺保留通过",
-    "scope": "第六轮修改 app.py、static/index.html、static/styles.css、static/app.js、tests/test_app.py；完成状态迁移、API、项目列表和当天承诺展示均在声明范围内。"
+    "rounds": "7",
+    "latest": "第七轮完成并通过产品验收；本地 JSON 备份导出已加入并验证只读边界",
+    "tests": "117/117 workspace tests passed; node --check static/app.js passed; 真实服务 JSON 导出接口与产品页面入口验证通过",
+    "scope": "第七轮修改 app.py、static/index.html、static/app.js、static/styles.css、tests/test_app.py；新增 schema_version/exported_at 和四类数据集合导出，不包含导入覆盖、自动备份或云同步。"
   },
   "fourth_round_evidence": {
     "iteration_id": "itr_fac58c9b9791487eb5587c11a09e04ea",
@@ -415,6 +450,21 @@
       "完成或恢复不删除任务",
       "完成或恢复不移除当天承诺",
       "完成或恢复不删除或移动时间块"
+    ]
+  },
+  "seventh_round_evidence": {
+    "iteration": "itr_219bfad06719402a9f316e8f4fec74a7",
+    "task": "tsk_ff1250adc2484974bef41c899fdbeffc",
+    "execution": "exe_dac822354f244c0786132cb74f9125ac",
+    "acceptance": "passed",
+    "tests": "117/117",
+    "node_check": "passed",
+    "api": "GET /api/export 返回 200 application/json，schema_version=1.0，包含 projects、tasks、day_commitments、time_blocks 和 completed 状态。",
+    "ui": "真实产品页面可见 Export JSON Backup 入口，点击后无页面错误。",
+    "readonly": "导出前后 GET /api/projects 响应一致，未修改源数据。",
+    "boundaries": [
+      "仅用户主动触发单文件 JSON 导出",
+      "不实现导入覆盖、自动备份或云同步"
     ]
   }
 }

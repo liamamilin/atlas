@@ -78,3 +78,16 @@
 - 执行：`exe_b692ead5c9f242e38b55e8f8b6f4aeb4`
 - 基线：`snap_df59bde63f29454885c562fd28a5c57f`
 - 验收：103/103 workspace tests、`node --check static/app.js` 和真实页面完成/恢复切换均通过；恢复任务后当天承诺仍保留。
+
+## 第七轮：本地数据 JSON 备份导出
+
+第七轮在六轮已验收的项目、任务、承诺、时间块、冲突提示、编辑删除和完成状态基础上，补齐本地优先数据的主动备份出口。用户点击页面入口后下载单个 JSON 文件，文件包含 `schema_version`、`exported_at`、项目、任务、当天承诺、时间块和任务 `completed` 状态。导出只读当前 SQLite 数据，不写入或改写任何源记录；本轮不做导入覆盖、自动备份或云同步。
+
+- 需求：`req_93d609a3079a493ea8196aa5620c4769`
+- 迭代：`itr_219bfad06719402a9f316e8f4fec74a7`
+- 任务：`tsk_ff1250adc2484974bef41c899fdbeffc`
+- 执行：`exe_dac822354f244c0786132cb74f9125ac`
+- 基线：`snap_959f76e7099044d2a154492ba1e6bf58`
+- 验收：117/117 workspace tests、`node --check static/app.js` 通过；真实服务返回 200 JSON，真实页面显示导出入口；导出前后项目 API 数据一致。
+
+第七轮 OpenCode 完成报告缺失且 requirement IDs 不完整，Atlas 未把 agent 自报当作完成事实；独立测试、接口结构、只读比对和页面入口证据均已补足，产品验收通过。

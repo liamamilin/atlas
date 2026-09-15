@@ -82,3 +82,14 @@ Atlas 已将两轮执行标记为 `applied`、产品验收标记为 `passed`，�
 - 改动：`tasks.completed` 数据迁移、`PUT /api/tasks/{id}/completion`、项目任务和当天承诺的 Done/Undo 控件与完成样式。
 - 独立验证：`node --check static/app.js` 通过；`python3 -m unittest discover -s tests -v` 共 103/103 通过，覆盖跨连接持久化以及完成状态不删除任务/承诺/时间块。
 - 产品验收：真实页面创建任务后显示 Done，点击变为 Undo；加入当天承诺后完成状态可见，恢复后承诺仍保留。Atlas 已标记验收通过并完成第六轮。
+
+## 第七轮：本地数据 JSON 备份导出
+
+- 需求：`req_93d609a3079a493ea8196aa5620c4769`（用户主动导出项目、任务、承诺、时间块和完成状态；只读；稳定版本字段；不含导入覆盖、自动备份或云同步）。
+- 迭代：`itr_219bfad06719402a9f316e8f4fec74a7`；任务：`tsk_ff1250adc2484974bef41c899fdbeffc`。
+- 执行：`exe_dac822354f244c0786132cb74f9125ac`，应用后基线 `snap_959f76e7099044d2a154492ba1e6bf58`。
+- 改动：`app.py` 新增 `export_backup()` 与 `GET /api/export`；`static/index.html` 增加 Export JSON Backup 入口；`static/app.js` 生成并下载 `planner-backup.json`，失败显示错误；补充导出数据层和 API 回归测试。
+- 独立验证：`node --check static/app.js` 通过；`python3 -m unittest discover -s tests -v` 共 117/117 通过。真实服务返回 `200 application/json`，`schema_version=1.0`，包含四类集合和 `completed`；导出前后项目 API 响应一致。
+- 产品验收：真实产品页面可见 `Export JSON Backup` 按钮，点击入口后无页面错误；验收通过并完成第七轮。
+
+运行时验收数据库已可逆移出工作区至 `/private/tmp/atlas-planner-export-20260915.db`，未写入源码提交。
