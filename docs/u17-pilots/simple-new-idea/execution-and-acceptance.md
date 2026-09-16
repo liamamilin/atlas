@@ -190,3 +190,14 @@ Atlas 已将第八轮任务验收标记为 passed，并完成迭代。
 - 真实 HTTP 验收：临时产品实例使用 `/private/tmp/atlas-round15-backups-acceptance-20260916/planner.db`；访问 `/` 确认页面包含 Safety Backups，访问 `/static/app.js` 确认加载备份管理逻辑；初始 `/api/backups` 为空；创建旧项目和任务后确认导入新备份，生成安全快照；随后 `/api/backups` 返回 1 个有效快照，路径等于恢复响应的 `safety_backup_path`，计数为 1 project、1 task、0 commitment、0 time block，文件存在且大小大于 0。
 
 首次未提权运行真实 HTTP 验收时因沙箱禁止绑定本地临时端口失败；允许本地端口后复跑通过。验收数据保留在 `/private/tmp/atlas-round15-backups-acceptance-20260916/` 作为可丢弃证据。
+
+
+## 第十六轮：安全快照预览与恢复
+
+- 范围：围绕 Safety Backups 增加从已有安全快照恢复的闭环，复用导入恢复的预览、确认、校验、恢复前快照和完整替换语义；不做删除快照或打开本机目录。
+- Atlas 状态：上一份已接受基线为 `snap_835160351c0847b6b55017828ce7fd33`；第十六轮代码实现后采用基线 `snap_9ab262ceff794dffaebd9605bec614d9`。
+- 改动：`app.py` 新增 `resolve_safety_backup_path()`、`load_safety_backup()`、`POST /api/backups/preview` 和 `POST /api/backups/restore`；路径必须位于当前数据库对应的安全快照目录内，恢复必须 `confirm=true`。`static/app.js` 为有效安全快照增加 Preview Restore，渲染预览并二次确认后恢复；`static/styles.css` 增加备份操作按钮布局。`tests/test_app.py` 增加数据层路径限制、HTTP 预览、未确认拒绝、确认恢复和路径越界拒绝测试。
+- 固定验证：`python3 -m py_compile app.py tests/test_app.py` 通过；`node --check static/app.js` 通过；`python3 -m unittest tests.test_app.TestExportBackup tests.test_app.TestImportAPI tests.test_app.TestConcurrentBackupAccess -v` 共 50/50 通过；`python3 -m unittest discover -s tests -v` 共 202/202 通过。
+- 真实 HTTP 验收：临时产品实例使用 `/private/tmp/atlas-round16-safety-restore-acceptance-20260916/planner.db`；页面脚本包含 `previewSafetyBackup` 与 `confirmSafetyBackupRestore`；先创建 Original Project/Original Task/当天承诺，再通过普通导入替换为 Current Project 并生成原状态安全快照；`/api/backups/preview` 正确预览该快照；未确认恢复返回 400；确认恢复后当前数据回到 Original Project/Original Task 且当天承诺恢复；恢复前又生成一个新安全快照，`/api/backups` 返回 2 个快照；越界路径预览返回 400。
+
+首次未提权运行真实 HTTP 验收时因沙箱禁止绑定本地临时端口失败；允许本地端口后复跑通过。验收数据保留在 `/private/tmp/atlas-round16-safety-restore-acceptance-20260916/` 作为可丢弃证据。

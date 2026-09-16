@@ -432,6 +432,12 @@
       "round": 15,
       "accepted": true,
       "role": "第十五轮备份文件管理入口实现后代码基线"
+    },
+    {
+      "id": "snap_9ab262ceff794dffaebd9605bec614d9",
+      "round": 16,
+      "accepted": true,
+      "role": "第十六轮安全快照预览与恢复实现后代码基线"
     }
   ],
   "iterations": [
@@ -580,10 +586,10 @@
     }
   },
   "verification": {
-    "rounds": "15",
-    "latest": "第十五轮完成备份文件管理入口；用户可在 Data Backup 区域查看自动安全快照列表、备份目录和每个快照的路径、大小、保存时间及记录计数，并复制路径。",
-    "tests": "197/197 workspace tests passed; TestExportBackup + TestImportAPI + TestConcurrentBackupAccess 45/45; python3 -m py_compile app.py tests/test_app.py passed; node --check static/app.js passed; real HTTP acceptance passed.",
-    "scope": "第十五轮修改 app.py、static/app.js、static/index.html、static/styles.css、tests/test_app.py；/api/backups 是只读元数据接口，不返回备份全文、不删除快照、不从快照一键恢复。"
+    "rounds": "16",
+    "latest": "第十六轮完成从 Safety Backups 选择安全快照并恢复；快照恢复复用导入的预览、确认、校验、恢复前安全快照和完整替换流程。",
+    "tests": "202/202 workspace tests passed; TestExportBackup + TestImportAPI + TestConcurrentBackupAccess 50/50; python3 -m py_compile app.py tests/test_app.py passed; node --check static/app.js passed; real HTTP acceptance passed.",
+    "scope": "第十六轮修改 app.py、static/app.js、static/styles.css、tests/test_app.py；新增安全快照预览和恢复，不改变备份 schema_version=1.0，不增加删除快照或打开目录能力。"
   },
   "fourth_round_evidence": {
     "iteration_id": "itr_fac58c9b9791487eb5587c11a09e04ea",
@@ -833,6 +839,35 @@
     ],
     "runtime_artifacts": [
       "/private/tmp/atlas-round15-backups-acceptance-20260916/"
+    ],
+    "notes": [
+      "首次未提权运行真实 HTTP 验收时因沙箱禁止绑定 127.0.0.1 临时端口失败；允许本地端口后复跑通过。",
+      "全量测试仍有既有 socket ResourceWarning，不影响断言结果。"
+    ]
+  },
+  "sixteenth_round_evidence": {
+    "round": 16,
+    "code_baseline": "snap_9ab262ceff794dffaebd9605bec614d9",
+    "changed_paths": [
+      "app.py",
+      "static/app.js",
+      "static/styles.css",
+      "tests/test_app.py"
+    ],
+    "implementation": [
+      "新增 resolve_safety_backup_path() 与 load_safety_backup()，限制恢复路径必须位于当前数据库 backups/<db-name> 目录内。",
+      "新增 POST /api/backups/preview 和 POST /api/backups/restore；恢复必须 confirm=true，恢复前会再次保存当前状态。",
+      "Safety Backups 中的有效快照新增 Preview Restore，预览后仍通过确认对话框执行恢复。"
+    ],
+    "verification": [
+      "python3 -m py_compile app.py tests/test_app.py",
+      "node --check static/app.js",
+      "python3 -m unittest tests.test_app.TestExportBackup tests.test_app.TestImportAPI tests.test_app.TestConcurrentBackupAccess -v: 50/50 passed",
+      "python3 -m unittest discover -s tests -v: 202/202 passed",
+      "临时产品实例真实 HTTP 验收通过：生成安全快照、预览该快照、未确认拒绝、确认恢复、恢复前再生成安全快照、路径越界拒绝。"
+    ],
+    "runtime_artifacts": [
+      "/private/tmp/atlas-round16-safety-restore-acceptance-20260916/"
     ],
     "notes": [
       "首次未提权运行真实 HTTP 验收时因沙箱禁止绑定 127.0.0.1 临时端口失败；允许本地端口后复跑通过。",
