@@ -426,6 +426,12 @@
       "round": 14,
       "accepted": true,
       "role": "第十四轮导出/导入并发写入策略实现后代码基线"
+    },
+    {
+      "id": "snap_5550f88148054e4e981b0dba774bba8a",
+      "round": 15,
+      "accepted": true,
+      "role": "第十五轮备份文件管理入口实现后代码基线"
     }
   ],
   "iterations": [
@@ -574,10 +580,10 @@
     }
   },
   "verification": {
-    "rounds": "14",
-    "latest": "第十四轮完成导出/导入期间的并发写入策略；同一数据库文件上的导出、导入和普通写入进入同一个服务级 RLock，导入恢复期间的并发项目创建会等待恢复完成后再执行。",
-    "tests": "193/193 workspace tests passed; TestConcurrentBackupAccess 1/1; TestImportAPI + TestEditDeleteAPI + TestDeletedItemRestore 53/53; python3 -m py_compile app.py tests/test_app.py passed; node --check static/app.js passed.",
-    "scope": "第十四轮修改 app.py、tests/test_app.py；不改变备份 schema_version=1.0，不改变导入覆盖语义、最近删除历史或前端交互。"
+    "rounds": "15",
+    "latest": "第十五轮完成备份文件管理入口；用户可在 Data Backup 区域查看自动安全快照列表、备份目录和每个快照的路径、大小、保存时间及记录计数，并复制路径。",
+    "tests": "197/197 workspace tests passed; TestExportBackup + TestImportAPI + TestConcurrentBackupAccess 45/45; python3 -m py_compile app.py tests/test_app.py passed; node --check static/app.js passed; real HTTP acceptance passed.",
+    "scope": "第十五轮修改 app.py、static/app.js、static/index.html、static/styles.css、tests/test_app.py；/api/backups 是只读元数据接口，不返回备份全文、不删除快照、不从快照一键恢复。"
   },
   "fourth_round_evidence": {
     "iteration_id": "itr_fac58c9b9791487eb5587c11a09e04ea",
@@ -800,6 +806,36 @@
     ],
     "notes": [
       "首次未提权运行并发 HTTP 测试时因沙箱禁止绑定 127.0.0.1 临时端口失败；允许本地端口后复跑通过。",
+      "全量测试仍有既有 socket ResourceWarning，不影响断言结果。"
+    ]
+  },
+  "fifteenth_round_evidence": {
+    "round": 15,
+    "code_baseline": "snap_5550f88148054e4e981b0dba774bba8a",
+    "changed_paths": [
+      "app.py",
+      "static/app.js",
+      "static/index.html",
+      "static/styles.css",
+      "tests/test_app.py"
+    ],
+    "implementation": [
+      "新增 list_safety_backups() 与 GET /api/backups，只读取 backups/<db-name> 下 JSON 安全快照的元数据。",
+      "Data Backup 区域新增 Safety Backups，展示备份目录、快照路径、大小、时间和四类记录计数。",
+      "前端提供 Copy Path；本轮不执行删除、打开本机目录或从快照一键恢复。"
+    ],
+    "verification": [
+      "python3 -m py_compile app.py tests/test_app.py",
+      "node --check static/app.js",
+      "python3 -m unittest tests.test_app.TestExportBackup tests.test_app.TestImportAPI tests.test_app.TestConcurrentBackupAccess -v: 45/45 passed",
+      "python3 -m unittest discover -s tests -v: 197/197 passed",
+      "临时产品实例真实 HTTP 验收通过：页面包含 Safety Backups；确认导入后 /api/backups 返回 1 个有效快照。"
+    ],
+    "runtime_artifacts": [
+      "/private/tmp/atlas-round15-backups-acceptance-20260916/"
+    ],
+    "notes": [
+      "首次未提权运行真实 HTTP 验收时因沙箱禁止绑定 127.0.0.1 临时端口失败；允许本地端口后复跑通过。",
       "全量测试仍有既有 socket ResourceWarning，不影响断言结果。"
     ]
   }

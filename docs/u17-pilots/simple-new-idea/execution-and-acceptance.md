@@ -179,3 +179,14 @@ Atlas 已将第八轮任务验收标记为 passed，并完成迭代。
 - 并发验收：测试中 mock `save_safety_backup()` 在导入恢复临界区暂停，随后启动并发 `POST /api/projects`；创建请求在导入释放前没有返回，释放后导入先完成，项目创建再成功写入，最终项目顺序为 Imported、Concurrent。
 
 首次未提权运行并发 HTTP 测试时因沙箱禁止绑定本地临时端口失败；允许本地端口后复跑通过。全量测试仍输出既有 socket ResourceWarning，但测试结果为 OK。
+
+
+## 第十五轮：备份文件管理入口
+
+- 范围：围绕自动安全快照补只读管理入口，让用户知道恢复前快照保存在哪里、包含什么数据；本轮不做删除快照、打开本机目录或从快照一键恢复。
+- Atlas 状态：上一份已接受基线为 `snap_1f983b2a7fc84790b40d1bd244eefa2b`；第十五轮代码实现后采用基线 `snap_5550f88148054e4e981b0dba774bba8a`。
+- 改动：`app.py` 新增 `_backup_file_summary()`、`list_safety_backups()` 和 `GET /api/backups`；接口按当前数据库定位 `backups/<db-name>`，按修改时间倒序返回 JSON 文件元数据和快照计数。`static/index.html`、`static/app.js`、`static/styles.css` 新增 Safety Backups 区域、Refresh 和 Copy Path。`tests/test_app.py` 增加空目录、已保存快照元数据和 HTTP 列表回归测试。
+- 固定验证：`python3 -m py_compile app.py tests/test_app.py` 通过；`node --check static/app.js` 通过；`python3 -m unittest tests.test_app.TestExportBackup tests.test_app.TestImportAPI tests.test_app.TestConcurrentBackupAccess -v` 共 45/45 通过；`python3 -m unittest discover -s tests -v` 共 197/197 通过。
+- 真实 HTTP 验收：临时产品实例使用 `/private/tmp/atlas-round15-backups-acceptance-20260916/planner.db`；访问 `/` 确认页面包含 Safety Backups，访问 `/static/app.js` 确认加载备份管理逻辑；初始 `/api/backups` 为空；创建旧项目和任务后确认导入新备份，生成安全快照；随后 `/api/backups` 返回 1 个有效快照，路径等于恢复响应的 `safety_backup_path`，计数为 1 project、1 task、0 commitment、0 time block，文件存在且大小大于 0。
+
+首次未提权运行真实 HTTP 验收时因沙箱禁止绑定本地临时端口失败；允许本地端口后复跑通过。验收数据保留在 `/private/tmp/atlas-round15-backups-acceptance-20260916/` 作为可丢弃证据。
