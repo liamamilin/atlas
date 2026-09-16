@@ -168,3 +168,14 @@ Atlas 已将第八轮任务验收标记为 passed，并完成迭代。
 - 浏览器验收：临时产品实例 `http://127.0.0.1:8128/` 使用 `/private/tmp/atlas-round13-ui-acceptance-20260916/planner.db`；通过 API 删除预置项目后页面显示 Recently Deleted 记录：Restore UI Project，包含 1 project、1 task、1 commitment、1 time block；点击 Restore 后项目和任务回到工作台，最近删除清空；切换到 `2026-09-16` 后当天承诺和 `09:00`–`10:00` 时间块可见。
 
 临时服务已关闭，`__pycache__` 已清理；验收数据保留在 `/private/tmp/atlas-round13-ui-acceptance-20260916/` 作为可丢弃证据。
+
+
+## 第十四轮：导出/导入期间的并发写入策略
+
+- 范围：围绕备份导出、导入恢复和普通写入的并发安全收口，仍按单用户本地 SQLite 应用设计；不改变导入确认、失败回滚、安全快照、备份 schema 或页面主流程。
+- Atlas 状态：上一份已接受基线为 `snap_d5f6cf8c717f4578b2ed7bfe2e351f04`；第十四轮代码实现后采用基线 `snap_f56c600ffe7c4d84b9f24d36264e889a`。
+- 改动：`app.py` 新增按数据库绝对路径分组的 `RLock` 与 `locked_db()`，并把导出、导入、最近删除恢复、项目/任务/承诺/时间块创建更新删除和主要读取入口统一纳入锁保护；顺手修复部分 DELETE/PUT 404 分支连接关闭依赖手写 `close()` 的资源泄漏风险。`tests/test_app.py` 增加 `TestConcurrentBackupAccess`，用 `ThreadingHTTPServer` 模拟导入持锁时的并发创建请求。
+- 固定验证：`python3 -m py_compile app.py tests/test_app.py` 通过；`node --check static/app.js` 通过；`python3 -m unittest tests.test_app.TestConcurrentBackupAccess -v` 共 1/1 通过；`python3 -m unittest tests.test_app.TestImportAPI tests.test_app.TestEditDeleteAPI tests.test_app.TestDeletedItemRestore -v` 共 53/53 通过；`python3 -m unittest discover -s tests -v` 共 193/193 通过。
+- 并发验收：测试中 mock `save_safety_backup()` 在导入恢复临界区暂停，随后启动并发 `POST /api/projects`；创建请求在导入释放前没有返回，释放后导入先完成，项目创建再成功写入，最终项目顺序为 Imported、Concurrent。
+
+首次未提权运行并发 HTTP 测试时因沙箱禁止绑定本地临时端口失败；允许本地端口后复跑通过。全量测试仍输出既有 socket ResourceWarning，但测试结果为 OK。

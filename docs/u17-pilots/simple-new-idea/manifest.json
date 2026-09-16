@@ -84,7 +84,7 @@
     "ordinary_end": "完整 assistant 响应写入原始事件文件",
     "atlas_start": "网页首次提交固定资料分析",
     "atlas_scope_end": "首轮需求和开发范围完成人工确认",
-    "atlas_iteration_end": "第十三轮项目/任务删除最近删除与恢复开发、测试、浏览器验收与 Atlas 代码基线同步完成（2026-09-16）"
+    "atlas_iteration_end": "第十四轮导出/导入并发写入策略开发、测试与 Atlas 代码基线同步完成（2026-09-16）"
   },
   "comparison_fields": [
     "重要遗漏",
@@ -95,7 +95,7 @@
     "生成首次通过率与重试"
   ],
   "atlas_project_id": "prj_e6299aa777e645b4a8c9157a31364e0c",
-  "rounds_completed": 13,
+  "rounds_completed": 14,
   "ordinary_comparison_archived": true,
   "atlas_output": "atlas-output.json",
   "excluded_preexisting_changes": [
@@ -108,6 +108,6 @@
     "atlas-web/src/routes/home.tsx"
   ],
   "completion_revision": "7a2423f",
-  "latest_atlas_baseline": "snap_79397bd065374386b8020432678c3597",
-  "latest_verification": "第十三轮：192/192 workspace tests、TestDeletedItemRestore 5/5、TestEditDeleteAPI 17/17、python3 -m py_compile、node --check static/app.js、临时产品实例浏览器验收通过；项目/任务删除会记录最近删除快照并可恢复；导入备份会清空旧恢复记录；Atlas 代码基线 snap_79397bd065374386b8020432678c3597 已同步。"
+  "latest_atlas_baseline": "snap_f56c600ffe7c4d84b9f24d36264e889a",
+  "latest_verification": "第十四轮：导出/导入并发写入策略完成；同一数据库文件上的导出、导入和普通写入使用服务级 RLock 序列化，避免恢复期间并发创建/修改穿插写入；python3 -m py_compile、node --check static/app.js、TestConcurrentBackupAccess 1/1、导入/删除/恢复相关 53/53、全量 193/193 workspace tests 通过；Atlas 代码基线 snap_f56c600ffe7c4d84b9f24d36264e889a 已同步。"
 }

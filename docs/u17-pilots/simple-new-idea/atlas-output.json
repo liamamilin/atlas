@@ -420,6 +420,12 @@
       "round": 13,
       "accepted": true,
       "role": "第十三轮项目/任务删除最近删除与恢复实现后代码基线"
+    },
+    {
+      "id": "snap_f56c600ffe7c4d84b9f24d36264e889a",
+      "round": 14,
+      "accepted": true,
+      "role": "第十四轮导出/导入并发写入策略实现后代码基线"
     }
   ],
   "iterations": [
@@ -568,10 +574,10 @@
     }
   },
   "verification": {
-    "rounds": "13",
-    "latest": "第十三轮完成项目/任务删除后的最近删除与恢复闭环；级联删除前保存快照，用户可从工作台恢复项目或任务，恢复会做 ID 冲突与源项目存在性检查。",
-    "tests": "192/192 workspace tests passed; TestDeletedItemRestore 5/5; TestEditDeleteAPI 17/17; python3 -m py_compile app.py tests/test_app.py passed; node --check static/app.js passed; browser UI acceptance passed.",
-    "scope": "第十三轮修改 app.py、static/app.js、static/index.html、static/styles.css、tests/test_app.py；导出备份 schema_version=1.0 保持不变，最近删除作为本地撤销历史不进入备份，导入备份时清空。"
+    "rounds": "14",
+    "latest": "第十四轮完成导出/导入期间的并发写入策略；同一数据库文件上的导出、导入和普通写入进入同一个服务级 RLock，导入恢复期间的并发项目创建会等待恢复完成后再执行。",
+    "tests": "193/193 workspace tests passed; TestConcurrentBackupAccess 1/1; TestImportAPI + TestEditDeleteAPI + TestDeletedItemRestore 53/53; python3 -m py_compile app.py tests/test_app.py passed; node --check static/app.js passed.",
+    "scope": "第十四轮修改 app.py、tests/test_app.py；不改变备份 schema_version=1.0，不改变导入覆盖语义、最近删除历史或前端交互。"
   },
   "fourth_round_evidence": {
     "iteration_id": "itr_fac58c9b9791487eb5587c11a09e04ea",
@@ -771,6 +777,30 @@
     },
     "runtime_artifacts": [
       "/private/tmp/atlas-round13-ui-acceptance-20260916/"
+    ]
+  },
+  "fourteenth_round_evidence": {
+    "round": 14,
+    "code_baseline": "snap_f56c600ffe7c4d84b9f24d36264e889a",
+    "changed_paths": [
+      "app.py",
+      "tests/test_app.py"
+    ],
+    "implementation": [
+      "新增按数据库绝对路径分组的服务级 RLock 与 locked_db() 上下文。",
+      "GET /api/projects、/api/deleted-items、/api/commitments、/api/export 与 POST /api/import、恢复、创建、删除、更新等写入口均使用同一锁保护。",
+      "导入确认恢复会在持锁期间创建安全快照和事务替换，普通写入等待导入完成后再执行。"
+    ],
+    "verification": [
+      "python3 -m py_compile app.py tests/test_app.py",
+      "node --check static/app.js",
+      "python3 -m unittest tests.test_app.TestConcurrentBackupAccess -v: 1/1 passed",
+      "python3 -m unittest tests.test_app.TestImportAPI tests.test_app.TestEditDeleteAPI tests.test_app.TestDeletedItemRestore -v: 53/53 passed",
+      "python3 -m unittest discover -s tests -v: 193/193 passed"
+    ],
+    "notes": [
+      "首次未提权运行并发 HTTP 测试时因沙箱禁止绑定 127.0.0.1 临时端口失败；允许本地端口后复跑通过。",
+      "全量测试仍有既有 socket ResourceWarning，不影响断言结果。"
     ]
   }
 }
