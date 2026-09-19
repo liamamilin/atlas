@@ -26,21 +26,23 @@ import promote_draft as promote
 from atlas_sources import SourceError, read_source, source_manifest
 from opencode_client import OpenCodeClient, OpenCodeError, iter_sse
 from execution_state import project_execution
-from execution_workspace import prepare_execution_workspace
+from execution_workspace import apply_execution_workspace, prepare_execution_workspace
 from execution_service import (
     _completion_report, _execution_evidence,
     apply_execution_result,
     continue_execution,
     create_iteration as create_execution_iteration,
     create_task as create_execution_task,
+    rebase_iteration,
     reconcile_execution, start_execution, stop_execution,
 )
 from project_store import ProjectStore, ProjectStoreError
 from project_export import export_project
 from project_generation import (
-    apply_generation_item, execute_generation, prepare_generation,
+    apply_generation_item, execute_generation, generation_staleness, prepare_generation,
     read_generation,
 )
+from project_open_items import list_open_items, resolve_open_item
 from project_baseline import (
     capture_project_baseline, check_project_changes, get_project_baseline,
     latest_project_baseline, list_project_baselines,
@@ -638,6 +640,162 @@ class ProjectStoreTests(unittest.TestCase):
         with self.assertRaisesRegex(ProjectStoreError, 'already applied'):
             apply_generation_item(
                 self.store, self.project['id'], run['id'], 'document', 0)
+
+    def test_open_items_merge_dispositions_and_convert_to_records(self):
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'source-v1',
+            excerpt='Fixed local evidence', note='Use the fixed boundary', read_status='reviewed')
+        run = prepare_generation(self.store, self.project['id'], 'analysis')
+        directory = (self.store.path.parent / 'generation-runs' /
+                     self.project['id'] / run['id'])
+        request = json.loads((directory / 'input.json').read_text())
+
+        def runner(_directory, _run):
+            return ({
+                'input_fingerprint': request['input_fingerprint'],
+                'questions': [{'question': 'Who owns review?', 'why': 'The evidence is silent.',
+                               'affects': ['analysis']}],
+                'requirements': [],
+                'conflicts': [{'summary': 'Two owners claim review',
+                               'impact': 'Ownership is ambiguous',
+                               'evidence': [{'kind': 'reference', 'id': reference['id']}]}],
+                'suggestions': [{'summary': 'Show the source version',
+                                 'reason': 'It keeps review traceable',
+                                 'evidence': [{'kind': 'reference', 'id': reference['id']}]}],
+                'documents': [{
+                    'document_id': None, 'kind': 'analysis', 'title': 'Analysis',
+                    'content': '# Analysis\n\nOne open ownership question.',
+                    'basis': [{'kind': 'reference', 'id': reference['id']}],
+                }],
+            }, {'engine_session_id': 'ses_fake'})
+
+        execute_generation(self.store, self.project['id'], run['id'], runner=runner)
+        items = list_open_items(self.store, self.project['id'])
+        self.assertEqual(len(items), 3)
+        self.assertTrue(all(item['status'] == 'open' for item in items))
+        self.assertTrue(all(item['current'] for item in items))
+        by_kind = {item['kind']: item for item in items}
+        self.assertEqual(by_kind['question']['affects'], ['analysis'])
+        self.assertEqual(by_kind['suggestion']['reference_ids'], [reference['id']])
+
+        with self.assertRaisesRegex(ValueError, 'note is required'):
+            resolve_open_item(self.store, self.project['id'], {
+                'run_id': run['id'], 'item_kind': 'question',
+                'item_index': by_kind['question']['index'],
+                'item_key': by_kind['question']['key'],
+                'status': 'answered', 'note': '',
+            })
+        answered = resolve_open_item(self.store, self.project['id'], {
+            'run_id': run['id'], 'item_kind': 'question',
+            'item_index': by_kind['question']['index'],
+            'item_key': by_kind['question']['key'],
+            'status': 'answered', 'convert': 'decision',
+            'note': 'The user owns review.',
+        })
+        self.assertEqual(answered['item']['status'], 'answered')
+        self.assertIsNotNone(answered['decision_id'])
+        decision = next(item for item in self.store.list_decisions(self.project['id'])
+                        if item['id'] == answered['decision_id'])
+        self.assertEqual(decision['statement'], 'The user owns review.')
+
+        accepted = resolve_open_item(self.store, self.project['id'], {
+            'run_id': run['id'], 'item_kind': 'suggestion',
+            'item_index': by_kind['suggestion']['index'],
+            'item_key': by_kind['suggestion']['key'],
+            'status': 'accepted', 'convert': 'requirement',
+            'note': 'Add it as a candidate requirement.',
+        })
+        self.assertEqual(accepted['item']['status'], 'accepted')
+        requirement = next(item for item in self.store.list_requirements(self.project['id'])
+                           if item['id'] == accepted['requirement_id'])
+        self.assertIsNone(requirement['confirmed_scope'])
+        self.assertEqual(requirement['reference_ids'], [reference['id']])
+
+        dismissed = resolve_open_item(self.store, self.project['id'], {
+            'run_id': run['id'], 'item_kind': 'conflict',
+            'item_index': by_kind['conflict']['index'],
+            'item_key': by_kind['conflict']['key'],
+            'status': 'dismissed', 'note': 'Not a conflict after review.',
+        })
+        self.assertEqual(dismissed['item']['status'], 'dismissed')
+        self.assertIsNone(dismissed['decision_id'])
+
+        deferred = resolve_open_item(self.store, self.project['id'], {
+            'run_id': run['id'], 'item_kind': 'question',
+            'item_index': by_kind['question']['index'],
+            'item_key': by_kind['question']['key'],
+            'status': 'deferred', 'note': '',
+        })
+        self.assertEqual(deferred['item']['status'], 'deferred')
+        current = list_open_items(self.store, self.project['id'])
+        self.assertEqual(len(current), 3)
+        self.assertEqual(len([item for item in current
+                              if item['kind'] == 'question' and item['run_id'] == run['id']]), 1)
+        with self.assertRaisesRegex(ProjectStoreError, 'changed'):
+            resolve_open_item(self.store, self.project['id'], {
+                'run_id': run['id'], 'item_kind': 'question',
+                'item_index': by_kind['question']['index'],
+                'item_key': 'question:deadbeefdeadbeef',
+                'status': 'deferred', 'note': '',
+            })
+
+    def test_generation_apply_is_receipt_backed_and_staleness_aware(self):
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'source-v1',
+            excerpt='Fixed local evidence', note='Use the fixed boundary', read_status='reviewed')
+        run = prepare_generation(self.store, self.project['id'], 'analysis')
+        directory = (self.store.path.parent / 'generation-runs' /
+                     self.project['id'] / run['id'])
+        request = json.loads((directory / 'input.json').read_text())
+
+        def runner(_directory, _run):
+            return ({
+                'input_fingerprint': request['input_fingerprint'],
+                'questions': [], 'conflicts': [], 'suggestions': [],
+                'requirements': [{
+                    'key': 'keep-local', 'content': 'Keep the workflow local',
+                    'recommended_scope': 'current',
+                    'recommendation_reason': 'The fixed evidence supports it',
+                    'acceptance_conditions': ['Works without an account'],
+                    'reference_ids': [reference['id']],
+                }],
+                'documents': [{
+                    'document_id': None, 'kind': 'analysis', 'title': 'Analysis',
+                    'content': '# Analysis\n\nLocal only.',
+                    'basis': [{'kind': 'reference', 'id': reference['id']}],
+                }],
+            }, {'engine_session_id': 'ses_fake'})
+
+        execute_generation(self.store, self.project['id'], run['id'], runner=runner)
+        applied = apply_generation_item(
+            self.store, self.project['id'], run['id'], 'requirement', 0)
+        current = read_generation(self.store, self.project['id'], run['id'])
+        staleness = generation_staleness(self.store, self.project['id'], current)
+        self.assertTrue(staleness['known'])
+        self.assertFalse(staleness['stale'])
+
+        stored = json.loads((directory / 'run.json').read_text())
+        stored['applied']['requirements'] = {}
+        (directory / 'run.json').write_text(json.dumps(stored))
+        again = apply_generation_item(
+            self.store, self.project['id'], run['id'], 'requirement', 0)
+        self.assertEqual(again['created']['id'], applied['created']['id'])
+        self.assertEqual(len(self.store.list_requirements(self.project['id'])), 1)
+
+        self.store.add_reference(
+            self.project['id'], 'atlas:application', 'second', 'source-v1',
+            excerpt='More evidence', note='Added later', read_status='read')
+        current = read_generation(self.store, self.project['id'], run['id'])
+        self.assertTrue(generation_staleness(
+            self.store, self.project['id'], current)['stale'])
+        with self.assertRaisesRegex(ProjectStoreError, 'stale'):
+            apply_generation_item(
+                self.store, self.project['id'], run['id'], 'document', 0)
+        confirmed = apply_generation_item(
+            self.store, self.project['id'], run['id'], 'document', 0,
+            confirm_stale=True)
+        self.assertEqual(confirmed['created']['kind'], 'analysis')
+        self.assertEqual(len(self.store.list_documents(self.project['id'])), 1)
 
     def test_value_analysis_is_advisory_grounded_and_never_changes_scope(self):
         reference = self.store.add_reference(
@@ -1447,6 +1605,14 @@ class ProjectStoreTests(unittest.TestCase):
             task['id'], 'passed', [{'kind': 'test', 'summary': '42 tests passed'}])
         self.assertEqual(accepted['acceptance_status'], 'passed')
 
+    def test_waived_acceptance_requires_an_explicit_reason(self):
+        task = self.store.create_task(self.project['id'], 'Implement', 'Do work')
+        with self.assertRaisesRegex(ValueError, 'evidence is required'):
+            self.store.record_acceptance(task['id'], 'waived', [])
+        waived = self.store.record_acceptance(
+            task['id'], 'waived', [{'kind': 'review', 'summary': 'Out of scope for this round'}])
+        self.assertEqual(waived['acceptance_status'], 'waived')
+
     def test_workspace_allows_only_one_active_execution(self):
         first = self.store.create_task(self.project['id'], 'First', 'First change')
         second = self.store.create_task(self.project['id'], 'Second', 'Second change')
@@ -1965,6 +2131,8 @@ class ExecutionServiceTests(unittest.TestCase):
         self.document = self.store.create_document(
             self.project['id'], 'current-state', 'Change plan', 'Update `src/app.py`.',
             [{'kind': 'workspace_baseline', 'id': self.baseline['id']}])
+        self.store.review_document(
+            self.project['id'], self.document['id'], 'approved', 'Pilot plan reviewed')
         self.iteration = create_execution_iteration(self.store, self.project['id'], {
             'title': 'Iteration one', 'objective': 'Update the value',
             'input_document_versions': [self.document['version_id']],
@@ -1993,6 +2161,31 @@ class ExecutionServiceTests(unittest.TestCase):
                 'input_document_versions': [self.document['version_id']],
                 'requirement_ids': [],
             })
+
+        pending_document = self.store.create_document(
+            self.project['id'], 'development-plan', 'Unapproved plan', 'Draft plan')
+        with self.assertRaisesRegex(ProjectStoreError, 'approve every fixed document'):
+            create_execution_iteration(self.store, self.project['id'], {
+                'title': 'Unapproved document', 'objective': 'Must stay blocked',
+                'input_document_versions': [pending_document['version_id']],
+                'requirement_ids': [self.requirement['id']],
+            })
+        self.store.review_document(
+            self.project['id'], pending_document['id'], 'rejected', 'Needs rework')
+        rejected = self.store.get_document(pending_document['id'])
+        self.assertEqual(rejected['review']['approval'], 'rejected')
+        with self.assertRaisesRegex(ProjectStoreError, 'approve every fixed document'):
+            create_execution_iteration(self.store, self.project['id'], {
+                'title': 'Rejected document', 'objective': 'Must stay blocked',
+                'input_document_versions': [pending_document['version_id']],
+                'requirement_ids': [self.requirement['id']],
+            })
+        self.store.review_document(
+            self.project['id'], pending_document['id'], 'approved', 'Rework accepted')
+        self.store.add_document_version(
+            pending_document['id'], 'Draft plan v2', change_summary='Edited')
+        reset = self.store.get_document(pending_document['id'])
+        self.assertEqual(reset['review']['approval'], 'pending')
 
         no_baseline = self.store.create_project(
             'No baseline', 'Require workspace review', self.root / 'no-baseline', 'new')
@@ -2332,6 +2525,112 @@ class ExecutionServiceTests(unittest.TestCase):
         self.assertEqual(
             latest_project_baseline(self.store, self.project['id'])['id'],
             recovered['application_state']['accepted_baseline_id'])
+
+    def test_failed_or_stopped_execution_cannot_pass_acceptance(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        self.store.update_execution(execution['id'], {
+            'state': 'failed', 'engine_status': 'idle', 'evidence': {}})
+        with self.assertRaisesRegex(ProjectStoreError, 'cannot pass acceptance'):
+            self.store.record_acceptance(
+                self.task['id'], 'passed', [{'kind': 'review', 'summary': 'Looks good'}])
+        waived = self.store.record_acceptance(
+            self.task['id'], 'waived',
+            [{'kind': 'review', 'summary': 'Superseded by an explicit follow-up'}])
+        self.assertEqual(waived['acceptance_status'], 'waived')
+
+    def test_applied_result_without_adopted_baseline_cannot_pass_acceptance(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        (Path(execution['workdir']) / 'src/app.py').write_text('VALUE = 2\n')
+        self.client.mode = 'completed'
+        reconcile_execution(
+            self.store, self.project['id'], execution['id'], self.client)
+        with patch('execution_service.capture_project_baseline',
+                   side_effect=ProjectStoreError('simulated baseline interruption')):
+            applied = apply_execution_result(
+                self.store, self.project['id'], execution['id'])
+        self.assertIn('baseline_adoption_error', applied['application_state'])
+        with self.assertRaisesRegex(ProjectStoreError, 'accepted workspace baseline'):
+            self.store.record_acceptance(
+                self.task['id'], 'passed', [{'kind': 'review', 'summary': 'Looks good'}])
+
+    def test_requirement_revisions_are_frozen_into_iterations_and_tasks(self):
+        self.assertEqual(self.iteration['baseline_id'], self.baseline['id'])
+        self.assertEqual(self.iteration['requirement_revisions'],
+                         [{'requirement_id': self.requirement['id'], 'revision': 1}])
+        updated = self.store.update_requirement(
+            self.project['id'], self.requirement['id'], content='Value becomes three')
+        self.assertEqual(updated['revision'], 2)
+        self.assertIsNone(updated['confirmed_scope'])
+        revisions = self.store.list_requirement_revisions(
+            self.project['id'], self.requirement['id'])
+        self.assertEqual([item['revision'] for item in revisions], [2, 1])
+        self.assertEqual(revisions[1]['content'], 'Value becomes two')
+
+        task = self.store.get_task(self.task['id'])
+        self.assertEqual(task['requirement_revisions'],
+                         [{'requirement_id': self.requirement['id'], 'revision': 1}])
+        context = self.store.task_context(self.task['id'])
+        self.assertEqual(context['requirements'][0]['content'], 'Value becomes two')
+        self.assertEqual(context['requirements'][0]['revision'], 1)
+
+        recommendation_only = self.store.update_requirement(
+            self.project['id'], self.requirement['id'],
+            recommended_scope='later', recommendation_reason='Still later')
+        self.assertEqual(recommendation_only['revision'], 2)
+        self.assertEqual(recommendation_only['content'], 'Value becomes three')
+
+    def test_iteration_baseline_requires_an_explicit_rebase(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        (Path(execution['workdir']) / 'src/app.py').write_text('VALUE = 2\n')
+        self.client.mode = 'completed'
+        reconcile_execution(
+            self.store, self.project['id'], execution['id'], self.client)
+        applied = apply_execution_result(
+            self.store, self.project['id'], execution['id'])
+        new_baseline = applied['application_state']['accepted_baseline_id']
+        self.assertNotEqual(new_baseline, self.baseline['id'])
+
+        with self.assertRaisesRegex(ProjectStoreError, 'rebase the iteration'):
+            start_execution(
+                self.store, self.project['id'], self.task['id'], {}, self.client)
+        rebased = rebase_iteration(
+            self.store, self.project['id'], self.iteration['id'], {})
+        self.assertEqual(rebased['baseline_id'], new_baseline)
+        self.assertEqual(rebased['baseline_history'][0]['baseline_id'], self.baseline['id'])
+        created = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        self.assertEqual(created['status'], 'running')
+        self.assertEqual(created['input_state']['workspace_baseline']['id'], new_baseline)
+
+    def test_interrupted_apply_recovers_the_intended_result(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        (Path(execution['workdir']) / 'src/app.py').write_text('VALUE = 2\n')
+        self.client.mode = 'completed'
+        completed = reconcile_execution(
+            self.store, self.project['id'], execution['id'], self.client)
+        before = self.store.get_snapshot(self.project['id'], execution['before_snapshot_id'])
+        after = self.store.get_snapshot(
+            self.project['id'], completed['after_snapshot_id'])
+        difference = compare_snapshots(before['manifest'], after['manifest'])
+        self.store.record_execution_application(execution['id'], 'applying', {
+            'baseline_id': self.baseline['id'],
+            'execution_workdir': execution['workdir'],
+            'apply_intent': {'after_snapshot_id': completed['after_snapshot_id']},
+        })
+        apply_execution_workspace(
+            str(self.workspace), execution['workdir'], before['manifest'],
+            after['manifest'], difference, execution['id'])
+
+        recovered = apply_execution_result(
+            self.store, self.project['id'], execution['id'])
+        self.assertEqual(recovered['application_status'], 'applied')
+        self.assertTrue(recovered['application_state']['recovered_from_interrupted_apply'])
+        self.assertEqual((self.workspace / 'src/app.py').read_text(), 'VALUE = 2\n')
+        self.assertIsNotNone(recovered['application_state']['accepted_baseline_id'])
 
     def test_workspace_change_blocks_execution_before_engine_session(self):
         (self.workspace / 'src/app.py').write_text('VALUE = 9\n')

@@ -72,6 +72,39 @@ VALUE_SECTIONS = (
 )
 
 
+def _basis_fingerprint(store, project_id: str, mode: str,
+                       exclude_requirement_ids: set[str] | None = None) -> str:
+    excluded = exclude_requirement_ids or set()
+    references = sorted(
+        (item["id"], item["source_version"], item["note"], item["read_status"])
+        for item in store.list_references(project_id))
+    requirements = sorted(
+        (item["id"], item.get("revision"))
+        for item in store.list_requirements(project_id)
+        if item["id"] not in excluded)
+    decisions = sorted(item["id"] for item in store.list_decisions(project_id))
+    payload = {"references": references, "requirements": requirements,
+               "decisions": decisions}
+    if mode == "improvement":
+        baseline = latest_project_baseline(store, project_id)
+        payload["baseline_id"] = baseline["id"] if baseline else None
+    serialized = json.dumps(payload, ensure_ascii=False, sort_keys=True,
+                            separators=(",", ":"))
+    return hashlib.sha256(serialized.encode()).hexdigest()
+
+
+def generation_staleness(store, project_id: str, run: dict) -> dict:
+    recorded = run.get("basis_fingerprint")
+    if not recorded:
+        return {"known": False, "stale": False}
+    excluded = {row["requirement_id"]
+                for row in store.list_generation_receipts(run["id"])
+                if row.get("requirement_id")}
+    current = _basis_fingerprint(
+        store, project_id, run.get("mode", ""), exclude_requirement_ids=excluded)
+    return {"known": True, "stale": current != recorded}
+
+
 def prepare_generation(store, project_id: str, mode: str,
                        document_kinds: list[str] | None = None,
                        model: str = "", improvement_goal: str = "",
@@ -116,6 +149,7 @@ def prepare_generation(store, project_id: str, mode: str,
         "model": model.strip(),
         "status": "queued",
         "input_fingerprint": request["input_fingerprint"],
+        "basis_fingerprint": _basis_fingerprint(store, project_id, mode),
         "result": None,
         "applied": {"requirements": {}, "documents": {}},
         "error": "",
@@ -266,6 +300,8 @@ def render_generation_prompt(request: dict) -> str:
     must be small ways to collect evidence. The summary is optional advice for the user to weigh; it must
     not contain a score, pass/fail status, go/no-go verdict, automatic rejection, or claim that the idea
     is worth or not worth building. Value analysis never changes scope and never blocks later work.
+    Do not restate or paraphrase this restriction inside the document, and avoid the phrases
+    `worth building`, `值得构建`, `should build`, and `是否值得构建` entirely.
 14. Prefix every substantive paragraph or list item in the seven sections with its classification:
     `[Evidence: exact input ID]`
     for observations; `[Unknown]` for unknowns; `[Evidence: exact input ID]` or `[Inference]` for
@@ -527,16 +563,23 @@ def mark_generation_interrupted(store, project_id: str, run_id: str) -> dict:
 
 
 def apply_generation_item(store, project_id: str, run_id: str,
-                          item_kind: str, index: int) -> dict:
+                          item_kind: str, index: int,
+                          confirm_stale: bool = False) -> dict:
     if item_kind not in {"requirement", "document"}:
         raise ValueError("item_kind must be requirement or document")
     if not isinstance(index, int) or isinstance(index, bool) or index < 0:
         raise ValueError("index must be a non-negative integer")
+    if not isinstance(confirm_stale, bool):
+        raise ValueError("confirm_stale must be a boolean")
     directory = _run_directory(store, project_id, run_id)
     with _STATE_LOCK:
         run = read_generation(store, project_id, run_id)
         if run["status"] != "completed" or not run.get("result"):
             raise ProjectStoreError("generation run is not completed")
+        if generation_staleness(store, project_id, run)["stale"] and not confirm_stale:
+            raise ProjectStoreError(
+                "generated result is stale against the current project inputs; "
+                "review the changed inputs and confirm the stale apply explicitly")
         request = None
         if run["mode"] == "improvement":
             request = json.loads((directory / "input.json").read_text())
@@ -551,10 +594,13 @@ def apply_generation_item(store, project_id: str, run_id: str,
             raise ProjectStoreError("generation item already applied")
         item = items[index]
         if item_kind == "requirement":
-            created = store.create_requirement(
-                project_id, item["content"], item["recommended_scope"],
-                item["recommendation_reason"], item["acceptance_conditions"],
-                item["reference_ids"])
+            created = store.apply_generation_requirement(
+                project_id, run_id, "requirement", index,
+                content=item["content"],
+                recommended_scope=item["recommended_scope"],
+                recommendation_reason=item["recommendation_reason"],
+                acceptance_conditions=item["acceptance_conditions"],
+                reference_ids=item["reference_ids"])
         else:
             if request is None:
                 request = json.loads((directory / "input.json").read_text())
@@ -587,14 +633,16 @@ def apply_generation_item(store, project_id: str, run_id: str,
                     f"AI section revision {request['revision']['section_heading']}: "
                     f"{request['revision']['instruction']}"
                     if run["mode"] == "revision" else f"Generated by {run_id}")
-                created = store.add_document_version(
-                    item["document_id"], item["content"], basis,
-                    expected_current_version=source["current_version"], author="ai",
-                    change_summary=change_summary)
+                expected_version = source["current_version"]
             else:
-                created = store.create_document(
-                    project_id, item["kind"], item["title"], item["content"], basis,
-                    author="ai", change_summary=f"Generated by {run_id}")
+                change_summary = f"Generated by {run_id}"
+                expected_version = None
+            created = store.apply_generation_document(
+                project_id, run_id, "document", index,
+                document_id=item["document_id"], kind=item["kind"],
+                title=item["title"], content=item["content"], basis=basis,
+                author="ai", change_summary=change_summary,
+                expected_current_version=expected_version)
         run["applied"][plural][key] = (
             {"document_id": created["id"], "version_id": created["version_id"]}
             if item_kind == "document" else created["id"])
@@ -896,11 +944,25 @@ def _validate_value_document(content: str, evidence_ids: set[str],
         r"(?i)\b(?:score|rating)\s*[:：]", r"\b\d{1,3}\s*/\s*100\b",
         r"(?:评分|得分)\s*[:：]", r"(?:通过|否决)\s*[:：]",
         r"(?i)\b(?:go|no-go)\s+(?:decision|verdict)\b",
-        r"(?i)\b(?:should|should not|shouldn't)\s+(?:build|be\s+built)\b",
-        r"(?:值得|不值得)(?:开发|构建|做)",
     )
     if any(re.search(pattern, content) for pattern in verdict_patterns):
         raise ValueError("value analysis must not contain a score or build verdict")
+    # A summary that explicitly declines to judge ("不判断该想法是否值得构建") restates the
+    # mandated boundary rather than asserting a verdict, so only flag asserted judgments.
+    worth_patterns = (
+        r"(?i)\b(?:should|should not|shouldn't)\s+(?:build|be\s+built)\b",
+        r"(?:值得|不值得)(?:开发|构建|做)",
+    )
+    disclaimer = re.compile(
+        r"(?:不判断|不评判|不评价|不评分|不改变|不提供|不构成|并不|无从判断|无法判断|"
+        r"whether|never\s+judge|without\s+judg|do(?:es)?\s+not\s+(?:state|claim|judge))",
+        re.IGNORECASE)
+    for pattern in worth_patterns:
+        for match in re.finditer(pattern, content):
+            prefix = content[max(0, match.start() - 40):match.start()]
+            if disclaimer.search(prefix) or prefix.endswith("是否"):
+                continue
+            raise ValueError("value analysis must not contain a score or build verdict")
 
 
 def _prepare_revision(store, project_id, document_id, section_heading, instruction):

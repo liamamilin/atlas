@@ -198,6 +198,7 @@ export interface ProjectRequirement {
   id: string;
   project_id: string;
   content: string;
+  revision?: number;
   recommended_scope: ProjectScope | null;
   recommendation_reason: string;
   confirmed_scope: ProjectScope | null;
@@ -237,7 +238,33 @@ export interface DocumentBasis {
 
 export interface DocumentReview {
   status: "current" | "needs_review";
+  freshness?: "current" | "needs_review";
+  approval?: "pending" | "approved" | "rejected";
+  note?: string;
+  reviewed_at?: string | null;
   reasons: { kind: "requirement_changed" | "upstream_document_changed" | "workspace_baseline_changed"; id: string; document_id?: string; current_baseline_id?: string }[];
+}
+
+export type ProjectOpenItemKind = "question" | "conflict" | "suggestion";
+export type ProjectOpenItemStatus = "open" | "answered" | "resolved" | "accepted" | "deferred" | "dismissed";
+
+export interface ProjectOpenItem {
+  id: string;
+  run_id: string;
+  mode: "analysis" | "improvement" | "value";
+  kind: ProjectOpenItemKind;
+  index: number;
+  key: string;
+  title: string;
+  detail: string;
+  affects: ProjectDocumentKind[];
+  reference_ids: string[];
+  created_at: string;
+  status: ProjectOpenItemStatus;
+  note: string;
+  decision_id: string | null;
+  requirement_id: string | null;
+  current: boolean;
 }
 
 export interface ProjectDocument {
@@ -280,6 +307,7 @@ export interface ProjectWorkspace {
   iterations: ProjectIteration[];
   tasks: ProjectTask[];
   executions: ProjectExecution[];
+  open_items?: ProjectOpenItem[];
 }
 
 export interface ProjectIteration {
@@ -291,6 +319,9 @@ export interface ProjectIteration {
   status: "planned" | "active" | "completed" | "abandoned";
   input_document_versions: string[];
   requirement_ids: string[];
+  requirement_revisions?: { requirement_id: string; revision: number }[];
+  baseline_id?: string | null;
+  baseline_history?: { baseline_id: string | null; rebased_at: string; note: string }[];
   created_at: string;
   updated_at: string;
   completed_at: string | null;
@@ -310,6 +341,7 @@ export interface ProjectTask {
   acceptance_evidence: { kind: string; summary: string; [key: string]: unknown }[];
   input_document_versions: string[];
   requirement_ids: string[];
+  requirement_revisions?: { requirement_id: string; revision: number }[];
   created_at: string;
   updated_at: string;
 }
@@ -344,7 +376,7 @@ export interface ProjectExecution {
   applied_snapshot_id: string | null;
   workdir: string;
   source_workdir: string;
-  application_status: "not_applicable" | "pending" | "applied" | "conflict" | "failed" | "superseded";
+  application_status: "not_applicable" | "pending" | "applying" | "applied" | "conflict" | "failed" | "superseded";
   application_state: {
     strategy?: "isolated_copy";
     source_workdir?: string;
@@ -605,6 +637,9 @@ export interface ProjectGenerationRun {
   model: string;
   status: "queued" | "running" | "completed" | "failed";
   input_fingerprint: string;
+  basis_fingerprint?: string;
+  stale?: boolean;
+  stale_known?: boolean;
   result: ProjectGenerationResult | null;
   applied: {
     requirements: Record<string, string>;
@@ -872,6 +907,39 @@ export async function getProjectDocumentDiff(projectId: string, documentId: stri
   return fetchJson<{ document_id: string; from_version: number; to_version: number; diff: string }>(
     `/api/projects/${encodeURIComponent(projectId)}/documents/${encodeURIComponent(documentId)}/diff`);
 }
+export async function reviewProjectDocument(
+  projectId: string,
+  documentId: string,
+  input: { status: "approved" | "rejected"; note?: string },
+) {
+  const result = await requestJson<ProjectDocument>(
+    `/api/projects/${encodeURIComponent(projectId)}/documents/${encodeURIComponent(documentId)}/review`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+export async function resolveProjectOpenItem(
+  projectId: string,
+  input: {
+    run_id: string;
+    item_kind: ProjectOpenItemKind;
+    item_index: number;
+    item_key: string;
+    status: Exclude<ProjectOpenItemStatus, "open">;
+    note?: string;
+    convert?: "decision" | "requirement";
+  },
+) {
+  const result = await requestJson<{ item: ProjectOpenItem; decision_id: string | null; requirement_id: string | null }>(
+    `/api/projects/${encodeURIComponent(projectId)}/open-items/resolve`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+  invalidateAtlasCache();
+  return result;
+}
 export async function exportProject(projectId: string) {
   return requestJson<ProjectExport>(`/api/projects/${encodeURIComponent(projectId)}/export`, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: "{}",
@@ -911,7 +979,7 @@ export async function startProjectGeneration(
 export async function applyProjectGenerationItem(
   projectId: string,
   runId: string,
-  input: { item_kind: "requirement" | "document"; index: number },
+  input: { item_kind: "requirement" | "document"; index: number; confirm_stale?: boolean },
 ) {
   const result = await requestJson<{ run: ProjectGenerationRun; created: ProjectRequirement | ProjectDocument }>(
     `/api/projects/${encodeURIComponent(projectId)}/generation-runs/${encodeURIComponent(runId)}/apply`, {
@@ -1048,6 +1116,20 @@ export async function replyProjectExecutionQuestion(
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
     });
+}
+
+export async function rebaseProjectIteration(
+  projectId: string,
+  iterationId: string,
+  input: { note?: string } = {},
+) {
+  const result = await requestJson<ProjectIteration>(
+    `/api/projects/${encodeURIComponent(projectId)}/iterations/${encodeURIComponent(iterationId)}/rebase`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+  invalidateAtlasCache();
+  return result;
 }
 
 export async function recordProjectTaskAcceptance(

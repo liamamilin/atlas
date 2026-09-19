@@ -1,6 +1,6 @@
 # 执行与验收记录
 
-状态：十三轮代码实现和产品验收已完成；普通生成对照已封存；项目/任务删除最近删除与恢复和 Atlas 代码基线已同步。
+状态：十七轮代码实现和产品验收已完成；普通生成对照已封存；项目/任务删除最近删除与恢复、安全快照恢复及中英文界面切换均已同步 Atlas 代码基线。
 
 ## 项目
 
@@ -201,3 +201,11 @@ Atlas 已将第八轮任务验收标记为 passed，并完成迭代。
 - 真实 HTTP 验收：临时产品实例使用 `/private/tmp/atlas-round16-safety-restore-acceptance-20260916/planner.db`；页面脚本包含 `previewSafetyBackup` 与 `confirmSafetyBackupRestore`；先创建 Original Project/Original Task/当天承诺，再通过普通导入替换为 Current Project 并生成原状态安全快照；`/api/backups/preview` 正确预览该快照；未确认恢复返回 400；确认恢复后当前数据回到 Original Project/Original Task 且当天承诺恢复；恢复前又生成一个新安全快照，`/api/backups` 返回 2 个快照；越界路径预览返回 400。
 
 首次未提权运行真实 HTTP 验收时因沙箱禁止绑定本地临时端口失败；允许本地端口后复跑通过。验收数据保留在 `/private/tmp/atlas-round16-safety-restore-acceptance-20260916/` 作为可丢弃证据。
+
+## 第十七轮：界面默认中文与中英文切换
+
+- 范围：统一日计划器的中文默认文案，并增加英文切换；不改变数据模型、API 契约、备份 schema 或恢复语义。
+- 基线：snap_7a81e767f75747e2acee4eb36154d878。
+- 改动：static/app.js 增加 zh/en 词条、planner_lang 持久化和 toggleLanguage()；static/index.html 增加默认中文静态文案和语言按钮；static/styles.css 增加头部语言按钮与窄屏布局。项目、当天承诺、最近删除、数据备份和安全快照的动态文本随语言切换重新渲染。
+- 验证：python3 -m py_compile app.py tests/test_app.py、node --check static/app.js、全量 202/202 workspace tests 通过；真实 HTTP 静态资源验收确认页面默认显示中文，脚本包含 planner_lang 与中英文词条，样式包含移动端语言按钮规则。
+- 结论：第十七轮通过；安全快照仍只提供预览和确认恢复，本轮没有增加删除快照或打开本机目录。

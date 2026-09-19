@@ -47,7 +47,8 @@ def create_iteration(store, project_id: str, body: dict) -> dict:
         raise ProjectStoreError("iteration requires at least one current document version")
     if not requirements:
         raise ProjectStoreError("iteration requires at least one confirmed current requirement")
-    if not latest_project_baseline(store, project_id):
+    baseline = latest_project_baseline(store, project_id)
+    if not baseline:
         raise ProjectStoreError("iteration requires an accepted workspace baseline")
     current = {item["version_id"]: item for item in store.list_documents(project_id)}
     for version_id in versions:
@@ -58,11 +59,27 @@ def create_iteration(store, project_id: str, body: dict) -> dict:
         if document["review"]["status"] != "current":
             raise ProjectStoreError(
                 "review document dependencies before starting a new iteration")
+        if document["review"]["approval"] != "approved":
+            raise ProjectStoreError(
+                "approve every fixed document version before starting a new iteration")
     return store.create_iteration(
         project_id, body.get("title"), body.get("objective"),
         versions,
         requirements,
-        activate)
+        activate,
+        baseline_id=baseline["id"])
+
+
+def rebase_iteration(store, project_id: str, iteration_id: str, body: dict) -> dict:
+    _body(body, {"note"})
+    note = body.get("note", "")
+    iteration = store.get_iteration(iteration_id)
+    if iteration["project_id"] != project_id:
+        raise ProjectStoreError("iteration does not belong to project")
+    baseline = latest_project_baseline(store, project_id)
+    if not baseline:
+        raise ProjectStoreError("rebase requires an accepted workspace baseline")
+    return store.rebase_iteration(project_id, iteration_id, baseline["id"], note)
 
 
 def create_task(store, project_id: str, body: dict) -> dict:
@@ -105,6 +122,10 @@ def start_execution(store, project_id: str, task_id: str, body: dict,
     baseline = latest_project_baseline(store, project_id)
     if not baseline:
         raise ProjectStoreError("execution requires an accepted workspace baseline")
+    if iteration.get("baseline_id") and baseline["id"] != iteration["baseline_id"]:
+        raise ProjectStoreError(
+            "the accepted workspace baseline advanced past this iteration; "
+            "rebase the iteration before starting more executions")
     checked = check_project_changes(store, project_id)
     if checked["current"]["content_fingerprint"] != \
             checked["baseline"]["content_fingerprint"]:
@@ -163,7 +184,7 @@ def start_execution(store, project_id: str, task_id: str, body: dict,
         raise
     try:
         if task["kind"] != "analysis" and previous_result and \
-                previous_result["application_status"] in {"pending", "conflict", "failed"}:
+                previous_result["application_status"] in {"pending", "applying", "conflict", "failed"}:
             _supersede_result(
                 store, previous_result, execution["id"], "replaced_by_new_execution")
         context = store.task_context(task_id)
@@ -352,6 +373,10 @@ def apply_execution_result(store, project_id: str, execution_id: str) -> dict:
         raise ProjectStoreError("execution result was superseded by a newer execution")
     if execution["application_status"] == "applied":
         return _adopt_applied_baseline(store, project_id, execution, project)
+    if execution["application_status"] == "applying":
+        recovered = _recover_applying_result(store, project_id, execution, task, project)
+        if recovered is not None:
+            return recovered
     evidence = (execution.get("raw_state") or {}).get("evidence") or {}
     filesystem = evidence.get("filesystem") or {}
     if not filesystem.get("scope_compliant"):
@@ -383,34 +408,69 @@ def apply_execution_result(store, project_id: str, execution_id: str) -> dict:
     violations = [path for path in changed if not _within(path, task["write_paths"])]
     if violations:
         raise ProjectStoreError("execution result has out-of-scope changes")
-    try:
-        applied_manifest = apply_execution_workspace(
-            project["workspace"], execution["workdir"], latest["manifest"],
-            after["manifest"], difference, execution_id)
-    except ProjectStoreError as error:
-        store.record_execution_application(
-            execution_id, "conflict", {"error": str(error),
-                                       "baseline_id": baseline_id})
-        raise
-    except OSError as error:
-        store.record_execution_application(
-            execution_id, "failed", {"error": str(error),
-                                     "baseline_id": baseline_id})
-        raise
-    applied = store.save_snapshot(
-        project_id, applied_manifest, "applied", task["id"])
     state = {
         "strategy": "isolated_copy", "source_workdir": project["workspace"],
         "execution_workdir": execution["workdir"],
         "baseline_id": baseline_id,
         "added": difference["added"], "modified": difference["modified"],
         "removed": difference["removed"], "accepted_baseline_id": None,
+        "apply_intent": {"after_snapshot_id": execution["after_snapshot_id"]},
     }
+    store.record_execution_application(execution_id, "applying", state)
+    try:
+        applied_manifest = apply_execution_workspace(
+            project["workspace"], execution["workdir"], latest["manifest"],
+            after["manifest"], difference, execution_id)
+    except ProjectStoreError as error:
+        store.record_execution_application(
+            execution_id, "conflict", {**state, "error": str(error)})
+        raise
+    except OSError as error:
+        store.record_execution_application(
+            execution_id, "failed", {**state, "error": str(error)})
+        raise
+    applied = store.save_snapshot(
+        project_id, applied_manifest, "applied", task["id"])
+    state.pop("apply_intent", None)
     store.record_execution_application(
         execution_id, "applied", state, applied["id"])
     return _adopt_applied_baseline(
         store, project_id,
         store.get_execution(execution_id), project, latest)
+
+
+def _recover_applying_result(store, project_id: str, execution: dict,
+                             task: dict, project: dict) -> dict | None:
+    """Finish or reject an apply that was interrupted mid-write.
+
+    Returns a dict when the interrupted apply is completed, None when nothing
+    was written yet (the caller may retry the normal apply), and raises when
+    the workspace matches neither the intended result nor the previous baseline.
+    """
+    state = dict(execution.get("application_state") or {})
+    after = store.get_snapshot(project_id, execution["after_snapshot_id"])
+    current = snapshot_workspace(project["workspace"])
+    current_files = current.get("files", {})
+    if current_files == after["manifest"].get("files", {}):
+        applied = store.save_snapshot(
+            project_id, after["manifest"], "applied", task["id"])
+        state.pop("apply_intent", None)
+        state["accepted_baseline_id"] = None
+        state["recovered_from_interrupted_apply"] = True
+        store.record_execution_application(
+            execution["id"], "applied", state, applied["id"])
+        return _adopt_applied_baseline(
+            store, project_id, store.get_execution(execution["id"]), project,
+            latest_project_baseline(store, project_id))
+    baseline_id = state.get("baseline_id") or (execution.get("input_state") or {}).get(
+        "workspace_baseline", {}).get("id")
+    previous = store.get_snapshot(project_id, baseline_id) if baseline_id else None
+    if previous and current_files != previous["manifest"].get("files", {}):
+        state["error"] = "workspace changed during an interrupted apply"
+        store.record_execution_application(execution["id"], "conflict", state)
+        raise ProjectStoreError(
+            "workspace changed during an interrupted apply; review before retrying")
+    return None
 
 
 def _adopt_applied_baseline(store, project_id: str, execution: dict,

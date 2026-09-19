@@ -31,8 +31,11 @@ import {
   listProjectGenerations,
   listWorkspaceBaselines,
   recordProjectTaskAcceptance,
+  rebaseProjectIteration,
   replyProjectExecutionPermission,
   replyProjectExecutionQuestion,
+  resolveProjectOpenItem,
+  reviewProjectDocument,
   startProjectExecution,
   startProjectGeneration,
   stopProjectExecution,
@@ -44,6 +47,7 @@ import {
   type ProjectExport,
   type ProjectExecution,
   type ProjectGenerationRun,
+  type ProjectOpenItem,
   type ProjectReference,
   type ProjectRequirement,
   type ProjectScope,
@@ -81,14 +85,19 @@ export function ProjectDetail() {
   const [revision, setRevision] = useState(0);
   const [analysisRun, setAnalysisRun] = useState<ProjectGenerationRun | null>(null);
   const [hasBaseline, setHasBaseline] = useState<boolean | null>(null);
+  const [latestBaselineId, setLatestBaselineId] = useState<string | null>(null);
   const { data, error, loading } = useAsync(
     () => getProjectWorkspace(projectId), [projectId, revision]);
 
   useEffect(() => {
-    if (data?.project.id) setCurrentProjectId(data.project.id);
-  }, [data?.project.id]);
+    if (data && data.project.id === projectId) setCurrentProjectId(data.project.id);
+  }, [data, projectId]);
 
-  useEffect(() => { setHasBaseline(null); }, [projectId]);
+  useEffect(() => {
+    setHasBaseline(null);
+    setAnalysisRun(null);
+    setLatestBaselineId(null);
+  }, [projectId]);
 
   const refresh = () => {
     invalidateAtlasCache();
@@ -97,6 +106,8 @@ export function ProjectDetail() {
 
   if (loading && !data) return <Loading />;
   if (error || !data) return <ErrorBox message={error || "project unavailable"} />;
+  if (data.project.id !== projectId) return <Loading />;
+  const activeIteration = data.iterations.find((item) => item.status === "active") || null;
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
@@ -112,84 +123,162 @@ export function ProjectDetail() {
         <ExportButton projectId={projectId} lang={lang} />
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-4">
-        <Stat value={data.references.length} label={lang === "zh" ? "固定资料" : "Pinned sources"} />
-        <Stat value={data.requirements.length} label={lang === "zh" ? "候选需求" : "Requirements"} />
-        <Stat value={data.decisions.length} label={lang === "zh" ? "项目决定" : "Decisions"} />
-        <Stat value={data.documents.length} label={lang === "zh" ? "关联文档" : "Documents"} />
-      </div>
+      <ProjectStatusHeader workspace={data} activeIteration={activeIteration}
+        nextStep={lifecycleSteps(data, hasBaseline).find((item) => !item.done) || null} />
 
-      <LifecycleOverview workspace={data} hasBaseline={hasBaseline} />
+      <StageSection stage={STAGES[0]}>
+        <LifecycleOverview workspace={data} hasBaseline={hasBaseline} />
 
-      <WorkspaceBaselinePanel projectId={projectId} onSaved={refresh}
-        onBaselineChange={setHasBaseline} />
+        <WorkspaceBaselinePanel projectId={projectId} onSaved={refresh}
+          onBaselineChange={(value, latestId) => { setHasBaseline(value); setLatestBaselineId(latestId); }} />
 
-      <GenerationPanel projectId={projectId} workspace={data} onSaved={refresh}
-        onAnalysis={setAnalysisRun} />
+        <GenerationPanel projectId={projectId} workspace={data} onSaved={refresh}
+          onAnalysis={setAnalysisRun} />
+      </StageSection>
 
-      <ConsistencyPanel workspace={data} analysisRun={analysisRun} />
+      <StageSection stage={STAGES[1]}>
+        <OpenItemsPanel projectId={projectId} workspace={data} onSaved={refresh} />
 
-      <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div>
-          <SectionTitle icon={Scale} title={lang === "zh" ? "范围与验收" : "Scope & acceptance"}
-            description={lang === "zh" ? "分析建议和用户确认分别保存；修改需求内容会清除旧确认并提示关联文档复核。" : "Recommendations and user confirmations are stored separately. Meaningful edits clear old confirmation and flag linked documents."} />
-          <div className="mt-4 space-y-3">
-            {data.requirements.map((requirement) => (
-              <RequirementCard key={`${requirement.id}:${requirement.updated_at}`} projectId={projectId}
-                requirement={requirement} references={data.references} onSaved={refresh} />
-            ))}
-            {!data.requirements.length ? <Empty text={lang === "zh" ? "还没有候选需求。" : "No candidate requirements yet."} /> : null}
+        <ConsistencyPanel workspace={data} analysisRun={analysisRun} />
+
+        <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <div>
+            <SectionTitle icon={Scale} title={lang === "zh" ? "范围与验收" : "Scope & acceptance"}
+              description={lang === "zh" ? "分析建议和用户确认分别保存；修改需求内容会清除旧确认并生成新的修订号。" : "Recommendations and user confirmations are stored separately. Meaningful edits clear old confirmation and create a new revision."} />
+            <div className="mt-4 space-y-3">
+              {data.requirements.map((requirement) => (
+                <RequirementCard key={`${requirement.id}:${requirement.updated_at}`} projectId={projectId}
+                  requirement={requirement} references={data.references} onSaved={refresh} />
+              ))}
+              {!data.requirements.length ? <Empty text={lang === "zh" ? "还没有候选需求。" : "No candidate requirements yet."} /> : null}
+            </div>
           </div>
-        </div>
-        <RequirementForm projectId={projectId} references={data.references} onSaved={refresh} />
-      </section>
+          <RequirementForm projectId={projectId} references={data.references} onSaved={refresh} />
+        </section>
 
-      <section className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div>
-          <SectionTitle icon={Lightbulb} title={lang === "zh" ? "已记录决定" : "Recorded decisions"}
-            description={lang === "zh" ? "决定保存采用内容和理由，可引用固定资料。" : "Decisions retain the chosen direction, rationale, and pinned sources."} />
-          <div className="mt-4 space-y-3">
-            {data.decisions.map((decision) => (
-              <article key={decision.id} className="rounded-xl bg-surface p-5 shadow-card">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="font-medium">{decision.statement}</h3>
-                  <span className="font-mono text-[11px] text-subtle">{decision.id}</span>
-                </div>
-                <p className="mt-2 text-sm leading-6 text-muted">{decision.rationale}</p>
-                <IdLinks ids={decision.reference_ids} prefix={lang === "zh" ? "依据" : "Sources"} />
-              </article>
-            ))}
-            {!data.decisions.length ? <Empty text={lang === "zh" ? "还没有项目决定。" : "No recorded decisions yet."} /> : null}
+        <section className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <div>
+            <SectionTitle icon={Lightbulb} title={lang === "zh" ? "已记录决定" : "Recorded decisions"}
+              description={lang === "zh" ? "决定保存采用内容和理由，可引用固定资料。" : "Decisions retain the chosen direction, rationale, and pinned sources."} />
+            <div className="mt-4 space-y-3">
+              {data.decisions.map((decision) => (
+                <article key={decision.id} className="rounded-xl bg-surface p-5 shadow-card">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="font-medium">{decision.statement}</h3>
+                    <span className="font-mono text-[11px] text-subtle">{decision.id}</span>
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-muted">{decision.rationale}</p>
+                  <IdLinks ids={decision.reference_ids} prefix={lang === "zh" ? "依据" : "Sources"} />
+                </article>
+              ))}
+              {!data.decisions.length ? <Empty text={lang === "zh" ? "还没有项目决定。" : "No recorded decisions yet."} /> : null}
+            </div>
           </div>
-        </div>
-        <DecisionForm projectId={projectId} references={data.references} onSaved={refresh} />
-      </section>
+          <DecisionForm projectId={projectId} references={data.references} onSaved={refresh} />
+        </section>
+      </StageSection>
 
-      <section className="mt-10">
-        <SectionTitle icon={FileText} title={lang === "zh" ? "关联文档与版本" : "Linked documents & versions"}
-          description={lang === "zh" ? "每次保存产生不可变版本，记录作者、修改说明和固定依据；旧版本可查看并比较。" : "Each save creates an immutable version with author, change summary, and pinned basis. Older versions remain viewable and comparable."} />
-        <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-          <div className="space-y-4">
-            {data.documents.map((document) => (
-              <DocumentCard key={`${document.id}:${document.current_version}`} projectId={projectId}
-                document={document} onSaved={refresh} />
-            ))}
-            {!data.documents.length ? <Empty text={lang === "zh" ? "还没有关联文档。" : "No linked documents yet."} /> : null}
+      <StageSection stage={STAGES[2]}>
+        <section className="mt-8">
+          <SectionTitle icon={FileText} title={lang === "zh" ? "关联文档与版本" : "Linked documents & versions"}
+            description={lang === "zh" ? "每次保存产生不可变版本并记录固定依据。依赖新鲜度与人工审阅分别记录；只有已批准且依据为当前的版本才能固定为迭代输入。" : "Each save creates an immutable version with pinned basis. Dependency freshness and human review are tracked separately; only approved, current-basis versions can be pinned into an iteration."} />
+          <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+            <div className="space-y-4">
+              {data.documents.map((document) => (
+                <DocumentCard key={`${document.id}:${document.current_version}`} projectId={projectId}
+                  document={document} onSaved={refresh} />
+              ))}
+              {!data.documents.length ? <Empty text={lang === "zh" ? "还没有关联文档。" : "No linked documents yet."} /> : null}
+            </div>
+            <DocumentForm projectId={projectId} workspace={data} onSaved={refresh} />
           </div>
-          <DocumentForm projectId={projectId} workspace={data} onSaved={refresh} />
-        </div>
-      </section>
+        </section>
 
-      <ExecutionPanel projectId={projectId} workspace={data} hasBaseline={hasBaseline}
-        onSaved={refresh} />
+        {activeIteration ? <p className="mt-6 rounded-lg bg-bg-elevated p-4 text-xs leading-5 text-muted">{lang === "zh" ? `活动迭代 #${activeIteration.sequence}《${activeIteration.title}》已建立并固定输入；执行、应用与验收在阶段四。` : `Active iteration #${activeIteration.sequence} "${activeIteration.title}" is active with frozen inputs; execute, apply, and accept in stage 4.`} <a className="text-primary" href="#stage-execute">{lang === "zh" ? "前往执行与验收" : "Go to Execute & accept"}</a></p> : <section className="mt-8">
+          <SectionTitle icon={Bot} title={lang === "zh" ? "建立活动迭代" : "Create active iteration"}
+            description={lang === "zh" ? "冻结已批准文档版本、已确认需求修订与当前已接受基线；建立后进入执行阶段。" : "Freeze approved document versions, confirmed requirement revisions, and the current accepted baseline. Execution follows."} />
+          <div className="mt-5"><IterationForm projectId={projectId} workspace={data} hasBaseline={hasBaseline} onSaved={refresh} /></div>
+        </section>}
+      </StageSection>
+
+      <StageSection stage={STAGES[3]}>
+        <ExecutionPanel projectId={projectId} workspace={data}
+          latestBaselineId={latestBaselineId} onSaved={refresh} />
+      </StageSection>
     </main>
   );
 }
 
-function LifecycleOverview({ workspace, hasBaseline }: {
-  workspace: ProjectWorkspace; hasBaseline: boolean | null;
+type StageId = "understand" | "scope" | "plan" | "execute";
+
+const STAGES: { id: StageId; zh: string; en: string; descriptionZh: string; descriptionEn: string }[] = [
+  {
+    id: "understand", zh: "理解项目", en: "Understand",
+    descriptionZh: "固定资料、检查工作区现状，并运行分析或价值评估。",
+    descriptionEn: "Pin sources, review the workspace state, and run analysis or value assessment.",
+  },
+  {
+    id: "scope", zh: "确定范围", en: "Scope",
+    descriptionZh: "处理开放问题、冲突与建议；确认需求范围并记录决定。",
+    descriptionEn: "Resolve open questions, conflicts, and suggestions; confirm requirement scope and record decisions.",
+  },
+  {
+    id: "plan", zh: "冻结计划", en: "Plan",
+    descriptionZh: "审阅并批准文档；冻结需求修订、文档版本与工作区基线，建立迭代。",
+    descriptionEn: "Review and approve documents; freeze requirement revisions, document versions, and the workspace baseline, then create the iteration.",
+  },
+  {
+    id: "execute", zh: "执行与验收", en: "Execute & accept",
+    descriptionZh: "任务执行、结果应用与产品验收；历史记录保持只读。",
+    descriptionEn: "Execute tasks, apply results, and record product acceptance; history stays read-only.",
+  },
+];
+
+function StageSection({ stage, children }: { stage: (typeof STAGES)[number]; children: ReactNode }) {
+  const { lang } = useLang();
+  return <section id={`stage-${stage.id}`} className="mt-12 scroll-mt-6">
+    <div className="flex items-start gap-3 border-b border-border pb-3">
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-medium text-primary">{STAGES.indexOf(stage) + 1}</span>
+      <div><h2 className="font-serif text-2xl font-medium">{lang === "zh" ? stage.zh : stage.en}</h2><p className="mt-1 text-xs leading-5 text-subtle">{lang === "zh" ? stage.descriptionZh : stage.descriptionEn}</p></div>
+    </div>
+    {children}
+  </section>;
+}
+
+function MiniStat({ value, label, warn }: { value: number; label: string; warn: boolean }) {
+  return <div className={`rounded-lg p-3 ${warn ? "bg-warn/10" : "bg-bg-elevated"}`}><div className={`text-lg font-medium ${warn ? "text-warn" : "text-fg"}`}>{value}</div><div className="mt-0.5 text-[11px] leading-4 text-muted">{label}</div></div>;
+}
+
+function ProjectStatusHeader({ workspace, activeIteration, nextStep }: {
+  workspace: ProjectWorkspace;
+  activeIteration: ProjectWorkspace["iterations"][number] | null;
+  nextStep: ReturnType<typeof lifecycleSteps>[number] | null;
 }) {
   const { lang } = useLang();
+  const openItems = (workspace.open_items || []).filter((item) => item.current && item.status === "open");
+  const counts = [
+    { value: openItems.filter((item) => item.kind === "question").length, zh: "开放问题", en: "Open questions" },
+    { value: openItems.filter((item) => item.kind === "conflict").length, zh: "明确冲突", en: "Conflicts" },
+    { value: openItems.filter((item) => item.kind === "suggestion").length, zh: "参考建议", en: "Suggestions" },
+    { value: workspace.requirements.filter((item) => !item.confirmed_scope).length, zh: "待确认需求", en: "Pending requirements" },
+    { value: workspace.documents.filter((item) => item.review.status === "needs_review").length, zh: "待复核文档", en: "Documents to review" },
+    { value: workspace.documents.filter((item) => (item.review.approval || "pending") !== "approved").length, zh: "未批准文档", en: "Unapproved documents" },
+  ];
+  return <section className="mt-6 rounded-xl border border-border bg-surface p-5 shadow-card">
+    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+      <div>
+        <p className="text-xs font-medium tracking-wide text-primary">{lang === "zh" ? "当前状态" : "Current status"}</p>
+        <p className="mt-2 text-sm">{activeIteration ? (lang === "zh" ? `活动迭代 #${activeIteration.sequence}《${activeIteration.title}》` : `Active iteration #${activeIteration.sequence} "${activeIteration.title}"`) : (lang === "zh" ? "活动迭代：尚未建立" : "Active iteration: not created yet")}</p>
+        <p className="mt-1 text-sm text-warn">{nextStep ? (lang === "zh" ? <>下一项：<a className="underline" href={`#stage-${nextStep.stage}`}>{nextStep.zh}</a></> : <>Next: <a className="underline" href={`#stage-${nextStep.stage}`}>{nextStep.en}</a></>) : (lang === "zh" ? "当前迭代已完成；可以开始新一轮迭代。" : "The current iteration is complete; start the next round.")}</p>
+        <p className="mt-2 text-xs text-subtle">{lang === "zh" ? `${workspace.references.length} 条固定资料 · ${workspace.requirements.length} 条候选需求 · ${workspace.decisions.length} 项决定 · ${workspace.documents.length} 份文档` : `${workspace.references.length} sources · ${workspace.requirements.length} requirements · ${workspace.decisions.length} decisions · ${workspace.documents.length} documents`}</p>
+      </div>
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">{counts.map((item) => <MiniStat key={item.en} value={item.value} label={lang === "zh" ? item.zh : item.en} warn={item.value > 0} />)}</div>
+    </div>
+    <nav className="mt-4 flex flex-wrap gap-2 border-t border-border pt-3">{STAGES.map((stage, index) => <a key={stage.id} href={`#stage-${stage.id}`} className="rounded-full bg-bg-elevated px-3 py-1 text-xs text-muted hover:text-fg">{index + 1} · {lang === "zh" ? stage.zh : stage.en}</a>)}</nav>
+  </section>;
+}
+
+function lifecycleSteps(workspace: ProjectWorkspace, hasBaseline: boolean | null) {
   const confirmed = workspace.requirements.some((item) => item.confirmed_scope === "current");
   const documentsReady = workspace.documents.some((item) => item.review.status === "current");
   const currentIteration = workspace.iterations.find((item) => item.status === "active")
@@ -202,35 +291,46 @@ function LifecycleOverview({ workspace, hasBaseline }: {
     currentExecutions.find((execution) => execution.task_id === task.id);
   const executed = currentTasks.length > 0 && currentTasks.every((task) =>
     task.execution_status === "completed");
-  const applied = currentTasks.length > 0 && currentTasks.every((task) =>
-    task.kind === "analysis" || latestExecution(task)?.application_status === "applied");
+  const applied = currentTasks.length > 0 && currentTasks.every((task) => {
+    if (task.kind === "analysis") return true;
+    const execution = latestExecution(task);
+    return execution?.application_status === "applied"
+      && !execution.application_state.baseline_adoption_error;
+  });
   const accepted = currentTasks.length > 0
     && currentTasks.every((item) => ["passed", "waived"].includes(item.acceptance_status));
-  const steps = [
-    { done: workspace.references.length > 0, zh: "收集资料", en: "Sources" },
-    { done: confirmed, zh: "确认需求", en: "Scope" },
-    { done: documentsReady, zh: "形成文档", en: "Documents" },
-    { done: hasBaseline === true, zh: "确认工作区", en: "Workspace" },
-    { done: Boolean(currentIteration), zh: "建立迭代", en: "Iteration" },
-    { done: executed, zh: "执行改动", en: "Execution" },
-    { done: applied, zh: "应用结果", en: "Apply" },
-    { done: accepted, zh: "产品验收", en: "Acceptance" },
-    { done: currentIteration?.status === "completed", zh: "完成迭代", en: "Complete" },
+  return [
+    { done: workspace.references.length > 0, zh: "收集资料", en: "Sources", stage: "understand" as StageId },
+    { done: confirmed, zh: "确认需求", en: "Scope", stage: "scope" as StageId },
+    { done: documentsReady, zh: "形成文档", en: "Documents", stage: "plan" as StageId },
+    { done: hasBaseline === true, zh: "确认工作区", en: "Workspace", stage: "understand" as StageId },
+    { done: Boolean(currentIteration), zh: "建立迭代", en: "Iteration", stage: "plan" as StageId },
+    { done: executed, zh: "执行改动", en: "Execution", stage: "execute" as StageId },
+    { done: applied, zh: "应用结果", en: "Apply", stage: "execute" as StageId },
+    { done: accepted, zh: "产品验收", en: "Acceptance", stage: "execute" as StageId },
+    { done: currentIteration?.status === "completed", zh: "完成迭代", en: "Complete", stage: "execute" as StageId },
   ];
+}
+
+function LifecycleOverview({ workspace, hasBaseline }: {
+  workspace: ProjectWorkspace; hasBaseline: boolean | null;
+}) {
+  const { lang } = useLang();
+  const steps = lifecycleSteps(workspace, hasBaseline);
   const next = steps.find((item) => !item.done);
   return <section className="mt-5 rounded-xl border border-border bg-surface p-4 shadow-card">
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div><p className="text-sm font-medium">{lang === "zh" ? "项目路径" : "Project path"}</p><p className="mt-1 text-xs text-subtle">{next ? (lang === "zh" ? `建议下一步：${next.zh}` : `Recommended next: ${next.en}`) : (lang === "zh" ? "当前迭代已完成。" : "The current iteration is complete.")}</p></div>
-      <div className="flex flex-wrap gap-2">{steps.map((item, index) => <div key={item.en} className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] ${item.done ? "bg-primary/10 text-primary" : item === next ? "bg-warn/10 text-warn" : "bg-bg-elevated text-subtle"}`}>
+      <div className="flex flex-wrap gap-2">{steps.map((item, index) => <a key={item.en} href={`#stage-${item.stage}`} className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] hover:opacity-80 ${item.done ? "bg-primary/10 text-primary" : item === next ? "bg-warn/10 text-warn" : "bg-bg-elevated text-subtle"}`}>
         {item.done ? <CheckCircle2 className="size-3.5" /> : <span>{index + 1}</span>}<span>{lang === "zh" ? item.zh : item.en}</span>
-      </div>)}</div>
+      </a>)}</div>
     </div>
   </section>;
 }
 
-function ExecutionPanel({ projectId, workspace, hasBaseline, onSaved }: {
-  projectId: string; workspace: ProjectWorkspace; hasBaseline: boolean | null;
-  onSaved: () => void;
+function ExecutionPanel({ projectId, workspace, latestBaselineId, onSaved }: {
+  projectId: string; workspace: ProjectWorkspace;
+  latestBaselineId: string | null; onSaved: () => void;
 }) {
   const { lang } = useLang();
   const active = workspace.iterations.find((item) => item.status === "active") || null;
@@ -243,30 +343,42 @@ function ExecutionPanel({ projectId, workspace, hasBaseline, onSaved }: {
     try { await updateProjectIterationStatus(projectId, active.id, status); onSaved(); }
     catch (cause) { setError(String(cause)); } finally { setBusy(""); }
   };
+  const rebase = async () => {
+    if (!active) return;
+    setBusy("rebase"); setError("");
+    try {
+      await rebaseProjectIteration(projectId, active.id, { note: "ui: rebase to latest accepted baseline" });
+      onSaved();
+    } catch (cause) { setError(String(cause)); } finally { setBusy(""); }
+  };
+  const baselineBehind = Boolean(active?.baseline_id && latestBaselineId
+    && active.baseline_id !== latestBaselineId);
   return <section className="mt-10">
     <SectionTitle icon={Bot} title={lang === "zh" ? "迭代与开发执行" : "Iterations & development execution"}
       description={lang === "zh" ? "把已确认需求、固定文档版本和已接受代码基线绑定为任务；OpenCode 负责执行，Atlas 独立记录状态、权限、文件变化和产品验收。" : "Bind confirmed requirements, fixed document versions, and an accepted code baseline into tasks. OpenCode executes while Atlas independently records state, permissions, file changes, and product acceptance."} />
     <div className="mt-5 space-y-5">
-      {!active ? <IterationForm projectId={projectId} workspace={workspace}
-        hasBaseline={hasBaseline} onSaved={onSaved} /> : <>
+      {!active ? <div className="rounded-xl bg-surface p-5 text-sm text-muted shadow-card">{lang === "zh" ? "当前没有活动迭代。请到" : "There is no active iteration. Create one in "}<a className="text-primary" href="#stage-plan">{lang === "zh" ? "阶段三「冻结计划」" : "stage 3 Plan"}</a>{lang === "zh" ? "固定输入并建立迭代。" : " by freezing the inputs."}</div> : <>
         <article className="rounded-xl bg-surface p-5 shadow-card">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div><div className="flex flex-wrap items-center gap-2"><Badge tone="ok">{lang === "zh" ? `活动迭代 ${active.sequence}` : `Active iteration ${active.sequence}`}</Badge><span className="font-mono text-[11px] text-subtle">{active.id}</span></div><h3 className="mt-2 font-medium">{active.title}</h3><p className="mt-1 text-sm leading-6 text-muted">{active.objective}</p></div>
             <div className="flex gap-2"><Button size="sm" variant="outline" disabled={Boolean(busy)} onClick={() => changeIteration("abandoned")}>{lang === "zh" ? "放弃迭代" : "Abandon"}</Button><Button size="sm" disabled={Boolean(busy) || !tasks.length} onClick={() => changeIteration("completed")}><CheckCircle2 className="size-4" />{lang === "zh" ? "完成迭代" : "Complete iteration"}</Button></div>
           </div>
           <IdLinks ids={active.input_document_versions} prefix={lang === "zh" ? "固定文档版本" : "Fixed document versions"} />
-          <IdLinks ids={active.requirement_ids} prefix={lang === "zh" ? "本版需求" : "Current requirements"} />
+          <IdLinks ids={active.requirement_ids.map((id) => { const pin = (active.requirement_revisions || []).find((item) => item.requirement_id === id); return pin ? `${id} · r${pin.revision}` : id; })} prefix={lang === "zh" ? "本版需求（固定修订）" : "Current requirements (pinned revisions)"} />
+          <IdLinks ids={active.baseline_id ? [active.baseline_id] : []} prefix={lang === "zh" ? "固定工作区基线" : "Pinned workspace baseline"} />
+          {baselineBehind ? <div className="mt-3 rounded-md bg-warn/10 p-3"><p className="text-xs leading-5 text-warn">{lang === "zh" ? "已应用的结果推进了项目基线；开始新的执行前需要把本迭代显式重新对齐到最新基线。已完成的执行与验收记录不受影响。" : "An applied result advanced the project baseline. Rebase this iteration explicitly before starting more executions; finished records are unchanged."}</p><Button className="mt-2" size="sm" disabled={Boolean(busy)} onClick={rebase}>{lang === "zh" ? "重新对齐迭代基线" : "Rebase iteration baseline"}</Button></div> : null}
+          {active.baseline_history?.length ? <details className="mt-2"><summary className="cursor-pointer text-xs text-primary">{lang === "zh" ? `基线调整记录 · ${active.baseline_history.length}` : `Baseline rebases · ${active.baseline_history.length}`}</summary><div className="mt-2 space-y-1 font-mono text-[10px] text-subtle">{active.baseline_history.map((item, index) => <p key={`${item.rebased_at}:${index}`}>{new Date(item.rebased_at).toLocaleString(lang === "zh" ? "zh-CN" : "en")} · {item.baseline_id || "none"} → {item.note || ""}</p>)}</div></details> : null}
           {error ? <p className="mt-3 text-xs text-danger">{error}</p> : null}
         </article>
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
           <div className="space-y-4">
-            {tasks.map((task) => <ExecutionTaskCard key={`${task.id}:${task.updated_at}`} projectId={projectId} task={task} executions={workspace.executions.filter((item) => item.task_id === task.id)} onSaved={onSaved} />)}
+            {tasks.map((task) => <ExecutionTaskCard key={`${task.id}:${task.updated_at}`} projectId={projectId} task={task} executions={workspace.executions.filter((item) => item.task_id === task.id)} requirements={workspace.requirements} documents={workspace.documents} readOnly={false} onSaved={onSaved} />)}
             {!tasks.length ? <Empty text={lang === "zh" ? "本迭代还没有执行任务。" : "This iteration has no execution tasks yet."} /> : null}
           </div>
           <TaskForm projectId={projectId} workspace={workspace} iteration={active} onSaved={onSaved} />
         </div>
       </>}
-      {workspace.iterations.filter((item) => item.status !== "active").length ? <details className="rounded-xl bg-surface p-5 shadow-card"><summary className="cursor-pointer text-sm text-primary">{lang === "zh" ? "历史迭代" : "Iteration history"}</summary><div className="mt-3 space-y-3">{workspace.iterations.filter((item) => item.status !== "active").map((item) => { const historicalTasks = workspace.tasks.filter((task) => task.iteration_id === item.id); return <details key={item.id} className="rounded-md bg-bg-elevated p-3"><summary className="cursor-pointer text-sm"><span className="font-medium">#{item.sequence} · {item.title}</span><span className="ml-2 text-xs text-subtle">{item.status} · {historicalTasks.length} {lang === "zh" ? "个任务" : "task(s)"}</span></summary><div className="mt-3 space-y-3">{historicalTasks.map((task) => <ExecutionTaskCard key={`${task.id}:${task.updated_at}`} projectId={projectId} task={task} executions={workspace.executions.filter((execution) => execution.task_id === task.id)} onSaved={onSaved} />)}{!historicalTasks.length ? <p className="text-xs text-subtle">{lang === "zh" ? "没有任务记录。" : "No task records."}</p> : null}</div></details>; })}</div></details> : null}
+      {workspace.iterations.filter((item) => item.status !== "active").length ? <details className="rounded-xl bg-surface p-5 shadow-card"><summary className="cursor-pointer text-sm text-primary">{lang === "zh" ? "历史迭代" : "Iteration history"}</summary><div className="mt-3 space-y-3">{workspace.iterations.filter((item) => item.status !== "active").map((item) => { const historicalTasks = workspace.tasks.filter((task) => task.iteration_id === item.id); return <details key={item.id} className="rounded-md bg-bg-elevated p-3"><summary className="cursor-pointer text-sm"><span className="font-medium">#{item.sequence} · {item.title}</span><span className="ml-2 text-xs text-subtle">{item.status} · {historicalTasks.length} {lang === "zh" ? "个任务" : "task(s)"}</span></summary><div className="mt-3 space-y-3">{historicalTasks.map((task) => <ExecutionTaskCard key={`${task.id}:${task.updated_at}`} projectId={projectId} task={task} executions={workspace.executions.filter((execution) => execution.task_id === task.id)} requirements={workspace.requirements} documents={workspace.documents} readOnly onSaved={onSaved} />)}{!historicalTasks.length ? <p className="text-xs text-subtle">{lang === "zh" ? "没有任务记录。" : "No task records."}</p> : null}</div></details>; })}</div></details> : null}
     </div>
   </section>;
 }
@@ -277,7 +389,8 @@ function IterationForm({ projectId, workspace, hasBaseline, onSaved }: {
 }) {
   const { lang } = useLang();
   const current = workspace.requirements.filter((item) => item.confirmed_scope === "current");
-  const currentDocuments = workspace.documents.filter((item) => item.review.status === "current");
+  const currentDocuments = workspace.documents.filter((item) =>
+    item.review.status === "current" && (item.review.approval || "pending") === "approved");
   const [title, setTitle] = useState(""); const [objective, setObjective] = useState("");
   const [documents, setDocuments] = useState<string[]>(currentDocuments.map((item) => item.version_id));
   const [requirements, setRequirements] = useState<string[]>(current.map((item) => item.id));
@@ -292,13 +405,13 @@ function IterationForm({ projectId, workspace, hasBaseline, onSaved }: {
   const [saving, setSaving] = useState(false); const [error, setError] = useState("");
   const missing: string[] = [];
   if (hasBaseline === false) missing.push(lang === "zh" ? "已接受的工作区基线" : "an accepted workspace baseline");
-  if (!currentDocuments.length) missing.push(lang === "zh" ? "至少一份当前文档" : "at least one current document");
+  if (!currentDocuments.length) missing.push(lang === "zh" ? "至少一份已批准且依据为当前的文档" : "at least one approved document with current basis");
   if (!current.length) missing.push(lang === "zh" ? "至少一条已确认本版需求" : "at least one confirmed current requirement");
   const submit = async (event: FormEvent) => { event.preventDefault(); setSaving(true); setError(""); try {
     await createProjectIteration(projectId, { title, objective, input_document_versions: documents, requirement_ids: requirements }); onSaved();
   } catch (cause) { setError(String(cause)); } finally { setSaving(false); } };
   return <article className="rounded-xl bg-surface p-5 shadow-card"><form onSubmit={submit}>
-    <div className="grid gap-5 lg:grid-cols-2"><div className="space-y-4"><h3 className="font-medium">{lang === "zh" ? "建立活动迭代" : "Create active iteration"}</h3><Field label={lang === "zh" ? "迭代标题" : "Iteration title"} value={title} onChange={setTitle} required /><TextArea label={lang === "zh" ? "本轮目标" : "Iteration objective"} value={objective} onChange={setObjective} required /></div><div className="grid gap-4 sm:grid-cols-2"><Picker label={lang === "zh" ? "固定已复核文档版本" : "Pin reviewed document versions"} options={currentDocuments.map((item) => ({ key: item.version_id, label: `${item.title} · v${item.current_version}` }))} selected={documents} onChange={setDocuments} /><Picker label={lang === "zh" ? "固定已确认本版需求" : "Pin confirmed current requirements"} options={current.map((item) => ({ key: item.id, label: item.content }))} selected={requirements} onChange={setRequirements} /></div></div>
+    <div className="grid gap-5 lg:grid-cols-2"><div className="space-y-4"><h3 className="font-medium">{lang === "zh" ? "建立活动迭代" : "Create active iteration"}</h3><Field label={lang === "zh" ? "迭代标题" : "Iteration title"} value={title} onChange={setTitle} required /><TextArea label={lang === "zh" ? "本轮目标" : "Iteration objective"} value={objective} onChange={setObjective} required /></div><div className="grid gap-4 sm:grid-cols-2"><Picker label={lang === "zh" ? "固定已批准文档版本" : "Pin approved document versions"} options={currentDocuments.map((item) => ({ key: item.version_id, label: `${item.title} · v${item.current_version}` }))} selected={documents} onChange={setDocuments} /><Picker label={lang === "zh" ? "固定已确认本版需求" : "Pin confirmed current requirements"} options={current.map((item) => ({ key: item.id, label: item.content }))} selected={requirements} onChange={setRequirements} /></div></div>
     {missing.length ? <p className="mt-4 rounded-md bg-warn/10 p-3 text-xs leading-5 text-warn">{lang === "zh" ? `开始迭代前还需要：${missing.join("、")}。` : `Before starting an iteration, add ${missing.join(", ")}.`}</p> : null}
     {error ? <p className="mt-3 text-xs text-danger">{error}</p> : null}<Button className="mt-5" disabled={saving || hasBaseline !== true || !documents.length || !requirements.length || !title.trim() || !objective.trim()}><Plus className="size-4" />{lang === "zh" ? "创建并启动迭代" : "Create and activate iteration"}</Button>
   </form></article>;
@@ -328,46 +441,68 @@ function TaskForm({ projectId, workspace, iteration, onSaved }: {
   </form></SideForm>;
 }
 
-function ExecutionTaskCard({ projectId, task, executions, onSaved }: {
-  projectId: string; task: ProjectTask; executions: ProjectExecution[]; onSaved: () => void;
+function ExecutionTaskCard({ projectId, task, executions, requirements, documents, readOnly, onSaved }: {
+  projectId: string; task: ProjectTask; executions: ProjectExecution[];
+  requirements: ProjectRequirement[]; documents: ProjectDocument[];
+  readOnly: boolean; onSaved: () => void;
 }) {
   const { lang } = useLang();
-  const [execution, setExecution] = useState<ProjectExecution | null>(executions[0] || null);
+  const [live, setLive] = useState<ProjectExecution | null>(executions[0] || null);
+  const [viewId, setViewId] = useState(executions[0]?.id || "");
   const [working, setWorking] = useState(""); const [error, setError] = useState("");
+  useEffect(() => { setLive(executions[0] || null); setViewId(executions[0]?.id || ""); }, [executions[0]?.id, task.id]);
+  const execution = viewId && viewId !== live?.id
+    ? executions.find((item) => item.id === viewId) || live
+    : live;
+  const isLatest = Boolean(live) && execution?.id === live?.id;
   const active = execution && ["queued", "running", "waiting_permission", "waiting_input"].includes(execution.status);
   const unavailable = execution?.status === "unknown";
-  useEffect(() => { setExecution(executions[0] || null); }, [executions[0]?.id]);
   useEffect(() => {
-    if (!active || !execution) return;
+    if (!active || !execution || !isLatest) return;
     let alive = true;
-    const timer = window.setInterval(() => getProjectExecution(projectId, execution.id).then((next) => { if (!alive) return; setExecution(next); if (["completed", "failed", "stopped", "unknown"].includes(next.status)) onSaved(); }, (cause) => { if (alive) setError(String(cause)); }), 1500);
+    const timer = window.setInterval(() => getProjectExecution(projectId, execution.id).then((next) => { if (!alive) return; setLive(next); if (["completed", "failed", "stopped", "unknown"].includes(next.status)) onSaved(); }, (cause) => { if (alive) setError(String(cause)); }), 1500);
     return () => { alive = false; window.clearInterval(timer); };
-  }, [active, execution?.id, projectId]);
-  const start = async () => { setWorking("start"); setError(""); try { setExecution(await startProjectExecution(projectId, task.id)); onSaved(); } catch (cause) { setError(String(cause)); } finally { setWorking(""); } };
-  const stop = async () => { if (!execution) return; setWorking("stop"); setError(""); try { setExecution(await stopProjectExecution(projectId, execution.id)); onSaved(); } catch (cause) { setError(String(cause)); } finally { setWorking(""); } };
+  }, [active, execution?.id, projectId, isLatest]);
+  const start = async () => { setWorking("start"); setError(""); try { const created = await startProjectExecution(projectId, task.id); setLive(created); setViewId(created.id); onSaved(); } catch (cause) { setError(String(cause)); } finally { setWorking(""); } };
+  const stop = async () => { if (!execution) return; setWorking("stop"); setError(""); try { setLive(await stopProjectExecution(projectId, execution.id)); onSaved(); } catch (cause) { setError(String(cause)); } finally { setWorking(""); } };
   const filesystem = execution?.raw_state.evidence?.filesystem;
   const verification = execution?.raw_state.evidence?.verification;
   const completionReport = execution?.raw_state.evidence?.completion_report;
   const commandEvidence = execution?.raw_state.evidence?.tool_calls?.commands || [];
   const displayStatus = execution?.status || task.execution_status;
   const acceptanceOpen = ["pending", "failed"].includes(task.acceptance_status);
+  const baselineAdoptionError = execution?.application_state.baseline_adoption_error;
+  const fullyApplied = execution?.application_status === "applied" && !baselineAdoptionError;
+  const taskRequirements = requirements.filter((item) => task.requirement_ids.includes(item.id));
+  const pinnedRevisions = new Map((task.requirement_revisions || []).map(
+    (item) => [item.requirement_id, item.revision]));
+  const taskDocuments = documents.filter((item) => task.input_document_versions.includes(item.version_id));
   return <article className="rounded-xl bg-surface p-5 shadow-card">
-    <div className="flex flex-wrap items-start justify-between gap-3"><div><div className="flex flex-wrap items-center gap-2"><Badge tone={displayStatus === "completed" ? "ok" : displayStatus === "failed" || displayStatus === "unknown" ? "danger" : active ? "warn" : "default"}>{executionStatus(displayStatus, lang)}</Badge>{execution && task.kind !== "analysis" ? <Badge tone={execution.application_status === "applied" ? "ok" : execution.application_status === "conflict" || execution.application_status === "failed" ? "danger" : execution.application_status === "superseded" ? "default" : "warn"}>{lang === "zh" ? `结果 ${execution.application_status}` : `Result ${execution.application_status}`}</Badge> : null}<Badge tone={task.acceptance_status === "passed" ? "ok" : task.acceptance_status === "failed" ? "danger" : "default"}>{lang === "zh" ? `验收 ${task.acceptance_status}` : `Acceptance ${task.acceptance_status}`}</Badge><span className="font-mono text-[11px] text-subtle">{task.id}</span></div><h3 className="mt-2 font-medium">{task.title}</h3><p className="mt-1 text-sm leading-6 text-muted">{task.objective}</p></div><div className="flex gap-2">{!active && !unavailable && acceptanceOpen && (task.acceptance_status === "failed" || execution?.application_status !== "applied") ? <Button size="sm" onClick={start} disabled={Boolean(working)}><Bot className="size-4" />{execution ? (lang === "zh" ? "新建重试执行" : "Start retry") : (lang === "zh" ? "启动 OpenCode" : "Start OpenCode")}</Button> : null}{active || unavailable ? <Button size="sm" variant="outline" onClick={stop} disabled={Boolean(working)}>{unavailable ? (lang === "zh" ? "关闭不可用执行" : "Close unavailable run") : (lang === "zh" ? "停止" : "Stop")}</Button> : null}</div></div>
+    <div className="flex flex-wrap items-start justify-between gap-3"><div><div className="flex flex-wrap items-center gap-2"><Badge tone={displayStatus === "completed" ? "ok" : displayStatus === "failed" || displayStatus === "unknown" ? "danger" : active ? "warn" : "default"}>{executionStatus(displayStatus, lang)}</Badge>{execution && task.kind !== "analysis" ? <Badge tone={execution.application_status === "applied" ? (baselineAdoptionError ? "danger" : "ok") : execution.application_status === "conflict" || execution.application_status === "failed" ? "danger" : execution.application_status === "superseded" ? "default" : "warn"}>{lang === "zh" ? `结果 ${execution.application_status}${baselineAdoptionError ? "（基线未采用）" : ""}` : `Result ${execution.application_status}${baselineAdoptionError ? " (baseline not adopted)" : ""}`}</Badge> : null}<Badge tone={task.acceptance_status === "passed" ? "ok" : task.acceptance_status === "failed" ? "danger" : "default"}>{lang === "zh" ? `验收 ${task.acceptance_status}` : `Acceptance ${task.acceptance_status}`}</Badge><span className="font-mono text-[11px] text-subtle">{task.id}</span></div><h3 className="mt-2 font-medium">{task.title}</h3><p className="mt-1 text-sm leading-6 text-muted">{task.objective}</p></div><div className="flex flex-wrap items-center gap-2">{readOnly ? <Badge tone="default">{lang === "zh" ? "只读记录" : "Read-only"}</Badge> : !isLatest ? <Badge tone="default">{lang === "zh" ? "旧尝试只读" : "Older attempt"}</Badge> : null}{!readOnly && isLatest && !active && !unavailable && acceptanceOpen && (task.acceptance_status === "failed" || !fullyApplied) ? <Button size="sm" onClick={start} disabled={Boolean(working)}><Bot className="size-4" />{execution ? (lang === "zh" ? "新建重试执行" : "Start retry") : (lang === "zh" ? "启动 OpenCode" : "Start OpenCode")}</Button> : null}{!readOnly && isLatest && (active || unavailable) ? <Button size="sm" variant="outline" onClick={stop} disabled={Boolean(working)}>{unavailable ? (lang === "zh" ? "关闭不可用执行" : "Close unavailable run") : (lang === "zh" ? "停止" : "Stop")}</Button> : null}</div></div>
+    {executions.length > 1 ? <div className="mt-3 flex flex-wrap items-center gap-2"><span className="text-xs text-subtle">{lang === "zh" ? "执行尝试" : "Attempts"}:</span>{executions.map((item, index) => <button key={item.id} type="button" onClick={() => setViewId(item.id)} className={`rounded-full px-2.5 py-1 font-mono text-[10px] ${item.id === execution?.id ? "bg-primary/10 text-primary" : "bg-bg-elevated text-subtle"}`}>{executions.length - index} · {executionStatus(item.status, lang)}</button>)}</div> : null}
     <div className="mt-3 grid gap-2 text-xs sm:grid-cols-3"><div className="rounded bg-bg-elevated p-3"><span className="text-subtle">{lang === "zh" ? "类型" : "Kind"}</span><p className="mt-1">{task.kind}</p></div><div className="rounded bg-bg-elevated p-3"><span className="text-subtle">{lang === "zh" ? "写入范围" : "Write scope"}</span><p className="mt-1 break-all">{task.write_paths.join(" · ") || (lang === "zh" ? "只读" : "Read only")}</p></div><div className="rounded bg-bg-elevated p-3"><span className="text-subtle">{lang === "zh" ? "验证命令" : "Verification"}</span><p className="mt-1">{task.verification_commands.length}</p></div></div>
-    {execution ? <ExecutionResult projectId={projectId} task={task} execution={execution} onChange={setExecution} onSaved={onSaved} /> : null}
+    <div className="mt-3 grid gap-3 text-xs sm:grid-cols-2">
+      <div className="rounded bg-bg-elevated p-3"><span className="text-subtle">{lang === "zh" ? "关联需求与验收条件" : "Linked requirements & acceptance"}</span>{taskRequirements.map((item) => <div key={item.id} className="mt-2"><p className="leading-5">{item.content}{pinnedRevisions.has(item.id) ? <span className="ml-1 font-mono text-[10px] text-subtle">r{pinnedRevisions.get(item.id)}</span> : null}</p>{item.acceptance_conditions.length ? <ul className="mt-1 list-disc space-y-0.5 pl-4 text-muted">{item.acceptance_conditions.map((value) => <li key={value}>{value}</li>)}</ul> : null}</div>)}{!taskRequirements.length ? <p className="mt-1 text-warn">{lang === "zh" ? "该任务未关联需求。" : "This task links no requirement."}</p> : null}</div>
+      <div className="rounded bg-bg-elevated p-3"><span className="text-subtle">{lang === "zh" ? "固定文档版本" : "Pinned document versions"}</span>{taskDocuments.map((item) => <p key={item.version_id} className="mt-1">{item.title} · v{item.current_version}</p>)}{!taskDocuments.length ? <p className="mt-1 text-subtle">—</p> : null}</div>
+    </div>
+    {execution ? <ExecutionResult projectId={projectId} task={task} execution={execution} readOnly={readOnly || !isLatest} onChange={(value) => { setLive(value); setViewId(value.id); }} onSaved={onSaved} /> : null}
     {verification ? <div className={`mt-4 rounded-md p-4 ${verification.all_planned_passed ? "bg-ok/10" : "bg-warn/10"}`}><p className={`text-sm font-medium ${verification.all_planned_passed ? "text-ok" : "text-warn"}`}>{verification.all_planned_passed ? (lang === "zh" ? "所有固定验证命令已通过" : "All fixed verification commands passed") : (lang === "zh" ? "验证未完整通过或证据不足" : "Verification is incomplete or did not pass")}</p>{commandEvidence.map((item, index) => <details key={`${item.command}:${index}`} className="mt-2"><summary className="cursor-pointer font-mono text-xs">{item.exit === 0 ? "✓" : "!"} {item.command}</summary><pre className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap rounded bg-surface p-3 font-mono text-[11px] text-muted">{item.output || (lang === "zh" ? "没有记录输出" : "No output recorded")}</pre></details>)}</div> : null}
     {completionReport && execution && ["completed", "failed", "stopped"].includes(execution.status) ? <div className={`mt-4 rounded-md p-4 ${completionReport.valid ? "bg-bg-elevated" : "bg-warn/10"}`}><p className={`text-sm font-medium ${completionReport.valid ? "text-fg" : "text-warn"}`}>{completionReport.valid ? (lang === "zh" ? "Agent 结构化完成报告" : "Structured agent completion report") : (lang === "zh" ? "Agent 完成报告缺失或无效" : "Agent completion report is missing or invalid")}</p><p className="mt-1 text-xs text-subtle">{lang === "zh" ? "此报告经过格式与需求 ID 校验，但仍是 agent 提供的信息，不等于 Atlas 验证或产品验收。" : "Its shape and requirement IDs are validated, but it remains agent-supplied information rather than Atlas verification or product acceptance."}</p>{completionReport.valid ? <div className="mt-3 space-y-2 text-xs">{completionReport.requirements.map((item) => <div key={item.id} className="rounded bg-surface p-3"><p><span className="font-mono">{item.id}</span> · <strong>{item.status}</strong></p>{item.evidence.map((value) => <p key={value} className="mt-1 text-muted">{value}</p>)}</div>)}<ChangePaths title={lang === "zh" ? "未完成项" : "Unfinished"} paths={completionReport.unfinished} /><ChangePaths title={lang === "zh" ? "方案偏离" : "Deviations"} paths={completionReport.deviations} /></div> : <p className="mt-2 font-mono text-xs text-warn">{completionReport.error}</p>}</div> : null}
     {filesystem ? <div className={`mt-4 rounded-md p-4 ${filesystem.scope_compliant ? "bg-ok/10" : "bg-danger/10"}`}><p className={`text-sm font-medium ${filesystem.scope_compliant ? "text-ok" : "text-danger"}`}>{filesystem.scope_compliant ? (lang === "zh" ? "文件变化位于声明范围内" : "File changes stayed within scope") : (lang === "zh" ? "发现超出声明范围的文件变化" : "File changes exceeded the declared scope")}</p><ChangePaths title={lang === "zh" ? "新增" : "Added"} paths={filesystem.added} /><ChangePaths title={lang === "zh" ? "修改" : "Modified"} paths={filesystem.modified} /><ChangePaths title={lang === "zh" ? "删除" : "Removed"} paths={filesystem.removed} />{filesystem.out_of_scope_changes.length ? <ChangePaths title={lang === "zh" ? "越界变化" : "Out-of-scope changes"} paths={filesystem.out_of_scope_changes} /> : null}</div> : null}
     {execution?.raw_state.evidence?.assistant_text ? <details className="mt-4"><summary className="cursor-pointer text-sm text-primary">{lang === "zh" ? "查看引擎结果" : "View engine result"}</summary><div className="mt-3 rounded-md bg-bg-elevated p-4"><Prose md={execution.raw_state.evidence.assistant_text} /></div></details> : null}
+    {task.acceptance_evidence.length ? <details className="mt-4"><summary className="cursor-pointer text-sm text-primary">{lang === "zh" ? "验收记录" : "Acceptance record"} · {task.acceptance_status}</summary><div className="mt-2 space-y-2">{task.acceptance_evidence.map((item, index) => <div key={`${item.kind}:${index}`} className="rounded-md bg-bg-elevated p-3 text-xs"><span className="font-mono text-subtle">{item.kind}</span><p className="mt-1 leading-5 text-muted">{item.summary}</p></div>)}</div></details> : null}
     {error ? <p className="mt-3 text-xs text-danger">{error}</p> : null}
   </article>;
 }
 
-function ExecutionResult({ projectId, task, execution, onChange, onSaved }: {
-  projectId: string; task: ProjectTask; execution: ProjectExecution; onChange: (value: ProjectExecution) => void; onSaved: () => void;
+function ExecutionResult({ projectId, task, execution, readOnly, onChange, onSaved }: {
+  projectId: string; task: ProjectTask; execution: ProjectExecution; readOnly: boolean;
+  onChange: (value: ProjectExecution) => void; onSaved: () => void;
 }) {
   const { lang } = useLang(); const [working, setWorking] = useState(""); const [error, setError] = useState(""); const [evidence, setEvidence] = useState(""); const [followUp, setFollowUp] = useState("");
   const acceptanceOpen = ["pending", "failed"].includes(task.acceptance_status);
+  const baselineAdoptionError = execution.application_state.baseline_adoption_error;
+  const fullyApplied = execution.application_status === "applied" && !baselineAdoptionError;
   const interaction = execution.raw_state.interaction;
   useEffect(() => { setEvidence(""); setFollowUp(""); setError(""); }, [execution.id]);
   useEffect(() => {
@@ -378,14 +513,16 @@ function ExecutionResult({ projectId, task, execution, onChange, onSaved }: {
   const permission = async (reply: "once" | "always" | "reject") => { if (!interaction?.request.id) return; setWorking(reply); setError(""); try { onChange(await replyProjectExecutionPermission(projectId, execution.id, { request_id: interaction.request.id, reply })); } catch (cause) { setError(String(cause)); } finally { setWorking(""); } };
   const applyResult = async () => { setWorking("apply"); setError(""); try { onChange(await applyProjectExecutionResult(projectId, execution.id)); onSaved(); } catch (cause) { setError(String(cause)); onSaved(); } finally { setWorking(""); } };
   const continueRun = async () => { setWorking("continue"); setError(""); try { onChange(await continueProjectExecution(projectId, execution.id, followUp)); setFollowUp(""); onSaved(); } catch (cause) { setError(String(cause)); onSaved(); } finally { setWorking(""); } };
-  const accept = async (status: "passed" | "failed" | "waived") => { setWorking(status); setError(""); try { await recordProjectTaskAcceptance(projectId, task.id, { status, evidence: status === "waived" ? [] : [{ kind: "review", summary: evidence }] }); onSaved(); } catch (cause) { setError(String(cause)); } finally { setWorking(""); } };
+  const accept = async (status: "passed" | "failed" | "waived") => { setWorking(status); setError(""); try { await recordProjectTaskAcceptance(projectId, task.id, { status, evidence: [{ kind: "review", summary: evidence }] }); onSaved(); } catch (cause) { setError(String(cause)); } finally { setWorking(""); } };
   return <div className="mt-4 border-t border-border pt-4">
     <div className="flex flex-wrap items-center gap-2 text-xs"><span className="font-mono text-subtle">{execution.id}</span><span className="text-muted">OpenCode · {execution.input_state.model || "unknown model"}</span><span className="text-subtle">{execution.raw_state.engine_status || execution.status}</span></div>
-    {interaction?.type === "permission" ? <div className="mt-3 rounded-md bg-warn/10 p-4"><p className="text-sm font-medium text-warn">{lang === "zh" ? "OpenCode 等待工具权限" : "OpenCode is waiting for tool permission"}</p><p className="mt-2 break-all font-mono text-xs text-muted">{interaction.request.permission || "tool"} · {(interaction.request.patterns || []).join(" · ")}</p><div className="mt-3 flex flex-wrap gap-2"><Button size="sm" disabled={Boolean(working)} onClick={() => permission("once")}>{lang === "zh" ? "仅本次允许" : "Allow once"}</Button><Button size="sm" variant="outline" disabled={Boolean(working)} onClick={() => permission("always")}>{lang === "zh" ? "后续同类允许" : "Always allow"}</Button><Button size="sm" variant="outline" disabled={Boolean(working)} onClick={() => permission("reject")}>{lang === "zh" ? "拒绝" : "Reject"}</Button></div></div> : null}
-    {interaction?.type === "question" ? <ExecutionQuestionForm projectId={projectId} execution={execution} onChange={onChange} /> : null}
-    {["completed", "failed", "stopped"].includes(execution.status) && acceptanceOpen && (task.kind === "analysis" || ["pending", "conflict", "failed"].includes(execution.application_status)) ? <div className="mt-4 rounded-md border border-border p-4"><p className="text-sm font-medium">{lang === "zh" ? "在当前 OpenCode 会话中继续" : "Continue in this OpenCode session"}</p><p className="mt-1 text-xs leading-5 text-muted">{lang === "zh" ? "后续指令会沿用当前隔离副本和会话上下文，同时建立一条新的执行记录与快照边界。" : "The follow-up keeps the isolated work copy and session context while creating a new execution record and snapshot boundary."}</p><TextArea label={lang === "zh" ? "后续修改或核查要求" : "Follow-up change or review instruction"} value={followUp} onChange={setFollowUp} /><Button className="mt-3" size="sm" variant="outline" disabled={Boolean(working) || !followUp.trim()} onClick={continueRun}>{lang === "zh" ? "继续当前会话" : "Continue session"}</Button></div> : null}
-    {execution.status === "completed" && task.kind !== "analysis" && execution.application_status !== "applied" && execution.application_status !== "superseded" ? <div className={`mt-4 rounded-md p-4 ${execution.application_status === "conflict" || execution.application_status === "failed" ? "bg-danger/10" : "bg-primary/10"}`}><p className="text-sm font-medium">{lang === "zh" ? "结果仍在隔离工作副本中" : "The result is still in the isolated work copy"}</p><p className="mt-2 text-xs leading-5 text-muted">{lang === "zh" ? "应用前 Atlas 会再次核对源工作区和已接受基线；有冲突时不会覆盖现有文件。应用成功后，准确写回的状态会成为新的已接受项目基线。" : "Before applying, Atlas rechecks the source workspace and accepted baseline. Conflicts do not overwrite current files. A successful exact write-back becomes the new accepted project baseline."}</p>{execution.application_state.error ? <p className="mt-2 text-xs text-danger">{execution.application_state.error}</p> : null}<Button className="mt-3" size="sm" disabled={Boolean(working) || !execution.raw_state.evidence?.filesystem?.scope_compliant} onClick={applyResult}><Save className="size-4" />{lang === "zh" ? "应用并更新项目基线" : "Apply and update baseline"}</Button></div> : null}
-    {["completed", "failed", "stopped"].includes(execution.status) && acceptanceOpen && (task.kind === "analysis" || execution.application_status === "applied") ? <div className="mt-4 rounded-md border border-border p-4"><p className="text-sm font-medium">{task.acceptance_status === "failed" ? (lang === "zh" ? "上次验收失败，可补充证据后重新确认" : "The last acceptance failed; review the result and decide again") : (lang === "zh" ? "产品验收仍待独立确认" : "Product acceptance still needs a separate decision")}</p><TextArea label={lang === "zh" ? "验收证据或失败原因" : "Acceptance evidence or failure reason"} value={evidence} onChange={setEvidence} /><div className="mt-3 flex flex-wrap gap-2"><Button size="sm" disabled={Boolean(working) || !evidence.trim()} onClick={() => accept("passed")}>{lang === "zh" ? "验收通过" : "Pass"}</Button><Button size="sm" variant="outline" disabled={Boolean(working) || !evidence.trim()} onClick={() => accept("failed")}>{lang === "zh" ? "验收失败" : "Fail"}</Button><Button size="sm" variant="outline" disabled={Boolean(working)} onClick={() => accept("waived")}>{lang === "zh" ? "明确免验" : "Waive"}</Button></div></div> : null}
+    {readOnly ? <p className="mt-2 text-[11px] leading-5 text-subtle">{lang === "zh" ? "只读：历史尝试和已结束迭代不能继续操作；请切换到最新尝试或建立新迭代。" : "Read-only: historical attempts and finished iterations cannot be operated. Use the latest attempt or start a new iteration."}</p> : null}
+    {!readOnly && interaction?.type === "permission" ? <div className="mt-3 rounded-md bg-warn/10 p-4"><p className="text-sm font-medium text-warn">{lang === "zh" ? "OpenCode 等待工具权限" : "OpenCode is waiting for tool permission"}</p><p className="mt-2 break-all font-mono text-xs text-muted">{interaction.request.permission || "tool"} · {(interaction.request.patterns || []).join(" · ")}</p><div className="mt-3 flex flex-wrap gap-2"><Button size="sm" disabled={Boolean(working)} onClick={() => permission("once")}>{lang === "zh" ? "仅本次允许" : "Allow once"}</Button><Button size="sm" variant="outline" disabled={Boolean(working)} onClick={() => permission("always")}>{lang === "zh" ? "后续同类允许" : "Always allow"}</Button><Button size="sm" variant="outline" disabled={Boolean(working)} onClick={() => permission("reject")}>{lang === "zh" ? "拒绝" : "Reject"}</Button></div></div> : null}
+    {!readOnly && interaction?.type === "question" ? <ExecutionQuestionForm projectId={projectId} execution={execution} onChange={onChange} /> : null}
+    {!readOnly && ["completed", "failed", "stopped"].includes(execution.status) && acceptanceOpen && (task.kind === "analysis" || ["pending", "conflict", "failed"].includes(execution.application_status)) ? <div className="mt-4 rounded-md border border-border p-4"><p className="text-sm font-medium">{lang === "zh" ? "在当前 OpenCode 会话中继续" : "Continue in this OpenCode session"}</p><p className="mt-1 text-xs leading-5 text-muted">{lang === "zh" ? "后续指令会沿用当前隔离副本和会话上下文，同时建立一条新的执行记录与快照边界。" : "The follow-up keeps the isolated work copy and session context while creating a new execution record and snapshot boundary."}</p><TextArea label={lang === "zh" ? "后续修改或核查要求" : "Follow-up change or review instruction"} value={followUp} onChange={setFollowUp} /><Button className="mt-3" size="sm" variant="outline" disabled={Boolean(working) || !followUp.trim()} onClick={continueRun}>{lang === "zh" ? "继续当前会话" : "Continue session"}</Button></div> : null}
+    {!readOnly && execution.status === "completed" && task.kind !== "analysis" && execution.application_status !== "applied" && execution.application_status !== "superseded" ? <div className={`mt-4 rounded-md p-4 ${execution.application_status === "conflict" || execution.application_status === "failed" ? "bg-danger/10" : "bg-primary/10"}`}><p className="text-sm font-medium">{lang === "zh" ? "结果仍在隔离工作副本中" : "The result is still in the isolated work copy"}</p><p className="mt-2 text-xs leading-5 text-muted">{lang === "zh" ? "应用前 Atlas 会再次核对源工作区和已接受基线；有冲突时不会覆盖现有文件。应用成功后，准确写回的状态会成为新的已接受项目基线。" : "Before applying, Atlas rechecks the source workspace and accepted baseline. Conflicts do not overwrite current files. A successful exact write-back becomes the new accepted project baseline."}</p>{execution.application_state.error ? <p className="mt-2 text-xs text-danger">{execution.application_state.error}</p> : null}<Button className="mt-3" size="sm" disabled={Boolean(working) || !execution.raw_state.evidence?.filesystem?.scope_compliant} onClick={applyResult}><Save className="size-4" />{lang === "zh" ? "应用并更新项目基线" : "Apply and update baseline"}</Button></div> : null}
+    {baselineAdoptionError ? <div className="mt-4 rounded-md bg-danger/10 p-4"><p className="text-sm font-medium text-danger">{lang === "zh" ? "文件已写回，但新项目基线未采用" : "Files were written back, but the new project baseline was not adopted"}</p><p className="mt-2 break-all font-mono text-xs leading-5 text-danger">{baselineAdoptionError}</p><p className="mt-2 text-xs leading-5 text-muted">{lang === "zh" ? "Atlas 已把执行结果写回工作区，但采用新基线失败；在此之前结果不应视为完整应用，也不能通过验收。请在「项目工作区基线」中检查外部变化并采用当前状态，然后新建重试执行或重新验收。" : "Atlas wrote the result back, but adopting the new baseline failed; the result is not fully applied and cannot pass acceptance. Check external changes and adopt the current state in the workspace baseline panel, then retry or accept again."}</p></div> : null}
+    {!readOnly && ["completed", "failed", "stopped"].includes(execution.status) && acceptanceOpen && (task.kind === "analysis" || fullyApplied) ? <div className="mt-4 rounded-md border border-border p-4"><p className="text-sm font-medium">{task.acceptance_status === "failed" ? (lang === "zh" ? "上次验收失败，可补充证据后重新确认" : "The last acceptance failed; review the result and decide again") : (lang === "zh" ? "产品验收仍待独立确认" : "Product acceptance still needs a separate decision")}</p>{execution.status !== "completed" ? <p className="mt-1 text-xs leading-5 text-warn">{lang === "zh" ? `本次执行${execution.status === "stopped" ? "已停止" : "失败"}，不能验收通过；请新建重试执行，或填写理由后明确免验。` : `This execution ${execution.status === "stopped" ? "was stopped" : "failed"} and cannot pass acceptance. Start a retry, or waive it with an explicit reason.`}</p> : null}<TextArea label={lang === "zh" ? "验收证据或失败原因" : "Acceptance evidence or failure reason"} value={evidence} onChange={setEvidence} /><div className="mt-3 flex flex-wrap gap-2">{execution.status === "completed" ? <><Button size="sm" disabled={Boolean(working) || !evidence.trim()} onClick={() => accept("passed")}>{lang === "zh" ? "验收通过" : "Pass"}</Button><Button size="sm" variant="outline" disabled={Boolean(working) || !evidence.trim()} onClick={() => accept("failed")}>{lang === "zh" ? "验收失败" : "Fail"}</Button></> : null}<Button size="sm" variant="outline" disabled={Boolean(working) || !evidence.trim()} onClick={() => accept("waived")}>{execution.status === "completed" ? (lang === "zh" ? "明确免验" : "Waive") : (lang === "zh" ? "填写理由并免验" : "Waive with reason")}</Button></div></div> : null}
     {error ? <p className="mt-3 text-xs text-danger">{error}</p> : null}
   </div>;
 }
@@ -407,7 +544,7 @@ function executionStatus(status: ProjectTask["execution_status"], lang: "zh" | "
 
 function WorkspaceBaselinePanel({ projectId, onSaved, onBaselineChange }: {
   projectId: string; onSaved: () => void;
-  onBaselineChange: (value: boolean) => void;
+  onBaselineChange: (value: boolean, latestId: string | null) => void;
 }) {
   const { lang } = useLang();
   const [baselines, setBaselines] = useState<WorkspaceBaselineSummary[]>([]);
@@ -425,7 +562,7 @@ function WorkspaceBaselinePanel({ projectId, onSaved, onBaselineChange }: {
       (items) => {
         if (!alive) return;
         setBaselines(items);
-        onBaselineChange(items.length > 0);
+        onBaselineChange(items.length > 0, items[0]?.id || null);
         setFocus(items[0]?.coverage.focus_paths.join("\n") || "");
       },
       (cause) => { if (alive) setError(String(cause)); },
@@ -448,7 +585,7 @@ function WorkspaceBaselinePanel({ projectId, onSaved, onBaselineChange }: {
         } : {}),
       });
       setBaselines((items) => [created, ...items]);
-      onBaselineChange(true);
+      onBaselineChange(true, created.id);
       setFocus(created.coverage.focus_paths.join("\n"));
       setCheck(null);
       onSaved();
@@ -536,7 +673,9 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
   const [error, setError] = useState("");
   const [starting, setStarting] = useState(false);
   const [applying, setApplying] = useState("");
+  const [staleConfirmed, setStaleConfirmed] = useState(false);
   const run = runs.find((item) => item.id === selectedRunId) || null;
+  const staleBlocked = Boolean(run?.stale) && !staleConfirmed;
   const hasConfirmedScope = workspace.requirements.some((item) => item.confirmed_scope === "current");
   const active = run?.status === "queued" || run?.status === "running";
   const hasActiveRun = runs.some((item) => item.status === "queued" || item.status === "running");
@@ -556,6 +695,8 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
     );
     return () => { alive = false; };
   }, [projectId]);
+
+  useEffect(() => { setStaleConfirmed(false); }, [selectedRunId]);
 
   useEffect(() => {
     if (!hasActiveRun) return;
@@ -592,7 +733,7 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
     const key = `${itemKind}:${index}`; setApplying(key); setError("");
     try {
       const result = await applyProjectGenerationItem(
-        projectId, run.id, { item_kind: itemKind, index });
+        projectId, run.id, { item_kind: itemKind, index, confirm_stale: staleConfirmed });
       setRuns((items) => items.map((item) => item.id === result.run.id ? result.run : item));
       if (result.run.mode === "analysis" || result.run.mode === "improvement") {
         onAnalysis(result.run);
@@ -643,19 +784,22 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
       {run.engine_session_id ? <span className="font-mono">{run.engine_session_id}</span> : null}
       {run.mode === "value" ? <span className="rounded bg-primary/10 px-2 py-1 text-primary">{lang === "zh" ? "仅供参考，不改变范围" : "Advisory only; scope unchanged"}</span> : null}
     </div> : null}
+    {run?.stale ? <div className="mt-3 rounded-md bg-warn/10 p-4"><p className="text-sm font-medium text-warn">{lang === "zh" ? "该结果的固定输入已过期" : "This result is stale against the current inputs"}</p><p className="mt-1 text-xs leading-5 text-muted">{lang === "zh" ? "生成之后至少有资料、需求或决定发生了变化。应用前请复核差异；确认后仍可按原结果应用。" : "Sources, requirements, or decisions changed after this run. Review the difference before applying; you may still apply the original result explicitly."}</p>{!staleConfirmed ? <Button className="mt-2" size="sm" variant="outline" onClick={() => setStaleConfirmed(true)}>{lang === "zh" ? "确认仍要应用过期结果" : "Confirm applying the stale result"}</Button> : <p className="mt-2 text-xs text-warn">{lang === "zh" ? "已确认，可以应用。" : "Confirmed; applying is enabled."}</p>}</div> : null}
     {active ? <p className="mt-4 text-sm text-muted">{lang === "zh" ? (run?.status === "queued" ? "等待文档执行器…" : "正在分析固定输入…") : (run?.status === "queued" ? "Waiting for the document runner…" : "Analyzing fixed input…")}</p> : null}
     {run?.status === "failed" ? <p className="mt-4 rounded-md bg-danger/10 p-3 text-xs text-danger">{run.error}</p> : null}
     {error ? <p className="mt-4 text-xs text-danger">{error}</p> : null}
     {result ? <div className="mt-5 grid gap-5 border-t border-border pt-5 lg:grid-cols-2">
       <div className="space-y-4">
-        <ProposalList title={lang === "zh" ? "需要用户回答" : "Questions for the user"} items={result.questions.map((item) => ({ title: item.question, text: item.why }))} empty={lang === "zh" ? "没有生成新的关键问题。" : "No new critical questions."} />
-        <ProposalList title={lang === "zh" ? "明确冲突" : "Explicit conflicts"} items={result.conflicts.map((item) => ({ title: item.summary, text: item.impact || "" }))} empty={lang === "zh" ? "生成结果没有报告有依据的明确冲突。" : "The result reports no evidence-backed explicit conflicts."} />
-        <ProposalList title={lang === "zh" ? "参考建议" : "Suggestions"} items={result.suggestions.map((item) => ({ title: item.summary, text: item.reason || "" }))} empty={lang === "zh" ? "没有额外参考建议。" : "No additional suggestions."} />
+        <ProposalList title={lang === "zh" ? "分析提出的开放问题" : "Open questions from the analysis"}
+          note={lang === "zh" ? "这里保留当轮生成原文；请在下方「待处理事项」中回答、暂缓或忽略。只有每个模式最新完成运行的项目才会进入待处理事项。" : "This keeps the original run output. Answer, defer, or dismiss items in the Open items panel below; only the latest completed run per mode feeds that panel."}
+          items={result.questions.map((item) => ({ title: item.question, text: item.why, meta: item.affects.map((value) => documentKind(value, lang)) }))} empty={lang === "zh" ? "没有生成新的关键问题。" : "No new critical questions."} />
+        <ProposalList title={lang === "zh" ? "明确冲突" : "Explicit conflicts"} items={result.conflicts.map((item) => ({ title: item.summary, text: item.impact || "", meta: item.evidence.map((value) => value.id) }))} empty={lang === "zh" ? "生成结果没有报告有依据的明确冲突。" : "The result reports no evidence-backed explicit conflicts."} />
+        <ProposalList title={lang === "zh" ? "参考建议" : "Suggestions"} items={result.suggestions.map((item) => ({ title: item.summary, text: item.reason || "", meta: item.evidence.map((value) => value.id) }))} empty={lang === "zh" ? "没有额外参考建议。" : "No additional suggestions."} />
       </div>
       <div className="space-y-4">
         {result.requirements.map((item, index) => {
           const applied = run.applied.requirements[String(index)];
-          return <article key={item.key} className="rounded-lg bg-bg-elevated p-4"><div className="flex items-start justify-between gap-3"><div><p className="text-[11px] text-primary">{lang === "zh" ? "AI 候选需求" : "AI candidate requirement"} · {scopeLabel(item.recommended_scope, lang)}</p><h3 className="mt-1 text-sm font-medium leading-6">{item.content}</h3></div><Button size="sm" variant="outline" disabled={Boolean(applied) || applying === `requirement:${index}`} onClick={() => apply("requirement", index)}>{applied ? (lang === "zh" ? "已加入" : "Added") : (lang === "zh" ? "加入候选" : "Add candidate")}</Button></div><p className="mt-2 text-xs leading-5 text-muted">{item.recommendation_reason}</p></article>;
+          return <article key={item.key} className="rounded-lg bg-bg-elevated p-4"><div className="flex items-start justify-between gap-3"><div><p className="text-[11px] text-primary">{lang === "zh" ? "AI 候选需求" : "AI candidate requirement"} · {scopeLabel(item.recommended_scope, lang)}</p><h3 className="mt-1 text-sm font-medium leading-6">{item.content}</h3></div><Button size="sm" variant="outline" disabled={Boolean(applied) || staleBlocked || applying === `requirement:${index}`} onClick={() => apply("requirement", index)}>{applied ? (lang === "zh" ? "已加入" : "Added") : (lang === "zh" ? "加入候选" : "Add candidate")}</Button></div><p className="mt-2 text-xs leading-5 text-muted">{item.recommendation_reason}</p></article>;
         })}
         {result.documents.map((item, index) => {
           const applied = run.applied.documents[String(index)];
@@ -665,15 +809,108 @@ function GenerationPanel({ projectId, workspace, onSaved, onAnalysis }: {
             return dependencyIndex < 0 || !run.applied.documents[String(dependencyIndex)];
           });
           const content = <div className="mt-3 max-h-80 overflow-auto rounded-md bg-surface p-3"><Prose md={item.content} /></div>;
-          return <article key={`${item.kind}:${index}`} className="rounded-lg bg-bg-elevated p-4"><div className="flex items-start justify-between gap-3"><div><p className="text-[11px] text-primary">{lang === "zh" ? `第 ${index + 1}/${result.documents.length} 份` : `${index + 1} of ${result.documents.length}`} · {documentKind(item.kind, lang)}</p><h3 className="mt-1 text-sm font-medium">{item.title}</h3>{dependencies.length ? <p className="mt-1 text-[11px] text-subtle">{lang === "zh" ? "依赖" : "Depends on"}: {dependencies.map((value) => documentKind(value, lang)).join(" · ")}</p> : null}{unmet.length ? <p className="mt-1 text-[11px] text-warn">{lang === "zh" ? "请先保存" : "Save first"}: {unmet.map((value) => documentKind(value, lang)).join(" · ")}</p> : null}</div><Button size="sm" variant="outline" disabled={Boolean(applied) || Boolean(unmet.length) || applying === `document:${index}`} onClick={() => apply("document", index)}>{applied ? (lang === "zh" ? "已保存" : "Saved") : item.document_id ? (lang === "zh" ? "保存为新版本" : "Save new version") : (lang === "zh" ? "创建关联文档" : "Create document")}</Button></div>{compact ? <details className="mt-3"><summary className="cursor-pointer text-xs text-primary">{lang === "zh" ? "查看完整草案" : "View full draft"}</summary>{content}</details> : content}</article>;
+          return <article key={`${item.kind}:${index}`} className="rounded-lg bg-bg-elevated p-4"><div className="flex items-start justify-between gap-3"><div><p className="text-[11px] text-primary">{lang === "zh" ? `第 ${index + 1}/${result.documents.length} 份` : `${index + 1} of ${result.documents.length}`} · {documentKind(item.kind, lang)}</p><h3 className="mt-1 text-sm font-medium">{item.title}</h3>{dependencies.length ? <p className="mt-1 text-[11px] text-subtle">{lang === "zh" ? "依赖" : "Depends on"}: {dependencies.map((value) => documentKind(value, lang)).join(" · ")}</p> : null}{unmet.length ? <p className="mt-1 text-[11px] text-warn">{lang === "zh" ? "请先保存" : "Save first"}: {unmet.map((value) => documentKind(value, lang)).join(" · ")}</p> : null}</div><Button size="sm" variant="outline" disabled={Boolean(applied) || Boolean(unmet.length) || staleBlocked || applying === `document:${index}`} onClick={() => apply("document", index)}>{applied ? (lang === "zh" ? "已保存" : "Saved") : item.document_id ? (lang === "zh" ? "保存为新版本" : "Save new version") : (lang === "zh" ? "创建关联文档" : "Create document")}</Button></div>{compact ? <details className="mt-3"><summary className="cursor-pointer text-xs text-primary">{lang === "zh" ? "查看完整草案" : "View full draft"}</summary>{content}</details> : content}</article>;
         })}
       </div>
     </div> : null}
   </section>;
 }
 
-function ProposalList({ title, items, empty }: { title: string; items: { title: string; text: string }[]; empty: string }) {
-  return <div><h3 className="text-sm font-medium">{title}</h3><div className="mt-2 space-y-2">{items.map((item, index) => <div key={`${item.title}:${index}`} className="rounded-md bg-bg-elevated p-3"><p className="text-sm">{item.title}</p>{item.text ? <p className="mt-1 text-xs leading-5 text-muted">{item.text}</p> : null}</div>)}{!items.length ? <p className="text-xs text-subtle">{empty}</p> : null}</div></div>;
+function ProposalList({ title, items, empty, note }: { title: string; items: { title: string; text: string; meta?: string[] }[]; empty: string; note?: string }) {
+  return <div><h3 className="text-sm font-medium">{title}</h3>{note ? <p className="mt-1 text-[11px] leading-5 text-subtle">{note}</p> : null}<div className="mt-2 space-y-2">{items.map((item, index) => <div key={`${item.title}:${index}`} className="rounded-md bg-bg-elevated p-3"><p className="text-sm">{item.title}</p>{item.text ? <p className="mt-1 text-xs leading-5 text-muted">{item.text}</p> : null}{item.meta?.length ? <p className="mt-2 flex flex-wrap gap-1.5">{item.meta.map((value) => <span key={value} className="rounded bg-chip px-1.5 py-0.5 font-mono text-[10px] text-muted">{value}</span>)}</p> : null}</div>)}{!items.length ? <p className="text-xs text-subtle">{empty}</p> : null}</div></div>;
+}
+
+function OpenItemsPanel({ projectId, workspace, onSaved }: {
+  projectId: string; workspace: ProjectWorkspace; onSaved: () => void;
+}) {
+  const { lang } = useLang();
+  const items = workspace.open_items || [];
+  const openItems = items.filter((item) => item.status === "open");
+  const handled = items.filter((item) => item.status !== "open");
+  const [activeId, setActiveId] = useState("");
+  const [note, setNote] = useState("");
+  const [working, setWorking] = useState("");
+  const [error, setError] = useState("");
+  const [showHandled, setShowHandled] = useState(false);
+  const resolve = async (item: ProjectOpenItem, status: "answered" | "resolved" | "accepted" | "deferred" | "dismissed", convert?: "decision" | "requirement") => {
+    setWorking(`${item.id}:${status}`); setError("");
+    try {
+      await resolveProjectOpenItem(projectId, {
+        run_id: item.run_id, item_kind: item.kind, item_index: item.index,
+        item_key: item.key, status, note: note.trim(), ...(convert ? { convert } : {}),
+      });
+      setActiveId(""); setNote(""); onSaved();
+    } catch (cause) { setError(String(cause)); } finally { setWorking(""); }
+  };
+  return <section className="mt-6 rounded-xl bg-surface p-5 shadow-card">
+    <div className="flex flex-wrap items-start justify-between gap-3">
+      <div className="flex max-w-2xl items-start gap-3"><Lightbulb className="mt-0.5 size-5 text-primary" /><div>
+        <h2 className="font-serif text-xl font-medium">{lang === "zh" ? "待处理事项" : "Open items"}</h2>
+        <p className="mt-1 text-xs leading-5 text-subtle">{lang === "zh" ? "来自最近一次完成的分析、改进或价值运行的问题、冲突和建议。处理结果会持久保存；回答问题可同时记录为项目决定，建议可转为候选需求。" : "Questions, conflicts, and suggestions from the latest completed analysis, improvement, or value run. Dispositions are persisted; answers can become decisions and suggestions can become candidate requirements."}</p>
+      </div></div>
+      <span className={`text-xs ${openItems.length ? "text-warn" : "text-subtle"}`}>{lang === "zh" ? `${openItems.length} 项待处理` : `${openItems.length} open`}</span>
+    </div>
+    {!items.length ? <p className="mt-4 text-sm text-subtle">{lang === "zh" ? "还没有可处理的分析结果。先运行「分析固定资料」。" : "No analysis output to process yet. Run \"Analyze pinned sources\" first."}</p> : null}
+    {error ? <p className="mt-3 rounded-md bg-danger/10 p-3 text-xs text-danger">{error}</p> : null}
+    <div className="mt-4 space-y-3">
+      {openItems.map((item) => <article key={item.id} className="rounded-lg bg-bg-elevated p-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge tone={item.kind === "conflict" ? "warn" : "default"}>{openItemKind(item.kind, lang)}</Badge>
+          <Badge tone="default">{item.mode}</Badge>
+          {!item.current ? <Badge tone="default">{lang === "zh" ? "仅供参考" : "Advisory"}</Badge> : null}
+          <span className="font-mono text-[10px] text-subtle">{item.key}</span>
+        </div>
+        <p className="mt-2 text-sm leading-6">{item.title}</p>
+        {item.detail ? <p className="mt-1 text-xs leading-5 text-muted">{item.detail}</p> : null}
+        {item.affects.length ? <p className="mt-2 flex flex-wrap gap-1.5">{item.affects.map((value) => <span key={value} className="rounded bg-chip px-1.5 py-0.5 text-[10px] text-muted">{documentKind(value, lang)}</span>)}</p> : null}
+        {activeId === item.id ? <div className="mt-3 border-t border-border pt-3">
+          <TextArea label={openItemNoteLabel(item.kind, lang)} value={note} onChange={setNote} />
+          <div className="mt-3 flex flex-wrap gap-2">
+            {item.kind === "question" ? <Button size="sm" disabled={Boolean(working) || !note.trim()} onClick={() => resolve(item, "answered", "decision")}>{lang === "zh" ? "保存回答并记录决定" : "Answer and record decision"}</Button> : null}
+            {item.kind === "conflict" ? <><Button size="sm" disabled={Boolean(working) || !note.trim()} onClick={() => resolve(item, "resolved")}>{lang === "zh" ? "标记已解决" : "Mark resolved"}</Button><Button size="sm" variant="outline" disabled={Boolean(working) || !note.trim()} onClick={() => resolve(item, "resolved", "decision")}>{lang === "zh" ? "转为决定" : "Record decision"}</Button></> : null}
+            {item.kind === "suggestion" ? <><Button size="sm" disabled={Boolean(working) || !note.trim()} onClick={() => resolve(item, "accepted", "requirement")}>{lang === "zh" ? "转为候选需求" : "To candidate requirement"}</Button><Button size="sm" variant="outline" disabled={Boolean(working) || !note.trim()} onClick={() => resolve(item, "accepted", "decision")}>{lang === "zh" ? "转为决定" : "Record decision"}</Button></> : null}
+            <Button size="sm" variant="outline" disabled={Boolean(working)} onClick={() => resolve(item, "deferred")}>{lang === "zh" ? "暂缓" : "Defer"}</Button>
+            <Button size="sm" variant="outline" disabled={Boolean(working)} onClick={() => resolve(item, "dismissed")}>{item.kind === "conflict" ? (lang === "zh" ? "说明不冲突" : "Not a conflict") : (lang === "zh" ? "忽略" : "Dismiss")}</Button>
+            <Button size="sm" variant="outline" disabled={Boolean(working)} onClick={() => { setActiveId(""); setNote(""); }}>{lang === "zh" ? "取消" : "Cancel"}</Button>
+          </div>
+        </div> : <div className="mt-3 flex flex-wrap gap-2">
+          <Button size="sm" variant="outline" onClick={() => { setActiveId(item.id); setNote(""); }}>{lang === "zh" ? "处理" : "Resolve"}</Button>
+        </div>}
+      </article>)}
+      {!openItems.length && items.length ? <p className="text-sm text-muted">{lang === "zh" ? "所有开放项都已处理。" : "All open items have been handled."}</p> : null}
+    </div>
+    {handled.length ? <div className="mt-4 border-t border-border pt-3">
+      <button type="button" className="text-xs text-primary" onClick={() => setShowHandled((value) => !value)}>{lang === "zh" ? `已处理 ${handled.length} 项` : `${handled.length} handled`} {showHandled ? "▾" : "▸"}</button>
+      {showHandled ? <div className="mt-2 space-y-2">{handled.map((item) => <div key={item.id} className="rounded-md bg-bg-elevated p-3"><div className="flex flex-wrap items-center gap-2"><Badge tone="ok">{openItemStatus(item.status, lang)}</Badge><span className="text-xs text-muted">{item.title}</span></div>{item.note ? <p className="mt-1 text-xs leading-5 text-muted">{item.note}</p> : null}{item.decision_id || item.requirement_id ? <p className="mt-1 font-mono text-[10px] text-subtle">{item.decision_id ? `decision ${item.decision_id}` : ""}{item.decision_id && item.requirement_id ? " · " : ""}{item.requirement_id ? `requirement ${item.requirement_id}` : ""}</p> : null}</div>)}</div> : null}
+    </div> : null}
+  </section>;
+}
+
+function openItemKind(kind: ProjectOpenItem["kind"], lang: "zh" | "en") {
+  const labels = {
+    question: { zh: "开放问题", en: "Open question" },
+    conflict: { zh: "明确冲突", en: "Explicit conflict" },
+    suggestion: { zh: "参考建议", en: "Suggestion" },
+  };
+  return labels[kind][lang];
+}
+
+function openItemStatus(status: ProjectOpenItem["status"], lang: "zh" | "en") {
+  const labels: Record<ProjectOpenItem["status"], { zh: string; en: string }> = {
+    open: { zh: "待处理", en: "Open" },
+    answered: { zh: "已回答", en: "Answered" },
+    resolved: { zh: "已解决", en: "Resolved" },
+    accepted: { zh: "已采纳", en: "Accepted" },
+    deferred: { zh: "已暂缓", en: "Deferred" },
+    dismissed: { zh: "已忽略", en: "Dismissed" },
+  };
+  return labels[status][lang];
+}
+
+function openItemNoteLabel(kind: ProjectOpenItem["kind"], lang: "zh" | "en") {
+  if (kind === "question") return lang === "zh" ? "回答（会作为决定内容保存）" : "Answer (saved as the decision statement)";
+  if (kind === "suggestion") return lang === "zh" ? "采纳理由或决定内容" : "Adoption reason or decision statement";
+  return lang === "zh" ? "处理说明或决定内容" : "Resolution note or decision statement";
 }
 
 function ConsistencyPanel({ workspace, analysisRun }: {
@@ -686,27 +923,43 @@ function ConsistencyPanel({ workspace, analysisRun }: {
   const analysis = analysisRun?.result;
   const openCandidates = analysis?.requirements.filter(
     (_item, index) => !analysisRun?.applied.requirements[String(index)]) || [];
-  const decisions = pending.length + (analysis?.questions.length || 0);
-  const suggestions = recommended.length + openCandidates.length + (analysis?.suggestions.length || 0);
+  const currentItems = (workspace.open_items || []).filter((item) => item.current);
+  const openItems = currentItems.filter((item) => item.status === "open");
+  const openQuestions = openItems.filter((item) => item.kind === "question");
+  const openConflicts = openItems.filter((item) => item.kind === "conflict");
+  const openSuggestions = openItems.filter((item) => item.kind === "suggestion");
+  const handledConflicts = currentItems.filter(
+    (item) => item.kind === "conflict" && item.status !== "open");
+  const decisions = pending.length + openQuestions.length;
+  const suggestions = recommended.length + openCandidates.length + openSuggestions.length;
   return (
     <section className="mt-6 rounded-xl bg-primary/[0.06] p-5 ring-1 ring-primary/15">
       <h2 className="font-medium">{lang === "zh" ? "一致性信号" : "Consistency signals"}</h2>
+      <p className="mt-1 text-[11px] leading-5 text-subtle">{analysisRun
+        ? (lang === "zh"
+          ? `统计来源：最近一次完成的固定输入分析 ${analysisRun.id}（${analysisRun.mode} · ${new Date(analysisRun.created_at).toLocaleString("zh-CN")}）。价值分析与当前选中的其它生成运行不计入。`
+          : `Counted from the latest completed fixed-input analysis ${analysisRun.id} (${analysisRun.mode} · ${new Date(analysisRun.created_at).toLocaleString("en")}). Value analysis and any other selected run are not counted.`)
+        : (lang === "zh"
+          ? "统计来源：尚无已完成的固定输入分析；分析类数字显示为“未检查”。"
+          : "Source: no completed fixed-input analysis yet; analysis-based counts show as not checked.")}</p>
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         <Signal title={lang === "zh" ? "明确冲突" : "Explicit conflicts"}
-          count={analysis ? analysis.conflicts.length : (lang === "zh" ? "未检查" : "Not checked")}
+          count={analysis ? openConflicts.length : (lang === "zh" ? "未检查" : "Not checked")}
           text={analysis
-            ? (analysis.conflicts.length
-              ? (lang === "zh" ? "最近一次固定输入分析发现了可定位的明确冲突。" : "The latest fixed-input analysis found evidence-backed explicit conflicts.")
-              : (lang === "zh" ? "最近一次固定输入分析未报告明确冲突；这不代表未来输入也没有冲突。" : "The latest fixed-input analysis reported no explicit conflict; future input may differ."))
+            ? (openConflicts.length
+              ? (lang === "zh" ? `${openConflicts.length} 项未处理${handledConflicts.length ? `，已处理 ${handledConflicts.length} 项` : ""}，可在「待处理事项」中处理。` : `${openConflicts.length} unresolved${handledConflicts.length ? `, ${handledConflicts.length} handled` : ""}; resolve them in Open items.`)
+              : (handledConflicts.length
+                ? (lang === "zh" ? `全部 ${handledConflicts.length} 项冲突已处理，没有未处理冲突。` : `All ${handledConflicts.length} conflicts are handled; none remain open.`)
+                : (lang === "zh" ? "最近一次固定输入分析未报告明确冲突；这不代表未来输入也没有冲突。" : "The latest fixed-input analysis reported no explicit conflict; future input may differ.")))
             : (lang === "zh" ? "尚未完成固定输入分析，不能推断为“没有冲突”。" : "No fixed-input analysis has completed, so absence of conflict cannot be inferred.")}
           muted={!analysis} />
         <Signal title={lang === "zh" ? "需要决定" : "Needs a decision"} count={decisions}
           text={decisions
-            ? (lang === "zh" ? `${pending.length} 条需求待确认，${analysis?.questions.length || 0} 个分析问题待回答。` : `${pending.length} requirements await confirmation and ${analysis?.questions.length || 0} analysis questions await answers.`)
-            : (lang === "zh" ? "当前没有待确认需求或分析问题。" : "No requirements or analysis questions await a decision.")} />
+            ? (lang === "zh" ? `${pending.length} 条需求待确认，${openQuestions.length} 个开放问题未处理（来自该运行）。` : `${pending.length} requirements await confirmation and ${openQuestions.length} open questions await answers (from that run).`)
+            : (lang === "zh" ? "当前没有待确认需求或开放问题。" : "No requirements or open questions await a decision.")} />
         <Signal title={lang === "zh" ? "参考建议" : "Suggestions"} count={suggestions}
           text={suggestions
-            ? (lang === "zh" ? `${recommended.length} 条已保存范围建议，${openCandidates.length} 条未加入候选，${analysis?.suggestions.length || 0} 条分析建议。` : `${recommended.length} saved scope recommendations, ${openCandidates.length} unapplied candidates, and ${analysis?.suggestions.length || 0} analysis suggestions.`)
+            ? (lang === "zh" ? `${recommended.length} 条已保存范围建议，${openCandidates.length} 条未加入候选，${openSuggestions.length} 条分析建议未处理。` : `${recommended.length} saved scope recommendations, ${openCandidates.length} unapplied candidates, and ${openSuggestions.length} unhandled analysis suggestions.`)
             : (lang === "zh" ? "当前没有未处理的参考建议。" : "There are no pending suggestions.")} />
         <Signal title={lang === "zh" ? "关联复核" : "Linked reviews"} count={review.length}
           text={review.length
@@ -793,6 +1046,7 @@ function RequirementCard({ projectId, requirement, references, onSaved }: {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-mono text-[11px] text-subtle">{requirement.id}</span>
+            <Badge tone="default">r{requirement.revision ?? 1}</Badge>
             <Badge tone={requirement.confirmed_scope ? "ok" : "warn"}>
               {requirement.confirmed_scope ? (lang === "zh" ? "用户已确认" : "User confirmed") : (lang === "zh" ? "待决定" : "Pending decision")}
             </Badge>
@@ -867,7 +1121,12 @@ function DocumentForm({ projectId, workspace, onSaved }: { projectId: string; wo
 
 function DocumentCard({ projectId, document, onSaved }: { projectId: string; document: ProjectDocument; onSaved: () => void }) {
   const { lang } = useLang(); const [content, setContent] = useState(document.content); const [summary, setSummary] = useState("");
+  const [reviewNote, setReviewNote] = useState("");
   const [saving, setSaving] = useState(false); const [error, setError] = useState(""); const [diff, setDiff] = useState<string | null>(null);
+  const approval = document.review.approval || "pending";
+  const review = async (status: "approved" | "rejected") => { setSaving(true); setError(""); try {
+    await reviewProjectDocument(projectId, document.id, { status, note: reviewNote }); setReviewNote(""); onSaved();
+  } catch (cause) { setError(String(cause)); } finally { setSaving(false); } };
   const headings = markdownHeadings(document.content);
   const [sectionHeading, setSectionHeading] = useState(headings[0] || "");
   const [revisionInstruction, setRevisionInstruction] = useState("");
@@ -909,9 +1168,19 @@ function DocumentCard({ projectId, document, onSaved }: { projectId: string; doc
   };
   const revisionCandidate = revisionRun?.result?.documents[0];
   return <article className={`rounded-xl bg-surface p-5 shadow-card ${document.review.status === "needs_review" ? "ring-2 ring-warn/25" : ""}`}>
-    <div className="flex flex-wrap items-start justify-between gap-3"><div><div className="flex flex-wrap items-center gap-2"><h3 className="font-medium">{document.title}</h3><Badge tone={document.review.status === "current" ? "ok" : "warn"}>{document.review.status === "current" ? (lang === "zh" ? "依据为当前" : "Current") : (lang === "zh" ? "需要复核" : "Needs review")}</Badge></div>
+    <div className="flex flex-wrap items-start justify-between gap-3"><div><div className="flex flex-wrap items-center gap-2"><h3 className="font-medium">{document.title}</h3><Badge tone={document.review.status === "current" ? "ok" : "warn"}>{document.review.status === "current" ? (lang === "zh" ? "依据为当前" : "Current") : (lang === "zh" ? "需要复核" : "Needs review")}</Badge><Badge tone={approval === "approved" ? "ok" : approval === "rejected" ? "danger" : "warn"}>{approval === "approved" ? (lang === "zh" ? "已批准" : "Approved") : approval === "rejected" ? (lang === "zh" ? "已拒绝" : "Rejected") : (lang === "zh" ? "待人工审阅" : "Awaiting review")}</Badge></div>
       <p className="mt-1 text-xs text-subtle">{documentKind(document.kind, lang)} · v{document.current_version} · {document.author} · {document.version_id}</p></div></div>
     {document.review.status === "needs_review" ? <p className="mt-3 flex gap-2 rounded-md bg-warn/10 p-3 text-xs leading-5 text-warn"><AlertTriangle className="mt-0.5 size-4 shrink-0" />{lang === "zh" ? "关联需求、上游文档或工作区基线已有变化。正文未被自动改写，请比较后保存新版本。" : "A linked requirement, upstream document, or workspace baseline changed. The content was preserved; review it before saving a new version."}</p> : null}
+    <div className="mt-3 rounded-md bg-bg-elevated p-3">
+      <div className="flex flex-wrap items-end gap-2">
+        <label className="min-w-56 flex-1 text-xs"><span className="text-subtle">{lang === "zh" ? "人工审阅说明（可选）" : "Review note (optional)"}</span><input value={reviewNote} onChange={(event) => setReviewNote(event.target.value)} className={inputClass} /></label>
+        <Button size="sm" disabled={saving} onClick={() => review("approved")}><CheckCircle2 className="size-4" />{lang === "zh" ? "批准当前版本" : "Approve current version"}</Button>
+        <Button size="sm" variant="outline" disabled={saving} onClick={() => review("rejected")}>{lang === "zh" ? "拒绝当前版本" : "Reject current version"}</Button>
+      </div>
+      <p className="mt-2 text-[11px] leading-5 text-subtle">{lang === "zh" ? `只有已批准且依据为当前的版本才能固定为迭代输入。${document.review.note ? `上次审阅：${document.review.note}${document.review.reviewed_at ? `（${new Date(document.review.reviewed_at).toLocaleString("zh-CN")}）` : ""}` : ""}` : `Only approved versions with current basis can be pinned into an iteration.${document.review.note ? ` Last review: ${document.review.note}${document.review.reviewed_at ? ` (${new Date(document.review.reviewed_at).toLocaleString("en")})` : ""}` : ""}`}</p>
+      {approval !== "approved" && document.review.status === "current" ? <p className="mt-1 text-[11px] text-warn">{lang === "zh" ? "该版本尚未批准，不能用于新的迭代。" : "This version is not approved and cannot seed a new iteration."}</p> : null}
+      {approval === "approved" && document.review.status === "needs_review" ? <p className="mt-1 text-[11px] text-warn">{lang === "zh" ? "依赖已变化，批准状态不足以让该版本进入迭代；请先复核并保存新版本。" : "Dependencies changed, so the approval alone cannot seed an iteration; review and save a new version."}</p> : null}
+    </div>
     <details className="mt-4"><summary className="cursor-pointer text-sm text-primary">{lang === "zh" ? "查看正文、编辑和版本" : "View, edit, and versions"}</summary>
       <div className="mt-4 rounded-md border border-border bg-bg-elevated p-4"><Prose md={document.content} /></div>
       <div className="mt-5 grid gap-4 lg:grid-cols-2"><div><TextArea label={lang === "zh" ? "编辑完整 Markdown（从当前版开始）" : "Edit full Markdown (starts from current)"} value={content} onChange={setContent} required rows={12} /><Field label={lang === "zh" ? "修改说明" : "Change summary"} value={summary} onChange={setSummary} required /><Button className="mt-3" size="sm" onClick={save} disabled={saving || !summary.trim()}><Save className="size-4" />{lang === "zh" ? "保存新版本" : "Save new version"}</Button></div>
@@ -961,7 +1230,6 @@ function lines(value: string) { return value.split("\n").map((item) => item.trim
 function scopeLabel(scope: ProjectScope | null, lang: "zh" | "en") { if (!scope) return lang === "zh" ? "无" : "None"; const labels = { current: { zh: "本版", en: "Current" }, later: { zh: "以后", en: "Later" }, excluded: { zh: "不做", en: "Excluded" } }; return labels[scope][lang]; }
 function documentKind(kind: ProjectDocumentKind, lang: "zh" | "en") { const item = DOCUMENT_KINDS.find((candidate) => candidate.value === kind); return item ? (lang === "zh" ? item.zh : item.en) : kind; }
 function IdLinks({ ids, prefix }: { ids: string[]; prefix: string }) { return ids.length ? <p className="mt-3 font-mono text-[11px] text-subtle">{prefix}: {ids.join(" · ")}</p> : null; }
-function Stat({ value, label }: { value: number; label: string }) { return <div className="rounded-xl bg-surface p-4 shadow-card"><div className="font-serif text-2xl">{value}</div><div className="mt-1 text-xs text-muted">{label}</div></div>; }
 function Empty({ text }: { text: string }) { return <div className="rounded-xl bg-surface p-6 text-sm text-muted shadow-card">{text}</div>; }
 function Signal({ title, count, text, muted }: { title: string; count: number | string; text: string; muted?: boolean }) { return <div className="rounded-lg bg-surface p-4 shadow-card"><div className="flex items-center justify-between gap-2"><h3 className="text-sm font-medium">{title}</h3><span className={`text-xs ${muted ? "text-subtle" : "text-primary"}`}>{count}</span></div><p className="mt-2 text-xs leading-5 text-muted">{text}</p></div>; }
 function SectionTitle({ icon: Icon, title, description }: { icon: typeof FileText; title: string; description: string }) { return <div className="flex items-start gap-3"><Icon className="mt-0.5 size-5 text-primary" /><div><h2 className="font-serif text-xl font-medium">{title}</h2><p className="mt-1 text-xs leading-5 text-subtle">{description}</p></div></div>; }

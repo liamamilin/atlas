@@ -82,9 +82,10 @@ from project_workflow import (
     update_requirement as update_project_requirement,
 )
 from project_generation import (
-    apply_generation_item, execute_generation, list_generations,
+    apply_generation_item, execute_generation, generation_staleness, list_generations,
     mark_generation_interrupted, prepare_generation, read_generation,
 )
+from project_open_items import list_open_items, resolve_open_item
 from project_baseline import (
     capture_project_baseline, check_project_changes, get_project_baseline,
     list_project_baselines,
@@ -94,6 +95,7 @@ from execution_service import (
     continue_execution,
     create_iteration as create_project_iteration,
     create_task as create_execution_task,
+    rebase_iteration as rebase_project_iteration,
     reconcile_execution, reply_permission as reply_execution_permission,
     reply_question as reply_execution_question, start_execution, stop_execution,
 )
@@ -167,8 +169,9 @@ def _run_project_generation(store, project_id, run_id):
 def project_generation_status(store, project_id, run_id):
     run = read_generation(store, project_id, run_id)
     if run["status"] in {"queued", "running"} and run_id not in PROJECT_GENERATION_THREADS:
-        return mark_generation_interrupted(store, project_id, run_id)
-    return run
+        run = mark_generation_interrupted(store, project_id, run_id)
+    staleness = generation_staleness(store, project_id, run)
+    return {**run, "stale": staleness["stale"], "stale_known": staleness["known"]}
 
 
 def project_generation_list(store, project_id):
@@ -714,7 +717,10 @@ class Handler(BaseHTTPRequestHandler):
         m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/workspace$", path)
         if m:
             try:
-                return self._json(project_workspace(get_project_store(), m.group(1)))
+                store = get_project_store()
+                payload = project_workspace(store, m.group(1))
+                payload["open_items"] = list_open_items(store, m.group(1))
+                return self._json(payload)
             except ProjectStoreError as error:
                 return self._json({"error": str(error)}, 404)
         m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/generation-runs$", path)
@@ -852,6 +858,17 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"error": str(error)}, _project_error_code(error))
             except (ValueError, json.JSONDecodeError) as error:
                 return self._json({"error": str(error)}, 400)
+        m = re.match(
+            r"^/api/projects/(prj_[A-Za-z0-9]+)/iterations/(itr_[A-Za-z0-9]+)/rebase$",
+            path)
+        if m:
+            try:
+                return self._json(rebase_project_iteration(
+                    get_project_store(), m.group(1), m.group(2), self._body()))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, _project_error_code(error))
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
         m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/tasks$", path)
         if m:
             try:
@@ -983,7 +1000,8 @@ class Handler(BaseHTTPRequestHandler):
                 body = self._body()
                 return self._json(apply_generation_item(
                     get_project_store(), m.group(1), m.group(2),
-                    body.get("item_kind"), body.get("index")), 201)
+                    body.get("item_kind"), body.get("index"),
+                    confirm_stale=body.get("confirm_stale", False)), 201)
             except ProjectStoreError as error:
                 message = str(error)
                 code = 409 if message in {
@@ -1041,6 +1059,29 @@ class Handler(BaseHTTPRequestHandler):
             except ProjectStoreError as error:
                 code = 409 if str(error) == "document version conflict" else 404
                 return self._json({"error": str(error)}, code)
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
+        m = re.match(
+            r"^/api/projects/(prj_[A-Za-z0-9]+)/documents/(doc_[A-Za-z0-9]+)/review$",
+            path)
+        if m:
+            try:
+                body = self._body()
+                if not isinstance(body, dict) or not isinstance(body.get("status"), str):
+                    raise ValueError("status is required")
+                return self._json(get_project_store().review_document(
+                    m.group(1), m.group(2), body["status"], body.get("note", "")))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, _project_error_code(error))
+            except (ValueError, json.JSONDecodeError) as error:
+                return self._json({"error": str(error)}, 400)
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/open-items/resolve$", path)
+        if m:
+            try:
+                return self._json(resolve_open_item(
+                    get_project_store(), m.group(1), self._body()))
+            except ProjectStoreError as error:
+                return self._json({"error": str(error)}, _project_error_code(error))
             except (ValueError, json.JSONDecodeError) as error:
                 return self._json({"error": str(error)}, 400)
         m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/export$", path)

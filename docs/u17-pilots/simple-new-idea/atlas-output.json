@@ -873,5 +873,29 @@
       "首次未提权运行真实 HTTP 验收时因沙箱禁止绑定 127.0.0.1 临时端口失败；允许本地端口后复跑通过。",
       "全量测试仍有既有 socket ResourceWarning，不影响断言结果。"
     ]
+  },
+  "seventeenth_round_evidence": {
+    "round": 17,
+    "code_baseline": "snap_7a81e767f75747e2acee4eb36154d878",
+    "changed_paths": [
+      "static/app.js",
+      "static/index.html",
+      "static/styles.css"
+    ],
+    "implementation": [
+      "默认语言为中文；用户可通过头部 EN/中文按钮切换，选择保存在 localStorage 的 planner_lang。",
+      "项目、当天承诺、最近删除、数据备份和安全快照的静态文案、动态列表、计数、时间格式和恢复提示均随语言切换重新渲染。",
+      "语言按钮和页面头部在窄屏下采用流式布局，不遮挡标题；本轮不改变数据模型、API 或备份格式。"
+    ],
+    "verification": [
+      "python3 -m py_compile app.py tests/test_app.py",
+      "node --check static/app.js",
+      "python3 -m unittest discover -s tests -v: 202/202 workspace tests passed",
+      "真实 HTTP 静态资源验收通过：/ 返回中文默认页面、/static/app.js 包含 planner_lang 与 toggleLanguage、/static/styles.css 包含语言按钮与移动端布局规则。"
+    ],
+    "notes": [
+      "本轮只整理界面语言和空状态文案，不扩大产品功能范围。",
+      "Safety Backups 仍只支持预览和确认恢复；本轮没有增加删除快照或打开本机目录。"
+    ]
   }
 }
