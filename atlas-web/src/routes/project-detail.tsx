@@ -163,6 +163,7 @@ export function ProjectDetail() {
       <ProjectStatusHeader workspace={data} activeIteration={activeIteration} hasBaseline={hasBaseline}
         nextStep={lifecycleSteps(data, hasBaseline).find((item) => !item.done) || null} />
       {!data.iterations.length ? <FirstWorkspaceHint lang={lang} /> : null}
+      {activeIteration ? <ExecutionReadiness lang={lang} preflight={harnessPreflight} /> : null}
 
       <StageSection stage={STAGES[0]}>
         <LifecycleOverview workspace={data} hasBaseline={hasBaseline} />
@@ -374,6 +375,31 @@ function FirstWorkspaceHint({ lang }: { lang: "zh" | "en" }) {
           <a className="rounded-full bg-surface px-3 py-1.5 text-primary shadow-card hover:underline" href="#stage-plan">{lang === "zh" ? "3 · 冻结计划" : "3 · Freeze plan"}</a>
           <Link className="px-2 py-1.5 text-muted hover:text-fg" to="/tutorial">{lang === "zh" ? "查看完整教程" : "Read the full tutorial"}</Link>
         </div>
+      </div>
+    </div>
+  </section>;
+}
+
+function ExecutionReadiness({ lang, preflight }: { lang: "zh" | "en"; preflight: HarnessPreflight | null }) {
+  const status = preflight?.status || "checking";
+  const tone = status === "passed" ? "bg-primary/10 text-primary" : status === "failed" ? "bg-danger/10 text-danger" : "bg-warn/10 text-warn";
+  return <section className={`mt-4 rounded-xl p-4 text-sm ${tone}`}>
+    <div className="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <p className="font-medium">{lang === "zh" ? "执行准备" : "Execution readiness"}</p>
+        <p className="mt-1 text-xs leading-5">
+          {status === "checking"
+            ? (lang === "zh" ? "正在检查 OpenCode 和 provider，稍后会显示是否可以启动任务。" : "Checking OpenCode and its provider; readiness will appear shortly.")
+            : status === "passed"
+              ? (lang === "zh" ? `已准备好：${preflight?.version || "OpenCode"} · provider 检查通过。` : `Ready: ${preflight?.version || "OpenCode"} · provider check passed.`)
+              : status === "not_configured"
+                ? (lang === "zh" ? "尚未配置 OpenCode；完成配置后才能启动隔离执行。" : "OpenCode is not configured; configure it before starting an isolated run.")
+                : (lang === "zh" ? "检查未通过；修复环境后回到这里重新检查。" : "The check failed; fix the environment and return here to check again.")}
+        </p>
+      </div>
+      <div className="flex flex-wrap gap-2 text-xs">
+        <a className="rounded-full bg-surface px-3 py-1.5 text-primary shadow-card hover:underline" href="#stage-execute">{lang === "zh" ? "查看执行区" : "View execution"}</a>
+        {status === "not_configured" || status === "failed" ? <Link className="px-2 py-1.5 text-muted hover:text-fg" to="/tutorial">{lang === "zh" ? "查看配置说明" : "Read setup guide"}</Link> : null}
       </div>
     </div>
   </section>;
