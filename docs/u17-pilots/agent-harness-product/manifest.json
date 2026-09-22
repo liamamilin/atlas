@@ -43,9 +43,9 @@
     "latest_analysis_open_questions": 5,
     "latest_analysis_conflicts": 4,
     "latest_analysis_suggestions": 6,
-    "implementation_boundary": "研究与文档最佳实践已完成；M0 CLI 预检、provider 配置检查、最小连通性冒烟和 .atlas/harness.json 兼容基线已通过；M1 CLI 适配器、显式 CLI 执行分支、启动前 preflight、运行证据索引、固定验证步骤映射、显式清理和最小终端入口已实现并有回归测试。真实终端验收已在授权环境完成 CLI、隔离副本、固定验证、权限门、证据和清理复测；只读任务的完整 TUI 路径已通过产品验收；单文件变更任务的执行、显式应用、独立验收和清理已通过。停止和任务级超时链路已通过；失败恢复和回滚仍需另建任务验收。",
+    "implementation_boundary": "研究与文档最佳实践已完成；M0 CLI 预检、provider 配置检查、最小连通性冒烟和 .atlas/harness.json 兼容基线已通过；M1 CLI 适配器、显式 CLI 执行分支、启动前 preflight、运行证据索引、固定验证步骤映射、显式清理和最小终端入口已实现并有回归测试。真实终端验收已在授权环境完成 CLI、隔离副本、固定验证、权限门、证据和清理复测；只读任务的完整 TUI 路径已通过产品验收；单文件变更任务的执行、显式应用、独立验收和清理已通过。停止、任务级超时和 OpenCode 失败恢复链路已通过；应用后回滚仍需另建任务验收。",
     "next_implementation_questions": [
-      "失败恢复和回滚路径是否满足产品验收",
+      "应用后的回滚/撤销路径是否满足产品验收",
       "任务状态、证据包和工作副本清理在变更任务中是否与网页工作台一致",
       "后续产品路线是否需要并行任务、take-over、历史列表或多入口",
       "是否支持多个并行任务会话",
@@ -100,7 +100,7 @@
       "tui_integration": "minimal_terminal_slice_integrated"
     },
     "m1_real_acceptance": {
-      "status": "real_cli_read_only_tui_bounded_mutation_stop_and_timeout_accepted",
+      "status": "real_cli_read_only_tui_bounded_mutation_stop_timeout_and_failure_recovery_accepted",
       "task_id": "tsk_4aa41e37e50448388589db2b2f9081c9",
       "execution_id": "exe_fc680ac2fbe94ff491f5cab3a534dfb9",
       "preflight": "passed",
@@ -183,7 +183,7 @@
         "cleanup": "completed"
       },
       "acceptance_status": "passed_read_only_tui_path",
-      "next_action": "单文件变更、停止和任务级超时链路已完成；下一步仅在需要时单独验收失败恢复和回滚",
+      "next_action": "单文件变更、停止、任务级超时和 OpenCode 失败恢复已完成；下一步仅在需要时单独验收应用后回滚",
       "mutation_acceptance": {
         "status": "passed",
         "task_id": "tsk_990032f6aebc443f938b967ba54e0293",
@@ -219,6 +219,17 @@
         "source_workspace_modified": false,
         "cleanup": "completed_and_evidence_preserved",
         "evidence": "m1-timeout-acceptance.md"
+      },
+      "failure_recovery_acceptance": {
+        "status": "passed",
+        "task_id": "tsk_d22d2a5fc92e416cbe7206d98ce82a28",
+        "execution_id": "exe_bbecc92c8acc4904a485e4ccd4781dc2",
+        "iteration_id": "itr_927707ced8fb4c6096afd5c6d61a4f7a",
+        "execution_status": "failed",
+        "exit_code": 1,
+        "source_workspace_modified": false,
+        "cleanup": "completed_and_evidence_preserved",
+        "evidence": "m1-failure-recovery-acceptance.md"
       }
     }
   },
