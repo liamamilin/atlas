@@ -336,6 +336,7 @@ export interface ProjectTask {
   objective: string;
   write_paths: string[];
   verification_commands: string[];
+  timeout_seconds?: number | null;
   execution_status: "planned" | "queued" | "running" | "waiting_permission" | "waiting_input" | "completed" | "failed" | "stopped" | "unknown";
   acceptance_status: "pending" | "passed" | "failed" | "waived";
   acceptance_evidence: { kind: string; summary: string; [key: string]: unknown }[];
@@ -1077,6 +1078,7 @@ export async function createProjectTask(projectId: string, input: {
   requirement_ids: string[];
   write_paths: string[];
   verification_commands: string[];
+  timeout_seconds?: number;
 }) {
   const result = await requestJson<ProjectTask>(
     `/api/projects/${encodeURIComponent(projectId)}/tasks`, {
