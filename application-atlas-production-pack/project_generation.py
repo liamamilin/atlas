@@ -12,8 +12,10 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import threading
+import tempfile
 import uuid
 
 from atlas_runtime import atomic_json, atomic_write
@@ -789,23 +791,39 @@ def _run_opencode(directory: Path, run: dict) -> tuple[dict, dict]:
     atomic_write(workspace / "input.md", (directory / "input.md").read_text())
     atomic_write(workspace / "prompt.md", (directory / "prompt.md").read_text())
     atomic_json(workspace / "opencode.json", config)
-    command = ["opencode", "run", "--pure", "--dir", str(workspace), "--format", "json",
-               "--title", f"Atlas U17 {run['id']}"]
-    if run["model"]:
-        command.extend(["--model", run["model"]])
-    command.append((workspace / "prompt.md").read_text())
-    environment = dict(os.environ)
-    environment["OPENCODE_CONFIG"] = str(workspace / "opencode.json")
-    with (directory / "engine.log").open("wb") as log:
-        process = subprocess.run(
-            command, cwd=workspace, env=environment, stdout=log, stderr=subprocess.STDOUT,
-            timeout=1800)
-    if process.returncode:
-        raise RuntimeError(f"OpenCode exited with status {process.returncode}")
-    result_path = workspace / "result.json"
-    if not result_path.is_file() or result_path.stat().st_size > MAX_RESULT_BYTES:
-        raise RuntimeError("OpenCode did not produce a valid-sized result.json")
-    result = json.loads(result_path.read_text())
+    # Keep the runtime directory outside the repository. OpenCode's `--dir`
+    # scope is reliable with the verified Homebrew binary, while the PATH
+    # binary on this machine resolves to a different CLI build and can fail
+    # before the model is invoked. The canonical inputs remain under the run
+    # directory for evidence; only their copies are exposed to the provider.
+    with tempfile.TemporaryDirectory(prefix="atlas-generation-") as runtime_name:
+        runtime = Path(runtime_name)
+        for name in ("input.json", "input.md", "prompt.md", "opencode.json"):
+            shutil.copy2(workspace / name, runtime / name)
+        configured_executable = os.environ.get("ATLAS_OPENCODE_BINARY", "").strip()
+        if not configured_executable:
+            homebrew_executable = Path("/opt/homebrew/bin/opencode")
+            configured_executable = str(homebrew_executable) \
+                if homebrew_executable.is_file() else (shutil.which("opencode") or "opencode")
+        command = [configured_executable, "run", "--pure", "--dir", str(runtime),
+                   "--format", "json", "--title", f"Atlas U17 {run['id']}"]
+        if run["model"]:
+            command.extend(["--model", run["model"]])
+        command.append((runtime / "prompt.md").read_text())
+        environment = dict(os.environ)
+        environment["OPENCODE_CONFIG"] = str(runtime / "opencode.json")
+        with (directory / "engine.log").open("wb") as log:
+            process = subprocess.run(
+                command, cwd=runtime, env=environment, stdout=log, stderr=subprocess.STDOUT,
+                timeout=1800)
+        if process.returncode:
+            raise RuntimeError(f"OpenCode exited with status {process.returncode}")
+        result_path = runtime / "result.json"
+        if not result_path.is_file() or result_path.stat().st_size > MAX_RESULT_BYTES:
+            raise RuntimeError("OpenCode did not produce a valid-sized result.json")
+        result_text = result_path.read_text()
+        atomic_write(workspace / "result.json", result_text)
+        result = json.loads(result_text)
     return result, {"engine_session_id": _extract_session_id(directory / "engine.log")}
 
 

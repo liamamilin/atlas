@@ -1,0 +1,252 @@
+{
+  "schema": 1,
+  "case_id": "multi-type-delivery-scheduling",
+  "title": "客户项目交付与个人排程",
+  "protocol_frozen_at": "2026-09-21T13:00:11Z",
+  "status": "t1-t5-accepted-analysis-boundary",
+  "purpose": "验证 Atlas 能否把多个应用类型的正式资料组合成可执行的项目交付、个人排程和客户决策范围，并明确数据归属与交接边界。",
+  "model": {
+    "provider_model": "opencode-go/mimo-v2.5",
+    "client": "OpenCode 1.18.31",
+    "variant": null
+  },
+  "initial_goal": "为小型客户交付团队设计一条从项目 backlog 到个人可用时段，再到客户反馈与验收的可追踪流程。首轮只确认记录归属、交接标识、状态映射、权限、同步和失败恢复；不承诺自动双向同步或完整客户门户实现。",
+  "sources": [
+    {
+      "id": "MT-S1",
+      "path": "application-atlas-production-pack/applications/agile-project-management-application.md",
+      "sha256": "d6fde2ee8a591df3cf2a1cd4a1b8c8c399eb84f6618d5b6635dcab4517fcf185",
+      "atlas_reference_id": "ref_ffb60e867d5b496f9f76d9cb20046a7a",
+      "source_role": "项目、backlog、工作项、状态、完成条件和交付节奏的类型事实"
+    },
+    {
+      "id": "MT-S2",
+      "path": "application-atlas-production-pack/applications/calendar-application.md",
+      "sha256": "b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d",
+      "atlas_reference_id": "ref_963c39cd67234195a4ccced60895322d",
+      "source_role": "带时间锚点的事件、可用时段和日程网格的类型事实"
+    },
+    {
+      "id": "MT-S3",
+      "path": "application-atlas-production-pack/applications/approval-workflow-platform.md",
+      "sha256": "937fe5167db755c0a2f973345a7a0b94b4928b92c15cd547ffb51f1ac07d9718",
+      "atlas_reference_id": "ref_b1ea9dbd14a847589188c269bb4a295a",
+      "source_role": "请求路由、审批决定、显式状态和可审计决策历史的类型事实"
+    }
+  ],
+  "first_iteration": {
+    "requirements": [
+      {
+        "id": "MT-R1",
+        "text": "项目工作项是交付范围的主记录；个人日程只引用工作项并记录时间承诺；客户审批请求是客户决定的主记录。三者通过稳定 ID、来源类型和状态映射关联。",
+        "acceptance": [
+          "能列出项目、排程、交付物、客户决定各自的主记录和引用关系",
+          "任务进入日程、交付物进入审批和审批返回项目时均保留稳定关联 ID"
+        ]
+      },
+      {
+        "id": "MT-R2",
+        "text": "交接必须显式记录状态、责任人、时间戳和失败恢复动作；同步失败或客户退回时不能静默覆盖项目状态。",
+        "acceptance": [
+          "至少覆盖排程冲突、审批退回、审批超时和重复回调四种异常",
+          "每种异常都有重试、人工接管或回滚路径"
+        ]
+      },
+      {
+        "id": "MT-R3",
+        "text": "首轮只交付跨类型数据契约、状态映射和可导出的开发文档，不实现自动双向同步、完整客户认证、计费或资源级自动排程。",
+        "acceptance": [
+          "范围表明确当前、后续和排除项",
+          "导出包可由新会话独立理解并继续开发"
+        ]
+      }
+    ],
+    "excluded_scope": [
+      "自动双向同步和最终一致性平台",
+      "完整客户账号、计费和多租户权限系统",
+      "按资源和技能自动排程",
+      "真实邮件、日历或审批供应商接入",
+      "替换 Atlas 或自研通用 agent harness"
+    ]
+  },
+  "atlas_project_id": "prj_255962a2629b4a4daf8d8c8f34e6b79e",
+  "atlas_record": {
+    "references_status": "fixed-and-read",
+    "reference_ids": [
+      "ref_ffb60e867d5b496f9f76d9cb20046a7a",
+      "ref_963c39cd67234195a4ccced60895322d",
+      "ref_b1ea9dbd14a847589188c269bb4a295a"
+    ],
+    "ordinary_generation_must_finish_before_atlas_generation": true,
+    "generation_status": "documents-generated-and-applied",
+    "generation_run_ids": [
+      "gen_7fe80ba680684482b97a3d27464e3494",
+      "gen_19c505bc623f4d3ea718c238ca8eee0a",
+      "gen_17c58cbc138b4f2dbd0b523ea713b92d"
+    ],
+    "failed_runs": [
+      {
+        "id": "gen_7fe80ba680684482b97a3d27464e3494",
+        "reason": "旧版命令参数 --pure/--dir 不受当前 OpenCode 1.18.31 支持",
+        "status": "failed"
+      },
+      {
+        "id": "gen_19c505bc623f4d3ea718c238ca8eee0a",
+        "reason": "去掉旧参数后，OpenCode 后台服务仍解析到仓库根目录，破坏隔离，已主动停止",
+        "status": "failed"
+      },
+      {
+        "id": "gen_17c58cbc138b4f2dbd0b523ea713b92d",
+        "reason": "standalone 重试仍未完成，发现项目根目录探测越界，已主动停止",
+        "status": "failed"
+      }
+    ],
+    "compatibility_fix": "project_generation.py now uses standalone OpenCode in a temporary directory outside the repository; 130 backend tests pass.",
+    "successful_generation_run_id": "gen_7c411b80bad04bbca883058301eaf1f2",
+    "engine_session_id": "ses_f39307384ffeclDhn8qZoXISGD",
+    "input_fingerprint": "2f5d9c06cfcc6b9deadee90eefe31d72ba9701695aa20c6f6a7cc919b6e3a165",
+    "basis_fingerprint": "f4990c6de682a4f305d5ab325d4a63fe58ca3e4d23341d3042c518b2b66bf2b8",
+    "output_sha256": "d1d369f42b51bd46dbe4368b9accecce8b0dcb0d14e79fefdc7ad908a9e40238",
+    "counts": {
+      "questions": 6,
+      "requirements": 6,
+      "conflicts": 3,
+      "suggestions": 6,
+      "documents": 1
+    },
+    "applied": false,
+    "requirement_ids": [
+      "req_a8038841aea54049acda239ef0e6a5c0",
+      "req_8d71b08faa644d9591a08e39921bac89",
+      "req_bdc3a472862e440bb2cc5f1726ceb23d",
+      "req_f3a3f6d8e46a47e9b0ee0f821ad89692",
+      "req_846261511acb4fd1a31d9dad57e4e71f",
+      "req_daef6b4dd9804830bc377c4317c1dd33"
+    ],
+    "requirements_applied_as_unconfirmed": true,
+    "analysis_document_id": "doc_c8f5a5477b3545be8300aeeb797d8b68",
+    "analysis_document_version": 1,
+    "analysis_review_status": "pending",
+    "analysis_document_version_id": "dver_447b6ed595b44bd787cb97497a94f7b4",
+    "document_generation_run_id": "gen_dc3d1f8c3da247619e876be60009d57c",
+    "document_generation_engine_session_id": "ses_f3918a26dffe41PP3aKyIGBe0u",
+    "document_generation_document_ids": {
+      "product-requirements": "doc_2aec9277b13b471b91e9a312fa47f368",
+      "technical-plan": "doc_9f72f5f119c4464db4fb8af20622bf4d",
+      "development-plan": "doc_9259791325d14ef8b6fdf924c597ad35",
+      "acceptance-plan": "doc_c73f217fc18f43db9c062bc4b75347b6"
+    },
+    "document_generation_version_ids": {
+      "product-requirements": "dver_8911cbdcc9ce448bbd578b0105cfda24",
+      "technical-plan": "dver_ab7b18a63b194a88a1c05c8cc5e2104d",
+      "development-plan": "dver_616984bc45cd4f80a6e31b876f7c64bf",
+      "acceptance-plan": "dver_de68c86b18c14931919c76d810fe068a"
+    },
+    "documents_applied": true,
+    "implementation_decision_ids": [
+      "dec_f09b752a574548fa83ae147097d06348",
+      "dec_521ec3d8963e457f9832d9376014b4c5",
+      "dec_3d702cc86126424f8703d6bf3ee6c7e9"
+    ],
+    "document_review_status": "completed-with-three-implementation-decisions",
+    "baseline_id": "snap_159b9845606e43d38c1a101cea2320cd",
+    "iteration_id": "itr_a750761320744c4b98543ff8ef81c07e",
+    "task_ids": [
+      "tsk_8b48ce2c414b41be8bb5fb66afdce872",
+      "tsk_ce239372c539454a805fd0c6e661f1fc",
+      "tsk_23d65fff61084be5838790963db1b57f",
+      "tsk_94d68a786e0b47d3814c10477e82ace6",
+      "tsk_0d37b11dafe5455eaba85ce059083c43"
+    ],
+    "completed_task_ids": [
+      "tsk_8b48ce2c414b41be8bb5fb66afdce872",
+      "tsk_ce239372c539454a805fd0c6e661f1fc",
+      "tsk_23d65fff61084be5838790963db1b57f",
+      "tsk_94d68a786e0b47d3814c10477e82ace6",
+      "tsk_0d37b11dafe5455eaba85ce059083c43"
+    ],
+    "completed_execution_ids": [
+      "exe_3e9789366db142b68a9ec77320156905",
+      "exe_30cdbb897bcb4595a607d7eeb01e4cbc",
+      "exe_b94bd5c8c8084c948faf10ea08e86cc3",
+      "exe_6558300bb9434cbeb2e1c5d59f1b06d1",
+      "exe_5b4fad2544fd447ca7795f96f705efc3"
+    ],
+    "t5_analysis_execution_id": "exe_5b4fad2544fd447ca7795f96f705efc3",
+    "t5_analysis_boundary": "contract-based read-only scenario analysis; no live provider or simulation adapter",
+    "failed_execution_ids": [
+      "exe_99df9621ff324c78b289d0ec28a1076f"
+    ],
+    "last_applied_snapshot_id": "snap_a13ce03385e44ee09d16e9097df5b118"
+  },
+  "ordinary_run": {
+    "mode": "single_response_without_atlas_workflow",
+    "pure": true,
+    "input_file": "ordinary-input.md",
+    "output_file": "ordinary-output.md",
+    "raw_events_file": "ordinary-events.jsonl",
+    "status": "completed-with-one-input-failure-preserved",
+    "block_reason": "自动审批拒绝将包含非公开客户交付/排程/审批案例材料发送给外部 OpenCode provider；未绕过。",
+    "session_id": "see ordinary-run.json argv/evidence",
+    "summary": {
+      "status": "completed",
+      "exitCode": 0,
+      "timedOut": false,
+      "argv": [
+        "/opt/homebrew/bin/opencode",
+        "run",
+        "--format",
+        "json",
+        "--model",
+        "opencode-go/mimo-v2.5",
+        "Read ordinary-input.md and the three named source documents in the same directory, and follow it exactly. Return only the requested Chinese Markdown proposal. Do not read any other files, do not search the network, do not execute code, and do not modify files.",
+        "--dir",
+        "/private/tmp/u17-ordinary-multi-type"
+      ],
+      "stdoutBytes": 144927,
+      "stderrBytes": 0,
+      "jsonEventCount": 11,
+      "eventTypes": [
+        "step_finish",
+        "step_start",
+        "text",
+        "tool_use"
+      ],
+      "diagnosticCode": null,
+      "diagnosticHint": null
+    },
+    "input_sha256": "d885eb7dafc93b5c50e31be58df1da4d2a68755204e7090d896b042cf8189974",
+    "output_sha256": "98817561a07fb55ace410a8505190c631f8cf2274b3c889be7311c31d7f4f883",
+    "raw_events_sha256": "aa542ceb11ca49cb6da46fd6c7650914bb9d6f3376f63903222faed39f9becaa",
+    "attempt_1_status": "completed-but-invalid-input-missing-source-files",
+    "attempt_1_files": [
+      "ordinary-output-attempt-1.md",
+      "ordinary-events-attempt-1.jsonl",
+      "ordinary-run-attempt-1.json"
+    ],
+    "corrected_input": "three source documents copied into isolated directory before retry"
+  },
+  "comparison_fields": [
+    "多类型边界是否被混为一个系统",
+    "主记录和引用关系是否明确",
+    "状态、权限和失败恢复是否可执行",
+    "开发前仍需追问的问题",
+    "无依据的自动同步或自动排程承诺",
+    "范围确认和文档生成的重试次数"
+  ],
+  "timing": {
+    "protocol_frozen": "2026-09-21T13:00:11Z",
+    "ordinary_start": "待普通基线生成",
+    "atlas_start": "普通基线完成后",
+    "scope_confirmed": "2026-09-22T02:17:09Z",
+    "document_generation": "2026-09-22T02:19:13Z"
+  },
+  "completion_gate": [
+    "普通基线和 Atlas 固定输入均已封存",
+    "三类来源事实、项目假设、推断和待决问题分栏",
+    "六项首轮候选需求已确认并记录决策",
+    "产品、技术、开发和验收文档已生成并应用到 Atlas 工作区",
+    "结构化任务、独立交接核对和范围取舍有记录"
+  ],
+  "next_action": "案例三分析与契约验收完成；如继续，单独规划模拟适配器开发，否则封存为产品使用最佳实践案例。"
+}

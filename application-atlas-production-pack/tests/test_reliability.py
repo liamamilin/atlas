@@ -19,6 +19,7 @@ import numpy as np
 CODE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(CODE))
 import atlas_runtime as rt
+import atlas_cli
 import classify as classifier
 import draft_new
 import gate_check
@@ -35,6 +36,10 @@ from execution_service import (
     create_task as create_execution_task,
     rebase_iteration,
     reconcile_execution, start_execution, stop_execution,
+    record_cli_run_evidence,
+    cleanup_execution_workspace,
+    start_cli_execution,
+    run_cli_verification,
 )
 from project_store import ProjectStore, ProjectStoreError
 from project_export import export_project
@@ -2236,6 +2241,8 @@ class ExecutionServiceTests(unittest.TestCase):
                          ['src/app.py'])
         self.assertTrue(completed['raw_state']['evidence']['filesystem']['scope_compliant'])
         self.assertTrue(completed['raw_state']['evidence']['verification']['all_planned_passed'])
+        self.assertEqual(completed['raw_state']['evidence']['run_summary']['status'], 'completed')
+        self.assertIsNone(completed['raw_state']['evidence']['run_summary']['exitCode'])
         completion = completed['raw_state']['evidence']['completion_report']
         self.assertTrue(completion['valid'])
         self.assertEqual(completion['requirements'][0]['status'], 'satisfied')
@@ -2259,6 +2266,7 @@ class ExecutionServiceTests(unittest.TestCase):
                 'input_document_versions': [self.document['version_id']],
                 'requirement_ids': [self.requirement['id']],
             })
+
         self.assertEqual(self.store.get_task(self.task['id'])['acceptance_status'], 'pending')
         exported = export_project(self.store, self.project['id'])
         self.assertEqual(exported['manifest']['schema'], 5)
@@ -2274,6 +2282,119 @@ class ExecutionServiceTests(unittest.TestCase):
             self.assertTrue(records['executions'][0]['raw_state']['evidence']
                             ['verification']['all_planned_passed'])
             self.assertIn(f"handoffs/{self.task['id']}.md", bundle.namelist())
+
+    def test_cli_run_evidence_is_persisted_outside_workspace_and_indexed(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        result = record_cli_run_evidence(self.store, self.project['id'], execution['id'], {
+            'argv': ['opencode', 'run', '--format', 'json'],
+            'exitCode': 0,
+            'timedOut': False,
+            'stdout': '{"type":"run.finished"}\n',
+            'stderr': '',
+        })
+        evidence = result['raw_state']['evidence']['cli_run']
+        self.assertEqual(evidence['summary']['status'], 'completed')
+        self.assertTrue(Path(evidence['directory']).is_dir())
+        self.assertTrue((Path(evidence['directory']) / 'run.json').exists())
+        self.assertNotIn(str(self.workspace), evidence['directory'])
+
+    def test_cli_failure_and_timeout_evidence_remain_distinguishable(self):
+        for exit_code, timed_out, expected in ((2, False, 'failed'), (124, True, 'timed_out')):
+            execution = start_execution(
+                self.store, self.project['id'], self.task['id'], {}, self.client)
+            result = record_cli_run_evidence(self.store, self.project['id'], execution['id'], {
+                'argv': ['opencode', 'run', '--format', 'json'],
+                'exitCode': exit_code,
+                'timedOut': timed_out,
+                'stdout': '',
+                'stderr': 'provider failure' if not timed_out else 'command timed out',
+            })
+            result = self.store.update_execution(execution['id'], {
+                'state': 'failed',
+                'engine_status': 'cli_test',
+                'evidence': result['raw_state']['evidence'],
+            }, execution.get('engine_message_id'))
+            summary = result['raw_state']['evidence']['cli_run']['summary']
+            self.assertEqual(summary['status'], expected)
+            self.assertNotEqual(summary['status'], 'completed')
+
+    def test_cleanup_requires_terminal_execution_and_preserves_evidence(self):
+        running = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        with self.assertRaisesRegex(ProjectStoreError, 'finished execution'):
+            cleanup_execution_workspace(self.store, self.project['id'], running['id'])
+
+        self.client.mode = 'completed'
+        completed = reconcile_execution(
+            self.store, self.project['id'], running['id'], self.client)
+        workdir = Path(completed['workdir'])
+        record_cli_run_evidence(self.store, self.project['id'], completed['id'], {
+            'argv': ['opencode', 'run'], 'exitCode': 0, 'timedOut': False,
+            'stdout': '{"type":"run.finished"}\n', 'stderr': '',
+        })
+        apply_execution_result(self.store, self.project['id'], completed['id'])
+        completed = self.store.get_execution(completed['id'])
+        evidence_dir = self.store.path.parent / 'execution-evidence' / self.project['id'] / completed['id']
+        self.assertTrue(workdir.exists())
+        cleaned = cleanup_execution_workspace(
+            self.store, self.project['id'], completed['id'])
+        self.assertFalse(workdir.exists())
+        self.assertTrue((evidence_dir / 'run.json').exists())
+        self.assertEqual(cleaned['raw_state']['evidence']['cleanup']['status'], 'cleaned')
+        self.assertTrue(cleaned['raw_state']['evidence']['cleanup']['evidence_preserved'])
+
+    def test_cli_transport_runs_in_isolation_and_records_terminal_evidence(self):
+        cli_task = create_execution_task(self.store, self.project['id'], {
+            'iteration_id': self.iteration['id'], 'kind': 'code',
+            'title': 'CLI transport task', 'objective': 'Run the CLI transport path.',
+            'input_document_versions': [self.document['version_id']],
+            'requirement_ids': [self.requirement['id']], 'write_paths': ['src'],
+            'verification_commands': ['python3 -c "print(\'cli verification\')"'],
+        })
+        config_dir = self.workspace / '.atlas'
+        config_dir.mkdir()
+        (config_dir / 'harness.json').write_text(json.dumps({
+            'backend': {'openCode': {
+                'minimumCompatibleVersion': '1.18.31',
+                'installSource': {'binaryPath': sys.executable},
+            }},
+            'provider': {'results': [{'name': 'OpenAI'}]},
+        }))
+        checked = check_project_changes(self.store, self.project['id'])
+        adopted = capture_project_baseline(
+            self.store, self.project['id'], ['src'], self.baseline['id'],
+            checked['current']['content_fingerprint'])
+        self.store.rebase_iteration(
+            self.project['id'], self.iteration['id'], adopted['id'], 'CLI transport test')
+
+        from opencode_cli_adapter import CliResult
+        def runner(argv, cwd, timeout):
+            return CliResult(tuple(argv), 0, '{"type":"run.finished"}\n', '')
+
+        with patch('execution_service.opencode_preflight', return_value={'status': 'passed'}):
+            execution = start_cli_execution(
+                self.store, self.project['id'], cli_task['id'],
+                {'model': 'openai/gpt', 'transport': 'cli'}, runner=runner)
+        self.assertEqual(execution['engine'], 'opencode-cli')
+        self.assertEqual(execution['status'], 'completed')
+        self.assertEqual(execution['raw_state']['evidence']['cli_run']['summary']['status'], 'completed')
+        self.assertEqual(execution['raw_state']['evidence']['run_summary']['exitCode'], 0)
+        self.assertTrue(execution['raw_state']['evidence']['verification']['all_planned_passed'])
+        self.assertEqual(execution['raw_state']['evidence']['tool_calls']['commands'][0]['exit'], 0)
+        self.assertEqual((self.workspace / 'src/app.py').read_text(), 'VALUE = 1\n')
+
+    def test_cli_verification_maps_steps_and_timeout(self):
+        result = run_cli_verification(
+            self.workspace,
+            ['python3 -c "print(\'ok\')"', 'sleep 2'],
+            timeout_seconds=1)
+        commands = result['tool_calls']['commands']
+        self.assertEqual(commands[0]['status'], 'completed')
+        self.assertEqual(commands[0]['exit'], 0)
+        self.assertEqual(commands[1]['status'], 'timed_out')
+        self.assertTrue(commands[1]['timedOut'])
+        self.assertFalse(result['verification']['all_planned_passed'])
 
     def test_reconcile_keeps_permission_as_first_class_interaction(self):
         execution = start_execution(
@@ -2957,6 +3078,226 @@ class CorpusTests(unittest.TestCase):
         self.assertTrue(result['promoted'])
         self.assertIn('Existing Tool / New Tool',(self.pack/'DIRECTORY.md').read_text())
         self.assertEqual(json.loads((self.web/'meta.json').read_text())['leafCount'],1)
+
+
+class OpenCodeCliAdapterTests(unittest.TestCase):
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp())
+        (self.root / ".atlas").mkdir()
+        (self.root / ".atlas" / "harness.json").write_text(json.dumps({
+            "backend": {"openCode": {"minimumCompatibleVersion": "1.18.31",
+                                       "installSource": {"binaryPath": "/usr/local/bin/opencode"}}},
+            "provider": {"results": [{"name": "OpenAI"}, {"name": "OpenCode Go"}]},
+            "policy": {"commandTimeoutSeconds": 10},
+        }))
+
+    def test_preflight_returns_safe_evidence_without_command_output(self):
+        from opencode_cli_adapter import CliResult, preflight
+        def runner(argv, cwd, timeout):
+            if argv[-1] == "--version":
+                return CliResult(tuple(argv), 0, "opencode 1.18.31\n", "")
+            return CliResult(tuple(argv), 0, "OpenAI\nOpenCode Go\nsecret-like-value\n", "")
+        with patch("opencode_cli_adapter.resolve_executable", return_value="/usr/local/bin/opencode"):
+            result = preflight(self.root, runner)
+        self.assertEqual(result["status"], "passed")
+        self.assertEqual(result["version"], "1.18.31")
+        self.assertNotIn("secret-like-value", json.dumps(result))
+        self.assertEqual(result["providerNames"], ["OpenAI", "OpenCode Go"])
+
+    def test_preflight_rejects_version_below_baseline(self):
+        from opencode_cli_adapter import CliResult, HarnessCompatibilityError, preflight
+        def runner(argv, cwd, timeout):
+            return CliResult(tuple(argv), 0, "1.17.0\n", "")
+        with patch("opencode_cli_adapter.resolve_executable", return_value="/usr/local/bin/opencode"):
+            with self.assertRaises(HarnessCompatibilityError) as raised:
+                preflight(self.root, runner)
+        self.assertEqual(raised.exception.code, "version_incompatible")
+
+    def test_preflight_marks_provider_check_failure_without_leaking_output(self):
+        from opencode_cli_adapter import CliResult, preflight
+
+        def runner(argv, cwd, timeout):
+            if argv[-1] == "--version":
+                return CliResult(tuple(argv), 0, "opencode 1.18.31\n", "")
+            return CliResult(tuple(argv), 2, "", "provider credentials unavailable: secret-token")
+
+        with patch("opencode_cli_adapter.resolve_executable", return_value="/usr/local/bin/opencode"):
+            result = preflight(self.root, runner)
+        self.assertEqual(result["status"], "failed")
+        self.assertFalse(result["checks"]["providers"]["passed"])
+        self.assertNotIn("secret-token", json.dumps(result))
+
+    def test_preflight_marks_timeout_as_failed(self):
+        from opencode_cli_adapter import CliResult, preflight
+
+        def runner(argv, cwd, timeout):
+            if argv[-1] == "--version":
+                return CliResult(tuple(argv), 0, "opencode 1.18.31\n", "")
+            return CliResult(tuple(argv), 124, "", "", timed_out=True)
+
+        with patch("opencode_cli_adapter.resolve_executable", return_value="/usr/local/bin/opencode"):
+            result = preflight(self.root, runner)
+        self.assertEqual(result["status"], "failed")
+        self.assertTrue(result["diagnostics"]["timedOut"])
+
+    def test_build_run_argv_is_shell_free_and_scoped(self):
+        from opencode_cli_adapter import build_run_argv
+        argv = build_run_argv("opencode", "echo hello; touch outside", self.root, "openai/gpt")
+        self.assertEqual(argv[:4], ("opencode", "run", "--format", "json"))
+        self.assertIn("--dir", argv)
+        self.assertNotIn("shell", argv)
+
+    def test_summarize_run_normalizes_json_events_and_transport_state(self):
+        from opencode_cli_adapter import summarize_run
+        summary = summarize_run({
+            "argv": ["opencode", "run", "--format", "json"],
+            "exitCode": 0,
+            "timedOut": False,
+            "stdout": '{"type":"step.started"}\nnot-json\n{"type":"step.finished"}\n',
+            "stderr": "warning",
+        })
+        self.assertEqual(summary["status"], "completed")
+        self.assertEqual(summary["jsonEventCount"], 2)
+        self.assertEqual(summary["eventTypes"], ["step.finished", "step.started"])
+        self.assertEqual(summary["stderrBytes"], len("warning".encode("utf-8")))
+
+    def test_summarize_run_distinguishes_timeout_and_failure(self):
+        from opencode_cli_adapter import summarize_run
+        self.assertEqual(summarize_run({"exitCode": 124, "timedOut": True})["status"], "timed_out")
+        self.assertEqual(summarize_run({"exitCode": 2, "timedOut": False})["status"], "failed")
+
+    def test_summarize_run_classifies_local_log_access_failure(self):
+        from opencode_cli_adapter import summarize_run
+        summary = summarize_run({
+            "exitCode": 1,
+            "timedOut": False,
+            "stderr": "Error: Unexpected error\\nUnknown: FileSystem.open (/tmp/opencode.log)",
+        })
+        self.assertEqual(summary["diagnosticCode"], "log_access")
+        self.assertIn("local log", summary["diagnosticHint"])
+
+    def test_summarize_run_classifies_provider_failure_without_raw_message(self):
+        from opencode_cli_adapter import summarize_run
+        summary = summarize_run({
+            "exitCode": 1,
+            "timedOut": False,
+            "stderr": "Unexpected server error. Check server logs for details.",
+        })
+        self.assertEqual(summary["diagnosticCode"], "provider_error")
+        self.assertNotIn("server logs", summary["diagnosticHint"])
+
+    def test_run_prompt_returns_stable_summary_alongside_raw_output(self):
+        from opencode_cli_adapter import CliResult, run_prompt
+
+        def runner(argv, cwd, timeout):
+            return CliResult(tuple(argv), 0, '{"type":"run.finished"}\n', "")
+
+        with patch("opencode_cli_adapter.resolve_executable", return_value="/usr/local/bin/opencode"):
+            result = run_prompt(self.root, "hello", runner=runner)
+        self.assertEqual(result["summary"]["status"], "completed")
+        self.assertEqual(result["summary"]["eventTypes"], ["run.finished"])
+        self.assertEqual(result["stdout"], '{"type":"run.finished"}\n')
+        self.assertFalse((self.root / ".atlas" / "opencode-cli.json").exists())
+
+    def test_write_run_evidence_creates_self_contained_files(self):
+        from opencode_cli_adapter import write_run_evidence
+        directory = self.root / "records" / "run_1"
+        result = write_run_evidence({
+            "argv": ["opencode", "run", "--format", "json"],
+            "exitCode": 0,
+            "timedOut": False,
+            "stdout": '{"type":"run.finished"}\n',
+            "stderr": "",
+        }, directory)
+        self.assertEqual(Path(result["directory"]), directory.resolve())
+        self.assertTrue((directory / "run.json").exists())
+        self.assertEqual((directory / "stdout.txt").read_text(), '{"type":"run.finished"}\n')
+        metadata = json.loads((directory / "run.json").read_text())
+        self.assertEqual(metadata["schema"], 1)
+        self.assertEqual(metadata["summary"]["status"], "completed")
+
+
+class AtlasCliTests(unittest.TestCase):
+    class FakeApi:
+        def __init__(self):
+            self.posts = []
+            self.project = {"id": "prj_demo", "name": "演示项目", "workspace": "/tmp/demo"}
+            self.task = {
+                "id": "tsk_demo", "title": "运行验证", "execution_status": "planned",
+                "acceptance_status": "pending",
+            }
+            self.execution = {
+                "id": "exe_demo", "engine": "opencode-cli", "status": "completed",
+                "application_status": "not_applicable", "raw_state": {"evidence": {
+                    "cli_run": {"summary": {"exitCode": 0, "timedOut": False},
+                                "evidenceDirectory": "/tmp/evidence"}}},
+            }
+
+        def get(self, path):
+            if path == "/api/projects":
+                return [self.project]
+            if path.endswith("/workspace"):
+                return {"project": self.project, "tasks": [self.task], "executions": [self.execution]}
+            if path.endswith("/harness/preflight"):
+                return {"status": "passed"}
+            if path.endswith("/executions/exe_demo"):
+                return self.execution
+            raise AssertionError(path)
+
+        def post(self, path, body=None):
+            self.posts.append((path, body))
+            if path.endswith("/executions"):
+                return self.execution
+            if path.endswith("/cleanup"):
+                return self.execution
+            raise AssertionError(path)
+
+    def test_terminal_entry_defaults_to_read_only_and_renders_chinese(self):
+        api = self.FakeApi()
+        output = []
+        result = atlas_cli.run(
+            atlas_cli.parser().parse_args(["--project", "prj_demo"]),
+            api=api, output=output.append)
+        self.assertEqual(result["project"]["id"], "prj_demo")
+        self.assertFalse(api.posts)
+        self.assertTrue(any("启动前检查: 通过" in line for line in output))
+        self.assertTrue(any("只读模式" in line for line in output))
+
+    def test_terminal_entry_requires_explicit_start_or_cleanup_for_mutations(self):
+        api = self.FakeApi()
+        output = []
+        result = atlas_cli.run(
+            atlas_cli.parser().parse_args(["--project", "prj_demo", "--task", "tsk_demo", "--start"]),
+            api=api, output=output.append)
+        self.assertEqual(result["id"], "exe_demo")
+        self.assertEqual(api.posts[0][1], {"transport": "cli"})
+        self.assertTrue(any('"exitCode": 0' in line for line in output))
+        output.clear()
+        atlas_cli.run(
+            atlas_cli.parser().parse_args(["--project", "prj_demo", "--execution", "exe_demo", "--cleanup"]),
+            api=api, output=output.append)
+        self.assertTrue(api.posts[-1][0].endswith("/cleanup"))
+        self.assertTrue(any("清理" in line for line in output))
+
+    def test_terminal_entry_exposes_keyboard_slice_without_changing_api_contract(self):
+        api = self.FakeApi()
+        args = atlas_cli.parser().parse_args(["--interactive", "--project", "prj_demo"])
+        with patch("atlas_cli._interactive", return_value=0) as interactive:
+            result = atlas_cli.run(args, api=api)
+        self.assertEqual(result, {})
+        interactive.assert_called_once_with(api, args)
+
+    def test_terminal_execution_summary_keeps_verification_transport_fields(self):
+        summary = atlas_cli._execution_summary(self.FakeApi().execution, "zh")
+        self.assertEqual(summary["transport"], "OpenCode CLI")
+        self.assertEqual(summary["exitCode"], 0)
+        self.assertFalse(summary["timedOut"])
+        self.assertIsNone(summary["diagnosticCode"])
+        self.assertEqual(summary["evidenceDirectory"], "/tmp/evidence")
+
+    def test_terminal_status_labels_cover_acceptance_states(self):
+        self.assertEqual(atlas_cli._status("passed", "zh"), "通过")
+        self.assertEqual(atlas_cli._status("waived", "en"), "Waived")
 
 
 if __name__=='__main__':unittest.main()

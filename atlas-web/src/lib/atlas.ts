@@ -364,10 +364,26 @@ export interface ExecutionQuestion {
   custom?: boolean;
 }
 
+export interface HarnessPreflight {
+  status: "passed" | "failed" | "not_configured";
+  configPath?: string;
+  executable?: string;
+  version?: string;
+  minimumVersion?: string;
+  providerNames?: string[];
+  code?: string;
+  message?: string;
+  checks?: {
+    version?: { passed?: boolean; exitCode?: number };
+    providers?: { passed?: boolean; exitCode?: number };
+  };
+  diagnostics?: { providerOutputPresent?: boolean; timedOut?: boolean };
+}
+
 export interface ProjectExecution {
   id: string;
   task_id: string;
-  engine: "opencode";
+  engine: "opencode" | "opencode-cli";
   engine_session_id: string;
   engine_message_id: string | null;
   status: Exclude<ProjectTask["execution_status"], "planned">;
@@ -407,6 +423,7 @@ export interface ProjectExecution {
     write_paths?: string[];
     verification_commands?: string[];
     model?: string;
+    transport?: "http" | "cli";
     continuation_of?: string;
     follow_up_instruction?: string;
     session_user_message_ids_before?: string[];
@@ -435,10 +452,37 @@ export interface ProjectExecution {
         deviations: string[];
       };
       tool_calls?: {
-        commands: { command: string; planned: boolean; status: string; exit: number | null; output: string; truncated: boolean }[];
+        commands: { command: string; planned: boolean; status: string; exit: number | null; output: string; truncated: boolean; durationMs?: number; timedOut?: boolean }[];
         file_edits: { tool: string; path: string; status: string; additions: number | null; deletions: number | null }[];
       };
       usage?: { cost: number; tokens: Record<string, number> };
+      run_summary?: {
+        status?: string;
+        engineStatus?: string;
+        exitCode?: number | null;
+        timedOut?: boolean;
+        verification?: Record<string, unknown>;
+      };
+      cli_run?: {
+        directory?: string;
+        files?: Record<string, string>;
+        summary?: {
+          status?: string;
+          exitCode?: number | null;
+          timedOut?: boolean;
+          eventTypes?: string[];
+          stdoutBytes?: number;
+          stderrBytes?: number;
+          jsonEventCount?: number;
+          [key: string]: unknown;
+        };
+      };
+      cleanup?: {
+        status?: string;
+        workdir?: string;
+        evidence_directory?: string;
+        evidence_preserved?: boolean;
+      };
       error?: string;
       detail?: string;
     };
@@ -792,6 +836,10 @@ export async function updateProjectReference(
 export async function getProjectWorkspace(projectId: string) {
   return fetchJson<ProjectWorkspace>(`/api/projects/${encodeURIComponent(projectId)}/workspace`);
 }
+export async function getProjectHarnessPreflight(projectId: string) {
+  return fetchJson<HarnessPreflight>(
+    `/api/projects/${encodeURIComponent(projectId)}/harness/preflight`);
+}
 export async function listWorkspaceBaselines(projectId: string) {
   return fetchJson<WorkspaceBaselineSummary[]>(
     `/api/projects/${encodeURIComponent(projectId)}/workspace-baselines`);
@@ -1042,7 +1090,7 @@ export async function createProjectTask(projectId: string, input: {
 export async function startProjectExecution(
   projectId: string,
   taskId: string,
-  input: { model?: string } = {},
+  input: { model?: string; transport?: "http" | "cli" } = {},
 ) {
   const result = await requestJson<ProjectExecution>(
     `/api/projects/${encodeURIComponent(projectId)}/tasks/${encodeURIComponent(taskId)}/executions`, {
@@ -1088,6 +1136,18 @@ export async function applyProjectExecutionResult(
 ) {
   const result = await requestJson<ProjectExecution>(
     `/api/projects/${encodeURIComponent(projectId)}/executions/${encodeURIComponent(executionId)}/apply`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: "{}",
+    });
+  invalidateAtlasCache();
+  return result;
+}
+
+export async function cleanupProjectExecution(
+  projectId: string,
+  executionId: string,
+) {
+  const result = await requestJson<ProjectExecution>(
+    `/api/projects/${encodeURIComponent(projectId)}/executions/${encodeURIComponent(executionId)}/cleanup`, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: "{}",
     });
   invalidateAtlasCache();

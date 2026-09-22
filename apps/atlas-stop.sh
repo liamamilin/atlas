@@ -1,6 +1,6 @@
 #!/bin/zsh
 # Atlas 停止：立即关闭全部服务与看门狗
-WS="/Users/milin/2026/软件开发/application-atlas"
+WS="${0:A:h:h}"
 pkill -f "apps/watchdog.sh" 2>/dev/null
 pkill -f "drafts_api.py" 2>/dev/null
 pkill -f "vite --port 5188" 2>/dev/null

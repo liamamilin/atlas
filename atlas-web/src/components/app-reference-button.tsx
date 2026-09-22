@@ -30,7 +30,7 @@ export function AppReferenceButton({ slug }: { slug: string }) {
       if (String(cause).includes("already saved")) {
         setState({ saved: true, message: lang === "zh" ? "已收藏此版本" : "This version is already saved" });
       } else {
-        setState({ saved: false, message: String(cause) });
+        setState({ saved: false, message: lang === "zh" ? "收藏失败，请稍后重试。" : "Could not save this record. Please try again." });
       }
     } finally {
       setSaving(false);
@@ -46,7 +46,7 @@ export function AppReferenceButton({ slug }: { slug: string }) {
         <BookmarkPlus className="size-3.5" />
         {saving ? (lang === "zh" ? "收藏中…" : "Saving…") : (lang === "zh" ? "收藏目录资料" : "Save catalog record")}
       </Button>
-      {state ? <p className="mt-1 max-w-64 text-xs text-danger">{state.message}</p> : null}
+      {state ? <p className="mt-1 max-w-64 text-xs text-danger" role={state.saved ? "status" : "alert"}>{state.message}</p> : null}
     </div>
   );
 }

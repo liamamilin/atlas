@@ -1,0 +1,235 @@
+{
+  "schema": 1,
+  "case_id": "agent-harness-product-research",
+  "title": "Agent Harness 产品调研与开发文档生成",
+  "category": "product-usage-best-practice",
+  "status": "implementation-m1-read-only-tui-accepted-mutation-controls-pending",
+  "purpose": "通过 Atlas 搜索和阅读 Agent Harness 相关类型、应用与文档，生成可追溯的产品、技术、开发和验收文档。",
+  "atlas_role": "research-and-documentation-workflow",
+  "theme": "agent-harness",
+  "research_started": true,
+  "atlas_project_id": "prj_0862eec26e94462cbdf5d0414c478c8c",
+  "atlas_project_title": "AI agent harness",
+  "run": {
+    "analysis_completed_at": "2026-09-20T15:34:23+08:00",
+    "document_generation_completed_at": "2026-09-20T17:49:05+08:00",
+    "completed_at": "2026-09-20T17:49:05+08:00",
+    "mode": "资料分析 + 文档生成",
+    "engine": "OpenCode",
+    "result": "已完成",
+    "fixed_references": [
+      "ai-coding-agent",
+      "ai-coding-assistant"
+    ],
+    "confirmed_requirements": 1,
+    "decisions": 27,
+    "generated_documents": 6,
+    "approved_documents": 6,
+    "historical_documents_pending_review": 1,
+    "latest_document_versions": {
+      "analysis": 7,
+      "product_requirements": 6,
+      "interaction_design": 5,
+      "technical_plan": 6,
+      "development_plan": 6,
+      "acceptance_plan": 6
+    },
+    "analysis_document_needs_re_review": false,
+    "export_confirmed_in_ui": true,
+    "export_refresh_required_after_latest_generation": false,
+    "export_refreshed_at": "2026-09-20T18:01:22+08:00",
+    "conflicts_resolved": 4,
+    "latest_conflicts_resolved": 2,
+    "latest_analysis_open_questions": 5,
+    "latest_analysis_conflicts": 4,
+    "latest_analysis_suggestions": 6,
+    "implementation_boundary": "研究与文档最佳实践已完成；M0 CLI 预检、provider 配置检查、最小连通性冒烟和 .atlas/harness.json 兼容基线已通过；M1 CLI 适配器、显式 CLI 执行分支、启动前 preflight、运行证据索引、固定验证步骤映射、显式清理和最小终端入口已实现并有回归测试。真实终端验收已在授权环境完成 CLI、隔离副本、固定验证、权限门、证据和清理复测；只读任务的完整 TUI 路径已通过产品验收。变更任务的停止和应用仍需另建任务验收。",
+    "next_implementation_questions": [
+      "变更任务的停止、应用、失败恢复和回滚路径是否满足产品验收",
+      "任务状态、证据包和工作副本清理在变更任务中是否与网页工作台一致",
+      "后续产品路线是否需要并行任务、take-over、历史列表或多入口",
+      "是否支持多个并行任务会话",
+      "是否提供暂停后的用户接管（take-over）交互",
+      "是否需要任务历史/会话列表界面"
+    ],
+    "m0_execution": {
+      "task_id": "tsk_96fd82a42cef4cd8b1ba0c4f6270eb4c",
+      "execution_id": "exe_e39db51f439a45f1be93b4f7df281cbb",
+      "status": "accepted",
+      "attempt": 2,
+      "opencode_version": "1.18.31",
+      "connectivity_smoke": "passed",
+      "source_workspace_modified": false
+    },
+    "m0_compatibility_baseline": {
+      "task_id": "tsk_45f6ed0862924657872652b5d4ab2fe2",
+      "execution_id": "exe_33a0bf216026434fa9bce5fd67a1bb16",
+      "status": "applied_and_accepted",
+      "path": ".atlas/harness.json",
+      "validation": "python3 -m json.tool .atlas/harness.json",
+      "minimum_compatible_version": "1.18.31",
+      "source_workspace_modified": true
+    },
+    "review_notes": [
+      "M0 已通过 Atlas 第二次执行：OpenCode 1.18.31、Homebrew 安装来源、provider 配置状态和最小模型请求均有证据；兼容基线任务已生成并应用 .atlas/harness.json，JSON 验证通过，迭代已重新对齐最新基线。"
+    ],
+    "m1_cli_adapter": {
+      "status": "cli_transport_preflight_evidence_and_cleanup_integrated",
+      "module": "application-atlas-production-pack/opencode_cli_adapter.py",
+      "contract": "docs/u17-pilots/agent-harness-product/m1-cli-adapter-contract.md",
+        "checks": [
+          "harness.json compatibility",
+          "provider output presence without raw output",
+          "shell-free argv construction",
+          "stable run summary for exit, timeout and JSON event types",
+          "fixed verification commands mapped to task steps",
+          "explicit cleanup preserves execution evidence"
+        ],
+      "preflight_api": {
+        "status": "integrated",
+        "endpoint": "GET /api/projects/:id/harness/preflight",
+        "workspace_gate": "failed preflight blocks isolated workspace creation",
+        "evidence": "m1-preflight-validation.md"
+      },
+      "cli_transport": {
+        "status": "integrated",
+        "request_flag": "transport=cli",
+        "continuation": "unsupported_by_design",
+        "default_transport": "http"
+      },
+      "tui_integration": "minimal_terminal_slice_integrated"
+    },
+    "m1_real_acceptance": {
+      "status": "real_cli_read_only_tui_accepted_mutating_controls_not_applicable",
+      "task_id": "tsk_4aa41e37e50448388589db2b2f9081c9",
+      "execution_id": "exe_fc680ac2fbe94ff491f5cab3a534dfb9",
+      "preflight": "passed",
+      "fixed_verification": "passed",
+      "opencode_run": "completed_with_permission_rejection",
+      "initial_attempt": {
+        "execution_id": "exe_7b6e4dd9e67446b1a88e4c6c325577d9",
+        "status": "failed",
+        "diagnostic": "受限环境无法打开 ~/.local/share/opencode/log/opencode.log"
+      },
+      "retry": {
+        "execution_id": "exe_4db1bd533d8e45259adefcb626da72d7",
+        "status": "completed",
+        "fixed_verification": "passed",
+        "opencode_events": 4,
+        "tool_permission": "bash 检查被权限门拒绝",
+        "source_workspace_modified": false,
+        "cleanup": "completed",
+        "evidence_directory": "application-atlas-production-pack/projects/execution-evidence/prj_0862eec26e94462cbdf5d0414c478c8c/exe_4db1bd533d8e45259adefcb626da72d7"
+      },
+      "tui_smoke": {
+        "status": "passed",
+        "command": "python3 application-atlas-production-pack/atlas_cli.py --interactive --lang zh",
+        "interaction": "项目选择 Enter → 任务视图 v → 任意键返回 → q 退出",
+        "exit_code": 0,
+        "scope": "验证项目选择、任务视图、运行详情返回和退出；不调用 provider，不修改项目文件",
+        "fix": "标准 PTY 不支持 curses.curs_set 时安全降级；补充 task_index 闭包声明，避免进入任务视图崩溃"
+      },
+      "approved_read_only_retry": {
+        "execution_id": "exe_fd26826a648b47f98f7fde12cbb88e7c",
+        "status": "completed",
+        "opencode_events": 27,
+        "tool_types": ["read", "glob", "grep"],
+        "bash_or_edit_called": false,
+        "fixed_verification": "passed",
+        "source_workspace_modified": false,
+        "isolated_filesystem_changed": false,
+        "scope_compliant": true,
+        "cleanup": "completed",
+        "evidence_directory": "application-atlas-production-pack/projects/execution-evidence/prj_0862eec26e94462cbdf5d0414c478c8c/exe_fd26826a648b47f98f7fde12cbb88e7c"
+      },
+      "tui_acceptance": {
+        "status": "passed_for_read_only_analysis_task",
+        "execution_id": "exe_fc680ac2fbe94ff491f5cab3a534dfb9",
+        "keyboard_path": ["j", "j", "Enter", "y", "v", "Space", "p", "text", "y", "x", "y", "c", "y", "q"],
+        "verified": ["task selection", "CLI execution", "run detail view", "manual acceptance", "evidence export", "worktree cleanup"],
+        "not_applicable": ["apply result (analysis task)", "stop active run (execution completed before stop)"],
+        "task_acceptance_status": "passed",
+        "latest_export": "application-atlas-production-pack/projects/exports/prj_0862eec26e94462cbdf5d0414c478c8c/20260921T125016Z-8d23b93f.zip",
+        "source_workspace_modified": false,
+        "cleanup": "completed"
+      },
+      "acceptance_status": "passed_read_only_tui_path",
+      "next_action": "进入第三个多类型需求最佳实践案例；若要覆盖停止和应用按钮，再创建一个可变更任务单独验收"
+    }
+  },
+  "iteration": {
+    "id": "itr_56ced8dfe0344b5a9726a3bf53822138",
+    "title": "Agent Harness 首版纵向切片",
+    "goal": "打通本地终端 TUI 到 OpenCode CLI、隔离工作副本、受控验证、差异审阅、显式应用和证据导出的最小端到端闭环；先完成环境预检与接入冒烟测试，不扩展并行任务、take-over、多入口或自动回滚。",
+    "fixed_document_versions": {
+      "analysis": 7,
+      "product_requirements": 6,
+      "interaction_design": 5,
+      "technical_plan": 6,
+      "development_plan": 6,
+      "acceptance_plan": 6
+    },
+    "task": {
+      "id": "tsk_96fd82a42cef4cd8b1ba0c4f6270eb4c",
+      "title": "M0：OpenCode CLI 环境预检与版本冒烟",
+      "type": "只读分析",
+      "status": "已验收",
+      "manual_preflight_status": "已通过",
+      "validation_command": "opencode --version",
+      "write_scope": "只读",
+      "evidence": "m0-opencode-preflight.md",
+      "evidence_json": "m0-evidence.json",
+      "preflight": {
+        "cli_path": "/opt/homebrew/bin/opencode",
+        "cli_version": "1.18.31",
+        "installation_source": "Homebrew",
+        "provider_credentials": "configured: commandcode, openai, opencode, opencode-go",
+        "connectivity_smoke": "passed",
+        "atlas_execution": "completed",
+        "compatibility_baseline": ".atlas/harness.json applied and accepted"
+      }
+    },
+    "next_task": {
+      "title": "M1：真实终端纵向切片独立验收",
+      "status": "终端入口已覆盖创建、执行、查看、停止、应用、验收、导出和清理；启动/退出冒烟通过，待在真实项目中完成完整键盘路径验收",
+      "depends_on": [
+        "M0",
+        "M0.1"
+      ],
+      "deliverables": [
+        "启动前 preflight 状态展示（已完成）",
+        "受控 CLI 运行摘要映射到步骤和证据路径（已完成）",
+        "终端入口默认只读、显式启动与显式清理（已完成）",
+        "真实任务创建、执行、应用、验收、导出和清理（待验收）",
+        "失败诊断可操作"
+      ]
+    }
+  },
+  "outputs": [
+    "产品需求文档",
+    "用户流程与范围说明",
+    "技术方案",
+    "开发计划",
+    "验收计划",
+    "来源与决策记录",
+    "首版实现取舍建议"
+  ],
+  "architecture_decision_input": "短期集成 OpenCode、长期是否抽象独立 Harness；由案例证据决定，不在本案例中预先承诺自研。",
+  "non_goals": [
+    "不把调研案例当作 Agent Harness 已经实现",
+    "不跳过来源阅读、范围确认和验收设计直接生成代码",
+    "不把 Atlas 的架构评估协议混入产品使用案例"
+  ],
+  "required_evidence": [
+    "类型和应用来源版本、章节定位、读取深度和未覆盖范围",
+    "事实、假设、推断、未知和待决策项的分层记录",
+    "产品、技术、开发和验收文档之间的需求到验收追溯",
+    "普通生成对照、Atlas 原始输入输出和导出包复核"
+  ],
+  "review_notes": [
+    "最新一轮六份文档已保存并批准；调研分析为 v7，产品/技术/开发/验收为 v6，交互设计为 v5。六份文档当前固定依据均为当前版本。",
+    "既有《AI agent harness 价值分析》v1 保留为历史资料，仍待人工审阅；其协助结构假设不作为首版范围依据。",
+    "导出 Markdown 包已在 Atlas 界面确认完成；通过重新加载项目完成独立界面复核。",
+    "二十七项决定已固定首版定位、用户、隔离、OpenCode CLI、TUI、纵向切片及实现细节；核心文档生成曾因 OpenCode 未产出有效大小的 result.json 失败，随后拆分生成成功。M0 已通过 Atlas 第二次执行：Homebrew OpenCode 1.18.31、默认 provider 配置、最小连通性冒烟均有证据；兼容基线任务已应用并验收 .atlas/harness.json，迭代已重新对齐最新基线。最新分析提出五个后续路线问题，暂不阻塞本案例；历史价值分析 v1 继续保留为未批准资料。"
+  ]
+}

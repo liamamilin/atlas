@@ -24,7 +24,7 @@ U17 面向新想法和已有项目改进：搜索与阅读类型、应用资料�
 - [M0–M4 历史验证档案](docs/archive/u17/README.md)：已完成里程碑的实现与验证证据。
 - [下游应用路线图](USAGE_ROADMAP.md)：U17 与其他功能的关系及历史记录。
 
-截至 2026-09-13，U17 的 M0–M4 与核心主线最小真实开发冒烟已完成。用户可从类型叶子直接创建项目，自动固定完整类型正文并进入项目工作区；新想法会得到实际存在的工作区，也可把类型加入当前项目。项目路径明确包含工作区基线，活动迭代必须固定当前文档、已确认本版需求和已接受基线。项目工作台支持带明确确认和活动任务保护的删除，并始终保留本地工作区和源码。网页可选择核心四件套、完整六件套或自定义文档集合；Atlas 要求目标完整、统一排序，并在逐份审阅保存时把下游草案绑定到本轮上游的不可变版本。开发执行继续由 OpenCode 在隔离工作副本中完成，Atlas 独立记录快照、文件/命令证据、需求覆盖、冲突安全写回和产品验收。最终全绿冒烟从类型入口完成了项目、基线、需求、文档、OpenCode 执行、结果应用、独立验收和迭代关闭。下一步进入 M5，先固定简单新想法案例的普通生成对照，再完成该案例的两轮真实迭代。
+截至 2026-09-22，U17 的 M0–M4、核心主线最小真实开发冒烟和 M5 三个产品使用案例均已完成当前范围内的验证。用户可从类型叶子直接创建项目，自动固定完整类型正文并进入项目工作区；新想法会得到实际存在的工作区，也可把类型加入当前项目。项目路径明确包含工作区基线，活动迭代必须固定当前文档、已确认本版需求和已接受基线。项目工作台支持带明确确认和活动任务保护的删除，并始终保留本地工作区和源码。网页可选择核心四件套、完整六件套或自定义文档集合；Atlas 要求目标完整、统一排序，并在逐份审阅保存时把下游草案绑定到本轮上游的不可变版本。开发执行继续由 OpenCode 在隔离工作副本中完成，Atlas 独立记录快照、文件/命令证据、需求覆盖、冲突安全写回和产品验收。多类型需求案例已完成 T1–T5 契约与只读分析验收，但尚未接入真实 provider 或模拟适配器；后续进入 M5 发布收口和执行后端演进决策。
 
 U17 的本地 API 提供正式资料全文读取，并管理项目、固定资料、需求、决定、文档版本、项目基线、生成运行、迭代、执行任务、验收与导出。`project_generation.py` 负责固定输入分析和文档/改进方案候选；`execution_service.py` 与 `opencode_runtime.py` 负责短期 OpenCode 执行后端；项目、基线、任务、文件证据和验收仍由 Atlas 独立持久化。
 
@@ -50,6 +50,18 @@ python3 application-atlas-production-pack/drafts_api.py
 ```
 
 打开 http://localhost:5188 。现有 macOS 启动器在 `apps/`，其中路径仍对应此电脑的工作区。
+
+也可以使用轻量终端入口查看同一套项目状态。它默认只读，执行和清理必须显式传参；所有实际操作仍通过本地 API，沿用 Atlas 的 preflight、隔离副本、验证和证据记录：
+
+```sh
+python3 application-atlas-production-pack/atlas_cli.py --project <项目 ID>
+python3 application-atlas-production-pack/atlas_cli.py --project <项目 ID> --task <任务 ID> --start --transport cli
+python3 application-atlas-production-pack/atlas_cli.py --project <项目 ID> --execution <执行 ID> --cleanup
+python3 application-atlas-production-pack/atlas_cli.py --project <项目 ID> --lang en
+python3 application-atlas-production-pack/atlas_cli.py --interactive
+```
+
+终端入口是 M1 的最小纵向切片，不替代网页工作台；它覆盖项目/任务创建与选择、preflight、启动确认、运行摘要与验证步骤查看、活动 HTTP 执行停止、CLI 结果应用、产品验收记录、项目证据包导出和显式清理，失败摘要会给出 `log_access`、`provider_error`、`cli_protocol` 等安全诊断码，交互式接管和多任务并行仍留在后续阶段。
 
 Vite 默认把 `/api` 代理到 `http://localhost:5199`。需要并行运行隔离 API 时，可在启动前设置 `ATLAS_API_TARGET=http://127.0.0.1:<port>`。
 

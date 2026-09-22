@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "case_id": "agent-harness-controlled-evaluation",
+  "title": "Agent Harness 架构评估（非产品最佳实践）",
+  "category": "architecture-decision-input",
+  "status": "architecture-protocol-draft",
+  "purpose": "比较现有 Atlas + OpenCode 路径与最小 Harness 控制面在同一边界代码任务上的控制、恢复、证据和成本表现。",
+  "engine": "opencode",
+  "harness_scope": [
+    "上下文组装",
+    "权限边界",
+    "隔离工作区",
+    "验证命令",
+    "事件记录",
+    "停止与恢复",
+    "交接包"
+  ],
+  "atlas_owns": [
+    "项目资料和需求",
+    "文档版本",
+    "工作区基线",
+    "任务和验收",
+    "应用与交接状态"
+  ],
+  "non_goals": [
+    "多引擎统一平台",
+    "云端调度",
+    "重写 OpenCode 能力",
+    "把引擎会话格式作为项目状态"
+  ],
+  "evidence_required": [
+    "同一任务的 Atlas + OpenCode 对照记录",
+    "最小 Harness 原始输入和事件记录",
+    "权限请求、停止、恢复和旧会话不可用证据",
+    "文件差异、命令输出、应用和独立验收",
+    "首次成功率、重试次数、恢复时间和成本对照"
+  ],
+  "status_note": "本文件不属于产品使用最佳实践；只有多个产品案例暴露重复控制缺口后，才启动架构评估，不代表已批准建设通用平台。"
+}

@@ -20,9 +20,14 @@ export function Home() {
           <h1 className="mt-3 font-serif text-4xl font-medium leading-[1.15] tracking-tight md:text-5xl">
             {t("heroTitle", lang, { n: meta?.leafCount ?? "…" })}
           </h1>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted md:text-lg">
-            {t("heroP", lang)}
-          </p>
+          <div className="mt-5 max-w-xl">
+            <p className="text-base font-medium leading-relaxed text-foreground md:text-lg">
+              {t("heroLead", lang)}
+            </p>
+            <p className="mt-3 text-base leading-relaxed text-muted md:text-lg">
+              {t("heroP", lang)}
+            </p>
+          </div>
           <form
             className="mt-8"
             onSubmit={(e) => {
@@ -31,7 +36,7 @@ export function Home() {
             }}
           >
             <label className="block">
-              <span className="sr-only">搜索类型</span>
+              <span className="sr-only">{t("searchLabel", lang)}</span>
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}

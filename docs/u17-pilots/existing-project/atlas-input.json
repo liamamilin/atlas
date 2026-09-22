@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "case_id": "existing-project-safe-task-cli",
+  "language": "zh",
+  "project_name": "M5 案例二 · 本地清单 CLI 安全持久化",
+  "goal": "改进本地清单 CLI 的持久化可靠性：写入采用安全的原子替换，读取损坏的 tasks.json 时给出明确且可恢复的错误，同时保持现有 add、list、done 行为兼容。",
+  "source_project": {
+    "workspace": "application-atlas-production-pack/projects/workspaces/prj_fdee487646e84eb08793d6304ff13f60",
+    "files": ["todo.py", "test_todo.py"],
+    "baseline_sha256": {
+      "todo.py": "10b9429c24b04003ca636a521c002fe855a8044eec185840d4ff1b22d537bf39",
+      "test_todo.py": "8339c26066a51894a23608520d0388792dd6e9b04f82d147e678d1b97dbd65ad"
+    }
+  },
+  "requirements": [
+    {
+      "external_id": "EP2-R1",
+      "text": "add 和 done 成功写入时不会留下半写入文件；写入失败时原有 tasks.json 保持不变。",
+      "acceptance": ["正常写入后数据完整可读取", "模拟写入失败时旧文件内容不变"]
+    },
+    {
+      "external_id": "EP2-R2",
+      "text": "tasks.json 损坏或不是有效 JSON 时，list 和写入命令返回明确错误，不静默重置。",
+      "acceptance": ["损坏文件返回非零和可理解错误", "损坏文件不会被 add 或 done 覆盖"]
+    },
+    {
+      "external_id": "EP2-R3",
+      "text": "现有 add、list、done 的成功输出和任务字段保持兼容。",
+      "acceptance": ["现有回归测试全部通过", "跨进程读取和完成状态保持一致"]
+    }
+  ],
+  "excluded_scope": ["新增任务命令", "图形界面", "多人协作", "云同步", "数据库迁移", "改变 tasks.json 字段语义"],
+  "allowed_write_paths": ["todo.py", "test_todo.py"],
+  "fixed_verification_commands": ["python3 -m unittest -v"],
+  "status": "atlas-analysis-complete",
+  "ordinary_comparison": {
+    "input_file": "ordinary-input.md",
+    "output_file": "ordinary-output.md",
+    "session_id": "ses_f42af8fbdffe8UjignBY9I6618",
+    "output_sha256": "4f6b6bb67d80601fdf93f76acdbedb5c2e0ffef3c84757cd552bb914e788b3c1"
+  },
+  "atlas_project_id": "prj_e6d8d97b6761428ab94c1cf1ff7a4419",
+  "reference_id": "ref_aabf1594c9c044a29c9fe197db43e6d5",
+  "workspace_baseline_id": "snap_a49ae939134642dcaa5905900a38a5bf",
+  "generation_runs": [
+    {"id": "gen_08fd77daf9674c03abb9080f8f7315d7", "status": "failed", "reason": "模型把 snap_ 基线 ID 填入 requirements.reference_ids"},
+    {"id": "gen_d68ed51ca06b4c50bb16ed5c1fd64ba7", "status": "completed", "input_fingerprint": "872703d4ea610abc583ba46adc7cec590fc28c5a07f48702f615462a7ed5ddcd"}
+  ],
+  "atlas_output_file": "atlas-output.json",
+  "comparison_limitations": [
+    "普通方案未附带 Atlas 的 task-management-application 固定参考资料，输入不完全等价。",
+    "只读分析结果尚未应用到 todo.py 或 test_todo.py。"
+  ]
+}

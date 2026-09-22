@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "case_id": "high-risk-data-recovery-migration",
+  "title": "高风险数据恢复与版本迁移",
+  "category": "product-usage-best-practice",
+  "status": "planning-template",
+  "purpose": "验证 Atlas 能否让数据恢复和版本迁移先预览、再确认、后应用，并保留可回滚的证据。",
+  "research_started": false,
+  "required_evidence": [
+    "只读基线、数据格式、数量和校验结果",
+    "迁移预览及新增、删除、转换、冲突和无法解析记录",
+    "备份或安全快照位置、校验和与保留期限",
+    "隔离副本执行、回滚验证、外部变化检查和独立验收",
+    "失败、冲突和恢复过程的原始记录"
+  ],
+  "non_goals": [
+    "不直接在源工作区试错",
+    "不在无恢复路径时扩大迁移范围",
+    "不把备份存在或 agent 自述当成迁移成功"
+  ]
+}

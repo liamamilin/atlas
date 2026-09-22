@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "case_id": "interrupted-session-recovery",
+  "title": "中断与会话不可用后的继续开发",
+  "category": "product-usage-best-practice",
+  "status": "planning-template",
+  "purpose": "验证 Atlas 能否在执行中断或旧会话不可用时，通过交接包安全恢复并避免重复副作用。",
+  "research_started": false,
+  "required_evidence": [
+    "任务输入版本、工作区基线、允许写入范围和已执行命令",
+    "文件差异、命令输出、应用状态和产品验收的分离记录",
+    "交接包中的已完成、未完成、待确认、失败原因和下一步",
+    "新会话对当前工作区、基线和外部变化的核对",
+    "继续执行后的独立验收和原始中断记录"
+  ],
+  "non_goals": [
+    "不把旧 agent 会话作为唯一状态来源",
+    "不自动重放全部可能产生副作用的命令",
+    "不覆盖中断时的原始证据"
+  ]
+}

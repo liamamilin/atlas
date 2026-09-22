@@ -10,7 +10,7 @@ import {
   saveProjectReference,
   type AtlasSourceKind,
 } from "@/lib/atlas";
-import { useLang } from "@/lib/lang";
+import { useLang, t } from "@/lib/lang";
 import { useCurrentProjectId } from "@/lib/project-selection";
 
 export function SourceReader({ slug }: { slug: string }) {
@@ -71,7 +71,7 @@ export function SourceReader({ slug }: { slug: string }) {
 
   if (manifestState.loading && !manifestState.data) return <Loading />;
   if (manifestState.error || !manifestState.data) {
-    return <ErrorBox message={manifestState.error || "source manifest unavailable"} />;
+    return <ErrorBox message={manifestState.error || t("sourceUnavailable", lang)} />;
   }
 
   return (
@@ -121,9 +121,10 @@ export function SourceReader({ slug }: { slug: string }) {
               ))}
             </select>
           </label>
-          <p className="pb-3 font-mono text-[11px] text-subtle">
-            {source.lines} {lang === "zh" ? "行" : "lines"} · {source.chars.toLocaleString()} chars · {source.fingerprint.slice(0, 10)}
-          </p>
+          <div className="pb-3 text-[11px] text-subtle">
+            {source.lines} {lang === "zh" ? "行" : "lines"} · {source.chars.toLocaleString()} {lang === "zh" ? "字符" : "chars"}
+            <details className="ml-2 inline-block align-middle font-mono"><summary className="cursor-pointer">{lang === "zh" ? "版本技术信息" : "Version details"}</summary><code className="mt-1 block rounded bg-chip px-1.5 py-0.5">{source.fingerprint}</code></details>
+          </div>
         </div>
       ) : null}
 

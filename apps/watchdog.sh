@@ -1,10 +1,11 @@
 #!/bin/zsh
 # 看门狗：系统无输入 ≥30min 或浏览器无连接 ≥30min → 关闭全部服务并通知
 set -u
-WS="/Users/milin/2026/软件开发/application-atlas"
+WS="${0:A:h:h}"
 VITE_PORT=5188
 LIMIT_SEC=1800
 ZERO=0
+ZERO_LIMIT_MIN=$((LIMIT_SEC / 60))
 
 echo "$(date '+%H:%M:%S') watchdog: watching (limit ${LIMIT_SEC}s)" >> "$WS/apps/launcher.log"
 while true; do
@@ -16,14 +17,16 @@ while true; do
   [ -z "$idle" ] && idle=0
   conns=$(lsof -ti tcp:$VITE_PORT -sTCP:ESTABLISHED 2>/dev/null | grep -v "^$" | wc -l | tr -d ' ')
 
-  if (( idle >= LIMIT_SEC )) || (( conns == 0 )); then
+  if (( idle >= LIMIT_SEC )); then
+    ZERO=$ZERO_LIMIT_MIN
+  elif (( conns == 0 )); then
     ZERO=$((ZERO+1))
   else
     ZERO=0
   fi
   echo "$(date '+%H:%M:%S') watchdog: idle=${idle}s conns=$conns zero-streak=${ZERO}min" >> "$WS/apps/launcher.log"
 
-  if (( ZERO >= LIMIT_SEC / 60 )); then
+  if (( ZERO >= ZERO_LIMIT_MIN )); then
     pkill -f "drafts_api.py" 2>/dev/null
     pkill -f "vite --port $VITE_PORT" 2>/dev/null
     pkill -f "vite.*--port $VITE_PORT" 2>/dev/null

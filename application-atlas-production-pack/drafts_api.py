@@ -51,7 +51,7 @@ Endpoints:
   POST   /api/projects/<id>/tasks
   POST   /api/projects/<id>/tasks/<task-id>/executions
   GET    /api/projects/<id>/executions/<execution-id>
-  POST   /api/projects/<id>/executions/<execution-id>/reconcile|continue|stop|apply|permission|question
+  POST   /api/projects/<id>/executions/<execution-id>/reconcile|continue|stop|apply|cleanup|permission|question
   POST   /api/projects/<id>/tasks/<task-id>/acceptance
 
 Run alongside `npm run dev` (vite proxies /api -> :5199).
@@ -90,8 +90,10 @@ from project_baseline import (
     capture_project_baseline, check_project_changes, get_project_baseline,
     list_project_baselines,
 )
+from opencode_cli_adapter import HarnessCompatibilityError, preflight as opencode_preflight
 from execution_service import (
     apply_execution_result,
+    cleanup_execution_workspace,
     continue_execution,
     create_iteration as create_project_iteration,
     create_task as create_execution_task,
@@ -795,6 +797,20 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"error": str(error)}, 404)
             except ValueError as error:
                 return self._json({"error": str(error)}, 400)
+        m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)/harness/preflight$", path)
+        if m:
+            try:
+                project = get_project_store().get_project(m.group(1))
+                config = Path(project["workspace"]) / ".atlas" / "harness.json"
+                if not config.exists():
+                    return self._json({"status": "not_configured", "configPath": str(config)})
+                return self._json(opencode_preflight(project["workspace"]))
+            except ProjectStoreError as error:
+                return self._json({"status": "failed", "code": "project_unavailable", "message": str(error)}, 404)
+            except HarnessCompatibilityError as error:
+                return self._json({"status": "failed", "code": error.code, "message": str(error), "details": error.details})
+            except (ValueError, OSError) as error:
+                return self._json({"status": "failed", "code": "preflight_error", "message": str(error)})
         m = re.match(r"^/api/projects/(prj_[A-Za-z0-9]+)$", path)
         if m:
             try:
@@ -883,8 +899,22 @@ class Handler(BaseHTTPRequestHandler):
             path)
         if m:
             try:
+                store = get_project_store()
+                project = store.get_project(m.group(1))
+                config = Path(project["workspace"]) / ".atlas" / "harness.json"
+                if config.exists():
+                    try:
+                        report = opencode_preflight(project["workspace"])
+                    except HarnessCompatibilityError as error:
+                        raise ProjectStoreError(f"OpenCode preflight failed ({error.code}): {error}") from error
+                    if report.get("status") != "passed":
+                        checks = report.get("checks") or {}
+                        raise ProjectStoreError(
+                            "OpenCode preflight failed: "
+                            f"version={checks.get('version', {}).get('exitCode', 'n/a')}, "
+                            f"providers={checks.get('providers', {}).get('exitCode', 'n/a')}")
                 return self._json(start_execution(
-                    get_project_store(), m.group(1), m.group(2), self._body()), 202)
+                    store, m.group(1), m.group(2), self._body()), 202)
             except ProjectStoreError as error:
                 return self._json({"error": str(error)}, _project_error_code(error))
             except (ValueError, json.JSONDecodeError) as error:
@@ -910,7 +940,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"error": str(error)}, 400)
         m = re.match(
             r"^/api/projects/(prj_[A-Za-z0-9]+)/executions/(exe_[A-Za-z0-9]+)/"
-            r"(reconcile|continue|stop|apply|permission|question)$", path)
+            r"(reconcile|continue|stop|apply|cleanup|permission|question)$", path)
         if m:
             try:
                 action = m.group(3)
@@ -934,6 +964,12 @@ class Handler(BaseHTTPRequestHandler):
                     if body:
                         raise ValueError("apply does not accept fields")
                     result = apply_execution_result(
+                        get_project_store(), m.group(1), m.group(2))
+                elif action == "cleanup":
+                    body = self._body()
+                    if body:
+                        raise ValueError("cleanup does not accept fields")
+                    result = cleanup_execution_workspace(
                         get_project_store(), m.group(1), m.group(2))
                 elif action == "permission":
                     result = reply_execution_permission(

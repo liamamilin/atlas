@@ -160,8 +160,18 @@ function StatusChip({ status, lint_ok }: { status: string; lint_ok: boolean }) {
           : "bg-chip text-muted";
   return (
     <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", color)}>
-      {(s ? s[lang] : status) + (status === "draft" && !lint_ok ? " · lint FAIL" : "")}
+      {(s ? s[lang] : status) + (status === "draft" && !lint_ok ? ` · ${lang === "zh" ? "检查未通过" : "lint failed"}` : "")}
     </span>
+  );
+}
+
+function DraftTechnicalMeta({ value, lang }: { value?: string; lang: Lang }) {
+  if (!value) return null;
+  return (
+    <details className="ml-2 inline-block align-middle text-[10px] text-subtle">
+      <summary className="cursor-pointer">{lang === "zh" ? "技术信息" : "Technical details"}</summary>
+      <code className="mt-1 block max-w-full break-all rounded bg-chip px-1.5 py-0.5 font-mono">{value}</code>
+    </details>
   );
 }
 
@@ -185,7 +195,8 @@ function DraftRow({ d, lang }: { d: DraftItem; lang: Lang }) {
           )}
         </div>
         <div className="mt-0.5 text-xs text-subtle">
-          {d.slug} · {d.size.toLocaleString()} 字符 · {d.created} · {d.engine}
+          {d.size.toLocaleString()} {lang === "zh" ? "字符" : "characters"} · {d.created}
+          <DraftTechnicalMeta value={[`slug ${d.slug}`, `engine ${d.engine}`].join(" · ")} lang={lang} />
         </div>
       </div>
       <Link to={`/drafts/${d.slug}`} className="text-xs text-primary hover:underline">
@@ -283,7 +294,7 @@ function CreateForm({ onDone }: { onDone: () => void }) {
         <input type="checkbox" checked={force} onChange={(e) => setForce(e.target.checked)} />
         {t("draftForce", lang)}
       </label>
-      {err ? <p className="text-xs text-danger">{err}</p> : null}
+      {err ? <p className="text-xs text-danger" role="alert">{err}</p> : null}
       <Button type="submit" disabled={busy || (!form.desc.trim() && !form.link.trim())}>
         {busy ? t("draftCreating", lang) : t("draftCreate", lang)}
       </Button>
@@ -349,9 +360,8 @@ export function DraftDetailPage({ slug }: { slug: string }) {
             ) : (
               <StatusChip status={data.front.status} lint_ok={data.lint.ok} />
             )}
-            <span>{slug}</span>
-            <span>·</span>
-            <span>{data.lint.size.toLocaleString()} 字符</span>
+            <span>{data.lint.size.toLocaleString()} {lang === "zh" ? "字符" : "characters"}</span>
+            <DraftTechnicalMeta value={`slug ${slug}`} lang={lang} />
           </div>
         </div>
         <div className="flex shrink-0 gap-2">
@@ -363,7 +373,7 @@ export function DraftDetailPage({ slug }: { slug: string }) {
           </Button>
         </div>
       </div>
-      {msg ? <p className="mt-2 text-xs text-muted">{msg}</p> : null}
+      {msg ? <p className="mt-2 text-xs text-muted" role="status">{msg}</p> : null}
       {data.front.status === "generating" ? <GenProgress p={data.progress} lang={lang} /> : null}
       {data.front.name_source === "model" && data.front.status !== "generating" ? (
         <div className="mt-4 rounded-xl bg-surface p-4 text-xs shadow-card">
@@ -380,10 +390,10 @@ export function DraftDetailPage({ slug }: { slug: string }) {
       (data.lint.errors.length || data.lint.warnings.length) ? (
         <div className="mt-4 rounded-xl bg-surface p-4 text-xs shadow-card">
           {data.lint.errors.map((e) => (
-            <p key={e} className="text-danger">ERROR {e}</p>
+            <p key={e} className="text-danger">{lang === "zh" ? "错误" : "Error"}：{e}</p>
           ))}
           {data.lint.warnings.map((w) => (
-            <p key={w} className="text-muted">warn {w}</p>
+            <p key={w} className="text-muted">{lang === "zh" ? "警告" : "Warning"}：{w}</p>
           ))}
         </div>
       ) : null}
@@ -519,7 +529,8 @@ function VerdictPanel({
         <p className="text-sm font-medium text-muted">{t("draftVerdict", lang)}</p>
         {rv.promoted ? (
           <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", rv.gate_ok === false ? "bg-danger/10 text-danger" : "bg-primary/10 text-primary")}>
-            {t("draftPromoted", lang)} {rv.gate ? `· gate ${rv.gate}` : ""}
+            {t("draftPromoted", lang)}
+            {rv.gate ? <DraftTechnicalMeta value={`gate ${rv.gate}`} lang={lang} /> : null}
           </span>
         ) : (
           <Button size="sm" disabled={busy || !canPromote} onClick={promote}>
@@ -550,7 +561,7 @@ function VerdictPanel({
       ) : (
         <p className="mt-1 text-xs text-subtle">{t("draftNoVerdict", lang)}</p>
       )}
-      {rv.promote_error || err ? <p className="mt-2 text-xs text-danger">{err || rv.promote_error}</p> : null}
+      {rv.promote_error || err ? <p className="mt-2 text-xs text-danger" role="alert">{err || rv.promote_error}</p> : null}
       {rv.promoted && rv.final_slug ? <Link className="mt-2 block text-sm text-primary" to={`/types/${rv.final_slug}`}>{lang === "zh" ? "查看正式类型" : "View published type"}</Link> : null}
       {!rv.promoted && ready ? (
         <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">

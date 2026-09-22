@@ -5,6 +5,7 @@ import atexit
 import json
 import os
 from pathlib import Path
+import shutil
 import socket
 import subprocess
 import threading
@@ -80,8 +81,12 @@ class OpenCodeRuntime:
         self._base_url = f"http://127.0.0.1:{port}"
         self._log = (self.state_root / "server.log").open("ab")
         environment = {**os.environ, "OPENCODE_CONFIG": str(config_path)}
+        executable = os.environ.get("ATLAS_OPENCODE_BINARY", "").strip()
+        if not executable:
+            bundled = Path("/opt/homebrew/bin/opencode")
+            executable = str(bundled) if bundled.exists() else (shutil.which("opencode") or "opencode")
         self._process = subprocess.Popen(
-            ["opencode", "serve", "--pure", "--hostname", "127.0.0.1",
+            [executable, "serve", "--hostname", "127.0.0.1",
              "--port", str(port), "--print-logs", "--log-level", "WARN"],
             cwd=self.state_root, env=environment, stdout=self._log,
             stderr=subprocess.STDOUT)

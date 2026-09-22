@@ -35,6 +35,7 @@ export function Projects() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState("");
   const [deleteError, setDeleteError] = useState("");
+  const [deleteNotice, setDeleteNotice] = useState("");
   const [form, setForm] = useState({ name: "", objective: "", workspace: "", mode: "new" as AtlasProject["mode"] });
 
   useEffect(() => {
@@ -75,8 +76,8 @@ export function Projects() {
       });
       select(project.id);
       navigate(`/projects/${project.id}`);
-    } catch (cause) {
-      setSaveError(String(cause));
+    } catch {
+      setSaveError(lang === "zh" ? "项目创建失败，请检查填写内容后重试。" : "Project creation failed. Check the form and try again.");
     } finally {
       setSaving(false);
     }
@@ -89,12 +90,16 @@ export function Projects() {
     if (!window.confirm(message)) return;
     setDeletingId(project.id);
     setDeleteError("");
+    setDeleteNotice("");
     try {
       await deleteProject(project.id);
       if (selectedId === project.id) select("");
+      setDeleteNotice(lang === "zh"
+        ? `项目“${project.name}”已删除；本地工作区和源码未受影响。`
+        : `“${project.name}” was deleted; the local workspace and source files were not changed.`);
       setRevision((value) => value + 1);
-    } catch (cause) {
-      setDeleteError(String(cause));
+    } catch {
+      setDeleteError(lang === "zh" ? "项目删除失败，请稍后重试。" : "Project deletion failed. Please try again.");
     } finally {
       setDeletingId("");
     }
@@ -108,7 +113,8 @@ export function Projects() {
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <section>
-          {deleteError ? <p className="mb-3 rounded-md bg-danger/10 p-3 text-sm text-danger">{deleteError}</p> : null}
+          {deleteNotice ? <p className="mb-3 rounded-md bg-primary/10 p-3 text-sm text-primary" role="status">{deleteNotice}</p> : null}
+          {deleteError ? <p className="mb-3 rounded-md bg-danger/10 p-3 text-sm text-danger" role="alert">{deleteError}</p> : null}
           {loading ? <Loading /> : error ? <ErrorBox message={error} /> : projects?.length ? (
             <div className="grid gap-3">
               {projects.map((project) => {
@@ -123,7 +129,10 @@ export function Projects() {
                           {selected ? <span className="rounded-full bg-chip px-2 py-0.5 text-xs text-primary">{t("projectCurrent", lang)}</span> : null}
                         </div>
                         <p className="mt-2 text-sm leading-6 text-muted">{project.objective}</p>
-                        <p className="mt-3 break-all font-mono text-xs text-subtle">{project.workspace}</p>
+                        <details className="mt-3 text-xs text-subtle">
+                          <summary className="cursor-pointer">{lang === "zh" ? "工作区位置" : "Workspace location"}</summary>
+                          <code className="mt-1 block break-all rounded bg-chip px-2 py-1 font-mono">{project.workspace}</code>
+                        </details>
                         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                           <span className="text-xs text-subtle">
                             {project.mode === "new" ? t("projectModeNew", lang) : t("projectModeExisting", lang)}
@@ -188,7 +197,7 @@ export function Projects() {
                 <option value="existing">{t("projectModeExisting", lang)}</option>
               </select>
             </label>
-            {saveError ? <p className="text-sm text-danger">{saveError}</p> : null}
+            {saveError ? <p className="text-sm text-danger" role="alert">{saveError}</p> : null}
             <Button className="w-full" disabled={saving || Boolean(starterSlug && !starterState.data)}>{saving ? t("projectCreating", lang) : t("projectCreate", lang)}</Button>
           </form>
         </section>
@@ -236,8 +245,8 @@ function ProjectReferences({ projectId }: { projectId: string }) {
         ...current,
         [reference.id]: { ...current[reference.id], ...saved },
       }));
-    } catch (cause) {
-      setSaveError(String(cause));
+    } catch {
+      setSaveError(lang === "zh" ? "资料状态保存失败，请稍后重试。" : "Could not save the research status. Please try again.");
     } finally {
       setBusyId("");
     }
@@ -349,7 +358,7 @@ function ProjectReferences({ projectId }: { projectId: string }) {
           {lang === "zh" ? "还没有收藏资料。先搜索类型或应用，然后在类型页阅读并收藏全文或章节。" : "No saved research yet. Search for a type or application, then read and save a document or section from its type page."}
         </p>
       )}
-      {saveError ? <p className="mt-3 text-sm text-danger">{saveError}</p> : null}
+      {saveError ? <p className="mt-3 text-sm text-danger" role="alert">{saveError}</p> : null}
     </section>
   );
 }

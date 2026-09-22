@@ -1,0 +1,163 @@
+{
+  "schema": 1,
+  "case_id": "existing-project-safe-task-cli",
+  "title": "已有项目改进 · 本地清单 CLI 的安全持久化",
+  "status": "completed-in-case-workspace",
+  "created_at": "2026-09-20",
+  "source_project": {
+    "atlas_project_id": "prj_fdee487646e84eb08793d6304ff13f60",
+    "mode": "existing",
+    "workspace": "application-atlas-production-pack/projects/workspaces/prj_fdee487646e84eb08793d6304ff13f60",
+    "files": [
+      {
+        "path": "todo.py",
+        "sha256": "10b9429c24b04003ca636a521c002fe855a8044eec185840d4ff1b22d537bf39"
+      },
+      {
+        "path": "test_todo.py",
+        "sha256": "8339c26066a51894a23608520d0388792dd6e9b04f82d147e678d1b97dbd65ad"
+      }
+    ],
+    "baseline_verification": "python3 -m unittest -v",
+    "baseline_result": "6 tests passed",
+    "post_change_files": [
+      {
+        "path": "todo.py",
+        "sha256": "e7d70923f4529d7597094d65abc63865389422933060f611bcb946cf8ea2cea0"
+      },
+      {
+        "path": "test_todo.py",
+        "sha256": "b43f451caceef2c0778a934e7d82d0ccc42e944dff9f89585752289a24ba2e2b"
+      }
+    ],
+    "post_change_result": "10 tests passed; manual add/list/done/list passed"
+  },
+  "goal": "改进本地清单 CLI 的持久化可靠性：写入采用安全的原子替换，读取损坏的 tasks.json 时给出明确且可恢复的错误，同时保持现有 add、list、done 行为兼容。",
+  "first_iteration": {
+    "requirements": [
+      {
+        "id": "EP2-R1",
+        "text": "add 和 done 成功写入时不会留下半写入文件；写入失败时原有 tasks.json 保持不变。",
+        "acceptance": [
+          "正常 add 和 done 后任务数据完整可读取",
+          "模拟写入失败时旧文件内容保持不变"
+        ]
+      },
+      {
+        "id": "EP2-R2",
+        "text": "tasks.json 损坏或不是有效 JSON 时，list 和写入命令返回明确错误，不静默重置为新空列表。",
+        "acceptance": [
+          "损坏文件执行 list 返回非零退出码和可理解错误",
+          "损坏文件执行 add 或 done 不覆盖原始内容"
+        ]
+      },
+      {
+        "id": "EP2-R3",
+        "text": "现有 add、list、done 的成功输出和任务字段保持兼容。",
+        "acceptance": [
+          "现有回归测试全部通过",
+          "跨进程读取仍能看到同一任务和完成状态"
+        ]
+      }
+    ],
+    "excluded_scope": [
+      "新增任务命令",
+      "图形界面",
+      "多人协作",
+      "云同步",
+      "数据库迁移",
+      "改变 tasks.json 的既有字段语义"
+    ],
+    "allowed_write_paths": [
+      "todo.py",
+      "test_todo.py"
+    ],
+    "verification_commands": [
+      "python3 -m unittest -v"
+    ]
+  },
+  "ordinary_comparison": {
+    "status": "completed",
+    "input_file": "ordinary-input.md",
+    "output_file": "ordinary-output.md",
+    "must_finish_before_atlas_generation": true,
+    "provider_model": "opencode-go/mimo-v2.5",
+    "client": "OpenCode 1.18.31",
+    "session_id": "ses_f42af8fbdffe8UjignBY9I6618",
+    "input_sha256": "1fa12b769240e4dda65b01106043db4730f0459446d7463686caf4c87d5cac18",
+    "output_sha256": "4f6b6bb67d80601fdf93f76acdbedb5c2e0ffef3c84757cd552bb914e788b3c1",
+    "raw_events_sha256": "117674b77652bcade70571188877831e3dd982450e457af9044d568bb9a2e2da",
+    "tokens": {
+      "input": 7139,
+      "output": 1039,
+      "reasoning": 0,
+      "cache": {
+        "read": 10048,
+        "write": 0
+      }
+    },
+    "cost_usd": 0.0013185144,
+    "completed_at": "2026-09-20T05:37:13.615991Z"
+  },
+  "atlas_record": {
+    "input_file": "atlas-input.json",
+    "output_file": "atlas-output.json",
+    "scope_start": "ordinary comparison complete",
+    "project_creation": "prj_e6d8d97b6761428ab94c1cf1ff7a4419",
+    "reference_id": "ref_aabf1594c9c044a29c9fe197db43e6d5",
+    "baseline_id": "snap_a49ae939134642dcaa5905900a38a5bf",
+    "post_change_baseline_id": "snap_3cf6a251ce664e27b023be423bdeda45",
+    "post_change_content_fingerprint": "f76e35ac8b0709cd47755db63a6bd9cb17305d22c0646d0f665ea8cb0daafef1",
+    "generation_run_ids": [
+      "gen_08fd77daf9674c03abb9080f8f7315d7",
+      "gen_d68ed51ca06b4c50bb16ed5c1fd64ba7"
+    ],
+    "successful_generation_run_id": "gen_d68ed51ca06b4c50bb16ed5c1fd64ba7",
+    "input_fingerprint": "872703d4ea610abc583ba46adc7cec590fc28c5a07f48702f615462a7ed5ddcd",
+    "basis_fingerprint": "896d3639f13a1dd94ee7ef7c3750de588aff604f395c6e59a636944cdc3f6cd7",
+    "engine_session_id": "ses_f42a3be21ffeYgPIc0ahypAqZG",
+    "model": "opencode-go/mimo-v2.5",
+    "requirement_ids": [
+      "req_5c0864f00b534db89446398755fe1c30",
+      "req_91d60e7edb93470c8899a17633819803",
+      "req_8c3fe94b555a4560b7981143ae803a75"
+    ],
+    "decision_id": "dec_48295cb016044a848b79da51799d0368",
+    "document_id": "doc_c89df3c79a5a40fc8d5d35a316e53a17",
+    "document_version_id": "dver_faf4bc9e0d79447f9f1603710d06078f",
+    "iteration_id": "itr_1c6a6a26621e42799ab801706029cb0e",
+    "task_id": "tsk_feb708bba5894584bdce5ecee6194fb8",
+    "task_acceptance": "passed"
+  },
+  "comparison_files": {
+    "scope_and_timeline": "scope-and-timeline.md",
+    "execution_and_acceptance": "execution-and-acceptance.md",
+    "findings": "findings.md"
+  },
+  "comparison_limitations": [
+    "普通方案输入只包含 ordinary-input.md 中的项目事实；Atlas 输入另外固定引用了 task-management-application 类型资料，因此两次输入并非完全相同。",
+    "Atlas 结果没有直接作为代码补丁应用；实现由差异判断后在案例工作区完成，需求、决定、文档和验收记录已写入 Atlas。",
+    "首轮 Atlas 运行因模型把 snap_ 基线 ID 填入 requirements.reference_ids 而被校验拒绝，已保留该失败运行作为证据。"
+  ],
+  "implementation": {
+    "status": "verified-and-recorded",
+    "modified_paths": ["todo.py", "test_todo.py"],
+    "tests": "python3 -m unittest -v (10 passed)",
+    "manual_smoke": "add → list → done → list passed",
+    "workspace_changed": true,
+    "atlas_apply_recorded": false,
+    "review_note": "改动已写入案例项目工作区并通过 Atlas 迭代与验收记录；未运行引擎执行/应用，因为实现已在受控工作区完成。Git 提交仍待用户决定。"
+  },
+  "export": {
+    "archive": "application-atlas-production-pack/projects/exports/prj_e6d8d97b6761428ab94c1cf1ff7a4419/20260920T061716Z-09bd65e1.zip",
+    "sha256": "b83f0a75bee78577a2735a8f3516072cf81b721f5f5ec34568791fa68b3cce99",
+    "counts": {"references": 1, "requirements": 3, "decisions": 1, "documents": 1, "iterations": 1, "tasks": 1, "executions": 0}
+  },
+  "baseline_review": {
+    "status": "reviewed-and-recaptured",
+    "old_baseline": "snap_a49ae939134642dcaa5905900a38a5bf",
+    "new_baseline": "snap_3cf6a251ce664e27b023be423bdeda45",
+    "outside_scope_change": "删除测试生成的 tasks.json 运行产物；已在复核后重新采集，不属于代码改动。"
+  },
+  "evidence_status": "普通方案、Atlas 只读分析、首轮实现、迭代和独立验收均已封存；案例二完成于受控工作区，尚未提交 Git。"
+}

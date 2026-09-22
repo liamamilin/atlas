@@ -106,7 +106,7 @@ export function Leaf() {
       {relKindsBlock(data.relations, relKinds, lang)}
       {data.sources ? (
         <section className="mt-8">
-          <h2 className="font-serif text-xl font-medium">{lang === "zh" ? "资料来源" : "Sources"}</h2>
+          <h2 className="font-serif text-xl font-medium">{t("sources", lang)}</h2>
           <Prose md={data.sources} className="mt-3 text-sm" />
         </section>
       ) : null}
@@ -197,7 +197,7 @@ function relKindsBlock(rels: LeafDetail["relations"], kinds: string[], lang: Lan
                     <Link to={`/types/${r.to}`} className="text-sm font-medium hover:underline">
                       {r.toName}
                     </Link>
-                    <span className="font-mono text-[11px] text-subtle">{r.to}</span>
+                    <details className="text-[10px] text-subtle"><summary className="cursor-pointer">{lang === "zh" ? "技术信息" : "Technical details"}</summary><code className="mt-1 block rounded bg-chip px-1.5 py-0.5 font-mono">{r.to}</code></details>
                   </div>
                   {r.distinction ? (
                     <p className="mt-1 text-[13px] leading-relaxed text-muted">{pick(lang, r.distinction_zh, r.distinction)}</p>

@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "task_id": "tsk_96fd82a42cef4cd8b1ba0c4f6270eb4c",
+  "execution_id": "exe_e39db51f439a45f1be93b4f7df281cbb",
+  "executed_at": "2026-09-20T10:39:38Z",
+  "mode": "read-only smoke + Atlas execution",
+  "source_workspace_modified": false,
+  "cli": {
+    "command": "opencode",
+    "path": "/opt/homebrew/bin/opencode",
+    "version": "1.18.31",
+    "installation_source": "Homebrew (anomalyco/tap/opencode)",
+    "package_name": "opencode",
+    "binary": "Mach-O 64-bit executable arm64"
+  },
+  "provider_check": {
+    "command": "opencode providers list",
+    "result": "configured provider names visible: OpenCode Go, OpenAI, OpenCode Zen, commandcode",
+    "credential_values_recorded": false
+  },
+  "connectivity_smoke": {
+    "status": "passed",
+    "execution_id": "exe_e39db51f439a45f1be93b4f7df281cbb",
+    "command": "opencode run --format json \"echo hello\" --dir /tmp",
+    "exit_code": 0,
+    "result": "CLI responded and model request returned a result"
+  },
+  "atlas_execution": {
+    "status": "completed",
+    "attempt": 2,
+    "execution_id": "exe_e39db51f439a45f1be93b4f7df281cbb",
+    "source_workspace_modified": false,
+    "verification": "opencode --version exited 0 with 1.18.31; Atlas recorded no source file changes"
+  },
+  "compatibility_baseline": {
+    "task_id": "tsk_45f6ed0862924657872652b5d4ab2fe2",
+    "execution_id": "exe_33a0bf216026434fa9bce5fd67a1bb16",
+    "status": "applied_and_accepted",
+    "path": ".atlas/harness.json",
+    "validation": "python3 -m json.tool .atlas/harness.json exited 0",
+    "minimum_compatible_version": "1.18.31",
+    "smoke_timestamp": "2026-09-20T10:42:53Z",
+    "source_workspace_modified": true,
+    "write_scope": [".atlas/harness.json"]
+  },
+  "notes": [
+    "npm list/info probes are non-blocking warnings because OpenCode is installed via Homebrew rather than npm.",
+    "The initial execution was retried after Atlas baseline reconciliation and after enabling bash for declared verification commands while keeping analysis edit access disabled.",
+    "The compatibility file records provider names and configuration status only; no credential values are included."
+  ],
+  "next_gate": "Proceed to M1 CLI adapter and TUI execution slice using .atlas/harness.json as the compatibility gate."
+}
