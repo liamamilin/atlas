@@ -310,12 +310,12 @@ function ProjectStatusHeader({ workspace, activeIteration, hasBaseline, nextStep
     ? workspace.documents.filter((item) => selectedDocumentVersions.has(item.version_id)
       && (item.review.status === "needs_review" || (item.review.approval || "pending") !== "approved"))
     : [];
-  const blockingCounts = [
+  const blockingCounts = activeIteration ? [
     { value: openItems.filter((item) => item.kind === "question").length, zh: "开放问题", en: "Open questions" },
     { value: openItems.filter((item) => item.kind === "conflict").length, zh: "明确冲突", en: "Conflicts" },
     { value: workspace.requirements.filter((item) => !item.confirmed_scope).length, zh: "待确认需求", en: "Pending requirements" },
     { value: selectedDocumentsNeedReview.length, zh: "本轮文档待复核", en: "Current documents to review" },
-  ];
+  ] : [];
   const optionalCounts = [
     { value: openItems.filter((item) => item.kind === "suggestion").length, zh: "参考建议", en: "Suggestions" },
     { value: workspace.documents.filter((item) => item.review.status === "needs_review").length, zh: "待复核文档", en: "Documents to review" },
