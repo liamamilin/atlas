@@ -36,7 +36,7 @@ export function Projects() {
   const [deletingId, setDeletingId] = useState("");
   const [deleteError, setDeleteError] = useState("");
   const [deleteNotice, setDeleteNotice] = useState("");
-  const [form, setForm] = useState({ name: "", objective: "", workspace: "", mode: "new" as AtlasProject["mode"] });
+  const [form, setForm] = useState({ name: "", objective: "", workspace: "", mode: (searchParams.get("mode") === "existing" ? "existing" : "new") as AtlasProject["mode"] });
 
   useEffect(() => {
     if (!starterState.data) return;
