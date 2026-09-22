@@ -354,7 +354,7 @@ function lifecycleSteps(workspace: ProjectWorkspace, hasBaseline: boolean | null
   const confirmed = workspace.requirements.some((item) => item.confirmed_scope === "current");
   const documentsReady = workspace.documents.some((item) => item.review.status === "current");
   const currentIteration = workspace.iterations.find((item) => item.status === "active")
-    || workspace.iterations[0] || null;
+    || workspace.iterations.slice().sort((a, b) => b.sequence - a.sequence)[0] || null;
   const currentTasks = currentIteration
     ? workspace.tasks.filter((item) => item.iteration_id === currentIteration.id) : [];
   const currentTaskIds = new Set(currentTasks.map((item) => item.id));
@@ -362,7 +362,7 @@ function lifecycleSteps(workspace: ProjectWorkspace, hasBaseline: boolean | null
   const latestExecution = (task: ProjectTask) =>
     currentExecutions.find((execution) => execution.task_id === task.id);
   const executed = currentTasks.length > 0 && currentTasks.every((task) =>
-    task.execution_status === "completed");
+    ["completed", "failed", "stopped", "unknown"].includes(task.execution_status));
   const applied = currentTasks.length > 0 && currentTasks.every((task) => {
     if (task.kind === "analysis") return true;
     const execution = latestExecution(task);
