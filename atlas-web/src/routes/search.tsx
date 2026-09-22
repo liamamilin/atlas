@@ -4,6 +4,7 @@ import { getApps, getMeta } from "@/lib/atlas";
 import { useAsync, Loading, ErrorBox } from "@/components/loaders";
 import { LeafCard } from "@/components/leaf-card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { AppReferenceButton } from "@/components/app-reference-button";
 import { useLang, t } from "@/lib/lang";
 import { useCurrentProjectId } from "@/lib/project-selection";
@@ -109,13 +110,27 @@ export function Search() {
         </section>
       ) : null}
 
-      {!total && projectId ? (
-        <div className="mt-8 rounded-xl bg-surface p-5 text-sm text-muted shadow-card">
-          {lang === "zh" ? "语料中暂时没有匹配结果。这个结果不会阻止项目继续；你可以回到" : "No corpus match was found. You can keep working and return to "}
-          <Link to="/projects" className="mx-1 text-primary hover:underline">
-            {lang === "zh" ? "当前项目" : "the current project"}
-          </Link>
-          {lang === "zh" ? "记录自己的调研和决策。" : "to record your own research and decisions."}
+      {!total ? (
+        <div className="mt-8 rounded-xl bg-surface p-6 shadow-card">
+          <p className="text-sm font-medium">
+            {q
+              ? (lang === "zh" ? "暂时没有匹配的类型或应用" : "No matching types or applications yet")
+              : (lang === "zh" ? "从一个关键词开始探索" : "Start with a keyword")}
+          </p>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+            {q
+              ? (lang === "zh"
+                ? "可以换一个更短的关键词，先浏览类型目录，或直接查看应用目录。没有匹配结果不会阻止项目继续。"
+                : "Try a shorter keyword, browse the type directory, or open the application catalog. A missing match does not block your project.")
+              : (lang === "zh"
+                ? "搜索会同时查找软件类型和真实应用；也可以先浏览完整类型目录，再从叶子页面创建项目。"
+                : "Search covers software types and real applications. You can also browse the full type directory and start a project from a leaf page.")}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button asChild size="sm"><Link to="/browse">{lang === "zh" ? "浏览类型目录" : "Browse types"}</Link></Button>
+            <Button asChild size="sm" variant="outline"><Link to="/apps">{lang === "zh" ? "查看应用目录" : "Open application catalog"}</Link></Button>
+            {projectId ? <Button asChild size="sm" variant="outline"><Link to="/projects">{lang === "zh" ? "回到当前项目" : "Return to current project"}</Link></Button> : null}
+          </div>
         </div>
       ) : null}
     </main>
