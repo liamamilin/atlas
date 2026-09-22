@@ -2344,6 +2344,25 @@ class ExecutionServiceTests(unittest.TestCase):
         self.assertEqual(cleaned['raw_state']['evidence']['cleanup']['status'], 'cleaned')
         self.assertTrue(cleaned['raw_state']['evidence']['cleanup']['evidence_preserved'])
 
+    def test_stopped_http_cleanup_materializes_evidence(self):
+        class AbortClient(self.Client):
+            def abort(self, _session_id):
+                return True
+
+        client = AbortClient()
+        running = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, client)
+        stopped = stop_execution(
+            self.store, self.project['id'], running['id'], client)
+        self.assertEqual(stopped['status'], 'stopped')
+        evidence_dir = self.store.path.parent / 'execution-evidence' / self.project['id'] / stopped['id']
+        cleaned = cleanup_execution_workspace(
+            self.store, self.project['id'], stopped['id'])
+        self.assertTrue((evidence_dir / 'atlas.json').exists())
+        self.assertTrue(cleaned['raw_state']['evidence']['cleanup']['evidence_preserved'])
+        self.assertEqual(
+            cleaned['raw_state']['evidence']['run_summary']['status'], 'cancelled')
+
     def test_cli_transport_runs_in_isolation_and_records_terminal_evidence(self):
         cli_task = create_execution_task(self.store, self.project['id'], {
             'iteration_id': self.iteration['id'], 'kind': 'code',

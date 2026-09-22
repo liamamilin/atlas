@@ -1084,6 +1084,22 @@ def cleanup_execution_workspace(store, project_id: str, execution_id: str) -> di
                           project_id / execution_id).resolve()
     raw = execution.get("raw_state") or {}
     evidence = dict(raw.get("evidence") or {})
+    # HTTP/session executions do not have the CLI adapter's evidence writer.
+    # Materialize a small Atlas-owned record before cleanup so removing the
+    # isolated worktree never removes the only durable execution evidence.
+    if not evidence_directory.exists():
+        evidence_directory.mkdir(parents=True, exist_ok=True)
+        (evidence_directory / "atlas.json").write_text(
+            json.dumps({
+                "schema": 1,
+                "execution_id": execution_id,
+                "task_id": execution["task_id"],
+                "status": execution["status"],
+                "application_status": execution.get("application_status"),
+                "before_snapshot_id": execution.get("before_snapshot_id"),
+                "after_snapshot_id": execution.get("after_snapshot_id"),
+                "evidence": evidence,
+            }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     evidence["cleanup"] = {
         "status": "cleaned" if existed else "already_absent",
         "workdir": str(workdir),
