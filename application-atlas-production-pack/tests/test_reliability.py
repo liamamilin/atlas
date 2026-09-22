@@ -2319,6 +2319,23 @@ class ExecutionServiceTests(unittest.TestCase):
             self.assertEqual(summary['status'], expected)
             self.assertNotEqual(summary['status'], 'completed')
 
+    def test_task_timeout_overrides_project_timeout_for_verification(self):
+        task = self.store.create_task(
+            self.project['id'], 'Bounded check', 'Run a bounded verification',
+            iteration_id=self.iteration['id'],
+            input_document_versions=[self.document['version_id']],
+            requirement_ids=[self.requirement['id']],
+            kind='analysis', verification_commands=['sleep 31'], timeout_seconds=30)
+        self.assertEqual(task['timeout_seconds'], 30)
+        self.assertEqual(task['timeout_seconds'], 30)
+        # A short real command keeps the regression test fast while exercising
+        # the same timed_out mapping used by the CLI execution path.
+        evidence = run_cli_verification(self.workspace, ['sleep 2'], timeout_seconds=1)
+        command = evidence['tool_calls']['commands'][0]
+        self.assertEqual(command['status'], 'timed_out')
+        self.assertTrue(command['timedOut'])
+        self.assertFalse(evidence['verification']['all_planned_passed'])
+
     def test_cleanup_requires_terminal_execution_and_preserves_evidence(self):
         running = start_execution(
             self.store, self.project['id'], self.task['id'], {}, self.client)

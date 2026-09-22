@@ -466,7 +466,8 @@ class ProjectStore:
                     requirement_ids: list[str] | None = None,
                     iteration_id: str | None = None,
                     kind: str = "code", write_paths: list[str] | None = None,
-                    verification_commands: list[str] | None = None) -> dict:
+                    verification_commands: list[str] | None = None,
+                    timeout_seconds: int | None = None) -> dict:
         task_id, now = _id("tsk"), _now()
         versions = input_document_versions or []
         requirements = requirement_ids or []
@@ -474,6 +475,13 @@ class ProjectStore:
             raise ValueError("task kind must be analysis, document, or code")
         normalized_write_paths = _relative_paths(write_paths or [], "write_paths")
         commands = _text_list(verification_commands or [], "verification_commands", 20)
+        if timeout_seconds is not None:
+            try:
+                timeout_seconds = int(timeout_seconds)
+            except (TypeError, ValueError) as error:
+                raise ValueError("timeout_seconds must be an integer") from error
+            if not 30 <= timeout_seconds <= 1800:
+                raise ValueError("timeout_seconds must be between 30 and 1800")
         if kind == "analysis" and normalized_write_paths:
             raise ValueError("analysis tasks cannot declare write paths")
         with self._transaction() as con:
@@ -517,13 +525,13 @@ class ProjectStore:
                 pins.append({"requirement_id": requirement_id, "revision": revision})
             con.execute("""INSERT INTO task
                 (id,project_id,iteration_id,kind,title,objective,write_paths_json,
-                 verification_commands_json,execution_status,acceptance_status,
+                verification_commands_json,timeout_seconds,execution_status,acceptance_status,
                  acceptance_evidence_json,input_versions_json,requirement_ids_json,
                  requirement_revisions_json,created_at,updated_at)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (task_id, project_id, iteration_id, kind, _required(title, "title"),
                  _required(objective, "objective"), _json(normalized_write_paths),
-                 _json(commands), "planned", "pending", "[]",
+                 _json(commands), timeout_seconds, "planned", "pending", "[]",
                  _json(versions), _json(requirements), _json(pins), now, now))
             con.execute("UPDATE project SET updated_at=? WHERE id=?", (now, project_id))
         return self.get_task(task_id)
@@ -1382,6 +1390,7 @@ class ProjectStore:
                     ("kind", "TEXT NOT NULL DEFAULT 'code'"),
                     ("write_paths_json", "TEXT NOT NULL DEFAULT '[]'"),
                     ("verification_commands_json", "TEXT NOT NULL DEFAULT '[]'"),
+                    ("timeout_seconds", "INTEGER"),
                     ("requirement_revisions_json", "TEXT NOT NULL DEFAULT '[]'")):
                 if name not in task_columns:
                     con.execute(f"ALTER TABLE task ADD COLUMN {name} {declaration}")

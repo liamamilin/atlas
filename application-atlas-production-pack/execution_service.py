@@ -91,14 +91,15 @@ def rebase_iteration(store, project_id: str, iteration_id: str, body: dict) -> d
 def create_task(store, project_id: str, body: dict) -> dict:
     _body(body, {"iteration_id", "kind", "title", "objective",
                  "input_document_versions", "requirement_ids", "write_paths",
-                 "verification_commands"})
+                 "verification_commands", "timeout_seconds"})
     return store.create_task(
         project_id, body.get("title"), body.get("objective"),
         _strings(body.get("input_document_versions"), "input_document_versions"),
         _strings(body.get("requirement_ids"), "requirement_ids"),
         body.get("iteration_id"), body.get("kind", "code"),
         _strings(body.get("write_paths"), "write_paths"),
-        _strings(body.get("verification_commands"), "verification_commands"))
+        _strings(body.get("verification_commands"), "verification_commands"),
+        body.get("timeout_seconds"))
 
 
 def start_execution(store, project_id: str, task_id: str, body: dict,
@@ -272,7 +273,8 @@ def start_cli_execution(store, project_id: str, task_id: str, body: dict,
         },
         "source_workdir": str(source_workdir), "workdir": str(workdir),
         "workspace_strategy": "isolated_copy", "write_paths": task["write_paths"],
-        "verification_commands": task["verification_commands"], "model": model,
+        "verification_commands": task["verification_commands"],
+        "timeout_seconds": task.get("timeout_seconds"), "model": model,
         "transport": "cli",
     }
     capabilities = {**CAPABILITIES, "session_start": False, "follow_up": False,
@@ -291,9 +293,10 @@ def start_cli_execution(store, project_id: str, task_id: str, body: dict,
         result = run_prompt(workdir, prompt, model, runner=runner) if runner else \
             run_prompt(workdir, prompt, model)
         record_cli_run_evidence(store, project_id, execution["id"], result)
+        configured_timeout = load_harness_config(workdir).command_timeout_seconds
+        timeout_seconds = task.get("timeout_seconds") or configured_timeout
         verification = run_cli_verification(
-            workdir, task["verification_commands"],
-            load_harness_config(workdir).command_timeout_seconds)
+            workdir, task["verification_commands"], timeout_seconds)
         current = store.get_execution(execution["id"])
         evidence = dict((current.get("raw_state") or {}).get("evidence") or {})
         evidence.update(verification)

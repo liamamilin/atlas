@@ -3,7 +3,7 @@
   "case_id": "agent-harness-product-research",
   "title": "Agent Harness 产品调研与开发文档生成",
   "category": "product-usage-best-practice",
-  "status": "implementation-m1-mutation-and-stop-accepted-recovery-pending",
+  "status": "implementation-m1-mutation-stop-timeout-accepted-recovery-pending",
   "purpose": "通过 Atlas 搜索和阅读 Agent Harness 相关类型、应用与文档，生成可追溯的产品、技术、开发和验收文档。",
   "atlas_role": "research-and-documentation-workflow",
   "theme": "agent-harness",
@@ -43,9 +43,9 @@
     "latest_analysis_open_questions": 5,
     "latest_analysis_conflicts": 4,
     "latest_analysis_suggestions": 6,
-    "implementation_boundary": "研究与文档最佳实践已完成；M0 CLI 预检、provider 配置检查、最小连通性冒烟和 .atlas/harness.json 兼容基线已通过；M1 CLI 适配器、显式 CLI 执行分支、启动前 preflight、运行证据索引、固定验证步骤映射、显式清理和最小终端入口已实现并有回归测试。真实终端验收已在授权环境完成 CLI、隔离副本、固定验证、权限门、证据和清理复测；只读任务的完整 TUI 路径已通过产品验收；单文件变更任务的执行、显式应用、独立验收和清理已通过。停止链路已通过；取消/超时、失败恢复和回滚仍需另建任务验收。",
+    "implementation_boundary": "研究与文档最佳实践已完成；M0 CLI 预检、provider 配置检查、最小连通性冒烟和 .atlas/harness.json 兼容基线已通过；M1 CLI 适配器、显式 CLI 执行分支、启动前 preflight、运行证据索引、固定验证步骤映射、显式清理和最小终端入口已实现并有回归测试。真实终端验收已在授权环境完成 CLI、隔离副本、固定验证、权限门、证据和清理复测；只读任务的完整 TUI 路径已通过产品验收；单文件变更任务的执行、显式应用、独立验收和清理已通过。停止和任务级超时链路已通过；失败恢复和回滚仍需另建任务验收。",
     "next_implementation_questions": [
-      "变更任务的取消/超时、失败恢复和回滚路径是否满足产品验收",
+      "失败恢复和回滚路径是否满足产品验收",
       "任务状态、证据包和工作副本清理在变更任务中是否与网页工作台一致",
       "后续产品路线是否需要并行任务、take-over、历史列表或多入口",
       "是否支持多个并行任务会话",
@@ -77,14 +77,14 @@
       "status": "cli_transport_preflight_evidence_and_cleanup_integrated",
       "module": "application-atlas-production-pack/opencode_cli_adapter.py",
       "contract": "docs/u17-pilots/agent-harness-product/m1-cli-adapter-contract.md",
-        "checks": [
-          "harness.json compatibility",
-          "provider output presence without raw output",
-          "shell-free argv construction",
-          "stable run summary for exit, timeout and JSON event types",
-          "fixed verification commands mapped to task steps",
-          "explicit cleanup preserves execution evidence"
-        ],
+      "checks": [
+        "harness.json compatibility",
+        "provider output presence without raw output",
+        "shell-free argv construction",
+        "stable run summary for exit, timeout and JSON event types",
+        "fixed verification commands mapped to task steps",
+        "explicit cleanup preserves execution evidence"
+      ],
       "preflight_api": {
         "status": "integrated",
         "endpoint": "GET /api/projects/:id/harness/preflight",
@@ -100,7 +100,7 @@
       "tui_integration": "minimal_terminal_slice_integrated"
     },
     "m1_real_acceptance": {
-      "status": "real_cli_read_only_tui_and_bounded_mutation_accepted",
+      "status": "real_cli_read_only_tui_bounded_mutation_stop_and_timeout_accepted",
       "task_id": "tsk_4aa41e37e50448388589db2b2f9081c9",
       "execution_id": "exe_fc680ac2fbe94ff491f5cab3a534dfb9",
       "preflight": "passed",
@@ -133,7 +133,11 @@
         "execution_id": "exe_fd26826a648b47f98f7fde12cbb88e7c",
         "status": "completed",
         "opencode_events": 27,
-        "tool_types": ["read", "glob", "grep"],
+        "tool_types": [
+          "read",
+          "glob",
+          "grep"
+        ],
         "bash_or_edit_called": false,
         "fixed_verification": "passed",
         "source_workspace_modified": false,
@@ -145,23 +149,50 @@
       "tui_acceptance": {
         "status": "passed_for_read_only_analysis_task",
         "execution_id": "exe_fc680ac2fbe94ff491f5cab3a534dfb9",
-        "keyboard_path": ["j", "j", "Enter", "y", "v", "Space", "p", "text", "y", "x", "y", "c", "y", "q"],
-        "verified": ["task selection", "CLI execution", "run detail view", "manual acceptance", "evidence export", "worktree cleanup"],
-        "not_applicable": ["apply result (analysis task)", "stop active run (execution completed before stop)"],
+        "keyboard_path": [
+          "j",
+          "j",
+          "Enter",
+          "y",
+          "v",
+          "Space",
+          "p",
+          "text",
+          "y",
+          "x",
+          "y",
+          "c",
+          "y",
+          "q"
+        ],
+        "verified": [
+          "task selection",
+          "CLI execution",
+          "run detail view",
+          "manual acceptance",
+          "evidence export",
+          "worktree cleanup"
+        ],
+        "not_applicable": [
+          "apply result (analysis task)",
+          "stop active run (execution completed before stop)"
+        ],
         "task_acceptance_status": "passed",
         "latest_export": "application-atlas-production-pack/projects/exports/prj_0862eec26e94462cbdf5d0414c478c8c/20260921T125016Z-8d23b93f.zip",
         "source_workspace_modified": false,
         "cleanup": "completed"
       },
       "acceptance_status": "passed_read_only_tui_path",
-      "next_action": "单文件变更任务已完成执行、应用、独立验收和清理；下一步仅在需要时单独验收停止、取消/超时、失败恢复和回滚路径",
+      "next_action": "单文件变更、停止和任务级超时链路已完成；下一步仅在需要时单独验收失败恢复和回滚",
       "mutation_acceptance": {
         "status": "passed",
         "task_id": "tsk_990032f6aebc443f938b967ba54e0293",
         "execution_id": "exe_713507199bbc4546881577b10aefc432",
         "iteration_id": "itr_d2810e2a65974f25947fbd935509eb1c",
         "fixed_verification": "passed",
-        "scope": ["change-task.txt"],
+        "scope": [
+          "change-task.txt"
+        ],
         "application": "applied",
         "independent_acceptance": "passed",
         "cleanup": "completed",
@@ -177,6 +208,17 @@
         "acceptance": "waived",
         "cleanup": "completed_and_evidence_preserved",
         "evidence": "m1-stop-cleanup-acceptance.md"
+      },
+      "timeout_acceptance": {
+        "status": "passed",
+        "task_id": "tsk_e6b5fc5d7d054cf292848d6c17d0f6f2",
+        "execution_id": "exe_bc01ac9c5fcd4e67884a6140f3086a69",
+        "iteration_id": "itr_27255a757fe04b2da5ed216cb8e0e401",
+        "timeout_seconds": 30,
+        "verification": "timed_out_exit_124_30004ms",
+        "source_workspace_modified": false,
+        "cleanup": "completed_and_evidence_preserved",
+        "evidence": "m1-timeout-acceptance.md"
       }
     }
   },
