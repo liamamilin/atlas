@@ -4,6 +4,7 @@ import { ChevronDown } from "lucide-react";
 import { getMeta, getSection } from "@/lib/atlas";
 import { useAsync, Loading, ErrorBox } from "@/components/loaders";
 import { LeafCard } from "@/components/leaf-card";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useLang, t, type Lang } from "@/lib/lang";
 const pick2 = (zh: string | undefined, en: string, lang: Lang) =>
@@ -68,7 +69,8 @@ function SubBlock({
   onToggle: () => void;
 }) {
   const { lang } = useLang();
-  const { data, error } = useAsync(() => (open ? getSection(sub.id) : Promise.resolve(null)), [open, sub.id]);
+  const [retry, setRetry] = useState(0);
+  const { data, error } = useAsync(() => (open ? getSection(sub.id) : Promise.resolve(null)), [open, sub.id, retry]);
   return (
     <div className="rounded-xl bg-surface shadow-card">
       <button
@@ -85,7 +87,12 @@ function SubBlock({
       {open ? (
         <div className="border-t border-border p-4">
           {error ? (
-            <p className="text-sm text-danger">{t("loadFailed", lang)}</p>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm text-danger">{t("loadFailed", lang)}</p>
+              <Button size="sm" variant="outline" onClick={() => setRetry((value) => value + 1)}>
+                {lang === "zh" ? "重试此领域" : "Retry this section"}
+              </Button>
+            </div>
           ) : data ? (
             <div className="grid gap-3 sm:grid-cols-2">
               {data.leaves.map((l) => (
