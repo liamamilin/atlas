@@ -94,6 +94,8 @@ export function Home() {
                   icon={Sparkles}
                   title={lang === "zh" ? "新想法" : "New idea"}
                   description={lang === "zh" ? "从一句目标开始，逐步收敛范围。" : "Start with one objective and narrow the scope."}
+                  audience={lang === "zh" ? "适合：还没有代码，先验证想法" : "Best for: an idea without code yet"}
+                  output={lang === "zh" ? "产出：需求、文档和首个开发范围" : "Output: requirements, docs, and a first scope"}
                   to="/projects"
                   action={lang === "zh" ? "创建项目" : "Create project"}
                 />
@@ -101,6 +103,8 @@ export function Home() {
                   icon={Wrench}
                   title={lang === "zh" ? "已有项目改进" : "Improve an existing project"}
                   description={lang === "zh" ? "读取本地工作区，先建立基线再规划改动。" : "Read a local workspace, accept a baseline, then plan changes."}
+                  audience={lang === "zh" ? "适合：已经有本地项目" : "Best for: an existing local project"}
+                  output={lang === "zh" ? "产出：基线、改进计划和验收记录" : "Output: a baseline, improvement plan, and acceptance record"}
                   to="/projects?mode=existing"
                   action={lang === "zh" ? "进入改进流程" : "Start improvement"}
                 />
@@ -108,6 +112,8 @@ export function Home() {
                   icon={FolderKanban}
                   title={lang === "zh" ? "Agent Harness 调研" : "Agent Harness study"}
                   description={lang === "zh" ? "用 Atlas 调研类型，生成文档并验证一个最小纵向切片。" : "Research the type in Atlas, generate docs, and validate a vertical slice."}
+                  audience={lang === "zh" ? "适合：研究 agent harness 或开发工具" : "Best for: researching an agent harness or dev tool"}
+                  output={lang === "zh" ? "产出：调研文档和最小可验收切片" : "Output: research docs and a minimal accepted slice"}
                   to="/projects?fromType=ai-coding-agent"
                   action={lang === "zh" ? "从类型创建" : "Create from type"}
                 />
@@ -148,10 +154,12 @@ export function Home() {
   );
 }
 
-function CaseEntry({ icon: Icon, title, description, to, action }: {
+function CaseEntry({ icon: Icon, title, description, audience, output, to, action }: {
   icon: typeof Sparkles;
   title: string;
   description: string;
+  audience: string;
+  output: string;
   to: string;
   action: string;
 }) {
@@ -160,6 +168,10 @@ function CaseEntry({ icon: Icon, title, description, to, action }: {
       <Icon className="size-5 text-primary" />
       <h3 className="mt-3 font-medium">{title}</h3>
       <p className="mt-1.5 min-h-10 text-sm leading-5 text-muted">{description}</p>
+      <div className="mt-3 space-y-1 text-xs leading-5 text-subtle">
+        <p>{audience}</p>
+        <p>{output}</p>
+      </div>
       <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
         {action}<ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
       </span>

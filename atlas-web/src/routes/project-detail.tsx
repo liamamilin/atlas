@@ -162,6 +162,7 @@ export function ProjectDetail() {
 
       <ProjectStatusHeader workspace={data} activeIteration={activeIteration} hasBaseline={hasBaseline}
         nextStep={lifecycleSteps(data, hasBaseline).find((item) => !item.done) || null} />
+      {!data.iterations.length ? <FirstWorkspaceHint lang={lang} /> : null}
 
       <StageSection stage={STAGES[0]}>
         <LifecycleOverview workspace={data} hasBaseline={hasBaseline} />
@@ -357,6 +358,24 @@ function ProjectStatusHeader({ workspace, activeIteration, hasBaseline, nextStep
       </div>
     </div>
     <nav className="mt-4 flex flex-wrap gap-2 border-t border-border pt-3">{STAGES.map((stage, index) => <a key={stage.id} href={`#stage-${stage.id}`} className="rounded-full bg-bg-elevated px-3 py-1 text-xs text-muted hover:text-fg">{index + 1} · {lang === "zh" ? stage.zh : stage.en}</a>)}</nav>
+  </section>;
+}
+
+function FirstWorkspaceHint({ lang }: { lang: "zh" | "en" }) {
+  return <section className="mt-4 rounded-xl border border-primary/20 bg-primary/[0.06] p-4">
+    <div className="flex items-start gap-3">
+      <Sparkles className="mt-0.5 size-4 shrink-0 text-primary" />
+      <div className="min-w-0">
+        <p className="text-sm font-medium">{lang === "zh" ? "第一次使用？按这三步开始" : "First time here? Start with these three steps"}</p>
+        <p className="mt-1 text-xs leading-5 text-muted">{lang === "zh" ? "先确认依据，再确认范围，最后冻结计划。完成前不会修改你的本地项目。" : "Confirm the evidence, define the scope, then freeze a plan. Nothing changes in your local project before you review it."}</p>
+        <div className="mt-3 flex flex-wrap gap-2 text-xs">
+          <a className="rounded-full bg-surface px-3 py-1.5 text-primary shadow-card hover:underline" href="#stage-understand">{lang === "zh" ? "1 · 固定资料" : "1 · Pin evidence"}</a>
+          <a className="rounded-full bg-surface px-3 py-1.5 text-primary shadow-card hover:underline" href="#stage-scope">{lang === "zh" ? "2 · 确认范围" : "2 · Define scope"}</a>
+          <a className="rounded-full bg-surface px-3 py-1.5 text-primary shadow-card hover:underline" href="#stage-plan">{lang === "zh" ? "3 · 冻结计划" : "3 · Freeze plan"}</a>
+          <Link className="px-2 py-1.5 text-muted hover:text-fg" to="/tutorial">{lang === "zh" ? "查看完整教程" : "Read the full tutorial"}</Link>
+        </div>
+      </div>
+    </div>
   </section>;
 }
 
