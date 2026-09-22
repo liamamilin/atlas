@@ -305,16 +305,25 @@ function ProjectStatusHeader({ workspace, activeIteration, hasBaseline, nextStep
   const checkingBaseline = hasBaseline === null;
   const latestIteration = workspace.iterations.slice().sort((a, b) => b.sequence - a.sequence)[0] || null;
   const openItems = (workspace.open_items || []).filter((item) => item.current && item.status === "open");
-  const counts = [
+  const selectedDocumentVersions = new Set(activeIteration?.input_document_versions || []);
+  const selectedDocumentsNeedReview = activeIteration
+    ? workspace.documents.filter((item) => selectedDocumentVersions.has(item.version_id)
+      && (item.review.status === "needs_review" || (item.review.approval || "pending") !== "approved"))
+    : [];
+  const blockingCounts = [
     { value: openItems.filter((item) => item.kind === "question").length, zh: "开放问题", en: "Open questions" },
     { value: openItems.filter((item) => item.kind === "conflict").length, zh: "明确冲突", en: "Conflicts" },
-    { value: openItems.filter((item) => item.kind === "suggestion").length, zh: "参考建议", en: "Suggestions" },
     { value: workspace.requirements.filter((item) => !item.confirmed_scope).length, zh: "待确认需求", en: "Pending requirements" },
+    { value: selectedDocumentsNeedReview.length, zh: "本轮文档待复核", en: "Current documents to review" },
+  ];
+  const optionalCounts = [
+    { value: openItems.filter((item) => item.kind === "suggestion").length, zh: "参考建议", en: "Suggestions" },
     { value: workspace.documents.filter((item) => item.review.status === "needs_review").length, zh: "待复核文档", en: "Documents to review" },
     { value: workspace.documents.filter((item) => (item.review.approval || "pending") !== "approved").length, zh: "未批准文档", en: "Unapproved documents" },
   ];
   const stageIndex = checkingBaseline ? 0 : nextStep ? STAGES.findIndex((stage) => stage.id === nextStep.stage) : STAGES.length - 1;
-  const visibleCounts = counts.filter((item) => item.value > 0);
+  const visibleBlockingCounts = blockingCounts.filter((item) => item.value > 0);
+  const visibleOptionalCounts = optionalCounts.filter((item) => item.value > 0);
   return <section className="mt-6 rounded-xl border border-border bg-surface p-5 shadow-card">
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
       <div>
@@ -335,15 +344,16 @@ function ProjectStatusHeader({ workspace, activeIteration, hasBaseline, nextStep
         {nextStep && !checkingBaseline ? <Button asChild size="sm" className="mt-4"><a href={`#stage-${nextStep.stage}`}>{lang === "zh" ? `开始：${nextStep.zh}` : `Start: ${nextStep.en}`}</a></Button> : null}
       </div>
       <div>
-        <p className="text-xs font-medium text-muted">{lang === "zh" ? "待处理事项" : "Needs attention"}</p>
-        {visibleCounts.length ? (
-          <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">{visibleCounts.map((item) => <MiniStat key={item.en} value={item.value} label={lang === "zh" ? item.zh : item.en} warn />)}</div>
+        <p className="text-xs font-medium text-muted">{lang === "zh" ? "当前迭代" : "Current iteration"}</p>
+        {visibleBlockingCounts.length ? (
+          <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">{visibleBlockingCounts.map((item) => <MiniStat key={item.en} value={item.value} label={lang === "zh" ? item.zh : item.en} warn />)}</div>
         ) : (
           <div className="mt-2 rounded-lg bg-primary/10 p-4 text-sm text-primary">
             <CheckCircle2 className="mb-1 size-4" />
-            {lang === "zh" ? "目前没有待处理事项。" : "There is nothing waiting for your attention."}
+            {lang === "zh" ? "当前没有阻塞项。" : "There are no blockers for the current iteration."}
           </div>
         )}
+        {visibleOptionalCounts.length ? <div className="mt-3 rounded-lg bg-bg-elevated p-3"><p className="text-xs font-medium text-muted">{lang === "zh" ? "可选建议与后续处理" : "Optional suggestions and follow-ups"}</p><div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">{visibleOptionalCounts.map((item) => <MiniStat key={item.en} value={item.value} label={lang === "zh" ? item.zh : item.en} warn={false} />)}</div></div> : null}
       </div>
     </div>
     <nav className="mt-4 flex flex-wrap gap-2 border-t border-border pt-3">{STAGES.map((stage, index) => <a key={stage.id} href={`#stage-${stage.id}`} className="rounded-full bg-bg-elevated px-3 py-1 text-xs text-muted hover:text-fg">{index + 1} · {lang === "zh" ? stage.zh : stage.en}</a>)}</nav>

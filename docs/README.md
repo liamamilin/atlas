@@ -8,6 +8,7 @@
 - [U17 开发规划](U17_DEVELOPMENT_PLAN.md)：已完成范围、剩余里程碑、优先级与完成条件。
 - [U17 项目工作台设计检查](U17_PROJECT_WORKBENCH_REVIEW.md)：项目页面的状态语义、操作闭环、风险分级、处理记录与重构顺序。
 - [U17 产品打磨计划](U17_PRODUCT_POLISH_PLAN.md)：当前阶段的产品收口顺序、完成定义和恢复 M5 的条件。
+- [U17 产品化收口开发计划](U17_PRODUCT_CLOSURE_PLAN.md)：本轮发布前的开发阶段、执行循环、完成条件和当前队列。
 - [U17 M5 试点计划](U17_M5_PILOT_PLAN.md)：产品打磨完成后的三个真实案例、普通生成对照和后端决策办法。
 - [U17 核心主线验证](U17_CORE_PATH_VALIDATION.md)：最近一次从类型入口到完成迭代的全绿证据。
 - [U17 发布检查清单](U17_RELEASE_CHECKLIST.md)：可重复执行的自动化、浏览器和安全反馈发布前检查。
