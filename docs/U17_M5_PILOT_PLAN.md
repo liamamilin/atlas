@@ -1,7 +1,7 @@
 # U17 M5 完整试点计划
 
 日期：2026-09-20
-状态：核心主线、产品打磨和发布复验已通过；简单新想法、已有项目改进、多类型需求和 Agent Harness 产品使用案例均已完成当前范围并封存。多类型需求 T1–T4 已应用契约文档，T5 为只读端到端分析；Agent Harness 已完成 M0/M1 纵向切片，并通过一个受控单文件变更任务的应用与独立验收。真实供应商、模拟适配器、变更任务停止/取消/超时、失败恢复、回滚和独立 Harness 仍是单独范围，不冒充当前完成项。
+状态：核心主线、产品打磨和发布复验已通过；简单新想法、已有项目改进、多类型需求和 Agent Harness 产品使用案例均已完成当前范围并封存。多类型需求 T1–T4 已应用契约文档，T5 为只读端到端分析；Agent Harness 已完成 M0/M1 纵向切片，并通过一个受控单文件变更任务的应用与独立验收。真实供应商、模拟适配器、变更任务停止链路已通过；取消/超时、失败恢复、回滚和独立 Harness 仍是单独范围，不冒充当前完成项。
 依据：[U17 设计稿](U17_DESIGN.md) · [开发规划](U17_DEVELOPMENT_PLAN.md) · [M4 执行验证档案](archive/u17/U17_M4_EXECUTION_VALIDATION.md)
 
 ## 1. 目标与顺序
@@ -105,7 +105,7 @@ M5 不继续预设新的产品模块。前置的最小真实开发冒烟已经�
 5. 把“短期集成 OpenCode、长期是否抽象独立 Harness”作为证据驱动的架构决策输入，不在本案例中预先承诺自研。
 6. 导出文档包，由新会话核对目标、范围、依赖、风险和下一项开发任务。
 
-案例证据与状态见 `docs/u17-pilots/agent-harness-product/`。已保存普通生成对照、Atlas 原始输入输出、来源指纹、文档版本、执行证据和独立界面复核；变更任务的停止/取消/超时、失败恢复、回滚与后续路线问题保持独立，不改变本案例当前完成结论；单文件变更任务验收记录见 `docs/u17-pilots/agent-harness-product/m1-mutation-acceptance.md`。
+案例证据与状态见 `docs/u17-pilots/agent-harness-product/`。已保存普通生成对照、Atlas 原始输入输出、来源指纹、文档版本、执行证据和独立界面复核；变更任务的取消/超时、失败恢复、回滚与后续路线问题保持独立，不改变本案例当前完成结论；单文件变更任务验收记录见 `docs/u17-pilots/agent-harness-product/m1-mutation-acceptance.md`；停止清理复验见 `docs/u17-pilots/agent-harness-product/m1-stop-cleanup-acceptance.md`。
 
 ### 5.2 后续产品实践案例：高风险数据恢复与版本迁移
 

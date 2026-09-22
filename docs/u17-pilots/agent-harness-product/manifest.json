@@ -3,7 +3,7 @@
   "case_id": "agent-harness-product-research",
   "title": "Agent Harness 产品调研与开发文档生成",
   "category": "product-usage-best-practice",
-  "status": "implementation-m1-bounded-mutation-accepted-recovery-pending",
+  "status": "implementation-m1-mutation-and-stop-accepted-recovery-pending",
   "purpose": "通过 Atlas 搜索和阅读 Agent Harness 相关类型、应用与文档，生成可追溯的产品、技术、开发和验收文档。",
   "atlas_role": "research-and-documentation-workflow",
   "theme": "agent-harness",
@@ -43,9 +43,9 @@
     "latest_analysis_open_questions": 5,
     "latest_analysis_conflicts": 4,
     "latest_analysis_suggestions": 6,
-    "implementation_boundary": "研究与文档最佳实践已完成；M0 CLI 预检、provider 配置检查、最小连通性冒烟和 .atlas/harness.json 兼容基线已通过；M1 CLI 适配器、显式 CLI 执行分支、启动前 preflight、运行证据索引、固定验证步骤映射、显式清理和最小终端入口已实现并有回归测试。真实终端验收已在授权环境完成 CLI、隔离副本、固定验证、权限门、证据和清理复测；只读任务的完整 TUI 路径已通过产品验收；单文件变更任务的执行、显式应用、独立验收和清理已通过。停止、取消/超时、失败恢复和回滚仍需另建任务验收。",
+    "implementation_boundary": "研究与文档最佳实践已完成；M0 CLI 预检、provider 配置检查、最小连通性冒烟和 .atlas/harness.json 兼容基线已通过；M1 CLI 适配器、显式 CLI 执行分支、启动前 preflight、运行证据索引、固定验证步骤映射、显式清理和最小终端入口已实现并有回归测试。真实终端验收已在授权环境完成 CLI、隔离副本、固定验证、权限门、证据和清理复测；只读任务的完整 TUI 路径已通过产品验收；单文件变更任务的执行、显式应用、独立验收和清理已通过。停止链路已通过；取消/超时、失败恢复和回滚仍需另建任务验收。",
     "next_implementation_questions": [
-      "变更任务的停止、取消/超时、失败恢复和回滚路径是否满足产品验收",
+      "变更任务的取消/超时、失败恢复和回滚路径是否满足产品验收",
       "任务状态、证据包和工作副本清理在变更任务中是否与网页工作台一致",
       "后续产品路线是否需要并行任务、take-over、历史列表或多入口",
       "是否支持多个并行任务会话",
@@ -166,6 +166,17 @@
         "independent_acceptance": "passed",
         "cleanup": "completed",
         "evidence": "m1-mutation-acceptance.md"
+      },
+      "stop_cleanup_acceptance": {
+        "status": "passed",
+        "task_id": "tsk_a94598891bcd41b4a917847d06f56d8b",
+        "execution_id": "exe_9384ae3aaf0c485db9f243ead2272233",
+        "iteration_id": "itr_07a0bb25be9645189600fe3ea328c660",
+        "execution_status": "stopped",
+        "run_summary": "cancelled",
+        "acceptance": "waived",
+        "cleanup": "completed_and_evidence_preserved",
+        "evidence": "m1-stop-cleanup-acceptance.md"
       }
     }
   },
