@@ -1,0 +1,31 @@
+{
+ "outcome": "passed",
+ "summary": "architecture_contract 维度通过：默认技术栈、SQLite 数据模型、URL 策略、API 与 HTML 的错误合同、默认归类与软删除迁移，以及 A04/A12 的分类输入语义相互一致，未发现会阻断核心旅程、造成数据完整性矛盾或与安全承诺冲突的问题。程序尚未存在，本次只审阅设计，未作运行验收。",
+ "checks": [
+  {
+   "dimension": "architecture_contract",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md",
+    "REVISION.md",
+    "CASE_DESIGN.json",
+    "CASE_ADAPTATION_POLICY.json",
+    "RESEARCH.md"
+   ],
+   "reason": "ARCHITECTURE 明确采用 python-web、Python 3.12 标准库与 SQLite，并给出 categories/bookmarks 表、单归类默认「未整理」、NOCASE 复用、软删除迁移、P1 去重、URL 原文保留与 /go 302；DRAFT 的 A04 统一使用 invalid_name，A12 保存/移动统一使用 invalid_category，HTML 用 category/category_id、JSON 用 category 并区分省略/null，均与 ARCHITECTURE 和 CASE_ADAPTATION_POLICY 对应。REVISION 将本次限定为 A04/A12 受限补丁，未发现越界或与既有阶段承诺冲突。"
+  }
+ ],
+ "suggestions": [
+  "补充书签 JSON 的稳定响应字段（至少 id、url、title、description、category 名称、category_id、trashed_at），因为 DRAFT 的 F01/F04/F08 依赖 GET /api/bookmarks/{id} 的 url 和 JSON category 与持久化结果一致，而架构目前只定义了端点、状态码和错误体。",
+  "在 UI/安全合同中明确所有用户可控值（原始 URL 的 href、title、description、category 名称及错误回填）必须经过 HTML/属性转义，并保证 DOM href 仍等于保存时原始 URL；对无认证的本地写接口应补充 Origin/CSRF 防护或明确接受该风险。",
+  "明确 HTML 保存表单的 category 控件支持自由输入新归类名（如 input/datalist），否则 D03 的自动创建和 F01 的「输入新归类名」在浏览器入口不可达。",
+  "将 contract_coverage 中 html/json.bookmark_save.category.* 的 feature_ids 从 F04 修正为 F01（与 F10 并列）；这些分支的 operation 是 bookmark_save，F04 仅覆盖移动。",
+  "为 A04 新建/重命名归类补充跨重启验证入口（--app-root/--data-dir），因为确认场景要求新建归类在重新打开后仍有效，而 F08 的重启覆盖目前只列 A01/A05/A09。"
+ ],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "review_rules_version": "atlas.current-required-contract.v1",
+ "proposal_digest": "f190b65275ab7c7136f523ba92aecde7c9392440d7676b070393e62ff9137b58",
+ "projection_digest": "593feefe20548959f016d921f6176c51477314f8d238c15a4c7492c1003f669f",
+ "stage": "blueprint-spec-review-0-bbc43771a1bbbe99-architecture_contract"
+}

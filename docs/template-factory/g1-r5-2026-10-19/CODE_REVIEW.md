@@ -7,3 +7,7 @@
 实施方执行证据：verification/focused.txt 为 52 项测试及 8 个子用例通过；完整后端 598 项、8 项既有可选跳过。独立审查结束时，完整13组门禁仍在收尾；最终本地结果和同SHA远端CI由主代理另记，不写成审查者亲自执行。
 
 联接测试在真实 Pipeline 的独立架构预审处由假CLI截获；不代表真实 provider、模板预审、应用或P0通过。真实生产必须在完整检查及同新代码SHA远端CI通过后另行取证。
+
+## 真实停止证据独立复核
+
+同一独立Sol reviewer只读复核了实际台账、失败原文、恢复attempt2、原job/checkpoint哈希、正式暂停与宿主评估：未发现计数错误、换意见重试或伪造通过。支持停止原因是phase_acceptance历史两次追加重试已用尽，并非500或截止耗尽；核对56/500、5/5、active0及原52/4保留。特别指出“CLI started”事件早于预算检查，不可当作实际进程；attempt2没有预留/process/结果。提出的过时快照文案已更新，最终以job-after/report-after/G1_ASSESSMENT为准。这仍是证据复核，不替代真实应用或工厂provider审阅。

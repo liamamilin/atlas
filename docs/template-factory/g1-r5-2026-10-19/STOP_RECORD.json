@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.g1-r5-stop-record.v1",
+  "status": "blocked",
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+  "job_id": "job_7742b1c124be4c9ab3a0096da5cdd772",
+  "stage": "blueprint-spec-review-0-bbc43771a1bbbe99-phase_acceptance",
+  "original_failure": {
+    "attempt": 1,
+    "code": "cli_protocol",
+    "reason": "incomplete cognitive JSON; no fields recovered",
+    "cli_exit_code": 0,
+    "cli_status": "completed",
+    "delivery_status": "failed"
+  },
+  "formal_recovery": {
+    "attempt": 2,
+    "state": "paused_budget",
+    "code": "budget_retry_limit",
+    "reason": "transient retry limit exhausted",
+    "new_cli_calls": 0
+  },
+  "plan_action": "pause",
+  "cli_used": 56,
+  "cli_limit": 500,
+  "repair_used": 5,
+  "repair_limit": 5,
+  "historical_stage_added_retries_used": 2,
+  "historical_stage_added_retries_limit": 2,
+  "active_reservations": 0,
+  "effective_deadline": 1792437223.754534,
+  "expired_at_stop": false,
+  "g1": "blocked",
+  "t08": "not_started",
+  "production_source_sha": "204d4e5beb7d6ce75a462ed342d01a9c03c43df2",
+  "needed_action": "No automatic resume. Current R5 authorization does not permit another transient retry or a sixth business repair. Any further phase_acceptance call requires separately authorized narrowly scoped retry-policy change through an audited formal service, preserving the two historical retries; deadline must still be valid. If expiry occurs, a new explicit time authorization is also required. No such changes executed."
+}

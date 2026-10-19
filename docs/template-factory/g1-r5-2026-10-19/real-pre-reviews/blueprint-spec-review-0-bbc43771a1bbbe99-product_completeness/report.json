@@ -1,0 +1,26 @@
+{
+ "outcome": "passed",
+ "summary": "仅审 product_completeness：P0 的保存与默认归类、归类管理、移动、归类浏览与计数、关键字检索、打开回跳、软删除与恢复、跨重启持久化和错误恢复均有 UI 或明确 JSON 入口，并与 ARCHITECTURE 的成功导航、失败响应和零写入约束一致；未发现阻断性主旅程或数据、错误、默认值矛盾。以下建议用于消除仍可能影响真实浏览器可达性的表述空白。",
+ "checks": [
+  {
+   "dimension": "product_completeness",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "F01–F11 与 A01–A12 均有入口、动作、成功、失败和恢复：GET / 的保存表单与搜索表单、/categories 的归类表单、记录行的 move/delete/open 表单与链接、/?trash=1 的 restore 表单、GET /go/{id} 的 302、GET /api/health；成功路径 303 导航，失败路径 400/409 的 form-error 或 JSON {error:{code,message,field}}，并保留输入且零写入。32 条 contract_coverage 错误分支均可追溯到 A04/A12 的真实 HTML/JSON 路径；保存、移动、删除、恢复及重启后的读取均由 SQLite 与同一实例目录支撑。"
+  }
+ ],
+ "suggestions": [
+  "在 ARCHITECTURE 的 GET /categories 合同中明确每个归类行是否各自渲染 rename/delete 表单并预填或隐藏 category_id，或提供归类选择控件；当前只列出一个 category-rename-form/category-delete-form 与 input category_id，未说明普通浏览器用户如何选择要重命名或删除的归类，A04 的真实表单操作因此不够明确。",
+  "在首页或全局导航补充可见的回收站入口（如指向 /?trash=1 的 a[data-testid=trash-link]）；当前只声明删除成功 303 到回收站，用户离开该落地页后，F09/A09 的恢复路径没有可发现的 UI 入口。",
+  "明确保存表单 category 控件的形态：是包含预置归类（未整理、待购、家居改造、以后看看）的 select/datalist，还是自由文本；F01 写“选择已有归类”，ARCHITECTURE 仅写 category 字段预填“未整理”，请补足该主保存旅程的既有归类选择能力。",
+  "将 F05/F11 承诺的首页侧栏 [data-testid=category-count] 与归类链接、以及记录列表/空状态容器补入 GET / 的 UI 合同，或明确这些元素仅出现在 /categories 并同步调整 A06/A11 的入口；当前 GET / 合同只列保存表单、category-manager、搜索表单和记录行。"
+ ],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "review_rules_version": "atlas.current-required-contract.v1",
+ "proposal_digest": "f190b65275ab7c7136f523ba92aecde7c9392440d7676b070393e62ff9137b58",
+ "projection_digest": "f317fa18b3e27dcc6dfaeb82f4fade7d29549b3d9cc5cb9005eae50c79f629c9",
+ "stage": "blueprint-spec-review-0-bbc43771a1bbbe99-product_completeness"
+}

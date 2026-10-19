@@ -34,3 +34,7 @@ version2 仅把该 G1 plan 的修复上限 4→5。基础 started `1792389754.63
 ## 回归与执行边界
 
 临时库联接回归装载归档完整29观察、实际分离的冻结来源/失败job、五文件scope与52/4，运行真实登记/queue/父暂停领取/resume/Pipeline，到架构预审 spy。模型边界为假CLI；不声称真实预审或应用通过。错误分支、source篡改、inner/outer恢复继续验证。真实生产必须等待本轮新 SHA 的完整门禁与远端CI，实际请求/响应随后分别保存。
+
+## 实际响应与保留边界
+
+实际登记、生效、重放和队列响应均已归档；请求字段详见authorization-request.json与queue-request.json。此次schema/接口不支持额外phase retry或第六轮；不能通过改model/note/request key获得额度。当前正式host assessment见G1_ASSESSMENT.json，原始协议错误/重试预算门禁分开见STOP_RECORD及protocol-recovery-proof。

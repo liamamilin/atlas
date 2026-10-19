@@ -20,3 +20,11 @@ PYTHONPATH=application-atlas-production-pack python3 -m template_factory.batch_c
 G1通过后，原 v1-2026-10-19/t08-request.json 经正式 preview固定自己的T08 plan/digest并run；固定书签、月度预算、多项目会议笔记三分母，不自动扩到十个。T08自身最多8小时，但共用原500总账，G1的5轮例外不扩散。
 
 遇到真实语义阻断或需要第六轮、调用/截止耗尽、外部服务阻塞：保存raw输入/输出、失败、budget与job/checkpoints，正式pause相关plan，完成不受阻文档、检查和提交。不重试换意见，不将协议错误当业务修复，也不将业务失败当协议重试。
+
+## 本轮已实际执行及停止
+
+登记/生效/排队与幂等重放已执行，见 authorization-response、queue-response、*-replay-response。版本2为bamd_ad804106fd7049b1b67b914b8e494300；successor job_7742b1c124be4c9ab3a0096da5cdd772。原 formal-repair-request-NOT-EXECUTED.json 是历史文件名，其精确正文已由本轮queue-request消费，不能重复作为新修订排队。
+
+当前原plan已正式pause，job attempt2为paused_budget，累计56/500、5/5、active0，G1blocked，T08not_started。当前逻辑阶段历史两次追加重试均已耗尽；当前授权不允许直接重试、重新排队或增额。协议失败的正式恢复只复用了前三checkpoint，没有新增CLI，见protocol-recovery-proof。
+
+只读检查仍可执行batch_cli status/report，或GET /api/factory/jobs/job_7742b1c124be4c9ab3a0096da5cdd772。不要将status响应中的旧base deadline当作有效截止；读匹配G1/plan/product的已激活version2，其绝对截止仍1792437223.754534。到期不能用暂停或恢复延期。下一步需要明确、受限且经正式服务登记的额外重试授权/机制；目前没有该授权，因此不提供会绕过限制的恢复命令。若之后有业务修复或已到期，分别需要对应明确授权。
