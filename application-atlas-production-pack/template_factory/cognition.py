@@ -506,6 +506,13 @@ def render_candidate(result, research, snapshot, candidate, job_id):
         "evidence": [],
         "research": research,
     }
+    if snapshot.get("v1"):
+        value.update({"factory_policy": "atlas.factory-v1.1", "case_basis": snapshot["case_basis"],
+                      "admission": snapshot.get("admission"), "case_design": snapshot.get("case_design", []),
+                      "phase_required_evidence": {spec["phases"][0]["id"]: [
+                          {"id": "independent-core-journey", "kind": "external",
+                           "executor": "atlas-independent-acceptance-v1",
+                           "description": "Independent user-entry/core-journey and risk verification against the same frozen source; suite results alone do not satisfy this item."}]}})
     candidate.mkdir(exist_ok=False)
     for name, content in clean_files.items():
         path = candidate / name
@@ -513,6 +520,11 @@ def render_candidate(result, research, snapshot, candidate, job_id):
         path.write_text(content)
     atomic_json(candidate / "template.json", value)
     atomic_json(candidate / "inputs/scenario.json", scenario)
+    if snapshot.get("v1"):
+        atomic_json(candidate / "inputs/case-basis.json", snapshot["case_basis"])
+        atomic_json(candidate / "inputs/case-design.json", snapshot.get("case_design", []))
+        value["evidence"] = [{"path": "inputs/case-basis.json", "scope": "Fixed shared case revisions and evidence digests; no upstream/downstream runtime claim."}]
+        atomic_json(candidate / "template.json", value)
     atomic_json(
         candidate / "acceptance/plan.json",
         {
@@ -662,6 +674,11 @@ def render_candidate(result, research, snapshot, candidate, job_id):
             else "Atlas checks structure, references, phase mappings and hashes only. Acceptance and reference programs have NOT been executed. Sources are OpenCode research reports, not independently re-fetched evidence. Independent cognitive review is stored separately; its pass is not downstream runtime success."
         ),
     )
+    if snapshot.get("v1"):
+        with (candidate / "CATEGORY.md").open("a") as handle:
+            handle.write("\n\n## 固定案例依据与设计取舍 / Fixed case basis and design\n\n")
+            handle.write("案例依据来自共享规范记录，完整版本见 inputs/case-basis.json。源码定位与独立审阅不代表上游运行通过。\n\n")
+            handle.write(json.dumps(snapshot.get("case_design", []), ensure_ascii=False, indent=2))
     atomic_json(
         candidate / "integrity.json",
         {"template_version": value["version"], "sha256": tree_manifest(candidate)},
@@ -809,7 +826,33 @@ def apply_review_reference_repair(result, response, source):
 def produce(pipeline, job, attempt, agent, stage, checkpoint):
     snapshot, config = job["snapshot"], job["snapshot"]["config"]
     repair = snapshot.get("cognitive_repair")
-    if repair:
+    if snapshot.get("v1"):
+        from .cases import CaseLibrary
+        library = CaseLibrary(pipeline.store)
+        library.require_admissible(snapshot["case_basis"])
+        accepted_ids = library.accepted_evidence_ids(snapshot["case_basis"])
+        cases = [library.get_case(r["case_id"], r["revision"]) for r in snapshot["case_basis"]["case_refs"]]
+        sources, summaries, gaps = [], [], []
+        for case in cases:
+            summaries.append(case["research"]["summary"])
+            gaps.extend(case["research"].get("unknowns", []))
+            for observation in case["observations"]:
+                if observation["evidence_id"] not in accepted_ids:
+                    gaps.append("Unaccepted observation excluded from usable facts: " + observation["evidence_id"])
+                    continue
+                if observation["kind"] not in {"code_observation", "documentation"}:
+                    continue
+                location = observation["location"]
+                fixed_source = next((s for s in case["source_snapshots"] if s["commit_sha"] == location.get("commit_sha")), None)
+                url = location.get("url") or (fixed_source["repository"] + "/blob/" + fixed_source["commit_sha"] + "/" + location["path"])
+                sources.append({"id": "S" + str(len(sources) + 2).zfill(2), "name": observation["evidence_id"],
+                                "url": url, "version": location.get("commit_sha") or location.get("material_version") or location.get("collected_at"),
+                                "facts": observation["statement"], "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+                                "reuse": "Independently accepted " + observation["kind"] + "; design adaptation is recorded separately; upstream not run."})
+        research = checkpoint("blueprint-research", lambda: validate_research({"sources": sources, "summary": "\n\n".join(summaries), "gaps": gaps}))
+        if any(s["name"] not in accepted_ids for s in research["sources"]):
+            raise FactoryError("research checkpoint includes unaccepted evidence", "case_adaptation_invalid", 409)
+    elif repair:
         research = checkpoint(
             "blueprint-research",
             lambda: validate_research(repair["research"]),
@@ -869,12 +912,32 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
     context = attempt / "context"
     context.mkdir()
     (context / "RESEARCH.md").write_text(research_context(research))
+    if snapshot.get("v1"):
+        atomic_json(context / "CASE_BASIS.json", snapshot["case_basis"])
+        adaptation = checkpoint("case-adaptation", lambda: agent(
+            "case-adaptation", "Read source/CASE_BASIS.json and source/RESEARCH.md. These are fixed shared canonical case facts, never rewrite identities or claim runtime. Return {\"choices\":[{\"evidence_ids\":[\"existing ID\"],\"disposition\":\"adopted|adjusted|new_design|not_adopted\",\"capability\":\"concrete scene capability\",\"reason\":\"why and difference\"}]}. Explain actual scenario adaptation, not a generic list. New design may use an empty evidence list; all borrowed decisions must reference existing evidence IDs. Do not search or execute.",
+            {"scenario": snapshot["scenario"], "language": config.get("language", "zh")}, context))
+        choices = adaptation.get("choices")
+        if not isinstance(choices, list) or not choices or len(choices) > 100:
+            raise FactoryError("case adaptation requires substantive choices", "case_adaptation_invalid", 409)
+        for choice in choices:
+            if not isinstance(choice, dict) or choice.get("disposition") not in {"adopted", "adjusted", "new_design", "not_adopted"}:
+                raise FactoryError("invalid case adaptation disposition", "case_adaptation_invalid", 409)
+            refs = choice.get("evidence_ids")
+            if not isinstance(refs, list) or not set(refs) <= set(snapshot["case_basis"]["evidence_ids"]) or (not refs and choice["disposition"] != "new_design"):
+                raise FactoryError("case adaptation references unknown evidence", "case_adaptation_invalid", 409)
+            text(choice.get("capability"), "adapted capability")
+            text(choice.get("reason"), "adaptation reason")
+        snapshot["case_design"] = choices
+        library.require_design_evidence(snapshot["case_basis"], choices)
+        atomic_json(context / "CASE_DESIGN.json", choices)
     runtime_protocol = config.get("acceptance_protocol")
     design_dimensions = DESIGN_DIMENSIONS + (
         ("runtime_protocol",) if runtime_protocol else ()
     )
     (context / "FORMAT.md").write_text(
         GENERATE_PROMPT + ("\n" + RUNTIME_PROTOCOL_GUIDANCE if runtime_protocol else "")
+        + ("\nV1: Read CASE_BASIS.json and CASE_DESIGN.json. Host-owned fixed case/evidence IDs are immutable; use research source IDs in features. Distinguish borrowed behavior, adaptations and new designs in architecture and reasons. V1 downstream profile is python-web on Python3.12 with standard library/SQLite; acceptance must use Python standard library, not npm/Playwright dependencies. Real UI journey will also be checked by an independent executor outside the suite. Do not invent runtime results. Keep P0 complete and executable offline. Cases and source have already been researched; do not search again." if snapshot.get("v1") else "")
     )
     if runtime_protocol:
         (context / "RUNTIME_PROTOCOL.md").write_text(RUNTIME_PROTOCOL_GUIDANCE)
@@ -929,6 +992,11 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
     design_report = None
     plan = None
     for index in range(config["repair_attempts"] + 1):
+        if index and snapshot.get("v1"):
+            from .budget import BudgetLedger
+            identity = snapshot["v1"]
+            BudgetLedger(pipeline.store, campaign_id=identity["campaign_id"]).record_repair(
+                identity["product_id"], "spec-repair:" + job["id"] + ":" + str(index))
         prior_plan = plan
 
         def propose():
@@ -1405,6 +1473,7 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             "edit_paths": snapshot.get("cognitive_repair", {}).get("edit_paths"),
             "reuse_spec": snapshot.get("cognitive_repair", {}).get("reuse_spec", False),
             "spec_review": design_report,
+            **({"case_basis": snapshot["case_basis"], "v1": snapshot["v1"], "case_design": snapshot.get("case_design", [])} if snapshot.get("v1") else {}),
         },
     )
     package = attempt / "blueprint.zip"
@@ -1685,8 +1754,27 @@ def queue_repair(store, artifact, value):
             "research": pinned_research(store, artifact, bundle, spec),
         },
     }
+    if original.get("v1"):
+        snapshot.update({key: original[key] for key in ("v1", "case_basis", "admission") if key in original})
+    request_digest = digest({"artifact_id": artifact["id"], "artifact_digest": artifact["digest"],
+                             "note": note, "scope": edit_paths, "reuse": reuse_spec, "config": config})
+    snapshot["repair_request_digest"] = request_digest
     batch_id, job_id, at = uid("bat"), uid("job"), now()
+    ledger = None
+    if original.get("v1"):
+        from .budget import BudgetLedger
+        ledger = BudgetLedger(store, campaign_id=original["v1"]["campaign_id"])
     with store.connect(True) as con:
+        prior = con.execute("SELECT batch_id FROM job WHERE kind='blueprint-production' AND json_extract(snapshot,'$.repair_request_digest')=? ORDER BY created_at LIMIT 1", (request_digest,)).fetchone()
+        if prior:
+            return store.batch(prior[0])
+        parent_state = "running"
+        if original.get("v1", {}).get("plan_id"):
+            parent = con.execute("SELECT b.state FROM v1_execution e JOIN batch b ON b.id=e.batch_id WHERE e.plan_id=?", (original["v1"]["plan_id"],)).fetchone()
+            if parent and parent[0] == "cancelled":
+                raise FactoryError("parent plan is cancelled", "cancelled", 409)
+            if parent and parent[0] == "paused":
+                parent_state = "paused"
         if con.execute(
             "SELECT 1 FROM job WHERE kind='blueprint-production' AND state IN ('queued','running') AND json_extract(snapshot,'$.scenario.id')=?",
             (spec["scenario"]["id"],),
@@ -1696,8 +1784,10 @@ def queue_repair(store, artifact, value):
             )
         con.execute(
             "INSERT INTO batch VALUES(?,?,?,?)",
-            (batch_id, "running", canonical(config), at),
+            (batch_id, parent_state, canonical(config), at),
         )
+        if ledger:
+            ledger.record_repair(original["v1"]["product_id"], "template-revision:" + artifact["digest"] + ":" + request_digest, con=con)
         con.execute(
             "INSERT INTO job VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
             (

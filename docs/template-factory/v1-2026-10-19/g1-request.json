@@ -1,0 +1,19 @@
+{
+  "name": "Atlas V1 G1 书签完整主链",
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "segment": "G1",
+  "scenario_ids": ["scn_7756e0007f6a463a97316f3f49c15248"],
+  "runtime_sample_ids": ["scn_7756e0007f6a463a97316f3f49c15248"],
+  "model": "opencode-go/deepseek-v4.1-flash",
+  "admission_policy": "ready-only-v1",
+  "concurrency": 2,
+  "timeout": 600,
+  "repair_attempts": 1,
+  "language": "zh",
+  "repository_hints": {
+    "scn_7756e0007f6a463a97316f3f49c15248": [
+      {"repository": "https://github.com/LakhindarPal/bookmark-manager", "reason": "已有公开候选基础，本轮重新取得实际版本并研究；历史报告不作本轮证据。"}
+    ]
+  },
+  "cognition_guidance": "首期 python-web，Python 标准库与 SQLite；P0 完成已确认场景全部核心旅程，包括保存、分类/移动、搜索、重开保留、打开原链接及可恢复失败。使用紧凑标准库 HTTP 行为验收程序，冻结 API/HTML 表单合同；不要引入外部依赖，不要生成应用实现或自报运行。成熟能力按适用性分期，保留未知。"
+}

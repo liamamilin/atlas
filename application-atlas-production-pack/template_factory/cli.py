@@ -12,6 +12,7 @@ import shutil
 import signal
 import subprocess
 import time
+from collections.abc import Mapping
 
 from atlas_runtime import atomic_json
 from opencode_permissions import detect_opencode_major_version
@@ -19,14 +20,49 @@ from privacy import redact_text, redact_value
 from .store import FactoryError
 
 _ORIGINAL_VERSION_DETECTOR = detect_opencode_major_version
+MAX_USAGE_EVENTS = 1000
 
 
-def _detect_major(executable):
+def _usage_event(event, part):
+    """Keep one provider-reported step record without aggregating it."""
+    reported = {}
+    for key in ("cost", "tokens"):
+        if key in part:
+            reported[key] = part[key]
+        elif key in event:
+            reported[key] = event[key]
+    tokens = reported.get("tokens")
+    tokens = tokens if isinstance(tokens, Mapping) else {}
+    cache = tokens.get("cache")
+    cache = cache if isinstance(cache, Mapping) else {}
+    return {
+        "event_type": event.get("type"),
+        "event_id": event.get("id") or event.get("eventID") or event.get("eventId"),
+        "session_id": event.get("sessionID") or event.get("sessionId") or part.get("sessionID") or part.get("sessionId"),
+        "message_id": event.get("messageID") or event.get("messageId") or part.get("messageID") or part.get("messageId"),
+        "part_id": part.get("id"),
+        "step_id": event.get("stepID") or event.get("stepId") or part.get("stepID") or part.get("stepId"),
+        "cost": reported.get("cost"),
+        # OpenCode reports a numeric cost but does not provide a currency here.
+        "cost_currency": None,
+        "tokens": {
+            "input": tokens.get("input"),
+            "output": tokens.get("output"),
+            "reasoning": tokens.get("reasoning"),
+            "cache": {"read": cache.get("read"), "write": cache.get("write")},
+        },
+        # Preserve the exact reported usage object; step values may be
+        # cumulative, so consumers must not treat this array as additive.
+        "reported_usage": reported,
+    }
+
+
+def _detect_major(executable, timeout=10):
     if detect_opencode_major_version is not _ORIGINAL_VERSION_DETECTOR:
         return detect_opencode_major_version(executable)
     try:
         probe = subprocess.run([executable, "--version"], capture_output=True,
-                               text=True, timeout=10, stdin=subprocess.DEVNULL)
+                               text=True, timeout=timeout, stdin=subprocess.DEVNULL)
     except (OSError, subprocess.TimeoutExpired):
         return 1
     match = re.search(r"v?(\d+)(?:\.\d+)+", probe.stdout or probe.stderr or "")
@@ -97,23 +133,57 @@ class CLI:
         return result
 
     def run(
-        self, directory, prompt, model, timeout, cancelled, progress, *, reasoning_effort=None
+        self, directory, prompt, model, timeout, cancelled, progress, *, reasoning_effort=None,
+        budget=None, budget_required=False
     ):
         run_started = time.monotonic()
         state = {"started": False}
+        reservation = None
+        ledger = None
+        if budget is not None:
+            if not isinstance(budget, Mapping) or budget.get("ledger") is None:
+                raise FactoryError("invalid budget context", "budget_context_invalid", 400)
+            ledger = budget["ledger"]
+            reservation = ledger.reserve(
+                budget.get("identity"), budget.get("phase"),
+                budget.get("kind", "production"), timeout,
+                job_id=budget.get("job_id"), requested_model=model,
+                requested_effort=reasoning_effort, stage=budget.get("stage"),
+                retry=budget.get("retry"),
+            )
+            timeout = reservation["timeout"]
+        elif budget_required:
+            raise FactoryError("V1 model call requires a durable budget ledger", "budget_required", 409)
         try:
             return self._run(directory, prompt, model, timeout, cancelled, progress,
-                             reasoning_effort=reasoning_effort, _state=state)
+                             reasoning_effort=reasoning_effort, _state=state,
+                             _budget_ledger=ledger,
+                             _budget_reservation=reservation["id"] if reservation else None)
         except BaseException as error:
+            if ledger is not None and reservation is not None:
+                if not state["started"]:
+                    try:
+                        ledger.release_not_started(reservation["id"])
+                    except FactoryError:
+                        pass
+                else:
+                    try:
+                        ledger.finish(reservation["id"], "failed", outcome=getattr(error, "code", "cli_failed"))
+                    except FactoryError:
+                        pass
             if not state["started"]:
                 target = Path(directory)
                 try:
                     target.mkdir(parents=True, exist_ok=True)
                     atomic_json(target / "cli-summary.json", redact_value({
                         "model": model, "actual_model": None, "requested_model": model,
+                        "observed_model": None,
                         "reasoning_effort": reasoning_effort,
+                        "requested_effort": reasoning_effort, "observed_effort": None,
                         "actual_reasoning_effort": None, "session_id": None,
                         "event_types": [], "exit_code": None,
+                        "usage_events": [], "usage_event_limit": MAX_USAGE_EVENTS,
+                        "usage_events_truncated": False,
                         "duration_seconds": round(time.monotonic() - run_started, 2),
                         "cli_status": "not_started", "delivery_status": "failed",
                         "failure_code": getattr(error, "code", "cli_start_failed"),
@@ -135,7 +205,10 @@ class CLI:
         *,
         reasoning_effort=None,
         _state=None,
+        _budget_ledger=None,
+        _budget_reservation=None,
     ):
+        call_started = time.monotonic()
         if not self.executable:
             raise FactoryError("OpenCode CLI is not installed", "cli_unavailable", 503)
         directory = Path(directory)
@@ -143,7 +216,10 @@ class CLI:
         initialize_project(directory)
         # Keep this symbol patchable for tests while ensuring version probes
         # spawned by this module never inherit a worker's stdin.
-        major = _detect_major(self.executable)
+        left = timeout - (time.monotonic() - call_started) if _budget_ledger else 10
+        if left <= 0:
+            raise FactoryError("CLI setup exhausted the call deadline", "budget_deadline", 409)
+        major = _detect_major(self.executable, timeout=min(10, left))
         requested_model = model
         if reasoning_effort is not None and (
             major < 2
@@ -175,8 +251,10 @@ class CLI:
             "scenario-review",
             "cognitive-review",
             "cognitive-review-reference-repair",
+            "case-adaptation",
+            "p0-application",
         } and not directory.name.startswith(
-            ("blueprint-generate", "blueprint-code", "blueprint-spec-review")
+            ("blueprint-generate", "blueprint-code", "blueprint-spec-review", "case-study", "case-evidence-review", "p0-delivery-repair")
         )
         fetches = (
             [
@@ -299,6 +377,10 @@ class CLI:
         environment["OPENCODE_CONFIG"] = str(config_path.resolve())
         if major < 2:
             environment["OPENCODE_ENABLE_EXA"] = "1"
+        if _budget_ledger:
+            timeout -= time.monotonic() - call_started
+        if timeout <= 0:
+            raise FactoryError("CLI setup exhausted the call deadline", "budget_deadline", 409)
         started = time.monotonic()
         process = subprocess.Popen(
                 argv,
@@ -311,6 +393,8 @@ class CLI:
             )
         if _state is not None:
             _state["started"] = True
+        if _budget_ledger is not None:
+            _budget_ledger.mark_started(_budget_reservation)
         exit_code = None
         failure = None
         delivery_status = "pending"
@@ -320,8 +404,12 @@ class CLI:
         pending = bytearray()
         texts, event_types, cli_errors = [], set(), []
         session_id = None
+        observed_model = None
+        observed_effort = None
+        usage_events = []
+        usage_events_truncated = False
         def consume(raw):
-            nonlocal session_id
+            nonlocal session_id, observed_model, observed_effort, usage_events_truncated
             event = json.loads(raw)
             if not isinstance(event, dict):
                 return
@@ -331,6 +419,23 @@ class CLI:
             event_types.add(event_type)
             session_id = event.get("sessionID") or event.get("sessionId") or session_id
             part = event.get("part") or {}
+            if isinstance(part, dict):
+                observed_model = (event.get("model") or event.get("modelID")
+                                  or part.get("model") or part.get("modelID") or observed_model)
+                if isinstance(observed_model, dict):
+                    provider = observed_model.get("providerID") or observed_model.get("providerId")
+                    model_id = observed_model.get("modelID") or observed_model.get("modelId")
+                    observed_model = (str(provider) + "/" + str(model_id)) if provider and model_id else json.dumps(observed_model, sort_keys=True)
+                observed_effort = (event.get("reasoning_effort") or event.get("reasoningEffort")
+                                   or part.get("reasoning_effort") or part.get("reasoningEffort")
+                                   or observed_effort)
+            else:
+                part = {}
+            if event_type == "step_finish":
+                if len(usage_events) < MAX_USAGE_EVENTS:
+                    usage_events.append(_usage_event(event, part))
+                else:
+                    usage_events_truncated = True
             cognitive_stage = directory.name in {
                 "cognitive-review",
                 "cognitive-review-reference-repair",
@@ -342,7 +447,8 @@ class CLI:
             if event_type == "text":
                 content = part.get("text") if isinstance(part, dict) else None
                 content = content or event.get("text")
-                if isinstance(content, str): texts.append(content)
+                if isinstance(content, str):
+                    texts.append(content)
             if event_type == "error":
                 cli_errors.append(str(event.get("error") or event.get("message") or "CLI error"))
             if event_type in {"tool_use", "tool", "step_start", "step_finish", "error"}:
@@ -477,8 +583,10 @@ class CLI:
                 process.stderr.close,
             ):
                 if close is not None:
-                    try: close()
-                    except Exception as error: cleanup_error = cleanup_error or error
+                    try:
+                        close()
+                    except Exception as error:
+                        cleanup_error = cleanup_error or error
             for name, data in chunks.items():
                 try:
                     (directory / f"{name}.log").write_text(redact_text(data.decode(errors="replace")))
@@ -493,10 +601,15 @@ class CLI:
                 failure = FactoryError("OpenCode evidence cleanup failed", "cli_cleanup_failed", 500)
                 delivery_status = "failed"
             summary = {
-                "model": model, "actual_model": model, "requested_model": requested_model,
+                "model": model, "actual_model": observed_model, "requested_model": requested_model,
+                "observed_model": observed_model,
                 "reasoning_effort": requested_effort, "session_id": session_id,
-                "actual_reasoning_effort": requested_effort,
+                "requested_effort": requested_effort, "observed_effort": observed_effort,
+                "actual_reasoning_effort": observed_effort,
                 "event_types": sorted(event_types), "exit_code": exit_code if exit_code is not None else process.poll(),
+                "usage_events": usage_events,
+                "usage_event_limit": MAX_USAGE_EVENTS,
+                "usage_events_truncated": usage_events_truncated,
                 "duration_seconds": round(time.monotonic() - started, 2),
                 "cli_status": "completed" if process.poll() is not None else "incomplete",
                 "delivery_status": delivery_status,
@@ -511,6 +624,14 @@ class CLI:
                     raise
             if raise_cleanup:
                 raise failure from cleanup_error
+            if _budget_ledger is not None:
+                _budget_ledger.finish(
+                    _budget_reservation,
+                    "completed" if failure is None else "failed",
+                    observed_model=observed_model,
+                    observed_effort=observed_effort,
+                    outcome=getattr(failure, "code", None),
+                )
 
 
 def recover_cognitive_framing(content):

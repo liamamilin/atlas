@@ -72,6 +72,9 @@ class FactoryStore:
         if self.path.is_symlink():
             raise FactoryError("factory database must not be a symlink")
         with self.connect() as con:
+            # UI readers and scheduler heartbeats must not block each other's
+            # commits. SQLite still serializes writers and preserves fencing.
+            con.execute("PRAGMA journal_mode=WAL")
             con.executescript("""
             CREATE TABLE IF NOT EXISTS scenario (
               id TEXT PRIMARY KEY, leaf TEXT NOT NULL, revision INTEGER NOT NULL,
@@ -109,6 +112,11 @@ class FactoryStore:
               created_at TEXT NOT NULL);
             """)
         os.chmod(self.path, 0o600)
+        from .v1_batches import migrate as migrate_batches
+        migrate_batches(self)
+        if (self.pack / "mvp_apps.json").is_file():
+            from .migrations import migrate as migrate_cases
+            migrate_cases(self)
 
     @contextmanager
     def connect(self, write=False):
@@ -797,16 +805,39 @@ class FactoryStore:
 
     def claim(self, worker, lane=None):
         with self.connect(True) as con:
+            # These limits hold across batches and schedulers, not merely in UI
+            # or a local ThreadPool. The BEGIN IMMEDIATE lock fences races.
+            running = con.execute("SELECT kind, snapshot FROM job WHERE state='running' AND lease>?", (time.time(),)).fetchall()
+            production = sum(r["kind"] not in {"harness-review", "runtime-verification", "scenario-review", "cognitive-review", "blueprint-runtime"} for r in running)
+            runtime = sum(r["kind"] in {"runtime-verification", "blueprint-runtime"} for r in running)
+            if lane == "production" and production >= 2:
+                return None
+            if lane == "verification" and runtime >= 1:
+                # Continue read-only reviews, but do not claim a second runtime.
+                runtime_full = 1
+            else:
+                runtime_full = 0
             row = con.execute(
                 """SELECT j.* FROM job j JOIN batch b ON b.id=j.batch_id
               WHERE j.state='queued' AND b.state='running'
+              AND NOT EXISTS (
+                SELECT 1 FROM v1_execution pe JOIN batch pb ON pb.id=pe.batch_id
+                WHERE pe.plan_id=json_extract(j.snapshot,'$.v1.plan_id')
+                  AND pb.state IN ('paused','cancelled'))
+              AND ((j.kind IN ('runtime-verification','blueprint-runtime') AND
+                (SELECT count(*) FROM job g WHERE g.state='running' AND g.lease>strftime('%s','now')
+                 AND g.kind IN ('runtime-verification','blueprint-runtime')) < 1) OR
+                (j.kind NOT IN ('runtime-verification','blueprint-runtime') AND
+                 (SELECT count(*) FROM job g WHERE g.state='running' AND g.lease>strftime('%s','now')
+                  AND g.kind NOT IN ('runtime-verification','blueprint-runtime')) < 2))
+              AND (?=0 OR j.kind NOT IN ('runtime-verification','blueprint-runtime'))
               AND (? IS NULL OR (?='verification' AND j.kind IN ('harness-review','runtime-verification','scenario-review','cognitive-review','blueprint-runtime'))
-                OR (?='production' AND j.kind IN ('production','scenarios','blueprint-production')))
+                OR (?='production' AND j.kind IN ('production','scenarios','blueprint-production','case-research','application-development')))
               AND (SELECT count(*) FROM job a WHERE a.batch_id=b.id AND a.state='running'
                 AND (? IS NULL OR (?='verification' AND a.kind IN ('harness-review','runtime-verification','scenario-review','cognitive-review','blueprint-runtime'))
-                  OR (?='production' AND a.kind IN ('production','scenarios','blueprint-production'))))
+                  OR (?='production' AND a.kind IN ('production','scenarios','blueprint-production','case-research','application-development'))))
                 < json_extract(b.config,'$.concurrency') ORDER BY j.created_at,j.id LIMIT 1""",
-                (lane, lane, lane, lane, lane, lane),
+                (runtime_full, lane, lane, lane, lane, lane, lane),
             ).fetchone()
             if not row:
                 return None
@@ -924,19 +955,24 @@ class FactoryStore:
         return self.job(job_id)
 
     def artifacts(self):
+        from .v1_catalog import review_status, catalog_eligibility
         with self.connect() as con:
-            return [
+            values = [
                 {
                     **json.loads(r["body"]),
                     "id": r["id"],
                     "level": r["level"],
                     "state": r["state"],
                     "digest": r["digest"],
+                    "publication_status": r["state"],
+                    "review_status": review_status(con, r["id"], r["digest"]) if json.loads(r["body"]).get("artifact_type") == "product-blueprint" else None,
+                    "evidence_status": "fixed_case_basis" if json.loads(r["body"]).get("provenance", {}).get("case_basis") else "legacy_unverified",
                     "acceptances": self.acceptances(r["id"]),
                     "acceptance_jobs": self.acceptance_jobs(r["id"]),
                 }
                 for r in con.execute("SELECT * FROM artifact ORDER BY created_at DESC")
             ]
+        return [{**value, **catalog_eligibility(self, value)} for value in values]
 
     def add_artifact(self, job_id, token, body):
         artifact_id = uid("tpl")
@@ -961,6 +997,14 @@ class FactoryStore:
                     now(),
                 ),
             )
+            if body.get("artifact_type") == "product-blueprint" and body.get("provenance", {}).get("v1"):
+                snapshot = json.loads(con.execute("SELECT snapshot FROM job WHERE id=?", (job_id,)).fetchone()[0])
+                con.execute("INSERT INTO v1_outbox VALUES(?,?,?,?,?)", (
+                    uid("out"), job_id, artifact_id,
+                    canonical({"method": "cognitive-review", "expected_digest": body["digest"],
+                               "model": snapshot["config"]["model"], "timeout": snapshot["config"]["timeout"],
+                               "language": snapshot["config"].get("language", "zh")}), "pending",
+                ))
             con.execute(
                 "UPDATE job SET state='completed',stage='completed',updated_at=? WHERE id=? AND token=?",
                 (now(), job_id, token),
@@ -980,6 +1024,15 @@ class FactoryStore:
             )
         return artifact_id
 
+    def reconcile_outbox(self):
+        """Replay atomically recorded successor intents after any crash boundary."""
+        with self.connect() as con:
+            pending = [dict(r) for r in con.execute("SELECT * FROM v1_outbox WHERE state='pending'")]
+        for intent in pending:
+            self.create_acceptance(intent["artifact_id"], json.loads(intent["body"]), automatic=True)
+            with self.connect(True) as con:
+                con.execute("UPDATE v1_outbox SET state='done' WHERE id=?", (intent["id"],))
+
     def artifact_action(self, artifact_id, value):
         action = value.get("action")
         if action not in {"publish", "withdraw"}:
@@ -993,13 +1046,18 @@ class FactoryStore:
                 raise FactoryError("artifact not found", "not_found", 404)
             body = json.loads(row["body"])
             if body.get("artifact_type") == "product-blueprint":
-                raise FactoryError(
-                    "cognitive publication is not connected yet",
-                    "blueprint_operation_unavailable",
-                    409,
-                )
-            if value.get("expected_digest") != row["digest"]:
+                from .v1_catalog import publish
+                publish(self, con, row, body, value, review)
+                # Read after the transaction commits so response shows new state.
+                cognitive = True
+            else:
+                cognitive = False
+            if cognitive:
+                pass
+            elif value.get("expected_digest") != row["digest"]:
                 raise FactoryError("artifact version changed", "revision_conflict", 409)
+            if cognitive:
+                return {**body, "id": artifact_id, "digest": row["digest"], "level": row["level"], "state": "published" if action == "publish" else "withdrawn", "publication_status": "published" if action == "publish" else "withdrawn"}
             level = value.get("level", row["level"])
             if level not in {"L0", "L1", "L2"}:
                 raise FactoryError(
@@ -1105,15 +1163,28 @@ class FactoryStore:
             "scenario": artifact["provenance"]["scenario"],
             "config": config,
         }
+        original_snapshot = self.job(artifact["job_id"])["snapshot"]
+        if original_snapshot.get("v1"):
+            snapshot["v1"] = original_snapshot["v1"]
+            snapshot["case_basis"] = original_snapshot.get("case_basis")
         batch_id, job_id, at = uid("bat"), uid("job"), now()
         with self.connect(True) as con:
             if automatic:
+                existing = con.execute(
+                    "SELECT batch_id FROM job WHERE kind=? AND json_extract(snapshot,'$.artifact_id')=? "
+                    "AND json_extract(snapshot,'$.artifact_digest')=? ORDER BY created_at LIMIT 1",
+                    (method, artifact_id, artifact["digest"]),
+                ).fetchone()
+                if existing:
+                    return self.batch(existing[0])
                 parent = con.execute(
                     "SELECT b.state FROM batch b JOIN job j ON j.batch_id=b.id WHERE j.id=?",
                     (artifact["job_id"],),
                 ).fetchone()
                 if not parent or parent[0] == "cancelled":
                     return None
+                if snapshot.get("v1"):
+                    batch_id = con.execute("SELECT batch_id FROM job WHERE id=?", (artifact["job_id"],)).fetchone()[0]
             active = con.execute(
                 "SELECT 1 FROM job WHERE kind=? AND state IN ('queued','running') AND json_extract(snapshot,'$.artifact_id')=?",
                 (method, artifact_id),
@@ -1123,7 +1194,7 @@ class FactoryStore:
                     "this acceptance is already queued or running", "conflict", 409
                 )
             con.execute(
-                "INSERT INTO batch VALUES(?,?,?,?)",
+                "INSERT OR IGNORE INTO batch VALUES(?,?,?,?)",
                 (batch_id, "running", canonical(config), at),
             )
             con.execute(

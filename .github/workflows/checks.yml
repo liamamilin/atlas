@@ -33,6 +33,7 @@ jobs:
           application-atlas-production-pack/project_store.py
           application-atlas-production-pack/project_backup.py
           application-atlas-production-pack/runtime_recovery.py
+          application-atlas-production-pack/template_factory
           atlas-web/scripts/gen-data.py
           atlas-web/scripts/verify-web-data.py
       - run: python -m unittest discover -s application-atlas-production-pack/tests -v
@@ -41,7 +42,7 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: atlas-web/package-lock.json
-      - run: npm ci
+      - run: npm ci --registry=https://registry.npmjs.org --replace-registry-host=always
         working-directory: atlas-web
       - run: python application-atlas-production-pack/export_atlas.py
       - run: npm run gen && npm run verify-data
@@ -52,3 +53,22 @@ jobs:
         working-directory: atlas-web
       - run: npm run typecheck && npm test && npm run build && npm run test:e2e
         working-directory: atlas-web
+      - name: Run template factory Playwright suite
+        run: npm run test:e2e:factory -- --reporter=line
+        working-directory: atlas-web
+  docker-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - name: Pull required runtime images
+        run: |
+          docker pull python:3.12-slim
+          docker pull node:22-bookworm-slim
+      - name: Run required Docker integration gate
+        env:
+          ATLAS_RUN_DOCKER_INTEGRATION: '1'
+        run: python application-atlas-production-pack/tests/run_required_docker_integration.py

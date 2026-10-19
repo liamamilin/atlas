@@ -4,6 +4,7 @@ import { getApps, type AppEntry } from "@/lib/atlas";
 import { useAsync, EmptyState, Loading, ErrorBox } from "@/components/loaders";
 import { Badge } from "@/components/ui/badge";
 import { AppReferenceButton } from "@/components/app-reference-button";
+import { CaseLibrary } from "@/components/case-library";
 import { useLang, pick, t } from "@/lib/lang";
 
 export function Apps() {
@@ -27,18 +28,22 @@ export function Apps() {
       target.focus({ preventScroll: true });
     });
   }, [data, hash]);
-  if (loading) return <Loading />;
-  if (error || !data) return <ErrorBox message={error ?? ""} />;
+  const apps = data || [];
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="font-serif text-3xl font-medium">{t("appsTitle", lang)}</h1>
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-        {t("appsP", lang, { n: data.length })}
+        {t("appsP", lang, { n: apps.length })}
       </p>
+      <CaseLibrary />
+      <section aria-label={lang === "zh" ? "历史应用目录" : "Legacy application catalog"} className="mt-12">
+      <h2 className="font-serif text-2xl font-medium">{lang === "zh" ? "应用目录" : "Application catalog"}</h2>
+      {loading ? <Loading /> : null}
+      {error ? <ErrorBox message={error} /> : null}
       {missingHash ? <p className="mt-3 text-sm text-warn" role="status">{lang === "zh" ? "链接的应用不存在，请返回应用目录重新选择。" : "The linked application does not exist. Return to the catalog and choose another."}</p> : null}
-      {data.length ? (
+      {apps.length ? (
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {data.map((a) => {
+        {apps.map((a) => {
           const appName = pick(lang, a.nameZh, a.nameEn || a.name);
           const appTagline = lang === "zh" ? a.tagline : (a.taglineEn || a.tagline);
           const appTasks = a.taskLabels?.[lang] || a.tasks;
@@ -70,14 +75,15 @@ export function Apps() {
           );
         })}
         </div>
-      ) : (
+      ) : !loading && !error ? (
         <EmptyState
           className="mt-8"
           title={lang === "zh" ? "应用目录为空" : "The application catalog is empty"}
         >
           {lang === "zh" ? "当前没有可展示的真实应用；类型正文仍然可以浏览。" : "There are no applications to show yet; the type catalog remains available."}
         </EmptyState>
-      )}
+      ) : null}
+      </section>
     </main>
   );
 }

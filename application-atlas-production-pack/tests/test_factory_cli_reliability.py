@@ -8,6 +8,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 from template_factory.cli import CLI
 from template_factory.store import FactoryError
 

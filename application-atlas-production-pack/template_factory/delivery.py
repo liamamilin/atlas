@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 
 from .artifacts import PROFILE_EXECUTABLES, command, relative, tree_manifest
 from .blueprints import unpack_archive

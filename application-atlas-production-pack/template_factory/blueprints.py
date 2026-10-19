@@ -143,6 +143,17 @@ def validate_blueprint(source):
         raise FactoryError("blueprint is missing required documents or metadata")
     validate_acceptance_manifest(source)
     spec = read_json(source / "template.json")
+    if isinstance(spec, dict) and spec.get("factory_policy") == "atlas.factory-v1.1":
+        basis = spec.get("case_basis")
+        if not isinstance(basis, dict) or digest({k: v for k, v in basis.items() if k != "basis_digest"}) != basis.get("basis_digest"):
+            raise FactoryError("fixed case basis digest differs", "evidence_basis_invalid", 409)
+        if basis.get("scenario_id") != spec.get("scenario", {}).get("id") or basis.get("scenario_revision") != spec.get("scenario", {}).get("revision"):
+            raise FactoryError("case basis is bound to another scenario", "evidence_basis_invalid", 409)
+        if read_json(source / "inputs/case-basis.json") != basis:
+            raise FactoryError("case basis and normative input differ", "evidence_basis_invalid", 409)
+        for choice in spec.get("case_design", []):
+            if not set(choice.get("evidence_ids", [])) <= set(basis.get("evidence_ids", [])):
+                raise FactoryError("case design references unknown evidence", "evidence_basis_invalid", 409)
     if (
         not isinstance(spec, dict)
         or spec.get("schema") != SCHEMA
@@ -170,7 +181,12 @@ def validate_blueprint(source):
     scenario = spec.get("scenario")
     if (
         not isinstance(scenario, dict)
-        or scenario.get("status") != "ready"
+        or (scenario.get("status") != "ready" and not (
+            scenario.get("status") == "draft" and spec.get("factory_policy") == "atlas.factory-v1.1"
+            and spec.get("admission", {}).get("kind") == "batch_policy"
+            and spec.get("admission", {}).get("revision") == scenario.get("revision")
+            and spec.get("admission", {}).get("review_id")
+        ))
         or type(scenario.get("revision")) is not int
         or scenario["revision"] < 1
         or read_json(source / "inputs/scenario.json") != scenario
@@ -549,7 +565,7 @@ def export_development(bundle, expected_digest, destination, project_name, phase
             ],
         },
     )
-    packet = write_handoff(destination, spec, phase, project_name, expected_digest)
+    write_handoff(destination, spec, phase, project_name, expected_digest)
     atomic_json(
         destination / ".atlas-blueprint.json",
         {

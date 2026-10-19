@@ -111,6 +111,46 @@ def validate_runner_manifest(source, spec, phase=None):
             "selected_phases": selected_phases}
 
 
+def phase_required_evidence(spec, phase):
+    """Return immutable host evidence requirements for a phase.
+
+    Absence preserves the legacy contract. Declared external items are not
+    satisfied by application uploads or by acceptance suite output.
+    """
+    phase_id = phase.get("id") if isinstance(phase, dict) else phase
+    mapping = spec.get("phase_required_evidence")
+    if mapping is None:
+        return []
+    if not isinstance(mapping, dict):
+        raise FactoryError("phase_required_evidence must be a phase map")
+    phase_rows = [row.get("id") for row in spec.get("phases", []) if isinstance(row, dict)]
+    phases = set(phase_rows)
+    if not set(mapping) <= phases:
+        raise FactoryError("phase evidence references an undeclared phase")
+    if phase_id is not None and phase_id not in phases:
+        raise FactoryError("phase evidence requested for an undeclared phase")
+    selected_through = phase_rows if phase_id is None else phase_rows[:phase_rows.index(phase_id) + 1]
+    result, seen = [], set()
+    for selected in phase_rows:
+        items = mapping.get(selected, [])
+        if not isinstance(items, list) or len(items) > 30:
+            raise FactoryError("phase evidence must contain at most 30 items per phase")
+        for item in items:
+            if not isinstance(item, dict):
+                raise FactoryError("phase evidence item must be an object")
+            identifier, description, executor = item.get("id"), item.get("description"), item.get("executor")
+            if (item.get("kind") != "external"
+                    or not isinstance(identifier, str) or not re.fullmatch(r"[a-z][a-z0-9_-]{0,63}", identifier)
+                    or identifier in seen or not isinstance(description, str) or not description.strip()
+                    or len(description) > 2000 or not isinstance(executor, str)
+                    or not re.fullmatch(r"[a-z][a-z0-9_-]{0,63}", executor)):
+                raise FactoryError("invalid or duplicate phase evidence requirement")
+            seen.add(identifier)
+            if selected in selected_through:
+                result.append({"id": identifier, "kind": "external", "description": description.strip(), "executor": executor})
+    return result
+
+
 def _strict_result(text, case_id):
     def pairs(items):
         out = {}
@@ -173,6 +213,7 @@ class BlueprintRuntimeVerifier(DockerVerifier):
             raise FactoryError("blueprint and application roots cannot be symlinks", "runtime_unavailable", 409)
         source, app, evidence = source_path.resolve(), app_path.resolve(), Path(evidence)
         manifest = validate_runner_manifest(source, spec, phase)
+        required_evidence = phase_required_evidence(spec, phase)
         if not isinstance(runtime, dict) or runtime.get("profile") not in {"python-web", "node-web", "static-web", "cli"}:
             raise FactoryError("unsupported application runtime", "runtime_unavailable", 409)
         if not app.is_dir() or app.is_symlink():
@@ -201,6 +242,9 @@ class BlueprintRuntimeVerifier(DockerVerifier):
                   "binding": {"source": str(source), "phase": phase.get("id") if isinstance(phase, dict) else phase,
                               "runtime": app_profile, "suite_digest": suite_digest,
                               "suite_inventory": suite_inventory},
+                  "suite_status": "pending", "phase_status": "unverified" if required_evidence else "pending",
+                  "required_evidence": required_evidence,
+                  "external_evidence": [{"id": item["id"], "status": "missing"} for item in required_evidence],
                   "environment": {"engine": "docker", "containers": [], "network": "none"},
                   "app_source_sha256_before": app_digest_before,
                   "app_source_inventory_before": app_hash_before,
@@ -355,7 +399,13 @@ class BlueprintRuntimeVerifier(DockerVerifier):
                     report.update(outcome="blocked" if visible_status == "failed" else "unavailable",
                                   failure=reason, error=reason)
                     return report
-            report.update(passed=True, outcome="passed")
+            report["suite_status"] = "passed"
+            if required_evidence:
+                report.update(passed=False, outcome="unverified", phase_status="unverified",
+                              code="phase_evidence_missing",
+                              error="required independent phase evidence has not been registered")
+            else:
+                report.update(passed=True, outcome="passed", phase_status="passed")
             return report
         except FactoryError as error:
             primary = error
@@ -411,6 +461,14 @@ class BlueprintRuntimeVerifier(DockerVerifier):
             report["cleanup"]["status"] = "passed" if report["cleanup"]["success"] else "failed"
             if not report["cleanup"]["success"]:
                 report.update(passed=False, outcome="unavailable", failure=report.get("failure", "verification cleanup did not complete"))
+                report["phase_status"] = "unverified"
+            if report.get("suite_status") == "pending":
+                if report.get("outcome") == "blocked":
+                    report["suite_status"] = "blocked"
+                    report["phase_status"] = "blocked"
+                else:
+                    report["suite_status"] = "unverified"
+                    report["phase_status"] = "unverified"
             try:
                 atomic_json(evidence / "report.json", report)
             except Exception:

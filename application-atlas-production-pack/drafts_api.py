@@ -449,8 +449,8 @@ def collect_atlas_reference(project_id, body, store=None, pack=None):
     if not isinstance(body, dict):
         raise ValueError("request body must be an object")
     kind, slug = body.get("kind"), body.get("slug")
-    if kind not in {"application", "research", "app"}:
-        raise ValueError("kind must be application, research, or app")
+    if kind not in {"application", "research", "app", "case"}:
+        raise ValueError("kind must be application, research, app, or case")
     if not isinstance(slug, str) or not slug:
         raise ValueError("slug is required")
     section = body.get("section")
@@ -464,7 +464,11 @@ def collect_atlas_reference(project_id, body, store=None, pack=None):
             not isinstance(expected_fingerprint, str)
             or not re.fullmatch(r"[0-9a-f]{64}", expected_fingerprint)):
         raise ValueError("expected_fingerprint must be a sha256 value")
-    if kind == "app":
+    if kind == "case":
+        if section:
+            raise ValueError("fixed case references do not have sections")
+        saved = _read_case_reference(slug, pack or PACK)
+    elif kind == "app":
         if section:
             raise ValueError("app catalog references do not have sections")
         saved = _read_app_catalog(slug, pack or PACK)
@@ -488,7 +492,9 @@ def list_project_references(project_id, store=None, pack=None):
         if tracked:
             kind = item["source_kind"].split(":", 1)[1]
             try:
-                if kind == "app":
+                if kind == "case":
+                    current_version = _read_case_reference(item["source_ref"], pack or PACK)["fingerprint"]
+                elif kind == "app":
                     current_version = _read_app_catalog(
                         item["source_ref"], pack or PACK)["fingerprint"]
                 else:
@@ -563,6 +569,21 @@ def _read_app_catalog(slug, pack):
     ])
     return {"slug": slug, "kind": "app", "fingerprint": fingerprint,
             "section": None, "content": "\n".join(lines), "complete": True}
+
+
+def _read_case_reference(reference, pack):
+    """Read an immutable case revision separately from atlas-app-catalog-v1."""
+    from template_factory.store import FactoryStore
+    from template_factory.cases import CaseLibrary
+    root = os.environ.get("ATLAS_FACTORY_ROOT", str(Path(pack) / "atlas/template-factory"))
+    case = CaseLibrary(FactoryStore(root, pack)).resolve_case_ref(reference)
+    # Independent review state changes over time; fixed material does not.
+    fixed = {key: value for key, value in case.items() if key != "observations"}
+    fixed["observations"] = [{key: value for key, value in row.items() if key != "reviews"} for row in case["observations"]]
+    content = json.dumps(fixed, ensure_ascii=False, sort_keys=True, indent=2)
+    fingerprint = hashlib.sha256(("atlas-case-reference-v1\n" + json.dumps(fixed, ensure_ascii=False, sort_keys=True, separators=(",", ":"))).encode()).hexdigest()
+    return {"slug": reference, "kind": "case", "fingerprint": fingerprint,
+            "section": None, "content": content, "complete": True}
 
 # ---- 模型生成身份（英文名/中文名/一句话想法，创建时 name/desc 可不填） ----
 ID_PROMPT = """你是软件类型语料库的编辑。根据用户提供的信息，为新软件类型起名并概括主张。

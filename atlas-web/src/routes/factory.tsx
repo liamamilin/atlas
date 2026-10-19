@@ -9,6 +9,7 @@ import { EmptyState, Loading } from "@/components/loaders";
 import { ScenarioGenerationPanel } from "@/components/scenario-generation-panel";
 import { BlueprintCard, BlueprintImportPanel } from "@/components/blueprint-artifacts";
 import { ScenarioReviewPanel } from "@/components/scenario-review-panel";
+import { FactoryV1 } from "@/components/factory-v1";
 
 const input = "mt-1.5 w-full rounded-md border border-border bg-bg-elevated px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/35";
 const names: Record<string, [string,string]> = {
@@ -28,7 +29,10 @@ export function Factory() {
   const {lang} = useLang();
   const zh = lang === "zh";
   const [params] = useSearchParams();
-  const [view,setView] = useState<"catalog"|"batches"|"artifacts">("catalog");
+  const focusedArtifactId = params.get("artifact_id");
+  const caseFilterId = params.get("case_id");
+  const caseFilterRevision = Number(params.get("case_revision")) || undefined;
+  const [view,setView] = useState<"catalog"|"batches"|"artifacts"|"v1">(() => params.get("view") === "artifacts" ? "artifacts" : params.get("view") === "v1" || params.has("scenario") || params.has("plan") ? "v1" : "catalog");
   const [leaf,setLeaf] = useState(params.get("leaf") || "");
   const [meta,setMeta] = useState<Meta|null>(null);
   const [catalog,setCatalog] = useState<Scenario[]>([]);
@@ -96,6 +100,12 @@ export function Factory() {
     },zh?"批次已创建；关闭页面后仍会继续执行。":"Batch created; work continues after this page closes.");
   }
   const visible = catalog.filter(s=>(!leaf||s.leaf===leaf)&&(!filter||`${s.name} ${s.leaf_name} ${s.objective}`.toLowerCase().includes(filter.toLowerCase())));
+  const visibleArtifacts = artifacts.filter(artifact => {
+    if (focusedArtifactId && artifact.id !== focusedArtifactId) return false;
+    if (!caseFilterId) return true;
+    const provenance = artifact.provenance as FactoryArtifact["provenance"] & {case_basis?:{case_refs?:{case_id:string;revision:number}[]}};
+    return !!provenance.case_basis?.case_refs?.some(ref => ref.case_id === caseFilterId && (!caseFilterRevision || ref.revision === caseFilterRevision));
+  });
   const groups = Array.from(visible.reduce((result,scenario)=>{
     const group=result.get(scenario.leaf);
     if(group)group.push(scenario);else result.set(scenario.leaf,[scenario]);
@@ -120,8 +130,8 @@ export function Factory() {
     </div>
     {error?<div role="alert" className="mt-4 rounded-lg bg-danger/10 p-4 text-sm text-danger"><p>{error}</p><button className="mt-2 underline" onClick={()=>act(()=>load())}>{zh?"重试加载":"Retry loading"}</button></div>:null}
     {notice?<p role="status" className="mt-4 rounded-lg bg-primary/10 p-4 text-sm text-primary">{notice}</p>:null}
-    <nav role="tablist" aria-label={zh?"工厂视图":"Factory views"} className="mt-6 flex gap-2 border-b border-border pb-3">
-      {([['catalog',zh?'生产目录':'Catalog'],['batches',zh?'任务批次':'Batches'],['artifacts',zh?'模板制品':'Artifacts']] as const).map(([key,title])=><Button key={key} role="tab" aria-selected={view===key} variant={view===key?"default":"outline"} onClick={()=>setView(key)}>{title}</Button>)}
+    <nav role="tablist" aria-label={zh?"工厂视图":"Factory views"} className="mt-6 flex flex-wrap gap-2 border-b border-border pb-3">
+      {([['catalog',zh?'生产目录':'Catalog'],['batches',zh?'任务批次':'Batches'],['artifacts',zh?'模板制品':'Artifacts'],['v1',zh?'V1 计划与预算':'V1 plan and budget']] as const).map(([key,title])=><Button key={key} role="tab" aria-selected={view===key} variant={view===key?"default":"outline"} onClick={()=>setView(key)}>{title}</Button>)}
     </nav>
     {view==="catalog"?<>
       <ScenarioGenerationPanel meta={meta} catalog={catalog} batches={batches} zh={zh} busy={busy} loaded={loaded} model={model} setModel={setModel} status={status} concurrency={concurrency} setConcurrency={setConcurrency} timeout={timeout} setTimeoutSeconds={setTimeoutSeconds} onGenerate={(leaves,skip_generated)=>createBatch("scenarios",undefined,{leaves,skip_generated})}/>
@@ -199,7 +209,8 @@ export function Factory() {
     {view==="batches"?<section className="mt-6 space-y-4">{!batches.length?<EmptyState title={zh?"还没有任务批次":"No batches yet"}>{zh?"先在生产目录选择场景，再启动生产。":"Select scenarios in the catalog to start production."}</EmptyState>:null}{batches.map(b=><article key={b.id} className="rounded-xl bg-surface p-5 shadow-card"><div className="flex flex-wrap justify-between gap-3"><div><h2 className="font-medium">{["harness-review","runtime-verification"].includes(b.config.kind)?label(b.config.kind):zh&&b.config.name.startsWith("Repair: ")?`修订：${b.config.name.slice(8)}`:b.config.name}</h2><p className="mt-1 break-all text-xs text-muted">{label(b.state)} · {b.config.model} · {zh?"并发":"Concurrency"} {b.config.concurrency}</p></div><div className="flex gap-2">{b.state!=="cancelled"?<><Button size="sm" variant="outline" disabled={busy} onClick={()=>act(()=>factoryRequest(`batches/${b.id}/${b.state==="paused"?"resume":"pause"}`,{}))}>{b.state==="paused"?(zh?"继续":"Resume"):(zh?"暂停新任务":"Pause queue")}</Button><Button size="sm" variant="ghost" disabled={busy} onClick={()=>{if(window.confirm(zh?"取消此批次的排队与运行任务？已有制品和证据会保留。":"Cancel queued and running jobs? Existing artifacts and evidence are retained."))void act(()=>factoryRequest(`batches/${b.id}/cancel`,{}));}}>{zh?"取消批次":"Cancel batch"}</Button></>:null}</div></div><div className="mt-4 space-y-2">{b.jobs.map(j=><div key={j.id} className="rounded-lg border border-border p-3"><div className="flex flex-wrap items-center justify-between gap-2"><div><p className="text-sm font-medium">{j.snapshot.scenario?.name||j.snapshot.leaf.name_zh||j.snapshot.leaf.name}</p><p className="mt-1 text-xs text-muted">{label(j.state)} · {label(j.stage)} · {zh?"尝试":"Attempt"} {j.attempt}</p></div><div className="flex gap-2"><Button size="sm" variant="ghost" onClick={()=>act(async()=>{setJob(await factoryRequest(`jobs/${j.id}`));setEvidence(null);})}>{zh?"详情":"Details"}</Button>{["failed","interrupted","needs_review"].includes(j.state)&&b.state!=="cancelled"?<Button size="sm" variant="outline" disabled={busy} onClick={()=>act(()=>factoryRequest(`jobs/${j.id}/retry`,{}))}>{zh?"从检查点重试":"Retry checkpoints"}</Button>:null}</div></div><GenerationResult job={j} zh={zh}/>{j.error?<p className="mt-2 break-words text-xs text-danger">{j.error}</p>:null}</div>)}</div></article>)}
       {job?<section className="rounded-xl border border-border p-5"><h2 className="font-medium">{zh?"任务详情":"Job details"} · {label(job.stage)}</h2><p className="mt-1 text-xs text-subtle">{job.id}</p><GenerationResult job={job} zh={zh}/><DesignReviews reviews={job.design_reviews} zh={zh}/><Button size="sm" variant="outline" className="mt-3" onClick={()=>act(async()=>{setEvidence(await factoryRequest(`jobs/${job.id}/evidence`));})}>{zh?"查看计划与验证证据":"View plan and verification evidence"}</Button><ol className="mt-4 space-y-2 text-xs text-muted">{job.events?.map(e=><li key={e.seq}>{new Date(e.at).toLocaleTimeString()} · {label(e.stage)} · {e.message}</li>)}</ol>{evidence?<pre className="mt-4 max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-bg-elevated p-3 text-xs">{JSON.stringify(evidence,null,2)}</pre>:null}</section>:null}
     </section>:null}
-    {view==="artifacts"?<section className="mt-6 space-y-4"><BlueprintImportPanel zh={zh} busy={busy} act={act}/>{!artifacts.length?<EmptyState title={zh?"还没有候选模板":"No candidate templates yet"}>{zh?"生产完成后，冻结候选模板会出现在这里。可先下载，再选择审阅或运行验收。":"Frozen candidates appear here after production. Download them or choose independent source or runtime acceptance."}</EmptyState>:null}{artifacts.map(a=>a.artifact_type==="product-blueprint"?<BlueprintCard key={a.id} artifact={a} zh={zh} busy={busy} act={act} model={model} timeout={timeout}/>:<ArtifactCard key={a.id} artifact={a} zh={zh} busy={busy} act={act} label={label} model={model} runtimeAvailable={!!status?.runtime.available} timeout={timeout}/>)}</section>:null}
+    {view==="artifacts"?<section className="mt-6 space-y-4"><BlueprintImportPanel zh={zh} busy={busy} act={act}/>{focusedArtifactId||caseFilterId?<p className="rounded-md bg-primary/10 p-3 text-xs">{zh?"已按链接筛选制品":"Artifacts filtered from your link"}: {focusedArtifactId||`${caseFilterId}${caseFilterRevision?` · r${caseFilterRevision}`:""}`} · <Link className="underline" to="/factory?view=artifacts">{zh?"查看全部制品":"Show all artifacts"}</Link></p>:null}{!visibleArtifacts.length?<EmptyState title={zh?(artifacts.length?"没有匹配的制品":"还没有候选模板"):(artifacts.length?"No matching artifact":"No candidate templates yet")}>{zh?"生产完成后，冻结候选模板会出现在这里。可先下载，再选择审阅或运行验收。":"Frozen candidates appear here after production. Download them or choose independent source or runtime acceptance."}</EmptyState>:null}{visibleArtifacts.map(a=><div key={a.id} id={`factory-artifact-${a.id}`}>{a.artifact_type==="product-blueprint"?<BlueprintCard artifact={a} zh={zh} busy={busy} act={act} model={model} timeout={timeout}/>:<ArtifactCard artifact={a} zh={zh} busy={busy} act={act} label={label} model={model} runtimeAvailable={!!status?.runtime.available} timeout={timeout}/>}</div>)}</section>:null}
+    {view==="v1"?<FactoryV1/>:null}
   </main>;
 }
 

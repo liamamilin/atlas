@@ -33,6 +33,14 @@ SAMPLE = (
 
 
 class BlueprintTests(unittest.TestCase):
+    def test_bundled_sample_is_self_contained_without_history_or_local_zip(self):
+        with patch("subprocess.run", side_effect=AssertionError("sample must not execute code or git")):
+            sample, status = dispatch("POST", "/api/factory/blueprints/sample", store=self.store)
+        self.assertEqual(status, 201)
+        self.assertEqual(sample["artifact_type"], "product-blueprint")
+        self.assertEqual(sample["evidence_status"], "legacy_unverified")
+        self.assertEqual(sample["state"], "draft")
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)
@@ -262,7 +270,7 @@ class BlueprintTests(unittest.TestCase):
                     body={**body, "expected_digest": value["digest"]},
                     store=self.store,
                 )
-            self.assertEqual(error.exception.code, "blueprint_operation_unavailable")
+            self.assertEqual(error.exception.code, "case_evidence_required" if operation == "review" else "blueprint_operation_unavailable")
         for method, args in [
             (self.store.create_acceptance, {"method": "harness-review"}),
             (
@@ -273,6 +281,17 @@ class BlueprintTests(unittest.TestCase):
             with self.assertRaises(FactoryError):
                 method(value["id"], {**args, "expected_digest": value["digest"]})
         self.assertEqual(len(self.store.batches()), 1)
+
+    def test_cognitive_revision_request_replays_terminal_job_instead_of_free_new_round(self):
+        value = import_blueprint(self.store, self.data())
+        request = {"expected_digest": value["digest"], "model": "fake/flash", "note": "Clarify the phase acceptance and limits."}
+        first = self.store.create_repair(value["id"], request)
+        with self.store.connect(True) as con:
+            con.execute("UPDATE job SET state='failed' WHERE batch_id=?", (first["id"],))
+        replay = self.store.create_repair(value["id"], request)
+        self.assertEqual(first["id"], replay["id"])
+        different = self.store.create_repair(value["id"], {**request, "model": "other/flash"})
+        self.assertNotEqual(different["id"], first["id"])
 
     def test_export_rejects_stale_digest_bad_project_and_unknown_phase(self):
         value = import_blueprint(self.store, self.data())

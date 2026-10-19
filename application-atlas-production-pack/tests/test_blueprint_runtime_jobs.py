@@ -1,6 +1,7 @@
 """Runtime queue/pinning integration. Fake transport, not application-quality proof."""
 
 import base64
+import hashlib
 import io
 import json
 import os
@@ -17,7 +18,8 @@ from template_factory.api import dispatch
 from template_factory.artifacts import tree_manifest
 from template_factory.blueprints import import_blueprint
 from template_factory.pipeline import Pipeline
-from template_factory.store import FactoryError
+from template_factory.store import FactoryError, digest
+from template_factory.runtime_jobs import register_phase_evidence
 
 
 class RuntimeJobTests(unittest.TestCase):
@@ -31,9 +33,13 @@ class RuntimeJobTests(unittest.TestCase):
         self.worker_patch.start()
         self.addCleanup(self.worker_patch.stop)
 
-    def artifact(self, binding=True):
+    def artifact(self, binding=True, required_evidence=None):
         if binding:
             spec = json.loads((self.source / "template.json").read_text())
+            if required_evidence:
+                phase = spec["phases"][0]["id"]
+                spec["phase_required_evidence"] = {phase: required_evidence}
+                (self.source / "template.json").write_text(json.dumps(spec, ensure_ascii=False))
             runner = {
                 "schema": "atlas.acceptance-runner.v1",
                 "result_schema": "atlas.acceptance-result.v1",
@@ -70,6 +76,46 @@ class RuntimeJobTests(unittest.TestCase):
         with self.assertRaises(FactoryError):
             self.submit(artifact)
         self.assertEqual(len(self.store.batches()), 1)  # import only
+
+    def test_runtime_child_inherits_fixed_plan_pause_and_cancellation(self):
+        artifact = self.artifact()
+        origin = self.store.job(artifact["job_id"])
+        artifact["provenance"]["v1"] = {
+            "campaign_id": "runtime-policy", "plan_id": "plan-policy",
+            "product_id": "bookmark", "segment": "G1",
+        }
+        from template_factory.runtime_jobs import queue_runtime
+        from template_factory.store import now
+        with self.store.connect(True) as con:
+            con.execute("INSERT INTO v1_execution VALUES(?,?,?,?,?)", ("plan-policy", "a" * 64, "policy-key", origin["batch_id"], now()))
+            con.execute("UPDATE batch SET state='paused' WHERE id=?", (origin["batch_id"],))
+        value = {"expected_digest": artifact["digest"], "phase": artifact["manifest"]["phases"][0]["id"],
+                 "execution_confirmed": True, "source_archive_base64": self.source_zip(), "timeout": 30}
+        paused = queue_runtime(self.store, artifact, value)
+        self.assertEqual(paused["state"], "paused")
+        self.assertIsNone(self.store.claim("runtime-worker", "verification"))
+        with self.store.connect(True) as con:
+            con.execute("UPDATE batch SET state='cancelled' WHERE id=?", (origin["batch_id"],))
+            con.execute("UPDATE job SET state='cancelled' WHERE batch_id=?", (paused["id"],))
+        with self.assertRaises(FactoryError) as caught:
+            queue_runtime(self.store, artifact, value)
+        self.assertEqual(caught.exception.code, "cancelled")
+        self.assertEqual(len(list((self.store.root / "submissions").iterdir())), 1)
+
+    def test_delayed_runtime_rechecks_segment_deadline_before_container_start(self):
+        artifact = self.artifact()
+        artifact["provenance"]["v1"] = {"campaign_id": "delayed-runtime", "product_id": "bookmark", "segment": "G1"}
+        from template_factory.runtime_jobs import queue_runtime
+        batch = queue_runtime(self.store, artifact, {"expected_digest": artifact["digest"],
+            "phase": artifact["manifest"]["phases"][0]["id"], "execution_confirmed": True,
+            "source_archive_base64": self.source_zip(), "timeout": 30})
+        job = self.store.claim("runtime-worker", "verification")
+        self.assertEqual(job["batch_id"], batch["id"])
+        with patch("template_factory.budget.BudgetLedger.phase_remaining", return_value=0), patch("template_factory.blueprint_runtime.BlueprintRuntimeVerifier.verify", side_effect=AssertionError("expired runtime must not start")):
+            with self.assertRaises(FactoryError) as caught:
+                Pipeline(self.store).run(job)
+            self.assertEqual(caught.exception.code, "budget_deadline")
+        self.assertEqual(self.store.job(job["id"])["state"], "paused_budget")
 
     def test_imported_runtime_enabled_revision_retains_frozen_protocol(self):
         artifact = self.artifact()
@@ -135,6 +181,73 @@ class RuntimeJobTests(unittest.TestCase):
                 pipeline.run(job)
         self.assertEqual(self.store.acceptances(artifact["id"]), [])
         self.assertEqual(self.store.job(job["id"])["state"], "failed")
+
+    def test_changed_frozen_suite_is_rejected_before_runtime_execution(self):
+        artifact = self.artifact()
+        self.submit(artifact)
+        job = self.store.claim("runtime-worker", "verification")
+        frozen_case = self.store.root / artifact["bundle_path"] / "source/acceptance/a.py"
+        frozen_case.write_text("changed suite")
+        pipeline = Pipeline(self.store)
+        with patch("template_factory.blueprint_runtime.BlueprintRuntimeVerifier.verify",
+                   side_effect=AssertionError("changed suite must not execute")):
+            with self.assertRaises(FactoryError):
+                pipeline.run(job)
+        self.assertEqual(self.store.acceptances(artifact["id"]), [])
+        self.assertEqual(self.store.job(job["id"])["state"], "failed")
+
+    def test_missing_phase_evidence_stays_unverified_until_bound_host_record_is_registered(self):
+        requirements = [{"id": "restart-check", "kind": "external", "description": "Verify stored data after restart.",
+                         "executor": "independent-restart-checker"}]
+        artifact = self.artifact(required_evidence=requirements)
+        self.submit(artifact)
+        job = self.store.claim("runtime-worker", "verification")
+        snapshot = job["snapshot"]
+        executor = {"kind": "independent_executor", "name": "independent-restart-checker", "version": "1.0"}
+        target_digest = digest(snapshot["target_binding"])
+        evidence_location = {}
+
+        class Verifier:
+            def verify(self, app, frozen, spec, phase, evidence, runtime, cancelled, progress):
+                evidence_location["directory"] = Path(evidence) / "external"
+                return {"outcome": "passed", "passed": True, "suite_status": "passed",
+                        "phase_status": "passed", "case_results": [],
+                        "binding": {"suite_digest": snapshot["suite_digest"]},
+                        "cleanup": {"success": True, "status": "passed"}}
+
+        pipeline = Pipeline(self.store)
+        pipeline.blueprint_verifier = Verifier()
+        pipeline.run(job)
+        report = self.store.acceptances(artifact["id"])[0]
+        self.assertEqual(report["suite_status"], "passed")
+        self.assertEqual(report["phase_status"], "unverified")
+        self.assertFalse(report["passed"])
+        self.assertEqual(report["missing_evidence"], ["restart-check"])
+        folder = evidence_location["directory"]
+        folder.mkdir(parents=True)
+        evidence_file = folder / "restart-check.json"
+        proof = {"schema": "atlas.phase-evidence.v1", "requirement_id": "restart-check",
+                 "target_digest": target_digest, "outcome": "passed", "executor": executor,
+                 "details": "synthetic independent executor record"}
+        evidence_file.write_text(json.dumps(proof, sort_keys=True))
+        relative = evidence_file.relative_to(self.store.root).as_posix()
+        registration = {"requirement_id": "restart-check", "target_digest": target_digest,
+                        "evidence_path": relative,
+                        "sha256": hashlib.sha256(evidence_file.read_bytes()).hexdigest(),
+                        "executor": executor}
+        with self.assertRaisesRegex(FactoryError, "target binding changed"):
+            register_phase_evidence(self.store, artifact["id"], report["id"],
+                                    {**registration, "target_digest": "0" * 64})
+        application = self.store.root / snapshot["submission_path"] / "app.py"
+        original_application = application.read_text()
+        application.write_text(original_application + "# mutated after run\n")
+        with self.assertRaisesRegex(FactoryError, "application target changed"):
+            register_phase_evidence(self.store, artifact["id"], report["id"], registration)
+        application.write_text(original_application)
+        passed = register_phase_evidence(self.store, artifact["id"], report["id"], registration)
+        self.assertEqual(passed["phase_status"], "passed")
+        self.assertTrue(passed["passed"])
+        self.assertEqual(self.store.job(job["id"])["state"], "completed")
 
     def test_runtime_infrastructure_failure_records_unavailable_with_partial_evidence(self):
         artifact = self.artifact()

@@ -6,6 +6,7 @@ from pathlib import Path
 
 from atlas_runtime import atomic_json
 from .artifacts import tree_manifest
+from .store import digest
 
 
 def _sha256(data):
@@ -49,6 +50,8 @@ def write_handoff(destination, spec, phase, project_name, template_digest):
         "prerequisite_phases": [row["id"] for row in phases[:-1]],
         "prerequisite_status": "requires_verification",
         "scenario": spec["scenario"],
+        "case_basis": spec.get("case_basis"),
+        "case_design": spec.get("case_design"),
         "roles": spec["roles"],
         "phases": phases,
         "features": features,
@@ -104,6 +107,12 @@ def write_handoff(destination, spec, phase, project_name, template_digest):
         "required_case_ids": [row["id"] for row in contract_cases],
         "cases": contract_cases,
         "suite_sha256": suite_inventory,
+        "suite_digest": digest(tree_manifest(destination / "blueprint")),
+        "suite_digest_scope": "all-frozen-blueprint-source; identical to managed runtime binding",
+        "program_inventory_digest": digest(suite_inventory),
+        "case_basis_digest": spec.get("case_basis", {}).get("basis_digest"),
+        "scenario_revision": spec["scenario"]["revision"],
+        "phase_required_evidence": spec.get("phase_required_evidence", {}).get(phase, []),
         "status": "not_run",
     }
     _write_json(destination / "ACCEPTANCE_CONTRACT.json", contract)

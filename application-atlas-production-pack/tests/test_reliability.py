@@ -4260,14 +4260,24 @@ class ClassificationProviderTests(unittest.TestCase):
         error = urllib.error.HTTPError(
             "https://opencode.ai/zen/go/v1/chat/completions", 503, "Unavailable", {},
             io.BytesIO(b"{}"))
-        with patch.object(classifier, "snapshot", return_value=self.state()), \
+        # Keep this transport test independent of credentials configured on a
+        # developer machine; otherwise it can fail before reaching _post_json.
+        with tempfile.TemporaryDirectory() as config_dir, \
+             patch.dict(os.environ, {
+                 "ATLAS_MODEL_CONFIG": str(Path(config_dir) / "model-config.json"),
+                 "ATLAS_MODEL_PROVIDER": "opencode-go",
+                 "ATLAS_API_KEY": "test-provider-key",
+             }), \
+             patch.object(classifier.atlas_model, "_opencode_credentials", return_value={}), \
+             patch.object(classifier, "snapshot", return_value=self.state()), \
              patch.object(classifier, "candidates", return_value=(
                  ("task-management-application",), {"task-management-application": 0.9})), \
-             patch.object(classifier.atlas_model, "_post_json", side_effect=error):
+             patch.object(classifier.atlas_model, "_post_json", side_effect=error) as post_json:
             with self.assertRaises(classifier.ClassificationProviderError) as raised:
                 classifier.classify("local task history", model="qwen3.8-flash")
         self.assertEqual(raised.exception.code, "provider_http_error")
         self.assertTrue(raised.exception.retryable)
+        post_json.assert_called_once()
 
     def test_provider_credential_is_never_echoed(self):
         # The raw provider body may quote the credential; it must be redacted

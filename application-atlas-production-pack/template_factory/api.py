@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import re
 import tempfile
+from functools import lru_cache
 from urllib.parse import parse_qs
 
 from atlas_runtime import PACK
@@ -22,13 +23,18 @@ from .blueprints import (
 )
 from .cli import CLI
 from .runtime import DockerVerifier
-from .store import FactoryError, FactoryStore
+from .store import FactoryError, FactoryStore, digest
 from .worker import ensure_worker
 
 
+@lru_cache(maxsize=8)
+def _initialized_store(root, pack):
+    return FactoryStore(root, pack)
+
+
 def get_store():
-    return FactoryStore(
-        os.environ.get("ATLAS_FACTORY_ROOT", str(PACK / "atlas/template-factory")), PACK
+    return _initialized_store(
+        os.environ.get("ATLAS_FACTORY_ROOT", str(PACK / "atlas/template-factory")), str(PACK)
     )
 
 
@@ -62,6 +68,9 @@ def dispatch(method, path, query="", body=None, store=None):
     store = store or get_store()
     body = body or {}
     route = path.removeprefix("/api/factory").strip("/")
+    if route.startswith("v1/"):
+        from .v1_api import dispatch_v1
+        return dispatch_v1(method, route[3:], query, body, store)
     if method == "GET" and route == "status":
         return {
             "cli": CLI().info(models=True),
@@ -103,17 +112,52 @@ def dispatch(method, path, query="", body=None, store=None):
             result = store.retry(match[1])
             ensure_worker(store)
             return result, 202
+    match = re.fullmatch(r"artifacts/(tpl_[a-f0-9]{32})/develop", route)
+    if method == "POST" and match:
+        from .development_jobs import queue_development
+        result = queue_development(store, artifact(store, match[1]), body)
+        ensure_worker(store)
+        return result, 202
+    match = re.fullmatch(r"jobs/(job_[a-f0-9]{32})/(delivery|verify-delivery)", route)
+    if match:
+        job = store.job(match[1])
+        record = store.checkpoint(job["id"], "application-delivery")
+        if job["kind"] != "application-development" or job["state"] != "completed" or not record or digest(record["result"]) != record["digest"]:
+            raise FactoryError("validated application delivery is unavailable", "delivery_unavailable", 409)
+        receipt = record["result"]
+        archive = controlled_path(store, receipt["archive_path"])
+        if hashlib.sha256(archive.read_bytes()).hexdigest() != receipt["archive_sha256"]:
+            raise FactoryError("validated application archive changed", "application_changed", 409)
+        if method == "GET" and match[2] == "delivery":
+            return archive, "application-" + job["id"] + ".zip", "application/zip"
+        if method == "POST" and match[2] == "verify-delivery":
+            import base64
+            if body.get("expected_archive_sha256") != receipt["archive_sha256"]:
+                raise FactoryError("application archive version changed", "revision_conflict", 409)
+            result = store.create_acceptance(receipt["artifact_id"], {
+                "method": "blueprint-runtime", "expected_digest": receipt["template_digest"],
+                "phase": receipt["phase"], "execution_confirmed": body.get("execution_confirmed"),
+                "timeout": body.get("timeout", 600),
+                "source_archive_base64": base64.b64encode(archive.read_bytes()).decode(),
+            })
+            ensure_worker(store)
+            return result, 202
     if method == "POST" and route in {"blueprints/import", "blueprints/sample"}:
         if route == "blueprints/sample":
             sample = (
                 Path(__file__).resolve().parents[2]
-                / "docs/template-factory/blueprint-pilots/bookmark-personal-2026-10-17/bookmark-personal-cognition-v0.1.1.zip"
+                / "docs/template-factory/blueprints/bookmark-personal"
             )
-            if not sample.is_file():
+            if not sample.is_dir():
                 raise FactoryError(
                     "bundled cognition sample unavailable", "not_found", 404
                 )
-            data = sample.read_bytes()
+            # Checked-in source is self-contained in a shallow/clean checkout;
+            # do not depend on ignored local ZIPs or historical git objects.
+            with tempfile.TemporaryDirectory(dir=store.root) as temporary:
+                path = Path(temporary) / "sample.zip"
+                archive_tree(sample, path)
+                data = path.read_bytes()
         else:
             data = decode_archive(body.get("archive_base64"))
         return import_blueprint(
@@ -133,7 +177,7 @@ def dispatch(method, path, query="", body=None, store=None):
                 if a.get("artifact_type", "runnable-starter") == filters["type"][0]
             ]
         if filters.get("published", [""])[0] == "1":
-            values = [a for a in values if a["state"] == "published"]
+            values = [a for a in values if a["state"] == "published" and a.get("catalog_eligible", True)]
         return values, 200
     match = re.fullmatch(
         r"artifacts/(tpl_[a-f0-9]{32})/(review|download|instantiate|preview|accept|repair|blueprint|development-package)",
@@ -144,6 +188,8 @@ def dispatch(method, path, query="", body=None, store=None):
         bundle = controlled_path(store, value["bundle_path"])
         if is_blueprint(value):
             spec = verify_frozen(bundle, value["digest"])
+            if method == "POST" and match[2] == "review":
+                return store.artifact_action(match[1], body), 200
             if method == "GET" and match[2] == "blueprint":
                 from .runtime_jobs import runtime_support
 

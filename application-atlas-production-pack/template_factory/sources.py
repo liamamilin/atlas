@@ -39,7 +39,7 @@ def github_repo(value):
     return match[1] + "/" + match[2]
 
 
-def request_bytes(url, limit=2_000_000):
+def request_bytes(url, limit=2_000_000, *, timeout=45):
     request = urllib.request.Request(
         url,
         headers={
@@ -49,7 +49,7 @@ def request_bytes(url, limit=2_000_000):
     )
     try:
         with urllib.request.build_opener(FixedRedirect()).open(
-            request, timeout=45
+            request, timeout=timeout
         ) as response:
             body = response.read(limit + 1)
     except FactoryError:
@@ -65,13 +65,24 @@ def request_bytes(url, limit=2_000_000):
     return body
 
 
-def fetch_source(repository, destination, fetch=request_bytes):
+def resolve_commit(repository, commit=None, fetch=request_bytes):
+    """Resolve once, then persist the returned SHA before downloading data."""
+    repo = github_repo(repository)
+    if commit is not None and (
+        not isinstance(commit, str) or not re.fullmatch(r"[a-f0-9]{40}", commit)
+    ):
+        raise FactoryError("source commit must be a full lowercase SHA")
+    resolved = json.loads(fetch(f"https://api.github.com/repos/{repo}/commits/{commit or 'HEAD'}"))
+    sha = resolved.get("sha")
+    if not isinstance(sha, str) or not re.fullmatch(r"[a-f0-9]{40}", sha) or (commit and sha != commit):
+        raise FactoryError("source did not resolve to the requested immutable commit")
+    return sha
+
+
+def fetch_source(repository, destination, fetch=request_bytes, *, commit=None):
     repo = github_repo(repository)
     metadata = json.loads(fetch(f"https://api.github.com/repos/{repo}"))
-    commit = json.loads(fetch(f"https://api.github.com/repos/{repo}/commits/HEAD"))
-    sha = commit.get("sha")
-    if not isinstance(sha, str) or not re.fullmatch(r"[a-f0-9]{40}", sha):
-        raise FactoryError("source did not resolve to an immutable commit")
+    sha = resolve_commit(repository, commit, fetch)
     license_info = metadata.get("license") or {}
     license_id = license_info.get("spdx_id")
     if not license_id or license_id in {"NOASSERTION", "NONE"}:
@@ -144,6 +155,8 @@ def fetch_source(repository, destination, fetch=request_bytes):
         )
     return {
         "repository": "https://github.com/" + repo,
+        "repository_id": metadata.get("id"),
+        "default_branch": metadata.get("default_branch"),
         "commit": sha,
         "license": license_id,
         "notice_hashes": notices,

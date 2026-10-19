@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.ts",
     "test:e2e": "playwright test",
+    "test:e2e:factory": "playwright test --config playwright.factory.config.ts",
     "gen": "python3 scripts/gen-data.py",
     "verify-data": "python3 scripts/verify-web-data.py",
     "api": "python3 ../application-atlas-production-pack/drafts_api.py"

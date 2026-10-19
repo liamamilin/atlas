@@ -1,0 +1,140 @@
+{
+  "schema": "atlas.independent-acceptance-plan.v1",
+  "created_date": "2026-10-19",
+  "sampling_plan": "../SAMPLING_PLAN.json",
+  "selection_policy": "Preserve all three preselected scenarios, even when admission or runtime execution blocks; never replace a failed target. Frozen before inspecting any run results.",
+  "profile": "python-web",
+  "suite_contract": "independent-core-journey",
+  "runner_contract": "atlas-independent-acceptance-v1",
+  "plan_status": "frozen-plan-only; no application target or template/acceptance-suite digest supplied yet",
+  "required_external_proof": {
+    "schema": "atlas.phase-evidence.v1",
+    "requirement_id": "independent-core-journey",
+    "target_digest": "digest(acceptance.target_binding), computed from the actual frozen acceptance target binding at execution",
+    "outcome": "passed only when all required cases for the selected scenario pass against the real frozen target",
+    "executor": {
+      "kind": "independent_executor",
+      "name": "atlas-independent-acceptance-v1",
+      "version": "1.0.0"
+    },
+    "must_bind": [
+      "actual_assertions",
+      "logs",
+      "environment",
+      "target source digest",
+      "template digest",
+      "suite digest",
+      "phase",
+      "scenario revision",
+      "case basis digest"
+    ],
+    "registration": "Do not register proof until parent provides real application IDs and target bindings; no authored proof can substitute for actual execution."
+  },
+  "scenarios": [
+    {
+      "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+      "revision": 2,
+      "name": "生活待购与灵感收藏夹",
+      "leaf": "bookmark-manager",
+      "observed_status": "ready",
+      "admission_gate": "must satisfy current batch admission policy before real execution; status is frozen as observed and never rewritten here",
+      "target_binding": {
+        "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+        "scenario_revision": 2,
+        "scenario_digest": "c704ec4cb701141a5166ecf5ce3e244f4ab35cd8606c2d1c378e6f75369b9034",
+        "acceptance": [
+          "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+          "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+          "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+          "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+        ],
+        "workflow": [
+          "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+          "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+          "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+          "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+          "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+        ]
+      },
+      "planned_core_cases": [
+        "save bookmark with title and URL",
+        "assign category then move it to another category",
+        "find by category and by keyword",
+        "open and verify exact original URL using a controlled local fixture",
+        "restart the same app container with the same persistent state and verify records remain",
+        "reject malformed/non-http(s) URL without creating a record",
+        "run concurrent independent saves and verify every acknowledged write is present exactly once"
+      ]
+    },
+    {
+      "scenario_id": "scn_6fb4896d9eb0428aa1c080df0a137813",
+      "revision": 1,
+      "name": "个人极简月度预算：先查剩余再消费",
+      "leaf": "budgeting-application",
+      "observed_status": "draft",
+      "admission_gate": "must satisfy current batch admission policy before real execution; status is frozen as observed and never rewritten here",
+      "target_binding": {
+        "scenario_id": "scn_6fb4896d9eb0428aa1c080df0a137813",
+        "scenario_revision": 1,
+        "scenario_digest": "0fd6ba2e7c362272f730fba9a432778dbad4fc13feb328c6373276378cc7579c",
+        "acceptance": [
+          "计划页对每个分配项同时显示计划金额、实际金额与剩余额度，并在录入支出后立即更新",
+          "任何一笔支出录入后，其所属分配项的剩余额度按该支出金额减少",
+          "分配项的实际支出超过计划金额后，其剩余额度显示为负数或明确的超支标记，而不是归零或隐藏",
+          "从分配项 A 转移金额到分配项 B 后，A 的剩余减少额与 B 的剩余增加额相同，计划总额不变",
+          "进入下一期后各分配项的计划金额回到模板数值，上一期剩余不被带入（未启用结转时）"
+        ],
+        "workflow": [
+          "新建本期（月度）计划，为食品、房租、交通、娱乐等用途创建分配项并填写计划金额",
+          "登记本期可用的预期收入，检查各分配项计划金额之和是否超过收入",
+          "消费后手动录入一笔支出并归属到对应分配项，该分配项剩余额度随即减少",
+          "购买前打开计划页，查看相关分配项及整体的剩余额度，据此决定是否购买或缩减金额",
+          "月中某分配项即将用尽，从其他分配项转移金额，或让超出部分留在该分配项上形成超支",
+          "期末查看各分配项的计划、实际与剩余对照，未使用金额留在本期，并按模板数值开始下一期计划"
+        ]
+      },
+      "planned_core_cases": [
+        "create a monthly plan and allocations with exact decimal money",
+        "record spending and verify exact planned/actual/remaining arithmetic without binary-float drift",
+        "exercise over-budget negative/explicit overrun state and balanced transfer",
+        "cross a month boundary and verify new allocations reset to configured template amounts when rollover is off",
+        "restart the same app container with the same persistent state and verify ledger and period values persist"
+      ]
+    },
+    {
+      "scenario_id": "scn_805c99ffe8da4532817592bb466a505e",
+      "revision": 1,
+      "name": "多项目会议结论的归档与回查",
+      "leaf": "note-taking-application",
+      "observed_status": "draft",
+      "admission_gate": "must satisfy current batch admission policy before real execution; status is frozen as observed and never rewritten here",
+      "target_binding": {
+        "scenario_id": "scn_805c99ffe8da4532817592bb466a505e",
+        "scenario_revision": 1,
+        "scenario_digest": "c7c91e1cd02875e4f6e9b070a571c905a0a9696198ac2147a924f0c059e27ce1",
+        "acceptance": [
+          "笔记移入某项目笔记本后出现在该笔记本列表中，且同一时刻只归属一个容器",
+          "被置顶的笔记在所属容器列表的固定位置保持可见，不随按日期或标题排序而移动",
+          "删除笔记后它进入可恢复的回收状态，在保留期内可被恢复并回到库中原有位置",
+          "归档后的笔记不再出现在默认活跃列表，但通过全库搜索仍能找到并打开"
+        ],
+        "workflow": [
+          "会议中用快速捕获窗口记录要点，先不决定归属",
+          "会后在桌面端把该笔记移入对应项目笔记本，并补充表格形式的决策与行动项",
+          "把当前重点推进的笔记置顶，使其在列表中始终可见",
+          "按阶段把已结束的笔记归档，清理活跃视图",
+          "把确实不需要的笔记删除，必要时在保留期内恢复",
+          "需要回顾时按容器浏览项目笔记本，找不到时改用全库搜索"
+        ]
+      },
+      "planned_core_cases": [
+        "capture notes then move each into the intended project notebook with one-container ownership",
+        "pin a note and verify stable top placement across sorting/reload",
+        "archive notes out of active list while retaining full content",
+        "search archived/history content across projects and open the exact retained note",
+        "delete and restore within retention, verifying original container/content are restored",
+        "restart the same app container with the same persistent state and verify archive/search/retention state persists"
+      ]
+    }
+  ]
+}

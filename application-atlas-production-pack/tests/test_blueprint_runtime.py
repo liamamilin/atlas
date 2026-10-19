@@ -2,7 +2,6 @@
 
 import json
 from pathlib import Path
-import shutil
 import sys
 import tempfile
 import unittest
@@ -152,6 +151,18 @@ class BlueprintRuntimeTests(unittest.TestCase):
             self.assertEqual(report["case_results"][0]["status"], "unverified" if protocol == "invalid" else "failed")
             self.assertEqual(report["case_results"][0]["id"], "A01")
             self.assertTrue(report["case_results"][0]["reason"])
+
+    def test_passing_suite_with_missing_required_phase_evidence_is_unverified(self):
+        self.spec["phase_required_evidence"] = {
+            "P0": [{"id": "restart-check", "kind": "external", "description": "Verify persisted data after restart.",
+                    "executor": "independent-restart-checker"}],
+        }
+        report = MockDocker().verify(self.app, self.source, self.spec, "P0", self.evidence, self.runtime)
+        self.assertEqual(report["suite_status"], "passed")
+        self.assertEqual(report["phase_status"], "unverified")
+        self.assertFalse(report["passed"])
+        self.assertEqual(report["outcome"], "unverified")
+        self.assertEqual(report["external_evidence"], [{"id": "restart-check", "status": "missing"}])
 
     def test_valid_failure_with_nonzero_exit_is_blocked_but_conflicting_pass_is_unverified(self):
         failed = MockDocker(protocol="failed-exit").verify(self.app, self.source, self.spec, "P0", self.evidence / "failed", self.runtime)

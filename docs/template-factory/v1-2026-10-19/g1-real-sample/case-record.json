@@ -1,0 +1,1114 @@
+{
+  "app_id": "app:repo:faa52e6b14140add50579594",
+  "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+  "created_at": "2026-10-19T06:19:40.565663+00:00",
+  "created_task_id": "job_d59605a1fbac430e84966ff143871068",
+  "digest": "d58ca8ae2ad37f581bbc79d1743df34657cdd651a43320db32ad3c4aeb275caf",
+  "evidence_digest": "706fa40ddf461e7cf1256f4b133979d5a019c6e7b848878c1be27bc75bd00d06",
+  "research": {
+    "input_digest": "941796f8efe0d21bbf6c268898d7d401d1e6cc2b3cfe2b0fb1a2c5e56e5d8587",
+    "scope": "Full read of the pinned source manifest under source/: README.md, package.json, index.html, vite.config.js, tsconfig.json, .gitignore, src/index.ts, src/App.tsrx (all 763 lines), src/includes/store.ts, src/includes/utils.ts, and src/includes/Icon.tsrx (first 80 lines); directory listings of source/ and source/src/. No files were executed, and no code outside the supplied manifest was inspected.",
+    "summary": "The pinned upstream tree at commit 539881b (github.com/lakhindarpal/bookmark-manager, materialized under source/) is a client-only bookmark manager built with Ripple TS, Vite, Tailwind/DaisyUI, Valibot, and Dexie/IndexedDB. A single Bookmark record type carries id, title, url, hostname, favicon Blob, description, flat tags[], isPinned, isArchived, visitCount, createdAt, visitedAt (source/src/includes/store.ts:3-16). The DB 'BookmarkDB' v1 has one table 'bookmarks' keyed by id with createdAt and visitCount indexes (source/src/includes/store.ts:41-47). The single component App.tsrx implements: an add/edit dialog with Valibot validation (URL http/https, title, description, 1-5 tags), a library grid with Home/Archived tabs, tag-filter sidebar with per-tag counts, title-only search, three sort modes with pinned-first, Visit (increments visitCount/visitedAt then window.open), Copy URL, Pin/Unpin, Edit, Archive/Unarchive, and a Delete action available only on archived items with a 5-second Undo toast. Metadata/favicons are fetched opportunistically from third-party services (api.microlink.io, images.weserv.nl, Google favicon) behind a 'sparkles' button and a fallback path, with failures only console.error'd. No test files, no import/export, no collections/folders, no sync, no preserved page copies, and no test script exist in the supplied manifest.",
+    "task_id": "job_d59605a1fbac430e84966ff143871068",
+    "unknowns": [
+      "Runtime behavior was not observed; all claims are static reading of source files.",
+      "Whether Dexie/IndexedDB persistence behaves correctly in real browsers at this commit is unverified.",
+      "Whether the third-party metadata/favicon endpoints (api.microlink.io, images.weserv.nl, Google s2 favicons) are reachable, rate-limited, or CORS-permitted at runtime is unverified.",
+      "The paired Research Notes referenced by leaf.md were not supplied, so product-level evidence beyond the pinned repository is unavailable.",
+      "No automated tests exist in the manifest, so none of the described behaviors are test-confirmed.",
+      "Behavior of Ripple TS reactivity primitives (track/effect/bindGroup/bindValue) at this pinned version was not validated.",
+      "The full commit tree was inferred from the supplied source_manifest and the on-disk source/ directory; files outside it were not inspected.",
+      "Host excluded unsupported evidence obs-no-test-files: observation cites an unknown source path: source/src",
+      "Host excluded unsupported evidence inf-no-tests: Depends on a quarantined, unlocated observation"
+    ]
+  },
+  "research_input_digest": "941796f8efe0d21bbf6c268898d7d401d1e6cc2b3cfe2b0fb1a2c5e56e5d8587",
+  "revision": 1,
+  "snapshot_ids": [
+    "src_3a8113f49b44ef3b3d7a7fca"
+  ],
+  "observations": [
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "2be642fc8f35015df2b623af261894b765c1fb9106932c90805f80a6db2449fd",
+      "evidence_id": "ev_ba200adf6e2c_05babdea64ba9858",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+        "line_end": 714,
+        "line_start": 699,
+        "path": "src/App.tsrx",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/App.tsrx"
+        },
+        "symbol": "inputData"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "New records are built with id `bm-${crypto.randomUUID()}`, hostname from getHostname(url), and defaults visitCount=0, visitedAt=null, isPinned=false, isArchived=false, createdAt=Date.now(); edits preserve the previous id, isPinned, isArchived, visitCount, createdAt, and visitedAt.",
+      "reviews": [
+        {
+          "review_id": "rev_46c0df270d9650196c868f5d06b334dc",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "2be642fc8f35015df2b623af261894b765c1fb9106932c90805f80a6db2449fd",
+          "created_at": "2026-10-19T06:21:07.828045+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "b4373de490abd2fc3e1545595bc1aef7af5f1953c48b0816e39527dd68cdd600",
+      "evidence_id": "ev_ba200adf6e2c_06c81a165e03c96a",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+        "line_end": 412,
+        "line_start": 369,
+        "path": "src/App.tsrx",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/App.tsrx"
+        },
+        "unresolved_symbol": "pin, edit"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Pin/Unpin and Edit actions are rendered only when the item is not archived, and Edit loads the item's url/title/description/tags/favicon into the dialog.",
+      "reviews": [
+        {
+          "review_id": "rev_ec8cc0127f290dac7297ffc35bf9c343",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "b4373de490abd2fc3e1545595bc1aef7af5f1953c48b0816e39527dd68cdd600",
+          "created_at": "2026-10-19T06:21:07.825636+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "9738ecfec828bc93a93274ef07cd0eb86963a8ef677eb5fb0ce111beb3d2a41c",
+      "evidence_id": "ev_ba200adf6e2c_1596da4a90687ca5",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+        "line_end": 129,
+        "line_start": 101,
+        "path": "src/App.tsrx",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/App.tsrx"
+        },
+        "symbol": "BookmarkFormSchema"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The Valibot BookmarkFormSchema requires a non-empty URL matching /^https?:\\/\\/(?:[\\w-]+\\.)+[a-zA-Z]{2,}(?:\\/\\S*)?$/ and v.url, a non-empty title up to 100 chars, a non-empty description up to 280 chars, and 1-5 tags each up to 30 chars.",
+      "reviews": [
+        {
+          "review_id": "rev_0b37c012f62544bd4324560e45249414",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "9738ecfec828bc93a93274ef07cd0eb86963a8ef677eb5fb0ce111beb3d2a41c",
+          "created_at": "2026-10-19T06:21:07.823512+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "1ebeb1e40d63cadc38f496131bc9f48610c3139b391ac6adb08b097ff39ad2e9",
+      "evidence_id": "ev_ba200adf6e2c_2288b28e90cd8450",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+        "line_end": 61,
+        "line_start": 58,
+        "path": "src/App.tsrx",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/App.tsrx"
+        },
+        "unresolved_symbol": "tab, filters, sort, search"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Tab, tag filters, sort, and search are held in component-local tracked state initialized to 'Home', [], 'Recently Added', and '' respectively, with no persistence to Dexie.",
+      "reviews": [
+        {
+          "review_id": "rev_5ef65fbeb85bf445e193f651af322b88",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "1ebeb1e40d63cadc38f496131bc9f48610c3139b391ac6adb08b097ff39ad2e9",
+          "created_at": "2026-10-19T06:21:07.822624+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "389846b2bf6635cde3ef8161f1027bc19d99f423d7aee1c75c13bdb72936aa50",
+      "evidence_id": "ev_ba200adf6e2c_3168bcd465b6a043",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "No collection concept exists outside the Bookmark fields and App.tsrx UI."
+        ],
+        "depends_on": [
+          "ev_ba200adf6e2c_9c7f6060878383fa",
+          "ev_ba200adf6e2c_1596da4a90687ca5",
+          "ev_ba200adf6e2c_06c81a165e03c96a",
+          "ev_ba200adf6e2c_9ab6b0e51811a16d"
+        ],
+        "reasoning": "The data model exposes only tags[] for organization, the form caps tags at five, and the sidebar only renders tag checkboxes rather than a collection tree; reclassification happens by editing the tag list."
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The scenario's user-controlled 'category' (归类) is realized only as up to five free-text tags on each record; there are no creatable, renameable, or nestable collections, and no separate move operation beyond editing tags.",
+      "reviews": [
+        {
+          "review_id": "rev_abb30c4bb1e972bffd70297fe0d90942",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "389846b2bf6635cde3ef8161f1027bc19d99f423d7aee1c75c13bdb72936aa50",
+          "created_at": "2026-10-19T06:21:07.831728+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "d6e7ebaee80c4ec90fb0e73e82b9df7b114ae35a66f5b44151c1377471ea5d3c",
+      "evidence_id": "ev_ba200adf6e2c_35e41aab676021eb",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+        "line_end": 37,
+        "line_start": 29,
+        "path": "src/App.tsrx",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/App.tsrx"
+        },
+        "unresolved_symbol": "saveBookmark, deleteBookmark"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "saveBookmark sets the record in the in-memory map then awaits db.bookmarks.put(bm); deleteBookmark removes from the map then awaits db.bookmarks.delete(id).",
+      "reviews": [
+        {
+          "review_id": "rev_6f83dce8bac2790e094d875627c67331",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "d6e7ebaee80c4ec90fb0e73e82b9df7b114ae35a66f5b44151c1377471ea5d3c",
+          "created_at": "2026-10-19T06:21:07.822125+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "c90500dc23152ef3169a31cffd3461e6658c44a59c78717de9c86347de959c9c",
+      "evidence_id": "ev_ba200adf6e2c_3b553994c375aea5",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "saveBookmark uses put with a newly generated id for every add, so identical URLs are distinct rows."
+        ],
+        "depends_on": [
+          "ev_ba200adf6e2c_515aa5d072bd2ec4",
+          "ev_ba200adf6e2c_05babdea64ba9858"
+        ],
+        "reasoning": "The schema indexes id, createdAt, and visitCount, not url, and each add generates a fresh `bm-${crypto.randomUUID()}` id."
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Duplicate records for the same URL can accumulate because the url field is neither uniquely indexed nor checked before insert; only id (a random UUID) is the key.",
+      "reviews": [
+        {
+          "review_id": "rev_e56007e9949a011802dad21a9f589e43",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "c90500dc23152ef3169a31cffd3461e6658c44a59c78717de9c86347de959c9c",
+          "created_at": "2026-10-19T06:21:07.838838+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "afc1f95277bba05677cc73f352b93faf89c2396c957e36f962dedcc2bee005f1",
+      "evidence_id": "ev_ba200adf6e2c_4c56ef30a1785be1",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+        "line_end": 453,
+        "line_start": 436,
+        "path": "src/App.tsrx",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/App.tsrx"
+        },
+        "symbol": "delete"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "A Delete action is rendered only for archived items; it calls deleteBookmark and shows an error-type toast with an Undo action that calls saveBookmark(item) to restore the record.",
+      "reviews": [
+        {
+          "review_id": "rev_1e02e15df6f3ece787b1db3fa1f58f69",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "afc1f95277bba05677cc73f352b93faf89c2396c957e36f962dedcc2bee005f1",
+          "created_at": "2026-10-19T06:21:07.826601+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "d51afa6a8eea6ab32450d028bf4ffc560b2c0007698bd9ff6bf8402b2ea79a22",
+      "evidence_id": "ev_ba200adf6e2c_5011700a24e503c7",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "d581eb982ce67b285056a74ab02d31a6a6a957423340da078e4ae89d9004189c",
+        "line_end": 26,
+        "line_start": 1,
+        "path": "src/includes/utils.ts",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/includes/utils.ts"
+        },
+        "unresolved_symbol": "getHostname, getBlobUrl, formatDate"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "getHostname returns '' unless the URL matches an http/https regex with a dotted domain, otherwise returns new URL(url).hostname; getBlobUrl caches object URLs per Blob in a WeakMap; formatDate returns 'Never' for falsy timestamps else a locale date string.",
+      "reviews": [
+        {
+          "review_id": "rev_9e485f316db5c12a87ff5f2f6c434f22",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "d51afa6a8eea6ab32450d028bf4ffc560b2c0007698bd9ff6bf8402b2ea79a22",
+          "created_at": "2026-10-19T06:21:07.828586+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "49ea8eb4be0e58f25ff563a88a802f0e376b61cf72a9e0401a85d5969c976c59",
+      "evidence_id": "ev_ba200adf6e2c_515aa5d072bd2ec4",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "b4dc58a7a48cd9929f3d35f31aef9fd5eb2b0b0606cdf735ce436a1e162b07ed",
+        "line_end": 47,
+        "line_start": 41,
+        "path": "src/includes/store.ts",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/includes/store.ts"
+        },
+        "symbol": "db"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "A Dexie database named 'BookmarkDB' version 1 declares a single 'bookmarks' EntityTable keyed by id and indexed on createdAt and visitCount.",
+      "reviews": [
+        {
+          "review_id": "rev_ff29815e7bea88b891d2ffc8e3b02cfc",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "49ea8eb4be0e58f25ff563a88a802f0e376b61cf72a9e0401a85d5969c976c59",
+          "created_at": "2026-10-19T06:21:07.820924+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "377aeaeae058465469b6fe1959717ca365afd37673ba179c231e244e255e17eb",
+      "evidence_id": "ev_ba200adf6e2c_5d51c18a989c01f8",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "6cbf0e25606a5627e6e3e6ceff394929691edf2d6417df922ecdca3321524eab",
+        "line_end": 19,
+        "line_start": 14,
+        "path": "index.html",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/index.html"
+        },
+        "symbol": "root"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "index.html defines the #root div and loads /src/index.ts as a module for the Bookmark Manager SPA.",
+      "reviews": [
+        {
+          "review_id": "rev_3268cf1b7ce2e999b1f1e479f02b7743",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "377aeaeae058465469b6fe1959717ca365afd37673ba179c231e244e255e17eb",
+          "created_at": "2026-10-19T06:21:07.830338+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "4ea50a75bb0e27a6e885708b1593f7292c686a9b8f7212a4826fdafa38c93e45",
+      "evidence_id": "ev_ba200adf6e2c_6805376f7e2ee383",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "b49b8acb566472b0d377438114d662854b4fb93c90b4cbde180c7dac588e3a93",
+        "host_classification": "Fixed documentation file; no implementation or runtime claim.",
+        "material_version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "source_path": "README.md",
+        "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/README.md"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "README describes the app as local-first with bookmarks stored in IndexedDB and featuring tagging, sorting by recently added/visited/most visited, and archiving/pinning.",
+      "reviews": [
+        {
+          "review_id": "rev_d14209dba2e7bb81732cc974407e721e",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "4ea50a75bb0e27a6e885708b1593f7292c686a9b8f7212a4826fdafa38c93e45",
+          "created_at": "2026-10-19T06:21:07.829035+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "a10fc2b280ae2e83eda3562e52f62fa390b5962f5fc8a32f5a1eba5f196d57ab",
+      "evidence_id": "ev_ba200adf6e2c_6bbd7a588896fe31",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "Users cannot bypass the schema, since submit always calls v.safeParse before saving."
+        ],
+        "depends_on": [
+          "ev_ba200adf6e2c_1596da4a90687ca5"
+        ],
+        "reasoning": "The tags schema enforces v.minLength(1), so a record cannot be stored without at least one tag, leaving no 'unsorted' inbox path."
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The scenario step of letting unclassified links land in a default category is not supported, because the form schema rejects saves with zero tags.",
+      "reviews": [
+        {
+          "review_id": "rev_d30f354f0561c67d434dd9bce51a1f44",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "a10fc2b280ae2e83eda3562e52f62fa390b5962f5fc8a32f5a1eba5f196d57ab",
+          "created_at": "2026-10-19T06:21:07.832267+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "417f58299cbd24f45c2abf5da20809db08d1d4449513e6fce604746c740ceeb8",
+      "evidence_id": "ev_ba200adf6e2c_7150b0ac7a5678db",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+        "line_end": 367,
+        "line_start": 360,
+        "path": "src/App.tsrx",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/App.tsrx"
+        },
+        "symbol": "Copy URL"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "A Copy URL action writes item.url to the clipboard and shows a success toast.",
+      "reviews": [
+        {
+          "review_id": "rev_595e62aa4e20e727580341324a04aac1",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "417f58299cbd24f45c2abf5da20809db08d1d4449513e6fce604746c740ceeb8",
+          "created_at": "2026-10-19T06:21:07.825138+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "61df1547455c601ea568f92bc65237af3f6dc7298abc18a837f8943a283a1fed",
+      "evidence_id": "ev_ba200adf6e2c_7d47d725a2e9b759",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "The user may submit without pressing the metadata button, in which case only the submitted fields are stored."
+        ],
+        "depends_on": [
+          "ev_ba200adf6e2c_ec303a2fd1afa287",
+          "ev_ba200adf6e2c_8e11efc61a4650ba",
+          "ev_ba200adf6e2c_05babdea64ba9858"
+        ],
+        "reasoning": "Both the metadata fetch and the favicon fallback are wrapped in try/catch that only log, and submission proceeds to build the record regardless of enrichment success."
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Metadata and favicon enrichment is best-effort and dependent on third-party HTTP services; failures degrade silently to console errors while the bookmark still saves with whatever fields the user entered or omitted defaults for.",
+      "reviews": [
+        {
+          "review_id": "rev_5d12e294526ebc830272e052d567e397",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "61df1547455c601ea568f92bc65237af3f6dc7298abc18a837f8943a283a1fed",
+          "created_at": "2026-10-19T06:21:07.838414+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "aaec85f888e49f2f7bf49cbb2c85bb7ecb79bfdbefb451f54c0513ffe217015e",
+      "evidence_id": "ev_ba200adf6e2c_86ed2327f33a3ca8",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+        "line_end": 27,
+        "line_start": 23,
+        "path": "src/App.tsrx",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/App.tsrx"
+        },
+        "symbol": "App"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "An effect on component creation calls db.bookmarks.toArray() and inserts each returned bookmark into an in-memory RippleMap keyed by bookmark id.",
+      "reviews": [
+        {
+          "review_id": "rev_ad696d53ea90471bb4f92ea86978166f",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "aaec85f888e49f2f7bf49cbb2c85bb7ecb79bfdbefb451f54c0513ffe217015e",
+          "created_at": "2026-10-19T06:21:07.821532+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "5b5992d70729f93b9fbb0cb638e3f411035b63c039b315be37b48118e72576d5",
+      "evidence_id": "ev_ba200adf6e2c_8e11efc61a4650ba",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+        "line_end": 697,
+        "line_start": 684,
+        "path": "src/App.tsrx",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/App.tsrx"
+        },
+        "symbol": "finalFavicon"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "On submit, if no favicon exists and a hostname is derivable, the code fetches a Google s2 favicon proxied through images.weserv.nl inside a try/catch that only logs failure.",
+      "reviews": [
+        {
+          "review_id": "rev_82b6bbdedebb75f12f5be9526bb6e1f2",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "5b5992d70729f93b9fbb0cb638e3f411035b63c039b315be37b48118e72576d5",
+          "created_at": "2026-10-19T06:21:07.827480+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "ac91e57b3dba519d9ffb913ca79f58946e36c37beccba7fad8d776ef436e038f",
+      "evidence_id": "ev_ba200adf6e2c_922f1dbc84912d99",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "IndexedDB storage is not shared or synchronized across browsers/devices by the app."
+        ],
+        "depends_on": [
+          "ev_ba200adf6e2c_515aa5d072bd2ec4",
+          "ev_ba200adf6e2c_6805376f7e2ee383",
+          "ev_ba200adf6e2c_86ed2327f33a3ca8"
+        ],
+        "reasoning": "The only storage mechanism declared is a local Dexie/IndexedDB database and the README frames the design as local-first with no accounts or servers."
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Persistence is local to one browser profile/device via IndexedDB with no sync layer, so the scenario's cross-session growth holds only on the same browser, and the leaf's multi-device context is unmet.",
+      "reviews": [
+        {
+          "review_id": "rev_ef1e1752bf79c5445f5fe6139895e5fa",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "ac91e57b3dba519d9ffb913ca79f58946e36c37beccba7fad8d776ef436e038f",
+          "created_at": "2026-10-19T06:21:07.833594+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "5a62fabe586db5e0860e7f15b7618ca09a326564cbe846fffd5edf767dad4836",
+      "evidence_id": "ev_ba200adf6e2c_93ef917a193a45ab",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "No other delete entry point exists in the manifest."
+        ],
+        "depends_on": [
+          "ev_ba200adf6e2c_4c56ef30a1785be1",
+          "ev_ba200adf6e2c_b1ca64cf2ad02998",
+          "ev_ba200adf6e2c_2288b28e90cd8450"
+        ],
+        "reasoning": "The Delete <li> is inside the if (item.isArchived) block, and restoration is bound solely to the toast's Undo onClick, which disappears when the toast auto-expires in five seconds."
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Deletion is limited to archived records and recovery is only the transient Undo action on the toast; there is no trash view, and non-archived records cannot be deleted at all through the UI.",
+      "reviews": [
+        {
+          "review_id": "rev_aaa7715d000be680685ac193c67bf124",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "5a62fabe586db5e0860e7f15b7618ca09a326564cbe846fffd5edf767dad4836",
+          "created_at": "2026-10-19T06:21:07.837897+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "5140e0f21c0580e0819eba9058916919e81482cab61d27274a444435732adb0d",
+      "evidence_id": "ev_ba200adf6e2c_93ff254508846f11",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+        "line_end": 354,
+        "line_start": 339,
+        "path": "src/App.tsrx",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/App.tsrx"
+        },
+        "symbol": "Visit"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The Visit action builds an updated bookmark with visitedAt=Date.now() and visitCount+1, calls saveBookmark(updated), then opens the URL with window.open(item.url, '_blank', 'noopener,noreferrer').",
+      "reviews": [
+        {
+          "review_id": "rev_e21995b48810a64485232d26f9db0e02",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "5140e0f21c0580e0819eba9058916919e81482cab61d27274a444435732adb0d",
+          "created_at": "2026-10-19T06:21:07.824562+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "75434817f5a108c7b7b39668c58497de2b976947bdaa60495a5976f1ea5595b9",
+      "evidence_id": "ev_ba200adf6e2c_9ab6b0e51811a16d",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+        "line_end": 88,
+        "line_start": 63,
+        "path": "src/App.tsrx",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/App.tsrx"
+        },
+        "symbol": "bookmarks"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The displayed list filters by isArchived matching the active tab, requires every selected tag to be present in bookmark.tags, matches search only against bookmark.title.toLowerCase(), and sorts pinned-first then by the chosen sort mode with createdAt descending as fallback.",
+      "reviews": [
+        {
+          "review_id": "rev_c110bee260eee772e9d38175601ddb6c",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "75434817f5a108c7b7b39668c58497de2b976947bdaa60495a5976f1ea5595b9",
+          "created_at": "2026-10-19T06:21:07.823048+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "7fe14da0e40fc7a3971695a98e45db3905cd89980fbfbe01fd719bf357d14315",
+      "evidence_id": "ev_ba200adf6e2c_9c7f6060878383fa",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "b4dc58a7a48cd9929f3d35f31aef9fd5eb2b0b0606cdf735ce436a1e162b07ed",
+        "line_end": 16,
+        "line_start": 3,
+        "path": "src/includes/store.ts",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/includes/store.ts"
+        },
+        "symbol": "Bookmark"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The Bookmark type stores id, title, url, hostname, favicon Blob, description, tags string array, isPinned, isArchived, visitCount, createdAt, and visitedAt.",
+      "reviews": [
+        {
+          "review_id": "rev_8520756153c31c1a1f6b7c4554ca2db4",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "7fe14da0e40fc7a3971695a98e45db3905cd89980fbfbe01fd719bf357d14315",
+          "created_at": "2026-10-19T06:21:07.820112+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "590e1663da363c0d40628033b036e2a9fca8adac9d36f7c06ec77c68b311c504",
+      "evidence_id": "ev_ba200adf6e2c_a2ebc864c5b6b3e7",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "8fd34f45b8e3392cfad6650602b1704af7e4b150cae22e74332555ce69406ba8",
+        "line_end": 9,
+        "line_start": 1,
+        "path": "src/index.ts",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/index.ts"
+        },
+        "symbol": "mount"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The entry point imports index.css, mounts the App component into #root via ripple's mount, and throws if the root element is missing.",
+      "reviews": [
+        {
+          "review_id": "rev_77c1566c20a050ab41c5b755e5119f74",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "590e1663da363c0d40628033b036e2a9fca8adac9d36f7c06ec77c68b311c504",
+          "created_at": "2026-10-19T06:21:07.829888+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "eb9d0a5e4ed877eac8c088c53461ae82b096ba848c5a783cd29b30e3d16e5b25",
+      "evidence_id": "ev_ba200adf6e2c_b1ca64cf2ad02998",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+        "line_end": 435,
+        "line_start": 413,
+        "path": "src/App.tsrx",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/App.tsrx"
+        },
+        "symbol": "archive"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The Archive/Unarchive action toggles isArchived and, when archiving, forces isPinned=false before saving.",
+      "reviews": [
+        {
+          "review_id": "rev_62aa9ba40efb4e5214a96b640e7d6340",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "eb9d0a5e4ed877eac8c088c53461ae82b096ba848c5a783cd29b30e3d16e5b25",
+          "created_at": "2026-10-19T06:21:07.826098+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "267281aac7c69c5885e3382f0d16023a79d7b47575b8fe6356b76ae4407eacbf",
+      "evidence_id": "ev_ba200adf6e2c_c4ad7e52e5713628",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+        "line_end": 56,
+        "line_start": 49,
+        "path": "src/App.tsrx",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/App.tsrx"
+        },
+        "symbol": "tagCounts"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Tag counts are derived by iterating all in-memory bookmarks and counting each tag occurrence, then sorted alphabetically for the sidebar.",
+      "reviews": [
+        {
+          "review_id": "rev_7a7c4ab13b57c2dd30ec13457404f616",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "267281aac7c69c5885e3382f0d16023a79d7b47575b8fe6356b76ae4407eacbf",
+          "created_at": "2026-10-19T06:21:07.827001+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "bedaf525785c18f436a430e24489689d9ad973b6e3be5b1896281550222371cb",
+      "evidence_id": "ev_ba200adf6e2c_e62ae7e0a2c68ba1",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "Tag names are found only via the sidebar checkbox filter, not via the text search."
+        ],
+        "depends_on": [
+          "ev_ba200adf6e2c_9ab6b0e51811a16d"
+        ],
+        "reasoning": "The filter clause applies _search exclusively to bookmark.title.toLowerCase()."
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Retrieval by keyword covers only bookmark titles, not URLs, descriptions, or tag names, so the scenario's 'find by a remembered word' workflow is partially supported.",
+      "reviews": [
+        {
+          "review_id": "rev_334567075bfe4f50ab7301ba1a40bce8",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "bedaf525785c18f436a430e24489689d9ad973b6e3be5b1896281550222371cb",
+          "created_at": "2026-10-19T06:21:07.833137+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "134199e7260f757d7c708010991955293b629b4022be9c00b78a7de5df6e52e5",
+      "evidence_id": "ev_ba200adf6e2c_e7dd8d32c05c39f9",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "Dexie over IndexedDB persists between sessions in the user's browser profile.",
+          "RippleMap reactivity renders the loaded records as the grid of articles."
+        ],
+        "depends_on": [
+          "ev_ba200adf6e2c_9c7f6060878383fa",
+          "ev_ba200adf6e2c_515aa5d072bd2ec4",
+          "ev_ba200adf6e2c_86ed2327f33a3ca8",
+          "ev_ba200adf6e2c_35e41aab676021eb",
+          "ev_ba200adf6e2c_1596da4a90687ca5",
+          "ev_ba200adf6e2c_9ab6b0e51811a16d",
+          "ev_ba200adf6e2c_93ff254508846f11"
+        ],
+        "reasoning": "Records are persisted on save and re-read on mount into the reactive map that drives the filtered/sorted list; the Visit action reopens the stored URL, closing the retrieve-and-return loop."
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The app supports the scenario's save-now/find-later loop: a deliberate add dialog writes a URL-anchored record into durable IndexedDB, and the record can later be browsed, tag-filtered, title-searched, and opened back to the live URL.",
+      "reviews": [
+        {
+          "review_id": "rev_be1d5e756f55721e76640786fda6892c",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "134199e7260f757d7c708010991955293b629b4022be9c00b78a7de5df6e52e5",
+          "created_at": "2026-10-19T06:21:07.830820+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "f2e6082bf490d98e7f508b61d6a29a5f05561c99fc07f308e61dd83888728c18",
+      "evidence_id": "ev_ba200adf6e2c_ec303a2fd1afa287",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+        "line_end": 160,
+        "line_start": 133,
+        "path": "src/App.tsrx",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/src/App.tsrx"
+        },
+        "symbol": "fetchMeta"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "fetchMeta calls https://api.microlink.io/?url=... and, on success with result.data, sets title/description and fetches the logo through https://images.weserv.nl/; errors are only console.error'd and the finally block resets loading.",
+      "reviews": [
+        {
+          "review_id": "rev_87d4484969add14b26ab5f4991a0c7c2",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "f2e6082bf490d98e7f508b61d6a29a5f05561c99fc07f308e61dd83888728c18",
+          "created_at": "2026-10-19T06:21:07.824083+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "digest": "51c3bca2ca4c2a10017a498dd2a0f533426b51ac3aeb4bf627fec81b7ab52ada",
+      "evidence_id": "ev_ba200adf6e2c_f30eb4285ca66219",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "file_digest": "a0df38a4bf76cb70e4a46fed0487345b3bd89ee98ec8b69f48bfca95260c6e90",
+        "line_end": 19,
+        "line_start": 10,
+        "path": "package.json",
+        "path_normalization": {
+          "policy": "single-source-mount-prefix-v1",
+          "reported": "source/package.json"
+        },
+        "symbol": "scripts"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "package.json scripts are start, dev, build, lint, typecheck, serve, format, and check; there is no test script and no test dependency.",
+      "reviews": [
+        {
+          "review_id": "rev_8702bbd620dd76abf479ad37bed579a2",
+          "outcome": "accepted",
+          "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "51c3bca2ca4c2a10017a498dd2a0f533426b51ac3aeb4bf627fec81b7ab52ada",
+          "created_at": "2026-10-19T06:21:07.829454+00:00"
+        }
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "adopted_scope": [
+        "Bookmark record model and Dexie/IndexedDB persistence layer (source/src/includes/store.ts:3-16, source/src/includes/store.ts:41-47).",
+        "Add/edit dialog with Valibot validation and generated ids (source/src/App.tsrx:101-129, source/src/App.tsrx:699-717).",
+        "Library list, tabs, tag sidebar, search, sort, and per-card actions (source/src/App.tsrx:58-88, source/src/App.tsrx:178-498).",
+        "URL validation, hostname extraction, blob-URL favicon handling, and date formatting (source/src/includes/utils.ts:1-26).",
+        "Application mount and static HTML shell (source/src/index.ts:1-9, source/index.html:14-19)."
+      ],
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "evidence_ids": [
+        "ev_ba200adf6e2c_1596da4a90687ca5",
+        "ev_ba200adf6e2c_05babdea64ba9858",
+        "ev_ba200adf6e2c_35e41aab676021eb",
+        "ev_ba200adf6e2c_86ed2327f33a3ca8",
+        "ev_ba200adf6e2c_9ab6b0e51811a16d",
+        "ev_ba200adf6e2c_c4ad7e52e5713628",
+        "ev_ba200adf6e2c_93ff254508846f11",
+        "ev_ba200adf6e2c_7150b0ac7a5678db",
+        "ev_ba200adf6e2c_06c81a165e03c96a",
+        "ev_ba200adf6e2c_b1ca64cf2ad02998",
+        "ev_ba200adf6e2c_4c56ef30a1785be1",
+        "ev_ba200adf6e2c_ec303a2fd1afa287",
+        "ev_ba200adf6e2c_8e11efc61a4650ba",
+        "ev_ba200adf6e2c_e7dd8d32c05c39f9",
+        "ev_ba200adf6e2c_3168bcd465b6a043",
+        "ev_ba200adf6e2c_6bbd7a588896fe31",
+        "ev_ba200adf6e2c_e62ae7e0a2c68ba1",
+        "ev_ba200adf6e2c_922f1dbc84912d99",
+        "ev_ba200adf6e2c_93ef917a193a45ab",
+        "ev_ba200adf6e2c_7d47d725a2e9b759"
+      ],
+      "exclusions": [
+        "No collections/folders or nested organization: organization is a flat string[] tags field only (source/src/includes/store.ts:3-16).",
+        "No unsorted/default category: the schema requires at least one tag (source/src/App.tsrx:121-128).",
+        "Search is title-only; URL, description, and tags are not searched (source/src/App.tsrx:63-88).",
+        "No import/export of browser bookmark HTML or other services' libraries; absent from the manifest.",
+        "No cloud sync or multi-device sharing; data is local IndexedDB (source/README.md:13-14).",
+        "No preserved page copies or snapshots; only a favicon Blob is stored (source/src/includes/store.ts:8).",
+        "No duplicate detection or URL uniqueness constraint; 'url' is not indexed uniquely (source/src/includes/store.ts:45-47).",
+        "No broken-link detection or library hygiene features.",
+        "No public sharing or collaboration.",
+        "No browser extension/bookmarklet; capture is via the in-page add form.",
+        "No trash view; Delete exists only for archived records and relies on a transient Undo toast (source/src/App.tsrx:436-453)."
+      ],
+      "reason": "The repository implements the scenario's core loop of deliberately saving a URL as a durable record, organizing it, retrieving it later, and returning to the original page. However, the scenario's 'category' (归类) concept maps only onto a mandatory flat tag list rather than creatable/movable collections, there is no default/unsorted category because at least one tag is required, and search covers only the title. Persistence is single-browser IndexedDB with no sync, so the multi-device aspect of the scenario is not supported.",
+      "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+      "scenario_revision": 2,
+      "workflow_support": [
+        "Save a seen link: Add Bookmark dialog captures URL with Valibot validation (source/src/App.tsrx:101-129, source/src/App.tsrx:658-717).",
+        "Choose a simple category: up to five free-text tags are entered in the dialog (source/src/App.tsrx:608-657).",
+        "Browse or search the personal library: Home/Archived tabs, tag checkbox filters with counts, and a title-search field (source/src/App.tsrx:49-56, source/src/App.tsrx:58-88, source/src/App.tsrx:241-250).",
+        "Move/manage organization after saving: Edit reopens the record and rewrites tags via saveBookmark (source/src/App.tsrx:392-412, source/src/App.tsrx:699-714).",
+        "Open a record to return to the original page: Visit updates visitedAt/visitCount and calls window.open(item.url, '_blank', 'noopener,noreferrer') (source/src/App.tsrx:339-354).",
+        "Persistence across sessions: records are written to Dexie table 'bookmarks' and re-read with db.bookmarks.toArray() on mount (source/src/includes/store.ts:41-47, source/src/App.tsrx:23-32)."
+      ]
+    }
+  ],
+  "source_snapshots": [
+    {
+      "archive_sha256": "8d7d5423093436727aa1dbb47ce8dc1bae715de309ac22bc65e650913f91af39",
+      "collected_at": "2026-10-19T06:03:21.864088+00:00",
+      "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "excluded_paths": [],
+      "file_manifest_digest": "b2af66143ffc52e3591c248ca1cdff66e6f24388ae797e9784dc9908fdf6ce4b",
+      "files": {
+        ".gitignore": "20e30f7d2feddb1cf1914aec96dc9a694c2aca0f02efbac0523d5a846dc82dc1",
+        ".prettierignore": "dc4cc2ab6231b00bb0dc801c9b7d463f8273b1557f98519b3d18570a487d03fe",
+        ".prettierrc": "d4eeddaeb3c416ceedf4c165dd4048d8d4596a6a5216fb54e54751fe2b80634b",
+        ".vscode/settings.json": "fa8d97f9abffb85cca63607cb22ba9cbf4e18d841a087e75d8edc02822d8bf1f",
+        "LICENSE": "17e5ccdd3ca04fa001985e8b3370d70d357f858d491b5691a461fd5985834a44",
+        "README.md": "b49b8acb566472b0d377438114d662854b4fb93c90b4cbde180c7dac588e3a93",
+        "bun.lock": "60d16e5afd1af76799de1e459bea78c1b66a0d022388ebc9c10daa9920023086",
+        "eslint.config.js": "21723b58d2f8d88320bcf607dde20041f6fd52a6b06864636776b76b4c2b5c0e",
+        "favicon.svg": "11ed7b3e1c389fe1b736dff5bf8df3dc700dcd9e1fdaebda6fbd9417c0e6b69e",
+        "index.html": "6cbf0e25606a5627e6e3e6ceff394929691edf2d6417df922ecdca3321524eab",
+        "package.json": "a0df38a4bf76cb70e4a46fed0487345b3bd89ee98ec8b69f48bfca95260c6e90",
+        "preview.png": "346d46f64f374faf3f7f901e53273df285f9eb2f34c4aabc712b32a0ceb945b9",
+        "src/App.tsrx": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+        "src/includes/Icon.tsrx": "b807d863fd08b06210341652a6a5a85dd063122d3fc12aef1163c45c85d7e23e",
+        "src/includes/store.ts": "b4dc58a7a48cd9929f3d35f31aef9fd5eb2b0b0606cdf735ce436a1e162b07ed",
+        "src/includes/utils.ts": "d581eb982ce67b285056a74ab02d31a6a6a957423340da078e4ae89d9004189c",
+        "src/index.css": "6c319086d7e7fa9298abab36a28618932d4f3a4a2c69f969b774ff6cf3aef3d7",
+        "src/index.ts": "8fd34f45b8e3392cfad6650602b1704af7e4b150cae22e74332555ce69406ba8",
+        "tsconfig.json": "db25efbcc189ea0e0679f48928d8491ef10358c569977399031018ce0b5f438f",
+        "vite.config.js": "ffd99be0c5dda12dbc1d6dd21ea11c94581a9df9ed9df3659c645c6a0f9c5974"
+      },
+      "license": {
+        "notice_hashes": {
+          "LICENSE": "17e5ccdd3ca04fa001985e8b3370d70d357f858d491b5691a461fd5985834a44"
+        },
+        "spdx_id_supplement": "MIT",
+        "supplement_collected_at": "2026-10-19T06:03:21.864088+00:00",
+        "supplement_source": "GitHub repository metadata for the current default branch; not evidence of the pinned commit license"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license_uncertainties": [
+        "Repository API license metadata is a current default-branch supplement; pinned-version terms are represented by fixed LICENSE/NOTICE files and their hashes."
+      ],
+      "repo_id": "1247664857",
+      "repository": "https://github.com/lakhindarpal/bookmark-manager",
+      "snapshot_id": "src_3a8113f49b44ef3b3d7a7fca",
+      "strategy_version": "github-safe-archive-v1"
+    }
+  ]
+}

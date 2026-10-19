@@ -88,7 +88,7 @@ class Pipeline:
         def stage(name, message):
             self.store.update(jid, token, name, message)
 
-        def agent(name, prompt, payload, source=None):
+        def agent(name, prompt, payload, source=None, *, budget_stage=None):
             directory = attempt / name
             directory.mkdir()
             # JSON escapes a multiline document into one long line. OpenCode's
@@ -102,6 +102,20 @@ class Pipeline:
             if source:
                 copy_tree(source, directory / "source")
             stage(name, "OpenCode CLI started")
+            budget_options = {}
+            if snapshot.get("v1"):
+                from .budget import BudgetLedger
+                identity = snapshot["v1"]
+                operation = budget_stage or (name + ":" + digest(payload)[:16])
+                with self.store.connect() as con:
+                    prior_calls = con.execute("SELECT count(*) FROM tf_budget_reservation WHERE campaign_id=? AND identity=? AND stage=? AND status!='not_started'", (identity["campaign_id"], identity["product_id"], operation)).fetchone()[0]
+                budget_options = {"budget_required": True, "budget": {
+                    "ledger": BudgetLedger(self.store, campaign_id=identity["campaign_id"]),
+                    "identity": identity["product_id"], "phase": identity["segment"],
+                    "stage": operation, "job_id": jid,
+                    **({"retry": prior_calls} if prior_calls else {}),
+                    "kind": "review" if "review" in name else "research" if "case-" in name else "production",
+                }}
             result = self.cli.run(
                 directory,
                 prompt,
@@ -109,6 +123,7 @@ class Pipeline:
                 config["timeout"],
                 cancelled,
                 lambda m: stage(name, m),
+                **budget_options,
             )
             atomic_json(directory / "result.json", result)
             return result
@@ -133,6 +148,14 @@ class Pipeline:
             return value
 
         try:
+            if job["kind"] == "application-development":
+                from .development_jobs import run_development
+                run_development(self, job, attempt, agent, stage, checkpoint)
+                return
+            if job["kind"] == "case-research":
+                from .case_research import run_research
+                run_research(self, job, attempt, agent, stage, checkpoint)
+                return
             if job["kind"] == "blueprint-runtime":
                 from .runtime_jobs import run_runtime
 
@@ -466,7 +489,9 @@ class Pipeline:
                     if isinstance(error, FactoryError)
                     else "production_error"
                 )
-                if job["kind"] in {"harness-review", "runtime-verification", "cognitive-review"}:
+                if code.startswith("budget_"):
+                    self.store.update(jid, token, self.store.job(jid)["stage"], "Stopped at persistent budget boundary: " + code, "paused_budget", code + ": " + str(error))
+                elif job["kind"] in {"harness-review", "runtime-verification", "cognitive-review"}:
                     self.store.complete_acceptance(
                         jid,
                         token,
