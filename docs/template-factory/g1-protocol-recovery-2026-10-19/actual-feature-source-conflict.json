@@ -1,0 +1,351 @@
+{
+  "schema": "atlas.pinned-source-reference-conflict.v1",
+  "job_id": "job_7742b1c124be4c9ab3a0096da5cdd772",
+  "attempt": 4,
+  "fixed_prepared_plan_digest": "f190b65275ab7c7136f523ba92aecde7c9392440d7676b070393e62ff9137b58",
+  "case_basis_digest": "a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589",
+  "accepted_evidence_ids": [
+    "ev_ba200adf6e2c_05babdea64ba9858",
+    "ev_ba200adf6e2c_06c81a165e03c96a",
+    "ev_ba200adf6e2c_1596da4a90687ca5",
+    "ev_ba200adf6e2c_3168bcd465b6a043",
+    "ev_ba200adf6e2c_35e41aab676021eb",
+    "ev_ba200adf6e2c_4c56ef30a1785be1",
+    "ev_ba200adf6e2c_6bbd7a588896fe31",
+    "ev_ba200adf6e2c_7150b0ac7a5678db",
+    "ev_ba200adf6e2c_7d47d725a2e9b759",
+    "ev_ba200adf6e2c_86ed2327f33a3ca8",
+    "ev_ba200adf6e2c_8e11efc61a4650ba",
+    "ev_ba200adf6e2c_922f1dbc84912d99",
+    "ev_ba200adf6e2c_93ef917a193a45ab",
+    "ev_ba200adf6e2c_93ff254508846f11",
+    "ev_ba200adf6e2c_9ab6b0e51811a16d",
+    "ev_ba200adf6e2c_b1ca64cf2ad02998",
+    "ev_ba200adf6e2c_c4ad7e52e5713628",
+    "ev_ba200adf6e2c_e62ae7e0a2c68ba1",
+    "ev_ba200adf6e2c_e7dd8d32c05c39f9",
+    "ev_ba200adf6e2c_ec303a2fd1afa287"
+  ],
+  "generation_facing_sources": [
+    {
+      "id": "S01",
+      "name": "Atlas confirmed input",
+      "url": "inputs/scenario.json",
+      "kind": "confirmed_input",
+      "version": "scn_7756e0007f6a463a97316f3f49c15248@2",
+      "facts": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+      "license": "Atlas scenario input; not a third-party code license",
+      "reuse": "Pinned requirement input"
+    },
+    {
+      "id": "S02",
+      "name": "ev_ba200adf6e2c_05babdea64ba9858",
+      "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "New records are built with id `bm-${crypto.randomUUID()}`, hostname from getHostname(url), and defaults visitCount=0, visitedAt=null, isPinned=false, isArchived=false, createdAt=Date.now(); edits preserve the previous id, isPinned, isArchived, visitCount, createdAt, and visitedAt.",
+      "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+      "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+    },
+    {
+      "id": "S03",
+      "name": "ev_ba200adf6e2c_06c81a165e03c96a",
+      "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "Pin/Unpin and Edit actions are rendered only when the item is not archived, and Edit loads the item's url/title/description/tags/favicon into the dialog.",
+      "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+      "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+    },
+    {
+      "id": "S04",
+      "name": "ev_ba200adf6e2c_1596da4a90687ca5",
+      "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "The Valibot BookmarkFormSchema requires a non-empty URL matching /^https?:\\/\\/(?:[\\w-]+\\.)+[a-zA-Z]{2,}(?:\\/\\S*)?$/ and v.url, a non-empty title up to 100 chars, a non-empty description up to 280 chars, and 1-5 tags each up to 30 chars.",
+      "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+      "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+    },
+    {
+      "id": "S06",
+      "name": "ev_ba200adf6e2c_35e41aab676021eb",
+      "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "saveBookmark sets the record in the in-memory map then awaits db.bookmarks.put(bm); deleteBookmark removes from the map then awaits db.bookmarks.delete(id).",
+      "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+      "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+    },
+    {
+      "id": "S07",
+      "name": "ev_ba200adf6e2c_4c56ef30a1785be1",
+      "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "A Delete action is rendered only for archived items; it calls deleteBookmark and shows an error-type toast with an Undo action that calls saveBookmark(item) to restore the record.",
+      "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+      "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+    },
+    {
+      "id": "S12",
+      "name": "ev_ba200adf6e2c_7150b0ac7a5678db",
+      "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "A Copy URL action writes item.url to the clipboard and shows a success toast.",
+      "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+      "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+    },
+    {
+      "id": "S13",
+      "name": "ev_ba200adf6e2c_86ed2327f33a3ca8",
+      "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "An effect on component creation calls db.bookmarks.toArray() and inserts each returned bookmark into an in-memory RippleMap keyed by bookmark id.",
+      "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+      "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+    },
+    {
+      "id": "S14",
+      "name": "ev_ba200adf6e2c_8e11efc61a4650ba",
+      "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "On submit, if no favicon exists and a hostname is derivable, the code fetches a Google s2 favicon proxied through images.weserv.nl inside a try/catch that only logs failure.",
+      "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+      "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+    },
+    {
+      "id": "S15",
+      "name": "ev_ba200adf6e2c_93ff254508846f11",
+      "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "The Visit action builds an updated bookmark with visitedAt=Date.now() and visitCount+1, calls saveBookmark(updated), then opens the URL with window.open(item.url, '_blank', 'noopener,noreferrer').",
+      "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+      "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+    },
+    {
+      "id": "S16",
+      "name": "ev_ba200adf6e2c_9ab6b0e51811a16d",
+      "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "The displayed list filters by isArchived matching the active tab, requires every selected tag to be present in bookmark.tags, matches search only against bookmark.title.toLowerCase(), and sorts pinned-first then by the chosen sort mode with createdAt descending as fallback.",
+      "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+      "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+    },
+    {
+      "id": "S19",
+      "name": "ev_ba200adf6e2c_b1ca64cf2ad02998",
+      "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "The Archive/Unarchive action toggles isArchived and, when archiving, forces isPinned=false before saving.",
+      "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+      "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+    },
+    {
+      "id": "S20",
+      "name": "ev_ba200adf6e2c_c4ad7e52e5713628",
+      "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "Tag counts are derived by iterating all in-memory bookmarks and counting each tag occurrence, then sorted alphabetically for the sidebar.",
+      "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+      "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+    },
+    {
+      "id": "S21",
+      "name": "ev_ba200adf6e2c_ec303a2fd1afa287",
+      "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "fetchMeta calls https://api.microlink.io/?url=... and, on success with result.data, sets title/description and fetches the logo through https://images.weserv.nl/; errors are only console.error'd and the finally block resets loading.",
+      "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+      "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+    }
+  ],
+  "excluded_source_ids": [
+    "S05",
+    "S08",
+    "S09",
+    "S10",
+    "S11",
+    "S17",
+    "S18",
+    "S22"
+  ],
+  "affected_features": [
+    {
+      "feature_id": "F01",
+      "feature_name": "保存收藏（URL 必填，标题/描述可选）",
+      "declared_source_ids": [
+        "S02",
+        "S04",
+        "S06",
+        "S17"
+      ],
+      "missing_source_ids": [
+        "S17"
+      ],
+      "missing_sources": [
+        {
+          "facts": "The Bookmark type stores id, title, url, hostname, favicon Blob, description, tags string array, isPinned, isArchived, visitCount, createdAt, and visitedAt.",
+          "id": "S17",
+          "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+          "name": "ev_ba200adf6e2c_9c7f6060878383fa",
+          "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run.",
+          "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/includes/store.ts",
+          "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+        }
+      ]
+    },
+    {
+      "feature_id": "F07",
+      "feature_name": "打开原始网页（URL 锚定与回跳）",
+      "declared_source_ids": [
+        "S15",
+        "S08"
+      ],
+      "missing_source_ids": [
+        "S08"
+      ],
+      "missing_sources": [
+        {
+          "facts": "getHostname returns '' unless the URL matches an http/https regex with a dotted domain, otherwise returns new URL(url).hostname; getBlobUrl caches object URLs per Blob in a WeakMap; formatDate returns 'Never' for falsy timestamps else a locale date string.",
+          "id": "S08",
+          "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+          "name": "ev_ba200adf6e2c_5011700a24e503c7",
+          "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run.",
+          "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/includes/utils.ts",
+          "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+        }
+      ]
+    },
+    {
+      "feature_id": "F08",
+      "feature_name": "多会话持久化（跨重启保留）",
+      "declared_source_ids": [
+        "S09",
+        "S13",
+        "S06",
+        "S11"
+      ],
+      "missing_source_ids": [
+        "S09",
+        "S11"
+      ],
+      "missing_sources": [
+        {
+          "facts": "A Dexie database named 'BookmarkDB' version 1 declares a single 'bookmarks' EntityTable keyed by id and indexed on createdAt and visitCount.",
+          "id": "S09",
+          "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+          "name": "ev_ba200adf6e2c_515aa5d072bd2ec4",
+          "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run.",
+          "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/includes/store.ts",
+          "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+        },
+        {
+          "facts": "README describes the app as local-first with bookmarks stored in IndexedDB and featuring tagging, sorting by recently added/visited/most visited, and archiving/pinning.",
+          "id": "S11",
+          "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+          "name": "ev_ba200adf6e2c_6805376f7e2ee383",
+          "reuse": "Independently accepted documentation; design adaptation is recorded separately; upstream not run.",
+          "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/README.md",
+          "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+        }
+      ]
+    },
+    {
+      "feature_id": "F10",
+      "feature_name": "输入校验与错误合同",
+      "declared_source_ids": [
+        "S04",
+        "S08"
+      ],
+      "missing_source_ids": [
+        "S08"
+      ],
+      "missing_sources": [
+        {
+          "facts": "getHostname returns '' unless the URL matches an http/https regex with a dotted domain, otherwise returns new URL(url).hostname; getBlobUrl caches object URLs per Blob in a WeakMap; formatDate returns 'Never' for falsy timestamps else a locale date string.",
+          "id": "S08",
+          "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+          "name": "ev_ba200adf6e2c_5011700a24e503c7",
+          "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run.",
+          "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/includes/utils.ts",
+          "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+        }
+      ]
+    },
+    {
+      "feature_id": "F11",
+      "feature_name": "本地应用外壳与首启（空库）",
+      "declared_source_ids": [
+        "S10",
+        "S18"
+      ],
+      "missing_source_ids": [
+        "S10",
+        "S18"
+      ],
+      "missing_sources": [
+        {
+          "facts": "index.html defines the #root div and loads /src/index.ts as a module for the Bookmark Manager SPA.",
+          "id": "S10",
+          "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+          "name": "ev_ba200adf6e2c_5d51c18a989c01f8",
+          "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run.",
+          "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/index.html",
+          "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+        },
+        {
+          "facts": "The entry point imports index.css, mounts the App component into #root via ripple's mount, and throws if the root element is missing.",
+          "id": "S18",
+          "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+          "name": "ev_ba200adf6e2c_a2ebc864c5b6b3e7",
+          "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run.",
+          "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/index.ts",
+          "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+        }
+      ]
+    },
+    {
+      "feature_id": "F12",
+      "feature_name": "元数据与图标增强（离线降级）",
+      "declared_source_ids": [
+        "S14",
+        "S21",
+        "S08"
+      ],
+      "missing_source_ids": [
+        "S08"
+      ],
+      "missing_sources": [
+        {
+          "facts": "getHostname returns '' unless the URL matches an http/https regex with a dotted domain, otherwise returns new URL(url).hostname; getBlobUrl caches object URLs per Blob in a WeakMap; formatDate returns 'Never' for falsy timestamps else a locale date string.",
+          "id": "S08",
+          "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+          "name": "ev_ba200adf6e2c_5011700a24e503c7",
+          "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run.",
+          "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/includes/utils.ts",
+          "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+        }
+      ]
+    },
+    {
+      "feature_id": "F24",
+      "feature_name": "访问计数与最近访问时间",
+      "declared_source_ids": [
+        "S15",
+        "S17"
+      ],
+      "missing_source_ids": [
+        "S17"
+      ],
+      "missing_sources": [
+        {
+          "facts": "The Bookmark type stores id, title, url, hostname, favicon Blob, description, tags string array, isPinned, isArchived, visitCount, createdAt, and visitedAt.",
+          "id": "S17",
+          "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+          "name": "ev_ba200adf6e2c_9c7f6060878383fa",
+          "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run.",
+          "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/includes/store.ts",
+          "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+        }
+      ]
+    }
+  ],
+  "authored_spec_changed_by_host": false,
+  "finding": "Fixed authored feature references cite case-level independently accepted sources excluded by the pinned scenario-scoped facts view because their evidence IDs are not linked to this scenario. They are not globally rejected evidence. No source reinstatement, authored source remap, evidence-view change or sixth repair applied."
+}

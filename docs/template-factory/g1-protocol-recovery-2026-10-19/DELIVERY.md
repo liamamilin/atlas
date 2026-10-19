@@ -1,42 +1,53 @@
-> 续作更新：原CI等待已解除，grant在同job attempt3消费1/1，phase_acceptance、decisions_defaults、runtime_protocol均完整passed，原前三CP复用。累计59/500、修复5/5。六项汇总遇到宿主目录遗漏CASE_ADAPTATION_POLICY.json的确定缺陷，计划已正式暂停；最小代码修复与零新增预审回归通过，正在执行新源码门禁。下文保留前次外部停止历史，最终结果以实际续作证据更新。
+# G1 一次性协议恢复：实际交付与停止点
 
-# 一次性协议恢复：代码交付与真实外部停止
+本次已实际消费唯一协议机会并继续生产，最终因固定规格的来源引用与当前场景证据视图不兼容而正式暂停。**G1 blocked；T08 未启动。** 当前原 job `job_7742b1c124be4c9ab3a0096da5cdd772` 为 attempt4 / failed，最后事件 stage 为 `blueprint-code-0-7`；真正失败位置是五文件生成后的 `render_candidate` 来源结构校验，不是该 README 模型调用失败。
 
-**G1 blocked；T08 not_started（0/3）。当前job_7742b1c124be4c9ab3a0096da5cdd772仍为attempt2 / paused_budget，stage为blueprint-spec-review-0-bbc43771a1bbbe99-phase_acceptance。CLI56/500、书签业务修复5/5、历史阶段追加2；本次一次性授权0/1（尚未登记或消费），活动调用0。正式模板0、真实P0通过0；案例新增0，原G1固定依据复用书签案例1。**
+|项目|实际结果|
+|---|---|
+|累计 CLI|64/500，活动0；本次续作从56增加8次（3项预审+5份文件），没有第二次额外协议重试|
+|书签业务修复|5/5，未增加第6轮；预算与会议笔记未启动、本轮各0轮|
+|协议机会|历史阶段追加2保留；新 grant 已登记、唯一消费1/1，phase_acceptance 完整通过|
+|有效截止|UTC2026-10-19 19:13:43.754534 / 北京2026-10-20 03:13:43.754534，原值未变；停止时未到期|
+|模板与P0|本轮新冻结0、正式发布0、真实P0开发0/通过0；旧未发布冻结候选1保留|
+|案例|本轮新增0、复用原规范案例r1共1；应用实证和模板仍用同一规范记录|
+|生产源码|`f94dc8c05d59819927d445074a8f6a733c84b1fa`；最终交付HEAD在Git历史及最终CI证据中另列|
+|源码CI|`39300021349` completed/success，check、docker-integration均通过|
 
-有效截止仍1792437223.754534：北京时间2026-10-20 03:13:43.754534（UTC2026-10-19 19:13:43.754534）。本轮停止记录采集时尚未到期；暂停不冻结时间。预算/会议笔记未启动、修复各0，原各上限2不变。
+## 已取得的真实证据
 
-## 已实现和验证
+1. 精确重读 `5df2209`/CI39282029202 和 `51350f8`/CI39283376657，均成功，保存 `ci-resumption-verified.json`。原授权文件、grant-request、幂等键未替换。
+2. 正式登记 grant `pgrant_f3595368c14d4b23b6ab536f6d198007`；唯一消费 reservation `bud_9a81a7a4adc14f49b46239ec68ee2fdb`，已completed。授权原文件SHA256为 `6592fdddfa743947cba4fcd685e3dc36d62e665203cac2c9a20ba029ee3f5829`。
+3. 正式 recover-protocol 将原 job 从attempt2恢复到attempt3；恢复前后实际查询同snapshot、prepared plan、案例依据、前三检查点及父暂停，登记/恢复幂等重放均未重复消费或增加attempt。见 `actual-recovered-before-resume.json`、`actual-protocol-execution-proof.json`。
+4. 唯一额外 phase_acceptance 完整通过，正常首次 decisions_defaults、runtime_protocol 通过。原始输入、输出、事件、summary、result/report在 `actual-attempt-3/`；前三旧检查点继续保留。
+5. 真实发现宿主汇总审阅材料缺失，仅新增共享 `CASE_ADAPTATION_POLICY.json` 的稳定写入；不修改严格校验、投影、提示、规格或检查点。独立审查无明确问题；完整恢复回归证明六项缓存审阅直接汇总，无新预审调用。
+6. 新源码13项门禁全部通过，源树摘要 `c14e6ad87cf501e367ad25620908472351fde7959283fc9b8ed16ed3246f3a28` 检查前后相同。后端613项（8项既有可选跳过），前端单测9，普通E2E17，工厂E2E27，Docker20（零跳过），其他审计/ruff/导出/数据/类型/构建通过。回归与fixture不算真实应用验收。
+7. 新SHA远端CI成功后，经正式普通failed retry进入原job attempt4，实际核对59/5/grant1、六CP原文、父暂停，再resume原计划。首个新调用为文件生成。五个授权文件完整返回，不在修改范围的4份程序原样复用。见 `actual-six-checkpoint-reuse-proof.json`、`actual-final-checkpoint-preservation.json`。
+8. API和worker实际根目录均为原生产根，无临时测试库残留；见 `actual-attempt-4-process-root-proof.json`。全部原调用、修复、时间、失败及授权记录保留，最终台账见 `actual-final-ledger-history.json`。
 
-原附件逐字节存authorization/，SHA256为6592fdddfa743947cba4fcd685e3dc36d62e665203cac2c9a20ba029ee3f5829。完整25字段固定请求见grant-request.json。
+## 当前真实阻断
 
-- 新ProtocolRetryGrantService及正式API/CLI：事务登记绑定原campaign/plan/product/job/失败reservation/operation/模型、input字节与canonical、projection/source/prompt/stdout摘要、原截止和max_extra_calls=1；先幂等后首次56/5/2校验。其他key不能重领。
-- BudgetLedger.reserve在原写事务内精确占用grant并创建reservation/use关联，保持operation retry=1而不写逻辑第三次为retry3；正常上限仍2，其他scope/campaign/product/T08及更低限制不获例外。预留占用，started/uncertain消耗；仅确知not_started释放并保留历史关联。未新增amendment或record_repair。
-- 新ProtocolRecoveryService及受限入口：只恢复原paused_budget attempt2，核对原协议失败、固定输入和三个已通过checkpoint、prepared plan与case适配；事务归档旧暂停原因/attempt/token/lease、snapshot/checkpoint摘要，再同job进入attempt3；重放不++；旧token失效，父批次继续paused。
-- 预算前事件改为preparing；真实started在Popen成功和mark_started后、清理保护区内。旧日志保留。原不完整JSON仍被拒绝，未补括号或手写passed。
+固定功能引用数组继承旧模板，旧模板采用 `legacy_all_accepted`，覆盖29条案例观测；当前固定检查点采用 `accepted-linked-observations-only-v1`，只有20条关联到本场景的事实。渲染后有7个功能引用了6个不在当前视图内的来源：
 
-定向protocol11项通过，含完整临时V1联接：正式register→同job recover→parent resume→claim→实际Pipeline；复用prepared plan/案例适配/前三CP，只向phase_acceptance发送一次假CLI，五个实际计算摘要与原字节完全一致，账目57/5、重放不增，下一正常维度前终止。这个57仅是临时库测试，**真实生产仍56**。
+|功能|缺失引用|
+|---|---|
+|F01|S17|
+|F07|S08|
+|F08|S09、S11|
+|F10|S08|
+|F11|S10、S18|
+|F12|S08|
+|F24|S17|
 
-CLI reliability14项通过，含拒绝不spawn、不发started、真实本地假CLI进程的启动顺序和异常清理、原坏JSON负例。独立Sol审查中发现的问题均已修复，最终无剩余明确缺陷。
+这6条观测在**案例层**均有摘要匹配的独立accepted审阅；它们因**未关联当前固定场景**被排除，并非全局拒绝或缺少案例审阅。详见 `actual-source-eligibility-proof.json` 和独立复核 `independent-source-scope-review.json`。
 
-本地既定13组全部通过且源树前后不变：后端612项（8项既有可选跳过）、web unit9、默认E2E17、工厂E2E27、严格Docker20项零跳过，其余审计/ruff/导出/数据/类型/构建通过。独立执行器Python/Node/Chromium正负fixture也通过，见verification。fixture不等于真实审阅或P0。
+修改功能引用超出原精确规格修订字段；扩大场景事实/链接或恢复旧legacy策略会改变证据资格、事实视图、research及投影摘要，不能声称原输入/六项审阅仍有效。没有进行这些改动，也未重新登记grant、增加业务修复或放宽校验。候选快照在 `candidate-attempt-4-not-frozen/`，明确不属于正式模板。
 
-## 准确外部停止点
+原计划已通过正式API暂停，任务保持原失败。宿主 `assess_g1` 正式结果见 `G1_ASSESSMENT.json`，passed=false，保留未发布/无交接/无P0/无运行证据等原因。
 
-实现源码已推送5df220983c11387832b870c2990318f0708450c8，源/测试树af50d5df847208717f49a7ff1be3ba807691a65af84f1f350ca387a78d0cf18e。新API已加载该源码，**尚无本轮真实模型执行**；最近真实生产调用仍来源204d4e5beb7d6ce75a462ed342d01a9c03c43df2。最终证据提交HEAD另行报告。
+## 未运行及后续入口
 
-必须的同SHA远端 [CI39282029202](https://github.com/liamamilin/atlas/actions/runs/39282029202) 两个job持续queued，没有通过或代码失败结论。GitHub [官方状态](https://www.githubstatus.com/) 同期报告Actions degraded_performance，事件“Degraded availability for GitHub Actions, GitHub Pages and Webhooks”仍在investigating。原始响应和采集时间见ci-external-wait.json、ci-source-latest.json。服务异常是外部状态佐证，不将其写成已证明的该次排队唯一原因。
+独立程序差分语义审阅、新冻结、冻结后审阅、发布、标准交接实际消费、真实P0、冻结套件运行、独立浏览器运行/phase proof和G1通过均未发生。原书签、月度预算、多项目会议笔记三个T08固定样本全部未启动；不替换失败样本。
 
-因此遵守“远端CI通过后才正式授权/恢复”，保持计划正式pause，**没有登记grant、没有恢复attempt3、没有57次真实调用**。这不是额外协议重试失败，也不是新增业务语义失败。旧paused_budget/budget_retry_limit与其原始协议失败完整保留。
+当前不能仅重放retry解决：后续须先取得明确的新业务/依据修订范围授权，协调这7个功能引用与固定场景事实视图，重新绑定受影响输入并独立审阅；本次不预先创建第6轮任务、不提出新增grant或自动扩大限额。原G1截止仍约束任何后续生产，暂停不冻结或延长时间。建议后续把同一严格引用检查提前到程序生成前，减少无效文件生成；该改进列计划，未借其改写当前结果。
 
-正式宿主assess_g1再次持久化blocked：队列未收敛、旧候选目录/审阅不合格、缺标准交接/实际开发/P0运行；它不被本地检查或CI排队报告覆盖。见G1_ASSESSMENT.json及STOP_RECORD.json。
-
-## 保全、未运行与恢复
-
-after-preservation-proof.json核对原56条reservation、5条repair、version1/version2、基础时间、原job整行和全部checkpoint均未变化；grant/recovery记录均空。原stdout/input/source证据字节未改；没有新candidate、campaign、计划或研究，没有模型/provider切换。provider内部请求、观察模型身份及实际费用仍unknown。
-
-本轮真实phase_acceptance额外机会、decisions_defaults/runtime_protocol、五文件修订、程序语义审阅、冻结/冻结后审阅/发布、标准交接被实际消费、真实P0、冻结套件与独立浏览器、phase proof均**未运行**。T08三个样本未启动。当前正式模板数和P0数未以fixture或旧草案补足。
-
-本次授权仍有效，无须重新索要同一范围许可。待5df2209的远端CI实际成功，重新核对未过绝对截止、仍56/5/2/active0及同输入后，按OPERATIONS的稳定请求正式登记grant、恢复同job、核对父暂停并resume。若已到期则停止新G1生产；本次没有延期授权。额外机会一旦真正启动即最多一次，再失败或完整语义结果需要业务第6轮时正式停，不能重领或换意见。
-
-源码和证据均推送既有codex/stabilize-atlas；不合并主分支或部署其他外部服务。最终HEAD远端CI与实现SHA的CI分别报告，不把本地13组或旧CI写成新远端通过。
+此前外部CI等待记录保留为 `*-EXTERNAL-CI-ARCHIVE.json`，attempt3宿主汇总缺陷与真实失败证据也保留；当前终态以 `STOP_RECORD.json` 为准。实际provider内部请求次数、真实观察模型身份和费用仍未知，不以CLI会话数推算。
