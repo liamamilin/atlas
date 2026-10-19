@@ -1,0 +1,18 @@
+--- historical/case-design
++++ prepared/case-design
+@@ -55,13 +55,13 @@
+     "reason": "Source facts derive tag counts by scanning all in-memory bookmarks and filter records by requiring every selected tag. The target computes category counts and category-scoped lists in SQL over active, non-deleted rows so the count and the list stay consistent; the source tag-sidebar algorithm is not the target implementation."
+   },
+   {
+-    "capability": "Search the selected category by keyword across title, URL, description and category name, retaining the submitted query and rendering matching or explicit empty results.",
++    "capability": "Search the selected category by keyword across title, hostname and description using case-insensitive substring matching, retaining category and query and rendering matching or explicit empty results.",
+     "disposition": "adjusted",
+     "evidence_ids": [
+       "ev_ba200adf6e2c_9ab6b0e51811a16d",
+       "ev_ba200adf6e2c_e62ae7e0a2c68ba1"
+     ],
+-    "reason": "Source search lowercases and compares only bookmark.title, which the evidence itself marks as partial for a remembered-word workflow. The target moves search into a server-side SQL predicate over the record's searchable text and scopes it to the selected category, while preserving the query and showing an empty state."
++    "reason": "Source search lowercases and compares only bookmark.title; the fixed target F06/A07 contract adjusts it to title, derived hostname and description, combined with the selected category. Raw URL text, category names and tags are not additional keyword fields. This clarifies target design only; accepted observations, evidence IDs, source revision and disposition remain unchanged."
+   },
+   {
+     "capability": "Open a saved record as a navigation to its stored original URL, preserving the URL text and never fetching, proxying or prefetching the destination during save, listing or open preparation.",

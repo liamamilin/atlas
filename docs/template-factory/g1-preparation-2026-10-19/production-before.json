@@ -1,0 +1,480 @@
+{
+  "head": "b1de0144858bf867fec616eec549d67d5ec17eb6",
+  "job": {
+    "id": "job_a53c47f3694047489c4f82cfc2e346be",
+    "state": "failed",
+    "stage": "blueprint-spec-review-1-runtime_protocol-v1",
+    "attempt": 2,
+    "error": "规范预审仍有阻断，已停止后续验收文件生成：scenario_scope: passed; product_completeness: passed; architecture_contract: passed; phase_acceptance: blocked; decisions_defaults: passed; runtime_protocol: passed",
+    "snapshot_digest": "d9e61875c0603804d71a024d9e07699dfb2319883cf668244bea674abdf3f0b4"
+  },
+  "logical_tables": {
+    "acceptance": {
+      "count": 14,
+      "digest": "9e47b39bdfb003a320e27a5c4e96c4407adb7457876d5f8263793cbdfe2edd3b"
+    },
+    "artifact": {
+      "count": 8,
+      "digest": "d608fefa0223cd18b133ea5b002d95df5c54c2f9e173d5209707faaf8f92982d"
+    },
+    "batch": {
+      "count": 26,
+      "digest": "14f3ab28e0f00893f81faf4f79b10d8025c6eff9f7f86a291774698c47ba499d"
+    },
+    "case_app": {
+      "count": 34,
+      "digest": "35f5d71912bd209e787c33a7fe16513d744193653def94aae3d018e55493364d"
+    },
+    "case_idempotency": {
+      "count": 1,
+      "digest": "d36287897cb4bbc05170941e7432c582a996eba7570427865e1fb0d3c6fd3f7c"
+    },
+    "case_revision": {
+      "count": 1,
+      "digest": "9673f8242ca18afb05196ec0f690d8e50541f65d2aee58a97ba835d873769f46"
+    },
+    "checkpoint": {
+      "count": 110,
+      "digest": "1cc77e103484832ef4e67bc249d9868e9a6085a6b5bfed4ab26f9c1b5fe6ba71"
+    },
+    "event": {
+      "count": 3115,
+      "digest": "6d88e3e93ff5202a6f9fcd1445cd31a40f3cb2fb0a56310e098c9ebebcb2ead1"
+    },
+    "evidence_observation": {
+      "count": 29,
+      "digest": "d90721f8945eed6e049422c9088a618efe7950ecdcebdda4ef97f9ec51bb7710"
+    },
+    "evidence_review": {
+      "count": 29,
+      "digest": "e0fa66dff477e5cd4b403c32ad9afe5aec17cbdf96df2e550a8aed0a7f73f7ab"
+    },
+    "job": {
+      "count": 67,
+      "digest": "233016d63dbf512fa4b1319ab93beb1daa3a9e60b9ae20ce5761cb5ea12fe5bb"
+    },
+    "scenario": {
+      "count": 33,
+      "digest": "ef1b39758bc2682a12c14d2a5d0766f5c1f32c8c6c0b473b252433924f2070e1"
+    },
+    "scenario_case_link": {
+      "count": 1,
+      "digest": "207179da343c16b5b56d0687b20469cbbd400404ca3417322b2a0e5949951aec"
+    },
+    "scenario_history": {
+      "count": 34,
+      "digest": "f182f586e3a54d57962de01666b0c03584444c6f51e7a8bb0001df68b7f8721d"
+    },
+    "scenario_review": {
+      "count": 34,
+      "digest": "85114f78f2005a7ae441b3508bcff5838b2b75c94367f184a1da8723cb585f86"
+    },
+    "schema_migration": {
+      "count": 2,
+      "digest": "71890d489b566c9dc674903b062934f02813b952e6c5af439ce3318c40bdc1c5"
+    },
+    "source_snapshot": {
+      "count": 1,
+      "digest": "80993624014e62b40f5994eb05302e959e297b0d9f35b8599713ea631ff4029a"
+    },
+    "tf_budget_amendment": {
+      "count": 1,
+      "digest": "e54f09470b041e5fe1591521f3d2e4bf153f583d2aa857cbb4e46f7c847623da"
+    },
+    "tf_budget_campaign": {
+      "count": 2,
+      "digest": "1709476b9c325f84d5286a6ac1a7092b538cd2fa6956267c67bb9c0efc8afc03"
+    },
+    "tf_budget_control": {
+      "count": 2,
+      "digest": "d08753bf081b420fa310399be7a76358e67eaefa31a9f6c6dacc6525f1878f40"
+    },
+    "tf_budget_phase": {
+      "count": 1,
+      "digest": "848acb7405f9585b647839c582a8737284fc1836933eddf4c4f44c4253b73f25"
+    },
+    "tf_budget_repair": {
+      "count": 4,
+      "digest": "cbd65c7398df7ff8cda409ba32a566b0045a113025b18a433974dcab953ce875"
+    },
+    "tf_budget_reservation": {
+      "count": 52,
+      "digest": "c5b533436ec0f4d38618be40d208437a3484a03860b2c8b0510cd3af0aa59fc4"
+    },
+    "tf_job_supersession": {
+      "count": 1,
+      "digest": "bf128e04007439af2ee418c438e12a9a2364f82cce0a76515e9404fe096fca50"
+    },
+    "tf_product_resume": {
+      "count": 1,
+      "digest": "5faebfabc742be0dde8875d291a8304865b285f14526333ee3b1252eb5c9c29a"
+    },
+    "v1_campaign_gate": {
+      "count": 1,
+      "digest": "ea20e212f19ee27a66bff402218e4b38527f690b08c6a8ea4e9367298a44f911"
+    },
+    "v1_campaign_product": {
+      "count": 0,
+      "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "v1_execution": {
+      "count": 1,
+      "digest": "1dd7b5f9383692710b86a39eb0f9b58af69e3f7794d67698a82844d8448462c8"
+    },
+    "v1_gate": {
+      "count": 0,
+      "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "v1_outbox": {
+      "count": 1,
+      "digest": "46a08d174ce30a84f80daee4917ed62701d0677250804c182651ee476c34b5d6"
+    },
+    "v1_plan": {
+      "count": 1,
+      "digest": "d641f4b0c1a487688405620d874330e758b6b3f8effe03f0dbedc530338a3d4d"
+    }
+  },
+  "budget": {
+    "tf_budget_phase": [
+      {
+        "campaign_id": "atlas-v1-first-production-2026-10-19",
+        "identity": "__campaign_segment__",
+        "phase": "G1",
+        "started": 1792389754.633465,
+        "deadline": 1792418554.633465
+      }
+    ],
+    "tf_budget_repair": [
+      {
+        "campaign_id": "atlas-v1-first-production-2026-10-19",
+        "product_id": "product-c42848f63251507bd9d911a5",
+        "operation_key": "spec-repair:job_d0d9d80dc9f64dd9890fc0b728bd9a5d:1",
+        "created": 1792391992.270707
+      },
+      {
+        "campaign_id": "atlas-v1-first-production-2026-10-19",
+        "product_id": "product-c42848f63251507bd9d911a5",
+        "operation_key": "template-revision:8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9:c944f23a1eade8a96da4bbe75b90d55e9e958d2ef2583edcdffbead4c2904204",
+        "created": 1792397222.6441312
+      },
+      {
+        "campaign_id": "atlas-v1-first-production-2026-10-19",
+        "product_id": "product-c42848f63251507bd9d911a5",
+        "operation_key": "template-revision:8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9:d9f1e62b08fc956cf18e8fe4a3ff0ce9964842e7c667de8d85a84823bcdaa5ff",
+        "created": 1792408423.7759721
+      },
+      {
+        "campaign_id": "atlas-v1-first-production-2026-10-19",
+        "product_id": "product-c42848f63251507bd9d911a5",
+        "operation_key": "spec-repair:job_a53c47f3694047489c4f82cfc2e346be:1",
+        "created": 1792411113.476394
+      }
+    ],
+    "tf_budget_amendment": [
+      {
+        "id": "bamd_9378738d1e274c409f756d92ec9c2ac5",
+        "campaign_id": "atlas-v1-first-production-2026-10-19",
+        "product_id": "product-c42848f63251507bd9d911a5",
+        "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+        "source_ref": "ATLAS_G1_CONVERGENCE_CODEX_INSTRUCTIONS.txt",
+        "source_digest": "cc3df91f60afad1a2bf4e862e534be36cb8fcc1f2b8d07687995b325fa7841ae",
+        "summary": "用户将附件交付并明确指示执行：仅原书签产品累计业务修复由2调整为4，允许一次最长8小时的G1补充窗口，完成前置修复及同一新SHA远端完整CI后，在正式恢复真实生产时激活。保留原campaign/plan/product/依据及全部历史。",
+        "reason": "合并处理已承诺P0合同、目标案例适配、URL政策与真实UI验收缺口；原三点请求过窄且已paused_budget。全局500、生产并发2、运行并发1、瞬时重试2及其他产品修复2均保持。",
+        "idempotency_key": "atlas-g1-convergence-user-authorization-2026-10-19-v1",
+        "version": 1,
+        "old_repair_limit": 2,
+        "new_repair_limit": 4,
+        "baseline_repair_count": 2,
+        "baseline_cli_sessions": 42,
+        "old_deadline": 1792418554.633465,
+        "window_seconds": 28800,
+        "created_at": 1792408411.830824,
+        "activated_at": 1792408423.754534,
+        "new_deadline": 1792437223.754534
+      }
+    ]
+  },
+  "note": "Read-only SQL + file hashes. No provider, queues, windows or limits changed.",
+  "historical_files": {
+    "count": 15742,
+    "digest": "38c25b9e82f6d1bc0237a0e84768a4d95407205a35fe84d7f0b76e793100310b",
+    "groups": {
+      "jobs/.DS_Store": {
+        "count": 1,
+        "digest": "c77e18a8bd9b58c5478aaa23294d651ac61a65eabbec06d4269695e8f7f25440"
+      },
+      "jobs/job_d8ab0accd0ad4047b2603cd469662eae": {
+        "count": 36,
+        "digest": "a25bc079686f4c50dc0a8439f07fe2e176ffa82039925c18262486c21ece2d2d"
+      },
+      "jobs/job_56119b77fb754ac0a68b07a157dfb224": {
+        "count": 36,
+        "digest": "0486a4e504007b810e9ac80a1deee0d02650c0c3a7488e0585aad7c9e0450643"
+      },
+      "jobs/job_ae0f901f19824afcb8b53e9724f8ee6f": {
+        "count": 224,
+        "digest": "82aa2bb0f7e086e61e43c27423a40439b10e68b803eea0af01bfa687b64b07ca"
+      },
+      "jobs/job_165e2cbc192643a582fee53a48901ade": {
+        "count": 35,
+        "digest": "5847a3afe989c24bb8154969b1bc572eaf8690cfaf52ab07a2864f3919e61465"
+      },
+      "jobs/job_ea7e18c1a1544ccd902f8f01f2ba5fff": {
+        "count": 35,
+        "digest": "f279c1891b7848ea7e8354d9484b1e37acf1acc3cdf1dd83939242fd1dac6fee"
+      },
+      "jobs/job_071660a7f58b41238cca2f5843f32799": {
+        "count": 36,
+        "digest": "e7d0b036a56d19f9e103dd5e77206166ef86699d24b812fa636fe4641a301b87"
+      },
+      "jobs/job_60029e1610a44b41984d48ae0d087b1e": {
+        "count": 5,
+        "digest": "ca0de7983594dc42360ce765813b80517790500c871d61e4cadf19f24d7e7b41"
+      },
+      "jobs/job_093cab4545b8433a8dc58a9e80ed5c4c": {
+        "count": 1669,
+        "digest": "834900139d9f932b14e63c4123f719babf6a467aa036be172efefae0d4cd4d30"
+      },
+      "jobs/job_6f842c9f36b144158724860d46042a47": {
+        "count": 36,
+        "digest": "68daf46e8454c373f543b90f047200c26005ee42905fec7c1e91805e12d051e6"
+      },
+      "jobs/job_2c03173d69134bf096929682c1ce17f6": {
+        "count": 36,
+        "digest": "b789d16b580d84ac48edffa0db543f938f9cf788b82eeb0a07807d0a2781df21"
+      },
+      "jobs/job_2f2cf28525d04a019cc99a897e1492c6": {
+        "count": 126,
+        "digest": "c3701ae195d0b6c906fe1dd8da6609ce29d793120c8eba94768ba364118717fa"
+      },
+      "jobs/job_2ced1ca16dde4e7e8af1e4656b856f6a": {
+        "count": 1655,
+        "digest": "2b67e811ebf2a315662b62fe88dc49ef4028c85595b6fadc469dd699debe434a"
+      },
+      "jobs/job_b80d00556a674455be598f4d355824de": {
+        "count": 36,
+        "digest": "1bbbc535df05d30978b95464a67fc881c6b035b24d0c121a99f05c93a36a58e1"
+      },
+      "jobs/job_2aa7f1e788e24c57b77b2c38a0789f4a": {
+        "count": 36,
+        "digest": "47bcbf2e7ac2cf1c84d6430dca8b28fb8a9cfa80a53fdc4cecffc10e2b519f87"
+      },
+      "jobs/job_5d134db6be0e4d51898399ceaa357d22": {
+        "count": 36,
+        "digest": "71334b60318bce81e5a564276a651390ff492b4f86ad13da0cd91ccef1702cc2"
+      },
+      "jobs/job_8c13691fd4ac4591a83308c02cd4e267": {
+        "count": 179,
+        "digest": "02ce97360d314c9f0132aa45e39a767cc755c2aaac42f54777633a9ffe940a61"
+      },
+      "jobs/job_03593458bcc44e6ea6269c2f1ebd0f32": {
+        "count": 36,
+        "digest": "fcd354fb0cc07b7930e4dff1e736368301035a13a379179ad9915883bf96f7a6"
+      },
+      "jobs/job_9ce19967d3294ec0b4c0a98a8c7559cd": {
+        "count": 36,
+        "digest": "b87770098b2554287543e655781cdeda2eaa06823497821569fe7930ef61c2d2"
+      },
+      "jobs/job_c82fb5d0d6f84727b9ee927572ff1574": {
+        "count": 36,
+        "digest": "4c5305c0b498ebaa3033f3d00b5b4c5592b95d3a406bfdbbcfff9882bd7415f0"
+      },
+      "jobs/job_3244001ea21e43b194f3482155c1d41d": {
+        "count": 3317,
+        "digest": "9d9cc88c28a0c3afe0feddf5c36f89defe94be69f25df44114654957920105cd"
+      },
+      "jobs/job_9480617e31994486ae09c9ecb69bdcc0": {
+        "count": 36,
+        "digest": "42ad79a2c195e12a1cae89a436b2f8b4c229a1b35ebb0ce5005ec322215846d6"
+      },
+      "jobs/job_2a502fe529f64ece8ad76b0781c296bd": {
+        "count": 36,
+        "digest": "c2998fc46b09e405184eb6e4b4892c15f3e3901be952811a63cadf09d62739a9"
+      },
+      "jobs/job_587b0b68d4ed44e5b351b38bf5fb6b1d": {
+        "count": 36,
+        "digest": "8c4c314a2b9aa5f29e5af3d9e128178d4200ecb9f557774d00bdc363cb04f0ce"
+      },
+      "jobs/job_d0d9d80dc9f64dd9890fc0b728bd9a5d": {
+        "count": 1499,
+        "digest": "66b6883d8b1e1c8204c332d0264b494020d6f3fc3c58209adeeb4245bd1e0b7d"
+      },
+      "jobs/job_a53c47f3694047489c4f82cfc2e346be": {
+        "count": 582,
+        "digest": "4a6cd4a429f2aaf4379a9f4efbfabb9a5b5732a401a0552657cc8124faab195a"
+      },
+      "jobs/job_fbdc211ca97245bda10ac45f324dca35": {
+        "count": 36,
+        "digest": "364eb6dfc7ade7414e1e3f6ee5d890dd1a827b553d0278a71771a30efb8fc3e3"
+      },
+      "jobs/job_cb647f2f96eb4b9492bace9c9aae9de6": {
+        "count": 36,
+        "digest": "d2f11ed260ad1daadc291e26743a0e1a1b33ff04fa2098673f99f198fcc80de4"
+      },
+      "jobs/job_653907f994944a6f8438656ec0a524a6": {
+        "count": 35,
+        "digest": "88633372e9fd90b92d1242c314ee6833b5710a63c23b5fc5fe3fc78c6b9b6d15"
+      },
+      "jobs/job_22b6268d9fad41a8b9344b104d8927ac": {
+        "count": 70,
+        "digest": "f97f8b59ed357bfa94a1730bb58b7ba09691b9ac124b7f87620be8f7be3e0d6a"
+      },
+      "jobs/job_b9ab62966bf949719e6fdb3f5ac4b9bb": {
+        "count": 36,
+        "digest": "19b8d1dce75f23cbc08e94d06494430a9e00177fe553b11bf1cb2e35cadf0d80"
+      },
+      "jobs/job_a284d10ff50a42128c548e4bdbd9ace1": {
+        "count": 36,
+        "digest": "a71c14b6b9a538d030531459e7271ae9fe00715a8b0040481e5f243aa117b387"
+      },
+      "jobs/job_346bc9dff1bf49fe910d8518acc5ad57": {
+        "count": 36,
+        "digest": "d778cbf3b39c710e2b4ddac1c17bfaee323408b5b18bd3e861fe41fbeefeaf8e"
+      },
+      "jobs/job_684bd549412e4b898cd7ab291d176f96": {
+        "count": 36,
+        "digest": "34d639ace57fd03acf7e4b1c22723beed9a56eda5daa4a39336734fa570d891f"
+      },
+      "jobs/job_1a1ca8f9deb243cc9d8a6aa7d7fa1527": {
+        "count": 36,
+        "digest": "1931b1584908dba3ab43abf58414ef812f80f4302517e18f2f7969baa65e0b00"
+      },
+      "jobs/job_d59605a1fbac430e84966ff143871068": {
+        "count": 197,
+        "digest": "cd9b92105991edb7c6ca6ec2d9f286b5c36134360721e87fea3add59a5e2a5d5"
+      },
+      "jobs/job_c7644d06da6743428795abff401c1a40": {
+        "count": 225,
+        "digest": "96052115d8cd64ab1810c585240aa222fbf1353cacf22147069fb1a19f464033"
+      },
+      "jobs/job_b24fcd8b729b43f6be1d8ad3b2ff45b9": {
+        "count": 47,
+        "digest": "efeb69c4ffbdb909aa7cc3cdc85d21d4b1a58385cd9b3cd1e1a55a98c7305166"
+      },
+      "jobs/job_e3c5dcf5fdab42eda0a5ff8bf2162eab": {
+        "count": 72,
+        "digest": "2a5fe18f1be14ac0ee3c8a74b022f8535553a28be238768c200ed672cf8eda0b"
+      },
+      "jobs/job_a1e2916330354288843541c86d155646": {
+        "count": 171,
+        "digest": "6f1ebb93557bb8725d6bc15912234dc9e0c6ccfb4df2524ed296e07d9a178c08"
+      },
+      "jobs/job_f78eed26408649cf874f980edfa8a397": {
+        "count": 35,
+        "digest": "b8289ff4361e7f6a1f2a9fddcb06f25507a57658565c1efe8a65438a563c7666"
+      },
+      "jobs/job_984a56f5625040bc924c073556663478": {
+        "count": 36,
+        "digest": "a10dfb0d514ad17b93b38814a39892c70bd42534fd8c91b1342c4c21ca681b14"
+      },
+      "jobs/job_ec09b6ad6d234a7fa8564ff22da7ea9d": {
+        "count": 36,
+        "digest": "f16bad8b05dbe1fd6ad0042e4c732bb40ed079f1d5ad6ef565e1c99c2fb1afb6"
+      },
+      "jobs/job_70a40df92e064fbc81ebbf8eda90c787": {
+        "count": 3,
+        "digest": "46e92b796cf179ba7110cfffb710845d4a14724872754b5d7a41335de93b3d6c"
+      },
+      "jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0": {
+        "count": 1280,
+        "digest": "6e582577364d4a58384f273970a69d8fd6f86336edfe05d156b6b7be34b9e74a"
+      },
+      "jobs/job_e740913447eb40908a5cb6dbe3ccdb93": {
+        "count": 35,
+        "digest": "1c4300adc803836050bc39a70d7907cf8580044c59ecbacc9c7902cbc743ab45"
+      },
+      "jobs/job_60174f48ba0340b380c268f33b0432e4": {
+        "count": 227,
+        "digest": "a2ebd29e3b3ccc60f624a702db66e9201e9ef9731529be730658c598165b3a6a"
+      },
+      "jobs/job_4056c212d9af4f67a73d1f209038b86a": {
+        "count": 36,
+        "digest": "60af3197469e176c96bf1e3f104ff6dbaf3448a1803f000dc778965f3da0c23f"
+      },
+      "jobs/job_65ab277bf729458a8e70247938453ada": {
+        "count": 76,
+        "digest": "8e59a8313def586479ee80b9a87fa738e37f34d5cb0ac6df92ab1182c0b62461"
+      },
+      "jobs/job_ee166980944c4adf8e2eeacb1a3629ff": {
+        "count": 72,
+        "digest": "6ba38d401f59def7ec7a61aec220c3a3e9637aa0b18893c717c07c0c20d9c3a9"
+      },
+      "jobs/job_6de625102d1348c9848b3da7a1b0fa2a": {
+        "count": 71,
+        "digest": "87ecc8622ed170ce1e004e8dc9d7deed9958feea04faae5af9c0642116cbb05d"
+      },
+      "jobs/job_70465a62dd3f4a5595038422f2004934": {
+        "count": 36,
+        "digest": "7967bd358ee8e6d01dc6a4fb60fdfb66ff7bddbd3fa1499f832465cc9ad16056"
+      },
+      "jobs/job_7ecd66b587494585a978847ecd67c675": {
+        "count": 36,
+        "digest": "1a3749e5cccbbf4741e58179bf40a7bfa187146442a8b920ddf6e1b574419a95"
+      },
+      "jobs/job_c4785bd0ee364c2aa9054dd50ce96d2e": {
+        "count": 36,
+        "digest": "f64a7e93a7788182aa26a74196dd33ff350357f4c0ddda80dfade101d845f7e9"
+      },
+      "jobs/job_1cb74fed2d3a4a478bfaaafac43e8490": {
+        "count": 1655,
+        "digest": "50fc63b9c80eb725dc18cabc6f90b2edd15dab197053fd305d2924881653625f"
+      },
+      "jobs/job_8b602909033446e3a5e6f531f441c9eb": {
+        "count": 76,
+        "digest": "fafbe09612e373666839af8064cfea4717215c61d2592df91190df9f4e10db65"
+      },
+      "jobs/job_e3df4e8ce55e443e9c01dc43ab84ede7": {
+        "count": 36,
+        "digest": "154cfcec0977e9dc9dc462f6b0d6bb9e627443d41bc5ff18de7aca1acba231b7"
+      },
+      "jobs/job_b28329cea0624b1993e5bf0ea16436b3": {
+        "count": 72,
+        "digest": "91c3e7f856ae2bd7560966dbfbf2ea2cc9604f08f94df5cf7f94367b4f350f1f"
+      },
+      "jobs/job_8e2ed2f9f7e9485b8cb60c570b7d0a51": {
+        "count": 79,
+        "digest": "5c89f35517bf6a1a485f8d686119258c3b0e27abd95a33dfe464cdaadafb709c"
+      },
+      "jobs/job_4f30d0f41ce94a2cbd16ae7996fb27ab": {
+        "count": 400,
+        "digest": "742f510883c25e56ada3a8499f7a76d9b673cd9b7c767052b0a453343f3ae83b"
+      },
+      "jobs/job_4472b3bfc7ee483184511ceec088994a": {
+        "count": 72,
+        "digest": "a1005227926f6ac18ccc9c44e564fc6d81b4bf36e7e63093bb5b2fef0932c379"
+      },
+      "jobs/job_6123c5e71a8544b5b7e4a03ab15a64e6": {
+        "count": 36,
+        "digest": "bad938b4d336e0c8d92e1e9ca57406c824c9aae79f31bf2742d352b5b75b0b16"
+      },
+      "jobs/job_f98bd5d46b9842bb8004cc15854d5593": {
+        "count": 36,
+        "digest": "91c693ca2a9a2210ca0c9f02f04b6a8cbfaef339d07d192913b6b61122a2026b"
+      },
+      "jobs/job_e5383ecc4dd04db1a50e9a697cf2bb3d": {
+        "count": 227,
+        "digest": "a05f690cfcb6b8df6b57bf49c5c6f74474098f451af3cb682c43ae1b37c839f1"
+      },
+      "jobs/job_5735f5266f46472e9f145425e0bfc643": {
+        "count": 36,
+        "digest": "8635ab1710359e41f48917c939cda18aa42d14e416ce481f4b9d13ce92ca52cd"
+      },
+      "jobs/job_86b66b0b9e7c49b38a2bf3170552f5c5": {
+        "count": 35,
+        "digest": "121431767c7e87b020ee3c73c5b8de0f70a0f09eed72b978018e9854efdf70bf"
+      },
+      "jobs/job_9b494e9f454d4e74900ae9913a178fa5": {
+        "count": 35,
+        "digest": "eadacd94ad276c8fe4b017a2fac3255f407785404bad73e8f779c4d39f09bbd7"
+      },
+      "artifacts/tpl_6fad5c5758244f1da3f24d5960bd7b0a.zip": {
+        "count": 1,
+        "digest": "34026bd13ed89c66a8ee1a37d08d53ffadb44bede287916fa636e1c9f112a067"
+      },
+      "artifacts/tpl_6fad5c5758244f1da3f24d5960bd7b0a": {
+        "count": 31,
+        "digest": "498c15940f18f1cf3d50bed56cd55d7b2aff38433cef3450a653eb02cb4c355e"
+      }
+    }
+  }
+}

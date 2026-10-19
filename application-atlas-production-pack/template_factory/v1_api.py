@@ -12,6 +12,10 @@ from .v1_batches import BatchService, select_case_basis
 
 def dispatch_v1(method, route, query, body, store):
     from .worker import ensure_worker
+    match = re.fullmatch(r"jobs/(job_[a-f0-9]{32})/prepare-revision", route)
+    if method == "POST" and match:
+        from .plan_revision import PreparedRevisionService
+        return PreparedRevisionService(store).prepare(match[1], body), 200
     library = CaseLibrary(store)
     params = parse_qs(query)
     if route == "budget/amendments":

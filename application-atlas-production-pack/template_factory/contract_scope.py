@@ -54,6 +54,8 @@ def validate_contract_coverage(spec, *, required=False):
         _fail("current-required P0 features lack contract coverage")
     if set(mapped) - set(features):
         _fail("contract coverage references unknown features")
+    from .error_contracts import validate_error_contract
+    validate_error_contract(spec)
     return coverage
 
 
@@ -107,7 +109,7 @@ def validate_repair_scope(scope, spec, edit_paths):
             found = [row for row in rows if row.get("id") == path[1]]
             exists = len(found) == 1 and path[2] in found[0] and path[2] not in {"id", "phase", "status", "applicability"}
         elif len(path) == 2 and path[0] == "contract_coverage":
-            exists = path[1] in {"schema", "review_rules_version", "features"}
+            exists = path[1] in {"schema", "review_rules_version", "features", "error_contract"}
         else:
             exists = False
         if not exists:

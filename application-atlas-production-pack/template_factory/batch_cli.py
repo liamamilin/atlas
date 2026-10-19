@@ -30,11 +30,17 @@ def main(argv=None):
     recovery = commands.add_parser("resume-product", help="Supersede one paused G1 job with a scoped product repair")
     recovery.add_argument("plan_id")
     recovery.add_argument("--request", type=Path, required=True)
+    preparation = commands.add_parser("prepare-revision", help="Validate a pinned failed-draft patch without queueing or spending budget")
+    preparation.add_argument("job_id")
+    preparation.add_argument("--request", type=Path, required=True)
     args = parser.parse_args(argv)
     store = FactoryStore(args.root, args.pack)
     service = BatchService(store)
     try:
-        if args.command == "preview":
+        if args.command == "prepare-revision":
+            from .plan_revision import PreparedRevisionService
+            result = PreparedRevisionService(store).prepare(args.job_id, json.loads(args.request.read_text()))
+        elif args.command == "preview":
             result = service.preview(json.loads(args.request.read_text()))
         elif args.command == "run":
             result = service.run(args.plan_id, {"expected_plan_digest": args.expected_plan_digest, "idempotency_key": args.idempotency_key})

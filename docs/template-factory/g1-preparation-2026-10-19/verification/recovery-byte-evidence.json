@@ -1,0 +1,252 @@
+{
+  "scope": "Temporary V1 stores and fake CLI only; no real provider, production queue or G1 acceptance.",
+  "tests_run": 3,
+  "successful": true,
+  "witnesses": [
+    {
+      "test": "test_checkpoint_reload_rebuilds_context_and_recovers_canonical_and_outer_envelopes",
+      "temporary_job_id": "job_7ebaad836a34423cbf53ea9ac4d7c0fe",
+      "state": "completed",
+      "generation_cli_summaries": 1,
+      "input_bytes_equal": true,
+      "source_bytes_equal": true,
+      "source_manifests": {
+        "first": {
+          "ACCEPTED_CASE_FACTS.json": "4042d4f02c02c608bcca338c364f81c54acf54dd21112ee0a781aa1fc5c23c0d",
+          "CASE_BASIS.json": "60846811f3d46cd5d79960313521766de8bfca0fbb9e3702dffb2712659ca749",
+          "CASE_DESIGN.json": "11038c4e6f8525fa4ada239075fcb2f072108744a06002bed3df9347e1d3e5f0",
+          "FORMAT.md": "7696af8ca2930eb4c5af2635778ab8fc1881a0435fb19ce93aa4f2fd4c104990",
+          "RESEARCH.md": "21fda5548efac3d611ca7b43d81a22b08a76ded672a79092f06a7f95961d50ae"
+        },
+        "rebuilt": {
+          "ACCEPTED_CASE_FACTS.json": "4042d4f02c02c608bcca338c364f81c54acf54dd21112ee0a781aa1fc5c23c0d",
+          "CASE_BASIS.json": "60846811f3d46cd5d79960313521766de8bfca0fbb9e3702dffb2712659ca749",
+          "CASE_DESIGN.json": "11038c4e6f8525fa4ada239075fcb2f072108744a06002bed3df9347e1d3e5f0",
+          "FORMAT.md": "7696af8ca2930eb4c5af2635778ab8fc1881a0435fb19ce93aa4f2fd4c104990",
+          "RESEARCH.md": "21fda5548efac3d611ca7b43d81a22b08a76ded672a79092f06a7f95961d50ae"
+        }
+      },
+      "original_delivery_sha256": {
+        "input.json": "d3609d5e8d0a42b640e0c1947b5c65842fc7966a80c50ed1c109ee5c54502d2c",
+        "stdout.log": "212515feb95314a2b4b5adddd5d23dfacf8512df4ea5b647df1fa2f40e9f3b97",
+        "result.json": "1aec877c869fd631814d8d2fa23bb21407b0d3033190e9f78992877b366d1200",
+        "cli-summary.json": "5340806a993ba5564f1392f71af16c3a76cfcf4af3dc9c8855cfe7b1500582b2"
+      },
+      "recovery_receipt": {
+        "schema": "atlas.generation-envelope-receipt.v1",
+        "normalization": "canonical spec.contract_coverage envelope",
+        "raw_result_digest": "b642ce1dbee386041e8eec071e4d37cd7c2e20c547868392bc31048e07f987ac",
+        "normalized_result_digest": "b642ce1dbee386041e8eec071e4d37cd7c2e20c547868392bc31048e07f987ac",
+        "raw_root_keys": [
+          "file_plan",
+          "spec"
+        ],
+        "raw_result_file": "result.json",
+        "recovery": "same-job-prior-attempt-successful-generation-delivery",
+        "no_new_cli_call": true,
+        "prior_attempt": 1,
+        "prior_stage": "attempt-1/blueprint-generate-0",
+        "input_digest": "c781607f4b597042652bc43da7d9c4025fa2d60aafd67e2fdf8e7e38274c785b",
+        "source_tree_digest": "70ea2c9b453532502eda04a5ad1d415c08028f1c52a6da64812ea4af2ad93e6e",
+        "cli_summary_digest": "42e9a09c6a584aff07a5e938fcea2e78fe848ef35abce635d6ded0b62c6ecdd2",
+        "stdout_sha256": "212515feb95314a2b4b5adddd5d23dfacf8512df4ea5b647df1fa2f40e9f3b97",
+        "parsed_stdout_result_digest": "b642ce1dbee386041e8eec071e4d37cd7c2e20c547868392bc31048e07f987ac"
+      },
+      "normalized_plan_checkpoint_digest": "b642ce1dbee386041e8eec071e4d37cd7c2e20c547868392bc31048e07f987ac"
+    },
+    {
+      "test": "test_checkpoint_reload_rebuilds_context_and_recovers_canonical_and_outer_envelopes",
+      "temporary_job_id": "job_a64a7516503147bfb3250a9da861c18c",
+      "state": "completed",
+      "generation_cli_summaries": 1,
+      "input_bytes_equal": true,
+      "source_bytes_equal": true,
+      "source_manifests": {
+        "first": {
+          "ACCEPTED_CASE_FACTS.json": "4042d4f02c02c608bcca338c364f81c54acf54dd21112ee0a781aa1fc5c23c0d",
+          "CASE_BASIS.json": "60846811f3d46cd5d79960313521766de8bfca0fbb9e3702dffb2712659ca749",
+          "CASE_DESIGN.json": "11038c4e6f8525fa4ada239075fcb2f072108744a06002bed3df9347e1d3e5f0",
+          "FORMAT.md": "7696af8ca2930eb4c5af2635778ab8fc1881a0435fb19ce93aa4f2fd4c104990",
+          "RESEARCH.md": "21fda5548efac3d611ca7b43d81a22b08a76ded672a79092f06a7f95961d50ae"
+        },
+        "rebuilt": {
+          "ACCEPTED_CASE_FACTS.json": "4042d4f02c02c608bcca338c364f81c54acf54dd21112ee0a781aa1fc5c23c0d",
+          "CASE_BASIS.json": "60846811f3d46cd5d79960313521766de8bfca0fbb9e3702dffb2712659ca749",
+          "CASE_DESIGN.json": "11038c4e6f8525fa4ada239075fcb2f072108744a06002bed3df9347e1d3e5f0",
+          "FORMAT.md": "7696af8ca2930eb4c5af2635778ab8fc1881a0435fb19ce93aa4f2fd4c104990",
+          "RESEARCH.md": "21fda5548efac3d611ca7b43d81a22b08a76ded672a79092f06a7f95961d50ae"
+        }
+      },
+      "original_delivery_sha256": {
+        "input.json": "d3609d5e8d0a42b640e0c1947b5c65842fc7966a80c50ed1c109ee5c54502d2c",
+        "stdout.log": "466dc7b4b492c719e888912d54d14a772949078b6d9fb06bd88816814e14377b",
+        "result.json": "78d3acde2893dbf1dfbbd3300779315552e81bcb179aaf40e99a71caea88ebfc",
+        "cli-summary.json": "6231776859d9b39c4e7fe307adb625fa2a18f8fcd5a92ae8654a18bf375cdbae"
+      },
+      "recovery_receipt": {
+        "schema": "atlas.generation-envelope-receipt.v1",
+        "normalization": "move exact top-level contract_coverage into spec.contract_coverage",
+        "raw_result_digest": "b8c7f3a9e84d17d325391cae612e4591af2bd9e07ea7c7ea97c459b471fccd13",
+        "outer_contract_coverage_digest": "6b5a834e85dde326107bf4f7d8c7d281daf270ce6d080ded4840e3159c16a495",
+        "normalized_result_digest": "b642ce1dbee386041e8eec071e4d37cd7c2e20c547868392bc31048e07f987ac",
+        "raw_root_keys": [
+          "contract_coverage",
+          "file_plan",
+          "spec"
+        ],
+        "raw_result_file": "result.json",
+        "recovery": "same-job-prior-attempt-successful-generation-delivery",
+        "no_new_cli_call": true,
+        "prior_attempt": 1,
+        "prior_stage": "attempt-1/blueprint-generate-0",
+        "input_digest": "c781607f4b597042652bc43da7d9c4025fa2d60aafd67e2fdf8e7e38274c785b",
+        "source_tree_digest": "70ea2c9b453532502eda04a5ad1d415c08028f1c52a6da64812ea4af2ad93e6e",
+        "cli_summary_digest": "9fc12bc86f06a0c8a8e23b40947dc4e50d2938052d02efbd74cd7b02c6142a4c",
+        "stdout_sha256": "466dc7b4b492c719e888912d54d14a772949078b6d9fb06bd88816814e14377b",
+        "parsed_stdout_result_digest": "b8c7f3a9e84d17d325391cae612e4591af2bd9e07ea7c7ea97c459b471fccd13"
+      },
+      "normalized_plan_checkpoint_digest": "b642ce1dbee386041e8eec071e4d37cd7c2e20c547868392bc31048e07f987ac"
+    },
+    {
+      "test": "test_source_tampering_blocks_recovery_and_triggers_new_generation",
+      "temporary_job_id": "job_938708d33604466292fd110a4b346cde",
+      "state": "failed",
+      "generation_cli_summaries": 2,
+      "input_bytes_equal": true,
+      "source_bytes_equal": false,
+      "source_manifests": {
+        "first": {
+          "ACCEPTED_CASE_FACTS.json": "6c98af197fd6fbf5236bec607f3a025f5e97a7f1de747d5e7700eb7c3f93f8f1",
+          "CASE_BASIS.json": "3f124f88533408883304c5be6de6b01ba361a2e746fee37473c9c5a90d58a1e1",
+          "CASE_DESIGN.json": "92e78d0b032962f47792a9fa95fd981ef63e1e3ef074d536d6304c75eddbe29f",
+          "FORMAT.md": "7696af8ca2930eb4c5af2635778ab8fc1881a0435fb19ce93aa4f2fd4c104990",
+          "RESEARCH.md": "21fda5548efac3d611ca7b43d81a22b08a76ded672a79092f06a7f95961d50ae"
+        },
+        "rebuilt": {
+          "ACCEPTED_CASE_FACTS.json": "6c98af197fd6fbf5236bec607f3a025f5e97a7f1de747d5e7700eb7c3f93f8f1",
+          "CASE_BASIS.json": "3f124f88533408883304c5be6de6b01ba361a2e746fee37473c9c5a90d58a1e1",
+          "CASE_DESIGN.json": "11038c4e6f8525fa4ada239075fcb2f072108744a06002bed3df9347e1d3e5f0",
+          "FORMAT.md": "7696af8ca2930eb4c5af2635778ab8fc1881a0435fb19ce93aa4f2fd4c104990",
+          "RESEARCH.md": "21fda5548efac3d611ca7b43d81a22b08a76ded672a79092f06a7f95961d50ae"
+        }
+      },
+      "original_delivery_sha256": {
+        "input.json": "cf33d398d67b5078c1fdfb2badf70b824de6800e44517602f7103f082d343532",
+        "stdout.log": "212515feb95314a2b4b5adddd5d23dfacf8512df4ea5b647df1fa2f40e9f3b97",
+        "result.json": "1aec877c869fd631814d8d2fa23bb21407b0d3033190e9f78992877b366d1200",
+        "cli-summary.json": "5340806a993ba5564f1392f71af16c3a76cfcf4af3dc9c8855cfe7b1500582b2"
+      },
+      "recovery_receipt": null,
+      "normalized_plan_checkpoint_digest": null
+    },
+    {
+      "test": "test_v1_aggregate_repair_rebuilds_case_context_and_recovers_before_plan_checkpoint",
+      "temporary_job_id": "job_c0ea929f98424c209662e4ed5fe49b4e",
+      "state": "completed",
+      "generation_cli_summaries": 1,
+      "input_bytes_equal": true,
+      "source_bytes_equal": true,
+      "source_manifests": {
+        "first": {
+          "ACCEPTED_CASE_FACTS.json": "d448ddf69299af81d43eda8f9f4155339921776d3df60eb5a3b3206859e5a4ee",
+          "CASE_BASIS.json": "5da06048ec62570c361a73776f51552a15ee9ab6c906a55b4eb30fb10885da52",
+          "CASE_DESIGN.json": "b2d0fd439f890cb90ac7b1da8f7b988eb54f6e1afd403e8655bf8081fcc4fef1",
+          "FORMAT.md": "2583039658a9f924a354dd83b502aeced33a70963fb2c08666f74113257010e5",
+          "REPAIR_SCOPE.json": "eaf4c6de199c4e5c4f5a097200badb483079760d8d0e7acf16f979970ddce965",
+          "RESEARCH.md": "21fda5548efac3d611ca7b43d81a22b08a76ded672a79092f06a7f95961d50ae",
+          "REVIEWS.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "REVISION.md": "c59d5d63fc5f622fe60e5dde216a8c4a1842a6153a50c03399e4317f08f17304",
+          "RUNTIME_CONTRACT.md": "e1b14ccb3b6292c5f25291ba03aa51666d1032224e813145e09c701a32f5854a",
+          "RUNTIME_PROTOCOL.md": "a1a03a5a305973793994580980dcab32ce4c0c267f945818b09e4680c8710c02",
+          "previous/AGENT.md": "0467910463d4ed7eb8f7261523da0347c6cd46e7949fea279fc6100a277b3360",
+          "previous/ARCHITECTURE.md": "9855e7435289df338a3e1e69dc447b7c19ca353bb1dc9d917f53e65b187ae793",
+          "previous/CATEGORY.md": "8c0bc9c6418bc6521d053ea02d298729e700dee28d944b778d4e250605cb01f7",
+          "previous/DECISIONS.md": "28aa2097cbb3132eee05f11d3df3420aa19c8668776154cbf96fa580caaf23c4",
+          "previous/PRODUCT.md": "b2c3c960693c22d127a9bbaacf52f1fa18abff4df324134ede452ee970fb3815",
+          "previous/README.md": "526104c270fbc958a33d58dc2e30b4bb4921bea1dfc60b373272ce14a596f0eb",
+          "previous/ROADMAP.md": "8a986c76167eb3713aa3926c2c6aa5dfb4df1d9635e599145c7d34264eebe3c1",
+          "previous/VALIDATION.md": "af62512360a76e433095f30c8b4d7802a533b4eaf323ae6c76c8b2f5085cb2a6",
+          "previous/acceptance/README.md": "5963afe2168d60c09f03d57619d5f07a425e5a7525245615d2c0017d161e70ce",
+          "previous/acceptance/common.py": "7f0d7d28d8336bdde3da267795e24d13e430f05e53063ee01ed5611236325d37",
+          "previous/acceptance/p0_find_open.py": "5ccd5115753b40267036a64e330e2c81b9ffd42e6ad00cc96565642e3941444a",
+          "previous/acceptance/p0_library.py": "db7911754c6ed37f90f61146e3a352cb7a28028b280d5a24878918490b62b6ef",
+          "previous/acceptance/p0_organize.py": "7d74bde76a8fcd6a52cdfa8aa31034f43f8c4d1dc50255f8d82e1cd356d1760b",
+          "previous/acceptance/p0_recovery.py": "b6caae610999680fccc101293cb43eceef07c8b79c93bbe2666bfb765c2b4927",
+          "previous/acceptance/p1_maturity.py": "d44e17c87314db18084b3b88bd2c700a75bfe583d108e9b518040fb8378601a3",
+          "previous/acceptance/plan.json": "960b866282cd7b65d938a85b1897966f1734a16dd4d5a657bb2b6a1cb4637caf",
+          "previous/acceptance/requirements.txt": "f1fc18b605a1eea93892d319d09122d91033a48dfd4b913f8f262a4dc8633deb",
+          "previous/acceptance/runner.json": "f9448d370749dcca44fb2024b1b4b6d761d127edaf98a523063a590db5c69375",
+          "previous/inputs/accepted-case-facts.json": "26af3d02457f0417e7f7e2800fc212bf5e6e4e94c31728b93400425627299579",
+          "previous/inputs/case-basis.json": "05e05fb4f089768b362659633fbce42f616449ed642c90e99255afc294583f58",
+          "previous/inputs/case-design.json": "2cb99156f26efc3af99a4bfa65cbb731d80ec4f566cdac198ef35d01d02c80ec",
+          "previous/inputs/scenario.json": "155a03f6787a4637fd84abaa6ab8837f455b5b2a4d0c6a60fcb46ad9b48aa29f",
+          "previous/integrity.json": "1710c0564fabbaa7cec0953d6049609bc3d91a0f31ff118ae1d6081dba9aa35d",
+          "previous/template.json": "8ad7f88f6c0f781052f24d20e81d705fcae6e8a60df2efa8aba8ceeae3c2e6eb"
+        },
+        "rebuilt": {
+          "ACCEPTED_CASE_FACTS.json": "d448ddf69299af81d43eda8f9f4155339921776d3df60eb5a3b3206859e5a4ee",
+          "CASE_BASIS.json": "5da06048ec62570c361a73776f51552a15ee9ab6c906a55b4eb30fb10885da52",
+          "CASE_DESIGN.json": "b2d0fd439f890cb90ac7b1da8f7b988eb54f6e1afd403e8655bf8081fcc4fef1",
+          "FORMAT.md": "2583039658a9f924a354dd83b502aeced33a70963fb2c08666f74113257010e5",
+          "REPAIR_SCOPE.json": "eaf4c6de199c4e5c4f5a097200badb483079760d8d0e7acf16f979970ddce965",
+          "RESEARCH.md": "21fda5548efac3d611ca7b43d81a22b08a76ded672a79092f06a7f95961d50ae",
+          "REVIEWS.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "REVISION.md": "c59d5d63fc5f622fe60e5dde216a8c4a1842a6153a50c03399e4317f08f17304",
+          "RUNTIME_CONTRACT.md": "e1b14ccb3b6292c5f25291ba03aa51666d1032224e813145e09c701a32f5854a",
+          "RUNTIME_PROTOCOL.md": "a1a03a5a305973793994580980dcab32ce4c0c267f945818b09e4680c8710c02",
+          "previous/AGENT.md": "0467910463d4ed7eb8f7261523da0347c6cd46e7949fea279fc6100a277b3360",
+          "previous/ARCHITECTURE.md": "9855e7435289df338a3e1e69dc447b7c19ca353bb1dc9d917f53e65b187ae793",
+          "previous/CATEGORY.md": "8c0bc9c6418bc6521d053ea02d298729e700dee28d944b778d4e250605cb01f7",
+          "previous/DECISIONS.md": "28aa2097cbb3132eee05f11d3df3420aa19c8668776154cbf96fa580caaf23c4",
+          "previous/PRODUCT.md": "b2c3c960693c22d127a9bbaacf52f1fa18abff4df324134ede452ee970fb3815",
+          "previous/README.md": "526104c270fbc958a33d58dc2e30b4bb4921bea1dfc60b373272ce14a596f0eb",
+          "previous/ROADMAP.md": "8a986c76167eb3713aa3926c2c6aa5dfb4df1d9635e599145c7d34264eebe3c1",
+          "previous/VALIDATION.md": "af62512360a76e433095f30c8b4d7802a533b4eaf323ae6c76c8b2f5085cb2a6",
+          "previous/acceptance/README.md": "5963afe2168d60c09f03d57619d5f07a425e5a7525245615d2c0017d161e70ce",
+          "previous/acceptance/common.py": "7f0d7d28d8336bdde3da267795e24d13e430f05e53063ee01ed5611236325d37",
+          "previous/acceptance/p0_find_open.py": "5ccd5115753b40267036a64e330e2c81b9ffd42e6ad00cc96565642e3941444a",
+          "previous/acceptance/p0_library.py": "db7911754c6ed37f90f61146e3a352cb7a28028b280d5a24878918490b62b6ef",
+          "previous/acceptance/p0_organize.py": "7d74bde76a8fcd6a52cdfa8aa31034f43f8c4d1dc50255f8d82e1cd356d1760b",
+          "previous/acceptance/p0_recovery.py": "b6caae610999680fccc101293cb43eceef07c8b79c93bbe2666bfb765c2b4927",
+          "previous/acceptance/p1_maturity.py": "d44e17c87314db18084b3b88bd2c700a75bfe583d108e9b518040fb8378601a3",
+          "previous/acceptance/plan.json": "960b866282cd7b65d938a85b1897966f1734a16dd4d5a657bb2b6a1cb4637caf",
+          "previous/acceptance/requirements.txt": "f1fc18b605a1eea93892d319d09122d91033a48dfd4b913f8f262a4dc8633deb",
+          "previous/acceptance/runner.json": "f9448d370749dcca44fb2024b1b4b6d761d127edaf98a523063a590db5c69375",
+          "previous/inputs/accepted-case-facts.json": "26af3d02457f0417e7f7e2800fc212bf5e6e4e94c31728b93400425627299579",
+          "previous/inputs/case-basis.json": "05e05fb4f089768b362659633fbce42f616449ed642c90e99255afc294583f58",
+          "previous/inputs/case-design.json": "2cb99156f26efc3af99a4bfa65cbb731d80ec4f566cdac198ef35d01d02c80ec",
+          "previous/inputs/scenario.json": "155a03f6787a4637fd84abaa6ab8837f455b5b2a4d0c6a60fcb46ad9b48aa29f",
+          "previous/integrity.json": "1710c0564fabbaa7cec0953d6049609bc3d91a0f31ff118ae1d6081dba9aa35d",
+          "previous/template.json": "8ad7f88f6c0f781052f24d20e81d705fcae6e8a60df2efa8aba8ceeae3c2e6eb"
+        }
+      },
+      "original_delivery_sha256": {
+        "input.json": "acca02aca9427638f84a27a9443f81d6a53adfd0e43f43ba342fa73409d47f09",
+        "stdout.log": "359ee261928674440a77810394bbd54e03c577394e304d047b41a1b81fb71f61",
+        "result.json": "679113340f859a111ebcf6180312197494140ae814853079a84dcbed0fd89edf",
+        "cli-summary.json": "9a55a793c7341930b56fb9554d732e6b536949976742fc852fd393da7483efa1"
+      },
+      "recovery_receipt": {
+        "schema": "atlas.generation-envelope-receipt.v1",
+        "normalization": "canonical spec.contract_coverage envelope",
+        "raw_result_digest": "2a37cf36d542937394a1f7c6336d7d36d41c327953b5097093274d92d3380ff5",
+        "normalized_result_digest": "2a37cf36d542937394a1f7c6336d7d36d41c327953b5097093274d92d3380ff5",
+        "raw_root_keys": [
+          "file_plan",
+          "spec"
+        ],
+        "raw_result_file": "result.json",
+        "recovery": "same-job-prior-attempt-successful-generation-delivery",
+        "no_new_cli_call": true,
+        "prior_attempt": 1,
+        "prior_stage": "attempt-1/blueprint-generate-0",
+        "input_digest": "654a95d607937abdf2cfb69c78360d2a1e81184df002530a2edee829bf4eedef",
+        "source_tree_digest": "907198cb992a783c36532b63cd4546386a91b49b0b0b2694ae750625487c6f62",
+        "cli_summary_digest": "1ff5f43ea6e59ade410d1656ca69ffb8bc8a7877b982fb3c17f969647241a510",
+        "stdout_sha256": "359ee261928674440a77810394bbd54e03c577394e304d047b41a1b81fb71f61",
+        "parsed_stdout_result_digest": "2a37cf36d542937394a1f7c6336d7d36d41c327953b5097093274d92d3380ff5"
+      },
+      "normalized_plan_checkpoint_digest": "2a37cf36d542937394a1f7c6336d7d36d41c327953b5097093274d92d3380ff5"
+    }
+  ]
+}
