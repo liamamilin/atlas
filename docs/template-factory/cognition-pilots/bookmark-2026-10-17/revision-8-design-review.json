@@ -1,0 +1,185 @@
+{
+ "outcome": "blocked",
+ "summary": "scenario_scope: passed; product_completeness: blocked; architecture_contract: passed; phase_acceptance: blocked; decisions_defaults: passed",
+ "checks": [
+  {
+   "dimension": "scenario_scope",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md",
+    "REVISION.md"
+   ],
+   "reason": "确认场景的四项验收与五步工作流逐一对应：F01/F02/F03/F04/F05 覆盖保存、跨会话持久、未分类默认落点、列表与打开；F08/F09 覆盖新建归类、保存时选择及之后移动，并保持操作后持久；F13/F14 覆盖关键字检索与按归类浏览。阶段划分 P0→P1→P2 未提前要求后期能力，P1 的软删除、回收站、归类删除二选一与 P2 的检索均在当前单人场景内。R01 为唯一数据所有者，R02 仅承担运行与维护，R03 明确为本期不存在的共享读者；F15–F25 的导入导出、标签、自动抓取、快照、全文检索、失效扫描、分享协作、批量操作和扩展入口均被明确排除于当前范围，没有把企业或无关能力带入本期承诺。"
+  },
+  {
+   "dimension": "product_completeness",
+   "outcome": "blocked",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "ARCHITECTURE.md §8 声明了 form[data-testid=move-form]（select[name=categoryId]+button[data-testid=move-submit]）和 form[data-testid=bookmark-edit-form]（input[name=title]+textarea[name=note]+button[data-testid=bookmark-edit-submit]），但两者都没有声明 action 或 method；§6 只给出 API PATCH /api/bookmarks/:id 等 JSON 接口，浏览器无 JS 表单不能直接使用 PATCH，也没有对应的 HTML POST 写路由、303 成功落点或失败重渲染契约。A29 因此声明了通过 UI 完成移动与编辑、刷新后读回，但当前草案没有提供可达的界面契约。这属于当前承诺中的主流程缺口，不是运行证据缺失。"
+  },
+  {
+   "dimension": "architecture_contract",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md",
+    "REVISION.md"
+   ],
+   "reason": "ARCHITECTURE §3–§9 与 DRAFT 的 D01–D09、F01–F14 对默认归类、单归属、软删除来源、归类 purge 二选一、URL 原文保存与 WHATWG Location 序列化、409/400 错误码及 Host/Origin 边界相互对应；数据不变量、写事务、恢复回退、分页排序未见相互矛盾，主旅程可实施。"
+  },
+  {
+   "dimension": "phase_acceptance",
+   "outcome": "blocked",
+   "files": [
+    "DRAFT.md"
+   ],
+   "reason": "A30 要求先在归类删除对话框中以 mode=move 将记录移入真实目标，随后对同一归类执行 purge，并断言记录进入回收站、trashedFromCategoryId/trashedFromCategoryName 指向原 tombstone，再对单条回收记录执行 trash-delete。move 成功后源归类已无 active 书签，purge 的 trashed 将为 0，后续“记录出现在回收站页面”和“仅该条永久消失”的断言没有对象；草案未像 A14 那样声明 move、失效目标、purge 使用独立归类或独立记录，也未说明 purge 对象是已承接记录的目标归类。因此 A30 不能按字面语义同时证明 move 与 purge 两条 P1 主路径。"
+  },
+  {
+   "dimension": "decisions_defaults",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "D01 规定单一归属、未分类默认落点与单层归类，并限定 P0/P1 开放范围；D02 默认以 409 阻止重复，仅在显式 allowDuplicate=true 时另存并保留冲突恢复表单；D03 删除归类默认 move，purge 须 confirm，默认归类受保护且 tombstone/目标校验明确；D04 默认不抓取、标题可由主机名派生；D05 采用保守 URL 归一并在打开前二次校验；D06 明确单用户、回环监听、无账号及 Host/Origin/Fetch 边界；D07 回收站不过期，清空需 confirm 与 --allow-destructive；D08 将导入导出限定为未实现的 P3 且不宣称具备；D09 明确重启 adapter、Playwright、子路径、认证头与破坏性操作契约。各 when_to_ask 均以真实用户信号（同链接多主题、抓取太慢、家人共用、迁移需求、目标无法重启等）为触发，并显式排除日常整理偏好等非触发项，属于可逆的文档化默认而非隐藏的人类决策；D08 的导入不去重仅存在于明确未实现的 P3，不构成与 D02 的当前冲突。"
+  }
+ ],
+ "suggestions": [
+  "在 ARCHITECTURE.md 为移动和编辑分别补充 HTML 写入口及其 action/method，例如 POST {basePath}/bookmarks/{id}/move 与 POST {basePath}/bookmarks/{id}/edit，并明确请求字段、成功 303 的目标页与 flash、校验失败时保留已填值并渲染 [data-testid=form-error]、失败零写入。",
+  "将上述 action 写入 move-form 与 bookmark-edit-form 的 DOM 契约，并说明其如何映射到既有 PATCH 语义；若计划使用客户端 JS 提交，则必须明确声明并给出无 JS 的可用回退，因为当前架构声明 SSR 表单成功后 303，不能依赖未声明的脚本行为。",
+  "保持 A29 的现有关键断言（移动后归属、编辑后刷新读回、纯空白标题报错且不改记录），仅补齐其依赖的 HTML 入口，不新增强制确认或批量能力。",
+  "补齐 ARCHITECTURE §8 中 bookmark-edit-form 与 move-form 的 method/action 以及成功 303、失败 form-error 契约，避免 HTML 路由与浏览器用例各自猜测。",
+  "统一 F01 的“含 userinfo 拒绝”与 D05/§4 的“非空 userinfo”表述，明确 http://@host/ 这类空 userinfo 的接受或拒绝结果。",
+  "明确 allowDuplicate=true 产生多条同 url_key 活跃记录后，409 duplicate_url 的 details.existingId 选择规则（如最小 id），使重复提示链接可确定。",
+  "明确 PATCH /api/bookmarks/:id 对已回收记录返回 404 还是 409，并区分 GET /api/bookmarks 的 categoryId 非法形状（400）与未知/tombstone（空结果）。",
+  "为 PUBLIC_ORIGIN/PUBLIC_BASE_PATH 给出可启动的精确合法形状，并在实现约束中写明 SQLite foreign_keys=ON，避免配置和外键承诺依赖未声明假设。",
+  "在 A30 中明确拆分夹具：move 分支、目标失效分支、purge 分支各自使用独立活跃归类与独立记录；若要在 move 后 purge 同一批记录，则明确以承接记录的目标归类为 purge 对象，并重新打开该归类的删除对话框，避免对已空的源归类执行 purge。",
+  "D05 的 when_to_ask 仍把「锚点差异」列为待提问项，但默认 url_key 已移除 fragment；建议改为跟踪参数或 http/https 合并等尚未处理的差异，避免误读。",
+  "为受保护的默认归类补一条 when_to_ask（例如用户要求将其改名或删除时如何回应），或明确该限制是刻意固定的产品约束。"
+ ],
+ "scope": "Independent dimension-by-dimension specification design review of pinned proposal projections before new programs are authored; no execution or frozen-candidate acceptance. Full research facts and authored programs remain for separate frozen-candidate review.",
+ "proposal_digest": "3e51b01c815be81bae4d83aa2895a70ff8ab31eebe941a72037a69f59ab8972d",
+ "subreviews": [
+  {
+   "outcome": "passed",
+   "summary": "范围与已确认场景一致：单人普通用户的“保存链接—简单归类/默认未分类—日后按归类或关键字找回—跳回原网页”主线，被 P0（保存、持久化、默认归类、列表与打开）、P1（归类新建/重命名/选择/移动，以及为防误删而设的软删除与回收站）和 P2（关键字检索、按归类浏览、排序分页）完整覆盖；角色限定为收藏者与部署维护者，共享协作者明确排除，导入导出、标签、抓取、快照、全文检索、失效扫描、公开分享、协作角色、批量操作与浏览器扩展均被列为后续、待决策或明确不适用，未混入本期验收。补充的重复保存防护、编辑标题/备注及回收站属于同一单人库的数据完整性保护，与确认目标相关且已在限界中约束，不构成无关扩张。",
+   "checks": [
+    {
+     "dimension": "scenario_scope",
+     "outcome": "passed",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md",
+      "REVISION.md"
+     ],
+     "reason": "确认场景的四项验收与五步工作流逐一对应：F01/F02/F03/F04/F05 覆盖保存、跨会话持久、未分类默认落点、列表与打开；F08/F09 覆盖新建归类、保存时选择及之后移动，并保持操作后持久；F13/F14 覆盖关键字检索与按归类浏览。阶段划分 P0→P1→P2 未提前要求后期能力，P1 的软删除、回收站、归类删除二选一与 P2 的检索均在当前单人场景内。R01 为唯一数据所有者，R02 仅承担运行与维护，R03 明确为本期不存在的共享读者；F15–F25 的导入导出、标签、自动抓取、快照、全文检索、失效扫描、分享协作、批量操作和扩展入口均被明确排除于当前范围，没有把企业或无关能力带入本期承诺。"
+    }
+   ],
+   "suggestions": [],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "3e51b01c815be81bae4d83aa2895a70ff8ab31eebe941a72037a69f59ab8972d",
+   "projection_digest": "c16b68cdb083fb91d0bbac15760dae1e0882074c9b68a9e1050f1e7acd5c9f13",
+   "stage": "blueprint-spec-review-1-scenario_scope"
+  },
+  {
+   "outcome": "blocked",
+   "summary": "product_completeness 阻塞：P0 的保存/重复恢复/重启持久/打开原页，以及 P1 的归类新建改名、保存时选归类、归类删除、软删除/回收站/恢复、P2 的检索与分页均有声明的主线；但 P1「移动归类」和「编辑标题/备注」两个浏览器主流程只有表单控件，没有可提交的服务端入口，无法从已声明界面完整走通成功、失败与恢复。",
+   "checks": [
+    {
+     "dimension": "product_completeness",
+     "outcome": "blocked",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "reason": "ARCHITECTURE.md §8 声明了 form[data-testid=move-form]（select[name=categoryId]+button[data-testid=move-submit]）和 form[data-testid=bookmark-edit-form]（input[name=title]+textarea[name=note]+button[data-testid=bookmark-edit-submit]），但两者都没有声明 action 或 method；§6 只给出 API PATCH /api/bookmarks/:id 等 JSON 接口，浏览器无 JS 表单不能直接使用 PATCH，也没有对应的 HTML POST 写路由、303 成功落点或失败重渲染契约。A29 因此声明了通过 UI 完成移动与编辑、刷新后读回，但当前草案没有提供可达的界面契约。这属于当前承诺中的主流程缺口，不是运行证据缺失。"
+    }
+   ],
+   "suggestions": [
+    "在 ARCHITECTURE.md 为移动和编辑分别补充 HTML 写入口及其 action/method，例如 POST {basePath}/bookmarks/{id}/move 与 POST {basePath}/bookmarks/{id}/edit，并明确请求字段、成功 303 的目标页与 flash、校验失败时保留已填值并渲染 [data-testid=form-error]、失败零写入。",
+    "将上述 action 写入 move-form 与 bookmark-edit-form 的 DOM 契约，并说明其如何映射到既有 PATCH 语义；若计划使用客户端 JS 提交，则必须明确声明并给出无 JS 的可用回退，因为当前架构声明 SSR 表单成功后 303，不能依赖未声明的脚本行为。",
+    "保持 A29 的现有关键断言（移动后归属、编辑后刷新读回、纯空白标题报错且不改记录），仅补齐其依赖的 HTML 入口，不新增强制确认或批量能力。"
+   ],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "3e51b01c815be81bae4d83aa2895a70ff8ab31eebe941a72037a69f59ab8972d",
+   "projection_digest": "7429236c84d369947673afda8c08ff83f4117a34fd2322b973997667e99a3c9f",
+   "stage": "blueprint-spec-review-1-product_completeness"
+  },
+  {
+   "outcome": "passed",
+   "summary": "架构契约在草案层面总体自洽：默认归类、单归属、去重、tombstone、回收站、URL 原文保存与 Location 序列化，以及 Host/Origin、十进制资源 ID、错误执行顺序之间未发现会阻断 P0–P2 主旅程或造成实质数据/安全承诺冲突的问题。以下仅为编写程序前建议澄清的接口边界，不构成设计阻断。",
+   "checks": [
+    {
+     "dimension": "architecture_contract",
+     "outcome": "passed",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md",
+      "REVISION.md"
+     ],
+     "reason": "ARCHITECTURE §3–§9 与 DRAFT 的 D01–D09、F01–F14 对默认归类、单归属、软删除来源、归类 purge 二选一、URL 原文保存与 WHATWG Location 序列化、409/400 错误码及 Host/Origin 边界相互对应；数据不变量、写事务、恢复回退、分页排序未见相互矛盾，主旅程可实施。"
+    }
+   ],
+   "suggestions": [
+    "补齐 ARCHITECTURE §8 中 bookmark-edit-form 与 move-form 的 method/action 以及成功 303、失败 form-error 契约，避免 HTML 路由与浏览器用例各自猜测。",
+    "统一 F01 的“含 userinfo 拒绝”与 D05/§4 的“非空 userinfo”表述，明确 http://@host/ 这类空 userinfo 的接受或拒绝结果。",
+    "明确 allowDuplicate=true 产生多条同 url_key 活跃记录后，409 duplicate_url 的 details.existingId 选择规则（如最小 id），使重复提示链接可确定。",
+    "明确 PATCH /api/bookmarks/:id 对已回收记录返回 404 还是 409，并区分 GET /api/bookmarks 的 categoryId 非法形状（400）与未知/tombstone（空结果）。",
+    "为 PUBLIC_ORIGIN/PUBLIC_BASE_PATH 给出可启动的精确合法形状，并在实现约束中写明 SQLite foreign_keys=ON，避免配置和外键承诺依赖未声明假设。"
+   ],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "3e51b01c815be81bae4d83aa2895a70ff8ab31eebe941a72037a69f59ab8972d",
+   "projection_digest": "e975045cf322fd19a0054434a3558c6d96adda77acdd471afb7098db5978b367",
+   "stage": "blueprint-spec-review-1-architecture_contract"
+  },
+  {
+   "outcome": "blocked",
+   "summary": "phase_acceptance 维度：P0–P2 的阶段目标、能力映射、引入依赖与文件接口总体一致；但 A30 的归类删除 UI 用例在 move 与 purge 之间缺少独立夹具声明，按草案字面无法同时证明两条 P1 主路径，需修正后再编写程序。",
+   "checks": [
+    {
+     "dimension": "phase_acceptance",
+     "outcome": "blocked",
+     "files": [
+      "DRAFT.md"
+     ],
+     "reason": "A30 要求先在归类删除对话框中以 mode=move 将记录移入真实目标，随后对同一归类执行 purge，并断言记录进入回收站、trashedFromCategoryId/trashedFromCategoryName 指向原 tombstone，再对单条回收记录执行 trash-delete。move 成功后源归类已无 active 书签，purge 的 trashed 将为 0，后续“记录出现在回收站页面”和“仅该条永久消失”的断言没有对象；草案未像 A14 那样声明 move、失效目标、purge 使用独立归类或独立记录，也未说明 purge 对象是已承接记录的目标归类。因此 A30 不能按字面语义同时证明 move 与 purge 两条 P1 主路径。"
+    }
+   ],
+   "suggestions": [
+    "在 A30 中明确拆分夹具：move 分支、目标失效分支、purge 分支各自使用独立活跃归类与独立记录；若要在 move 后 purge 同一批记录，则明确以承接记录的目标归类为 purge 对象，并重新打开该归类的删除对话框，避免对已空的源归类执行 purge。"
+   ],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "3e51b01c815be81bae4d83aa2895a70ff8ab31eebe941a72037a69f59ab8972d",
+   "projection_digest": "c4b03b0a0e92b5aadae4d2ba99c16b82d4b2f656c1193dfde5f991c2e2abda74",
+   "stage": "blueprint-spec-review-1-phase_acceptance"
+  },
+  {
+   "outcome": "passed",
+   "summary": "仅审查 decisions_defaults：九项决策均给出了明确默认值、影响范围与具体 when_to_ask；默认值可被用户显式覆盖或在后续阶段增量调整，未发现与当前 DRAFT/ARCHITECTURE 承诺冲突或缺失的关键产品决策。",
+   "checks": [
+    {
+     "dimension": "decisions_defaults",
+     "outcome": "passed",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "reason": "D01 规定单一归属、未分类默认落点与单层归类，并限定 P0/P1 开放范围；D02 默认以 409 阻止重复，仅在显式 allowDuplicate=true 时另存并保留冲突恢复表单；D03 删除归类默认 move，purge 须 confirm，默认归类受保护且 tombstone/目标校验明确；D04 默认不抓取、标题可由主机名派生；D05 采用保守 URL 归一并在打开前二次校验；D06 明确单用户、回环监听、无账号及 Host/Origin/Fetch 边界；D07 回收站不过期，清空需 confirm 与 --allow-destructive；D08 将导入导出限定为未实现的 P3 且不宣称具备；D09 明确重启 adapter、Playwright、子路径、认证头与破坏性操作契约。各 when_to_ask 均以真实用户信号（同链接多主题、抓取太慢、家人共用、迁移需求、目标无法重启等）为触发，并显式排除日常整理偏好等非触发项，属于可逆的文档化默认而非隐藏的人类决策；D08 的导入不去重仅存在于明确未实现的 P3，不构成与 D02 的当前冲突。"
+    }
+   ],
+   "suggestions": [
+    "D05 的 when_to_ask 仍把「锚点差异」列为待提问项，但默认 url_key 已移除 fragment；建议改为跟踪参数或 http/https 合并等尚未处理的差异，避免误读。",
+    "为受保护的默认归类补一条 when_to_ask（例如用户要求将其改名或删除时如何回应），或明确该限制是刻意固定的产品约束。"
+   ],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "3e51b01c815be81bae4d83aa2895a70ff8ab31eebe941a72037a69f59ab8972d",
+   "projection_digest": "e975045cf322fd19a0054434a3558c6d96adda77acdd471afb7098db5978b367",
+   "stage": "blueprint-spec-review-1-decisions_defaults"
+  }
+ ]
+}

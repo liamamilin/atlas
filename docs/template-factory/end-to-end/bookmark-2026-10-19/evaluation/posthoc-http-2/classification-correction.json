@@ -1,0 +1,8 @@
+{
+  "classification": "harness_measurement_invalid",
+  "product_evidence_valid": false,
+  "original_run_json_preserved": true,
+  "reason": "The second probe still did not distinguish li.collection from bookmark rows using class tokens and did not preserve HTML snapshots. Its matching inventory counts did not reflect the actual rendered sidebar.",
+  "corrected_by": "../posthoc-http-3/run.json",
+  "corrections": "Exact li class-token classification, deduplication by record ID, complete inventory comparison, actual app HTML parser cross-check, raw HTML snapshots, and no-follow /go/<id> response-header inspection."
+}

@@ -1,0 +1,38 @@
+{
+ "base_proposal_digest": "588f606043e48b5c366fe5400c7b1170053c01ebee22454854a53649bd31e521",
+ "model_response_digest": "f67d8877bcc8e5a0c54a9eff701fc4700601a3d86ead225f03e9340283489e18",
+ "effective_proposal_digest": "3e51b01c815be81bae4d83aa2895a70ff8ab31eebe941a72037a69f59ab8972d",
+ "changed_fields": [
+  [
+   "architecture_markdown"
+  ],
+  [
+   "acceptance",
+   "A05",
+   "goal"
+  ],
+  [
+   "features",
+   "F05",
+   "reason"
+  ],
+  [
+   "decisions",
+   "D05",
+   "default"
+  ],
+  [
+   "decisions",
+   "D05",
+   "impact"
+  ]
+ ],
+ "file_plan_changes": [
+  {
+   "path": "acceptance/p0-library.cjs",
+   "purpose": "编辑。导出 {phase:'P0', cases:[A02,A05,A06,A07]}，包含 A02 真实重启持久化、A05 列表倒序与 /b/{id} 302 Location 序列化、A06 JSON 重复 409/existingId/allowDuplicate、A07 首页 HTML 与打开链接。扩展 A05：保留既有 ASCII 打开、含 query/fragment 的 302 与未找到负例，另保存一条含中文、IDN 与空格的固定合成 .invalid URL，断言 API 读回原始 Unicode 字符串、Location 等于 new URL(url).href 且为合法 ASCII 头值、redirect 不跟随，所有请求只发配置目标且不联网访问 .invalid；不先 new URL(...).href 再保存。依赖 common 与 support；由 p0.cjs 聚合，不调用分类写接口或检索。对应本轮 URL 存储与 HTTP 传输契约第 4 项。",
+   "reuse": false
+  }
+ ],
+ "scope": "Exact model-authored local specification repair. Unaddressed fields, row identities and file inventory retained by host; not acceptance evidence."
+}

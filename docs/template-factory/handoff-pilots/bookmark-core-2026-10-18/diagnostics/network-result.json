@@ -1,0 +1,13 @@
+{
+  "scope": "acceptance helper diagnostic, not app acceptance",
+  "fixtures": "two owned loopback origins, synthetic Basic marker, deny-only proxy",
+  "cross_origin_requests": [
+    {
+      "path": "/cross-origin",
+      "authorization": "Basic c3ludGhldGljLXVzZXI6c3ludGhldGljLW1hcmtlcg=="
+    }
+  ],
+  "guard_claim": "no_background_outbound_reported",
+  "violations": [],
+  "attempted": []
+}

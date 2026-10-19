@@ -1,0 +1,89 @@
+{
+  "id": "EP01",
+  "kind": "posthoc_exploratory_not_core",
+  "tests": [
+    {
+      "id": "EP01",
+      "subprobe": "absent_target",
+      "status": "passed",
+      "posthoc": true,
+      "application_command_exit": 0,
+      "original_plan_id": null,
+      "tampered_id": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M1/EP01-initial/absent_target/outside/receipt-target",
+      "outside_target": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M1/EP01-initial/absent_target/outside/receipt-target.json",
+      "outside_before": {
+        "protected-sentinel.bin": "50f220e7bf044f8cb0a775c05a462e035b4221630c5f75da6e1c70e3f9663683"
+      },
+      "outside_after": {
+        "protected-sentinel.bin": "50f220e7bf044f8cb0a775c05a462e035b4221630c5f75da6e1c70e3f9663683"
+      },
+      "outside_unchanged": true,
+      "inside_before": {
+        "old-a.txt": "6f726967696e616c2073796e7468657469632072656e616d656420636f6e74656e740a00ff",
+        "keep.txt": "756e746f75636865642073796e7468657469632066696c65"
+      },
+      "inside_after": {
+        "new-a.txt": "6f726967696e616c2073796e7468657469632072656e616d656420636f6e74656e740a00ff",
+        "keep.txt": "756e746f75636865642073796e7468657469632066696c65"
+      },
+      "inside_safe": true,
+      "meaning": "Safe rejection or safe ignored extra id accepted; any new/changed outside file fails"
+    },
+    {
+      "id": "EP01",
+      "subprobe": "existing_target",
+      "status": "passed",
+      "posthoc": true,
+      "application_command_exit": 0,
+      "original_plan_id": null,
+      "tampered_id": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M1/EP01-initial/existing_target/outside/receipt-target",
+      "outside_target": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M1/EP01-initial/existing_target/outside/receipt-target.json",
+      "outside_before": {
+        "protected-sentinel.bin": "50f220e7bf044f8cb0a775c05a462e035b4221630c5f75da6e1c70e3f9663683",
+        "receipt-target.json": "50f220e7bf044f8cb0a775c05a462e035b4221630c5f75da6e1c70e3f9663683"
+      },
+      "outside_after": {
+        "protected-sentinel.bin": "50f220e7bf044f8cb0a775c05a462e035b4221630c5f75da6e1c70e3f9663683",
+        "receipt-target.json": "50f220e7bf044f8cb0a775c05a462e035b4221630c5f75da6e1c70e3f9663683"
+      },
+      "outside_unchanged": true,
+      "inside_before": {
+        "old-a.txt": "6f726967696e616c2073796e7468657469632072656e616d656420636f6e74656e740a00ff",
+        "keep.txt": "756e746f75636865642073796e7468657469632066696c65"
+      },
+      "inside_after": {
+        "new-a.txt": "6f726967696e616c2073796e7468657469632072656e616d656420636f6e74656e740a00ff",
+        "keep.txt": "756e746f75636865642073796e7468657469632066696c65"
+      },
+      "inside_safe": true,
+      "meaning": "Safe rejection or safe ignored extra id accepted; any new/changed outside file fails"
+    }
+  ],
+  "application_sha256_before": {
+    "DECISIONS.md": "57496ba1aa8bd1aff286310a71a4f8fe4c9ed6104dcbfffc1d0e07f64f680a48",
+    "README.md": "66c8f1a96251ad5642974cab4ce15a2199e10c5c8a57b1af6a6ff346e3ae02da",
+    "app.py": "dbac5887de058cc2be1e3b772eefe55b4672cc16180b8334edabf81c9f80dc22",
+    "renamer_cli.py": "127540ac5ff1ca240371ece6758a355df47daeb00e4be12054819512cfb93cb9",
+    "renamer_commands.py": "e79e648854ea352f981d3a5a2d748fc7f5ed8f2b8602c053621fd85bb1acecb8",
+    "renamer_errors.py": "aafa9882900e0380eeea58ee52de49d5d3f3a8aa0c55848c2d6873c781612317",
+    "renamer_listing.py": "6ec36df6af250868cf329c76b3a1f38d8e58611f55aba67a388e29a9e92dad8e",
+    "renamer_plans.py": "345ad90b408ebff25908bc7f513078013f089e44765d54525217badf2e010c0c",
+    "renamer_state.py": "ee87a4e04bd410e386d61f75240402935b82434f49d1bad0cbba51c2ef3110e6"
+  },
+  "application_sha256_after": {
+    "DECISIONS.md": "57496ba1aa8bd1aff286310a71a4f8fe4c9ed6104dcbfffc1d0e07f64f680a48",
+    "README.md": "66c8f1a96251ad5642974cab4ce15a2199e10c5c8a57b1af6a6ff346e3ae02da",
+    "app.py": "dbac5887de058cc2be1e3b772eefe55b4672cc16180b8334edabf81c9f80dc22",
+    "renamer_cli.py": "127540ac5ff1ca240371ece6758a355df47daeb00e4be12054819512cfb93cb9",
+    "renamer_commands.py": "e79e648854ea352f981d3a5a2d748fc7f5ed8f2b8602c053621fd85bb1acecb8",
+    "renamer_errors.py": "aafa9882900e0380eeea58ee52de49d5d3f3a8aa0c55848c2d6873c781612317",
+    "renamer_listing.py": "6ec36df6af250868cf329c76b3a1f38d8e58611f55aba67a388e29a9e92dad8e",
+    "renamer_plans.py": "345ad90b408ebff25908bc7f513078013f089e44765d54525217badf2e010c0c",
+    "renamer_state.py": "ee87a4e04bd410e386d61f75240402935b82434f49d1bad0cbba51c2ef3110e6"
+  },
+  "application_unchanged": true,
+  "source_reviewed_operator_assertion": true,
+  "freeze_sha256": "f4b7c2c0c5381a2260e7b43894ac9bff5f0c362ec55cde4bb814d83c1df4375b",
+  "core_scores_changed": false,
+  "all_executed_checks_passed": true
+}

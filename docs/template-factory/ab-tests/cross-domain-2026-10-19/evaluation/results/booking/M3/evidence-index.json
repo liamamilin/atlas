@@ -1,0 +1,23 @@
+{
+  "case": "booking",
+  "label": "M3",
+  "rounds": {
+    "initial": {
+      "directory": "initial-oracle-v3",
+      "oracle_version": 3,
+      "oracle_freeze_file": "freeze-v3.json",
+      "oracle_freeze_sha256": "4f0899dc039d93a7290fafe0ff03aa5ee2fca4cb93e47639f75cfa92347c6152",
+      "result_sha256": "995f5df096c0baeda56a9e21e3d5d5703207484422ef40dc1ee935912aa86afe",
+      "source_audit": "source-audit-initial.json",
+      "application_changed": false
+    }
+  },
+  "preserved_runs": [
+    {
+      "directory": "initial",
+      "oracle_version": 2,
+      "use_for_current_comparison": false,
+      "reason": "K06 module shadow and browser cache lookup tool failures; no app change; original raw evidence retained"
+    }
+  ]
+}

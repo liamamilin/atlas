@@ -1,0 +1,758 @@
+{
+  "date": "2026-10-17",
+  "batches": [
+    "bat_e0bb94d1119548b795197d661d199850",
+    "bat_9b1baf7a92a5489e9e597dd70d9110d2"
+  ],
+  "model": "open-design/deepseek-v4.1-flash",
+  "scope": "场景生成与独立审阅；每叶子 3 个场景，含两条审阅的必要重试。",
+  "source": "OpenCode sanitized local exports, per-assistant message tokens, with final stop messages present. Calendar generation cross-checked with opencode stats. Visible tool counts from all corresponding events.jsonl.",
+  "aggregation": "Sum input + output + reasoning + cache.read + cache.write fields across assistant messages. Includes multi-turn context, cache and retries. Workload measure, not provider invoice.",
+  "limits": [
+    "CLI streaming step_finish events omit final answer round in these runs; raw stream sum undercounts.",
+    "This version session info.tokens differs from per-message stats; aggregation follows per-message stats, matching opencode stats for the checked project.",
+    "Exported cost 0 does not mean free use; provider invoice not retrieved.",
+    "Excludes template discovery, source adaptation and acceptance. Only visible OpenCode tool calls are counted, not unobservable provider-side internal activity."
+  ],
+  "summary": {
+    "leaf_count": 6,
+    "new_scenarios": 18,
+    "model_sessions": 26,
+    "token_field_sum": 451737,
+    "average_per_leaf": 75289.5,
+    "min_per_leaf": 63531,
+    "max_per_leaf": 85125,
+    "average_generation": 15673.666666666666,
+    "average_review": 59615.833333333336,
+    "websearch_calls": 0,
+    "webfetch_calls": 0
+  },
+  "leaves": [
+    {
+      "leaf": "calendar-application",
+      "name_zh": "日历应用",
+      "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+      "scenarios": 3,
+      "phases": {
+        "scenarios": {
+          "calls": 1,
+          "input": 6669,
+          "output": 1185,
+          "reasoning": 1492,
+          "cache_read": 4352,
+          "cache_write": 0,
+          "token_field_sum": 13698,
+          "websearch_calls": 0,
+          "webfetch_calls": 0
+        },
+        "scenario-review": {
+          "calls": 4,
+          "input": 31914,
+          "output": 6590,
+          "reasoning": 4763,
+          "cache_read": 28160,
+          "cache_write": 0,
+          "token_field_sum": 71427,
+          "websearch_calls": 0,
+          "webfetch_calls": 0
+        }
+      },
+      "total_token_field_sum": 85125,
+      "cache_read": 32512,
+      "websearch_calls": 0,
+      "webfetch_calls": 0
+    },
+    {
+      "leaf": "budgeting-application",
+      "name_zh": "预算应用",
+      "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+      "scenarios": 3,
+      "phases": {
+        "scenarios": {
+          "calls": 1,
+          "input": 7818,
+          "output": 1469,
+          "reasoning": 3406,
+          "cache_read": 6144,
+          "cache_write": 0,
+          "token_field_sum": 18837,
+          "websearch_calls": 0,
+          "webfetch_calls": 0
+        },
+        "scenario-review": {
+          "calls": 3,
+          "input": 27319,
+          "output": 5144,
+          "reasoning": 7581,
+          "cache_read": 19840,
+          "cache_write": 0,
+          "token_field_sum": 59884,
+          "websearch_calls": 0,
+          "webfetch_calls": 0
+        }
+      },
+      "total_token_field_sum": 78721,
+      "cache_read": 25984,
+      "websearch_calls": 0,
+      "webfetch_calls": 0
+    },
+    {
+      "leaf": "note-taking-application",
+      "name_zh": "笔记应用",
+      "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+      "scenarios": 3,
+      "phases": {
+        "scenarios": {
+          "calls": 1,
+          "input": 7498,
+          "output": 1185,
+          "reasoning": 3628,
+          "cache_read": 4224,
+          "cache_write": 0,
+          "token_field_sum": 16535,
+          "websearch_calls": 0,
+          "webfetch_calls": 0
+        },
+        "scenario-review": {
+          "calls": 3,
+          "input": 25791,
+          "output": 5110,
+          "reasoning": 5701,
+          "cache_read": 17536,
+          "cache_write": 0,
+          "token_field_sum": 54138,
+          "websearch_calls": 0,
+          "webfetch_calls": 0
+        }
+      },
+      "total_token_field_sum": 70673,
+      "cache_read": 21760,
+      "websearch_calls": 0,
+      "webfetch_calls": 0
+    },
+    {
+      "leaf": "time-tracking-application",
+      "name_zh": "时间跟踪应用",
+      "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+      "scenarios": 3,
+      "phases": {
+        "scenarios": {
+          "calls": 1,
+          "input": 6784,
+          "output": 1151,
+          "reasoning": 3151,
+          "cache_read": 4224,
+          "cache_write": 0,
+          "token_field_sum": 15310,
+          "websearch_calls": 0,
+          "webfetch_calls": 0
+        },
+        "scenario-review": {
+          "calls": 4,
+          "input": 32095,
+          "output": 5243,
+          "reasoning": 7059,
+          "cache_read": 23040,
+          "cache_write": 0,
+          "token_field_sum": 67437,
+          "websearch_calls": 0,
+          "webfetch_calls": 0
+        }
+      },
+      "total_token_field_sum": 82747,
+      "cache_read": 27264,
+      "websearch_calls": 0,
+      "webfetch_calls": 0
+    },
+    {
+      "leaf": "to-do-list-application",
+      "name_zh": "待办事项应用",
+      "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+      "scenarios": 3,
+      "phases": {
+        "scenarios": {
+          "calls": 1,
+          "input": 7134,
+          "output": 1100,
+          "reasoning": 1876,
+          "cache_read": 6016,
+          "cache_write": 0,
+          "token_field_sum": 16126,
+          "websearch_calls": 0,
+          "webfetch_calls": 0
+        },
+        "scenario-review": {
+          "calls": 3,
+          "input": 24209,
+          "output": 3593,
+          "reasoning": 8068,
+          "cache_read": 18944,
+          "cache_write": 0,
+          "token_field_sum": 54814,
+          "websearch_calls": 0,
+          "webfetch_calls": 0
+        }
+      },
+      "total_token_field_sum": 70940,
+      "cache_read": 24960,
+      "websearch_calls": 0,
+      "webfetch_calls": 0
+    },
+    {
+      "leaf": "read-it-later-application",
+      "name_zh": "稍后阅读应用",
+      "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+      "scenarios": 3,
+      "phases": {
+        "scenarios": {
+          "calls": 1,
+          "input": 7100,
+          "output": 1028,
+          "reasoning": 1056,
+          "cache_read": 4352,
+          "cache_write": 0,
+          "token_field_sum": 13536,
+          "websearch_calls": 0,
+          "webfetch_calls": 0
+        },
+        "scenario-review": {
+          "calls": 3,
+          "input": 24864,
+          "output": 4036,
+          "reasoning": 7271,
+          "cache_read": 13824,
+          "cache_write": 0,
+          "token_field_sum": 49995,
+          "websearch_calls": 0,
+          "webfetch_calls": 0
+        }
+      },
+      "total_token_field_sum": 63531,
+      "cache_read": 18176,
+      "websearch_calls": 0,
+      "webfetch_calls": 0
+    }
+  ],
+  "calls": [
+    {
+      "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+      "job_id": "job_587b0b68d4ed44e5b351b38bf5fb6b1d",
+      "attempt": 1,
+      "leaf": "calendar-application",
+      "phase": "scenarios",
+      "assistant_steps": 3,
+      "final_finish": "stop",
+      "input": 6669,
+      "output": 1185,
+      "reasoning": 1492,
+      "cache_read": 4352,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 3
+      },
+      "token_field_sum": 13698
+    },
+    {
+      "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+      "job_id": "job_70465a62dd3f4a5595038422f2004934",
+      "attempt": 1,
+      "leaf": "budgeting-application",
+      "phase": "scenarios",
+      "assistant_steps": 4,
+      "final_finish": "stop",
+      "input": 7818,
+      "output": 1469,
+      "reasoning": 3406,
+      "cache_read": 6144,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 3
+      },
+      "token_field_sum": 18837
+    },
+    {
+      "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+      "job_id": "job_b80d00556a674455be598f4d355824de",
+      "attempt": 1,
+      "leaf": "note-taking-application",
+      "phase": "scenarios",
+      "assistant_steps": 3,
+      "final_finish": "stop",
+      "input": 7498,
+      "output": 1185,
+      "reasoning": 3628,
+      "cache_read": 4224,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 3
+      },
+      "token_field_sum": 16535
+    },
+    {
+      "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+      "job_id": "job_ee166980944c4adf8e2eeacb1a3629ff",
+      "attempt": 1,
+      "leaf": "calendar-application",
+      "phase": "scenario-review",
+      "assistant_steps": 3,
+      "final_finish": "stop",
+      "input": 7854,
+      "output": 1459,
+      "reasoning": 792,
+      "cache_read": 5504,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 2
+      },
+      "token_field_sum": 15609
+    },
+    {
+      "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+      "job_id": "job_ee166980944c4adf8e2eeacb1a3629ff",
+      "attempt": 2,
+      "leaf": "calendar-application",
+      "phase": "scenario-review",
+      "assistant_steps": 4,
+      "final_finish": "stop",
+      "input": 8027,
+      "output": 1964,
+      "reasoning": 580,
+      "cache_read": 7552,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 3
+      },
+      "token_field_sum": 18123
+    },
+    {
+      "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+      "job_id": "job_4056c212d9af4f67a73d1f209038b86a",
+      "attempt": 1,
+      "leaf": "calendar-application",
+      "phase": "scenario-review",
+      "assistant_steps": 4,
+      "final_finish": "stop",
+      "input": 8048,
+      "output": 1777,
+      "reasoning": 1838,
+      "cache_read": 7552,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 3
+      },
+      "token_field_sum": 19215
+    },
+    {
+      "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+      "job_id": "job_071660a7f58b41238cca2f5843f32799",
+      "attempt": 1,
+      "leaf": "calendar-application",
+      "phase": "scenario-review",
+      "assistant_steps": 4,
+      "final_finish": "stop",
+      "input": 7985,
+      "output": 1390,
+      "reasoning": 1553,
+      "cache_read": 7552,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 3
+      },
+      "token_field_sum": 18480
+    },
+    {
+      "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+      "job_id": "job_b9ab62966bf949719e6fdb3f5ac4b9bb",
+      "attempt": 1,
+      "leaf": "budgeting-application",
+      "phase": "scenario-review",
+      "assistant_steps": 3,
+      "final_finish": "stop",
+      "input": 9080,
+      "output": 1952,
+      "reasoning": 1096,
+      "cache_read": 6144,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 3
+      },
+      "token_field_sum": 18272
+    },
+    {
+      "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+      "job_id": "job_2aa7f1e788e24c57b77b2c38a0789f4a",
+      "attempt": 1,
+      "leaf": "budgeting-application",
+      "phase": "scenario-review",
+      "assistant_steps": 4,
+      "final_finish": "stop",
+      "input": 9372,
+      "output": 1714,
+      "reasoning": 2364,
+      "cache_read": 7936,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 3
+      },
+      "token_field_sum": 21386
+    },
+    {
+      "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+      "job_id": "job_684bd549412e4b898cd7ab291d176f96",
+      "attempt": 1,
+      "leaf": "budgeting-application",
+      "phase": "scenario-review",
+      "assistant_steps": 3,
+      "final_finish": "stop",
+      "input": 8867,
+      "output": 1478,
+      "reasoning": 4121,
+      "cache_read": 5760,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 2
+      },
+      "token_field_sum": 20226
+    },
+    {
+      "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+      "job_id": "job_03593458bcc44e6ea6269c2f1ebd0f32",
+      "attempt": 1,
+      "leaf": "note-taking-application",
+      "phase": "scenario-review",
+      "assistant_steps": 4,
+      "final_finish": "stop",
+      "input": 8855,
+      "output": 1684,
+      "reasoning": 1561,
+      "cache_read": 7680,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 3
+      },
+      "token_field_sum": 19780
+    },
+    {
+      "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+      "job_id": "job_6f842c9f36b144158724860d46042a47",
+      "attempt": 1,
+      "leaf": "note-taking-application",
+      "phase": "scenario-review",
+      "assistant_steps": 4,
+      "final_finish": "stop",
+      "input": 8664,
+      "output": 1887,
+      "reasoning": 1949,
+      "cache_read": 7808,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 3
+      },
+      "token_field_sum": 20308
+    },
+    {
+      "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+      "job_id": "job_5d134db6be0e4d51898399ceaa357d22",
+      "attempt": 1,
+      "leaf": "note-taking-application",
+      "phase": "scenario-review",
+      "assistant_steps": 2,
+      "final_finish": "stop",
+      "input": 8272,
+      "output": 1539,
+      "reasoning": 2191,
+      "cache_read": 2048,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 2
+      },
+      "token_field_sum": 14050
+    },
+    {
+      "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+      "job_id": "job_346bc9dff1bf49fe910d8518acc5ad57",
+      "attempt": 1,
+      "leaf": "time-tracking-application",
+      "phase": "scenarios",
+      "assistant_steps": 3,
+      "final_finish": "stop",
+      "input": 6784,
+      "output": 1151,
+      "reasoning": 3151,
+      "cache_read": 4224,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 2
+      },
+      "token_field_sum": 15310
+    },
+    {
+      "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+      "job_id": "job_9480617e31994486ae09c9ecb69bdcc0",
+      "attempt": 1,
+      "leaf": "to-do-list-application",
+      "phase": "scenarios",
+      "assistant_steps": 4,
+      "final_finish": "stop",
+      "input": 7134,
+      "output": 1100,
+      "reasoning": 1876,
+      "cache_read": 6016,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 3
+      },
+      "token_field_sum": 16126
+    },
+    {
+      "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+      "job_id": "job_a284d10ff50a42128c548e4bdbd9ace1",
+      "attempt": 1,
+      "leaf": "read-it-later-application",
+      "phase": "scenarios",
+      "assistant_steps": 3,
+      "final_finish": "stop",
+      "input": 7100,
+      "output": 1028,
+      "reasoning": 1056,
+      "cache_read": 4352,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 2
+      },
+      "token_field_sum": 13536
+    },
+    {
+      "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+      "job_id": "job_f98bd5d46b9842bb8004cc15854d5593",
+      "attempt": 1,
+      "leaf": "to-do-list-application",
+      "phase": "scenario-review",
+      "assistant_steps": 3,
+      "final_finish": "stop",
+      "input": 7896,
+      "output": 1097,
+      "reasoning": 4525,
+      "cache_read": 5632,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 2
+      },
+      "token_field_sum": 19150
+    },
+    {
+      "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+      "job_id": "job_c82fb5d0d6f84727b9ee927572ff1574",
+      "attempt": 1,
+      "leaf": "to-do-list-application",
+      "phase": "scenario-review",
+      "assistant_steps": 3,
+      "final_finish": "stop",
+      "input": 8133,
+      "output": 1269,
+      "reasoning": 1062,
+      "cache_read": 5632,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 3
+      },
+      "token_field_sum": 16096
+    },
+    {
+      "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+      "job_id": "job_cb647f2f96eb4b9492bace9c9aae9de6",
+      "attempt": 1,
+      "leaf": "to-do-list-application",
+      "phase": "scenario-review",
+      "assistant_steps": 4,
+      "final_finish": "stop",
+      "input": 8180,
+      "output": 1227,
+      "reasoning": 2481,
+      "cache_read": 7680,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 3
+      },
+      "token_field_sum": 19568
+    },
+    {
+      "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+      "job_id": "job_e3c5dcf5fdab42eda0a5ff8bf2162eab",
+      "attempt": 1,
+      "leaf": "time-tracking-application",
+      "phase": "scenario-review",
+      "assistant_steps": 3,
+      "final_finish": "stop",
+      "input": 8067,
+      "output": 1271,
+      "reasoning": 1680,
+      "cache_read": 5760,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 2
+      },
+      "token_field_sum": 16778
+    },
+    {
+      "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+      "job_id": "job_e3c5dcf5fdab42eda0a5ff8bf2162eab",
+      "attempt": 2,
+      "leaf": "time-tracking-application",
+      "phase": "scenario-review",
+      "assistant_steps": 3,
+      "final_finish": "stop",
+      "input": 8057,
+      "output": 1465,
+      "reasoning": 2069,
+      "cache_read": 5760,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 2
+      },
+      "token_field_sum": 17351
+    },
+    {
+      "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+      "job_id": "job_2a502fe529f64ece8ad76b0781c296bd",
+      "attempt": 1,
+      "leaf": "time-tracking-application",
+      "phase": "scenario-review",
+      "assistant_steps": 3,
+      "final_finish": "stop",
+      "input": 8004,
+      "output": 1295,
+      "reasoning": 2406,
+      "cache_read": 5760,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 2
+      },
+      "token_field_sum": 17465
+    },
+    {
+      "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+      "job_id": "job_984a56f5625040bc924c073556663478",
+      "attempt": 1,
+      "leaf": "time-tracking-application",
+      "phase": "scenario-review",
+      "assistant_steps": 3,
+      "final_finish": "stop",
+      "input": 7967,
+      "output": 1212,
+      "reasoning": 904,
+      "cache_read": 5760,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 2
+      },
+      "token_field_sum": 15843
+    },
+    {
+      "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+      "job_id": "job_e3df4e8ce55e443e9c01dc43ab84ede7",
+      "attempt": 1,
+      "leaf": "read-it-later-application",
+      "phase": "scenario-review",
+      "assistant_steps": 2,
+      "final_finish": "stop",
+      "input": 8249,
+      "output": 1260,
+      "reasoning": 2089,
+      "cache_read": 2048,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 2
+      },
+      "token_field_sum": 13646
+    },
+    {
+      "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+      "job_id": "job_6123c5e71a8544b5b7e4a03ab15a64e6",
+      "attempt": 1,
+      "leaf": "read-it-later-application",
+      "phase": "scenario-review",
+      "assistant_steps": 3,
+      "final_finish": "stop",
+      "input": 8331,
+      "output": 1370,
+      "reasoning": 3081,
+      "cache_read": 6016,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 3
+      },
+      "token_field_sum": 18798
+    },
+    {
+      "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+      "job_id": "job_c4785bd0ee364c2aa9054dd50ce96d2e",
+      "attempt": 1,
+      "leaf": "read-it-later-application",
+      "phase": "scenario-review",
+      "assistant_steps": 3,
+      "final_finish": "stop",
+      "input": 8284,
+      "output": 1406,
+      "reasoning": 2101,
+      "cache_read": 5760,
+      "cache_write": 0,
+      "websearch_calls": 0,
+      "webfetch_calls": 0,
+      "tools": {
+        "read": 2
+      },
+      "token_field_sum": 17551
+    }
+  ]
+}

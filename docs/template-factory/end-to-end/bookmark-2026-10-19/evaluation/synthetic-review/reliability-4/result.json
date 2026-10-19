@@ -1,0 +1,17 @@
+{
+  "kind": "synthetic-runner-reliability",
+  "docker_cli_sent": false,
+  "product_started": false,
+  "tests": 7,
+  "result": "passed",
+  "checks": [
+    "bounded Docker timeout classification",
+    "cleanup continues and records failed removal",
+    "initial journal precedes owned-resource creation",
+    "cleanup interruption preserves the original primary failure",
+    "cleanup journaling interruption does not skip later cleanup",
+    "post-hoc HTML parser distinguishes exact collection/bookmark class tokens across nested lists",
+    "successful business result becomes failed/interrupted when final cleanup journaling raises OSError/KeyboardInterrupt, and status matches exit code"
+  ],
+  "evidence": "unittest-output.txt"
+}

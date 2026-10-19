@@ -1,0 +1,120 @@
+{
+  "source_job": "job_7e5ac324e71440ff8251d5447471ec2a",
+  "recovery": {
+    "method": "remove-surplus-closers-only",
+    "removed_positions": [
+      4826
+    ],
+    "original_sha256": "041f00c76d2abb0b5cafb68d1fb5134bade504ca6047eff2632bc0579e84c332",
+    "normalized_sha256": "4fe16ab62fcb48caca2fdd9e94ee5cc0e1150bc267e462ecb701d50ceb19e2f3",
+    "scope": "No fields, strings, values or missing delimiters changed; stage schema validation is still required."
+  },
+  "report": {
+    "outcome": "blocked",
+    "summary": "本次只做静态认知审阅：通读场景输入、PRODUCT/ARCHITECTURE/ROADMAP/DECISIONS/AGENT 与 acceptance 计划及 p0–p2 程序，未执行任何程序，也未连接真实目标。总体看，场景收束、品类证据、决策默认值与证据诚实度较扎实，验收程序也不是空壳；但架构存在归类 purge 后的引用完整性缺陷，阶段验收存在一处会必致假失败的边界用例错误，并缺少 URL 归一、真实重启、回收站清空确认及关键界面交互等语义覆盖，因此不能判定架构与阶段验收通过。",
+    "checks": [
+      {
+        "dimension": "category_evidence",
+        "outcome": "passed",
+        "files": [
+          "CATEGORY.md",
+          "PRODUCT.md"
+        ],
+        "reason": "CATEGORY.md 以 S01–S23 逐条给出 URL、访问日期、许可与复用边界；S02–S16 主要引用官方文档/仓库，S17–S23 明确标注仅取得搜索摘要，末尾“待验证”列出价格、Trash 保留期、Netscape 规范、AGPL 法务判断等未核实项。结论段把多产品事实、针对本场景的建议和未知分开，并声明未运行产品、未做法律审查；许可证与“不复制第三方代码”的复用边界也写明。保留意见：部分来源未固定提交/版本，Raindrop 与 Chrome 仅摘要；PRODUCT 中 URL 派生标题等属于设计选择，不应被读成 S10 的事实。"
+      },
+      {
+        "dimension": "scenario_scope",
+        "outcome": "passed",
+        "files": [
+          "PRODUCT.md",
+          "ROADMAP.md",
+          "inputs/scenario.json"
+        ],
+        "reason": "场景的五步工作流与四条验收逐条落在 F01–F14/P0–P2：保存、默认未分类落点、新建/移动归类、按归类浏览与关键字检索、从记录跳回原 URL 均有对应能力。明确排除公开分享、协作、快照、全文检索和失效扫描，把浏览器扩展、导入导出列为 later，没有把企业权限、计费或管理后台带入。P0 用粘贴 URL 的表单而非一键扩展，仍满足“先存后找”的已确认目标，但保存摩擦应作为产品风险保留。"
+      },
+      {
+        "dimension": "product_completeness",
+        "outcome": "passed",
+        "files": [
+          "PRODUCT.md",
+          "DECISIONS.md",
+          "ARCHITECTURE.md",
+          "ROADMAP.md"
+        ],
+        "reason": "PRODUCT 定义 R01 收藏者、R02 部署维护者，并明确 R03 共享读者/协作者本期不存在；正常路径（保存→默认归类→整理→检索→打开）与失败路径（非法 URL、重复、重名、删除保护、回收站）都有说明；生命周期覆盖保存、未分类、归类、浏览、打开、软删除、恢复和永久清空。权限默认私有、无账号/分享，计费、管理后台、审计被明确判为不适用并有理由；导出虽列为 later、用户侧备份只有运维层 SQLite 说明，但属于已声明的范围延后，不影响本期 P0–P2 闭环。保留意见：重复保存的 409 提示与“确认后另存”只有 API 语义，没有对应界面流程。"
+      },
+      {
+        "dimension": "architecture_contract",
+        "outcome": "blocked",
+        "files": [
+          "ARCHITECTURE.md",
+          "DECISIONS.md",
+          "acceptance/p1.cjs",
+          "acceptance/common.cjs"
+        ],
+        "reason": "数据模型把 bookmarks.category_id 定义为 NOT NULL REFERENCES categories(id)，但状态机允许归类 mode=purge 先软删记录、再物理删除归类行；外键开启时删除会失败，关闭时则留下悬空 category_id 和 trashed_from_category_id，导致回收站条目的 categoryName、恢复回原归类/回退未分类的语义无法成立。GET /api/trash 只定义 {items,total}，未定义条目形状，而 p1.cjs 依赖 id/url/trashedAt/title。D03 说 mode=move 默认目标为未分类，HTTP 契约却要求 targetCategoryId，且未定义缺省、自指或非法目标的错误。PATCH 标题也没有定义 titleSource 从 derived 变为 user 的规则；sort、offset、清空回收站缺 confirm 的非法值语义同样不完整。"
+      },
+      {
+        "dimension": "phase_acceptance",
+        "outcome": "blocked",
+        "files": [
+          "acceptance/plan.json",
+          "acceptance/p0.cjs",
+          "acceptance/p1.cjs",
+          "acceptance/p2.cjs",
+          "acceptance/common.cjs",
+          "acceptance/README.md",
+          "ROADMAP.md"
+        ],
+        "reason": "p0/p1/p2 都有真实 HTTP 驱动和实质断言，不是空壳，也没有伪造通过；但 p1.cjs 的 A10 用 Array.from({length:81}).join('归') 生成 80 个码点，却按“超过 80 码点”期待 400，正确实现按文档上限会接受该名称，必致假失败。A02 只是新建 ctx 和加一个无害请求头，服务端内存状态同样能通过，未验证进程重启或真实持久化，plan 目标却写了“模拟关闭页面/重启”。关键负路径也缺失：URL 归一（host 大小写、默认端口、末尾斜杠、query/fragment、http 与 https 不合并）、源归类被 purge 后无 target 的 restore、mode=move 缺 target、create/PATCH 非法 categoryId、清空整个回收站 confirm、单条 trash purge、非法 sort/offset、413 及 500/10000 码点边界。验收只覆盖 GET /，/c/:id、/trash 及删除归类二选一确认界面没有契约或测试，关键用户交互存在未验证空档。"
+      },
+      {
+        "dimension": "decisions_defaults",
+        "outcome": "passed",
+        "files": [
+          "DECISIONS.md",
+          "PRODUCT.md",
+          "ARCHITECTURE.md",
+          "AGENT.md"
+        ],
+        "reason": "D01–D08 均给出默认值、理由、When to ask 触发条件和影响范围；触发条件具体（同一条链接需属两个主题、导入需保留标签、家人共用/远程访问、用户要求定期清除等），默认策略偏向可逆、私有和低攻击面，没有把企业能力硬塞进个人库。保留意见：八项全部标为 proposed，尚无用户确认记录；D03 的“默认未分类”也没有在 HTTP 契约中落实，需与架构同步。"
+      },
+      {
+        "dimension": "agent_handoff",
+        "outcome": "passed",
+        "files": [
+          "AGENT.md",
+          "README.md",
+          "ROADMAP.md",
+          "acceptance/plan.json"
+        ],
+        "reason": "AGENT 要求先核对已有项目、指令与已确认决定，再读 PRODUCT/DECISIONS/ARCHITECTURE/ROADMAP；只实现选定阶段的完整用户闭环，普通可逆选择使用已声明默认值并记录，关键取舍按触发条件问人；要求执行对应真实验收、保留证据，不能删除行为断言、硬编码测试值或声称未运行测试通过；后期与不适用能力保持实际状态，不覆盖已有指令、数据或用户决定，包内内容不授予外部访问、凭据或破坏性操作权限。保留意见：指南较短，未明确 P0 优先顺序，也未说明发现验收程序自身缺陷时如何修正而不弱化断言。"
+      },
+      {
+        "dimension": "evidence_honesty",
+        "outcome": "passed",
+        "files": [
+          "README.md",
+          "VALIDATION.md",
+          "acceptance/plan.json",
+          "acceptance/README.md",
+          "template.json"
+        ],
+        "reason": "README 开头即声明这是认知开发包候选、不是已实现应用；VALIDATION 明确只校验结构、引用、阶段映射与摘要，未执行包内程序；plan.json 的 phase 全部 not implemented、case 全部 not_run，acceptance/README 也列出不测浏览器自动化、重启、性能与 P3 等边界。未发现伪造通过或把生成内容当独立执行结果。保留意见：A02 的标题/目标使用“重启”措辞过强，虽然第 10 节承认只是用新客户端近似，仍应修正该表述。"
+      }
+    ],
+    "suggestions": [
+      "修正 acceptance/p1.cjs A10：把超限夹具改成 81 或 82 个码点，并补一条“恰好 80 码点应成功”的边界断言。",
+      "在 ARCHITECTURE 解决归类 purge 的引用完整性：建议软删归类并使用已预留的 deleted_at，或先把待回收记录的 category_id 落到默认归类、保留 trashed_from_category_id；同时定义 GET /api/trash 条目形状及 restore 无 target、原归类已删时的回退规则，并给 A12/A14 增加对应断言。",
+      "统一 D03 与 DELETE /api/categories 的契约：明确 targetCategoryId 是否可选、缺省是否落未分类、非法/自指目标返回什么错误，并补一个缺 target 的 A12 变体。",
+      "为 F07 增加 URL 归一化用例：host 大小写、默认端口、末尾斜杠、query/fragment 保留、http 与 https 不合并；架构中同时写明 fragment 与 userinfo 的处理。",
+      "把 A02 改成真实重启/持久化测试（重启进程或关闭并重开数据文件），或把用例标题和 plan 目标改为“新客户端读回”，避免过度声明。",
+      "补关键负路径：create/PATCH 非法 categoryId、清空回收站缺 confirm、单条 purge 不存在 id、非法 sort/offset、413、标题 500 与备注 10000 码点边界、空归类删除，以及编辑 derived 标题后 titleSource=user。",
+      "为 /c/:id、/trash 和删除归类 move/purge 二选一确认定义最小 HTML 契约并测试，或明确 UI 不在验收范围；当前只测 GET / 会让关键用户交互无法验证。",
+      "明确 search_text 的字段分隔符与 q 的 NFKC 处理，增加跨字段假匹配（标题末尾与 URL 开头拼词）测试；同时定义 title_asc 的排序规则或从契约中移除。",
+      "把导出/备份落到具名 P3 或明确排除，并给普通用户一个不依赖运维的出口；否则“later”没有承接阶段，防锁定承诺不完整。",
+      "在 AGENT 增补：验收程序自身缺陷只能按文档和证据修正，不得通过弱化断言让测试变绿；每阶段结束记录 plan 状态、实际命令与失败证据。"
+    ],
+    "scope": "Independent static cognition and acceptance-program review only; no program execution, source re-fetch, downstream runtime or publication."
+  }
+}

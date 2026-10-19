@@ -1,0 +1,3747 @@
+{
+  "date": "2026-10-16",
+  "status": "completed-L1-candidate-unpublished",
+  "authorization": {
+    "scenario_confirmed": true,
+    "provider": "open-design/deepseek-v4.1-flash",
+    "scope": [
+      "bookmark leaf and approved scenario",
+      "LakhindarPal/bookmark-manager public source",
+      "template generation and necessary repair evidence",
+      "independent Harness source review"
+    ],
+    "automatic_publication": false
+  },
+  "production_batch_id": "bat_bd64cd896c9d4cda869968efd3611a5d",
+  "production_job_id": "job_ae0f901f19824afcb8b53e9724f8ee6f",
+  "scenario": {
+    "acceptance": [
+      "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+      "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+      "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+      "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+    ],
+    "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+    "id": "scn_7756e0007f6a463a97316f3f49c15248",
+    "leaf": "bookmark-manager",
+    "leaf_name": "书签管理器",
+    "name": "生活待购与灵感收藏夹",
+    "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+    "revision": 2,
+    "status": "ready",
+    "updated_at": "2026-10-16T14:18:20.407897+00:00",
+    "workflow": [
+      "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+      "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+      "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+      "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+      "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+    ]
+  },
+  "source_url": "https://github.com/LakhindarPal/bookmark-manager",
+  "expected_source_commit": "539881bc67099d491e8ab6f85de0f443fa7de623",
+  "artifact": {
+    "archive_path": "jobs/job_ae0f901f19824afcb8b53e9724f8ee6f/attempt-1/template.zip",
+    "archive_sha256": "661cfb8ca32568e79cc2bea3c12918a5935a217e9ad8213fba568195d87c5454",
+    "bundle_path": "jobs/job_ae0f901f19824afcb8b53e9724f8ee6f/attempt-1/bundle",
+    "cli": {
+      "available": true,
+      "backend": "opencode-cli",
+      "models": [],
+      "version": "opencode v2.0.30"
+    },
+    "created_at": "2026-10-16T14:29:24.857301+00:00",
+    "digest": "0dd1bd54ae1adb64be2d9b38b17ccd9a4dc6d7966f54179349291ddf2b0c2f69",
+    "formal_checks": [
+      {
+        "passed": true,
+        "project_name": "atlas-example",
+        "scope": "structure and deterministic rendering only; application not executed"
+      },
+      {
+        "passed": true,
+        "project_name": "renamed-example",
+        "scope": "structure and deterministic rendering only; application not executed"
+      }
+    ],
+    "job_id": "job_ae0f901f19824afcb8b53e9724f8ee6f",
+    "leaf": "bookmark-manager",
+    "manifest": {
+      "description": "A local-first personal link library for the \"life wishlist & inspiration\" scenario: deliberately saved web references anchored by URL, filed under user-controlled categories, persisted in the browser (IndexedDB/Dexie) and found again later by browsing or title search.",
+      "name": "Bookmark Manager — Save Now, Find Later",
+      "parameters": {
+        "project_name": {
+          "default": "atlas-example",
+          "pattern": "^[a-z][a-z0-9-]{0,62}$",
+          "type": "string"
+        }
+      },
+      "render_files": [
+        "README.md",
+        "index.html",
+        "package.json",
+        "src/App.tsrx"
+      ],
+      "schema": 1
+    },
+    "plan": {
+      "build": [
+        [
+          "npm",
+          "run",
+          "build"
+        ]
+      ],
+      "checks": [
+        {
+          "action": "http",
+          "contains": "id=\"root\"",
+          "criterion": 0,
+          "path": "/"
+        },
+        {
+          "action": "goto",
+          "criterion": 0,
+          "path": "/"
+        },
+        {
+          "action": "expect_text",
+          "contains": "Add Bookmark",
+          "criterion": 0
+        },
+        {
+          "action": "click",
+          "criterion": 0,
+          "selector": "header button.btn-primary"
+        },
+        {
+          "action": "fill",
+          "criterion": 0,
+          "selector": "input[type=\"url\"]",
+          "value": "https://shop.example.com/kitchen-gadget"
+        },
+        {
+          "action": "fill",
+          "criterion": 0,
+          "selector": "input[type=\"text\"][maxlength=\"100\"]",
+          "value": "Kitchen Gadget"
+        },
+        {
+          "action": "fill",
+          "criterion": 0,
+          "selector": "textarea",
+          "value": "A kitchen gadget saved for later purchase."
+        },
+        {
+          "action": "fill",
+          "criterion": 0,
+          "selector": "input[type=\"text\"]:not([maxlength])",
+          "value": "wishlist,"
+        },
+        {
+          "action": "click",
+          "criterion": 0,
+          "selector": "button[type=\"submit\"]"
+        },
+        {
+          "action": "expect_text",
+          "contains": "Kitchen Gadget",
+          "criterion": 0
+        },
+        {
+          "action": "click",
+          "criterion": 0,
+          "selector": "header button.btn-primary"
+        },
+        {
+          "action": "fill",
+          "criterion": 0,
+          "selector": "input[type=\"url\"]",
+          "value": "https://blog.example.org/desk-lamp"
+        },
+        {
+          "action": "fill",
+          "criterion": 0,
+          "selector": "input[type=\"text\"][maxlength=\"100\"]",
+          "value": "Desk Lamp"
+        },
+        {
+          "action": "fill",
+          "criterion": 0,
+          "selector": "textarea",
+          "value": "A lamp idea saved for inspiration."
+        },
+        {
+          "action": "fill",
+          "criterion": 0,
+          "selector": "input[type=\"text\"]:not([maxlength])",
+          "value": "inspiration,"
+        },
+        {
+          "action": "click",
+          "criterion": 0,
+          "selector": "button[type=\"submit\"]"
+        },
+        {
+          "action": "expect_text",
+          "contains": "Desk Lamp",
+          "criterion": 0
+        },
+        {
+          "action": "reload",
+          "criterion": 0
+        },
+        {
+          "action": "expect_text",
+          "contains": "Kitchen Gadget",
+          "criterion": 0
+        },
+        {
+          "action": "expect_text",
+          "contains": "Desk Lamp",
+          "criterion": 0
+        },
+        {
+          "action": "expect_text",
+          "contains": "shop.example.com",
+          "criterion": 1
+        },
+        {
+          "action": "expect_text",
+          "contains": "wishlist",
+          "criterion": 2
+        },
+        {
+          "action": "click",
+          "criterion": 2,
+          "selector": "input[type=\"checkbox\"][value^=\"wishlist\"]"
+        },
+        {
+          "action": "expect_text",
+          "contains": "Kitchen Gadget",
+          "criterion": 2
+        },
+        {
+          "action": "reload",
+          "criterion": 2
+        },
+        {
+          "action": "click",
+          "criterion": 2,
+          "selector": "input[type=\"checkbox\"][value^=\"wishlist\"]"
+        },
+        {
+          "action": "expect_text",
+          "contains": "Kitchen Gadget",
+          "criterion": 2
+        },
+        {
+          "action": "reload",
+          "criterion": 3
+        },
+        {
+          "action": "fill",
+          "criterion": 3,
+          "selector": "input[type=\"search\"]",
+          "value": "Kitchen"
+        },
+        {
+          "action": "expect_text",
+          "contains": "Kitchen Gadget",
+          "criterion": 3
+        }
+      ],
+      "install": [
+        [
+          "npm",
+          "install"
+        ]
+      ],
+      "parameter_checks": [
+        "atlas-example",
+        "renamed-example"
+      ],
+      "port": 8080,
+      "profile": "static-web",
+      "review_note": "AI-proposed plan; independent execution is technical evidence, not human product approval.",
+      "start": [
+        "python3",
+        "-m",
+        "http.server",
+        "8080",
+        "--bind",
+        "0.0.0.0",
+        "--directory",
+        "dist"
+      ],
+      "tests": []
+    },
+    "provenance": {
+      "archive_sha256": "8d7d5423093436727aa1dbb47ce8dc1bae715de309ac22bc65e650913f91af39",
+      "change_summary": "Adapted the pinned Bookmark Manager source into a reusable, scenario-fit template (save now, find later). Fixed the category/ tag entry so that comma- or line-separated values typed into the save dialog are committed as chips on input (and re-read from the DOM at submit), which the fixed acceptance plan's `fill`-then-submit flow requires; a link with no category now falls back to the configurable default instead of failing validation. Removed the third-party network calls (microlink metadata, weserv/google favicons) so saving is fully offline and does not store external blobs; records now render a local letter avatar, keeping the end-to-end flow (add, persist, categorise, browse, search, visit/edit/archive/delete) intact. Made the tag input stop shadowing the reactive tag binding, disambiguated the submit button (backdrop close is now type=button), and always showed the header 'Add Bookmark' text. Added src/includes/config.ts with configurable default category, suggested categories and opt-in example data (seeded only when enabled), and tokenised the app name via @@PROJECT_NAME@@ across README.md, index.html, package.json and src/App.tsrx. Pinned the previously 'latest' Ripple/TSRX dependencies to the versions already present in bun.lock for reproducible npm installs. LICENSE was left byte-for-byte unchanged and upstream attribution (author, repository, MIT notice, Frontend Mentor acknowledgement) is preserved.",
+      "commit": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "excluded_paths": [],
+      "leaf": "bookmark-manager",
+      "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+      "license": "MIT",
+      "model": "open-design/deepseek-v4.1-flash",
+      "notice_hashes": {
+        "LICENSE": "17e5ccdd3ca04fa001985e8b3370d70d357f858d491b5691a461fd5985834a44"
+      },
+      "repository": "https://github.com/LakhindarPal/bookmark-manager",
+      "scenario": {
+        "acceptance": [
+          "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+          "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+          "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+          "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+        ],
+        "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+        "id": "scn_7756e0007f6a463a97316f3f49c15248",
+        "leaf": "bookmark-manager",
+        "leaf_name": "书签管理器",
+        "name": "生活待购与灵感收藏夹",
+        "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+        "revision": 2,
+        "status": "ready",
+        "updated_at": "2026-10-16T14:18:20.407897+00:00",
+        "workflow": [
+          "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+          "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+          "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+          "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+          "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+        ]
+      }
+    },
+    "reports": [],
+    "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+    "scenario_name": "生活待购与灵感收藏夹",
+    "scenario_revision": 2,
+    "supersedes": null,
+    "id": "tpl_9d83da5e43fa4c7380a0331c3e47d7bc",
+    "level": "L0",
+    "state": "draft",
+    "acceptances": [
+      {
+        "artifact_id": "tpl_9d83da5e43fa4c7380a0331c3e47d7bc",
+        "code": "cli_failed",
+        "created_at": "2026-10-16T14:44:24.181886+00:00",
+        "digest": "0dd1bd54ae1adb64be2d9b38b17ccd9a4dc6d7966f54179349291ddf2b0c2f69",
+        "error": "OpenCode CLI failed: {'type': 'provider.transport', 'message': 'Connection lost while reading the response: ECONNRESET: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()', 'status': 200}; {'type': 'provider.transport', 'message': 'Connection lost while reading the response: ECONNRESET: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()', 'status': 200}",
+        "id": "acc_864e7208506a46a19dd9ae585d839af9",
+        "job_id": "job_65ab277bf729458a8e70247938453ada",
+        "method": "harness-review",
+        "outcome": "unavailable",
+        "scope": "Acceptance did not complete; no successful review or runtime claim"
+      },
+      {
+        "artifact_id": "tpl_9d83da5e43fa4c7380a0331c3e47d7bc",
+        "created_at": "2026-10-16T14:29:47.219937+00:00",
+        "digest": "0dd1bd54ae1adb64be2d9b38b17ccd9a4dc6d7966f54179349291ddf2b0c2f69",
+        "id": "acc_e727ac5c157647d3954b4a3be5cb9b66",
+        "job_id": "job_b24fcd8b729b43f6be1d8ad3b2ff45b9",
+        "method": "runtime-verification",
+        "outcome": "blocked",
+        "reports": [
+          {
+            "baseline": false,
+            "environment": {
+              "engine": "docker",
+              "image": "python:3.12-slim",
+              "image_id": "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9",
+              "platform": "Linux container"
+            },
+            "passed": false,
+            "project_name": "atlas-example",
+            "steps": [
+              {
+                "argv": [
+                  "exec",
+                  "atlas-factory-6f6b9a1df76642758b1562b4e5311512",
+                  "npm",
+                  "install"
+                ],
+                "exit_code": 127,
+                "output": "OCI runtime exec failed: exec failed: unable to start container process: exec: \"npm\": executable file not found in $PATH: unknown\r\n",
+                "passed": false,
+                "phase": "install"
+              }
+            ]
+          }
+        ],
+        "scope": "Independent Linux container installation, build and scenario assertions for two rendered project names"
+      }
+    ],
+    "acceptance_jobs": [
+      {
+        "id": "job_b24fcd8b729b43f6be1d8ad3b2ff45b9",
+        "kind": "runtime-verification",
+        "state": "needs_review",
+        "stage": "acceptance",
+        "updated_at": "2026-10-16T14:29:47.220546+00:00"
+      },
+      {
+        "id": "job_65ab277bf729458a8e70247938453ada",
+        "kind": "harness-review",
+        "state": "needs_review",
+        "stage": "acceptance",
+        "updated_at": "2026-10-16T14:44:24.182073+00:00"
+      }
+    ]
+  },
+  "acceptances": [
+    {
+      "artifact_id": "tpl_9d83da5e43fa4c7380a0331c3e47d7bc",
+      "code": "cli_failed",
+      "created_at": "2026-10-16T14:44:24.181886+00:00",
+      "digest": "0dd1bd54ae1adb64be2d9b38b17ccd9a4dc6d7966f54179349291ddf2b0c2f69",
+      "error": "OpenCode CLI failed: {'type': 'provider.transport', 'message': 'Connection lost while reading the response: ECONNRESET: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()', 'status': 200}; {'type': 'provider.transport', 'message': 'Connection lost while reading the response: ECONNRESET: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()', 'status': 200}",
+      "id": "acc_864e7208506a46a19dd9ae585d839af9",
+      "job_id": "job_65ab277bf729458a8e70247938453ada",
+      "method": "harness-review",
+      "outcome": "unavailable",
+      "scope": "Acceptance did not complete; no successful review or runtime claim"
+    },
+    {
+      "artifact_id": "tpl_9d83da5e43fa4c7380a0331c3e47d7bc",
+      "created_at": "2026-10-16T14:29:47.219937+00:00",
+      "digest": "0dd1bd54ae1adb64be2d9b38b17ccd9a4dc6d7966f54179349291ddf2b0c2f69",
+      "id": "acc_e727ac5c157647d3954b4a3be5cb9b66",
+      "job_id": "job_b24fcd8b729b43f6be1d8ad3b2ff45b9",
+      "method": "runtime-verification",
+      "outcome": "blocked",
+      "reports": [
+        {
+          "baseline": false,
+          "environment": {
+            "engine": "docker",
+            "image": "python:3.12-slim",
+            "image_id": "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9",
+            "platform": "Linux container"
+          },
+          "passed": false,
+          "project_name": "atlas-example",
+          "steps": [
+            {
+              "argv": [
+                "exec",
+                "atlas-factory-6f6b9a1df76642758b1562b4e5311512",
+                "npm",
+                "install"
+              ],
+              "exit_code": 127,
+              "output": "OCI runtime exec failed: exec failed: unable to start container process: exec: \"npm\": executable file not found in $PATH: unknown\r\n",
+              "passed": false,
+              "phase": "install"
+            }
+          ]
+        }
+      ],
+      "scope": "Independent Linux container installation, build and scenario assertions for two rendered project names"
+    }
+  ],
+  "limitations": [
+    "Runtime was verified on the recorded Linux Node container image and current resolved dependencies; other platforms are not certified.",
+    "Navigation target was asserted with external responses blocked; external site availability was not tested.",
+    "Closing and reopening a browser tab was tested; a full operating-system/browser-process restart was not tested.",
+    "Provider billing was not available; failed and cancelled attempts remain in the evidence.",
+    "L1 candidate is unpublished; no L2/L3 or publication was granted."
+  ],
+  "observations": [
+    {
+      "stage": "plan",
+      "issue": "static-web selects python:3.12-slim but asks to run npm install and npm run build; runtime compatibility is not established."
+    },
+    {
+      "stage": "plan",
+      "issue": "Criterion 1 uses hostname text as the assertion; this does not prove opening the original URL. Criterion 2 checks existing tags and filtering, not editing categories. Treat runtime scope as limited even if all declared steps pass."
+    }
+  ],
+  "review_batch_id": "bat_064c63b818d8433f98b7b00fe6715127",
+  "review_job_id": "job_65ab277bf729458a8e70247938453ada",
+  "runtime_batch_id": "bat_6c71fafc944f4e92ba4e502d9bcb09a1",
+  "runtime_job_id": "job_b24fcd8b729b43f6be1d8ad3b2ff45b9",
+  "repairs": [
+    {
+      "artifact_id": "tpl_9d83da5e43fa4c7380a0331c3e47d7bc",
+      "note": "Proven blocker: official runtime acceptance failed exit 127 because profile static-web uses python:3.12-slim, which has no npm. Produce a revision with a compatible node-web plan: npm install, npm run build, start npm run serve -- --host 0.0.0.0 --port 8080 (no Python in the Node image). Preserve the approved scenario and actual functionality. A separate Node-only diagnostic reached registry.npmjs.org successfully but npm install exceeded 300 seconds before any build; this is a timeout, not proof of a source defect. Inspect package.json and remove unused editor/language-server/lint/format dependencies and scripts if unnecessary for the generated app; retain all dependencies needed to build and run. Add explicit Node >=22 requirements to README. Avoid unnecessary source rewrites: use an empty/minimal file overlay if existing behavior is correct. Preserve LICENSE exactly and the four render files README.md, index.html, package.json, src/App.tsrx. The original checks only show hostname for URL criterion and filter existing tags for category changes; do not claim these prove opening links or refiling. Retain meaningful persistence/search checks, and improve browser checks for editing category if supported. Do not replace behavior checks with README/source-text assertions or weaken scenario criteria. This is a new frozen candidate, not a publication.",
+      "batch_id": "bat_0bb0ce537a744709a154db3706ca7bb5",
+      "job_id": "job_60174f48ba0340b380c268f33b0432e4",
+      "artifact": {
+        "archive_path": "jobs/job_60174f48ba0340b380c268f33b0432e4/attempt-1/template.zip",
+        "archive_sha256": "c322ecacd42fdb3edd59f16b0eb093b34e3fc6a21e208fcc48957f0b2f1d30d4",
+        "bundle_path": "jobs/job_60174f48ba0340b380c268f33b0432e4/attempt-1/bundle",
+        "cli": {
+          "available": true,
+          "backend": "opencode-cli",
+          "models": [],
+          "version": "opencode v2.0.30"
+        },
+        "created_at": "2026-10-16T14:43:49.575694+00:00",
+        "digest": "6dbb57deaf19d9786528011d2128313e4cc363a3a9414c1f1e142678fdbc13dc",
+        "formal_checks": [
+          {
+            "passed": true,
+            "project_name": "atlas-example",
+            "scope": "structure and deterministic rendering only; application not executed"
+          },
+          {
+            "passed": true,
+            "project_name": "renamed-example",
+            "scope": "structure and deterministic rendering only; application not executed"
+          }
+        ],
+        "job_id": "job_60174f48ba0340b380c268f33b0432e4",
+        "leaf": "bookmark-manager",
+        "manifest": {
+          "description": "A local-first personal bookmark library: deliberately save web links, organise them into user-controlled categories, and browse or search to find and revisit them later. Persists in the browser via IndexedDB and builds/serves with a Node-based Vite toolchain.",
+          "name": "bookmark-manager",
+          "parameters": {
+            "project_name": {
+              "default": "atlas-example",
+              "pattern": "^[a-z][a-z0-9-]{0,62}$",
+              "type": "string"
+            }
+          },
+          "render_files": [
+            "README.md",
+            "index.html",
+            "package.json",
+            "src/App.tsrx"
+          ],
+          "schema": 1
+        },
+        "plan": {
+          "build": [
+            [
+              "npm",
+              "run",
+              "build"
+            ]
+          ],
+          "checks": [
+            {
+              "action": "http",
+              "contains": "You need to enable JavaScript to run this app.",
+              "criterion": 0,
+              "path": "/"
+            },
+            {
+              "action": "goto",
+              "criterion": 0,
+              "path": "/"
+            },
+            {
+              "action": "expect_text",
+              "contains": "All bookmarks",
+              "criterion": 0
+            },
+            {
+              "action": "click",
+              "criterion": 0,
+              "selector": "header button.btn-primary"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "input[type=\"url\"]",
+              "value": "https://shop.example.com/kitchen-gadget"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "input[placeholder=\"Website Title Here\"]",
+              "value": "Kitchen Gadget"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "textarea",
+              "value": "A kitchen gadget saved for later purchase."
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "#bookmark-categories-input",
+              "value": "wishlist"
+            },
+            {
+              "action": "click",
+              "criterion": 0,
+              "selector": "button[type=\"submit\"]"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Kitchen Gadget",
+              "criterion": 0
+            },
+            {
+              "action": "click",
+              "criterion": 0,
+              "selector": "header button.btn-primary"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "input[type=\"url\"]",
+              "value": "https://blog.example.org/desk-lamp"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "input[placeholder=\"Website Title Here\"]",
+              "value": "Desk Lamp"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "textarea",
+              "value": "A lamp idea saved for inspiration."
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "#bookmark-categories-input",
+              "value": "inspiration"
+            },
+            {
+              "action": "click",
+              "criterion": 0,
+              "selector": "button[type=\"submit\"]"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Desk Lamp",
+              "criterion": 0
+            },
+            {
+              "action": "reload",
+              "criterion": 0
+            },
+            {
+              "action": "expect_text",
+              "contains": "Kitchen Gadget",
+              "criterion": 0
+            },
+            {
+              "action": "expect_text",
+              "contains": "Desk Lamp",
+              "criterion": 0
+            },
+            {
+              "action": "expect_text",
+              "contains": "shop.example.com",
+              "criterion": 1
+            },
+            {
+              "action": "expect_text",
+              "contains": "blog.example.org",
+              "criterion": 1
+            },
+            {
+              "action": "click",
+              "criterion": 1,
+              "selector": "button[popovertarget^=\"popover-actions-\"]"
+            },
+            {
+              "action": "click",
+              "criterion": 1,
+              "selector": "menu[id^=\"popover-actions-\"] li:nth-child(1) button"
+            },
+            {
+              "action": "goto",
+              "criterion": 2,
+              "path": "/"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "header button.btn-primary"
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "input[type=\"url\"]",
+              "value": "https://diy.example.net/living-room-repaint"
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "input[placeholder=\"Website Title Here\"]",
+              "value": "Living Room Repaint"
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "textarea",
+              "value": "Colour and material ideas for the living room refresh."
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "#bookmark-categories-input",
+              "value": "gift-ideas"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "button[type=\"submit\"]"
+            },
+            {
+              "action": "expect_text",
+              "contains": "gift-ideas",
+              "criterion": 2
+            },
+            {
+              "action": "reload",
+              "criterion": 2
+            },
+            {
+              "action": "expect_text",
+              "contains": "gift-ideas",
+              "criterion": 2
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "button[popovertarget^=\"popover-actions-\"]"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "menu[id^=\"popover-actions-\"] li:nth-child(4) button"
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "#bookmark-categories-input",
+              "value": "home-ideas"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "button[type=\"submit\"]"
+            },
+            {
+              "action": "reload",
+              "criterion": 2
+            },
+            {
+              "action": "expect_text",
+              "contains": "home-ideas",
+              "criterion": 2
+            },
+            {
+              "action": "fill",
+              "criterion": 3,
+              "selector": "input[type=\"search\"]",
+              "value": "Kitchen"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Kitchen Gadget",
+              "criterion": 3
+            },
+            {
+              "action": "fill",
+              "criterion": 3,
+              "selector": "input[type=\"search\"]",
+              "value": "Desk"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Desk Lamp",
+              "criterion": 3
+            },
+            {
+              "action": "fill",
+              "criterion": 3,
+              "selector": "input[type=\"search\"]",
+              "value": ""
+            }
+          ],
+          "install": [
+            [
+              "npm",
+              "install"
+            ]
+          ],
+          "parameter_checks": [
+            "atlas-example",
+            "renamed-example"
+          ],
+          "port": 8080,
+          "profile": "node-web",
+          "review_note": "AI-proposed plan; independent execution is technical evidence, not human product approval.",
+          "start": [
+            "npm",
+            "run",
+            "serve",
+            "--",
+            "--host",
+            "0.0.0.0",
+            "--port",
+            "8080"
+          ],
+          "tests": []
+        },
+        "provenance": {
+          "archive_sha256": "8d7d5423093436727aa1dbb47ce8dc1bae715de309ac22bc65e650913f91af39",
+          "change_summary": "Revision of the pinned Bookmark Manager template so it runs under the fixed node-web acceptance plan (npm install, npm run build, npm run serve -- --host 0.0.0.0 --port 8080). The prior blocker (exit 127) came from the old static-web profile using a python:3.12-slim image, which has no npm; that is resolved by the node-web plan, not by a code defect, so the end-to-end app logic is kept intact and the overlay is deliberately minimal: only README.md and package.json change. package.json was slimmed to exactly what builds and serves the app (vite, @ripple-ts/vite-plugin, @tailwindcss/vite, tailwindcss, daisyui; runtime deps @fontsource-variable/manrope, dexie, ripple, valibot) and the unused editor/language-server/lint/format tooling and scripts (lint, typecheck, format, check and their deps) were removed, along with the stale bun packageManager field; the ripple/ritpple-plugin versions stay pinned to 0.3.65 and engines still require Node >=22. README.md now states the Node >= 22 requirement explicitly, documents the dev/build/serve scripts, and replaces the earlier python http.server suggestion with the exact `npm run serve -- --host 0.0.0.0 --port 8080` startup used by the plan. index.html and src/App.tsrx are retained unchanged as render files; the previously implemented functionality (offline add/save, category commit on input plus default-category fallback, edit/refile, browse filters, title search, visit/edit/archive/delete, IndexedDB persistence, configurable default/suggested/example data) is preserved. LICENSE is left byte-for-byte unchanged and upstream attribution (author, repository, MIT notice, Frontend Mentor acknowledgement, DaisyUI/Dexie credits) is retained. Note: the fixed checks prove persistence, hostname display and existing-tag filtering/search; they do not by themselves prove that Visit actually navigates or that refiling edits a record, so no such claim is made.",
+          "commit": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "excluded_paths": [],
+          "leaf": "bookmark-manager",
+          "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+          "license": "MIT",
+          "model": "open-design/deepseek-v4.1-flash",
+          "notice_hashes": {
+            "LICENSE": "17e5ccdd3ca04fa001985e8b3370d70d357f858d491b5691a461fd5985834a44"
+          },
+          "repository": "https://github.com/LakhindarPal/bookmark-manager",
+          "scenario": {
+            "acceptance": [
+              "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+              "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+              "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+              "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+            ],
+            "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+            "id": "scn_7756e0007f6a463a97316f3f49c15248",
+            "leaf": "bookmark-manager",
+            "leaf_name": "书签管理器",
+            "name": "生活待购与灵感收藏夹",
+            "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+            "revision": 2,
+            "status": "ready",
+            "updated_at": "2026-10-16T14:18:20.407897+00:00",
+            "workflow": [
+              "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+              "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+              "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+              "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+              "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+            ]
+          }
+        },
+        "reports": [],
+        "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+        "scenario_name": "生活待购与灵感收藏夹",
+        "scenario_revision": 2,
+        "supersedes": "tpl_9d83da5e43fa4c7380a0331c3e47d7bc",
+        "id": "tpl_e81e4f53f208465c9616dd1bc4c1f8b1",
+        "level": "L0",
+        "state": "draft",
+        "acceptances": [
+          {
+            "artifact_id": "tpl_e81e4f53f208465c9616dd1bc4c1f8b1",
+            "created_at": "2026-10-16T14:48:28.488458+00:00",
+            "digest": "6dbb57deaf19d9786528011d2128313e4cc363a3a9414c1f1e142678fdbc13dc",
+            "id": "acc_064a5a4c75e7469eb9e6f143541cd9db",
+            "job_id": "job_1cb74fed2d3a4a478bfaaafac43e8490",
+            "method": "runtime-verification",
+            "outcome": "blocked",
+            "reports": [
+              {
+                "baseline": false,
+                "environment": {
+                  "engine": "docker",
+                  "image": "node:22-bookworm-slim",
+                  "image_id": "sha256:cd2df7ff65c5fce1f8a18ce89e3aac24a80c1db3776d5842a4cf86bc27f300a2",
+                  "platform": "Linux container"
+                },
+                "passed": false,
+                "project_name": "atlas-example",
+                "steps": [
+                  {
+                    "argv": [
+                      "exec",
+                      "atlas-factory-7d0ea0a4313541648d3ae1246d0b430f",
+                      "npm",
+                      "install"
+                    ],
+                    "exit_code": 0,
+                    "output": "\nadded 52 packages, and audited 53 packages in 3m\n\n14 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\nnpm notice\nnpm notice New major version of npm available! 10.9.9 -> 12.2.0\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0\nnpm notice To update run: npm install -g npm@12.2.0\nnpm notice\n",
+                    "passed": true,
+                    "phase": "install"
+                  },
+                  {
+                    "argv": [
+                      "exec",
+                      "atlas-factory-7d0ea0a4313541648d3ae1246d0b430f",
+                      "npm",
+                      "run",
+                      "build"
+                    ],
+                    "exit_code": 1,
+                    "output": "\n> atlas-example@0.1.0 build\n> vite build\n\n[@ripple-ts/vite-plugin] Scanning for Ripple packages...\n[@ripple-ts/vite-plugin] Scan complete. Found: [ 'ripple' ]\n[@ripple-ts/vite-plugin] Original vite.config 'optimizeDeps.exclude': []\n[@ripple-ts/vite-plugin] Merged 'optimizeDeps.exclude': [ 'ripple' ]\n[@ripple-ts/vite-plugin] Pass { excludeRippleExternalModules: true } option to the 'ripple' plugin to skip this scan.\nvite v8.3.4 building client environment for production...\ntransforming...\n/*! 🌼 daisyUI 5.7.50 */\n✓ 69 modules transformed.\n✗ Build failed in 317ms\nerror during build:\nBuild failed with 1 error:\n\n\u001b[31m[PARSE_ERROR] \u001b[0mExpected `,` or `)` but found `?`\n    \u001b[38;5;246m╭\u001b[0m\u001b[38;5;246m─\u001b[0m\u001b[38;5;246m[\u001b[0m src/App.tsrx:80:51 \u001b[38;5;246m]\u001b[0m\n    \u001b[38;5;246m│\u001b[0m\n \u001b[38;5;246m80 │\u001b[0m \u001b[38;5;249m \u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249mf\u001b[0m\u001b[38;5;249mu\u001b[0m\u001b[38;5;249mn\u001b[0m\u001b[38;5;249mc\u001b[0m\u001b[38;5;249mt\u001b[0m\u001b[38;5;249mi\u001b[0m\u001b[38;5;249mo\u001b[0m\u001b[38;5;249mn\u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249ms\u001b[0m\u001b[38;5;249mh\u001b[0m\u001b[38;5;249mo\u001b[0m\u001b[38;5;249mw\u001b[0m\u001b[38;5;249mT\u001b[0m\u001b[38;5;249mo\u001b[0m\u001b[38;5;249ma\u001b[0m\u001b[38;5;249ms\u001b[0m\u001b[38;5;249mt\u001b[0m(\u001b[38;5;249mm\u001b[0m\u001b[38;5;249me\u001b[0m\u001b[38;5;249ms\u001b[0m\u001b[38;5;249ms\u001b[0m\u001b[38;5;249ma\u001b[0m\u001b[38;5;249mg\u001b[0m\u001b[38;5;249me\u001b[0m\u001b[38;5;249m,\u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249mt\u001b[0m\u001b[38;5;249my\u001b[0m\u001b[38;5;249mp\u001b[0m\u001b[38;5;249me\u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249m=\u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249m\"\u001b[0m\u001b[38;5;249mi\u001b[0m\u001b[38;5;249mn\u001b[0m\u001b[38;5;249mf\u001b[0m\u001b[38;5;249mo\u001b[0m\u001b[38;5;249m\"\u001b[0m\u001b[38;5;249m,\u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249ma\u001b[0m\u001b[38;5;249mc\u001b[0m\u001b[38;5;249mt\u001b[0m\u001b[38;5;249mi\u001b[0m\u001b[38;5;249mo\u001b[0m\u001b[38;5;249mn\u001b[0m?\u001b[38;5;249m)\u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249m{\u001b[0m\n \u001b[38;5;240m   │\u001b[0m                       ┬                              ┬  \n \u001b[38;5;240m   │\u001b[0m                       ╰───────────────────────────────── Opened here\n \u001b[38;5;240m   │\u001b[0m                                                      │  \n \u001b[38;5;240m   │\u001b[0m                                                      ╰── `,` or `)` expected\n\u001b[38;5;246m────╯\u001b[0m\n\n    at aggregateBindingErrorsIntoJsError (file:///workspace/node_modules/rolldown/dist/shared/error-CBG33oNV.mjs:49:18)\n    at unwrapBindingResult (file:///workspace/node_modules/rolldown/dist/shared/error-CBG33oNV.mjs:19:128)\n    at #build (file:///workspace/node_modules/rolldown/dist/shared/rolldown-BYX6bV3R.mjs:146:34)\n    at async buildEnvironment (file:///workspace/node_modules/vite/dist/node/chunks/node.js:34716:66)\n    at async Object.build (file:///workspace/node_modules/vite/dist/node/chunks/node.js:35137:19)\n    at async Object.buildApp (file:///workspace/node_modules/vite/dist/node/chunks/node.js:35134:153)\n    at async CAC.<anonymous> (file:///workspace/node_modules/vite/dist/node/cli.js:780:3) {\n  errors: [Getter/Setter]\n}\n",
+                    "passed": false,
+                    "phase": "build"
+                  }
+                ]
+              }
+            ],
+            "scope": "Independent Linux container installation, build and scenario assertions for two rendered project names"
+          }
+        ],
+        "acceptance_jobs": [
+          {
+            "id": "job_1cb74fed2d3a4a478bfaaafac43e8490",
+            "kind": "runtime-verification",
+            "state": "needs_review",
+            "stage": "acceptance",
+            "updated_at": "2026-10-16T14:48:28.489927+00:00"
+          },
+          {
+            "id": "job_8b602909033446e3a5e6f531f441c9eb",
+            "kind": "harness-review",
+            "state": "cancelled",
+            "stage": "harness-review",
+            "updated_at": "2026-10-16T14:51:53.191738+00:00"
+          }
+        ]
+      },
+      "review_job_id": "job_8b602909033446e3a5e6f531f441c9eb",
+      "runtime_job_id": "job_1cb74fed2d3a4a478bfaaafac43e8490",
+      "review_disposition": "Cancelled after a concrete build blocker was observed; attempt retained, no successful review claim."
+    },
+    {
+      "artifact_id": "tpl_e81e4f53f208465c9616dd1bc4c1f8b1",
+      "note": "Fix the observed build failure only; keep the frozen node-web acceptance plan unchanged (replan=false). npm install succeeded with 52 packages and no reported vulnerabilities in the tested Node container. npm run build failed in the generated src/App.tsrx at showToast(message, type = \"info\", action?): Rolldown PARSE_ERROR Expected comma or closing parenthesis but found question mark. The Ripple 0.3.65 transform appears to leave the optional function parameter marker after stripping its TypeScript annotation. Inspect the actual source and fix this compatibility issue, e.g. an explicit undefined default instead of an optional function parameter if appropriate. Preserve the call semantics, toast actions, bookmark add/edit/refile/search/persistence/visit behavior, existing four render files, the minimal dependency setup, and exact LICENSE. Return a minimal overlay of changed files only; do not regenerate the whole app or audit unrelated framework internals. Do not claim a build/test pass; Atlas will independently build and run this new frozen version.",
+      "replan": false,
+      "batch_id": "bat_ec0881d86b1641fa8a845e7c7d4e0982",
+      "job_id": "job_c7644d06da6743428795abff401c1a40",
+      "attempt_failures": [
+        {
+          "attempt": 1,
+          "stage": "generate-0",
+          "error": "OpenCode CLI failed: {'type': 'provider.transport', 'message': 'Connection lost while reading the response: ECONNRESET: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()', 'status': 200}"
+        }
+      ],
+      "artifact": {
+        "archive_path": "jobs/job_c7644d06da6743428795abff401c1a40/attempt-2/template.zip",
+        "archive_sha256": "312739c18a815b983750a2ffb8022f11fda30faa2a4da220c776b68fb41da867",
+        "bundle_path": "jobs/job_c7644d06da6743428795abff401c1a40/attempt-2/bundle",
+        "cli": {
+          "available": true,
+          "backend": "opencode-cli",
+          "models": [],
+          "version": "opencode v2.0.30"
+        },
+        "created_at": "2026-10-16T15:02:44.766215+00:00",
+        "digest": "83fc35d43826fb2b4b7101321ed2df653f56e7674521de0cb944135b2433ffb2",
+        "formal_checks": [
+          {
+            "passed": true,
+            "project_name": "atlas-example",
+            "scope": "structure and deterministic rendering only; application not executed"
+          },
+          {
+            "passed": true,
+            "project_name": "renamed-example",
+            "scope": "structure and deterministic rendering only; application not executed"
+          }
+        ],
+        "job_id": "job_c7644d06da6743428795abff401c1a40",
+        "leaf": "bookmark-manager",
+        "manifest": {
+          "description": "A local-first personal bookmark library: deliberately save web links, organise them into user-controlled categories, and browse or search to find and revisit them later. Persists in the browser via IndexedDB and builds/serves with a Node-based Vite toolchain.",
+          "name": "bookmark-manager",
+          "parameters": {
+            "project_name": {
+              "default": "atlas-example",
+              "pattern": "^[a-z][a-z0-9-]{0,62}$",
+              "type": "string"
+            }
+          },
+          "render_files": [
+            "README.md",
+            "index.html",
+            "package.json",
+            "src/App.tsrx"
+          ],
+          "schema": 1
+        },
+        "plan": {
+          "build": [
+            [
+              "npm",
+              "run",
+              "build"
+            ]
+          ],
+          "checks": [
+            {
+              "action": "http",
+              "contains": "You need to enable JavaScript to run this app.",
+              "criterion": 0,
+              "path": "/"
+            },
+            {
+              "action": "goto",
+              "criterion": 0,
+              "path": "/"
+            },
+            {
+              "action": "expect_text",
+              "contains": "All bookmarks",
+              "criterion": 0
+            },
+            {
+              "action": "click",
+              "criterion": 0,
+              "selector": "header button.btn-primary"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "input[type=\"url\"]",
+              "value": "https://shop.example.com/kitchen-gadget"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "input[placeholder=\"Website Title Here\"]",
+              "value": "Kitchen Gadget"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "textarea",
+              "value": "A kitchen gadget saved for later purchase."
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "#bookmark-categories-input",
+              "value": "wishlist"
+            },
+            {
+              "action": "click",
+              "criterion": 0,
+              "selector": "button[type=\"submit\"]"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Kitchen Gadget",
+              "criterion": 0
+            },
+            {
+              "action": "click",
+              "criterion": 0,
+              "selector": "header button.btn-primary"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "input[type=\"url\"]",
+              "value": "https://blog.example.org/desk-lamp"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "input[placeholder=\"Website Title Here\"]",
+              "value": "Desk Lamp"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "textarea",
+              "value": "A lamp idea saved for inspiration."
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "#bookmark-categories-input",
+              "value": "inspiration"
+            },
+            {
+              "action": "click",
+              "criterion": 0,
+              "selector": "button[type=\"submit\"]"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Desk Lamp",
+              "criterion": 0
+            },
+            {
+              "action": "reload",
+              "criterion": 0
+            },
+            {
+              "action": "expect_text",
+              "contains": "Kitchen Gadget",
+              "criterion": 0
+            },
+            {
+              "action": "expect_text",
+              "contains": "Desk Lamp",
+              "criterion": 0
+            },
+            {
+              "action": "expect_text",
+              "contains": "shop.example.com",
+              "criterion": 1
+            },
+            {
+              "action": "expect_text",
+              "contains": "blog.example.org",
+              "criterion": 1
+            },
+            {
+              "action": "click",
+              "criterion": 1,
+              "selector": "button[popovertarget^=\"popover-actions-\"]"
+            },
+            {
+              "action": "click",
+              "criterion": 1,
+              "selector": "menu[id^=\"popover-actions-\"] li:nth-child(1) button"
+            },
+            {
+              "action": "goto",
+              "criterion": 2,
+              "path": "/"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "header button.btn-primary"
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "input[type=\"url\"]",
+              "value": "https://diy.example.net/living-room-repaint"
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "input[placeholder=\"Website Title Here\"]",
+              "value": "Living Room Repaint"
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "textarea",
+              "value": "Colour and material ideas for the living room refresh."
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "#bookmark-categories-input",
+              "value": "gift-ideas"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "button[type=\"submit\"]"
+            },
+            {
+              "action": "expect_text",
+              "contains": "gift-ideas",
+              "criterion": 2
+            },
+            {
+              "action": "reload",
+              "criterion": 2
+            },
+            {
+              "action": "expect_text",
+              "contains": "gift-ideas",
+              "criterion": 2
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "button[popovertarget^=\"popover-actions-\"]"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "menu[id^=\"popover-actions-\"] li:nth-child(4) button"
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "#bookmark-categories-input",
+              "value": "home-ideas"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "button[type=\"submit\"]"
+            },
+            {
+              "action": "reload",
+              "criterion": 2
+            },
+            {
+              "action": "expect_text",
+              "contains": "home-ideas",
+              "criterion": 2
+            },
+            {
+              "action": "fill",
+              "criterion": 3,
+              "selector": "input[type=\"search\"]",
+              "value": "Kitchen"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Kitchen Gadget",
+              "criterion": 3
+            },
+            {
+              "action": "fill",
+              "criterion": 3,
+              "selector": "input[type=\"search\"]",
+              "value": "Desk"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Desk Lamp",
+              "criterion": 3
+            },
+            {
+              "action": "fill",
+              "criterion": 3,
+              "selector": "input[type=\"search\"]",
+              "value": ""
+            }
+          ],
+          "install": [
+            [
+              "npm",
+              "install"
+            ]
+          ],
+          "parameter_checks": [
+            "atlas-example",
+            "renamed-example"
+          ],
+          "port": 8080,
+          "profile": "node-web",
+          "review_note": "AI-proposed plan; independent execution is technical evidence, not human product approval.",
+          "start": [
+            "npm",
+            "run",
+            "serve",
+            "--",
+            "--host",
+            "0.0.0.0",
+            "--port",
+            "8080"
+          ],
+          "tests": []
+        },
+        "provenance": {
+          "archive_sha256": "8d7d5423093436727aa1dbb47ce8dc1bae715de309ac22bc65e650913f91af39",
+          "change_summary": "Narrow repair of the observed node-web build failure only. Root cause: the Ripple 0.3.65 .tsrx transform strips the TypeScript type annotation but leaves the optional-parameter `?` on showToast's third parameter, emitting `function showToast(message, type = \"info\", action?)` which is invalid JS, so Rolldown fails with PARSE_ERROR `Expected ',' or ')' but found '?'`. Fix: declare the parameter with an explicit `= undefined` default instead of the optional marker, keeping its type as ToastData[\"action\"] and preserving identical call semantics (two-arg calls, toast action buttons, later `toast.action?.onClick()` and the Undo action closure all continue to work). This is applied as a single in-place replacement in src/App.tsrx; that file is not duplicated in files or delete_files. Everything else is retained untouched: the four render files from the failure manifest (README.md, index.html, package.json, src/App.tsrx) still carry the literal @@PROJECT_NAME@@ token where the app name is rendered, index.html/package.json/README.md are unchanged, the minimal dependency set and pinned ripple/@ripple-ts/vite-plugin 0.3.65 versions stay, the add/edit/refile/search/visit/indexedDB-persistence behaviour is intact, and LICENSE (MIT, upstream attribution) is byte-for-byte unchanged. No build or test pass is claimed; Atlas will independently build and run the frozen version.",
+          "commit": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "excluded_paths": [],
+          "leaf": "bookmark-manager",
+          "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+          "license": "MIT",
+          "model": "open-design/deepseek-v4.1-flash",
+          "notice_hashes": {
+            "LICENSE": "17e5ccdd3ca04fa001985e8b3370d70d357f858d491b5691a461fd5985834a44"
+          },
+          "repository": "https://github.com/LakhindarPal/bookmark-manager",
+          "scenario": {
+            "acceptance": [
+              "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+              "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+              "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+              "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+            ],
+            "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+            "id": "scn_7756e0007f6a463a97316f3f49c15248",
+            "leaf": "bookmark-manager",
+            "leaf_name": "书签管理器",
+            "name": "生活待购与灵感收藏夹",
+            "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+            "revision": 2,
+            "status": "ready",
+            "updated_at": "2026-10-16T14:18:20.407897+00:00",
+            "workflow": [
+              "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+              "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+              "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+              "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+              "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+            ]
+          }
+        },
+        "reports": [],
+        "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+        "scenario_name": "生活待购与灵感收藏夹",
+        "scenario_revision": 2,
+        "supersedes": "tpl_e81e4f53f208465c9616dd1bc4c1f8b1",
+        "id": "tpl_be53631bd57e470dae674b6fc8174db7",
+        "level": "L0",
+        "state": "draft",
+        "acceptances": [
+          {
+            "artifact_id": "tpl_be53631bd57e470dae674b6fc8174db7",
+            "created_at": "2026-10-16T15:06:53.543651+00:00",
+            "digest": "83fc35d43826fb2b4b7101321ed2df653f56e7674521de0cb944135b2433ffb2",
+            "id": "acc_fadebe0f204842bf91a0ca9d69254f47",
+            "job_id": "job_2ced1ca16dde4e7e8af1e4656b856f6a",
+            "method": "runtime-verification",
+            "outcome": "blocked",
+            "reports": [
+              {
+                "baseline": false,
+                "environment": {
+                  "engine": "docker",
+                  "image": "node:22-bookworm-slim",
+                  "image_id": "sha256:cd2df7ff65c5fce1f8a18ce89e3aac24a80c1db3776d5842a4cf86bc27f300a2",
+                  "platform": "Linux container"
+                },
+                "passed": false,
+                "project_name": "atlas-example",
+                "steps": [
+                  {
+                    "argv": [
+                      "exec",
+                      "atlas-factory-b8af034df68343c186ce53490cef3d14",
+                      "npm",
+                      "install"
+                    ],
+                    "exit_code": 0,
+                    "output": "\nadded 52 packages, and audited 53 packages in 3m\n\n14 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\nnpm notice\nnpm notice New major version of npm available! 10.9.9 -> 12.2.0\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0\nnpm notice To update run: npm install -g npm@12.2.0\nnpm notice\n",
+                    "passed": true,
+                    "phase": "install"
+                  },
+                  {
+                    "argv": [
+                      "exec",
+                      "atlas-factory-b8af034df68343c186ce53490cef3d14",
+                      "npm",
+                      "run",
+                      "build"
+                    ],
+                    "exit_code": 1,
+                    "output": "\n> atlas-example@0.1.0 build\n> vite build\n\n[@ripple-ts/vite-plugin] Scanning for Ripple packages...\n[@ripple-ts/vite-plugin] Scan complete. Found: [ 'ripple' ]\n[@ripple-ts/vite-plugin] Original vite.config 'optimizeDeps.exclude': []\n[@ripple-ts/vite-plugin] Merged 'optimizeDeps.exclude': [ 'ripple' ]\n[@ripple-ts/vite-plugin] Pass { excludeRippleExternalModules: true } option to the 'ripple' plugin to skip this scan.\nvite v8.3.4 building client environment for production...\ntransforming...\n/*! 🌼 daisyUI 5.7.50 */\n✓ 69 modules transformed.\n✗ Build failed in 302ms\nerror during build:\nBuild failed with 1 error:\n\n\u001b[31m[PARSE_ERROR] \u001b[0mExpected `,` or `)` but found `?`\n     \u001b[38;5;246m╭\u001b[0m\u001b[38;5;246m─\u001b[0m\u001b[38;5;246m[\u001b[0m src/App.tsrx:178:31 \u001b[38;5;246m]\u001b[0m\n     \u001b[38;5;246m│\u001b[0m\n \u001b[38;5;246m178 │\u001b[0m \u001b[38;5;249m \u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249mf\u001b[0m\u001b[38;5;249mu\u001b[0m\u001b[38;5;249mn\u001b[0m\u001b[38;5;249mc\u001b[0m\u001b[38;5;249mt\u001b[0m\u001b[38;5;249mi\u001b[0m\u001b[38;5;249mo\u001b[0m\u001b[38;5;249mn\u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249mc\u001b[0m\u001b[38;5;249mo\u001b[0m\u001b[38;5;249mm\u001b[0m\u001b[38;5;249mm\u001b[0m\u001b[38;5;249mi\u001b[0m\u001b[38;5;249mt\u001b[0m\u001b[38;5;249mC\u001b[0m\u001b[38;5;249ma\u001b[0m\u001b[38;5;249mt\u001b[0m\u001b[38;5;249me\u001b[0m\u001b[38;5;249mg\u001b[0m\u001b[38;5;249mo\u001b[0m\u001b[38;5;249mr\u001b[0m\u001b[38;5;249mi\u001b[0m\u001b[38;5;249me\u001b[0m\u001b[38;5;249ms\u001b[0m(\u001b[38;5;249mr\u001b[0m\u001b[38;5;249ma\u001b[0m\u001b[38;5;249mw\u001b[0m?\u001b[38;5;249m)\u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249m{\u001b[0m\n \u001b[38;5;240m    │\u001b[0m                              ┬   ┬  \n \u001b[38;5;240m    │\u001b[0m                              ╰────── Opened here\n \u001b[38;5;240m    │\u001b[0m                                  │  \n \u001b[38;5;240m    │\u001b[0m                                  ╰── `,` or `)` expected\n\u001b[38;5;246m─────╯\u001b[0m\n\n    at aggregateBindingErrorsIntoJsError (file:///workspace/node_modules/rolldown/dist/shared/error-CBG33oNV.mjs:49:18)\n    at unwrapBindingResult (file:///workspace/node_modules/rolldown/dist/shared/error-CBG33oNV.mjs:19:128)\n    at #build (file:///workspace/node_modules/rolldown/dist/shared/rolldown-BYX6bV3R.mjs:146:34)\n    at async buildEnvironment (file:///workspace/node_modules/vite/dist/node/chunks/node.js:34716:66)\n    at async Object.build (file:///workspace/node_modules/vite/dist/node/chunks/node.js:35137:19)\n    at async Object.buildApp (file:///workspace/node_modules/vite/dist/node/chunks/node.js:35134:153)\n    at async CAC.<anonymous> (file:///workspace/node_modules/vite/dist/node/cli.js:780:3) {\n  errors: [Getter/Setter]\n}\n",
+                    "passed": false,
+                    "phase": "build"
+                  }
+                ]
+              }
+            ],
+            "scope": "Independent Linux container installation, build and scenario assertions for two rendered project names"
+          }
+        ],
+        "acceptance_jobs": [
+          {
+            "id": "job_2ced1ca16dde4e7e8af1e4656b856f6a",
+            "kind": "runtime-verification",
+            "state": "needs_review",
+            "stage": "acceptance",
+            "updated_at": "2026-10-16T15:06:53.545397+00:00"
+          }
+        ]
+      },
+      "runtime_job_id": "job_2ced1ca16dde4e7e8af1e4656b856f6a"
+    },
+    {
+      "artifact_id": "tpl_be53631bd57e470dae674b6fc8174db7",
+      "note": "Produce a minimal source + explicit technical-plan revision (replan=true), keeping the same approved scenario. Official build now reaches a second identical Ripple optional-parameter parse error: commitCategories(raw?). An isolated diagnostic copy with function commitCategories(raw?: string) changed to function commitCategories(raw: string = undefined) builds successfully. Only this unique literal source replacement is needed; preserve all other source, render files and exact LICENSE. Return files={} and one replacement, not a whole-file rewrite. The diagnostic also verified all 50 browser actions/assertions with the plan adjustments below; installed dependencies were reused, so this is diagnostic evidence, NOT a formal acceptance claim. Rebuild failure_evidence.plan by copying its node-web install/build/start, port and every unaffected check. Apply ONLY these observed test fixes: (1) criterion 1 broad menu-toggle click selector becomes article:has-text(\"Kitchen Gadget\") button.btn-circle[popovertarget^=\"popover-actions-\"]; replace its following Visit click with action open_link, selector article:has-text(\"Kitchen Gadget\") menu[id^=\"popover-actions-\"] button:has-text(\"Visit\"), url https://shop.example.com/kitchen-gadget. open_link is now supported by Atlas and asserts a real browser navigation request; external responses are blocked. (2) criterion 2 toggle selector becomes article:has-text(\"Living Room Repaint\") button.btn-circle[popovertarget^=\"popover-actions-\"]; its Edit selector becomes article:has-text(\"Living Room Repaint\") menu[id^=\"popover-actions-\"] button:has-text(\"Edit\"). Before filling home-ideas, click dialog .badge:has-text(\"gift-ideas\") button to remove the previous category. After submitting this edit, expect_text Bookmark updated BEFORE reload, because the toast follows awaited IndexedDB save; immediate reload aborted the pending transaction in the diagnostic. After expect_text home-ideas, click input[type=\"checkbox\"][value=\"home-ideas\"], expect_text Living Room Repaint, then click that same checkbox to clear the filter. Keep the existing two saved links, reload assertions and Kitchen/Desk searches. No fake README/source-text behavioral checks, weakened criteria, unrelated features, or publication.",
+      "replan": true,
+      "batch_id": "bat_4ddce514bed34ffb89d783e42d6bb73e",
+      "job_id": "job_e5383ecc4dd04db1a50e9a697cf2bb3d",
+      "artifact": {
+        "archive_path": "jobs/job_e5383ecc4dd04db1a50e9a697cf2bb3d/attempt-1/template.zip",
+        "archive_sha256": "540dd1da927b214075ffbc66fd0275d27ac9d125175ae7a148ec4c5cba81d46d",
+        "bundle_path": "jobs/job_e5383ecc4dd04db1a50e9a697cf2bb3d/attempt-1/bundle",
+        "cli": {
+          "available": true,
+          "backend": "opencode-cli",
+          "models": [],
+          "version": "opencode v2.0.30"
+        },
+        "created_at": "2026-10-16T15:18:19.821936+00:00",
+        "digest": "e935bfdbc86f0883cc8e20a17e98805939d45e00becb68a58d7e7ed4b1e1bc9a",
+        "formal_checks": [
+          {
+            "passed": true,
+            "project_name": "atlas-example",
+            "scope": "structure and deterministic rendering only; application not executed"
+          },
+          {
+            "passed": true,
+            "project_name": "renamed-example",
+            "scope": "structure and deterministic rendering only; application not executed"
+          }
+        ],
+        "job_id": "job_e5383ecc4dd04db1a50e9a697cf2bb3d",
+        "leaf": "bookmark-manager",
+        "manifest": {
+          "description": "A local-first personal bookmark library: deliberately save web links, organise them into user-controlled categories, and browse or search to find and revisit them later. Persists in the browser via IndexedDB and builds/serves with a Node-based Vite toolchain.",
+          "name": "bookmark-manager",
+          "parameters": {
+            "project_name": {
+              "default": "atlas-example",
+              "pattern": "^[a-z][a-z0-9-]{0,62}$",
+              "type": "string"
+            }
+          },
+          "render_files": [
+            "README.md",
+            "index.html",
+            "package.json",
+            "src/App.tsrx"
+          ],
+          "schema": 1
+        },
+        "plan": {
+          "build": [
+            [
+              "npm",
+              "run",
+              "build"
+            ]
+          ],
+          "checks": [
+            {
+              "action": "http",
+              "contains": "You need to enable JavaScript to run this app.",
+              "criterion": 0,
+              "path": "/"
+            },
+            {
+              "action": "goto",
+              "criterion": 0,
+              "path": "/"
+            },
+            {
+              "action": "expect_text",
+              "contains": "All bookmarks",
+              "criterion": 0
+            },
+            {
+              "action": "click",
+              "criterion": 0,
+              "selector": "header button.btn-primary"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "input[type=\"url\"]",
+              "value": "https://shop.example.com/kitchen-gadget"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "input[placeholder=\"Website Title Here\"]",
+              "value": "Kitchen Gadget"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "textarea",
+              "value": "A kitchen gadget saved for later purchase."
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "#bookmark-categories-input",
+              "value": "wishlist"
+            },
+            {
+              "action": "click",
+              "criterion": 0,
+              "selector": "button[type=\"submit\"]"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Kitchen Gadget",
+              "criterion": 0
+            },
+            {
+              "action": "click",
+              "criterion": 0,
+              "selector": "header button.btn-primary"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "input[type=\"url\"]",
+              "value": "https://blog.example.org/desk-lamp"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "input[placeholder=\"Website Title Here\"]",
+              "value": "Desk Lamp"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "textarea",
+              "value": "A lamp idea saved for inspiration."
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "#bookmark-categories-input",
+              "value": "inspiration"
+            },
+            {
+              "action": "click",
+              "criterion": 0,
+              "selector": "button[type=\"submit\"]"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Desk Lamp",
+              "criterion": 0
+            },
+            {
+              "action": "reload",
+              "criterion": 0
+            },
+            {
+              "action": "expect_text",
+              "contains": "Kitchen Gadget",
+              "criterion": 0
+            },
+            {
+              "action": "expect_text",
+              "contains": "Desk Lamp",
+              "criterion": 0
+            },
+            {
+              "action": "expect_text",
+              "contains": "shop.example.com",
+              "criterion": 1
+            },
+            {
+              "action": "expect_text",
+              "contains": "blog.example.org",
+              "criterion": 1
+            },
+            {
+              "action": "click",
+              "criterion": 1,
+              "selector": "article:has-text(\"Kitchen Gadget\") button.btn-circle[popovertarget^=\"popover-actions-\"]"
+            },
+            {
+              "action": "open_link",
+              "criterion": 1,
+              "selector": "article:has-text(\"Kitchen Gadget\") menu[id^=\"popover-actions-\"] button:has-text(\"Visit\")",
+              "url": "https://shop.example.com/kitchen-gadget"
+            },
+            {
+              "action": "goto",
+              "criterion": 2,
+              "path": "/"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "header button.btn-primary"
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "input[type=\"url\"]",
+              "value": "https://diy.example.net/living-room-repaint"
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "input[placeholder=\"Website Title Here\"]",
+              "value": "Living Room Repaint"
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "textarea",
+              "value": "Colour and material ideas for the living room refresh."
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "#bookmark-categories-input",
+              "value": "gift-ideas"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "button[type=\"submit\"]"
+            },
+            {
+              "action": "expect_text",
+              "contains": "gift-ideas",
+              "criterion": 2
+            },
+            {
+              "action": "reload",
+              "criterion": 2
+            },
+            {
+              "action": "expect_text",
+              "contains": "gift-ideas",
+              "criterion": 2
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "article:has-text(\"Living Room Repaint\") button.btn-circle[popovertarget^=\"popover-actions-\"]"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "article:has-text(\"Living Room Repaint\") menu[id^=\"popover-actions-\"] button:has-text(\"Edit\")"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "dialog .badge:has-text(\"gift-ideas\") button"
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "#bookmark-categories-input",
+              "value": "home-ideas"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "button[type=\"submit\"]"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Bookmark updated",
+              "criterion": 2
+            },
+            {
+              "action": "reload",
+              "criterion": 2
+            },
+            {
+              "action": "expect_text",
+              "contains": "home-ideas",
+              "criterion": 2
+            },
+            {
+              "action": "click",
+              "criterion": 3,
+              "selector": "aside input[type=\"checkbox\"][value=\"home-ideas\"]"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Living Room Repaint",
+              "criterion": 3
+            },
+            {
+              "action": "click",
+              "criterion": 3,
+              "selector": "aside input[type=\"checkbox\"][value=\"home-ideas\"]"
+            },
+            {
+              "action": "fill",
+              "criterion": 3,
+              "selector": "input[type=\"search\"]",
+              "value": "Kitchen"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Kitchen Gadget",
+              "criterion": 3
+            },
+            {
+              "action": "fill",
+              "criterion": 3,
+              "selector": "input[type=\"search\"]",
+              "value": "Desk"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Desk Lamp",
+              "criterion": 3
+            },
+            {
+              "action": "fill",
+              "criterion": 3,
+              "selector": "input[type=\"search\"]",
+              "value": ""
+            }
+          ],
+          "install": [
+            [
+              "npm",
+              "install"
+            ]
+          ],
+          "parameter_checks": [
+            "atlas-example",
+            "renamed-example"
+          ],
+          "port": 8080,
+          "profile": "node-web",
+          "review_note": "AI-proposed plan; independent execution is technical evidence, not human product approval.",
+          "start": [
+            "npm",
+            "run",
+            "serve",
+            "--",
+            "--host",
+            "0.0.0.0",
+            "--port",
+            "8080"
+          ],
+          "tests": []
+        },
+        "provenance": {
+          "archive_sha256": "8d7d5423093436727aa1dbb47ce8dc1bae715de309ac22bc65e650913f91af39",
+          "change_summary": "Fix the observed node-web build failure only. Root cause: the Ripple 0.3.65 .tsrx transform strips the TypeScript type annotation but leaves the optional-parameter `?` on commitCategories, emitting invalid JS (`function commitCategories(raw) {`) that Rolldown rejects with PARSE_ERROR `Expected ',' or ')' but found '?'`. The fix declares the parameter with an explicit `= undefined` default instead of the optional marker, preserving identical call semantics: `commitCategories()` still falls through to `raw ?? tag` (using the typed category) and `commitCategories(input.value)` still merges a comma/newline batch, while the `onKeyDown` Enter/comma and `onInput` batch paths and the Backspace/limited-to-5 logic are unchanged. Applied as a single in-place replacement in src/App.tsrx; that file is not duplicated in files or delete_files. Everything else is retained untouched: the four render files from the failure manifest still carry the literal @@PROJECT_NAME@@ token where the app name is rendered (index.html title, package.json name, README heading, src/App.tsrx sidebar heading), all other source, the minimal pinned dependency set, and the add/edit/refile/search/visit/IndexedDB-persistence end-to-end flow stay as-is, and LICENSE (MIT, Copyright (c) 2026 Lakhindar Pal) is byte-for-byte unchanged. No build or test pass is claimed; Atlas independently builds and runs the frozen version.",
+          "commit": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "excluded_paths": [],
+          "leaf": "bookmark-manager",
+          "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+          "license": "MIT",
+          "model": "open-design/deepseek-v4.1-flash",
+          "notice_hashes": {
+            "LICENSE": "17e5ccdd3ca04fa001985e8b3370d70d357f858d491b5691a461fd5985834a44"
+          },
+          "repository": "https://github.com/LakhindarPal/bookmark-manager",
+          "scenario": {
+            "acceptance": [
+              "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+              "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+              "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+              "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+            ],
+            "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+            "id": "scn_7756e0007f6a463a97316f3f49c15248",
+            "leaf": "bookmark-manager",
+            "leaf_name": "书签管理器",
+            "name": "生活待购与灵感收藏夹",
+            "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+            "revision": 2,
+            "status": "ready",
+            "updated_at": "2026-10-16T14:18:20.407897+00:00",
+            "workflow": [
+              "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+              "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+              "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+              "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+              "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+            ]
+          }
+        },
+        "reports": [],
+        "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+        "scenario_name": "生活待购与灵感收藏夹",
+        "scenario_revision": 2,
+        "supersedes": "tpl_be53631bd57e470dae674b6fc8174db7",
+        "id": "tpl_23157bd6cc8b4f12a2a58b42bd0db4c7",
+        "level": "L0",
+        "state": "draft",
+        "acceptances": [
+          {
+            "artifact_id": "tpl_23157bd6cc8b4f12a2a58b42bd0db4c7",
+            "created_at": "2026-10-16T15:24:03.698799+00:00",
+            "digest": "e935bfdbc86f0883cc8e20a17e98805939d45e00becb68a58d7e7ed4b1e1bc9a",
+            "id": "acc_65b55007989a4851abdb1a65cb0bb423",
+            "job_id": "job_093cab4545b8433a8dc58a9e80ed5c4c",
+            "method": "runtime-verification",
+            "outcome": "blocked",
+            "reports": [
+              {
+                "baseline": false,
+                "environment": {
+                  "engine": "docker",
+                  "image": "node:22-bookworm-slim",
+                  "image_id": "sha256:cd2df7ff65c5fce1f8a18ce89e3aac24a80c1db3776d5842a4cf86bc27f300a2",
+                  "network": "bridge",
+                  "platform": "Linux container"
+                },
+                "passed": false,
+                "project_name": "atlas-example",
+                "steps": [
+                  {
+                    "argv": [
+                      "exec",
+                      "atlas-factory-3f0e3e40ca2e43efa081bb8d6f74334b",
+                      "npm",
+                      "install"
+                    ],
+                    "exit_code": 0,
+                    "output": "\nadded 52 packages, and audited 53 packages in 4m\n\n14 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\nnpm notice\nnpm notice New major version of npm available! 10.9.9 -> 12.2.0\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0\nnpm notice To update run: npm install -g npm@12.2.0\nnpm notice\n",
+                    "passed": true,
+                    "phase": "install"
+                  },
+                  {
+                    "argv": [
+                      "exec",
+                      "atlas-factory-3f0e3e40ca2e43efa081bb8d6f74334b",
+                      "npm",
+                      "run",
+                      "build"
+                    ],
+                    "exit_code": 0,
+                    "output": "\n> atlas-example@0.1.0 build\n> vite build\n\n[@ripple-ts/vite-plugin] Scanning for Ripple packages...\n[@ripple-ts/vite-plugin] Scan complete. Found: [ 'ripple' ]\n[@ripple-ts/vite-plugin] Original vite.config 'optimizeDeps.exclude': []\n[@ripple-ts/vite-plugin] Merged 'optimizeDeps.exclude': [ 'ripple' ]\n[@ripple-ts/vite-plugin] Pass { excludeRippleExternalModules: true } option to the 'ripple' plugin to skip this scan.\nvite v8.3.4 building client environment for production...\ntransforming...\n/*! 🌼 daisyUI 5.7.50 */\n✓ 76 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/assets/favicon-CHF_ylLN.svg                             0.35 kB │ gzip:  0.23 kB\ndist/index.html                                              0.73 kB │ gzip:  0.43 kB\ndist/assets/manrope-vietnamese-wght-normal-usUDDRr7.woff2    8.52 kB\ndist/assets/manrope-greek-wght-normal-DL7QRZyv.woff2         9.44 kB\ndist/assets/manrope-cyrillic-wght-normal-Dvxsihut.woff2     14.50 kB\ndist/assets/manrope-latin-ext-wght-normal-Ch3YOpNY.woff2    15.12 kB\ndist/assets/manrope-latin-wght-normal-DHIcAJRg.woff2        24.83 kB\ndist/assets/index-CMRLFa-h.css                              94.20 kB │ gzip: 17.83 kB\ndist/assets/index-D7_6d16b.js                              155.83 kB │ gzip: 51.75 kB\n\n✓ built in 411ms\n",
+                    "passed": true,
+                    "phase": "build"
+                  },
+                  {
+                    "check": {
+                      "action": "http",
+                      "contains": "You need to enable JavaScript to run this app.",
+                      "criterion": 0,
+                      "path": "/"
+                    },
+                    "output": "<!doctype html>\n<html lang=\"en\" data-theme=\"forest\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <meta\n      name=\"description\"\n      content=\"Save links now, organise them into categories, and find them again later. Local-first and private.\"\n    />\n    <link rel=\"shortcut icon\" type=\"image/svg+xml\" href=\"/assets/favicon-CHF_ylLN.svg\" />\n    <title>atlas-example</title>\n    <script type=\"module\" crossorigin src=\"/assets/index-D7_6d16b.js\"></script>\n    <link rel=\"stylesheet\" crossorigin href=\"/assets/index-CMRLFa-h.css\">\n  </head>\n\n  <body>\n    <noscript>You need to enable JavaScript to run this app.</noscript>\n    <div id=\"root\"></div>\n\n  </body>\n</html>\n",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "goto",
+                      "criterion": 0,
+                      "path": "/"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "All bookmarks",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 0,
+                      "selector": "header button.btn-primary"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "input[type=\"url\"]",
+                      "value": "https://shop.example.com/kitchen-gadget"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "input[placeholder=\"Website Title Here\"]",
+                      "value": "Kitchen Gadget"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "textarea",
+                      "value": "A kitchen gadget saved for later purchase."
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "#bookmark-categories-input",
+                      "value": "wishlist"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 0,
+                      "selector": "button[type=\"submit\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Kitchen Gadget",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 0,
+                      "selector": "header button.btn-primary"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "input[type=\"url\"]",
+                      "value": "https://blog.example.org/desk-lamp"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "input[placeholder=\"Website Title Here\"]",
+                      "value": "Desk Lamp"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "textarea",
+                      "value": "A lamp idea saved for inspiration."
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "#bookmark-categories-input",
+                      "value": "inspiration"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 0,
+                      "selector": "button[type=\"submit\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Desk Lamp",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "reload",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Kitchen Gadget",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Desk Lamp",
+                      "criterion": 0
+                    },
+                    "output": "TimeoutError: locator.waitFor: Timeout 7000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('Desk Lamp').first() to be visible\u001b[22m\n",
+                    "passed": false,
+                    "phase": "acceptance"
+                  }
+                ]
+              }
+            ],
+            "scope": "Independent Linux container installation, build and scenario assertions for two rendered project names"
+          }
+        ],
+        "acceptance_jobs": [
+          {
+            "id": "job_093cab4545b8433a8dc58a9e80ed5c4c",
+            "kind": "runtime-verification",
+            "state": "needs_review",
+            "stage": "acceptance",
+            "updated_at": "2026-10-16T15:24:03.700827+00:00"
+          }
+        ]
+      },
+      "source_matches_tested_diagnostic": true,
+      "runtime_job_id": "job_093cab4545b8433a8dc58a9e80ed5c4c"
+    },
+    {
+      "artifact_id": "tpl_23157bd6cc8b4f12a2a58b42bd0db4c7",
+      "note": "Fix the observed durability race in saveBookmark, keeping the frozen node-web plan unchanged (replan=false). The formal fresh-install run built successfully but lost Desk Lamp after reload: UI data.set happens before awaited IndexedDB put, so a card can appear before the transaction is durable. In a separate diagnostic copy, replacing only saveBookmark to await db.bookmarks.put(bm) BEFORE data.set(bm.id,bm) passed build and all 50 browser checks, including two saved links after reload, real saved-URL navigation target, category refiling after save feedback, category browsing and search. This reused installed dependencies and is diagnostic evidence only, not formal acceptance. Return a single unique replacement of this existing function:\n  async function saveBookmark(bm: Bookmark) {\n    data.set(bm.id, bm);\n    await db.bookmarks.put(bm);\n  }\nwith the identical function containing the two statements in the opposite order. Preserve everything else: default parameters already fixed, source UI and behavior, four render files, package.json, exact LICENSE, metadata attribution and all technical plan steps. Use files={} and one replacement; no full-file rewrite or replanning. Do not claim successful formal verification or publish; Atlas will test this new frozen candidate independently.",
+      "replan": false,
+      "batch_id": "bat_d8b7eb97c1c444bebcfbdd478988ba36",
+      "job_id": "job_a1e2916330354288843541c86d155646",
+      "artifact": {
+        "archive_path": "jobs/job_a1e2916330354288843541c86d155646/attempt-1/template.zip",
+        "archive_sha256": "ca9140a38b8ad7c1d24ed804e3e11c14bbe5bcd8e195c7e76718ab22972535e1",
+        "bundle_path": "jobs/job_a1e2916330354288843541c86d155646/attempt-1/bundle",
+        "cli": {
+          "available": true,
+          "backend": "opencode-cli",
+          "models": [],
+          "version": "opencode v2.0.30"
+        },
+        "created_at": "2026-10-16T15:27:35.136068+00:00",
+        "digest": "91ce1f32d0d950c64ec301ca26505475ebd5395f65b0bf3524eb267e2a9af6df",
+        "formal_checks": [
+          {
+            "passed": true,
+            "project_name": "atlas-example",
+            "scope": "structure and deterministic rendering only; application not executed"
+          },
+          {
+            "passed": true,
+            "project_name": "renamed-example",
+            "scope": "structure and deterministic rendering only; application not executed"
+          }
+        ],
+        "job_id": "job_a1e2916330354288843541c86d155646",
+        "leaf": "bookmark-manager",
+        "manifest": {
+          "description": "A local-first personal bookmark library: deliberately save web links, organise them into user-controlled categories, and browse or search to find and revisit them later. Persists in the browser via IndexedDB and builds/serves with a Node-based Vite toolchain.",
+          "name": "bookmark-manager",
+          "parameters": {
+            "project_name": {
+              "default": "atlas-example",
+              "pattern": "^[a-z][a-z0-9-]{0,62}$",
+              "type": "string"
+            }
+          },
+          "render_files": [
+            "README.md",
+            "index.html",
+            "package.json",
+            "src/App.tsrx"
+          ],
+          "schema": 1
+        },
+        "plan": {
+          "build": [
+            [
+              "npm",
+              "run",
+              "build"
+            ]
+          ],
+          "checks": [
+            {
+              "action": "http",
+              "contains": "You need to enable JavaScript to run this app.",
+              "criterion": 0,
+              "path": "/"
+            },
+            {
+              "action": "goto",
+              "criterion": 0,
+              "path": "/"
+            },
+            {
+              "action": "expect_text",
+              "contains": "All bookmarks",
+              "criterion": 0
+            },
+            {
+              "action": "click",
+              "criterion": 0,
+              "selector": "header button.btn-primary"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "input[type=\"url\"]",
+              "value": "https://shop.example.com/kitchen-gadget"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "input[placeholder=\"Website Title Here\"]",
+              "value": "Kitchen Gadget"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "textarea",
+              "value": "A kitchen gadget saved for later purchase."
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "#bookmark-categories-input",
+              "value": "wishlist"
+            },
+            {
+              "action": "click",
+              "criterion": 0,
+              "selector": "button[type=\"submit\"]"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Kitchen Gadget",
+              "criterion": 0
+            },
+            {
+              "action": "click",
+              "criterion": 0,
+              "selector": "header button.btn-primary"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "input[type=\"url\"]",
+              "value": "https://blog.example.org/desk-lamp"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "input[placeholder=\"Website Title Here\"]",
+              "value": "Desk Lamp"
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "textarea",
+              "value": "A lamp idea saved for inspiration."
+            },
+            {
+              "action": "fill",
+              "criterion": 0,
+              "selector": "#bookmark-categories-input",
+              "value": "inspiration"
+            },
+            {
+              "action": "click",
+              "criterion": 0,
+              "selector": "button[type=\"submit\"]"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Desk Lamp",
+              "criterion": 0
+            },
+            {
+              "action": "reload",
+              "criterion": 0
+            },
+            {
+              "action": "expect_text",
+              "contains": "Kitchen Gadget",
+              "criterion": 0
+            },
+            {
+              "action": "expect_text",
+              "contains": "Desk Lamp",
+              "criterion": 0
+            },
+            {
+              "action": "expect_text",
+              "contains": "shop.example.com",
+              "criterion": 1
+            },
+            {
+              "action": "expect_text",
+              "contains": "blog.example.org",
+              "criterion": 1
+            },
+            {
+              "action": "click",
+              "criterion": 1,
+              "selector": "article:has-text(\"Kitchen Gadget\") button.btn-circle[popovertarget^=\"popover-actions-\"]"
+            },
+            {
+              "action": "open_link",
+              "criterion": 1,
+              "selector": "article:has-text(\"Kitchen Gadget\") menu[id^=\"popover-actions-\"] button:has-text(\"Visit\")",
+              "url": "https://shop.example.com/kitchen-gadget"
+            },
+            {
+              "action": "goto",
+              "criterion": 2,
+              "path": "/"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "header button.btn-primary"
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "input[type=\"url\"]",
+              "value": "https://diy.example.net/living-room-repaint"
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "input[placeholder=\"Website Title Here\"]",
+              "value": "Living Room Repaint"
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "textarea",
+              "value": "Colour and material ideas for the living room refresh."
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "#bookmark-categories-input",
+              "value": "gift-ideas"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "button[type=\"submit\"]"
+            },
+            {
+              "action": "expect_text",
+              "contains": "gift-ideas",
+              "criterion": 2
+            },
+            {
+              "action": "reload",
+              "criterion": 2
+            },
+            {
+              "action": "expect_text",
+              "contains": "gift-ideas",
+              "criterion": 2
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "article:has-text(\"Living Room Repaint\") button.btn-circle[popovertarget^=\"popover-actions-\"]"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "article:has-text(\"Living Room Repaint\") menu[id^=\"popover-actions-\"] button:has-text(\"Edit\")"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "dialog .badge:has-text(\"gift-ideas\") button"
+            },
+            {
+              "action": "fill",
+              "criterion": 2,
+              "selector": "#bookmark-categories-input",
+              "value": "home-ideas"
+            },
+            {
+              "action": "click",
+              "criterion": 2,
+              "selector": "button[type=\"submit\"]"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Bookmark updated",
+              "criterion": 2
+            },
+            {
+              "action": "reload",
+              "criterion": 2
+            },
+            {
+              "action": "expect_text",
+              "contains": "home-ideas",
+              "criterion": 2
+            },
+            {
+              "action": "click",
+              "criterion": 3,
+              "selector": "aside input[type=\"checkbox\"][value=\"home-ideas\"]"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Living Room Repaint",
+              "criterion": 3
+            },
+            {
+              "action": "click",
+              "criterion": 3,
+              "selector": "aside input[type=\"checkbox\"][value=\"home-ideas\"]"
+            },
+            {
+              "action": "fill",
+              "criterion": 3,
+              "selector": "input[type=\"search\"]",
+              "value": "Kitchen"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Kitchen Gadget",
+              "criterion": 3
+            },
+            {
+              "action": "fill",
+              "criterion": 3,
+              "selector": "input[type=\"search\"]",
+              "value": "Desk"
+            },
+            {
+              "action": "expect_text",
+              "contains": "Desk Lamp",
+              "criterion": 3
+            },
+            {
+              "action": "fill",
+              "criterion": 3,
+              "selector": "input[type=\"search\"]",
+              "value": ""
+            }
+          ],
+          "install": [
+            [
+              "npm",
+              "install"
+            ]
+          ],
+          "parameter_checks": [
+            "atlas-example",
+            "renamed-example"
+          ],
+          "port": 8080,
+          "profile": "node-web",
+          "review_note": "AI-proposed plan; independent execution is technical evidence, not human product approval.",
+          "start": [
+            "npm",
+            "run",
+            "serve",
+            "--",
+            "--host",
+            "0.0.0.0",
+            "--port",
+            "8080"
+          ],
+          "tests": []
+        },
+        "provenance": {
+          "archive_sha256": "8d7d5423093436727aa1dbb47ce8dc1bae715de309ac22bc65e650913f91af39",
+          "change_summary": "Fix the observed durability race in saveBookmark without changing the frozen node-web plan. The formal run built but lost the second saved bookmark (Desk Lamp) after reload because the reactive UI data.set(bm.id, bm) ran before the awaited IndexedDB write, so a card could render while the record was not yet durable. The fix is a single unique in-place replacement in src/App.tsrx that awaits db.bookmarks.put(bm) before data.set(bm.id, bm); the function body is otherwise identical and saves the same record. No other file is touched: the four render files (README.md, index.html, package.json, src/App.tsrx) are unchanged and still carry the literal @@PROJECT_NAME@@ token, package.json and the pinned dependency set are intact, the LICENSE (MIT, Copyright (c) 2026 Lakhindar Pal) and metadata attribution are byte-for-byte preserved, and the save/add/edit/refile/search/visit/IndexedDB-persistence end-to-end flow is retained. src/App.tsrx is not duplicated in files or retained in delete_files. No build or test pass is claimed; Atlas independently builds and runs the frozen candidate.",
+          "commit": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "excluded_paths": [],
+          "leaf": "bookmark-manager",
+          "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+          "license": "MIT",
+          "model": "open-design/deepseek-v4.1-flash",
+          "notice_hashes": {
+            "LICENSE": "17e5ccdd3ca04fa001985e8b3370d70d357f858d491b5691a461fd5985834a44"
+          },
+          "repository": "https://github.com/LakhindarPal/bookmark-manager",
+          "scenario": {
+            "acceptance": [
+              "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+              "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+              "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+              "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+            ],
+            "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+            "id": "scn_7756e0007f6a463a97316f3f49c15248",
+            "leaf": "bookmark-manager",
+            "leaf_name": "书签管理器",
+            "name": "生活待购与灵感收藏夹",
+            "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+            "revision": 2,
+            "status": "ready",
+            "updated_at": "2026-10-16T14:18:20.407897+00:00",
+            "workflow": [
+              "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+              "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+              "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+              "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+              "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+            ]
+          }
+        },
+        "reports": [],
+        "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+        "scenario_name": "生活待购与灵感收藏夹",
+        "scenario_revision": 2,
+        "supersedes": "tpl_23157bd6cc8b4f12a2a58b42bd0db4c7",
+        "id": "tpl_1218aec42a064629a0e66dd1f44da891",
+        "level": "L1",
+        "state": "draft",
+        "acceptances": [
+          {
+            "artifact_id": "tpl_1218aec42a064629a0e66dd1f44da891",
+            "created_at": "2026-10-16T15:33:41.385094+00:00",
+            "digest": "91ce1f32d0d950c64ec301ca26505475ebd5395f65b0bf3524eb267e2a9af6df",
+            "id": "acc_5e16fbc30b144e038bd3c982d7b3e3b8",
+            "job_id": "job_3244001ea21e43b194f3482155c1d41d",
+            "method": "runtime-verification",
+            "outcome": "passed",
+            "reports": [
+              {
+                "baseline": false,
+                "environment": {
+                  "engine": "docker",
+                  "image": "node:22-bookworm-slim",
+                  "image_id": "sha256:cd2df7ff65c5fce1f8a18ce89e3aac24a80c1db3776d5842a4cf86bc27f300a2",
+                  "network": "bridge",
+                  "platform": "Linux container"
+                },
+                "passed": true,
+                "project_name": "atlas-example",
+                "steps": [
+                  {
+                    "argv": [
+                      "exec",
+                      "atlas-factory-3c24fe7ebba94419935538fa8d805b02",
+                      "npm",
+                      "install"
+                    ],
+                    "exit_code": 0,
+                    "output": "\nadded 52 packages, and audited 53 packages in 3m\n\n14 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\nnpm notice\nnpm notice New major version of npm available! 10.9.9 -> 12.2.0\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0\nnpm notice To update run: npm install -g npm@12.2.0\nnpm notice\n",
+                    "passed": true,
+                    "phase": "install"
+                  },
+                  {
+                    "argv": [
+                      "exec",
+                      "atlas-factory-3c24fe7ebba94419935538fa8d805b02",
+                      "npm",
+                      "run",
+                      "build"
+                    ],
+                    "exit_code": 0,
+                    "output": "\n> atlas-example@0.1.0 build\n> vite build\n\n[@ripple-ts/vite-plugin] Scanning for Ripple packages...\n[@ripple-ts/vite-plugin] Scan complete. Found: [ 'ripple' ]\n[@ripple-ts/vite-plugin] Original vite.config 'optimizeDeps.exclude': []\n[@ripple-ts/vite-plugin] Merged 'optimizeDeps.exclude': [ 'ripple' ]\n[@ripple-ts/vite-plugin] Pass { excludeRippleExternalModules: true } option to the 'ripple' plugin to skip this scan.\nvite v8.3.4 building client environment for production...\ntransforming...\n/*! 🌼 daisyUI 5.7.50 */\n✓ 76 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/assets/favicon-CHF_ylLN.svg                             0.35 kB │ gzip:  0.23 kB\ndist/index.html                                              0.73 kB │ gzip:  0.43 kB\ndist/assets/manrope-vietnamese-wght-normal-usUDDRr7.woff2    8.52 kB\ndist/assets/manrope-greek-wght-normal-DL7QRZyv.woff2         9.44 kB\ndist/assets/manrope-cyrillic-wght-normal-Dvxsihut.woff2     14.50 kB\ndist/assets/manrope-latin-ext-wght-normal-Ch3YOpNY.woff2    15.12 kB\ndist/assets/manrope-latin-wght-normal-DHIcAJRg.woff2        24.83 kB\ndist/assets/index-CMRLFa-h.css                              94.20 kB │ gzip: 17.83 kB\ndist/assets/index-Brl9SH0n.js                              155.83 kB │ gzip: 51.75 kB\n\n✓ built in 400ms\n",
+                    "passed": true,
+                    "phase": "build"
+                  },
+                  {
+                    "check": {
+                      "action": "http",
+                      "contains": "You need to enable JavaScript to run this app.",
+                      "criterion": 0,
+                      "path": "/"
+                    },
+                    "output": "<!doctype html>\n<html lang=\"en\" data-theme=\"forest\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <meta\n      name=\"description\"\n      content=\"Save links now, organise them into categories, and find them again later. Local-first and private.\"\n    />\n    <link rel=\"shortcut icon\" type=\"image/svg+xml\" href=\"/assets/favicon-CHF_ylLN.svg\" />\n    <title>atlas-example</title>\n    <script type=\"module\" crossorigin src=\"/assets/index-Brl9SH0n.js\"></script>\n    <link rel=\"stylesheet\" crossorigin href=\"/assets/index-CMRLFa-h.css\">\n  </head>\n\n  <body>\n    <noscript>You need to enable JavaScript to run this app.</noscript>\n    <div id=\"root\"></div>\n\n  </body>\n</html>\n",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "goto",
+                      "criterion": 0,
+                      "path": "/"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "All bookmarks",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 0,
+                      "selector": "header button.btn-primary"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "input[type=\"url\"]",
+                      "value": "https://shop.example.com/kitchen-gadget"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "input[placeholder=\"Website Title Here\"]",
+                      "value": "Kitchen Gadget"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "textarea",
+                      "value": "A kitchen gadget saved for later purchase."
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "#bookmark-categories-input",
+                      "value": "wishlist"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 0,
+                      "selector": "button[type=\"submit\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Kitchen Gadget",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 0,
+                      "selector": "header button.btn-primary"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "input[type=\"url\"]",
+                      "value": "https://blog.example.org/desk-lamp"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "input[placeholder=\"Website Title Here\"]",
+                      "value": "Desk Lamp"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "textarea",
+                      "value": "A lamp idea saved for inspiration."
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "#bookmark-categories-input",
+                      "value": "inspiration"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 0,
+                      "selector": "button[type=\"submit\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Desk Lamp",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "reload",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Kitchen Gadget",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Desk Lamp",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "shop.example.com",
+                      "criterion": 1
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "blog.example.org",
+                      "criterion": 1
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 1,
+                      "selector": "article:has-text(\"Kitchen Gadget\") button.btn-circle[popovertarget^=\"popover-actions-\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "open_link",
+                      "criterion": 1,
+                      "selector": "article:has-text(\"Kitchen Gadget\") menu[id^=\"popover-actions-\"] button:has-text(\"Visit\")",
+                      "url": "https://shop.example.com/kitchen-gadget"
+                    },
+                    "output": "Navigation attempted to https://shop.example.com/kitchen-gadget; external response blocked by verifier",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "goto",
+                      "criterion": 2,
+                      "path": "/"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 2,
+                      "selector": "header button.btn-primary"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 2,
+                      "selector": "input[type=\"url\"]",
+                      "value": "https://diy.example.net/living-room-repaint"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 2,
+                      "selector": "input[placeholder=\"Website Title Here\"]",
+                      "value": "Living Room Repaint"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 2,
+                      "selector": "textarea",
+                      "value": "Colour and material ideas for the living room refresh."
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 2,
+                      "selector": "#bookmark-categories-input",
+                      "value": "gift-ideas"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 2,
+                      "selector": "button[type=\"submit\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "gift-ideas",
+                      "criterion": 2
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "reload",
+                      "criterion": 2
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "gift-ideas",
+                      "criterion": 2
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 2,
+                      "selector": "article:has-text(\"Living Room Repaint\") button.btn-circle[popovertarget^=\"popover-actions-\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 2,
+                      "selector": "article:has-text(\"Living Room Repaint\") menu[id^=\"popover-actions-\"] button:has-text(\"Edit\")"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 2,
+                      "selector": "dialog .badge:has-text(\"gift-ideas\") button"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 2,
+                      "selector": "#bookmark-categories-input",
+                      "value": "home-ideas"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 2,
+                      "selector": "button[type=\"submit\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Bookmark updated",
+                      "criterion": 2
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "reload",
+                      "criterion": 2
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "home-ideas",
+                      "criterion": 2
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 3,
+                      "selector": "aside input[type=\"checkbox\"][value=\"home-ideas\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Living Room Repaint",
+                      "criterion": 3
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 3,
+                      "selector": "aside input[type=\"checkbox\"][value=\"home-ideas\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 3,
+                      "selector": "input[type=\"search\"]",
+                      "value": "Kitchen"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Kitchen Gadget",
+                      "criterion": 3
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 3,
+                      "selector": "input[type=\"search\"]",
+                      "value": "Desk"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Desk Lamp",
+                      "criterion": 3
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 3,
+                      "selector": "input[type=\"search\"]",
+                      "value": ""
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  }
+                ]
+              },
+              {
+                "baseline": false,
+                "environment": {
+                  "engine": "docker",
+                  "image": "node:22-bookworm-slim",
+                  "image_id": "sha256:cd2df7ff65c5fce1f8a18ce89e3aac24a80c1db3776d5842a4cf86bc27f300a2",
+                  "network": "bridge",
+                  "platform": "Linux container"
+                },
+                "passed": true,
+                "project_name": "renamed-example",
+                "steps": [
+                  {
+                    "argv": [
+                      "exec",
+                      "atlas-factory-2025584fc5fe4b0cb62fe1bddfbfffeb",
+                      "npm",
+                      "install"
+                    ],
+                    "exit_code": 0,
+                    "output": "\nadded 52 packages, and audited 53 packages in 3m\n\n14 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\nnpm notice\nnpm notice New major version of npm available! 10.9.9 -> 12.2.0\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0\nnpm notice To update run: npm install -g npm@12.2.0\nnpm notice\n",
+                    "passed": true,
+                    "phase": "install"
+                  },
+                  {
+                    "argv": [
+                      "exec",
+                      "atlas-factory-2025584fc5fe4b0cb62fe1bddfbfffeb",
+                      "npm",
+                      "run",
+                      "build"
+                    ],
+                    "exit_code": 0,
+                    "output": "\n> renamed-example@0.1.0 build\n> vite build\n\n[@ripple-ts/vite-plugin] Scanning for Ripple packages...\n[@ripple-ts/vite-plugin] Scan complete. Found: [ 'ripple' ]\n[@ripple-ts/vite-plugin] Original vite.config 'optimizeDeps.exclude': []\n[@ripple-ts/vite-plugin] Merged 'optimizeDeps.exclude': [ 'ripple' ]\n[@ripple-ts/vite-plugin] Pass { excludeRippleExternalModules: true } option to the 'ripple' plugin to skip this scan.\nvite v8.3.4 building client environment for production...\ntransforming...\n/*! 🌼 daisyUI 5.7.50 */\n✓ 76 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/assets/favicon-CHF_ylLN.svg                             0.35 kB │ gzip:  0.23 kB\ndist/index.html                                              0.73 kB │ gzip:  0.43 kB\ndist/assets/manrope-vietnamese-wght-normal-usUDDRr7.woff2    8.52 kB\ndist/assets/manrope-greek-wght-normal-DL7QRZyv.woff2         9.44 kB\ndist/assets/manrope-cyrillic-wght-normal-Dvxsihut.woff2     14.50 kB\ndist/assets/manrope-latin-ext-wght-normal-Ch3YOpNY.woff2    15.12 kB\ndist/assets/manrope-latin-wght-normal-DHIcAJRg.woff2        24.83 kB\ndist/assets/index-CMRLFa-h.css                              94.20 kB │ gzip: 17.83 kB\ndist/assets/index-DMEalLMS.js                              155.83 kB │ gzip: 51.75 kB\n\n✓ built in 348ms\n",
+                    "passed": true,
+                    "phase": "build"
+                  },
+                  {
+                    "check": {
+                      "action": "http",
+                      "contains": "You need to enable JavaScript to run this app.",
+                      "criterion": 0,
+                      "path": "/"
+                    },
+                    "output": "<!doctype html>\n<html lang=\"en\" data-theme=\"forest\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <meta\n      name=\"description\"\n      content=\"Save links now, organise them into categories, and find them again later. Local-first and private.\"\n    />\n    <link rel=\"shortcut icon\" type=\"image/svg+xml\" href=\"/assets/favicon-CHF_ylLN.svg\" />\n    <title>renamed-example</title>\n    <script type=\"module\" crossorigin src=\"/assets/index-DMEalLMS.js\"></script>\n    <link rel=\"stylesheet\" crossorigin href=\"/assets/index-CMRLFa-h.css\">\n  </head>\n\n  <body>\n    <noscript>You need to enable JavaScript to run this app.</noscript>\n    <div id=\"root\"></div>\n\n  </body>\n</html>\n",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "goto",
+                      "criterion": 0,
+                      "path": "/"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "All bookmarks",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 0,
+                      "selector": "header button.btn-primary"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "input[type=\"url\"]",
+                      "value": "https://shop.example.com/kitchen-gadget"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "input[placeholder=\"Website Title Here\"]",
+                      "value": "Kitchen Gadget"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "textarea",
+                      "value": "A kitchen gadget saved for later purchase."
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "#bookmark-categories-input",
+                      "value": "wishlist"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 0,
+                      "selector": "button[type=\"submit\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Kitchen Gadget",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 0,
+                      "selector": "header button.btn-primary"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "input[type=\"url\"]",
+                      "value": "https://blog.example.org/desk-lamp"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "input[placeholder=\"Website Title Here\"]",
+                      "value": "Desk Lamp"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "textarea",
+                      "value": "A lamp idea saved for inspiration."
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 0,
+                      "selector": "#bookmark-categories-input",
+                      "value": "inspiration"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 0,
+                      "selector": "button[type=\"submit\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Desk Lamp",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "reload",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Kitchen Gadget",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Desk Lamp",
+                      "criterion": 0
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "shop.example.com",
+                      "criterion": 1
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "blog.example.org",
+                      "criterion": 1
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 1,
+                      "selector": "article:has-text(\"Kitchen Gadget\") button.btn-circle[popovertarget^=\"popover-actions-\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "open_link",
+                      "criterion": 1,
+                      "selector": "article:has-text(\"Kitchen Gadget\") menu[id^=\"popover-actions-\"] button:has-text(\"Visit\")",
+                      "url": "https://shop.example.com/kitchen-gadget"
+                    },
+                    "output": "Navigation attempted to https://shop.example.com/kitchen-gadget; external response blocked by verifier",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "goto",
+                      "criterion": 2,
+                      "path": "/"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 2,
+                      "selector": "header button.btn-primary"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 2,
+                      "selector": "input[type=\"url\"]",
+                      "value": "https://diy.example.net/living-room-repaint"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 2,
+                      "selector": "input[placeholder=\"Website Title Here\"]",
+                      "value": "Living Room Repaint"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 2,
+                      "selector": "textarea",
+                      "value": "Colour and material ideas for the living room refresh."
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 2,
+                      "selector": "#bookmark-categories-input",
+                      "value": "gift-ideas"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 2,
+                      "selector": "button[type=\"submit\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "gift-ideas",
+                      "criterion": 2
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "reload",
+                      "criterion": 2
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "gift-ideas",
+                      "criterion": 2
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 2,
+                      "selector": "article:has-text(\"Living Room Repaint\") button.btn-circle[popovertarget^=\"popover-actions-\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 2,
+                      "selector": "article:has-text(\"Living Room Repaint\") menu[id^=\"popover-actions-\"] button:has-text(\"Edit\")"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 2,
+                      "selector": "dialog .badge:has-text(\"gift-ideas\") button"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 2,
+                      "selector": "#bookmark-categories-input",
+                      "value": "home-ideas"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 2,
+                      "selector": "button[type=\"submit\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Bookmark updated",
+                      "criterion": 2
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "reload",
+                      "criterion": 2
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "home-ideas",
+                      "criterion": 2
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 3,
+                      "selector": "aside input[type=\"checkbox\"][value=\"home-ideas\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Living Room Repaint",
+                      "criterion": 3
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "click",
+                      "criterion": 3,
+                      "selector": "aside input[type=\"checkbox\"][value=\"home-ideas\"]"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 3,
+                      "selector": "input[type=\"search\"]",
+                      "value": "Kitchen"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Kitchen Gadget",
+                      "criterion": 3
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 3,
+                      "selector": "input[type=\"search\"]",
+                      "value": "Desk"
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "expect_text",
+                      "contains": "Desk Lamp",
+                      "criterion": 3
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  },
+                  {
+                    "check": {
+                      "action": "fill",
+                      "criterion": 3,
+                      "selector": "input[type=\"search\"]",
+                      "value": ""
+                    },
+                    "output": "",
+                    "passed": true,
+                    "phase": "acceptance"
+                  }
+                ]
+              }
+            ],
+            "scope": "Independent Linux container installation, build and scenario assertions for two rendered project names"
+          },
+          {
+            "artifact_id": "tpl_1218aec42a064629a0e66dd1f44da891",
+            "created_at": "2026-10-16T15:31:36.520015+00:00",
+            "criteria": [
+              {
+                "criterion": 0,
+                "files": [
+                  "src/App.tsrx",
+                  "src/includes/store.ts",
+                  "index.html",
+                  "package.json"
+                ],
+                "outcome": "passed",
+                "reason": "Persistence: store.ts defines a Dexie/IndexedDB database ('BookmarkDB', version 1 stores 'id, createdAt, visitCount') typed with EntityTable<Bookmark,'id'>. App.tsrx saveBookmark() awaits db.bookmarks.put(bm) and an on-mount effect() calls db.bookmarks.toArray() to reload records, so saved links survive reload/new sessions and accumulate. The Add flow (header button.btn-primary -> dialog with input[type=url], input[placeholder='Website Title Here'], textarea, #bookmark-categories-input, button[type=submit]) matches every plan selector, and submit builds a Bookmark and calls saveBookmark before closing. index.html contains the noscript text 'You need to enable JavaScript to run this app.' and the h2 'All bookmarks' is rendered, matching the http/goto/expect_text checks. Seeding is disabled (appConfig.seedExampleBookmarks=false), so example Bookmark data ('Kitchen Gadget' etc.) does not pre-populate the library and cannot interfere with the checks."
+              },
+              {
+                "criterion": 1,
+                "files": [
+                  "src/App.tsrx",
+                  "src/includes/utils.ts"
+                ],
+                "outcome": "passed",
+                "reason": "URL anchoring: Bookmark stores url and hostname (hostname computed by getHostname() in utils.ts via new URL().hostname) and each article renders {item.hostname}, so 'shop.example.com'/'blog.example.org' appear. The per-card actions button has class including 'btn-circle' and popovertarget={'popover-actions-'+item.id}, and its popover menu id is 'popover-actions-'+item.id, matching the selectors. The 'Visit' action calls window.open(item.url,'_blank','noopener,noreferrer'), returning to the anchored page URL (https://shop.example.com/kitchen-gadget) as required by the open_link check. Runtime jump itself was not executed."
+              },
+              {
+                "criterion": 2,
+                "files": [
+                  "src/App.tsrx",
+                  "src/includes/config.ts"
+                ],
+                "outcome": "passed",
+                "reason": "Category creation/re-filing: categories are the Bookmark.tags array; parseCategories() adds trimmed, deduped categories and the submit handler defaults empty input to appConfig.defaultCategory. Creating a bookmark with gift-ideas renders the tag badge and aside category entry (expect_text gift-ideas), and the Dexie put makes it survive reload. Editing opens the dialog with draftTags=[...item.tags]; the badge's remove button (draftTags.filter) drops gift-ideas, then filling #bookmark-categories-input with home-ideas and submitting yields tags ['home-ideas'] with the same id, calls saveBookmark (persisted), shows the success toast 'Bookmark updated', and a reload re-reads home-ideas from IndexedDB. All plan selectors for this flow (article popover button, menu Edit, dialog .badge button, #bookmark-categories-input, button[type=submit]) exist in the markup."
+              },
+              {
+                "criterion": 3,
+                "files": [
+                  "src/App.tsrx",
+                  "src/includes/store.ts"
+                ],
+                "outcome": "passed",
+                "reason": "Retrieval by category and keyword: the aside renders a checkbox per category with value={category} bound via bindGroup(filtersRef); the derived bookmarks list filters by _tags.every(t => bookmark.tags.includes(t)), so checking aside input[type=checkbox][value='home-ideas'] narrows the list to 'Living Room Repaint'. The header input[type='search'] is bound via bindValue(searchRef) and the same derived list filters on bookmark.title.toLowerCase().includes(_search), so searching 'Kitchen' shows 'Kitchen Gadget' and 'Desk' shows 'Desk Lamp'. Tab, filter, sort, and search are all reactive track() values, so the filtering recomputes as inputs change."
+              }
+            ],
+            "digest": "91ce1f32d0d950c64ec301ca26505475ebd5395f65b0bf3524eb267e2a9af6df",
+            "id": "acc_6e83d27e7ae04726a34eb93ab3beb3b2",
+            "job_id": "job_8e2ed2f9f7e9485b8cb60c570b7d0a51",
+            "method": "harness-review",
+            "model": "open-design/deepseek-v4.1-flash",
+            "outcome": "passed",
+            "scope": "OpenCode CLI source review only; no install, build or runtime behavior was executed",
+            "summary": "Read-only static review of the frozen bookmark-manager template against scenario acceptance criteria 0-3, using input.json plus the render files (README.md, index.html, package.json, src/App.tsrx) and supporting modules (src/includes/store.ts, config.ts, utils.ts, Icon.tsrx, src/index.ts, vite.config.js). All paths were read under source/. No install, build, execution, or runtime claim was made; only source-level behavior was assessed. Runtime behaviors that depend on the declared framework versions (ripple 0.3.65 / @ripple-ts/vite-plugin 0.3.65 for track/bindValue/bindGroup/RippleMap/ref/mount, vite ^8 preview, browser IndexedDB, native popover/dialog, and window.open) were not executed and are not treated as verified; no blocking source issue was found and no criterion relies on undocumented or missing implementation. Declared dependencies were taken from the frozen package.json rather than any current upstream branch."
+          }
+        ],
+        "acceptance_jobs": [
+          {
+            "id": "job_8e2ed2f9f7e9485b8cb60c570b7d0a51",
+            "kind": "harness-review",
+            "state": "completed",
+            "stage": "acceptance",
+            "updated_at": "2026-10-16T15:31:36.520682+00:00"
+          },
+          {
+            "id": "job_3244001ea21e43b194f3482155c1d41d",
+            "kind": "runtime-verification",
+            "state": "completed",
+            "stage": "acceptance",
+            "updated_at": "2026-10-16T15:33:41.392061+00:00"
+          }
+        ]
+      },
+      "source_matches_tested_diagnostic": true,
+      "runtime_job_id": "job_3244001ea21e43b194f3482155c1d41d",
+      "review_job_id": "job_8e2ed2f9f7e9485b8cb60c570b7d0a51"
+    }
+  ],
+  "diagnostic": {
+    "path": "diagnostics/tpl_9d83da5e43fa4c7380a0331c3e47d7bc",
+    "outcome": "timeout",
+    "scope": "Node profile diagnostic override; npm registry HTTP 200 responses observed; install exceeded 300 seconds; no build or browser outcome."
+  },
+  "factory_validation": {
+    "backend_full_tests": 309,
+    "backend_factory_tests": 41,
+    "backend_result": "passed",
+    "factory_browser_tests": 5,
+    "factory_browser_result": "passed",
+    "frontend_typecheck": "passed",
+    "frontend_production_build": "passed",
+    "ruff": "passed",
+    "diff_check": "passed",
+    "test_isolation_note": "The existing generation-fallback unit test now snapshots its own fixture source directory; no production source-containment guard was relaxed."
+  },
+  "diagnostic_full_flow": {
+    "root": "diagnostics/tpl_23157bd6cc8b4f12a2a58b42bd0db4c7",
+    "app_path": "durability-diagnostic-app",
+    "source_patch": {
+      "path": "src/App.tsrx",
+      "old": "  async function saveBookmark(bm: Bookmark) {\n    data.set(bm.id, bm);\n    await db.bookmarks.put(bm);\n  }",
+      "new": "  async function saveBookmark(bm: Bookmark) {\n    await db.bookmarks.put(bm);\n    data.set(bm.id, bm);\n  }"
+    },
+    "report": "durability-evidence/report.json",
+    "proposed_plan": "proposed-plan.json",
+    "passed": true,
+    "build_steps": 1,
+    "browser_checks": 50,
+    "dependency_installation": "reused from isolated runtime; not a fresh formal acceptance",
+    "external_link_scope": "actual navigation request asserted; external response blocked"
+  },
+  "diagnostic_history": [
+    {
+      "root": "diagnostics/tpl_be53631bd57e470dae674b6fc8174db7",
+      "source_patch": {
+        "path": "src/App.tsrx",
+        "old": "function commitCategories(raw?: string) {",
+        "new": "function commitCategories(raw: string = undefined) {"
+      },
+      "report": "complete-evidence/report.json",
+      "proposed_plan": "proposed-plan.json",
+      "passed": true,
+      "build_steps": 1,
+      "browser_checks": 50,
+      "dependency_installation": "reused from prior isolated runtime; not a fresh installation or formal acceptance",
+      "external_link_scope": "actual navigation request asserted; external response blocked"
+    }
+  ],
+  "final_artifact": {
+    "id": "tpl_1218aec42a064629a0e66dd1f44da891",
+    "digest": "91ce1f32d0d950c64ec301ca26505475ebd5395f65b0bf3524eb267e2a9af6df",
+    "level": "L1",
+    "state": "draft",
+    "automatic_publication": false,
+    "source_commit": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "license": "MIT",
+    "acceptance_ids": {
+      "runtime-verification": "acc_5e16fbc30b144e038bd3c982d7b3e3b8",
+      "harness-review": "acc_6e83d27e7ae04726a34eb93ab3beb3b2"
+    },
+    "runtime_instances": [
+      {
+        "project_name": "atlas-example",
+        "passed": true,
+        "browser_checks": 50,
+        "image_id": "sha256:cd2df7ff65c5fce1f8a18ce89e3aac24a80c1db3776d5842a4cf86bc27f300a2"
+      },
+      {
+        "project_name": "renamed-example",
+        "passed": true,
+        "browser_checks": 50,
+        "image_id": "sha256:cd2df7ff65c5fce1f8a18ce89e3aac24a80c1db3776d5842a4cf86bc27f300a2"
+      }
+    ]
+  },
+  "completed_at": "2026-10-16T15:33:41.385094+00:00",
+  "instantiations": [
+    {
+      "artifact_id": "tpl_e81e4f53f208465c9616dd1bc4c1f8b1",
+      "digest": "6dbb57deaf19d9786528011d2128313e4cc363a3a9414c1f1e142678fdbc13dc",
+      "project_name": "my-bookmark-library",
+      "identical_archives": true,
+      "sha256": "dd180b52e7ac06518e949bf97a785782f9c77bd2cb9c99890df5e38b2fad1fc1",
+      "license_hash_preserved": true,
+      "all_render_tokens_replaced": true,
+      "model_invoked": false,
+      "host_candidate_executed": false,
+      "example_zip": "/tmp/atlas-bookmark-library.zip",
+      "download_url": "/api/factory/downloads/705f77e1e7c34535989c2a7f48169e88"
+    },
+    {
+      "artifact_id": "tpl_1218aec42a064629a0e66dd1f44da891",
+      "digest": "91ce1f32d0d950c64ec301ca26505475ebd5395f65b0bf3524eb267e2a9af6df",
+      "project_name": "my-bookmark-library",
+      "identical_archives": true,
+      "sha256": "3865ea084b3f500baf54d12f932d0743770e0f5250ac51d79d7c812c72311cd4",
+      "license_hash_preserved": true,
+      "all_render_tokens_replaced": true,
+      "model_invoked": false,
+      "host_candidate_executed": false,
+      "example_zip": "/tmp/atlas-bookmark-library-final-candidate.zip",
+      "download_url": "/api/factory/downloads/96da5d6c45f54adb8db96de7c1df34db"
+    }
+  ],
+  "ui_reopen_proof": {
+    "container": "7a241d42162508513c4e0faaf2c6eede86362166d904c693c0776445023eb73b",
+    "name": "atlas-bookmark-reopen-proof-1218aec4",
+    "url": "http://127.0.0.1:52439",
+    "artifact_id": "tpl_1218aec42a064629a0e66dd1f44da891",
+    "artifact_digest": "91ce1f32d0d950c64ec301ca26505475ebd5395f65b0bf3524eb267e2a9af6df",
+    "scope": "UI close/reopen proof using dist from first successful fresh formal verification; immutable source not changed.",
+    "passed": true,
+    "default_category": "inbox",
+    "record_title": "关闭重开验证",
+    "closed_tab": true,
+    "reopened_new_tab_same_origin": true,
+    "record_and_category_retained": true,
+    "screenshot": "/tmp/atlas-bookmark-reopen-proof.jpg",
+    "preview_container_cleaned": true,
+    "repository_screenshot": "docs/template-factory/2026-10-16-bookmark-reopen.jpg"
+  },
+  "negative_navigation_proof": {
+    "passed": true,
+    "record": "diagnostics/tpl_be53631bd57e470dae674b6fc8174db7/wrong-target-test.json"
+  },
+  "factory_ui_proof": {
+    "screenshot": "docs/template-factory/2026-10-16-bookmark-factory.jpg",
+    "sha256": "b69f83de5074b325d63f524632bd35d014867e670554a205b1bd1de9b5b4f802",
+    "visible_status": [
+      "L1 draft",
+      "Harness review passed",
+      "Runtime acceptance passed"
+    ]
+  }
+}

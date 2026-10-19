@@ -1,0 +1,80 @@
+{
+  "experiment": "one paired practical trial, not a statistical benchmark",
+  "model": "commandcode/deepseek/deepseek-v4.1-flash",
+  "template_version": "0.1.12",
+  "mapping": {
+    "template": "Y",
+    "without_template": "X"
+  },
+  "integrity_verified": true,
+  "independent_comparison_sha256": "58828cfab03e366f3e0f64ee7a435dfdb1090ec4523f9fad02354561cbdac298",
+  "apps": {
+    "X": {
+      "source_hashes": {
+        "README.md": "7f263957fc3dd7f57530f67c39b03740d6a560cfb3e5fb976cbc39339a618281",
+        "api.py": "aeaa93180db3f50da4b0faa48e01a1f3f495800509c0ca52a3681c9937dee907",
+        "app.py": "0bae81e1a0708f6a64f787162013c1abf3eadac9fb383661047401811f940498",
+        "static/app.js": "1222f429b5b7b2659704a037c5d96a6d697dd21cfa462469ac6047e42083a88a",
+        "static/index.html": "7067bc3c740f79c2cb791a846b585d40599b8cd878ec6703eddf4dea457d796f",
+        "static/style.css": "5adf38446776588644e2cfe4dd38655eb80dea377afcf979a76c871b00399578",
+        "storage.py": "7117d513561abe369c884c9fba9edf1ae22747d1fdf253e95e6839598f9cdde4"
+      },
+      "runtime_required": {
+        "R01": "runtime_assertions_passed",
+        "R02": "runtime_assertions_passed",
+        "R03": "runtime_assertions_passed",
+        "R04": "runtime_assertions_passed",
+        "R05": "runtime_assertions_passed",
+        "R06": "runtime_assertions_passed",
+        "R07": "runtime_assertions_passed",
+        "R08": "runtime_assertions_passed",
+        "R09": "runtime_assertions_passed"
+      },
+      "supplement": {
+        "outcome": "accepted_text_changed",
+        "submitted_full_note_verified": true,
+        "expected_note_code_points": 3420,
+        "actual_note_code_points": 2000
+      },
+      "test_services_stopped": true
+    },
+    "Y": {
+      "source_hashes": {
+        "README.md": "798e44e2d83b85b5e873cb8b2c7c25bbd5bcf4e55fedc6ee73452294c098b1ac",
+        "app.py": "5154d306e39bc5fdccb0a6bb01406be98e1af6e2056abf74f7fb5c4ab6b9650a",
+        "db.py": "ba4c4b80bde894347281610bd5c0e590801983cbbc9509d772addc09d5207eb8",
+        "server.py": "8432279095f36205d49aa18506393f09e56eaf4f3d069cdffeda93e7be7f9299",
+        "static/app.js": "b0029def4157f6e372e44dbe720b219cd5da0253b75fb4d399412706fcb021dc",
+        "static/style.css": "872104c515040ebfaee21e8f902fe6a4ba6bb93a5fefc89d0ac3a2c8b001fda3",
+        "store.py": "98a6a09a377a0b23b9ffffbaa3d2f2c2b5ab44fdeabcbb8524298d4d44809c41",
+        "urlutil.py": "4ae3077a9d0d5d9296615b30b03e90e163b48acd620d503b1ad36661fa4eb99a",
+        "views.py": "311c04a9e3957c99b85b40505d0fba478252a5f96e24530f4dfa9a8f976e1648"
+      },
+      "runtime_required": {
+        "R01": "runtime_assertions_passed",
+        "R02": "runtime_assertions_passed",
+        "R03": "runtime_assertions_passed",
+        "R04": "runtime_assertions_passed",
+        "R05": "runtime_assertions_passed",
+        "R06": "runtime_assertions_passed",
+        "R07": "runtime_assertions_passed",
+        "R08": "runtime_assertions_passed",
+        "R09": "runtime_assertions_passed"
+      },
+      "supplement": {
+        "outcome": "exact_round_trip",
+        "submitted_full_note_verified": true,
+        "expected_note_code_points": 3420,
+        "actual_note_code_points": 3420
+      },
+      "test_services_stopped": true
+    }
+  },
+  "caveats": [
+    "one scenario, one pair, no statistical causal conclusion",
+    "shared Python runtime overrides recommended Node stack",
+    "post-review M02b is exploratory and not a changed required gate",
+    "text-only independent evaluator audited actual runtime records; evaluator did not execute code",
+    "original template acceptance suite not run; no publication or grade promotion"
+  ]
+}

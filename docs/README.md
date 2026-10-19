@@ -2,6 +2,28 @@
 
 本目录只把当前决策、下一步计划和仍会继续更新的验证记录放在顶层。已经完成的阶段记录移入 `archive/`，保留证据但不再作为当前任务入口。
 
+## GitHub 阶段交付
+
+用户于 2026-10-19 授权将当前开发成果及后续完成并验证的阶段成果提交、推送到 `git@github.com:liamamilin/atlas.git`。沿用当前工作分支，每阶段提交前核对改动、凭据、可分发文件和相应验证；不强制推送或覆盖远程历史。源码、文档、汇总证据及明确保留的交付包进入版本库；本地数据库、凭据、依赖、构建输出与模型运行的嵌套 Git 工作区留在本机。后者由 `template-factory/.gitignore` 明确列出，避免误提交为无法克隆的子模块；原文件不删除。推送本身不代表已发布产品或远程 CI 已通过。
+
+## 模板工厂
+
+叶子类型与应用场景构成生产目录。当前已实现场景生产及代码候选模板流程；模板主线为“认知模板包”，提供成熟产品判断、开发决策、分期与可执行验收，结合必要代码交给开发 agent 使用。认知包支持 OpenCode 多源研究、独立规范预审、联合生成、完整审阅、修订及冻结阅读；开发包按完整认知、当前执行和独立验收组织。声明冻结 runner 的包可提交源码进行 Docker 阶段验收；旧包缺适配器明确不可用。真实试产阻断、运行和修订证据分别记录，认知发布仍未开放。
+
+- [自动认知生产与独立审阅验证](template-factory/2026-10-17-cognitive-production.md)
+- [完整认知库、阶段执行与独立验收改造](template-factory/2026-10-19-factory-refactor/README.md)：交付协议、CLI 可靠性、容器运行边界与本轮验证。
+- [使用/不使用认知模板的真实开发 A/B](template-factory/ab-tests/bookmark-2026-10-18/REPORT.md)：同一 commandcode/DeepSeek V4.1 Flash 开发两份应用、真实浏览器及持久化实测、独立匿名配对评测；核心流程均通过，边界差异、开发用量和 CLI 失败分别记录。
+- [阶段摘要交接与本地导出验证](template-factory/handoff-pilots/bookmark-2026-10-18/README.md)：当前能力、前期回归和决策先读，完整原包按任务查阅；不等于新一轮模型开发或成本验证。
+- [完整核心 P0 的书签后续试用](template-factory/handoff-pilots/bookmark-core-2026-10-18/README.md)：新规范、OpenCode 开发、分类与请求截断缺陷、必要修复及真实复测；首轮和修复结果分别保留，不改旧 A/B 成绩。
+- [跨品类模板与交接形式对照](template-factory/ab-tests/cross-domain-2026-10-19/REPORT.md)：预算、设施预约、批量改名，比较无模板、完整附件和同包分层交接；真实运行、修复与探索性边界差异分开记录，没有通用获胜或成本结论。另见[模板形式建议](template-factory/ab-tests/cross-domain-2026-10-19/FORM_ANALYSIS.md)。
+- [认知包工厂接入验证](template-factory/2026-10-17-cognitive-factory-integration.md)
+- [认知模板设计与当前实施顺序](TEMPLATE_COGNITION_DESIGN.md)
+- [个人书签认知模板样板](template-factory/blueprints/bookmark-personal/README.md)：规范、开发指令与阶段验收；已完成独立审阅修订和下游 P0 十项实测，范围及证据见包内 VALIDATION.md。
+
+- [开发计划与范围](TEMPLATE_FACTORY_PLAN.md)
+- [使用说明](TEMPLATE_FACTORY_GUIDE.md)
+- [验证记录](TEMPLATE_FACTORY_VALIDATION.md)
+
 ## 当前工作文档
 
 - [U17 产品设计](U17_DESIGN.md)：产品边界、用户流程、项目模型和执行架构。
@@ -9,6 +31,7 @@
 - [U17 项目工作台设计检查](U17_PROJECT_WORKBENCH_REVIEW.md)：项目页面的状态语义、操作闭环、风险分级、处理记录与重构顺序。
 - [U17 产品打磨计划](U17_PRODUCT_POLISH_PLAN.md)：当前阶段的产品收口顺序、完成定义和恢复 M5 的条件。
 - [U17 产品化收口开发计划](U17_PRODUCT_CLOSURE_PLAN.md)：本轮发布前的开发阶段、执行循环、完成条件和当前队列。
+- [U17 剩余产品收口与发布打磨计划](U17_REMAINING_PRODUCT_PLAN.md)：T025-T032 的优先级、依赖、外部条件、验证矩阵和 `PROJECT_ACCEPTED` 门槛。
 - [U17 M5 试点计划](U17_M5_PILOT_PLAN.md)：产品打磨完成后的三个真实案例、普通生成对照和后端决策办法。
 - [U17 核心主线验证](U17_CORE_PATH_VALIDATION.md)：最近一次从类型入口到完成迭代的全绿证据。
 - [U17 发布检查清单](U17_RELEASE_CHECKLIST.md)：可重复执行的自动化、浏览器和安全反馈发布前检查。
@@ -29,4 +52,4 @@
 
 - [U17 M0–M4 验证档案](archive/u17/README.md)：已完成阶段的实现范围、测试和浏览器证据。
 
-归档文档用于追溯，不用于判断当前下一步。当前状态以开发规划和 M5 试点计划为准。
+归档文档用于追溯，不用于判断当前下一步。当前状态以开发规划、M5 试点计划和[剩余产品收口与发布打磨计划](U17_REMAINING_PRODUCT_PLAN.md)为准。

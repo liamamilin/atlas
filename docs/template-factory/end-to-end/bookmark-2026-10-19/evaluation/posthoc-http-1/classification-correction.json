@@ -1,0 +1,8 @@
+{
+  "classification": "harness_measurement_invalid",
+  "product_evidence_valid": false,
+  "original_run_json_preserved": true,
+  "reason": "The initial probe searched after a narrow title query and classified rows using data attributes rather than exact li class tokens. It missed the saved CRLF record and did not inspect /go/<id>; category counts were also not trustworthy.",
+  "corrected_by": "../posthoc-http-3/run.json",
+  "corrections": "Exact li class-token classification, deduplication by record ID, complete inventory comparison, actual app HTML parser cross-check, raw HTML snapshots, and no-follow /go/<id> response-header inspection."
+}

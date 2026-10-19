@@ -1,0 +1,48 @@
+{
+  "base_proposal_digest": "bc8a73b6d9eaab204cef484bbd476abca9ad6212fb03d2828817ea164dde0366",
+  "model_response_digest": "2621e9312209815e36a4ab4f7bf78ff0c9b9b8dcbeac4886e6c10ffd7ad2393d",
+  "effective_proposal_digest": "8be9b8cd74ed3e71d7dda7efddd8841717e640f822eb0cccf6d0702b41d865f3",
+  "changed_fields": [
+    [
+      "architecture_markdown"
+    ],
+    [
+      "decisions",
+      "D07",
+      "default"
+    ],
+    [
+      "acceptance",
+      "A03",
+      "goal"
+    ],
+    [
+      "acceptance",
+      "A09",
+      "goal"
+    ],
+    [
+      "acceptance",
+      "A17",
+      "goal"
+    ],
+    [
+      "acceptance",
+      "A20",
+      "goal"
+    ]
+  ],
+  "file_plan_changes": [
+    {
+      "path": "acceptance/p0-limits.cjs",
+      "purpose": "编辑。P0 行为组 A08/A09/A10，导出 {phase:'P0', cases:[A08,A09,A10]}。保留 A08 字段边界成功往返与 A10 保守归一。扩展 A09：在既有 501/10001/2049/64KiB 之外，发送含 CR、LF、Tab、U+0000 的原始 URL 断言 400 invalid_url 且 details.reason=control_character；标题或备注含 U+0001 断言 invalid_title/invalid_note；保留 Origin:null、外站 Origin、Sec-Fetch-Site:cross-site 的 403 forbidden_origin 与 POST 错误 Host 的 400 invalid_host。新增只向已配置目标发送错误 Host 的 GET：/api/bookmarks、/api/categories、/api/bookmarks/{id}、/b/{id}、/，均断言 400 invalid_host、统一错误信封、正文不含已存标题或 URL；另用正确 Host 加伪造 X-Forwarded-Host 证明不采信该头。追加真实 application/x-www-form-urlencoded 的 POST /bookmarks 保存表单四类坏头负例（错误 Host、Origin:null、外站 Origin、Sec-Fetch-Site:cross-site），字段为合法 runId 网址/标题/备注、非 JSON body，经 common.request 只向已配置目标发送且 redirect=manual，期待错误 Host=400 invalid_host、其余=403 forbidden_origin，响应仅错误信封且无数据正文。所有失败后用 listRunBookmarks 与 categorySnapshot 断言零写入，操作前后基础列表、归类计数与本 run 探测记录不变，不提前调用 P1/P2 接口。依赖 common.request/api/断言与 support.defineCase/expectError/fillCodePoints/listRunBookmarks/readBookmark/scopedUrl；由 p0.cjs require，不读取凭据。对应 REVISION 第 5、7 项。",
+      "reuse": false
+    },
+    {
+      "path": "acceptance/p1-edit.cjs",
+      "purpose": "编辑。P1 行为组 A19/A20，导出 {phase:'P1', cases:[A19,A20]}。保留 A19 全部原断言与 A20 不存在 id、空 PATCH、PATCH url、非法 categoryId 与统一错误信封；形状合法但不存在/已 tombstone 的 categoryId 断言 details.reason=unknown_or_deleted。以本 run 独立且由 tracker 管理的活跃归类、目标归类、活跃书签与回收站书签为前置，在 A20 追加坏头矩阵：HTML POST /bookmarks/{id}/move、/bookmarks/{id}/edit、/bookmarks/{id}/delete、/categories、/categories/{id}/rename、/categories/{id}/delete（mode=move 到本 run 活跃目标）、/trash/{id}/restore、/trash/{id}/delete、/trash/clear 使用真实 application/x-www-form-urlencoded 与语义合法字段；JSON POST /api/categories、PATCH /api/categories/{id}、DELETE /api/categories/{id}?mode=move&targetCategoryId={ownedTarget} 覆盖同样坏头；错误 Host 得 400 invalid_host（含 GET /api/trash 仅错误信封、无数据正文），Origin:null、外站 Origin、Sec-Fetch-Site:cross-site 得 403 forbidden_origin。永久删除/清空探针不带 confirm 或 confirm=false，绝不发送全局 confirm=true；不调用全局 DELETE /api/trash、不绕过 common 的 --allow-destructive 护栏。每步后用 API 读回、完整归类快照与本 run 活跃/回收记录证明零写入并保留 title/note/categoryId/updatedAt/来源字段与计数；只操作本 run 夹具，不假设全库或回收站为空，不清理非本 run 记录，保留旧 tracker 的实际接口与失败诊断。依赖 common/support；由 p1.cjs 聚合，不读取 P2 检索。",
+      "reuse": false
+    }
+  ],
+  "scope": "Exact model-authored local specification repair. Unaddressed fields, row identities and file inventory retained by host; not acceptance evidence."
+}

@@ -1,0 +1,55 @@
+{
+  "status": "delivered",
+  "cli_status": "completed",
+  "attempt": 1,
+  "elapsed_seconds_all_attempts": 127.16,
+  "source_sha256": {
+    "DECISIONS.md": "30ad0cc5dff563006663cc29c0d71c4ef6aa53901818912264b6a3c6b7e0d9c8",
+    "README.md": "2cf7f0495de9b988acff9e35cfd19f1147463f5debe1e92d8274b64d668dc961",
+    "api.py": "53e898f9f459a89a9b739a888b88b712acd20bb1f12ef4f2e84997c7bda02d05",
+    "app.py": "549fd3f06aa18c164f3e5a3f2318ec39e10eebdaef9262d1e34d22f166b4e492",
+    "static/app.js": "7c6dc799b0396ed0a37f9041dc106b15f18a30021cbab0432ae8935fd7487ccd",
+    "static/index.html": "f303155f656242a5b0db7e53d745f34eb74ebf0914e34781926f4837dcc25070",
+    "static/style.css": "643a6c959d95feaeea1c15bbe7995600956537123da486156d45826c9880d020",
+    "storage.py": "43928157df237fcfe569159cefc578605e9d2ad1120d5465ccb64c08494fe531"
+  },
+  "host_source_findings": [],
+  "author_claims": {
+    "files": [
+      "app.py",
+      "storage.py",
+      "api.py",
+      "static/index.html",
+      "static/app.js",
+      "static/style.css",
+      "README.md",
+      "DECISIONS.md"
+    ],
+    "implemented": [
+      "month selection with per-month isolation",
+      "category+budget create with duplicate rejection (409)",
+      "budget update via PUT /api/categories/{id}",
+      "expense create/update/delete with validation",
+      "positive two-decimal money parsing, no silent rounding",
+      "date must belong to category month",
+      "state summary budget/spent/remaining with negative overspend",
+      "UTF-8 CSV export with standard quoting",
+      "SQLite durable storage in --data-dir",
+      "browser UI wired to same JSON API with required data-testids",
+      "error feedback without corrupting prior data"
+    ],
+    "limits": [
+      "single user, no auth or concurrent-write control",
+      "categories cannot be renamed/deleted",
+      "no month rollover/copy",
+      "plain UTF-8 CSV, no Excel-formula handling",
+      "note length unbounded"
+    ],
+    "self_checks": {
+      "status": "not_run"
+    }
+  },
+  "application_hand_edits": false,
+  "execution": "not_run",
+  "evidence_status": "await independent source review and real runtime"
+}

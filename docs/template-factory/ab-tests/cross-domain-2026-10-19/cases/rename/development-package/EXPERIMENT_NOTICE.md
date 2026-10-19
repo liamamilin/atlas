@@ -1,0 +1,1 @@
+Experimental unpublished template. Independent static outcome: passed. Programs have NOT run. Common task forbids developer execution; report not_run and implement the user journey. External independent tests remain separate. Source facts are model-reported; no universal stack or license certification.

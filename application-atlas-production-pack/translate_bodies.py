@@ -17,7 +17,8 @@ import threading
 import time
 import urllib.request
 
-from atlas_runtime import PACK as DATA_PACK, api_key, corpus_lock
+from atlas_runtime import PACK as DATA_PACK, corpus_lock
+import atlas_model
 PACK = str(DATA_PACK)
 DB = os.path.join(PACK, "atlas", "atlas.sqlite")
 OUT = os.path.join(PACK, "atlas", "body-zh.jsonl")
@@ -25,7 +26,6 @@ STATE = os.path.join(PACK, "atlas", "bodyzh-state.json")
 LOG = os.path.join(PACK, "logs", "translate-bodies.log")
 PROMPT_V = "v2"
 OLLAMA = "http://localhost:11434/api/chat"
-API = "https://opencode.ai/zen/go/v1/chat/completions"
 
 PROMPT = """把下列软件类型档案翻译成中文，只输出一个JSON对象（键与输入完全相同），不要输出思考过程。
 规则：
@@ -77,14 +77,9 @@ def call_local(prompt):
 
 
 def call_api(prompt):
-    body = {"model": "mimo-v2.5", "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.1, "max_tokens": 6000}
-    headers = {"Authorization": f"Bearer {api_key()}", "Content-Type": "application/json",
-               "x-opencode-session": "atlas-translate-body",
-               "User-Agent": "atlas-translate/1.0 (curl-compatible)"}
-    r = json.load(urllib.request.urlopen(urllib.request.Request(
-        API, json.dumps(body).encode(), headers), timeout=600))
-    return (r["choices"][0]["message"].get("content") or "").strip()
+    return atlas_model.complete_text(
+        [{"role": "user", "content": prompt}],
+        role="translate", temperature=0.1, max_tokens=6000, timeout=600)
 
 
 def translate_one(slug, fields, engine, tries):

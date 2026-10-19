@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>社区共享设施预约</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>社区共享设施预约</h1>
+    <div id="user-bar" class="user-bar">
+      <span id="user-label">未登录</span>
+      <button id="logout" data-testid="logout" type="button" hidden>退出登录</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="login-panel" class="card">
+      <h2>登录</h2>
+      <form id="login-form" autocomplete="on">
+        <label>用户名
+          <input id="login-username" data-testid="login-username" type="text"
+                 name="username" autocomplete="username" required>
+        </label>
+        <label>密码
+          <input id="login-password" data-testid="login-password" type="password"
+                 name="password" autocomplete="current-password" required>
+        </label>
+        <button id="login-submit" data-testid="login-submit" type="submit">登录</button>
+      </form>
+      <p class="hint">演示账号：管理员 admin；居民 alice、bob。（合成本地测试数据，请勿复用。）</p>
+    </section>
+
+    <section id="admin-panel" class="card" hidden>
+      <h2>设施管理（管理员）</h2>
+      <form id="resource-form">
+        <label>设施名称
+          <input id="resource-name" data-testid="resource-name" type="text" required>
+        </label>
+        <button id="resource-save" data-testid="resource-save" type="submit">创建设施</button>
+      </form>
+    </section>
+
+    <section id="resident-panel" class="card" hidden>
+      <h2>预约设施（居民）</h2>
+      <form id="booking-form">
+        <label>设施
+          <select id="booking-resource" data-testid="booking-resource" required></select>
+        </label>
+        <label>开始时间（ISO8601，含时区）
+          <input id="booking-start" data-testid="booking-start" type="text"
+                 placeholder="2035-01-01T10:00:00+08:00" required>
+        </label>
+        <label>结束时间（ISO8601，含时区）
+          <input id="booking-end" data-testid="booking-end" type="text"
+                 placeholder="2035-01-01T11:00:00+08:00" required>
+        </label>
+        <label>备注
+          <input id="booking-note" data-testid="booking-note" type="text">
+        </label>
+        <button id="booking-save" data-testid="booking-save" type="submit">提交预约</button>
+      </form>
+    </section>
+
+    <section id="content-panel" class="card" hidden>
+      <h2>设施与占用时段</h2>
+      <ul id="resource-list" class="resource-list"></ul>
+      <p id="availability" class="availability">请选择设施查看占用时段。</p>
+
+      <h2>预约记录</h2>
+      <p id="booking-empty" class="hint" hidden>暂无预约记录。</p>
+      <table id="booking-table" class="booking-table" hidden>
+        <thead>
+          <tr><th>编号</th><th>设施</th><th>开始</th><th>结束</th><th>备注</th><th>状态</th><th>操作</th></tr>
+        </thead>
+        <tbody id="booking-body"></tbody>
+      </table>
+    </section>
+
+    <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+  </main>
+
+  <script>
+    window.APP_CONFIG = {
+      login: '/api/login',
+      logout: '/api/logout',
+      me: '/api/me',
+      resources: '/api/resources',
+      availability: '/api/availability',
+      bookings: '/api/bookings'
+    };
+  </script>
+  <script src="/app.js"></script>
+</body>
+</html>

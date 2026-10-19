@@ -1,0 +1,257 @@
+{
+  "typescript_version": "5.9.3",
+  "scope": "Host AST parsing only: direct bare expression calls to named locally declared async functions. No generated program executed. No inference about imported methods, async arrows, callbacks, promise chains or runtime outcomes; findings need source inspection.",
+  "checked": [
+    {
+      "file": "browser.cjs",
+      "sha256": "6f67fb0f8e57c689c431179e13bd27edd81926165109cac066bd0738770fad70",
+      "local_async_names": [
+        "assertEmptyState",
+        "assertExternalFixtureVisible",
+        "clickDeleteCancel",
+        "clickOpenLink",
+        "countRows",
+        "createCategoryViaUi",
+        "expectNavigatedTo",
+        "fillBookmarkForm",
+        "gotoCategory",
+        "gotoHome",
+        "gotoPage",
+        "gotoTrash",
+        "isVisible",
+        "launchChromium",
+        "moveBookmarkViaUi",
+        "navigateAfterAction",
+        "openCategoryDeleteDialog",
+        "readFormError",
+        "readRowId",
+        "requireDialog",
+        "restoreFirstTrashItem",
+        "rowIds",
+        "searchViaUi",
+        "selectCategoryOption",
+        "setSort",
+        "settleAfter",
+        "submitBookmarkForm",
+        "submitDeleteMove",
+        "submitDeletePurge",
+        "waitForCategoryLink",
+        "waitForFormError",
+        "waitForResultsOrEmpty",
+        "waitForRow",
+        "waitForRowById",
+        "waitForRowWithCategory",
+        "withPage"
+      ]
+    },
+    {
+      "file": "common.cjs",
+      "sha256": "5b2067b3b32a7b4a254ce8e7338eb560f5beda333f69242a54cee2241ae54733",
+      "local_async_names": [
+        "apiRequest",
+        "cleanup",
+        "fetchHome",
+        "fetchOnce",
+        "request",
+        "scopedList",
+        "seedBookmark",
+        "seedCategory"
+      ]
+    },
+    {
+      "file": "p0-library.cjs",
+      "sha256": "03506f04c5990473dbe859004b642220bd09f1871abdc48d8bd12bee0b01c3d2",
+      "local_async_names": []
+    },
+    {
+      "file": "p0-limits.cjs",
+      "sha256": "58c50669c5d99f5169457b77565867c9045cc0e6f9afcaadd5da5b45f521b2b5",
+      "local_async_names": [
+        "assertDistinctSaved",
+        "assertDuplicateGroup",
+        "createTracked"
+      ]
+    },
+    {
+      "file": "p0-save.cjs",
+      "sha256": "fefeb0aaa8b9bee1b8de753fb06458b6f2b41b64abad0044cd4af8077c5b64aa",
+      "local_async_names": [
+        "locateInBasicList",
+        "rawCategoryItems"
+      ]
+    },
+    {
+      "file": "p0.cjs",
+      "sha256": "d16c3c5ba43a10c9035e56024cf2c8c8de965ece9c1d18dedd76ffabc7d2907e",
+      "local_async_names": []
+    },
+    {
+      "file": "p1-categories.cjs",
+      "sha256": "3ee25c9ee08c0ffdcf513ca153e27e957a4662ee14ee2a08f7b6cd049355d363",
+      "local_async_names": [
+        "createCategoryWithBookmarks",
+        "createEmptyCategory",
+        "createMixedStateCategory"
+      ]
+    },
+    {
+      "file": "p1-edit.cjs",
+      "sha256": "27f767231e59d6f478c961ea833b97371b8f96df814f59d10ae0bcc1cfd53522",
+      "local_async_names": [
+        "assertMatrixUnchanged",
+        "createCategoryFixture",
+        "createUserTitledBookmark",
+        "matrixSnapshot",
+        "runHeaderMatrix"
+      ]
+    },
+    {
+      "file": "p1-trash.cjs",
+      "sha256": "62a80fe8deaaf39589107452359bcc126e7253b84f69ebbe1f32ee61efba8a39",
+      "local_async_names": [
+        "createBookmark",
+        "createCategory",
+        "trashBookmark"
+      ]
+    },
+    {
+      "file": "p1.cjs",
+      "sha256": "bd3c39a4e94d430ac7ef5cfe514f019b01c1735bb62e4df2089def506e988b5f",
+      "local_async_names": []
+    },
+    {
+      "file": "p2-browse.cjs",
+      "sha256": "e73e351357ab3d72504c341c2a1df6c517e45b687ddf1999f179925d4d68baf7",
+      "local_async_names": [
+        "categoryFilter",
+        "createBookmark",
+        "createCategory"
+      ]
+    },
+    {
+      "file": "p2-search.cjs",
+      "sha256": "9bec3c4dfe50070ea37798d692e6fc6e182377d27546bbf604024708c70bb8ca",
+      "local_async_names": [
+        "createBookmark",
+        "createCategory",
+        "search"
+      ]
+    },
+    {
+      "file": "p2.cjs",
+      "sha256": "276f6431dff11262ec6a552b6f060c78d60089b6346d636f39c2d064cdd5d076",
+      "local_async_names": []
+    },
+    {
+      "file": "run.cjs",
+      "sha256": "cfe91926adb63b5d93e3fec95457024e8b4d54ed7de585e2123194f44cd9be25",
+      "local_async_names": [
+        "executeSuite",
+        "main",
+        "runPlan",
+        "waitForHealth"
+      ]
+    },
+    {
+      "file": "support.cjs",
+      "sha256": "02836f9fe73e4b1042b131837cddbd0ae83f77d4eee9a6c16ea24655e0c1e6b7",
+      "local_async_names": [
+        "categorySnapshot",
+        "collectPaged",
+        "expectSearch",
+        "findDefaultCategory",
+        "listAllBookmarks",
+        "listRunBookmarks",
+        "listRunTrash",
+        "probeHealthQuiet",
+        "readBookmark",
+        "readHealthIdentity",
+        "restartTarget",
+        "run",
+        "runCounts"
+      ]
+    },
+    {
+      "file": "ui-p0.cjs",
+      "sha256": "7d1b777bd180919e07a7b1ce33a73f3b57e68fc581a799a8ff34cb912eab10af",
+      "local_async_names": [
+        "assertLimitTwoPagination",
+        "assertNoDuplicateForm",
+        "assertPageOrderMatchesApi",
+        "assertRowIdentity",
+        "assertRowUrlAndCreated",
+        "assertServerSideUrlErrors",
+        "clickPager",
+        "expectPagerActive",
+        "expectPagerDisabled",
+        "fieldValue",
+        "gotoPagedHome",
+        "readBookmarkById",
+        "readDefaultDescPage",
+        "readPager",
+        "readRowTitle",
+        "reloadHome",
+        "submitDuplicateSave",
+        "waitForRowsOrEmpty"
+      ]
+    },
+    {
+      "file": "ui-p1.cjs",
+      "sha256": "bb83375e74fe2d3acadd4bc2109860cfebe5ca1544e586e97a556bc418bf1520",
+      "local_async_names": [
+        "assertSaveFormCategories",
+        "chooseDeleteTarget",
+        "clickAndCapturePost",
+        "clickAndCaptureResponse",
+        "clickAndSettle",
+        "clickHomeLink",
+        "clickPurgeUnchecked",
+        "clickTrashLink",
+        "countCategoryLinks",
+        "deleteBookmarkViaUi",
+        "deleteTrashItemViaUi",
+        "findEditForm",
+        "findMoveForm",
+        "findRenameForm",
+        "readApiBookmark",
+        "readFlash",
+        "readLocalError",
+        "readSelectOptions",
+        "requireDialog",
+        "restoreTrashItem",
+        "seedBookmark",
+        "seedCategory",
+        "submitConfirmedPurge",
+        "submitDialogMove",
+        "submitDialogMoveExpectError",
+        "submitEditExpectFormError",
+        "submitEditForm",
+        "submitMoveExpectFormError",
+        "submitMoveForm",
+        "submitRenameExpectFormError",
+        "submitRenameSuccess",
+        "waitForCategoryLinkById",
+        "waitForCategoryLinkGone",
+        "waitForDialogError",
+        "waitForRowGone",
+        "waitForTrashItem",
+        "waitForTrashItemGone"
+      ]
+    },
+    {
+      "file": "ui-p2.cjs",
+      "sha256": "f20e5bf9a0309b14624c8119769a0625d6cd0825090212fcae2cd05aa2ebc9e1",
+      "local_async_names": [
+        "assertRowsBelongToCategory",
+        "clickPager",
+        "countRowsByTitle",
+        "readPager",
+        "readSortValue",
+        "reloadCurrentPage",
+        "seedBookmark",
+        "seedCategory"
+      ]
+    }
+  ],
+  "findings": []
+}

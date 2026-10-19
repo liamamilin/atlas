@@ -1,0 +1,27 @@
+{
+  "cases": [
+    {
+      "base_url": "http://127.0.0.1:3000",
+      "business_route": "/bookmarks",
+      "actual_pathname": "/bookmarks",
+      "expected_pathname": "/bookmarks",
+      "passed": true
+    },
+    {
+      "base_url": "http://127.0.0.1:3000/app",
+      "business_route": "/bookmarks/42/move",
+      "actual_pathname": "/app/bookmarks/42/move",
+      "expected_pathname": "/app/bookmarks/42/move",
+      "passed": true
+    },
+    {
+      "base_url": "http://127.0.0.1:3000/bookmarks",
+      "business_route": "/bookmarks/42/move",
+      "actual_pathname": "/bookmarks/bookmarks/42/move",
+      "expected_pathname": "/bookmarks/bookmarks/42/move",
+      "passed": true
+    }
+  ],
+  "scope": "Host-only ASCII URL concatenation and parsing, following the literal common.resolveTarget algorithm and architecture prefix contract. No generated code, network, target application or acceptance program executed.",
+  "conclusion": "Repeated bookmarks components are valid when deployment prefix and business resource name coincide. Do not remove the business namespace."
+}

@@ -1,0 +1,845 @@
+{
+ "title": "社区共享设施的预约与取消（回环本地实验）",
+ "roles": [
+  {
+   "id": "R01",
+   "name": "设施管理员",
+   "responsibility": "配置可预约设施；查看并管理全部预约（含他人）；可取消任意预约；其权限完全来自服务端账户角色，不信任请求参数。"
+  },
+  {
+   "id": "R02",
+   "name": "居民",
+   "responsibility": "登录后查看设施与占用时段，提交、查看并取消自己的预约；不能创建设施、不能查看或取消他人记录。"
+  }
+ ],
+ "features": [
+  {
+   "id": "F01",
+   "name": "登录、登出与会话",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "确认场景的第一步即“通过本地演示账号登录”，后续所有权限判定依赖服务端会话。",
+   "sources": [
+    "S01"
+   ],
+   "acceptance": [
+    "A01",
+    "A02"
+   ]
+  },
+  {
+   "id": "F02",
+   "name": "管理员创建可预约设施",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "场景明确“管理员创建可预约设施”，是预约的前置数据。",
+   "sources": [
+    "S01"
+   ],
+   "acceptance": [
+    "A03",
+    "A04"
+   ]
+  },
+  {
+   "id": "F03",
+   "name": "查看设施与占用时段（可用性）",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "场景要求“居民查看设施及占用时段”，且不得暴露他人个人细节。",
+   "sources": [
+    "S01"
+   ],
+   "acceptance": [
+    "A05",
+    "A11"
+   ]
+  },
+  {
+   "id": "F04",
+   "name": "提交预约（ISO8601、半开区间、结束晚于开始）",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "核心动作：居民提交开始与结束时间，结束>开始、带时区按真实时刻比较、半开区间相邻可预约。",
+   "sources": [
+    "S01",
+    "S11"
+   ],
+   "acceptance": [
+    "A03",
+    "A06",
+    "A07",
+    "A08"
+   ]
+  },
+  {
+   "id": "F05",
+   "name": "查看自己的预约 / 管理员查看全部",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "场景要求居民查看自己的预约，管理员管理全部，且居民不得查看他人详情。",
+   "sources": [
+    "S01"
+   ],
+   "acceptance": [
+    "A06",
+    "A10",
+    "A12"
+   ]
+  },
+  {
+   "id": "F06",
+   "name": "取消预约（幂等、保留状态、释放时段）",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "场景要求取消保留状态记录并释放原时段，可重复提交，且不得破坏历史或他人数据。",
+   "sources": [
+    "S01"
+   ],
+   "acceptance": [
+    "A10",
+    "A11",
+    "A12"
+   ]
+  },
+  {
+   "id": "F07",
+   "name": "重叠唯一占用与并发隔离（不同设施互不阻塞）",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "确认验收要求并发竞争同一设施重叠时段最多成功一笔，不同设施不互相阻塞。",
+   "sources": [
+    "S01",
+    "S11"
+   ],
+   "acceptance": [
+    "A08",
+    "A09",
+    "A13"
+   ]
+  },
+  {
+   "id": "F08",
+   "name": "持久化与真实重启一致",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "场景要求刷新及真实重启后仍一致；数据必须落在 --data-dir 且重启不重置。",
+   "sources": [
+    "S01"
+   ],
+   "acceptance": [
+    "A14"
+   ]
+  },
+  {
+   "id": "F09",
+   "name": "中文浏览器 UI 与 data-testid 适配契约",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "CONTRACT 要求 GET / 提供可用 UI、与 JSON API 共享真实状态、暴露固定 data-testid 供真实操作。",
+   "sources": [
+    "S01"
+   ],
+   "acceptance": [
+    "A15"
+   ]
+  },
+  {
+   "id": "F10",
+   "name": "服务端权限执行（角色不可伪造）",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "确认验收明确管理员/居民角色不可由请求参数伪造，owner 与服务端会话绑定。",
+   "sources": [
+    "S01"
+   ],
+   "acceptance": [
+    "A02",
+    "A03",
+    "A10"
+   ]
+  },
+  {
+   "id": "F11",
+   "name": "失败与错误契约（非 2xx + JSON 原因，不伪报成功）",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "确认验收要求失败说明原因、不伪报成功；API 校验失败须为非 2xx 且含解释。",
+   "sources": [
+    "S01"
+   ],
+   "acceptance": [
+    "A07",
+    "A16"
+   ]
+  },
+  {
+   "id": "F12",
+   "name": "审批流（请求→批准/拒绝、按设施自动批准）",
+   "phase": null,
+   "applicability": "later",
+   "reason": "S02/S04/S05 表明成熟产品支持审批与自动批准；本最小演示直接确认，保留 status 字段即可扩展。",
+   "sources": [
+    "S02",
+    "S04",
+    "S05"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F13",
+   "name": "按设施规则（客人上限、营业时间、费用、押金、材料要求）",
+   "phase": null,
+   "applicability": "later",
+   "reason": "S06/S07 记录按设施展示 rules/guest limits/fees/deposits；本场景未要求费用与规则引擎。",
+   "sources": [
+    "S06",
+    "S07"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F14",
+   "name": "通知（新请求、变更、结果邮件）",
+   "phase": null,
+   "applicability": "not applicable",
+   "reason": "确认范围明确不集成邮件；S02/S03/S04 的通知能力仅作后续预留。",
+   "sources": [
+    "S02",
+    "S03",
+    "S04"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F15",
+   "name": "日历与列表双视图",
+   "phase": null,
+   "applicability": "later",
+   "reason": "S02/S05/S08 显示日历视图为成熟能力；本演示仅需可用性与表单。",
+   "sources": [
+    "S02",
+    "S05",
+    "S08"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F16",
+   "name": "管理员代订与重复排期",
+   "phase": null,
+   "applicability": "later",
+   "reason": "S02/S08 支持代表居民创建预约与重复排期；本场景只需居民自助预约。",
+   "sources": [
+    "S02",
+    "S08"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F17",
+   "name": "闭馆/封禁时段",
+   "phase": null,
+   "applicability": "later",
+   "reason": "S05 提及 closing step；本最小场景未要求封禁时段，先以管理员的可用性表达。",
+   "sources": [
+    "S05"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F18",
+   "name": "配额、等待名单与信用",
+   "phase": null,
+   "applicability": "decision needed",
+   "reason": "S08/S10 提供配额/等待名单思路，但是否需要取决于社区政策，属真实人类决策。",
+   "sources": [
+    "S08",
+    "S10"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F19",
+   "name": "审计轨迹与导出",
+   "phase": null,
+   "applicability": "later",
+   "reason": "S06/S07 的企业能力；本演示仅保留状态与时间戳字段以便后续扩展。",
+   "sources": [
+    "S06",
+    "S07"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F20",
+   "name": "支付/押金与账单衔接",
+   "phase": null,
+   "applicability": "not applicable",
+   "reason": "确认范围明确不集成支付；S07 的押金流程仅为行为参考。",
+   "sources": [
+    "S07"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F21",
+   "name": "多楼宇/区域分组视图",
+   "phase": null,
+   "applicability": "later",
+   "reason": "S09 的房间按 building/area 分组属相邻类别能力，单设施社区演示不需要。",
+   "sources": [
+    "S09"
+   ],
+   "acceptance": []
+  }
+ ],
+ "decisions": [
+  {
+   "id": "D01",
+   "question": "是否需要预约审批流，还是提交即确认？",
+   "default": "默认提交即确认（无审批），保留 booking.status 字段；理由：确认掩盖场景直接预约可立即使用，且不引入未被要求的审批端点。",
+   "when_to_ask": "运营方要求某些设施需工作人员批准，或按设施类型自动批准时。",
+   "impact": "新增 pending 状态、管理员批准/拒绝端点与相应验收；改变 P0 可用性语义。",
+   "status": "decided-default"
+  },
+  {
+   "id": "D02",
+   "question": "重叠占用在应用层事务校验还是数据库排除约束？",
+   "default": "默认 SQLite BEGIN IMMEDIATE 串行事务内先 SELECT 重叠再 INSERT，并以 UNIQUE(resource_id,start_epoch) 作同起点守卫；理由：CONTRACT 固定标准库+SQLite，无排除约束。",
+   "when_to_ask": "预期多进程/高并发写入，或迁往 PostgreSQL 时。",
+   "impact": "数据层实现与并发验收；PostgreSQL 可用 tstzrange + EXCLUDE 约束（S11）等价替换。",
+   "status": "decided-default"
+  },
+  {
+   "id": "D03",
+   "question": "时段如何表示与比较？",
+   "default": "默认把带显式偏移的 ISO8601 解析为 UTC epoch 整数存储与比较，并按实例渲染规范化 ISO；区间为半开 [start,end)。",
+   "when_to_ask": "需要按本地墙钟时间做重复排期或处理夏令时语义时。",
+   "impact": "校验、排序与可用性计算。",
+   "status": "decided-default"
+  },
+  {
+   "id": "D04",
+   "question": "取消是软删除还是物理删除？",
+   "default": "默认软取消：保留行、status=cancelled，重复取消幂等返回同一记录；理由：确认验收要求保留状态记录、不破坏历史。",
+   "when_to_ask": "存在法务保留期限或用户删除权要求时。",
+   "impact": "数据模型、可用性过滤与取消验收。",
+   "status": "decided-default"
+  },
+  {
+   "id": "D05",
+   "question": "认证与会话如何实现？",
+   "default": "默认标准库哈希存储口令 + 服务端会话 Cookie，角色与 owner 仅取自会话；理由：角色不可由请求参数伪造是硬验收。",
+   "when_to_ask": "需要外部身份/SSO 时（本场景明确不支持公网身份）。",
+   "impact": "认证、授权中间件与全部越权验收。",
+   "status": "decided-default"
+  },
+  {
+   "id": "D06",
+   "question": "演示账号何时创建、是否重置？",
+   "default": "默认 --init-demo 仅在空库创建 admin/alice/bob 三个合成账户，绝不重置既有账户或记录；理由：CONTRACT 要求且保证重启一致性。",
+   "when_to_ask": "运营方希望自带账户或自定义种子时。",
+   "impact": "启动流程与重启一致性验收。",
+   "status": "decided-default"
+  },
+  {
+   "id": "D07",
+   "question": "UI 时间输入采用何种控件？",
+   "default": "默认使用可输入显式时区偏移的 ISO8601 文本框；理由：CONTRACT 明确避免浏览器时区改写。",
+   "when_to_ask": "最终用户需要本地时区选择器或自动检测时。",
+   "impact": "UI 适配契约与端到端可用。",
+   "status": "decided-default"
+  },
+  {
+   "id": "D08",
+   "question": "成熟类别能力（审批、规则、通知、等待名单、审计、支付）是否本期引入？",
+   "default": "默认全部推迟为 phase=null，仅预留状态/记录字段；理由：GUIDANCE 要求不为显得完整而加入未要求功能。",
+   "when_to_ask": "当社区政策明确需要审批、费用押金、通知或配额时逐个决策。",
+   "impact": "范围、数据模型与后续阶段划分。",
+   "status": "decided-default"
+  }
+ ],
+ "phases": [
+  {
+   "id": "P0",
+   "title": "回环本地最小可用预约与取消",
+   "goal": "管理员创建设施，居民登录后查看占用时段并按时段预约、查看与取消自己的预约；权限由服务端执行，重启后一致。",
+   "features": [
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06",
+    "F07",
+    "F08",
+    "F09",
+    "F10",
+    "F11"
+   ],
+   "acceptance": [
+    "A01",
+    "A02",
+    "A03",
+    "A04",
+    "A05",
+    "A06",
+    "A07",
+    "A08",
+    "A09",
+    "A10",
+    "A11",
+    "A12",
+    "A13",
+    "A14",
+    "A15",
+    "A16"
+   ],
+   "status": "not implemented"
+  }
+ ],
+ "acceptance": [
+  {
+   "id": "A01",
+   "phase": "P0",
+   "goal": "使用合成演示账号可登录并建立服务端会话，GET /api/me 返回当前用户与角色，登出后会话失效。",
+   "type": "positive",
+   "features": [
+    "F01"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A02",
+   "phase": "P0",
+   "goal": "未携带会话访问 GET /api/bookings 返回 401，而非空成功或数据泄露。",
+   "type": "negative",
+   "features": [
+    "F01",
+    "F10"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A03",
+   "phase": "P0",
+   "goal": "居民请求创建资源返回 403；居民提交预约时携带他方 user_id/role 一律忽略，owner 取自会话。",
+   "type": "negative",
+   "features": [
+    "F02",
+    "F04",
+    "F10"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A04",
+   "phase": "P0",
+   "goal": "管理员创建资源后，GET /api/resources 中出现该资源且可供预约。",
+   "type": "positive",
+   "features": [
+    "F02"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A05",
+   "phase": "P0",
+   "goal": "GET /api/availability 只返回 active 预约的时段，且不含他人个人细节。",
+   "type": "positive",
+   "features": [
+    "F03"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A06",
+   "phase": "P0",
+   "goal": "居民提交带显式偏移的 ISO8601 预约成功并出现在自己的列表中；相邻半开区间 [t0,t1) 与 [t1,t2) 均可预约。",
+   "type": "positive",
+   "features": [
+    "F04",
+    "F05"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A07",
+   "phase": "P0",
+   "goal": "结束不晚于开始或非法/缺时区 ISO8601 返回 400，且响应为非 2xx JSON 且含可读原因。",
+   "type": "negative",
+   "features": [
+    "F04",
+    "F11"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A08",
+   "phase": "P0",
+   "goal": "同一设施重叠时段预约返回 409，且未写入新记录、不伪报成功。",
+   "type": "negative",
+   "features": [
+    "F04",
+    "F07"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A09",
+   "phase": "P0",
+   "goal": "不同设施在同一时刻的预约互不阻塞，均可成功。",
+   "type": "positive",
+   "features": [
+    "F07"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A10",
+   "phase": "P0",
+   "goal": "居民不能查看他人预约详情、列他不在自己列表、取消他人预约被拒且原记录不变。",
+   "type": "negative",
+   "features": [
+    "F05",
+    "F06",
+    "F10"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A11",
+   "phase": "P0",
+   "goal": "取消自己的预约后 status=cancelled、原时段在可用性中释放；重复取消返回同一 cancelled 结果且不产生重复记录。",
+   "type": "positive",
+   "features": [
+    "F03",
+    "F06"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A12",
+   "phase": "P0",
+   "goal": "管理员可查看全部预约并可取消任意预约。",
+   "type": "positive",
+   "features": [
+    "F05",
+    "F06"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A13",
+   "phase": "P0",
+   "goal": "并发发起同一设施重叠预约时最多一笔成功（2xx），其余为 409，最终 active 记录数一致。",
+   "type": "positive",
+   "features": [
+    "F07"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A14",
+   "phase": "P0",
+   "goal": "刷新后资源与预约一致；在提供 app.py 与一次性 DIR 时真实重启进程后数据与状态保持一致。",
+   "type": "positive",
+   "features": [
+    "F08"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A15",
+   "phase": "P0",
+   "goal": "GET / 返回可用中文 UI，包含必需 data-testid 控件，按角色显示，并据此完成一次真实登录与预约。",
+   "type": "positive",
+   "features": [
+    "F09"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A16",
+   "phase": "P0",
+   "goal": "各类校验失败均为非 2xx JSON 且含原因说明，不出现静默成功或伪成功。",
+   "type": "negative",
+   "features": [
+    "F11"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  }
+ ],
+ "architecture_markdown": "默认技术栈：Python3 标准库 ThreadingHTTPServer + sqlite3 + 原生 HTML/CSS/JS，无第三方依赖；理由：CONTRACT 固定标准库与 SQLite、无安装、仅回环；替代方案：Flask/FastAPI 需安装（拒）；PostgreSQL 的 exclusion constraint（S11）可表达\"不得重叠\"，但引入外部数据库与部署（拒；若迁往 PostgreSQL 可用 tstzrange + EXCLUDE 约束等价替换）。进程为单进程多线程、SQLite 单写者，全部持久数据落在 --data-dir。\n\n数据模型（DIR 内 SQLite）：users(id, username UNIQUE, password_hash, role ∈ {admin,resident})；sessions(token PRIMARY KEY, user_id, expires_at)；resources(id, name, active)；bookings(id, resource_id, owner_id, start_epoch INTEGER, end_epoch INTEGER, start_iso, end_iso, note, status ∈ {active,cancelled} 默认 active, created_at, cancelled_at)。索引：UNIQUE(resource_id,start_epoch) 作为同起点守卫，另建 (resource_id,status) 与 (owner_id,status)。时段按带偏移 ISO8601 解析为 UTC epoch 整数做真实时刻比较，语义为半开区间 [start,end)。\n\n并发与重叠：每次写入使用 BEGIN IMMEDIATE 事务，顺序为校验→SELECT 重叠（status='active' AND start_epoch < :end AND end_epoch > :start）→INSERT；命中重叠返回 409。同一设施重叠最多一笔成功，不同设施互不阻塞。\n\nAPI 契约（与 CONTRACT 完全一致）：POST /api/login、POST /api/logout；GET /api/me；GET /api/resources、POST /api/resources（admin）；GET /api/availability?resource_id=；POST /api/bookings；GET /api/bookings、GET /api/bookings/{id}；POST /api/bookings/{id}/cancel。错误契约：校验失败一律为非 2xx（400 参数非法、401 未登录、403 越权、404 不存在、409 重叠），响应体为 JSON 形如 {\"error\":\"可读原因\"}，绝不返回伪成功。状态机：booking 仅 active→cancelled 单向，重复取消幂等返回同一记录。\n\nUI/适配契约：GET / 返回可用中文 UI，与 JSON API 共享同一真实状态；必需 data-testid=login-username,login-password,login-submit,resource-name,resource-save,booking-resource,booking-start,booking-end,booking-note,booking-save,logout；仅在登录/角色满足后显示相关控件；booking-start/end 为可输入显式时区偏移的 ISO8601 文本框以避免浏览器改写；select 的 option value 等于 resource_id。测试适配器据此以 HTTP（urllib + http.cookiejar）驱动真实登录与预约。\n\n非功能要求：只绑定 127.0.0.1，无外部网络、遥测、子进程、任意文件访问或安装；口令用标准库哈希存储，会话由服务端持有，角色与 owner 只取自会话，客户端提交的 user_id/role 一律忽略；应用文件不超过 12 个，数据只在 DIR 内。\n\n边界见 limits。",
+ "limits": [
+  "仅回环本地演示：不集成邮件、真实住户、支付/押金、公网身份或外部网络。",
+  "单进程 SQLite 单写者；并发保证限于该进程与 BEGIN IMMEDIATE 串行事务，不构成跨主机或多副本强保证。",
+  "仅一个设施管理员与两个合成居民账户，无多租户、无组织层级。",
+  "无审批、规则引擎、通知、等待名单、审计导出与账单，仅预留状态与记录字段。",
+  "时区比较以 UTC 实例为准；不处理按本地墙钟的重复排期与夏令时特例。",
+  "取消为软取消，保留状态记录，不提供物理删除或保留期策略。",
+  "验收程序仅由独立操作员在显式目标上运行；生成期不执行，所有状态保持 not_run。"
+ ],
+ "id": "blueprint-cross-domain-booking-2026-10-19",
+ "schema": "atlas.product-blueprint.v0",
+ "kind": "product-blueprint",
+ "version": "0.1.0",
+ "created_at": "2026-10-18T19:29:57.040687+00:00",
+ "status": "candidate; programs not executed",
+ "scenario": {
+  "id": "experiment-booking",
+  "revision": 1,
+  "status": "ready",
+  "leaf": "amenity-booking-platform",
+  "name": "社区共享设施的预约与取消",
+  "audience": "一个设施管理员和封闭名单内的两个居民",
+  "objective": "管理员配置设施，居民登录后选择时段预约、查看自己的预约并取消；同一设施不能被重复占用，权限由服务端执行。",
+  "workflow": [
+   "通过本地演示账号登录",
+   "管理员创建可预约设施",
+   "居民查看设施及占用时段，提交开始与结束时间",
+   "居民查看和取消自己的预约，管理员可管理全部",
+   "取消保留状态记录并释放原时段",
+   "刷新及真实重启后仍一致"
+  ],
+  "acceptance": [
+   "仅回环本地演示，不集成邮件、真实住户、支付或公网身份服务",
+   "管理员与居民角色不可由请求参数伪造；居民不能创建设施、查看别人预约详情或取消别人的记录",
+   "结束必须晚于开始；时段为有时区的 ISO8601，按真实时刻比较；半开区间相邻可预约、重叠不可预约",
+   "并发竞争同一设施重叠时段最多成功一笔；不同设施不互相阻塞",
+   "取消可重复提交但不能破坏历史或别人的数据；失败要说明原因，不伪报成功"
+  ],
+  "authorization_scope": "user-authorized local experiment only; no catalog mutation"
+ },
+ "sources": [
+  {
+   "id": "S01",
+   "name": "Atlas confirmed input",
+   "url": "inputs/scenario.json",
+   "kind": "confirmed_input",
+   "version": "experiment-booking@1",
+   "facts": "管理员配置设施，居民登录后选择时段预约、查看自己的预约并取消；同一设施不能被重复占用，权限由服务端执行。",
+   "license": "Atlas scenario input; not a third-party code license",
+   "reuse": "Pinned requirement input"
+  },
+  {
+   "id": "S02",
+   "name": "BuildingLink Staff Help Site — Amenity Reservations",
+   "url": "https://help-staff.buildinglink.com/en/support/solutions/articles/42000098635-amenity-reservations",
+   "version": "访问日期 2026-10-19；仅经搜索呈现，未抓取完整页面",
+   "facts": "运营文档描述 Amenity Reservations 模块：非管理层用户提交的请求状态自动为 Requested，只有 Management/Security Officer 级用户可 Approve/Decline/Cancel；管理层录入时可把状态由 Requested 改为 Approved 以自动批准；可按设施类型设为免审批自动批准；支持代表居民创建预约、按重复方式排期、日历视图、给预约添加 Note/Log（如提醒补交材料或付款）；可配置新请求与变更的通知接收人，并让居民在批准或拒绝时自动收到通知；模块可设为 Internal Only。",
+   "license": "非代码（厂商 SaaS 文档）",
+   "reuse": "仅作行为参考，代码不可复用"
+  },
+  {
+   "id": "S03",
+   "name": "BuildingLink Staff Help — Product Update: Amenity Reservation Settings / Amenity Settings",
+   "url": "https://help-staff.buildinglink.com/en/support/solutions/articles/42000111019-product-update-amenity-reservation-settings",
+   "version": "访问日期 2026-10-19；仅经搜索呈现",
+   "facts": "产品更新页面说明 Amenity Reservations 的通知默认选项在 Manage > Reservations > Settings 配置；Amenity Settings 页面说明 Manager 或 Security Officer 可在 Settings > Amenity Reservations 新增设施类型。",
+   "license": "非代码（厂商 SaaS 文档）",
+   "reuse": "仅作行为参考"
+  },
+  {
+   "id": "S04",
+   "name": "BuildingLink Resident Help Site — Amenity Reservations",
+   "url": "https://help-resident.buildinglink.com/en/support/solutions/articles/42000104467-amenity-reservations",
+   "version": "访问日期 2026-10-19；仅经搜索呈现",
+   "facts": "居民侧文档说明居民在 Amenity Reservations 日历视图可见全部或仅部分请求取决于物业设置；不需要管理层批准的设施，请求提交后自动进入 Approved 状态。",
+   "license": "非代码（厂商 SaaS 文档）",
+   "reuse": "仅作行为参考"
+  },
+  {
+   "id": "S05",
+   "name": "Vantaca Support — Best Practice: Calendar & Amenity Reservations / Enabling Amenity Reservations for your Home Portal",
+   "url": "https://support.vantaca.com/hc/en-us/articles/360056872551-Best-Practice-Calendar-Amenity-Reservations",
+   "version": "访问日期 2026-10-19；仅经搜索呈现",
+   "facts": "支持文章描述预约工作流步骤：第一步 Reservation Request Received 可自动流转到 Reservation Confirmed，某一步为 closing step；董事会成员可对 amenity reservation action items 执行 Approve 或 Decline；Enabling Amenity Reservations 文章提到可在日历上显示预约流程步骤以帮助业主了解所处阶段；官网博客称预约请求发送给管理方审批，业主可查看可用性并请求预约。",
+   "license": "非代码（厂商 SaaS 文档）",
+   "reuse": "仅作行为参考（协会/HOA 侧）"
+  },
+  {
+   "id": "S06",
+   "name": "CINC Systems — Boards + Residents（含 CINC Connect / RESERVE 与知识库）",
+   "url": "https://cincsystems.com/boards-residents",
+   "version": "访问日期 2026-10-19；仅经搜索呈现",
+   "facts": "Boards + Residents 页面称居民可在线完成预约并在同一处查看详情，预约前可查看 rules、guest limits、fees、deposits 或其他要求；CINC Connect 公告列出 clubhouses、tennis courts、pools 等 amenity reservations；RESERVE 模块让业主在线预订、支付并管理社区设施预约；知识库含 How to Reserve an Amenity（仅见标题）。",
+   "license": "非代码（厂商 SaaS 文档）",
+   "reuse": "仅作行为参考"
+  },
+  {
+   "id": "S07",
+   "name": "Yardi — Concierge IQ / RentCafe Resident Portal",
+   "url": "https://www.yardi.com/product/concierge-iq/",
+   "version": "访问日期 2026-10-19；经搜索呈现（含一份 RentCafe 说明 PDF 片段）",
+   "facts": "Concierge IQ 产品页称允许居民通过 RentCafe Resident Portal 直接预订 clubhouse 或 hospitality 空间，并把预订接入门户以保持管理可控；RentCafe Resident Portal 产品页把 amenity 相关能力列为居民门户的一部分；搜索到的 RentCafe 说明 PDF 片段称部分设施需在 Resident Services Team 批准请求后立即支付 250 美元押金。",
+   "license": "非代码（厂商 SaaS 文档）",
+   "reuse": "仅作行为参考（押金/审批与账单衔接）"
+  },
+  {
+   "id": "S08",
+   "name": "LibreBooking — 开源资源预约系统（GitHub）",
+   "url": "https://github.com/LibreBooking/librebooking",
+   "version": "develop 分支（未固定提交），访问日期 2026-10-19",
+   "facts": "开源资源预约解决方案；特性含多资源预约与 waitlist、基于角色的访问控制（RBAC）、预约配额与 credits、细粒度使用报表、插件架构、通过 ics 的 Outlook/Thunderbird 集成；fork 自 Booked Scheduler 2020 年最后开源版；README 安全公告称 7.1.0 之前 Remember Me cookie 可被伪造以冒充任意用户（含管理员），7.0.0 之前存在管理员接管漏洞。",
+   "license": "GPL-3.0",
+   "reuse": "代码为 copyleft（GPL-3.0），直接复用会带来传染性许可义务；建议仅参考其多资源/配额/RBAC 行为模型，不复制源码",
+   "license_url": "https://github.com/LibreBooking/librebooking/blob/develop/LICENSE.md"
+  },
+  {
+   "id": "S09",
+   "name": "MRBS (Meeting Room Booking System)（GitHub）",
+   "url": "https://github.com/meeting-room-booking-system/mrbs-code",
+   "version": "master 分支（未固定提交），访问日期 2026-10-19",
+   "facts": "PHP 会议/资源预约系统，房间按 building/area 分组并以并列视图展示；默认 db 认证下首个用户创建管理员；要求 PHP 7.2+ 与 MySQL 5.5.3+/PostgreSQL 8.2+；定位为自托管、可自行掌控数据的共享空间预约。",
+   "license": "GPL-2.0（另打包第三方组件 MIT / LGPL-2.1 / Apache-2.0 / CC BY-SA 4.0）",
+   "reuse": "GPL-2.0 copyleft；作为相邻类别（通用房间/资源）行为参考，源码复用需满足 GPL 义务",
+   "license_url": "https://github.com/meeting-room-booking-system/mrbs-code/blob/master/LICENSE"
+  },
+  {
+   "id": "S10",
+   "name": "bernii/django-reservations（GitHub）",
+   "url": "https://github.com/bernii/django-reservations",
+   "version": "master 分支（未固定提交），访问日期 2026-10-19",
+   "facts": "Django 预约模块：可自定义预约模型、设置单次/多次与每日/每月预约上限、Ajax 日历、预约相关自动邮件、自定义 Django Admin、i18n；仓库仅 14 次提交，配置停留在 travis 与 syncdb 时代，维护活跃度低。",
+   "license": "WOW License（作者自定义非标准宽松许可，非 OSI 标准名称），许可文本声明 No rights reserved 并授予自由使用",
+   "reuse": "许可宽松但非标准且项目老旧未维护，跨栈复用价值不确定；建议只参考其配额与邮件思路",
+   "license_url": "https://github.com/bernii/django-reservations/blob/master/LICENSE"
+  },
+  {
+   "id": "S11",
+   "name": "PostgreSQL 官方文档 — Range Types（含 exclusion constraints）",
+   "url": "https://www.postgresql.org/docs/current/rangetypes.html",
+   "version": "current 版本文档，访问日期 2026-10-19；仅经搜索呈现，未抓取完整文档",
+   "facts": "官方文档说明内置 range 类型（含带时区时间戳范围 tstzrange）及 exclusion constraint 可表达诸如“不得重叠”的约束，防止任何重叠值写入；范围默认边界约定为下含上不含 [)。",
+   "license": "非代码（PostgreSQL 官方文档）",
+   "reuse": "可作为数据层防重叠/并发写入的技术模式参考（前提是选用 PostgreSQL），属实现技术而非类别产品"
+  }
+ ],
+ "evidence": [],
+ "research": {
+  "sources": [
+   {
+    "id": "S02",
+    "name": "BuildingLink Staff Help Site — Amenity Reservations",
+    "url": "https://help-staff.buildinglink.com/en/support/solutions/articles/42000098635-amenity-reservations",
+    "version": "访问日期 2026-10-19；仅经搜索呈现，未抓取完整页面",
+    "facts": "运营文档描述 Amenity Reservations 模块：非管理层用户提交的请求状态自动为 Requested，只有 Management/Security Officer 级用户可 Approve/Decline/Cancel；管理层录入时可把状态由 Requested 改为 Approved 以自动批准；可按设施类型设为免审批自动批准；支持代表居民创建预约、按重复方式排期、日历视图、给预约添加 Note/Log（如提醒补交材料或付款）；可配置新请求与变更的通知接收人，并让居民在批准或拒绝时自动收到通知；模块可设为 Internal Only。",
+    "license": "非代码（厂商 SaaS 文档）",
+    "reuse": "仅作行为参考，代码不可复用"
+   },
+   {
+    "id": "S03",
+    "name": "BuildingLink Staff Help — Product Update: Amenity Reservation Settings / Amenity Settings",
+    "url": "https://help-staff.buildinglink.com/en/support/solutions/articles/42000111019-product-update-amenity-reservation-settings",
+    "version": "访问日期 2026-10-19；仅经搜索呈现",
+    "facts": "产品更新页面说明 Amenity Reservations 的通知默认选项在 Manage > Reservations > Settings 配置；Amenity Settings 页面说明 Manager 或 Security Officer 可在 Settings > Amenity Reservations 新增设施类型。",
+    "license": "非代码（厂商 SaaS 文档）",
+    "reuse": "仅作行为参考"
+   },
+   {
+    "id": "S04",
+    "name": "BuildingLink Resident Help Site — Amenity Reservations",
+    "url": "https://help-resident.buildinglink.com/en/support/solutions/articles/42000104467-amenity-reservations",
+    "version": "访问日期 2026-10-19；仅经搜索呈现",
+    "facts": "居民侧文档说明居民在 Amenity Reservations 日历视图可见全部或仅部分请求取决于物业设置；不需要管理层批准的设施，请求提交后自动进入 Approved 状态。",
+    "license": "非代码（厂商 SaaS 文档）",
+    "reuse": "仅作行为参考"
+   },
+   {
+    "id": "S05",
+    "name": "Vantaca Support — Best Practice: Calendar & Amenity Reservations / Enabling Amenity Reservations for your Home Portal",
+    "url": "https://support.vantaca.com/hc/en-us/articles/360056872551-Best-Practice-Calendar-Amenity-Reservations",
+    "version": "访问日期 2026-10-19；仅经搜索呈现",
+    "facts": "支持文章描述预约工作流步骤：第一步 Reservation Request Received 可自动流转到 Reservation Confirmed，某一步为 closing step；董事会成员可对 amenity reservation action items 执行 Approve 或 Decline；Enabling Amenity Reservations 文章提到可在日历上显示预约流程步骤以帮助业主了解所处阶段；官网博客称预约请求发送给管理方审批，业主可查看可用性并请求预约。",
+    "license": "非代码（厂商 SaaS 文档）",
+    "reuse": "仅作行为参考（协会/HOA 侧）"
+   },
+   {
+    "id": "S06",
+    "name": "CINC Systems — Boards + Residents（含 CINC Connect / RESERVE 与知识库）",
+    "url": "https://cincsystems.com/boards-residents",
+    "version": "访问日期 2026-10-19；仅经搜索呈现",
+    "facts": "Boards + Residents 页面称居民可在线完成预约并在同一处查看详情，预约前可查看 rules、guest limits、fees、deposits 或其他要求；CINC Connect 公告列出 clubhouses、tennis courts、pools 等 amenity reservations；RESERVE 模块让业主在线预订、支付并管理社区设施预约；知识库含 How to Reserve an Amenity（仅见标题）。",
+    "license": "非代码（厂商 SaaS 文档）",
+    "reuse": "仅作行为参考"
+   },
+   {
+    "id": "S07",
+    "name": "Yardi — Concierge IQ / RentCafe Resident Portal",
+    "url": "https://www.yardi.com/product/concierge-iq/",
+    "version": "访问日期 2026-10-19；经搜索呈现（含一份 RentCafe 说明 PDF 片段）",
+    "facts": "Concierge IQ 产品页称允许居民通过 RentCafe Resident Portal 直接预订 clubhouse 或 hospitality 空间，并把预订接入门户以保持管理可控；RentCafe Resident Portal 产品页把 amenity 相关能力列为居民门户的一部分；搜索到的 RentCafe 说明 PDF 片段称部分设施需在 Resident Services Team 批准请求后立即支付 250 美元押金。",
+    "license": "非代码（厂商 SaaS 文档）",
+    "reuse": "仅作行为参考（押金/审批与账单衔接）"
+   },
+   {
+    "id": "S08",
+    "name": "LibreBooking — 开源资源预约系统（GitHub）",
+    "url": "https://github.com/LibreBooking/librebooking",
+    "version": "develop 分支（未固定提交），访问日期 2026-10-19",
+    "facts": "开源资源预约解决方案；特性含多资源预约与 waitlist、基于角色的访问控制（RBAC）、预约配额与 credits、细粒度使用报表、插件架构、通过 ics 的 Outlook/Thunderbird 集成；fork 自 Booked Scheduler 2020 年最后开源版；README 安全公告称 7.1.0 之前 Remember Me cookie 可被伪造以冒充任意用户（含管理员），7.0.0 之前存在管理员接管漏洞。",
+    "license": "GPL-3.0",
+    "reuse": "代码为 copyleft（GPL-3.0），直接复用会带来传染性许可义务；建议仅参考其多资源/配额/RBAC 行为模型，不复制源码",
+    "license_url": "https://github.com/LibreBooking/librebooking/blob/develop/LICENSE.md"
+   },
+   {
+    "id": "S09",
+    "name": "MRBS (Meeting Room Booking System)（GitHub）",
+    "url": "https://github.com/meeting-room-booking-system/mrbs-code",
+    "version": "master 分支（未固定提交），访问日期 2026-10-19",
+    "facts": "PHP 会议/资源预约系统，房间按 building/area 分组并以并列视图展示；默认 db 认证下首个用户创建管理员；要求 PHP 7.2+ 与 MySQL 5.5.3+/PostgreSQL 8.2+；定位为自托管、可自行掌控数据的共享空间预约。",
+    "license": "GPL-2.0（另打包第三方组件 MIT / LGPL-2.1 / Apache-2.0 / CC BY-SA 4.0）",
+    "reuse": "GPL-2.0 copyleft；作为相邻类别（通用房间/资源）行为参考，源码复用需满足 GPL 义务",
+    "license_url": "https://github.com/meeting-room-booking-system/mrbs-code/blob/master/LICENSE"
+   },
+   {
+    "id": "S10",
+    "name": "bernii/django-reservations（GitHub）",
+    "url": "https://github.com/bernii/django-reservations",
+    "version": "master 分支（未固定提交），访问日期 2026-10-19",
+    "facts": "Django 预约模块：可自定义预约模型、设置单次/多次与每日/每月预约上限、Ajax 日历、预约相关自动邮件、自定义 Django Admin、i18n；仓库仅 14 次提交，配置停留在 travis 与 syncdb 时代，维护活跃度低。",
+    "license": "WOW License（作者自定义非标准宽松许可，非 OSI 标准名称），许可文本声明 No rights reserved 并授予自由使用",
+    "reuse": "许可宽松但非标准且项目老旧未维护，跨栈复用价值不确定；建议只参考其配额与邮件思路",
+    "license_url": "https://github.com/bernii/django-reservations/blob/master/LICENSE"
+   },
+   {
+    "id": "S11",
+    "name": "PostgreSQL 官方文档 — Range Types（含 exclusion constraints）",
+    "url": "https://www.postgresql.org/docs/current/rangetypes.html",
+    "version": "current 版本文档，访问日期 2026-10-19；仅经搜索呈现，未抓取完整文档",
+    "facts": "官方文档说明内置 range 类型（含带时区时间戳范围 tstzrange）及 exclusion constraint 可表达诸如“不得重叠”的约束，防止任何重叠值写入；范围默认边界约定为下含上不含 [)。",
+    "license": "非代码（PostgreSQL 官方文档）",
+    "reuse": "可作为数据层防重叠/并发写入的技术模式参考（前提是选用 PostgreSQL），属实现技术而非类别产品"
+   }
+  ],
+  "summary": "类别事实：Amenity Booking Platform 的核心是运营方定义的设施清单、封闭的居民/租户名单、设施×时段×预约人的限时预约以及楼宇侧控制面。成熟产品的可识别能力包括：可用性日历/时段、请求→审批（部分设施可自动批准）、按设施展示规则（客人上限、营业时间、费用、押金、材料要求）、取消/修改与闭馆封禁、通知、管理员代订与历史记录、列表与日历双视图。S02–S07 的厂商文档一致支持审批状态、自动批准、按设施规则、代订与日历视图等行为；S08–S10 显示开源侧多为通用资源/会议室预约（LibreBooking、MRBS）或轻量 Django 模块，并非针对建筑共享设施的完整实现。场景建议：本场景是本地回环最小演示（1 名管理员 + 2 名居民），应把类别核心做扎实——服务端权限不可伪造、ISO8601 带时区真实时刻比较、结束晚于开始、半开区间相邻可预约而重叠不可、并发下同一设施重叠最多一笔成功、不同设施互不阻塞、取消幂等且保留状态、重启后一致；S11 的区间/唯一或排除约束思路可作为防重复占用的实现参考（是否采用取决于所选数据库）。邮件、真实住户、支付、押金、公网身份、导出与审计等企业能力在本场景属非必需，仅需预留清晰的状态与记录字段以便后续扩展，不应强行引入。复用与自建：厂商产品（BuildingLink、Vantaca、CINC、Yardi）为闭源 SaaS，只能作为行为参考；开源备选均有许可与适配成本——LibreBooking 为 GPL-3.0、MRBS 为 GPL-2.0（copyleft，直接复用会带来许可义务），django-reservations 许可非标准且长期未维护；对如此小的本地演示，自建比引入 copyleft 或陈旧代码更合适。本次为模型报告的来源证据，非独立运行或法律核验。",
+  "gaps": [
+   "BuildingLink、Vantaca、CINC、Yardi 各页面仅通过搜索结果呈现获得，未抓取完整文档（webfetch 仅允许 github/raw/docs.python.org/docs.npmjs.com），因此其重叠时段是硬阻止还是依赖审批、精确的时长/容量/通知规则均未确认",
+   "没有任何厂商完整文档确认以带时区 ISO8601 存储时段、半开区间相邻可预约的语义，也未确认并发竞争下“同一设施重叠最多一笔成功”的强保证",
+   "Vantaca/CINC/Yardi 的审批、取消释放、闭馆封禁等流程细节为片段级证据，未经完整文档核实",
+   "未找到有文档的、面向建筑共享设施的专属开源项目；S08–S10 均为相邻的通用资源/会议室预约或轻量模块，类别不完全等同",
+   "厂商产品的审计轨迹、导出、数据生命周期、恢复与账单/押金自动化细节未获官方文档确认；CINC/HomeHerald 的第三方比较页与 Yardi Relay 博客属非官方来源，未采用为事实",
+   "django-reservations 的 WOW License 为非标准自定许可，非 OSI 认可名称，法律含义未核验",
+   "PostgreSQL 文档条目为搜索呈现，未抓取完整页面；未验证本场景实际使用的数据库是否支持 exclusion constraint",
+   "未评估任何具体实现栈（语言/框架/数据库），故复用与自建建议停留在模式层面"
+  ]
+ }
+}

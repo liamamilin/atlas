@@ -1,0 +1,47 @@
+{
+ "project_name": "trial-booking",
+ "phase": "P0",
+ "template_digest": "a471b95204433826ace01bb2577140fef3858dd00dff379af74039590d4e4216",
+ "choices": [
+  {
+   "id": "D01",
+   "default": "默认提交即确认（无审批），保留 booking.status 字段；理由：确认掩盖场景直接预约可立即使用，且不引入未被要求的审批端点。",
+   "choice": null
+  },
+  {
+   "id": "D02",
+   "default": "默认 SQLite BEGIN IMMEDIATE 串行事务内先 SELECT 重叠再 INSERT，并以 UNIQUE(resource_id,start_epoch) 作同起点守卫；理由：CONTRACT 固定标准库+SQLite，无排除约束。",
+   "choice": null
+  },
+  {
+   "id": "D03",
+   "default": "默认把带显式偏移的 ISO8601 解析为 UTC epoch 整数存储与比较，并按实例渲染规范化 ISO；区间为半开 [start,end)。",
+   "choice": null
+  },
+  {
+   "id": "D04",
+   "default": "默认软取消：保留行、status=cancelled，重复取消幂等返回同一记录；理由：确认验收要求保留状态记录、不破坏历史。",
+   "choice": null
+  },
+  {
+   "id": "D05",
+   "default": "默认标准库哈希存储口令 + 服务端会话 Cookie，角色与 owner 仅取自会话；理由：角色不可由请求参数伪造是硬验收。",
+   "choice": null
+  },
+  {
+   "id": "D06",
+   "default": "默认 --init-demo 仅在空库创建 admin/alice/bob 三个合成账户，绝不重置既有账户或记录；理由：CONTRACT 要求且保证重启一致性。",
+   "choice": null
+  },
+  {
+   "id": "D07",
+   "default": "默认使用可输入显式时区偏移的 ISO8601 文本框；理由：CONTRACT 明确避免浏览器时区改写。",
+   "choice": null
+  },
+  {
+   "id": "D08",
+   "default": "默认全部推迟为 phase=null，仅预留状态/记录字段；理由：GUIDANCE 要求不为显得完整而加入未要求功能。",
+   "choice": null
+  }
+ ]
+}

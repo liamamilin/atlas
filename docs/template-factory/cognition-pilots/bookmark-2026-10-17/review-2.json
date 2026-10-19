@@ -1,0 +1,116 @@
+{
+  "artifact_id": "tpl_623e0336b49144fd8a4836c5cb59691d",
+  "checks": [
+    {
+      "dimension": "category_evidence",
+      "files": [
+        "CATEGORY.md",
+        "README.md",
+        "VALIDATION.md"
+      ],
+      "outcome": "passed",
+      "reason": "CATEGORY.md 以 S01–S23 给出 URL、事实、许可与复用边界，明确区分品类事实、针对本场景的建议和“待验证/未知”；许可证区分 MIT 与 AGPL-3.0，并声明未复制第三方代码、未断言价格或上限。存在 S01–S23 整段重复、leaf 所称 Research Notes 不在 inventory、研究日期 2026-09-06 与 CATEGORY 的 2026-10-17 不一致等证据链编辑问题；不影响核心事实，但应清理。"
+    },
+    {
+      "dimension": "scenario_scope",
+      "files": [
+        "inputs/scenario.json",
+        "PRODUCT.md",
+        "DECISIONS.md"
+      ],
+      "outcome": "passed",
+      "reason": "inputs/scenario.json 是单人、普通网络用户、保存后回找；PRODUCT.md 将其收窄为 R01 个人收藏者、R02 部署维护者、R03 明确不存在的共享角色，P0 保存/持久/打开，P1 归类/移动/回收站，P2 检索/浏览，逐条对应四条 scenario acceptance。未引入多人协作、公开分享或企业权限；增加归类删除与回收站属于数据安全细化，不是场景漂移。"
+    },
+    {
+      "dimension": "product_completeness",
+      "files": [
+        "PRODUCT.md",
+        "ARCHITECTURE.md",
+        "DECISIONS.md"
+      ],
+      "outcome": "passed",
+      "reason": "PRODUCT.md 覆盖 R01/R02/R03、正常流程（保存→未分类→归类→检索→打开）、失败流程（invalid_url、duplicate、limits、错误信封）、生命周期（保存→软删除→回收站→恢复/清空）与备份；F20–F23 明确 not applicable，F15/F16 导出/导入明确 later，F24/F25 later，权限、计费、审计、管理后台在 ARCHITECTURE 明确不做，符合单用户场景。标题留空派生与架构空串 400 的边界仍需在架构与 UI 对齐。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "files": [
+        "ARCHITECTURE.md",
+        "DECISIONS.md"
+      ],
+      "outcome": "uncertain",
+      "reason": "ARCHITECTURE.md 给出技术栈默认值与理由、SQLite 数据模型/不变量/状态机、URL 归一正反例、HTTP/错误/参数/确认/UI/重启 adapter 契约，细节充分。但 POST title 为空串或纯空白时是派生还是 400 未限定（产品说标题可留空派生，而 UI 空输入通常提交空串）；POST 携带不存在或已 tombstone 的 categoryId 未给出明确错误；PATCH 空 body 无错误码；id 声明为 opaque string 而表为 INTEGER；这些都会造成实现分歧。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "files": [
+        "ROADMAP.md",
+        "acceptance/plan.json",
+        "acceptance/p0-save.cjs",
+        "acceptance/p0-limits.cjs",
+        "acceptance/p1-categories.cjs",
+        "acceptance/p1-trash.cjs",
+        "acceptance/p2-search.cjs",
+        "acceptance/p2-browse.cjs",
+        "acceptance/ui-p0.cjs",
+        "acceptance/ui-p1.cjs",
+        "acceptance/ui-p2.cjs",
+        "acceptance/browser.cjs",
+        "acceptance/run.cjs"
+      ],
+      "outcome": "blocked",
+      "reason": "ROADMAP.md 与 acceptance/plan.json 的 33 个 case 与 F01–F14 双向覆盖，P0 只用默认归类、基础列表、按 id 与只读页面，不创建归类、不用 q、不调用回收站；P1 不用 q/categoryId 过滤；P2 才用服务端 q；阶段顺序正确。程序是真实 HTTP/Playwright 驱动，未见空 stub、mock 成功或仅检查文件。但存在重要缺口：未测 mode=move 指向 tombstone 归类（target_unavailable）与 mode=purge 携带 targetCategoryId（target_not_allowed），未测 POST 非法 categoryId、POST 空标题、URL 2049/host 为空；browser.cjs 的 page.goto('/')、'/c/...'、'/trash' 在带路径前缀的 base-url 下会丢失前缀，与 acceptance/README 5.2 的子路径承诺冲突。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "files": [
+        "DECISIONS.md",
+        "PRODUCT.md",
+        "ARCHITECTURE.md"
+      ],
+      "outcome": "passed",
+      "reason": "DECISIONS.md D01–D09 均给出默认、理由、影响与 when_to_ask，覆盖组织模型、重复处理、归类删除、元数据抓取、URL 归一、账号与分享、回收站、导入导出以及重启/浏览器验收；默认与 P0–P2 验收一致，且没有让早期阶段依赖后期 API。状态均为 proposed，交接时应按 proposed 处理，而不是当作已确认。"
+    },
+    {
+      "dimension": "agent_handoff",
+      "files": [
+        "AGENT.md",
+        "README.md",
+        "ROADMAP.md"
+      ],
+      "outcome": "passed",
+      "reason": "AGENT.md 要求先核对已有项目、指令与已确认决定，只实现选定阶段的完整用户闭环，保留后期与不适用能力的实际状态，禁止删除行为断言、硬编码测试值或声称未运行测试通过，并声明包不授予外部访问、凭据、发布或破坏性权限；README 给出了阅读顺序。内容正确但很简短，缺当前阶段选择、证据记录和 proposed 决策处理步骤。"
+    },
+    {
+      "dimension": "evidence_honesty",
+      "files": [
+        "README.md",
+        "VALIDATION.md",
+        "acceptance/README.md",
+        "acceptance/plan.json",
+        "template.json",
+        "integrity.json"
+      ],
+      "outcome": "passed",
+      "reason": "README.md、VALIDATION.md、acceptance/README.md、acceptance/plan.json 与 template.json 均明确 not implemented/not_run/未执行，未声称任何测试通过；integrity.json 提供文件哈希，来源说明为模型调研、未独立重抓。未发现导入或生成的成功证据冒充执行结果；CATEGORY 的重复与日期不一致属于编辑和来源一致性问题，不是伪造通过。"
+    }
+  ],
+  "created_at": "2026-10-17T12:40:15.241802+00:00",
+  "digest": "0c57c66c4fb57c6dd87746acde018cc2f411978ac446c3b1074c38c366d5a3f9",
+  "id": "acc_c10f1380f8594679ae57806707fd0765",
+  "job_id": "job_683650aada974fb79d072884b6b3f457",
+  "method": "cognitive-review",
+  "outcome": "blocked",
+  "scope": "Independent static cognition and acceptance-program review only; no program execution, source re-fetch, downstream runtime or publication.",
+  "suggestions": [
+    "在 ARCHITECTURE.md 统一 POST title 的空白语义：若空串应派生，明确其与 PATCH 空串 400 的差异，并让 UI 空输入省略 title；若空串应 400，则修改 PRODUCT F01 与 UI 表单说明，并补 A01 的空白标题用例。",
+    "在 ARCHITECTURE.md 明确 POST /api/bookmarks 的 categoryId 校验（不存在或已 tombstone 应返回 400 invalid_category）、PATCH 空 body 的错误码，以及 id 的统一序列化表示，并同步补 acceptance 负例。",
+    "补充 mode=move 指向 tombstone 归类（target_unavailable）与 mode=purge 携带 targetCategoryId（target_not_allowed）的测试；这两条直接关系 active bookmark 不得指向 tombstone 归类的数据完整性。",
+    "补充 URL 2048/2049、host 为空、POST 非法 categoryId、空白标题，以及 GET /api/trash 与 GET /api/categories 排序等边界断言，避免只覆盖主要成功路径。",
+    "修复 acceptance/browser.cjs 的子路径 base-url：gotoHome、gotoCategory、gotoTrash 不能直接用 page.goto('/')、'/c/...'、'/trash'，应基于 ctx.baseUrl 的 pathname 拼接或使用相对路径；增加 base-url 带 /bookmarks 的 UI 用例。",
+    "补充 UI 失败路径：空白标题、重复 URL、非法 URL 的 form-error，以及空库和空归类空态；当前 A28–A33 主要覆盖成功路径。",
+    "删除 CATEGORY.md 中重复的 S01–S23 全段，统一研究/访问日期，补齐或删除 leaf 所称 Research Notes 的引用；若 Pinboard 仍保留在代表产品中，补可核验来源或明确标注未验证。",
+    "在 AGENT.md 增加阶段选择、验收证据记录和 proposed 决策处理规则（不得把 proposed 当 confirmed），并明确 P3 与不适用能力的 handoff 状态。",
+    "若要证明“重新打开后仍然有效”包含进程重启，补 A02 类似的跨进程重启对归类与移动结果的读回；否则明确场景只要求页面刷新或新开页面。"
+  ],
+  "summary": "对书签管理器蓝图做了静态独立审阅，未运行任何验收程序、未连接目标、未执行重启 adapter 或浏览器。总体判断：场景收窄、核心用户流程、决策默认值与证据诚实性较强，未发现空 stub、伪造成功或把“文件存在”当通过；但架构对空白标题、非法归类等边界未完全定案，验收对若干数据完整性负例及 browser 子路径 base-url 支持存在缺口，因此不能据此判定 P0–P2 已可完整验收。"
+}

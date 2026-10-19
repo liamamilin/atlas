@@ -1,0 +1,1614 @@
+{
+  "date": "2026-10-17",
+  "scope": "用户明确授权后的三个未覆盖叶子场景生成与独立审阅；仅保存草案。",
+  "batch_id": "bat_e0bb94d1119548b795197d661d199850",
+  "state": "completed",
+  "config": {
+    "concurrency": 2,
+    "kind": "scenarios",
+    "language": "zh",
+    "model": "open-design/deepseek-v4.1-flash",
+    "name": "场景生产第3批 · 新叶子覆盖 · 笔记 / 日历 / 预算 · 2026-10-17",
+    "repair_attempts": 1,
+    "timeout": 900,
+    "leaves": [
+      "calendar-application",
+      "budgeting-application",
+      "note-taking-application"
+    ]
+  },
+  "summary": {
+    "new_leaves": 3,
+    "new_scenarios": 9,
+    "review_outcomes": {
+      "passed": 7,
+      "needs_changes": 2
+    },
+    "catalog_before": 15,
+    "catalog_after": 24,
+    "covered_leaves_before": 2,
+    "covered_leaves_after": 5,
+    "original_scenarios_unchanged": true,
+    "new_scenarios_all_draft_r1": true,
+    "cli_calls": 13,
+    "new_template_jobs": 0
+  },
+  "jobs": [
+    {
+      "id": "job_587b0b68d4ed44e5b351b38bf5fb6b1d",
+      "kind": "scenarios",
+      "leaf": "calendar-application",
+      "state": "completed",
+      "stage": "completed",
+      "attempt": 1,
+      "generation_result": {
+        "count": 3,
+        "reason": "input.existing_scenarios 为空，没有既有场景冲突。三个场景分别覆盖本 Type 定义核心的不同侧面且互不重叠：第一个只依赖『用户可编辑的事件 + 持久日程 + 可导航时间网格』这一最小核心（含 all-day 锚定与拖拽调整），第二个覆盖组织者侧的共享时间基础设施（availability 忙闲查看、邀请投递、RSVP 状态跟踪与更新传播），第三个覆盖绝对时间锚定这一硬性规则（切时区只重排渲染、事件保留创建时区）。三者的用户角色、目标与工作流差异明确，且都能在叶子描述的界面与行为范围内给出可观察的验收结果，因此提议这三条。",
+        "scenario_ids": [
+          "scn_48045a003653497aa92fd8934cabb8b1",
+          "scn_7437d84c37f64f61b3f33f63910c90b3",
+          "scn_0a74369fbaf04e53869178a5321d69a9"
+        ]
+      }
+    },
+    {
+      "id": "job_70465a62dd3f4a5595038422f2004934",
+      "kind": "scenarios",
+      "leaf": "budgeting-application",
+      "state": "completed",
+      "stage": "completed",
+      "attempt": 1,
+      "generation_result": {
+        "count": 3,
+        "reason": "input.existing_scenarios 为空，尚无任何已覆盖场景，因此补充三条互不重复的实用场景：第一条覆盖无账户、以单月为周期的极简计划型用法，完整走一遍计划—记录—对比—调整—结转的循环；第二条把使用者换成共享同一计划的伴侣/家庭，行为差异在于多人共同记录、避免重复入账并共享同一剩余额度；第三条把周期换成装修/婚礼这类一次性窗口，行为差异在于项目级总预算与分配项合计的约束、以及与日常月计划并存的独立口径。三者分别对应不同的用户结构与周期形态，各自触达核心模型的不同侧面。未提出按零基或信封方法划分的场景，因为方法属于“计划如何起草”的做法而非该类型的定义核心，其工作流与第一条高度重合；也未提出依赖银行连接或账户余额的场景，因为账户层是可选的容器，去掉后仍是完整的预算应用。",
+        "scenario_ids": [
+          "scn_6fb4896d9eb0428aa1c080df0a137813",
+          "scn_5c1fb49db51b430db0990dbf40c281fe",
+          "scn_83e08ffa38df4faeb51d3a1944aebbe8"
+        ]
+      }
+    },
+    {
+      "id": "job_b80d00556a674455be598f4d355824de",
+      "kind": "scenarios",
+      "leaf": "note-taking-application",
+      "state": "completed",
+      "stage": "completed",
+      "attempt": 1,
+      "generation_result": {
+        "count": 3,
+        "reason": "input.existing_scenarios 为空，没有已确认或草稿场景可比较，因此按叶子定义核心中的两种使用节奏与一个存储基质变体各取一个互不重叠的场景：课堂速记以“移动端低摩擦捕获 + 全库搜索”为返回路径；多项目归档以“容器浏览 + 置顶/归档/删除恢复”的生命周期管理为目标；本地 Markdown 库以离线可用、开放文件所有权、链接与导出为核心。三者在用户、目标、返回路径和关注点（检索、生命周期、数据所有权）上具体不同，且都只使用叶子已陈述的定义核心与标准能力，未新增核心之外的要求。",
+        "scenario_ids": [
+          "scn_e08806df40ac4e6096e843767d571a5a",
+          "scn_805c99ffe8da4532817592bb466a505e",
+          "scn_65bdff54e6934fd4b3d5dfc805b138d3"
+        ]
+      }
+    },
+    {
+      "id": "job_ee166980944c4adf8e2eeacb1a3629ff",
+      "kind": "scenario-review",
+      "leaf": "calendar-application",
+      "state": "completed",
+      "stage": "scenario-review",
+      "attempt": 2,
+      "generation_result": null
+    },
+    {
+      "id": "job_4056c212d9af4f67a73d1f209038b86a",
+      "kind": "scenario-review",
+      "leaf": "calendar-application",
+      "state": "completed",
+      "stage": "scenario-review",
+      "attempt": 1,
+      "generation_result": null
+    },
+    {
+      "id": "job_071660a7f58b41238cca2f5843f32799",
+      "kind": "scenario-review",
+      "leaf": "calendar-application",
+      "state": "completed",
+      "stage": "scenario-review",
+      "attempt": 1,
+      "generation_result": null
+    },
+    {
+      "id": "job_b9ab62966bf949719e6fdb3f5ac4b9bb",
+      "kind": "scenario-review",
+      "leaf": "budgeting-application",
+      "state": "completed",
+      "stage": "scenario-review",
+      "attempt": 1,
+      "generation_result": null
+    },
+    {
+      "id": "job_2aa7f1e788e24c57b77b2c38a0789f4a",
+      "kind": "scenario-review",
+      "leaf": "budgeting-application",
+      "state": "completed",
+      "stage": "scenario-review",
+      "attempt": 1,
+      "generation_result": null
+    },
+    {
+      "id": "job_684bd549412e4b898cd7ab291d176f96",
+      "kind": "scenario-review",
+      "leaf": "budgeting-application",
+      "state": "completed",
+      "stage": "scenario-review",
+      "attempt": 1,
+      "generation_result": null
+    },
+    {
+      "id": "job_03593458bcc44e6ea6269c2f1ebd0f32",
+      "kind": "scenario-review",
+      "leaf": "note-taking-application",
+      "state": "completed",
+      "stage": "scenario-review",
+      "attempt": 1,
+      "generation_result": null
+    },
+    {
+      "id": "job_6f842c9f36b144158724860d46042a47",
+      "kind": "scenario-review",
+      "leaf": "note-taking-application",
+      "state": "completed",
+      "stage": "scenario-review",
+      "attempt": 1,
+      "generation_result": null
+    },
+    {
+      "id": "job_5d134db6be0e4d51898399ceaa357d22",
+      "kind": "scenario-review",
+      "leaf": "note-taking-application",
+      "state": "completed",
+      "stage": "scenario-review",
+      "attempt": 1,
+      "generation_result": null
+    }
+  ],
+  "input_proofs": [
+    {
+      "job_id": "job_587b0b68d4ed44e5b351b38bf5fb6b1d",
+      "kind": "scenarios",
+      "attempt": 1,
+      "language": "zh",
+      "leaf": "calendar-application",
+      "leaf_fingerprint": "b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d",
+      "source_document_matches": true,
+      "source_sha256": "b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d",
+      "lines": 220,
+      "existing_scenarios": 0,
+      "peer_scenarios": null,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb89c6353ffelv2fLjIFLPMk9T",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 25.92
+      }
+    },
+    {
+      "job_id": "job_70465a62dd3f4a5595038422f2004934",
+      "kind": "scenarios",
+      "attempt": 1,
+      "language": "zh",
+      "leaf": "budgeting-application",
+      "leaf_fingerprint": "249f205edc697755a09df0892ccbff1e2657cfa1b4e5a0a3c0e32f0f71bd8484",
+      "source_document_matches": true,
+      "source_sha256": "249f205edc697755a09df0892ccbff1e2657cfa1b4e5a0a3c0e32f0f71bd8484",
+      "lines": 274,
+      "existing_scenarios": 0,
+      "peer_scenarios": null,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb89c6353ffevtFlYeTeZl4Dqs",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 43.03
+      }
+    },
+    {
+      "job_id": "job_b80d00556a674455be598f4d355824de",
+      "kind": "scenarios",
+      "attempt": 1,
+      "language": "zh",
+      "leaf": "note-taking-application",
+      "leaf_fingerprint": "2bac271ffaf19c64def80f24f96e6f061d1d4893ecd36e56808e9c43fef4271c",
+      "source_document_matches": true,
+      "source_sha256": "2bac271ffaf19c64def80f24f96e6f061d1d4893ecd36e56808e9c43fef4271c",
+      "lines": 291,
+      "existing_scenarios": 0,
+      "peer_scenarios": null,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb89bfd1bffeH1436wuW8Qz19j",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 46.0
+      }
+    },
+    {
+      "job_id": "job_ee166980944c4adf8e2eeacb1a3629ff",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "language": "zh",
+      "leaf": "calendar-application",
+      "leaf_fingerprint": "b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d",
+      "source_document_matches": true,
+      "source_sha256": "b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d",
+      "lines": 220,
+      "existing_scenarios": null,
+      "peer_scenarios": 2,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb89bfd1bffeVFhJXy2tqUQhWa",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 22.42
+      }
+    },
+    {
+      "job_id": "job_ee166980944c4adf8e2eeacb1a3629ff",
+      "kind": "scenario-review",
+      "attempt": 2,
+      "language": "zh",
+      "leaf": "calendar-application",
+      "leaf_fingerprint": "b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d",
+      "source_document_matches": true,
+      "source_sha256": "b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d",
+      "lines": 220,
+      "existing_scenarios": null,
+      "peer_scenarios": 2,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb89b0e76ffessnUZIHfnXbzOG",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 27.06
+      }
+    },
+    {
+      "job_id": "job_4056c212d9af4f67a73d1f209038b86a",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "language": "zh",
+      "leaf": "calendar-application",
+      "leaf_fingerprint": "b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d",
+      "source_document_matches": true,
+      "source_sha256": "b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d",
+      "lines": 220,
+      "existing_scenarios": null,
+      "peer_scenarios": 2,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb89bfd1affeme3Ce7rdQLH0Ca",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 32.6
+      }
+    },
+    {
+      "job_id": "job_071660a7f58b41238cca2f5843f32799",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "language": "zh",
+      "leaf": "calendar-application",
+      "leaf_fingerprint": "b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d",
+      "source_document_matches": true,
+      "source_sha256": "b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d",
+      "lines": 220,
+      "existing_scenarios": null,
+      "peer_scenarios": 2,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb89ba46cffehjNdPkuh55TZ2h",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 27.63
+      }
+    },
+    {
+      "job_id": "job_b9ab62966bf949719e6fdb3f5ac4b9bb",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "language": "zh",
+      "leaf": "budgeting-application",
+      "leaf_fingerprint": "249f205edc697755a09df0892ccbff1e2657cfa1b4e5a0a3c0e32f0f71bd8484",
+      "source_document_matches": true,
+      "source_sha256": "249f205edc697755a09df0892ccbff1e2657cfa1b4e5a0a3c0e32f0f71bd8484",
+      "lines": 274,
+      "existing_scenarios": null,
+      "peer_scenarios": 2,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb89b7d01ffeWViPGFrG1w4i1x",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 27.86
+      }
+    },
+    {
+      "job_id": "job_2aa7f1e788e24c57b77b2c38a0789f4a",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "language": "zh",
+      "leaf": "budgeting-application",
+      "leaf_fingerprint": "249f205edc697755a09df0892ccbff1e2657cfa1b4e5a0a3c0e32f0f71bd8484",
+      "source_document_matches": true,
+      "source_sha256": "249f205edc697755a09df0892ccbff1e2657cfa1b4e5a0a3c0e32f0f71bd8484",
+      "lines": 274,
+      "existing_scenarios": null,
+      "peer_scenarios": 2,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb89b37e5ffe5yimppMkFFhTM1",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 35.99
+      }
+    },
+    {
+      "job_id": "job_684bd549412e4b898cd7ab291d176f96",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "language": "zh",
+      "leaf": "budgeting-application",
+      "leaf_fingerprint": "249f205edc697755a09df0892ccbff1e2657cfa1b4e5a0a3c0e32f0f71bd8484",
+      "source_document_matches": true,
+      "source_sha256": "249f205edc697755a09df0892ccbff1e2657cfa1b4e5a0a3c0e32f0f71bd8484",
+      "lines": 274,
+      "existing_scenarios": null,
+      "peer_scenarios": 2,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb89aa9e5ffeSW66fdcWp6tUC0",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 46.26
+      }
+    },
+    {
+      "job_id": "job_03593458bcc44e6ea6269c2f1ebd0f32",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "language": "zh",
+      "leaf": "note-taking-application",
+      "leaf_fingerprint": "2bac271ffaf19c64def80f24f96e6f061d1d4893ecd36e56808e9c43fef4271c",
+      "source_document_matches": true,
+      "source_sha256": "2bac271ffaf19c64def80f24f96e6f061d1d4893ecd36e56808e9c43fef4271c",
+      "lines": 291,
+      "existing_scenarios": null,
+      "peer_scenarios": 2,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb89aa413ffeBqTxMneppPam7w",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 32.67
+      }
+    },
+    {
+      "job_id": "job_6f842c9f36b144158724860d46042a47",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "language": "zh",
+      "leaf": "note-taking-application",
+      "leaf_fingerprint": "2bac271ffaf19c64def80f24f96e6f061d1d4893ecd36e56808e9c43fef4271c",
+      "source_document_matches": true,
+      "source_sha256": "2bac271ffaf19c64def80f24f96e6f061d1d4893ecd36e56808e9c43fef4271c",
+      "lines": 291,
+      "existing_scenarios": null,
+      "peer_scenarios": 2,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb89a23ccffeCilc6GYuEdwgKT",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 35.51
+      }
+    },
+    {
+      "job_id": "job_5d134db6be0e4d51898399ceaa357d22",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "language": "zh",
+      "leaf": "note-taking-application",
+      "leaf_fingerprint": "2bac271ffaf19c64def80f24f96e6f061d1d4893ecd36e56808e9c43fef4271c",
+      "source_document_matches": true,
+      "source_sha256": "2bac271ffaf19c64def80f24f96e6f061d1d4893ecd36e56808e9c43fef4271c",
+      "lines": 291,
+      "existing_scenarios": null,
+      "peer_scenarios": 2,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb899f477ffeu8Z5ILrByPBwbs",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 32.35
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "acceptance": [
+        "新建笔记后不执行任何保存操作，立即关闭并重开应用，正文与图片仍在",
+        "不选择任何笔记本即可成功创建笔记，该笔记出现在库中并可在“未归档”位置找到",
+        "在全库搜索中输入笔记正文里的词，能返回该笔记并显示匹配上下文",
+        "从搜索结果打开笔记后可继续编辑，改动持久保存"
+      ],
+      "audience": "用手机或平板上课记笔记的学生",
+      "id": "scn_e08806df40ac4e6096e843767d571a5a",
+      "leaf": "note-taking-application",
+      "leaf_name": "笔记应用",
+      "name": "课堂速记与考前检索复习",
+      "objective": "在课堂上以近乎零成本的方式把讲授内容与自己的批注存成笔记，并在复习时无论当初是否整理过都能找回这些笔记",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:05:44.788641+00:00",
+      "workflow": [
+        "在快速笔记窗口新建一条笔记，只填标题和关键词，暂不选择笔记本",
+        "课堂中在笔记编辑器里继续追加要点，并插入拍照的板书或课件图片",
+        "依赖应用的持续自动保存，中途切到其他应用再回来内容不丢失",
+        "课后在图书馆导航器中把这条未归档笔记移入课程笔记本，并按主题添加标签",
+        "期末复习时在全库搜索里输入关键词，在结果中查看匹配上下文并打开对应笔记",
+        "对仍然零散未归档的旧笔记直接用搜索访问，而不依赖文件夹"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "场景紧扣叶子定义核心。叶子的三条识别属性为「The note as the unit of record」「A personal library of many notes」「The capture-and-return loop」（leaf.md 16-18 行），并明确「Capture: getting information into a new note must be nearly effortless」「Return: ... browsing organized containers, and/or searching across the whole library」（43 行）。场景的快速笔记捕获、未归档即可创建、插入图片、全库搜索回取正对应这三条，未越界为知识库/文档编辑器/书签管理器。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "与 peer1（scn_65bdff54e6934fd4b3d5dfc805b138d3「本地 Markdown 笔记库的离线积累与导出」）比：peer1 的目标是完全离线、以普通 Markdown 文件掌控数据并导出单篇，验收围绕断网/不登录、外部工具读取文件、链接与反向链接、PDF 导出；本场景目标是课堂零摩擦捕获与考前检索，验收围绕自动保存持久化、未归档创建、搜索匹配上下文，目标/受众/工作流均不同。与 peer2（scn_805c99ffe8da4532817592bb466a505e「多项目会议结论的归档与回查」）比：仅有「快速捕获时先不决定归属、之后移入笔记本、搜索兜底」这一形式相似，peer2 的实质是桌面端多项目容器归档与置顶/归档/删除恢复的生命周期管理，本场景是移动端学生课中插图捕获与期末关键词复习，验收项无一重合于其置顶、归档视图、回收站恢复等要点。故两条 peer 均列入比较但属不同场景，无实质重复。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "流程为可用的端到端闭环：快速笔记窗口新建（只填标题与关键词、暂不选笔记本）→ 课中追加要点并插入拍照图片 → 依赖持续自动保存、切换应用返回不丢失 → 课后在图书馆导航器移入课程笔记本并加标签 → 期末在全库搜索输入关键词、查看匹配上下文并打开笔记 → 仍零散未归档的旧笔记直接靠搜索访问。与叶子「Capture a note」（87-93 行，含『the note is saved as you go』）和「Return to a note」（109-115 行浏览或搜索）步骤对应；第 112-113 行「Search: type words from the note → results across the whole library」直接支撑第 5-6 步。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "passed",
+              "reason": "四条验收均可观察：1）关闭重开后正文与图片仍在（验证持续保存，对应 leaf.md 208-210 行「Notes persist and save continuously」）；2）不选笔记本即可创建且可在「未归档」找到（对应 95 行「a note can start unfiled and be sorted later」）；3）全库搜索正文词返回该笔记并显示匹配上下文（对应 117 行「Search is the safety net」与 188 行「results with highlighted context」）；4）从搜索结果打开后继续编辑且改动持久保存。这组验收覆盖了捕获—回取主闭环与场景的核心承诺，足以判定行为是否达成。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "passed",
+              "reason": "边界自洽且未引入无依据假设：所涉快速笔记窗口、全库搜索、图片嵌入、笔记本/标签、持续保存皆为叶子承认的能力（95 行、117 行、146 行「rich content: images...」、151 行「capture surfaces beyond the editor」），未要求团队协作、知识网络或实现细节（存储介质、同步方式、技术栈均未越界指定）。audience「用手机或平板上课记笔记的学生」与 objective 一致，验收 2 中的「未归档」与工作流第 1 步「暂不选择笔记本」相互一致。语言为简体中文，符合 input.language=zh 要求。"
+            }
+          ],
+          "created_at": "2026-10-17T01:06:59.869818+00:00",
+          "id": "scv_3596d02ad33b4420be5ef19fb712e508",
+          "input_digest": "7919b3df5f0d20a3a6c2f15fc79def72e728bf3325a389584cd36f52ff8a1698",
+          "job_id": "job_03593458bcc44e6ea6269c2f1ebd0f32",
+          "leaf_evidence": [
+            {
+              "end_line": 18,
+              "start_line": 16
+            },
+            {
+              "end_line": 43,
+              "start_line": 43
+            },
+            {
+              "end_line": 95,
+              "start_line": 95
+            },
+            {
+              "end_line": 117,
+              "start_line": 117
+            }
+          ],
+          "leaf_fingerprint": "2bac271ffaf19c64def80f24f96e6f061d1d4893ecd36e56808e9c43fef4271c",
+          "leaf_quotes": [
+            "- **The note as the unit of record** — a persistent, individually addressable piece of user-authored content, text-centric, optionally embedding images, files, audio, and other material.\n- **A personal library of many notes** — notes accumulate over time into one collection that belongs to the individual, private by default. Sharing is a delegation of specific notes or containers, never a change of ownership.\n- **The capture-and-return loop** — creating a new note is deliberately low-friction, and returning to any earlier note is guaranteed through browsing and/or search.",
+            "**The capture-and-return loop.** The loop is the Type's reason to exist. Capture: getting information into a new note must be nearly effortless — this is why mature products save continuously as you write and why many provide capture surfaces outside the main editor (a quick-note window, a web clipper, a document scanner, a share-sheet entry from other apps). Return: a note that cannot be found again is worthless, so the application guarantees a way back — browsing organized containers, and/or searching across the whole library.",
+            "Saving is continuous in mature products; there is no save step to remember. Organization can be skipped at capture time — a note can start unfiled and be sorted later, which is precisely what makes capture fast.",
+            "Search is the safety net: it returns notes even when the user never organized them. In several products search also reaches into attachments, scanned documents, and recorded transcripts."
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "passed",
+          "peer_digest": "fb5efb269f0a342e5229a7c03829b815807ee75ab21e6f3769a6a495b754b1ef",
+          "peer_scenarios": [
+            {
+              "id": "scn_65bdff54e6934fd4b3d5dfc805b138d3",
+              "name": "本地 Markdown 笔记库的离线积累与导出",
+              "revision": 1
+            },
+            {
+              "id": "scn_805c99ffe8da4532817592bb466a505e",
+              "name": "多项目会议结论的归档与回查",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_e08806df40ac4e6096e843767d571a5a",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "可在验收中补一条覆盖工作流第 4 步的回取路径，例如「将未归档笔记移入课程笔记本并加标签后，可从该笔记本列表或对应标签视图再次找到它」，使流程中的组织环节也有可观察判据（当前该环节为叶子所列可选/标准能力，不影响主闭环判定）。",
+            "工作流第 1 步「只填标题和关键词」中的「关键词」含义略含糊：可明确它是笔记正文的初步文字（与后续第 2 步追加要点一致），或写明它是独立的关键词/标签字段，避免与第 4 步「加标签」混淆。",
+            "可在验收 3 或新增一条中指明搜索范围确为全库（含未归档笔记）而非当前笔记本内，以强化『未整理也能找回』这一核心承诺的可验证性。"
+          ],
+          "summary": "该场景「课堂速记与考前检索复习」是笔记应用这一 Application Type 的合理实例：学生用手机/平板以快速笔记窗口零摩擦捕获（暂不归档）、课中插入板书图片并依赖持续自动保存，课后归入课程笔记本并打标签，期末用全库搜索按关键词回到任意未整理旧笔记。这与叶子定义核心（笔记为持久化作者内容单元、个人笔记库、捕获—回取闭环）一致，验收项覆盖了持久化、未归档创建、搜索上下文匹配与搜索后继续编辑，端到端流程连贯、边界合理，语言符合 zh 要求。与给出的两个 peer 相比目标/受众/验收均不同（peer1 是本地 Markdown 离线文件库与导出，peer2 是桌面端多项目归档与生命周期管理），仅在「先捕获后归档、搜索兜底」这一点上有部分形式相似，但不足以构成重复。本次评审仅基于 pinned leaf 与 peer_scenarios 文本，无法验证运行时行为、市场价值或实现可行性；验收项未覆盖第 4 步「移入课程笔记本并加标签」后的回取路径，属可选补强而非阻断。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_03593458bcc44e6ea6269c2f1ebd0f32",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    },
+    {
+      "acceptance": [
+        "笔记移入某项目笔记本后出现在该笔记本列表中，且同一时刻只归属一个容器",
+        "被置顶的笔记在所属容器列表的固定位置保持可见，不随按日期或标题排序而移动",
+        "删除笔记后它进入可恢复的回收状态，在保留期内可被恢复并回到库中原有位置",
+        "归档后的笔记不再出现在默认活跃列表，但通过全库搜索仍能找到并打开"
+      ],
+      "audience": "同时跟进多个项目、以桌面端为主的职场人士",
+      "id": "scn_805c99ffe8da4532817592bb466a505e",
+      "leaf": "note-taking-application",
+      "leaf_name": "笔记应用",
+      "name": "多项目会议结论的归档与回查",
+      "objective": "把会议结论和项目细节持续记入个人笔记库，按项目归档并管理活跃与过期笔记，使任一历史记录都能被可靠取回",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:05:44.788641+00:00",
+      "workflow": [
+        "会议中用快速捕获窗口记录要点，先不决定归属",
+        "会后在桌面端把该笔记移入对应项目笔记本，并补充表格形式的决策与行动项",
+        "把当前重点推进的笔记置顶，使其在列表中始终可见",
+        "按阶段把已结束的笔记归档，清理活跃视图",
+        "把确实不需要的笔记删除，必要时在保留期内恢复",
+        "需要回顾时按容器浏览项目笔记本，找不到时改用全库搜索"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "场景明确以「个人笔记库」为中心并反复强调捕获与取回：leaf.md 第 5 行 “an individual's instrument for capturing information as persistent notes and getting it back later”，第 43 行 “Capture: getting information into a new note must be nearly effortless … Return: a note that cannot be found again is worthless, so the application guarantees a way back — browsing organized containers, and/or searching across the whole library.”。objectives「把会议结论和项目细节持续记入个人笔记库…使任一历史记录都能被可靠取回」与 workflow 第 1、6 步正对应定义核心的 capture-and-return loop（第 43 行）。事件/容器/置顶对应第 49 行 “containers (notebooks, sections, folders), tags, pins, sorting and reordering”，单一归属对应第 222 行 “a note sits in exactly one notebook or folder at a time”，删除可恢复对应第 230 行 “Deleting a note commonly moves it to a recoverable trash state for a period”，归档对应第 54 行 “deleting a note (commonly recoverable for a period) … archiving”。全部为定义核心或成熟产品标准能力，未越出该 Type。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "与 peer scn_65bdff54e6934fd4b3d5dfc805b138d3（本地 Markdown 离线库、数据所有权/导出/密码锁）相比，用户、目标与流程均不同：后者以用户指定文件夹中的 Markdown 文件、导出与反链为重心，本场景为桌面职场人在多项目间按笔记本归档并管理活跃/过期笔记。与 peer scn_e08806df40ac4e6096e843767d571a5a（学生课堂速记与考前检索）相比，二者都含「先不归类捕获、随后移入容器、再用搜索回查」的相似环节，但用户与场景（手机/平板上课的学生 vs 同时跟进多个项目、以桌面端为主的职场人士）不同，且本场景新增了置顶定位于固定位置、按阶段归档、删除后在保留期内恢复并回到原位等生命周期流程，验收也集中于此，非重复。故相关 ID 为空。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "workflow 六步构成连贯可用闭环：会议中快速捕获（不决定归属）→ 会后移入对应项目笔记本并补充决策/行动项 → 置顶当前重点 → 按阶段归档已结束笔记 → 删除确实不需要的并在保留期内恢复 → 按容器浏览、找不到时改用全库搜索。步骤 2 的「移入对应项目笔记本」与验收第 1 条「同一时刻只归属一个容器」一致，步骤 3、4、5 分别与验收第 2、4、3 条对应，步骤 6 与验收第 4 条及 leaf 第 110-112 行 “Browse: open a container … or Search: type words from the note → results across the whole library” 的返回路径一致，无自相矛盾或方向缺失。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "passed",
+              "reason": "四条验收标准均为外部可观察结果，覆盖工作流主体：第 1 条验证归档动作使笔记出现在目标笔记本列表且归属唯一；第 2 条验证「被置顶的笔记在所属容器列表的固定位置保持可见，不随按日期或标题排序而移动」，可直接观察位置稳定性；第 3 条验证「删除笔记后它进入可恢复的回收状态，在保留期内可被恢复并回到库中原有位置」；第 4 条验证「归档后的笔记不再出现在默认活跃列表，但通过全库搜索仍能找到并打开」。这些即可判定通过/失败的行为断言，无需实现细节即可评估。快速捕获步骤与「表格」形式本身缺少专门断言，属可选补强，不阻碍主流程验收。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "passed",
+              "reason": "边界合理且内部一致：范围限于个人、单用户的私人库（audience 为职场人士个人，无人共享或组织治理），与 leaf 第 33 行 “there is no team workspace, no organizational membership, and no administrator in the base model” 及第 41 行 “owned by the individual: private by default” 相符。未引入不必要假设；验收第 3 条只要求「在保留期内」可恢复，未硬编码具体期限，与 leaf 第 230 行 “Exact retention varies by product.” 一致。唯一需留意的边界是场景使用「会议结论」「决策与行动项」措辞，接近 leaf 第 261 行 “Meeting Notes Application — record anchored to a specific identified meeting occurrence with meeting anatomy (agenda, decisions, action items); remove that anchor and it is general note-taking”，但本场景按项目笔记本而非按具体会议事件归档、目标为长期个人库积累与取回，未固定于某次会议，故仍在一般笔记应用范围内；语言为中文，符合 input.language，无忽略问题。"
+            }
+          ],
+          "created_at": "2026-10-17T01:07:35.544311+00:00",
+          "id": "scv_40efac936441477cbaf7c5a3dcebc312",
+          "input_digest": "550732670b0348a5a5ea258913982e15b336092116a55c69b8e7fcfdad167b2b",
+          "job_id": "job_6f842c9f36b144158724860d46042a47",
+          "leaf_evidence": [
+            {
+              "end_line": 18,
+              "start_line": 5
+            },
+            {
+              "end_line": 43,
+              "start_line": 39
+            },
+            {
+              "end_line": 222,
+              "start_line": 218
+            },
+            {
+              "end_line": 230,
+              "start_line": 228
+            }
+          ],
+          "leaf_fingerprint": "2bac271ffaf19c64def80f24f96e6f061d1d4893ecd36e56808e9c43fef4271c",
+          "leaf_quotes": [
+            "A **Note-taking Application** is an individual's instrument for capturing information as persistent notes and getting it back later. Its defining core is small:\n\n```text\nPersonal owner\n└── Personal note library (accumulates over time)\n    ├── Note ── Note ── Note ... (persistent authored records)\n    └── Return paths: browse containers · tags · links · search\n```\n\nThree properties together make the Type recognizable:\n\n- **The note as the unit of record** — a persistent, individually addressable piece of user-authored content, text-centric, optionally embedding images, files, audio, and other material.\n- **A personal library of many notes** — notes accumulate over time into one collection that belongs to the individual, private by default. Sharing is a delegation of specific notes or containers, never a change of ownership.\n- **The capture-and-return loop** — creating a new note is deliberately low-friction, and returning to any earlier note is guaranteed through browsing and/or search.",
+            "**The note.** The system's world is made of notes. A note is a persistent, individually addressable record of authored content: usually text, commonly with embedded material — images, file attachments, audio, tables, checklists, handwriting. Notes are typically short to medium, but can grow long. A note is created and edited by its owner; the application stores it and makes it retrievable. The note is what everything else hangs from — containers organize notes, search finds notes, links connect notes.\n\n**The personal library.** Notes accumulate, over years, into one user's library. The library is durable — notes do not expire or disappear — and it is owned by the individual: private by default. When sharing exists, it is granted per note or per container (a notebook, a folder), and it delegates access without changing who owns the library.\n\n**The capture-and-return loop.** The loop is the Type's reason to exist. Capture: getting information into a new note must be nearly effortless — this is why mature products save continuously as you write and why many provide capture surfaces outside the main editor (a quick-note window, a web clipper, a document scanner, a share-sheet entry from other apps). Return: a note that cannot be found again is worthless, so the application guarantees a way back — browsing organized containers, and/or searching across the whole library.",
+            "The application does not force the user to file a note before capturing it. Retrieval does not depend on organization: search returns unfiled notes too. Products make this guarantee explicitly — one documents the goal as finding notes \"even if you forget where you put them.\"\n\n### A note usually lives in one container; tags and links cut across\n\nIn most products a note sits in exactly one notebook or folder at a time, while tags and links can connect it to many contexts simultaneously. Containers answer \"where does this live\"; tags and links answer \"what does this relate to.\" Smart folders and tag views are computed from rules, not manual membership.",
+            "### Deletion is usually recoverable\n\nDeleting a note commonly moves it to a recoverable trash state for a period rather than destroying it immediately; some products additionally keep per-note version history. Exact retention varies by product."
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "passed",
+          "peer_digest": "2cdd074e84a54fca77eb449006055ed6efd4e58c1cfbed8569002183a2ba27a2",
+          "peer_scenarios": [
+            {
+              "id": "scn_65bdff54e6934fd4b3d5dfc805b138d3",
+              "name": "本地 Markdown 笔记库的离线积累与导出",
+              "revision": 1
+            },
+            {
+              "id": "scn_e08806df40ac4e6096e843767d571a5a",
+              "name": "课堂速记与考前检索复习",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_805c99ffe8da4532817592bb466a505e",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "可补一条可选验收覆盖工作流第 1 步：在快速捕获窗口创建、未指定容器即关闭应用的笔记，随后能在库中（如「未归档」位置）找到，以直接验证「先不决定归属」的低摩擦捕获（参照 leaf 第 95 行 “a note can start unfiled and be sorted later”）。",
+            "若希望避免与 Meeting Notes Application 边界模糊，可在场景描述中明确「以项目为归档单位、不绑定具体会议事件与议程」，使「移除会议锚点仍为一般笔记记录」的定位更清晰；此为非阻塞的可选澄清。"
+          ],
+          "summary": "该场景（scn_805c99ffe8da4532817592bb466a505e「多项目会议结论的归档与回查」）落在笔记应用的定义核心内：个人所有者在个人笔记库中低摩擦捕获会议结论，并依靠容器浏览与全库搜索可靠取回，同时用置顶、归档、删除/恢复等生命周期机制管理活跃度。六步工作流自捕获到归档、删除恢复再到浏览/搜索回查，形成可用的端到端闭环；四条验收标准均为可观察结果（归属唯一、置顶位置稳定、删除后可恢复、归档后仅可搜索到），覆盖了工作流主体步骤。与两个 peer 相比，用户、目标与流程重心不同，不构成重复。范围边界合理，未引入团队协作、组织治理等越界内容，语言为中文，符合 input.language。局限：步骤 1「快速捕获、先不决定归属」与步骤 2 的「表格」形式本身没有直接验收项，且场景带有会议结论/决策与行动项用语，接近 leaf 所列 Meeting Notes Application 边界，但因其按项目而非按具体会议事件归档、目标是长期个人库的积累与取回，仍属一般笔记应用。上述均为可选优化，不影响通过判定。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_6f842c9f36b144158724860d46042a47",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    },
+    {
+      "acceptance": [
+        "断网且未登录时，新建、编辑、浏览、搜索笔记均正常，不出现要求联网或登录的阻断",
+        "笔记以用户可直接读取的 Markdown 文件保存在指定文件夹，应用关闭后外部文本工具能打开同一文件",
+        "在一篇笔记中写入指向另一篇笔记的链接后，可从源笔记跳转并看到指向它的反向链接",
+        "导出单篇笔记得到 PDF 或文本文件，内容与该笔记一致且不含库中其他笔记"
+      ],
+      "audience": "重视数据所有权、希望笔记以开放文件保存的写作者或研究者",
+      "id": "scn_65bdff54e6934fd4b3d5dfc805b138d3",
+      "leaf": "note-taking-application",
+      "leaf_name": "笔记应用",
+      "name": "本地 Markdown 笔记库的离线积累与导出",
+      "objective": "在完全离线、无账号依赖的情况下把笔记作为本地普通文件长期积累，直接用文件掌控与备份，并把单篇笔记导出给他人",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:05:44.788641+00:00",
+      "workflow": [
+        "在用户指定的本地文件夹中以 Markdown 文件新建笔记，文件名即标题",
+        "断网状态下继续撰写、插入本地图片附件并检索已有笔记",
+        "用文件夹层级组织主题，同时在笔记之间写入内部链接建立关联",
+        "关闭应用后直接用系统文件管理器查看、复制或备份这些笔记文件",
+        "把需要交给他人的单篇笔记导出为 PDF 或文本，并附上其中的图片",
+        "为少数敏感笔记单独启用密码锁"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "场景落在叶子明确定义的核心上：叶子第5行称其为 \"an individual's instrument for capturing information as persistent notes and getting it back later\"，第9-11行的结构图为 \"Personal note library (accumulates over time)\" 与 \"Return paths: browse containers · tags · links · search\"，场景正是个人所有、累积成库、可浏览/检索的笔记库。第17行 \"private by default\" 对应无账号、离线、本地文件的私人库设定；第243行的变体 \"Local-first plain-text library — notes as Markdown files in a folder the user owns; links, backlinks, and graph views emphasized\" 与场景的本地 Markdown 文件、内部链接直接对应；第55行 \"Export and print\" 覆盖导出单篇为 PDF/文本。可选能力（锁、导出）都在叶子第47-56行被列为标准能力而非定义核心，因此未越出 Type。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "与两个 peer 相比，用户与目标不同：scn_805c99ffe8da4532817592bb466a505e 面向 \"同时跟进多个项目、以桌面端为主的职场人士\"，围绕容器归属、置顶、归档与回收站生命周期；scn_e08806df40ac4e6096e843767d571a5a 面向 \"用手机或平板上课记笔记的学生\"，围绕零选择容器捕获、自动保存与考前全库搜索。本场景的声明目标是 \"在完全离线、无账号依赖的情况下把笔记作为本地普通文件长期积累，直接用文件掌控与备份\"，其独有可观察行为是外部文件管理器直接读写同一 Markdown 文件、以及单篇导出并附图片，二者均未出现在 peer 的 acceptance 中。仅「用文件夹组织 + 检索」等通用步骤重合，不足以构成重复；这两个 peer 已在比较中排除，故不计入 related_scenario_ids。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "步骤构成连贯链路：在指定文件夹以 Markdown 新建（文件名即标题）→ 断网继续撰写/插图/检索 → 文件夹组织并写入笔记间链接 → 关闭应用后用系统文件管理器查看、复制或备份 → 导出单篇并附图片。捕获、离线使用、组织与关联、文件层验证、对外交付依次衔接，且每一步都可由所声明的本地文件与离线前提支撑。末步「为少数敏感笔记单独启用密码锁」置于导出之后，顺序略松散，但整体是并列的使用事件而非严格时序，未妨碍主链路可用性。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "passed",
+              "reason": "验收项可观察且覆盖主链路：「断网且未登录时，新建、编辑、浏览、搜索笔记均正常」对应工作流 1-2；「笔记以用户可直接读取的 Markdown 文件保存在指定文件夹，应用关闭后外部文本工具能打开同一文件」对应步骤 1 与 4；「在一篇笔记中写入指向另一篇笔记的链接后，可从源笔记跳转并看到指向它的反向链接」对应步骤 3，并呼应叶子第11行 \"links\" 与第243行 \"links, backlinks\"；「导出单篇笔记得到 PDF 或文本文件，内容与该笔记一致且不含库中其他笔记」对应步骤 5 与叶子第55行。工作流步骤 6（密码锁）与步骤 3 的文件夹层级本身没有对应验收项，但密码锁属叶子第151行列出的标准能力而非定义核心，属可选完善，不构成阻断。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "passed",
+              "reason": "边界自洽：用户指定本地文件夹、离线无账号、单篇导出、少数笔记加锁，都是有限且与定义核心兼容的范围；引出链接/反向链接仍保留个人库与笔记为单位，未滑向叶子第255行所述 PKM 的 \"connected network ... as the point\"，也未触及组织治理语料。语言检查：input.language 为 zh，场景 name、objective、workflow、acceptance 的叙述均为简体中文，Markdown、PDF 等标识符保留原样属允许情形。唯一需说明的是「可直接读取的 Markdown 文件」与逐篇密码锁之间的实现张力：验收 2 只对未加锁笔记断言，故不构成内部矛盾，属可在说明中澄清的实现默认。"
+            }
+          ],
+          "created_at": "2026-10-17T01:07:44.496077+00:00",
+          "id": "scv_f5f47488b3964d4097eb083dc88edda6",
+          "input_digest": "117780a806c1efd135c62ba4123888a4dc018ccdf9a69b90f7226746a65c5833",
+          "job_id": "job_5d134db6be0e4d51898399ceaa357d22",
+          "leaf_evidence": [
+            {
+              "end_line": 5,
+              "start_line": 5
+            },
+            {
+              "end_line": 11,
+              "start_line": 9
+            },
+            {
+              "end_line": 17,
+              "start_line": 17
+            },
+            {
+              "end_line": 55,
+              "start_line": 55
+            },
+            {
+              "end_line": 151,
+              "start_line": 151
+            },
+            {
+              "end_line": 243,
+              "start_line": 243
+            }
+          ],
+          "leaf_fingerprint": "2bac271ffaf19c64def80f24f96e6f061d1d4893ecd36e56808e9c43fef4271c",
+          "leaf_quotes": [
+            "A **Note-taking Application** is an individual's instrument for capturing information as persistent notes and getting it back later. Its defining core is small:",
+            "└── Personal note library (accumulates over time)\n    ├── Note ── Note ── Note ... (persistent authored records)\n    └── Return paths: browse containers · tags · links · search",
+            "- **A personal library of many notes** — notes accumulate over time into one collection that belongs to the individual, private by default. Sharing is a delegation of specific notes or containers, never a change of ownership.",
+            "- **Export and print** — taking a note out as PDF, text, or paper.",
+            "- export/print, note locking",
+            "- **Local-first plain-text library** — notes as Markdown files in a folder the user owns; links, backlinks, and graph views emphasized; plugin ecosystems; sync and publishing as add-ons"
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "passed",
+          "peer_digest": "e977ade9dedd8f14a812c405727e4c3f47e1930af8b0f3e079bb4639127e33af",
+          "peer_scenarios": [
+            {
+              "id": "scn_805c99ffe8da4532817592bb466a505e",
+              "name": "多项目会议结论的归档与回查",
+              "revision": 1
+            },
+            {
+              "id": "scn_e08806df40ac4e6096e843767d571a5a",
+              "name": "课堂速记与考前检索复习",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_65bdff54e6934fd4b3d5dfc805b138d3",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "为工作流第 6 步「为少数敏感笔记单独启用密码锁」补一条可观察验收（例如：未解锁时该笔记内容不可读，解锁后可正常编辑与检索，且不影响库中其他笔记），或将该步从工作流中移除，避免出现无验收覆盖的步骤。",
+            "补一条覆盖工作流第 3 步文件夹层级的验收（例如：在应用内移动笔记到子文件夹后，文件系统中的 Markdown 文件随之移动且仍可被外部工具打开），使组织路径与断言有对应关系。",
+            "在两处涉及文件形态的表述上加一句澄清，说明加锁是通过应用层加密实现、解锁后仍为普通可读 Markdown，从而与验收 2「外部文本工具能打开同一文件」保持明确一致；此为说明性补充，非必需产品决策。"
+          ],
+          "summary": "被审场景（scn_65bdff54e6934fd4b3d5dfc805b138d3「本地 Markdown 笔记库的离线积累与导出」）在本轮范围内通过五项检查：其核心（个人所有、笔记库累积、捕获—返回闭环）与 Atlas 叶子的定义核心一致；用户/目标/工作流与两个 peer 场景不同；工作流构成可用的端到端链路；验收项可观察；范围与语言自洽。仅存两处非阻塞性提示：(1) 工作流最后一步「为少数敏感笔记单独启用密码锁」在 acceptance 中没有对应可观察项；(2) 「用户可直接读取的 Markdown 文件」与逐篇密码锁之间存在需要说明的张力（前者仅对未加锁笔记断言，故不构成矛盾），另「以文件夹层级组织主题」也未直接进入验收。这些属于可选完善，不改变结论。本结论仅限所给叶子与两个 peer 的场景层面对照，不构成运行或市场验证。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_5d134db6be0e4d51898399ceaa357d22",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    },
+    {
+      "acceptance": [
+        "计划页对每个分配项同时显示计划金额、实际金额与剩余额度，并在录入支出后立即更新",
+        "任何一笔支出录入后，其所属分配项的剩余额度按该支出金额减少",
+        "分配项的实际支出超过计划金额后，其剩余额度显示为负数或明确的超支标记，而不是归零或隐藏",
+        "从分配项 A 转移金额到分配项 B 后，A 的剩余减少额与 B 的剩余增加额相同，计划总额不变",
+        "进入下一期后各分配项的计划金额回到模板数值，上一期剩余不被带入（未启用结转时）"
+      ],
+      "audience": "希望用预先承诺约束日常开支、且不连接银行账户的个人用户（如刚独立生活的年轻上班族）",
+      "id": "scn_6fb4896d9eb0428aa1c080df0a137813",
+      "leaf": "budgeting-application",
+      "leaf_name": "预算应用",
+      "name": "个人极简月度预算：先查剩余再消费",
+      "objective": "为一个月的各项用途预先设定计划金额，并在每次消费前查看该用途的剩余额度，让计划真正影响消费决策。",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:05:15.622841+00:00",
+      "workflow": [
+        "新建本期（月度）计划，为食品、房租、交通、娱乐等用途创建分配项并填写计划金额",
+        "登记本期可用的预期收入，检查各分配项计划金额之和是否超过收入",
+        "消费后手动录入一笔支出并归属到对应分配项，该分配项剩余额度随即减少",
+        "购买前打开计划页，查看相关分配项及整体的剩余额度，据此决定是否购买或缩减金额",
+        "月中某分配项即将用尽，从其他分配项转移金额，或让超出部分留在该分配项上形成超支",
+        "期末查看各分配项的计划、实际与剩余对照，未使用金额留在本期，并按模板数值开始下一期计划"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "场景核心正是叶子定义的四个属性。叶子第 5 行称其为「decide in advance how much money may go to which purposes over a defined period, and then continuously measures actual spending against those decisions」，第 9–14 行的核心结构列出「Spending plan (a budget bound to a period) / Allocations / Actuals: spending captured in the app / Comparison state: planned vs actual vs remaining」。场景的月度计划、食品/房租/交通/娱乐分配项、手动录入支出、计划页显示计划/实际/剩余，一一对应。第 16 行明确「A product with no bank links and no account tracking at all can be a complete budgeting tool; what it cannot lack is the plan and the running answer to \"how much do I have left?\"」，场景受众为「不连接银行账户的个人用户」，正落在第 229 行描述的最小计划列表形态；未越界到 Expense Tracking 或 PFM。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "对比两个 peer：scn_5c1fb49db51b430db0990dbf40c281fe 的用户是「共同承担日常开支、使用同一份计划的伴侣或家庭成员」，其验收与流程围绕共享可见性、重复录入删除或合并、支出重新归属、转移留痕（「金额转移保留可查询的痕迹，能看出是谁在何时改动了哪两个分配项」）；scn_83e08ffa38df4faeb51d3a1944aebbe8 是「有明确起止的支出项目做计划的个人或家庭」，以项目总预算、起止时间、关窗为骨架（「项目结束时关闭该计划窗口」）。本场景是单个个人在循环月度周期内的极简计划，既不涉及多人协作与留痕，也不涉及一次性窗口与项目总额，三者的用户、目标与端到端流程均不同，仅共享同一叶子类型，属正常同类型变体，不构成重复。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "六步流程闭环且可用：建本期计划并创建分配项→登记预期收入并核对合计→消费后录入支出归属分配项、剩余减少→购买前查计划页剩余→月中从其他分配项转移金额或保留超支→期末对照并按模板开启下期。依次覆盖叶子第 89 行「plan → fund → spend → compare → adjust」的循环与第 141 行的期末收尾，环节之间有明确的前后依赖（先有计划与分配项，才能录入支出与查看剩余；有剩余不足才有转移或超支），无明显断点或需要外部系统才能完成的操作，且手工录入与第 229 行「no accounts, no bank links, no auto-categorization」的形态自洽。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "passed",
+              "reason": "验收标准为可观察的界面与数值断言：「计划页对每个分配项同时显示计划金额、实际金额与剩余额度，并在录入支出后立即更新」；「任何一笔支出录入后，其所属分配项的剩余额度按该支出金额减少」；「分配项的实际支出超过计划金额后，其剩余额度显示为负数或明确的超支标记，而不是归零或隐藏」；「从分配项 A 转移金额到分配项 B 后，A 的剩余减少额与 B 的剩余增加额相同，计划总额不变」；「进入下一期后各分配项的计划金额回到模板数值，上一期剩余不被带入（未启用结转时）」。这些断言逐条对应流程的录入、比对、调整与结期四种行为，含守恒（转移不改变总额）与边界（超支、跨期不结转）条件，不需要依赖未声明的技术栈或阈值即可判定通过与否。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "passed",
+              "reason": "边界合理且内部一致：明确限定「不连接银行账户」的手工个人预算，避免引入账户同步、自动分类等叶子第 16 行归为「not what makes a product a budgeting application」的能力；受众声明为个人而非家庭或企业，未涉及叶子的共享（第 84 行）或企业费用管理场景。验收之间互相一致：转移时「计划总额不变」与超支「显示为负数」是同一对比状态下的两种不同处理，符合叶子第 203 行「the comparison must be able to represent failure, not only success」以及第 80 行对超支不同处理方式的描述；「上一期剩余不被带入（未启用结转时）」与叶子第 215 行「A new period starts from the plan's configured amounts, not from whatever was left behind — unless rollover is enabled」一致。未发现无依据的假设或被留空的必需产品决策。"
+            }
+          ],
+          "created_at": "2026-10-17T01:05:59.509291+00:00",
+          "id": "scv_f4f454139879428d85c8919c31572ece",
+          "input_digest": "f1f9a43bd64bf0d1e505a95fe900b851ddb7bd1dcd03dedc3efe931dea4eb8e7",
+          "job_id": "job_b9ab62966bf949719e6fdb3f5ac4b9bb",
+          "leaf_evidence": [
+            {
+              "end_line": 5,
+              "start_line": 5
+            },
+            {
+              "end_line": 14,
+              "start_line": 9
+            },
+            {
+              "end_line": 127,
+              "start_line": 126
+            },
+            {
+              "end_line": 203,
+              "start_line": 203
+            },
+            {
+              "end_line": 215,
+              "start_line": 215
+            },
+            {
+              "end_line": 229,
+              "start_line": 229
+            }
+          ],
+          "leaf_fingerprint": "249f205edc697755a09df0892ccbff1e2657cfa1b4e5a0a3c0e32f0f71bd8484",
+          "leaf_quotes": [
+            "A **Budgeting Application** helps a person or household decide in advance how much money may go to which purposes over a defined period, and then continuously measures actual spending against those decisions.",
+            "```text\nSpending plan (a budget bound to a period)\n└── Allocations: planned amounts assigned to purposes within the plan\n    └── Actuals: spending captured in the app, feeding the comparison\n        └── Comparison state: planned vs actual vs remaining (\"what's left?\")\n```",
+            "\nBefore spending, the user checks the plan: how much remains in the relevant allocation, what is left overall, what remains per day or per week. This is the moment the product exists for — the plan changing the spending decision.",
+            "Actuals can exceed an allocation. Products handle the shortfall differently — the allocation's remaining amount goes negative, other allocations can cover it, or the user can exclude the spending from the comparison — but the comparison must be able to represent failure, not only success.",
+            "A new period starts from the plan's configured amounts, not from whatever was left behind — unless rollover is enabled for an allocation. Annual and goal allocations deliberately straddle periods, accumulating a set-aside each period toward a future expense.",
+            "- **Minimal plan-list products** — no accounts, no bank links, no auto-categorization: just planned entries and actual entries and the \"what's left\" difference, for one period or one project at a time."
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "passed",
+          "peer_digest": "6a87d346e33ece1fa1aa35ef3112656310bb9e62aa1236d917f94e38d886d202",
+          "peer_scenarios": [
+            {
+              "id": "scn_5c1fb49db51b430db0990dbf40c281fe",
+              "name": "家庭共享计划：伴侣共同记录同一份月度预算",
+              "revision": 1
+            },
+            {
+              "id": "scn_83e08ffa38df4faeb51d3a1944aebbe8",
+              "name": "一次性项目预算：装修（或婚礼、旅行）的单窗口计划",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_6fb4896d9eb0428aa1c080df0a137813",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "可为工作流第 2 步「登记本期可用的预期收入，检查各分配项计划金额之和是否超过收入」补一条可观察验收，例如「各分配项计划金额之和超过已登记预期收入时，计划页给出可见的超出提示，且该提示随分配项金额编辑而更新」，使收入锚定环节与叶子第 73 行的收入锚定能力一样可被验证。",
+            "「先查剩余再消费」的决策本身不可直接观察，可在验收中把该意图落到可见面，例如「购买前打开计划页可在不进入录入流程的情况下只读看到相关分配项的计划、实际与剩余数值」，以免验收只覆盖录入后的更新而遗漏决策前的查询路径。"
+          ],
+          "summary": "该场景与叶子定义高度吻合：以「本期计划 + 分配项 + 实际支出 + 计划/实际/剩余对比」为核心，是叶子明示的极简手工记账、不连接银行账户的产品形态（Minimal plan-list）。工作流按 leaf 的 plan → fund → spend → compare → adjust → close 循环完整走通，5 条验收标准均为可观察的数值/状态行为（录入后剩余减少、超支呈负值或标记、转移前后两侧剩余变化等额且计划总额不变、下期回到模板值不结转），与叶子「超支是一等状态」「期间边界」「计划是活的对象」的规则一致。与两个 peer 相比，用户与工作流均不同：scn_5c1fb49db51b430db0990dbf40c281fe 是伴侣/家庭共享同一计划的共同记账（邀请成员、重复录入合并、重新归属、改动留痕），scn_83e08ffa38df4faeb51d3a1944aebbe8 是有明确起止的一次性项目窗口（项目总预算、按用途分配、关窗归档），两者标题之外的用户、目标与流程都与本场景的「个人极简月度循环」有实质差异，不构成重叠。语言为 zh，场景正文为简体中文，符合 input.language。局限：收入锚定（工作流第 2 步「登记预期收入并检查是否超支」）在验收标准中没有对应的可观察条目，属可补强的细节而非阻断性问题；「先查剩余再消费」的决策行为本身不可直接观察，只能通过计划页展示的剩余额度间接验证，本评审仅在受限于所给输入的前提下作此判断，未做全库去重，也未验证运行时实现或市场表现。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_b9ab62966bf949719e6fdb3f5ac4b9bb",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    },
+    {
+      "acceptance": [
+        "两个参与者看到同一计划的分配项、实际金额与剩余额度，任一方录入支出后另一方刷新即可看到相同剩余",
+        "同一笔支出被重复录入时，可以删除或合并其中一条，剩余额度只扣减一次",
+        "支出被重新归属到另一分配项后，原分配项剩余增加、新分配项剩余减少相同的金额",
+        "任一方录入的支出直接计入对比并影响剩余额度，无需另一方确认或批准",
+        "金额转移保留可查询的痕迹，能看出是谁在何时改动了哪两个分配项"
+      ],
+      "audience": "共同承担日常开支、使用同一份计划的伴侣或家庭成员（两人或多人）",
+      "id": "scn_5c1fb49db51b430db0990dbf40c281fe",
+      "leaf": "budgeting-application",
+      "leaf_name": "预算应用",
+      "name": "家庭共享计划：伴侣共同记录同一份月度预算",
+      "objective": "让所有共同支出者记录到同一份计划并看到同一个剩余额度，避免重复记账与口径不一致，在花钱之前就得到一致的“还能花多少”答案。",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:05:15.622841+00:00",
+      "workflow": [
+        "一方创建家庭月度计划并设定各分配项金额，邀请另一方加入同一份计划",
+        "任一方消费后录入支出并归属到分配项，注明用途与付款人",
+        "消费前任一方查看同一分配项的剩余额度，作为共同决策依据",
+        "发现重复录入或归属错误时，删除、合并或重新归属该笔支出，剩余额度随之更新",
+        "某分配项吃紧时，两人协商后由任一方执行分配项之间的金额转移",
+        "期末共同查看计划与实际对照，确认各分配项结余并开始下期计划"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "场景完整命中叶的四项定义核心并引用其结构：计划绑定周期（“Spending plan (a budget bound to a period)”，第10行）、分配项（“Allocations: planned amounts assigned to purposes within the plan”，第11行）、应用内实际支出（“Actuals: spending captured in the app”，第12行）与对比状态（“Comparison state: planned vs actual vs remaining”，第13行）；用户设定与第22行“an individual or a household — couples and families commonly share one plan”、第30行“the shared partner or family member who records spending into the same plan”一致；第84行“**Sharing** — household plans shared between partners or family members, with joint recording of actuals”直接支持共享计划这一场景，第232行亦将“Shared household plans”列为该 Type 的变体。验收中“无需另一方确认或批准”也与第30行“no approval or reimbursement flow exists”相符。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "已逐项对比两个 peer。与 scn_6fb4896d9eb0428aa1c080df0a137813（个人极简月度预算）虽同为月度计划，但声明用户不同（“共同承担日常开支……使用同一份计划的伴侣或家庭成员” vs “不连接银行账户的个人用户”），目标不同（“让所有共同支出者记录到同一份计划并看到同一个剩余额度，避免重复记账与口径不一致” vs 个人“先查剩余再消费”），流程额外包含邀请加入、双方录入后互相可见、重复录入的删除/合并、支出重新归属、付款人标注，而验收也落在多用户一致性与重复扣减等该 peer 未涉及的可观察结果上。与 scn_83e08ffa38df4faeb51d3a1944aebbe8（一次性项目/装修窗口）在对象与周期上不同（重复月度计划 vs 单次项目窗口与项目总额）。故不存在需要修订的实质重叠场景。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "六步流程闭合且可端到端执行：建计划与分配项并邀请对方→任一方录入支出并归属→消费前查看同一分配项剩余→纠错（删除/合并/重新归属）→协商后执行分配项间金额转移→期末对照并开始下期。与叶的循环“plan → fund → spend → compare → adjust”（第89行）一致，且第4步（第127行“This is the moment the product exists for — the plan changing the spending decision”）、第5步（第132行“move money from another allocation”）与第6步（第141行“At period end the comparison is final for that period and a new one begins from the plan's template figures”）均有叶内对应，每步产出与责任方明确。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "passed",
+              "reason": "五条验收均为可观察、可判定的结果，且覆盖共享这一核心差异点：“两个参与者看到同一计划的分配项、实际金额与剩余额度，任一方录入支出后另一方刷新即可看到相同剩余”验证共享可见性；“同一笔支出被重复录入时，可以删除或合并其中一条，剩余额度只扣减一次”给出确定性判据；“支出被重新归属到另一分配项后，原分配项剩余增加、新分配项剩余减少相同的金额”以等额增减为断言；“任一方录入的支出直接计入对比并影响剩余额度，无需另一方确认或批准”对应叶第30行无审批流；“金额转移保留可查询的痕迹”给出可核查的审计结果。缺陷状态在叶中亦为“first-class state”（第201行），未与本场景冲突。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "passed",
+              "reason": "边界合理且内部自洽：场景限定为共享的月度家庭计划，不引入账户/银行连接与自动分类，这与叶第16行“A product with no bank links and no account tracking at all can be a complete budgeting tool”并不冲突，也未越界进入 Expense Tracking 或 PFM（第18、238–239行）。“两人协商后由任一方执行分配项之间的金额转移”属于叶允许的对计划中途编辑（第137行“Editing the plan mid-period is normal”）；“无需审批”与第30行一致，未引入企业报销语义。场景正文为简体中文，符合 input.language=\"zh\"，未发现语言违背；亦未虚构阈值或商业假设。"
+            }
+          ],
+          "created_at": "2026-10-17T01:06:25.299108+00:00",
+          "id": "scv_d19a6d593b4744839dae59b467100bac",
+          "input_digest": "461b3641833f748691210b2016ceda09c7f203f2592cc425530c15817ee3881f",
+          "job_id": "job_2aa7f1e788e24c57b77b2c38a0789f4a",
+          "leaf_evidence": [
+            {
+              "end_line": 14,
+              "start_line": 9
+            },
+            {
+              "end_line": 30,
+              "start_line": 22
+            },
+            {
+              "end_line": 84,
+              "start_line": 84
+            },
+            {
+              "end_line": 141,
+              "start_line": 141
+            }
+          ],
+          "leaf_fingerprint": "249f205edc697755a09df0892ccbff1e2657cfa1b4e5a0a3c0e32f0f71bd8484",
+          "leaf_quotes": [
+            "```text\nSpending plan (a budget bound to a period)\n└── Allocations: planned amounts assigned to purposes within the plan\n    └── Actuals: spending captured in the app, feeding the comparison\n        └── Comparison state: planned vs actual vs remaining (\"what's left?\")\n```",
+            "The primary user is an individual or a household — couples and families commonly share one plan — who wants to make spending decisions against a commitment rather than against a running balance. Typical moments of use:\n\n- **at the start of a period** — drafting or refilling the plan: how much for groceries, rent, transport, fun, savings\n- **when income arrives** — assigning the newly available money to purposes before it is spent\n- **before a purchase** — checking an allocation's remaining amount (\"can I afford this within the plan?\")\n- **during review** — seeing which allocations are running out or overspent, and moving money to fix the plan\n- **at period end** — closing the period, optionally carrying unspent amounts, and starting the next plan\n\nA secondary user is the shared partner or family member who records spending into the same plan. The context is personal money: the spender and the planner are the same party, and no approval or reimbursement flow exists — that is the corporate spend-management world, not this one.",
+            "- **Sharing** — household plans shared between partners or family members, with joint recording of actuals.",
+            "At period end the comparison is final for that period and a new one begins from the plan's template figures. Unspent amounts stay behind unless rollover is enabled for an allocation; goals and annual plans keep accumulating across periods."
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "passed",
+          "peer_digest": "ce8bc5a69d6cb7bc1de3ee783f1746933917a5fbb5daa709838e4a7e841e80dc",
+          "peer_scenarios": [
+            {
+              "id": "scn_6fb4896d9eb0428aa1c080df0a137813",
+              "name": "个人极简月度预算：先查剩余再消费",
+              "revision": 1
+            },
+            {
+              "id": "scn_83e08ffa38df4faeb51d3a1944aebbe8",
+              "name": "一次性项目预算：装修（或婚礼、旅行）的单窗口计划",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_5c1fb49db51b430db0990dbf40c281fe",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "为工作流第6步补充一条可观察验收，明确期末未用完金额是留在本期还是按模板数值开启下期（对应 leaf.md 第141行“Unspent amounts stay behind unless rollover is enabled”），否则“开始下期计划”的行为无法被验证。",
+            "在验收中显式要求每笔支出显示其录入人/付款人并可追溯（呼应工作流第2步“注明用途与付款人”），把“双方共同记账”的责任归属变为可断言结果。",
+            "将“合并”重复支出的判定口径写清（如同一分配项、金额相同且时间相近），使“删除或合并其中一条”的断言可复现，避免不同实现下判定标准不一致。"
+          ],
+          "summary": "本场景《家庭共享计划：伴侣共同记录同一份月度预算》与其锚定的 Budgeting Application 叶定义核心贴合：围绕“月度计划—分配项—实际支出—剩余额度对比”展开，并落在叶文档明确承认的“伴侣/家庭共享同一份计划、共同记录实际支出”用户与变体上（leaf.md 第22、30、84、232行）。与所提供的两个 peer 场景相比，用户、目标与流程均有实质差异，未发现需要修订的重复场景。五条验收标准覆盖了共享可见性、重复扣减、重归属等额调整、无需审批、转移留痕等可观察结果，工作流六步闭合可执行。限制：这是对输入文本的范围审查，未验证运行时行为、实现可行性或市场价值；场景对“期末结账/下期计划”与“付款人归属”在验收标准中未完全展开，仅作为可选改进建议，不影响本次判定。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_2aa7f1e788e24c57b77b2c38a0789f4a",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    },
+    {
+      "acceptance": [
+        "一次性计划窗口与日常月度计划各自展示自己的分配项与剩余额度，互不改变对方口径",
+        "项目层面显示总预算、已支出与剩余总额，其数值等于各分配项相应数字之和",
+        "在窗口内录入支出后，对应分配项剩余与项目剩余总额同步减少相同的金额",
+        "分配项计划金额被调整后，项目合计与剩余总额立即按新数值重算，并对超出项目预算给出可见提示",
+        "项目窗口关闭后不再参与新周期的模板数值，历史数据仍可查看"
+      ],
+      "audience": "为一个有明确起止的支出项目做计划的个人或家庭（如装修业主、婚礼筹备者），其日常月计划通常同时存在",
+      "id": "scn_83e08ffa38df4faeb51d3a1944aebbe8",
+      "leaf": "budgeting-application",
+      "leaf_name": "预算应用",
+      "name": "一次性项目预算：装修（或婚礼、旅行）的单窗口计划",
+      "objective": "在项目总金额约束下为项目的各项用途设定计划金额，并在项目持续的数月里按实际支出对照剩余，直到项目结束关闭该计划。",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:05:15.622841+00:00",
+      "workflow": [
+        "新建一个一次性计划窗口（如装修），设定项目总预算与起止时间",
+        "按用途建立分配项（设计费、主材、人工、家具等）并填写计划金额，检查合计不超过项目总预算",
+        "每次准备投入资金时，把可用金额填入该项目的相应分配项或按计划预留",
+        "每笔支出（定金、材料款）录入并归属到对应分配项，剩余额度下降",
+        "某分配项超支时，从其他分配项转移金额或调整总预算，并重新核对项目合计",
+        "项目结束时关闭该计划窗口，查看各分配项的计划与实际对照"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "场景的四要素与 leaf 定义核心逐项对应：周期绑定的计划（leaf 38“or a one-off window (a project, event, or year)”）、分配项计划金额（39“planned amounts assigned to purposes inside the plan”）、应用内录入实际支出（40“spending is captured or recorded in the application”）、持续对照剩余（41“continuously shows where actuals stand against allocations”）。场景“设定项目总预算与起止时间/按用途建立分配项并填写计划金额/每笔支出录入并归属到对应分配项，剩余额度下降”直接落在该核心上，且 leaf 明确把装修、婚礼类单窗口计划列为正式形态（82、230）。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "用户与目标不同：本场景为“一次性项目窗口（装修业主/婚礼筹备者）”，以项目总金额为约束、数月后关闭窗口；peer scn_5c1fb49db51b430db0990dbf40c281fe 的核心是“伴侣/家庭成员共享同一份月度计划、多人录入与重复录入合并”（其验收围绕双方可见性、重复录入、归属变更、无审批），本场景无多用户协作验收；peer scn_6fb4896d9eb0428aa1c080df0a137813 是“个人极简月度预算、按模板数值循环下一期”，对象是反复重开的月度周期，本场景是单次窗口且关闭后不再进入新周期模板。流程首尾（建立计划、归属支出、超支时转移金额）有共有步骤，但这是 leaf 的通用 plan→fund→spend→compare→adjust 循环，不构成实质重叠。相关的两个 peer 均仅作比较，无重复场景。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "步骤1→6构成可用闭环：设定总预算与起止时间 → 按用途建分配项并校验合计 → 投入/预留资金 → 录入支出并归属（剩余下降）→ 超支时转移金额或调整总预算并重新核对合计 → 结束后关闭窗口并查看计划vs实际对照，与 leaf 第89行循环及第141行“关闭周期、对照定稿”一致。唯一衔接缺口是验收项1要求“一次性窗口与日常月度计划各自独立”，而流程从未建立或提及那份月度计划（仅出现在 audience 字段），属可补充说明的轻微断层，不影响项目窗口自身的流程完整性。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "passed",
+              "reason": "验收项给出可判定的观察点：分配项剩余与项目剩余同步减少同一金额（项3）、调整计划金额后合计与剩余立即重算并对超出项目预算给出可见提示（项4）、关闭窗口后不再参与新周期模板数值且历史仍可查看（项5，对应 leaf 141“a new one begins from the plan's template figures”与211“The plan's history persists period by period, so past plans remain inspectable”）、两计划口径互不影响（项1）。均为对 UI 数值与状态的二元判定，无需代码或技术栈。唯一歧义在项2的“总预算等于各分配项之和”，该冲突归入 scope 记录，不在此重复。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "needs_changes",
+              "reason": "内部一致性冲突：工作流第2步“检查合计不超过项目总预算”意味着分配项合计可以小于项目总预算（leaf 73、199 也承认计划可未分配满、未分配额是计算值），而验收项2断言“项目层面显示总预算、已支出与剩余总额，其数值等于各分配项相应数字之和”，同时验收项4又把“项目预算”当作可被分配项合计超出的上限使用，同一术语在“上限”与“合计”两种含义间摇摆，使项2无法唯一判定。另有边界假设未在工作流落地：验收项1预设存在并行的日常月度计划（audience 已声明，leaf 230 亦支持“alongside the recurring household plan”），但流程未创建或引用该计划。语言符合 input.language=zh，未发现越界到企业/政府预算或账务语义。"
+            }
+          ],
+          "created_at": "2026-10-17T01:07:11.953885+00:00",
+          "id": "scv_f66feb21c5f643259c6d11cf7e202035",
+          "input_digest": "5cb57213113994ed3baf867c7bf9cfce6a2409b03834a238811e87754627593e",
+          "job_id": "job_684bd549412e4b898cd7ab291d176f96",
+          "leaf_evidence": [
+            {
+              "end_line": 38,
+              "start_line": 38
+            },
+            {
+              "end_line": 41,
+              "start_line": 39
+            },
+            {
+              "end_line": 82,
+              "start_line": 82
+            },
+            {
+              "end_line": 141,
+              "start_line": 141
+            },
+            {
+              "end_line": 230,
+              "start_line": 230
+            }
+          ],
+          "leaf_fingerprint": "249f205edc697755a09df0892ccbff1e2657cfa1b4e5a0a3c0e32f0f71bd8484",
+          "leaf_quotes": [
+            "- **Spending plan bound to a period** — the plan is the organizing object. It exists for a defined time scope: a recurring period (most commonly a month) or a one-off window (a project, event, or year). Without a period, there is no plan to live within.",
+            "- **Allocations** — planned amounts assigned to purposes inside the plan: \"this much for food, this much for rent, this much for the car fund.\" Allocations are the plan's substance. Without them, the product is a wish list or a forecast, not a budget.\n- **Actuals in the app** — spending is captured or recorded in the application, at whatever grain the product offers (a simple expense entry or a full categorized transaction). Actuals are what make the plan a live tool instead of a note.\n- **Comparison state** — the application continuously shows where actuals stand against allocations: remaining, left to spend, overspent, funded or unfunded. This is the state users consult before spending. Without it, the plan never meets reality.",
+            "- **Non-monthly budgets** — annual or event-based plans (a year of holiday spending accumulated monthly; a wedding or renovation project) alongside the recurring period.",
+            "At period end the comparison is final for that period and a new one begins from the plan's template figures. Unspent amounts stay behind unless rollover is enabled for an allocation; goals and annual plans keep accumulating across periods.",
+            "- **Project / event budgets** — the same core applied to a single-purpose window (wedding, renovation, holiday), often as a separate plan alongside the recurring household plan."
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "needs_changes",
+          "peer_digest": "390fed5e5bc4617ca499088e730dcd713a804e5aa3fa8ac7396a6073e27efcc0",
+          "peer_scenarios": [
+            {
+              "id": "scn_5c1fb49db51b430db0990dbf40c281fe",
+              "name": "家庭共享计划：伴侣共同记录同一份月度预算",
+              "revision": 1
+            },
+            {
+              "id": "scn_6fb4896d9eb0428aa1c080df0a137813",
+              "name": "个人极简月度预算：先查剩余再消费",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_83e08ffa38df4faeb51d3a1944aebbe8",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "改写验收项2，区分两种金额：把“项目总预算”定义为用户设定的上限，把“项目层已支出/剩余”定义为各分配项相应数值之和；若允许分配项合计小于总预算，要求界面显示未分配余额（对齐 leaf 第73、199行），避免“总预算=各分配项之和”与工作流第2步“合计不超过项目总预算”冲突。",
+            "在工作流中补一步显式说明该项目窗口与日常月度计划并存（或声明该项目窗口可独立存在），使验收项1“各自展示自己的分配项与剩余额度，互不改变对方口径”能在流程内被验证。",
+            "为验收项5补一个可观察入口，例如“关闭后该项目出现在只读的历史/已结束计划列表，可查看各分配项计划vs实际对照”，使“历史数据仍可查看”有明确的判定位置。"
+          ],
+          "summary": "该场景以“固定起止的一次性项目窗口（装修/婚礼/旅行）+ 项目总金额上限 + 项目结束后关闭”为核心，与 leaf 关于非月度预算与项目/事件预算的定义一致（leaf 第38、82、230行），用户、目标与端到端流程和两个 peer 场景（伴侣共享月度计划、个人极简月度查剩余再消费）可区分；六步流程（建窗口→建分配项→投入资金→录入支出→转移/调总额→关闭并对照）基本可用且验收项多为可观察的数值一致性断言。主要问题是内部一致性：工作流第2步允许分配项合计“不超过”项目总预算（即可能小于），而验收项2却要求项目层“总预算”数值等于各分配项之和，二者冲突，导致该验收项无法唯一判定。审阅范围限于给定输入与 leaf.md，未验证运行时、市场或全库去重。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_684bd549412e4b898cd7ab291d176f96",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    },
+    {
+      "acceptance": [
+        "新建事件保存后立即出现在对应日期与时段的事件块上，重新打开应用后仍在原位置",
+        "all-day 事件显示在全天车道而不是某个时间槽内",
+        "拖动改期后原时段空出、新时段显示该事件，且事件详情中的开始/结束时间与网格显示一致",
+        "在月视图与周视图之间切换时，同一事件的日期归属保持一致"
+      ],
+      "audience": "需要安排个人生活的普通用户（家庭活动、复诊、缴费截止日、亲友聚会）",
+      "id": "scn_48045a003653497aa92fd8934cabb8b1",
+      "leaf": "calendar-application",
+      "leaf_name": "日历应用",
+      "name": "个人日常日程的录入与回顾",
+      "objective": "在一天中的多次短交互里，把近期安排快速录入日/周/月网格，并能随时导航到任意一天确认它被什么占用。",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:04:58.508067+00:00",
+      "workflow": [
+        "在周视图点击周四 18:00 的空档，创建 18:00–19:00 的事件并填写标题",
+        "对生日一类事项改用 all-day 锚定，事件出现在日视图顶部的全天车道",
+        "切到月视图查看本月事件的整体分布，再回到今天确认当前时间指示位置",
+        "发现时段冲突时把事件拖到另一个时间，或拉伸边界改变时长",
+        "关闭应用后重新打开，并翻到同一日期确认事件仍在原日期与时段"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "场景直接落实叶子的定义核心。叶子第 5 行定义日历为“the user records, edits, and reviews **time-anchored events** … held in a **persistent schedule** that is presented on a **navigable calendar time grid** (day, week, month, and larger frames)”，第 34 行说明事件“anchored to the calendar clock: a date, and normally a start time and end time. A date-only variant (an \"all-day\" or multi-day event) anchors to a day instead of a clock time”。场景 workflow 的第 1 步在周视图点击 18:00 空档创建 18:00–19:00 事件、第 2 步用 all-day 锚定生日事项，正对应叶子第 82–87 行的“Point at a time on the grid … → set start / end (or all-day) … → save”。验收第 1 条要求保存后立即出现在对应日期与时段、重开应用后仍在该位置，对应第 35 行“The schedule survives sessions and device changes; it is a record, not a transient view”。第 3 条验收（拖动改期后原时段空出、新时段显示该事件）对应第 93 行“adjusts — dragging an event to a new time, stretching its edges to change duration”，第 2 条对应第 172 行“**All-day events occupy a day lane**, not a time slot”。未把叶子标为非定义要素的能力（提醒、重复、共享、时区）设为核心要求。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "与两个同伴场景在用户、目标与流程上均不重叠。本场景的用户是需要安排个人生活的普通用户（家庭活动、复诊、缴费截止日、亲友聚会），执行单人录入—导航—改期—重开确认这一闭环。同伴 scn_0a74369fbaf04e53869178a5321d69a9（跨时区出差的日程核对）的核心是切换显示时区后核对事件仍处于同一真实时刻、以及异地新建事件的时区标注，属于叶子第 116–118 行及第 165 行所述的 “Cross-time-zone behavior”，本场景既未切换时区也未断言绝对时刻不变。同伴 scn_7437d84c37f64f61b3f33f63910c90b3（组织多人会议并跟踪受邀人响应）涉及受邀人 busy/free、accept/decline/maybe 传播，属叶子第 95–106 行“Meet with others”与第 167–168 行“Organizer vs. attendee rights / RSVP states are first-class data”，本场景全程单人、无受邀人与响应状态，验收也不含通知或响应传播。三者虽同为 calendar-application 叶子的合法子场景，但覆盖的是不同的用户/目标/工作流，不构成重复或需要改动的材料性重叠。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "流程连贯且可端到端执行：周视图点击周四 18:00 空档并创建 18:00–19:00 事件 → 对生日一类事项改用 all-day 锚定并确认其出现在全天车道 → 切到月视图看整月分布再回到今天确认当前时间指示 → 遇冲突时拖动改期或拉伸边界改时长 → 关闭重开并回到同一日期确认仍在原日期与时段。步骤间存在自然的因果推进，且每一步都落在叶子描述的操作面上（网格放置事件、全天车道、日/周/月导航与当前时间指示、拖动移动/拉伸、持久日程）。第 1 步的“18:00 空档”与第 4 步的“发现时段冲突”前后呼应，无跳步或需要额外外部角色才能继续的断点。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "passed",
+              "reason": "四条验收标准均为可观测结果并基本覆盖整条流程：新建保存后事件块立即出现在对应日期与时段且重开应用后仍在原位（覆盖 workflow 第 1、5 步的录入与持久化）、all-day 事件显示在全天车道而非时间槽内（覆盖第 2 步，且与叶子第 172 行一致）、拖动改期后原时段空出、新时段显示该事件且详情起止时间与网格显示一致（覆盖第 4 步，并含跨视图一致性核对）、月视图与周视图切换时同一事件的日期归属保持一致（覆盖第 3 步）。每条都可通过查看网格上的事件块位置、全天车道、事件详情时间字段以及重开应用后的状态来判定，无需依赖内部实现。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "passed",
+              "reason": "边界合理且内部一致：场景聚焦单一普通用户的个人日程，明确不涉及叶子列为非定义要素的提醒、重复、共享、时区与 RSVP，因此没有对叶子的过度外推；同时也没有把实现选择当作既定约束，未绑定技术栈或数值阈值。受众（家庭活动、复诊、缴费截止日、亲友聚会）与 objective（多次短交互中快速录入日/周/月网格并随时导航确认）以及 workflow 一致，未出现相互矛盾的要求。输入 language 为 zh，场景的 name、audience、objective、workflow、acceptance 均为简体中文的成篇表述，仅保留 all-day 等必要技术标识符，符合语言要求。唯一的不确定性是叶子第 15 行将“time-zone handling”等列为非定义要素，而“关闭应用后重新打开”隐含同一设备/同一时区的默认前提，这只是常规实现默认，不阻碍该工作流或其可观测验收的评估。"
+            }
+          ],
+          "created_at": "2026-10-17T01:06:26.980876+00:00",
+          "id": "scv_7f3efcafb47f4c88bb374ea8881bd109",
+          "input_digest": "f8fe927ba5759777d48e8f9a2e9ad0344c60f882f9dfef0d4a4c7839377585e2",
+          "job_id": "job_ee166980944c4adf8e2eeacb1a3629ff",
+          "leaf_evidence": [
+            {
+              "end_line": 5,
+              "start_line": 5
+            },
+            {
+              "end_line": 35,
+              "start_line": 34
+            },
+            {
+              "end_line": 87,
+              "start_line": 82
+            },
+            {
+              "end_line": 93,
+              "start_line": 93
+            },
+            {
+              "end_line": 172,
+              "start_line": 172
+            }
+          ],
+          "leaf_fingerprint": "b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d",
+          "leaf_quotes": [
+            "A **Calendar Application** is an application in which the user records, edits, and reviews **time-anchored events** — appointments, meetings, occasions, deadlines — held in a **persistent schedule** that is presented on a **navigable calendar time grid** (day, week, month, and larger frames).",
+            "- **Event** — the central object. A record of something intended to happen, anchored to the calendar clock: a date, and normally a start time and end time. A date-only variant (an \"all-day\" or multi-day event) anchors to a day instead of a clock time. The user can create, change, move, and delete events; the schedule is theirs to manage.\n- **The schedule on a time grid** — the accumulated events form a persistent schedule, presented against the calendar's own structure (days, weeks, months) so the user can navigate to any past or future frame and see what occupies it. The schedule survives sessions and device changes; it is a record, not a transient view.",
+            "```text\nPoint at a time on the grid (or type a description)\n→ set start / end (or all-day)\n→ optional: repeat rule, alert, location, invitees, attachments, target calendar\n→ save\n```",
+            "The user navigates day/week/month views (many products add year and agenda/list frames) to inspect and manage the schedule, receives alerts as events approach, and adjusts — dragging an event to a new time, stretching its edges to change duration, or opening it to edit details. Search finds events in the accumulated history.",
+            "- **All-day events occupy a day lane**, not a time slot, and behave slightly differently when moved or resized."
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "passed",
+          "peer_digest": "306fb99c7fc3741f65139648e8fde951a9dbec35afd51f11e747fcc8a7cb81e9",
+          "peer_scenarios": [
+            {
+              "id": "scn_0a74369fbaf04e53869178a5321d69a9",
+              "name": "跨时区出差的日程核对",
+              "revision": 1
+            },
+            {
+              "id": "scn_7437d84c37f64f61b3f33f63910c90b3",
+              "name": "组织多人会议并跟踪受邀人响应",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_48045a003653497aa92fd8934cabb8b1",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "可在 acceptance 中显式补一条“全天事件被拖动或改期后仍归属全天车道而不落入具体时间槽”，以直接覆盖叶子第 172 行关于全天事件移动/缩放行为略有不同的表述。",
+            "可在 workflow 第 5 步注明“在同一设备与同一时区下重开应用”，把持久化验证与同伴场景的跨时区行为明确区隔，避免读者误读为时区相关断言。",
+            "如需覆盖“回顾”面向历史导航的行为，可在 workflow 中补一句翻到某个过往日期确认历史事件仍在原位置的步骤，使 objective 中的“随时导航到任意一天”在流程与验收中都有对应落点。"
+          ],
+          "summary": "该场景围绕日历应用的定义核心（用户管理的、锚定到日期/时段的事件，存入可跨会话存活的持久日程，并呈现在可导航的日/周/月时间网格上）展开，目标人群与行为边界清晰，端到端流程完整且验收标准可观测，未发现与两个同伴场景的材料性重叠。范围审查未发现不支持的假设：场景刻意只覆盖单人个人日程的录入、导航、改期与持久化，把跨时区、邀请/RSVP、availability 等叶子明确列为“成熟产品的常见附加项而非定义要素”的部分留给同伴场景。局限：本审查仅基于 input.json、leaf.md（共 220 行）与所给两个同伴场景，属单场景限定审查，不对运行时、市场价值或全语料去重作任何断言；未提供的实现细节（如具体技术栈、数值阈值）按任务约定不构成阻塞。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_ee166980944c4adf8e2eeacb1a3629ff",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    },
+    {
+      "acceptance": [
+        "组织者在事件详情中能看到每位受邀人的响应状态，受邀人改变响应后组织者刷新即可看到更新",
+        "受邀人接受后该事件出现在其本人日历的对应时段，拒绝后按产品设置默认隐藏或按需显示",
+        "组织者改期后受邀人日历中的时间随之更新，而不是新增一条重复事件",
+        "受邀人能够只修改自己的响应状态或附加面向组织者的备注，而不能改动事件本身的标题与时间"
+      ],
+      "audience": "需要协调多人时间的团队负责人或项目经理（会议组织者）",
+      "id": "scn_7437d84c37f64f61b3f33f63910c90b3",
+      "leaf": "calendar-application",
+      "leaf_name": "日历应用",
+      "name": "组织多人会议并跟踪受邀人响应",
+      "objective": "选出一个受邀人可参加且不与其已有事件冲突的时段，发出邀请，并跟踪 accept / decline / maybe 状态直至确认到场。",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:04:58.508067+00:00",
+      "workflow": [
+        "创建事件并添加受邀人，打开 availability 视图查看各自的 busy/free 时段",
+        "在候选时段中挑选大家共同的空闲时间，并核对是否与某位受邀人已有事件冲突",
+        "保存并发送邀请，受邀人分别在日历的通知区或邮件中收到该邀请",
+        "组织者在事件详情的受邀人列表中查看各人的响应状态",
+        "对无法参加的人改期后重新保存，确认更新传播到所有受邀人的日历"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "情景对象正是叶子定义的核心：持久事件 + 网格呈现 + 邀请/响应。leaf.md 第 97–104 行给出“Create event with invitees → invitation delivered … → each invitee responds: accept / decline / maybe (tentative) → organizer sees the responses and tracks attendance … → updates propagate to every attendee's calendar”，与情景 workflow 第 2–5 步（发邀请、查看响应、改期后传播）一一对应；第 167 行“The organizer controls the event and tracks responses; an invitee can change only their own response, add an organizer-visible comment, or propose a different time”精确支持验收项 4；第 168 行“Declined events may be hidden from the grid or shown on demand”支持验收项 2。情景并未把重心移到纯时段协商上，仍落在日历事件记录与响应跟踪。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "与 peer scn_0a74369fbaf04e53869178a5321d69a9（跨时区出差核对，用户是跨时区职场人，目标是核对绝对时刻与时区标注）以及 scn_48045a003653497aa92fd8934cabb8b1（个人日常日程录入与回顾，用户是普通个人用户，目标是快速录入与导航）相比，本情景的用户是多位受邀人的会议组织者，目标是选出无冲突共同空闲时段、发出邀请并跟踪 accept/decline/maybe 直至确认，工作流包含 availability 视图、受邀人响应与改期传播，三者用户、目标、工作流均不同，无实质性重叠。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "workflow 是一条完整可用的端到端链路：创建事件并添加受邀人并打开 availability 视图 → 挑选共同空闲并核对冲突 → 保存发送、受邀人通过通知区或邮件收到 → 组织者在详情中查看各人响应 → 改期后重新保存并确认更新传播到所有受邀人日历。起始、动作、结果闭合，与 leaf.md 第 83–87 行的事件创建流程、第 97–104 行的邀请流、第 106 行“the organizer can see invitees' free and busy periods … is warned when the proposed time conflicts with an invitee's existing events”可对照，无断裂或不可操作步骤。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "needs_changes",
+              "reason": "验收标准覆盖了响应状态可视与刷新更新、接受/拒绝后的日历呈现、改期不产生重复事件、受邀人仅能改自己的响应或加备注（对应 leaf.md 第 167–168 行），这些均可观测。但 objective 的第一半“选出一个受邀人可参加且不与其已有事件冲突的时段”及 workflow 第 1–2 步（打开 availability 视图、核对冲突）没有任何一条验收项可判定，参照 leaf.md 第 106 行与第 152–157 行的 Availability view，核心目标的关键环节缺失验收标准。此外验收项 2 中“拒绝后按产品设置默认隐藏或按需显示”把可观测结果交给未指定的产品设置，判定边界不确定。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "passed",
+              "reason": "边界合理且内部一致：情景停留在日历事件的邀请与响应范畴，与 leaf.md 第 189–199 行关于 Meeting Scheduling Application 的边界说明不冲突——该情景的主对象仍是持久事件记录与响应跟踪，availability 只是叶子第 106 行明确承认可嵌入的辅助能力。受众（团队负责人/项目经理）与工作流自洽，未引入外部依赖或未声明假设；全部情景叙述（name、objective、workflow、acceptance、audience）均为简体中文，符合 input.language=\"zh\"。"
+            }
+          ],
+          "created_at": "2026-10-17T01:05:31.390092+00:00",
+          "id": "scv_4ad69634fcd44ee59957d400d734f5b6",
+          "input_digest": "ebffeff745c535d3172bda960ce407ca72b92345bf1485dcef33fd8a8ecad8d7",
+          "job_id": "job_4056c212d9af4f67a73d1f209038b86a",
+          "leaf_evidence": [
+            {
+              "end_line": 104,
+              "start_line": 97
+            },
+            {
+              "end_line": 106,
+              "start_line": 106
+            },
+            {
+              "end_line": 168,
+              "start_line": 167
+            }
+          ],
+          "leaf_fingerprint": "b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d",
+          "leaf_quotes": [
+            "```text\nCreate event with invitees\n→ invitation delivered (by email or within the calendar service)\n→ each invitee responds: accept / decline / maybe (tentative)\n→ organizer sees the responses and tracks attendance\n→ invitee may propose a new time; organizer may update the event\n→ updates propagate to every attendee's calendar\n```",
+            "Organizing side, mature products help pick the time: the organizer can see invitees' free and busy periods, look for the first time everyone is available, and is warned when the proposed time conflicts with an invitee's existing events. On the responding side, the invitee sees incoming invitations (in the calendar's notification area, in notifications, or in email), responds, can change the response later, and may attach a comment to the organizer. Some products flag invitations from unknown senders as junk.",
+            "- **Organizer vs. attendee rights.** The organizer controls the event and tracks responses; an invitee can change only their own response, add an organizer-visible comment, or propose a different time. Updates flow from the organizer to every attendee's calendar.\n- **RSVP states are first-class data.** Accept / decline / maybe (or tentative) states are visible to the organizer and, commonly, to other attendees. Declined events may be hidden from the grid or shown on demand."
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "needs_changes",
+          "peer_digest": "7bc995406165b72add34a41958e47ef1e0b6dc9e5529417e91acc96a9550d864",
+          "peer_scenarios": [
+            {
+              "id": "scn_0a74369fbaf04e53869178a5321d69a9",
+              "name": "跨时区出差的日程核对",
+              "revision": 1
+            },
+            {
+              "id": "scn_48045a003653497aa92fd8934cabb8b1",
+              "name": "个人日常日程的录入与回顾",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_7437d84c37f64f61b3f33f63910c90b3",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "为 objective 的第一半补充可观测验收项，例如：“在 availability 视图中，组织者能看到每位受邀人在候选时段内的 busy/free 状态，且当所选时段与某位受邀人已有事件重叠时得到明确的冲突提示”，使 workflow 第 1–2 步可被判定。",
+            "若 availability 能力依赖底层日历服务（leaf.md 第 169 行说明其存在与否取决于服务支持），请在验收项中显式写明“当服务不支持 availability 时，以既有事件时段比对替代，并给出可观测的冲突提示”，避免把该步骤留为不可测。",
+            "收紧验收项 2 的判定口径，例如改为：“受邀人拒绝后，该事件默认不在其日/周网格上渲染，且可通过显式操作（如显示已拒绝事件的开关）查看”，把“按产品设置”替换为可观测的默认行为与可切换行为。",
+            "可选：在 workflow 第 2 步补充一句“若无可避免的公共空闲时段，组织者选择最少冲突时段并知晓冲突对象”，使 objective 中“可参加且不冲突”在无法达成时的处理也有明确路径。"
+          ],
+          "summary": "情景“组织多人会议并跟踪受邀人响应”与叶子定义的核心高度一致：它围绕一个锚定在网格上的事件、邀请流与 RSVP 状态展开，与 leaf.md 第 97–106 行的“Meet with others”流程及第 167–168 行的“Organizer vs. attendee rights / RSVP states”逐条对应，并未偏离为纯日程协商类产品（题目仍以事件记录为中心）。与两个 peer（跨时区出差核对、个人日常日程录入）在用户、目标与工作流上均不同，属于同一 Type 的互补情景，不构成重复。语言为简体中文，符合 input.language。唯一实质问题是验收标准未覆盖已声明的核心目标前半段——“选出一个受邀人可参加且不与其已有事件冲突的时段”（availability 视图 / 冲突提示），因此该段流程无法被现有验收项判定；另有一条验收项把拒绝后的显示行为交给“产品设置”，观测边界不够确定。本次审查仅基于 pinned 叶子与给定 peer 文本，未做全量语料去重，也不代表运行时或市场验证。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_4056c212d9af4f67a73d1f209038b86a",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    },
+    {
+      "acceptance": [
+        "切换显示时区后事件在网格上的绝对时刻不变，只有本地显示时间随之改变",
+        "在异地时区创建的事件详情保留其创建时区，切回住地时区后仍对应同一真实时刻",
+        "产品若支持 floating（不随时区改变的墙钟时间）事件，需在详情中显式区分；默认行为不把普通事件当作浮动事件处理"
+      ],
+      "audience": "频繁跨时区出差、需要在临时所在地确认原有时区安排的职场人",
+      "id": "scn_0a74369fbaf04e53869178a5321d69a9",
+      "leaf": "calendar-application",
+      "leaf_name": "日历应用",
+      "name": "跨时区出差的日程核对",
+      "objective": "在把显示时区切到当地后，核对原有事件仍发生在同一真实时刻，并正确处理在异地新建的事件。",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:04:58.508067+00:00",
+      "workflow": [
+        "出发前在住地时区创建一次与海外同事的通话事件",
+        "抵达后把应用/设备的显示时区切换为当地",
+        "在日视图中核对该通话所处的时段与本地显示时间",
+        "在当地时区新建一个事件，打开详情确认它的时区标注",
+        "返回住地时区后重新查看这两个事件"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "场景围绕叶的「time-anchored events」与「persistent schedule / navigable time grid」定义核心展开：工作流第 1、4 步创建事件，第 3 步在日视图中核对事件所处时段，第 5 步跨会话切回后复查，对应 leaf.md 第 5 行 'user records, edits, and reviews **time-anchored events** ... presented on a **navigable calendar time grid**' 与第 10-12 行结构块 'User-managed event ... └── Persistent schedule ... └── Presented on the calendar's own time grid, navigable across time'。其时区重点直接源自第 118 行 'Events are anchored to absolute time. When the user moves or changes display time zone, the schedule re-renders so each event still happens at the same real moment; an event created while temporarily in another zone keeps that zone.' 与第 165 行 '**Absolute-time anchoring.** ... Changing the display time zone re-renders the schedule but does not move events'。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "与 peer 用户/目标/流程均不同：peer scn_48045a003653497aa92fd8934cabb8b1 的受众是普通个人用户，目标是日常录入与回顾（周视图点空档、all-day 车道、月视图导航、拖拽改期），未涉及显示时区切换或异地建事件；peer scn_7437d84c37f64f61b3f33f63910c90b3 的受众是会议组织者，目标是选共同空闲时段并跟踪 accept/decline/maybe，核心是多人协调。本场景受众为跨时区出差职场人，目标是核对绝对时刻不变并标注异地创建事件的时区，流程为切换显示时区→日视图核对→异地新建→切回复核，与两个 peer 无用户、目标或流程重叠。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "工作流为连贯可用的端到端路径：出发前在住地时区创建与海外同事的通话事件 → 抵达后把显示时区切换为当地 → 在日视图核对该通话的时段与本地显示时间 → 在当地时区新建事件并在详情确认时区标注 → 返回住地时区后重新查看这两个事件。步骤覆盖创建、显示时区改变、网格核对、异地创建、回切复核全过程，与叶第 118 行的跨时区行为一致，无断裂或缺失环节。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "passed",
+              "reason": "三条验收均为可观察结果，且覆盖上述流程：『切换显示时区后事件在网格上的绝对时刻不变，只有本地显示时间随之改变』对应切换与日视图核对步骤；『在异地时区创建的事件详情保留其创建时区，切回住地时区后仍对应同一真实时刻』对应异地新建与回切复核步骤。第三条对 floating 事件采用'产品若支持……需在详情中显式区分'的条件表述，与叶第 118 行 'Some products additionally allow an event to be \"floating\"' 的例外定位一致，不把可选能力变成必做产品决策，也不阻断主流程验收。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "passed",
+              "reason": "边界合理：聚焦单一出差者的跨时区核对，未混入邀请/RSVP、free/busy 等 peer 已覆盖的多人协调内容。受众、目标、流程与验收内部一致（均为跨时区出差者的显示时区与绝对时刻核验）。未提出无依据的假设——时区标注与 floating 的区分均由叶第 118、165 行文本支撑，且未声称已有运行时或市场验证。"
+            }
+          ],
+          "created_at": "2026-10-17T01:05:49.163208+00:00",
+          "id": "scv_72205ef3a9f842ca8cbf04f8de2ef45a",
+          "input_digest": "8689e777e025d9077813ca5092edb522f10ce785b4986ee26bba756180ec8773",
+          "job_id": "job_071660a7f58b41238cca2f5843f32799",
+          "leaf_evidence": [
+            {
+              "end_line": 5,
+              "start_line": 5
+            },
+            {
+              "end_line": 12,
+              "start_line": 10
+            },
+            {
+              "end_line": 118,
+              "start_line": 118
+            },
+            {
+              "end_line": 165,
+              "start_line": 165
+            }
+          ],
+          "leaf_fingerprint": "b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d",
+          "leaf_quotes": [
+            "A **Calendar Application** is an application in which the user records, edits, and reviews **time-anchored events** — appointments, meetings, occasions, deadlines — held in a **persistent schedule** that is presented on a **navigable calendar time grid** (day, week, month, and larger frames).",
+            "User-managed event (anchored to a date, normally a start–end span)\n└── Persistent schedule (accumulated event store that survives sessions)\n    └── Presented on the calendar's own time grid, navigable across time",
+            "Events are anchored to absolute time. When the user moves or changes display time zone, the schedule re-renders so each event still happens at the same real moment; an event created while temporarily in another zone keeps that zone. Some products additionally allow an event to be \"floating\" — fixed to a wall-clock time regardless of the viewing zone.",
+            "- **Absolute-time anchoring.** An event happens at a real moment. Changing the display time zone re-renders the schedule but does not move events; events created in another zone keep that zone. (Some products allow deliberately floating events; this is an exception, not the rule.)"
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "passed",
+          "peer_digest": "2cc5af9ea4c4e6f63882d13b0155fd2f5075fc0b7ef2bac5fe5395fd9aa8f574",
+          "peer_scenarios": [
+            {
+              "id": "scn_48045a003653497aa92fd8934cabb8b1",
+              "name": "个人日常日程的录入与回顾",
+              "revision": 1
+            },
+            {
+              "id": "scn_7437d84c37f64f61b3f33f63910c90b3",
+              "name": "组织多人会议并跟踪受邀人响应",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_0a74369fbaf04e53869178a5321d69a9",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [],
+          "summary": "该场景与叶节点 calendar-application 高度契合：叶明确把「绝对时刻锚定 / 跨时区显示」列为重要规则（第 118 行、第 165 行），场景的工作流正是创建事件→切换显示时区→在网格核对→异地新建→切回住地复核，覆盖了事件与可导航网格这一核心。与两个 peer 场景（个人日常录入回顾 scn_48045a003653497aa92fd8934cabb8b1、组织多人会议跟踪响应 scn_7437d84c37f64f61b3f33f63910c90b3）在用户、目标与流程上均无实质重叠，故不列出 related_scenario_ids。验收项可观察、流程自洽、边界合理。局限：本评审仅依据 input.json、leaf.md 与所给 peer 文本，未做全语料去重，也不代表已有运行时或市场验证。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_071660a7f58b41238cca2f5843f32799",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    }
+  ],
+  "failures_and_recovery": [
+    {
+      "job_id": "job_ee166980944c4adf8e2eeacb1a3629ff",
+      "attempt": 1,
+      "error": "review reason must be non-empty text (up to 8000 characters)",
+      "observed_issue": "五个检查维度的 reason 均为空字符串；不记为通过。",
+      "recovery": "相同固定输入单独重试该审阅；attempt 2 完成且结论 passed，未重新生成场景。"
+    }
+  ],
+  "limits": [
+    "审阅仅核对固定类型正文和同类场景，不构成运行时、市场价值或全库去重验证。",
+    "7 个审阅通过项仍为草案，需要人工确认。",
+    "本批未修订两个 needs_changes 场景，建议保留在报告中。",
+    "未生产或发布模板；没有测量账单实际费用。"
+  ],
+  "screenshot": "docs/template-factory/2026-10-17-scenario-batch-03.jpg"
+}

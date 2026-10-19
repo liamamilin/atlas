@@ -1,0 +1,141 @@
+{
+ "schema": "atlas.acceptance-contract.v1",
+ "template_digest": "3bbcbb2a2685f188756e5b47dd27ac606f11f72359910e09023084758bd972c1",
+ "selected_phase": "P0",
+ "required_case_ids": [
+  "A01",
+  "A02",
+  "A03",
+  "A04",
+  "A05",
+  "A06",
+  "A07",
+  "A08",
+  "A09",
+  "A10"
+ ],
+ "cases": [
+  {
+   "id": "A01",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "把一个合法 http/https URL 保存到指定已有归类后，库列表出现该记录，且标题、URL 与所属归类与提交值一致。",
+   "features": [
+    "F01"
+   ],
+   "implementation": "acceptance/p0.py",
+   "implementation_sha256": "867d980455d5aae323871f05936977fd18b556bfa44fb9abce86aac396477d7b"
+  },
+  {
+   "id": "A02",
+   "phase": "P0",
+   "type": "negative",
+   "goal": "提交空 URL、非 http(s) 协议（javascript:、data:）或畸形 URL 时被拒绝并返回可见错误，库中记录数保持不变。",
+   "features": [
+    "F01"
+   ],
+   "implementation": "acceptance/p0.py",
+   "implementation_sha256": "867d980455d5aae323871f05936977fd18b556bfa44fb9abce86aac396477d7b"
+  },
+  {
+   "id": "A03",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "保存时未选择归类，记录进入默认收件箱，并可在默认收件箱视图中浏览到。",
+   "features": [
+    "F02"
+   ],
+   "implementation": "acceptance/p0.py",
+   "implementation_sha256": "867d980455d5aae323871f05936977fd18b556bfa44fb9abce86aac396477d7b"
+  },
+  {
+   "id": "A04",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "新建归类后该归类出现在归类侧栏，且可将记录保存或移动到该新归类。",
+   "features": [
+    "F03"
+   ],
+   "implementation": "acceptance/p0.py",
+   "implementation_sha256": "867d980455d5aae323871f05936977fd18b556bfa44fb9abce86aac396477d7b"
+  },
+  {
+   "id": "A05",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "把记录从归类 A 移动到归类 B 后，记录出现在 B 的浏览结果，且不再出现在 A。",
+   "features": [
+    "F04"
+   ],
+   "implementation": "acceptance/p0.py",
+   "implementation_sha256": "867d980455d5aae323871f05936977fd18b556bfa44fb9abce86aac396477d7b"
+  },
+  {
+   "id": "A06",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "按归类浏览只返回该归类的记录，不会串入其他归类的记录。",
+   "features": [
+    "F05"
+   ],
+   "implementation": "acceptance/p0.py",
+   "implementation_sha256": "867d980455d5aae323871f05936977fd18b556bfa44fb9abce86aac396477d7b"
+  },
+  {
+   "id": "A07",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "关键字检索命中标题、URL 或备注中匹配的记录，并排除不匹配的记录。",
+   "features": [
+    "F06"
+   ],
+   "implementation": "acceptance/p0.py",
+   "implementation_sha256": "867d980455d5aae323871f05936977fd18b556bfa44fb9abce86aac396477d7b"
+  },
+  {
+   "id": "A08",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "访问记录的开原页入口返回指向所存 URL 的 http(s) 跳转（3xx Location 或含真实原始链接的页面），且不代理或返回目标网页正文。",
+   "features": [
+    "F07"
+   ],
+   "implementation": "acceptance/p0.py",
+   "implementation_sha256": "867d980455d5aae323871f05936977fd18b556bfa44fb9abce86aac396477d7b"
+  },
+  {
+   "id": "A09",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "保存记录后，一个全新无会话的 HTTP 客户端仍能通过浏览或检索读回该记录，表明数据已由服务端持久保存；进程重启后的数据仍在由独立浏览器验收覆盖，本套件不重启服务、不直接读取应用数据库，也不得声称已完成进程重启。",
+   "features": [
+    "F08"
+   ],
+   "implementation": "acceptance/p0.py",
+   "implementation_sha256": "867d980455d5aae323871f05936977fd18b556bfa44fb9abce86aac396477d7b"
+  },
+  {
+   "id": "A10",
+   "phase": "P0",
+   "type": "negative",
+   "goal": "无匹配关键字的检索返回空结果集而不误报；未暴露的公开或分享类路由返回 404 且不泄露库内容。",
+   "features": [
+    "F09"
+   ],
+   "implementation": "acceptance/p0.py",
+   "implementation_sha256": "867d980455d5aae323871f05936977fd18b556bfa44fb9abce86aac396477d7b"
+  }
+ ],
+ "suite_sha256": {
+  "acceptance/README.md": "d00fbcfe22fa0a180d077e29dda5dcec16fd2a25530c8745c042a019484dedf5",
+  "acceptance/common.py": "b631aaf9e3fcbef8d28fa2ab49bc51db560fa2b2b408bc51c0809a434a1de24f",
+  "acceptance/p0.py": "867d980455d5aae323871f05936977fd18b556bfa44fb9abce86aac396477d7b",
+  "acceptance/p0_core.py": "7487ec14c8ec02d1cb954dec75261ac8c80e7499bcc3360f3e7ecd4446ab0b35",
+  "acceptance/p0_find.py": "a14482feb65579ded9ac825dbe685b765373eb564dbdae14f6e946e87f433fea",
+  "acceptance/p1.py": "480f809fc265fb385d9014fa9f8d841198022b8a4d5dffa09bb7500813213ac8",
+  "acceptance/p2.py": "f428929c1d92f09ac1eaa54e7f1837fc1b0cb6be387a284cb11c39d8389b820a",
+  "acceptance/plan.json": "f1b91df910d5df68f4b6f4af3ade5fba8fc9723280e303b229aae4008472b5e7",
+  "acceptance/runner.json": "d5aa06873eae718c269d301e2a159b0d33de25e916997165c29439120b1cdb22"
+ },
+ "status": "not_run"
+}

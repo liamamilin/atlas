@@ -1,0 +1,123 @@
+{
+  "probe": "synthetic stdlib HTTP server only",
+  "application_source_used": false,
+  "image": "python:3.12-slim",
+  "network_mode": "custom user-defined bridge; not host network",
+  "docker_network_internal": false,
+  "bridge_egress_enforced": false,
+  "published_addresses": [
+    "127.0.0.1:63746",
+    "127.0.0.1:63747"
+  ],
+  "browser_request_policy": "Chromium context permits only this app origin and local fixture origin; other requests aborted",
+  "network_none": false,
+  "source_mount_read_only": true,
+  "root_filesystem_read_only": true,
+  "dedicated_data_directory": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-acceptance-probe-60sjmjx8/data",
+  "credentials_passed_to_container": false,
+  "container_socket_mounted": false,
+  "container_limits": {
+    "memory": "256m",
+    "cpus": "0.5",
+    "pids": 64,
+    "capabilities_dropped": "ALL",
+    "no_new_privileges": true
+  },
+  "browser": "Playwright Chromium, independent host process with isolated temporary HOME/TMPDIR",
+  "cleanup": "owned container and network removal attempted in finally; temporary directory retained",
+  "probe_source_sha256": {
+    "http_probe.py": "586e23abcd3b73b0935035f2bc5281349134cacb8c71153b47e2d3ab56a17be1",
+    "chromium_probe.cjs": "cb30f7d0d6d42043517e4df29630162191dd55caee84f78727cdb799c3367106",
+    "run_probe.py": "34f30a41cc75b99bbde276a9c981de72a4a56e341b4a6544b106ee6521eb463b"
+  },
+  "image_id": "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9",
+  "docker_network_internal_actual": false,
+  "container_id": "28a95fb09ac32772dc4ece8d422343286bb6567fb278d404d01774c4faf80814",
+  "container_configuration": {
+    "image": "python:3.12-slim",
+    "command": [
+      "python",
+      "/probe.py"
+    ],
+    "user": "501:20",
+    "network_mode": "bookmark-probe-net-03b066348c",
+    "port_bindings": {
+      "8000/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "63746"
+        }
+      ],
+      "8001/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "63747"
+        }
+      ]
+    },
+    "effective_published_ports": {
+      "8000/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "63746"
+        }
+      ],
+      "8001/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "63747"
+        }
+      ]
+    },
+    "container_running": true,
+    "readonly_rootfs": true,
+    "cap_drop": [
+      "ALL"
+    ],
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "memory_bytes": 268435456,
+    "nano_cpus": 500000000,
+    "pids_limit": 64,
+    "mounts": [
+      {
+        "Type": "bind",
+        "Source": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/environment/http_probe.py",
+        "Destination": "/probe.py",
+        "RW": false
+      },
+      {
+        "Type": "bind",
+        "Source": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-acceptance-probe-60sjmjx8/data",
+        "Destination": "/data",
+        "RW": true
+      }
+    ],
+    "environment_variable_names": [
+      "FIXTURE_URL",
+      "PATH",
+      "LANG",
+      "GPG_KEY",
+      "PYTHON_VERSION",
+      "PYTHON_SHA256"
+    ]
+  },
+  "chromium_executable": "/Users/milin/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing",
+  "chromium_result": {
+    "appStatus": 200,
+    "appUrl": "http://127.0.0.1:63746/",
+    "fixtureUrl": "http://127.0.0.1:63747/original",
+    "fixtureReached": true,
+    "postStatus": 201,
+    "externalRequestBlocked": true,
+    "blockedRequests": [
+      "https://example.com/"
+    ],
+    "chromiumVersion": "153.0.8010.12"
+  },
+  "chromium_stderr": "",
+  "persisted_marker": "chromium-persist-check",
+  "status": "pass",
+  "temporary_root": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-acceptance-probe-60sjmjx8"
+}

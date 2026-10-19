@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/handoff-pilots/bookmark-core-2026-10-18/application-repair/app.py", line 58, in <module>
+    sys.exit(main())
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/handoff-pilots/bookmark-core-2026-10-18/application-repair/app.py", line 41, in main
+    httpd = ThreadingHTTPServer(("127.0.0.1", args.port), app_server.AppHandler)
+  File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py", line 452, in __init__
+    self.server_bind()
+  File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/http/server.py", line 137, in server_bind
+    socketserver.TCPServer.server_bind(self)
+  File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py", line 466, in server_bind
+    self.socket.bind(self.server_address)
+OSError: [Errno 48] Address already in use

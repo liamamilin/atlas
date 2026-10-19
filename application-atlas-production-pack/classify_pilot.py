@@ -7,10 +7,13 @@ import sqlite3
 import urllib.request
 import numpy as np
 
+from classify import ClassificationProviderError, _provider_error
+
+import atlas_model
+
 PACK = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(PACK, "atlas", "atlas.sqlite")
-API = "https://opencode.ai/zen/go/v1/chat/completions"
-KEY = json.load(open(os.path.expanduser("~/.local/share/opencode/auth.json")))["opencode-go"]["key"]
+ADJUDICATOR = os.environ.get("ATLAS_ADJUDICATOR", "").strip()
 
 
 def embed(texts):
@@ -46,13 +49,17 @@ def adjudicate(desc, cands, bounds=""):
 {cand_txt}
 {btxt}
 只输出 JSON: {{"choice": "<slug 或 none>", "reason": "一句话理由"}}"""
-    body = {"model": "qwen3.7-max", "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.1, "max_tokens": 2000}
-    req = urllib.request.Request(API, json.dumps(body).encode(),
-                                 {"Authorization": f"Bearer {KEY}", "Content-Type": "application/json",
-                                  "x-opencode-session": "atlas-pilot", "User-Agent": "atlas-pilot/1.0"})
-    r = json.load(urllib.request.urlopen(req, timeout=240))
-    txt = (r["choices"][0]["message"].get("content") or "").strip()
+    try:
+        txt = atlas_model.complete_text(
+            [{"role": "user", "content": prompt}],
+            model=ADJUDICATOR or None, role="adjudicator",
+            temperature=0.1, max_tokens=2000, timeout=240)
+    except atlas_model.ModelConfigError as error:
+        raise _provider_error(error) from error
+    except Exception as error:
+        if isinstance(error, ClassificationProviderError):
+            raise
+        raise _provider_error(error) from error
     m = re.search(r"\{.*\}", txt, re.S)
     if m:
         return json.loads(m.group(0))
@@ -61,7 +68,6 @@ def adjudicate(desc, cands, bounds=""):
 
 def main():
     con = sqlite3.connect(DB)
-    slugs = [r[0] for r in con.execute("SELECT slug FROM embedding")]
     rows = con.execute("SELECT slug, vec FROM embedding").fetchall()
     mat = np.stack([np.frombuffer(r[1], dtype=np.float32) for r in rows])
     norms = np.linalg.norm(mat, axis=1, keepdims=True)

@@ -4,6 +4,7 @@ No live corpus writes occur until export, translations, embeddings and the
 fixed 52-item gate all pass. Draft IDs remain stable after promotion.
 """
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -65,8 +66,8 @@ def insert_bullet(section_id, name, directory):
     text = Path(directory).read_text()
     lines = text.split("\n")
     start = None
-    for i, l in enumerate(lines):
-        if re.match(rf"^###\s+{re.escape(section_id)}\b", l):
+    for i, line in enumerate(lines):
+        if re.match(rf"^###\s+{re.escape(section_id)}\b", line):
             start = i
             break
     if start is None:
@@ -74,9 +75,9 @@ def insert_bullet(section_id, name, directory):
     end = start + 1
     while end < len(lines) and not re.match(r"^#{1,3}\s|^---$", lines[end]):
         end += 1
-    bullets = [l for l in lines[start + 1 : end] if l.startswith("- ")]
+    bullets = [line for line in lines[start + 1 : end] if line.startswith("- ")]
     new = f"- {name}"
-    if any(l[2:].lower() == name.lower() for l in bullets):
+    if any(line[2:].lower() == name.lower() for line in bullets):
         return new  # idempotent: bullet already inserted by an earlier attempt
     bullets.append(new)
     bullets.sort(key=lambda s: re.sub(r"^- ", "", s).lower())
@@ -89,9 +90,9 @@ def append_alias(into_slug, alias_name, directory, canonical_name):
     """Add ` / alias_name` to the DIRECTORY bullet of into_slug (if not present)."""
     text = Path(directory).read_text()
     lines = text.split("\n")
-    for i, l in enumerate(lines):
-        if l.startswith("- "):
-            name = l[2:].strip()
+    for i, line in enumerate(lines):
+        if line.startswith("- "):
+            name = line[2:].strip()
             if name == canonical_name:
                 if alias_name.lower() in name.lower():
                     return name
@@ -172,13 +173,27 @@ def set_status(slug, status, pack):
     atomic_write(path, text)
 
 
-def promote(slug, action, target, pack=PACK, web_data=None, runner=None):
+def _assert_body_revision(slug, expected, pack):
+    if expected is None:
+        return
+    if not isinstance(expected, str) or not re.fullmatch(r"[0-9a-f]{64}", expected):
+        raise ValueError("body revision is required")
+    path = Path(pack) / "drafts" / f"{slug}.md"
+    _, body = parse_front(path.read_text())
+    current = hashlib.sha256(body.encode("utf-8")).hexdigest()
+    if current != expected:
+        raise ValueError("草稿正文已变化，请重新加载后再入库")
+
+
+def promote(slug, action, target, pack=PACK, web_data=None, runner=None,
+            expected_body_sha256=None):
     pack = Path(pack)
     runner = runner or run_stage
     web_data = Path(web_data) if web_data is not None else WEB_DATA
     with corpus_lock(pack):
         recover_publication(pack)
         front, body, final = validate_promotion(slug, action, target, pack)
+        _assert_body_revision(slug, expected_body_sha256, pack)
         original_fingerprint = fingerprint(slug, pack)
         set_status(slug, "promoting", pack)
         try:
@@ -216,6 +231,7 @@ def promote(slug, action, target, pack=PACK, web_data=None, runner=None):
                 update_review(slug, {"gate": f"{summary['accuracy']:.1%}", "gate_ok": summary["passed"]}, pack)
                 if not summary["passed"]:
                     raise RuntimeError(f"回归未达标：{summary['accuracy']:.1%}，要求至少 90%；正式语料保持不变")
+                _assert_body_revision(slug, expected_body_sha256, pack)
                 if fingerprint(slug, pack) != original_fingerprint:
                     raise RuntimeError("入库期间草稿被修改，已停止发布")
                 mapping = [(stage / "DIRECTORY.md", pack / "DIRECTORY.md")]

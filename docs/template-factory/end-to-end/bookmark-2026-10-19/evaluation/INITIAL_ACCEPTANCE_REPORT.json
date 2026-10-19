@@ -1,0 +1,116 @@
+{
+  "kind": "independent-initial-application-acceptance",
+  "acceptance_run": "initial-retry-3",
+  "app_archive_sha256": "48a8f7d31b431a073a155c7e2a2489210f823683d77514759fee728c490a47d2",
+  "delivery_sha256": "4accad35f8399183eb6a8426a971c8434611b69f0160d2b505e9dd29b86cb38e",
+  "image": "python:3.12-slim",
+  "image_id": "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9",
+  "runtime_start_argv": [
+    "python3",
+    "-m",
+    "app",
+    "--host",
+    "0.0.0.0",
+    "--port",
+    "8000",
+    "--data-dir",
+    "/state/data"
+  ],
+  "source_hash_unchanged": true,
+  "ui_run_status": "passed",
+  "initial_checks": [
+    {
+      "id": "save-to-default-without-category",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "create-collection",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "save-in-new-collection",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "move-and-browse-by-category",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "keyword-search",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "open-original-page",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "html-output-safety",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "invalid-inputs-no-dirty-data",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "duplicate-save-risk-observation",
+      "status": "observed",
+      "detail": "created_new_record; 1 -> 2; observation-only"
+    }
+  ],
+  "restart_checks": [
+    "collections",
+    "bookmarks-and-moves",
+    "search",
+    "first-and-second-original-targets",
+    "duplicate-save-observed-state",
+    "html-safety"
+  ],
+  "restart_started_at_before": "2026-10-19T03:39:43.463776008Z",
+  "restart_started_at_after": "2026-10-19T03:40:00.187915127Z",
+  "duplicate_save_observation": {
+    "outcome": "created_new_record",
+    "before_count": 1,
+    "after_count": 2,
+    "contract_result": "observation-only"
+  },
+  "cleanup_all_resources_removed": true,
+  "posthoc_probe": "posthoc-http-3",
+  "posthoc_kind": "independent exploration after core acceptance; not part of frozen P0 verdict",
+  "crlf_probe": {
+    "status": 303,
+    "rejected_4xx": false,
+    "dirty_record_id": "1",
+    "redirect_status": 302,
+    "injected_header_present": true,
+    "pass": false
+  },
+  "concurrency_probe": {
+    "rounds": 20,
+    "status_code_patterns": {
+      "(303, 400)": 11,
+      "(400, 303)": 9
+    },
+    "successful_303_records_missing_after_response": 6,
+    "missing_rounds": [
+      1,
+      5,
+      10,
+      16,
+      18,
+      20
+    ],
+    "http_500_count": 0,
+    "remote_errors": 0,
+    "pass": false
+  },
+  "posthoc_cleanup_all_resources_removed": true,
+  "network_scope": "Dedicated Docker bridge and host 127.0.0.1 publish; bridge egress not blocked; all browser requests in UI run were origin-allowlisted."
+}

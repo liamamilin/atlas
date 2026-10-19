@@ -1,0 +1,35 @@
+{
+  "version": 3,
+  "date": "2026-10-19",
+  "status": "infrastructure_corrected_shared_oracle",
+  "source_sha256": {
+    "run.py": "316c99ad1566a8ef121c87239359a0a693bf5b61f2f07e191daae1276be4afa9",
+    "browser.cjs": "354389ab7a19867dc683d12dccac35b67c064ddf66136a7da70f0d0e296de4f5",
+    "rubric.json": "7fae705d4505ac12f1be01f5541325337e27208f01d07774541e1af22dbf72e8",
+    "README.md": "54fba30a2cce7f6d7440ad95f0f7e7977c5d35e5a0641e5b167af44f509727ea",
+    "oracle-corrections-v2.json": "355977983a9c7103dc796208388d128d5b3694b7902e2645b8f3d4978fb0cb4b",
+    "oracle-corrections-v3.json": "a2c44bfa72f807fa045c688b15f67404444738d9895ffffbaa63f867f2e968b1"
+  },
+  "input_sha256": {
+    "cases/budget/request.json": "f785ff2e2a54fa8908241406261a1cd411b63b1ac5025b0ee847363ab8510f40",
+    "cases/budget/CONTRACT.md": "4f90838821b17e02ca1283412e3925486b41049c8e66b3f4a522ba70029b197d",
+    "cases/budget/REQUEST.md": "0b35785af09845ee5c0ed37ae25e693f74510578e0a2e03da760294376cdf24d",
+    "cases/booking/request.json": "157d60981e1300cfecd8aaa809ef073f4c303e5602f91e6d6a56969e07354af6",
+    "cases/booking/CONTRACT.md": "fb95f49383f4149cca47f69abcdbb04d81f2cf8fd74d08110fda67a30906d15b",
+    "cases/booking/REQUEST.md": "8b19fcff94d9fdd12f9969ed2d75b4041b802f3d74dc2567b0d97956b390b814",
+    "cases/rename/request.json": "7c800098f04badb64cc954e5c9ebbd5cc451a82904242b503a3609369b443005",
+    "cases/rename/CONTRACT.md": "176296cc09161aae8c09562d42ae0746f6cad1576395d9355b613f0b6f582131",
+    "cases/rename/REQUEST.md": "080f4cd5ff36f06e4b30bbc1a0df02f31e65be7615bac48205215d45debc67d7"
+  },
+  "selfchecks": [
+    "Python AST syntax",
+    "Node --check browser.cjs",
+    "require/Suite utility pass/fail/unverified classification",
+    "v1 archived source hashes equal original freeze"
+  ],
+  "real_application_tests": "Original booking M3 initial preserved with six API groups passed, K06 and browser not executed due tool faults",
+  "condition_mapping_read": false,
+  "developer_or_template_output_read": false,
+  "supersedes": "freeze-v2.json; source preserved in oracle-v2/",
+  "correction_record": "oracle-corrections-v3.json"
+}

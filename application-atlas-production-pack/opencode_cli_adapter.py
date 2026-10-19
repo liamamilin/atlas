@@ -15,8 +15,16 @@ from pathlib import Path
 import shutil
 import subprocess
 import re
-import tempfile
 from typing import Callable, Sequence
+
+from opencode_permissions import (
+    detect_opencode_major_version, install_workdir_permission_policy,
+    remove_workdir_permission_policy,
+)
+from privacy import redact_text, redact_value
+
+
+MAX_EVIDENCE_TEXT_CHARS = 1_000_000
 
 
 class HarnessCompatibilityError(RuntimeError):
@@ -117,41 +125,14 @@ def resolve_executable(config: HarnessConfig) -> str:
     return resolved
 
 
-def _permission_config() -> dict:
-    return {
-        "$schema": "https://opencode.ai/config.json",
-        "permission": {
-            # Mutating tasks run in an isolated copy and Atlas enforces the
-            # declared write_paths from the resulting snapshot. The previous
-            # deny setting made every document/code CLI task report success
-            # without being able to create its declared output file.
-            "read": "allow", "edit": "allow", "glob": "allow",
-            "grep": "allow", "list": "allow", "bash": "deny",
-            "webfetch": "deny", "websearch": "deny",
-            "external_directory": "deny", "task": "deny", "question": "deny",
-        },
-    }
-
-
 def _run(argv: Sequence[str], cwd: Path, timeout: int) -> CliResult:
     environment = dict(os.environ)
-    config_path = cwd / ".atlas" / "opencode-cli.json"
-    temporary_config = None
-    if config_path.is_file():
-        # Keep the CLI permission contract scoped to the isolated workdir. The
-        # generated config never contains credentials or provider output.
-        environment["OPENCODE_CONFIG"] = str(config_path)
-    else:
-        # A generated permission policy is runtime plumbing, not a project
-        # change. Keep it outside the isolated workdir so snapshot scope checks
-        # only see agent-produced files.
-        temporary_config = tempfile.NamedTemporaryFile(
-            mode="w", suffix=".opencode.json", prefix="atlas-",
-            encoding="utf-8", delete=False)
-        json.dump(_permission_config(), temporary_config, ensure_ascii=False, indent=2)
-        temporary_config.write("\n")
-        temporary_config.close()
-        environment["OPENCODE_CONFIG"] = temporary_config.name
+    # Permission policy is always Atlas-owned. A project-provided config must
+    # not be able to re-enable shell, web, or external-directory access.
+    major_version = detect_opencode_major_version(str(argv[0]))
+    policy_required = len(argv) > 1 and argv[1] == "run"
+    if policy_required:
+        install_workdir_permission_policy(cwd, major_version)
     try:
         completed = subprocess.run(
             list(argv), cwd=str(cwd), text=True, capture_output=True,
@@ -164,11 +145,8 @@ def _run(argv: Sequence[str], cwd: Path, timeout: int) -> CliResult:
     except OSError as error:
         return CliResult(tuple(argv), 127, "", str(error))
     finally:
-        if temporary_config is not None:
-            try:
-                Path(temporary_config.name).unlink()
-            except FileNotFoundError:
-                pass
+        if policy_required:
+            remove_workdir_permission_policy(cwd)
 
 
 def preflight(workdir: str | Path, runner: Callable[[Sequence[str], Path, int], CliResult] = _run) -> dict:
@@ -195,7 +173,13 @@ def preflight(workdir: str | Path, runner: Callable[[Sequence[str], Path, int], 
             f"OpenCode {actual} does not satisfy minimum {config.minimum_version}",
             {"actualVersion": actual, "minimumVersion": config.minimum_version})
 
-    providers_result = runner((executable, "providers", "list"), root, config.command_timeout_seconds)
+    # V2's model listing starts the service and may itself require a shell
+    # permission in headless configurations. `debug config` is a read-only
+    # compatibility probe that exposes provider configuration without
+    # contacting a provider or returning credentials.
+    provider_command = ((executable, "providers", "list") if actual.split(".", 1)[0] == "1"
+                        else (executable, "debug", "config"))
+    providers_result = runner(provider_command, root, config.command_timeout_seconds)
     provider_output_present = bool((providers_result.stdout or providers_result.stderr).strip())
     return {
         "status": "passed" if version_result.passed and providers_result.passed and provider_output_present else "failed",
@@ -223,10 +207,15 @@ def build_run_argv(executable: str, prompt: str, workdir: str | Path,
     root = Path(workdir).resolve()
     if not root.is_dir():
         raise ValueError("workdir must be an existing directory")
-    argv = [executable, "run", "--format", "json"]
+    # V2 discovers the project from cwd and requires a private server for an
+    # unattended run. V1 used --pure; neither version needs the removed --dir
+    # form because the subprocess cwd is already the isolated project.
+    major_version = detect_opencode_major_version(executable)
+    private_flag = "--standalone" if major_version >= 2 else "--pure"
+    argv = [executable, "run", "--format", "json", private_flag]
     if model:
         argv.extend(("--model", model))
-    argv.extend((prompt, "--dir", str(root)))
+    argv.append(prompt)
     return tuple(argv)
 
 
@@ -325,26 +314,44 @@ def diagnose_cli_failure(result: dict, stderr: str | None = None) -> tuple[str |
     return "process_exit", "inspect stderr.txt in the execution evidence directory"
 
 
+def _bounded_evidence_text(value: str) -> tuple[str, bool]:
+    redacted = redact_text(value)
+    if len(redacted) <= MAX_EVIDENCE_TEXT_CHARS:
+        return redacted, False
+    marker = f"\n\n[Atlas truncated {len(redacted) - MAX_EVIDENCE_TEXT_CHARS} characters]\n\n"
+    available = MAX_EVIDENCE_TEXT_CHARS - len(marker)
+    head = available // 2
+    tail = available - head
+    return redacted[:head] + marker + redacted[-tail:], True
+
+
 def write_run_evidence(result: dict, evidence_dir: str | Path) -> dict:
     """Persist CLI transport evidence in a self-contained directory."""
     if not isinstance(result, dict):
         raise ValueError("result must be an object")
     root = Path(evidence_dir).expanduser().resolve()
-    root.mkdir(parents=True, exist_ok=True)
+    root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    os.chmod(root, 0o700)
     summary = result.get("summary") if isinstance(result.get("summary"), dict) \
         else summarize_run(result)
-    metadata = {
+    stdout, stdout_truncated = _bounded_evidence_text(
+        result.get("stdout") if isinstance(result.get("stdout"), str) else "")
+    stderr, stderr_truncated = _bounded_evidence_text(
+        result.get("stderr") if isinstance(result.get("stderr"), str) else "")
+    metadata = redact_value({
         "schema": 1,
         "argv": list(result.get("argv") or []),
         "summary": summary,
         "files": {"stdout": "stdout.txt", "stderr": "stderr.txt"},
+        "truncated": {"stdout": stdout_truncated, "stderr": stderr_truncated},
+    })
+    files = {
+        "stdout.txt": stdout,
+        "stderr.txt": stderr,
+        "run.json": json.dumps(metadata, ensure_ascii=False, indent=2) + "\n",
     }
-    (root / "stdout.txt").write_text(
-        result.get("stdout") if isinstance(result.get("stdout"), str) else "",
-        encoding="utf-8")
-    (root / "stderr.txt").write_text(
-        result.get("stderr") if isinstance(result.get("stderr"), str) else "",
-        encoding="utf-8")
-    (root / "run.json").write_text(
-        json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    for name, content in files.items():
+        path = root / name
+        path.write_text(content, encoding="utf-8")
+        os.chmod(path, 0o600)
     return {"directory": str(root), "metadata": metadata}

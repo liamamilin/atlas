@@ -1,0 +1,140 @@
+# 品类认知与来源
+
+固定的模型调研记录；来源访问日期与 Atlas 叶子原稿编写日期含义不同。叶子原稿的研究笔记链接属于原语料上下文，不表示本包附带该文件；本包来源以以下条目及未知项为准。
+
+类别事实（有来源）与场景结论（待验证推断）分开陈述。
+
+一、类别成熟做法。1) 预览默认化：F2 默认 dry-run（S07）；brename 的 -d/--dry-run（S08）；RnR 默认 dry-run（S09）；util-linux rename 的 -n/--no-act 需配 -v 才能看到计划（S06）。2) 冲突必须在动手前被检出并显式处理：brename 把 new path existed 与『本轮新名又被本轮另一项覆盖』都列为潜在数据丢失并拒绝/询问；F2 声称每个操作执行前校验并可自动消解冲突；util-linux 则相反——手册明确『默认没有任何保护』（S05-S08）。3) 撤销依赖持久化日志：brename 用 .brename_detail.txt 只支持撤销『上一次成功操作』，RnR 用 dump 文件支持 undo/redo，F2 声称任意改名可撤销（S07-S09）；util-linux rename 与 POSIX rename(2) 本身都不提供撤销（S05、S06）。4) 可选备份：RnR -b 生成唯一且不会被覆盖的 .bk（S09）。5) 明确退出码与逐条回执：util-linux 用 0/1/2/4/64 区分全成功/全失败/部分失败/无改动/未预期（S06）。6) 作用域与类型过滤是常规选项：递归、含目录、含隐藏文件都是显式开关（S06、S08、S09）。7) 大小写不敏感文件系统会制造『看不见的』冲突（brename 举例 test.tar.gz→test.tar 覆盖 TEST.tar，并在 Windows 默认启用不敏感检查）（S08）。
+
+二、与场景（单目录、字面替换、预览→确认→执行→撤销）的对照。一致的：预览不改动、冲突预检、journal 式撤销、可选备份、逐条回执——这些都有成熟先例可借鉴（S06-S09）。超出既有文档做法的：预览与执行之间的『源内容被改则拒绝过期计划』、按计划身份拒绝重复执行（幂等/防第二轮改名）、撤销时遇到新冲突不覆盖——在抓取到的四类工具文档中均未见对应机制说明，应视为场景特化要求，需要在实现中自行定义判定依据（建议同时使用 inode/device、size、mtime 与必要时内容哈希；但纳秒时间戳与哈希成本未获文档确认，见 gaps）。
+
+三、数据生命周期与失败安全。改名在同文件系统内是元数据操作、不搬运内容，POSIX 下成功即原子（S03、S05），所以『失败后旧数据不丢』的压力点不在改名本身，而在：(a) 绝不覆盖目标——POSIX rename 在 Unix 会静默替换目标（S03、S05），因此拒绝覆盖必须靠执行前的目标存在性预检与执行时的再次核查，且这之间天然存在 TOCTOU 窗口，Python 标准库未暴露 Linux 专有的 renameat2/RENAME_NOREPLACE 原子免覆盖语义（S05）；(b) 计划内部的冲突（两个源指向同一新名、或新名落在源集合中）必须在预览阶段整体拒绝，这正是 brename 与 F2 的做法（S07、S08）；(c) 换名环（如 a↔b）无法用 POSIX rename 原子完成（RENAME_EXCHANGE 仅 Linux 专有，S05），需借临时名做两阶段改名；(d) journal 需在每步改名后落盘（含 fsync）以便崩溃后核对与恢复——这是设计推断，抓取文档只显示『有 dump/日志文件』而非其持久化与崩溃语义（S08、S09）；(e) NFS 上『失败即未改名』不成立，是明确的例外（S05）。
+
+四、权限、计费、管理、审计、导出、恢复的适用性评估（不把企业特性当强需求）。个人本地 CLI 场景下：无计费面（不适用）；无多租户管理与角色模型（不适用），权限只需把操作系统判定结果为 OSError/PermissionError 并如实报错即可（S04）；审计的轻量替代就是『执行回执 + 计划/回执文件』，与 brename/RnR 的日志文件同级别（S08、S09），无需不可篡改审计链；导出即把预览计划与执行回执以文本呈现，无需导出格式规范；恢复方面改名不是删除，不需要回收站式机制，撤销 journal 就是恢复路径（S07-S09），而『删除常走可恢复步骤』属类别通例，与本次改名操作无直接关系（S01）。
+
+五、复用还是自建。可复用的现成工具（util-linux rename、F2、brename、RnR）都以模式/正则驱动并支持递归等更大作用域，且 F2/brename/RnR 为 Go/Rust 二进制需额外安装（GPL/Go/Rust 生态），与『Python 标准库 CLI、字面替换、单目录、非递归、拒绝冲突、可撤销计划、显式 --confirm、幂等』的要求并不对齐；因此结论倾向自建（仅用标准库），并把上述工具的『默认预览、冲突预检整体拒绝、journal 撤销、可选备份、明确退出码』作为设计模式借用。涉及许可：util-linux 为 GPLv2 项目（rename.c 无逐文件头，man 页声明公有领域），F2/brename/RnR 均为 MIT，均只在概念层复用；本任务不复制任何第三方代码。
+
+六、未知与不可确认。本报告全部为文档研究，未运行任何工具、未做运行时或崩溃注入验证；搜索摘要中提到的 GUI 工具（Total Commander MRT、Advanced Renamer、Windows 资源管理器）撤销/预览行为未从官方文档核实；Python 3.x 的 os.rename/os.replace 官方小节未能在抓取配额内抵达（多次尝试 os.rst 均截断于 rename 之前），相关跨平台差异来自 2.7 文档与 POSIX man 页，属转述而非 3.x 逐字确认。
+
+## S01 · Atlas confirmed input
+
+inputs/scenario.json · experiment-rename@1
+
+先预览单目录文件名的文字替换，再明确确认执行，并能撤销这次批量改名；保护原始内容和未选文件。
+
+Atlas scenario input; not a third-party code license
+
+
+
+Pinned requirement input
+
+## S02 · Python 3.13 pathlib 文档与 CPython 源码（Doc/library/pathlib.rst、Lib/pathlib/_local.py）
+
+https://raw.githubusercontent.com/python/cpython/3.13/Lib/pathlib/_local.py · CPython 3.13 分支（未固定到具体 commit）；pathlib.rst 取 main 分支（未固定）
+
+Path.rename() 文档串说明把本路径改名为目标路径并委托 os.rename；Path.replace() 委托 os.replace，且『目标存在时覆盖』。Path.stat()/Path.lstat() 返回 os.stat_result（stat 默认跟随符号链接，lstat 不跟随），is_file/is_dir 带 follow_symlinks 参数，is_symlink 对失效链接也返回 True；iterdir() 基于 os.scandir，子项顺序『任意』。PurePath.with_name() 在名字为空、含路径分隔符（含 altsep）或等于 '.' 时抛 ValueError，可用于校验『新名必须是单个文件名』。pathlib 文档明确 PurePath('foo/../bar') 不会被词法折叠，因为 foo 若是符号链接语义会变。
+
+Python Software Foundation License Version 2（文档代码自 3.8.6 起为 PSF-2.0 与 Zero-Clause BSD 双许可），provenance: CPython 仓库 LICENSE 文件
+
+https://raw.githubusercontent.com/python/cpython/main/LICENSE
+
+reuse（标准库/文档，作为实现依据）；仅作参考阅读，本任务不复制第三方代码
+
+## S03 · Python 2.7 标准库文档 os 模块（Doc/library/os.rst，contains os.rename）
+
+https://raw.githubusercontent.com/python/cpython/2.7/Doc/library/os.rst · CPython 2.7 分支（未固定具体 commit）
+
+os.rename(src, dst)：若 dst 是目录则抛 OSError；在 Unix 上若 dst 存在且是文件，会在有权限时被『静默替换』；src 与 dst 跨文件系统时可能失败；成功时为原子操作（POSIX 要求）。在 Windows 上若 dst 已存在则抛 OSError（即使 dst 是文件），且 Windows 可能无法在 dst 已存在时实现原子改名。os.stat 返回 st_mode/st_ino/st_dev/st_size/st_atime/st_mtime/st_ctime，并提示时间戳含义与分辨率依平台/文件系统而异（举例 FAT 的 st_mtime 为 2 秒分辨率）。os.listdir 顺序任意且不含 '.'、'..'；os.lstat 不跟随符号链接；os.pathconf/`pathconf_names` 提供 NAME_MAX 等系统限制查询入口。
+
+Python Software Foundation License Version 2（见 CPython LICENSE）
+
+https://raw.githubusercontent.com/python/cpython/main/LICENSE
+
+reuse（标准库语义依据）；注意该页面为 2.7 版本，3.x 差异见 gaps
+
+## S04 · What's New In Python 3.3 — PEP 3151 重排 OS/IO 异常层次
+
+https://raw.githubusercontent.com/python/cpython/3.3/Doc/whatsnew/3.3.rst · CPython 3.3 分支（未固定具体 commit）
+
+自 3.3 起 OS/IO 错误统一为 OSError 并细分出子类：BlockingIOError、ChildProcessError、ConnectionError、FileExistsError、FileNotFoundError、InterruptedError、IsADirectoryError、NotADirectoryError、PermissionError、ProcessLookupError、TimeoutError。因此可以把『目标已存在』(FileExistsError)、『权限不足』(PermissionError)、『类型不符』(IsADirectoryError/NotADirectoryError) 与其它失败区分处理，而不必解析 errno。
+
+Python Software Foundation License Version 2（见 CPython LICENSE）
+
+https://raw.githubusercontent.com/python/cpython/main/LICENSE
+
+reuse（错误分类依据）
+
+## S05 · Linux man-pages — rename(2) 手册页
+
+https://raw.githubusercontent.com/mkerrisk/man-pages/master/man2/rename.2 · man-pages 仓库 master 分支（未固定；页脚标注 2021-08-27，Linux Programmer's Manual）
+
+若 newpath 已存在，会被原子替换，另一进程不会看到 newpath 消失；但存在一段时间内两个名字都指向被改名文件。oldpath 是符号链接时改的是链接本身；newpath 是符号链接时链接被覆盖。oldpath 可为目录，此时 newpath 必须不存在或为空目录。若 oldpath 与 newpath 互为同一文件的硬链接，rename() 什么都不做并返回成功。错误包括：EXDEV（跨挂载点不允许改名，即使同一文件系统挂载多次）、ENAMETOOLONG、ENOTEMPTY/EEXIST（非空目录）、EISDIR、EPERM/EACCES（含 sticky 位场景）、EROFS、EINVAL（把目录变成自身子目录）。renameat2 的 RENAME_NOREPLACE（目标存在即报错，需文件系统支持，且未与该页所列 RENAME_EXCHANGE 同用）与 RENAME_EXCHANGE（原子交换，需两路径都存在）为 Linux 专有。BUGS 一节：在 NFS 上不能假设『操作失败就说明没改名』（服务端执行后崩溃、重传 RPC 会报错）。一致性：POSIX.1-2001/2008、C89/C99。
+
+man-pages 页头声明许可：允许保留版权与许可声明的逐字复制与修改分发（VERBATIM 类许可），作者 Eckhardt/Haardt/Jackson/Kerrisk；provenance: 文件头 %%%LICENSE_START(VERBATIM)
+
+https://raw.githubusercontent.com/mkerrisk/man-pages/master/man2/rename.2
+
+reuse（系统调用语义依据）；本任务不复制该文本
+
+## S06 · util-linux — rename(1) 手册页源与 misc-utils/rename.c 实现
+
+https://raw.githubusercontent.com/util-linux/util-linux/master/misc-utils/rename.1.adoc · util-linux 仓库 master 分支（未固定；源码注释起始 aeb 2000-01-01）
+
+rename 默认只替换文件名中『第一次出现』的子串；-a/--all 替换全部、-l/--last 只替换最后一次；-n/--no-act 不做任何改动（需配合 --verbose 才能看到计划）；-o/--no-overwrite 不覆盖已存在文件；-i/--interactive 覆盖前询问；-s 改为修改符号链接指向而非链接本身；-c 复制而非改名。WARNING 明确：默认或未使用 --no-overwrite/--interactive/--no-act 时改名『没有任何保护』，只要有权限就执行，在 /lib 以 root 运行后果可能很严重，建议先备份。边界：子串为空时替换串加到文件名开头（--all 时插入每两个字符之间）；若子串或替换串含 '/' 则改的是整条路径，可能导致文件在目录间移动，且不支持创建目录或跨文件系统移动。退出码：0 全部成功、1 全部失败、2 部分失败、4 什么都没改、64 未预期错误。源码层面：-i 与 -o 互斥；do_file 用 lstat 检查目标是否已存在，--no-act 时不调用 rename(2)；do_symlink 读取链接目标后 unlink 再 symlink 重建；do_copy 用 O_NOFOLLOW 打开并以 is_same_inode 拒绝复制到同一文件，复制失败会 unlink 目标清理。
+
+项目 COPYING 为 GNU GPL Version 2 文本（已核实文件内容，是否 GPL-2.0-or-later 未逐文件核验）；本 man 页源文件 rename.1.adoc 自带声明：无版权主张、属公有领域；rename.c 未见逐文件许可头。provenance: util-linux 仓库 COPYING 与 misc-utils/rename.1.adoc
+
+https://raw.githubusercontent.com/util-linux/util-linux/master/COPYING
+
+build（作为『同类工具默认行为与失败清理』的参照）；不复制代码；GPL 许可对整份二进制的复用会带来传染性风险，本项目自建可规避
+
+## S07 · F2 — Command-Line Batch Renaming（ayoisaiah/f2）README 与 LICENCE
+
+https://raw.githubusercontent.com/ayoisaiah/f2/master/README.md · master 分支（未固定；无意固定版本号，只读到 README 与 LICENCE）
+
+F2 是 Go 写的跨平台批改名 CLI。README 自述差异化能力：默认即 dry-run（先审阅改动再执行）；每个改名操作在执行前都被校验，检测到的冲突可自动消解；『任何改名操作都能轻松撤销』；支持用文件属性（EXIF/ID3）等变量。README 指向的撤销实现说明位于 f2.freshman.tech 指南（本次未抓取，故 journal 位置与回滚语义未确认）。
+
+MIT Licence，Copyright (c) 2020 Ayooluwa Isaiah，provenance: 仓库 LICENCE 文件（已在 README 中链接）
+
+https://raw.githubusercontent.com/ayoisaiah/f2/master/LICENCE
+
+reuse-as-design-reference（MIT 允许复用，但本次仅作设计模式参照，未复制代码）
+
+## S08 · brename — A practical cross-platform command-line tool for safely batch renaming（shenwei356/brename）README 与 LICENSE
+
+https://raw.githubusercontent.com/shenwei356/brename/master/README.md · master 分支（README 展示的版本为 2.14.0；未固定到具体 tag）
+
+改名执行前先做潜在冲突检查并逐条列出：new path existed（可能覆盖造成数据丢失）、overwriting newly renamed path（本轮改名的目标又被本轮另一项覆盖，肉眼难查）、missing target、目标以空格结尾、目标以句点结尾（Windows 不允许）。-d/--dry-run 只打印不改；-u/--undo 撤销『上一次成功操作』，依赖写入的 .brename_detail.txt（-x 可禁用 undo 文件）；-o/--overwrite-mode 取 0 报错、1 覆盖、2 不改名；Windows 默认启用大小写不敏感路径检查（-w），可用 -W 关闭，README 举出 test.tar.gz→test.tar 会覆盖 TEST.tar 的例子；默认跳过以 '.' 开头的隐藏路径（-S ^\.），可用空值关闭。
+
+MIT License，Copyright (c) 2013-2019 Wei Shen，provenance: 仓库 LICENSE 文件
+
+https://raw.githubusercontent.com/shenwei356/brename/master/LICENSE
+
+reuse-as-design-reference（MIT；仅参考其冲突预检与 journal 撤销思路，未复制代码）
+
+## S09 · RnR — securely rename multiple files and directories（ismaelgv/rnr）README 与 LICENSE
+
+https://raw.githubusercontent.com/ismaelgv/rnr/master/README.md · master 分支（未固定 tag/版本）
+
+RnR 是 Rust 写的批改名 CLI，定位为安全（automated checks to avoid unwanted file collisions, removals or overwrites）。默认行为包括：默认 dry-run；默认只改文件与符号链接（忽略目录，需 -D 才包含）；默认忽略隐藏文件（-x 包含）；默认只替换 1 处（-l 0 表示全部）；只接受 UTF-8；『Does not generate backups』（需 -b 才生成 .bk 且保证唯一、不覆盖既有备份）。force 模式下把操作写入 dump 文件，可用 from-file 子命令 -u 撤销、不带附加参数则重做（undo/redo 由 dump 文件驱动）。
+
+MIT License，Copyright (c) 2018 Ismael González Valverde，provenance: 仓库 LICENSE 文件
+
+https://raw.githubusercontent.com/ismaelgv/rnr/master/LICENSE
+
+reuse-as-design-reference（MIT；仅参考其默认预览、dump 文件 undo/redo、可选备份，未复制代码）
+
+## 待验证
+
+- Python 3.x 的 os.rename/os.replace 官方文档小节未被逐字读到：多次抓取 Doc/library/os.rst（2.7 除外）与 docs.python.org/3/library/os.html 均在 os.rename 之前被截断；3.x 行为差异是基于 2.7 文档与 rename(2) 手册的转述，未从 3.x 文档确认。
+- os.replace 的存在与语义（跨平台覆盖）仅由 CPython 3.13 的 pathlib 源码文档串（Path.replace 委托 os.replace 且目标存在时覆盖）间接确认，未读到 3.x 官方 os.replace 小节。
+- os.stat_result 的 st_mtime_ns/st_ctime_ns 纳秒字段、st_ino 在 Windows 的可用性、以及 os.pathconf 读取 NAME_MAX 的具体可用性，均未在抓取到的文档片段中确认。
+- F2 的撤销实现细节（journal 文件位置、失败回滚语义、是否支持链式撤销）未确认：相关官方指南位于 f2.freshman.tech，超出本次允许抓取范围。
+- brename 的 .brename_detail.txt 日志格式、是否 fsync 落盘、部分失败时 undo 的行为（仅见 -U/--force-undo 选项名）未确认。
+- RnR dump 文件的持久化与崩溃语义、以及 undo 遇新冲突时的处理，README 未说明，未确认。
+- GUI 类别行为仅见搜索摘要，未从官方文档确认：Total Commander 多重重命名工具（预览列表与执行前告警）、Advanced Renamer（声称可撤销整批）、Windows 资源管理器与 PowerShell Rename-Item 的 -WhatIf/-Confirm 语义。
+- 大小写不敏感文件系统（Windows/NTFS、macOS 默认 APFS）与 Unicode 规范化（NFC/NFD）导致的目标名等价冲突处理，未在任何抓取到的官方文档中核验；仅见 brename 关于 Windows 默认不敏感与 TEST.tar 覆盖的例子。
+- 网络文件系统上的日志与恢复语义未核验：仅知 NFS 上『rename 失败并不代表未改名』这一明确例外；SMB/exFAT 上的 fsync 与 journal 行为未知。
+- util-linux rename.c 的逐文件许可未核验（项目 COPYING 为 GNU GPL v2 文本，man 页源文件声明属公有领域，源码文件本身未见许可头）；是否 GPL-2.0-or-later 未确认。
+- 本次未运行、未 fuzz、未做崩溃注入或并发改名测试；所有结论均为模型阅读文档后的报告，不构成独立运行时或法律核验。
+- leaf.md 自身声明的来源限制（Android/Google 文件管理器未能抓取、各产品冲突对话框与名称长度限制未逐项验证）未被本次研究消除。

@@ -1,12 +1,38 @@
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
 
-export function Prose({ md, className }: { md: string; className?: string }) {
+export function resolveTypeMarkdownUrl(url: string) {
+  const value = url.trim();
+  if (!value || value.startsWith("#") || value.startsWith("/") || /^[a-z][a-z0-9+.-]*:/i.test(value)) {
+    return value;
+  }
+  const [before_hash, hash] = value.split("#", 2);
+  const [path, query] = before_hash.split("?", 2);
+  const filename = path.split("/").pop() || "";
+  if (!filename.toLowerCase().endsWith(".md")) return value;
+  let slug = filename.slice(0, -3);
+  try {
+    slug = decodeURIComponent(slug);
+  } catch {
+    return value;
+  }
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return value;
+  return `/types/${slug}${query ? `?${query}` : ""}${hash ? `#${hash}` : ""}`;
+}
+
+export function Prose({ md, className, resolveTypeLinks = false }: {
+  md: string;
+  className?: string;
+  resolveTypeLinks?: boolean;
+}) {
+  const urlTransform = resolveTypeLinks
+    ? (url: string) => defaultUrlTransform(resolveTypeMarkdownUrl(url))
+    : defaultUrlTransform;
   return (
     <div
       className={cn(
-        "prose prose-sm max-w-none text-ink-soft",
+        "prose prose-sm max-w-none overflow-x-auto text-ink-soft",
         "[&_h1,_h2,_h3,_h4]:font-serif [&_h1,_h2,_h3,_h4]:text-fg",
         "[&_h3]:text-[15px] [&_h4]:text-sm",
         "[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2",
@@ -20,7 +46,7 @@ export function Prose({ md, className }: { md: string; className?: string }) {
         className,
       )}
     >
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{md}</ReactMarkdown>
+      <ReactMarkdown remarkPlugins={[remarkGfm]} urlTransform={urlTransform}>{md}</ReactMarkdown>
     </div>
   );
 }

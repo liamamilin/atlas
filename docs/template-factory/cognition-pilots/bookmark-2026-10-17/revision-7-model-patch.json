@@ -1,0 +1,53 @@
+{
+ "spec_changes": [
+  {
+   "path": [
+    "architecture_markdown"
+   ],
+   "replacements": [
+    {
+     "old": "只有单条回收站 purge 才物理删除书签行。",
+     "new": "归类删除从不物理删除书签行，只有回收站 purge（单条 DELETE /api/trash/:id 或确认清空 DELETE /api/trash?confirm=true）才物理删除书签行。"
+    },
+    {
+     "old": "400 invalid_url（reason=control_character）",
+     "new": "400 invalid_url（details.reason=control_character）"
+    },
+    {
+     "old": "再 trim（空 → required）→ 码点 1–2048（url_too_long）→ WHATWG 解析（unparsable）→ scheme http/https（否则 unsupported_protocol）→ hostname 非空（host_required）→ userinfo 为空（userinfo_not_allowed）。",
+     "new": "再 trim（空 → 400 invalid_url，details.reason=required）→ 码点 1–2048（超限 → 400 invalid_url，details.reason=url_too_long）→ WHATWG 解析失败（400 invalid_url，details.reason=unparsable）→ scheme 非 http/https（400 unsupported_protocol，details.reason=unsupported_protocol）→ hostname 为空（400 invalid_url，details.reason=host_required）→ userinfo 非空（400 invalid_url，details.reason=userinfo_not_allowed）。"
+    },
+    {
+     "old": "同 url_key 且未 allowDuplicate=true → 409 duplicate_url，details.existingId 字符串。",
+     "new": "重复检查只比较 trashed_at 为空且 url_key 相同的活跃书签。存在活跃重复时：allowDuplicate 缺省或 false → 409 duplicate_url，details.existingId 为可打开的活跃记录十进制字符串；allowDuplicate=true（JSON 布尔 true 或 HTML 隐藏字段的字符串 true 规范化为布尔 true）→ 创建第二条；其它 allowDuplicate 形状 → 400 invalid_field。回收站记录不参与重复判断，软删除后重新保存同一 URL 直接 201。"
+    },
+    {
+     "old": "- GET /api/categories → 活跃归类，默认在前，其余按 name_key。",
+     "new": "- GET /api/categories → 活跃归类，默认在前，其余按 name_key；每个归类对象形状为 {id,name,isDefault,bookmarkCount,createdAt,updatedAt}，其中 bookmarkCount 为整数且只统计 trashed_at 为空的书签。POST /api/categories → 201 {category}，PATCH /api/categories/:id → 200 {category}，两处的 category 均为该形状并携带当前 bookmarkCount。"
+    },
+    {
+     "old": "- 删除归类对话框：[data-testid=category-delete-dialog]，含 button[data-testid=delete-cancel]、select[name=targetCategoryId]、button[data-testid=delete-move]、input[data-testid=confirm-purge]（checkbox）、button[data-testid=delete-purge]、[data-testid=dialog-error]。表单 action={basePath}/categories/{id}/delete；mode=move 或 mode=purge&confirm=true。未勾选确认时点 purge 必须在本地显示 dialog-error 且不发请求；服务端仍强制 mode/confirm；目标失效返回 400，对话框显示 dialog-error 且零写入。",
+     "new": "- 删除归类对话框：[data-testid=category-delete-dialog]，含 button[data-testid=delete-cancel]、[data-testid=dialog-error]，以及两个独立表单，二者 action 均为 {basePath}/categories/{id}/delete：move 表单含 select[name=targetCategoryId] + button[data-testid=delete-move]，提交 mode=move；purge 表单含 input[data-testid=confirm-purge]（checkbox）+ button[data-testid=delete-purge]，提交 mode=purge&confirm=true，且不得包含 select 或提交 targetCategoryId。未勾选确认时点 purge 必须在本地显示 dialog-error 且不发请求；服务端仍强制 mode/confirm；目标失效返回 400，对话框显示 dialog-error 且零写入；purge 成功依赖请求中始终没有 targetCategoryId。"
+    }
+   ]
+  },
+  {
+   "path": [
+    "decisions",
+    "D02",
+    "default"
+   ],
+   "old": "默认阻止并返回既有记录（API 为 409 duplicate_url + 十进制字符串 details.existingId；HTML 表单不写入、保留 url/title/note/categoryId、显示 form-error、提供既有记录链接与显式另存表单）。只有用户提交隐藏 allowDuplicate=true 才创建第二条；首次普通提交不得自动带 true。重复判断只使用 D05 的 url_key，不做模糊匹配。",
+   "new": "默认阻止并返回既有记录（API 为 409 duplicate_url + 十进制字符串 details.existingId；HTML 表单不写入、保留 url/title/note/categoryId、显示 form-error、提供既有记录链接与显式另存表单）。重复判断只检查 trashed_at 为空且 url_key 相同的活跃记录；回收站记录不参与，软删除后重新保存同一 URL 直接创建新记录，因此 details.existingId 与既有记录链接始终指向可打开的活跃记录。只有用户提交隐藏 allowDuplicate=true（JSON 布尔 true 或 HTML 隐藏字段的字符串 true 规范化为布尔 true）才创建第二条；首次普通提交不得自动带 true；其它 allowDuplicate 形状返回 400 invalid_field。重复判断只使用 D05 的 url_key，不做模糊匹配。"
+  },
+  {
+   "path": [
+    "decisions",
+    "D02",
+    "when_to_ask"
+   ],
+   "old": "用户反馈同一页面确实需要两份不同归类或备注，或导入后需要合并工具，或希望保存永不被打断；此时再决定是否把另存升级为默认。",
+   "new": "用户反馈同一页面确实需要两份不同归类或备注，或导入后需要合并工具，或希望保存永不被打断；此时再决定是否把另存升级为默认。回收站记录不参与重复判断、软删除后可重新保存，已由默认规则确定，不构成提问理由。"
+  }
+ ]
+}

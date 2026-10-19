@@ -1,0 +1,40 @@
+{
+  "scope": "local phase-handoff export only; no LLM, application or bundled acceptance execution",
+  "original_zip_sha256": "22a2b1e426c6eee0778459540aaf2d7dd34e390140a55e1ccda2bbb51e5b6a4b",
+  "original_version": "0.1.12",
+  "exports": [
+    {
+      "phase": "P0",
+      "prerequisite_phases": [],
+      "feature_count": 7,
+      "case_count": 11,
+      "negative_case_count": 4,
+      "decision_count": 9,
+      "blueprint_bytes": 996447,
+      "entry_files_bytes": 40333,
+      "byte_scope": "UTF-8 file sizes, not measured context usage, tokens, cost or speed",
+      "source_files_byte_identical": true,
+      "archive": "bookmark-v0.1.12-p0-handoff.zip",
+      "archive_sha256": "989f2e8519bc2467a4399494f501894e824d52ed5c404f2e2813f6d9e6acd8b5",
+      "phase_scope_warning": "Original P0 excludes category management and search; export does not rephase it."
+    },
+    {
+      "phase": "P2",
+      "prerequisite_phases": [
+        "P0",
+        "P1"
+      ],
+      "feature_count": 14,
+      "case_count": 33,
+      "negative_case_count": 10,
+      "decision_count": 9,
+      "blueprint_bytes": 996447,
+      "entry_files_bytes": 60737,
+      "byte_scope": "UTF-8 file sizes, not measured context usage, tokens, cost or speed",
+      "source_files_byte_identical": true,
+      "archive": "bookmark-v0.1.12-p2-handoff.zip",
+      "archive_sha256": "8e60f8a9265c4ca5b9f3180daf1601b1632983ec507cdd2a15f9025ce9f79658",
+      "phase_scope_warning": "Includes P0/P1 prerequisites and optional legacy features; not a newly redesigned core P0."
+    }
+  ]
+}

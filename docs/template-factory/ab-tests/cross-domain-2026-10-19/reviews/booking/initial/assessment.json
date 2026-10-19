@@ -1,0 +1,443 @@
+{
+  "summary": "本案例为 booking（社区共享设施预约与取消）的条件盲评估：三份匿名交付 M1/M2/M3 均 status=delivered、cli_status=completed，并在同一冻结 v3 oracle 下各自产生完整真实证据目录。按 rubric 的 9 个运行时核心 ID（K01–K07、KU01、KU02）逐项核对 result.json、http-events.json、browser-result.json、processes.json、provenance.json 与源码后，三者全部 passed：认证/越权 403、相邻可预约与同真实时刻 409、半开区间与非法时间 400、隐私与 owner 只取自会话、两次取消幂等并释放时段、双连接屏障并发恰一笔成功、真实新 PID 重启且重复 --init-demo 保留历史、真实浏览器控件写入并经只读 API 回读。差异集中在响应形态（200 或 201、{id} 或 {id,booking}、直接记录或 {booking}）与读接口是否要求登录，均属 oracle 明确声明为中性可接受，不构成结果级缺陷。因此不存在基于结果证据的胜者；本文不做数值打分。认知维度按 C01–C05 独立于运行时单独评定，三者也基本一致，仅 M2 文档出现一处指向未交付文件的引用。",
+  "applications": [
+    {
+      "label": "M1",
+      "delivery": "delivered；cli_status=completed；attempt=2（elapsed_all_attempts=512.42s）；application_hand_edits=false；execution=not_run；证据目录 evaluation/results/booking/M1/initial",
+      "core": [
+        {
+          "id": "K01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/http-events.json",
+            "source/M1/evidence/result.json"
+          ],
+          "reason": "未登录 GET /api/me 返回 401；错误口令 401；admin/alice/bob 登录各返回本人 id 与角色（admin 为 admin，alice/bob 为 resident），无伪造身份。"
+        },
+        {
+          "id": "K02",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/http-events.json",
+            "source/M1/application/api.py"
+          ],
+          "reason": "以居民会话携带 role=admin、user_id=admin 的 POST /api/resources 返回 403（api.py 仅按会话角色判定）；随后管理员成功创建会议室与活动室（201）。"
+        },
+        {
+          "id": "K03",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/http-events.json",
+            "source/M1/application/isoutil.py",
+            "source/M1/application/store.py"
+          ],
+          "reason": "10:00+08:00→11:00+08:00 与 11:00+08:00→12:00+08:00 相邻均 201；02:30Z→03:30Z 与首笔同一真实时刻返回 409；另一设施可约；无时区/相等/倒置/乱码分别 400。"
+        },
+        {
+          "id": "K04",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/http-events.json",
+            "source/M1/application/store.py"
+          ],
+          "reason": "居民 GET /api/bookings/2 返回 403；携伪造 admin 字段取消他人预约返回 403；availability 仅含 start/end；admin 携伪造 user_id 下单后 owner_id 仍为会话用户 2；admin 列表可见全部记录。"
+        },
+        {
+          "id": "K05",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/http-events.json",
+            "source/M1/application/store.py"
+          ],
+          "reason": "对 id=1 连续两次取消均 200 且 status=cancelled、行保留；随后同设施同时段重新预约成功（id=5），说明原时段已释放。"
+        },
+        {
+          "id": "K06",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/result.json",
+            "source/M1/evidence/http-events.json"
+          ],
+          "reason": "K06 明细 genuine_two_connection_barrier=true，两结果串行化为 409 与 201；后续列表仅出现 id=6 一笔，持久唯一。"
+        },
+        {
+          "id": "K07",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/processes.json",
+            "source/M1/evidence/http-events.json",
+            "source/M1/application/auth.py"
+          ],
+          "reason": "processes.json 记录两个不同 PID 使用同一 data-dir 且均带 --init-demo；重启后 admin 登录成功，GET /api/bookings 仍保有 id1–id6 全部历史；alice 登出后 /api/me 401。"
+        },
+        {
+          "id": "KU01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/browser-result.json"
+          ],
+          "reason": "browser-result 记录真实 UI 控件登录 admin 后经页面发出 POST /api/resources 得 201，pageErrors 与 blocked 均为空。"
+        },
+        {
+          "id": "KU02",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/browser-result.json"
+          ],
+          "reason": "居民 alice 经真实控件输入带偏移 ISO8601，页面 POST /api/bookings 得 201；随后页面 GET /api/bookings 回读出现 id=7（浏览器活动室、2032-07-12 时段），bodyText 显示预约提交成功。"
+        }
+      ],
+      "cognition": [
+        {
+          "id": "C01",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/README.md",
+            "source/M1/application/DECISIONS.md"
+          ],
+          "reason": "README 明确列出 P0 F01–F11 与文件结构/API 表/限制，并有独立的后续路线（尚未实现）段；DECISIONS 另有明确不在本期范围段，未把遗漏伪装成未来工作。"
+        },
+        {
+          "id": "C02",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/DECISIONS.md",
+            "source/M1/application/store.py",
+            "source/M1/application/db.py",
+            "source/M1/application/auth.py"
+          ],
+          "reason": "D01–D08 逐条给出采用值、理由与被否替代（如拒 PostgreSQL EXCLUDE），且与代码一致：BEGIN IMMEDIATE+半开区间重叠查询、部分唯一索引、PBKDF2 加盐、服务端会话。"
+        },
+        {
+          "id": "C03",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/README.md"
+          ],
+          "reason": "P0 已覆盖登录→管理员建设施→居民预约/查看/取消→重启一致的完整旅程；后续路线（审批、设施规则、日历、配额、审计通知）围绕同一设施管理员/居民用户，未引入未要求的企业级范围。"
+        },
+        {
+          "id": "C04",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/DECISIONS.md"
+          ],
+          "reason": "仍需人类决定段列出审批触发条件、配额/等待名单/信用、取消保留期与删除权、公网身份、多进程/PostgreSQL 等真实未决项；同时把可逆选择作为默认落地并记录。"
+        },
+        {
+          "id": "C05",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/DECISIONS.md",
+            "source/M1/delivery.json",
+            "source/M1/source-audit.json"
+          ],
+          "reason": "DECISIONS 自检状态与 README 均声明生成期不执行程序、验收用例 not_run；delivery.json self_checks=not_run、execution=not_run；operator 的 source-audit 与源码观察另列为源级发现，未混称运行事实。"
+        }
+      ],
+      "root_causes": [],
+      "limits": [
+        "并发保证仅限单进程 SQLite BEGIN IMMEDIATE；单项并发探针是有限证据，非原子性/安全证明。",
+        "源码观察：.session-box 设 display:flex 会覆盖 hidden，登录前顶栏登出按钮可能可见；无对应核心 ID、且浏览器证据未覆盖登录前页面，故不改判运行时结论。",
+        "operator-visual-observations 声称已查看截图，但本次仅有文本证据，未进行独立视觉核对。",
+        "浏览器提交后下拉回到首个设施（记录为可逆 UX 观察），已由只读 API 回读确认写入正确。"
+      ]
+    },
+    {
+      "label": "M2",
+      "delivery": "delivered；cli_status=completed；attempt=1（elapsed_all_attempts=287.53s）；application_hand_edits=false；execution=not_run；证据目录 evaluation/results/booking/M2/initial",
+      "core": [
+        {
+          "id": "K01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/http-events.json",
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "未登录 /api/me 401；错误口令 401；三账号登录返回本人 id 与角色（admin/admin，alice、bob/resident）。"
+        },
+        {
+          "id": "K02",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/http-events.json",
+            "source/M2/application/api.py"
+          ],
+          "reason": "居民会话携 role=admin/user_id=admin 建设施返回 403；管理员随后创建两设施成功（201，返回 {id}）。"
+        },
+        {
+          "id": "K03",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/http-events.json",
+            "source/M2/application/timeutil.py"
+          ],
+          "reason": "相邻 +08:00 时段均 201；02:30Z→03:30Z 与已存在时段同一真实时刻 409；他设施可约；无时区、相等、倒置、非法文本分别 400。"
+        },
+        {
+          "id": "K04",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/http-events.json",
+            "source/M2/application/api.py"
+          ],
+          "reason": "居民查/取消他人预约均 403；availability 仅 start/end；admin 携伪造 user_id 下单 owner_id 仍为会话用户 2；admin 列表返回全部。"
+        },
+        {
+          "id": "K05",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/http-events.json",
+            "source/M2/application/api.py"
+          ],
+          "reason": "同一预约两次取消均 200、status=cancelled 且行保留；同设施同时段重新预约成功（id=5），时段被释放。"
+        },
+        {
+          "id": "K06",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "K06 明细 genuine_two_connection_barrier=true，两结果 409 与 201；后续列表 id=6 唯一持久。"
+        },
+        {
+          "id": "K07",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/processes.json",
+            "source/M2/evidence/server-1.log",
+            "source/M2/evidence/server-2.log",
+            "source/M2/evidence/http-events.json"
+          ],
+          "reason": "两个不同 PID 复用同一 data-dir 且带 --init-demo；server-1 记录初始化演示账号而 server-2 无重置输出；重启后历史记录完整，登录成功，登出后 /api/me 401。"
+        },
+        {
+          "id": "KU01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/browser-result.json"
+          ],
+          "reason": "真实 UI 控件登录 admin 后页面 POST /api/resources 得 201；pageErrors、blocked 为空。"
+        },
+        {
+          "id": "KU02",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/browser-result.json"
+          ],
+          "reason": "居民经真实控件提交预约，页面 POST /api/bookings 得 201，随后 GET /api/bookings 回读出现 #7 及 2032-07-12 时段，bodyText 显示预约成功。"
+        }
+      ],
+      "cognition": [
+        {
+          "id": "C01",
+          "outcome": "supported",
+          "evidence": [
+            "source/M2/application/README.md",
+            "source/M2/application/DECISIONS.md"
+          ],
+          "reason": "README 分列已实现 P0 F01–F11、已知边界与后续路线；DECISIONS 有明确越界段并与交付声明分离，未把缺失功能包装为已完成。"
+        },
+        {
+          "id": "C02",
+          "outcome": "supported",
+          "evidence": [
+            "source/M2/application/DECISIONS.md",
+            "source/M2/application/api.py",
+            "source/M2/application/db.py"
+          ],
+          "reason": "10 条默认均含理由与被拒替代（含全局唯一索引与部分唯一索引的取舍、BEGIN IMMEDIATE、PBKDF2）；第 10 条主动记录读接口要求登录这一可逆选择，与 api.py 实现一致。"
+        },
+        {
+          "id": "C03",
+          "outcome": "supported",
+          "evidence": [
+            "source/M2/application/README.md"
+          ],
+          "reason": "P0 完成管理员建设施、居民预约查看取消与重启一致的旅程；后续 6 条为审批、设施规则、通知/日历、封禁/配额、审计保留、PostgreSQL 迁移，均面向同一用户且无冗余企业范围。"
+        },
+        {
+          "id": "C04",
+          "outcome": "supported",
+          "evidence": [
+            "source/M2/application/DECISIONS.md"
+          ],
+          "reason": "仍未决的人类决策列出审批、收费押金、配额/等待名单、保留期、PostgreSQL 等触发条件，并声明不阻塞当前交付。"
+        },
+        {
+          "id": "C05",
+          "outcome": "partial",
+          "evidence": [
+            "source/M2/application/README.md",
+            "source/M2/application/DECISIONS.md",
+            "source/M2/delivery.json"
+          ],
+          "reason": "文档总体诚实地把交付声明与 not_run 分开（delivery.json self_checks=not_run、execution=not_run），但 README/DECISIONS 指引操作员运行 acceptance/run.py，而交付清单与 delivery.json 文件表均不含该文件，属指向未交付产物的可核验性瑕疵，故只评部分支持。"
+        }
+      ],
+      "root_causes": [],
+      "limits": [
+        "并发保证限于单进程 BEGIN IMMEDIATE 串行写事务；单个两连接探针不能推广为全部交错下的安全证明。",
+        "源码观察：设施名静默截断至 120、备注截断至 500，超出冻结夹具规模，未做运行时主张。",
+        "文档引用的 acceptance/run.py 不在 source_inventory 与交付文件表中，无法核对其存在与结论。",
+        "仅有文本证据，未独立查看浏览器截图。"
+      ]
+    },
+    {
+      "label": "M3",
+      "delivery": "delivered；cli_status=completed；attempt=1（elapsed_all_attempts=173.37s）；application_hand_edits=false；execution=not_run；证据目录 evaluation/results/booking/M3/initial-oracle-v3（v2 原跑保留于 initial/，use_for_current_comparison=false）",
+      "core": [
+        {
+          "id": "K01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/http-events.json",
+            "source/M3/evidence/result.json"
+          ],
+          "reason": "未登录 /api/me 401；错误口令 401；三账号登录各自返回本人 id 与角色（admin/admin，alice、bob/resident）。"
+        },
+        {
+          "id": "K02",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/http-events.json",
+            "source/M3/application/api.py"
+          ],
+          "reason": "居民携伪造 role=admin/user_id=admin 建设施返回 403；管理员随后创建两设施成功（200，返回 {id}）。"
+        },
+        {
+          "id": "K03",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/http-events.json",
+            "source/M3/application/times.py"
+          ],
+          "reason": "相邻时段均成功；同一真实时刻不同偏移重叠 409；另一设施可约；缺时区、相等、倒置、非法时间分别 400。"
+        },
+        {
+          "id": "K04",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/http-events.json",
+            "source/M3/application/api.py"
+          ],
+          "reason": "居民查看/取消他人预约 403；availability 仅 start/end（无个人字段）；admin 携伪造 user_id 下单 owner_id 仍为会话用户 2；admin 列表可见全部。"
+        },
+        {
+          "id": "K05",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/http-events.json",
+            "source/M3/application/api.py"
+          ],
+          "reason": "对同一预约两次取消均 200、cancelled 且记录保留；随后同时段重新预约成功（id=5），原时段释放。"
+        },
+        {
+          "id": "K06",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/result.json",
+            "source/M3/round-provenance.json"
+          ],
+          "reason": "v3 重跑 K06 明细 genuine_two_connection_barrier=true，结果 409 与 200（契约接受任意 2xx）；v2 因工具故障未执行该检查的原跑被保留但标记 use_for_current_comparison=false。"
+        },
+        {
+          "id": "K07",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/processes.json",
+            "source/M3/evidence/http-events.json",
+            "source/M3/application/auth.py"
+          ],
+          "reason": "两个不同 PID 复用同一 data-dir 且重复 --init-demo；重启后记录完整、admin 登录成功、alice 登出后 /api/me 401；auth.ensure_demo_users 仅缺失补建。"
+        },
+        {
+          "id": "KU01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/browser-result.json"
+          ],
+          "reason": "真实 UI 控件登录 admin 后 POST /api/resources 得 200；pageErrors、blocked 为空。"
+        },
+        {
+          "id": "KU02",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/browser-result.json"
+          ],
+          "reason": "居民经真实控件提交预约，POST /api/bookings 得 200，随后 GET /api/bookings 回读出现设施 #3 与 2032-07-12 时段，bodyText 显示预约成功，编号 #7。"
+        }
+      ],
+      "cognition": [
+        {
+          "id": "C01",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/README.md",
+            "source/M3/application/DECISIONS.md"
+          ],
+          "reason": "README 分别列出已实现范围、数据与依赖边界、后续路线与文件结构；DECISIONS 有明确不在范围内段，交付声明与未实现项界限清楚。"
+        },
+        {
+          "id": "C02",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/DECISIONS.md",
+            "source/M3/application/times.py",
+            "source/M3/application/api.py"
+          ],
+          "reason": "8 条默认含理由与被否替代（内存状态、普通唯一索引、明文口令、请求体放角色等）；第 2 条说明 3.10 fromisoformat 不支持 Z 并在解析层归一，与 times.py 实现一致；第 4 条 200 取舍与证据一致。"
+        },
+        {
+          "id": "C03",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/README.md"
+          ],
+          "reason": "P0 完成核心旅程；后续路线为设施编辑/停用、改期、会话过期、审计与并发压测、多设施占用视图，服务同一用户且未强加企业权限/计费范围。"
+        },
+        {
+          "id": "C04",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/DECISIONS.md"
+          ],
+          "reason": "仍需人决定列出会话过期/吊销、管理员是否代订、设施时间窗/容量、改期、留存清理等真实未知项，且不阻塞当前交付。"
+        },
+        {
+          "id": "C05",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/delivery.json",
+            "source/M3/application/README.md",
+            "source/M3/source-audit.json"
+          ],
+          "reason": "delivery.json self_checks=not_run、execution=not_run；README/DECISIONS 未伪称已测或已上线；源级安全/持久化结论明确标注为源审而非运行时，未编造许可、研究或运行事实。"
+        }
+      ],
+      "root_causes": [],
+      "limits": [
+        "会话不设过期（作者已在 DECISIONS 记录为范围简化）；不算核心缺陷但属已知边界。",
+        "GET /api/resources 与 /api/availability 允许匿名读取，仅返回名称与占用时间，无个人字段；契约未禁止，故不影响核心 ID。",
+        "并发保证来自单进程 BEGIN IMMEDIATE 写锁，一次两连接探针为有限证据，非跨进程/跨主机安全证明。",
+        "本次仅有文本证据，未独立查看浏览器截图。"
+      ]
+    }
+  ],
+  "cross_application_observations": [
+    "三份交付均 status=delivered 且 cli_status=completed，9 个核心运行时 ID 全部 passed，无 unverified/partial/failed；未发现任何 setup 或工具错误导致的降级结论。",
+    "接口形态差异属 oracle 明确的中性可接受项：M1/M2 创建返回 201、M3 返回 200；M1 返回 {id,booking}，M2/M3 返回 {id}；M1/M2 预约详情包裹 {booking}，M3 直接返回记录——均与冻结契约兼容，无结果级优劣。",
+    "读接口鉴权选择不同：M1/M2 要求登录才能列设施/可用性，M3 允许匿名只读；两者均不泄露居民身份、备注或他人预约，K04 均通过，不构成缺陷。",
+    "并发证据一致：三者均在双连接屏障下恰一笔成功、另一笔 409，且后续列表仅一笔持久；单次探针是有限证据，不能外推为全部交错或安全认证。",
+    "浏览器证据均通过共享 data-testid 触发真实写入并用只读 API 回读，页面无 JS 错误；但所有结论基于文本证据，截图未由本评估独立查看。",
+    "认知维度差异很小：C01–C04 三者均 supported；仅 M2 的 C05 因文档指引运行未随交付提供的 acceptance/run.py 而评 partial。",
+    "在结果与认知证据上三者接近等价，本评估刻意不给出数值总分，也不强制产生唯一胜者。"
+  ],
+  "limits": [
+    "本评估为只读、条件盲的静态源码+既有证据复核，未执行任何应用或测试，所有运行结论依赖 operator/harness 记录的真实证据文件。",
+    "截图仅以文本方式呈现，未独立视觉核对；operator-visual-observations 仅为操作员声明。",
+    "并发、密码哈希与绑定保证仅由单项探针与源码审阅支持，不构成完整安全或原子性证明。",
+    "外部网络被禁止；未进行联网、安装或对等访问，未验证真实重启以外的部署形态。",
+    "单应用证据不支持任何通用性能/令牌/价格层面的结论。"
+  ]
+}

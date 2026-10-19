@@ -1,0 +1,95 @@
+{
+  "summary": "静态独立审阅，未运行任何程序、未连接目标、未执行重启或浏览器验收。该蓝图的范围、产品闭环、决策默认值与证据诚实性总体成立：单人个人书签库的保存—归类—检索—打开主线清楚，P0–P2 交付顺序合理，未把 P3、账号、分享、快照等后置或不适用的能力冒充为当前能力。主要问题集中在验收与架构契约的一致性：A03/A17/A20 依赖架构未定义的 invalid_category reason；A30 对单条永久删除/清空的本地拦截、跳转和分类文本断言超出已声明 UI 契约；A09 的 Host/Origin 负例未覆盖 HTML 表单写入，存在安全负例覆盖缺口。因此静态审阅不能判定该冻结包可直接交接；所有阶段与用例仍为 not implemented/not_run，未声称任何测试通过。",
+  "checks": [
+    {
+      "dimension": "category_evidence",
+      "outcome": "passed",
+      "files": [
+        "CATEGORY.md",
+        "README.md"
+      ],
+      "reason": "CATEGORY.md 将多来源一致的类别事实、本场景建议和未知项分开陈述；S02–S23 给出来源与许可信息（linkding MIT，Linkwarden/Karakeep AGPL-3.0），并明确标注 Raindrop 仅取得搜索摘要、Pinboard 未验证、未做许可证法律审查、未运行产品。没有把建议或摘要写成已验证事实，也区分了原稿研究日期与当前来源访问日期。"
+    },
+    {
+      "dimension": "scenario_scope",
+      "outcome": "passed",
+      "files": [
+        "PRODUCT.md",
+        "ROADMAP.md"
+      ],
+      "reason": "产品围绕场景的保存—归类—检索—打开闭环，明确 R01 单用户、R03 共享读者/协作者本期不存在，P0–P2 只交付保存、持久化、归类、回收站、编辑、检索与浏览；多设备同步、浏览器扩展、公开分享、标签、快照等均明确后置或排除，没有扩张到企业权限或协作场景。"
+    },
+    {
+      "dimension": "product_completeness",
+      "outcome": "passed",
+      "files": [
+        "PRODUCT.md",
+        "DECISIONS.md",
+        "ARCHITECTURE.md"
+      ],
+      "reason": "已覆盖主要用户、正常与失败路径、数据生命周期（默认归类、重复、软删除、恢复、永久删除、清空、归类 tombstone）、访问边界（无账号、回环监听、Host/Origin、无公开分享）、备份与恢复说明，以及不适用的计费、后台、审计、协作能力。导出/导入明确列为 P3 而未宣称当前可用，符合场景的最小范围。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "outcome": "blocked",
+      "files": [
+        "ARCHITECTURE.md",
+        "acceptance/README.md",
+        "acceptance/p1-edit.cjs"
+      ],
+      "reason": "架构主干完整，数据模型、事务不变量、URL/标题/备注规则、HTTP 错误信封和适配器边界都较清楚；但 §4/§6 没有定义 POST/PATCH/restore 在归类不存在或已 tombstone 时的 invalid_category details.reason=unknown_or_deleted，而 A03/A17/A20 强制该值。§8 也未定义单条 trash-delete 与清空表单未确认时的本地报错/不发请求行为、部分成功表单的 303 目标，以及 category-link/bookmark-category 的文本是否允许包含计数；A29–A31 却按未声明的具体文本和本地拦截断言。上述缺口会让严格遵循架构的实现出现假失败。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "outcome": "blocked",
+      "files": [
+        "acceptance/plan.json",
+        "acceptance/p0-limits.cjs",
+        "acceptance/p1-categories.cjs",
+        "acceptance/p1-edit.cjs",
+        "acceptance/p1-trash.cjs",
+        "acceptance/ui-p1.cjs"
+      ],
+      "reason": "F01–F14 与 A01–A33 的双向映射完整，程序使用真实 HTTP/浏览器而非空桩，且大量断言检查读回、计数守恒、零写入和负路径。但 A09 的 Host/Origin/Sec-Fetch-Site 负例只覆盖 API POST 与 GET，没有覆盖保存、移动、编辑、删除、归类删除、恢复等 HTML 表单写入；若实现只在 API 路由上校验 Host/Origin，仍可通过现有用例，属于安全负例覆盖缺口。A30 还要求未确认的单条永久删除/清空产生本地错误且不发请求，并依赖未声明的跳转和分类链接精确文本；A03/A17/A20 依赖未声明的 invalid_category reason。另需注意这些程序全部为 not_run，不能作为已通过证据。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "outcome": "passed",
+      "files": [
+        "DECISIONS.md",
+        "AGENT.md"
+      ],
+      "reason": "D01–D09 均给出明确默认值、采用理由、影响面和 When to ask 触发条件；例如单归属+默认未分类、重复默认阻止、归类删除二选一、默认不抓取元数据、无账号、回收站不过期、P3 导入导出、重启与破坏性操作边界。AGENT.md 明确把 proposed 决策视为待采纳建议，不冒充用户已确认，符合尊重既有决定的要求。"
+    },
+    {
+      "dimension": "agent_handoff",
+      "outcome": "passed",
+      "files": [
+        "AGENT.md",
+        "README.md",
+        "ROADMAP.md"
+      ],
+      "reason": "交接要求先核对已有项目、指令和已确认决定，再读文档；按当前阶段实现完整用户闭环，后期或不适用能力保持真实状态；准备专用测试实例，记录实际命令、目标版本、通过/失败/未完成及日志；明确不得删除行为断言、硬编码测试值或声称未运行测试通过。README 与 ROADMAP 提供阶段入口和验收边界，足以让后续实现者分阶段推进。"
+    },
+    {
+      "dimension": "evidence_honesty",
+      "outcome": "passed",
+      "files": [
+        "README.md",
+        "VALIDATION.md",
+        "acceptance/README.md",
+        "acceptance/plan.json"
+      ],
+      "reason": "README 与 VALIDATION 明确该包是候选而非已实现应用，未运行验收、未连接目标、未执行重启或浏览器；acceptance/README 与 plan.json 将 P0–P2 标为 not implemented、A01–A33 标为 not_run，并区分 incomplete 与 pass。未发现把静态审阅、结构校验或模型调研报告冒充执行通过的情况；证据诚实性良好。"
+    }
+  ],
+  "suggestions": [
+    "在 ARCHITECTURE §4/§6 明确 invalid_category 的 reason 枚举（至少 unknown_or_deleted），并同步 A03/A17/A20；否则放宽这些断言，只校验错误码。",
+    "在 ARCHITECTURE §8 明确单条 trash-delete 与清空表单未确认时的本地拦截/错误文案/零请求要求，明确成功表单的 303 目标，以及 category-link、bookmark-category 的文本契约（名称还是含计数）；否则修改 A29–A31 使用 contains 或 data 属性定位。",
+    "扩展 A09/A28 或新增安全用例：对保存、移动、编辑、删除、归类删除、恢复等 HTML 表单 POST 发送错误 Host、Origin:null、外站 Origin、Sec-Fetch-Site:cross-site，断言 400/403 且零写入；并覆盖 /api/trash 与归类写接口。",
+    "为 D02 增加“回收站记录不参与重复判断、软删除后同 URL 重新保存直接 201”的用例；为 D03 增加 tombstone 名称复用及回收站记录不进入 /c/{id} 的检查。",
+    "将空库/空回收站、搜索表单保留 categoryId/sort/limit、sort-form 无 JS 路径等已声明行为补成自动用例，或继续明确标为手工观察且不纳入发布门槛。",
+    "若 P0 不希望暴露归类下拉，调整 A28 对 select[name=categoryId] 的依赖；否则在 ARCHITECTURE 明确 P0 也渲染仅含默认归类的 select，避免 P0 用例要求 P1 元素。",
+    "清理 A30 中 assertEqual(条件, true) 之类前置断言，避免把夹具状态当作行为证据；补充 allowDuplicate 非法形状、POST categoryId 对象/数组、标题/备注非字符串等负例。"
+  ]
+}

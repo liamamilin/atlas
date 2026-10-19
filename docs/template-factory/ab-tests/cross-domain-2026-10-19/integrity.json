@@ -1,0 +1,177 @@
+{
+  "status": "all_expected_initial_cells_accounted_for_and_receipts_consistent",
+  "missing_initial_cells": [],
+  "pending_runtime_evidence": [],
+  "pending_stages": [],
+  "cells": {
+    "budget/M1/initial": {
+      "delivery_status": "delivered",
+      "runtime_evidence": "v3/source/result/tool hashes match",
+      "application_matches_delivery": true
+    },
+    "budget/M2/initial": {
+      "delivery_status": "failed_delivery",
+      "runtime_evidence": "v3 explicit not_run; failed delivery receipt hash matches"
+    },
+    "budget/M3/initial": {
+      "delivery_status": "delivered",
+      "runtime_evidence": "v3/source/result/tool hashes match",
+      "application_matches_delivery": true
+    },
+    "budget/M3/repair": {
+      "delivery_status": "delivered",
+      "runtime_evidence": "v3/source/result/tool hashes match",
+      "application_matches_delivery": true
+    },
+    "booking/M1/initial": {
+      "delivery_status": "delivered",
+      "runtime_evidence": "v3/source/result/tool hashes match",
+      "application_matches_delivery": true
+    },
+    "booking/M2/initial": {
+      "delivery_status": "delivered",
+      "runtime_evidence": "v3/source/result/tool hashes match",
+      "application_matches_delivery": true
+    },
+    "booking/M3/initial": {
+      "delivery_status": "delivered",
+      "runtime_evidence": "v3/source/result/tool hashes match",
+      "application_matches_delivery": true
+    },
+    "rename/M1/initial": {
+      "delivery_status": "delivered",
+      "runtime_evidence": "v3/source/result/tool hashes match",
+      "application_matches_delivery": true,
+      "exploratory_evidence": "EP01 posthoc/source/result/tool hashes match; core unchanged"
+    },
+    "rename/M2/initial": {
+      "delivery_status": "delivered",
+      "runtime_evidence": "v3/source/result/tool hashes match",
+      "application_matches_delivery": true,
+      "exploratory_evidence": "EP01 posthoc/source/result/tool hashes match; core unchanged"
+    },
+    "rename/M2/repair": {
+      "delivery_status": "delivered",
+      "runtime_evidence": "v3/source/result/tool hashes match",
+      "application_matches_delivery": true,
+      "exploratory_evidence": "EP01 posthoc/source/result/tool hashes match; core unchanged"
+    },
+    "rename/M3/initial": {
+      "delivery_status": "delivered",
+      "runtime_evidence": "v3/source/result/tool hashes match",
+      "application_matches_delivery": true,
+      "exploratory_evidence": "EP01 posthoc/source/result/tool hashes match; core unchanged"
+    }
+  },
+  "stages": {
+    "runs/budget/M1/initial/attempt-1/scenario-review": {
+      "input_identity_checks": "passed",
+      "status": "cli_finished",
+      "failure": null,
+      "attachment": "none"
+    },
+    "runs/budget/M2/initial/attempt-1/scenario-review": {
+      "input_identity_checks": "passed",
+      "status": "failure_preserved",
+      "failure": {
+        "status": "failed_delivery",
+        "error": "",
+        "scope": "transport/protocol attempt retained; partial app is not a successful delivery"
+      },
+      "attachment": "supplied according to host input-freeze and driver branch; raw CLI argv/provider payload not independently captured"
+    },
+    "runs/budget/M2/initial/attempt-2/scenario-review": {
+      "input_identity_checks": "passed",
+      "status": "failure_preserved",
+      "failure": {
+        "status": "failed_delivery",
+        "error": "",
+        "scope": "transport/protocol attempt retained; partial app is not a successful delivery"
+      },
+      "attachment": "supplied according to host input-freeze and driver branch; raw CLI argv/provider payload not independently captured"
+    },
+    "runs/budget/M3/initial/attempt-1/scenario-review": {
+      "input_identity_checks": "passed",
+      "status": "cli_finished",
+      "failure": null,
+      "attachment": "none"
+    },
+    "runs/budget/M3/repair/attempt-1/scenario-review": {
+      "input_identity_checks": "passed",
+      "status": "cli_finished",
+      "failure": null,
+      "attachment": "none"
+    },
+    "runs/booking/M1/initial/attempt-1/scenario-review": {
+      "input_identity_checks": "passed",
+      "status": "failure_preserved",
+      "failure": {
+        "status": "failed_delivery",
+        "error": "",
+        "scope": "transport/protocol attempt retained; partial app is not a successful delivery"
+      },
+      "attachment": "supplied according to host input-freeze and driver branch; raw CLI argv/provider payload not independently captured"
+    },
+    "runs/booking/M1/initial/attempt-2/scenario-review": {
+      "input_identity_checks": "passed",
+      "status": "cli_finished",
+      "failure": null,
+      "attachment": "supplied according to host input-freeze and driver branch; raw CLI argv/provider payload not independently captured"
+    },
+    "runs/booking/M2/initial/attempt-1/scenario-review": {
+      "input_identity_checks": "passed",
+      "status": "cli_finished",
+      "failure": null,
+      "attachment": "none"
+    },
+    "runs/booking/M3/initial/attempt-1/scenario-review": {
+      "input_identity_checks": "passed",
+      "status": "cli_finished",
+      "failure": null,
+      "attachment": "none"
+    },
+    "runs/rename/M1/initial/attempt-1/scenario-review": {
+      "input_identity_checks": "passed",
+      "status": "cli_finished",
+      "failure": null,
+      "attachment": "none"
+    },
+    "runs/rename/M2/initial/attempt-1/scenario-review": {
+      "input_identity_checks": "passed",
+      "status": "cli_finished",
+      "failure": null,
+      "attachment": "none"
+    },
+    "runs/rename/M2/repair/attempt-1/scenario-review": {
+      "input_identity_checks": "passed",
+      "status": "cli_finished",
+      "failure": null,
+      "attachment": "none"
+    },
+    "runs/rename/M3/initial/attempt-1/scenario-review": {
+      "input_identity_checks": "passed",
+      "status": "failure_preserved",
+      "failure": {
+        "status": "failed_delivery",
+        "error": "[\"{'type': 'provider.invalid-output', 'message': 'OpenAI Chat stream ended without finish_reason', 'status': 200}\"]",
+        "scope": "transport/protocol attempt retained; partial app is not a successful delivery"
+      },
+      "attachment": "supplied according to host input-freeze and driver branch; raw CLI argv/provider payload not independently captured"
+    },
+    "runs/rename/M3/initial/attempt-2/scenario-review": {
+      "input_identity_checks": "passed",
+      "status": "cli_finished",
+      "failure": null,
+      "attachment": "supplied according to host input-freeze and driver branch; raw CLI argv/provider payload not independently captured"
+    }
+  },
+  "normalized_author_configuration_hashes": [
+    "844ce8d35bc868e089b47602fe971a7584b39810fc472ddc56b7308e112ab952"
+  ],
+  "limits": [
+    "Input checks prove supplied local bytes and declared host driver branch, not complete provider context exposure.",
+    "Same common prompt prefix is followed by intentional condition instructions and optional observed repair feedback.",
+    "Source and evidence checks do not establish efficacy or security; independent runtime/review are separate.",
+    "Reviewers get original app documentation, which may reveal template provenance despite withheld mapping."
+  ]
+}

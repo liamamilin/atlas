@@ -1,0 +1,487 @@
+[
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-01",
+      "list"
+    ],
+    "returncode": 0,
+    "stdout": "{\"files\": [{\"name\": \"keep.txt\", \"size\": 12}, {\"name\": \"old-2.bin\", \"size\": 256}, {\"name\": \"old-甲.txt\", \"size\": 13}]}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-01",
+      "preview",
+      "--find",
+      "old",
+      "--replace",
+      "new",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-01/.atlas-renamer/plan.json"
+    ],
+    "returncode": 0,
+    "stdout": "{\"status\": \"preview\", \"operations\": [{\"old\": \"old-2.bin\", \"new\": \"new-2.bin\"}, {\"old\": \"old-甲.txt\", \"new\": \"new-甲.txt\"}], \"plan\": \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-01/.atlas-renamer/plan.json\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-01",
+      "apply",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-01/.atlas-renamer/plan.json"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "错误: apply 需要显式 --confirm\n"
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-01",
+      "apply",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-01/.atlas-renamer/plan.json",
+      "--confirm"
+    ],
+    "returncode": 0,
+    "stdout": "{\"status\": \"applied\", \"operations\": [{\"old\": \"old-2.bin\", \"new\": \"new-2.bin\"}, {\"old\": \"old-甲.txt\", \"new\": \"new-甲.txt\"}], \"receipt\": \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-01/.atlas-renamer/receipts/39e7c597a0a24e57bcc1b6bd7ad2a0a2.json\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-01",
+      "apply",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-01/.atlas-renamer/plan.json",
+      "--confirm"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "错误: 该计划已经执行过，拒绝重复执行\n"
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-01",
+      "undo",
+      "--receipt",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-01/.atlas-renamer/receipts/39e7c597a0a24e57bcc1b6bd7ad2a0a2.json"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "错误: undo 需要显式 --confirm\n"
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-01",
+      "undo",
+      "--receipt",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-01/.atlas-renamer/receipts/39e7c597a0a24e57bcc1b6bd7ad2a0a2.json",
+      "--confirm"
+    ],
+    "returncode": 0,
+    "stdout": "{\"status\": \"undone\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-02",
+      "preview",
+      "--find",
+      "old",
+      "--replace",
+      "new",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-02/.atlas-renamer/plan.json"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "错误: 目标文件已存在，拒绝生成计划: 'new-a'\n"
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-03",
+      "preview",
+      "--find",
+      "old",
+      "--replace",
+      "new",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-03/.atlas-renamer/plan.json"
+    ],
+    "returncode": 0,
+    "stdout": "{\"status\": \"preview\", \"operations\": [{\"old\": \"old-a\", \"new\": \"new-a\"}], \"plan\": \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-03/.atlas-renamer/plan.json\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-03",
+      "apply",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-03/.atlas-renamer/plan.json",
+      "--confirm"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "错误: 计划已过期，源文件内容已改变: old-a\n"
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-04",
+      "preview",
+      "--find",
+      "old",
+      "--replace",
+      "../escaped",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-04/.atlas-renamer/plan.json"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "错误: 替换结果不是合法文件名: '../escaped-a'（来自 'old-a'）\n"
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-04",
+      "preview",
+      "--find",
+      "old",
+      "--replace",
+      "/absolute/escape",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-04/.atlas-renamer/plan.json"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "错误: 替换结果不是合法文件名: '/absolute/escape-a'（来自 'old-a'）\n"
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-04",
+      "preview",
+      "--find",
+      "old",
+      "--replace",
+      "sub/name",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-04/.atlas-renamer/plan.json"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "错误: 替换结果不是合法文件名: 'sub/name-a'（来自 'old-a'）\n"
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-04",
+      "preview",
+      "--find",
+      "",
+      "--replace",
+      "x",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-04/.atlas-renamer/empty.json"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "错误: --find 不能为空（查找为字面文本，不是正则）\n"
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-05",
+      "preview",
+      "--find",
+      "old",
+      "--replace",
+      "new",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-05/.atlas-renamer/plan.json"
+    ],
+    "returncode": 0,
+    "stdout": "{\"status\": \"preview\", \"operations\": [{\"old\": \"old-a\", \"new\": \"new-a\"}], \"plan\": \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-05/.atlas-renamer/plan.json\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-05",
+      "apply",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-05/.atlas-renamer/plan.json",
+      "--confirm"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "错误: 计划包含非法文件名\n"
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-06",
+      "preview",
+      "--find",
+      "old",
+      "--replace",
+      "new",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-06/.atlas-renamer/plan.json"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "错误: 状态目录不能是符号链接\n"
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-07",
+      "preview",
+      "--find",
+      "old",
+      "--replace",
+      "new",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-07/.atlas-renamer/plan.json"
+    ],
+    "returncode": 0,
+    "stdout": "{\"status\": \"preview\", \"operations\": [{\"old\": \"old-a\", \"new\": \"new-a\"}], \"plan\": \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-07/.atlas-renamer/plan.json\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-07",
+      "apply",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-07/.atlas-renamer/plan.json",
+      "--confirm"
+    ],
+    "returncode": 0,
+    "stdout": "{\"status\": \"applied\", \"operations\": [{\"old\": \"old-a\", \"new\": \"new-a\"}], \"receipt\": \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-07/.atlas-renamer/receipts/3e0b1ffa69114c8b90d9aafb7cbdf0b3.json\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-07",
+      "undo",
+      "--receipt",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-07/.atlas-renamer/receipts/3e0b1ffa69114c8b90d9aafb7cbdf0b3.json",
+      "--confirm"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "错误: 撤销目标存在冲突或数据已改变，拒绝覆盖\n"
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-08",
+      "preview",
+      "--find",
+      "a.b",
+      "--replace",
+      "renamed",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-08/.atlas-renamer/plan.json"
+    ],
+    "returncode": 0,
+    "stdout": "{\"status\": \"preview\", \"operations\": [{\"old\": \"a.b.txt\", \"new\": \"renamed.txt\"}], \"plan\": \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-08/.atlas-renamer/plan.json\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-08",
+      "apply",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-08/.atlas-renamer/plan.json",
+      "--confirm"
+    ],
+    "returncode": 0,
+    "stdout": "{\"status\": \"applied\", \"operations\": [{\"old\": \"a.b.txt\", \"new\": \"renamed.txt\"}], \"receipt\": \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-08/.atlas-renamer/receipts/2f2f5a54df884923a59cd74281e0b291.json\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-09",
+      "preview",
+      "--find",
+      "old",
+      "--replace",
+      "new",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-09/.atlas-renamer/plan.json"
+    ],
+    "returncode": 0,
+    "stdout": "{\"status\": \"preview\", \"operations\": [{\"old\": \"old-a\", \"new\": \"new-a\"}], \"plan\": \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-09/.atlas-renamer/plan.json\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-09",
+      "apply",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-09/.atlas-renamer/plan.json",
+      "--confirm"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "错误: 源文件缺失或不是普通文件: old-a\n"
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-10",
+      "preview",
+      "--find",
+      "old",
+      "--replace",
+      "new",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/owned-outside-plan.json"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "错误: 路径必须位于状态目录内: /Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-10/.atlas-renamer\n"
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-11",
+      "preview",
+      "--find",
+      "old",
+      "--replace",
+      "new",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-11/.atlas-renamer/plan.json"
+    ],
+    "returncode": 0,
+    "stdout": "{\"status\": \"preview\", \"operations\": [{\"old\": \"old-a\", \"new\": \"new-a\"}], \"plan\": \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-11/.atlas-renamer/plan.json\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-11",
+      "apply",
+      "--plan",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-11/.atlas-renamer/plan.json",
+      "--confirm"
+    ],
+    "returncode": 0,
+    "stdout": "{\"status\": \"applied\", \"operations\": [{\"old\": \"old-a\", \"new\": \"new-a\"}], \"receipt\": \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-11/.atlas-renamer/receipts/d65f0fe176b449ac95703761a6bb2158.json\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+      "-B",
+      "app.py",
+      "--root",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-11",
+      "undo",
+      "--receipt",
+      "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M2/initial/fixture-11/.atlas-renamer/receipts/d65f0fe176b449ac95703761a6bb2158.json",
+      "--confirm"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "错误: 撤销目标存在冲突或数据已改变，拒绝覆盖\n"
+  }
+]

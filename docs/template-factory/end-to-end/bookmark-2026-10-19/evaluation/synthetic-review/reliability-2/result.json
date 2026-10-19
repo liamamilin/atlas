@@ -1,0 +1,14 @@
+{
+  "kind": "synthetic-runner-reliability",
+  "docker_cli_sent": false,
+  "product_started": false,
+  "tests": 4,
+  "result": "passed",
+  "checks": [
+    "Docker timeout is bounded and classified as environment block",
+    "cleanup proceeds and persists failed cleanup state after one cleanup timeout",
+    "initial journal is ordered before temporary state and fixture creation",
+    "KeyboardInterrupt during cleanup is written to interruption.json and later cleanup steps continue"
+  ],
+  "evidence": "unittest-output.txt"
+}

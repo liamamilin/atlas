@@ -1,0 +1,342 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/me",
+    "request": null,
+    "status": 401,
+    "response": "{\"error\": \"未登录\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/login",
+    "request": {
+      "username": "admin",
+      "password": "wrong"
+    },
+    "status": 401,
+    "response": "{\"error\": \"用户名或密码错误\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/login",
+    "request": {
+      "username": "admin",
+      "password": "AtlasDemo-Admin-9!"
+    },
+    "status": 200,
+    "response": "{\"user\": {\"id\": 1, \"username\": \"admin\", \"role\": \"admin\"}}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/login",
+    "request": {
+      "username": "alice",
+      "password": "AtlasDemo-Alice-9!"
+    },
+    "status": 200,
+    "response": "{\"user\": {\"id\": 2, \"username\": \"alice\", \"role\": \"resident\"}}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/login",
+    "request": {
+      "username": "bob",
+      "password": "AtlasDemo-Bob-9!"
+    },
+    "status": 200,
+    "response": "{\"user\": {\"id\": 3, \"username\": \"bob\", \"role\": \"resident\"}}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/me",
+    "request": null,
+    "status": 200,
+    "response": "{\"user\": {\"id\": 2, \"username\": \"alice\", \"role\": \"resident\"}}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/resources",
+    "request": {
+      "name": "伪造设施",
+      "role": "admin",
+      "user_id": "admin"
+    },
+    "status": 403,
+    "response": "{\"error\": \"只有管理员可以执行此操作\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/resources",
+    "request": {
+      "name": "会议室"
+    },
+    "status": 200,
+    "response": "{\"id\": 1}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/resources",
+    "request": {
+      "name": "活动室"
+    },
+    "status": 200,
+    "response": "{\"id\": 2}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/resources",
+    "request": null,
+    "status": 200,
+    "response": "{\"resources\": [{\"id\": 1, \"name\": \"会议室\"}, {\"id\": 2, \"name\": \"活动室\"}]}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/bookings",
+    "request": {
+      "resource_id": 1,
+      "start": "2030-06-01T10:00:00+08:00",
+      "end": "2030-06-01T11:00:00+08:00",
+      "note": "私密甲"
+    },
+    "status": 200,
+    "response": "{\"id\": 1}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/bookings",
+    "request": {
+      "resource_id": 1,
+      "start": "2030-06-01T11:00:00+08:00",
+      "end": "2030-06-01T12:00:00+08:00",
+      "note": "私密乙"
+    },
+    "status": 200,
+    "response": "{\"id\": 2}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/bookings",
+    "request": {
+      "resource_id": 1,
+      "start": "2030-06-01T02:30:00Z",
+      "end": "2030-06-01T03:30:00Z",
+      "note": "同真实时刻冲突"
+    },
+    "status": 409,
+    "response": "{\"error\": \"该时段与已有预约重叠，请另选时间\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/bookings",
+    "request": {
+      "resource_id": 2,
+      "start": "2030-06-01T10:00:00+08:00",
+      "end": "2030-06-01T11:00:00+08:00",
+      "note": "普通预约"
+    },
+    "status": 200,
+    "response": "{\"id\": 3}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/bookings",
+    "request": {
+      "resource_id": 1,
+      "start": "2030-06-01T10:00:00",
+      "end": "2030-06-01T11:00:00",
+      "note": "无效"
+    },
+    "status": 400,
+    "response": "{\"error\": \"时间必须包含时区偏移，例如 2026-11-01T10:00:00+08:00\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/bookings",
+    "request": {
+      "resource_id": 1,
+      "start": "2030-06-01T12:00:00Z",
+      "end": "2030-06-01T12:00:00Z",
+      "note": "无效"
+    },
+    "status": 400,
+    "response": "{\"error\": \"结束时间必须晚于开始时间\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/bookings",
+    "request": {
+      "resource_id": 1,
+      "start": "2030-06-01T13:00:00Z",
+      "end": "2030-06-01T12:00:00Z",
+      "note": "无效"
+    },
+    "status": 400,
+    "response": "{\"error\": \"结束时间必须晚于开始时间\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/bookings",
+    "request": {
+      "resource_id": 1,
+      "start": "bad",
+      "end": "bad",
+      "note": "无效"
+    },
+    "status": 400,
+    "response": "{\"error\": \"无法解析时间：bad\"}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/bookings/2",
+    "request": null,
+    "status": 403,
+    "response": "{\"error\": \"无权查看他人的预约\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/bookings/2/cancel",
+    "request": {
+      "user_id": "admin",
+      "role": "admin"
+    },
+    "status": 403,
+    "response": "{\"error\": \"无权取消他人的预约\"}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/bookings",
+    "request": null,
+    "status": 200,
+    "response": "{\"bookings\": [{\"id\": 1, \"resource_id\": 1, \"start\": \"2030-06-01T02:00:00+00:00\", \"end\": \"2030-06-01T03:00:00+00:00\", \"note\": \"私密甲\", \"status\": \"active\", \"owner_id\": 2}, {\"id\": 3, \"resource_id\": 2, \"start\": \"2030-06-01T02:00:00+00:00\", \"end\": \"2030-06-01T03:00:00+00:00\", \"note\": \"普通预约\", \"status\": \"active\", \"owner_id\": 2}]}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/availability?resource_id=1",
+    "request": null,
+    "status": 200,
+    "response": "{\"slots\": [{\"start\": \"2030-06-01T02:00:00+00:00\", \"end\": \"2030-06-01T03:00:00+00:00\"}, {\"start\": \"2030-06-01T03:00:00+00:00\", \"end\": \"2030-06-01T04:00:00+00:00\"}]}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/bookings",
+    "request": null,
+    "status": 200,
+    "response": "{\"bookings\": [{\"id\": 1, \"resource_id\": 1, \"start\": \"2030-06-01T02:00:00+00:00\", \"end\": \"2030-06-01T03:00:00+00:00\", \"note\": \"私密甲\", \"status\": \"active\", \"owner_id\": 2}, {\"id\": 3, \"resource_id\": 2, \"start\": \"2030-06-01T02:00:00+00:00\", \"end\": \"2030-06-01T03:00:00+00:00\", \"note\": \"普通预约\", \"status\": \"active\", \"owner_id\": 2}, {\"id\": 2, \"resource_id\": 1, \"start\": \"2030-06-01T03:00:00+00:00\", \"end\": \"2030-06-01T04:00:00+00:00\", \"note\": \"私密乙\", \"status\": \"active\", \"owner_id\": 3}]}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/me",
+    "request": null,
+    "status": 200,
+    "response": "{\"user\": {\"id\": 1, \"username\": \"admin\", \"role\": \"admin\"}}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/bookings",
+    "request": {
+      "resource_id": 1,
+      "start": "2030-06-02T10:00:00Z",
+      "end": "2030-06-02T11:00:00Z",
+      "note": "普通预约",
+      "user_id": 1,
+      "role": "admin"
+    },
+    "status": 200,
+    "response": "{\"id\": 4}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/bookings/4",
+    "request": null,
+    "status": 200,
+    "response": "{\"id\": 4, \"resource_id\": 1, \"start\": \"2030-06-02T10:00:00+00:00\", \"end\": \"2030-06-02T11:00:00+00:00\", \"note\": \"普通预约\", \"status\": \"active\", \"owner_id\": 2}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/me",
+    "request": null,
+    "status": 200,
+    "response": "{\"user\": {\"id\": 2, \"username\": \"alice\", \"role\": \"resident\"}}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/bookings/1/cancel",
+    "request": {},
+    "status": 200,
+    "response": "{\"id\": 1, \"resource_id\": 1, \"start\": \"2030-06-01T02:00:00+00:00\", \"end\": \"2030-06-01T03:00:00+00:00\", \"note\": \"私密甲\", \"status\": \"cancelled\", \"owner_id\": 2}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/bookings/1/cancel",
+    "request": {},
+    "status": 200,
+    "response": "{\"id\": 1, \"resource_id\": 1, \"start\": \"2030-06-01T02:00:00+00:00\", \"end\": \"2030-06-01T03:00:00+00:00\", \"note\": \"私密甲\", \"status\": \"cancelled\", \"owner_id\": 2}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/bookings",
+    "request": null,
+    "status": 200,
+    "response": "{\"bookings\": [{\"id\": 1, \"resource_id\": 1, \"start\": \"2030-06-01T02:00:00+00:00\", \"end\": \"2030-06-01T03:00:00+00:00\", \"note\": \"私密甲\", \"status\": \"cancelled\", \"owner_id\": 2}, {\"id\": 3, \"resource_id\": 2, \"start\": \"2030-06-01T02:00:00+00:00\", \"end\": \"2030-06-01T03:00:00+00:00\", \"note\": \"普通预约\", \"status\": \"active\", \"owner_id\": 2}, {\"id\": 4, \"resource_id\": 1, \"start\": \"2030-06-02T10:00:00+00:00\", \"end\": \"2030-06-02T11:00:00+00:00\", \"note\": \"普通预约\", \"status\": \"active\", \"owner_id\": 2}]}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/bookings",
+    "request": {
+      "resource_id": 1,
+      "start": "2030-06-01T10:00:00+08:00",
+      "end": "2030-06-01T11:00:00+08:00",
+      "note": "释放后重订"
+    },
+    "status": 200,
+    "response": "{\"id\": 5}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/bookings",
+    "request": null,
+    "status": 200,
+    "response": "{\"bookings\": [{\"id\": 1, \"resource_id\": 1, \"start\": \"2030-06-01T02:00:00+00:00\", \"end\": \"2030-06-01T03:00:00+00:00\", \"note\": \"私密甲\", \"status\": \"cancelled\", \"owner_id\": 2}, {\"id\": 3, \"resource_id\": 2, \"start\": \"2030-06-01T02:00:00+00:00\", \"end\": \"2030-06-01T03:00:00+00:00\", \"note\": \"普通预约\", \"status\": \"active\", \"owner_id\": 2}, {\"id\": 5, \"resource_id\": 1, \"start\": \"2030-06-01T02:00:00+00:00\", \"end\": \"2030-06-01T03:00:00+00:00\", \"note\": \"释放后重订\", \"status\": \"active\", \"owner_id\": 3}, {\"id\": 2, \"resource_id\": 1, \"start\": \"2030-06-01T03:00:00+00:00\", \"end\": \"2030-06-01T04:00:00+00:00\", \"note\": \"私密乙\", \"status\": \"active\", \"owner_id\": 3}, {\"id\": 4, \"resource_id\": 1, \"start\": \"2030-06-02T10:00:00+00:00\", \"end\": \"2030-06-02T11:00:00+00:00\", \"note\": \"普通预约\", \"status\": \"active\", \"owner_id\": 2}]}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/login",
+    "request": {
+      "username": "admin",
+      "password": "AtlasDemo-Admin-9!"
+    },
+    "status": 200,
+    "response": "{\"user\": {\"id\": 1, \"username\": \"admin\", \"role\": \"admin\"}}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/bookings",
+    "request": null,
+    "status": 200,
+    "response": "{\"bookings\": [{\"id\": 1, \"resource_id\": 1, \"start\": \"2030-06-01T02:00:00+00:00\", \"end\": \"2030-06-01T03:00:00+00:00\", \"note\": \"私密甲\", \"status\": \"cancelled\", \"owner_id\": 2}, {\"id\": 3, \"resource_id\": 2, \"start\": \"2030-06-01T02:00:00+00:00\", \"end\": \"2030-06-01T03:00:00+00:00\", \"note\": \"普通预约\", \"status\": \"active\", \"owner_id\": 2}, {\"id\": 5, \"resource_id\": 1, \"start\": \"2030-06-01T02:00:00+00:00\", \"end\": \"2030-06-01T03:00:00+00:00\", \"note\": \"释放后重订\", \"status\": \"active\", \"owner_id\": 3}, {\"id\": 2, \"resource_id\": 1, \"start\": \"2030-06-01T03:00:00+00:00\", \"end\": \"2030-06-01T04:00:00+00:00\", \"note\": \"私密乙\", \"status\": \"active\", \"owner_id\": 3}, {\"id\": 4, \"resource_id\": 1, \"start\": \"2030-06-02T10:00:00+00:00\", \"end\": \"2030-06-02T11:00:00+00:00\", \"note\": \"普通预约\", \"status\": \"active\", \"owner_id\": 2}]}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/login",
+    "request": {
+      "username": "alice",
+      "password": "AtlasDemo-Alice-9!"
+    },
+    "status": 200,
+    "response": "{\"user\": {\"id\": 2, \"username\": \"alice\", \"role\": \"resident\"}}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/logout",
+    "request": {},
+    "status": 200,
+    "response": "{\"ok\": true}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/me",
+    "request": null,
+    "status": 401,
+    "response": "{\"error\": \"未登录\"}"
+  }
+]

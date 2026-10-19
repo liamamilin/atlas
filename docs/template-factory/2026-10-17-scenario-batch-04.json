@@ -1,0 +1,1578 @@
+{
+  "date": "2026-10-17",
+  "batch_id": "bat_9b1baf7a92a5489e9e597dd70d9110d2",
+  "state": "completed",
+  "scope": "用户授权本批及后续同用途场景批次；本批三个未覆盖叶子，仅保存草案。",
+  "config": {
+    "concurrency": 2,
+    "kind": "scenarios",
+    "language": "zh",
+    "model": "open-design/deepseek-v4.1-flash",
+    "name": "场景生产第4批 · 待办 / 稍后阅读 / 时间跟踪 · 2026-10-17",
+    "repair_attempts": 1,
+    "timeout": 900,
+    "leaves": [
+      "time-tracking-application",
+      "to-do-list-application",
+      "read-it-later-application"
+    ]
+  },
+  "summary": {
+    "new_leaves": 3,
+    "new_scenarios": 9,
+    "review_outcomes": {
+      "passed": 7,
+      "needs_changes": 2
+    },
+    "catalog_before": 24,
+    "catalog_after": 33,
+    "covered_leaves_before": 5,
+    "covered_leaves_after": 8,
+    "original_scenarios_unchanged": true,
+    "new_scenarios_all_draft_r1": true,
+    "cli_calls": 13,
+    "new_template_jobs": 0
+  },
+  "input_proofs": [
+    {
+      "job_id": "job_346bc9dff1bf49fe910d8518acc5ad57",
+      "kind": "scenarios",
+      "attempt": 1,
+      "leaf": "time-tracking-application",
+      "language": "zh",
+      "leaf_fingerprint": "084b09f4349e23bcca0f2e27528b50c2c7873bff29adfb7a4dffbcae47d0c856",
+      "source_document_matches": true,
+      "source_sha256": "084b09f4349e23bcca0f2e27528b50c2c7873bff29adfb7a4dffbcae47d0c856",
+      "lines": 227,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb8721beaffeRIQ6P2dFYh7JZr",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 34.15
+      }
+    },
+    {
+      "job_id": "job_9480617e31994486ae09c9ecb69bdcc0",
+      "kind": "scenarios",
+      "attempt": 1,
+      "leaf": "to-do-list-application",
+      "language": "zh",
+      "leaf_fingerprint": "2140dae2f28aaaa14b9271fc8deb7328d51a34e725309f6c6949fdaf4301a625",
+      "source_document_matches": true,
+      "source_sha256": "2140dae2f28aaaa14b9271fc8deb7328d51a34e725309f6c6949fdaf4301a625",
+      "lines": 225,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb8721beaffeGL3vtuMCC7Abs5",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 28.27
+      }
+    },
+    {
+      "job_id": "job_a284d10ff50a42128c548e4bdbd9ace1",
+      "kind": "scenarios",
+      "attempt": 1,
+      "leaf": "read-it-later-application",
+      "language": "zh",
+      "leaf_fingerprint": "e6394b0067d837a50a6451d99e030d18361bfdb0570cc457f805015e576ec658",
+      "source_document_matches": true,
+      "source_sha256": "e6394b0067d837a50a6451d99e030d18361bfdb0570cc457f805015e576ec658",
+      "lines": 238,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb871aaceffejaVqR2I3CW8mBo",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 24.01
+      }
+    },
+    {
+      "job_id": "job_f98bd5d46b9842bb8004cc15854d5593",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "leaf": "to-do-list-application",
+      "language": "zh",
+      "leaf_fingerprint": "2140dae2f28aaaa14b9271fc8deb7328d51a34e725309f6c6949fdaf4301a625",
+      "source_document_matches": true,
+      "source_sha256": "2140dae2f28aaaa14b9271fc8deb7328d51a34e725309f6c6949fdaf4301a625",
+      "lines": 225,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb871aa9cffec0tyNcyqaK1xXy",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 41.81
+      }
+    },
+    {
+      "job_id": "job_c82fb5d0d6f84727b9ee927572ff1574",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "leaf": "to-do-list-application",
+      "language": "zh",
+      "leaf_fingerprint": "2140dae2f28aaaa14b9271fc8deb7328d51a34e725309f6c6949fdaf4301a625",
+      "source_document_matches": true,
+      "source_sha256": "2140dae2f28aaaa14b9271fc8deb7328d51a34e725309f6c6949fdaf4301a625",
+      "lines": 225,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb871aacaffeUTcQPgo9haa1xZ",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 22.37
+      }
+    },
+    {
+      "job_id": "job_cb647f2f96eb4b9492bace9c9aae9de6",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "leaf": "to-do-list-application",
+      "language": "zh",
+      "leaf_fingerprint": "2140dae2f28aaaa14b9271fc8deb7328d51a34e725309f6c6949fdaf4301a625",
+      "source_document_matches": true,
+      "source_sha256": "2140dae2f28aaaa14b9271fc8deb7328d51a34e725309f6c6949fdaf4301a625",
+      "lines": 225,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb87152c9ffeHTVP6TjMIi9ldI",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 32.72
+      }
+    },
+    {
+      "job_id": "job_e3c5dcf5fdab42eda0a5ff8bf2162eab",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "leaf": "time-tracking-application",
+      "language": "zh",
+      "leaf_fingerprint": "084b09f4349e23bcca0f2e27528b50c2c7873bff29adfb7a4dffbcae47d0c856",
+      "source_document_matches": true,
+      "source_sha256": "084b09f4349e23bcca0f2e27528b50c2c7873bff29adfb7a4dffbcae47d0c856",
+      "lines": 227,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb87105d6ffepQo00I7lO553cX",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 24.32
+      }
+    },
+    {
+      "job_id": "job_e3c5dcf5fdab42eda0a5ff8bf2162eab",
+      "kind": "scenario-review",
+      "attempt": 2,
+      "leaf": "time-tracking-application",
+      "language": "zh",
+      "leaf_fingerprint": "084b09f4349e23bcca0f2e27528b50c2c7873bff29adfb7a4dffbcae47d0c856",
+      "source_document_matches": true,
+      "source_sha256": "084b09f4349e23bcca0f2e27528b50c2c7873bff29adfb7a4dffbcae47d0c856",
+      "lines": 227,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb86fa03effezSo9DzKgJ3m710",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 28.34
+      }
+    },
+    {
+      "job_id": "job_2a502fe529f64ece8ad76b0781c296bd",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "leaf": "time-tracking-application",
+      "language": "zh",
+      "leaf_fingerprint": "084b09f4349e23bcca0f2e27528b50c2c7873bff29adfb7a4dffbcae47d0c856",
+      "source_document_matches": true,
+      "source_sha256": "084b09f4349e23bcca0f2e27528b50c2c7873bff29adfb7a4dffbcae47d0c856",
+      "lines": 227,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb870d0a7ffepjTFjzo14R7bE0",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 29.06
+      }
+    },
+    {
+      "job_id": "job_984a56f5625040bc924c073556663478",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "leaf": "time-tracking-application",
+      "language": "zh",
+      "leaf_fingerprint": "084b09f4349e23bcca0f2e27528b50c2c7873bff29adfb7a4dffbcae47d0c856",
+      "source_document_matches": true,
+      "source_sha256": "084b09f4349e23bcca0f2e27528b50c2c7873bff29adfb7a4dffbcae47d0c856",
+      "lines": 227,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb870a515ffe4fz8zgXgCIpgZH",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 21.59
+      }
+    },
+    {
+      "job_id": "job_e3df4e8ce55e443e9c01dc43ab84ede7",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "leaf": "read-it-later-application",
+      "language": "zh",
+      "leaf_fingerprint": "e6394b0067d837a50a6451d99e030d18361bfdb0570cc457f805015e576ec658",
+      "source_document_matches": true,
+      "source_sha256": "e6394b0067d837a50a6451d99e030d18361bfdb0570cc457f805015e576ec658",
+      "lines": 238,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb8705e10ffec5WcXmzZ6ZoRyG",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 27.09
+      }
+    },
+    {
+      "job_id": "job_6123c5e71a8544b5b7e4a03ab15a64e6",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "leaf": "read-it-later-application",
+      "language": "zh",
+      "leaf_fingerprint": "e6394b0067d837a50a6451d99e030d18361bfdb0570cc457f805015e576ec658",
+      "source_document_matches": true,
+      "source_sha256": "e6394b0067d837a50a6451d99e030d18361bfdb0570cc457f805015e576ec658",
+      "lines": 238,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb8705047ffeDM4Lj2jkqz1Y5Q",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 34.34
+      }
+    },
+    {
+      "job_id": "job_c4785bd0ee364c2aa9054dd50ce96d2e",
+      "kind": "scenario-review",
+      "attempt": 1,
+      "leaf": "read-it-later-application",
+      "language": "zh",
+      "leaf_fingerprint": "e6394b0067d837a50a6451d99e030d18361bfdb0570cc457f805015e576ec658",
+      "source_document_matches": true,
+      "source_sha256": "e6394b0067d837a50a6451d99e030d18361bfdb0570cc457f805015e576ec658",
+      "lines": 238,
+      "cli": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_eb86ff337ffekaemzxHPnhxs8s",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 28.99
+      }
+    }
+  ],
+  "jobs": [
+    {
+      "id": "job_346bc9dff1bf49fe910d8518acc5ad57",
+      "kind": "scenarios",
+      "leaf": "time-tracking-application",
+      "state": "completed",
+      "attempt": 1,
+      "generation_result": {
+        "count": 3,
+        "reason": "现有场景为空，这三条分别覆盖三种不同的人物与目标：自由职业者事后补录并按客户开票、计费团队按周期提交审批并依赖锁定保证数据稳定、知识工作者确认自动捕获建议后才形成记录。它们对应手动录入、计时器与时间表、建议确认三种记录形成方式，且目的地分别为客户账单、团队审批与个人隐私边界，工作流和验收行为互不重复。",
+        "scenario_ids": [
+          "scn_815a7d861e944a2c90e257ddb1bb95c5",
+          "scn_e0566b4358854e64ae59d35a3545102a",
+          "scn_5090205fb3534475a0524fb93d81e4da"
+        ]
+      }
+    },
+    {
+      "id": "job_9480617e31994486ae09c9ecb69bdcc0",
+      "kind": "scenarios",
+      "leaf": "to-do-list-application",
+      "state": "completed",
+      "attempt": 1,
+      "generation_result": {
+        "count": 3,
+        "reason": "现有场景为空。这三个场景分别覆盖叶子强调的三种不同重心：小范围共享清单中的共同记录与条目分配、每日专注视图作为不拥有条目的透镜及其夜间回收规则、提醒与重复条目构成的安全网。三者的用户目标和工作流互不重叠，也没有把条目扩展成多阶段任务管理或组织级协作。",
+        "scenario_ids": [
+          "scn_67ff089cbbfe42b09e85f03d4ca5fda1",
+          "scn_0b062cd067b94c1c82ab6a7c50c08f43",
+          "scn_516f729d15b940fcb43795522099864d"
+        ]
+      }
+    },
+    {
+      "id": "job_a284d10ff50a42128c548e4bdbd9ace1",
+      "kind": "scenarios",
+      "leaf": "read-it-later-application",
+      "state": "completed",
+      "attempt": 1,
+      "generation_result": {
+        "count": 3,
+        "reason": "现有场景为空。以上三个场景分别覆盖日常捕获与离线清队列、长文档跨中断续读与归档、服务关停前的队列迁移，用户目标和工作流互不重复，且都落在“主动保存—持有内容—延期队列—应用内阅读—清理”这一核心内；未引入标签体系、AI 辅助等核心之外的新要求。",
+        "scenario_ids": [
+          "scn_a5ce3c5293ab45378dfb5bd57f5bdb0a",
+          "scn_ce1ff6fedd0f471aa4e99232edaa61f1",
+          "scn_c1b0509518c64cf1a0d131b1c1a98d19"
+        ]
+      }
+    },
+    {
+      "id": "job_f98bd5d46b9842bb8004cc15854d5593",
+      "kind": "scenario-review",
+      "leaf": "to-do-list-application",
+      "state": "completed",
+      "attempt": 1,
+      "generation_result": null
+    },
+    {
+      "id": "job_c82fb5d0d6f84727b9ee927572ff1574",
+      "kind": "scenario-review",
+      "leaf": "to-do-list-application",
+      "state": "completed",
+      "attempt": 1,
+      "generation_result": null
+    },
+    {
+      "id": "job_cb647f2f96eb4b9492bace9c9aae9de6",
+      "kind": "scenario-review",
+      "leaf": "to-do-list-application",
+      "state": "completed",
+      "attempt": 1,
+      "generation_result": null
+    },
+    {
+      "id": "job_e3c5dcf5fdab42eda0a5ff8bf2162eab",
+      "kind": "scenario-review",
+      "leaf": "time-tracking-application",
+      "state": "completed",
+      "attempt": 2,
+      "generation_result": null
+    },
+    {
+      "id": "job_2a502fe529f64ece8ad76b0781c296bd",
+      "kind": "scenario-review",
+      "leaf": "time-tracking-application",
+      "state": "completed",
+      "attempt": 1,
+      "generation_result": null
+    },
+    {
+      "id": "job_984a56f5625040bc924c073556663478",
+      "kind": "scenario-review",
+      "leaf": "time-tracking-application",
+      "state": "completed",
+      "attempt": 1,
+      "generation_result": null
+    },
+    {
+      "id": "job_e3df4e8ce55e443e9c01dc43ab84ede7",
+      "kind": "scenario-review",
+      "leaf": "read-it-later-application",
+      "state": "completed",
+      "attempt": 1,
+      "generation_result": null
+    },
+    {
+      "id": "job_6123c5e71a8544b5b7e4a03ab15a64e6",
+      "kind": "scenario-review",
+      "leaf": "read-it-later-application",
+      "state": "completed",
+      "attempt": 1,
+      "generation_result": null
+    },
+    {
+      "id": "job_c4785bd0ee364c2aa9054dd50ce96d2e",
+      "kind": "scenario-review",
+      "leaf": "read-it-later-application",
+      "state": "completed",
+      "attempt": 1,
+      "generation_result": null
+    }
+  ],
+  "scenarios": [
+    {
+      "acceptance": [
+        "保存动作完成后，文章立即出现在未读列表中，且不会被自动标记为已读",
+        "文章详情同时显示应用内可读的正文和可回到原始网页的来源链接",
+        "飞行模式下已保存文章仍能打开并完整阅读正文",
+        "读完后文章从未读列表消失并进入归档，未读计数相应减少",
+        "重新打开归档文章时仍能看到已读状态和来源链接"
+      ],
+      "audience": "工作日长时间在线浏览、主要在地铁或公交上阅读的上班族",
+      "id": "scn_a5ce3c5293ab45378dfb5bd57f5bdb0a",
+      "leaf": "read-it-later-application",
+      "leaf_name": "稍后阅读应用",
+      "name": "通勤族的每日捕获与离线清队列",
+      "objective": "在不打断当前工作的前提下把白天遇到的文章存入队列，并在无网络通勤途中读掉其中几篇，让未读队列持续减少。",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:51:36.285563+00:00",
+      "workflow": [
+        "白天浏览网页时通过浏览器扩展或分享入口保存一篇长文，不填写标签或分类",
+        "保存后文章以未读状态进入队列，保留标题、来源和原文链接",
+        "傍晚出发前在应用内查看未读列表，按阅读时长挑选一至两篇",
+        "通勤途中在无网络环境下打开文章，在应用内阅读正文并调整字号与主题",
+        "读完后将文章归档，返回队列确认未读数减少且已归档文章仍可检索"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "场景围绕 leaf 的定义核心展开：条目由“a deliberate save act performed somewhere else”产生并携带来源与可读内容（第38行），进入“New items enter unread … items are consumed — marked read and set aside”（第41行）的队列，在“The product itself presents the saved content for reading”（第44行）的应用内阅读面消费。验收第1条对应 leaf 的“Saving deliberately does not mark anything read”（第173行），验收第4、5条对应“Archive preserves the read item for reference”（第124行）与归档/删除区分（第179–181行）。离线阅读虽非定义核心，但被 leaf 明确列为该类别的标准能力（第53行），不构成类型偏移。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "与 scn_c1b0509518c64cf1a0d131b1c1a98d19（旧服务关停前导出/导入并迁移阅读状态）相比，本场景不含迁移、导入导出或状态搬迁；与 scn_ce1ff6fedd0f471aa4e99232edaa61f1（长 PDF/报告跨中断续读并从上次位置恢复）相比，本场景既无进度续读要求，也无文档类型或中断恢复流程，其目标是通勤无网络时每日清掉一两篇。三者仅在“来源链接保留、读完归档”这类 leaf 固有行为上相交，用户、目标与端到端路径均不同，不构成需要修订的重复。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "五个步骤构成闭环：扩展/分享入口保存且不填标签（第1步）→ 以未读入队并保留标题、来源、原文链接（第2步）→ 出发前按阅读时长从无读列表挑选（第3步）→ 无网络下在应用内阅读并可调字号/主题（第4步）→ 归档并回队列确认未读减少、归档仍可查（第5步）。每条状态转换都有明确触发者与结果，未出现跳步或需要外部系统才能完成的环节。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "passed",
+              "reason": "验收项均为可观察行为：保存后在未读列表出现且不被自动标已读、详情同时有可读正文与来源链接、飞行模式下可打开并完整阅读、归档后从未读消失且计数减少、重开归档仍显示已读状态与链接。覆盖了捕获、入队、阅读、清队列的主干；按阅读时长排序、字号/主题调整与归档检索属于界面细节，未被单列验收，但不妨碍判断声明目标是否达成，建议补充而非阻断。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "passed",
+              "reason": "受众为通勤上班族，与 leaf “Mobile phones are the dominant reading surface”（第29行）及个人私密队列设定一致；捕获方式（浏览器扩展或分享入口）属“Frictionless capture machinery”标准能力（第50行），未越界成订阅流、书签管理或永久图书馆。场景未绑定技术栈、数值指标或商业假设，边界合理；全部自撰场景文字为简体中文，符合 language=zh，未出现语言偏离。"
+            }
+          ],
+          "created_at": "2026-10-17T01:53:04.731327+00:00",
+          "id": "scv_2c421e00429842d1bf2d79044299c550",
+          "input_digest": "422424f1e869d0d0faf7f22d76606cfa73287626b2915890003653091780a79b",
+          "job_id": "job_e3df4e8ce55e443e9c01dc43ab84ede7",
+          "leaf_evidence": [
+            {
+              "end_line": 13,
+              "start_line": 10
+            },
+            {
+              "end_line": 38,
+              "start_line": 38
+            },
+            {
+              "end_line": 41,
+              "start_line": 41
+            },
+            {
+              "end_line": 44,
+              "start_line": 44
+            },
+            {
+              "end_line": 173,
+              "start_line": 173
+            },
+            {
+              "end_line": 181,
+              "start_line": 179
+            }
+          ],
+          "leaf_fingerprint": "e6394b0067d837a50a6451d99e030d18361bfdb0570cc457f805015e576ec658",
+          "leaf_quotes": [
+            "Deliberate capture (a save act performed from elsewhere)\n└── Saved reading item — source link + held content\n    └── Deferred-reading queue — unread → read → archived/removed\n        └── In-app reading surface — the product presents the content itself",
+            "A persistent, individually addressable entry in the user's library, created by a deliberate save act performed somewhere else — a browser page, a share sheet, a paste, an email. Each item carries, at minimum, its source (title and origin link) and its content in a form the product can present for reading: commonly an extracted, cleaned reading copy; an archived copy of the original page; an uploaded document such as a PDF or e-book; or media with its transcript. The content is the working object — this is what separates the Type from a bookmark, which holds an organized address and leaves the content on the web. The origin link stays with the item: when the held copy is wrong or incomplete, the link is the fallback and the way back to the source.",
+            "The collection is lived in as a queue of things to read *later*. New items enter unread; the primary surfaces sort and filter by reading state; and items are *consumed* — marked read and set aside (archived, removed, or deleted) once handled. Keeping an item is the deliberate exception, expressed as a favorites/starred layer, not the default fate of every save. The queue's health is measured by items being processed and cleared, not by the library growing. This posture is what separates the Type from a permanent library (nothing is \"later\" there, and nothing is expected to leave) and from a feed (where the source, not the user's intent, drives what arrives).",
+            "The product itself presents the saved content for reading — a typographic reader-mode view for articles, an archived-page view, a document viewer for PDFs and e-books, a player or transcript view for media. Reading-comfort controls (typography, themes, layout) surround the content. The alternative — handing the user back out to the open web — is a link list, not a reading application.",
+            "Saving deliberately does not mark anything read. The unseen state persists until the user actually opens the item — this is the queue's honesty, and products surface it visibly (unread counts, unseen markers that disappear on open).",
+            "### Archive is not delete\n\nThe post-consumption state is distinct from removal. Archived items leave the attention stream but remain retrievable; deletion (with trash/restore where offered) is the irreversible act. The platform-native minimal form collapses this layering to \"hide what you've read\" — the state distinction is maturity, not invariant."
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "passed",
+          "peer_digest": "fb2d2a74ddab274b364962a04f31a0472b2c86cb2fd7d0edac5f621c48251482",
+          "peer_scenarios": [
+            {
+              "id": "scn_c1b0509518c64cf1a0d131b1c1a98d19",
+              "name": "旧服务关停前的队列搬迁",
+              "revision": 1
+            },
+            {
+              "id": "scn_ce1ff6fedd0f471aa4e99232edaa61f1",
+              "name": "长报告的分段续读与完成归档",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_a5ce3c5293ab45378dfb5bd57f5bdb0a",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "在第2步明确“在线保存时即取得并留存正文副本”，使验收第3条的飞行模式场景可被一致地测试，避免读者怀疑离线正文来源不明。",
+            "为工作流第3步补一条可观察验收，例如“未读列表展示预计阅读时长，用户可按其选择文章”，或从工作流删去该细节以保持验收与流程一一对应。",
+            "为第4步的字号/主题调整与第5步的“已归档文章仍可检索”各补一条轻量验收（如重开文章后字号设置仍生效、在归档中通过关键词或列表找到该文章），把流程中的承诺纳入可验证范围。"
+          ],
+          "summary": "场景以“白天低摩擦保存 → 未读队列 → 通勤离线在应用内读完 → 归档清队列”为主线，直接落在 leaf 的三段式定义核心上，且与两个 peer 的目标、受众和工作流有清楚区分。五项检查在本轮给定材料范围内均通过；局限是本次仅做文本审查，未验证实际离线能力、提取质量或市场价值。少量工作流细节（按阅读时长挑选、字号/主题调整、归档可检索）未被验收项逐一覆盖，属可补强的可选改进，不影响主流程可评估性。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_e3df4e8ce55e443e9c01dc43ab84ede7",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    },
+    {
+      "acceptance": [
+        "中断并重新打开应用后，条目仍处于未读或阅读中状态，并从接近上次离开的位置继续显示",
+        "条目详情始终保留来源链接，即使已保存的正文不完整也可回到原始页面",
+        "同一长文档可多次打开而不产生重复的队列条目",
+        "完成后条目进入归档而非被删除，且不再出现在未读列表",
+        "在归档中仍可重新打开该文档并继续查阅"
+      ],
+      "audience": "需要阅读长篇报告、白皮书或 PDF 的研究人员与知识工作者",
+      "id": "scn_ce1ff6fedd0f471aa4e99232edaa61f1",
+      "leaf": "read-it-later-application",
+      "leaf_name": "稍后阅读应用",
+      "name": "长报告的分段续读与完成归档",
+      "objective": "把一份无法一次读完的长文档留在队列中，跨多次中断继续阅读，读完后归档而不是误删。",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:51:36.285563+00:00",
+      "workflow": [
+        "在工作场景中把 PDF 或长文的链接保存到稍后阅读队列",
+        "稍后在应用内打开该条目，使用文档或正文阅读界面开始阅读",
+        "中途被打断时直接关闭应用，不手动记录页码",
+        "当天晚些时候或次日重新打开同一条目，从上次位置继续",
+        "读完后执行归档，并在需要时通过来源链接回到原始发布页核对内容"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "场景覆盖 leaf 的三项共同结构：工作场景中从别处保存 PDF 或长文链接，对应 “Deliberate capture (a save act performed from elsewhere)”（第 10 行）；条目在应用内以“文档或正文阅读界面”打开，对应 “the product presents the content itself”（第 44 行）；读完后归档且不再出现在未读列表，对应 “unread → read → archived/removed”（第 12 行）与 “Archive is not delete”（第 179 行）。验收 2 提到“已保存的正文”与来源链接回退，也对应条目须同时持有内容与 “source link + held content”（第 11 行）。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "与 peer 1（通勤族离线清队列）共享“保存→应用内阅读→归档”的类别骨架，但用户情境、目标与中段流程不同：peer 1 是在无网络通勤中批量读掉一至两篇文章并调整字号主题，本场景是研究人员对单份 PDF/长报告跨多次中断续读、依赖位置恢复、并明确避免重复条目。与 peer 2（旧服务关停前导入导出迁移）在目标与流程上无重叠，后者核心是导出/导入与状态迁移。共享的归档与来源链接验收属于该 Type 的通用行为，不构成实质重复。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "五步构成可用的端到端闭环：保存链接入队→应用内开始阅读→直接关闭不手记页码→稍后重开同一条目续读→读完归档并可回到原始发布页。中断与恢复发生在同一可寻址条目上，且第 5 步同时收束队列状态与来源核对，没有缺失的必要环节。验收 1 的“未读或阅读中”状态表述略宽（已打开阅读的条目通常应进入阅读中），但不妨碍对“重开后续读”这一主行为的评估。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "passed",
+              "reason": "验收均可在界面上观察：中断重开后“从接近上次离开的位置继续显示”；详情保留来源链接；同一文档多次打开不产生重复条目；完成后条目进入归档且从“未读列表”消失；归档中仍可重新打开。这些条件与工作流步骤一一对应，足以判定该流程是否成立。工作流末步“通过来源链接回到原始发布页核对内容”目前只由“保留链接”间接覆盖，属于可补充的观察点而非阻断性缺口。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "passed",
+              "reason": "边界收束在单个用户、单份长文档、跨会话续读与归档，未引入分享、推荐流、标注同步等 leaf 明示为外围的能力，也未把现代增强能力当作定义核心。内部一致性基本成立：目标中的“归档而不是误删”由验收 4、5 的“归档非删除、归档中仍可重开”落实；验收 3 的“不产生重复条目”虽未在工作流中单列，但与“多次打开同一条目”直接一致。PDF 内容由应用内文档界面呈现，符合 leaf 对 “document viewer for PDFs and e-books” 的定位。"
+            }
+          ],
+          "created_at": "2026-10-17T01:53:15.502674+00:00",
+          "id": "scv_eaa6ba39dc1549d389bd5c92238c5352",
+          "input_digest": "55f4060e9b9af3e73ea14fabd6ce0fe186b457ac18d0eca06eab6ce57055fa93",
+          "job_id": "job_6123c5e71a8544b5b7e4a03ab15a64e6",
+          "leaf_evidence": [
+            {
+              "end_line": 38,
+              "start_line": 37
+            },
+            {
+              "end_line": 41,
+              "start_line": 40
+            },
+            {
+              "end_line": 44,
+              "start_line": 43
+            },
+            {
+              "end_line": 55,
+              "start_line": 53
+            },
+            {
+              "end_line": 181,
+              "start_line": 179
+            }
+          ],
+          "leaf_fingerprint": "e6394b0067d837a50a6451d99e030d18361bfdb0570cc457f805015e576ec658",
+          "leaf_quotes": [
+            "**1. The saved reading item as the unit of record.**\nA persistent, individually addressable entry in the user's library, created by a deliberate save act performed somewhere else — a browser page, a share sheet, a paste, an email. Each item carries, at minimum, its source (title and origin link) and its content in a form the product can present for reading: commonly an extracted, cleaned reading copy; an archived copy of the original page; an uploaded document such as a PDF or e-book; or media with its transcript. The content is the working object — this is what separates the Type from a bookmark, which holds an organized address and leaves the content on the web. The origin link stays with the item: when the held copy is wrong or incomplete, the link is the fallback and the way back to the source.",
+            "**2. The deferred-reading queue posture.**\nThe collection is lived in as a queue of things to read *later*. New items enter unread; the primary surfaces sort and filter by reading state; and items are *consumed* — marked read and set aside (archived, removed, or deleted) once handled. Keeping an item is the deliberate exception, expressed as a favorites/starred layer, not the default fate of every save. The queue's health is measured by items being processed and cleared, not by the library growing. This posture is what separates the Type from a permanent library (nothing is \"later\" there, and nothing is expected to leave) and from a feed (where the source, not the user's intent, drives what arrives).",
+            "**3. The in-app reading surface as the product's main act.**\nThe product itself presents the saved content for reading — a typographic reader-mode view for articles, an archived-page view, a document viewer for PDFs and e-books, a player or transcript view for media. Reading-comfort controls (typography, themes, layout) surround the content. The alternative — handing the user back out to the open web — is a link list, not a reading application.",
+            "- **Offline availability** — held content readable without connectivity, per item or automatically; the practical reason the content is held at all.\n- **Continuity** — the library, its reading states, and typically progress and annotations, carried across the user's devices.\n- **Reading experience controls** — typography, themes, layout, estimated reading time; reading progress and return-to-position at the modern pole; full-text search over the library.",
+            "### Archive is not delete\n\nThe post-consumption state is distinct from removal. Archived items leave the attention stream but remain retrievable; deletion (with trash/restore where offered) is the irreversible act. The platform-native minimal form collapses this layering to \"hide what you've read\" — the state distinction is maturity, not invariant."
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "passed",
+          "peer_digest": "4c7ea3adc9ce1f732a8783a5e5d30c9007dc2b9cc85be858abf5afee65e50fe0",
+          "peer_scenarios": [
+            {
+              "id": "scn_a5ce3c5293ab45378dfb5bd57f5bdb0a",
+              "name": "通勤族的每日捕获与离线清队列",
+              "revision": 1
+            },
+            {
+              "id": "scn_c1b0509518c64cf1a0d131b1c1a98d19",
+              "name": "旧服务关停前的队列搬迁",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_ce1ff6fedd0f471aa4e99232edaa61f1",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "将验收 1 的状态改为“阅读中”，去掉“未读或”，以与 leaf 第 173 行“Saving deliberately does not mark anything read ... until the user actually opens the item”保持一致。",
+            "为工作流第 5 步补充一条可观察验收：从条目详情的来源链接可实际打开原始发布页并看到原文，而不只是“链接被保留”。",
+            "明确 PDF 情形下持有的是应用内可阅读的文档副本（上传或抓取），而非仅保存链接，以强化与 leaf“in-app reading surface”的对应。"
+          ],
+          "summary": "该场景以“一份长报告跨多次中断续读并最终归档”为主线，完整落在 Read-it-later Application 的定义核心上：从别处主动保存、条目带来源与持有内容、应用内阅读、读完后归档而非删除。与两个 peer 相比，用户情境与目标不同，但场景 1 在“保存→应用内阅读→归档”上与 peer 1 共享类别通用骨架；这是该 Type 的必然重叠，不构成实质重复。五项检查均通过。限制：本次仅比对 pinned leaf 与所给两个 peer 的文本，未验证运行时行为、实现可行性或市场价值，也不代表全语料去重。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_6123c5e71a8544b5b7e4a03ab15a64e6",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    },
+    {
+      "acceptance": [
+        "导入完成后，条目出现在新应用的队列中，并带有可打开的来源链接和保存的内容",
+        "已读与未读状态随条目迁移，未读条目进入待读列表",
+        "导入的条目在新应用中可直接阅读正文或文档，而不只是显示网址",
+        "无法取得内容副本的条目仍保留来源链接，并可打开原网页作为回退",
+        "用户可再次导出当前队列，导出结果包含条目、链接和阅读状态"
+      ],
+      "audience": "长期使用某个稍后阅读服务、因该服务即将关停而需要迁出个人队列的用户",
+      "id": "scn_c1b0509518c64cf1a0d131b1c1a98d19",
+      "leaf": "read-it-later-application",
+      "leaf_name": "稍后阅读应用",
+      "name": "旧服务关停前的队列搬迁",
+      "objective": "在旧服务停止前导出完整阅读队列，导入新应用后保留条目、来源链接和已读状态，继续按原队列阅读与清理。",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:51:36.285563+00:00",
+      "workflow": [
+        "从即将关停的旧服务导出全部条目及阅读状态",
+        "在新应用中执行导入，将导出文件作为来源",
+        "逐项确认导入后的条目带有标题、来源链接和可阅读的内容副本",
+        "对照旧服务的未读与已读清单，检查状态是否随条目一起迁移",
+        "在新队列中继续阅读未读条目，读完后归档，并保留一份导出文件作为副本"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "场景完整触及三项定义性结构：条目携带来源链接与可阅读内容副本（第 38 行 \"Each item carries, at minimum, its source (title and origin link) and its content in a form the product can present for reading\"）、延后阅读队列与已读/未读迁移（第 41 行 \"The collection is lived in as a queue of things to read *later*.\"）、应用内阅读面（第 44 行 \"The product itself presents the saved content for reading\"）。迁移入口亦被明确纳入标准能力与类别生存能力（第 50 行 bulk import as the migration path；第 126–134 行 \"Migration: moving the library\"；第 189 行 \"Data portability — export of items, states, and annotations in open formats — is a structural expectation of the category, born of repeated shutdowns.\"）。场景保留内容副本失败时回退来源链接，也与第 177 行 \"The held copy can be wrong; the link is the fallback\" 一致。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "与 scn_a5ce3c5293ab45378dfb5bd57f5bdb0a（通勤族每日捕获与离线清队列）相比，本场景的入口不是浏览时的单篇保存，而是旧服务关停前的整库导出导入；与 scn_ce1ff6fedd0f471aa4e99232edaa61f1（长报告分段续读）相比，本场景的驱动目标是数据不丢失与状态延续，而非跨中断的阅读位置恢复。三者虽都包含「读完归档」这一队列动作，但用户处境、目标与主工作流不同，无实质重复。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "needs_changes",
+              "reason": "主链路（导出→导入→核对→继续阅读与归档→留存副本）成立，但第 3 步「逐项确认导入后的条目带有标题、来源链接和可阅读的内容副本」对一条完整个人队列不具备可操作性，且流程未定义部分条目内容无法取得、导入失败或重复时的处理与核对方式，使「导出完整阅读队列」的完整性在流程层面无法闭合。应改为批量清单比对加例外清单核对，而不是逐项人工确认。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "needs_changes",
+              "reason": "验收标准可观察，但未覆盖工作流中的关键结果：(1) 没有对「完整」的可检验判据，例如导入后的条目集合/总数与导出清单一致、差异可解释；(2) 工作流第 5 步「读完后归档」没有对应验收项，验收 2 只检查状态迁移，未检查归档后条目离开待读列表且仍可打开；(3) 「保留一份导出文件作为副本」仅由验收 5「用户可再次导出当前队列」间接覆盖，未验证该副本仍包含条目、链接与状态并可再次使用。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "passed",
+              "reason": "范围限定在单个用户的个人队列迁移与后续阅读清理，未引入共享协作、推荐流或永久库等越界诉求；受众与叶子「the work environment is personal and private by default」（第 29 行）一致。导入文件格式、导入通道、去重策略等保持开放，属于实现选择而非必须在此裁决的产品决策；未提出无依据的法律或平台授权假设。"
+            }
+          ],
+          "created_at": "2026-10-17T01:53:33.950507+00:00",
+          "id": "scv_908584b1bdaa4e2cadeb1574d82df179",
+          "input_digest": "66e656e214342898198d7a5fed306f3b0fa7dc5a7f66ce0476d84a16f3627756",
+          "job_id": "job_c4785bd0ee364c2aa9054dd50ce96d2e",
+          "leaf_evidence": [
+            {
+              "end_line": 5,
+              "start_line": 5
+            },
+            {
+              "end_line": 44,
+              "start_line": 38
+            },
+            {
+              "end_line": 50,
+              "start_line": 50
+            },
+            {
+              "end_line": 134,
+              "start_line": 126
+            },
+            {
+              "end_line": 177,
+              "start_line": 177
+            },
+            {
+              "end_line": 189,
+              "start_line": 189
+            }
+          ],
+          "leaf_fingerprint": "e6394b0067d837a50a6451d99e030d18361bfdb0570cc457f805015e576ec658",
+          "leaf_quotes": [
+            "A **Read-it-later Application** is a personal reading application built around a queue: it captures content the user encounters but does not want to read in that moment — web articles above all, and at the modern pole PDFs, e-books, videos, and newsletters — holds each saved item together with a copy of its content, presents that content itself for in-app reading at a later time, and retires items from the queue once they have been read.",
+            "A persistent, individually addressable entry in the user's library, created by a deliberate save act performed somewhere else — a browser page, a share sheet, a paste, an email. Each item carries, at minimum, its source (title and origin link) and its content in a form the product can present for reading: commonly an extracted, cleaned reading copy; an archived copy of the original page; an uploaded document such as a PDF or e-book; or media with its transcript. The content is the working object — this is what separates the Type from a bookmark, which holds an organized address and leaves the content on the web. The origin link stays with the item: when the held copy is wrong or incomplete, the link is the fallback and the way back to the source.\n\n**2. The deferred-reading queue posture.**\nThe collection is lived in as a queue of things to read *later*. New items enter unread; the primary surfaces sort and filter by reading state; and items are *consumed* — marked read and set aside (archived, removed, or deleted) once handled. Keeping an item is the deliberate exception, expressed as a favorites/starred layer, not the default fate of every save. The queue's health is measured by items being processed and cleared, not by the library growing. This posture is what separates the Type from a permanent library (nothing is \"later\" there, and nothing is expected to leave) and from a feed (where the source, not the user's intent, drives what arrives).\n\n**3. The in-app reading surface as the product's main act.**\nThe product itself presents the saved content for reading — a typographic reader-mode view for articles, an archived-page view, a document viewer for PDFs and e-books, a player or transcript view for media. Reading-comfort controls (typography, themes, layout) surround the content. The alternative — handing the user back out to the open web — is a link list, not a reading application.",
+            "- **Frictionless capture machinery** — browser extension, mobile share-sheet target, bookmarklet, paste-a-URL form, dedicated mobile apps, and bulk import as the migration path.",
+            "### Migration: moving the library\n\n```text\nExport from the old service (full-library export)\n→ import into the new one (native import or generic file formats)\n→ states and, at the modern pole, highlights and notes come along\n```\n\nBecause the Type's services have repeatedly shut down, import/export is a survival capability of the category, and vendor trust (\"will you still exist?\") is part of the sales conversation in ways unusual among Application Types.",
+            "Extraction is an automated interpretation of someone else's page, and it fails: paywalled content, scraping blocks, fragile layouts. Mature products treat this as a designed-for case — re-fetch, per-site parsing rules, rendered-content fallbacks — and always keep the origin link on the item. The queue may degrade to a link for a broken item, but degradation is the exception the product works to repair, not the design center.",
+            "Data portability — export of items, states, and annotations in open formats — is a structural expectation of the category, born of repeated shutdowns. It is the user's hedge against the queue being their only copy of things they meant to read."
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "needs_changes",
+          "peer_digest": "940b55887785147c8cc7fe4eadc7fd84d8af2e8a16d90f40c9b9de77effb8d94",
+          "peer_scenarios": [
+            {
+              "id": "scn_a5ce3c5293ab45378dfb5bd57f5bdb0a",
+              "name": "通勤族的每日捕获与离线清队列",
+              "revision": 1
+            },
+            {
+              "id": "scn_ce1ff6fedd0f471aa4e99232edaa61f1",
+              "name": "长报告的分段续读与完成归档",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_c1b0509518c64cf1a0d131b1c1a98d19",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "将工作流第 3 步改为「导入后按清单批量核对条目集合与总数，并对无法取得内容副本的条目生成例外清单逐一处理」，避免对整库逐项人工确认。",
+            "在验收标准中增加完整性判据，例如「导入后的条目总数与导出清单一致，任何缺失、重复或额外条目都可被列出并解释」。",
+            "在验收标准中补充「读完的条目可归档、归档后不再出现在待读列表，但仍可重新打开并看到已读状态与来源链接」，使其对应工作流第 5 步。",
+            "把「保留副本」写成可检验项：导入完成后导出一次，确认导出文件包含条目、来源链接和阅读状态，并确认该文件可被再次导入或打开查阅。"
+          ],
+          "summary": "场景与叶子定义的核心结构基本对齐：以导入迁移为入口，随后在新应用的队列中阅读并清理条目，符合叶子把「从同类服务导入/全库导出」视为类别生存能力的描述（第 126–134、189 行）。与两个同伴场景相比，用户、目标与工作流都不同：同伴分别覆盖通勤捕获与离线清队列、长文档续读，本场景聚焦服务关停前的整体搬迁，因此不构成重复。主要问题在可验证性：验收标准没有覆盖「完整迁移」的条目集合一致性、读完后归档离开待读列表，以及「保留一份导出副本」的检查；工作流第 3 步要求对整条队列逐项确认，在实际规模下不可行，也没有定义内容获取失败或部分导入失败时的核对方式。以上均可修补，故为 needs_changes。本评审仅基于给定叶子与输入，不涉及运行时或市场验证。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_c4785bd0ee364c2aa9054dd50ce96d2e",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    },
+    {
+      "acceptance": [
+        "每条补录记录保存后成为独立、可再次找到的条目，关闭并重新打开应用后仍存在，日期、时长、说明及客户/项目归属不丢失",
+        "时间表的日合计与项目合计等于所覆盖日期范围内已保存条目时长之和；修改条目后合计立即更新",
+        "按客户筛选的汇总报告只统计归属该客户的条目，可计费与不可计费分别汇总，导出明细的条数和合计与屏幕显示一致"
+      ],
+      "audience": "按客户和项目收费的独立设计师、顾问等自由职业者",
+      "id": "scn_815a7d861e944a2c90e257ddb1bb95c5",
+      "leaf": "time-tracking-application",
+      "leaf_name": "时间跟踪应用",
+      "name": "自由职业者补记漏计工时并按客户核算可计费时长",
+      "objective": "在工作结束后凭记忆补录当天遗漏的工时，把每段时间归入正确的客户与项目，并汇总出可直接用于开票的可计费时长。",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:51:17.576333+00:00",
+      "workflow": [
+        "打开当天或本周时间表，按客户→项目→任务选择或建立对应的记录行",
+        "用时长或起止时间补录每段工作，填写简短说明，并标记可计费或不可计费",
+        "对重复性工作使用继续上一条或复制上周结构，减少重复录入",
+        "核对每条记录的日期、时长和归属，修正重叠或遗漏后查看按日、按项目合计",
+        "按客户和日期范围生成汇总报告，导出明细作为开票依据"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "场景核心正是叶子定义的三要素：手动补录形成条目、条目归属工作结构、条目持久可核。叶子称产品把工时记录为“individual, persistent time entries”并“attributes each entry to a piece of work structure — a project, task, client, or matter”（第5行），核心树写明条目由“formed by a user act (timer, manual input, timesheet cell, or confirmed suggestion)”（第12行），并强调“forgetting to start the timer is an expected event, so manual reconstruction is a supported path”（第92行）。场景在工作流第2步“用时长或起止时间补录每段工作”、第4步核对归属与合计，目标为“汇总出可直接用于开票的可计费时长”，与叶子第50行“a billable/non-billable flag on entries”和第49行的报告/导出能力吻合，未漂移到自动观察或考勤类型。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "已逐一对比两个 peer，均非实质性重复。scn_5090205fb3534475a0524fb93d81e4da 的用户是“使用自动捕获功能…的知识工作者及其团队”，核心动作是审阅后台捕获建议并逐条确认或丢弃，条目的形成依赖确认建议；本场景是自由职业者凭记忆主动补录，无后台捕获、无团队私有性约束，目标也只是自身客户开票核算。scn_e0566b4358854e64ae59d35a3545102a 的用户是“按项目计费的成员及其时间表审批人”，目标是提交、退回、审批并锁定整周，流程含审批人队列和锁定；本场景为单人使用，无提交/审批/锁定环节，终点是客户维度可计费汇总与导出。三者仅在“手工补录工时”这一通用动作上有交集，不构成同一用户目标与流程的重复，故 related_scenario_ids 为空。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "五步构成可用的端到端闭环：打开当天/本周时间表并按客户→项目→任务建立记录行；以时长或起止时间补录并填说明、标记可计费；用“继续上一条或复制上周结构”减少重复；核对日期、时长、归属并查看日/项目合计；按客户与日期范围生成报告并导出明细。各步均可由前一步产出驱动，最终交付“可直接用于开票的可计费时长”，与目标一致；选择客户/项目/任务与合计、导出分别对应叶子第96行工作层级、第48行“totals per day, per week, and per attribution group”与第49行“export to spreadsheets”。第3步的复制辅助是可选提速动作，未阻断主流程。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "passed",
+              "reason": "三条验收均为可观察结果且覆盖主流程：其一验证补录条目“关闭并重新打开应用后仍存在，日期、时长、说明及客户/项目归属不丢失”，对应持久、可寻址条目；其二验证“日合计与项目合计等于…已保存条目时长之和；修改条目后合计立即更新”，给出可计算的等值判定；其三验证按客户筛选只计该客户条目、可计费与不可计费分别汇总、导出“条数和合计与屏幕显示一致”，把报告与导出结果绑定到屏幕值，可复现判定。整体能评估从补录到开票依据的声明行为，不依赖具体技术实现或数值阈值。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "passed",
+              "reason": "受众“按客户和项目收费的独立设计师、顾问等自由职业者”与叶子第23行“Freelancers and solo professionals track time per client and project so they can bill accurately”一致；报告、导出、可计费标记属于叶子第44–50行所述成熟产品常见能力，而非定义外扩张，且未声称内置开票或自动捕获。边界限定在补录、核对、客户汇总与导出，未引入团队审批或监控等超出场景的假设；工作流第4步“修正重叠”是叶子未展开的交互细节，但未改变主流程或验收判定，可作为可选细化而非阻断问题。"
+            }
+          ],
+          "created_at": "2026-10-17T01:53:54.531423+00:00",
+          "id": "scv_f58be029488543418b00944d2c9af825",
+          "input_digest": "67ab7a18b49967afe886e8ce117d399896bc698385fd84550692e6eb79995af7",
+          "job_id": "job_e3c5dcf5fdab42eda0a5ff8bf2162eab",
+          "leaf_evidence": [
+            {
+              "end_line": 5,
+              "start_line": 5
+            },
+            {
+              "end_line": 12,
+              "start_line": 10
+            },
+            {
+              "end_line": 42,
+              "start_line": 40
+            },
+            {
+              "end_line": 92,
+              "start_line": 92
+            },
+            {
+              "end_line": 50,
+              "start_line": 48
+            }
+          ],
+          "leaf_fingerprint": "084b09f4349e23bcca0f2e27528b50c2c7873bff29adfb7a4dffbcae47d0c856",
+          "leaf_quotes": [
+            "A **Time Tracking Application** is the record-keeper of time spent on work: it captures how long work took as individual, persistent time entries, attributes each entry to a piece of work structure — a project, task, client, or matter — and turns the accumulated record into timesheets, reports, and billable hours.",
+            "Time entry (a persistent, addressable record of a duration)\n└── attributed to a work structure (project / task / client / matter)\n    └── formed by a user act (timer, manual input, timesheet cell, or confirmed suggestion)",
+            "- **The time entry as the unit of record.** A persistent, individually addressable record of a duration of time — carrying its date, its recorder, and typically a short description. The entry survives sessions and accumulates into the user's (or team's) history. Without it there is only a stopwatch with no memory.\n- **Attribution to a work structure.** Each entry is attributed to a target in a user-maintained work hierarchy — most commonly project, with task and client as finer and coarser grains. This is what the record is *about*: work performed, not applications used, and not attendance kept. The hierarchy's depth and how strictly it is enforced vary by product (some require the full client→project→task chain, some require only a project, some leave attribution optional in the quick-timer surface) — but the existence of a user-chosen work-structure target is constant.\n- **User-driven formation of the record.** The entry comes into being through a user act: starting and stopping a timer, typing a duration or start/end times, filling a cell in a timesheet grid, or confirming a suggestion produced by automatic capture. The record is declarative — the user says what the time was for. Where records form without the user's hand, the product has crossed into ambient usage observation.",
+            "Timer and manual entry are both first-class in mature products; forgetting to start the timer is an expected event, so manual reconstruction is a supported path, not an apology. Where a product captures activity automatically in the background, the captured material is presented as suggestions or raw blocks that the user reviews and converts into entries — the entry still owes its existence to the user's confirmation.",
+            "- **Timesheet views** — day and week grids over the entry population, with totals per day, per week, and per attribution group.\n- **Reports and analysis** — filter, group, and break down time by project, client, task, team member, and date range; detailed (entry-level) and summary forms; export to spreadsheets and accounting tools.\n- **Billable semantics** — a billable/non-billable flag on entries and configurable billable rates (set per project, per person, or per task), with cost rates alongside in team products."
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "passed",
+          "peer_digest": "4ff4b2441d143e0c01547c7285b738f2aa13a0f20a9721167643e8a454ac90ef",
+          "peer_scenarios": [
+            {
+              "id": "scn_5090205fb3534475a0524fb93d81e4da",
+              "name": "审阅自动捕获建议并确认成可归属的时间条目",
+              "revision": 1
+            },
+            {
+              "id": "scn_e0566b4358854e64ae59d35a3545102a",
+              "name": "计费团队成员的周时间表提交、退回与锁定",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_815a7d861e944a2c90e257ddb1bb95c5",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "建议在第一条验收中显式加入“可计费标记随条目持久化”，或说明其由第三条的分别汇总间接覆盖，避免重开后标记丢失时无法判定。",
+            "工作流第3步“继续上一条或复制上周结构”目前无对应验收；可补一条可观察结果（如复制后生成独立的可编辑条目且归属沿用），或将其标注为可选步骤，使每条流程步骤都有验收落点。",
+            "第4步“修正重叠”涉及叶子未描述的冲突判定；若保留，建议补充一条场景内可观察规则（如重叠时提示并允许调整时长），否则改为“核对并修正日期、时长与归属”以避免隐含未声明的产品决定。"
+          ],
+          "summary": "仅基于文档的定向审查：该场景以自由职业者事后凭记忆补录工时为起点，形成带客户/项目/任务归属的持久时间条目，并以可计费时长汇总和导出支撑开票，与 Atlas 叶子定义的核心一致；与两个 peer 在用户、目标和流程上均可区分，流程连贯且验收可观察。未进行任何运行时、实现或市场验证，检查仅覆盖所给叶子与 peer 文本；未做全语料去重。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_e3c5dcf5fdab42eda0a5ff8bf2162eab",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    },
+    {
+      "acceptance": [
+        "成员提交当周时间表后，该周期对其变为只读，新增和修改入口不可用；审批人队列中出现该提交，并显示记录工时与预期工时",
+        "审批人退回并指明需修改的日期或条目后，成员可重新编辑该周期并再次提交，退回前已保存的其他条目仍然保留",
+        "审批通过后整周锁定，包括没有记录的日期，普通成员无法修改；审批被撤回后该周期恢复可编辑"
+      ],
+      "audience": "代理机构或咨询团队中按项目计费的成员及其时间表审批人",
+      "id": "scn_e0566b4358854e64ae59d35a3545102a",
+      "leaf": "time-tracking-application",
+      "leaf_name": "时间跟踪应用",
+      "name": "计费团队成员的周时间表提交、退回与锁定",
+      "objective": "把一周内分散的计时与补录整理成完整时间表，经提交、退回修改和审批后锁定周期，使后续账单和项目统计基于稳定的工时数据。",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:51:17.576333+00:00",
+      "workflow": [
+        "成员在周内用计时器记录各项目与任务，忘记启动时在时间表网格中补录时长",
+        "周末在时间表按项目/任务核对每天的合计，补齐缺漏并修正归属",
+        "提交当周时间表，等待审批",
+        "审批人对照预期工时审阅，退回某一天并要求补充说明或修改时长",
+        "成员修改被退回的内容后重新提交，审批人确认无误后批准",
+        "审批通过后周期锁定；若事后发现错误，由具备审批权限的角色撤回审批或按锁定编辑规则处理"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "场景保留了叶子定义的核心：工作流第 1–2 步用计时器与时间表网格形成条目并按项目/任务归属，对应 leaf.md 第 9–13 行“Time entry ... attributed to a work structure ... formed by a user act (timer, manual input, timesheet cell...)”；验收 1 的审批队列“显示记录工时与预期工时”对应第 147 行“submitted timesheets with logged hours against expected hours”；验收 3 的整周锁定与撤回重开对应第 169 行“once approved, the whole period locks (including days with no time) ... approval can be withdrawn to reopen a period”。审批虽被叶子称为可选组织纪律（第 110 行），但同属其明确记录的团队时间表能力（第 100–108 行），因此不构成偏离核心。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "与 peer 场景逐一比较用户、目标与工作流：scn_5090205fb3534475a0524fb93d81e4da 是知识工作者逐条审阅自动捕获建议并确认成条目，核心在“确认/丢弃建议”，不涉及提交与审批；scn_815a7d861e944a2c90e257ddb1bb95c5 是自由职业者事后补录并按客户汇总可计费时长、导出开票，核心在“个人补记与客户计费报告”，无审批人、退回与周期锁定。本场景的用户是计费团队成员与其审批人，目标是经提交、退回修改与批准锁定稳定周工时，工作流包含审批队列、退回后重提和整周锁定，与两个 peer 均不构成实质重叠。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "流程端到端连贯且可执行：周内计时与漏记补录（第 1 步）→ 周末按项目/任务核对日合计并修正归属（第 2 步）→ 提交并等待审批（第 3 步）→ 审批人对照预期工时退回具体日期（第 4 步）→ 修改后重新提交并获批（第 5 步）→ 批准后锁定，错误时可撤回审批重开（第 6 步）。提交、退回、重提、批准与撤回各状态衔接清楚，没有跳步或循环依赖。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "passed",
+              "reason": "三条验收均给出可观察的状态变化与角色边界：提交后作者侧入口不可用且审批队列出现“记录工时与预期工时”（验收 1）；退回并指明日期/条目后可重新编辑并再次提交，且“退回前已保存的其他条目仍然保留”（验收 2）；批准后“整周锁定，包括没有记录的日期”，撤回后“恢复可编辑”（验收 3）。这些覆盖了提交→退回→重提→批准→撤回的核心流程，可由界面状态、队列内容与条目保留情况判定。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "passed",
+              "reason": "范围与叶子一致且内部自洽：受众为“代理机构或咨询团队中按项目计费的成员及其时间表审批人”，对应叶子第 24 行 billable teams 与第 29 行“Managers/approvers review submitted timesheets, request changes, and approve periods”；未漂移为考勤/薪资或自动监控；“预期工时”有叶子第 147 行支撑，不是凭空假设。场景正文为简体中文，符合 input.language=zh，技术性标识与引文未受影响。第 6 步“按锁定编辑规则处理”表述略宽，但与验收 3 的撤回分支并存，不影响既定流程成立。"
+            }
+          ],
+          "created_at": "2026-10-17T01:52:37.361363+00:00",
+          "id": "scv_d0006e4bf8ad416d8e674d6123ca7049",
+          "input_digest": "6b404c058691bc5f7cacd7c6d244d2c891a882958cfcf8bdc925574add745737",
+          "job_id": "job_2a502fe529f64ece8ad76b0781c296bd",
+          "leaf_evidence": [
+            {
+              "end_line": 13,
+              "start_line": 9
+            },
+            {
+              "end_line": 110,
+              "start_line": 100
+            },
+            {
+              "end_line": 147,
+              "start_line": 145
+            },
+            {
+              "end_line": 169,
+              "start_line": 167
+            },
+            {
+              "end_line": 30,
+              "start_line": 21
+            }
+          ],
+          "leaf_fingerprint": "084b09f4349e23bcca0f2e27528b50c2c7873bff29adfb7a4dffbcae47d0c856",
+          "leaf_quotes": [
+            "```text\nTime entry (a persistent, addressable record of a duration)\n└── attributed to a work structure (project / task / client / matter)\n    └── formed by a user act (timer, manual input, timesheet cell, or confirmed suggestion)\n```",
+            "```text\nEntries accumulate through the period (day/week)\n→ the timesheet view totals them per day, per attribution group\n→ (team tier) the member submits the timesheet\n→ an approver reviews against expected hours\n   → approve  → the period locks\n   → request changes / send back → the member edits and resubmits\n→ locked periods keep billing, payroll, and reporting numbers stable\n```\n\nSubmission and approval are an **optional organizational discipline**, not part of the core: products gate it behind plans or modules, and a person tracking time only for themselves has no submission step at all. Where it exists, its purpose is stated plainly by vendors: catching missing or misattributed time before it becomes an invoice, and freezing the numbers that payroll and clients depend on.",
+            "### Approvals surface (team tier)\n\nThe reviewer's queue: submitted timesheets with logged hours against expected hours, approve / request-changes / decline actions, and the locked-period list.",
+            "### Submitted and approved periods lock\n\nOnce a timesheet is submitted it becomes read-only to its author; once approved, the whole period locks (including days with no time). Only administrators — or roles with approval permission — can edit locked entries, usually with an explicit warning, and approval can be withdrawn to reopen a period. This locking is what makes the record trustworthy enough to invoice and pay against.",
+            "The primary user is anyone who needs to account for their working time against the work it belonged to:\n\n- **Freelancers and solo professionals** track time per client and project so they can bill accurately and see what is profitable.\n- **Members of billable teams** (agencies, consultancies, law firms, design and software teams) log their hours against shared projects; the record feeds client invoices, project budgets, and internal visibility.\n- **Individuals tracking for themselves** use the same entries for self-awareness — where the day actually went — without any billing downstream.\n\nSecondary roles appear once a team is involved:\n\n- **Managers/approvers** review submitted timesheets, request changes, and approve periods so downstream numbers are stable.\n- **Administrators** set up the work structure (clients, projects, tasks), rates, permissions, and — where offered — approval schedules and lock rules."
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "passed",
+          "peer_digest": "a160921ef5326a483053ee6e08f72b44dbba5faa060caabb3c3dd3b2c93d26f1",
+          "peer_scenarios": [
+            {
+              "id": "scn_5090205fb3534475a0524fb93d81e4da",
+              "name": "审阅自动捕获建议并确认成可归属的时间条目",
+              "revision": 1
+            },
+            {
+              "id": "scn_815a7d861e944a2c90e257ddb1bb95c5",
+              "name": "自由职业者补记漏计工时并按客户核算可计费时长",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_e0566b4358854e64ae59d35a3545102a",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "可选：将工作流第 6 步“或按锁定编辑规则处理”拆成明确分支，或在验收中补充“具备审批权限的角色编辑已锁定周期”的可观察结果，以免与“撤回审批后恢复可编辑”分支混淆。"
+          ],
+          "summary": "本次仅针对单个场景做独立复核：将场景与已固定的 Atlas 叶子定义（leaf.md）及两个 peer 场景对照，未进行运行时验证、市场验证，也未做全库去重。结论：该场景的提交—退回—重提—批准—锁定主链路与叶子中“团队时间表纪律”及锁定规则一致，用户、目标与两个 peer 场景在工作流层面可区分，验收标准可观察，五个维度均通过。局限在于“事后处理已锁定周期”仍有可选分支表述较宽泛，属于非阻塞的可选澄清点。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_2a502fe529f64ece8ad76b0781c296bd",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    },
+    {
+      "acceptance": [
+        "建议在被确认前不会作为时间条目出现在时间表、报告或团队合计中",
+        "确认一条建议后生成独立、持久的时间条目，其客户/项目/任务归属、说明和修改后的时长均被保存；被丢弃的建议不生成任何条目",
+        "当天处理完毕后，时间表合计只包含已确认条目，且等于各确认条目时长之和",
+        "在启用私有默认设置的产品中，未确认或已丢弃的捕获内容不进入共享报告和团队合计，团队可见的只有已确认条目"
+      ],
+      "audience": "使用自动捕获功能、且要求每条记录由本人确认的知识工作者及其团队",
+      "id": "scn_5090205fb3534475a0524fb93d81e4da",
+      "leaf": "time-tracking-application",
+      "leaf_name": "时间跟踪应用",
+      "name": "审阅自动捕获建议并确认成可归属的时间条目",
+      "objective": "把后台捕获的活动片段逐条审阅，只将相关工作确认为带客户/项目/任务归属的正式时间条目，丢弃私人或无关片段，避免未经确认的观察数据进入团队工时。",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:51:17.576333+00:00",
+      "workflow": [
+        "打开当天的自动捕获建议或原始时间区块，查看每段的时间范围与推断出的活动内容",
+        "确认与工作相关的片段，选择客户、项目和任务，必要时修改说明与时长",
+        "丢弃与工作无关或属于私人的片段，不将其转为条目",
+        "逐条处理完当天建议后，在时间表中核对已确认条目及当日合计",
+        "在团队报告中确认只有已确认条目参与汇总"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "叶明确把“confirmed suggestion”列为形成时间的用户行为：“formed by a user act (timer, manual input, timesheet cell, or confirmed suggestion)”（第12行），并说明自动捕获材料“presented as suggestions or raw blocks that the user reviews and converts into entries — the entry still owes its existence to the user's confirmation”（第92行）。场景的审阅、确认、归属、丢弃正是这一核心，且“Automatic-capture tracker — … suggestion-based entry formation; privacy posture (local storage, private-by-default)”（第187行）与验收第4条直接对应；叶同时强调归属目标恒定（第41行）和未确认材料可保持私有（第161行），场景未越界到仅自动累积的活动观察。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "与 scn_815a7d861e944a2c90e257ddb1bb95c5 相比：该同伴是自由职业者“凭记忆补录”漏计工时并按客户汇总开票（手动输入路径、计费/开票目标）；本场景是审阅后台捕获建议并仅在确认后生成条目（确认建议路径、隐私与归属治理目标），流程首步与验收重点均不同。与 scn_e0566b4358854e64ae59d35a3545102a 相比：该同伴是周时间表提交、退回与审批锁定（团队审批纪律）；本场景不含提交/审批/锁定环节，关注建议的逐条确认与丢弃，以及未确认内容不进入团队合计。因此无 materially overlapping 的重复场景。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "五步构成完整端到端链路：打开当天建议并查看时间段与推断活动→确认并选择客户/项目/任务、可改说明与时长→丢弃私人或无关片段→在时间表核对已确认条目与当日合计→在团队报告确认仅已确认条目参与汇总。每一步都有明确的用户动作与可见结果，且与叶的“review → confirm → entry exists, attributed and dated”（第88–92行）一致，未出现无法衔接或需要补充前置能力的断点。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "passed",
+              "reason": "验收覆盖流程关键节点且可观察：未确认建议不出现在时间表/报告/团队合计（第1条）；确认后生成独立、持久条目并保存客户/项目/任务、说明及修改后时长，丢弃则不生成条目（第2条）；当天合计等于已确认条目时长之和（第3条）；启用私有默认时未确认/已丢弃内容不进入共享报告，团队仅见已确认条目（第4条）。这些均可通过界面状态、条目列表与合计数值核验，不依赖未给出的实现细节。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "passed",
+              "reason": "边界合理：限定在“使用自动捕获功能、且要求每条记录由本人确认的知识工作者及其团队”，不扩展到截图/键盘监控、计费开票或审批锁定；验收第4条以“在启用私有默认设置的产品中”为条件，属于叶第161行所述产品差异，而非强加的统一产品决策。场景中文叙述符合 input.language=zh，英文仅为“客户/项目/任务”等通用概念及既有标识，未发现内部矛盾或未支持的关键假设。"
+            }
+          ],
+          "created_at": "2026-10-17T01:52:41.036822+00:00",
+          "id": "scv_cd72158dcdd34f36bed96ece2d5d4391",
+          "input_digest": "08e42b51e02505f1a1efcf8c12d11ec736a23ef0cd56c414b925a00c54b1e160",
+          "job_id": "job_984a56f5625040bc924c073556663478",
+          "leaf_evidence": [
+            {
+              "end_line": 12,
+              "start_line": 10
+            },
+            {
+              "end_line": 42,
+              "start_line": 42
+            },
+            {
+              "end_line": 92,
+              "start_line": 88
+            },
+            {
+              "end_line": 161,
+              "start_line": 159
+            },
+            {
+              "end_line": 187,
+              "start_line": 185
+            }
+          ],
+          "leaf_fingerprint": "084b09f4349e23bcca0f2e27528b50c2c7873bff29adfb7a4dffbcae47d0c856",
+          "leaf_quotes": [
+            "Time entry (a persistent, addressable record of a duration)\n└── attributed to a work structure (project / task / client / matter)\n    └── formed by a user act (timer, manual input, timesheet cell, or confirmed suggestion)",
+            "- **User-driven formation of the record.** The entry comes into being through a user act: starting and stopping a timer, typing a duration or start/end times, filling a cell in a timesheet grid, or confirming a suggestion produced by automatic capture. The record is declarative — the user says what the time was for. Where records form without the user's hand, the product has crossed into ambient usage observation.",
+            "Confirm a suggestion produced by automatic background capture\n→ a time entry exists, attributed and dated\n```\n\nTimer and manual entry are both first-class in mature products; forgetting to start the timer is an expected event, so manual reconstruction is a supported path, not an apology. Where a product captures activity automatically in the background, the captured material is presented as suggestions or raw blocks that the user reviews and converts into entries — the entry still owes its existence to the user's confirmation.",
+            "### The entry is declarative and user-owned\n\nAn entry exists because a user formed it. Automatic capture, where present, only proposes — its output becomes an entry through user confirmation, and in some products the unconfirmed material stays private to the user, never visible to administrators.",
+            "- **Solo billing tracker** — freelancer-oriented: timer, clients and projects, billable rates, invoice generation from entries.\n- **Team timesheet tracker** — workspace with members, roles, submission/approval discipline, locking, utilization and profitability reporting.\n- **Automatic-capture tracker** — background observation of computer work feeding suggestion-based entry formation; privacy posture (local storage, private-by-default) is part of the pitch."
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "passed",
+          "peer_digest": "0b4cbddd22b3ef1b3caee048a1ba9bbf24745916a9277fab0533835335c62282",
+          "peer_scenarios": [
+            {
+              "id": "scn_815a7d861e944a2c90e257ddb1bb95c5",
+              "name": "自由职业者补记漏计工时并按客户核算可计费时长",
+              "revision": 1
+            },
+            {
+              "id": "scn_e0566b4358854e64ae59d35a3545102a",
+              "name": "计费团队成员的周时间表提交、退回与锁定",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_5090205fb3534475a0524fb93d81e4da",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "可将工作流第1步的“自动捕获建议或原始时间区块”统一表述为“待审阅的建议（或原始捕获区块）”，并说明两者都位于同一审阅界面，以减少验收时的对象歧义。",
+            "可在验收第2条补充“重新打开应用后该条目仍可找到”，把“持久”这一可观察结果显式化；这属于可选强化，不影响当前流程与验收成立。"
+          ],
+          "summary": "该场景把叶定义的“用户确认自动捕获建议→形成归属到客户/项目/任务的时间条目”作为明确核心，用户、目标、五步流程与四条验收标准一致且可观察；与两份同伴场景在用户行为、目标和流程上均不同，未发现需修订的重叠。局限：本次仅对照这份固定叶文本与输入中提供的两份同伴场景，未做全量去重，也未进行运行时或市场验证；“私有默认”仅作为条件性产品设置被引用，符合叶中“某些产品”的表述。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_984a56f5625040bc924c073556663478",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    },
+    {
+      "acceptance": [
+        "两位受邀者打开清单看到相同的未完成条目，一方新增的条目会出现在另一方设备上",
+        "被指定的条目显示负责人，且负责人可以将其勾选完成",
+        "条目勾选后从未完成列表消失并出现在已完成历史中，取消勾选后回到未完成状态",
+        "结算后未购买的条目仍保留在该清单中，不会被自动清除"
+      ],
+      "audience": "同住伴侣或家庭成员，各自用手机记录家中所需物品",
+      "id": "scn_67ff089cbbfe42b09e85f03d4ca5fda1",
+      "leaf": "to-do-list-application",
+      "leaf_name": "待办事项应用",
+      "name": "家庭共享采购清单",
+      "objective": "把随时想到的采购项汇总到同一份清单，到店时按清单完成采购，并分清各自负责的条目",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:51:11.704945+00:00",
+      "workflow": [
+        "一位成员新建“本周采购”清单，通过链接邀请另一位家庭成员，两人在各自手机上看到同一份清单",
+        "任意一方想到什么就直接向该清单添加条目，例如“牛奶”“电池”，无需先约定由谁记录",
+        "为“取快递”这类需要顺路处理的条目指定负责人，并补充商店或备注",
+        "到店后两人从同一清单逐项勾选；发现买重时取消勾选，让条目恢复为未完成",
+        "购物结束后在已完成历史中核对本次买到的条目，未买到的条目继续留在清单中"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "叶子把核心定义为 “The to-do item as the unit of record” 与 “The list as the primary container and working surface”，并把小型共享清单列为常见场景：“a household shopping list … invite a few named people, optionally hand an item to one of them”。场景的共享清单、条目新增、负责人和勾选完成均落在这些定义内；完成/取消完成也对应叶子 “check it off … the item leaves the open view, stays in history” 和 “optionally un-check”。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "与 scn_0b062cd067b94c1c82ab6a7c50c08f43 对比：后者是个人在多条清单间的每日专注与夜间回收，目标是控制当天工作量；本场景是多成员围绕一份采购清单的共享与分工，用户、目标和主流程不同。与 scn_516f729d15b940fcb43795522099864d 对比：后者以重复条目、到期日和提醒为核心；本场景不依赖重复或提醒，而以邀请、同步和负责人勾选为核心。仅有“勾选完成”这一通用动作相同，不构成重复。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "五步形成闭环：新建清单并用链接邀请（对应叶子 “invite specific people (link, message, email)”）→ 双方各自添加条目 → 为需要顺路处理的条目指定负责人并补充商店/备注 → 到店逐项勾选，买重时取消勾选 → 购物结束后在历史中核对，未买到的条目保留。步骤之间有清楚的先后关系和数据延续，没有缺口。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "passed",
+              "reason": "四条验收均可观察：双方设备看到相同未完成条目且新增同步；被指派条目显示负责人且负责人可完成；勾选后从未完成消失并进入已完成历史，取消勾选可恢复；购物结束后未购买条目仍保留。它们覆盖了共享、分工、完成/撤销和结束核对四个关键行为。“商店或备注”未被验收覆盖，但属于可选属性，不影响上述流程的评价。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "needs_changes",
+              "reason": "参与人数前后不一致：验收写“两位受邀者打开清单”，工作流却只“通过链接邀请另一位家庭成员”，按字面验收需要创建者之外的两名受邀者，而流程只建立一名受邀者，测试时无法据流程确定参与者。另外，“结算后”在工作流中没有对应动作，步骤5只写“购物结束后”，该词容易被读成支付或结账。除这两处外，场景限定在家庭小型共享清单，没有引入组织角色或审批，符合叶子 “Sharing is list-scoped and personal” 的边界。"
+            }
+          ],
+          "created_at": "2026-10-17T01:51:54.076392+00:00",
+          "id": "scv_0efdeb04ec344bc9adb23dd64d24e53b",
+          "input_digest": "bc13ee123a711117ca70fdeba74f31a8cc901359182efe9067d58c2e15f19cf0",
+          "job_id": "job_f98bd5d46b9842bb8004cc15854d5593",
+          "leaf_evidence": [
+            {
+              "end_line": 5,
+              "start_line": 5
+            },
+            {
+              "end_line": 24,
+              "start_line": 24
+            },
+            {
+              "end_line": 104,
+              "start_line": 98
+            },
+            {
+              "end_line": 128,
+              "start_line": 122
+            }
+          ],
+          "leaf_fingerprint": "2140dae2f28aaaa14b9271fc8deb7328d51a34e725309f6c6949fdaf4301a625",
+          "leaf_quotes": [
+            "A **To-do List Application** is a personal application that holds **lists of to-do items** — lightweight records of things the person intends to do — and lets the user capture them, be reminded of them, and **check them off** when done.",
+            "A secondary, very common context is the **small shared list**: a household shopping list, a couple's errand list, a family trip packing list, a small set of tasks split with a colleague or family member. Sharing in this Type is list-level and personal — invite a few named people, optionally hand an item to one of them — not an organizational membership model.",
+            "```text\nOpen a list\n→ see its open items (sorted manually or by date/priority)\n→ do a thing\n→ check it off (the defining act; the item leaves the open view, stays in history)\n→ optionally un-check if it wasn't actually done\n```",
+            "```text\nCreate or open a list\n→ invite specific people (link, message, email)\n→ everyone sees and edits the same list\n→ optionally assign an item to one person\n→ completion activity is visible to the group\n```"
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "needs_changes",
+          "peer_digest": "041145599b783c8e3e1ce3b3909c984c7966defd56de7652cbce14fcd484bcb4",
+          "peer_scenarios": [
+            {
+              "id": "scn_0b062cd067b94c1c82ab6a7c50c08f43",
+              "name": "每日专注清单与夜间回收",
+              "revision": 1
+            },
+            {
+              "id": "scn_516f729d15b940fcb43795522099864d",
+              "name": "周期性家务的时间提醒",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_67ff089cbbfe42b09e85f03d4ca5fda1",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "统一参与人数：将验收1改为“两位成员（创建者与受邀者）打开清单看到相同的未完成条目……”，或在第一步增加邀请第二位家庭成员，并同步调整负责人的可能范围。",
+            "将“结算后未购买的条目……”改为“购物结束、完成本次采购后……”，或在流程中明确一个结束本次采购的可观察动作，避免“结算”被理解为支付或结账。",
+            "可选地补充验收，说明非负责人是否可以勾选被指派的条目，以及“商店或备注”是否需要作为可见信息被验证；若不需要验证，可将其明确为可选补充信息。"
+          ],
+          "summary": "该场景以家庭共享采购清单为核心，符合叶子中“清单是主要工作面、条目可完成”的定义，并与两个 peer 在用户、目标和流程上可区分；整体流程连贯，多数验收可观察。但验收中的“两位受邀者”与工作流只邀请“另一位家庭成员”存在人数不一致，“结算后”也没有对应的流程动作，属于可修复的内部一致性问题。本次仅对照 pinned leaf 与两个 peer 评审，不构成全语料去重、运行可用性或市场验证。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_f98bd5d46b9842bb8004cc15854d5593",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    },
+    {
+      "acceptance": [
+        "加入今天的条目仍在其原清单中可见，并带有“今天”关联，而不是被复制成一条新条目",
+        "在每日专注视图勾选完成后，原清单中的同一条目也显示为完成",
+        "被忽略的建议不会从原清单中删除或被标记完成",
+        "夜间重置后，未完成项回到原清单并离开当天视图，次日重新出现在建议中"
+      ],
+      "audience": "同时维护工作、阅读、家务等多条清单，需要控制每天实际工作量的个人",
+      "id": "scn_0b062cd067b94c1c82ab6a7c50c08f43",
+      "leaf": "to-do-list-application",
+      "leaf_name": "待办事项应用",
+      "name": "每日专注清单与夜间回收",
+      "objective": "每天从各清单中挑出少量真正要做的事，专注完成；未完成项在夜间回到原清单，次日仍可被重新挑中",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:51:11.704945+00:00",
+      "workflow": [
+        "用户已有多条清单，例如“工作”“阅读”“家务”，早晨打开每日专注视图",
+        "从建议中挑选三项加入今天，也可以从任一清单手动加入一项",
+        "白天在每日专注视图中逐项完成；勾选后，该项在其原清单中同步显示为完成",
+        "对不打算今天做的建议选择忽略，该条目继续留在原清单",
+        "夜间视图重置，当天未完成项返回各自原清单，次日重新出现在建议中"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "场景目标“每天从各清单中挑出少量真正要做的事，专注完成；未完成项在夜间回到原清单，次日仍可被重新挑中”直接对应叶子 Plan the day 一节：*\"Open the daily-focus list ... pick today's items from suggestions or by adding from any list ... in products with a nightly reset: uncompleted items return to their home list and reappear in tomorrow's suggestions\"*（108–118 行），并与每日专注视图定义 *\"Today's short list: items added for today plus suggestions from across the lists. Primary actions: add to today, dismiss a suggestion, check off. In some products it empties nightly by design.\"*（157–159 行）一致。验收第 1、2 条还落实了叶子规则 *\"The list is the home of record. Smart lists and daily views gather items but do not own them; an item edited or completed through a lens changes in its home list.\"*（172 行），未发生向 Task Management 的漂移。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "与 scn_516f729d15b940fcb43795522099864d 相比：后者是“周期性家务的时间提醒”，核心是重复条目在下一次到期日重新生成与提醒触发；本场景无重复或提醒设定，核心是每日挑选与夜间回收。与 scn_67ff089cbbfe42b09e85f03d4ca5fda1 相比：后者是两位家庭成员共享同一采购清单并指定负责人；本场景是单人跨多条清单控制每日工作量，不涉及邀请、共享或负责人。三者的用户、目标与端到端流程均不同，仅共享同一叶子的条目/清单基础结构。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "流程闭合且可执行：早晨打开每日专注视图（步骤 1）→ 从建议中挑三项或从任一清单手动加入（步骤 2）→ 白天在每日专注视图逐项完成并同步原清单（步骤 3）→ 忽略不做的建议且条目留在原清单（步骤 4）→ 夜间重置，未完成项回到原清单并在次日重回建议（步骤 5）。起点、操作、状态变化与次日结果首尾衔接，无缺失环节或自相矛盾之处。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "passed",
+              "reason": "四条验收均为可观察状态断言：加入今天的条目在原清单仍可见并带“今天”关联而非复制（对应“不复制、不夺走归属”）；每日专注视图勾选后原清单同一条目显示完成（对应叶子 172 行跨视图同步）；被忽略的建议未被删除或标记完成；夜间重置后未完成项回到原清单、离开当天视图并在次日建议中重现。这些断言覆盖了挑选、手动加入、完成、忽略与回收的完整流程，判定不依赖内部实现细节。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "passed",
+              "reason": "边界合理：仅使用叶子列为成熟产品能力的每日专注面与建议、夜间回收，不引入项目层级、审批流、工作量统计或团队视图，未越过叶子 173 行“Urgency is derived, not staged”与 Task Management 的边界。“挑选三项”属于个人使用惯例而非硬性产品约束。场景正文为简体中文，符合 input.language=zh；仅工作流第 1 步“家务”存在引号不成对的排版小瑕疵，不影响含义或验收。"
+            }
+          ],
+          "created_at": "2026-10-17T01:51:34.646248+00:00",
+          "id": "scv_84dcac2ff11e408fb47ceb2422dc3f3d",
+          "input_digest": "f0c3b64c9fd3ace8264636c98c90645fc9fd031014e864881d2dc1dbaa537eeb",
+          "job_id": "job_c82fb5d0d6f84727b9ee927572ff1574",
+          "leaf_evidence": [
+            {
+              "end_line": 118,
+              "start_line": 108
+            },
+            {
+              "end_line": 159,
+              "start_line": 157
+            },
+            {
+              "end_line": 172,
+              "start_line": 172
+            }
+          ],
+          "leaf_fingerprint": "2140dae2f28aaaa14b9271fc8deb7328d51a34e725309f6c6949fdaf4301a625",
+          "leaf_quotes": [
+            "### Plan the day\n\n```text\nOpen the daily-focus list (morning, or the night before)\n→ pick today's items from suggestions or by adding from any list\n→ work from that list during the day, checking items off\n→ in products with a nightly reset: uncompleted items return to their home list\n  and reappear in tomorrow's suggestions\n```\n\nThis ritual is the capture-and-remember posture made explicit: a fresh, short list for today, with nothing lost — what didn't get done goes back to where it lives.",
+            "### Daily-focus view\n\nToday's short list: items added for today plus suggestions from across the lists. Primary actions: add to today, dismiss a suggestion, check off. In some products it empties nightly by design.",
+            "- **The list is the home of record.** Smart lists and daily views gather items but do not own them; an item edited or completed through a lens changes in its home list. In products with a nightly-resetting daily list, uncompleted items are explicitly returned to their home list rather than lost."
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "passed",
+          "peer_digest": "8300c87385aaebe7d4fa5f4d28427a7c8e4273337b9dcc5b436e4f87acf0a4a0",
+          "peer_scenarios": [
+            {
+              "id": "scn_516f729d15b940fcb43795522099864d",
+              "name": "周期性家务的时间提醒",
+              "revision": 1
+            },
+            {
+              "id": "scn_67ff089cbbfe42b09e85f03d4ca5fda1",
+              "name": "家庭共享采购清单",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_0b062cd067b94c1c82ab6a7c50c08f43",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "将工作流第 1 步中的“工作”“家务”补全为成对中文引号（“家务”），保持文本排版一致。"
+          ],
+          "summary": "该场景以叶子的“每日专注视图（daily-focus）”为核心：用户每天从既有清单中挑少量条目组成当天清单，完成后在每日专注视图勾选，原清单同步显示完成；未完成项夜间回收至原清单，次日重新出现在建议中。这与叶子对每日专注视图的“透镜”定位、以及“清单为记录归属”的规则一致；工作流完整、验收可观察，且与两个 peer_scenarios（重复提醒家务、共享采购清单）在用户、目标与流程上均不重叠。本次结论仅基于钉住的 leaf.md 与给定 peer_scenarios 的文本审查，不构成运行时或市场验证。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_c82fb5d0d6f84727b9ee927572ff1574",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    },
+    {
+      "acceptance": [
+        "完成重复条目后，同一清单中出现下一次到期日的条目，原完成记录保留在历史中",
+        "下一次到期日按设定周期计算，用户无需手动重建条目",
+        "未完成的过期条目仍留在清单的未完成视图中，并以逾期状态呈现",
+        "提醒按条目设定的时间触发；关闭通知不会删除条目，也不会改变其完成状态"
+      ],
+      "audience": "独自打理住所、需要按固定节奏处理家务的上班族",
+      "id": "scn_516f729d15b940fcb43795522099864d",
+      "leaf": "to-do-list-application",
+      "leaf_name": "待办事项应用",
+      "name": "周期性家务的时间提醒",
+      "objective": "用带提醒的重复条目记住每周或每月的固定家务，完成一次后自动出现下一次，并保留每次完成记录",
+      "revision": 1,
+      "status": "draft",
+      "updated_at": "2026-10-17T01:51:11.704945+00:00",
+      "workflow": [
+        "在“家务”清单添加“周三倒垃圾”，设置每周重复和周中晚上的提醒",
+        "在“家居维护”清单添加“更换净水器滤芯”，设置每月重复和到期日",
+        "到提醒时间收到通知，打开条目所在清单完成当前这一次",
+        "完成后清单中出现下一次到期日的同一条目，已完成的那次进入历史",
+        "某次未完成时，该条目保持未完成，并按到期状态显示为逾期，直到被勾选"
+      ],
+      "reviews": [
+        {
+          "checks": [
+            {
+              "dimension": "leaf_fit",
+              "outcome": "passed",
+              "reason": "场景以两份命名清单为工作面板，条目可勾选完成并保留历史，直接对应第40行“The to-do item as the unit of record ... Its defining act is completion”和第41行“The list as the primary container and working surface”。重复与提醒虽非定义核心，但第50行明确将“Recurrence — a repeating item re-materializes after each completion (... trash day ...)”列为成熟产品的标准能力，第174行也确认“the completed occurrences remain as history”。场景没有用派生视图或组织化流程取代清单，因此仍落在该 Type 内。"
+            },
+            {
+              "dimension": "distinctness",
+              "outcome": "passed",
+              "reason": "已比较 scn_0b062cd067b94c1c82ab6a7c50c08f43（每日专注清单与夜间回收）与 scn_67ff089cbbfe42b09e85f03d4ca5fda1（家庭共享采购清单）。前者围绕每日挑选、建议忽略与夜间把未完成项退回原清单，后者围绕邀请成员、共享同步、负责人与采购核对；本场景是单人固定家务的周期生成、提醒与逾期保留，既不涉及每日专注视图，也不涉及共享或分配。三者仅有通用的“条目完成后保留历史”记录语法，不构成实质重叠。"
+            },
+            {
+              "dimension": "workflow",
+              "outcome": "passed",
+              "reason": "流程从建立“周三倒垃圾”（每周重复、周中晚上提醒）和“更换净水器滤芯”（每月重复、到期日）开始，到提醒触发、在所属清单完成当前一次、下一次到期条目出现且本次进入历史，最后覆盖未完成条目持续以逾期状态留在未完成视图。五步首尾相接，覆盖创建、提醒、完成、再生成和历史查看，没有缺失的交接或依赖未说明的外部步骤。"
+            },
+            {
+              "dimension": "testability",
+              "outcome": "passed",
+              "reason": "验收项与流程逐步对应且可观察：完成后同清单出现下一次到期条目且原记录留在历史（对应第4步）；下一次日期按设定周期计算、无需手工重建（对应第4步）；逾期的未完成条目仍在未完成视图并显示逾期（对应第5步）；提醒在设定时间触发，关闭通知不删除条目也不改变完成状态（对应第3步）。这些都能通过清单、历史和通知状态核验，无需依赖未声明的实现细节。"
+            },
+            {
+              "dimension": "scope",
+              "outcome": "passed",
+              "reason": "边界合理：受众是独自打理住所的上班族，只有两份个人清单，没有引入团队、轮值公平性或审批等属于相邻 Type 的机制；第196行也区分了“chore apps center a cadence-first chore record with rotation/fairness machinery; here recurrence is an item attribute”。场景未假定特定技术栈、通知渠道或数值阈值，中文叙述符合 input.language 为 zh 的要求，技术性条目名保持原文不影响语言判断。"
+            }
+          ],
+          "created_at": "2026-10-17T01:52:07.681976+00:00",
+          "id": "scv_86ac8f14cd3c4162b1e901d5598959db",
+          "input_digest": "b7c8b46afcead0b04bbf15b8017acd4628a395ab39c98015de10f291a83f6ce2",
+          "job_id": "job_cb647f2f96eb4b9492bace9c9aae9de6",
+          "leaf_evidence": [
+            {
+              "end_line": 5,
+              "start_line": 5
+            },
+            {
+              "end_line": 41,
+              "start_line": 40
+            },
+            {
+              "end_line": 50,
+              "start_line": 50
+            },
+            {
+              "end_line": 174,
+              "start_line": 174
+            }
+          ],
+          "leaf_fingerprint": "2140dae2f28aaaa14b9271fc8deb7328d51a34e725309f6c6949fdaf4301a625",
+          "leaf_quotes": [
+            "A **To-do List Application** is a personal application that holds **lists of to-do items** — lightweight records of things the person intends to do — and lets the user capture them, be reminded of them, and **check them off** when done.",
+            "- **The to-do item as the unit of record.** A persistent, individually addressable record of one thing the person intends to do — lightweight by design: a short title, optionally a note, a date, a reminder. Its defining act is **completion**: checking it off, moving it from open to done. Without completable items, the product is a text list or a note.\n- **The list as the primary container and working surface.** Items are held on named lists; the list is the surface the user opens, reviews, and works from — capture, review, and completion happen on the list. Views derived from the lists (a daily-focus list, criteria-based smart lists) are lenses: they gather items from the lists, but the items' home remains the list. Without the list as the home and working surface — items managed as a population through organizing structure and views — the product has become a task manager.",
+            "- **Recurrence** — a repeating item re-materializes after each completion (medications, trash day, practice sessions).",
+            "- **Recurrence re-materializes the item.** A repeating item's next occurrence appears on completion; the completed occurrences remain as history. Recurrence is an attribute of an item, not a separately managed routine population."
+          ],
+          "model": "open-design/deepseek-v4.1-flash",
+          "outcome": "passed",
+          "peer_digest": "b2da53af003238cf1aa581f62d1e531e0e698371012e7da115dff0ade7308c2b",
+          "peer_scenarios": [
+            {
+              "id": "scn_0b062cd067b94c1c82ab6a7c50c08f43",
+              "name": "每日专注清单与夜间回收",
+              "revision": 1
+            },
+            {
+              "id": "scn_67ff089cbbfe42b09e85f03d4ca5fda1",
+              "name": "家庭共享采购清单",
+              "revision": 1
+            }
+          ],
+          "related_scenario_ids": [],
+          "scenario_id": "scn_516f729d15b940fcb43795522099864d",
+          "scenario_revision": 1,
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "suggestions": [
+            "可选、不阻塞：可补充说明逾期后才勾选时，下一次到期日是以原定到期日为基准还是以实际完成日为基准，并相应增加一条验收断言，以消除边界行为的不确定性。"
+          ],
+          "summary": "本次范围审查仅针对该单个场景，对照已固定的 leaf（to-do-list-application）和两个 peer_scenarios 进行核验，结论为通过。场景把重复家务放在“家务”“家居维护”两份清单中，以条目完成、下一次到期日重新出现、完成记录保留和逾期仍可见为主线，体现了叶子定义的“清单为家、条目可完成”核心，并将重复与提醒作为条目的属性使用，而非另建一套家务排班体系。两个 peer 分别聚焦每日专注/夜间回收与家庭共享采购/负责人分配，与本场景的用户、目标和流程均不同。局限：本次未验证运行时通知投递、跨设备同步、市场价值或全量语料去重；逾期后才完成时下一次到期日的计算基准未明确，但不影响当前声明的按周期生成与历史保留流程。",
+          "current": true
+        }
+      ],
+      "review_jobs": [
+        {
+          "id": "job_cb647f2f96eb4b9492bace9c9aae9de6",
+          "state": "completed",
+          "error": null,
+          "scenario_revision": 1,
+          "current": true
+        }
+      ]
+    }
+  ],
+  "failures_and_recovery": [
+    {
+      "job_id": "job_e3c5dcf5fdab42eda0a5ff8bf2162eab",
+      "attempt": 1,
+      "error": "scenario review needs exact pinned leaf quotes",
+      "observed_issue": "首次报告既没有 leaf_evidence 也没有 leaf_quotes；不记为通过。",
+      "recovery": "仅重试固定输入的独立审阅，attempt 2 完成且通过；未重新生成。"
+    }
+  ],
+  "limits": [
+    "审阅不代表运行时、市场价值或全库去重已验证。",
+    "全部新增仍为草案；未修改或确认两个需修改场景。",
+    "未生产或发布模板。"
+  ],
+  "screenshot": "docs/template-factory/2026-10-17-scenario-batch-04.jpg"
+}

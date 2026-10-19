@@ -1,0 +1,24 @@
+{
+  "case": "rename",
+  "label": "M3",
+  "rounds": {
+    "initial": {
+      "directory": "initial",
+      "oracle_version": 3,
+      "oracle_freeze_file": "freeze-v3.json",
+      "oracle_freeze_sha256": "4f0899dc039d93a7290fafe0ff03aa5ee2fca4cb93e47639f75cfa92347c6152",
+      "result_sha256": "9a851cc9a01472e8546be9dec8aedf060ebb95c38dd4724a3a3c57fdf1b77706",
+      "source_audit": "source-audit-initial.json",
+      "application_changed": false
+    }
+  },
+  "exploratory": {
+    "EP01_initial": {
+      "directory": "EP01-initial",
+      "posthoc": true,
+      "freeze": "EP01-freeze.json",
+      "result_sha256": "466967b6cdf475b9d051644f12e6d573119c6612b4c4d0b684cbd2844ab5989f",
+      "core_scores_changed": false
+    }
+  }
+}

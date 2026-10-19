@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-19",
+  "status": "completed_single_followup_trial_with_necessary_repair",
+  "model": "commandcode/deepseek/deepseek-v4.1-flash",
+  "reasoning_effort": "high",
+  "not_a_new_randomized_ab": true,
+  "template_static_review": "seven passed; phase_acceptance uncertain",
+  "authored_17_case_suite": "not_run_as_a_suite",
+  "template_published": false,
+  "grade_promoted": false,
+  "initial_required": {
+    "R01": "passed",
+    "R02": "passed",
+    "R03": "passed",
+    "R04": "partial",
+    "R05": "failed",
+    "R06": "passed",
+    "R07": "passed",
+    "R08": "partial",
+    "R09": "passed"
+  },
+  "repaired_required": {
+    "R01": "passed",
+    "R02": "passed",
+    "R03": "passed",
+    "R04": "passed",
+    "R05": "passed",
+    "R06": "passed",
+    "R07": "passed",
+    "R08": "passed",
+    "R09": "passed"
+  },
+  "application_source_hand_edits": false,
+  "initial_delivery": {
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "reasoning_effort": "high",
+    "session_ids": [
+      "ses_eb04521b8ffeYRvrsr6RohLQQf"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 738.24,
+    "transport": "scoped file write tools; final response metadata only",
+    "provider_error_events": []
+  },
+  "successful_repair_recovery_delivery": {
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "reasoning_effort": "high",
+    "session_ids": [
+      "ses_eafa5193cffegbvzLnMyok2MSk"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 177.29,
+    "transport": "scoped file write tools; final response metadata only",
+    "provider_error_events": []
+  },
+  "preserved_failures": [
+    "production invalid plan root path, missing limits and provider stream error/retry",
+    "repair-interruption.json",
+    "review-protocol-failure.json",
+    "evaluation/outcome-review/format-repair/cognitive-review/format-input-failure.json"
+  ],
+  "long_note": "3420 logical codepoints fully submitted; explicit 2000 limit rejection, input preserved; not full long-note storage",
+  "oversized_request": "initial accepted 999895 of 1001000 submitted ASCII title characters; repaired HTTP413 with no new record and old record intact",
+  "double_click_saved_records": 1,
+  "services_stopped": true,
+  "real_user_data_modified": false,
+  "original_ab_results_unchanged": true,
+  "unique_billed_tokens": "unknown",
+  "general_speed_or_cost_advantage": "not_established",
+  "evidence_sha256": {
+    "freeze.json": "4bcea9cd48f8c420a9e46505911ae1008af1b676a2877db4005caab1cadb5e5b",
+    "generation.json": "06d46261134c03c24433ebfa8c2e68928f2ec988fa863225130c46267aac61a8",
+    "repair-generation.json": "c8a28ed44ae7fe7052752fb7e9afd6f48aa9ee68bb76ff9f9f73cb0c507a8f74",
+    "evaluation/runtime/runtime-results.json": "3be8f26304a964b9afd4cd3048b38a3d4b2cb510fb9df1dfe608e432020f5a8d",
+    "evaluation/runtime-repair/runtime-results.json": "e9f3838937c740f4b82675a6b85a26d95a36febb30fcde71aa792185ee85f3c8",
+    "evaluation/supplement-repair/result.json": "eec5edcb1cea7c76bb435989d5b9d72534047a4d813e5ec55cc1ad333818f315",
+    "evaluation/body-initial/result.json": "a755d3a4ddd8174a82a317db3219da588e1914a2f43d90efc0e8a7f9179f5e9c",
+    "evaluation/body-repair/result.json": "baf02144195290d0b468ac2726ec810324cb497f7268f3f2aec1b533ae51b1ff",
+    "independent-outcome-review.json": "e12d9ecd9a0a5b8199b6d40267c5061fa9c2fbfbd95887d38c98237914ec2b8c",
+    "review-format-recovery.json": "21c510447bc2b132fdc8e50fbb7ec884b5869c7406cec843b7fed55112c3fb60"
+  }
+}

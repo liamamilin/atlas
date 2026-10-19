@@ -1,0 +1,459 @@
+{
+ "schema": "atlas.development-handoff.v1",
+ "project_name": "trial-budget",
+ "template_digest": "aa80a6e1049c7e0c6a1ccf37a2f8d70af9c122fe2024c6b1be3b2fd2e201f51b",
+ "blueprint": "blueprint/template.json",
+ "selected_phase": "P0",
+ "selected_goal": "使用者能在本地浏览器中选月、建立分类与预算、记录并纠正支出、核对计划/实际/剩余（含超支负剩余）、切换月份后重启仍可回查，并导出当月 CSV。",
+ "prerequisite_phases": [],
+ "scenario": {
+  "id": "experiment-budget",
+  "revision": 1,
+  "status": "ready",
+  "leaf": "budgeting-application",
+  "name": "个人月度预算与消费前剩余额度",
+  "audience": "单个本地用户，不连接银行或支付服务",
+  "objective": "按月为用途设置预算，记录和纠正实际支出，在消费前看到准确的计划、已花和剩余，并导出自己的记录。",
+  "workflow": [
+   "选择月份并建立分类及预算",
+   "记录有日期、分类、金额和备注的支出",
+   "核对分类及整月计划/实际/剩余，超支可见",
+   "修改或删除误记支出并即时重算",
+   "切换月份、重启后仍可回查",
+   "导出当月支出 CSV"
+  ],
+  "acceptance": [
+   "仅本人本地数据；货币为人民币，两位小数，支出须为正数，不静默取整或裁剪输入",
+   "每月预算及支出互相隔离；未使用分类仍可见，超支显示负剩余，不自动阻止记账",
+   "修改/删除后汇总与列表一致，失败输入给出反馈且不破坏旧数据",
+   "数据只存指定目录，正常重启保留；导出对应当前月份，中文、引号和换行可往返"
+  ],
+  "authorization_scope": "user-authorized local experiment only; no catalog mutation"
+ },
+ "roles": [
+  {
+   "id": "R01",
+   "name": "本地使用者（唯一用户）",
+   "responsibility": "在本地浏览器中选择月份、建立分类与月预算、记录/修改/删除支出、查看计划/实际/剩余（含超支负剩余）并导出当月 CSV；数据仅存于指定目录，全离线、无银行或支付连接。"
+  },
+  {
+   "id": "R02",
+   "name": "独立验收操作员",
+   "responsibility": "在隔离环境中以显式目标（--target-url，或 --app-path 加 --data-root）运行 acceptance/run.py，针对真实实例执行行为断言并读取非零退出码；不接触真实用户数据、凭据或外部网络。"
+  }
+ ],
+ "phases": [
+  {
+   "id": "P0",
+   "title": "单机本地月度预算核心旅程",
+   "goal": "使用者能在本地浏览器中选月、建立分类与预算、记录并纠正支出、核对计划/实际/剩余（含超支负剩余）、切换月份后重启仍可回查，并导出当月 CSV。",
+   "features": [
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06",
+    "F07",
+    "F08",
+    "F09",
+    "F10"
+   ],
+   "acceptance": [
+    "A01",
+    "A02",
+    "A03",
+    "A04",
+    "A05",
+    "A06",
+    "A07",
+    "A08",
+    "A09",
+    "A10",
+    "A11",
+    "A12",
+    "A13",
+    "A14"
+   ],
+   "status": "not implemented"
+  }
+ ],
+ "features": [
+  {
+   "id": "F01",
+   "name": "月份选择与按月隔离",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "场景以“按月”为组织单位，必须先选月并保证不同月份的分类、预算与支出互相隔离，切换月份可回查。",
+   "sources": [
+    "S01",
+    "S02",
+    "S04",
+    "S06"
+   ],
+   "acceptance": [
+    "A01",
+    "A10"
+   ]
+  },
+  {
+   "id": "F02",
+   "name": "建立分类与月预算",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "核心旅程起点：为某月建立分类并分配预算额度，一个分类即一条“计划”记录。",
+   "sources": [
+    "S01",
+    "S02",
+    "S04"
+   ],
+   "acceptance": [
+    "A02",
+    "A03"
+   ]
+  },
+  {
+   "id": "F03",
+   "name": "调整分类月预算",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "计划可随时修改且不追溯；改预算只作用于目标月份，不能误改其他月。",
+   "sources": [
+    "S02",
+    "S03",
+    "S06"
+   ],
+   "acceptance": [
+    "A12"
+   ]
+  },
+  {
+   "id": "F04",
+   "name": "记录支出（日期/分类/金额/备注）",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "实际支出是“计划−实际=剩余”的另一半；需日期、分类、正数金额与备注，且日期须属该分类所在月。",
+   "sources": [
+    "S01",
+    "S07"
+   ],
+   "acceptance": [
+    "A04",
+    "A05",
+    "A06"
+   ]
+  },
+  {
+   "id": "F05",
+   "name": "分类与整月计划/实际/剩余（超支负剩余可见）",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "消费前的剩余额是核心输出；超支合法并显示为负剩余，未使用分类仍须可见，且不阻止后续记账。",
+   "sources": [
+    "S01",
+    "S05",
+    "S06"
+   ],
+   "acceptance": [
+    "A07"
+   ]
+  },
+  {
+   "id": "F06",
+   "name": "修改/删除支出并即时重算",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "误记可纠正；改删后列表与汇总必须即时一致地重算（对齐 running balance 语义）。",
+   "sources": [
+    "S01",
+    "S04"
+   ],
+   "acceptance": [
+    "A08",
+    "A09"
+   ]
+  },
+  {
+   "id": "F07",
+   "name": "输入校验与失败反馈（不破坏旧数据）",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "不允许静默取整或裁剪输入；失败输入需给出反馈且保持既有数据不变。",
+   "sources": [
+    "S01",
+    "S12"
+   ],
+   "acceptance": [
+    "A05",
+    "A06",
+    "A09",
+    "A14"
+   ]
+  },
+  {
+   "id": "F08",
+   "name": "本地持久化与重启回查",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "数据须落在指定目录并在正常重启后保留，支持跨会话回查。",
+   "sources": [
+    "S01",
+    "S13",
+    "S08"
+   ],
+   "acceptance": [
+    "A10"
+   ]
+  },
+  {
+   "id": "F09",
+   "name": "导出当月 CSV（RFC 4180 往返）",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "导出是当前最小审计/恢复起点；须对应所选月份，且中文、字段内引号与换行可往返解析。",
+   "sources": [
+    "S10",
+    "S11",
+    "S13"
+   ],
+   "acceptance": [
+    "A11"
+   ]
+  },
+  {
+   "id": "F10",
+   "name": "浏览器 UI 与真实状态一致",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "人类 UI 能力必须通过声明的入口可达；GET / 提供可用中文界面，且与 JSON API 共用同一真实状态。",
+   "sources": [
+    "S07",
+    "S08"
+   ],
+   "acceptance": [
+    "A01",
+    "A13"
+   ]
+  }
+ ],
+ "acceptance": [
+  {
+   "id": "A01",
+   "phase": "P0",
+   "goal": "启动后 GET / 返回可用中文 UI；将 data-testid=month 设为某月后，JSON API 返回与该月一致的实时状态。",
+   "type": "positive",
+   "features": [
+    "F01",
+    "F10"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A02",
+   "phase": "P0",
+   "goal": "通过 UI 控件（category-name/category-budget/category-save）与 POST /api/categories 建立分类与预算，GET /api/state 返回该分类且 spent 为 \"0.00\"。",
+   "type": "positive",
+   "features": [
+    "F02"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A03",
+   "phase": "P0",
+   "goal": "同一月份重复名称创建分类返回非 2xx JSON 错误，且不产生隐藏的第二个分类。",
+   "type": "negative",
+   "features": [
+    "F02"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A04",
+   "phase": "P0",
+   "goal": "记录含日期、分类、金额与备注的支出后，GET /api/state 列表包含该笔且汇总与之一致。",
+   "type": "positive",
+   "features": [
+    "F04"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A05",
+   "phase": "P0",
+   "goal": "非正数或超过两位小数的金额被拒绝（非 2xx JSON），存储值与汇总保持原样，不静默取整或裁剪。",
+   "type": "negative",
+   "features": [
+    "F04",
+    "F07"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A06",
+   "phase": "P0",
+   "goal": "交易日期与分类所属月份不一致时被拒绝，且既有数据不变。",
+   "type": "negative",
+   "features": [
+    "F04",
+    "F07"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A07",
+   "phase": "P0",
+   "goal": "分类与整月的 budget/spent/remaining/totals 计算正确；未使用分类仍出现；超支显示负 remaining 且不阻止后续记账。",
+   "type": "positive",
+   "features": [
+    "F05"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A08",
+   "phase": "P0",
+   "goal": "修改或删除支出后，交易列表与汇总即时一致地重算。",
+   "type": "positive",
+   "features": [
+    "F06"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A09",
+   "phase": "P0",
+   "goal": "对不存在或非法 id 的 PUT/DELETE 返回非 2xx，原记录保持不变。",
+   "type": "negative",
+   "features": [
+    "F06",
+    "F07"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A10",
+   "phase": "P0",
+   "goal": "不同月份数据互相隔离；以同一 --data-dir 重启后数据保留，且数据仅写入指定目录。",
+   "type": "positive",
+   "features": [
+    "F01",
+    "F08"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A11",
+   "phase": "P0",
+   "goal": "GET /api/export?month 返回 UTF-8 CSV，含表头与当月行；中文、字段内引号与换行按 RFC 4180 往返可解析。",
+   "type": "positive",
+   "features": [
+    "F09"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A12",
+   "phase": "P0",
+   "goal": "PUT /api/categories/{id} 更新目标月预算，且不误改其他月份的同名分类。",
+   "type": "positive",
+   "features": [
+    "F03"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A13",
+   "phase": "P0",
+   "goal": "UI 控件反映与 JSON API 相同的真实状态（例如新增支出后界面汇总数字随之更新）。",
+   "type": "positive",
+   "features": [
+    "F10"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A14",
+   "phase": "P0",
+   "goal": "API 校验失败返回非 2xx JSON 错误说明；UI 对失败给出可理解反馈且不破坏旧数据。",
+   "type": "negative",
+   "features": [
+    "F07"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  }
+ ],
+ "decisions": [
+  {
+   "id": "D01",
+   "question": "金额如何表示与取整？",
+   "default": "以整数“分”存储与计算，响应渲染为两位小数字符串；对超过两位小数或非正数输入直接拒绝而非静默舍入。理由：避免二进制浮点误差（S12），并满足场景“不静默取整或裁剪输入”。可逆。",
+   "when_to_ask": "当使用者明确希望自动舍入到分、或需要接受超过两位的小数输入时。",
+   "impact": "数据模型、输入校验、汇总公式与 CSV 导出的数值格式。",
+   "status": "默认采用（可逆）"
+  },
+  {
+   "id": "D02",
+   "question": "超支是否跨月结转？",
+   "default": "P0 仅在当月展示负剩余，不自动结转下月。理由：已确认验收只承诺当月计划/实际/剩余；跨月 rollover 属成熟扩展（S05）。可逆。",
+   "when_to_ask": "当使用者要求上月超支影响下月可用额度、或需要结转语义时。",
+   "impact": "汇总公式、月切换展示与后续阶段规划。",
+   "status": "默认采用（可逆）"
+  },
+  {
+   "id": "D03",
+   "question": "本地数据如何持久化与写入保护？",
+   "default": "SQLite 单库（CONTRACT 固定），以事务/临时文件方式原子写入，且只写入 --data-dir。理由：单机集中持久化并降低损坏风险（S13,S01）。可逆。",
+   "when_to_ask": "当需要多设备同步、备份轮换或对崩溃恢复作出承诺时。",
+   "impact": "存储布局、启动参数与恢复策略。",
+   "status": "默认采用"
+  },
+  {
+   "id": "D04",
+   "question": "是否需要完整编辑历史/审计日志？",
+   "default": "P0 不建完整编辑历史，以导出 CSV 作为最小审计与恢复起点。理由：据可用一手文档未见主流产品提供完整编辑历史（S01 未验证项）。",
+   "when_to_ask": "当使用者要求改账留痕、回溯历史版本或合规审计时。",
+   "impact": "数据模型（历史表）、UI 展示与导出内容。",
+   "status": "待人类确认"
+  },
+  {
+   "id": "D05",
+   "question": "CSV 导出采用何种方言？",
+   "default": "UTF-8、RFC 4180 引号规则、QUOTE_MINIMAL、CRLF、表头 date,category,amount,note。理由：S10/S11 给出信息性标准与标准库行为；与 CONTRACT 一致。已定。",
+   "when_to_ask": "当目标环境要求其他编码、分隔符或 Excel 本地化行为时。",
+   "impact": "导出实现、往返测试与字段格式。",
+   "status": "已定（与 CONTRACT 一致）"
+  },
+  {
+   "id": "D06",
+   "question": "是否支持删除/归档分类？",
+   "default": "P0 不支持删除分类，未使用分类保留可见。理由：场景要求未使用分类仍可见，契约未定义删除语义（S02 分类为月内对象）。可逆。",
+   "when_to_ask": "当使用者要求清理、重命名或归档分类时。",
+   "impact": "API 表面、月内隔离与历史数据一致性。",
+   "status": "默认采用（可逆，后续阶段）"
+  }
+ ],
+ "limits": [
+  "仅面向单个本地用户，不连接银行或支付服务，无账户层、无同步、无多租户。",
+  "货币固定人民币（CNY，两位小数），不支持多币种或自定义符号。",
+  "P0 只展示当月计划/实际/剩余，不提供跨月 rollover 结转。",
+  "不提供完整编辑历史/审计日志；导出 CSV 为最小审计与恢复起点。",
+  "P0 不支持删除/归档分类，未使用分类保留可见。",
+  "验收程序不实现下游应用、不安装依赖、不执行外部命令、不访问真实 HOME/Downloads，全部用例状态为 not_run。"
+ ],
+ "evidence_status": "not_run_by_export"
+}

@@ -2,7 +2,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { ArrowRight, Boxes, Compass, FolderKanban, Layers, Sparkles, Wrench } from "lucide-react";
 import { useState } from "react";
 import { getMeta } from "@/lib/atlas";
-import { useAsync, Loading, ErrorBox } from "@/components/loaders";
+import { useAsync, EmptyState, Loading, ErrorBox } from "@/components/loaders";
 import { Button } from "@/components/ui/button";
 import { useLang, t, pick } from "@/lib/lang";
 
@@ -124,29 +124,38 @@ export function Home() {
           <section className="mx-auto max-w-6xl px-4 pb-16">
             <h2 className="font-serif text-2xl font-medium">{t("byDomain", lang)}</h2>
             <p className="mt-2 text-sm text-muted">{t("byDomainP", lang)}</p>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {meta.l0s.map((l0) => {
-                const leafN = meta.leafIndex.filter((x) => x.sec === l0.id || l0.subs.some((s) => s.id === x.sec)).length;
-                return (
-                  <Link
-                    key={l0.id}
-                    to={`/browse#${l0.id}`}
-                    className="rounded-xl bg-surface p-5 shadow-card transition-shadow hover:shadow-card-hover"
-                  >
-                    <div className="text-xs text-subtle">{l0.id}</div>
-                    <h3 className="mt-1 font-medium">{pick(lang, l0.name_zh, l0.name)}</h3>
-                    <div className="mt-1.5 text-xs text-muted">
-                      {l0.subs.length > 0 ? (
-                        <>
-                          {l0.subs.length}{t("subs", lang)} ·{" "}
-                        </>
-                      ) : null}
-                      {leafN}{t("types", lang)}
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
+            {meta.l0s.length ? (
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {meta.l0s.map((l0) => {
+                  const leafN = meta.leafIndex.filter((x) => x.sec === l0.id || l0.subs.some((s) => s.id === x.sec)).length;
+                  return (
+                    <Link
+                      key={l0.id}
+                      to={`/browse#${l0.id}`}
+                      className="rounded-xl bg-surface p-5 shadow-card transition-shadow hover:shadow-card-hover"
+                    >
+                      <div className="text-xs text-subtle">{l0.id}</div>
+                      <h3 className="mt-1 font-medium">{pick(lang, l0.name_zh, l0.name)}</h3>
+                      <div className="mt-1.5 text-xs text-muted">
+                        {l0.subs.length > 0 ? (
+                          <>
+                            {l0.subs.length}{t("subs", lang)} ·{" "}
+                          </>
+                        ) : null}
+                        {leafN}{t("types", lang)}
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            ) : (
+              <EmptyState
+                className="mt-6"
+                title={lang === "zh" ? "类型目录为空" : "The type catalog is empty"}
+              >
+                {lang === "zh" ? "当前没有可浏览的领域；生成或导入语料后会显示在这里。" : "No domains are available yet; generated or imported corpus data will appear here."}
+              </EmptyState>
+            )}
           </section>
         </>
       ) : null}

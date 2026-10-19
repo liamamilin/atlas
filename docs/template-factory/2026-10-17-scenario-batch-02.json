@@ -1,0 +1,862 @@
+{
+  "date": "2026-10-17",
+  "scope": "Regression on the two already authorized and covered leaves; not new leaf coverage.",
+  "batch_id": "bat_4c3d2984db65428fb55d1c17ebee0300",
+  "state": "completed",
+  "config": {
+    "kind": "scenarios",
+    "name": "场景生产第2批 · 去重与中文验证 · 2026-10-17",
+    "model": "open-design/deepseek-v4.1-flash",
+    "language": "zh",
+    "concurrency": 2,
+    "timeout": 900,
+    "leaves": [
+      "task-management-application",
+      "bookmark-manager"
+    ]
+  },
+  "input_and_read_proofs": [
+    {
+      "job_id": "job_2c03173d69134bf096929682c1ce17f6",
+      "attempt": 1,
+      "kind": "scenarios",
+      "language": "zh",
+      "leaf_fingerprint": "816ab50adb110ae50fd8df449c7437b434bb8970266b1196385b1116e623899c",
+      "source_document_matches": true,
+      "lines": 271,
+      "complete_document_read_visible": true,
+      "existing_scenarios_digest": "28bb09a2b6467bd3099568d260f7d4e4c525649a892359106a5e7bcf3ac6e8e7",
+      "existing_scenarios": [
+        {
+          "id": "scn_133dcc8698b946f7acf110aaecc37783",
+          "revision": 1
+        },
+        {
+          "id": "scn_374d3e68906d4e0f94cbce2df195d5d6",
+          "revision": 1
+        },
+        {
+          "id": "scn_3d2691ba3380442e971f1131f3ae7379",
+          "revision": 1
+        },
+        {
+          "id": "scn_67279018432643158b706ee0b4f9abfe",
+          "revision": 1
+        },
+        {
+          "id": "scn_722423687c5e417185ac3963a57286a3",
+          "revision": 1
+        },
+        {
+          "id": "scn_9738941d26b6488ea798faec18bbcc50",
+          "revision": 1
+        }
+      ],
+      "result": {
+        "count": 3,
+        "reason": "现有六个场景覆盖了个人周计划、自由职业者捕捉—执行闭环、学生学期规划、小型团队共享清单（中英两版）与周期任务复位，但仍有三个具体行为缺口。其一，所有既有场景都只在列表／「今天」视图中工作，从未验证叶子强调的结构性要点——看板列与日历只是同一批任务记录的渲染，拖拽改变的是任务自身属性而非独立状态；新增场景一以「多视图同源」为核心目标，验收直接检查跨视图一致与非复制。其二，既有捕捉都发生在应用内手工录入，未覆盖邮件／聊天／语音转发入口与自然语言日期解析、多选批量归类、已保存过滤器复核这一整套高频入口场景；场景二的用户目标是清空不断涌入的收件箱，行为路径与自由职业者按日逐条 triage 不同。其三，既有两个团队场景都是全体成员加入所有共享容器，未覆盖叶子明确写为重要规则的「容器即访问边界」在外部单人协作者身上的表现（仅见一个容器、指派给其本人、完成后可撤销成员资格）；场景三的用户目标是按事外包而非团队共同作业。三者都落在叶子的定义核心（任务为记录单位、受管组织、执行视图）与标准能力（看板／日历布局、快速捕捉、共享容器与指派）之内，不引入审批流、自定义工作流状态或项目进度汇总等越界机制。",
+        "scenario_ids": [
+          "scn_a13ce1a050e94653a4bfa28529981a7c",
+          "scn_fb2a1e36a5924f6da3516fff0c734b59",
+          "scn_18e548513c8a4daa8bf28e890892d5da"
+        ]
+      }
+    },
+    {
+      "job_id": "job_5735f5266f46472e9f145425e0bfc643",
+      "attempt": 1,
+      "kind": "scenarios",
+      "language": "zh",
+      "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+      "source_document_matches": true,
+      "lines": 229,
+      "complete_document_read_visible": true,
+      "existing_scenarios_digest": "546c914544c1db73dff74e7115657f7d6d145d0d9eca1c2b6961b63b28b7419a",
+      "existing_scenarios": [
+        {
+          "id": "scn_4e93484ec0674723840a142456b9fe50",
+          "revision": 1
+        },
+        {
+          "id": "scn_4faa861048af4f8dac27dd44e531f25a",
+          "revision": 1
+        },
+        {
+          "id": "scn_7756e0007f6a463a97316f3f49c15248",
+          "revision": 2
+        },
+        {
+          "id": "scn_8936303b326f4a43bee84d6e98f45f2d",
+          "revision": 1
+        }
+      ],
+      "result": {
+        "count": 2,
+        "reason": "现有四个场景（开发者、研究者、普通用户、学生）覆盖的都是在单处逐条保存、按自建分类归置并日后检索的同类目标，彼此只是用户与主题不同。新增的两个场景针对叶子中尚未被覆盖的两种不同用户目标：其一是“跨浏览器、跨设备合并与访问”，把多个浏览器中既有的书签批量导入为一个不绑定单一浏览器的独立库，并在此后从任意设备保存与回查，对应叶子中“独立产品存在的原因即浏览器无关性”与标准导入导出互操作这条线索；其二是“长期库的去重与结构整理”，以周期性维护本身为首要目标（合并同一地址的重复记录、重组分类、处理失效引用），对应叶子“整理空间：移除死链、合并重复、重构结构”这一独立开馆动因。两者与既有场景的差别在于工作流起点（批量导入/维护巡查）与成功标准（跨端一致、库结构可持续），而非仅更换人物标签。",
+        "scenario_ids": [
+          "scn_a36b0131efd747f994b2fb5d22846b5d",
+          "scn_244cdd4295fc4f98a3b02674eef2772d"
+        ]
+      }
+    },
+    {
+      "job_id": "job_b28329cea0624b1993e5bf0ea16436b3",
+      "attempt": 2,
+      "kind": "scenario-review",
+      "language": "zh",
+      "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+      "source_document_matches": true,
+      "lines": 229,
+      "complete_document_read_visible": true
+    },
+    {
+      "job_id": "job_4472b3bfc7ee483184511ceec088994a",
+      "attempt": 2,
+      "kind": "scenario-review",
+      "language": "zh",
+      "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+      "source_document_matches": true,
+      "lines": 229,
+      "complete_document_read_visible": true
+    },
+    {
+      "job_id": "job_fbdc211ca97245bda10ac45f324dca35",
+      "attempt": 1,
+      "kind": "scenario-review",
+      "language": "zh",
+      "leaf_fingerprint": "816ab50adb110ae50fd8df449c7437b434bb8970266b1196385b1116e623899c",
+      "source_document_matches": true,
+      "lines": 271,
+      "complete_document_read_visible": true
+    },
+    {
+      "job_id": "job_d8ab0accd0ad4047b2603cd469662eae",
+      "attempt": 1,
+      "kind": "scenario-review",
+      "language": "zh",
+      "leaf_fingerprint": "816ab50adb110ae50fd8df449c7437b434bb8970266b1196385b1116e623899c",
+      "source_document_matches": true,
+      "lines": 271,
+      "complete_document_read_visible": true
+    },
+    {
+      "job_id": "job_1a1ca8f9deb243cc9d8a6aa7d7fa1527",
+      "attempt": 1,
+      "kind": "scenario-review",
+      "language": "zh",
+      "leaf_fingerprint": "816ab50adb110ae50fd8df449c7437b434bb8970266b1196385b1116e623899c",
+      "source_document_matches": true,
+      "lines": 271,
+      "complete_document_read_visible": true
+    }
+  ],
+  "new_scenarios": [
+    {
+      "id": "scn_a13ce1a050e94653a4bfa28529981a7c",
+      "leaf": "task-management-application",
+      "name": "多视图一致：列表／看板／日历同源（One Population, Many Layouts）",
+      "audience": "需要按不同视角规划与推进同一批任务的个人工作者，例如活动策划、内容排期人员或小团队负责人：习惯用日历排期、用看板看分组、用列表逐条执行",
+      "objective": "让同一批任务在列表、看板、日历与「今天」视图之间保持一致呈现；在看板移动卡片或拖拽日历改期，改变的是任务自身属性，而不是另一份记录",
+      "workflow": [
+        "把一段时间的工作全部捕捉进一个容器，并补齐截止日期、优先级与标签",
+        "切换到看板布局，查看卡片按容器内分区（或按标签分组）的分布",
+        "把卡片从一列拖到另一列，用于调整该任务所属的分区／分组",
+        "切换到日历布局，把到期日不合适的任务拖到其他日期上，用于重新排期",
+        "回到列表布局核对：刚被移动的任务只出现一次，其分区与日期就是刚刚改动后的值",
+        "在「今天」视图逐条完成当天任务，任一布局中该任务随即离开未完成集合"
+      ],
+      "acceptance": [
+        "在看板中把卡片从 A 列移到 B 列后，列表视图中该任务显示的分区／分组同步变为 B，且任务没有被复制成两条",
+        "在日历布局中把任务拖到另一天后，该任务的截止日期、列表视图中的显示以及「即将到来」中的位置一并更新",
+        "看板列由分区或所选分组派生，列本身不是独立状态；不存在只有某个布局才知道的任务状态",
+        "在任一布局中把任务标记为完成后，其他布局与「今天」视图中它都从待办集合消失，并进入已完成记录",
+        "按某标签分组的看板与按同一标签筛选的列表返回同一组任务，不多不少"
+      ],
+      "status": "draft",
+      "revision": 1,
+      "final_review": {
+        "checks": [
+          {
+            "dimension": "leaf_fit",
+            "outcome": "passed",
+            "reason": "场景直击叶子的定义性核心——执行视图为同一任务总体（population）的不同渲染。叶子明确写道「The board is a view, not the record」以及「Where boards exist, moving a card between columns changes the underlying attribute (section, grouping) — the same record then renders differently in list or calendar.」；日历方面叶子写「**calendar layout**: dated tasks placed on a week/month grid; drag to reschedule」；完成一致性方面叶子写「completing a task updates the population everywhere」。场景的验收与工作流（看板移动卡片仅改分区/分组、日历拖拽仅改截止日期、完成在各地图与「今天」同步消失）逐条对应该核心，未越界到 issue tracker 的多状态流转或 kanban 板的「列即记录」模型。"
+          },
+          {
+            "dimension": "distinctness",
+            "outcome": "passed",
+            "reason": "逐一比对 8 个 peer：scn_133dcc8698b946f7acf110aaecc37783 与 scn_67279018432643158b706ee0b4f9abfe 以团队共享清单的指派／评论／完成为目标；scn_18e548513c8a4daa8bf28e890892d5da 以单一容器内外部分权可见性为目标；scn_3d2691ba3380442e971f1131f3ae7379「个人周计划工作台」与 scn_374d3e68906d4e0f94cbce2df195d5d6「freelancer 捕捉→完成循环」以捕捉—整理—今天推进为主线；scn_722423687c5e417185ac3963a57286a3 以重复规则复位为目标；scn_9738941d26b6488ea798faec18bbcc50 与 scn_fb2a1e36a5924f6da3516fff0c734b59 分别以学期规划、多渠道捕捉与批量整理为目标。其中 scn_374d…5d6 与 scn_9738…cc50 仅把「board 或按标签的 filter」作为步骤一笔带过，scn_3d26…7379 只覆盖列表/今天，均未把「跨布局同源一致性」本身作为目标与验收。本场景的用户（按多视角看待同一批任务的个人工作者）、目标（改图形=改属性、不产生第二份记录）与工作流（看板移动与日历改期后回列表核对）自成一格，无与任何 peer 的目标／用户／工作流重合，故不列出重叠对象。"
+          },
+          {
+            "dimension": "workflow",
+            "outcome": "passed",
+            "reason": "流程闭环且可实际走通：捕捉进一个容器并补齐截止日期／优先级／标签 → 切到看板查看卡片按分区（或按标签分组）分布 → 拖动卡片调整所属分区／分组 → 切到日历把到期日不合适的任务拖到其他日期 → 回列表核对只出现一次且显示值已更新 → 在「今天」逐条完成，任务随即离开未完成集合。每步都有明确的入口视图与产物，前后依赖清晰，与叶子「Capture → organize → work from views → Complete → Review」的规范循环一致。"
+          },
+          {
+            "dimension": "testability",
+            "outcome": "passed",
+            "reason": "五条验收均以可观察结果陈述，且覆盖整条工作流：看板 A→B 列移动后列表分组同步为 B 且不复制（覆盖步骤 2–3、5）；日历拖到另一天后截止日期、列表显示与「即将到来」位置一并更新（覆盖步骤 4–5）；看板列由分区或所选分组派生、不存在某布局独有的任务状态（覆盖同源前提）；任一布局完成后其他布局与「今天」均移出待办并进入已完成记录（覆盖步骤 6）；按同一标签的分组看板与筛选列表返回同一组任务（覆盖步骤 2、5 的等价性）。均为可直接对照界面状态判定的断言，无需依赖运行时或市场数据。"
+          },
+          {
+            "dimension": "scope",
+            "outcome": "passed",
+            "reason": "边界合理且内部自洽：验收 3 与工作流第 2 步对「列由分区或所选分组派生」表述一致；场景未强加技术栈、数值阈值或商业计划，也未混入指派评论、重复规则、权限共享等属其他 peer 的目标。所有断言均由叶子支持：拖拽改期对应「drag to reschedule」，拖拽换列对应「moving a card between columns changes the underlying attribute (section, grouping)」，完成同步对应「completing a task updates the population everywhere」。语言为 zh，场景正文、名称、受众与验收均为简体中文，无忽略所请求语言的问题。"
+          }
+        ],
+        "created_at": "2026-10-16T19:35:13.548038+00:00",
+        "id": "scv_63afd623dc9a4b2586b9a7895b6bff76",
+        "input_digest": "1b24cf9834134f8989ce47a64fade1f1cca37f23266b3ad529d33894ede8f3fa",
+        "job_id": "job_fbdc211ca97245bda10ac45f324dca35",
+        "leaf_fingerprint": "816ab50adb110ae50fd8df449c7437b434bb8970266b1196385b1116e623899c",
+        "leaf_quotes": [
+          "The board is a view, not the record",
+          "Where boards exist, moving a card between columns changes the underlying attribute (section, grouping) — the same record then renders differently in list or calendar. This is the structural tell separating this Type from board-first products.",
+          "The user works *from* these views, and completing a task updates the population everywhere.",
+          "- **calendar layout**: dated tasks placed on a week/month grid; drag to reschedule",
+          "- **board layout**: sections (or a chosen grouping) become columns; tasks appear as cards; drag moves them — a view over the records, not a separate record model"
+        ],
+        "model": "open-design/deepseek-v4.1-flash",
+        "outcome": "passed",
+        "peer_digest": "2dacaf1bebabc2174cae3a8dbc259561d0252feb9bde1fc00a2abe59253b47b4",
+        "peer_scenarios": [
+          {
+            "id": "scn_133dcc8698b946f7acf110aaecc37783",
+            "name": "小组共享清单协作（Small-Team Shared List）",
+            "revision": 1
+          },
+          {
+            "id": "scn_18e548513c8a4daa8bf28e890892d5da",
+            "name": "单一容器内的外部协作者（Scoped External Collaborator）",
+            "revision": 1
+          },
+          {
+            "id": "scn_374d3e68906d4e0f94cbce2df195d5d6",
+            "name": "Freelance consultant's weekly capture-to-completion loop",
+            "revision": 1
+          },
+          {
+            "id": "scn_3d2691ba3380442e971f1131f3ae7379",
+            "name": "个人周计划工作台（Personal Week Planner）",
+            "revision": 1
+          },
+          {
+            "id": "scn_67279018432643158b706ee0b4f9abfe",
+            "name": "Small team shared list for delegation and follow-through",
+            "revision": 1
+          },
+          {
+            "id": "scn_722423687c5e417185ac3963a57286a3",
+            "name": "周期性事务复位（Recurring Routine Scheduler）",
+            "revision": 1
+          },
+          {
+            "id": "scn_9738941d26b6488ea798faec18bbcc50",
+            "name": "Student's term planning across coursework and personal life",
+            "revision": 1
+          },
+          {
+            "id": "scn_fb2a1e36a5924f6da3516fff0c734b59",
+            "name": "多渠道捕捉与收件箱批量整理（Omnichannel Capture & Batch Triage）",
+            "revision": 1
+          }
+        ],
+        "related_scenario_ids": [],
+        "scenario_id": "scn_a13ce1a050e94653a4bfa28529981a7c",
+        "scenario_revision": 1,
+        "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+        "suggestions": [
+          "（可选打磨）验收 1 中的「列表视图中该任务显示的分区／分组同步变为 B」可显式说明列表需按同一属性分组后查看，否则默认列表不显示分组，判定点不够唯一。",
+          "（可选打磨）在工作流第 3 步注明看板当前的分组维度（按分区 or 按标签），并提示若按标签分组则拖拽改的是标签，以便与验收 5 的「同标签分组看板 vs 同标签筛选列表一致」自然衔接。",
+          "（可选打磨）验收 4 可补充一句：完成后任务仍可在已完成列表/完成状态筛选中查看，与叶子「Completion is boolean, recorded」及 peer 中已完成记录的表述保持一致。"
+        ],
+        "summary": "该场景「多视图一致：列表／看板／日历同源」与其绑定的 Task Management Application 叶子高度吻合：它检验的正是「同一批任务记录由多种执行视图呈现、视图只是记录的渲染」这一结构关键点，并把看板拖拽、日历改期、完成动作都约束为修改任务自身属性而非产生第二份记录。工作流从捕捉→组织→看板→日历→列表核对→今天完成，端到端连贯；五条验收标准均可观察、覆盖整条流程；边界与内部表述一致，受众与语言（zh）均符合输入要求。本次为限定范围内审查，仅比对输入中提供的 8 个 peer_scenarios，未做全语料去重，也不构成运行时或市场验证。唯一可改进之处属可选打磨而非阻断问题。",
+        "current": true
+      }
+    },
+    {
+      "id": "scn_fb2a1e36a5924f6da3516fff0c734b59",
+      "leaf": "task-management-application",
+      "name": "多渠道捕捉与收件箱批量整理（Omnichannel Capture & Batch Triage）",
+      "audience": "工作任务主要来自邮件、聊天与口述转达的知识工作者或小团队负责人，输入量大且来源分散",
+      "objective": "把邮件转发、聊天消息、语音或快捷方式中的事项快速落进统一收件箱，再用一次批量整理把它们归入容器、打标签、设日期与优先级，使入口不堵塞",
+      "workflow": [
+        "通过转发邮件到应用地址、从聊天中转发消息或使用全局快捷键／语音，把事项逐条丢进收件箱，除标题外不填任何字段",
+        "在标题输入中使用自然语言写日期（如「周五 14:00」「下月 3 号」），保存后日期被解析成该任务的截止日期",
+        "打开收件箱，一次选中多条任务，批量移动到对应容器并批量打标签",
+        "对仍缺日期的条目逐条补齐截止日期或优先级，或明确保留为无日期的待办",
+        "收件箱清空后，任务已出现在各自容器以及由日期驱动的「今天／即将到来」视图中",
+        "用搜索或已保存的过滤条件（如「指派给我」「本周到期」「无截止日期」）复核是否仍有遗留条目"
+      ],
+      "acceptance": [
+        "转发进来的邮件或聊天内容生成一条独立任务，可在收件箱中被打开、编辑、移动或单独完成",
+        "「周五 14:00」「下月 3 号」这类自然语言在保存后成为对应日期的截止日期，任务随之出现在正确的「今天／即将到来／日历」位置",
+        "多选若干任务后可一次性移动容器并添加标签，操作对全部被选任务生效，且每个任务之后仍可单独编辑",
+        "收件箱中的任务一经移动到其他容器就离开收件箱，不再重复出现在收件箱列表中",
+        "按「指派给我」「本周到期」「无截止日期」等已保存过滤条件能准确取回相应任务，且结果不含未匹配的任务"
+      ],
+      "status": "draft",
+      "revision": 1,
+      "final_review": {
+        "checks": [
+          {
+            "dimension": "leaf_fit",
+            "outcome": "passed",
+            "reason": "场景三要素与叶子定义核心一一对应：叶子「task as the unit of record, open → done」「managed organization (containers, decomposition, classification)」「execution views over the population」，验收含「单独完成」、容器/标签、今天/即将到来/日历视图。捕捉方式来自叶子标准能力「**Quick capture** — global shortcuts, voice input, email/chat forwarding, widgets; natural-language parsing of dates while typing.」与循环描述「quick-add a task from anywhere (shortcut, widget, voice, email/chat forward)」「natural language supplies the date (\"Friday 2pm\") while typing」；批量整理对应「select-many for bulk actions」；复核步骤对应「saved filters/smart lists with their own criteria; global search across containers」。无越界到 issue tracker/kanban/项目管理的迹象。"
+          },
+          {
+            "dimension": "distinctness",
+            "outcome": "passed",
+            "reason": "按用户/目标/工作流逐项比较：最接近的 scn_374d3e68（Freelance consultant's weekly capture-to-completion loop）确实共享「捕捉进单一 Inbox、无需必填字段」「整理时归容器、设日期与优先级、打标签」步骤，但其中枢是覆盖整周的完整循环（拆分父子任务、Upcoming/Calendar 排期、Today 执行、重复任务、周五复盘），本场景只覆盖捕捉与批量整理两段并新增多渠道来源（邮件转发／聊天转发／语音／快捷键）与多选批量移动+批量打标签，用户目标与端到端范围不同，非同一场景。scn_3d2691ba（个人周计划工作台）以「周计划＋执行」为中心、scn_133dcc86/scn_18e54851/scn_67279018 以团队共享指派为中心、scn_a13ce1a0 以多视图一致为中心、scn_72242368 以重复复位为中心，均与本场景「入口不堵塞／批量整理」的焦点不同。故不列出重复场景。"
+          },
+          {
+            "dimension": "workflow",
+            "outcome": "passed",
+            "reason": "流程连贯可用：逐条丢进收件箱（仅标题）→ 标题内自然语言日期被解析为截止日期 → 打开收件箱多选批量移动容器并批量打标签 → 对仍缺日期者逐条补齐或明确保留为无日期 → 收件箱清空后任务分别出现在各自容器与日期驱动的今天／即将到来视图 → 用搜索或已保存过滤复核遗留项。每一步都产出下一步所需的状态，第 4 步「明确保留为无日期」与第 5 步「日期驱动视图」的差异也自洽，无循环依赖或断点。"
+          },
+          {
+            "dimension": "testability",
+            "outcome": "needs_changes",
+            "reason": "多数环节有可观察判据：验收 1 对应捕捉后可在收件箱打开/编辑/移动/单独完成；验收 2 对应自然语言日期落到正确视图；验收 3 对应多选批量移动+打标签且各任务仍可单独编辑；验收 4 对应离开收件箱不重复出现；验收 5 对应已保存过滤（指派给我／本周到期／无截止日期）取回准确。缺口在于工作流第 1 步声明「或使用全局快捷键／语音」也是捕捉渠道，而验收 1 仅覆盖「转发进来的邮件或聊天内容」，故「多渠道」这一场景主张中有一半渠道缺少可观察的验收判据，属可修复的表述缺口而非流程本身不可评估。"
+          },
+          {
+            "dimension": "scope",
+            "outcome": "passed",
+            "reason": "边界克制且内部一致：只覆盖捕捉与整理两段，不越界到多阶段工作流、审批或项目组合；audience（来源分散、输入量大的知识工作者／小团队负责人）与 objective 一致；所用假设均可在叶子找到依据——邮件地址捕捉（「email address」「email/chat forwarding」）、语音与全局快捷键（「global shortcuts, voice input」）、多选批量（「select-many for bulk actions」）、已保存过滤（「saved filters/smart lists」）、「指派给我」类过滤（「\"assigned to me\", by label, by date range」），未引入数值阈值、技术栈或商业假设。语言为 zh，所写正文均为简体中文，仅技术/专有词保留原文，符合语言要求。"
+          }
+        ],
+        "created_at": "2026-10-16T19:35:33.033062+00:00",
+        "id": "scv_0523ad76c6a8405988be2ef1f62c5359",
+        "input_digest": "b7ba718f6be1d06682adab013977537912fc4de670baffd8bab6312d36d69e74",
+        "job_id": "job_d8ab0accd0ad4047b2603cd469662eae",
+        "leaf_fingerprint": "816ab50adb110ae50fd8df449c7437b434bb8970266b1196385b1116e623899c",
+        "leaf_quotes": [
+          "**Quick capture** — global shortcuts, voice input, email/chat forwarding, widgets; natural-language parsing of dates while typing.",
+          "quick-add a task from anywhere (shortcut, widget, voice, email/chat forward)",
+          "natural language supplies the date (\"Friday 2pm\") while typing",
+          "select-many for bulk actions",
+          "saved filters/smart lists with their own criteria; global search across containers",
+          "task as the unit of record, open → done",
+          "Work flows from organization, not from re-reading."
+        ],
+        "model": "open-design/deepseek-v4.1-flash",
+        "outcome": "needs_changes",
+        "peer_digest": "dbaf90b1008b9831e174cb45a7ca053256471fa2a8b589d507ef95e47d6eebf7",
+        "peer_scenarios": [
+          {
+            "id": "scn_133dcc8698b946f7acf110aaecc37783",
+            "name": "小组共享清单协作（Small-Team Shared List）",
+            "revision": 1
+          },
+          {
+            "id": "scn_18e548513c8a4daa8bf28e890892d5da",
+            "name": "单一容器内的外部协作者（Scoped External Collaborator）",
+            "revision": 1
+          },
+          {
+            "id": "scn_374d3e68906d4e0f94cbce2df195d5d6",
+            "name": "Freelance consultant's weekly capture-to-completion loop",
+            "revision": 1
+          },
+          {
+            "id": "scn_3d2691ba3380442e971f1131f3ae7379",
+            "name": "个人周计划工作台（Personal Week Planner）",
+            "revision": 1
+          },
+          {
+            "id": "scn_67279018432643158b706ee0b4f9abfe",
+            "name": "Small team shared list for delegation and follow-through",
+            "revision": 1
+          },
+          {
+            "id": "scn_722423687c5e417185ac3963a57286a3",
+            "name": "周期性事务复位（Recurring Routine Scheduler）",
+            "revision": 1
+          },
+          {
+            "id": "scn_9738941d26b6488ea798faec18bbcc50",
+            "name": "Student's term planning across coursework and personal life",
+            "revision": 1
+          },
+          {
+            "id": "scn_a13ce1a050e94653a4bfa28529981a7c",
+            "name": "多视图一致：列表／看板／日历同源（One Population, Many Layouts）",
+            "revision": 1
+          }
+        ],
+        "related_scenario_ids": [],
+        "scenario_id": "scn_fb2a1e36a5924f6da3516fff0c734b59",
+        "scenario_revision": 1,
+        "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+        "suggestions": [
+          "将验收 1 泛化为与渠道无关的表述（例如「任何渠道——邮件转发、聊天转发、全局快捷键或语音——捕捉到的事项都立即在收件箱中生成一条可打开、编辑、移动或单独完成的独立任务」），或另加一条针对语音/全局快捷键捕捉的验收，使工作流第 1 步的「多渠道捕捉」可被观察。",
+          "可选：补一条针对批量整理的验收，明确「批量移动/打标签后，任务出现在目标容器，且不再停留在原收件箱、未被复制成两条」，与现有验收 4 合并表述即可。",
+          "可选：为自然语言日期解析补一条边界验收（如文本无法解析为日期时保留原文本且不误设截止日期），避免把解析失败误判为解析成功。"
+        ],
+        "summary": "该场景聚焦「多渠道捕捉 → 收件箱批量整理」这一段循环，与叶子「任务管理软件」的定义核心逐项吻合：任务记录 open→done（验收含单独完成任务）、受管理的组织（容器、标签、优先级）、以及执行视图（今天／即将到来／日历／已保存过滤）。工作流第 1、2 步与叶子「quick-add a task from anywhere (shortcut, widget, voice, email/chat forward)」「natural language supplies the date (\"Friday 2pm\") while typing」一致，批量整理对应叶子任务列表界面的「select-many for bulk actions」。与最接近的 peer scn_374d3e68（Freelance consultant's weekly capture-to-completion loop）在「捕捉进收件箱 + 整理归位」阶段有部分步骤重叠，但该 peer 覆盖整周完整循环（拆分、排期、执行、重复、复盘），本场景则止于捕捉与批量整理并新增多渠道来源与多选批处理，用户目标与工作流中心不同，故不判为重复；scn_3d2691ba（个人周计划工作台）与 scn_133dcc86 等同样以「捕捉 + 组织」开篇，但中心分别是周计划与团队协作。语言为 zh，正文为简体中文，符合要求。局限：验收只显式覆盖「转发邮件／聊天」这一渠道，工作流第 1 步声明的「全局快捷键／语音」捕捉缺少可观察的验收判据，因此 testability 判为 needs_changes（可修复的表述缺口）。本审查为桌面推演，不含运行时或市场验证。",
+        "current": true
+      }
+    },
+    {
+      "id": "scn_18e548513c8a4daa8bf28e890892d5da",
+      "leaf": "task-management-application",
+      "name": "单一容器内的外部协作者（Scoped External Collaborator）",
+      "audience": "只把某一件事交给外部人员（如自由职业设计师、临时助理、家庭成员）的个体经营者或小团队负责人",
+      "objective": "在不开放自己全部任务的前提下，让外部协作者只在一个共享容器内看到并处理被指派的任务，完成状态对双方可见",
+      "workflow": [
+        "个体工作者把个人任务与各客户的任务分放在不同容器中，只共享需要外部参与的那一个容器",
+        "邀请外部协作者加入该容器，并把待办任务指派给他",
+        "协作者在自己的账号中只看到这一个容器及其中的任务，看不到工作者的其他容器",
+        "双方在任务下评论澄清细节，必要时调整截止日期与优先级",
+        "协作者把任务标记为完成，工作者在该共享容器中看到完成状态，未完成项继续留在容器中",
+        "合作结束后移除该协作者的成员资格，容器内的任务与已完成记录仍保留在工作者账号中"
+      ],
+      "acceptance": [
+        "被邀请的协作者只能访问被共享的那一个容器，工作者账号内的其他容器与任务对其不可见、不可被搜索命中",
+        "指派给协作者的任务出现在协作者的执行视图（如「今天」）中，同时仍留在共享容器内供双方查看",
+        "协作者完成该任务后，工作者在共享容器中直接观察到完成状态，无需额外的汇报动作；双方各自的个人容器中不会出现对方的任务",
+        "移除成员资格后，该协作者不再能打开或修改该容器，而容器中已有任务与完成记录不会被删除"
+      ],
+      "status": "draft",
+      "revision": 1,
+      "final_review": {
+        "checks": [
+          {
+            "dimension": "leaf_fit",
+            "outcome": "passed",
+            "reason": "场景判定点直接对应 leaf 的『### The container is an access boundary for collaboration』：'Sharing happens at the container level: members of a shared list/project can edit its tasks, and assignment selects an owner inside that circle. Personal containers remain private unless deliberately shared.' 场景把协作限定在单一共享容器并保留两态完成（'协作者把任务标记为完成，工作者在该共享容器中看到完成状态'、'未完成项继续留在容器中'），与 leaf 'Completion is boolean, recorded, and often reversible' 及 'invite collaborators (link, contact, or email) → members see and edit the tasks → assign a task to a member ... → completion is visible to everyone in the container' 一致；未出现自定义工作流状态、审批/路由或容器级进度 rollup，未越界为 issue tracker 或 project management。"
+          },
+          {
+            "dimension": "distinctness",
+            "outcome": "passed",
+            "reason": "逐项对比：scn_67279018432643158b706ee0b4f9abfe（Small team shared list for delegation and follow-through）与 scn_133dcc8698b946f7acf110aaecc37783（小组共享清单协作）在指派、评论、完成可见的个人 Today 视图等机制上确有重叠，但二者用户是团队/家庭内部成员，本场景用户是『只把某一件事交给外部人员（如自由职业设计师、临时助理、家庭成员）的个体经营者或小团队负责人』，目标明确为『在不开放自己全部任务的前提下』仅开放单一容器，并新增两条 peer 均未覆盖的验收（其他容器不可见且不可被搜索命中；移除成员资格后不再能打开或修改容器而任务与完成记录不删除），属机制扩展而非重复。scn_374d3e68906d4e0f94cbce2df195d5d6、scn_3d2691ba3380442e971f1131f3ae7379、scn_722423687c5e417185ac3963a57286a3、scn_9738941d26b6488ea798faec18bbcc50、scn_a13ce1a050e94653a4bfa28529981a7c、scn_fb2a1e36a5924f6da3516fff0c734b59 分别聚焦单人捕捉-完成循环、个人周计划、重复复位、学业规划、多视图一致与多渠道捕捉，目标与用户均不同。"
+          },
+          {
+            "dimension": "workflow",
+            "outcome": "passed",
+            "reason": "六步流程连贯且可执行：分容器归置个人与各客户任务→只共享需要外部参与的那一个容器→邀请并指派→协作者仅见该容器及其任务→双方评论并调整截止日期与优先级→标记完成后工作者在共享容器即时看到、未完成项保留→结束后移除成员资格且记录保留。前一步的产物是后一步的输入，终点与目标（不开放全部任务的前提下完成一次外部协作并安全收尾）闭合，未出现跳跃或依赖未声明前置条件。"
+          },
+          {
+            "dimension": "testability",
+            "outcome": "passed",
+            "reason": "四条验收均可观察且覆盖该流程的关键判定点：『被邀请的协作者只能访问被共享的那一个容器，工作者账号内的其他容器与任务对其不可见、不可被搜索命中』验证访问隔离；『指派给协作者的任务出现在协作者的执行视图（如「今天」）中，同时仍留在共享容器内供双方查看』验证指派与双边可见；『协作者完成该任务后，工作者在共享容器中直接观察到完成状态，无需额外的汇报动作；双方各自的个人容器中不会出现对方的任务』验证完成语义与容器边界；『移除成员资格后，该协作者不再能打开或修改该容器，而容器中已有任务与完成记录不会被删除』验证撤销与数据保留。判据不含主观措辞，可由操作前后状态对比判定。"
+          },
+          {
+            "dimension": "scope",
+            "outcome": "passed",
+            "reason": "边界合理且内部自洽：场景只描述用户行为与可见结果（共享一个容器、指派、完成、移除成员），不预设具体技术栈、数值阈值或商业形态；『只共享需要外部参与的那一个容器』与验收 1/3 的隔离要求一致，不与 leaf 的 'Personal containers remain private unless deliberately shared' 冲突；成员资格的邀请与移除对应 leaf 'container-level share/invite and membership management in collaborative products'，未引入组织架构、角色层级或容量规划等被 leaf 明确排除的机制。语言为 zh，场景正文（名称、目标、受众、工作流、验收）均为简体中文，符合 input.language。"
+          }
+        ],
+        "created_at": "2026-10-16T19:35:51.479917+00:00",
+        "id": "scv_363822913cd9455dad254ef475042eeb",
+        "input_digest": "e589b0c4c43a685e721f77f3c45af12384308dfb3f1ad009040b0a08d3559d91",
+        "job_id": "job_1a1ca8f9deb243cc9d8a6aa7d7fa1527",
+        "leaf_fingerprint": "816ab50adb110ae50fd8df449c7437b434bb8970266b1196385b1116e623899c",
+        "leaf_quotes": [
+          "The container is an access boundary for collaboration",
+          "Sharing happens at the container level: members of a shared list/project can edit its tasks, and assignment selects an owner inside that circle. Personal containers remain private unless deliberately shared. Team-tier products add workspace-level roles on top.",
+          "→ invite collaborators (link, contact, or email)",
+          "→ completion is visible to everyone in the container",
+          "Collaboration is deliberately lightweight: container-level membership with edit rights and per-task assignment. No approval chains, no role hierarchies, no capacity planning — products that add those are layering on work-management machinery.",
+          "container-level share/invite and membership management in collaborative products"
+        ],
+        "model": "open-design/deepseek-v4.1-flash",
+        "outcome": "passed",
+        "peer_digest": "70391b5967efea542d65e2decba89ca642f2afa4b54219b877af1b2c57dcc674",
+        "peer_scenarios": [
+          {
+            "id": "scn_133dcc8698b946f7acf110aaecc37783",
+            "name": "小组共享清单协作（Small-Team Shared List）",
+            "revision": 1
+          },
+          {
+            "id": "scn_374d3e68906d4e0f94cbce2df195d5d6",
+            "name": "Freelance consultant's weekly capture-to-completion loop",
+            "revision": 1
+          },
+          {
+            "id": "scn_3d2691ba3380442e971f1131f3ae7379",
+            "name": "个人周计划工作台（Personal Week Planner）",
+            "revision": 1
+          },
+          {
+            "id": "scn_67279018432643158b706ee0b4f9abfe",
+            "name": "Small team shared list for delegation and follow-through",
+            "revision": 1
+          },
+          {
+            "id": "scn_722423687c5e417185ac3963a57286a3",
+            "name": "周期性事务复位（Recurring Routine Scheduler）",
+            "revision": 1
+          },
+          {
+            "id": "scn_9738941d26b6488ea798faec18bbcc50",
+            "name": "Student's term planning across coursework and personal life",
+            "revision": 1
+          },
+          {
+            "id": "scn_a13ce1a050e94653a4bfa28529981a7c",
+            "name": "多视图一致：列表／看板／日历同源（One Population, Many Layouts）",
+            "revision": 1
+          },
+          {
+            "id": "scn_fb2a1e36a5924f6da3516fff0c734b59",
+            "name": "多渠道捕捉与收件箱批量整理（Omnichannel Capture & Batch Triage）",
+            "revision": 1
+          }
+        ],
+        "related_scenario_ids": [],
+        "scenario_id": "scn_18e548513c8a4daa8bf28e890892d5da",
+        "scenario_revision": 1,
+        "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+        "suggestions": [
+          "可选：在验收中补一条覆盖工作流第 4 步，例如「协作者与工作者在任务下的评论对双方可见且与任务绑定，调整后的截止日期或优先级同步反映在双方视图中」，使评论/属性调整也可独立验证；此为补齐而非阻断项。",
+          "可选：在验收 1 中明确「不可被搜索命中」的验证范围（在该协作者的全局搜索与共享容器内搜索中均不返回工作者其他容器的任务），减少判定歧义。",
+          "可选：在目标或工作流中点明移除成员资格后归还的访问范围（仅撤销该容器的成员资格，不影响该协作者仍被共享的其他容器），以强化与 scn_67279018432643158b706ee0b4f9abfe、scn_133dcc8698b946f7acf110aaecc37783 的区分度。"
+        ],
+        "summary": "该场景与 pinned leaf 的「容器即协作访问边界」判定点高度吻合：外部协作者仅获得单一容器的成员资格，被指派任务在其执行视图（今天）中出现、完成后双方在同一容器内可见、移除成员资格后容器内任务与完成记录保留，全程保持 open→done 的两态完成语义，未引入自定义工作流状态、审批链或项目级进度汇总。工作流从分容器→共享单个容器→指派→协作者受限访问→评论/调期→完成→移除成员资格，端到端可走通；四条验收标准均指向可观察行为。审查范围限于所给 leaf 文本与 7 个 peer_scenarios 的一致性，未做全量去重，也不构成可实现性、运行时或市场验证。唯一轻微留白是工作流第 4 步的「评论与调期」未单独写入验收标准，属可选补齐，不影响本场景核心判定点。",
+        "current": true
+      }
+    },
+    {
+      "id": "scn_a36b0131efd747f994b2fb5d22846b5d",
+      "leaf": "bookmark-manager",
+      "name": "跨浏览器与多设备合并的个人书签库",
+      "audience": "在办公与个人设备上混用多种浏览器、不希望书签被锁在单一浏览器配置文件里的个人用户",
+      "objective": "把散落在多个浏览器与设备中的书签一次性并入一个独立的个人库，并在任一设备上用同一份记录继续保存与回查。",
+      "workflow": [
+        "从各浏览器导出标准书签文件（HTML），在库中批量导入，把既有条目一次性纳入个人库",
+        "浏览导入结果，按自己关心的主题重新归类，并对导入产生的重复项或无关条目做清理",
+        "此后在任意浏览器或设备上遇到值得保留的页面时，通过保存入口一键保存到同一账号下的库",
+        "更换设备或浏览器时打开同一个库，按分类浏览或按关键词检索已保存条目",
+        "从条目打开其 URL，回到原始外部网页"
+      ],
+      "acceptance": [
+        "批量导入的条目与之后逐条保存的条目进入同一个持久库，更换浏览器或设备后仍可访问",
+        "库不依赖任何单一浏览器的配置文件即可浏览与检索",
+        "用户可对导入条目重新分类、重命名或删除，操作结果在下次会话中原样保留",
+        "按关键词或分类能检索到导入的或新存的条目并返回其 URL",
+        "系统只保存指向外部网页的引用，不抓取正文、不把条目转成阅读队列或用户笔记"
+      ],
+      "status": "draft",
+      "revision": 1,
+      "final_review": {
+        "checks": [
+          {
+            "dimension": "leaf_fit",
+            "outcome": "passed",
+            "reason": "场景落点与叶子定义核心一致：objective 强调“并入一个独立的个人库…在任一设备上用同一份记录继续保存与回查”，对应 leaf.md 第 41-44 行四项属性（“Reference record anchored to an address”“Persistent, accumulating personal library”“User-controlled organization and retrieval”）；leaf.md 第 33 行明确“The work environment is inherently multi-device — the whole point of a standalone library is that it is not trapped in one browser or one machine.”；导入书签文件对应第 81 行“import/export in the standard browser-bookmark HTML format, which functions as the Type's interchange convention”。场景验收亦守住边界“只保存指向外部网页的引用，不抓取正文、不把条目转成阅读队列或用户笔记”，与第 41 行“The record is not the content”一致。"
+          },
+          {
+            "dimension": "distinctness",
+            "outcome": "passed",
+            "reason": "逐一比对 peer：scn_244cdd 的目标是“定期清理重复、错放与失效的条目并重组分类结构”（长期库维护），本场景目标是跨浏览器/设备的一次性合并并在同一账号下继续保存，虽同含“清理重复项”一步但重心与触发条件不同；scn_4e9348 面向开发者项目/技术栈索引，scn_4faa8610 面向研究者参考文献，scn_7756e000 面向普通用户生活待购/灵感，scn_89363b 面向学生课程书架，受众与目标均可区分。以上均仅作比较，不构成需修订的重叠，故 related_scenario_ids 为空。"
+          },
+          {
+            "dimension": "workflow",
+            "outcome": "passed",
+            "reason": "workflow 五步构成连贯端到端闭环：从各浏览器导出并批量导入 → 浏览导入结果重新归类与清理 → 此后在任意浏览器/设备保存到同一库 → 换设备后按分类浏览或关键词检索 → 从条目打开 URL 回到原网页。与 leaf.md 第 89-119 行的 Capture/Organize/Find and return 循环对应（导入见第 99 行“Bulk capture exists in both directions: import brings an existing bookmark file…”，打开记录见第 118 行“open the record → click through to the live resource”），无断裂或缺失环节。"
+          },
+          {
+            "dimension": "testability",
+            "outcome": "passed",
+            "reason": "验收项覆盖整个流程且可观察：批量导入条目与后续逐条保存条目进入同一持久库并在换浏览器/设备后仍可访问（对应导入与跨设备两步）；库不依赖单一浏览器配置文件即可浏览检索；重新分类/重命名/删除在下次会话原样保留（对应整理与持久性）；按关键词或分类检索到条目并返回 URL（对应检索与打开）；系统只存引用、不抓取正文/不转阅读队列或笔记（对应类型边界，见 leaf.md 第 175 行“The record points; the web owns the content.”）。均为可从行为结果判定的判据。"
+          },
+          {
+            "dimension": "scope",
+            "outcome": "passed",
+            "reason": "边界合理且内部一致：场景聚焦“保存引用、日后回查”，明确排除正文抓取、阅读队列与用户笔记，与 leaf.md 第 17-19 行所述“未落在 Read-it-later / Note-taking”的边界一致；受众为混用多浏览器、不愿被锁定在单一配置文件的个人用户，与第 33、80 行“independence from any single browser profile”契合。多设备“同一账号”属叶子所列成熟产品的标准能力（第 80 行“Multi-device, multi-browser access — web, desktop, and mobile clients sharing one library”），不构成无依据假设；场景正文为简体中文，符合 input.language=zh，未发现语言偏离。"
+          }
+        ],
+        "created_at": "2026-10-16T19:37:29.431732+00:00",
+        "id": "scv_f1b88decc5724a5fbfcaca9ea4bfa3f7",
+        "input_digest": "b9305cfc070a5d0cf7e3d03824813d3e107b42376c6fb038b25202ef357b3b2f",
+        "job_id": "job_b28329cea0624b1993e5bf0ea16436b3",
+        "leaf_evidence": [
+          {
+            "end_line": 15,
+            "start_line": 7
+          },
+          {
+            "end_line": 44,
+            "start_line": 41
+          },
+          {
+            "end_line": 33,
+            "start_line": 33
+          },
+          {
+            "end_line": 81,
+            "start_line": 80
+          }
+        ],
+        "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+        "leaf_quotes": [
+          "The defining core is small:\n\n```text\nDeliberately saved reference record\n└── anchored to an external web resource by its address (URL)\n    └── held in a persistent, accumulating personal library\n        └── under user-controlled organization\n            └── retrieved later to return to the resource\n```",
+          "- **Reference record anchored to an address** — the central object is a record that points at a web resource via its URL, enriched with whatever metadata the product adds. The record is not the content; the content lives on the web, outside the library. This is what separates the Type from notes (authored content) and from read-it-later services (the captured readable copy is the working object).\n- **Deliberate capture** — every record originates from a user decision to save (a click, a share, a pasted URL, an approved import). Nothing is logged automatically. This is what separates the library from browser history.\n- **Persistent, accumulating personal library** — records survive sessions and devices and pile up over time into a long-lived personal asset, often numbering thousands of items.\n- **User-controlled organization and retrieval** — the user structures the library in some form and can find records again by browsing that structure and/or by searching. The *form* of organization is an implementation choice, not part of the definition.",
+          "Secondary contexts: small teams or groups maintaining shared collections (research, reading lists, project links); public sharing of a curated list when the owner chooses to. The work environment is inherently multi-device — the whole point of a standalone library is that it is not trapped in one browser or one machine.",
+          "- **Multi-device, multi-browser access** — web, desktop, and mobile clients sharing one library; independence from any single browser profile is the reason standalone products exist.\n- **Interoperability** — import/export in the standard browser-bookmark HTML format, which functions as the Type's interchange convention."
+        ],
+        "model": "open-design/deepseek-v4.1-flash",
+        "outcome": "passed",
+        "peer_digest": "d1e60fbc01c9307ce2ff4f48441d90de95b57668acbbd95ede4c237fcacd232d",
+        "peer_scenarios": [
+          {
+            "id": "scn_244cdd4295fc4f98a3b02674eef2772d",
+            "name": "长期书签库的去重与结构整理",
+            "revision": 1
+          },
+          {
+            "id": "scn_4e93484ec0674723840a142456b9fe50",
+            "name": "开发者的项目技术资源索引",
+            "revision": 1
+          },
+          {
+            "id": "scn_4faa861048af4f8dac27dd44e531f25a",
+            "name": "独立研究者的长期参考文献库",
+            "revision": 1
+          },
+          {
+            "id": "scn_7756e0007f6a463a97316f3f49c15248",
+            "name": "生活待购与灵感收藏夹",
+            "revision": 2
+          },
+          {
+            "id": "scn_8936303b326f4a43bee84d6e98f45f2d",
+            "name": "学生的课程参考书架",
+            "revision": 1
+          }
+        ],
+        "related_scenario_ids": [],
+        "scenario_id": "scn_a36b0131efd747f994b2fb5d22846b5d",
+        "scenario_revision": 1,
+        "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+        "suggestions": [
+          "（可选）可在 workflow 第 2 步补充一句：导入后若同一地址已在库中存在，用户可保留、合并或删除，以便与验收“清理重复项”形成更直接的可观察对应（叶子第 178 行指出“One resource, generally one record”的收敛趋势，但严格度因产品而异，故非必改）。",
+          "（可选）可在验收中明确检索“按分类浏览”与“关键词检索”至少各覆盖一个导入条目和一个新存条目，使跨浏览器合并这一独特点在验收中得到直接体现。"
+        ],
+        "summary": "本场景《跨浏览器与多设备合并的个人书签库》以“把多个浏览器/设备中散落的书签一次性并入一个独立个人库，并在此后跨设备继续保存与回查”为目标，与 Atlas 叶子 bookmark-manager 的定义核心高度吻合：以 URL 锚定的刻意保存引用记录、持久累积的个人库、用户自控的组织与检索（leaf.md 第 41-44 行），且明确以“不被单一浏览器困住”为价值点（第 33、80 行），批量导入所用的浏览器 HTML 书签格式正是该类型的交换约定（第 81 行）。与所提供的 5 个同类 peer 相比，本场景的独特点是一次性跨浏览器/设备合并 + 同一账号下持续保存；peer scn_244cdd 虽同样涉及重复项清理，但其重心是长期累积库的周期性去重与结构整理，目标与场景不同，其余 peer 在受众与目标上（开发者项目索引、研究者参考文献、生活待购收藏、学生课程书架）明显区分。工作流为导入→整理→跨浏览器保存→换设备后浏览/检索→打开原网页，端到端连贯；验收项覆盖该流程且可观察。未发现语言偏离（场景正文为简体中文）。局限：本审查仅针对所提供的叶子与 peer 文本，未做全库去重，也不构成运行时或商业验证；允许的“同一账号”多设备同步属叶子所述的成熟产品标准能力（第 17、80 行），非阻断性假设。",
+        "current": true
+      }
+    },
+    {
+      "id": "scn_244cdd4295fc4f98a3b02674eef2772d",
+      "leaf": "bookmark-manager",
+      "name": "长期书签库的去重与结构整理",
+      "audience": "库已累积成百上千条、需要定期整理以维持可检索性的长期书签使用者",
+      "objective": "在不改变“保存引用、日后回查”用途的前提下，定期清理重复、错放与失效的条目并重组分类结构，让多年累积的库仍然可用。",
+      "workflow": [
+        "打开库，按分类或时间浏览，找出指向同一地址的多条记录以及已无用或过期的条目",
+        "对同一地址的重复记录执行合并或删除，只保留可用的引用",
+        "把长期停留在待整理区的条目移动到合适分类或补上组织标记",
+        "合并、重命名或调整分类层级，使结构与当前的主题划分一致",
+        "对不再能打开的地址条目做删除或标记处理，不再让它们出现在常规浏览中",
+        "整理完成后通过检索与分类浏览验证目标条目仍可定位并打开其 URL"
+      ],
+      "acceptance": [
+        "对同一 URL 的多条记录执行合并或删除后，库中指向该地址的记录数量减少，且剩余记录仍打开同一 URL",
+        "分类可被重命名、合并、移动或在层级间调整，整理后分类结构与条目归属在下次会话保持",
+        "把条目从待整理区移入某分类后，该条目出现在目标分类中",
+        "整理后按关键词或分类仍能定位到目标条目并返回其 URL",
+        "被删除的条目不再出现在常规浏览与检索结果中",
+        "整理操作不会把条目转换为正文副本或用户自撰内容"
+      ],
+      "status": "draft",
+      "revision": 1,
+      "final_review": {
+        "checks": [
+          {
+            "dimension": "leaf_fit",
+            "outcome": "passed",
+            "reason": "场景核心（定期清理重复/错放/失效条目并重组分类，仍以引用回查为目的）正是 leaf 的维护循环：“Periodically: run duplicate review → merge or remove / → check broken-link reports → repair (find replacement) or delete”（123-130 行），并对应 leaf 中打开应用的理由之一 “clean house: remove dead links, merge duplicates, restructure”（31 行）。验收第 6 条“整理操作不会把条目转换为正文副本或用户自撰内容”与 leaf 的边界 “The record points; the web owns the content”（175 行）及 “One resource, generally one record”（178 行）一致，未漂移为 Read-it-later 或 Note-taking。"
+          },
+          {
+            "dimension": "distinctness",
+            "outcome": "passed",
+            "reason": "与所给五个 peer 逐一比较：scn_4e93484ec0674723840a142456b9fe50（开发者项目索引）、scn_4faa861048af4f8dac27dd44e531f25a（研究者长期文献库）、scn_7756e0007f6a463a97316f3f49c15248（生活待购灵感夹）、scn_8936303b326f4a43bee84d6e98f45f2d（学生课程书架）的用户/目标均为“保存—归类—回查”的建设型流程，整理仅出现在收尾步骤（如 scn_4faa861048af4f8dac27dd44e531f25a 末步“对不再需要的条目进行移动、重命名或删除”）。scn_a36b0131efd747f994b2fb5d22846b5d（跨浏览器合并）虽含“对导入产生的重复项或无关条目做清理”，但其目标是多浏览器/多设备合并，清理是为导入服务的一次性动作。本场景用户为大型长期库的维护者，目标是持续去重与分类结构重整，工作流不含捕获环节而是全面的库卫生流程，中心不同，不构成材料性重叠。"
+          },
+          {
+            "dimension": "workflow",
+            "outcome": "passed",
+            "reason": "六步构成可用的端到端流程：浏览定位重复与失效条目（26）→ 合并或删除重复（27）→ 处理待整理区条目（28）→ 合并/重命名/调整分类层级（29）→ 处理打不开的地址（30）→ 通过检索与分类浏览验证可定位并打开 URL（31）。步骤间有清晰因果与终点，符合 leaf 的 Organize（103-108 行：assign → restructure: nest, rename, merge）与 Maintain（125-130 行）两条既有循环，未引入相互冲突的动作。"
+          },
+          {
+            "dimension": "testability",
+            "outcome": "passed",
+            "reason": "验收条款基本可观测且覆盖主要步骤：合并/删除后指向同一 URL 的记录数减少且剩余记录仍打开同一 URL（第 12 条）；分类重命名/合并/移动/层级调整在下次会话保持（13）；条目从待整理区移入目标分类（14）；整理后仍能按关键词或分类定位并返回 URL（15）；被删除条目不再出现在常规浏览与检索（16）；不转为正文副本或自撰内容（17）。这些对应 workflow 的 2/3/4/6 步，属可观察结果而非实现细节。"
+          },
+          {
+            "dimension": "scope",
+            "outcome": "passed",
+            "reason": "边界合理：明确限定为“保存引用、日后回查”用途不变，并以验收第 6 条排除转为内容消费或用户自撰，与 leaf 的 Type 边界一致；受众“库已累积成百上千条”对应 leaf “often numbering thousands of items”（43 行），内部前后一致。不依赖未给出的数值阈值或具体技术栈。仅为文本层面审查，未做运行或市场验证。语言为 zh，场景正文为简体中文，符合 input.language。"
+          }
+        ],
+        "created_at": "2026-10-16T19:37:21.307603+00:00",
+        "id": "scv_1ae177c9462c420eaa7673afacd52376",
+        "input_digest": "3938fa17f4029b6648d527e13a5267fb7eba6ea4db22fb36402b4a1cec6f54a4",
+        "job_id": "job_4472b3bfc7ee483184511ceec088994a",
+        "leaf_evidence": [
+          {
+            "end_line": 31,
+            "start_line": 31
+          },
+          {
+            "end_line": 130,
+            "start_line": 123
+          },
+          {
+            "end_line": 175,
+            "start_line": 175
+          },
+          {
+            "end_line": 178,
+            "start_line": 178
+          }
+        ],
+        "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+        "leaf_quotes": [
+          "- clean house: remove dead links, merge duplicates, restructure",
+          "### Maintain\n\n```text\nPeriodically: run duplicate review → merge or remove\n→ check broken-link reports → repair (find replacement) or delete\n→ optionally trigger/request preserved copies of important records\n→ deleted records go to a recoverable trash in some products\n```",
+          "- **The record points; the web owns the content.** A saved page can change or vanish without the record knowing. The library guarantees the *reference*, not the *content* — unless the product also stores a preserved copy, which is an optional capability.",
+          "- **One resource, generally one record.** Mature products converge on a single record per address — either by preventing duplicates outright or by surfacing them for cleanup — but the strictness varies by product."
+        ],
+        "model": "open-design/deepseek-v4.1-flash",
+        "outcome": "passed",
+        "peer_digest": "3b3e9cae13fa8925fde29403e80a3e672abc9526e624926b9b7f8f68361481fe",
+        "peer_scenarios": [
+          {
+            "id": "scn_4e93484ec0674723840a142456b9fe50",
+            "name": "开发者的项目技术资源索引",
+            "revision": 1
+          },
+          {
+            "id": "scn_4faa861048af4f8dac27dd44e531f25a",
+            "name": "独立研究者的长期参考文献库",
+            "revision": 1
+          },
+          {
+            "id": "scn_7756e0007f6a463a97316f3f49c15248",
+            "name": "生活待购与灵感收藏夹",
+            "revision": 2
+          },
+          {
+            "id": "scn_8936303b326f4a43bee84d6e98f45f2d",
+            "name": "学生的课程参考书架",
+            "revision": 1
+          },
+          {
+            "id": "scn_a36b0131efd747f994b2fb5d22846b5d",
+            "name": "跨浏览器与多设备合并的个人书签库",
+            "revision": 1
+          }
+        ],
+        "related_scenario_ids": [],
+        "scenario_id": "scn_244cdd4295fc4f98a3b02674eef2772d",
+        "scenario_revision": 1,
+        "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+        "suggestions": [
+          "为 workflow 第 5 步“对不再能打开的地址条目做删除或标记处理”补充对应验收（例如：被标记的失效条目可在专门视图查看，且不再出现在常规浏览与检索中），使每一步都有可观测判据。",
+          "明确“同一地址”的重复判定口径（完全相同的 URL，还是归一化后相同，如去尾斜杠、忽略跟踪参数），避免验收第 1 条与第 3 条在判定时产生歧义。",
+          "补充合并时的保留规则（保留哪条记录的标题/分类/时间等元数据）作为可观测结果，使“合并”在验收中可复核。"
+        ],
+        "summary": "该场景是一个“长期书签库维护/整理”型场景：以去重、结构调整、失效链接处理为中心，用户在既有大型库内维护可检索性。经与 leaf.md 对照，维护（duplicate review → merge or remove；broken-link 处理）与“One resource, generally one record”均在 Atlas 定义之内，且 negative 边界（不转为正文副本或自撰内容）与 leaf 的“record points；the web owns the content”一致。因此 leaf_fit / distinctness / workflow / testability / scope 五个维度均判定 passed。与五个 peer 场景相比，本场景把重心完全放在库卫生与结构重排（peer 场景仅在收尾步骤顺带清理），不构成重复；scn_a36b0131efd747f994b2fb5d22846b5d（导入后清理重复）是最接近的对比对象，但其目标是跨浏览器/多设备合并，中心不在持续去重与结构整理。局限：这是对场景文本的静态审查，未做运行验证；workflow 第 5 步“标记处理”与验收条款未完全一一对应，属可改进项。",
+        "current": true
+      }
+    }
+  ],
+  "review_outcomes": {
+    "passed": 4,
+    "needs_changes": 1,
+    "rejected": 0
+  },
+  "scenario_count_before": 10,
+  "scenario_count_after": 15,
+  "old_revisions_and_states_unchanged": true,
+  "all_authored_fields_contain_chinese": true,
+  "no_new_leaf_coverage": true,
+  "no_automatic_confirmation_or_templates": true,
+  "jobs": [
+    {
+      "id": "job_2c03173d69134bf096929682c1ce17f6",
+      "kind": "scenarios",
+      "state": "completed",
+      "attempt": 1,
+      "created_at": "2026-10-16T19:33:39.726412+00:00",
+      "updated_at": "2026-10-16T19:34:30.227884+00:00"
+    },
+    {
+      "id": "job_5735f5266f46472e9f145425e0bfc643",
+      "kind": "scenarios",
+      "state": "completed",
+      "attempt": 1,
+      "created_at": "2026-10-16T19:33:39.726412+00:00",
+      "updated_at": "2026-10-16T19:34:18.771747+00:00"
+    },
+    {
+      "id": "job_b28329cea0624b1993e5bf0ea16436b3",
+      "kind": "scenario-review",
+      "state": "completed",
+      "attempt": 2,
+      "created_at": "2026-10-16T19:34:18.774559+00:00",
+      "updated_at": "2026-10-16T19:37:29.432408+00:00"
+    },
+    {
+      "id": "job_4472b3bfc7ee483184511ceec088994a",
+      "kind": "scenario-review",
+      "state": "completed",
+      "attempt": 2,
+      "created_at": "2026-10-16T19:34:18.774768+00:00",
+      "updated_at": "2026-10-16T19:37:21.308147+00:00"
+    },
+    {
+      "id": "job_fbdc211ca97245bda10ac45f324dca35",
+      "kind": "scenario-review",
+      "state": "completed",
+      "attempt": 1,
+      "created_at": "2026-10-16T19:34:30.230529+00:00",
+      "updated_at": "2026-10-16T19:35:13.548702+00:00"
+    },
+    {
+      "id": "job_d8ab0accd0ad4047b2603cd469662eae",
+      "kind": "scenario-review",
+      "state": "completed",
+      "attempt": 1,
+      "created_at": "2026-10-16T19:34:30.230841+00:00",
+      "updated_at": "2026-10-16T19:35:33.033699+00:00"
+    },
+    {
+      "id": "job_1a1ca8f9deb243cc9d8a6aa7d7fa1527",
+      "kind": "scenario-review",
+      "state": "completed",
+      "attempt": 1,
+      "created_at": "2026-10-16T19:34:30.231143+00:00",
+      "updated_at": "2026-10-16T19:35:51.480637+00:00"
+    }
+  ],
+  "cli_invocations": 9,
+  "retained_failures": [
+    {
+      "job_id": "job_b28329cea0624b1993e5bf0ea16436b3",
+      "previous_error": "scenario review needs exact pinned leaf quotes",
+      "new_attempt": 2
+    },
+    {
+      "job_id": "job_4472b3bfc7ee483184511ceec088994a",
+      "previous_error": "scenario review needs exact pinned leaf quotes",
+      "new_attempt": 2
+    }
+  ],
+  "citation_repair": "New reviews cite source line ranges; Atlas extracts exact Markdown. Legacy exact quote reports remain supported. Invalid earlier transcribed quotes were never accepted as passing.",
+  "zero_additions_verification": "Covered by local backend and isolated browser checks; this real batch proposed five additions, so it does not constitute real-provider evidence of a zero-addition response.",
+  "deduplication_limit": "Same-leaf pinned peers guide generation and independent review. Semantic uniqueness is advisory, not a deterministic full-corpus guarantee.",
+  "checks": {
+    "backend_total": 324,
+    "factory_backend": 56,
+    "factory_browser": 8,
+    "frontend_typecheck": "passed",
+    "frontend_build": "passed",
+    "ruff": "passed",
+    "diff_check": "passed"
+  },
+  "raw_evidence_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory",
+  "screenshot": "docs/template-factory/2026-10-17-scenario-batch-02.jpg",
+  "no_material_overlap_flagged": true
+}

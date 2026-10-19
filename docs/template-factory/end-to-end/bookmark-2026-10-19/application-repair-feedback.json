@@ -1,0 +1,24 @@
+{
+  "scope": "Repair only the independent findings in the three selected files; preserve all frozen P0 capabilities, runtime argv, filenames and all unselected bytes. Do not implement P1/P2 or weaken tests. This is authorized necessary app repair, not template mutation.",
+  "findings": [
+    {
+      "id": "SR01",
+      "files": [
+        "app/validation.py",
+        "app/server.py"
+      ],
+      "problem": "Raw URL CR/LF survive validation and can be placed into Location by /go, allowing response-header injection.",
+      "required_fix": "Reject raw control characters before parsing/normalizing/saving; guard redirect response boundary too; do not silently strip dangerous raw input and accept it."
+    },
+    {
+      "id": "SR02",
+      "files": [
+        "app/storage.py"
+      ],
+      "problem": "ThreadingHTTPServer requests share one check_same_thread=False SQLite connection without transaction locking; another request rollback can discard an acknowledged concurrent write.",
+      "required_fix": "Use per-request isolated connections or serialize complete storage operations/transactions, including precondition reads, commits/rollbacks and shared reads. Preserve category uniqueness and correct error behavior."
+    }
+  ],
+  "source_report": "gates/initial-source-review.json",
+  "evidence_status": "Static findings; runtime reproduction kept separately when available."
+}

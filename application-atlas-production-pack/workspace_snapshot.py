@@ -9,6 +9,10 @@ from pathlib import Path
 DEFAULT_IGNORES = frozenset({
     ".git", ".hg", ".svn", ".venv", "__pycache__", "node_modules", "dist",
 })
+MAX_SNAPSHOT_FILES = 20_000
+MAX_SNAPSHOT_BYTES = 512 * 1024 * 1024
+MAX_SNAPSHOT_FILE_BYTES = 128 * 1024 * 1024
+MAX_SNAPSHOT_DEPTH = 32
 
 
 def snapshot_workspace(root: str | Path, ignore_names=DEFAULT_IGNORES) -> dict:
@@ -17,20 +21,32 @@ def snapshot_workspace(root: str | Path, ignore_names=DEFAULT_IGNORES) -> dict:
     The result is owned by Atlas and can be compared independently of an
     execution engine's diff endpoint.
     """
-    root = Path(root).resolve()
+    raw_root = Path(root)
+    root = raw_root.resolve()
+    if raw_root.is_symlink():
+        raise ValueError("workspace root must not be a symlink")
     if not root.is_dir():
         raise ValueError("workspace root must be an existing directory")
+    if root == Path("/") or root == Path.home().resolve() \
+            or root == Path(__file__).resolve().parent:
+        raise ValueError("workspace root is too broad for an Atlas snapshot")
     ignored = set(ignore_names)
     files: dict[str, dict] = {}
     errors: list[dict] = []
+    total_bytes = 0
     for current, directories, names in os.walk(root, topdown=True, followlinks=False):
         current_path = Path(current)
+        depth = len(current_path.relative_to(root).parts)
+        if depth > MAX_SNAPSHOT_DEPTH:
+            raise ValueError("workspace nesting exceeds the snapshot limit")
         kept = []
         for name in sorted(directories):
             path = current_path / name
             if name in ignored:
                 continue
             if path.is_symlink():
+                if len(files) >= MAX_SNAPSHOT_FILES:
+                    raise ValueError("workspace file count exceeds the snapshot limit")
                 _record_link(root, path, files, errors)
             else:
                 kept.append(name)
@@ -40,12 +56,21 @@ def snapshot_workspace(root: str | Path, ignore_names=DEFAULT_IGNORES) -> dict:
                 continue
             path = current_path / name
             if path.is_symlink():
+                if len(files) >= MAX_SNAPSHOT_FILES:
+                    raise ValueError("workspace file count exceeds the snapshot limit")
                 _record_link(root, path, files, errors)
                 continue
             try:
                 stat = path.stat()
                 if not path.is_file():
                     continue
+                if stat.st_size > MAX_SNAPSHOT_FILE_BYTES:
+                    raise ValueError("workspace file exceeds the snapshot size limit")
+                if len(files) >= MAX_SNAPSHOT_FILES:
+                    raise ValueError("workspace file count exceeds the snapshot limit")
+                total_bytes += stat.st_size
+                if total_bytes > MAX_SNAPSHOT_BYTES:
+                    raise ValueError("workspace exceeds the snapshot byte limit")
                 digest = hashlib.sha256()
                 with path.open("rb") as stream:
                     for chunk in iter(lambda: stream.read(1024 * 1024), b""):

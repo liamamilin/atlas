@@ -1,0 +1,455 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-01",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-01\", \"categories\": [], \"transactions\": [], \"totals\": {\"budget\": \"0.00\", \"spent\": \"0.00\", \"remaining\": \"0.00\"}}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/categories",
+    "request": {
+      "month": "2030-01",
+      "name": "餐饮",
+      "budget": "0.20"
+    },
+    "status": 201,
+    "response": "{\"id\": 1}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/categories",
+    "request": {
+      "month": "2030-01",
+      "name": "未使用",
+      "budget": "10.00"
+    },
+    "status": 201,
+    "response": "{\"id\": 2}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/transactions",
+    "request": {
+      "date": "2030-01-05",
+      "category_id": 1,
+      "amount": "0.10",
+      "note": "第一笔"
+    },
+    "status": 201,
+    "response": "{\"id\": 1}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/transactions",
+    "request": {
+      "date": "2030-01-05",
+      "category_id": 1,
+      "amount": "0.20",
+      "note": "第二笔"
+    },
+    "status": 201,
+    "response": "{\"id\": 2}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-01",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-01\", \"categories\": [{\"id\": 1, \"name\": \"餐饮\", \"budget\": \"0.20\", \"spent\": \"0.30\", \"remaining\": \"-0.10\"}, {\"id\": 2, \"name\": \"未使用\", \"budget\": \"10.00\", \"spent\": \"0.00\", \"remaining\": \"10.00\"}], \"transactions\": [{\"id\": 1, \"date\": \"2030-01-05\", \"category_id\": 1, \"amount\": \"0.10\", \"note\": \"第一笔\"}, {\"id\": 2, \"date\": \"2030-01-05\", \"category_id\": 1, \"amount\": \"0.20\", \"note\": \"第二笔\"}], \"totals\": {\"budget\": \"10.20\", \"spent\": \"0.30\", \"remaining\": \"9.90\"}}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/categories",
+    "request": {
+      "month": "2030-02",
+      "name": "餐饮",
+      "budget": "50.00"
+    },
+    "status": 201,
+    "response": "{\"id\": 3}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/transactions",
+    "request": {
+      "date": "2030-02-03",
+      "category_id": 3,
+      "amount": "3.45",
+      "note": ""
+    },
+    "status": 201,
+    "response": "{\"id\": 3}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-02",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-02\", \"categories\": [{\"id\": 3, \"name\": \"餐饮\", \"budget\": \"50.00\", \"spent\": \"3.45\", \"remaining\": \"46.55\"}], \"transactions\": [{\"id\": 3, \"date\": \"2030-02-03\", \"category_id\": 3, \"amount\": \"3.45\", \"note\": \"\"}], \"totals\": {\"budget\": \"50.00\", \"spent\": \"3.45\", \"remaining\": \"46.55\"}}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-01",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-01\", \"categories\": [{\"id\": 1, \"name\": \"餐饮\", \"budget\": \"0.20\", \"spent\": \"0.30\", \"remaining\": \"-0.10\"}, {\"id\": 2, \"name\": \"未使用\", \"budget\": \"10.00\", \"spent\": \"0.00\", \"remaining\": \"10.00\"}], \"transactions\": [{\"id\": 1, \"date\": \"2030-01-05\", \"category_id\": 1, \"amount\": \"0.10\", \"note\": \"第一笔\"}, {\"id\": 2, \"date\": \"2030-01-05\", \"category_id\": 1, \"amount\": \"0.20\", \"note\": \"第二笔\"}], \"totals\": {\"budget\": \"10.20\", \"spent\": \"0.30\", \"remaining\": \"9.90\"}}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/transactions",
+    "request": {
+      "date": "2030-01-03",
+      "category_id": 3,
+      "amount": "1.00",
+      "note": "跨月应拒绝"
+    },
+    "status": 400,
+    "response": "{\"error\": \"支出日期必须属于该分类所在月份\"}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-02",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-02\", \"categories\": [{\"id\": 3, \"name\": \"餐饮\", \"budget\": \"50.00\", \"spent\": \"3.45\", \"remaining\": \"46.55\"}], \"transactions\": [{\"id\": 3, \"date\": \"2030-02-03\", \"category_id\": 3, \"amount\": \"3.45\", \"note\": \"\"}], \"totals\": {\"budget\": \"50.00\", \"spent\": \"3.45\", \"remaining\": \"46.55\"}}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/categories",
+    "request": {
+      "month": "2030-03",
+      "name": "可纠正",
+      "budget": "100.00"
+    },
+    "status": 201,
+    "response": "{\"id\": 4}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/transactions",
+    "request": {
+      "date": "2030-03-01",
+      "category_id": 4,
+      "amount": "8.75",
+      "note": ""
+    },
+    "status": 201,
+    "response": "{\"id\": 4}"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/transactions/4",
+    "request": {
+      "date": "2030-03-02",
+      "category_id": 4,
+      "amount": "2.35",
+      "note": "改正"
+    },
+    "status": 200,
+    "response": "{\"id\": 4}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-03",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-03\", \"categories\": [{\"id\": 4, \"name\": \"可纠正\", \"budget\": \"100.00\", \"spent\": \"2.35\", \"remaining\": \"97.65\"}], \"transactions\": [{\"id\": 4, \"date\": \"2030-03-02\", \"category_id\": 4, \"amount\": \"2.35\", \"note\": \"改正\"}], \"totals\": {\"budget\": \"100.00\", \"spent\": \"2.35\", \"remaining\": \"97.65\"}}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-03",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-03\", \"categories\": [{\"id\": 4, \"name\": \"可纠正\", \"budget\": \"100.00\", \"spent\": \"2.35\", \"remaining\": \"97.65\"}], \"transactions\": [{\"id\": 4, \"date\": \"2030-03-02\", \"category_id\": 4, \"amount\": \"2.35\", \"note\": \"改正\"}], \"totals\": {\"budget\": \"100.00\", \"spent\": \"2.35\", \"remaining\": \"97.65\"}}"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/categories/4",
+    "request": {
+      "budget": "200.00"
+    },
+    "status": 200,
+    "response": "{\"id\": 4, \"month\": \"2030-03\", \"name\": \"可纠正\", \"budget\": \"200.00\"}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-03",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-03\", \"categories\": [{\"id\": 4, \"name\": \"可纠正\", \"budget\": \"200.00\", \"spent\": \"2.35\", \"remaining\": \"197.65\"}], \"transactions\": [{\"id\": 4, \"date\": \"2030-03-02\", \"category_id\": 4, \"amount\": \"2.35\", \"note\": \"改正\"}], \"totals\": {\"budget\": \"200.00\", \"spent\": \"2.35\", \"remaining\": \"197.65\"}}"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/transactions/4",
+    "request": null,
+    "status": 200,
+    "response": "{\"id\": 4, \"deleted\": true}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-03",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-03\", \"categories\": [{\"id\": 4, \"name\": \"可纠正\", \"budget\": \"200.00\", \"spent\": \"0.00\", \"remaining\": \"200.00\"}], \"transactions\": [], \"totals\": {\"budget\": \"200.00\", \"spent\": \"0.00\", \"remaining\": \"200.00\"}}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-03",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-03\", \"categories\": [{\"id\": 4, \"name\": \"可纠正\", \"budget\": \"200.00\", \"spent\": \"0.00\", \"remaining\": \"200.00\"}], \"transactions\": [], \"totals\": {\"budget\": \"200.00\", \"spent\": \"0.00\", \"remaining\": \"200.00\"}}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/categories",
+    "request": {
+      "month": "2030-04",
+      "name": "验证",
+      "budget": "20.00"
+    },
+    "status": 201,
+    "response": "{\"id\": 5}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/transactions",
+    "request": {
+      "date": "2030-04-02",
+      "category_id": 5,
+      "amount": "1.00",
+      "note": "原始数据"
+    },
+    "status": 201,
+    "response": "{\"id\": 5}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-04",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-04\", \"categories\": [{\"id\": 5, \"name\": \"验证\", \"budget\": \"20.00\", \"spent\": \"1.00\", \"remaining\": \"19.00\"}], \"transactions\": [{\"id\": 5, \"date\": \"2030-04-02\", \"category_id\": 5, \"amount\": \"1.00\", \"note\": \"原始数据\"}], \"totals\": {\"budget\": \"20.00\", \"spent\": \"1.00\", \"remaining\": \"19.00\"}}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/transactions",
+    "request": {
+      "date": "2030-04-02",
+      "category_id": 5,
+      "amount": "0",
+      "note": "不应保存"
+    },
+    "status": 400,
+    "response": "{\"error\": \"金额无效：金额必须为正数\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/transactions",
+    "request": {
+      "date": "2030-04-02",
+      "category_id": 5,
+      "amount": "-1.00",
+      "note": "不应保存"
+    },
+    "status": 400,
+    "response": "{\"error\": \"金额无效：金额必须为正数\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/transactions",
+    "request": {
+      "date": "2030-04-02",
+      "category_id": 5,
+      "amount": "0.001",
+      "note": "不应保存"
+    },
+    "status": 400,
+    "response": "{\"error\": \"金额无效：金额最多两位小数\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/transactions",
+    "request": {
+      "date": "2030-04-02",
+      "category_id": 5,
+      "amount": "NaN",
+      "note": "不应保存"
+    },
+    "status": 400,
+    "response": "{\"error\": \"金额无效：金额必须是有限数字\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/transactions",
+    "request": {
+      "date": "2030-04-02",
+      "category_id": 5,
+      "amount": "Infinity",
+      "note": "不应保存"
+    },
+    "status": 400,
+    "response": "{\"error\": \"金额无效：金额必须是有限数字\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/transactions",
+    "request": {
+      "date": "2030-04-02",
+      "category_id": 5,
+      "amount": "abc",
+      "note": "不应保存"
+    },
+    "status": 400,
+    "response": "{\"error\": \"金额无效：金额必须是数字\"}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/categories",
+    "request": {
+      "month": "2030-04",
+      "name": "验证",
+      "budget": "3.00"
+    },
+    "status": 409,
+    "response": "{\"error\": \"该月份已存在同名分类\"}"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/transactions/5",
+    "request": {
+      "date": "2030-02-30",
+      "category_id": 5,
+      "amount": "3.00",
+      "note": "无效日期"
+    },
+    "status": 400,
+    "response": "{\"error\": \"date 不是有效日期\"}"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/transactions/5",
+    "request": {
+      "date": "2030-04-02",
+      "category_id": "absent",
+      "amount": "3.00",
+      "note": "不存在"
+    },
+    "status": 400,
+    "response": "{\"error\": \"category_id 必须是整数\"}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-04",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-04\", \"categories\": [{\"id\": 5, \"name\": \"验证\", \"budget\": \"20.00\", \"spent\": \"1.00\", \"remaining\": \"19.00\"}], \"transactions\": [{\"id\": 5, \"date\": \"2030-04-02\", \"category_id\": 5, \"amount\": \"1.00\", \"note\": \"原始数据\"}], \"totals\": {\"budget\": \"20.00\", \"spent\": \"1.00\", \"remaining\": \"19.00\"}}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/categories",
+    "request": {
+      "month": "2030-05",
+      "name": "导出,\"分类\"",
+      "budget": "10.00"
+    },
+    "status": 201,
+    "response": "{\"id\": 6}"
+  },
+  {
+    "method": "POST",
+    "path": "/api/transactions",
+    "request": {
+      "date": "2030-05-03",
+      "category_id": 6,
+      "amount": "1.23",
+      "note": "中文,\"引号\"\n下一行"
+    },
+    "status": 201,
+    "response": "{\"id\": 6}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/export?month=2030-05",
+    "request": null,
+    "status": 200,
+    "response": "date,category,amount,note\r\n2030-05-03,\"导出,\"\"分类\"\"\",1.23,\"中文,\"\"引号\"\"\n下一行\"\r\n"
+  },
+  {
+    "method": "GET",
+    "path": "/api/export?month=2031-01",
+    "request": null,
+    "status": 200,
+    "response": "date,category,amount,note\r\n"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-01",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-01\", \"categories\": [{\"id\": 1, \"name\": \"餐饮\", \"budget\": \"0.20\", \"spent\": \"0.30\", \"remaining\": \"-0.10\"}, {\"id\": 2, \"name\": \"未使用\", \"budget\": \"10.00\", \"spent\": \"0.00\", \"remaining\": \"10.00\"}], \"transactions\": [{\"id\": 1, \"date\": \"2030-01-05\", \"category_id\": 1, \"amount\": \"0.10\", \"note\": \"第一笔\"}, {\"id\": 2, \"date\": \"2030-01-05\", \"category_id\": 1, \"amount\": \"0.20\", \"note\": \"第二笔\"}], \"totals\": {\"budget\": \"10.20\", \"spent\": \"0.30\", \"remaining\": \"9.90\"}}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-02",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-02\", \"categories\": [{\"id\": 3, \"name\": \"餐饮\", \"budget\": \"50.00\", \"spent\": \"3.45\", \"remaining\": \"46.55\"}], \"transactions\": [{\"id\": 3, \"date\": \"2030-02-03\", \"category_id\": 3, \"amount\": \"3.45\", \"note\": \"\"}], \"totals\": {\"budget\": \"50.00\", \"spent\": \"3.45\", \"remaining\": \"46.55\"}}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-03",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-03\", \"categories\": [{\"id\": 4, \"name\": \"可纠正\", \"budget\": \"200.00\", \"spent\": \"0.00\", \"remaining\": \"200.00\"}], \"transactions\": [], \"totals\": {\"budget\": \"200.00\", \"spent\": \"0.00\", \"remaining\": \"200.00\"}}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-04",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-04\", \"categories\": [{\"id\": 5, \"name\": \"验证\", \"budget\": \"20.00\", \"spent\": \"1.00\", \"remaining\": \"19.00\"}], \"transactions\": [{\"id\": 5, \"date\": \"2030-04-02\", \"category_id\": 5, \"amount\": \"1.00\", \"note\": \"原始数据\"}], \"totals\": {\"budget\": \"20.00\", \"spent\": \"1.00\", \"remaining\": \"19.00\"}}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-05",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-05\", \"categories\": [{\"id\": 6, \"name\": \"导出,\\\"分类\\\"\", \"budget\": \"10.00\", \"spent\": \"1.23\", \"remaining\": \"8.77\"}], \"transactions\": [{\"id\": 6, \"date\": \"2030-05-03\", \"category_id\": 6, \"amount\": \"1.23\", \"note\": \"中文,\\\"引号\\\"\\n下一行\"}], \"totals\": {\"budget\": \"10.00\", \"spent\": \"1.23\", \"remaining\": \"8.77\"}}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-01",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-01\", \"categories\": [{\"id\": 1, \"name\": \"餐饮\", \"budget\": \"0.20\", \"spent\": \"0.30\", \"remaining\": \"-0.10\"}, {\"id\": 2, \"name\": \"未使用\", \"budget\": \"10.00\", \"spent\": \"0.00\", \"remaining\": \"10.00\"}], \"transactions\": [{\"id\": 1, \"date\": \"2030-01-05\", \"category_id\": 1, \"amount\": \"0.10\", \"note\": \"第一笔\"}, {\"id\": 2, \"date\": \"2030-01-05\", \"category_id\": 1, \"amount\": \"0.20\", \"note\": \"第二笔\"}], \"totals\": {\"budget\": \"10.20\", \"spent\": \"0.30\", \"remaining\": \"9.90\"}}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-02",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-02\", \"categories\": [{\"id\": 3, \"name\": \"餐饮\", \"budget\": \"50.00\", \"spent\": \"3.45\", \"remaining\": \"46.55\"}], \"transactions\": [{\"id\": 3, \"date\": \"2030-02-03\", \"category_id\": 3, \"amount\": \"3.45\", \"note\": \"\"}], \"totals\": {\"budget\": \"50.00\", \"spent\": \"3.45\", \"remaining\": \"46.55\"}}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-03",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-03\", \"categories\": [{\"id\": 4, \"name\": \"可纠正\", \"budget\": \"200.00\", \"spent\": \"0.00\", \"remaining\": \"200.00\"}], \"transactions\": [], \"totals\": {\"budget\": \"200.00\", \"spent\": \"0.00\", \"remaining\": \"200.00\"}}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-04",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-04\", \"categories\": [{\"id\": 5, \"name\": \"验证\", \"budget\": \"20.00\", \"spent\": \"1.00\", \"remaining\": \"19.00\"}], \"transactions\": [{\"id\": 5, \"date\": \"2030-04-02\", \"category_id\": 5, \"amount\": \"1.00\", \"note\": \"原始数据\"}], \"totals\": {\"budget\": \"20.00\", \"spent\": \"1.00\", \"remaining\": \"19.00\"}}"
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?month=2030-05",
+    "request": null,
+    "status": 200,
+    "response": "{\"month\": \"2030-05\", \"categories\": [{\"id\": 6, \"name\": \"导出,\\\"分类\\\"\", \"budget\": \"10.00\", \"spent\": \"1.23\", \"remaining\": \"8.77\"}], \"transactions\": [{\"id\": 6, \"date\": \"2030-05-03\", \"category_id\": 6, \"amount\": \"1.23\", \"note\": \"中文,\\\"引号\\\"\\n下一行\"}], \"totals\": {\"budget\": \"10.00\", \"spent\": \"1.23\", \"remaining\": \"8.77\"}}"
+  }
+]

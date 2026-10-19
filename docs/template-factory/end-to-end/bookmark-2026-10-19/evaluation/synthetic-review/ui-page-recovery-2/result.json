@@ -1,0 +1,49 @@
+{
+  "status": "passed",
+  "kind": "synthetic harness-only test",
+  "firstResponseXssValue": "1",
+  "firstResponseXssPersistedAcrossNavigation": true,
+  "collectionText": "阅读收藏",
+  "navigation": {
+    "originalGo": {
+      "finalUrl": "http://127.0.0.1:55029/original?token=synthetic-original",
+      "navigation": "app-go-redirect",
+      "usedPopup": false,
+      "restoredApp": true,
+      "returnCollectionId": "7"
+    },
+    "originalDirect": {
+      "finalUrl": "http://127.0.0.1:55029/original?token=synthetic-original",
+      "navigation": "direct-original-link",
+      "usedPopup": false,
+      "restoredApp": true,
+      "returnCollectionId": "7"
+    },
+    "secondGo": {
+      "finalUrl": "http://127.0.0.1:55029/second?token=synthetic-second",
+      "navigation": "app-go-redirect",
+      "usedPopup": false,
+      "restoredApp": true,
+      "returnCollectionId": "7"
+    },
+    "secondDirect": {
+      "finalUrl": "http://127.0.0.1:55029/second?token=synthetic-second",
+      "navigation": "direct-original-link",
+      "usedPopup": false,
+      "restoredApp": true,
+      "returnCollectionId": "7"
+    },
+    "browseAfterClicks": true
+  },
+  "duplicateOutcomes": {
+    "upsert": "updated_existing_record",
+    "create": "created_new_record",
+    "reject": "rejected",
+    "noChange": "accepted_without_observable_change",
+    "idempotencyReplay": {
+      "unchanged": true,
+      "updated": false
+    }
+  },
+  "evidenceDir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/synthetic-review/ui-page-recovery-2"
+}

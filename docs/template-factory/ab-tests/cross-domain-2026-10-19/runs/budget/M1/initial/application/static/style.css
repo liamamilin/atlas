@@ -1,0 +1,110 @@
+:root {
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --ink: #1f2933;
+  --muted: #6b7280;
+  --line: #d9e0e8;
+  --accent: #2f6fed;
+  --danger: #c0392b;
+  --ok: #1e7d46;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 24px;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar h1 { font-size: 18px; margin: 0; }
+
+.month-bar { display: flex; align-items: center; gap: 8px; }
+.month-bar label { color: var(--muted); }
+
+main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+
+.card h2 { font-size: 15px; margin: 0 0 12px; color: var(--muted); font-weight: 600; }
+
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.row label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); }
+
+input, select, textarea, button {
+  font: inherit;
+  color: inherit;
+}
+
+input, select, textarea {
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  min-width: 130px;
+}
+
+textarea { resize: vertical; min-width: 200px; }
+
+button {
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+button.secondary { background: #fff; color: var(--ink); border-color: var(--line); }
+
+.feedback {
+  max-width: 980px;
+  margin: 12px auto 0;
+  padding: 0 16px;
+  min-height: 22px;
+  color: var(--muted);
+}
+.feedback.error { color: var(--danger); }
+.feedback.ok { color: var(--ok); }
+
+table.data { width: 100%; border-collapse: collapse; }
+table.data th, table.data td {
+  text-align: left;
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+table.data th { font-size: 13px; color: var(--muted); font-weight: 600; }
+td.over { color: var(--danger); font-weight: 600; }
+td .budget-input { min-width: 90px; width: 100px; margin-right: 6px; }
+td button { padding: 5px 10px; font-size: 13px; }
+td button + button { margin-left: 6px; }
+
+.totals { margin: 12px 0 0; font-weight: 600; }
+.empty { color: var(--muted); margin: 10px 0 0; }

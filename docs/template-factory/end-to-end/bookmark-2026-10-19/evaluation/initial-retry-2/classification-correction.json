@@ -1,0 +1,11 @@
+{
+  "classification": "blocked",
+  "failure_kind": "harness_ui_contract_adaptation",
+  "stage": "ui_initial",
+  "reason": "The UI harness attempted to select the default collection explicitly for the XSS sentinel. The frozen core workflow represents default assignment by omitting collection_id; that extra selection had no matching option on the current page. The script stopped before testing sentinel safety.",
+  "product_failure": false,
+  "primary_observation": "Chromium launched successfully; the saved screenshots and fixture logs show the preceding default save, category creation, second URL navigation, move, category browsing, search and original-page checks were reached before the harness error. The phase did not complete and no actual Docker restart was attempted.",
+  "original_run_json_preserved": true,
+  "correction": "Save the sentinel through the same UI action as the default-category workflow by omitting collection_id.",
+  "app_archive_sha256": "48a8f7d31b431a073a155c7e2a2489210f823683d77514759fee728c490a47d2"
+}

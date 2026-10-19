@@ -1,0 +1,873 @@
+{
+  "label": "X",
+  "fixtures": [
+    {
+      "id": "A",
+      "url": "https://example.com/item/lamp?source=collection&variant=warm#details"
+    },
+    {
+      "id": "B",
+      "url": "https://example.com/item/bookshelf",
+      "title": "折叠书架",
+      "note": "小户型，周末量尺寸",
+      "category": "待购"
+    },
+    {
+      "id": "C",
+      "url": "https://example.com/tutorial/bread",
+      "title": "酸面包教程",
+      "note": "周日尝试"
+    }
+  ],
+  "checks": [
+    {
+      "id": "R01",
+      "area": "运行交付",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:45:50.617Z",
+      "observation": {
+        "body": "收\n生活待购与灵感收藏夹\n\n先存下来，需要时再回头处理\n\n清除\n保存新链接\n网页地址\n标题（可留空）\n归类\n未整理（默认）\n待购\n家居改造\n以后看看\n备注（可留空）\n 保存到收藏夹\n我的归类\n0 条记录\n全部记录\n0\n未整理\n0\n待购\n0\n改名\n删除\n家居改造\n0\n改名\n删除\n以后看看\n0\n改名\n删除\n新建\n全部记录\n按最近保存排序\n\n共 0 条记录\n\n这里还没有记录。把浏览时看到的链接保存进来吧。\n\n共收藏 0 条，已打开过 0 条\n数据保存在本机，关闭页面不会丢失。",
+        "note": "Source dependency review and supervisor process evidence supplement this browser check."
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "001-R01-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:45:50.752Z"
+    },
+    {
+      "id": "R02",
+      "area": "保存",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:45:50.752Z",
+      "observation": [
+        {
+          "url": "https://example.com/tutorial/bread",
+          "title": "酸面包教程",
+          "note": "周日尝试",
+          "text": "酸面包教程\nhttps://example.com/tutorial/bread\n\n周日尝试\n\n未整理\n保存于 2026-10-18\n编辑 / 移动\n删除"
+        },
+        {
+          "url": "https://example.com/item/lamp?source=collection&variant=warm#details",
+          "title": "lamp",
+          "note": "",
+          "text": "lamp\nhttps://example.com/item/lamp?source=collection&variant=warm#details\n未整理\n保存于 2026-10-18\n编辑 / 移动\n删除"
+        }
+      ],
+      "status": "runtime_assertions_passed",
+      "evidence": "004-R02-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:45:51.446Z"
+    },
+    {
+      "id": "R03",
+      "area": "未分类",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:45:51.446Z",
+      "observation": [
+        {
+          "url": "https://example.com/tutorial/bread",
+          "title": "酸面包教程",
+          "note": "周日尝试",
+          "text": "酸面包教程\nhttps://example.com/tutorial/bread\n\n周日尝试\n\n未整理\n保存于 2026-10-18\n编辑 / 移动\n删除"
+        },
+        {
+          "url": "https://example.com/item/lamp?source=collection&variant=warm#details",
+          "title": "lamp",
+          "note": "",
+          "text": "lamp\nhttps://example.com/item/lamp?source=collection&variant=warm#details\n未整理\n保存于 2026-10-18\n编辑 / 移动\n删除"
+        }
+      ],
+      "status": "runtime_assertions_passed",
+      "evidence": "005-R03-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:45:51.595Z"
+    },
+    {
+      "id": "R04",
+      "area": "创建及选择归类",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:45:51.595Z",
+      "observation": [
+        {
+          "url": "https://example.com/item/bookshelf",
+          "title": "折叠书架",
+          "note": "小户型，周末量尺寸",
+          "text": "折叠书架\nhttps://example.com/item/bookshelf\n\n小户型，周末量尺寸\n\n待购\n保存于 2026-10-18\n编辑 / 移动\n删除"
+        }
+      ],
+      "status": "runtime_assertions_passed",
+      "evidence": "008-R04-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:45:52.028Z"
+    },
+    {
+      "id": "R05",
+      "area": "移动",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:45:52.028Z",
+      "observation": {
+        "destination": [
+          {
+            "url": "https://example.com/item/bookshelf",
+            "title": "折叠书架",
+            "note": "小户型，周末量尺寸",
+            "text": "折叠书架\nhttps://example.com/item/bookshelf\n\n小户型，周末量尺寸\n\n学习\n保存于 2026-10-18\n编辑 / 移动\n删除"
+          },
+          {
+            "url": "https://example.com/tutorial/bread",
+            "title": "酸面包教程",
+            "note": "周日尝试",
+            "text": "酸面包教程\nhttps://example.com/tutorial/bread\n\n周日尝试\n\n学习\n保存于 2026-10-18\n编辑 / 移动\n删除"
+          }
+        ]
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "014-R05-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:45:53.360Z"
+    },
+    {
+      "id": "R06",
+      "area": "搜索",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:45:53.360Z",
+      "observation": {
+        "emptyBody": "收\n生活待购与灵感收藏夹\n\n先存下来，需要时再回头处理\n\n清除\n保存新链接\n网页地址\n标题（可留空）\n归类\n未整理（默认）\n待购\n家居改造\n以后看看\n学习\n备注（可留空）\n 保存到收藏夹\n我的归类\n3 条记录\n全部记录\n3\n未整理\n1\n待购\n0\n改名\n删除\n家居改造\n0\n改名\n删除\n以后看看\n0\n改名\n删除\n学习\n2\n改名\n删除\n新建\n搜索：不存在的词零匹配\n按最近保存排序\n\n找到 0 条与关键字相关的记录\n\n没有找到匹配的记录，换个关键字试试。\n\n共收藏 3 条，已打开过 0 条\n数据保存在本机，关闭页面不会丢失。",
+        "scope": "all records selected through product UI"
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "018-R06-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:45:54.775Z"
+    },
+    {
+      "id": "R07",
+      "area": "打开原网页",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:45:54.776Z",
+      "observation": [
+        {
+          "id": "A",
+          "href": "http://127.0.0.1:49912/open/1",
+          "interceptedNavigation": [
+            {
+              "check": "R07",
+              "type": "external-navigation-request",
+              "url": "https://example.com/item/lamp?source=collection&variant=warm"
+            }
+          ],
+          "redirects": [
+            {
+              "check": "R07",
+              "type": "server-redirect",
+              "url": "http://127.0.0.1:49912/open/1",
+              "status": 302,
+              "location": "https://example.com/item/lamp?source=collection&variant=warm#details",
+              "resolvedTarget": "https://example.com/item/lamp?source=collection&variant=warm#details"
+            }
+          ],
+          "browserUrls": []
+        },
+        {
+          "id": "B",
+          "href": "http://127.0.0.1:49912/open/3",
+          "interceptedNavigation": [
+            {
+              "check": "R07",
+              "type": "external-navigation-request",
+              "url": "https://example.com/item/bookshelf"
+            }
+          ],
+          "redirects": [
+            {
+              "check": "R07",
+              "type": "server-redirect",
+              "url": "http://127.0.0.1:49912/open/3",
+              "status": 302,
+              "location": "https://example.com/item/bookshelf",
+              "resolvedTarget": "https://example.com/item/bookshelf"
+            }
+          ],
+          "browserUrls": []
+        },
+        {
+          "id": "C",
+          "href": "http://127.0.0.1:49912/open/2",
+          "interceptedNavigation": [
+            {
+              "check": "R07",
+              "type": "external-navigation-request",
+              "url": "https://example.com/tutorial/bread"
+            }
+          ],
+          "redirects": [
+            {
+              "check": "R07",
+              "type": "server-redirect",
+              "url": "http://127.0.0.1:49912/open/2",
+              "status": 302,
+              "location": "https://example.com/tutorial/bread",
+              "resolvedTarget": "https://example.com/tutorial/bread"
+            }
+          ],
+          "browserUrls": []
+        }
+      ],
+      "status": "runtime_assertions_passed",
+      "evidence": "019-R07-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:45:56.410Z"
+    },
+    {
+      "id": "R08",
+      "area": "持久化",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:45:56.410Z",
+      "observation": {
+        "restart": {
+          "ok": true,
+          "epoch": {
+            "number": 2,
+            "command": [
+              "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+              "app.py",
+              "--port",
+              "49912",
+              "--data-dir",
+              "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/data-core"
+            ],
+            "cwd": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/app",
+            "data_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/data-core",
+            "port": 49912,
+            "pid": 16160,
+            "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/service-02.log",
+            "started_at": 1792331157.9734569,
+            "http_status": 200,
+            "ready_at": 1792331158.077773
+          },
+          "base_url": "http://127.0.0.1:49912"
+        },
+        "isolated": {
+          "ok": true,
+          "epoch": {
+            "number": 3,
+            "command": [
+              "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+              "app.py",
+              "--port",
+              "49912",
+              "--data-dir",
+              "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/data-isolation"
+            ],
+            "cwd": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/app",
+            "data_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/data-isolation",
+            "port": 49912,
+            "pid": 16166,
+            "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/service-03.log",
+            "started_at": 1792331159.6964512,
+            "http_status": 200,
+            "ready_at": 1792331159.7984939
+          },
+          "base_url": "http://127.0.0.1:49912"
+        }
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "023-R08-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:46:01.883Z"
+    },
+    {
+      "id": "R09",
+      "area": "反馈及失败后的数据安全",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:46:01.883Z",
+      "observation": {
+        "before": [
+          {
+            "url": "https://example.com/item/bookshelf",
+            "title": "折叠书架",
+            "note": "小户型，周末量尺寸",
+            "text": "折叠书架\nhttps://example.com/item/bookshelf\n\n小户型，周末量尺寸\n\n学习\n保存于 2026-10-18\n已打开 1 次\n编辑 / 移动\n删除"
+          },
+          {
+            "url": "https://example.com/tutorial/bread",
+            "title": "酸面包教程",
+            "note": "周日尝试",
+            "text": "酸面包教程\nhttps://example.com/tutorial/bread\n\n周日尝试\n\n学习\n保存于 2026-10-18\n已打开 1 次\n编辑 / 移动\n删除"
+          },
+          {
+            "url": "https://example.com/item/lamp?source=collection&variant=warm#details",
+            "title": "lamp",
+            "note": "",
+            "text": "lamp\nhttps://example.com/item/lamp?source=collection&variant=warm#details\n未整理\n保存于 2026-10-18\n已打开 1 次\n编辑 / 移动\n删除"
+          }
+        ],
+        "after": [
+          {
+            "url": "https://example.com/item/bookshelf",
+            "title": "折叠书架",
+            "note": "小户型，周末量尺寸",
+            "text": "折叠书架\nhttps://example.com/item/bookshelf\n\n小户型，周末量尺寸\n\n学习\n保存于 2026-10-18\n已打开 1 次\n编辑 / 移动\n删除"
+          },
+          {
+            "url": "https://example.com/tutorial/bread",
+            "title": "酸面包教程",
+            "note": "周日尝试",
+            "text": "酸面包教程\nhttps://example.com/tutorial/bread\n\n周日尝试\n\n学习\n保存于 2026-10-18\n已打开 1 次\n编辑 / 移动\n删除"
+          },
+          {
+            "url": "https://example.com/item/lamp?source=collection&variant=warm#details",
+            "title": "lamp",
+            "note": "",
+            "text": "lamp\nhttps://example.com/item/lamp?source=collection&variant=warm#details\n未整理\n保存于 2026-10-18\n已打开 1 次\n编辑 / 移动\n删除"
+          }
+        ],
+        "feedback": "收\n生活待购与灵感收藏夹\n\n先存下来，需要时再回头处理\n\n清除\n保存新链接\n网页地址\n标题（可留空）\n归类\n未整理（默认）\n待购\n家居改造\n以后看看\n学习\n备注（可留空）\n 保存到收藏夹\n我的归类\n3 条记录\n全部记录\n3\n未整理\n1\n待购\n0\n改名\n删除\n家居改造\n0\n改名\n删除\n以后看看\n0\n改名\n删除\n学习\n2\n改名\n删除\n新建\n全部记录\n按最近保存排序\n\n共 3 条记录\n\n折叠书架\nhttps://example.com/item/bookshelf\n\n小户型，周末量尺寸\n\n学习\n保存于 2026-10-18\n已打开 1 次\n编辑 / 移动\n删除\n酸面包教程\nhttps://example.com/tutorial/bread\n\n周日尝试\n\n学习\n保存于 2026-10-18\n已打开 1 次\n编辑 / 移动\n删除\nlamp\nhttps://example.com/item/lamp?source=collection&variant=warm#details\n未整理\n保存于 2026-10-18\n已打开 1 次\n编辑 / 移动\n删除\n共收藏 3 条，已打开过 3 条\n数据保存在本机，关闭页面不会丢失。",
+        "note": "Successful operation feedback is also captured in R02/R04/R05 screenshots."
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "025-R09-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:46:02.558Z"
+    },
+    {
+      "id": "M01",
+      "area": "恢复及状态",
+      "kind": "exploration",
+      "startedAt": "2026-10-18T13:46:02.558Z",
+      "observation": {
+        "crash": {
+          "ok": true,
+          "epoch": {
+            "number": 5,
+            "command": [
+              "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+              "app.py",
+              "--port",
+              "49912",
+              "--data-dir",
+              "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/data-core"
+            ],
+            "cwd": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/app",
+            "data_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/data-core",
+            "port": 49912,
+            "pid": 16214,
+            "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/service-05.log",
+            "started_at": 1792331162.605878,
+            "http_status": 200,
+            "ready_at": 1792331162.710974
+          },
+          "base_url": "http://127.0.0.1:49912"
+        },
+        "multiTabSequential": "both records present",
+        "repeatedSave": {
+          "interaction": {
+            "observation": "Invoked one physical double-click on same save button. Request outcomes are in browser events."
+          },
+          "records": [
+            {
+              "url": "https://example.com/explore/double-save",
+              "title": "重复点击保存",
+              "note": "同一表单双击",
+              "text": "重复点击保存\nhttps://example.com/explore/double-save\n\n同一表单双击\n\n未整理\n保存于 2026-10-18\n编辑 / 移动\n删除"
+            },
+            {
+              "url": "https://example.com/explore/double-save",
+              "title": "重复点击保存",
+              "note": "同一表单双击",
+              "text": "重复点击保存\nhttps://example.com/explore/double-save\n\n同一表单双击\n\n未整理\n保存于 2026-10-18\n编辑 / 移动\n删除"
+            },
+            {
+              "url": "https://example.com/explore/tab-two",
+              "title": "多页签二",
+              "note": "第二张页面随后保存",
+              "text": "多页签二\nhttps://example.com/explore/tab-two\n\n第二张页面随后保存\n\n未整理\n保存于 2026-10-18\n编辑 / 移动\n删除"
+            },
+            {
+              "url": "https://example.com/explore/tab-one",
+              "title": "多页签一",
+              "note": "第一张页面先保存",
+              "text": "多页签一\nhttps://example.com/explore/tab-one\n\n第一张页面先保存\n\n未整理\n保存于 2026-10-18\n编辑 / 移动\n删除"
+            }
+          ]
+        }
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "027-M01-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:46:05.920Z"
+    },
+    {
+      "id": "M02",
+      "area": "真实输入边界",
+      "kind": "exploration",
+      "startedAt": "2026-10-18T13:46:05.920Z",
+      "status": "assertion_failed_needs_review",
+      "error": "Error: Long Chinese, spaces, quotes, note, and URL round trip exactly.\nObserved: {\"url\":\"https://example.com/explore/boundary?one=two&quoted=%22%E4%B8%AD%E6%96%87%22#section\",\"title\":\"中文 空格 '双引号\\\" 长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题\",\"note\":\"备注 \\\" ' & 中文\\n长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容\",\"text\":\"中文 空格 '双引号\\\" 长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题\\nhttps://example.com/explore/boundary?one=two&quoted=%22%E4%B8%AD%E6%96%87%22#section\\n\\n备注 \\\" ' & 中文\\n长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容\\n\\n未整理\\n保存于 2026-10-18\\n编辑 / 移动\\n删除\"}\n    at assert (file:///Users/milin/2026/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/evaluation/runtime_test.mjs:20:63)\n    at file:///Users/milin/2026/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/evaluation/runtime_test.mjs:241:5\n    at runNextTicks (node:internal/process/task_queues:65:5)\n    at process.processImmediate (node:internal/timers:453:9)\n    at process.callbackTrampoline (node:internal/async_hooks:130:17)\n    at async check (file:///Users/milin/2026/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/evaluation/runtime_test.mjs:43:30)\n    at async file:///Users/milin/2026/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/evaluation/runtime_test.mjs:237:3",
+      "evidence": "028-M02-assertion_failed_needs_review",
+      "finishedAt": "2026-10-18T13:46:06.405Z"
+    },
+    {
+      "id": "M03",
+      "area": "失败处理",
+      "kind": "exploration",
+      "startedAt": "2026-10-18T13:46:06.406Z",
+      "observation": {
+        "ok": true,
+        "probes": [
+          {
+            "probe": "occupied-port",
+            "command": [
+              "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+              "app.py",
+              "--port",
+              "49912",
+              "--data-dir",
+              "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/data-occupied-port"
+            ],
+            "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/probe-occupied-port.log",
+            "outcome": "exited",
+            "returncode": 1,
+            "text": "Traceback (most recent call last):\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/app/app.py\", line 183, in <module>\n    raise SystemExit(main())\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/app/app.py\", line 167, in main\n    httpd = ThreadingHTTPServer((\"127.0.0.1\", args.port), Handler)\n  File \"/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py\", line 452, in __init__\n    self.server_bind()\n  File \"/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/http/server.py\", line 137, in server_bind\n    socketserver.TCPServer.server_bind(self)\n  File \"/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py\", line 466, in server_bind\n    self.socket.bind(self.server_address)\nOSError: [Errno 48] Address already in use\n"
+          },
+          {
+            "probe": "unusable-data-dir",
+            "command": [
+              "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+              "app.py",
+              "--port",
+              "50250",
+              "--data-dir",
+              "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/unusable-data-path"
+            ],
+            "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/probe-unusable-data-dir.log",
+            "outcome": "exited",
+            "returncode": 2,
+            "text": "无法初始化数据目录：[Errno 17] File exists: '/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/unusable-data-path'\n"
+          }
+        ],
+        "afterFailureRecords": [
+          {
+            "url": "https://example.com/explore/boundary?one=two&quoted=%22%E4%B8%AD%E6%96%87%22#section",
+            "title": "中文 空格 '双引号\" 长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题",
+            "note": "备注 \" ' & 中文\n长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容",
+            "text": "中文 空格 '双引号\" 长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题\nhttps://example.com/explore/boundary?one=two&quoted=%22%E4%B8%AD%E6%96%87%22#section\n\n备注 \" ' & 中文\n长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容\n\n未整理\n保存于 2026-10-18\n编辑 / 移动\n删除"
+          },
+          {
+            "url": "https://example.com/explore/double-save",
+            "title": "重复点击保存",
+            "note": "同一表单双击",
+            "text": "重复点击保存\nhttps://example.com/explore/double-save\n\n同一表单双击\n\n未整理\n保存于 2026-10-18\n编辑 / 移动\n删除"
+          },
+          {
+            "url": "https://example.com/explore/double-save",
+            "title": "重复点击保存",
+            "note": "同一表单双击",
+            "text": "重复点击保存\nhttps://example.com/explore/double-save\n\n同一表单双击\n\n未整理\n保存于 2026-10-18\n编辑 / 移动\n删除"
+          },
+          {
+            "url": "https://example.com/explore/tab-two",
+            "title": "多页签二",
+            "note": "第二张页面随后保存",
+            "text": "多页签二\nhttps://example.com/explore/tab-two\n\n第二张页面随后保存\n\n未整理\n保存于 2026-10-18\n编辑 / 移动\n删除"
+          },
+          {
+            "url": "https://example.com/explore/tab-one",
+            "title": "多页签一",
+            "note": "第一张页面先保存",
+            "text": "多页签一\nhttps://example.com/explore/tab-one\n\n第一张页面先保存\n\n未整理\n保存于 2026-10-18\n编辑 / 移动\n删除"
+          }
+        ],
+        "persistenceWriteFailure": "unverified; no artificial storage fault injected"
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "029-M03-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:46:06.956Z"
+    },
+    {
+      "id": "M04",
+      "area": "内容安全",
+      "kind": "exploration",
+      "startedAt": "2026-10-18T13:46:06.956Z",
+      "observation": {
+        "executed": null,
+        "record": {
+          "url": "https://example.com/explore/safe-content-probe",
+          "title": "中文 ' \" & <b>标题</b>",
+          "note": "<svg onload=\"window.__atlasLocalHarmlessProbe=1\"></svg> & ' \"",
+          "text": "中文 ' \" & <b>标题</b>\nhttps://example.com/explore/safe-content-probe\n\n<svg onload=\"window.__atlasLocalHarmlessProbe=1\"></svg> & ' \"\n\n未整理\n保存于 2026-10-18\n编辑 / 移动\n删除"
+        }
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "030-M04-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:46:07.460Z"
+    },
+    {
+      "id": "M05",
+      "area": "上手及浏览",
+      "kind": "exploration",
+      "startedAt": "2026-10-18T13:46:07.460Z",
+      "observation": {
+        "observation": "Initial empty state, save/category/unclassified/search/open entry points, and empty search were captured in R01-R07. Adapter source documents actual UI routes; human reviewer assesses obstacles without aesthetic scoring."
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "031-M05-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:46:07.542Z"
+    }
+  ],
+  "actions": [
+    {
+      "at": "2026-10-18T13:45:50.617Z",
+      "check": "R01",
+      "name": "Load Chinese app through assigned loopback port.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:45:50.752Z",
+      "check": "R02",
+      "name": "Save A with URL only.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:45:50.945Z",
+      "check": "R02",
+      "name": "Save C with title and note, no category.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:45:51.096Z",
+      "check": "R02",
+      "name": "Refresh.",
+      "result": {
+        "_type": "Response",
+        "_guid": "response@3fc0a867e6a60f8d402cef30d1e3f6a6"
+      }
+    },
+    {
+      "at": "2026-10-18T13:45:51.446Z",
+      "check": "R03",
+      "name": "Open unclassified view.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:45:51.595Z",
+      "check": "R04",
+      "name": "Create 待购.",
+      "result": {
+        "category": "待购",
+        "observation": "Already present in initial UI; no new-category claim for this value."
+      }
+    },
+    {
+      "at": "2026-10-18T13:45:51.628Z",
+      "check": "R04",
+      "name": "Create 学习.",
+      "result": {
+        "category": "学习",
+        "observation": "Created through UI."
+      }
+    },
+    {
+      "at": "2026-10-18T13:45:51.778Z",
+      "check": "R04",
+      "name": "Save B with category 待购.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:45:51.899Z",
+      "check": "R04",
+      "name": "Browse 待购.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:45:52.146Z",
+      "check": "R05",
+      "name": "Move C from unclassified to 学习.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:45:52.429Z",
+      "check": "R05",
+      "name": "Move B from 待购 to 学习.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:45:53.576Z",
+      "check": "R06",
+      "name": "Search 书架 over all records.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:45:53.926Z",
+      "check": "R06",
+      "name": "Search 面包 over all records.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:45:54.294Z",
+      "check": "R06",
+      "name": "Search nonexistent term.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:45:54.623Z",
+      "check": "R06",
+      "name": "Clear search.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:45:54.991Z",
+      "check": "R07",
+      "name": "Open original URL for A.",
+      "result": "http://127.0.0.1:49912/open/1"
+    },
+    {
+      "at": "2026-10-18T13:45:55.509Z",
+      "check": "R07",
+      "name": "Open original URL for B.",
+      "result": "http://127.0.0.1:49912/open/3"
+    },
+    {
+      "at": "2026-10-18T13:45:56.077Z",
+      "check": "R07",
+      "name": "Open original URL for C.",
+      "result": "http://127.0.0.1:49912/open/2"
+    },
+    {
+      "at": "2026-10-18T13:45:57.948Z",
+      "check": "R08",
+      "name": "Normally stop and restart with same data directory.",
+      "result": {
+        "ok": true,
+        "epoch": {
+          "number": 2,
+          "command": [
+            "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+            "app.py",
+            "--port",
+            "49912",
+            "--data-dir",
+            "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/data-core"
+          ],
+          "cwd": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/app",
+          "data_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/data-core",
+          "port": 49912,
+          "pid": 16160,
+          "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/service-02.log",
+          "started_at": 1792331157.9734569,
+          "http_status": 200,
+          "ready_at": 1792331158.077773
+        },
+        "base_url": "http://127.0.0.1:49912"
+      }
+    },
+    {
+      "at": "2026-10-18T13:45:59.683Z",
+      "check": "R08",
+      "name": "Start with separate new empty data directory.",
+      "result": {
+        "ok": true,
+        "epoch": {
+          "number": 3,
+          "command": [
+            "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+            "app.py",
+            "--port",
+            "49912",
+            "--data-dir",
+            "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/data-isolation"
+          ],
+          "cwd": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/app",
+          "data_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/data-isolation",
+          "port": 49912,
+          "pid": 16166,
+          "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/service-03.log",
+          "started_at": 1792331159.6964512,
+          "http_status": 200,
+          "ready_at": 1792331159.7984939
+        },
+        "base_url": "http://127.0.0.1:49912"
+      }
+    },
+    {
+      "at": "2026-10-18T13:46:00.164Z",
+      "check": "R08",
+      "name": "Restore core test data instance.",
+      "result": {
+        "ok": true,
+        "epoch": {
+          "number": 4,
+          "command": [
+            "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+            "app.py",
+            "--port",
+            "49912",
+            "--data-dir",
+            "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/data-core"
+          ],
+          "cwd": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/app",
+          "data_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/data-core",
+          "port": 49912,
+          "pid": 16170,
+          "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/X/initial/evidence/service-04.log",
+          "started_at": 1792331160.179034,
+          "http_status": 200,
+          "ready_at": 1792331160.285929
+        },
+        "base_url": "http://127.0.0.1:49912"
+      }
+    },
+    {
+      "at": "2026-10-18T13:46:02.105Z",
+      "check": "R09",
+      "name": "Attempt empty URL save with existing data.",
+      "result": {
+        "value": "",
+        "validity": false,
+        "validationMessage": "Please fill out this field."
+      }
+    }
+  ],
+  "events": [
+    {
+      "check": "R02",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:49912/api/bookmarks",
+      "status": 201,
+      "submittedBody": "{\"url\":\"https://example.com/item/lamp?source=collection&variant=warm#details\",\"title\":\"\",\"note\":\"\",\"category_id\":1}"
+    },
+    {
+      "check": "R02",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:49912/api/bookmarks",
+      "status": 201,
+      "submittedBody": "{\"url\":\"https://example.com/tutorial/bread\",\"title\":\"酸面包教程\",\"note\":\"周日尝试\",\"category_id\":1}"
+    },
+    {
+      "check": "R04",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:49912/api/categories",
+      "status": 201,
+      "submittedBody": "{\"name\":\"学习\"}"
+    },
+    {
+      "check": "R04",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:49912/api/bookmarks",
+      "status": 201,
+      "submittedBody": "{\"url\":\"https://example.com/item/bookshelf\",\"title\":\"折叠书架\",\"note\":\"小户型，周末量尺寸\",\"category_id\":2}"
+    },
+    {
+      "check": "R05",
+      "type": "write-response",
+      "method": "PUT",
+      "url": "http://127.0.0.1:49912/api/bookmarks/2",
+      "status": 200,
+      "submittedBody": "{\"url\":\"https://example.com/tutorial/bread\",\"title\":\"酸面包教程\",\"note\":\"周日尝试\",\"category_id\":5}"
+    },
+    {
+      "check": "R05",
+      "type": "write-response",
+      "method": "PUT",
+      "url": "http://127.0.0.1:49912/api/bookmarks/3",
+      "status": 200,
+      "submittedBody": "{\"url\":\"https://example.com/item/bookshelf\",\"title\":\"折叠书架\",\"note\":\"小户型，周末量尺寸\",\"category_id\":5}"
+    },
+    {
+      "check": "R07",
+      "type": "external-navigation-request",
+      "url": "https://example.com/item/lamp?source=collection&variant=warm"
+    },
+    {
+      "check": "R07",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:49912/open/1",
+      "status": 302,
+      "location": "https://example.com/item/lamp?source=collection&variant=warm#details",
+      "resolvedTarget": "https://example.com/item/lamp?source=collection&variant=warm#details"
+    },
+    {
+      "check": "R07",
+      "type": "proxy-denied-external",
+      "target": "example.com:443"
+    },
+    {
+      "check": "R07",
+      "type": "external-navigation-request",
+      "url": "https://example.com/item/bookshelf"
+    },
+    {
+      "check": "R07",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:49912/open/3",
+      "status": 302,
+      "location": "https://example.com/item/bookshelf",
+      "resolvedTarget": "https://example.com/item/bookshelf"
+    },
+    {
+      "check": "R07",
+      "type": "proxy-denied-external",
+      "target": "example.com:443"
+    },
+    {
+      "check": "R07",
+      "type": "external-navigation-request",
+      "url": "https://example.com/tutorial/bread"
+    },
+    {
+      "check": "R07",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:49912/open/2",
+      "status": 302,
+      "location": "https://example.com/tutorial/bread",
+      "resolvedTarget": "https://example.com/tutorial/bread"
+    },
+    {
+      "check": "R07",
+      "type": "proxy-denied-external",
+      "target": "example.com:443"
+    },
+    {
+      "check": "M01",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:49912/api/bookmarks",
+      "status": 201,
+      "submittedBody": "{\"url\":\"https://example.com/explore/tab-one\",\"title\":\"多页签一\",\"note\":\"第一张页面先保存\",\"category_id\":1}"
+    },
+    {
+      "check": "M01",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:49912/api/bookmarks",
+      "status": 201,
+      "submittedBody": "{\"url\":\"https://example.com/explore/tab-two\",\"title\":\"多页签二\",\"note\":\"第二张页面随后保存\",\"category_id\":1}"
+    },
+    {
+      "check": "M01",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:49912/api/bookmarks",
+      "status": 201,
+      "submittedBody": "{\"url\":\"https://example.com/explore/double-save\",\"title\":\"重复点击保存\",\"note\":\"同一表单双击\",\"category_id\":1}"
+    },
+    {
+      "check": "M01",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:49912/api/bookmarks",
+      "status": 201,
+      "submittedBody": "{\"url\":\"https://example.com/explore/double-save\",\"title\":\"重复点击保存\",\"note\":\"同一表单双击\",\"category_id\":1}"
+    },
+    {
+      "check": "M02",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:49912/api/bookmarks",
+      "status": 201,
+      "submittedBody": "{\"url\":\"https://example.com/explore/boundary?one=two&quoted=%22%E4%B8%AD%E6%96%87%22#section\",\"title\":\"中文 空格 '双引号\\\" 长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题\",\"note\":\"备注 \\\" ' & 中文\\n长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 \",\"category_id\":1}"
+    },
+    {
+      "check": "M04",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:49912/api/bookmarks",
+      "status": 201,
+      "submittedBody": "{\"url\":\"https://example.com/explore/safe-content-probe\",\"title\":\"中文 ' \\\" & <b>标题</b>\",\"note\":\"<svg onload=\\\"window.__atlasLocalHarmlessProbe=1\\\"></svg> & ' \\\"\",\"category_id\":1}"
+    }
+  ]
+}

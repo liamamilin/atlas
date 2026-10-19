@@ -1,0 +1,2115 @@
+{
+  "schema": "atlas.bookmark-posthoc-http-probes.v1",
+  "kind": "post-hoc-independent-exploration",
+  "status": "completed",
+  "started_at": "2026-10-19T03:51:39Z",
+  "evidence_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/posthoc-http-repair-1",
+  "runner_command": [
+    "python3",
+    "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/posthoc_http_probes.py",
+    "--bundle",
+    "docs/template-factory/end-to-end/bookmark-2026-10-19/development/repair-1",
+    "--evidence-dir",
+    "docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/posthoc-http-repair-1",
+    "--image",
+    "python:3.12-slim",
+    "--concurrency-rounds",
+    "20"
+  ],
+  "bundle_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/development/repair-1",
+  "image": "python:3.12-slim",
+  "base_url": "http://127.0.0.1:49577",
+  "network_mode": "dedicated user-defined bridge; egress not enforced",
+  "network_none": false,
+  "owned_resources": {
+    "temporary_root": {
+      "path": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-posthoc-debe3d5b902e4d9d884d2e2726610d03",
+      "state": "removed"
+    },
+    "network": {
+      "name": "bookmark-posthoc-net-20aecea90636",
+      "state": "absent-verified"
+    },
+    "container": {
+      "name": "bookmark-posthoc-app-20aecea90636",
+      "state": "absent-verified"
+    },
+    "fixture_server": {
+      "state": "not-created"
+    },
+    "fixture_thread": {
+      "state": "not-created"
+    }
+  },
+  "docker_commands": {
+    "network_create": [
+      "docker",
+      "network",
+      "create",
+      "bookmark-posthoc-net-20aecea90636"
+    ],
+    "container_cleanup": [
+      "docker",
+      "rm",
+      "--force",
+      "bookmark-posthoc-app-20aecea90636"
+    ],
+    "network_cleanup": [
+      "docker",
+      "network",
+      "rm",
+      "bookmark-posthoc-net-20aecea90636"
+    ],
+    "container_run_plan": {
+      "name": "bookmark-posthoc-app-20aecea90636",
+      "image": "python:3.12-slim",
+      "host_publish": "127.0.0.1:49577:8000",
+      "source_mount": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-posthoc-debe3d5b902e4d9d884d2e2726610d03/verified-application:/app:readonly",
+      "state_mount": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-posthoc-debe3d5b902e4d9d884d2e2726610d03/state:/state",
+      "runtime_argv": [
+        "python3",
+        "-m",
+        "app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+        "--data-dir",
+        "/state/data"
+      ]
+    }
+  },
+  "limitations": [
+    "No browser is used for these post-hoc probes.",
+    "Docker bridge egress is not blocked; probe requests target only 127.0.0.1."
+  ],
+  "updated_at": "2026-10-19T03:51:41Z",
+  "stage": "cleanup",
+  "stage_events": [
+    {
+      "stage": "bundle_verification",
+      "state": "started",
+      "at": 1792381899.7394218
+    },
+    {
+      "stage": "bundle_verification",
+      "state": "completed",
+      "at": 1792381899.7431738,
+      "details": {
+        "archive_sha256": "406f755e0177a9a6337ec7daec67484b89db27a154f07c3476b9d5048f1f6389"
+      }
+    },
+    {
+      "stage": "docker_preflight",
+      "state": "started",
+      "at": 1792381899.743585
+    },
+    {
+      "stage": "docker_preflight",
+      "state": "completed",
+      "at": 1792381899.833622,
+      "details": {
+        "image_id": "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9"
+      }
+    },
+    {
+      "stage": "network_setup",
+      "state": "started",
+      "at": 1792381899.834375
+    },
+    {
+      "stage": "network_setup",
+      "state": "completed",
+      "at": 1792381899.867386,
+      "details": {}
+    },
+    {
+      "stage": "container_start",
+      "state": "started",
+      "at": 1792381899.8681002
+    },
+    {
+      "stage": "container_start",
+      "state": "completed",
+      "at": 1792381900.573929,
+      "details": {
+        "container_id": "d1a9bd5638fe8c3cdd339b18196e2ed763d8eb863baedd107244b9a00572d66e",
+        "readiness_url": "http://127.0.0.1:49577/"
+      }
+    },
+    {
+      "stage": "crlf_url_probe",
+      "state": "started",
+      "at": 1792381900.5746508
+    },
+    {
+      "stage": "crlf_url_probe",
+      "state": "completed",
+      "at": 1792381900.583752,
+      "details": {
+        "pass": true,
+        "status": 400
+      }
+    },
+    {
+      "stage": "concurrent_category_probe",
+      "state": "started",
+      "at": 1792381900.5842922
+    },
+    {
+      "stage": "concurrent_category_probe",
+      "state": "completed",
+      "at": 1792381900.700842,
+      "details": {
+        "pass": true,
+        "rounds": 20
+      }
+    },
+    {
+      "stage": "post_probe_server_logs",
+      "state": "started",
+      "at": 1792381900.702087
+    },
+    {
+      "stage": "post_probe_server_logs",
+      "state": "completed",
+      "at": 1792381900.720387,
+      "details": {
+        "returncode": 0,
+        "stdout_chars": 0,
+        "stderr_chars": 4528
+      }
+    },
+    {
+      "stage": "source_integrity",
+      "state": "started",
+      "at": 1792381900.722006
+    },
+    {
+      "stage": "source_integrity",
+      "state": "completed",
+      "at": 1792381900.723798,
+      "details": {
+        "unchanged": true
+      }
+    }
+  ],
+  "bundle": {
+    "bundle_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/development/repair-1",
+    "receipt_sha256": "6530100a30c027292310f230d1a0da04beafd79064f6f7b6f5c0cac8ccc39c41",
+    "archive_sha256": "406f755e0177a9a6337ec7daec67484b89db27a154f07c3476b9d5048f1f6389",
+    "source_package_sha256": "93b5786c05e530252beef39644ba66614ddb0c93d4dd5c4facd23f237ad1fd73",
+    "source_context_sha256": "93b5786c05e530252beef39644ba66614ddb0c93d4dd5c4facd23f237ad1fd73",
+    "receipt_validated_metadata": {
+      "schema": "atlas.application-delivery.v1",
+      "app_root": ".",
+      "files": {
+        "README.md": "7faa3905d766dbbe4e49af05c7f370fc118160f59e8736378ed23d2b6809a52a",
+        "app/__init__.py": "9469dc4b6b75244f86c93ecdcfd8265b2b758952cac25d25f2009c9b5258da0f",
+        "app/__main__.py": "fb51d09e657e2d32efdede834cf098d2612b9a30a8c7c0dd205f5b51d5ef5425",
+        "app/config.py": "3fa66e7b1233cbc4e8b01556256336ae974c35a0c67ec631a2e7608f6e0c4ae9",
+        "app/server.py": "41b84e08e069e57e026add5a59be4bcf5b46866df6cc23a16224677cc88977d5",
+        "app/storage.py": "cc65cb96367a2485b6e154c518079f713162837cedfee306e4feebe4b09bb662",
+        "app/validation.py": "d0ac670149cb6c5cb61459e3833e235281403ed92f46a9094975fb4eaa052a43",
+        "app/views.py": "e923f629fd6d8d10fb1568285be871b9c06dbecc3157259ff5746b05f36ee01b"
+      },
+      "normalizations": [],
+      "runtime": {
+        "profile": "python-web",
+        "install": [],
+        "build": [],
+        "start": [
+          "python3",
+          "-m",
+          "app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--data-dir",
+          "/state/data"
+        ],
+        "port": 8000,
+        "readiness_path": "/"
+      }
+    },
+    "extracted_root": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-posthoc-debe3d5b902e4d9d884d2e2726610d03/verified-application",
+    "extracted_source_sha256": {
+      "README.md": "7faa3905d766dbbe4e49af05c7f370fc118160f59e8736378ed23d2b6809a52a",
+      "app/__init__.py": "9469dc4b6b75244f86c93ecdcfd8265b2b758952cac25d25f2009c9b5258da0f",
+      "app/__main__.py": "fb51d09e657e2d32efdede834cf098d2612b9a30a8c7c0dd205f5b51d5ef5425",
+      "app/config.py": "3fa66e7b1233cbc4e8b01556256336ae974c35a0c67ec631a2e7608f6e0c4ae9",
+      "app/server.py": "41b84e08e069e57e026add5a59be4bcf5b46866df6cc23a16224677cc88977d5",
+      "app/storage.py": "cc65cb96367a2485b6e154c518079f713162837cedfee306e4feebe4b09bb662",
+      "app/validation.py": "d0ac670149cb6c5cb61459e3833e235281403ed92f46a9094975fb4eaa052a43",
+      "app/views.py": "e923f629fd6d8d10fb1568285be871b9c06dbecc3157259ff5746b05f36ee01b",
+      "delivery.json": "4accad35f8399183eb6a8426a971c8434611b69f0160d2b505e9dd29b86cb38e"
+    }
+  },
+  "delivery_runtime_start_argv": [
+    "python3",
+    "-m",
+    "app",
+    "--host",
+    "0.0.0.0",
+    "--port",
+    "8000",
+    "--data-dir",
+    "/state/data"
+  ],
+  "data_dir_argument": "/state/data",
+  "readiness_path": "/",
+  "app_source_sha256_before": {
+    "README.md": "7faa3905d766dbbe4e49af05c7f370fc118160f59e8736378ed23d2b6809a52a",
+    "delivery.json": "4accad35f8399183eb6a8426a971c8434611b69f0160d2b505e9dd29b86cb38e",
+    "app/__init__.py": "9469dc4b6b75244f86c93ecdcfd8265b2b758952cac25d25f2009c9b5258da0f",
+    "app/__main__.py": "fb51d09e657e2d32efdede834cf098d2612b9a30a8c7c0dd205f5b51d5ef5425",
+    "app/config.py": "3fa66e7b1233cbc4e8b01556256336ae974c35a0c67ec631a2e7608f6e0c4ae9",
+    "app/server.py": "41b84e08e069e57e026add5a59be4bcf5b46866df6cc23a16224677cc88977d5",
+    "app/storage.py": "cc65cb96367a2485b6e154c518079f713162837cedfee306e4feebe4b09bb662",
+    "app/validation.py": "d0ac670149cb6c5cb61459e3833e235281403ed92f46a9094975fb4eaa052a43",
+    "app/views.py": "e923f629fd6d8d10fb1568285be871b9c06dbecc3157259ff5746b05f36ee01b"
+  },
+  "image_id": "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9",
+  "container_id": "d1a9bd5638fe8c3cdd339b18196e2ed763d8eb863baedd107244b9a00572d66e",
+  "container_settings": {
+    "id": "d1a9bd5638fe8c3cdd339b18196e2ed763d8eb863baedd107244b9a00572d66e",
+    "state": {
+      "Status": "running",
+      "Running": true,
+      "Pid": 1474,
+      "StartedAt": "2026-10-19T03:51:39.912441804Z",
+      "FinishedAt": "0001-01-01T00:00:00Z",
+      "ExitCode": 0
+    },
+    "restart_count": 0,
+    "port_bindings": {
+      "8000/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "49577"
+        }
+      ]
+    },
+    "effective_ports": {
+      "8000/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "49577"
+        }
+      ]
+    },
+    "network_mode": "bookmark-posthoc-net-20aecea90636",
+    "internal_rootfs": true,
+    "cap_drop": [
+      "ALL"
+    ],
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "limits": {
+      "Memory": 268435456,
+      "NanoCpus": 500000000,
+      "PidsLimit": 64
+    },
+    "mounts": [
+      {
+        "Type": "bind",
+        "Source": "/private/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-posthoc-debe3d5b902e4d9d884d2e2726610d03/verified-application",
+        "Destination": "/app",
+        "RW": false
+      },
+      {
+        "Type": "bind",
+        "Source": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-posthoc-debe3d5b902e4d9d884d2e2726610d03/state",
+        "Destination": "/state",
+        "RW": true
+      }
+    ],
+    "environment_names": [
+      "PYTHONDONTWRITEBYTECODE",
+      "PYTHONUNBUFFERED",
+      "PATH",
+      "LANG",
+      "GPG_KEY",
+      "PYTHON_VERSION",
+      "PYTHON_SHA256"
+    ]
+  },
+  "html_inventory_parser_crosscheck": {
+    "post_status": 303,
+    "expected_name": "Parser inventory 20aecea9",
+    "matching_collection_count": 1,
+    "matching_collection_id": "2",
+    "unique_collection_ids": [
+      "1",
+      "2"
+    ],
+    "html_snapshot": "inventory-parser-crosscheck.html"
+  },
+  "crlf_probe": {
+    "payload": {
+      "url_encoded": "http%3A%2F%2Fexample.invalid%2Fpath%0D%0AX-Codex-Probe%3A+injected-20aecea9"
+    },
+    "post_response": {
+      "status": 400,
+      "reason": "Bad Request",
+      "headers": [
+        [
+          "Server",
+          "BaseHTTP/0.6 Python/3.12.15"
+        ],
+        [
+          "Date",
+          "Mon, 19 Oct 2026 03:51:40 GMT"
+        ],
+        [
+          "Content-Type",
+          "text/html; charset=utf-8"
+        ],
+        [
+          "Content-Length",
+          "3108"
+        ]
+      ],
+      "location": null,
+      "header_names": [
+        "Server",
+        "Date",
+        "Content-Type",
+        "Content-Length"
+      ]
+    },
+    "rejected_4xx": true,
+    "inventory_unchanged": true,
+    "baseline_bookmark_ids": [],
+    "after_bookmark_ids": [],
+    "baseline_collection_ids": [
+      "1",
+      "2"
+    ],
+    "after_collection_ids": [
+      "1",
+      "2"
+    ],
+    "redirect_header_probe": {
+      "status": "not_applicable_rejected"
+    },
+    "matching_bookmark_rows": [],
+    "html_snapshot": "inventory-after-crlf.html",
+    "pass": true
+  },
+  "concurrent_category_probe": {
+    "rounds_requested": 20,
+    "rounds_completed": 20,
+    "observations": [
+      {
+        "round": 1,
+        "name": "Concurrent 20aecea9 00",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "3"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 00"
+        ],
+        "html_snapshot": "inventory-concurrent-01.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 2,
+        "name": "Concurrent 20aecea9 01",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "4"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 01"
+        ],
+        "html_snapshot": "inventory-concurrent-02.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 3,
+        "name": "Concurrent 20aecea9 02",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "5"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 02"
+        ],
+        "html_snapshot": "inventory-concurrent-03.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 4,
+        "name": "Concurrent 20aecea9 03",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "6"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 03"
+        ],
+        "html_snapshot": "inventory-concurrent-04.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 5,
+        "name": "Concurrent 20aecea9 04",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "7"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 04"
+        ],
+        "html_snapshot": "inventory-concurrent-05.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 6,
+        "name": "Concurrent 20aecea9 05",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "8"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 05"
+        ],
+        "html_snapshot": "inventory-concurrent-06.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 7,
+        "name": "Concurrent 20aecea9 06",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "9"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 06"
+        ],
+        "html_snapshot": "inventory-concurrent-07.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 8,
+        "name": "Concurrent 20aecea9 07",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "10"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 07"
+        ],
+        "html_snapshot": "inventory-concurrent-08.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 9,
+        "name": "Concurrent 20aecea9 08",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "11"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 08"
+        ],
+        "html_snapshot": "inventory-concurrent-09.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 10,
+        "name": "Concurrent 20aecea9 09",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "12"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 09"
+        ],
+        "html_snapshot": "inventory-concurrent-10.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 11,
+        "name": "Concurrent 20aecea9 10",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "13"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 10"
+        ],
+        "html_snapshot": "inventory-concurrent-11.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 12,
+        "name": "Concurrent 20aecea9 11",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "14"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 11"
+        ],
+        "html_snapshot": "inventory-concurrent-12.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 13,
+        "name": "Concurrent 20aecea9 12",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "15"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 12"
+        ],
+        "html_snapshot": "inventory-concurrent-13.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 14,
+        "name": "Concurrent 20aecea9 13",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "16"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 13"
+        ],
+        "html_snapshot": "inventory-concurrent-14.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 15,
+        "name": "Concurrent 20aecea9 14",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "17"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 14"
+        ],
+        "html_snapshot": "inventory-concurrent-15.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 16,
+        "name": "Concurrent 20aecea9 15",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "18"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 15"
+        ],
+        "html_snapshot": "inventory-concurrent-16.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 17,
+        "name": "Concurrent 20aecea9 16",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "19"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 16"
+        ],
+        "html_snapshot": "inventory-concurrent-17.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 18,
+        "name": "Concurrent 20aecea9 17",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "20"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 17"
+        ],
+        "html_snapshot": "inventory-concurrent-18.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 19,
+        "name": "Concurrent 20aecea9 18",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "21"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 18"
+        ],
+        "html_snapshot": "inventory-concurrent-19.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 20,
+        "name": "Concurrent 20aecea9 19",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:51:40 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 1,
+        "matching_collection_ids": [
+          "22"
+        ],
+        "matching_collection_texts": [
+          "Concurrent 20aecea9 19"
+        ],
+        "html_snapshot": "inventory-concurrent-20.html",
+        "successful_303_name_persisted": true,
+        "no_500": true
+      }
+    ],
+    "pass": true
+  },
+  "server_logs": {
+    "returncode": 0,
+    "stdout": "",
+    "stderr": "172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /bookmarks HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:51:40] \"GET / HTTP/1.1\" 200 -\n"
+  },
+  "app_source_sha256_after": {
+    "README.md": "7faa3905d766dbbe4e49af05c7f370fc118160f59e8736378ed23d2b6809a52a",
+    "delivery.json": "4accad35f8399183eb6a8426a971c8434611b69f0160d2b505e9dd29b86cb38e",
+    "app/__init__.py": "9469dc4b6b75244f86c93ecdcfd8265b2b758952cac25d25f2009c9b5258da0f",
+    "app/__main__.py": "fb51d09e657e2d32efdede834cf098d2612b9a30a8c7c0dd205f5b51d5ef5425",
+    "app/config.py": "3fa66e7b1233cbc4e8b01556256336ae974c35a0c67ec631a2e7608f6e0c4ae9",
+    "app/server.py": "41b84e08e069e57e026add5a59be4bcf5b46866df6cc23a16224677cc88977d5",
+    "app/storage.py": "cc65cb96367a2485b6e154c518079f713162837cedfee306e4feebe4b09bb662",
+    "app/validation.py": "d0ac670149cb6c5cb61459e3833e235281403ed92f46a9094975fb4eaa052a43",
+    "app/views.py": "e923f629fd6d8d10fb1568285be871b9c06dbecc3157259ff5746b05f36ee01b"
+  },
+  "source_hash_unchanged": true,
+  "result": {
+    "crlf_url_rejected_without_dirty_data": true,
+    "concurrent_same_name_categories_no_500_and_success_persists": true
+  },
+  "cleanup": {
+    "events": [
+      {
+        "step": "container_remove",
+        "state": "started",
+        "at": 1792381900.726624
+      },
+      {
+        "step": "container_remove",
+        "state": "completed",
+        "at": 1792381900.881027
+      },
+      {
+        "step": "container_absence_verification",
+        "state": "started",
+        "at": 1792381900.885184
+      },
+      {
+        "step": "container_absence_verification",
+        "state": "completed",
+        "at": 1792381900.908118
+      },
+      {
+        "step": "network_remove",
+        "state": "started",
+        "at": 1792381900.9115741
+      },
+      {
+        "step": "network_remove",
+        "state": "completed",
+        "at": 1792381901.10391
+      },
+      {
+        "step": "network_absence_verification",
+        "state": "started",
+        "at": 1792381901.106764
+      },
+      {
+        "step": "network_absence_verification",
+        "state": "completed",
+        "at": 1792381901.12445
+      },
+      {
+        "step": "temporary_state_removed",
+        "state": "started",
+        "at": 1792381901.13017
+      },
+      {
+        "step": "temporary_state_removed",
+        "state": "completed",
+        "at": 1792381901.132896
+      }
+    ],
+    "container_remove": {
+      "ok": true,
+      "returncode": 0,
+      "stdout": "bookmark-posthoc-app-20aecea90636",
+      "stderr": ""
+    },
+    "container_absence_verification": {
+      "ok": true,
+      "returncode": 1,
+      "stdout": "[]",
+      "stderr": "Error: No such object: bookmark-posthoc-app-20aecea90636"
+    },
+    "network_remove": {
+      "ok": true,
+      "returncode": 0,
+      "stdout": "bookmark-posthoc-net-20aecea90636",
+      "stderr": ""
+    },
+    "network_absence_verification": {
+      "ok": true,
+      "returncode": 1,
+      "stdout": "[]",
+      "stderr": "Error response from daemon: network bookmark-posthoc-net-20aecea90636 not found"
+    },
+    "fixture_server_stopped": true,
+    "fixture_thread_stopped": true,
+    "temporary_state_removed": true,
+    "container_absent_verified": true,
+    "network_absent_verified": true,
+    "all_resources_removed": true
+  },
+  "completed_at": "2026-10-19T03:51:41Z"
+}

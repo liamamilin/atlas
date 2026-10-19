@@ -32,12 +32,15 @@ def project_execution(reconcile: dict, task_message_id: str | None = None) -> di
     engine_status = status_record.get("type", "idle")
     relevant = _relevant_messages(messages, task_message_id)
 
-    permission = _last_matching_permission(pending, relevant)
+    permission = _last_matching_permission(
+        pending, relevant, (reconcile.get("session") or {}).get("id"))
     if permission:
         return _result("waiting_permission", engine_status, relevant,
                        permission_id=permission.get("id"))
 
-    question = _pending_question(reconcile.get("pending_questions") or [], relevant)
+    question = _pending_question(
+        reconcile.get("pending_questions") or [], relevant,
+        (reconcile.get("session") or {}).get("id"))
     if question:
         return _result("waiting_input", engine_status, relevant,
                        question_id=question.get("id"))
@@ -64,6 +67,10 @@ def project_execution(reconcile: dict, task_message_id: str | None = None) -> di
         return _result("queued", engine_status, relevant)
     if task_message_id and not relevant:
         return _result("queued", engine_status, relevant)
+    session_outcome = (reconcile.get("session") or {}).get("outcome")
+    if any(item.get("info", {}).get("role") == "assistant" for item in relevant) \
+            and session_outcome not in {"failed", "interrupted"}:
+        return _result("running", engine_status, relevant)
     return _result("unknown", engine_status, relevant)
 
 
@@ -81,17 +88,25 @@ def _related_message_ids(messages: list[dict]) -> set[str]:
             if item.get("info", {}).get("id")}
 
 
-def _last_matching_permission(items: list[dict], messages: list[dict]) -> dict | None:
+def _last_matching_permission(
+        items: list[dict], messages: list[dict],
+        session_id: str | None = None) -> dict | None:
     ids = _related_message_ids(messages)
     matches = [item for item in items
-               if not ids or (item.get("tool") or {}).get("messageID") in ids]
+               if (session_id and item.get("sessionID") == session_id)
+               or not ids
+               or (item.get("tool") or {}).get("messageID") in ids
+               or (item.get("source") or {}).get("messageID") in ids]
     return matches[-1] if matches else None
 
 
-def _pending_question(items: list[dict], messages: list[dict]) -> dict | None:
+def _pending_question(
+        items: list[dict], messages: list[dict],
+        session_id: str | None = None) -> dict | None:
     ids = _related_message_ids(messages)
     matches = [item for item in items
-               if not ids or item.get("messageID") in ids
+               if (session_id and item.get("sessionID") == session_id)
+               or not ids or item.get("messageID") in ids
                or (item.get("tool") or {}).get("messageID") in ids]
     return matches[-1] if matches else None
 

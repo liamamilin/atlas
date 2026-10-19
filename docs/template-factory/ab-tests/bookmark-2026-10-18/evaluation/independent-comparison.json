@@ -1,0 +1,311 @@
+{
+  "scope": "independent read-only audit of actual runtime evidence; evaluator did not execute programs",
+  "condition_mapping_seen": false,
+  "required": [
+    {
+      "id": "R01",
+      "X": "通过",
+      "Y": "通过",
+      "reason": "两者均以 python3 app.py --port/--data-dir 在指定回环端口启动返回 HTTP 200，中文界面可用且仅依赖标准库与 SQLite。",
+      "evidence": [
+        "source/X/evidence/001-R01-runtime_assertions_passed.txt",
+        "source/X/evidence/processes.json",
+        "source/X/application/app.py",
+        "source/Y/evidence/001-R01-runtime_assertions_passed.txt",
+        "source/Y/evidence/processes.json",
+        "source/Y/application/app.py"
+      ]
+    },
+    {
+      "id": "R02",
+      "X": "通过",
+      "reason_x_placeholder": "",
+      "Y": "通过",
+      "X_reason": "",
+      "X/application": "",
+      "reason": "X 仅 URL 保存 A（自动派生标题 lamp）、C 带标题备注保存，刷新后详情与备注仍在；Y 同样保存 A 与 C 并在 SSR 列表呈现。",
+      "evidence": [
+        "source/X/evidence/002-R02-saved-A.txt",
+        "source/X/evidence/003-R02-saved-C.txt",
+        "source/X/evidence/runtime-results.json",
+        "source/Y/evidence/002-R02-saved-A.txt",
+        "source/Y/evidence/003-R02-saved-C.txt",
+        "source/Y/evidence/runtime-results.json"
+      ]
+    },
+    {
+      "id": "R03",
+      "X": "通过",
+      "Y": "通过",
+      "reason": "两者都无需先建归类即可存入未整理/未分类，并能从该视图找回 A 与 C。",
+      "evidence": [
+        "source/X/evidence/005-R03-runtime_assertions_passed.txt",
+        "source/X/evidence/012-R05-unclassified-after-move.txt",
+        "source/Y/evidence/005-R03-runtime_assertions_passed.txt",
+        "source/Y/evidence/012-R05-unclassified-after-move.txt"
+      ]
+    },
+    {
+      "id": "R04",
+      "X": "通过",
+      "Y": "通过",
+      "reason": "X 新建学习（待购已预置）、Y 新建待购与学习并在保存 B 时选择待购，B 均在对应归类可见。",
+      "evidence": [
+        "source/X/evidence/008-R04-runtime_assertions_passed.txt",
+        "source/X/evidence/runtime-results.json",
+        "source/Y/evidence/008-R04-runtime_assertions_passed.txt",
+        "source/Y/evidence/runtime-results.json"
+      ]
+    },
+    {
+      "id": "R05",
+      "X": "通过",
+      "Y": "通过",
+      "reason": "移动后学习同时含 B 与 C，原归属未整理仅剩 A、待购为空，URL/标题/备注完整且无复制。",
+      "evidence": [
+        "source/X/evidence/011-R05-destination.txt",
+        "source/X/evidence/012-R05-unclassified-after-move.txt",
+        "source/X/evidence/013-R05-source-after-move.txt",
+        "source/Y/evidence/011-R05-destination.txt",
+        "source/Y/evidence/012-R05-unclassified-after-move.txt",
+        "source/Y/evidence/013-R05-source-after-move.txt"
+      ]
+    },
+    {
+      "id": "R06",
+      "X": "通过",
+      "Y": "通过",
+      "reason": "两者以书架/面包命中 B/C，范围可辨（首页为全部），空结果显示且清除查询后可继续；Y 空结果文案与空库相同（见 issues suggestion）。",
+      "evidence": [
+        "source/X/evidence/015-R06-书架.txt",
+        "source/X/evidence/016-R06-面包.txt",
+        "source/X/evidence/017-R06-empty-search.txt",
+        "source/Y/evidence/015-R06-书架.txt",
+        "source/Y/evidence/016-R06-面包.txt",
+        "source/Y/evidence/017-R06-empty-search.txt"
+      ]
+    },
+    {
+      "id": "R07",
+      "X": "通过",
+      "Y": "通过",
+      "reason": "两者都由 /open/1、/b/1 发起外部导航请求并返回 302 Location，A 的路径、查询与 #details 片段均保留（外链加载被代理拒绝属预期）。",
+      "evidence": [
+        "source/X/evidence/runtime-results.json",
+        "source/Y/evidence/runtime-results.json",
+        "source/Y/application/server.py",
+        "source/X/application/app.py"
+      ]
+    },
+    {
+      "id": "R08",
+      "X": "通过",
+      "Y": "通过",
+      "reason": "刷新与同数据目录重启后 3 条记录、字段与学习归属保留，另用空目录启动显示为空，无旧目录混入。",
+      "evidence": [
+        "source/X/evidence/020-R08-refresh-persisted.txt",
+        "source/X/evidence/021-R08-normal-restart-persisted.txt",
+        "source/X/evidence/022-R08-fresh-directory-empty.txt",
+        "source/Y/evidence/020-R08-refresh-persisted.txt",
+        "source/Y/evidence/021-R08-normal-restart-persisted.txt",
+        "source/Y/evidence/022-R08-fresh-directory-empty.txt"
+      ]
+    },
+    {
+      "id": "R09",
+      "X": "通过",
+      "Y": "通过",
+      "reason": "X 空 URL 被浏览器 required 与服务端双重拒绝，Y 提交空 URL 返回 200 并显示 URL 不合法，两者已有记录前后完全一致且可继续操作。",
+      "evidence": [
+        "source/X/evidence/024-R09-empty-url-feedback.txt",
+        "source/X/evidence/runtime-results.json",
+        "source/X/application/storage.py",
+        "source/Y/evidence/024-R09-empty-url-feedback.txt",
+        "source/Y/evidence/runtime-results.json",
+        "source/Y/application/store.py"
+      ]
+    }
+  ],
+  "exploratory": [
+    {
+      "id": "M01",
+      "X": "SIGKILL 后同目录重启恢复；顺序多标签两条记录都在；一次双击产生两条同 URL 重复记录，无去重或提交防抖。真正并发与多次重复点击未测。",
+      "Y": "SIGKILL 后恢复；顺序多标签记录都在；一次双击只落一条记录（SSR 导航替换表单）。真正并发与多次重复点击未测。",
+      "evidence": [
+        "source/X/evidence/runtime-results.json",
+        "source/X/evidence/027-M01-runtime_assertions_passed.txt",
+        "source/Y/evidence/runtime-results.json",
+        "source/Y/evidence/027-M01-runtime_assertions_passed.txt"
+      ]
+    },
+    {
+      "id": "M02",
+      "X": "断言失败：长标题受 HTML maxlength=60、长备注在写入时被截断，往返不一致；重复 URL 被允许并留下两条相同 URL 记录。",
+      "Y": "通过：中文、空格、引号、长标题长备注与带片段 URL 往返一致；重复 URL 被拦截并给出仍然保存一份的入口（duplicateUrlCount 1）。",
+      "evidence": [
+        "source/X/evidence/028-M02-assertion_failed_needs_review.txt",
+        "source/X/evidence/runtime-results.json",
+        "source/X/application/storage.py",
+        "source/Y/evidence/028-M02-runtime_assertions_passed.txt",
+        "source/Y/evidence/runtime-results.json",
+        "source/Y/application/store.py"
+      ]
+    },
+    {
+      "id": "M03",
+      "X": "端口占用与不可用数据目录两次启动均退出、无虚假成功；端口占用打印原始 traceback，数据目录失败给出中文提示；真实持久化故障未注入。",
+      "Y": "端口占用与不可用数据目录两次启动均退出、无虚假成功；两者都直接抛出原始 traceback（英文栈）；真实持久化故障未注入。",
+      "evidence": [
+        "source/X/evidence/probe-occupied-port.log",
+        "source/X/evidence/probe-unusable-data-dir.log",
+        "source/Y/evidence/probe-occupied-port.log",
+        "source/Y/evidence/probe-unusable-dir.log",
+        "source/Y/evidence/results-probe.json"
+      ]
+    },
+    {
+      "id": "M04",
+      "X": "标题与备注中的 <b></b>、<svg onload> 探针按文本呈现，executed=null，未见脚本执行。",
+      "Y": "同样按转义文本呈现，executed=null，未见脚本执行。",
+      "evidence": [
+        "source/X/evidence/030-M04-runtime_assertions_passed.txt",
+        "source/Y/evidence/030-M04-runtime_assertions_passed.txt",
+        "source/X/application/static/app.js",
+        "source/Y/application/views.py"
+      ]
+    },
+    {
+      "id": "M05",
+      "X": "空状态、保存/归类/未分类/搜索/打开入口在 R01-R07 快照中可见；未独立执行完整上手任务，仅按既有交互推断。",
+      "Y": "入口同样在 R01-R07 快照可见（含回收站与删除确认）；未独立执行完整上手任务。",
+      "evidence": [
+        "source/X/evidence/runtime-results.json",
+        "source/Y/evidence/runtime-results.json"
+      ]
+    }
+  ],
+  "supplement": {
+    "id": "M02b",
+    "posthoc": true,
+    "X": "同一 3420 码点逻辑备注经 JSON POST 提交并被 201 接受，但记录读回仅 2000 码点（accepted_text_changed；原始提交体确为 3420）。",
+    "Y": "同一 3420 码点逻辑备注经表单提交（原始 body CRLF 计 3600，映射为逻辑 LF 3420），刷新后读回仍为 3420（exact_round_trip）。",
+    "interpretation": "X 在写入层静默截断已被接受的备注文本，属真实的可接受文本丢失；Y 完整保留且只在超过 10000/500 码点时明确拒绝。此为事后补充探索，不改变 R01-R09 判定。",
+    "evidence": [
+      "source/X/supplement/result.json",
+      "source/X/supplement/browser-run.log",
+      "source/X/application/storage.py",
+      "source/Y/supplement/result.json",
+      "source/Y/supplement/browser-run.log",
+      "source/Y/application/store.py"
+    ]
+  },
+  "issues": [
+    {
+      "label": "X",
+      "severity": "material",
+      "check": "M02b/M02 长文本",
+      "file": "source/X/application/storage.py",
+      "line": 15,
+      "actual": "MAX_TEXT=2000，clean_text 在第 74-80 行静默截断，create_bookmark 第 263 行对 note 调用 clean_text；3420 码点备注被 201 接受后读回仅 2000 码点。",
+      "consequence": "用户已成功保存的长备注在刷新后永久少了一段，且界面无任何截断提示。",
+      "fix": "超限时返回明确错误，或提高/可配置上限并在接受前提示，不得静默截断。",
+      "evidence": [
+        "source/X/supplement/result.json",
+        "source/X/evidence/028-M02-assertion_failed_needs_review.txt"
+      ]
+    },
+    {
+      "label": "Y",
+      "severity": "material",
+      "check": "交付管线/R01 交付证据",
+      "file": "source/Y/delivery-status.json",
+      "line": 2,
+      "actual": "cli_exit_code=1、source_status=delivered_source_cli_failed、pipeline_status=failed；但同源 app 仍能启动并通过 R01-R09 运行检查。",
+      "consequence": "交付流程未干净完成，不能因源码可运行就视为生成管线成功。",
+      "fix": "修复 CLI 生成流程并以非零退出为阻塞项复核。",
+      "evidence": [
+        "source/Y/delivery-status.json"
+      ]
+    },
+    {
+      "label": "X",
+      "severity": "suggestion",
+      "check": "M01 重复点击保存",
+      "file": "source/X/application/static/app.js",
+      "line": 316,
+      "actual": "submitAdd 无进行中互斥，一次双击同表单产生两条相同 URL 记录。",
+      "consequence": "用户可能误存重复条目，需手工删除。",
+      "fix": "提交期间禁用按钮或做提交中防抖/幂等。",
+      "evidence": [
+        "source/X/evidence/runtime-results.json",
+        "source/X/evidence/027-M01-runtime_assertions_passed.txt"
+      ]
+    },
+    {
+      "label": "Y",
+      "severity": "suggestion",
+      "check": "R06 空结果可理解性",
+      "file": "source/Y/application/views.py",
+      "line": 274,
+      "actual": "搜索零匹配与空库共用文案“这里还没有记录。”，仅 data-empty-kind 区分。",
+      "consequence": "已有数据的用户看到该文案可能误以为整个库为空。",
+      "fix": "搜索无匹配时给出“没有找到匹配的记录”类区分文案。",
+      "evidence": [
+        "source/Y/evidence/017-R06-empty-search.txt",
+        "source/Y/application/views.py"
+      ]
+    },
+    {
+      "label": "Y",
+      "severity": "suggestion",
+      "check": "M03 端口占用与不可用数据目录",
+      "file": "source/Y/application/app.py",
+      "line": 113,
+      "actual": "db.ensure 抛出 FileExistsError、第 117 行端口占用抛 OSError，均以原始英文 traceback 结束进程。",
+      "consequence": "用户只看到英文栈，缺少中文指引（未产生虚假成功、未破坏已有数据）。",
+      "fix": "捕获 OSError 输出中文失败说明并以清晰退出码结束。",
+      "evidence": [
+        "source/Y/evidence/probe-occupied-port.log",
+        "source/Y/evidence/probe-unusable-data-dir.log"
+      ]
+    },
+    {
+      "label": "X",
+      "severity": "suggestion",
+      "check": "M03 端口占用",
+      "file": "source/X/application/app.py",
+      "line": 167,
+      "actual": "端口被占用时 ThreadingHTTPServer 绑定抛 OSError 原始 traceback 退出（数据目录失败则有中文提示）。",
+      "consequence": "用户看到英文栈而非中文端口占用说明。",
+      "fix": "捕获绑定失败并输出中文提示。",
+      "evidence": [
+        "source/X/evidence/probe-occupied-port.log",
+        "source/X/evidence/runtime-results.json"
+      ]
+    }
+  ],
+  "comparison": {
+    "core": "两个匿名应用都完成了核心闭环：仅 URL 保存、可选标题备注、未分类找回、创建并选择归类、移动与归属、标题关键字搜索、打开原网页、刷新/同目录重启持久化与空目录隔离，均有直接运行证据。",
+    "meaningful_differences": [
+      "X 静默截断超长备注/标题（2000/60 码点）；Y 完整保留并在超限时明确报错（10000/500 码点）。",
+      "X 允许重复 URL 并可能留下重复记录；Y 默认拦截重复 URL 并提供显式另存入口。",
+      "空 URL：X 用浏览器 required 加服务端双重校验；Y 用 novalidate 表单加服务端“URL 不合法”反馈，均未破坏已有数据。",
+      "X 为前端 fetch 交互；Y 为 SSR 表单并附带回收站与删除确认等额外界面，但额外功能存在不等于已验证正确。",
+      "交付状态：X pipeline completed（cli 0），Y cli 1 / pipeline failed，与可运行源码分开记录。"
+    ],
+    "cannot_conclude": [
+      "无 condition map、无生成提示与日志，单次、同模型会话，不能推断条件导致质量差异或选出普适赢家。",
+      "rubric 未规定长度上限，M02b 仅为事后探索，不能据此改写既有九项判定或设新门槛。",
+      "M05 上手可用性、M03 真实持久化故障与真正并发均未充分验证。",
+      "截图未做视觉审查，本会话只接收 DOM/body 快照与记录的浏览器动作。"
+    ]
+  },
+  "limits": [
+    "只读评估，未运行任何程序、未编辑文件、未访问工作区外路径（日志按 basename 映射到提供的副本）。",
+    "未提供 condition map、生成提示、provider 生成日志或初步评分，X/Y 条件未知。",
+    "单个应用、单次成对实验，不能统计证明因果或推广。",
+    "X/Y 的 evidence/browser-run.log 为空，浏览器行为依赖 runtime-results.json 与 evidence 文本快照。",
+    "M02b 为冻结标准之外的补充探索，X 首次评审后新增，不影响 R01-R09 判定。",
+    "M01 的重复点击与多标签为顺序执行，非真正并发。"
+  ]
+}

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 from pathlib import Path, PurePosixPath
 import shutil
@@ -48,6 +49,118 @@ def prepare_execution_workspace(store_root: str | Path, project_id: str,
         raise
 
 
+APPLY_JOURNAL_NAME = "journal.json"
+
+
+def _write_apply_journal(stage: Path, journal: dict) -> None:
+    """Persist apply intent before destructive filesystem operations."""
+    target = stage / APPLY_JOURNAL_NAME
+    temporary = stage / f".{APPLY_JOURNAL_NAME}.tmp"
+    temporary.write_text(
+        json.dumps(journal, ensure_ascii=False, sort_keys=True), encoding="utf-8")
+    os.chmod(temporary, 0o600)
+    with temporary.open("rb") as stream:
+        os.fsync(stream.fileno())
+    os.replace(temporary, target)
+    os.chmod(target, 0o600)
+
+
+def read_apply_journal(source_root: str | Path, execution_id: str) -> tuple[Path, dict] | None:
+    """Return a durable apply journal for an execution, without mutating it."""
+    source = Path(source_root).resolve()
+    if not source.is_dir() or source.is_symlink():
+        return None
+    try:
+        children = sorted(source.iterdir(), key=lambda item: item.name)
+    except OSError:
+        return None
+    for child in children:
+        if not child.name.startswith(".atlas-apply-") or child.is_symlink() \
+                or not child.is_dir():
+            continue
+        path = child / APPLY_JOURNAL_NAME
+        if path.is_symlink():
+            continue
+        try:
+            value = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            continue
+        if isinstance(value, dict) and value.get("execution_id") == execution_id:
+            return child, value
+    return None
+
+
+def restore_interrupted_apply(source_root: str | Path, execution_id: str) -> dict:
+    """Explicitly restore the pre-apply files for a journaled interrupted apply.
+
+    This is never called during startup. The caller must explicitly confirm the
+    action; an unknown user edit is refused rather than overwritten.
+    """
+    found = read_apply_journal(source_root, execution_id)
+    if not found:
+        raise ProjectStoreError("no durable apply journal was found for this execution")
+    stage, journal = found
+    source = Path(source_root).resolve()
+    journal_source = journal.get("source_root")
+    if isinstance(journal_source, str) and Path(journal_source).resolve() != source:
+        raise ProjectStoreError("apply journal source does not match the project workspace")
+    before = journal.get("before_manifest") or {}
+    after = journal.get("after_manifest") or {}
+    before_files = before.get("files") or {}
+    after_files = after.get("files") or {}
+    changed = journal.get("difference") or {}
+    paths = list(changed.get("added") or []) + list(changed.get("modified") or []) \
+        + list(changed.get("removed") or [])
+    current = snapshot_workspace(source, DEFAULT_IGNORES | {stage.name})
+    if current.get("errors"):
+        raise ProjectStoreError("cannot recover an apply while workspace reads are incomplete")
+    current_files = current.get("files") or {}
+    backup_root = stage / "backup"
+    for relative in paths:
+        _relative(relative)
+        before_meta = before_files.get(relative)
+        after_meta = after_files.get(relative)
+        current_meta = current_files.get(relative)
+        if current_meta is not None and current_meta != before_meta and current_meta != after_meta:
+            raise ProjectStoreError(
+                f"workspace changed after interrupted apply; review before recovery: {relative}")
+        backup = backup_root / relative
+        if before_meta is None:
+            if current_meta is not None:
+                _safe_destination(source, relative)
+                target = source / relative
+                if target.is_dir() and not target.is_symlink():
+                    shutil.rmtree(target)
+                else:
+                    target.unlink()
+            continue
+        if current_meta == before_meta:
+            continue
+        if not backup.exists() and not backup.is_symlink():
+            raise ProjectStoreError(
+                f"apply backup is incomplete; manual review is required: {relative}")
+        if backup.is_symlink():
+            _safe_link(backup_root, backup.parent, os.readlink(backup), relative)
+        _safe_destination(source, relative)
+        target = source / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        os.replace(backup, target)
+    current = snapshot_workspace(source, DEFAULT_IGNORES | {stage.name})
+    if current.get("errors"):
+        raise ProjectStoreError("workspace recovery verification failed")
+    for relative in paths:
+        if current.get("files", {}).get(relative) != before_files.get(relative):
+            raise ProjectStoreError(
+                f"workspace did not return to the pre-apply state: {relative}")
+    shutil.rmtree(stage)
+    return {
+        "execution_id": execution_id,
+        "action": "restore_before",
+        "status": "restored",
+        "manifest": current,
+    }
+
+
 def apply_execution_workspace(source_root: str | Path, work_root: str | Path,
                               before_manifest: dict, after_manifest: dict,
                               difference: dict, execution_id: str) -> dict:
@@ -76,23 +189,58 @@ def apply_execution_workspace(source_root: str | Path, work_root: str | Path,
     new_root, backup_root = stage / "new", stage / "backup"
     applied: list[str] = []
     backed_up: list[str] = []
+    journal = {
+        "schema": 1,
+        "execution_id": execution_id,
+        "source_root": str(source),
+        "work_root": str(work),
+        "before_manifest": {
+            "root": before_manifest.get("root"),
+            "files": before_manifest.get("files") or {},
+        },
+        "after_manifest": {
+            "root": after_manifest.get("root"),
+            "files": after_manifest.get("files") or {},
+        },
+        "difference": difference,
+        "phase": "prepared",
+        "backed_up": [],
+        "applied": [],
+    }
     try:
+        _write_apply_journal(stage, journal)
         for relative in added + modified:
             _stage_result(work, new_root, relative, after_manifest["files"][relative])
+        journal["phase"] = "staged"
+        _write_apply_journal(stage, journal)
         for relative in sorted(modified + removed, key=_depth, reverse=True):
             target, backup = source / relative, backup_root / relative
+            _assert_apply_target(source, relative, before_manifest["files"].get(relative))
             backup.parent.mkdir(parents=True, exist_ok=True)
             os.replace(target, backup)
             backed_up.append(relative)
+            journal["backed_up"] = list(backed_up)
+            journal["phase"] = "backing_up"
+            _write_apply_journal(stage, journal)
         _remove_empty_changed_directories(source, removed)
+        journal["phase"] = "installing"
+        _write_apply_journal(stage, journal)
         for relative in sorted(added + modified, key=_depth):
             target, staged = source / relative, new_root / relative
+            if relative not in before_manifest.get("files", {}):
+                _assert_apply_target(source, relative, None)
             target.parent.mkdir(parents=True, exist_ok=True)
             os.replace(staged, target)
             applied.append(relative)
+            journal["applied"] = list(applied)
+            _write_apply_journal(stage, journal)
+        journal["phase"] = "verifying"
+        _write_apply_journal(stage, journal)
         result = snapshot_workspace(source, DEFAULT_IGNORES | {stage.name})
         if result.get("errors") or result["files"] != after_manifest.get("files", {}):
             raise ProjectStoreError("applied files do not match the recorded execution result")
+        journal["phase"] = "committed"
+        _write_apply_journal(stage, journal)
         shutil.rmtree(stage)
         return result
     except BaseException:
@@ -145,6 +293,37 @@ def _stage_result(work: Path, new_root: Path, relative: str, metadata: dict):
         os.symlink(link, target)
     else:
         raise ProjectStoreError(f"unsupported execution result entry: {relative}")
+
+
+def _assert_apply_target(root: Path, relative: str, expected: dict | None) -> None:
+    """Reject a user edit immediately before replacing one target path."""
+    target = root / relative
+    _safe_destination(root, relative)
+    if expected is None:
+        if target.exists() or target.is_symlink():
+            raise ProjectStoreError(
+                f"project workspace changed while applying result: {relative}")
+        return
+    if target.is_symlink():
+        link = os.readlink(target)
+        current = {
+            "kind": "symlink",
+            "target": link,
+            "sha256": hashlib.sha256(link.encode("utf-8")).hexdigest(),
+        }
+    elif target.is_file() and not target.is_symlink():
+        stat = target.stat()
+        digest = hashlib.sha256()
+        with target.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+        current = {"kind": "file", "size": stat.st_size, "sha256": digest.hexdigest()}
+    else:
+        raise ProjectStoreError(
+            f"project workspace changed while applying result: {relative}")
+    if current != expected:
+        raise ProjectStoreError(
+            f"project workspace changed while applying result: {relative}")
 
 
 def _safe_link(root: Path, parent: Path, link: str, relative: str):

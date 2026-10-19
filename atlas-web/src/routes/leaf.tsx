@@ -5,11 +5,12 @@ import { getLeaf, saveProjectReference, type LeafDetail } from "@/lib/atlas";
 import { useAsync, Loading, ErrorBox } from "@/components/loaders";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { REL_KIND_ZH } from "@/lib/atlas";
+import { relationKindLabel } from "@/lib/atlas";
 import { Prose } from "@/components/prose";
 import { SourceReader } from "@/components/source-reader";
 import { useLang, pick, t, type Lang } from "@/lib/lang";
 import { useCurrentProjectId } from "@/lib/project-selection";
+import { LeafScenarios } from "@/components/leaf-scenarios";
 
 export function Leaf() {
   const { slug } = useParams<{ slug: string }>();
@@ -41,15 +42,16 @@ export function Leaf() {
       ) : null}
 
       <TypeProjectActions leaf={data} />
+      <LeafScenarios leaf={data.slug} />
 
       {data.dc ? (
         <section className="mt-8 rounded-xl bg-primary/[0.06] p-5 ring-1 ring-primary/15">
           <h2 className="text-xs font-medium uppercase tracking-widest text-primary">{t("definingCore", lang)}</h2>
-          <Prose md={pick(lang, data.dc_zh, data.dc)} className="mt-3" />
+          <Prose md={pick(lang, data.dc_zh, data.dc)} className="mt-3" resolveTypeLinks />
           {lang === "zh" && data.dc && data.dc.trim() !== (data.dc_zh || "").trim() ? (
             <details className="mt-3">
               <summary className="cursor-pointer text-xs text-subtle hover:text-fg">{t("enOriginal", lang)}</summary>
-              <Prose md={data.dc} className="mt-2" />
+              <Prose md={data.dc} className="mt-2" resolveTypeLinks />
             </details>
           ) : null}
         </section>
@@ -58,28 +60,28 @@ export function Leaf() {
       {data.overview ? (
         <section className="mt-8">
           <h2 className="font-serif text-xl font-medium">{t("overview", lang)}</h2>
-          <Prose md={pick(lang, data.overview_zh, data.overview)} className="mt-3" />
+          <Prose md={pick(lang, data.overview_zh, data.overview)} className="mt-3" resolveTypeLinks />
         </section>
       ) : null}
 
       {data.how ? (
         <section className="mt-8">
           <h2 className="font-serif text-xl font-medium">{t("howItWorks", lang)}</h2>
-          <Prose md={pick(lang, data.how_zh, data.how)} className="mt-3" />
+          <Prose md={pick(lang, data.how_zh, data.how)} className="mt-3" resolveTypeLinks />
         </section>
       ) : null}
 
       {data.rules ? (
         <section className="mt-8">
           <h2 className="font-serif text-xl font-medium">{t("rules", lang)}</h2>
-          <Prose md={pick(lang, data.rules_zh, data.rules)} className="mt-3" />
+          <Prose md={pick(lang, data.rules_zh, data.rules)} className="mt-3" resolveTypeLinks />
         </section>
       ) : null}
 
       {data.variants ? (
         <section className="mt-8">
           <h2 className="font-serif text-xl font-medium">{t("variants", lang)}</h2>
-          <Prose md={pick(lang, data.variants_zh, data.variants)} className="mt-3" />
+          <Prose md={pick(lang, data.variants_zh, data.variants)} className="mt-3" resolveTypeLinks />
         </section>
       ) : null}
 
@@ -99,7 +101,7 @@ export function Leaf() {
       {data.products ? (
         <section className="mt-8">
           <h2 className="font-serif text-xl font-medium">{t("corpusProducts", lang)}</h2>
-          <Prose md={pick(lang, data.products_zh, data.products)} className="mt-3 text-muted" />
+          <Prose md={pick(lang, data.products_zh, data.products)} className="mt-3 text-muted" resolveTypeLinks />
         </section>
       ) : null}
 
@@ -107,10 +109,10 @@ export function Leaf() {
       {data.sources ? (
         <section className="mt-8">
           <h2 className="font-serif text-xl font-medium">{t("sources", lang)}</h2>
-          <Prose md={data.sources} className="mt-3 text-sm" />
+          <Prose md={data.sources} className="mt-3 text-sm" resolveTypeLinks />
         </section>
       ) : null}
-      <SourceReader slug={data.slug} />
+      <SourceReader slug={data.slug} fallbackMarkdown={data.full_md} />
     </main>
   );
 }
@@ -189,13 +191,13 @@ function relKindsBlock(rels: LeafDetail["relations"], kinds: string[], lang: Lan
       <div className="mt-3 space-y-4">
         {kinds.map((k) => (
           <div key={k}>
-            <h3 className="text-xs font-medium uppercase tracking-widest text-subtle">{REL_KIND_ZH[k] ?? k}</h3>
+            <h3 className="text-xs font-medium uppercase tracking-widest text-subtle">{relationKindLabel(k, lang)}</h3>
             <div className="mt-2 space-y-2">
-              {rels.filter((r) => r.kind === k).map((r) => (
-                <div key={r.to} className="rounded-lg bg-surface p-3 shadow-card">
+              {rels.filter((r) => r.kind === k).map((r, index) => (
+                <div key={r.id || `${r.kind}:${r.to}:${index}`} className="rounded-lg bg-surface p-3 shadow-card">
                   <div className="flex items-baseline justify-between gap-2">
                     <Link to={`/types/${r.to}`} className="text-sm font-medium hover:underline">
-                      {r.toName}
+                      {pick(lang, r.toNameZh, r.toNameEn || r.toName)}
                     </Link>
                     <details className="text-[10px] text-subtle"><summary className="cursor-pointer">{lang === "zh" ? "技术信息" : "Technical details"}</summary><code className="mt-1 block rounded bg-chip px-1.5 py-0.5 font-mono">{r.to}</code></details>
                   </div>

@@ -1,0 +1,10 @@
+{
+  "classification": "blocked",
+  "failure_kind": "harness_path_resolution",
+  "stage": "ui_initial",
+  "reason": "The runner resolved Playwright's executablePath while HOME pointed to the temporary browser profile, so Playwright reported a nonexistent temporary cache path. No product UI action ran.",
+  "product_failure": false,
+  "original_run_json_preserved": true,
+  "correction": "Use allowlisted PATH/HOME/TMPDIR to resolve the installed binary, then use a temporary HOME for actual Chromium launch.",
+  "followup": "synthetic-review/browser-preflight-1/result.json"
+}

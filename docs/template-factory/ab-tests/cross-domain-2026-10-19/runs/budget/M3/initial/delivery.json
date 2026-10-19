@@ -1,0 +1,57 @@
+{
+  "status": "delivered",
+  "cli_status": "completed",
+  "attempt": 1,
+  "elapsed_seconds_all_attempts": 182.32,
+  "source_sha256": {
+    "DECISIONS.md": "86b155def3f5b91663f14bc114f88982348c4773819b93913f92c9f4c16e9fb3",
+    "README.md": "ddc00d6f26f7da69fd2274db4aa599c19a2759eee8b48f1b254c6ccd44dcac80",
+    "api.py": "86ead064627a320a130a3b8244595b379c1fb190cec8c061bde6d152e9c3ae66",
+    "app.py": "1c56ab4d0e336f1683e7c45b608ab569a75963d09030a200c4fafa30799cfe35",
+    "db.py": "250203dce6f1b8bfe96d1c6d0e5c009c48b7f27142645a94f55955d10242e61b",
+    "money.py": "e4aa4d5e81bb30a35ff8021008decaf6acc76fb7a3082ef66d20dc5155a633c6",
+    "static/app.js": "3f4cf591056801b27d4bbad2c7616715f9e37d4c014403b390bdcdba0599af9f",
+    "static/index.html": "8ae5450a05ecc60c4e3a064a37e0491b28c95126c980f83bb0263f90c8975614",
+    "static/style.css": "e1fc2f05237feb82ef0433568268c5ed5793a2f40ac94e47d54e9a8607083425"
+  },
+  "host_source_findings": [],
+  "author_claims": {
+    "files": [
+      "app.py",
+      "money.py",
+      "db.py",
+      "api.py",
+      "static/index.html",
+      "static/style.css",
+      "static/app.js",
+      "README.md",
+      "DECISIONS.md"
+    ],
+    "implemented": [
+      "Month selection and per-month isolation",
+      "Create category with monthly budget (duplicate month/name rejected)",
+      "Update category monthly budget without cross-month mutation",
+      "Record expenses (date/category/positive 2dp amount/note) with date-month match enforced",
+      "Category and whole-month budget/spent/remaining incl. negative overspend, unused categories visible",
+      "Edit/delete expenses with immediate consistent recomputation",
+      "Validation failures return non-2xx JSON error and preserve existing data",
+      "SQLite persistence in --data-dir with restart recovery",
+      "GET /api/export monthly UTF-8 RFC 4180 CSV (Chinese/quotes/newlines round-trip)",
+      "Chinese browser UI sharing the same real JSON API state with all required data-testid controls"
+    ],
+    "limits": [
+      "Single local user only; no bank/payment connection, auth, sync or multi-tenant",
+      "CNY only, two decimals; amounts with >2 decimals or non-positive are rejected, not rounded",
+      "P0 shows current-month plan/actual/remaining only; no cross-month rollover",
+      "No category delete/rename/archive in P0",
+      "No full edit history/audit log (D04 still pending human confirmation)",
+      "No automated test results produced in this environment"
+    ],
+    "self_checks": {
+      "status": "not_run"
+    }
+  },
+  "application_hand_edits": false,
+  "execution": "not_run",
+  "evidence_status": "await independent source review and real runtime"
+}

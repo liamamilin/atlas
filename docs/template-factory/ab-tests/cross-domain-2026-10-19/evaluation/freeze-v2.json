@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "date": "2026-10-19",
+  "status": "frozen_before_application_generation_or_execution",
+  "source_sha256": {
+    "run.py": "bae012ab5eedc7d910754bfc2afec51f378e922c22a87eb7ef0b2fe4f2dff9fd",
+    "browser.cjs": "354389ab7a19867dc683d12dccac35b67c064ddf66136a7da70f0d0e296de4f5",
+    "rubric.json": "7fae705d4505ac12f1be01f5541325337e27208f01d07774541e1af22dbf72e8",
+    "README.md": "bb1b09f536b2fdd016b50ac8b2ac634dc4b7e00e7f1ed3548925c62532b34d6b",
+    "oracle-corrections-v2.json": "355977983a9c7103dc796208388d128d5b3694b7902e2645b8f3d4978fb0cb4b"
+  },
+  "input_sha256": {
+    "cases/budget/request.json": "f785ff2e2a54fa8908241406261a1cd411b63b1ac5025b0ee847363ab8510f40",
+    "cases/budget/CONTRACT.md": "4f90838821b17e02ca1283412e3925486b41049c8e66b3f4a522ba70029b197d",
+    "cases/budget/REQUEST.md": "0b35785af09845ee5c0ed37ae25e693f74510578e0a2e03da760294376cdf24d",
+    "cases/booking/request.json": "157d60981e1300cfecd8aaa809ef073f4c303e5602f91e6d6a56969e07354af6",
+    "cases/booking/CONTRACT.md": "fb95f49383f4149cca47f69abcdbb04d81f2cf8fd74d08110fda67a30906d15b",
+    "cases/booking/REQUEST.md": "8b19fcff94d9fdd12f9969ed2d75b4041b802f3d74dc2567b0d97956b390b814",
+    "cases/rename/request.json": "7c800098f04badb64cc954e5c9ebbd5cc451a82904242b503a3609369b443005",
+    "cases/rename/CONTRACT.md": "176296cc09161aae8c09562d42ae0746f6cad1576395d9355b613f0b6f582131",
+    "cases/rename/REQUEST.md": "080f4cd5ff36f06e4b30bbc1a0df02f31e65be7615bac48205215d45debc67d7"
+  },
+  "selfchecks": [
+    "Python AST syntax",
+    "Node --check browser.cjs",
+    "require/Suite utility pass/fail/unverified classification",
+    "v1 archived source hashes equal original freeze"
+  ],
+  "real_application_tests": "not_run",
+  "condition_mapping_read": false,
+  "developer_or_template_output_read": false,
+  "supersedes": "freeze-v1.json; preserved with source in oracle-v1/",
+  "correction_record": "oracle-corrections-v2.json"
+}

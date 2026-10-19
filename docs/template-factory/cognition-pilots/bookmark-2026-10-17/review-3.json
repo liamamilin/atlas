@@ -1,0 +1,112 @@
+{
+  "artifact_id": "tpl_b039c0f308694b93ba0a4873fe774591",
+  "checks": [
+    {
+      "dimension": "category_evidence",
+      "files": [
+        "CATEGORY.md",
+        "README.md"
+      ],
+      "outcome": "passed",
+      "reason": "CATEGORY.md 把 S02–S23 的可核对事实、建议与未知项分开：每条来源带 URL、访问日期和许可信息（linkding 为 MIT；Linkwarden/Karakeep 为 AGPL-3.0；Raindrop/Chrome 为专有或官方文档），并明确 Raindrop 与 Chrome 正文未抓取、仅有搜索摘要；Pinboard 未验证故未引用。复用建议限于单归属分类、未分类落点、Netscape HTML、软删除等类别约定，未声称复制第三方代码；对 AGPL 网络服务义务明确要求法务评估。未知项覆盖性能、中文分词、URL 规范化、回收站保留期、导入去重和移动端商店审核，未把文档所述行为冒充为已运行验证。"
+    },
+    {
+      "dimension": "scenario_scope",
+      "files": [
+        "PRODUCT.md",
+        "ROADMAP.md",
+        "acceptance/plan.json",
+        "inputs/scenario.json"
+      ],
+      "outcome": "passed",
+      "reason": "范围与已确认场景 scn_b92e41ce674f405fad0c87381f1dc5b7@1 对齐：P0 保存、跨会话持久、默认归类和打开原页；P1 新建/移动归类、软删除、回收站与恢复；P2 关键字检索和按归类浏览。明确排除公开分享、账号、协作、计费、管理后台、审计、快照、全文检索、失效链接扫描和导入导出；R01 是普通收藏者，R02 是部署维护者，R03 明确声明本期不存在。回收站、编辑和归类删除虽超出场景验收条目，但服务于“保存后整理和找回”的个人库闭环，未引入团队协作或多用户权限。"
+    },
+    {
+      "dimension": "product_completeness",
+      "files": [
+        "PRODUCT.md",
+        "ARCHITECTURE.md",
+        "acceptance/ui-p1.cjs",
+        "acceptance/plan.json"
+      ],
+      "outcome": "blocked",
+      "reason": "用户、正常/失败流程、数据生命周期和权限/计费/后台/审计/导出的适用性都有交代，导出导入也明确列为 P3 而非本期宣称；但承诺为 current required 的 P1 能力没有完整用户界面。F08 要求“新建与重命名归类”，F12 要求“编辑标题与备注”，而 ARCHITECTURE.md §11 的 UI/DOM 契约只列出归类创建、书签移动、检索/排序和恢复，没有重命名控件或标题/备注编辑控件；A11/A12/A19/A20 仅走 HTTP，浏览器用例 A29/A30 不覆盖这些操作。F04 承诺分页，但 UI 契约没有分页控件或分页验收；F10 的安全 mode=move 删除路径虽在 DOM 中列出 delete-move，A30 只测取消和 purge，缺失安全路径的 UI 验证。另缺少首页空库空态和回收站单条永久删除的 UI 路径。API 存在不等于普通用户可完成该闭环。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "files": [
+        "ARCHITECTURE.md",
+        "acceptance/p1-categories.cjs",
+        "acceptance/p1-trash.cjs",
+        "acceptance/ui-p2.cjs",
+        "DECISIONS.md"
+      ],
+      "outcome": "blocked",
+      "reason": "存在契约与验收的直接冲突：ARCHITECTURE.md §4 允许非数字请求体 categoryId 返回 invalid_category 或 invalid_field，而 A13/A14/A17 发送 'ghost-…' 并分别要求 invalid_category（target_unavailable、unknown_or_deleted），实现若按架构返回 invalid_field 就会被判失败。A33 要求刷新后仍保持 created_asc，但 §11 只定义排序表单，没有规定查询参数或持久化方式。安全与边界契约也不完整：表单 POST + 303 与无认证回环服务没有 CSRF/Origin/Host 校验，D06 的代理认证不能阻止用户浏览器向本机发起跨站表单写操作；PATCH url 的拒绝响应、已回收记录 PATCH 的 404 语义、归类 purge 时 trashed_from_category_id 的写入规则未明确，却被 A17/A20 依赖；A28 要求 https:// 到达服务端并显示 form-error，但未规定 input 不使用浏览器原生 type=url 校验或加 novalidate。现有数据模型、API 形状、错误信封和重启/浏览器适配器契约总体清楚，但上述缺口足以让实现与验收各自成立却互相冲突。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "files": [
+        "acceptance/p1-edit.cjs",
+        "acceptance/p0-save.cjs",
+        "ROADMAP.md",
+        "acceptance/plan.json",
+        "acceptance/p0-limits.cjs"
+      ],
+      "outcome": "blocked",
+      "reason": "映射完整性表面成立：33 个 case、F01–F14 的 current required 能力都有 acceptance，P0/P1/P2 集合与 plan 一致；阶段依赖也基本正确，P0 不使用分类创建、q 或回收站，P1 不使用 P2 的 q/categoryId 过滤，P2 才使用检索、过滤和排序。但 A19 是确定性的假失败：runA19 在创建书签之前取 countsBefore（acceptance/p1-edit.cjs:192），末尾又断言 runCounts 等于 countsBefore（:357）；正确实现创建一条 active 记录后计数必然多 1，A19 无法通过。A03 的目标写 bookmarkCount 增加 1，程序却连续保存两条默认归类记录并断言增加 2（acceptance/p0-save.cjs:310-347），plan/ROADMAP 也重复 +1，目标与断言互相矛盾。语义负路径还缺：A10 未测非默认端口保留、路径大小写保留和 http:///path 可接受；没有 PATCH url 必须拒绝、标题编辑后 search_text 必须更新、note 不得 trim、PATCH categoryId=null、仅未知字段 PATCH 等测试；也没有归类重命名和书签编辑的浏览器验收。因此不能判定该阶段验收可靠。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "files": [
+        "DECISIONS.md",
+        "AGENT.md",
+        "ARCHITECTURE.md"
+      ],
+      "outcome": "passed",
+      "reason": "D01–D09 都给出了具体默认值、理由、影响范围和 when-to-ask 触发条件：单归属归类加默认未分类、重复默认 409/allowDuplicate、删除归类显式 move/purge、默认不抓取网页、保守 URL 归一、回环监听且不内建账号、回收站不过期、导入导出留到 P3、A02 用部署方重启 adapter 且浏览器固定 Playwright 1.63.0。D06 的远程访问触发、D08 的迁移触发和 D09 的 adapter/浏览器触发都可操作。全部决策标记为 proposed，AGENT.md 也提醒不得冒充用户已确认；默认值足以让实现者做可逆选择，关键取舍有明确问人条件。"
+    },
+    {
+      "dimension": "agent_handoff",
+      "files": [
+        "AGENT.md",
+        "README.md",
+        "acceptance/README.md"
+      ],
+      "outcome": "passed",
+      "reason": "AGENT.md 要求先核对已有项目、指令和已确认决定，再读 PRODUCT/DECISIONS/ARCHITECTURE/ROADMAP；把 proposed 决策视为待采纳建议，选择当前阶段并只实现该阶段的完整用户闭环，后期与不适用能力保持实际状态。它要求专用测试实例、真实 HTTP/浏览器验收，并记录实际命令、目标版本、通过/失败/未完成与日志；明确禁止通过删除断言、硬编码测试值或声称未运行测试通过来让测试变绿；也要求不覆盖已有指令、数据或用户决定，并声明包内容不授予外部访问、凭据、发布或破坏性操作权限。阶段顺序可从 ROADMAP 读取，交接基本可执行；可再明确“当前阶段验收通过后才进入下一阶段”的门禁，但不构成阻断。"
+    },
+    {
+      "dimension": "evidence_honesty",
+      "files": [
+        "README.md",
+        "VALIDATION.md",
+        "acceptance/README.md",
+        "ARCHITECTURE.md",
+        "acceptance/plan.json"
+      ],
+      "outcome": "passed",
+      "reason": "README.md、VALIDATION.md、acceptance/README.md、ARCHITECTURE.md 和 plan.json 一致声明这是候选蓝图，P0–P2 均 not implemented、33 个 case 均 not_run，未运行目标、重启 adapter 或浏览器，也未宣称任何测试通过；CATEGORY.md 还区分了叶子原稿编写日期与来源访问日期。没有把导入或生成内容当作独立执行证据。仍存在文档准确性问题：acceptance/README.md 说固定包含 20 个文件，但 inventory 中 acceptance 实际有 21 个（plan.json 未列入目录清单）；A03 的目标计数与程序断言相反、A19 的计数断言错误，说明文档和程序未完全对齐，但这些不是伪造执行结果。"
+    }
+  ],
+  "created_at": "2026-10-17T21:23:17.617450+00:00",
+  "digest": "d1d440d9bf3fc795edb9114ee62c9da5b67eb71a971dd381b3258447ec85c5ab",
+  "id": "acc_c29085b2c1454759a967310338072895",
+  "job_id": "job_4951e6356c7c46ec9e9417676eaaaed5",
+  "method": "cognitive-review",
+  "outcome": "blocked",
+  "scope": "Independent static cognition and acceptance-program review only; no program execution, source re-fetch, downstream runtime or publication.",
+  "suggestions": [
+    "修正 A19：把 countsBefore 移到创建书签之后，或在末尾改为断言 active 计数为 countsBefore.active+1，并显式记录新增记录；当前 A19 在正确实现上必然失败。",
+    "统一 A03 的计数承诺：ROADMAP、acceptance/plan.json 和 p0-save.cjs 都写成“两次默认保存后 bookmarkCount 增加 2”，或把夹具改成一次保存；不要让目标写 +1 而程序断言 +2。",
+    "为请求体 categoryId 的非数字/非法类型定一个一致错误码：建议 ARCHITECTURE.md §4 明确 body categoryId 非法一律返回 400 invalid_category（并按上下文给 unknown_or_deleted/target_unavailable），与 A13/A14/A17 对齐；或者修改这些测试接受 invalid_field。",
+    "补齐 P1 用户界面：在 ARCHITECTURE.md §11 增加归类重命名和书签标题/备注编辑控件及路由，并增加浏览器验收，覆盖成功、空编辑/纯空白标题的 form-error、刷新后持久和计数不变；不要让 F08/F12 只存在于 HTTP API。",
+    "为 A30 增加 mode=move 的浏览器用例：选择目标归类、取消、非法目标零写入，并验证记录未被 purge；同时为回收站增加单条永久删除和清空操作的 UI 验收，避免 purge-only 界面通过。",
+    "补齐 F04 的分页与空态：定义列表分页控件、URL 参数和验收，覆盖首页空库、空归类、空搜索结果、空回收站；当前浏览器契约只验证有数据的首屏和部分空态。",
+    "在架构中规定排序状态的持久化方式（例如 /c/{id}?sort=created_asc），并让 A33 与实现共用该契约；同时明确 PATCH url 的拒绝响应、已回收记录 PATCH 返回 404、归类 purge 时 trashed_from_category_id 的写入和恢复回退规则。",
+    "为所有会改变数据的表单/API 定义 CSRF 或 Origin/Host 防护（同源 token 或严格 Origin 校验），并在 D06 的远程代理场景说明威胁模型；仅监听 127.0.0.1 不能阻止用户浏览器从其他网站提交跨站表单。",
+    "补充关键负路径测试：A10 增加非默认端口保留、路径大小写保留、http:///path 可接受；增加 PATCH url 拒绝、标题编辑后检索更新、备注不 trim、PATCH categoryId=null、仅未知字段 PATCH 的测试；A28 明确 input 使用 type=text 或 novalidate，确保 https:// 能到达服务端并显示 form-error。",
+    "更新 acceptance/README.md 的文件清单为 21 个并纳入 plan.json；在 AGENT.md 增加明确的阶段门禁（P0 验收通过后再进入 P1）以及在发现实现与用户已确认决定冲突时先询问的步骤。"
+  ],
+  "summary": "本次仅做静态审阅，未运行任何验收程序，也未连接目标实例；结论不能替代执行证据。蓝图在品类证据、场景收束、决策默认值和“未实现/未运行”的事实表述上较强，但当前不能作为可执行基线：A19 存在确定性的计数断言错误，A03 的目标与程序断言互相矛盾，P1 的归类重命名/书签编辑缺少 UI 契约与浏览器验收，架构对非数字 categoryId、排序持久化、URL 不可修改和 CSRF 等关键契约不完整；A10 等还缺少重要的保守归一侧负测试。因此产品完整性、架构契约和阶段验收均不能通过。"
+}

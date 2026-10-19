@@ -1,5 +1,22 @@
 const cache = new Map<string, { promise: Promise<unknown>; expires: number }>();
 
+export class AtlasApiError extends Error {
+  readonly status: number;
+  readonly code: string;
+  readonly retryable: boolean;
+  readonly details?: unknown;
+
+  constructor(status: number, message: string, code = `http_${status}`,
+              retryable = false, details?: unknown) {
+    super(message);
+    this.name = "AtlasApiError";
+    this.status = status;
+    this.code = code;
+    this.retryable = retryable;
+    this.details = details;
+  }
+}
+
 export function invalidateAtlasCache() {
   cache.clear();
 }
@@ -7,8 +24,19 @@ export function invalidateAtlasCache() {
 export function fetchJson<T>(url: string): Promise<T> {
   const entry = cache.get(url);
   if (entry && entry.expires > Date.now()) return entry.promise as Promise<T>;
-  const promise = fetch(url, { cache: "no-cache" }).then((response) => {
-    if (!response.ok) throw new Error(`${response.status} ${url}`);
+  const promise = fetch(url, { cache: "no-cache" }).then(async (response) => {
+    if (!response.ok) {
+      const value = await response.json().catch(() => null) as {
+        error?: string; code?: string; retryable?: boolean; details?: unknown;
+      } | null;
+      throw new AtlasApiError(
+        response.status,
+        value?.error || `${response.status} ${url}`,
+        value?.code,
+        value?.retryable,
+        value?.details,
+      );
+    }
     return response.json() as Promise<T>;
   });
   cache.set(url, { promise, expires: Date.now() + 15000 });
@@ -20,8 +48,18 @@ export function fetchJson<T>(url: string): Promise<T> {
 
 async function requestJson<T>(url: string, init: RequestInit): Promise<T> {
   const response = await fetch(url, { ...init, cache: "no-cache" });
-  const value = await response.json().catch(() => null) as { error?: string } | null;
-  if (!response.ok) throw new Error(value?.error || `${response.status} ${url}`);
+  const value = await response.json().catch(() => null) as {
+    error?: string; code?: string; retryable?: boolean; details?: unknown;
+  } | null;
+  if (!response.ok) {
+    throw new AtlasApiError(
+      response.status,
+      value?.error || `${response.status} ${url}`,
+      value?.code,
+      value?.retryable,
+      value?.details,
+    );
+  }
   return value as T;
 }
 
@@ -29,6 +67,7 @@ export interface LeafIndexItem {
   slug: string;
   name: string;
   name_zh: string;
+  aliases_zh?: string[];
   sec: string;
   dc: string;
   dc_zh?: string;
@@ -88,18 +127,46 @@ export interface LeafDetail {
   products_zh?: string;
   sources?: string;
   full_md?: string;
-  relations: { to: string; toName: string; kind: string; distinction: string; distinction_zh?: string }[];
+  relations: {
+    id?: string;
+    to: string;
+    toName: string;
+    toNameZh?: string;
+    toNameEn?: string;
+    kind: string;
+    kindLabelZh?: string;
+    kindLabelEn?: string;
+    distinction: string;
+    distinction_zh?: string;
+  }[];
   apps: { slug: string; name: string }[];
+}
+
+export interface AppClassificationEvidence {
+  source: string;
+  sourceRef: string;
+  method: string;
+  selectedLeaf: string;
+  scores: { leaf: string; score: number }[];
+  sourceSummary?: string;
 }
 
 export interface AppEntry {
   slug: string;
   name: string;
+  nameEn?: string;
+  nameZh?: string;
+  aliases?: string[];
   vendor: string;
   tagline: string;
+  taglineEn?: string;
   tasks: string[];
+  taskLabels?: { zh: string[]; en: string[] };
   leaf: string;
   leafName: string;
+  leafNameZh?: string;
+  leafNameEn?: string;
+  classificationEvidence?: AppClassificationEvidence;
 }
 
 export interface AtlasProject {
@@ -132,6 +199,8 @@ export interface DeleteProjectResult {
   workspace: string;
   workspace_preserved: boolean;
   deleted_records: Record<string, number>;
+  artifacts_removed: string[];
+  artifact_cleanup_errors: Record<string, string>;
 }
 
 export type AtlasSourceKind = "application" | "research";
@@ -327,6 +396,76 @@ export interface ProjectIteration {
   completed_at: string | null;
 }
 
+export interface AcceptanceRequirementBinding {
+  requirement_id?: string;
+  revision?: number;
+  acceptance_conditions?: string[];
+}
+
+export type AcceptanceConditionResultStatus = "passed" | "failed" | "waived";
+
+export interface AcceptanceConditionResult {
+  requirement_id: string;
+  revision: number;
+  condition: string;
+  result: AcceptanceConditionResultStatus;
+  note?: string;
+}
+
+export interface AcceptanceEvidence {
+  kind: string;
+  summary: string;
+  execution_id?: string | null;
+  baseline_id?: string | null;
+  document_version_ids?: string[];
+  requirement_bindings?: AcceptanceRequirementBinding[];
+  condition_results?: AcceptanceConditionResult[];
+  recorded_at?: string;
+  [key: string]: unknown;
+}
+
+export interface LegacyAcceptanceMigrationRecord {
+  task_id: string;
+  acceptance_status: string;
+  status: "complete" | "not_backfilled" | "backfilled" | "needs_review" | "no_conditions" | "invalid";
+  binding_recorded_at?: string | null;
+  expected_condition_count: number;
+  provided_condition_count: number;
+  missing_conditions: Array<{ requirement_id: string; revision: number; condition: string }>;
+}
+
+export interface LegacyAcceptanceMigrationReport {
+  schema: number;
+  project_id: string;
+  dry_run: boolean;
+  transactional: boolean;
+  idempotent: boolean;
+  historical_results_inferred: boolean;
+  generated_at: string;
+  summary: {
+    total_bindings: number;
+    complete: number;
+    not_backfilled: number;
+    backfilled: number;
+    needs_review: number;
+    no_conditions: number;
+    invalid: number;
+  };
+  records: LegacyAcceptanceMigrationRecord[];
+  backfilled_task_ids?: string[];
+  confirmation?: string;
+}
+
+export interface ProjectRequirementSnapshot {
+  requirement_id: string;
+  revision: number;
+  content: string;
+  acceptance_conditions: string[];
+  reference_ids: string[];
+  content_sha256?: string;
+  created_at?: string;
+}
+
 export interface ProjectTask {
   id: string;
   project_id: string;
@@ -339,10 +478,11 @@ export interface ProjectTask {
   timeout_seconds?: number | null;
   execution_status: "planned" | "queued" | "running" | "waiting_permission" | "waiting_input" | "completed" | "failed" | "stopped" | "unknown";
   acceptance_status: "pending" | "passed" | "failed" | "waived";
-  acceptance_evidence: { kind: string; summary: string; [key: string]: unknown }[];
+  acceptance_evidence: AcceptanceEvidence[];
   input_document_versions: string[];
   requirement_ids: string[];
   requirement_revisions?: { requirement_id: string; revision: number }[];
+  requirement_snapshots?: ProjectRequirementSnapshot[];
   created_at: string;
   updated_at: string;
 }
@@ -407,6 +547,7 @@ export interface ProjectExecution {
     error?: string;
     superseded_by_execution_id?: string;
     reason?: string;
+    recovery?: { action: string; status?: string; journal?: string };
   };
   input_state: {
     schema?: number;
@@ -443,6 +584,12 @@ export interface ProjectExecution {
         successful_commands: string[];
         missing_or_failed_commands: string[];
         all_planned_passed: boolean;
+        error?: string;
+      };
+      verification_source?: "atlas_fixed" | "agent_reported";
+      agent_reported_verification?: {
+        tool_calls?: Record<string, unknown>;
+        verification?: Record<string, unknown>;
       };
       completion_report?: {
         reported: boolean;
@@ -698,13 +845,20 @@ export interface ProjectGenerationRun {
 
 export const REL_KIND_ZH: Record<string, string> = {
   adjacent: "相邻",
+  alternative: "替代",
+  authority: "权威",
+  broader: "更宽",
+  complementary: "互补",
+  contrasts: "对照",
+  counterpart: "对应",
+  downstream: "下游",
+  narrower: "更窄",
+  other: "其他",
+  overlaps: "交叠",
   related: "相关",
   sibling: "同类",
-  other: "其他",
+  substrate: "基础承载",
   upstream: "上游",
-  downstream: "下游",
-  overlaps: "交叠",
-  contrasts: "对照",
   variant_of: "变体",
   capability_of: "内嵌能力",
   component_of: "组件",
@@ -715,6 +869,38 @@ export const REL_KIND_ZH: Record<string, string> = {
   enabled_by: "依托",
 };
 
+export const REL_KIND_EN: Record<string, string> = {
+  adjacent: "Adjacent",
+  alternative: "Alternative",
+  authority: "Authority",
+  broader: "Broader",
+  complementary: "Complementary",
+  contrasts: "Contrasts",
+  counterpart: "Counterpart",
+  downstream: "Downstream",
+  narrower: "Narrower",
+  other: "Other",
+  overlaps: "Overlaps",
+  related: "Related",
+  sibling: "Sibling",
+  substrate: "Substrate",
+  upstream: "Upstream",
+  variant_of: "Variant of",
+  capability_of: "Capability of",
+  component_of: "Component of",
+  parent_of: "Parent of",
+  child_of: "Child of",
+  specializes: "Specializes",
+  generalizes: "Generalizes",
+  enabled_by: "Enabled by",
+};
+
+export function relationKindLabel(kind: string, lang: "zh" | "en") {
+  return lang === "zh"
+    ? (REL_KIND_ZH[kind] || kind.replaceAll("_", " "))
+    : (REL_KIND_EN[kind] || kind.replaceAll("_", " "));
+}
+
 export async function getMeta() {
   return fetchJson<Meta>("/data/meta.json");
 }
@@ -722,7 +908,10 @@ export async function getSection(id: string) {
   return fetchJson<SectionData>(`/data/sections/${id}.json`);
 }
 export async function getLeaf(slug: string) {
-  return fetchJson<LeafDetail>(`/data/leaves/${slug}.json`);
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+    throw new Error("invalid type slug");
+  }
+  return fetchJson<LeafDetail>(`/data/leaves/${encodeURIComponent(slug)}.json`);
 }
 export async function getApps() {
   return fetchJson<AppEntry[]>("/data/apps.json");
@@ -783,6 +972,148 @@ export async function createProject(input: CreateProjectInput) {
   invalidateAtlasCache();
   return project;
 }
+export interface ProjectBackupResult {
+  project_id: string;
+  archive_name: string;
+  archive_sha256: string;
+  download_url: string;
+  manifest: {
+    schema: number;
+    project_id: string;
+    created_at: string;
+    project_name?: string;
+    source_workspace_included: boolean;
+    included_artifact_roots?: string[];
+    excluded: string[];
+    files: Record<string, { sha256: string; size: number }>;
+  };
+}
+
+export interface ProjectBackupSummary {
+  name: string;
+  size: number;
+  valid: boolean;
+  error_code?: string;
+  created_at?: string;
+  project_id?: string;
+  project_name?: string;
+  sha256?: string;
+  source_workspace_included?: boolean;
+  included_artifact_roots?: string[];
+  excluded?: string[];
+  file_count?: number;
+  uncompressed_bytes?: number;
+}
+
+export interface ProjectBackupList {
+  project_id: string;
+  backups: ProjectBackupSummary[];
+}
+
+export interface ProjectRestoreTarget {
+  restore_id: string;
+  project_id: string;
+  status: "prepared";
+}
+
+export interface ProjectRestoreResult {
+  restore_id: string;
+  backup_name: string;
+  status: "completed";
+  project_id: string;
+  project: AtlasProject;
+  artifacts_restored_count: number;
+}
+
+export interface ProjectRestoreStatus {
+  restore_id: string;
+  project_id: string;
+  status: "not_started" | "interrupted" | "completed";
+  interrupted: boolean;
+  phase: string;
+  database_installed: boolean;
+  installed_artifact_count: number;
+}
+
+export async function createProjectBackup(projectId: string) {
+  return requestJson<ProjectBackupResult>(
+    `/api/projects/${encodeURIComponent(projectId)}/backup`,
+    { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" },
+  );
+}
+
+export async function listProjectBackups(projectId: string) {
+  return fetchJson<ProjectBackupList>(
+    `/api/projects/${encodeURIComponent(projectId)}/backups`,
+  );
+}
+
+export async function prepareProjectBackupRestore(projectId: string, backupName: string) {
+  return requestJson<ProjectRestoreTarget>(
+    `/api/projects/${encodeURIComponent(projectId)}/backups/${encodeURIComponent(backupName)}/restore-target`,
+    { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" },
+  );
+}
+
+export async function restoreProjectBackup(
+  projectId: string,
+  backupName: string,
+  restoreId: string,
+) {
+  return requestJson<ProjectRestoreResult>(
+    `/api/projects/${encodeURIComponent(projectId)}/backups/${encodeURIComponent(backupName)}/restore`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        restore_id: restoreId,
+        confirm: "restore_to_new_store",
+      }),
+    },
+  );
+}
+
+export interface ProjectBackupDeleteResult {
+  project_id: string;
+  name: string;
+  deleted: boolean;
+}
+
+export interface ProjectRestoreRecoveryResult {
+  restore_id: string;
+  project_id: string;
+  status: "recovered";
+  removed_count: number;
+}
+
+export async function getProjectRestoreStatus(projectId: string, restoreId: string) {
+  return fetchJson<ProjectRestoreStatus>(
+    `/api/projects/${encodeURIComponent(projectId)}/restore-status/${encodeURIComponent(restoreId)}`,
+  );
+}
+
+export async function deleteProjectBackup(projectId: string, backupName: string) {
+  return requestJson<ProjectBackupDeleteResult>(
+    `/api/projects/${encodeURIComponent(projectId)}/backups/${encodeURIComponent(backupName)}`,
+    {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ confirm: "delete_backup" }),
+    },
+  );
+}
+
+export async function recoverProjectRestore(projectId: string, restoreId: string) {
+  return requestJson<ProjectRestoreRecoveryResult>(
+    `/api/projects/${encodeURIComponent(projectId)}/restore-status/${encodeURIComponent(restoreId)}/recover`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ confirm: "cleanup_partial_restore" }),
+    },
+  );
+}
+
 export async function deleteProject(projectId: string) {
   const result = await requestJson<DeleteProjectResult>(
     `/api/projects/${encodeURIComponent(projectId)}`,
@@ -806,6 +1137,7 @@ export async function saveProjectReference(projectId: string, input: {
   section?: string;
   note?: string;
   read_status?: ProjectReference["read_status"];
+  expected_fingerprint?: string;
 }) {
   const reference = await requestJson<ProjectReference>(
     `/api/projects/${encodeURIComponent(projectId)}/references`,
@@ -896,7 +1228,7 @@ export async function updateProjectRequirement(
 export async function confirmProjectRequirement(
   projectId: string,
   requirementId: string,
-  input: { scope: ProjectScope; reason: string },
+  input: { scope: ProjectScope; reason: string; expected_revision: number },
 ) {
   const result = await requestJson<ProjectRequirement>(
     `/api/projects/${encodeURIComponent(projectId)}/requirements/${encodeURIComponent(requirementId)}/confirm`, {
@@ -959,7 +1291,7 @@ export async function getProjectDocumentDiff(projectId: string, documentId: stri
 export async function reviewProjectDocument(
   projectId: string,
   documentId: string,
-  input: { status: "approved" | "rejected"; note?: string },
+  input: { status: "approved" | "rejected"; note?: string; expected_current_version: number },
 ) {
   const result = await requestJson<ProjectDocument>(
     `/api/projects/${encodeURIComponent(projectId)}/documents/${encodeURIComponent(documentId)}/review`, {
@@ -995,8 +1327,26 @@ export async function exportProject(projectId: string) {
   });
 }
 
+/** No-store variant that still surfaces the API's structured error payload. */
+async function fetchJsonNoStore<T>(url: string): Promise<T> {
+  const response = await fetch(url, { cache: "no-store" });
+  const value = await response.json().catch(() => null) as {
+    error?: string; code?: string; retryable?: boolean; details?: unknown;
+  } | null;
+  if (!response.ok) {
+    throw new AtlasApiError(
+      response.status,
+      value?.error || `${response.status} ${url}`,
+      value?.code,
+      value?.retryable,
+      value?.details,
+    );
+  }
+  return value as T;
+}
+
 export async function listProjectGenerations(projectId: string) {
-  return fetchJson<ProjectGenerationRun[]>(
+  return fetchJsonNoStore<ProjectGenerationRun[]>(
     `/api/projects/${encodeURIComponent(projectId)}/generation-runs`);
 }
 
@@ -1103,10 +1453,10 @@ export async function startProjectExecution(
   return result;
 }
 
-export async function getProjectExecution(projectId: string, executionId: string) {
+export async function reconcileProjectExecution(projectId: string, executionId: string) {
   return requestJson<ProjectExecution>(
-    `/api/projects/${encodeURIComponent(projectId)}/executions/${encodeURIComponent(executionId)}`,
-    { method: "GET" });
+    `/api/projects/${encodeURIComponent(projectId)}/executions/${encodeURIComponent(executionId)}/reconcile`,
+    { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
 }
 
 export async function stopProjectExecution(projectId: string, executionId: string) {
@@ -1144,6 +1494,19 @@ export async function applyProjectExecutionResult(
   return result;
 }
 
+export async function recoverProjectExecutionApply(
+  projectId: string,
+  executionId: string,
+) {
+  const result = await requestJson<ProjectExecution>(
+    `/api/projects/${encodeURIComponent(projectId)}/executions/${encodeURIComponent(executionId)}/recover-apply`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "restore_before", confirm: executionId }),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+
 export async function cleanupProjectExecution(
   projectId: string,
   executionId: string,
@@ -1159,7 +1522,7 @@ export async function cleanupProjectExecution(
 export async function replyProjectExecutionPermission(
   projectId: string,
   executionId: string,
-  input: { request_id: string; reply: "once" | "always" | "reject"; message?: string },
+  input: { request_id: string; reply: "once" | "reject"; message?: string },
 ) {
   return requestJson<ProjectExecution>(
     `/api/projects/${encodeURIComponent(projectId)}/executions/${encodeURIComponent(executionId)}/permission`, {
@@ -1194,10 +1557,255 @@ export async function rebaseProjectIteration(
   return result;
 }
 
+export async function getLegacyAcceptanceMigration(projectId: string) {
+  return fetchJson<LegacyAcceptanceMigrationReport>(
+    `/api/projects/${encodeURIComponent(projectId)}/acceptance-migration`,
+  );
+}
+
+export async function backfillLegacyAcceptance(projectId: string) {
+  const result = await requestJson<LegacyAcceptanceMigrationReport>(
+    `/api/projects/${encodeURIComponent(projectId)}/acceptance-migration/backfill`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ confirm: "backfill_legacy_acceptance_metadata" }),
+    },
+  );
+  invalidateAtlasCache();
+  return result;
+}
+
+export interface AskStep {
+  index: number;
+  tool: string;
+  arguments?: Record<string, unknown>;
+  summary: string;
+  error?: boolean;
+  result?: unknown;
+}
+
+export interface AskCitation {
+  slug: string;
+  name_zh: string;
+}
+
+export interface AskUsage {
+  prompt_tokens: number | null;
+  completion_tokens: number | null;
+  total_tokens: number | null;
+  cost: number | null;
+}
+
+export type AskStatus =
+  | "completed" | "timeout" | "token_limit" | "turn_limit"
+  | "provider_error" | "no_answer" | "failed";
+
+export interface AskMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  created_at: string;
+  status?: AskStatus;
+  error?: string;
+  steps?: AskStep[];
+  citations?: AskCitation[];
+  usage?: AskUsage | null;
+}
+
+export interface AskThread {
+  id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  messages: AskMessage[];
+  running: boolean;
+  model?: {
+    configured: boolean;
+    provider: string | null;
+    model: string | null;
+    reason: string | null;
+  };
+}
+
+export interface AskThreadSummary {
+  id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  message_count: number;
+  running: boolean;
+  excerpt: string;
+}
+
+export async function listAskThreads() {
+  return fetchJsonNoStore<AskThreadSummary[]>("/api/ask/threads");
+}
+
+export async function createAskThread(title = "") {
+  const result = await requestJson<AskThread>("/api/ask/threads", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title }),
+  });
+  invalidateAtlasCache();
+  return result;
+}
+
+export async function getAskThread(threadId: string) {
+  return fetchJsonNoStore<AskThread>(
+    `/api/ask/threads/${encodeURIComponent(threadId)}`);
+}
+
+export async function askQuestion(threadId: string, content: string) {
+  return requestJson<{ id: string; status: string }>(
+    `/api/ask/threads/${encodeURIComponent(threadId)}/messages`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content }),
+    });
+}
+
+export async function deleteAskThread(threadId: string) {
+  const result = await requestJson<{ id: string; deleted: boolean }>(
+    `/api/ask/threads/${encodeURIComponent(threadId)}`, {
+      method: "DELETE", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ confirm: "delete_ask_thread" }),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+
+export interface ModelProvider {
+  id: string;
+  name: string;
+  preset: string;
+  style: "openai" | "anthropic";
+  base_url: string;
+  models: string[];
+  has_key: boolean;
+  key_masked: string;
+  updated_at: string;
+}
+
+export interface ModelPreset {
+  name: string;
+  style: "openai" | "anthropic";
+  base_url: string;
+  models: string[];
+}
+
+export interface ResolvedModel {
+  configured: boolean;
+  reason?: string;
+  provider?: string;
+  provider_name?: string;
+  model?: string;
+  source?: string;
+  base_url?: string;
+}
+
+export interface ModelSettings {
+  providers: ModelProvider[];
+  default: { provider: string | null; model: string | null };
+  embedding: { provider: string; base_url: string; model: string };
+  presets: Record<string, ModelPreset>;
+  resolved: ResolvedModel;
+  embeddings: { id: string; name: string; base_url: string; model: string }[];
+}
+
+export interface ProviderTestResult {
+  id: string;
+  ok: boolean;
+  models: string[];
+  model_count: number;
+  error: string | null;
+  code: string | null;
+  latency_ms: number;
+}
+
+export interface ProviderInput {
+  id?: string;
+  preset?: string;
+  name?: string;
+  style?: "openai" | "anthropic";
+  base_url?: string;
+  api_key?: string | null;
+  models?: string[];
+}
+
+export async function getModelSettings() {
+  return fetchJson<ModelSettings>("/api/settings/model");
+}
+
+export async function saveModelProvider(input: ProviderInput) {
+  const result = await requestJson<ModelProvider>("/api/settings/model/providers", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  invalidateAtlasCache();
+  return result;
+}
+
+export async function deleteModelProvider(providerId: string) {
+  const result = await requestJson<{ id: string; deleted: boolean }>(
+    `/api/settings/model/providers/${encodeURIComponent(providerId)}`,
+    {
+      method: "DELETE", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ confirm: "delete_model_provider" }),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+
+export async function testModelProvider(providerId: string) {
+  return requestJson<ProviderTestResult>(
+    `/api/settings/model/providers/${encodeURIComponent(providerId)}/test`,
+    { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+}
+
+export async function listProviderModels(providerId: string) {
+  return fetchJson<{ id: string; models: string[] }>(
+    `/api/settings/model/providers/${encodeURIComponent(providerId)}/models`);
+}
+
+export async function setDefaultModel(provider: string | null, model: string | null) {
+  const result = await requestJson<{ provider: string | null; model: string | null }>(
+    "/api/settings/model/default", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ provider, model }),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+
+export async function setEmbeddingEndpoint(input: {
+  provider?: string; base_url?: string; model?: string;
+}) {
+  const result = await requestJson<{ provider: string; base_url: string; model: string }>(
+    "/api/settings/model/embedding", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+  invalidateAtlasCache();
+  return result;
+}
+
+export async function importOpencodeCredentials() {
+  const result = await requestJson<{ imported: string[]; count: number }>(
+    "/api/settings/model/import", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: "{}",
+    });
+  invalidateAtlasCache();
+  return result;
+}
+
 export async function recordProjectTaskAcceptance(
   projectId: string,
   taskId: string,
-  input: { status: "passed" | "failed" | "waived"; evidence: { kind: string; summary: string }[] },
+  input: {
+    status: "passed" | "failed" | "waived";
+    evidence: { kind: string; summary: string }[];
+    condition_results?: AcceptanceConditionResult[];
+  },
 ) {
   const result = await requestJson<ProjectTask>(
     `/api/projects/${encodeURIComponent(projectId)}/tasks/${encodeURIComponent(taskId)}/acceptance`, {

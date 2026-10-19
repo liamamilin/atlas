@@ -13,7 +13,7 @@ import {
 import { useLang, t } from "@/lib/lang";
 import { useCurrentProjectId } from "@/lib/project-selection";
 
-export function SourceReader({ slug }: { slug: string }) {
+export function SourceReader({ slug, fallbackMarkdown }: { slug: string; fallbackMarkdown?: string }) {
   const { lang } = useLang();
   const [projectId] = useCurrentProjectId();
   const [kind, setKind] = useState<AtlasSourceKind>("application");
@@ -54,6 +54,7 @@ export function SourceReader({ slug }: { slug: string }) {
         section: section || undefined,
         note,
         read_status: "read",
+        expected_fingerprint: source.fingerprint,
       });
       setSaveState({
         ok: true,
@@ -69,9 +70,25 @@ export function SourceReader({ slug }: { slug: string }) {
     }
   };
 
-  if (manifestState.loading && !manifestState.data) return <Loading />;
+  if (manifestState.loading && !manifestState.data && !fallbackMarkdown) return <Loading />;
+  if (fallbackMarkdown && (manifestState.error || !manifestState.data || manifestState.data.sources.length === 0)) {
+    return <StaticSource markdown={fallbackMarkdown} lang={lang} />;
+  }
   if (manifestState.error || !manifestState.data) {
-    return <ErrorBox message={manifestState.error || t("sourceUnavailable", lang)} />;
+    return (
+      <section className="mt-8 rounded-xl bg-surface p-5 text-sm text-muted shadow-card">
+        <h2 className="font-serif text-xl font-medium">{lang === "zh" ? "正式资料阅读器" : "Canonical source reader"}</h2>
+        <p className="mt-2">{t("sourceUnavailable", lang)}</p>
+      </section>
+    );
+  }
+  if (manifestState.data.sources.length === 0) {
+    return (
+      <section className="mt-8 rounded-xl bg-surface p-5 text-sm text-muted shadow-card">
+        <h2 className="font-serif text-xl font-medium">{lang === "zh" ? "正式资料阅读器" : "Canonical source reader"}</h2>
+        <p className="mt-2">{lang === "zh" ? "该类型暂无正式 Markdown 资料。" : "No canonical Markdown is available for this type yet."}</p>
+      </section>
+    );
   }
 
   return (
@@ -93,6 +110,9 @@ export function SourceReader({ slug }: { slug: string }) {
             <button
               key={item.kind}
               type="button"
+              role="tab"
+              aria-selected={kind === item.kind}
+              aria-controls={`source-panel-${item.kind}`}
               disabled={saving}
               onClick={() => { setKind(item.kind); setSection(""); setSaveState(null); }}
               className={`rounded-md px-3 py-1.5 text-xs font-medium ${kind === item.kind ? "bg-surface text-primary shadow-card" : "text-muted"}`}
@@ -130,8 +150,8 @@ export function SourceReader({ slug }: { slug: string }) {
 
       {contentState.loading ? <Loading>{lang === "zh" ? "读取正式资料中…" : "Reading source…"}</Loading> :
         contentState.error ? <ErrorBox message={contentState.error} /> : contentState.data ? (
-          <div className="mt-5 max-h-[42rem] overflow-y-auto rounded-lg border border-border bg-bg-elevated p-5">
-            <Prose md={contentState.data.content} />
+          <div id={`source-panel-${kind}`} role="tabpanel" className="mt-5 max-h-[42rem] overflow-y-auto rounded-lg border border-border bg-bg-elevated p-5">
+            <Prose md={contentState.data.content} resolveTypeLinks />
           </div>
         ) : null}
 
@@ -167,6 +187,24 @@ export function SourceReader({ slug }: { slug: string }) {
             {saveState.ok ? <CheckCircle2 className="size-4" /> : null}{saveState.message}
           </p>
         ) : null}
+      </div>
+    </section>
+  );
+}
+
+function StaticSource({ markdown, lang }: { markdown: string; lang: "zh" | "en" }) {
+  return (
+    <section className="mt-8 rounded-xl bg-surface p-5 shadow-card">
+      <div className="flex flex-wrap items-center gap-2">
+        <BookOpen className="size-5 text-primary" />
+        <h2 className="font-serif text-xl font-medium">{lang === "zh" ? "正式资料阅读器" : "Canonical source reader"}</h2>
+        <span className="rounded-full bg-chip px-2 py-0.5 text-[11px] text-muted">{lang === "zh" ? "静态资料" : "Static source"}</span>
+      </div>
+      <p className="mt-2 text-xs leading-5 text-subtle">
+        {lang === "zh" ? "本地 API 不可用，以下为构建时生成的正式正文快照。" : "The local API is unavailable; this is the canonical snapshot generated at build time."}
+      </p>
+      <div className="mt-5 max-h-[42rem] overflow-y-auto rounded-lg border border-border bg-bg-elevated p-5">
+        <Prose md={markdown} resolveTypeLinks />
       </div>
     </section>
   );

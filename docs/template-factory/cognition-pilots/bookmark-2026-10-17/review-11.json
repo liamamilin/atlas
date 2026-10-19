@@ -1,0 +1,94 @@
+{
+  "summary": "静态审阅范围是 P0–P2 的单人本地书签库。产品范围、决策、架构与来源证据整体自洽，保存、持久化、归类、回收站与检索主流程均有实质验收；但 P1 的 HTML 破坏性表单缺少绕过前端 JS 后的服务器端确认验收，这是重要的安全与数据完整性负路径缺口，因此不能把当前验收视为通过。本次未运行任何程序、未启动目标、未执行浏览器或重启适配器，所有运行结果仍未知。",
+  "checks": [
+    {
+      "dimension": "category_evidence",
+      "outcome": "passed",
+      "files": [
+        "CATEGORY.md",
+        "PRODUCT.md"
+      ],
+      "reason": "CATEGORY.md 的 S01–S23 列出可核对 URL、访问日期与许可，其中 linkding 为 MIT，Linkwarden 与 Karakeep 为 AGPL-3.0，并把多来源一致的类别事实、面向本场景的建议和待验证项分开；S17–S23 明确标注仅有搜索摘要，未知项单独列出，没有断言未核实的价格或默认值。PRODUCT.md 将导出、导入、元数据抓取与更强 URL 归一标为 later 或 decision needed，未把建议冒充既有事实。"
+    },
+    {
+      "dimension": "scenario_scope",
+      "outcome": "passed",
+      "files": [
+        "PRODUCT.md",
+        "CATEGORY.md",
+        "DECISIONS.md"
+      ],
+      "reason": "PRODUCT.md 的 R01–R03 与场景四条验收对应：主动保存、URL 锚定、跨会话累积、归类移动或新建、归类浏览或关键字检索、打开原页；单人本地库、无公开分享、无协作、无账号被明确声明，跨设备同步留给未来 D06 触发条件。范围没有把阅读队列、快照、团队协作或内容策展硬塞进当前场景。"
+    },
+    {
+      "dimension": "product_completeness",
+      "outcome": "passed",
+      "files": [
+        "PRODUCT.md",
+        "DECISIONS.md",
+        "ARCHITECTURE.md"
+      ],
+      "reason": "R01、R02 与明确不存在的 R03 覆盖了相关用户；F01–F14 覆盖保存、持久化、默认归类、列表、打开、去重、归类生命周期、回收站、恢复、永久删除、编辑、检索与浏览，失败路径和零写入规则也有定义；回收站不过期、归类 tombstone、备份边界与默认私有均有说明。F15、F16 的导出导入明确列为 P3 later，F20–F23 的快照、全文检索、失效扫描和公开分享明确不适用，F18、F19 有决策触发条件，没有把不适用企业能力当作本期必需。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "outcome": "passed",
+      "files": [
+        "ARCHITECTURE.md",
+        "DECISIONS.md"
+      ],
+      "reason": "ARCHITECTURE.md 定义了 SQLite 表、索引与不变量，默认归类与 tombstone，单一归属，URL 校验顺序与保守归一，资源 ID 十进制字符串，统一错误信封，JSON 与 HTML 写路由，302 Location 的 WHATWG 序列化，检索、排序与分页参数，Host/Origin/Fetch 边界，basePath，重启 adapter 与破坏性确认；§1、§2 说明了技术栈和访问边界的默认值及理由。凭据只用于 HTTP runner 的配置目标 origin/basePath，浏览器前置拒绝认证头，日志不记录 URL query 或凭据；未发现与 PRODUCT 和 DECISIONS 冲突的契约。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "outcome": "blocked",
+      "files": [
+        "ROADMAP.md",
+        "acceptance/plan.json",
+        "acceptance/ui-p1.cjs",
+        "acceptance/p1-categories.cjs",
+        "acceptance/p1-trash.cjs",
+        "acceptance/p1-edit.cjs"
+      ],
+      "reason": "阶段顺序 P0→P1→P2 与 F01–F14 的引入阶段基本对应，plan.json 的 33 个用例均映射到 features，P0 不调用 P1/P2 写接口，P2 仅依赖已交付的 P1 PATCH，A01–A33 有实质断言而非空桩。但 HTML 破坏性路径存在重要负路径缺口：A30 对单条永久删除、清空回收站和 purge 的未确认状态只验证前端 JS 本地拦截，见 ui-p1.cjs 的 clickPurgeUnchecked 与 deleteTrashItemViaUi；A15、A18 只覆盖 JSON API 的 confirm；A20 的坏头探针在安全中间件处先被拒绝，无法证明无 JS 或直接 POST 时服务器仍会拒绝。A30 还明确不执行确认清空，因此 /trash/clear 的表单 action、303 与成功清空路径只有 A18 的 API 覆盖，UI 正例仍未被验证。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "outcome": "passed",
+      "files": [
+        "DECISIONS.md",
+        "AGENT.md"
+      ],
+      "reason": "D01–D09 均给出默认选择、理由、影响面和 when-to-ask：重复保存默认阻止并提供显式 allowDuplicate，删除归类必须选择 mode 并在 purge 时确认，默认不抓取元数据，URL 只做保守归一，单用户无账号，回收站不过期，导入导出留在 P3，浏览器与重启适配边界明确。没有用模糊的“视情况”代替默认值；proposed 状态与 AGENT.md 要求把设计建议视为待采纳而非用户已确认一致。"
+    },
+    {
+      "dimension": "agent_handoff",
+      "outcome": "passed",
+      "files": [
+        "AGENT.md",
+        "README.md",
+        "ROADMAP.md"
+      ],
+      "reason": "AGENT.md 要求先核对已有项目、指令与用户决定，再阅读 PRODUCT、DECISIONS、ARCHITECTURE、ROADMAP；按当前阶段实现完整用户闭环，把 proposed 当作建议而非已确认结论，普通可逆选择使用已声明默认值并记录，关键取舍按决策触发条件询问用户；准备专用测试实例运行该阶段 HTTP 或浏览器验收，记录实际命令、目标版本、通过、失败与未完成，并明确不得删除行为断言、硬编码测试值或声称未运行测试通过。README.md 与 ROADMAP.md 给出了相同的阅读顺序和阶段边界。"
+    },
+    {
+      "dimension": "evidence_honesty",
+      "outcome": "passed",
+      "files": [
+        "README.md",
+        "VALIDATION.md",
+        "ARCHITECTURE.md",
+        "acceptance/README.md",
+        "acceptance/plan.json"
+      ],
+      "reason": "README.md 明确当前是认知开发包候选而非已实现应用；VALIDATION.md 说明 Atlas 只校验结构、引用、阶段映射与文件摘要；ARCHITECTURE.md 与 acceptance/README.md 声明 P0–P2 为 not implemented、A01–A33 为 not_run，plan.json 的状态也一致。没有把静态审阅、候选程序或文件存在说成执行通过；CATEGORY.md 对搜索摘要、未抓取正文和未知项作了标注，并将叶子原稿研究日期与来源访问日期区分说明，没有要求改写不可变输入日期。"
+    }
+  ],
+  "suggestions": [
+    "在 P1 增加一个不依赖前端 JS 的服务器端确认负例，可扩展现有 A30 或新增用例：携带正确 Host 与 Origin，直接 POST /trash/{id}/delete、/trash/clear 和 /categories/{id}/delete?mode=purge 且不带 confirm，断言 4xx、回收站与归类记录零变化，并断言 purge 表单不会提交 targetCategoryId。",
+    "在专用实例补充 /trash/clear 的确认正例：勾选确认并提交 confirm=true，断言 303 到 /trash、清空数量与 active、trashed、total 计数符合契约；如果仍保留为手工项，应在验收记录中明确未运行，不能计为通过。",
+    "补齐契约已写但验收未直接断言的 UI 细节：GET /c/{unknown} 返回 404，空态使用 data-empty-kind=category、data-empty-kind=search、data-empty-kind=trash，以及空库只作手工核对时的状态记录；这些可放入现有阶段，不必新增阶段。",
+    "补充低风险但明确的契约测试：已 tombstone 的归类名称可复用、手填标题首尾空白应被 trim、子路径部署下 openPath 固定为 /b/{id} 而 HTML href 带 PUBLIC_BASE_PATH。",
+    "P3 导出导入继续保持 later，同时在用户可见说明中写明导出仅含元数据、不含图标、预览或页面副本；当前不要在任何文档或验收中宣称已具备导出导入能力。"
+  ]
+}

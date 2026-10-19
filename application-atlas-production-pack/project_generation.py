@@ -5,20 +5,28 @@ replaceable runner used to produce a proposal from that input.
 """
 from __future__ import annotations
 
+from contextlib import contextmanager
 from datetime import datetime, timezone
 import difflib
+import errno
+import fcntl
 import hashlib
 import json
 import os
 from pathlib import Path
 import re
 import shutil
+import stat
 import subprocess
 import threading
 import tempfile
 import uuid
 
 from atlas_runtime import atomic_json, atomic_write
+from opencode_permissions import (
+    detect_opencode_major_version, execution_permission_config,
+)
+from privacy import redact_text
 from project_baseline import check_project_changes, latest_project_baseline, transient_summary
 from project_store import ProjectStoreError
 from project_workflow import DOCUMENT_KINDS
@@ -52,7 +60,70 @@ DOCUMENT_DEPENDENCIES = {
 }
 MAX_INPUT_CHARS = 500_000
 MAX_RESULT_BYTES = 2_000_000
+_GENERATION_SNAPSHOT_MAX_HASH_BYTES = 4_000_000
+_GENERATION_SNAPSHOT_IGNORED_DIRS = {
+    '.git', '.venv', 'node_modules', '__pycache__', '.pytest_cache',
+    'dist', 'build', 'coverage',
+}
 _STATE_LOCK = threading.RLock()
+_LIFECYCLE_LOCKS: dict[str, threading.RLock] = {}
+_LIFECYCLE_LOCKS_GUARD = threading.Lock()
+
+
+class ProjectLifecycleBusy(ProjectStoreError):
+    """Another process or thread owns the project's generation lifecycle."""
+
+
+def _lifecycle_thread_lock(project_id: str) -> threading.RLock:
+    with _LIFECYCLE_LOCKS_GUARD:
+        return _LIFECYCLE_LOCKS.setdefault(project_id, threading.RLock())
+
+
+@contextmanager
+def project_lifecycle_lock(store, project_id: str, blocking: bool = True):
+    """Serialize generation and destructive project lifecycle operations.
+
+    The thread lock avoids intra-process races; the adjacent lock file also
+    protects against a second Atlas process. A non-blocking delete fails
+    closed while an engine run owns the project instead of waiting and then
+    deleting a project the user did not see complete.
+    """
+    if not re.fullmatch(r"prj_[A-Za-z0-9]+", project_id):
+        raise ProjectStoreError("project id is invalid")
+    thread_lock = _lifecycle_thread_lock(project_id)
+    acquired = thread_lock.acquire(blocking=blocking)
+    if not acquired:
+        raise ProjectLifecycleBusy("project has an active generation or lifecycle operation")
+    stream = None
+    try:
+        lock_root = store.path.parent / "runtime" / "project-lifecycle"
+        if any(parent.is_symlink() for parent in (lock_root.parent, lock_root)):
+            raise ProjectStoreError("project lifecycle lock root is a symlink")
+        lock_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+        os.chmod(lock_root, 0o700)
+        lock_path = lock_root / f"{project_id}.lock"
+        if lock_path.is_symlink():
+            raise ProjectStoreError("project lifecycle lock is a symlink")
+        stream = lock_path.open("a+")
+        os.chmod(lock_path, 0o600)
+        flags = fcntl.LOCK_EX if blocking else fcntl.LOCK_EX | fcntl.LOCK_NB
+        try:
+            fcntl.flock(stream.fileno(), flags)
+        except OSError as error:
+            if not blocking and error.errno in {errno.EACCES, errno.EAGAIN}:
+                raise ProjectLifecycleBusy(
+                    "project has an active generation or lifecycle operation") from error
+            raise
+        yield
+    finally:
+        if stream is not None:
+            try:
+                fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
+            finally:
+                stream.close()
+        thread_lock.release()
+
+
 IMPROVEMENT_SECTIONS = (
     "Current behavior / 当前行为",
     "Expected behavior / 期望行为",
@@ -75,21 +146,48 @@ VALUE_SECTIONS = (
 
 
 def _basis_fingerprint(store, project_id: str, mode: str,
-                       exclude_requirement_ids: set[str] | None = None) -> str:
+                       exclude_requirement_ids: set[str] | None = None,
+                       applied_document_versions: dict[str, str] | None = None) -> str:
     excluded = exclude_requirement_ids or set()
+    expected_documents = applied_document_versions or {}
+    project = store.get_project(project_id)
     references = sorted(
-        (item["id"], item["source_version"], item["note"], item["read_status"])
+        (item["id"], item["source_kind"], item["source_ref"], item["source_version"],
+         item["locator"], item["note"], item["read_status"])
         for item in store.list_references(project_id))
-    requirements = sorted(
-        (item["id"], item.get("revision"))
-        for item in store.list_requirements(project_id)
-        if item["id"] not in excluded)
-    decisions = sorted(item["id"] for item in store.list_decisions(project_id))
-    payload = {"references": references, "requirements": requirements,
-               "decisions": decisions}
+    requirements = []
+    for item in store.list_requirements(project_id):
+        if item["id"] in excluded:
+            continue
+        if mode in {"documents", "revision"} and item["confirmed_scope"] != "current":
+            continue
+        requirements.append((
+            item["id"], item.get("revision"), item["recommended_scope"],
+            item["recommendation_reason"], item["confirmed_scope"],
+            item["confirmation_reason"]))
+    decisions = sorted(
+        (item["id"], item["statement"], item["rationale"],
+         tuple(item["reference_ids"]))
+        for item in store.list_decisions(project_id))
+    documents = []
+    for item in store.list_documents(project_id):
+        if expected_documents.get(item["id"]) == item["version_id"]:
+            continue
+        documents.append((
+            item["id"], item["version_id"], item["current_version"],
+            item["content_sha256"], item["kind"], item["title"],
+            item["review"]["status"], item["review"]["approval"]))
+    payload = {
+        "project": (project["id"], project["name"], project["objective"], project["mode"]),
+        "references": references,
+        "requirements": sorted(requirements),
+        "decisions": decisions,
+        "documents": sorted(documents),
+    }
     if mode == "improvement":
         baseline = latest_project_baseline(store, project_id)
-        payload["baseline_id"] = baseline["id"] if baseline else None
+        payload["workspace_baseline"] = (
+            (baseline["id"], baseline["fingerprint"]) if baseline else None)
     serialized = json.dumps(payload, ensure_ascii=False, sort_keys=True,
                             separators=(",", ":"))
     return hashlib.sha256(serialized.encode()).hexdigest()
@@ -99,11 +197,22 @@ def generation_staleness(store, project_id: str, run: dict) -> dict:
     recorded = run.get("basis_fingerprint")
     if not recorded:
         return {"known": False, "stale": False}
-    excluded = {row["requirement_id"]
-                for row in store.list_generation_receipts(run["id"])
-                if row.get("requirement_id")}
+    receipts = store.list_generation_receipts(run["id"])
+    requirement_revisions = {
+        item["id"]: item.get("revision") for item in store.list_requirements(project_id)}
+    excluded = {
+        row["requirement_id"] for row in receipts
+        if row.get("requirement_id")
+        and requirement_revisions.get(row["requirement_id"]) == 1
+    }
+    applied_documents = {
+        row["document_id"]: row["version_id"] for row in receipts
+        if row.get("document_id") and row.get("version_id")
+    }
     current = _basis_fingerprint(
-        store, project_id, run.get("mode", ""), exclude_requirement_ids=excluded)
+        store, project_id, run.get("mode", ""),
+        exclude_requirement_ids=excluded,
+        applied_document_versions=applied_documents)
     return {"known": True, "stale": current != recorded}
 
 
@@ -112,6 +221,17 @@ def prepare_generation(store, project_id: str, mode: str,
                        model: str = "", improvement_goal: str = "",
                        document_id: str = "", section_heading: str = "",
                        revision_instruction: str = "") -> dict:
+    with project_lifecycle_lock(store, project_id):
+        return _prepare_generation_unlocked(
+            store, project_id, mode, document_kinds, model, improvement_goal,
+            document_id, section_heading, revision_instruction)
+
+
+def _prepare_generation_unlocked(store, project_id: str, mode: str,
+                                document_kinds: list[str] | None = None,
+                                model: str = "", improvement_goal: str = "",
+                                document_id: str = "", section_heading: str = "",
+                                revision_instruction: str = "") -> dict:
     if mode not in MODES:
         raise ValueError("mode must be analysis, value, documents, improvement, or revision")
     if not isinstance(model, str):
@@ -155,6 +275,7 @@ def prepare_generation(store, project_id: str, mode: str,
         "result": None,
         "applied": {"requirements": {}, "documents": {}},
         "error": "",
+        "error_code": "",
         "engine_session_id": None,
         "created_at": now,
         "updated_at": now,
@@ -502,6 +623,24 @@ def render_generation_input(request: dict) -> str:
 
 
 def execute_generation(store, project_id: str, run_id: str, runner=None) -> dict:
+    with project_lifecycle_lock(store, project_id):
+        return _execute_generation_unlocked(store, project_id, run_id, runner)
+
+
+def _generation_error_code(error: BaseException) -> str:
+    if isinstance(error, TimeoutError):
+        return "provider_timeout"
+    if isinstance(error, ValueError):
+        return "invalid_result"
+    if isinstance(error, ProjectStoreError):
+        return "project_state"
+    text = str(error).lower()
+    if "opencode" in text or "provider" in text or "engine" in text:
+        return "provider_error"
+    return "generation_error"
+
+
+def _execute_generation_unlocked(store, project_id: str, run_id: str, runner=None) -> dict:
     directory = _run_directory(store, project_id, run_id)
     run = read_generation(store, project_id, run_id)
     if run["status"] != "queued":
@@ -515,9 +654,10 @@ def execute_generation(store, project_id: str, run_id: str, runner=None) -> dict
         if request["mode"] == "improvement":
             _ensure_improvement_workspace(store, project_id, request)
     except BaseException as error:
-        _update_run(directory, run, status="failed", error=str(error))
+        _update_run(directory, run, status="failed", error=str(error),
+                    error_code=_generation_error_code(error))
         raise
-    _update_run(directory, run, status="running", error="")
+    _update_run(directory, run, status="running", error="", error_code="")
     try:
         result, metadata = (runner or _run_opencode)(directory, run)
         validated = validate_generation_result(request, result)
@@ -525,7 +665,8 @@ def execute_generation(store, project_id: str, run_id: str, runner=None) -> dict
             directory, run, status="completed", result=validated,
             engine_session_id=metadata.get("engine_session_id"), error="")
     except BaseException as error:
-        _update_run(directory, run, status="failed", error=str(error))
+        _update_run(directory, run, status="failed", error=str(error),
+                    error_code=_generation_error_code(error))
         raise
 
 
@@ -549,8 +690,9 @@ def list_generations(store, project_id: str) -> list[dict]:
             run = json.loads(path.read_text())
             if run.get("project_id") == project_id and run.get("status") in RUN_STATES:
                 runs.append(run)
-        except (OSError, ValueError):
-            continue
+        except (OSError, ValueError) as error:
+            raise ProjectStoreError(
+                f"generation run {path.parent.name} is unreadable") from error
     return sorted(runs, key=lambda item: (item["created_at"], item["id"]), reverse=True)
 
 
@@ -560,13 +702,22 @@ def mark_generation_interrupted(store, project_id: str, run_id: str) -> dict:
     if run["status"] in {"queued", "running"}:
         return _update_run(
             directory, run, status="failed",
-            error="The API process stopped before this generation run finished. Start a new run.")
+            error="The API process stopped before this generation run finished. Start a new run.",
+            error_code="process_interrupted")
     return run
 
 
 def apply_generation_item(store, project_id: str, run_id: str,
                           item_kind: str, index: int,
                           confirm_stale: bool = False) -> dict:
+    with project_lifecycle_lock(store, project_id):
+        return _apply_generation_item_unlocked(
+            store, project_id, run_id, item_kind, index, confirm_stale)
+
+
+def _apply_generation_item_unlocked(store, project_id: str, run_id: str,
+                                   item_kind: str, index: int,
+                                   confirm_stale: bool = False) -> dict:
     if item_kind not in {"requirement", "document"}:
         raise ValueError("item_kind must be requirement or document")
     if not isinstance(index, int) or isinstance(index, bool) or index < 0:
@@ -578,10 +729,12 @@ def apply_generation_item(store, project_id: str, run_id: str,
         run = read_generation(store, project_id, run_id)
         if run["status"] != "completed" or not run.get("result"):
             raise ProjectStoreError("generation run is not completed")
-        if generation_staleness(store, project_id, run)["stale"] and not confirm_stale:
+        staleness = generation_staleness(store, project_id, run)
+        if (not staleness["known"] or staleness["stale"]) and not confirm_stale:
+            detail = "stale" if staleness["known"] else "unknown"
             raise ProjectStoreError(
-                "generated result is stale against the current project inputs; "
-                "review the changed inputs and confirm the stale apply explicitly")
+                f"generated result is {detail} against the current project inputs; "
+                "review the changed inputs and confirm the apply explicitly")
         request = None
         if run["mode"] == "improvement":
             request = json.loads((directory / "input.json").read_text())
@@ -776,55 +929,362 @@ def validate_generation_result(request: dict, result: dict) -> dict:
     return result
 
 
-def _run_opencode(directory: Path, run: dict) -> tuple[dict, dict]:
-    config = {
-        "$schema": "https://opencode.ai/config.json",
-        "permission": {
-            "read": "allow", "edit": "allow", "glob": "allow", "grep": "allow",
-            "list": "allow", "bash": "deny", "webfetch": "deny", "websearch": "deny",
-            "external_directory": "deny", "task": "deny", "question": "deny",
-        },
+def _persist_engine_log(path: Path, raw: bytes) -> None:
+    limit = 1_000_000
+    text = redact_text(raw.decode("utf-8", "replace"))
+    if len(text) > limit:
+        marker = f"\n\n[Atlas truncated {len(text) - limit} characters]\n\n"
+        available = limit - len(marker)
+        head = available // 2
+        text = text[:head] + marker + text[-(available - head):]
+    path.write_text(text, encoding="utf-8")
+    os.chmod(path, 0o600)
+
+
+def _generation_result_from_log(raw: bytes, expected_fingerprint: str) -> dict | None:
+    """Recover a complete result object when OpenCode returned it as text.
+
+    The CLI normally writes ``result.json``. Some V2 runs only expose the
+    assistant's JSON in an event stream, so extraction is deliberately strict:
+    the object must have the exact generation top-level shape and the request
+    fingerprint before normal Atlas validation sees it.
+    """
+    decoder = json.JSONDecoder()
+    expected = {
+        "input_fingerprint", "questions", "requirements", "conflicts",
+        "suggestions", "documents",
     }
+
+    def scan(text: str, seen: set[str]) -> dict | None:
+        if text in seen or len(text) > 2_000_000:
+            return None
+        seen.add(text)
+        try:
+            value = json.loads(text)
+        except (TypeError, json.JSONDecodeError):
+            value = None
+        if isinstance(value, dict):
+            if set(value) == expected and value.get("input_fingerprint") == expected_fingerprint:
+                return value
+        start = 0
+        while True:
+            start = text.find("{", start)
+            if start < 0:
+                break
+            try:
+                value, end = decoder.raw_decode(text[start:])
+            except json.JSONDecodeError:
+                start += 1
+                continue
+            if isinstance(value, str):
+                nested = scan(value, seen)
+                if nested is not None:
+                    return nested
+            elif (isinstance(value, dict) and set(value) == expected
+                  and value.get("input_fingerprint") == expected_fingerprint):
+                return value
+            start += max(1, end)
+
+    def strings(value) -> list[str]:
+        found: list[str] = []
+        if isinstance(value, str):
+            found.append(value)
+        elif isinstance(value, dict):
+            for key, item in value.items():
+                if key in {"text", "output", "content", "rawInput"}:
+                    found.extend(strings(item))
+                elif isinstance(item, (dict, list)):
+                    found.extend(strings(item))
+        elif isinstance(value, list):
+            for item in value:
+                found.extend(strings(item))
+        return found
+
+    seen: set[str] = set()
+    for line in raw.decode("utf-8", "replace").splitlines():
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            event = line
+        for candidate in strings(event):
+            result = scan(candidate, seen)
+            if result is not None:
+                return result
+    return None
+
+
+def _generation_permission_config(major_version: int) -> dict:
+    """Allow generation to create only its result file in the private project."""
+    config = execution_permission_config(major_version, allow_edit=False)
+    if major_version >= 2:
+        config["permissions"].append(
+            {"action": "edit", "resource": "result.json", "effect": "allow"})
+    else:
+        config["permission"]["edit"]["result.json"] = "allow"
+    return config
+
+
+def _write_generation_config(root: Path, config: dict, major_version: int) -> Path:
+    target = (root / ".opencode" / "opencode.json" if major_version >= 2
+              else root / "opencode.json")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    atomic_json(target, config)
+    os.chmod(target, 0o400)
+    return target
+
+
+def _initialize_generation_project(runtime: Path) -> None:
+    """Give V2 a real disposable project root instead of the caller's repo."""
+    try:
+        completed = subprocess.run(
+            ["git", "init", "--quiet", "."], cwd=str(runtime),
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            timeout=15, check=False)
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise RuntimeError(
+            "could not establish an isolated OpenCode project root") from error
+    if completed.returncode != 0:
+        raise RuntimeError("could not establish an isolated OpenCode project root")
+    marker = runtime / ".atlas-generation-root"
+    marker.write_text("Atlas disposable generation project\n", encoding="utf-8")
+    os.chmod(marker, 0o600)
+
+
+def _generation_source_root() -> Path:
+    """Return the source tree that must not receive provider artifacts."""
+    return Path(__file__).resolve().parents[1]
+
+
+def _path_in_roots(path: Path, roots: tuple[Path, ...]) -> bool:
+    return any(path == root or root in path.parents for root in roots)
+
+
+def _snapshot_entry(path: Path, root: Path):
+    relative = path.relative_to(root).as_posix()
+    try:
+        info = path.lstat()
+    except OSError as error:
+        raise RuntimeError("could not snapshot the generation source tree") from error
+    mode = stat.S_IMODE(info.st_mode)
+    if stat.S_ISLNK(info.st_mode):
+        return relative, ("symlink", os.readlink(path))
+    if stat.S_ISDIR(info.st_mode):
+        return relative, ("directory", mode, info.st_mtime_ns)
+    if not stat.S_ISREG(info.st_mode):
+        return relative, ("other", mode, info.st_mtime_ns)
+    digest = ""
+    if info.st_size <= _GENERATION_SNAPSHOT_MAX_HASH_BYTES:
+        hasher = hashlib.sha256()
+        try:
+            with path.open("rb") as stream:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                    hasher.update(chunk)
+        except OSError as error:
+            raise RuntimeError("could not snapshot the generation source tree") from error
+        digest = hasher.hexdigest()
+    return relative, ("file", mode, info.st_size, info.st_mtime_ns, digest)
+
+
+def _snapshot_source_tree(root: Path, excluded_roots: tuple[Path, ...]) -> dict:
+    root = Path(root).resolve()
+    excluded = tuple(Path(item).resolve() for item in excluded_roots)
+    if not root.exists():
+        return {}
+    entries: dict[str, tuple] = {}
+    try:
+        for current, dirnames, filenames in os.walk(
+                root, topdown=True, followlinks=False):
+            current_path = Path(current)
+            retained: list[str] = []
+            for name in dirnames:
+                path = current_path / name
+                relative_parts = path.relative_to(root).parts
+                if (name in _GENERATION_SNAPSHOT_IGNORED_DIRS
+                        or any(part in _GENERATION_SNAPSHOT_IGNORED_DIRS
+                               for part in relative_parts)
+                        or _path_in_roots(path, excluded)):
+                    continue
+                if path.is_symlink():
+                    key, value = _snapshot_entry(path, root)
+                    entries[key] = value
+                else:
+                    key, value = _snapshot_entry(path, root)
+                    entries[key] = value
+                    retained.append(name)
+            dirnames[:] = retained
+            for name in filenames:
+                path = current_path / name
+                relative_parts = path.relative_to(root).parts
+                if (any(part in _GENERATION_SNAPSHOT_IGNORED_DIRS
+                        for part in relative_parts)
+                        or _path_in_roots(path, excluded)):
+                    continue
+                key, value = _snapshot_entry(path, root)
+                entries[key] = value
+    except RuntimeError:
+        raise
+    except OSError as error:
+        raise RuntimeError("could not snapshot the generation source tree") from error
+    return entries
+
+
+def _source_tree_violations(before: dict, after: dict) -> dict:
+    before_keys = set(before)
+    after_keys = set(after)
+    return {
+        "added": sorted(after_keys - before_keys),
+        "removed": sorted(before_keys - after_keys),
+        "changed": sorted(
+            key for key in before_keys & after_keys if before[key] != after[key]),
+    }
+
+
+def _record_artifact_violation(directory: Path, violations: dict) -> None:
+    path = directory / "provider-artifact-violation.json"
+    atomic_json(path, {
+        "schema": 1,
+        "kind": "provider_artifact_containment",
+        "added": violations["added"],
+        "removed": violations["removed"],
+        "changed": violations["changed"],
+    })
+    os.chmod(path, 0o600)
+
+
+def _enforce_source_containment(directory: Path, source_root: Path,
+                                before: dict, trusted_roots: tuple[Path, ...]) -> None:
+    try:
+        after = _snapshot_source_tree(source_root, trusted_roots)
+        violations = _source_tree_violations(before, after)
+    except BaseException as error:
+        _record_artifact_violation(directory, {
+            "added": [], "removed": [], "changed": [],
+        })
+        if isinstance(error, RuntimeError):
+            raise
+        raise RuntimeError("could not verify generation source containment") from error
+    if any(violations.values()):
+        _record_artifact_violation(directory, violations)
+        raise RuntimeError(
+            "OpenCode wrote outside the controlled generation artifact roots")
+
+
+def _run_opencode(directory: Path, run: dict) -> tuple[dict, dict]:
+    configured_executable = os.environ.get("ATLAS_OPENCODE_BINARY", "").strip()
+    if not configured_executable:
+        configured_executable = shutil.which("opencode") or "opencode"
+    major_version = detect_opencode_major_version(configured_executable)
+    config = _generation_permission_config(major_version)
+    if major_version >= 2:
+        config["permissions"].append(
+            {"action": "question", "resource": "*", "effect": "deny"})
+    else:
+        config["permission"]["question"] = "deny"
     workspace = directory / "engine"
     workspace.mkdir(exist_ok=True)
     atomic_write(workspace / "input.json", (directory / "input.json").read_text())
     atomic_write(workspace / "input.md", (directory / "input.md").read_text())
     atomic_write(workspace / "prompt.md", (directory / "prompt.md").read_text())
-    atomic_json(workspace / "opencode.json", config)
-    # Keep the runtime directory outside the repository. OpenCode's `--dir`
-    # scope is reliable with the verified Homebrew binary, while the PATH
-    # binary on this machine resolves to a different CLI build and can fail
-    # before the model is invoked. The canonical inputs remain under the run
-    # directory for evidence; only their copies are exposed to the provider.
+    _write_generation_config(workspace, config, major_version)
+    # Keep the runtime directory outside the repository. The canonical inputs
+    # remain under the run directory for evidence; only their copies are exposed
+    # to the provider. V2 discovers a private project from cwd, so explicitly
+    # initialize a disposable Git root and place its config in .opencode/.
     with tempfile.TemporaryDirectory(prefix="atlas-generation-") as runtime_name:
         runtime = Path(runtime_name)
-        for name in ("input.json", "input.md", "prompt.md", "opencode.json"):
+        _initialize_generation_project(runtime)
+        for name in ("input.json", "input.md", "prompt.md"):
             shutil.copy2(workspace / name, runtime / name)
-        configured_executable = os.environ.get("ATLAS_OPENCODE_BINARY", "").strip()
-        if not configured_executable:
-            homebrew_executable = Path("/opt/homebrew/bin/opencode")
-            configured_executable = str(homebrew_executable) \
-                if homebrew_executable.is_file() else (shutil.which("opencode") or "opencode")
-        command = [configured_executable, "run", "--pure", "--dir", str(runtime),
-                   "--format", "json", "--title", f"Atlas U17 {run['id']}"]
+        relative_config = (".opencode/opencode.json" if major_version >= 2
+                           else "opencode.json")
+        runtime_config = runtime / relative_config
+        runtime_config.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(workspace / relative_config, runtime_config)
+        os.chmod(runtime_config, 0o400)
+        command = [configured_executable, "run", "--format", "json",
+                   "--title", f"Atlas U17 {run['id']}"]
+        command.append("--pure" if major_version < 2 else "--standalone")
         if run["model"]:
             command.extend(["--model", run["model"]])
-        command.append((runtime / "prompt.md").read_text())
+        prompt = (runtime / "prompt.md").read_text()
+        fixed_input = (runtime / "input.md").read_text()
+        command.append(
+            "The private project root is the current runtime directory. "
+            "Use the edit tool to create the actual UTF-8 file `result.json` at the root "
+            "of that project; do not use an absolute path, the Atlas repository, or any "
+            "other directory. Do not only print JSON or claim that you wrote it.\n\n"
+            + prompt
+            + "\n\n# Fixed input.md (inline)\n\n"
+            + fixed_input
+        )
         environment = dict(os.environ)
-        environment["OPENCODE_CONFIG"] = str(runtime / "opencode.json")
-        with (directory / "engine.log").open("wb") as log:
-            process = subprocess.run(
-                command, cwd=runtime, env=environment, stdout=log, stderr=subprocess.STDOUT,
-                timeout=1800)
-        if process.returncode:
-            raise RuntimeError(f"OpenCode exited with status {process.returncode}")
-        result_path = runtime / "result.json"
-        if not result_path.is_file() or result_path.stat().st_size > MAX_RESULT_BYTES:
-            raise RuntimeError("OpenCode did not produce a valid-sized result.json")
-        result_text = result_path.read_text()
-        atomic_write(workspace / "result.json", result_text)
+        # Some CLI tools consult PWD as well as the kernel cwd. Keep both inside
+        # the disposable project so an edit cannot be resolved against the repo.
+        environment["PWD"] = str(runtime)
+        source_root = _generation_source_root()
+        trusted_roots = (
+            directory.resolve(), workspace.resolve(), runtime.resolve())
+        source_before = _snapshot_source_tree(source_root, trusted_roots)
+        process = None
+        timeout_error = None
+        raw = b""
+        with tempfile.TemporaryFile() as raw_log:
+            try:
+                try:
+                    process = subprocess.run(
+                        command, cwd=runtime, env=environment, stdout=raw_log,
+                        stderr=subprocess.STDOUT, timeout=1800)
+                except subprocess.TimeoutExpired as error:
+                    timeout_error = error
+                raw_log.seek(0, os.SEEK_END)
+                size = raw_log.tell()
+                raw_log.seek(0)
+                raw = raw_log.read(2_000_000)
+                if size > len(raw):
+                    raw += f"\n[Atlas read {size - len(raw)} omitted bytes]\n".encode()
+                _persist_engine_log(directory / "engine.log", raw)
+            finally:
+                _enforce_source_containment(
+                    directory, source_root, source_before, trusted_roots)
+        if timeout_error is not None:
+            raise timeout_error
+        if process is None or process.returncode:
+            status = process.returncode if process is not None else "unknown"
+            raise RuntimeError(f"OpenCode exited with status {status}")
+        result_candidates = [
+            runtime / "result.json",
+            workspace / "result.json",
+            directory / "result.json",
+        ]
+        for path in result_candidates:
+            if path.is_symlink():
+                raise RuntimeError("OpenCode result path must not be a symlink")
+            if path.exists() and not path.is_file():
+                raise RuntimeError("OpenCode result path must be a regular file")
+        result_path = next(
+            (path for path in result_candidates if path.is_file()),
+            None,
+        )
+        recovered_from_log = False
+        if result_path is None:
+            recovered = _generation_result_from_log(raw, str(run.get("input_fingerprint") or ""))
+            if recovered is None:
+                raise RuntimeError("OpenCode did not produce a valid-sized result.json")
+            result_text = json.dumps(recovered, ensure_ascii=False) + "\n"
+            atomic_write(workspace / "result.json", result_text)
+            recovered_from_log = True
+        else:
+            if result_path.stat().st_size > MAX_RESULT_BYTES:
+                raise RuntimeError("OpenCode did not produce a valid-sized result.json")
+            result_text = result_path.read_text()
+            if result_path != workspace / "result.json":
+                atomic_write(workspace / "result.json", result_text)
         result = json.loads(result_text)
-    return result, {"engine_session_id": _extract_session_id(directory / "engine.log")}
+    return result, {
+        "engine_session_id": _extract_session_id(directory / "engine.log"),
+        "result_recovered_from_log": recovered_from_log,
+        "artifact_root": "runtime",
+    }
 
 
 def _extract_session_id(path: Path) -> str | None:

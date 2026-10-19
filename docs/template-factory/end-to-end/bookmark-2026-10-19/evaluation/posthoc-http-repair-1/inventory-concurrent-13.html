@@ -1,0 +1,33 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>私人收藏夹</title><style>:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.5; }
+a { color: #0b5cad; }
+header.topbar { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: 0.75rem 1rem; border-bottom: 1px solid #d9d9d9; }
+header.topbar h1 { font-size: 1.15rem; margin: 0; }
+header.topbar h1 a { text-decoration: none; }
+form.search { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
+.layout { display: flex; align-items: flex-start; gap: 1.5rem; padding: 1rem; }
+nav.sidebar { flex: 0 0 16rem; }
+nav.sidebar ul.collections { list-style: none; margin: 0 0 1rem; padding: 0; }
+nav.sidebar li.collection { padding: 0.2rem 0.4rem; border-radius: 4px; }
+nav.sidebar li.collection.active { background: #e8f0fb; font-weight: 600; }
+nav.sidebar li.collection a { text-decoration: none; }
+nav.sidebar form.new-collection { display: flex; flex-direction: column; gap: 0.3rem; }
+main.library { flex: 1 1 auto; min-width: 0; }
+section.capture form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.75rem; margin-bottom: 1rem; }
+section.capture label { display: flex; flex-direction: column; font-size: 0.85rem; gap: 0.2rem; }
+section.capture input, section.capture select { padding: 0.35rem; }
+ul.bookmarks { list-style: none; margin: 0; padding: 0; }
+li.bookmark { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; padding: 0.6rem 0.4rem; border-bottom: 1px solid #ececec; }
+a.bookmark-title { font-weight: 600; margin-right: auto; word-break: break-all; }
+a.bookmark-open { white-space: nowrap; }
+span.bookmark-note { color: #666; }
+form.move { display: flex; align-items: center; gap: 0.4rem; }
+label.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+p.empty { color: #666; }
+main.error { max-width: 40rem; margin: 3rem auto; padding: 0 1rem; }
+main.error h1 { margin-bottom: 0.25rem; }
+main.error p.status { color: #666; margin-top: 0; }
+main.error p.message { font-weight: 600; }
+section.recovery form { display: flex; flex-direction: column; gap: 0.4rem; max-width: 28rem; }
+</style></head><body><header class="topbar"><h1><a href="/">私人收藏夹</a></h1><form class="search" method="get" action="/"><label for="search-q">检索</label><input id="search-q" type="search" name="q" value="" placeholder="标题、网址或备注关键字"><button type="submit">搜索</button></form></header><div class="layout"><nav class="sidebar" aria-label="归类"><h2>归类</h2><p><a class="all-link" href="/">全部收藏</a></p><ul class="collections"><li class="collection" data-collection-id="1" data-default="1"><a href="/?collection=1">未整理</a></li><li class="collection" data-collection-id="3" data-default="0"><a href="/?collection=3">Concurrent 20aecea9 00</a></li><li class="collection" data-collection-id="4" data-default="0"><a href="/?collection=4">Concurrent 20aecea9 01</a></li><li class="collection" data-collection-id="5" data-default="0"><a href="/?collection=5">Concurrent 20aecea9 02</a></li><li class="collection" data-collection-id="6" data-default="0"><a href="/?collection=6">Concurrent 20aecea9 03</a></li><li class="collection" data-collection-id="7" data-default="0"><a href="/?collection=7">Concurrent 20aecea9 04</a></li><li class="collection" data-collection-id="8" data-default="0"><a href="/?collection=8">Concurrent 20aecea9 05</a></li><li class="collection" data-collection-id="9" data-default="0"><a href="/?collection=9">Concurrent 20aecea9 06</a></li><li class="collection" data-collection-id="10" data-default="0"><a href="/?collection=10">Concurrent 20aecea9 07</a></li><li class="collection" data-collection-id="11" data-default="0"><a href="/?collection=11">Concurrent 20aecea9 08</a></li><li class="collection" data-collection-id="12" data-default="0"><a href="/?collection=12">Concurrent 20aecea9 09</a></li><li class="collection" data-collection-id="13" data-default="0"><a href="/?collection=13">Concurrent 20aecea9 10</a></li><li class="collection" data-collection-id="14" data-default="0"><a href="/?collection=14">Concurrent 20aecea9 11</a></li><li class="collection" data-collection-id="15" data-default="0"><a href="/?collection=15">Concurrent 20aecea9 12</a></li><li class="collection" data-collection-id="2" data-default="0"><a href="/?collection=2">Parser inventory 20aecea9</a></li></ul><form class="new-collection" method="post" action="/collections"><label for="new-collection-name">新建归类</label><input id="new-collection-name" type="text" name="name" value="" required><button type="submit">新建</button></form></nav><main class="library"><section class="capture"><h2>保存链接</h2><form method="post" action="/bookmarks"><label for="capture-url">网址</label><input id="capture-url" type="url" name="url" value="" required placeholder="https://..."><label for="capture-title">标题</label><input id="capture-title" type="text" name="title" value="" placeholder="留空则显示网址"><label for="capture-collection">归类</label><select id="capture-collection" name="collection_id"><option value="" selected>未整理（默认收件箱）</option><option value="3">Concurrent 20aecea9 00</option><option value="4">Concurrent 20aecea9 01</option><option value="5">Concurrent 20aecea9 02</option><option value="6">Concurrent 20aecea9 03</option><option value="7">Concurrent 20aecea9 04</option><option value="8">Concurrent 20aecea9 05</option><option value="9">Concurrent 20aecea9 06</option><option value="10">Concurrent 20aecea9 07</option><option value="11">Concurrent 20aecea9 08</option><option value="12">Concurrent 20aecea9 09</option><option value="13">Concurrent 20aecea9 10</option><option value="14">Concurrent 20aecea9 11</option><option value="15">Concurrent 20aecea9 12</option><option value="2">Parser inventory 20aecea9</option></select><button type="submit">保存</button></form></section><section class="results"><h2>全部收藏</h2><ul class="bookmarks"></ul><p class="empty">这里还没有记录；可用上方表单保存一个链接。</p></section></main></div></body></html>

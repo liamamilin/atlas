@@ -1,0 +1,193 @@
+{
+  "phase": "initial",
+  "runId": "bm-8d12bef49904",
+  "checks": [
+    {
+      "id": "save-to-default-without-category",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "create-collection",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "save-in-new-collection",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "move-and-browse-by-category",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "keyword-search",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "open-original-page",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "html-output-safety",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "invalid-inputs-no-dirty-data",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "duplicate-save-risk-observation",
+      "status": "observed",
+      "detail": "created_new_record; 1 -> 2; observation-only"
+    }
+  ],
+  "urls": {
+    "first": "http://127.0.0.1:63202/original?token=bm-8d12bef49904_original",
+    "second": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+    "xss": "http://127.0.0.1:63202/xss?token=bm-8d12bef49904_xss"
+  },
+  "titles": {
+    "first": "Cobalt chair bm-8d12bef49904",
+    "second": "Green lamp bm-8d12bef49904",
+    "xss": "<img src=x onerror=\"window.__atlasXss=1\"> XSS-bm-8d12bef49904"
+  },
+  "duplicateSave": {
+    "beforeRecords": [
+      {
+        "id": "2",
+        "title": "Green lamp bm-8d12bef49904",
+        "href": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+        "visibleText": "Green lamp bm-8d12bef49904\n打开原页\n移动到归类\n未整理\n待购-bm-8d12bef49904\n移动",
+        "expectedUrl": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+        "clickedUrl": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+        "navigation": "direct-original-link"
+      }
+    ],
+    "beforeCount": 1,
+    "postStatus": 303,
+    "afterRecords": [
+      {
+        "id": "4",
+        "title": "Repeated bm-8d12bef49904",
+        "href": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+        "visibleText": "Repeated bm-8d12bef49904\n打开原页\n移动到归类\n未整理\n待购-bm-8d12bef49904\n移动",
+        "expectedUrl": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+        "clickedUrl": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+        "navigation": "direct-original-link"
+      },
+      {
+        "id": "2",
+        "title": "Green lamp bm-8d12bef49904",
+        "href": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+        "visibleText": "Green lamp bm-8d12bef49904\n打开原页\n移动到归类\n未整理\n待购-bm-8d12bef49904\n移动",
+        "expectedUrl": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+        "clickedUrl": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+        "navigation": "direct-original-link"
+      }
+    ],
+    "afterCount": 2,
+    "outcome": "created_new_record",
+    "contract": "risk observation only; fail only if frozen contract promises uniqueness/idempotency",
+    "contractResult": "observation-only"
+  },
+  "defaultCollection": {
+    "id": "1",
+    "text": "未整理"
+  },
+  "bookmarks": {
+    "first": {
+      "id": "1",
+      "url": "http://127.0.0.1:63202/original?token=bm-8d12bef49904_original",
+      "title": "Cobalt chair bm-8d12bef49904"
+    },
+    "second": {
+      "id": "4",
+      "url": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+      "title": "Repeated bm-8d12bef49904"
+    },
+    "xss": {
+      "id": "3",
+      "url": "http://127.0.0.1:63202/xss?token=bm-8d12bef49904_xss",
+      "title": "<img src=x onerror=\"window.__atlasXss=1\"> XSS-bm-8d12bef49904"
+    },
+    "secondUrlRecordIds": [
+      "2",
+      "4"
+    ]
+  },
+  "createdCollection": {
+    "id": "2",
+    "name": "待购-bm-8d12bef49904"
+  },
+  "htmlSafety": {
+    "xssObservedDuringSaveResponse": null,
+    "xssObservedAfterSearch": null,
+    "dialogs": []
+  },
+  "invalidInputs": [
+    {
+      "name": "empty-url",
+      "status": 400,
+      "inventoryUnchanged": true
+    },
+    {
+      "name": "malformed-url",
+      "status": 400,
+      "inventoryUnchanged": true
+    },
+    {
+      "name": "javascript-scheme",
+      "status": 400,
+      "inventoryUnchanged": true
+    },
+    {
+      "name": "data-scheme",
+      "status": 400,
+      "inventoryUnchanged": true
+    },
+    {
+      "name": "blank-category",
+      "status": 400,
+      "inventoryUnchanged": true
+    },
+    {
+      "name": "duplicate-category",
+      "status": 400,
+      "inventoryUnchanged": true
+    }
+  ],
+  "expectedAfterRestart": {
+    "secondUrlRecords": [
+      {
+        "id": "4",
+        "title": "Repeated bm-8d12bef49904",
+        "href": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+        "visibleText": "Repeated bm-8d12bef49904\n打开原页\n移动到归类\n未整理\n待购-bm-8d12bef49904\n移动",
+        "expectedUrl": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+        "clickedUrl": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+        "navigation": "direct-original-link"
+      },
+      {
+        "id": "2",
+        "title": "Green lamp bm-8d12bef49904",
+        "href": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+        "visibleText": "Green lamp bm-8d12bef49904\n打开原页\n移动到归类\n未整理\n待购-bm-8d12bef49904\n移动",
+        "expectedUrl": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+        "clickedUrl": "http://127.0.0.1:63202/second?token=bm-8d12bef49904_second",
+        "navigation": "direct-original-link"
+      }
+    ]
+  },
+  "blockedRequests": [
+    "https://example.com/"
+  ],
+  "dialogs": [],
+  "status": "passed"
+}

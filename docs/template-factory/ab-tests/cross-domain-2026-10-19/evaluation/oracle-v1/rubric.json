@@ -1,0 +1,190 @@
+{
+  "version": 1,
+  "date": "2026-10-19",
+  "kind": "pre-generation independent outcome oracle",
+  "scope": "All entries trace explicit common requests/contracts, not hidden maturity requirements",
+  "cases": {
+    "budget": [
+      {
+        "id": "B01",
+        "outcome": "Create two monthly categories; unused category visible; 0.10+0.20 exactly 0.30; overspend -0.10 accepted",
+        "trace": "REQUEST workflow 1–3; acceptance 1–2; state/categories/transactions contract",
+        "kind": "real_api"
+      },
+      {
+        "id": "B02",
+        "outcome": "Same category name in different months; month state and date/category consistency isolate money",
+        "trace": "REQUEST acceptance 2; transaction date/month contract",
+        "kind": "real_api"
+      },
+      {
+        "id": "B03",
+        "outcome": "Edit amount/date/note and budget; delete transaction; totals and rows recalculate",
+        "trace": "REQUEST workflow 4; acceptance 3; PUT/DELETE contract",
+        "kind": "real_api"
+      },
+      {
+        "id": "B04",
+        "outcome": "Zero/negative/excess precision/non-finite/invalid amount, duplicate category, invalid date/reference rejected; original state preserved",
+        "trace": "REQUEST acceptance 1 and 3; validation and duplicate contract",
+        "kind": "real_api"
+      },
+      {
+        "id": "B05",
+        "outcome": "Current-month CSV only; Chinese, comma, quotes, newline parse losslessly; empty month has no unrelated rows",
+        "trace": "REQUEST workflow 6; acceptance 4; export contract",
+        "kind": "real_api"
+      },
+      {
+        "id": "B06",
+        "outcome": "A real new PID with same data directory preserves every tested month",
+        "trace": "REQUEST workflow 5; acceptance 4; start contract",
+        "kind": "real_api"
+      },
+      {
+        "id": "BU01",
+        "outcome": "Create category by real browser controls, verify real API",
+        "trace": "CONTRACT Chinese usable browser UI; shared testids",
+        "kind": "browser"
+      },
+      {
+        "id": "BU02",
+        "outcome": "Create expense by real browser controls, verify record and exact totals",
+        "trace": "CONTRACT same real browser/API state; shared testids",
+        "kind": "browser"
+      }
+    ],
+    "booking": [
+      {
+        "id": "K01",
+        "outcome": "Unauthenticated /me and wrong password rejected; synthetic logins return own identity and resident role",
+        "trace": "REQUEST login, acceptance 1–2; demo/login/session contract",
+        "kind": "real_api"
+      },
+      {
+        "id": "K02",
+        "outcome": "Resident cannot forge admin to create facility; admin creates two facilities",
+        "trace": "REQUEST workflow 2; role server-side requirement",
+        "kind": "real_api"
+      },
+      {
+        "id": "K03",
+        "outcome": "Adjacent intervals accepted; same instant with different offsets conflicts; other facility accepted; naive/equal/reversed/bad dates rejected",
+        "trace": "REQUEST acceptance 3–4; interval/status contract",
+        "kind": "real_api"
+      },
+      {
+        "id": "K04",
+        "outcome": "No other resident detail/cancel/list leak; occupancy contains time only; forged owner ignored; admin sees all",
+        "trace": "REQUEST workflow 4; acceptance 2; privacy/owner contract",
+        "kind": "real_api"
+      },
+      {
+        "id": "K05",
+        "outcome": "Cancellation twice retains cancelled history and releases original slot",
+        "trace": "REQUEST workflow 5; acceptance 5; cancel contract",
+        "kind": "real_api"
+      },
+      {
+        "id": "K06",
+        "outcome": "Two real parallel conflicting requests: exactly one success, one 409, one durable record",
+        "trace": "REQUEST acceptance 4; overlap contract",
+        "kind": "real_api"
+      },
+      {
+        "id": "K07",
+        "outcome": "Real PID restart and repeated init flag preserve history; login works; logout invalidates current session",
+        "trace": "REQUEST workflow 6; session/init/logout contract",
+        "kind": "real_api"
+      },
+      {
+        "id": "KU01",
+        "outcome": "Admin login and facility creation through actual browser UI",
+        "trace": "CONTRACT browser shared controls and same real state",
+        "kind": "browser"
+      },
+      {
+        "id": "KU02",
+        "outcome": "Resident login and booking through actual browser UI with real API readback",
+        "trace": "CONTRACT browser shared controls and same real state",
+        "kind": "browser"
+      }
+    ],
+    "rename": [
+      {
+        "id": "F01",
+        "outcome": "List only immediate ordinary files; preview unchanged; confirmed apply only; content preserved; repeat does not mutate; confirmed later-process undo restores",
+        "trace": "REQUEST workflow 1–5; acceptance 1, 5; list/preview/apply/undo contract",
+        "kind": "real_cli"
+      },
+      {
+        "id": "F02",
+        "outcome": "Existing destination collision rejects entire batch before any ordinary-file mutation",
+        "trace": "REQUEST acceptance 3; apply conflict contract",
+        "kind": "real_cli"
+      },
+      {
+        "id": "F03",
+        "outcome": "Changed source bytes after preview reject stale plan without losing edits",
+        "trace": "REQUEST acceptance 4; immutable identity/content evidence contract",
+        "kind": "real_cli"
+      },
+      {
+        "id": "F04",
+        "outcome": "Traversal/absolute/subdirectory replacement rejected before mutation; empty literal find rejected",
+        "trace": "REQUEST acceptance 2; single filename contract",
+        "kind": "real_cli"
+      },
+      {
+        "id": "F05",
+        "outcome": "Edited plan destination cannot escape root or destroy data",
+        "trace": "REQUEST acceptance 1–3; edited-plan validation contract",
+        "kind": "real_cli"
+      },
+      {
+        "id": "F06",
+        "outcome": "Symlink state directory cannot produce any file outside root",
+        "trace": "CONTRACT external symlink state protection",
+        "kind": "real_cli"
+      },
+      {
+        "id": "F07",
+        "outcome": "Undo refuses existing restore target without changing current contents",
+        "trace": "REQUEST acceptance 5; undo conflict contract",
+        "kind": "real_cli"
+      },
+      {
+        "id": "F08",
+        "outcome": "Dot in literal find is not regex; unmatched file untouched",
+        "trace": "REQUEST acceptance 2; literal replacement contract",
+        "kind": "real_cli"
+      },
+      {
+        "id": "F09",
+        "outcome": "Source replaced by symlink after preview must not be followed/renamed and external owned sentinel unchanged",
+        "trace": "REQUEST ordinary-file-only, no root escape, stale-plan protection",
+        "kind": "real_cli"
+      },
+      {
+        "id": "F10",
+        "outcome": "Preview plan path outside state directory rejected without external plan creation",
+        "trace": "CONTRACT plan location requirement",
+        "kind": "real_cli"
+      },
+      {
+        "id": "F11",
+        "outcome": "Undo after renamed file edit must preserve edited bytes; refusal unchanged or filename restoration preserving bytes accepted",
+        "trace": "CONTRACT no changed-data overwrite; REQUEST data preservation",
+        "kind": "real_cli"
+      }
+    ]
+  },
+  "not_claimed": [
+    "statistical confidence",
+    "generic security certification",
+    "unspecified mature features",
+    "visual quality without viewing screenshot",
+    "all race interleavings"
+  ],
+  "status": "frozen before applications; no business execution yet"
+}

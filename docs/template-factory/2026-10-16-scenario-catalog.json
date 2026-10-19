@@ -1,0 +1,317 @@
+{
+  "date": "2026-10-16",
+  "source_batch_id": "bat_70c6ed193b5a499c8d2a657875123b73",
+  "source_evidence": "2026-10-16-concurrency.json",
+  "target": "local Atlas factory catalog; all entries remain drafts",
+  "items": [
+    {
+      "source_scenario_id": "scn_23ea2fe8f5ad473aa720a830a09879e8",
+      "catalog_scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+      "leaf": "bookmark-manager",
+      "name": "生活待购与灵感收藏夹",
+      "status": "draft",
+      "revision": 1,
+      "action": "created-draft",
+      "review_changes": [],
+      "original": {
+        "acceptance": [
+          "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+          "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+          "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+          "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+        ],
+        "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+        "id": "scn_23ea2fe8f5ad473aa720a830a09879e8",
+        "leaf": "bookmark-manager",
+        "leaf_name": "书签管理器",
+        "name": "生活待购与灵感收藏夹",
+        "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+        "revision": 1,
+        "status": "draft",
+        "updated_at": "2026-10-16T06:58:48.775630+00:00",
+        "workflow": [
+          "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+          "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+          "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+          "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+          "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+        ]
+      },
+      "catalog_snapshot": {
+        "id": "scn_7756e0007f6a463a97316f3f49c15248",
+        "leaf": "bookmark-manager",
+        "leaf_name": "书签管理器",
+        "name": "生活待购与灵感收藏夹",
+        "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+        "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+        "workflow": [
+          "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+          "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+          "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+          "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+          "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+        ],
+        "acceptance": [
+          "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+          "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+          "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+          "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+        ],
+        "status": "draft",
+        "updated_at": "2026-10-16T14:00:05.505849+00:00",
+        "revision": 1
+      }
+    },
+    {
+      "source_scenario_id": "scn_25f101e2f31e40afa0cb3069dcd22a90",
+      "catalog_scenario_id": "scn_3d2691ba3380442e971f1131f3ae7379",
+      "leaf": "task-management-application",
+      "name": "个人周计划工作台（Personal Week Planner）",
+      "status": "draft",
+      "revision": 1,
+      "action": "created-draft",
+      "review_changes": [
+        "不预设完成父任务是否自动完成子任务，改为验证层级与进度一致",
+        "补充持久化验收，防止仅页面内状态成立"
+      ],
+      "original": {
+        "acceptance": [
+          "新建任务默认处于「未完成」状态，且可在收件箱中立即被检索到",
+          "将任务的截止日期设为今天后，该任务出现在「今天」视图中；设到未来日期则只出现在「即将到来」",
+          "勾选完成一个父任务不会自动完成其未完成的子任务，但子任务全部完成会反映在父任务的可见进度上",
+          "被标记完成的任务从「今天」与「即将到来」视图中消失，仍可通过完成状态筛选或已完成列表查看",
+          "跨越截止日期仍未完成的任务，第二天仍出现在「今天」或「逾期」视图中，而不会自行消失"
+        ],
+        "audience": "需要同时管理职业项目与个人事务的独立工作者、自由职业者或知识工作者",
+        "id": "scn_25f101e2f31e40afa0cb3069dcd22a90",
+        "leaf": "task-management-application",
+        "leaf_name": "任务管理软件",
+        "name": "个人周计划工作台（Personal Week Planner）",
+        "objective": "把散落在各处的事项快速捕捉成任务，按容器、标签、优先级和截止日期组织起来，然后从「今天／即将到来」视图专注推进并在完成时清空当天负担",
+        "revision": 1,
+        "status": "draft",
+        "updated_at": "2026-10-16T06:58:34.786730+00:00",
+        "workflow": [
+          "用户在收件箱中快速录入若干任务，每条只需标题，可选截止日期或优先级",
+          "用户把任务归入容器（如「工作」「家庭」）并打标签、设优先级，把大事项拆成若干子任务",
+          "用户在「今天／即将到来」视图中挑选当日要推进的任务，用截止日期和优先级判断紧急程度",
+          "用户逐条执行任务，完成后将其标记为完成，任务从待办视图消失并计入已完成",
+          "周期结束（如每周日）用户回顾未完成任务，重新安排截止日期并规划下周"
+        ]
+      },
+      "catalog_snapshot": {
+        "id": "scn_3d2691ba3380442e971f1131f3ae7379",
+        "leaf": "task-management-application",
+        "leaf_name": "任务管理软件",
+        "name": "个人周计划工作台（Personal Week Planner）",
+        "audience": "需要同时管理职业项目与个人事务的独立工作者、自由职业者或知识工作者",
+        "objective": "把散落在各处的事项快速捕捉成任务，按容器、标签、优先级和截止日期组织起来，然后从「今天／即将到来」视图专注推进并在完成时清空当天负担",
+        "workflow": [
+          "用户在收件箱中快速录入若干任务，每条只需标题，可选截止日期或优先级",
+          "用户把任务归入容器（如「工作」「家庭」）并打标签、设优先级，把大事项拆成若干子任务",
+          "用户在「今天／即将到来」视图中挑选当日要推进的任务，用截止日期和优先级判断紧急程度",
+          "用户逐条执行任务，完成后将其标记为完成，任务从待办视图消失并计入已完成",
+          "周期结束（如每周日）用户回顾未完成任务，重新安排截止日期并规划下周"
+        ],
+        "acceptance": [
+          "新建任务默认处于「未完成」状态，且可在收件箱中立即被检索到",
+          "将任务的截止日期设为今天后，该任务出现在「今天」视图中；设到未来日期则只出现在「即将到来」",
+          "用户可以创建和完成子任务；父任务显示的进度与子任务的实际完成情况一致",
+          "被标记完成的任务从「今天」与「即将到来」视图中消失，仍可通过完成状态筛选或已完成列表查看",
+          "跨越截止日期仍未完成的任务，第二天仍出现在「今天」或「逾期」视图中，而不会自行消失",
+          "刷新或重新进入应用后，任务内容、截止日期、完成状态和父子关系仍然保留"
+        ],
+        "status": "draft",
+        "updated_at": "2026-10-16T14:00:05.508314+00:00",
+        "revision": 1
+      }
+    },
+    {
+      "source_scenario_id": "scn_8e71b0e8504b4bff873a22382e2ac2d1",
+      "catalog_scenario_id": "scn_722423687c5e417185ac3963a57286a3",
+      "leaf": "task-management-application",
+      "name": "周期性事务复位（Recurring Routine Scheduler）",
+      "status": "draft",
+      "revision": 1,
+      "action": "created-draft",
+      "review_changes": [
+        "将固定七天后的错误泛化改为按实际日历规则生成，并明确月末边界"
+      ],
+      "original": {
+        "acceptance": [
+          "重复任务被完成后不会在已完成状态中永久停留，而是在下一周期时点重新以未完成状态出现",
+          "由重复规则生成的新实例具有与下一周期对应的截止日期，而非沿用旧日期",
+          "带有「每周」规则的任务在七天后重新出现，带有「每月」规则的任务在下一对应日历日重新出现",
+          "暂停或删除重复规则后，该任务不再于后续周期自动重新出现",
+          "一次性（无重复规则）任务完成后不会自行重新出现"
+        ],
+        "audience": "需要按固定周期重复处理同类事项的个人或基层运营人员，如居家维护、场所日常检查、例行复盘",
+        "id": "scn_8e71b0e8504b4bff873a22382e2ac2d1",
+        "leaf": "task-management-application",
+        "leaf_name": "任务管理软件",
+        "name": "周期性事务复位（Recurring Routine Scheduler）",
+        "objective": "把按日／周／月重复的例行事项建模为可复位的任务，使其在当前周期完成后按计划自动重新出现，从而用任务循环而非记忆来驱动例行工作",
+        "revision": 1,
+        "status": "draft",
+        "updated_at": "2026-10-16T06:58:34.786730+00:00",
+        "workflow": [
+          "用户创建一条带有重复规则的任务（如每周一上午检查库存、每月末整理报销）并设置首次截止日期",
+          "用户在日常执行视图中照常处理该任务，并在完成后将其标记为完成",
+          "周期推进到下一个重复时点后，系统依据重复规则生成新的未完成任务实例，并带上新的截止日期",
+          "用户在「今天／即将到来」中看到重新出现的任务，继续按同样的组织方式处理",
+          "用户可随时暂停或移除某条重复规则，使该任务不再自动重新出现"
+        ]
+      },
+      "catalog_snapshot": {
+        "id": "scn_722423687c5e417185ac3963a57286a3",
+        "leaf": "task-management-application",
+        "leaf_name": "任务管理软件",
+        "name": "周期性事务复位（Recurring Routine Scheduler）",
+        "audience": "需要按固定周期重复处理同类事项的个人或基层运营人员，如居家维护、场所日常检查、例行复盘",
+        "objective": "把按日／周／月重复的例行事项建模为可复位的任务，使其在当前周期完成后按计划自动重新出现，从而用任务循环而非记忆来驱动例行工作",
+        "workflow": [
+          "用户创建一条带有重复规则的任务（如每周一上午检查库存、每月末整理报销）并设置首次截止日期",
+          "用户在日常执行视图中照常处理该任务，并在完成后将其标记为完成",
+          "周期推进到下一个重复时点后，系统依据重复规则生成新的未完成任务实例，并带上新的截止日期",
+          "用户在「今天／即将到来」中看到重新出现的任务，继续按同样的组织方式处理",
+          "用户可随时暂停或移除某条重复规则，使该任务不再自动重新出现"
+        ],
+        "acceptance": [
+          "重复任务被完成后不会在已完成状态中永久停留，而是在下一周期时点重新以未完成状态出现",
+          "由重复规则生成的新实例具有与下一周期对应的截止日期，而非沿用旧日期",
+          "每周规则按配置的周几与时间生成下次任务；每月规则按配置的日期生成，并明确展示遇到不存在日期时的处理方式",
+          "暂停或删除重复规则后，该任务不再于后续周期自动重新出现",
+          "一次性（无重复规则）任务完成后不会自行重新出现"
+        ],
+        "status": "draft",
+        "updated_at": "2026-10-16T14:00:05.509792+00:00",
+        "revision": 1
+      }
+    },
+    {
+      "source_scenario_id": "scn_ec881ea12eca46bdb4c7db9e0594665f",
+      "catalog_scenario_id": "scn_133dcc8698b946f7acf110aaecc37783",
+      "leaf": "task-management-application",
+      "name": "小组共享清单协作（Small-Team Shared List）",
+      "status": "draft",
+      "revision": 1,
+      "action": "created-draft",
+      "review_changes": [
+        "移除没有依据的 2 至 10 人限制",
+        "移除禁止任何中间状态的额外限制，聚焦共享任务和完成反馈"
+      ],
+      "original": {
+        "acceptance": [
+          "被指派的任务出现在被指派者的执行视图中，指派人能观察到同一任务状态从待办变为完成",
+          "任何成员都能对共享清单中的任务添加评论，评论按时间顺序显示且与任务绑定",
+          "任务的记录状态始终只有「未完成」与「已完成」两种，不存在用户自定义的中间阶段",
+          "任务列表可按指派对象与完成状态筛选，未完成任务与已完成任务可分别查看",
+          "共享清单中某成员完成的任务对该清单所有成员即时可见"
+        ],
+        "audience": "2 至 10 人的小团队、家庭或兴趣小组，需要在不引入多阶段工单流程的前提下共同推进事项",
+        "id": "scn_ec881ea12eca46bdb4c7db9e0594665f",
+        "leaf": "task-management-application",
+        "leaf_name": "任务管理软件",
+        "name": "小组共享清单协作（Small-Team Shared List）",
+        "objective": "让成员在同一共享清单中增补任务、相互指派、评论并看到完成进展，用统一的待办状态而非自定义工作流来协调日常协作",
+        "revision": 1,
+        "status": "draft",
+        "updated_at": "2026-10-16T06:58:34.786730+00:00",
+        "workflow": [
+          "成员创建一个共享清单（如「搬家准备」「活动筹备」），邀请其他成员加入",
+          "成员各自往清单中添加任务，并手动把任务指派给某位成员",
+          "被指派者在自己的「我的任务／今天」视图中看到指派给自己的任务，与其个人任务并列",
+          "任务出现疑问时，成员在任务下留言讨论，必要时对方更新截止日期或优先级",
+          "任务完成后指派者或执行者将其标记为完成，清单中所有成员都能看到该任务的完成状态变化"
+        ]
+      },
+      "catalog_snapshot": {
+        "id": "scn_133dcc8698b946f7acf110aaecc37783",
+        "leaf": "task-management-application",
+        "leaf_name": "任务管理软件",
+        "name": "小组共享清单协作（Small-Team Shared List）",
+        "audience": "需要共同推进日常事项的小团队、家庭或兴趣小组",
+        "objective": "让成员在同一共享清单中增补任务、相互指派、评论并看到完成进展，用统一的待办状态而非自定义工作流来协调日常协作",
+        "workflow": [
+          "成员创建一个共享清单（如「搬家准备」「活动筹备」），邀请其他成员加入",
+          "成员各自往清单中添加任务，并手动把任务指派给某位成员",
+          "被指派者在自己的「我的任务／今天」视图中看到指派给自己的任务，与其个人任务并列",
+          "任务出现疑问时，成员在任务下留言讨论，必要时对方更新截止日期或优先级",
+          "任务完成后指派者或执行者将其标记为完成，清单中所有成员都能看到该任务的完成状态变化"
+        ],
+        "acceptance": [
+          "被指派的任务出现在被指派者的执行视图中，指派人能观察到同一任务状态从待办变为完成",
+          "任何成员都能对共享清单中的任务添加评论，评论按时间顺序显示且与任务绑定",
+          "任务的未完成与已完成状态清晰区分，成员可以按完成状态查看共享事项",
+          "任务列表可按指派对象与完成状态筛选，未完成任务与已完成任务可分别查看",
+          "共享清单中某成员完成的任务对该清单所有成员即时可见"
+        ],
+        "status": "draft",
+        "updated_at": "2026-10-16T14:00:05.511465+00:00",
+        "revision": 1
+      }
+    }
+  ],
+  "recommended_order": [
+    "bookmark-manager",
+    "task-management-application"
+  ],
+  "external_model_calls_in_this_preparation": 0,
+  "first_trial_preparation": {
+    "state": "completed-L1-candidate-unpublished",
+    "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+    "scenario_name": "生活待购与灵感收藏夹",
+    "acceptance": [
+      "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+      "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+      "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+      "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+    ],
+    "candidate": "https://github.com/LakhindarPal/bookmark-manager",
+    "source_preflight_commit": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "source_preflight_license": "MIT",
+    "source_preflight_file_count": 20,
+    "request_preview": {
+      "kind": "production",
+      "name": "书签收藏夹 · 首轮真实模板试产",
+      "model": "open-design/deepseek-v4.1-flash",
+      "concurrency": 1,
+      "timeout": 900,
+      "scenario_ids": [
+        "scn_7756e0007f6a463a97316f3f49c15248"
+      ],
+      "source_url": "https://github.com/LakhindarPal/bookmark-manager"
+    },
+    "requires_scenario_confirmation": false,
+    "external_data_scope": [
+      "书签管理器叶子正文",
+      "已审阅场景的目标、流程和验收条件",
+      "公开候选源码与来源信息",
+      "后续模板源码及必要失败证据"
+    ],
+    "intended_actions": [
+      "生成冻结候选",
+      "根据实际失败证据进行必要修复",
+      "独立 Harness 源码审阅",
+      "可选本地 Docker 运行验收"
+    ],
+    "publication": "No automatic publication; candidate remains a draft.",
+    "observations": [
+      "20-file public source acquired and LICENSE hash recorded; no candidate code was executed.",
+      "Upstream uses Bun and Ripple/Vite; Node/npm compatibility and runtime behavior remain unverified.",
+      "Source commit is pinned on actual acquisition; compare it with the preflight commit before interpreting results."
+    ],
+    "authorization": "User explicitly approved bookmark template production, necessary repairs and independent Harness review with open-design/deepseek-v4.1-flash; no automatic publication.",
+    "production_batch_id": "bat_bd64cd896c9d4cda869968efd3611a5d",
+    "confirmed_scenario_revision": 2,
+    "latest_artifact_id": "tpl_1218aec42a064629a0e66dd1f44da891",
+    "latest_artifact_digest": "91ce1f32d0d950c64ec301ca26505475ebd5395f65b0bf3524eb267e2a9af6df",
+    "execution_record": "2026-10-16-bookmark-pilot.json"
+  },
+  "catalog_scenario_current_status": {
+    "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+    "revision": 2,
+    "status": "ready",
+    "other_imported_scenarios": "remain draft"
+  }
+}

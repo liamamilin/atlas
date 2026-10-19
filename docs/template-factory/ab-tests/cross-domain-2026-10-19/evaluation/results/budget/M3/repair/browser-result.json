@@ -1,0 +1,85 @@
+{
+  "case": "budget",
+  "kind": "real_browser_happy_path",
+  "writes": "UI controls only",
+  "checks": [
+    {
+      "id": "BU01",
+      "status": "passed",
+      "detail": "Created category through actual UI; real API readback matched"
+    },
+    {
+      "id": "BU02",
+      "status": "passed",
+      "detail": "Created expense through actual UI; real API list and totals matched"
+    }
+  ],
+  "blocked": [],
+  "pageErrors": [],
+  "requests": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:55862/",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:55862/static/style.css",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:55862/static/app.js",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:55862/api/state?month=2026-10",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:55862/api/state?month=2032-07",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:55862/api/state?month=2032-07",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:55862/api/categories",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:55862/api/state?month=2032-07",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:55862/api/state?month=2032-07",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:55862/api/transactions",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:55862/api/state?month=2032-07",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:55862/api/state?month=2032-07",
+      "status": 200
+    }
+  ],
+  "browserTimezone": "Asia/Shanghai",
+  "screenshot": "browser.png; capture only, not independently visually assessed",
+  "bodyText": "个人月度预算与剩余额度\n\n仅本机使用 · 人民币（元，两位小数）· 数据只写入指定目录，重启后仍可回查\n\n选择月份\n导出当月 CSV\n建立分类与月预算\n保存分类\n记录支出\n浏览器餐饮（剩余 87.66）\n记一笔\n本月总览\n本月计划 100.00\n已花 12.34\n剩余 87.66\n分类\t预算\t已花\t剩余\t操作\n浏览器餐饮\t100.00\t12.34\t87.66\t改预算\n本月支出明细\n日期\t分类\t金额\t备注\t操作\n2032-07-12\t浏览器餐饮\t12.34\t浏览器真实输入\t修改删除",
+  "status": "passed"
+}

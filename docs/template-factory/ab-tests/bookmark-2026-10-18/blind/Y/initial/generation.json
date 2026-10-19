@@ -1,0 +1,75 @@
+{
+  "label": "Y",
+  "round": "initial",
+  "status": "delivered_source_cli_failed",
+  "elapsed": 1753.1,
+  "files": {
+    "README.md": "798e44e2d83b85b5e873cb8b2c7c25bbd5bcf4e55fedc6ee73452294c098b1ac",
+    "app.py": "5154d306e39bc5fdccb0a6bb01406be98e1af6e2056abf74f7fb5c4ab6b9650a",
+    "db.py": "ba4c4b80bde894347281610bd5c0e590801983cbbc9509d772addc09d5207eb8",
+    "server.py": "8432279095f36205d49aa18506393f09e56eaf4f3d069cdffeda93e7be7f9299",
+    "static/app.js": "b0029def4157f6e372e44dbe720b219cd5da0253b75fb4d399412706fcb021dc",
+    "static/style.css": "872104c515040ebfaee21e8f902fe6a4ba6bb93a5fefc89d0ac3a2c8b001fda3",
+    "store.py": "98a6a09a377a0b23b9ffffbaa3d2f2c2b5ab44fdeabcbb8524298d4d44809c41",
+    "urlutil.py": "4ae3077a9d0d5d9296615b30b03e90e163b48acd620d503b1ad36661fa4eb99a",
+    "views.py": "311c04a9e3957c99b85b40505d0fba478252a5f96e24530f4dfa9a8f976e1648"
+  },
+  "implemented_claims": [
+    "save bookmarks with derived/user title, note, field limits",
+    "default '未分类' category and single-ownership categories",
+    "new/rename categories with NFKC name-conflict checks",
+    "choose category on save and move afterwards",
+    "delete category with move/purge choice and tombstone",
+    "duplicate URL block with existing-record link and explicit re-save",
+    "302 open to original URL",
+    "soft delete, trash list, restore (original or chosen), single purge, clear",
+    "edit title/note",
+    "keyword search over title/url/note with NFKC + AND",
+    "browse by category, sort created_desc/asc, pagination",
+    "JSON API + Chinese SSR UI with data-testid hooks",
+    "Host/Origin/Sec-Fetch-Site checks and 64KiB body limit"
+  ],
+  "limits_claims": [
+    "single user, single instance, loopback only, no auth",
+    "no metadata fetching, snapshots, full-text, import/export, sharing or bulk ops",
+    "Url max 2048, title 500, note 10000, category name 80, body 64KiB",
+    "category rows tombstoned, trash cleared manually",
+    "302 Location is WHATWG ASCII serialization, not guaranteed byte-identical to input"
+  ],
+  "execution": "not_yet_run",
+  "recovery": {
+    "label": "Y",
+    "method": "extract complete declared final JSON metadata from actual final text; freeze already-written matching files byte-for-byte for testing ONLY",
+    "provider_events": [
+      {
+        "type": "error",
+        "timestamp": 1792331251216,
+        "sessionID": "ses_eb0c28b5fffeu5FDMYXyJvaTaK",
+        "error": {
+          "type": "provider.invalid-output",
+          "message": "OpenAI Chat stream ended without finish_reason",
+          "status": 200
+        }
+      }
+    ],
+    "no_model_call": true,
+    "no_source_edits": true,
+    "cli_exit_code": 1,
+    "last_step_reason": "tool-calls",
+    "file_hashes": {
+      "README.md": "798e44e2d83b85b5e873cb8b2c7c25bbd5bcf4e55fedc6ee73452294c098b1ac",
+      "app.py": "5154d306e39bc5fdccb0a6bb01406be98e1af6e2056abf74f7fb5c4ab6b9650a",
+      "db.py": "ba4c4b80bde894347281610bd5c0e590801983cbbc9509d772addc09d5207eb8",
+      "server.py": "8432279095f36205d49aa18506393f09e56eaf4f3d069cdffeda93e7be7f9299",
+      "static/app.js": "b0029def4157f6e372e44dbe720b219cd5da0253b75fb4d399412706fcb021dc",
+      "static/style.css": "872104c515040ebfaee21e8f902fe6a4ba6bb93a5fefc89d0ac3a2c8b001fda3",
+      "store.py": "98a6a09a377a0b23b9ffffbaa3d2f2c2b5ab44fdeabcbb8524298d4d44809c41",
+      "urlutil.py": "4ae3077a9d0d5d9296615b30b03e90e163b48acd620d503b1ad36661fa4eb99a",
+      "views.py": "311c04a9e3957c99b85b40505d0fba478252a5f96e24530f4dfa9a8f976e1648"
+    },
+    "runtime": "not_yet_run",
+    "original_failure_kept": true,
+    "pipeline_status": "failed; not converted to successful completion",
+    "limitation": "Complete source and metadata do not erase nonzero CLI exit or missing clean stop."
+  }
+}

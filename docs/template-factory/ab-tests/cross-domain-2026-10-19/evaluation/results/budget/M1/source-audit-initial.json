@@ -1,0 +1,30 @@
+{
+  "case": "budget",
+  "label": "M1",
+  "round": "initial",
+  "all_files_manually_read": {
+    "DECISIONS.md": "30ad0cc5dff563006663cc29c0d71c4ef6aa53901818912264b6a3c6b7e0d9c8",
+    "README.md": "2cf7f0495de9b988acff9e35cfd19f1147463f5debe1e92d8274b64d668dc961",
+    "api.py": "53e898f9f459a89a9b739a888b88b712acd20bb1f12ef4f2e84997c7bda02d05",
+    "app.py": "549fd3f06aa18c164f3e5a3f2318ec39e10eebdaef9262d1e34d22f166b4e492",
+    "static/app.js": "7c6dc799b0396ed0a37f9041dc106b15f18a30021cbab0432ae8935fd7487ccd",
+    "static/index.html": "f303155f656242a5b0db7e53d745f34eb74ebf0914e34781926f4837dcc25070",
+    "static/style.css": "643a6c959d95feaeea1c15bbe7995600956537123da486156d45826c9880d020",
+    "storage.py": "43928157df237fcfe569159cefc578605e9d2ad1120d5465ccb64c08494fe531"
+  },
+  "python": "3.10.13 (main, Jul 28 2025, 13:11:45) [Clang 17.0.0 (clang-1700.0.13.5)]",
+  "execution_safety": "approved for assigned synthetic local tests after complete source review",
+  "safety_notes": [
+    "127.0.0.1 listener and SQLite under assigned data-dir; init_schema CREATE IF NOT EXISTS",
+    "Static file whitelist with basename, no arbitrary read route",
+    "No shell/subprocess/eval/secret reads/outbound clients/external assets or telemetry",
+    "Money integer cents with max-two-decimal parser, validation before mutations; CSV module for quoting",
+    "UI fetch and export href only relative app API; user text via textContent"
+  ],
+  "prohibited_context_not_read": [
+    "condition-map",
+    "template",
+    "developer inputs/prompts"
+  ],
+  "application_modified": false
+}

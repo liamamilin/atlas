@@ -1,0 +1,35 @@
+{
+  "ok": true,
+  "probes": [
+    {
+      "probe": "occupied-port",
+      "command": [
+        "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+        "app.py",
+        "--port",
+        "56596",
+        "--data-dir",
+        "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/initial/evidence/data-occupied-port"
+      ],
+      "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/initial/evidence/probe-occupied-port.log",
+      "outcome": "exited",
+      "returncode": 1,
+      "text": "Traceback (most recent call last):\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/initial/app/app.py\", line 137, in <module>\n    main()\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/initial/app/app.py\", line 117, in main\n    httpd = ThreadingHTTPServer((\"127.0.0.1\", args.port), AppHandler)\n  File \"/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py\", line 452, in __init__\n    self.server_bind()\n  File \"/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/http/server.py\", line 137, in server_bind\n    socketserver.TCPServer.server_bind(self)\n  File \"/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py\", line 466, in server_bind\n    self.socket.bind(self.server_address)\nOSError: [Errno 48] Address already in use\n"
+    },
+    {
+      "probe": "unusable-data-dir",
+      "command": [
+        "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+        "app.py",
+        "--port",
+        "56682",
+        "--data-dir",
+        "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/initial/evidence/unusable-data-path"
+      ],
+      "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/initial/evidence/probe-unusable-data-dir.log",
+      "outcome": "exited",
+      "returncode": 1,
+      "text": "Traceback (most recent call last):\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/initial/app/app.py\", line 137, in <module>\n    main()\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/initial/app/app.py\", line 113, in main\n    db_path = db.ensure(data_dir)\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/initial/app/db.py\", line 63, in ensure\n    os.makedirs(data_dir, exist_ok=True)\n  File \"/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/os.py\", line 225, in makedirs\n    mkdir(name, mode)\nFileExistsError: [Errno 17] File exists: '/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/initial/evidence/unusable-data-path'\n"
+    }
+  ]
+}

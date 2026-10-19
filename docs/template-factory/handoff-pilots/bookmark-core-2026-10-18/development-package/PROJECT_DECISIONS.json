@@ -1,0 +1,62 @@
+{
+ "project_name": "bookmark-core-trial",
+ "phase": "P0",
+ "template_digest": "65d7880e19bcc92df54ad76248d155b29c978d2770344ac1ecc9005c3c1eba00",
+ "choices": [
+  {
+   "id": "D01",
+   "default": "推荐默认：显式提示“可能已存在”并保留一个显式“仍然保存”动作，允许用户确认后保存为另一条记录；比较键仅做最小规范化（scheme/host 小写、去默认端口、去路径末尾多余斜杠，保留 query 与 fragment），原因是不自动丢弃用户数据、可逆。",
+   "choice": null
+  },
+  {
+   "id": "D02",
+   "default": "推荐默认不抓取，标题仅取用户输入或回退为 URL；原因是避免 SSRF、超时、反爬与响应体积等失败模式，并保持仅回环、无后台外发。",
+   "choice": null
+  },
+  {
+   "id": "D03",
+   "default": "推荐以 category_id 为 NULL 表示“未分类”并在界面显示为“未分类/以后看看”，不预置可删除实体；原因保证未归类落点始终存在。",
+   "choice": null
+  },
+  {
+   "id": "D04",
+   "default": "推荐设定一个明确的较大上限并在超限时显式报错且不落库，绝不静默截断；具体数值在实现时按合理长文本取值，不设武断性能阈值。",
+   "choice": null
+  },
+  {
+   "id": "D05",
+   "default": "推荐删除时必须显式二选一：把其中记录移入未分类，或级联删除并要求二次确认，默认前者；原因是避免无提示丢失记录。",
+   "choice": null
+  },
+  {
+   "id": "D06",
+   "default": "推荐默认 Python 3 标准库（http.server + sqlite3）+ 中文浏览器界面，入口 python3 app.py --port PORT --data-dir DIR，仅回环，数据全部在 DIR 下，无应用依赖安装；这是本次试验环境的明确选择，不是类别约束。",
+   "choice": null
+  },
+  {
+   "id": "D07",
+   "default": "推荐仅做最小规范化（trim、scheme/host 小写、去默认端口、去路径末尾多余斜杠），保留 query 与 fragment 作为身份一部分；对 http/https、跟踪参数等变体不做自动合并。",
+   "choice": null
+  },
+  {
+   "id": "D08",
+   "default": "推荐默认无认证、仅绑定回环；原因单用户本地使用，避免凭证管理。若验收接受认证参数，则仅作用于显式配置的目标，绝不附加到外部导航或夹具，且不记录凭据值。",
+   "choice": null
+  },
+  {
+   "id": "D09",
+   "default": "推荐 P0 不提供撤销（P0 无删除能力），仅保证保存与归类可逆（可移动）；撤销随回收站阶段一并引入。",
+   "choice": null
+  },
+  {
+   "id": "D10",
+   "default": "推荐 P0 不做，按后续阶段引入 Netscape HTML/JSON 元数据导出，并明示导入不去重、导出不等于完整备份。",
+   "choice": null
+  },
+  {
+   "id": "D11",
+   "default": "推荐默认由操作员控制 before/after：用例先经 UI 保存记录与分类，输出停止并重启（python3 app.py --port PORT --data-dir DIR）的步骤，操作员完成后用例再经 UI 读回数据；仅当用例自身以固定 argv（不启用 shell 插值）启动应用并安全持有该子进程时，才可只终止自己启动的 PID 并重新启动。不得执行任意 shell 命令、不得终止无关进程；不得以文件存在或新建 SQLite 连接作为重启证明，也不要求应用暴露内部数据库连接状态。",
+   "choice": null
+  }
+ ]
+}

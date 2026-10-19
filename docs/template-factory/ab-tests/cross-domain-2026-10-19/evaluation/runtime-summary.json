@@ -1,0 +1,259 @@
+{
+  "date": "2026-10-19",
+  "reviewer": "independent_test_engineer",
+  "condition_mapping_read": false,
+  "template_or_developer_context_read": false,
+  "blinding_limit": "App-authored docs contain blueprint/template references; treatment clues may be inferable despite withheld mapping",
+  "shared_oracle": "freeze-v3.json",
+  "core_results": [
+    {
+      "case": "budget",
+      "label": "M1",
+      "round": "initial",
+      "evidence": "results/budget/M1/initial",
+      "outcome": "all_executed_core_checks_passed"
+    },
+    {
+      "case": "budget",
+      "label": "M2",
+      "round": "initial",
+      "evidence": "results/budget/M2/initial",
+      "outcome": "failed_delivery_not_executed"
+    },
+    {
+      "case": "budget",
+      "label": "M3",
+      "round": "initial",
+      "evidence": "results/budget/M3/initial",
+      "outcome": "real_product_startup_failure; dependent behavior unverified"
+    },
+    {
+      "case": "budget",
+      "label": "M3",
+      "round": "repair",
+      "evidence": "results/budget/M3/repair",
+      "outcome": "all_executed_core_checks_passed"
+    },
+    {
+      "case": "booking",
+      "label": "M1",
+      "round": "initial",
+      "evidence": "results/booking/M1/initial",
+      "outcome": "all_executed_core_checks_passed"
+    },
+    {
+      "case": "booking",
+      "label": "M2",
+      "round": "initial",
+      "evidence": "results/booking/M2/initial",
+      "outcome": "all_executed_core_checks_passed"
+    },
+    {
+      "case": "booking",
+      "label": "M3",
+      "round": "initial",
+      "evidence": "results/booking/M3/initial-oracle-v3",
+      "outcome": "all_executed_core_checks_passed"
+    },
+    {
+      "case": "rename",
+      "label": "M1",
+      "round": "initial",
+      "evidence": "results/rename/M1/initial",
+      "outcome": "all_executed_core_checks_passed"
+    },
+    {
+      "case": "rename",
+      "label": "M2",
+      "round": "initial",
+      "evidence": "results/rename/M2/initial",
+      "outcome": "all_executed_core_checks_passed"
+    },
+    {
+      "case": "rename",
+      "label": "M2",
+      "round": "repair",
+      "evidence": "results/rename/M2/repair",
+      "outcome": "all_executed_core_checks_passed"
+    },
+    {
+      "case": "rename",
+      "label": "M3",
+      "round": "initial",
+      "evidence": "results/rename/M3/initial",
+      "outcome": "all_executed_core_checks_passed"
+    }
+  ],
+  "exploratory_EP01": [
+    {
+      "case": "rename",
+      "label": "M1",
+      "round": "EP01_initial",
+      "evidence": "results/rename/M1/EP01-initial",
+      "posthoc": true,
+      "passed": true,
+      "subprobes": [
+        {
+          "subprobe": "absent_target",
+          "status": "passed",
+          "outside_unchanged": true,
+          "inside_safe": true
+        },
+        {
+          "subprobe": "existing_target",
+          "status": "passed",
+          "outside_unchanged": true,
+          "inside_safe": true
+        }
+      ]
+    },
+    {
+      "case": "rename",
+      "label": "M2",
+      "round": "EP01_initial",
+      "evidence": "results/rename/M2/EP01-initial",
+      "posthoc": true,
+      "passed": false,
+      "subprobes": [
+        {
+          "subprobe": "absent_target",
+          "status": "failed",
+          "outside_unchanged": false,
+          "inside_safe": true
+        },
+        {
+          "subprobe": "existing_target",
+          "status": "passed",
+          "outside_unchanged": true,
+          "inside_safe": true
+        }
+      ]
+    },
+    {
+      "case": "rename",
+      "label": "M2",
+      "round": "EP01_repair",
+      "evidence": "results/rename/M2/EP01-repair",
+      "posthoc": true,
+      "passed": true,
+      "subprobes": [
+        {
+          "subprobe": "absent_target",
+          "status": "passed",
+          "outside_unchanged": true,
+          "inside_safe": true
+        },
+        {
+          "subprobe": "existing_target",
+          "status": "passed",
+          "outside_unchanged": true,
+          "inside_safe": true
+        }
+      ]
+    },
+    {
+      "case": "rename",
+      "label": "M3",
+      "round": "EP01_initial",
+      "evidence": "results/rename/M3/EP01-initial",
+      "posthoc": true,
+      "passed": true,
+      "subprobes": [
+        {
+          "subprobe": "absent_target",
+          "status": "passed",
+          "outside_unchanged": true,
+          "inside_safe": true
+        },
+        {
+          "subprobe": "existing_target",
+          "status": "passed",
+          "outside_unchanged": true,
+          "inside_safe": true
+        }
+      ]
+    }
+  ],
+  "application_hand_edits": false,
+  "limitations": [
+    "One initial application per cell, not statistical proof",
+    "Explicit common contracts measure stated-requirement implementation, not discovery of unstated maturity needs",
+    "Source-only risks are not mislabeled runtime-proven defects",
+    "Browser probes verify happy-path control writes; full UI maturity/accessibility/mobile not assessed",
+    "All EP01 results are posthoc and separate from core oracle",
+    "Original v2 booking M3 infrastructure-failure evidence retained and superseded by v3 pointer"
+  ],
+  "service_cleanup": {
+    "all_owned_service_epochs_stopped_and_waited": true,
+    "epochs": [
+      {
+        "pid": 75701,
+        "returncode": -15,
+        "evidence": "results/booking/M1/initial/processes.json"
+      },
+      {
+        "pid": 75702,
+        "returncode": -15,
+        "evidence": "results/booking/M1/initial/processes.json"
+      },
+      {
+        "pid": 74343,
+        "returncode": -15,
+        "evidence": "results/booking/M2/initial/processes.json"
+      },
+      {
+        "pid": 74344,
+        "returncode": -15,
+        "evidence": "results/booking/M2/initial/processes.json"
+      },
+      {
+        "pid": 73546,
+        "returncode": -15,
+        "evidence": "results/booking/M3/initial/processes.json"
+      },
+      {
+        "pid": 73547,
+        "returncode": -15,
+        "evidence": "results/booking/M3/initial/processes.json"
+      },
+      {
+        "pid": 73762,
+        "returncode": -15,
+        "evidence": "results/booking/M3/initial-oracle-v3/processes.json"
+      },
+      {
+        "pid": 73763,
+        "returncode": -15,
+        "evidence": "results/booking/M3/initial-oracle-v3/processes.json"
+      },
+      {
+        "pid": 76890,
+        "returncode": -15,
+        "evidence": "results/budget/M1/initial/processes.json"
+      },
+      {
+        "pid": 76893,
+        "returncode": -15,
+        "evidence": "results/budget/M1/initial/processes.json"
+      },
+      {
+        "pid": 77927,
+        "returncode": 1,
+        "evidence": "results/budget/M3/initial/processes.json"
+      },
+      {
+        "pid": 80515,
+        "returncode": -15,
+        "evidence": "results/budget/M3/repair/processes.json"
+      },
+      {
+        "pid": 80516,
+        "returncode": -15,
+        "evidence": "results/budget/M3/repair/processes.json"
+      }
+    ],
+    "browser_proxy": "Each completed browser tool closed its browser and proxy in finally; launch-failed v2 spawned no browser",
+    "CLI": "Every real rename subprocess completed/waited; no timeouts or background services"
+  },
+  "core_toolchain_hashes_still_frozen": true
+}

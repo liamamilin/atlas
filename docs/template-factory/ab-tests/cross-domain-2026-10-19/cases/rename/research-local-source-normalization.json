@@ -1,0 +1,14 @@
+{
+  "status": "validated_after_explicit_normalization",
+  "removed_row": {
+    "id": "S01",
+    "name": "Atlas 已确认输入：input.json / leaf.md（File Manager 叶） / source/REQUEST.md",
+    "url": "n/a (本地任务文件；leaf.md 内引用的外部来源不在此条核实范围)",
+    "version": "access date 2026-10-19；leaf.md 原文研究日 2026-09-07；scenario revision 1",
+    "facts": "确认类别为 File Manager（导航真实存储层级 + 以文件/文件夹为单位 + 会变更存储的操作，含 rename）；确认场景为『单一指定本地目录、先预览字面查找替换、显式确认后执行、可撤销这一次批量改名』。已固定约束：Python 标准库 CLI、默认不递归、不处理目录与符号链接、不触碰根目录之外；查找为非空字面文本（非正则）、新名必须是单个文件名且不允许目录穿越；冲突/目标已存在则拒绝整份计划，不覆盖、不静默跳过；预览与执行之间源文件内容被改须拒绝过期计划；执行与撤销都要显式 --confirm，重复执行不得产生第二轮改名；撤销遇新冲突不得覆盖；演示只用测试创建的普通文件。",
+    "license": "not code（任务输入）",
+    "reuse": "作为范围基线；不引入输入之外的强制企业特性"
+  },
+  "scope": "Only redundant local S01 row removed; Atlas injects exact scenario as S01. Original invalid model response preserved. No external fact, source ID, summary or gap changed.",
+  "external_sources_unchanged": true
+}

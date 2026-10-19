@@ -1,0 +1,388 @@
+{
+  "summary": "本案例为 budget（个人月度预算）condition-blind 复核：三个匿名应用 M1、M2、M3。M1 与 M3 均交付了完整可执行应用，B01–B06 真实 API、BU01/BU02 真实浏览器控件加真实 API 回读全部通过；M2 两轮传输/协议尝试失败，没有不可变的完整应用，运行未执行，只能判为交付失败且行为不可验证。M3 的初始轮曾在绑定端口前因 api.py 类体 `store = store` 抛 NameError 启动失败，repair 轮以类定义后注入 Handler.store 修复，修复轮四项证据齐备并通过。C01–C05 认知维度上，M1 与 M3 均有与代码一致、可追溯的决策记录；M2 无文档可审。不设固定分值或强制胜者。",
+  "applications": [
+    {
+      "label": "M1",
+      "delivery": "delivered；cli_status=completed；round-provenance 记 requested_round=repair 但 actual_delivery_round=initial、application_changed=false，初始应用原样延续并完成真实 API 与浏览器检查",
+      "core": [
+        {
+          "id": "B01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/http-events.json",
+            "source/M1/evidence/result.json"
+          ],
+          "reason": "餐饮预算 0.20、两笔 0.10+0.20 得已花 0.30、剩余 -0.10，未使用分类以 0.00 仍可见；totals 10.20/0.30/9.90 精确为两位小数"
+        },
+        {
+          "id": "B02",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/http-events.json"
+          ],
+          "reason": "2030-02 与 2030-01 同名「餐饮」金额彼此隔离；把 2030-01-03 记到 2030-02 分类返回 400 且 2030-02 状态不变"
+        },
+        {
+          "id": "B03",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/http-events.json"
+          ],
+          "reason": "PUT /api/transactions/4 改金额日期备注、PUT /api/categories/4 改预算后 totals 即重算；DELETE 4 后明细为空、汇总回到 200.00/0.00/200.00"
+        },
+        {
+          "id": "B04",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/http-events.json",
+            "source/M1/application/storage.py"
+          ],
+          "reason": "金额 0、-1.00、0.001、NaN、Infinity、abc 与重复分类、2030-02-30、category_id=absent 均返回非 2xx JSON；随后 GET 状态与 before 完全一致，未破坏旧数据"
+        },
+        {
+          "id": "B05",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/http-events.json"
+          ],
+          "reason": "api/export?month=2030-05 往返中文、逗号、双引号与换行（含 CRLF 与引号转义）；2031-01 空月仅表头、无跨月行"
+        },
+        {
+          "id": "B06",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/processes.json",
+            "source/M1/evidence/http-events.json"
+          ],
+          "reason": "真实重启由 pid 76890 换为 76893、同一 data-dir；重启后 2030-01 至 2030-05 快照与重启前逐一相等"
+        },
+        {
+          "id": "BU01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/browser-result.json",
+            "source/M1/application/static/index.html"
+          ],
+          "reason": "browser.cjs 用真实控件填入 month=2032-07 并点击 category-save（POST /api/categories 201），再经 /api/state 回读存在「浏览器餐饮」；非 API-only"
+        },
+        {
+          "id": "BU02",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/browser-result.json"
+          ],
+          "reason": "真实选择分类、填 2032-07-12 与 12.34 并点击 expense-save（POST /api/transactions 201），回读 totals spent=12.34、remaining=87.66 与明细一致"
+        }
+      ],
+      "cognition": [
+        {
+          "id": "C01",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/README.md",
+            "source/M1/application/DECISIONS.md"
+          ],
+          "reason": "README 分「当前范围（已实现）／已知限制／后续路线（候选，未实现）」，DECISIONS 有「范围外及原因」，并与 REQUEST/CONTRACT 条目对应；未把遗漏伪装为未来工作"
+        },
+        {
+          "id": "C02",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/DECISIONS.md",
+            "source/M1/application/storage.py"
+          ],
+          "reason": "12 条默认决策含理由与被否方案，且与代码一致：整数分存储、UNIQUE(month,name) 返回 409、PUT 忽略 month、支出日期须属分类月、csv 模块引用"
+        },
+        {
+          "id": "C03",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/README.md"
+          ],
+          "reason": "P0 覆盖建分类、记账、核对、改删、切月、重启、导出全旅程；后续为分类改名删除、结转、趋势、CSV 导入、无障碍，服务同一本地用户，无企业级扩张"
+        },
+        {
+          "id": "C04",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/DECISIONS.md"
+          ],
+          "reason": "列出 5 项真实未知：分类改名/删除时支出处置、结转规则、备注上限、CSV 导入冲突判定、超支提示强度，并声明未擅自实现"
+        },
+        {
+          "id": "C05",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/delivery.json",
+            "source/M1/application/README.md"
+          ],
+          "reason": "delivery 与文档一致声明 self_checks=not_run、execution=not_run，限制逐条可核，未编造研究/许可/运行时事实"
+        }
+      ],
+      "root_causes": [],
+      "limits": [
+        "仅文本与 JSON 证据，browser.png 未由复核者目视；不含移动端与无障碍评估",
+        "单应用一次性浏览器探针为有限证据，不构成安全性或全部竞态证明"
+      ]
+    },
+    {
+      "label": "M2",
+      "delivery": "failed_delivery；两轮传输/协议尝试均失败，无不可变的完整应用交付；execution=not_run，未从部分源推断成功",
+      "core": [
+        {
+          "id": "B01",
+          "outcome": "unverified",
+          "evidence": [
+            "source/M2/delivery.json",
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "无完整应用可执行，tests 为空，无运行时行为证据"
+        },
+        {
+          "id": "B02",
+          "outcome": "unverified",
+          "evidence": [
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "未运行，无月份隔离的实际结果可判"
+        },
+        {
+          "id": "B03",
+          "outcome": "unverified",
+          "evidence": [
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "未运行，无改删与重算的实际结果可判"
+        },
+        {
+          "id": "B04",
+          "outcome": "unverified",
+          "evidence": [
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "未运行，无校验拒绝与旧数据保持的实际结果可判"
+        },
+        {
+          "id": "B05",
+          "outcome": "unverified",
+          "evidence": [
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "未运行，无 CSV 导出往返的实际结果可判"
+        },
+        {
+          "id": "B06",
+          "outcome": "unverified",
+          "evidence": [
+            "source/M2/evidence/provenance.json"
+          ],
+          "reason": "未启动任何进程（services_started 为空），无重启持久化结果可判"
+        },
+        {
+          "id": "BU01",
+          "outcome": "unverified",
+          "evidence": [
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "browser_status=not_run，无真实浏览器控件动作或回读"
+        },
+        {
+          "id": "BU02",
+          "outcome": "unverified",
+          "evidence": [
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "browser_status=not_run，无真实 UI 记账及总额回读"
+        }
+      ],
+      "cognition": [
+        {
+          "id": "C01",
+          "outcome": "unverified",
+          "evidence": [
+            "source/M2/delivery.json"
+          ],
+          "reason": "未交付 DECISIONS/README，无可审的范围与追溯材料"
+        },
+        {
+          "id": "C02",
+          "outcome": "unverified",
+          "evidence": [
+            "source/M2/delivery.json"
+          ],
+          "reason": "无决策记录与代码可供核对其默认值及理由"
+        },
+        {
+          "id": "C03",
+          "outcome": "unverified",
+          "evidence": [
+            "source/M2/delivery.json"
+          ],
+          "reason": "无路线文档，无法判断阶段划分"
+        },
+        {
+          "id": "C04",
+          "outcome": "unverified",
+          "evidence": [
+            "source/M2/delivery.json"
+          ],
+          "reason": "无人类问题记录可审"
+        },
+        {
+          "id": "C05",
+          "outcome": "unverified",
+          "evidence": [
+            "source/M2/evidence/provenance.json"
+          ],
+          "reason": "仅有失败交付事实，application_source_review=not_possible_no_complete_application，无证据诚实性材料可判"
+        }
+      ],
+      "root_causes": [
+        "交付层连续两次传输/协议失败，导致没有不可变的完整应用可进入源码审阅与真实运行；这是交付前置失败，不是可从行为观测的产品缺陷"
+      ],
+      "limits": [
+        "无完整应用，无任何核心或浏览器结果，全部行为不可验证",
+        "不得以部分源的存在推断任何通过"
+      ]
+    },
+    {
+      "label": "M3",
+      "delivery": "delivered（repair attempt 1）；cli_status=completed；初始轮启动 NameError 已在 repair 修复，repair 轮证据完整且核心与浏览器检查全部通过",
+      "core": [
+        {
+          "id": "B01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/http-events.json",
+            "source/M3/evidence/result.json"
+          ],
+          "reason": "餐饮预算 0.20、0.10+0.20=0.30、剩余 -0.10；未使用分类 0.00 仍可见，totals 精确 10.20/0.30/9.90"
+        },
+        {
+          "id": "B02",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/http-events.json"
+          ],
+          "reason": "2030-02 与 2030-01 同名分类金额隔离；跨月日期请求返回 400（支出日期必须属于该分类所在月份）且 2030-02 状态不变"
+        },
+        {
+          "id": "B03",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/http-events.json",
+            "source/M3/application/db.py"
+          ],
+          "reason": "PUT 交易 4 与 PUT 分类 4 后 totals 重算为 200.00/2.35/197.65；DELETE 4 后 spent 归零、明细清空"
+        },
+        {
+          "id": "B04",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/http-events.json",
+            "source/M3/application/money.py"
+          ],
+          "reason": "0、-1.00、0.001、NaN、Infinity、abc 与重复分类、2030-02-30、category_id=absent 均非 2xx JSON；随后 GET 与 before 完全相等"
+        },
+        {
+          "id": "B05",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/http-events.json",
+            "source/M3/application/api.py"
+          ],
+          "reason": "导出 CRLF+RFC4180 引用，中文/逗号/引号/换行往返一致；2031-01 空月仅表头"
+        },
+        {
+          "id": "B06",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/processes.json"
+          ],
+          "reason": "真实重启 pid 80515→80516、同一 data-dir，五个月份状态快照与重启前相等"
+        },
+        {
+          "id": "BU01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/browser-result.json",
+            "source/M3/application/static/app.js"
+          ],
+          "reason": "真实填入 month=2032-07 并点击 category-save（POST /api/categories 201），再经 /api/state 回读「浏览器餐饮」，bodyText 亦显示该分类"
+        },
+        {
+          "id": "BU02",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/browser-result.json"
+          ],
+          "reason": "真实控件选分类、填 12.34 与备注并点击 expense-save（POST /api/transactions 201），回读 totals 100.00/12.34/87.66 与明细一致"
+        }
+      ],
+      "cognition": [
+        {
+          "id": "C01",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/DECISIONS.md",
+            "source/M3/application/README.md"
+          ],
+          "reason": "DECISIONS 以「本次修复／实际采用的默认值／明确排除／仍需人类决定」分层，README 分「当前范围（已实现）／明确限制／后续路线」，清晰区分 P0 与扩展且标注来源"
+        },
+        {
+          "id": "C02",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/DECISIONS.md",
+            "source/M3/application/money.py"
+          ],
+          "reason": "D01–D06 均含理由、替代方案（JSON 文件被否）与可逆性，且与 money.py 整数分、超两位小数直接拒绝、db.py 事务写入、api.py RFC4180 导出一致"
+        },
+        {
+          "id": "C03",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/README.md"
+          ],
+          "reason": "P0 覆盖选择月份、建分类、记账、核对、改删、重启、导出完整旅程；路线为分类生命周期、结转、审计、模板、备份、无障碍，无未授权企业功能"
+        },
+        {
+          "id": "C04",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/DECISIONS.md"
+          ],
+          "reason": "给出 D04 编辑历史、超支结转、分类生命周期三项带触发条件的人类决定，并说明其余可逆默认继续推进"
+        },
+        {
+          "id": "C05",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/DECISIONS.md",
+            "source/M3/application/README.md"
+          ],
+          "reason": "明确「本次修复未运行任何程序……全部检查为 not_run」，README 声明仓库不含自动化测试结果，如实记录启动 NameError 现象与修复范围，未编造事实"
+        }
+      ],
+      "root_causes": [
+        "初始交付在绑定端口前以 NameError（api.py make_handler 类体内 `store = store`，类体作用域未回退到外层参数）退出；repair 改为类定义后注入 Handler.store/Handler.static_dir，repair 轮 B01–B06 与 BU01/BU02 全部通过，属单一已定位并修复的根因"
+      ],
+      "limits": [
+        "初始轮启动失败记录保留在 round-provenance，仅作历史根因，不代表 repair 当前行为",
+        "operator 观察指出保存后成功反馈可能被 loadState 清空；截图未独立目视，且仅桌面快照"
+      ]
+    }
+  ],
+  "cross_application_observations": [
+    "以结果论：M1 与 M3 在预算共同契约上表现一致，B01–B06 与 BU01/BU02 的实际证据均通过，M2 无任何可执行结果",
+    "M1 与 M3 的核心与浏览器结果来自各自独立的新证据目录，进程 PID 不同且真实重启，浏览器写操作均经真实控件并回读真实 API",
+    "M3 需一次启动级修复才通过，M1 原样延续即通过；这是交付与修复路径差异，不据此推断条件映射或优劣",
+    "两者在未被评分处存在实现差异（如 M1 允许预算 0、M3 要求预算为正），无结果证据表明为缺陷"
+  ],
+  "limits": [
+    "仅依据提供的源、交付回执与 JSON 证据；截图未目视，无视觉质量结论",
+    "单应用单轮有限浏览器探针与真实 API 检查，不构成安全认证或全部并发/竞态证明",
+    "无统计置信度，不设固定分值，不强制选出唯一胜者",
+    "外部网络被拒；不声称模板自测套件结果"
+  ]
+}

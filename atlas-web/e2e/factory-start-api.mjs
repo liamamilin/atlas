@@ -1,0 +1,16 @@
+import {spawn} from 'node:child_process';
+import {copyFileSync,existsSync,mkdirSync,rmSync,writeFileSync} from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+const web=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const pack=path.resolve(web,'../application-atlas-production-pack');
+const runtime=path.join(web,'.factory-e2e-runtime');
+rmSync(runtime,{recursive:true,force:true});
+mkdirSync(path.join(runtime,'atlas'),{recursive:true});
+mkdirSync(path.join(runtime,'drafts'),{recursive:true});
+copyFileSync(path.join(pack,'atlas/atlas.sqlite'),path.join(runtime,'atlas/atlas.sqlite'));
+for(const file of ['mvp_apps.json','mvp_apps_classified.json'])if(existsSync(path.join(pack,file)))copyFileSync(path.join(pack,file),path.join(runtime,file));
+writeFileSync(path.join(runtime,'drafts/review.json'),'{}');
+const child=spawn(process.env.PYTHON||'python3',['drafts_api.py','--port','5209'],{cwd:pack,env:{...process.env,ATLAS_PACK:runtime,ATLAS_PROJECT_STORE:path.join(runtime,'projects/projects.sqlite'),ATLAS_FACTORY_DISABLE_WORKER:'1'},stdio:'inherit'});
+for(const signal of ['SIGTERM','SIGINT'])process.on(signal,()=>child.kill(signal));
+child.on('exit',code=>{rmSync(runtime,{recursive:true,force:true});process.exit(code||0);});

@@ -1,0 +1,84 @@
+{
+  "base_proposal_digest": "bc8a73b6d9eaab204cef484bbd476abca9ad6212fb03d2828817ea164dde0366",
+  "spec_changes": [
+    {
+      "path": [
+        "architecture_markdown"
+      ],
+      "replacements": [
+        {
+          "old": "浮点、负数、非数字、对象、数组、不存在或 tombstone 同样 400 invalid_category。",
+          "new": "浮点、负数、非数字、对象、数组同样 400 invalid_category；显式 categoryId 形状合法但资源不存在或已 tombstone 时统一 400 invalid_category、details.reason=unknown_or_deleted（POST /api/bookmarks、PATCH /api/bookmarks/:id、POST /api/bookmarks/:id/restore 一致）。归类删除独有的 target_unavailable/self_target/target_not_allowed 保持，不混用；不为其它未指定错误发明 reason。"
+        },
+        {
+          "old": "归类删除目标契约：targetCategoryId 仅用于 mode=move",
+          "new": "显式 categoryId 资源契约：POST /api/bookmarks、PATCH /api/bookmarks/:id 与 POST /api/bookmarks/:id/restore 的形状合法 categoryId 若不存在或已 tombstone，统一返回 400 invalid_category、details.reason=unknown_or_deleted；null、空串与类型等形状错误仍按 §4 处理，不附加该 reason。\n\n归类删除目标契约：targetCategoryId 仅用于 mode=move"
+        },
+        {
+          "old": "所有页面服务端渲染；成功表单返回 303 到 basePath 目标页；校验失败重新渲染并显示 [data-testid=form-error]（role=alert），保留用户已填值且不写入；成功提示用 [data-testid=flash]。",
+          "new": "所有页面服务端渲染；所有写入表单 method=post，查询表单保持 method=get。成功表单返回 303，Location 为 basePath 下的目标页：新建归类到首页；重命名到 /c/{id}；保存、重复另存、移动、编辑、软删除、归类删除 move/purge 与恢复到首页；单条永久删除与清空到 /trash。校验失败重新渲染并显示 [data-testid=form-error]（role=alert），保留用户已填值且不写入；一般字段错误为 200 + form-error，归类删除目标失效为 400 + dialog-error；成功提示用 [data-testid=flash]。Host/Origin/Fetch Metadata 安全拒绝在业务表单之前返回 400 invalid_host / 403 forbidden_origin 的 JSON 错误信封，不被普通表单的 200 渲染覆盖。浏览器渐进增强开启时，未勾选 trash-delete-confirm 或 trash-clear-confirm 点击提交必须在本地阻止、显示非空可见 form-error 或 role=alert，且不导航、不发变更请求；服务端独立校验确认，不能只依赖 JS，无 JS 时仍拒绝未确认请求且零写入。category-link 与 bookmark-category 元素内文本是归类名；计数如显示放在这些元素之外。"
+        },
+        {
+          "old": "P1 起 select 列出全部活跃归类，默认选中默认归类，tombstone 不出现。",
+          "new": "P0 也渲染 select[name=categoryId]，但仅含默认归类；P1 起列出全部活跃归类，默认选中默认归类，tombstone 不出现；A28 不因此调用 P1 接口。"
+        },
+        {
+          "old": "form[data-testid=trash-delete-form][data-bookmark-id] action={basePath}/trash/{id}/delete（checkbox[data-testid=trash-delete-confirm] + button[data-testid=trash-delete-submit]）、form[data-testid=trash-clear-form] action={basePath}/trash/clear（checkbox[data-testid=trash-clear-confirm] + button[data-testid=trash-clear-submit]）。清空会清空整个实例，只允许在专用实例手工执行，本轮不执行确认清空。",
+          "new": "form[data-testid=trash-delete-form][data-bookmark-id] action={basePath}/trash/{id}/delete（checkbox[data-testid=trash-delete-confirm] 勾选后提交 confirm=true + button[data-testid=trash-delete-submit]）、form[data-testid=trash-clear-form] action={basePath}/trash/clear（checkbox[data-testid=trash-clear-confirm] 勾选后提交 confirm=true + button[data-testid=trash-clear-submit]）。单条 HTML 永久删除要求 confirm=true，服务端独立校验，未确认请求零写入；这条 HTML 规则不改变 §6 中单条 JSON API DELETE /api/trash/:id 不读 confirm 的契约。清空会清空整个实例，只允许在专用实例手工执行，本轮不执行确认清空。"
+        }
+      ]
+    },
+    {
+      "path": [
+        "decisions",
+        "D07",
+        "default"
+      ],
+      "new": "不过期，完全由用户手动清空。单条 DELETE /api/trash/{id} 永久删除明确 id，不需要 confirm；HTML 回收站表单的单条永久删除需勾选确认并提交 confirm=true，由服务端独立校验，未确认零写入。清空整个回收站需 confirm=true。DELETE /api/trash 在请求发出前还要求运行上下文显式 --allow-destructive；缺少时以 infrastructure ATLAS_DESTRUCTIVE_NOT_ACKNOWLEDGED 记为未完成，不静默跳过。普通单条回收站删除不受该开关影响。"
+    },
+    {
+      "path": [
+        "acceptance",
+        "A03",
+        "goal"
+      ],
+      "new": "两次保存（title 缺省与纯空白标题各一次；categoryId 分别缺省与 null）都落入 isDefault=true 的未分类，两条标题均由服务端派生且非空非空白；归类列表恰有一个默认归类且默认在前、其余按 name_key 升序，默认归类 bookmarkCount 增加 2；记录 categoryId 为单一十进制字符串标量。POST 携带保证不存在的 categoryId 字符串返回 400 invalid_category（details.reason=unknown_or_deleted），且基础列表记录数、默认归类计数与归类快照不变。"
+    },
+    {
+      "path": [
+        "acceptance",
+        "A09",
+        "goal"
+      ],
+      "new": "501 码点标题返回 400 invalid_title，10001 码点备注返回 400 invalid_note，2049 码点 URL 返回 400 invalid_url（reason=url_too_long），超过 64 KiB 的请求体返回 413 payload_too_large（先于字段校验）；原始 URL 含 CR、LF、Tab 或 U+0000 返回 400 invalid_url（reason=control_character），标题或备注含 U+0001 返回 invalid_title/invalid_note；错误 Origin（Origin:null 与外站）与 Sec-Fetch-Site:cross-site 返回 403 forbidden_origin，POST 错误 Host 返回 400 invalid_host；对 GET /api/bookmarks、/api/categories、/api/bookmarks/{id}、/b/{id} 与 / 发错误 Host 均返回 400 invalid_host，响应仅为错误信封且不含已存标题或 URL。另以真实 application/x-www-form-urlencoded 的 POST /bookmarks 保存表单（合法 runId 网址/标题/备注，非 JSON body）追加四类坏头负例：错误 Host 返回 400 invalid_host，Origin:null、外站 Origin 与 Sec-Fetch-Site:cross-site 各返回 403 forbidden_origin，响应仅有错误信封且无数据正文，坏头只随该目标请求发送、不访问外站。所有失败零写入、不改变记录数、不产生部分写入，操作前后基础列表、归类计数与本 run 探测记录不变；伪造 Host 只发往已配置目标。"
+    },
+    {
+      "path": [
+        "acceptance",
+        "A17",
+        "goal"
+      ],
+      "new": "restore 省略 categoryId 时回到原归类且 fallbackUsed=false；原归类已 tombstone 时回退默认归类、fallbackUsed=true，回收站条目仍保留原归类名与 categoryDeleted=true；指定不存在或已 tombstone 的目标返回 400 invalid_category（details.reason=unknown_or_deleted）且记录留在回收站；已回收记录的 trashed_from_category_id 不被后续归类删除覆盖。"
+    },
+    {
+      "path": [
+        "acceptance",
+        "A20",
+        "goal"
+      ],
+      "new": "不存在 id 的 PATCH/DELETE/restore 返回 404 not_found，对 active 记录 restore 返回 409 not_trashed，已回收记录合法形状 PATCH 返回 404；PATCH 显式 url 一律 400 invalid_field（details.field=url）且整笔零写入；PATCH categoryId=null、空串、非法数字类型返回 400 invalid_category，已 tombstone 或不存在的形状合法 categoryId 返回 400 invalid_category（details.reason=unknown_or_deleted）；POST 携带已 tombstone 或不存在 categoryId 返回 400 invalid_category（details.reason=unknown_or_deleted）；PATCH 仅未知字段或空 body 返回 400 empty_patch；失败均返回统一错误信封且不改变记录、归类计数与列表。另以本 run 独立且由 tracker 管理的活跃归类、目标归类、活跃书签与回收站书签为前置，对 P1 写入口扩充坏头矩阵：HTML POST /bookmarks/{id}/move、/bookmarks/{id}/edit、/bookmarks/{id}/delete、/categories、/categories/{id}/rename、/categories/{id}/delete（mode=move 到本 run 活跃目标）、/trash/{id}/restore、/trash/{id}/delete 与 /trash/clear 均使用真实 application/x-www-form-urlencoded 与语义合法字段（永久删除/清空探针不带 confirm 或 confirm=false，绝不发送 HTML 全局 confirm=true）；JSON POST /api/categories、PATCH /api/categories/{id}、DELETE /api/categories/{id}?mode=move&targetCategoryId={ownedTarget} 覆盖同样坏头；错误 Host 返回 400 invalid_host（含 GET /api/trash 仅返回错误信封、无数据正文），Origin:null、外站 Origin 与 Sec-Fetch-Site:cross-site 返回 403 forbidden_origin。每一矩阵步骤后以实际 API 读回、完整归类快照与本 run 活跃及回收记录证明零写入，保留 title/note/categoryId/updatedAt 与来源字段和计数；测试只操作本 run 夹具，不假设全库或回收站为空，不清理非本 run 记录，也不调用全局 DELETE /api/trash 或绕过 --allow-destructive 护栏。"
+    }
+  ],
+  "file_plan_changes": [
+    {
+      "path": "acceptance/p0-limits.cjs",
+      "purpose": "编辑。P0 行为组 A08/A09/A10，导出 {phase:'P0', cases:[A08,A09,A10]}。保留 A08 字段边界成功往返与 A10 保守归一。扩展 A09：在既有 501/10001/2049/64KiB 之外，发送含 CR、LF、Tab、U+0000 的原始 URL 断言 400 invalid_url 且 details.reason=control_character；标题或备注含 U+0001 断言 invalid_title/invalid_note；保留 Origin:null、外站 Origin、Sec-Fetch-Site:cross-site 的 403 forbidden_origin 与 POST 错误 Host 的 400 invalid_host。新增只向已配置目标发送错误 Host 的 GET：/api/bookmarks、/api/categories、/api/bookmarks/{id}、/b/{id}、/，均断言 400 invalid_host、统一错误信封、正文不含已存标题或 URL；另用正确 Host 加伪造 X-Forwarded-Host 证明不采信该头。追加真实 application/x-www-form-urlencoded 的 POST /bookmarks 保存表单四类坏头负例（错误 Host、Origin:null、外站 Origin、Sec-Fetch-Site:cross-site），字段为合法 runId 网址/标题/备注、非 JSON body，经 common.request 只向已配置目标发送且 redirect=manual，期待错误 Host=400 invalid_host、其余=403 forbidden_origin，响应仅错误信封且无数据正文。所有失败后用 listRunBookmarks 与 categorySnapshot 断言零写入，操作前后基础列表、归类计数与本 run 探测记录不变，不提前调用 P1/P2 接口。依赖 common.request/api/断言与 support.defineCase/expectError/fillCodePoints/listRunBookmarks/readBookmark/scopedUrl；由 p0.cjs require，不读取凭据。对应 REVISION 第 5、7 项。",
+      "reuse": false
+    },
+    {
+      "path": "acceptance/p1-edit.cjs",
+      "purpose": "编辑。P1 行为组 A19/A20，导出 {phase:'P1', cases:[A19,A20]}。保留 A19 全部原断言与 A20 不存在 id、空 PATCH、PATCH url、非法 categoryId 与统一错误信封；形状合法但不存在/已 tombstone 的 categoryId 断言 details.reason=unknown_or_deleted。以本 run 独立且由 tracker 管理的活跃归类、目标归类、活跃书签与回收站书签为前置，在 A20 追加坏头矩阵：HTML POST /bookmarks/{id}/move、/bookmarks/{id}/edit、/bookmarks/{id}/delete、/categories、/categories/{id}/rename、/categories/{id}/delete（mode=move 到本 run 活跃目标）、/trash/{id}/restore、/trash/{id}/delete、/trash/clear 使用真实 application/x-www-form-urlencoded 与语义合法字段；JSON POST /api/categories、PATCH /api/categories/{id}、DELETE /api/categories/{id}?mode=move&targetCategoryId={ownedTarget} 覆盖同样坏头；错误 Host 得 400 invalid_host（含 GET /api/trash 仅错误信封、无数据正文），Origin:null、外站 Origin、Sec-Fetch-Site:cross-site 得 403 forbidden_origin。永久删除/清空探针不带 confirm 或 confirm=false，绝不发送全局 confirm=true；不调用全局 DELETE /api/trash、不绕过 common 的 --allow-destructive 护栏。每步后用 API 读回、完整归类快照与本 run 活跃/回收记录证明零写入并保留 title/note/categoryId/updatedAt/来源字段与计数；只操作本 run 夹具，不假设全库或回收站为空，不清理非本 run 记录，保留旧 tracker 的实际接口与失败诊断。依赖 common/support；由 p1.cjs 聚合，不读取 P2 检索。",
+      "reuse": false
+    }
+  ]
+}

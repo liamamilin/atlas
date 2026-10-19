@@ -1,0 +1,1410 @@
+{
+ "acceptance": [
+  {
+   "features": [
+    "F01"
+   ],
+   "goal": "把一个合法 http/https URL 保存到指定已有归类后，库列表出现该记录，且标题、URL 与所属归类与提交值一致。",
+   "id": "A01",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F01"
+   ],
+   "goal": "提交空 URL、非 http(s) 协议（javascript:、data:）或畸形 URL 时被拒绝并返回可见错误，库中记录数保持不变。",
+   "id": "A02",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "negative"
+  },
+  {
+   "features": [
+    "F02"
+   ],
+   "goal": "保存时未选择归类，记录进入默认收件箱，并可在默认收件箱视图中浏览到。",
+   "id": "A03",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F03"
+   ],
+   "goal": "新建归类后该归类出现在归类侧栏，且可将记录保存或移动到该新归类。",
+   "id": "A04",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F04"
+   ],
+   "goal": "把记录从归类 A 移动到归类 B 后，记录出现在 B 的浏览结果，且不再出现在 A。",
+   "id": "A05",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F05"
+   ],
+   "goal": "按归类浏览只返回该归类的记录，不会串入其他归类的记录。",
+   "id": "A06",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F06"
+   ],
+   "goal": "关键字检索命中标题、URL 或备注中匹配的记录，并排除不匹配的记录。",
+   "id": "A07",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F07"
+   ],
+   "goal": "访问记录的开原页入口返回指向所存 URL 的 http(s) 跳转（3xx Location 或含真实原始链接的页面），且不代理或返回目标网页正文。",
+   "id": "A08",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F08"
+   ],
+   "goal": "保存记录后，一个全新无会话的 HTTP 客户端仍能通过浏览或检索读回该记录，表明数据已由服务端持久保存；进程重启后的数据仍在由独立浏览器验收覆盖，本套件不重启服务、不直接读取应用数据库，也不得声称已完成进程重启。",
+   "id": "A09",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F09"
+   ],
+   "goal": "无匹配关键字的检索返回空结果集而不误报；未暴露的公开或分享类路由返回 404 且不泄露库内容。",
+   "id": "A10",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "negative"
+  },
+  {
+   "features": [
+    "F10"
+   ],
+   "goal": "编辑记录标题与备注后，列表与详情显示新值且更改持久保留。",
+   "id": "A11",
+   "implementation": "acceptance/p1.py",
+   "phase": "P1",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F11"
+   ],
+   "goal": "删除记录后移入回收站、从常规浏览与检索排除；从回收站恢复后重新可见。",
+   "id": "A12",
+   "implementation": "acceptance/p1.py",
+   "phase": "P1",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F10",
+    "F11"
+   ],
+   "goal": "已删除记录不出现在浏览与检索；对不存在或已删除 id 的编辑、移动与恢复请求返回 404 且库状态不变。",
+   "id": "A13",
+   "implementation": "acceptance/p1.py",
+   "phase": "P1",
+   "status": "not_run",
+   "type": "negative"
+  },
+  {
+   "features": [
+    "F12"
+   ],
+   "goal": "再次保存同一 URL 不产生第二条记录，且原记录被更新而非复制。",
+   "id": "A14",
+   "implementation": "acceptance/p1.py",
+   "phase": "P1",
+   "status": "not_run",
+   "type": "negative"
+  },
+  {
+   "features": [
+    "F13"
+   ],
+   "goal": "列表默认按加入时间倒序；按归类与关键字筛选返回正确子集与顺序。",
+   "id": "A15",
+   "implementation": "acceptance/p1.py",
+   "phase": "P1",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F14"
+   ],
+   "goal": "在父归类下新建子归类后，可在父与子层级浏览并把记录移动到子归类。",
+   "id": "A16",
+   "implementation": "acceptance/p1.py",
+   "phase": "P1",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F15"
+   ],
+   "goal": "重命名归类生效；删除归类时其记录回退到默认收件箱而不被级联删除。",
+   "id": "A17",
+   "implementation": "acceptance/p1.py",
+   "phase": "P1",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F16"
+   ],
+   "goal": "为记录添加与移除标签，并按标签浏览或检索出对应记录。",
+   "id": "A18",
+   "implementation": "acceptance/p1.py",
+   "phase": "P1",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F17"
+   ],
+   "goal": "导出整个库为 Netscape 书签 HTML，解析后包含归类结构与记录的 URL 与标题。",
+   "id": "A19",
+   "implementation": "acceptance/p2.py",
+   "phase": "P2",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F18"
+   ],
+   "goal": "从 Netscape 书签 HTML 导入时文件夹映射为归类，并保留 URL、标题与添加日期。",
+   "id": "A20",
+   "implementation": "acceptance/p2.py",
+   "phase": "P2",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F18"
+   ],
+   "goal": "导入畸形、空或超过大小上限的文件被明确拒绝并给出错误，库内容保持不变。",
+   "id": "A21",
+   "implementation": "acceptance/p2.py",
+   "phase": "P2",
+   "status": "not_run",
+   "type": "negative"
+  },
+  {
+   "features": [
+    "F19"
+   ],
+   "goal": "元数据抓取默认关闭，保存不触发外发请求；即使启用，指向私网或回环地址的抓取也被拒绝为安全错误。",
+   "id": "A22",
+   "implementation": "acceptance/p2.py",
+   "phase": "P2",
+   "status": "not_run",
+   "type": "negative"
+  },
+  {
+   "features": [
+    "F20"
+   ],
+   "goal": "在无外网环境下失效链接检查明确报告为 unavailable 或未验证，不伪报全部正常，也不改动记录本身。",
+   "id": "A23",
+   "implementation": "acceptance/p2.py",
+   "phase": "P2",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F21"
+   ],
+   "goal": "在未配置存档能力时请求网页副本，返回明确的未实现或不可用，而不是伪造或空的存档内容。",
+   "id": "A24",
+   "implementation": "acceptance/p2.py",
+   "phase": "P2",
+   "status": "not_run",
+   "type": "negative"
+  },
+  {
+   "features": [
+    "F22"
+   ],
+   "goal": "预填捕获入口 GET /?add=1&url=&title= 返回带预填值的真实保存表单，供 bookmarklet 或扩展调用。",
+   "id": "A25",
+   "implementation": "acceptance/p2.py",
+   "phase": "P2",
+   "status": "not_run",
+   "type": "positive"
+  }
+ ],
+ "architecture_markdown": "### 技术栈与理由\n默认：Python 3 标准库 `http.server.ThreadingHTTPServer` + `sqlite3` + 服务端渲染 HTML 表单（无 JavaScript、无第三方依赖）。理由：目标运行环境无外网、无可安装依赖，标准库即可离线运行；单文件 SQLite 便于持久化与验收只读断言；服务端渲染表单让验收用标准库 HTTP 客户端驱动真实用户流程（GUIDANCE 推荐），无需浏览器。\n备选与权衡：Flask/FastAPI/Django 需 pip 安装（离线不可靠）且模板或 ORM 增加体积；Node/Express 需 npm 且无内建 SQLite 驱动；前端 SPA + JSON API 需构建工具与真实浏览器才能验证界面，与离线约束冲突；纯静态站点无法满足本地持久化。采用标准库方案，同时把 HTTP 层与存储层分离，便于日后替换框架。\n\n### 数据模型\nP0：\n- `collections(id INTEGER PK, name TEXT NOT NULL UNIQUE, is_default INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL)`；首次启动创建默认收件箱（is_default=1，名称“未整理”），不可删除。\n- `bookmarks(id INTEGER PK, url TEXT NOT NULL, title TEXT NOT NULL DEFAULT '', note TEXT NOT NULL DEFAULT '', collection_id INTEGER NOT NULL REFERENCES collections(id), created_at TEXT NOT NULL, updated_at TEXT NOT NULL)`。\nP1 增量：`bookmarks.deleted_at TEXT NULL`；`collections.parent_id INTEGER NULL`；`tags(id INTEGER PK, name TEXT NOT NULL UNIQUE)` 与 `bookmark_tags(bookmark_id, tag_id)`。\nP2 增量：可选的 `fetch_status`、`archive_path` 字段；导入批次仅作日志，不改变主模型。\n所有时间以 UTC ISO-8601 文本存储；P1 起对规范化 URL 建唯一索引以实现一地址一记录。\n\n### HTTP / API 与错误契约\n| 方法 | 路径 | 请求 | 成功 | 错误 |\n| GET | `/`（含 `?collection=&q=`） | 无或查询参数 | 200 渲染列表与归类侧栏 | 未知 collection id → 404 |\n| POST | `/bookmarks` | 表单 `url`(必填) `title` `collection_id`(可选) | 303 → `/?collection=<id或inbox>` | 非法/空 URL → 400 错误页并回显输入 |\n| POST | `/collections` | 表单 `name` | 303 → `/` | 空或重名 → 400 |\n| POST | `/bookmarks/<id>/move` | 表单 `collection_id` | 303 → 目标归类 | 未知 id 或未知归类 → 404 |\n| GET | `/go/<id>` | 无 | 302 `Location: <保存的 URL>` | 未知 id → 404 |\n| GET | `/?q=` | 查询 | 200 结果页（可为空） | 无 |\n约定：GET 只读；所有 POST 变更后一律 303 重定向（PRG，避免刷新重复提交）；400 错误页保留用户输入并提供返回链接作为恢复；404 对不同实体统一格式。P1+ 沿用同一模式：`/trash`、`/bookmarks/<id>/restore`、`/bookmarks/<id>`(编辑)、`/tags`、`/export`、`/import`。未定义的公开或分享类路由一律 404。\n\n### UI 适配契约（供验收用标准库驱动真实界面）\n稳定字段与路由：\n- 捕获表单 `<form method=\"post\" action=\"/bookmarks\">`，字段 `url`(required)、`title`、`collection_id`(可选 select)。\n- 新建归类 `<form method=\"post\" action=\"/collections\">`，字段 `name`。\n- 移动记录 `<form method=\"post\" action=\"/bookmarks/<id>/move\">`，字段 `collection_id`。\n- 检索表单 `<form method=\"get\" action=\"/\">`，字段 `q`。\n- 列表项 `<li class=\"bookmark\" data-bookmark-id=\"..\">`，标题链接 `<a class=\"bookmark-title\" href=\"<保存的 URL>\">`；归类项 `<li class=\"collection\" data-collection-id=\"..\" data-default=\"0|1\">`。\n- 打开原页入口 `GET /go/<id>`（302）。\n无 JavaScript 依赖，所有交互在无脚本的可访问 HTML 中可用。\n\n### 用户能力追踪（入口 → 动作 → 成功 → 错误 → 恢复）\n| 能力 | 入口 | 动作 | 成功 | 错误 | 恢复 |\n| F01 保存 | 首页捕获表单 | POST /bookmarks | 303 后列表出现记录 | 非法 URL 400 | 错误页回显输入，修正后重提 |\n| F02 默认收件箱 | 捕获表单不选归类 | 提交 | 记录落入未整理 | — | 之后移动到合适归类 |\n| F03 新建归类 | 侧栏新建表单 | POST /collections | 303 后侧栏出现归类 | 空名 400 | 重新输入名称 |\n| F04 移动 | 记录上的移动表单 | POST /bookmarks/id/move | 目标归类出现记录 | 未知 id/归类 404 | 返回列表重新选择 |\n| F05 按归类浏览 | 侧栏归类链接 | GET /?collection= | 只显示该归类记录 | 未知 id 404 | 返回默认收件箱 |\n| F06 检索 | 顶部检索表单 | GET /?q= | 命中列表 | 无匹配→空结果 | 换关键词或清空 |\n| F07 打开原页 | 记录标题链接或 /go/id | GET /go/id | 302 到真实 URL | 未知 id 404 | 返回库列表 |\n| F08 持久化 | 任意写操作 | 事务提交 | 数据目录内 SQLite 落盘 | 磁盘错误→500 | 从数据目录备份恢复 |\n| F09 私有优先 | 无公开路由 | 访问 /share、/public | — | 统一 404 | 仅本地访问 |\n\n### 非功能要求\n- 离线自包含：运行期不访问外网；唯一例外是用户点击打开原页的 302 目标，验收不跟随该跳转。\n- 持久化：每次写操作提交 SQLite 事务；数据目录可整目录备份与恢复。\n- 单用户私有：无认证、无公开分享路由；本产品无凭据，不记录也不输出任何敏感值。\n- 安全：输出 HTML 全转义；URL 仅接受 http/https 绝对地址，拒绝 javascript:/data: 等 scheme；抓取启用时默认拒绝私网与回环地址。\n- 可移植：应用源码只读，仅 --data-dir 可写。\n- 可测：界面契约稳定（字段名、路由、data-* 属性），P0 全流程无需浏览器即可验收。\n\n### 限制与假设\n- 单进程本地服务，不做多实例并发写，SQLite 默认配置即可。\n- P0 不抓取页面元数据、不检测失效链接、不保存副本；抓取与存档见 D05/D11，属 P2 可选且离线默认关闭。\n- 进程重启的全流程验证由独立浏览器验收完成；本验收套件不重启服务，也不直接读取应用数据库，仅以保存后由全新无状态 HTTP 客户端读回记录作为套件内持久化佐证，进程重启耐久性标记为未验证，不声称已完成进程重启。\n- 导入导出、标签、子归类、回收站均属 P1/P2，P0 用例不得依赖它们。\n- 失效链接检测与元数据抓取在离线验收环境只能报告 unavailable，不得伪报通过。\n",
+ "decisions": [
+  {
+   "default": "P0 只实现“一记录一主归类＋默认收件箱”的单归属模型；标签作为 P1 可选叠加且不改变单归属语义。理由：与场景“简单归类”及 Raindrop/Linkwarden 默认形态一致，模型最小且可逆。",
+   "id": "D01",
+   "impact": "bookmarks.collection_id 单值 vs 多对多关联表；检索与组织面板 UI；迁移成本低但决定后续标签设计。",
+   "question": "组织模型采用单归属归类，还是同时引入标签/多归属？",
+   "status": "accepted-default（P0 固定单归属；标签待 P1 决策）",
+   "when_to_ask": "当用户实际需要在一条记录上同时表达多个主题、或跨归类用同一关键词聚合时。"
+  },
+  {
+   "default": "检测到已存在同 URL 记录时更新其元数据而非新建第二条，并在界面提示“已存在，已更新”。理由：成熟产品收敛于一地址一记录、避免库膨胀，行为可逆。",
+   "id": "D02",
+   "impact": "URL 唯一约束或查重端点、保存端点响应（新建 vs 更新）、冲突提示文案。",
+   "question": "再次保存同一 URL 时如何处理？",
+   "status": "open（P1 实现前确认）",
+   "when_to_ask": "当用户确实需要为同一页面保留用途不同的两条记录（例如同时归入“待购”和“参考”）时。"
+  },
+  {
+   "default": "软删除到回收站（deleted_at），常规浏览与检索排除、可恢复；永久清空需显式操作。理由：误删恢复成本低，成熟产品多用 Trash。",
+   "id": "D03",
+   "impact": "bookmarks.deleted_at、回收站视图、检索过滤、清空端点。",
+   "question": "删除是立即永久删除还是先入回收站？",
+   "status": "open（P1）",
+   "when_to_ask": "当用户做批量清理，或出于隐私要求彻底删除某些记录时。"
+  },
+  {
+   "default": "仅接受 http/https 绝对 URL 并在保存时做语法校验；服务端抓取默认关闭；启用抓取时默认拒绝私网、回环与链路本地地址（对齐 linkding SSRF 防护）。理由：安全优先且可逆。",
+   "id": "D04",
+   "impact": "校验模块、抓取服务、网络访问策略、错误契约。",
+   "question": "URL 校验与服务端抓取采用什么安全策略？",
+   "status": "accepted-default（P0 生效；抓取延后）",
+   "when_to_ask": "当启用自动元数据抓取，或确需保存非 http(s) 或内网地址时。"
+  },
+  {
+   "default": "默认由用户手动填写标题（URL 必填，标题为空则回退显示 URL）；自动抓取为 P2 可选且默认关闭。理由：离线环境无法抓取，手动路径最可靠。",
+   "id": "D05",
+   "impact": "保存表单必填项、保存时延、抓取的网络与安全依赖。",
+   "question": "标题等元数据由谁提供？",
+   "status": "open（P2）",
+   "when_to_ask": "当用户希望在保存时零输入、由系统自动补齐标题或图标时。"
+  },
+  {
+   "default": "Netscape 书签 HTML 作为导入导出格式（文件夹映射为归类），不承诺导出包含网页副本。理由：本类目事实交换标准，迁移与轻量备份成本最低。",
+   "id": "D06",
+   "impact": "导入映射与去重策略、导出字段、备份完整性声明。",
+   "question": "导出与导入使用什么格式作为互操作基线？",
+   "status": "open（P2）",
+   "when_to_ask": "当用户要迁移到或自其他书签产品，或需要含副本的完整实例级备份时。"
+  },
+  {
+   "default": "所有业务数据写入 --data-dir（默认 ./state）下的 SQLite 文件 library.sqlite3；服务监听 --port（默认 8000）；应用源码保持只读。理由：验收可写入独立数据目录并断言持久化，部署可换卷或端口。",
+   "id": "D07",
+   "impact": "启动参数、备份与恢复流程、验收的持久化断言。",
+   "question": "数据位置、启动方式与端口如何确定？",
+   "status": "accepted-default（P0）",
+   "when_to_ask": "当部署到持久卷、更换端口，或多实例共享同一数据库时。"
+  },
+  {
+   "default": "默认检索标题、URL 与备注（不含网页正文）；全文检索需外部索引，列为非必需。理由：不引入外部搜索引擎依赖，满足“记得一个词”的场景。",
+   "id": "D08",
+   "impact": "依赖引入、索引存储、查询实现。",
+   "question": "检索范围到哪一层？",
+   "status": "accepted-default（全文搜索不适用）",
+   "when_to_ask": "当用户要按网页正文内容检索时。"
+  },
+  {
+   "default": "把记录移回默认收件箱（不级联删除），删除前二次确认。理由：避免误删整组记录，组织结构可重塑。",
+   "id": "D09",
+   "impact": "归类删除端点、记录归属更新、数据完整性。",
+   "question": "删除归类时其下的记录如何处置？",
+   "status": "open（P1）",
+   "when_to_ask": "当用户想一次性删除某个归类及其全部记录时。"
+  },
+  {
+   "default": "P0 为无登录的单用户本地库；远程访问与多设备需独立决策（认证、HTTPS、同步）。理由：场景为单人本地，强加认证只增复杂度。",
+   "id": "D10",
+   "impact": "安全模型、部署形态、验收范围（远程需认证用例）。",
+   "question": "是否需要登录与远程、多设备访问？",
+   "status": "accepted-default（P0）",
+   "when_to_ask": "当用户要从其他设备访问，或多人共用同一实例时。"
+  },
+  {
+   "default": "默认不保存副本（记录指向，内容归 Web）；存档为 P2 可选，启用需 headless 浏览器、异步队列与存储，并说明登录或付费墙页面只会保存到登录墙。理由：与定义性“指向而非持有”一致，成本高。",
+   "id": "D11",
+   "impact": "存储与计算成本、异步任务、备份完整性。",
+   "question": "是否为记录保存网页副本（存档）？",
+   "status": "open（P2）",
+   "when_to_ask": "当页面经常消失、用户需要离线或长期留存时。"
+  }
+ ],
+ "features": [
+  {
+   "acceptance": [
+    "A01",
+    "A02"
+   ],
+   "applicability": "current required",
+   "id": "F01",
+   "name": "保存链接记录（主动捕获表单）",
+   "phase": "P0",
+   "reason": "场景核心：把偶然看到、当下不处理的外部网页留存下来的唯一入口，记录以 URL 为锚点，是必需的真人可用界面入口。",
+   "sources": [
+    "S01",
+    "S02",
+    "S12"
+   ]
+  },
+  {
+   "acceptance": [
+    "A03"
+   ],
+   "applicability": "current required",
+   "id": "F02",
+   "name": "默认收件箱（未整理归类）",
+   "phase": "P0",
+   "reason": "工作流要求未整理的链接可先进入默认归类、之后再移动；成熟产品（Raindrop Unsorted、Linkwarden Unorganized）均以此承接延迟整理。",
+   "sources": [
+    "S01",
+    "S03",
+    "S21"
+   ]
+  },
+  {
+   "acceptance": [
+    "A04"
+   ],
+   "applicability": "current required",
+   "id": "F03",
+   "name": "新建归类",
+   "phase": "P0",
+   "reason": "工作流要求保存时选择简单归类，并允许独立新建归类；归类等价于成熟产品的 collection/文件夹。",
+   "sources": [
+    "S01",
+    "S03"
+   ]
+  },
+  {
+   "acceptance": [
+    "A05"
+   ],
+   "applicability": "current required",
+   "id": "F04",
+   "name": "在归类之间移动记录",
+   "phase": "P0",
+   "reason": "场景明确要求未经整理或放错的链接之后能手动移动到更合适的位置，且重新打开后仍然有效。",
+   "sources": [
+    "S01",
+    "S02"
+   ]
+  },
+  {
+   "acceptance": [
+    "A06"
+   ],
+   "applicability": "current required",
+   "id": "F05",
+   "name": "按归类浏览",
+   "phase": "P0",
+   "reason": "检索路径之一：需要实际处理时打开个人库、浏览相关归类。",
+   "sources": [
+    "S01",
+    "S03"
+   ]
+  },
+  {
+   "acceptance": [
+    "A07"
+   ],
+   "applicability": "current required",
+   "id": "F06",
+   "name": "关键字检索",
+   "phase": "P0",
+   "reason": "检索路径之二：只记得某个词、不确定归类时找回记录；成熟产品在 title/description/URL/tags/notes 上匹配。",
+   "sources": [
+    "S01",
+    "S02"
+   ]
+  },
+  {
+   "acceptance": [
+    "A08"
+   ],
+   "applicability": "current required",
+   "id": "F07",
+   "name": "从记录打开原网页",
+   "phase": "P0",
+   "reason": "定义性终点：记录指向而非持有内容，打开记录必须回到真实外部页面；这是本类型存在的原因。",
+   "sources": [
+    "S01",
+    "S02"
+   ]
+  },
+  {
+   "acceptance": [
+    "A09"
+   ],
+   "applicability": "current required",
+   "id": "F08",
+   "name": "持久化个人库（跨会话与重启）",
+   "phase": "P0",
+   "reason": "定义性属性：记录跨会话累积成长期个人资产；GUIDANCE 明确要求进程重启后数据仍在。",
+   "sources": [
+    "S01",
+    "S02"
+   ]
+  },
+  {
+   "acceptance": [
+    "A10"
+   ],
+   "applicability": "current required",
+   "id": "F09",
+   "name": "私有优先（无公开暴露入口）",
+   "phase": "P0",
+   "reason": "成熟规则 private by default：单用户本地库默认不向他人公开，不提供分享或多用户入口，避免误暴露。",
+   "sources": [
+    "S01",
+    "S24",
+    "S23"
+   ]
+  },
+  {
+   "acceptance": [
+    "A11",
+    "A13"
+   ],
+   "applicability": "later",
+   "id": "F10",
+   "name": "编辑记录字段（标题/备注/URL 修正）",
+   "phase": "P1",
+   "reason": "记录携带元数据且各处可编辑，修正标题、补充备注是整理常态；场景未强制，属成熟能力。",
+   "sources": [
+    "S02",
+    "S21"
+   ]
+  },
+  {
+   "acceptance": [
+    "A12",
+    "A13"
+   ],
+   "applicability": "later",
+   "id": "F11",
+   "name": "删除到回收站与恢复",
+   "phase": "P1",
+   "reason": "可恢复删除成本低、体验稳（Raindrop Trash 可拖出恢复），为误删提供恢复路径，符合失败与恢复要求。",
+   "sources": [
+    "S01",
+    "S02"
+   ]
+  },
+  {
+   "acceptance": [
+    "A14"
+   ],
+   "applicability": "later",
+   "id": "F12",
+   "name": "同一 URL 收敛为一条记录",
+   "phase": "P1",
+   "reason": "成熟产品收敛于“一地址一记录”以防重复；linkding 在 URL 已存在时更新现有书签而非新建。",
+   "sources": [
+    "S01",
+    "S12",
+    "S07"
+   ]
+  },
+  {
+   "acceptance": [
+    "A15"
+   ],
+   "applicability": "later",
+   "id": "F13",
+   "name": "排序与筛选",
+   "phase": "P1",
+   "reason": "库增长后需要最新优先排序与按归类或关键字筛选，成熟产品默认 newest-first。",
+   "sources": [
+    "S02",
+    "S05"
+   ]
+  },
+  {
+   "acceptance": [
+    "A16"
+   ],
+   "applicability": "later",
+   "id": "F14",
+   "name": "嵌套子归类",
+   "phase": "P1",
+   "reason": "层级化组织是成熟产品常见形态（Linkwarden 将嵌套文件夹映射为子 collection）；场景初期扁平归类已够。",
+   "sources": [
+    "S03",
+    "S19"
+   ]
+  },
+  {
+   "acceptance": [
+    "A17"
+   ],
+   "applicability": "later",
+   "id": "F15",
+   "name": "归类重命名与删除（记录回退）",
+   "phase": "P1",
+   "reason": "组织结构应易于重塑；删除归类不应级联丢失记录，应回退默认收件箱。",
+   "sources": [
+    "S03",
+    "S15"
+   ]
+  },
+  {
+   "acceptance": [
+    "A18"
+   ],
+   "applicability": "later",
+   "id": "F16",
+   "name": "标签组织",
+   "phase": "P1",
+   "reason": "标签是与归类并行的成熟组织方式（linkding、Pinboard 以标签为主）；场景只要简单归类，故后置且不改单归属语义。",
+   "sources": [
+    "S01",
+    "S10",
+    "S21"
+   ]
+  },
+  {
+   "acceptance": [
+    "A19"
+   ],
+   "applicability": "later",
+   "id": "F17",
+   "name": "导出为 Netscape 书签 HTML",
+   "phase": "P2",
+   "reason": "互操作与轻量备份的最低基线；Raindrop 称该格式任何浏览器或书签管理器均可导入，成本最低。",
+   "sources": [
+    "S01",
+    "S04",
+    "S10"
+   ]
+  },
+  {
+   "acceptance": [
+    "A20",
+    "A21"
+   ],
+   "applicability": "later",
+   "id": "F18",
+   "name": "从 Netscape 书签 HTML 导入",
+   "phase": "P2",
+   "reason": "一键迁移既有浏览器书签；Linkwarden 将文件夹映射为 collection 并保留添加日期与标签。",
+   "sources": [
+    "S19",
+    "S10",
+    "S04"
+   ]
+  },
+  {
+   "acceptance": [
+    "A22"
+   ],
+   "applicability": "decision needed",
+   "id": "F19",
+   "name": "自动元数据抓取（默认关闭＋SSRF 防护）",
+   "phase": "P2",
+   "reason": "成熟产品自动抓取标题/描述/图标，但服务端抓取涉及外网与 SSRF 风险（linkding 默认拒绝内网主机）；本场景无外网，须默认关闭。",
+   "sources": [
+    "S10",
+    "S13",
+    "S21"
+   ]
+  },
+  {
+   "acceptance": [
+    "A23"
+   ],
+   "applicability": "later",
+   "id": "F20",
+   "name": "失效链接清单",
+   "phase": "P2",
+   "reason": "内容归 Web 所有使 link rot 成为结构性维护问题（Raindrop broken links）；离线环境只能报告未验证，不得伪造结果。",
+   "sources": [
+    "S08"
+   ]
+  },
+  {
+   "acceptance": [
+    "A24"
+   ],
+   "applicability": "decision needed",
+   "id": "F21",
+   "name": "网页存档副本",
+   "phase": "P2",
+   "reason": "存档是成熟独立产品的常见增强但非定义，且需 headless 浏览器、异步队列与存储成本（linkding latest-plus、Linkwarden 多格式），默认关闭。",
+   "sources": [
+    "S09",
+    "S18",
+    "S11"
+   ]
+  },
+  {
+   "acceptance": [
+    "A25"
+   ],
+   "applicability": "later",
+   "id": "F22",
+   "name": "捕获互操作（bookmarklet/扩展预填表单）",
+   "phase": "P2",
+   "reason": "成熟产品的捕获机械含 bookmarklet/扩展；本地首阶段只能提供可被其调用的预填捕获入口。",
+   "sources": [
+    "S10",
+    "S16"
+   ]
+  },
+  {
+   "acceptance": [],
+   "applicability": "not applicable",
+   "id": "F23",
+   "name": "全文搜索",
+   "phase": null,
+   "reason": "需外部搜索引擎（Linkwarden 依赖 Meilisearch）并抓取网页正文，超出场景“保存-检索-回跳”范围。",
+   "sources": [
+    "S05",
+    "S18"
+   ]
+  },
+  {
+   "acceptance": [],
+   "applicability": "not applicable",
+   "id": "F24",
+   "name": "多设备与云同步",
+   "phase": null,
+   "reason": "场景为单人本地库，云同步与多设备非当前需求，属成熟产品定位差异点，整体可延后重估。",
+   "sources": [
+    "S10",
+    "S05"
+   ]
+  },
+  {
+   "acceptance": [],
+   "applicability": "not applicable",
+   "id": "F25",
+   "name": "分享、公开集合与协作",
+   "phase": null,
+   "reason": "成熟规则为私有优先、分享是显式可选；本场景无分享需求，且会引入权限与角色复杂度。",
+   "sources": [
+    "S20",
+    "S17"
+   ]
+  },
+  {
+   "acceptance": [],
+   "applicability": "not applicable",
+   "id": "F26",
+   "name": "阅读器与未读标记",
+   "phase": null,
+   "reason": "与 Read-it-later 的混合重叠，非书签管理器定义；本场景是留存而非消费队列。",
+   "sources": [
+    "S10",
+    "S18"
+   ]
+  },
+  {
+   "acceptance": [],
+   "applicability": "not applicable",
+   "id": "F27",
+   "name": "提醒与标注",
+   "phase": null,
+   "reason": "属付费增值层与个性化能力（Raindrop Pro），本单用户场景适用性低。",
+   "sources": [
+    "S05"
+   ]
+  }
+ ],
+ "limits": [
+  "单用户本地库，不做登录、权限、协作与云同步（D10；F24、F25 不适用）。",
+  "P0 不自动抓取网页元数据，标题由用户手动填写或回退显示 URL（D05）。",
+  "P0 不保存网页副本，记录只指向外部资源，网页内容归 Web 所有（D11、F21 延后）。",
+  "P0 不检测失效链接、不做重复检测工具，链接失效属结构性维护问题，离线环境只报告未验证（F20）。",
+  "全文搜索不适用：需外部搜索引擎与正文抓取，超出场景范围（D08、F23）。",
+  "检索范围默认限于标题、URL 与备注，不含网页正文。",
+  "验收套件不重启服务进程，也不直接读取应用数据库；进程重启耐久性在本套件中标记为未验证（由独立浏览器验收覆盖），本套件仅以保存后由全新无状态 HTTP 客户端读回记录为佐证，不声称已重启。",
+  "运行期无外网；验收不跟随打开原页的 302 外部跳转，仅断言 Location 指向所存 URL。",
+  "导入导出仅支持 Netscape 书签 HTML，且导出不含网页或存档副本，不能作为完整实例备份（D06）。",
+  "容量与性能不作任意指标承诺；单进程 SQLite 足以支撑个人库规模，具体上限待真实使用与压测后确定。"
+ ],
+ "phases": [
+  {
+   "acceptance": [
+    "A01",
+    "A02",
+    "A03",
+    "A04",
+    "A05",
+    "A06",
+    "A07",
+    "A08",
+    "A09",
+    "A10"
+   ],
+   "features": [
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06",
+    "F07",
+    "F08",
+    "F09"
+   ],
+   "goal": "普通用户能在浏览器中主动保存外部网页链接，指定或新建简单归类，按归类浏览与关键字检索找回记录，并从记录打开真实原网页；数据在服务进程重启后仍然存在。",
+   "id": "P0",
+   "status": "not implemented",
+   "title": "核心闭环：保存 → 归类 → 找回 → 打开"
+  },
+  {
+   "acceptance": [
+    "A11",
+    "A12",
+    "A13",
+    "A14",
+    "A15",
+    "A16",
+    "A17",
+    "A18"
+   ],
+   "features": [
+    "F10",
+    "F11",
+    "F12",
+    "F13",
+    "F14",
+    "F15",
+    "F16"
+   ],
+   "goal": "用户能编辑记录、删除并恢复、避免重复、按时间/归类/关键字筛选排序，并用子归类与标签重塑组织结构。",
+   "id": "P1",
+   "status": "not implemented",
+   "title": "整理与维护"
+  },
+  {
+   "acceptance": [
+    "A19",
+    "A20",
+    "A21",
+    "A22",
+    "A23",
+    "A24",
+    "A25"
+   ],
+   "features": [
+    "F17",
+    "F18",
+    "F19",
+    "F20",
+    "F21",
+    "F22"
+   ],
+   "goal": "用户能导入与导出 Netscape 书签 HTML 完成迁移与轻量备份，并在显式开启时使用元数据抓取、失效链接清单、可选存档与 bookmarklet 捕获入口。",
+   "id": "P2",
+   "status": "not implemented",
+   "title": "互操作与可选增强"
+  }
+ ],
+ "roles": [
+  {
+   "id": "R01",
+   "name": "收藏夹使用者",
+   "responsibility": "在浏览器中主动保存浏览时遇到的外部网页链接，选择或新建简单归类（如“待购”“家居改造”“以后看看”），把未整理或放错的记录移动到合适归类，按归类浏览或用关键字检索找回记录，并从记录打开原始网页。"
+  },
+  {
+   "id": "R02",
+   "name": "本地部署与运维者",
+   "responsibility": "以只读应用源码加可写数据目录的方式启动本地服务（--port、--data-dir），保证数据目录持久、可整目录备份，升级或重启时不丢失业务数据，并确保服务不暴露到公网。"
+  }
+ ],
+ "title": "生活待购与灵感收藏夹",
+ "id": "blueprint-job_b33d0a3f57cd4c628f4b4070750f7cd0",
+ "schema": "atlas.product-blueprint.v0",
+ "kind": "product-blueprint",
+ "version": "0.1.0",
+ "created_at": "2026-10-19T02:55:44.250163+00:00",
+ "status": "candidate; programs not executed",
+ "scenario": {
+  "acceptance": [
+   "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+   "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+   "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+   "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+  ],
+  "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+  "id": "scn_7756e0007f6a463a97316f3f49c15248",
+  "leaf": "bookmark-manager",
+  "leaf_name": "书签管理器",
+  "name": "生活待购与灵感收藏夹",
+  "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+  "revision": 2,
+  "status": "ready",
+  "updated_at": "2026-10-16T14:18:20.407897+00:00",
+  "workflow": [
+   "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+   "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+   "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+   "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+   "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+  ]
+ },
+ "sources": [
+  {
+   "id": "S01",
+   "name": "Atlas confirmed input",
+   "url": "inputs/scenario.json",
+   "kind": "confirmed_input",
+   "version": "scn_7756e0007f6a463a97316f3f49c15248@2",
+   "facts": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+   "license": "Atlas scenario input; not a third-party code license",
+   "reuse": "Pinned requirement input"
+  },
+  {
+   "id": "S02",
+   "name": "Raindrop.io Help Center — Bookmarks",
+   "url": "https://help.raindrop.io/bookmarks",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "书签是产品核心对象，保存时选择 collection、可加 tag 与笔记并保存；一个书签只属于一个 collection；删除的书签移入 Trash collection，可像普通 collection 一样浏览，并通过拖出（或移到任意 collection）来恢复。",
+   "license": "专有 SaaS，非代码；未提供开源许可证",
+   "reuse": "build（仅借鉴概念约定，复用其交互约定而非代码）"
+  },
+  {
+   "id": "S03",
+   "name": "Raindrop.io Help Center — Collections",
+   "url": "https://help.raindrop.io/collections",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "collection 类似文件夹用于分组；未选择 collection 就保存的书签落入内置收件箱 Unsorted，供日后整理；每个 collection 有独立图标与布局设置。",
+   "license": "专有 SaaS，非代码；未提供开源许可证",
+   "reuse": "build（采用“默认收件箱”概念；本场景验收要求含默认归类）"
+  },
+  {
+   "id": "S04",
+   "name": "Raindrop.io Help Center — Export & backup",
+   "url": "https://help.raindrop.io/export",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "可导出整账户、单个 collection 或选中项，格式为 HTML、CSV、TXT；HTML 即浏览器书签通用的 Netscape 格式，任何浏览器或书签管理器均可导入；自动每日备份（云目的地如 Dropbox、Google Drive，另有 OneDrive 提及）需 Pro 订阅；导出与备份在网页端执行。",
+   "license": "专有 SaaS，非代码；未提供开源许可证",
+   "reuse": "reuse（采用 Netscape HTML 作为互操作导出格式）；备份/云同步为可选"
+  },
+  {
+   "id": "S05",
+   "name": "Raindrop.io Help Center — Limits（计划对比）",
+   "url": "https://help.raindrop.io/limitations",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "免费版书签、collection、tag、每个 collection 的协作者数与同步设备数均无限；免费与 Pro 的差异集中在：文件上传 100MB/月 vs 10GB/月、单文件 100MB vs 300MB、提醒、标注、重复查找器（Duplicate finder）、自动备份；Pro 才含 Duplicate finder 与 Automatic backups。",
+   "license": "专有 SaaS，非代码；未提供开源许可证",
+   "reuse": "build（按场景取舍付费点：本场景不需要标注/提醒/大文件上传，重复与备份可自建为轻量能力）"
+  },
+  {
+   "id": "S06",
+   "name": "Raindrop.io — Pricing",
+   "url": "https://raindrop.io/pro/buy",
+   "version": "access date 2026-10-19（页面显示 Pro 年付 US$28；价格易变）",
+   "facts": "官方定价页：Free 版无限书签/collection/highlights/设备、导入导出、跨平台应用、可分享协作、100MB/月文件上传；Pro 年付 US$28，增加 AI 助手、全文搜索、Web archive（网页存档）、提醒、标注、Duplicate and broken links finder、每日备份、10GB/月上传。",
+   "license": "专有 SaaS，非代码；未提供开源许可证",
+   "reuse": "build（作为可选增值层参照；核心库功能免费，存档/全文搜索/去重等为本场景的非必需增强）"
+  },
+  {
+   "id": "S07",
+   "name": "Raindrop.io Help Center — Duplicates",
+   "url": "https://help.raindrop.io/duplicates",
+   "version": "access date 2026-10-19（在线文档，未固定版本；页面正文多半未取回）",
+   "facts": "Raindrop.io 可检测重复书签并在单一列表展示以便清理；Filters 页的 Library health 将 Duplicates 定义为“同一 URL 被保存多次”。（具体判定算法与是否自动合并未从完整正文核验。）",
+   "license": "专有 SaaS，非代码；未提供开源许可证",
+   "reuse": "build（库卫生为成熟产品的可选能力，非本场景定义性需求）"
+  },
+  {
+   "id": "S08",
+   "name": "Raindrop.io Help Center — Broken links",
+   "url": "https://help.raindrop.io/broken-links",
+   "version": "access date 2026-10-19（在线文档，未固定版本；正文受搜索摘要限制）",
+   "facts": "提供失效链接（broken links）清单能力；该页 FAQ 明确 Raindrop.io 会自动为每个书签保存 web archive 副本。（检测机制细节未从完整正文核验。）",
+   "license": "专有 SaaS，非代码；未提供开源许可证",
+   "reuse": "build（失效链接为“内容在应用之外”带来的结构性维护事项，可延后实现）"
+  },
+  {
+   "id": "S09",
+   "name": "Raindrop.io Help Center — Web archive（永久副本）",
+   "url": "https://help.raindrop.io/web-archive",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "自动保存每个网页的副本；失败的页面会自动重试；可下载副本到本地并手动分享；据 Web 端变更日志（2025-05-19），对失效或离线的链接也使用 Wayback Machine 生成永久副本。",
+   "license": "专有 SaaS，非代码；未提供开源许可证",
+   "reuse": "build/optional（内容保存在原站之外，是否存档属可选增强，非书签管理器定义）"
+  },
+  {
+   "id": "S10",
+   "name": "linkding — 官方文档站（产品与功能）",
+   "url": "https://linkding.link/",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "自托管书签管理器，定位最小、快速、易部署；功能：标签组织、可开关的自定义、自动抓取标题/描述/图标/预览图、归档（本地 HTML 快照或 Internet Archive）、批量编辑、Netscape HTML 格式导入导出、多用户并可向他人或访客分享、Firefox/Chrome 扩展、REST API、单 Docker 容器 + SQLite 低维护。",
+   "license": "开源（MIT，见其 GitHub 仓库）",
+   "reuse": "reuse（MIT 宽松许可，可借鉴其最小实现与导入导出契约；本任务不复制代码）",
+   "license_url": "https://github.com/sissbruecker/linkding/blob/master/LICENSE.txt"
+  },
+  {
+   "id": "S11",
+   "name": "linkding — Archiving 文档",
+   "url": "https://linkding.link/archiving/",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "服务器端归档仅在 latest-plus 镜像提供，用 singlefile-cli（headless Chromium）生成单 HTML 快照并加载 uBlock Origin Lite；直接指向 PDF 的 URL 会下载 PDF 存为资产；缺点：镜像显著变大、需约 1GB 内存、不支持 ARM v7、可能触发反爬、登录页内容不完整。替代路径：用 SingleFile 扩展上传到 /api/bookmarks/singlefile/，或 linkding 扩展“添加书签后运行 SingleFile”。",
+   "license": "开源（MIT）；归档依赖 third-party 工具（singlefile-cli、Chromium），其各自许可未在本任务核验",
+   "reuse": "build/optional（存档有实际资源与可靠性代价，适合作为可选层）",
+   "license_url": "https://github.com/sissbruecker/linkding/blob/master/LICENSE.txt"
+  },
+  {
+   "id": "S12",
+   "name": "linkding — REST API 文档",
+   "url": "https://linkding.link/api/",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "API 以 per-user token 认证；书签 CRUD、check 端点检查 URL 是否已保存并返回现有书签与抓取的 metadata 及 auto_tags；创建时若 URL 已存在会“静默更新现有书签而非新建”（文档提示未来可能改为报错）；分发时可按 modified_since/added_since 过滤；含 archived（归档）书签端点、assets（快照/上传）、bundles。",
+   "license": "开源（MIT）",
+   "reuse": "build（“同 URL 一条记录”的收敛策略与 check 端点是可借鉴的契约设计）",
+   "license_url": "https://github.com/sissbruecker/linkding/blob/master/LICENSE.txt"
+  },
+  {
+   "id": "S13",
+   "name": "linkding — Options 文档（安全与运行选项）",
+   "url": "https://linkding.link/options/",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "默认拒绝加载指向内网主机的 URL 数据以防护 SSRF，可通过 LD_ALLOWED_INTERNAL_HOSTS 配置白名单或 * 关闭；LD_DISABLE_URL_VALIDATION 可禁用 URL 校验以存非 http(s) 或非全限定地址；支持 LD_ENABLE_OIDC（OIDC/SSO）与 LD_ENABLE_AUTH_PROXY（认证代理，会自动建用户）；数据库可选 SQLite（默认）或 PostgreSQL。",
+   "license": "开源（MIT）",
+   "reuse": "build（单用户自托管可关闭这些企业向能力；但 URL 校验/SSRF 防护对任何抓取元数据的产品都值得早期考虑）",
+   "license_url": "https://github.com/sissbruecker/linkding/blob/master/LICENSE.txt"
+  },
+  {
+   "id": "S14",
+   "name": "linkding — Auto tagging 文档",
+   "url": "https://linkding.link/auto-tagging/",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "按 URL 模式（hostname/path/query/fragment）自动打标签；规则在创建或更新书签时应用；不匹配网站内容，不支持通配符；网页表单与浏览器扩展会预览将要添加的标签。",
+   "license": "开源（MIT）",
+   "reuse": "build/optional（自动归类为可选增强，本场景用户手动选简单归类）",
+   "license_url": "https://github.com/sissbruecker/linkding/blob/master/LICENSE.txt"
+  },
+  {
+   "id": "S15",
+   "name": "linkding — Admin 文档",
+   "url": "https://linkding.link/admin/",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "内置 Django admin，含 linkding 定制；提供 UI 之外的能力：用户管理/自助、书签与标签管理（含批量操作）；批量书签动作有 Delete/Archive/Unarchive；标签可批量删除或删除未使用标签，删除标签不影响书签本身。",
+   "license": "开源（MIT）",
+   "reuse": "build（管理面/审计能力在本单用户场景中适用性低，可省略）",
+   "license_url": "https://github.com/sissbruecker/linkding/blob/master/LICENSE.txt"
+  },
+  {
+   "id": "S16",
+   "name": "linkding — GitHub 仓库（自述与许可证）",
+   "url": "https://github.com/sissbruecker/linkding",
+   "version": "master 分支，access date 2026-10-19（未固定分支；约 11.3k stars）",
+   "facts": "官方仓库确认：自托管、Docker 部署；功能含标签组织、批量编辑、Markdown 笔记、read-it-later、与他用户/访客分享、自动获取标题描述图标、归档、Netscape HTML 导入导出、PWA、Firefox/Chrome 扩展与 bookmarklet、OIDC/认证代理 SSO、REST API、admin 面板。仓库标注 MIT license。",
+   "license": "MIT License，Copyright (c) 2019 Sascha Ißbrücker",
+   "reuse": "reuse（MIT：宽松，可参考实现与再分发；本任务仅研究、不复制代码）",
+   "license_url": "https://github.com/sissbruecker/linkding/blob/master/LICENSE.txt"
+  },
+  {
+   "id": "S17",
+   "name": "Linkwarden — 官方文档 Welcome",
+   "url": "https://docs.linkwarden.app/",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "自托管、开源的协作式书签管理器：收集、阅读、标注并“完整保存”网页；明确以网页可能消失（link rot）为由为每个书签保存多格式副本；兼具 read-it-later 体验与 web archive 可靠性；面向协作，支持公开分享与多用户。",
+   "license": "开源（AGPL-3.0，见其 GitHub LICENSE.md）",
+   "reuse": "谨慎 reuse（AGPL-3.0 属 copyleft，网络服务修改后须向用户提供源码；如用于闭源产品需评估合规）",
+   "license_url": "https://github.com/linkwarden/linkwarden/blob/main/LICENSE.md"
+  },
+  {
+   "id": "S18",
+   "name": "Linkwarden — Preservation 文档",
+   "url": "https://docs.linkwarden.app/usage/preservation",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "保存链接进入队列，后台 worker 用真实浏览器异步生成多种格式；格式含 Readable（正文）、Webpage（单文件 HTML，Monolith）、Screenshot（整页 JPEG）、PDF，以及提交给 Wayback Machine 的 Archive.org 快照（不由 Linkwarden 存储）；除 Archive.org 外新账户默认全开，可按全局或按 Tag 配置；刷新会先删除现有副本再从实时页面重新保存（页面已消失则失去旧副本）；每链接有超时与大小上限，生成失败标记为不可用；副本按 collection 存于磁盘或 S3，删除链接/collection 会连带删除文件；正文提取文本用于全文搜索（需 Meilisearch，自托管未必具备）。",
+   "license": "开源（AGPL-3.0）",
+   "reuse": "build/optional（内容存档是重量级可选能力，与书签“指向而非持有内容”的核心相反）",
+   "license_url": "https://github.com/linkwarden/linkwarden/blob/main/LICENSE.md"
+  },
+  {
+   "id": "S19",
+   "name": "Linkwarden — Import & Export 文档",
+   "url": "https://docs.linkwarden.app/usage/import-and-export",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "导入不参与去重，同一文件重复导入会产生两份；导入的链接会进入归档队列；从浏览器 HTML 文件导入时：文件夹变为 collection、嵌套文件夹变为子 collection、无文件夹的书签进入名为 Imports 的 collection、保留原始添加日期、有 TAGS 属性时保留标签；导出为 backup.json，仅含元数据（账户设置、collections、links、tags、置顶链接、RSS 订阅），不含已保存的截图/PDF/快照，不能作为实例的完整备份；导入文件默认上限 10MB（IMPORT_LIMIT）。",
+   "license": "开源（AGPL-3.0）",
+   "reuse": "reuse（其“导入不去重”“导出仅元数据”的取舍值得作为自建时的边界提示）",
+   "license_url": "https://github.com/linkwarden/linkwarden/blob/main/LICENSE.md"
+  },
+  {
+   "id": "S20",
+   "name": "Linkwarden — Read and Annotate 文档（权限说明）",
+   "url": "https://docs.linkwarden.app/usage/read-and-annotate",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "高亮与笔记对每个用户私有，共享 collection 中各成员独立标注彼此不可见；标注需要 collection 上的 Admin 角色或拥有权；Viewer/Contributor 可阅读但不能标注；公开 collection 的访客可读 Readable 但不能标注；删除链接会删除其标注。",
+   "license": "开源（AGPL-3.0）",
+   "reuse": "build（角色/权限属协作向能力，本单用户场景适用性低）",
+   "license_url": "https://github.com/linkwarden/linkwarden/blob/main/LICENSE.md"
+  },
+  {
+   "id": "S21",
+   "name": "Linkwarden — Links 文档（数据模型）",
+   "url": "https://docs.linkwarden.app/usage/links",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "每个链接的数据：Address(URL) 必填、Collection 必填(默认 Unorganized)、Tags 可选、Name 可选、Description 可选(默认自动生成)、Is Pinned 可选、Screenshot/PDF 自动生成；一个链接只属一个 collection 但可有多个 tag；collection 可分享协作、tag 不可分享；Overview 说明每个用户的链接/标签/collection 数量不限。",
+   "license": "开源（AGPL-3.0）",
+   "reuse": "build（“一条记录=URL+一个主归类+多标签”与场景的“简单归类”高度吻合）",
+   "license_url": "https://github.com/linkwarden/linkwarden/blob/main/LICENSE.md"
+  },
+  {
+   "id": "S22",
+   "name": "Linkwarden — GitHub LICENSE.md",
+   "url": "https://github.com/linkwarden/linkwarden/blob/main/LICENSE.md",
+   "version": "main 分支 raw 文件，access date 2026-10-19（未固定分支）",
+   "facts": "文件正文为 GNU Affero General Public License Version 3（2007-11-19 文本，含第 13 条远程网络交互条款），标题为 AGPL v3 应用模板。",
+   "license": "GNU AGPL-3.0",
+   "reuse": "谨慎 reuse（copyleft：若基于其代码提供网络服务需向用户提供对应源码）",
+   "license_url": "https://github.com/linkwarden/linkwarden/blob/main/LICENSE.md"
+  },
+  {
+   "id": "S23",
+   "name": "Pinboard — 官方 FAQ",
+   "url": "https://pinboard.in/faq/",
+   "version": "access date 2026-10-19（在线文档，未固定版本；价格与服务状态可能变动）",
+   "facts": "定位为“你见过的东西的互联网搜索引擎”——个人链接存档，可从任意电脑保存与搜索；archive 为付费功能，下载并存每个书签的本地副本并在原站下线/变更后仍可用，同时开启对书签页面全文的全文搜索；archive 价格 US$39/年（多年有折扣），7 天退款；每链接 32MB 大小上限；每链接只爬取一次，可手动 re-crawl；导入会保留标签与创建时间、隐私等元数据；标签最长 255 字符、不可含空白/逗号、不区分大小写；可用最多 4 个标签组合过滤；付费用户可请求下载归档备份（每书签一个文件夹+顶层 manifest HTML）。",
+   "license": "专有 SaaS，非代码；未提供开源许可证",
+   "reuse": "build（付费存档层与全文搜索是可选增值；单用户场景可省略）"
+  },
+  {
+   "id": "S24",
+   "name": "Pinboard — 官方 howto 页",
+   "url": "https://pinboard.in/howto/",
+   "version": "access date 2026-10-19（在线文档，未固定版本）",
+   "facts": "书签可设为 public 或 private，仅自己可见 private；可将全部书签默认设为 private；以点号(.)开头的标签为私有标签；标签是主要组织方式，可按录入顺序或字母顺序显示，标签云约显示最常用的 200 个；Bundles 是“标签的命名集合”，用于把大量标签按类别分组，默认公开（点号前缀可私有）；导入会保留标签，原为私有的仍保持私有。",
+   "license": "专有 SaaS，非代码；未提供开源许可证",
+   "reuse": "build（私有优先与“标签分组”概念可借鉴；默认隐私符合叶子“private by default”规则）"
+  },
+  {
+   "id": "S25",
+   "name": "Pinboard — API v2 DRAFT 文档",
+   "url": "https://idlewords.com/pinboard_api2_draft.htm",
+   "version": "草稿文档（DRAFT），access date 2026-10-19",
+   "facts": "草稿 API：书签含 archived 端点用于取回缓存副本 URL，仅归档用户可用；POST 请求重新爬取会覆盖原副本；标签为不含空白、大小写不敏感的自由标识；提供标签列表、批量改名与删除等端点；bundles 返回用户标签分组。",
+   "license": "专有 SaaS 的 API 文档，非代码；未提供开源许可证",
+   "reuse": "uncertainty（草稿接口易变；仅作参考，不依赖其契约）"
+  },
+  {
+   "id": "S26",
+   "name": "Delicious（社交书签历史）— Wikipedia 条目",
+   "url": "https://en.wikipedia.org/wiki/Delicious_(website)",
+   "version": "条目版本 2026-09-22（access date 2026-10-19；百科非官方一手来源）",
+   "facts": "Delicious（del.icio.us）是成立于 2003 年的社交书签 Web 服务，用于存储、分享与发现网页书签，以标签为核心、早期公共可见并带社交/发现属性；后被 Yahoo 等收购（历史归属与关停细节未逐条核验）。",
+   "license": "非代码（百科条目；Wikipedia 文本许可未在本任务核验版本）",
+   "reuse": "build（作为“标签型社交书签”历史变体的旁证，佐证核心可脱离现代存档/协作能力而成立）"
+  },
+  {
+   "id": "S27",
+   "name": "Google Chrome 帮助 — 创建、查找与编辑书签（内置书签管理器）",
+   "url": "https://support.google.com/chrome/answer/188842",
+   "version": "access date 2026-10-19（仅经搜索摘要，未取回完整正文）",
+   "facts": "Chrome 内置书签管理器：可添加/编辑书签与文件夹；导出会把书签写成 HTML 文件，可再导入到另一浏览器或新设备（导出/导入路径见配套帮助页 support.google.com/chrome/answer/96816）。仅凭搜索摘要，未核验完整正文细节。",
+   "license": "专有产品文档，非代码；未提供开源许可证",
+   "reuse": "build（浏览器内置形式与独立产品“同核不同范围”的对照旁证；作为叶子概念论断的弱证据）"
+  }
+ ],
+ "evidence": [],
+ "research": {
+  "sources": [
+   {
+    "id": "S02",
+    "name": "Raindrop.io Help Center — Bookmarks",
+    "url": "https://help.raindrop.io/bookmarks",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "书签是产品核心对象，保存时选择 collection、可加 tag 与笔记并保存；一个书签只属于一个 collection；删除的书签移入 Trash collection，可像普通 collection 一样浏览，并通过拖出（或移到任意 collection）来恢复。",
+    "license": "专有 SaaS，非代码；未提供开源许可证",
+    "reuse": "build（仅借鉴概念约定，复用其交互约定而非代码）"
+   },
+   {
+    "id": "S03",
+    "name": "Raindrop.io Help Center — Collections",
+    "url": "https://help.raindrop.io/collections",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "collection 类似文件夹用于分组；未选择 collection 就保存的书签落入内置收件箱 Unsorted，供日后整理；每个 collection 有独立图标与布局设置。",
+    "license": "专有 SaaS，非代码；未提供开源许可证",
+    "reuse": "build（采用“默认收件箱”概念；本场景验收要求含默认归类）"
+   },
+   {
+    "id": "S04",
+    "name": "Raindrop.io Help Center — Export & backup",
+    "url": "https://help.raindrop.io/export",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "可导出整账户、单个 collection 或选中项，格式为 HTML、CSV、TXT；HTML 即浏览器书签通用的 Netscape 格式，任何浏览器或书签管理器均可导入；自动每日备份（云目的地如 Dropbox、Google Drive，另有 OneDrive 提及）需 Pro 订阅；导出与备份在网页端执行。",
+    "license": "专有 SaaS，非代码；未提供开源许可证",
+    "reuse": "reuse（采用 Netscape HTML 作为互操作导出格式）；备份/云同步为可选"
+   },
+   {
+    "id": "S05",
+    "name": "Raindrop.io Help Center — Limits（计划对比）",
+    "url": "https://help.raindrop.io/limitations",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "免费版书签、collection、tag、每个 collection 的协作者数与同步设备数均无限；免费与 Pro 的差异集中在：文件上传 100MB/月 vs 10GB/月、单文件 100MB vs 300MB、提醒、标注、重复查找器（Duplicate finder）、自动备份；Pro 才含 Duplicate finder 与 Automatic backups。",
+    "license": "专有 SaaS，非代码；未提供开源许可证",
+    "reuse": "build（按场景取舍付费点：本场景不需要标注/提醒/大文件上传，重复与备份可自建为轻量能力）"
+   },
+   {
+    "id": "S06",
+    "name": "Raindrop.io — Pricing",
+    "url": "https://raindrop.io/pro/buy",
+    "version": "access date 2026-10-19（页面显示 Pro 年付 US$28；价格易变）",
+    "facts": "官方定价页：Free 版无限书签/collection/highlights/设备、导入导出、跨平台应用、可分享协作、100MB/月文件上传；Pro 年付 US$28，增加 AI 助手、全文搜索、Web archive（网页存档）、提醒、标注、Duplicate and broken links finder、每日备份、10GB/月上传。",
+    "license": "专有 SaaS，非代码；未提供开源许可证",
+    "reuse": "build（作为可选增值层参照；核心库功能免费，存档/全文搜索/去重等为本场景的非必需增强）"
+   },
+   {
+    "id": "S07",
+    "name": "Raindrop.io Help Center — Duplicates",
+    "url": "https://help.raindrop.io/duplicates",
+    "version": "access date 2026-10-19（在线文档，未固定版本；页面正文多半未取回）",
+    "facts": "Raindrop.io 可检测重复书签并在单一列表展示以便清理；Filters 页的 Library health 将 Duplicates 定义为“同一 URL 被保存多次”。（具体判定算法与是否自动合并未从完整正文核验。）",
+    "license": "专有 SaaS，非代码；未提供开源许可证",
+    "reuse": "build（库卫生为成熟产品的可选能力，非本场景定义性需求）"
+   },
+   {
+    "id": "S08",
+    "name": "Raindrop.io Help Center — Broken links",
+    "url": "https://help.raindrop.io/broken-links",
+    "version": "access date 2026-10-19（在线文档，未固定版本；正文受搜索摘要限制）",
+    "facts": "提供失效链接（broken links）清单能力；该页 FAQ 明确 Raindrop.io 会自动为每个书签保存 web archive 副本。（检测机制细节未从完整正文核验。）",
+    "license": "专有 SaaS，非代码；未提供开源许可证",
+    "reuse": "build（失效链接为“内容在应用之外”带来的结构性维护事项，可延后实现）"
+   },
+   {
+    "id": "S09",
+    "name": "Raindrop.io Help Center — Web archive（永久副本）",
+    "url": "https://help.raindrop.io/web-archive",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "自动保存每个网页的副本；失败的页面会自动重试；可下载副本到本地并手动分享；据 Web 端变更日志（2025-05-19），对失效或离线的链接也使用 Wayback Machine 生成永久副本。",
+    "license": "专有 SaaS，非代码；未提供开源许可证",
+    "reuse": "build/optional（内容保存在原站之外，是否存档属可选增强，非书签管理器定义）"
+   },
+   {
+    "id": "S10",
+    "name": "linkding — 官方文档站（产品与功能）",
+    "url": "https://linkding.link/",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "自托管书签管理器，定位最小、快速、易部署；功能：标签组织、可开关的自定义、自动抓取标题/描述/图标/预览图、归档（本地 HTML 快照或 Internet Archive）、批量编辑、Netscape HTML 格式导入导出、多用户并可向他人或访客分享、Firefox/Chrome 扩展、REST API、单 Docker 容器 + SQLite 低维护。",
+    "license": "开源（MIT，见其 GitHub 仓库）",
+    "reuse": "reuse（MIT 宽松许可，可借鉴其最小实现与导入导出契约；本任务不复制代码）",
+    "license_url": "https://github.com/sissbruecker/linkding/blob/master/LICENSE.txt"
+   },
+   {
+    "id": "S11",
+    "name": "linkding — Archiving 文档",
+    "url": "https://linkding.link/archiving/",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "服务器端归档仅在 latest-plus 镜像提供，用 singlefile-cli（headless Chromium）生成单 HTML 快照并加载 uBlock Origin Lite；直接指向 PDF 的 URL 会下载 PDF 存为资产；缺点：镜像显著变大、需约 1GB 内存、不支持 ARM v7、可能触发反爬、登录页内容不完整。替代路径：用 SingleFile 扩展上传到 /api/bookmarks/singlefile/，或 linkding 扩展“添加书签后运行 SingleFile”。",
+    "license": "开源（MIT）；归档依赖 third-party 工具（singlefile-cli、Chromium），其各自许可未在本任务核验",
+    "reuse": "build/optional（存档有实际资源与可靠性代价，适合作为可选层）",
+    "license_url": "https://github.com/sissbruecker/linkding/blob/master/LICENSE.txt"
+   },
+   {
+    "id": "S12",
+    "name": "linkding — REST API 文档",
+    "url": "https://linkding.link/api/",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "API 以 per-user token 认证；书签 CRUD、check 端点检查 URL 是否已保存并返回现有书签与抓取的 metadata 及 auto_tags；创建时若 URL 已存在会“静默更新现有书签而非新建”（文档提示未来可能改为报错）；分发时可按 modified_since/added_since 过滤；含 archived（归档）书签端点、assets（快照/上传）、bundles。",
+    "license": "开源（MIT）",
+    "reuse": "build（“同 URL 一条记录”的收敛策略与 check 端点是可借鉴的契约设计）",
+    "license_url": "https://github.com/sissbruecker/linkding/blob/master/LICENSE.txt"
+   },
+   {
+    "id": "S13",
+    "name": "linkding — Options 文档（安全与运行选项）",
+    "url": "https://linkding.link/options/",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "默认拒绝加载指向内网主机的 URL 数据以防护 SSRF，可通过 LD_ALLOWED_INTERNAL_HOSTS 配置白名单或 * 关闭；LD_DISABLE_URL_VALIDATION 可禁用 URL 校验以存非 http(s) 或非全限定地址；支持 LD_ENABLE_OIDC（OIDC/SSO）与 LD_ENABLE_AUTH_PROXY（认证代理，会自动建用户）；数据库可选 SQLite（默认）或 PostgreSQL。",
+    "license": "开源（MIT）",
+    "reuse": "build（单用户自托管可关闭这些企业向能力；但 URL 校验/SSRF 防护对任何抓取元数据的产品都值得早期考虑）",
+    "license_url": "https://github.com/sissbruecker/linkding/blob/master/LICENSE.txt"
+   },
+   {
+    "id": "S14",
+    "name": "linkding — Auto tagging 文档",
+    "url": "https://linkding.link/auto-tagging/",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "按 URL 模式（hostname/path/query/fragment）自动打标签；规则在创建或更新书签时应用；不匹配网站内容，不支持通配符；网页表单与浏览器扩展会预览将要添加的标签。",
+    "license": "开源（MIT）",
+    "reuse": "build/optional（自动归类为可选增强，本场景用户手动选简单归类）",
+    "license_url": "https://github.com/sissbruecker/linkding/blob/master/LICENSE.txt"
+   },
+   {
+    "id": "S15",
+    "name": "linkding — Admin 文档",
+    "url": "https://linkding.link/admin/",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "内置 Django admin，含 linkding 定制；提供 UI 之外的能力：用户管理/自助、书签与标签管理（含批量操作）；批量书签动作有 Delete/Archive/Unarchive；标签可批量删除或删除未使用标签，删除标签不影响书签本身。",
+    "license": "开源（MIT）",
+    "reuse": "build（管理面/审计能力在本单用户场景中适用性低，可省略）",
+    "license_url": "https://github.com/sissbruecker/linkding/blob/master/LICENSE.txt"
+   },
+   {
+    "id": "S16",
+    "name": "linkding — GitHub 仓库（自述与许可证）",
+    "url": "https://github.com/sissbruecker/linkding",
+    "version": "master 分支，access date 2026-10-19（未固定分支；约 11.3k stars）",
+    "facts": "官方仓库确认：自托管、Docker 部署；功能含标签组织、批量编辑、Markdown 笔记、read-it-later、与他用户/访客分享、自动获取标题描述图标、归档、Netscape HTML 导入导出、PWA、Firefox/Chrome 扩展与 bookmarklet、OIDC/认证代理 SSO、REST API、admin 面板。仓库标注 MIT license。",
+    "license": "MIT License，Copyright (c) 2019 Sascha Ißbrücker",
+    "reuse": "reuse（MIT：宽松，可参考实现与再分发；本任务仅研究、不复制代码）",
+    "license_url": "https://github.com/sissbruecker/linkding/blob/master/LICENSE.txt"
+   },
+   {
+    "id": "S17",
+    "name": "Linkwarden — 官方文档 Welcome",
+    "url": "https://docs.linkwarden.app/",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "自托管、开源的协作式书签管理器：收集、阅读、标注并“完整保存”网页；明确以网页可能消失（link rot）为由为每个书签保存多格式副本；兼具 read-it-later 体验与 web archive 可靠性；面向协作，支持公开分享与多用户。",
+    "license": "开源（AGPL-3.0，见其 GitHub LICENSE.md）",
+    "reuse": "谨慎 reuse（AGPL-3.0 属 copyleft，网络服务修改后须向用户提供源码；如用于闭源产品需评估合规）",
+    "license_url": "https://github.com/linkwarden/linkwarden/blob/main/LICENSE.md"
+   },
+   {
+    "id": "S18",
+    "name": "Linkwarden — Preservation 文档",
+    "url": "https://docs.linkwarden.app/usage/preservation",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "保存链接进入队列，后台 worker 用真实浏览器异步生成多种格式；格式含 Readable（正文）、Webpage（单文件 HTML，Monolith）、Screenshot（整页 JPEG）、PDF，以及提交给 Wayback Machine 的 Archive.org 快照（不由 Linkwarden 存储）；除 Archive.org 外新账户默认全开，可按全局或按 Tag 配置；刷新会先删除现有副本再从实时页面重新保存（页面已消失则失去旧副本）；每链接有超时与大小上限，生成失败标记为不可用；副本按 collection 存于磁盘或 S3，删除链接/collection 会连带删除文件；正文提取文本用于全文搜索（需 Meilisearch，自托管未必具备）。",
+    "license": "开源（AGPL-3.0）",
+    "reuse": "build/optional（内容存档是重量级可选能力，与书签“指向而非持有内容”的核心相反）",
+    "license_url": "https://github.com/linkwarden/linkwarden/blob/main/LICENSE.md"
+   },
+   {
+    "id": "S19",
+    "name": "Linkwarden — Import & Export 文档",
+    "url": "https://docs.linkwarden.app/usage/import-and-export",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "导入不参与去重，同一文件重复导入会产生两份；导入的链接会进入归档队列；从浏览器 HTML 文件导入时：文件夹变为 collection、嵌套文件夹变为子 collection、无文件夹的书签进入名为 Imports 的 collection、保留原始添加日期、有 TAGS 属性时保留标签；导出为 backup.json，仅含元数据（账户设置、collections、links、tags、置顶链接、RSS 订阅），不含已保存的截图/PDF/快照，不能作为实例的完整备份；导入文件默认上限 10MB（IMPORT_LIMIT）。",
+    "license": "开源（AGPL-3.0）",
+    "reuse": "reuse（其“导入不去重”“导出仅元数据”的取舍值得作为自建时的边界提示）",
+    "license_url": "https://github.com/linkwarden/linkwarden/blob/main/LICENSE.md"
+   },
+   {
+    "id": "S20",
+    "name": "Linkwarden — Read and Annotate 文档（权限说明）",
+    "url": "https://docs.linkwarden.app/usage/read-and-annotate",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "高亮与笔记对每个用户私有，共享 collection 中各成员独立标注彼此不可见；标注需要 collection 上的 Admin 角色或拥有权；Viewer/Contributor 可阅读但不能标注；公开 collection 的访客可读 Readable 但不能标注；删除链接会删除其标注。",
+    "license": "开源（AGPL-3.0）",
+    "reuse": "build（角色/权限属协作向能力，本单用户场景适用性低）",
+    "license_url": "https://github.com/linkwarden/linkwarden/blob/main/LICENSE.md"
+   },
+   {
+    "id": "S21",
+    "name": "Linkwarden — Links 文档（数据模型）",
+    "url": "https://docs.linkwarden.app/usage/links",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "每个链接的数据：Address(URL) 必填、Collection 必填(默认 Unorganized)、Tags 可选、Name 可选、Description 可选(默认自动生成)、Is Pinned 可选、Screenshot/PDF 自动生成；一个链接只属一个 collection 但可有多个 tag；collection 可分享协作、tag 不可分享；Overview 说明每个用户的链接/标签/collection 数量不限。",
+    "license": "开源（AGPL-3.0）",
+    "reuse": "build（“一条记录=URL+一个主归类+多标签”与场景的“简单归类”高度吻合）",
+    "license_url": "https://github.com/linkwarden/linkwarden/blob/main/LICENSE.md"
+   },
+   {
+    "id": "S22",
+    "name": "Linkwarden — GitHub LICENSE.md",
+    "url": "https://github.com/linkwarden/linkwarden/blob/main/LICENSE.md",
+    "version": "main 分支 raw 文件，access date 2026-10-19（未固定分支）",
+    "facts": "文件正文为 GNU Affero General Public License Version 3（2007-11-19 文本，含第 13 条远程网络交互条款），标题为 AGPL v3 应用模板。",
+    "license": "GNU AGPL-3.0",
+    "reuse": "谨慎 reuse（copyleft：若基于其代码提供网络服务需向用户提供对应源码）",
+    "license_url": "https://github.com/linkwarden/linkwarden/blob/main/LICENSE.md"
+   },
+   {
+    "id": "S23",
+    "name": "Pinboard — 官方 FAQ",
+    "url": "https://pinboard.in/faq/",
+    "version": "access date 2026-10-19（在线文档，未固定版本；价格与服务状态可能变动）",
+    "facts": "定位为“你见过的东西的互联网搜索引擎”——个人链接存档，可从任意电脑保存与搜索；archive 为付费功能，下载并存每个书签的本地副本并在原站下线/变更后仍可用，同时开启对书签页面全文的全文搜索；archive 价格 US$39/年（多年有折扣），7 天退款；每链接 32MB 大小上限；每链接只爬取一次，可手动 re-crawl；导入会保留标签与创建时间、隐私等元数据；标签最长 255 字符、不可含空白/逗号、不区分大小写；可用最多 4 个标签组合过滤；付费用户可请求下载归档备份（每书签一个文件夹+顶层 manifest HTML）。",
+    "license": "专有 SaaS，非代码；未提供开源许可证",
+    "reuse": "build（付费存档层与全文搜索是可选增值；单用户场景可省略）"
+   },
+   {
+    "id": "S24",
+    "name": "Pinboard — 官方 howto 页",
+    "url": "https://pinboard.in/howto/",
+    "version": "access date 2026-10-19（在线文档，未固定版本）",
+    "facts": "书签可设为 public 或 private，仅自己可见 private；可将全部书签默认设为 private；以点号(.)开头的标签为私有标签；标签是主要组织方式，可按录入顺序或字母顺序显示，标签云约显示最常用的 200 个；Bundles 是“标签的命名集合”，用于把大量标签按类别分组，默认公开（点号前缀可私有）；导入会保留标签，原为私有的仍保持私有。",
+    "license": "专有 SaaS，非代码；未提供开源许可证",
+    "reuse": "build（私有优先与“标签分组”概念可借鉴；默认隐私符合叶子“private by default”规则）"
+   },
+   {
+    "id": "S25",
+    "name": "Pinboard — API v2 DRAFT 文档",
+    "url": "https://idlewords.com/pinboard_api2_draft.htm",
+    "version": "草稿文档（DRAFT），access date 2026-10-19",
+    "facts": "草稿 API：书签含 archived 端点用于取回缓存副本 URL，仅归档用户可用；POST 请求重新爬取会覆盖原副本；标签为不含空白、大小写不敏感的自由标识；提供标签列表、批量改名与删除等端点；bundles 返回用户标签分组。",
+    "license": "专有 SaaS 的 API 文档，非代码；未提供开源许可证",
+    "reuse": "uncertainty（草稿接口易变；仅作参考，不依赖其契约）"
+   },
+   {
+    "id": "S26",
+    "name": "Delicious（社交书签历史）— Wikipedia 条目",
+    "url": "https://en.wikipedia.org/wiki/Delicious_(website)",
+    "version": "条目版本 2026-09-22（access date 2026-10-19；百科非官方一手来源）",
+    "facts": "Delicious（del.icio.us）是成立于 2003 年的社交书签 Web 服务，用于存储、分享与发现网页书签，以标签为核心、早期公共可见并带社交/发现属性；后被 Yahoo 等收购（历史归属与关停细节未逐条核验）。",
+    "license": "非代码（百科条目；Wikipedia 文本许可未在本任务核验版本）",
+    "reuse": "build（作为“标签型社交书签”历史变体的旁证，佐证核心可脱离现代存档/协作能力而成立）"
+   },
+   {
+    "id": "S27",
+    "name": "Google Chrome 帮助 — 创建、查找与编辑书签（内置书签管理器）",
+    "url": "https://support.google.com/chrome/answer/188842",
+    "version": "access date 2026-10-19（仅经搜索摘要，未取回完整正文）",
+    "facts": "Chrome 内置书签管理器：可添加/编辑书签与文件夹；导出会把书签写成 HTML 文件，可再导入到另一浏览器或新设备（导出/导入路径见配套帮助页 support.google.com/chrome/answer/96816）。仅凭搜索摘要，未核验完整正文细节。",
+    "license": "专有产品文档，非代码；未提供开源许可证",
+    "reuse": "build（浏览器内置形式与独立产品“同核不同范围”的对照旁证；作为叶子概念论断的弱证据）"
+   }
+  ],
+  "summary": "本报告区分“大类事实”（来自官方文档佐证）与“本场景特定建议”，并对权限、计费、管理、审计、导出与恢复逐项做适用性评估而非一律要求。\n\n一类、被官方文档佐证的大类事实：\n1) 记录是“指向”而非“持有”：Linkwarden 明确直说原因——只存地址等于赌页面还在，故另存多格式副本；Raindrop 与 Pinboard 的存档/失效链接/网页归档页同样把原内容放在应用之外。这印证叶子“记录指向、内容归 Web 所有”。\n2) 主动捕获 + 持久累积库 + 用户可控组织/检索：Raindrop（collection/tag/收件箱 Unsorted/搜索匹配 title/description/URL/tags/notes）、linkding（标签+批量编辑+搜索）、Linkwarden（一链接一 collection + 多 tag）、Pinboard（标签+组合过滤）一致。\n3) 组织形态是实现选择：Raindrop 用“collection 为主、一书签一 collection + 多 tag”，Linkwarden 同构（含默认 Unorganized），linkding/Pinboard 以标签为主、Pinboard 另有 bundles（标签分组）。叶子“形式不属定义”得到支持。\n4) 成熟产品的常见增强（非定义）：自动元数据（linkding/Raindrop/Linkwarden）、去重（Raindrop Duplicate finder，属 Pro）、失效链接（Raindrop broken links）、内容存档（Raindrop web archive、linkding latest-plus、Linkwarden 多格式、Pinboard archive）、多设备/多浏览器、导入导出互操作、私有优先与可选分享、read-later（linkding unread、Linkwarden reader）。\n5) 互操作约定：Netscape HTML 书签格式。linkding 明言以其导入导出；Raindrop 导出 HTML 即该格式且称“任何浏览器或书签管理器均可导入”；Linkwarden 从浏览器 HTML 导入并把文件夹映射为 collection、保留日期与 TAGS。这是本类目事实上的交换标准。\n\n二类、按场景（生活待购与灵感收藏夹：单用户、简单归类、保存-检索-回跳）的取舍：\n- 必做（直接对应验收）：以 URL 为锚的记录且打开即跳原页；主动保存（一键/表单/粘贴 URL）；持久化存储；简单归类（等价于“collection/文件夹”）的创建与移动，并在重开后保持；默认收件箱承接未整理项；按归类浏览 + 关键字检索；从记录打开原网页。\n- 建议低成本纳入：删除的“回收站/可恢复”区（Raindrop 把删除项移入 Trash 并可拖出恢复，成本低、体验稳）；以 Netscape HTML 做导入/导出，既为一键迁移也为轻量备份（linkding/Raindrop/Linkwarden 均以此为互操作基线）。\n- 可选/延后（成熟产品有、但本场景非必需）：网页存档、失效链接检测、重复检测、全文搜索、协作与权限、标注/阅读器、AI 归类、云备份、大文件上传。若做，应参照其真实约束：存档需 headless 浏览器与异步队列、内存与磁盘成本高，且登录/付费墙页面会保存成登录墙（Linkwarden/linkding/Pinboard 均有此局限）；全文搜索需额外搜索引擎（Linkwarden 依赖 Meilisearch）。\n\n三类、权限/计费/管理/审计/导出与恢复的适用性评估：\n- 权限：Linkwarden 有 Admin/Viewer/Contributor 角色、标注私有、collection 可分享而 tag 不可分享；linkding 支持多用户与向访客分享、OIDC/认证代理。本场景为单用户私人库，权限体系适用性低，唯一应默认的是“私有优先”（Pinboard 可默认全私有）。\n- 计费：Raindrop Free（无限书签/collection/tag/设备）vs Pro 年付 US$28（全文搜索、存档、去重/失效链接、每日备份等）；Pinboard archive US$39/年。结论：核心保存-检索在成熟产品中普遍免费，付费点集中在存档/全文搜索/备份等增强；本场景无需照搬付费分层。\n- 管理/审计：linkding 提供 Django admin 做用户与批量书签/标签管理、批量删除/归档，并记录 SSRF 拦截为警告；Linkwarden 有 Bulk Actions。此类企业取向能力对本场景适用性低，可省略；但 linkding 的 URL 校验与 SSRF 防护（默认拒绝加载内网主机）对任何“由服务端抓取 URL 元数据”的实现都值得在早期即考虑，属安全而非企业特性。\n- 导出与恢复：Raindrop 全账户/单 collection/选中项导出 HTML/CSV/TXT，自动每日备份需 Pro；Linkwarden 导出 backup.json 仅元数据、不含已保存副本、不算完整实例备份、且导入不参与去重；Pinboard 可请求归档备份；linkding 以 Netscape HTML 导入导出。建议自建时把“导出为 Netscape HTML”+“内部可恢复删除”作为最低恢复基线，并明确“导出不含存档副本”。\n\n四类、复用 vs 自建：\n- 复用：linkding 为 MIT，宽松可参考/再分发；Linkwarden 为 AGPL-3.0，属网络 copyleft，基于其代码对外提供网络服务需向用户提供源码，若目标为闭源产品应谨慎；Raindrop、Pinboard 为专有 SaaS，无开源许可证，只能借鉴概念与交互，不能复制代码。\n- 自建：鉴于叶子核心很小（URL 记录 + 归类 + 检索），且本场景仅需该核心子集，自建核心并用 Netscape HTML 保证可迁移，成本最低且契合验收；把存档、去重、失效检测等重量级能力列为可选，避免为“企业特性”付出不必要的复杂度与成本。\n- 不确定性：上述许可结论均基于仓库 LICENSE 文本（linkding MIT、Linkwarden AGPL-3.0），但“是否可将某组件用于本项目”的最终判断需法务确认；本报告为模型报告来源证据，非独立运行时或法律核验。\n\n五类、未知与弱证据：Raindrop 重复/失效链接的判定算法、Pinboard 当前运营与价格、Chrome 内置书签的完整正文、Delicious 的完整历史归属，均未从完整官方正文取得，已在 gaps 标注。",
+  "gaps": [
+   "Chrome/Mozilla 等浏览器厂商的完整官方书签文档未取回（仅得搜索结果摘要），关于“浏览器内置书签”的陈述停留在概念层，未核验导出/导入步骤与去重行为细节。",
+   "Raindrop.io 的 Duplicates 与 Broken links 帮助页正文多半未取回（受搜索摘要限制），重复判定算法、是否自动合并、失效链接检测机制均未核验。",
+   "Raindrop.io Web archive 的具体限制（副本保留期、存储配额、失败重试上限）未从完整正文核验；仅确认“失败会自动重试”“可用 Wayback Machine 生成永久副本”。",
+   "Raindrop.io 自动每日备份的还原点数量（如“30 个”）与 OneDrive 目的地来自第三方博客/论坛摘要，未在官方帮助正文中逐一确认，故正文未采信。",
+   "Pinboard 的当前运营状态、实际价格与功能（如 archive US$39/年、32MB 上限）来自其官方 FAQ/howto 页面，但该页为长期静态文本、可能已过时；未从独立来源核验其现况。Delicious 的成立、收购与关停细节仅来自 Wikipedia 条目，未以一手官方来源核验。",
+   "linkding 未固定版本号（文档与授权文件取自 master 分支，access date 2026-10-19）；linkding 是否提供“回收站/可恢复删除”未在本次所核验文档中确认，视为未知。",
+   "linkding 归档依赖的 third-party 组件（singlefile-cli、Chromium、uBlock Origin Lite）各自许可证未在本任务核验；其“开源（MIT）”仅指 linkding 主仓库。",
+   "Linkwarden 文档取自 main 分支在线站（access date 2026-10-19，未固定版本）；其存档资源的存储上限、超时、批大小等具体数值以环境变量配置，本报告未逐一取值核验。",
+   "Netscape 书签 HTML 格式的正式规范来源未定位到权威标准文档；本报告仅依据 linkding 与 Raindrop 官方文档对其作为互操作格式的表述，未核验字段级规范与浏览器兼容边界。",
+   "各类产品的价格、免费额度与功能分层随版本变动，本报告仅在标注的访问日（2026-10-19）成立；本报告为模型报告的来源证据，非独立运行时验证，亦非法律意见。"
+  ]
+ }
+}

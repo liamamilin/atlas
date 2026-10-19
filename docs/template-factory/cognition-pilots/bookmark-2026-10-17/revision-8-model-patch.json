@@ -1,0 +1,70 @@
+{
+ "spec_changes": [
+  {
+   "path": [
+    "architecture_markdown"
+   ],
+   "replacements": [
+    {
+     "old": "→ userinfo 非空（400 invalid_url，details.reason=userinfo_not_allowed）。保存 trim 后的原始字符串。",
+     "new": "→ userinfo 非空（400 invalid_url，details.reason=userinfo_not_allowed）。保存 trim 后的原始 Unicode 字符串：数据库、API JSON 与列表文本都保留该值并逐字符往返，不改写为 canonical URL。"
+    },
+    {
+     "old": "- 输出 Location 前再次检验已存 url；含控制字符等历史非法值返回 500 internal，不输出该头。",
+     "new": "- 输出 Location 前再次检验已存 url；含控制字符等历史非法值返回 500 internal，不输出该头。合法值按 §6 使用 new URL(url).href 的 WHATWG 序列化 ASCII 结果，不直接输出原始 Unicode 字符串。"
+    },
+    {
+     "old": "- GET /b/:id → 302，Location 为保存时的原始 url；已回收/不存在 → 404。",
+     "new": "- GET /b/:id → 302，Location 固定为 new URL(保存的原始 url).href（WHATWG URL serializer 的 ASCII 结果：IDN 主机名转 punycode，路径、query 与 fragment 中需要编码的字符按标准百分号编码，保留参数、UTM 与 fragment 语义且不删除、不排序）；已回收/不存在 → 404。"
+    },
+    {
+     "old": "- 编码：全链路 UTF-8；长度按 Unicode 码点；中文、emoji 往返逐字符相等。",
+     "new": "- 编码：全链路 UTF-8；长度按 Unicode 码点；库内存储、API JSON 与列表文本中的中文、emoji 逐字符往返相等；302 Location 是 WHATWG 序列化后的 ASCII 头值，不承诺与原始 URL 逐字符相等。"
+    }
+   ]
+  },
+  {
+   "path": [
+    "acceptance",
+    "A05",
+    "goal"
+   ],
+   "old": "连续保存三条后，基础列表跨页结果中本 run 三条记录按 createdAt 倒序（同毫秒按 id 倒序）且为插入逆序，id 均为十进制字符串；GET /b/{id} 返回 302，Location 与保存时含 query、fragment 的 URL 逐字符一致。",
+   "new": "连续保存三条后，基础列表跨页结果中本 run 三条记录按 createdAt 倒序（同毫秒按 id 倒序）且为插入逆序，id 均为十进制字符串；对含 query 与 fragment 的 ASCII URL，GET /b/{id} 返回 302，Location 与 new URL(保存的原始 url).href 逐字符相等（含 query 与 fragment）且为可合法发送的 ASCII 头值，请求不跟随重定向；不存在的 id 返回 404。另保存一条含中文、IDN 与空格的固定合成 .invalid URL，API 读回 url 与提交的原始 Unicode 字符串逐字符一致，GET /b/{id} 的 Location 等于 new URL(url).href（IDN 转 punycode、必要字符百分号编码），不联网访问该 .invalid 目标。"
+  },
+  {
+   "path": [
+    "features",
+    "F05",
+    "reason"
+   ],
+   "old": "记录的终点是回到外部页面。库内只保存引用，不承载正文；打开动作必须精确跳转到保存时的 URL（含 query 与 fragment）。API 的 openPath 固定为不带部署前缀的 /b/{id}，UI 的 href 才拼 basePath；输出 Location 前再次检验已存 URL，历史非法值不得输出头。",
+   "new": "记录的终点是回到外部页面。库内只保存引用，不承载正文；库内与列表保留保存时的原始 Unicode URL（含 query 与 fragment），打开时 302 的 Location 使用 new URL(url).href 的 WHATWG 序列化 ASCII 结果（IDN 转 punycode，必要字符按标准百分号编码，保留 query、UTM 与 fragment 语义），因此不承诺 Location 与原始输入逐字符相等。API 的 openPath 固定为不带部署前缀的 /b/{id}，UI 的 href 才拼 basePath；输出 Location 前再次检验已存 URL，历史非法值不得输出头。"
+  },
+  {
+   "path": [
+    "decisions",
+    "D05",
+    "default"
+   ],
+   "old": "只接受绝对 http/https；在 trim 与 WHATWG 解析前检查原始输入，含任何 C0 U+0000–U+001F 或 DEL U+007F 立即 400 invalid_url、details.reason=control_character；随后 trim，按 Unicode 码点限制 1–2048。拒绝非空 userinfo 与真正无主机名。归一仅做 scheme/host 小写、去默认端口、去非根末尾斜杠；保留非默认端口、路径大小写与 query 原序；fragment 从匹配键移除但原样保存；http 与 https 不合并。输出 Location 前再次检验已存 URL，历史非法值返回 500 internal。",
+   "new": "只接受绝对 http/https；在 trim 与 WHATWG 解析前检查原始输入，含任何 C0 U+0000–U+001F 或 DEL U+007F 立即 400 invalid_url、details.reason=control_character；随后 trim，按 Unicode 码点限制 1–2048。拒绝非空 userinfo 与真正无主机名。归一仅做 scheme/host 小写、去默认端口、去非根末尾斜杠；保留非默认端口、路径大小写与 query 原序；fragment 从匹配键移除但原样保存；http 与 https 不合并。库内、API JSON 与列表保留 trim 后的原始 Unicode URL；输出 Location 前再次检验已存 URL，历史非法值返回 500 internal；合法值的 302 Location 使用 new URL(url).href 的 WHATWG 序列化 ASCII 结果（IDN 转 punycode、必要字符百分号编码），不要求与原始输入逐字符相等。"
+  },
+  {
+   "path": [
+    "decisions",
+    "D05",
+    "impact"
+   ],
+   "old": "url_key 生成、重复检查、打开重定向头安全、导入匹配与既有记录是否需要一次性重算；规则变化必须声明作用范围。",
+   "new": "url_key 生成、重复检查、打开重定向头的 ASCII 序列化、导入匹配与既有记录是否需要一次性重算；规则变化必须声明作用范围。"
+  }
+ ],
+ "file_plan_changes": [
+  {
+   "path": "acceptance/p0-library.cjs",
+   "purpose": "编辑。导出 {phase:'P0', cases:[A02,A05,A06,A07]}，包含 A02 真实重启持久化、A05 列表倒序与 /b/{id} 302 Location 序列化、A06 JSON 重复 409/existingId/allowDuplicate、A07 首页 HTML 与打开链接。扩展 A05：保留既有 ASCII 打开、含 query/fragment 的 302 与未找到负例，另保存一条含中文、IDN 与空格的固定合成 .invalid URL，断言 API 读回原始 Unicode 字符串、Location 等于 new URL(url).href 且为合法 ASCII 头值、redirect 不跟随，所有请求只发配置目标且不联网访问 .invalid；不先 new URL(...).href 再保存。依赖 common 与 support；由 p0.cjs 聚合，不调用分类写接口或检索。对应本轮 URL 存储与 HTTP 传输契约第 4 项。",
+   "reuse": false
+  }
+ ]
+}

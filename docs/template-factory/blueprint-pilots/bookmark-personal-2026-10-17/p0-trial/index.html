@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang='zh-CN'>
+<head>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<title>生活待购与灵感收藏夹</title>
+<link rel='stylesheet' href='style.css'>
+</head>
+<body>
+<div class='page'>
+<header class='page-header'>
+<p class='eyebrow'>个人本地收藏</p>
+<h1>生活待购与灵感收藏夹</h1>
+<p class='lede'>保存想稍后处理的商品页、教程或灵感链接。书签只保存在本机浏览器，不会上传。</p>
+</header>
+<main>
+<section class='panel' aria-labelledby='capture-heading'>
+<h2 id='capture-heading'>添加书签</h2>
+<form id='bookmark-form' novalidate>
+<div class='field'>
+<label for='title'>标题</label>
+<input id='title' name='title' type='text' autocomplete='off' aria-required='true'>
+</div>
+<div class='field'>
+<label for='url'>链接地址</label>
+<input id='url' name='url' type='url' inputmode='url' autocomplete='off' spellcheck='false' aria-required='true' aria-describedby='url-hint'>
+<p id='url-hint' class='hint'>请输入完整的 http:// 或 https:// 地址。</p>
+</div>
+<div class='field'>
+<label for='category'>分类</label>
+<input id='category' name='category' type='text' list='category-options' autocomplete='off' placeholder='收件箱'>
+<datalist id='category-options'></datalist>
+</div>
+<div class='form-actions'>
+<button id='save-button' type='submit' disabled>保存书签</button>
+<button id='cancel-edit' class='secondary' type='button' hidden>取消编辑</button>
+</div>
+<p id='form-hint' class='form-hint' hidden></p>
+</form>
+<div id='alert' class='feedback alert' role='alert' aria-live='assertive' aria-atomic='true'></div>
+<div id='status' class='feedback status' role='status' aria-live='polite' aria-atomic='true'></div>
+</section>
+<section class='panel' aria-labelledby='library-heading'>
+<h2 id='library-heading'>我的收藏</h2>
+<div class='filters'>
+<div class='field'>
+<label for='search'>搜索书签</label>
+<input id='search' type='search' autocomplete='off' placeholder='标题、链接或分类'>
+</div>
+<div class='field'>
+<label for='filter-category'>筛选分类</label>
+<select id='filter-category'>
+<option value=''>全部分类</option>
+</select>
+</div>
+</div>
+<div id='bookmark-list' class='bookmark-list'></div>
+<p id='empty-state' class='empty-state' hidden>没有匹配的书签</p>
+</section>
+</main>
+<footer class='page-footer'>P0 本地版：暂不提供回收站、导出、导入或云同步。</footer>
+</div>
+<script type='module' src='app.js'></script>
+</body>
+</html>

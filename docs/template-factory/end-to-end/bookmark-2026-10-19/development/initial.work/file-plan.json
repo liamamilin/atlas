@@ -1,0 +1,111 @@
+{
+ "file_plan": [
+  {
+   "path": "delivery.json",
+   "purpose": "Atlas application-delivery descriptor authored for the offline runtime runner. Declares schema atlas.application-delivery.v1, root '.', the exact source file list (every file below except delivery.json), and a python-web runtime with literal literal argv: no install/build steps (standard library only), start ['python3','-m','app','--host','0.0.0.0','--port','8000','--data-dir','/state/data'], integer port 8000, readiness_path '/'. The delivery command binds 0.0.0.0 inside the container only; the app itself defaults to loopback when --host is omitted.",
+   "imports": [],
+   "exports": []
+  },
+  {
+   "path": "README.md",
+   "purpose": "Operator and developer README stating the frozen offline contract: Python 3 standard library only (http.server.ThreadingHTTPServer + sqlite3 + server-rendered HTML, no third-party dependencies, no build), how to launch locally with `python3 -m app --host 127.0.0.1 --port 8000 --data-dir ./state`, that mutable data lives in the SQLite file library.sqlite3 under the --data-dir (delivery uses /state/data beneath the persistent /state mount), that source stays read-only, there is no authentication and no public/share route, and there is no outbound network access at runtime (only the user-initiated /go/<id> 302 leaves the app). Documents the P0 HTTP routes and form fields the server renders.",
+   "imports": [],
+   "exports": []
+  },
+  {
+   "path": "app/__init__.py",
+   "purpose": "Package marker for the `app` package; defines shared package-level constants/version used by the launch path so `python -m app` is a valid module invocation. No side effects on import.",
+   "imports": [],
+   "exports": [
+    "__version__"
+   ]
+  },
+  {
+   "path": "app/__main__.py",
+   "purpose": "Executable module entry point (`python -m app`). Calls app.config.parse_args to obtain the ServerConfig (host, port, data-dir) and app.server.run to initialize storage and serve. Thin glue only; keeps argument parsing and HTTP wiring in their own modules so both remain independently testable.",
+   "imports": [
+    "sys",
+    "app.config",
+    "app.server"
+   ],
+   "exports": [
+    "main"
+   ]
+  },
+  {
+   "path": "app/config.py",
+   "purpose": "Argument and configuration layer. parse_args(argv) uses argparse to read --host (explicit host option, default 127.0.0.1 loopback), --port (default 8000, validated to the 1024-65535 range), and --data-dir (default ./state, created if absent); returns an immutable Config. Cross-file interface: app/__main__.py and app/server.py consume Config for binding and for locating the on-disk SQLite file; delivery.json supplies the literal 0.0.0.0/8000//state/data values.",
+   "imports": [
+    "argparse",
+    "dataclasses",
+    "os"
+   ],
+   "exports": [
+    "Config",
+    "parse_args",
+    "validate_port",
+    "DEFAULT_HOST",
+    "DEFAULT_PORT",
+    "DEFAULT_DATA_DIR"
+   ]
+  },
+  {
+   "path": "app/storage.py",
+   "purpose": "SQLite storage layer owning schema and data access, independent of HTTP. Storage(data_dir) opens <data_dir>/library.sqlite3, sets up the frozen P0 tables (collections with name UNIQUE and is_default; bookmarks with url, title, note, collection_id FK, created_at, updated_at), and seeds the undeletable default inbox ('未整理', is_default=1) on first start. Exposes list_collections, get_collection, get_default_collection, find_collection_by_name, create_collection, list_bookmarks(collection_id, query) (only the selected collection, search LIKE over title/url/note), create_bookmark, get_bookmark, and move_bookmark. Every write commits in a transaction so data survives process restart. Cross-file interface: app/server.py calls these methods; app/views.py receives the returned row dicts.",
+   "imports": [
+    "sqlite3",
+    "os",
+    "datetime"
+   ],
+   "exports": [
+    "Storage",
+    "SCHEMA_VERSION"
+   ]
+  },
+  {
+   "path": "app/validation.py",
+   "purpose": "Pure validation helpers shared by storage and server. normalize_url/is_valid_http_url accept only absolute http/https URLs and reject empty, malformed, missing-host, and non-http(s) schemes (javascript:, data:, ftp:); clean_title trims a manually entered title and falls back to the URL when blank (D05); validate_collection_name rejects empty names (D04). Cross-file interface: app/server.py uses these to return 400 errors before touching storage, and app/storage.py uses them for defensiveness.",
+   "imports": [
+    "urllib.parse"
+   ],
+   "exports": [
+    "normalize_url",
+    "is_valid_http_url",
+    "clean_title",
+    "validate_collection_name"
+   ]
+  },
+  {
+   "path": "app/views.py",
+   "purpose": "Server-side HTML rendering (no JavaScript, no template engine). render_index(collections, bookmarks, selected_collection_id, query, form_state) returns the library page containing the sidebar list items <li class=\"collection\" data-collection-id data-default>, the capture form (POST /bookmarks with url required, title, optional collection_id select), the new-collection form (POST /collections name), the search form (GET / field q), the bookmark list items <li class=\"bookmark\" data-bookmark-id data-collection-id> each with <a class=\"bookmark-title\" href=\"<saved url>\"> and a move form (POST /bookmarks/<id>/move collection_id). render_error(status, message, form_state) returns the 400/404 pages, echoing submitted input for recovery. All dynamic text is escaped with html.escape. Cross-file interface: app/server.py passes storage row dicts in and writes the returned strings to the response.",
+   "imports": [
+    "html",
+    "urllib.parse"
+   ],
+   "exports": [
+    "render_index",
+    "render_error",
+    "escape"
+   ]
+  },
+  {
+   "path": "app/server.py",
+   "purpose": "HTTP layer: a ThreadingHTTPServer subclass plus a BaseHTTPRequestHandler-based request handler implementing the frozen routes and error contract. GET / (with ?collection= and ?q=, honoring the 'inbox' alias and returning 404 for an unknown collection id), POST /bookmarks (validate -> 303 to /?collection=<id|inbox> or 400 echoing input), POST /collections (303 to / or 400), POST /bookmarks/<id>/move (303 to target or 404), GET /go/<id> (302 Location = saved URL, no proxying, 404 if unknown), and a catch-all that 404s undefined public/share routes without leaking stored data. GET is read-only; all POSTs use PRG redirects. run(config) creates the data dir, builds Storage, wires storage+views, and serves on (config.host, config.port). Cross-file interface: depends on app.config.Config, app.storage.Storage, app.validation, and app.views; imported by app/__main__.py.",
+   "imports": [
+    "http.server",
+    "urllib.parse",
+    "http",
+    "app.config",
+    "app.storage",
+    "app.validation",
+    "app.views"
+   ],
+   "exports": [
+    "Application",
+    "RequestHandler",
+    "make_server",
+    "run"
+   ]
+  }
+ ]
+}

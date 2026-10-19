@@ -1,0 +1,54 @@
+{
+  "status": "delivered",
+  "cli_status": "completed",
+  "attempt": 1,
+  "elapsed_seconds_all_attempts": 165.48,
+  "source_sha256": {
+    "DECISIONS.md": "3091631448ba098a55ef75809e493a0e21a1353ed9be80bf89d9f0cff80ddace",
+    "README.md": "bc269e0060ed5a1129fcc6f41846779f50db5a26f7beaa1546e85525c7b2fe19",
+    "app.py": "6725e307553aa1342f8ea04113c1ebbcbf170e10d9483303dde6f863be07fa75",
+    "atlas_errors.py": "69b820c1bfc9d037022339e4065545b96633875acf3497e2f07f40c56a98dfae",
+    "commands.py": "572aabec5feb97963702205cff890ed73cb1bcc89d1ba28099b4d8ebb39e278f",
+    "fsops.py": "7946c63d360dc0d487b10a01bb4728435a713c6cede4a62242cd238222b9f54a",
+    "naming.py": "4cafa14576c3b8e636812ed2f3dc98326c1be4ec5bfc46363778687e7dc7b504",
+    "paths.py": "594798fd9dca46895784ae66f96d35268f86e4e606767b601b038208efef00ee",
+    "planner.py": "c3953e49e01a66d000b342318ea41b66459f6f2f6b4416c9952431a48ac6f2c5"
+  },
+  "host_source_findings": [],
+  "author_claims": {
+    "files": [
+      "app.py",
+      "commands.py",
+      "naming.py",
+      "paths.py",
+      "fsops.py",
+      "planner.py",
+      "atlas_errors.py",
+      "README.md",
+      "DECISIONS.md"
+    ],
+    "implemented": [
+      "list of immediate ordinary files excluding .atlas-renamer/dirs/symlinks",
+      "preview with literal text find/replace, illegal-name and conflict refusal, immutable multiline JSON plan with sha256/size/mtime evidence",
+      "apply with --confirm, stale-content refusal, whole-batch conflict refusal, non-overwriting renames with rollback, durable receipt, reapply refusal",
+      "undo with --confirm, restore this batch only, refuse on conflict/changed data without overwriting, reject repeat undo",
+      "strict path confinement to DIR/.atlas-renamer with symlink-escape rejection",
+      "JSON-only stdout, stderr messages, nonzero exits on failure",
+      "README and DECISIONS documents"
+    ],
+    "limits": [
+      "single directory, non-recursive",
+      "ordinary files only; no symlinks or directories",
+      "literal substring find, not regex",
+      "one apply corresponds to one undo",
+      "case-insensitive duplicate/conflict detection (conservative for case-insensitive filesystems)",
+      "no GUI, cloud, trash/delete, concurrency locks"
+    ],
+    "self_checks": {
+      "status": "not_run"
+    }
+  },
+  "application_hand_edits": false,
+  "execution": "not_run",
+  "evidence_status": "await independent source review and real runtime"
+}

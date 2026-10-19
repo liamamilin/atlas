@@ -1,0 +1,1961 @@
+{
+  "schema": "atlas.bookmark-posthoc-http-probes.v1",
+  "kind": "post-hoc-independent-exploration",
+  "status": "completed",
+  "started_at": "2026-10-19T03:42:44Z",
+  "evidence_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/posthoc-http-2",
+  "runner_command": [
+    "python3",
+    "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/posthoc_http_probes.py",
+    "--bundle",
+    "docs/template-factory/end-to-end/bookmark-2026-10-19/development/initial",
+    "--evidence-dir",
+    "docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/posthoc-http-2",
+    "--image",
+    "python:3.12-slim",
+    "--concurrency-rounds",
+    "20"
+  ],
+  "bundle_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/development/initial",
+  "image": "python:3.12-slim",
+  "base_url": "http://127.0.0.1:63919",
+  "network_mode": "dedicated user-defined bridge; egress not enforced",
+  "network_none": false,
+  "owned_resources": {
+    "temporary_root": {
+      "path": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-posthoc-f57bf576c4ed40b08c90b4c3a3415c25",
+      "state": "removed"
+    },
+    "network": {
+      "name": "bookmark-posthoc-net-5e12e022f0f9",
+      "state": "absent-verified"
+    },
+    "container": {
+      "name": "bookmark-posthoc-app-5e12e022f0f9",
+      "state": "absent-verified"
+    },
+    "fixture_server": {
+      "state": "not-created"
+    },
+    "fixture_thread": {
+      "state": "not-created"
+    }
+  },
+  "docker_commands": {
+    "network_create": [
+      "docker",
+      "network",
+      "create",
+      "bookmark-posthoc-net-5e12e022f0f9"
+    ],
+    "container_cleanup": [
+      "docker",
+      "rm",
+      "--force",
+      "bookmark-posthoc-app-5e12e022f0f9"
+    ],
+    "network_cleanup": [
+      "docker",
+      "network",
+      "rm",
+      "bookmark-posthoc-net-5e12e022f0f9"
+    ],
+    "container_run_plan": {
+      "name": "bookmark-posthoc-app-5e12e022f0f9",
+      "image": "python:3.12-slim",
+      "host_publish": "127.0.0.1:63919:8000",
+      "source_mount": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-posthoc-f57bf576c4ed40b08c90b4c3a3415c25/verified-application:/app:readonly",
+      "state_mount": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-posthoc-f57bf576c4ed40b08c90b4c3a3415c25/state:/state",
+      "runtime_argv": [
+        "python3",
+        "-m",
+        "app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+        "--data-dir",
+        "/state/data"
+      ]
+    }
+  },
+  "limitations": [
+    "No browser is used for these post-hoc probes.",
+    "Docker bridge egress is not blocked; probe requests target only 127.0.0.1."
+  ],
+  "updated_at": "2026-10-19T03:42:46Z",
+  "stage": "cleanup",
+  "stage_events": [
+    {
+      "stage": "bundle_verification",
+      "state": "started",
+      "at": 1792381364.986737
+    },
+    {
+      "stage": "bundle_verification",
+      "state": "completed",
+      "at": 1792381364.9918132,
+      "details": {
+        "archive_sha256": "48a8f7d31b431a073a155c7e2a2489210f823683d77514759fee728c490a47d2"
+      }
+    },
+    {
+      "stage": "docker_preflight",
+      "state": "started",
+      "at": 1792381364.992191
+    },
+    {
+      "stage": "docker_preflight",
+      "state": "completed",
+      "at": 1792381365.074938,
+      "details": {
+        "image_id": "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9"
+      }
+    },
+    {
+      "stage": "network_setup",
+      "state": "started",
+      "at": 1792381365.075613
+    },
+    {
+      "stage": "network_setup",
+      "state": "completed",
+      "at": 1792381365.107873,
+      "details": {}
+    },
+    {
+      "stage": "container_start",
+      "state": "started",
+      "at": 1792381365.1086578
+    },
+    {
+      "stage": "container_start",
+      "state": "completed",
+      "at": 1792381365.5198221,
+      "details": {
+        "container_id": "06832cf1a71ca3f54c3e1f24a872deab3ec8af97d8b7bc8c12a57093376ba253",
+        "readiness_url": "http://127.0.0.1:63919/"
+      }
+    },
+    {
+      "stage": "crlf_url_probe",
+      "state": "started",
+      "at": 1792381365.520619
+    },
+    {
+      "stage": "crlf_url_probe",
+      "state": "completed",
+      "at": 1792381365.529186,
+      "details": {
+        "pass": false,
+        "status": 303
+      }
+    },
+    {
+      "stage": "concurrent_category_probe",
+      "state": "started",
+      "at": 1792381365.529803
+    },
+    {
+      "stage": "concurrent_category_probe",
+      "state": "completed",
+      "at": 1792381365.641571,
+      "details": {
+        "pass": false,
+        "rounds": 20
+      }
+    },
+    {
+      "stage": "post_probe_server_logs",
+      "state": "started",
+      "at": 1792381365.642669
+    },
+    {
+      "stage": "post_probe_server_logs",
+      "state": "completed",
+      "at": 1792381365.660223,
+      "details": {
+        "returncode": 0,
+        "stdout_chars": 0,
+        "stderr_chars": 4455
+      }
+    },
+    {
+      "stage": "source_integrity",
+      "state": "started",
+      "at": 1792381365.6617348
+    },
+    {
+      "stage": "source_integrity",
+      "state": "completed",
+      "at": 1792381365.663425,
+      "details": {
+        "unchanged": true
+      }
+    }
+  ],
+  "bundle": {
+    "bundle_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/development/initial",
+    "receipt_sha256": "cc721d60a86f988bee38687b54b6b0aefee7931811a1af91c1075beeb33e9e0c",
+    "archive_sha256": "48a8f7d31b431a073a155c7e2a2489210f823683d77514759fee728c490a47d2",
+    "source_package_sha256": "93b5786c05e530252beef39644ba66614ddb0c93d4dd5c4facd23f237ad1fd73",
+    "source_context_sha256": "93b5786c05e530252beef39644ba66614ddb0c93d4dd5c4facd23f237ad1fd73",
+    "receipt_validated_metadata": {
+      "schema": "atlas.application-delivery.v1",
+      "app_root": ".",
+      "files": {
+        "README.md": "7faa3905d766dbbe4e49af05c7f370fc118160f59e8736378ed23d2b6809a52a",
+        "app/__init__.py": "9469dc4b6b75244f86c93ecdcfd8265b2b758952cac25d25f2009c9b5258da0f",
+        "app/__main__.py": "fb51d09e657e2d32efdede834cf098d2612b9a30a8c7c0dd205f5b51d5ef5425",
+        "app/config.py": "3fa66e7b1233cbc4e8b01556256336ae974c35a0c67ec631a2e7608f6e0c4ae9",
+        "app/server.py": "d76d5e9330af274fed0c2035c966864879abee5d849aca33e5794fe5e612d7ba",
+        "app/storage.py": "2d4bbd4ab4890c516e5bf64a7e1cdad37b41c1ea7ba2bf177fe8a855bfd16417",
+        "app/validation.py": "fb1f00cdd3ab5f0442aa613103750c0c1b0fdd05d8e3a50d64cd7e18a56c4bfe",
+        "app/views.py": "e923f629fd6d8d10fb1568285be871b9c06dbecc3157259ff5746b05f36ee01b"
+      },
+      "normalizations": [],
+      "runtime": {
+        "profile": "python-web",
+        "install": [],
+        "build": [],
+        "start": [
+          "python3",
+          "-m",
+          "app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--data-dir",
+          "/state/data"
+        ],
+        "port": 8000,
+        "readiness_path": "/"
+      }
+    },
+    "extracted_root": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-posthoc-f57bf576c4ed40b08c90b4c3a3415c25/verified-application",
+    "extracted_source_sha256": {
+      "README.md": "7faa3905d766dbbe4e49af05c7f370fc118160f59e8736378ed23d2b6809a52a",
+      "app/__init__.py": "9469dc4b6b75244f86c93ecdcfd8265b2b758952cac25d25f2009c9b5258da0f",
+      "app/__main__.py": "fb51d09e657e2d32efdede834cf098d2612b9a30a8c7c0dd205f5b51d5ef5425",
+      "app/config.py": "3fa66e7b1233cbc4e8b01556256336ae974c35a0c67ec631a2e7608f6e0c4ae9",
+      "app/server.py": "d76d5e9330af274fed0c2035c966864879abee5d849aca33e5794fe5e612d7ba",
+      "app/storage.py": "2d4bbd4ab4890c516e5bf64a7e1cdad37b41c1ea7ba2bf177fe8a855bfd16417",
+      "app/validation.py": "fb1f00cdd3ab5f0442aa613103750c0c1b0fdd05d8e3a50d64cd7e18a56c4bfe",
+      "app/views.py": "e923f629fd6d8d10fb1568285be871b9c06dbecc3157259ff5746b05f36ee01b",
+      "delivery.json": "4accad35f8399183eb6a8426a971c8434611b69f0160d2b505e9dd29b86cb38e"
+    }
+  },
+  "delivery_runtime_start_argv": [
+    "python3",
+    "-m",
+    "app",
+    "--host",
+    "0.0.0.0",
+    "--port",
+    "8000",
+    "--data-dir",
+    "/state/data"
+  ],
+  "data_dir_argument": "/state/data",
+  "readiness_path": "/",
+  "app_source_sha256_before": {
+    "README.md": "7faa3905d766dbbe4e49af05c7f370fc118160f59e8736378ed23d2b6809a52a",
+    "delivery.json": "4accad35f8399183eb6a8426a971c8434611b69f0160d2b505e9dd29b86cb38e",
+    "app/__init__.py": "9469dc4b6b75244f86c93ecdcfd8265b2b758952cac25d25f2009c9b5258da0f",
+    "app/__main__.py": "fb51d09e657e2d32efdede834cf098d2612b9a30a8c7c0dd205f5b51d5ef5425",
+    "app/config.py": "3fa66e7b1233cbc4e8b01556256336ae974c35a0c67ec631a2e7608f6e0c4ae9",
+    "app/server.py": "d76d5e9330af274fed0c2035c966864879abee5d849aca33e5794fe5e612d7ba",
+    "app/storage.py": "2d4bbd4ab4890c516e5bf64a7e1cdad37b41c1ea7ba2bf177fe8a855bfd16417",
+    "app/validation.py": "fb1f00cdd3ab5f0442aa613103750c0c1b0fdd05d8e3a50d64cd7e18a56c4bfe",
+    "app/views.py": "e923f629fd6d8d10fb1568285be871b9c06dbecc3157259ff5746b05f36ee01b"
+  },
+  "image_id": "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9",
+  "container_id": "06832cf1a71ca3f54c3e1f24a872deab3ec8af97d8b7bc8c12a57093376ba253",
+  "container_settings": {
+    "id": "06832cf1a71ca3f54c3e1f24a872deab3ec8af97d8b7bc8c12a57093376ba253",
+    "state": {
+      "Status": "running",
+      "Running": true,
+      "Pid": 2105,
+      "StartedAt": "2026-10-19T03:42:45.152353967Z",
+      "FinishedAt": "0001-01-01T00:00:00Z",
+      "ExitCode": 0
+    },
+    "restart_count": 0,
+    "port_bindings": {
+      "8000/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "63919"
+        }
+      ]
+    },
+    "effective_ports": {
+      "8000/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "63919"
+        }
+      ]
+    },
+    "network_mode": "bookmark-posthoc-net-5e12e022f0f9",
+    "internal_rootfs": true,
+    "cap_drop": [
+      "ALL"
+    ],
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "limits": {
+      "Memory": 268435456,
+      "NanoCpus": 500000000,
+      "PidsLimit": 64
+    },
+    "mounts": [
+      {
+        "Type": "bind",
+        "Source": "/private/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-posthoc-f57bf576c4ed40b08c90b4c3a3415c25/verified-application",
+        "Destination": "/app",
+        "RW": false
+      },
+      {
+        "Type": "bind",
+        "Source": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-posthoc-f57bf576c4ed40b08c90b4c3a3415c25/state",
+        "Destination": "/state",
+        "RW": true
+      }
+    ],
+    "environment_names": [
+      "PYTHONDONTWRITEBYTECODE",
+      "PYTHONUNBUFFERED",
+      "PATH",
+      "LANG",
+      "GPG_KEY",
+      "PYTHON_VERSION",
+      "PYTHON_SHA256"
+    ]
+  },
+  "crlf_probe": {
+    "payload": {
+      "url_encoded": "http%3A%2F%2Fexample.invalid%2Fpath%0D%0AX-Codex-Probe%3A+injected-5e12e022"
+    },
+    "post_response": {
+      "status": 303,
+      "reason": "See Other",
+      "headers": [
+        [
+          "Server",
+          "BaseHTTP/0.6 Python/3.12.15"
+        ],
+        [
+          "Date",
+          "Mon, 19 Oct 2026 03:42:45 GMT"
+        ],
+        [
+          "Location",
+          "/?collection=1"
+        ],
+        [
+          "Content-Length",
+          "0"
+        ]
+      ],
+      "location": "/?collection=1",
+      "header_names": [
+        "Server",
+        "Date",
+        "Location",
+        "Content-Length"
+      ]
+    },
+    "rejected_4xx": false,
+    "inventory_unchanged": false,
+    "baseline_bookmark_ids": [],
+    "after_bookmark_ids": [],
+    "baseline_collection_ids": [
+      "1"
+    ],
+    "after_collection_ids": [
+      "1",
+      "1"
+    ],
+    "redirect_header_probe": {
+      "status": "not_applicable_rejected"
+    },
+    "pass": false
+  },
+  "concurrent_category_probe": {
+    "rounds_requested": 20,
+    "rounds_completed": 20,
+    "observations": [
+      {
+        "round": 1,
+        "name": "Concurrent 5e12e022 00",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 0,
+        "successful_303_name_persisted": false,
+        "no_500": true
+      },
+      {
+        "round": 2,
+        "name": "Concurrent 5e12e022 01",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 2,
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 3,
+        "name": "Concurrent 5e12e022 02",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 2,
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 4,
+        "name": "Concurrent 5e12e022 03",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 2,
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 5,
+        "name": "Concurrent 5e12e022 04",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 0,
+        "successful_303_name_persisted": false,
+        "no_500": true
+      },
+      {
+        "round": 6,
+        "name": "Concurrent 5e12e022 05",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 2,
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 7,
+        "name": "Concurrent 5e12e022 06",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 2,
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 8,
+        "name": "Concurrent 5e12e022 07",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 2,
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 9,
+        "name": "Concurrent 5e12e022 08",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 0,
+        "successful_303_name_persisted": false,
+        "no_500": true
+      },
+      {
+        "round": 10,
+        "name": "Concurrent 5e12e022 09",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 0,
+        "successful_303_name_persisted": false,
+        "no_500": true
+      },
+      {
+        "round": 11,
+        "name": "Concurrent 5e12e022 10",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 2,
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 12,
+        "name": "Concurrent 5e12e022 11",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 2,
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 13,
+        "name": "Concurrent 5e12e022 12",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 2,
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 14,
+        "name": "Concurrent 5e12e022 13",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 2,
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 15,
+        "name": "Concurrent 5e12e022 14",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 2,
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 16,
+        "name": "Concurrent 5e12e022 15",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 0,
+        "successful_303_name_persisted": false,
+        "no_500": true
+      },
+      {
+        "round": 17,
+        "name": "Concurrent 5e12e022 16",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 2,
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 18,
+        "name": "Concurrent 5e12e022 17",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 2,
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 19,
+        "name": "Concurrent 5e12e022 18",
+        "responses": [
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          400,
+          303
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 2,
+        "successful_303_name_persisted": true,
+        "no_500": true
+      },
+      {
+        "round": 20,
+        "name": "Concurrent 5e12e022 19",
+        "responses": [
+          {
+            "status": 303,
+            "reason": "See Other",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Location",
+                "/"
+              ],
+              [
+                "Content-Length",
+                "0"
+              ]
+            ],
+            "location": "/",
+            "header_names": [
+              "Server",
+              "Date",
+              "Location",
+              "Content-Length"
+            ]
+          },
+          {
+            "status": 400,
+            "reason": "Bad Request",
+            "headers": [
+              [
+                "Server",
+                "BaseHTTP/0.6 Python/3.12.15"
+              ],
+              [
+                "Date",
+                "Mon, 19 Oct 2026 03:42:45 GMT"
+              ],
+              [
+                "Content-Type",
+                "text/html; charset=utf-8"
+              ],
+              [
+                "Content-Length",
+                "2908"
+              ]
+            ],
+            "location": null,
+            "header_names": [
+              "Server",
+              "Date",
+              "Content-Type",
+              "Content-Length"
+            ]
+          }
+        ],
+        "errors": [],
+        "status_codes": [
+          303,
+          400
+        ],
+        "successful_303_count": 1,
+        "matching_collection_count": 0,
+        "successful_303_name_persisted": false,
+        "no_500": true
+      }
+    ],
+    "pass": false
+  },
+  "server_logs": {
+    "returncode": 0,
+    "stdout": "",
+    "stderr": "172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /bookmarks HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 400 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"POST /collections HTTP/1.1\" 303 -\n172.19.0.1 - - [19/Oct/2026 03:42:45] \"GET / HTTP/1.1\" 200 -\n"
+  },
+  "app_source_sha256_after": {
+    "README.md": "7faa3905d766dbbe4e49af05c7f370fc118160f59e8736378ed23d2b6809a52a",
+    "delivery.json": "4accad35f8399183eb6a8426a971c8434611b69f0160d2b505e9dd29b86cb38e",
+    "app/__init__.py": "9469dc4b6b75244f86c93ecdcfd8265b2b758952cac25d25f2009c9b5258da0f",
+    "app/__main__.py": "fb51d09e657e2d32efdede834cf098d2612b9a30a8c7c0dd205f5b51d5ef5425",
+    "app/config.py": "3fa66e7b1233cbc4e8b01556256336ae974c35a0c67ec631a2e7608f6e0c4ae9",
+    "app/server.py": "d76d5e9330af274fed0c2035c966864879abee5d849aca33e5794fe5e612d7ba",
+    "app/storage.py": "2d4bbd4ab4890c516e5bf64a7e1cdad37b41c1ea7ba2bf177fe8a855bfd16417",
+    "app/validation.py": "fb1f00cdd3ab5f0442aa613103750c0c1b0fdd05d8e3a50d64cd7e18a56c4bfe",
+    "app/views.py": "e923f629fd6d8d10fb1568285be871b9c06dbecc3157259ff5746b05f36ee01b"
+  },
+  "source_hash_unchanged": true,
+  "result": {
+    "crlf_url_rejected_without_dirty_data": false,
+    "concurrent_same_name_categories_no_500_and_success_persists": false
+  },
+  "cleanup": {
+    "events": [
+      {
+        "step": "container_remove",
+        "state": "started",
+        "at": 1792381365.665771
+      },
+      {
+        "step": "container_remove",
+        "state": "completed",
+        "at": 1792381365.8169768
+      },
+      {
+        "step": "container_absence_verification",
+        "state": "started",
+        "at": 1792381365.820338
+      },
+      {
+        "step": "container_absence_verification",
+        "state": "completed",
+        "at": 1792381365.8443708
+      },
+      {
+        "step": "network_remove",
+        "state": "started",
+        "at": 1792381365.8475509
+      },
+      {
+        "step": "network_remove",
+        "state": "completed",
+        "at": 1792381366.042357
+      },
+      {
+        "step": "network_absence_verification",
+        "state": "started",
+        "at": 1792381366.046258
+      },
+      {
+        "step": "network_absence_verification",
+        "state": "completed",
+        "at": 1792381366.065185
+      },
+      {
+        "step": "temporary_state_removed",
+        "state": "started",
+        "at": 1792381366.071661
+      },
+      {
+        "step": "temporary_state_removed",
+        "state": "completed",
+        "at": 1792381366.0743139
+      }
+    ],
+    "container_remove": {
+      "ok": true,
+      "returncode": 0,
+      "stdout": "bookmark-posthoc-app-5e12e022f0f9",
+      "stderr": ""
+    },
+    "container_absence_verification": {
+      "ok": true,
+      "returncode": 1,
+      "stdout": "[]",
+      "stderr": "Error: No such object: bookmark-posthoc-app-5e12e022f0f9"
+    },
+    "network_remove": {
+      "ok": true,
+      "returncode": 0,
+      "stdout": "bookmark-posthoc-net-5e12e022f0f9",
+      "stderr": ""
+    },
+    "network_absence_verification": {
+      "ok": true,
+      "returncode": 1,
+      "stdout": "[]",
+      "stderr": "Error response from daemon: network bookmark-posthoc-net-5e12e022f0f9 not found"
+    },
+    "fixture_server_stopped": true,
+    "fixture_thread_stopped": true,
+    "temporary_state_removed": true,
+    "container_absent_verified": true,
+    "network_absent_verified": true,
+    "all_resources_removed": true
+  },
+  "completed_at": "2026-10-19T03:42:46Z"
+}

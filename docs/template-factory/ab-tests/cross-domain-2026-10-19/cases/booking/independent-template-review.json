@@ -1,0 +1,93 @@
+{
+  "outcome": "passed",
+  "summary": "本包为回环本地最小演示（1 名管理员 + 2 名居民）的认知开发包候选，内部一致且诚实：P0 覆盖已确认核心闭环（登录→建设施→查看可用性→按时段预约→查看/取消→重启一致→服务端权限），验收程序 run.py 为真实 HTTP 驱动、含正负路径，决策均有默认值与询问条件，来源区分事实/建议/未知。限制：所有程序状态为 not_run，未执行任何运行验证（本审阅亦不运行）；ARCHITECTURE 未钉死成功响应体字段名（resources/bookings/slots/id 由 run.py 隐式约定）；input.json 声明的 guidance_file 指向 source/GUIDANCE.md，但该文件不在 source_inventory 与目录中；少数低风险负路径与 A15 的“按角色显示”未直接断言。这些属可选补强，不构成核心流程、承诺矛盾或数据完整性阻断。",
+  "checks": [
+    {
+      "dimension": "category_evidence",
+      "outcome": "passed",
+      "files": [
+        "CATEGORY.md",
+        "template.json",
+        "inputs/scenario.json"
+      ],
+      "reason": "S01 为 Atlas 确认输入，S02–S07 为厂商 SaaS 文档（仅行为参考、代码不可复用），S08–S10 为开源项目并给出许可与复用风险（LibreBooking GPL-3.0、MRBS GPL-2.0、django-reservations 非标准 WOW License），S11 为 PostgreSQL 官方 range/exclusion 文档；明确区分“类别事实/场景建议/待验证”，并自述“模型报告的来源证据，非独立运行或法律核验”，未作无依据的许可或行为断言。"
+    },
+    {
+      "dimension": "scenario_scope",
+      "outcome": "passed",
+      "files": [
+        "inputs/scenario.json",
+        "PRODUCT.md",
+        "ROADMAP.md"
+      ],
+      "reason": "范围与确认场景吻合：仅回环本地、1 管理员 + 2 居民、无邮件/支付/公网身份；F01–F11 为 P0 current required 并对应 workflow 与 acceptance 五条；F14 通知、F20 支付标为 not applicable，F12/13/15/16/17/19/21 标为 later，F18 标为 decision needed，均给出理由，未强引入不适用企业功能。"
+    },
+    {
+      "dimension": "product_completeness",
+      "outcome": "passed",
+      "files": [
+        "PRODUCT.md",
+        "inputs/scenario.json",
+        "DECISIONS.md"
+      ],
+      "reason": "角色 R01 管理员、R02 居民齐备；正常流（登录、建设施、查看占用、提交、查看、取消）与失败流（400/401/403/404/409，A07/A10/A16）均定义；数据生命周期含软取消保留 status 与时间戳、释放时段、重启持久化（D04/A14）；权限服务端执行（F10）、计费 F20 不适用、审计/导出 F19 later、恢复以 A14 重启一致性表达，覆盖场景所需。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "outcome": "passed",
+      "files": [
+        "ARCHITECTURE.md",
+        "DECISIONS.md",
+        "acceptance/run.py"
+      ],
+      "reason": "给出默认栈（标准库 ThreadingHTTPServer+sqlite3+原生前端）及理由与否决的替代；数据模型 users/sessions/resources/bookings 含索引与半开区间语义；并发用 BEGIN IMMEDIATE 串行事务 + 重叠谓词（start<end AND end>start）命中返回 409；API 端点、错误契约（400/401/403/404/409 + JSON error）、UI/data-testid 适配契约、非功能边界均有定义。仅成功响应体的字段名（resources/bookings/slots）未在文档钉死、且未声明 SQLite busy timeout，属可补强的轻量缺口。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "outcome": "passed",
+      "files": [
+        "ROADMAP.md",
+        "acceptance/plan.json",
+        "acceptance/run.py",
+        "acceptance/README.md"
+      ],
+      "reason": "P0 为唯一下达阶段且包含确认核心闭环，未把不可缺步骤推迟；F01–F11 与 A01–A16 双向覆盖完整（每能力有引入阶段验收，每条验收有对应 feature）；run.py 为真实 HTTP 断言的语义测试，无空桩、无伪造成功、无同义反复，覆盖 401/403/404/409/400 负路径、重叠唯一、不同设施隔离、取消幂等释放、并发屏障竞争（6 并发恰好 1 成功）、真实重启一致与中文 UI data-testid；不依赖后期 API。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "outcome": "passed",
+      "files": [
+        "DECISIONS.md",
+        "template.json"
+      ],
+      "reason": "D01–D08 每条含 question、可执行 default、明确 when_to_ask 触发条件、impact 与 status=decided-default；如 D01 提交即确认并保留 status、D02 SQLite 事务+同起点唯一、D04 软取消、D06 --init-demo 仅空库建号、D08 成熟能力全部推迟。默认可逆且触发条件具体，未冒充用户已确认。"
+    },
+    {
+      "dimension": "agent_handoff",
+      "outcome": "passed",
+      "files": [
+        "AGENT.md",
+        "README.md"
+      ],
+      "reason": "AGENT 指导先核对已有项目/决定，选当前阶段并仅实现其完整闭环，首阶段须完成已确认核心闭环而不拆到后期；要求运行真实 HTTP/浏览器验收并记录实际命令与结果，禁止删断言、硬编码或谎称通过；将 proposed 决策视为建议、不冒充用户确认、不覆盖已有指令/数据/决定；README 给出原包阅读起点与按需阅读，尊重既有决定。"
+    },
+    {
+      "dimension": "evidence_honesty",
+      "outcome": "passed",
+      "files": [
+        "VALIDATION.md",
+        "acceptance/README.md",
+        "README.md",
+        "CATEGORY.md"
+      ],
+      "reason": "VALIDATION 与 acceptance/README 明确“尚未执行、全部 not_run、生成期不运行”，plan.json 状态 not_run/not implemented，未出现伪报通过；CATEGORY 的“待验证”如实列出未抓取页面与未确认语义；README 说明来源为模型调研、Atlas 仅校验结构。唯一限制：input.json 的 guidance_file 指向 source/GUIDANCE.md，但该文件未见于 source_inventory 或目录，D08/AGENT 对 GUIDANCE 的引用不可就地复核。"
+    }
+  ],
+  "suggestions": [
+    "在 ARCHITECTURE.md 固化成功响应的 JSON 形态（/api/resources 返回 {resources:[{id,name,...}]}、/api/bookings 返回 {bookings:[...]}、/api/availability 返回 {slots:[{start,end}]}、创建返回 {id}），使实现方无需依赖 run.py 反推契约。",
+    "补充 SQLite 并发写细节：明确 busy_timeout/timeout 与数据库连接策略，避免 BEGIN IMMEDIATE 竞争时出现 500（database is locked）而使 A13 期望的 409 语义落空。",
+    "补齐少量低风险负路径验收或说明：取消不存在预约、availability 缺少/非法 resource_id、非整数 id 的 400/404 归属，以及 A15 对“按角色显示控件”的直接断言（当前 goal 隐含但未测）。",
+    "确认 source/GUIDANCE.md 是否应随包提供；若为外部注入，请在 README 或 source_inventory 注明其地位，以免下游无法复核 D08 与 AGENT 的引用依据。"
+  ],
+  "scope": "Independent static cognition and acceptance-program review only; no program execution, source re-fetch, downstream runtime or publication."
+}

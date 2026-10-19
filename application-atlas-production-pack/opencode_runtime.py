@@ -5,6 +5,7 @@ import atexit
 import json
 import os
 from pathlib import Path
+import secrets
 import shutil
 import socket
 import subprocess
@@ -12,6 +13,10 @@ import threading
 import time
 
 from opencode_client import OpenCodeClient
+from opencode_permissions import (
+    detect_opencode_major_version, execution_permission_config,
+    install_workdir_permission_policy,
+)
 
 
 class OpenCodeRuntime:
@@ -22,25 +27,65 @@ class OpenCodeRuntime:
         self._lock = threading.RLock()
         self._process: subprocess.Popen | None = None
         self._base_url: str | None = None
+        self._major_version: int | None = None
+        self._username: str | None = None
+        self._password: str | None = None
         self._log = None
         atexit.register(self.close)
 
-    def client(self, directory: str | Path) -> OpenCodeClient:
+    def client(self, directory: str | Path, allow_edit: bool = True) -> OpenCodeClient:
         workdir = Path(directory).resolve()
         if not workdir.is_dir():
             raise ValueError("execution workdir must be an existing directory")
-        return OpenCodeClient(self.ensure(), str(workdir))
+        base_url = self.ensure()
+        major_version = self.permission_major_version()
+        policy = execution_permission_config(
+            major_version, allow_edit=allow_edit)
+        install_workdir_permission_policy(
+            workdir, major_version, allow_edit=allow_edit)
+        return OpenCodeClient(
+            base_url, str(workdir), major_version=major_version,
+            username=self._username, password=self._password,
+            permissions=policy.get("permissions") if major_version >= 2 else None)
+
+    def permission_major_version(self) -> int:
+        """Return the version used to select the project permission shape."""
+        if os.environ.get("ATLAS_OPENCODE_URL", "").strip():
+            return self._external_major_version()
+        self.ensure()
+        with self._lock:
+            return self._major_version or 1
+
+    def _external_major_version(self) -> int:
+        executable = os.environ.get("ATLAS_OPENCODE_BINARY", "").strip()
+        if not executable:
+            executable = shutil.which("opencode") or "opencode"
+        return detect_opencode_major_version(executable)
 
     def ensure(self) -> str:
         configured = os.environ.get("ATLAS_OPENCODE_URL", "").strip()
         if configured:
-            client = OpenCodeClient(configured, str(self.state_root))
+            if os.environ.get("ATLAS_ALLOW_UNMANAGED_OPENCODE") != "1":
+                raise RuntimeError(
+                    "ATLAS_OPENCODE_URL is disabled by default because Atlas cannot "
+                    "verify that server's permission policy; set "
+                    "ATLAS_ALLOW_UNMANAGED_OPENCODE=1 for an explicit trusted override")
+            major_version = self._external_major_version()
+            self._username = os.environ.get("ATLAS_OPENCODE_USERNAME", "opencode")
+            self._password = os.environ.get("ATLAS_OPENCODE_PASSWORD")
+            client = OpenCodeClient(
+                configured, str(self.state_root), major_version=major_version,
+                username=os.environ.get("ATLAS_OPENCODE_USERNAME", "opencode"),
+                password=os.environ.get("ATLAS_OPENCODE_PASSWORD"))
             client.health()
             return configured.rstrip("/")
         with self._lock:
             if self._base_url and self._process and self._process.poll() is None:
                 try:
-                    OpenCodeClient(self._base_url, str(self.state_root)).health()
+                    OpenCodeClient(
+                        self._base_url, str(self.state_root),
+                        major_version=self._major_version,
+                        username=self._username, password=self._password).health()
                     return self._base_url
                 except Exception:
                     self.close()
@@ -51,6 +96,9 @@ class OpenCodeRuntime:
             process, log = self._process, self._log
             self._process = None
             self._base_url = None
+            self._major_version = None
+            self._username = None
+            self._password = None
             self._log = None
             if process and process.poll() is None:
                 process.terminate()
@@ -63,34 +111,42 @@ class OpenCodeRuntime:
                 log.close()
 
     def _start(self) -> str:
-        self.state_root.mkdir(parents=True, exist_ok=True)
-        config = {
-            "$schema": "https://opencode.ai/config.json",
-            "permission": {
-                "read": "allow", "glob": "allow", "grep": "allow", "list": "allow",
-                "edit": "allow", "bash": "ask", "question": "allow",
-                "external_directory": "deny", "webfetch": "deny", "websearch": "deny",
-                "task": "deny", "skill": "deny",
-            },
-        }
+        self.state_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+        os.chmod(self.state_root, 0o700)
+        executable = os.environ.get("ATLAS_OPENCODE_BINARY", "").strip()
+        if not executable:
+            executable = shutil.which("opencode") or "opencode"
+        major_version = detect_opencode_major_version(executable)
+        config = execution_permission_config(major_version, allow_edit=False)
         config_path = self.state_root / "opencode.json"
         config_path.write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n")
+        os.chmod(config_path, 0o600)
         with socket.socket() as probe:
             probe.bind(("127.0.0.1", 0))
             port = probe.getsockname()[1]
         self._base_url = f"http://127.0.0.1:{port}"
+        self._major_version = major_version
+        # V2's server currently fixes the Basic-auth username to `opencode`;
+        # keep the generated password private to this Atlas child process.
+        self._username = "opencode"
+        self._password = secrets.token_urlsafe(32)
         self._log = (self.state_root / "server.log").open("ab")
-        environment = {**os.environ, "OPENCODE_CONFIG": str(config_path)}
-        executable = os.environ.get("ATLAS_OPENCODE_BINARY", "").strip()
-        if not executable:
-            bundled = Path("/opt/homebrew/bin/opencode")
-            executable = str(bundled) if bundled.exists() else (shutil.which("opencode") or "opencode")
+        os.chmod(self._log.fileno(), 0o600)
+        environment = {
+            **os.environ,
+            "OPENCODE_CONFIG": str(config_path),
+            "OPENCODE_SERVER_USERNAME": self._username,
+            "OPENCODE_SERVER_PASSWORD": self._password,
+        }
         self._process = subprocess.Popen(
             [executable, "serve", "--hostname", "127.0.0.1",
-             "--port", str(port), "--print-logs", "--log-level", "WARN"],
+             "--port", str(port), "--print-logs", "--log-level", "warn"],
             cwd=self.state_root, env=environment, stdout=self._log,
             stderr=subprocess.STDOUT)
-        client = OpenCodeClient(self._base_url, str(self.state_root), timeout=2)
+        client = OpenCodeClient(
+            self._base_url, str(self.state_root), timeout=2,
+            major_version=major_version, username=self._username,
+            password=self._password)
         deadline = time.monotonic() + 12
         last_error: BaseException | None = None
         while time.monotonic() < deadline:

@@ -15,7 +15,9 @@
 - 简单新想法和已有项目改进案例均已完成当前范围的真实执行、应用、回归和验收；失败、过期基线、外部变化和证据边界均有记录。
 - 多类型需求案例已完成来源固定、范围确认、四份契约文档应用和 T1–T5 验收。T5 明确以只读端到端分析为边界，没有把不存在的 provider 集成写成完成项。
 - Agent Harness 产品使用案例已完成六份有来源文档、27 项决定、M0 CLI/provider/连通性预检、`.atlas/harness.json` 兼容基线、M1 CLI 适配器、权限门、固定验证、证据保存、显式清理和只读 TUI 路径；变更任务的停止与应用仍单独验收。
-- 当前自动化回归为后端 130 项通过，前端 typecheck/build 通过，API 健康检查通过，核心浏览器路径通过。
+- 当前自动化回归为后端 218 项、前端单元测试 7 项和 Playwright 浏览器测试 51 项通过；前端 typecheck/build、API 健康检查和干净数据生成验证通过。
+- 真实 OpenCode Go 临时隔离验证使用 `opencode-go/deepseek-v4.1-flash` 完成 analysis execution、带固定单测/范围检查/显式 apply 的 code execution，以及 generation→backup→restore；`deepseek-v4-flash` 对当前凭据返回 provider access disabled，未将其误报为可用。
+- T027 分类 provider 门禁使用 `qwen3.8-flash` 完成真实成功 smoke；显式 `opencode-go/deepseek-v4.1-flash` 返回 `model_unavailable`，被记录为不可重试的 provider 失败，不自动 fallback。分类结果只作为建议证据，不自动确认需求或写入正式语料。
 
 ## 为什么现在不自研通用 Harness
 
@@ -27,9 +29,10 @@
 
 1. OpenCode 版本和安装来源写入项目兼容基线；不承诺浮动的 latest。
 2. Atlas 只通过受控 CLI 适配层传递 argv、stdin、stdout/stderr、退出码和稳定事件，不依赖未声明的内部 API。
-3. 凭证继续由 OpenCode 读取；Atlas 不接收、不持久化 provider 凭证和原始敏感输出。
-4. 每次执行仍需经过 preflight、隔离副本、允许范围、危险操作硬门、固定验证和独立产品验收。
-5. 适配层错误必须能归一化为可恢复状态，并保留原始证据引用；会话不可用时依靠 Atlas 交接包继续，不自动重放副作用。
+3. 凭证继续由 OpenCode 读取；Atlas 不主动读取 provider 凭证。执行 stdout/stderr 和结构化原始状态会先经过已知密钥模式脱敏，再以用户私有权限保存在本地证据中；脱敏是降低风险，不代表原始输出天然无敏感信息。
+4. 每次执行仍需经过 preflight、隔离副本、允许范围、危险操作硬门、固定验证和独立产品验收；HTTP/V2 完成/失败终态固定验证由 Atlas 在 agent 停止后独立执行，CLI 使用同一无 shell 注册表，agent 自报验证只作为次级证据。HTTP/CLI agent 默认不使用自主 shell，权限交互不提供持久授权。
+5. V1/V2 权限策略由 Atlas 临时写入隔离副本并在终态恢复；受管 V2 session 还携带 Atlas 权限规则，CLI 使用 standalone/private 服务。该策略和验证器注册表是权限边界，不是 OS/容器沙箱，不能宣称解释器、测试代码或同用户进程已完全隔离。
+6. 适配层错误必须能归一化为可恢复状态，并保留原始证据引用；apply 破坏性替换前写 durable journal，启动只报告并要求显式 `restore_before`，不自动重放副作用；会话不可用时依靠 Atlas 交接包继续。
 
 ## 触发重新评估的条件
 

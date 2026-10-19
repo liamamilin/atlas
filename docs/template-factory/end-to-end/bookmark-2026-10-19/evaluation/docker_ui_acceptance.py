@@ -1,0 +1,969 @@
+"""Independent, isolated Docker + Chromium acceptance runner; do not run before package freeze."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+from pathlib import PurePosixPath
+import shutil
+import socket
+import subprocess
+import tempfile
+import threading
+import time
+import uuid
+import zipfile
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from urllib.error import URLError
+from urllib.request import urlopen
+from urllib.parse import urlsplit
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[4]
+PLAYWRIGHT = ROOT / "atlas-web/node_modules/playwright"
+IMAGE_DEFAULT = "python:3.12-slim"
+
+
+class DockerCommandTimeout(subprocess.TimeoutExpired):
+    """A bounded Docker CLI call timed out; classify it as an environment block."""
+
+
+def sha256(path):
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for block in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def source_hashes(root):
+    output = {}
+    for base, dirs, files in os.walk(root):
+        dirs[:] = sorted(d for d in dirs if d != ".git" and d != "__pycache__")
+        for name in sorted(files):
+            path = Path(base) / name
+            rel = path.relative_to(root).as_posix()
+            if path.is_symlink():
+                output[rel] = {"symlink": os.readlink(path)}
+            elif path.is_file():
+                output[rel] = sha256(path)
+    return output
+
+
+def docker(*args, check=True, timeout=30):
+    try:
+        return subprocess.run(["docker", *map(str, args)], check=check, text=True,
+                              capture_output=True, timeout=timeout)
+    except subprocess.TimeoutExpired as exc:
+        raise DockerCommandTimeout(exc.cmd, exc.timeout, output=exc.output, stderr=exc.stderr) from exc
+
+
+def atomic_write_json(path, value):
+    path = Path(path)
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.{uuid.uuid4().hex}.tmp")
+    try:
+        with temporary.open("x", encoding="utf-8") as stream:
+            json.dump(value, stream, ensure_ascii=False, indent=2)
+            stream.write("\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    finally:
+        try:
+            temporary.unlink()
+        except FileNotFoundError:
+            pass
+
+
+def atomic_write_text(path, text):
+    path = Path(path)
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.{uuid.uuid4().hex}.tmp")
+    try:
+        with temporary.open("x", encoding="utf-8") as stream:
+            stream.write(text)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    finally:
+        try:
+            temporary.unlink()
+        except FileNotFoundError:
+            pass
+
+
+def classify_failure(stage, exc):
+    if isinstance(exc, DockerCommandTimeout):
+        return "blocked", "environment_docker_cli_timeout"
+    if stage == "docker_daemon_preflight":
+        return "blocked", "environment_docker_daemon_unavailable"
+    if stage == "local_image_preflight":
+        return "blocked", "environment_image_missing_or_uninspectable"
+    if stage in {"docker_network_setup", "docker_container_create"}:
+        return "blocked", "environment_docker_setup_failed"
+    if isinstance(exc, (FileNotFoundError, TimeoutError, subprocess.TimeoutExpired, URLError)):
+        return "blocked", "environment_or_readiness_timeout"
+    return "failed", "product_or_acceptance_failure"
+
+
+def free_port():
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        return s.getsockname()[1]
+
+
+def _strict_json_bytes(data, label):
+    def pairs(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"duplicate JSON key in {label}: {key}")
+            result[key] = value
+        return result
+    try:
+        return json.loads(data.decode("utf-8"), object_pairs_hook=pairs)
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"invalid UTF-8 JSON in {label}") from exc
+
+
+def _safe_zip_path(name):
+    if not isinstance(name, str) or not name or "\\" in name or "\x00" in name:
+        raise ValueError("invalid ZIP member path")
+    path = PurePosixPath(name)
+    if path.is_absolute() or str(path) != name or any(part in {"", ".", ".."} for part in path.parts):
+        raise ValueError(f"unsafe ZIP member path: {name!r}")
+    reserved_parts = {".git", ".opencode", "node_modules", ".venv", "__pycache__"}
+    if (any(part in reserved_parts for part in path.parts)
+            or path.name in {"delivery-receipt.json", "cli-summary.json", "result.json", "input.json"}
+            or path.name.startswith(".env")
+            or path.suffix.lower() in {".pem", ".key", ".p12"}):
+        raise ValueError(f"reserved or sensitive ZIP member path: {name!r}")
+    return path
+
+
+def _manifest_strict(root):
+    root = Path(root)
+    manifest = {}
+    for base, dirs, files in os.walk(root, followlinks=False):
+        base_path = Path(base)
+        for name in list(dirs):
+            item = base_path / name
+            if item.is_symlink():
+                raise ValueError(f"symlink in frozen source tree: {item}")
+        for name in files:
+            item = base_path / name
+            if item.is_symlink() or not item.is_file():
+                raise ValueError(f"non-regular file in frozen source tree: {item}")
+            manifest[item.relative_to(root).as_posix()] = sha256(item)
+    return dict(sorted(manifest.items()))
+
+
+def _normalized_delivery_metadata(delivery, source_hashes):
+    if not isinstance(delivery, dict) or delivery.get("schema") != "atlas.application-delivery.v1" or delivery.get("root") != ".":
+        raise ValueError("frozen delivery.json must use atlas.application-delivery.v1 and root '.'")
+    declared = delivery.get("files")
+    if not isinstance(declared, list) or not declared or len(declared) > 300:
+        raise ValueError("delivery.json files must declare 1 to 300 files")
+    normalized, aliases = [], []
+    known = set(source_hashes)
+    for item in declared:
+        path = _safe_zip_path(item)
+        candidates = {str(path)}
+        if str(path).startswith("app/"):
+            candidates.add(str(path)[4:])
+        else:
+            candidates.add("app/" + str(path))
+        matches = candidates & known
+        if len(matches) != 1:
+            raise ValueError(f"declared source file missing or ambiguous: {item!r}")
+        actual = next(iter(matches))
+        if actual in normalized:
+            raise ValueError(f"duplicate or colliding delivery source path: {item!r}")
+        normalized.append(actual)
+        if item != actual:
+            aliases.append({"declared": item, "path": actual})
+    if set(normalized) != known:
+        raise ValueError("delivery.json inventory does not match ZIP application sources")
+
+    runtime = delivery.get("runtime")
+    allowed = {"profile", "install", "build", "start", "port", "readiness_path"}
+    if not isinstance(runtime, dict) or set(runtime) - allowed or runtime.get("profile") != "python-web":
+        raise ValueError("unsupported or malformed frozen runtime metadata")
+    install, build, start, port = runtime.get("install", []), runtime.get("build", []), runtime.get("start"), runtime.get("port")
+    if install != [] or build != [] or not isinstance(start, list) or not start or not all(isinstance(x, str) for x in start):
+        raise ValueError("offline frozen runtime must have literal start argv and empty install/build")
+    if type(port) is not int or not 1024 <= port <= 65535:
+        raise ValueError("frozen runtime port is invalid")
+    readiness = runtime.get("readiness_path", "/")
+    if (not isinstance(readiness, str) or not readiness.startswith("/") or readiness.startswith("//")
+            or "\\" in readiness or "?" in readiness or "#" in readiness or "\x00" in readiness
+            or any(part in {".", ".."} for part in readiness.split("/"))):
+        raise ValueError("invalid runtime readiness_path")
+    normalized_runtime = {
+        "profile": "python-web", "install": [], "build": [], "start": start,
+        "port": port, "readiness_path": readiness,
+    }
+    return {
+        "schema": "atlas.application-delivery.v1",
+        "app_root": ".",
+        "files": dict(sorted(source_hashes.items())),
+        "normalizations": aliases,
+        "runtime": normalized_runtime,
+    }
+
+
+def unpack_verified_bundle(bundle_dir, destination):
+    """Verify a develop_app.py frozen output and extract its ZIP into a new temp tree."""
+    bundle_dir = Path(bundle_dir).resolve()
+    receipt_path = bundle_dir / "delivery-receipt.json"
+    archive_path = bundle_dir / "application.zip"
+    application_copy = bundle_dir / "application"
+    if (not receipt_path.is_file() or receipt_path.is_symlink()
+            or not archive_path.is_file() or archive_path.is_symlink()
+            or not application_copy.is_dir() or application_copy.is_symlink()):
+        raise ValueError("bundle must contain application.zip, delivery-receipt.json and application/")
+    receipt_bytes = receipt_path.read_bytes()
+    receipt = _strict_json_bytes(receipt_bytes, "delivery-receipt.json")
+    archive_bytes = archive_path.read_bytes()
+    if receipt.get("schema") != "atlas.application-delivery-receipt.v1" or receipt.get("delivery_schema") != "atlas.application-delivery.v1" or receipt.get("frozen") is not True:
+        raise ValueError("delivery receipt schema/frozen marker is invalid")
+    if receipt.get("phase") != "P0":
+        raise ValueError("frozen application receipt is not phase P0")
+    if hashlib.sha256(archive_bytes).hexdigest() != receipt.get("archive_sha256"):
+        raise ValueError("application.zip SHA-256 does not match receipt")
+    expected_files = receipt.get("files_sha256")
+    expected_sources = receipt.get("application_source_sha256")
+    if not isinstance(expected_files, dict) or not isinstance(expected_sources, dict):
+        raise ValueError("delivery receipt file hash manifests are missing")
+    if len(expected_files) > 301 or not expected_files:
+        raise ValueError("receipt file inventory is invalid")
+
+    contents, actual_files = {}, {}
+    total_size = 0
+    with zipfile.ZipFile(archive_path) as archive:
+        seen = set()
+        for info in archive.infolist():
+            if info.is_dir():
+                raise ValueError("frozen application ZIP must contain files only")
+            name = info.filename
+            _safe_zip_path(name)
+            if name in seen:
+                raise ValueError(f"duplicate ZIP member: {name}")
+            seen.add(name)
+            mode = info.external_attr >> 16
+            if mode and (mode & 0o170000) not in (0, 0o100000):
+                raise ValueError(f"ZIP member is a link or special file: {name}")
+            if info.file_size > 8 * 1024 * 1024:
+                raise ValueError(f"ZIP member exceeds 8 MiB: {name}")
+            total_size += info.file_size
+            if total_size > 64 * 1024 * 1024:
+                raise ValueError("application ZIP expands beyond 64 MiB limit")
+            content = archive.read(info)
+            contents[name] = content
+            actual_files[name] = hashlib.sha256(content).hexdigest()
+    if not actual_files or actual_files != expected_files:
+        raise ValueError("ZIP member inventory or per-file hashes differ from receipt")
+    if "delivery.json" not in contents:
+        raise ValueError("application ZIP lacks root delivery.json")
+    delivery = _strict_json_bytes(contents["delivery.json"], "ZIP delivery.json")
+    app_sources = {name: digest for name, digest in actual_files.items() if name != "delivery.json"}
+    if app_sources != expected_sources:
+        raise ValueError("ZIP application sources differ from application_source_sha256")
+    if _manifest_strict(application_copy) != app_sources:
+        raise ValueError("frozen application/ directory differs from ZIP/receipt source hashes")
+    validated = receipt.get("validated_metadata")
+    expected_validated = _normalized_delivery_metadata(delivery, app_sources)
+    if validated != expected_validated:
+        raise ValueError("receipt validated_metadata differs from ZIP delivery.json and source hashes")
+
+    destination = Path(destination)
+    if destination.exists():
+        raise ValueError("verified extraction destination must not already exist")
+    destination.mkdir(parents=True)
+    for name, content in contents.items():
+        target = destination.joinpath(*_safe_zip_path(name).parts)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(content)
+        target.chmod(0o444)
+    for base, dirs, _ in os.walk(destination, topdown=False):
+        Path(base).chmod(0o555)
+    if _manifest_strict(destination) != actual_files:
+        raise ValueError("verified extracted source tree failed post-extraction hash check")
+    return {
+        "bundle_dir": str(bundle_dir),
+        "receipt_sha256": hashlib.sha256(receipt_bytes).hexdigest(),
+        "archive_sha256": hashlib.sha256(archive_bytes).hexdigest(),
+        "source_package_sha256": receipt.get("source_package_sha256"),
+        "source_context_sha256": receipt.get("source_context_sha256"),
+        "receipt_validated_metadata": validated,
+        "extracted_root": str(destination),
+        "extracted_source_sha256": actual_files,
+    }
+
+
+class Fixture(BaseHTTPRequestHandler):
+    def do_GET(self):
+        page = urlsplit(self.path).path
+        if page not in ("/original", "/second", "/xss"):
+            self.send_error(404)
+            return
+        label = "Local original fixture page" if page == "/original" else "Local secondary fixture page"
+        body = f"<!doctype html><title>{label}</title><h1>{label}</h1>".encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def log_message(self, fmt, *args):
+        print("fixture: " + fmt % args, flush=True)
+
+
+def command_value(command, flag):
+    for i, arg in enumerate(command):
+        if arg == flag:
+            if i + 1 >= len(command):
+                raise ValueError(f"delivery runtime.start has {flag} without a value")
+            return command[i + 1]
+        if arg.startswith(flag + "="):
+            return arg.split("=", 1)[1]
+    return None
+
+
+def read_delivery(delivery_path):
+    delivery_path = delivery_path.resolve()
+    doc = json.loads(delivery_path.read_text())
+    if doc.get("schema") != "atlas.application-delivery.v1":
+        raise ValueError(f"unexpected delivery schema: {doc.get('schema')!r}")
+    root = doc.get("root")
+    runtime = doc.get("runtime")
+    if root != "." or not isinstance(runtime, dict):
+        raise ValueError("delivery root/runtime missing or malformed")
+    start = runtime.get("start")
+    if not isinstance(start, list) or not start or not all(isinstance(x, str) for x in start):
+        raise ValueError("delivery runtime.start must be a nonempty argv list")
+    if runtime.get("install", []) or runtime.get("build", []):
+        raise ValueError("offline acceptance requires delivery install/build to be empty")
+    if runtime.get("profile") != "python-web":
+        raise ValueError(f"unsupported delivery runtime profile: {runtime.get('profile')!r}")
+    port = runtime.get("port")
+    if type(port) is not int or not (1024 <= port <= 65535):
+        raise ValueError("delivery runtime.port must be a valid integer")
+    if command_value(start, "--host") != "0.0.0.0":
+        raise ValueError("container command must explicitly bind --host 0.0.0.0")
+    if command_value(start, "--port") != str(port):
+        raise ValueError("delivery start argv --port must equal runtime.port")
+    data_dir = command_value(start, "--data-dir")
+    if not isinstance(data_dir, str) or not (data_dir == "/state" or data_dir.startswith("/state/")) or ".." in PurePosixPath(data_dir).parts:
+        raise ValueError("delivery start argv must use a data directory beneath /state")
+    app_root = (delivery_path.parent / root).resolve()
+    if not app_root.is_dir():
+        raise ValueError(f"delivery application root does not exist: {app_root}")
+    return doc, start, port, app_root, data_dir, runtime.get("readiness_path", "/")
+
+
+def wait_ready(base_url, container, timeout=30):
+    last = None
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        state = json.loads(docker("inspect", container, timeout=5).stdout)[0]["State"]
+        if not state.get("Running"):
+            raise RuntimeError(f"app container exited before readiness: {state}")
+        try:
+            with urlopen(base_url, timeout=1) as response:
+                if response.status == 200:
+                    return
+                last = f"HTTP {response.status}"
+        except (URLError, TimeoutError, OSError) as exc:
+            last = repr(exc)
+        time.sleep(0.25)
+    raise TimeoutError(f"app did not become ready: {last}")
+
+
+def remove_temp_tree(root):
+    root = Path(root)
+    if not root.exists():
+        return True
+    for base, dirs, files in os.walk(root, topdown=False, followlinks=False):
+        for name in files:
+            path = Path(base) / name
+            if not path.is_symlink():
+                path.chmod(0o600)
+        for name in dirs:
+            path = Path(base) / name
+            if not path.is_symlink():
+                path.chmod(0o700)
+        Path(base).chmod(0o700)
+    shutil.rmtree(root)
+    return not root.exists()
+
+
+def _docker_says_missing(result):
+    if result.returncode == 0:
+        return False
+    detail = ((result.stdout or "") + "\n" + (result.stderr or "")).lower()
+    return "no such" in detail or "not found" in detail or "does not exist" in detail
+
+
+def cleanup_resources(report, persist, *, container, network, temp_root,
+                      container_attempted, network_attempted, fixture, fixture_thread,
+                      docker_call=docker, temp_remover=remove_temp_tree):
+    """Bounded, independently recorded cleanup; dependency injection supports no-Docker tests."""
+    cleanup = report.setdefault("cleanup", {"events": []})
+    evidence_dir = Path(report["evidence_dir"]) if report.get("evidence_dir") else None
+
+    def preserve_interruption(exc, step_name):
+        interruption = {
+            "stage": f"cleanup:{step_name}",
+            "error": repr(exc),
+            "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        }
+        report.setdefault("cleanup_interruptions", []).append(interruption)
+        if evidence_dir is not None:
+            try:
+                atomic_write_json(evidence_dir / "interruption.json", {
+                    "status": "interrupted_during_cleanup",
+                    **interruption,
+                    "run_json": str(evidence_dir / "run.json"),
+                })
+            except BaseException as write_exc:
+                report["interruption_record_error"] = repr(write_exc)
+
+    def journal(step_name):
+        try:
+            persist()
+            return True
+        except BaseException as exc:
+            cleanup.setdefault("journal_errors", []).append({"step": step_name, "error": repr(exc)})
+            if isinstance(exc, KeyboardInterrupt):
+                preserve_interruption(exc, f"journal:{step_name}")
+            return False
+
+    def step(name, callback):
+        cleanup["events"].append({"step": name, "state": "started", "at": time.time()})
+        journal(f"{name}:started")
+        try:
+            value = callback()
+            cleanup[name] = value
+            cleanup["events"].append({"step": name, "state": "completed", "at": time.time()})
+        except BaseException as exc:  # A cleanup failure must not skip later cleanup or the report write.
+            cleanup[name] = {"ok": False, "error": repr(exc)}
+            cleanup["events"].append({"step": name, "state": "failed", "error": repr(exc), "at": time.time()})
+            if isinstance(exc, KeyboardInterrupt):
+                preserve_interruption(exc, name)
+        journal(f"{name}:finished")
+        return cleanup[name]
+
+    def remove_container():
+        if not container_attempted:
+            return {"ok": True, "state": "not-created"}
+        result = docker_call("rm", "--force", container, check=False, timeout=10)
+        return {"ok": result.returncode == 0 or _docker_says_missing(result),
+                "returncode": result.returncode, "stdout": result.stdout.strip(), "stderr": result.stderr.strip()}
+
+    def verify_container_absent():
+        if not container_attempted:
+            return {"ok": True, "state": "not-created"}
+        result = docker_call("inspect", container, check=False, timeout=10)
+        return {"ok": _docker_says_missing(result), "returncode": result.returncode,
+                "stdout": result.stdout.strip(), "stderr": result.stderr.strip()}
+
+    def remove_network():
+        if not network_attempted:
+            return {"ok": True, "state": "not-created"}
+        result = docker_call("network", "rm", network, check=False, timeout=10)
+        return {"ok": result.returncode == 0 or _docker_says_missing(result),
+                "returncode": result.returncode, "stdout": result.stdout.strip(), "stderr": result.stderr.strip()}
+
+    def verify_network_absent():
+        if not network_attempted:
+            return {"ok": True, "state": "not-created"}
+        result = docker_call("network", "inspect", network, check=False, timeout=10)
+        return {"ok": _docker_says_missing(result), "returncode": result.returncode,
+                "stdout": result.stdout.strip(), "stderr": result.stderr.strip()}
+
+    container_removal = step("container_remove", remove_container)
+    report["owned_resources"]["container"]["state"] = "removed" if container_removal.get("ok") else "cleanup-failed"
+    journal("container_remove:resource-state")
+    container_absence = step("container_absence_verification", verify_container_absent)
+    if container_absence.get("ok"):
+        report["owned_resources"]["container"]["state"] = "absent-verified"
+    journal("container_absence_verification:resource-state")
+    network_removal = step("network_remove", remove_network)
+    report["owned_resources"]["network"]["state"] = "removed" if network_removal.get("ok") else "cleanup-failed"
+    journal("network_remove:resource-state")
+    network_absence = step("network_absence_verification", verify_network_absent)
+    if network_absence.get("ok"):
+        report["owned_resources"]["network"]["state"] = "absent-verified"
+    journal("network_absence_verification:resource-state")
+
+    if fixture is None:
+        cleanup["fixture_server_stopped"] = {"ok": True, "state": "not-created"}
+        report["owned_resources"]["fixture_server"]["state"] = "not-created"
+        journal("fixture_server:not-created")
+    else:
+        def shutdown_fixture():
+            if fixture_thread is None or not fixture_thread.is_alive():
+                return {"ok": True, "state": "serve-loop-not-running"}
+            fixture.shutdown()
+            return {"ok": True}
+        step("fixture_shutdown", shutdown_fixture)
+        step("fixture_server_close", lambda: (fixture.server_close(), {"ok": True})[1])
+    if fixture_thread is None:
+        cleanup["fixture_thread_stopped"] = {"ok": True, "state": "not-created"}
+        report["owned_resources"]["fixture_thread"]["state"] = "not-created"
+        journal("fixture_thread:not-created")
+    else:
+        def join_fixture():
+            if not fixture_thread.ident:
+                return {"ok": True, "state": "never-started", "alive": False}
+            fixture_thread.join(timeout=3)
+            return {"ok": not fixture_thread.is_alive(), "alive": fixture_thread.is_alive()}
+        step("fixture_thread_stopped", join_fixture)
+        cleanup["fixture_server_stopped"] = {
+            "ok": all(cleanup.get(key, {}).get("ok", False) for key in (
+                "fixture_shutdown", "fixture_server_close", "fixture_thread_stopped"))
+        }
+        report["owned_resources"]["fixture_server"]["state"] = (
+            "stopped" if cleanup["fixture_server_stopped"]["ok"] else "cleanup-failed")
+        report["owned_resources"]["fixture_thread"]["state"] = (
+            "stopped" if cleanup["fixture_thread_stopped"]["ok"] else "cleanup-failed")
+        journal("fixture:resource-state")
+
+    def remove_temp():
+        return {"ok": temp_remover(temp_root)}
+    step("temporary_state_removed", remove_temp)
+    report["owned_resources"]["temporary_root"]["state"] = (
+        "removed" if cleanup["temporary_state_removed"].get("ok") else "cleanup-failed")
+    journal("temporary_state_removed:resource-state")
+    cleanup["container_absent_verified"] = cleanup["container_absence_verification"].get("ok", False)
+    cleanup["network_absent_verified"] = cleanup["network_absence_verification"].get("ok", False)
+    cleanup["fixture_server_stopped"] = cleanup.get("fixture_server_stopped", {}).get("ok", False)
+    cleanup["fixture_thread_stopped"] = cleanup.get("fixture_thread_stopped", {}).get("ok", False)
+    cleanup["temporary_state_removed"] = cleanup["temporary_state_removed"].get("ok", False)
+    cleanup["all_resources_removed"] = all(cleanup.get(key, False) for key in (
+        "container_absent_verified", "network_absent_verified", "fixture_server_stopped",
+        "fixture_thread_stopped", "temporary_state_removed"))
+    journal("cleanup:summary")
+    return cleanup
+
+
+def finalize_cleanup_outcome(report, persist, evidence_dir, *, max_persist_attempts=2):
+    """Reconcile cleanup/journal outcomes before writing the final verdict."""
+    evidence_dir = Path(evidence_dir)
+
+    def note_interruption(exc, stage_name):
+        event = {
+            "stage": stage_name,
+            "error": repr(exc),
+            "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        }
+        report.setdefault("cleanup_interruptions", []).append(event)
+        try:
+            atomic_write_json(evidence_dir / "interruption.json", {
+                "status": "interrupted_during_cleanup", **event,
+                "run_json": str(evidence_dir / "run.json"),
+            })
+        except BaseException as write_exc:
+            report["interruption_record_error"] = repr(write_exc)
+
+    def aggregate():
+        cleanup = report.setdefault("cleanup", {})
+        has_interruption = bool(report.get("cleanup_interruptions"))
+        has_journal_error = bool(report.get("cleanup_journal_errors") or cleanup.get("journal_errors"))
+        resources_removed = cleanup.get("all_resources_removed", False)
+        if not resources_removed or has_journal_error:
+            report["cleanup_failure"] = True
+        if report.get("status") == "passed" and (not resources_removed or has_interruption or has_journal_error):
+            if has_interruption and resources_removed:
+                report["status"] = "interrupted"
+                report["failure_kind"] = "cleanup_interrupted"
+                report["error"] = "cleanup was interrupted after the acceptance workflow passed"
+            else:
+                report["status"] = "failed"
+                report["failure_kind"] = "acceptance_cleanup_or_evidence_failed"
+                report["error"] = "cleanup or final evidence persistence did not complete cleanly"
+            report.setdefault("primary_failure", {
+                "stage": "cleanup", "status": report["status"],
+                "failure_kind": report["failure_kind"], "error": report["error"],
+            })
+
+    aggregate()
+    for attempt in range(max_persist_attempts):
+        try:
+            persist()
+            break
+        except BaseException as exc:
+            report.setdefault("cleanup_journal_errors", []).append({
+                "stage": "cleanup:final_persist", "attempt": attempt + 1, "error": repr(exc),
+            })
+            if isinstance(exc, KeyboardInterrupt):
+                note_interruption(exc, "cleanup:final_persist")
+            aggregate()
+    return report.get("status")
+
+
+def container_meta(container, timeout=10):
+    item = json.loads(docker("inspect", container, timeout=timeout).stdout)[0]
+    return {
+        "id": item["Id"],
+        "state": {key: item["State"].get(key) for key in ("Status", "Running", "Pid", "StartedAt", "FinishedAt", "ExitCode")},
+        "restart_count": item.get("RestartCount"),
+        "port_bindings": item["HostConfig"].get("PortBindings"),
+        "effective_ports": item["NetworkSettings"].get("Ports"),
+        "network_mode": item["HostConfig"].get("NetworkMode"),
+        "internal_rootfs": item["HostConfig"].get("ReadonlyRootfs"),
+        "cap_drop": item["HostConfig"].get("CapDrop"),
+        "security_options": item["HostConfig"].get("SecurityOpt"),
+        "limits": {key: item["HostConfig"].get(key) for key in ("Memory", "NanoCpus", "PidsLimit")},
+        "mounts": [{key: m.get(key) for key in ("Type", "Source", "Destination", "RW")} for m in item["Mounts"]],
+        "environment_names": [entry.split("=", 1)[0] for entry in item["Config"].get("Env", [])],
+    }
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--bundle", required=True, type=Path,
+                        help="Frozen develop_app.py output directory containing application.zip and delivery-receipt.json")
+    parser.add_argument("--evidence-dir", required=True, type=Path,
+                        help="Use a fresh directory per run, e.g. evaluation/initial or evaluation/repair-1")
+    parser.add_argument("--image", default=IMAGE_DEFAULT, help="Must already exist locally; no image pull is attempted")
+    parser.add_argument("--duplicate-url-contract", choices=("observe", "unique-url", "idempotent"), default="observe",
+                        help="Apply a duplicate-save failure rule only when the frozen template explicitly promises it")
+    args = parser.parse_args()
+    evidence = args.evidence_dir.resolve()
+    if evidence.exists():
+        raise SystemExit(f"evidence directory already exists; refusing overwrite: {evidence}")
+    evidence.mkdir(parents=True)
+    (evidence / "screenshots").mkdir()
+    env_evidence = evidence / "run.json"
+
+    run_token = uuid.uuid4().hex
+    temp_root = Path(tempfile.gettempdir()) / f"bookmark-product-acceptance-{run_token}"
+    data_dir = temp_root / "state"
+    network = "bookmark-product-net-" + run_token[:10]
+    container = "bookmark-product-app-" + run_token[:10]
+    host_port = free_port()
+    fixture_port = free_port()
+    app_url = f"http://127.0.0.1:{host_port}/"
+    fixture_base = f"http://127.0.0.1:{fixture_port}"
+    fixture = None
+    fixture_thread = None
+    network_attempted = False
+    container_attempted = False
+    interrupted = False
+    report = {
+        "schema": "atlas.bookmark-ui-acceptance.v1",
+        "status": "running",
+        "stage": "preflight",
+        "started_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "evidence_dir": str(evidence),
+        "runner_command": ["python3", str(Path(__file__).resolve()), *os.sys.argv[1:]],
+        "frozen_bundle_dir": str(args.bundle.resolve()),
+        "delivery_sha256": None,
+        "app_root": None,
+        "app_source_sha256_before": None,
+        "app_source_sha256_after": None,
+        "app_image": args.image,
+        "app_image_id": None,
+        "app_url": app_url,
+        "duplicate_url_contract": args.duplicate_url_contract,
+        "fixture_base": fixture_base,
+        "browser_policy": "Chromium requests permitted only to exact app origin and exact local fixture origin; all other requests aborted",
+        "docker_network_mode": "dedicated user-defined bridge; egress not enforced",
+        "network_none": False,
+        "container_settings": None,
+        "lifecycle": [],
+        "stage_events": [],
+        "owned_resources": {
+            "temporary_root": {"path": str(temp_root), "state": "planned"},
+            "fixture_server": {"address": f"127.0.0.1:{fixture_port}", "state": "planned"},
+            "fixture_thread": {"name": f"fixture-{run_token[:10]}", "state": "planned"},
+            "network": {"name": network, "state": "planned"},
+            "container": {"name": container, "state": "planned"},
+        },
+        "docker_commands": {
+            "network_create": ["docker", "network", "create", network],
+            "container_cleanup": ["docker", "rm", "--force", container],
+            "network_cleanup": ["docker", "network", "rm", network],
+            "container_run_plan": {
+                "name": container, "image": args.image, "host_publish": f"127.0.0.1:{host_port}:<delivery.runtime.port>",
+                "source_mount": f"{temp_root}/verified-application:/app:readonly",
+                "state_mount": f"{data_dir}:/state", "runtime_argv": "<verified delivery.json runtime.start>",
+            },
+        },
+        "limitations": ["Bridge egress is not blocked; browser-origin allowlist is enforced in Chromium only."],
+        "screenshots_dir": str(evidence / "screenshots"),
+    }
+
+    def persist():
+        report["updated_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        atomic_write_json(env_evidence, report)
+
+    def stage(name):
+        report["stage"] = name
+        report["stage_events"].append({"stage": name, "state": "started", "at": time.time()})
+        persist()
+
+    def stage_done(name, details=None):
+        report["stage_events"].append({"stage": name, "state": "completed", "at": time.time(), "details": details or {}})
+        persist()
+
+    # This first durable snapshot precedes creation of the data dir, HTTP fixture,
+    # Docker network, or container. It records their unique names and planned commands.
+    persist()
+    try:
+        stage("temporary_data_setup")
+        temp_root.mkdir(mode=0o700)
+        data_dir.mkdir()
+        data_dir.chmod(0o777)
+        report["owned_resources"]["temporary_root"]["state"] = "created"
+        stage_done("temporary_data_setup", {"data_dir": str(data_dir)})
+
+        stage("fixture_server_setup")
+        fixture = ThreadingHTTPServer(("127.0.0.1", fixture_port), Fixture)
+        fixture_thread = threading.Thread(target=fixture.serve_forever, daemon=True)
+        fixture_thread.start()
+        report["owned_resources"]["fixture_server"]["state"] = "started"
+        stage_done("fixture_server_setup", {"fixture_base": fixture_base})
+
+        stage("bundle_verification")
+        app_root = temp_root / "verified-application"
+        bundle_info = unpack_verified_bundle(args.bundle, app_root)
+        delivery_path = app_root / "delivery.json"
+        delivery, start_argv, container_port, app_root, data_argument, readiness_path = read_delivery(delivery_path)
+        report["bundle_verification"] = bundle_info
+        report["delivery_file"] = str(delivery_path)
+        report["delivery_sha256"] = sha256(delivery_path)
+        report["delivery_runtime_start_argv"] = start_argv
+        report["delivery_runtime_port"] = container_port
+        report["delivery_data_dir_argument"] = data_argument
+        report["delivery_readiness_path"] = readiness_path
+        report["app_root"] = str(app_root)
+        report["app_source_sha256_before"] = source_hashes(app_root)
+        report["docker_commands"]["container_run_plan"]["runtime_argv"] = start_argv
+        report["docker_commands"]["container_run_plan"]["host_publish"] = f"127.0.0.1:{host_port}:{container_port}"
+        stage_done("bundle_verification", {"archive_sha256": bundle_info["archive_sha256"], "delivery_sha256": report["delivery_sha256"]})
+
+        stage("docker_daemon_preflight")
+        docker("info", timeout=10)
+        stage_done("docker_daemon_preflight")
+        stage("local_image_preflight")
+        report["app_image_id"] = docker("image", "inspect", "--format", "{{.Id}}", args.image, timeout=10).stdout.strip()
+        stage_done("local_image_preflight", {"image_id": report["app_image_id"]})
+
+        stage("docker_network_setup")
+        network_attempted = True
+        report["owned_resources"]["network"]["state"] = "creation-attempted"
+        persist()
+        docker("network", "create", network, timeout=15)
+        report["owned_resources"]["network"]["state"] = "created"
+        net_meta = json.loads(docker("network", "inspect", network, timeout=10).stdout)[0]
+        report["docker_network_internal"] = net_meta["Internal"]
+        if net_meta["Internal"]:
+            raise RuntimeError("expected parent-approved bridge fallback, got internal Docker network")
+        stage_done("docker_network_setup", {"internal": net_meta["Internal"]})
+
+        stage("docker_container_create")
+        container_attempted = True
+        report["owned_resources"]["container"]["state"] = "creation-attempted"
+        persist()
+        run = docker(
+            "run", "--detach", "--read-only", "--tmpfs", "/tmp:rw,nosuid,nodev",
+            "--cap-drop", "ALL", "--security-opt", "no-new-privileges:true",
+            "--memory", "256m", "--cpus", "0.5", "--pids-limit", "64",
+            "--user", f"{os.getuid()}:{os.getgid()}", "--workdir", "/app",
+            "--mount", f"type=bind,src={app_root},dst=/app,readonly",
+            "--mount", f"type=bind,src={data_dir},dst=/state",
+            "--network", network, "--publish", f"127.0.0.1:{host_port}:{container_port}",
+            "--env", "PYTHONDONTWRITEBYTECODE=1", "--env", "PYTHONUNBUFFERED=1",
+            "--name", container, args.image, *start_argv,
+            timeout=30,
+        )
+        report["container_id"] = run.stdout.strip()
+        report["owned_resources"]["container"]["state"] = "created"
+        report["container_settings"] = container_meta(container, timeout=10)
+        effective = report["container_settings"]["effective_ports"] or {}
+        if not any(entry and entry[0].get("HostIp") == "127.0.0.1" for entry in effective.values()):
+            raise RuntimeError("Docker did not effectively publish app port to 127.0.0.1")
+        readiness_url = app_url.rstrip("/") + readiness_path
+        stage_done("docker_container_create", {"container_id": run.stdout.strip()})
+
+        stage("application_readiness")
+        wait_ready(readiness_url, container, timeout=30)
+        report["lifecycle"].append({"event": "initial_start", "container": container_meta(container, timeout=10)})
+        stage_done("application_readiness")
+
+        stage("browser_setup")
+        home = temp_root / "browser-home"
+        home.mkdir()
+        # Playwright resolves executablePath from its browser cache. Discover the
+        # installed binary with an allowlisted environment using the user's HOME,
+        # then launch it with a separate temporary HOME so Chromium cannot see
+        # the user's normal profile/configuration.
+        discovery_env = {
+            "PATH": os.environ["PATH"],
+            "HOME": str(Path.home()),
+            "TMPDIR": str(temp_root),
+        }
+        module_result = subprocess.run(
+            ["node", "-e", "const {chromium}=require(process.argv[1]);process.stdout.write(chromium.executablePath())", str(PLAYWRIGHT)],
+            cwd=ROOT, env=discovery_env, check=True, text=True, capture_output=True, timeout=15,
+        )
+        isolated_browser_env = {"PATH": os.environ["PATH"], "HOME": str(home), "TMPDIR": str(temp_root)}
+        phase_env = {
+            **isolated_browser_env,
+            "PLAYWRIGHT_MODULE": str(PLAYWRIGHT),
+            "PLAYWRIGHT_EXECUTABLE": module_result.stdout,
+            "APP_URL": app_url,
+            "FIXTURE_BASE": fixture_base,
+            "EVIDENCE_DIR": str(evidence),
+            "DUPLICATE_URL_CONTRACT": args.duplicate_url_contract,
+        }
+        report["browser"] = {"engine": "Chromium", "executable": module_result.stdout,
+                             "executable_discovery": "allowlisted PATH/HOME/TMPDIR; HOME used only to resolve Playwright's installed browser binary",
+                             "environment": "Chromium launch uses temporary HOME and allowlisted PATH/HOME/TMPDIR; no inherited credential variables"}
+        stage_done("browser_setup", {"executable": module_result.stdout})
+
+        def run_phase(phase, run_id=None):
+            stage(f"ui_{phase}")
+            phase_env["PHASE"] = phase
+            if run_id:
+                phase_env["RUN_ID"] = run_id
+            try:
+                proc = subprocess.run(
+                    ["node", str(HERE / "bookmark_ui_acceptance.cjs")], cwd=ROOT,
+                    env=phase_env, text=True, capture_output=True, timeout=120,
+                )
+            except subprocess.TimeoutExpired as exc:
+                out = exc.stdout or ""
+                err = exc.stderr or ""
+                if isinstance(out, bytes):
+                    out = out.decode("utf-8", "replace")
+                if isinstance(err, bytes):
+                    err = err.decode("utf-8", "replace")
+                atomic_write_text(evidence / f"{phase}.stdout.json", out)
+                atomic_write_text(evidence / f"{phase}.stderr.log", err)
+                report["phase_timeout"] = {"phase": phase, "seconds": exc.timeout, "cmd": exc.cmd}
+                persist()
+                raise
+            atomic_write_text(evidence / f"{phase}.stdout.json", proc.stdout)
+            atomic_write_text(evidence / f"{phase}.stderr.log", proc.stderr)
+            persist()
+            if proc.returncode:
+                raise RuntimeError(f"Chromium UI phase {phase} failed (exit {proc.returncode}): {proc.stderr[-4000:]}")
+            parsed = json.loads(proc.stdout)
+            report[f"{phase.replace('-', '_')}_phase"] = parsed
+            stage_done(f"ui_{phase}")
+            return parsed
+
+        run_id = "bm-" + uuid.uuid4().hex[:12]
+        run_phase("initial", run_id)
+        stage("pre_restart_snapshot")
+        before_restart = container_meta(container, timeout=10)
+        report["lifecycle"].append({"event": "before_restart", "container": before_restart})
+        stage_done("pre_restart_snapshot", {"started_at": before_restart["state"]["StartedAt"]})
+
+        stage("docker_restart")
+        restart_output = docker("restart", "--time", "5", container, timeout=30).stdout.strip()
+        stage_done("docker_restart", {"stdout": restart_output})
+        stage("post_restart_readiness")
+        wait_ready(readiness_url, container, timeout=30)
+        after_restart = container_meta(container, timeout=10)
+        report["lifecycle"].append({"event": "docker_restart", "command": ["docker", "restart", "--time", "5", container], "stdout": restart_output})
+        report["lifecycle"].append({"event": "after_restart", "container": after_restart})
+        if before_restart["state"]["StartedAt"] == after_restart["state"]["StartedAt"]:
+            raise RuntimeError("Docker container StartedAt did not change; real process restart is unproven")
+        stage_done("post_restart_readiness", {"started_at": after_restart["state"]["StartedAt"]})
+
+        run_phase("after-restart")
+        stage("post_acceptance_source_integrity")
+        report["app_source_sha256_after"] = source_hashes(app_root)
+        if report["app_source_sha256_after"] != report["app_source_sha256_before"]:
+            raise RuntimeError("application source changed during acceptance")
+        stage_done("post_acceptance_source_integrity")
+        report["status"] = "passed"
+        persist()
+    except KeyboardInterrupt as exc:
+        interrupted = True
+        report["status"] = "interrupted"
+        report["failure_kind"] = "operator_interruption"
+        report["error"] = repr(exc)
+        report["interrupted_at_stage"] = report.get("stage")
+        report["primary_failure"] = {
+            "stage": report["interrupted_at_stage"],
+            "status": "interrupted",
+            "failure_kind": "operator_interruption",
+            "error": repr(exc),
+        }
+        try:
+            atomic_write_json(evidence / "interruption.json", {
+                "status": "interrupted",
+                "stage": report["interrupted_at_stage"],
+                "error": repr(exc),
+                "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "run_json": str(env_evidence),
+            })
+        except BaseException as write_exc:
+            report["interruption_record_error"] = repr(write_exc)
+        persist()
+    except Exception as exc:
+        report["failure_stage"] = report.get("stage")
+        report["status"], report["failure_kind"] = classify_failure(report.get("stage", "unknown"), exc)
+        report["error"] = repr(exc)
+        report["primary_failure"] = {
+            "stage": report["failure_stage"],
+            "status": report["status"],
+            "failure_kind": report["failure_kind"],
+            "error": report["error"],
+        }
+        if isinstance(exc, subprocess.CalledProcessError):
+            report["command"] = exc.cmd
+            report["stdout"] = exc.stdout
+            report["stderr"] = exc.stderr
+            report["primary_failure"].update({"command": exc.cmd, "stdout": exc.stdout, "stderr": exc.stderr})
+        if isinstance(exc, subprocess.TimeoutExpired):
+            report["command"] = exc.cmd
+            report["timeout_seconds"] = exc.timeout
+            report["primary_failure"].update({"command": exc.cmd, "timeout_seconds": exc.timeout})
+        persist()
+        if container_attempted:
+            try:
+                report["failure_container_logs"] = docker("logs", "--tail", "200", container, check=False, timeout=10).stdout
+                persist()
+            except BaseException as log_exc:
+                report["failure_container_logs_error"] = repr(log_exc)
+                persist()
+    finally:
+        report["stage"] = "cleanup"
+        try:
+            persist()
+        except BaseException as persist_exc:
+            report.setdefault("cleanup_journal_errors", []).append({"stage": "cleanup:started", "error": repr(persist_exc)})
+            if isinstance(persist_exc, KeyboardInterrupt):
+                report.setdefault("cleanup_interruptions", []).append({
+                    "stage": "cleanup:journal:started", "error": repr(persist_exc),
+                    "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                })
+                try:
+                    atomic_write_json(evidence / "interruption.json", {
+                        "status": "interrupted_during_cleanup",
+                        **report["cleanup_interruptions"][-1],
+                        "run_json": str(env_evidence),
+                    })
+                except BaseException as write_exc:
+                    report["interruption_record_error"] = repr(write_exc)
+        cleanup_resources(
+            report, persist, container=container, network=network, temp_root=temp_root,
+            container_attempted=container_attempted, network_attempted=network_attempted,
+            fixture=fixture, fixture_thread=fixture_thread,
+        )
+        report["completed_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        finalize_cleanup_outcome(report, persist, evidence)
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    if report["status"] == "interrupted":
+        raise SystemExit(130)
+    if report["status"] != "passed":
+        raise SystemExit(1)
+
+if __name__ == "__main__":
+    main()

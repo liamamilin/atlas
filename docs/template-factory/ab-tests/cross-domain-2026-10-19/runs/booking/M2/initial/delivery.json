@@ -1,0 +1,63 @@
+{
+  "status": "delivered",
+  "cli_status": "completed",
+  "attempt": 1,
+  "elapsed_seconds_all_attempts": 287.53,
+  "source_sha256": {
+    "DECISIONS.md": "db0e16ed59498568c6194fa9e65b5546d3feac3154dd27dd9e79bdd04e7b5cad",
+    "README.md": "73ea0d8a37029f21468619625a93138ff1ed5b59720ece81ced0ad60dc53ba83",
+    "api.py": "49fcb83cb0909bc2bd930247bf2b192f5ab1b116359999a3e43170e97194acc8",
+    "app.js": "67f98d64cf2bee20aa8a121b15d19be9c50fcaded5eef3eb30d8ee67aff898cc",
+    "app.py": "7b8944e78fd69668abe19a64cf70913b5a0a512c385ac4b46ace9811323af997",
+    "db.py": "37387096504e5e49e93c7b18111df5ce79537f118773cae65ded1a26d0a23c14",
+    "index.html": "6020deb6f7ba7a4cf125d52e810e7e331b105a1aaa646b44562a7149925bd566",
+    "security.py": "151e611238fa3f5670082947d8081739a3421e46364b30e0f3238db3fedff99d",
+    "style.css": "7f7ef937bf15461e60e73508f9bd17572a309ee8a7c180de82cc50e97f61bf00",
+    "timeutil.py": "613718f8cad9b97587eae4640212a45cffab860a5e528fe5ece68d532ab6ef08"
+  },
+  "host_source_findings": [],
+  "author_claims": {
+    "files": [
+      "app.py",
+      "db.py",
+      "security.py",
+      "timeutil.py",
+      "api.py",
+      "index.html",
+      "app.js",
+      "style.css",
+      "README.md",
+      "DECISIONS.md"
+    ],
+    "implemented": [
+      "F01 login/logout/server sessions",
+      "F02 admin creates resources",
+      "F03 availability of active slots",
+      "F04 ISO8601 half-open booking with end>start",
+      "F05 own bookings / admin all",
+      "F06 idempotent soft cancel releasing slot",
+      "F07 overlap uniqueness + concurrency isolation",
+      "F08 persistence across real restart",
+      "F09 Chinese UI + data-testid contract",
+      "F10 server-enforced roles/ownership",
+      "F11 non-2xx JSON error contract",
+      "--init-demo non-destructive seeding",
+      "localhost 127.0.0.1 binding, --port/--data-dir CLI"
+    ],
+    "limits": [
+      "loopback local demo only; no email/real residents/payment/public identity/external network",
+      "single-process SQLite single-writer; concurrency limited to BEGIN IMMEDIATE in-process serialization",
+      "only three synthetic accounts, single community, no multi-tenancy",
+      "no approval/rules/notifications/waitlist/audit/billing; only reserved status+timestamp fields",
+      "timezone compared by UTC instant only; no wall-clock recurrence or DST handling",
+      "cancel is soft; no physical delete or retention policy",
+      "no programs executed; all acceptance cases remain not_run pending independent operator"
+    ],
+    "self_checks": {
+      "status": "not_run"
+    }
+  },
+  "application_hand_edits": false,
+  "execution": "not_run",
+  "evidence_status": "await independent source review and real runtime"
+}

@@ -6,20 +6,20 @@ import os
 import queue
 import re
 import sqlite3
+import sys
 import threading
 import time
 import urllib.request
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import atlas_model
 
 PACK = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(PACK, "atlas", "atlas.sqlite")
 OUT = os.path.join(PACK, "atlas", "stress_instances.jsonl")
 STATE = os.path.join(PACK, "atlas", "stress-state-api.json")
 LOG = os.path.join(PACK, "logs", "stress-gen.log")
-API = "https://opencode.ai/zen/go/v1/chat/completions"
-MODEL = "mimo-v2.5"
 WORKERS = 12
-
-KEY = json.load(open(os.path.expanduser("~/.local/share/opencode/auth.json")))["opencode-go"]["key"]
 
 PROMPT = """基于下面这个软件应用类型的定义，虚构一个真实感的产品使用场景描述（2-3句中文）。
 硬性要求：
@@ -35,17 +35,11 @@ PROMPT = """基于下面这个软件应用类型的定义，虚构一个真实�
 
 
 def api_gen(name, dc, retries=2):
-    body = {"model": MODEL,
-            "messages": [{"role": "user", "content": PROMPT.format(name=name, dc=dc[:900])}],
-            "temperature": 0.8, "max_tokens": 1200}
-    headers = {"Authorization": f"Bearer {KEY}", "Content-Type": "application/json",
-               "x-opencode-session": "atlas-stress",
-               "User-Agent": "atlas-stress/1.0 (curl-compatible)"}
     for _ in range(retries + 1):
         try:
-            req = urllib.request.Request(API, json.dumps(body).encode(), headers)
-            r = json.load(urllib.request.urlopen(req, timeout=240))
-            txt = (r["choices"][0]["message"].get("content") or "").strip()
+            txt = atlas_model.complete_text(
+                [{"role": "user", "content": PROMPT.format(name=name, dc=dc[:900])}],
+                role="identity", temperature=0.8, max_tokens=1200, timeout=240)
             m = re.search(r"(?:</think>\s*)?(.+)", txt, re.S)
             txt = (m.group(1) if m else txt).strip()
             if len(txt) >= 40:

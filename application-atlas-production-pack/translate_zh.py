@@ -11,14 +11,13 @@ import threading
 import time
 import urllib.request
 
-from atlas_runtime import PACK as DATA_PACK, api_key, corpus_lock
+from atlas_runtime import PACK as DATA_PACK, corpus_lock
+import atlas_model
 PACK = str(DATA_PACK)
 DB = os.path.join(PACK, "atlas", "atlas.sqlite")
 STATE = os.path.join(PACK, "atlas", "translate-state.json")
 OUTL = os.path.join(PACK, "atlas", "translations.jsonl")
 LOG = os.path.join(PACK, "logs", "translate.log")
-API = "https://opencode.ai/zen/go/v1/chat/completions"
-MODEL = "mimo-v2.5"
 WORKERS = 12
 
 
@@ -42,17 +41,11 @@ def save_state(st):
 
 
 def translate(name, dc, retries=2):
-    body = {"model": MODEL,
-            "messages": [{"role": "user", "content": PROMPT.format(name=name, dc=dc)}],
-            "temperature": 0.1, "max_tokens": 2500}
-    headers = {"Authorization": f"Bearer {api_key()}", "Content-Type": "application/json",
-               "x-opencode-session": "atlas-translate",
-               "User-Agent": "atlas-translate/1.0 (curl-compatible)"}
     for attempt in range(retries + 1):
         try:
-            req = urllib.request.Request(API, json.dumps(body).encode(), headers)
-            r = json.load(urllib.request.urlopen(req, timeout=240))
-            txt = (r["choices"][0]["message"].get("content") or "").strip()
+            txt = atlas_model.complete_text(
+                [{"role": "user", "content": PROMPT.format(name=name, dc=dc)}],
+                role="translate", temperature=0.1, max_tokens=2500, timeout=240)
             m = re.search(r"\{.*\}", txt, re.S)
             if m:
                 res = json.loads(m.group(0))

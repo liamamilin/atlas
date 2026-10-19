@@ -1,0 +1,74 @@
+{
+  "case": "booking",
+  "tests": [
+    {
+      "id": "K01",
+      "status": "passed",
+      "detail": null,
+      "seconds": 0.0472
+    },
+    {
+      "id": "K02",
+      "status": "passed",
+      "detail": null,
+      "seconds": 0.0032
+    },
+    {
+      "id": "K03",
+      "status": "passed",
+      "detail": null,
+      "seconds": 0.0052
+    },
+    {
+      "id": "K04",
+      "status": "passed",
+      "detail": null,
+      "seconds": 0.0052
+    },
+    {
+      "id": "K05",
+      "status": "passed",
+      "detail": null,
+      "seconds": 0.0026
+    },
+    {
+      "id": "K06",
+      "status": "passed",
+      "detail": {
+        "genuine_two_connection_barrier": true,
+        "outcomes": [
+          {
+            "status": 409,
+            "body": {
+              "error": "该时段与已有预约重叠，请另选时间"
+            }
+          },
+          {
+            "status": 200,
+            "body": {
+              "id": 6
+            }
+          }
+        ]
+      },
+      "seconds": 0.0059
+    },
+    {
+      "id": "K07",
+      "status": "passed",
+      "detail": null,
+      "seconds": 0.1344
+    },
+    {
+      "id": "BROWSER",
+      "status": "passed",
+      "detail": {
+        "result": "browser-result.json",
+        "screenshot": "captured, not independently visually assessed"
+      },
+      "seconds": 1.1502
+    }
+  ],
+  "browser_status": "see browser-result.json",
+  "all_executed_checks_passed": true
+}

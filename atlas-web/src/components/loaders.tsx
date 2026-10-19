@@ -28,6 +28,19 @@ export function Loading({ children }: { children?: ReactNode }) {
   return <div role="status" aria-live="polite" className="py-16 text-center text-sm text-subtle">{children ?? t("loading", lang)}</div>;
 }
 
+export function EmptyState({ title, children, className = "" }: {
+  title: string;
+  children?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div role="status" aria-live="polite" className={`rounded-xl border border-dashed border-border bg-surface p-6 text-sm text-muted ${className}`}>
+      <p className="font-medium text-fg">{title}</p>
+      {children ? <div className="mt-2 leading-6">{children}</div> : null}
+    </div>
+  );
+}
+
 export function ErrorBox({ message }: { message: string }) {
   const { lang } = useLang();
   return (

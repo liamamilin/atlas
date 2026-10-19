@@ -1,0 +1,176 @@
+{
+ "outcome": "blocked",
+ "summary": "scenario_scope: passed; product_completeness: passed; architecture_contract: blocked; phase_acceptance: passed; decisions_defaults: uncertain",
+ "checks": [
+  {
+   "dimension": "scenario_scope",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "确认场景四项验收均有具体落点：F01/F03/F07 覆盖保存与未指定归类进入默认归类，F02 覆盖跨进程持久与重启后按 id 读回，F04/F05 覆盖列表展示原始 URL、创建时间及 302 精确打开外链；F08/F09 在 P1 覆盖新建、重命名归类、保存时选择归类与之后移动且持久，F13/F14 在 P2 覆盖标题/URL/备注关键字检索与按归类浏览、交集、排序分页。角色 R01 与场景中的单人收藏者一致，R02 仅为部署维护角色，R03 明确声明本期不存在共享读者；F20–F23 排除快照、全文检索、失效扫描与公开分享，F15–F17、F24、F25 延后且理由均与本场景相关。P0 保存表单只写入默认归类、保存时选归类延至 P1，是引入阶段的明确限制，最终 P0–P2 覆盖确认工作流；新增的重复提示、回收站与编辑能力属于研究支持的数据完整性与完整性补充，不改变场景主旅程。"
+  },
+  {
+   "dimension": "product_completeness",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "A28 从首页 bookmark-form 完成保存、非法输入 form-error、重复冲突后保留字段并提供 duplicate-existing-link 与 duplicate-save-form 显式另存，以及 open-link 真实导航、分页 link 与 page-prev/page-next 边界；A29 通过 category-form、category-rename-form、保存 select[name=categoryId]、move-form 与 bookmark-edit-form 完成新建、改名、选择归类、移动与编辑及失败保留；A30 通过 category-delete-dialog 覆盖取消、未确认本地拦截、mode=move、目标失效 dialog-error 与 purge 后进入回收站、trash-delete 永久删除；A31 从真实列表 bookmark-delete-form 点击软删除，经 trash-link 进入回收站并分别按原归类与显式目标 restore，刷新后仍生效；A32/A33 通过 search-form、/c/{id} 或 categoryId query、sort-form 与真实分页覆盖检索和按归类浏览并保留 q、categoryId、sort、limit。上述入口、成功反馈、错误提示和恢复动作与 ARCHITECTURE.md 的 UI、303、flash、form-error、dialog-error、empty-state 契约一致。清空回收站确认正例与空库空态被明确列为未运行手工项，未伪装为验收通过。"
+  },
+  {
+   "dimension": "architecture_contract",
+   "outcome": "blocked",
+   "files": [
+    "ARCHITECTURE.md",
+    "DRAFT.md"
+   ],
+   "reason": "§3 不变量 4 称「只有单条回收站 purge 才物理删除书签行」，但 §6 的 DELETE /api/trash?confirm=true 明确返回 {purged:n}，DRAFT 的 F11 与限制也要求清空整个回收站，二者直接矛盾。§6 重复规则写为「同 url_key 且未 allowDuplicate=true → 409」，未限定 trashed_at IS NULL；而 §6 的 GET /b/:id 与 GET /api/bookmarks/:id 对已回收记录返回 404，删除后重存同一 URL 时 409 的 details.existingId 及 duplicate-existing-link 可能指向不可打开的记录。§8 的归类删除对话框把 select[name=targetCategoryId] 与 delete-purge 放在同一表单，但 §6 规定 mode=purge 只要携带 targetCategoryId（无论是否有值）即 400 target_not_allowed，按现有结构 purge 提交无法成功。另 F03/A03 依赖 bookmarkCount、§3 也定义其语义，但 §6 未声明 category 对象及该字段的返回位置；§4 还使用 required、url_too_long、host_required、userinfo_not_allowed 等名称，而 §6 错误码清单只有 invalid_url/unsupported_protocol，错误契约不可直接实现。"
+  },
+  {
+   "dimension": "phase_acceptance",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "P0 的 A01–A10 与 A28 覆盖 URL 保存与派生标题、两次默认归类落库并 +2、重启后按 id 读回、列表倒序分页、/b/{id} 302 精确 Location、重复 URL 的 JSON/UI 恢复、字段与控制字符边界、Host/Origin 拒绝及真实外部打开；P1 的 A11–A20 与 A29–A31 覆盖归类新建/重命名与 NFKC 冲突、保存时选归类、移动、move/purge 二选一与失效目标零写入、列表行软删除→真实 trash-link→恢复原归类或另一活跃归类、单条永久删除、编辑与空编辑；P2 的 A21–A27 与 A32–A33 覆盖检索字段/AND/NFKC/回收站排除、categoryId 交集、双向排序与稳定分页、UI 搜索及真实翻页保留 q/categoryId/sort/limit。file_plan 将新增断言放入已标为编辑的 A09/A14/A15/A27/A28/A29–A31/A33 文件；A18 的 --allow-destructive 前置护栏由 common.request 与 run.cjs 承担而不改 p1-trash.cjs；A22 明确依赖已交付的 P1 PATCH；P0 不调用 P1/P2，P1 不依赖 P2 检索。所有阶段仍为 not implemented、A01–A33 为 not_run，A18 无 flag 时按计划记 incomplete/退出 2，未承诺运行通过。"
+  },
+  {
+   "dimension": "decisions_defaults",
+   "outcome": "uncertain",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "D02 规定同一 url_key 默认阻止保存，并把 duplicate-existing-link 指向 /b/{existingId}，却没有限定只检查活跃记录；ARCHITECTURE 又规定已回收记录的 /b/:id 返回 404。如果回收站记录也参与重复判断，用户软删除后重新保存同一 URL 会收到 409，而冲突链接是死链；D02 的默认行为和 when_to_ask 都没有定义这种状态。"
+  }
+ ],
+ "suggestions": [
+  "在 P0 交付说明中显式写明 P0 只是中间阶段，保存时选择归类要到 P1 才具备，避免把 P0 表述为已完整满足确认工作流。",
+  "将 F07 重复保存处理与 F10/F11 删除、回收站能力标注为场景衍生的数据完整性支撑项，而非确认场景新增目标，以免范围被理解为无约束扩张。",
+  "把 §3 不变量 4 改为「归类删除不物理删除书签；回收站 purge（单条或清空）才物理删除」，与 DELETE /api/trash?confirm=true 的 purged 语义一致。",
+  "在 §6 明确重复检查只比较 trashed_at IS NULL 的活跃书签（或定义回收站冲突的可恢复路径），并限定 allowDuplicate 仅接受布尔 true，保证 409 existingId 始终可打开。",
+  "将归类删除对话框拆成 move 与 purge 两个提交路径，或规定 purge 提交必须省略/禁用 targetCategoryId，与 target_not_allowed 的「无论是否有值」规则一致。",
+  "在 §6 声明 category 响应形状（至少 id、name、isDefault、bookmarkCount、createdAt、updatedAt）以及 GET/POST/PATCH /api/categories 中 bookmarkCount 的位置，使 A03 的计数断言有明确接口。",
+  "统一 §4 与 §6 的 URL 错误码：把 required、url_too_long、host_required、userinfo_not_allowed 映射为已列错误码并定义 details.reason，或补入错误码清单，同时给出 A09 可断言的 reason 集合。",
+  "在 D02 中明确重复判断只针对 trashed_at 为空的活跃记录，或为回收站冲突定义专门提示与可达链接，并保证 duplicate-existing-link 不指向已回收记录。"
+ ],
+ "scope": "Independent dimension-by-dimension specification design review of pinned proposal projections before new programs are authored; no execution or frozen-candidate acceptance. Full research facts and authored programs remain for separate frozen-candidate review.",
+ "proposal_digest": "0650ced04ef7802075519cdd2d76da42685c957e248c4cd9fe544dffa15dd239",
+ "subreviews": [
+  {
+   "outcome": "passed",
+   "summary": "提案范围与已确认的“生活待购与灵感收藏夹”场景吻合：保存、默认归类、跨进程持久、打开原页、新建/移动归类、按归类浏览与关键字检索均有对应能力与 P0–P2 落点；角色限定为单人收藏者与部署维护者，公开分享、协作、快照、全文检索等均明确排除，未出现与场景无关的企业能力扩张。P0 仅支持默认归类、保存时选择归类要到 P1，以及重复保存与回收站等数据完整性支撑项，属于已说明的阶段安排与合理补充，不构成主旅程缺口。",
+   "checks": [
+    {
+     "dimension": "scenario_scope",
+     "outcome": "passed",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "reason": "确认场景四项验收均有具体落点：F01/F03/F07 覆盖保存与未指定归类进入默认归类，F02 覆盖跨进程持久与重启后按 id 读回，F04/F05 覆盖列表展示原始 URL、创建时间及 302 精确打开外链；F08/F09 在 P1 覆盖新建、重命名归类、保存时选择归类与之后移动且持久，F13/F14 在 P2 覆盖标题/URL/备注关键字检索与按归类浏览、交集、排序分页。角色 R01 与场景中的单人收藏者一致，R02 仅为部署维护角色，R03 明确声明本期不存在共享读者；F20–F23 排除快照、全文检索、失效扫描与公开分享，F15–F17、F24、F25 延后且理由均与本场景相关。P0 保存表单只写入默认归类、保存时选归类延至 P1，是引入阶段的明确限制，最终 P0–P2 覆盖确认工作流；新增的重复提示、回收站与编辑能力属于研究支持的数据完整性与完整性补充，不改变场景主旅程。"
+    }
+   ],
+   "suggestions": [
+    "在 P0 交付说明中显式写明 P0 只是中间阶段，保存时选择归类要到 P1 才具备，避免把 P0 表述为已完整满足确认工作流。",
+    "将 F07 重复保存处理与 F10/F11 删除、回收站能力标注为场景衍生的数据完整性支撑项，而非确认场景新增目标，以免范围被理解为无约束扩张。"
+   ],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "0650ced04ef7802075519cdd2d76da42685c957e248c4cd9fe544dffa15dd239",
+   "projection_digest": "a83b39a4755d9218a134932950279a8cc8c3a15e081e396b2c4d03982018109e",
+   "stage": "blueprint-spec-review-1-scenario_scope"
+  },
+  {
+   "outcome": "passed",
+   "summary": "product_completeness 维度通过：草案把场景的四条主用户旅程都落实到了可操作的浏览器界面，并覆盖失败与恢复路径；P0 的保存、列表、打开原页、重复冲突及显式另存，P1 的归类新建与重命名、保存时选择归类、移动、软删除、回收站恢复、单条永久删除、编辑，P2 的检索、按归类浏览、排序、分页及状态保持，均有真实表单、链接和 303、flash、form-error、dialog-error、empty-state 等回归路径承接。清空回收站的正例与空库空态被明确标为未执行的手工核对，未被宣称为已通过，因此不构成当前承诺矛盾或主线中断。",
+   "checks": [
+    {
+     "dimension": "product_completeness",
+     "outcome": "passed",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "reason": "A28 从首页 bookmark-form 完成保存、非法输入 form-error、重复冲突后保留字段并提供 duplicate-existing-link 与 duplicate-save-form 显式另存，以及 open-link 真实导航、分页 link 与 page-prev/page-next 边界；A29 通过 category-form、category-rename-form、保存 select[name=categoryId]、move-form 与 bookmark-edit-form 完成新建、改名、选择归类、移动与编辑及失败保留；A30 通过 category-delete-dialog 覆盖取消、未确认本地拦截、mode=move、目标失效 dialog-error 与 purge 后进入回收站、trash-delete 永久删除；A31 从真实列表 bookmark-delete-form 点击软删除，经 trash-link 进入回收站并分别按原归类与显式目标 restore，刷新后仍生效；A32/A33 通过 search-form、/c/{id} 或 categoryId query、sort-form 与真实分页覆盖检索和按归类浏览并保留 q、categoryId、sort、limit。上述入口、成功反馈、错误提示和恢复动作与 ARCHITECTURE.md 的 UI、303、flash、form-error、dialog-error、empty-state 契约一致。清空回收站确认正例与空库空态被明确列为未运行手工项，未伪装为验收通过。"
+    }
+   ],
+   "suggestions": [],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "0650ced04ef7802075519cdd2d76da42685c957e248c4cd9fe544dffa15dd239",
+   "projection_digest": "056418824c54787304be60ece36f5df5d3e34dff45c5bdc1203ba66bff2a1ff2",
+   "stage": "blueprint-spec-review-1-product_completeness"
+  },
+  {
+   "outcome": "blocked",
+   "summary": "architecture_contract 维度受阻：默认值、数据模型与安全边界大体自洽，但当前草案仍有数处会让验收程序无法一致实现的契约冲突，集中在回收站清空、重复 URL 判定、归类 purge 表单、category 响应形状与 URL 错误码。",
+   "checks": [
+    {
+     "dimension": "architecture_contract",
+     "outcome": "blocked",
+     "files": [
+      "ARCHITECTURE.md",
+      "DRAFT.md"
+     ],
+     "reason": "§3 不变量 4 称「只有单条回收站 purge 才物理删除书签行」，但 §6 的 DELETE /api/trash?confirm=true 明确返回 {purged:n}，DRAFT 的 F11 与限制也要求清空整个回收站，二者直接矛盾。§6 重复规则写为「同 url_key 且未 allowDuplicate=true → 409」，未限定 trashed_at IS NULL；而 §6 的 GET /b/:id 与 GET /api/bookmarks/:id 对已回收记录返回 404，删除后重存同一 URL 时 409 的 details.existingId 及 duplicate-existing-link 可能指向不可打开的记录。§8 的归类删除对话框把 select[name=targetCategoryId] 与 delete-purge 放在同一表单，但 §6 规定 mode=purge 只要携带 targetCategoryId（无论是否有值）即 400 target_not_allowed，按现有结构 purge 提交无法成功。另 F03/A03 依赖 bookmarkCount、§3 也定义其语义，但 §6 未声明 category 对象及该字段的返回位置；§4 还使用 required、url_too_long、host_required、userinfo_not_allowed 等名称，而 §6 错误码清单只有 invalid_url/unsupported_protocol，错误契约不可直接实现。"
+    }
+   ],
+   "suggestions": [
+    "把 §3 不变量 4 改为「归类删除不物理删除书签；回收站 purge（单条或清空）才物理删除」，与 DELETE /api/trash?confirm=true 的 purged 语义一致。",
+    "在 §6 明确重复检查只比较 trashed_at IS NULL 的活跃书签（或定义回收站冲突的可恢复路径），并限定 allowDuplicate 仅接受布尔 true，保证 409 existingId 始终可打开。",
+    "将归类删除对话框拆成 move 与 purge 两个提交路径，或规定 purge 提交必须省略/禁用 targetCategoryId，与 target_not_allowed 的「无论是否有值」规则一致。",
+    "在 §6 声明 category 响应形状（至少 id、name、isDefault、bookmarkCount、createdAt、updatedAt）以及 GET/POST/PATCH /api/categories 中 bookmarkCount 的位置，使 A03 的计数断言有明确接口。",
+    "统一 §4 与 §6 的 URL 错误码：把 required、url_too_long、host_required、userinfo_not_allowed 映射为已列错误码并定义 details.reason，或补入错误码清单，同时给出 A09 可断言的 reason 集合。"
+   ],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "0650ced04ef7802075519cdd2d76da42685c957e248c4cd9fe544dffa15dd239",
+   "projection_digest": "eaa17976bf31405f12042c276a8878af98563d5f33751750bde66dbfda9dd361",
+   "stage": "blueprint-spec-review-1-architecture_contract"
+  },
+  {
+   "outcome": "passed",
+   "summary": "仅就 phase_acceptance 维度做设计预审：P0/P1/P2 的验收集合、阶段目标、功能映射与文件计划相互一致，主要使用路径均有阶段内可执行的 API/UI 用例；未发现当前承诺矛盾，也未发现会把未运行项说成通过的计划。",
+   "checks": [
+    {
+     "dimension": "phase_acceptance",
+     "outcome": "passed",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "reason": "P0 的 A01–A10 与 A28 覆盖 URL 保存与派生标题、两次默认归类落库并 +2、重启后按 id 读回、列表倒序分页、/b/{id} 302 精确 Location、重复 URL 的 JSON/UI 恢复、字段与控制字符边界、Host/Origin 拒绝及真实外部打开；P1 的 A11–A20 与 A29–A31 覆盖归类新建/重命名与 NFKC 冲突、保存时选归类、移动、move/purge 二选一与失效目标零写入、列表行软删除→真实 trash-link→恢复原归类或另一活跃归类、单条永久删除、编辑与空编辑；P2 的 A21–A27 与 A32–A33 覆盖检索字段/AND/NFKC/回收站排除、categoryId 交集、双向排序与稳定分页、UI 搜索及真实翻页保留 q/categoryId/sort/limit。file_plan 将新增断言放入已标为编辑的 A09/A14/A15/A27/A28/A29–A31/A33 文件；A18 的 --allow-destructive 前置护栏由 common.request 与 run.cjs 承担而不改 p1-trash.cjs；A22 明确依赖已交付的 P1 PATCH；P0 不调用 P1/P2，P1 不依赖 P2 检索。所有阶段仍为 not implemented、A01–A33 为 not_run，A18 无 flag 时按计划记 incomplete/退出 2，未承诺运行通过。"
+    }
+   ],
+   "suggestions": [],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "0650ced04ef7802075519cdd2d76da42685c957e248c4cd9fe544dffa15dd239",
+   "projection_digest": "fcfe8d222da8ab8297b7b92eda92c6f654a4de0690804fb9742556730c8e8d49",
+   "stage": "blueprint-spec-review-1-phase_acceptance"
+  },
+  {
+   "outcome": "uncertain",
+   "summary": "D01–D09 都给出了明确的默认行为和真实的提问触发条件，默认值总体可逆；但 D02 没有说明重复判断是否包含回收站记录，冲突链接可能指向已回收记录并因此返回 404，所以该默认行为在回收站状态下仍不完整。",
+   "checks": [
+    {
+     "dimension": "decisions_defaults",
+     "outcome": "uncertain",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "reason": "D02 规定同一 url_key 默认阻止保存，并把 duplicate-existing-link 指向 /b/{existingId}，却没有限定只检查活跃记录；ARCHITECTURE 又规定已回收记录的 /b/:id 返回 404。如果回收站记录也参与重复判断，用户软删除后重新保存同一 URL 会收到 409，而冲突链接是死链；D02 的默认行为和 when_to_ask 都没有定义这种状态。"
+    }
+   ],
+   "suggestions": [
+    "在 D02 中明确重复判断只针对 trashed_at 为空的活跃记录，或为回收站冲突定义专门提示与可达链接，并保证 duplicate-existing-link 不指向已回收记录。"
+   ],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "0650ced04ef7802075519cdd2d76da42685c957e248c4cd9fe544dffa15dd239",
+   "projection_digest": "eaa17976bf31405f12042c276a8878af98563d5f33751750bde66dbfda9dd361",
+   "stage": "blueprint-spec-review-1-decisions_defaults"
+  }
+ ]
+}

@@ -1,0 +1,97 @@
+{
+  "summary": "静态审阅结论：该冻结蓝图在场景范围、产品闭环、架构契约、阶段验收、决策默认值与交接上总体自洽，未发现阻断性缺陷。范围仅限文档与验收程序设计审阅；未运行 Node、Playwright、重启 adapter 或连接任何目标，因此这里的 passed 不代表应用验收通过。Host/Origin 伪造头、浏览器真实分页与破坏性清空等运行时行为仍未证实。",
+  "checks": [
+    {
+      "dimension": "category_evidence",
+      "outcome": "passed",
+      "files": [
+        "CATEGORY.md"
+      ],
+      "reason": "CATEGORY.md 明确把类别内核事实（URL 记录、持久个人库、单归属归类、未分类落点、检索与打开）与针对本场景的建议分开，并在“待验证”中列出未验证的 Pinboard、Raindrop 摘要、Chrome 帮助、规模性能与 URL 归一细节；同时逐项标注 MIT 与 AGPL-3.0 的复用边界、网络服务义务风险以及“未复制第三方代码”。来源访问日期与叶子原稿日期的差异也在开头解释，没有把调研建议伪装成已执行结论。"
+    },
+    {
+      "dimension": "scenario_scope",
+      "outcome": "passed",
+      "files": [
+        "PRODUCT.md",
+        "ROADMAP.md"
+      ],
+      "reason": "PRODUCT.md 将范围收敛为单人对自己的链接库：R01 收藏者、R02 部署维护者，R03 共享协作者明确不存在；单一归类、默认“以后看看”、保存后移动、关键字检索与打开原页直接对齐场景四条验收。P0–P2 不引入账号、协作、公开分享、快照、全文索引、计费或后台，属于对场景的合理裁剪而非遗漏。"
+    },
+    {
+      "dimension": "product_completeness",
+      "outcome": "passed",
+      "files": [
+        "PRODUCT.md",
+        "DECISIONS.md",
+        "ARCHITECTURE.md",
+        "acceptance/README.md"
+      ],
+      "reason": "正常与失败流程覆盖保存、派生标题、重复 URL 阻止与显式另存、非法 URL/超限输入拒绝、归类新建改名、移动、删除归类二选一、软删除、回收站恢复、单条永久删除与清空；数据生命周期为保存→默认归类→归类/检索→打开→软删除→回收站→恢复或永久删除，并明确 tombstone 与清空边界。权限/计费/后台/审计被明确判为不适用，导出导入列为 P3 后续，恢复能力属于 P1；空库与空回收站有手工核对设计但当前未运行，属于已知边界而非虚假通过。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "outcome": "passed",
+      "files": [
+        "ARCHITECTURE.md",
+        "DECISIONS.md"
+      ],
+      "reason": "ARCHITECTURE.md 给出默认技术栈及理由、SQLite 数据模型与不变量、URL 校验/归一/302 序列化、单归属与默认归类、软删除/tombstone/恢复/清空状态机、统一错误信封与执行顺序、分页排序、SSR DOM 契约、验收 CLI/重启 adapter/认证边界及破坏性确认。API 形状、错误码、details.reason、默认值与失败零写入均有明确契约；本机未认证和回环监听不等于认证也被如实声明。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "outcome": "passed",
+      "files": [
+        "ROADMAP.md",
+        "acceptance/plan.json",
+        "acceptance/p0-save.cjs",
+        "acceptance/p0-limits.cjs",
+        "acceptance/p1-categories.cjs",
+        "acceptance/p1-trash.cjs",
+        "acceptance/p1-edit.cjs",
+        "acceptance/p2-search.cjs",
+        "acceptance/ui-p1.cjs",
+        "acceptance/ui-p2.cjs"
+      ],
+      "reason": "F01–F14 均在引入阶段有对应验收：P0 覆盖保存、重启持久化、默认落点、列表/分页、302、重复与 Host/Origin 拒绝；P1 覆盖归类生命周期、移动、回收站、恢复、编辑与坏头矩阵；P2 覆盖检索、排序、交集与分页。P0 用例未依赖 P1 归类写接口或 P2 q；P1 归属断言不依赖 P2 过滤。A16 增加服务端确认负例，A20 增加真实表单/JSON 坏头矩阵，A28/A30/A31 有真实点击、导航与零写入断言，不是空壳或伪造成功；全部状态仍为 not_run。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "outcome": "passed",
+      "files": [
+        "DECISIONS.md",
+        "AGENT.md"
+      ],
+      "reason": "D01–D09 每项都有可执行默认值、影响范围和 when-to-ask 触发条件，例如单归属、重复阻止与显式另存、归类删除二选一、不抓取元数据、保守 URL 归一、无账号与前置认证代理、回收站不过期、P3 导入导出、重启 adapter 与浏览器认证边界。状态均标为 proposed，AGENT.md 明确要求把 proposed 当待采纳建议而不是用户已确认决定，并允许普通可逆选择使用已声明默认值。"
+    },
+    {
+      "dimension": "agent_handoff",
+      "outcome": "passed",
+      "files": [
+        "AGENT.md",
+        "README.md",
+        "ROADMAP.md"
+      ],
+      "reason": "AGENT.md 要求先核对已有项目、指令与已确认决定，按当前阶段只实现完整用户闭环，保留后期与不适用能力的实际状态；要求准备专用测试实例、记录实际命令与结果、区分通过/失败/未完成，并禁止删除断言、硬编码或声称未运行测试通过。README.md 给出阅读顺序与“只实现当前阶段”，与 ROADMAP 的 P0→P1→P2 交付顺序一致；交接没有覆盖用户既有决定，也没有授予外部访问、凭据或破坏性操作权限。"
+    },
+    {
+      "dimension": "evidence_honesty",
+      "outcome": "passed",
+      "files": [
+        "README.md",
+        "VALIDATION.md",
+        "acceptance/README.md",
+        "ARCHITECTURE.md"
+      ],
+      "reason": "README.md 与 VALIDATION.md 明确声明这是认知开发包候选、不是已实现应用，Atlas 只校验结构与摘要，未执行包内程序；acceptance/README.md 反复注明三阶段 not implemented、A01–A33 全为 not_run、未启动目标/浏览器/重启 adapter，空库、空回收站与确认清空人工项同样未运行。没有把静态审阅或未执行用例表述为通过，也没有用导入或生成声明替代真实执行。"
+    }
+  ],
+  "suggestions": [
+    "把 F04/F11 的空库与空回收站从纯手工项提升为明确阶段完成门槛，或补充可在全新专用实例上自动执行的空态验收；当前自动套件有手工步骤但状态未运行，容易在实现阶段被遗漏。",
+    "在 A09/A20 的 Host 负例中补上 GET /api/health、GET /c/{id} 与 GET /trash，并把 A09 的 Host/Origin 覆盖显式映射到 F02，使“所有读取都校验 Host”的承诺与特性追踪一致。",
+    "Host/Origin 伪造请求目前经全局 fetch 发送，建议改用 node:http 或在发送前增加实际请求头自检，确保测试确实发出伪造的 Host/Origin，而不是被运行时静默改写。",
+    "补充“软删除后同址重存，再恢复旧记录”的组合验收，明确恢复路径是允许产生两条活跃同址记录，还是应阻止/提示；当前 F07 只覆盖保存时去重，恢复路径未定义。",
+    "补充低风险但已声明契约的负例：allowDuplicate 非布尔形状、POST categoryId 空串、invalid_json、URL 中的 DEL 字符、limit=0；并在 A30 清空未确认时断言可见的本地错误，而不只断言无请求。",
+    "在架构中明确 createdAt/updatedAt 的 UTC ISO 格式与排序语义，以及 url_key 对 IDN 主机、尾点主机等 WHATWG 序列化的具体规则，避免排序稳定性和跨形式重复判断留下实现歧义。"
+  ]
+}

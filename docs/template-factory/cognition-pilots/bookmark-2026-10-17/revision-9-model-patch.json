@@ -1,0 +1,43 @@
+{
+  "base_proposal_digest": "3e51b01c815be81bae4d83aa2895a70ff8ab31eebe941a72037a69f59ab8972d",
+  "spec_changes": [
+    {
+      "path": [
+        "architecture_markdown"
+      ],
+      "replacements": [
+        {
+          "old": "GET /api/categories → 活跃归类，默认在前，其余按 name_key；每个归类对象形状为",
+          "new": "GET /api/categories → 200 {items:[category]}，活跃归类，默认在前，其余按 name_key；每个 category 对象形状为"
+        },
+        {
+          "old": "空对象或仅未知字段 → 400 empty_patch。",
+          "new": "空对象或仅未知字段 → 400 empty_patch。\n- 浏览器 SSR 表单写入口：POST {basePath}/bookmarks/:id/move {categoryId} 与 POST {basePath}/bookmarks/:id/edit {title,note}，分别执行与 PATCH /api/bookmarks/:id 对应字段相同的校验与单事务更新，不依赖浏览器 JS。成功 303 到 {basePath}/ 并显示非空 flash；失败重新渲染 200、保留已填值、显示 form-error 且零写入。编辑表单不接受 url，纯空白标题按 invalid_title 语义失败，备注前后空白原样保留，title=null 重派生仅 API 可用。"
+        },
+        {
+          "old": "trashedFromCategoryId 为删除来源归类 id，trashedFromCategoryName 为对应名称（含 tombstone）。本期流程产生的条目两者均为非空十进制字符串，只有无来源的历史数据可为 null；",
+          "new": "trashedFromCategoryId 为删除来源归类 id（非空十进制字符串），trashedFromCategoryName 为对应名称的原始 Unicode 字符串（含 tombstone，不是十进制数字）；categoryId 为十进制字符串，categoryName 为原始 Unicode 名称。本期流程产生的条目二者均非空，只有无来源的历史数据可分别为 null；"
+        },
+        {
+          "old": "form[data-testid=move-form]（select[name=categoryId] + button[data-testid=move-submit]）、form[data-testid=bookmark-edit-form][data-bookmark-id]（input[name=title] + textarea[name=note] + button[data-testid=bookmark-edit-submit]）",
+          "new": "form[data-testid=move-form] method=post action={basePath}/bookmarks/{id}/move（select[name=categoryId] + button[data-testid=move-submit]）、form[data-testid=bookmark-edit-form][data-bookmark-id] method=post action={basePath}/bookmarks/{id}/edit（input[name=title] + textarea[name=note] + button[data-testid=bookmark-edit-submit]）"
+        }
+      ]
+    },
+    {
+      "path": [
+        "acceptance",
+        "A30",
+        "goal"
+      ],
+      "new": "浏览器打开归类删除对话框；move、目标失效与 purge/单条永久删除三个分支各自创建独立的活跃归类与独立记录，不把已 move 或已 tombstone 的源归类当作后续 purge 对象。取消后数据不变；未勾选确认时点 purge 显示 dialog-error 且不发请求；move 分支选择真实目标并提交 mode=move 后记录仍在库、落到该目标且不是 purge；目标失效分支在对话框打开后用真实 API 使目标归类失效，提交 move 显示 dialog-error 且零写入；purge 分支对独立活跃归类勾选确认后提交，归类从导航消失，其 active 记录出现在回收站页面，回收站条目的 trashedFromCategoryId 与 trashedFromCategoryName 指向原 tombstone 归类；随后对该分支的单条回收记录执行 trash-delete 并确认，仅该条永久消失，同 run 先前回收条目与其他记录保留。清空 UI 仅断言存在与未确认拦截，不在本轮执行确认清空。不得复用 A31 的记录或假设 A30 的 purge 记录是 A31 的原归类记录。"
+    }
+  ],
+  "file_plan_changes": [
+    {
+      "path": "acceptance/ui-p1.cjs",
+      "purpose": "编辑。浏览器 P1 行为组 A29/A30/A31，导出 {phase:'P1', runner:'browser', title, cases:[A29,A30,A31], getCases()}。A29：用 category-form 新建归类，gotoHome 后确认保存表单 select[name=categoryId] 列出全部活跃归类、默认选中默认归类、tombstone 不出现；直接选择新建归类保存并断言行 data-category-id、bookmark-category、API categoryId 与刷新持久；保留空归类页、move-form 与 bookmark-edit-form 的条目级 POST（成功 303 回首页并显示 flash，失败 form-error 且零写入）、rename 正常/空名/重名 form-error、备注原样、空 body PATCH。A30：move、失效目标、purge/单条永久删除三个分支各自创建独立的活跃归类与独立记录，不把已 move 或已 tombstone 的源归类作为后续 purge 对象；保留取消、未确认 purge 零请求、mode=move、失效目标零写入、确认 purge、单条 trash-delete 与其他回收条目保留；补充 purge 回收条目的 trashedFromCategoryId/Name 指向原 tombstone；清空 UI 只验证存在与拦截。A31：独立创建两个归类与两条记录，在真实列表点击 bookmark-delete-form 的 bookmark-delete-submit，断言 303 首页与非空 flash；点击 trash-link 进入带部署前缀的 /trash；第一条 restore-submit 无目标回原归类，第二条 restore-target 明确选择另一活跃归类；断言 id/url/createdAt、active/trashed 守恒与刷新持久；不使用 API DELETE 代替用户点击，不复用 A30 记录。只用 browser.cjs 既有导出，不 mock API。对应 REVISION 第 1、3 项。",
+      "reuse": false
+    }
+  ]
+}

@@ -1,0 +1,346 @@
+{
+  "date": "2026-10-16",
+  "backend": "OpenCode CLI; artifact registration reports opencode v2.0.30",
+  "model": "open-design/deepseek-v4.1-flash",
+  "artifact_id": "tpl_34182ee57edb4ecc90ec244f5485b4f9",
+  "artifact_digest": "9a8f2a314ae37e163517e9e7f73e760e274b0aef53da25298e1e89023a669be9",
+  "job_id": "job_aa3841c8e4724935b5b5083fb5e0f828",
+  "source": {
+    "repository": "https://github.com/dwyl/javascript-todo-list-tutorial",
+    "commit": "547bbbf73528c6583f89bd27649d9ceb9bbc9660",
+    "license": "GPL-2.0",
+    "notice_hashes": {
+      "LICENSE": "6e53667e8b9b4f4735448c64f7c1adc15e4890ef86ce02d3f154607fcf742cb4"
+    }
+  },
+  "scenario": {
+    "name": "本地个人待办 · 工厂试产",
+    "workflow": [
+      "输入任务并添加",
+      "标记任务完成",
+      "刷新页面继续使用"
+    ],
+    "acceptance": [
+      "可以添加任务并在页面看到任务",
+      "可以将任务标记完成",
+      "刷新后任务与完成状态仍存在"
+    ]
+  },
+  "formal_checks": [
+    {
+      "passed": true,
+      "project_name": "atlas-example",
+      "scope": "structure and deterministic rendering only; application not executed"
+    },
+    {
+      "passed": true,
+      "project_name": "renamed-example",
+      "scope": "structure and deterministic rendering only; application not executed"
+    }
+  ],
+  "acceptances": [
+    {
+      "artifact_id": "tpl_34182ee57edb4ecc90ec244f5485b4f9",
+      "created_at": "2026-10-16T06:43:18.647305+00:00",
+      "criteria": [
+        {
+          "criterion": 0,
+          "files": [
+            "index.html",
+            "lib/todo-app.js",
+            "lib/elmish.js"
+          ],
+          "outcome": "passed",
+          "reason": "Add-and-see is implemented. index.html contains the string 'lib/todo-app.js' (header HTTP / contains todo-app.js) and mounts the app; view() in lib/todo-app.js renders input#new-todo and button#add-todo whose onclick is signal('ADD') (lines 292-305). update() case 'ADD' (lines 24-45) reads #new-todo via document.getElementById('new-todo'), trims its value, ignores empty input, assigns id = last.id+1 or 1, and pushes {id,title,done:false}. mount/render in lib/elmish.js (lines 28-46) saves the model to localStorage and re-renders the DOM, and render_item emits the title via text(item.title) inside a label, so typing 'Buy milk' and clicking Add renders 'Buy milk' in the list; render_main only shows todos when model.todos.length > 0, matching the expected text check. Initialization requirement: elmish.js must load before todo-app.js and before the inline mount() call, as index.html does."
+        },
+        {
+          "criterion": 1,
+          "files": [
+            "lib/todo-app.js",
+            "lib/elmish.js"
+          ],
+          "outcome": "passed",
+          "reason": "Completion toggling is implemented. render_item builds each row's checkbox with class=toggle and onclick = signal('TOGGLE', item.id) (lines 144-149); add_attributes in elmish.js assigns function attributes to node.onclick (line 65), so the plan's click on .toggle dispatches TOGGLE. update() case 'TOGGLE' (lines 46-57) flips item.done for the matching id (strict equality with the numeric id) and recomputes all_done. render_footer (lines 213-230) counts items where done === false; with the single item completed count is 0, and the text is built as ' item' + (count>1 || count===0 ? 's' : '') + ' left' => ' items left', prefixed by strong(count) rendering '0', producing the expected '0 items left'. The footer is shown because done > 0 sets display 'block'. Note: the CSS selector relies on className 'toggle'; later 'class=toggle' attribute application overwrites the fall-through className from the earlier checked attribute, so the class remains '.toggle'."
+        },
+        {
+          "criterion": 2,
+          "files": [
+            "lib/elmish.js",
+            "index.html",
+            "lib/todo-app.js"
+          ],
+          "outcome": "passed",
+          "reason": "Persistence across reload is implemented. mount() defines store_name = 'todos-elmish_' + root_element_id and render() does localStorage.setItem(store_name, JSON.stringify(mod)) on every render (elmish.js lines 26-32); the signal callback re-reads JSON.parse(localStorage.getItem(store_name)) before each update (line 36), and mount restores model = JSON.parse(localStorage.getItem(store_name)) || model before the first render (line 42). Because ADD and TOGGLE both render, the todo title and its done=true state are written under key 'todos-elmish_app'. After the plan's reload in the same origin, mount reloads that saved model, render_main re-renders 'Buy milk' (title is emitted regardless of done state) and render_footer recomputes count = 0 with done = 1, again showing '0 items left'. Initialization dependency: this requires the page be served over an http(s) origin (plan: http://localhost:8080) so localStorage is available; index.html's inline example_todos seed is overridden by any stored model, as documented."
+        }
+      ],
+      "digest": "9a8f2a314ae37e163517e9e7f73e760e274b0aef53da25298e1e89023a669be9",
+      "id": "acc_3e65dd6931ad4bcbb60ea2274b314d33",
+      "job_id": "job_b55d8a3ac2d54b85ba9e7643e115d0e8",
+      "method": "harness-review",
+      "model": "open-design/deepseek-v4.1-flash",
+      "outcome": "passed",
+      "scope": "OpenCode CLI source review only; no install, build or runtime behavior was executed",
+      "summary": "Read-only source review of the frozen static-web template at source/ (manifest.render_files: README.md, index.html, lib/todo-app.js). I inspected source/index.html, source/lib/todo-app.js, source/lib/elmish.js and README.md as evidence; no files were executed and no code was run. The app is a plain Elm-architecture TodoMVC template served statically (python3 -m http.server 8080). index.html loads lib/elmish.js then lib/todo-app.js as classic scripts and calls the global mount(model, update, view, 'app', subscriptions), so no build/module step is required. lib/elmish.js provides mount/render and persists the whole model to localStorage under key 'todos-elmish_app' on every render, then restores it on load, which is the persistence mechanism behind criterion 2. Notes/limitations: (a) lib/elmish.js, the CSS and favicon are required at runtime but are not listed in render_files; they must be copied verbatim with the source tree, otherwise the page would 404 on its scripts and never mount. (b) localStorage persistence only works when served over an http(s) origin (the plan uses http://localhost:8080), not file://. (c) elmish.js uses setAttribute('style', a[1]) where a[1] is only 'display' (the value after '=' is dropped by the split), so hidden/visible sections render anyway; this is cosmetically wrong but does not block the three acceptance checks. (d) The upstream repo has 100%-coverage tape tests and GPL-2.0 attribution, but the plan declares no tests, so those were not treated as evidence. All three scenario acceptance criteria are implemented in source; runtime success is not asserted."
+    },
+    {
+      "artifact_id": "tpl_34182ee57edb4ecc90ec244f5485b4f9",
+      "created_at": "2026-10-16T06:33:20.912117+00:00",
+      "digest": "9a8f2a314ae37e163517e9e7f73e760e274b0aef53da25298e1e89023a669be9",
+      "id": "acc_80f26cdc2cae40a6b0534210a960ae24",
+      "job_id": "job_deec1b5950204a7980e99f956a093781",
+      "method": "runtime-verification",
+      "outcome": "passed",
+      "reports": [
+        {
+          "baseline": false,
+          "environment": {
+            "engine": "docker",
+            "image": "python:3.12-slim",
+            "image_id": "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9",
+            "network": "bridge",
+            "platform": "Linux container"
+          },
+          "passed": true,
+          "project_name": "atlas-example",
+          "steps": [
+            {
+              "check": {
+                "action": "http",
+                "contains": "todo-app.js",
+                "criterion": 0,
+                "path": "/"
+              },
+              "output": "<!DOCTYPE html>\n<html lang=\"en-GB\" data-framework=\"javascript\">\n<head>\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n  <meta name=\"viewport\"\n  content=\"width=device-width, initial-scale=1.0, user-scalable=yes\">\n  <title>atlas-example</title>\n  <link rel=\"shortcut icon\"\n  href=\"lib/favicon.ico\" type=\"image/x-icon\">\n</head>\n<body>\n  <div id=\"app\"></div>\n  <!-- Styling is optional; it just makes the app look nicer. -->\n  <link rel=\"stylesheet\" href=\"lib/todomvc-common-base.css\">\n  <link rel=\"stylesheet\" href=\"lib/todomvc-app.css\">\n  <script src=\"lib/elmish.js\"></script>\n  <script src=\"lib/todo-app.js\"></script>\n  <script>\n    // Configurable example data for atlas-example.\n    // Add entries to example_todos to seed the list on first run.\n    // Anything already saved in localStorage takes precedence, so a\n    // refresh keeps the tasks and their done state.\n    var example_todos = [\n      // { id: 1, title: \"Try atlas-example\", done: false },\n      // { id: 2, tit",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "goto",
+                "criterion": 0,
+                "path": "/"
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "fill",
+                "criterion": 0,
+                "selector": "#new-todo",
+                "value": "Buy milk"
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "click",
+                "criterion": 0,
+                "selector": "#add-todo"
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "expect_text",
+                "contains": "Buy milk",
+                "criterion": 0
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "click",
+                "criterion": 1,
+                "selector": ".toggle"
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "expect_text",
+                "contains": "0 items left",
+                "criterion": 1
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "reload",
+                "criterion": 2
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "expect_text",
+                "contains": "Buy milk",
+                "criterion": 2
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "expect_text",
+                "contains": "0 items left",
+                "criterion": 2
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            }
+          ]
+        },
+        {
+          "baseline": false,
+          "environment": {
+            "engine": "docker",
+            "image": "python:3.12-slim",
+            "image_id": "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9",
+            "network": "bridge",
+            "platform": "Linux container"
+          },
+          "passed": true,
+          "project_name": "renamed-example",
+          "steps": [
+            {
+              "check": {
+                "action": "http",
+                "contains": "todo-app.js",
+                "criterion": 0,
+                "path": "/"
+              },
+              "output": "<!DOCTYPE html>\n<html lang=\"en-GB\" data-framework=\"javascript\">\n<head>\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n  <meta name=\"viewport\"\n  content=\"width=device-width, initial-scale=1.0, user-scalable=yes\">\n  <title>renamed-example</title>\n  <link rel=\"shortcut icon\"\n  href=\"lib/favicon.ico\" type=\"image/x-icon\">\n</head>\n<body>\n  <div id=\"app\"></div>\n  <!-- Styling is optional; it just makes the app look nicer. -->\n  <link rel=\"stylesheet\" href=\"lib/todomvc-common-base.css\">\n  <link rel=\"stylesheet\" href=\"lib/todomvc-app.css\">\n  <script src=\"lib/elmish.js\"></script>\n  <script src=\"lib/todo-app.js\"></script>\n  <script>\n    // Configurable example data for renamed-example.\n    // Add entries to example_todos to seed the list on first run.\n    // Anything already saved in localStorage takes precedence, so a\n    // refresh keeps the tasks and their done state.\n    var example_todos = [\n      // { id: 1, title: \"Try renamed-example\", done: false },\n      // { id: ",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "goto",
+                "criterion": 0,
+                "path": "/"
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "fill",
+                "criterion": 0,
+                "selector": "#new-todo",
+                "value": "Buy milk"
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "click",
+                "criterion": 0,
+                "selector": "#add-todo"
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "expect_text",
+                "contains": "Buy milk",
+                "criterion": 0
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "click",
+                "criterion": 1,
+                "selector": ".toggle"
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "expect_text",
+                "contains": "0 items left",
+                "criterion": 1
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "reload",
+                "criterion": 2
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "expect_text",
+                "contains": "Buy milk",
+                "criterion": 2
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            },
+            {
+              "check": {
+                "action": "expect_text",
+                "contains": "0 items left",
+                "criterion": 2
+              },
+              "output": "",
+              "passed": true,
+              "phase": "acceptance"
+            }
+          ]
+        }
+      ],
+      "scope": "Independent Linux container installation, build and scenario assertions for two rendered project names"
+    }
+  ],
+  "production_runtime_dependency": "Real production completed using a verifier that raises if invoked. No runtime acceptance was called by production.",
+  "search_probe": {
+    "tool": "websearch",
+    "status": "completed",
+    "workspace": "/tmp/atlas-factory-search-probe-20261016"
+  },
+  "limitations": [
+    "One public task-manager source, two rendered project names, Linux static-web runtime only.",
+    "Runtime container used bridge networking; outbound traffic was not isolated.",
+    "No broad leaf coverage, production throughput or provider cost claim."
+  ],
+  "deterministic_instantiation": {
+    "project_name": "my-task-board",
+    "api_status": 201,
+    "two_archives_byte_identical": true,
+    "license_hash_preserved": true
+  },
+  "related_concurrency_evidence": "2026-10-16-concurrency.json"
+}

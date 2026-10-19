@@ -1,0 +1,36 @@
+{
+  "status": "generated",
+  "pipeline_status": "completed",
+  "elapsed_seconds": 738.34,
+  "source_sha256": {
+    "README.md": "80d2dcee14cd5a409af7d32ca8c0b83be8649e200218d3fbfb797ff4ff50318a",
+    "app.py": "ffd3269500f8af4cdc8733c0ee2ef87b0034185a6fd0daac82752f85da4274ab",
+    "db.py": "33ddf5d6dcc09823536b1862b73d3dd467f3c34bc49e114f824daa18ef494805",
+    "render.py": "5289b80badea693456023551297d00c86b7ce242c916931d5c0c94f2c8d96212",
+    "server.py": "51714be21a5ab3139f6b43772caab2f43945373e3b45a8e4e98626bc45970093",
+    "static/app.css": "290bcee2aae58f93aeebb2fa3a36cea6673296b159b2c5c50041ebaebacf89b5",
+    "urls.py": "8d5863d8ee1e9303fa63a0e5c0e8ac3fcf0056da21dcc3e85c001af472ddb06e"
+  },
+  "implemented_claims": [
+    "python3 app.py --port PORT --data-dir DIR, 127.0.0.1 only, sqlite3 in DIR, stdlib only",
+    "save URL-only (title optional, falls back to URL), optional note",
+    "categories: default 未分类 (category_id NULL), choose existing or create new at save time",
+    "move record between categories via per-record select",
+    "browse by category; default added-time descending",
+    "keyword search over title/URL/note/category (case-insensitive substring)",
+    "open record in new tab to original URL, preserving query+fragment; separate empty vs no-match texts",
+    "duplicate URL: explicit 可能已存在 prompt + 仍然保存 confirm; same-button double submit idempotent via nonce",
+    "explicit errors without persisting for invalid/non-http(s) URL, note over 2000 chars, duplicate category name; inputs preserved for retry",
+    "UTF-8 Chinese/emoji safe; local app.css, no external assets, no metadata fetch/telemetry"
+  ],
+  "limits_claims": [
+    "not executed here; no runtime/acceptance result claimed",
+    "note cap is 2000 chars (documented in UI); over-limit rejected, never truncated",
+    "A08 empty-library text renders only when the library is actually empty (no hidden placeholder, per stated validation limits); a sequential shared-DB run reaches A08 non-empty, so that case cannot observe the empty text",
+    "no delete/edit/trash, no category rename/delete, no import/export, no tags, no pagination, no bulk ops",
+    "no accounts/auth; loopback-only; metadata fetching disabled",
+    "dedupe uses minimal normalization only (scheme/host lower, default port, trailing slash); query/fragment kept"
+  ],
+  "execution": "not_run",
+  "source_hand_edits": false
+}

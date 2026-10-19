@@ -1,0 +1,22 @@
+locator.selectOption: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('form[method="post"][action="/bookmarks"]').first().locator('[name="collection_id"]').first()
+    - locator resolved to <select name="collection_id" id="capture-collection">…</select>
+  - attempting select option action
+    2 × waiting for element to be visible and enabled
+      - did not find some options
+    - retrying select option action
+    - waiting 20ms
+    2 × waiting for element to be visible and enabled
+      - did not find some options
+    - retrying select option action
+      - waiting 100ms
+    60 × waiting for element to be visible and enabled
+       - did not find some options
+     - retrying select option action
+       - waiting 500ms
+
+    at submit (/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/bookmark_ui_acceptance.cjs:15:39)
+    at async send (/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/bookmark_ui_acceptance.cjs:28:18)
+    at async firstRun (/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/bookmark_ui_acceptance.cjs:217:3)
+    at async /Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/bookmark_ui_acceptance.cjs:369:54

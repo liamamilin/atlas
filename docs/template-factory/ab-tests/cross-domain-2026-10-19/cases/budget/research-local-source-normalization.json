@@ -1,0 +1,14 @@
+{
+  "status": "validated_after_explicit_normalization",
+  "removed_row": {
+    "id": "S01",
+    "name": "Atlas 已确认输入：budgeting-application leaf 与 experiment-budget 场景",
+    "url": "leaf.md; input.json（本工作区）",
+    "version": "leaf（budgeting-application）/ scenario revision 1；访问日期标签 2026-10-19（research_date）",
+    "facts": "leaf 将预算类应用定义为四项定义性核心：绑定期间的支出计划、分配到用途的额度、应用内捕获的实际支出、计划/实际/剩余的比较态；银行连接、自动分类、信封术语、零基/50-30-20 等方法被列为常见实现而非定义，并强调无账户、无银行连接的产品仍可是完整预算工具。输入场景为：单个本地用户，不连接银行或支付服务，人民币，两位小数，支出为正数且不静默取整或裁剪；按月隔离预算与支出，未使用分类仍可见，超支显示负剩余且不阻止记账；改删误记后汇总与列表一致，失败输入有反馈且不破坏旧数据；数据只存指定目录、正常重启保留；导出当月支出 CSV 且中文、引号、换行可往返。",
+    "license": "not code / 未声明（仓库内文档）",
+    "reuse": "作为类型判断与验收基线；不作为第三方代码复用"
+  },
+  "scope": "Only redundant local S01 row removed; Atlas injects exact scenario as S01. Original invalid model response preserved. No external fact, source ID, summary or gap changed.",
+  "external_sources_unchanged": true
+}

@@ -1,0 +1,534 @@
+{
+  "summary": "本 rename 案例三个匿名应用 M1/M2/M3 均在受控真实 CLI 夹具（新建 evidence 目录、真实子进程、应用哈希前后一致）上完成 F01–F11，交付回执、oracle cli-events 与 result.json 相互印证。三者核心运行时未出现失败；冻结后的 EP01（可编辑顶层 id 改为 owned 绝对路径）探测三者均通过，但机制不同：M1/M3 安全忽略额外 id 并正常改名，M2 在改名前的 plan.id 令牌校验中整批拒绝。认知审计 C01–C05 三者基本成立且与代码一致。无核心运行时失败，故按证据不设唯一胜者。",
+  "applications": [
+    {
+      "label": "M1",
+      "delivery": "delivery.json：status=delivered、cli_status=completed、attempt=1；round-provenance 显示请求 repair 但实际交付 initial 并原样沿用（application_changed=false）；作者 execution=self not_run，由独立 oracle 在新增 evidence 目录运行 F01–F11 全部 passed，应用哈希前后一致。",
+      "core": [
+        {
+          "id": "F01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/result.json",
+            "source/M1/evidence/cli-events.json",
+            "source/M1/application/renamer_commands.py"
+          ],
+          "reason": "cli-events 记录 list/preview/未确认 apply 被拒/确认 apply/already-applied/undo 全流程真实退出码与 JSON；result.json F01=passed，内容字节与未选文件保持不变。"
+        },
+        {
+          "id": "F02",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/result.json",
+            "source/M1/application/renamer_plans.py"
+          ],
+          "reason": "check_conflicts 对已存在目标、重复目标、落在源集合内的新名整批拒绝；result.json F02=passed，冲突未改动任何原文件。"
+        },
+        {
+          "id": "F03",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/result.json",
+            "source/M1/application/renamer_plans.py"
+          ],
+          "reason": "identity_matches 用 dev/ino/size/mtime_ns 复核；预览后改写源内容触发拒绝且不丢改动，F03=passed。"
+        },
+        {
+          "id": "F04",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/result.json",
+            "source/M1/application/renamer_plans.py"
+          ],
+          "reason": "validate_find_replace 拒空 find 与含分隔符替换，is_plain_filename 拒 ../、绝对、子目录；result.json F04=passed。"
+        },
+        {
+          "id": "F05",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/result.json",
+            "source/M1/application/renamer_plans.py"
+          ],
+          "reason": "apply 前的 validate_plan/_validate_operation_list 要求每个 new 为单个合法文件名，篡改目标被改名前的校验拦截，未生成 root 外文件，F05=passed。"
+        },
+        {
+          "id": "F06",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/result.json",
+            "source/M1/application/renamer_state.py"
+          ],
+          "reason": "check_state_dir_safe 拒符号链接状态目录、resolve_state_path 复核 realpath 归属；F06=passed，外部 sentinel 未变。"
+        },
+        {
+          "id": "F07",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/result.json",
+            "source/M1/application/renamer_commands.py"
+          ],
+          "reason": "cmd_undo 整批预检旧名占用即拒绝、不覆盖；F07=passed，当前内容未变。"
+        },
+        {
+          "id": "F08",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/result.json",
+            "source/M1/application/renamer_plans.py"
+          ],
+          "reason": "查找用字面 in/replace，非正则；a.b 仅命中 a.b.txt，未选 axb.txt 不变，F08=passed。"
+        },
+        {
+          "id": "F09",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/result.json",
+            "source/M1/application/renamer_commands.py"
+          ],
+          "reason": "_verify_sources/每步 lstat 要求 S_ISREG，源被换成符号链接即拒绝且不跟随；F09=passed，外部 owned 文件未被改名或改写。"
+        },
+        {
+          "id": "F10",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/result.json",
+            "source/M1/application/renamer_state.py"
+          ],
+          "reason": "resolve_state_path 要求计划解析后为 ROOT/.atlas-renamer 直接子项；状态目录外的 --plan 被拒且未创建外部计划，F10=passed。"
+        },
+        {
+          "id": "F11",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/result.json",
+            "source/M1/application/renamer_commands.py"
+          ],
+          "reason": "撤销前 identity_matches 核对已改名文件，内容被编辑即拒绝且保持字节；F11=passed。"
+        }
+      ],
+      "cognition": [
+        {
+          "id": "C01",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/README.md",
+            "source/M1/application/DECISIONS.md"
+          ],
+          "reason": "README 分列「当前真实范围与限制」与「后续路线图（未实现）」，DECISIONS 单列明确排除范围及理由，未把缺口伪装成未来工作。"
+        },
+        {
+          "id": "C02",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/DECISIONS.md",
+            "source/M1/application/renamer_plans.py",
+            "source/M1/application/renamer_commands.py"
+          ],
+          "reason": "DEC-01/03/04/06/07 与代码一致（identity 元组、整批预检+每步 lstat、环拒绝、全量替换、回执名由计划文件名派生），并以成本/可移植性说明被否决备选。"
+        },
+        {
+          "id": "C03",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/README.md"
+          ],
+          "reason": "P0 覆盖 list→preview→apply→undo 完整旅程；路线图仅列内容哈希、备份/多轮撤销、目录锁、大小写/Unicode、可选递归正则，均服务同一用户且标注超出当前范围，无企业级多余功能。"
+        },
+        {
+          "id": "C04",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/DECISIONS.md"
+          ],
+          "reason": "列出 5 个真实未决问题（低分辨率文件系统是否启用哈希、网络文件系统语义、并发锁、断电恢复协议、替换次数策略）并给出触发条件，可逆默认先行不阻塞。"
+        },
+        {
+          "id": "C05",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/README.md",
+            "source/M1/delivery.json"
+          ],
+          "reason": "README 明确「所有验收与自检均为 not_run」，delivery.json self_checks=not_run、execution=not_run，仅描述设计而非宣称补丁运行结果，未编造调研/许可/运行事实。"
+        }
+      ],
+      "exploratory": [
+        {
+          "id": "EP01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/exploratory-EP01/result.json",
+            "source/M1/exploratory-EP01/absent_target/result.json",
+            "source/M1/exploratory-EP01/existing_target/result.json"
+          ],
+          "reason": "两个子探测均 passed：apply 正常退出 0 并完成改名，owned outside 目录整表哈希前后不变（无新建 receipt-target.json、sentinel 未改）；因 M1 计划无顶层 id、回执名由计划文件名派生，额外 id 被安全忽略。"
+        }
+      ],
+      "root_causes": [
+        "无核心运行时根因；F01–F11 与 EP01 均由真实 owned 夹具证据通过。"
+      ],
+      "limits": [
+        "自检与验收由独立 oracle 运行，非作者自证；未见作者运行证据。",
+        "M1 交付为 initial 原样沿用，未产生修复轮；核心结论仅针对该 initial 版本。",
+        "EP01 仅证明相对本探测的绝对 id 向量安全，不证明全部路径字段与竞态安全。"
+      ]
+    },
+    {
+      "label": "M2",
+      "delivery": "delivery.json：status=delivered、cli_status=completed、attempt=1；round-provenance 显示请求 repair 且实际交付 repair（application_changed=false）；作者 execution=self not_run，独立 oracle 在新增 evidence 目录运行 F01–F11 全部 passed，应用哈希前后一致。",
+      "core": [
+        {
+          "id": "F01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/result.json",
+            "source/M2/evidence/cli-events.json",
+            "source/M2/application/commands.py"
+          ],
+          "reason": "cli-events 记录完整 list/preview/未确认 apply 被拒/确认 apply/重复 apply 拒绝/undo 流程；F01=passed，内容与未选文件保持不变、回执位于状态目录内。"
+        },
+        {
+          "id": "F02",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/result.json",
+            "source/M2/application/commands.py"
+          ],
+          "reason": "preview 与 apply 双重 casefold 目标存在/重名检查并整批拒绝；F02=passed，未改动原文件。"
+        },
+        {
+          "id": "F03",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/result.json",
+            "source/M2/application/fsops.py"
+          ],
+          "reason": "身份证据含 sha256+size，apply 复核内容哈希，改源后拒绝过期计划且保留改动；F03=passed。"
+        },
+        {
+          "id": "F04",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/result.json",
+            "source/M2/application/naming.py"
+          ],
+          "reason": "is_bare_name 拒空/分隔符/./..，compute_replacements 保持字面语义；遍历与空 find 均被拒，F04=passed。"
+        },
+        {
+          "id": "F05",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/result.json",
+            "source/M2/application/naming.py",
+            "source/M2/application/commands.py"
+          ],
+          "reason": "编辑后的 new 由 is_bare_name 校验、源由 sha256 复核，越界目标被拒且未创建 root 外文件；F05=passed。"
+        },
+        {
+          "id": "F06",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/result.json",
+            "source/M2/application/paths.py"
+          ],
+          "reason": "ensure_state_dir 拒符号链接、_within 复核 realpath 归属、resolve_state_path 拒外部链接目标；F06=passed，外部 sentinel 未变。"
+        },
+        {
+          "id": "F07",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/result.json",
+            "source/M2/application/commands.py"
+          ],
+          "reason": "undo 前整批判定 conflict 即拒绝覆盖；F07=passed，当前内容未变。"
+        },
+        {
+          "id": "F08",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/result.json",
+            "source/M2/application/naming.py"
+          ],
+          "reason": "find 为字面 in/str.replace，非正则；未匹配文件不动，F08=passed。"
+        },
+        {
+          "id": "F09",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/result.json",
+            "source/M2/application/fsops.py"
+          ],
+          "reason": "file_identity 用 lstat 要求普通文件、identity_matches 拒符号链接；源被替换为符号链接即拒绝；F09=passed。"
+        },
+        {
+          "id": "F10",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/result.json",
+            "source/M2/application/paths.py"
+          ],
+          "reason": "resolve_state_path 要求父目录 realpath 位于状态目录内；外部 --plan 被拒且未创建外部计划，F10=passed。"
+        },
+        {
+          "id": "F11",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/result.json",
+            "source/M2/application/commands.py"
+          ],
+          "reason": "undo 对已改名文件做 sha256 身份核对，被编辑即 conflict 拒绝且字节保留；F11=passed。"
+        }
+      ],
+      "cognition": [
+        {
+          "id": "C01",
+          "outcome": "supported",
+          "evidence": [
+            "source/M2/application/README.md",
+            "source/M2/application/DECISIONS.md"
+          ],
+          "reason": "README 分列「当前范围」「已知限制/不做的事」「后续路线（尚未实现）」，DECISIONS 单列明确范围外及理由，未隐藏缺口。"
+        },
+        {
+          "id": "C02",
+          "outcome": "supported",
+          "evidence": [
+            "source/M2/application/DECISIONS.md",
+            "source/M2/application/commands.py",
+            "source/M2/application/naming.py"
+          ],
+          "reason": "默认项与代码一致（sha256+size 身份、EXCL 计划、receipts/<plan-id>.json、id 令牌白名单、casefold 判重、预览期拒绝冲突），并逐条给出否决理由。"
+        },
+        {
+          "id": "C03",
+          "outcome": "supported",
+          "evidence": [
+            "source/M2/application/README.md"
+          ],
+          "reason": "P0 完成完整旅程；路线图仅列可选递归/glob、多批撤销、正则、结构化 dry-run/错误对象，均服务同一本地用户，无企业权限/计费类多余范围。"
+        },
+        {
+          "id": "C04",
+          "outcome": "supported",
+          "evidence": [
+            "source/M2/application/DECISIONS.md"
+          ],
+          "reason": "记录 3 个真实未决问题（仅大小写改名、跨多批撤销历史栈、机器可读错误 JSON）并接受普通可逆默认先行，属真实决策触发点。"
+        },
+        {
+          "id": "C05",
+          "outcome": "supported",
+          "evidence": [
+            "source/M2/delivery.json",
+            "source/M2/application/DECISIONS.md"
+          ],
+          "reason": "delivery.json 明确 self_checks=not_run、execution=not_run，author_claims 如实标注 limits 与修复取舍，未声称已运行测试或调研结论。"
+        }
+      ],
+      "exploratory": [
+        {
+          "id": "EP01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/exploratory-EP01/result.json",
+            "source/M2/exploratory-EP01/absent_target/result.json",
+            "source/M2/exploratory-EP01/existing_target/result.json"
+          ],
+          "reason": "两个子探测均 passed：apply 退出 1（is_state_token 在改名之前拒绝被篡改为绝对路径的 plan.id），inside 与 outside 整表哈希前后不变，未在外部新建或改写任何文件。"
+        }
+      ],
+      "root_causes": [
+        "已解决根因：初始版把可编辑 plan.id 直接拼入回执路径；修复在改名前的令牌校验中拒绝非法 id（DECISIONS 第 10 条、commands.py、naming.py is_state_token）。"
+      ],
+      "limits": [
+        "自检与验收由独立 oracle 运行，非作者自证。",
+        "EP01 仅覆盖顶层 id 单一向量，不构成全部路径字段或并发竞态安全证明。"
+      ]
+    },
+    {
+      "label": "M3",
+      "delivery": "delivery.json：status=delivered、cli_status=completed、attempt=2；round-provenance 显示请求 repair 但实际交付 initial 原样沿用（application_changed=false）；作者 execution=self not_run，独立 oracle 在新增 evidence 目录运行 F01–F11 全部 passed，应用哈希前后一致。",
+      "core": [
+        {
+          "id": "F01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/result.json",
+            "source/M3/evidence/cli-events.json",
+            "source/M3/application/execution.py"
+          ],
+          "reason": "cli-events 记录真实 list/preview/未确认 apply 被拒/确认 apply/重复 apply 拒绝/undo；F01=passed，内容与未选文件保持、回执在状态目录内。"
+        },
+        {
+          "id": "F02",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/result.json",
+            "source/M3/application/planning.py"
+          ],
+          "reason": "find_conflicts 对目标已存在/重复/落在源集合内整批拒绝，_precheck 再复核；F02=passed，未改动任何原文件。"
+        },
+        {
+          "id": "F03",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/result.json",
+            "source/M3/application/identity.py"
+          ],
+          "reason": "默认 dev/ino/size/mtime_ns 身份在 _precheck 与每步核对；改源后拒绝过期计划且不丢改动，F03=passed。"
+        },
+        {
+          "id": "F04",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/result.json",
+            "source/M3/application/planning.py"
+          ],
+          "reason": "find=='' 拒绝、check_simple_name 拒分隔符/./..，字面替换；遍历与空 find 均被拒，F04=passed。"
+        },
+        {
+          "id": "F05",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/result.json",
+            "source/M3/application/execution.py"
+          ],
+          "reason": "_precheck 对每个 new 调 check_simple_name 并要求 identity，编辑后的越界目标在改名之前拒绝；F05=passed，未生成 root 外文件。"
+        },
+        {
+          "id": "F06",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/result.json",
+            "source/M3/application/paths.py"
+          ],
+          "reason": "ensure_state_dir 拒符号链接、resolve_state_file 比对父目录 realpath 与状态目录；F06=passed，外部 sentinel 未变。"
+        },
+        {
+          "id": "F07",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/result.json",
+            "source/M3/application/reversal.py"
+          ],
+          "reason": "undo 整批预检旧名占用即拒绝、不覆盖；F07=passed，当前内容未变。"
+        },
+        {
+          "id": "F08",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/result.json",
+            "source/M3/application/planning.py"
+          ],
+          "reason": "find not in name 的字面成员判断，非正则；未匹配文件不动，F08=passed。"
+        },
+        {
+          "id": "F09",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/result.json",
+            "source/M3/application/execution.py"
+          ],
+          "reason": "_precheck 用 lstat 要求 S_ISREG，identity_matches 亦 lstat；源换成符号链接即拒绝且不跟随；F09=passed。"
+        },
+        {
+          "id": "F10",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/result.json",
+            "source/M3/application/paths.py"
+          ],
+          "reason": "resolve_state_file 要求 realpath(parent)==状态目录；外部 --plan 被拒且未创建外部计划，F10=passed。"
+        },
+        {
+          "id": "F11",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/result.json",
+            "source/M3/application/reversal.py"
+          ],
+          "reason": "undo 对已改名文件 identity_matches 比对，被编辑即拒绝且字节保留；F11=passed。"
+        }
+      ],
+      "cognition": [
+        {
+          "id": "C01",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/README.md",
+            "source/M3/application/DECISIONS.md"
+          ],
+          "reason": "README 分列「当前范围（P0，已实现）」「已知限制」「后续路线（不在本次范围）」，DECISIONS 单列明确不在范围及原因，未把缺口伪装为未来工作。"
+        },
+        {
+          "id": "C02",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/DECISIONS.md",
+            "source/M3/application/identity.py",
+            "source/M3/application/execution.py"
+          ],
+          "reason": "D01–D06 与代码一致（元数据身份+可选 --hash、不可覆盖计划、每步 lstat、环拒绝、fsync+原子替换、全量替换），并说明关闭哈希与放弃平台专有能力的代价。"
+        },
+        {
+          "id": "C03",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/README.md"
+          ],
+          "reason": "P0 覆盖完整闭环；路线图仅列可选备份、显式递归/过滤、正则、多轮 undo/redo、跨平台大小写/Unicode、原子交换、--hash，均围绕同一用户，无企业权限/计费范围。"
+        },
+        {
+          "id": "C04",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/DECISIONS.md"
+          ],
+          "reason": "D01/D02/D03/D04/D05 均标注「未决（需人决定）」及触发条件，可逆默认先行，属真实未知点而非空泛口号。"
+        },
+        {
+          "id": "C05",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/README.md",
+            "source/M3/delivery.json"
+          ],
+          "reason": "README 明确所有自检/验收状态为 not_run，delivery.json self_checks=not_run、execution=not_run；对第三方工具崩溃语义明确标注未确认，未编造调研结论。"
+        }
+      ],
+      "exploratory": [
+        {
+          "id": "EP01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/exploratory-EP01/result.json",
+            "source/M3/exploratory-EP01/absent_target/result.json",
+            "source/M3/exploratory-EP01/existing_target/result.json"
+          ],
+          "reason": "两个子探测均 passed：apply 退出 0 并正常改名，owned outside 目录整表哈希前后不变；M3 计划用 plan_id（非顶层 id），额外 id 被安全忽略。"
+        }
+      ],
+      "root_causes": [
+        "无核心运行时根因；F01–F11 与 EP01 均由真实 owned 夹具证据通过。"
+      ],
+      "limits": [
+        "自检与验收由独立 oracle 运行，非作者自证。",
+        "M3 交付为 initial 原样沿用，未产生修复轮；结论仅针对该 initial 版本。",
+        "残余未测风险：内部 plan_id 仅做非空字符串检查即拼入 receipt-<plan_id>.json，EP01 只测顶层 id，未覆盖该向量（见 source/M3/source-audit.json 与 execution.py _receipt_path）。"
+      ]
+    }
+  ],
+  "cross_application_observations": [
+    "结果层面：三应用 F01–F11 全部 passed，均以真实 CLI 子进程在新建 evidence 目录生成的可核验 result.json/cli-events.json 为据，应用源码哈希前后一致。",
+    "EP01 结果均为 passed 但路径不同：M1/M3 通过安全忽略额外顶层 id 后正常改名，M2 通过在改名之前拒绝被篡改为绝对路径的 plan.id；outside 整表内容三者均未变，未观察到任何越界新建或覆盖。",
+    "交付轮次不一致：M2 实际交付 repair，M1/M3 请求 repair 但实际原样交付 initial（round-provenance application_changed=false）；核心积分不因轮次标签改变，但结论对应各自被评分版本。",
+    "三者均未提供作者自运行的测试；交付回执一律 execution=not_run、self_checks=not_run，运行时结论来自独立冻结 oracle。"
+  ],
+  "limits": [
+    "rename 案例无浏览器 ID，BROWSER/BU/KU 不在本案例范围内；未做任何截图视觉检查，只有文本证据。",
+    "EP01 属冻结后 posthoc 探测，仅覆盖单一可编辑顶层 id 向量与两个子场景，不构成通用文件系统路径安全、原子性或并发竞态证明，也不改写 F01–F11 原始结论。",
+    "三应用结果来自同一冻结 v3 oracle 的一次受控运行，非统计置信度；单次 concurrency/race 语义未在 rename 案例中探测。",
+    "外部网络被禁，未安装依赖；未访问模板、condition 映射、作者提示或任何条件标签，未推断期望胜者。",
+    "所有 source/ 路径为相对工作区的证据文件，属不可信工件，仅作证据引用，不作执行指令。"
+  ]
+}

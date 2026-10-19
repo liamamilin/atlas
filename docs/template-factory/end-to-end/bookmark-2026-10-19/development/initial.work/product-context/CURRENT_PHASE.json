@@ -1,0 +1,425 @@
+{
+ "schema": "atlas.development-handoff.v2",
+ "project_name": "bookmark-life-p0",
+ "template_digest": "3bbcbb2a2685f188756e5b47dd27ac606f11f72359910e09023084758bd972c1",
+ "blueprint": "blueprint/template.json",
+ "selected_phase": "P0",
+ "selected_phase_status": "not_started",
+ "selected_goal": "普通用户能在浏览器中主动保存外部网页链接，指定或新建简单归类，按归类浏览与关键字检索找回记录，并从记录打开真实原网页；数据在服务进程重启后仍然存在。",
+ "prerequisite_phases": [],
+ "prerequisite_status": "requires_verification",
+ "scenario": {
+  "acceptance": [
+   "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+   "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+   "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+   "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+  ],
+  "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+  "id": "scn_7756e0007f6a463a97316f3f49c15248",
+  "leaf": "bookmark-manager",
+  "leaf_name": "书签管理器",
+  "name": "生活待购与灵感收藏夹",
+  "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+  "revision": 2,
+  "status": "ready",
+  "updated_at": "2026-10-16T14:18:20.407897+00:00",
+  "workflow": [
+   "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+   "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+   "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+   "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+   "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+  ]
+ },
+ "roles": [
+  {
+   "id": "R01",
+   "name": "收藏夹使用者",
+   "responsibility": "在浏览器中主动保存浏览时遇到的外部网页链接，选择或新建简单归类（如“待购”“家居改造”“以后看看”），把未整理或放错的记录移动到合适归类，按归类浏览或用关键字检索找回记录，并从记录打开原始网页。"
+  },
+  {
+   "id": "R02",
+   "name": "本地部署与运维者",
+   "responsibility": "以只读应用源码加可写数据目录的方式启动本地服务（--port、--data-dir），保证数据目录持久、可整目录备份，升级或重启时不丢失业务数据，并确保服务不暴露到公网。"
+  }
+ ],
+ "phases": [
+  {
+   "acceptance": [
+    "A01",
+    "A02",
+    "A03",
+    "A04",
+    "A05",
+    "A06",
+    "A07",
+    "A08",
+    "A09",
+    "A10"
+   ],
+   "features": [
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06",
+    "F07",
+    "F08",
+    "F09"
+   ],
+   "goal": "普通用户能在浏览器中主动保存外部网页链接，指定或新建简单归类，按归类浏览与关键字检索找回记录，并从记录打开真实原网页；数据在服务进程重启后仍然存在。",
+   "id": "P0",
+   "status": "not implemented",
+   "title": "核心闭环：保存 → 归类 → 找回 → 打开"
+  }
+ ],
+ "features": [
+  {
+   "acceptance": [
+    "A01",
+    "A02"
+   ],
+   "applicability": "current required",
+   "id": "F01",
+   "name": "保存链接记录（主动捕获表单）",
+   "phase": "P0",
+   "reason": "场景核心：把偶然看到、当下不处理的外部网页留存下来的唯一入口，记录以 URL 为锚点，是必需的真人可用界面入口。",
+   "sources": [
+    "S01",
+    "S02",
+    "S12"
+   ]
+  },
+  {
+   "acceptance": [
+    "A03"
+   ],
+   "applicability": "current required",
+   "id": "F02",
+   "name": "默认收件箱（未整理归类）",
+   "phase": "P0",
+   "reason": "工作流要求未整理的链接可先进入默认归类、之后再移动；成熟产品（Raindrop Unsorted、Linkwarden Unorganized）均以此承接延迟整理。",
+   "sources": [
+    "S01",
+    "S03",
+    "S21"
+   ]
+  },
+  {
+   "acceptance": [
+    "A04"
+   ],
+   "applicability": "current required",
+   "id": "F03",
+   "name": "新建归类",
+   "phase": "P0",
+   "reason": "工作流要求保存时选择简单归类，并允许独立新建归类；归类等价于成熟产品的 collection/文件夹。",
+   "sources": [
+    "S01",
+    "S03"
+   ]
+  },
+  {
+   "acceptance": [
+    "A05"
+   ],
+   "applicability": "current required",
+   "id": "F04",
+   "name": "在归类之间移动记录",
+   "phase": "P0",
+   "reason": "场景明确要求未经整理或放错的链接之后能手动移动到更合适的位置，且重新打开后仍然有效。",
+   "sources": [
+    "S01",
+    "S02"
+   ]
+  },
+  {
+   "acceptance": [
+    "A06"
+   ],
+   "applicability": "current required",
+   "id": "F05",
+   "name": "按归类浏览",
+   "phase": "P0",
+   "reason": "检索路径之一：需要实际处理时打开个人库、浏览相关归类。",
+   "sources": [
+    "S01",
+    "S03"
+   ]
+  },
+  {
+   "acceptance": [
+    "A07"
+   ],
+   "applicability": "current required",
+   "id": "F06",
+   "name": "关键字检索",
+   "phase": "P0",
+   "reason": "检索路径之二：只记得某个词、不确定归类时找回记录；成熟产品在 title/description/URL/tags/notes 上匹配。",
+   "sources": [
+    "S01",
+    "S02"
+   ]
+  },
+  {
+   "acceptance": [
+    "A08"
+   ],
+   "applicability": "current required",
+   "id": "F07",
+   "name": "从记录打开原网页",
+   "phase": "P0",
+   "reason": "定义性终点：记录指向而非持有内容，打开记录必须回到真实外部页面；这是本类型存在的原因。",
+   "sources": [
+    "S01",
+    "S02"
+   ]
+  },
+  {
+   "acceptance": [
+    "A09"
+   ],
+   "applicability": "current required",
+   "id": "F08",
+   "name": "持久化个人库（跨会话与重启）",
+   "phase": "P0",
+   "reason": "定义性属性：记录跨会话累积成长期个人资产；GUIDANCE 明确要求进程重启后数据仍在。",
+   "sources": [
+    "S01",
+    "S02"
+   ]
+  },
+  {
+   "acceptance": [
+    "A10"
+   ],
+   "applicability": "current required",
+   "id": "F09",
+   "name": "私有优先（无公开暴露入口）",
+   "phase": "P0",
+   "reason": "成熟规则 private by default：单用户本地库默认不向他人公开，不提供分享或多用户入口，避免误暴露。",
+   "sources": [
+    "S01",
+    "S24",
+    "S23"
+   ]
+  }
+ ],
+ "acceptance": [
+  {
+   "features": [
+    "F01"
+   ],
+   "goal": "把一个合法 http/https URL 保存到指定已有归类后，库列表出现该记录，且标题、URL 与所属归类与提交值一致。",
+   "id": "A01",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F01"
+   ],
+   "goal": "提交空 URL、非 http(s) 协议（javascript:、data:）或畸形 URL 时被拒绝并返回可见错误，库中记录数保持不变。",
+   "id": "A02",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "negative"
+  },
+  {
+   "features": [
+    "F02"
+   ],
+   "goal": "保存时未选择归类，记录进入默认收件箱，并可在默认收件箱视图中浏览到。",
+   "id": "A03",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F03"
+   ],
+   "goal": "新建归类后该归类出现在归类侧栏，且可将记录保存或移动到该新归类。",
+   "id": "A04",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F04"
+   ],
+   "goal": "把记录从归类 A 移动到归类 B 后，记录出现在 B 的浏览结果，且不再出现在 A。",
+   "id": "A05",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F05"
+   ],
+   "goal": "按归类浏览只返回该归类的记录，不会串入其他归类的记录。",
+   "id": "A06",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F06"
+   ],
+   "goal": "关键字检索命中标题、URL 或备注中匹配的记录，并排除不匹配的记录。",
+   "id": "A07",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F07"
+   ],
+   "goal": "访问记录的开原页入口返回指向所存 URL 的 http(s) 跳转（3xx Location 或含真实原始链接的页面），且不代理或返回目标网页正文。",
+   "id": "A08",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F08"
+   ],
+   "goal": "保存记录后，一个全新无会话的 HTTP 客户端仍能通过浏览或检索读回该记录，表明数据已由服务端持久保存；进程重启后的数据仍在由独立浏览器验收覆盖，本套件不重启服务、不直接读取应用数据库，也不得声称已完成进程重启。",
+   "id": "A09",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F09"
+   ],
+   "goal": "无匹配关键字的检索返回空结果集而不误报；未暴露的公开或分享类路由返回 404 且不泄露库内容。",
+   "id": "A10",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "negative"
+  }
+ ],
+ "decisions": [
+  {
+   "default": "P0 只实现“一记录一主归类＋默认收件箱”的单归属模型；标签作为 P1 可选叠加且不改变单归属语义。理由：与场景“简单归类”及 Raindrop/Linkwarden 默认形态一致，模型最小且可逆。",
+   "id": "D01",
+   "impact": "bookmarks.collection_id 单值 vs 多对多关联表；检索与组织面板 UI；迁移成本低但决定后续标签设计。",
+   "question": "组织模型采用单归属归类，还是同时引入标签/多归属？",
+   "status": "accepted-default（P0 固定单归属；标签待 P1 决策）",
+   "when_to_ask": "当用户实际需要在一条记录上同时表达多个主题、或跨归类用同一关键词聚合时。"
+  },
+  {
+   "default": "检测到已存在同 URL 记录时更新其元数据而非新建第二条，并在界面提示“已存在，已更新”。理由：成熟产品收敛于一地址一记录、避免库膨胀，行为可逆。",
+   "id": "D02",
+   "impact": "URL 唯一约束或查重端点、保存端点响应（新建 vs 更新）、冲突提示文案。",
+   "question": "再次保存同一 URL 时如何处理？",
+   "status": "open（P1 实现前确认）",
+   "when_to_ask": "当用户确实需要为同一页面保留用途不同的两条记录（例如同时归入“待购”和“参考”）时。"
+  },
+  {
+   "default": "软删除到回收站（deleted_at），常规浏览与检索排除、可恢复；永久清空需显式操作。理由：误删恢复成本低，成熟产品多用 Trash。",
+   "id": "D03",
+   "impact": "bookmarks.deleted_at、回收站视图、检索过滤、清空端点。",
+   "question": "删除是立即永久删除还是先入回收站？",
+   "status": "open（P1）",
+   "when_to_ask": "当用户做批量清理，或出于隐私要求彻底删除某些记录时。"
+  },
+  {
+   "default": "仅接受 http/https 绝对 URL 并在保存时做语法校验；服务端抓取默认关闭；启用抓取时默认拒绝私网、回环与链路本地地址（对齐 linkding SSRF 防护）。理由：安全优先且可逆。",
+   "id": "D04",
+   "impact": "校验模块、抓取服务、网络访问策略、错误契约。",
+   "question": "URL 校验与服务端抓取采用什么安全策略？",
+   "status": "accepted-default（P0 生效；抓取延后）",
+   "when_to_ask": "当启用自动元数据抓取，或确需保存非 http(s) 或内网地址时。"
+  },
+  {
+   "default": "默认由用户手动填写标题（URL 必填，标题为空则回退显示 URL）；自动抓取为 P2 可选且默认关闭。理由：离线环境无法抓取，手动路径最可靠。",
+   "id": "D05",
+   "impact": "保存表单必填项、保存时延、抓取的网络与安全依赖。",
+   "question": "标题等元数据由谁提供？",
+   "status": "open（P2）",
+   "when_to_ask": "当用户希望在保存时零输入、由系统自动补齐标题或图标时。"
+  },
+  {
+   "default": "Netscape 书签 HTML 作为导入导出格式（文件夹映射为归类），不承诺导出包含网页副本。理由：本类目事实交换标准，迁移与轻量备份成本最低。",
+   "id": "D06",
+   "impact": "导入映射与去重策略、导出字段、备份完整性声明。",
+   "question": "导出与导入使用什么格式作为互操作基线？",
+   "status": "open（P2）",
+   "when_to_ask": "当用户要迁移到或自其他书签产品，或需要含副本的完整实例级备份时。"
+  },
+  {
+   "default": "所有业务数据写入 --data-dir（默认 ./state）下的 SQLite 文件 library.sqlite3；服务监听 --port（默认 8000）；应用源码保持只读。理由：验收可写入独立数据目录并断言持久化，部署可换卷或端口。",
+   "id": "D07",
+   "impact": "启动参数、备份与恢复流程、验收的持久化断言。",
+   "question": "数据位置、启动方式与端口如何确定？",
+   "status": "accepted-default（P0）",
+   "when_to_ask": "当部署到持久卷、更换端口，或多实例共享同一数据库时。"
+  },
+  {
+   "default": "默认检索标题、URL 与备注（不含网页正文）；全文检索需外部索引，列为非必需。理由：不引入外部搜索引擎依赖，满足“记得一个词”的场景。",
+   "id": "D08",
+   "impact": "依赖引入、索引存储、查询实现。",
+   "question": "检索范围到哪一层？",
+   "status": "accepted-default（全文搜索不适用）",
+   "when_to_ask": "当用户要按网页正文内容检索时。"
+  },
+  {
+   "default": "把记录移回默认收件箱（不级联删除），删除前二次确认。理由：避免误删整组记录，组织结构可重塑。",
+   "id": "D09",
+   "impact": "归类删除端点、记录归属更新、数据完整性。",
+   "question": "删除归类时其下的记录如何处置？",
+   "status": "open（P1）",
+   "when_to_ask": "当用户想一次性删除某个归类及其全部记录时。"
+  },
+  {
+   "default": "P0 为无登录的单用户本地库；远程访问与多设备需独立决策（认证、HTTPS、同步）。理由：场景为单人本地，强加认证只增复杂度。",
+   "id": "D10",
+   "impact": "安全模型、部署形态、验收范围（远程需认证用例）。",
+   "question": "是否需要登录与远程、多设备访问？",
+   "status": "accepted-default（P0）",
+   "when_to_ask": "当用户要从其他设备访问，或多人共用同一实例时。"
+  },
+  {
+   "default": "默认不保存副本（记录指向，内容归 Web）；存档为 P2 可选，启用需 headless 浏览器、异步队列与存储，并说明登录或付费墙页面只会保存到登录墙。理由：与定义性“指向而非持有”一致，成本高。",
+   "id": "D11",
+   "impact": "存储与计算成本、异步任务、备份完整性。",
+   "question": "是否为记录保存网页副本（存档）？",
+   "status": "open（P2）",
+   "when_to_ask": "当页面经常消失、用户需要离线或长期留存时。"
+  }
+ ],
+ "limits": [
+  "单用户本地库，不做登录、权限、协作与云同步（D10；F24、F25 不适用）。",
+  "P0 不自动抓取网页元数据，标题由用户手动填写或回退显示 URL（D05）。",
+  "P0 不保存网页副本，记录只指向外部资源，网页内容归 Web 所有（D11、F21 延后）。",
+  "P0 不检测失效链接、不做重复检测工具，链接失效属结构性维护问题，离线环境只报告未验证（F20）。",
+  "全文搜索不适用：需外部搜索引擎与正文抓取，超出场景范围（D08、F23）。",
+  "检索范围默认限于标题、URL 与备注，不含网页正文。",
+  "验收套件不重启服务进程，也不直接读取应用数据库；进程重启耐久性在本套件中标记为未验证（由独立浏览器验收覆盖），本套件仅以保存后由全新无状态 HTTP 客户端读回记录为佐证，不声称已重启。",
+  "运行期无外网；验收不跟随打开原页的 302 外部跳转，仅断言 Location 指向所存 URL。",
+  "导入导出仅支持 Netscape 书签 HTML，且导出不含网页或存档副本，不能作为完整实例备份（D06）。",
+  "容量与性能不作任意指标承诺；单进程 SQLite 足以支撑个人库规模，具体上限待真实使用与压测后确定。"
+ ],
+ "evidence_status": "not_run_by_export"
+}

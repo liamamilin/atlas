@@ -1,0 +1,6244 @@
+{
+ "scope": "Only this trial's production, repair, author and independent review sessions, including failures.",
+ "calls_with_session_id": 40,
+ "non_model_replays": 2,
+ "websearch_calls": 13,
+ "webfetch_calls": 3,
+ "session_usage_fields": {
+  "input": 1618074,
+  "output": 144250,
+  "reasoning": 461413,
+  "cache_read": 3815552,
+  "cache_write": 0
+ },
+ "assistant_messages_missing_tokens": 1,
+ "records": [
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_2f2cf28525d04a019cc99a897e1492c6/attempt-1/cognitive-review",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eade9d032ffeAkj9LNgDHfzBdG",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 143.96,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "afeb0295ce2da48794b9511d9420b4ddeb49f24939ae40231e75513c82f5e0ca",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eade9d032ffeAkj9LNgDHfzBdG",
+    "user_messages": 1,
+    "actual_input_sha256": "c7edd1e012e9ebeb9939e87924aa205e2a5fa39781431c1d149ba5b484f1a141",
+    "actual_input_characters": 4184,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_15216376400102pWtI4L3qGzEG",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1759,
+       "output": 181,
+       "reasoning": 13,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152164b2e0016IdWMRjzDy151v",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1678,
+       "output": 367,
+       "reasoning": 7,
+       "cache": {
+        "read": 1664,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152165c28001rUfJKFbOsYra8S",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 12209,
+       "output": 370,
+       "reasoning": 31,
+       "cache": {
+        "read": 3328,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152166d49001G2wE7ER8WV9aN0",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 7490,
+       "output": 370,
+       "reasoning": 55,
+       "cache": {
+        "read": 15488,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1521694420013cQc8BmKxcU2di",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 5009,
+       "output": 284,
+       "reasoning": 37,
+       "cache": {
+        "read": 22912,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15216a373001Wx9rEvtbWS6j0j",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 13100,
+       "output": 194,
+       "reasoning": 20,
+       "cache": {
+        "read": 27904,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15216b6da001s2QKNI9IbR4X1S",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 17890,
+       "output": 187,
+       "reasoning": 9,
+       "cache": {
+        "read": 40960,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15216c7ca001OG1wYmt3XAJ151",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 13250,
+       "output": 190,
+       "reasoning": 9984,
+       "cache": {
+        "read": 58752,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15217f7f0001rCHjOvzFPqtLqN",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 11753,
+       "output": 2444,
+       "reasoning": 1203,
+       "cache": {
+        "read": 71936,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_2f2cf28525d04a019cc99a897e1492c6/attempt-2/cognitive-review",
+   "cli": {
+    "cli_status": "replayed_prior_response",
+    "actual_model": null,
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "source": "application-atlas-production-pack/atlas/template-factory/jobs/job_2f2cf28525d04a019cc99a897e1492c6/attempt-1/cognitive-review/result.json",
+    "source_sha256": "a32231ec9299114e6311e08a796b86f61cc362e367cc0f00da49a4f28bd11ce0",
+    "scope": "Unmodified failed cognitive-review response reused for normal validation and bounded protocol repair; no new initial cognitive-review call."
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_2f2cf28525d04a019cc99a897e1492c6/attempt-2/cognitive-review-reference-repair",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eade23128ffeNGpbVSGT3hi5wd",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 36.3,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "1c9cc6874b8843a4af0f67936be28264bba832ee2c2962e3202bfbd3145d03a4",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eade23128ffeNGpbVSGT3hi5wd",
+    "user_messages": 1,
+    "actual_input_sha256": "f9f0d87d7c71fe3dc79ae790c9ff6926831fb78d326de9b332f3ca8cac113bfa",
+    "actual_input_characters": 1890,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_1521ddd39001rW1YQQGDHPZuGz",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1352,
+       "output": 96,
+       "reasoning": 12,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1521deb950016CW0VlTPMxakqm",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 213,
+       "output": 288,
+       "reasoning": 7,
+       "cache": {
+        "read": 1280,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1521df5bb001IRDtQXl2zXYalG",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 3726,
+       "output": 23,
+       "reasoning": 3638,
+       "cache": {
+        "read": 1408,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-1/blueprint-research",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eae1867b4ffeh9OrIYhaWo2epC",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 120.39,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "43fefddd9cd26112c5f6b4378dade09a6c8eac59db5108b1544afd65979caf45",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 13,
+   "webfetch_calls": 3,
+   "session_audit": {
+    "session_id": "ses_eae1867b4ffeh9OrIYhaWo2epC",
+    "user_messages": 1,
+    "actual_input_sha256": "838d639c8a4c83a0273dd5e71f37877a16165896430c8d910c86527d775912b7",
+    "actual_input_characters": 2827,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_151e79f6f001B0MykXEBVbB4pQ",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1827,
+       "output": 277,
+       "reasoning": 13,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151e7b29c001Lk3a7Yi5rZb649",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 5413,
+       "output": 154,
+       "reasoning": 103,
+       "cache": {
+        "read": 1792,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151e7ca83001f8W4aMeYTZHkln",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 17950,
+       "output": 161,
+       "reasoning": 224,
+       "cache": {
+        "read": 7168,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151e7f9c30012W0cjMakbtAVID",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2893,
+       "output": 163,
+       "reasoning": 317,
+       "cache": {
+        "read": 25088,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151e815bb0015PmO2bNBSabTLT",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 4722,
+       "output": 224,
+       "reasoning": 218,
+       "cache": {
+        "read": 27904,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151e8326a0017k1sVXqAAzaGvj",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 13814,
+       "output": 7148,
+       "reasoning": 5795,
+       "cache": {
+        "read": 32512,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-2/blueprint-code-0-0",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eae0bef44ffeLzOrOa8k041zL3",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "tool_use"
+    ],
+    "exit_code": 130,
+    "duration_seconds": 164.24,
+    "cli_status": "completed",
+    "delivery_status": "failed",
+    "failure_code": "cancelled",
+    "stdout_sha256": "8ef06e06a3755863081ac77d836d501eac2b5352f71299eec7a9e3f0bc623fa3",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eae0bef44ffeLzOrOa8k041zL3",
+    "user_messages": 1,
+    "actual_input_sha256": "718ef85c1ea813197ca90ff19e41768115c644be29d1123d81f46156a749d57a",
+    "actual_input_characters": 3384,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_151f4175d001ghPWIlH0FjtTFu",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1655,
+       "output": 103,
+       "reasoning": 14,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f42461001z1C3fKT6uapVhX",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 769,
+       "output": 303,
+       "reasoning": 8,
+       "cache": {
+        "read": 1536,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f4346d001YZvMvJaSguiAjw",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 14915,
+       "output": 297,
+       "reasoning": 46,
+       "cache": {
+        "read": 2304,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f43fcc001TZeYiN07YecjZN",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 13727,
+       "output": 196,
+       "reasoning": 73,
+       "cache": {
+        "read": 17152,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f44ca5001b1zTZ2GsZADYY4",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 7796,
+       "output": 102,
+       "reasoning": 94,
+       "cache": {
+        "read": 30848,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f45868001Pf3zKKthia4a2m",
+      "finish": "error",
+      "rawFinish": null,
+      "tokens": null,
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-2/blueprint-generate-0",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eae12b055ffe9YefSiFVVQKHo0",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 181.88,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "60fc71571db848750656864f207706d15a297a30d5adf507d50b3106ca7cdd37",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eae12b055ffe9YefSiFVVQKHo0",
+    "user_messages": 1,
+    "actual_input_sha256": "39376e87b6ce48cd73ef84f1899ae439c1928cc674b9df49a67425e223c2cf59",
+    "actual_input_characters": 6327,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_151ed5624001v4D7in2jlv681U",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2315,
+       "output": 191,
+       "reasoning": 13,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151ed6365001ikSKQ7X0QFr2Fl",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1368,
+       "output": 387,
+       "reasoning": 45,
+       "cache": {
+        "read": 2304,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151ed6fd100155O9coffS2dOQU",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 14033,
+       "output": 108,
+       "reasoning": 68,
+       "cache": {
+        "read": 3584,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151ed7e54001ewLEgHSXZjsZTb",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 888,
+       "output": 101,
+       "reasoning": 47,
+       "cache": {
+        "read": 17536,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151ed8c1b001L1TpX1UfLygFFb",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 374,
+       "output": 9082,
+       "reasoning": 21234,
+       "cache": {
+        "read": 18304,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-2/blueprint-generate-research-repair-0",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eae12e1f8ffets1R5mwNbAp5cA",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 12.77,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "945a4c403d587f82e3643da9571734135162d62f9945eeb4233f964e35c8db22",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eae12e1f8ffets1R5mwNbAp5cA",
+    "user_messages": 1,
+    "actual_input_sha256": "9d8b0948cef36dd4f76ca9db33f952b247baa05a3fa752da3307d78862ad1025",
+    "actual_input_characters": 1848,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_151ed2509001KT2hEH0v09e15L",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1362,
+       "output": 103,
+       "reasoning": 7,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151ed33de001EWp3WFv23I8BK2",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 225,
+       "output": 106,
+       "reasoning": 7,
+       "cache": {
+        "read": 1280,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151ed3a0f001gjy81bhP5Dms23",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 322,
+       "output": 213,
+       "reasoning": 35,
+       "cache": {
+        "read": 1408,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151ed4297001hBRXRFtwMGoigl",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 8505,
+       "output": 9,
+       "reasoning": 222,
+       "cache": {
+        "read": 1664,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-2/blueprint-research",
+   "cli": {
+    "cli_status": "replayed_prior_response",
+    "actual_model": null,
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "source": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-1/blueprint-research/result.json",
+    "source_sha256": "67398ca51d308bbd4c2a349024e581f28dfb7d785077482de332bc834269c957",
+    "scope": "Unmodified failed research response reused for normal validation and bounded protocol repair; no new research call."
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-2/blueprint-spec-review-0-architecture_contract",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eae0ea548ffe8t0TB9j3Ye1a6c",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 63.82,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "fc0cb93a3f588f6f260d4310b743c3a5a1c58f06714f056a2a42c4cd158ac803",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eae0ea548ffe8t0TB9j3Ye1a6c",
+    "user_messages": 1,
+    "actual_input_sha256": "1572d9ade8ef4f84e963116975a7a9dab925ed6eaa68367dc1c7b23f2c88f5f9",
+    "actual_input_characters": 4188,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_151f16187001pLlTgRDn4hm2J3",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1773,
+       "output": 107,
+       "reasoning": 13,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f1727f001sb048Gz5RyQVxH",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 605,
+       "output": 209,
+       "reasoning": 7,
+       "cache": {
+        "read": 1664,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f1858f001qb1PDEEimo6Wrp",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 7076,
+       "output": 212,
+       "reasoning": 47,
+       "cache": {
+        "read": 2176,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f1962b001j3j1qP2TGILq1Y",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 4472,
+       "output": 729,
+       "reasoning": 5749,
+       "cache": {
+        "read": 9216,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-2/blueprint-spec-review-0-decisions_defaults",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eae0cae81ffeoeNUKTanftN5qh",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 48.87,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "2c50171369fa2f97645aecc85a6a6bc79f9a8787bd3cf882156ba0af6cfc0dae",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eae0cae81ffeoeNUKTanftN5qh",
+    "user_messages": 1,
+    "actual_input_sha256": "170bfca217989ceb0aadb63220701994769e078798f87fcccc4ce508083cccaa",
+    "actual_input_characters": 4185,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_151f35773001IbvsxAItdKapYY",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1773,
+       "output": 115,
+       "reasoning": 0,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f364260010v6q2pVMHwLj0j",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 258,
+       "output": 107,
+       "reasoning": 9,
+       "cache": {
+        "read": 1664,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f36a73001D62aPOvzhniimA",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 495,
+       "output": 209,
+       "reasoning": 24,
+       "cache": {
+        "read": 1920,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f3727a001LzHlTdrjBnkxWY",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 7111,
+       "output": 212,
+       "reasoning": 128,
+       "cache": {
+        "read": 2304,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f385f7001QMrO4rAfTAgC3N",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 4588,
+       "output": 657,
+       "reasoning": 4027,
+       "cache": {
+        "read": 9344,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-2/blueprint-spec-review-0-phase_acceptance",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eae0dab74ffems88trGZ4FNNxz",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 64.62,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "9ee556f9c40df7a23f2a15bf0125187b65ae7e30c096ceeb38b74309c4d79dd7",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eae0dab74ffems88trGZ4FNNxz",
+    "user_messages": 1,
+    "actual_input_sha256": "3de91613745e71ca5c34d93f05284cee7249fd86adce239e277fed2561281674",
+    "actual_input_characters": 4183,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_151f25b120015x14a6Sh8wxZWU",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1773,
+       "output": 107,
+       "reasoning": 8,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f2697d001q9YnhJyyqoKNGl",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 622,
+       "output": 104,
+       "reasoning": 15,
+       "cache": {
+        "read": 1664,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f270670015sk9lFrQ0z6h6B",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 262,
+       "output": 106,
+       "reasoning": 0,
+       "cache": {
+        "read": 2176,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f27e78001jsKZTCj5xxLGxO",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 222,
+       "output": 109,
+       "reasoning": 12,
+       "cache": {
+        "read": 2432,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f284df001BsN1Fku6jc5zF3",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 9849,
+       "output": 112,
+       "reasoning": 102,
+       "cache": {
+        "read": 2560,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f294c9001u6wK9CWtKe4loy",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2276,
+       "output": 110,
+       "reasoning": 8,
+       "cache": {
+        "read": 12288,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f2a008001781UNKbVw1PFvF",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 569,
+       "output": 110,
+       "reasoning": 10,
+       "cache": {
+        "read": 14464,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f2af19001xz7M2oNIKN29rT",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 2417,
+       "output": 863,
+       "reasoning": 4946,
+       "cache": {
+        "read": 14976,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-2/blueprint-spec-review-0-product_completeness",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eae0f7071ffece91eBLleb8uXs",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 51.9,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "13cf18bf30694e1f2c8efe7faa7705993531589edb693f926d95873d9b3ac63d",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eae0f7071ffece91eBLleb8uXs",
+    "user_messages": 1,
+    "actual_input_sha256": "b24025b636c158564f7365fb949d534176232547b9ddff805144560cd28ce5d9",
+    "actual_input_characters": 4187,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_151f0958e001Q4FeqcTrwX1cuv",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1773,
+       "output": 64,
+       "reasoning": 10,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f0a604001e2OwsiMsODfwa6",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2200,
+       "output": 73,
+       "reasoning": 7,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f0c46b001peZi88bx6Czi9m",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 11810,
+       "output": 72,
+       "reasoning": 9,
+       "cache": {
+        "read": 2176,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f0cc1d001BDm9S12e08s0OF",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 2564,
+       "output": 622,
+       "reasoning": 4051,
+       "cache": {
+        "read": 13952,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-2/blueprint-spec-review-0-scenario_scope",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eae0fe92fffe8ylVs1Ws1hfb50",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 30.85,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "f77a03c8842e3af4acc0a4e1d8afaf2786c7c840bfc98d94b2edeea72e384119",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eae0fe92fffe8ylVs1Ws1hfb50",
+    "user_messages": 1,
+    "actual_input_sha256": "6b803fa229682b4d919befd64e4cc491041187a2ab8ce11cec77ea511f47b849",
+    "actual_input_characters": 4181,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_151f01dd7001lIoBGmK3kh5kRG",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1773,
+       "output": 107,
+       "reasoning": 13,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f02ad10015E8SF3lwHL5GJu",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 640,
+       "output": 411,
+       "reasoning": 7,
+       "cache": {
+        "read": 1664,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f03979001K6OE5kBQXpn0an",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 10283,
+       "output": 666,
+       "reasoning": 2030,
+       "cache": {
+        "read": 2304,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-3/blueprint-code-1-0",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadfbfdf4ffeQ1q29kXef0KxBx",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 246.13,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "bf3ab4b17aff91678925dae962fb5d35f19b5a810da430bfd6ca9933c2a0d872",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadfbfdf4ffeQ1q29kXef0KxBx",
+    "user_messages": 1,
+    "actual_input_sha256": "dbe6b440a7d34c8b08ce3c7c9a4bf71513c24bfabc5ea0015d9e5b7444b451e1",
+    "actual_input_characters": 3384,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_152040880001pd20kGWqm2i37I",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1655,
+       "output": 64,
+       "reasoning": 8,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152041929001tZgwexOubibuoD",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 748,
+       "output": 108,
+       "reasoning": 16,
+       "cache": {
+        "read": 1536,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152042362001aBeUhpfTYXvj5c",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 15301,
+       "output": 140,
+       "reasoning": 127,
+       "cache": {
+        "read": 2176,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15204308b0019MYv2W9qbe0JzE",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 13034,
+       "output": 111,
+       "reasoning": 40,
+       "cache": {
+        "read": 17408,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520445f6001iUZUtktQGPg10j",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 25907,
+       "output": 6494,
+       "reasoning": 42344,
+       "cache": {
+        "read": 30336,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-3/blueprint-code-1-1",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadf83bfbffelmupKPB4fG0ib0",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 160.33,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "51b6273ff9352fb5670e3db97c4ddf3619a924181fdb438336fa6fd18a256a6e",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadf83bfbffelmupKPB4fG0ib0",
+    "user_messages": 1,
+    "actual_input_sha256": "24406fa03559ff89ecfde5d9564529ce80db86ad6cf3af14977938379559856f",
+    "actual_input_characters": 3384,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_15207cb2b001UXRI7xqhZBB6VZ",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1655,
+       "output": 103,
+       "reasoning": 13,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15207dc54001o5Pa3300G93gEc",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 790,
+       "output": 205,
+       "reasoning": 26,
+       "cache": {
+        "read": 1536,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15207e470001JeE3L4oGTtwA3A",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 13567,
+       "output": 209,
+       "reasoning": 83,
+       "cache": {
+        "read": 2304,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15207f183001zo6UHDG631mzbA",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 9516,
+       "output": 200,
+       "reasoning": 342,
+       "cache": {
+        "read": 15744,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520802da001SKGRkmF8oFJm68",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1104,
+       "output": 202,
+       "reasoning": 54,
+       "cache": {
+        "read": 25216,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152081597001MgW29nVZqz3I93",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 773,
+       "output": 206,
+       "reasoning": 69,
+       "cache": {
+        "read": 26240,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520825e6001lb3Du7ulBZfToI",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 12535,
+       "output": 209,
+       "reasoning": 165,
+       "cache": {
+        "read": 27008,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152083f7d0013AjeFpuxTVs738",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 2734,
+       "output": 4310,
+       "reasoning": 24134,
+       "cache": {
+        "read": 39424,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-3/blueprint-code-1-2",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadf5c924ffe5PEAnbz7Y6zryy",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 128.52,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "d5e09978d4ceac817dbabdf9b0b6b5a90e7d0b7108ab0a5ab284d38e77f5efb2",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadf5c924ffe5PEAnbz7Y6zryy",
+    "user_messages": 1,
+    "actual_input_sha256": "51e2e8cc42189c062e0aa84f40c3f3363dd625942f3dfebf80fd9cf3c4800226",
+    "actual_input_characters": 3384,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_1520a3d0f001l0ulny6nJGruvw",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1655,
+       "output": 193,
+       "reasoning": 20,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520a494d001QGOxGHPow4vTzs",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 918,
+       "output": 399,
+       "reasoning": 41,
+       "cache": {
+        "read": 1536,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520a5793001bHZ75feR0iq0XH",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 23189,
+       "output": 215,
+       "reasoning": 266,
+       "cache": {
+        "read": 2432,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520a67ed001vA2K85uDK0mZq1",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 12398,
+       "output": 404,
+       "reasoning": 186,
+       "cache": {
+        "read": 25600,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520a87120017lg4HENgSg6dmR",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 13840,
+       "output": 5197,
+       "reasoning": 16228,
+       "cache": {
+        "read": 37888,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-3/blueprint-code-1-3",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadf3d2acffeGCWXeHHHVlswfz",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 29.21,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "625c0a8f3856eb3b51916c170ffce211e6e315982556b73f4c02c31aabbfb986",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadf3d2acffeGCWXeHHHVlswfz",
+    "user_messages": 1,
+    "actual_input_sha256": "2a58a98e3f28954a327b5ff34a832f1438ec8a5027e61998ec20c08e2f8ae109",
+    "actual_input_characters": 3384,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_1520c3405001F0jYnP0OZZUsqe",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1655,
+       "output": 112,
+       "reasoning": 0,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520c3eb7001zwwBLIA7yYEsrU",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 740,
+       "output": 205,
+       "reasoning": 8,
+       "cache": {
+        "read": 1536,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520c4d5f001tdrYhcaGwWgUj5",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 13627,
+       "output": 319,
+       "reasoning": 129,
+       "cache": {
+        "read": 2176,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520c5af2001c8cetTkyYm84it",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 18087,
+       "output": 206,
+       "reasoning": 218,
+       "cache": {
+        "read": 15744,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520c6bc80019qs7A4kHq1sst9",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 2777,
+       "output": 761,
+       "reasoning": 1043,
+       "cache": {
+        "read": 33792,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-3/blueprint-code-1-4",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadf3604effemdbJJIYCkuaC9i",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 276.44,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "02e554ee4debaa15b4b758170edf25498168130ab6acbdc609dd13691f4a69b6",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadf3604effemdbJJIYCkuaC9i",
+    "user_messages": 1,
+    "actual_input_sha256": "f5680b0afe76f239b9482839eddee5f6d4e0e0be1f7c0624ff254e7f6d2ad372",
+    "actual_input_characters": 3384,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_1520ca638001CVREJVJnIE1QsD",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1655,
+       "output": 100,
+       "reasoning": 14,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520cafa90016731nq3VVpmF4S",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 266,
+       "output": 103,
+       "reasoning": 10,
+       "cache": {
+        "read": 1536,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520cba38001rgGYdF6zpplJBo",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 706,
+       "output": 102,
+       "reasoning": 97,
+       "cache": {
+        "read": 1792,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520cc6f9001lCq9CiQtHNKnZp",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 423,
+       "output": 109,
+       "reasoning": 0,
+       "cache": {
+        "read": 2432,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520cceaa001UOraQrisdc4JUG",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1056,
+       "output": 106,
+       "reasoning": 11,
+       "cache": {
+        "read": 2816,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520cd922001YrpSq2GpQ0LUGs",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 12560,
+       "output": 111,
+       "reasoning": 92,
+       "cache": {
+        "read": 3840,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520ce38f001JlFsfDzG37JTxe",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 7366,
+       "output": 112,
+       "reasoning": 27,
+       "cache": {
+        "read": 16384,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520ced020018uIU3fLln2rbaN",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1112,
+       "output": 114,
+       "reasoning": 39,
+       "cache": {
+        "read": 23680,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520d058a001RUgkxD1QgoiQ8z",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 4994,
+       "output": 114,
+       "reasoning": 0,
+       "cache": {
+        "read": 24704,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520d11cd0014BYuNwsa1ZWfh9",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 5805,
+       "output": 108,
+       "reasoning": 104,
+       "cache": {
+        "read": 29696,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520d259500151BGe0xhAzHujZ",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2211,
+       "output": 204,
+       "reasoning": 167,
+       "cache": {
+        "read": 35456,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520d349a001JIE4I1SD6s6e6H",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1113,
+       "output": 206,
+       "reasoning": 122,
+       "cache": {
+        "read": 37632,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520d440f001LXg5sNGykdHRAn",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 12672,
+       "output": 110,
+       "reasoning": 54,
+       "cache": {
+        "read": 38656,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520d5832001t8C0JJlBjfg36z",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2313,
+       "output": 111,
+       "reasoning": 768,
+       "cache": {
+        "read": 51328,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520d7bfb001UpSebHqSVmg492",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 12934,
+       "output": 105,
+       "reasoning": 90,
+       "cache": {
+        "read": 53632,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520d945a001lMmCZCuNSA9RTD",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 11859,
+       "output": 106,
+       "reasoning": 3959,
+       "cache": {
+        "read": 66560,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520e042e001wTQA6nO874XcHS",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 11615,
+       "output": 106,
+       "reasoning": 103,
+       "cache": {
+        "read": 78336,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520e1a7d0017cdaJ36jXKXzS5",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 398,
+       "output": 109,
+       "reasoning": 9,
+       "cache": {
+        "read": 89856,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520e2714001ONlEyvuHjR5olS",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 244,
+       "output": 11105,
+       "reasoning": 29009,
+       "cache": {
+        "read": 90240,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-3/blueprint-code-1-5",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadef27d6ffe3SdetcLAjySyG7",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 231.45,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "3830c4989c881e45df7e0d59763d94abc764c3b166ecc916d2c516377b91bed7",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadef27d6ffe3SdetcLAjySyG7",
+    "user_messages": 1,
+    "actual_input_sha256": "8e472474347a73ae4966c308aea0ecd4d3dccb394f5eb6a0521a33f0c1cec6ca",
+    "actual_input_characters": 3384,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_15210ded5001NOhUsVk7eO5KCe",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1655,
+       "output": 116,
+       "reasoning": 0,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15210f113001ZQLOvT5bfBqr4l",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 858,
+       "output": 100,
+       "reasoning": 14,
+       "cache": {
+        "read": 1536,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15210fbc8001pRSuKTnsvUG42m",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 237,
+       "output": 135,
+       "reasoning": 37,
+       "cache": {
+        "read": 2304,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152110688001jol2OcZC29RFCx",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 372,
+       "output": 205,
+       "reasoning": 35,
+       "cache": {
+        "read": 2432,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15211112e001LEZ2B0JHZe3i9V",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 13670,
+       "output": 206,
+       "reasoning": 113,
+       "cache": {
+        "read": 2688,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152112142001w4pmwSKo3rAagy",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2735,
+       "output": 213,
+       "reasoning": 86,
+       "cache": {
+        "read": 16256,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152112e2e001GJ5XpyaWkH2hEU",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 19459,
+       "output": 202,
+       "reasoning": 349,
+       "cache": {
+        "read": 18944,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152115078001o7e7LsyLjgoxM8",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2864,
+       "output": 216,
+       "reasoning": 81,
+       "cache": {
+        "read": 38400,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152115f3c001O39FC4yBdv4JvA",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 5997,
+       "output": 106,
+       "reasoning": 62,
+       "cache": {
+        "read": 41216,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152117611001uESBuO38iWquid",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 7744,
+       "output": 210,
+       "reasoning": 73,
+       "cache": {
+        "read": 47104,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152118cf90013q9Txqp9X9kgsf",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 12784,
+       "output": 105,
+       "reasoning": 54,
+       "cache": {
+        "read": 54784,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15211a43d001HU0UYmg4pJLqAO",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 11929,
+       "output": 8264,
+       "reasoning": 27708,
+       "cache": {
+        "read": 67456,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-3/blueprint-code-1-6",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadeb9f60ffetEd2Opdtng88EQ",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 48.43,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "7c2d74b5f965c44df8e361842ecddbbc3aec6123e58a433844882a0a5789d79c",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadeb9f60ffetEd2Opdtng88EQ",
+    "user_messages": 1,
+    "actual_input_sha256": "bc651cb6057d2c376ec1aeabf7629b8de983a1981e745950e4ff8e76a01e0899",
+    "actual_input_characters": 3384,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_15214675b001gunliPdT7gfEJ4",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1655,
+       "output": 115,
+       "reasoning": 0,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1521472ff001m36M8WFMgeQHi4",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 766,
+       "output": 209,
+       "reasoning": 13,
+       "cache": {
+        "read": 1536,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152147ea3001JZLp54G5fp53cW",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 468,
+       "output": 301,
+       "reasoning": 67,
+       "cache": {
+        "read": 2176,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152148f04001wsSFu02H5xt5dD",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 15729,
+       "output": 316,
+       "reasoning": 112,
+       "cache": {
+        "read": 2560,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15214a0d6001msGlT5sM6Xgal3",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 22361,
+       "output": 111,
+       "reasoning": 197,
+       "cache": {
+        "read": 18176,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15214b44a001HgRj7FEIt47XKF",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 7544,
+       "output": 206,
+       "reasoning": 778,
+       "cache": {
+        "read": 40448,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15214f8770011p6NNSHgKidX3T",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 3418,
+       "output": 1186,
+       "reasoning": 316,
+       "cache": {
+        "read": 47872,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-3/blueprint-code-1-7",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadeae1dcffes1CBMvO1sTOfdt",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 66.38,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "780e6c33aefd784ee4b390d3eefac4ad6b1d8059051a830386e22261e2c409a4",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadeae1dcffes1CBMvO1sTOfdt",
+    "user_messages": 1,
+    "actual_input_sha256": "3a13c99aab2a4cc56346696f7cd5e032d8ff8ef4f552053013547611a50eb11c",
+    "actual_input_characters": 3384,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_15215245b001e5vyA0QrWI7Heb",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1655,
+       "output": 103,
+       "reasoning": 10,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152153088001as2fZd4DslyWBB",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 900,
+       "output": 303,
+       "reasoning": 35,
+       "cache": {
+        "read": 1536,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152153ed8001HNfZ2GNKs6you3",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 14016,
+       "output": 306,
+       "reasoning": 69,
+       "cache": {
+        "read": 2432,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152154dff001Fup3k61DW0C1qJ",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 10926,
+       "output": 213,
+       "reasoning": 41,
+       "cache": {
+        "read": 16384,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15215622a001XRIPsRe1inu40M",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 8346,
+       "output": 246,
+       "reasoning": 167,
+       "cache": {
+        "read": 27264,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15215729a001G0UzVrLmDR3T4X",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2565,
+       "output": 302,
+       "reasoning": 65,
+       "cache": {
+        "read": 35584,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152158391001VuWINYIf5wiO0L",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 12970,
+       "output": 3041,
+       "reasoning": 4530,
+       "cache": {
+        "read": 38144,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-3/blueprint-generate-1",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eae059e9fffelbPlrr1UcgWbC2",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 165.71,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "c0916a42d73cbd5fc337e4c17198bc9717d2ca8156baac007f1703dfe112a367",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eae059e9fffelbPlrr1UcgWbC2",
+    "user_messages": 1,
+    "actual_input_sha256": "0a0a4ffdd33554ef167e124bfeca02038f9779ebbdba9932e49a684560371ff1",
+    "actual_input_characters": 2910,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_151fa681f0013dhk4rlA1XBzFy",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1585,
+       "output": 102,
+       "reasoning": 14,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151fa7838001ZMP38qrjaKRz70",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 848,
+       "output": 99,
+       "reasoning": 7,
+       "cache": {
+        "read": 1536,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151fa7fd5001HvQUaXOLWkED8B",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 219,
+       "output": 105,
+       "reasoning": 50,
+       "cache": {
+        "read": 2304,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151fa9555001GhUxkjrbG6XIcR",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 12287,
+       "output": 107,
+       "reasoning": 227,
+       "cache": {
+        "read": 2432,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151faa5e4001Hzmkm000MSLJh5",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2397,
+       "output": 109,
+       "reasoning": 95,
+       "cache": {
+        "read": 14592,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151fab06a0011l0w5rbtdYgwxo",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 10588,
+       "output": 387,
+       "reasoning": 694,
+       "cache": {
+        "read": 16896,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151fad084001TwLNTnANYKIZRn",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1675,
+       "output": 384,
+       "reasoning": 2146,
+       "cache": {
+        "read": 27392,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151fb1584001noTyit7F68tcqv",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 2863,
+       "output": 2160,
+       "reasoning": 20629,
+       "cache": {
+        "read": 29056,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-3/blueprint-spec-review-0-runtime_protocol-v1",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eae06bbf3ffeuoD5FzTQ42mfo7",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 72.93,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "c4c179e84864abdc4c1073e877f366d32d0224d1ed70e03b951f3cbb7fdc920e",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eae06bbf3ffeuoD5FzTQ42mfo7",
+    "user_messages": 1,
+    "actual_input_sha256": "8866449603183501e4c4f07d1ceaaa498ca59be5462cc8d15cda2f05bcc1ad88",
+    "actual_input_characters": 4925,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_151f94b200016hz9LAYpoNwt0a",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1917,
+       "output": 110,
+       "reasoning": 10,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f959ed001791MvGb8036srp",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 930,
+       "output": 218,
+       "reasoning": 34,
+       "cache": {
+        "read": 1792,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f96364001k6eeKNp3CS7MAD",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1007,
+       "output": 112,
+       "reasoning": 17,
+       "cache": {
+        "read": 2688,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f96a5300160KvxHBybAQRTZ",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 13782,
+       "output": 115,
+       "reasoning": 30,
+       "cache": {
+        "read": 3584,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f987210015Xs9LJSMN6MvXT",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2175,
+       "output": 113,
+       "reasoning": 4,
+       "cache": {
+        "read": 17280,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151f996c7001HXwtFNpkwKd8ff",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 2487,
+       "output": 1045,
+       "reasoning": 6098,
+       "cache": {
+        "read": 19328,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-3/blueprint-spec-review-1-architecture_contract",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eae0187deffeBvY7r7Xv3aKGqs",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 62.7,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "ab6db0cb9c3bfa87fa338f1d64e28fec8ffe493edade64bd7e0fbceb07525ac8",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eae0187deffeBvY7r7Xv3aKGqs",
+    "user_messages": 1,
+    "actual_input_sha256": "09cf3d418beec547bae2e98c35e9b326c869a5c823ca117dc925c6af3772039e",
+    "actual_input_characters": 4927,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_151fe7e16001g5fY3hKLP6KS31",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1908,
+       "output": 201,
+       "reasoning": 14,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151fe8b82001PtYyFC31bNnjqo",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 735,
+       "output": 411,
+       "reasoning": 7,
+       "cache": {
+        "read": 1792,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151fe9a4a001cUnhS5r6bBw6a7",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 11494,
+       "output": 735,
+       "reasoning": 6798,
+       "cache": {
+        "read": 2432,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-3/blueprint-spec-review-1-decisions_defaults",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadff7dc8ffe1j5uz3z2qMCKDv",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 43.31,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "c14b04fd7300f074443af9f33e7e22bcfe69e091c4ca4aecdf03fe85295b644a",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadff7dc8ffe1j5uz3z2qMCKDv",
+    "user_messages": 1,
+    "actual_input_sha256": "1ce429b83cf4cb4ee192aa5d4b2e6c57bd06c5b631201f12d0e7c9a5bb69cdb3",
+    "actual_input_characters": 4924,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_152008899001gSFeqmCjgL44Qv",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1908,
+       "output": 104,
+       "reasoning": 14,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152009557001gwfvyaBhE0qZGU",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 267,
+       "output": 107,
+       "reasoning": 14,
+       "cache": {
+        "read": 1792,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152009ef2001VOGtC3wQhn5Ebz",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 508,
+       "output": 411,
+       "reasoning": 7,
+       "cache": {
+        "read": 2048,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15200a9d00016wllVYNu7XMC3r",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 11523,
+       "output": 652,
+       "reasoning": 3976,
+       "cache": {
+        "read": 2432,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-3/blueprint-spec-review-1-phase_acceptance",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eae009288ffechQ72AXkSLvrsP",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 70.73,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "0c2a975423fd85afcdb5e53c3d2d798febb8f50e3359a646b91290be0a9cc726",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eae009288ffechQ72AXkSLvrsP",
+    "user_messages": 1,
+    "actual_input_sha256": "a59c68d9df14e4485d4f3833044c9ec5065d8f8091e60b7a2cd5c3509cc1f97a",
+    "actual_input_characters": 4922,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_151ff73fc001xoRu1W9GIebcKd",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1652,
+       "output": 107,
+       "reasoning": 10,
+       "cache": {
+        "read": 256,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151ff7f8d0012QNm1oG80WWWBC",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 628,
+       "output": 411,
+       "reasoning": 7,
+       "cache": {
+        "read": 1792,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151ff8a3c001F3woiMel0pIUYr",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 15098,
+       "output": 866,
+       "reasoning": 8992,
+       "cache": {
+        "read": 2304,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-3/blueprint-spec-review-1-product_completeness",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eae026008ffezsZGJLC1u0VoEK",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 55.2,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "889667c8dc77684d6e0cc5626f6e943de229bf8d88225c3e160dc84ef526bd50",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eae026008ffezsZGJLC1u0VoEK",
+    "user_messages": 1,
+    "actual_input_sha256": "c8da93034786e7b951a6749d41b299e46e48ad8694c7b6129a3e7e2234d6cce5",
+    "actual_input_characters": 4926,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_151fda8b0001YFE0C9r4WXtTAq",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1908,
+       "output": 201,
+       "reasoning": 13,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151fdb83c001lPLzQZndHdjkVI",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 749,
+       "output": 411,
+       "reasoning": 106,
+       "cache": {
+        "read": 1792,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151fdc5fe001Aqj02biRLK4dY0",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 15120,
+       "output": 696,
+       "reasoning": 7037,
+       "cache": {
+        "read": 2432,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-3/blueprint-spec-review-1-runtime_protocol-v1",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadfed429ffeyWp7CmsqaMdwn3",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 185.82,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "af27c6956a0e41de0f3c27abc9b7adeb3454f2735ed3438857e46b527c0ef52a",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadfed429ffeyWp7CmsqaMdwn3",
+    "user_messages": 1,
+    "actual_input_sha256": "5269354865f38a7af527c76868b55f843b1eca81a9a4ecf1d3899c440a264ec2",
+    "actual_input_characters": 4925,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_15201321a001ZYuFnW4uUOrXYs",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1917,
+       "output": 110,
+       "reasoning": 10,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152014035001D5oiTnYm959pYj",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 926,
+       "output": 217,
+       "reasoning": 11,
+       "cache": {
+        "read": 1792,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1520148c1001ANoH1MTIGI1UMV",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 14576,
+       "output": 321,
+       "reasoning": 54,
+       "cache": {
+        "read": 2688,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152016256001iMrBCXEP9bnOV3",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 5037,
+       "output": 748,
+       "reasoning": 24709,
+       "cache": {
+        "read": 17152,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "application-atlas-production-pack/atlas/template-factory/jobs/job_b33d0a3f57cd4c628f4b4070750f7cd0/attempt-3/blueprint-spec-review-1-scenario_scope",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eae0316dbffemDjycAVTPrmIi3",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 46.72,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "b71a7f070cb7e877b56987efe3f1dbaf26e476bc4cb8a4fa41c29088de07df72",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eae0316dbffemDjycAVTPrmIi3",
+    "user_messages": 1,
+    "actual_input_sha256": "134bb913c7c7ff2d48373e1f771b79ebb8cec3dd8276c21f9a9f66c42e54c630",
+    "actual_input_characters": 4920,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_151fcef2f001Yt8uY4QM3ib2pA",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1908,
+       "output": 116,
+       "reasoning": 0,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151fcfa99001CY5toxB0sU2VgU",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 633,
+       "output": 209,
+       "reasoning": 7,
+       "cache": {
+        "read": 1792,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151fd02670017QYLSREqlT9wLU",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 6053,
+       "output": 212,
+       "reasoning": 11,
+       "cache": {
+        "read": 2304,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_151fd0c15001pGYGMILqvKvtYl",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 4454,
+       "output": 855,
+       "reasoning": 3917,
+       "cache": {
+        "read": 8320,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "docs/template-factory/end-to-end/bookmark-2026-10-19/development/initial.work/blueprint-code-app-initial-000",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eade0066effe1lZpeJM1ww6I2t",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 37.65,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "c93238f75d0cff613cd8872c572c73b6cb982998cfb01405c955a179505a430f",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eade0066effe1lZpeJM1ww6I2t",
+    "user_messages": 1,
+    "actual_input_sha256": "23af7c844435bfb2cf3a971df265ddc5735234c85f601b5b6ca39f286d65e573",
+    "actual_input_characters": 4352,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_15220023f001YS1f7TkZPHpLvm",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1968,
+       "output": 418,
+       "reasoning": 28,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522019d200148rHVops3Sb21M",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 10446,
+       "output": 248,
+       "reasoning": 35,
+       "cache": {
+        "read": 1920,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152203030001euYD0qaGXx70JY",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 4435,
+       "output": 348,
+       "reasoning": 276,
+       "cache": {
+        "read": 12288,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152204de3001tLyp9IkCnNfKZ3",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 22568,
+       "output": 168,
+       "reasoning": 584,
+       "cache": {
+        "read": 16640,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522069db001g6d7wyucIoqCZc",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 1708,
+       "output": 226,
+       "reasoning": 401,
+       "cache": {
+        "read": 39168,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "docs/template-factory/end-to-end/bookmark-2026-10-19/development/initial.work/blueprint-code-app-initial-001",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eaddf72faffe6MvjPpzOBfVwdi",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 66.82,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "20ce38e43911408f9e0e488a5ffdfd9e782f0a308fc16a0d39aab9759a005e2e",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eaddf72faffe6MvjPpzOBfVwdi",
+    "user_messages": 1,
+    "actual_input_sha256": "761fd3c39aa9e62d5247e048b87f633541de8adda6fa844a112ea2057a81fa1a",
+    "actual_input_characters": 4522,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_152209934001esaFV77mZKCmyu",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2008,
+       "output": 157,
+       "reasoning": 13,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15220a8be001AH9629eJazWL10",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1129,
+       "output": 343,
+       "reasoning": 14,
+       "cache": {
+        "read": 1920,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15220b410001xwJhqiPe48H3Fz",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 9618,
+       "output": 254,
+       "reasoning": 30,
+       "cache": {
+        "read": 2944,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15220c95e001S5la1L9yacSIHq",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 4586,
+       "output": 356,
+       "reasoning": 102,
+       "cache": {
+        "read": 12544,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15220d94b001QNIaQMx1A4wXds",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 14070,
+       "output": 344,
+       "reasoning": 164,
+       "cache": {
+        "read": 17024,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15220ef140014t1eSkKOFe1NKf",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 11381,
+       "output": 261,
+       "reasoning": 200,
+       "cache": {
+        "read": 30976,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522105d4001ner514nOvavqOy",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 3071,
+       "output": 102,
+       "reasoning": 3135,
+       "cache": {
+        "read": 42240,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522160d8001c36yMywRlrRIdC",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 3438,
+       "output": 2070,
+       "reasoning": 13,
+       "cache": {
+        "read": 45184,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "docs/template-factory/end-to-end/bookmark-2026-10-19/development/initial.work/blueprint-code-app-initial-002",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadde6d8bffeqpSjIx1ZtRl2zV",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 36.17,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "d333e1872af5fa59db9141198e425e6f2918dc309a9aaff9d4b7dfc42365e7fb",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadde6d8bffeqpSjIx1ZtRl2zV",
+    "user_messages": 1,
+    "actual_input_sha256": "c7868a150e347fc6b8886bcdefe296ba2164c381b3b7bcface993b5d53330144",
+    "actual_input_characters": 4071,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_152219934001fnSpswDeJ7QYJH",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1904,
+       "output": 490,
+       "reasoning": 47,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15221aa63001I8GGdz1BUpVgeW",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 10573,
+       "output": 416,
+       "reasoning": 70,
+       "cache": {
+        "read": 1792,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15221be7b00174eL9nDE8Ebdrt",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 24082,
+       "output": 443,
+       "reasoning": 106,
+       "cache": {
+        "read": 12288,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15221fc22001kEKn8R4LkhzTW7",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 20036,
+       "output": 120,
+       "reasoning": 637,
+       "cache": {
+        "read": 36352,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "docs/template-factory/end-to-end/bookmark-2026-10-19/development/initial.work/blueprint-code-app-initial-003",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eaddddfcaffeGx5qPJcfwEGXff",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 55.74,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "ce1ea40d2f03912a24c3443b8b97e5d6801c9b53aa5538c076df674a4c965109",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eaddddfcaffeGx5qPJcfwEGXff",
+    "user_messages": 1,
+    "actual_input_sha256": "c4126d1f7bc2c80a4c7cab00196d1fc5ad755ee69e3042195e943c10732c7315",
+    "actual_input_characters": 4252,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_152222753001N1U37UiajgCo5Z",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1947,
+       "output": 157,
+       "reasoning": 33,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522235d5001QkLu09m92gUDLw",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1048,
+       "output": 343,
+       "reasoning": 8,
+       "cache": {
+        "read": 1920,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152224420001PYpIwNs8QkHezq",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 9531,
+       "output": 329,
+       "reasoning": 35,
+       "cache": {
+        "read": 2944,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522253bf001HBSYrD9PYdHEsT",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 5188,
+       "output": 267,
+       "reasoning": 55,
+       "cache": {
+        "read": 12416,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522266b10018EOQSMO45l3EqY",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 10353,
+       "output": 186,
+       "reasoning": 32,
+       "cache": {
+        "read": 17536,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152229627001oBQKz8zXLfS3kl",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 10736,
+       "output": 261,
+       "reasoning": 408,
+       "cache": {
+        "read": 27776,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15222b00c001pI1Bmj2VtibJ97",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 2386,
+       "output": 342,
+       "reasoning": 2135,
+       "cache": {
+        "read": 38400,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "docs/template-factory/end-to-end/bookmark-2026-10-19/development/initial.work/blueprint-code-app-initial-004",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eaddd058fffeK4RokDgBADgLde",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 84.15,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "e9d59920ed88bfa29c7cb021215a990f1931e33bbfb37fd07f8f8c2eac3ac47c",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eaddd058fffeK4RokDgBADgLde",
+    "user_messages": 1,
+    "actual_input_sha256": "c9330bca625cc36c1458df32bd836dc00291c01036ffe4cba376ca079635401a",
+    "actual_input_characters": 4552,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_15223035d001booP0klg9z0YB0",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2036,
+       "output": 157,
+       "reasoning": 19,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522315ba001O4KNYcmRlIsuBf",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1233,
+       "output": 343,
+       "reasoning": 20,
+       "cache": {
+        "read": 1920,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152232706001BgLCDvY3GBrmnD",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 9600,
+       "output": 411,
+       "reasoning": 36,
+       "cache": {
+        "read": 3072,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152233ab7001qT2fYlRlDypFXD",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 5639,
+       "output": 267,
+       "reasoning": 78,
+       "cache": {
+        "read": 12672,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152237750001cBapY37oLDHYHz",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 10486,
+       "output": 272,
+       "reasoning": 526,
+       "cache": {
+        "read": 18304,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152239636001CtPr6ybONXiD54",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 12204,
+       "output": 1545,
+       "reasoning": 5741,
+       "cache": {
+        "read": 28672,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "docs/template-factory/end-to-end/bookmark-2026-10-19/development/initial.work/blueprint-code-app-initial-005",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eaddbbc6affeeC29SgWjCNfqYy",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 195.28,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "fff393709a2714b5dff20d3c33b5c21f6436fb124fa5510960aa5cf7b9536cbf",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eaddbbc6affeeC29SgWjCNfqYy",
+    "user_messages": 1,
+    "actual_input_sha256": "6c5f0b47d4ce1cb2520bbf09a178a648165654ac95b2461c3e9cce28dc30b744",
+    "actual_input_characters": 4841,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_152244995001c3ZlGR7SV7yLUo",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2088,
+       "output": 99,
+       "reasoning": 0,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152245c72001laEA5llR3hnzP1",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1094,
+       "output": 352,
+       "reasoning": 8,
+       "cache": {
+        "read": 2048,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522467a2001Jtq86gKLdc0lsX",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 9586,
+       "output": 361,
+       "reasoning": 41,
+       "cache": {
+        "read": 3072,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15224760e00173hg8rNBwjtJXx",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 12697,
+       "output": 194,
+       "reasoning": 53,
+       "cache": {
+        "read": 12544,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522483d8001Hpmi2BtLh54aJ1",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 10677,
+       "output": 496,
+       "reasoning": 35,
+       "cache": {
+        "read": 25216,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152249a2f001LwaRJukXBhZHXn",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 7502,
+       "output": 273,
+       "reasoning": 7655,
+       "cache": {
+        "read": 35840,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15225721a0015ODE4l5M1tslzs",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 27088,
+       "output": 3866,
+       "reasoning": 19546,
+       "cache": {
+        "read": 43264,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "docs/template-factory/end-to-end/bookmark-2026-10-19/development/initial.work/blueprint-code-app-initial-006",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadd8c117ffeGOIjLKKnZxFcdI",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 123.62,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "9d47031fe3a0ada9fabcac0c1315fc4a890f4118b680c2ea09beb54c90600304",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadd8c117ffeGOIjLKKnZxFcdI",
+    "user_messages": 1,
+    "actual_input_sha256": "55ecbc4d1772e3ba3da7146e39f11214ae74918d50a94c42a48632591a87fc33",
+    "actual_input_characters": 4633,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_152274495001gms7u4EkrqeZuz",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2030,
+       "output": 163,
+       "reasoning": 16,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15227565c0019j5ybLYsTDUPT9",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 3237,
+       "output": 343,
+       "reasoning": 50,
+       "cache": {
+        "read": 1920,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152277303001jsWk7FCeKeug93",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 9586,
+       "output": 492,
+       "reasoning": 89,
+       "cache": {
+        "read": 5120,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152278307001Nu00Zr91cUhUpA",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 9683,
+       "output": 351,
+       "reasoning": 13,
+       "cache": {
+        "read": 14592,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152279627001H45dW5FW8TNBZ3",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 11274,
+       "output": 272,
+       "reasoning": 36,
+       "cache": {
+        "read": 24192,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15227a8d6001dk84HfEdybQoE2",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 11606,
+       "output": 340,
+       "reasoning": 1802,
+       "cache": {
+        "read": 35456,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15227edf3001Fm7jlKFx7ade5M",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 3238,
+       "output": 1296,
+       "reasoning": 10137,
+       "cache": {
+        "read": 46976,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "docs/template-factory/end-to-end/bookmark-2026-10-19/development/initial.work/blueprint-code-app-initial-007",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadd6ddbbffewIVA1iSkXSFovA",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 271.47,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "e2c8962022662cb81c8e3f9799a1348a802eb6e74430cff35272c8e2fac9e2f0",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadd6ddbbffewIVA1iSkXSFovA",
+    "user_messages": 1,
+    "actual_input_sha256": "3c65977ae8133592e6d6c251e62292f1cdc8e960eaf295fb97b181da85224599",
+    "actual_input_characters": 5050,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_1522928a00012f4vzQSYxKCXhq",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2132,
+       "output": 82,
+       "reasoning": 12,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522938ce001aJhEHPowSq8qFg",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 211,
+       "output": 85,
+       "reasoning": 7,
+       "cache": {
+        "read": 2048,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15229423f00165amyvp4yH0b1J",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1171,
+       "output": 343,
+       "reasoning": 8,
+       "cache": {
+        "read": 2176,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522951e4001y3d5YlSaloU2mw",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 9526,
+       "output": 174,
+       "reasoning": 18,
+       "cache": {
+        "read": 3328,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152296056001fv3EnWvY4ADYAN",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 4248,
+       "output": 249,
+       "reasoning": 66,
+       "cache": {
+        "read": 12800,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152296c05001jkpRtf5IjfKHOI",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 7649,
+       "output": 183,
+       "reasoning": 50,
+       "cache": {
+        "read": 17024,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152297e70001xyvvqF6B4d84gy",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 12194,
+       "output": 184,
+       "reasoning": 33,
+       "cache": {
+        "read": 24576,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152298bd00010at30vLzW5RHpQ",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 6806,
+       "output": 333,
+       "reasoning": 72,
+       "cache": {
+        "read": 36736,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15229adbf001ADgus67khZa8B6",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 3570,
+       "output": 5358,
+       "reasoning": 34228,
+       "cache": {
+        "read": 43520,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "docs/template-factory/end-to-end/bookmark-2026-10-19/development/initial.work/blueprint-code-app-initial-008",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadd2b8ddfferqvG4cbFiOjah1",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 180.7,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "9f07a0dc91cb777053f9f0cf4df81921cdc748f556aa019f37cf0b2ef8eac4f1",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadd2b8ddfferqvG4cbFiOjah1",
+    "user_messages": 1,
+    "actual_input_sha256": "01699cf0b600b6d90e474f3d7531b1687b270d2925dff9f6c14e8bf62f816ff7",
+    "actual_input_characters": 5149,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_1522d4d9c0011MaXfrJTULwkpc",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2178,
+       "output": 157,
+       "reasoning": 13,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522d5afc001HccfuYd1PFcGSb",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1273,
+       "output": 343,
+       "reasoning": 20,
+       "cache": {
+        "read": 2176,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522d65f3001p3EHn1lyXV67Pp",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 9640,
+       "output": 335,
+       "reasoning": 21,
+       "cache": {
+        "read": 3328,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522d7587001v2uOyOHoHUL3Gd",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 6551,
+       "output": 332,
+       "reasoning": 46,
+       "cache": {
+        "read": 12928,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522d82f7001mgezp2AevvkFUu",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 11661,
+       "output": 340,
+       "reasoning": 34,
+       "cache": {
+        "read": 19456,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522d98e3001emNiV40MJvNNsc",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 10926,
+       "output": 186,
+       "reasoning": 22,
+       "cache": {
+        "read": 31104,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522daf49001ETGcI1rcS9edF5",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 10659,
+       "output": 178,
+       "reasoning": 185,
+       "cache": {
+        "read": 41984,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1522dccce001Ua6DzRhslOIc7d",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 18426,
+       "output": 3187,
+       "reasoning": 21992,
+       "cache": {
+        "read": 52608,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "docs/template-factory/end-to-end/bookmark-2026-10-19/development/initial.work/blueprint-code-app-plan-initial",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eade12f41ffe37mXnEIvHMV5f3",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 75.88,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "2f234c270697d0ff826926a5a55153802febe5e987e743fc42d195825af4b234",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eade12f41ffe37mXnEIvHMV5f3",
+    "user_messages": 1,
+    "actual_input_sha256": "c470f8291c99c43a03300853bb0d45944391d432776369aa0343ae194552d62b",
+    "actual_input_characters": 2738,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_1521ed6ae0018kfxuAH059qh5i",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1527,
+       "output": 155,
+       "reasoning": 9,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1521ee538001ScAr7PHlwzztxm",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 924,
+       "output": 339,
+       "reasoning": 31,
+       "cache": {
+        "read": 1408,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1521ef405001hZ43Lu2OFrdSnY",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 9550,
+       "output": 340,
+       "reasoning": 68,
+       "cache": {
+        "read": 2304,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1521f02d6001bPrzkGOaPa0aI0",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 4705,
+       "output": 262,
+       "reasoning": 62,
+       "cache": {
+        "read": 11776,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1521f10a8001M0ZzrO0a4wqJBH",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 6105,
+       "output": 265,
+       "reasoning": 26,
+       "cache": {
+        "read": 16384,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1521f1e93001ZJ0RyO3yNPfad4",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 5506,
+       "output": 181,
+       "reasoning": 62,
+       "cache": {
+        "read": 22400,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1521f2a9d001RxueSco80jJCC4",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 12107,
+       "output": 97,
+       "reasoning": 55,
+       "cache": {
+        "read": 27904,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1521f389b001dmS9J9HqQuZFvL",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 5898,
+       "output": 420,
+       "reasoning": 256,
+       "cache": {
+        "read": 39936,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1521f5457001hINjH6zUjlTbo6",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 22720,
+       "output": 343,
+       "reasoning": 2383,
+       "cache": {
+        "read": 45824,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1521f9df3001pRwD63GBFdKDdK",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 4946,
+       "output": 1551,
+       "reasoning": 1420,
+       "cache": {
+        "read": 68480,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "docs/template-factory/end-to-end/bookmark-2026-10-19/development/repair-1.work/blueprint-code-app-repair-e969429a9a-5f11cbbc-000",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadbd7556ffeSARyekld2bxstC",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 97.94,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "a01f9dcbad494597fa617fb5231bbd253d417282c373bc7c35d73552c2be3633",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadbd7556ffeSARyekld2bxstC",
+    "user_messages": 1,
+    "actual_input_sha256": "d555d74dd59f56283284c89329ce1af6e368a968f02812b4fb3b0d100346ad88",
+    "actual_input_characters": 6132,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_15242910a001A1kf1QeSryg38y",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2386,
+       "output": 187,
+       "reasoning": 13,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15242a1910013AlF6ibri8ccEi",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1227,
+       "output": 403,
+       "reasoning": 30,
+       "cache": {
+        "read": 2304,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15242ade6001nL64cte3x2Mcjt",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 9724,
+       "output": 389,
+       "reasoning": 78,
+       "cache": {
+        "read": 3456,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15242c5370015Bu9bNs8OTQ8oY",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 12956,
+       "output": 314,
+       "reasoning": 1687,
+       "cache": {
+        "read": 13056,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1524305e5001eDBA0sGSAer3so",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 14821,
+       "output": 494,
+       "reasoning": 47,
+       "cache": {
+        "read": 25984,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152431b87001Ec5D545cj0OQBg",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 14313,
+       "output": 1221,
+       "reasoning": 8694,
+       "cache": {
+        "read": 40704,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "docs/template-factory/end-to-end/bookmark-2026-10-19/development/repair-1.work/blueprint-code-app-repair-e969429a9a-5f11cbbc-001",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadbbf6c0ffeCkMmx2gO37EYqX",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 171.47,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "d2bb1e9bdac8767cb1d114397d861cd3395878472cc27bd8094deea26ef0c8f3",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadbbf6c0ffeCkMmx2gO37EYqX",
+    "user_messages": 1,
+    "actual_input_sha256": "417d9361c5875ce4f6c84ef80ec2f8b6b60f4e82bde1e9b106614af2ff65082a",
+    "actual_input_characters": 6134,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_15244117b001II5d3DwN7vo46K",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2388,
+       "output": 195,
+       "reasoning": 13,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152441f30001OCf9fThJMkD8vX",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 5344,
+       "output": 499,
+       "reasoning": 261,
+       "cache": {
+        "read": 2304,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152443331001dz6HkaWg085CA7",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 14207,
+       "output": 393,
+       "reasoning": 48,
+       "cache": {
+        "read": 7552,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152444320001ndB55BXczOmZzy",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 8185,
+       "output": 485,
+       "reasoning": 360,
+       "cache": {
+        "read": 21632,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1524469ee001JgzkkTp2Et95e7",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 11212,
+       "output": 417,
+       "reasoning": 1103,
+       "cache": {
+        "read": 29696,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_1524498180015Rrgmzkm1tOsZ2",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 20071,
+       "output": 4008,
+       "reasoning": 22365,
+       "cache": {
+        "read": 40832,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  },
+  {
+   "stage": "docs/template-factory/end-to-end/bookmark-2026-10-19/development/repair-1.work/blueprint-code-app-repair-e969429a9a-5f11cbbc-002",
+   "cli": {
+    "model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "actual_model": "commandcode/deepseek/deepseek-v4.1-flash#atlas-effort-high",
+    "requested_model": "commandcode/deepseek/deepseek-v4.1-flash",
+    "reasoning_effort": "high",
+    "session_id": "ses_eadb9586effeKmRoyFO45COv6H",
+    "actual_reasoning_effort": "high",
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 81.4,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "a647841efb002e076b46cee19ac565e79d3d21cc5cdadd2848fe3908c7a142dd",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "websearch_calls": 0,
+   "webfetch_calls": 0,
+   "session_audit": {
+    "session_id": "ses_eadb9586effeKmRoyFO45COv6H",
+    "user_messages": 1,
+    "actual_input_sha256": "04a6c1aed6f69111892d4ac2dfbc902d8513907516c09a0f9a18fc38681c56d9",
+    "actual_input_characters": 6140,
+    "inherited_driver_marker": false,
+    "assistant_usage_records": [
+     {
+      "id": "msg_15246ae4f001q7uZRiUBnJeFj3",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 2388,
+       "output": 187,
+       "reasoning": 13,
+       "cache": {
+        "read": 0,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15246bffa001xum4BHRs4jRkNu",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 1231,
+       "output": 390,
+       "reasoning": 14,
+       "cache": {
+        "read": 2304,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15246cdc8001z7WOZcvVrCIH3p",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 11742,
+       "output": 403,
+       "reasoning": 335,
+       "cache": {
+        "read": 3456,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15246ed23001r31JxJBiaaIxwk",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 10048,
+       "output": 314,
+       "reasoning": 48,
+       "cache": {
+        "read": 15104,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15246fd6b001hUYEUPB87h92MV",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 13218,
+       "output": 314,
+       "reasoning": 81,
+       "cache": {
+        "read": 25088,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152471a570016I317ZMIE0aomM",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 8238,
+       "output": 389,
+       "reasoning": 1965,
+       "cache": {
+        "read": 38272,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_15247657a001xVQBMq0iVdlAhY",
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "tokens": {
+       "input": 5157,
+       "output": 301,
+       "reasoning": 153,
+       "cache": {
+        "read": 46464,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     },
+     {
+      "id": "msg_152478209001qZ8914kr7iQRVR",
+      "finish": "stop",
+      "rawFinish": "stop",
+      "tokens": {
+       "input": 7237,
+       "output": 1672,
+       "reasoning": 2597,
+       "cache": {
+        "read": 51584,
+        "write": 0
+       }
+      },
+      "model": {
+       "id": "deepseek/deepseek-v4.1-flash",
+       "providerID": "commandcode",
+       "variant": "atlas-effort-high"
+      }
+     }
+    ],
+    "limits": "This owned session only. No full transcript, credentials or unrelated session exported. Usage fields may overlap; not an invoice."
+   }
+  }
+ ],
+ "limits": "Recorded token/cache/reasoning fields can overlap. No billed monetary total inferred. Missing exports/tokens are unavailable, not evidence of zero usage."
+}

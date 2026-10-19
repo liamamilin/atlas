@@ -1,0 +1,86 @@
+:root {
+  color-scheme: light;
+  --line: #e2e2e6;
+  --accent: #b45309;
+  --muted: #6b7280;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #f7f7f9;
+  color: #1f2937;
+  line-height: 1.6;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #ffffff;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.brand { font-weight: 700; color: var(--accent); text-decoration: none; }
+
+.nav { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+.nav-item { display: inline-flex; gap: 0.25rem; align-items: center; }
+.nav a { color: #374151; text-decoration: none; }
+.nav a:hover { text-decoration: underline; }
+
+main { max-width: 960px; margin: 0 auto; padding: 1rem; }
+
+.panel { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+.panel h2 { margin-top: 0; font-size: 1rem; }
+
+input, textarea, select, button { font: inherit; }
+input, textarea, select { padding: 0.4rem 0.5rem; border: 1px solid var(--line); border-radius: 6px; max-width: 100%; }
+textarea { width: 100%; min-height: 3.5rem; }
+button { padding: 0.4rem 0.75rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; cursor: pointer; }
+button:hover { background: #f3f4f6; }
+
+.flash { background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; padding: 0.5rem 0.75rem; border-radius: 6px; margin-bottom: 0.75rem; }
+.error { background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; padding: 0.5rem 0.75rem; border-radius: 6px; margin: 0.5rem 0; }
+.error:empty { display: none; }
+
+.library { display: flex; flex-direction: column; gap: 0.75rem; }
+.bookmark { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 0.75rem 1rem; }
+.bookmark h3 { margin: 0 0 0.25rem; font-size: 1rem; }
+.bookmark h3 a { color: #1d4ed8; text-decoration: none; }
+.bookmark p { margin: 0.15rem 0; }
+.bookmark .url span { color: var(--muted); word-break: break-all; font-size: 0.85rem; }
+.bookmark .meta { color: var(--muted); font-size: 0.85rem; }
+.bookmark form { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-top: 0.4rem; }
+
+.pager { display: flex; gap: 1rem; justify-content: center; padding: 0.75rem; }
+.pager a { color: #1d4ed8; }
+.pager a[aria-disabled="true"] { color: #9ca3af; cursor: not-allowed; text-decoration: none; }
+
+.empty { color: var(--muted); text-align: center; padding: 2rem; }
+
+.trash-item { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.75rem; }
+.trash-item form { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-top: 0.4rem; }
+
+.duplicate { color: #92400e; }
+
+.dialog[hidden] { display: none; }
+.dialog {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 20;
+}
+.dialog-box { background: #fff; border-radius: 10px; padding: 1.25rem; width: 100%; max-width: 460px; }
+.dialog-form { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.75rem 0; }
+.dialog-form select { max-width: 100%; }

@@ -1,0 +1,37 @@
+{
+  "case": "rename",
+  "label": "M1",
+  "round": "initial",
+  "all_files_manually_read": {
+    "DECISIONS.md": "57496ba1aa8bd1aff286310a71a4f8fe4c9ed6104dcbfffc1d0e07f64f680a48",
+    "README.md": "66c8f1a96251ad5642974cab4ce15a2199e10c5c8a57b1af6a6ff346e3ae02da",
+    "app.py": "dbac5887de058cc2be1e3b772eefe55b4672cc16180b8334edabf81c9f80dc22",
+    "renamer_cli.py": "127540ac5ff1ca240371ece6758a355df47daeb00e4be12054819512cfb93cb9",
+    "renamer_commands.py": "e79e648854ea352f981d3a5a2d748fc7f5ed8f2b8602c053621fd85bb1acecb8",
+    "renamer_errors.py": "aafa9882900e0380eeea58ee52de49d5d3f3a8aa0c55848c2d6873c781612317",
+    "renamer_listing.py": "6ec36df6af250868cf329c76b3a1f38d8e58611f55aba67a388e29a9e92dad8e",
+    "renamer_plans.py": "345ad90b408ebff25908bc7f513078013f089e44765d54525217badf2e010c0c",
+    "renamer_state.py": "ee87a4e04bd410e386d61f75240402935b82434f49d1bad0cbba51c2ef3110e6"
+  },
+  "python": "3.10.13 (main, Jul 28 2025, 13:11:45) [Clang 17.0.0 (clang-1700.0.13.5)]",
+  "execution_safety": "approved only for controlled synthetic core and owned-sentinel EP01 fixtures",
+  "safety_notes": [
+    "No network, subprocess/shell/eval/secret access; only explicit root and its state directory",
+    "Root canonicalization, non-symlink ordinary file listing, state path restricted to direct child of root/.atlas-renamer",
+    "Receipt path derived from validated plan filename, not plan.id; EP01 id extra field not used",
+    "Confirm gates apply/undo; whole-batch conflict/lstat checks; immutable plan exclusive creation; receipt temp+replace inside state",
+    "Undo refuses current changed metadata/conflicting targets; repeated apply explicit already-applied"
+  ],
+  "source_risks_not_runtime_claims": [
+    "Stale-content check uses inode/device/size/mtime only, no hash; content changed while restoring metadata could evade it (not part frozen fixture)",
+    "Atomic receipt helper deterministic .tmp-name could follow preexisting symlink if malicious actor creates it; not exercised by controlled frozen core/EP01",
+    "os.rename has documented precheck/rename race against external concurrent writer, outside current concurrency scope"
+  ],
+  "EP01_scope_review": "Absolute plan.id only references known owned sibling outside target; application ignores extra field; no uncontrolled target or ../ traversal",
+  "prohibited_context_not_read": [
+    "condition-map",
+    "template",
+    "developer prompts/input"
+  ],
+  "application_modified": false
+}

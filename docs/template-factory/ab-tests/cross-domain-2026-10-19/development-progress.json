@@ -1,0 +1,173 @@
+{
+  "rename/M2": {
+    "status": "delivered",
+    "cli_status": "completed",
+    "attempt": 1,
+    "elapsed_seconds_all_attempts": 165.48,
+    "source_sha256": {
+      "DECISIONS.md": "3091631448ba098a55ef75809e493a0e21a1353ed9be80bf89d9f0cff80ddace",
+      "README.md": "bc269e0060ed5a1129fcc6f41846779f50db5a26f7beaa1546e85525c7b2fe19",
+      "app.py": "6725e307553aa1342f8ea04113c1ebbcbf170e10d9483303dde6f863be07fa75",
+      "atlas_errors.py": "69b820c1bfc9d037022339e4065545b96633875acf3497e2f07f40c56a98dfae",
+      "commands.py": "572aabec5feb97963702205cff890ed73cb1bcc89d1ba28099b4d8ebb39e278f",
+      "fsops.py": "7946c63d360dc0d487b10a01bb4728435a713c6cede4a62242cd238222b9f54a",
+      "naming.py": "4cafa14576c3b8e636812ed2f3dc98326c1be4ec5bfc46363778687e7dc7b504",
+      "paths.py": "594798fd9dca46895784ae66f96d35268f86e4e606767b601b038208efef00ee",
+      "planner.py": "c3953e49e01a66d000b342318ea41b66459f6f2f6b4416c9952431a48ac6f2c5"
+    },
+    "host_source_findings": [],
+    "author_claims": {
+      "files": [
+        "app.py",
+        "commands.py",
+        "naming.py",
+        "paths.py",
+        "fsops.py",
+        "planner.py",
+        "atlas_errors.py",
+        "README.md",
+        "DECISIONS.md"
+      ],
+      "implemented": [
+        "list of immediate ordinary files excluding .atlas-renamer/dirs/symlinks",
+        "preview with literal text find/replace, illegal-name and conflict refusal, immutable multiline JSON plan with sha256/size/mtime evidence",
+        "apply with --confirm, stale-content refusal, whole-batch conflict refusal, non-overwriting renames with rollback, durable receipt, reapply refusal",
+        "undo with --confirm, restore this batch only, refuse on conflict/changed data without overwriting, reject repeat undo",
+        "strict path confinement to DIR/.atlas-renamer with symlink-escape rejection",
+        "JSON-only stdout, stderr messages, nonzero exits on failure",
+        "README and DECISIONS documents"
+      ],
+      "limits": [
+        "single directory, non-recursive",
+        "ordinary files only; no symlinks or directories",
+        "literal substring find, not regex",
+        "one apply corresponds to one undo",
+        "case-insensitive duplicate/conflict detection (conservative for case-insensitive filesystems)",
+        "no GUI, cloud, trash/delete, concurrency locks"
+      ],
+      "self_checks": {
+        "status": "not_run"
+      }
+    },
+    "application_hand_edits": false,
+    "execution": "not_run",
+    "evidence_status": "await independent source review and real runtime"
+  },
+  "rename/M1": {
+    "status": "delivered",
+    "cli_status": "completed",
+    "attempt": 1,
+    "elapsed_seconds_all_attempts": 277.7,
+    "source_sha256": {
+      "DECISIONS.md": "57496ba1aa8bd1aff286310a71a4f8fe4c9ed6104dcbfffc1d0e07f64f680a48",
+      "README.md": "66c8f1a96251ad5642974cab4ce15a2199e10c5c8a57b1af6a6ff346e3ae02da",
+      "app.py": "dbac5887de058cc2be1e3b772eefe55b4672cc16180b8334edabf81c9f80dc22",
+      "renamer_cli.py": "127540ac5ff1ca240371ece6758a355df47daeb00e4be12054819512cfb93cb9",
+      "renamer_commands.py": "e79e648854ea352f981d3a5a2d748fc7f5ed8f2b8602c053621fd85bb1acecb8",
+      "renamer_errors.py": "aafa9882900e0380eeea58ee52de49d5d3f3a8aa0c55848c2d6873c781612317",
+      "renamer_listing.py": "6ec36df6af250868cf329c76b3a1f38d8e58611f55aba67a388e29a9e92dad8e",
+      "renamer_plans.py": "345ad90b408ebff25908bc7f513078013f089e44765d54525217badf2e010c0c",
+      "renamer_state.py": "ee87a4e04bd410e386d61f75240402935b82434f49d1bad0cbba51c2ef3110e6"
+    },
+    "host_source_findings": [],
+    "author_claims": {
+      "files": [
+        "app.py",
+        "renamer_errors.py",
+        "renamer_state.py",
+        "renamer_listing.py",
+        "renamer_plans.py",
+        "renamer_commands.py",
+        "renamer_cli.py",
+        "README.md",
+        "DECISIONS.md"
+      ],
+      "implemented": [
+        "list immediate regular files excluding .atlas-renamer/dirs/symlinks",
+        "preview literal find/replace with single-filename validation and immutable plan+identity evidence",
+        "whole-batch conflict precheck (existing target, duplicate target, target inside source set/ring)",
+        "apply --confirm with stale/duplicate detection, incremental receipt and rollback",
+        "undo --confirm restoring only this batch without overwriting changed/occupied names",
+        "state path boundary: plan/receipt must be direct children of ROOT/.atlas-renamer, reject traversal/escape/external symlink",
+        "nonzero exit + stderr on all failures with no false success JSON"
+      ],
+      "limits": [
+        "single non-recursive root of immediate ordinary files only",
+        "literal (non-regex) find; no path separators in replacement",
+        "no renameat2; small documented TOCTOU window between check and rename",
+        "rings rejected as internal conflict; no temp-name two-phase swap",
+        "no cross-filesystem rename; no NFS/SMB failure guarantee",
+        "stale detection uses dev/ino/size/mtime_ns only, no content hash",
+        "best-effort fsync, no power-loss-exact recovery"
+      ],
+      "self_checks": {
+        "status": "not_run"
+      }
+    },
+    "application_hand_edits": false,
+    "execution": "not_run",
+    "evidence_status": "await independent source review and real runtime"
+  },
+  "rename/M3": {
+    "status": "delivered",
+    "cli_status": "completed",
+    "attempt": 2,
+    "elapsed_seconds_all_attempts": 639.55,
+    "source_sha256": {
+      "DECISIONS.md": "826aa9a327807d94c5a85a9f92bd73b101e2ff628d186cd0d7d44ff9fcae7249",
+      "README.md": "b35ac5f6df3656373b2f871d4e790382f66d31cf4d61303f8b3b67ac8d08b5fa",
+      "app.py": "99ddfc5d98ddf7f92ad023fd37670a9b05bd214dd2c5c13c0cfbd76589539258",
+      "errors.py": "87f966c0facc5afdd066bfcba191c77bc9b051f6b4c63a12effebc968b3fa195",
+      "execution.py": "6fa29dacc2ca79a5d810adaa712ce65870bce529b4936c43520b1b3b34ff2a38",
+      "identity.py": "72722b39201c3805e9258d538d1a4a219e9ff43e4ed64e108dce2dee66e55f02",
+      "listing.py": "4ce9b926d001abdeaf1680584e3b95ec06fecb1b87b0fdf978aa986cd893a36d",
+      "paths.py": "8deec6d8c59f4a6a4419accae5d320f7721a58789e03eb5d7a0aaf746448d993",
+      "planning.py": "7afa52bef8eba6662f1974eb2223abde445abc771e2d5d06003e2cba8f318f0a",
+      "reversal.py": "1158810ab739adea9f0b17ae350eaa3b35017aae8bff3addbe31a99cf445b3ab",
+      "state.py": "0279ddbd8f7633939c8e3d8aa9ab77f52353455f6449e57706db343e76034aee"
+    },
+    "host_source_findings": [],
+    "author_claims": {
+      "files": [
+        "app.py",
+        "errors.py",
+        "paths.py",
+        "identity.py",
+        "listing.py",
+        "planning.py",
+        "execution.py",
+        "reversal.py",
+        "state.py",
+        "README.md",
+        "DECISIONS.md"
+      ],
+      "implemented": [
+        "list immediate ordinary files (exclude dirs/symlinks/.atlas-renamer)",
+        "literal find/replace preview with single-filename validation",
+        "immutable identity-bearing plan under DIR/.atlas-renamer",
+        "whole-batch conflict precheck and refusal",
+        "apply with --confirm, per-item receipt, rollback on failure",
+        "already-applied and stale-plan refusal",
+        "undo with --confirm restoring only this batch without overwriting",
+        "state path boundary vs absolute/.. /external-symlink escapes",
+        "nonzero exit + stderr on failure with no false-success JSON"
+      ],
+      "limits": [
+        "single non-recursive root, ordinary files only",
+        "literal (non-regex) find; no directory separators/traversal",
+        "no renameat2: tiny TOCTOU window between precheck and rename",
+        "rename rings (a<->b) refused, no two-phase temp swap",
+        "no cross-filesystem rename (EXDEV refused); no NFS failure guarantee",
+        "no multi-round undo/redo, no backups, no case/Unicode-equivalence guarantees",
+        "fsync-based crash visibility is best-effort, not power-failure recovery",
+        "all self-checks/acceptance not_run; generation executed nothing"
+      ],
+      "self_checks": {
+        "status": "not_run"
+      }
+    },
+    "application_hand_edits": false,
+    "execution": "not_run",
+    "evidence_status": "await independent source review and real runtime"
+  }
+}

@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Evaluate cheap adjudicator models on the classification pilot (graph-expanded pool)."""
-import json, re, sqlite3, urllib.request, numpy as np, concurrent.futures as cf, time, sys
+import json, re, sqlite3, urllib.request, numpy as np, concurrent.futures as cf, time, sys, os
 
-KEY = json.load(open("/Users/milin/.local/share/opencode/auth.json"))["opencode-go"]["key"]
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import atlas_model
+
 con = sqlite3.connect("atlas/atlas.sqlite")
 rows = con.execute("SELECT slug, vec FROM embedding").fetchall()
 M = np.stack([np.frombuffer(r[1], dtype=np.float32) for r in rows])
@@ -69,16 +71,13 @@ def run(model, items, Q):
         pool = pool_for(q)
         cands = [f"- {s}（{leaf_info[s][0]}）: {leaf_info[s][1]}" for s in pool]
         bd = pairwise(pool)
-        body = {"model": model, "messages": [{"role": "user", "content": PROMPT.format(
-            desc=it["desc"], cands="\n".join(cands), bounds=("\n分界记录:\n" + bd if bd else ""))}],
-            "temperature": 0.1, "max_tokens": 3000}
         for attempt in range(2):
             try:
-                r = json.load(urllib.request.urlopen(urllib.request.Request(
-                    "https://opencode.ai/zen/go/v1/chat/completions", json.dumps(body).encode(),
-                    {"Authorization": f"Bearer {KEY}", "Content-Type": "application/json",
-                     "x-opencode-session": "atlas-eval", "User-Agent": "atlas-pilot/1.0"}), timeout=300))
-                txt = (r["choices"][0]["message"].get("content") or "").strip()
+                txt = atlas_model.complete_text(
+                    [{"role": "user", "content": PROMPT.format(
+                        desc=it["desc"], cands="\n".join(cands),
+                        bounds=("\n分界记录:\n" + bd if bd else ""))}],
+                    model=model, temperature=0.1, max_tokens=3000, timeout=300)
                 m = re.search(r"\{[^{]*\"choice\"[^}]*\}", txt, re.S)
                 if m:
                     return {"name": it["name"], "expect": it["expect"], "choice": json.loads(m.group(0))["choice"].strip()}

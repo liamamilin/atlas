@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "kind": "synthetic failure-stage unit test",
+  "cases": {
+    "daemon": {
+      "stage": "docker_daemon_preflight",
+      "status": "blocked",
+      "failure_kind": "environment_docker_daemon_unavailable"
+    },
+    "image": {
+      "stage": "local_image_preflight",
+      "status": "blocked",
+      "failure_kind": "environment_image_missing_or_uninspectable"
+    },
+    "setup": {
+      "stage": "docker_network_setup",
+      "status": "blocked",
+      "failure_kind": "environment_docker_setup_failed"
+    },
+    "readiness": {
+      "stage": "application_readiness",
+      "status": "failed",
+      "failure_kind": "product_or_acceptance_failure"
+    }
+  }
+}

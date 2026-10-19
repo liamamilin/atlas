@@ -11,6 +11,8 @@ import sqlite3
 import uuid
 
 from atlas_runtime import PACK
+from privacy import redact_value
+from workspace_snapshot import DEFAULT_IGNORES, snapshot_workspace
 
 
 SCHEMA_VERSION = 5
@@ -20,6 +22,9 @@ TASK_STATES = {"planned", "queued", "running", "waiting_permission",
                "waiting_input", "completed", "failed", "stopped", "unknown"}
 EXECUTION_STATES = TASK_STATES - {"planned"}
 ACCEPTANCE_STATES = {"pending", "passed", "failed", "waived"}
+ACCEPTANCE_CONDITION_STATES = {"passed", "failed", "waived"}
+LEGACY_ACCEPTANCE_BACKFILL_CONFIRMATION = "backfill_legacy_acceptance_metadata"
+LEGACY_ACCEPTANCE_MIGRATION_SCHEMA = 1
 APPLICATION_STATES = {
     "not_applicable", "pending", "applying", "applied", "conflict", "failed", "superseded",
 }
@@ -106,11 +111,13 @@ class ProjectStore:
             if not project:
                 raise ProjectStoreError("project not found")
             active = con.execute("""SELECT e.id FROM execution e JOIN task t ON t.id=e.task_id
-                WHERE t.project_id=? AND e.status IN
-                ('queued','running','waiting_permission','waiting_input') LIMIT 1""",
+                WHERE t.project_id=? AND (
+                    e.status IN ('queued','running','waiting_permission','waiting_input')
+                    OR e.application_status IN ('pending','applying','conflict','failed')
+                ) LIMIT 1""",
                                  (project_id,)).fetchone()
             if active:
-                raise ProjectStoreError("project has an active execution")
+                raise ProjectStoreError("project has an active execution or unresolved execution result")
 
             counts = {
                 "executions": con.execute("""SELECT COUNT(*) FROM execution e JOIN task t
@@ -232,15 +239,19 @@ class ProjectStore:
         return result
 
     def review_document(self, project_id: str, document_id: str, status: str,
-                        note: str = "") -> dict:
+                        note: str = "",
+                        expected_current_version: int | None = None) -> dict:
         if status not in {"approved", "rejected"}:
             raise ValueError("document review status must be approved or rejected")
         now = _now()
         with self._transaction() as con:
-            row = con.execute("SELECT project_id FROM document WHERE id=?",
+            row = con.execute("SELECT project_id,current_version FROM document WHERE id=?",
                               (document_id,)).fetchone()
             if not row or row["project_id"] != project_id:
                 raise ProjectStoreError("document not found")
+            if (expected_current_version is not None
+                    and row["current_version"] != expected_current_version):
+                raise ProjectStoreError("document version conflict")
             con.execute("""UPDATE document SET review_status=?,review_note=?,
                 reviewed_at=? WHERE id=?""",
                 (status, note if isinstance(note, str) else "", now, document_id))
@@ -550,6 +561,23 @@ class ProjectStore:
         result["write_paths"] = json.loads(result.pop("write_paths_json"))
         result["verification_commands"] = json.loads(
             result.pop("verification_commands_json"))
+        snapshots = []
+        with self._connect() as con:
+            for pin in result["requirement_revisions"]:
+                revision = con.execute(
+                    """SELECT requirement_id,revision,content,acceptance_json,
+                        reference_ids_json,content_sha256,created_at
+                        FROM requirement_revision WHERE requirement_id=? AND revision=?""",
+                    (pin["requirement_id"], pin["revision"])).fetchone()
+                if not revision:
+                    continue
+                snapshot = dict(revision)
+                snapshot["acceptance_conditions"] = json.loads(
+                    snapshot.pop("acceptance_json") or "[]")
+                snapshot["reference_ids"] = json.loads(
+                    snapshot.pop("reference_ids_json") or "[]")
+                snapshots.append(snapshot)
+        result["requirement_snapshots"] = snapshots
         return result
 
     def list_tasks(self, project_id: str, iteration_id: str | None = None) -> list[dict]:
@@ -703,15 +731,19 @@ class ProjectStore:
             con.execute("UPDATE project SET updated_at=? WHERE id=?", (now, project_id))
         return self.get_requirement(requirement_id)
 
-    def confirm_requirement(self, requirement_id: str, scope: str, reason: str) -> dict:
+    def confirm_requirement(self, requirement_id: str, scope: str, reason: str,
+                            expected_revision: int | None = None) -> dict:
         if scope not in SCOPE_STATES:
             raise ValueError("invalid confirmed scope")
         now = _now()
         with self._transaction() as con:
             requirement = con.execute(
-                "SELECT project_id FROM requirement WHERE id=?", (requirement_id,)).fetchone()
+                "SELECT project_id,revision FROM requirement WHERE id=?", (requirement_id,)).fetchone()
             if not requirement:
                 raise ProjectStoreError("requirement not found")
+            if (expected_revision is not None
+                    and requirement["revision"] != expected_revision):
+                raise ProjectStoreError("requirement revision conflict")
             con.execute("""UPDATE requirement SET confirmed_scope=?,confirmation_reason=?,
                 updated_at=? WHERE id=?""", (scope, _required(reason, "reason"), now, requirement_id))
             con.execute("UPDATE project SET updated_at=? WHERE id=?",
@@ -928,7 +960,8 @@ class ProjectStore:
                         (now, row["project_id"]))
         return self.get_iteration(iteration_id)
 
-    def record_acceptance(self, task_id: str, status: str, evidence: list[dict]) -> dict:
+    def record_acceptance(self, task_id: str, status: str, evidence: list[dict],
+                          condition_results: list[dict] | None = None) -> dict:
         """Record product acceptance separately from engine execution completion."""
         if status not in ACCEPTANCE_STATES - {"pending"}:
             raise ValueError("acceptance status must be passed, failed, or waived")
@@ -940,37 +973,270 @@ class ProjectStore:
             raise ValueError("acceptance evidence must contain kind and summary")
         if not evidence:
             raise ValueError("acceptance evidence is required")
+        if any(item.get("kind") == "acceptance_binding" for item in evidence):
+            raise ValueError("acceptance_binding evidence is reserved for Atlas")
+        if condition_results is not None:
+            if not isinstance(condition_results, list) or not all(
+                    isinstance(item, dict)
+                    and isinstance(item.get("requirement_id"), str)
+                    and item["requirement_id"].strip()
+                    and isinstance(item.get("revision"), int)
+                    and not isinstance(item.get("revision"), bool)
+                    and item["revision"] > 0
+                    and isinstance(item.get("condition"), str)
+                    and item["condition"].strip()
+                    and item.get("result") in ACCEPTANCE_CONDITION_STATES
+                    and (item.get("note", "") == "" or isinstance(item.get("note"), str))
+                    for item in condition_results):
+                raise ValueError(
+                    "condition results must contain requirement, revision, condition, and result")
         now = _now()
         with self._transaction() as con:
             task = con.execute(
-                "SELECT project_id,kind FROM task WHERE id=?", (task_id,)).fetchone()
+                """SELECT project_id,kind,input_versions_json,requirement_ids_json,
+                    requirement_revisions_json FROM task WHERE id=?""",
+                (task_id,)).fetchone()
             if not task:
                 raise ProjectStoreError("task not found")
+            execution = con.execute("""SELECT id,status,application_status,
+                application_state_json,input_state_json FROM execution
+                WHERE task_id=? ORDER BY created_at DESC,id DESC LIMIT 1""",
+                (task_id,)).fetchone()
             if status == "passed":
-                execution = con.execute("""SELECT status,application_status,
-                    application_state_json FROM execution
-                    WHERE task_id=? ORDER BY created_at DESC,id DESC LIMIT 1""",
-                    (task_id,)).fetchone()
-                if execution and execution["status"] in {"failed", "stopped", "unknown"}:
+                if not execution:
                     raise ProjectStoreError(
-                        "a failed or stopped execution cannot pass acceptance; "
+                        "passed acceptance requires a completed execution; "
+                        "run the task or waive it with an explicit reason")
+                if execution["status"] in {"failed", "stopped", "unknown"}:
+                    raise ProjectStoreError(
+                        "a failed, stopped, or unknown execution cannot pass acceptance; "
                         "retry it or waive it with an explicit reason")
-                if execution and task["kind"] in {"code", "document"}:
-                    if execution["application_status"] in {
-                            "pending", "applying", "conflict", "failed", "superseded"}:
+                if execution["status"] != "completed":
+                    raise ProjectStoreError(
+                        "only a completed execution can pass acceptance; "
+                        "retry it or waive it with an explicit reason")
+                state = json.loads(execution["application_state_json"] or "{}")
+                if task["kind"] in {"code", "document"}:
+                    if execution["application_status"] != "applied":
                         raise ProjectStoreError(
                             "apply the isolated execution result before passing acceptance")
-                    state = json.loads(execution["application_state_json"] or "{}")
-                    if execution["application_status"] == "applied" and \
-                            state.get("baseline_adoption_error"):
+                    accepted_baseline_id = state.get("accepted_baseline_id")
+                    baseline_rows = con.execute(
+                        "SELECT id,manifest_json FROM workspace_snapshot "
+                        "WHERE project_id=? ORDER BY created_at DESC,id DESC",
+                        (task["project_id"],)).fetchall()
+                    latest_baseline_id = None
+                    accepted_manifest = None
+                    for baseline_row in baseline_rows:
+                        try:
+                            baseline_manifest = json.loads(
+                                baseline_row["manifest_json"] or "{}")
+                        except json.JSONDecodeError:
+                            continue
+                        if baseline_manifest.get("purpose") == "project-baseline":
+                            latest_baseline_id = baseline_row["id"]
+                            if baseline_row["id"] == accepted_baseline_id:
+                                accepted_manifest = baseline_manifest
+                            break
+                    if not accepted_baseline_id or accepted_baseline_id != latest_baseline_id:
                         raise ProjectStoreError(
                             "the applied result did not become the accepted workspace "
                             "baseline; reconcile the workspace before passing acceptance")
+                    if state.get("baseline_adoption_error"):
+                        raise ProjectStoreError(
+                            "the applied result did not become the accepted workspace "
+                            "baseline; reconcile the workspace before passing acceptance")
+                    project = con.execute(
+                        "SELECT workspace FROM project WHERE id=?",
+                        (task["project_id"],)).fetchone()
+                    try:
+                        current = snapshot_workspace(
+                            project["workspace"], ignore_names=DEFAULT_IGNORES)
+                    except (OSError, ValueError) as error:
+                        raise ProjectStoreError(
+                            "the accepted workspace baseline cannot be verified") from error
+                    if current.get("errors") or current.get("files") != \
+                            (accepted_manifest or {}).get("files", {}):
+                        raise ProjectStoreError(
+                            "the project workspace changed after the accepted baseline; "
+                            "review the workspace before passing acceptance")
+                elif execution["application_status"] != "not_applicable":
+                    raise ProjectStoreError(
+                        "an analysis execution must remain non-applicable before passing acceptance")
+
+            version_ids = json.loads(task["input_versions_json"] or "[]")
+            requirement_ids = json.loads(task["requirement_ids_json"] or "[]")
+            pins = {
+                item["requirement_id"]: item["revision"]
+                for item in json.loads(task["requirement_revisions_json"] or "[]")
+            }
+            requirement_bindings = []
+            for requirement_id in requirement_ids:
+                revision = pins.get(requirement_id)
+                if revision is None:
+                    row = con.execute(
+                        "SELECT revision,acceptance_json FROM requirement WHERE id=?",
+                        (requirement_id,)).fetchone()
+                else:
+                    row = con.execute(
+                        """SELECT v.revision,v.acceptance_json FROM requirement r
+                            JOIN requirement_revision v ON v.requirement_id=r.id
+                            WHERE r.id=? AND v.revision=?""",
+                        (requirement_id, revision)).fetchone()
+                if not row:
+                    raise ProjectStoreError("task references a missing requirement revision")
+                requirement_bindings.append({
+                    "requirement_id": requirement_id,
+                    "revision": row["revision"],
+                    "acceptance_conditions": json.loads(row["acceptance_json"] or "[]"),
+                })
+            expected_conditions = [
+                (binding["requirement_id"], binding["revision"], condition.strip())
+                for binding in requirement_bindings
+                for condition in binding["acceptance_conditions"]
+            ]
+            normalized_condition_results = []
+            if expected_conditions:
+                if condition_results is None:
+                    raise ProjectStoreError(
+                        "acceptance requires a result for every pinned condition")
+                provided = {}
+                for item in condition_results:
+                    key = (item["requirement_id"], item["revision"], item["condition"].strip())
+                    if key in provided:
+                        raise ValueError("acceptance condition results contain a duplicate")
+                    provided[key] = item
+                if set(provided) != set(expected_conditions):
+                    raise ProjectStoreError(
+                        "acceptance condition results must match every pinned condition")
+                for requirement_id, revision, condition in expected_conditions:
+                    item = provided[(requirement_id, revision, condition)]
+                    normalized = {
+                        "requirement_id": requirement_id,
+                        "revision": revision,
+                        "condition": condition,
+                        "result": item["result"],
+                    }
+                    if item.get("note", "").strip():
+                        normalized["note"] = item["note"]
+                    normalized_condition_results.append(normalized)
+                results = [item["result"] for item in normalized_condition_results]
+                if status == "passed" and any(result != "passed" for result in results):
+                    raise ProjectStoreError(
+                        "passed acceptance requires every pinned condition to pass")
+                if status == "waived" and any(result != "waived" for result in results):
+                    raise ProjectStoreError(
+                        "waived acceptance requires every pinned condition to be waived")
+                if status == "failed" and "failed" not in results:
+                    raise ProjectStoreError(
+                        "failed acceptance requires at least one failed condition")
+            elif condition_results:
+                raise ProjectStoreError(
+                    "acceptance condition results do not match task requirements")
+            execution_id = execution["id"] if execution else None
+            application_state = json.loads(execution["application_state_json"] or "{}") if execution else {}
+            input_state = json.loads(execution["input_state_json"] or "{}") if execution else {}
+            baseline_id = (
+                application_state.get("accepted_baseline_id")
+                or application_state.get("baseline_id")
+                or (input_state.get("workspace_baseline") or {}).get("id")
+            )
+            execution_summary = (
+                f"execution {execution_id} · {execution['status']} · "
+                f"{execution['application_status']}"
+                if execution else "no execution recorded"
+            )
+            binding = {
+                "kind": "acceptance_binding",
+                "summary": f"{execution_summary} · baseline {baseline_id or 'none'}",
+                "execution_id": execution_id,
+                "baseline_id": baseline_id,
+                "document_version_ids": version_ids,
+                "requirement_bindings": requirement_bindings,
+                "condition_results": normalized_condition_results,
+                "recorded_at": now,
+            }
             con.execute("""UPDATE task SET acceptance_status=?,acceptance_evidence_json=?,
-                updated_at=? WHERE id=?""", (status, _json(evidence), now, task_id))
+                updated_at=? WHERE id=?""",
+                (status, _json(redact_value([*evidence, binding])), now, task_id))
             con.execute("UPDATE project SET updated_at=? WHERE id=?",
                         (now, task["project_id"]))
         return self.get_task(task_id)
+
+    def legacy_acceptance_migration(self, project_id: str) -> dict:
+        """Report legacy acceptance bindings without inferring human results."""
+        with self._connect() as con:
+            self._require_project(con, project_id)
+            rows = con.execute(
+                """SELECT id,acceptance_status,acceptance_evidence_json
+                FROM task WHERE project_id=? ORDER BY created_at,id""",
+                (project_id,)).fetchall()
+        records = []
+        for row in rows:
+            try:
+                evidence = json.loads(row["acceptance_evidence_json"] or "[]")
+            except (TypeError, json.JSONDecodeError):
+                records.append(_legacy_acceptance_record(
+                    row["id"], row["acceptance_status"], None, "invalid"))
+                continue
+            binding = next((item for item in evidence
+                            if isinstance(item, dict)
+                            and item.get("kind") == "acceptance_binding"), None) \
+                if isinstance(evidence, list) else None
+            if binding is not None:
+                records.append(_legacy_acceptance_record(
+                    row["id"], row["acceptance_status"], binding,
+                    _legacy_binding_status(binding)))
+        return _legacy_acceptance_report(project_id, records, dry_run=True)
+
+    def backfill_legacy_acceptance(self, project_id: str, confirmation: str) -> dict:
+        """Mark missing historical condition results without inventing them."""
+        if confirmation != LEGACY_ACCEPTANCE_BACKFILL_CONFIRMATION:
+            raise ProjectStoreError(
+                f"confirm must be exactly {LEGACY_ACCEPTANCE_BACKFILL_CONFIRMATION!r}")
+        now = _now()
+        updated = []
+        with self._transaction() as con:
+            self._require_project(con, project_id)
+            rows = con.execute(
+                """SELECT id,acceptance_evidence_json FROM task
+                WHERE project_id=? ORDER BY created_at,id""", (project_id,)).fetchall()
+            for row in rows:
+                try:
+                    evidence = json.loads(row["acceptance_evidence_json"] or "[]")
+                except (TypeError, json.JSONDecodeError):
+                    continue
+                if not isinstance(evidence, list):
+                    continue
+                for index, binding in enumerate(evidence):
+                    if not isinstance(binding, dict) \
+                            or binding.get("kind") != "acceptance_binding" \
+                            or binding.get("legacy_migration") \
+                            or _legacy_binding_status(binding) != "not_backfilled":
+                        continue
+                    source_fingerprint = hashlib.sha256(
+                        _json(evidence).encode("utf-8")).hexdigest()
+                    binding["condition_results"] = []
+                    binding["condition_results_status"] = "not_backfilled"
+                    binding["legacy_migration"] = {
+                        "schema": LEGACY_ACCEPTANCE_MIGRATION_SCHEMA,
+                        "source": "legacy_acceptance_binding",
+                        "source_fingerprint": source_fingerprint,
+                        "backfilled_at": now,
+                        "reason": "historical per-condition human result unavailable; no conclusion inferred",
+                    }
+                    evidence[index] = binding
+                    con.execute(
+                        """UPDATE task SET acceptance_evidence_json=?,updated_at=?
+                        WHERE id=?""", (_json(redact_value(evidence)), now, row["id"]))
+                    updated.append(row["id"])
+                    break
+            if updated:
+                con.execute("UPDATE project SET updated_at=? WHERE id=?", (now, project_id))
+        report = self.legacy_acceptance_migration(project_id)
+        report["backfilled_task_ids"] = updated
+        report["confirmation"] = LEGACY_ACCEPTANCE_BACKFILL_CONFIRMATION
+        return report
 
     def save_snapshot(self, project_id: str, snapshot: dict, phase: str,
                       task_id: str | None = None) -> dict:
@@ -1056,7 +1322,9 @@ class ProjectStore:
                  before_snapshot_id, _absolute_path(workdir, "workdir") if workdir else "",
                  _absolute_path(source_workdir, "source_workdir") if source_workdir else "",
                  application_status,
-                 _json(input_state or {}), _json(capabilities or {}), "{}", now, now))
+                 _json(redact_value(input_state or {})),
+                 _json(redact_value(capabilities or {})),
+                 "{}", now, now))
             except sqlite3.IntegrityError as error:
                 if (workdir and "execution.workdir" in str(error)) or \
                         (source_workdir and "execution.source_workdir" in str(error)):
@@ -1086,14 +1354,16 @@ class ProjectStore:
                 raise ProjectStoreError("execution not found")
             allowed = {
                 "pending": {"applying", "applied", "conflict", "failed", "superseded"},
-                "applying": {"applying", "applied", "conflict", "failed", "superseded"},
+                "applying": {"applied", "conflict", "failed", "superseded"},
                 "conflict": {"applying", "applied", "conflict", "failed", "superseded"},
                 "failed": {"applying", "applied", "conflict", "failed", "superseded"},
                 "applied": {"applied", "superseded"},
                 "superseded": {"superseded"},
                 "not_applicable": set(),
             }
-            if status not in allowed[row["application_status"]]:
+            if status not in allowed.get(row["application_status"], set()):
+                if status == "applying" and row["application_status"] == "applying":
+                    raise ProjectStoreError("execution result is already being applied")
                 raise ProjectStoreError("invalid execution application transition")
             if applied_snapshot_id:
                 owned = con.execute("""SELECT 1 FROM workspace_snapshot
@@ -1104,7 +1374,7 @@ class ProjectStore:
             con.execute("""UPDATE execution SET application_status=?,
                 application_state_json=?,applied_snapshot_id=COALESCE(?,applied_snapshot_id),
                 applied_at=?,updated_at=? WHERE id=?""",
-                (status, _json(state), applied_snapshot_id,
+                (status, _json(redact_value(state)), applied_snapshot_id,
                  now if status == "applied" else None, now, execution_id))
             con.execute("UPDATE project SET updated_at=? WHERE id=?",
                         (now, row["project_id"]))
@@ -1144,13 +1414,60 @@ class ProjectStore:
             con.execute("""UPDATE execution SET status=?,engine_message_id=COALESCE(?,engine_message_id),
                 after_snapshot_id=COALESCE(?,after_snapshot_id),raw_state_json=?,
                 updated_at=?,finished_at=? WHERE id=?""",
-                (state, engine_message_id, after_snapshot_id, _json(projection), now,
+                (state, engine_message_id, after_snapshot_id,
+                 _json(redact_value(projection)), now,
                  finished_at, execution_id))
-            con.execute("UPDATE task SET execution_status=?,updated_at=? WHERE id=?",
-                        (state, now, row["task_id"]))
+            latest = con.execute(
+                "SELECT id FROM execution WHERE task_id=? "
+                "ORDER BY created_at DESC,rowid DESC LIMIT 1",
+                (row["task_id"],),
+            ).fetchone()
+            if latest and latest["id"] == execution_id:
+                con.execute("UPDATE task SET execution_status=?,updated_at=? WHERE id=?",
+                            (state, now, row["task_id"]))
             con.execute("UPDATE project SET updated_at=? WHERE id=?",
                         (now, row["project_id"]))
         return self.get_execution(execution_id)
+
+    def redact_persisted_evidence(self) -> dict:
+        """Redact known secret patterns from existing technical evidence records."""
+        changed = {"executions": 0, "tasks": 0}
+        with self._transaction() as con:
+            execution_rows = con.execute(
+                "SELECT id,raw_state_json,input_state_json,capabilities_json,"
+                "application_state_json FROM execution").fetchall()
+            for row in execution_rows:
+                updates = {}
+                for column in (
+                        "raw_state_json", "input_state_json", "capabilities_json",
+                        "application_state_json"):
+                    try:
+                        value = json.loads(row[column] or "{}")
+                    except json.JSONDecodeError:
+                        continue
+                    redacted = redact_value(value)
+                    if redacted != value:
+                        updates[column] = _json(redacted)
+                if updates:
+                    assignments = ",".join(f"{column}=?" for column in updates)
+                    con.execute(
+                        f"UPDATE execution SET {assignments} WHERE id=?",
+                        (*updates.values(), row["id"]))
+                    changed["executions"] += 1
+            task_rows = con.execute(
+                "SELECT id,acceptance_evidence_json FROM task").fetchall()
+            for row in task_rows:
+                try:
+                    value = json.loads(row["acceptance_evidence_json"] or "[]")
+                except json.JSONDecodeError:
+                    continue
+                redacted = redact_value(value)
+                if redacted != value:
+                    con.execute(
+                        "UPDATE task SET acceptance_evidence_json=? WHERE id=?",
+                        (_json(redacted), row["id"]))
+                    changed["tasks"] += 1
+        return changed
 
     def get_execution(self, execution_id: str) -> dict:
         with self._connect() as con:
@@ -1614,6 +1931,121 @@ class ProjectStore:
         if not row:
             raise ProjectStoreError(f"{table} not found")
         return dict(row)
+
+
+def _legacy_condition_keys(values):
+    keys = set()
+    if not isinstance(values, list):
+        return None
+    for item in values:
+        if not isinstance(item, dict):
+            return None
+        requirement_id = item.get("requirement_id")
+        revision = item.get("revision")
+        condition = item.get("condition")
+        if (not isinstance(requirement_id, str) or not requirement_id.strip()
+                or not isinstance(revision, int) or isinstance(revision, bool)
+                or revision < 1 or not isinstance(condition, str)
+                or not condition.strip()):
+            return None
+        key = (requirement_id, revision, condition.strip())
+        if key in keys or item.get("result") not in ACCEPTANCE_CONDITION_STATES:
+            return None
+        keys.add(key)
+    return keys
+
+
+def _legacy_expected_conditions(binding):
+    if not isinstance(binding, dict):
+        return None
+    requirements = binding.get("requirement_bindings")
+    if not isinstance(requirements, list):
+        return None
+    expected = set()
+    for item in requirements:
+        if not isinstance(item, dict):
+            return None
+        requirement_id = item.get("requirement_id")
+        revision = item.get("revision")
+        conditions = item.get("acceptance_conditions")
+        if (not isinstance(requirement_id, str) or not requirement_id.strip()
+                or not isinstance(revision, int) or isinstance(revision, bool)
+                or revision < 1 or not isinstance(conditions, list)):
+            return None
+        for condition in conditions:
+            if not isinstance(condition, str) or not condition.strip():
+                return None
+            key = (requirement_id, revision, condition.strip())
+            if key in expected:
+                return None
+            expected.add(key)
+    return expected
+
+
+def _legacy_binding_status(binding):
+    expected = _legacy_expected_conditions(binding)
+    if expected is None:
+        return "needs_review"
+    if not expected:
+        return "no_conditions"
+    if isinstance(binding.get("legacy_migration"), dict) \
+            and binding["legacy_migration"].get("schema") == LEGACY_ACCEPTANCE_MIGRATION_SCHEMA:
+        return "backfilled"
+    if binding.get("condition_results_status") == "not_backfilled":
+        return "not_backfilled"
+    provided = binding.get("condition_results")
+    if provided is None:
+        return "not_backfilled"
+    provided_keys = _legacy_condition_keys(provided)
+    if provided_keys is None:
+        return "needs_review"
+    if provided_keys == expected:
+        return "complete"
+    if not provided:
+        return "not_backfilled"
+    return "needs_review"
+
+
+def _legacy_acceptance_record(task_id, acceptance_status, binding, status):
+    expected = _legacy_expected_conditions(binding) or set()
+    provided = binding.get("condition_results") if isinstance(binding, dict) else None
+    provided_keys = _legacy_condition_keys(provided) or set()
+    missing = [
+        {"requirement_id": requirement_id, "revision": revision, "condition": condition}
+        for requirement_id, revision, condition in sorted(expected - provided_keys)
+    ]
+    return {
+        "task_id": task_id,
+        "acceptance_status": acceptance_status,
+        "status": status,
+        "binding_recorded_at": binding.get("recorded_at") if isinstance(binding, dict) else None,
+        "expected_condition_count": len(expected),
+        "provided_condition_count": len(provided_keys),
+        "missing_conditions": missing,
+    }
+
+
+def _legacy_acceptance_report(project_id, records, dry_run=True):
+    summary = {
+        "total_bindings": len(records),
+        "complete": sum(item["status"] == "complete" for item in records),
+        "not_backfilled": sum(item["status"] == "not_backfilled" for item in records),
+        "backfilled": sum(item["status"] == "backfilled" for item in records),
+        "needs_review": sum(item["status"] == "needs_review" for item in records),
+        "no_conditions": sum(item["status"] == "no_conditions" for item in records),
+        "invalid": sum(item["status"] == "invalid" for item in records),
+    }
+    return {
+        "schema": LEGACY_ACCEPTANCE_MIGRATION_SCHEMA,
+        "project_id": project_id,
+        "dry_run": dry_run,
+        "transactional": True,
+        "idempotent": True,
+        "historical_results_inferred": False,
+        "generated_at": _now(),
+        "summary": summary,
+        "records": records,
+    }
 
 
 def _id(prefix: str) -> str:

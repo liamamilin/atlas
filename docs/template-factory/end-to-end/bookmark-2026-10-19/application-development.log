@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.application-delivery-receipt.v1",
+  "delivery_schema": "atlas.application-delivery.v1",
+  "phase": "P0",
+  "source_package_sha256": "93b5786c05e530252beef39644ba66614ddb0c93d4dd5c4facd23f237ad1fd73",
+  "source_context_sha256": "93b5786c05e530252beef39644ba66614ddb0c93d4dd5c4facd23f237ad1fd73",
+  "archive_sha256": "48a8f7d31b431a073a155c7e2a2489210f823683d77514759fee728c490a47d2",
+  "files_sha256": {
+    "README.md": "7faa3905d766dbbe4e49af05c7f370fc118160f59e8736378ed23d2b6809a52a",
+    "app/__init__.py": "9469dc4b6b75244f86c93ecdcfd8265b2b758952cac25d25f2009c9b5258da0f",
+    "app/__main__.py": "fb51d09e657e2d32efdede834cf098d2612b9a30a8c7c0dd205f5b51d5ef5425",
+    "app/config.py": "3fa66e7b1233cbc4e8b01556256336ae974c35a0c67ec631a2e7608f6e0c4ae9",
+    "app/server.py": "d76d5e9330af274fed0c2035c966864879abee5d849aca33e5794fe5e612d7ba",
+    "app/storage.py": "2d4bbd4ab4890c516e5bf64a7e1cdad37b41c1ea7ba2bf177fe8a855bfd16417",
+    "app/validation.py": "fb1f00cdd3ab5f0442aa613103750c0c1b0fdd05d8e3a50d64cd7e18a56c4bfe",
+    "app/views.py": "e923f629fd6d8d10fb1568285be871b9c06dbecc3157259ff5746b05f36ee01b",
+    "delivery.json": "4accad35f8399183eb6a8426a971c8434611b69f0160d2b505e9dd29b86cb38e"
+  },
+  "application_source_sha256": {
+    "README.md": "7faa3905d766dbbe4e49af05c7f370fc118160f59e8736378ed23d2b6809a52a",
+    "app/__init__.py": "9469dc4b6b75244f86c93ecdcfd8265b2b758952cac25d25f2009c9b5258da0f",
+    "app/__main__.py": "fb51d09e657e2d32efdede834cf098d2612b9a30a8c7c0dd205f5b51d5ef5425",
+    "app/config.py": "3fa66e7b1233cbc4e8b01556256336ae974c35a0c67ec631a2e7608f6e0c4ae9",
+    "app/server.py": "d76d5e9330af274fed0c2035c966864879abee5d849aca33e5794fe5e612d7ba",
+    "app/storage.py": "2d4bbd4ab4890c516e5bf64a7e1cdad37b41c1ea7ba2bf177fe8a855bfd16417",
+    "app/validation.py": "fb1f00cdd3ab5f0442aa613103750c0c1b0fdd05d8e3a50d64cd7e18a56c4bfe",
+    "app/views.py": "e923f629fd6d8d10fb1568285be871b9c06dbecc3157259ff5746b05f36ee01b"
+  },
+  "validated_metadata": {
+    "schema": "atlas.application-delivery.v1",
+    "app_root": ".",
+    "files": {
+      "README.md": "7faa3905d766dbbe4e49af05c7f370fc118160f59e8736378ed23d2b6809a52a",
+      "app/__init__.py": "9469dc4b6b75244f86c93ecdcfd8265b2b758952cac25d25f2009c9b5258da0f",
+      "app/__main__.py": "fb51d09e657e2d32efdede834cf098d2612b9a30a8c7c0dd205f5b51d5ef5425",
+      "app/config.py": "3fa66e7b1233cbc4e8b01556256336ae974c35a0c67ec631a2e7608f6e0c4ae9",
+      "app/server.py": "d76d5e9330af274fed0c2035c966864879abee5d849aca33e5794fe5e612d7ba",
+      "app/storage.py": "2d4bbd4ab4890c516e5bf64a7e1cdad37b41c1ea7ba2bf177fe8a855bfd16417",
+      "app/validation.py": "fb1f00cdd3ab5f0442aa613103750c0c1b0fdd05d8e3a50d64cd7e18a56c4bfe",
+      "app/views.py": "e923f629fd6d8d10fb1568285be871b9c06dbecc3157259ff5746b05f36ee01b"
+    },
+    "normalizations": [],
+    "runtime": {
+      "profile": "python-web",
+      "install": [],
+      "build": [],
+      "start": [
+        "python3",
+        "-m",
+        "app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+        "--data-dir",
+        "/state/data"
+      ],
+      "port": 8000,
+      "readiness_path": "/"
+    }
+  },
+  "frozen": true
+}

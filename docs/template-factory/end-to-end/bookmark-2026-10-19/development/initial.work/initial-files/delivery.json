@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.application-delivery.v1",
+  "root": ".",
+  "files": [
+    "README.md",
+    "app/__init__.py",
+    "app/__main__.py",
+    "app/config.py",
+    "app/storage.py",
+    "app/validation.py",
+    "app/views.py",
+    "app/server.py"
+  ],
+  "runtime": {
+    "profile": "python-web",
+    "install": [],
+    "build": [],
+    "start": ["python3", "-m", "app", "--host", "0.0.0.0", "--port", "8000", "--data-dir", "/state/data"],
+    "port": 8000,
+    "readiness_path": "/"
+  }
+}

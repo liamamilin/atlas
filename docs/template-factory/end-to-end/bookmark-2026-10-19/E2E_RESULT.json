@@ -1,0 +1,93 @@
+{
+ "schema": "atlas.pilot-e2e-result.v1",
+ "completed_at": "2026-10-19T03:58:17.327209+00:00",
+ "verdict": "passed",
+ "scope": "This bookmark P0 end-to-end flow only; real production, OpenCode application development, independent acceptance, model repair and retest.",
+ "model": "commandcode/deepseek/deepseek-v4.1-flash",
+ "reasoning_effort": "high",
+ "template": {
+  "id": "tpl_934bc93157f948b982459a9affa72c79",
+  "digest": "3bbcbb2a2685f188756e5b47dd27ac606f11f72359910e09023084758bd972c1",
+  "level": "L0",
+  "state": "draft",
+  "published": false
+ },
+ "application": {
+  "archive_sha256": "406f755e0177a9a6337ec7daec67484b89db27a154f07c3476b9d5048f1f6389",
+  "phase": "P0",
+  "source_package_sha256": "93b5786c05e530252beef39644ba66614ddb0c93d4dd5c4facd23f237ad1fd73",
+  "changed_files": [
+   "app/server.py",
+   "app/storage.py",
+   "app/validation.py"
+  ],
+  "manual_application_edits": false
+ },
+ "results": {
+  "frozen_cases_passed": 10,
+  "frozen_assertions_passed": 115,
+  "browser_checks_passed": 8,
+  "browser_observation_only": 1,
+  "real_restart_checks_passed": 6,
+  "crlf_rejected_without_dirty_data": true,
+  "concurrent_rounds": 20,
+  "initial_lost_acknowledged_writes_rounds": 6,
+  "final_lost_acknowledged_writes_rounds": 0,
+  "cleanup_verified": true,
+  "frozen_inputs_and_source_bindings_verified": true
+ },
+ "usage": {
+  "calls_with_session_id": 40,
+  "non_model_replays": 2,
+  "websearch_calls": 13,
+  "webfetch_calls": 3,
+  "session_usage_fields": {
+   "input": 1618074,
+   "output": 144250,
+   "reasoning": 461413,
+   "cache_read": 3815552,
+   "cache_write": 0
+  },
+  "assistant_messages_missing_tokens": 1
+ },
+ "regression": {
+  "discovered": 442,
+  "executed_passed": 434,
+  "opt_in_skipped": 8
+ },
+ "independent_evidence_review": {
+  "role": "sol_reviewer",
+  "mode": "read-only evidence and binding verification; not a test rerun",
+  "verdict": "No blocking mismatch; supports this bookmark P0 flow only"
+ },
+ "limits": [
+  "P1/P2 not implemented or run",
+  "Single case; not an A/B result, generic security certification or throughput guarantee",
+  "Browser Docker bridge egress not blocked; factory runtime separately network-none",
+  "One assistant usage message lacks tokens; fields may overlap and are not an invoice",
+  "Frozen template documentation and later-phase contract suggestions remain listed in README"
+ ],
+ "evidence_sha256": {
+  "run.json": "31e93d133252b66556c3b9ab996889dd78c97062c2d4bcb2c18512ff0c34620b",
+  "scenario.json": "835fd685630daeafbeb2602498f995ee6bdb5cf2382252bbcb66764086a434b1",
+  "cognitive-template.zip": "47c97f55d3e0f77f6425bff51076e7db5826f2a9cc91de19158dfc6cbbc6f715",
+  "development-package.zip": "5e8c8c0c3a227c15ef37a73b771abfc8a2ad506f48adcde720673e34b457d8aa",
+  "gates/cognition-acceptance-audit.json": "3ebb9ccad68f4d3bcfe95a798144d7280af2cb81ba240615b81bbd5355b8ad88",
+  "gates/app-repair-scope-audit.json": "88d0b2bf89970f63d519e6e907e07e83a618e34de84a1d94495e30d9ef44c0d1",
+  "runtime/initial/report.json": "44488722638d4148cf5eb2dbeaad6530420bea4fa471590812217944083bf399",
+  "runtime/repair-1/report.json": "aabcf2b4122a8f567e43ccc10e932e38925c7e120743e0e9720c194f60ac5f7c",
+  "evaluation/PLAN.md": "87698506065b6a66ad9b23897601345a24f48651fe8370d7abee49631ec09c89",
+  "evaluation/SCOPE_NOTE.md": "e792615d4f7eac7cddea72b26c3c7f16fe0d2c4029fa9841b0e27e81a31547e0",
+  "evaluation/freeze.json": "4fa15b363c7b190e8ae20d058f52fd4006b8b4326b00bead9b6dcd4f93ab778e",
+  "evaluation/INITIAL_ACCEPTANCE_REPORT.md": "d9cfbadeeda472b757b42ebad271d8b60a291baab7ece9b71d60d833c1930197",
+  "evaluation/FINAL_ACCEPTANCE_REPORT.md": "1b0903ce56fd2e169e0591ff6c9e591bfb205795f85a59bd68ae7c2590a7339f",
+  "evaluation/FINAL_ACCEPTANCE_REPORT.json": "e2d9e29212b3eef9e25c1fbdd623e9878c8e6ee749bb29fca6d05395c0ef8a81",
+  "evaluation/repair-1/run.json": "ed37d5926084af43be397ab4519d5900ad9b72d59d2b635dce8978317784dd54",
+  "evaluation/posthoc-http-3/run.json": "1cdb6620774a1de15764a7de7bcf77b3760d269c0fbc63a85c5ff028bae8f8f2",
+  "evaluation/posthoc-http-repair-1/run.json": "41cc6f56c274631cd680e1869accb9ba68ca402d689e8fc4aee589b10af0a2a0",
+  "development/repair-1/application.zip": "406f755e0177a9a6337ec7daec67484b89db27a154f07c3476b9d5048f1f6389",
+  "development/repair-1/delivery-receipt.json": "6530100a30c027292310f230d1a0da04beafd79064f6f7b6f5c0cac8ccc39c41",
+  "usage.json": "249293f9f081608dbff9cdb3a94c5e9c547081551ba2213242eebdd2b2ec7729",
+  "backend-regression.log": "456d8b66e2a5d7aff4a2374e4a8bac7b4583328aaef2e927477aada0dc6a5d0f"
+ }
+}

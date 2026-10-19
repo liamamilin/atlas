@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { getMeta, getSection } from "@/lib/atlas";
-import { useAsync, Loading, ErrorBox } from "@/components/loaders";
+import { useAsync, EmptyState, Loading, ErrorBox } from "@/components/loaders";
 import { LeafCard } from "@/components/leaf-card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -26,11 +26,20 @@ export function Browse() {
       <p className="mt-2 text-sm text-muted">
         {t("browseP", lang, { l0: meta.l0Count, sec: meta.sectionCount, leaf: meta.leafCount })}
       </p>
-      <div className="mt-8 space-y-6">
-        {meta.l0s.map((l0) => (
-          <DomainBlock key={l0.id} l0={l0} subs={l0.subs} />
-        ))}
-      </div>
+      {meta.l0s.length ? (
+        <div className="mt-8 space-y-6">
+          {meta.l0s.map((l0) => (
+            <DomainBlock key={l0.id} l0={l0} subs={l0.subs} />
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          className="mt-8"
+          title={lang === "zh" ? "类型目录为空" : "The type catalog is empty"}
+        >
+          {lang === "zh" ? "当前没有可浏览的领域或类型。" : "There are no domains or types to browse yet."}
+        </EmptyState>
+      )}
     </main>
   );
 }
@@ -50,7 +59,7 @@ function DomainBlock({
         <span className="mr-2 text-sm text-subtle">{l0.id}</span>
         {pick2(l0.name_zh, l0.name, lang)}
       </h2>
-      <div className="mt-4 grid items-start gap-4 lg:grid-cols-2">
+      <div className="mt-4 grid min-w-0 items-start gap-4 lg:grid-cols-2">
         {subs.map((s) => (
           <SubBlock key={s.id} sub={s} open={open === s.id} onToggle={() => setOpen(open === s.id ? null : s.id)} />
         ))}
@@ -72,11 +81,13 @@ function SubBlock({
   const [retry, setRetry] = useState(0);
   const { data, error } = useAsync(() => (open ? getSection(sub.id) : Promise.resolve(null)), [open, sub.id, retry]);
   return (
-    <div className="rounded-xl bg-surface shadow-card">
+    <div className="min-w-0 rounded-xl bg-surface shadow-card">
       <button
         type="button"
+        aria-expanded={open}
+        aria-controls={`section-${sub.id}`}
         onClick={onToggle}
-        className="flex w-full items-center gap-3 p-4 text-left"
+        className="flex min-w-0 w-full items-center gap-3 p-4 text-left"
       >
         <ChevronDown className={cn("size-4 shrink-0 text-subtle transition-transform", !open && "-rotate-90")} />
         <div className="min-w-0">
@@ -85,7 +96,7 @@ function SubBlock({
         </div>
       </button>
       {open ? (
-        <div className="border-t border-border p-4">
+        <div id={`section-${sub.id}`} className="border-t border-border p-4">
           {error ? (
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm text-danger">{t("loadFailed", lang)}</p>

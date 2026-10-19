@@ -1,0 +1,63 @@
+{
+  "kind": "posthoc diagnostic plus repair category negative checks; not a change to R01-R09",
+  "categoryChecks": [
+    {
+      "label": "blank",
+      "name": "   ",
+      "feedback": [
+        "分类名称不能为空，请填写有效名称后再创建。"
+      ],
+      "retainedInput": "",
+      "actualCategoryLinkCount": 0
+    },
+    {
+      "label": "create",
+      "name": "诊断分类",
+      "feedback": [],
+      "retainedInput": "",
+      "actualCategoryLinkCount": 1
+    },
+    {
+      "label": "duplicate",
+      "name": "诊断分类",
+      "feedback": [
+        "分类「诊断分类」已存在，请直接选择它或换一个名称。"
+      ],
+      "retainedInput": "诊断分类",
+      "actualCategoryLinkCount": 1
+    },
+    {
+      "label": "move",
+      "destination": "诊断分类",
+      "readback": "诊断分类"
+    },
+    {
+      "label": "move",
+      "destination": "未分类（以后看看）",
+      "readback": "未分类"
+    }
+  ],
+  "attemptedTitleLength": 1001000,
+  "attemptedTitleSha256": "952e972d39e734b84d098b354df1ffaaa140f183d28665e9f9a161cd54fc7cc5",
+  "submittedTitleLength": 1001000,
+  "submittedTitleSha256": "952e972d39e734b84d098b354df1ffaaa140f183d28665e9f9a161cd54fc7cc5",
+  "submittedBodyBytes": 1001144,
+  "httpStatus": 413,
+  "immediateBody": "生活待购与灵感收藏夹\n\n把偶然看到、暂时不处理的网页链接先存起来；需要时再按分类或关键词找回来，并回到原页面。\n\n分类\n全部\n未分类\n诊断分类\n新建分类\n创建分类\n\n在上方填写名称即可独立新建分类；保存记录时也可以顺手新建。\n\n提交内容过大：单次请求上限为 1000000 字节，本次声明 1001144 字节。整份请求已被拒绝，未解析、未保存任何内容，现有记录保持不变；被拒绝的正文不会保留，请缩小后重新填写并提交。\n\n保存链接\n链接 URL（必填）\n标题（可选）\n备注（最多 2000 字）\n分类（可选，不选则进入未分类）\n未分类（以后看看）\n诊断分类\n新建分类（可选）\n保存到收藏夹\n搜索关键词\n搜索\n原有记录保持完整\n未分类\n\nhttps://example.com/diagnostic/existing\n\n保存于 2026-10-18 18:55 UTC\n\n移动到分类\n未分类（以后看看）\n诊断分类\n移动",
+  "before": [
+    {
+      "url": "https://example.com/diagnostic/existing",
+      "title": "原有记录保持完整"
+    }
+  ],
+  "after": [
+    {
+      "url": "https://example.com/diagnostic/existing",
+      "titleLength": 8
+    }
+  ],
+  "fullSubmissionVerified": true,
+  "existingRecordPreserved": true,
+  "outcome": "explicitly_rejected_413_no_new_record",
+  "blockedOrigins": []
+}

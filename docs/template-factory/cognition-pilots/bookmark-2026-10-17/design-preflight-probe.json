@@ -1,0 +1,65 @@
+{
+  "outcome": "blocked",
+  "summary": "静态设计复审（本次仅阅读草案与调研，未运行程序）：P0–P2 的场景范围与阶段划分基本对齐，但当前草案不能按现状放行。主要阻塞是单条书签软删除在浏览器中没有入口，P1 验收因此无法证明“删除→回收站→恢复”，读取 API 的 Host 防护与 categoryId 契约也相互矛盾；另有一处决策默认值待明确。以下结论不声称任何验收已通过。",
+  "checks": [
+    {
+      "dimension": "scenario_scope",
+      "outcome": "passed",
+      "files": [
+        "DRAFT.md",
+        "RESEARCH.md"
+      ],
+      "reason": "已确认场景的四项验收——跨会话持久、URL 锚定跳转、归类移动/新建且刷新后生效、归类浏览或关键字检索——分别落到 F02/F05/F08-F09/F13-F14 与 A02/A05/A29/A32-A33；账号、公开分享、快照、全文检索、导入导出、批量与扩展均被显式列为后续或不适用，没有把企业能力带进本期。保存时直接选归类的 workflow 只由表单 select 暗示，未在阶段验收中体现，但可由保存后移动完成，属于完整性问题而非范围蔓延。"
+    },
+    {
+      "dimension": "product_completeness",
+      "outcome": "blocked",
+      "files": [
+        "DRAFT.md",
+        "ARCHITECTURE.md"
+      ],
+      "reason": "F11 是 P1 当前必需，但 §8 的列表行只有 open-link、move-form、bookmark-edit-form，没有单条书签删除控件；DELETE /api/bookmarks/{id} 只给 HTTP 客户端能力。A30 当前只通过删除整个归类把记录送进回收站，A31 又直接假设回收站已有记录，因此“删除单条→回收站→恢复”没有浏览器入口。另有：§8 未定义到 /trash 的导航链接；F04 要求列表显示 URL 与添加时间，但行 DOM 与 A07/A28 均未包含或断言；D02 的“可打开或确认后另存”在 UI 只有 form-error，没有打开既有记录或 allowDuplicate 控件；保存表单的 categoryId 选项与默认未说明，也没有保存时直接选归类的 UI 用例。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "outcome": "blocked",
+      "files": [
+        "ARCHITECTURE.md",
+        "DRAFT.md"
+      ],
+      "reason": "§4 把请求体 categoryId 限定为十进制字符串或正整数，并只说 PATCH null 返回 400，但 F03/A03 要求 POST 缺省或 null 落入默认归类；应明确 POST null=默认、PATCH null=400，否则实现与验收冲突。§2/D06 只对“变更数据”的 API/表单校验 Host，GET /api/bookmarks、/api/categories、/api/trash 不校验 Host，这与“所有数据私有、无匿名读取路径”和“防 DNS 重绑定”的承诺冲突；重绑定页面可读取收藏数据。另，F04 的列表 URL/时间在 §8 行契约中缺失，与产品维度指出的不一致相同。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "outcome": "blocked",
+      "files": [
+        "DRAFT.md",
+        "ARCHITECTURE.md"
+      ],
+      "reason": "P1 目标宣称“删除记录进入回收站并可恢复”，但 A16/A18 只测 API DELETE，A30 用归类 purge 造回收站数据，A31 再来恢复；没有“UI 删除单条书签”的验收，且 A31 若复用 A30 的 purge 记录，原归类已 tombstone，省略目标的恢复会 fallback 到默认归类，无法满足“显示原归类名”。A31 也未测“恢复到指定归类”；A29 只测空名称，未测 F08 要求的重名 form-error。A28 的空库手工核对与 A30 的确认清空未执行是显式声明，不作为阻塞。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "outcome": "uncertain",
+      "files": [
+        "DRAFT.md"
+      ],
+      "reason": "D01/D03–D09 的默认值与 ask trigger 基本明确且可逆：单归属+未分类、删除归类显式 move/purge、不抓取、保守归一、回收站不过期、P3 范围、重启 adapter/浏览器认证边界。D02 的默认承诺“可打开或确认后另存”没有对应浏览器控件，PUBLIC_ORIGIN 也没有默认值或未配置时的启动失败约定；这两处使默认行为不能仅凭草案唯一确定，需在实现前补明。"
+    }
+  ],
+  "suggestions": [
+    "在 §8 列表行增加单条书签软删除表单（明确按钮与成功 flash，软删除可逆，不强制二次确认）和到 /trash 的导航链接；补 ui-p1 用例覆盖“UI 删除单条→回收站→不选目标恢复→首页原归类名”，并让 A31 用活跃归类中的 API DELETE 记录作前置，避免复用 A30 的归类 purge 记录。",
+    "把 F04 的 URL 与添加时间落实为行内可断言元素（如 bookmark-url、bookmark-created），在 A07/A28 中断言；若本期不展示，则从 F04 删除该承诺。",
+    "让 D02 的重复保存恢复路径在浏览器可达：409 form-error 提供打开既有记录链接与明确“仍然保存（allowDuplicate=true）”控件，并在 A28 断言；否则收窄 D02 文案。",
+    "统一 categoryId 契约：POST 缺省或 null → 默认归类；PATCH null/空串 → 400 invalid_category；同步 §4、A01/A03/A20。",
+    "将 Host 校验扩展到读取 API（至少 /api/bookmarks、/api/categories、/api/trash），或在 D06/§2 明确收窄隐私承诺；A09 增加错误 Host 读取 400 invalid_host 的负例，并规定 PUBLIC_ORIGIN 的默认或必填/启动失败。",
+    "明确保存表单 categoryId 的选项与默认（P1 列出活跃归类，默认未分类），补一条保存时直接选归类的 UI 用例，或在场景/F01 中明确只支持保存后移动。",
+    "A29 增加重名归类的 form-error；A31 增加“恢复到指定归类”的 UI 断言；A30 的确认清空继续作为显式未执行手工项。",
+    "为 A18 的 DELETE /api/trash?confirm=true 增加专用实例标记或 --allow-destructive 技术护栏，避免误清空真实收藏库的回收站。"
+  ],
+  "scope": "Independent specification design probe only; no program generation, execution, publication or source refresh.",
+  "artifact_digest": "8480ac173324c2cb12c6efbd224accc9e5de50b0387d2fc0fd6666680c91e042",
+  "proposal_digest": "6a5f8c4076451e0983eef849cfa1294ad6bb3535228e33f76bc31d600e7d391c",
+  "implementation_observed_after_sha256": "11de09128457f5519b5fa6dc87687643fe292d697b1dc0364d5826eedd5605d9",
+  "implementation_hash_note": "This probe driver initially hashed the source after the call. Source changed during the call; this hash is an end observation, not an invocation-version attestation. Subsequent driver revisions capture source and prompt hashes before invocation."
+}

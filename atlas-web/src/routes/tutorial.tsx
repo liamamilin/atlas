@@ -15,9 +15,40 @@ function forWeb(md: string) {
     .replace(/\[([^\]]+)\]\((?!https?:\/\/|#|mailto:)([^)]+)\)/g, (_match, _label, href: string) => `\`${href}\``);
 }
 
+const tutorialEnglish = forWeb(`
+# Atlas Tutorial
+
+## 1. Choose a starting point
+
+Start from a new idea, an existing project, or an Agent Harness study. Choose a concrete outcome before opening a provider session.
+
+## 2. Pin evidence
+
+Browse the type tree or search the catalog. Pin the complete type document, the relevant section, and a short project note so later runs use a reviewable source version.
+
+## 3. Shape the project
+
+Use the project workspace to record open questions, conflicts, suggestions, requirements, and decisions. AI output remains a proposal until you review and confirm it.
+
+## 4. Create an iteration and execute
+
+Approve the documents you want to freeze, create an iteration, and define bounded write paths and fixed verification commands. OpenCode runs in an isolated copy; the source workspace is not changed automatically.
+
+## 5. Apply and accept
+
+Inspect the diff and verification evidence, explicitly apply or reject the result, then record product acceptance separately from engine completion.
+
+## Safety boundaries
+
+Atlas does not automatically commit, push, deploy, publish, delete repositories, or write outside the declared project boundary. Keep credentials out of prompts and evidence, and stop when a decision requires human review.
+`);
+
 export function Tutorial() {
   const { lang } = useLang();
-  const md = useMemo(() => forWeb(tutorialMd), []);
+  const md = useMemo(
+    () => lang === "zh" ? forWeb(tutorialMd) : tutorialEnglish,
+    [lang],
+  );
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
       <h1 className="font-serif text-3xl font-medium">{t("tutorial", lang)}</h1>

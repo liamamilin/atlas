@@ -1,0 +1,970 @@
+{
+  "date": "2026-10-17",
+  "batch_id": "bat_218ad08189cc42cd8ec4a77c08680df5",
+  "full_document_recheck_batch_id": "bat_cfefcf7d55f1414e8f5ed39b1182b990",
+  "model": "open-design/deepseek-v4.1-flash",
+  "leaves": [
+    "task-management-application",
+    "bookmark-manager"
+  ],
+  "generation_concurrency": 2,
+  "generated_scenarios": 6,
+  "review_outcomes": {
+    "passed": 3,
+    "needs_changes": 3,
+    "rejected": 0
+  },
+  "all_generated_scenes_remain_draft": true,
+  "new_confirmations": 0,
+  "new_templates": 0,
+  "new_leaf_coverage": 0,
+  "coverage_note": "Both leaves had prior trial scenarios; this validates the integrated production/review loop, not broader type coverage.",
+  "initial_scenarios": [
+    {
+      "id": "scn_7756e0007f6a463a97316f3f49c15248",
+      "revision": 2,
+      "status": "ready"
+    },
+    {
+      "id": "scn_133dcc8698b946f7acf110aaecc37783",
+      "revision": 1,
+      "status": "draft"
+    },
+    {
+      "id": "scn_722423687c5e417185ac3963a57286a3",
+      "revision": 1,
+      "status": "draft"
+    },
+    {
+      "id": "scn_3d2691ba3380442e971f1131f3ae7379",
+      "revision": 1,
+      "status": "draft"
+    }
+  ],
+  "final_scenarios": [
+    {
+      "id": "scn_374d3e68906d4e0f94cbce2df195d5d6",
+      "leaf": "task-management-application",
+      "name": "Freelance consultant's weekly capture-to-completion loop",
+      "audience": "Solo independent consultants and freelancers juggling several client engagements plus their own admin and business-development work in one account.",
+      "objective": "Turn an undifferentiated stream of client requests, meeting notes, and self-generated admin into a scheduled, prioritized population of tasks that is worked from daily rather than merely remembered.",
+      "workflow": [
+        "Capture every incoming request and follow-up into a single Inbox container in one action, with no required fields, during calls or between meetings.",
+        "Triage the Inbox daily: assign each captured task to a client container or Personal, add a due date where a deadline exists, set priority, and attach a label for context (onsite, phone, deep-work).",
+        "Decompose any task larger than one sitting into sub-tasks inside the parent task, so 'Draft Q3 report' becomes outline, data pull, review, and send.",
+        "Schedule the week in the Upcoming and Calendar views, placing fixed client commitments on their dates and pulling priority-flagged tasks forward into free slots.",
+        "Work from the Today view each morning, ordering tasks by due date and priority and checking items off as they are finished so the open population shrinks in real time.",
+        "Set recurring tasks for weekly invoicing, monthly expense submission, and quarterly tax reserve, and let each instance re-materialize when its cycle advances.",
+        "Review the week's unfinished tasks on Friday, rescheduling rather than abandoning them, and complete a short weekly planning pass for the next cycle."
+      ],
+      "acceptance": [
+        "Every captured item appears immediately as an individual open task in the Inbox and can be opened, edited, moved, or completed on its own.",
+        "A task created as a sub-task appears nested under its parent and can be completed independently without closing the parent.",
+        "A due date or priority assigned in triage causes the task to appear in the corresponding Today, Upcoming, or Calendar view without further manual placement.",
+        "Completing a task removes it from open execution views while preserving its record, and a recurring task reappears with a new date when its cycle advances.",
+        "Filtering by label or container returns exactly the tasks carrying that label or belonging to that container."
+      ],
+      "status": "draft",
+      "revision": 1,
+      "final_review": {
+        "checks": [
+          {
+            "dimension": "leaf_fit",
+            "outcome": "passed",
+            "reason": "The scenario instantiates all three jointly-held structures of the defining core. Task-as-unit-of-record and open→done: acceptance #1 (captured item appears as an individual open task that can be opened, edited, moved, completed) and #4 (completing removes from open views while preserving the record). Managed organization: workflow steps 2–3 assign client/Personal containers, labels and priority and decompose into sub-tasks, matching 'managed organization (containers, decomposition, classification)'. Execution views over the population: acceptance #3 and #5 (due/priority drives Today/Upcoming/Calendar; filtering by label/container) match 'execution views over the population' and 'the daily surface is computed from the population's attributes'. Recurrence: acceptance #4 matches 'Completing an occurrence of a recurring task generates the next one on the rule's schedule.'"
+          },
+          {
+            "dimension": "distinctness",
+            "outcome": "needs_changes",
+            "reason": "User, goal and workflow materially overlap peer scn_3d2691ba3380442e971f1131f3ae7379 ('Personal Week Planner'). Same user: that peer's audience is '独立工作者、自由职业者或知识工作者' (independent worker/freelancer) managing professional and personal matters, essentially the scenario's 'Solo independent consultants and freelancers'. Same goal: capture scattered items into tasks, organize by container/label/priority/due date, then work from Today/Upcoming until done. Same workflow loop: peer steps '收件箱中快速录入' → '归入容器…打标签、设优先级…拆成若干子任务' → Today/Upcoming → mark complete → '周期结束…回顾未完成任务，重新安排'; the scenario mirrors this with Inbox capture → client/Personal container + label/priority → sub-tasks → Upcoming/Calendar → Today → complete → Friday review/reschedule. The scenario's additions either are mechanism inside the same loop (Calendar placement, triage detail) or duplicate the separate recurrence peer (scn_722423687c5e417185ac3963a57286a3 — recurring re-materialization), leaving no distinct user/goal center of gravity. Compared but distinct: scn_133dcc8698b946f7acf110aaecc37783 and scn_67279018432643158b706ee0b4f9abfe (team/shared-list collaboration with assignment and comments — the scenario is solo), scn_9738941d26b6488ea798faec18bbcc50 (student coursework audience) and scn_722423687c5e417185ac3963a57286a3 (recurrence-first routine audience)."
+          },
+          {
+            "dimension": "workflow",
+            "outcome": "passed",
+            "reason": "The seven steps form a coherent, usable end-to-end loop matching the leaf's 'Capture → organize → work → complete → review': (1) one-action Inbox capture with no required fields; (2) daily triage into client/Personal containers with due date, priority, label; (3) decomposition into sub-tasks; (4) weekly scheduling in Upcoming/Calendar; (5) daily work from Today ordered by due date and priority; (6) recurring admin tasks that re-materialize; (7) Friday review that reschedules rather than abandons. Each step has a clear trigger and output, and the loop closes back into the next cycle."
+          },
+          {
+            "dimension": "testability",
+            "outcome": "passed",
+            "reason": "The five acceptance criteria are observable and cover the flow: #1 capture produces an immediately visible, individually actionable open task in the Inbox; #2 sub-task nesting and independent completion of the sub-task with the parent remaining open; #3 a due date or priority set in triage deterministically places the task in Today/Upcoming/Calendar with no manual placement; #4 completion removes the task from open views while the record persists and a recurring instance reappears with a new date; #5 filtering by label or container returns exactly the matching set. These are checkable by inspecting view membership and record state rather than implementation internals."
+          },
+          {
+            "dimension": "scope",
+            "outcome": "passed",
+            "reason": "Boundaries are reasonable and stay within the Type: a single solo account, containers including an Inbox plus client and Personal containers, sub-tasks, labels, priority, date-driven views, completion history and recurrence. No unsupported assumptions are introduced (no team membership, approvals, custom workflow states or progress rollup, which the leaf explicitly places outside this Type). The scenario is internally consistent: the objective ('worked from daily rather than merely remembered') maps to Today-view execution in steps 4–5, and the acceptance criteria reference the same Inbox, client/Personal containers and Today/Upcoming/Calendar views named in the workflow."
+          }
+        ],
+        "created_at": "2026-10-16T19:24:43.674467+00:00",
+        "id": "scv_ca0cbe89a74b466f96155035dbfcca0d",
+        "input_digest": "df6767891fc4ec87c50bc6185757a97542a0771c50653b9fe29c08bd59d8f804",
+        "job_id": "job_22b6268d9fad41a8b9344b104d8927ac",
+        "leaf_fingerprint": "816ab50adb110ae50fd8df449c7437b434bb8970266b1196385b1116e623899c",
+        "leaf_quotes": [
+          "A **Task Management Application** is an application whose world is a population of **tasks** — individually addressable, completable records of discrete items of work — which the user organizes into managed structures (containers, sub-tasks, labels, priorities) and works from through execution views (today/upcoming, calendar, board, filters) that the tasks' own attributes drive.",
+          "- task as the unit of record, open → done",
+          "- managed organization (containers, decomposition, classification)",
+          "- execution views over the population",
+          "Completing an occurrence of a recurring task generates the next one on the rule's schedule.",
+          "**Completion is the engine.** Everything the application reports — progress, streaks, overdue counts — derives from completion acts and due dates; no one approves, routes, or transitions the record through states."
+        ],
+        "model": "open-design/deepseek-v4.1-flash",
+        "outcome": "needs_changes",
+        "peer_digest": "c00b3fcd6e63876dfcde363b15f630d68b3281218cd7525cf1c700dc87bf9461",
+        "peer_scenarios": [
+          {
+            "id": "scn_133dcc8698b946f7acf110aaecc37783",
+            "name": "小组共享清单协作（Small-Team Shared List）",
+            "revision": 1
+          },
+          {
+            "id": "scn_3d2691ba3380442e971f1131f3ae7379",
+            "name": "个人周计划工作台（Personal Week Planner）",
+            "revision": 1
+          },
+          {
+            "id": "scn_67279018432643158b706ee0b4f9abfe",
+            "name": "Small team shared list for delegation and follow-through",
+            "revision": 1
+          },
+          {
+            "id": "scn_722423687c5e417185ac3963a57286a3",
+            "name": "周期性事务复位（Recurring Routine Scheduler）",
+            "revision": 1
+          },
+          {
+            "id": "scn_9738941d26b6488ea798faec18bbcc50",
+            "name": "Student's term planning across coursework and personal life",
+            "revision": 1
+          }
+        ],
+        "related_scenario_ids": [
+          "scn_3d2691ba3380442e971f1131f3ae7379"
+        ],
+        "scenario_id": "scn_374d3e68906d4e0f94cbce2df195d5d6",
+        "scenario_revision": 1,
+        "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+        "suggestions": [
+          "Differentiate the scenario from scn_3d2691ba3380442e971f1131f3ae7379 ('Personal Week Planner') by making the professional client-context the organizing spine rather than the generic capture→container→Today loop: e.g. give the scenario a goal centered on context-switching across multiple client engagements and separating billable client work from internal business-development/admin, with acceptance criteria that assert per-client container isolation and cross-client view behavior.",
+          "Drop or reduce the parts that duplicate other peers so the scenario has a distinct center: the recurring weekly-invoicing/monthly-expense/quarterly-tax step duplicates scn_722423687c5e417185ac3963a57286a3 ('Recurring Routine Scheduler') — either remove it or make it incidental rather than a named workflow step.",
+          "Add an observable acceptance criterion for workflow step 7 (Friday review): unfinished tasks that are rescheduled receive a new due date and consequently appear in the correct Upcoming/Today view, so the review-and-reschedule behavior is testable rather than only implied."
+        ],
+        "summary": "The scenario ('Freelance consultant's weekly capture-to-completion loop') is a well-formed, internally consistent task-management scenario that clearly exercises the leaf's defining core: an Inbox-populated task record (open → done), managed organization via client containers/Personal, sub-tasks, labels and priority, and execution views (Today/Upcoming/Calendar) computed from attributes, plus recurring re-materialization. leaf_fit, workflow, testability and scope pass on the supplied evidence. The blocking issue is distinctness: the declared user, goal and workflow are substantially the same as peer scn_3d2691ba3380442e971f1131f3ae7379 ('个人周计划工作台 / Personal Week Planner'), whose audience is the same solo freelancer/independent worker, whose objective is the same capture-organize-work-complete loop, and whose workflow duplicates capture-to-Inbox → container/label/priority → sub-tasks → Today/Upcoming → complete → periodic review/reschedule. The scenario's main differentiators (recurring admin tasks; client-engagement framing) either sit inside that same loop or overlap the separate recurrence peer, so a revision should sharpen the professional client-context spine. Limits: this is a scoped review of one scenario against the pinned leaf and the five supplied peers; no runtime, market or full-corpus deduplication is claimed, and tech stack, thresholds and implementation detail were not required.",
+        "current": true
+      },
+      "earlier_reviews": [
+        {
+          "id": "scv_8e7cb788d33e41f0bfcefe7eb3b60997",
+          "job_id": "job_86b66b0b9e7c49b38a2bf3170552f5c5",
+          "outcome": "needs_changes",
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "summary": "The scenario is a solid, in-scope instantiation of the Task Management Application leaf: a solo consultant captures into an Inbox, triages into client containers with due date/priority/label, decomposes into sub-tasks, schedules in Upcoming/Calendar, works from Today, uses recurring routines, and reviews weekly. Leaf fit, workflow coherence, testability and scope all hold. The one real problem is distinctness: it is materially the same user, goal and end-to-end loop as the supplied peer scn_3d2691ba3380442e971f1131f3ae7379 (freelancer/independent-worker personal week planner), so it currently reads as a near-duplicate with client-engagement naming rather than a genuinely distinct scenario. This is a repairable overlap, not a fundamentally unsuitable scenario. The review is scoped to the single supplied leaf, this scenario and the five supplied peers; it is not a full-corpus deduplication and makes no runtime, market or implementability claim."
+        }
+      ]
+    },
+    {
+      "id": "scn_67279018432643158b706ee0b4f9abfe",
+      "leaf": "task-management-application",
+      "name": "Small team shared list for delegation and follow-through",
+      "audience": "Leads and members of small teams (5-15 people) who need a shared place to hand off tasks and see what has been completed, without adopting a heavy workflow tool.",
+      "objective": "Coordinate a small group's work through shared containers where tasks are assigned to members and completion is visible to everyone, keeping every record in the simple open-or-done state.",
+      "workflow": [
+        "Create one shared container per active workstream or client and add the whole team as members of that container.",
+        "Have members add tasks directly to the shared container, and have the lead add tasks and assign each one to a named member.",
+        "When delegating a large item, break it into sub-tasks and assign each sub-task to the right member, keeping the parent as the overall item.",
+        "Use priority and due dates to signal what matters this week, and attach labels such as blocked, waiting-on-client, or review to make status legible from attributes rather than from separate states.",
+        "Discuss specifics by commenting on the task itself so the conversation stays attached to the work item instead of scattering across chat.",
+        "Members work from a personal Today view that surfaces the tasks assigned to them alongside their private tasks in a clearly separated space.",
+        "The group scans the shared container's open and completed tasks at the end of the week to see what moved and what did not."
+      ],
+      "acceptance": [
+        "A task assigned to a member appears in that member's assigned-task view while remaining visible in the shared container to all members.",
+        "A comment added to a task is visible to every member of its container and stays attached when the task is reassigned.",
+        "When a member completes an assigned task, its completion is observable to the other container members without any additional reporting action.",
+        "Sub-tasks can be completed and assigned independently of the parent task, and the parent remains open until it is completed directly.",
+        "A member's personal tasks never appear in a shared container unless the member deliberately moves or shares them."
+      ],
+      "status": "draft",
+      "revision": 1,
+      "final_review": {
+        "checks": [
+          {
+            "dimension": "leaf_fit",
+            "outcome": "passed",
+            "reason": "The scenario targets the leaf's exact defining core: it keeps records in the two-state grammar ('keeping every record in the simple open-or-done state' against the leaf's 'A task is open or done.'), organizes 'shared containers' with sub-tasks/priority/labels, and works from an execution view ('personal Today view'). It matches the leaf's second user directly — 'Small groups and teams are the second user: shared lists or shared projects where members add tasks, assign them to each other, comment, and watch completion happen.' — and stays inside the leaf's collaboration boundary ('assignment selects an owner inside that circle'), explicitly avoiding workflow states, approval chains, or role machinery."
+          },
+          {
+            "dimension": "distinctness",
+            "outcome": "needs_changes",
+            "reason": "Material overlap with scn_133dcc8698b946f7acf110aaecc37783: same user (small team/family/interest group needing shared day-to-day cooperation vs. leads/members of 5-15 person teams), same goal (shared list where members add tasks, assign each other, comment, and see completion under a unified two-state status), and same workflow arc (create shared list → invite members → add and assign tasks → comment on the task → complete with status visible to all). The scenario's acceptance criteria 1-3 (assigned task appears in assignee's view while staying in the shared container; comments visible to every member; completion observable to other members) restate that peer's criteria almost verbatim. The other peers were compared and are distinct: scn_374d3e68906d4e0f94cbce2df195d5d6 (solo freelancer capture-to-completion), scn_3d2691ba3380442e971f1131f3ae7379 (personal week planner), scn_722423687c5e417185ac3963a57286a3 (recurring routine reset), and scn_9738941d26b6488ea798faec18bbcc50 (student term planning) are all single-actor scenarios with different audiences, objectives, and workflows."
+          },
+          {
+            "dimension": "workflow",
+            "outcome": "passed",
+            "reason": "The seven steps form a coherent end-to-end loop consistent with the leaf's canonical capture→organize→work→complete→review: create one shared container per workstream/client and add members; members and lead add tasks with assignment; decompose large items into assigned sub-tasks; signal urgency with priority/due dates and legible status via labels; comment on the task so discussion stays attached; work from a personal Today view separating assigned and private tasks; scan the container's open/completed tasks weekly. Each step has a clear actor and predecessor, and the whole is usable as described without missing transitions."
+          },
+          {
+            "dimension": "testability",
+            "outcome": "passed",
+            "reason": "The five acceptance criteria are observable and cover the workflow's critical claims: assigned task appears in the member's assigned-task view while remaining visible in the shared container to all; a comment is visible to every container member and survives reassignment; completion of an assigned task is observable to other members without a separate reporting action; sub-tasks complete/assign independently while the parent stays open until completed directly; personal tasks never surface in a shared container unless deliberately moved or shared. Each corresponds to a concrete action the described workflow performs (assignment, commenting/reassignment, completion, decomposition, personal/shared separation), so they are evaluable without implementation detail."
+          },
+          {
+            "dimension": "scope",
+            "outcome": "passed",
+            "reason": "Boundaries are reasonable and internally consistent: the audience is bounded to small teams of 5-15, the two-state grammar is repeatedly preserved ('rather than from separate states'), and no unsupported machinery (approvals, workflow states, progress rollup on containers, org roles) is assumed. The personal-vs-shared separation step is backed by the leaf's common/optional variant 'separated personal vs team workspaces in one account', and the sub-task/parent-open rule is a legitimate choice within the leaf's note that sub-task cascade rules vary. Remaining choices (specific labels, container count, review cadence) are usage detail, not unsupported assumptions."
+          }
+        ],
+        "created_at": "2026-10-16T19:22:54.834453+00:00",
+        "id": "scv_fc7dbcb8775840218cecff95776beaee",
+        "input_digest": "33b249c999e79966c0856a18ea9933ed065159b7888d2f829ae73317594bc6bb",
+        "job_id": "job_7ecd66b587494585a978847ecd67c675",
+        "leaf_fingerprint": "816ab50adb110ae50fd8df449c7437b434bb8970266b1196385b1116e623899c",
+        "leaf_quotes": [
+          "A task is open or done.",
+          "**Small groups and teams** are the second user: shared lists or shared projects where members add tasks, **assign** them to each other, comment, and watch completion happen.",
+          "Sharing happens at the container level: members of a shared list/project can edit its tasks, and assignment selects an owner inside that circle. Personal containers remain private unless deliberately shared."
+        ],
+        "model": "open-design/deepseek-v4.1-flash",
+        "outcome": "needs_changes",
+        "peer_digest": "2b819c7d56cf6dae97c66bfaecb891a93c5a217a5c7ba15489e97a9e24966afa",
+        "peer_scenarios": [
+          {
+            "id": "scn_133dcc8698b946f7acf110aaecc37783",
+            "name": "小组共享清单协作（Small-Team Shared List）",
+            "revision": 1
+          },
+          {
+            "id": "scn_374d3e68906d4e0f94cbce2df195d5d6",
+            "name": "Freelance consultant's weekly capture-to-completion loop",
+            "revision": 1
+          },
+          {
+            "id": "scn_3d2691ba3380442e971f1131f3ae7379",
+            "name": "个人周计划工作台（Personal Week Planner）",
+            "revision": 1
+          },
+          {
+            "id": "scn_722423687c5e417185ac3963a57286a3",
+            "name": "周期性事务复位（Recurring Routine Scheduler）",
+            "revision": 1
+          },
+          {
+            "id": "scn_9738941d26b6488ea798faec18bbcc50",
+            "name": "Student's term planning across coursework and personal life",
+            "revision": 1
+          }
+        ],
+        "related_scenario_ids": [
+          "scn_133dcc8698b946f7acf110aaecc37783"
+        ],
+        "scenario_id": "scn_67279018432643158b706ee0b4f9abfe",
+        "scenario_revision": 1,
+        "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+        "suggestions": [
+          "Resolve the overlap with scn_133dcc8698b946f7acf110aaecc37783 rather than restating it: either merge the two into one small-team shared-list scenario, or re-anchor this one on a genuinely different user/goal — e.g., the team lead's delegation-and-follow-through loop across several client workstreams, where oversight of who owns what and what slipped replaces the peer's generic mutual-assignment mutual-commenting framing.",
+          "Replace acceptance criteria 1-3, which duplicate scn_133dcc8698b946f7acf110aaecc37783, with criteria specific to the differentiating behavior — e.g., each named workstream/client container exposes its own open and completed sets at the weekly scan, and a task reassigned between members keeps its sub-task breakdown and container membership intact.",
+          "If the scenario is kept, state in the objective why this is a distinct scenario from the peer (lead-driven oversight across multiple containers, private-vs-shared separation, decomposition into assigned sub-tasks) so the distinction is carried by audience, goal, and workflow rather than by added detail."
+        ],
+        "summary": "The scenario fits the Task Management Application leaf's defining core (task as open→done record, managed containers/decomposition/classification, execution views with assignment) and is workable and testable on its own terms. However, it materially overlaps peer scenario scn_133dcc8698b946f7acf110aaecc37783: both target small-team shared lists, both make mutual assignment + task-level comments + completion visibility to all members the objective, and both follow the same create-shared-list → add/assign → comment → complete-visible arc, with acceptance criteria that map nearly one-to-one. The distinctions this scenario adds (multiple containers per client/workstream, sub-tasks, labels/priority, personal-vs-shared separation, weekly review) are refinements of the same user/goal/workflow rather than a different scenario, so distinctness needs revision. This review is scoped to the supplied input only; no runtime behavior, code, source, market demand, or full-corpus deduplication was validated.",
+        "current": true
+      },
+      "earlier_reviews": [
+        {
+          "id": "scv_5f9e422fb01145ecb915e31f12dd41f5",
+          "job_id": "job_9b494e9f454d4e74900ae9913a178fa5",
+          "outcome": "needs_changes",
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "summary": "The scenario is a strong leaf fit: it targets the leaf's secondary user (small teams) and keeps the deliberate two-state grammar, using labels/priority/due dates for legibility instead of workflow states. Its end-to-end flow (shared container -> add/assign -> decompose -> attribute-based signalling -> comment -> work from Today -> weekly scan) is coherent and its acceptance criteria are observable. The single material problem is distinctness: peer scn_133dcc8698b946f7acf110aaecc37783 (\"Small-Team Shared List\") shares the audience, the objective and almost the entire workflow, so the two scenarios are near-duplicates on user/goal/workflow rather than merely similar titles. Limits: this is a scoped review of one scenario against the supplied peers, not full-corpus deduplication, and no runtime/market validation is claimed; also the reader truncated leaf.content at 2000 characters, so quotes are taken only from the fully visible portion of that field."
+        }
+      ]
+    },
+    {
+      "id": "scn_9738941d26b6488ea798faec18bbcc50",
+      "leaf": "task-management-application",
+      "name": "Student's term planning across coursework and personal life",
+      "audience": "University and graduate students who must balance assignment deadlines, exam preparation, recurring study habits, and personal errands in one account.",
+      "objective": "Make a term's worth of coursework and personal commitments workable week to week by scheduling deadlines, decomposing large assignments, and building recurring study cycles that re-materialize automatically.",
+      "workflow": [
+        "At the start of term, create a container per course and capture every syllabus deadline as a task with its due date.",
+        "Label tasks by type (reading, problem set, paper, exam, personal) and set priority so the heaviest work is identifiable before it becomes urgent.",
+        "Break each major assignment into sub-tasks with earlier internal due dates so the work starts well before the deadline.",
+        "Plan the study week from the Upcoming view, placing study blocks against upcoming deadlines and using a board or filter over labels to see the workload per course.",
+        "Work a daily Today view that mixes academic tasks and personal errands in one ordered list, completing items as they are finished.",
+        "Create recurring tasks for weekly lectures review, problem-set practice, and gym or habit routines, and rely on them to reappear each cycle.",
+        "Before each exam, filter to that course's label and work only from the filtered set until all listed tasks are done or rescheduled."
+      ],
+      "acceptance": [
+        "Tasks entered with a syllabus due date land on the correct date in the Calendar and Upcoming views without manual rescheduling.",
+        "A parent assignment stays open while its sub-tasks are completed one by one, and completing all sub-tasks does not by itself mark the assignment done.",
+        "A recurring study task appears again on its next scheduled date after being completed, retaining its container, label, and priority.",
+        "Filtering by the course label returns exactly that course's tasks and excludes everything else.",
+        "Personal errands and academic tasks appear together in the Today view while remaining in their separate containers."
+      ],
+      "status": "draft",
+      "revision": 1,
+      "final_review": {
+        "checks": [
+          {
+            "dimension": "leaf_fit",
+            "outcome": "passed",
+            "reason": "The scenario exercises exactly the leaf's defining core: the task as an open→done unit of record (acceptance #2, '#5 work a daily Today view ... completing items as they are finished'), managed organization (per-course containers, labels by type, priority, sub-task decomposition), and execution views over the population (Upcoming, Calendar, board/filter over labels, Today). It stays inside the two-state grammar with urgency derived from due dates/priority and uses recurrence re-materialization rather than staged workflow, matching the leaf's statement that completing a recurring occurrence generates the next one. No project-management rollup, issue-tracker triage states, or team role machinery is introduced."
+          },
+          {
+            "dimension": "distinctness",
+            "outcome": "passed",
+            "reason": "Compared against all five peers. scn_133dcc8698b946f7acf110aaecc37783 and scn_67279018432643158b706ee0b4f9abfe are team/shared-list scenarios centered on invitation, assignment, and comment visibility — the reviewed scenario has no sharing, assignment, or comments. scn_722423687c5e417185ac3963a57286a3 is dedicated wholly to recurrence-rule semantics, whereas recurrence is one of seven steps here. The closest peers are scn_374d3e68906d4e0f94cbce2df195d5d6 (freelancer capture-to-completion) and scn_3d2691ba3380442e971f1131f3ae7379 (personal week planner): both share the canonical capture→organize→today→review loop, but the reviewed scenario differs in user (students), goal (term-scale course planning with exam prep and mixed academic/personal load), and concrete workflow (course containers from a syllabus, internal sub-task due dates, exam-time label filtering, recurring lecture/problem-set practice). Similarity here is the Type's shared canonical loop, not duplication."
+          },
+          {
+            "dimension": "workflow",
+            "outcome": "passed",
+            "reason": "The seven steps form a usable end-to-end loop: set up course containers and capture syllabus deadlines → classify by type/priority → decompose major assignments into dated sub-tasks → plan the week from Upcoming with board/label views → execute a mixed academic/personal Today list → run recurring study and habit cycles → filter to one course before an exam. Each step names a surface and a user action, and the sequence returns to execution and completion rather than stopping at setup, matching the leaf's 'Capture → organize → work → complete → review' loop."
+          },
+          {
+            "dimension": "testability",
+            "outcome": "passed",
+            "reason": "All five acceptance criteria are externally observable and map onto the workflow: #1 date correctness in Calendar/Upcoming (steps 1 and 4), #2 parent stays open while sub-tasks complete (step 3), #3 recurrence reappears with container/label/priority retained (step 6), #4 course-label filter returns exactly that course's tasks (steps 4 and 7), #5 personal and academic tasks co-appear in Today while remaining in separate containers (step 5). None require inspecting implementation internals. Coverage of step 4's board view and of sub-task internal due dates driving Upcoming is only partial, which is a completeness suggestion rather than a blocker."
+          },
+          {
+            "dimension": "scope",
+            "outcome": "passed",
+            "reason": "Boundaries are reasonable and internally consistent: one student account, coursework plus personal life, no sharing/team features, and no reliance on integrations, roles, or reporting machinery. Scope is term-bounded, which fits the audience and objective. The only tension is acceptance #2 pinning that completing all sub-tasks does not complete the parent, while the leaf says cascade rules vary by product — this is the scenario choosing one legitimate two-state variant as its observable contract, not an unsupported assumption."
+          }
+        ],
+        "created_at": "2026-10-16T19:23:14.856994+00:00",
+        "id": "scv_6c11902780084cb8bbd832bd3bae25f3",
+        "input_digest": "4f8ccbd3976abf3009e718908a02b7273ac2719d5aeb1b9df0c4e618cd2d119e",
+        "job_id": "job_ec09b6ad6d234a7fa8564ff22da7ea9d",
+        "leaf_fingerprint": "816ab50adb110ae50fd8df449c7437b434bb8970266b1196385b1116e623899c",
+        "leaf_quotes": [
+          "A **Task Management Application** is an application whose world is a population of **tasks** — individually addressable, completable records of discrete items of work — which the user organizes into managed structures (containers, sub-tasks, labels, priorities) and works from through execution views (today/upcoming, calendar, board, filters) that the tasks' own attributes drive.",
+          "A task is open or done. Completing removes it from active views and writes it to history; un-completing brings it back (products typically require showing completed tasks first).",
+          "Completing an occurrence of a recurring task generates the next one on the rule's schedule.",
+          "The user works *from* these views, and completing a task updates the population everywhere.",
+          "Personal containers remain private unless deliberately shared."
+        ],
+        "model": "open-design/deepseek-v4.1-flash",
+        "outcome": "passed",
+        "peer_digest": "ff4f6ce8b9c944f1c19d7eb525f0865d3b7771ac8f0f84e762d7999fe671ebbd",
+        "peer_scenarios": [
+          {
+            "id": "scn_133dcc8698b946f7acf110aaecc37783",
+            "name": "小组共享清单协作（Small-Team Shared List）",
+            "revision": 1
+          },
+          {
+            "id": "scn_374d3e68906d4e0f94cbce2df195d5d6",
+            "name": "Freelance consultant's weekly capture-to-completion loop",
+            "revision": 1
+          },
+          {
+            "id": "scn_3d2691ba3380442e971f1131f3ae7379",
+            "name": "个人周计划工作台（Personal Week Planner）",
+            "revision": 1
+          },
+          {
+            "id": "scn_67279018432643158b706ee0b4f9abfe",
+            "name": "Small team shared list for delegation and follow-through",
+            "revision": 1
+          },
+          {
+            "id": "scn_722423687c5e417185ac3963a57286a3",
+            "name": "周期性事务复位（Recurring Routine Scheduler）",
+            "revision": 1
+          }
+        ],
+        "related_scenario_ids": [],
+        "scenario_id": "scn_9738941d26b6488ea798faec18bbcc50",
+        "scenario_revision": 1,
+        "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+        "suggestions": [
+          "Add one acceptance criterion for the per-course board view used in workflow step 4 (e.g. sections derived from labels render the same tasks as the list, and moving a card changes its label/section rather than being a separate record), so that stated surface is covered by an observable check.",
+          "Add an acceptance criterion that a completed task leaves the Today/Upcoming/Calendar views while remaining retrievable in completed history, covering the completion half of workflow step 5 explicitly rather than only via the parent/sub-task criterion.",
+          "Make the recurring-study acceptance criterion also cover a missed occurrence (overdue recurring task still reappears/advances on schedule) so the cycle behavior in step 6 is bounded, not just the happy-path completion.",
+          "Since the leaf notes sub-task/parent cascade rules vary by product, state the chosen cascade explicitly as a scenario product decision (completing sub-tasks does not close the parent; completing the parent may require consistent sub-task state) to avoid the criterion reading as a general rule of the Type.",
+          "Optionally clarify in the workflow that sub-tasks carry their own internal due dates that surface in Upcoming, tying step 3's internal deadlines to an observable view rather than leaving them implicit."
+        ],
+        "summary": "The scenario is a coherent, leaf-faithful instance of the Task Management Application Type: a university student uses containers per course plus a personal container, captures syllabus deadlines with due dates, classifies by label/priority, decomposes assignments into sub-tasks, plans from Upcoming/Calendar, works a mixed Today view, runs recurring study cycles, and filters by course label before exams. All five dimensions pass in this scoped review. The scenario sits squarely inside the leaf's two-state grammar (no custom workflow states, approval chains, or project rollup), and its recurring re-materialization, label filters, and sub-task/parent behavior are standard capabilities of the leaf. This review compares only the supplied peers and does not claim corpus-wide deduplication; it also does not assert runtime or market validation. The main residual uncertainty is that acceptance #2 pins a specific sub-task/parent cascade rule where the leaf says cascade rules vary by product — this is treated as a legitimate scenario-level variant definition (consistent with the two-state grammar), not a defect, and is flagged as a suggestion.",
+        "current": true
+      },
+      "earlier_reviews": [
+        {
+          "id": "scv_fd634c89278a421b8eedf619eafdadfd",
+          "job_id": "job_ea7e18c1a1544ccd902f8f01f2ba5fff",
+          "outcome": "needs_changes",
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "summary": "The scenario 'Student's term planning across coursework and personal life' (scn_9738941d26b6488ea798faec18bbcc50) fits the task-management-application leaf core and its acceptance criteria are observable; the only concern raised is that its end-to-end loop closely parallels two solo-individual peers, so its differentiators should be made explicit. Review is limited to input.json text (leaf.content was readable only in part, so leaf quotes come from the visible portion); no runtime, dedup, or market validation is claimed."
+        }
+      ]
+    },
+    {
+      "id": "scn_4faa861048af4f8dac27dd44e531f25a",
+      "leaf": "bookmark-manager",
+      "name": "独立研究者的长期参考文献库",
+      "audience": "需要数月到数年持续收集资料的独立研究者、撰稿人或研究生（以个人为单位，非团队共享）",
+      "objective": "让研究者在浏览过程中随手保存网页来源，把它们归入自己掌控的主题集合，并在写作时凭记忆线索快速找回原来的页面地址。",
+      "workflow": [
+        "浏览器中遇到可能有用的文章、数据源或工具页时，一键保存为一个只记录标题与 URL 的书签条目",
+        "阅读该条目的当前地址与标题，必要时手工补充或修正标题，使其日后可辨认",
+        "把条目拖入或指定到自建的分类文件夹（如按研究主题、章节或方法分类）",
+        "数月后在库内按标题关键词、文件夹或已保存的 URL 片段进行检索",
+        "从检索结果中选中条目并打开其 URL，回到原始网页来源",
+        "对不再需要的条目进行移动、重命名或删除，保持库的可用性"
+      ],
+      "acceptance": [
+        "保存后条目立即出现在持久书签库中，应用重启或新会话后仍存在",
+        "每条书签都保留其指向外部网页的 URL，且打开该条目即导航到该地址",
+        "用户可自行创建、重命名、移动和删除分类，组织结果在下次会话中原样保留",
+        "按关键词或文件夹检索能在不断累积的库中定位到目标条目并返回其 URL",
+        "系统不自动抓取正文内容，不把书签转化为阅读队列或用户笔记"
+      ],
+      "status": "draft",
+      "revision": 1,
+      "final_review": {
+        "checks": [
+          {
+            "dimension": "leaf_fit",
+            "outcome": "passed",
+            "reason": "场景逐条落实 leaf 的四项定义内核：(1) 主动捕获——'一键保存为一个只记录标题与 URL 的书签条目'，对应 leaf 的'Deliberate capture'；(2) URL 锚定的参考记录——'每条书签都保留其指向外部网页的 URL，且打开该条目即导航到该地址'；(3) 持久累积的个人库——'保存后条目立即出现在持久书签库中，应用重启或新会话后仍存在'；(4) 用户掌控的组织与检索——'用户可自行创建、重命名、移动和删除分类'与'按关键词或文件夹检索能在不断累积的库中定位到目标条目并返回其 URL'。同时验收第 5 条'系统不自动抓取正文内容，不把书签转化为阅读队列或用户笔记'精确对应 leaf 的核心职责（save now, find later）及其与 Read-it-later / Note-taking 的边界；研究者的主题/章节/方法分类并未引入引文元数据或书目输出，因而没有滑向 Reference Manager 这一 specialized sibling。"
+          },
+          {
+            "dimension": "distinctness",
+            "outcome": "passed",
+            "reason": "逐一对比三个 peer：scn_4e93484ec0674723840a142456b9fe50（开发者按项目/技术栈的技术资源索引）、scn_7756e0007f6a463a97316f3f49c15248（普通用户待购与灵感收藏）、scn_8936303b326f4a43bee84d6e98f45f2d（学生按课程/学期的参考书架）。本场景用户为'独立研究者、撰稿人或研究生（个人单位）'，目标为'在写作时凭记忆线索快速找回原来的页面地址'，组织轴为'研究主题、章节或方法'，三者在用户身份、使用目的与组织维度上均可区分。三者工作流形态相近（保存→归类→编辑标题→检索→打开→整理）是 leaf 强制要求的核心回路，任何合规场景都会有此形状，不构成同一用户同一目标下的重复；其中格式上最接近的是 scn_4e93…（同为知识工作者的私人参考索引）与 scn_8936…（同为学术资料回查），但组织轴与用户/目的不同，仅属相似而非重复，故未列入 related_scenario_ids。"
+          },
+          {
+            "dimension": "workflow",
+            "outcome": "passed",
+            "reason": "六步构成连贯可用的端到端流程：在浏览器中一键保存条目→核对/修正标题以便日后辨认→拖入自建分类（研究主题/章节/方法）→数月后按标题关键词、文件夹或 URL 片段检索→选中条目打开其 URL 回到原始网页→对不再需要的条目移动、重命名或删除。每一步都是可执行的用户动作，且能抵达声明目标（写作时凭记忆线索找回原页面地址）；捕获入口虽未点名扩展/书签小工具，但属 leaf 列为标准配备的捕获机制，不构成流程断点。"
+          },
+          {
+            "dimension": "testability",
+            "outcome": "passed",
+            "reason": "验收标准可观察且覆盖完整流程：持久性（'应用重启或新会话后仍存在'）、URL 锚定与导航（'打开该条目即导航到该地址'）、组织操作及其持久化（'创建、重命名、移动和删除分类，组织结果在下次会话中原样保留'）、检索回原址（'按关键词或文件夹检索能在不断累积的库中定位到目标条目并返回其 URL'），以及负向边界（'不自动抓取正文内容，不转化为阅读队列或用户笔记'）。这些条件均可用具体行为判定，覆盖了捕获→组织→检索→回原址的全回路及类型边界。"
+          },
+          {
+            "dimension": "scope",
+            "outcome": "passed",
+            "reason": "边界合理且内部一致：定位为单人私有的长期参考库，验收与 workflow 均未引入共享、公开或协作功能，与 leaf 的'Private by default'一致；不依赖 leaf 未支持的假设（无引文元数据、无正文抓取、无发布）。仅有一处轻微内部张力：工作流第 1 步说条目'只记录标题与 URL'，而第 2 步又说'必要时手工补充或修正标题'，标题究竟由系统从页面元数据自动获取还是用户手工录入未明说——但这属于不影响流程与验收判定的实现细节，不构成阻断性缺口。多设备未涉及，但声明的目标不要求它。"
+          }
+        ],
+        "created_at": "2026-10-16T19:22:44.503364+00:00",
+        "id": "scv_dce3eef347e444f4b07bdb14d39aa80e",
+        "input_digest": "6b651774100cb7aee032731ad24dbaa6c30e7fc361affbbc4158a0901725b77a",
+        "job_id": "job_6de625102d1348c9848b3da7a1b0fa2a",
+        "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+        "leaf_quotes": [
+          "The essential job is **save now, find later**.",
+          "**Reference record anchored to an address** — the central object is a record that points at a web resource via its URL, enriched with whatever metadata the product adds.",
+          "**Persistent, accumulating personal library** — records survive sessions and devices and pile up over time into a long-lived personal asset, often numbering thousands of items.",
+          "**User-controlled organization and retrieval** — the user structures the library in some form and can find records again by browsing that structure and/or by searching.",
+          "**The record points; the web owns the content.**"
+        ],
+        "model": "open-design/deepseek-v4.1-flash",
+        "outcome": "passed",
+        "peer_digest": "8d68fd88188ba1a6db841ce653dac9dd1f6ef02d6434423f271a3f18cca1ef18",
+        "peer_scenarios": [
+          {
+            "id": "scn_4e93484ec0674723840a142456b9fe50",
+            "name": "开发者的项目技术资源索引",
+            "revision": 1
+          },
+          {
+            "id": "scn_7756e0007f6a463a97316f3f49c15248",
+            "name": "生活待购与灵感收藏夹",
+            "revision": 2
+          },
+          {
+            "id": "scn_8936303b326f4a43bee84d6e98f45f2d",
+            "name": "学生的课程参考书架",
+            "revision": 1
+          }
+        ],
+        "related_scenario_ids": [],
+        "scenario_id": "scn_4faa861048af4f8dac27dd44e531f25a",
+        "scenario_revision": 1,
+        "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+        "suggestions": [
+          "明确标题的来源：说明标题是由系统从页面元数据自动获取，还是由用户手工录入，以消除工作流第 1 步'只记录标题与 URL'与第 2 步'手工补充或修正标题'之间的轻微张力；可在验收中补一条'标题可由用户编辑并在下次会话中原样保留'。",
+          "视需要显式写出捕获入口（浏览器扩展 / 书签小工具 / 手动添加表单），因为工作流第 1 步依赖'在浏览器中一键保存'，而 leaf 将扩展等捕获机制列为标准配备。",
+          "若'已保存的 URL 片段检索'是希望保留的区分行为，建议把它单列为一条可观察验收标准（例如输入 URL 片段能返回对应条目并给出其 URL），以免它在'按关键词或文件夹检索'中被弱化。"
+        ],
+        "summary": "本场景在本次限定审查的五项维度上均通过：它完整落实书签管理器的定义内核（主动保存、URL 锚定、持续累积的个人库、用户自建分类与检索回原址），并明确守住与阅读队列/笔记的边界。用户为独立研究者/撰稿人，目标与三个 peer（开发者项目索引、普通用户待购灵感、学生课程书架）在用户与目标上可区分；工作流形态相近主要源于 leaf 对 save→organize→retrieve→return 的硬性要求，而非同一用户同一目标下的重复。审查仅基于提供的 leaf.md、input.json 与 peer_scenarios，不含全量语料去重，也不代表运行时、市场或商业价值验证。",
+        "current": true
+      },
+      "earlier_reviews": []
+    },
+    {
+      "id": "scn_8936303b326f4a43bee84d6e98f45f2d",
+      "leaf": "bookmark-manager",
+      "name": "学生的课程参考书架",
+      "audience": "按学期修读多门课程、需要按课程反复回看阅读材料与在线资源的学生",
+      "objective": "为学生提供一个跨学期累积的个人来源书架，使其在浏览课程相关网页时随手保存，并按课程或学期归类，以便在作业与复习时回查。",
+      "workflow": [
+        "在阅读课程阅读材料、在线文档或参考站点时，为该页面保存一个书签条目",
+        "将条目归入与课程或学期对应的用户自建分类",
+        "每门课开始时新建分类，学期结束后保留分类而不删除条目",
+        "准备作业或复习时，浏览对应课程分类下的条目清单",
+        "打开某个条目的 URL 回到原网页获取所需材料",
+        "学期结束后对分类做整理，重命名、合并或归档到自己的命名结构中"
+      ],
+      "acceptance": [
+        "同一账号下的书签库跨学期持续累积，不会在会话结束后清空",
+        "用户可自行建立以课程或学期命名的分类，并随时重命名与重组",
+        "每条书签均保存其来源 URL，点击即回到原始网页",
+        "按课程分类或标题关键词可以检索出对应条目",
+        "应用不生成用户自撰内容，不将保存的资源变为公开分享的集合"
+      ],
+      "status": "draft",
+      "revision": 1,
+      "final_review": {
+        "checks": [
+          {
+            "dimension": "leaf_fit",
+            "outcome": "passed",
+            "reason": "核心四要素逐项落地：验收“每条书签均保存其来源 URL，点击即回到原始网页”对应 leaf 的锚定属性与“retrieved later to return to the resource”；“同一账号下的书签库跨学期持续累积，不会在会话结束后清空”对应“held in a persistent, accumulating personal library”；“用户可自行建立以课程或学期命名的分类，并随时重命名与重组”对应“under user-controlled organization”；目标“按课程或学期归类，以便在作业与复习时回查”即 leaf 的“save now, find later”。验收第 5 条明确排除自撰内容与公开分享，守住了 leaf 与 Note-taking、Content Curation 的边界。"
+          },
+          {
+            "dimension": "distinctness",
+            "outcome": "needs_changes",
+            "reason": "与 scn_4faa861048af4f8dac27dd44e531f25a（独立研究者长期参考文献库）实质重叠：其受众写明“独立研究者、撰稿人或研究生”，目标是长期累积个人来源集合以便凭线索找回，工作流为“保存只记录标题与 URL 的条目—手工修正标题—归入自建分类文件夹—数月后按标题关键词/文件夹/URL 片段检索—打开 URL 回原页—移动/重命名/删除”。本场景仅把组织轴替换为“课程/学期”，六步中第一、二、四、五步与之近乎等价，属于同一用户群与同一工作流的重新贴标签。已比较但可区分：scn_4e93484ec0674723840a142456b9fe50（开发者）受众与目标为技术项目开发，组织轴是项目/技术栈；scn_7756e0007f6a463a97316f3f49c15248（生活待购与灵感）受众与目标为普通网络用户的消费/灵感留存，均不构成本次实质重复。"
+          },
+          {
+            "dimension": "workflow",
+            "outcome": "passed",
+            "reason": "六步构成可用的端到端闭环，与 leaf 的 Capture / Organize / Find and return 段落同一形态：捕获（保存页面条目）→ 归类（课程或学期分类）→ 时间边界维护（开课新建、学期结束保留条目）→ 回查（浏览课程分类清单）→ 返回资源（打开 URL）→ 整理（重命名、合并、归档）。闭环中每一步都能由用户在当前场景内独立触发，无外部未定义角色或缺失环节。仅第 6 步“归档到自己的命名结构中”与第 3 步“保留分类而不删除条目”之间的关系略含糊，但属可选细节，不影响流程成立。"
+          },
+          {
+            "dimension": "testability",
+            "outcome": "passed",
+            "reason": "五条验收均可直接观察且覆盖整条工作流：跨会话/跨学期累积不丢失（对应持久累积库）、可自建并随时重命名重组课程或学期分类（对应归类与整理）、每条记录保留来源 URL 且点击回到原网页（对应检索后的返回）、按课程分类或标题关键词可检索出条目（对应回查）、系统不生成用户自撰内容且不将保存资源变为公开分享集合（负向边界，可通过功能检查判定）。没有依赖内部实现或不可观测指标的条款。"
+          },
+          {
+            "dimension": "scope",
+            "outcome": "passed",
+            "reason": "边界自洽：限定为个人、私有的学生来源书架，明确不做自撰内容与公开分享，与 leaf 的“Private by default”和“The library grows only by user action”一致；未引入 leaf 未承认的能力（如自动登录抓取、团队协作、正文转载）。跨学期保留、按课程并行多分类、账户范围等设定都能在 leaf 的长期个人库与多设备定位下得到支持，未见未加说明的强假设或超出单用户书签管理范围的目标。"
+          }
+        ],
+        "created_at": "2026-10-16T19:23:43.162427+00:00",
+        "id": "scv_29df11e8ef41488cbbb0523a53cacd31",
+        "input_digest": "8e05c4ff554d679844c6a8c78b8952203e2f799acb8612b0d28b9658b4bb4d74",
+        "job_id": "job_56119b77fb754ac0a68b07a157dfb224",
+        "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+        "leaf_quotes": [
+          "A **Bookmark Manager** is a personal library application for the web: it saves references to web resources as durable records, organizes them under the user's control, and makes them findable later so the user can return to those resources.",
+          "anchored to an external web resource by its address (URL)",
+          "held in a persistent, accumulating personal library",
+          "under user-controlled organization",
+          "retrieved later to return to the resource",
+          "The essential job is **save now, find later**."
+        ],
+        "model": "open-design/deepseek-v4.1-flash",
+        "outcome": "needs_changes",
+        "peer_digest": "fb14dc39c31ad619cd104a6c64fbba226a29982c86e52dc79b958a7386fa9d29",
+        "peer_scenarios": [
+          {
+            "id": "scn_4e93484ec0674723840a142456b9fe50",
+            "name": "开发者的项目技术资源索引",
+            "revision": 1
+          },
+          {
+            "id": "scn_4faa861048af4f8dac27dd44e531f25a",
+            "name": "独立研究者的长期参考文献库",
+            "revision": 1
+          },
+          {
+            "id": "scn_7756e0007f6a463a97316f3f49c15248",
+            "name": "生活待购与灵感收藏夹",
+            "revision": 2
+          }
+        ],
+        "related_scenario_ids": [
+          "scn_4faa861048af4f8dac27dd44e531f25a"
+        ],
+        "scenario_id": "scn_8936303b326f4a43bee84d6e98f45f2d",
+        "scenario_revision": 1,
+        "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+        "suggestions": [
+          "为该场景补出相对 scn_4faa861048af4f8dac27dd44e531f25a 的差异化行为，而不只是更换组织轴：在工作流中明确“同一学期多门课程并行、跨学期保留旧分类、学期交界处的迁移动作”，并在验收中增补可观察条目（例如“同一用户可同时存在多个课程分类并在其间切换浏览，且上一学期分类在下一学期仍可检索与打开其中的 URL”）。",
+          "或与本 peer 二选一：若判定“研究生长期参考文献库”已覆盖学生按主题长期积累的用法，应合并二者或删去其一，避免同一 leaf 下存在工作流几乎逐条相同的两个场景。",
+          "明确学期末“归档”的具体含义（是与重命名、合并并列的分类整理动作，还是将分类移出默认浏览视图），并说明它与第 3 步“保留分类而不删除条目”如何共存，以消除流程内的轻微歧义。"
+        ],
+        "summary": "该场景在 leaf_fit、workflow、testability、scope 四个维度成立：它完整保留 leaf 定义的核心——以 URL 锚定、由用户主动保存的引用记录，进入不断累积的个人私有库，由用户自建分类组织，日后按分类或关键词找回并跳回原网页；五条验收标准均可直接观察，且负向边界（不生成用户自撰内容、不把库变成公开分享集合）与 leaf 对 Note-taking / Content Curation 的划界一致。问题集中在 distinctness：与输入中已有的 peer“独立研究者的长期参考文献库”（scn_4faa861048af4f8dac27dd44e531f25a）实质重叠——该 peer 的受众本就明确包含“研究生”，且本场景六步工作流中“主动保存页面—归入用户自建分类—数月后按关键词/分类检索—打开条目 URL 回原页—整理不再需要的条目”与其几乎逐条对应，差别主要是把组织轴由“研究主题/章节/方法”换成“课程/学期”。限制说明：本次仅对照 input.json 提供的 3 个 peer 与 leaf.md 做判定，未做全语料去重，也未验证运行时可行性、市场规模或商业价值。",
+        "current": true
+      },
+      "earlier_reviews": [
+        {
+          "id": "scv_1f4320381efd44759edc719f260fabfe",
+          "job_id": "job_f78eed26408649cf874f980edfa8a397",
+          "outcome": "needs_changes",
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "summary": "场景「学生的课程参考书架」在核心行为上与 Bookmark Manager 叶子定义一致：刻意保存的条目、以 URL 锚定外部网页、持久累积的个人库、用户自建分类、日后检索回访，且明确排除自撰内容与公开分享。工作流闭环、验收可观察、边界自洽，leaf_fit / workflow / testability / scope 四项通过。主要问题在去重：它与同行场景「独立研究者的长期参考文献库」(scn_4faa861048af4f8dac27dd44e531f25a) 在使用者、目标与端到端流程上高度重合——后者受众明确包含「研究生」，二者的工作流步骤与验收条件近乎逐条对应，区别基本只在组织轴命名（课程/学期 vs 研究主题）与措辞，因此 distinctness 需要修改。本次评审仅基于 input.json 文本，未做全量语料去重，也不构成运行时或市场验证。"
+        }
+      ]
+    },
+    {
+      "id": "scn_4e93484ec0674723840a142456b9fe50",
+      "leaf": "bookmark-manager",
+      "name": "开发者的项目技术资源索引",
+      "audience": "同时推进多个技术项目的个人开发者或小规模开发实践者",
+      "objective": "让开发者把日常浏览中遇到的技术文档、工具站点和参考链接保存为私人索引，并按项目或技术栈归入自己掌控的分类，日后凭项目快速找回。",
+      "workflow": [
+        "在查阅文档、库主页或工具站点时，一键保存一个书签条目",
+        "将该条目归入其所属项目或技术栈的用户自建分类",
+        "为条目保留可辨认的标题，必要时手工修改以便日后查找",
+        "切换到某个项目时，打开对应分类浏览与其相关的已保存链接",
+        "按标题关键词或分类检索，定位此前保存的地址并打开返回该资源",
+        "项目结束后调整分类结构，移动或删除失效或过时的条目"
+      ],
+      "acceptance": [
+        "保存的条目以 URL 为锚点并持久保存，跨会话可再次访问",
+        "用户可自由创建、重命名、移动和删除以项目或技术栈命名的分类",
+        "在多个项目的累积库中按关键词或分类检索可定位到目标条目",
+        "通过条目打开的导航指向其保存的外部网址",
+        "系统保持为个人保存与回查工具，不承担代码托管、资料发布或团队协作分享功能"
+      ],
+      "status": "draft",
+      "revision": 1,
+      "final_review": {
+        "checks": [
+          {
+            "dimension": "leaf_fit",
+            "outcome": "passed",
+            "reason": "四项定义性属性均有对应：一键保存条目对应 Deliberate capture（叶子：“**Deliberate capture** — every record originates from a user decision to save”）；条目以 URL 为锚点并跨会话持久对应 “**Reference record anchored to an address**” 与 “**Persistent, accumulating personal library**”；用户自建分类、按关键词/分类检索、打开条目导航回外部网址对应 “**User-controlled organization and retrieval** — the user structures the library in some form and can find records again by browsing that structure and/or by searching.” 场景核心即叶子所述 “The essential job is **save now, find later**.”；验收第 5 条把产品限定为个人保存与回查，也符合叶子 “the product finds things the user has already seen and chosen to keep” 的定位，未漂移向代码托管、发布或协作类型。"
+          },
+          {
+            "dimension": "distinctness",
+            "outcome": "passed",
+            "reason": "与三个 peer 逐一比较：scn_4faa861048af4f8dac27dd44e531f25a（用户为独立研究者/撰稿人/研究生，按研究主题、章节或方法归类，动机是写作时找回来源）；scn_7756e0007f6a463a97316f3f49c15248（普通网络用户在“待购/家居改造/以后看看”等生活归类下暂存，尚未进入整理阶段，无“先保存后归类再由项目驱动浏览”的复访循环）；scn_8936303b326f4a43bee84d6e98f45f2d（学生按课程/学期累积，验收以“跨学期不清空”与课程分类为轴）。本场景用户为同时推进多个技术项目的个人开发者，目标是把技术文档、工具站点、参考链接按项目/技术栈归入私人索引，工作流以“切换到某个项目→打开对应分类浏览”为检索主轴，并以“项目结束后调整分类结构、移除非当前技术栈的过时条目”收尾，用户、目标与组织语义均与 peer 不同，属同一类型下的不同场景而非重复，无需修改。"
+          },
+          {
+            "dimension": "workflow",
+            "outcome": "passed",
+            "reason": "六步构成可用的端到端闭环：一键保存（获取）→ 归入项目/技术栈分类（组织）→ 手工修正可辨认标题（可检索性）→ 切换项目按分类浏览（结构浏览返回）→ 按标题关键词或分类检索并打开原网址（检索与返回外部资源）→ 项目结束时重组/移删（维护）。与叶子 “Capture / Organize / Find and return / Maintain” 的流程骨架一致，且每步都可由个人开发者在真实场景中执行，分类自建也对应叶子 “Organization is user-controlled and always revisable”。题干未规定是否使用浏览器扩展或手动表单，属叶子明示的实现选择，不影响流程成立。"
+          },
+          {
+            "dimension": "testability",
+            "outcome": "passed",
+            "reason": "五条验收均可观察：验收 1 的“跨会话可再次访问”可用重启/新会话后条目仍存在来检验；验收 2 的分类创建、重命名、移动、删除可逐项操作并核对结果；验收 3 的“按关键词或分类检索可定位目标条目”给出明确返回判据；验收 4 的“打开导航指向其保存的外部网址”是可直接验证的跳转行为；验收 5 的边界排除项可通过确认不存在托管、发布或协作分享能力来核对。五条合起来覆盖了获取、组织、检索、返回、边界这一完整流程，未依赖主观判断。"
+          },
+          {
+            "dimension": "scope",
+            "outcome": "passed",
+            "reason": "边界清晰且内部一致：受众是个人开发者或小规模实践者，用量与“项目/技术栈”分类规模相符；验收第 5 条主动排除代码托管、资料发布和团队协作分享，与叶子 “**Private by default.** The library is personal” 不冲突（叶子中团队共享与公开发布本就是可选次要情境），属于合理的范围收缩而非矛盾。场景未断言市场规模、性能指标或具体实现方案，也未把叶子列为“成熟产品的标准配置”（扩展、自动元数据、快照、去重等）当作必需前提，无不受支持的假设。"
+          }
+        ],
+        "created_at": "2026-10-16T19:23:48.812732+00:00",
+        "id": "scv_5a4f8f52074c4b2698df86d28c91ef61",
+        "input_digest": "231c92764e25e65a9da1698a55f2491c4f8544b1179957eb982a20456b67883c",
+        "job_id": "job_9ce19967d3294ec0b4c0a98a8c7559cd",
+        "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+        "leaf_quotes": [
+          "The essential job is **save now, find later**.",
+          "**Reference record anchored to an address** — the central object is a record that points at a web resource via its URL, enriched with whatever metadata the product adds.",
+          "**Deliberate capture** — every record originates from a user decision to save (a click, a share, a pasted URL, an approved import). Nothing is logged automatically.",
+          "**Persistent, accumulating personal library** — records survive sessions and devices and pile up over time into a long-lived personal asset, often numbering thousands of items.",
+          "**User-controlled organization and retrieval** — the user structures the library in some form and can find records again by browsing that structure and/or by searching. The *form* of organization is an implementation choice, not part of the definition.",
+          "Retrieval is the loop the whole Type exists for. Results are the user's own records; the product finds things the user has already seen and chosen to keep — the inverse of a search engine, which finds things the user has never seen.",
+          "**Private by default.** The library is personal; visibility to others requires an explicit sharing act (a public link, a per-record flag, or an invited member)."
+        ],
+        "model": "open-design/deepseek-v4.1-flash",
+        "outcome": "passed",
+        "peer_digest": "026f9f1db91749c164fff9190079f53113593508b44858a8ae87a3210b3cbda2",
+        "peer_scenarios": [
+          {
+            "id": "scn_4faa861048af4f8dac27dd44e531f25a",
+            "name": "独立研究者的长期参考文献库",
+            "revision": 1
+          },
+          {
+            "id": "scn_7756e0007f6a463a97316f3f49c15248",
+            "name": "生活待购与灵感收藏夹",
+            "revision": 2
+          },
+          {
+            "id": "scn_8936303b326f4a43bee84d6e98f45f2d",
+            "name": "学生的课程参考书架",
+            "revision": 1
+          }
+        ],
+        "related_scenario_ids": [],
+        "scenario_id": "scn_4e93484ec0674723840a142456b9fe50",
+        "scenario_revision": 1,
+        "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+        "suggestions": [
+          "可选改进：把工作流第 3 步“为条目保留可辨认的标题，必要时手工修改”补入一条可观察验收（例如“条目标题可编辑，修改后在同一会话与下次会话中均保持修改后的值，且该标题参与关键词检索”），使检索类验收的输入条件也被覆盖。",
+          "可选改进：如需与 scn_4faa861048af4f8dac27dd44e531f25a 等 peer 拉开更明显差距，可在建议层面强化开发者特有的组织语义，例如允许以技术栈为主轴、把项目作为归档视图并说明项目终止后条目的去向，但当前流程本身已足够区分，不构成阻塞。"
+        ],
+        "summary": "该场景对 Bookmark Manager 叶子定义的核心（有意保存的 URL 锚定记录、持久累积的个人库、用户自控的组织与检索、事后返回原资源）覆盖完整，工作流端到端连贯，验收标准可观察，边界设置在个人范围内且与叶子的“默认私有”一致。对照三个 peer（研究者参考文献库、生活待购与灵感收藏夹、学生课程书架）逐一比较用户、目标与工作流后，未发现实质重叠或重复：本场景以“同时推进多个项目的开发者”为用户，以“项目/技术栈索引”和项目切换为浏览轴，组织语义与检索动机均有别于 peer 的主题/章节/方法、待购/家居、课程/学期分类。本次评审仅限 input.json、leaf.md 与所给 peer 文本，未做全库去重，不含运行时或市场验证，也未确认该场景本身的商业价值或可实现性；未发现阻塞性问题，因此全部维度通过。",
+        "current": true
+      },
+      "earlier_reviews": [
+        {
+          "id": "scv_ead4dfd96be74ba78d74791bb9644b8e",
+          "job_id": "job_653907f994944a6f8438656ec0a524a6",
+          "outcome": "needs_changes",
+          "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+          "summary": "该场景在 leaf 的四项核心上贴合：以 URL 锚定外部资源、持久累积的个人库、用户自控的组织方式、日后回查并返回原页面；六步工作流从采集到回查闭合可用，五条验收均为可观察结果，边界上明确排除代码托管/资料发布/团队分享，未引入技术栈或实现假设。唯一实质问题是区分度：其目标与工作流与 peer scn_4faa861048af4f8dac27dd44e531f25a 几乎逐句同构，与 scn_8936303b326f4a43bee84d6e98f45f2d 亦高度接近，差异基本只落在受众表述与分类命名对象（项目/技术栈 vs 研究主题/课程）上，属可修复的重叠。本审查仅依据 input.json 中的 leaf 与 peer_scenarios 文本，未做全库去重，未验证可实现性、运行时行为或市场价值。"
+        }
+      ]
+    }
+  ],
+  "full_leaf_read_proofs": [
+    {
+      "scenario_id": "scn_374d3e68906d4e0f94cbce2df195d5d6",
+      "job_id": "job_22b6268d9fad41a8b9344b104d8927ac",
+      "attempt": 2,
+      "path": "jobs/job_22b6268d9fad41a8b9344b104d8927ac/attempt-2/scenario-review/leaf.md",
+      "leaf_fingerprint": "816ab50adb110ae50fd8df449c7437b434bb8970266b1196385b1116e623899c",
+      "bytes": 19010,
+      "lines": 271,
+      "content_matches_json": true,
+      "sha256_matches_fingerprint": true,
+      "read_tools": [
+        {
+          "arguments": {
+            "path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_22b6268d9fad41a8b9344b104d8927ac/attempt-2/scenario-review/leaf.md"
+          },
+          "visible_numbered_lines": 271
+        }
+      ],
+      "all_document_lines_visible": true
+    },
+    {
+      "scenario_id": "scn_67279018432643158b706ee0b4f9abfe",
+      "job_id": "job_7ecd66b587494585a978847ecd67c675",
+      "attempt": 1,
+      "path": "jobs/job_7ecd66b587494585a978847ecd67c675/attempt-1/scenario-review/leaf.md",
+      "leaf_fingerprint": "816ab50adb110ae50fd8df449c7437b434bb8970266b1196385b1116e623899c",
+      "bytes": 19010,
+      "lines": 271,
+      "content_matches_json": true,
+      "sha256_matches_fingerprint": true,
+      "read_tools": [
+        {
+          "arguments": {
+            "path": "leaf.md"
+          },
+          "visible_numbered_lines": 271
+        }
+      ],
+      "all_document_lines_visible": true
+    },
+    {
+      "scenario_id": "scn_9738941d26b6488ea798faec18bbcc50",
+      "job_id": "job_ec09b6ad6d234a7fa8564ff22da7ea9d",
+      "attempt": 1,
+      "path": "jobs/job_ec09b6ad6d234a7fa8564ff22da7ea9d/attempt-1/scenario-review/leaf.md",
+      "leaf_fingerprint": "816ab50adb110ae50fd8df449c7437b434bb8970266b1196385b1116e623899c",
+      "bytes": 19010,
+      "lines": 271,
+      "content_matches_json": true,
+      "sha256_matches_fingerprint": true,
+      "read_tools": [
+        {
+          "arguments": {
+            "path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_ec09b6ad6d234a7fa8564ff22da7ea9d/attempt-1/scenario-review/leaf.md"
+          },
+          "visible_numbered_lines": 271
+        }
+      ],
+      "all_document_lines_visible": true
+    },
+    {
+      "scenario_id": "scn_4faa861048af4f8dac27dd44e531f25a",
+      "job_id": "job_6de625102d1348c9848b3da7a1b0fa2a",
+      "attempt": 2,
+      "path": "jobs/job_6de625102d1348c9848b3da7a1b0fa2a/attempt-2/scenario-review/leaf.md",
+      "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+      "bytes": 16931,
+      "lines": 229,
+      "content_matches_json": true,
+      "sha256_matches_fingerprint": true,
+      "read_tools": [
+        {
+          "arguments": {
+            "path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_6de625102d1348c9848b3da7a1b0fa2a/attempt-2/scenario-review/leaf.md"
+          },
+          "visible_numbered_lines": 229
+        }
+      ],
+      "all_document_lines_visible": true
+    },
+    {
+      "scenario_id": "scn_8936303b326f4a43bee84d6e98f45f2d",
+      "job_id": "job_56119b77fb754ac0a68b07a157dfb224",
+      "attempt": 1,
+      "path": "jobs/job_56119b77fb754ac0a68b07a157dfb224/attempt-1/scenario-review/leaf.md",
+      "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+      "bytes": 16931,
+      "lines": 229,
+      "content_matches_json": true,
+      "sha256_matches_fingerprint": true,
+      "read_tools": [
+        {
+          "arguments": {
+            "path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_56119b77fb754ac0a68b07a157dfb224/attempt-1/scenario-review/leaf.md"
+          },
+          "visible_numbered_lines": 229
+        }
+      ],
+      "all_document_lines_visible": true
+    },
+    {
+      "scenario_id": "scn_4e93484ec0674723840a142456b9fe50",
+      "job_id": "job_9ce19967d3294ec0b4c0a98a8c7559cd",
+      "attempt": 1,
+      "path": "jobs/job_9ce19967d3294ec0b4c0a98a8c7559cd/attempt-1/scenario-review/leaf.md",
+      "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+      "bytes": 16931,
+      "lines": 229,
+      "content_matches_json": true,
+      "sha256_matches_fingerprint": true,
+      "read_tools": [
+        {
+          "arguments": {
+            "path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_9ce19967d3294ec0b4c0a98a8c7559cd/attempt-1/scenario-review/leaf.md"
+          },
+          "visible_numbered_lines": 229
+        }
+      ],
+      "all_document_lines_visible": true
+    }
+  ],
+  "jobs": [
+    {
+      "id": "job_165e2cbc192643a582fee53a48901ade",
+      "kind": "scenarios",
+      "state": "completed",
+      "attempts": 1,
+      "created_at": "2026-10-16T19:12:44.928409+00:00",
+      "updated_at": "2026-10-16T19:13:28.774324+00:00"
+    },
+    {
+      "id": "job_e740913447eb40908a5cb6dbe3ccdb93",
+      "kind": "scenarios",
+      "state": "completed",
+      "attempts": 1,
+      "created_at": "2026-10-16T19:12:44.928409+00:00",
+      "updated_at": "2026-10-16T19:13:22.103852+00:00"
+    },
+    {
+      "id": "job_6de625102d1348c9848b3da7a1b0fa2a",
+      "kind": "scenario-review",
+      "state": "completed",
+      "attempts": 2,
+      "created_at": "2026-10-16T19:13:22.106069+00:00",
+      "updated_at": "2026-10-16T19:22:44.503864+00:00"
+    },
+    {
+      "id": "job_f78eed26408649cf874f980edfa8a397",
+      "kind": "scenario-review",
+      "state": "completed",
+      "attempts": 1,
+      "created_at": "2026-10-16T19:13:22.106255+00:00",
+      "updated_at": "2026-10-16T19:14:24.792196+00:00"
+    },
+    {
+      "id": "job_653907f994944a6f8438656ec0a524a6",
+      "kind": "scenario-review",
+      "state": "completed",
+      "attempts": 1,
+      "created_at": "2026-10-16T19:13:22.106387+00:00",
+      "updated_at": "2026-10-16T19:15:01.499906+00:00"
+    },
+    {
+      "id": "job_86b66b0b9e7c49b38a2bf3170552f5c5",
+      "kind": "scenario-review",
+      "state": "completed",
+      "attempts": 1,
+      "created_at": "2026-10-16T19:13:28.776209+00:00",
+      "updated_at": "2026-10-16T19:15:04.002218+00:00"
+    },
+    {
+      "id": "job_9b494e9f454d4e74900ae9913a178fa5",
+      "kind": "scenario-review",
+      "state": "completed",
+      "attempts": 1,
+      "created_at": "2026-10-16T19:13:28.776514+00:00",
+      "updated_at": "2026-10-16T19:16:21.920608+00:00"
+    },
+    {
+      "id": "job_ea7e18c1a1544ccd902f8f01f2ba5fff",
+      "kind": "scenario-review",
+      "state": "completed",
+      "attempts": 1,
+      "created_at": "2026-10-16T19:13:28.776816+00:00",
+      "updated_at": "2026-10-16T19:15:57.590194+00:00"
+    },
+    {
+      "id": "job_22b6268d9fad41a8b9344b104d8927ac",
+      "kind": "scenario-review",
+      "state": "completed",
+      "attempts": 2,
+      "created_at": "2026-10-16T19:21:27.646061+00:00",
+      "updated_at": "2026-10-16T19:24:43.675416+00:00"
+    },
+    {
+      "id": "job_7ecd66b587494585a978847ecd67c675",
+      "kind": "scenario-review",
+      "state": "completed",
+      "attempts": 1,
+      "created_at": "2026-10-16T19:21:27.646356+00:00",
+      "updated_at": "2026-10-16T19:22:54.835281+00:00"
+    },
+    {
+      "id": "job_ec09b6ad6d234a7fa8564ff22da7ea9d",
+      "kind": "scenario-review",
+      "state": "completed",
+      "attempts": 1,
+      "created_at": "2026-10-16T19:21:27.646608+00:00",
+      "updated_at": "2026-10-16T19:23:14.857747+00:00"
+    },
+    {
+      "id": "job_56119b77fb754ac0a68b07a157dfb224",
+      "kind": "scenario-review",
+      "state": "completed",
+      "attempts": 1,
+      "created_at": "2026-10-16T19:21:27.646810+00:00",
+      "updated_at": "2026-10-16T19:23:43.162958+00:00"
+    },
+    {
+      "id": "job_9ce19967d3294ec0b4c0a98a8c7559cd",
+      "kind": "scenario-review",
+      "state": "completed",
+      "attempts": 1,
+      "created_at": "2026-10-16T19:21:27.646998+00:00",
+      "updated_at": "2026-10-16T19:23:48.813297+00:00"
+    }
+  ],
+  "cli_invocations": 15,
+  "retained_failures": [
+    {
+      "job_id": "job_6de625102d1348c9848b3da7a1b0fa2a",
+      "attempt": 1,
+      "reason": "Review marked distinctness passed while listing materially overlapping scenario IDs; validator rejected contradiction. Clarified prompt and retried without regenerating drafts."
+    },
+    {
+      "job_id": "job_22b6268d9fad41a8b9344b104d8927ac",
+      "attempt": 2,
+      "reason": "Model returned malformed final JSON (missing closing array bracket); original response retained and not counted as a valid report."
+    }
+  ],
+  "fixes": [
+    "Provide byte-faithful leaf.md alongside full JSON input to avoid per-line read truncation; grant only exact document read paths.",
+    "Clarify related_scenario_ids denotes material overlap, not all compared peers."
+  ],
+  "checks": {
+    "backend_total": 319,
+    "factory_backend": 51,
+    "ruff": "passed"
+  },
+  "operator_observations": [
+    "The generation stage has only the leaf document, not existing scene context, so repeated production can duplicate earlier scenes; provide pinned existing scenarios before broader rollout.",
+    "Three task scenarios were generated in English despite the Chinese UI; output locale should be explicit in the generation input.",
+    "Review judgments are advisory and differ across attempts; do not treat model pass as human confirmation or market/runtime validation."
+  ],
+  "raw_evidence_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory",
+  "automatic_confirmation": false,
+  "automatic_publication": false,
+  "automatic_template_production": false,
+  "screenshot": "docs/template-factory/2026-10-17-scenario-batch-01.jpg"
+}

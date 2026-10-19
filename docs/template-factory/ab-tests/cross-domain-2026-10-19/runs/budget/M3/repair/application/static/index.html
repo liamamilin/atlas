@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>个人月度预算</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="app-header">
+  <h1>个人月度预算与剩余额度</h1>
+  <p class="subtitle">仅本机使用 · 人民币（元，两位小数）· 数据只写入指定目录，重启后仍可回查</p>
+</header>
+
+<main>
+  <section class="panel">
+    <div class="month-row">
+      <label for="month">选择月份</label>
+      <input type="month" id="month" data-testid="month">
+      <button type="button" id="export-btn" class="secondary">导出当月 CSV</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>建立分类与月预算</h2>
+    <div class="form-row">
+      <input type="text" id="category-name" data-testid="category-name"
+             placeholder="分类名称，如 餐饮" autocomplete="off">
+      <input type="text" id="category-budget" data-testid="category-budget"
+             placeholder="预算金额，如 1000.00" inputmode="decimal" autocomplete="off">
+      <button type="button" id="category-save" data-testid="category-save">保存分类</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>记录支出</h2>
+    <div class="form-row">
+      <input type="date" id="expense-date" data-testid="expense-date">
+      <select id="expense-category" data-testid="expense-category"></select>
+      <input type="text" id="expense-amount" data-testid="expense-amount"
+             placeholder="金额，如 23.45" inputmode="decimal" autocomplete="off">
+      <input type="text" id="expense-note" data-testid="expense-note"
+             placeholder="备注" autocomplete="off">
+      <button type="button" id="expense-save" data-testid="expense-save">记一笔</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>本月总览</h2>
+    <div class="totals" id="totals"></div>
+    <table>
+      <thead>
+        <tr><th>分类</th><th>预算</th><th>已花</th><th>剩余</th><th>操作</th></tr>
+      </thead>
+      <tbody id="category-rows"></tbody>
+    </table>
+  </section>
+
+  <section class="panel">
+    <h2>本月支出明细</h2>
+    <table>
+      <thead>
+        <tr><th>日期</th><th>分类</th><th>金额</th><th>备注</th><th>操作</th></tr>
+      </thead>
+      <tbody id="transaction-rows"></tbody>
+    </table>
+  </section>
+</main>
+
+<div id="feedback" class="feedback" aria-live="polite" role="status"></div>
+
+<script>
+  window.APP_API = {
+    state: "/api/state",
+    categories: "/api/categories",
+    transactions: "/api/transactions",
+    export: "/api/export"
+  };
+</script>
+<script src="/static/app.js"></script>
+</body>
+</html>

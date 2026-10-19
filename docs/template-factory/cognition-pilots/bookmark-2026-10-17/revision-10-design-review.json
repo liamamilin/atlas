@@ -1,0 +1,177 @@
+{
+  "outcome": "passed",
+  "summary": "scenario_scope: passed; product_completeness: passed; architecture_contract: passed; phase_acceptance: passed; decisions_defaults: passed",
+  "checks": [
+    {
+      "dimension": "scenario_scope",
+      "outcome": "passed",
+      "files": [
+        "DRAFT.md",
+        "ARCHITECTURE.md"
+      ],
+      "reason": "确认场景的四个验收点均有对应能力：F01/F03 保存与默认归类、F02 跨会话持久、F05 打开原页、F08/F09 新建归类与移动、F13/F14 检索与归类浏览。角色限定为单用户收藏者，R02 仅为部署维护者且明确不浏览内容，R03 明确本期不存在，符合单人私有范围。P0 的保存表单仅含默认归类，P1 才允许保存时选择归类，属于已声明的阶段依赖而非范围缺失；P3 导入导出与标签、扩展等均未纳入本期，快照/全文检索/分享协作已排除，没有把后续或不适用的能力写成本期承诺。"
+    },
+    {
+      "dimension": "product_completeness",
+      "outcome": "passed",
+      "files": [
+        "DRAFT.md",
+        "ARCHITECTURE.md"
+      ],
+      "reason": "DRAFT 的 A28–A33 与 ARCHITECTURE §8 明确给出了 bookmark-form、duplicate-save-form、move/edit/delete 表单、category-form/category-rename-form/删除归类对话框、trash restore/single-purge/clear、search/sort/page 链接，覆盖用户从保存、选择或移动归类、浏览或检索到打开原页和删除后恢复的完整路径。失败与恢复也有声明：字段校验失败时重新渲染 200 并保留已填值及 form-error；重复 URL 不写入，保留 url/title/note/categoryId，并提供 duplicate-existing-link 与显式另存；归类删除目标失效返回 400 并显示 dialog-error；软删除成功 303 回首页并显示 flash，随后可经 trash-link 恢复或永久删除。A02 规划验证重启后持久，A05/A28 规划验证经 /b/{id} 302 回到原始网页。空库空态与确认清空被明确列为未执行的手工核对项，不构成本期必要产品能力缺失。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "outcome": "passed",
+      "files": [
+        "DRAFT.md",
+        "ARCHITECTURE.md"
+      ],
+      "reason": "D01 的单归属加默认归类、D02 的仅活跃 url_key 去重、D03 的 move/purge 加 tombstone、D05 的 URL 校验/归一/302 ASCII Location、D06 的 Host/Origin/Fetch 边界、D07 的回收站确认与 --allow-destructive 规则均在 ARCHITECTURE.md 第 2–9 节有对应字段、错误码和事务不变量；ID 字符串化、分页排序参数、confirm/allowDuplicate 规范化、restore 回退与 bookmarkCount 计数也一致。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "outcome": "passed",
+      "files": [
+        "DRAFT.md",
+        "ARCHITECTURE.md",
+        "REVISION.md"
+      ],
+      "reason": "P0 的 A01–A10/A28 覆盖保存、重启持久、默认归类、列表、302、重复与边界及首页分页；P1 的 A11–A20/A29–A31 覆盖归类新建改名、移动、删除二选一、回收站恢复、单条清除与编辑；P2 的 A21–A27/A32–A33 覆盖检索、归类过滤、排序分页与 UI。file_plan 将 A01/A03/A04 映射到 p0-save，A02/A05/A06/A07 到 p0-library，A08–A10 到 p0-limits，A11–A15 到 p1-categories，A16–A18 到 p1-trash，A19–A20 到 p1-edit，A21–A24/A27 到 p2-search，A25–A26 到 p2-browse，A28/A29–A31/A32–A33 到 ui-*，导出接口、聚合器与 run.cjs 的加载约定一致；A22 对已交付 P1 PATCH 的使用符合架构 §9 的阶段纪律。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "outcome": "passed",
+      "files": [
+        "DRAFT.md",
+        "ARCHITECTURE.md"
+      ],
+      "reason": "决策显式且默认可逆：D01 采用单归属归类与不可删改的默认落点，P0 仅默认归类、P1 再开放新建/改名/选择/移动；D02 默认阻止重复 URL，但通过显式 allowDuplicate=true 或 HTML 另存表单保留用户选择；D03 要求显式 mode=move 或 mode=purge&confirm=true，默认目标为默认归类，且不物理删除 categories 行；D04 默认不抓取、标题可按主机名派生并标记 titleSource；D05 明确保守 URL 归一与 302 序列化边界；D06 默认仅监听 127.0.0.1、无内建账号，远程访问须由部署者在认证代理后提供；D07 回收站不过期，单条 HTML 永久删除与清空分别要求 confirm=true，全局清空另需 --allow-destructive；D08 将导入导出明确列为 P3 不实现；D09 明确重启 adapter、浏览器认证与破坏性测试的默认及失败语义。各 when_to_ask 均绑定可观察的用户需求或部署能力（如多主题归属、需要合并、抓取太慢、UTM 重复、家人共用、定期清理、目标无法重启），而非日常整理偏好，属于有意义的提问触发。"
+    }
+  ],
+  "suggestions": [
+    "在阶段说明中明确 P0 仅支持默认归类、P1 才覆盖“保存时选择归类”，避免将 P0 误读为已满足确认工作流的第 2 步。",
+    "建议明确 PATCH /api/bookmarks/:id 成功时的 200 响应体形状，避免验收程序对返回字段产生不同假设。",
+    "建议在 sort-form 中显式保留 q 与 categoryId，以兑现 F14 的检索、归类与排序组合；当前只明确规定分页链接保留这些参数。",
+    "A03 的“其余按 name_key 升序”在 P0 没有创建非默认归类的可用能力；请把该排序断言移到 P1（例如 A11/A29 创建两个归类后断言），或明确声明该断言依赖目标中已有的非默认归类。",
+    "A20 的坏 Host 矩阵只覆盖 GET /api/trash；若 F02 继续承诺所有读取页面校验 Host，建议补 GET /trash 与 GET /c/{id} 的 400 invalid_host 负例，或明确只在代表性路由上证明该全局中间件。",
+    "建议将 F10 中的「默认路径是 mode=move」改为「推荐路径为 mode=move」，以匹配 D03 与 ARCHITECTURE §6 的「缺少 mode 返回 400 category_delete_mode_required」，避免把 UI 主路径误读为 API 可省略 mode 的默认值。",
+    "建议在 D01/F03 中固定默认归类的单一用户可见名称（当前「未分类」「以后看看」「未分类（以后看看）」并存），供 UI 文案和后续验收统一引用。"
+  ],
+  "scope": "Independent dimension-by-dimension specification design review of pinned proposal projections before new programs are authored; no execution or frozen-candidate acceptance. Full research facts and authored programs remain for separate frozen-candidate review.",
+  "proposal_digest": "8be9b8cd74ed3e71d7dda7efddd8841717e640f822eb0cccf6d0702b41d865f3",
+  "subreviews": [
+    {
+      "outcome": "passed",
+      "summary": "范围与已确认场景一致：单人、单实例的个人书签库，围绕保存 URL、默认未分类、归类与移动、按归类浏览/关键字检索、打开原页面展开；P0–P2 分阶段覆盖完整闭环。导出导入、标签、批量操作、浏览器扩展均明确延后，快照、全文检索、失效扫描、分享协作均明确排除，未引入多用户或企业能力。P1 的删除/回收站/归类删除属于防止记录无声丢失的数据生命周期补充，与确认场景不冲突。",
+      "checks": [
+        {
+          "dimension": "scenario_scope",
+          "outcome": "passed",
+          "files": [
+            "DRAFT.md",
+            "ARCHITECTURE.md"
+          ],
+          "reason": "确认场景的四个验收点均有对应能力：F01/F03 保存与默认归类、F02 跨会话持久、F05 打开原页、F08/F09 新建归类与移动、F13/F14 检索与归类浏览。角色限定为单用户收藏者，R02 仅为部署维护者且明确不浏览内容，R03 明确本期不存在，符合单人私有范围。P0 的保存表单仅含默认归类，P1 才允许保存时选择归类，属于已声明的阶段依赖而非范围缺失；P3 导入导出与标签、扩展等均未纳入本期，快照/全文检索/分享协作已排除，没有把后续或不适用的能力写成本期承诺。"
+        }
+      ],
+      "suggestions": [
+        "在阶段说明中明确 P0 仅支持默认归类、P1 才覆盖“保存时选择归类”，避免将 P0 误读为已满足确认工作流的第 2 步。"
+      ],
+      "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+      "proposal_digest": "8be9b8cd74ed3e71d7dda7efddd8841717e640f822eb0cccf6d0702b41d865f3",
+      "projection_digest": "2074dd67ecc18cbd3cbe6d118d313f2c20c48d9bbfbb24f28870eee4d9331eb5",
+      "stage": "blueprint-spec-review-1-scenario_scope"
+    },
+    {
+      "outcome": "passed",
+      "summary": "产品完整性维度审查通过：在 P0–P2 的当前范围内，保存、归类/移动、浏览/检索、打开原页、软删除与回收站恢复等主要用户旅程都有已声明的浏览器入口，并且覆盖成功、校验失败和恢复路径；未发现只有 API 而没有 UI 的必要主能力，也未发现阻断性缺口。",
+      "checks": [
+        {
+          "dimension": "product_completeness",
+          "outcome": "passed",
+          "files": [
+            "DRAFT.md",
+            "ARCHITECTURE.md"
+          ],
+          "reason": "DRAFT 的 A28–A33 与 ARCHITECTURE §8 明确给出了 bookmark-form、duplicate-save-form、move/edit/delete 表单、category-form/category-rename-form/删除归类对话框、trash restore/single-purge/clear、search/sort/page 链接，覆盖用户从保存、选择或移动归类、浏览或检索到打开原页和删除后恢复的完整路径。失败与恢复也有声明：字段校验失败时重新渲染 200 并保留已填值及 form-error；重复 URL 不写入，保留 url/title/note/categoryId，并提供 duplicate-existing-link 与显式另存；归类删除目标失效返回 400 并显示 dialog-error；软删除成功 303 回首页并显示 flash，随后可经 trash-link 恢复或永久删除。A02 规划验证重启后持久，A05/A28 规划验证经 /b/{id} 302 回到原始网页。空库空态与确认清空被明确列为未执行的手工核对项，不构成本期必要产品能力缺失。"
+        }
+      ],
+      "suggestions": [],
+      "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+      "proposal_digest": "8be9b8cd74ed3e71d7dda7efddd8841717e640f822eb0cccf6d0702b41d865f3",
+      "projection_digest": "f4e472482d77bff300de3a04cffff6b223e407f6419c4b871e9147cec5dd77ac",
+      "stage": "blueprint-spec-review-1-product_completeness"
+    },
+    {
+      "outcome": "passed",
+      "summary": "architecture_contract 维度通过：D01–D09 的默认规则与数据模型、HTTP/错误信封、Host/Origin 安全边界及验收运行契约相互对齐，未发现会破坏主流程或造成数据/安全缺口的矛盾。P0–P2 仍未实现、A01–A33 未运行，本次仅做静态设计审阅。",
+      "checks": [
+        {
+          "dimension": "architecture_contract",
+          "outcome": "passed",
+          "files": [
+            "DRAFT.md",
+            "ARCHITECTURE.md"
+          ],
+          "reason": "D01 的单归属加默认归类、D02 的仅活跃 url_key 去重、D03 的 move/purge 加 tombstone、D05 的 URL 校验/归一/302 ASCII Location、D06 的 Host/Origin/Fetch 边界、D07 的回收站确认与 --allow-destructive 规则均在 ARCHITECTURE.md 第 2–9 节有对应字段、错误码和事务不变量；ID 字符串化、分页排序参数、confirm/allowDuplicate 规范化、restore 回退与 bookmarkCount 计数也一致。"
+        }
+      ],
+      "suggestions": [
+        "建议明确 PATCH /api/bookmarks/:id 成功时的 200 响应体形状，避免验收程序对返回字段产生不同假设。",
+        "建议在 sort-form 中显式保留 q 与 categoryId，以兑现 F14 的检索、归类与排序组合；当前只明确规定分页链接保留这些参数。"
+      ],
+      "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+      "proposal_digest": "8be9b8cd74ed3e71d7dda7efddd8841717e640f822eb0cccf6d0702b41d865f3",
+      "projection_digest": "b3973b20c71f2d739489de5586955bbd2b0462a558ffde5fa4df79906d1b1107",
+      "stage": "blueprint-spec-review-1-architecture_contract"
+    },
+    {
+      "outcome": "passed",
+      "summary": "phase_acceptance 范围内通过：P0/P1/P2 的 acceptance 集合与 phases/features 对齐，所有案例均能落到 file_plan 声明的行为组、聚合器或浏览器 runner；P0 未调用 P1/P2 写接口，P2 对 P1 PATCH 与归类页的依赖符合架构的阶段纪律；A02/A18 的 incomplete/退出码契约没有被当作通过。仅有两处非阻断的范围澄清。",
+      "checks": [
+        {
+          "dimension": "phase_acceptance",
+          "outcome": "passed",
+          "files": [
+            "DRAFT.md",
+            "ARCHITECTURE.md",
+            "REVISION.md"
+          ],
+          "reason": "P0 的 A01–A10/A28 覆盖保存、重启持久、默认归类、列表、302、重复与边界及首页分页；P1 的 A11–A20/A29–A31 覆盖归类新建改名、移动、删除二选一、回收站恢复、单条清除与编辑；P2 的 A21–A27/A32–A33 覆盖检索、归类过滤、排序分页与 UI。file_plan 将 A01/A03/A04 映射到 p0-save，A02/A05/A06/A07 到 p0-library，A08–A10 到 p0-limits，A11–A15 到 p1-categories，A16–A18 到 p1-trash，A19–A20 到 p1-edit，A21–A24/A27 到 p2-search，A25–A26 到 p2-browse，A28/A29–A31/A32–A33 到 ui-*，导出接口、聚合器与 run.cjs 的加载约定一致；A22 对已交付 P1 PATCH 的使用符合架构 §9 的阶段纪律。"
+        }
+      ],
+      "suggestions": [
+        "A03 的“其余按 name_key 升序”在 P0 没有创建非默认归类的可用能力；请把该排序断言移到 P1（例如 A11/A29 创建两个归类后断言），或明确声明该断言依赖目标中已有的非默认归类。",
+        "A20 的坏 Host 矩阵只覆盖 GET /api/trash；若 F02 继续承诺所有读取页面校验 Host，建议补 GET /trash 与 GET /c/{id} 的 400 invalid_host 负例，或明确只在代表性路由上证明该全局中间件。"
+      ],
+      "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+      "proposal_digest": "8be9b8cd74ed3e71d7dda7efddd8841717e640f822eb0cccf6d0702b41d865f3",
+      "projection_digest": "a6863774fb6f7c58dee5bb36d3f119ce2109cd2d21808b69395eb64c24fe9681",
+      "stage": "blueprint-spec-review-1-phase_acceptance"
+    },
+    {
+      "outcome": "passed",
+      "summary": "decisions_defaults 维度通过：D01–D09 均给出明确默认值、可逆路径与真实的提问触发条件，破坏性操作要求显式确认；未发现会破坏主旅程、造成当前承诺矛盾或数据完整性/安全缺口的默认值矛盾。仅有两处措辞或文案需在编写验收前统一，不影响结论。",
+      "checks": [
+        {
+          "dimension": "decisions_defaults",
+          "outcome": "passed",
+          "files": [
+            "DRAFT.md",
+            "ARCHITECTURE.md"
+          ],
+          "reason": "决策显式且默认可逆：D01 采用单归属归类与不可删改的默认落点，P0 仅默认归类、P1 再开放新建/改名/选择/移动；D02 默认阻止重复 URL，但通过显式 allowDuplicate=true 或 HTML 另存表单保留用户选择；D03 要求显式 mode=move 或 mode=purge&confirm=true，默认目标为默认归类，且不物理删除 categories 行；D04 默认不抓取、标题可按主机名派生并标记 titleSource；D05 明确保守 URL 归一与 302 序列化边界；D06 默认仅监听 127.0.0.1、无内建账号，远程访问须由部署者在认证代理后提供；D07 回收站不过期，单条 HTML 永久删除与清空分别要求 confirm=true，全局清空另需 --allow-destructive；D08 将导入导出明确列为 P3 不实现；D09 明确重启 adapter、浏览器认证与破坏性测试的默认及失败语义。各 when_to_ask 均绑定可观察的用户需求或部署能力（如多主题归属、需要合并、抓取太慢、UTM 重复、家人共用、定期清理、目标无法重启），而非日常整理偏好，属于有意义的提问触发。"
+        }
+      ],
+      "suggestions": [
+        "建议将 F10 中的「默认路径是 mode=move」改为「推荐路径为 mode=move」，以匹配 D03 与 ARCHITECTURE §6 的「缺少 mode 返回 400 category_delete_mode_required」，避免把 UI 主路径误读为 API 可省略 mode 的默认值。",
+        "建议在 D01/F03 中固定默认归类的单一用户可见名称（当前「未分类」「以后看看」「未分类（以后看看）」并存），供 UI 文案和后续验收统一引用。"
+      ],
+      "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+      "proposal_digest": "8be9b8cd74ed3e71d7dda7efddd8841717e640f822eb0cccf6d0702b41d865f3",
+      "projection_digest": "b3973b20c71f2d739489de5586955bbd2b0462a558ffde5fa4df79906d1b1107",
+      "stage": "blueprint-spec-review-1-decisions_defaults"
+    }
+  ]
+}

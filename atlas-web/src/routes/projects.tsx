@@ -1,20 +1,29 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { AlertTriangle, BookMarked, FolderKanban, Plus, RefreshCw, Save, Trash2 } from "lucide-react";
+import { AlertTriangle, BookMarked, Download, FolderKanban, Plus, RefreshCw, Save, Trash2 } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ErrorBox, Loading, useAsync } from "@/components/loaders";
 import { Prose } from "@/components/prose";
 import {
   createProject,
+  createProjectBackup,
   deleteProject,
+  deleteProjectBackup,
   getLeaf,
   getProject,
   getProjectReferences,
   getProjects,
+  getProjectRestoreStatus,
   invalidateAtlasCache,
+  listProjectBackups,
+  prepareProjectBackupRestore,
+  recoverProjectRestore,
+  restoreProjectBackup,
   updateProjectReference,
   type AtlasProject,
   type ProjectReference,
+  type ProjectRestoreStatus,
+  type ProjectRestoreTarget,
 } from "@/lib/atlas";
 import { pick, t, useLang } from "@/lib/lang";
 import { useCurrentProjectId } from "@/lib/project-selection";
@@ -31,9 +40,12 @@ export function Projects() {
   const [revision, setRevision] = useState(0);
   const { data: projects, error, loading } = useAsync(getProjects, [revision]);
   const [selectedId, select] = useCurrentProjectId();
+  const selectedProject = projects?.find((project) => project.id === selectedId);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState("");
+  const [backingUpId, setBackingUpId] = useState("");
+  const [backupRevision, setBackupRevision] = useState(0);
   const [deleteError, setDeleteError] = useState("");
   const [deleteNotice, setDeleteNotice] = useState("");
   const [form, setForm] = useState({ name: "", objective: "", workspace: "", mode: (searchParams.get("mode") === "existing" ? "existing" : "new") as AtlasProject["mode"] });
@@ -83,20 +95,51 @@ export function Projects() {
     }
   };
 
+  const backup = async (project: AtlasProject) => {
+    if (backingUpId) return;
+    setBackingUpId(project.id);
+    setDeleteError("");
+    setDeleteNotice("");
+    try {
+      const result = await createProjectBackup(project.id);
+      const anchor = document.createElement("a");
+      anchor.href = result.download_url;
+      anchor.download = "";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      invalidateAtlasCache();
+      setBackupRevision((value) => value + 1);
+      setDeleteNotice(lang === "zh"
+        ? `项目“${project.name}”的备份已创建并开始下载；用户源码不包含在备份中。`
+        : `A backup of “${project.name}” was created and is downloading; source files are not included.`);
+    } catch (cause) {
+      setDeleteError(cause instanceof Error ? cause.message
+        : (lang === "zh" ? "项目备份失败，请确认没有活动执行或生成任务。" : "Backup failed. Confirm that no generation or execution is active."));
+    } finally {
+      setBackingUpId("");
+    }
+  };
+
   const remove = async (project: AtlasProject) => {
     const message = lang === "zh"
-      ? `删除项目“${project.name}”及其 Atlas 文档、需求和执行记录？\n\n本地工作区和源码不会删除。此操作不可撤销。`
-      : `Delete “${project.name}” and its Atlas documents, requirements, and execution records?\n\nThe local workspace and source files will be preserved. This cannot be undone.`;
+      ? `删除项目“${project.name}”及其 Atlas 文档、需求、执行副本、证据和导出包？\n\n本地工作区和源码不会删除。此操作不可撤销。`
+      : `Delete “${project.name}” and its Atlas documents, requirements, execution copies, evidence, and exports?\n\nThe local workspace and source files will be preserved. This cannot be undone.`;
     if (!window.confirm(message)) return;
     setDeletingId(project.id);
     setDeleteError("");
     setDeleteNotice("");
     try {
-      await deleteProject(project.id);
+      const result = await deleteProject(project.id);
       if (selectedId === project.id) select("");
-      setDeleteNotice(lang === "zh"
-        ? `项目“${project.name}”已删除；本地工作区和源码未受影响。`
-        : `“${project.name}” was deleted; the local workspace and source files were not changed.`);
+      const cleanupFailed = Object.keys(result.artifact_cleanup_errors || {});
+      setDeleteNotice(cleanupFailed.length
+        ? (lang === "zh"
+          ? `项目“${project.name}”已删除，但部分 Atlas 产物清理失败：${cleanupFailed.join("、")}。`
+          : `“${project.name}” was deleted, but some Atlas artifacts could not be cleaned: ${cleanupFailed.join(", ")}.`)
+        : (lang === "zh"
+          ? `项目“${project.name}”及其 Atlas 产物已删除；本地工作区和源码未受影响。`
+          : `“${project.name}” and its Atlas artifacts were deleted; the local workspace and source files were not changed.`));
       setRevision((value) => value + 1);
     } catch {
       setDeleteError(lang === "zh" ? "项目删除失败，请稍后重试。" : "Project deletion failed. Please try again.");
@@ -142,9 +185,32 @@ export function Projects() {
                             <Button size="sm" asChild><Link to={`/projects/${project.id}`}>{lang === "zh" ? "打开工作区" : "Open workspace"}</Link></Button>
                             <Button
                               size="sm"
+                              variant="outline"
+                              disabled={Boolean(backingUpId) || deletingId === project.id}
+                              onClick={() => backup(project)}
+                            >
+                              <Download className="size-3.5" />
+                              {backingUpId === project.id
+                                ? (lang === "zh" ? "备份中…" : "Backing up…")
+                                : (lang === "zh" ? "备份" : "Back up")}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={Boolean(backingUpId) || deletingId === project.id}
+                              onClick={() => {
+                                select(project.id);
+                                document.getElementById("backup-restore")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                              }}
+                            >
+                              <RefreshCw className="size-3.5" />
+                              {lang === "zh" ? "管理备份" : "Manage backups"}
+                            </Button>
+                            <Button
+                              size="sm"
                               variant="ghost"
                               className="text-danger hover:bg-danger/10"
-                              disabled={deletingId === project.id}
+                              disabled={deletingId === project.id || Boolean(backingUpId)}
                               onClick={() => remove(project)}
                             >
                               <Trash2 className="size-3.5" />
@@ -202,7 +268,12 @@ export function Projects() {
           </form>
         </section>
       </div>
-      {selectedId ? <ProjectReferences projectId={selectedId} /> : null}
+      {selectedProject ? (
+        <>
+          <ProjectReferences projectId={selectedProject.id} />
+          <BackupRestorePanel key={selectedProject.id} project={selectedProject} revision={backupRevision} />
+        </>
+      ) : null}
     </main>
   );
 }
@@ -361,6 +432,254 @@ function ProjectReferences({ projectId }: { projectId: string }) {
       {saveError ? <p className="mt-3 text-sm text-danger" role="alert">{saveError}</p> : null}
     </section>
   );
+}
+
+function BackupRestorePanel({ project, revision }: { project: AtlasProject; revision: number }) {
+  const { lang } = useLang();
+  const [localRevision, setLocalRevision] = useState(0);
+  const [selectedBackup, setSelectedBackup] = useState("");
+  const [target, setTarget] = useState<ProjectRestoreTarget | null>(null);
+  const [status, setStatus] = useState<ProjectRestoreStatus | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
+  const { data, error: listError, loading } = useAsync(
+    () => listProjectBackups(project.id),
+    [project.id, revision, localRevision],
+  );
+  const backups = data?.backups || [];
+
+  const refresh = () => {
+    invalidateAtlasCache();
+    setLocalRevision((value) => value + 1);
+    setError("");
+  };
+
+  const prepare = async (backupName: string) => {
+    if (busy) return;
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const prepared = await prepareProjectBackupRestore(project.id, backupName);
+      setSelectedBackup(backupName);
+      setTarget(prepared);
+      setStatus(null);
+      setNotice(lang === "zh"
+        ? "恢复目标已由 Atlas 准备好；请确认后写入新的空项目库。"
+        : "Atlas prepared a controlled restore target. Confirm before writing a new empty project store.");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message
+        : (lang === "zh" ? "无法准备恢复目标。" : "Could not prepare a restore target."));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const removeBackup = async (backupName: string) => {
+    if (busy) return;
+    const message = lang === "zh"
+      ? `删除备份“${backupName}”？\n\n只删除 Atlas 备份归档，不删除项目或用户源码；此操作不可撤销。`
+      : `Delete backup “${backupName}”?\n\nOnly the Atlas archive is deleted; the project and user source are not removed. This cannot be undone.`;
+    if (!window.confirm(message)) return;
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      await deleteProjectBackup(project.id, backupName);
+      invalidateAtlasCache();
+      setSelectedBackup("");
+      setTarget(null);
+      setLocalRevision((value) => value + 1);
+      setNotice(lang === "zh" ? "备份归档已删除。" : "Backup archive deleted.");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message
+        : (lang === "zh" ? "备份删除失败。" : "Could not delete the backup."));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const restore = async () => {
+    if (!target || !selectedBackup || busy) return;
+    const message = lang === "zh"
+      ? `将备份恢复到新的空项目库？\n\n不会覆盖当前项目库，也不会写入用户源码。恢复目标由 Atlas 管理。`
+      : `Restore this backup to a new empty project store?\n\nThe current store will not be overwritten, user source files will not be included, and Atlas manages the target.`;
+    if (!window.confirm(message)) return;
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const result = await restoreProjectBackup(
+        project.id, selectedBackup, target.restore_id,
+      );
+      setStatus({
+        restore_id: result.restore_id,
+        project_id: result.project_id,
+        status: "completed",
+        interrupted: false,
+        phase: "verified",
+        database_installed: true,
+        installed_artifact_count: result.artifacts_restored_count,
+      });
+      setTarget(null);
+      setLocalRevision((value) => value + 1);
+      setNotice(lang === "zh"
+        ? "恢复完成；当前项目库和用户源码未被覆盖。"
+        : "Restore completed; the current store and user source files were not overwritten.");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message
+        : (lang === "zh" ? "恢复失败；请检查恢复状态。" : "Restore failed; inspect the restore status."));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const recoverInterrupted = async () => {
+    if (!status || status.status !== "interrupted" || busy) return;
+    const message = lang === "zh"
+      ? "清理这次中断的恢复目标？\n\n只会删除 restore journal 记录且指纹未变化的 Atlas 产物；不会删除用户源码。"
+      : "Clean up this interrupted restore target?\n\nOnly Atlas artifacts recorded by the restore journal and unchanged by fingerprint will be removed; user source is not removed.";
+    if (!window.confirm(message)) return;
+    setBusy(true);
+    setError("");
+    try {
+      const result = await recoverProjectRestore(project.id, status.restore_id);
+      setStatus({
+        restore_id: result.restore_id,
+        project_id: result.project_id,
+        status: "not_started",
+        interrupted: false,
+        phase: "recovered",
+        database_installed: false,
+        installed_artifact_count: 0,
+      });
+      setNotice(lang === "zh"
+        ? "中断恢复已清理；可以重新准备一个恢复目标。"
+        : "Interrupted restore cleanup completed; a new target can be prepared.");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message
+        : (lang === "zh" ? "中断恢复清理失败。" : "Interrupted restore cleanup failed."));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const refreshStatus = async () => {
+    if (!status || busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      setStatus(await getProjectRestoreStatus(project.id, status.restore_id));
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message
+        : (lang === "zh" ? "无法读取恢复状态。" : "Could not read restore status."));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section id="backup-restore" className="mt-8 rounded-xl bg-surface p-5 shadow-card">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="font-serif text-xl font-medium">{lang === "zh" ? "备份与恢复" : "Backup and restore"}</h2>
+          <p className="mt-1 max-w-3xl text-xs leading-5 text-subtle">
+            {lang === "zh"
+              ? "备份包含 Atlas 项目状态和受控证据，不包含用户源码。恢复只能写入服务端生成的新的空项目库，不接受任意主机路径。Atlas 不会自动清理备份；删除归档需要逐项确认。"
+              : "Backups contain Atlas project state and controlled evidence, not user source. Restore only writes a new empty store generated by the server; arbitrary host paths are rejected. Atlas does not automatically clean backups; deleting an archive requires item-by-item confirmation."}
+          </p>
+        </div>
+        <Button size="sm" variant="ghost" onClick={refresh} disabled={busy} aria-label={lang === "zh" ? "刷新备份列表" : "Refresh backup list"}>
+          <RefreshCw className="size-3.5" />{lang === "zh" ? "刷新" : "Refresh"}
+        </Button>
+      </div>
+
+      {notice ? <p className="mt-4 rounded-md bg-primary/10 p-3 text-sm text-primary" role="status">{notice}</p> : null}
+      {error || listError ? <p className="mt-4 rounded-md bg-danger/10 p-3 text-sm text-danger" role="alert">{error || String(listError)}</p> : null}
+      {loading ? <Loading /> : backups.length ? (
+        <div className="mt-4 space-y-3">
+          {backups.map((backup) => (
+            <div key={backup.name} className="rounded-lg border border-border bg-bg-elevated p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate font-mono text-xs">{backup.name}</p>
+                  <p className="mt-1 text-xs text-muted">
+                    {backup.created_at ? new Date(backup.created_at).toLocaleString(lang === "zh" ? "zh-CN" : "en-US") : (lang === "zh" ? "时间未知" : "Unknown time")}
+                    {backup.size !== undefined ? ` · ${formatBytes(backup.size)}` : ""}
+                  </p>
+                  {backup.sha256 ? <p className="mt-1 font-mono text-[11px] text-subtle">SHA-256 {backup.sha256.slice(0, 16)}…</p> : null}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`rounded-full px-2 py-1 text-[11px] ${backup.valid ? "bg-primary/10 text-primary" : "bg-danger/10 text-danger"}`}>
+                    {backup.valid ? (lang === "zh" ? "校验通过" : "Validated") : (lang === "zh" ? "不可恢复" : "Unavailable")}
+                  </span>
+                  <Button size="sm" variant="outline" disabled={!backup.valid || busy} onClick={() => prepare(backup.name)}>
+                    {lang === "zh" ? "准备恢复" : "Prepare restore"}
+                  </Button>
+                  <Button size="sm" variant="ghost" disabled={busy} onClick={() => removeBackup(backup.name)}>
+                    {lang === "zh" ? "删除归档" : "Delete archive"}
+                  </Button>
+                </div>
+              </div>
+              {backup.valid ? (
+                <p className="mt-3 text-xs text-subtle">
+                  {lang === "zh" ? "不包含用户源码；恢复不会覆盖当前项目库。" : "User source is not included; restore cannot overwrite the current store."}
+                </p>
+              ) : <p className="mt-3 text-xs text-danger">{lang === "zh" ? "备份校验失败，不能作为恢复来源。" : "This backup failed validation and cannot be restored."}</p>}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-4 text-sm text-muted">{lang === "zh" ? "还没有可用备份。先在项目卡片中创建备份。" : "No backups are available yet. Create one from the project card first."}</p>
+      )}
+
+      {target ? (
+        <div className="mt-4 rounded-lg border border-warn/40 bg-warn/10 p-4">
+          <p className="text-sm font-medium">{lang === "zh" ? "恢复到新的空项目库" : "Restore to a new empty project store"}</p>
+          <p className="mt-1 text-xs leading-5 text-muted">
+            {lang === "zh" ? `备份：${selectedBackup}。目标由 Atlas 管理（${target.restore_id}）；不会接受主机路径。` : `Backup: ${selectedBackup}. Atlas manages the target (${target.restore_id}); host paths are not accepted.`}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button size="sm" disabled={busy} onClick={restore}>
+              {lang === "zh" ? "确认恢复到新空库" : "Confirm restore to new store"}
+            </Button>
+            <Button size="sm" variant="ghost" disabled={busy} onClick={() => setTarget(null)}>
+              {lang === "zh" ? "取消" : "Cancel"}
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
+      {status ? (
+        <div className={`mt-4 rounded-lg border p-4 text-sm ${status.status === "interrupted" ? "border-warn/40 bg-warn/10 text-warn" : "border-primary/20 bg-primary/5"}`} role="status">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span>
+              {lang === "zh" ? `恢复状态：${status.status}` : `Restore status: ${status.status}`}
+              {status.phase ? ` · ${status.phase}` : ""}
+            </span>
+            <Button size="sm" variant="ghost" disabled={busy} onClick={refreshStatus}>
+              {lang === "zh" ? "刷新状态" : "Refresh status"}
+            </Button>
+          </div>
+          {status.status === "interrupted" ? (
+            <div className="mt-2">
+              <p className="text-xs">{lang === "zh" ? "检测到中断的恢复；清理前请核对 journal 和目标未被替换。" : "An interrupted restore was detected; verify the journal and target were not replaced before cleanup."}</p>
+              <Button size="sm" variant="outline" className="mt-2" disabled={busy} onClick={recoverInterrupted}>
+                {lang === "zh" ? "确认清理中断恢复" : "Confirm interrupted cleanup"}
+              </Button>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function formatBytes(value: number) {
+  if (value < 1024) return `${value} B`;
+  if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
+  return `${(value / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function referenceKind(kind: string, lang: "zh" | "en") {

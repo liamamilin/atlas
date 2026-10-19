@@ -1,0 +1,259 @@
+{
+  "schema": "atlas.acceptance-plan.v0",
+  "template_id": "bookmark-personal-cognition",
+  "phases": [
+    {
+      "id": "P0",
+      "title": "可用个人收藏闭环",
+      "goal": "保存→分类/修改→检索→重开→回到原网页，含写入失败和输入安全。",
+      "features": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07"
+      ],
+      "acceptance": [
+        "A01",
+        "A02",
+        "A03",
+        "A04",
+        "A05",
+        "A06",
+        "A07",
+        "A08",
+        "A09",
+        "A17"
+      ],
+      "status": "待下游实现"
+    },
+    {
+      "id": "P1",
+      "title": "数据生命周期与可带走",
+      "goal": "误删可恢复，全部数据可导出并安全导入新库；坏数据不伤旧库。",
+      "features": [
+        "F08",
+        "F09",
+        "F10"
+      ],
+      "acceptance": [
+        "A10",
+        "A11",
+        "A12",
+        "A13",
+        "A14"
+      ],
+      "status": "待下游实现"
+    },
+    {
+      "id": "P2",
+      "title": "长期整理效率",
+      "goal": "在保留数据的前提下查重和批量归类，失败不产生半完成操作。",
+      "features": [
+        "F11",
+        "F12"
+      ],
+      "acceptance": [
+        "A15",
+        "A16"
+      ],
+      "status": "待下游实现"
+    }
+  ],
+  "cases": [
+    {
+      "id": "A01",
+      "phase": "P0",
+      "goal": "保存默认归类，刷新、关页重开及同一 profile 浏览器重启后仍可查到；保存不外发",
+      "type": "positive",
+      "features": [
+        "F01",
+        "F04"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    },
+    {
+      "id": "A02",
+      "phase": "P0",
+      "goal": "编辑原条目并创建新归类；重开后内容与归类保留，记录不增加",
+      "type": "positive",
+      "features": [
+        "F02",
+        "F04"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    },
+    {
+      "id": "A03",
+      "phase": "P0",
+      "goal": "搜索标题/URL/分类文本与分类筛选交集；空结果有提示，清空筛选不丢记录",
+      "type": "positive",
+      "features": [
+        "F03"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    },
+    {
+      "id": "A04",
+      "phase": "P0",
+      "goal": "点击实际记录链接触发正确外部目标导航且隔离 opener",
+      "type": "positive",
+      "features": [
+        "F05"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    },
+    {
+      "id": "A05",
+      "phase": "P0",
+      "goal": "新建和编辑拒绝危险 URL/空标题，校验失败保留各字段且不覆盖旧记录",
+      "type": "negative",
+      "features": [
+        "F05",
+        "F06"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    },
+    {
+      "id": "A06",
+      "phase": "P0",
+      "goal": "打开失败或已有库读取失败时明确错误并禁用保存；故障恢复后旧数据完整",
+      "type": "negative",
+      "features": [
+        "F04",
+        "F06"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    },
+    {
+      "id": "A07",
+      "phase": "P0",
+      "goal": "写事务中止时保留输入且不显示成功，重开没有半写入",
+      "type": "negative",
+      "features": [
+        "F04",
+        "F06"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    },
+    {
+      "id": "A08",
+      "phase": "P0",
+      "goal": "新建和编辑标题中的 HTML 作为文字显示，重开后也不执行",
+      "type": "negative",
+      "features": [
+        "F06"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    },
+    {
+      "id": "A09",
+      "phase": "P0",
+      "goal": "一次保存操作的快速重复提交只形成一条记录",
+      "type": "negative",
+      "features": [
+        "F01"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    },
+    {
+      "id": "A10",
+      "phase": "P1",
+      "goal": "删除进入回收站并可恢复；刷新后状态正确",
+      "type": "positive",
+      "features": [
+        "F08"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    },
+    {
+      "id": "A11",
+      "phase": "P1",
+      "goal": "全量导出不受当前搜索限制，包含记录及回收站状态",
+      "type": "positive",
+      "features": [
+        "F09"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    },
+    {
+      "id": "A12",
+      "phase": "P1",
+      "goal": "在全新库导入有效备份后，内容和分类可用并持久保留",
+      "type": "positive",
+      "features": [
+        "F10"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    },
+    {
+      "id": "A13",
+      "phase": "P1",
+      "goal": "损坏 JSON、未知版本、混合有效/危险记录和同批重复 ID 均不产生部分写入",
+      "type": "negative",
+      "features": [
+        "F10"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    },
+    {
+      "id": "A14",
+      "phase": "P1",
+      "goal": "重复 ID 不覆盖既有内容，显示冲突数量且保留未冲突记录",
+      "type": "negative",
+      "features": [
+        "F10"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    },
+    {
+      "id": "A15",
+      "phase": "P2",
+      "goal": "提示重复 URL，保留全部记录且不自动删除",
+      "type": "positive",
+      "features": [
+        "F11"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    },
+    {
+      "id": "A16",
+      "phase": "P2",
+      "goal": "批量分类事务成功则全部生效，事务失败则全部保留原值",
+      "type": "negative",
+      "features": [
+        "F12"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    },
+    {
+      "id": "A17",
+      "phase": "P0",
+      "goal": "用标签和键盘保存，375px 无横向溢出；状态反馈可发现",
+      "type": "positive",
+      "features": [
+        "F07"
+      ],
+      "implementation": "acceptance/run.cjs",
+      "status": "待运行"
+    }
+  ]
+}

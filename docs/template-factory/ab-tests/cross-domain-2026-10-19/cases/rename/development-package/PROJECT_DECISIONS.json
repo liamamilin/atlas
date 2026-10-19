@@ -1,0 +1,37 @@
+{
+ "project_name": "trial-rename",
+ "phase": "P0",
+ "template_digest": "58faa0244d30865a31c5c9d39c7a8e15560eca2e2546091bc2415a562687d075",
+ "choices": [
+  {
+   "id": "D01",
+   "default": "默认采用 st_dev+st_ino+st_size+st_mtime_ns 组合（平台不提供 ns 字段时回退秒级）；默认不计算内容哈希，因为哈希在大批量或大文件上有成本，且纳秒字段可用性未获文档逐字确认（S02、S03）。",
+   "choice": null
+  },
+  {
+   "id": "D02",
+   "default": "默认假设本地同文件系统原子改名（S03、S05），跨挂载返回 EXDEV 时拒绝；不承诺网络文件系统上的失败语义，并在帮助与文档中声明该限制。",
+   "choice": null
+  },
+  {
+   "id": "D03",
+   "default": "采用执行前整批预检 + 每步执行前再次 lstat 核查，遇目标存在即拒绝且不替换；不依赖 Linux 专有 renameat2/RENAME_NOREPLACE（Python 标准库未暴露，S05），并在文档中明示极小窗口存在。",
+   "choice": null
+  },
+  {
+   "id": "D04",
+   "default": "默认把环与内部覆盖一律视为计划内部冲突，在预览阶段整批拒绝，不引入临时名两阶段交换；理由：交换需 Linux 专有 RENAME_EXCHANGE，超出确认范围（S05）。",
+   "choice": null
+  },
+  {
+   "id": "D05",
+   "default": "默认每完成一步改名即更新回执并 flush+fsync 落盘，使崩溃后可核对与恢复；但抓取文档只显示存在 dump/日志文件而未确认其持久化与崩溃语义（S08、S09），故不承诺断电精确恢复。",
+   "choice": null
+  },
+  {
+   "id": "D06",
+   "default": "默认替换全部字面出现并逐条列入计划；理由：『替换』语义下行为可预测，且可供用户在执行前逐条审阅；备选（util-linux 默认只替换第一次，S06）可作为后续选项。",
+   "choice": null
+  }
+ ]
+}

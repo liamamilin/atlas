@@ -1,0 +1,32 @@
+{
+  "pipeline_status": "completed",
+  "elapsed_seconds": 177.36,
+  "source_sha256": {
+    "README.md": "458e076fcf89d77e11a99d4df774f2f25141ef4312798428f0837f37c0a2df78",
+    "app.py": "ffd3269500f8af4cdc8733c0ee2ef87b0034185a6fd0daac82752f85da4274ab",
+    "db.py": "72f32ee8067064870297c1d90cc1ff4dfd7b86ab011dd654cde2051625d03b93",
+    "render.py": "a3844069e1be7f137591f5b5243501611b30550ff1fb8b8eb5545e17790ef4da",
+    "server.py": "d1b5f7b837e146d24790ba01391dbd75ce580152e58c7a5d415344326b373b6b",
+    "static/app.css": "138a54f60ab4876d892f04d657dc016b0fbad60ce5f26b98e9c01b273af1008e",
+    "urls.py": "8d5863d8ee1e9303fa63a0e5c0e8ac3fcf0056da21dcc3e85c001af472ddb06e"
+  },
+  "source_hand_edits": false,
+  "implemented_claims": [
+    "Standalone visible category creation (/category + sidebar form) independent of saving a bookmark, with blank/duplicate Chinese feedback and no write",
+    "Move existing records to any category (including the newly created one and 未分类) via /move",
+    "Create form preserves current browsing view via return_category so records stay visible for immediate move",
+    "Oversize request rejected before parsing/writing with honest HTTP 413 and clear Chinese message; no records changed; no claim of retaining unread body",
+    "Invalid Content-Length rejected HTTP 400; invalid UTF-8 rejected HTTP 400; malformed percent-encoding rejected HTTP 400 (strict, no silent replacement)",
+    "2000-character note limit rejects with feedback and retains submitted fields; never silent truncation",
+    "Preserved inline-create path, original URL, search, duplicate confirm, double-click idempotency, error/input retention, data-dir SQLite persistence",
+    "README updated only for actual behavior"
+  ],
+  "limits_claims": [
+    "No execution performed; interpreter/browser/tests not run by me",
+    "Oversize request risk not runtime-reproduced here; only source-level handling changed",
+    "Only app/ modified; no editing/deletion/accounts/import/export added",
+    "GET query decoding left at default replace behavior; strict decoding applies to POST request bodies only"
+  ],
+  "runtime_status": "not_run",
+  "initial_evidence_preserved": true
+}

@@ -1,0 +1,61 @@
+{
+ "outcome": "blocked",
+ "summary": "静态设计预审结论为 blocked：场景范围、产品主链、阶段验收与决策默认值基本可接受，P0–P2 的用例与文件计划能够覆盖保存、重复恢复、归类/移动、编辑、软删除/回收站/恢复、检索、浏览、打开与分页；但 ARCHITECTURE §10 与 DRAFT R03 仍把无内建账号的本机服务写成“无匿名读取路径/任何匿名可读路径都越界”，与 §2/D06“无认证、回环不等于认证、远程必须前置认证代理”直接矛盾，属于会误导部署的当前安全承诺，修正前不能接受。未运行任何程序，不声称 A01–A33 通过。",
+ "checks": [
+  {
+   "dimension": "scenario_scope",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "RESEARCH.md"
+   ],
+   "reason": "场景限定为单人对自己的生活链接库：F01–F14 对齐“保存→默认未分类→新建/选择归类→移动→检索/浏览→打开→软删除/恢复”；F15/F16/F17/F24/F25 明确为 later，F20–F23 为 not applicable，F18/F19 为 decision needed；R03 明确本期无协作者，未引入企业功能。"
+  },
+  {
+   "dimension": "product_completeness",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "当前用户主线均有声明入口与恢复路径：首页 bookmark-form 保存并显示 form-error/flash，重复冲突保留 url/title/note/categoryId 并提供 duplicate-existing-link 与 duplicate-save-form；category-form/category-rename-form、行内 move-form、bookmark-edit-form、bookmark-delete-form、trash-link/home-link、restore-submit/restore-target、trash-delete-form、search-form、open-link 与 page-prev/page-next 均有 DOM 契约，A28–A33 覆盖成功、错误、刷新持久与真实导航；导出为 P3 明确未宣称。"
+  },
+  {
+   "dimension": "architecture_contract",
+   "outcome": "blocked",
+   "files": [
+    "ARCHITECTURE.md",
+    "DRAFT.md",
+    "REVISION.md"
+   ],
+   "reason": "ARCHITECTURE §10 写“无匿名读取路径”，DRAFT R03 写“任何匿名可读路径都视为越界”，但 §2 与 D06 明确本版本没有内建账号、默认只监听回环且回环监听不是认证，所有读页面/API 实际未认证；REVISION 也明确要求不得继续写成已实现无匿名读取。这是自相矛盾的当前安全承诺，可能让部署者误以为读取已受认证保护。应改为“无公开分享、无跨站读取路径；本机读取未认证，远程访问必须前置认证反向代理”，并同步 R03；Host/Origin 仍只是 DNS rebinding 纵深防御。"
+  },
+  {
+   "dimension": "phase_acceptance",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "P0 的 A01–A10/A28 只用默认归类、基础列表、按 id 读回与打开；P1 的 A11–A20/A29–A31 用归类、移动、软删除/回收站/编辑，不依赖 P2 q；P2 的 A21–A27/A32–A33 用检索/排序/分页，A22 明确允许已交付的 P1 PATCH；A18 的 --allow-destructive 缺失记 incomplete，A30 的 UI 确认清空明确为未运行，未伪装通过；阶段目标与文件映射可测。"
+  },
+  {
+   "dimension": "decisions_defaults",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "D01–D09 均有明确 default、when_to_ask、impact 与 proposed 状态；D02 重复阻止+显式另存、D03 归类删除二选一+tombstone、D05 保守 URL 归一与控制字符、D06 无账号/回环+前置代理、D07 回收站手动清空、D08 P3 交换格式均有可逆默认与真实提问触发，没有把 proposed 冒充用户确认；D06 的架构表述矛盾归入 architecture_contract。"
+  }
+ ],
+ "suggestions": [
+  "修正 ARCHITECTURE §10 与 DRAFT R03：删除“无匿名读取路径/任何匿名可读路径都越界”，改为“无公开分享、无跨站读取路径；本机读取未认证，远程访问必须前置认证反向代理”，并保留 Host/Origin 仅为 DNS rebinding 纵深防御的说明。",
+  "在 ARCHITECTURE §6 明确定义 GET /api/trash 条目 DTO，统一 A16、A17、A30 使用的 categoryId、categoryName、categoryDeleted、trashedFromCategoryId、trashedFromCategoryName 及其 null 语义，避免同一回收站条目在不同用例中形状不一致。",
+  "明确排序第二键方向：created_desc 用 id DESC，created_asc 用 id ASC，使 A26 的“两种排序互为逆序”与 A05 的同毫秒断言有唯一实现。",
+  "在 A14/A30 中写明 move 与 purge 使用独立归类或独立 fixture；move 成功后源归类已 tombstone，不能在同一归类上继续执行 purge，避免验收编排歧义。",
+  "为 D06/D09 的安全承诺补代表性负例：正确 Host 加伪造 X-Forwarded-Host 仍返回 400 invalid_host；--auth-header 越出 origin/basePath 时不附带凭据；--with-ui 加非空 auth 在创建 browser/context/page 前失败。当前只有实现声明，没有验收断言。"
+ ],
+ "scope": "Independent specification design review only; This proposal is reviewed before its new programs are authored; no execution or frozen-candidate acceptance.",
+ "proposal_digest": "1fac94c870261d1f3663b1d4eaf1abd8ce629bc16a95a0cebcc1fe89b93001f7"
+}

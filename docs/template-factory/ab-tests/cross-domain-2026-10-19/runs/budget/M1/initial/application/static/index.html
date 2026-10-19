@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>个人月度预算</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>个人月度预算</h1>
+  <div class="month-bar">
+    <label for="month">月份</label>
+    <input type="month" id="month" data-testid="month">
+    <button type="button" id="export-btn">导出当月 CSV</button>
+  </div>
+</header>
+
+<div id="feedback" class="feedback" role="status" aria-live="polite" data-testid="feedback"></div>
+
+<main>
+  <section class="card">
+    <h2>建立分类与预算</h2>
+    <div class="row">
+      <label>分类名称
+        <input type="text" id="category-name" data-testid="category-name" placeholder="如：餐饮">
+      </label>
+      <label>月度预算
+        <input type="text" id="category-budget" data-testid="category-budget"
+               inputmode="decimal" placeholder="如：1500.00">
+      </label>
+      <button type="button" id="category-save" data-testid="category-save">保存分类</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>记录支出</h2>
+    <div class="row" id="expense-form">
+      <label>日期
+        <input type="date" id="expense-date" data-testid="expense-date">
+      </label>
+      <label>分类
+        <select id="expense-category" data-testid="expense-category"></select>
+      </label>
+      <label>金额
+        <input type="text" id="expense-amount" data-testid="expense-amount"
+               inputmode="decimal" placeholder="如：35.80">
+      </label>
+      <label>备注
+        <textarea id="expense-note" data-testid="expense-note" rows="1"
+                  placeholder="可选"></textarea>
+      </label>
+      <button type="button" id="expense-save" data-testid="expense-save">保存支出</button>
+      <button type="button" id="expense-cancel" hidden>取消修改</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>分类计划 / 实际 / 剩余</h2>
+    <table class="data">
+      <thead>
+        <tr><th>分类</th><th>计划</th><th>已花</th><th>剩余</th><th>调整预算</th></tr>
+      </thead>
+      <tbody id="category-rows"></tbody>
+    </table>
+    <p class="totals" id="totals">计划 ¥0.00 / 已花 ¥0.00 / 剩余 ¥0.00</p>
+  </section>
+
+  <section class="card">
+    <h2>本月支出明细</h2>
+    <table class="data">
+      <thead>
+        <tr><th>日期</th><th>分类</th><th>金额</th><th>备注</th><th>操作</th></tr>
+      </thead>
+      <tbody id="transaction-rows"></tbody>
+    </table>
+    <p class="empty" id="transaction-empty" hidden>本月还没有支出记录。</p>
+  </section>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

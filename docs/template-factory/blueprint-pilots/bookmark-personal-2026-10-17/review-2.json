@@ -1,0 +1,133 @@
+{
+  "outcome": "needs_changes",
+  "summary": "本次为静态修订复审，未运行任何测试。上一轮阻塞项中，D07 保存不外发、A17 状态文本、A10 删除后重载、A13 混合/重复 ID 导入、A16 单事务计数均已闭合；A14/A15 的数量与 role=status 契约、A01 持久 profile、A03 分类文本检索也已补齐。剩余问题集中在 A05 编辑路径：未提交空标题，重载后也未验证分类未被改写，因此实现可在更新时接受空标题或部分覆盖分类而仍通过全部 P0 用例；A06 恢复后保存按钮可用性与恢复提示仅有建议级缺口。",
+  "checks": [
+    {
+      "area": "上一轮 D07 保存不外发与外部请求断言",
+      "outcome": "passed",
+      "files": [
+        "source/DECISIONS.md",
+        "source/ARCHITECTURE.md",
+        "source/acceptance/run.cjs",
+        "source/template.json"
+      ],
+      "reason": "run.cjs 的 configure 在每个用例上下文注册 request 监听、外站 route 中止和 CSP violation 绑定，末尾断言 external 为空，仅 A04 允许点击目标 URL 的一次请求；A01 目标已写“保存不外发”，ARCHITECTURE 的“验收适用范围”明确该检查覆盖测试操作与末尾短观察窗，没有夸大为可证明全部网络侧信道。"
+    },
+    {
+      "area": "上一轮 A17 状态反馈可发现",
+      "outcome": "passed",
+      "files": [
+        "source/acceptance/run.cjs",
+        "source/ARCHITECTURE.md",
+        "source/template.json"
+      ],
+      "reason": "A17 用标签填入标题和链接后按 Enter 提交，检查记录出现，并以 status(page,'已保存') 断言 role=status 文本包含“已保存”；A02 另断言“已更新”，空 role=status 容器不再能通过。"
+    },
+    {
+      "area": "上一轮 A05 输入保留/编辑路径与 A06 读取失败",
+      "outcome": "needs_changes",
+      "files": [
+        "source/acceptance/run.cjs",
+        "source/ROADMAP.md",
+        "source/template.json",
+        "source/ARCHITECTURE.md"
+      ],
+      "reason": "A05 已对新建和编辑循环清空 alert、断言 alert 非空并逐一比对标题/链接/分类输入值；编辑路径覆盖 javascript:/data:/file:/相对 URL 和凭据，A08 覆盖编辑 HTML，A06 新增已有库读取失败与旧记录保留。但 A05 编辑循环没有提交空标题，重载后也只检查 row('原收藏') 数量、article 数量和 href，没有检查分类仍为“原分类”；A06 清除读取故障并 reload 后只查旧记录，未断言保存按钮恢复可用或提示包含恢复/重载指引。"
+    },
+    {
+      "area": "上一轮 A10 删除/恢复持久化",
+      "outcome": "passed",
+      "files": [
+        "source/acceptance/run.cjs",
+        "source/template.json",
+        "source/ROADMAP.md"
+      ],
+      "reason": "删除后先断言主列表 0 条，再 reload 确认仍为 0 且存储就绪；随后进入回收站确认该记录存在，恢复、返回全部书签后再 reload 确认 1 条，删除后未持久化的实现不能通过。"
+    },
+    {
+      "area": "上一轮 A13 导入混合批次与无部分写入",
+      "outcome": "passed",
+      "files": [
+        "source/acceptance/run.cjs",
+        "source/DECISIONS.md",
+        "source/ARCHITECTURE.md"
+      ],
+      "reason": "A13 的 payload 包含坏 JSON、未知版本、一条有效加一条危险 URL、以及同批重复 id；每次先清空 alert，拒绝后 reload 并断言导出 records 与导入前 deepEqual，能观察逐条写入或先写有效记录的实现。"
+    },
+    {
+      "area": "上一轮 A16 单事务与 A14/A15 契约",
+      "outcome": "passed",
+      "files": [
+        "source/acceptance/run.cjs",
+        "source/ARCHITECTURE.md",
+        "source/template.json"
+      ],
+      "reason": "A16 用 countWrites 统计 readwrite transaction 次数，成功与中止路径均断言恰好 1 次，中止后 reload 仍保留两条原分类；A14 断言“新增 1，冲突 1”的数量格式且不覆盖冲突记录；A15 按 role=status 报告重复 URL 与标题，ARCHITECTURE 已同步这些契约。"
+    },
+    {
+      "area": "上一轮 A01 持久 profile 与 A03 分类文本检索",
+      "outcome": "passed",
+      "files": [
+        "source/acceptance/run.cjs",
+        "source/ARCHITECTURE.md",
+        "source/template.json"
+      ],
+      "reason": "A01 使用独立临时 profile 的 persistent context，关页重开后再关闭并重启同一 profile，断言记录和 href 仍在；A03 增加仅出现在分类名中的“学习”搜索词并断言只命中对应记录，不再只验证标题/URL。"
+    },
+    {
+      "area": "决策默认与架构/UI 契约一致性",
+      "outcome": "passed",
+      "files": [
+        "source/DECISIONS.md",
+        "source/ARCHITECTURE.md",
+        "source/template.json",
+        "source/acceptance/run.cjs"
+      ],
+      "reason": "D05 的事务完成后显示成功、D06 的导入/批量单事务、D07 的默认不外发与 D03 的 URL 规则均能在契约和用例中找到对应；ARCHITECTURE 明确 A06/A07/A16 的故障注入仅适用于默认 IndexedDB，换栈需等价适配器，解决了上一轮 D02 的适用范围问题。UI 名称、role=status/alert、空结果文案和 P1/P2 控件名与 run.cjs 一致。"
+    },
+    {
+      "area": "阶段映射、执行器与文档状态",
+      "outcome": "passed",
+      "files": [
+        "source/acceptance/plan.json",
+        "source/acceptance/run.cjs",
+        "source/verify.py",
+        "source/template.json",
+        "source/VALIDATION.md"
+      ],
+      "reason": "plan.json 与 template.json 的 17 个用例逐项相同，P0 十项、P1 五项、P2 两项；每个 ID 在 run.cjs 有 async 执行器，verify.py 静态检查双向映射、执行器和清单。README/VALIDATION 仍标草案、P0 未实现、evidence 为空，未发现把未运行测试说成通过。"
+    },
+    {
+      "area": "品类来源与权限/计费/后台/审计/导出适用性",
+      "outcome": "passed",
+      "files": [
+        "source/CATEGORY.md",
+        "source/PRODUCT.md",
+        "source/template.json"
+      ],
+      "reason": "本轮未改动品类结论；F14 成员权限、F15 计费、F16 后台/审计仍标当前默认不适用，F09 导出在 P1，F13/F18 待定；F14-F16 的理由已补“所列来源仅作品类背景，不直接证明计费、审计或共享撤回实现”，未把来源当作已实现能力的背书，也未引入超出单人本地范围的强制能力。"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "files": [
+        "source/acceptance/run.cjs",
+        "source/ROADMAP.md",
+        "source/template.json",
+        "source/ARCHITECTURE.md"
+      ],
+      "problem": "A05 的目标是“新建和编辑拒绝危险 URL/空标题，校验失败保留各字段且不覆盖旧记录”，但编辑循环只提交了危险 URL，没有提交空标题；每次非法编辑后重载也只检查 row('原收藏') 数量、article 数量和 href，没有检查分类是否仍为“原分类”，标题仅能通过 row 选择器间接证明。因此，更新路径接受空标题，或在拒绝 URL 的同时把分类改为“未保存分类”的实现，仍可通过全部 P0 用例。",
+      "fix": "在 A05 编辑循环加入空标题提交（如 '   '），并断言 alert、三个输入值及重载后的标题/分类/href 都保持原值；P0 可用 article 内分类文本和链接 href 验证，必要时再补充 updatedAt 不变。"
+    },
+    {
+      "severity": "suggestion",
+      "files": [
+        "source/acceptance/run.cjs",
+        "source/ARCHITECTURE.md"
+      ],
+      "problem": "A06 在已有库读取失败后清除故障并 reload，只断言旧记录仍在，没有断言保存按钮恢复可用，也没有断言错误提示包含“恢复存储后重载”的指引；实现可以永久禁用保存或只显示泛化错误而通过 A06，与 ARCHITECTURE 的“正常就绪后按钮可用”和“明确提示恢复存储后重载”不完全一致。",
+      "fix": "故障清除并 reload 后增加保存按钮可用的断言；对两次失败提示增加恢复/重载相关文本断言，或同步收窄 ARCHITECTURE 的措辞。"
+    }
+  ]
+}

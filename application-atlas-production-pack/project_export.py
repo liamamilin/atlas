@@ -14,6 +14,7 @@ import zipfile
 
 from project_baseline import latest_project_baseline
 from handoff_bundle import build_handoff, render_markdown as render_handoff_markdown
+from privacy import redact_value
 
 
 DOCUMENT_ORDER = {
@@ -35,11 +36,13 @@ def export_project(store, project_id: str) -> dict:
     decisions = store.list_decisions(project_id)
     documents = store.list_documents(project_id)
     iterations = store.list_iterations(project_id)
-    tasks = store.list_tasks(project_id)
-    executions = store.list_executions(project_id)
+    tasks = redact_value(store.list_tasks(project_id))
+    executions = redact_value(store.list_executions(project_id))
+    migration = store.legacy_acceptance_migration(project_id)
     baseline = latest_project_baseline(store, project_id)
     root = store.path.parent / "exports" / project_id
-    root.mkdir(parents=True, exist_ok=True)
+    root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    os.chmod(root, 0o700)
     name = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:8]
     temp = Path(tempfile.mkdtemp(prefix=".export-", dir=root))
     final = root / name
@@ -48,18 +51,23 @@ def export_project(store, project_id: str) -> dict:
     try:
         files = _build_files(
             store, project, references, requirements, decisions, documents,
-            iterations, tasks, executions, baseline)
+            iterations, tasks, executions, baseline, migration)
         hashes = {}
         for relative, content in files.items():
             path = temp / relative
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(content, encoding="utf-8")
+            os.chmod(path, 0o600)
             hashes[relative] = hashlib.sha256(content.encode("utf-8")).hexdigest()
         manifest = {
             "schema": 5,
             "exported_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "project_id": project_id,
             "project_updated_at": project["updated_at"],
+            "privacy": {
+                "known_secret_redaction": True,
+                "external_evidence_files_included": False,
+            },
             "counts": {
                 "references": len(references), "requirements": len(requirements),
                 "decisions": len(decisions), "documents": len(documents),
@@ -67,6 +75,7 @@ def export_project(store, project_id: str) -> dict:
                 "iterations": len(iterations), "tasks": len(tasks),
                 "executions": len(executions),
             },
+            "legacy_acceptance_migration": migration["summary"],
             "workspace_baseline_id": baseline["id"] if baseline else None,
             "workspace_baseline_fingerprint": baseline["fingerprint"] if baseline else None,
             "unresolved_requirement_ids": [
@@ -87,14 +96,17 @@ def export_project(store, project_id: str) -> dict:
                     "completion_report", {}).get("valid")],
             "files": hashes,
         }
-        (temp / "manifest.json").write_text(
+        manifest_path = temp / "manifest.json"
+        manifest_path.write_text(
             json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        os.chmod(manifest_path, 0o600)
         os.replace(temp, final)
         with zipfile.ZipFile(temp_archive, "w", zipfile.ZIP_DEFLATED) as bundle:
             for path in sorted(final.rglob("*")):
                 if path.is_file():
                     bundle.write(path, path.relative_to(final))
         os.replace(temp_archive, archive)
+        os.chmod(archive, 0o600)
     except BaseException:
         shutil.rmtree(temp, ignore_errors=True)
         shutil.rmtree(final, ignore_errors=True)
@@ -111,7 +123,7 @@ def export_project(store, project_id: str) -> dict:
 
 
 def _build_files(store, project, references, requirements, decisions, documents,
-                 iterations, tasks, executions, baseline=None):
+                 iterations, tasks, executions, baseline=None, migration=None):
     files = {}
     reference_links = []
     for index, reference in enumerate(references, 1):
@@ -133,8 +145,10 @@ def _build_files(store, project, references, requirements, decisions, documents,
         "schema": 1, "project_id": project["id"], "iterations": iterations,
         "tasks": tasks, "executions": executions,
     }, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    files["acceptance-migration.json"] = json.dumps(
+        redact_value(migration or {}), ensure_ascii=False, indent=2, sort_keys=True) + "\n"
     for task in tasks:
-        handoff = build_handoff(store, task["id"])
+        handoff = redact_value(build_handoff(store, task["id"]))
         stem = f"handoffs/{task['id']}"
         files[stem + ".json"] = json.dumps(
             handoff, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
@@ -271,7 +285,7 @@ def _baseline_markdown(item):
         f"- Baseline ID: `{item['id']}`",
         f"- Record fingerprint: `{item['fingerprint']}`",
         f"- Captured: `{item['created_at']}`",
-        f"- Full evidence manifest: [workspace-baseline.json](workspace-baseline.json)", "",
+        "- Full evidence manifest: [workspace-baseline.json](workspace-baseline.json)", "",
     ]
     return "\n".join(header) + manifest.get("report_markdown", "").rstrip() + "\n"
 

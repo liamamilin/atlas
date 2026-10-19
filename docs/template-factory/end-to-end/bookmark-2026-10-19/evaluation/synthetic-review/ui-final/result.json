@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "kind": "synthetic harness-only test",
+  "firstResponseXssValue": "1",
+  "firstResponseXssPersistedAcrossNavigation": true,
+  "collectionText": "阅读收藏",
+  "navigation": {
+    "go": {
+      "finalUrl": "http://127.0.0.1:54431/original?token=synthetic",
+      "navigation": "app-go-redirect",
+      "usedPopup": false
+    },
+    "direct": {
+      "finalUrl": "http://127.0.0.1:54431/original?token=synthetic",
+      "navigation": "direct-original-link",
+      "usedPopup": false
+    }
+  },
+  "duplicateOutcomes": {
+    "upsert": "updated_existing_record",
+    "create": "created_new_record",
+    "reject": "rejected",
+    "noChange": "accepted_without_observable_change"
+  },
+  "evidenceDir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/synthetic-review/ui-final"
+}

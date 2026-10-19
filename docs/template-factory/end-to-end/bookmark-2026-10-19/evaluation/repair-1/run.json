@@ -1,0 +1,1003 @@
+{
+  "schema": "atlas.bookmark-ui-acceptance.v1",
+  "status": "passed",
+  "stage": "cleanup",
+  "started_at": "2026-10-19T03:51:09Z",
+  "evidence_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/repair-1",
+  "runner_command": [
+    "python3",
+    "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/docker_ui_acceptance.py",
+    "--bundle",
+    "docs/template-factory/end-to-end/bookmark-2026-10-19/development/repair-1",
+    "--evidence-dir",
+    "docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/repair-1",
+    "--image",
+    "python:3.12-slim"
+  ],
+  "frozen_bundle_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/development/repair-1",
+  "delivery_sha256": "4accad35f8399183eb6a8426a971c8434611b69f0160d2b505e9dd29b86cb38e",
+  "app_root": "/private/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-product-acceptance-dc45f2d8952d457aba86fb6f294397c2/verified-application",
+  "app_source_sha256_before": {
+    "README.md": "7faa3905d766dbbe4e49af05c7f370fc118160f59e8736378ed23d2b6809a52a",
+    "delivery.json": "4accad35f8399183eb6a8426a971c8434611b69f0160d2b505e9dd29b86cb38e",
+    "app/__init__.py": "9469dc4b6b75244f86c93ecdcfd8265b2b758952cac25d25f2009c9b5258da0f",
+    "app/__main__.py": "fb51d09e657e2d32efdede834cf098d2612b9a30a8c7c0dd205f5b51d5ef5425",
+    "app/config.py": "3fa66e7b1233cbc4e8b01556256336ae974c35a0c67ec631a2e7608f6e0c4ae9",
+    "app/server.py": "41b84e08e069e57e026add5a59be4bcf5b46866df6cc23a16224677cc88977d5",
+    "app/storage.py": "cc65cb96367a2485b6e154c518079f713162837cedfee306e4feebe4b09bb662",
+    "app/validation.py": "d0ac670149cb6c5cb61459e3833e235281403ed92f46a9094975fb4eaa052a43",
+    "app/views.py": "e923f629fd6d8d10fb1568285be871b9c06dbecc3157259ff5746b05f36ee01b"
+  },
+  "app_source_sha256_after": {
+    "README.md": "7faa3905d766dbbe4e49af05c7f370fc118160f59e8736378ed23d2b6809a52a",
+    "delivery.json": "4accad35f8399183eb6a8426a971c8434611b69f0160d2b505e9dd29b86cb38e",
+    "app/__init__.py": "9469dc4b6b75244f86c93ecdcfd8265b2b758952cac25d25f2009c9b5258da0f",
+    "app/__main__.py": "fb51d09e657e2d32efdede834cf098d2612b9a30a8c7c0dd205f5b51d5ef5425",
+    "app/config.py": "3fa66e7b1233cbc4e8b01556256336ae974c35a0c67ec631a2e7608f6e0c4ae9",
+    "app/server.py": "41b84e08e069e57e026add5a59be4bcf5b46866df6cc23a16224677cc88977d5",
+    "app/storage.py": "cc65cb96367a2485b6e154c518079f713162837cedfee306e4feebe4b09bb662",
+    "app/validation.py": "d0ac670149cb6c5cb61459e3833e235281403ed92f46a9094975fb4eaa052a43",
+    "app/views.py": "e923f629fd6d8d10fb1568285be871b9c06dbecc3157259ff5746b05f36ee01b"
+  },
+  "app_image": "python:3.12-slim",
+  "app_image_id": "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9",
+  "app_url": "http://127.0.0.1:49288/",
+  "duplicate_url_contract": "observe",
+  "fixture_base": "http://127.0.0.1:49289",
+  "browser_policy": "Chromium requests permitted only to exact app origin and exact local fixture origin; all other requests aborted",
+  "docker_network_mode": "dedicated user-defined bridge; egress not enforced",
+  "network_none": false,
+  "container_settings": {
+    "id": "35b6eef00628799b94fc1df5e6bb791859451831bf44bdc6e90368740cdbecdf",
+    "state": {
+      "Status": "running",
+      "Running": true,
+      "Pid": 1149,
+      "StartedAt": "2026-10-19T03:51:10.100324637Z",
+      "FinishedAt": "0001-01-01T00:00:00Z",
+      "ExitCode": 0
+    },
+    "restart_count": 0,
+    "port_bindings": {
+      "8000/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "49288"
+        }
+      ]
+    },
+    "effective_ports": {
+      "8000/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "49288"
+        }
+      ]
+    },
+    "network_mode": "bookmark-product-net-dc45f2d895",
+    "internal_rootfs": true,
+    "cap_drop": [
+      "ALL"
+    ],
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "limits": {
+      "Memory": 268435456,
+      "NanoCpus": 500000000,
+      "PidsLimit": 64
+    },
+    "mounts": [
+      {
+        "Type": "bind",
+        "Source": "/private/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-product-acceptance-dc45f2d8952d457aba86fb6f294397c2/verified-application",
+        "Destination": "/app",
+        "RW": false
+      },
+      {
+        "Type": "bind",
+        "Source": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-product-acceptance-dc45f2d8952d457aba86fb6f294397c2/state",
+        "Destination": "/state",
+        "RW": true
+      }
+    ],
+    "environment_names": [
+      "PYTHONDONTWRITEBYTECODE",
+      "PYTHONUNBUFFERED",
+      "PATH",
+      "LANG",
+      "GPG_KEY",
+      "PYTHON_VERSION",
+      "PYTHON_SHA256"
+    ]
+  },
+  "lifecycle": [
+    {
+      "event": "initial_start",
+      "container": {
+        "id": "35b6eef00628799b94fc1df5e6bb791859451831bf44bdc6e90368740cdbecdf",
+        "state": {
+          "Status": "running",
+          "Running": true,
+          "Pid": 1149,
+          "StartedAt": "2026-10-19T03:51:10.100324637Z",
+          "FinishedAt": "0001-01-01T00:00:00Z",
+          "ExitCode": 0
+        },
+        "restart_count": 0,
+        "port_bindings": {
+          "8000/tcp": [
+            {
+              "HostIp": "127.0.0.1",
+              "HostPort": "49288"
+            }
+          ]
+        },
+        "effective_ports": {
+          "8000/tcp": [
+            {
+              "HostIp": "127.0.0.1",
+              "HostPort": "49288"
+            }
+          ]
+        },
+        "network_mode": "bookmark-product-net-dc45f2d895",
+        "internal_rootfs": true,
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_options": [
+          "no-new-privileges:true"
+        ],
+        "limits": {
+          "Memory": 268435456,
+          "NanoCpus": 500000000,
+          "PidsLimit": 64
+        },
+        "mounts": [
+          {
+            "Type": "bind",
+            "Source": "/private/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-product-acceptance-dc45f2d8952d457aba86fb6f294397c2/verified-application",
+            "Destination": "/app",
+            "RW": false
+          },
+          {
+            "Type": "bind",
+            "Source": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-product-acceptance-dc45f2d8952d457aba86fb6f294397c2/state",
+            "Destination": "/state",
+            "RW": true
+          }
+        ],
+        "environment_names": [
+          "PYTHONDONTWRITEBYTECODE",
+          "PYTHONUNBUFFERED",
+          "PATH",
+          "LANG",
+          "GPG_KEY",
+          "PYTHON_VERSION",
+          "PYTHON_SHA256"
+        ]
+      }
+    },
+    {
+      "event": "before_restart",
+      "container": {
+        "id": "35b6eef00628799b94fc1df5e6bb791859451831bf44bdc6e90368740cdbecdf",
+        "state": {
+          "Status": "running",
+          "Running": true,
+          "Pid": 1149,
+          "StartedAt": "2026-10-19T03:51:10.100324637Z",
+          "FinishedAt": "0001-01-01T00:00:00Z",
+          "ExitCode": 0
+        },
+        "restart_count": 0,
+        "port_bindings": {
+          "8000/tcp": [
+            {
+              "HostIp": "127.0.0.1",
+              "HostPort": "49288"
+            }
+          ]
+        },
+        "effective_ports": {
+          "8000/tcp": [
+            {
+              "HostIp": "127.0.0.1",
+              "HostPort": "49288"
+            }
+          ]
+        },
+        "network_mode": "bookmark-product-net-dc45f2d895",
+        "internal_rootfs": true,
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_options": [
+          "no-new-privileges:true"
+        ],
+        "limits": {
+          "Memory": 268435456,
+          "NanoCpus": 500000000,
+          "PidsLimit": 64
+        },
+        "mounts": [
+          {
+            "Type": "bind",
+            "Source": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-product-acceptance-dc45f2d8952d457aba86fb6f294397c2/state",
+            "Destination": "/state",
+            "RW": true
+          },
+          {
+            "Type": "bind",
+            "Source": "/private/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-product-acceptance-dc45f2d8952d457aba86fb6f294397c2/verified-application",
+            "Destination": "/app",
+            "RW": false
+          }
+        ],
+        "environment_names": [
+          "PYTHONDONTWRITEBYTECODE",
+          "PYTHONUNBUFFERED",
+          "PATH",
+          "LANG",
+          "GPG_KEY",
+          "PYTHON_VERSION",
+          "PYTHON_SHA256"
+        ]
+      }
+    },
+    {
+      "event": "docker_restart",
+      "command": [
+        "docker",
+        "restart",
+        "--time",
+        "5",
+        "bookmark-product-app-dc45f2d895"
+      ],
+      "stdout": "Flag --time has been deprecated, use --timeout instead\nbookmark-product-app-dc45f2d895"
+    },
+    {
+      "event": "after_restart",
+      "container": {
+        "id": "35b6eef00628799b94fc1df5e6bb791859451831bf44bdc6e90368740cdbecdf",
+        "state": {
+          "Status": "running",
+          "Running": true,
+          "Pid": 1308,
+          "StartedAt": "2026-10-19T03:51:27.227151047Z",
+          "FinishedAt": "2026-10-19T03:51:27.088425589Z",
+          "ExitCode": 0
+        },
+        "restart_count": 0,
+        "port_bindings": {
+          "8000/tcp": [
+            {
+              "HostIp": "127.0.0.1",
+              "HostPort": "49288"
+            }
+          ]
+        },
+        "effective_ports": {
+          "8000/tcp": [
+            {
+              "HostIp": "127.0.0.1",
+              "HostPort": "49288"
+            }
+          ]
+        },
+        "network_mode": "bookmark-product-net-dc45f2d895",
+        "internal_rootfs": true,
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_options": [
+          "no-new-privileges:true"
+        ],
+        "limits": {
+          "Memory": 268435456,
+          "NanoCpus": 500000000,
+          "PidsLimit": 64
+        },
+        "mounts": [
+          {
+            "Type": "bind",
+            "Source": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-product-acceptance-dc45f2d8952d457aba86fb6f294397c2/state",
+            "Destination": "/state",
+            "RW": true
+          },
+          {
+            "Type": "bind",
+            "Source": "/private/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-product-acceptance-dc45f2d8952d457aba86fb6f294397c2/verified-application",
+            "Destination": "/app",
+            "RW": false
+          }
+        ],
+        "environment_names": [
+          "PYTHONDONTWRITEBYTECODE",
+          "PYTHONUNBUFFERED",
+          "PATH",
+          "LANG",
+          "GPG_KEY",
+          "PYTHON_VERSION",
+          "PYTHON_SHA256"
+        ]
+      }
+    }
+  ],
+  "stage_events": [
+    {
+      "stage": "temporary_data_setup",
+      "state": "started",
+      "at": 1792381869.9200761
+    },
+    {
+      "stage": "temporary_data_setup",
+      "state": "completed",
+      "at": 1792381869.920426,
+      "details": {
+        "data_dir": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-product-acceptance-dc45f2d8952d457aba86fb6f294397c2/state"
+      }
+    },
+    {
+      "stage": "fixture_server_setup",
+      "state": "started",
+      "at": 1792381869.920653
+    },
+    {
+      "stage": "fixture_server_setup",
+      "state": "completed",
+      "at": 1792381869.9258409,
+      "details": {
+        "fixture_base": "http://127.0.0.1:49289"
+      }
+    },
+    {
+      "stage": "bundle_verification",
+      "state": "started",
+      "at": 1792381869.9261792
+    },
+    {
+      "stage": "bundle_verification",
+      "state": "completed",
+      "at": 1792381869.9302158,
+      "details": {
+        "archive_sha256": "406f755e0177a9a6337ec7daec67484b89db27a154f07c3476b9d5048f1f6389",
+        "delivery_sha256": "4accad35f8399183eb6a8426a971c8434611b69f0160d2b505e9dd29b86cb38e"
+      }
+    },
+    {
+      "stage": "docker_daemon_preflight",
+      "state": "started",
+      "at": 1792381869.930581
+    },
+    {
+      "stage": "docker_daemon_preflight",
+      "state": "completed",
+      "at": 1792381870.0048451,
+      "details": {}
+    },
+    {
+      "stage": "local_image_preflight",
+      "state": "started",
+      "at": 1792381870.005638
+    },
+    {
+      "stage": "local_image_preflight",
+      "state": "completed",
+      "at": 1792381870.02404,
+      "details": {
+        "image_id": "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9"
+      }
+    },
+    {
+      "stage": "docker_network_setup",
+      "state": "started",
+      "at": 1792381870.0247629
+    },
+    {
+      "stage": "docker_network_setup",
+      "state": "completed",
+      "at": 1792381870.0729868,
+      "details": {
+        "internal": false
+      }
+    },
+    {
+      "stage": "docker_container_create",
+      "state": "started",
+      "at": 1792381870.073789
+    },
+    {
+      "stage": "docker_container_create",
+      "state": "completed",
+      "at": 1792381870.206429,
+      "details": {
+        "container_id": "35b6eef00628799b94fc1df5e6bb791859451831bf44bdc6e90368740cdbecdf"
+      }
+    },
+    {
+      "stage": "application_readiness",
+      "state": "started",
+      "at": 1792381870.207231
+    },
+    {
+      "stage": "application_readiness",
+      "state": "completed",
+      "at": 1792381870.516843,
+      "details": {}
+    },
+    {
+      "stage": "browser_setup",
+      "state": "started",
+      "at": 1792381870.517834
+    },
+    {
+      "stage": "browser_setup",
+      "state": "completed",
+      "at": 1792381870.671705,
+      "details": {
+        "executable": "/Users/milin/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing"
+      }
+    },
+    {
+      "stage": "ui_initial",
+      "state": "started",
+      "at": 1792381870.67271
+    },
+    {
+      "stage": "ui_initial",
+      "state": "completed",
+      "at": 1792381882.027963,
+      "details": {}
+    },
+    {
+      "stage": "pre_restart_snapshot",
+      "state": "started",
+      "at": 1792381882.028633
+    },
+    {
+      "stage": "pre_restart_snapshot",
+      "state": "completed",
+      "at": 1792381882.046487,
+      "details": {
+        "started_at": "2026-10-19T03:51:10.100324637Z"
+      }
+    },
+    {
+      "stage": "docker_restart",
+      "state": "started",
+      "at": 1792381882.047487
+    },
+    {
+      "stage": "docker_restart",
+      "state": "completed",
+      "at": 1792381887.298621,
+      "details": {
+        "stdout": "Flag --time has been deprecated, use --timeout instead\nbookmark-product-app-dc45f2d895"
+      }
+    },
+    {
+      "stage": "post_restart_readiness",
+      "state": "started",
+      "at": 1792381887.300025
+    },
+    {
+      "stage": "post_restart_readiness",
+      "state": "completed",
+      "at": 1792381887.6352289,
+      "details": {
+        "started_at": "2026-10-19T03:51:27.227151047Z"
+      }
+    },
+    {
+      "stage": "ui_after-restart",
+      "state": "started",
+      "at": 1792381887.636346
+    },
+    {
+      "stage": "ui_after-restart",
+      "state": "completed",
+      "at": 1792381893.3803542,
+      "details": {}
+    },
+    {
+      "stage": "post_acceptance_source_integrity",
+      "state": "started",
+      "at": 1792381893.381134
+    },
+    {
+      "stage": "post_acceptance_source_integrity",
+      "state": "completed",
+      "at": 1792381893.3825479,
+      "details": {}
+    }
+  ],
+  "owned_resources": {
+    "temporary_root": {
+      "path": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-product-acceptance-dc45f2d8952d457aba86fb6f294397c2",
+      "state": "removed"
+    },
+    "fixture_server": {
+      "address": "127.0.0.1:49289",
+      "state": "stopped"
+    },
+    "fixture_thread": {
+      "name": "fixture-dc45f2d895",
+      "state": "stopped"
+    },
+    "network": {
+      "name": "bookmark-product-net-dc45f2d895",
+      "state": "absent-verified"
+    },
+    "container": {
+      "name": "bookmark-product-app-dc45f2d895",
+      "state": "absent-verified"
+    }
+  },
+  "docker_commands": {
+    "network_create": [
+      "docker",
+      "network",
+      "create",
+      "bookmark-product-net-dc45f2d895"
+    ],
+    "container_cleanup": [
+      "docker",
+      "rm",
+      "--force",
+      "bookmark-product-app-dc45f2d895"
+    ],
+    "network_cleanup": [
+      "docker",
+      "network",
+      "rm",
+      "bookmark-product-net-dc45f2d895"
+    ],
+    "container_run_plan": {
+      "name": "bookmark-product-app-dc45f2d895",
+      "image": "python:3.12-slim",
+      "host_publish": "127.0.0.1:49288:8000",
+      "source_mount": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-product-acceptance-dc45f2d8952d457aba86fb6f294397c2/verified-application:/app:readonly",
+      "state_mount": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-product-acceptance-dc45f2d8952d457aba86fb6f294397c2/state:/state",
+      "runtime_argv": [
+        "python3",
+        "-m",
+        "app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+        "--data-dir",
+        "/state/data"
+      ]
+    }
+  },
+  "limitations": [
+    "Bridge egress is not blocked; browser-origin allowlist is enforced in Chromium only."
+  ],
+  "screenshots_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/repair-1/screenshots",
+  "updated_at": "2026-10-19T03:51:34Z",
+  "bundle_verification": {
+    "bundle_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/end-to-end/bookmark-2026-10-19/development/repair-1",
+    "receipt_sha256": "6530100a30c027292310f230d1a0da04beafd79064f6f7b6f5c0cac8ccc39c41",
+    "archive_sha256": "406f755e0177a9a6337ec7daec67484b89db27a154f07c3476b9d5048f1f6389",
+    "source_package_sha256": "93b5786c05e530252beef39644ba66614ddb0c93d4dd5c4facd23f237ad1fd73",
+    "source_context_sha256": "93b5786c05e530252beef39644ba66614ddb0c93d4dd5c4facd23f237ad1fd73",
+    "receipt_validated_metadata": {
+      "schema": "atlas.application-delivery.v1",
+      "app_root": ".",
+      "files": {
+        "README.md": "7faa3905d766dbbe4e49af05c7f370fc118160f59e8736378ed23d2b6809a52a",
+        "app/__init__.py": "9469dc4b6b75244f86c93ecdcfd8265b2b758952cac25d25f2009c9b5258da0f",
+        "app/__main__.py": "fb51d09e657e2d32efdede834cf098d2612b9a30a8c7c0dd205f5b51d5ef5425",
+        "app/config.py": "3fa66e7b1233cbc4e8b01556256336ae974c35a0c67ec631a2e7608f6e0c4ae9",
+        "app/server.py": "41b84e08e069e57e026add5a59be4bcf5b46866df6cc23a16224677cc88977d5",
+        "app/storage.py": "cc65cb96367a2485b6e154c518079f713162837cedfee306e4feebe4b09bb662",
+        "app/validation.py": "d0ac670149cb6c5cb61459e3833e235281403ed92f46a9094975fb4eaa052a43",
+        "app/views.py": "e923f629fd6d8d10fb1568285be871b9c06dbecc3157259ff5746b05f36ee01b"
+      },
+      "normalizations": [],
+      "runtime": {
+        "profile": "python-web",
+        "install": [],
+        "build": [],
+        "start": [
+          "python3",
+          "-m",
+          "app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--data-dir",
+          "/state/data"
+        ],
+        "port": 8000,
+        "readiness_path": "/"
+      }
+    },
+    "extracted_root": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-product-acceptance-dc45f2d8952d457aba86fb6f294397c2/verified-application",
+    "extracted_source_sha256": {
+      "README.md": "7faa3905d766dbbe4e49af05c7f370fc118160f59e8736378ed23d2b6809a52a",
+      "app/__init__.py": "9469dc4b6b75244f86c93ecdcfd8265b2b758952cac25d25f2009c9b5258da0f",
+      "app/__main__.py": "fb51d09e657e2d32efdede834cf098d2612b9a30a8c7c0dd205f5b51d5ef5425",
+      "app/config.py": "3fa66e7b1233cbc4e8b01556256336ae974c35a0c67ec631a2e7608f6e0c4ae9",
+      "app/server.py": "41b84e08e069e57e026add5a59be4bcf5b46866df6cc23a16224677cc88977d5",
+      "app/storage.py": "cc65cb96367a2485b6e154c518079f713162837cedfee306e4feebe4b09bb662",
+      "app/validation.py": "d0ac670149cb6c5cb61459e3833e235281403ed92f46a9094975fb4eaa052a43",
+      "app/views.py": "e923f629fd6d8d10fb1568285be871b9c06dbecc3157259ff5746b05f36ee01b",
+      "delivery.json": "4accad35f8399183eb6a8426a971c8434611b69f0160d2b505e9dd29b86cb38e"
+    }
+  },
+  "delivery_file": "/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/bookmark-product-acceptance-dc45f2d8952d457aba86fb6f294397c2/verified-application/delivery.json",
+  "delivery_runtime_start_argv": [
+    "python3",
+    "-m",
+    "app",
+    "--host",
+    "0.0.0.0",
+    "--port",
+    "8000",
+    "--data-dir",
+    "/state/data"
+  ],
+  "delivery_runtime_port": 8000,
+  "delivery_data_dir_argument": "/state/data",
+  "delivery_readiness_path": "/",
+  "docker_network_internal": false,
+  "container_id": "35b6eef00628799b94fc1df5e6bb791859451831bf44bdc6e90368740cdbecdf",
+  "browser": {
+    "engine": "Chromium",
+    "executable": "/Users/milin/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing",
+    "executable_discovery": "allowlisted PATH/HOME/TMPDIR; HOME used only to resolve Playwright's installed browser binary",
+    "environment": "Chromium launch uses temporary HOME and allowlisted PATH/HOME/TMPDIR; no inherited credential variables"
+  },
+  "initial_phase": {
+    "phase": "initial",
+    "runId": "bm-6b45017c58e7",
+    "checks": [
+      {
+        "id": "save-to-default-without-category",
+        "status": "pass",
+        "detail": ""
+      },
+      {
+        "id": "create-collection",
+        "status": "pass",
+        "detail": ""
+      },
+      {
+        "id": "save-in-new-collection",
+        "status": "pass",
+        "detail": ""
+      },
+      {
+        "id": "move-and-browse-by-category",
+        "status": "pass",
+        "detail": ""
+      },
+      {
+        "id": "keyword-search",
+        "status": "pass",
+        "detail": ""
+      },
+      {
+        "id": "open-original-page",
+        "status": "pass",
+        "detail": ""
+      },
+      {
+        "id": "html-output-safety",
+        "status": "pass",
+        "detail": ""
+      },
+      {
+        "id": "invalid-inputs-no-dirty-data",
+        "status": "pass",
+        "detail": ""
+      },
+      {
+        "id": "duplicate-save-risk-observation",
+        "status": "observed",
+        "detail": "created_new_record; 1 -> 2; observation-only"
+      }
+    ],
+    "urls": {
+      "first": "http://127.0.0.1:49289/original?token=bm-6b45017c58e7_original",
+      "second": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+      "xss": "http://127.0.0.1:49289/xss?token=bm-6b45017c58e7_xss"
+    },
+    "titles": {
+      "first": "Cobalt chair bm-6b45017c58e7",
+      "second": "Green lamp bm-6b45017c58e7",
+      "xss": "<img src=x onerror=\"window.__atlasXss=1\"> XSS-bm-6b45017c58e7"
+    },
+    "duplicateSave": {
+      "beforeRecords": [
+        {
+          "id": "2",
+          "title": "Green lamp bm-6b45017c58e7",
+          "href": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+          "visibleText": "Green lamp bm-6b45017c58e7\n打开原页\n移动到归类\n未整理\n待购-bm-6b45017c58e7\n移动",
+          "expectedUrl": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+          "clickedUrl": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+          "navigation": "direct-original-link"
+        }
+      ],
+      "beforeCount": 1,
+      "postStatus": 303,
+      "afterRecords": [
+        {
+          "id": "4",
+          "title": "Repeated bm-6b45017c58e7",
+          "href": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+          "visibleText": "Repeated bm-6b45017c58e7\n打开原页\n移动到归类\n未整理\n待购-bm-6b45017c58e7\n移动",
+          "expectedUrl": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+          "clickedUrl": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+          "navigation": "direct-original-link"
+        },
+        {
+          "id": "2",
+          "title": "Green lamp bm-6b45017c58e7",
+          "href": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+          "visibleText": "Green lamp bm-6b45017c58e7\n打开原页\n移动到归类\n未整理\n待购-bm-6b45017c58e7\n移动",
+          "expectedUrl": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+          "clickedUrl": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+          "navigation": "direct-original-link"
+        }
+      ],
+      "afterCount": 2,
+      "outcome": "created_new_record",
+      "contract": "risk observation only; fail only if frozen contract promises uniqueness/idempotency",
+      "contractResult": "observation-only"
+    },
+    "defaultCollection": {
+      "id": "1",
+      "text": "未整理"
+    },
+    "bookmarks": {
+      "first": {
+        "id": "1",
+        "url": "http://127.0.0.1:49289/original?token=bm-6b45017c58e7_original",
+        "title": "Cobalt chair bm-6b45017c58e7"
+      },
+      "second": {
+        "id": "4",
+        "url": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+        "title": "Repeated bm-6b45017c58e7"
+      },
+      "xss": {
+        "id": "3",
+        "url": "http://127.0.0.1:49289/xss?token=bm-6b45017c58e7_xss",
+        "title": "<img src=x onerror=\"window.__atlasXss=1\"> XSS-bm-6b45017c58e7"
+      },
+      "secondUrlRecordIds": [
+        "2",
+        "4"
+      ]
+    },
+    "createdCollection": {
+      "id": "2",
+      "name": "待购-bm-6b45017c58e7"
+    },
+    "htmlSafety": {
+      "xssObservedDuringSaveResponse": null,
+      "xssObservedAfterSearch": null,
+      "dialogs": []
+    },
+    "invalidInputs": [
+      {
+        "name": "empty-url",
+        "status": 400,
+        "inventoryUnchanged": true
+      },
+      {
+        "name": "malformed-url",
+        "status": 400,
+        "inventoryUnchanged": true
+      },
+      {
+        "name": "javascript-scheme",
+        "status": 400,
+        "inventoryUnchanged": true
+      },
+      {
+        "name": "data-scheme",
+        "status": 400,
+        "inventoryUnchanged": true
+      },
+      {
+        "name": "blank-category",
+        "status": 400,
+        "inventoryUnchanged": true
+      },
+      {
+        "name": "duplicate-category",
+        "status": 400,
+        "inventoryUnchanged": true
+      }
+    ],
+    "expectedAfterRestart": {
+      "secondUrlRecords": [
+        {
+          "id": "4",
+          "title": "Repeated bm-6b45017c58e7",
+          "href": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+          "visibleText": "Repeated bm-6b45017c58e7\n打开原页\n移动到归类\n未整理\n待购-bm-6b45017c58e7\n移动",
+          "expectedUrl": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+          "clickedUrl": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+          "navigation": "direct-original-link"
+        },
+        {
+          "id": "2",
+          "title": "Green lamp bm-6b45017c58e7",
+          "href": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+          "visibleText": "Green lamp bm-6b45017c58e7\n打开原页\n移动到归类\n未整理\n待购-bm-6b45017c58e7\n移动",
+          "expectedUrl": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+          "clickedUrl": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+          "navigation": "direct-original-link"
+        }
+      ]
+    },
+    "blockedRequests": [
+      "https://example.com/"
+    ],
+    "dialogs": [],
+    "status": "passed"
+  },
+  "after_restart_phase": {
+    "phase": "after-restart",
+    "status": "passed",
+    "actualContainerRestart": true,
+    "checks": [
+      "collections",
+      "bookmarks-and-moves",
+      "search",
+      "first-and-second-original-targets",
+      "duplicate-save-observed-state",
+      "html-safety"
+    ],
+    "secondTargetSnapshots": [
+      {
+        "id": "4",
+        "title": "Repeated bm-6b45017c58e7",
+        "href": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+        "visibleText": "Repeated bm-6b45017c58e7\n打开原页\n移动到归类\n未整理\n待购-bm-6b45017c58e7\n移动",
+        "expectedUrl": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+        "clickedUrl": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+        "navigation": "direct-original-link"
+      },
+      {
+        "id": "2",
+        "title": "Green lamp bm-6b45017c58e7",
+        "href": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+        "visibleText": "Green lamp bm-6b45017c58e7\n打开原页\n移动到归类\n未整理\n待购-bm-6b45017c58e7\n移动",
+        "expectedUrl": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+        "clickedUrl": "http://127.0.0.1:49289/second?token=bm-6b45017c58e7_second",
+        "navigation": "direct-original-link"
+      }
+    ]
+  },
+  "cleanup": {
+    "events": [
+      {
+        "step": "container_remove",
+        "state": "started",
+        "at": 1792381893.384895
+      },
+      {
+        "step": "container_remove",
+        "state": "completed",
+        "at": 1792381893.549054
+      },
+      {
+        "step": "container_absence_verification",
+        "state": "started",
+        "at": 1792381893.551336
+      },
+      {
+        "step": "container_absence_verification",
+        "state": "completed",
+        "at": 1792381893.573604
+      },
+      {
+        "step": "network_remove",
+        "state": "started",
+        "at": 1792381893.576746
+      },
+      {
+        "step": "network_remove",
+        "state": "completed",
+        "at": 1792381893.765613
+      },
+      {
+        "step": "network_absence_verification",
+        "state": "started",
+        "at": 1792381893.767623
+      },
+      {
+        "step": "network_absence_verification",
+        "state": "completed",
+        "at": 1792381893.7868211
+      },
+      {
+        "step": "fixture_shutdown",
+        "state": "started",
+        "at": 1792381893.7890198
+      },
+      {
+        "step": "fixture_shutdown",
+        "state": "completed",
+        "at": 1792381894.236344
+      },
+      {
+        "step": "fixture_server_close",
+        "state": "started",
+        "at": 1792381894.237636
+      },
+      {
+        "step": "fixture_server_close",
+        "state": "completed",
+        "at": 1792381894.238604
+      },
+      {
+        "step": "fixture_thread_stopped",
+        "state": "started",
+        "at": 1792381894.239445
+      },
+      {
+        "step": "fixture_thread_stopped",
+        "state": "completed",
+        "at": 1792381894.2402618
+      },
+      {
+        "step": "temporary_state_removed",
+        "state": "started",
+        "at": 1792381894.241787
+      },
+      {
+        "step": "temporary_state_removed",
+        "state": "completed",
+        "at": 1792381894.243823
+      }
+    ],
+    "container_remove": {
+      "ok": true,
+      "returncode": 0,
+      "stdout": "bookmark-product-app-dc45f2d895",
+      "stderr": ""
+    },
+    "container_absence_verification": {
+      "ok": true,
+      "returncode": 1,
+      "stdout": "[]",
+      "stderr": "Error: No such object: bookmark-product-app-dc45f2d895"
+    },
+    "network_remove": {
+      "ok": true,
+      "returncode": 0,
+      "stdout": "bookmark-product-net-dc45f2d895",
+      "stderr": ""
+    },
+    "network_absence_verification": {
+      "ok": true,
+      "returncode": 1,
+      "stdout": "[]",
+      "stderr": "Error response from daemon: network bookmark-product-net-dc45f2d895 not found"
+    },
+    "fixture_shutdown": {
+      "ok": true
+    },
+    "fixture_server_close": {
+      "ok": true
+    },
+    "fixture_thread_stopped": true,
+    "fixture_server_stopped": true,
+    "temporary_state_removed": true,
+    "container_absent_verified": true,
+    "network_absent_verified": true,
+    "all_resources_removed": true
+  },
+  "completed_at": "2026-10-19T03:51:34Z"
+}

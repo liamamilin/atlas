@@ -5,12 +5,14 @@ import os
 import random
 import re
 import sqlite3
+import sys
 import urllib.request
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import atlas_model
 
 PACK = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(PACK, "atlas", "atlas.sqlite")
-API = "https://opencode.ai/zen/go/v1/chat/completions"
-KEY = json.load(open(os.path.expanduser("~/.local/share/opencode/auth.json")))["opencode-go"]["key"]
 N = 40
 
 PROMPT = """基于下面这个软件应用类型的定义，虚构一个真实感的产品使用场景描述（2-3句中文）。
@@ -44,14 +46,9 @@ def main():
 
     results = []
     for i, (slug, name_zh, dc, l0) in enumerate(picked):
-        body = {"model": "mimo-v2.5",
-                "messages": [{"role": "user", "content": PROMPT.format(dc=(l0 or dc)[:900])}],
-                "temperature": 0.8, "max_tokens": 800}
-        req = urllib.request.Request(API, json.dumps(body).encode(),
-                                     {"Authorization": f"Bearer {KEY}", "Content-Type": "application/json",
-                                      "x-opencode-session": "atlas-pilot", "User-Agent": "atlas-pilot/1.0"})
-        r = json.load(urllib.request.urlopen(req, timeout=240))
-        txt = (r["choices"][0]["message"].get("content") or "").strip()
+        txt = atlas_model.complete_text(
+            [{"role": "user", "content": PROMPT.format(dc=(l0 or dc)[:900])}],
+            role="identity", temperature=0.8, max_tokens=800, timeout=240)
         txt = re.sub(r"^```.*?\n|```$", "", txt, flags=re.S).strip()
         results.append({"name": f"synthetic-{i+1:02d}", "expect": slug, "leaf_zh": name_zh, "desc": txt})
         print(f"[{i+1}/{N}] {slug} ({name_zh}): {txt[:60]}...", flush=True)

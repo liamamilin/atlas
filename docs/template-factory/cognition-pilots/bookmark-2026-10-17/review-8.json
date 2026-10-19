@@ -1,0 +1,98 @@
+{
+  "summary": "依据 input.json、source 文档、acceptance/plan.json 与验收程序做静态审查；未执行程序、未启动目标、未安装依赖，结论不代表任何测试已通过。33 个用例与 F01–F14 的映射总体完整，P0/P1/P2 引入顺序基本正确，来源与未运行状态披露充分。但 P1 验收未覆盖 D02 的「回收站记录不参与重复判断、软删除后可重新保存同址」以及同一归类混合 active/trashed 的删除守恒；另 A09/A20 的 HTML 路径在子路径部署下会重复 PUBLIC_BASE_PATH。故不能把阶段验收视为充分通过，结论仅限静态契约审查。",
+  "checks": [
+    {
+      "dimension": "category_evidence",
+      "outcome": "passed",
+      "files": [
+        "CATEGORY.md",
+        "PRODUCT.md",
+        "DECISIONS.md"
+      ],
+      "reason": "CATEGORY.md 将 Raindrop、Linkwarden、linkding 等的访问日期、官方文档/搜索摘要差异、Pinboard 未验证项与本场景建议分开；明确 linkding 为 MIT、Linkwarden/Karakeep 为 AGPL-3.0，并声明未复制代码。建议没有冒充类别事实，未知项也单独列出。"
+    },
+    {
+      "dimension": "scenario_scope",
+      "outcome": "passed",
+      "files": [
+        "inputs/scenario.json",
+        "PRODUCT.md",
+        "ROADMAP.md"
+      ],
+      "reason": "确认场景是普通个人用户、单人对自己的链接库；产品围绕保存、默认未分类、归类、检索和跳回原页展开，明确排除公开分享、协作角色、标签、嵌套与浏览器扩展，导入导出列为 P3 later，没有把企业功能强行纳入。"
+    },
+    {
+      "dimension": "product_completeness",
+      "outcome": "passed",
+      "files": [
+        "PRODUCT.md",
+        "ARCHITECTURE.md",
+        "DECISIONS.md"
+      ],
+      "reason": "覆盖 R01 收藏者与 R02 部署维护者，R03 明确不存在；正常与失败流包含非法 URL、重复、无归类、编辑、软删除、恢复、永久删除和清空；数据生命周期完整，权限/计费/管理/审计均说明不适用理由，导出导入明确未实现且不冒充已具备。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "outcome": "passed",
+      "files": [
+        "ARCHITECTURE.md",
+        "DECISIONS.md",
+        "PRODUCT.md"
+      ],
+      "reason": "架构给出技术栈默认值及理由、SQLite 数据模型与不变量、API 形状/错误码/执行顺序、URL 与 url_key 规则、302 序列化、HTML 路由、检索分页、Host/Origin 边界、重启 adapter 与浏览器适配器契约；未发现与产品承诺冲突的契约。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "outcome": "blocked",
+      "files": [
+        "acceptance/p0-library.cjs",
+        "acceptance/p1-trash.cjs",
+        "acceptance/p1-categories.cjs",
+        "acceptance/p0-limits.cjs",
+        "acceptance/p1-edit.cjs",
+        "acceptance/plan.json",
+        "DECISIONS.md",
+        "PRODUCT.md"
+      ],
+      "reason": "F07/F10/F11 的验收有实质缺口：A06 只覆盖 active 重复，A16/A18/A24 在软删除后都没有再次 POST 同一 URL，故 D02 的「回收站记录不参与重复判断、软删除后可直接重新保存」未被验证；若实现把 trashed 纳入 url_key 唯一检查，现有用例仍可能通过。A14/A17/A30 的归类夹具均为 active 与 trashed 分离，未覆盖同一归类同时含两类记录时的 move/purge，invariant 9 的来源字段与计数守恒无法证明。另 A09 的 POST /bookmarks 与 A20 的 /bookmarks/{id}/... 在 base-url 已含 /bookmarks 时会拼成 /bookmarks/bookmarks/...，子路径部署下安全矩阵会打错路由。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "outcome": "passed",
+      "files": [
+        "DECISIONS.md",
+        "PRODUCT.md",
+        "AGENT.md"
+      ],
+      "reason": "D01–D09 均有明确默认值、影响范围和 when_to_ask；例如 D02 规定重复只查 active、D06 规定单用户无内建账号、D07 规定清空需运行确认；默认值可直接指导实现，询问条件具体，未把日常偏好误设为提问理由。"
+    },
+    {
+      "dimension": "agent_handoff",
+      "outcome": "passed",
+      "files": [
+        "AGENT.md",
+        "ROADMAP.md",
+        "README.md"
+      ],
+      "reason": "AGENT 要求先核对现有项目、指令与已确认决定，只实现当前阶段，将 proposed 视为待采纳建议，使用已声明默认值，按触发条件问人；要求准备专用实例并记录真实命令和结果，禁止删除断言、硬编码测试值或声称未运行测试通过，也要求不覆盖用户已有决定。"
+    },
+    {
+      "dimension": "evidence_honesty",
+      "outcome": "passed",
+      "files": [
+        "README.md",
+        "VALIDATION.md",
+        "acceptance/README.md",
+        "acceptance/plan.json"
+      ],
+      "reason": "README、VALIDATION、验收 README 与 plan.json 一致声明 P0–P2 为 not implemented、A01–A33 为 not_run，未运行程序、未启动目标、未安装浏览器；没有伪造通过证据。CATEGORY.md 还区分了叶子原稿研究日期与本次来源访问日期，没有要求改写不可变输入日期。"
+    }
+  ],
+  "suggestions": [
+    "在 acceptance/p1-trash.cjs 或 A18 增加「软删除后重新 POST 同一 URL」：断言返回 201、生成新 id、旧回收站记录保留，且 409 的 existingId 不会指向 trashed 记录；同时覆盖 HTML 与 JSON 两种 allowDuplicate 入口。",
+    "在 acceptance/p1-categories.cjs 增加同一归类同时含 active 与 trashed 记录的夹具：分别验证 mode=move 只移动 active、mode=purge 只把 active 送入回收站，trashed_from_* 不被覆盖，active/trashed 总数守恒；并让 A30 的 purge 分支也覆盖该混合夹具。",
+    "修正 acceptance/p0-limits.cjs 与 acceptance/p1-edit.cjs 的 HTML 路径拼接：base-url 已含 PUBLIC_BASE_PATH 时，/bookmarks 用相对 /bookmarks，bookmark 子路由用 /{id}/move、/{id}/edit、/{id}/delete，或统一从 ctx.baseUrl 的 pathname 生成，避免 /bookmarks/bookmarks/...。",
+    "补充 UI 覆盖：A28 的空库、A30 的空回收站与清空未确认时的非空 form-error/role=alert、非空 /c/:id 记录页，以及搜索/排序表单保留 q/categoryId/sort/limit 并将 offset 归零。",
+    "在 A29/A30 增加 DOM 负断言：bookmark-edit-form 不含 input[name=url]，category purge form 不含 select[name=targetCategoryId]；并在 A09/A20 的 Host 矩阵补充 /api/health 与 /c/:id、/trash 读页面。"
+  ]
+}

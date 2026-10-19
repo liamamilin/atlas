@@ -6,10 +6,13 @@ import re
 import sqlite3
 import urllib.request
 
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import atlas_model
+
 PACK = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(PACK, "atlas", "atlas.sqlite")
 OUT = os.path.join(PACK, "atlas", "section-zh.json")
-KEY = json.load(open(os.path.expanduser("~/.local/share/opencode/auth.json")))["opencode-go"]["key"]
 
 if os.path.exists(OUT):
     print("exists, skip")
@@ -21,13 +24,9 @@ else:
     prompt = ("把下列分类树节点的 name 翻译成中文（path 仅作参考，不要输出）。"
               "输出JSON数组 [{\"id\":..., \"name_zh\":...}]，覆盖全部节点，不要遗漏。"
               "命名用软件行业通用中文叫法。保留缩写（CRM/ERP/HR）。\n" + json.dumps(payload, ensure_ascii=False))
-    body = {"model": "mimo-v2.5", "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.1, "max_tokens": 4000}
-    r = json.load(urllib.request.urlopen(urllib.request.Request(
-        "https://opencode.ai/zen/go/v1/chat/completions", json.dumps(body).encode(),
-        {"Authorization": f"Bearer {KEY}", "Content-Type": "application/json",
-         "x-opencode-session": "atlas-sections", "User-Agent": "atlas/1.0"}), timeout=600))
-    txt = (r["choices"][0]["message"].get("content") or "").strip()
+    txt = atlas_model.complete_text(
+        [{"role": "user", "content": prompt}],
+        role="translate", temperature=0.1, max_tokens=4000, timeout=600)
     if txt.startswith("```"):
         txt = re.sub(r"^```[a-zA-Z]*\s*", "", txt)
         txt = re.sub(r"\s*```\s*$", "", txt)

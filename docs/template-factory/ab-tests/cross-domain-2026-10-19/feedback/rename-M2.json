@@ -1,0 +1,19 @@
+{
+  "kind": "observed_runtime_failure",
+  "recorded_before_repair_call": 1792353382.45331,
+  "observations": [
+    {
+      "id": "EP01",
+      "classification": "Real root-containment violation found by a separately frozen exploratory test, not a new core score",
+      "reproduction": [
+        "Use a fresh owned root containing old-a.txt; preview literal old -> new and save a legitimate plan in the assigned state directory",
+        "Edit/add the plan top-level id to an absolute string for an owned sibling outside/receipt-target; ensure receipt-target.json does not yet exist",
+        "Run confirmed apply for that same root and edited plan"
+      ],
+      "actual": "The real process exited 0, renamed the intended inside file, and wrote outside/receipt-target.json outside the assigned root. The existing outside-sentinel variant was rejected unchanged: overwrite is NOT demonstrated.",
+      "expected": "No write or overwrite may escape the assigned root through any untrusted plan field. Reject unsafe edited input before mutation or safely disregard unsupported fields while honoring the common containment/data-preservation contract. Keep the working core list/preview/apply/undo workflows.",
+      "evidence": "evaluation/results/rename/M2/EP01-initial/absent_target/apply-event.json"
+    }
+  ],
+  "checks_status": "Initial F01-F11 passed and stay recorded. EP01 is posthoc after initial M2 source audit, frozen before other rename source inspection, then applied equally to all three. One optional product repair, no author execution or access to evaluation tooling/peer apps."
+}

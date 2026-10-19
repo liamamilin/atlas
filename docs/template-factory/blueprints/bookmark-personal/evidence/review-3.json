@@ -1,0 +1,24 @@
+{
+  "outcome": "passed",
+  "summary": "本次仅对 A05、A06 做静态修订复审，未运行任何测试。上一轮两项剩余问题均已闭合：A05 的编辑路径现在会提交空标题，并在重载后校验标题、分类与 href 未被改写；A06 在存储故障清除并重载后断言保存按钮恢复可用，两次失败提示均含恢复/重载指引。",
+  "checks": [
+    {
+      "area": "A05",
+      "outcome": "passed",
+      "files": [
+        "source/acceptance/run.cjs"
+      ],
+      "reason": "编辑循环在危险 URL 之后新增 reject('   ',url,'未保存分类') 提交空标题（run.cjs:36）；reject 每次先 clearAlert，再断言 alert 非空，并用 assertInputs 逐一比对标题/链接/分类三个输入值；重载后断言 row('原收藏') 恰为 1 条、innerText 含“原分类”且不含“未保存分类”、article 总数为 1、href 仍为原 url，标题由 row('原收藏') 选择器直接固定。新建路径同样有 '   ' 空标题拒绝且 article 数为 0，因此接受空标题或部分覆盖分类的更新实现均无法通过。"
+    },
+    {
+      "area": "A06",
+      "outcome": "passed",
+      "files": [
+        "source/acceptance/run.cjs",
+        "source/ARCHITECTURE.md"
+      ],
+      "reason": "A06 对初始打开失败与已有库读取失败两次均断言 alert 非空、匹配 /刷新|重载|重新加载/ 且保存按钮禁用（run.cjs:37）；清除故障并 reload 后断言旧记录仍在、保存按钮 isEnabled、article 恰 1 条，覆盖“正常就绪后按钮可用”和“明确提示恢复存储后重载”的契约（ARCHITECTURE.md:19），永久禁用保存或仅泛化错误的实现不能通过。"
+    }
+  ],
+  "issues": []
+}

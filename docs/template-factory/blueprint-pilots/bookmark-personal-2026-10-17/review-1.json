@@ -1,0 +1,218 @@
+{
+  "outcome": "needs_changes",
+  "summary": "本次为静态审阅，未运行任何测试。单人本地边界、来源标注、能力阶段和权限/计费/后台/审计/导出的适用性判断总体克制且一致，17 个用例与 P0/P1/P2 的结构映射完整；但 P0 仍存在隐私默认、状态反馈、校验失败保留输入和编辑路径未验收，P1/P2 的删除持久化、导入原子性、批量事务原子性和冲突计数也存在可误通过的断言，当前不宜按这套验收直接进入下游实现。",
+  "checks": [
+    {
+      "area": "品类来源与许可标注",
+      "outcome": "passed",
+      "files": [
+        "source/CATEGORY.md",
+        "source/template.json",
+        "source/inputs/scenario.json"
+      ],
+      "reason": "CATEGORY.md 将 S01 固定输入、S02/S03 在线文档、S04/S05 未固定 commit 仓库、S06 固定 commit、S07/S08 平台文档分别标注；template.json 的 scenario 与 inputs/scenario.json 一致，S06 明确声明旧试产不证明本包。未发现把单个第三方产品扩展写成品类硬约束；F14-F16 的来源归因偏弱作为建议处理。"
+    },
+    {
+      "area": "能力地图与权限/计费/后台/审计/导出适用性",
+      "outcome": "passed",
+      "files": [
+        "source/PRODUCT.md",
+        "source/DECISIONS.md",
+        "source/template.json"
+      ],
+      "reason": "F14 成员权限、F15 计费、F16 后台/支持/审计均标为当前默认不适用，F13 云同步与 F18 标签/嵌套/全文检索标为待定，F09 导出放在 P1；D01/D08 与 R01 单人角色、单人本地库一致。没有把权限、计费、后台或审计误报为 P0/P1 已实现。"
+    },
+    {
+      "area": "决策与默认值一致性",
+      "outcome": "passed",
+      "files": [
+        "source/DECISIONS.md",
+        "source/ARCHITECTURE.md",
+        "source/template.json"
+      ],
+      "reason": "D01-D08 与 ARCHITECTURE 的默认架构、URL 策略、收件箱、事务完成、软删除/导入、默认不外发、运营边界逐项对应；references/url-policy.mjs 的 http/https、无凭据、保留 query/hash 与 D03 一致；references/atomic-idb.mjs 以 transaction complete 为成功与 D05 一致。"
+    },
+    {
+      "area": "P0 端到端闭环",
+      "outcome": "needs_changes",
+      "files": [
+        "source/ROADMAP.md",
+        "source/acceptance/run.cjs",
+        "source/acceptance/plan.json"
+      ],
+      "reason": "A01 覆盖保存默认收件箱、刷新与同上下文重开；A02 覆盖编辑/新分类且记录数不增；A03 覆盖标题/URL 搜索、分类交集、空结果和清空；A04 覆盖 href/target/rel 与外链请求。缺口：A01 只重开同一 BrowserContext，未覆盖场景所称多次会话/浏览器重启；A03 未覆盖 ARCHITECTURE 声明的分类文本关键字搜索；A02 保存后立即 reload 存在未等待持久化的竞态。"
+    },
+    {
+      "area": "P0 失败、安全与隐私路径",
+      "outcome": "needs_changes",
+      "files": [
+        "source/PRODUCT.md",
+        "source/ARCHITECTURE.md",
+        "source/DECISIONS.md",
+        "source/acceptance/run.cjs"
+      ],
+      "reason": "A05 拒绝 javascript/data/file/相对 URL、凭据和空标题；A06 模拟 indexedDB.open 失败；A07 中止 readwrite 事务并检查旧记录、输入和半写入；A08 检查 HTML 标题不执行；A09 检查重复 requestSubmit 只一条。缺口：D07 的保存不外发没有被断言；A05 未断言校验失败保留输入；A05/A08 未覆盖编辑路径；A06 未覆盖已有库读取失败；A17 只检查 status 元素存在。"
+    },
+    {
+      "area": "架构/UI 契约一致性",
+      "outcome": "needs_changes",
+      "files": [
+        "source/ARCHITECTURE.md",
+        "source/ROADMAP.md",
+        "source/acceptance/run.cjs"
+      ],
+      "reason": "ARCHITECTURE 的标签、article/heading、打开原网页、收件箱、空结果文案、P1/P2 控件名大多能在 run.cjs 找到对应断言；但 A14 目标要求冲突数量，契约/测试只要求含“冲突”；A15 测试要求 role=status，契约未规定报告容器；A03 与“搜索 category”不一致；A06 要求保存按钮永久 disabled，与“按钮不应永久 disabled”存在未说明的例外。"
+    },
+    {
+      "area": "阶段映射、执行器与测试可信度",
+      "outcome": "needs_changes",
+      "files": [
+        "source/acceptance/plan.json",
+        "source/acceptance/run.cjs",
+        "source/acceptance/selfcheck.cjs",
+        "source/verify.py",
+        "source/references/atomic-idb.mjs"
+      ],
+      "reason": "plan.json 与 template.json 的 17 个用例、P0 十项、P1 五项、P2 两项逐项一致，每个 ID 在 run.cjs 有执行器，verify.py 的静态断言覆盖双向映射和哈希清单；结构层未发现孤儿。语义层：A10 删除后未 reload、A13 无混合批次、A16 只中止全部事务、A05/A13 alert 可复用、A02/A11/A12/A16 未等待持久化，均可能造成假通过或假失败。"
+    },
+    {
+      "area": "文档、验证状态与完整性声明",
+      "outcome": "passed",
+      "files": [
+        "source/README.md",
+        "source/VALIDATION.md",
+        "source/template.json",
+        "source/integrity.json"
+      ],
+      "reason": "README/VALIDATION/template 将状态标为草案、P0 未实现、P1/P2 未实测，evidence 为空；VALIDATION 区分结构、参考模块、harness 自检和真实产品验收，未声称产品已通过；build.py/verify.py/integrity.json 的职责说明与静态阅读一致。本次未运行测试。"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "blocking",
+      "files": [
+        "source/DECISIONS.md",
+        "source/PRODUCT.md",
+        "source/acceptance/run.cjs"
+      ],
+      "problem": "D07 与 PRODUCT 明确承诺保存时不抓标题/favicon/正文、不接外部 API，但 run.cjs 只用 context.route 中止外站请求，没有在 A01/A04/A09 等保存流程断言保存期间外站请求数为 0。实现在 save 时 fetch 原网页、失败后继续用输入标题保存，仍可通过全部 P0 用例，隐私默认没有被证明。",
+      "fix": "在保存流程监听 request，断言除本地预览来源外无请求；或新增 P0 用例把 D07 映射到验收，并把保存期间的外站请求视为失败。"
+    },
+    {
+      "severity": "blocking",
+      "files": [
+        "source/acceptance/run.cjs",
+        "source/ARCHITECTURE.md",
+        "source/ROADMAP.md"
+      ],
+      "problem": "A17 目标包含“状态反馈可发现”，但只断言 getByRole('status').count() 存在；空的 role=status 容器也能通过。P0 没有任何用例断言成功状态文本，而 ARCHITECTURE 要求 role=status 显示“已保存/已更新”，F07 的可理解状态因此可被假通过。",
+      "fix": "A17 在保存后断言 status 文本包含“已保存”，编辑后包含“已更新”；或新增 P0 用例覆盖状态文本与 alert/status 角色。"
+    },
+    {
+      "severity": "blocking",
+      "files": [
+        "source/acceptance/run.cjs",
+        "source/PRODUCT.md",
+        "source/ARCHITECTURE.md"
+      ],
+      "problem": "PRODUCT 与 ARCHITECTURE 要求校验/存储失败保留输入，但 A05 只检查 alert 和记录数，未检查标题、URL、分类是否仍保留；A07 也只检查标题。A05/A08 只覆盖新建，未覆盖编辑既有记录时改成 javascript:/data:/相对 URL 或 HTML 标题，F06 的不可信输入在更新路径上可能被绕过。A06 只模拟首次打开失败，未模拟已有库读取失败，无法证明“读取失败不当作空库覆盖”。",
+      "fix": "在 A05 每次非法提交后断言三个字段值未被清空；增加编辑路径的危险 URL/HTML 标题用例；增加已有记录时读取失败的用例，断言旧记录不被空库覆盖。"
+    },
+    {
+      "severity": "blocking",
+      "files": [
+        "source/acceptance/run.cjs",
+        "source/ROADMAP.md",
+        "source/ARCHITECTURE.md"
+      ],
+      "problem": "A10 目标写“删除进入回收站并可恢复；刷新后状态正确”，但测试在删除后没有 reload，只在恢复后 reload。删除仅改内存、deletedAt 未持久化的实现也能通过：最终 reload 时期望的 1 条记录正是未真正删除的原记录。",
+      "fix": "删除后 reload，断言主列表无记录且回收站有该记录；再恢复并 reload；必要时通过导出数据检查 deletedAt。"
+    },
+    {
+      "severity": "blocking",
+      "files": [
+        "source/acceptance/run.cjs",
+        "source/DECISIONS.md",
+        "source/ARCHITECTURE.md"
+      ],
+      "problem": "D06/ARCHITECTURE 要求导入先验证整个 payload 再单事务写入；A13 的三个坏 payload 都只含一个无效记录（坏 JSON、未知版本、单条危险 URL），没有“一个有效 + 一个无效/重复”的混合批次，逐条导入到坏记录才中止的实现不会产生可观察的部分写入，仍可通过。",
+      "fix": "增加混合 payload：一条有效记录加一条无效字段/危险 URL/重复 id，断言导入后导出与导入前完全一致；可同时统计写事务次数。"
+    },
+    {
+      "severity": "blocking",
+      "files": [
+        "source/acceptance/run.cjs",
+        "source/ROADMAP.md",
+        "source/ARCHITECTURE.md"
+      ],
+      "problem": "A16 目标要求批量分类事务失败时全部保留原值，ARCHITECTURE 要求单事务；但 abortWrites 会中止所有 readwrite 事务，逐条记录分别开事务的实现也会全部中止并通过，无法区分单事务与多事务。",
+      "fix": "让故障只影响第二条写入/第二个事务，或记录事务数量，断言批量移动只有一个事务且失败时两条都保留原值。"
+    },
+    {
+      "severity": "suggestion",
+      "files": [
+        "source/acceptance/run.cjs",
+        "source/ARCHITECTURE.md",
+        "source/ROADMAP.md"
+      ],
+      "problem": "A14 目标写“显示冲突数量”，但 ARCHITECTURE 只要求反馈含“冲突”，run.cjs 也只断言状态文本包含“冲突”，不显示数量的实现可通过。A15 的重复报告测试要求出现在 role=status，但 ARCHITECTURE 只写“报告列出”，未规定角色，等价 UI 可能被误判。",
+      "fix": "A14 断言具体 added/conflicts 数量并更新契约；A15 在 ARCHITECTURE 明确报告容器/角色，或让测试按行为而非未声明角色查找。"
+    },
+    {
+      "severity": "suggestion",
+      "files": [
+        "source/ARCHITECTURE.md",
+        "source/ROADMAP.md",
+        "source/acceptance/run.cjs"
+      ],
+      "problem": "ARCHITECTURE 要求搜索在 title/url/category 三者上做包含匹配，A03 目标/测试只验证 title/URL 关键字加分类 select 交集，未验证“分类文本本身可被关键字命中”；只搜 title/url 的实现可通过。",
+      "fix": "增加只出现在分类名中的搜索词并断言命中，或把 ARCHITECTURE/ROADMAP 收窄为 title/url 搜索加分类筛选。"
+    },
+    {
+      "severity": "suggestion",
+      "files": [
+        "source/PRODUCT.md",
+        "source/ROADMAP.md",
+        "source/acceptance/run.cjs"
+      ],
+      "problem": "场景要求“多次会话之间持久保留”，A01 只关闭页面并在同一 BrowserContext 新开页面，未覆盖浏览器重启/持久化 profile；蓝图没有说明“会话”是否仅指同一浏览器上下文。",
+      "fix": "明确“会话=同一浏览器 profile/context”，或增加 persistent context 跨浏览器重启的验收；同时保留浏览器清理/来源变化的限制说明。"
+    },
+    {
+      "severity": "suggestion",
+      "files": [
+        "source/acceptance/run.cjs"
+      ],
+      "problem": "A02 保存后立即 reload，A11 删除后立即导出，A12 导入确认后立即 reload，A16 批量应用后立即 reload，都没有等待持久化完成状态；正确的异步实现可能被误判失败，导出也可能读到旧状态。",
+      "fix": "在 reload/export 前等待 role=status 的成功/added 文本或目标行状态；使用轮询断言持久化结果。"
+    },
+    {
+      "severity": "suggestion",
+      "files": [
+        "source/acceptance/run.cjs"
+      ],
+      "problem": "A05 和 A13 循环提交多个非法输入时没有清空/区分 alert；后续输入即使没有产生新错误，前一次 alert 仍可满足检查。A13 的无写入断言仍能兜底，但对每个 payload 的错误反馈没有被证明。",
+      "fix": "每次提交前清空 alert 或断言消息变化；为不同错误使用可区分文本。"
+    },
+    {
+      "severity": "suggestion",
+      "files": [
+        "source/acceptance/run.cjs",
+        "source/DECISIONS.md",
+        "source/ARCHITECTURE.md"
+      ],
+      "problem": "D02 允许采用非 IndexedDB 技术栈，ARCHITECTURE 也说可采用等价适配器；但 A06 直接覆盖 indexedDB.open，A07 覆盖 IDBDatabase.prototype.transaction，非 IDB 存储无法复用这两个失败用例，测试与“可调整默认”不一致。",
+      "fix": "明确 A06/A07 仅适用于 IDB，或提供存储适配器的故障注入接口；为其他存储实现保留等价失败断言。"
+    },
+    {
+      "severity": "suggestion",
+      "files": [
+        "source/PRODUCT.md",
+        "source/CATEGORY.md",
+        "source/template.json"
+      ],
+      "problem": "F15 计费、F16 后台/支持/审计、F14 共享撤回的来源 S05/S04 事实只支持协作/成员权限/标签/导入导出/REST API，没有直接支持计费、后台、审计或共享撤回；虽然这些能力标为不适用，来源列仍像在为其背书。",
+      "fix": "把这些能力的来源标为“品类背景/无直接来源”，或补充相应官方来源；保持不适用结论不变。"
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "summary": "静态审阅 input.json/leaf.md 与 source 下的阶段、决策和验收程序。包内明确 P0–P2 未实现、A01–A33 全部未运行，因此本结论只评价蓝图与验收设计，不声称应用通过。范围与单人生活收藏场景基本一致，数据模型、错误契约、边界和默认值写得具体；主要阻塞在验收设计：A33 只校验 sort-select 与 URL，不校验 created_asc 的实际行序；A29 将记录移动到非空 /c/{id} 后只查 API，未断言分类页出现该记录；category-link 从未被真实点击；A28/A33 分页未校验列表顺序；PRODUCT F04/F11 的空态承诺与 acceptance/README 的“手工、非发布硬要求”相冲突。导出/导入延后到 P3 与 UI sort-form 未实际操作是进一步覆盖缺口，但未发现虚假运行声明。",
+  "checks": [
+    {
+      "dimension": "category_evidence",
+      "outcome": "passed",
+      "files": [
+        "CATEGORY.md"
+      ],
+      "reason": "CATEGORY.md 将类别事实、场景建议和未知项分开，引用 linkding README/Archiving/Backups/Search/Options、Linkwarden Overview/Links/Collections/Preservation/Import、Raindrop 帮助中心与 Chrome 帮助，并明确 Raindrop 仅取得搜索摘要、Pinboard 未列入、价格/回收站保留期/中文分词/大规模导入未验证。许可段落区分 linkding MIT、Linkwarden/Karakeep AGPL-3.0 与 Raindrop 专有，说明未复制第三方代码且未做许可证法律审查。仅“元数据抓取失败不能阻止记录落库”一句缺少直接来源，宜标为设计建议或补证；该句不影响当前零抓取的架构。"
+    },
+    {
+      "dimension": "scenario_scope",
+      "outcome": "passed",
+      "files": [
+        "PRODUCT.md",
+        "ROADMAP.md",
+        "acceptance/plan.json"
+      ],
+      "reason": "确认场景是普通用户、单人对自己的链接库；PRODUCT/ROADMAP 把 P0 定为保存、默认未分类、跨进程持久与打开原页，P1 定为归类新建/移动/软删除/恢复/永久删除，P2 定为归类浏览、关键字检索、排序与分页。场景四条验收分别由 A01–A10/A28、A11–A20/A29–A31、A21–A27/A32–A33 对应。标签、嵌套、快照、公开分享、协作、计费、后台等没有被强行纳入当前范围；多设备仅通过认证反向代理，没有超出确认场景。"
+    },
+    {
+      "dimension": "product_completeness",
+      "outcome": "passed",
+      "files": [
+        "PRODUCT.md",
+        "CATEGORY.md",
+        "ARCHITECTURE.md",
+        "DECISIONS.md",
+        "acceptance/README.md"
+      ],
+      "reason": "PRODUCT.md 定义 R01 收藏者、R02 部署维护者、R03 明确不存在的共享读者；F01–F14 为 current required，F15/F16/F24/F25 为 later，F18/F19 为 decision needed，F20–F23 为 not applicable。正常与失败流覆盖保存、默认落点、重复 URL、非法 URL、归类移动/删除、编辑、软删除、回收站、恢复与清空。数据生命周期完整到 purge；权限、计费、审计、后台明确不适用。导出/导入只有 P3 规划，且空库/空回收站被降为手工项，建议在发布说明中显式告知或补自动化，但不把企业后台等不适用能力当作本期缺口。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "outcome": "passed",
+      "files": [
+        "ARCHITECTURE.md",
+        "DECISIONS.md",
+        "acceptance/common.cjs",
+        "acceptance/run.cjs"
+      ],
+      "reason": "ARCHITECTURE.md §1–§11 给出 Node 22/Fastify/SQLite 选择理由、表结构与不变量、十进制字符串资源 ID、URL 校验与保守归一、状态机与守恒、完整 HTTP 端点与错误信封/执行顺序、检索/排序/分页、basePath 与 Host/Origin、重启与浏览器适配器以及非功能限制。数据、API、错误码和适配器契约互相一致，默认值与理由可执行。唯一模糊点是 /c/{id} 只明确标题与空态，未明确非空记录列表，与 F14 的归类浏览存在接口说明不足。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "outcome": "blocked",
+      "files": [
+        "acceptance/plan.json",
+        "ROADMAP.md",
+        "acceptance/ui-p0.cjs",
+        "acceptance/ui-p1.cjs",
+        "acceptance/ui-p2.cjs",
+        "acceptance/p0-save.cjs",
+        "acceptance/p1-categories.cjs",
+        "acceptance/p1-trash.cjs",
+        "acceptance/p2-search.cjs",
+        "acceptance/p2-browse.cjs",
+        "acceptance/README.md",
+        "PRODUCT.md",
+        "ARCHITECTURE.md"
+      ],
+      "reason": "plan.json 将 F01–F14 全部映射到引入阶段，A01–A33 唯一且出现在对应阶段；程序并非空壳：A03 校验默认计数增加 2，A05 校验 302 WHATWG 序列化，A09/A20 覆盖 Host/Origin/Sec-Fetch-Site 与零写入，A14 覆盖 active+trashed 混合状态，A18 有破坏性护栏，A28 用本地外部夹具做真实导航。但存在可让错误实现通过的 false acceptance：A33 设置 created_asc 并读取 sort-select，却没有断言首页行序等于创建升序，服务端忽略 sort 仍可通过；A29 将记录移动到 emptyId 后进入 /c/{id}，只查 API 和重命名，没有断言该页出现这条记录；A30 只校验 category-link 的 href，没有点击；A28/A33 分页只查无重复/并集，不查 createdAt 排序；sort-form/sort-submit 从未点击，browser.setSort 未被任何用例使用；PRODUCT F04 的空态与 ARCHITECTURE §8 的空回收站，在 acceptance/README §14/§15 被降为手工且非发布硬要求。这些是缺失的目标交互/语义断言，不只是可选 polish。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "outcome": "passed",
+      "files": [
+        "DECISIONS.md",
+        "PRODUCT.md",
+        "ROADMAP.md"
+      ],
+      "reason": "D01–D09 每条都有默认值、理由与 When to ask 触发条件，并标为 proposed。D01 单一归属+未分类、D02 重复阻止+显式另存、D03 删除归类显式二选一与 tombstone、D04 不抓取元数据、D05 保守 URL 归一、D06 单用户本机+反向代理认证、D07 回收站不过期与清空护栏、D08 P3 导出/导入、D09 重启 adapter 与浏览器验收边界均可执行。没有把 proposed 冒充用户已确认，也未发现默认值冲突。"
+    },
+    {
+      "dimension": "agent_handoff",
+      "outcome": "passed",
+      "files": [
+        "AGENT.md",
+        "README.md",
+        "acceptance/README.md"
+      ],
+      "reason": "AGENT.md 要求先核对已有项目、指令与已确认决定，将 proposed 决策视为待采纳建议，只实现当前阶段的完整用户闭环，后期与不适用能力保持实际状态；准备专用测试实例并运行该阶段 HTTP/浏览器验收，记录实际命令、目标版本、通过/失败/未完成与日志；验收程序自身有误时不得删除行为断言、硬编码测试值或声称未运行测试通过；不得覆盖已有指令、数据或用户决定。ROADMAP 以 P0→P1→P2 明确交付顺序，README/VALIDATION 再次强调包内内容不授予外部访问、凭据、发布或破坏性操作权限。交接充分；仅可再显式提醒 --allow-destructive 的使用前提。"
+    },
+    {
+      "dimension": "evidence_honesty",
+      "outcome": "passed",
+      "files": [
+        "README.md",
+        "VALIDATION.md",
+        "ARCHITECTURE.md",
+        "acceptance/README.md",
+        "acceptance/plan.json",
+        "ROADMAP.md"
+      ],
+      "reason": "README/VALIDATION/ARCHITECTURE §0/acceptance README §16/plan.json 一致声明 P0–P2 未实现、A01–A33 未运行、本次生产未启动目标或浏览器、没有任何 pass 证据；没有把静态审阅或已存在文件说成执行通过。CATEGORY.md 把研究访问日期与叶子原稿日期分开，并说明叶子研究笔记链接不属于本包；输入中的历史日期没有被要求改写。A18 缺少 --allow-destructive 时记为 incomplete 而非 pass，空库/空回收站与 P3 导出也明确标为手工或未实现。PRODUCT F04/F11 与 acceptance/README 对空态是否属于发布硬要求存在承诺不一致，但这是覆盖冲突，不是虚假运行声明。"
+    }
+  ],
+  "suggestions": [
+    "在 acceptance/ui-p2.cjs A33 首页首屏增加对 created_asc 行序的断言：将页面 rowIds 与本 run seeded 顺序或 API created_asc 结果逐项比较；并用 browser.setSort 真实操作 sort-form，再断言 URL、offset 归零和行序；A28 同样补 created_desc 行序断言。",
+    "在 acceptance/ui-p1.cjs A29 的 move 分支后至少断言 /c/{emptyId} 上出现该 bookmark-item 的 id/title/category，并由首页真实点击 category-link 进入；补 tombstone 或未知 /c/{id} 的 404 负例，避免分类页只测空态。",
+    "对齐空态承诺：要么在 P0/P1 增加空库与空回收站断言（data-empty-kind=library/trash），要么在 PRODUCT F04/F11 与 ARCHITECTURE §8 明确空态为后续或非当前验收，消除与 acceptance/README §14/§15 的冲突。",
+    "补低成本高价值负例：malformed JSON 返回 invalid_json、非法 allowDuplicate 形状、默认 limit=50 与 limit 边界、错误 Host 的 /c/{id} 与 /trash，以及备注/URL/归类名/flash 的 HTML 转义断言。",
+    "为 P3 导出/导入给出用户可见的数据可携带性说明和明确里程碑；若近期不实现，至少在 README/产品范围写明当前只能通过 SQLite 备份取回数据，避免用户误以为已有导出。",
+    "CATEGORY.md 将“抓取失败不阻止落库”标注为设计建议或补直接来源；A18 的全局回收站清空继续限定专用实例，并在 AGENT/README 显式重复 --allow-destructive 前提。"
+  ]
+}

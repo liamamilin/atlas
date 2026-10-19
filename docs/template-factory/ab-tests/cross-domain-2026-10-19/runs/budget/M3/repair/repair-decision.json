@@ -1,0 +1,33 @@
+{
+  "initial_source_sha256": {
+    "DECISIONS.md": "86b155def3f5b91663f14bc114f88982348c4773819b93913f92c9f4c16e9fb3",
+    "README.md": "ddc00d6f26f7da69fd2274db4aa599c19a2759eee8b48f1b254c6ccd44dcac80",
+    "api.py": "86ead064627a320a130a3b8244595b379c1fb190cec8c061bde6d152e9c3ae66",
+    "app.py": "1c56ab4d0e336f1683e7c45b608ab569a75963d09030a200c4fafa30799cfe35",
+    "db.py": "250203dce6f1b8bfe96d1c6d0e5c009c48b7f27142645a94f55955d10242e61b",
+    "money.py": "e4aa4d5e81bb30a35ff8021008decaf6acc76fb7a3082ef66d20dc5155a633c6",
+    "static/app.js": "3f4cf591056801b27d4bbad2c7616715f9e37d4c014403b390bdcdba0599af9f",
+    "static/index.html": "8ae5450a05ecc60c4e3a064a37e0491b28c95126c980f83bb0263f90c8975614",
+    "static/style.css": "e1fc2f05237feb82ef0433568268c5ed5793a2f40ac94e47d54e9a8607083425"
+  },
+  "feedback": {
+    "kind": "observed_runtime_failure",
+    "recorded_before_repair_call": 1792353050.184035,
+    "observations": [
+      {
+        "id": "startup",
+        "reproduction": [
+          "Run the delivered app with CPython 3.10.13: python3 -B app.py --port <unused loopback port> --data-dir <empty owned directory>",
+          "Wait for local HTTP readiness"
+        ],
+        "actual": "The real process exited 1 before bind. Traceback: app.py main -> api.py make_handler -> nested Handler class body, store = store -> NameError: name store is not defined. The independent operator preserved server-1.log and unchanged source hashes.",
+        "expected": "The application must start on 127.0.0.1 and serve the agreed complete P0 API and browser workflow. Keep all common contracts and existing intended data rules.",
+        "evidence": "evaluation/results/budget/M3/initial/server-1.log"
+      }
+    ],
+    "checks_status": "Dependent functional checks and browser did not run due startup failure; no invented pass or separate feature failures.",
+    "limits": "One repair opportunity; author may not execute or inspect evaluation tooling/peer apps. Only reported symptom, reproduction and expected outcome are provided."
+  },
+  "policy": "One optional product repair after actual material failure, no app hand edits, no new hidden behavior criteria; initial evidence unchanged",
+  "stdin_boundary": "Author driver now DEVNULL; original budget inherited common launcher script is removed, recorded as a repair-round control change, not attributed solely to template."
+}

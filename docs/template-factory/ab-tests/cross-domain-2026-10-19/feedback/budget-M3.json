@@ -1,0 +1,18 @@
+{
+  "kind": "observed_runtime_failure",
+  "recorded_before_repair_call": 1792353050.184035,
+  "observations": [
+    {
+      "id": "startup",
+      "reproduction": [
+        "Run the delivered app with CPython 3.10.13: python3 -B app.py --port <unused loopback port> --data-dir <empty owned directory>",
+        "Wait for local HTTP readiness"
+      ],
+      "actual": "The real process exited 1 before bind. Traceback: app.py main -> api.py make_handler -> nested Handler class body, store = store -> NameError: name store is not defined. The independent operator preserved server-1.log and unchanged source hashes.",
+      "expected": "The application must start on 127.0.0.1 and serve the agreed complete P0 API and browser workflow. Keep all common contracts and existing intended data rules.",
+      "evidence": "evaluation/results/budget/M3/initial/server-1.log"
+    }
+  ],
+  "checks_status": "Dependent functional checks and browser did not run due startup failure; no invented pass or separate feature failures.",
+  "limits": "One repair opportunity; author may not execute or inspect evaluation tooling/peer apps. Only reported symptom, reproduction and expected outcome are provided."
+}

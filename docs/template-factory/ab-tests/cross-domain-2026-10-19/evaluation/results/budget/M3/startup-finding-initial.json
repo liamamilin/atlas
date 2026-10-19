@@ -1,0 +1,15 @@
+{
+  "kind": "actual_application_startup_failure",
+  "case": "budget",
+  "label": "M3",
+  "round": "initial",
+  "not_tool_failure": true,
+  "evidence": "initial/server-1.log",
+  "root_cause": "api.py make_handler nested class Handler executes store = store and raises NameError: name store is not defined before binding HTTP server",
+  "real_process_exit": 1,
+  "core_behavior": "not_run; all dependent APIs/browser unverified due one startup defect, not multiple feature failures",
+  "application_hashes_unchanged": true,
+  "cleanup": "Process exited 1 and runner waited; no service listening or browser launched",
+  "repair_scope": "Fix handler closure binding only; do not change business rules or testing hooks",
+  "source_only_secondary_observation": "Shared positive amount parser also rejects zero budget; not executed and not added to frozen rubric"
+}

@@ -37,6 +37,18 @@ def update_review(slug, changes, pack=PACK):
         return state[slug]
 
 
+def remove_review(slug, pack=PACK):
+    valid_slug(slug)
+    with review_lock(pack):
+        path = Path(pack) / "drafts/review.json"
+        state = load_review(pack)
+        if slug not in state:
+            return False
+        state.pop(slug, None)
+        atomic_json(path, state)
+        return True
+
+
 def fingerprint(slug, pack=PACK):
     path = Path(pack) / "drafts" / (valid_slug(slug) + ".md")
     front, body = parse_front(path.read_text())

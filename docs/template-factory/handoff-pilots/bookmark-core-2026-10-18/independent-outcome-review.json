@@ -1,0 +1,312 @@
+{
+  "summary": "C 应用在本轮 initial→repaired 的跟随修复中：修复前初版核心闭环已能完成 R01/R02/R03/R06/R07/R09；R04 因只能\"保存时顺带建类、无独立建类\"而只部分满足（待购可经保存 B 建立并浏览，学习无法在无多余记录时建立），R05 因目的分类\"学习\"不存在、且没有独立建类入口而失败（根因是产品缺口，非单纯选择器错误），R08 因流程在\"学习\"处超时、未进入正常重启，仅证实刷新持久化为部分。修复版新增 /category 独立建类与分类校验、严格请求体校验（超限 HTTP 413 整体拒绝而非截断）、长备注校验即时反馈，九项中 R04/R05/R08 均已由运行证据补齐，R01–R09 在修复版可判通过。诊断（超大同标题 413/初版截断）与补充 M02b（3420 逻辑码点长备注）为 posthoc/预置探索，不计入九项需求；模板自撰 17 例验收套件未运行、不得称其通过。本结论仅限单应用单次跟随实验，不作评分、不排胜负、不推广因果。",
+  "rounds": [
+    {
+      "id": "initial",
+      "required": [
+        {
+          "id": "R01",
+          "outcome": "passed",
+          "evidence": [
+            "source/initial/runtime/runtime-results.json",
+            "source/initial/runtime/001-R01-runtime_assertions_passed.txt",
+            "source/initial/runtime/service-01.log",
+            "source/initial/runtime/processes.json",
+            "source/initial/runtime/static-inventory.json"
+          ],
+          "reason": "运行证据：进程以 python3 app.py --port 52785 --data-dir .../runtime/data-core 在 127.0.0.1 启动，service-01.log 首行中文启动信息、http_status 200；页面首屏含中文可用界面，空目录下 expectRecords([]) 通过；static-inventory 的 non_stdlib_imports 为空，无账户或额外依赖。"
+        },
+        {
+          "id": "R02",
+          "outcome": "passed",
+          "evidence": [
+            "source/initial/runtime/runtime-results.json",
+            "source/initial/runtime/002-R02-saved-A.json",
+            "source/initial/runtime/003-R02-saved-C.json",
+            "source/initial/runtime/004-R02-runtime_assertions_passed.json"
+          ],
+          "reason": "A 仅 URL 保存成功（标题回退为 URL 仍可识别），C 含标题\"酸面包教程\"与备注\"周日尝试\"保存成功；刷新后 A、C 均呈现且字段匹配，POST /save 均 200。events 中 C 因同 nonce 重复提交两次但只落一条，属幂等。"
+        },
+        {
+          "id": "R03",
+          "outcome": "passed",
+          "evidence": [
+            "source/initial/runtime/runtime-results.json",
+            "source/initial/runtime/005-R03-runtime_assertions_passed.json"
+          ],
+          "reason": "未分类视图（/?category=unsorted）运行中同时找回 A 与 C，无须预先建类，记录可日后找回。"
+        },
+        {
+          "id": "R04",
+          "outcome": "partial",
+          "evidence": [
+            "source/initial/runtime/runtime-results.json",
+            "source/initial/runtime/006-R04-created-待购.json",
+            "source/initial/runtime/008-R04-runtime_assertions_passed.txt",
+            "source/initial/application/server.py",
+            "source/initial/application/render.py"
+          ],
+          "reason": "待购经保存 B 时的 new_category 顺带建立，B 落入待购并可按待购浏览（008 快照），这部分运行证实；但 actions 明确记录 Create 待购/Create 学习 均 created:false，且无 /category 路由与独立建类表单（server.py:132-138、render.py:203-210），\"学习\"无法在无多余记录下建立。harness 标 runtime_assertions_passed 属高估：该检查只断言 expectRecords([B])，未断言第二个分类创建成功。"
+        },
+        {
+          "id": "R05",
+          "outcome": "failed",
+          "evidence": [
+            "source/initial/runtime/runtime-results.json",
+            "source/initial/runtime/009-R05-tool_or_environment_error_unverified.txt",
+            "source/initial/application/render.py",
+            "source/initial/application/server.py"
+          ],
+          "reason": "移动 C 至\"学习\"直接失败：目的分类不存在且无可独立创建途径（错误原文\"no destination category 学习 and no independent create/move-create action\"）；快照显示 C 仍在未分类、分类导航只有未分类/待购。属产品缺口，非选择器或环境错误；移动处理器本身从未被执行，故移动机制未获运行验证。"
+        },
+        {
+          "id": "R06",
+          "outcome": "passed",
+          "evidence": [
+            "source/initial/runtime/runtime-results.json",
+            "source/initial/runtime/010-R06-书架.json",
+            "source/initial/runtime/011-R06-面包.json",
+            "source/initial/runtime/012-R06-empty-search.txt",
+            "source/initial/runtime/013-R06-runtime_assertions_passed.json"
+          ],
+          "reason": "全量范围下\"书架\"命中 B、\"面包\"命中 C，结果与当前范围一致；不存在词返回明确空结果文案\"没有找到匹配的记录…\"；清除查询后恢复全部记录。"
+        },
+        {
+          "id": "R07",
+          "outcome": "passed",
+          "evidence": [
+            "source/initial/runtime/runtime-results.json",
+            "source/initial/runtime/014-R07-runtime_assertions_passed.json"
+          ],
+          "reason": "A 的 href 为含 #details 的完整原 URL，B/C 亦精确；同时捕获到对 example.com 的原站导航请求（fragment 在 HTTP 导航中按浏览器规范省略，href 已保留）。外网被刻意拒绝，不要求页面加载成功。"
+        },
+        {
+          "id": "R08",
+          "outcome": "partial",
+          "evidence": [
+            "source/initial/runtime/runtime-results.json",
+            "source/initial/runtime/processes.json",
+            "source/initial/test-toolchain/runtime_test.mjs"
+          ],
+          "reason": "R08 在首轮 persistence() 中，page.goto 后 all()/expectRecords(fixtures) 已通过（A/B/C 三记录字段完整），即刷新后持久化被证实；随后在 viewCategory('学习') 处 30s 超时而失败（runtime_test.mjs:79，由 R08 第 204 行调用），正常停止重启（control restart）从未执行，新空目录隔离亦未跑。重启与隔离属缺证据，不作通过。"
+        },
+        {
+          "id": "R09",
+          "outcome": "passed",
+          "evidence": [
+            "source/initial/runtime/runtime-results.json",
+            "source/initial/runtime/016-R09-empty-url-feedback.txt",
+            "source/initial/runtime/017-R09-runtime_assertions_passed.json"
+          ],
+          "reason": "已有数据时提交空 URL，返回明确提示\"请填写链接 URL（必填）。\"，未新增空 URL 记录；reload 后 before/after 三记录完全一致，用户可继续操作。"
+        }
+      ]
+    },
+    {
+      "id": "repaired",
+      "required": [
+        {
+          "id": "R01",
+          "outcome": "passed",
+          "evidence": [
+            "source/repaired/runtime/runtime-results.json",
+            "source/repaired/runtime/001-R01-runtime_assertions_passed.txt",
+            "source/repaired/runtime/service-01.log",
+            "source/repaired/runtime/processes.json"
+          ],
+          "reason": "以 app.py --port 60278 --data-dir .../runtime-repair/data-core 在回环启动，service-01.log 中文启动行、http 200；空目录首屏中文可用且无记录，指定端口与数据目录有效。"
+        },
+        {
+          "id": "R02",
+          "outcome": "passed",
+          "evidence": [
+            "source/repaired/runtime/runtime-results.json",
+            "source/repaired/runtime/002-R02-saved-A.json",
+            "source/repaired/runtime/003-R02-saved-C.json",
+            "source/repaired/runtime/004-R02-runtime_assertions_passed.json"
+          ],
+          "reason": "仅 URL 的 A 与带标题/备注的 C 保存成功，刷新后字段完整呈现；同 nonce 重复 POST 只落一条。"
+        },
+        {
+          "id": "R03",
+          "outcome": "passed",
+          "evidence": [
+            "source/repaired/runtime/runtime-results.json",
+            "source/repaired/runtime/005-R03-runtime_assertions_passed.json"
+          ],
+          "reason": "未分类视图运行中找回 A 与 C，无须先建类。"
+        },
+        {
+          "id": "R04",
+          "outcome": "passed",
+          "evidence": [
+            "source/repaired/runtime/runtime-results.json",
+            "source/repaired/runtime/006-R04-created-待购.json",
+            "source/repaired/runtime/007-R04-created-学习.json",
+            "source/repaired/runtime/008-R04-runtime_assertions_passed.txt",
+            "source/repaired/application/server.py",
+            "source/repaired/application/render.py"
+          ],
+          "reason": "新增独立建类表单（render.py:56-74）与 /category 路由（server.py:210-211,318-353）；events 记录两次 POST /category（待购、学习）200，actions 记为\"created through standalone UI\"；保存 B 用 category_id=1（待购），按待购浏览可见 B。"
+        },
+        {
+          "id": "R05",
+          "outcome": "passed",
+          "evidence": [
+            "source/repaired/runtime/runtime-results.json",
+            "source/repaired/runtime/009-R05-moved-C.json",
+            "source/repaired/runtime/010-R05-moved-B.json",
+            "source/repaired/runtime/011-R05-destination.txt",
+            "source/repaired/runtime/012-R05-unclassified-after-move.txt",
+            "source/repaired/runtime/013-R05-source-after-move.txt",
+            "source/repaired/runtime/014-R05-runtime_assertions_passed.json"
+          ],
+          "reason": "POST /move 两次（bookmark_id=2、3 → category_id=2）均 200；刷新后学习视图同时含 B 与 C，未分类仅剩 A，原待购不再含 B；标题、备注、URL 完整，无复制或丢失。"
+        },
+        {
+          "id": "R06",
+          "outcome": "passed",
+          "evidence": [
+            "source/repaired/runtime/runtime-results.json",
+            "source/repaired/runtime/015-R06-书架.json",
+            "source/repaired/runtime/016-R06-面包.json",
+            "source/repaired/runtime/017-R06-empty-search.txt",
+            "source/repaired/runtime/018-R06-runtime_assertions_passed.json"
+          ],
+          "reason": "关键词命中 B、C，范围一致；空结果文案可理解；清除查询恢复全量。"
+        },
+        {
+          "id": "R07",
+          "outcome": "passed",
+          "evidence": [
+            "source/repaired/runtime/runtime-results.json",
+            "source/repaired/runtime/019-R07-runtime_assertions_passed.json"
+          ],
+          "reason": "A 的 href 保留路径、查询参数与 #details，B/C 精确；捕获到原站导航请求；外网按设计拒绝。"
+        },
+        {
+          "id": "R08",
+          "outcome": "passed",
+          "evidence": [
+            "source/repaired/runtime/runtime-results.json",
+            "source/repaired/runtime/020-R08-refresh-persisted.txt",
+            "source/repaired/runtime/021-R08-normal-restart-persisted.txt",
+            "source/repaired/runtime/022-R08-fresh-directory-empty.txt",
+            "source/repaired/runtime/023-R08-runtime_assertions_passed.json",
+            "source/repaired/runtime/processes.json"
+          ],
+          "reason": "刷新后 B、C 在学习；以同一 data-core 正常停止后重启（epoch 2）后字段与归属保持；以新空目录 data-isolation（epoch 3）启动后视图为空、不混入旧数据；随后恢复数据实例。"
+        },
+        {
+          "id": "R09",
+          "outcome": "passed",
+          "evidence": [
+            "source/repaired/runtime/runtime-results.json",
+            "source/repaired/runtime/024-R09-empty-url-feedback.txt",
+            "source/repaired/runtime/025-R09-runtime_assertions_passed.json"
+          ],
+          "reason": "空 URL 提交返回\"请填写链接 URL（必填）。\"，未产生记录；reload 后 before/after 一致，已有记录未被破坏。"
+        }
+      ]
+    }
+  ],
+  "followup": {
+    "long_note": "M02b 为预置的冻结标准之外探索（同 3420 逻辑码点）：两轮都在 HTML 表单 CRLF→逻辑 LF 归一后确认整段被提交（原始 3600 码点、逻辑 3420 码点，未见裁剪/截断）。初版 outcome=not_saved_inspect_feedback：长备注未保存、记录为空，但初版探针是刷新后才读反馈，因此未捕获即时提示——由 source/initial/application/server.py:179-184 可知初版本就会在当次响应给出\"备注过长\"错误，故不得据此断言初版缺少反馈，只能说明该轮未测即时反馈。修复版 outcome=explicitly_rejected_input_retained：immediate.feedback 为\"备注过长：最多 2000 字，本次提交 3600 字，未被保存。请缩短后重试。\"，输入框保留原文、records 为空（source/repaired/supplement/result.json:14-20）。两轮均未保存被裁短记录。",
+    "double_save": "同按钮双击属单独探索，非九项之一。初版 M01 未验证（与 R05/R08 同因\"学习\"超时中断）。修复版一次物理双击产生两次同 nonce 的 POST /save（nonce=a825100…）均 200，但仅落一条\"重复点击保存\"记录，客户端 nonce + 服务端 register_nonce 幂等生效（source/repaired/runtime/runtime-results.json M01 与 events；source/repaired/application/db.py:176-186、server.py:230-233）。多标签先后保存两记录均存在；崩溃后重启可恢复。",
+    "empty_search": "两轮空搜索结果均显示区分于空库的文案\"没有找到匹配的记录。请更换关键词，或切换到其他分类后再试。\"，清除查询后恢复列表（source/initial/runtime/012-R06-empty-search.txt；source/repaired/runtime/017-R06-empty-search.txt）。修复版同时展示独立建类入口与\"创建分类\"，但未改九项定义。",
+    "delivery": "交付 CLI 状态、保留源码、runtime 状态与包审查为彼此独立事实：两轮 delivery.json 均 cli_exit_code=0（初版 elapsed 738.24s、修复版 177.29s），app_hand_edits=false，runtime_status 仅写\"inspect supplied evidence\"（未自我认证运行通过）。修复版 db.py/render.py/server.py/README.md/static/app.css 的 sha256 与初版不同，app.py、urls.py 相同，说明本轮确有修复的新源码；所给数据未报告 CLI 失败。CLI 退出码不能当作运行时通过依据。"
+  },
+  "issues": [
+    {
+      "severity": "material",
+      "trigger": "初版中尝试独立创建\"学习\"分类，并将 C 从未分类移入\"学习\"",
+      "observed": "无独立建类入口：actions 记录 Create 学习 created:false，move 抛错\"no destination category 学习 and no independent create/move-create action\"；快照显示分类导航仅\"未分类/待购\"",
+      "consequence": "用户无法预先建立空分类，也无法把已有记录移入尚未出现的分类，直接导致 R04 部分、R05 失败并连带 R08 无法进入重启；修复版新增 /category 后消除",
+      "evidence": [
+        "source/initial/runtime/runtime-results.json",
+        "source/initial/runtime/009-R05-tool_or_environment_error_unverified.txt",
+        "source/initial/application/server.py",
+        "source/initial/application/render.py"
+      ]
+    },
+    {
+      "severity": "material",
+      "trigger": "posthoc 诊断：提交 1,001,000 字符标题（请求体 1,001,144 字节）",
+      "observed": "初版 HTTP 200、outcome=accepted_partial_value：请求体先被截断到 1,000,000 字节再解析，记录被创建但标题被裁为 999,895 字符，旧记录保留；修复版 HTTP 413、explicitly_rejected_413_no_new_record，整份拒绝且不落库",
+      "consequence": "初版对超限输入表现为\"看似成功\"的静默数据截断，属数据完整性风险；该结论仅来自单个合成过大输入探针，不能外推为所有畸形编码/失败路径均被修复",
+      "evidence": [
+        "source/initial/application/server.py",
+        "source/initial/diagnostic/result.json",
+        "source/repaired/application/server.py",
+        "source/repaired/diagnostic/result.json"
+      ]
+    },
+    {
+      "severity": "minor",
+      "trigger": "复读初版 R04 检查状态与 actions",
+      "observed": "检查状态为 runtime_assertions_passed，但 actions 记录 Create 待购/Create 学习 均 created:false；该检查只断言 expectRecords([B])，未断言第二个分类创建成功",
+      "consequence": "harness 标签高估通过度，掩盖\"学习\"缺失这一产品缺口；审阅必须对照 actions 与快照而非仅看状态",
+      "evidence": [
+        "source/initial/runtime/runtime-results.json",
+        "source/initial/test-toolchain/runtime_test.mjs"
+      ]
+    },
+    {
+      "severity": "minor",
+      "trigger": "初版 R05/R08/M01 访问\"学习\"链接或移动选项",
+      "observed": "适配器以精确角色/选项查找，缺失时抛普通 Error，使检查被归为 tool_or_environment_error_unverified（30s locator 超时）",
+      "consequence": "产品缺口与工具/选择器错误被同一标签掩盖，易误判为测试问题；实际根因是产品无独立建类，二者需区分",
+      "evidence": [
+        "source/initial/test-toolchain/adapters.C.mjs",
+        "source/initial/runtime/runtime-results.json"
+      ]
+    },
+    {
+      "severity": "minor",
+      "trigger": "探索 M03：端口被占用或数据目录不可用时启动服务",
+      "observed": "两轮均以原始 Python traceback 退出（returncode 1，OSError Errno 48 / FileExistsError Errno 17），无面向用户的中文解释；已有记录未见破坏",
+      "consequence": "日常启动失败时用户难以理解原因；属单独探索项，不影响九项核心判定",
+      "evidence": [
+        "source/initial/runtime/runtime-results.json",
+        "source/initial/runtime/probe-occupied-port.log",
+        "source/initial/runtime/probe-unusable-data-dir.log",
+        "source/repaired/runtime/probe-occupied-port.log",
+        "source/repaired/runtime/probe-unusable-data-dir.log"
+      ]
+    },
+    {
+      "severity": "unverified",
+      "trigger": "复核证据完整性（两轮 runtime 运行日志、模板验收套件、持久化写入故障）",
+      "observed": "两轮 runtime/browser-run.log 均为 0 字节空文件；本文字审阅未提供任何截图；M03 的 persistenceWriteFailure 记为\"unverified; no artificial storage fault injected\"；模板自撰 17 例验收套件未被执行",
+      "consequence": "无法做视觉核对，不能声称套件通过，也不能判断真实写入故障下的表现；相关结论只依赖 runtime-results.json 与文本快照",
+      "evidence": [
+        "source/initial/runtime/browser-run.log",
+        "source/repaired/runtime/browser-run.log",
+        "source/rounds.json"
+      ]
+    },
+    {
+      "severity": "unverified",
+      "trigger": "将补充 M02b 与诊断探针用于支撑/反驳九项需求",
+      "observed": "M02b（3420 逻辑码点长备注）与 413/截断诊断均是预置补充或 posthoc 合成探针，作用域明确标注\"not a new core requirement / not a change to R01-R09\"；初版补充是刷新后才读反馈",
+      "consequence": "这些观察须与 R01–R09 分开报告，不能据此改写九项结论或断言全部失败/编码路径已验证",
+      "evidence": [
+        "source/initial/supplement/result.json",
+        "source/repaired/supplement/result.json",
+        "source/initial/diagnostic/result.json",
+        "source/repaired/diagnostic/result.json"
+      ]
+    }
+  ],
+  "limits": [
+    "单应用、单次成对跟随（initial→repaired），非随机对照，不能统计证明条件导致质量差异，也不推广为普遍因果结论。",
+    "初版 R04/R05/R08/M01 的失败共享同一根因（缺少独立空分类创建），故初版各项判定相互关联，不能视为彼此独立的多个缺陷计数。",
+    "未提供模板、开发提示词、先前结果或条件映射，故不得推断任何模板条件，也不得据此比较不同模板。",
+    "模板自撰的 17 例验收套件未由共同测试执行，不得声称其通过；本审阅只依据已提供的共同运行证据。",
+    "外部网络被刻意拒绝，R07 仅为 href/Location/导航请求层面的证据，不涉及外站页面加载；无截图，未做视觉评价。",
+    "诊断（413 与初版 accepted_partial_value）与补充 M02b 为合成/预置的 posthoc/探索证据，与九项分离；单一超大输入探针不足以证明所有编码畸形或失败路径均已处理。",
+    "M03 的持久化写入故障路径未验证（未注入故障）；M01 的初版并发/双击未验证。",
+    "两轮为不同实例与端口/数据目录（52785→60278），修复版运行于 runtime-repair 目录；运行耗时（738.24s vs 177.29s）不作为通过门槛或胜负依据。",
+    "不给出数值评分、合格率或强制优胜者；最终是否完成及如何集成由父代理决定。"
+  ]
+}

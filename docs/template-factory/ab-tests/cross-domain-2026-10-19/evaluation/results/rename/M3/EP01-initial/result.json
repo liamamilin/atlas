@@ -1,0 +1,93 @@
+{
+  "id": "EP01",
+  "kind": "posthoc_exploratory_not_core",
+  "tests": [
+    {
+      "id": "EP01",
+      "subprobe": "absent_target",
+      "status": "passed",
+      "posthoc": true,
+      "application_command_exit": 0,
+      "original_plan_id": null,
+      "tampered_id": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M3/EP01-initial/absent_target/outside/receipt-target",
+      "outside_target": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M3/EP01-initial/absent_target/outside/receipt-target.json",
+      "outside_before": {
+        "protected-sentinel.bin": "50f220e7bf044f8cb0a775c05a462e035b4221630c5f75da6e1c70e3f9663683"
+      },
+      "outside_after": {
+        "protected-sentinel.bin": "50f220e7bf044f8cb0a775c05a462e035b4221630c5f75da6e1c70e3f9663683"
+      },
+      "outside_unchanged": true,
+      "inside_before": {
+        "old-a.txt": "6f726967696e616c2073796e7468657469632072656e616d656420636f6e74656e740a00ff",
+        "keep.txt": "756e746f75636865642073796e7468657469632066696c65"
+      },
+      "inside_after": {
+        "new-a.txt": "6f726967696e616c2073796e7468657469632072656e616d656420636f6e74656e740a00ff",
+        "keep.txt": "756e746f75636865642073796e7468657469632066696c65"
+      },
+      "inside_safe": true,
+      "meaning": "Safe rejection or safe ignored extra id accepted; any new/changed outside file fails"
+    },
+    {
+      "id": "EP01",
+      "subprobe": "existing_target",
+      "status": "passed",
+      "posthoc": true,
+      "application_command_exit": 0,
+      "original_plan_id": null,
+      "tampered_id": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M3/EP01-initial/existing_target/outside/receipt-target",
+      "outside_target": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/cross-domain-2026-10-19/evaluation/results/rename/M3/EP01-initial/existing_target/outside/receipt-target.json",
+      "outside_before": {
+        "protected-sentinel.bin": "50f220e7bf044f8cb0a775c05a462e035b4221630c5f75da6e1c70e3f9663683",
+        "receipt-target.json": "50f220e7bf044f8cb0a775c05a462e035b4221630c5f75da6e1c70e3f9663683"
+      },
+      "outside_after": {
+        "protected-sentinel.bin": "50f220e7bf044f8cb0a775c05a462e035b4221630c5f75da6e1c70e3f9663683",
+        "receipt-target.json": "50f220e7bf044f8cb0a775c05a462e035b4221630c5f75da6e1c70e3f9663683"
+      },
+      "outside_unchanged": true,
+      "inside_before": {
+        "old-a.txt": "6f726967696e616c2073796e7468657469632072656e616d656420636f6e74656e740a00ff",
+        "keep.txt": "756e746f75636865642073796e7468657469632066696c65"
+      },
+      "inside_after": {
+        "new-a.txt": "6f726967696e616c2073796e7468657469632072656e616d656420636f6e74656e740a00ff",
+        "keep.txt": "756e746f75636865642073796e7468657469632066696c65"
+      },
+      "inside_safe": true,
+      "meaning": "Safe rejection or safe ignored extra id accepted; any new/changed outside file fails"
+    }
+  ],
+  "application_sha256_before": {
+    "DECISIONS.md": "826aa9a327807d94c5a85a9f92bd73b101e2ff628d186cd0d7d44ff9fcae7249",
+    "README.md": "b35ac5f6df3656373b2f871d4e790382f66d31cf4d61303f8b3b67ac8d08b5fa",
+    "app.py": "99ddfc5d98ddf7f92ad023fd37670a9b05bd214dd2c5c13c0cfbd76589539258",
+    "errors.py": "87f966c0facc5afdd066bfcba191c77bc9b051f6b4c63a12effebc968b3fa195",
+    "execution.py": "6fa29dacc2ca79a5d810adaa712ce65870bce529b4936c43520b1b3b34ff2a38",
+    "identity.py": "72722b39201c3805e9258d538d1a4a219e9ff43e4ed64e108dce2dee66e55f02",
+    "listing.py": "4ce9b926d001abdeaf1680584e3b95ec06fecb1b87b0fdf978aa986cd893a36d",
+    "paths.py": "8deec6d8c59f4a6a4419accae5d320f7721a58789e03eb5d7a0aaf746448d993",
+    "planning.py": "7afa52bef8eba6662f1974eb2223abde445abc771e2d5d06003e2cba8f318f0a",
+    "reversal.py": "1158810ab739adea9f0b17ae350eaa3b35017aae8bff3addbe31a99cf445b3ab",
+    "state.py": "0279ddbd8f7633939c8e3d8aa9ab77f52353455f6449e57706db343e76034aee"
+  },
+  "application_sha256_after": {
+    "DECISIONS.md": "826aa9a327807d94c5a85a9f92bd73b101e2ff628d186cd0d7d44ff9fcae7249",
+    "README.md": "b35ac5f6df3656373b2f871d4e790382f66d31cf4d61303f8b3b67ac8d08b5fa",
+    "app.py": "99ddfc5d98ddf7f92ad023fd37670a9b05bd214dd2c5c13c0cfbd76589539258",
+    "errors.py": "87f966c0facc5afdd066bfcba191c77bc9b051f6b4c63a12effebc968b3fa195",
+    "execution.py": "6fa29dacc2ca79a5d810adaa712ce65870bce529b4936c43520b1b3b34ff2a38",
+    "identity.py": "72722b39201c3805e9258d538d1a4a219e9ff43e4ed64e108dce2dee66e55f02",
+    "listing.py": "4ce9b926d001abdeaf1680584e3b95ec06fecb1b87b0fdf978aa986cd893a36d",
+    "paths.py": "8deec6d8c59f4a6a4419accae5d320f7721a58789e03eb5d7a0aaf746448d993",
+    "planning.py": "7afa52bef8eba6662f1974eb2223abde445abc771e2d5d06003e2cba8f318f0a",
+    "reversal.py": "1158810ab739adea9f0b17ae350eaa3b35017aae8bff3addbe31a99cf445b3ab",
+    "state.py": "0279ddbd8f7633939c8e3d8aa9ab77f52353455f6449e57706db343e76034aee"
+  },
+  "application_unchanged": true,
+  "source_reviewed_operator_assertion": true,
+  "freeze_sha256": "f4b7c2c0c5381a2260e7b43894ac9bff5f0c362ec55cde4bb814d83c1df4375b",
+  "core_scores_changed": false,
+  "all_executed_checks_passed": true
+}

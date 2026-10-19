@@ -1,0 +1,15 @@
+{
+  "version": 3,
+  "date": "2026-10-19",
+  "causality": "First real booking M3 initial run exposed infrastructure defects before K06 or browser actions could execute. Original run and v2 sources/evidence preserved; no application changed.",
+  "original_evidence": "results/booking/M3/initial",
+  "applies_equally": "Every case and arm, both initial and repaired applications",
+  "assertions_changed": false,
+  "changes": [
+    "Rename local concurrent function to avoid shadowing concurrent.futures module; same two-connection/barrier/assertions",
+    "Set explicit installed PLAYWRIGHT_BROWSERS_PATH only for owned browser tool while preserving app minimal HOME; no installation or external network",
+    "Toolchain provenance hashes only frozen tool sources, not recursive growing evidence",
+    "Browser launch errors are infrastructure-unverified rather than product failure"
+  ],
+  "preserved_original": "oracle-v2/ and freeze-v2.json"
+}

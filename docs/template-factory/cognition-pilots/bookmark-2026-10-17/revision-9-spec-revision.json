@@ -1,0 +1,23 @@
+{
+  "base_proposal_digest": "3e51b01c815be81bae4d83aa2895a70ff8ab31eebe941a72037a69f59ab8972d",
+  "model_response_digest": "3f531c51f5a3db2dcfda139d6cfa07212d81dbb03b98657a0e905d543217f2ba",
+  "effective_proposal_digest": "c289f4445cfbaebc37604ec71b60f23d66ca748ee3bf2ed1c915f73c22b2d83f",
+  "changed_fields": [
+    [
+      "architecture_markdown"
+    ],
+    [
+      "acceptance",
+      "A30",
+      "goal"
+    ]
+  ],
+  "file_plan_changes": [
+    {
+      "path": "acceptance/ui-p1.cjs",
+      "purpose": "编辑。浏览器 P1 行为组 A29/A30/A31，导出 {phase:'P1', runner:'browser', title, cases:[A29,A30,A31], getCases()}。A29：用 category-form 新建归类，gotoHome 后确认保存表单 select[name=categoryId] 列出全部活跃归类、默认选中默认归类、tombstone 不出现；直接选择新建归类保存并断言行 data-category-id、bookmark-category、API categoryId 与刷新持久；保留空归类页、move-form 与 bookmark-edit-form 的条目级 POST（成功 303 回首页并显示 flash，失败 form-error 且零写入）、rename 正常/空名/重名 form-error、备注原样、空 body PATCH。A30：move、失效目标、purge/单条永久删除三个分支各自创建独立的活跃归类与独立记录，不把已 move 或已 tombstone 的源归类作为后续 purge 对象；保留取消、未确认 purge 零请求、mode=move、失效目标零写入、确认 purge、单条 trash-delete 与其他回收条目保留；补充 purge 回收条目的 trashedFromCategoryId/Name 指向原 tombstone；清空 UI 只验证存在与拦截。A31：独立创建两个归类与两条记录，在真实列表点击 bookmark-delete-form 的 bookmark-delete-submit，断言 303 首页与非空 flash；点击 trash-link 进入带部署前缀的 /trash；第一条 restore-submit 无目标回原归类，第二条 restore-target 明确选择另一活跃归类；断言 id/url/createdAt、active/trashed 守恒与刷新持久；不使用 API DELETE 代替用户点击，不复用 A30 记录。只用 browser.cjs 既有导出，不 mock API。对应 REVISION 第 1、3 项。",
+      "reuse": false
+    }
+  ],
+  "scope": "Exact model-authored local specification repair. Unaddressed fields, row identities and file inventory retained by host; not acceptance evidence."
+}

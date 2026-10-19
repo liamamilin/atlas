@@ -4,10 +4,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 5188",
-    "build": "vite build",
+    "clean:build-metadata": "node scripts/clean-build-metadata.mjs",
+    "build": "npm run clean:build-metadata && vite build && npm run clean:build-metadata",
     "preview": "vite preview --port 5188",
     "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.ts",
+    "test:e2e": "playwright test",
     "gen": "python3 scripts/gen-data.py",
+    "verify-data": "python3 scripts/verify-web-data.py",
     "api": "python3 ../application-atlas-production-pack/drafts_api.py"
   },
   "dependencies": {
@@ -22,6 +26,7 @@
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@radix-ui/react-slot": "^1.2.3",
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.1.16",

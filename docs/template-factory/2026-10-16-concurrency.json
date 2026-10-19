@@ -1,0 +1,128 @@
+{
+  "date": "2026-10-16",
+  "authorization": "User explicitly authorized sending both leaf documents to the configured OpenCode provider for this test.",
+  "model": "open-design/deepseek-v4.1-flash",
+  "cli": {
+    "backend": "opencode-cli",
+    "available": true,
+    "version": "opencode v2.0.30",
+    "models": []
+  },
+  "workspace": "/private/var/folders/hr/tz7sdpwx2xv30x2xydhkg70w0000gn/T/atlas-factory-concurrency-20261016-15fyhsi5",
+  "batch_id": "bat_70c6ed193b5a499c8d2a657875123b73",
+  "batch_kind": "scenarios",
+  "configured_concurrency": 2,
+  "maximum_running_jobs": 2,
+  "maximum_active_cli_process_records": 2,
+  "overlap_samples": [
+    {
+      "observed_at": 1792133880.1755579,
+      "running_jobs": 2,
+      "cli_processes": [
+        {
+          "job_id": "job_51608855fecc44d5870113df692e36e4",
+          "pid": 63942
+        },
+        {
+          "job_id": "job_6ce4ae986e784073b1b07713e717c24c",
+          "pid": 63943
+        }
+      ]
+    }
+  ],
+  "persisted_batch_state": "completed",
+  "elapsed_seconds": 51.11,
+  "jobs": [
+    {
+      "job_id": "job_51608855fecc44d5870113df692e36e4",
+      "leaf": "bookmark-manager",
+      "state": "completed",
+      "error": null,
+      "draft_count": 1,
+      "drafts": [
+        {
+          "id": "scn_23ea2fe8f5ad473aa720a830a09879e8",
+          "name": "生活待购与灵感收藏夹",
+          "status": "draft",
+          "revision": 1,
+          "workflow_count": 5,
+          "acceptance_count": 4
+        }
+      ],
+      "cli_summary": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_ebc7f266effeCK3mseay74gx0c",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 48.87
+      }
+    },
+    {
+      "job_id": "job_6ce4ae986e784073b1b07713e717c24c",
+      "leaf": "task-management-application",
+      "state": "completed",
+      "error": null,
+      "draft_count": 3,
+      "drafts": [
+        {
+          "id": "scn_25f101e2f31e40afa0cb3069dcd22a90",
+          "name": "个人周计划工作台（Personal Week Planner）",
+          "status": "draft",
+          "revision": 1,
+          "workflow_count": 5,
+          "acceptance_count": 5
+        },
+        {
+          "id": "scn_ec881ea12eca46bdb4c7db9e0594665f",
+          "name": "小组共享清单协作（Small-Team Shared List）",
+          "status": "draft",
+          "revision": 1,
+          "workflow_count": 5,
+          "acceptance_count": 5
+        },
+        {
+          "id": "scn_8e71b0e8504b4bff873a22382e2ac2d1",
+          "name": "周期性事务复位（Recurring Routine Scheduler）",
+          "status": "draft",
+          "revision": 1,
+          "workflow_count": 5,
+          "acceptance_count": 5
+        }
+      ],
+      "cli_summary": {
+        "model": "open-design/deepseek-v4.1-flash",
+        "session_id": "ses_ebc7f2671ffep5NkJjYO9e5TsF",
+        "event_types": [
+          "step_finish",
+          "step_start",
+          "text",
+          "tool_use"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 34.88
+      }
+    }
+  ],
+  "artifact_count": 0,
+  "passed": true,
+  "scope": "Real durable worker, two overlapping OpenCode CLI processes, scenario drafts and database reopen. This is not a template-production throughput or cost benchmark.",
+  "cli_intervals": [
+    {
+      "job_id": "job_51608855fecc44d5870113df692e36e4",
+      "finished_at": 1792133928.774932,
+      "approximate_started_at": 1792133879.904932
+    },
+    {
+      "job_id": "job_6ce4ae986e784073b1b07713e717c24c",
+      "finished_at": 1792133914.7858,
+      "approximate_started_at": 1792133879.9057999
+    }
+  ],
+  "approximate_cli_overlap_seconds": 34.88,
+  "all_cli_process_records_finished": true
+}

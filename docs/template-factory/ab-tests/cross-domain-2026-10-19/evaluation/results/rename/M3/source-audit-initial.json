@@ -1,0 +1,39 @@
+{
+  "case": "rename",
+  "label": "M3",
+  "round": "initial",
+  "all_files_manually_read": {
+    "DECISIONS.md": "826aa9a327807d94c5a85a9f92bd73b101e2ff628d186cd0d7d44ff9fcae7249",
+    "README.md": "b35ac5f6df3656373b2f871d4e790382f66d31cf4d61303f8b3b67ac8d08b5fa",
+    "app.py": "99ddfc5d98ddf7f92ad023fd37670a9b05bd214dd2c5c13c0cfbd76589539258",
+    "errors.py": "87f966c0facc5afdd066bfcba191c77bc9b051f6b4c63a12effebc968b3fa195",
+    "execution.py": "6fa29dacc2ca79a5d810adaa712ce65870bce529b4936c43520b1b3b34ff2a38",
+    "identity.py": "72722b39201c3805e9258d538d1a4a219e9ff43e4ed64e108dce2dee66e55f02",
+    "listing.py": "4ce9b926d001abdeaf1680584e3b95ec06fecb1b87b0fdf978aa986cd893a36d",
+    "paths.py": "8deec6d8c59f4a6a4419accae5d320f7721a58789e03eb5d7a0aaf746448d993",
+    "planning.py": "7afa52bef8eba6662f1974eb2223abde445abc771e2d5d06003e2cba8f318f0a",
+    "reversal.py": "1158810ab739adea9f0b17ae350eaa3b35017aae8bff3addbe31a99cf445b3ab",
+    "state.py": "0279ddbd8f7633939c8e3d8aa9ab77f52353455f6449e57706db343e76034aee"
+  },
+  "python": "3.10.13 (main, Jul 28 2025, 13:11:45) [Clang 17.0.0 (clang-1700.0.13.5)]",
+  "execution_safety": "approved for frozen controlled core and owned sibling-sentinel EP01 fixtures only",
+  "safety_notes": [
+    "No outbound network, subprocess/shell/eval/secret access or dependency install",
+    "Root canonicalized, ordinary files only, state parent realpath must equal assigned root/.atlas-renamer; state symlink refused",
+    "Confirm required, whole batch identity/conflict checks before rename, rollback on failure",
+    "Exclusive new plans and random mkstemp atomic receipt replace within state",
+    "EP01 top-level id is extra unused field; receipts derive separate generated plan_id"
+  ],
+  "source_risks_not_runtime_claims": [
+    "Default metadata-only identity has no content hash unless --hash chosen; same size/restored mtime can evade default stale detection",
+    "Internal plan_id only checked nonempty string before receipt path formatting; EP01 tests top-level id and does not certify all editable fields",
+    "Documented os.rename precheck race under concurrent external file mutation remains outside declared tested scope"
+  ],
+  "EP01_scope_review": "Same frozen tool uses only owned evidence sibling outside targets, no ../ or uncontrolled file locations",
+  "prohibited_context_not_read": [
+    "condition-map",
+    "template",
+    "developer input/prompt"
+  ],
+  "application_modified": false
+}

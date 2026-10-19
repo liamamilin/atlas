@@ -12,7 +12,9 @@ Exit 0 = draft ready (status: draft), 3 = lint failed (status: failed),
 2 = rejected (duplicate slug / high collision without --force).
 """
 import argparse
+from contextlib import contextmanager
 import datetime
+import fcntl
 import json
 import os
 import re
@@ -21,14 +23,42 @@ import sys
 from atlas_runtime import PACK as DATA_PACK
 PACK = str(DATA_PACK)
 sys.path.insert(0, PACK)
-from leaf_lint import lint
-from atlas_runtime import atomic_write
+from leaf_lint import lint  # noqa: E402
+from atlas_runtime import atomic_write  # noqa: E402
 
 DRAFTS = os.path.join(PACK, "drafts")
 PROMPT = os.path.join(PACK, "drafts_prompt.md")
 WORKDIR = os.path.dirname(PACK)
 ENGINES_CFG = os.path.join(DRAFTS, "engines.json")
 HIGH_SIM = 0.80
+SLUG_LOCKS = os.path.join(DRAFTS, ".slug-locks")
+
+
+class SlugLockBusy(RuntimeError):
+    pass
+
+
+@contextmanager
+def slug_lock(slug, drafts_root=None):
+    lock_root = os.path.join(drafts_root, ".slug-locks") if drafts_root else SLUG_LOCKS
+    os.makedirs(lock_root, exist_ok=True, mode=0o700)
+    os.chmod(lock_root, 0o700)
+    safe = re.sub(r"[^a-z0-9-]", "-", slug)[:80] or "empty"
+    path = os.path.join(lock_root, f"{safe}.lock")
+    stream = open(path, "a+", encoding="utf-8")
+    os.chmod(path, 0o600)
+    acquired = False
+    try:
+        try:
+            fcntl.flock(stream.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            acquired = True
+        except BlockingIOError as error:
+            raise SlugLockBusy("该草稿正在被另一个操作占用，请稍后重试") from error
+        yield
+    finally:
+        if acquired:
+            fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
+        stream.close()
 
 
 def slugify(name):
@@ -61,7 +91,7 @@ def write_draft(slug, idea, engine, source):
           f"desc: {idea['desc']}\nlink: {idea.get('link') or ''}\n"
           f"name_source: {idea.get('name_source', 'user')}\n"
           f"source: {source}\nstatus: generating\nengine: {engine}\ncreated: {now}\n---\n")
-    open(os.path.join(DRAFTS, slug + ".md"), "w", encoding="utf-8").write(fm)
+    atomic_write(os.path.join(DRAFTS, slug + ".md"), fm)
 
 
 def unique_slug(base):
@@ -85,7 +115,8 @@ def rename_draft(old, new):
 
 def refresh_front(slug, status, extra=""):
     p = os.path.join(DRAFTS, slug + ".md")
-    text = open(p, encoding="utf-8").read()
+    with open(p, encoding="utf-8") as stream:
+        text = stream.read()
     text = re.sub(r"^status: .*$", f"status: {status}", text, count=1, flags=re.M)
     if extra:
         text = re.sub(r"^---\n", f"---\n{extra}\n", text, count=1)
@@ -145,7 +176,12 @@ def main():
         print(f"拒绝：与正式语料最高相似度 {top[0][1]:.3f} ≥ {HIGH_SIM}；如确认要建，加 --force")
         sys.exit(2)
 
-    write_draft(slug, idea, engine_name, args.source)
+    with slug_lock(slug):
+        taken = slug_taken(slug)
+        if taken:
+            print(f"拒绝：slug「{slug}」已存在于{ '草稿区' if taken == 'draft' else '正式语料' }")
+            sys.exit(2)
+        write_draft(slug, idea, engine_name, args.source)
     print(f"草稿骨架已写入 drafts/{slug}.md (status: generating)")
 
     if args.no_generate:

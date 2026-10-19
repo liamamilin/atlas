@@ -1,0 +1,184 @@
+{
+ "outcome": "blocked",
+ "summary": "scenario_scope: passed; product_completeness: passed; architecture_contract: blocked; phase_acceptance: passed; decisions_defaults: passed",
+ "checks": [
+  {
+   "dimension": "scenario_scope",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "DRAFT 的 confirmed_scenario 与 title/roles/features/phases 对齐：主动保存（F01）、跨会话持久（F02）、未分类默认落点（F03）、列表与打开原页（F04/F05）、保存时选归类与之后移动（F09）、新建/重命名归类（F08）、按归类浏览与关键字检索（F13/F14）分别覆盖确认工作流与四条验收；单一归属（F06）和重复 URL 保守处理（F07）服务于同一目标，不是无关扩张。角色只保留个人收藏者与部署维护者，并以 R03 明确声明不存在共享/协作角色。F15–F25 对导出导入、标签、自动抓取、快照、全文检索、失效扫描、分享协作、批量和扩展均给出 later/decision needed/not applicable 且 acceptance 为空；limits 进一步声明 P3 不实现、不宣称具备，符合“不无关扩张”。ARCHITECTURE 的 P0–P2 阶段纪律与场景主线一致，未引入多用户、公开读取或下游应用。"
+  },
+  {
+   "dimension": "product_completeness",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "P0 的首页 bookmark-form、bookmark-item/open-link、duplicate-existing-link 与 duplicate-save-form 由 A28 覆盖保存、列表、打开、重复冲突和显式另存；P1 的 category-form/category-rename-form、select[name=categoryId]、move-form、category-delete-dialog、bookmark-delete-form、trash-link、restore-submit、trash-delete-form 由 A29–A31 覆盖归类与回收站闭环；P2 的 search-form、category-link、sort-form 与 page-prev/page-next 由 A32–A33 覆盖检索、归类浏览与分页。F01–F14 均映射到当前阶段验收，失败恢复有 form-error/dialog-error 与零写入契约。"
+  },
+  {
+   "dimension": "architecture_contract",
+   "outcome": "blocked",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "ARCHITECTURE.md §4 规定保存 trim 后的原始 URL，§6 规定 GET /b/:id 的 Location 为保存时的原始 url，§10 又承诺中文/emoji 逐字符往返；D05 同时允许 WHATWG 可解析的非 ASCII URL。Node/Fastify 的 Location 头不能原样承载这些字符，草案未定义 WHATWG 序列化/百分号编码，也未定义验收比较口径，导致打开主线对中文或 IDN URL 可能 500 或跳转到错误地址，且与 F04 的 bookmark-url 文本等于提交值产生冲突。"
+  },
+  {
+   "dimension": "phase_acceptance",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "P0 的 A01–A10/A28 仅使用默认归类、基础列表、按 id 读取、保存、重复与分页；P1 的 A11–A20/A29–A31 使用归类、移动、二选一删除、回收站、恢复、单条清除与真实 UI 导航；P2 的 A21–A27/A32–A33 才使用服务端 q、排序和 categoryId 过滤。A22 明确允许依赖已交付的 P1 PATCH，A14/A30/A31 要求独立夹具且不复用彼此记录，A18 的 --allow-destructive 前置与 ATLAS_DESTRUCTIVE_NOT_ACKNOWLEDGED/退出 2 的架构约定一致；file_plan 将每个案例放入对应行为组并声明 common/support/browser 依赖，未发现案例依赖未声明导出或后期阶段能力。"
+  },
+  {
+   "dimension": "decisions_defaults",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "D01–D09 的 default 与 when_to_ask 完整且具体：D01 单归属归类与默认未分类，D02 重复默认阻止但冲突后可显式另存，D03 归类删除必须显式选择 move 或 purge+confirm，D04 不抓取标题，D05 保守 URL 归一，D06 仅回环监听且无内建认证，D07 回收站不过期且清空需 confirm 与运行确认，D08/D09 明确后续范围与验收边界；这些默认与 ARCHITECTURE 的默认、错误码和事务契约一致，提问条件也基于真实用户信号而非日常偏好。"
+  }
+ ],
+ "suggestions": [
+  "将 F14 的「按归类浏览」表述限定为 P2 的服务端 categoryId 过滤、q 交集与分页排序，避免与 P1 已承诺的 /c/:id 归类页浏览重复计为新能力；这只是阶段边界措辞校正，不改变场景范围。",
+  "为编辑表单补充“恢复自动标题”入口，或明确 title=null 重派生仅属 API 契约；当前浏览器只能提交空串并得到 400 invalid_title，用户无法从 UI 回到 derived 标题。",
+  "在 /trash 的 DOM 契约中补充原归类名与 trashedFromCategoryId/Name 的展示元素，或把 limits 中“回收站中的历史条目仍显示原归类名与来源字段”限定为 API 字段，避免展示承诺缺少浏览器接口。",
+  "明确 /b/:id 的 Location 使用 WHATWG 序列化后的绝对 URL（非 ASCII 百分号编码、IDN 转 punycode，保留 query 与 fragment），库内与列表仍保存/展示原始 URL；输出前校验序列化结果，并让 A05 按解析后的目标 URL 比较，而不是逐字符比较 Location 头。"
+ ],
+ "scope": "Independent dimension-by-dimension specification design review of pinned proposal projections before new programs are authored; no execution or frozen-candidate acceptance. Full research facts and authored programs remain for separate frozen-candidate review.",
+ "proposal_digest": "588f606043e48b5c366fe5400c7b1170053c01ebee22454854a53649bd31e521",
+ "subreviews": [
+  {
+   "checks": [
+    {
+     "dimension": "scenario_scope",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "outcome": "passed",
+     "reason": "DRAFT 的 confirmed_scenario 与 title/roles/features/phases 对齐：主动保存（F01）、跨会话持久（F02）、未分类默认落点（F03）、列表与打开原页（F04/F05）、保存时选归类与之后移动（F09）、新建/重命名归类（F08）、按归类浏览与关键字检索（F13/F14）分别覆盖确认工作流与四条验收；单一归属（F06）和重复 URL 保守处理（F07）服务于同一目标，不是无关扩张。角色只保留个人收藏者与部署维护者，并以 R03 明确声明不存在共享/协作角色。F15–F25 对导出导入、标签、自动抓取、快照、全文检索、失效扫描、分享协作、批量和扩展均给出 later/decision needed/not applicable 且 acceptance 为空；limits 进一步声明 P3 不实现、不宣称具备，符合“不无关扩张”。ARCHITECTURE 的 P0–P2 阶段纪律与场景主线一致，未引入多用户、公开读取或下游应用。"
+    }
+   ],
+   "outcome": "passed",
+   "projection_digest": "72e8c537867b409431206026f4af78e71f631860a160b1eb80967aaca825fa33",
+   "proposal_digest": "588f606043e48b5c366fe5400c7b1170053c01ebee22454854a53649bd31e521",
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "stage": "blueprint-spec-review-1-scenario_scope",
+   "suggestions": [
+    "将 F14 的「按归类浏览」表述限定为 P2 的服务端 categoryId 过滤、q 交集与分页排序，避免与 P1 已承诺的 /c/:id 归类页浏览重复计为新能力；这只是阶段边界措辞校正，不改变场景范围。"
+   ],
+   "summary": "当前草案的范围与已确认场景一致：产品仍是普通用户单人使用的「生活待购与灵感收藏夹」，核心旅程（保存→默认未分类→归类/移动→按归类浏览或关键字检索→打开原网页）在 P0–P2 均有对应能力；导出导入、标签、批量、扩展、快照、全文检索、公开分享等均被明确排除或延后，且不带本期验收，不属于无关扩张。P0–P2 仍为 not implemented，本次仅作范围设计判断。"
+  },
+  {
+   "checks": [
+    {
+     "dimension": "product_completeness",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "outcome": "passed",
+     "reason": "P0 的首页 bookmark-form、bookmark-item/open-link、duplicate-existing-link 与 duplicate-save-form 由 A28 覆盖保存、列表、打开、重复冲突和显式另存；P1 的 category-form/category-rename-form、select[name=categoryId]、move-form、category-delete-dialog、bookmark-delete-form、trash-link、restore-submit、trash-delete-form 由 A29–A31 覆盖归类与回收站闭环；P2 的 search-form、category-link、sort-form 与 page-prev/page-next 由 A32–A33 覆盖检索、归类浏览与分页。F01–F14 均映射到当前阶段验收，失败恢复有 form-error/dialog-error 与零写入契约。"
+    }
+   ],
+   "citation_aliases": [
+    {
+     "canonical": "DRAFT.md",
+     "reported": "source/DRAFT.md"
+    },
+    {
+     "canonical": "ARCHITECTURE.md",
+     "reported": "source/ARCHITECTURE.md"
+    }
+   ],
+   "citation_recovery": {
+    "raw_report_sha256": "30851ab53482efb7c9a338572ab13b661fed20dd4dfcb336de029ca0fa89b696",
+    "scope": "Only exact source/ aliases normalized to provided files. Finding, outcome and reasoning unchanged. No additional model call.",
+    "source_attempt": 1,
+    "source_job": "job_14107dcca60746dcb549fc9d2412ea90"
+   },
+   "outcome": "passed",
+   "projection_digest": "cdafcc5592affba56b041552a1a8b73fc6ec5c65d691da4a05e769bf39def988",
+   "proposal_digest": "588f606043e48b5c366fe5400c7b1170053c01ebee22454854a53649bd31e521",
+   "scope": "Independent static design review of declared proposal projection only; no program review, execution or publication.",
+   "stage": "blueprint-spec-review-1-product_completeness",
+   "suggestions": [
+    "为编辑表单补充“恢复自动标题”入口，或明确 title=null 重派生仅属 API 契约；当前浏览器只能提交空串并得到 400 invalid_title，用户无法从 UI 回到 derived 标题。",
+    "在 /trash 的 DOM 契约中补充原归类名与 trashedFromCategoryId/Name 的展示元素，或把 limits 中“回收站中的历史条目仍显示原归类名与来源字段”限定为 API 字段，避免展示承诺缺少浏览器接口。"
+   ],
+   "summary": "在 P0–P2 范围内，场景主线都能通过已声明的浏览器表单、链接和 API 契约完成闭环：保存、默认归类落点、重启后持久、列表与打开原页、重复 URL 的冲突提示与显式另存、归类新建/重命名/保存时选择/行内移动、归类删除二选一、软删除→回收站→恢复、编辑、检索、归类浏览与分页；主要失败路径均有 form-error、dialog-error、错误信封和零写入约束。空库与确认清空回收站已明确标为未运行的手工项，不计为通过。"
+  },
+  {
+   "outcome": "blocked",
+   "summary": "默认归类、单归属、重复保存、回收站/删除、Host/Origin、错误码与阶段边界总体自洽；唯一阻断点是打开记录的 302 Location 序列化未定义：库内保存原始 URL，但直接作为 Location 输出对含中文、IDN 或空格的合法 http(s) URL 不可实现，违反“全链路 UTF-8 往返”和“精确还原”承诺。",
+   "checks": [
+    {
+     "dimension": "architecture_contract",
+     "outcome": "blocked",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "reason": "ARCHITECTURE.md §4 规定保存 trim 后的原始 URL，§6 规定 GET /b/:id 的 Location 为保存时的原始 url，§10 又承诺中文/emoji 逐字符往返；D05 同时允许 WHATWG 可解析的非 ASCII URL。Node/Fastify 的 Location 头不能原样承载这些字符，草案未定义 WHATWG 序列化/百分号编码，也未定义验收比较口径，导致打开主线对中文或 IDN URL 可能 500 或跳转到错误地址，且与 F04 的 bookmark-url 文本等于提交值产生冲突。"
+    }
+   ],
+   "suggestions": [
+    "明确 /b/:id 的 Location 使用 WHATWG 序列化后的绝对 URL（非 ASCII 百分号编码、IDN 转 punycode，保留 query 与 fragment），库内与列表仍保存/展示原始 URL；输出前校验序列化结果，并让 A05 按解析后的目标 URL 比较，而不是逐字符比较 Location 头。"
+   ],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "588f606043e48b5c366fe5400c7b1170053c01ebee22454854a53649bd31e521",
+   "projection_digest": "e0ca50b905146de5d378bf25a469da953a943ff34015d91bb33582dc3f87f753",
+   "stage": "blueprint-spec-review-1-architecture_contract"
+  },
+  {
+   "outcome": "passed",
+   "summary": "phase_acceptance 维度通过：P0–P2 的验收案例与各阶段目标对应，未发现跨阶段能力越界、不可用的文件接口或虚假通过承诺。",
+   "checks": [
+    {
+     "dimension": "phase_acceptance",
+     "outcome": "passed",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "reason": "P0 的 A01–A10/A28 仅使用默认归类、基础列表、按 id 读取、保存、重复与分页；P1 的 A11–A20/A29–A31 使用归类、移动、二选一删除、回收站、恢复、单条清除与真实 UI 导航；P2 的 A21–A27/A32–A33 才使用服务端 q、排序和 categoryId 过滤。A22 明确允许依赖已交付的 P1 PATCH，A14/A30/A31 要求独立夹具且不复用彼此记录，A18 的 --allow-destructive 前置与 ATLAS_DESTRUCTIVE_NOT_ACKNOWLEDGED/退出 2 的架构约定一致；file_plan 将每个案例放入对应行为组并声明 common/support/browser 依赖，未发现案例依赖未声明导出或后期阶段能力。"
+    }
+   ],
+   "suggestions": [],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "588f606043e48b5c366fe5400c7b1170053c01ebee22454854a53649bd31e521",
+   "projection_digest": "4dc06cb68ebea45103ffc5a57e26d4579a68f0bd4875efd2c3f14ea426cd8043",
+   "stage": "blueprint-spec-review-1-phase_acceptance"
+  },
+  {
+   "outcome": "passed",
+   "summary": "decisions_defaults 维度通过：9 项决策均有明确默认、影响与可观察的提问触发条件；当前 P0–P2 的产品默认与需用户显式选择的动作区分清楚，未发现与当前草案或架构承诺冲突的默认，也未发现虚假验收承诺。",
+   "checks": [
+    {
+     "dimension": "decisions_defaults",
+     "outcome": "passed",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "reason": "D01–D09 的 default 与 when_to_ask 完整且具体：D01 单归属归类与默认未分类，D02 重复默认阻止但冲突后可显式另存，D03 归类删除必须显式选择 move 或 purge+confirm，D04 不抓取标题，D05 保守 URL 归一，D06 仅回环监听且无内建认证，D07 回收站不过期且清空需 confirm 与运行确认，D08/D09 明确后续范围与验收边界；这些默认与 ARCHITECTURE 的默认、错误码和事务契约一致，提问条件也基于真实用户信号而非日常偏好。"
+    }
+   ],
+   "suggestions": [],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "588f606043e48b5c366fe5400c7b1170053c01ebee22454854a53649bd31e521",
+   "projection_digest": "e0ca50b905146de5d378bf25a469da953a943ff34015d91bb33582dc3f87f753",
+   "stage": "blueprint-spec-review-1-decisions_defaults"
+  }
+ ]
+}

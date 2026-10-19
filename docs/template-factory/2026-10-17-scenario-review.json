@@ -1,0 +1,322 @@
+{
+  "date": "2026-10-17",
+  "scope": "Real OpenCode CLI, self-authored synthetic inputs only. No Atlas corpus or user projects uploaded. Not a large-scale quality benchmark.",
+  "model": "open-design/deepseek-v4.1-flash",
+  "prompt_digest": "641ee2e94d6affb37a948d5a88a2b75eba9979c21097c95eebfbabe7407b12f0",
+  "workspace": "/tmp/atlas-scenario-review-live-20261017",
+  "cases": [
+    {
+      "case": "valid",
+      "job_id": "job_3bd3e23d0ad14f11b0ebda9a637e45c0",
+      "job_state": "completed",
+      "scenario_status": "draft",
+      "input": {
+        "leaf": {
+          "content": "# 个人任务清单（自建验证资料）\n定义核心：帮助个人记录任务、切换任务的未完成与已完成状态，并在刷新页面后保留任务与状态。\n场景应以任务记录和完成状态管理为中心。无需账户、协作、周期调度或支付。\n此资料由本次开发自行编写，供独立场景审阅验证，不是 Atlas 用户项目或叶子正文。",
+          "fingerprint": "a461992a4843b760f7e477c5f30f9326c1ef05d0f099f50d02ef7dd046a2513f",
+          "name": "Synthetic personal todo",
+          "name_zh": "自建个人待办",
+          "slug": "synthetic-personal-todo"
+        },
+        "scenario": {
+          "acceptance": [
+            "输入任务并保存后能在清单中看到同一标题",
+            "标为完成后显示已完成，再恢复能显示未完成",
+            "刷新后任务标题与最后一次完成状态仍保留"
+          ],
+          "audience": "个人用户",
+          "id": "scn_80a3497620a74c81bf7cb32f021aa814",
+          "leaf": "synthetic-personal-todo",
+          "name": "今日个人待办",
+          "objective": "记录待办并追踪完成状态，稍后回来继续使用",
+          "revision": 1,
+          "workflow": [
+            "输入任务标题并保存",
+            "将任务标为完成或恢复未完成",
+            "刷新后继续查看任务与状态"
+          ]
+        },
+        "peer_scenarios": []
+      },
+      "report": {
+        "checks": [
+          {
+            "dimension": "leaf_fit",
+            "outcome": "passed",
+            "reason": "叶子定义核心为「帮助个人记录任务、切换任务的未完成与已完成状态，并在刷新页面后保留任务与状态」，场景目标「记录待办并追踪完成状态，稍后回来继续使用」与工作流（输入任务标题并保存 → 标为完成或恢复未完成 → 刷新后继续查看任务与状态）逐项对应该核心，且叶子声明「场景应以任务记录和完成状态管理为中心。无需账户、协作、周期调度或支付」，场景未引入账户、协作、调度或支付内容。"
+          },
+          {
+            "dimension": "distinctness",
+            "outcome": "passed",
+            "reason": "input.json 中 peer_scenarios 为空数组，没有可比较的用户/目标/工作流，本维度仅在所给输入范围内核对，场景自身不存在内部重复或与并列场景的标题式重叠；这不等于对更广语料完成去重。"
+          },
+          {
+            "dimension": "workflow",
+            "outcome": "passed",
+            "reason": "工作流为三段连贯可用流程：输入任务标题并保存（产生清单条目）→ 将任务标为完成或恢复未完成（状态切换）→ 刷新后继续查看任务与状态（回流使用），起点、操作与回流查看齐全，无缺失环节或前后矛盾，支撑「记录待办并追踪完成状态，稍后回来继续使用」的目标。"
+          },
+          {
+            "dimension": "testability",
+            "outcome": "passed",
+            "reason": "验收标准可观察且覆盖整条工作流：「输入任务并保存后能在清单中看到同一标题」覆盖保存步骤，「标为完成后显示已完成，再恢复能显示未完成」覆盖双向状态切换，「刷新后任务标题与最后一次完成状态仍保留」覆盖持久化回流；每条均可用清单界面可见结果判定，未依赖未定义的数值阈值或内部实现。"
+          },
+          {
+            "dimension": "scope",
+            "outcome": "passed",
+            "reason": "范围边界合理且内部一致：仅限个人使用，排除账户、协作、周期调度与支付，与叶子声明相符；三条验收标准与三步工作流、objective 相互一致，无自相矛盾。场景未指定存储方式、任务数量上限或排序/筛选/删除规则，属实现层默认或可选打磨，不影响所述工作流及其可观察验收的评估。"
+          }
+        ],
+        "created_at": "2026-10-16T19:05:00.373368+00:00",
+        "id": "scv_c6dde64d821d4ed5aa295c45063be3ef",
+        "input_digest": "31c73c2db9b15f388c571e60a39a049732cbf1850958521b133bdf1701c37dac",
+        "job_id": "job_3bd3e23d0ad14f11b0ebda9a637e45c0",
+        "leaf_fingerprint": "a461992a4843b760f7e477c5f30f9326c1ef05d0f099f50d02ef7dd046a2513f",
+        "leaf_quotes": [
+          "帮助个人记录任务、切换任务的未完成与已完成状态，并在刷新页面后保留任务与状态。",
+          "场景应以任务记录和完成状态管理为中心。无需账户、协作、周期调度或支付。",
+          "此资料由本次开发自行编写，供独立场景审阅验证，不是 Atlas 用户项目或叶子正文。"
+        ],
+        "model": "open-design/deepseek-v4.1-flash",
+        "outcome": "passed",
+        "peer_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "peer_scenarios": [],
+        "related_scenario_ids": [],
+        "scenario_id": "scn_80a3497620a74c81bf7cb32f021aa814",
+        "scenario_revision": 1,
+        "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+        "suggestions": [
+          "可选：在验收中明确是否支持多条任务，例如「连续保存两条任务后，刷新页面仍能看到两条任务各自的标题与状态」，以便覆盖清单而非单条的场景语义。",
+          "可选：补充删除或清空已完成任务的边界描述，或显式声明本期不支持，避免清单只增不减带来的范围歧义。",
+          "可选：在场景说明中标注其定义核心来自本次自建的合成叶子（synthetic-personal-todo），提示后续不得据此宣称真实用户项目或运行时/市场验证。"
+        ],
+        "summary": "场景「今日个人待办」与钉住的合成叶子 synthetic-personal-todo 的定义核心一致：记录任务、在未完成/已完成之间切换、刷新后保留任务与状态；三条工作流步骤与三条验收标准一一对应，构成可观察的端到端闭环，未越界引入账户、协作、周期调度或支付。peer_scenarios 为空，因此唯一性只在本次输入内部核对（不存在可供比较的同类场景），并不代表对全量语料去重。需说明的边界与不确定性：叶子正文自述「此资料由本次开发自行编写……不是 Atlas 用户项目或叶子正文」，故本次评审仅验证场景与该合成定义核心的自洽与可用性，不能证明其源自真实 Atlas 用户项目，也不构成运行时或市场验证；此外场景未明确是否支持多条任务、排序/筛选或删除，这些属于可选打磨，不阻碍声明的目标与验收评估。",
+        "current": true
+      }
+    },
+    {
+      "case": "duplicate",
+      "job_id": "job_5ba580b7e7cc4c76bf7609fc723a99bf",
+      "job_state": "completed",
+      "scenario_status": "draft",
+      "input": {
+        "leaf": {
+          "content": "# 个人任务清单（自建验证资料）\n定义核心：帮助个人记录任务、切换任务的未完成与已完成状态，并在刷新页面后保留任务与状态。\n场景应以任务记录和完成状态管理为中心。无需账户、协作、周期调度或支付。\n此资料由本次开发自行编写，供独立场景审阅验证，不是 Atlas 用户项目或叶子正文。",
+          "fingerprint": "a461992a4843b760f7e477c5f30f9326c1ef05d0f099f50d02ef7dd046a2513f",
+          "name": "Synthetic personal todo",
+          "name_zh": "自建个人待办",
+          "slug": "synthetic-personal-todo"
+        },
+        "scenario": {
+          "acceptance": [
+            "输入任务并保存后能在清单中看到同一标题",
+            "标为完成后显示已完成，再恢复能显示未完成",
+            "刷新后任务标题与最后一次完成状态仍保留"
+          ],
+          "audience": "个人用户",
+          "id": "scn_8823c5c50fea40a8bbccacc045d91d3f",
+          "leaf": "synthetic-personal-todo",
+          "name": "今日个人待办",
+          "objective": "记录待办并追踪完成状态，稍后回来继续使用",
+          "revision": 1,
+          "workflow": [
+            "输入任务标题并保存",
+            "将任务标为完成或恢复未完成",
+            "刷新后继续查看任务与状态"
+          ]
+        },
+        "peer_scenarios": [
+          {
+            "acceptance": [
+              "输入任务并保存后能在清单中看到同一标题",
+              "标为完成后显示已完成，再恢复能显示未完成",
+              "刷新后任务标题与最后一次完成状态仍保留"
+            ],
+            "audience": "个人用户",
+            "id": "scn_ec0a5a5aeca04f179993fa8df744c7c9",
+            "leaf": "synthetic-personal-todo",
+            "name": "日常任务记录板",
+            "objective": "记录待办并追踪完成状态，稍后回来继续使用",
+            "revision": 1,
+            "workflow": [
+              "输入任务标题并保存",
+              "将任务标为完成或恢复未完成",
+              "刷新后继续查看任务与状态"
+            ]
+          }
+        ]
+      },
+      "report": {
+        "checks": [
+          {
+            "dimension": "leaf_fit",
+            "outcome": "passed",
+            "reason": "叶子定义核心为『帮助个人记录任务、切换任务的未完成与已完成状态，并在刷新页面后保留任务与状态』，并声明『场景应以任务记录和完成状态管理为中心』；场景 objective『记录待办并追踪完成状态，稍后回来继续使用』、workflow 与 acceptance 正是新增记录、完成/未完成切换与刷新保留，未涉及『账户、协作、周期调度或支付』等叶子排除项，贴合定义核心。"
+          },
+          {
+            "dimension": "distinctness",
+            "outcome": "needs_changes",
+            "reason": "peer_scenarios 中 scn_ec0a5a5aeca04f179993fa8df744c7c9 与本场景同 leaf，audience（个人用户）、objective（记录待办并追踪完成状态，稍后回来继续使用）、workflow（输入任务标题并保存／将任务标为完成或恢复未完成／刷新后继续查看任务与状态）及三条 acceptance 逐字相同，仅 name 与 id 不同，构成材料性重叠而非仅标题相近。"
+          },
+          {
+            "dimension": "workflow",
+            "outcome": "passed",
+            "reason": "workflow 三步构成可用闭环：『输入任务标题并保存』产生记录，『将任务标为完成或恢复未完成』改变状态，『刷新后继续查看任务与状态』验证留存，步骤顺序与目标一致，无缺环或互斥环节。"
+          },
+          {
+            "dimension": "testability",
+            "outcome": "passed",
+            "reason": "三条 acceptance 均为可观察判定：『输入任务并保存后能在清单中看到同一标题』、『标为完成后显示已完成，再恢复能显示未完成』、『刷新后任务标题与最后一次完成状态仍保留』，恰好覆盖 workflow 的新增、双向状态切换与刷新持久化，无需要外部依赖即可判定。"
+          },
+          {
+            "dimension": "scope",
+            "outcome": "passed",
+            "reason": "受众限定为『个人用户』，范围与叶子『无需账户、协作、周期调度或支付』一致，未引入未支持的假设或超范围功能；内部一致，未把实现细节（存储方式、技术栈）当作必备约束。"
+          }
+        ],
+        "created_at": "2026-10-16T19:06:30.760976+00:00",
+        "id": "scv_c6362a45c3a24f2e846aeac5bc5a2d13",
+        "input_digest": "482dbd2c7f637800de09c3cb28bcd875b196f7447a4417559759afee128f7d50",
+        "job_id": "job_5ba580b7e7cc4c76bf7609fc723a99bf",
+        "leaf_fingerprint": "a461992a4843b760f7e477c5f30f9326c1ef05d0f099f50d02ef7dd046a2513f",
+        "leaf_quotes": [
+          "帮助个人记录任务、切换任务的未完成与已完成状态，并在刷新页面后保留任务与状态。",
+          "场景应以任务记录和完成状态管理为中心。无需账户、协作、周期调度或支付。"
+        ],
+        "model": "open-design/deepseek-v4.1-flash",
+        "outcome": "needs_changes",
+        "peer_digest": "1cf35691b2803fabfbe6d6c04a61ef6824fbc794b882348e735b656eef760d67",
+        "peer_scenarios": [
+          {
+            "id": "scn_ec0a5a5aeca04f179993fa8df744c7c9",
+            "name": "日常任务记录板",
+            "revision": 1
+          }
+        ],
+        "related_scenario_ids": [
+          "scn_ec0a5a5aeca04f179993fa8df744c7c9"
+        ],
+        "scenario_id": "scn_8823c5c50fea40a8bbccacc045d91d3f",
+        "scenario_revision": 1,
+        "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+        "suggestions": [
+          "与 peer 场景区分：为「今日个人待办」增加可观察的行为差异，例如按当日范围过滤/展示今日待办，或在 workflow 与 acceptance 中加入任务编辑与删除后的状态保留判定，并将目标改写为『管理今日待办并追踪完成状态』之类可区分的表述。",
+          "若两者确为同一场景，应只保留一条并删除重复项；保留时由该条承载 leaf 的记录、状态切换与刷新保留核心。",
+          "可选补充（非阻塞）：在 acceptance 中明确刷新后新任务的未完成默认状态，或明确排序/展示范围，使『稍后回来继续使用』的判定更具体。"
+        ],
+        "summary": "场景「今日个人待办」与叶子核心高度一致：记录任务、切换未完成/已完成、刷新后保留状态，三项验收均直接对应叶子定义核心，且未引入账户、协作等叶子排除的内容。端到端流程（新增→切换状态→刷新查看）连贯可用，验收标准可观察。唯一实质问题：它与同一 leaf 下的 peer 场景 scn_ec0a5a5aeca04f179993fa8df744c7c9 在受众、目标、工作流与三条验收上逐字相同，仅名称与 id 不同，属材料性重叠；因此 distinctness 判为 needs_changes，其余维度在本限定范围内通过。本审阅仅基于输入内文，未做全语料去重，也未验证运行时或商业价值。",
+        "current": true
+      }
+    },
+    {
+      "case": "wrong-type",
+      "job_id": "job_22c50e22b2934521883313957b5b1c7f",
+      "job_state": "completed",
+      "scenario_status": "draft",
+      "input": {
+        "leaf": {
+          "content": "# 个人任务清单（自建验证资料）\n定义核心：帮助个人记录任务、切换任务的未完成与已完成状态，并在刷新页面后保留任务与状态。\n场景应以任务记录和完成状态管理为中心。无需账户、协作、周期调度或支付。\n此资料由本次开发自行编写，供独立场景审阅验证，不是 Atlas 用户项目或叶子正文。",
+          "fingerprint": "a461992a4843b760f7e477c5f30f9326c1ef05d0f099f50d02ef7dd046a2513f",
+          "name": "Synthetic personal todo",
+          "name_zh": "自建个人待办",
+          "slug": "synthetic-personal-todo"
+        },
+        "scenario": {
+          "acceptance": [
+            "查询城市后显示对应城市的天气信息"
+          ],
+          "audience": "个人用户",
+          "id": "scn_33d9bb189f6a49f2a3253feba33b2a01",
+          "leaf": "synthetic-personal-todo",
+          "name": "城市天气预报",
+          "objective": "查询城市未来的天气与降雨概率",
+          "revision": 1,
+          "workflow": [
+            "输入城市",
+            "查询预报",
+            "查看未来天气"
+          ]
+        },
+        "peer_scenarios": []
+      },
+      "report": {
+        "checks": [
+          {
+            "dimension": "leaf_fit",
+            "outcome": "rejected",
+            "reason": "叶子定义的判定核心是“帮助个人记录任务、切换任务的未完成与已完成状态，并在刷新页面后保留任务与状态”，并要求“场景应以任务记录和完成状态管理为中心”。而场景 name 为“城市天气预报”，objective 为“查询城市未来的天气与降雨概率”，audience 为“个人用户”，workflow 为输入城市→查询预报→查看未来天气，acceptance 为“查询城市后显示对应城市的天气信息”，完全不包含任务记录、完成/未完成状态切换或刷新后保留状态中的任何一项，定义核心未被覆盖。"
+          },
+          {
+            "dimension": "distinctness",
+            "outcome": "passed",
+            "reason": "输入中 peer_scenarios 为空数组，不存在可比较的对等场景，因此无法也无需判定与对等场景在用户/目标/工作流上的重叠；仅在所给输入范围内看，没有发现重复或实质重叠的情形。此结论不构成跨语料去重结论。"
+          },
+          {
+            "dimension": "workflow",
+            "outcome": "passed",
+            "reason": "场景自身的 workflow 为“输入城市→查询预报→查看未来天气”，三步构成一条连贯、可用的端到端用户流程，能对应 objective 中“查询城市未来的天气”这一目标，步骤之间没有断裂或循环依赖。该判定仅针对流程自洽性，不代表其与叶子匹配。"
+          },
+          {
+            "dimension": "testability",
+            "outcome": "needs_changes",
+            "reason": "唯一验收标准“查询城市后显示对应城市的天气信息”过于笼统：objective 明确提到“降雨概率”，但验收未涵盖降雨概率这一可观察输出；“未来天气”未界定覆盖天数范围，也未说明城市不存在/查询失败等情况下应观察到什么，因此即便按天气场景自身衡量，也无法据此稳定判定端到端流程是否通过。"
+          },
+          {
+            "dimension": "scope",
+            "outcome": "needs_changes",
+            "reason": "场景在天气查询这一主题内边界尚算收敛（单城市查询、无账户/协作/支付），但相对叶子引入了未获支持的前提：叶子未包含任何天气数据来源或城市解析能力，场景默认存在可用的城市天气数据；同时缺少对“未来”时间跨度与查询失败边界的界定，导致范围虽小但内部一致性与前提支撑不足。"
+          }
+        ],
+        "created_at": "2026-10-16T19:06:29.312374+00:00",
+        "id": "scv_2fb030378bfa4c1ead452e1342431c4a",
+        "input_digest": "5bf35451352a1a9f3b48ef777a5770656da2e7bc725ff2ee6e6330a971fdab71",
+        "job_id": "job_22c50e22b2934521883313957b5b1c7f",
+        "leaf_fingerprint": "a461992a4843b760f7e477c5f30f9326c1ef05d0f099f50d02ef7dd046a2513f",
+        "leaf_quotes": [
+          "定义核心：帮助个人记录任务、切换任务的未完成与已完成状态，并在刷新页面后保留任务与状态。",
+          "场景应以任务记录和完成状态管理为中心。无需账户、协作、周期调度或支付。",
+          "此资料由本次开发自行编写，供独立场景审阅验证，不是 Atlas 用户项目或叶子正文。"
+        ],
+        "model": "open-design/deepseek-v4.1-flash",
+        "outcome": "rejected",
+        "peer_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "peer_scenarios": [],
+        "related_scenario_ids": [],
+        "scenario_id": "scn_33d9bb189f6a49f2a3253feba33b2a01",
+        "scenario_revision": 1,
+        "scope": "Independent model review of pinned leaf, scenario and supplied same-leaf peers; human confirmation required; no runtime or market validation.",
+        "suggestions": [
+          "按叶子重新定义场景：将用户目标改为个人任务记录与完成状态管理，例如新增任务、切换未完成/已完成状态、刷新页面后仍保留任务与其状态。",
+          "将 workflow 改写为围绕任务的操作链路，例如“录入任务→查看任务列表→切换完成状态→刷新页面→确认任务与状态仍保留”，确保与叶子定义核心逐项对应。",
+          "重写验收标准使其可观察且覆盖上述流程，例如：新增任务后列表出现该任务；切换后状态在界面与刷新后均保持一致；刷新后任务文本与状态不丢失，并补充可疑/边界情形（如空任务不新增、刷新后已完成项仍为已完成）。",
+          "若仍希望保留天气类主题，应改绑到包含天气查询核心的叶子，而非当前 synthetic-personal-todo，否则不应提交为对该叶子的场景。"
+        ],
+        "summary": "该场景与所绑定叶子的定义核心无关，属于“类型不匹配”的根本性偏离：叶子要求的是个人任务记录与完成状态管理（含刷新后保留），而场景是“城市天气预报”查询，用户、目标、工作流、验收标准均围绕天气数据，无法体现任务记录或完成状态切换中的任何一项。peer_scenarios 为空，因此无法做跨场景去重，distinctness 仅在本输入内判定；本次评审只基于 input.json 文本，未验证任何运行时、数据源或市场可用性，也不代表已做全语料去重。",
+        "current": true
+      }
+    }
+  ],
+  "calibration": {
+    "initial_valid": "needs_changes: demanded an explicit routine default",
+    "change": "Do not turn routine implementation choices or optional polish into required product decisions unless a concrete impact on workflow or observable acceptance is identified.",
+    "same_input_final": "passed",
+    "negative_samples_rechecked_with_final_prompt": true,
+    "total_cli_calls": 6
+  },
+  "checks": {
+    "backend_total": 318,
+    "factory_backend": 50,
+    "factory_browser": 7,
+    "frontend_typecheck": "passed",
+    "frontend_build": "passed",
+    "ruff": "passed",
+    "diff_check": "passed"
+  },
+  "data_boundary": "Synthetic stores only; live catalog was not sent to provider or modified. User confirmation remains required.",
+  "live_ui": {
+    "screenshot": "docs/template-factory/2026-10-17-scenario-review-entry.jpg",
+    "existing_scenarios": 4,
+    "existing_scenario_review_calls": 0,
+    "api_reloaded_without_active_jobs": true,
+    "review_button_enabled": true
+  }
+}

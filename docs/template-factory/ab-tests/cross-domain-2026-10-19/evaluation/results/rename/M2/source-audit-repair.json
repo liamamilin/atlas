@@ -1,0 +1,45 @@
+{
+  "case": "rename",
+  "label": "M2",
+  "round": "repair",
+  "sha256": {
+    "DECISIONS.md": "245f7d6ed308d2eb5b8ada10e8130446b652dc9886f058f90261e9eae9b9749b",
+    "README.md": "8c0199ac6b3c78816ca30e1d95bbc25d8a61948ac8a259ae6c692f2fd8ab6cac",
+    "app.py": "6725e307553aa1342f8ea04113c1ebbcbf170e10d9483303dde6f863be07fa75",
+    "atlas_errors.py": "69b820c1bfc9d037022339e4065545b96633875acf3497e2f07f40c56a98dfae",
+    "commands.py": "60ddff1334c1b1f2fe1e507cd2e33935b8ed02a8ca432598880ac01811a69bd8",
+    "fsops.py": "7946c63d360dc0d487b10a01bb4728435a713c6cede4a62242cd238222b9f54a",
+    "naming.py": "30767ee4e66b77bd87651651ed8bd7ffa9f7fc77ffd411d572ff942006d37400",
+    "paths.py": "53874a1b7972d15a19c48b7d6f7b21e455caa7240b0cb0c917cc0a65eda4f8ea",
+    "planner.py": "c3953e49e01a66d000b342318ea41b66459f6f2f6b4416c9952431a48ac6f2c5"
+  },
+  "source_review": "All current content reviewed via exact four unchanged hashes and complete differences against previously fully read originals",
+  "unchanged_from_fully_reviewed_initial": [
+    "app.py",
+    "atlas_errors.py",
+    "fsops.py",
+    "planner.py"
+  ],
+  "changed_reviewed_files": [
+    "commands.py",
+    "naming.py",
+    "paths.py",
+    "README.md",
+    "DECISIONS.md"
+  ],
+  "python": "3.10.13 (main, Jul 28 2025, 13:11:45) [Clang 17.0.0 (clang-1700.0.13.5)]",
+  "execution_safety": "approved for same frozen controlled core and EP01 owned sibling sentinel fixtures",
+  "repair_in_source": [
+    "Plan id safe single-segment whitelist validated before mutation",
+    "Receipts subdirectory explicitly rejects symlink and validates resolved containment",
+    "No new external IO, dynamic execution, user-data scope or test-specific endpoint introduced"
+  ],
+  "source_limitations": "Concurrent external filesystem races remain out of scope; no general security certification",
+  "EP01": "Same separately frozen posthoc tool, scores separate from core",
+  "application_modified": false,
+  "prohibited_context_not_read": [
+    "condition-map",
+    "template",
+    "developer inputs/prompts"
+  ]
+}

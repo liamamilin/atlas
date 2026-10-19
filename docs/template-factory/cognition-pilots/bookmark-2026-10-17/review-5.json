@@ -1,0 +1,113 @@
+{
+  "artifact_id": "tpl_cf4ea1e64a0a48aea93ac772312a5b2d",
+  "checks": [
+    {
+      "dimension": "category_evidence",
+      "files": [
+        "CATEGORY.md",
+        "README.md",
+        "VALIDATION.md"
+      ],
+      "outcome": "passed",
+      "reason": "CATEGORY.md 明确区分 S01 场景输入、S02–S23 文档事实、'本场景建议' 与 '未知'；对 S17–S21 仅有搜索摘要、Pinboard 抓取失败、未做许可证法律审查等限制均如实标注。license/reuse 区分了 linkding MIT、Linkwarden/Karakeep AGPL-3.0 与专有 SaaS，并声明未复制第三方代码；访问日期与叶子原稿日期分开说明。未独立重抓来源，因此文档事实不能当作已复现行为。"
+    },
+    {
+      "dimension": "scenario_scope",
+      "files": [
+        "PRODUCT.md",
+        "ARCHITECTURE.md",
+        "ROADMAP.md",
+        "inputs/scenario.json"
+      ],
+      "outcome": "passed",
+      "reason": "范围收窄为单人、私有、Web 表单保存、单归属归类、未分类回退、打开原页以及标题/URL/备注检索，正对应场景四条验收；F15/F16/F17/F24/F25 明确列为 later，F20–F23 明确 not applicable，F18/F19 留待决策，没有把阅读队列、公开分享、协作、快照或全文索引混入本期。自托管部署由 R02 维护者承担，普通用户角色与单人库假设一致。"
+    },
+    {
+      "dimension": "product_completeness",
+      "files": [
+        "PRODUCT.md",
+        "ARCHITECTURE.md",
+        "ROADMAP.md",
+        "acceptance/ui-p1.cjs",
+        "acceptance/p1-trash.cjs"
+      ],
+      "outcome": "blocked",
+      "reason": "无账号、无计费/后台/审计的裁剪与场景相符，回收站/恢复和 SQLite 备份已声明，导出列 P3 且未冒充本期能力。但 F11 要求用户软删除单条书签并进入回收站，ARCHITECTURE §8 的列表行却只有 open-link、move-form、edit-form，没有单条删除控件或确认入口；A16/A18 只测 API，A30 通过删除整个归类把记录送入回收站，不能替代普通用户删除一条记录。重复保存的 UI 也只有 form-error，没有 allowDuplicate 的可见出口；空书签库空态被降为手工非发布硬要求，与 F04 的声明不完全闭合。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "files": [
+        "ARCHITECTURE.md",
+        "PRODUCT.md",
+        "acceptance/common.cjs",
+        "acceptance/README.md"
+      ],
+      "outcome": "blocked",
+      "reason": "架构对数据模型、URL/标题/备注/归类校验、错误码、状态机、Host/Origin、PUBLIC_BASE_PATH 与 openPath 给出了默认值、理由和较完整的 API/错误契约，整体可执行。但同一 §8 DOM 契约缺少单条书签删除/确认入口，导致 F11 的 UI 合同不闭合。另 common.cjs 的 resolveUrl 接受任意绝对 http(s) URL，而 request 对该路径仍附加 auth header；'只附加到已配置目标' 的适配器承诺未被代码强制。当前用例未触发外部绝对 URL，故未见实际泄漏，但这是凭据外送的潜在路径，应加同源校验。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "files": [
+        "acceptance/ui-p1.cjs",
+        "acceptance/p1-edit.cjs",
+        "acceptance/p1-categories.cjs",
+        "acceptance/p1-trash.cjs",
+        "acceptance/p0-library.cjs",
+        "acceptance/p2-search.cjs",
+        "acceptance/p2-browse.cjs",
+        "ARCHITECTURE.md"
+      ],
+      "outcome": "blocked",
+      "reason": "阶段依赖总体遵循 P0→P1→P2，早期用例未显式依赖后期 q/回收站接口；但存在阻断性语义缺陷。A30 第 1071 行 assertEqual(staleSourceEntry.bookmarkCount, staleBefore ? staleSourceEntry.bookmarkCount : staleSourceEntry.bookmarkCount) 是恒真断言；A30 在 A20 之后运行却要求 baseline trashed===0，而 A20 把 doomed 记录留在回收站，正确实现也会失败。A29 在归类页重命名后调用 reloadHome，而 reloadHome 等待仅首页契约要求的 bookmark-form；按 §8 该页没有保存表单时会超时。A16–A18、A21–A27 多处把 categoryId 接受为 string 或 number，p0-library 的 id 也只查非空字符串，未按 ARCHITECTURE 的十进制字符串契约断言；A14 未验证其声明的 purge 后 trashed_from_category_id。A33 还只断言刷新后排序保持，未断言 sort/limit/offset 写入 URL query。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "files": [
+        "DECISIONS.md",
+        "PRODUCT.md",
+        "ARCHITECTURE.md"
+      ],
+      "outcome": "passed",
+      "reason": "D01–D09 均有明确 default、When to ask 与影响：单一归属+未分类、重复 409+allowDuplicate、归类删除 move/purge 二选一、不抓取元数据、保守 URL 归一、无账号+Host/Origin、回收站不过期、P3 导入导出、验收与浏览器认证边界都可执行。D02 的 '确认后另存' 尚未在 UI 落地，属于实现/验收缺口而非决策默认值缺失；各决策的询问触发条件清楚，没有把普通可逆选择升级为必须问人。"
+    },
+    {
+      "dimension": "agent_handoff",
+      "files": [
+        "AGENT.md",
+        "DECISIONS.md",
+        "ROADMAP.md",
+        "ARCHITECTURE.md"
+      ],
+      "outcome": "passed",
+      "reason": "AGENT.md 要求先核对已有项目、指令与已确认决定，只实现当前阶段完整用户闭环，后期与不适用能力保持实际状态；proposed 决策不冒充用户已确认，普通可逆选择使用已声明默认值并记录，关键取舍按触发条件问人。它还要求准备专用测试实例、记录实际命令/目标/失败/未完成，验收程序有误按规范修正，不覆盖已有指令、数据或用户决定，并明确包不授予外部访问、凭据、发布或破坏性操作权限。阶段顺序和验收映射主要由 ROADMAP/acceptance 提供，handoff 本身略简但未违背这些约束。"
+    },
+    {
+      "dimension": "evidence_honesty",
+      "files": [
+        "README.md",
+        "VALIDATION.md",
+        "ARCHITECTURE.md",
+        "acceptance/README.md"
+      ],
+      "outcome": "passed",
+      "reason": "README、VALIDATION、ARCHITECTURE 与 acceptance README 反复声明 P0–P2 not implemented、A01–A33 not_run、未启动目标/浏览器/adapter、没有 pass 证据；只把结构、引用、阶段映射与摘要作为已做检查，并明确静态审阅不等于应用验收。未发现把导入、生成或模型调研结果冒充为独立执行结果。未重抓来源或复算 sha256，因此只能确认文档没有宣称运行通过，不能确认运行时行为。"
+    }
+  ],
+  "created_at": "2026-10-17T21:58:17.207893+00:00",
+  "digest": "fbcf0ddfea153d6c07f9e0b38b9bc81073621e63e4a6b1af79f5d8a0325c8e08",
+  "id": "acc_b875d205176a4d5a98409467a2be2568",
+  "job_id": "job_6872b229aa464c35997a040b56f0ef7a",
+  "method": "cognitive-review",
+  "outcome": "blocked",
+  "scope": "Independent static cognition and acceptance-program review only; no program execution, source re-fetch, downstream runtime or publication.",
+  "suggestions": [
+    "在 ARCHITECTURE §8 增加单条书签软删除的真实控件与确认交互，并新增相应 UI 验收；否则 F11 对普通用户不可达。",
+    "修复 A30：让 A20 结束时恢复或永久删除 doomed，或让 A30 使用相对基线并移除 trashed===0；删除第 1071 行恒真断言，改为精确断言源归类 bookmarkCount 或依赖已有 categorySnapshot 深比较。",
+    "修复 A29：归类页重命名后改用 browser.gotoHome 再回归类页，或明确把 bookmark-form 纳入 /c/{id} 的 DOM 契约；不要用 reloadHome 等待仅首页要求的表单。",
+    "把 p0-library、p1-trash、p2-search、p2-browse 的 id/categoryId 断言统一收紧为 typeof string 且匹配十进制正则，并在 A14 增加 purge 后 trashed_from_category_id 指向原 tombstone 的断言。",
+    "在 common.request/resolveUrl 中强制 auth header 只发往 ctx.baseUrl 同源目标，拒绝任意外部绝对 URL；增加带认证参数时外部绝对 URL 与 Sec-Fetch-Site=cross-site 的负向验收。",
+    "明确 allowDuplicate 是否提供 UI 出口；若仅 API 可用，应在 F07/README 中写明。补充 A33 的 sort/limit/offset URL query 断言，以及 A14/A16 之外对 title/name trim 和 title/note 非字符串类型的负向覆盖。",
+    "在 README 中注明 integrity.json 的 sha256 由 Atlas 生成时校验、本审阅未复算；在 AGENT.md 增加简短的阶段门禁与证据字段清单（阶段、目标版本、命令、结果、未完成原因），便于下游 agent 按 P0→P1→P2 交接。"
+  ],
+  "summary": "静态审阅结论：品类证据、场景收敛、决策默认值和证据诚实性基本合格，P0–P2 的保存、持久、打开、归类、回收站与检索主链在文档和用例上有较完整设计；但当前不能视为可交付。单条书签删除在 UI 合同与验收中缺失，A30 存在恒真断言且会因 A20 遗留的回收站记录而误判失败，A29 在归类页错误调用 reloadHome，多处用例放宽 ID 字符串契约，A14 未验证其声明的 trashed_from_category_id；此外 common.request 未强制认证头只发往已配置目标，存在潜在凭据外送路径。本次仅做静态审阅，未执行任何程序、未重抓来源、未复算 sha256，运行期行为与性能均未验证。"
+}

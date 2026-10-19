@@ -53,6 +53,13 @@ git diff --check
 - [x] 数据备份、最近删除和恢复前安全快照说明保存范围、创建时机、ID 冲突和替换影响；中英文保持同步（由 M5 本地日计划器案例的真实 HTTP 验收和案例文档覆盖）。
 - [x] 内部 ID、会话、指纹、哈希、绝对路径和版本标识默认收起，但仍可按需核对。
 
+### 4.1 本地安全审查复验
+
+- [x] `docs/U17_SECURITY_REVIEW.md` 已记录 API、workspace/apply、provider runtime、backup/restore、凭据和发布边界。
+- [x] 已明确 loopback、权限策略、固定验证器、路径检测和工作区复制都不是 OS/容器沙箱证明。
+- [x] 本地 key/token/secret 模式扫描无未允许命中；扫描结果和限制已记录。
+- [ ] 目标发布 SHA 的远程 CI、macOS 签名/公证、目标平台人工审查和独立进程/容器/VM 证据仍待外部环境。
+
 ## 5. 发布判定
 
 - 所有核心路径和 P0 自动检查通过，才允许进入发布评审。
@@ -68,3 +75,14 @@ git diff --check
 - Agent Harness 项目：首版纵向切片迭代已通过 API 收口为 `completed`；工作台刷新后显示“最近迭代已完成”和 `9/9 项已完成`。
 - 浏览器路径：默认中文；首页案例入口、浏览类型、任务管理叶子页、项目列表、已有项目预选、Agent Harness 类型起点、教程和 Agent Harness 项目详情均可加载；草稿已有数据，未触发删除或覆盖操作。
 - 本次未执行项目删除、源工作区覆盖或正式资料发布；浏览器中发现的连接拒绝来自前端服务未运行，重启后页面加载正常。
+
+## 7. 当前工作树加固复验（2026-09-24）
+
+- 后端 199 项回归在当前环境及干净 Python 3.11 环境通过；此前全新 Python 3.10 虚拟环境的 155 项复验也通过。
+- 前端 7 项单元测试、12 项 Playwright E2E（重复 3 次共 36/36 通过）、类型检查和生产构建通过；E2E 覆盖类型叶子、无 API 资料 fallback、别名搜索、未知路由 404、Apps hash 深链、移动视口溢出、英文教程、草稿 dirty 保存/删除、SPA 导航阻断、生成完成 hydration、轮询 stale/retry、项目切换身份、API 恢复初始化、跨源拒绝和备份下载。
+- 网页数据从 Markdown 重新导出后验证为 1,805 leaves、270 sections、33 apps，无缺失或 stale 文件。
+- 依赖审计：干净 Python 3.11 环境对锁定 requirements 的 `pip-audit --no-deps --disable-pip` 无已知漏洞，当前 `npm audit` 为 0；完整解析式 `pip-audit` 仍由 CI 在发布 SHA 重新执行，关键 Python 路径 Ruff 通过。
+- OpenCode 2.0.16 实际 `debug config` 已验证 Atlas V2 项目策略加载并在终态恢复原配置；托管 V2 服务的 Basic 认证、`/api/info`、session create/prompt/reconcile 传输已做本机冒烟；受管 V2 session 权限规则已回读确认，U17 shell/MCP/web/外部目录默认拒绝，草稿 MCP 进程也以只读模式拒绝分类副作用，HTTP/V2 完成/失败终态固定验证由 Atlas 独立执行，权限交互不提供持久授权且禁止/未知动作只能拒绝。Apply 现在有 durable journal、进程崩溃回归和显式 `recover-apply`，Restore 也有 journal、进程崩溃回归和显式 `restore-status`/`recover-restore`，备份/删除对未应用结果和并发 mutation fail closed；固定验证拒绝 shell、内联解释器代码、绝对路径和未注册执行器。
+- 生产构建已按路由拆包；主 JS 约 376.77 kB，最大页面 chunk 约 158.06 kB，不再触发 500 kB 拆包警告。
+- 页面逐项审查和后续任务记录在 `docs/U17_PAGE_AUDIT.md` / `docs/U17_PAGE_POLISH_PLAN.md`；其中 source 404、草稿轮询错误、项目切换隔离和移动溢出仍需按优先级处理。
+- 当前改动尚未提交或推送，GitHub Actions 尚未验证同一发布 SHA；分类门禁、macOS 签名/公证和完整执行沙箱仍未完成，因此当前仍不满足公开发布条件。

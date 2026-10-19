@@ -1,0 +1,112 @@
+{
+  "artifact_id": "tpl_231994f1a0a841d6b040d66de3287a6a",
+  "checks": [
+    {
+      "dimension": "category_evidence",
+      "files": [
+        "CATEGORY.md",
+        "README.md",
+        "VALIDATION.md"
+      ],
+      "outcome": "passed",
+      "reason": "CATEGORY.md 以 S01–S23 列出官方文档、GitHub 与帮助页及访问日期，区分多来源事实、本场景建议与未知项；许可标注 linkding MIT、Linkwarden/Karakeep AGPL-3.0、Raindrop 专有，并明确未复制第三方代码、AGPL 需法务评估；对 Raindrop/Chrome 仅取得搜索摘要、Pinboard FAQ 抓取失败等限制如实披露，没有把未验证事实写成结论。"
+    },
+    {
+      "dimension": "scenario_scope",
+      "files": [
+        "PRODUCT.md",
+        "ARCHITECTURE.md",
+        "DECISIONS.md"
+      ],
+      "outcome": "passed",
+      "reason": "确认场景是单人对自己的生活链接库，PRODUCT/ARCHITECTURE 的保存、默认未分类、单一归属、移动、检索与打开均对齐场景目标；R03 明确不存在协作者，F20–F23 等分享、协作、计费、审计、后台能力标为不适用，没有引入企业功能。单实例自托管与 R02 部署者是设计假设，但未扩张为多用户或公开分享。"
+    },
+    {
+      "dimension": "product_completeness",
+      "files": [
+        "PRODUCT.md",
+        "ARCHITECTURE.md",
+        "acceptance/ui-p0.cjs",
+        "acceptance/ui-p1.cjs",
+        "acceptance/p1-trash.cjs",
+        "acceptance/plan.json"
+      ],
+      "outcome": "blocked",
+      "reason": "R01/R02/R03 与不适用能力划分清楚，主链基本齐全；但 F11 的软删除缺少正常 UI 入口：ARCHITECTURE §8 的列表行没有单条书签删除控件，A16/A18 通过 API 删除，A30 是从回收站永久删除或经归类 purge 间接进入，A31 用 API 播种回收站，用户无法在 UI 中把某条书签放入回收站。D02 承诺重复 URL 时可打开既有记录或确认另存，UI 契约与 A28 只有 form-error，没有既有记录链接或 allowDuplicate 入口。这些是数据生命周期与失败流程缺口，不是企业功能或可选打磨。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "files": [
+        "ARCHITECTURE.md",
+        "DECISIONS.md",
+        "acceptance/p0-limits.cjs",
+        "acceptance/common.cjs",
+        "acceptance/browser.cjs"
+      ],
+      "outcome": "blocked",
+      "reason": "数据模型、API/错误信封、重启与浏览器适配器契约总体具体，但 §2/§10 只要求变更数据的 API/表单校验 Host/Origin；GET /api/bookmarks、/api/categories、/api/trash、/b/:id 与 / 在默认回环或未加认证代理时可被 DNS rebinding 读取整个私人库，与 D06 的无匿名读取路径与 Host 防 DNS 重绑定承诺矛盾。另 URL 原样保存并作为 302 Location 输出，却未拒绝 CR/LF 等控制字符；search_text 用 U+0001 分隔但未禁止 title/note 含该字符，字段隔离承诺不完整。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "files": [
+        "ROADMAP.md",
+        "acceptance/plan.json",
+        "acceptance/p1-categories.cjs",
+        "acceptance/ui-p0.cjs",
+        "acceptance/ui-p1.cjs",
+        "acceptance/p1-trash.cjs"
+      ],
+      "outcome": "blocked",
+      "reason": "33 个 ID 与阶段/能力映射完整，P0 用例主体不调用 P1 写接口，P1 不依赖 P2 的 q/categoryId 过滤；但语义覆盖不足：A14 目标要求 purge 的 active 记录 trashed_from_category_id 指向原归类 tombstone，p1-categories.cjs 只查 url/trashedAt，A30 也只查 categoryId；A29 只新建归类后移动，未用保存表单选择新归类（场景第 2 步）；A28 明确把空库留给手工且未运行；没有浏览器用例验证 --with-ui 携带 auth-header 的前置拒绝及外部夹具不带凭据；A15 只测 mode=move 删除默认归类，未测 mode=purge 保护；分页未测保留 q/categoryId。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "files": [
+        "DECISIONS.md",
+        "PRODUCT.md",
+        "ARCHITECTURE.md"
+      ],
+      "outcome": "passed",
+      "reason": "D01–D09 均有明确默认值、理由、影响与 when-to-ask：单一归属、重复阻止、删除归类二选一、不抓取元数据、保守 URL 归一、无账号/分享、回收站不过期、P3 交换格式、验收边界；proposed 状态未被冒充为用户已确认。D02 的另存 UX 与 D06 的读请求 Host 落地缺口分别归入 product/architecture/phase 检查。"
+    },
+    {
+      "dimension": "agent_handoff",
+      "files": [
+        "AGENT.md",
+        "README.md",
+        "ROADMAP.md"
+      ],
+      "outcome": "passed",
+      "reason": "AGENT.md 要求先核对已有项目、指令与已确认决定，把 proposed 当建议，按当前阶段实现完整用户闭环，准备专用测试实例并记录真实命令、结果与日志，禁止删断言、硬编码或假称通过，不覆盖用户决定，包内内容不授予外部访问、凭据或破坏性权限；README/ROADMAP 补足阶段细节。"
+    },
+    {
+      "dimension": "evidence_honesty",
+      "files": [
+        "README.md",
+        "VALIDATION.md",
+        "acceptance/README.md",
+        "acceptance/plan.json"
+      ],
+      "outcome": "passed",
+      "reason": "README、VALIDATION 与 acceptance/README 反复标注 P0–P2 not implemented、A01–A33 not_run、未执行程序；A28 明确不宣称空库自动断言；来源、建议与未知分开，未虚构运行结果。局限是本审阅也未运行任何程序、未重算 integrity 哈希、未重抓第三方来源；A14 对 trashedFrom 的覆盖声明超过实际断言，已在 phase_acceptance 指出。"
+    }
+  ],
+  "created_at": "2026-10-17T21:58:00.953154+00:00",
+  "digest": "8480ac173324c2cb12c6efbd224accc9e5de50b0387d2fc0fd6666680c91e042",
+  "id": "acc_291c3b69eff94c54be02990bcf80e2b0",
+  "job_id": "job_270a556449834cc4baa3914161913c11",
+  "method": "cognitive-review",
+  "outcome": "blocked",
+  "scope": "Independent static cognition and acceptance-program review only; no program execution, source re-fetch, downstream runtime or publication.",
+  "suggestions": [
+    "P1 增加单条书签软删除的真实 UI 控件与用例：列表行或详情页提供 bookmark-delete-form（action=/bookmarks/{id}/delete），从 UI 保存→删除→在 /trash 看到→恢复；同时给 A14/A30 的 purge 条目补 trashedFromCategoryId/trashedFromCategoryName 断言。",
+    "A29 或新增浏览器用例覆盖保存时选择归类：用 category-form 新建归类后，直接在保存表单选择它提交，断言行 data-category-id、bookmark-category 与 API categoryId，而不是只用 API 播种后移动。",
+    "按 D02 补重复 URL 的 UI 分支：显示既有记录链接，并提供显式 allowDuplicate=true 的仍然另存控件和浏览器正/负用例；若产品决定只提示不另存，就修订 D02/F07 并记录该取舍。",
+    "把 Host/Origin/Fetch Metadata 校验扩展到读接口与页面，至少覆盖 /api/bookmarks、/api/categories、/api/trash、/b/:id 与 /；或对非回环部署强制认证。新增伪造 Host 读取 /api/bookmarks 的负例，并同步修正 D06/ARCHITECTURE 的 DNS rebinding 承诺。",
+    "URL 校验拒绝或规范化 CR/LF 等控制字符，并在输出 Location 前再次校验；title/note/q 禁止 U+0001 或改用不会冲突的索引编码；增加相应负例，避免头注入和跨字段假匹配。",
+    "补默认归类 purge 保护（DELETE default?mode=purge&confirm=true 应 409 且零写入）、tombstone 名称复用、A29 重命名 303、分页保留 q/categoryId 的断言；清空回收站的 UI 确认正例只在专用实例执行，或明确标为未覆盖。",
+    "为 A18/A30 等破坏性验收增加技术护栏，例如要求 health.stage=test 或显式 --allow-destructive；默认拒绝对未标记实例执行清空回收站，不要只依赖 README 警告。",
+    "增加浏览器认证边界用例：--with-ui 加非空 auth-header 必须在创建 browser/context/page 前以 ATLAS_BROWSER_AUTH_UNSUPPORTED 失败，且外部夹具与导航不带凭据；同时让 common.request 只对配置目标 origin 附加认证头。"
+  ],
+  "summary": "静态审阅 source/ 的冻结候选：品类证据、场景范围、决策默认值与交接基本成立，但产品 UI 生命周期与失败分支、架构读请求安全、以及若干阶段验收语义存在阻断性缺口，当前不能按可交付蓝图接受。未运行任何程序、未重算 integrity 哈希、未重抓第三方来源；结论仅基于所读文本与代码，测试状态仍为 not_run。"
+}

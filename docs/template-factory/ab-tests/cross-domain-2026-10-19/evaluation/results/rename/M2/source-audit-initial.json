@@ -1,0 +1,35 @@
+{
+  "case": "rename",
+  "label": "M2",
+  "round": "initial",
+  "all_files_manually_read": {
+    "DECISIONS.md": "3091631448ba098a55ef75809e493a0e21a1353ed9be80bf89d9f0cff80ddace",
+    "README.md": "bc269e0060ed5a1129fcc6f41846779f50db5a26f7beaa1546e85525c7b2fe19",
+    "app.py": "6725e307553aa1342f8ea04113c1ebbcbf170e10d9483303dde6f863be07fa75",
+    "atlas_errors.py": "69b820c1bfc9d037022339e4065545b96633875acf3497e2f07f40c56a98dfae",
+    "commands.py": "572aabec5feb97963702205cff890ed73cb1bcc89d1ba28099b4d8ebb39e278f",
+    "fsops.py": "7946c63d360dc0d487b10a01bb4728435a713c6cede4a62242cd238222b9f54a",
+    "naming.py": "4cafa14576c3b8e636812ed2f3dc98326c1be4ec5bfc46363778687e7dc7b504",
+    "paths.py": "594798fd9dca46895784ae66f96d35268f86e4e606767b601b038208efef00ee",
+    "planner.py": "c3953e49e01a66d000b342318ea41b66459f6f2f6b4416c9952431a48ac6f2c5"
+  },
+  "python": "3.10.13 (main, Jul 28 2025, 13:11:45) [Clang 17.0.0 (clang-1700.0.13.5)]",
+  "execution_safety": "approved only for frozen controlled synthetic fixtures; no user files",
+  "safety_notes": [
+    "No network, subprocess, shell, eval, secret/environment reads or dependency install",
+    "Root realpath and ordinary-file-only inspection; state symlink refusal and state path containment",
+    "All tested plans have own generated IDs; tamper fixture changes only filename target and checks containment",
+    "Confirm required before apply/undo, whole-plan content/collision checks, O_EXCL plan/receipt writes",
+    "State written below explicit assigned root; rename operations use bare filename validation"
+  ],
+  "source_risks_not_runtime_claims": [
+    "Receipt path constructs receipts/<plan_id>.json from editable plan id without re-validating that id; crafted path-bearing id may escape root. Frozen F05 edits filename, not id, so this risk is not certified by its pass",
+    "Preflight existence checks followed by os.rename are not no-replace atomic against an external concurrent filesystem writer; concurrency explicitly outside application scope"
+  ],
+  "prohibited_context_not_read": [
+    "condition-map",
+    "template",
+    "developer input/prompt"
+  ],
+  "application_modified": false
+}

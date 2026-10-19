@@ -1,0 +1,567 @@
+{
+ "schema": "atlas.development-handoff.v1",
+ "project_name": "bookmark-core-trial",
+ "template_digest": "65d7880e19bcc92df54ad76248d155b29c978d2770344ac1ecc9005c3c1eba00",
+ "blueprint": "blueprint/template.json",
+ "selected_phase": "P0",
+ "selected_goal": "用户能保存外部链接（仅 URL 必填）、选择或新建简单归类、把未归类记录移动到位、按分类浏览或关键字找到记录、打开原页，且数据在真实进程重启后仍在。",
+ "prerequisite_phases": [],
+ "scenario": {
+  "acceptance": [
+   "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+   "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+   "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+   "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+  ],
+  "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+  "id": "scn_b92e41ce674f405fad0c87381f1dc5b7",
+  "leaf": "bookmark-manager",
+  "leaf_name": "书签管理器",
+  "name": "生活待购与灵感收藏夹",
+  "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+  "revision": 1,
+  "status": "ready",
+  "updated_at": "2026-10-17T06:54:57.880835+00:00",
+  "workflow": [
+   "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+   "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+   "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+   "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+   "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+  ]
+ },
+ "roles": [
+  {
+   "id": "R01",
+   "name": "收藏者（普通网络用户）",
+   "responsibility": "把浏览时看到的外部网页链接以 URL 存入个人库，选择或新建简单归类，之后按分类浏览或关键字检索，并打开原页继续购买/阅读/参考。"
+  },
+  {
+   "id": "R02",
+   "name": "本地运维者",
+   "responsibility": "用 python3 app.py --port PORT --data-dir DIR 在回环地址启动应用并指定数据目录；在需要时执行真实的进程停止与重启，以配合持久化验收。"
+  },
+  {
+   "id": "R03",
+   "name": "验收执行者（测试/操作员）",
+   "responsibility": "提供真实目标 URL 与运行参数，驱动浏览器验收；在未提供且未能安全持有进程时，按 before/after 步骤执行真实重启，绝不把刷新当作重启。"
+  }
+ ],
+ "phases": [
+  {
+   "id": "P0",
+   "title": "核心收藏闭环",
+   "goal": "用户能保存外部链接（仅 URL 必填）、选择或新建简单归类、把未归类记录移动到位、按分类浏览或关键字找到记录、打开原页，且数据在真实进程重启后仍在。",
+   "features": [
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06",
+    "F07",
+    "F08",
+    "F09",
+    "F10",
+    "F11",
+    "F12"
+   ],
+   "acceptance": [
+    "A01",
+    "A02",
+    "A03",
+    "A04",
+    "A05",
+    "A06",
+    "A07",
+    "A08",
+    "A09",
+    "A10",
+    "A11",
+    "A12",
+    "A13",
+    "A14",
+    "A15",
+    "A16",
+    "A17"
+   ],
+   "status": "not implemented"
+  }
+ ],
+ "features": [
+  {
+   "id": "F01",
+   "name": "保存链接（仅 URL 必填，标题与备注可选）",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "确认场景的核心动作是保存偶然看到的外部链接；URL 必填、标题/备注可选，缺省标题回退为 URL，抓取失败不阻断落库。",
+   "sources": [
+    "S01",
+    "S10",
+    "S02"
+   ],
+   "acceptance": [
+    "A01",
+    "A02",
+    "A15",
+    "A16"
+   ]
+  },
+  {
+   "id": "F02",
+   "name": "归类：默认未分类落点，保存时可选择或新建分类",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "成熟产品一致采用“单一归属 + 未分类默认落点”；未选分类时仍必须成功保存并进入未分类，避免未归类无处安放。",
+   "sources": [
+    "S01",
+    "S10",
+    "S17"
+   ],
+   "acceptance": [
+    "A01",
+    "A03",
+    "A04"
+   ]
+  },
+  {
+   "id": "F03",
+   "name": "移动记录到其他归类",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "工作流要求先入默认归类、之后手动移动到更合适的位置；移动结果需在重新打开后保持。",
+   "sources": [
+    "S01",
+    "S18",
+    "S10"
+   ],
+   "acceptance": [
+    "A05"
+   ]
+  },
+  {
+   "id": "F04",
+   "name": "按分类浏览，默认按添加时间倒序",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "用户处理任务时先进入个人库并按归类浏览，时间倒序符合“最近存入优先处理”的直觉。",
+   "sources": [
+    "S01",
+    "S05"
+   ],
+   "acceptance": [
+    "A06"
+   ]
+  },
+  {
+   "id": "F05",
+   "name": "关键字检索与空状态区分",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "验收要求能通过关键字找到此前存入的链接；检索范围为标题/URL/备注/分类名，且空库反馈必须与检索无匹配反馈不同。",
+   "sources": [
+    "S01",
+    "S05"
+   ],
+   "acceptance": [
+    "A07",
+    "A08",
+    "A16"
+   ]
+  },
+  {
+   "id": "F06",
+   "name": "打开记录跳回原始 URL",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "每条记录以 URL 锚定外部网页，点击即在新标签打开原页，且必须保留 query 与 fragment，库内不承载正文。",
+   "sources": [
+    "S01",
+    "S10"
+   ],
+   "acceptance": [
+    "A09"
+   ]
+  },
+  {
+   "id": "F07",
+   "name": "数据持久化于 --data-dir，跨真实进程重启保留",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "验收要求链接在多次会话之间持久累积；以 SQLite 落盘到指定数据目录，并以“新的自有进程 + 通过 UI 重新读回数据”作为真实重启的证明，而非刷新或文件存在。",
+   "sources": [
+    "S01",
+    "S04"
+   ],
+   "acceptance": [
+    "A10"
+   ]
+  },
+  {
+   "id": "F08",
+   "name": "重复 URL 的显式且保守策略",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "重复处理必须显式：默认提示已存在并允许用户显式继续保存，不静默拒绝也不静默产生重复。",
+   "sources": [
+    "S01",
+    "S20",
+    "S18"
+   ],
+   "acceptance": [
+    "A11"
+   ]
+  },
+  {
+   "id": "F09",
+   "name": "同按钮重复提交不产生两条记录",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "保留的历史运行教训：同一按钮双击不得意外保存两条；用客户端令牌加服务端短窗口幂等保证。",
+   "sources": [
+    "S01",
+    "S14"
+   ],
+   "acceptance": [
+    "A12"
+   ]
+  },
+  {
+   "id": "F10",
+   "name": "备注不静默截断",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "保留的历史运行教训：验收附注不得被静默裁剪；超限必须显式报错且不落库，用户可自行缩短后重试。",
+   "sources": [
+    "S01",
+    "S11"
+   ],
+   "acceptance": [
+    "A13"
+   ]
+  },
+  {
+   "id": "F11",
+   "name": "保存失败与恢复：无效/非 http(s) 显式报错、输入可修正重试",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "必要失败路径：无效 URL 或非 http(s) 协议必须显式报错不落库，失败后表单保留输入供用户修正并重试成功。",
+   "sources": [
+    "S01",
+    "S07",
+    "S10"
+   ],
+   "acceptance": [
+    "A14",
+    "A15"
+   ]
+  },
+  {
+   "id": "F12",
+   "name": "本地私有：仅回环监听、无后台外发",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "个人收藏可能含敏感偏好，默认应私有、不公开、不默认上传第三方；P0 不自动抓取元数据、不发遥测，唯一的对外导航是用户显式点击“打开原页”。",
+   "sources": [
+    "S01",
+    "S07"
+   ],
+   "acceptance": [
+    "A17"
+   ]
+  }
+ ],
+ "acceptance": [
+  {
+   "id": "A01",
+   "phase": "P0",
+   "goal": "仅填写 URL 即可保存成功；记录未经选择时进入未分类并立即出现，缺省标题回退为 URL。",
+   "type": "positive",
+   "features": [
+    "F01",
+    "F02"
+   ],
+   "implementation": "acceptance/p0-save-classify.cjs",
+   "status": "not_run"
+  },
+  {
+   "id": "A02",
+   "phase": "P0",
+   "goal": "保存带标题与备注的记录成功；重新加载后标题与备注完整可见，未被改写或丢失。",
+   "type": "positive",
+   "features": [
+    "F01"
+   ],
+   "implementation": "acceptance/p0-save-classify.cjs",
+   "status": "not_run"
+  },
+  {
+   "id": "A03",
+   "phase": "P0",
+   "goal": "保存时选择一个已存在分类，记录出现在该分类浏览结果中。",
+   "type": "positive",
+   "features": [
+    "F02"
+   ],
+   "implementation": "acceptance/p0-save-classify.cjs",
+   "status": "not_run"
+  },
+  {
+   "id": "A04",
+   "phase": "P0",
+   "goal": "保存时新建分类并把记录归入；重新加载后新分类与归属关系保持。",
+   "type": "positive",
+   "features": [
+    "F02"
+   ],
+   "implementation": "acceptance/p0-save-classify.cjs",
+   "status": "not_run"
+  },
+  {
+   "id": "A05",
+   "phase": "P0",
+   "goal": "把记录从一个分类移动到另一个分类；重新加载后其归属已更新且不再出现在原分类。",
+   "type": "positive",
+   "features": [
+    "F03"
+   ],
+   "implementation": "acceptance/p0-find-open.cjs",
+   "status": "not_run"
+  },
+  {
+   "id": "A06",
+   "phase": "P0",
+   "goal": "分类浏览只显示该分类记录，且默认按添加时间倒序（新在前）。",
+   "type": "positive",
+   "features": [
+    "F04"
+   ],
+   "implementation": "acceptance/p0-find-open.cjs",
+   "status": "not_run"
+  },
+  {
+   "id": "A07",
+   "phase": "P0",
+   "goal": "关键字检索能命中标题、URL、备注或分类名中的匹配记录，且不返回无关记录。",
+   "type": "positive",
+   "features": [
+    "F05"
+   ],
+   "implementation": "acceptance/p0-find-open.cjs",
+   "status": "not_run"
+  },
+  {
+   "id": "A08",
+   "phase": "P0",
+   "goal": "空库状态与检索无匹配状态呈现彼此不同的提示，二者不被混为一谈。",
+   "type": "negative",
+   "features": [
+    "F05"
+   ],
+   "implementation": "acceptance/p0-find-open.cjs",
+   "status": "not_run"
+  },
+  {
+   "id": "A09",
+   "phase": "P0",
+   "goal": "点击记录在新标签页打开原始 URL，且原 URL 的 query 与 fragment 均被保留；测试环境拦截该外部请求以避免真实外连，仅断言被尝试打开的 URL 与新标签行为。",
+   "type": "positive",
+   "features": [
+    "F06"
+   ],
+   "implementation": "acceptance/p0-find-open.cjs",
+   "status": "not_run"
+  },
+  {
+   "id": "A10",
+   "phase": "P0",
+   "goal": "数据写入 --data-dir；经真实进程重启后，先前保存的记录与分类仍可经 UI 读回。默认由操作员执行 before/after 步骤；若由用例自身安全持有应用进程，则仅重启该自有进程并断言 PID 变化。刷新不得被当作重启，文件存在或新建 SQLite 连接不得作为证明。",
+   "type": "positive",
+   "features": [
+    "F07"
+   ],
+   "implementation": "acceptance/p0-persistence.cjs",
+   "status": "not_run"
+  },
+  {
+   "id": "A11",
+   "phase": "P0",
+   "goal": "保存已存在的相同 URL 时出现显式“已存在”提示，用户可显式选择继续保存为另一条记录；不发生静默拒绝或静默重复。",
+   "type": "negative",
+   "features": [
+    "F08"
+   ],
+   "implementation": "acceptance/p0-save-classify.cjs",
+   "status": "not_run"
+  },
+  {
+   "id": "A12",
+   "phase": "P0",
+   "goal": "在同一保存表单上快速双击提交，只产生一条记录（重复提交不导致两条）。",
+   "type": "negative",
+   "features": [
+    "F09"
+   ],
+   "implementation": "acceptance/p0-save-classify.cjs",
+   "status": "not_run"
+  },
+  {
+   "id": "A13",
+   "phase": "P0",
+   "goal": "提交超过声明上限的备注时显式报错且不落库；不出现备注被静默截断后保存的情况。",
+   "type": "negative",
+   "features": [
+    "F10"
+   ],
+   "implementation": "acceptance/p0-save-classify.cjs",
+   "status": "not_run"
+  },
+  {
+   "id": "A14",
+   "phase": "P0",
+   "goal": "提交无效 URL 或非 http(s) 协议地址时显式报错且不落库。",
+   "type": "negative",
+   "features": [
+    "F11"
+   ],
+   "implementation": "acceptance/p0-save-classify.cjs",
+   "status": "not_run"
+  },
+  {
+   "id": "A15",
+   "phase": "P0",
+   "goal": "保存失败后表单保留用户已输入内容，用户修正后重试可成功保存。",
+   "type": "positive",
+   "features": [
+    "F01",
+    "F11"
+   ],
+   "implementation": "acceptance/p0-save-classify.cjs",
+   "status": "not_run"
+  },
+  {
+   "id": "A16",
+   "phase": "P0",
+   "goal": "含中文与 emoji 的标题与备注保存、显示与检索均正确，无乱码或字符丢失。",
+   "type": "positive",
+   "features": [
+    "F01",
+    "F05"
+   ],
+   "implementation": "acceptance/p0-save-classify.cjs",
+   "status": "not_run"
+  },
+  {
+   "id": "A17",
+   "phase": "P0",
+   "goal": "应用仅绑定回环地址；除用户显式点击“打开原页”外，P0 流程不发起任何后台外发请求（无元数据抓取、无遥测）；测试环境阻止对外部地址的真实连接；若配置认证参数则仅作用于显式指定的目标且不记录凭据值，不支持的模式显式失败。",
+   "type": "negative",
+   "features": [
+    "F12"
+   ],
+   "implementation": "acceptance/p0-find-open.cjs",
+   "status": "not_run"
+  }
+ ],
+ "decisions": [
+  {
+   "id": "D01",
+   "question": "保存遇到已存在的相同 URL 时应如何处理？",
+   "default": "推荐默认：显式提示“可能已存在”并保留一个显式“仍然保存”动作，允许用户确认后保存为另一条记录；比较键仅做最小规范化（scheme/host 小写、去默认端口、去路径末尾多余斜杠，保留 query 与 fragment），原因是不自动丢弃用户数据、可逆。",
+   "when_to_ask": "当用户明确反馈希望自动合并重复项，或希望默认直接拒绝重复保存时。",
+   "impact": "影响保存流程的交互与数据完整性；变更会影响已有库中重复记录的处理预期。",
+   "status": "proposed"
+  },
+  {
+   "id": "D02",
+   "question": "P0 是否由服务端自动抓取网页标题等元数据？",
+   "default": "推荐默认不抓取，标题仅取用户输入或回退为 URL；原因是避免 SSRF、超时、反爬与响应体积等失败模式，并保持仅回环、无后台外发。",
+   "when_to_ask": "当用户明确要求自动标题并接受服务端对目标站点发起请求时，再引入并同时加内网拦截、超时与体积上限。",
+   "impact": "决定是否新增网络依赖与安全防护；关闭时保存流程完全离线可用。",
+   "status": "proposed"
+  },
+  {
+   "id": "D03",
+   "question": "分类的默认落点如何表示？",
+   "default": "推荐以 category_id 为 NULL 表示“未分类”并在界面显示为“未分类/以后看看”，不预置可删除实体；原因保证未归类落点始终存在。",
+   "when_to_ask": "当用户希望自定义默认分类名称或希望默认落点可被重命名/删除时。",
+   "impact": "影响数据模型与列表查询；改动涉及迁移与既有表单默认值。",
+   "status": "proposed"
+  },
+  {
+   "id": "D04",
+   "question": "备注长度上限与超限行为？",
+   "default": "推荐设定一个明确的较大上限并在超限时显式报错且不落库，绝不静默截断；具体数值在实现时按合理长文本取值，不设武断性能阈值。",
+   "when_to_ask": "当实际用户保存超长备注被拒绝并反馈上限过小时，再调整上限或改为无上限存储。",
+   "impact": "影响验收的负面用例与错误提示文案；决定数据完整性承诺。",
+   "status": "proposed"
+  },
+  {
+   "id": "D05",
+   "question": "分类删除的语义（后期引入时）？",
+   "default": "推荐删除时必须显式二选一：把其中记录移入未分类，或级联删除并要求二次确认，默认前者；原因是避免无提示丢失记录。",
+   "when_to_ask": "当实现分类删除能力时（P0 不实现）。",
+   "impact": "影响后期阶段的删除交互与数据保留承诺。",
+   "status": "proposed"
+  },
+  {
+   "id": "D06",
+   "question": "运行栈与部署形态？",
+   "default": "推荐默认 Python 3 标准库（http.server + sqlite3）+ 中文浏览器界面，入口 python3 app.py --port PORT --data-dir DIR，仅回环，数据全部在 DIR 下，无应用依赖安装；这是本次试验环境的明确选择，不是类别约束。",
+   "when_to_ask": "当部署环境没有 Python 3，或需要多实例并发、容器编排时，再评估替代栈。",
+   "impact": "影响开发者入口、依赖与运维方式；替代方案（如 Node/Django 成品）会引入额外依赖或运维成本。",
+   "status": "proposed"
+  },
+  {
+   "id": "D07",
+   "question": "URL 规范化与去重键范围？",
+   "default": "推荐仅做最小规范化（trim、scheme/host 小写、去默认端口、去路径末尾多余斜杠），保留 query 与 fragment 作为身份一部分；对 http/https、跟踪参数等变体不做自动合并。",
+   "when_to_ask": "当用户抱怨同一页面因协议或跟踪参数而被视为不同记录时。",
+   "impact": "影响重复判定与存储；放宽会带来误合并风险。",
+   "status": "proposed"
+  },
+  {
+   "id": "D08",
+   "question": "是否需要认证？",
+   "default": "推荐默认无认证、仅绑定回环；原因单用户本地使用，避免凭证管理。若验收接受认证参数，则仅作用于显式配置的目标，绝不附加到外部导航或夹具，且不记录凭据值。",
+   "when_to_ask": "当需要从本机以外访问或部署到共享主机时，必须先引入认证与传输加密。",
+   "impact": "影响安全边界与验收参数；不支持的模式必须显式失败为基础设施/不完整，不静默跳过。",
+   "status": "proposed"
+  },
+  {
+   "id": "D09",
+   "question": "保存后是否提供立即撤销？",
+   "default": "推荐 P0 不提供撤销（P0 无删除能力），仅保证保存与归类可逆（可移动）；撤销随回收站阶段一并引入。",
+   "when_to_ask": "当引入删除或用户反馈误存需要即时撤回时。",
+   "impact": "影响保存成功后的交互与后续阶段设计。",
+   "status": "proposed"
+  },
+  {
+   "id": "D10",
+   "question": "何时引入导入/导出？",
+   "default": "推荐 P0 不做，按后续阶段引入 Netscape HTML/JSON 元数据导出，并明示导入不去重、导出不等于完整备份。",
+   "when_to_ask": "当用户担心数据锁定或需要换机迁移时。",
+   "impact": "影响数据可携带性与存储锁定的风险敞口。",
+   "status": "proposed"
+  },
+  {
+   "id": "D11",
+   "question": "如何验证“跨真实进程重启”的持久化？",
+   "default": "推荐默认由操作员控制 before/after：用例先经 UI 保存记录与分类，输出停止并重启（python3 app.py --port PORT --data-dir DIR）的步骤，操作员完成后用例再经 UI 读回数据；仅当用例自身以固定 argv（不启用 shell 插值）启动应用并安全持有该子进程时，才可只终止自己启动的 PID 并重新启动。不得执行任意 shell 命令、不得终止无关进程；不得以文件存在或新建 SQLite 连接作为重启证明，也不要求应用暴露内部数据库连接状态。",
+   "when_to_ask": "当运行环境不允许人工介入、且能提供一个仅管理本用例所启动进程的受控重启器时。",
+   "impact": "影响 A10 的执行方式与判定；未完成的操作员步骤不得记为通过，刷新不得当作重启。",
+   "status": "proposed"
+  }
+ ],
+ "limits": [
+  "检索为大小写不敏感子串匹配（标题/URL/备注/分类名），不含正文全文索引。",
+  "P0 不做服务端元数据抓取，标题仅来自用户输入或回退为 URL；P0 流程不发起外部网络请求（用户显式点击打开原页除外）。",
+  "无删除/回收站（记录只可保存与移动）；分类只可新建与选择，不可重命名或删除。",
+  "无导入/导出、无批量操作、无标签、无分页。",
+  "无认证，仅回环可达；不支持外部主机访问。",
+  "重复判定基于最小规范化键并保留 query/fragment，不做跟踪参数或 http/https 变体的自动合并。",
+  "不做网页快照/归档、失效链接扫描与正文全文检索。",
+  "不设任意性能/成本/延迟阈值；语义正确性与数据完整性优先于规模指标。"
+ ],
+ "evidence_status": "not_run_by_export"
+}

@@ -1,0 +1,106 @@
+:root {
+  --ink: #1f2933;
+  --muted: #64748b;
+  --line: #d8dee6;
+  --accent: #2b6cb0;
+  --ok: #276749;
+  --err: #9b2c2c;
+  --bg: #f5f7fa;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.5;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar h1 { font-size: 18px; margin: 0; }
+
+.session-box { display: flex; align-items: center; gap: 12px; color: var(--muted); }
+
+main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px 18px;
+}
+
+.card h2 { margin: 0 0 12px; font-size: 16px; }
+
+.hint { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+
+.field { display: block; margin-bottom: 10px; font-size: 13px; color: var(--muted); }
+
+.field input,
+.field select {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px 10px;
+  font-size: 14px;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn.small { padding: 4px 10px; font-size: 12px; }
+
+.btn.ghost { color: var(--accent); background: transparent; border: 1px solid var(--accent); }
+
+.slot-list { list-style: none; margin: 0; padding: 0; }
+
+.slot-list li {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+
+.slot-list li.empty { color: var(--muted); border-bottom: none; }
+
+.bookings-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+.bookings-table th,
+.bookings-table td {
+  text-align: left;
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.bookings-table th { color: var(--muted); font-weight: 600; }
+
+.message { min-height: 20px; font-size: 14px; }
+.message.ok { color: var(--ok); }
+.message.error { color: var(--err); }

@@ -12,6 +12,29 @@ jobs:
           python-version: '3.11'
           cache: pip
       - run: pip install -r requirements.txt
+      - run: python -m pip install pip-audit==2.10.1 ruff==0.15.17
+      - run: pip-audit -r requirements.txt
+      - name: Lint critical Python paths
+        run: >-
+          ruff check
+          application-atlas-production-pack/privacy.py
+          application-atlas-production-pack/drafts_api.py
+          application-atlas-production-pack/drafts_engines/__init__.py
+          application-atlas-production-pack/mcp_atlas.py
+          application-atlas-production-pack/execution_service.py
+          application-atlas-production-pack/execution_state.py
+          application-atlas-production-pack/execution_workspace.py
+          application-atlas-production-pack/opencode_client.py
+          application-atlas-production-pack/opencode_cli_adapter.py
+          application-atlas-production-pack/opencode_permissions.py
+          application-atlas-production-pack/opencode_runtime.py
+          application-atlas-production-pack/project_export.py
+          application-atlas-production-pack/project_generation.py
+          application-atlas-production-pack/project_store.py
+          application-atlas-production-pack/project_backup.py
+          application-atlas-production-pack/runtime_recovery.py
+          atlas-web/scripts/gen-data.py
+          atlas-web/scripts/verify-web-data.py
       - run: python -m unittest discover -s application-atlas-production-pack/tests -v
       - uses: actions/setup-node@v4
         with:
@@ -20,5 +43,12 @@ jobs:
           cache-dependency-path: atlas-web/package-lock.json
       - run: npm ci
         working-directory: atlas-web
-      - run: npm run typecheck && npm run build
+      - run: python application-atlas-production-pack/export_atlas.py
+      - run: npm run gen && npm run verify-data
+        working-directory: atlas-web
+      - run: npx playwright install --with-deps chromium
+        working-directory: atlas-web
+      - run: npm audit --registry=https://registry.npmjs.org --audit-level=high
+        working-directory: atlas-web
+      - run: npm run typecheck && npm test && npm run build && npm run test:e2e
         working-directory: atlas-web

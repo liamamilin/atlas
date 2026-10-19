@@ -1,0 +1,16 @@
+{
+  "id": "EP01",
+  "scope": "Posthoc explicitly requested, not shared core",
+  "source_audit_reference": "source-audit-initial.json",
+  "new_scope_review": "Reviewed commands.py receipt construction and planner.py O_EXCL writer; identifier is absolute path only to owned evidence sibling outside/receipt-target; no uncontrolled traversal",
+  "observed_defect": "absent outside target: apply exited 0 and created receipt-target.json outside assigned root while completing rename; existing target refused with no overwrite",
+  "severity_interpretation": "Actual root-containment violation; overwrite not shown; no real user files or credentials touched",
+  "reproduction_files": [
+    "EP01-initial/absent_target/apply-event.json",
+    "EP01-initial/absent_target/result.json",
+    "EP01-initial/absent_target/outside/receipt-target.json"
+  ],
+  "application_unchanged": true,
+  "process_cleanup": "Both apply subprocesses completed/waited; no background service",
+  "core_v3_unchanged": "F01–F11 original passing scores retained, EP01 shown separately"
+}

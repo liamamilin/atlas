@@ -1,0 +1,23 @@
+{
+  "reviewer": "experiment_design_review independent agent; read-only, no runtime duplication or model calls",
+  "scope": [
+    "REPORT.md",
+    "FORM_ANALYSIS.md",
+    "integrity.json",
+    "observed-author-metrics.json",
+    "evaluation/runtime-summary.json",
+    "stdin deviation and actual-input records"
+  ],
+  "verified": "All nine observed author metric rows recomputed from available session assistant fields; outcomes and protocol limits consistent",
+  "requested_corrections": [
+    {
+      "issue": "Rename full first attempt has one tokens=null assistant record; session totals remain incomplete",
+      "action": "REPORT explicitly states missing field and observable-only totals; no billing or full-usage claim"
+    },
+    {
+      "issue": "stdin deviation rename pending audit text stale",
+      "action": "Updated to confirmed clean actual session exports; originals kept"
+    }
+  ],
+  "limits": "Audit occurred before final initial-rename OpenCode structured review completed; that was explicitly marked pending. No repeated application tests."
+}

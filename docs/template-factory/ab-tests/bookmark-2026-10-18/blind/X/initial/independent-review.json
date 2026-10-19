@@ -1,0 +1,210 @@
+{
+  "label": "X",
+  "scope": "独立静态审计：仅阅读 input.json 指定的源码、运行时结果与证据快照；评测者未执行任何程序、未访问外网、未修改文件。",
+  "workflow_outcome": "supported",
+  "required": [
+    {
+      "id": "R01",
+      "outcome": "通过",
+      "reason": "进程以规定命令 `python3 app.py --port 49912 --data-dir .../data-core` 启动（processes.json epochs），service-01.log 显示仅绑定 127.0.0.1:49912 且 / 返回 200；001 快照呈现中文界面、空收藏状态与“已打开过 0 条”，六次启动 http_status 均为 200。app.py 只 import 标准库与本地 api/storage，README 声明仅依赖 Python3 标准库与 sqlite3，无账户。",
+      "evidence": [
+        "source/evidence/processes.json",
+        "source/evidence/service-01.log",
+        "source/evidence/001-R01-runtime_assertions_passed.txt",
+        "source/application/app.py",
+        "source/application/README.md"
+      ]
+    },
+    {
+      "id": "R02",
+      "outcome": "通过",
+      "reason": "A 仅填 URL 即保存成功（events 中 POST /api/bookmarks 201，body 仅 url），自动标题为 “lamp”；C 带标题“酸面包教程”、备注“周日尝试”保存。R02 刷新后 004 快照与 records 同时含 A、C，A 的 URL 保留 path/query/#details 片段，无标题记录仍可识别；002 快照显示保存反馈 toast“已保存到「未整理」”。",
+      "evidence": [
+        "source/evidence/runtime-results.json",
+        "source/evidence/002-R02-saved-A.txt",
+        "source/evidence/004-R02-runtime_assertions_passed.json",
+        "source/application/static/app.js"
+      ]
+    },
+    {
+      "id": "R03",
+      "outcome": "通过",
+      "reason": "未创建任何归类前，A、C 落入默认归类；R03 打开未整理视图（服务端 GET /api/bookmarks?category_id=1）后 005 快照恰含 A 与 C 两条，说明无须先建归类即可保存并在“未整理”找回。",
+      "evidence": [
+        "source/evidence/005-R03-runtime_assertions_passed.json",
+        "source/evidence/runtime-results.json",
+        "source/evidence/service-01.log"
+      ]
+    },
+    {
+      "id": "R04",
+      "outcome": "通过",
+      "reason": "通过 UI 新建“学习”（POST /api/categories 201；events 记录“学习”为 Created through UI），保存 B 时选择“待购”（POST body category_id=2），随后按待购浏览 008 快照只显示 B，标题/备注/URL 完整。注：adapter 如实标注“待购”为初始已存在，非本次新建，但“学习”已直接证明用户可新建归类。",
+      "evidence": [
+        "source/evidence/runtime-results.json",
+        "source/evidence/008-R04-runtime_assertions_passed.json",
+        "source/application/storage.py"
+      ]
+    },
+    {
+      "id": "R05",
+      "outcome": "通过",
+      "reason": "C（id2）与 B（id3）经编辑对话框 PUT 至“学习”（category_id=5）；刷新后 011 目的归类“学习”含 B、C 两条且标题/备注/URL 完整；012“未整理”仅剩 A；013“待购”显示 0 条空状态；014 全程 URL 集合无重复无丢失。",
+      "evidence": [
+        "source/evidence/011-R05-destination.txt",
+        "source/evidence/012-R05-unclassified-after-move.txt",
+        "source/evidence/013-R05-source-after-move.txt",
+        "source/evidence/014-R05-runtime_assertions_passed.json"
+      ]
+    },
+    {
+      "id": "R06",
+      "outcome": "通过",
+      "reason": "在“全部记录”范围搜“书架”仅得 B（015）、搜“面包”仅得 C（016），命中标题关键字；搜不存在的词得 0 条并提示“没有找到匹配的记录，换个关键字试试”（017）；清除搜索后恢复 3 条。列表头显示“搜索：<词>”，范围为全局且可理解。",
+      "evidence": [
+        "source/evidence/015-R06-书架.txt",
+        "source/evidence/016-R06-面包.txt",
+        "source/evidence/017-R06-empty-search.txt",
+        "source/application/storage.py"
+      ]
+    },
+    {
+      "id": "R07",
+      "outcome": "通过",
+      "reason": "点击标题链接（新标签）经 /open/<id> 302 跳转：A→https://example.com/item/lamp?source=collection&variant=warm#details（含 #details），B→https://example.com/item/bookshelf，C→https://example.com/tutorial/bread。events 记录到真实浏览器外链导航请求与 server-redirect resolvedTarget；实际外站加载被本地 deny 代理阻断，符合 rubric 允许。",
+      "evidence": [
+        "source/evidence/runtime-results.json",
+        "source/evidence/019-R07-runtime_assertions_passed.txt",
+        "source/application/app.py"
+      ]
+    },
+    {
+      "id": "R08",
+      "outcome": "通过",
+      "reason": "刷新后 020 静默保留 3 条及归类/字段/搜索；SIGTERM 正常停止后以同一 data-core 重启，021 显示 3 条、学习 2 条、未整理 1 条、字段与打开次数一致；以新空目录 data-isolation 启动，022 显示 0 条不混入旧记录。",
+      "evidence": [
+        "source/evidence/020-R08-refresh-persisted.txt",
+        "source/evidence/021-R08-normal-restart-persisted.txt",
+        "source/evidence/022-R08-fresh-directory-empty.txt",
+        "source/evidence/processes.json"
+      ]
+    },
+    {
+      "id": "R09",
+      "outcome": "通过",
+      "reason": "已有 3 条数据时提交空 URL：原生表单校验判定 invalid（validity=false，validationMessage“Please fill out this field”），events 中无对应 POST，未产生虚假成功记录；024 空 URL 反馈快照与 before/after 记录逐条一致，原有数据未破坏；保存/移动反馈由 toast 与更新列表体现（002/011）。",
+      "evidence": [
+        "source/evidence/runtime-results.json",
+        "source/evidence/024-R09-empty-url-feedback.txt",
+        "source/application/static/index.html",
+        "source/application/static/app.js"
+      ]
+    }
+  ],
+  "maturity": [
+    {
+      "id": "M01",
+      "observation": "崩溃恢复已测：epoch4 SIGKILL 后 epoch5 重启，026 仍见 3 条核心记录与归类。多标签页先后保存已测：两张页面分别保存 tab-one、tab-two，刷新后两条并存。重复点击已测：一次物理双击同一保存按钮产生两条完全相同 URL/标题/备注的记录（未去重，但结果一致）。",
+      "risk": "快速重复点击会生成重复条目，需人工清理；三子探针均已执行，无未测子探针。",
+      "evidence": [
+        "source/evidence/processes.json",
+        "source/evidence/026-M01-crash-recovered.txt",
+        "source/evidence/027-M01-runtime_assertions_passed.json",
+        "source/evidence/runtime-results.json"
+      ]
+    },
+    {
+      "id": "M02",
+      "observation": "带 query 与 %22 中文、#section 的 URL 原样保留；中文/空格/引号在标题、备注中作为内容保存。探针整体判定 assertion_failed_needs_review：可见标题被截到 60 字（storage MAX_NAME / index.html title maxlength=60），而测试提交的 80 次重复“长标题”更长，故断言失败；本次备注约 972 字（<MAX_TEXT=2000）未触发截断。因断言在标题处中止，第二次重复 URL 保存及 >2000 字备注两个子探针未执行。",
+      "risk": "标题上限与 UI maxlength 一致，真实用户无法输入超长标题，故标题截断不可达；但备注 textarea 无 maxlength，若粘贴 >2000 字内容可能被 storage 静默截断（该子探针未验证）。",
+      "evidence": [
+        "source/evidence/runtime-results.json",
+        "source/evidence/028-M02-assertion_failed_needs_review.txt",
+        "source/application/storage.py",
+        "source/application/static/index.html",
+        "source/test-toolchain/runtime_test.mjs"
+      ]
+    },
+    {
+      "id": "M03",
+      "observation": "端口被占用：进程以 returncode 1 退出，但 stderr 是原始 Python traceback（OSError Errno 48），非中文友好提示；数据目录不可用：exit 2 且输出“无法初始化数据目录：[Errno 17] File exists...”。两探针均未产生虚假成功，且失败后列表仍保留此前 M01/M02 记录。持久化写入故障未注入（unverified）。",
+      "risk": "端口冲突时用户仅看到堆栈，难判断原因，但无假成功、无数据破坏；存储写入故障路径未验证。",
+      "evidence": [
+        "source/evidence/probe-occupied-port.log",
+        "source/evidence/probe-unusable-data-dir.log",
+        "source/evidence/runtime-results.json",
+        "source/application/app.py"
+      ]
+    },
+    {
+      "id": "M04",
+      "observation": "标题含 <b>标题</b>、备注含 <svg onload=...> 的本地无害探针保存后，页面执行检测 executed 为 null（未执行），030 快照将 HTML 特殊字符按字面文本呈现。",
+      "risk": "未观察到脚本执行或 HTML 注入；本地无害标记已验证。",
+      "evidence": [
+        "source/evidence/runtime-results.json",
+        "source/application/static/app.js"
+      ]
+    },
+    {
+      "id": "M05",
+      "observation": "空状态提示“这里还没有记录。把浏览时看到的链接保存进来吧。”，空搜索提示“没有找到匹配的记录，换个关键字试试。”；保存、归类、未整理、搜索、打开原网页入口在 R01–R07 快照中均可见且可达。该探索无独立执行动作，仅汇总既有快照，未按审美评分。",
+      "risk": "未发现具体可用性障碍；属于探索性汇总，非独立新增探针。",
+      "evidence": [
+        "source/evidence/001-R01-runtime_assertions_passed.txt",
+        "source/evidence/017-R06-empty-search.txt",
+        "source/evidence/runtime-results.json"
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "severity": "suggestion",
+      "check": "M02",
+      "file": "source/application/storage.py",
+      "line": 262,
+      "actual": "create_bookmark 用 clean_text(title, MAX_NAME=60) 与 clean_text(note, MAX_TEXT=2000) 截断后再存（storage.py:74-80、15-17），截断无任何提示；M02 中提交的 80 段“长标题”被静默存为 60 字，故运行断言 round trip 失败。标题侧 index.html:33 有 maxlength=60 与之一致，备注侧 index.html:37 的 textarea 无 maxlength。",
+      "consequence": "超长标题经 UI 不可达，风险低；但备注超过 2000 字时可能被静默截断，用户以为整段已保存。",
+      "fix": "为备注 textarea 增加与实际存储上限一致的 maxlength（或提交前提示），或在截断时返回明确提示，避免静默丢字。",
+      "evidence": [
+        "source/application/storage.py",
+        "source/application/static/index.html",
+        "source/evidence/028-M02-assertion_failed_needs_review.txt",
+        "source/evidence/runtime-results.json"
+      ]
+    },
+    {
+      "severity": "suggestion",
+      "check": "M03",
+      "file": "source/application/app.py",
+      "line": 167,
+      "actual": "端口占用时 ThreadingHTTPServer 绑定抛出未捕获的 OSError，用户看到完整 Python traceback（probe-occupied-port.log），而数据目录失败路径在 app.py:160-164 已有中文提示。",
+      "consequence": "端口冲突时缺少可读的中文错误说明，用户难以理解失败原因；但进程非零退出、无虚假成功。",
+      "fix": "将服务绑定包入 try/except OSError，输出类似“端口 49912 已被占用”的中文提示并返回非零退出码。",
+      "evidence": [
+        "source/evidence/probe-occupied-port.log",
+        "source/application/app.py"
+      ]
+    },
+    {
+      "severity": "suggestion",
+      "check": "M01",
+      "file": "source/application/static/app.js",
+      "line": 316,
+      "actual": "同一表单一次物理双击保存按钮产生两条完全相同的 URL/标题/备注记录（runtime-results 中两条 double-save POST 均 201）。rubric 允许重复 URL 被接受或去重，此处选择接受且反馈一致。",
+      "consequence": "误双击会留下重复条目，需要用户自行删除；不构成需求失败。",
+      "fix": "如需更佳体验，可在提交期间禁用保存按钮或做短时幂等处理，并在重复时给出提示。",
+      "evidence": [
+        "source/evidence/runtime-results.json",
+        "source/evidence/027-M01-runtime_assertions_passed.json"
+      ]
+    }
+  ],
+  "limits": [
+    "单应用单次成对实验；未获取条件映射与生成日志，不能推断因果或做普遍化结论。",
+    "评测者只读：未执行程序、未实际浏览器操作，结论基于已提供的运行证据快照。",
+    "原始截图未发送给纯文本评测者，仅凭 body 快照与实际动作/事件日志判断。",
+    "M02 的“重复 URL 第二次保存”与“备注 >2000 字截断”两个子探针因断言在标题处中止而未执行，标为未验证。",
+    "M03 的人工持久化写入故障未注入（runtime 自述 unverified），只验证了端口占用与不可用数据目录两项。",
+    "M05 无独立执行动作，仅汇总既有快照，未新增上手实测。"
+  ]
+}

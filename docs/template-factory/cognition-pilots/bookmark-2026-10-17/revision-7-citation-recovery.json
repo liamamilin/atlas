@@ -1,0 +1,39 @@
+{
+  "outcome": "passed",
+  "summary": "在 P0–P2 范围内，场景主线都能通过已声明的浏览器表单、链接和 API 契约完成闭环：保存、默认归类落点、重启后持久、列表与打开原页、重复 URL 的冲突提示与显式另存、归类新建/重命名/保存时选择/行内移动、归类删除二选一、软删除→回收站→恢复、编辑、检索、归类浏览与分页；主要失败路径均有 form-error、dialog-error、错误信封和零写入约束。空库与确认清空回收站已明确标为未运行的手工项，不计为通过。",
+  "checks": [
+    {
+      "dimension": "product_completeness",
+      "outcome": "passed",
+      "files": [
+        "DRAFT.md",
+        "ARCHITECTURE.md"
+      ],
+      "reason": "P0 的首页 bookmark-form、bookmark-item/open-link、duplicate-existing-link 与 duplicate-save-form 由 A28 覆盖保存、列表、打开、重复冲突和显式另存；P1 的 category-form/category-rename-form、select[name=categoryId]、move-form、category-delete-dialog、bookmark-delete-form、trash-link、restore-submit、trash-delete-form 由 A29–A31 覆盖归类与回收站闭环；P2 的 search-form、category-link、sort-form 与 page-prev/page-next 由 A32–A33 覆盖检索、归类浏览与分页。F01–F14 均映射到当前阶段验收，失败恢复有 form-error/dialog-error 与零写入契约。"
+    }
+  ],
+  "suggestions": [
+    "为编辑表单补充“恢复自动标题”入口，或明确 title=null 重派生仅属 API 契约；当前浏览器只能提交空串并得到 400 invalid_title，用户无法从 UI 回到 derived 标题。",
+    "在 /trash 的 DOM 契约中补充原归类名与 trashedFromCategoryId/Name 的展示元素，或把 limits 中“回收站中的历史条目仍显示原归类名与来源字段”限定为 API 字段，避免展示承诺缺少浏览器接口。"
+  ],
+  "scope": "Independent static design review of declared proposal projection only; no program review, execution or publication.",
+  "citation_aliases": [
+    {
+      "reported": "source/DRAFT.md",
+      "canonical": "DRAFT.md"
+    },
+    {
+      "reported": "source/ARCHITECTURE.md",
+      "canonical": "ARCHITECTURE.md"
+    }
+  ],
+  "proposal_digest": "588f606043e48b5c366fe5400c7b1170053c01ebee22454854a53649bd31e521",
+  "projection_digest": "cdafcc5592affba56b041552a1a8b73fc6ec5c65d691da4a05e769bf39def988",
+  "stage": "blueprint-spec-review-1-product_completeness",
+  "citation_recovery": {
+    "source_job": "job_14107dcca60746dcb549fc9d2412ea90",
+    "source_attempt": 1,
+    "raw_report_sha256": "30851ab53482efb7c9a338572ab13b661fed20dd4dfcb336de029ca0fa89b696",
+    "scope": "Only exact source/ aliases normalized to provided files. Finding, outcome and reasoning unchanged. No additional model call."
+  }
+}

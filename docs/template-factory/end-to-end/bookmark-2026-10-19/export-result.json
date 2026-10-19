@@ -1,0 +1,145 @@
+{
+ "status": 201,
+ "export": {
+  "phase": "P0",
+  "project_name": "bookmark-life-p0",
+  "template_digest": "3bbcbb2a2685f188756e5b47dd27ac606f11f72359910e09023084758bd972c1",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1",
+  "download_url": "/api/factory/development-downloads/19044aeb6456450cb78dad651f1f5649",
+  "artifact_type": "product-blueprint",
+  "message": "Development handoff only; no LLM, install or application execution."
+ },
+ "cognition_review": {
+  "artifact_id": "tpl_934bc93157f948b982459a9affa72c79",
+  "checks": [
+   {
+    "dimension": "category_evidence",
+    "files": [
+     "CATEGORY.md",
+     "PRODUCT.md"
+    ],
+    "outcome": "passed",
+    "reason": "CATEGORY.md 以 S02–S27 逐条列出可核验来源与访问日期，并把“被官方文档佐证的大类事实”（一、五类）与“本场景取舍/建议”（二、三类）及“未知与弱证据”（四、五类、待验证）明确分层；类S22 记录 AGPL-3.0 文本、S10/S11/S16 记录 MIT，S02-S09/S23-S27 明示专有 SaaS 无开源许可，并区分 reuse/build/uncertain，声明最终可用性需法务确认，未做无依据主张；来源访问日期与叶子原稿研究日期（2026-09-06）被注明含义不同。"
+   },
+   {
+    "dimension": "scenario_scope",
+    "files": [
+     "PRODUCT.md",
+     "ROADMAP.md",
+     "inputs/scenario.json"
+    ],
+    "outcome": "passed",
+    "reason": "inputs/scenario.json（scn_7756e0007f6a463a97316f3f49c15248@2）的用途、受众与五步工作流与 PRODUCT.md 第3–18行一一对应；F23-F27 把全文搜索、多设备/云同步、分享协作、阅读器/未读、提醒与标注显式判为不适用，F09 私有优先、单用户本地库符合“普通网络用户、简单归类、保存-检索-回跳”；叶子中属于成熟产品的能力（浏览器扩展、云同步、公开分享、存档）被降为 P1/P2 或可选，未越出确认场景。"
+   },
+   {
+    "dimension": "product_completeness",
+    "files": [
+     "PRODUCT.md",
+     "ARCHITECTURE.md"
+    ],
+    "outcome": "passed",
+    "reason": "PRODUCT.md 定义 R01 收藏夹使用者与 R02 本地部署运维者两条用户线；F01-F09 覆盖主动捕获、默认收件箱、新建/移动归类、浏览、检索、打开原页、持久化与私有优先的正常流，A02/A10/A13 覆盖非法输入、隐藏路由不泄露与失败后库不变；数据生命周期含持久化（F08）、软删除/回收站恢复（F11）、导入导出与轻量备份（F17/F18）、R02 与 D07 的 --data-dir 整目录备份；导出（F17）、恢复（F11/D07）有对应能力，权限以 F09 私有优先默认、计费/管理/审计对单人本地场景判为不适用，未强塞企业特性。"
+   },
+   {
+    "dimension": "architecture_contract",
+    "files": [
+     "ARCHITECTURE.md",
+     "DECISIONS.md"
+    ],
+    "outcome": "passed",
+    "reason": "ARCHITECTURE.md 给出技术栈默认（标准库 http.server+sqlite3+服务端渲染）与逐项替代/理由；P0 数据模型逐字段类型/约束（collections、bookmarks）并标注 P1/P2 增量；HTTP 契约表列方法、路径、请求、成功（303 PRG）与错误（400/404），并有 UI 适配契约（表单 action/字段、li.bookmark[data-bookmark-id]、li.collection[data-collection-id][data-default]、/go 302）与“入口→动作→成功→错误→恢复”追踪表；错误页回显输入、GET 只读、区分 400/404，满足默认/理由/数据/API/错误/适配契约。"
+   },
+   {
+    "dimension": "phase_acceptance",
+    "files": [
+     "ROADMAP.md",
+     "acceptance/plan.json",
+     "acceptance/runner.json",
+     "acceptance/p0.py",
+     "acceptance/p0_core.py",
+     "acceptance/p0_find.py",
+     "acceptance/p1.py",
+     "acceptance/p2.py"
+    ],
+    "outcome": "passed",
+    "reason": "plan.json 三阶段 F01-F09↔A01-A10、F10-F16↔A11-A18、F17-F22↔A19-A25 双向覆盖一一对应，A01-A25 在实现中恰好各出现一次（p0_core A01-05、p0_find A06-10 经 p0.py 合并校验缺项/多项，p1 A11-18，p2 A19-25）；runner.json 逐例绑定 --case/--base-url/--data-dir，与 common.main 的退出码 0/1/2、stdout 单条 atlas.acceptance-result.v1 一致；用例经标准库 http.client 提交真实表单并解析真实 HTML，非空桩：A02/A10/A13/A14/A21/A22/A24 含负例与库不变性断言，A05/A06/A16 验证归类隔离，A08 断言 302 Location 等于所存 URL 且不跟随外跳。limits：A09 明确只做无状态读回、不重启进程、不读数据库（重启耐久性未验证）；A02/A13/A20/A21/A23 的 baseline-snapshot 为恒真信息断言。"
+   },
+   {
+    "dimension": "decisions_defaults",
+    "files": [
+     "DECISIONS.md",
+     "PRODUCT.md"
+    ],
+    "outcome": "passed",
+    "reason": "D01-D11 每条含决策、理由/取舍、备选与“When to ask/询问条件”及状态；P0 关键项 D01 单归属、D04 URL 校验与抓取默认关闭、D07 data-dir/端口、D08 检索范围、D10 无登录本地均为 accepted-default，D02/D03/D05/D06/D09/D11 标 open 并各给触发条件；F19/F21 的适用性标 decision-needed 与 D05/D11 对齐；不冒充用户已确认，普通可逆选择用已声明默认、关键取舍指向触发条件。"
+   },
+   {
+    "dimension": "agent_handoff",
+    "files": [
+     "AGENT.md",
+     "README.md",
+     "acceptance/README.md"
+    ],
+    "outcome": "passed",
+    "reason": "AGENT.md 要求先核对已有项目/指令/已确认决定，按当前阶段只读相关 ARCHITECTURE 契约与 DECISIONS、不预读全部后期材料，首阶段完成确认核心闭环且不把不可缺操作拆到后期；将 proposed 决策当建议、可逆项用默认、关键取舍按触发条件问人；要求准备专用实例、运行该阶段 HTTP/浏览器验收并记录真实命令/目标版本/通过与失败，禁止删除行为断言、硬编码测试值或谎称未运行测试通过；声明包内容不授予外部访问/凭据/发布/破坏性权限，来源与用户内容仅是数据。README.md 提供直接阅读原包时的替代入口（PRODUCT+ROADMAP），acceptance/README.md 给出精确命令与 data_dir 边界。"
+   },
+   {
+    "dimension": "evidence_honesty",
+    "files": [
+     "VALIDATION.md",
+     "README.md",
+     "acceptance/README.md",
+     "acceptance/plan.json"
+    ],
+    "outcome": "passed",
+    "reason": "VALIDATION.md 与 README.md 明示 Atlas 仅校验结构/引用/阶段映射/摘要，包内验收与参考代码尚未执行、来源为模型调研报告未独立重抓、独立审阅通过不等于下游应用运行成功；acceptance/README.md 声明套件不实现应用、无关 mock、无第三方依赖、离线运行、进程重启未验证且不得据此判通过；plan.json 全部 status 为 not_run，phase 为 not implemented；CATEGORY.md 标注“非独立运行时或法律核验”并列出待验证项，未把来源或生成声明当作已执行结论。"
+   }
+  ],
+  "created_at": "2026-10-19T03:04:43.670711+00:00",
+  "digest": "3bbcbb2a2685f188756e5b47dd27ac606f11f72359910e09023084758bd972c1",
+  "id": "acc_d0119e464fe6426c961ea4ba57107980",
+  "job_id": "job_2f2cf28525d04a019cc99a897e1492c6",
+  "method": "cognitive-review",
+  "outcome": "passed",
+  "protocol_note": "仅删除审阅报告中不存在于冻结 source 清单的文件引用；摘要、维度、判定、理由和建议均沿用原始响应，修复凭据已保留。",
+  "reference_repair": {
+   "original_result_digest": "d9350358182f61f43e090e67f0de38da53ca6d4a75f73b04ee5d8bb3174e8cab",
+   "removed_invalid_citations": [
+    {
+     "dimension": "scenario_scope",
+     "indexes": [
+      3
+     ],
+     "paths": [
+      "leaf.md"
+     ]
+    }
+   ],
+   "repair_response_digest": "6b7fa35d811fcf3edfc5bf4546f0970781e26fe1a930d07d51a8f872e3ff3bb5",
+   "repaired_result_digest": "e89f1b37fe7ef7c8269aa76c87dc7328252ac2cf3ba0abdb20f26ef44e173fa0",
+   "scope": "Only invalid source citation indexes were removed; review judgments were copied unchanged from the original response.",
+   "validation_error": {
+    "code": "invalid_request",
+    "message": "review cites nonexistent source file",
+    "status": 400
+   }
+  },
+  "scope": "Independent static cognition and acceptance-program review only; no program execution, source re-fetch, downstream runtime or publication.",
+  "suggestions": [
+   "把 P1/P2 的 HTTP 与适配契约补入 ARCHITECTURE.md：目前 /bookmarks/<id>/delete、/collections/<id>/rename、/collections/<id>/delete、/?tag=、li.collection 的 data-parent-id、备注渲染所用的 bookmark-note/note 类、以及 P2 的 /links/check、/bookmarks/<id>/archive、/?add=1、fetch=1 与 multipart 导入字段仅冻结在 p1.py/p2.py 文档串中，实现者不应被迫阅读测试程序才能得到契约。",
+   "修正 acceptance/README.md 中对 source/SPECIFICATION.json 的引用：该文件不在 source_inventory 中，实际契约在 ARCHITECTURE.md、实现映射在 acceptance/plan.json，应改为指向现有文件以免下游找不到规范。",
+   "移除或强化恒真断言：A02/A13/A20/A21/A23 的 baseline-snapshot 恒为 True，只作信息记录不加覆盖率，建议改为断言快照结构良好（如首页/各归类视图返回 200）或直接删除。",
+   "补充负例：ARCHITECTURE 约定“移动到未知归类→404”，但现有 A13 只覆盖未知/已删除 bookmark id，建议新增移动到未知 collection id 的 404 且库不变用例。",
+   "在 PRODUCT.md 明确记录计费/管理/审计的适用性结论（单人本地库不适用），与 CATEGORY.md 第三类保持一致，使适用性判断在产品定义层可见，而非只存在于调研报告。",
+   "保留 F08 进程重启耐久性“未验证”的诚实标注，同时把独立浏览器/重启验收列为具名的后续交付项，使该定义性主张有可追踪的验证路径；并将 D02/D03/D09 的 open 状态与已冻结的 P1 验收（A14/A12/A17）对齐，注明验收实现的是已声明默认值。"
+  ],
+  "summary": "本包为已冻结的“书签管理器（生活待购与灵感收藏夹）”认知开发蓝图，尚未实现、未执行。独立审阅结论：品类证据分层清晰（官方文档佐证事实／场景建议／未知项分离，许可与复用有标注且要求法务确认）；范围与确认场景（单用户本地库、简单归类、保存-检索-回跳）一致，超出定义的企业能力被明确列为不适用；产品定义覆盖两类用户、正常与失败流、数据生命周期与导出/恢复，并对权限/计费/管理/审计做了适用性取舍；架构给出技术栈理由、P0 数据模型、已定义路由的成功/错误契约、验收用 UI 适配契约与能力追踪；P0 首阶段即完成确认的核心闭环且 P0 用例不依赖后期 API；阶段与用例双向覆盖（F01-F22 ↔ A01-A25），runner.json 逐例绑定与实现一致、用标准库真实 HTTP 驱动、含负例与数据不变性断言；决策均有默认值与询问触发；交接说明按当前阶段推进、尊重既有决定并禁止伪报。限制：进程重启耐久性（F08 定义性主张）本套件不重启进程、仅以无状态读回佐证并如实标注未验证；P1/P2 部分路由与 UI 适配属性仅在 p1.py/p2.py 冻结，未并入 ARCHITECTURE.md；acceptance/README.md 引用不存在的 SPECIFICATION.json；少量“baseline-snapshot”断言恒真；均属需修订的完整性问题而非核心流程/安全/数据完整性阻断。未运行任何程序，不声称测试通过。"
+ },
+ "scope": "Frozen original and current-phase development package; no application execution or publication."
+}

@@ -1,15 +1,19 @@
 import concurrent.futures
 from contextlib import closing, redirect_stdout
+import hashlib
 import io
 import json
 import os
 from pathlib import Path
 import re
-import shutil
+from types import SimpleNamespace
+import socket
 import sqlite3
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 import unittest
 import zipfile
 from unittest.mock import patch
@@ -17,11 +21,24 @@ from unittest.mock import patch
 import numpy as np
 
 CODE = Path(__file__).resolve().parents[1]
+
+
+def condition_result(requirement, result, note=""):
+    return {
+        "requirement_id": requirement["id"],
+        "revision": requirement["revision"],
+        "condition": requirement["acceptance_conditions"][0],
+        "result": result,
+        **({"note": note} if note else {}),
+    }
+
+
 sys.path.insert(0, str(CODE))
 import atlas_runtime as rt
 import atlas_cli
 import classify as classifier
 import draft_new
+import drafts_api
 import gate_check
 import promote_draft as promote
 from atlas_sources import SourceError, read_source, source_manifest
@@ -35,7 +52,7 @@ from execution_service import (
     create_iteration as create_execution_iteration,
     create_task as create_execution_task,
     rebase_iteration,
-    reconcile_execution, start_execution, stop_execution,
+    reconcile_execution, reply_permission, start_execution, stop_execution,
     record_cli_run_evidence,
     cleanup_execution_workspace,
     start_cli_execution,
@@ -56,6 +73,195 @@ from handoff_bundle import build_handoff, validate_handoff, write_handoff
 from sample_package import validate_package
 from workspace_snapshot import compare_snapshots, snapshot_workspace
 from review_store import fingerprint, corpus_revision, update_review, load_review
+
+
+class ApiRequestBoundaryTests(unittest.TestCase):
+    @staticmethod
+    def handler(headers=None):
+        import drafts_api
+        handler = object.__new__(drafts_api.Handler)
+        handler.headers = headers or {'Host': 'localhost:5173'}
+        handler.path = '/api/health'
+        handler._json = lambda value, code=200: (value, code)
+        return handler
+
+    def test_local_host_and_origin_allowlist(self):
+        self.assertTrue(drafts_api._local_http_authority('localhost:5199'))
+        self.assertTrue(drafts_api._local_http_authority('127.0.0.1'))
+        self.assertTrue(drafts_api._local_http_origin('http://localhost:5173/'))
+        self.assertFalse(drafts_api._local_http_authority('attacker.example'))
+        self.assertFalse(drafts_api._local_http_authority('localhost:invalid'))
+        self.assertFalse(drafts_api._local_http_origin('https://attacker.example'))
+        handler = self.handler({
+            'Host': 'localhost:5173',
+            'Origin': 'http://localhost:5173',
+            'Sec-Fetch-Site': 'same-origin',
+        })
+        payload, code = handler.do_GET()
+        self.assertEqual(code, 200)
+        self.assertTrue(payload['ok'])
+
+    def test_request_guard_rejects_unsafe_requests(self):
+        cases = [
+            ({'Host': 'attacker.example'}, 'GET', 403),
+            ({
+                'Host': 'localhost:5173',
+                'Origin': 'https://attacker.example',
+            }, 'GET', 403),
+            ({
+                'Host': 'localhost:5173',
+                'Sec-Fetch-Site': 'cross-site',
+            }, 'GET', 403),
+            ({
+                'Host': 'localhost:5173',
+                'Content-Type': 'text/plain',
+                'Content-Length': '2',
+            }, 'POST', 415),
+            ({
+                'Host': 'localhost:5173',
+                'Content-Type': 'application/json',
+                'Transfer-Encoding': 'chunked',
+            }, 'POST', 400),
+            ({
+                'Host': 'localhost:5173',
+                'Content-Type': 'application/json',
+                'Content-Length': str(drafts_api.MAX_REQUEST_BODY_BYTES + 1),
+            }, 'POST', 413),
+            ({
+                'Host': 'localhost:5173',
+                'Content-Type': 'application/json',
+                'Content-Length': 'invalid',
+            }, 'POST', 400),
+        ]
+        for headers, method, expected in cases:
+            with self.subTest(headers=headers, method=method):
+                handler = self.handler(headers)
+                result, code = (handler.do_GET() if method == 'GET' else handler.do_POST())
+                self.assertEqual(code, expected)
+                self.assertIn('error', result)
+
+    def test_json_body_is_bounded_and_must_be_an_object(self):
+        handler = self.handler({
+            'Host': 'localhost:5173',
+            'Content-Type': 'application/json',
+            'Content-Length': '7',
+        })
+        handler.rfile = io.BytesIO(b'{"x":1}')
+        self.assertEqual(handler._body(), {'x': 1})
+
+        handler = self.handler({
+            'Host': 'localhost:5173',
+            'Content-Type': 'application/json',
+            'Content-Length': '1',
+        })
+        handler.rfile = io.BytesIO(b'[')
+        with self.assertRaisesRegex(ValueError, 'valid JSON'):
+            handler._body()
+
+        handler.headers['Content-Length'] = '2'
+        handler.rfile = io.BytesIO(b'[]')
+        with self.assertRaisesRegex(ValueError, 'must be an object'):
+            handler._body()
+
+
+class WebFetchSafetyTests(unittest.TestCase):
+    class Response:
+        def __init__(self, status, headers=None, body=b''):
+            self.status = status
+            self.headers = headers or {}
+            self.body = body
+
+        def getheader(self, name, default=None):
+            for key, value in self.headers.items():
+                if key.lower() == name.lower():
+                    return value
+            return default
+
+        def read(self, amount=None):
+            return self.body if amount is None else self.body[:amount]
+
+    class Connection:
+        def __init__(self, response):
+            self.response = response
+            self.request_args = None
+            self.closed = False
+
+        def request(self, method, target, headers=None):
+            self.request_args = (method, target, headers or {})
+
+        def getresponse(self):
+            return self.response
+
+        def close(self):
+            self.closed = True
+
+    def test_web_fetch_extracts_text_through_validated_pinned_connection(self):
+        connection = self.Connection(self.Response(
+            200, {'Content-Type': 'text/html; charset=utf-8'},
+            b'<html><style>hidden</style><script>bad()</script>'
+            b'<h1>Public research</h1><p>Useful evidence.</p></html>'))
+        with patch.object(drafts_api, '_resolve_public_addresses',
+                          return_value=['93.184.216.34']), \
+             patch.object(drafts_api, '_pinned_web_connection', return_value=connection):
+            result = drafts_api._fetch_text('https://example.com/research')
+        self.assertEqual(result, 'Public research Useful evidence.')
+        self.assertEqual(connection.request_args[0], 'GET')
+        self.assertEqual(connection.request_args[1], '/research')
+        self.assertEqual(connection.request_args[2]['Host'], 'example.com')
+        self.assertTrue(connection.closed)
+
+    def test_web_fetch_rejects_non_http_credentials_and_local_targets(self):
+        unsafe = [
+            'file:///etc/passwd',
+            'ftp://example.com/research',
+            'https://user:secret@example.com/research',
+            'http://127.0.0.1/internal',
+            'http://10.0.0.1/internal',
+            'http://169.254.169.254/latest/meta-data/',
+            'http://[::1]/internal',
+        ]
+        for url in unsafe:
+            with self.subTest(url=url), self.assertRaises(ValueError):
+                drafts_api._fetch_text(url)
+
+    def test_web_fetch_revalidates_redirect_targets(self):
+        redirect = self.Connection(self.Response(
+            302, {'Location': 'http://127.0.0.1/private'}))
+        with patch.object(drafts_api, '_resolve_public_addresses',
+                          return_value=['93.184.216.34']), \
+             patch.object(drafts_api, '_pinned_web_connection', return_value=redirect) as connection:
+            with self.assertRaisesRegex(ValueError, 'private, local, or reserved'):
+                drafts_api._fetch_text('https://example.com/start')
+        self.assertTrue(redirect.closed)
+        self.assertEqual(connection.call_count, 1)
+
+    def test_web_fetch_rejects_mixed_dns_binary_and_oversized_responses(self):
+        mixed_dns = [
+            (socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP, '', ('93.184.216.34', 443)),
+            (socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP, '', ('127.0.0.1', 443)),
+        ]
+        with patch.object(drafts_api.socket, 'getaddrinfo', return_value=mixed_dns):
+            with self.assertRaisesRegex(ValueError, 'private, local, or reserved'):
+                drafts_api._resolve_public_addresses('mixed.example', 443)
+
+        binary = self.Connection(self.Response(
+            200, {'Content-Type': 'application/octet-stream'}, b'binary'))
+        with patch.object(drafts_api, '_resolve_public_addresses',
+                          return_value=['93.184.216.34']), \
+             patch.object(drafts_api, '_pinned_web_connection', return_value=binary):
+            with self.assertRaisesRegex(ValueError, 'supported text format'):
+                drafts_api._fetch_text('https://example.com/file')
+
+        oversized = self.Connection(self.Response(
+            200, {
+                'Content-Type': 'text/plain',
+                'Content-Length': str(drafts_api.WEB_FETCH_MAX_BYTES + 1),
+            }, b'x'))
+        with patch.object(drafts_api, '_resolve_public_addresses',
+                          return_value=['93.184.216.34']), \
+             patch.object(drafts_api, '_pinned_web_connection', return_value=oversized):
+            with self.assertRaisesRegex(ValueError, 'too large'):
+                drafts_api._fetch_text('https://example.com/large')
 
 
 class SourceReadingTests(unittest.TestCase):
@@ -93,6 +299,17 @@ class SourceReadingTests(unittest.TestCase):
         self.assertTrue(second['complete'])
         self.assertEqual(first['content'] + second['content'], self.research)
         self.assertEqual(first['fingerprint'], second['fingerprint'])
+
+    def test_missing_source_manifest_returns_a_stable_empty_contract(self):
+        import drafts_api
+        handler = object.__new__(drafts_api.Handler)
+        handler.headers = {'Host': 'localhost:5173'}
+        handler.path = '/api/sources/missing-type'
+        handler._json = lambda value, code=200: (value, code)
+        with patch.object(drafts_api, 'PACK', str(self.pack)):
+            payload, code = handler.do_GET()
+        self.assertEqual(code, 200)
+        self.assertEqual(payload, {'slug': 'missing-type', 'sources': []})
 
     def test_invalid_paths_and_offsets_fail_closed(self):
         with self.assertRaises(SourceError):
@@ -145,6 +362,24 @@ class OpenCodeClientTests(unittest.TestCase):
         self.assertEqual([item['id'] for item in result['pending_questions']], ['que_one'])
         self.assertEqual(result['engine_diff'], [])
 
+    def test_reconcile_treats_missing_diff_as_empty(self):
+        self.responses.extend([
+            {'ses_abc': {'type': 'busy'}},
+            {'id': 'ses_abc'},
+            [{'info': {'id': 'msg_one'}, 'parts': []}],
+            [],
+            [{'id': 'per_one', 'sessionID': 'ses_abc'}],
+            [{'id': 'que_one', 'sessionID': 'ses_abc'}],
+        ])
+        with patch.object(self.client, 'diff', side_effect=OpenCodeError(404, 'not ready')), \
+             patch.object(self.client, 'pending_permissions', side_effect=OpenCodeError(404, 'not ready')), \
+             patch.object(self.client, 'pending_questions', side_effect=OpenCodeError(404, 'not ready')):
+            result = self.client.reconcile('ses_abc')
+        self.assertEqual(result['engine_diff'], [])
+        self.assertEqual(result['pending_permissions'], [])
+        self.assertEqual(result['pending_questions'], [])
+        self.assertEqual(result['status']['type'], 'busy')
+
     def test_permission_reply_uses_current_nondeprecated_endpoint(self):
         self.responses.append(True)
         self.assertTrue(self.client.reply_permission('per_abc', 'once'))
@@ -177,6 +412,72 @@ class OpenCodeClientTests(unittest.TestCase):
         events = list(self.client.events(raw, 'ses_abc'))
         self.assertEqual([event['type'] for event in events], ['server.connected', 'session.status'])
         self.assertEqual(len(list(iter_sse(io.BytesIO(b'data: {"ok":true}\n\n')))), 1)
+
+    def test_v2_transport_uses_api_auth_and_normalizes_messages(self):
+        client = OpenCodeClient(
+            'http://127.0.0.1:4098', '/tmp/project',
+            major_version=2, username='opencode', password='v2-secret',
+            permissions=[{'action': 'shell', 'resource': '*', 'effect': 'deny'}])
+        # Use the same small response adapter as the V1 tests, with an explicit
+        # opener so the request sequence remains inspectable.
+        def opener(request, timeout):
+            self.requests.append((request, timeout))
+            return self.Response(self.responses.pop(0))
+        client._opener = opener
+        self.responses.extend([
+            {'version': '2.0.13', 'pid': 1, 'urls': [], 'paths': {'tmp': '/tmp'}},
+            {'data': {'id': 'ses_v2', 'title': 'probe'}},
+            None, None,
+            {'data': {'id': 'msg_v2', 'sessionID': 'ses_v2', 'type': 'user',
+                      'payload': {'text': 'hello'}}},
+            {'data': {'ses_v2': {'type': 'running'}}},
+            {'data': {'id': 'ses_v2'}},
+            {'data': [
+                {'id': 'msg_a', 'type': 'assistant', 'time': {'completed': 1},
+                 'finish': 'stop', 'content': [{'type': 'text', 'text': 'done'}]},
+                {'id': 'msg_v2', 'type': 'user', 'text': 'hello'},
+            ], 'cursor': {}},
+            {'data': []}, {'data': []}, {'data': []},
+        ])
+        self.assertEqual(client.health()['version'], '2.0.13')
+        session = client.create_session('probe')
+        self.assertEqual(session['id'], 'ses_v2')
+        result = client.send_message_async(
+            'ses_v2', 'hello', 'opencode-go', 'space-bunny-free')
+        self.assertEqual(result['id'], 'msg_v2')
+        current = client.reconcile('ses_v2')
+        self.assertEqual(current['status']['type'], 'running')
+        self.assertEqual(current['messages'][1]['info']['parentID'], 'msg_v2')
+        self.assertEqual(current['messages'][1]['parts'][0]['text'], 'done')
+        request_paths = [request.full_url for request, _ in self.requests]
+        self.assertTrue(all('/api/' in path for path in request_paths))
+        self.assertIn('Authorization', self.requests[0][0].headers)
+        self.assertTrue(self.requests[0][0].headers['Authorization'].startswith('Basic '))
+        self.assertEqual(
+            json.loads(self.requests[1][0].data)['location'],
+            {'directory': '/tmp/project'})
+        self.assertEqual(
+            json.loads(self.requests[1][0].data)['permissions'],
+            [{'action': 'shell', 'resource': '*', 'effect': 'deny'}])
+
+    def test_v2_permission_and_form_replies_use_session_scoped_endpoints(self):
+        client = OpenCodeClient(
+            'http://127.0.0.1:4098', '/tmp/project', major_version=2,
+            username='opencode', password='v2-secret')
+        requests = []
+        def opener(request, timeout):
+            requests.append(request)
+            if request.method == 'GET':
+                return self.Response(
+                    {'data': [{'id': 'frm_v2', 'sessionID': 'ses_v2', 'title': 'Choose',
+                               'fields': [{'key': 'option', 'type': 'string'}]}]})
+            return self.Response(None)
+        client._opener = opener
+        forms = client.pending_questions('ses_v2')
+        self.assertEqual(forms[0]['id'], 'frm_v2')
+        client.reply_question('frm_v2', [['yes']], session_id='ses_v2')
+        self.assertIn('/api/session/ses_v2/form/frm_v2/reply', requests[1].full_url)
+        self.assertEqual(json.loads(requests[1].data), {'answer': {'option': 'yes'}})
 
     def test_rejects_remote_servers_and_invalid_ids(self):
         with self.assertRaises(ValueError):
@@ -223,6 +524,18 @@ class WorkspaceSnapshotTests(unittest.TestCase):
         self.assertEqual(result['files']['link']['kind'], 'symlink')
         self.assertEqual(result['files']['link']['target'], 'keep.txt')
 
+    def test_snapshot_rejects_broad_roots_and_resource_limits(self):
+        with self.assertRaisesRegex(ValueError, 'too broad'):
+            snapshot_workspace('/')
+        with self.assertRaisesRegex(ValueError, 'too broad'):
+            snapshot_workspace(Path.home())
+        with patch('workspace_snapshot.MAX_SNAPSHOT_FILES', 1):
+            with self.assertRaisesRegex(ValueError, 'file count'):
+                snapshot_workspace(self.root)
+        with patch('workspace_snapshot.MAX_SNAPSHOT_BYTES', 1):
+            with self.assertRaisesRegex(ValueError, 'byte limit'):
+                snapshot_workspace(self.root)
+
     def test_different_roots_cannot_be_compared(self):
         before = snapshot_workspace(self.root)
         with tempfile.TemporaryDirectory() as other:
@@ -251,6 +564,16 @@ class ExecutionStateTests(unittest.TestCase):
         }, 'msg_user')
         self.assertEqual(result['state'], 'completed')
         self.assertEqual(result['evidence']['message_id'], 'msg_answer')
+
+    def test_partial_assistant_message_without_terminal_outcome_stays_running(self):
+        result = project_execution({
+            'status': {'type': 'idle'},
+            'session': {'outcome': None},
+            'messages': [{'info': {
+                'id': 'msg_partial', 'parentID': 'msg_user', 'role': 'assistant',
+            }}],
+        }, 'msg_user')
+        self.assertEqual(result['state'], 'running')
 
     def test_idle_alone_is_not_completion(self):
         result = project_execution({'status': {'type': 'idle'}, 'messages': []}, 'msg_missing')
@@ -337,6 +660,79 @@ class ProjectStoreTests(unittest.TestCase):
             for table in ('project', 'reference', 'requirement', 'decision', 'document',
                           'document_version', 'task', 'execution', 'workspace_snapshot'):
                 self.assertEqual(con.execute(f'SELECT COUNT(*) FROM {table}').fetchone()[0], 0)
+
+    def test_project_delete_blocks_an_applying_result(self):
+        task = self.store.create_task(
+            self.project['id'], 'Apply result', 'Apply a reviewed result', kind='code')
+        execution = self.store.create_execution(
+            task['id'], 'opencode', 'ses_apply_delete', application_status='pending')
+        self.store.update_execution(execution['id'], {'state': 'completed'})
+        self.store.record_execution_application(
+            execution['id'], 'applying', {'apply_intent': {'after_snapshot_id': 'snap_pending'}})
+        with self.assertRaisesRegex(ProjectStoreError, 'unresolved execution result'):
+            self.store.delete_project(self.project['id'])
+        with self.assertRaisesRegex(ProjectStoreError, 'already being applied'):
+            self.store.record_execution_application(
+                execution['id'], 'applying', {'retry': True})
+        self.store.record_execution_application(execution['id'], 'superseded', {'error': 'test'})
+        result = self.store.delete_project(self.project['id'])
+        self.assertTrue(result['deleted'])
+
+    def test_project_delete_uses_generation_lifecycle_lock(self):
+        import drafts_api
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'source-v1',
+            excerpt='Fixed evidence', read_status='read')
+        run = prepare_generation(self.store, self.project['id'], 'analysis')
+        entered = threading.Event()
+        release = threading.Event()
+
+        def runner(directory, _run):
+            request = json.loads((directory / 'input.json').read_text())
+            entered.set()
+            release.wait(5)
+            return ({
+                'input_fingerprint': request['input_fingerprint'],
+                'questions': [], 'requirements': [], 'conflicts': [], 'suggestions': [],
+                'documents': [{
+                    'document_id': None, 'kind': 'analysis', 'title': 'Analysis',
+                    'content': '# Analysis\n\nFixed evidence.',
+                    'basis': [{'kind': 'reference', 'id': reference['id']}],
+                }],
+            }, {'engine_session_id': 'ses_lifecycle'})
+
+        worker = threading.Thread(
+            target=execute_generation,
+            args=(self.store, self.project['id'], run['id']),
+            kwargs={'runner': runner},
+        )
+        worker.start()
+        self.assertTrue(entered.wait(2))
+        with self.assertRaisesRegex(ProjectStoreError, 'active generation|lifecycle'):
+            drafts_api.delete_project(
+                self.project['id'], {'confirm': self.project['id']}, store=self.store)
+        self.assertTrue(self.store.get_project(self.project['id']))
+        release.set()
+        worker.join(5)
+        self.assertFalse(worker.is_alive())
+        result = drafts_api.delete_project(
+            self.project['id'], {'confirm': self.project['id']}, store=self.store)
+        self.assertTrue(result['deleted'])
+
+    def test_artifact_cleanup_does_not_follow_symlink_roots(self):
+        import drafts_api
+        outside = self.root / 'outside'
+        outside.mkdir()
+        target = outside / self.project['id']
+        target.mkdir()
+        (target / 'keep.txt').write_text('keep')
+        root = self.root / 'exports'
+        root.symlink_to(outside, target_is_directory=True)
+        removed, error = drafts_api._remove_project_artifact_root(
+            root, self.project['id'])
+        self.assertFalse(removed)
+        self.assertIn('symlink', error)
+        self.assertTrue((target / 'keep.txt').exists())
 
     def test_empty_workspace_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'workspace'):
@@ -583,6 +979,8 @@ class ProjectStoreTests(unittest.TestCase):
             requirements = bundle.read('requirements.md').decode()
             source_name = next(name for name in names if name.startswith('sources/'))
             source = bundle.read(source_name).decode()
+        self.assertIn('acceptance-migration.json', names)
+        self.assertEqual(exported['manifest']['legacy_acceptance_migration']['total_bindings'], 0)
         self.assertIn('Product requirements', index)
         self.assertIn('User confirmation: `pending`', requirements)
         self.assertIn('AI recommendation: `current`', requirements)
@@ -801,6 +1199,73 @@ class ProjectStoreTests(unittest.TestCase):
             confirm_stale=True)
         self.assertEqual(confirmed['created']['kind'], 'analysis')
         self.assertEqual(len(self.store.list_documents(self.project['id'])), 1)
+
+    def test_generation_without_basis_fingerprint_fails_closed(self):
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'source-v1',
+            excerpt='Fixed evidence')
+        run = prepare_generation(self.store, self.project['id'], 'analysis')
+        directory = (self.store.path.parent / 'generation-runs' /
+                     self.project['id'] / run['id'])
+        request = json.loads((directory / 'input.json').read_text())
+
+        def runner(_directory, _run):
+            return ({
+                'input_fingerprint': request['input_fingerprint'],
+                'questions': [], 'conflicts': [], 'suggestions': [],
+                'requirements': [{
+                    'key': 'unknown-basis', 'content': 'Require explicit review',
+                    'recommended_scope': 'current', 'recommendation_reason': 'fixed',
+                    'acceptance_conditions': ['Reviewed'], 'reference_ids': [reference['id']],
+                }], 'documents': [{
+                    'document_id': None, 'kind': 'analysis', 'title': 'Analysis',
+                    'content': '# Analysis\n\nVerified.', 'basis': [{'kind': 'reference', 'id': reference['id']}],
+                }],
+            }, {'engine_session_id': 'ses_unknown'})
+
+        execute_generation(self.store, self.project['id'], run['id'], runner=runner)
+        stored = json.loads((directory / 'run.json').read_text())
+        stored.pop('basis_fingerprint', None)
+        (directory / 'run.json').write_text(json.dumps(stored))
+        with self.assertRaisesRegex(ProjectStoreError, 'unknown'):
+            apply_generation_item(
+                self.store, self.project['id'], run['id'], 'requirement', 0)
+        applied = apply_generation_item(
+            self.store, self.project['id'], run['id'], 'requirement', 0,
+            confirm_stale=True)
+        self.assertTrue(applied['created']['id'])
+
+    def test_generation_staleness_tracks_confirmation_and_document_state(self):
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'source-v1',
+            excerpt='Fixed evidence')
+        requirement = self.store.create_requirement(
+            self.project['id'], 'Keep the accepted scope', 'current', 'Supported',
+            ['Scope is confirmed'], [reference['id']])
+        confirmation_run = prepare_generation(self.store, self.project['id'], 'analysis')
+        self.assertFalse(generation_staleness(
+            self.store, self.project['id'], confirmation_run)['stale'])
+        self.store.confirm_requirement(requirement['id'], 'current', 'Approved')
+        self.assertTrue(generation_staleness(
+            self.store, self.project['id'], confirmation_run)['stale'])
+
+        document = self.store.create_document(
+            self.project['id'], 'analysis', 'Analysis', 'Initial analysis',
+            [{'kind': 'reference', 'id': reference['id']}])
+        approval_run = prepare_generation(self.store, self.project['id'], 'analysis')
+        self.assertFalse(generation_staleness(
+            self.store, self.project['id'], approval_run)['stale'])
+        self.store.review_document(
+            self.project['id'], document['id'], 'approved', 'Reviewed')
+        self.assertTrue(generation_staleness(
+            self.store, self.project['id'], approval_run)['stale'])
+
+        version_run = prepare_generation(self.store, self.project['id'], 'analysis')
+        self.store.add_document_version(
+            document['id'], 'Newer analysis', document['basis'],
+            expected_current_version=1, change_summary='Changed after generation')
+        self.assertTrue(generation_staleness(
+            self.store, self.project['id'], version_run)['stale'])
 
     def test_value_analysis_is_advisory_grounded_and_never_changes_scope(self):
         reference = self.store.add_reference(
@@ -1133,8 +1598,9 @@ class ProjectStoreTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'fingerprint'):
             execute_generation(
                 self.store, self.project['id'], run['id'], runner=wrong_fingerprint)
-        self.assertEqual(
-            read_generation(self.store, self.project['id'], run['id'])['status'], 'failed')
+        failed_run = read_generation(self.store, self.project['id'], run['id'])
+        self.assertEqual(failed_run['status'], 'failed')
+        self.assertEqual(failed_run['error_code'], 'invalid_result')
 
         second = prepare_generation(self.store, self.project['id'], 'analysis')
         directory = (self.store.path.parent / 'generation-runs' /
@@ -1264,7 +1730,7 @@ class ProjectStoreTests(unittest.TestCase):
         self.store.add_document_version(
             document['id'], '# PRD\n\nNewer human edit', document['basis'],
             expected_current_version=1, author='human', change_summary='Edited while AI ran')
-        with self.assertRaisesRegex(ProjectStoreError, 'version conflict'):
+        with self.assertRaisesRegex(ProjectStoreError, 'stale'):
             apply_generation_item(
                 self.store, self.project['id'], run['id'], 'document', 0)
         self.assertEqual(self.store.get_document(document['id'])['content'],
@@ -1459,7 +1925,7 @@ class ProjectStoreTests(unittest.TestCase):
             document['id'], stale_source['content'] + '\nExternal edit.\n', stale_source['basis'],
             expected_current_version=stale_source['current_version'], author='human',
             change_summary='Edited while revision ran')
-        with self.assertRaisesRegex(ProjectStoreError, 'version conflict'):
+        with self.assertRaisesRegex(ProjectStoreError, 'stale'):
             apply_generation_item(
                 self.store, self.project['id'], stale['id'], 'document', 0)
 
@@ -1580,6 +2046,24 @@ class ProjectStoreTests(unittest.TestCase):
                 'kind': 'app', 'slug': 'sample-app', 'section': 'details',
             }, self.store, pack)
 
+    def test_source_reference_rejects_a_stale_displayed_fingerprint(self):
+        import drafts_api
+        pack = self.root / 'source-pack'
+        (pack / 'applications').mkdir(parents=True)
+        (pack / 'research').mkdir()
+        (pack / 'applications' / 'sample.md').write_text('# Sample\n\nFixed body\n')
+        with self.assertRaisesRegex(drafts_api.SourceRevisionConflict, 'source changed'):
+            drafts_api.collect_atlas_reference(self.project['id'], {
+                'kind': 'application', 'slug': 'sample',
+                'expected_fingerprint': '0' * 64,
+            }, self.store, pack)
+        saved = drafts_api.collect_atlas_reference(self.project['id'], {
+            'kind': 'application', 'slug': 'sample',
+            'expected_fingerprint': drafts_api._read_complete_source(
+                'sample', 'application', None, pack)['fingerprint'],
+        }, self.store, pack)
+        self.assertEqual(saved['source_ref'], 'sample')
+
     def test_execution_updates_task_and_keeps_raw_projection(self):
         document = self.store.create_document(self.project['id'], 'plan', 'Plan', 'content')
         task = self.store.create_task(self.project['id'], 'Implement', 'Do work',
@@ -1596,8 +2080,31 @@ class ProjectStoreTests(unittest.TestCase):
         self.assertEqual(stored_task['execution_status'], 'waiting_permission')
         self.assertEqual(stored_task['acceptance_status'], 'pending')
 
+    def test_late_execution_update_does_not_overwrite_latest_task_status(self):
+        task = self.store.create_task(
+            self.project['id'], 'Concurrent executions', 'Keep latest state',
+            kind='analysis')
+        first = self.store.create_execution(task['id'], 'opencode', 'ses_first')
+        self.store.update_execution(first['id'], {
+            'state': 'completed', 'engine_status': 'idle', 'evidence': {},
+        })
+        second = self.store.create_execution(task['id'], 'opencode', 'ses_second')
+        self.store.update_execution(first['id'], {
+            'state': 'completed', 'engine_status': 'idle', 'evidence': {},
+        })
+        self.assertEqual(self.store.get_task(task['id'])['execution_status'], 'queued')
+        self.store.update_execution(second['id'], {
+            'state': 'running', 'engine_status': 'busy', 'evidence': {},
+        })
+        self.assertEqual(self.store.get_task(task['id'])['execution_status'], 'running')
+        self.store.update_execution(second['id'], {
+            'state': 'completed', 'engine_status': 'idle', 'evidence': {},
+        })
+        self.assertEqual(self.store.get_task(task['id'])['execution_status'], 'completed')
+
     def test_execution_completion_does_not_imply_acceptance(self):
-        task = self.store.create_task(self.project['id'], 'Implement', 'Do work')
+        task = self.store.create_task(
+            self.project['id'], 'Review', 'Inspect the evidence', kind='analysis')
         execution = self.store.create_execution(task['id'], 'opencode', 'ses_example')
         self.store.update_execution(execution['id'], {
             'state': 'completed', 'engine_status': 'idle',
@@ -1609,6 +2116,310 @@ class ProjectStoreTests(unittest.TestCase):
         accepted = self.store.record_acceptance(
             task['id'], 'passed', [{'kind': 'test', 'summary': '42 tests passed'}])
         self.assertEqual(accepted['acceptance_status'], 'passed')
+
+    def test_acceptance_records_server_owned_execution_and_input_binding(self):
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'source-v1',
+            excerpt='Fixed evidence', read_status='read')
+        requirement = self.store.create_requirement(
+            self.project['id'], 'Keep the evidence visible', 'current', 'Relevant',
+            ['The evidence remains pinned'], [reference['id']])
+        self.store.confirm_requirement(requirement['id'], 'current', 'Approved')
+        document = self.store.create_document(
+            self.project['id'], 'analysis', 'Analysis plan', 'Review the evidence',
+            [{'kind': 'reference', 'id': reference['id']}])
+        task = self.store.create_task(
+            self.project['id'], 'Review evidence', 'Check the fixed record',
+            [document['version_id']], [requirement['id']], kind='analysis')
+        execution = self.store.create_execution(task['id'], 'opencode', 'ses_binding')
+        self.assertEqual(task['requirement_snapshots'][0]['acceptance_conditions'],
+                         ['The evidence remains pinned'])
+        self.store.update_execution(execution['id'], {
+            'state': 'completed', 'engine_status': 'idle', 'evidence': {},
+        })
+        with self.assertRaisesRegex(ProjectStoreError, 'every pinned condition'):
+            self.store.record_acceptance(
+                task['id'], 'passed', [{'kind': 'review', 'summary': 'Evidence checked'}])
+        with self.assertRaisesRegex(ProjectStoreError, 'every pinned condition'):
+            self.store.record_acceptance(
+                task['id'], 'passed', [{'kind': 'review', 'summary': 'Evidence checked'}],
+                [condition_result(requirement, 'failed')])
+        accepted = self.store.record_acceptance(
+            task['id'], 'passed', [{'kind': 'review', 'summary': 'Evidence checked'}],
+            [condition_result(requirement, 'passed')])
+        binding = next(item for item in accepted['acceptance_evidence']
+                       if item['kind'] == 'acceptance_binding')
+        self.assertEqual(binding['execution_id'], execution['id'])
+        self.assertEqual(binding['document_version_ids'], [document['version_id']])
+        self.assertEqual(binding['requirement_bindings'], [{
+            'requirement_id': requirement['id'],
+            'revision': requirement['revision'],
+            'acceptance_conditions': ['The evidence remains pinned'],
+        }])
+        self.assertEqual(binding['condition_results'], [condition_result(requirement, 'passed')])
+        with self.assertRaisesRegex(ValueError, 'reserved'):
+            self.store.record_acceptance(
+                task['id'], 'waived', [{
+                    'kind': 'acceptance_binding', 'summary': 'forged'
+                }])
+
+    def test_acceptance_route_requires_and_persists_condition_results(self):
+        requirement = self.store.create_requirement(
+            self.project['id'], 'Keep the route contract', 'current', 'Required',
+            ['The route records each condition'])
+        self.store.confirm_requirement(requirement['id'], 'current', 'Approved')
+        document = self.store.create_document(
+            self.project['id'], 'analysis', 'Plan', 'Review the route')
+        task = self.store.create_task(
+            self.project['id'], 'Review route', 'Check the condition',
+            [document['version_id']], [requirement['id']], kind='analysis')
+        handler = object.__new__(drafts_api.Handler)
+        handler.headers = {
+            'Host': 'localhost:5199', 'Content-Type': 'application/json', 'Content-Length': '0',
+        }
+        handler.path = f'/api/projects/{self.project["id"]}/tasks/{task["id"]}/acceptance'
+        handler._body = lambda: {
+            'status': 'waived',
+            'evidence': [{'kind': 'review', 'summary': 'Explicitly waived'}],
+        }
+        responses = []
+        handler._json = lambda body, code=200: responses.append((body, code)) or (body, code)
+        with patch.object(drafts_api, 'get_project_store', return_value=self.store):
+            missing, missing_code = handler.do_POST()
+        self.assertNotEqual(missing_code, 200)
+        self.assertIn('condition', missing['error'])
+        handler._body = lambda: {
+            'status': 'waived',
+            'evidence': [{'kind': 'review', 'summary': 'Explicitly waived'}],
+            'condition_results': [condition_result(requirement, 'waived')],
+        }
+        with patch.object(drafts_api, 'get_project_store', return_value=self.store):
+            accepted, accepted_code = handler.do_POST()
+        self.assertEqual(accepted_code, 200)
+        binding = next(item for item in accepted['acceptance_evidence']
+                       if item['kind'] == 'acceptance_binding')
+        self.assertEqual(binding['condition_results'], [condition_result(requirement, 'waived')])
+
+    def test_legacy_acceptance_migration_is_dry_run_explicit_and_idempotent(self):
+        requirement = self.store.create_requirement(
+            self.project['id'], 'Keep the legacy condition', 'current', 'Required',
+            ['The legacy condition remains visible'])
+        self.store.confirm_requirement(requirement['id'], 'current', 'Approved')
+        task = self.store.create_task(
+            self.project['id'], 'Review legacy', 'Check the old record',
+            requirement_ids=[requirement['id']], kind='analysis')
+        accepted = self.store.record_acceptance(
+            task['id'], 'waived', [{'kind': 'review', 'summary': 'Legacy review'}],
+            [condition_result(requirement, 'waived')])
+        binding = next(item for item in accepted['acceptance_evidence']
+                       if item['kind'] == 'acceptance_binding')
+        binding.pop('condition_results')
+        with sqlite3.connect(self.store.path) as con:
+            con.execute(
+                'UPDATE task SET acceptance_evidence_json=? WHERE id=?',
+                (json.dumps([{'kind': 'review', 'summary': 'Legacy review'}, binding]),
+                 task['id']))
+            con.commit()
+        report = self.store.legacy_acceptance_migration(self.project['id'])
+        self.assertEqual(report['summary']['not_backfilled'], 1)
+        record = next(item for item in report['records'] if item['task_id'] == task['id'])
+        self.assertEqual(record['missing_conditions'][0]['condition'],
+                         'The legacy condition remains visible')
+        with self.assertRaisesRegex(ProjectStoreError, 'confirm'):
+            self.store.backfill_legacy_acceptance(self.project['id'], 'wrong')
+        migrated = self.store.backfill_legacy_acceptance(
+            self.project['id'], 'backfill_legacy_acceptance_metadata')
+        self.assertEqual(migrated['backfilled_task_ids'], [task['id']])
+        migrated_task = self.store.get_task(task['id'])
+        migrated_binding = next(item for item in migrated_task['acceptance_evidence']
+                                if item['kind'] == 'acceptance_binding')
+        self.assertEqual(migrated_binding['condition_results'], [])
+        self.assertEqual(migrated_binding['condition_results_status'], 'not_backfilled')
+        self.assertEqual(migrated_task['acceptance_status'], 'waived')
+        again = self.store.backfill_legacy_acceptance(
+            self.project['id'], 'backfill_legacy_acceptance_metadata')
+        self.assertEqual(again['backfilled_task_ids'], [])
+        self.assertEqual(again['summary']['backfilled'], 1)
+
+    def test_legacy_acceptance_migration_routes_require_confirmation(self):
+        import drafts_api
+        requirement = self.store.create_requirement(
+            self.project['id'], 'Route migration condition', 'current', 'Required',
+            ['The old route record remains explicit'])
+        self.store.confirm_requirement(requirement['id'], 'current', 'Approved')
+        task = self.store.create_task(
+            self.project['id'], 'Legacy route task', 'Review old record',
+            requirement_ids=[requirement['id']], kind='analysis')
+        accepted = self.store.record_acceptance(
+            task['id'], 'waived', [{'kind': 'review', 'summary': 'Legacy route review'}],
+            [condition_result(requirement, 'waived')])
+        evidence = accepted['acceptance_evidence']
+        binding = next(item for item in evidence if item['kind'] == 'acceptance_binding')
+        binding.pop('condition_results')
+        with sqlite3.connect(self.store.path) as con:
+            con.execute('UPDATE task SET acceptance_evidence_json=? WHERE id=?',
+                        (json.dumps(evidence), task['id']))
+            con.commit()
+        handler = object.__new__(drafts_api.Handler)
+        handler._json = lambda value, code=200: (value, code)
+        with patch.object(drafts_api, 'get_project_store', return_value=self.store):
+            handler.path = f'/api/projects/{self.project["id"]}/acceptance-migration'
+            report, code = handler.do_GET()
+            self.assertEqual(code, 200)
+            self.assertEqual(report['summary']['not_backfilled'], 1)
+            handler.path = (
+                f'/api/projects/{self.project["id"]}/acceptance-migration/backfill')
+            handler._body = lambda: {'confirm': 'wrong'}
+            rejected, code = handler.do_POST()
+            self.assertEqual(code, 400)
+            self.assertIn('confirmation', rejected['error'])
+            handler._body = lambda: {'confirm': 'backfill_legacy_acceptance_metadata'}
+            migrated, code = handler.do_POST()
+            self.assertEqual(code, 200)
+            self.assertEqual(migrated['backfilled_task_ids'], [task['id']])
+
+    def test_passed_acceptance_requires_a_completed_and_applied_execution(self):
+        task = self.store.create_task(
+            self.project['id'], 'Implement', 'Do work', kind='code')
+        with self.assertRaisesRegex(ProjectStoreError, 'requires a completed execution'):
+            self.store.record_acceptance(
+                task['id'], 'passed', [{'kind': 'review', 'summary': 'Looks good'}])
+        execution = self.store.create_execution(
+            task['id'], 'opencode', 'ses_apply', application_status='pending')
+        self.store.update_execution(execution['id'], {
+            'state': 'completed', 'engine_status': 'idle', 'evidence': {}})
+        with self.assertRaisesRegex(ProjectStoreError, 'apply the isolated execution result'):
+            self.store.record_acceptance(
+                task['id'], 'passed', [{'kind': 'review', 'summary': 'Looks good'}])
+        self.store.record_execution_application(execution['id'], 'applied', {})
+        with self.assertRaisesRegex(ProjectStoreError, 'accepted workspace baseline'):
+            self.store.record_acceptance(
+                task['id'], 'passed', [{'kind': 'review', 'summary': 'Looks good'}])
+        workspace = Path(self.project['workspace'])
+        workspace.mkdir(parents=True, exist_ok=True)
+        baseline = capture_project_baseline(self.store, self.project['id'], [])
+        newer = capture_project_baseline(
+            self.store, self.project['id'], [],
+            expected_baseline_id=baseline['id'],
+            expected_content_fingerprint=baseline['content_fingerprint'])
+        self.store.record_execution_application(execution['id'], 'applied', {
+            'accepted_baseline_id': baseline['id'],
+        })
+        with self.assertRaisesRegex(ProjectStoreError, 'accepted workspace baseline'):
+            self.store.record_acceptance(
+                task['id'], 'passed', [{'kind': 'review', 'summary': 'Looks good'}])
+        self.store.record_execution_application(execution['id'], 'applied', {
+            'accepted_baseline_id': newer['id'],
+        })
+        (workspace / 'unreviewed.txt').write_text('changed after baseline\n')
+        with self.assertRaisesRegex(ProjectStoreError, 'changed after the accepted baseline'):
+            self.store.record_acceptance(
+                task['id'], 'passed', [{'kind': 'review', 'summary': 'Looks good'}])
+        (workspace / 'unreviewed.txt').unlink()
+        accepted = self.store.record_acceptance(
+            task['id'], 'passed', [{'kind': 'review', 'summary': 'Looks good'}])
+        self.assertEqual(accepted['acceptance_status'], 'passed')
+
+    def test_acceptance_focus_paths_do_not_replace_default_snapshot_ignores(self):
+        workspace = Path(self.project['workspace'])
+        (workspace / 'src').mkdir(parents=True, exist_ok=True)
+        (workspace / 'src' / 'app.py').write_text('print("ok")\\n')
+        baseline = capture_project_baseline(self.store, self.project['id'], ['src'])
+        task = self.store.create_task(
+            self.project['id'], 'Focused implementation', 'Use the focused path',
+            kind='code')
+        execution = self.store.create_execution(
+            task['id'], 'opencode', 'ses_focus', application_status='pending')
+        self.store.update_execution(execution['id'], {
+            'state': 'completed', 'engine_status': 'idle', 'evidence': {},
+        })
+        self.store.record_execution_application(execution['id'], 'applied', {
+            'accepted_baseline_id': baseline['id'],
+        })
+        accepted = self.store.record_acceptance(
+            task['id'], 'passed', [{'kind': 'review', 'summary': 'Focused baseline verified'}])
+        self.assertEqual(accepted['acceptance_status'], 'passed')
+
+    def test_document_review_and_requirement_confirmation_use_revision_cas(self):
+        document = self.store.create_document(
+            self.project['id'], 'analysis', 'Plan', 'v1')
+        updated = self.store.add_document_version(document['id'], 'v2')
+        with self.assertRaisesRegex(ProjectStoreError, 'version conflict'):
+            self.store.review_document(
+                self.project['id'], document['id'], 'approved', expected_current_version=1)
+        self.store.review_document(
+            self.project['id'], document['id'], 'approved',
+            expected_current_version=updated['current_version'])
+
+        requirement = self.store.create_requirement(self.project['id'], 'Keep evidence')
+        changed = self.store.update_requirement(
+            self.project['id'], requirement['id'], content='Keep revised evidence')
+        with self.assertRaisesRegex(ProjectStoreError, 'revision conflict'):
+            self.store.confirm_requirement(
+                requirement['id'], 'current', 'stale', expected_revision=1)
+        self.store.confirm_requirement(
+            requirement['id'], 'current', 'current',
+            expected_revision=changed['revision'])
+
+    def test_execution_evidence_and_export_redact_known_secrets(self):
+        task = self.store.create_task(
+            self.project['id'], 'Inspect', 'Inspect the evidence', kind='analysis')
+        execution = self.store.create_execution(
+            task['id'], 'opencode', 'ses_redact',
+            input_state={'api_key': 'input-secret'},
+            capabilities={'nested': {'token': 'capability-secret'}})
+        updated = self.store.update_execution(execution['id'], {
+            'state': 'running',
+            'engine_status': 'busy',
+            'evidence': {
+                'assistant_text': (
+                    'Authorization: Bearer output-secret\n'
+                    'ATLAS_RESULT: {"requirements": []}'),
+                'tool_calls': {'commands': [{
+                    'command': 'curl https://user:password@example.com/private'}]},
+            },
+        })
+        self.assertEqual(updated['input_state']['api_key'], '[REDACTED]')
+        self.assertEqual(
+            updated['capabilities']['nested']['token'], '[REDACTED]')
+        self.assertIn('ATLAS_RESULT', updated['raw_state']['evidence']['assistant_text'])
+        persisted = json.dumps(updated, ensure_ascii=False)
+        for secret in ('input-secret', 'capability-secret', 'output-secret', 'password'):
+            self.assertNotIn(secret, persisted)
+
+        with sqlite3.connect(self.store.path) as con:
+            con.execute(
+                'UPDATE execution SET raw_state_json=?,input_state_json=? WHERE id=?',
+                (json.dumps({
+                    'state': 'running',
+                    'evidence': {'assistant_text': 'Bearer legacy-export-secret'},
+                }), json.dumps({'token': 'legacy-input-secret'}), execution['id']))
+            con.commit()
+        exported = export_project(self.store, self.project['id'])
+        archive = Path(exported['archive'])
+        self.assertEqual(archive.stat().st_mode & 0o777, 0o600)
+        self.assertEqual(archive.parent.stat().st_mode & 0o777, 0o700)
+        self.assertTrue(exported['manifest']['privacy']['known_secret_redaction'])
+        with zipfile.ZipFile(archive) as bundle:
+            combined = b'\n'.join(bundle.read(name) for name in bundle.namelist())
+            execution_records = bundle.read('execution-records.json')
+            handoff = bundle.read(f'handoffs/{task["id"]}.json')
+        self.assertNotIn(b'legacy-export-secret', combined)
+        self.assertNotIn(b'legacy-input-secret', combined)
+        self.assertIn(b'[REDACTED]', execution_records)
+        self.assertIn(b'[REDACTED]', handoff)
+        self.assertEqual(
+            (Path(exported['directory']) / 'manifest.json').stat().st_mode & 0o777, 0o600)
+
+        sanitized = self.store.redact_persisted_evidence()
+        self.assertEqual(sanitized['executions'], 1)
+        with sqlite3.connect(self.store.path) as con:
+            database_text = '\n'.join(
+                row[0] for row in con.execute(
+                    'SELECT raw_state_json FROM execution UNION ALL '
+                    'SELECT input_state_json FROM execution'))
+        self.assertNotIn('legacy-export-secret', database_text)
+        self.assertNotIn('legacy-input-secret', database_text)
 
     def test_waived_acceptance_requires_an_explicit_reason(self):
         task = self.store.create_task(self.project['id'], 'Implement', 'Do work')
@@ -1666,7 +2477,9 @@ class ProjectStoreTests(unittest.TestCase):
             self.project['id'], 'Implement', 'Do work', iteration_id=iteration['id'])
         with self.assertRaises(ProjectStoreError):
             self.store.update_iteration_status(iteration['id'], 'completed')
-        self.store.record_acceptance(task['id'], 'passed', [{'kind': 'review', 'summary': 'Accepted'}])
+        self.store.record_acceptance(
+            task['id'], 'waived',
+            [{'kind': 'review', 'summary': 'Explicitly waived for this unit test'}])
         completed = self.store.update_iteration_status(iteration['id'], 'completed')
         self.assertEqual(completed['status'], 'completed')
         self.assertIsNotNone(completed['completed_at'])
@@ -1676,6 +2489,130 @@ class ProjectStoreTests(unittest.TestCase):
             self.store.create_task(self.project['id'], 'Implement', 'Do work', ['dver_missing'])
         with sqlite3.connect(self.store.path) as con:
             self.assertEqual(con.execute('SELECT count(*) FROM task').fetchone()[0], 0)
+
+    def test_generation_accepts_result_written_in_persistent_engine_directory(self):
+        from project_generation import _run_opencode
+        source_root = self.root / 'fallback-source-root'
+        source_root.mkdir()
+        (source_root / 'existing.txt').write_text('keep')
+        directory = self.root / 'generation-fallback'
+        directory.mkdir()
+        (directory / 'input.json').write_text('{}')
+        (directory / 'input.md').write_text('fixed input')
+        (directory / 'prompt.md').write_text('write result.json')
+        engine = directory / 'engine'
+        engine.mkdir()
+        (engine / 'engine.log').write_text('')
+        original_run = subprocess.run
+        observed = {}
+
+        def fake_run(command, **kwargs):
+            if command[:2] == ['git', 'init']:
+                return original_run(command, **kwargs)
+            observed['cwd'] = Path(kwargs['cwd'])
+            observed['pws'] = kwargs['env'].get('PWD')
+            config_path = observed['cwd'] / '.opencode' / 'opencode.json'
+            observed['config'] = json.loads(config_path.read_text())
+            observed['git_root'] = (observed['cwd'] / '.git').is_dir()
+            (engine / 'result.json').write_text('{"input_fingerprint":"fixed"}')
+            return SimpleNamespace(returncode=0)
+
+        with patch('project_generation._generation_source_root', return_value=source_root), \
+             patch('project_generation.detect_opencode_major_version', return_value=2), \
+             patch('project_generation.subprocess.run', side_effect=fake_run):
+            result, metadata = _run_opencode(directory, {'id': 'gen_fallback', 'model': ''})
+        self.assertEqual(result['input_fingerprint'], 'fixed')
+        self.assertIsNone(metadata['engine_session_id'])
+        self.assertTrue(observed['git_root'])
+        self.assertEqual(observed['pws'], str(observed['cwd']))
+        self.assertIn(
+            {'action': 'edit', 'resource': 'result.json', 'effect': 'allow'},
+            observed['config']['permissions'])
+
+    def test_generation_keeps_provider_result_in_disposable_runtime(self):
+        from project_generation import _run_opencode
+        source_root = self.root / 'source-root'
+        source_root.mkdir()
+        (source_root / 'existing.txt').write_text('keep')
+        directory = self.root / 'generation-runtime-result'
+        directory.mkdir()
+        (directory / 'input.json').write_text('{}')
+        (directory / 'input.md').write_text('fixed input')
+        (directory / 'prompt.md').write_text('write result.json')
+        original_run = subprocess.run
+
+        def fake_run(command, **kwargs):
+            if command[:2] == ['git', 'init']:
+                return original_run(command, **kwargs)
+            (Path(kwargs['cwd']) / 'result.json').write_text(
+                '{"input_fingerprint":"fixed"}')
+            return SimpleNamespace(returncode=0)
+
+        with patch('project_generation._generation_source_root', return_value=source_root), \
+             patch('project_generation.detect_opencode_major_version', return_value=2), \
+             patch('project_generation.subprocess.run', side_effect=fake_run):
+            result, metadata = _run_opencode(
+                directory, {'id': 'gen_runtime_result', 'model': ''})
+        self.assertEqual(result['input_fingerprint'], 'fixed')
+        self.assertEqual(metadata['artifact_root'], 'runtime')
+        self.assertTrue((directory / 'engine' / 'result.json').is_file())
+        self.assertFalse((source_root / 'result.json').exists())
+
+    def test_generation_rejects_provider_artifact_outside_runtime(self):
+        from project_generation import _run_opencode
+        source_root = self.root / 'source-root'
+        source_root.mkdir()
+        (source_root / 'existing.txt').write_text('keep')
+        directory = self.root / 'generation-violation'
+        directory.mkdir()
+        (directory / 'input.json').write_text('{}')
+        (directory / 'input.md').write_text('fixed input')
+        (directory / 'prompt.md').write_text('write result.json')
+        original_run = subprocess.run
+
+        def fake_run(command, **kwargs):
+            if command[:2] == ['git', 'init']:
+                return original_run(command, **kwargs)
+            (source_root / 'result.json').write_text('{"input_fingerprint":"fixed"}')
+            return SimpleNamespace(returncode=0)
+
+        with patch('project_generation._generation_source_root', return_value=source_root), \
+             patch('project_generation.detect_opencode_major_version', return_value=2), \
+             patch('project_generation.subprocess.run', side_effect=fake_run):
+            with self.assertRaisesRegex(RuntimeError, 'outside the controlled'):
+                _run_opencode(directory, {'id': 'gen_violation', 'model': ''})
+        report = json.loads(
+            (directory / 'provider-artifact-violation.json').read_text())
+        self.assertIn('result.json', report['added'])
+        self.assertTrue((source_root / 'result.json').exists())
+        self.assertFalse((directory / 'engine' / 'result.json').exists())
+
+    def test_generation_recovers_only_matching_complete_json_text(self):
+        from project_generation import _generation_result_from_log
+        result = {
+            'input_fingerprint': 'fixed', 'questions': [], 'requirements': [],
+            'conflicts': [], 'suggestions': [], 'documents': [],
+        }
+        event = {'type': 'text', 'part': {'text': 'prefix\n```json\n' + json.dumps(result) + '\n```'}}
+        raw = (json.dumps(event) + '\n').encode()
+        self.assertEqual(_generation_result_from_log(raw, 'fixed'), result)
+        self.assertIsNone(_generation_result_from_log(raw, 'other'))
+        self.assertIsNone(_generation_result_from_log(
+            (json.dumps({'type': 'text', 'text': '{"input_fingerprint":"fixed"}'}) + '\n').encode(),
+            'fixed'))
+
+    def test_generation_engine_log_is_redacted_and_bounded(self):
+        from project_generation import _persist_engine_log
+        path = self.root / 'engine.log'
+        _persist_engine_log(path, (
+            b'Authorization: Bearer generation-secret\n' +
+            b'x' * 1_100_000))
+        value = path.read_text(encoding='utf-8')
+        self.assertNotIn('generation-secret', value)
+        self.assertIn('[REDACTED]', value)
+        self.assertIn('Atlas truncated', value)
+        self.assertLessEqual(len(value), 1_000_000)
+        self.assertEqual(path.stat().st_mode & 0o777, 0o600)
 
     def test_handoff_uses_fixed_inputs_and_flags_missing_recovery_evidence(self):
         reference = self.store.add_reference(
@@ -1770,6 +2707,40 @@ class ProjectStoreTests(unittest.TestCase):
         self.assertEqual(code, 400)
         self.assertIn('existing directory', invalid_workspace['error'])
 
+    def test_execution_get_is_read_only_and_reconcile_is_explicit_post(self):
+        import drafts_api
+        task = self.store.create_task(
+            self.project['id'], 'Inspect', 'Inspect the evidence', kind='analysis')
+        execution = self.store.create_execution(
+            task['id'], 'opencode', 'ses_read_only')
+        handler = object.__new__(drafts_api.Handler)
+        handler.headers = {
+            'Host': 'localhost:5173',
+            'Origin': 'http://localhost:5173',
+            'Content-Type': 'application/json',
+            'Content-Length': '2',
+        }
+        handler._json = lambda value, code=200: (value, code)
+        base = (f'/api/projects/{self.project["id"]}/executions/'
+                f'{execution["id"]}')
+        handler.path = base
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store), \
+             patch.object(drafts_api, 'reconcile_execution') as reconcile:
+            payload, code = handler.do_GET()
+        self.assertEqual(code, 200)
+        self.assertEqual(payload['id'], execution['id'])
+        reconcile.assert_not_called()
+
+        handler.path = base + '/reconcile'
+        handler._body = lambda: {}
+        expected = {'id': execution['id'], 'status': 'completed'}
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store), \
+             patch.object(drafts_api, 'reconcile_execution', return_value=expected) as reconcile:
+            payload, code = handler.do_POST()
+        self.assertEqual(code, 200)
+        self.assertEqual(payload, expected)
+        reconcile.assert_called_once_with(self.store, self.project['id'], execution['id'])
+
     def test_project_http_starter_reference_and_confirmed_delete(self):
         import drafts_api
         pack = self.root / 'corpus'
@@ -1809,17 +2780,42 @@ class ProjectStoreTests(unittest.TestCase):
         workspace = Path(created['workspace'])
         workspace.mkdir(parents=True, exist_ok=True)
         (workspace / 'keep.txt').write_text('keep\n')
-        generation_root = (self.store.path.parent / 'generation-runs' /
-                           created['id'] / 'gen_finished')
-        generation_root.mkdir(parents=True)
-        (generation_root / 'run.json').write_text('{}')
+        artifact_roots = {}
+        for name, relative in {
+            'generation-runs': 'gen_finished/run.json',
+            'execution-workspaces': 'run_test/workspace.txt',
+            'execution-evidence': 'exe_test/stderr.txt',
+            'exports': 'bundle/export.zip',
+        }.items():
+            artifact = self.store.path.parent / name / created['id'] / relative
+            artifact.parent.mkdir(parents=True)
+            artifact.write_text(
+                json.dumps({'id': 'gen_finished', 'project_id': created['id'],
+                            'status': 'completed', 'created_at': '2026-09-24T00:00:00Z'})
+                if name == 'generation-runs' else 'artifact')
+            artifact_roots[name] = artifact
+        custom_run = (self.root / 'custom-executions' / created['id'] /
+                      'run_test')
+        custom_run.mkdir(parents=True)
+        (custom_run / 'workspace.txt').write_text('isolated')
+        custom_task = self.store.create_task(
+            created['id'], 'Cleanup', 'Exercise custom cleanup')
+        custom_execution = self.store.create_execution(
+            custom_task['id'], 'opencode', 'ses_cleanup', workdir=str(custom_run))
+        self.store.update_execution(custom_execution['id'], {
+            'state': 'stopped', 'engine_status': 'idle', 'evidence': {}})
         handler._body = lambda: {'confirm': created['id']}
         with patch.object(drafts_api, 'PROJECT_STORE', self.store):
             deleted, code = handler.do_DELETE()
         self.assertEqual(code, 200)
         self.assertTrue(deleted['workspace_preserved'])
         self.assertEqual((workspace / 'keep.txt').read_text(), 'keep\n')
-        self.assertFalse(generation_root.parent.exists())
+        self.assertTrue(set(artifact_roots).issubset(deleted['artifacts_removed']))
+        self.assertIn('execution-workspaces:custom', deleted['artifacts_removed'])
+        self.assertEqual(deleted['artifact_cleanup_errors'], {})
+        self.assertFalse(custom_run.parent.exists())
+        for artifact in artifact_roots.values():
+            self.assertFalse(artifact.exists())
         with self.assertRaisesRegex(ProjectStoreError, 'project not found'):
             self.store.get_project(created['id'])
 
@@ -1947,7 +2943,9 @@ class ProjectStoreTests(unittest.TestCase):
         self.assertIsNone(requirement['confirmed_scope'])
 
         handler.path += '/' + requirement['id'] + '/confirm'
-        handler._body = lambda: {'scope': 'current', 'reason': 'Approved for the pilot'}
+        handler._body = lambda: {
+            'scope': 'current', 'reason': 'Approved for the pilot', 'expected_revision': 1,
+        }
         with patch.object(drafts_api, 'PROJECT_STORE', self.store):
             confirmed, code = handler.do_POST()
         self.assertEqual(code, 200)
@@ -2082,7 +3080,7 @@ class ExecutionServiceTests(unittest.TestCase):
                     'messages': [user, assistant], 'engine_diff': [],
                     'pending_permissions': permissions, 'pending_questions': []}
 
-        def reply_permission(self, request_id, reply, message=None):
+        def reply_permission(self, request_id, reply, message=None, session_id=None):
             self.permission_replies.append((request_id, reply, message))
             self.mode = 'running'
             return True
@@ -2206,10 +3204,27 @@ class ExecutionServiceTests(unittest.TestCase):
                 'requirement_ids': [requirement['id']],
             })
 
+    def test_api_tasks_require_fixed_document_and_requirement_inputs(self):
+        with self.assertRaisesRegex(ProjectStoreError, 'fixed document version'):
+            create_execution_task(self.store, self.project['id'], {
+                'iteration_id': self.iteration['id'], 'kind': 'analysis',
+                'title': 'Missing document', 'objective': 'Must stay blocked',
+                'input_document_versions': [],
+                'requirement_ids': [self.requirement['id']],
+            })
+        with self.assertRaisesRegex(ProjectStoreError, 'fixed requirement'):
+            create_execution_task(self.store, self.project['id'], {
+                'iteration_id': self.iteration['id'], 'kind': 'analysis',
+                'title': 'Missing requirement', 'objective': 'Must stay blocked',
+                'input_document_versions': [self.document['version_id']],
+                'requirement_ids': [],
+            })
+
     def test_failed_product_acceptance_can_start_a_new_execution(self):
         failed = self.store.record_acceptance(
             self.task['id'], 'failed',
-            [{'kind': 'review', 'summary': 'The visible behavior is still incorrect'}])
+            [{'kind': 'review', 'summary': 'The visible behavior is still incorrect'}],
+            [condition_result(self.requirement, 'failed')])
         self.assertEqual(failed['acceptance_status'], 'failed')
         execution = start_execution(
             self.store, self.project['id'], self.task['id'], {}, self.client)
@@ -2227,7 +3242,7 @@ class ExecutionServiceTests(unittest.TestCase):
         self.assertEqual(execution['source_workdir'], str(self.workspace.resolve()))
         self.assertEqual(execution['application_status'], 'pending')
         self.assertEqual(execution['input_state']['workspace_strategy'], 'isolated_copy')
-        self.assertTrue(self.client.tools['bash'])
+        self.assertFalse(self.client.tools['bash'])
         self.assertIn('Allowed write paths: `src`', self.client.prompt)
         execution_workspace = Path(execution['workdir'])
         self.assertFalse((execution_workspace / 'node_modules').exists())
@@ -2241,6 +3256,8 @@ class ExecutionServiceTests(unittest.TestCase):
                          ['src/app.py'])
         self.assertTrue(completed['raw_state']['evidence']['filesystem']['scope_compliant'])
         self.assertTrue(completed['raw_state']['evidence']['verification']['all_planned_passed'])
+        self.assertEqual(completed['raw_state']['evidence']['verification_source'], 'atlas_fixed')
+        self.assertIn('agent_reported_verification', completed['raw_state']['evidence'])
         self.assertEqual(completed['raw_state']['evidence']['run_summary']['status'], 'completed')
         self.assertIsNone(completed['raw_state']['evidence']['run_summary']['exitCode'])
         completion = completed['raw_state']['evidence']['completion_report']
@@ -2250,7 +3267,8 @@ class ExecutionServiceTests(unittest.TestCase):
         self.assertEqual((self.workspace / 'src/app.py').read_text(), 'VALUE = 1\n')
         with self.assertRaisesRegex(ProjectStoreError, 'isolated execution result'):
             self.store.record_acceptance(
-                self.task['id'], 'passed', [{'kind': 'review', 'summary': 'Looks good'}])
+                self.task['id'], 'passed', [{'kind': 'review', 'summary': 'Looks good'}],
+                [condition_result(self.requirement, 'passed')])
         applied = apply_execution_result(
             self.store, self.project['id'], execution['id'])
         self.assertEqual(applied['application_status'], 'applied')
@@ -2319,6 +3337,32 @@ class ExecutionServiceTests(unittest.TestCase):
             self.assertEqual(summary['status'], expected)
             self.assertNotEqual(summary['status'], 'completed')
 
+    def test_verification_registry_rejects_inline_absolute_and_unknown_commands(self):
+        from execution_service import _verification_argv
+        root = Path(self.temp.name) / 'verify-root'
+        root.mkdir()
+        for command, message in (
+                ('python3 -c "print(1)"', 'inline interpreter'),
+                ('python3 /tmp/read_secret.py', 'absolute paths'),
+                ('curl https://example.com', 'not registered'),
+                ('/bin/sh -c true', 'not allowed'),
+                ('node -e "process.exit(0)"', 'inline Node'),
+                ('python3 -m pip install left-pad', 'registered Python')):
+            with self.subTest(command=command), self.assertRaisesRegex(ValueError, message):
+                _verification_argv(command, root)
+        argv = _verification_argv('python3 -m unittest discover -s tests -v', root)
+        self.assertTrue(Path(argv[0]).is_absolute())
+        self.assertEqual(argv[1:], ['-m', 'unittest', 'discover', '-s', 'tests', '-v'])
+
+        with self.assertRaisesRegex(ValueError, 'inline interpreter'):
+            create_execution_task(self.store, self.project['id'], {
+                'iteration_id': self.iteration['id'], 'kind': 'analysis',
+                'title': 'Rejected verifier', 'objective': 'Do not run inline code',
+                'input_document_versions': [self.document['version_id']],
+                'requirement_ids': [self.requirement['id']],
+                'verification_commands': ['python3 -c "print(1)"'],
+            })
+
     def test_task_timeout_overrides_project_timeout_for_verification(self):
         task = self.store.create_task(
             self.project['id'], 'Bounded check', 'Run a bounded verification',
@@ -2376,6 +3420,8 @@ class ExecutionServiceTests(unittest.TestCase):
         cleaned = cleanup_execution_workspace(
             self.store, self.project['id'], stopped['id'])
         self.assertTrue((evidence_dir / 'atlas.json').exists())
+        self.assertEqual(evidence_dir.stat().st_mode & 0o777, 0o700)
+        self.assertEqual((evidence_dir / 'atlas.json').stat().st_mode & 0o777, 0o600)
         self.assertTrue(cleaned['raw_state']['evidence']['cleanup']['evidence_preserved'])
         self.assertEqual(
             cleaned['raw_state']['evidence']['run_summary']['status'], 'cancelled')
@@ -2386,7 +3432,7 @@ class ExecutionServiceTests(unittest.TestCase):
             'title': 'CLI transport task', 'objective': 'Run the CLI transport path.',
             'input_document_versions': [self.document['version_id']],
             'requirement_ids': [self.requirement['id']], 'write_paths': ['src'],
-            'verification_commands': ['python3 -c "print(\'cli verification\')"'],
+            'verification_commands': ['python3 -m unittest'],
         })
         config_dir = self.workspace / '.atlas'
         config_dir.mkdir()
@@ -2423,13 +3469,55 @@ class ExecutionServiceTests(unittest.TestCase):
     def test_cli_verification_maps_steps_and_timeout(self):
         result = run_cli_verification(
             self.workspace,
-            ['python3 -c "print(\'ok\')"', 'sleep 2'],
+            ['python3 -m unittest', 'sleep 2'],
             timeout_seconds=1)
         commands = result['tool_calls']['commands']
         self.assertEqual(commands[0]['status'], 'completed')
         self.assertEqual(commands[0]['exit'], 0)
         self.assertEqual(commands[1]['status'], 'timed_out')
         self.assertTrue(commands[1]['timedOut'])
+        self.assertFalse(result['verification']['all_planned_passed'])
+
+    def test_fixed_verifier_rejects_modified_protected_tests(self):
+        from execution_service import _verification_protection
+        tests = self.workspace / 'tests'
+        tests.mkdir()
+        test_file = tests / 'test_sample.py'
+        test_file.write_text('def test_sample():\n    assert True\n')
+        before = snapshot_workspace(self.workspace)
+        protected = _verification_protection(before, ['python3 -m unittest'])
+        test_file.write_text('def test_sample():\n    assert False\n')
+        result = run_cli_verification(
+            self.workspace, ['python3 -m unittest'], protected_files=protected)
+        self.assertFalse(result['verification']['all_planned_passed'])
+        self.assertIn('verification inputs changed', result['verification']['error'])
+        self.assertEqual(result['tool_calls']['commands'], [])
+
+    def test_verification_rejects_shell_chaining_and_scrubs_environment(self):
+        marker = self.workspace / 'shell-injection'
+        probe = self.workspace / 'verify_env.py'
+        probe.write_text(
+            'import os\n'
+            'assert not os.environ.get("OPENAI_API_KEY")\n'
+            'assert not os.environ.get("ANTHROPIC_API_KEY")\n')
+        commands = [
+            (f'python3 -c "import pathlib; pathlib.Path(\'shell-injection\').write_text(\'bad\')" '
+             f'&& touch {marker.name}'),
+            '/bin/sh -c "touch shell-injection"',
+            'python3 verify_env.py',
+        ]
+        with patch.dict(os.environ, {
+                'OPENAI_API_KEY': 'must-not-reach-verification',
+                'ANTHROPIC_API_KEY': 'must-not-reach-verification',
+        }, clear=False):
+            result = run_cli_verification(self.workspace, commands, timeout_seconds=5)
+        records = result['tool_calls']['commands']
+        self.assertEqual(records[0]['status'], 'failed')
+        self.assertIn('shell operators', records[0]['output'])
+        self.assertEqual(records[1]['status'], 'failed')
+        self.assertIn('not allowed', records[1]['output'])
+        self.assertEqual(records[2]['status'], 'completed')
+        self.assertFalse(marker.exists())
         self.assertFalse(result['verification']['all_planned_passed'])
 
     def test_reconcile_keeps_permission_as_first_class_interaction(self):
@@ -2441,6 +3529,60 @@ class ExecutionServiceTests(unittest.TestCase):
         self.assertEqual(waiting['status'], 'waiting_permission')
         self.assertEqual(waiting['raw_state']['interaction']['request']['id'],
                          'per_execution')
+
+    def test_permission_replies_cannot_create_persistent_grants(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        self.client.mode = 'permission'
+        reconcile_execution(
+            self.store, self.project['id'], execution['id'], self.client)
+        with self.assertRaisesRegex(ProjectStoreError, 'persistent permission grants'):
+            reply_permission(
+                self.store, self.project['id'], execution['id'],
+                {'request_id': 'per_execution', 'reply': 'always'}, self.client)
+        with self.assertRaisesRegex(ProjectStoreError, 'outside the Atlas U17 policy'):
+            reply_permission(
+                self.store, self.project['id'], execution['id'],
+                {'request_id': 'per_execution', 'reply': 'once'}, self.client)
+        self.assertEqual(self.client.permission_replies, [])
+
+    def test_permission_reply_rejects_resource_outside_task_write_paths(self):
+        class ResourceClient(self.Client):
+            def reconcile(self, session_id):
+                result = super().reconcile(session_id)
+                result['pending_permissions'] = [{
+                    'id': 'per_resource', 'permission': 'edit',
+                    'resource': 'tests/agent_test.py',
+                    'tool': {'messageID': 'msg_answer'},
+                }]
+                return result
+
+        client = ResourceClient()
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, client)
+        client.mode = 'permission'
+        execution = reconcile_execution(
+            self.store, self.project['id'], execution['id'], client)
+        with self.assertRaisesRegex(ProjectStoreError, 'outside the task write_paths'):
+            reply_permission(
+                self.store, self.project['id'], execution['id'],
+                {'request_id': 'per_resource', 'reply': 'once'}, client)
+        self.assertEqual(client.permission_replies, [])
+
+    def test_cleanup_does_not_remove_a_workdir_reused_by_follow_up(self):
+        first = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        (Path(first['workdir']) / 'src/app.py').write_text('VALUE = 2\n')
+        self.client.mode = 'completed'
+        first = reconcile_execution(
+            self.store, self.project['id'], first['id'], self.client)
+        second = continue_execution(
+            self.store, self.project['id'], first['id'],
+            {'instruction': 'Review the change again.'}, self.client)
+        with self.assertRaisesRegex(ProjectStoreError, 'still referenced'):
+            cleanup_execution_workspace(
+                self.store, self.project['id'], first['id'])
+        self.assertTrue(Path(second['workdir']).exists())
 
     def test_follow_up_reuses_session_and_creates_a_new_snapshot_boundary(self):
         first = start_execution(
@@ -2536,6 +3678,25 @@ class ExecutionServiceTests(unittest.TestCase):
                          'session_unavailable_confirmed')
         self.assertIsNotNone(stopped['after_snapshot_id'])
 
+    def test_unknown_execution_workspace_can_be_cleaned_after_explicit_review(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+
+        class MissingClient:
+            def reconcile(self, _session_id):
+                raise OpenCodeError(404, 'session unavailable')
+
+        unknown = reconcile_execution(
+            self.store, self.project['id'], execution['id'], MissingClient())
+        self.assertEqual(unknown['status'], 'unknown')
+        workdir = Path(unknown['workdir'])
+        self.assertTrue(workdir.exists())
+        cleaned = cleanup_execution_workspace(
+            self.store, self.project['id'], execution['id'])
+        self.assertFalse(workdir.exists())
+        self.assertEqual(cleaned['raw_state']['evidence']['cleanup']['status'], 'cleaned')
+        self.assertTrue(cleaned['raw_state']['evidence']['cleanup']['evidence_preserved'])
+
     def test_http_continue_route_uses_the_existing_execution(self):
         import drafts_api
         execution = start_execution(
@@ -2612,6 +3773,116 @@ class ExecutionServiceTests(unittest.TestCase):
         self.assertEqual(recorded['application_status'], 'conflict')
         self.assertEqual((self.workspace / 'src/app.py').read_text(), 'VALUE = 9\n')
 
+    def test_explicit_apply_recovery_restores_a_journaled_backup(self):
+        from execution_workspace import (
+            _write_apply_journal, restore_interrupted_apply,
+        )
+        source = self.root / 'journal-source'
+        source.mkdir()
+        target = source / 'file.txt'
+        old = b'old\n'
+        new = b'new\n'
+        target.write_bytes(old)
+        before = {'files': {'file.txt': {
+            'kind': 'file', 'size': len(old),
+            'sha256': hashlib.sha256(old).hexdigest(),
+        }}}
+        after = {'files': {'file.txt': {
+            'kind': 'file', 'size': len(new),
+            'sha256': hashlib.sha256(new).hexdigest(),
+        }}}
+        stage = source / '.atlas-apply-test'
+        (stage / 'backup').mkdir(parents=True)
+        (stage / 'backup' / 'file.txt').write_bytes(old)
+        target.unlink()
+        _write_apply_journal(stage, {
+            'schema': 1,
+            'execution_id': 'exe_journal',
+            'before_manifest': before,
+            'after_manifest': after,
+            'difference': {'added': [], 'modified': ['file.txt'], 'removed': []},
+            'phase': 'backing_up',
+            'backed_up': ['file.txt'],
+            'applied': [],
+        })
+        result = restore_interrupted_apply(source, 'exe_journal')
+        self.assertEqual(result['status'], 'restored')
+        self.assertEqual(target.read_bytes(), old)
+        self.assertFalse(stage.exists())
+
+    def test_process_crash_leaves_a_recoverable_apply_journal(self):
+        source = self.root / 'crash-source'
+        work = self.root / 'crash-work'
+        source.mkdir()
+        work.mkdir()
+        (work / 'file.txt').write_text('new\n')
+        old = b'old\n'
+        (source / 'file.txt').write_bytes(old)
+        before = {'files': {'file.txt': {
+            'kind': 'file', 'size': len(old),
+            'sha256': hashlib.sha256(old).hexdigest(),
+        }}}
+        new = b'new\n'
+        after = {'files': {'file.txt': {
+            'kind': 'file', 'size': len(new),
+            'sha256': hashlib.sha256(new).hexdigest(),
+        }}}
+        script = """
+import json, os, sys
+sys.path.insert(0, sys.argv[1])
+import execution_workspace
+real = execution_workspace.os.replace
+crashed = False
+def crash_after_backup(source, target):
+    global crashed
+    real(source, target)
+    if not crashed and '/backup/' in str(target):
+        crashed = True
+        os._exit(77)
+execution_workspace.os.replace = crash_after_backup
+execution_workspace.apply_execution_workspace(
+    sys.argv[2], sys.argv[3], json.loads(sys.argv[4]), json.loads(sys.argv[5]),
+    {'added': [], 'modified': ['file.txt'], 'removed': []}, 'exe_crash')
+"""
+        result = subprocess.run([
+            sys.executable, '-c', script, str(CODE), str(source), str(work),
+            json.dumps(before), json.dumps(after),
+        ], cwd=str(CODE), capture_output=True)
+        self.assertEqual(result.returncode, 77)
+        self.assertFalse((source / 'file.txt').exists())
+        from execution_workspace import read_apply_journal, restore_interrupted_apply
+        self.assertIsNotNone(read_apply_journal(source, 'exe_crash'))
+        recovered = restore_interrupted_apply(source, 'exe_crash')
+        self.assertEqual(recovered['status'], 'restored')
+        self.assertEqual((source / 'file.txt').read_bytes(), old)
+
+    def test_result_application_rechecks_each_target_before_replace(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        (Path(execution['workdir']) / 'src/app.py').write_text('VALUE = 2\n')
+        self.client.mode = 'completed'
+        reconcile_execution(
+            self.store, self.project['id'], execution['id'], self.client)
+        import execution_workspace
+        original = execution_workspace._assert_apply_target
+        changed = False
+
+        def edit_before_check(root, relative, expected):
+            nonlocal changed
+            if not changed and relative == 'src/app.py':
+                changed = True
+                (root / relative).write_text('VALUE = 9\n')
+            return original(root, relative, expected)
+
+        with patch.object(execution_workspace, '_assert_apply_target',
+                          side_effect=edit_before_check):
+            with self.assertRaisesRegex(ProjectStoreError, 'changed while applying'):
+                apply_execution_result(
+                    self.store, self.project['id'], execution['id'])
+        self.assertEqual((self.workspace / 'src/app.py').read_text(), 'VALUE = 9\n')
+        self.assertEqual(
+            self.store.get_execution(execution['id'])['application_status'], 'conflict')
+
     def test_http_apply_route_uses_the_recorded_isolated_result(self):
         import drafts_api
         execution = start_execution(
@@ -2631,6 +3902,26 @@ class ExecutionServiceTests(unittest.TestCase):
         self.assertEqual(applied['application_status'], 'applied')
         self.assertEqual((self.workspace / 'src/app.py').read_text(), 'VALUE = 2\n')
 
+    def test_http_recover_apply_route_requires_explicit_service_call(self):
+        import drafts_api
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        handler = object.__new__(drafts_api.Handler)
+        handler.path = (f"/api/projects/{self.project['id']}/executions/"
+                        f"{execution['id']}/recover-apply")
+        handler._body = lambda: {
+            'action': 'restore_before', 'confirm': execution['id']}
+        handler._json = lambda value, code=200: (value, code)
+        expected = {'id': execution['id'], 'application_status': 'conflict'}
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store), \
+             patch.object(drafts_api, 'recover_interrupted_apply',
+                          return_value=expected) as recover:
+            payload, code = handler.do_POST()
+        self.assertEqual(code, 200)
+        self.assertEqual(payload, expected)
+        recover.assert_called_once_with(
+            self.store, self.project['id'], execution['id'], handler._body())
+
     def test_result_application_rolls_back_a_partial_filesystem_failure(self):
         execution = start_execution(
             self.store, self.project['id'], self.task['id'], {}, self.client)
@@ -2645,7 +3936,7 @@ class ExecutionServiceTests(unittest.TestCase):
         def fail_second(source, target):
             nonlocal calls
             calls += 1
-            if calls == 2:
+            if '/backup/' in str(target):
                 raise OSError('simulated write failure')
             return replace(source, target)
 
@@ -2690,10 +3981,12 @@ class ExecutionServiceTests(unittest.TestCase):
             'state': 'failed', 'engine_status': 'idle', 'evidence': {}})
         with self.assertRaisesRegex(ProjectStoreError, 'cannot pass acceptance'):
             self.store.record_acceptance(
-                self.task['id'], 'passed', [{'kind': 'review', 'summary': 'Looks good'}])
+                self.task['id'], 'passed', [{'kind': 'review', 'summary': 'Looks good'}],
+                [condition_result(self.requirement, 'passed')])
         waived = self.store.record_acceptance(
             self.task['id'], 'waived',
-            [{'kind': 'review', 'summary': 'Superseded by an explicit follow-up'}])
+            [{'kind': 'review', 'summary': 'Superseded by an explicit follow-up'}],
+            [condition_result(self.requirement, 'waived')])
         self.assertEqual(waived['acceptance_status'], 'waived')
 
     def test_applied_result_without_adopted_baseline_cannot_pass_acceptance(self):
@@ -2710,7 +4003,8 @@ class ExecutionServiceTests(unittest.TestCase):
         self.assertIn('baseline_adoption_error', applied['application_state'])
         with self.assertRaisesRegex(ProjectStoreError, 'accepted workspace baseline'):
             self.store.record_acceptance(
-                self.task['id'], 'passed', [{'kind': 'review', 'summary': 'Looks good'}])
+                self.task['id'], 'passed', [{'kind': 'review', 'summary': 'Looks good'}],
+                [condition_result(self.requirement, 'passed')])
 
     def test_requirement_revisions_are_frozen_into_iterations_and_tasks(self):
         self.assertEqual(self.iteration['baseline_id'], self.baseline['id'])
@@ -2898,6 +4192,101 @@ class RetrievalTests(unittest.TestCase):
                 self.assertTrue(all(s.slugs == ('first','second') for s in snapshots))
 
 
+class ClassificationProviderTests(unittest.TestCase):
+    class Response:
+        def __init__(self, payload):
+            self.payload = payload
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self):
+            return json.dumps(self.payload).encode("utf-8")
+
+    @staticmethod
+    def state():
+        return classifier.Snapshot(
+            ("task-management-application",), np.array([[1.0]], dtype=np.float32),
+            {"task-management-application": ("任务管理", "任务和项目记录")},
+            {"task-management-application": "01"}, {}, {},
+        )
+
+    def test_classify_uses_explicit_model_and_returns_stable_metadata(self):
+        observed = {}
+
+        def fake_chat(messages, **kwargs):
+            observed["model"] = kwargs.get("model")
+            observed["timeout"] = kwargs.get("timeout")
+            observed["role"] = kwargs.get("role")
+            return {
+                "content": ('[{"slug":"task-management-application","score":9,"brief":"ok"}]\n'
+                            '{"choice":"task-management-application"}'),
+                "model": "qwen3.8-flash",
+            }
+
+        with patch.object(classifier, "snapshot", return_value=self.state()), \
+             patch.object(classifier, "candidates", return_value=(
+                 ("task-management-application",), {"task-management-application": 0.9})), \
+             patch.object(classifier.atlas_model, "chat", side_effect=fake_chat):
+            result = classifier.classify("local task history", model="qwen3.8-flash")
+        self.assertEqual(result["choice"], "task-management-application")
+        self.assertEqual(result["model"], "qwen3.8-flash")
+        self.assertEqual(observed["model"], "qwen3.8-flash")
+        self.assertEqual(observed["timeout"], 300)
+        self.assertEqual(observed["role"], "adjudicator")
+
+    def test_unavailable_model_is_redacted_and_not_retried(self):
+        # A provider rejecting the model must surface as a non-retryable
+        # configuration failure, and the credential must not leak into it.
+        error = classifier.atlas_model.ModelConfigError(
+            "the selected model is unavailable on this provider",
+            code="model_unavailable", status=400)
+        with patch.object(classifier, "snapshot", return_value=self.state()), \
+             patch.object(classifier, "candidates", return_value=(
+                 ("task-management-application",), {"task-management-application": 0.9})), \
+             patch.object(classifier.atlas_model, "chat", side_effect=error) as chat:
+            with self.assertRaises(classifier.ClassificationProviderError) as raised:
+                classifier.classify("local task history", model="unavailable/model")
+        self.assertEqual(raised.exception.code, "model_unavailable")
+        self.assertFalse(raised.exception.retryable)
+        self.assertEqual(chat.call_count, 1)
+
+    def test_provider_http_failure_is_retryable_without_fallback(self):
+        import urllib.error
+
+        error = urllib.error.HTTPError(
+            "https://opencode.ai/zen/go/v1/chat/completions", 503, "Unavailable", {},
+            io.BytesIO(b"{}"))
+        with patch.object(classifier, "snapshot", return_value=self.state()), \
+             patch.object(classifier, "candidates", return_value=(
+                 ("task-management-application",), {"task-management-application": 0.9})), \
+             patch.object(classifier.atlas_model, "_post_json", side_effect=error):
+            with self.assertRaises(classifier.ClassificationProviderError) as raised:
+                classifier.classify("local task history", model="qwen3.8-flash")
+        self.assertEqual(raised.exception.code, "provider_http_error")
+        self.assertTrue(raised.exception.retryable)
+
+    def test_provider_credential_is_never_echoed(self):
+        # The raw provider body may quote the credential; it must be redacted
+        # before it can reach a caller or the persisted detail field.
+        import urllib.error
+
+        error = urllib.error.HTTPError(
+            "https://opencode.ai/zen/go/v1/chat/completions", 400, "Bad Request", {},
+            io.BytesIO(b'{"error":{"message":"bad key. Authorization: Bearer test-secret"}}'))
+        with patch.object(classifier, "snapshot", return_value=self.state()), \
+             patch.object(classifier, "candidates", return_value=(
+                 ("task-management-application",), {"task-management-application": 0.9})), \
+             patch.object(classifier.atlas_model, "_post_json", side_effect=error):
+            with self.assertRaises(classifier.ClassificationProviderError) as raised:
+                classifier.classify("local task history", model="qwen3.8-flash")
+        self.assertNotIn("test-secret", str(raised.exception))
+        self.assertNotIn("test-secret", raised.exception.detail)
+
+
 class GateTests(unittest.TestCase):
     def test_accepted_labels_are_explicit_and_partial_results_fail(self):
         items = [{'name':'钉钉','expect':'team-messaging-application'}]
@@ -2915,6 +4304,574 @@ class GateTests(unittest.TestCase):
         self.assertFalse(summary['passed'])
         self.assertEqual(summary['errors'],1)
         self.assertFalse(rows[0]['ret1'])
+
+
+class RuntimeRecoveryTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.workspace = self.root / 'workspace'
+        self.workspace.mkdir()
+        self.store = ProjectStore(self.root / 'state' / 'projects.sqlite')
+        self.project = self.store.create_project(
+            'Recovery', 'Recover interrupted work safely', self.workspace, 'existing')
+
+    def test_startup_recovery_marks_active_work_unknown_without_replay(self):
+        from runtime_recovery import recover_atlas_runtime
+        running_task = self.store.create_task(
+            self.project['id'], 'Running', 'Interrupted running task', kind='analysis')
+        running = self.store.create_execution(
+            running_task['id'], 'opencode', 'ses_running')
+        self.store.update_execution(running['id'], {
+            'state': 'running', 'engine_status': 'busy', 'evidence': {},
+            'interaction': {'type': 'permission', 'request': {'id': 'per_keep'}}})
+        applying_task = self.store.create_task(
+            self.project['id'], 'Applying', 'Interrupted applying task')
+        applying = self.store.create_execution(
+            applying_task['id'], 'opencode', 'ses_applying',
+            application_status='pending')
+        self.store.record_execution_application(
+            applying['id'], 'applying', {'apply_intent': {'after_snapshot_id': 'snap_missing'}})
+        reference = self.store.add_reference(
+            self.project['id'], 'atlas:application', 'sample', 'v1',
+            excerpt='Fixed recovery evidence')
+        self.assertTrue(reference['id'].startswith('ref_'))
+        generation = prepare_generation(self.store, self.project['id'], 'analysis')
+        staging = self.workspace / '.atlas-apply-test'
+        staging.mkdir()
+        (staging / 'new').mkdir()
+
+        report = recover_atlas_runtime(self.store)
+        self.assertFalse(report['automatic_replay'])
+        self.assertEqual(len(report['executions_interrupted']), 2)
+        self.assertEqual(len(report['generations_interrupted']), 1)
+        self.assertEqual(len(report['applications_requiring_review']), 1)
+        self.assertEqual(report['staging_directories'][0]['action'], 'reported_only')
+        recovered = self.store.get_execution(running['id'])
+        self.assertEqual(recovered['status'], 'unknown')
+        self.assertEqual(recovered['raw_state']['engine_status'], 'api_restart_interrupted')
+        self.assertEqual(recovered['raw_state']['interaction']['request']['id'], 'per_keep')
+        self.event = recovered['raw_state']['evidence']['recovery_events'][-1]
+        self.assertEqual(self.event['previous_status'], 'running')
+        self.assertFalse(self.event['automatic_replay'])
+        self.assertEqual(self.store.get_execution(applying['id'])['application_status'], 'applying')
+        from project_generation import read_generation
+        self.assertEqual(read_generation(
+            self.store, self.project['id'], generation['id'])['status'], 'failed')
+        self.assertTrue(staging.exists())
+        latest = self.root / 'state' / 'runtime' / 'recovery' / 'latest.json'
+        self.assertTrue(latest.is_file())
+        self.assertEqual(latest.stat().st_mode & 0o777, 0o600)
+
+        second = recover_atlas_runtime(self.store)
+        self.assertEqual(second['executions_interrupted'], [])
+        self.assertEqual(second['generations_interrupted'], [])
+        self.assertEqual(len(second['applications_requiring_review']), 1)
+
+    def test_startup_recovery_reports_a_journaled_apply_stage(self):
+        from execution_workspace import _write_apply_journal
+        from runtime_recovery import recover_atlas_runtime
+        task = self.store.create_task(
+            self.project['id'], 'Journaled apply', 'Keep the journal visible')
+        execution = self.store.create_execution(
+            task['id'], 'opencode', 'ses_journaled', application_status='pending')
+        self.store.update_execution(execution['id'], {'state': 'completed'})
+        self.store.record_execution_application(
+            execution['id'], 'applying', {'apply_intent': {'after_snapshot_id': 'snap_missing'}})
+        stage = self.workspace / '.atlas-apply-journaled'
+        stage.mkdir()
+        _write_apply_journal(stage, {
+            'schema': 1,
+            'execution_id': execution['id'],
+            'before_manifest': {'files': {}},
+            'after_manifest': {'files': {}},
+            'difference': {'added': [], 'modified': [], 'removed': []},
+            'phase': 'installing',
+            'backed_up': [],
+            'applied': [],
+        })
+        report = recover_atlas_runtime(self.store)
+        entry = next(item for item in report['staging_directories']
+                     if item.get('execution_id') == execution['id'])
+        self.assertEqual(entry['action'], 'explicit_apply_recovery_required')
+        self.assertEqual(entry['phase'], 'installing')
+        self.assertTrue(Path(entry['journal']).is_file())
+
+    def test_startup_recovery_reports_malformed_generation_runs(self):
+        from runtime_recovery import recover_atlas_runtime
+        broken = self.root / 'state' / 'generation-runs' / self.project['id'] / 'gen_broken'
+        broken.mkdir(parents=True)
+        (broken / 'run.json').write_text('{not valid json', encoding='utf-8')
+        report = recover_atlas_runtime(self.store)
+        self.assertTrue(any(item.get('scope') == 'generations'
+                            for item in report['errors']))
+
+    def test_project_store_process_lock_prevents_two_api_owners(self):
+        from runtime_recovery import acquire_project_store_lock
+        first = acquire_project_store_lock(self.store.path)
+        self.addCleanup(first.close)
+        lock_path = self.store.path.parent / 'runtime' / 'api-process.lock'
+        self.assertEqual(lock_path.stat().st_mode & 0o777, 0o600)
+        with self.assertRaisesRegex(RuntimeError, 'another Atlas API process'):
+            acquire_project_store_lock(self.store.path)
+        first.close()
+        replacement = acquire_project_store_lock(self.store.path)
+        replacement.close()
+
+
+class ProjectBackupTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.store = ProjectStore(self.root / 'state' / 'projects.sqlite')
+        self.workspace = self.root / 'workspace'
+        self.workspace.mkdir()
+        (self.workspace / 'keep.py').write_text('print("source")\n')
+        self.project = self.store.create_project(
+            'Backup me', 'Preserve accepted intent', self.workspace, 'existing')
+        requirement = self.store.create_requirement(
+            self.project['id'], 'Keep accepted scope', 'current', 'User approved')
+        self.store.confirm_requirement(requirement['id'], 'current', 'Approved')
+        self.document = self.store.create_document(
+            self.project['id'], 'technical-plan', 'Plan', '# Plan\n\nAccepted content')
+        other_workspace = self.root / 'other-workspace'
+        other_workspace.mkdir()
+        self.other = self.store.create_project(
+            'Other project', 'Must not enter scoped backup', other_workspace, 'existing')
+        self.store.create_requirement(
+            self.other['id'], 'Other requirement', 'later', 'Out of scope')
+
+    def test_backup_is_project_scoped_and_restores_to_a_new_store(self):
+        from project_backup import (
+            ProjectBackupError, create_project_backup, restore_project_backup,
+            validate_project_backup,
+        )
+        artifacts = {
+            'generation-runs': 'gen_test/run.json',
+            'execution-evidence': 'exe_test/stderr.txt',
+            'exports': 'bundle/manifest.json',
+        }
+        for name, relative in artifacts.items():
+            path = self.store.path.parent / name / self.project['id'] / relative
+            path.parent.mkdir(parents=True)
+            path.write_text(json.dumps({'project_id': self.project['id']}))
+        other_artifact = (self.store.path.parent / 'exports' / self.other['id'] /
+                          'other.txt')
+        other_artifact.parent.mkdir(parents=True)
+        other_artifact.write_text('other')
+
+        create_project_backup(self.store, self.project['id'])
+        import drafts_api
+        handler = object.__new__(drafts_api.Handler)
+        handler.path = f"/api/projects/{self.project['id']}/backup"
+        handler._body = lambda: {}
+        handler._json = lambda value, code=200: (value, code)
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            api_result, code = handler.do_POST()
+        self.assertEqual(code, 201)
+        self.assertNotIn('archive', api_result)
+        self.assertRegex(api_result['archive_name'], r'^\d{8}T\d{6}Z-[0-9a-f]{8}\.zip$')
+        self.assertTrue(api_result['download_url'].endswith(api_result['archive_name']))
+        handler.path = api_result['download_url']
+        handler._file = lambda path, name: (path, name)
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            downloaded = handler.do_GET()
+        self.assertEqual(downloaded[1], api_result['archive_name'])
+
+        archive = (self.store.path.parent / "backups" / self.project['id'] /
+                   api_result['archive_name'])
+        self.assertEqual(archive.stat().st_mode & 0o777, 0o600)
+        self.assertEqual(archive.parent.stat().st_mode & 0o777, 0o700)
+        manifest = validate_project_backup(archive)
+        self.assertEqual(manifest['project_id'], self.project['id'])
+        self.assertFalse(manifest['source_workspace_included'])
+        with zipfile.ZipFile(archive) as bundle:
+            names = bundle.namelist()
+        self.assertIn('backup/project.sqlite', names)
+        self.assertFalse(any(self.other['id'] in name for name in names))
+        self.assertFalse(any('keep.py' in name for name in names))
+
+        target = self.root / 'restored' / 'projects.sqlite'
+        restored = restore_project_backup(archive, target)
+        self.assertEqual(restored['project_id'], self.project['id'])
+        store = ProjectStore(target)
+        self.assertEqual([item['id'] for item in store.list_projects()], [self.project['id']])
+        self.assertEqual(store.get_document(self.document['id'])['content'],
+                         '# Plan\n\nAccepted content')
+        self.assertEqual(target.stat().st_mode & 0o777, 0o600)
+        for name, relative in artifacts.items():
+            restored_artifact = target.parent / name / self.project['id'] / relative
+            self.assertTrue(restored_artifact.is_file(), relative)
+            self.assertEqual(restored_artifact.stat().st_mode & 0o777, 0o600)
+        self.assertEqual((self.workspace / 'keep.py').read_text(), 'print("source")\n')
+        with self.assertRaisesRegex(ProjectBackupError, 'already exists'):
+            restore_project_backup(archive, target)
+
+    def test_browser_backup_list_and_restore_target_are_controlled(self):
+        import drafts_api
+        from project_backup import create_project_backup
+        created = create_project_backup(self.store, self.project['id'])
+        archive_name = Path(created['archive']).name
+        handler = object.__new__(drafts_api.Handler)
+        handler._json = lambda value, code=200: (value, code)
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            handler.path = f'/api/projects/{self.project["id"]}/backups'
+            listed, code = handler.do_GET()
+            self.assertEqual(code, 200)
+            self.assertEqual(len(listed['backups']), 1)
+            self.assertEqual(listed['backups'][0]['name'], archive_name)
+            self.assertNotIn('archive', listed['backups'][0])
+
+            handler.path = (
+                f'/api/projects/{self.project["id"]}/backups/{archive_name}/restore-target')
+            handler._body = lambda: {}
+            prepared, code = handler.do_POST()
+            self.assertEqual(code, 201)
+            self.assertNotIn('target_store', prepared)
+            self.assertRegex(prepared['restore_id'], r'^restore_[0-9a-f]{32}$')
+
+            handler.path = (
+                f'/api/projects/{self.project["id"]}/backups/{archive_name}/restore')
+            handler._body = lambda: {
+                'restore_id': prepared['restore_id'],
+                'confirm': 'restore_to_new_store',
+                'target_store': '/tmp/should-not-be-accepted',
+            }
+            rejected, code = handler.do_POST()
+            self.assertEqual(code, 400)
+            self.assertIn('only', rejected['error'])
+            self.assertEqual(rejected['code'], 'invalid_request')
+            self.assertFalse(rejected['retryable'])
+
+            handler._body = lambda: {
+                'restore_id': prepared['restore_id'],
+                'confirm': 'restore_to_new_store',
+            }
+            restored, code = handler.do_POST()
+            self.assertEqual(code, 201)
+            self.assertEqual(restored['status'], 'completed')
+            self.assertNotIn('store', restored)
+            self.assertNotIn('target_store', restored)
+            self.assertEqual(restored['project_id'], self.project['id'])
+
+            handler.path = (
+                f'/api/projects/{self.project["id"]}/restore-status/'
+                f'{prepared["restore_id"]}')
+            status, code = handler.do_GET()
+            self.assertEqual(code, 200)
+            self.assertEqual(status['status'], 'completed')
+            self.assertNotIn('target_store', status)
+        self.assertEqual((self.workspace / 'keep.py').read_text(), 'print("source")\n')
+
+    def test_browser_backup_delete_and_restore_cleanup_are_explicit(self):
+        import drafts_api
+        import project_backup
+        from project_backup import create_project_backup, prepare_project_restore
+        created = create_project_backup(self.store, self.project['id'])
+        archive_name = Path(created['archive']).name
+        handler = object.__new__(drafts_api.Handler)
+        handler._json = lambda value, code=200: (value, code)
+        with patch.object(drafts_api, 'PROJECT_STORE', self.store):
+            handler.path = f'/api/projects/{self.project["id"]}/backups/{archive_name}'
+            handler._body = lambda: {}
+            rejected, code = handler.do_DELETE()
+            self.assertEqual(code, 400)
+            self.assertIn('confirmation', rejected['error'])
+            handler._body = lambda: {'confirm': 'delete_backup'}
+            deleted, code = handler.do_DELETE()
+            self.assertEqual(code, 200)
+            self.assertTrue(deleted['deleted'])
+            self.assertFalse(Path(created['archive']).exists())
+
+            prepared = prepare_project_restore(self.store, self.project['id'])
+            target = Path(prepared['target_store'])
+            stage = target.parent / '.atlas-restore-test'
+            stage.mkdir()
+            project_backup._write_restore_journal(
+                project_backup._restore_journal_path(target), {
+                    'schema': project_backup.RESTORE_JOURNAL_SCHEMA,
+                    'project_id': self.project['id'],
+                    'target_store': str(target),
+                    'artifact_root': str(target.parent),
+                    'stage': str(stage),
+                    'phase': 'extracting',
+                    'installed_artifacts': [],
+                    'artifact_fingerprints': {},
+                    'database_sha256': '',
+                    'database_installed': False,
+                })
+            handler.path = (
+                f'/api/projects/{self.project["id"]}/restore-status/'
+                f'{prepared["restore_id"]}/recover')
+            handler._body = lambda: {'confirm': 'cleanup_partial_restore'}
+            recovered, code = handler.do_POST()
+            self.assertEqual(code, 200)
+            self.assertEqual(recovered['status'], 'recovered')
+            self.assertFalse(stage.exists())
+            handler.path = (
+                f'/api/projects/{self.project["id"]}/restore-status/'
+                f'{prepared["restore_id"]}')
+            status, code = handler.do_GET()
+            self.assertEqual(code, 200)
+            self.assertEqual(status['status'], 'not_started')
+        self.assertEqual((self.workspace / 'keep.py').read_text(), 'print("source")\n')
+
+    def test_prepare_restore_target_rejects_workspace_overlap(self):
+        from project_backup import ProjectBackupError, prepare_project_restore
+        overlap_store = ProjectStore(self.workspace / 'atlas' / 'projects.sqlite')
+        overlap_project = overlap_store.create_project(
+            'Overlap', 'Must not create restore state in source', self.workspace, 'existing')
+        with self.assertRaisesRegex(ProjectBackupError, 'overlaps'):
+            prepare_project_restore(overlap_store, overlap_project['id'])
+
+    def test_restore_validates_and_extracts_the_same_archive_handle(self):
+        import project_backup
+        from project_backup import create_project_backup, restore_project_backup
+        result = create_project_backup(self.store, self.project['id'])
+        archive = Path(result['archive'])
+        replacement = self.root / 'replacement.zip'
+        with zipfile.ZipFile(archive) as source, zipfile.ZipFile(
+                replacement, 'w', zipfile.ZIP_DEFLATED) as changed:
+            changed.writestr('backup/undeclared.txt', b'changed')
+            for item in source.infolist():
+                changed.writestr(item, source.read(item.filename))
+        real_validate = project_backup._validate_open_backup
+
+        def validate_then_replace(bundle):
+            manifest = real_validate(bundle)
+            os.replace(replacement, archive)
+            return manifest
+
+        target = self.root / 'same-handle' / 'projects.sqlite'
+        with patch.object(project_backup, '_validate_open_backup',
+                          side_effect=validate_then_replace):
+            restored = restore_project_backup(archive, target)
+        self.assertEqual(restored['project_id'], self.project['id'])
+        self.assertEqual(ProjectStore(target).get_project(self.project['id'])['id'],
+                         self.project['id'])
+
+    def test_interrupted_restore_keeps_journal_until_explicit_cleanup(self):
+        import project_backup
+        from project_backup import (
+            RESTORE_RECOVERY_CONFIRMATION, create_project_backup,
+            inspect_project_restore, recover_interrupted_restore,
+        )
+        artifact = self.store.path.parent / 'exports' / self.project['id'] / 'bundle'
+        artifact.mkdir(parents=True)
+        (artifact / 'manifest.json').write_text('{"ok": true}\n', encoding='utf-8')
+        result = create_project_backup(self.store, self.project['id'])
+        target = self.root / 'interrupted-restore' / 'projects.sqlite'
+        script = """
+import os, sys
+sys.path.insert(0, sys.argv[1])
+import project_backup
+real_rename = project_backup.os.rename
+def crash_after_rename(source, destination):
+    real_rename(source, destination)
+    if '/exports/' in str(destination):
+        os._exit(78)
+project_backup.os.rename = crash_after_rename
+project_backup.restore_project_backup(sys.argv[2], sys.argv[3])
+"""
+        crashed = subprocess.run([
+            sys.executable, '-c', script, str(CODE), result['archive'], str(target),
+        ], cwd=str(CODE), capture_output=True)
+        self.assertEqual(crashed.returncode, 78)
+        status = inspect_project_restore(target)
+        self.assertTrue(status['interrupted'])
+        self.assertFalse(target.exists())
+        with self.assertRaisesRegex(project_backup.ProjectBackupError, 'confirm'):
+            recover_interrupted_restore(target)
+        recovered = recover_interrupted_restore(target, RESTORE_RECOVERY_CONFIRMATION)
+        self.assertEqual(recovered['action'], 'cleanup_partial_restore')
+        self.assertFalse(inspect_project_restore(target)['interrupted'])
+        self.assertFalse(target.exists())
+
+    def test_restore_database_link_crash_window_is_explicitly_recoverable(self):
+        from project_backup import (
+            RESTORE_RECOVERY_CONFIRMATION, create_project_backup,
+            inspect_project_restore, recover_interrupted_restore,
+        )
+        result = create_project_backup(self.store, self.project['id'])
+        target = self.root / 'db-crash' / 'projects.sqlite'
+        script = """
+import os, sys
+sys.path.insert(0, sys.argv[1])
+import project_backup
+real_link = project_backup.os.link
+def crash_after_link(source, destination):
+    real_link(source, destination)
+    os._exit(79)
+project_backup.os.link = crash_after_link
+project_backup.restore_project_backup(sys.argv[2], sys.argv[3])
+"""
+        crashed = subprocess.run([
+            sys.executable, '-c', script, str(CODE), result['archive'], str(target),
+        ], cwd=str(CODE), capture_output=True)
+        self.assertEqual(crashed.returncode, 79)
+        status = inspect_project_restore(target)
+        self.assertTrue(status['interrupted'])
+        self.assertFalse(status['database_installed'])
+        self.assertTrue(target.is_file())
+        recovered = recover_interrupted_restore(target, RESTORE_RECOVERY_CONFIRMATION)
+        self.assertEqual(recovered['action'], 'cleanup_partial_restore')
+        self.assertFalse(target.exists())
+        self.assertFalse(inspect_project_restore(target)['interrupted'])
+
+    def test_restore_recovery_refuses_replaced_database(self):
+        from project_backup import (
+            RESTORE_RECOVERY_CONFIRMATION, ProjectBackupError, create_project_backup,
+            inspect_project_restore, recover_interrupted_restore,
+        )
+        result = create_project_backup(self.store, self.project['id'])
+        target = self.root / 'replaced-db' / 'projects.sqlite'
+        script = """
+import os, sys
+sys.path.insert(0, sys.argv[1])
+import project_backup
+real_link = project_backup.os.link
+def crash_after_link(source, destination):
+    real_link(source, destination)
+    os._exit(82)
+project_backup.os.link = crash_after_link
+project_backup.restore_project_backup(sys.argv[2], sys.argv[3])
+"""
+        crashed = subprocess.run([
+            sys.executable, '-c', script, str(CODE), result['archive'], str(target),
+        ], cwd=str(CODE), capture_output=True)
+        self.assertEqual(crashed.returncode, 82)
+        target.write_bytes(b'not the restored database')
+        with self.assertRaisesRegex(ProjectBackupError, 'changed after database installation'):
+            recover_interrupted_restore(target, RESTORE_RECOVERY_CONFIRMATION)
+        self.assertTrue(target.exists())
+        self.assertTrue(inspect_project_restore(target)['interrupted'])
+
+    def test_restore_artifact_journal_precedes_atomic_install(self):
+        from project_backup import (
+            RESTORE_RECOVERY_CONFIRMATION, create_project_backup,
+            inspect_project_restore, recover_interrupted_restore,
+        )
+        artifact = self.store.path.parent / 'exports' / self.project['id'] / 'bundle'
+        artifact.mkdir(parents=True)
+        (artifact / 'manifest.json').write_text('{"ok": true}\n', encoding='utf-8')
+        result = create_project_backup(self.store, self.project['id'])
+        target = self.root / 'artifact-journal' / 'projects.sqlite'
+        script = """
+import os, sys
+sys.path.insert(0, sys.argv[1])
+import project_backup
+real_rename = project_backup.os.rename
+def crash_before_rename(source, destination):
+    if '/exports/' in str(destination):
+        os._exit(80)
+    return real_rename(source, destination)
+project_backup.os.rename = crash_before_rename
+project_backup.restore_project_backup(sys.argv[2], sys.argv[3])
+"""
+        crashed = subprocess.run([
+            sys.executable, '-c', script, str(CODE), result['archive'], str(target),
+        ], cwd=str(CODE), capture_output=True)
+        self.assertEqual(crashed.returncode, 80)
+        status = inspect_project_restore(target)
+        self.assertTrue(status['interrupted'])
+        self.assertFalse(target.exists())
+        self.assertTrue(status['installed_artifacts'])
+        recovered = recover_interrupted_restore(target, RESTORE_RECOVERY_CONFIRMATION)
+        self.assertEqual(recovered['action'], 'cleanup_partial_restore')
+        self.assertFalse(inspect_project_restore(target)['interrupted'])
+
+    def test_restore_recovery_refuses_replaced_artifact(self):
+        from project_backup import (
+            RESTORE_RECOVERY_CONFIRMATION, ProjectBackupError, create_project_backup,
+            inspect_project_restore, recover_interrupted_restore,
+        )
+        artifact = self.store.path.parent / 'exports' / self.project['id'] / 'bundle'
+        artifact.mkdir(parents=True)
+        (artifact / 'manifest.json').write_text('{"ok": true}\n', encoding='utf-8')
+        result = create_project_backup(self.store, self.project['id'])
+        target = self.root / 'replaced-artifact' / 'projects.sqlite'
+        script = """
+import os, sys
+sys.path.insert(0, sys.argv[1])
+import project_backup
+real_rename = project_backup.os.rename
+def crash_after_rename(source, destination):
+    real_rename(source, destination)
+    if '/exports/' in str(destination):
+        os._exit(81)
+project_backup.os.rename = crash_after_rename
+project_backup.restore_project_backup(sys.argv[2], sys.argv[3])
+"""
+        crashed = subprocess.run([
+            sys.executable, '-c', script, str(CODE), result['archive'], str(target),
+        ], cwd=str(CODE), capture_output=True)
+        self.assertEqual(crashed.returncode, 81)
+        installed = target.parent / 'exports' / self.project['id']
+        (installed / 'manifest.json').write_text('{"changed": true}\n', encoding='utf-8')
+        with self.assertRaisesRegex(ProjectBackupError, 'changed after installation'):
+            recover_interrupted_restore(target, RESTORE_RECOVERY_CONFIRMATION)
+        self.assertTrue(installed.exists())
+        self.assertTrue(inspect_project_restore(target)['interrupted'])
+
+    def test_backup_redacts_legacy_execution_evidence_in_the_copy(self):
+        from project_backup import create_project_backup
+        task = self.store.create_task(
+            self.project['id'], 'Legacy evidence', 'Backup redacts old evidence')
+        execution = self.store.create_execution(
+            task['id'], 'opencode', 'ses_legacy', application_status='not_applicable')
+        self.store.update_execution(execution['id'], {'state': 'stopped'})
+        with sqlite3.connect(self.store.path) as con:
+            con.execute(
+                'UPDATE execution SET raw_state_json=? WHERE id=?',
+                (json.dumps({'evidence': {'token': 'legacy-secret-value'}}), execution['id']))
+            con.commit()
+        result = create_project_backup(self.store, self.project['id'])
+        with zipfile.ZipFile(result['archive']) as bundle:
+            data = bundle.read('backup/project.sqlite')
+        restored = self.root / 'redacted.sqlite'
+        restored.write_bytes(data)
+        with sqlite3.connect(restored) as con:
+            raw = con.execute(
+                'SELECT raw_state_json FROM execution WHERE id=?', (execution['id'],)
+            ).fetchone()[0]
+        self.assertNotIn('legacy-secret-value', raw)
+        self.assertIn('[REDACTED]', raw)
+        self.assertNotIn(b'legacy-secret-value', data)
+
+    def test_backup_refuses_active_work(self):
+        from project_backup import ProjectBackupError, create_project_backup
+        task = self.store.create_task(
+            self.project['id'], 'Active', 'Must finish before backup')
+        self.store.create_execution(task['id'], 'opencode', 'ses_active')
+        with self.assertRaisesRegex(ProjectBackupError, 'active generation or execution'):
+            create_project_backup(self.store, self.project['id'])
+
+    def test_backup_refuses_unapplied_completed_results(self):
+        from project_backup import ProjectBackupError, create_project_backup
+        task = self.store.create_task(
+            self.project['id'], 'Pending result', 'Cannot restore an isolated result')
+        execution = self.store.create_execution(
+            task['id'], 'opencode', 'ses_pending_backup', application_status='pending')
+        self.store.update_execution(execution['id'], {'state': 'completed'})
+        with self.assertRaisesRegex(ProjectBackupError, 'active generation or execution'):
+            create_project_backup(self.store, self.project['id'])
+
+    def test_backup_validation_detects_tampering(self):
+        from project_backup import ProjectBackupError, create_project_backup, validate_project_backup
+        result = create_project_backup(self.store, self.project['id'])
+        source = Path(result['archive'])
+        tampered = self.root / 'tampered.zip'
+        with zipfile.ZipFile(source) as original:
+            with zipfile.ZipFile(tampered, 'w', zipfile.ZIP_DEFLATED) as changed:
+                for item in original.infolist():
+                    data = original.read(item.filename)
+                    if item.filename == 'backup/project.sqlite':
+                        data += b'tampered'
+                    changed.writestr(item, data)
+        with self.assertRaisesRegex(ProjectBackupError, 'hash mismatch'):
+            validate_project_backup(tampered)
 
 
 class PublicationTests(unittest.TestCase):
@@ -2947,6 +4904,33 @@ class PublicationTests(unittest.TestCase):
             with rt.corpus_lock(temp):
                 with self.assertRaises(RuntimeError):
                     with rt.corpus_lock(temp):pass
+
+    def test_web_data_publish_rolls_back_an_interrupted_directory_swap(self):
+        import importlib.util
+        script = CODE.parent / 'atlas-web/scripts/gen-data.py'
+        spec = importlib.util.spec_from_file_location('atlas_gen_data_test', script)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            output = root / 'data'
+            output.mkdir()
+            (output / 'marker.txt').write_text('old')
+            stage = root / '.data.staging-test'
+            stage.mkdir()
+            (stage / 'marker.txt').write_text('new')
+            real_replace = os.replace
+            def fail_cutover(source, target):
+                if Path(source).name.startswith('.data.staging-') and Path(target) == output:
+                    raise OSError('simulated cutover failure')
+                return real_replace(source, target)
+            with patch.object(module.os, 'replace', side_effect=fail_cutover):
+                with self.assertRaisesRegex(OSError, 'simulated cutover failure'):
+                    module.publish_web_data(stage, output)
+            self.assertEqual((output / 'marker.txt').read_text(), 'old')
+            self.assertFalse(stage.exists())
+            self.assertFalse((root / '.data.publish.json').exists())
+            self.assertEqual(list(root.glob('.data.backup-*')), [])
 
     def test_review_updates_do_not_clobber_other_drafts(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -3036,6 +5020,23 @@ class CorpusTests(unittest.TestCase):
             self.assertEqual(con.execute('SELECT slug FROM leaf').fetchone()[0],'existing-tool-et')
 
 
+    def test_web_data_generation_removes_stale_files_and_matches_leaf_index(self):
+        self.fill_aux(self.pack)
+        output = self.pack / 'web-data'
+        (output / 'leaves').mkdir(parents=True)
+        (output / 'sections').mkdir(parents=True)
+        (output / 'leaves' / 'stale-tool.json').write_text('{}')
+        (output / 'sections' / 'stale-section.json').write_text('{}')
+        self.run_script(self.pack, '../atlas-web/scripts/gen-data.py')
+        meta = json.loads((output / 'meta.json').read_text())
+        leaf_files = {path.stem for path in (output / 'leaves').glob('*.json')}
+        self.assertEqual(meta['leafCount'], 1)
+        self.assertEqual(leaf_files, {'existing-tool'})
+        self.assertFalse((output / 'leaves' / 'stale-tool.json').exists())
+        self.assertFalse((output / 'sections' / 'stale-section.json').exists())
+        self.assertEqual(json.loads((output / 'leaves/existing-tool.json').read_text())['slug'],
+                         'existing-tool')
+
     def test_missing_stale_or_variant_review_cannot_create_leaf(self):
         (self.pack/'drafts/review.json').write_text('{}')
         with self.assertRaisesRegex(ValueError,'查重'):promote.validate_promotion('wip-new','new','01.01',self.pack)
@@ -3073,6 +5074,167 @@ class CorpusTests(unittest.TestCase):
             handler.do_POST()
         self.assertEqual(responses[0][1],409)
         thread.assert_not_called()
+
+    def test_draft_body_revision_rejects_stale_save_and_promote(self):
+        import drafts_api
+        with patch.object(drafts_api, 'PACK', str(self.pack)), \
+             patch.object(drafts_api, 'DRAFTS', str(self.pack / 'drafts')):
+            original = drafts_api.read_draft('wip-new')['body_sha256']
+            changed = self.draft.read_text() + '\nLocal edit'
+            new_hash = drafts_api.save_body('wip-new', changed, original)
+            self.assertNotEqual(new_hash, original)
+            with self.assertRaises(drafts_api.DraftRevisionConflict):
+                drafts_api.save_body('wip-new', changed + '\nStale write', original)
+
+            handler = object.__new__(drafts_api.Handler)
+            handler.path = '/api/promote'
+            handler._body = lambda: {
+                'slug': 'wip-new', 'action': 'new', 'section': '01.01',
+                'body_sha256': original,
+            }
+            responses = []
+            handler._json = lambda body, code=200: responses.append((body, code))
+            with patch.object(drafts_api.threading, 'Thread') as thread:
+                handler.do_POST()
+            self.assertEqual(responses[0][1], 409)
+            thread.assert_not_called()
+
+    def test_saving_body_invalidates_old_translation(self):
+        import drafts_api
+        with patch.object(drafts_api, 'PACK', str(self.pack)), \
+             patch.object(drafts_api, 'DRAFTS', str(self.pack / 'drafts')):
+            body_hash = drafts_api.read_draft('wip-new')['body_sha256']
+            (self.pack / 'drafts/wip-new.zh.json').write_text('{"old": true}')
+            (self.pack / 'drafts/wip-new.research.zh.md').write_text('旧译文')
+            update_review('wip-new', {
+                'translation_state': 'completed', 'translation_body_sha256': body_hash,
+            }, self.pack)
+            drafts_api.save_body('wip-new', self.draft.read_text() + '\nChanged', body_hash)
+            self.assertFalse((self.pack / 'drafts/wip-new.zh.json').exists())
+            self.assertFalse((self.pack / 'drafts/wip-new.research.zh.md').exists())
+            self.assertEqual(load_review(self.pack)['wip-new']['translation_state'], 'stale')
+
+    def test_published_review_conflict_is_read_only(self):
+        import drafts_api
+        with patch.object(drafts_api, 'PACK', str(self.pack)), \
+             patch.object(drafts_api, 'DRAFTS', str(self.pack / 'drafts')):
+            update_review('wip-new', {'promoted': True, 'final_slug': 'new-tool'}, self.pack)
+            detail = drafts_api.read_draft('wip-new')
+            self.assertTrue(detail['status_conflict'])
+            self.assertEqual(detail['status'], 'status_conflict')
+            handler = object.__new__(drafts_api.Handler)
+            handler.path = '/api/drafts/wip-new'
+            handler._body = lambda: {'body': 'must not write'}
+            responses = []
+            handler._json = lambda body, code=200: responses.append((body, code))
+            handler.do_PUT()
+            self.assertEqual(responses[0][1], 409)
+
+    def test_create_rejects_empty_slug_without_writing(self):
+        import drafts_api
+        with patch.object(drafts_api, 'DRAFTS', str(self.pack / 'drafts')), \
+             patch.object(drafts_api.dn, 'collision', return_value=[]), \
+             patch.object(drafts_api.threading, 'Thread') as thread:
+            handler = object.__new__(drafts_api.Handler)
+            handler.path = '/api/drafts'
+            handler._body = lambda: {'name': '!!!', 'desc': 'an idea'}
+            responses = []
+            handler._json = lambda body, code=200: responses.append((body, code))
+            handler.do_POST()
+            self.assertEqual(responses[0][1], 400)
+            self.assertFalse((self.pack / 'drafts' / '.md').exists())
+            thread.assert_not_called()
+
+    def test_concurrent_create_of_same_slug_has_one_winner(self):
+        import drafts_api
+        def create(_):
+            handler = object.__new__(drafts_api.Handler)
+            handler.path = '/api/drafts'
+            handler._body = lambda: {'name': 'Same Slug', 'desc': 'same idea'}
+            responses = []
+            handler._json = lambda body, code=200: responses.append((body, code))
+            handler.do_POST()
+            return responses[0]
+        with patch.object(drafts_api, 'DRAFTS', str(self.pack / 'drafts')), \
+             patch.object(drafts_api.dn, 'DRAFTS', str(self.pack / 'drafts')), \
+             patch.object(drafts_api.dn, 'PACK', str(self.pack)), \
+             patch.object(drafts_api.dn, 'collision', return_value=[]), \
+             patch.object(drafts_api, 'run_engine', lambda _slug: None):
+            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+                results = list(pool.map(create, range(2)))
+        self.assertEqual(sorted(code for _, code in results), [201, 409])
+        self.assertEqual(len(list((self.pack / 'drafts').glob('same-slug.md'))), 1)
+
+    def test_dedupe_rejects_a_second_writer_while_slug_is_locked(self):
+        import drafts_api
+        with patch.object(drafts_api, 'PACK', str(self.pack)), \
+             patch.object(drafts_api, 'DRAFTS', str(self.pack / 'drafts')):
+            body_hash = drafts_api.read_draft('wip-new')['body_sha256']
+            with drafts_api.dn.slug_lock('wip-new', str(self.pack / 'drafts')):
+                with self.assertRaises(drafts_api.dn.SlugLockBusy):
+                    drafts_api.dedupe_draft('wip-new', body_hash)
+
+    def test_delete_removes_review_record_with_draft(self):
+        import drafts_api
+        with patch.object(drafts_api, 'PACK', str(self.pack)), \
+             patch.object(drafts_api, 'DRAFTS', str(self.pack / 'drafts')):
+            update_review('wip-new', {'verdict': 'new'}, self.pack)
+            result = drafts_api.delete_draft('wip-new')
+            self.assertIn('review.json:wip-new', result['removed'])
+            self.assertNotIn('wip-new', load_review(self.pack))
+
+    def test_translation_start_is_single_flight_and_durable_state(self):
+        import drafts_api
+        class FakeThread:
+            def __init__(self, *args, **kwargs):
+                pass
+            def start(self):
+                pass
+        with patch.object(drafts_api, 'PACK', str(self.pack)), \
+             patch.object(drafts_api, 'DRAFTS', str(self.pack / 'drafts')), \
+             patch.object(drafts_api.threading, 'Thread', FakeThread):
+            try:
+                body_hash = drafts_api.read_draft('wip-new')['body_sha256']
+                self.assertTrue(drafts_api.start_translation('wip-new', body_hash))
+                self.assertFalse(drafts_api.start_translation('wip-new', body_hash))
+                self.assertEqual(load_review(self.pack)['wip-new']['translation_state'], 'running')
+            finally:
+                drafts_api.TRANSLATION_THREADS.pop('wip-new', None)
+
+    def test_restart_fails_closed_for_generation_and_translation(self):
+        import drafts_api
+        with patch.object(drafts_api, 'PACK', str(self.pack)), \
+             patch.object(drafts_api, 'DRAFTS', str(self.pack / 'drafts')), \
+             patch.object(drafts_api.dn, 'DRAFTS', str(self.pack / 'drafts')):
+            self.draft.write_text(self.draft.read_text().replace('status: draft', 'status: generating'))
+            update_review('wip-new', {'translation_state': 'running'}, self.pack)
+            result = drafts_api.recover_interrupted_drafts()
+            self.assertEqual(result, {'generating': 1, 'translations': 1})
+            self.assertIn('status: failed', self.draft.read_text())
+            review = load_review(self.pack)['wip-new']
+            self.assertEqual(review['generation_state'], 'interrupted')
+            self.assertEqual(review['translation_state'], 'failed')
+
+    def test_failed_generation_can_be_explicitly_restarted(self):
+        import drafts_api
+        class FakeThread:
+            def __init__(self, *args, **kwargs):
+                pass
+            def start(self):
+                pass
+        with patch.object(drafts_api, 'PACK', str(self.pack)), \
+             patch.object(drafts_api, 'DRAFTS', str(self.pack / 'drafts')), \
+             patch.object(drafts_api.dn, 'DRAFTS', str(self.pack / 'drafts')), \
+             patch.object(drafts_api.threading, 'Thread', FakeThread):
+            self.draft.write_text(self.draft.read_text().replace('status: draft', 'status: failed'))
+            (self.pack / 'drafts/wip-new.body.md').write_text('partial')
+            body_hash = drafts_api.read_draft('wip-new')['body_sha256']
+            try:
+                self.assertTrue(drafts_api.start_regeneration('wip-new', body_hash))
+                self.assertIn('status: generating', self.draft.read_text())
+                self.assertFalse((self.pack / 'drafts/wip-new.body.md').exists())
+            finally:
+                drafts_api.GEN_THREADS.pop('wip-new', None)
 
     def test_api_does_not_enqueue_a_draft_already_promoting_in_another_process(self):
         import drafts_api
@@ -3114,6 +5276,125 @@ class CorpusTests(unittest.TestCase):
         self.assertTrue(result['promoted'])
         self.assertIn('Existing Tool / New Tool',(self.pack/'DIRECTORY.md').read_text())
         self.assertEqual(json.loads((self.web/'meta.json').read_text())['leafCount'],1)
+
+
+class DraftEngineTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.workdir = self.root / 'pack'
+        self.workdir.mkdir()
+        (self.workdir / 'applications').mkdir()
+        (self.workdir / 'drafts').mkdir()
+        (self.workdir / 'WRITING_GUIDE.md').write_text('Guide')
+        (self.workdir / 'applications' / 'one.md').write_text('One')
+        (self.workdir / 'applications' / 'two.md').write_text('Two')
+        (self.workdir / 'drafts' / 'safe-draft.md').write_text('Draft')
+
+    def test_draft_permissions_deny_shell_web_and_undeclared_edits(self):
+        from drafts_engines import draft_permission_config
+        exemplars = ('one', 'two')
+        v2 = draft_permission_config('safe-draft', exemplars, 2)
+        rules = v2['permissions']
+        self.assertTrue(any(
+            rule == {'action': 'shell', 'resource': '*', 'effect': 'deny'}
+            for rule in rules))
+        self.assertTrue(any(
+            rule == {'action': 'webfetch', 'resource': '*', 'effect': 'deny'}
+            for rule in rules))
+        self.assertTrue(any(
+            rule == {'action': 'edit', 'resource': '*', 'effect': 'deny'}
+            for rule in rules))
+        for output in (
+                'drafts/safe-draft.identity.json', 'drafts/safe-draft.body.md',
+                'drafts/safe-draft.research.md'):
+            self.assertTrue(any(
+                rule == {'action': 'edit', 'resource': output, 'effect': 'allow'}
+                for rule in rules))
+        self.assertTrue(any(
+            rule == {'action': 'edit', 'resource': '.opencode/**', 'effect': 'deny'}
+            for rule in rules))
+        self.assertFalse(any(
+            rule.get('action') == 'edit' and rule.get('resource') == 'drafts/other.md'
+            for rule in rules))
+        self.assertTrue(any(
+            rule.get('action') == 'application_atlas_get_leaf'
+            for rule in rules))
+        self.assertEqual(
+            v2['mcp']['application-atlas']['command'][1:],
+            [str(Path(__file__).resolve().parents[1] / 'mcp_atlas.py'),
+             '--atlas-read-only']
+        )
+        self.assertTrue(Path(v2['mcp']['application-atlas']['command'][1]).is_file())
+
+        v1 = draft_permission_config('safe-draft', exemplars, 1)
+        permission = v1['permission']
+        self.assertEqual(permission['bash'], 'deny')
+        self.assertEqual(permission['webfetch'], 'deny')
+        self.assertEqual(permission['list'], 'deny')
+        self.assertEqual(permission['code_mode'], 'deny')
+        self.assertEqual(permission['skill'], 'deny')
+        self.assertEqual(permission['edit']['*'], 'deny')
+        self.assertEqual(
+            permission['edit']['drafts/safe-draft.body.md'], 'allow')
+        self.assertEqual(permission['application_atlas_classify_product'], 'deny')
+        self.assertEqual(permission['application_atlas_search_atlas'], 'allow')
+        self.assertEqual(
+            v1['mcp']['application-atlas']['command'][1:],
+            [str(Path(__file__).resolve().parents[1] / 'mcp_atlas.py'),
+             '--atlas-read-only']
+        )
+
+    def test_read_only_mcp_refuses_classification_side_effect(self):
+        import runpy
+        import sys
+        original_argv = sys.argv
+        try:
+            sys.argv = [str(CODE / 'mcp_atlas.py'), '--atlas-read-only']
+            module = runpy.run_path(
+                str(CODE / 'mcp_atlas.py'), run_name='atlas_read_only_test')
+        finally:
+            sys.argv = original_argv
+        result = json.loads(module['classify_product']('a local database tool'))
+        self.assertIn('disabled', result['error'])
+
+    def test_draft_engine_uses_temporary_exact_config_and_redacts_log(self):
+        from drafts_engines import OpencodeEngine, render_prompt
+        prompt_path = self.root / 'prompt.md'
+        prompt_path.write_text(
+            'Link: {{LINK}}\nExcerpt: {{LINK_EXCERPT}}\nSlug: {{SLUG}}')
+        rendered = render_prompt(str(prompt_path), {
+            'slug': 'safe-draft', 'name': 'Safe', 'name_zh': '安全',
+            'desc': 'Test', 'link': 'https://example.com',
+            'link_excerpt': 'untrusted public evidence',
+        }, ('one', 'two'))
+        self.assertIn('untrusted public evidence', rendered)
+        log_path = self.workdir / 'drafts' / 'safe-draft.opencode.log'
+        observed = {}
+        def fake_run(argv, **kwargs):
+            config_path = Path(kwargs['cwd']) / '.opencode' / 'opencode.json'
+            observed['config'] = json.loads(config_path.read_text())
+            observed['config_path'] = config_path
+            observed['argv'] = argv
+            return SimpleNamespace(
+                returncode=0,
+                stdout='Authorization: Bearer draft-log-secret\n',
+                stderr='')
+        with patch('drafts_engines.detect_opencode_major_version', return_value=2), \
+             patch('drafts_engines.choose_exemplars', return_value=('one', 'two')), \
+             patch('drafts_engines.subprocess.run', side_effect=fake_run):
+            self.assertTrue(OpencodeEngine().generate(
+                {'slug': 'safe-draft', 'name': 'Safe', 'name_zh': '安全',
+                 'desc': 'Test', 'link': 'https://example.com',
+                 'link_excerpt': 'untrusted public evidence'},
+                str(prompt_path), str(self.workdir), str(log_path)))
+        self.assertTrue(any(
+            rule == {'action': 'shell', 'resource': '*', 'effect': 'deny'}
+            for rule in observed['config']['permissions']))
+        self.assertFalse(observed['config_path'].exists())
+        self.assertNotIn('draft-log-secret', log_path.read_text())
+        self.assertEqual(log_path.stat().st_mode & 0o777, 0o600)
 
 
 class OpenCodeCliAdapterTests(unittest.TestCase):
@@ -3178,9 +5459,10 @@ class OpenCodeCliAdapterTests(unittest.TestCase):
 
     def test_build_run_argv_is_shell_free_and_scoped(self):
         from opencode_cli_adapter import build_run_argv
-        argv = build_run_argv("opencode", "echo hello; touch outside", self.root, "openai/gpt")
-        self.assertEqual(argv[:4], ("opencode", "run", "--format", "json"))
-        self.assertIn("--dir", argv)
+        with patch('opencode_cli_adapter.detect_opencode_major_version', return_value=2):
+            argv = build_run_argv("opencode", "echo hello; touch outside", self.root, "openai/gpt")
+        self.assertEqual(argv[:5], ("opencode", "run", "--format", "json", "--standalone"))
+        self.assertNotIn("--dir", argv)
         self.assertNotIn("shell", argv)
 
     def test_summarize_run_normalizes_json_events_and_transport_state(self):
@@ -3235,6 +5517,33 @@ class OpenCodeCliAdapterTests(unittest.TestCase):
         self.assertEqual(result["stdout"], '{"type":"run.finished"}\n')
         self.assertFalse((self.root / ".atlas" / "opencode-cli.json").exists())
 
+    def test_cli_runner_uses_atlas_owned_v2_permissions(self):
+        from opencode_cli_adapter import _run
+        project_config = self.root / '.atlas' / 'opencode-cli.json'
+        project_config.write_text(json.dumps({
+            'permission': {'bash': 'allow', 'webfetch': 'allow'},
+        }))
+        original_project_config = project_config.read_text()
+        observed = {}
+
+        def fake_run(argv, **kwargs):
+            config_path = Path(kwargs['cwd']) / '.opencode' / 'opencode.json'
+            observed['config'] = json.loads(config_path.read_text())
+            observed['path'] = config_path
+            return SimpleNamespace(
+                returncode=0, stdout='ok', stderr='', check=False)
+        with patch('opencode_cli_adapter.detect_opencode_major_version', return_value=2), \
+             patch('opencode_cli_adapter.subprocess.run', side_effect=fake_run):
+            result = _run(('opencode', 'run'), self.root, 30)
+        self.assertEqual(result.exit_code, 0)
+        shell_rules = [
+            rule for rule in observed['config']['permissions']
+            if rule['action'] == 'shell']
+        self.assertEqual(shell_rules, [
+            {'action': 'shell', 'resource': '*', 'effect': 'deny'}])
+        self.assertFalse(observed['path'].exists())
+        self.assertEqual(project_config.read_text(), original_project_config)
+
     def test_write_run_evidence_creates_self_contained_files(self):
         from opencode_cli_adapter import write_run_evidence
         directory = self.root / "records" / "run_1"
@@ -3251,6 +5560,114 @@ class OpenCodeCliAdapterTests(unittest.TestCase):
         metadata = json.loads((directory / "run.json").read_text())
         self.assertEqual(metadata["schema"], 1)
         self.assertEqual(metadata["summary"]["status"], "completed")
+
+    def test_write_run_evidence_redacts_secrets_and_uses_private_permissions(self):
+        from opencode_cli_adapter import MAX_EVIDENCE_TEXT_CHARS, write_run_evidence
+        directory = self.root / "records" / "redacted"
+        result = write_run_evidence({
+            "argv": ["tool", "--api-key=cli-argv-secret"],
+            "exitCode": 1,
+            "timedOut": False,
+            "stdout": "Authorization: Bearer cli-stdout-secret\n",
+            "stderr": "api_key=cli-stderr-secret\n" + ("x" * MAX_EVIDENCE_TEXT_CHARS),
+        }, directory)
+        self.assertEqual(directory.stat().st_mode & 0o777, 0o700)
+        for name in ("stdout.txt", "stderr.txt", "run.json"):
+            self.assertEqual((directory / name).stat().st_mode & 0o777, 0o600)
+        combined = ''.join((directory / name).read_text() for name in (
+            "stdout.txt", "stderr.txt", "run.json"))
+        for secret in (
+                "cli-argv-secret", "cli-stdout-secret", "cli-stderr-secret"):
+            self.assertNotIn(secret, combined)
+        self.assertIn("[REDACTED]", combined)
+        self.assertTrue(result["metadata"]["truncated"]["stderr"])
+        self.assertIn("Atlas truncated", (directory / "stderr.txt").read_text())
+        self.assertLessEqual(
+            len((directory / "stderr.txt").read_text()), MAX_EVIDENCE_TEXT_CHARS)
+        self.assertNotIn("cli-stdout-secret", result["metadata"]["argv"])
+
+
+class OpenCodePermissionTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name) / 'run'
+        self.root.mkdir()
+
+    def test_v2_policy_is_restored_after_a_temporary_run(self):
+        from opencode_permissions import (
+            install_workdir_permission_policy, remove_workdir_permission_policy,
+        )
+        target = self.root / '.opencode' / 'opencode.json'
+        target.parent.mkdir()
+        original = {'permissions': [
+            {'action': 'shell', 'resource': '*', 'effect': 'allow'}]}
+        target.write_text(json.dumps(original), encoding='utf-8')
+        state = install_workdir_permission_policy(self.root, 2, allow_edit=True)
+        self.assertEqual(state['schema'], 1)
+        policy = json.loads(target.read_text(encoding='utf-8'))
+        self.assertEqual(policy['permissions'][0], {
+            'action': '*', 'resource': '*', 'effect': 'deny'})
+        self.assertIn(
+            {'action': 'shell', 'resource': '*', 'effect': 'deny'},
+            policy['permissions'])
+        self.assertIn(
+            {'action': 'edit', 'resource': '.opencode/**', 'effect': 'deny'},
+            policy['permissions'])
+        self.assertEqual(target.stat().st_mode & 0o777, 0o400)
+        os.chmod(target, 0o600)
+        target.write_text('agent replacement', encoding='utf-8')
+        self.assertTrue(remove_workdir_permission_policy(self.root))
+        self.assertEqual(json.loads(target.read_text(encoding='utf-8')), original)
+        self.assertFalse((self.root.parent / '.atlas-permission-state').exists())
+
+    def test_v1_policy_uses_direct_config_and_denies_shell(self):
+        from opencode_permissions import (
+            install_workdir_permission_policy, remove_workdir_permission_policy,
+        )
+        install_workdir_permission_policy(self.root, 1, allow_edit=False)
+        target = self.root / 'opencode.json'
+        config = json.loads(target.read_text(encoding='utf-8'))
+        self.assertEqual(config['permission']['bash'], 'deny')
+        self.assertEqual(config['permission']['edit']['*'], 'deny')
+        self.assertEqual(config['permission']['code_mode'], 'deny')
+        self.assertEqual(config['permission']['skill'], 'deny')
+        self.assertEqual(config['permission']['mcp'], 'deny')
+        self.assertEqual(config['permission']['application_atlas_*'], 'deny')
+        self.assertFalse(config['tools']['mcp'])
+        self.assertEqual(config['permission']['edit']['opencode.json'], 'deny')
+        self.assertFalse(config['tools']['bash'])
+        self.assertTrue(remove_workdir_permission_policy(self.root))
+        self.assertFalse(target.exists())
+
+    def test_version_detection_handles_opencode_v_prefix(self):
+        from unittest.mock import patch
+        from opencode_permissions import detect_opencode_major_version
+        with patch('opencode_permissions.subprocess.run', return_value=SimpleNamespace(
+                stdout='opencode v2.0.13\n', stderr='')):
+            self.assertEqual(detect_opencode_major_version('opencode'), 2)
+        with patch('opencode_permissions.subprocess.run', return_value=SimpleNamespace(
+                stdout='opencode 1.18.31\n', stderr='')):
+            self.assertEqual(detect_opencode_major_version('opencode'), 1)
+
+    def test_permission_policy_rejects_a_symlinked_config(self):
+        from opencode_permissions import (
+            OpenCodePermissionError, install_workdir_permission_policy,
+        )
+        target = self.root / '.opencode' / 'opencode.json'
+        target.parent.mkdir()
+        target.symlink_to(self.root / 'outside.json')
+        with self.assertRaises(OpenCodePermissionError):
+            install_workdir_permission_policy(self.root, 2)
+
+    def test_unmanaged_opencode_url_requires_explicit_trust_override(self):
+        from opencode_runtime import OpenCodeRuntime
+        runtime = OpenCodeRuntime(self.root.parent)
+        with patch.dict(os.environ, {
+                'ATLAS_OPENCODE_URL': 'http://127.0.0.1:65530',
+                'ATLAS_ALLOW_UNMANAGED_OPENCODE': '',
+        }, clear=False), self.assertRaisesRegex(RuntimeError, 'disabled by default'):
+            runtime.ensure()
 
 
 class AtlasCliTests(unittest.TestCase):
@@ -3334,6 +5751,599 @@ class AtlasCliTests(unittest.TestCase):
     def test_terminal_status_labels_cover_acceptance_states(self):
         self.assertEqual(atlas_cli._status("passed", "zh"), "通过")
         self.assertEqual(atlas_cli._status("waived", "en"), "Waived")
+
+
+class ModelSettingsTests(unittest.TestCase):
+    """Provider configuration and credential handling for /api/settings/model."""
+
+    def setUp(self):
+        import atlas_model
+        self.model = atlas_model
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.config = Path(self._tmp.name) / "model-config.json"
+        self._env = patch.dict(os.environ, {
+            "ATLAS_MODEL_CONFIG": str(self.config)}, clear=False)
+        self._env.start()
+        self.addCleanup(self._env.stop)
+        self.addCleanup(lambda: os.environ.pop("ATLAS_MODEL_CONFIG", None))
+
+    def saved(self):
+        return json.loads(self.config.read_text(encoding="utf-8"))
+
+    def test_credentials_are_write_only(self):
+        provider = self.model.upsert_provider({
+            "preset": "open-design", "api_key": "sk-secret-value-1234567890"})
+        self.assertTrue(provider["has_key"])
+        self.assertNotIn("api_key", provider)
+        self.assertIn("\u2022\u2022\u2022\u2022", provider["key_masked"])
+
+        blob = json.dumps(self.model.public_view(), ensure_ascii=False)
+        self.assertNotIn("sk-secret-value-1234567890", blob)
+
+    def test_saved_file_is_owner_only(self):
+        self.model.upsert_provider({"preset": "deepseek", "api_key": "sk-abcdef123456"})
+        self.assertEqual(self.config.stat().st_mode & 0o777, 0o600)
+
+    def test_blank_key_keeps_stored_value_and_null_clears_it(self):
+        self.model.upsert_provider({"preset": "openai", "api_key": "sk-original-123456"})
+        self.model.upsert_provider({"preset": "openai", "base_url": "https://example.com/v1"})
+        stored = self.saved()["providers"]["openai"]
+        self.assertEqual(stored["api_key"], "sk-original-123456")
+        self.assertEqual(stored["base_url"], "https://example.com/v1")
+
+        self.model.upsert_provider({"preset": "openai", "api_key": None})
+        self.assertEqual(self.saved()["providers"]["openai"]["api_key"], "")
+
+    def test_base_url_must_be_absolute_http(self):
+        for bad in ["not-a-url", "ftp://example.com", "file:///etc/passwd", ""]:
+            with self.subTest(base_url=bad):
+                with self.assertRaises(self.model.ModelConfigError):
+                    self.model.upsert_provider({
+                        "id": "custom", "name": "Custom", "api_key": "k",
+                        "base_url": bad})
+
+    def test_unknown_provider_is_reported_as_not_configured(self):
+        with self.assertRaises(self.model.ModelConfigError) as ctx:
+            self.model.resolve(provider="does-not-exist")
+        self.assertEqual(ctx.exception.code, "not_configured")
+
+    def test_missing_credential_is_reported(self):
+        self.model.upsert_provider({"preset": "groq"})
+        with self.assertRaises(self.model.ModelConfigError) as ctx:
+            self.model.resolve(provider="groq")
+        self.assertEqual(ctx.exception.code, "no_credential")
+
+    def test_delete_requires_explicit_confirmation(self):
+        self.model.upsert_provider({"preset": "mistral", "api_key": "k"})
+        with self.assertRaises(self.model.ModelConfigError):
+            self.model.delete_provider("mistral", "yes")
+        self.assertTrue(self.model.load_config()["providers"]["mistral"])
+        self.model.delete_provider(
+            "mistral", self.model.DELETE_CONFIRMATION)
+        self.assertNotIn("mistral", self.model.load_config()["providers"])
+
+    def test_deleting_the_default_clears_the_default(self):
+        self.model.upsert_provider({"preset": "xai", "api_key": "k", "models": ["grok-1"]})
+        self.model.set_default("xai", "grok-1")
+        self.model.delete_provider("xai", self.model.DELETE_CONFIRMATION)
+        self.assertEqual(self.model.load_config()["default"],
+                         {"provider": None, "model": None})
+
+    def test_provider_error_messages_do_not_leak_the_credential(self):
+        import urllib.error
+        secret = "sk-super-secret-token-value"
+        error = urllib.error.HTTPError(
+            "https://api.example.com/v1/models", 401, "Unauthorized", {},
+            io.BytesIO(b'{"error":"bad key "}'))
+        mapped = self.model._provider_error(error)
+        self.assertEqual(mapped.code, "unauthorized")
+        self.assertNotIn(secret, str(mapped))
+
+    def test_role_model_falls_back_to_the_default(self):
+        self.model.upsert_provider({
+            "preset": "open-design", "api_key": "k",
+            "models": ["deepseek-v4.1-flash", "glm-5.3-flash"]})
+        self.model.set_default("open-design", "deepseek-v4.1-flash")
+        # No role configured: every task uses the default model.
+        for role in ("adjudicator", "dedupe", "translate", "identity"):
+            self.assertEqual(self.model.role_model(role), "")
+            self.assertEqual(self.model.resolve(role=role)["model"],
+                             "deepseek-v4.1-flash")
+
+    def test_role_model_naming_a_served_model_is_honored(self):
+        self.model.upsert_provider({
+            "preset": "open-design", "api_key": "k",
+            "models": ["deepseek-v4.1-flash", "glm-5.3-flash"]})
+        self.model.set_default("open-design", "deepseek-v4.1-flash")
+        with patch.dict(os.environ, {"ATLAS_ADJUDICATOR": "glm-5.3-flash"}):
+            self.assertEqual(self.model.resolve(role="adjudicator")["model"],
+                             "glm-5.3-flash")
+
+    def test_role_model_the_provider_lacks_is_ignored(self):
+        # A stale Go-era model name must not be sent to a provider that does
+        # not serve it; the default model is used instead.
+        self.model.upsert_provider({
+            "preset": "open-design", "api_key": "k",
+            "models": ["deepseek-v4.1-flash"]})
+        self.model.set_default("open-design", "deepseek-v4.1-flash")
+        with patch.dict(os.environ, {"ATLAS_ADJUDICATOR": "qwen3.8-flash"}):
+            self.assertEqual(self.model.resolve(role="adjudicator")["model"],
+                             "deepseek-v4.1-flash")
+
+    def test_complete_text_falls_back_to_reasoning(self):
+        # Some reasoning models return the answer in `reasoning` with an empty
+        # `content`; the helper must not return an empty string.
+        self.model.upsert_provider({
+            "id": "r", "name": "R", "api_key": "k",
+            "base_url": "https://api.example.com/v1", "models": ["m"]})
+        payload = {"model": "m",
+                   "choices": [{"message": {"content": "", "reasoning": " 42 "}}]}
+        with patch.object(self.model, "_post_json",
+                          lambda url, body, headers, timeout: payload):
+            self.assertEqual(
+                self.model.complete_text([{"role": "user", "content": "x"}],
+                                         provider="r"),
+                "42")
+
+    def test_import_reads_credentials_from_the_sqlite_store(self):
+        # OpenCode keeps recently added providers only in opencode.db, so an
+        # importer reading auth.json alone silently misses them.
+        root = Path(self._tmp.name)
+        store = root / ".local/share/opencode"
+        store.mkdir(parents=True, exist_ok=True)
+        with sqlite3.connect(store / "opencode.db") as connection:
+            connection.execute(
+                "CREATE TABLE credential (integration_id TEXT, value TEXT)")
+            connection.execute(
+                "INSERT INTO credential VALUES (?, ?)",
+                ("open-design", json.dumps({"key": "sk-from-db", "type": "api"})))
+        with patch.object(Path, "home", return_value=root):
+            result = self.model.import_from_opencode()
+        self.assertIn("open-design", result["imported"])
+        stored = self.saved()["providers"]["open-design"]
+        self.assertEqual(stored["api_key"], "sk-from-db")
+        self.assertEqual(stored["base_url"],
+                         "https://amr-link.open-design.ai/v1")
+
+    def test_http_error_mapping(self):
+        import urllib.error
+        cases = [
+            (404, "bad_endpoint"),
+            (429, "rate_limited"),
+            (500, "provider_error"),
+        ]
+        for status, expected in cases:
+            with self.subTest(status=status):
+                error = urllib.error.HTTPError(
+                    "https://api.example.com/v1/chat/completions", status, "", {},
+                    io.BytesIO(b"upstream failure"))
+                self.assertEqual(self.model._provider_error(error).code, expected)
+
+    def test_model_unavailable_is_not_retryable(self):
+        import urllib.error
+        error = urllib.error.HTTPError(
+            "https://api.example.com/v1/chat/completions", 400, "", {},
+            io.BytesIO(b'{"error":{"message":"Model is unavailable"}}'))
+        mapped = self.model._provider_error(error)
+        self.assertEqual(mapped.code, "model_unavailable")
+
+    def test_usage_omits_unknown_numbers_rather_than_guessing(self):
+        self.model.upsert_provider({
+            "id": "probe", "name": "Probe", "api_key": "k",
+            "base_url": "https://api.example.com/v1", "models": ["m"]})
+        payload = {
+            "model": "m",
+            "choices": [{"message": {"content": "hi"}, "finish_reason": "stop"}],
+        }
+        with patch.object(self.model, "_post_json",
+                          lambda url, body, headers, timeout: payload):
+            out = self.model.chat([{"role": "user", "content": "x"}], provider="probe")
+        self.assertEqual(out["content"], "hi")
+        self.assertIsNone(out["usage"]["total_tokens"])
+        self.assertIsNone(out["usage"]["cost"])
+
+    def test_tool_calls_are_normalized(self):
+        payload = {
+            "model": "m",
+            "choices": [{
+                "message": {
+                    "content": "",
+                    "tool_calls": [{
+                        "id": "call_1", "type": "function",
+                        "function": {"name": "search_atlas",
+                                     "arguments": '{"query": "kanban"}'}}],
+                },
+                "finish_reason": "tool_calls",
+            }],
+            "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
+        }
+        self.model.upsert_provider({
+            "id": "tools", "name": "Tools", "api_key": "k",
+            "base_url": "https://api.example.com/v1", "models": ["m"]})
+        with patch.object(self.model, "_post_json",
+                          lambda url, body, headers, timeout: payload):
+            out = self.model.chat(
+                [{"role": "user", "content": "x"}],
+                provider="tools",
+                tools=[{"type": "function", "function": {
+                    "name": "search_atlas", "parameters": {"type": "object"}}}])
+        self.assertEqual(out["finish_reason"], "tool_calls")
+        self.assertEqual(out["tool_calls"][0]["function"]["name"], "search_atlas")
+        self.assertEqual(out["usage"]["total_tokens"], 15)
+
+    def test_settings_routes_return_masked_views(self):
+        handler = object.__new__(drafts_api.Handler)
+        handler.headers = {'Host': 'localhost:5199'}
+        handler.path = '/api/settings/model'
+        captured = {}
+        handler._json = lambda value, code=200: captured.update(
+            {"value": value, "code": code}) or (value, code)
+        body = {
+            "preset": "open-design",
+            "api_key": "sk-route-secret-abcdef123456",
+        }
+        handler._body = lambda: body
+        handler._settings_model_post('/api/settings/model/providers')
+        self.assertEqual(captured["code"], 201)
+        self.assertNotIn("api_key", captured["value"])
+
+        captured.clear()
+        payload, code = handler.do_GET()
+        self.assertEqual(code, 200)
+        self.assertIn("providers", payload)
+        self.assertIn("presets", payload)
+        self.assertNotIn("sk-route-secret-abcdef123456",
+                         json.dumps(payload, ensure_ascii=False))
+
+    def test_settings_route_reports_config_errors_with_codes(self):
+        handler = object.__new__(drafts_api.Handler)
+        handler.headers = {'Host': 'localhost:5199'}
+        handler._json = lambda value, code=200: {"value": value, "code": code}
+        handler._body = lambda: {"preset": "bad preset id!!", "api_key": "k"}
+        result = handler._settings_model_post('/api/settings/model/providers')
+        self.assertEqual(result["code"], 400)
+        self.assertEqual(result["value"]["code"], "invalid_request")
+
+
+class AskHarnessTests(unittest.TestCase):
+    """The read-only Ask harness: tool surface, bounding, and citation safety."""
+
+    def setUp(self):
+        import atlas_ask
+        import atlas_tools
+        self.ask = atlas_ask
+        self.tools = atlas_tools
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self._env = patch.dict(os.environ, {
+            "ATLAS_ASK_ROOT": str(Path(self._tmp.name) / "ask")}, clear=False)
+        self._env.start()
+        self.addCleanup(self._env.stop)
+        self.addCleanup(lambda: os.environ.pop("ATLAS_ASK_ROOT", None))
+        # Point the module-level root at the temp dir for this test.
+        self._root = patch.object(
+            self.ask, "ASK_ROOT", Path(self._tmp.name) / "ask")
+        self._root.start()
+        self.addCleanup(self._root.stop)
+
+    # ---- tool surface ----
+
+    def test_only_read_only_tools_are_exposed(self):
+        names = set(self.tools.TOOL_FUNCTIONS)
+        self.assertEqual(names, {
+            "search_atlas", "get_leaf", "get_neighbors", "get_section_tree",
+            "read_atlas_source", "get_atlas_source_manifest"})
+        # No tool may write, shell out, or reach the network.
+        for forbidden in ("write", "edit", "shell", "bash", "webfetch",
+                          "websearch", "subagent", "delete", "promote"):
+            self.assertNotIn(forbidden, names)
+
+    def test_schemas_match_the_dispatch_table(self):
+        declared = {schema["function"]["name"]
+                    for schema in self.tools.TOOL_SCHEMAS}
+        self.assertTrue(declared <= set(self.tools.TOOL_FUNCTIONS))
+        for schema in self.tools.TOOL_SCHEMAS:
+            self.assertIn("description", schema["function"])
+            self.assertEqual(schema["function"]["parameters"]["type"], "object")
+
+    def test_unknown_tool_is_refused_not_executed(self):
+        result = self.tools.run_tool("os.system", {"cmd": "rm -rf /"})
+        self.assertEqual(result["code"], "unknown_tool")
+
+    def test_bad_arguments_are_reported_as_data(self):
+        self.assertEqual(
+            self.tools.run_tool("get_leaf", {"nope": 1})["code"], "bad_argument")
+        self.assertEqual(
+            self.tools.run_tool("get_leaf", "not-a-dict")["code"], "bad_argument")
+
+    def test_arguments_are_rejected_when_missing_required_field(self):
+        result = self.tools.run_tool("search_atlas", {})
+        self.assertEqual(result["code"], "bad_argument")
+
+    def test_limit_is_clamped(self):
+        # A model asking for more than the cap gets the cap, never more.
+        self.assertEqual(self.tools._limit(9999, 5, self.tools.MAX_SEARCH_K),
+                         self.tools.MAX_SEARCH_K)
+        self.assertEqual(self.tools._limit(-5, 5, self.tools.MAX_SEARCH_K), 1)
+        self.assertEqual(self.tools._limit("abc", 5, self.tools.MAX_SEARCH_K), 5)
+
+    def test_slug_is_bounded(self):
+        with self.assertRaises(self.tools.ToolError):
+            self.tools._slug("")
+        with self.assertRaises(self.tools.ToolError):
+            self.tools._slug("x" * 500)
+
+    # ---- conversation lifecycle ----
+
+    def test_thread_round_trip_and_delete_confirmation(self):
+        thread = self.ask.create_thread("hello")
+        self.assertTrue(thread["id"].startswith("ask_"))
+        self.assertEqual(self.ask.read_thread(thread["id"])["messages"], [])
+        self.assertEqual(len(self.ask.list_threads()), 1)
+
+        with self.assertRaises(self.ask.AskError):
+            self.ask.delete_thread(thread["id"], "yes")
+        self.assertTrue(self.ask.read_thread(thread["id"]))
+
+        self.ask.delete_thread(thread["id"], self.ask.DELETE_CONFIRMATION)
+        with self.assertRaises(self.ask.AskError) as ctx:
+            self.ask.read_thread(thread["id"])
+        self.assertEqual(ctx.exception.code, "not_found")
+
+    def test_invalid_thread_id_is_not_found(self):
+        for bad in ("", "nope", "../escape", "ask_short"):
+            with self.subTest(thread_id=bad):
+                with self.assertRaises(self.ask.AskError) as ctx:
+                    self.ask.read_thread(bad)
+                self.assertEqual(ctx.exception.code, "not_found")
+
+    def test_thread_id_cannot_escape_the_root(self):
+        with self.assertRaises(self.ask.AskError):
+            self.ask._path("ask_" + "0" * 32 + "/../../etc/passwd")
+
+    def test_empty_question_is_rejected_before_spawning(self):
+        thread = self.ask.create_thread()
+        for bad in ("", "   ", None, 123):
+            with self.subTest(content=bad):
+                with self.assertRaises(self.ask.AskError) as ctx:
+                    self.ask.start_question(thread["id"], bad)
+                self.assertEqual(ctx.exception.code, "invalid_request")
+        # Nothing was recorded and no worker is running.
+        self.assertEqual(self.ask.read_thread(thread["id"])["messages"], [])
+        self.assertFalse(self.ask.read_thread(thread["id"])["running"])
+
+    def test_over_long_question_is_rejected(self):
+        thread = self.ask.create_thread()
+        with self.assertRaises(self.ask.AskError):
+            self.ask.start_question(thread["id"], "x" * (self.ask.MAX_QUESTION_CHARS + 1))
+
+    # ---- citation safety ----
+
+    def test_citations_only_include_slugs_a_tool_surfaced(self):
+        available = {"kanban-task-board": {"slug": "kanban-task-board",
+                                           "name_zh": "看板任务板"}}
+        answer = "看板 [kanban-task-board] 和 [invented-type] 不同。"
+        cited = self.ask._citations(answer, available)
+        self.assertEqual([item["slug"] for item in cited], ["kanban-task-board"])
+        # A fabricated slug must never become a link.
+        self.assertNotIn("invented-type", [item["slug"] for item in cited])
+
+    def test_citations_are_deduplicated_and_bounded(self):
+        available = {f"type-{i}": {"slug": f"type-{i}", "name_zh": ""}
+                     for i in range(100)}
+        answer = " ".join(f"[type-{i}]" for i in range(100))
+        cited = self.ask._citations(answer, available)
+        self.assertEqual(len(cited), 20)
+        self.assertEqual(len({item["slug"] for item in cited}), len(cited))
+
+    def test_no_answer_yields_no_citations(self):
+        self.assertEqual(self.ask._citations("", {"a": {"slug": "a"}}), [])
+
+    def test_type_collection_records_names_from_search_results(self):
+        payload = {"count": 1, "results": [
+            {"slug": "kanban-task-board", "name_zh": "看板任务板",
+             "related": ["task-management-application"]}]}
+        found = self.ask._collect_types(payload, {})
+        self.assertEqual(found["kanban-task-board"]["name_zh"], "看板任务板")
+        self.assertIn("task-management-application", found)
+
+    # ---- tool output redaction ----
+
+    def test_tool_output_is_redacted_before_storage(self):
+        payload = {"note": "Authorization: Bearer sk-secret-value-1234567890"}
+        cleaned = self.ask._redact_payload(payload)
+        self.assertNotIn("sk-secret-value-1234567890", json.dumps(cleaned))
+
+    def test_tool_result_text_is_fenced_as_data(self):
+        fenced = self.ask._fence({"a": 1})
+        self.assertTrue(fenced.startswith("<atlas-data>"))
+        self.assertTrue(fenced.endswith("</atlas-data>"))
+        # Oversized output is truncated rather than pasted whole.
+        big = self.ask._fence({"blob": "x" * 60_000})
+        self.assertLess(len(big), 30_000)
+
+    def test_summarize_reports_errors_compactly(self):
+        self.assertIn("boom", self.ask._summarize("get_leaf", {"error": "boom"}))
+
+    # ---- bounding ----
+
+    def test_run_limits_are_finite_and_sane(self):
+        self.assertGreaterEqual(self.ask.MAX_TURNS, 1)
+        self.assertLessEqual(self.ask.MAX_TURNS, 20)
+        self.assertGreater(self.ask.MAX_SECONDS, 0)
+        self.assertGreater(self.ask.MAX_TOKENS, 0)
+
+    def test_worker_records_a_failed_message_instead_of_hanging(self):
+        thread = self.ask.create_thread()
+        # Simulate a model failure mid-run.
+        with patch.object(self.ask.atlas_model, "chat",
+                          side_effect=self.ask.atlas_model.ModelConfigError(
+                              "no provider", code="not_configured")):
+            self.ask.start_question(thread["id"], "hello")
+            for _ in range(100):
+                if not self.ask.read_thread(thread["id"])["running"]:
+                    break
+                time.sleep(0.05)
+        final = self.ask.read_thread(thread["id"])
+        self.assertFalse(final["running"])
+        last = final["messages"][-1]
+        self.assertEqual(last["role"], "assistant")
+        self.assertEqual(last["status"], "provider_error")
+        # The failure is visible and did not leave the thread stuck.
+        self.assertTrue(last["content"] or last["error"])
+
+    def test_concurrent_question_on_one_thread_is_refused(self):
+        thread = self.ask.create_thread()
+        started = threading.Event()
+        release = threading.Event()
+
+        def slow_chat(*_args, **_kwargs):
+            started.set()
+            release.wait(timeout=10)
+            return {"content": "done", "tool_calls": [], "usage": {}, "raw": {}}
+
+        with patch.object(self.ask.atlas_model, "chat", side_effect=slow_chat):
+            self.ask.start_question(thread["id"], "first")
+            self.assertTrue(started.wait(timeout=5))
+            try:
+                with self.assertRaises(self.ask.AskError) as ctx:
+                    self.ask.start_question(thread["id"], "second")
+                self.assertEqual(ctx.exception.code, "busy")
+                self.assertEqual(ctx.exception.status, 409)
+            finally:
+                release.set()
+            for _ in range(100):
+                if not self.ask.read_thread(thread["id"])["running"]:
+                    break
+                time.sleep(0.05)
+
+    def test_turn_limit_stops_a_tool_loop_that_never_answers(self):
+        thread = self.ask.create_thread()
+        calls = {"n": 0}
+
+        def always_calls_tool(*_args, **_kwargs):
+            calls["n"] += 1
+            return {
+                "content": "",
+                "tool_calls": [{
+                    "id": f"call_{calls['n']}", "type": "function",
+                    "function": {"name": "get_section_tree",
+                                 "arguments": '{"depth": 1}'}}],
+                "usage": {"total_tokens": 1},
+                "model": "m", "provider": "p",
+                "raw": {"choices": [{"message": {
+                    "content": "",
+                    "tool_calls": [{
+                        "id": f"call_{calls['n']}", "type": "function",
+                        "function": {"name": "get_section_tree",
+                                     "arguments": '{"depth": 1}'}}]}}]},
+            }
+
+        with patch.object(self.ask.atlas_model, "chat", side_effect=always_calls_tool), \
+             patch.object(self.ask.atlas_tools, "run_tool",
+                          return_value={"count": 29, "sections": []}):
+            self.ask.start_question(thread["id"], "loop forever")
+            for _ in range(200):
+                if not self.ask.read_thread(thread["id"])["running"]:
+                    break
+                time.sleep(0.05)
+
+        final = self.ask.read_thread(thread["id"])
+        self.assertFalse(final["running"])
+        last = final["messages"][-1]
+        # It must stop at the turn ceiling rather than looping forever.
+        self.assertEqual(last["status"], "turn_limit")
+        self.assertEqual(calls["n"], self.ask.MAX_TURNS)
+
+    def test_step_records_carry_a_readable_summary(self):
+        thread = self.ask.create_thread()
+
+        def one_tool_then_answer(*_args, **_kwargs):
+            if not getattr(one_tool_then_answer, "done", False):
+                one_tool_then_answer.done = True
+                return {
+                    "content": "",
+                    "tool_calls": [{"id": "c1", "type": "function",
+                                    "function": {"name": "search_atlas",
+                                                 "arguments": '{"query": "x"}'}}],
+                    "usage": {}, "model": "m", "provider": "p",
+                    "raw": {"choices": [{"message": {
+                        "content": "", "tool_calls": [{"id": "c1", "type": "function",
+                        "function": {"name": "search_atlas",
+                                     "arguments": '{"query": "x"}'}}]}}]},
+                }
+            return {"content": "答案 [kanban-task-board]", "tool_calls": [],
+                    "usage": {}, "model": "m", "provider": "p", "raw": {}}
+
+        fake_result = {"count": 1, "results": [
+            {"slug": "kanban-task-board", "name_zh": "看板任务板"}]}
+        with patch.object(self.ask.atlas_model, "chat", side_effect=one_tool_then_answer), \
+             patch.object(self.ask.atlas_tools, "run_tool", return_value=fake_result):
+            self.ask.start_question(thread["id"], "q")
+            for _ in range(200):
+                if not self.ask.read_thread(thread["id"])["running"]:
+                    break
+                time.sleep(0.05)
+
+        last = self.ask.read_thread(thread["id"])["messages"][-1]
+        self.assertEqual(last["status"], "completed")
+        self.assertEqual(len(last["steps"]), 1)
+        self.assertEqual(last["steps"][0]["tool"], "search_atlas")
+        self.assertTrue(last["steps"][0]["summary"])
+        self.assertEqual([c["slug"] for c in last["citations"]],
+                         ["kanban-task-board"])
+
+    # ---- usage honesty ----
+
+    def test_usage_is_null_when_the_provider_reports_nothing(self):
+        thread = self.ask.create_thread()
+        with patch.object(self.ask.atlas_model, "chat",
+                          return_value={"content": "hi", "tool_calls": [],
+                                        "usage": {}, "model": "m",
+                                        "provider": "p", "raw": {}}):
+            self.ask.start_question(thread["id"], "q")
+            for _ in range(100):
+                if not self.ask.read_thread(thread["id"])["running"]:
+                    break
+                time.sleep(0.05)
+        usage = self.ask.read_thread(thread["id"])["messages"][-1]["usage"]
+        self.assertIsNone(usage["total_tokens"])
+        self.assertIsNone(usage["cost"])
+
+    def test_usage_accumulates_across_turns(self):
+        thread = self.ask.create_thread()
+        turns = {"n": 0}
+
+        def two_turns(*_args, **_kwargs):
+            turns["n"] += 1
+            if turns["n"] == 1:
+                return {"content": "", "tool_calls": [
+                    {"id": "c1", "type": "function",
+                     "function": {"name": "get_section_tree", "arguments": "{}"}}],
+                    "usage": {"total_tokens": 100, "prompt_tokens": 80,
+                              "completion_tokens": 20},
+                    "model": "m", "provider": "p",
+                    "raw": {"choices": [{"message": {
+                        "content": "", "tool_calls": [{"id": "c1", "type": "function",
+                        "function": {"name": "get_section_tree",
+                                     "arguments": "{}"}}]}}]}}
+            return {"content": "done", "tool_calls": [],
+                    "usage": {"total_tokens": 50, "prompt_tokens": 40,
+                              "completion_tokens": 10},
+                    "model": "m", "provider": "p", "raw": {}}
+
+        with patch.object(self.ask.atlas_model, "chat", side_effect=two_turns), \
+             patch.object(self.ask.atlas_tools, "run_tool",
+                          return_value={"count": 1, "sections": []}):
+            self.ask.start_question(thread["id"], "q")
+            for _ in range(200):
+                if not self.ask.read_thread(thread["id"])["running"]:
+                    break
+                time.sleep(0.05)
+        usage = self.ask.read_thread(thread["id"])["messages"][-1]["usage"]
+        self.assertEqual(usage["total_tokens"], 150)
+        self.assertIsNone(usage["cost"])
 
 
 if __name__=='__main__':unittest.main()

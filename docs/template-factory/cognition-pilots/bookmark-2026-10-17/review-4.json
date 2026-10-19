@@ -1,0 +1,101 @@
+{
+  "artifact_id": "tpl_8b6f7605d76543f6b5c317caecef6e34",
+  "checks": [
+    {
+      "dimension": "category_evidence",
+      "files": [
+        "CATEGORY.md"
+      ],
+      "outcome": "passed",
+      "reason": "CATEGORY.md 明确区分多来源事实（S02-S23）、本场景建议和“未知”清单，记录访问日期、来源限制与 MIT/AGPL/专有许可，并声明未做法律审查；Pinboard 未验证内容留在待验证清单，未转化为本包的产品或验收事实，未出现无依据的价格或限额断言。"
+    },
+    {
+      "dimension": "scenario_scope",
+      "files": [
+        "PRODUCT.md",
+        "DECISIONS.md"
+      ],
+      "outcome": "passed",
+      "reason": "范围严格落在单人、单实例、私有链接库：保存、默认未分类、简单单归属归类、浏览/检索、302 回原页；D01/D06 和 R03 明确不引入标签、嵌套、账号、分享或协作，符合已确认场景。"
+    },
+    {
+      "dimension": "product_completeness",
+      "files": [
+        "PRODUCT.md",
+        "ARCHITECTURE.md",
+        "DECISIONS.md"
+      ],
+      "outcome": "passed",
+      "reason": "覆盖个人用户 R01、部署维护者 R02 和不存在的协作者 R03；正常/失败流（无效 URL、重复、归类目标、空编辑、回收站）、数据生命周期（保存→未分类→归类→检索→打开→删除→回收站→清空）及导出后置、私有权限、恢复、无计费/管理后台/审计的适用性均有说明。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "files": [
+        "ARCHITECTURE.md",
+        "DECISIONS.md"
+      ],
+      "outcome": "passed",
+      "reason": "给出技术栈默认与理由、SQLite 数据模型和不变量、ID/URL/标题/归类契约、统一错误信封、状态机、分页检索、健康/重启 adapter 及浏览器认证边界；PATCH categoryId 的“缺省或 null”措辞与后文“显式 null 非法”有歧义，但不改变已声明的核心行为，需按建议收紧。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "files": [
+        "ARCHITECTURE.md",
+        "acceptance/plan.json",
+        "acceptance/p1-categories.cjs",
+        "acceptance/p1-edit.cjs",
+        "acceptance/p1-trash.cjs"
+      ],
+      "outcome": "blocked",
+      "reason": "A13 用非十进制 'ghost-...' 作为 PATCH body categoryId 并要求 400 invalid_category，A17 同样用非十进制 ghost 作为 restore body categoryId 并要求 invalid_category/unknown_or_deleted；ARCHITECTURE §4 对非数字 body categoryId 明确允许 invalid_category 或 invalid_field，合规实现返回 invalid_field 会被判失败。A14 的非十进制 targetCategoryId 也有同类风险。阶段门因此不能可靠判定 P1。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "files": [
+        "DECISIONS.md",
+        "PRODUCT.md",
+        "ARCHITECTURE.md"
+      ],
+      "outcome": "passed",
+      "reason": "D01-D09 每项都有明确默认值、理由、影响面和 when-to-ask 触发条件，覆盖单归属/未分类、重复 URL、归类删除、无抓取、保守归一、无登录、回收站不过期、P3 导入导出及重启/浏览器验收；D08/D09 明确未实现能力，未冒充用户已确认。"
+    },
+    {
+      "dimension": "agent_handoff",
+      "files": [
+        "AGENT.md",
+        "DECISIONS.md",
+        "acceptance/README.md",
+        "README.md"
+      ],
+      "outcome": "passed",
+      "reason": "AGENT.md 要求先核对已有项目与用户决定、把 proposed 决策当建议、只实现当前阶段完整闭环、用专用实例运行真实 HTTP/浏览器验收并记录命令与未完成项；明确禁止覆盖用户决定、删除断言、硬编码或把未运行测试说成通过。"
+    },
+    {
+      "dimension": "evidence_honesty",
+      "files": [
+        "README.md",
+        "VALIDATION.md",
+        "acceptance/README.md",
+        "ARCHITECTURE.md",
+        "acceptance/plan.json"
+      ],
+      "outcome": "passed",
+      "reason": "根 README、VALIDATION、验收 README、ARCHITECTURE 和 plan.json 均明确 P0-P2 not implemented、33 个用例 not_run，未声称运行过目标、重启 adapter 或浏览器；来源访问日期与叶子原稿日期的区分也写清楚了。"
+    }
+  ],
+  "created_at": "2026-10-17T21:31:13.921134+00:00",
+  "digest": "bfb339faa1ec39df4582e6eccbac1769a60468549595e76e923704b1be62440f",
+  "id": "acc_253b757ab4c04e91a896ba6084a8ee9a",
+  "job_id": "job_042c402f49984461beaddd13edb535c7",
+  "method": "cognitive-review",
+  "outcome": "blocked",
+  "scope": "Independent static cognition and acceptance-program review only; no program execution, source re-fetch, downstream runtime or publication.",
+  "suggestions": [
+    "修正 P1 错误码验收：A13/A17 改用十进制且保证不存在的 categoryId，或让断言接受 ARCHITECTURE §4 允许的 invalid_category 与 invalid_field；A14 的非十进制 targetCategoryId 同样统一，并在需要时断言 details.reason。",
+    "收紧 ARCHITECTURE §6 的 PATCH categoryId 表述：字段缺省=不变，显式 null/空串=400 invalid_category，POST null=落默认归类；删除自相矛盾的“POST/PATCH 缺省或 null”句。",
+    "在 UI 契约中补充保存、移动、新建归类、恢复、排序等 HTML 表单的 action、method、303 回跳目标及排序持久化方式，避免浏览器验收依赖未写明的路由。",
+    "补充 F04 首页空态与默认 limit=50 的验收；A16-A18 对 trash 的 categoryId/trashedFromCategoryId 统一断言 typeof string；将 A03 第二处 categoryIds 检查改为检查 second。",
+    "增加“归类同时含活跃与回收站记录”的删除用例，以及 allowDuplicate 非布尔值、PATCH categoryId 显式 null 等负路径；A26 的排序切换改为显式提交或等待 URL，避免 600ms 竞态。"
+  ],
+  "summary": "静态审阅结论：品类证据与场景边界基本自洽，单人单实例范围、数据生命周期、决策默认值和“未实现/未运行”声明清楚。主要阻断是 P1 验收对非十进制 categoryId 的错误码要求与 ARCHITECTURE 允许 invalid_field 的契约不一致，合规实现可能被误判失败；另有 UI 表单路由、首页空态及若干 ID 类型断言缺口。本次仅静态阅读，未执行、安装或修改任何内容，不能作为实现或验收通过证据。"
+}

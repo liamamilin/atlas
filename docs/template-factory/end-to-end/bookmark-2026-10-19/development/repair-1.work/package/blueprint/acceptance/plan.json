@@ -1,0 +1,361 @@
+{
+ "schema": "atlas.acceptance-plan.v0",
+ "template_id": "blueprint-job_b33d0a3f57cd4c628f4b4070750f7cd0",
+ "phases": [
+  {
+   "acceptance": [
+    "A01",
+    "A02",
+    "A03",
+    "A04",
+    "A05",
+    "A06",
+    "A07",
+    "A08",
+    "A09",
+    "A10"
+   ],
+   "features": [
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06",
+    "F07",
+    "F08",
+    "F09"
+   ],
+   "goal": "普通用户能在浏览器中主动保存外部网页链接，指定或新建简单归类，按归类浏览与关键字检索找回记录，并从记录打开真实原网页；数据在服务进程重启后仍然存在。",
+   "id": "P0",
+   "status": "not implemented",
+   "title": "核心闭环：保存 → 归类 → 找回 → 打开"
+  },
+  {
+   "acceptance": [
+    "A11",
+    "A12",
+    "A13",
+    "A14",
+    "A15",
+    "A16",
+    "A17",
+    "A18"
+   ],
+   "features": [
+    "F10",
+    "F11",
+    "F12",
+    "F13",
+    "F14",
+    "F15",
+    "F16"
+   ],
+   "goal": "用户能编辑记录、删除并恢复、避免重复、按时间/归类/关键字筛选排序，并用子归类与标签重塑组织结构。",
+   "id": "P1",
+   "status": "not implemented",
+   "title": "整理与维护"
+  },
+  {
+   "acceptance": [
+    "A19",
+    "A20",
+    "A21",
+    "A22",
+    "A23",
+    "A24",
+    "A25"
+   ],
+   "features": [
+    "F17",
+    "F18",
+    "F19",
+    "F20",
+    "F21",
+    "F22"
+   ],
+   "goal": "用户能导入与导出 Netscape 书签 HTML 完成迁移与轻量备份，并在显式开启时使用元数据抓取、失效链接清单、可选存档与 bookmarklet 捕获入口。",
+   "id": "P2",
+   "status": "not implemented",
+   "title": "互操作与可选增强"
+  }
+ ],
+ "cases": [
+  {
+   "features": [
+    "F01"
+   ],
+   "goal": "把一个合法 http/https URL 保存到指定已有归类后，库列表出现该记录，且标题、URL 与所属归类与提交值一致。",
+   "id": "A01",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F01"
+   ],
+   "goal": "提交空 URL、非 http(s) 协议（javascript:、data:）或畸形 URL 时被拒绝并返回可见错误，库中记录数保持不变。",
+   "id": "A02",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "negative"
+  },
+  {
+   "features": [
+    "F02"
+   ],
+   "goal": "保存时未选择归类，记录进入默认收件箱，并可在默认收件箱视图中浏览到。",
+   "id": "A03",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F03"
+   ],
+   "goal": "新建归类后该归类出现在归类侧栏，且可将记录保存或移动到该新归类。",
+   "id": "A04",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F04"
+   ],
+   "goal": "把记录从归类 A 移动到归类 B 后，记录出现在 B 的浏览结果，且不再出现在 A。",
+   "id": "A05",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F05"
+   ],
+   "goal": "按归类浏览只返回该归类的记录，不会串入其他归类的记录。",
+   "id": "A06",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F06"
+   ],
+   "goal": "关键字检索命中标题、URL 或备注中匹配的记录，并排除不匹配的记录。",
+   "id": "A07",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F07"
+   ],
+   "goal": "访问记录的开原页入口返回指向所存 URL 的 http(s) 跳转（3xx Location 或含真实原始链接的页面），且不代理或返回目标网页正文。",
+   "id": "A08",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F08"
+   ],
+   "goal": "保存记录后，一个全新无会话的 HTTP 客户端仍能通过浏览或检索读回该记录，表明数据已由服务端持久保存；进程重启后的数据仍在由独立浏览器验收覆盖，本套件不重启服务、不直接读取应用数据库，也不得声称已完成进程重启。",
+   "id": "A09",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F09"
+   ],
+   "goal": "无匹配关键字的检索返回空结果集而不误报；未暴露的公开或分享类路由返回 404 且不泄露库内容。",
+   "id": "A10",
+   "implementation": "acceptance/p0.py",
+   "phase": "P0",
+   "status": "not_run",
+   "type": "negative"
+  },
+  {
+   "features": [
+    "F10"
+   ],
+   "goal": "编辑记录标题与备注后，列表与详情显示新值且更改持久保留。",
+   "id": "A11",
+   "implementation": "acceptance/p1.py",
+   "phase": "P1",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F11"
+   ],
+   "goal": "删除记录后移入回收站、从常规浏览与检索排除；从回收站恢复后重新可见。",
+   "id": "A12",
+   "implementation": "acceptance/p1.py",
+   "phase": "P1",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F10",
+    "F11"
+   ],
+   "goal": "已删除记录不出现在浏览与检索；对不存在或已删除 id 的编辑、移动与恢复请求返回 404 且库状态不变。",
+   "id": "A13",
+   "implementation": "acceptance/p1.py",
+   "phase": "P1",
+   "status": "not_run",
+   "type": "negative"
+  },
+  {
+   "features": [
+    "F12"
+   ],
+   "goal": "再次保存同一 URL 不产生第二条记录，且原记录被更新而非复制。",
+   "id": "A14",
+   "implementation": "acceptance/p1.py",
+   "phase": "P1",
+   "status": "not_run",
+   "type": "negative"
+  },
+  {
+   "features": [
+    "F13"
+   ],
+   "goal": "列表默认按加入时间倒序；按归类与关键字筛选返回正确子集与顺序。",
+   "id": "A15",
+   "implementation": "acceptance/p1.py",
+   "phase": "P1",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F14"
+   ],
+   "goal": "在父归类下新建子归类后，可在父与子层级浏览并把记录移动到子归类。",
+   "id": "A16",
+   "implementation": "acceptance/p1.py",
+   "phase": "P1",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F15"
+   ],
+   "goal": "重命名归类生效；删除归类时其记录回退到默认收件箱而不被级联删除。",
+   "id": "A17",
+   "implementation": "acceptance/p1.py",
+   "phase": "P1",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F16"
+   ],
+   "goal": "为记录添加与移除标签，并按标签浏览或检索出对应记录。",
+   "id": "A18",
+   "implementation": "acceptance/p1.py",
+   "phase": "P1",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F17"
+   ],
+   "goal": "导出整个库为 Netscape 书签 HTML，解析后包含归类结构与记录的 URL 与标题。",
+   "id": "A19",
+   "implementation": "acceptance/p2.py",
+   "phase": "P2",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F18"
+   ],
+   "goal": "从 Netscape 书签 HTML 导入时文件夹映射为归类，并保留 URL、标题与添加日期。",
+   "id": "A20",
+   "implementation": "acceptance/p2.py",
+   "phase": "P2",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F18"
+   ],
+   "goal": "导入畸形、空或超过大小上限的文件被明确拒绝并给出错误，库内容保持不变。",
+   "id": "A21",
+   "implementation": "acceptance/p2.py",
+   "phase": "P2",
+   "status": "not_run",
+   "type": "negative"
+  },
+  {
+   "features": [
+    "F19"
+   ],
+   "goal": "元数据抓取默认关闭，保存不触发外发请求；即使启用，指向私网或回环地址的抓取也被拒绝为安全错误。",
+   "id": "A22",
+   "implementation": "acceptance/p2.py",
+   "phase": "P2",
+   "status": "not_run",
+   "type": "negative"
+  },
+  {
+   "features": [
+    "F20"
+   ],
+   "goal": "在无外网环境下失效链接检查明确报告为 unavailable 或未验证，不伪报全部正常，也不改动记录本身。",
+   "id": "A23",
+   "implementation": "acceptance/p2.py",
+   "phase": "P2",
+   "status": "not_run",
+   "type": "positive"
+  },
+  {
+   "features": [
+    "F21"
+   ],
+   "goal": "在未配置存档能力时请求网页副本，返回明确的未实现或不可用，而不是伪造或空的存档内容。",
+   "id": "A24",
+   "implementation": "acceptance/p2.py",
+   "phase": "P2",
+   "status": "not_run",
+   "type": "negative"
+  },
+  {
+   "features": [
+    "F22"
+   ],
+   "goal": "预填捕获入口 GET /?add=1&url=&title= 返回带预填值的真实保存表单，供 bookmarklet 或扩展调用。",
+   "id": "A25",
+   "implementation": "acceptance/p2.py",
+   "phase": "P2",
+   "status": "not_run",
+   "type": "positive"
+  }
+ ]
+}

@@ -1,0 +1,37 @@
+{
+ "project_name": "trial-budget",
+ "phase": "P0",
+ "template_digest": "aa80a6e1049c7e0c6a1ccf37a2f8d70af9c122fe2024c6b1be3b2fd2e201f51b",
+ "choices": [
+  {
+   "id": "D01",
+   "default": "以整数“分”存储与计算，响应渲染为两位小数字符串；对超过两位小数或非正数输入直接拒绝而非静默舍入。理由：避免二进制浮点误差（S12），并满足场景“不静默取整或裁剪输入”。可逆。",
+   "choice": null
+  },
+  {
+   "id": "D02",
+   "default": "P0 仅在当月展示负剩余，不自动结转下月。理由：已确认验收只承诺当月计划/实际/剩余；跨月 rollover 属成熟扩展（S05）。可逆。",
+   "choice": null
+  },
+  {
+   "id": "D03",
+   "default": "SQLite 单库（CONTRACT 固定），以事务/临时文件方式原子写入，且只写入 --data-dir。理由：单机集中持久化并降低损坏风险（S13,S01）。可逆。",
+   "choice": null
+  },
+  {
+   "id": "D04",
+   "default": "P0 不建完整编辑历史，以导出 CSV 作为最小审计与恢复起点。理由：据可用一手文档未见主流产品提供完整编辑历史（S01 未验证项）。",
+   "choice": null
+  },
+  {
+   "id": "D05",
+   "default": "UTF-8、RFC 4180 引号规则、QUOTE_MINIMAL、CRLF、表头 date,category,amount,note。理由：S10/S11 给出信息性标准与标准库行为；与 CONTRACT 一致。已定。",
+   "choice": null
+  },
+  {
+   "id": "D06",
+   "default": "P0 不支持删除分类，未使用分类保留可见。理由：场景要求未使用分类仍可见，契约未定义删除语义（S02 分类为月内对象）。可逆。",
+   "choice": null
+  }
+ ]
+}

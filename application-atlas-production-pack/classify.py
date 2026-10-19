@@ -10,18 +10,86 @@ import sqlite3
 import sys
 import threading
 import urllib.request
+from urllib.error import HTTPError, URLError
 from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
 from atlas_runtime import PACK, api_key
+from privacy import redact_text
+
+import atlas_model
 
 DB = str(PACK / "atlas" / "atlas.sqlite")
-ADJUDICATOR = os.environ.get("ATLAS_ADJUDICATOR", "qwen3.8-flash")
+# Empty means "use the configured default model"; an explicit value pins the
+# adjudicator to a specific model on the default provider.
+ADJUDICATOR = os.environ.get("ATLAS_ADJUDICATOR", "").strip()
 POOL_MAX = 16
 _cache_lock = threading.Lock()
 _snapshot = None
 _signature = None
+
+
+class ClassificationProviderError(RuntimeError):
+    """A redacted, stable classification-provider failure."""
+
+    def __init__(self, code: str, message: str, *, status: int | None = None,
+                 retryable: bool = False, detail: str = ""):
+        super().__init__(message)
+        self.code = code
+        self.status = status
+        self.retryable = retryable
+        self.detail = redact_text(detail)[:800]
+
+
+def _provider_error(error: BaseException) -> ClassificationProviderError:
+    # atlas_model already redacts and classifies provider failures; translate
+    # its codes into the classification contract the CLI and callers expect.
+    if isinstance(error, atlas_model.ModelConfigError):
+        mapping = {
+            "unauthorized": ("provider_auth", False),
+            "no_credential": ("provider_auth", False),
+            "not_configured": ("provider_auth", False),
+            "no_model": ("model_unavailable", False),
+            "model_unavailable": ("model_unavailable", False),
+            "rate_limited": ("provider_rate_limited", True),
+            "timeout": ("provider_network_error", True),
+            "unreachable": ("provider_network_error", True),
+            "invalid_response": ("invalid_response", False),
+        }
+        code, retryable = mapping.get(
+            error.code, ("provider_http_error", error.code in {"provider_error"}))
+        return ClassificationProviderError(
+            code, str(error), status=error.status, retryable=retryable)
+    if isinstance(error, HTTPError):
+        try:
+            detail = error.read(4096).decode("utf-8", "replace")
+        except OSError:
+            detail = ""
+        detail = redact_text(detail)
+        lowered = detail.lower()
+        status = int(error.code)
+        if status in {401, 403}:
+            code, retryable = "provider_auth", False
+        elif status == 429:
+            code, retryable = "provider_rate_limited", True
+        elif "model" in lowered and "unavailable" in lowered:
+            code, retryable = "model_unavailable", False
+        else:
+            code, retryable = "provider_http_error", status >= 500
+        return ClassificationProviderError(
+            code, f"classification provider returned HTTP {status}",
+            status=status, retryable=retryable, detail=detail)
+    if isinstance(error, URLError):
+        return ClassificationProviderError(
+            "provider_network_error", "classification provider network request failed",
+            retryable=True, detail=str(error.reason))
+    if isinstance(error, (TimeoutError, OSError)):
+        return ClassificationProviderError(
+            "provider_network_error", "classification provider network request failed",
+            retryable=True, detail=str(error))
+    return ClassificationProviderError(
+        "provider_error", "classification provider request failed", detail=str(error))
 
 
 @dataclass(frozen=True)
@@ -122,32 +190,65 @@ def candidates(qtext, k=10, state=None):
 
 
 def classify(desc, model=None):
+    # An explicit model (argument or ATLAS_ADJUDICATOR) pins the model; empty
+    # means "use the configured default for the adjudicator role".
+    raw = ADJUDICATOR if model is None else model
+    if raw is None:
+        raw = ""
+    if not isinstance(raw, str):
+        raise ValueError("classification model must be text")
+    model_name = raw.strip()
     state = snapshot()
     pool, similarities = candidates(desc, state=state)
     cands = [f"- {s}（{state.leaf_info[s][0]}）: {state.leaf_info[s][1]}" for s in pool]
     bounds = _pairwise(pool, state)
-    body = {"model": model or ADJUDICATOR,
-            "messages": [{"role": "user", "content": PROMPT.format(
-                desc=desc, cands="\n".join(cands), bounds=("\n分界记录:\n" + bounds if bounds else ""))}],
-            "temperature": 0.1, "max_tokens": 3000}
-    req = urllib.request.Request("https://opencode.ai/zen/go/v1/chat/completions", json.dumps(body).encode(),
-        {"Authorization": f"Bearer {api_key()}", "Content-Type": "application/json",
-         "x-opencode-session": "atlas-classify", "User-Agent": "atlas-classify/1.0"})
-    with urllib.request.urlopen(req, timeout=300) as response:
-        result = json.load(response)
-    text = (result["choices"][0]["message"].get("content") or "").strip()
+    prompt = PROMPT.format(
+        desc=desc, cands="\n".join(cands),
+        bounds=("\n分界记录:\n" + bounds if bounds else ""))
+    try:
+        result = atlas_model.complete(
+            [{"role": "user", "content": prompt}],
+            model=model_name or None, role="adjudicator",
+            temperature=0.1, max_tokens=3000, timeout=300)
+    except atlas_model.ModelConfigError as error:
+        raise _provider_error(error) from error
+    except (HTTPError, URLError, TimeoutError, OSError, KeyError,
+            FileNotFoundError) as error:
+        raise _provider_error(error) from error
+    text = result["text"]
+    served_model = result["model"] or model_name
+    if not text:
+        raise ClassificationProviderError(
+            "invalid_response", "classification provider response shape is invalid")
     match = re.search(r"\[.*?\]", text, re.S)
     scores = {}
     if match:
-        for item in json.loads(match.group(0)):
+        try:
+            scored_items = json.loads(match.group(0))
+        except json.JSONDecodeError as error:
+            raise ClassificationProviderError(
+                "invalid_response", "classification provider score payload is invalid",
+                detail=str(error)) from error
+        if not isinstance(scored_items, list):
+            raise ClassificationProviderError(
+                "invalid_response", "classification provider score payload is invalid")
+        for item in scored_items:
+            if not isinstance(item, dict):
+                continue
             slug, score = item.get("slug"), item.get("score")
             if slug in pool and isinstance(score, (int, float)) and 0 <= score <= 10:
                 scores[slug] = score
     match = re.search(r'\{[^{]*"choice"[^}]*\}', text, re.S)
-    choice = json.loads(match.group(0)).get("choice") if match else None
+    try:
+        choice = json.loads(match.group(0)).get("choice") if match else None
+    except (json.JSONDecodeError, AttributeError) as error:
+        raise ClassificationProviderError(
+            "invalid_response", "classification provider choice payload is invalid",
+            detail=str(error)) from error
     if choice not in pool and choice != "none":
         raise ValueError("分类器没有返回有效候选类型")
     return {"choice": choice, "scores": scores, "pool": pool,
+            "model": served_model,
             "detail": [{"slug": s, "name_zh": state.leaf_info[s][0]} for s in pool]}
 
 

@@ -1,0 +1,39 @@
+{
+  "kind": "trusted Python image lifecycle probe; not product acceptance",
+  "image": "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9",
+  "name": "atlas-bookmark-env-f3e318507446",
+  "started_at": "2026-10-19T03:31:28.090181+00:00",
+  "steps": [
+    {
+      "argv": [
+        "docker",
+        "create",
+        "--pull=never",
+        "--name",
+        "atlas-bookmark-env-f3e318507446",
+        "--network",
+        "none",
+        "--read-only",
+        "--cap-drop=ALL",
+        "--security-opt=no-new-privileges",
+        "--pids-limit",
+        "32",
+        "--memory",
+        "128m",
+        "--cpus",
+        "1",
+        "--user",
+        "501:20",
+        "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9",
+        "python3",
+        "-c",
+        "print(\"ATLAS_ENV_ID_PROBE_OK\")"
+      ],
+      "timeout_seconds": 20
+    }
+  ],
+  "passed": false,
+  "error": "Command '['docker', 'create', '--pull=never', '--name', 'atlas-bookmark-env-f3e318507446', '--network', 'none', '--read-only', '--cap-drop=ALL', '--security-opt=no-new-privileges', '--pids-limit', '32', '--memory', '128m', '--cpus', '1', '--user', '501:20', 'sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9', 'python3', '-c', 'print(\"ATLAS_ENV_ID_PROBE_OK\")']' timed out after 20 seconds",
+  "cleanup_passed": false,
+  "cleanup_note": "Creation yielded no ID; use exact owned name lookup via container list before claiming cleanup."
+}

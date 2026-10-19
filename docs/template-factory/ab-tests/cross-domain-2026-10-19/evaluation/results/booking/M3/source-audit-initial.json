@@ -1,0 +1,50 @@
+{
+  "case": "booking",
+  "cell": "M3",
+  "round": "initial",
+  "all_source_and_docs_manually_read": [
+    "DECISIONS.md",
+    "README.md",
+    "api.py",
+    "app.py",
+    "auth.py",
+    "db.py",
+    "static/app.js",
+    "static/index.html",
+    "static/style.css",
+    "times.py"
+  ],
+  "sha256": {
+    "DECISIONS.md": "8f31007035946dc28d71bc1ea8acddd7e1da52ec51ec855f252a0c8209ecbc9f",
+    "README.md": "bc7179bc77bdf5aa42c79bb8d8f689427fbabef4d865692e8afec283a4ab0b4f",
+    "api.py": "184cd2b5c2a85b9059aeb3b1c98914d389c52bebd87a8c750eee23cd8255a257",
+    "app.py": "ddaa1e12eaa34376226616b9514775123f78a5d585a8a71e3f00304d53d253d3",
+    "auth.py": "f900417f32f2fb5500165a4256c1731170e8e79e2584b9d676eed4d2ca6deb47",
+    "db.py": "47915fcb4d71ead729b5bfae46f242b717a0d0ba0b0d7404d80d1599cce336ca",
+    "static/app.js": "296c833244a68594459b30502b61985b9380079f3f7ca10d002df861ca53bb0f",
+    "static/index.html": "eba0c1b00a3c1c7436f3878640eec837a097baa8dc4f1aebaab88ee84502c48e",
+    "static/style.css": "edc1e87e6a62953df95b62fabca751ce51f6cb135242e43abec32b651aa7a5d5",
+    "times.py": "87f940e6f74e076f4fbf56120d0d130ed46bea661ccc097e2dce3d87157ba2f7"
+  },
+  "python": "3.10.13 (main, Jul 28 2025, 13:11:45) [Clang 17.0.0 (clang-1700.0.13.5)]",
+  "execution_safety": "approved for assigned synthetic local test scope after complete source review",
+  "findings": {
+    "bind": "app.py Server binds 127.0.0.1 only, supplied port",
+    "storage": "db.configure resolves assigned data-dir and app.db; SQLite schema init uses IF NOT EXISTS; init-demo only adds missing users; source assets read from three-item allowlist",
+    "outbound": "No outbound Python network client, external assets, script imports or telemetry; browser fetch only relative app APIs",
+    "execution": "No subprocess/shell/eval/dynamic imports or arbitrary file endpoints",
+    "credentials": "Only common-contract synthetic demo users, PBKDF2-HMAC-SHA256 salted 120000 iterations; service-owned opaque random sessions; no environment/secret file reads",
+    "concurrency": "BEGIN IMMEDIATE spans overlap check plus insert; independent real connections to be tested",
+    "unverified_before_run": [
+      "actual UI usability",
+      "runtime persistence and permission outcomes",
+      "all possible concurrency schedules"
+    ]
+  },
+  "prohibited_context_not_read": [
+    "condition-map",
+    "template",
+    "developer prompts or inputs"
+  ],
+  "application_modified": false
+}

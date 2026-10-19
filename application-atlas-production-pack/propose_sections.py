@@ -4,15 +4,16 @@ Pipeline: bge-m3 embeddings (sqlite embedding table) -> KMeans per domain
 -> LLM names & re-assigns subsections (en+zh) -> MECE validation.
 Output: atlas/subsections-proposal.json
 """
-import json, os, re, sqlite3, struct, time, urllib.request
+import json, os, re, sqlite3, struct, sys, time, urllib.request
 import numpy as np
 from sklearn.cluster import KMeans
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import atlas_model
 
 PACK = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(PACK, "atlas", "atlas.sqlite")
 OUT = os.path.join(PACK, "atlas", "subsections-proposal.json")
-API = "https://opencode.ai/zen/go/v1/chat/completions"
-KEY = json.load(open(os.path.expanduser("~/.local/share/opencode/auth.json")))["opencode-go"]["key"]
 
 con = sqlite3.connect(DB)
 leaves = {}
@@ -38,15 +39,11 @@ PROMPT = """你是应用软件分类专家。下面是"{domain}"领域下的叶�
 """
 
 def call_api(prompt, tries=3):
-    body = {"model": "mimo-v2.5", "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.2, "max_tokens": 8000}
-    headers = {"Authorization": f"Bearer {KEY}", "Content-Type": "application/json",
-               "x-opencode-session": "atlas-sections", "User-Agent": "atlas-sections/1.0"}
     for i in range(tries):
         try:
-            r = json.load(urllib.request.urlopen(urllib.request.Request(
-                API, json.dumps(body).encode(), headers), timeout=600))
-            return (r["choices"][0]["message"].get("content") or "").strip()
+            return atlas_model.complete_text(
+                [{"role": "user", "content": prompt}],
+                role="translate", temperature=0.2, max_tokens=8000, timeout=600)
         except Exception as e:
             print(f"    api retry {i+1}: {e}")
             time.sleep(5)

@@ -1,0 +1,68 @@
+{
+  "version": "bookmark-ab-rubric-v1",
+  "frozen_date": "2026-10-18",
+  "frozen_before_implementation_access": true,
+  "language": "zh-CN",
+  "scope": {
+    "purpose": "个人中文生活待购与灵感收藏夹",
+    "runtime": ["Python 3 标准库", "SQLite", "loopback HTTP"],
+    "entrypoint": "python3 app.py --port PORT --data-dir DIR",
+    "reviewer_read_only": true,
+    "runtime_checks_executed_by": "父代理或实施者",
+    "implementation_contracts_not_prescribed": ["API 路径", "状态码", "数据库结构", "HTML 结构", "testid", "视觉布局"],
+    "not_required": ["账户", "支付", "协作", "云同步", "部署平台", "编辑或删除记录", "导入导出", "自动抓取标题", "全文检索", "复杂标签体系"]
+  },
+  "fixtures": {
+    "categories": ["待购", "学习"],
+    "records": [
+      {"id": "A", "url": "https://example.com/item/lamp?source=collection&variant=warm#details", "title": null, "note": null, "category": null},
+      {"id": "B", "url": "https://example.com/item/bookshelf", "title": "折叠书架", "note": "小户型，周末量尺寸", "category": "待购"},
+      {"id": "C", "url": "https://example.com/tutorial/bread", "title": "酸面包教程", "note": "周日尝试", "category": null}
+    ],
+    "url_check": "接受浏览器规范化后的等价 URL；保留有意义的路径、查询参数和片段；不要求外网页面加载成功"
+  },
+  "required_checks": [
+    {"id": "R01", "area": "运行交付", "action": "共同环境中使用指定命令、端口及空目录启动，经 loopback 访问", "expected": ["中文网页可用", "无账户或共同环境之外的运行依赖", "指定端口及数据目录有效"]},
+    {"id": "R02", "area": "保存", "action": "保存仅含 URL 的 A，保存含标题及备注的 C，刷新查看", "expected": ["仅 URL 即可保存", "可选标题和备注得到保存并呈现", "无标题记录仍可识别和打开"]},
+    {"id": "R03", "area": "未分类", "action": "通过未分类入口或等效视图找回 A 和 C", "expected": ["无须先创建归类", "未分类记录能够日后找回"]},
+    {"id": "R04", "area": "创建及选择归类", "action": "创建待购和学习，保存 B 时选择待购，再按待购浏览", "expected": ["用户可创建归类", "保存时可选归类", "B 在对应归类可见"]},
+    {"id": "R05", "area": "移动", "action": "将 C 从未分类移至学习，将 B 从待购移至学习，刷新检查相关归类", "expected": ["目的归类可找到记录", "原归属不再保留此次移动的归属", "标题备注及 URL 完整", "无意外复制或丢失"]},
+    {"id": "R06", "area": "搜索", "action": "在覆盖相应记录的范围以书架查找 B、面包查找 C；查询不存在的词后清除查询", "expected": ["标题关键字能够找回记录", "搜索范围可理解且结果一致", "空结果可理解", "清除查询后可继续浏览"], "accepted_designs": ["全局搜索", "归类内搜索"]},
+    {"id": "R07", "area": "打开原网页", "action": "从列表或详情打开 A、B、C", "expected": ["导航目标为对应原 URL", "A 的路径查询参数及片段保留"], "accepted_designs": ["当前标签页", "新标签页"]},
+    {"id": "R08", "area": "持久化", "action": "刷新；正常停止并用相同目录重启；重查字段归属及搜索；另用空目录启动", "expected": ["已确认保存的数据在刷新及正常重启后保留", "移动后的归属保留", "新目录不混入旧目录数据"]},
+    {"id": "R09", "area": "反馈及失败后的数据安全", "action": "观察保存归类及移动反馈；已有数据时尝试空 URL 保存；重查已有数据", "expected": ["界面变化或提示足以理解操作结果", "空 URL 不被报告为成功保存的有效网页记录", "无效操作不破坏已有记录", "用户可继续操作"], "accepted_designs": ["浏览器原生表单校验", "更新后的列表", "明确文字提示"]}
+  ],
+  "exploratory_checks": [
+    {"id": "M01", "area": "恢复及状态", "probes": ["突然终止服务后的恢复", "多标签页先后操作", "重复点击保存"]},
+    {"id": "M02", "area": "真实输入边界", "probes": ["中文", "空格", "引号", "长标题及备注", "URL 查询参数", "重复 URL"], "note": "不预设长度上限或必须去重"},
+    {"id": "M03", "area": "失败处理", "probes": ["端口占用", "不可用数据目录", "实际持久化错误"], "note": "使用独立测试目录；检查提示、虚假成功和已有数据完整性"},
+    {"id": "M04", "area": "内容安全", "probes": ["HTML 特殊字符", "仅在本地使用无害标记的脚本探针"], "note": "不访问外部地址"},
+    {"id": "M05", "area": "上手及浏览", "probes": ["核心入口发现", "空状态", "空搜索结果"], "note": "记录具体障碍，不按个人审美评分"}
+  ],
+  "judgment": {
+    "required_outcomes": ["通过", "部分满足", "不满足", "未验证"],
+    "pass_requires_direct_runtime_evidence": true,
+    "missing_evidence_is_failure": false,
+    "static_evidence_policy": "源码可支持明确缺陷和行为推断，不能单独证明运行成功",
+    "required_finding_fields": ["匿名实现", "检查 ID", "文件及行号（如适用）", "触发操作", "实际结果", "用户后果", "证据位置", "可执行修复方向"],
+    "separate_observation_inference_and_missing_evidence": true,
+    "numeric_score": null,
+    "pass_rate_threshold": null,
+    "latency_threshold": null,
+    "excluded_quality_proxies": ["代码行数", "文档量", "个人风格偏好", "视觉精致程度推断正确性"],
+    "exploration_policy": "独立报告，不增加显式需求；真实严重后果仍需说明；未执行仅标未验证"
+  },
+  "comparison": {
+    "order": ["核心闭环及实际数据丢失等问题", "逐项需求覆盖", "反馈可理解性", "运行交付证据", "独立成熟度观察"],
+    "exploration_cannot_offset_missing_requirements": true,
+    "forced_winner": false,
+    "final_completion_owner": "父代理",
+    "causal_limit": "单个应用、单次成对实验不能统计证明因果或支持普遍推广"
+  },
+  "freeze_policy": {
+    "no_condition_mapping_access": true,
+    "no_posthoc_target_threshold_or_priority_changes": true,
+    "ambiguities": "记录歧义并对 X/Y 使用同一解释",
+    "additional_probes": "标为冻结标准之外的补充，不回写既有结果"
+  }
+}

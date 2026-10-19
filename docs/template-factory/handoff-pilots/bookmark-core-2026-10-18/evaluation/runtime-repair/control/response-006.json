@@ -1,0 +1,35 @@
+{
+  "ok": true,
+  "probes": [
+    {
+      "probe": "occupied-port",
+      "command": [
+        "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+        "app.py",
+        "--port",
+        "60278",
+        "--data-dir",
+        "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/handoff-pilots/bookmark-core-2026-10-18/evaluation/runtime-repair/data-occupied-port"
+      ],
+      "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/handoff-pilots/bookmark-core-2026-10-18/evaluation/runtime-repair/probe-occupied-port.log",
+      "outcome": "exited",
+      "returncode": 1,
+      "text": "Traceback (most recent call last):\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/handoff-pilots/bookmark-core-2026-10-18/application-repair/app.py\", line 58, in <module>\n    sys.exit(main())\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/handoff-pilots/bookmark-core-2026-10-18/application-repair/app.py\", line 41, in main\n    httpd = ThreadingHTTPServer((\"127.0.0.1\", args.port), app_server.AppHandler)\n  File \"/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py\", line 452, in __init__\n    self.server_bind()\n  File \"/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/http/server.py\", line 137, in server_bind\n    socketserver.TCPServer.server_bind(self)\n  File \"/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py\", line 466, in server_bind\n    self.socket.bind(self.server_address)\nOSError: [Errno 48] Address already in use\n"
+    },
+    {
+      "probe": "unusable-data-dir",
+      "command": [
+        "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+        "app.py",
+        "--port",
+        "60604",
+        "--data-dir",
+        "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/handoff-pilots/bookmark-core-2026-10-18/evaluation/runtime-repair/unusable-data-path"
+      ],
+      "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/handoff-pilots/bookmark-core-2026-10-18/evaluation/runtime-repair/probe-unusable-data-dir.log",
+      "outcome": "exited",
+      "returncode": 1,
+      "text": "Traceback (most recent call last):\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/handoff-pilots/bookmark-core-2026-10-18/application-repair/app.py\", line 58, in <module>\n    sys.exit(main())\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/handoff-pilots/bookmark-core-2026-10-18/application-repair/app.py\", line 40, in main\n    store = app_server.configure(args.data_dir)\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/handoff-pilots/bookmark-core-2026-10-18/application-repair/server.py\", line 46, in configure\n    STORE = Store(data_dir)\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/handoff-pilots/bookmark-core-2026-10-18/application-repair/db.py\", line 58, in __init__\n    os.makedirs(self.data_dir, exist_ok=True)\n  File \"/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/os.py\", line 225, in makedirs\n    mkdir(name, mode)\nFileExistsError: [Errno 17] File exists: '/Users/milin/2026/软件开发/application-atlas/docs/template-factory/handoff-pilots/bookmark-core-2026-10-18/evaluation/runtime-repair/unusable-data-path'\n"
+    }
+  ]
+}

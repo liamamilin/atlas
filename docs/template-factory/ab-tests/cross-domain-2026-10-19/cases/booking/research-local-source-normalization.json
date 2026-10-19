@@ -1,0 +1,14 @@
+{
+  "status": "validated_after_explicit_normalization",
+  "removed_row": {
+    "id": "S01",
+    "name": "Atlas 确认输入：amenity-booking-platform leaf 与 experiment-booking 场景（leaf.md、input.json、source/REQUEST.md）",
+    "url": "local://input.json",
+    "version": "scenario revision 1；访问日期 2026-10-19",
+    "facts": "类别定义：建筑或社区自有的共享设施预约系统，结构为运营方定义设施清单 + 封闭居民/租户名单 + 限时预约（设施×时段×预约人）+ 楼宇侧控制面；与租户门户、约会排程、通用资源日历、设施管理、酒店 PMS 等相邻类型区分。场景为本地回环演示：一名设施管理员与名单内两名居民，管理员配置设施，居民登录后按时段预约、查看与取消，同一设施不可被重复占用，权限由服务端执行，取消保留状态并释放原时段，重启后一致。",
+    "license": "非代码（Atlas 自产输入）",
+    "reuse": "作为本任务的权威类别与场景边界；不复制任何第三方内容"
+  },
+  "scope": "Only redundant local S01 row removed; Atlas injects exact scenario as S01. Original invalid model response preserved. No external fact, source ID, summary or gap changed.",
+  "external_sources_unchanged": true
+}

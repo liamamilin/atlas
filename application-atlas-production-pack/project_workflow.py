@@ -73,7 +73,11 @@ def confirm_requirement(store, project_id, requirement_id, body):
     scope = body.get("scope")
     if scope not in SCOPE_STATES:
         raise ValueError("scope must be current, later, or excluded")
-    return store.confirm_requirement(requirement_id, scope, _text(body, "reason"))
+    expected_revision = body.get("expected_revision")
+    if not isinstance(expected_revision, int) or isinstance(expected_revision, bool) or expected_revision < 1:
+        raise ValueError("expected_revision is required")
+    return store.confirm_requirement(
+        requirement_id, scope, _text(body, "reason"), expected_revision)
 
 
 def create_decision(store, project_id, body):

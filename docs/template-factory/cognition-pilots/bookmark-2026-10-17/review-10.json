@@ -1,0 +1,93 @@
+{
+  "summary": "本次仅做静态审阅，未运行任何验收程序、未启动目标、未执行重启 adapter 或浏览器。蓝图在品类证据、场景范围、产品定义、决策默认值、Agent 交接与证据诚实性上基本完整；关键阻断是 P1 浏览器验收的 ui-p1.cjs 引用了不存在的导出，A29–A31 会在运行时直接失败。另有 A33 排序表单保留 q/categoryId/limit 的契约未写清，以及部分服务端确认负例未覆盖。",
+  "checks": [
+    {
+      "dimension": "category_evidence",
+      "outcome": "passed",
+      "files": [
+        "CATEGORY.md",
+        "DECISIONS.md"
+      ],
+      "reason": "CATEGORY.md 以 S02–S23 分别列出 linkding、Linkwarden、Karakeep、Raindrop 与 Chrome 的来源，明确访问日期、许可（MIT、AGPL-3.0、专有）与“未取得代码许可”；把“单一归属 + 未分类 + 软删除 + Netscape HTML”等类别事实与“本场景建议首版只做四件事”分开表述，并在“未知/待验证”中列明未运行产品、仅取搜索摘要、未做法律审查等限制。未把推荐性设计冒充已核实事实，也未声称复制第三方代码。"
+    },
+    {
+      "dimension": "scenario_scope",
+      "outcome": "passed",
+      "files": [
+        "PRODUCT.md",
+        "DECISIONS.md",
+        "acceptance/plan.json"
+      ],
+      "reason": "场景是单人保存生活待购、教程与灵感网页，日后按归类或关键字找回并回到原页。PRODUCT 的 F01–F14 与 P0–P2 覆盖保存、默认归类、打开原页、归类、重复提示、软删除/恢复、编辑与检索，没有漂移成稍后读、公开策展或笔记产品；F15–F25 将导入导出、标签、快照、协作等明确列为 later、decision needed 或 not applicable，范围与确认场景一致。"
+    },
+    {
+      "dimension": "product_completeness",
+      "outcome": "passed",
+      "files": [
+        "PRODUCT.md",
+        "DECISIONS.md",
+        "ARCHITECTURE.md"
+      ],
+      "reason": "PRODUCT 明确 R01 个人收藏者、R02 部署维护者与本期不存在的 R03 共享读者；F01–F14 覆盖正常保存/归类/检索/打开以及重复、非法 URL、无标题、删除归类、回收站与编辑失败等路径。数据生命周期从保存、未分类、归类、检索、打开、软删除、回收站到单条永久删除与手动清空完整，恢复可选原归类或回退默认归类；F15 导出明确为 P3 later 且不宣称已有，F16–F25 对导入、标签、快照、全文检索、失效扫描、分享、计费/后台/审计等逐项说明不适用或后续理由，没有强行引入不适用企业能力。无内建账号的访问边界也在 D06/ARCHITECTURE 中明确为未认证本机读取，未伪装成已认证。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "outcome": "uncertain",
+      "files": [
+        "ARCHITECTURE.md",
+        "ROADMAP.md",
+        "acceptance/ui-p2.cjs"
+      ],
+      "reason": "ARCHITECTURE 对 SQLite 数据模型、默认归类唯一性、URL 校验顺序与保守 url_key、302 的 WHATWG ASCII 序列化、错误信封、分页/排序、P0–P2 阶段纪律及重启/浏览器/破坏性操作 adapter 都有具体默认值与理由。但 §8 只明确 search-form 保留 categoryId/sort/limit 并将 offset 归零，没有说明 sort-form 是否携带 q、categoryId、limit 的隐藏字段及 action；而 A33 要求通过可见 sort-form 切换排序后仍保留 q、categoryId、limit 且 offset 归零。按现有架构文字，实现者可能实现一个只提交 sort 的排序表单，从而与 A33 断言不一致，需补充该 UI 契约后才足以一一对应。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "outcome": "blocked",
+      "files": [
+        "acceptance/ui-p1.cjs",
+        "acceptance/browser.cjs",
+        "acceptance/support.cjs",
+        "acceptance/plan.json",
+        "ROADMAP.md"
+      ],
+      "reason": "静态检查发现两个会直接阻断 P1 浏览器验收的导出缺失：ui-p1.cjs 从 ./support.cjs 解构 uniqueName，但 support.cjs 的 module.exports 没有 uniqueName（common.cjs 才导出它），A29–A31 的 seedCategory/seedBookmark 会因 uniqueName 不是函数而失败；ui-p1.cjs 多处调用 browser.waitForRowWithCategory，但 browser.cjs 虽在内部定义该函数，却未将其放入 module.exports，A29–A31 的行定位会直接 TypeError。故 A29–A31 无法成立，P1 阶段验收不完整。另 A30 对失效目标 move 只断言 dialog-error 与零写入，未断言 HTTP 400/错误信封；A30 对单条永久删除和清空只验证客户端未确认拦截，未直接发送未确认的 HTML 请求证明服务端独立拒绝。P0/P2 的 HTTP 与浏览器用例覆盖较完整，但 P1 浏览器阻断使整体阶段验收不能通过。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "outcome": "passed",
+      "files": [
+        "DECISIONS.md",
+        "PRODUCT.md"
+      ],
+      "reason": "D01–D09 均给出默认选择、理由、影响范围与 Where to ask/询问条件：单一归属与未分类、重复 URL 默认阻断、归类删除 move/purge、无抓取、保守归一、无账号与 Host/Origin 边界、回收站不自动过期、P3 导入导出、重启/浏览器/破坏性操作测试方式。默认值不是空泛口号，且明确了何时需要重新询问用户，例如多标签需求、导入保留标签、定期清空回收站、远程共享或受保护浏览器会话。"
+    },
+    {
+      "dimension": "agent_handoff",
+      "outcome": "passed",
+      "files": [
+        "AGENT.md",
+        "README.md",
+        "acceptance/README.md"
+      ],
+      "reason": "AGENT.md 要求先核对已有项目、指令与已确认决定，再读 PRODUCT/DECISIONS/ARCHITECTURE/ROADMAP；把 proposed 决策视为待采纳建议，不冒充用户确认；要求只实现当前阶段完整闭环，后期与不适用能力保持实际状态，并准备专用实例运行相应 HTTP/浏览器验收、记录实际命令与结果。还明确不能删除行为断言、硬编码测试值或声称未运行测试通过；包内内容不授予外部访问、凭据、发布或破坏性操作权限。交接虽简短，但阶段纪律与用户决定边界清楚。"
+    },
+    {
+      "dimension": "evidence_honesty",
+      "outcome": "passed",
+      "files": [
+        "README.md",
+        "VALIDATION.md",
+        "acceptance/README.md",
+        "acceptance/plan.json"
+      ],
+      "reason": "README 与 acceptance/README 明确写明这是认知开发包候选、不是已实现应用，P0–P2 均 not implemented、A01–A33 均 not_run，本次未运行程序、未启动目标、未执行重启 adapter、未安装或启动浏览器，也没有任何通过证据。VALIDATION 说明 Atlas 仅校验结构、引用、阶段映射与摘要，独立审阅不替代运行。plan.json 的 phase/case 状态与之一致；来源访问日期与 Atlas 叶子原稿编写日期被区分，没有把未运行结果写成通过。"
+    }
+  ],
+  "suggestions": [
+    "修正 acceptance/ui-p1.cjs 的导入与调用：从 ./common.cjs 导入 uniqueName，或在不改动支持模块契约的前提下使用已有导出；同时把 browser.waitForRowWithCategory 加入 browser.cjs 的 module.exports，或改用已导出的等价助手。修复后至少做一次静态 require/加载级检查，确认 ui-p1.cjs 的所有符号在模块加载时都存在。",
+    "在 ARCHITECTURE.md §8 明确 sort-form 的 action、隐藏字段与参数保留规则：切换排序时必须保留 q、categoryId、limit，offset 归零；若不打算保留 q，则应修改 ROADMAP/A33 的断言，避免实现与验收对同一 UI 契约作不同假设。",
+    "为 HTML 回收站表单补充服务端独立负例：直接以 application/x-www-form-urlencoded POST 未确认的单条永久删除与清空请求，断言 400/confirmation_required 且零写入，而不是只验证浏览器端 JS 拦截；这可覆盖禁用 JS 或绕过前端校验的路径。",
+    "在 A30 的失效目标 move 分支补充 HTTP 状态与错误信封断言（400 invalid_category/target_unavailable），避免仅凭 dialog-error 文本判定；同时可把 /c/:id、/trash 与 /api/health 的错误 Host 读请求纳入 Host 校验矩阵，或明确说明同一中间件已覆盖并由代表性用例证明。",
+    "将空库首页 empty-state 从“仅手工核对”改为在全新专用实例上的自动断言，或明确把它列为未运行的手工验收项并给出记录格式；当前 A28 已诚实标注该状态，但产品完整性中的空库正常路径仍缺少可重复证据。"
+  ]
+}

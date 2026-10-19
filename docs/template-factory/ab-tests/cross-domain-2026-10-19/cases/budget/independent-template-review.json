@@ -1,0 +1,85 @@
+{
+  "outcome": "passed",
+  "summary": "对冻结的认知蓝图（experiment-budget@1，个人月度预算与消费前剩余额度）作独立静态审阅：PRODUCT/CATEGORY/ARCHITECTURE/ROADMAP/DECISIONS/AGENT 与 P0 验收 A01–A14 在范围、契约、阶段覆盖与诚实性上基本自洽，未发现破坏核心闭环、伪造验收、矛盾承诺或目标凭据外泄；范围限定单用户、人民币、无银行/同步，未强加企业特性。所有程序均标 not_run，本审阅未执行任何程序。局限：input.json 的 guidance_file 指向 source/GUIDANCE.md，而该文件既不在 source_inventory 也实际不存在；UI 一致性主要靠 data-testid 存在性与可选内嵌状态校验，未真正驱动界面；A11 末行重新序列化往返属自证式断言。这些为观察/建议，非阻断。",
+  "checks": [
+    {
+      "dimension": "category_evidence",
+      "outcome": "passed",
+      "files": [
+        "CATEGORY.md"
+      ],
+      "reason": "S01–S13 逐条标注事实、许可与复用方式；类别事实段与 S02–S12 对应，Actual（MIT，限参复用）、Firefly III（AGPL-3.0，因 copyleft 不复制）、Fudget（专有，不可复用）的结论附 LICENSE 或仓库依据，未过度断言；『待验证』列出 webfetch 域受限、第三方正文为搜索快照、CNY 两位小数与编辑历史未验证等未知项，明确区分引用事实、建议与未知。"
+    },
+    {
+      "dimension": "scenario_scope",
+      "outcome": "passed",
+      "files": [
+        "PRODUCT.md",
+        "inputs/scenario.json"
+      ],
+      "reason": "场景为单个本地用户、人民币、无银行/支付连接；F20–F25（银行同步、多用户、多币种、复式/投资、审批报销、YNAB 导入）标为 not applicable，未强加企业特性；工作流逐条对齐 workflow 六步与四条 acceptance。"
+    },
+    {
+      "dimension": "product_completeness",
+      "outcome": "passed",
+      "files": [
+        "PRODUCT.md",
+        "DECISIONS.md"
+      ],
+      "reason": "用户 R01/R02 明确；正常流程（选月→建分类/预算→记账→核对→改删→重启回查→导出）与失败流程（F07 及 A05/A06/A09/A14，失败给出反馈且不破坏旧数据）齐全；数据生命周期含 D03 原子写入/仅写 --data-dir、F08 重启保留；F09 导出为最小审计；编辑历史/审计以 D04 决策触发保留，权限/计费/多租户按场景不适用，恢复 F15 列后期。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "outcome": "passed",
+      "files": [
+        "ARCHITECTURE.md"
+      ],
+      "reason": "给出默认栈与理由并否定 Flask/FastAPI 及直接复用 Actual/Firefly III；定义 categories/transactions 数据模型与整数分/两位小数表示；API 端点、非 2xx 且含 error 字段的错误形状、失败不改数据、月份隔离键等契约明确；UI/CLI 适配契约（data-testid 清单、启动命令、仅 loopback）齐备。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "outcome": "passed",
+      "files": [
+        "ROADMAP.md",
+        "acceptance/plan.json",
+        "acceptance/run.py"
+      ],
+      "reason": "P0 为唯一阶段且完成已确认核心闭环，未把不可缺步骤推到后期；F01–F10 与 A01–A14 双向覆盖完整，无后期 API 被前期要求；run.py 针对真实目标发请求，含 A03/A05/A06/A09/A14 负例、A07 超支负剩余、A08 改删即时重算、A11 中文/引号/换行往返等真实断言。弱项（建议级）：A01/A13 的 UI-状态一致性主要靠 data-testid 字符串存在与可选内嵌 JSON 校验，A11 末行 parse(serialize(rows))==rows 为自证式断言，未真正驱动界面或直接断言导出字节。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "outcome": "passed",
+      "files": [
+        "DECISIONS.md"
+      ],
+      "reason": "D01–D06 均含问题、默认值、理由、when to ask、影响与状态；D01 整数分并拒绝静默舍入、D02 不做跨月 rollover、D03 SQLite 事务/原子写入且仅写 --data-dir、D05 RFC 4180+QUOTE_MINIMAL+CRLF、D06 P0 不删分类；D04（编辑历史/审计）标为待人类确认并给出升级触发条件。"
+    },
+    {
+      "dimension": "agent_handoff",
+      "outcome": "passed",
+      "files": [
+        "AGENT.md",
+        "README.md"
+      ],
+      "reason": "AGENT 要求先核对已有项目与已确认决定、按当前阶段读 ARCHITECTURE 契约与对应验收、不预读全部成熟材料；首阶段须完成已确认核心闭环且不得把不可缺操作拆到后期；proposed 决策当建议、可逆选择用已声明默认值并记录、关键取舍按触发问人；README 指明从 HANDOFF/CURRENT_PHASE 起步。尊重既有用户决定与冻结要求。"
+    },
+    {
+      "dimension": "evidence_honesty",
+      "outcome": "passed",
+      "files": [
+        "VALIDATION.md",
+        "README.md",
+        "acceptance/README.md"
+      ],
+      "reason": "多处声明生成阶段未运行程序、全部状态 not_run；Web 模式 A10 记 SKIP 而非伪造通过；VALIDATION 只承认结构/引用/阶段映射/摘要校验；无导入或生成结果冒充独立执行。注意：input.json 的 guidance_file 指向 source/GUIDANCE.md，但该文件不在 source_inventory 也不存在，属元数据不一致（建议修正），不构成本维度阻断。"
+    }
+  ],
+  "suggestions": [
+    "修正 input.json 的 guidance_file，或把 source/GUIDANCE.md 补入包内并使 source_inventory 一致，避免悬空引用。",
+    "为 F10/A13 增加真正驱动 UI 的校验（如无头渲染后读取汇总数值并与 /api/state 比对），并明确 A01/A02 的断言目标是控件存在性还是真实 UI 交互，消除目标描述与实现不符。",
+    "把 A11 的 parse(serialize(rows))==rows 自证式断言替换为对导出字节的直接结构断言（CRLF 行尾、字段内引号双写、末行换行、表头一致）。",
+    "在 acceptance/README 中显式提示：Web 模式不覆盖重启持久化与仅写指定目录，A10/F08 完整验证仅在 CLI 模式成立。",
+    "保持 D04（编辑历史/审计）为待确认并保留默认『导出即最小审计/恢复起点』及升级触发条件，使后期决策不阻塞 P0。"
+  ],
+  "scope": "Independent static cognition and acceptance-program review only; no program execution, source re-fetch, downstream runtime or publication."
+}

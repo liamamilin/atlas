@@ -1,0 +1,102 @@
+{
+  "schema": "atlas.acceptance-result.v0",
+  "target": "http://127.0.0.1:5220/",
+  "phase": "P0",
+  "mode": "real-target",
+  "fault": null,
+  "started_at": "2026-10-17T06:03:57.842Z",
+  "cases": [
+    {
+      "id": "A01",
+      "goal": "保存默认归类，刷新、关页重开及同一 profile 浏览器重启后仍可查到；保存不外发",
+      "status": "passed",
+      "duration_ms": 704
+    },
+    {
+      "id": "A02",
+      "goal": "编辑原条目并创建新归类；重开后内容与归类保留，记录不增加",
+      "status": "passed",
+      "duration_ms": 374
+    },
+    {
+      "id": "A03",
+      "goal": "搜索标题/URL/分类文本与分类筛选交集；空结果有提示，清空筛选不丢记录",
+      "status": "passed",
+      "duration_ms": 415
+    },
+    {
+      "id": "A04",
+      "goal": "点击实际记录链接触发正确外部目标导航且隔离 opener",
+      "status": "passed",
+      "duration_ms": 305
+    },
+    {
+      "id": "A05",
+      "goal": "新建和编辑拒绝危险 URL/空标题，校验失败保留各字段且不覆盖旧记录",
+      "status": "passed",
+      "duration_ms": 752
+    },
+    {
+      "id": "A06",
+      "goal": "打开失败或已有库读取失败时明确错误并禁用保存；故障恢复后旧数据完整",
+      "status": "passed",
+      "duration_ms": 399
+    },
+    {
+      "id": "A07",
+      "goal": "写事务中止时保留输入且不显示成功，重开没有半写入",
+      "status": "passed",
+      "duration_ms": 397
+    },
+    {
+      "id": "A08",
+      "goal": "新建和编辑标题中的 HTML 作为文字显示，重开后也不执行",
+      "status": "passed",
+      "duration_ms": 509
+    },
+    {
+      "id": "A09",
+      "goal": "一次保存操作的快速重复提交只形成一条记录",
+      "status": "passed",
+      "duration_ms": 203
+    },
+    {
+      "id": "A17",
+      "goal": "用标签和键盘保存，375px 无横向溢出；状态反馈可发现",
+      "status": "passed",
+      "duration_ms": 254
+    }
+  ],
+  "unselected": [
+    {
+      "id": "A10",
+      "status": "not_executed"
+    },
+    {
+      "id": "A11",
+      "status": "not_executed"
+    },
+    {
+      "id": "A12",
+      "status": "not_executed"
+    },
+    {
+      "id": "A13",
+      "status": "not_executed"
+    },
+    {
+      "id": "A14",
+      "status": "not_executed"
+    },
+    {
+      "id": "A15",
+      "status": "not_executed"
+    },
+    {
+      "id": "A16",
+      "status": "not_executed"
+    }
+  ],
+  "finished_at": "2026-10-17T06:04:02.663Z",
+  "passed": true
+}

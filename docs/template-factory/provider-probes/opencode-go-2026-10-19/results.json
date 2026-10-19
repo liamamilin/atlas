@@ -1,0 +1,133 @@
+{
+ "scope": "Synthetic JSON smoke checks only. No Atlas leaf, template, application source or credentials sent as task input; not a quality benchmark.",
+ "input_sha256": "227be5bc6030e626131aad2c6c50005ba5d3c9b0a0c9aac87c3939cadd3f321a",
+ "requested_models": [
+  "opencode-go/longcat-2.5-preview-free",
+  "opencode-go/beam-free",
+  "opencode-go/deepseek-v4.1-flash"
+ ],
+ "results": [
+  {
+   "requested_model": "opencode-go/longcat-2.5-preview-free",
+   "started_at": "2026-10-19T04:02:23.965924+00:00",
+   "status": "passed",
+   "response": {
+    "schema": "atlas.provider-smoke.v1",
+    "count": 1,
+    "reject_candidate": true
+   },
+   "cli": {
+    "model": "opencode-go/longcat-2.5-preview-free",
+    "actual_model": "opencode-go/longcat-2.5-preview-free",
+    "requested_model": "opencode-go/longcat-2.5-preview-free",
+    "reasoning_effort": null,
+    "session_id": "ses_eadacd5e5ffeAogrR8CoyBmR2a",
+    "actual_reasoning_effort": null,
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 15.67,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "82a91739460af4ed1fa30b0b310bdb173d943aa8c9a8a2f17b52cad3fabda23c",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "completed_at": "2026-10-19T04:02:39.751616+00:00"
+  },
+  {
+   "requested_model": "opencode-go/beam-free",
+   "started_at": "2026-10-19T04:03:01.731959+00:00",
+   "status": "passed",
+   "response": {
+    "schema": "atlas.provider-smoke.v1",
+    "count": 1,
+    "reject_candidate": true
+   },
+   "cli": {
+    "model": "opencode-go/beam-free",
+    "actual_model": "opencode-go/beam-free",
+    "requested_model": "opencode-go/beam-free",
+    "reasoning_effort": null,
+    "session_id": "ses_eadac42d2ffeXKQYykCAeyC2ag",
+    "actual_reasoning_effort": null,
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 3.91,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "dec75934c3e4c2418eef3190671a5d84160770a7dcb29eb1a89393eeda83858e",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "completed_at": "2026-10-19T04:03:05.739132+00:00"
+  },
+  {
+   "requested_model": "opencode-go/deepseek-v4.1-flash",
+   "started_at": "2026-10-19T04:02:23.966343+00:00",
+   "status": "passed",
+   "response": {
+    "schema": "atlas.provider-smoke.v1",
+    "count": 1,
+    "reject_candidate": true
+   },
+   "cli": {
+    "model": "opencode-go/deepseek-v4.1-flash",
+    "actual_model": "opencode-go/deepseek-v4.1-flash",
+    "requested_model": "opencode-go/deepseek-v4.1-flash",
+    "reasoning_effort": null,
+    "session_id": "ses_eadacd5d9ffeHZ3GLp96ati7TJ",
+    "actual_reasoning_effort": null,
+    "event_types": [
+     "step_finish",
+     "step_start",
+     "text",
+     "tool_use"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 8.97,
+    "cli_status": "completed",
+    "delivery_status": "delivered",
+    "failure_code": null,
+    "stdout_sha256": "4bff36e9c355680032a6d75389ae6a6f0d9d4b33810949eab5e47bd3aac7ec65",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "completed_at": "2026-10-19T04:02:33.052049+00:00"
+  },
+  {
+   "requested_model": "opencode-go/cat-jam-free",
+   "started_at": "2026-10-19T04:02:23.966169+00:00",
+   "status": "failed",
+   "code": "cli_failed",
+   "error": "OpenCode CLI failed: {'type': 'provider.no-route', 'message': 'Model unavailable: opencode-go/cat-jam-free'}",
+   "cli": {
+    "model": "opencode-go/cat-jam-free",
+    "actual_model": "opencode-go/cat-jam-free",
+    "requested_model": "opencode-go/cat-jam-free",
+    "reasoning_effort": null,
+    "session_id": "ses_eadacd5daffeP747pCfrCxbHYy",
+    "actual_reasoning_effort": null,
+    "event_types": [
+     "error"
+    ],
+    "exit_code": 1,
+    "duration_seconds": 3.05,
+    "cli_status": "completed",
+    "delivery_status": "failed",
+    "failure_code": "cli_failed",
+    "stdout_sha256": "5770e46e7e21ca3a9f4bed131f642b52778a3e537fa58697c3315ef40c4f3635",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "completed_at": "2026-10-19T04:02:27.138417+00:00"
+  }
+ ]
+}

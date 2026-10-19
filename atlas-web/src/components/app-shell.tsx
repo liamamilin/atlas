@@ -19,11 +19,13 @@ export function AppShell() {
           <nav aria-label={lang === "zh" ? "主导航" : "Main navigation"} className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap text-sm text-muted [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {[
               { to: "/", label: t("home", lang) },
+              { to: "/ask", label: t("ask", lang) },
               { to: "/browse", label: t("browse", lang) },
               { to: "/apps", label: t("apps", lang) },
-              { to: "/projects", label: t("projects", lang) },
+              { to: "/factory", label: lang === "zh" ? "模板工厂" : "Template factory" },
               { to: "/drafts", label: t("drafts", lang) },
               { to: "/tutorial", label: t("tutorial", lang) },
+              { to: "/settings", label: t("settings", lang) },
             ].map((l) => (
               <NavLink
                 key={l.to}

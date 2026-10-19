@@ -1,0 +1,887 @@
+{
+ "title": "个人月度预算与消费前剩余额度",
+ "roles": [
+  {
+   "id": "R01",
+   "name": "本地使用者（唯一用户）",
+   "responsibility": "在本地浏览器中选择月份、建立分类与月预算、记录/修改/删除支出、查看计划/实际/剩余（含超支负剩余）并导出当月 CSV；数据仅存于指定目录，全离线、无银行或支付连接。"
+  },
+  {
+   "id": "R02",
+   "name": "独立验收操作员",
+   "responsibility": "在隔离环境中以显式目标（--target-url，或 --app-path 加 --data-root）运行 acceptance/run.py，针对真实实例执行行为断言并读取非零退出码；不接触真实用户数据、凭据或外部网络。"
+  }
+ ],
+ "features": [
+  {
+   "id": "F01",
+   "name": "月份选择与按月隔离",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "场景以“按月”为组织单位，必须先选月并保证不同月份的分类、预算与支出互相隔离，切换月份可回查。",
+   "sources": [
+    "S01",
+    "S02",
+    "S04",
+    "S06"
+   ],
+   "acceptance": [
+    "A01",
+    "A10"
+   ]
+  },
+  {
+   "id": "F02",
+   "name": "建立分类与月预算",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "核心旅程起点：为某月建立分类并分配预算额度，一个分类即一条“计划”记录。",
+   "sources": [
+    "S01",
+    "S02",
+    "S04"
+   ],
+   "acceptance": [
+    "A02",
+    "A03"
+   ]
+  },
+  {
+   "id": "F03",
+   "name": "调整分类月预算",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "计划可随时修改且不追溯；改预算只作用于目标月份，不能误改其他月。",
+   "sources": [
+    "S02",
+    "S03",
+    "S06"
+   ],
+   "acceptance": [
+    "A12"
+   ]
+  },
+  {
+   "id": "F04",
+   "name": "记录支出（日期/分类/金额/备注）",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "实际支出是“计划−实际=剩余”的另一半；需日期、分类、正数金额与备注，且日期须属该分类所在月。",
+   "sources": [
+    "S01",
+    "S07"
+   ],
+   "acceptance": [
+    "A04",
+    "A05",
+    "A06"
+   ]
+  },
+  {
+   "id": "F05",
+   "name": "分类与整月计划/实际/剩余（超支负剩余可见）",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "消费前的剩余额是核心输出；超支合法并显示为负剩余，未使用分类仍须可见，且不阻止后续记账。",
+   "sources": [
+    "S01",
+    "S05",
+    "S06"
+   ],
+   "acceptance": [
+    "A07"
+   ]
+  },
+  {
+   "id": "F06",
+   "name": "修改/删除支出并即时重算",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "误记可纠正；改删后列表与汇总必须即时一致地重算（对齐 running balance 语义）。",
+   "sources": [
+    "S01",
+    "S04"
+   ],
+   "acceptance": [
+    "A08",
+    "A09"
+   ]
+  },
+  {
+   "id": "F07",
+   "name": "输入校验与失败反馈（不破坏旧数据）",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "不允许静默取整或裁剪输入；失败输入需给出反馈且保持既有数据不变。",
+   "sources": [
+    "S01",
+    "S12"
+   ],
+   "acceptance": [
+    "A05",
+    "A06",
+    "A09",
+    "A14"
+   ]
+  },
+  {
+   "id": "F08",
+   "name": "本地持久化与重启回查",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "数据须落在指定目录并在正常重启后保留，支持跨会话回查。",
+   "sources": [
+    "S01",
+    "S13",
+    "S08"
+   ],
+   "acceptance": [
+    "A10"
+   ]
+  },
+  {
+   "id": "F09",
+   "name": "导出当月 CSV（RFC 4180 往返）",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "导出是当前最小审计/恢复起点；须对应所选月份，且中文、字段内引号与换行可往返解析。",
+   "sources": [
+    "S10",
+    "S11",
+    "S13"
+   ],
+   "acceptance": [
+    "A11"
+   ]
+  },
+  {
+   "id": "F10",
+   "name": "浏览器 UI 与真实状态一致",
+   "phase": "P0",
+   "applicability": "current required",
+   "reason": "人类 UI 能力必须通过声明的入口可达；GET / 提供可用中文界面，且与 JSON API 共用同一真实状态。",
+   "sources": [
+    "S07",
+    "S08"
+   ],
+   "acceptance": [
+    "A01",
+    "A13"
+   ]
+  },
+  {
+   "id": "F11",
+   "name": "月末结转（负 rollover）",
+   "phase": null,
+   "applicability": "later",
+   "reason": "成熟产品把上月剩余（可为负）带入下月；本场景验收仅承诺当月计划/实际/剩余，故列后续可选项。",
+   "sources": [
+    "S05",
+    "S03"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F12",
+   "name": "信封式分配/Fill 动作",
+   "phase": null,
+   "applicability": "later",
+   "reason": "Goodbudget 以显式 Fill 与推导的 Available 表达分配；本场景用直接月预算即可，属后续增强。",
+   "sources": [
+    "S04",
+    "S03"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F13",
+   "name": "按收入自动生成计划与 Left this month",
+   "phase": null,
+   "applicability": "later",
+   "reason": "Monarch/Simplifi 以收入生成计划；本场景无收入/银行连接，暂不需要。",
+   "sources": [
+    "S06",
+    "S03"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F14",
+   "name": "定期/计划交易（scheduled）",
+   "phase": null,
+   "applicability": "later",
+   "reason": "YNAB/Simplifi 支持未来或周期性条目；非当前确认流程。",
+   "sources": [
+    "S02",
+    "S06"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F15",
+   "name": "备份与恢复（预算导出/导入）",
+   "phase": null,
+   "applicability": "later",
+   "reason": "单机数据生命周期需要原子写入与备份轮换，但缺少一手约定，作为显式后期项。",
+   "sources": [
+    "S13",
+    "S01"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F16",
+   "name": "编辑历史/审计日志",
+   "phase": null,
+   "applicability": "decision needed",
+   "reason": "未见主流产品提供完整编辑历史（S01 标为未验证）；是否需要改账留痕属真实人类决策。",
+   "sources": [
+    "S01"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F17",
+   "name": "报表与趋势",
+   "phase": null,
+   "applicability": "later",
+   "reason": "Actual/Firefly III 提供报表；非当前最小旅程所需。",
+   "sources": [
+    "S08",
+    "S09"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F18",
+   "name": "打印",
+   "phase": null,
+   "applicability": "later",
+   "reason": "Fudget 将打印/导出置于付费层；属可选输出形态。",
+   "sources": [
+    "S07"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F19",
+   "name": "分类排除出预算",
+   "phase": null,
+   "applicability": "later",
+   "reason": "Monarch 允许分类 Exclude this category from the budget；当前无此需要。",
+   "sources": [
+    "S05"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F20",
+   "name": "银行/支付账户同步",
+   "phase": null,
+   "applicability": "not applicable",
+   "reason": "场景明确“不连接银行或支付服务”，无账户层。",
+   "sources": [
+    "S02",
+    "S04",
+    "S13"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F21",
+   "name": "多用户/共享预算",
+   "phase": null,
+   "applicability": "not applicable",
+   "reason": "仅单个本地用户，无多租户或分享需求。",
+   "sources": [
+    "S02"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F22",
+   "name": "多币种/自定义货币符号",
+   "phase": null,
+   "applicability": "not applicable",
+   "reason": "场景固定人民币（CNY，两位小数）。",
+   "sources": [
+    "S07"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F23",
+   "name": "复式记账/账户净值/投资视图",
+   "phase": null,
+   "applicability": "not applicable",
+   "reason": "Firefly III 的复式记账与企业资产视图不属本类型核心，也不在本场景范围。",
+   "sources": [
+    "S09"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F24",
+   "name": "审批/报销/企业或公共预算",
+   "phase": null,
+   "applicability": "not applicable",
+   "reason": "无组织层、无审批与报销流程。",
+   "sources": [
+    "S01"
+   ],
+   "acceptance": []
+  },
+  {
+   "id": "F25",
+   "name": "YNAB4/YNAB5 导入",
+   "phase": null,
+   "applicability": "not applicable",
+   "reason": "无既有外部预算数据迁移需求。",
+   "sources": [
+    "S13"
+   ],
+   "acceptance": []
+  }
+ ],
+ "decisions": [
+  {
+   "id": "D01",
+   "question": "金额如何表示与取整？",
+   "default": "以整数“分”存储与计算，响应渲染为两位小数字符串；对超过两位小数或非正数输入直接拒绝而非静默舍入。理由：避免二进制浮点误差（S12），并满足场景“不静默取整或裁剪输入”。可逆。",
+   "when_to_ask": "当使用者明确希望自动舍入到分、或需要接受超过两位的小数输入时。",
+   "impact": "数据模型、输入校验、汇总公式与 CSV 导出的数值格式。",
+   "status": "默认采用（可逆）"
+  },
+  {
+   "id": "D02",
+   "question": "超支是否跨月结转？",
+   "default": "P0 仅在当月展示负剩余，不自动结转下月。理由：已确认验收只承诺当月计划/实际/剩余；跨月 rollover 属成熟扩展（S05）。可逆。",
+   "when_to_ask": "当使用者要求上月超支影响下月可用额度、或需要结转语义时。",
+   "impact": "汇总公式、月切换展示与后续阶段规划。",
+   "status": "默认采用（可逆）"
+  },
+  {
+   "id": "D03",
+   "question": "本地数据如何持久化与写入保护？",
+   "default": "SQLite 单库（CONTRACT 固定），以事务/临时文件方式原子写入，且只写入 --data-dir。理由：单机集中持久化并降低损坏风险（S13,S01）。可逆。",
+   "when_to_ask": "当需要多设备同步、备份轮换或对崩溃恢复作出承诺时。",
+   "impact": "存储布局、启动参数与恢复策略。",
+   "status": "默认采用"
+  },
+  {
+   "id": "D04",
+   "question": "是否需要完整编辑历史/审计日志？",
+   "default": "P0 不建完整编辑历史，以导出 CSV 作为最小审计与恢复起点。理由：据可用一手文档未见主流产品提供完整编辑历史（S01 未验证项）。",
+   "when_to_ask": "当使用者要求改账留痕、回溯历史版本或合规审计时。",
+   "impact": "数据模型（历史表）、UI 展示与导出内容。",
+   "status": "待人类确认"
+  },
+  {
+   "id": "D05",
+   "question": "CSV 导出采用何种方言？",
+   "default": "UTF-8、RFC 4180 引号规则、QUOTE_MINIMAL、CRLF、表头 date,category,amount,note。理由：S10/S11 给出信息性标准与标准库行为；与 CONTRACT 一致。已定。",
+   "when_to_ask": "当目标环境要求其他编码、分隔符或 Excel 本地化行为时。",
+   "impact": "导出实现、往返测试与字段格式。",
+   "status": "已定（与 CONTRACT 一致）"
+  },
+  {
+   "id": "D06",
+   "question": "是否支持删除/归档分类？",
+   "default": "P0 不支持删除分类，未使用分类保留可见。理由：场景要求未使用分类仍可见，契约未定义删除语义（S02 分类为月内对象）。可逆。",
+   "when_to_ask": "当使用者要求清理、重命名或归档分类时。",
+   "impact": "API 表面、月内隔离与历史数据一致性。",
+   "status": "默认采用（可逆，后续阶段）"
+  }
+ ],
+ "phases": [
+  {
+   "id": "P0",
+   "title": "单机本地月度预算核心旅程",
+   "goal": "使用者能在本地浏览器中选月、建立分类与预算、记录并纠正支出、核对计划/实际/剩余（含超支负剩余）、切换月份后重启仍可回查，并导出当月 CSV。",
+   "features": [
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06",
+    "F07",
+    "F08",
+    "F09",
+    "F10"
+   ],
+   "acceptance": [
+    "A01",
+    "A02",
+    "A03",
+    "A04",
+    "A05",
+    "A06",
+    "A07",
+    "A08",
+    "A09",
+    "A10",
+    "A11",
+    "A12",
+    "A13",
+    "A14"
+   ],
+   "status": "not implemented"
+  }
+ ],
+ "acceptance": [
+  {
+   "id": "A01",
+   "phase": "P0",
+   "goal": "启动后 GET / 返回可用中文 UI；将 data-testid=month 设为某月后，JSON API 返回与该月一致的实时状态。",
+   "type": "positive",
+   "features": [
+    "F01",
+    "F10"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A02",
+   "phase": "P0",
+   "goal": "通过 UI 控件（category-name/category-budget/category-save）与 POST /api/categories 建立分类与预算，GET /api/state 返回该分类且 spent 为 \"0.00\"。",
+   "type": "positive",
+   "features": [
+    "F02"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A03",
+   "phase": "P0",
+   "goal": "同一月份重复名称创建分类返回非 2xx JSON 错误，且不产生隐藏的第二个分类。",
+   "type": "negative",
+   "features": [
+    "F02"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A04",
+   "phase": "P0",
+   "goal": "记录含日期、分类、金额与备注的支出后，GET /api/state 列表包含该笔且汇总与之一致。",
+   "type": "positive",
+   "features": [
+    "F04"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A05",
+   "phase": "P0",
+   "goal": "非正数或超过两位小数的金额被拒绝（非 2xx JSON），存储值与汇总保持原样，不静默取整或裁剪。",
+   "type": "negative",
+   "features": [
+    "F04",
+    "F07"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A06",
+   "phase": "P0",
+   "goal": "交易日期与分类所属月份不一致时被拒绝，且既有数据不变。",
+   "type": "negative",
+   "features": [
+    "F04",
+    "F07"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A07",
+   "phase": "P0",
+   "goal": "分类与整月的 budget/spent/remaining/totals 计算正确；未使用分类仍出现；超支显示负 remaining 且不阻止后续记账。",
+   "type": "positive",
+   "features": [
+    "F05"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A08",
+   "phase": "P0",
+   "goal": "修改或删除支出后，交易列表与汇总即时一致地重算。",
+   "type": "positive",
+   "features": [
+    "F06"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A09",
+   "phase": "P0",
+   "goal": "对不存在或非法 id 的 PUT/DELETE 返回非 2xx，原记录保持不变。",
+   "type": "negative",
+   "features": [
+    "F06",
+    "F07"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A10",
+   "phase": "P0",
+   "goal": "不同月份数据互相隔离；以同一 --data-dir 重启后数据保留，且数据仅写入指定目录。",
+   "type": "positive",
+   "features": [
+    "F01",
+    "F08"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A11",
+   "phase": "P0",
+   "goal": "GET /api/export?month 返回 UTF-8 CSV，含表头与当月行；中文、字段内引号与换行按 RFC 4180 往返可解析。",
+   "type": "positive",
+   "features": [
+    "F09"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A12",
+   "phase": "P0",
+   "goal": "PUT /api/categories/{id} 更新目标月预算，且不误改其他月份的同名分类。",
+   "type": "positive",
+   "features": [
+    "F03"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A13",
+   "phase": "P0",
+   "goal": "UI 控件反映与 JSON API 相同的真实状态（例如新增支出后界面汇总数字随之更新）。",
+   "type": "positive",
+   "features": [
+    "F10"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A14",
+   "phase": "P0",
+   "goal": "API 校验失败返回非 2xx JSON 错误说明；UI 对失败给出可理解反馈且不破坏旧数据。",
+   "type": "negative",
+   "features": [
+    "F07"
+   ],
+   "implementation": "acceptance/run.py",
+   "status": "not_run"
+  }
+ ],
+ "architecture_markdown": "## 默认技术栈与理由\n- Python 3 标准库 + SQLite（CONTRACT 固定）：无安装、无第三方依赖，适合本地单机；sqlite3 提供事务与集中持久化。\n- HTTP 层用标准库 http.server（ThreadingHTTPServer + 轻量路由），只绑定 127.0.0.1，贴合“本地单用户、无外部网络”。\n- 前端为随应用提供的原生 HTML/CSS/JS，与 JSON API 共用同一真实状态，不引入 CDN 或外部资源。\n- 被否方案：Flask/FastAPI（需第三方依赖，违反零安装约束）；直接复用 Actual Budget(NodeJS，规模不匹配)或 Firefly III(AGPL-3.0，强 copyleft，不宜复制)（S08,S09）。\n\n## 数据模型（保持小规模）\n- categories(id INTEGER PK, month TEXT 'YYYY-MM', name TEXT, budget_cents INTEGER)，唯一约束 (month,name)。\n- transactions(id INTEGER PK, date TEXT 'YYYY-MM-DD', category_id INTEGER, amount_cents INTEGER, note TEXT)。\n- 金额一律以整数“分”存储，响应渲染为两位小数字符串；亦可用 decimal.quantize 实现（S12）。\n- spent 由按 category 聚合推导，remaining = budget − spent；totals 为整月 budget/spent/remaining 聚合。\n\n## API/错误/状态契约（与 CONTRACT.md 一致）\n- GET /api/state?month=YYYY-MM；POST /api/categories；PUT /api/categories/{id}；POST /api/transactions；PUT /api/transactions/{id}；DELETE /api/transactions/{id}；GET /api/export?month=YYYY-MM。\n- 所有金额为两位小数字符串；校验失败（非正数、超过两位小数、日期与分类月不符、同月同名、未知 id）返回非 2xx 且 JSON {\"error\":\"...\"}，同时不改变既有数据。\n- 月份是隔离键：写入与查询必须匹配目标月，跨月误改必须拒绝。\n\n## UI/CLI 适配契约（供测试）\n- UI 必须提供 data-testid=month,category-name,category-budget,category-save,expense-date,expense-category,expense-amount,expense-note,expense-save；分类选择项 value 等于 category_id。\n- 先填 month 等待状态加载；category-save 建分类；expense-save 记账。其余界面可自由设计。\n- 启动：python3 app.py --port PORT --data-dir DIR，仅 127.0.0.1。\n- 验收程序 acceptance/run.py 以显式目标参数连接真实实例（Web 模式仅允许给定的 loopback origin/port，禁止跨源重定向）；本地 CLI 模式仅允许显式 --app-path 与受控 --data-root，shell=False。\n\n## 非功能需求\n- 全离线：无遥测、无外部网络、无任意文件访问、无子进程；数据仅写入 --data-dir。\n- 金额确定性：整数“分”或 decimal，避免二进制浮点误差。\n- 持久化：事务/原子写入，正常重启后可回查。\n- 反馈：UI 对失败给出可理解提示，API 返回结构化错误。\n\n## 复用与来源\n- S10（RFC 4180）与 S11/S12（Python csv/decimal 标准库）作为格式与精度依据；未复制任何第三方代码。",
+ "limits": [
+  "仅面向单个本地用户，不连接银行或支付服务，无账户层、无同步、无多租户。",
+  "货币固定人民币（CNY，两位小数），不支持多币种或自定义符号。",
+  "P0 只展示当月计划/实际/剩余，不提供跨月 rollover 结转。",
+  "不提供完整编辑历史/审计日志；导出 CSV 为最小审计与恢复起点。",
+  "P0 不支持删除/归档分类，未使用分类保留可见。",
+  "验收程序不实现下游应用、不安装依赖、不执行外部命令、不访问真实 HOME/Downloads，全部用例状态为 not_run。"
+ ],
+ "id": "blueprint-cross-domain-budget-2026-10-19",
+ "schema": "atlas.product-blueprint.v0",
+ "kind": "product-blueprint",
+ "version": "0.1.0",
+ "created_at": "2026-10-18T19:31:10.825887+00:00",
+ "status": "candidate; programs not executed",
+ "scenario": {
+  "id": "experiment-budget",
+  "revision": 1,
+  "status": "ready",
+  "leaf": "budgeting-application",
+  "name": "个人月度预算与消费前剩余额度",
+  "audience": "单个本地用户，不连接银行或支付服务",
+  "objective": "按月为用途设置预算，记录和纠正实际支出，在消费前看到准确的计划、已花和剩余，并导出自己的记录。",
+  "workflow": [
+   "选择月份并建立分类及预算",
+   "记录有日期、分类、金额和备注的支出",
+   "核对分类及整月计划/实际/剩余，超支可见",
+   "修改或删除误记支出并即时重算",
+   "切换月份、重启后仍可回查",
+   "导出当月支出 CSV"
+  ],
+  "acceptance": [
+   "仅本人本地数据；货币为人民币，两位小数，支出须为正数，不静默取整或裁剪输入",
+   "每月预算及支出互相隔离；未使用分类仍可见，超支显示负剩余，不自动阻止记账",
+   "修改/删除后汇总与列表一致，失败输入给出反馈且不破坏旧数据",
+   "数据只存指定目录，正常重启保留；导出对应当前月份，中文、引号和换行可往返"
+  ],
+  "authorization_scope": "user-authorized local experiment only; no catalog mutation"
+ },
+ "sources": [
+  {
+   "id": "S01",
+   "name": "Atlas confirmed input",
+   "url": "inputs/scenario.json",
+   "kind": "confirmed_input",
+   "version": "experiment-budget@1",
+   "facts": "按月为用途设置预算，记录和纠正实际支出，在消费前看到准确的计划、已花和剩余，并导出自己的记录。",
+   "license": "Atlas scenario input; not a third-party code license",
+   "reuse": "Pinned requirement input"
+  },
+  {
+   "id": "S02",
+   "name": "YNAB API 官方文档（REST/OpenAPI）",
+   "url": "https://api.ynab.com/",
+   "version": "OpenAPI spec 版本 1.87.0（文档页；访问 2026-10-19）",
+   "facts": "官方 REST API：Plan 为顶层容器，其下含 accounts、categories（按 category groups 组织）、payees、transactions、scheduled transactions、months 与 money movements；分类的 assigned/activity/available 金额按月（月内）取值，可通过带 month 的端点读写；金额以 milliunits（整数）表示；账户分 on budget / tracking；账户间转账用特殊 transfer payee 表示，交易可拆分为 subtransactions；scheduled transactions 表示定期但尚未入账的条目。",
+   "license": "not code / 官方文档未声明开源许可",
+   "reuse": "作为计划/月度/分类比较态的数据模型参考；不复用代码"
+  },
+  {
+   "id": "S03",
+   "name": "YNAB 官方方法页（The YNAB Method）",
+   "url": "https://www.ynab.com/ynab-method",
+   "version": "网页内容；访问 2026-10-19（未固定版本）",
+   "facts": "官方方法强调 give every dollar a job（把当前持有的每一美元分配到分类，而非按凭空数字），并把拥抱真实支出（把汽车保险、年费等非月度支出平摊为月度预留）、roll with the punches（超支时从别的分类挪钱，计划是随时可改的活对象）、age your money 作为配套实践。",
+   "license": "not code / 商业产品文档",
+   "reuse": "方法、术语与超支调整语义参考；不复用代码"
+  },
+  {
+   "id": "S04",
+   "name": "Goodbudget 官方帮助中心（信封预算）",
+   "url": "https://goodbudget.com/help/",
+   "version": "多篇帮助文章（部分标注 2020-02-21、2023-11-16、2024-04-22 等）；访问 2026-10-19",
+   "facts": "官方信封式预算：先建 Envelopes，再从 Available 把钱 Fill 进信封（可选 Add budgeted amount 结转余额或 Set to budget amount 补足，并可 Schedule 自动 Fill）；支出记入信封使余额下降，且录入预先安排的支出会先计入当前信封余额；未分配的钱称 Available（原 Unallocated），是『还没分配用途』的推导额而非直接编辑；用 running balance 计算当前余额，余额不受单月限制，因此补记/改账过去日期会改变当前信封余额；新月份需重新 Fill，上月交易仍可见。",
+   "license": "not code / 商业产品文档",
+   "reuse": "行为与边界参考（结转、补记重算、Available 推导）"
+  },
+  {
+   "id": "S05",
+   "name": "Monarch Money 官方帮助中心：Rollover Budgets",
+   "url": "https://help.monarchmoney.com/hc/en-us/articles/4411119762196-Rollover-Budgets",
+   "version": "帮助文章，Last Updated 2026-08-14；访问 2026-10-19",
+   "facts": "官方 rollover 规则：把上月剩余（可为负，即超支）带入下月，公式 Rollover(上月) + Planned(本月) − Actual(本月) = Remaining(下月)；rollover 仅可用于支出分类（不适用于收入分类）；示例中上月 −25 的超支会以负 rollover 进入下月；分类可 Exclude this category from the budget（排除后该分类及其交易从预算中隐藏）；rollover 可对单个分类或整个 bucket 启用，Flex 与 Category 两种预算方式并存。",
+   "license": "not code / 商业产品文档",
+   "reuse": "月末结转与超支负值语义参考"
+  },
+  {
+   "id": "S06",
+   "name": "Quicken Simplifi 官方帮助中心：Understanding Your Spending Plan",
+   "url": "https://support.simplifi.quicken.com/en/articles/4212702-understanding-your-spending-plan",
+   "version": "帮助文章，Written June 11, 2026；访问 2026-10-19",
+   "facts": "官方 Spending Plan 把月度分为 Income、Bills、Planned Spend、Other Spend、Goals 等部分，并给出 Left this Month 作为当月真实可用余额；Spending Plan 只针对当月交易、不包含既有账户余额；删除 recurring 项会永久移除；计划不追溯生效，从订阅开始的月份起算；为避免双计，链接了 recurring reminder 的交易归入 Bills 而非 Planned Spend；建立 Planned Spend 时可填写 rollover remaining balance。",
+   "license": "not code / 商业产品文档",
+   "reuse": "自动生成计划与 Left to spend 表面参考；适用于消费前查看剩余的场景"
+  },
+  {
+   "id": "S07",
+   "name": "Fudget 官方产品页与商店描述（最小计划清单形态）",
+   "url": "https://fudget.com/",
+   "version": "官网与 App Store/Google Play 描述（更新 2025-09-26）；访问 2026-10-19",
+   "facts": "官方描述为无银行连接、手动录入的最简预算：设定收入与支出后即时显示 running balance（what's left）；支持按月/周或事件/项目（婚礼、装修）预算、把条目标记为已付、在预算之间结转余额（carry over balance）、多币种与自定义货币符号、备注；CSV 导出与打印等多在付费层（Fudget Plus）。基础版免费，付费为订阅制，属专有商业软件，无公开源码。",
+   "license": "专有商业软件（未提供开源许可）",
+   "reuse": "作为无账户、无银行连接的最小形态参考；不可复用代码"
+  },
+  {
+   "id": "S08",
+   "name": "Actual Budget 开源仓库",
+   "url": "https://github.com/actualbudget/actual",
+   "version": "默认分支 master（未固定 commit）；访问 2026-10-19",
+   "facts": "README 称其为本地优先（local-first）个人财务工具，100% 免费开源、以 NodeJS 编写，带同步机制；以信封预算（envelope budgeting）为核心，可选端到端加密、多设备同步与可自行托管的同步服务，并有本地桌面应用；提供预算、账户管理、报表等文档。LICENSE.txt 文本为 MIT 许可（Copyright James Long）。",
+   "license": "MIT License（LICENSE.txt）",
+   "reuse": "MIT 宽松，可参考并有限复用；但其为大型 NodeJS 应用，与本任务单用户小工具规模不匹配，建议以行为/数据模型参考为主",
+   "license_url": "https://github.com/actualbudget/actual/blob/master/LICENSE.txt"
+  },
+  {
+   "id": "S09",
+   "name": "Firefly III 开源仓库",
+   "url": "https://github.com/firefly-iii/firefly-iii",
+   "version": "默认分支 main（未固定 commit）；访问 2026-10-19",
+   "facts": "README 称其为自托管的开源个人财务管理器，支持预算、分类与标签，提供导入工具与多种财务报表；官方站点描述其核心为复式记账（double-entry bookkeeping）并支持多币种记账。仓库标明 AGPL-3.0，代码文件 LICENSE 为 GNU Affero General Public License v3。",
+   "license": "GNU Affero General Public License v3 (AGPL-3.0)",
+   "reuse": "AGPL 属强 copyleft 且含网络使用条款，建议仅作功能参考，不复制其代码",
+   "license_url": "https://github.com/firefly-iii/firefly-iii/blob/main/LICENSE"
+  },
+  {
+   "id": "S10",
+   "name": "RFC 4180：CSV 通用格式与 MIME 类型",
+   "url": "https://www.rfc-editor.org/rfc/rfc4180.html",
+   "version": "RFC 4180，Info 类，2005 年 10 月；访问 2026-10-19",
+   "facts": "CSV 的信息性事实标准：记录以 CRLF 结尾；末行可无结尾换行；可选首行表头；字段含逗号、双引号或换行时应用双引号包裹；字段内双引号以两个双引号转义；每行字段数应一致，末字段后不应有逗号；注册 MIME 类型 text/csv。",
+   "license": "not code / IETF RFC（信息性文档）",
+   "reuse": "作为导出/导入 CSV 的格式规范复用"
+  },
+  {
+   "id": "S11",
+   "name": "Python 标准库 csv 模块文档",
+   "url": "https://docs.python.org/3/library/csv.html",
+   "version": "Python 3.15.0 文档（页面更新 2026-10-18）；访问 2026-10-19",
+   "facts": "csv 提供 reader/writer、DictReader/DictWriter 与方言机制；QUOTE_MINIMAL（默认）只对含分隔符、引号、'\\r'/'\\n' 等特殊字符的字段加引号；doublequote 默认为 True，把字段内引号写成两个引号；读写文件应使用 newline=''，否则含换行的引号字段会被错误解析或写出多余 '\\r'；读取默认按 UTF-8 解码，可用 encoding 指定其他编码。",
+   "license": "Python Software Foundation License Version 2.0（文档；示例另按 Zero Clause BSD）",
+   "reuse": "复用（若实现语言为 Python），可直接得到符合 RFC 4180 的引号/换行处理",
+   "license_url": "https://docs.python.org/3/license.html"
+  },
+  {
+   "id": "S12",
+   "name": "Python 标准库 decimal 模块文档",
+   "url": "https://docs.python.org/3/library/decimal.html",
+   "version": "Python 3.15.0 文档；访问 2026-10-19",
+   "facts": "decimal 提供精确十进制浮点运算，文档称其被会计类应用首选：0.1+0.1+0.1-0.3 精确为 0，而二进制浮点得 5.55e-17；可保留有效位（1.30+1.20=2.50）；quantize 可把结果舍入到固定小数位（如 Decimal('.01')）；上下文可设精度与舍入模式（默认 ROUND_HALF_EVEN，另有 HALF_UP、DOWN 等）并可把 Inexact/Rounded 等信号设为异常以显式暴露舍入。",
+   "license": "Python Software Foundation License Version 2.0（文档）",
+   "reuse": "复用；或改用整数最小单位（分）避免浮点误差",
+   "license_url": "https://docs.python.org/3/license.html"
+  },
+  {
+   "id": "S13",
+   "name": "Actual Budget 官方 API 文档（本地存储、导入导出）",
+   "url": "https://actualbudget.org/docs/api/",
+   "version": "官方文档页，经搜索快照获取（未逐字核对全文，未固定版本）；访问 2026-10-19",
+   "facts": "官方 API 文档称：预算数据在本地缓存于 dataDir（默认为当前工作目录，浏览器端为 IndexedDB 且留在设备上），无 serverURL 时不发起网络请求；exportBudget 把当前预算导出为 zip（db.sqlite 与 metadata.json），importBudget 可再导入还原；可导入 YNAB4/YNAB5 导出；主要用途之一即自定义导入/导出。",
+   "license": "not code / 官方文档未声明开源许可",
+   "reuse": "数据生命周期、导出与恢复策略的参考；不复用代码"
+  }
+ ],
+ "evidence": [],
+ "research": {
+  "sources": [
+   {
+    "id": "S02",
+    "name": "YNAB API 官方文档（REST/OpenAPI）",
+    "url": "https://api.ynab.com/",
+    "version": "OpenAPI spec 版本 1.87.0（文档页；访问 2026-10-19）",
+    "facts": "官方 REST API：Plan 为顶层容器，其下含 accounts、categories（按 category groups 组织）、payees、transactions、scheduled transactions、months 与 money movements；分类的 assigned/activity/available 金额按月（月内）取值，可通过带 month 的端点读写；金额以 milliunits（整数）表示；账户分 on budget / tracking；账户间转账用特殊 transfer payee 表示，交易可拆分为 subtransactions；scheduled transactions 表示定期但尚未入账的条目。",
+    "license": "not code / 官方文档未声明开源许可",
+    "reuse": "作为计划/月度/分类比较态的数据模型参考；不复用代码"
+   },
+   {
+    "id": "S03",
+    "name": "YNAB 官方方法页（The YNAB Method）",
+    "url": "https://www.ynab.com/ynab-method",
+    "version": "网页内容；访问 2026-10-19（未固定版本）",
+    "facts": "官方方法强调 give every dollar a job（把当前持有的每一美元分配到分类，而非按凭空数字），并把拥抱真实支出（把汽车保险、年费等非月度支出平摊为月度预留）、roll with the punches（超支时从别的分类挪钱，计划是随时可改的活对象）、age your money 作为配套实践。",
+    "license": "not code / 商业产品文档",
+    "reuse": "方法、术语与超支调整语义参考；不复用代码"
+   },
+   {
+    "id": "S04",
+    "name": "Goodbudget 官方帮助中心（信封预算）",
+    "url": "https://goodbudget.com/help/",
+    "version": "多篇帮助文章（部分标注 2020-02-21、2023-11-16、2024-04-22 等）；访问 2026-10-19",
+    "facts": "官方信封式预算：先建 Envelopes，再从 Available 把钱 Fill 进信封（可选 Add budgeted amount 结转余额或 Set to budget amount 补足，并可 Schedule 自动 Fill）；支出记入信封使余额下降，且录入预先安排的支出会先计入当前信封余额；未分配的钱称 Available（原 Unallocated），是『还没分配用途』的推导额而非直接编辑；用 running balance 计算当前余额，余额不受单月限制，因此补记/改账过去日期会改变当前信封余额；新月份需重新 Fill，上月交易仍可见。",
+    "license": "not code / 商业产品文档",
+    "reuse": "行为与边界参考（结转、补记重算、Available 推导）"
+   },
+   {
+    "id": "S05",
+    "name": "Monarch Money 官方帮助中心：Rollover Budgets",
+    "url": "https://help.monarchmoney.com/hc/en-us/articles/4411119762196-Rollover-Budgets",
+    "version": "帮助文章，Last Updated 2026-08-14；访问 2026-10-19",
+    "facts": "官方 rollover 规则：把上月剩余（可为负，即超支）带入下月，公式 Rollover(上月) + Planned(本月) − Actual(本月) = Remaining(下月)；rollover 仅可用于支出分类（不适用于收入分类）；示例中上月 −25 的超支会以负 rollover 进入下月；分类可 Exclude this category from the budget（排除后该分类及其交易从预算中隐藏）；rollover 可对单个分类或整个 bucket 启用，Flex 与 Category 两种预算方式并存。",
+    "license": "not code / 商业产品文档",
+    "reuse": "月末结转与超支负值语义参考"
+   },
+   {
+    "id": "S06",
+    "name": "Quicken Simplifi 官方帮助中心：Understanding Your Spending Plan",
+    "url": "https://support.simplifi.quicken.com/en/articles/4212702-understanding-your-spending-plan",
+    "version": "帮助文章，Written June 11, 2026；访问 2026-10-19",
+    "facts": "官方 Spending Plan 把月度分为 Income、Bills、Planned Spend、Other Spend、Goals 等部分，并给出 Left this Month 作为当月真实可用余额；Spending Plan 只针对当月交易、不包含既有账户余额；删除 recurring 项会永久移除；计划不追溯生效，从订阅开始的月份起算；为避免双计，链接了 recurring reminder 的交易归入 Bills 而非 Planned Spend；建立 Planned Spend 时可填写 rollover remaining balance。",
+    "license": "not code / 商业产品文档",
+    "reuse": "自动生成计划与 Left to spend 表面参考；适用于消费前查看剩余的场景"
+   },
+   {
+    "id": "S07",
+    "name": "Fudget 官方产品页与商店描述（最小计划清单形态）",
+    "url": "https://fudget.com/",
+    "version": "官网与 App Store/Google Play 描述（更新 2025-09-26）；访问 2026-10-19",
+    "facts": "官方描述为无银行连接、手动录入的最简预算：设定收入与支出后即时显示 running balance（what's left）；支持按月/周或事件/项目（婚礼、装修）预算、把条目标记为已付、在预算之间结转余额（carry over balance）、多币种与自定义货币符号、备注；CSV 导出与打印等多在付费层（Fudget Plus）。基础版免费，付费为订阅制，属专有商业软件，无公开源码。",
+    "license": "专有商业软件（未提供开源许可）",
+    "reuse": "作为无账户、无银行连接的最小形态参考；不可复用代码"
+   },
+   {
+    "id": "S08",
+    "name": "Actual Budget 开源仓库",
+    "url": "https://github.com/actualbudget/actual",
+    "version": "默认分支 master（未固定 commit）；访问 2026-10-19",
+    "facts": "README 称其为本地优先（local-first）个人财务工具，100% 免费开源、以 NodeJS 编写，带同步机制；以信封预算（envelope budgeting）为核心，可选端到端加密、多设备同步与可自行托管的同步服务，并有本地桌面应用；提供预算、账户管理、报表等文档。LICENSE.txt 文本为 MIT 许可（Copyright James Long）。",
+    "license": "MIT License（LICENSE.txt）",
+    "reuse": "MIT 宽松，可参考并有限复用；但其为大型 NodeJS 应用，与本任务单用户小工具规模不匹配，建议以行为/数据模型参考为主",
+    "license_url": "https://github.com/actualbudget/actual/blob/master/LICENSE.txt"
+   },
+   {
+    "id": "S09",
+    "name": "Firefly III 开源仓库",
+    "url": "https://github.com/firefly-iii/firefly-iii",
+    "version": "默认分支 main（未固定 commit）；访问 2026-10-19",
+    "facts": "README 称其为自托管的开源个人财务管理器，支持预算、分类与标签，提供导入工具与多种财务报表；官方站点描述其核心为复式记账（double-entry bookkeeping）并支持多币种记账。仓库标明 AGPL-3.0，代码文件 LICENSE 为 GNU Affero General Public License v3。",
+    "license": "GNU Affero General Public License v3 (AGPL-3.0)",
+    "reuse": "AGPL 属强 copyleft 且含网络使用条款，建议仅作功能参考，不复制其代码",
+    "license_url": "https://github.com/firefly-iii/firefly-iii/blob/main/LICENSE"
+   },
+   {
+    "id": "S10",
+    "name": "RFC 4180：CSV 通用格式与 MIME 类型",
+    "url": "https://www.rfc-editor.org/rfc/rfc4180.html",
+    "version": "RFC 4180，Info 类，2005 年 10 月；访问 2026-10-19",
+    "facts": "CSV 的信息性事实标准：记录以 CRLF 结尾；末行可无结尾换行；可选首行表头；字段含逗号、双引号或换行时应用双引号包裹；字段内双引号以两个双引号转义；每行字段数应一致，末字段后不应有逗号；注册 MIME 类型 text/csv。",
+    "license": "not code / IETF RFC（信息性文档）",
+    "reuse": "作为导出/导入 CSV 的格式规范复用"
+   },
+   {
+    "id": "S11",
+    "name": "Python 标准库 csv 模块文档",
+    "url": "https://docs.python.org/3/library/csv.html",
+    "version": "Python 3.15.0 文档（页面更新 2026-10-18）；访问 2026-10-19",
+    "facts": "csv 提供 reader/writer、DictReader/DictWriter 与方言机制；QUOTE_MINIMAL（默认）只对含分隔符、引号、'\\r'/'\\n' 等特殊字符的字段加引号；doublequote 默认为 True，把字段内引号写成两个引号；读写文件应使用 newline=''，否则含换行的引号字段会被错误解析或写出多余 '\\r'；读取默认按 UTF-8 解码，可用 encoding 指定其他编码。",
+    "license": "Python Software Foundation License Version 2.0（文档；示例另按 Zero Clause BSD）",
+    "reuse": "复用（若实现语言为 Python），可直接得到符合 RFC 4180 的引号/换行处理",
+    "license_url": "https://docs.python.org/3/license.html"
+   },
+   {
+    "id": "S12",
+    "name": "Python 标准库 decimal 模块文档",
+    "url": "https://docs.python.org/3/library/decimal.html",
+    "version": "Python 3.15.0 文档；访问 2026-10-19",
+    "facts": "decimal 提供精确十进制浮点运算，文档称其被会计类应用首选：0.1+0.1+0.1-0.3 精确为 0，而二进制浮点得 5.55e-17；可保留有效位（1.30+1.20=2.50）；quantize 可把结果舍入到固定小数位（如 Decimal('.01')）；上下文可设精度与舍入模式（默认 ROUND_HALF_EVEN，另有 HALF_UP、DOWN 等）并可把 Inexact/Rounded 等信号设为异常以显式暴露舍入。",
+    "license": "Python Software Foundation License Version 2.0（文档）",
+    "reuse": "复用；或改用整数最小单位（分）避免浮点误差",
+    "license_url": "https://docs.python.org/3/license.html"
+   },
+   {
+    "id": "S13",
+    "name": "Actual Budget 官方 API 文档（本地存储、导入导出）",
+    "url": "https://actualbudget.org/docs/api/",
+    "version": "官方文档页，经搜索快照获取（未逐字核对全文，未固定版本）；访问 2026-10-19",
+    "facts": "官方 API 文档称：预算数据在本地缓存于 dataDir（默认为当前工作目录，浏览器端为 IndexedDB 且留在设备上），无 serverURL 时不发起网络请求；exportBudget 把当前预算导出为 zip（db.sqlite 与 metadata.json），importBudget 可再导入还原；可导入 YNAB4/YNAB5 导出；主要用途之一即自定义导入/导出。",
+    "license": "not code / 官方文档未声明开源许可",
+    "reuse": "数据生命周期、导出与恢复策略的参考；不复用代码"
+   }
+  ],
+  "summary": "类别事实：leaf 把预算应用的四项定义锁定为『绑定期间的支出计划 + 分配到用途的额度 + 应用内实际支出 + 计划/实际/剩余比较态』，成熟产品的差异集中在实现方式。YNAB/Goodbudget 走信封或零基路线且把 Fill/分配当作显式动作；Monarch 与 Quicken Simplifi 以收入自动生成计划并强调一个『还剩多少』数字（Left this month / Remaining）；Fudget 证明无账户、无银行连接的最小清单形态（计划项 − 实际项 = 剩余）即可成立。跨产品的共同行为：消费前的剩余额是核心输出；未分配额是被推导而非直接输入的；超支是合法状态（负剩余，可结转进下月，如 Monarch 的 Rollover 公式）；对过去日期的补记/改账会按 running balance 重算当前余额（Goodbudget 明确说明）；计划可随时修改、按期间隔离、不追溯；导出以 CSV 为主。金额精度上，YNAB 用整数 milliunits，Python decimal 文档给出精确十进制与 quantize 的会计级做法，避免二进制浮点误差。\n针对本场景（单个本地用户、人民币、无银行/支付连接、按月中文本地数据）：适用的是 Fudget/Goodbudget 的手动核心加 Monarch 的负 rollover 语义；银行同步、多用户分享、审批/报销、企业预算/公共预算、账户净值与投资视图不属于本类型核心，也不适用于本场景。验收中的『超支显示负剩余且不阻止记账』与 rollover 负值语义一致；『改删后即时重算』与 running balance 一致，但主流产品未验证提供完整编辑历史，故审计宜以可导出记录与定期备份为主；『导出当月 CSV、中文/引号/换行可往返』应对齐 RFC 4180（含特殊字符的字段用双引号包裹、字段内双引号写成两个），并使用语言内置库（如 Python csv 的 QUOTE_MINIMAL 与 newline=''）；两位小数用 decimal 的 quantize 或整数分表示。\n复用 vs 自建：类别行为与格式规范可直接参考产品文档、RFC 4180 与标准库；开源实现里 Actual Budget（MIT）可参考甚至有限复用，Firefly III（AGPL-3.0）因 copyleft 不宜复制代码。由于本场景功能面小（单用户、单机、无账户层、无同步），建议自建薄实现并复用内置 CSV/十进制能力，而不是引入大型应用；权限、计费、多租户管理等企业特性在此不适用，仅保留『导出即审计/恢复起点』这一最小关切。单机数据生命周期还应自行落实原子写入与备份目录策略，这一点在多数商业产品文档中并未公开说明。",
+  "gaps": [
+   "webfetch 仅允许 github.com / raw.githubusercontent.com / docs.python.org / docs.npmjs.com；YNAB、Goodbudget、Monarch、Quicken Simplifi、Fudget、Actual 官网与帮助中心的正文未能以完整文档形式核验，除这里明确取得的页面文本外，其余属搜索快照证据。",
+   "YNAB 用户端帮助中心据 leaf 记录为 JavaScript 外壳，无法取到正文；本报告据官方 API 文档与方法页，未覆盖其帮助中心的用户操作细节。",
+   "Quicken Simplifi 与 Monarch 的准确数值限制（分类上限、历史保留、rollover 的具体取整规则）未从完整官方文档证实，故不作断言。",
+   "Goodbudget 的 Available 计算式与 running balance 补记重算规则来自帮助文章片段，未逐条核对完整文档；其『审计/Audit』相关文章正文未取得。",
+   "未见任一主流预算产品（据可用一手文档）提供完整的编辑历史/审计日志；改账是否留痕、如何回溯为未验证项。",
+   "第三方产品 CSV 导入/导出对中文、字段内引号与嵌入换行的实际往返行为未逐字验证；RFC 4180 与 Python csv 仅提供应遵循的格式与库行为依据。",
+   "人民币（CNY，ISO 4217）的两位小数与符号格式未引用官方货币/本地化一手来源验证，仅依场景约定。",
+   "Fudget 的 CSV 导出位于付费订阅层，具体字段与编码未从官方完整文档获得；其数据存储位置与备份策略未验证。",
+   "Firefly III 与 Actual Budget 的实际存储格式、迁移/备份流程未运行或逐文件核验；许可结论仅据仓库 LICENSE 文件。",
+   "单机数据持久化（原子写入、崩溃恢复、备份轮换）缺少针对本场景的一手约定或标准引用；SQLite/WAL 等具体实现细节未在本报告中作为证据核实。",
+   "未发现与本场景完全对应的中文单机预算应用官方文档；类别行为证据主要来自国际产品，迁移到本地中文场景需自行验证。"
+  ]
+ }
+}

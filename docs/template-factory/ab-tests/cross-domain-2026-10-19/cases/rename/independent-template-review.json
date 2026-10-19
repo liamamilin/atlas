@@ -1,0 +1,93 @@
+{
+  "outcome": "passed",
+  "summary": "对冻结的认知产品蓝图做静态审阅（未运行任何程序、未执行验收）。范围：单目录、非递归、非空字面查找/替换、预览→显式确认执行→撤销、保护原始内容与未选文件，入口固定为 python3 app.py --root DIR COMMAND ...。结论：8 个维度均通过；蓝图内部一致，P0 已覆盖确认场景的完整核心闭环，A01–A12 与 F01–F09 双向覆盖，且验收程序含真实磁盘状态断言与负路径，未见空桩、伪造成功、缺失目标交互或同义反复。限制：包内全部验收状态为 not_run，来源多数为未固定 commit 的文档/README 研究，3.x os.rename/renameat2 等未逐字确认（蓝图已在 gaps 中披露）；下列为可选改进而非放行条件。",
+  "checks": [
+    {
+      "dimension": "category_evidence",
+      "outcome": "passed",
+      "files": [
+        "CATEGORY.md",
+        "template.json"
+      ],
+      "reason": "CATEGORY.md 逐条列出 S01–S09 的 URL/版本、可引用事实、许可与复用方式，并显式区分『类别事实（有来源）』与『场景结论（待验证推断）』；许可核对到位（util-linux COPYING 为 GPLv2、rename.1.adoc 声明公有领域、rename.c 无逐文件许可头；F2/brename/RnR 均 MIT，注明 copyright 与仓库 LICENCE；CPython 为 PSF-2.0），复用级别写明『仅概念层复用、本任务不复制第三方代码』。未知项集中在『待验证/gaps』（3.x os 文档未读到、GUI 三类工具仅见搜索摘要、NFS/SMB 日志语义、纳秒字段可用性、rename.c 逐文件许可），且未把未知推断升格为 P0 需求（F14 仅列为 later）。"
+    },
+    {
+      "dimension": "scenario_scope",
+      "outcome": "passed",
+      "files": [
+        "inputs/scenario.json",
+        "PRODUCT.md",
+        "ROADMAP.md"
+      ],
+      "reason": "PRODUCT.md 的受众/目标/工作流/验收六条与 inputs/scenario.json 逐条对应：单根目录、默认非递归、不处理目录与符号链接、字面而非正则、新名为单个文件名禁目录穿越、拒绝整份计划、--confirm、重复执行不产生第二轮、撤销不覆盖。F16 计费、F17 多租户权限、F18 不可篡改审计/合规导出、F19 GUI 均以具体理由标为 not applicable，未强加企业特性；演示隔离（仅测试文件、不触碰真实 Downloads/HOME）在 acceptance/README.md 落实。"
+    },
+    {
+      "dimension": "product_completeness",
+      "outcome": "passed",
+      "files": [
+        "PRODUCT.md",
+        "template.json"
+      ],
+      "reason": "角色覆盖 R01 目录整理用户、R02 独立验收操作者、R03 开发者；正常流程由 F01–F09 覆盖 list→preview→apply 回执→list→undo，失败流程覆盖 F04 冲突整体拒绝、F06 陈旧/重复执行、F07 撤销冲突、F09 失败安全与真实报错；数据生命周期含计划/回执持久化（状态目录 .atlas-renamer，计划不可变）与撤销 journal；适用性评估明确：无计费、权限仅映射 OSError/PermissionError、审计用回执/计划文件轻量替代、导出即文本呈现、恢复即撤销，且不要求回收站等不适用机制。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "outcome": "passed",
+      "files": [
+        "ARCHITECTURE.md",
+        "DECISIONS.md"
+      ],
+      "reason": "ARCHITECTURE.md 给出默认技术栈与理由（Python3 标准库 CLI，禁用依赖/网络/shell 子进程）及替代方案取舍；数据模型定义计划 JSON 字段（version/created_at/find/replace/root/operations[old,new,identity:{dev,ino,size,mtime_ns,可选sha256}]）与回执 JSON；命令契约逐条规定 list/preview/apply/undo 的 stdout 单一 JSON、退出码、必填 --confirm、路径必须落在 DIR/.atlas-renamer、路径穿越与外部符号链接拒绝；错误分类借 PEP 3151 子类不解析 errno；测试适配契约明确 shell=False 子进程与夹具隔离，无测试专用端点。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "outcome": "passed",
+      "files": [
+        "ROADMAP.md",
+        "acceptance/plan.json",
+        "acceptance/run.py",
+        "acceptance/README.md"
+      ],
+      "reason": "唯一交付阶段 P0 即完成已确认核心闭环，未把不可缺步骤推迟；F01–F09 与 A01–A12 双向映射完整（F03→A08、F06→A07/A08 等多对多亦成立，无遗漏 P0 义务），F10–F19 为 later/not-applicable 且 acceptance 为空，早期用例只调用已定义 CLI，不依赖后期 API。语义测试经核读具有真实目标交互：A01 lstat 级 list 集合/size 比对并排除状态目录与链接；A04 覆盖目标已存在、两源同名、新名落入源集合三类内部冲突且断言零改名；A05 校验磁盘新名/内容、未选文件与回执可读；A07 断言第二次 apply 不产生第二轮；A08 断言内容或身份改动时整批拒绝且不部分改名；A10 断言撤销遇新冲突/数据改动不覆盖不删除；false_success 拦截非零退出时输出成功 JSON，read_regular 拦截假成功与静默跳过。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "outcome": "passed",
+      "files": [
+        "DECISIONS.md",
+        "template.json"
+      ],
+      "reason": "D01–D06 均含具体默认值、理由、When to ask 触发条件与影响面：陈旧判定默认 dev+ino+size+mtime_ns 不哈希（低分辨率/同大小同时间戳时询问）；NFS 不承诺失败即未改名；TOCTOU 采用整批预检+每步 lstat 且明示极小窗口；换名环默认整批拒绝；每步改名后 flush+fsync 但不承诺断电级恢复；同名多次出现默认全部替换。默认值可执行且与架构/验收一致（D06 与 A02 的替换全部语义一致），open 与 default-adopted 状态区分清楚，未把 proposed 冒充用户已确认。"
+    },
+    {
+      "dimension": "agent_handoff",
+      "outcome": "passed",
+      "files": [
+        "AGENT.md",
+        "README.md"
+      ],
+      "reason": "README 给出分阶段入口（先核对 PRODUCT 确认场景与 ROADMAP 当前阶段，按任务再读 ARCHITECTURE/DECISIONS，不必预读全部后期材料）；AGENT.md 要求先核对已有项目/指令/已确认决定、把 proposed 决策视为待采纳建议、关键取舍按触发条件问人、选择当前阶段仅实现其完整闭环、不覆盖已有指令与用户决定、验收记录实测命令与通过/失败/未完成且不得声称未运行测试通过。仅发现一处模板残留（AGENT.md 提到『HTTP/浏览器验收』，与本包 CLI 适配契约不符），属措辞级别，不影响阶段性分工与决策尊重。"
+    },
+    {
+      "dimension": "evidence_honesty",
+      "outcome": "passed",
+      "files": [
+        "README.md",
+        "VALIDATION.md",
+        "acceptance/README.md",
+        "integrity.json"
+      ],
+      "reason": "README 声明『认知开发包候选；不是已实现应用』『来源为模型调研报告；Atlas 已校验结构，尚未执行包内程序』；VALIDATION.md 明确 Atlas 仅校验结构/引用/阶段映射/摘要，验收与参考代码未执行；acceptance/README.md 与 run.py 头注释均声明生成阶段未执行、A01–A12 与 P0 状态为 not_run、由独立操作者在受控环境执行；input.json/acceptance/plan.json 中所有 status 为 not_run/not implemented，无任何『测试已通过』式声明；integrity.json 提供文件摘要，CATEGORY.md 与 template.json 的 gaps 如实列出未确认项。未发现伪造通过、凭据外泄或外部导航注入（子进程仅继承被重定向到一次性 home 的环境）。"
+    }
+  ],
+  "suggestions": [
+    "将 AGENT.md 中『运行该阶段相应 HTTP/浏览器验收』改为与本包一致的 CLI 子进程验收（acceptance/run.py），避免实施 Agent 寻找并不存在的 HTTP/浏览器目标。",
+    "在 A04 补充真正的换名环夹具（两新名均尚不存在、互为对方源名，如 a→b 且 b→a），以隔离验证『新名落在源集合内/环』判定，而非仅由『目标已存在』触发拒绝。",
+    "增加执行期部分失败用例（已成功改名若干步后某步失败），断言非零退出、逐条回执仍可用于 undo、旧数据不丢失，以实证 F05/F07/F09 的失败安全承诺（当前 A12 仅覆盖预检即拒绝的冲突）。",
+    "为 F07 声明的『重复执行（撤销）亦须安全』补充重复 undo 用例，验证第二次 undo 不产生第二轮改名或误报成功。",
+    "A05 可用含两次出现查找串的文件名验证 apply 路径同样按 D06 默认替换全部（当前仅在 A02 preview 覆盖该语义）。",
+    "在包内提供 GUIDANCE.md/CONTRACT，或把 ARCHITECTURE.md 中『（CONTRACT、GUIDANCE）』的运行时约束权威来源改指向已固定的 inputs/scenario.json 验收条目，避免引用不可得的指导文件。",
+    "在 acceptance/README.md 的 A11 说明中补充『绝对路径越界、.. 穿越、外部符号链接、越界计划/回执复制』四类子场景与被拒绝的观察点，便于操作者按最小步骤复现。"
+  ],
+  "scope": "Independent static cognition and acceptance-program review only; no program execution, source re-fetch, downstream runtime or publication."
+}

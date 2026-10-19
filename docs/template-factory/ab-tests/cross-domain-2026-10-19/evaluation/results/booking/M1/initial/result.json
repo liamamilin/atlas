@@ -1,0 +1,83 @@
+{
+  "case": "booking",
+  "tests": [
+    {
+      "id": "K01",
+      "status": "passed",
+      "detail": null,
+      "seconds": 0.0519
+    },
+    {
+      "id": "K02",
+      "status": "passed",
+      "detail": null,
+      "seconds": 0.0077
+    },
+    {
+      "id": "K03",
+      "status": "passed",
+      "detail": null,
+      "seconds": 0.011
+    },
+    {
+      "id": "K04",
+      "status": "passed",
+      "detail": null,
+      "seconds": 0.0064
+    },
+    {
+      "id": "K05",
+      "status": "passed",
+      "detail": null,
+      "seconds": 0.0042
+    },
+    {
+      "id": "K06",
+      "status": "passed",
+      "detail": {
+        "genuine_two_connection_barrier": true,
+        "outcomes": [
+          {
+            "status": 409,
+            "body": {
+              "error": "该设施在所选时段已被预约"
+            }
+          },
+          {
+            "status": 201,
+            "body": {
+              "id": 6,
+              "booking": {
+                "id": 6,
+                "resource_id": 1,
+                "owner_id": 3,
+                "start": "2030-06-03T10:00:00+00:00",
+                "end": "2030-06-03T11:00:00+00:00",
+                "note": "并发bob",
+                "status": "active"
+              }
+            }
+          }
+        ]
+      },
+      "seconds": 0.0056
+    },
+    {
+      "id": "K07",
+      "status": "passed",
+      "detail": null,
+      "seconds": 0.1401
+    },
+    {
+      "id": "BROWSER",
+      "status": "passed",
+      "detail": {
+        "result": "browser-result.json",
+        "screenshot": "captured, not independently visually assessed"
+      },
+      "seconds": 0.99
+    }
+  ],
+  "browser_status": "see browser-result.json",
+  "all_executed_checks_passed": true
+}

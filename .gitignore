@@ -13,6 +13,9 @@ application-atlas-production-pack/batch.log
 atlas-web/node_modules/
 atlas-web/dist/
 atlas-web/public/data/
+atlas-web/.e2e-runtime/
+atlas-web/test-results/
+atlas-web/playwright-report/
 
 # ---- 参照库（嵌套 git 仓库）----
 _ref-software-map/
@@ -22,6 +25,11 @@ _ref-software-map/
 
 # ---- 临时/杂项 ----
 *.zip
+# Frozen bookmark pilot deliverables retained with their acceptance evidence.
+!docs/template-factory/end-to-end/bookmark-2026-10-19/cognitive-template.zip
+!docs/template-factory/end-to-end/bookmark-2026-10-19/development-package.zip
+!docs/template-factory/end-to-end/bookmark-2026-10-19/development/initial/application.zip
+!docs/template-factory/end-to-end/bookmark-2026-10-19/development/repair-1/application.zip
 bug1_912.png
 bug2-912.png
 leaves.txt
@@ -44,3 +52,18 @@ application-atlas-production-pack/projects/
 
 application-atlas-production-pack/atlas/.publish/
 application-atlas-production-pack/drafts/*.lock
+application-atlas-production-pack/drafts/.slug-locks/
+.atlas-permission-state/
+# Model provider credentials (write-only, machine-local)
+application-atlas-production-pack/atlas/model-config.json
+# Ask conversation history (machine-local runtime data)
+application-atlas-production-pack/atlas/ask/
+application-atlas-production-pack/atlas/template-factory/
+
+atlas-web/.factory-e2e-runtime/
+
+# Disposable application databases from documented acceptance runs.
+docs/template-factory/**/*.db
+docs/template-factory/**/*.db-*
+docs/template-factory/**/*.sqlite
+docs/template-factory/**/*.sqlite-*

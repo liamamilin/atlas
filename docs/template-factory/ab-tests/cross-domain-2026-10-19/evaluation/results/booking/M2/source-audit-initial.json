@@ -1,0 +1,37 @@
+{
+  "case": "booking",
+  "label": "M2",
+  "round": "initial",
+  "all_files_manually_read": {
+    "DECISIONS.md": "db0e16ed59498568c6194fa9e65b5546d3feac3154dd27dd9e79bdd04e7b5cad",
+    "README.md": "73ea0d8a37029f21468619625a93138ff1ed5b59720ece81ced0ad60dc53ba83",
+    "api.py": "49fcb83cb0909bc2bd930247bf2b192f5ab1b116359999a3e43170e97194acc8",
+    "app.js": "67f98d64cf2bee20aa8a121b15d19be9c50fcaded5eef3eb30d8ee67aff898cc",
+    "app.py": "7b8944e78fd69668abe19a64cf70913b5a0a512c385ac4b46ace9811323af997",
+    "db.py": "37387096504e5e49e93c7b18111df5ce79537f118773cae65ded1a26d0a23c14",
+    "index.html": "6020deb6f7ba7a4cf125d52e810e7e331b105a1aaa646b44562a7149925bd566",
+    "security.py": "151e611238fa3f5670082947d8081739a3421e46364b30e0f3238db3fedff99d",
+    "style.css": "7f7ef937bf15461e60e73508f9bd17572a309ee8a7c180de82cc50e97f61bf00",
+    "timeutil.py": "613718f8cad9b97587eae4640212a45cffab860a5e528fe5ece68d532ab6ef08"
+  },
+  "python": "3.10.13 (main, Jul 28 2025, 13:11:45) [Clang 17.0.0 (clang-1700.0.13.5)]",
+  "execution_safety": "approved for assigned synthetic local tests after complete source inspection",
+  "safety_notes": [
+    "app.py binds 127.0.0.1, whitelist static routes, no arbitrary path serving",
+    "SQLite file at supplied data-dir; initialization does not reset existing users/history",
+    "Only stdlib imports; no shell, subprocess, dynamic eval, environment/secret reads, outbound client, external asset URLs or telemetry",
+    "PBKDF2 salted 120000 iterations; opaque server-side expiring sessions; owner/role from DB session",
+    "BEGIN IMMEDIATE transaction around conflict check/insert and cancel",
+    "UI fetch uses declared relative endpoints, DOM user text via textContent"
+  ],
+  "source_observations_not_runtime_findings": [
+    "timeutil intentionally converts timestamps to integer seconds (subsecond behavior not tested by frozen suite)",
+    "facility name and note silently sliced to 120/500, outside frozen fixture sizes; no runtime claim"
+  ],
+  "prohibited_context_not_read": [
+    "condition-map",
+    "template",
+    "developer inputs/prompts"
+  ],
+  "application_modified": false
+}

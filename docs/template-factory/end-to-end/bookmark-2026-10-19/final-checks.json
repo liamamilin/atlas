@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-10-19T03:58:46.505279+00:00",
+  "git_diff_check": "passed",
+  "report_local_links": "passed",
+  "regression_totals_verified": true,
+  "completion_record_verified": true,
+  "resource_inventory": {
+    "method": "Read-only docker ps -a --format {{.Names}} with socket access",
+    "pilot_containers_remaining": 0,
+    "unrelated_containers_modified": false
+  },
+  "note": "Initial sandbox socket read was denied; the authorized read-only inventory succeeded with escalated socket access. Per-run network/state/fixture cleanup evidence remains in independent run reports."
+}

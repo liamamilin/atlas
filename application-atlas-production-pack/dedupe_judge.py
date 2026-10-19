@@ -19,7 +19,9 @@ from leaf_lint import parse_front
 from drafts_api import draft_path
 
 from atlas_runtime import api_key
-MODEL = os.environ.get("ATLAS_DEDUP_MODEL", "mimo-v2.5")
+import atlas_model
+
+MODEL = os.environ.get("ATLAS_DEDUP_MODEL", "").strip()
 
 PROMPT = """你是软件类型语料库的查重裁决者。判断「新提案」与已有类型的关系。
 
@@ -62,17 +64,9 @@ def judge(slug):
     prompt = PROMPT.format(
         name=front.get("name", slug), name_zh=front.get("name_zh", ""), desc=desc,
         dc=dc_excerpt(body), cands="\n".join(cands), bounds=("\n" + bd if bd else "（无）"))
-    body_msg = {"model": MODEL,
-                "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0.1, "max_tokens": 3000}
-    r = json.load(urllib.request.urlopen(urllib.request.Request(
-        "https://opencode.ai/zen/go/v1/chat/completions", json.dumps(body_msg).encode(),
-        {"Authorization": f"Bearer {api_key()}", "Content-Type": "application/json",
-         "x-opencode-session": "atlas-dedupe", "User-Agent": "atlas-dedupe/1.0"}), timeout=300))
-    msg = r["choices"][0]["message"]
-    txt = (msg.get("content") or "").strip()
-    if not txt and msg.get("reasoning"):
-        txt = str(msg["reasoning"]).strip()
+    txt = atlas_model.complete_text(
+        [{"role": "user", "content": prompt}],
+        role="dedupe", temperature=0.1, max_tokens=3000, timeout=300)
     m = re.search(r"\{[^{]*verdict[^}]*\}", txt, re.S)
     out = json.loads(m.group(0)) if m else {"verdict": "unknown", "best": None,
                                             "reason": txt[:200], "section_hint": None}

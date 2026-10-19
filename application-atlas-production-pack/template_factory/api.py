@@ -1,0 +1,297 @@
+"""Small factory API surface sharing the local server's existing request guards."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import tempfile
+from urllib.parse import parse_qs
+
+from atlas_runtime import PACK
+from .artifacts import archive_tree, render_template
+from .blueprints import (
+    DOCUMENTS,
+    decode_archive,
+    export_development,
+    import_blueprint,
+    is_blueprint,
+    verify_frozen,
+)
+from .cli import CLI
+from .runtime import DockerVerifier
+from .store import FactoryError, FactoryStore
+from .worker import ensure_worker
+
+
+def get_store():
+    return FactoryStore(
+        os.environ.get("ATLAS_FACTORY_ROOT", str(PACK / "atlas/template-factory")), PACK
+    )
+
+
+def artifact(store, artifact_id):
+    result = next((a for a in store.artifacts() if a["id"] == artifact_id), None)
+    if not result:
+        raise FactoryError("template not found", "not_found", 404)
+    return result
+
+
+def controlled_path(store, value):
+    if (
+        not isinstance(value, str)
+        or ".." in Path(value).parts
+        or Path(value).is_absolute()
+    ):
+        raise FactoryError("invalid internal artifact path")
+    path = store.root / value
+    if any(
+        p.is_symlink() for p in (path, *list(path.parents)[: len(Path(value).parts)])
+    ):
+        raise FactoryError("internal artifact path is a symlink")
+    resolved = path.resolve()
+    if not resolved.is_relative_to(store.root) or not path.exists():
+        raise FactoryError("artifact is unavailable", "not_found", 404)
+    return path
+
+
+def dispatch(method, path, query="", body=None, store=None):
+    """Return (JSON object, status) or (Path, download name, content type)."""
+    store = store or get_store()
+    body = body or {}
+    route = path.removeprefix("/api/factory").strip("/")
+    if method == "GET" and route == "status":
+        return {
+            "cli": CLI().info(models=True),
+            "runtime": DockerVerifier().info(),
+            "profiles": ["static-web", "python-web", "node-web", "cli"],
+            "renderer": "atlas-declarative-v1",
+            "parameter": "project_name",
+            "note": "Scenario proposals and verification plans require review; L3 is never automatic.",
+        }, 200
+    if method == "GET" and route == "catalog":
+        leaf = parse_qs(query).get("leaf", [None])[0]
+        return store.scenarios(leaf), 200
+    if method == "POST" and route == "scenarios":
+        return store.save_scenario(body), 201
+    match = re.fullmatch(r"scenarios/(scn_[a-f0-9]{32})", route)
+    if method == "POST" and match:
+        return store.save_scenario(body, match[1]), 200
+    if method == "GET" and route == "batches":
+        # Opening the factory also recovers queued work after API/worker restart.
+        batches = store.batches()
+        if any(j["state"] in {"queued", "running"} for b in batches for j in b["jobs"]):
+            ensure_worker(store)
+        return batches, 200
+    if method == "POST" and route == "batches":
+        result = store.create_batch(body)
+        ensure_worker(store)
+        return result, 202
+    match = re.fullmatch(r"batches/(bat_[a-f0-9]{32})/(pause|resume|cancel)", route)
+    if method == "POST" and match:
+        result = store.batch_action(match[1], match[2])
+        if match[2] == "resume":
+            ensure_worker(store)
+        return result, 200
+    match = re.fullmatch(r"jobs/(job_[a-f0-9]{32})(/retry)?", route)
+    if match:
+        if method == "GET" and not match[2]:
+            return store.job(match[1]), 200
+        if method == "POST" and match[2]:
+            result = store.retry(match[1])
+            ensure_worker(store)
+            return result, 202
+    if method == "POST" and route in {"blueprints/import", "blueprints/sample"}:
+        if route == "blueprints/sample":
+            sample = (
+                Path(__file__).resolve().parents[2]
+                / "docs/template-factory/blueprint-pilots/bookmark-personal-2026-10-17/bookmark-personal-cognition-v0.1.1.zip"
+            )
+            if not sample.is_file():
+                raise FactoryError(
+                    "bundled cognition sample unavailable", "not_found", 404
+                )
+            data = sample.read_bytes()
+        else:
+            data = decode_archive(body.get("archive_base64"))
+        return import_blueprint(
+            store,
+            data,
+            "bundled-sample" if route.endswith("sample") else "imported-blueprint",
+        ), 201
+    if method == "GET" and route == "artifacts":
+        filters = parse_qs(query)
+        values = store.artifacts()
+        if filters.get("leaf"):
+            values = [a for a in values if a["leaf"] == filters["leaf"][0]]
+        if filters.get("type"):
+            values = [
+                a
+                for a in values
+                if a.get("artifact_type", "runnable-starter") == filters["type"][0]
+            ]
+        if filters.get("published", [""])[0] == "1":
+            values = [a for a in values if a["state"] == "published"]
+        return values, 200
+    match = re.fullmatch(
+        r"artifacts/(tpl_[a-f0-9]{32})/(review|download|instantiate|preview|accept|repair|blueprint|development-package)",
+        route,
+    )
+    if match:
+        value = artifact(store, match[1])
+        bundle = controlled_path(store, value["bundle_path"])
+        if is_blueprint(value):
+            spec = verify_frozen(bundle, value["digest"])
+            if method == "GET" and match[2] == "blueprint":
+                from .runtime_jobs import runtime_support
+
+                return {
+                    "artifact_id": value["id"],
+                    "digest": value["digest"],
+                    "spec": spec,
+                    "documents": {
+                        name: (bundle / "source" / name).read_text()
+                        for name in DOCUMENTS
+                    },
+                    "evidence_scope": "Package declarations only; imported reports do not become factory acceptance.",
+                    "runtime_acceptance": runtime_support(bundle / "source", spec),
+                }, 200
+            if method == "POST" and match[2] == "development-package":
+                if body.get("expected_digest") != value["digest"]:
+                    raise FactoryError(
+                        "artifact version changed", "revision_conflict", 409
+                    )
+                with tempfile.TemporaryDirectory(dir=store.root) as temporary:
+                    result = export_development(
+                        bundle,
+                        value["digest"],
+                        Path(temporary) / "development",
+                        body.get("project_name"),
+                        body.get("phase"),
+                    )
+                    download_dir = store.root / "downloads"
+                    download_dir.mkdir(exist_ok=True)
+                    import uuid
+
+                    download_id = uuid.uuid4().hex
+                    archive_tree(
+                        Path(temporary) / "development",
+                        download_dir / (download_id + ".zip"),
+                    )
+                return {
+                    **result,
+                    "download_url": "/api/factory/development-downloads/" + download_id,
+                    "artifact_type": "product-blueprint",
+                    "message": "Development handoff only; no LLM, install or application execution.",
+                }, 201
+            if method == "POST" and match[2] in {"accept", "repair"}:
+                result = (
+                    store.create_acceptance(match[1], body)
+                    if match[2] == "accept"
+                    else store.create_repair(match[1], body)
+                )
+                ensure_worker(store)
+                return result, 202
+            if match[2] != "download":
+                raise FactoryError(
+                    "Use cognitive reading, download, development export, cognitive-review, blueprint-runtime (when a frozen runner adapter exists), or repair. Cognitive publication is not available yet.",
+                    "blueprint_operation_unavailable",
+                    409,
+                )
+        elif match[2] in {"blueprint", "development-package"}:
+            raise FactoryError(
+                "this artifact is a runnable code template", "wrong_artifact_type", 409
+            )
+        if method == "POST" and match[2] in {"accept", "repair"}:
+            result = (
+                store.create_acceptance(match[1], body)
+                if match[2] == "accept"
+                else store.create_repair(match[1], body)
+            )
+            ensure_worker(store)
+            return result, 202
+        if method == "GET" and match[2] == "preview":
+            if not value.get("preview_path"):
+                raise FactoryError(
+                    "no browser screenshot for this artifact", "not_found", 404
+                )
+            return (
+                controlled_path(store, value["preview_path"]),
+                "application.png",
+                "image/png",
+            )
+        if method == "POST" and match[2] == "review":
+            # Recheck frozen contents before a human review changes publication.
+            with tempfile.TemporaryDirectory(dir=store.root) as temporary:
+                render_template(bundle, Path(temporary) / "check", "review-check")
+            return store.artifact_action(match[1], body), 200
+        if method == "GET" and match[2] == "download":
+            file = controlled_path(store, value["archive_path"])
+            if hashlib.sha256(file.read_bytes()).hexdigest() != value["archive_sha256"]:
+                raise FactoryError(
+                    "archive changed after validation", "artifact_changed", 409
+                )
+            return file, value["id"] + ".zip", "application/zip"
+        if method == "POST" and match[2] == "instantiate":
+            # No caller-supplied host path and no automatic install/code execution.
+            with tempfile.TemporaryDirectory(dir=store.root) as temporary:
+                directory = Path(temporary) / "app"
+                render_template(bundle, directory, body.get("project_name"))
+                download_dir = store.root / "downloads"
+                download_dir.mkdir(exist_ok=True)
+                import uuid
+
+                download_id = uuid.uuid4().hex
+                archive_tree(directory, download_dir / (download_id + ".zip"))
+            return {
+                "download_url": "/api/factory/downloads/" + download_id,
+                "project_name": body["project_name"],
+                "template_digest": value["digest"],
+                "message": "Created without an LLM call. Unzip and follow README; nothing was installed on this host.",
+            }, 201
+    match = re.fullmatch(r"(downloads|development-downloads)/([a-f0-9]{32})", route)
+    if method == "GET" and match:
+        return (
+            controlled_path(store, "downloads/" + match[2] + ".zip"),
+            "atlas-development.zip"
+            if match[1] == "development-downloads"
+            else "atlas-application.zip",
+            "application/zip",
+        )
+    match = re.fullmatch(r"jobs/(job_[a-f0-9]{32})/evidence", route)
+    if method == "GET" and match:
+        job = store.job(match[1])
+        root = controlled_path(store, "jobs/" + job["id"])
+        results = []
+        for file in sorted(root.rglob("*.json")):
+            if file.name not in {
+                "report.json",
+                "cli-summary.json",
+                "plan.json",
+                "discovery.json",
+                "source.json",
+                "baseline.json",
+                "acceptance-report.json",
+                "blueprint-research.json",
+            }:
+                if file.name != "result.json" or file.parent.name not in {
+                    "scenarios",
+                    "scenario-review",
+                    "blueprint-research",
+                    "cognitive-review",
+                }:
+                    continue
+            file = controlled_path(store, str(file.relative_to(store.root)))
+            if file.stat().st_size < 1_000_000:
+                from privacy import redact_value
+
+                results.append(
+                    {
+                        "path": str(file.relative_to(root)),
+                        "data": redact_value(json.loads(file.read_text())),
+                    }
+                )
+        return results, 200
+    raise FactoryError("factory route not found", "not_found", 404)

@@ -1,0 +1,76 @@
+{
+  "kind": "trusted Python image lifecycle probe after normal Docker restart; not product acceptance",
+  "image": "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9",
+  "name": "atlas-bookmark-env-9c0c5a3be1e7",
+  "started_at": "2026-10-19T03:34:10.311901+00:00",
+  "steps": [
+    {
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "python:3.12-slim"
+      ],
+      "exit_code": 0,
+      "stdout": "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "docker",
+        "create",
+        "--pull=never",
+        "--name",
+        "atlas-bookmark-env-9c0c5a3be1e7",
+        "--network",
+        "none",
+        "--read-only",
+        "--cap-drop=ALL",
+        "--security-opt=no-new-privileges",
+        "--pids-limit",
+        "32",
+        "--memory",
+        "128m",
+        "--cpus",
+        "1",
+        "--user",
+        "501:20",
+        "sha256:ce9a404c2c0138e747a43e6ea022d2f7e670ed868df35d627a663ba7fb940ea9",
+        "python3",
+        "-c",
+        "print(\"ATLAS_ENV_ID_PROBE_OK\")"
+      ],
+      "exit_code": 0,
+      "stdout": "78965912f42a98585848c17c80793bd3d7e323f3e9e4287b5289a735bd793c4e",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "docker",
+        "start",
+        "--attach",
+        "78965912f42a98585848c17c80793bd3d7e323f3e9e4287b5289a735bd793c4e"
+      ],
+      "exit_code": 0,
+      "stdout": "ATLAS_ENV_ID_PROBE_OK",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "docker",
+        "rm",
+        "--force",
+        "78965912f42a98585848c17c80793bd3d7e323f3e9e4287b5289a735bd793c4e"
+      ],
+      "exit_code": 0,
+      "stdout": "78965912f42a98585848c17c80793bd3d7e323f3e9e4287b5289a735bd793c4e",
+      "stderr": ""
+    }
+  ],
+  "passed": true,
+  "tag_inspect_passed": true,
+  "container_id": "78965912f42a98585848c17c80793bd3d7e323f3e9e4287b5289a735bd793c4e",
+  "cleanup_passed": true
+}

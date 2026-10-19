@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>社区共享设施预约</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>社区共享设施预约</h1>
+  <div id="session-box" class="session-box" hidden>
+    <span id="session-user"></span>
+    <button data-testid="logout" id="logout-btn" class="btn ghost" type="button">登出</button>
+  </div>
+</header>
+
+<main>
+  <section id="login-panel" class="card">
+    <h2>登录</h2>
+    <p class="hint">使用本地演示账号登录（管理员 admin，居民 alice / bob）。</p>
+    <label class="field">用户名
+      <input data-testid="login-username" id="login-username" type="text"
+             autocomplete="username" spellcheck="false">
+    </label>
+    <label class="field">密码
+      <input data-testid="login-password" id="login-password" type="password"
+             autocomplete="current-password">
+    </label>
+    <button data-testid="login-submit" id="login-submit" class="btn" type="button">登录</button>
+  </section>
+
+  <section id="admin-panel" class="card" hidden>
+    <h2>设施管理（管理员）</h2>
+    <label class="field">设施名称
+      <input data-testid="resource-name" id="resource-name" type="text">
+    </label>
+    <button data-testid="resource-save" id="resource-save" class="btn" type="button">创建设施</button>
+  </section>
+
+  <section id="booking-panel" class="card" hidden>
+    <h2>提交预约</h2>
+    <label class="field">设施
+      <select data-testid="booking-resource" id="booking-resource"></select>
+    </label>
+    <label class="field">开始时间（含时区偏移的 ISO8601）
+      <input data-testid="booking-start" id="booking-start" type="text"
+             placeholder="2035-01-01T00:00:00+08:00" spellcheck="false">
+    </label>
+    <label class="field">结束时间（含时区偏移的 ISO8601）
+      <input data-testid="booking-end" id="booking-end" type="text"
+             placeholder="2035-01-01T01:00:00+08:00" spellcheck="false">
+    </label>
+    <label class="field">备注
+      <input data-testid="booking-note" id="booking-note" type="text">
+    </label>
+    <button data-testid="booking-save" id="booking-save" class="btn" type="button">提交预约</button>
+  </section>
+
+  <section id="availability-panel" class="card" hidden>
+    <h2>占用时段</h2>
+    <ul id="availability-list" class="slot-list"></ul>
+  </section>
+
+  <section id="bookings-panel" class="card" hidden>
+    <h2 id="bookings-title">预约记录</h2>
+    <table class="bookings-table">
+      <thead>
+        <tr><th>ID</th><th>设施</th><th>开始</th><th>结束</th><th>状态</th><th>备注</th><th>操作</th></tr>
+      </thead>
+      <tbody id="bookings-body"></tbody>
+    </table>
+  </section>
+
+  <div id="message" class="message" role="status" aria-live="polite"></div>
+</main>
+
+<script>
+/* 真实接口端点配置，供 /static/app.js 使用。 */
+window.ATLAS_ENDPOINTS = {
+  login: "/api/login",
+  logout: "/api/logout",
+  me: "/api/me",
+  resources: "/api/resources",
+  availability: "/api/availability",
+  bookings: "/api/bookings"
+};
+</script>
+<script src="/static/app.js"></script>
+</body>
+</html>

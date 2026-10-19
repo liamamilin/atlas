@@ -426,11 +426,37 @@ def _interactive(api: AtlasApi, args: argparse.Namespace) -> int:
             return
         if not confirm(stdscr, f"{_label(lang, 'acceptance')}: {summary}?"):
             return
+        snapshots = task.get("requirement_snapshots") or []
+        if not snapshots:
+            current_requirements = {
+                item.get("id"): item for item in (workspace or {}).get("requirements", [])
+                if isinstance(item, dict) and item.get("id")
+            }
+            snapshots = [{
+                "requirement_id": requirement_id,
+                "revision": next((
+                    pin.get("revision") for pin in task.get("requirement_revisions", [])
+                    if pin.get("requirement_id") == requirement_id
+                ), (current_requirements.get(requirement_id) or {}).get("revision", 1)),
+                "acceptance_conditions": (current_requirements.get(requirement_id) or {}).get(
+                    "acceptance_conditions", []),
+            } for requirement_id in task.get("requirement_ids", [])
+                if requirement_id in current_requirements]
+        result_by_status = {"passed": "passed", "failed": "failed", "waived": "waived"}
+        condition_results = [{
+            "requirement_id": snapshot.get("requirement_id"),
+            "revision": snapshot.get("revision", 1),
+            "condition": condition,
+            "result": result_by_status[status],
+        } for snapshot in snapshots
+            for condition in snapshot.get("acceptance_conditions", [])
+            if isinstance(condition, str) and condition.strip()]
         try:
             result = api.post(
                 f"/api/projects/{quote(project['id'], safe='')}/tasks/"
                 f"{quote(task['id'], safe='')}/acceptance",
-                {"status": status, "evidence": [{"kind": "terminal", "summary": summary}]})
+                {"status": status, "evidence": [{"kind": "terminal", "summary": summary}],
+                 "condition_results": condition_results})
             message = f"{_label(lang, 'acceptance')}: " \
                       f"{_status(result.get('acceptance_status'), lang)}"
             load_project(project)

@@ -1,0 +1,1039 @@
+{
+  "label": "Y",
+  "fixtures": [
+    {
+      "id": "A",
+      "url": "https://example.com/item/lamp?source=collection&variant=warm#details"
+    },
+    {
+      "id": "B",
+      "url": "https://example.com/item/bookshelf",
+      "title": "折叠书架",
+      "note": "小户型，周末量尺寸",
+      "category": "待购"
+    },
+    {
+      "id": "C",
+      "url": "https://example.com/tutorial/bread",
+      "title": "酸面包教程",
+      "note": "周日尝试"
+    }
+  ],
+  "checks": [
+    {
+      "id": "R01",
+      "area": "运行交付",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:58:03.713Z",
+      "observation": {
+        "body": "生活待购与灵感收藏夹\n未分类\n回收站\n保存新链接\n   \n未分类\n 保存到收藏夹\n查找与排序\n搜索\n最新添加\n最早添加\n排序\n新建归类\n新建归类\n\n这里还没有记录。",
+        "note": "Source dependency review and supervisor process evidence supplement this browser check."
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "001-R01-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:58:03.813Z"
+    },
+    {
+      "id": "R02",
+      "area": "保存",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:58:03.814Z",
+      "observation": [
+        {
+          "url": "https://example.com/tutorial/bread",
+          "title": "酸面包教程",
+          "note": "周日尝试",
+          "text": "酸面包教程\n\n酸面包教程\n\nhttps://example.com/tutorial/bread\n\n未分类 · 2026-10-18T13:58:04.008Z\n\n未分类\n移动\n保存编辑\n删除"
+        },
+        {
+          "url": "https://example.com/item/lamp?source=collection&variant=warm#details",
+          "title": "example.com",
+          "note": "",
+          "text": "example.com\n\nexample.com\n\nhttps://example.com/item/lamp?source=collection&variant=warm#details\n\n未分类 · 2026-10-18T13:58:03.882Z\n\n未分类\n移动\n保存编辑\n删除"
+        }
+      ],
+      "status": "runtime_assertions_passed",
+      "evidence": "004-R02-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:58:04.253Z"
+    },
+    {
+      "id": "R03",
+      "area": "未分类",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:58:04.253Z",
+      "observation": [
+        {
+          "url": "https://example.com/tutorial/bread",
+          "title": "酸面包教程",
+          "note": "周日尝试",
+          "text": "酸面包教程\n\n酸面包教程\n\nhttps://example.com/tutorial/bread\n\n未分类 · 2026-10-18T13:58:04.008Z\n\n未分类\n移动\n保存编辑\n删除"
+        },
+        {
+          "url": "https://example.com/item/lamp?source=collection&variant=warm#details",
+          "title": "example.com",
+          "note": "",
+          "text": "example.com\n\nexample.com\n\nhttps://example.com/item/lamp?source=collection&variant=warm#details\n\n未分类 · 2026-10-18T13:58:03.882Z\n\n未分类\n移动\n保存编辑\n删除"
+        }
+      ],
+      "status": "runtime_assertions_passed",
+      "evidence": "005-R03-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:58:04.359Z"
+    },
+    {
+      "id": "R04",
+      "area": "创建及选择归类",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:58:04.359Z",
+      "observation": [
+        {
+          "url": "https://example.com/item/bookshelf",
+          "title": "折叠书架",
+          "note": "小户型，周末量尺寸",
+          "text": "折叠书架\n\n折叠书架\n\nhttps://example.com/item/bookshelf\n\n待购 · 2026-10-18T13:58:04.656Z\n\n未分类\n学习\n待购\n移动\n保存编辑\n删除"
+        }
+      ],
+      "status": "runtime_assertions_passed",
+      "evidence": "008-R04-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:58:04.751Z"
+    },
+    {
+      "id": "R05",
+      "area": "移动",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:58:04.751Z",
+      "observation": {
+        "destination": [
+          {
+            "url": "https://example.com/item/bookshelf",
+            "title": "折叠书架",
+            "note": "小户型，周末量尺寸",
+            "text": "折叠书架\n\n折叠书架\n\nhttps://example.com/item/bookshelf\n\n学习 · 2026-10-18T13:58:04.656Z\n\n未分类\n学习\n待购\n移动\n保存编辑\n删除"
+          },
+          {
+            "url": "https://example.com/tutorial/bread",
+            "title": "酸面包教程",
+            "note": "周日尝试",
+            "text": "酸面包教程\n\n酸面包教程\n\nhttps://example.com/tutorial/bread\n\n学习 · 2026-10-18T13:58:04.008Z\n\n未分类\n学习\n待购\n移动\n保存编辑\n删除"
+          }
+        ]
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "014-R05-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:58:05.545Z"
+    },
+    {
+      "id": "R06",
+      "area": "搜索",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:58:05.545Z",
+      "observation": {
+        "emptyBody": "生活待购与灵感收藏夹\n未分类\n学习\n删除\n待购\n删除\n回收站\n保存新链接\n   \n未分类\n学习\n待购\n 保存到收藏夹\n查找与排序\n搜索\n最新添加\n最早添加\n排序\n新建归类\n新建归类\n\n这里还没有记录。",
+        "scope": "all records selected through product UI"
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "018-R06-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:58:06.121Z"
+    },
+    {
+      "id": "R07",
+      "area": "打开原网页",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:58:06.121Z",
+      "observation": [
+        {
+          "id": "A",
+          "href": "http://127.0.0.1:53305/b/1",
+          "interceptedNavigation": [
+            {
+              "check": "R07",
+              "type": "external-navigation-request",
+              "url": "https://example.com/item/lamp?source=collection&variant=warm"
+            }
+          ],
+          "redirects": [
+            {
+              "check": "R07",
+              "type": "server-redirect",
+              "url": "http://127.0.0.1:53305/b/1",
+              "status": 302,
+              "location": "https://example.com/item/lamp?source=collection&variant=warm#details",
+              "resolvedTarget": "https://example.com/item/lamp?source=collection&variant=warm#details"
+            }
+          ],
+          "browserUrls": []
+        },
+        {
+          "id": "B",
+          "href": "http://127.0.0.1:53305/b/3",
+          "interceptedNavigation": [
+            {
+              "check": "R07",
+              "type": "external-navigation-request",
+              "url": "https://example.com/item/bookshelf"
+            }
+          ],
+          "redirects": [
+            {
+              "check": "R07",
+              "type": "server-redirect",
+              "url": "http://127.0.0.1:53305/b/3",
+              "status": 302,
+              "location": "https://example.com/item/bookshelf",
+              "resolvedTarget": "https://example.com/item/bookshelf"
+            }
+          ],
+          "browserUrls": []
+        },
+        {
+          "id": "C",
+          "href": "http://127.0.0.1:53305/b/2",
+          "interceptedNavigation": [
+            {
+              "check": "R07",
+              "type": "external-navigation-request",
+              "url": "https://example.com/tutorial/bread"
+            }
+          ],
+          "redirects": [
+            {
+              "check": "R07",
+              "type": "server-redirect",
+              "url": "http://127.0.0.1:53305/b/2",
+              "status": 302,
+              "location": "https://example.com/tutorial/bread",
+              "resolvedTarget": "https://example.com/tutorial/bread"
+            }
+          ],
+          "browserUrls": []
+        }
+      ],
+      "status": "runtime_assertions_passed",
+      "evidence": "019-R07-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:58:07.583Z"
+    },
+    {
+      "id": "R08",
+      "area": "持久化",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:58:07.583Z",
+      "observation": {
+        "restart": {
+          "ok": true,
+          "epoch": {
+            "number": 2,
+            "command": [
+              "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+              "app.py",
+              "--port",
+              "53305",
+              "--data-dir",
+              "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/data-core"
+            ],
+            "cwd": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/app",
+            "data_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/data-core",
+            "port": 53305,
+            "pid": 18457,
+            "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/service-02.log",
+            "started_at": 1792331888.3090749,
+            "http_status": 200,
+            "ready_at": 1792331888.414222
+          },
+          "base_url": "http://127.0.0.1:53305"
+        },
+        "isolated": {
+          "ok": true,
+          "epoch": {
+            "number": 3,
+            "command": [
+              "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+              "app.py",
+              "--port",
+              "53305",
+              "--data-dir",
+              "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/data-isolation"
+            ],
+            "cwd": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/app",
+            "data_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/data-isolation",
+            "port": 53305,
+            "pid": 18460,
+            "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/service-03.log",
+            "started_at": 1792331889.165177,
+            "http_status": 200,
+            "ready_at": 1792331889.271528
+          },
+          "base_url": "http://127.0.0.1:53305"
+        }
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "023-R08-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:58:10.277Z"
+    },
+    {
+      "id": "R09",
+      "area": "反馈及失败后的数据安全",
+      "kind": "required",
+      "startedAt": "2026-10-18T13:58:10.277Z",
+      "observation": {
+        "before": [
+          {
+            "url": "https://example.com/item/bookshelf",
+            "title": "折叠书架",
+            "note": "小户型，周末量尺寸",
+            "text": "折叠书架\n\n折叠书架\n\nhttps://example.com/item/bookshelf\n\n学习 · 2026-10-18T13:58:04.656Z\n\n未分类\n学习\n待购\n移动\n保存编辑\n删除"
+          },
+          {
+            "url": "https://example.com/tutorial/bread",
+            "title": "酸面包教程",
+            "note": "周日尝试",
+            "text": "酸面包教程\n\n酸面包教程\n\nhttps://example.com/tutorial/bread\n\n学习 · 2026-10-18T13:58:04.008Z\n\n未分类\n学习\n待购\n移动\n保存编辑\n删除"
+          },
+          {
+            "url": "https://example.com/item/lamp?source=collection&variant=warm#details",
+            "title": "example.com",
+            "note": "",
+            "text": "example.com\n\nexample.com\n\nhttps://example.com/item/lamp?source=collection&variant=warm#details\n\n未分类 · 2026-10-18T13:58:03.882Z\n\n未分类\n学习\n待购\n移动\n保存编辑\n删除"
+          }
+        ],
+        "after": [
+          {
+            "url": "https://example.com/item/bookshelf",
+            "title": "折叠书架",
+            "note": "小户型，周末量尺寸",
+            "text": "折叠书架\n\n折叠书架\n\nhttps://example.com/item/bookshelf\n\n学习 · 2026-10-18T13:58:04.656Z\n\n未分类\n学习\n待购\n移动\n保存编辑\n删除"
+          },
+          {
+            "url": "https://example.com/tutorial/bread",
+            "title": "酸面包教程",
+            "note": "周日尝试",
+            "text": "酸面包教程\n\n酸面包教程\n\nhttps://example.com/tutorial/bread\n\n学习 · 2026-10-18T13:58:04.008Z\n\n未分类\n学习\n待购\n移动\n保存编辑\n删除"
+          },
+          {
+            "url": "https://example.com/item/lamp?source=collection&variant=warm#details",
+            "title": "example.com",
+            "note": "",
+            "text": "example.com\n\nexample.com\n\nhttps://example.com/item/lamp?source=collection&variant=warm#details\n\n未分类 · 2026-10-18T13:58:03.882Z\n\n未分类\n学习\n待购\n移动\n保存编辑\n删除"
+          }
+        ],
+        "feedback": "生活待购与灵感收藏夹\n未分类\n学习\n删除\n待购\n删除\n回收站\nURL 不合法\n保存新链接\n   \n未分类\n学习\n待购\n 保存到收藏夹\n查找与排序\n搜索\n最新添加\n最早添加\n排序\n新建归类\n新建归类\n折叠书架\n\n折叠书架\n\nhttps://example.com/item/bookshelf\n\n学习 · 2026-10-18T13:58:04.656Z\n\n未分类\n学习\n待购\n移动\n保存编辑\n删除\n酸面包教程\n\n酸面包教程\n\nhttps://example.com/tutorial/bread\n\n学习 · 2026-10-18T13:58:04.008Z\n\n未分类\n学习\n待购\n移动\n保存编辑\n删除\nexample.com\n\nexample.com\n\nhttps://example.com/item/lamp?source=collection&variant=warm#details\n\n未分类 · 2026-10-18T13:58:03.882Z\n\n未分类\n学习\n待购\n移动\n保存编辑\n删除\n上一页\n下一页",
+        "note": "Successful operation feedback is also captured in R02/R04/R05 screenshots."
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "025-R09-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:58:10.683Z"
+    },
+    {
+      "id": "M01",
+      "area": "恢复及状态",
+      "kind": "exploration",
+      "startedAt": "2026-10-18T13:58:10.684Z",
+      "observation": {
+        "crash": {
+          "ok": true,
+          "epoch": {
+            "number": 5,
+            "command": [
+              "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+              "app.py",
+              "--port",
+              "53305",
+              "--data-dir",
+              "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/data-core"
+            ],
+            "cwd": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/app",
+            "data_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/data-core",
+            "port": 53305,
+            "pid": 18465,
+            "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/service-05.log",
+            "started_at": 1792331890.714188,
+            "http_status": 200,
+            "ready_at": 1792331890.820719
+          },
+          "base_url": "http://127.0.0.1:53305"
+        },
+        "multiTabSequential": "both records present",
+        "repeatedSave": {
+          "interaction": {
+            "observation": "Invoked one physical double-click on same save button; SSR navigation may replace the form. Request outcomes retained separately."
+          },
+          "records": [
+            {
+              "url": "https://example.com/explore/double-save",
+              "title": "重复点击保存",
+              "note": "同一表单双击",
+              "text": "重复点击保存\n\n重复点击保存\n\nhttps://example.com/explore/double-save\n\n未分类 · 2026-10-18T13:58:12.049Z\n\n未分类\n移动\n保存编辑\n删除"
+            },
+            {
+              "url": "https://example.com/explore/tab-two",
+              "title": "多页签二",
+              "note": "第二张页面随后保存",
+              "text": "多页签二\n\n多页签二\n\nhttps://example.com/explore/tab-two\n\n未分类 · 2026-10-18T13:58:11.869Z\n\n未分类\n移动\n保存编辑\n删除"
+            },
+            {
+              "url": "https://example.com/explore/tab-one",
+              "title": "多页签一",
+              "note": "第一张页面先保存",
+              "text": "多页签一\n\n多页签一\n\nhttps://example.com/explore/tab-one\n\n未分类 · 2026-10-18T13:58:11.810Z\n\n未分类\n移动\n保存编辑\n删除"
+            }
+          ]
+        }
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "027-M01-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:58:12.242Z"
+    },
+    {
+      "id": "M02",
+      "area": "真实输入边界",
+      "kind": "exploration",
+      "startedAt": "2026-10-18T13:58:12.242Z",
+      "observation": {
+        "duplicateUrlCount": 1,
+        "records": [
+          {
+            "url": "https://example.com/explore/boundary?one=two&quoted=%22%E4%B8%AD%E6%96%87%22#section",
+            "title": "中文 空格 '双引号\" 长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题",
+            "note": "备注 \" ' & 中文\n长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 ",
+            "text": "中文 空格 '双引号\" 长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题\n\n中文 空格 '双引号\" 长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题\n\nhttps://example.com/explore/boundary?one=two&quoted=%22%E4%B8%AD%E6%96%87%22#section\n\n未分类 · 2026-10-18T13:58:12.301Z\n\n未分类\n移动\n保存编辑\n删除"
+          },
+          {
+            "url": "https://example.com/explore/double-save",
+            "title": "重复点击保存",
+            "note": "同一表单双击",
+            "text": "重复点击保存\n\n重复点击保存\n\nhttps://example.com/explore/double-save\n\n未分类 · 2026-10-18T13:58:12.049Z\n\n未分类\n移动\n保存编辑\n删除"
+          },
+          {
+            "url": "https://example.com/explore/tab-two",
+            "title": "多页签二",
+            "note": "第二张页面随后保存",
+            "text": "多页签二\n\n多页签二\n\nhttps://example.com/explore/tab-two\n\n未分类 · 2026-10-18T13:58:11.869Z\n\n未分类\n移动\n保存编辑\n删除"
+          },
+          {
+            "url": "https://example.com/explore/tab-one",
+            "title": "多页签一",
+            "note": "第一张页面先保存",
+            "text": "多页签一\n\n多页签一\n\nhttps://example.com/explore/tab-one\n\n未分类 · 2026-10-18T13:58:11.810Z\n\n未分类\n移动\n保存编辑\n删除"
+          }
+        ]
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "028-M02-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:58:12.702Z"
+    },
+    {
+      "id": "M03",
+      "area": "失败处理",
+      "kind": "exploration",
+      "startedAt": "2026-10-18T13:58:12.703Z",
+      "observation": {
+        "ok": true,
+        "probes": [
+          {
+            "probe": "occupied-port",
+            "command": [
+              "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+              "app.py",
+              "--port",
+              "53305",
+              "--data-dir",
+              "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/data-occupied-port"
+            ],
+            "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/probe-occupied-port.log",
+            "outcome": "exited",
+            "returncode": 1,
+            "text": "Traceback (most recent call last):\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/app/app.py\", line 118, in <module>\n    main()\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/app/app.py\", line 98, in main\n    httpd = ThreadingHTTPServer((\"127.0.0.1\", args.port), AppHandler)\n  File \"/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py\", line 452, in __init__\n    self.server_bind()\n  File \"/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/http/server.py\", line 137, in server_bind\n    socketserver.TCPServer.server_bind(self)\n  File \"/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py\", line 466, in server_bind\n    self.socket.bind(self.server_address)\nOSError: [Errno 48] Address already in use\n"
+          },
+          {
+            "probe": "unusable-data-dir",
+            "command": [
+              "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+              "app.py",
+              "--port",
+              "53371",
+              "--data-dir",
+              "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/unusable-data-path"
+            ],
+            "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/probe-unusable-data-dir.log",
+            "outcome": "exited",
+            "returncode": 1,
+            "text": "Traceback (most recent call last):\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/app/app.py\", line 118, in <module>\n    main()\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/app/app.py\", line 94, in main\n    conn = db.open_database(data_dir)\n  File \"/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/app/db.py\", line 47, in open_database\n    os.makedirs(data_dir, exist_ok=True)\n  File \"/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/os.py\", line 225, in makedirs\n    mkdir(name, mode)\nFileExistsError: [Errno 17] File exists: '/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/unusable-data-path'\n"
+          }
+        ],
+        "afterFailureRecords": [
+          {
+            "url": "https://example.com/explore/boundary?one=two&quoted=%22%E4%B8%AD%E6%96%87%22#section",
+            "title": "中文 空格 '双引号\" 长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题",
+            "note": "备注 \" ' & 中文\n长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 长备注内容 ",
+            "text": "中文 空格 '双引号\" 长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题\n\n中文 空格 '双引号\" 长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题长标题\n\nhttps://example.com/explore/boundary?one=two&quoted=%22%E4%B8%AD%E6%96%87%22#section\n\n未分类 · 2026-10-18T13:58:12.301Z\n\n未分类\n移动\n保存编辑\n删除"
+          },
+          {
+            "url": "https://example.com/explore/double-save",
+            "title": "重复点击保存",
+            "note": "同一表单双击",
+            "text": "重复点击保存\n\n重复点击保存\n\nhttps://example.com/explore/double-save\n\n未分类 · 2026-10-18T13:58:12.049Z\n\n未分类\n移动\n保存编辑\n删除"
+          },
+          {
+            "url": "https://example.com/explore/tab-two",
+            "title": "多页签二",
+            "note": "第二张页面随后保存",
+            "text": "多页签二\n\n多页签二\n\nhttps://example.com/explore/tab-two\n\n未分类 · 2026-10-18T13:58:11.869Z\n\n未分类\n移动\n保存编辑\n删除"
+          },
+          {
+            "url": "https://example.com/explore/tab-one",
+            "title": "多页签一",
+            "note": "第一张页面先保存",
+            "text": "多页签一\n\n多页签一\n\nhttps://example.com/explore/tab-one\n\n未分类 · 2026-10-18T13:58:11.810Z\n\n未分类\n移动\n保存编辑\n删除"
+          }
+        ],
+        "persistenceWriteFailure": "unverified; no artificial storage fault injected"
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "029-M03-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:58:13.099Z"
+    },
+    {
+      "id": "M04",
+      "area": "内容安全",
+      "kind": "exploration",
+      "startedAt": "2026-10-18T13:58:13.100Z",
+      "observation": {
+        "executed": null,
+        "record": {
+          "url": "https://example.com/explore/safe-content-probe",
+          "title": "中文 ' \" & <b>标题</b>",
+          "note": "<svg onload=\"window.__atlasLocalHarmlessProbe=1\"></svg> & ' \"",
+          "text": "中文 ' \" & <b>标题</b>\n\n中文 ' \" & <b>标题</b>\n\nhttps://example.com/explore/safe-content-probe\n\n未分类 · 2026-10-18T13:58:13.149Z\n\n未分类\n移动\n保存编辑\n删除"
+        }
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "030-M04-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:58:13.359Z"
+    },
+    {
+      "id": "M05",
+      "area": "上手及浏览",
+      "kind": "exploration",
+      "startedAt": "2026-10-18T13:58:13.360Z",
+      "observation": {
+        "observation": "Initial empty state, save/category/unclassified/search/open entry points, and empty search were captured in R01-R07. Adapter source documents actual UI routes; human reviewer assesses obstacles without aesthetic scoring."
+      },
+      "status": "runtime_assertions_passed",
+      "evidence": "031-M05-runtime_assertions_passed",
+      "finishedAt": "2026-10-18T13:58:13.439Z"
+    }
+  ],
+  "actions": [
+    {
+      "at": "2026-10-18T13:58:03.713Z",
+      "check": "R01",
+      "name": "Load Chinese app through assigned loopback port.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:58:03.814Z",
+      "check": "R02",
+      "name": "Save A with URL only.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:58:03.946Z",
+      "check": "R02",
+      "name": "Save C with title and note, no category.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:58:04.077Z",
+      "check": "R02",
+      "name": "Refresh.",
+      "result": {
+        "_type": "Response",
+        "_guid": "response@d53b01e32de64791130dd1fe8820e78a"
+      }
+    },
+    {
+      "at": "2026-10-18T13:58:04.253Z",
+      "check": "R03",
+      "name": "Open unclassified view.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:58:04.359Z",
+      "check": "R04",
+      "name": "Create 待购.",
+      "result": {
+        "category": "待购",
+        "observation": "Created through UI."
+      }
+    },
+    {
+      "at": "2026-10-18T13:58:04.477Z",
+      "check": "R04",
+      "name": "Create 学习.",
+      "result": {
+        "category": "学习",
+        "observation": "Created through UI."
+      }
+    },
+    {
+      "at": "2026-10-18T13:58:04.599Z",
+      "check": "R04",
+      "name": "Save B with category 待购.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:58:04.665Z",
+      "check": "R04",
+      "name": "Browse 待购.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:58:04.797Z",
+      "check": "R05",
+      "name": "Move C from unclassified to 学习.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:58:04.963Z",
+      "check": "R05",
+      "name": "Move B from 待购 to 学习.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:58:05.634Z",
+      "check": "R06",
+      "name": "Search 书架 over all records.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:58:05.757Z",
+      "check": "R06",
+      "name": "Search 面包 over all records.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:58:05.881Z",
+      "check": "R06",
+      "name": "Search nonexistent term.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:58:05.984Z",
+      "check": "R06",
+      "name": "Clear search.",
+      "result": "completed"
+    },
+    {
+      "at": "2026-10-18T13:58:06.210Z",
+      "check": "R07",
+      "name": "Open original URL for A.",
+      "result": "http://127.0.0.1:53305/b/1"
+    },
+    {
+      "at": "2026-10-18T13:58:06.676Z",
+      "check": "R07",
+      "name": "Open original URL for B.",
+      "result": "http://127.0.0.1:53305/b/3"
+    },
+    {
+      "at": "2026-10-18T13:58:07.146Z",
+      "check": "R07",
+      "name": "Open original URL for C.",
+      "result": "http://127.0.0.1:53305/b/2"
+    },
+    {
+      "at": "2026-10-18T13:58:08.260Z",
+      "check": "R08",
+      "name": "Normally stop and restart with same data directory.",
+      "result": {
+        "ok": true,
+        "epoch": {
+          "number": 2,
+          "command": [
+            "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+            "app.py",
+            "--port",
+            "53305",
+            "--data-dir",
+            "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/data-core"
+          ],
+          "cwd": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/app",
+          "data_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/data-core",
+          "port": 53305,
+          "pid": 18457,
+          "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/service-02.log",
+          "started_at": 1792331888.3090749,
+          "http_status": 200,
+          "ready_at": 1792331888.414222
+        },
+        "base_url": "http://127.0.0.1:53305"
+      }
+    },
+    {
+      "at": "2026-10-18T13:58:09.140Z",
+      "check": "R08",
+      "name": "Start with separate new empty data directory.",
+      "result": {
+        "ok": true,
+        "epoch": {
+          "number": 3,
+          "command": [
+            "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+            "app.py",
+            "--port",
+            "53305",
+            "--data-dir",
+            "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/data-isolation"
+          ],
+          "cwd": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/app",
+          "data_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/data-isolation",
+          "port": 53305,
+          "pid": 18460,
+          "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/service-03.log",
+          "started_at": 1792331889.165177,
+          "http_status": 200,
+          "ready_at": 1792331889.271528
+        },
+        "base_url": "http://127.0.0.1:53305"
+      }
+    },
+    {
+      "at": "2026-10-18T13:58:09.445Z",
+      "check": "R08",
+      "name": "Restore core test data instance.",
+      "result": {
+        "ok": true,
+        "epoch": {
+          "number": 4,
+          "command": [
+            "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+            "app.py",
+            "--port",
+            "53305",
+            "--data-dir",
+            "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/data-core"
+          ],
+          "cwd": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/app",
+          "data_dir": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/data-core",
+          "port": 53305,
+          "pid": 18461,
+          "log": "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/ab-tests/bookmark-2026-10-18/blind/Y/preflight/evidence/service-04.log",
+          "started_at": 1792331889.4842298,
+          "http_status": 200,
+          "ready_at": 1792331889.590118
+        },
+        "base_url": "http://127.0.0.1:53305"
+      }
+    },
+    {
+      "at": "2026-10-18T13:58:10.373Z",
+      "check": "R09",
+      "name": "Attempt empty URL save with existing data.",
+      "result": {
+        "errorText": "URL 不合法"
+      }
+    }
+  ],
+  "events": [
+    {
+      "check": "R02",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 303,
+      "submittedBody": "url=https%3A%2F%2Fexample.com%2Fitem%2Flamp%3Fsource%3Dcollection%26variant%3Dwarm%23details&title=&note=&categoryId=1"
+    },
+    {
+      "check": "R02",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 303,
+      "location": "/",
+      "resolvedTarget": "http://127.0.0.1:53305/"
+    },
+    {
+      "check": "R02",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 303,
+      "submittedBody": "url=https%3A%2F%2Fexample.com%2Ftutorial%2Fbread&title=%E9%85%B8%E9%9D%A2%E5%8C%85%E6%95%99%E7%A8%8B&note=%E5%91%A8%E6%97%A5%E5%B0%9D%E8%AF%95&categoryId=1"
+    },
+    {
+      "check": "R02",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 303,
+      "location": "/",
+      "resolvedTarget": "http://127.0.0.1:53305/"
+    },
+    {
+      "check": "R04",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:53305/categories",
+      "status": 303,
+      "submittedBody": "name=%E5%BE%85%E8%B4%AD"
+    },
+    {
+      "check": "R04",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:53305/categories",
+      "status": 303,
+      "location": "/",
+      "resolvedTarget": "http://127.0.0.1:53305/"
+    },
+    {
+      "check": "R04",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:53305/categories",
+      "status": 303,
+      "submittedBody": "name=%E5%AD%A6%E4%B9%A0"
+    },
+    {
+      "check": "R04",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:53305/categories",
+      "status": 303,
+      "location": "/",
+      "resolvedTarget": "http://127.0.0.1:53305/"
+    },
+    {
+      "check": "R04",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 303,
+      "submittedBody": "url=https%3A%2F%2Fexample.com%2Fitem%2Fbookshelf&title=%E6%8A%98%E5%8F%A0%E4%B9%A6%E6%9E%B6&note=%E5%B0%8F%E6%88%B7%E5%9E%8B%EF%BC%8C%E5%91%A8%E6%9C%AB%E9%87%8F%E5%B0%BA%E5%AF%B8&categoryId=2"
+    },
+    {
+      "check": "R04",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 303,
+      "location": "/",
+      "resolvedTarget": "http://127.0.0.1:53305/"
+    },
+    {
+      "check": "R05",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:53305/bookmarks/2/move",
+      "status": 303,
+      "submittedBody": "categoryId=3"
+    },
+    {
+      "check": "R05",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:53305/bookmarks/2/move",
+      "status": 303,
+      "location": "/",
+      "resolvedTarget": "http://127.0.0.1:53305/"
+    },
+    {
+      "check": "R05",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:53305/bookmarks/3/move",
+      "status": 303,
+      "submittedBody": "categoryId=3"
+    },
+    {
+      "check": "R05",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:53305/bookmarks/3/move",
+      "status": 303,
+      "location": "/",
+      "resolvedTarget": "http://127.0.0.1:53305/"
+    },
+    {
+      "check": "R07",
+      "type": "external-navigation-request",
+      "url": "https://example.com/item/lamp?source=collection&variant=warm"
+    },
+    {
+      "check": "R07",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:53305/b/1",
+      "status": 302,
+      "location": "https://example.com/item/lamp?source=collection&variant=warm#details",
+      "resolvedTarget": "https://example.com/item/lamp?source=collection&variant=warm#details"
+    },
+    {
+      "check": "R07",
+      "type": "proxy-denied-external",
+      "target": "example.com:443"
+    },
+    {
+      "check": "R07",
+      "type": "requestfailed",
+      "url": "https://example.com/item/lamp?source=collection&variant=warm",
+      "failure": {
+        "errorText": "net::ERR_TUNNEL_CONNECTION_FAILED"
+      }
+    },
+    {
+      "check": "R07",
+      "type": "external-navigation-request",
+      "url": "https://example.com/item/bookshelf"
+    },
+    {
+      "check": "R07",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:53305/b/3",
+      "status": 302,
+      "location": "https://example.com/item/bookshelf",
+      "resolvedTarget": "https://example.com/item/bookshelf"
+    },
+    {
+      "check": "R07",
+      "type": "proxy-denied-external",
+      "target": "example.com:443"
+    },
+    {
+      "check": "R07",
+      "type": "requestfailed",
+      "url": "https://example.com/item/bookshelf",
+      "failure": {
+        "errorText": "net::ERR_TUNNEL_CONNECTION_FAILED"
+      }
+    },
+    {
+      "check": "R07",
+      "type": "external-navigation-request",
+      "url": "https://example.com/tutorial/bread"
+    },
+    {
+      "check": "R07",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:53305/b/2",
+      "status": 302,
+      "location": "https://example.com/tutorial/bread",
+      "resolvedTarget": "https://example.com/tutorial/bread"
+    },
+    {
+      "check": "R07",
+      "type": "proxy-denied-external",
+      "target": "example.com:443"
+    },
+    {
+      "check": "R07",
+      "type": "requestfailed",
+      "url": "https://example.com/tutorial/bread",
+      "failure": {
+        "errorText": "net::ERR_TUNNEL_CONNECTION_FAILED"
+      }
+    },
+    {
+      "check": "R09",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 200,
+      "submittedBody": "url=&title=&note=&categoryId=1"
+    },
+    {
+      "check": "R09",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 200,
+      "submittedBody": "url=&title=&note=&categoryId=1"
+    },
+    {
+      "check": "M01",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 303,
+      "submittedBody": "url=https%3A%2F%2Fexample.com%2Fexplore%2Ftab-one&title=%E5%A4%9A%E9%A1%B5%E7%AD%BE%E4%B8%80&note=%E7%AC%AC%E4%B8%80%E5%BC%A0%E9%A1%B5%E9%9D%A2%E5%85%88%E4%BF%9D%E5%AD%98&categoryId=1"
+    },
+    {
+      "check": "M01",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 303,
+      "location": "/",
+      "resolvedTarget": "http://127.0.0.1:53305/"
+    },
+    {
+      "check": "M01",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 303,
+      "submittedBody": "url=https%3A%2F%2Fexample.com%2Fexplore%2Ftab-two&title=%E5%A4%9A%E9%A1%B5%E7%AD%BE%E4%BA%8C&note=%E7%AC%AC%E4%BA%8C%E5%BC%A0%E9%A1%B5%E9%9D%A2%E9%9A%8F%E5%90%8E%E4%BF%9D%E5%AD%98&categoryId=1"
+    },
+    {
+      "check": "M01",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 303,
+      "location": "/",
+      "resolvedTarget": "http://127.0.0.1:53305/"
+    },
+    {
+      "check": "M01",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 303,
+      "submittedBody": "url=https%3A%2F%2Fexample.com%2Fexplore%2Fdouble-save&title=%E9%87%8D%E5%A4%8D%E7%82%B9%E5%87%BB%E4%BF%9D%E5%AD%98&note=%E5%90%8C%E4%B8%80%E8%A1%A8%E5%8D%95%E5%8F%8C%E5%87%BB&categoryId=1"
+    },
+    {
+      "check": "M01",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 303,
+      "location": "/",
+      "resolvedTarget": "http://127.0.0.1:53305/"
+    },
+    {
+      "check": "M02",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 303,
+      "submittedBody": "url=https%3A%2F%2Fexample.com%2Fexplore%2Fboundary%3Fone%3Dtwo%26quoted%3D%2522%25E4%25B8%25AD%25E6%2596%2587%2522%23section&title=%E4%B8%AD%E6%96%87+%E7%A9%BA%E6%A0%BC+%27%E5%8F%8C%E5%BC%95%E5%8F%B7%22+%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98&note=%E5%A4%87%E6%B3%A8+%22+%27+%26+%E4%B8%AD%E6%96%87%0D%0A%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+&categoryId=1"
+    },
+    {
+      "check": "M02",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 303,
+      "location": "/",
+      "resolvedTarget": "http://127.0.0.1:53305/"
+    },
+    {
+      "check": "M02",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 200,
+      "submittedBody": "url=https%3A%2F%2Fexample.com%2Fexplore%2Fboundary%3Fone%3Dtwo%26quoted%3D%2522%25E4%25B8%25AD%25E6%2596%2587%2522%23section&title=%E4%B8%AD%E6%96%87+%E7%A9%BA%E6%A0%BC+%27%E5%8F%8C%E5%BC%95%E5%8F%B7%22+%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98&note=%E5%A4%87%E6%B3%A8+%22+%27+%26+%E4%B8%AD%E6%96%87%0D%0A%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+&categoryId=1"
+    },
+    {
+      "check": "M02",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 200,
+      "submittedBody": "url=https%3A%2F%2Fexample.com%2Fexplore%2Fboundary%3Fone%3Dtwo%26quoted%3D%2522%25E4%25B8%25AD%25E6%2596%2587%2522%23section&title=%E4%B8%AD%E6%96%87+%E7%A9%BA%E6%A0%BC+%27%E5%8F%8C%E5%BC%95%E5%8F%B7%22+%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98%E9%95%BF%E6%A0%87%E9%A2%98&note=%E5%A4%87%E6%B3%A8+%22+%27+%26+%E4%B8%AD%E6%96%87%0D%0A%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+%E9%95%BF%E5%A4%87%E6%B3%A8%E5%86%85%E5%AE%B9+&categoryId=1"
+    },
+    {
+      "check": "M04",
+      "type": "write-response",
+      "method": "POST",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 303,
+      "submittedBody": "url=https%3A%2F%2Fexample.com%2Fexplore%2Fsafe-content-probe&title=%E4%B8%AD%E6%96%87+%27+%22+%26+%3Cb%3E%E6%A0%87%E9%A2%98%3C%2Fb%3E&note=%3Csvg+onload%3D%22window.__atlasLocalHarmlessProbe%3D1%22%3E%3C%2Fsvg%3E+%26+%27+%22&categoryId=1"
+    },
+    {
+      "check": "M04",
+      "type": "server-redirect",
+      "url": "http://127.0.0.1:53305/bookmarks",
+      "status": 303,
+      "location": "/",
+      "resolvedTarget": "http://127.0.0.1:53305/"
+    }
+  ]
+}

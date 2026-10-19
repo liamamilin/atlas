@@ -1,0 +1,503 @@
+{
+  "summary": "rename 案例（round=initial）三个匿名应用的独立评估。三者交付均为 delivered、cli_status=completed，应用源码 before/after 哈希一致且未被手改；F01–F11 核心全部在真实 CLI 与自有合成 fixture 上通过，有各自 result.json、完整 cli-events.json 与 provenance 佐证。posthoc 探索探针 EP01 不改变原始核心分：M1 与 M3 两个子探针均通过（根目录外无新增/改动，根目录内改名安全）；M2 的 absent_target 子探针失败——apply 退出 0 并在受指派根目录之外新建了回执文件，构成真实的 containment 违背。C01–C05 三者均以代码与文档相互印证，记为 supported。不设固定分数、不强行选出胜者。",
+  "applications": [
+    {
+      "label": "M1",
+      "delivery": "delivered；cli_status=completed；attempt=1；作者自检 self_checks=not_run；execution=not_run（由独立操作者运行）；provenance 显示 app 源码 before/after 哈希一致、application_unchanged=true。",
+      "core": [
+        {
+          "id": "F01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/result.json",
+            "source/M1/evidence/cli-events.json",
+            "source/M1/evidence/provenance.json"
+          ],
+          "reason": "fixture-01：list 仅返回 keep.txt/old-2.bin/old-甲.txt；preview 未改数据；无 --confirm 的 apply/undo 均退出 1 且无 stdout JSON；确认 apply 后二进制与中文内容不变；重复 apply 返回 already-applied 且不再改名；确认 undo 返回 undone 并恢复原名内容。result.json F01=passed。"
+        },
+        {
+          "id": "F02",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/cli-events.json",
+            "source/M1/evidence/result.json"
+          ],
+          "reason": "fixture-02 preview 退出 1「目标已存在，整批拒绝: new-a」，未生成计划，原文件零改动。"
+        },
+        {
+          "id": "F03",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/cli-events.json",
+            "source/M1/evidence/result.json"
+          ],
+          "reason": "fixture-03 preview 成功后改动源内容，apply 退出 1「计划已过期，源文件已改动: old-a」，未丢改动。"
+        },
+        {
+          "id": "F04",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/cli-events.json",
+            "source/M1/evidence/result.json"
+          ],
+          "reason": "fixture-04 对 ../escaped、/absolute/escape、sub/name 三种替换在 preview 阶段即拒绝；空 find 亦被拒。"
+        },
+        {
+          "id": "F05",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/cli-events.json",
+            "source/M1/evidence/result.json"
+          ],
+          "reason": "fixture-05 计划中裸名 new-a 被改为 ../escape 后，apply 退出 1「计划 含非法文件名」，未越界且未改动数据。"
+        },
+        {
+          "id": "F06",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/cli-events.json",
+            "source/M1/evidence/result.json",
+            "source/M1/application/renamer_state.py"
+          ],
+          "reason": "fixture-06 当 .atlas-renamer 为外部符号链接时 preview 退出 1「状态目录是符号链接」，外部 sentinel 未被写入。"
+        },
+        {
+          "id": "F07",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/cli-events.json",
+            "source/M1/evidence/result.json"
+          ],
+          "reason": "fixture-07 执行后占用旧名，undo 退出 1「撤销冲突，旧名已被占用: old-a」，未覆盖当前内容。"
+        },
+        {
+          "id": "F08",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/cli-events.json",
+            "source/M1/evidence/result.json"
+          ],
+          "reason": "fixture-08 find=a.b 作为字面量仅命中 a.b.txt→renamed.txt，axb.txt 未被触碰，证明非正则。"
+        },
+        {
+          "id": "F09",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/cli-events.json",
+            "source/M1/evidence/result.json"
+          ],
+          "reason": "fixture-09 预览后源被替换为符号链接，apply 退出 1「源文件类型改变: old-a」，未跟随/改名，外部目标保持不变。"
+        },
+        {
+          "id": "F10",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/cli-events.json",
+            "source/M1/evidence/result.json"
+          ],
+          "reason": "fixture-10 计划路径位于状态目录之外时 preview 退出 1，未在外部创建计划文件。"
+        },
+        {
+          "id": "F11",
+          "outcome": "passed",
+          "evidence": [
+            "source/M1/evidence/cli-events.json",
+            "source/M1/evidence/result.json"
+          ],
+          "reason": "fixture-11 执行后修改新名文件，undo 退出 1「撤销拒绝，文件已被改动: new-a」，被改内容未被覆盖。"
+        }
+      ],
+      "cognition": [
+        {
+          "id": "C01",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/README.md",
+            "source/M1/application/DECISIONS.md"
+          ],
+          "reason": "README 明确区分「当前真实范围与限制」与「后续路线图（未实现）」，DECISIONS 设「明确排除的范围」，未把遗漏伪装为未来工作。"
+        },
+        {
+          "id": "C02",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/DECISIONS.md",
+            "source/M1/application/renamer_plans.py",
+            "source/M1/application/renamer_state.py"
+          ],
+          "reason": "DEC-01..08 给出实际默认与理由并列出被否决方案（正则/递归、无保护改名、内容哈希、环交换、renameat2），与代码实现（dev+ino+size+mtime_ns、整批预检、逐条 lstat）一致。"
+        },
+        {
+          "id": "C03",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/README.md",
+            "source/M1/application/DECISIONS.md"
+          ],
+          "reason": "P0 覆盖 list→preview→apply→undo 完整闭环；路线图为可选哈希、备份/多轮撤销、目录锁、Unicode、递归正则，服务同一单目录用户，无多租户/计费等企业级扩张。"
+        },
+        {
+          "id": "C04",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/DECISIONS.md"
+          ],
+          "reason": "列出 5 个需人工决定项（是否启用哈希、NFS 语义、并发锁、断电恢复协议、替换次数策略）并说明触发条件，未擅自作答。"
+        },
+        {
+          "id": "C05",
+          "outcome": "supported",
+          "evidence": [
+            "source/M1/application/README.md",
+            "source/M1/delivery.json"
+          ],
+          "reason": "README「自检状态」明确标注所有验收/自检为 not_run，delivery 中 self_checks=not_run；未虚构研究、许可或运行事实。"
+        }
+      ],
+      "root_causes": [],
+      "limits": [
+        "默认陈旧判定仅用 dev/ino/size/mtime_ns，存在极窄同大小同时间戳漏检窗口（文档已声明）；",
+        "未做 renameat2，预检与改名之间有极小 TOCTOU 窗口，文档已声明；",
+        "source-audit 指出回执临时文件名确定、若被恶意预置符号链接可被跟随，EP01 未覆盖该点；",
+        "EP01 为 posthoc 有限探针，通过不代表全部路径/竞态安全；rename 无浏览器 ID，不涉及浏览器。"
+      ]
+    },
+    {
+      "label": "M2",
+      "delivery": "delivered；cli_status=completed；attempt=1；self_checks=not_run；execution=not_run；provenance 显示 app 源码 before/after 哈希一致、application_unchanged=true。",
+      "core": [
+        {
+          "id": "F01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/result.json",
+            "source/M2/evidence/cli-events.json",
+            "source/M2/evidence/provenance.json"
+          ],
+          "reason": "fixture-01 list/preview/apply/undo 全链路成功：无 confirm 拒绝、确认后 applied、重复 apply 退出 1「该计划已经执行过」、确认 undo 恢复原名内容，回执位于 .atlas-renamer/receipts/ 内。"
+        },
+        {
+          "id": "F02",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/cli-events.json",
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "fixture-02 preview 退出 1「目标文件已存在，拒绝生成计划: 'new-a'」，零改动。"
+        },
+        {
+          "id": "F03",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/cli-events.json",
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "fixture-03 源内容改变后 apply 退出 1「计划已过期，源文件内容已改变: old-a」，sha256/size 判定生效。"
+        },
+        {
+          "id": "F04",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/cli-events.json",
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "fixture-04 三种穿越/绝对/子目录替换与空 find 全部被拒并给出说明。"
+        },
+        {
+          "id": "F05",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/cli-events.json",
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "fixture-05 计划目标名被改为 ../escape 后 apply 退出 1「计划包含非法文件名」，未越界未改数据。"
+        },
+        {
+          "id": "F06",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/cli-events.json",
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "fixture-06 符号链接状态目录下 preview 退出 1「状态目录不能是符号链接」，外部 sentinel 未变。"
+        },
+        {
+          "id": "F07",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/cli-events.json",
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "fixture-07 旧名被占用后 undo 退出 1「撤销目标存在冲突或数据已改变，拒绝覆盖」。"
+        },
+        {
+          "id": "F08",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/cli-events.json",
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "fixture-08 find=a.b 仅字面命中 a.b.txt→renamed.txt，未按正则影响其他文件。"
+        },
+        {
+          "id": "F09",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/cli-events.json",
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "fixture-09 源被换成符号链接后 apply 退出 1「源文件缺失或不是普通文件: old-a」，未跟随未改名。"
+        },
+        {
+          "id": "F10",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/cli-events.json",
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "fixture-10 计划路径在状态目录外时 preview 退出 1「路径必须位于状态目录内」，未外部建文件。"
+        },
+        {
+          "id": "F11",
+          "outcome": "passed",
+          "evidence": [
+            "source/M2/evidence/cli-events.json",
+            "source/M2/evidence/result.json"
+          ],
+          "reason": "fixture-11 新名内容被改后 undo 退出 1「撤销目标存在冲突或数据已改变，拒绝覆盖」，被改数据保留。"
+        }
+      ],
+      "cognition": [
+        {
+          "id": "C01",
+          "outcome": "supported",
+          "evidence": [
+            "source/M2/application/README.md",
+            "source/M2/application/DECISIONS.md"
+          ],
+          "reason": "README 分「当前范围」「已知限制/不做的事」「后续路线（尚未实现）」，DECISIONS 设「明确的范围外」，P0 与后续能力界限清楚。"
+        },
+        {
+          "id": "C02",
+          "outcome": "supported",
+          "evidence": [
+            "source/M2/application/DECISIONS.md",
+            "source/M2/application/commands.py",
+            "source/M2/application/planner.py",
+            "source/M2/application/naming.py"
+          ],
+          "reason": "9 条产品默认（跳过无变化项、空替换合法、预览即拒冲突、O_EXCL、sha256+size 判定、重复执行双保险、casefold 判重、失败回滚）与代码一致，并列出被否决方案及理由。"
+        },
+        {
+          "id": "C03",
+          "outcome": "supported",
+          "evidence": [
+            "source/M2/application/README.md"
+          ],
+          "reason": "P0 完成一次执行对应一次撤销的完整旅程；路线图为可选递归/glob、多批撤销栈、正则子命令、结构化错误，未引入无关企业范围。"
+        },
+        {
+          "id": "C04",
+          "outcome": "supported",
+          "evidence": [
+            "source/M2/application/DECISIONS.md"
+          ],
+          "reason": "提出仅大小写不同改名、多批撤销栈、机器可读错误对象三个真实待决项，且说明当前安全取舍。"
+        },
+        {
+          "id": "C05",
+          "outcome": "supported",
+          "evidence": [
+            "source/M2/application/README.md",
+            "source/M2/delivery.json",
+            "source/M2/source-audit.json"
+          ],
+          "reason": "文档未宣称已运行结果；delivery 记 self_checks=not_run；source-audit 以 source_risks_not_runtime_claims 明示回执 id 拼接风险与并发竞态为源码风险而非运行结论，未见虚构研究/许可事实。"
+        }
+      ],
+      "root_causes": [
+        "回执路径由未校验的顶层可编辑 plan.id 直接拼接（receipts 目录 + plan_id + .json）；当 id 为绝对路径时 os.path.join 丢弃状态目录前缀，apply 在受指派根目录之外创建新回执文件，构成真实 containment 违背（EP01 absent_target）。"
+      ],
+      "limits": [
+        "EP01 existing_target 仅因外部目标已存在而触发 already-applied 拒绝（未覆盖，但亦未完成改名），不能据此认为具备无覆盖写保护；<",
+        "回执 id 拼接缺口未被 F05（仅改文件名目标）认证，属源码审计发现；",
+        "mtime_ns 记录但不参与过期判定，改用 sha256+size（文档已声明）；",
+        "未使用 renameat2，预检与 os.rename 间存在已声明的 TOCTOU 窗口。"
+      ]
+    },
+    {
+      "label": "M3",
+      "delivery": "delivered；cli_status=completed；attempt=2；self_checks=not_run；execution=not_run；provenance 显示 app 源码 before/after 哈希一致、application_unchanged=true。",
+      "core": [
+        {
+          "id": "F01",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/result.json",
+            "source/M3/evidence/cli-events.json",
+            "source/M3/evidence/provenance.json"
+          ],
+          "reason": "fixture-01 list/preview/apply/undo 全通过：无 confirm 拒绝、确认 applied、重复 apply 退出 1「已执行过」、确认 undo 恢复原名内容，回执 receipt-<plan_id>.json 位于状态目录内。"
+        },
+        {
+          "id": "F02",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/cli-events.json",
+            "source/M3/evidence/result.json"
+          ],
+          "reason": "fixture-02 preview 退出 1「整批冲突，已整体拒绝：目标已存在，拒绝覆盖 new-a」，零改动。"
+        },
+        {
+          "id": "F03",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/cli-events.json",
+            "source/M3/evidence/result.json"
+          ],
+          "reason": "fixture-03 源改动后 apply 退出 1「源文件已改动，计划已过期：old-a」。"
+        },
+        {
+          "id": "F04",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/cli-events.json",
+            "source/M3/evidence/result.json"
+          ],
+          "reason": "fixture-04 三种穿越/绝对/子目录替换与空 find 均被拒且说明清晰。"
+        },
+        {
+          "id": "F05",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/cli-events.json",
+            "source/M3/evidence/result.json"
+          ],
+          "reason": "fixture-05 计划目标名改为 ../escape 后 apply 退出 1「目标文件名不能包含路径分隔符：'../escape'」，未越界。"
+        },
+        {
+          "id": "F06",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/cli-events.json",
+            "source/M3/evidence/result.json"
+          ],
+          "reason": "fixture-06 符号链接状态目录下 preview 退出 1「状态文件必须位于 .atlas-renamer 目录内」，在写入前拒绝，外部 sentinel 未变。"
+        },
+        {
+          "id": "F07",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/cli-events.json",
+            "source/M3/evidence/result.json"
+          ],
+          "reason": "fixture-07 旧名被占用后 undo 退出 1「撤销冲突：旧名已被占用，拒绝覆盖 old-a」。"
+        },
+        {
+          "id": "F08",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/cli-events.json",
+            "source/M3/evidence/result.json"
+          ],
+          "reason": "fixture-08 find=a.b 字面命中 a.b.txt→renamed.txt，其余文件不受影响。"
+        },
+        {
+          "id": "F09",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/cli-events.json",
+            "source/M3/evidence/result.json"
+          ],
+          "reason": "fixture-09 源换成符号链接后 apply 退出 1「源文件已不再是普通文件，计划已过期：old-a」，未跟随未改名。"
+        },
+        {
+          "id": "F10",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/cli-events.json",
+            "source/M3/evidence/result.json"
+          ],
+          "reason": "fixture-10 计划路径在状态目录外时 preview 退出 1「状态文件必须位于 .atlas-renamer 目录内」，未外部创建。"
+        },
+        {
+          "id": "F11",
+          "outcome": "passed",
+          "evidence": [
+            "source/M3/evidence/cli-events.json",
+            "source/M3/evidence/result.json"
+          ],
+          "reason": "fixture-11 新名内容被改后 undo 退出 1「撤销冲突：new-a 数据已被改动，拒绝覆盖」，被改数据保留。"
+        }
+      ],
+      "cognition": [
+        {
+          "id": "C01",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/README.md",
+            "source/M3/application/DECISIONS.md"
+          ],
+          "reason": "README 分「当前范围（P0，已实现）」「已知限制」「后续路线（不在本次范围）」，DECISIONS 设「明确不在范围」，界限清楚。"
+        },
+        {
+          "id": "C02",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/DECISIONS.md",
+            "source/M3/application/identity.py",
+            "source/M3/application/execution.py"
+          ],
+          "reason": "D01–D06 与路径/错误处理决策给出实际默认、代价与触发条件，并列出被否决方案（正则、链式改名、renameat2 依赖等），与代码（元数据默认+可选 --hash、整批预检、环拒绝）一致。"
+        },
+        {
+          "id": "C03",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/README.md"
+          ],
+          "reason": "P0 覆盖 list→preview→apply→undo 闭环；路线图为可选备份、递归开关、正则、多轮撤销、Unicode、原子交换、--hash 策略，均服务同一用户，无计费/多租户等无关扩张。"
+        },
+        {
+          "id": "C04",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/DECISIONS.md"
+          ],
+          "reason": "在 D01/D02/D03/D05 与 D04 触发条件中列出哈希启用、NFS 语义、并发锁、断电恢复、环交换等真实待决问题，未擅自作答。"
+        },
+        {
+          "id": "C05",
+          "outcome": "supported",
+          "evidence": [
+            "source/M3/application/README.md",
+            "source/M3/application/DECISIONS.md"
+          ],
+          "reason": "README「所有自检/验收状态为 not_run」；D05 明确承认抓取资料只显示既有工具具备 dump/日志，未确认崩溃语义，故不承诺断电级恢复，体现证据诚实。"
+        }
+      ],
+      "root_causes": [],
+      "limits": [
+        "默认身份证据仅元数据（dev/ino/size/mtime_ns），可选 --hash 才记 sha256，存在同大小/恢复时间戳漏检窗口；",
+        "未使用 renameat2，预检与 os.rename 间存在已声明的 TOCTOU 窗口；",
+        "状态文件 plan_id 仅校验非空字符串，EP01 只测顶层 id，未认证所有可编辑字段；",
+        "EP01 通过为 posthoc 有限结论，不代表全部路径/竞态安全。"
+      ]
+    }
+  ],
+  "cross_application_observations": [
+    "三个应用均交付 delivered、cli_status=completed，且 provenance 前后哈希一致、application_unchanged=true；F01–F11 在真实 CLI 与自有合成 fixture 上全部 passed（各自 result.json 与 cli-events.json 逐条对应，非仅静态存在）。",
+    "EP01 为发现后冻结的 posthoc 探针、不属 F01–F11 且不改变原始核心分：M2 在顶层可编辑 id 设为绝对路径且外部目标缺失时，apply 退出 0 并在受指派根目录之外新建回执文件，属真实 containment 违背；M1、M3 两个子探针均通过（回执派生自经校验的计划文件名或生成的 plan_id，顶层 id 未被使用）。",
+    "M2 的 existing_target 子探针通过只是因外部文件已存在而被 already-applied 拒绝、未覆盖亦未改名，不能据此认定具备无覆盖写保护；根因是按未校验可编辑 id 拼接回执路径。",
+    "通过绝对 id 探针不等于全部路径/竞态安全：三者均在文档声明未使用 renameat2，存在极小 TOCTOU 窗口；EP01 未覆盖并发写与临时文件符号链接等场景。",
+    "rename 无浏览器 ID，浏览器探针不适用；仅提供文本证据，无截图视觉评估。",
+    "EP01 由同源审计发现（源自 M2 源码审计）但以同一 tool/freeze 平等应用于三个应用，属事后探索，非统计证明。"
+  ],
+  "limits": [
+    "本评估仅用文本证据与源码，未执行程序、未联网、未访问对等方；",
+    "EP01 为 posthoc 有限探针，其结论不推翻原 F01–F11 得分；",
+    "M2 round-provenance 提及 repair 轮次，但本 inventory 未提供 repair 应用或证据，故仅评估 initial；",
+    "核心通过不代表模板作者测试套件或应用自检结果——三者均标记 self_checks=not_run、execution=not_run；",
+    "不设固定数值分、不因单一应用给出通用令牌/速度/价格收益结论。"
+  ]
+}

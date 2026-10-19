@@ -1,0 +1,18 @@
+{
+  "schema": "atlas.bookmark-ui-acceptance-interruption.v1",
+  "status": "interrupted-incomplete",
+  "command": "python3 docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/docker_ui_acceptance.py --bundle docs/template-factory/end-to-end/bookmark-2026-10-19/development/initial --evidence-dir docs/template-factory/end-to-end/bookmark-2026-10-19/evaluation/initial",
+  "reason": "The parent agent reported that the local python:3.12-slim tag was not inspectable while the frozen image ID was available, and asked to stop the pull wait. This runner session was interrupted with Ctrl-C after it remained blocked; the traceback shows the interruption occurred while its cleanup subprocess ran docker rm --force.",
+  "available_evidence": {
+    "run_json": false,
+    "phase_stdout_or_stderr": false,
+    "screenshots": false,
+    "initial_directory_contains_only_empty_screenshots_directory": true
+  },
+  "limitations": [
+    "The runner did not write its final run.json, so the exact exception stage and cleanup verification are unavailable.",
+    "This is not a passed or failed product acceptance result.",
+    "Container and Docker daemon cleanup were not independently verified after interruption.",
+    "No application UI phase evidence is present in this directory."
+  ]
+}

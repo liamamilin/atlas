@@ -12,13 +12,13 @@ import threading
 import time
 import urllib.request
 
-from atlas_runtime import PACK as DATA_PACK, api_key, corpus_lock
+from atlas_runtime import PACK as DATA_PACK, corpus_lock
+import atlas_model
 PACK = str(DATA_PACK)
 DB = os.path.join(PACK, "atlas", "atlas.sqlite")
 OUT = os.path.join(PACK, "atlas", "rels-zh.jsonl")
 STATE = os.path.join(PACK, "atlas", "relszh-state.json")
 OLLAMA = "http://localhost:11434/api/chat"
-API = "https://opencode.ai/zen/go/v1/chat/completions"
 PROMPT_V = "v2"
 
 PROMPT = """把下列关系分界说明翻译成中文，只输出一个JSON对象 {{"items":[...]}}，不要输出思考过程。
@@ -39,13 +39,9 @@ def call_local(prompt):
 
 
 def call_api(prompt):
-    body = {"model": "mimo-v2.5", "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.1, "max_tokens": 4000}
-    r = json.load(urllib.request.urlopen(urllib.request.Request(
-        API, json.dumps(body).encode(),
-        {"Authorization": f"Bearer {api_key()}", "Content-Type": "application/json",
-         "x-opencode-session": "atlas-rels", "User-Agent": "atlas/1.0"}), timeout=600))
-    return (r["choices"][0]["message"].get("content") or "").strip()
+    return atlas_model.complete_text(
+        [{"role": "user", "content": prompt}],
+        role="translate", temperature=0.1, max_tokens=4000, timeout=600)
 
 
 def parse_out(txt):

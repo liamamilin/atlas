@@ -1,0 +1,152 @@
+{
+  "scope": "Initial application author calls, failed attempts included. Session export fields overlap CLI step fields; never add both. Cache/read/reasoning are reported separately, not unique billed total. Failed final metadata/provider calls retained. One case per cell, no speed causality.",
+  "rows": [
+    {
+      "case": "budget",
+      "label": "M1",
+      "condition": "no_template",
+      "author_calls": 1,
+      "cli_seconds_including_protocol_retry": 127.08,
+      "session_export_usage_fields": {
+        "input": 33362,
+        "output": 13016,
+        "reasoning": 14645,
+        "cache_read": 146688
+      },
+      "terminal_finishes": [
+        "stop"
+      ]
+    },
+    {
+      "case": "budget",
+      "label": "M2",
+      "condition": "full_upfront",
+      "author_calls": 2,
+      "cli_seconds_including_protocol_retry": 380.72,
+      "session_export_usage_fields": {
+        "input": 183724,
+        "output": 28198,
+        "reasoning": 50468,
+        "cache_read": 1458432
+      },
+      "terminal_finishes": [
+        "stop",
+        "stop"
+      ]
+    },
+    {
+      "case": "budget",
+      "label": "M3",
+      "condition": "layered_on_demand",
+      "author_calls": 1,
+      "cli_seconds_including_protocol_retry": 182.2,
+      "session_export_usage_fields": {
+        "input": 71884,
+        "output": 14819,
+        "reasoning": 22771,
+        "cache_read": 476160
+      },
+      "terminal_finishes": [
+        "stop"
+      ]
+    },
+    {
+      "case": "booking",
+      "label": "M1",
+      "condition": "full_upfront",
+      "author_calls": 2,
+      "cli_seconds_including_protocol_retry": 512.24,
+      "session_export_usage_fields": {
+        "input": 174734,
+        "output": 31277,
+        "reasoning": 45478,
+        "cache_read": 1512704
+      },
+      "terminal_finishes": [
+        "stop",
+        "stop"
+      ]
+    },
+    {
+      "case": "booking",
+      "label": "M2",
+      "condition": "layered_on_demand",
+      "author_calls": 1,
+      "cli_seconds_including_protocol_retry": 287.41,
+      "session_export_usage_fields": {
+        "input": 78823,
+        "output": 18068,
+        "reasoning": 21047,
+        "cache_read": 960896
+      },
+      "terminal_finishes": [
+        "stop"
+      ]
+    },
+    {
+      "case": "booking",
+      "label": "M3",
+      "condition": "no_template",
+      "author_calls": 1,
+      "cli_seconds_including_protocol_retry": 173.29,
+      "session_export_usage_fields": {
+        "input": 36294,
+        "output": 14714,
+        "reasoning": 13212,
+        "cache_read": 425216
+      },
+      "terminal_finishes": [
+        "stop"
+      ]
+    },
+    {
+      "case": "rename",
+      "label": "M1",
+      "condition": "layered_on_demand",
+      "author_calls": 1,
+      "cli_seconds_including_protocol_retry": 277.59,
+      "session_export_usage_fields": {
+        "input": 92630,
+        "output": 13780,
+        "reasoning": 36554,
+        "cache_read": 842624
+      },
+      "terminal_finishes": [
+        "stop"
+      ]
+    },
+    {
+      "case": "rename",
+      "label": "M2",
+      "condition": "no_template",
+      "author_calls": 1,
+      "cli_seconds_including_protocol_retry": 165.4,
+      "session_export_usage_fields": {
+        "input": 36361,
+        "output": 9474,
+        "reasoning": 18662,
+        "cache_read": 235776
+      },
+      "terminal_finishes": [
+        "stop"
+      ]
+    },
+    {
+      "case": "rename",
+      "label": "M3",
+      "condition": "full_upfront",
+      "author_calls": 2,
+      "cli_seconds_including_protocol_retry": 639.37,
+      "session_export_usage_fields": {
+        "input": 222316,
+        "output": 25267,
+        "reasoning": 67573,
+        "cache_read": 2774656
+      },
+      "terminal_finishes": [
+        "stop",
+        "stop"
+      ]
+    }
+  ]
+}
