@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import re
 import time
 import uuid
@@ -25,12 +26,26 @@ G1_AMENDMENT_PLAN = "plan_87059846caf345d2b2fe690657cf324f"
 G1_AMENDMENT_OLD_DEADLINE = 1792418554.633465
 G1_AMENDMENT_WINDOW_SECONDS = 8 * 60 * 60
 G1_AUTHORIZATION_SOURCE_DIGEST = "cc3df91f60afad1a2bf4e862e534be36cb8fcc1f2b8d07687995b325fa7841ae"
+G1_R5_AUTHORIZATION_SCHEMA = "atlas.g1-r5-authorization.v1"
+G1_R5_AUTHORIZATION_SOURCE_REF = "docs/template-factory/g1-r5-2026-10-19/authorization/ATLAS_G1_R5_EXECUTION_CODEX_INSTRUCTIONS.txt"
+G1_R5_AUTHORIZATION_SOURCE_DIGEST = "4d642929aeccdea2a5b0afb5d92157bc54f7e47871f2a3425b05a35268cc9b73"
+G1_R5_DEADLINE = 1792437223.754534
+G1_R5_BASE_STARTED = 1792389754.633465
+G1_R5_BASE_DEADLINE = 1792418554.633465
+G1_R5_PREDECESSOR_ID = "bamd_9378738d1e274c409f756d92ec9c2ac5"
+G1_R5_FAILED_JOB = "job_a53c47f3694047489c4f82cfc2e346be"
+G1_R5_CHECKPOINT = "blueprint-plan-1"
+G1_R5_CHECKPOINT_DIGEST = "b82eaafd6126d5e21e1ccd734a590b5e8a417f51497465e72a4574ab20873894"
+G1_R5_PREPARED_REQUEST_DIGEST = "10c8b1c4ae25a5a4d5346295da426510aea6d0b2c981b8d8c12df50b660a1e43"
+G1_R5_EFFECTIVE_PLAN_DIGEST = "f190b65275ab7c7136f523ba92aecde7c9392440d7676b070393e62ff9137b58"
+G1_R5_PATCH_DIGEST = "76673a0a9b28bd52aab8d44208ea58a6764aa78d0d9b541af2ff41e4d237241c"
+G1_R5_REPAIR_REQUEST_DIGEST = "72991407589cc5cfe950178a7f7ea1dbd0011dad4cd93ca05d77a1956d9a6089"
 
 
 def _legacy_retry_scope(stage):
     """Map historical indexed stage names to today's stable retry scopes."""
     base = str(stage or "").split(":", 1)[0]
-    match = re.fullmatch(r"blueprint-spec-review-\d+-(.+?)(?:-v1)?", base)
+    match = re.fullmatch(r"blueprint-spec-review-\d+-(?:[0-9a-f]{16}-)?(.+?)(?:-[0-9a-f]{16})?(?:-v1)?", base)
     if match:
         return "blueprint-spec-review:" + match.group(1)
     if base.startswith("blueprint-code-"):
@@ -72,6 +87,8 @@ class BudgetLedger:
             "CREATE TABLE IF NOT EXISTS tf_budget_repair (campaign_id TEXT NOT NULL, product_id TEXT NOT NULL, operation_key TEXT NOT NULL, created REAL NOT NULL, PRIMARY KEY(campaign_id, product_id, operation_key))",
             "CREATE INDEX IF NOT EXISTS tf_budget_repair_product ON tf_budget_repair(campaign_id,product_id)",
             "CREATE TABLE IF NOT EXISTS tf_budget_amendment (id TEXT PRIMARY KEY, campaign_id TEXT NOT NULL, product_id TEXT NOT NULL, plan_id TEXT NOT NULL, source_ref TEXT NOT NULL, source_digest TEXT NOT NULL, summary TEXT NOT NULL, reason TEXT NOT NULL, idempotency_key TEXT NOT NULL, version INTEGER NOT NULL, old_repair_limit INTEGER NOT NULL, new_repair_limit INTEGER NOT NULL, baseline_repair_count INTEGER NOT NULL, baseline_cli_sessions INTEGER NOT NULL, old_deadline REAL NOT NULL, window_seconds INTEGER NOT NULL, created_at REAL NOT NULL, activated_at REAL, new_deadline REAL, UNIQUE(campaign_id,product_id,idempotency_key))",
+            "CREATE TABLE IF NOT EXISTS tf_budget_amendment_binding (amendment_id TEXT PRIMARY KEY, request_json TEXT NOT NULL, request_digest TEXT NOT NULL)",
+            "CREATE UNIQUE INDEX IF NOT EXISTS tf_budget_amendment_version ON tf_budget_amendment(campaign_id,product_id,version)",
         )
         with store.connect(True) as con:
             for statement in statements:
@@ -375,6 +392,8 @@ class BudgetAmendmentService:
         self.ledger = BudgetLedger(store, campaign_id=self.campaign_id, clock=clock)
 
     def register(self, request):
+        if isinstance(request, dict) and request.get("schema") == G1_R5_AUTHORIZATION_SCHEMA:
+            return self.register_r5(request)
         required = ("product_id", "plan_id", "source_ref", "source_digest", "summary", "reason", "idempotency_key")
         if not isinstance(request, dict) or any(not isinstance(request.get(k), str) or not request[k].strip() for k in required):
             raise FactoryError("all amendment source, scope and idempotency fields are required", "budget_amendment_invalid", 400)
@@ -405,17 +424,150 @@ class BudgetAmendmentService:
                         (amendment_id, self.campaign_id, request["product_id"], request["plan_id"], request["source_ref"], request["source_digest"], request["summary"], request["reason"], request["idempotency_key"], repairs, cli_sessions, G1_AMENDMENT_OLD_DEADLINE, G1_AMENDMENT_WINDOW_SECONDS, at))
             return dict(con.execute("SELECT * FROM tf_budget_amendment WHERE id=?", (amendment_id,)).fetchone())
 
+    def _validate_r5_request(self, request):
+        required = ("schema", "campaign_id", "product_id", "plan_id", "source_ref", "source_digest",
+                    "summary", "reason", "idempotency_key", "predecessor_amendment_id", "failed_job_id",
+                    "checkpoint_name", "checkpoint_result_digest", "prepared_request_digest",
+                    "effective_plan_digest", "patch_digest", "repair_request_digest")
+        if any(not isinstance(request.get(key), str) or not request[key].strip() for key in required):
+            raise FactoryError("all version 2 authorization bindings are required", "budget_amendment_invalid", 400)
+        if request["schema"] != G1_R5_AUTHORIZATION_SCHEMA:
+            raise FactoryError("unsupported budget amendment schema", "budget_amendment_invalid", 400)
+        fixed = {
+            "campaign_id": G1_AMENDMENT_CAMPAIGN, "product_id": G1_AMENDMENT_PRODUCT,
+            "plan_id": G1_AMENDMENT_PLAN, "source_ref": G1_R5_AUTHORIZATION_SOURCE_REF,
+            "source_digest": G1_R5_AUTHORIZATION_SOURCE_DIGEST,
+            "predecessor_amendment_id": G1_R5_PREDECESSOR_ID,
+            "failed_job_id": G1_R5_FAILED_JOB, "checkpoint_name": G1_R5_CHECKPOINT,
+            "checkpoint_result_digest": G1_R5_CHECKPOINT_DIGEST,
+            "prepared_request_digest": G1_R5_PREPARED_REQUEST_DIGEST,
+            "effective_plan_digest": G1_R5_EFFECTIVE_PLAN_DIGEST,
+            "patch_digest": G1_R5_PATCH_DIGEST,
+            "repair_request_digest": G1_R5_REPAIR_REQUEST_DIGEST,
+            "idempotency_key": "atlas-g1-r5-user-authorization-2026-10-19-v1",
+        }
+        if self.campaign_id != G1_AMENDMENT_CAMPAIGN or any(request.get(k) != v for k, v in fixed.items()):
+            raise FactoryError("version 2 amendment is outside the exact authorized binding", "budget_amendment_scope", 403)
+        if len(request["summary"]) > 2000 or len(request["reason"]) > 1000:
+            raise FactoryError("amendment text exceeds limits", "budget_amendment_invalid", 400)
+        source_path = self.store.pack.parent / G1_R5_AUTHORIZATION_SOURCE_REF
+        try:
+            source_digest = hashlib.sha256(source_path.read_bytes()).hexdigest()
+        except OSError as exc:
+            raise FactoryError("version 2 authorization source is unavailable", "budget_amendment_source", 409) from exc
+        if source_digest != G1_R5_AUTHORIZATION_SOURCE_DIGEST:
+            raise FactoryError("version 2 authorization source bytes changed", "budget_amendment_source", 409)
+        # Recompute from the fixed checked-in preparation materials and run the
+        # existing host re-preparation path against the real failed job.
+        repo = self.store.pack.parent
+        prep_path = repo / "docs/template-factory/g1-preparation-2026-10-19/prepare-revision-request.json"
+        repair_path = repo / "docs/template-factory/g1-preparation-2026-10-19/formal-repair-request-NOT-EXECUTED.json"
+        try:
+            from .store import digest
+            prep_request = json.loads(prep_path.read_text(encoding="utf-8"))
+            repair_request = json.loads(repair_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise FactoryError("fixed prepared revision materials are unavailable", "budget_amendment_basis", 409) from exc
+        if digest(prep_request) != G1_R5_PREPARED_REQUEST_DIGEST or digest(repair_request) != G1_R5_REPAIR_REQUEST_DIGEST:
+            raise FactoryError("fixed prepared revision materials changed", "budget_amendment_basis", 409)
+        if repair_request.get("expected_digest") != "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9":
+            raise FactoryError("formal repair request binding changed", "budget_amendment_basis", 409)
+        try:
+            from .plan_revision import PreparedRevisionService
+            prepared = PreparedRevisionService(self.store).prepare(G1_R5_FAILED_JOB, prep_request)
+        except FactoryError as exc:
+            raise FactoryError("fixed prepared revision no longer validates", "budget_amendment_basis", 409) from exc
+        if (prepared.get("request_digest") != G1_R5_PREPARED_REQUEST_DIGEST
+                or prepared.get("effective_plan_digest") != G1_R5_EFFECTIVE_PLAN_DIGEST
+                or digest(prepared.get("effective_plan")) != G1_R5_EFFECTIVE_PLAN_DIGEST):
+            raise FactoryError("prepared revision result differs from the authorized exact materials", "budget_amendment_basis", 409)
+        return digest(request)
+
+    def register_r5(self, request):
+        if (not isinstance(request, dict)
+                or not isinstance(request.get("idempotency_key"), str)
+                or not request["idempotency_key"].strip()):
+            raise FactoryError("version 2 authorization request is required", "budget_amendment_invalid", 400)
+        from .store import digest
+        request_digest = digest(request)
+        # BEGIN IMMEDIATE serializes the prior lookup, v1/baseline verification,
+        # and insertion so a changed key cannot race in a second version 2.
+        with self.store.connect(True) as con:
+            prior = con.execute(
+                "SELECT a.*,b.request_json,b.request_digest FROM tf_budget_amendment a "
+                "LEFT JOIN tf_budget_amendment_binding b ON b.amendment_id=a.id "
+                "WHERE a.campaign_id=? AND a.product_id=? AND a.idempotency_key=?",
+                (self.campaign_id, G1_AMENDMENT_PRODUCT, request["idempotency_key"]),
+            ).fetchone()
+            if prior:
+                if prior["request_digest"] != request_digest or prior["request_json"] != json.dumps(request, ensure_ascii=False, sort_keys=True, separators=(",", ":")):
+                    raise FactoryError("idempotency key was already used for different authorization", "idempotency_conflict", 409)
+                return {k: prior[k] for k in prior.keys() if k not in {"request_json", "request_digest"}}
+            self._validate_r5_request(request)
+            prior_v2 = con.execute(
+                "SELECT id FROM tf_budget_amendment WHERE campaign_id=? AND product_id=? AND version=2",
+                (self.campaign_id, G1_AMENDMENT_PRODUCT),
+            ).fetchone()
+            if prior_v2:
+                raise FactoryError("the single authorized version 2 is already recorded", "budget_amendment_exhausted", 409)
+            predecessor = con.execute("SELECT * FROM tf_budget_amendment WHERE id=? AND campaign_id=? AND product_id=?",
+                                      (G1_R5_PREDECESSOR_ID, self.campaign_id, G1_AMENDMENT_PRODUCT)).fetchone()
+            if (not predecessor or predecessor["version"] != 1 or predecessor["activated_at"] is None
+                    or predecessor["new_repair_limit"] != 4 or predecessor["new_deadline"] != G1_R5_DEADLINE):
+                raise FactoryError("active version 1 predecessor or inherited deadline changed", "budget_amendment_basis", 409)
+            repairs = con.execute("SELECT COUNT(*) FROM tf_budget_repair WHERE campaign_id=? AND product_id=?",
+                                  (self.campaign_id, G1_AMENDMENT_PRODUCT)).fetchone()[0]
+            old_deadline = con.execute("SELECT started,deadline FROM tf_budget_phase WHERE campaign_id=? AND identity='__campaign_segment__' AND phase='G1'",
+                                       (self.campaign_id,)).fetchone()
+            cli_sessions = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status!='not_started'",
+                                       (self.campaign_id,)).fetchone()[0]
+            active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','started','uncertain')",
+                                 (self.campaign_id,)).fetchone()[0]
+            if (not old_deadline or old_deadline[0] != G1_R5_BASE_STARTED or old_deadline[1] != G1_R5_BASE_DEADLINE
+                    or repairs != 4 or cli_sessions != 52 or active != 0):
+                raise FactoryError("first version 2 registration requires the fixed phase and 0-active / 4-repair / 52-call baseline",
+                                   "budget_amendment_basis", 409)
+            amendment_id = "bamd_" + uuid.uuid4().hex
+            at = float(self.clock())
+            con.execute(
+                "INSERT INTO tf_budget_amendment VALUES(?,?,?,?,?,?,?,?,?,2,4,5,?,?,?,0,?,NULL,?)",
+                (amendment_id, self.campaign_id, G1_AMENDMENT_PRODUCT, G1_AMENDMENT_PLAN,
+                 G1_R5_AUTHORIZATION_SOURCE_REF, G1_R5_AUTHORIZATION_SOURCE_DIGEST,
+                 request["summary"], request["reason"], request["idempotency_key"],
+                 repairs, cli_sessions, G1_R5_DEADLINE, at, G1_R5_DEADLINE),
+            )
+            encoded = json.dumps(request, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+            con.execute("INSERT INTO tf_budget_amendment_binding VALUES(?,?,?)",
+                        (amendment_id, encoded, request_digest))
+            return dict(con.execute("SELECT * FROM tf_budget_amendment WHERE id=?", (amendment_id,)).fetchone())
+
     def activate_locked(self, con, amendment_id):
         row = con.execute("SELECT * FROM tf_budget_amendment WHERE id=? AND campaign_id=?", (amendment_id, self.campaign_id)).fetchone()
         if not row:
             raise FactoryError("budget amendment not found", "not_found", 404)
         if row["activated_at"] is not None:
             return dict(row)
-        old = con.execute("SELECT deadline FROM tf_budget_phase WHERE campaign_id=? AND identity='__campaign_segment__' AND phase='G1'", (self.campaign_id,)).fetchone()
-        if not old or old[0] != row["old_deadline"]:
-            raise FactoryError("original G1 deadline is missing or changed", "budget_amendment_basis", 409)
         at = float(self.clock())
-        deadline = max(float(row["old_deadline"]), at + row["window_seconds"])
+        if row["version"] == 2:
+            if row["old_repair_limit"] != 4 or row["new_repair_limit"] != 5 or row["old_deadline"] != G1_R5_DEADLINE:
+                raise FactoryError("version 2 amendment basis changed", "budget_amendment_basis", 409)
+            base = con.execute("SELECT started,deadline FROM tf_budget_phase WHERE campaign_id=? AND identity='__campaign_segment__' AND phase='G1'",
+                               (self.campaign_id,)).fetchone()
+            predecessor = con.execute("SELECT version,activated_at,new_repair_limit,new_deadline FROM tf_budget_amendment WHERE id=? AND campaign_id=? AND product_id=?",
+                                      (G1_R5_PREDECESSOR_ID, self.campaign_id, G1_AMENDMENT_PRODUCT)).fetchone()
+            if (not base or base["started"] != G1_R5_BASE_STARTED or base["deadline"] != G1_R5_BASE_DEADLINE
+                    or not predecessor or predecessor["version"] != 1 or predecessor["activated_at"] is None
+                    or predecessor["new_repair_limit"] != 4 or predecessor["new_deadline"] != G1_R5_DEADLINE
+                    or row["new_deadline"] != G1_R5_DEADLINE):
+                raise FactoryError("version 2 base phase or active predecessor changed", "budget_amendment_basis", 409)
+            if row["old_deadline"] <= at:
+                raise FactoryError("inherited G1 deadline has expired", "budget_deadline", 409)
+            deadline = G1_R5_DEADLINE
+        else:
+            old = con.execute("SELECT deadline FROM tf_budget_phase WHERE campaign_id=? AND identity='__campaign_segment__' AND phase='G1'", (self.campaign_id,)).fetchone()
+            if not old or old[0] != row["old_deadline"]:
+                raise FactoryError("original G1 deadline is missing or changed", "budget_amendment_basis", 409)
+            deadline = max(float(row["old_deadline"]), at + row["window_seconds"])
         con.execute("UPDATE tf_budget_amendment SET activated_at=?,new_deadline=? WHERE id=? AND activated_at IS NULL", (at, deadline, amendment_id))
         return dict(con.execute("SELECT * FROM tf_budget_amendment WHERE id=?", (amendment_id,)).fetchone())
 

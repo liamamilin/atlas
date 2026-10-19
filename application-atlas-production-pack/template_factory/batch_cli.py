@@ -33,11 +33,17 @@ def main(argv=None):
     preparation = commands.add_parser("prepare-revision", help="Validate a pinned failed-draft patch without queueing or spending budget")
     preparation.add_argument("job_id")
     preparation.add_argument("--request", type=Path, required=True)
+    r5 = commands.add_parser("queue-r5", help="Atomically activate inherited-deadline R5 authorization and queue exact prepared repair")
+    r5.add_argument("plan_id")
+    r5.add_argument("--request", type=Path, required=True)
     args = parser.parse_args(argv)
     store = FactoryStore(args.root, args.pack)
     service = BatchService(store)
     try:
-        if args.command == "prepare-revision":
+        if args.command == "queue-r5":
+            from .r5_execution import R5ExecutionService
+            result = R5ExecutionService(store).queue(args.plan_id, json.loads(args.request.read_text()))
+        elif args.command == "prepare-revision":
             from .plan_revision import PreparedRevisionService
             result = PreparedRevisionService(store).prepare(args.job_id, json.loads(args.request.read_text()))
         elif args.command == "preview":

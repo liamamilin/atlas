@@ -12,6 +12,7 @@ from template_factory.cognition import (
     AGGREGATE_SEMANTIC_REVIEW_PROMPT,
     DESIGN_REVIEW_PROMPT,
     GENERATE_PROMPT,
+    REVIEW_PROMPT,
     _case_adaptation_review_digest,
     _reuse_prepared_case_adaptation,
     _validate_design_review_checkpoint,
@@ -132,11 +133,13 @@ class ScenarioPolicyTests(unittest.TestCase):
         self.assertEqual(adaptation_input["target_profile"], {"delivery_profile": "python-web"})
 
     def test_global_generation_and_design_prompts_have_no_bookmark_rules(self):
-        shared = "\n".join((GENERATE_PROMPT, DESIGN_REVIEW_PROMPT, AGGREGATE_SEMANTIC_REVIEW_PROMPT)).lower()
+        shared = "\n".join((GENERATE_PROMPT, DESIGN_REVIEW_PROMPT, AGGREGATE_SEMANTIC_REVIEW_PROMPT, REVIEW_PROMPT)).lower()
         for term in ("indexeddb", "dexie", "a02", "a04", "a12", "category_id", "hostname, and description"):
             self.assertNotIn(term, shared)
         self.assertIn("case_adaptation_policy.json", DESIGN_REVIEW_PROMPT.lower())
         self.assertIn("case_policy_digest", AGGREGATE_SEMANTIC_REVIEW_PROMPT)
+        self.assertIn("aggregate_repair_scope.authorized_assertion_changes", REVIEW_PROMPT)
+        self.assertIn("all other existing assertion intent must be preserved", REVIEW_PROMPT)
         self.assertIn("spec.contract_coverage", GENERATE_PROMPT)
         self.assertIn('"spec":{"title"', GENERATE_PROMPT)
         self.assertIn('"limits":["..."],"contract_coverage":{"schema":"atlas.contract-coverage.v1"', GENERATE_PROMPT)

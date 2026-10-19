@@ -16,6 +16,10 @@ def dispatch_v1(method, route, query, body, store):
     if method == "POST" and match:
         from .plan_revision import PreparedRevisionService
         return PreparedRevisionService(store).prepare(match[1], body), 200
+    match = re.fullmatch(r"plans/(plan_[a-f0-9]{32})/queue-r5", route)
+    if method == "POST" and match:
+        from .r5_execution import R5ExecutionService
+        return R5ExecutionService(store).queue(match[1], body), 202
     library = CaseLibrary(store)
     params = parse_qs(query)
     if route == "budget/amendments":

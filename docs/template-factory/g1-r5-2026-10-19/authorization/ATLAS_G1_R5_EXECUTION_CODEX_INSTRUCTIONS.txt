@@ -1,0 +1,366 @@
+Atlas G1 第五轮正式修订与首批生产执行指令
+文件名：ATLAS_G1_R5_EXECUTION_CODEX_INSTRUCTIONS.txt
+版本：2026-10-19 / r1
+适用仓库：https://github.com/liamamilin/atlas
+已核验代码基线：3033c609e1c4faf77273b8e2672bcb06db78f0cf
+默认工作分支：codex/stabilize-atlas
+
+一、任务与授权
+
+当用户将本文件交给 Codex 并要求按附件执行时，本文件构成本轮明确的开发及续作授权。
+完成下述小范围工厂收尾、正式预算调整和真实 G1；G1 通过后继续原固定三场景 T08。
+在范围和限额内连续完成后续步骤，不停在“代码完成”“准备完成”或“可以继续”。
+本文件交付本身不表示生产台账已经被修改，实际授权必须经正式服务登记、生效和取证。
+
+本次唯一新增额度：
+- 仅原书签产品在原 G1 plan 内，累计业务修复上限从 4 调整为 5，即新增最多 1 轮。
+- 模板、内部规格和应用业务修复共享该产品的计数。正式修订首次入队正常记第 5 轮。
+- prepared 修订保持 repair_attempts=0；没有隐含第 6 轮。
+- 后续首次正常 P0 开发可以继续；如果开发结果需要新的业务修复，仍受已经使用的 5 轮总额限制。
+- G1/T08 受控 CLI 会话总上限保持 500，原 52 次及后续消耗全部保留。
+- 生产/静态审阅并发上限 2，运行并发上限 1，同一逻辑阶段的瞬时追加重试上限 2。
+- 已用追加重试不清零；新语义候选可有合法首次审阅，同一输入不能靠新 job ID 获得新额度。
+- 其他产品业务修复上限仍为 2。保留现有模型/provider 配置及更低的环境和费用限制。
+- 未观测到的 provider 内部请求数、实际模型身份、费用继续记 unknown。
+
+本次不新增或重开 G1 时间窗口：
+- 原 base started：1792389754.633465。
+- 原 base deadline：1792418554.633465。
+- 前次补充窗口已激活：1792408423.754534。
+- 当前唯一有效 G1 deadline：1792437223.754534。
+- 即 UTC 2026-10-19 19:13:43.754534，北京时间 2026-10-20 03:13:43.754534。
+- 第五轮授权继承这一绝对截止。暂停、恢复、重启、新任务、新授权记录不延长它。
+- 执行时若已过期，仍完成离线代码、必要检查和可审查交付；停止新真实生产调用，如实报告超时。
+- T08 沿原已批准规则：只有 G1 通过才启动，其自身时间段从首次正式启动起最多 8 小时。
+  T08 不重置 500 次总账，不重置产品修复历史，不承接失败 G1 来绕过 G1 截止。
+  书签 G1 的单 plan 增额不扩散到 T08；T08 优先复用书签已有精确合格产物。
+
+除上述累计 4→5 外，之前明确的范围、来源、冻结、证据、发布和抽验要求继续有效。
+本轮允许必要代码修复、回归、提交推送既有工作分支、正式预算操作、模板目录发布、
+标准交接、真实应用开发/运行和既定 T08。达到规定门禁后执行，无须逐项再次索要许可。
+如平台自动审批拒绝，说明被拒动作和原因，完成不受影响工作，不绕过审批。
+
+二、固定现场与资料
+
+优先进入现有 application-atlas 仓库；用户此前路径：
+/Users/milin/2026/软件开发/application-atlas
+路径不存在时，依据当前工作区定位真实 git 仓库，不将本文件所在下载目录当成生产根目录。
+
+先读取适用 AGENTS.md，检查 git status、HEAD、分支和 origin。
+不重置用户工作区；如 HEAD 晚于 3033c60，确认其祖先关系并审阅相关增量，保留已有工作。
+不切换到 main 去丢弃当前分支成果。使用仓库已配置的正式工厂业务根目录。
+
+优先阅读：
+1. docs/template-factory/g1-preparation-2026-10-19/DELIVERY.md
+2. 同目录 CONTRACTS.md、CODE_REVIEW.md、current-draft.diff、case-design.diff
+3. 同目录 prepare-revision-request.json、prepare-revision-response.json、current-draft-plan.json
+4. 同目录 formal-repair-request-NOT-EXECUTED.json
+5. 同目录 production-before.json、production-after.json、production-unchanged-proof.json
+6. docs/template-factory/g1-convergence-2026-10-19/ 下的预算、scope、恢复和独立执行器记录
+7. docs/template-factory/v1-2026-10-19/ 下的 G1_MANIFEST.json、G1_REPORT.md、
+   OPERATIONS.md、t08-request.json、SAMPLING_PLAN.json 及独立执行器计划
+8. 如已有 ATLAS_G1_CONVERGENCE_CODEX_INSTRUCTIONS.txt，沿用其未被本文件替换的要求。
+
+固定身份：
+- campaign：atlas-v1-first-production-2026-10-19
+- G1 plan：plan_87059846caf345d2b2fe690657cf324f
+- G1 plan digest：1f7701fbf5f52dde011dee76196b2cb01697e10190c6ad17c1273f4b5dcc3d30
+- product：product-c42848f63251507bd9d911a5
+- scenario：scn_7756e0007f6a463a97316f3f49c15248，revision 2
+- 当前 failed job：job_a53c47f3694047489c4f82cfc2e346be，归档 attempt 2
+- 原冻结 artifact：tpl_7f4c17e834c342e7b462e6bb8b6379e4
+- 原 artifact digest：8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9
+- case basis digest：a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589
+- 原 case-adaptation checkpoint result：
+  9175773345975665f4ea3cd4b99633fc2a375a9e8d373c295618d56a2b74afa8
+- 当前 blueprint-plan-1 的 result digest：
+  b82eaafd6126d5e21e1ccd734a590b5e8a417f51497465e72a4574ab20873894
+- 精确 patch digest：
+  76673a0a9b28bd52aab8d44208ea58a6764aa78d0d9b541af2ff41e4d237241c
+- effective plan digest：
+  f190b65275ab7c7136f523ba92aecde7c9392440d7676b070393e62ff9137b58
+- 前驱 amendment：bamd_9378738d1e274c409f756d92ec9c2ac5，version 1，已激活 2→4。
+- 固定上游：lakhindarpal/bookmark-manager@539881bc67099d491e8ab6f85de0f443fa7de623。
+
+上述 JSON digest 沿项目 canonical 算法重算。checkpoint 的 result 摘要与外层记录摘要不得混用。
+现场归档基准为 CLI 52、该产品业务修复 4、真实活动调用 0、G1 blocked、T08 not_started。
+先从正式状态接口只读核对。若已存在本次幂等请求，进入幂等恢复；若是其他来源的漂移，
+报告具体差异并完成不依赖漂移状态的代码工作，不能改历史使其凑回固定基准。
+
+三、工作包 A：完成一处提示隔离收尾
+
+定位：
+- application-atlas-production-pack/template_factory/cognition.py 中全局 REVIEW_PROMPT。
+- application-atlas-production-pack/tests/test_factory_scenario_policy.py 中通用提示隔离测试。
+
+目前冻结审阅通用提示仍硬编码“唯一可替换的是 A02 单标签 hostname 负例改正例”。
+将这段改为：严格遵守输入 aggregate_repair_scope.authorized_assertion_changes；
+仅该输入明确授权的断言语义变化可接受，其余现有断言意图必须保留。
+
+书签 A02 的原具体政策保留在本任务绑定的 scope 中：
+- 绝对、可解析的 HTTP(S) URL，有合法非空 hostname 即可，不要求点或 DNS 可达。
+- 原非 HTTP(S)、畸形 URL、空/非法 hostname 及失败无写入负例保留。
+- 不能把清理全局提示解释为放宽当前书签的宿主授权白名单。
+
+把 REVIEW_PROMPT 加入现有通用提示隔离测试，保留书签双重 ID 命中正控和其他场景负控。
+不扩展成新的通用策略平台；不重做已通过的 JSON 字节稳定性和 envelope 实现。
+
+四、工作包 B：正式支持本次 4→5 授权
+
+当前 BudgetAmendmentService 只接受旧授权摘要、42/2 基准和唯一一次 2→4。
+必须最小扩展已有机制，支持本次精确绑定的 version 2，不直接改业务库补额度。
+
+1. 授权来源
+保留用户交付的本指令原始 UTF-8 文件，计算其实际字节 SHA-256；以该原始文件作为 source_ref/source_digest。
+不要沿用上一轮授权摘要，不伪造人工点击或管理员批准，不在文件中填一个自指的全文件摘要。
+可将原文件原样归档到本轮 docs；实现报告与它分开，避免修改已登记的授权来源。
+单独创建稳定幂等键，例如 atlas-g1-r5-user-authorization-2026-10-19-v1。
+授权请求实际使用的新字段和入口由实现决定，并写入 CONTRACTS/OPERATIONS。
+
+2. 新登记的固定校验
+新记录仅绑定本文件第二节 campaign/product/G1 plan、当前 failed job、
+原 plan-1 result、准备请求及 effective plan、前驱 amendment 和本次授权文件摘要。
+校验前驱已激活、版本为 1、有效修复上限为 4、有效 deadline 为 1792437223.754534。
+第一次新登记时要求全 campaign 已计费 CLI 52、该产品业务修复 4，并与实际固定证据相符。
+新记录 old_repair_limit=4、new_repair_limit=5，明确增量 1；最多一条本次 version 2。
+同一事务内核对前驱、版本和当前基准并追加；并发或更换幂等键不得重复获得 version 2。
+其他产品、其他 plan、其他 campaign 不适用。
+
+3. 幂等顺序
+先查本次稳定幂等键；相同完整请求返回原记录，同键异请求拒绝。
+只有没有原记录时才核对首次登记 52/4 基准。
+因此真实续作后的 53/5 等历史，不应阻止同一已成功请求的幂等查询/恢复。
+激活、排队和结果响应丢失的恢复同样保留幂等，不能随机改 note/model/timeout 再排一次。
+
+4. 时间生效
+version 2 必须有明确的“只增加修复额度、继承前驱有效截止”分支：
+new_deadline 始终等于 1792437223.754534。
+不能沿用旧 activate_locked 的 max(old_deadline, now + window_seconds) 算法；
+只将 window_seconds 设为 0 也不足以满足继承语义。
+不修改 base started/deadline，不修改 version 1 的任一历史字段，不重开 G1 segment。
+首次生效仅记录新授权生效时间及继承的有效截止；重复生效返回原记录。
+到期后继续拒绝新生产调用和预留，不能把截止推至当前时间。
+
+5. 统一消费与事务
+继续使用现有“最新已激活且身份匹配的 amendment”选择机制。
+version 2 未生效时，version 1 的上限 4 和有效截止仍生效；
+version 2 生效后，上限为 5，截止相同。
+reserve、record_repair、phase_remaining、effective_deadline、runtime 和预算报告应读取一致结果。
+查询明确限定 campaign/product/plan/phase，不让 G1 例外扩散到 T08。
+保留原计数、500 次总额及所有更低限制；配置刷新、多个 worker、重启不能抹掉合法增额或超额。
+
+在正式服务中协调 version 2 生效、记第 5 轮和 prepared successor 入队。
+优先复用 queue_repair 已有 caller-owned transaction/ledger 能力，保证失败与重放不留下重复修复或错误队列。
+新增 API/CLI 协调入口可以封装现有服务，但创建修订仍走现有 artifact repair 业务逻辑。
+登记保持可审查；完成新代码门禁后才执行真实生效与入队。
+
+五、工作包 C：补齐正式 V1 正向联接回归
+
+全部使用临时数据库、临时业务目录和假 CLI；不得用真实生产库做测试夹具。
+
+现有 prepared producer spy 未携带实际 v1/case_basis、repair_scope/edit_paths。
+新增一条使用归档正式 prepared 请求和完整真实形状 snapshot 的联接测试：
+- 原 artifact、failed plan-1、29 条固定案例依据、五文件 scope、version 1 和 52/4 基准均被正确装载；
+- 经过正式新授权服务及 queue_repair 创建实际 successor snapshot；
+- 父计划 paused 时，新子批次继承暂停，claim 不能抢跑；
+- 正式 plan resume 后，经过 claim/Pipeline 或实际生产入口，执行到首个独立设计预审；
+- 新 effective plan 和修订后 case_design 被消费；
+- blueprint 整体规格生成调用 0，案例重新研究/适配生成调用 0；
+- 实际收到的 scope 与五文件 edit_paths 完整，准备摘要保持一致；
+- 首次正式排队恰记 1 次业务修复；重放返回同一 batch/job，不新增 repair；
+- 不把测试中的 spy 通过写成真实模型预审或真实应用通过。
+
+在现有预算测试中补足本次版本风险，可采用参数化，不另建大型测试工程：
+- version 2 pending/active 分别产生 4/5 的效果，deadline 数值完全不变；
+- 错授权、错前驱、错 patch/checkpoint、同键异请求、重复 version 2 均拒绝；
+- 未生效不得用第 5 轮；第 5 轮允许；第 6 轮拒绝；
+- 其他产品、T08 不获得本次额外 G1 权限；
+- 登记/生效/排队重放不重复记账，基准已被合法后续消耗时幂等仍成立；
+- 截止到期后不预留调用，暂停/恢复/重启不改变 deadline；
+- 失败事务回滚，不遗留错误 successor 或修复计数。
+
+保留已有 source 篡改拒绝、inner/outer envelope 恢复、32 分支混码/遗漏拒绝回归。
+执行本轮改动相关回归以及项目既定完整门禁，推送后确认同一新代码 SHA 的远端 CI 全部通过。
+检查日志注明实际执行、跳过及 fixture 属性；不要把 13 组检查写成 13 个测试用例。
+同一 SHA 已充分验证后推进生产，除非发现明确新风险，不重复执行无关审计来消耗窗口。
+
+六、工作包 D：执行固定 prepared 修订
+
+生产启动前只读核对：
+- 工作包 A/B/C 完成，真实生产源码 SHA 对应 CI 通过；
+- 本次授权来源、前驱、固定请求与当前状态匹配；
+- 当前有效窗口尚未到期，全局调用、重试、并发均有合法空间；
+- 正式 plan 仍可恢复，旧任务的失败证据保留。
+
+当前只读准备入口已存在：
+POST /api/factory/v1/jobs/job_a53c47f3694047489c4f82cfc2e346be/prepare-revision
+body：docs/template-factory/g1-preparation-2026-10-19/prepare-revision-request.json
+
+已有等价 CLI：
+PYTHONPATH=application-atlas-production-pack python3 -m template_factory.batch_cli \
+  prepare-revision job_a53c47f3694047489c4f82cfc2e346be \
+  --request docs/template-factory/g1-preparation-2026-10-19/prepare-revision-request.json
+
+正式修订业务入口：
+POST /api/factory/artifacts/tpl_7f4c17e834c342e7b462e6bb8b6379e4/repair
+body：docs/template-factory/g1-preparation-2026-10-19/formal-repair-request-NOT-EXECUTED.json
+
+执行时：
+1. 通过正式新授权协调流程使 version 2 生效，并提交上述固定业务请求。
+2. 服务重验原始 prepared_revision，宿主重算 effective plan/case_design；不接收替代有效草案。
+3. 新请求计入第 5 轮，保存新 amendment、request digest、job/batch 和旧 failed job 的来源关系。
+4. 父计划暂停时先核对新子批次，再通过既有 plan resume 恢复父子批次。
+5. 由正式 worker 消费，使用已有完成检查点和可验证原交付，不手动拼接生产目录。
+
+不重试旧 a53 任务来期待它自动获得新草案；它保留旧 blocked checkpoint。
+不调用绑定旧 4f30 paused_budget 任务的 resume-product；当前应走 failed-plan prepared 路径。
+不更改旧任务为成功；如果队列评估有真实状态问题，通过正式服务修复其因果关系并保留历史。
+
+本次精确草案边界：
+- 只消费已经核验的 A04/A12 goal、架构追加澄清、p0_organize 文件职责及宿主错误分支/引用。
+- 搜索适配仅为第 7 项 capability/reason 的既有修正，仍是 title/hostname/description
+  大小写不敏感子串搜索叠加分类过滤；证据 ID、disposition 和其他适配保持。
+- 不重新生成整个规格，不重新研究案例，不为这次任务重新生成案例适配。
+- 角色、功能身份和阶段、其他用例、limits、其他文件计划/reuse 及旧来源证据保留。
+- architecture 预审必须实际消费 CASE_DESIGN/CASE_ADAPTATION_POLICY，并绑定新的材料摘要。
+- 不能将旧 5 项通过移植成新草案的通过；只有所有相关输入摘要匹配的缓存可复用。
+
+允许修改的程序文件沿原 scope：
+acceptance/p0_library.py
+acceptance/p0_organize.py
+acceptance/p0_find_open.py
+acceptance/p0_recovery.py
+acceptance/README.md
+
+其余固定程序保留；由正式生成/冻结过程刷新派生 template.json、acceptance/plan.json 和 integrity。
+A02 单标签 hostname 是 scope 中唯一既有断言语义替换；其余现有断言意图保留。
+
+七、模板与真实应用必须兑现的合同
+
+A04 分类创建/重命名：
+- name 省略、空、纯空白、121 字符非法；JSON 另含 null；
+- 状态 400、分类名称语义 invalid_name；HTML/JSON 各按自己的响应合同断言；
+- 保留重名、默认分类保护、分类删除迁移活动及软删记录、恢复等原有行为。
+
+A12 保存书签：
+- category 是名称；省略默认未整理；JSON null 同样默认未整理；
+- 显式空、纯空白、121 字符为 400 invalid_category；
+- 有效新分类名称按既有合同允许自动创建。
+
+A12 移动书签：
+- HTML category_id 是已有 ID；省略、空、未知 ID 为 400 invalid_category；
+  未知 ID 不能被当作名称创建。
+- JSON category 是名称；省略、null、空、纯空白、121 字符为 400 invalid_category；
+  有效新名称按既有合同允许创建；不新增 category_id API。
+
+共同要求：
+- HTML 字符串 "null" 与 JSON null 区分；未知 GET 分类筛选仍返回空结果。
+- 错误不造成部分写入；HTML 可读 form-error、提交值保留和可重试入口；
+  JSON 返回 error.code/message/field，不要求 JSON 具备 DOM。
+- 32 个负向分支：A04 的 HTML 8 + JSON 10；A12 保存 6 + 移动 8。
+- 宿主结构校验不等于程序行为通过。每个分支必须能对应实际验收程序中的断言，
+  真实应用运行报告应能追溯相应执行结果；可复用既有报告结构，不要求另造协议。
+- 保留默认保存、新名称创建、分类管理/移动/计数、分类内搜索、原 URL 精确打开、
+  软删恢复、同容器重启持久化、所有原始并发写入不丢失等已承诺旅程。
+- URL 重复检测仍为既有 P1；按原目标 scope 处理孤立承诺，不把建议自动升级成 P0。
+
+八、完成真实 G1 主链
+
+按真实门禁顺序持续执行：
+1. 当前 prepared 草案完成规定全部独立设计维度预审。
+2. 限定文件实际生成/修订；宿主执行 scope/diff/错误合同门禁。
+3. 聚合语义审阅确认原断言意图和新增覆盖，保存精确程序差分。
+4. 正式冻结新 artifact，记录 actual spec/program/suite digest。
+5. 对该实际冻结版本独立审阅通过；预审不能代替冻结后审阅。
+6. 达到目录准入后正式发布，准确区分“已审阅发布”和“真实 P0 已通过”。
+7. 从实际产品入口导出标准 development/handoff 包，记录 export/template/case/phase 摘要。
+8. 正式 application-development 作业消费该标准包，保存接收、交付检查点和实际 app 归档。
+   开发所需补充必须进入正式版本和交接材料，不能私下另给一份更完整规格来制造成功。
+9. 冻结模板套件运行于这一实际应用；独立 Chromium 对同一目标执行真实浏览器核心旅程。
+   页面用户动作经实际控件完成，API 按既有计划用于对照、状态观察及并发输入。
+   沿当前执行器的 Docker 隔离、固定 loopback 中继、真实重启和清理合同取证。
+10. 通过正式宿主流程生成精确 phase proof，绑定 template/suite/app_root/runtime/target/phase/环境。
+11. 用 BatchService.assess_g1 或项目实际正式等价入口重新评估并持久化 G1。
+
+运行前记录当前 runner 与冻结计划的实际摘要；不把旧摘要套到新代码上。
+保留当前已固定的独立计划；本轮不批准为通过而修改 frozen machineplan 或删除断言。
+既有 fixture、relay probe、候选页面导出、临时库回归、历史应用和 CI 均不能代替真实 P0。
+
+G1 应由新证据解除全部实际原因：
+- queue_not_quiescent：正式活动任务完成、队列收敛；
+- template catalog eligibility / review：新模板当前正式合格记录；
+- standard_development_export：标准导出及接收链；
+- development_delivery_checkpoint：真实开发交付；
+- runtime_run / phase proof：同一个实际 P0 的精确绑定运行证据。
+不能通过删旧失败、手写 passed、修改报告或只改父批次状态使评估通过。
+
+第 5 轮内后续步骤若首次正常执行成功，继续直到 G1 评估。
+需要新业务修复时已无第 6 轮额度：正式停止并保留完整失败。
+协议/网络错误仅按既有瞬时重试政策处理；语义不通过、uncertain 或缺合同不能包装成协议重试。
+审阅不得通过重试换意见。按规则可复用的完成检查点与原始交付继续复用。
+
+九、G1 通过后完成既定 T08
+
+G1 blocked 时不启动 T08。
+G1 通过后直接继续：
+1. 读取原 t08-request.json 和 SAMPLING_PLAN.json，经正式 preview 固定有效 plan/digest 后 run。
+2. T08 使用自己的 plan ID、稳定幂等键和已有 segment 规则，不复用 G1 plan ID。
+3. 三个固定样本：书签、月度预算、多项目会议笔记。
+4. 书签精确合格的 G1 产物按正式复用规则使用；另两个完成真实生产、必要开发与抽验。
+5. 本轮只完成这三个，原最多 10 个是上限，不自动扩到 10 个、不替换失败样本。
+6. 原案例继续供模板与应用实证共用；有必要的新研究才形成新 revision，
+   新增案例数、复用案例数、应用身份数和模板版本数分别报告。
+7. 若相同工厂根因反复影响样本，先暂停相关路径，依据真实失败修复工厂；
+   不能把每个样本的业务修复额度逐个耗尽来替代根因处理。
+8. 三样本按原固定抽验要求全部取得必要真实证据，才报告首批完成；
+   任一未运行、失败或受限，报告 partial/blocked 与准确分母。
+
+十、交付与停止点
+
+建议归档到 docs/template-factory/g1-r5-2026-10-19/，复用既有结构即可：
+- DELIVERY.md：结果、变更、实际阻断、下一恢复动作。
+- CONTRACTS.md / OPERATIONS.md：真实新授权接口、实际请求、响应及正式恢复命令。
+- 原授权文件、授权实际字节摘要、version 2 请求/记录、预算前后和固定 deadline 证据。
+- 基线绑定、新代码 SHA/CI、prepared 请求/草案摘要、新旧 job/batch 关系与真实消费证明。
+- 模板差分、冻结与独立审阅、正式发布记录。
+- 标准交接实际消费、P0 交付、应用摘要、独立运行、phase proof、宿主 G1 评估。
+- 固定三场景 T08 逐项结果和同一总账消耗。
+- 未运行项和失败、中断、重试、清理的原始证据索引。
+
+以实际代码来源 SHA 绑定生产证据；如最终新增证据提交，分别报告生产源码 SHA 与最终 HEAD。
+最终推送既有工作分支并核对其 CI，避免把先前 SHA 的通过冒充最终 HEAD 的通过。
+不合并主分支或部署其他外部服务；模板目录发布及本地正式生产按本文件授权执行。
+
+最终回复开头必须给出：
+G1：passed/blocked；T08：completed/partial/not_started；
+正式模板数；真实 P0 通过数；新增/复用案例数；
+CLI 已用/500；书签业务修复已用/5；有效截止及是否超时；
+生产源码 SHA、最终 HEAD、远端 CI；
+准确停止阶段、原始失败原因及下一步所需动作。
+
+不得只汇报准备完成和 CI 通过。
+若额度、截止、外部服务或真实门禁使工作无法继续，先完成已授权且不受阻的代码与交付，
+正式暂停对应真实生产，保存可恢复状态，如实报告实际边界。
+不得清零历史、提高第 5 轮上限、修改时钟、换 campaign、换固定样本、
+直接写库补通过、降低 P0 或用合成证据替代真实应用。
+
+十一、核验依据（固定版本）
+
+基线提交：
+https://github.com/liamamilin/atlas/commit/3033c609e1c4faf77273b8e2672bcb06db78f0cf
+该提交 CI：
+https://github.com/liamamilin/atlas/actions/runs/39262201674
+
+准备合同与实际请求：
+https://github.com/liamamilin/atlas/blob/3033c609e1c4faf77273b8e2672bcb06db78f0cf/docs/template-factory/g1-preparation-2026-10-19/CONTRACTS.md
+精确修订与绑定：
+https://github.com/liamamilin/atlas/blob/3033c609e1c4faf77273b8e2672bcb06db78f0cf/application-atlas-production-pack/template_factory/plan_revision.py
+现有预算登记和激活：
+https://github.com/liamamilin/atlas/blob/3033c609e1c4faf77273b8e2672bcb06db78f0cf/application-atlas-production-pack/template_factory/budget.py
+prepared 正式消费与冻结审阅提示：
+https://github.com/liamamilin/atlas/blob/3033c609e1c4faf77273b8e2672bcb06db78f0cf/application-atlas-production-pack/template_factory/cognition.py
+现有联接测试范围：
+https://github.com/liamamilin/atlas/blob/3033c609e1c4faf77273b8e2672bcb06db78f0cf/application-atlas-production-pack/tests/test_factory_plan_preparation.py
+
+本文件结束。
+
