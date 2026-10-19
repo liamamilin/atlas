@@ -1,0 +1,50 @@
+{
+ "scenario": {
+  "acceptance": [
+   "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+   "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+   "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+   "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+  ],
+  "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+  "id": "scn_7756e0007f6a463a97316f3f49c15248",
+  "leaf": "bookmark-manager",
+  "leaf_name": "书签管理器",
+  "name": "生活待购与灵感收藏夹",
+  "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+  "revision": 2,
+  "status": "ready",
+  "updated_at": "2026-10-16T14:18:20.407897+00:00",
+  "workflow": [
+   "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+   "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+   "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+   "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+   "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+  ]
+ },
+ "language": "zh",
+ "target_profile": {
+  "delivery_profile": "python-web",
+  "python": "3.12",
+  "storage": "SQLite",
+  "rendering": "server-rendered HTML"
+ },
+ "url_policy": {
+  "schemes": [
+   "http",
+   "https"
+  ],
+  "absolute": true,
+  "nonempty_valid_hostname": true,
+  "single_label_hosts": true,
+  "dns_required": false,
+  "preserve_original_text": true,
+  "p0_fetch": false
+ },
+ "required_adaptations": [
+  "F08/F11 IndexedDB/Dexie SPA source to SQLite SSR target",
+  "retain upstream dotted-host regex as source fact but map it as adjusted",
+  "case facts are not target requirements"
+ ]
+}

@@ -8,8 +8,8 @@
 | C02 | 统一规则、CONTRACT_COVERAGE、REPAIR_SCOPE、目标适配/URL政策 | 源码和聚合请求已冻结；83项聚焦检查通过。固定旧案例29观察与casebasis；scope fd3746…，仅A02单标签例负转正，其他断言意图保留 |
 | C03 | 真UI操作与负控、独立执行器边界 | 真Chromium两负控、23执行器合同fixture及helper通过；原machineplan/网络none/receipt机制保留。仅准备证据，不是实际应用运行 |
 | C04 | append-only授权、有效限额/窗口、原子取代和正式恢复 | 32项预算/真实临时库恢复测试通过；scope、旧job/candidate和checkpoint固定，过期/失败回滚；实际授权尚未登记或激活 |
-| C05 | 独立代码审查、本地完整检查、同新SHA远端完整CI | CODE_REVIEW.md及修复回归；verification/final-2完整13项全过且source无漂移，566后端/8可选skip、9web单元、17默认E2E、27工厂E2E、20严格Docker/0skip。当前推送最终新SHA核对远端，尚未激活补充窗口 |
-| C06 | 聚合修订、冻结、独立审阅、发布、标准包真实消费、P0/phase proof/宿主G1 | 未开始，等待前置；所有生产走正式服务 |
+| C05 | 独立代码审查、本地完整检查、同新SHA远端完整CI | 已通过：verification/final-2完整13项全过且source无漂移；566后端/8可选skip、9web单元、17默认E2E、27工厂E2E、20严格Docker/0skip。fc7e50b4656d4f07e5af65551b9d9e3ea542ef93远端39242394654两job全部step success，含独立Chromium负控；日志见ci-convergence-* |
+| C06 | 聚合修订、冻结、独立审阅、发布、标准包真实消费、P0/phase proof/宿主G1 | 已通过正式register/resume启动；amendment-response/resume-response及budget-after-resume保留。第3轮修复，job_a53c47f3694047489c4f82cfc2e346be；窗口截止2026-10-20 03:13:43+08:00。后续步骤执行中，尚无新模板/P0/G1通过 |
 | C07 | 原三场景T08实际生产/开发/抽验 | G1通过后直接执行，固定分母3不替换 |
 | C08 | 代码阶段推送、证据/失败/恢复/下一批建议 | 随步骤记录；不自动扩大范围或额度 |
 

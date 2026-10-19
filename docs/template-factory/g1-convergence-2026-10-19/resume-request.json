@@ -1,0 +1,191 @@
+{
+  "old_job_id": "job_4f30d0f41ce94a2cbd16ae7996fb27ab",
+  "artifact_id": "tpl_7f4c17e834c342e7b462e6bb8b6379e4",
+  "expected_digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+  "checkpoint_name": "blueprint-plan-0",
+  "checkpoint_digest": "85ef5a33154f4d1803ebd85b6f6cd35c275da8b3504476bfcd086d9b3e0bab0a",
+  "amendment_id": "bamd_9378738d1e274c409f756d92ec9c2ac5",
+  "idempotency_key": "atlas-g1-aggregate-resume-2026-10-19-v1",
+  "repair": {
+    "expected_digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+    "model": "opencode-go/deepseek-v4.1-flash",
+    "language": "zh",
+    "timeout": 600,
+    "note": "请对固定的旧冻结候选进行一次正式聚合修订，范围以同一请求中的 REPAIR_SCOPE.json 为准；reuse_spec=false，必须先预审规格，再生成/修订程序，冻结前执行宿主 authored-field 与程序 diff 门禁。不要调用或建议任何未授权模型/工具行为，不要声称测试或运行已通过。请返回完整的新规格及限定的五个程序文件，不能只做 spec-only 补丁。\n\n## Intended aggregate contract\n\nThis request revises the pinned draft only. It does not state that the old candidate passed, that repair-2 froze, or that any acceptance program ran. All original P0 feature IDs, phases, current-required status, and capabilities remain. A02 single-label hostname rejection is the sole authorized semantic replacement. Every other assertion intent remains; changes to its implementation may only add the specified browser/UI and directly necessary adaptations. F14/A15 stays P1.\n\n### Current-required contract coverage\n\nThe new `contract_coverage` object maps every P0 `current required` feature to a design basis, user entry, action, success state/navigation, failure, recovery, and existing acceptance IDs. Host checks enforce fixed schema/review-rule versions, feature and acceptance references, and completeness of the mapping. The frozen independent reviewer still judges whether each route is a real complete journey; field presence or keywords do not establish semantic completeness.\n\n### URL policy and A02 change\n\nA record URL must be an absolute, parseable HTTP(S) URL with a valid nonempty hostname. A single-label hostname such as `http://localhost` is valid. No DNS lookup, network reachability, or target fetch is required. Keep the original submitted URL string for persistence and opening; opening must navigate to that exact value. Saving, opening, and actively fetching are distinct; no P0 fetch is added. Preserve negative cases for missing scheme, unsupported schemes, empty/invalid hostname and assert rejection does not write. Move only the single-label hostname from A02's negative set to an explicit positive boundary example. Preserve the upstream dotted-host regex as a source observation and explain its target mapping as `adjusted`, because a dot is not a general URL-validity requirement. If the existing update API accepts a changed URL, recompute `hostname` from that URL. Do not move duplicate URL behavior to P0: F14/A15 remains P1.\n\n### UI contract and selectors\n\nThe browser adapter must use these stable selectors (and may use semantic equivalents only if the frozen authored contract explicitly declares them): category manager link `a[data-testid=\"category-manager\"]`; create form `form[data-testid=\"category-create-form\"]` with `input[name=\"name\"]`; rename form `form[data-testid=\"category-rename-form\"]` with `input[name=\"category_id\"]` and `input[name=\"name\"]`; category-delete form `form[data-testid=\"category-delete-form\"]` with `input[name=\"category_id\"]`; category-search form `form[data-testid=\"category-search-form\"]` with `select` or `input[name=\"category\"]` (category name) and `input[name=\"q\"]`; category links and GET `/` preserve both query values. Rename/delete forms carry `input[name=\"category_id\"]`. Per-record move/delete/restore forms `form[data-testid=\"record-move-form\"]`, `record-delete-form`, `record-restore-form` carry `input[name=\"record_id\"]`; move uses `select[name=\"category_id\"]` (API category ID), translated by the HTML handler to the category name expected by the existing move endpoint. Visible count is `[data-testid=\"category-count\"][data-category-id]`; record row is `tr[data-testid=\"record-row\"][data-record-id]` with `a[data-testid=\"record-open-link\"]` pointing to the exact saved URL, `target=\"_blank\"`, `rel=\"noopener\"`; validation feedback is `[data-testid=\"form-error\"]`. Category create/rename/delete submissions must operate through real forms, report duplicate/invalid/protected-category errors without mutation, preserve invalid input or provide an actionable recovery path, and navigate to the resulting category state on success. Category deletion migrates both active and soft-deleted records to `未整理`; a soft-deleted record remains restorable.\n\nCategory search is submitted from the real category page and preserves both selected category and q. Show selected category, retained query and matching/empty results. Test the same keyword across two categories and a no-match query within one category. The sidebar count is visibly rendered and counts active (non-trashed) records only; compare with the API and actual list after move, delete, and restore. Move, delete, restore and open are attributed to the selected row via `data-record-id`; open assertion verifies actual link/navigation target and exact saved URL. Form errors must not cause 5xx or mutate data; malformed JSON retains the existing `bad_request` and no-write behavior. Keep existing JSON API acceptance. Remove the unpaired “edit entry” UI promise; do not add a new P0 record-editing feature. Preserve any existing URL-update API contract and recalculate hostname if URL changes.\n\n### Existing assertions and decision explanations\n\nPreserve all existing P0 obligations not explicitly listed as additions or the A02 replacement: save and stable cross-restart data (A01), default/preseeded category and save behavior (A03), category move/persistence (A05), category filtering and counts (A06), keyword fields and empty result (A07), exact original URL opening/unknown ID (A08), soft-delete/restart/restore (A09), unknown IDs and malformed request non-mutation (A10), health/empty shell (A11), and invalid category save/move non-mutation (A12). Do not weaken status/error/data-integrity assertions for convenience. Keep D04's repair-2 impact correction: `trashed_at`, default list filtering, and `/restore`; do not reintroduce undefined `purge`. Clarify D07 with category-plus-keyword and active-only count behavior. Clarify D08 to describe the Python-web/SQLite/SSR target and its independent HTTP acceptance. D12 concerns flat category depth, not schema migration. The architecture describes `schema_meta(version)` and transactional versioned migrations; remove the erroneous attribution of migration strategy to D12.\n\n### Case adaptation input and source/target boundary\n\nRun case adaptation under a new `case-adaptation-aggregate-v1` input/revision while retaining logical retry scope `case-adaptation`. The actual formal adaptation input must include target profile `{delivery_profile: python-web, python: 3.12, storage: SQLite, rendering: server-rendered HTML}`, the URL policy stated above, and explicit adaptations: F08/F11 IndexedDB/Dexie + SPA are source facts while target uses SQLite + SSR; preserve local persistence/cross-session and single-user intent but mark implementation adjusted; preserve upstream dotted-host regex as source fact but map it as adjusted; source observations are not target requirements. Correct case-design explanations and derived `PRODUCT.md`: F08 must say persistence behavior is adopted but storage implementation is adjusted; F11 must say target is SSR rather than an adopted SPA shell. Use only valid IDs from the fixed case evidence basis for adopted/adjusted/not_adopted, and no invented evidence IDs. New target policies may cite this explicit instruction, not claim upstream evidence. Preserve fixed case revision, upstream commit, case-basis digest, and all 29 immutable facts.\n\n### Allowed files and exact comparison\n\nThe only authorized program paths are `acceptance/p0_library.py`, `acceptance/p0_organize.py`, `acceptance/p0_find_open.py`, `acceptance/p0_recovery.py`, and `acceptance/README.md`. Keep all other existing acceptance/reference program files and their assertion intents. Do not edit `acceptance/plan.json`, dependencies, or application code. `common.py` is not authorized absent a demonstrated concrete helper gap; if such a gap is found, stop and prepare a separately reviewed scope instead of expanding this request. The host must compare authored fields and program files to the pinned baseline before freezing. Review the exact pre-freeze authored diff and program diff, including unchanged identities/phases/current-required statuses and all preserved assertions. Rendered `template.json`, product docs, host metadata and integrity files are derived outputs and are guarded by authored scope plus host digests, not treated as acceptance program edits.\n\n### Historical repair-2 reconciliation\n\nThe earlier repair-2 request was spec-only and never froze. Preserve its history and baseline. Carry forward its `bad_request` malformed-JSON correction and corrected D04 impact. Do not carry forward its dotted-host restriction: this request's explicit target URL policy supersedes that one patch. The original three-point request remains historical evidence and is not treated as the current complete scope.\n",
+    "edit_paths": [
+      "acceptance/p0_library.py",
+      "acceptance/p0_organize.py",
+      "acceptance/p0_find_open.py",
+      "acceptance/p0_recovery.py",
+      "acceptance/README.md"
+    ],
+    "reuse_spec": false,
+    "repair_scope": {
+      "version": "atlas.aggregate-repair-scope.v1",
+      "baseline": {
+        "artifact_id": "tpl_7f4c17e834c342e7b462e6bb8b6379e4",
+        "expected_digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+        "case_basis_digest": "a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589",
+        "immutable_case_facts": 29
+      },
+      "known_blockers": [
+        {
+          "feature_id": "F03",
+          "acceptance_id": "A04",
+          "decision_id": "D03",
+          "basis": "Category management needs actual HTML create/rename/delete journeys, protection, validation and reassignment of active and soft-deleted records."
+        },
+        {
+          "feature_id": "F04",
+          "acceptance_id": "A05",
+          "decision_id": "D03",
+          "basis": "The existing move capability needs browser form coverage and visible result/feedback while preserving persistence checks."
+        },
+        {
+          "feature_id": "F05",
+          "acceptance_id": "A06",
+          "decision_id": "D07",
+          "basis": "P0 category browsing requires visible counts that include active records only and agree with API/list results after state changes."
+        },
+        {
+          "feature_id": "F06",
+          "acceptance_id": "A07",
+          "decision_id": "D07",
+          "basis": "Category-scoped search must submit category and q together and show selected category, retained query, and matching/empty results."
+        },
+        {
+          "feature_id": "F08",
+          "acceptance_id": "A01",
+          "decision_id": "D08",
+          "basis": "The source IndexedDB/Dexie implementation is not the target Python/SQLite persistence implementation; correct target rationale while preserving restart assertion."
+        },
+        {
+          "feature_id": "F09",
+          "acceptance_id": "A09",
+          "decision_id": "D04",
+          "basis": "HTML soft-delete/restore recovery must be exercised; category deletion also needs trashed records to remain recoverable."
+        },
+        {
+          "feature_id": "F10",
+          "acceptance_id": "A10",
+          "decision_id": null,
+          "basis": "Malformed requests and form validation need explicit non-mutating feedback/recovery; retain JSON bad_request and existing API behavior."
+        },
+        {
+          "feature_id": "F10",
+          "acceptance_id": "A02",
+          "decision_id": null,
+          "basis": "Correct the URL boundary from dotted-host rejection to absolute parseable HTTP(S) with a valid nonempty hostname."
+        },
+        {
+          "feature_id": "F10",
+          "acceptance_id": "A12",
+          "decision_id": "D03",
+          "basis": "Invalid category input must retain failure/no-mutation semantics with usable HTML feedback."
+        },
+        {
+          "feature_id": "F11",
+          "acceptance_id": "A11",
+          "decision_id": "D08",
+          "basis": "The target shell is Python server-rendered HTML, not the source SPA mount; preserve the empty-library readiness contract."
+        }
+      ],
+      "authorized_assertion_changes": [
+        {
+          "acceptance_id": "A02",
+          "change": "single_label_hostname_negative_to_positive",
+          "rationale": "The explicit target policy accepts any absolute parseable HTTP(S) URL with a valid nonempty hostname, without requiring DNS or a dot. This is the sole authorized semantic replacement of an existing assertion; malformed scheme, non-HTTP(S), empty/invalid hostname and no-write-on-failure negatives remain."
+        }
+      ],
+      "authored_field_paths": [
+        [
+          "architecture_markdown"
+        ],
+        [
+          "features",
+          "F08",
+          "reason"
+        ],
+        [
+          "features",
+          "F11",
+          "reason"
+        ],
+        [
+          "acceptance",
+          "A02",
+          "goal"
+        ],
+        [
+          "acceptance",
+          "A04",
+          "goal"
+        ],
+        [
+          "acceptance",
+          "A06",
+          "goal"
+        ],
+        [
+          "acceptance",
+          "A07",
+          "goal"
+        ],
+        [
+          "acceptance",
+          "A09",
+          "goal"
+        ],
+        [
+          "acceptance",
+          "A10",
+          "goal"
+        ],
+        [
+          "acceptance",
+          "A12",
+          "goal"
+        ],
+        [
+          "decisions",
+          "D03",
+          "impact"
+        ],
+        [
+          "decisions",
+          "D04",
+          "impact"
+        ],
+        [
+          "decisions",
+          "D07",
+          "impact"
+        ],
+        [
+          "decisions",
+          "D08",
+          "impact"
+        ],
+        [
+          "contract_coverage",
+          "schema"
+        ],
+        [
+          "contract_coverage",
+          "review_rules_version"
+        ],
+        [
+          "contract_coverage",
+          "features"
+        ]
+      ],
+      "edit_paths": [
+        "acceptance/p0_library.py",
+        "acceptance/p0_organize.py",
+        "acceptance/p0_find_open.py",
+        "acceptance/p0_recovery.py",
+        "acceptance/README.md"
+      ]
+    }
+  }
+}

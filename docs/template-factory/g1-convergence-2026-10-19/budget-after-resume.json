@@ -1,0 +1,56 @@
+{
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "cli_sessions_used": 43,
+  "cli_sessions_limit": 500,
+  "active": 1,
+  "limits": {
+    "cli_sessions": 500,
+    "production_concurrency": 2,
+    "runtime_concurrency": 1,
+    "product_repairs": 2,
+    "transient_retries": 2,
+    "phase_seconds": 28800
+  },
+  "segments": [
+    {
+      "phase": "G1",
+      "started": 1792389754.633465,
+      "deadline": 1792418554.633465,
+      "remaining_seconds": 10123.37758898735
+    }
+  ],
+  "paused": false,
+  "paused_at": null,
+  "pause_reason": null,
+  "repairs": [
+    {
+      "product_id": "product-c42848f63251507bd9d911a5",
+      "repairs_used": 3
+    }
+  ],
+  "amendments": [
+    {
+      "id": "bamd_9378738d1e274c409f756d92ec9c2ac5",
+      "campaign_id": "atlas-v1-first-production-2026-10-19",
+      "product_id": "product-c42848f63251507bd9d911a5",
+      "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+      "source_ref": "ATLAS_G1_CONVERGENCE_CODEX_INSTRUCTIONS.txt",
+      "source_digest": "cc3df91f60afad1a2bf4e862e534be36cb8fcc1f2b8d07687995b325fa7841ae",
+      "summary": "用户将附件交付并明确指示执行：仅原书签产品累计业务修复由2调整为4，允许一次最长8小时的G1补充窗口，完成前置修复及同一新SHA远端完整CI后，在正式恢复真实生产时激活。保留原campaign/plan/product/依据及全部历史。",
+      "reason": "合并处理已承诺P0合同、目标案例适配、URL政策与真实UI验收缺口；原三点请求过窄且已paused_budget。全局500、生产并发2、运行并发1、瞬时重试2及其他产品修复2均保持。",
+      "idempotency_key": "atlas-g1-convergence-user-authorization-2026-10-19-v1",
+      "version": 1,
+      "old_repair_limit": 2,
+      "new_repair_limit": 4,
+      "baseline_repair_count": 2,
+      "baseline_cli_sessions": 42,
+      "old_deadline": 1792418554.633465,
+      "window_seconds": 28800,
+      "created_at": 1792408411.830824,
+      "activated_at": 1792408423.754534,
+      "new_deadline": 1792437223.754534
+    }
+  ],
+  "provider_requests": null,
+  "cost": null
+}
