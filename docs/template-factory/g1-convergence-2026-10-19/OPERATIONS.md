@@ -39,3 +39,11 @@ PYTHONPATH=application-atlas-production-pack python3 -m template_factory.batch_c
 ## T08
 
 仅宿主重新评估 G1 真正 passed 后，使用原 `docs/template-factory/v1-2026-10-19/t08-request.json` 正式 preview，保存新 plan/digest 后用稳定幂等键 run。固定书签、月度预算、多项目会议笔记三个分母；不替换失败样本，不扩大到十个。全局500和其他产品2轮不变，T08首次正式运行开启自己的八小时窗口。
+
+## 已发生的第3轮及协议恢复
+
+本次实际 amendment 为 `bamd_9378738d1e274c409f756d92ec9c2ac5`，已在正式 resume-product 时激活：1792408423.754534，截止1792437223.754534（北京时间2026-10-20 03:13:43.754534）。不得再次登记/激活以延期。旧任务已正式取代，新任务 `job_a53c47f3694047489c4f82cfc2e346be` 的 attempt1 完成案例适配及生成CLI交付后，被宿主 coverage 外层/内层不匹配拒绝；44次调用、3轮修复，父plan已正式pause。
+
+协议修复完成并取得新代码完整本地/远端通过后，可通过已有 `POST /api/factory/jobs/job_a53c47f3694047489c4f82cfc2e346be/retry` 入队同一任务，再用原plan正式resume。此处普通retry仅恢复这个 failed 后继，不能复用为 paused_budget 的通用恢复，也不能再调用首次 resume-product。恢复 receipt 必须证明旧生成交付的完整input/source/model/stdout/result均匹配；原CLI已收费，不退款、不重复生成。严格源树只读恢复核对见 `repair-3/recovery-readonly-check.json`，它不代表实际重试已执行。
+
+若早期scope检查发现原提案越界，保存精确还原反馈后使用既有index1业务修复，占用第4轮。达到4后不允许额外模板/内部规格/应用业务修复；瞬时协议重试也不重置历史。停止时保留正式状态和原失败，不能通过改job身份继续。

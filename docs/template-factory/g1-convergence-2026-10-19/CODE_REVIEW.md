@@ -21,3 +21,11 @@
 另已核查：新 case-adaptation-aggregate-v1 是正式新输入和检查点，包含 Python/SQLite/SSR 与 URL 政策；原案例事实不改。规范与程序差分检查时点在生成完成后、冻结前。独立运行器读取宿主固定摘要的正式预算响应并核对 job/plan/product/segment，分界检查绝对有效截止时间。
 
 最终 focused/full CI 与真实生产状态另见本目录后续证据；未执行的真实模型、应用、phase proof 均不在此标记通过。
+
+## 真实第3轮交付后的协议恢复修复
+
+真实 `job_a53c47f3694047489c4f82cfc2e346be/attempt-1/blueprint-generate-0` CLI 已完成交付，但 coverage 位于外层，宿主仅接受 spec 内层。新增无损且无歧义的双格式接收，原始 result 不改；同一 job 正式 retry 可验证成功 summary（包括 failure_code 为空）、requested model、完整输入/source 字节树、stdout SHA 及 NDJSON text 解析后的 result，保存恢复 receipt，不再调用同一 generate。任何漂移拒绝恢复，不修改历史 CLI 日志或账本。
+
+Sol 独立只读复核确认真实 V1 accepted-facts 重建 RESEARCH.md 与原始 source 字节完全相同，因此没有加入字段顺序等价或放宽 source gate。早期 authored scope 门禁在真实提案与 SPECIFICATION/ARCHITECTURE 保存后、规格审阅和程序生成前；越界产生精确 baseline restoration feedback，再走既有 index1 patch 与稳定的正式 repair 计费。宿主不静默恢复模型字段。最终 scope、预冻结独立语义审阅、冻结后独立审阅均保留。新增 Pipeline 夹具验证 aggregate 分支恢复、0 次重复 generate、0 次 index0 设计/程序、显式 patch 和范围恢复；该夹具不等于真实模型或真实 P0 证据。
+
+恢复入口复核另发现P1：普通 `POST jobs/{id}/retry` 接受 cancelled，可使已有 supersession 的旧任务重新入队并获得新 token。当前生产plan暂停且旧任务未被重试，没有发生双重执行。定点修复在 retry 原事务内检查正式 supersession 记录，返回409，保留旧任务 error/attempt/终态；兼容尚无该表的旧数据库与普通取消重试。该修复后的最终检查单独保存，不能用此前 source 为 ce6631… 的通过结果代替。

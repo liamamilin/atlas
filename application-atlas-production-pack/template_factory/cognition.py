@@ -8,8 +8,8 @@ import difflib
 from pathlib import Path
 import textwrap
 
-from atlas_runtime import atomic_json
-from .artifacts import archive_tree, relative, tree_manifest
+from atlas_runtime import atomic_json, atomic_write
+from .artifacts import archive_tree, copy_tree, relative, tree_manifest
 from .blueprints import (
     SCHEMA,
     KIND,
@@ -39,6 +39,182 @@ AUTHORED_FIELDS = {
     "limits",
 }
 OPTIONAL_AUTHORED_FIELDS = {"contract_coverage"}
+
+
+def _normalize_generation_envelope(value):
+    """Accept the two unambiguous generator envelopes without mutating raw output."""
+    if not isinstance(value, dict):
+        raise FactoryError("cognition generation result must be an object", "cli_protocol", 409)
+    if set(value) == {"spec", "file_plan"}:
+        if not isinstance(value["spec"], dict):
+            raise FactoryError("cognition spec must be an object", "cli_protocol", 409)
+        return value, None
+    if set(value) != {"spec", "contract_coverage", "file_plan"}:
+        raise FactoryError("cognition generation result has unexpected root fields", "cli_protocol", 409)
+    if not isinstance(value["spec"], dict) or not isinstance(value["contract_coverage"], dict):
+        raise FactoryError("outer contract coverage envelope is malformed", "cli_protocol", 409)
+    if "contract_coverage" in value["spec"]:
+        raise FactoryError("contract coverage appears both inside and outside spec", "cli_protocol", 409)
+    normalized = {
+        "spec": {**value["spec"], "contract_coverage": value["contract_coverage"]},
+        "file_plan": value["file_plan"],
+    }
+    validate_contract_coverage(normalized["spec"], required=True)
+    receipt = {
+        "schema": "atlas.generation-envelope-receipt.v1",
+        "normalization": "move exact top-level contract_coverage into spec.contract_coverage",
+        "raw_result_digest": digest(value),
+        "outer_contract_coverage_digest": digest(value["contract_coverage"]),
+        "normalized_result_digest": digest(normalized),
+        "raw_root_keys": sorted(value),
+        "raw_result_file": "result.json",
+    }
+    return normalized, receipt
+
+
+def _aggregate_scope_restorations(before_spec, after_spec, scope):
+    """Describe unauthorized authored changes as exact values to restore."""
+    allowed = {tuple(path) for path in scope.get("authored_field_paths", [])}
+    restorations = []
+    for field in (
+        "title", "roles", "features", "decisions", "phases", "acceptance",
+        "architecture_markdown", "limits", "contract_coverage",
+    ):
+        before, after = before_spec.get(field), after_spec.get(field)
+        if before == after:
+            continue
+        if field in {"roles", "features", "decisions", "phases", "acceptance"}:
+            before_rows = {row.get("id"): row for row in before or []}
+            after_rows = {row.get("id"): row for row in after or []}
+            if before_rows.keys() != after_rows.keys():
+                restorations.append({
+                    "path": [field], "baseline_value": before, "proposed_value": after,
+                    "reason": "Row identities differ; exact-spec-patch cannot add or remove identities.",
+                })
+                continue
+            for identity, baseline_row in before_rows.items():
+                proposed_row = after_rows[identity]
+                for key in baseline_row.keys() | proposed_row.keys():
+                    path = (field, identity, key)
+                    if baseline_row.get(key) != proposed_row.get(key) and path not in allowed:
+                        restorations.append({
+                            "path": list(path), "baseline_value": baseline_row.get(key),
+                            "proposed_value": proposed_row.get(key),
+                        })
+        elif field == "contract_coverage":
+            before_coverage = before or {}
+            after_coverage = after or {}
+            changed_keys = set(before_coverage) | set(after_coverage)
+            for key in sorted(changed_keys):
+                path = (field, key)
+                if before_coverage.get(key) != after_coverage.get(key) and path not in allowed:
+                    restorations.append({
+                        "path": list(path), "baseline_value": before_coverage.get(key),
+                        "proposed_value": after_coverage.get(key),
+                    })
+        elif (field,) not in allowed:
+            restorations.append({
+                "path": [field], "baseline_value": before, "proposed_value": after,
+            })
+    return restorations
+
+
+def _parse_delivered_stdout(raw_stdout):
+    """Mirror CLI text-event collection, then use the canonical CLI result parser."""
+    text_parts = []
+    for line in raw_stdout.splitlines():
+        try:
+            event = json.loads(line)
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            continue
+        if not isinstance(event, dict) or event.get("type") != "text":
+            continue
+        part = event.get("part") or {}
+        content = part.get("text") if isinstance(part, dict) else None
+        content = content or event.get("text")
+        if isinstance(content, str):
+            text_parts.append(content)
+    result_text = "\n".join(text_parts).strip()
+    if not result_text:
+        result_text = raw_stdout.decode(errors="replace").strip()
+    from .cli import parse_result
+
+    return parse_result(result_text, redundant_closing=True)
+
+
+def _recover_prior_generation_delivery(
+    *, store_root, job_id, current_attempt, current_input, current_source, requested_model
+):
+    """Recover only a matching successful same-job initial generator delivery."""
+    from pathlib import Path
+
+    from .artifacts import tree_manifest
+
+    if current_attempt <= 1:
+        return None
+    jobs_root = Path(store_root) / "jobs" / job_id
+    if (jobs_root / "blueprint-plan-0.json").exists():
+        return None
+    current_input_digest = digest(current_input)
+    current_source_digest = digest(tree_manifest(current_source))
+    for attempt_number in range(current_attempt - 1, 0, -1):
+        prior = jobs_root / f"attempt-{attempt_number}" / "blueprint-generate-0"
+        evidence_paths = [
+            prior / "input.json",
+            prior / "source",
+            prior / "cli-summary.json",
+            prior / "stdout.log",
+            prior / "result.json",
+        ]
+        if not all(path.exists() and not path.is_symlink() for path in evidence_paths):
+            continue
+        try:
+            prior_input = json.loads((prior / "input.json").read_text(encoding="utf-8"))
+            if digest(prior_input) != current_input_digest:
+                continue
+            prior_source = prior / "source"
+            prior_source_digest = digest(tree_manifest(prior_source))
+            if prior_source_digest != current_source_digest:
+                continue
+            summary = json.loads((prior / "cli-summary.json").read_text(encoding="utf-8"))
+            if (
+                summary.get("requested_model") != requested_model
+                or summary.get("cli_status") != "completed"
+                or summary.get("exit_code") != 0
+                or summary.get("delivery_status") != "delivered"
+                or summary.get("failure_code") is not None
+            ):
+                continue
+            raw_stdout = (prior / "stdout.log").read_bytes()
+            stdout_digest = hashlib.sha256(raw_stdout).hexdigest()
+            if stdout_digest != summary.get("stdout_sha256"):
+                continue
+            raw_result = json.loads((prior / "result.json").read_text(encoding="utf-8"))
+            parsed_result = _parse_delivered_stdout(raw_stdout)
+            if digest(parsed_result) != digest(raw_result):
+                continue
+            if set(raw_result) != {"spec", "contract_coverage", "file_plan"}:
+                continue
+            if not isinstance(raw_result.get("spec"), dict) or "contract_coverage" in raw_result["spec"]:
+                continue
+            normalized, envelope_receipt = _normalize_generation_envelope(raw_result)
+            receipt = {
+                **envelope_receipt,
+                "recovery": "same-job-prior-attempt-successful-generation-delivery",
+                "no_new_cli_call": True,
+                "prior_attempt": attempt_number,
+                "prior_stage": f"attempt-{attempt_number}/blueprint-generate-0",
+                "input_digest": current_input_digest,
+                "source_tree_digest": current_source_digest,
+                "cli_summary_digest": digest(summary),
+                "stdout_sha256": stdout_digest,
+                "raw_result_digest": digest(raw_result),
+                "parsed_stdout_result_digest": digest(parsed_result),
+            }
+            return raw_result, normalized, receipt
+        except (OSError, ValueError, TypeError, KeyError, FactoryError):
+            continue
+    return None
 
 AGGREGATE_SEMANTIC_REVIEW_PROMPT = """Independently review a proposed aggregate repair BEFORE it is frozen. Read input.json and compare source/baseline/ with source/candidate/ directly. Read each baseline/ARCHITECTURE.md and candidate/ARCHITECTURE.md in full as the line-preserving projection of architecture_markdown; cross-check against the corresponding AUTHORED_FIELDS.json. The supplied scope and exact diff are the authorization boundary. Judge semantic assertion intent, not keywords or superficial AST/count patterns. Confirm every prior assertion intent remains except the explicitly authorized A02 change from rejecting to accepting a single-label hostname; A02 must still reject missing scheme, unsupported scheme and empty/invalid hostname without writing. Added/changed tests must be direct UI adaptations/additions, not weakened existing obligations. Check the authored specification preserves feature identities, phases and current-required status; evaluate contract coverage as real reachable journeys rather than populated fields. Check case adaptation accurately distinguishes IndexedDB/Dexie + SPA source facts from SQLite + Python SSR target and applies the explicit URL policy. Return JSON {\"identity\":{\"scope_digest\":\"...\",\"diff_digest\":\"...\",\"baseline_digest\":\"...\",\"candidate_authored_digest\":\"...\",\"baseline_program_digest\":\"...\",\"candidate_program_digest\":\"...\"},\"outcome\":\"passed|blocked|uncertain\",\"summary\":\"...\",\"checks\":[{\"id\":\"assertion_intent_preserved\",\"outcome\":\"passed|blocked|uncertain\",\"reason\":\"...\"},{\"id\":\"scope_fidelity\",\"outcome\":\"passed|blocked|uncertain\",\"reason\":\"...\"},{\"id\":\"case_adaptation\",\"outcome\":\"passed|blocked|uncertain\",\"reason\":\"...\"}],\"findings\":[{\"severity\":\"blocker|uncertain|suggestion\",\"basis\":\"...\"}]}. Use only passed when the exact intent is preserved and every check is substantively satisfied. Any weakened or removed unauthorized assertion is blocked; unresolved evidence is uncertain. Do not execute programs or claim runtime/test success. This review is an additional freeze gate and does not replace frozen-candidate cognitive review."""
 
@@ -930,10 +1106,10 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
         if any(s["name"] not in accepted_ids for s in research["sources"]):
             raise FactoryError("research checkpoint includes unaccepted evidence", "case_adaptation_invalid", 409)
     elif repair:
-        research = checkpoint(
+        research = validate_research(checkpoint(
             "blueprint-research",
             lambda: validate_research(repair["research"]),
-        )
+        ))
     elif pipeline.store.checkpoint(job["id"], "blueprint-research") is not None:
         # Older production attempts checkpointed only the normalized research.
         # Reuse that authenticated checkpoint before considering any new call.
@@ -1066,7 +1242,6 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
     previous = None
     if repair:
         from .api import controlled_path
-        from .artifacts import copy_tree
 
         previous = controlled_path(pipeline.store, repair["bundle_path"])
         previous_spec = verify_frozen(previous, repair["digest"])
@@ -1262,14 +1437,17 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                             change["path"] for change in raw["spec_changes"]
                         ],
                         "file_plan_changes": raw.get("file_plan_changes", []),
+                        "scope_failure_receipt": (
+                            "SCOPE_FAILURE_" + str(index - 1) + ".json"
+                            if (context / ("SCOPE_FAILURE_" + str(index - 1) + ".json")).is_file()
+                            else None
+                        ),
                         "scope": "Exact model-authored local specification repair. Unaddressed fields, row identities and file inventory retained by host; not acceptance evidence.",
                     },
                 )
                 return revised
-            result = agent(
-                "blueprint-generate-" + str(index),
-                GENERATE_PROMPT,
-                {
+            generation_stage = "blueprint-generate-" + str(index)
+            generation_input = {
                     "leaf": snapshot["leaf"],
                     "scenario": snapshot["scenario"],
                     "language": config.get("language", "zh"),
@@ -1290,9 +1468,53 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                     if repair
                     else None,
                     "source_inventory": sorted(tree_manifest(context)),
-                },
-                context,
+                }
+            owned_generation_input = generation_input
+            leaf = generation_input.get("leaf")
+            if isinstance(leaf, dict) and isinstance(leaf.get("content"), str):
+                owned_generation_input = {
+                    **generation_input,
+                    "leaf": {**leaf, "content_file": "leaf.md"},
+                }
+            recovered = None
+            can_recover_generation = (
+                not repair
+                or (
+                    bool(repair.get("repair_scope"))
+                    and not repair.get("reuse_spec")
+                    and repair.get("spec_edit_paths") is None
+                )
             )
+            if can_recover_generation and index == 0 and plan is None:
+                recovered = _recover_prior_generation_delivery(
+                    store_root=pipeline.store.root,
+                    job_id=job["id"],
+                    current_attempt=job["attempt"],
+                    current_input=owned_generation_input,
+                    current_source=context,
+                    requested_model=config["model"],
+                )
+            if recovered:
+                raw_result, result, receipt = recovered
+                recovered_stage = attempt / generation_stage
+                recovered_stage.mkdir()
+                atomic_json(recovered_stage / "input.json", owned_generation_input)
+                if isinstance(leaf, dict) and isinstance(leaf.get("content"), str):
+                    atomic_write(recovered_stage / "leaf.md", leaf["content"])
+                copy_tree(context, recovered_stage / "source")
+                atomic_json(recovered_stage / "result.json", raw_result)
+                atomic_json(recovered_stage / "recovery-receipt.json", receipt)
+                stage(generation_stage, "Recovered verified prior successful delivery; no new model call")
+            else:
+                raw_result = agent(
+                    generation_stage,
+                    GENERATE_PROMPT,
+                    generation_input,
+                    context,
+                )
+                result, receipt = _normalize_generation_envelope(raw_result)
+                if receipt:
+                    atomic_json(attempt / generation_stage / "normalization-receipt.json", receipt)
             validate_file_plan(result, allow_reuse=bool(repair), require_runtime=bool(runtime_protocol))
             return result
 
@@ -1324,6 +1546,52 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             )
         atomic_json(context / "SPECIFICATION.json", plan)
         (context / "ARCHITECTURE.md").write_text(plan["spec"]["architecture_markdown"])
+        if repair and repair.get("repair_scope") and not repair.get("reuse_spec") and repair.get("spec_edit_paths") is None:
+            baseline_spec = verify_frozen(previous, repair["digest"])
+            try:
+                validate_repair_diff(
+                    baseline_spec, plan["spec"], {}, {}, repair["repair_scope"]
+                )
+            except FactoryError as scope_error:
+                restorations = _aggregate_scope_restorations(
+                    baseline_spec, plan["spec"], repair["repair_scope"]
+                )
+                scope_failure = {
+                    "schema": "atlas.aggregate-spec-scope-failure.v1",
+                    "scope_version": repair["repair_scope"]["version"],
+                    "baseline_artifact_digest": repair["digest"],
+                    "baseline_authored_digest": digest({
+                        key: baseline_spec.get(key)
+                        for key in AUTHORED_FIELDS | OPTIONAL_AUTHORED_FIELDS
+                        if key in baseline_spec
+                    }),
+                    "proposal_digest": digest(plan),
+                    "error": str(scope_error),
+                    "baseline_restorations": restorations,
+                    "instruction": "Restore listed unauthorized authored values exactly to baseline; this restores the original authorization boundary and does not expand scope.",
+                }
+                atomic_json(context / ("SCOPE_FAILURE_" + str(index) + ".json"), scope_failure)
+                (context / "PREVIOUS_PROPOSAL.json").write_text(
+                    json.dumps(plan, ensure_ascii=False, indent=2)
+                )
+                feedback = [
+                    "The host rejected this aggregate proposal before independent design review and before any program authoring.",
+                    "Repair only by restoring unauthorized values to the pinned baseline. This is not permission to expand the queued scope.",
+                    "Scope version: " + repair["repair_scope"]["version"],
+                    "Host rejection: " + str(scope_error),
+                    "Exact baseline restorations (path and required value):",
+                    json.dumps(restorations, ensure_ascii=False, indent=2),
+                    "Preserve all authorized changes and the complete file plan.",
+                ]
+                (context / "DESIGN_FEEDBACK.md").write_text("\n\n".join(feedback))
+                errors.append("Host aggregate authored-field scope gate: " + str(scope_error))
+                if index < config["repair_attempts"]:
+                    continue
+                raise FactoryError(
+                    "aggregate proposal remains outside its authorized authored-field scope",
+                    "repair_scope_violation",
+                    409,
+                ) from scope_error
         # Review the knowledge and journeys before paying to author every program.
         if not (repair and repair.get("reuse_spec")):
             sections = [

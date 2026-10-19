@@ -42,6 +42,7 @@ class WeakeningAggregateCLI(FakeCognitionCLI):
     weaken_program = False
     aggregate_semantic_outcome = "blocked"
     program_content = None
+    architecture_addition = None
 
     def run(self, directory, prompt, model, timeout, cancelled, progress):
         if self.weaken_program and directory.name.startswith("blueprint-code"):
@@ -50,7 +51,13 @@ class WeakeningAggregateCLI(FakeCognitionCLI):
             if path == "acceptance/p0_organize.py":
                 content = self.program_content or "# Deliberately weakened: no category assertions remain.\n"
                 return {"path": path, "content": content}
-        return super().run(directory, prompt, model, timeout, cancelled, progress)
+        result = super().run(directory, prompt, model, timeout, cancelled, progress)
+        if (
+            directory.name.startswith("blueprint-generate-")
+            and self.architecture_addition
+        ):
+            result["spec"]["architecture_markdown"] += self.architecture_addition
+        return result
 
 
 class SpecPatchTests(unittest.TestCase):
@@ -128,6 +135,8 @@ class SpecPatchTests(unittest.TestCase):
         job_id = batch["jobs"][0]["id"]
         self.cli = WeakeningAggregateCLI(self.source)
         self.cli.weaken_program = True
+        self.cli.scope_repair_baseline = spec
+        self.cli.architecture_addition = "\n\nScoped aggregate architecture clarification."
         from template_factory.pipeline import Pipeline
         pipeline = Pipeline(self.store, cli=self.cli)
         with self.assertRaisesRegex(FactoryError, "did not pass"):
@@ -160,6 +169,7 @@ class SpecPatchTests(unittest.TestCase):
         shutil.copytree(g1_source, self.source)
         _, _, original = self.produce()
         original_source = self.store.root / original["bundle_path"] / "source"
+        spec = json.loads((original_source / "template.json").read_text())
         program = (original_source / "acceptance/p0_organize.py").read_text()
         scope = {
             "version": "atlas.aggregate-repair-scope.v1",
@@ -177,6 +187,8 @@ class SpecPatchTests(unittest.TestCase):
         self.cli.weaken_program = True
         self.cli.aggregate_semantic_outcome = "passed"
         self.cli.program_content = program + "\n# Additive repair note; existing assertions are retained.\n"
+        self.cli.scope_repair_baseline = spec
+        self.cli.architecture_addition = "\n\nScoped aggregate architecture clarification."
         from template_factory.pipeline import Pipeline
         pipeline = Pipeline(self.store, cli=self.cli)
         with patch("template_factory.cognition.freeze_blueprint", side_effect=FactoryError("synthetic stop after semantic checkpoint")):

@@ -90,6 +90,64 @@ class FactoryBudgetV1Tests(unittest.TestCase):
         with self.assertRaises(FactoryError):
             ledger.record_repair("other-product", "other-third")
 
+    def test_g1_index_one_repair_is_idempotent_across_ledger_restart(self):
+        """The authorized repair key survives restart without charging twice."""
+        self._seed_original_g1_deadline()
+        ledger = BudgetLedger(self.store, campaign_id=G1_AMENDMENT_CAMPAIGN,
+                              clock=lambda: self.now[0])
+
+        service = BudgetAmendmentService(self.store, clock=lambda: self.now[0])
+        amendment = service.register(self._amendment_request())
+        self.assertEqual(amendment["baseline_repair_count"], 2)
+        self.assertEqual(amendment["baseline_cli_sessions"], 42)
+        service.activate(amendment["id"])
+
+        # Keep the baseline authorization proof exact, then use the normal
+        # reservation API to bring cumulative call usage to the current 44.
+        for index in range(2):
+            reservation = ledger.reserve(
+                G1_AMENDMENT_PRODUCT, "G1", "production", 60,
+                job_id=f"job_fixture:call-{index}",
+                plan_id=G1_AMENDMENT_PLAN,
+            )
+            ledger.mark_started(reservation["id"])
+            ledger.finish(reservation["id"], "completed")
+
+        first = ledger.record_repair(
+            G1_AMENDMENT_PRODUCT, "spec-repair:job_fixture:0",
+            plan_id=G1_AMENDMENT_PLAN,
+        )
+        self.assertTrue(first["recorded"])
+        self.assertEqual(first["repairs_used"], 3)
+        index_one = ledger.record_repair(
+            G1_AMENDMENT_PRODUCT, "spec-repair:job_fixture:1",
+            plan_id=G1_AMENDMENT_PLAN,
+        )
+        self.assertTrue(index_one["recorded"])
+        self.assertEqual(index_one["repairs_used"], 4)
+
+        restarted = BudgetLedger(self.store, campaign_id=G1_AMENDMENT_CAMPAIGN,
+                                 clock=lambda: self.now[0])
+        replay = restarted.record_repair(
+            G1_AMENDMENT_PRODUCT, "spec-repair:job_fixture:1",
+            plan_id=G1_AMENDMENT_PLAN,
+        )
+        self.assertFalse(replay["recorded"])
+        self.assertEqual(replay["repairs_used"], 4)
+        with self.assertRaises(FactoryError) as caught:
+            restarted.record_repair(
+                G1_AMENDMENT_PRODUCT, "spec-repair:job_fixture:2",
+                plan_id=G1_AMENDMENT_PLAN,
+            )
+        self.assertEqual(caught.exception.code, "budget_repair_limit")
+        snapshot = restarted.snapshot()
+        self.assertEqual(snapshot["cli_sessions_used"], 44)
+        self.assertEqual(snapshot["limits"]["cli_sessions"], 500)
+        self.assertEqual(snapshot["repairs"], [{
+            "product_id": G1_AMENDMENT_PRODUCT,
+            "repairs_used": 4,
+        }])
+
     def test_g1_amendment_rejects_other_campaign_and_mismatched_idempotent_request(self):
         self._seed_original_g1_deadline()
         service = BudgetAmendmentService(self.store, clock=lambda: self.now[0])

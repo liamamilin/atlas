@@ -1,0 +1,30 @@
+
+> test:e2e
+> playwright test
+
+[WebServer] (node:89522) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 17 tests using 1 worker
+
+(node:89530) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/tests/core.spec.ts:24:1 › browse opens a generated type leaf without browser errors (832ms)
+  ✓   2 e2e/tests/core.spec.ts:45:1 › type page uses a stable source fallback without canonical API files (621ms)
+  ✓   3 e2e/tests/core.spec.ts:55:1 › draft editor exposes dirty state and saves before deletion (856ms)
+  ✓   4 e2e/tests/core.spec.ts:90:1 › draft generation completion hydrates the editor (4.8s)
+  ✓   5 e2e/tests/core.spec.ts:99:1 › draft polling exposes a stale state and retry affordance (4.9s)
+  ✓   6 e2e/tests/core.spec.ts:124:1 › search matches type and application aliases (1.0s)
+  ✓   7 e2e/tests/core.spec.ts:135:1 › unknown routes render a real not-found page (261ms)
+  ✓   8 e2e/tests/core.spec.ts:144:1 › apps hash links focus the target and invalid hashes explain recovery (622ms)
+  ✓   9 e2e/tests/core.spec.ts:153:1 › mobile pages avoid horizontal overflow and name the draft editor (763ms)
+  ✓  10 e2e/tests/core.spec.ts:167:1 › public catalog exposes bilingual labels and navigable canonical links (1.4s)
+  ✓  11 e2e/tests/core.spec.ts:183:1 › project detail state follows the selected project (851ms)
+  ✓  12 e2e/tests/core.spec.ts:207:1 › English tutorial does not fall back to the long Chinese source (370ms)
+  ✓  13 e2e/tests/core.spec.ts:214:1 › local API initializes recovery, backup download, and controlled restore (837ms)
+  ✓  14 e2e/tests/matrix.spec.ts:71:1 › normal route matrix passes at 375px and 768px (8.7s)
+  ✓  15 e2e/tests/matrix.spec.ts:87:1 › language and accessible names hold across the route matrix (4.7s)
+  ✓  16 e2e/tests/matrix.spec.ts:121:1 › route error matrix exposes a recoverable alert (5.3s)
+  ✓  17 e2e/tests/matrix.spec.ts:156:1 › representative empty states remain explicit and navigable (3.9s)
+
+  17 passed (42.2s)

@@ -1,0 +1,862 @@
+{
+ "spec": {
+  "title": "生活待购与灵感收藏夹",
+  "roles": [
+   {
+    "id": "R01",
+    "name": "收藏者（个人用户）",
+    "responsibility": "在浏览时主动保存外部网页链接，选择或新建简单归类、把未整理的链接移动到合适归类、按归类或关键字找回、打开记录回到原页，并清理误存条目。"
+   },
+   {
+    "id": "R02",
+    "name": "本地收藏应用（服务端与页面外壳）",
+    "responsibility": "校验录入、派生域名、持久化收藏与归类、提供保存/浏览/检索/打开/恢复接口，并以服务端渲染 HTML 表单维持离线可用。"
+   },
+   {
+    "id": "R03",
+    "name": "独立验收执行者",
+    "responsibility": "以 URL 与 CLI 参数驱动真实目标，执行表单与 API 的正负向行为断言、重启持久化验证与错误恢复验证，不修改应用、不自报运行结果。"
+   }
+  ],
+  "features": [
+   {
+    "id": "F01",
+    "name": "保存收藏（URL 必填，标题/描述可选）",
+    "phase": "P0",
+    "applicability": "current required",
+    "reason": "场景流程第1-2步要求看到想记住的页面即主动保存；上游记录了新记录默认字段与保存落盘（S02、S06），并把 URL 校验与编辑回填收敛在表单（S04）。",
+    "sources": [
+     "S02",
+     "S04",
+     "S06",
+     "S17"
+    ],
+    "acceptance": [
+     "A01",
+     "A02",
+     "A03"
+    ]
+   },
+   {
+    "id": "F02",
+    "name": "默认“未整理”与预置归类集合",
+    "phase": "P0",
+    "applicability": "current required",
+    "reason": "场景流程第3步要求未整理的链接先进入默认归类；上游只有 Home/Archived 视图、无默认桶（S16），故按场景新增默认收件区，并借鉴其标签聚合思路（S20）。",
+    "sources": [
+     "S16",
+     "S20"
+    ],
+    "acceptance": [
+     "A03"
+    ]
+   },
+   {
+    "id": "F03",
+    "name": "归类管理（新建/重命名/删除）",
+    "phase": "P0",
+    "applicability": "current required",
+    "reason": "场景验收第3条要求可新建归类；上游明确没有 collections/folders（S16），因此归类实体与增删改必须新设计并落库。",
+    "sources": [
+     "S16",
+     "S20"
+    ],
+    "acceptance": [
+     "A04"
+    ]
+   },
+   {
+    "id": "F04",
+    "name": "记录在归类间移动",
+    "phase": "P0",
+    "applicability": "current required",
+    "reason": "场景验收第3条要求记录可在归类之间移动且重开后仍有效；上游检索按标签交集筛选（S16），这里把多值交集改造为单一归属迁移。",
+    "sources": [
+     "S16"
+    ],
+    "acceptance": [
+     "A05",
+     "A12"
+    ]
+   },
+   {
+    "id": "F05",
+    "name": "归类浏览与条目计数",
+    "phase": "P0",
+    "applicability": "current required",
+    "reason": "场景验收第4条要求通过归类浏览找回；上游侧栏按标签聚合计数（S20、S16），改为按归类聚合与筛选。",
+    "sources": [
+     "S16",
+     "S20"
+    ],
+    "acceptance": [
+     "A06"
+    ]
+   },
+   {
+    "id": "F06",
+    "name": "关键字检索（标题/域名/描述）",
+    "phase": "P0",
+    "applicability": "current required",
+    "reason": "场景验收第4条要求关键字检索；上游仅匹配标题小写（S16），需扩展到域名与描述以覆盖只记得来源的场景。",
+    "sources": [
+     "S16"
+    ],
+    "acceptance": [
+     "A07"
+    ]
+   },
+   {
+    "id": "F07",
+    "name": "打开原始网页（URL 锚定与回跳）",
+    "phase": "P0",
+    "applicability": "current required",
+    "reason": "场景验收第2条与流程第5步要求打开记录即回到原页；上游 Visit 以 window.open(noopener,noreferrer) 打开并由 URL 派生域名（S15、S08），保留打开与派生、去掉访问计数。",
+    "sources": [
+     "S15",
+     "S08"
+    ],
+    "acceptance": [
+     "A08"
+    ]
+   },
+   {
+    "id": "F08",
+    "name": "多会话持久化（跨重启保留）",
+    "phase": "P0",
+    "applicability": "current required",
+    "reason": "场景验收第1条要求多次会话之间持久保留。上游以 Dexie/IndexedDB 单浏览器配置落盘并在启动时全量载入（S09、S13、S06），只证明本地持久化意图。目标保留单用户、跨会话与跨重启的数据行为，但改用 Python/SQLite 服务端持久化（D08）；存储实现与浏览器配置范围属 adjusted，不声称沿用 IndexedDB/Dexie 或客户端内存映射。",
+    "sources": [
+     "S09",
+     "S13",
+     "S06",
+     "S11"
+    ],
+    "acceptance": [
+     "A01",
+     "A05",
+     "A09"
+    ]
+   },
+   {
+    "id": "F09",
+    "name": "删除与撤销恢复",
+    "phase": "P0",
+    "applicability": "current required",
+    "reason": "场景要求可恢复的失败；上游删除配 5 秒 Undo 恢复（S07），去掉“仅归档可删”前置限制，保留删除加恢复的兜底。",
+    "sources": [
+     "S07"
+    ],
+    "acceptance": [
+     "A09"
+    ]
+   },
+   {
+    "id": "F10",
+    "name": "输入校验与错误合同",
+    "phase": "P0",
+    "applicability": "current required",
+    "reason": "上游以 Valibot 约束 http/https、标题长度与标签数量（S04），并由 getHostname 派生域名（S08）；场景把标签必填改为可选归类，需要显式错误的保存、移动与归类表单契约。上游点域名正则保留为来源观测，目标 URL 规则按明确目标策略调整为 adjusted。",
+    "sources": [
+     "S04",
+     "S08"
+    ],
+    "acceptance": [
+     "A02",
+     "A10",
+     "A12"
+    ]
+   },
+   {
+    "id": "F11",
+    "name": "本地应用外壳与首启（空库）",
+    "phase": "P0",
+    "applicability": "current required",
+    "reason": "场景是单用户本地工具；上游 index.html 提供 #root 并由入口挂载 SPA（S10、S18）。目标按 D08 交付 python-web 服务端渲染 HTML 表单与空库首屏，SSR 属 adjusted，不沿用 SPA 外壳、客户端挂载或前端构建链；首页录入与列表容器仍是 current required。",
+    "sources": [
+     "S10",
+     "S18"
+    ],
+    "acceptance": [
+     "A11"
+    ]
+   },
+   {
+    "id": "F12",
+    "name": "元数据与图标增强（离线降级）",
+    "phase": "P1",
+    "applicability": "later",
+    "reason": "场景希望一眼辨认商品页/教程/灵感图，但上游依赖 api.microlink.io、images.weserv.nl 与 Google favicon 三个未验证端点且失败仅 console.error（S14、S21、S08）；因此把可用性依赖降为本地域名派生，外部抓取降级为可选增强。",
+    "sources": [
+     "S14",
+     "S21",
+     "S08"
+    ],
+    "acceptance": [
+     "A13"
+    ]
+   },
+   {
+    "id": "F13",
+    "name": "导入/导出（浏览器书签 HTML）",
+    "phase": "P1",
+    "applicability": "later",
+    "reason": "互操作是成熟产品的标准配置，但上游 manifest 没有导入/导出（S22 无测试脚本、无导入导出能力），属场景后期新增。",
+    "sources": [],
+    "acceptance": [
+     "A14"
+    ]
+   },
+   {
+    "id": "F14",
+    "name": "重复链接检测",
+    "phase": "P1",
+    "applicability": "later",
+    "reason": "成熟产品趋向一址一记录，上游未实现去重（S16、S17 无重复处理）；P1 在保存与导入路径新增服务层重复检测（D06），P0 核心用例不依赖该能力。",
+    "sources": [],
+    "acceptance": [
+     "A15"
+    ]
+   },
+   {
+    "id": "F15",
+    "name": "浏览器扩展/分享目标抓取",
+    "phase": null,
+    "applicability": "not applicable",
+    "reason": "场景交付为本地 Web 工具，扩展与移动分享目标不在本期范围，手工录入与打开回跳已覆盖核心旅程。",
+    "sources": [],
+    "acceptance": []
+   },
+   {
+    "id": "F16",
+    "name": "多设备与云同步",
+    "phase": null,
+    "applicability": "not applicable",
+    "reason": "本期是单机单实例的本地库，数据在单一 SQLite 文件；跨设备同步属后期形态，不阻塞核心旅程。",
+    "sources": [],
+    "acceptance": []
+   },
+   {
+    "id": "F17",
+    "name": "网页留存副本/快照",
+    "phase": null,
+    "applicability": "decision needed",
+    "reason": "记录只保证引用而非内容（场景与原类型定义如此）；是否保存副本依赖外部抓取与存储，离线验收不可验证，需用户明确要求后再定。",
+    "sources": [],
+    "acceptance": []
+   },
+   {
+    "id": "F18",
+    "name": "失效链接检测与修复",
+    "phase": null,
+    "applicability": "decision needed",
+    "reason": "链接腐坏是本类型的结构性风险，但检测需要主动外呼，外部网络在验收中禁用；先保证引用与打开回跳，是否检测待用户决定。",
+    "sources": [],
+    "acceptance": []
+   },
+   {
+    "id": "F19",
+    "name": "嵌套归类与多标签并存",
+    "phase": null,
+    "applicability": "decision needed",
+    "reason": "场景明说“选择一个简单归类”，扁平单选加收件区已足够；嵌套/标签是成熟能力，待归类数量或交叉主题增长时再评估。",
+    "sources": [],
+    "acceptance": []
+   },
+   {
+    "id": "F20",
+    "name": "置顶/归档与多排序模式",
+    "phase": null,
+    "applicability": "not applicable",
+    "reason": "上游置顶与归档、三种排序属书签阅读器语境（S19、S16、S03），会给编辑与删除增加前置条件，与快速保存、快速清理相冲突，故不采用。",
+    "sources": [
+     "S19",
+     "S16",
+     "S03"
+    ],
+    "acceptance": []
+   },
+   {
+    "id": "F21",
+    "name": "公开分享与协作库",
+    "phase": null,
+    "applicability": "not applicable",
+    "reason": "场景是私有个人收藏箱，分享不在核心旅程内；公开或协作需要多用户身份与权限，属不同类型定位。",
+    "sources": [],
+    "acceptance": []
+   },
+   {
+    "id": "F22",
+    "name": "阅读稍后与未读标记",
+    "phase": null,
+    "applicability": "not applicable",
+    "reason": "场景重心是留存引用并可回跳，而非消费队列；未读标记会使产品向 Read-it-later 漂移。",
+    "sources": [],
+    "acceptance": []
+   },
+   {
+    "id": "F23",
+    "name": "复制 URL 动作",
+    "phase": null,
+    "applicability": "not applicable",
+    "reason": "上游提供 Copy URL（S12），但本场景终点是打开原页而非分发链接，去掉可减少每条记录的操作噪音。",
+    "sources": [
+     "S12"
+    ],
+    "acceptance": []
+   },
+   {
+    "id": "F24",
+    "name": "访问计数与最近访问时间",
+    "phase": null,
+    "applicability": "not applicable",
+    "reason": "上游 Visit 会累加 visitCount 与 visitedAt（S15、S17）；场景只需打开动作，不需访问统计，故不保留这两个字段。",
+    "sources": [
+     "S15",
+     "S17"
+    ],
+    "acceptance": []
+   }
+  ],
+  "decisions": [
+   {
+    "id": "D01",
+    "question": "记录应归属于单一“归类”，还是允许像标签一样同时属于多个？",
+    "default": "单选归类（bookmark.category_id 标量外键）。场景流程明确“选择一个简单归类”，单归属让移动、计数与浏览语义无歧义；未来若需多值可迁移到关联表而不丢数据。",
+    "when_to_ask": "当真实用户反馈同一条记录必须同时属于多个主题，或需要跨主题交叉检索时再评估多标签。",
+    "impact": "决定数据模型（标量外键 vs 关联表）以及浏览、计数与检索的实现路径。",
+    "status": "decided"
+   },
+   {
+    "id": "D02",
+    "question": "保存时不选归类，应阻止保存还是落入默认“未整理”？",
+    "default": "落入默认“未整理”，保存始终成功。场景流程第3步要求未经整理的链接可先进入默认归类，快速保存不应打断浏览。",
+    "when_to_ask": "当目标用户群要求强制归类（例如团队共享库）时再改为必选。",
+    "impact": "决定保存接口是否允许缺省 category，以及首启预置数据内容。",
+    "status": "decided"
+   },
+   {
+    "id": "D03",
+    "question": "在保存或移动界面输入一个尚不存在的归类名，应自动创建还是报错？",
+    "default": "自动创建（名称大小写不敏感去重），重名则复用现有归类；保持保存流程不中断。",
+    "when_to_ask": "当出现拼写错误导致归类碎片化的证据时，改为只允许从既有归类中选择。",
+    "impact": "决定 categories 的 NOCASE 唯一约束、保存/移动自动创建与复用语义、显式归类管理的重复 409 与 HTML 表单错误，以及写入事务边界。",
+    "status": "decided"
+   },
+   {
+    "id": "D04",
+    "question": "删除是立即物理删除，还是软删除到可恢复区并支持短时撤销？",
+    "default": "软删除：记录标记 trashed_at，默认视图排除，提供撤销恢复；场景要求可恢复的失败。",
+    "when_to_ask": "当用户要求彻底清除隐私数据或回收站增长需要释放空间时，再提供永久删除与清空。",
+    "impact": "决定数据模型的 trashed_at 列、默认列表过滤、/?trash=1 回收站视图与 /restore 接口；不引入 purge。删除归类时活动与软删除记录都迁回默认归类。",
+    "status": "decided"
+   },
+   {
+    "id": "D05",
+    "question": "标题、描述与图标是否依赖第三方抓取服务？",
+    "default": "本地优先：图标由域名派生本地路由，第三方元数据抓取为可选增强且失败静默降级，保证离线可保存。",
+    "when_to_ask": "当部署环境确认可访问外部服务且用户需要富预览时再启用增强。",
+    "impact": "决定保存流程的时延与可用性依赖，以及收藏响应中的 favicon/title 字段形态。",
+    "status": "decided"
+   },
+   {
+    "id": "D06",
+    "question": "同一 URL 再次保存时，阻止还是允许？",
+    "default": "自 P1/F14 起默认检测并返回 409 duplicate_url（附已有 id 供跳转查看），保存方显式 allow_duplicate 时可强制新增；P0 核心用例不依赖去重，软删除记录不参与判定；场景与成熟产品都倾向一址一记录。",
+    "when_to_ask": "当用户明确需要对同一地址保留多个不同上下文的记录时再放宽。",
+    "impact": "决定服务层去重查询、allow_duplicate 语义与导入时的合并或跳过策略（不使用 url 唯一索引）。",
+    "status": "decided"
+   },
+   {
+    "id": "D07",
+    "question": "关键字应匹配哪些字段？",
+    "default": "标题加域名(hostname)加描述，大小写不敏感，可与归类过滤叠加；不检索正文（无抓取）。",
+    "when_to_ask": "当需要按网页正文全文检索时再引入抓取与索引（属后期能力）。",
+    "impact": "决定查询实现与参数语义：category 与 q 同时保留并叠加；侧栏/归类页可见计数与 /api/categories count 只计入活动（未软删）记录，并在移动、删除、恢复后保持一致。",
+    "status": "decided"
+   },
+   {
+    "id": "D08",
+    "question": "采用何种运行时与持久化方式？",
+    "default": "python-web 加 Python 3.12 标准库 http.server 加单文件 SQLite；满足离线、单用户与可独立验收，无需外部依赖。",
+    "when_to_ask": "当需要多用户、并发写入或托管部署时再引入 Web 框架与服务端数据库。",
+    "impact": "决定交付 profile、SSR HTML 表单、SQLite 持久化、部署命令形态，以及以独立 HTTP/HTML 表单验收和隔离 app_root 实例重启验证的方式；不使用浏览器库代替真实目标。",
+    "status": "decided"
+   },
+   {
+    "id": "D09",
+    "question": "是否需要登录或口令？",
+    "default": "默认无认证；交付进程在独立验收网络中监听测试者可路由的接口（--host 0.0.0.0），日常本机使用可绑定 127.0.0.1；不引入凭据文件，符合个人本地库的定位。",
+    "when_to_ask": "当应用需要暴露到局域网或公网时，必须加入认证，否则只允许本机绑定。",
+    "impact": "决定部署方式与验收的认证契约（验收默认不携带凭据）。",
+    "status": "decided"
+   },
+   {
+    "id": "D10",
+    "question": "导入/导出采用什么格式？",
+    "default": "Netscape 浏览器书签 HTML（本类型的交换约定），归类映射为文件夹或标签字段。",
+    "when_to_ask": "当需要与某个具体产品双向同步时再适配其专有格式。",
+    "impact": "决定 P1 导入/导出的解析与生成实现。",
+    "status": "decided"
+   },
+   {
+    "id": "D11",
+    "question": "是否提供云同步或多用户共享？",
+    "default": "P0 不做：本地单实例，数据在单一 SQLite 文件；跨设备属后期能力。",
+    "when_to_ask": "当用户明确需要在多设备访问同一库时再设计同步或托管。",
+    "impact": "影响运行形态与数据归属，不阻塞 P0 核心旅程。",
+    "status": "deferred"
+   },
+   {
+    "id": "D12",
+    "question": "归类是否需要嵌套层级，或与标签并存？",
+    "default": "P0 使用扁平单选归类加“未整理”收件区；嵌套与标签属成熟能力，按需在后期启用。",
+    "when_to_ask": "当扁平归类数量增长到难以浏览，或需要交叉主题时。",
+    "impact": "影响侧栏结构与检索实现，可后续迁移而不破坏现有数据；仅涉及归类深度，不承担数据库迁移策略。",
+    "status": "deferred"
+   },
+   {
+    "id": "D13",
+    "question": "是否需要保存网页副本并检测失效链接？",
+    "default": "本期不做：抓取与归档在离线验收下不可验证；先保证引用记录与打开回跳。",
+    "when_to_ask": "当用户明确要求内容留存，或需要清理死链时再评估。",
+    "impact": "涉及外部抓取与存储扩展，属后期可选能力，不纳入 P0/P1 验收。",
+    "status": "open"
+   }
+  ],
+  "phases": [
+   {
+    "id": "P0",
+    "title": "个人收藏箱核心旅程",
+    "goal": "用户可保存链接（可选归类或落入未整理）、按归类或关键字找回、打开原页、清理并撤销，且全部数据跨会话与重启保留，非法输入得到可恢复的明确错误。",
+    "features": [
+     "F01",
+     "F02",
+     "F03",
+     "F04",
+     "F05",
+     "F06",
+     "F07",
+     "F08",
+     "F09",
+     "F10",
+     "F11"
+    ],
+    "acceptance": [
+     "A01",
+     "A02",
+     "A03",
+     "A04",
+     "A05",
+     "A06",
+     "A07",
+     "A08",
+     "A09",
+     "A10",
+     "A11",
+     "A12"
+    ],
+    "status": "not implemented"
+   },
+   {
+    "id": "P1",
+    "title": "成熟增强：元数据、互操作与库清理",
+    "goal": "在离线可用的前提下增强记录可辨识度（本地派生图标、外部抓取仅作增强），并支持浏览器书签格式的导入导出与重复链接检测，用于长期库维护。",
+    "features": [
+     "F12",
+     "F13",
+     "F14"
+    ],
+    "acceptance": [
+     "A13",
+     "A14",
+     "A15"
+    ],
+    "status": "not implemented"
+   }
+  ],
+  "acceptance": [
+   {
+    "id": "A01",
+    "phase": "P0",
+    "goal": "保存一条链接后，同进程与重启后的新进程都能读到该记录，且 id 与内容稳定。",
+    "type": "positive",
+    "features": [
+     "F01",
+     "F08"
+    ],
+    "implementation": "acceptance/p0_library.py",
+    "status": "not_run"
+   },
+   {
+    "id": "A02",
+    "phase": "P0",
+    "goal": "绝对可解析的 HTTP(S) URL（含单标签主机如 http://localhost）可保存并原样保留；缺协议、非 HTTP(S)、空/无效主机名的 URL 返回 400 invalid_url 且不新增记录；保存不抓取目标页。",
+    "type": "negative",
+    "features": [
+     "F01",
+     "F10"
+    ],
+    "implementation": "acceptance/p0_library.py",
+    "status": "not_run"
+   },
+   {
+    "id": "A03",
+    "phase": "P0",
+    "goal": "不选归类保存时记录落入“未整理”，保存时给出的新归类名被自动创建，首启可见预置归类。",
+    "type": "positive",
+    "features": [
+     "F01",
+     "F02"
+    ],
+    "implementation": "acceptance/p0_library.py",
+    "status": "not_run"
+   },
+   {
+    "id": "A04",
+    "phase": "P0",
+    "goal": "通过真实 HTML 表单新建、重命名与删除归类并按成功导航回到归类页；重名、空名、超长名与默认归类保护显示 form-error 且不写入；删除归类把其活动与软删除记录都迁回“未整理”，被软删记录仍可恢复。",
+    "type": "positive",
+    "features": [
+     "F03"
+    ],
+    "implementation": "acceptance/p0_organize.py",
+    "status": "not_run"
+   },
+   {
+    "id": "A05",
+    "phase": "P0",
+    "goal": "在给定的 base_url 目标把记录从“未整理”移动到另一归类，并用独立实例证明该归属跨重启仍然有效。",
+    "type": "positive",
+    "features": [
+     "F04",
+     "F08"
+    ],
+    "implementation": "acceptance/p0_organize.py",
+    "status": "not_run"
+   },
+   {
+    "id": "A06",
+    "phase": "P0",
+    "goal": "在首页与归类页读取可见 category-count（仅活动记录）并按归类浏览；移动、删除、恢复后 HTML 计数、实际列表与 /api/categories count 三者保持一致。",
+    "type": "positive",
+    "features": [
+     "F05"
+    ],
+    "implementation": "acceptance/p0_organize.py",
+    "status": "not_run"
+   },
+   {
+    "id": "A07",
+    "phase": "P0",
+    "goal": "从真实归类页提交 category 与 q 检索表单，页面保留所选归类与查询并显示匹配或明确空结果；同一关键字在两个归类分别命中，某归类无匹配时显示空结果；保留标题、域名、描述与大小写不敏感的 JSON 断言。",
+    "type": "positive",
+    "features": [
+     "F06"
+    ],
+    "implementation": "acceptance/p0_find_open.py",
+    "status": "not_run"
+   },
+   {
+    "id": "A08",
+    "phase": "P0",
+    "goal": "打开记录跳转到保存时的原始 URL（302 Location 等于保存值），未知 id 返回 404。",
+    "type": "positive",
+    "features": [
+     "F07"
+    ],
+    "implementation": "acceptance/p0_find_open.py",
+    "status": "not_run"
+   },
+   {
+    "id": "A09",
+    "phase": "P0",
+    "goal": "通过记录删除表单软删除后默认 HTML 排除、回收站视图可见并可恢复；恢复表单成功后内容与归类重新可见，计数同步；隔离实例重启后删除状态仍保持。",
+    "type": "positive",
+    "features": [
+     "F08",
+     "F09"
+    ],
+    "implementation": "acceptance/p0_recovery.py",
+    "status": "not_run"
+   },
+   {
+    "id": "A10",
+    "phase": "P0",
+    "goal": "未知 id 与畸形 JSON 返回结构化错误且不产生 5xx、不改变现有数据（畸形 JSON 为 400 bad_request）；HTML 表单错误显示 form-error 并保留提交值或提供可运行恢复控件，失败写入为 0。",
+    "type": "negative",
+    "features": [
+     "F10"
+    ],
+    "implementation": "acceptance/p0_recovery.py",
+    "status": "not_run"
+   },
+   {
+    "id": "A11",
+    "phase": "P0",
+    "goal": "健康检查返回就绪，首页外壳在空库下渲染录入表单与列表容器，入口不报错。",
+    "type": "positive",
+    "features": [
+     "F11"
+    ],
+    "implementation": "acceptance/p0_library.py",
+    "status": "not_run"
+   },
+   {
+    "id": "A12",
+    "phase": "P0",
+    "goal": "保存或移动到空名、超长名或未知归类时，HTML 表单与 JSON 均返回 400 invalid_category 并显示可用错误反馈，现有归类与记录不变。",
+    "type": "negative",
+    "features": [
+     "F04",
+     "F10"
+    ],
+    "implementation": "acceptance/p0_organize.py",
+    "status": "not_run"
+   },
+   {
+    "id": "A13",
+    "phase": "P1",
+    "goal": "外部网络不可用时保存仍然成功，图标与标题降级为本地派生结果，缺失增强不阻塞或报错。",
+    "type": "positive",
+    "features": [
+     "F12"
+    ],
+    "implementation": "acceptance/p1_maturity.py",
+    "status": "not_run"
+   },
+   {
+    "id": "A14",
+    "phase": "P1",
+    "goal": "导出为浏览器书签 HTML 可包含已存记录，且导入该 HTML 后相应记录可再次检索到。",
+    "type": "positive",
+    "features": [
+     "F13"
+    ],
+    "implementation": "acceptance/p1_maturity.py",
+    "status": "not_run"
+   },
+   {
+    "id": "A15",
+    "phase": "P1",
+    "goal": "重复 URL 默认被拒绝（409 duplicate_url）且库不变；显式允许重复时可新增第二条。",
+    "type": "negative",
+    "features": [
+     "F14"
+    ],
+    "implementation": "acceptance/p1_maturity.py",
+    "status": "not_run"
+   }
+  ],
+  "architecture_markdown": "## 默认技术栈与理由\n- 交付 profile 为 python-web：Python 3.12 标准库（http.server、sqlite3、urllib、json、html.parser）实现服务端、持久化与 HTML 渲染；无第三方依赖、无构建步骤。\n- 备选 Flask/FastAPI 或 Node + SPA 生态更丰富，但需要安装依赖、构建或浏览器运行时，与离线、可独立验收的要求冲突。\n- 页面采用服务端渲染 HTML 表单与 POST/redirect/GET；HTML 表单与 JSON API 共用同一服务层。SSR 是相对上游 SPA 的实现调整（F11）；SQLite 是相对 Dexie/IndexedDB 的持久化实现调整（F08），保留单用户、跨会话与跨重启行为，不声称沿用浏览器存储。\n\n## 数据模型（SQLite，位于应用 --data-dir/bookmarks.sqlite3；验收使用隔离实例目录）\n- schema_meta(version INTEGER NOT NULL)：迁移版本。首次启动在单一事务内建表并写入预置归类；后续按 schema_meta 版本执行有序、事务化迁移。迁移策略由架构定义，不由 D12 承担；D12 只讨论归类深度。\n- categories(id TEXT PRIMARY KEY, name TEXT NOT NULL UNIQUE COLLATE NOCASE, is_default INTEGER NOT NULL DEFAULT 0, position INTEGER NOT NULL, created_at INTEGER NOT NULL)。首启预置「未整理」(is_default=1)、「待购」、「家居改造」、「以后看看」。默认归类不可重命名或删除。\n- bookmarks(id TEXT PRIMARY KEY, url TEXT NOT NULL, hostname TEXT NOT NULL, title TEXT NULL, description TEXT NULL, category_id TEXT NOT NULL REFERENCES categories(id), favicon_url TEXT NULL, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, trashed_at INTEGER NULL)。\n- 索引：category_id、created_at、hostname；P0 不建立 url 唯一索引。重复 URL 的 409 判定属 P1/F14，由服务层查询活动记录完成，allow_duplicate=true 时绕过；软删除记录不参与判定。\n- 删除归类在一个事务内先把该归类下所有记录（包括 trashed_at 非空者）的 category_id 迁回默认归类，再删除归类；因此 restore 不会产生无归类记录。\n- 计数一律按 trashed_at IS NULL 的活动记录计算；默认列表与归类浏览只显示活动记录，/?trash=1 与 include_trashed=1 显示软删除记录。\n\n## URL、记录与打开契约\n- 记录 URL 必须是绝对、可解析的 HTTP(S) URL，且具有有效非空 hostname。单标签主机（如 http://localhost）有效；不要求点域名、DNS 解析、网络可达或目标抓取。\n- 持久化与打开都保留用户提交的原始 URL 文本，不规范化、不改写。hostname 由当前 URL 解析派生（小写）；PATCH /api/bookmarks/{id} 若改变 URL，必须重算 hostname。\n- 上游 S04/S08 的点域名正则保留为来源观测，按目标策略映射为 adjusted，不作为目标有效性规则；P0 不抓取、不探测、不预取已保存目标。\n- 每个记录行的打开链接 href 必须等于保存的原始 URL，target=_blank，rel 含 noopener；GET /go/{id} 仍返回 302 且 Location 等于该原始 URL。打开是用户导航，不是服务端抓取。\n- P0 不提供独立记录编辑 UI，不新增 isolated edit feature；保留既有 PATCH /api/bookmarks/{id} JSON 契约及其非法 URL/归类校验。\n\n## API 与错误合同（JSON）\n- GET /api/health 返回 200 就绪信息与 schema 版本。\n- GET /api/categories 返回归类数组，每项含 id、name、count、is_default；count 只统计活动记录。\n- POST /api/categories（body: name）返回 201；重名 409 duplicate_category；空名、去空白后为空或超过 120 字符 400 invalid_name。\n- PATCH /api/categories/{id} 重命名：空名/超长 400 invalid_name，与既有归类重名 409 duplicate_category，默认归类 400 protected_category；DELETE /api/categories/{id} 在事务内迁移记录后删除，默认归类 400 protected_category。\n- GET /api/bookmarks?category=<name|id>&q=<str>&include_trashed=0 返回记录数组，默认按 created_at 倒序、同值以 id 兜底；q 对标题、hostname 与描述做大小写不敏感子串匹配，并与 category 叠加；未知归类过滤返回空集。\n- POST /api/bookmarks（body: url 必填；title、description、category 可选；allow_duplicate 可选）返回 201；category 省略或为 null 归入默认「未整理」，给出新名称时按 NOCASE 自动创建并复用既有归类；显式空字符串、去空白后为空或超过 120 字符 400 invalid_category；非法 URL 400 invalid_url。重复 URL 在 P1/F14 下返回 409 duplicate_url 并附 existing_id。\n- GET /api/bookmarks/{id} 200 或 404 not_found；PATCH 更新字段，非法 URL 400 invalid_url、非法归类 400 invalid_category；POST /api/bookmarks/{id}/move（body: category）迁移归属，缺失/空/超长 400 invalid_category；DELETE /api/bookmarks/{id} 软删除返回 200；POST /api/bookmarks/{id}/restore 恢复。\n- 错误合同：所有校验失败返回 {error:{code,message,field}}，状态码为 400/404/409；畸形 JSON 映射为 400 bad_request 且不写入；校验类错误绝不产生 5xx；响应体固定可解析。\n- 状态合同：排序稳定、GET 幂等；归类与检索词为请求级参数，不写入数据库。\n\n## HTML 表单与 UI 适配器合同\n- 首页 GET / 与 GET /?category=<name>&q=<str> 渲染保存表单、检索表单、侧栏归类链接与计数、记录行、移动/删除表单、category-manager 链接；有查询时显示所选归类与保留的 q；无结果时显示明确空状态。\n- 保存表单 action=/bookmarks/new method=post，字段 url、title、description、category；HTML 中 category 省略或空串映射为默认「未整理」，超长或伪造未知归类显示 invalid_category。成功 303 到 /?category=<归类名>。\n- category-manager 链接为 a[data-testid='category-manager']，指向 GET /categories。归类页含新建表单 form[data-testid='category-create-form']，字段 name；每个归类含 form[data-testid='category-rename-form']（category_id、name）与 form[data-testid='category-delete-form']（category_id）。成功 303 到 /categories；重复 409 duplicate_category、非法 400 invalid_name、默认保护 400 protected_category，页面含 [data-testid='form-error'] 并回填名称或保留可运行的创建/重命名表单。\n- 检索表单为 form[data-testid='category-search-form'] method=get action=/，字段 select 或 input name=category（归类名）与 input name=q；提交后服务端在 GET / 保留两个值，侧栏归类链接也保留 q；结果只包含所选归类中匹配的活动记录。\n- 每个记录行是 tr[data-testid='record-row'][data-record-id]；行内打开链接是 a[data-testid='record-open-link']，href 为保存的精确原始 URL，target=_blank，rel=noopener。\n- 移动表单 form[data-testid='record-move-form'] action=/bookmarks/{id}/move，含 hidden input name=record_id 与 select name=category_id（API 归类 ID，服务端转换为归类名）；成功 303 到 /?category=<目标归类>。\n- 删除表单 form[data-testid='record-delete-form'] action=/bookmarks/{id}/delete 含 hidden record_id；恢复表单 form[data-testid='record-restore-form'] action=/bookmarks/{id}/restore 含 hidden record_id。默认视图排除软删除记录；GET /?trash=1 渲染回收站记录及恢复表单；恢复成功 303 到 /?category=<原归类>。\n- 归类计数是 [data-testid='category-count'][data-category-id]，可见文本为活动记录数的十进制整数，不显示软删除记录；移动、删除、恢复后计数与列表、API count 同源更新。\n- 失败表单返回 400/404/409 的 HTML（不产生 5xx），页面含 [data-testid='form-error'] 的可读消息；保存、创建、重命名表单回填提交值，移动/删除/恢复错误提供返回列表或再次提交的可运行控件；事务回滚，现有记录与归类不变。\n\n## 验收适配器合同\n- --base-url 指向运行中的 python-web 实例；所有 HTTP 与 HTML 表单行为断言绑定该精确 origin，拒绝跨源重定向与凭据头。\n- --app-root 为只读应用源码根，--data-dir 为测试者草稿根；重启用例在 data_dir/instances/<uuid> 创建每实例隔离 scratch，以 [sys.executable, <app_root>/app/serve.py, --host, 127.0.0.1, --port, <空闲端口>, --data-dir, <实例子目录>] 启动同一冻结应用，轮询 /api/health，执行真实动作后停止，再用相同子目录重启并读回。\n- 套件从目标响应解析上述表单的 action、method 与字段并提交真实 application/x-www-form-urlencoded 请求，检查 303 Location 后的 HTML；这是 HTML 表单层行为验证，不启动浏览器 DOM。独立浏览器执行者按同一 data-testid 与字段名验证真实浏览器导航。\n- 无认证模式；若目标返回 401/403，验收显式报告基础设施未就绪，不跳过或伪造通过。外部网络禁用，套件不抓取已保存 URL、元数据或图标。\n\n## 非功能需求\n- 离线可用：保存不依赖任何外部服务；第三方增强失败静默降级，不阻塞保存。\n- 单用户本机：无认证、无凭据文件；日常运行默认绑定 127.0.0.1，独立验收仅在隔离网络内监听测试者可路由的接口。\n- 确定性：排序与错误码稳定，GET 幂等，事务化写入，便于重复验收。\n- 数据完整性：删除归类迁移活动与软删除记录；软删除保证可恢复；恢复不产生孤儿记录。\n- 可读错误：HTML 表单错误可读、可恢复，且失败不改变存储。\n- 忠实性：验收只断言真实 HTTP/HTML 行为，不检查文件或标题存在性，不使用 mock 目标，不设未经验证的时延或成本指标。",
+  "limits": [
+   "不实现云同步、多用户共享或托管部署（D11、F16、F21）。",
+   "不保存网页快照、不做正文全文检索、不做失效链接检测（F17、F18、D13）。",
+   "不引入置顶/归档、多排序模式、复制 URL 与访问计数（F20、F23、F24）。",
+   "归类为扁平单选，不支持嵌套层级或多标签并存（F19、D01）。",
+   "不提供独立记录编辑 UI；仅保留既有 JSON PATCH 契约并在 URL 变化时重算 hostname。",
+   "第三方元数据与图标抓取未验证可达性，仅作可选增强且失败静默降级（F12、D05）。",
+   "验收不携带认证凭据；若目标要求认证，验收必须显式报告基础设施未就绪而非跳过或通过（D09）。",
+   "验收在 HTML 表单/API 层执行，不驱动真实浏览器 DOM；真实浏览器导航由独立执行者按同一选择器验证。",
+   "不设置未经验证的性能或成本目标。"
+  ]
+ },
+ "contract_coverage": {
+  "schema": "atlas.contract-coverage.v1",
+  "review_rules_version": "atlas.current-required-contract.v1",
+  "features": [
+   {
+    "feature_id": "F01",
+    "design_basis": "场景 workflow 第1-2步要求主动保存；S02/S04/S06 提供记录字段、表单校验与落盘观测，目标按 python-web 与 SQLite 调整实现。",
+    "entry": "GET / 的保存表单（action=/bookmarks/new，字段 url、title、description、category）",
+    "action": "填写 URL、可选标题/描述与归类并提交真实 HTML 表单",
+    "success_state": "记录持久化；HTML 出现带 data-record-id 的记录行与打开链接，API 可读回原始 URL",
+    "navigation": "成功 303 到 /?category=<归类名>，页面显示新记录",
+    "failure": "非法 URL 返回 400 invalid_url，非法归类返回 400 invalid_category，页面显示 [data-testid='form-error']",
+    "recovery": "错误页保留已填 URL/标题/描述/归类并提供可再次提交的保存表单",
+    "acceptance_ids": [
+     "A01",
+     "A02",
+     "A03"
+    ]
+   },
+   {
+    "feature_id": "F02",
+    "design_basis": "场景 workflow 第3步要求未整理链接先进入默认归类；S16 无默认桶，按场景新增「未整理」收件区。",
+    "entry": "GET / 保存表单的「未整理」默认归类，或省略/留空 category",
+    "action": "不另选归类直接提交保存表单",
+    "success_state": "记录 category_id 指向默认「未整理」；侧栏计数增加，API 按「未整理」可查到",
+    "navigation": "成功 303 到 /?category=未整理",
+    "failure": "默认归类缺失或保存事务失败时不写入，页面显示可读错误",
+    "recovery": "重新加载首页或选择「未整理」再次提交",
+    "acceptance_ids": [
+     "A03"
+    ]
+   },
+   {
+    "feature_id": "F03",
+    "design_basis": "场景验收第3条要求可新建归类；S16 表明上游没有 collections/folders，故归类 CRUD 属新设计。",
+    "entry": "首页 a[data-testid='category-manager'] 进入 GET /categories；新建/重命名/删除表单",
+    "action": "提交 name、category_id 的真实 HTML 表单完成新建、重命名、删除",
+    "success_state": "归类持久化；归类页显示更新后的名称、计数与操作表单",
+    "navigation": "成功 303 到 /categories，页面反映结果",
+    "failure": "重名 409 duplicate_category、空名/超长 400 invalid_name、默认归类 400 protected_category，显示 [data-testid='form-error'] 且不写入",
+    "recovery": "回填提交名称或保留可运行的创建/重命名表单；删除失败保留归类，删除成功把活动与软删除记录迁回默认归类",
+    "acceptance_ids": [
+     "A04"
+    ]
+   },
+   {
+    "feature_id": "F04",
+    "design_basis": "场景验收第3条要求记录可在归类之间移动且重开后仍有效；S16 的标签交集被改造为单一归属迁移。",
+    "entry": "记录行的 form[data-testid='record-move-form']，含 record_id 与 select category_id",
+    "action": "选择目标归类并提交移动表单",
+    "success_state": "记录 category_id 更新；新归类列表与计数包含该记录，原归类排除；重启后仍保持",
+    "navigation": "成功 303 到 /?category=<目标归类>",
+    "failure": "未知记录 404 not_found、空/超长/未知归类 400 invalid_category；显示 form-error，原归属不变",
+    "recovery": "错误页保留记录行与可再次提交的移动表单，或提供返回列表链接",
+    "acceptance_ids": [
+     "A05",
+     "A12"
+    ]
+   },
+   {
+    "feature_id": "F05",
+    "design_basis": "场景验收第4条要求通过归类浏览找回；S20/S16 的标签计数改造为按归类聚合。",
+    "entry": "首页侧栏归类链接与 [data-testid='category-count'][data-category-id]，归类页同一计数",
+    "action": "点击归类浏览并读取可见计数",
+    "success_state": "只显示该归类活动记录；计数等于活动记录数，并在移动、删除、恢复后与列表及 API count 一致",
+    "navigation": "GET /?category=<归类名>，页面显示所选归类与结果",
+    "failure": "未知归类过滤返回 200 空结果而非 5xx；计数与列表不一致即验收失败",
+    "recovery": "侧栏链接返回全部归类或另一个有效归类",
+    "acceptance_ids": [
+     "A06"
+    ]
+   },
+   {
+    "feature_id": "F06",
+    "design_basis": "场景验收第4条要求关键字检索；S16 仅匹配标题，目标扩展到 hostname 与描述并保留归类叠加。",
+    "entry": "归类页 form[data-testid='category-search-form']，字段 category 与 q",
+    "action": "选择归类、输入关键字并提交 GET 表单",
+    "success_state": "页面保留所选归类与 q，显示匹配活动记录；无匹配显示明确空结果；JSON 检索同样匹配标题/域名/描述且大小写不敏感",
+    "navigation": "GET /?category=<归类名>&q=<查询>，同一列表页显示结果",
+    "failure": "无匹配返回 200 空结果而非错误；非法请求不得 5xx",
+    "recovery": "清空 q 或改选归类后再次提交，表单保留可运行状态",
+    "acceptance_ids": [
+     "A07"
+    ]
+   },
+   {
+    "feature_id": "F07",
+    "design_basis": "场景验收第2条与 workflow 第5步要求打开记录即回到原页；S15 的打开行为保留，去掉访问计数。",
+    "entry": "记录行 a[data-testid='record-open-link']；支持 GET /go/{id}",
+    "action": "点击打开链接或访问 /go/{id}",
+    "success_state": "链接 href 等于保存的原始 URL，target=_blank 且 rel 含 noopener；/go/{id} 返回 302 且 Location 等于原始 URL",
+    "navigation": "导航到保存的精确外部 URL（浏览器新标签）；这是显式的用户导航",
+    "failure": "未知 id 的 /go 返回 404 not_found；不得把打开改成服务端抓取",
+    "recovery": "返回个人库列表并选择其他记录",
+    "acceptance_ids": [
+     "A08"
+    ]
+   },
+   {
+    "feature_id": "F08",
+    "design_basis": "场景验收第1条要求跨会话持久保留；S09/S13/S06 只证明本地 Dexie 持久化意图，目标按 D08 以 SQLite 保留行为、调整存储实现。",
+    "entry": "同一 SQLite data dir 的应用进程重启；无单独页面入口",
+    "action": "保存/移动/删除后停止服务，再用相同实例子目录启动同一冻结应用",
+    "success_state": "重启后记录 id、原始 URL、内容、归类与软删除状态保持一致，计数与列表可读回",
+    "navigation": "none：持久化是状态验证，不产生页面导航；重启后通过 GET / 与 API 读回",
+    "failure": "目标不就绪或重启后记录缺失/改变即失败；不得静默以空库继续或声称通过",
+    "recovery": "使用相同 data dir 重启同一应用并重新读取；不自动清库",
+    "acceptance_ids": [
+     "A01",
+     "A05",
+     "A09"
+    ]
+   },
+   {
+    "feature_id": "F09",
+    "design_basis": "场景要求可恢复的失败；S07 的 Undo 恢复调整为显式软删除与恢复表单。",
+    "entry": "记录行 form[data-testid='record-delete-form']；GET /?trash=1 的 form[data-testid='record-restore-form']",
+    "action": "提交删除表单软删除记录，随后在回收站提交恢复表单",
+    "success_state": "默认视图排除、回收站可见；恢复后内容与归类重新可见，计数同步更新",
+    "navigation": "删除成功 303 到 /?category=<原归类>；恢复成功 303 到 /?category=<原归类>",
+    "failure": "未知记录 404 not_found，显示 form-error 且不改变存储；不得物理删除或产生孤儿",
+    "recovery": "回收站中的恢复表单可重新提交；删除归类后软删除记录仍在默认归类下可恢复",
+    "acceptance_ids": [
+     "A09"
+    ]
+   },
+   {
+    "feature_id": "F10",
+    "design_basis": "场景与 S04/S08 要求显式校验；目标按调整后的 URL 策略与统一错误合同实现，覆盖 HTML 与 JSON。",
+    "entry": "保存表单、移动表单、归类新建/重命名/删除表单，以及对应 JSON API",
+    "action": "提交非法 URL、非法/超长/重复/受保护归类，或发送未知 id、畸形 JSON",
+    "success_state": "合法请求成功写入；非法请求返回明确 400/404/409 错误码且不写入",
+    "navigation": "合法表单成功 303 到结果页；失败停留在可恢复的 HTML 页面或返回结构化 JSON",
+    "failure": "invalid_url、invalid_category、invalid_name、duplicate_category、protected_category、bad_request、not_found；绝不 5xx",
+    "recovery": "HTML 保留提交值或提供可运行恢复表单；JSON 调用方可修正后重试，存储保持不变",
+    "acceptance_ids": [
+     "A02",
+     "A10",
+     "A12"
+    ]
+   },
+   {
+    "feature_id": "F11",
+    "design_basis": "场景是本地单用户工具；S10/S18 的 SPA 外壳映射为 python-web 服务端渲染首页与空库首屏。",
+    "entry": "GET / 首页与 GET /categories 归类页",
+    "action": "打开首页或从 category-manager 链接进入归类页",
+    "success_state": "健康检查 200；首页 200 text/html，含保存表单、url 字段、列表容器与 category-manager 链接；空库显示空状态",
+    "navigation": "none：入口直接渲染首页；无需重定向",
+    "failure": "健康检查非 200 或页面缺失录入/列表外壳即失败，不得以静态标题存在性代替",
+    "recovery": "重新加载 / 或重启应用，健康检查恢复后继续使用",
+    "acceptance_ids": [
+     "A11"
+    ]
+   }
+  ]
+ },
+ "file_plan": [
+  {
+   "path": "acceptance/common.py",
+   "reuse": true,
+   "purpose": "保持不变并复制固定基线字节。共享 Python 3.12 标准库工具，导出 AcceptanceError、AppStartError、HttpRequestError、ExternalNavigationBlocked、HttpClient、HttpResponse、Recorder、build_parser、parse_case_args、launch_app、stop_app、wait_health、free_port、emit_result、DEFAULT_CATEGORY、PRESET_CATEGORIES。接口：HttpClient 绑定精确 origin、禁止凭据头与跨源重定向；Recorder.check/expect_status/finish 输出单个 atlas.acceptance-result.v1；launch_app(app_root, data_dir, port, instance_dir=.../fresh=...) 在 data_dir/instances/<uuid> 启动同一冻结 app/serve.py，轮询 /api/health，stop_app 后再启动可验证重启。所有 P0 程序从自身目录自举 sys.path 后 import common，不修改该文件；HTML 表单解析辅助因授权范围限制放在各 P0 程序内部，避免扩展 common 的公共接口。"
+  },
+  {
+   "path": "acceptance/p0_library.py",
+   "purpose": "重写保存、URL 校验、默认归类和首启外壳用例，覆盖 A01、A02、A03、A11。导入 common 与标准库 html.parser、re、uuid、urllib.parse。内部提供按 data-testid/action 从 HTML 提取表单、读取 action/method/input 字段、以 application/x-www-form-urlencoded 提交并读取 303 Location 的局部辅助；这些辅助不写入 common。A01 用 action=/bookmarks/new 真实表单保存 URL/title/description，断言 303 后 HTML 记录行与 API 读回，再通过 --app-root/--data-dir 启动隔离实例、保存、停止、同子目录重启，断言 id、原始 URL 与内容稳定。A02 用保存表单提交缺协议、javascript:、ftp:、空/无法解析 hostname 等负向 URL，断言 400 invalid_url、form-error 与相对计数不新增；加入单标签主机 http://localhost/<token> 正边界，断言成功、原始 URL 保留、hostname=localhost，且不抓取目标。A03 断言预置归类、空白/默认归类保存落入「未整理」、新归类名经保存表单自动创建并可浏览。A11 断言 /api/health 200 JSON、GET / 200 text/html、保存表单/url 字段/列表容器、a[data-testid='category-manager'] 与 GET /categories 的新建表单。运行契约：--case A01/A02/A03/A11 --base-url；A01 另需 --app-root 与 --data-dir；未知 case 显式 dispatch 失败；stdout 单个结果 JSON，失败非零退出。"
+  },
+  {
+   "path": "acceptance/p0_organize.py",
+   "purpose": "重写归类管理、移动、归类浏览计数和非法归类用例，覆盖 A04、A05、A06、A12。导入 common 与标准库 html.parser、re、uuid、urllib.parse，复用本文件内部的 HTML 表单解析/提交辅助。A04 从 a[data-testid='category-manager'] 进入 GET /categories，使用 category-create-form、category-rename-form、category-delete-form 真实提交：成功 303 后 HTML 可见新名称与计数；重复 409 duplicate_category、空/超长 400 invalid_name、默认归类 400 protected_category 均显示 form-error 且分类集合不变；删除归类前先创建活动记录并用 record-delete-form 软删除一条记录，删除归类后断言活动与软删除记录的 API/HTML 都归入「未整理」，且被软删记录可经 record-restore-form 恢复、不产生孤儿。A05 用 record-move-form 的 record_id 与 category_id 把记录从「未整理」移动，断言 303、新归类 HTML 行/计数、API 归属；另用隔离实例重复移动、停止、重启并读回。A06 创建两类记录，读取 [data-testid='category-count'][data-category-id] 与 /api/categories count，断言只计活动记录且与列表一致；再依次用移动、删除、恢复表单改变状态，断言 HTML 计数、列表与 API count 同步。A12 用保存表单提交超长归类、用移动表单提交未知/非法 category_id，断言 400 invalid_category、form-error、现有归类/记录/锚点归属不变；同时保留 JSON 空名与超长名 invalid_category 断言。运行契约：--case A04/A05/A06/A12 --base-url；A05 另需 --app-root 与 --data-dir；未知 case 显式失败。"
+  },
+  {
+   "path": "acceptance/p0_find_open.py",
+   "purpose": "重写归类检索与打开回跳用例，覆盖 A07、A08。导入 common 与标准库 html.parser、re、uuid、urllib.parse，使用内部 HTML 表单与行解析辅助。A07 创建两个归类及共享关键字记录；从真实归类页 form[data-testid='category-search-form'] 提交 category 与 q，断言响应 HTML 的 select/input 保留两个值、只出现所选归类匹配行、同一关键字在另一归类分别命中、在一个归类用无匹配 q 时显示空状态且无记录行；同时用 JSON 断言标题、hostname、描述子串、大小写不敏感、category+q 叠加与无匹配 200 空数组。A08 用保存表单创建带 query 的原始 URL；断言记录行 tr[data-testid='record-row'][data-record-id] 内 a[data-testid='record-open-link'] 的 href 精确等于保存 URL、target=_blank、rel 含 noopener；GET /go/{id} 不跟随重定向时 302 Location 精确等于保存 URL；未知 id 404 not_found；打开动作后 API 读回 URL 未被改写。运行契约：--case A07/A08 --base-url；未知 case 显式失败；stdout 单个结果 JSON，失败非零退出。"
+  },
+  {
+   "path": "acceptance/p0_recovery.py",
+   "purpose": "重写软删除/恢复与错误合同用例，覆盖 A09、A10。导入 common 与标准库 html.parser、re、uuid、urllib.parse，使用内部 HTML 表单解析/提交辅助。A09 在 --base-url 目标用保存表单创建记录，用 record-delete-form 删除，断言默认 GET / HTML 不含该行而 GET /?trash=1 含 record-restore-form；提交恢复表单后断言原 URL/标题/描述/归类重新可见、计数同步。另通过 --app-root/--data-dir 在隔离实例保存并删除、停止、同子目录重启，断言默认视图仍排除、回收站仍可见，随后用恢复表单恢复并读回。A10 对未知 id 的 GET/PATCH/DELETE/move 断言 404 not_found；畸形 JSON 的保存/PATCH/move 断言 400 bad_request、无 5xx；HTML 保存/移动非法值与未知 id 的删除/恢复表单断言 400/404、form-error 且提供可运行恢复控件；相对计数与锚点字段断言存储不变。运行契约：--case A09/A10 --base-url；A09 另需 --app-root 与 --data-dir；未知 case 显式失败。"
+  },
+  {
+   "path": "acceptance/p1_maturity.py",
+   "reuse": true,
+   "purpose": "保持不变并复制固定基线字节。P1 成熟增强验收，覆盖 A13、A14、A15；导入 common 与标准库 html.parser、os、uuid、urllib.parse。A13 断言离线保存、hostname 派生、title/favicon 降级与首页无外部资源；A14 通过 --data-dir 生成 Netscape HTML 并断言导出/导入与可检索性；A15 断言重复 URL 409 duplicate_url、existing_id、库不变与 allow_duplicate 成功。不修改其断言意图或接口；由 runner.json 使用 --base-url，A14 另用 --data-dir。"
+  },
+  {
+   "path": "acceptance/requirements.txt",
+   "reuse": true,
+   "purpose": "保持不变。声明 Python 3.12 标准库、无第三方依赖、install 为空；说明不执行 pip/npm、不依赖 Playwright 或浏览器库，浏览器专属前提不可用时报告未就绪而非伪造通过。"
+  },
+  {
+   "path": "acceptance/README.md",
+   "purpose": "重写完整运行说明。记录目标适配器 --base-url、--app-root、--data-dir 的适用范围与精确 flags；A01/A05/A09 的重启适配器 argv 与每实例隔离目录；A14 的 data_dir 导入 fixture；HTML 表单层测试与独立浏览器执行的边界；data-testid 与字段名清单（category-manager、category-create-form、category-rename-form、category-delete-form、category-search-form、record-move-form、record-delete-form、record-restore-form、form-error、category-count、record-row、record-open-link；name、category_id、record_id、category、q）；每个用例的行为证据、结果 schema、退出码、离线限制、无认证契约；根 delivery.json 示例，profile 为 python-web，start 为字面 argv 数组并说明 0.0.0.0 仅用于隔离验收网络；明确程序尚未执行，不声称通过。"
+  },
+  {
+   "path": "acceptance/runner.json",
+   "reuse": true,
+   "purpose": "保持固定基线字节，置于计划最后。必须为 atlas.acceptance-runner.v1 / atlas.acceptance-result.v1，cases 覆盖 A01-A15 各一次；A01/A05/A09 使用 --case {case_id} --base-url {base_url} --app-root {app_root} --data-dir {data_dir}，A14 使用 --case {case_id} --base-url {base_url} --data-dir {data_dir}，其余使用 --case {case_id} --base-url {base_url}。实现文件由 spec.acceptance 选择，runner 不覆盖；所有 args 仅使用字面量与允许的占位符。"
+  }
+ ]
+}

@@ -937,6 +937,16 @@ class FactoryStore:
             ).fetchone()
             if not row:
                 raise FactoryError("job not found", "not_found", 404)
+            supersession_table = con.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='tf_job_supersession'"
+            ).fetchone()
+            if supersession_table and con.execute(
+                "SELECT 1 FROM tf_job_supersession WHERE old_job_id=?", (job_id,)
+            ).fetchone():
+                raise FactoryError(
+                    "superseded jobs cannot be retried; use the recorded successor",
+                    "job_superseded", 409,
+                )
             if row[0] not in {"failed", "interrupted", "cancelled", "needs_review"}:
                 raise FactoryError(
                     "only failed or interrupted jobs can retry", "conflict", 409

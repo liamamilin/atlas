@@ -1,0 +1,221 @@
+{
+ "leaf": {
+  "content": "# Bookmark Manager\n\n## Overview\n\nA **Bookmark Manager** is a personal library application for the web: it saves references to web resources as durable records, organizes them under the user's control, and makes them findable later so the user can return to those resources.\n\nThe defining core is small:\n\n```text\nDeliberately saved reference record\n└── anchored to an external web resource by its address (URL)\n    └── held in a persistent, accumulating personal library\n        └── under user-controlled organization\n            └── retrieved later to return to the resource\n```\n\nEverything else commonly associated with the category — browser extensions, automatic metadata, tags and nested collections, cloud sync, duplicate and broken-link management, preserved copies of pages, public sharing — is standard equipment of mature modern products rather than what makes the product a bookmark manager. Older and platform-native forms of the same idea (a browser's built-in bookmark folders, the tag-only social bookmarking services of the mid-2000s) satisfy the core without any of those features.\n\nThe essential job is **save now, find later**. When the center of gravity shifts to consuming captured content (a reading queue), publishing collections for an audience, or storing user-authored material, the product is drifting toward a different Application Type (Read-it-later, Content Curation, or Note-taking respectively).\n\n## Users & Context\n\nThe primary user is an individual who encounters web resources faster than they can act on them: articles, tools, documentation, references, inspiration, things to buy, things to revisit. They save deliberately — each record exists because the person chose to keep that page — and return weeks, months, or years later.\n\nTypical reasons to open the application:\n\n- save a page just encountered, in one click, without losing browsing flow\n- put a saved page where it belongs (topic, project, list)\n- find \"that page I saw a while ago\" by remembering a word, a tag, or roughly where it was filed\n- return to a specific known resource (a tool, a reference, a recipe) instead of searching the web for it again\n- clean house: remove dead links, merge duplicates, restructure\n\nSecondary contexts: small teams or groups maintaining shared collections (research, reading lists, project links); public sharing of a curated list when the owner chooses to. The work environment is inherently multi-device — the whole point of a standalone library is that it is not trapped in one browser or one machine.\n\n## Core Model\n\n### The Defining Core\n\nFour properties. If any one is removed, the product is no longer recognizable as a bookmark manager:\n\n- **Reference record anchored to an address** — the central object is a record that points at a web resource via its URL, enriched with whatever metadata the product adds. The record is not the content; the content lives on the web, outside the library. This is what separates the Type from notes (authored content) and from read-it-later services (the captured readable copy is the working object).\n- **Deliberate capture** — every record originates from a user decision to save (a click, a share, a pasted URL, an approved import). Nothing is logged automatically. This is what separates the library from browser history.\n- **Persistent, accumulating personal library** — records survive sessions and devices and pile up over time into a long-lived personal asset, often numbering thousands of items.\n- **User-controlled organization and retrieval** — the user structures the library in some form and can find records again by browsing that structure and/or by searching. The *form* of organization is an implementation choice, not part of the definition.\n\n### The Record\n\nA bookmark record typically carries:\n\n- the resource's URL — the anchor and, in most products, the record's identity\n- title and description (fetched from the page automatically in many modern products, and user-editable everywhere)\n- a preview thumbnail or icon\n- organizational assignments: collections/folders and/or tags\n- timestamps, favorite/pinned flags, and free-form notes in many products\n\nConcept versus implementation — the core concepts are realized differently across products:\n\n```text\nConcept:             Saved reference record\nImplementations:     link with metadata (universal); record plus preserved page copy;\n                     uploaded file kept as a library item (some products)\n\nConcept:             User-controlled organization\nImplementations:     hierarchical folders/collections; tags; favorites/pins;\n                     manual ordering; an \"unsorted\" inbox for uncategorized saves\n\nConcept:             Retrieval\nImplementations:     search over titles/URLs/descriptions/tags (full-text over page\n                     content in some products); browse by collection or tag; filters; sort\n```\n\n### Capabilities Shared by Mature Products\n\nThese are standard in current standalone products. They make the library practical but do not define the Type:\n\n- **Capture machinery** — a browser extension or bookmarklet (save from any page without leaving it), a mobile share-sheet target, a manual \"add URL\" form, and bulk import from browsers or other services.\n- **Metadata enrichment** — automatic extraction of title, description, and preview imagery from the saved page; editable by the user.\n- **Layered organization** — nested collections/folders and/or tags, often both; favorites or pinned items; a landing zone (unsorted/inbox) for saves the user hasn't classified yet.\n- **Retrieval machinery** — search across the library, filters (by tag, type, date), sorting (newest-first is the common default), and bulk edit tools for reorganizing at scale.\n- **Multi-device, multi-browser access** — web, desktop, and mobile clients sharing one library; independence from any single browser profile is the reason standalone products exist.\n- **Interoperability** — import/export in the standard browser-bookmark HTML format, which functions as the Type's interchange convention.\n- **Library hygiene** — duplicate detection or prevention; awareness of broken links (detection or error listings). Common in standalone products, though depth varies.\n- **Preservation copies** — a saved snapshot of the page (local file, vendor-hosted copy, or a third-party web archive) so the content survives even if the original disappears. Common in dedicated standalone products; absent from the Type's older and platform-native forms, and therefore not part of the definition.\n- **Private-first sharing** — the library defaults to private; sharing a single link, a collection, or the whole account is an explicit, optional act.\n- **Read-later affordances** — unread flags, clean reader views, reminders. A common hybrid overlap with Read-it-later, not part of the definition.\n\n## How It Works\n\n### Capture\n\n```text\nEncounter a page (in a browser or app)\n→ invoke the save surface (extension / share sheet / add form)\n→ the product creates a record: URL + fetched title, description, preview\n→ optionally pick a collection and add tags at save time\n→ done — the record is in the library\n```\n\nCapture is designed to cost seconds. If the user skips classification, the record lands in an unsorted area to be triaged later. Bulk capture exists in both directions: import brings an existing bookmark file or another service's library in at once, and some products can capture all open browser tabs in one action.\n\n### Organize\n\n```text\nOpen the unsorted area (or any collection)\n→ assign records to collections, apply or clean up tags\n→ restructure: nest, rename, merge, or reorder collections\n→ bulk operations move or relabel many records at once\n```\n\nOrganization is retroactive and continuously editable — records can be re-filed at any time, and the organizational structure itself (unlike a file system) is usually cheap to reshape because records are small.\n\n### Find and return\n\n```text\nRemember something about the record (a word, a tag, the topic)\n→ search, or browse to the collection/tag\n→ scan result list (newest-first, or filtered/sorted)\n→ open the record → click through to the live resource\n```\n\nRetrieval is the loop the whole Type exists for. Results are the user's own records; the product finds things the user has already seen and chosen to keep — the inverse of a search engine, which finds things the user has never seen.\n\n### Maintain\n\n```text\nPeriodically: run duplicate review → merge or remove\n→ check broken-link reports → repair (find replacement) or delete\n→ optionally trigger/request preserved copies of important records\n→ deleted records go to a recoverable trash in some products\n```\n\nBecause the referenced content lives on the web and out of the application's control, maintenance is a permanent background concern of this Type — link rot is structural, not an edge case.\n\n## Interfaces\n\n### Library list (home)\n\nThe primary surface: the accumulated records in a browsable list.\n\n- typical information: title, URL/source, thumbnail, tags, collection, date added\n- primary actions: open record, edit, move, tag, favorite, delete, select-many for bulk actions\n\n### Capture surface\n\nA small overlay, not a full screen: the browser-extension popup, the mobile share target, or the add form.\n\n- typical information: page URL and fetched title/preview\n- primary actions: save, pick collection, add tags, (sometimes) set reminder\n\n### Collection / organization sidebar\n\nThe library's structural map.\n\n- typical information: collection tree (often nestable), tag list or cloud, special views (unsorted, favorites, trash)\n- primary actions: create/rename/nest/merge/delete collections, browse into one\n\n### Record detail / edit\n\nOne record's full surface.\n\n- typical information: URL, title, description, preview, notes, tags, collection, timestamps; sometimes the preserved copy or an embedded reader view\n- primary actions: edit fields, move/recategorize, open original, preserve copy, delete\n\n### Search and filters\n\n- typical information: query field, filter controls (tag, type, date), result list\n- primary actions: search, refine, act on results\n\n### Trash\n\nWhere deletions land in products that offer recovery; excluded from search and normal views until restored or purged.\n\n## Important Rules / Behaviors\n\n- **The record points; the web owns the content.** A saved page can change or vanish without the record knowing. The library guarantees the *reference*, not the *content* — unless the product also stores a preserved copy, which is an optional capability.\n- **The library grows only by user action.** Capture is deliberate. Imports and automated intake (e.g., configured feeds) enlarge the library only because the user set them up. There is no silent accumulation as with browser history.\n- **Organization is user-controlled and always revisable.** No structure is imposed by the system; tags and collections mean what the user wants them to mean, and records can be re-filed indefinitely.\n- **One resource, generally one record.** Mature products converge on a single record per address — either by preventing duplicates outright or by surfacing them for cleanup — but the strictness varies by product.\n- **Private by default.** The library is personal; visibility to others requires an explicit sharing act (a public link, a per-record flag, or an invited member).\n- **Deletion is often recoverable, but not always.** Some products hold deleted records in a trash area; others delete permanently, especially in bulk operations.\n- **Read-later state, where present, is orthogonal to organization.** A record can be organized and still unread; the unread flag describes the user's relationship to the content, not the record's place in the library.\n\n## Variants\n\n- **Cloud consumer product** — hosted service with free and paid tiers, full client surface (web/desktop/mobile/extension), preservation and advanced search commonly reserved for paying users.\n- **Minimal paid archive** — deliberately feature-light, text-first, tag-based; longevity and full-content archiving as the value proposition.\n- **Self-hosted open source** — the user runs the server; data ownership and privacy as the value proposition; feature depth varies from minimal to preservation-heavy.\n- **Team/collaborative library** — shared collections with invited contributors; positioned for research groups, agencies, and content teams.\n- **Social bookmarking** (historical founding variant) — public-by-default saving with follower networks and discovery pages; private libraries later became the dominant posture.\n- **Visual/moodboard style** — grid and mosaic presentations of previews, favored for design inspiration use.\n- **Reader-centric hybrid** — strong reader views, annotations, and unread queues; overlaps Read-it-later significantly.\n- **Browser feature vs standalone product** — the same core exists inside browsers; the standalone Type is distinguished by browser independence and library-scale management (see below).\n\n## Related Application Types\n\n| Application Type | Relationship | Distinction |\n|---|---|---|\n| Read-it-later Application | closest sibling | its center of gravity is the consumption queue: content is captured to be read and cleared; a bookmark manager's center is the retrievable reference kept in an organized library |\n| Web Browser (built-in bookmarking) | same core, different scope | a browser bookmark feature is bound to one browser profile and offers no library-scale search, hygiene, preservation, or sharing; the standalone Type exists precisely to be browser-independent |\n| Note-taking / Personal Knowledge Management Application | adjacent | notes center on user-authored content; a bookmark record is a pointer with metadata; PKM tools that save links are absorbing a capability, not becoming this Type |\n| Feed Reader | adjacent | a feed reader subscribes to streams — items arrive automatically and continuously; the bookmark manager holds deliberate one-off captures |\n| Content Curation Platform | adjacent, audience-facing | curation platforms publish collections for an audience as the primary job; the bookmark manager is private-first with sharing as an option |\n| Reference Manager | specialized sibling | scholarly records with citation metadata and bibliographic output; the general bookmark manager has neither |\n| Reading Library Application | family sibling | a library of readable content objects (books/documents) consumed in-app, rather than references whose content stays on the web |\n| General Web Search Engine | functional opposite | a search engine finds resources the user has never seen; a bookmark manager retrieves resources the user has already seen and saved |\n\nThe boundary that matters most in practice is with **Read-it-later**: products hybridize heavily (reader views, unread flags appear on both sides). The structural test is the center of gravity — an organized library meant to be kept and searched, versus a queue meant to be consumed and emptied.\n\n## Representative Products\n\n- **Raindrop.io** — modern cloud-first product; collections + tags, automatic metadata, reader view, duplicate/broken-link tools, preserved copies, sharing and collaboration\n- **Pinboard** — minimal paid web service (since 2009), tag-based, with a paid archival tier; explicit heir of the social-bookmarking lineage\n- **Linkding** — self-hosted, minimal, metadata-fetching, snapshot-capable\n- **Linkwarden** — self-hostable, preservation-first, with collaboration and reader/annotation layers\n\nThe defining core was also checked against the Type's other historical forms — browser-native bookmark folders and the tag-only social bookmarking services of the 2000s — to avoid defining the category solely by today's cloud-and-preservation products.\n\n## Sources\n\nResearch date: **2026-09-06**\n\n- Raindrop.io — Help Center (official documentation): https://help.raindrop.io/ (index, quickstart, bookmarks, collections)\n- Pinboard — Official FAQ: https://pinboard.in/faq/\n- Linkding — Official documentation site: https://linkding.link/\n- Linkwarden — Official product site: https://linkwarden.app/\n\n> Sourcing limitations: current browser-vendor documentation (Chrome Help, Mozilla Support) could not be fetched on the research date, so statements about built-in browser bookmarking are kept at the conceptual level. Linkwarden evidence is the official product site (feature list and positioning) rather than its operational documentation; Linkding's fetched feature list is partial. Accordingly, no precise limits, prices, or default settings from any product are asserted in this document.\n\nDetailed evidence, product-by-product observations, cross-product comparison, and boundary analysis are recorded in the paired Research Notes.\n",
+  "fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+  "name": "Bookmark Manager",
+  "name_zh": "书签管理器",
+  "slug": "bookmark-manager",
+  "content_file": "leaf.md"
+ },
+ "scenario": {
+  "acceptance": [
+   "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+   "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+   "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+   "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+  ],
+  "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+  "id": "scn_7756e0007f6a463a97316f3f49c15248",
+  "leaf": "bookmark-manager",
+  "leaf_name": "书签管理器",
+  "name": "生活待购与灵感收藏夹",
+  "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+  "revision": 2,
+  "status": "ready",
+  "updated_at": "2026-10-16T14:18:20.407897+00:00",
+  "workflow": [
+   "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+   "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+   "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+   "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+   "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+  ]
+ },
+ "language": "zh",
+ "failure_evidence": [],
+ "guidance_file": null,
+ "design_feedback_file": null,
+ "revision": {
+  "instructions_file": "source/REVISION.md",
+  "reviews_file": "source/REVIEWS.md",
+  "instructions": "请对固定的旧冻结候选进行一次正式聚合修订，范围以同一请求中的 REPAIR_SCOPE.json 为准；reuse_spec=false，必须先预审规格，再生成/修订程序，冻结前执行宿主 authored-field 与程序 diff 门禁。不要调用或建议任何未授权模型/工具行为，不要声称测试或运行已通过。请返回完整的新规格及限定的五个程序文件，不能只做 spec-only 补丁。\n\n## Intended aggregate contract\n\nThis request revises the pinned draft only. It does not state that the old candidate passed, that repair-2 froze, or that any acceptance program ran. All original P0 feature IDs, phases, current-required status, and capabilities remain. A02 single-label hostname rejection is the sole authorized semantic replacement. Every other assertion intent remains; changes to its implementation may only add the specified browser/UI and directly necessary adaptations. F14/A15 stays P1.\n\n### Current-required contract coverage\n\nThe new `contract_coverage` object maps every P0 `current required` feature to a design basis, user entry, action, success state/navigation, failure, recovery, and existing acceptance IDs. Host checks enforce fixed schema/review-rule versions, feature and acceptance references, and completeness of the mapping. The frozen independent reviewer still judges whether each route is a real complete journey; field presence or keywords do not establish semantic completeness.\n\n### URL policy and A02 change\n\nA record URL must be an absolute, parseable HTTP(S) URL with a valid nonempty hostname. A single-label hostname such as `http://localhost` is valid. No DNS lookup, network reachability, or target fetch is required. Keep the original submitted URL string for persistence and opening; opening must navigate to that exact value. Saving, opening, and actively fetching are distinct; no P0 fetch is added. Preserve negative cases for missing scheme, unsupported schemes, empty/invalid hostname and assert rejection does not write. Move only the single-label hostname from A02's negative set to an explicit positive boundary example. Preserve the upstream dotted-host regex as a source observation and explain its target mapping as `adjusted`, because a dot is not a general URL-validity requirement. If the existing update API accepts a changed URL, recompute `hostname` from that URL. Do not move duplicate URL behavior to P0: F14/A15 remains P1.\n\n### UI contract and selectors\n\nThe browser adapter must use these stable selectors (and may use semantic equivalents only if the frozen authored contract explicitly declares them): category manager link `a[data-testid=\"category-manager\"]`; create form `form[data-testid=\"category-create-form\"]` with `input[name=\"name\"]`; rename form `form[data-testid=\"category-rename-form\"]` with `input[name=\"category_id\"]` and `input[name=\"name\"]`; category-delete form `form[data-testid=\"category-delete-form\"]` with `input[name=\"category_id\"]`; category-search form `form[data-testid=\"category-search-form\"]` with `select` or `input[name=\"category\"]` (category name) and `input[name=\"q\"]`; category links and GET `/` preserve both query values. Rename/delete forms carry `input[name=\"category_id\"]`. Per-record move/delete/restore forms `form[data-testid=\"record-move-form\"]`, `record-delete-form`, `record-restore-form` carry `input[name=\"record_id\"]`; move uses `select[name=\"category_id\"]` (API category ID), translated by the HTML handler to the category name expected by the existing move endpoint. Visible count is `[data-testid=\"category-count\"][data-category-id]`; record row is `tr[data-testid=\"record-row\"][data-record-id]` with `a[data-testid=\"record-open-link\"]` pointing to the exact saved URL, `target=\"_blank\"`, `rel=\"noopener\"`; validation feedback is `[data-testid=\"form-error\"]`. Category create/rename/delete submissions must operate through real forms, report duplicate/invalid/protected-category errors without mutation, preserve invalid input or provide an actionable recovery path, and navigate to the resulting category state on success. Category deletion migrates both active and soft-deleted records to `未整理`; a soft-deleted record remains restorable.\n\nCategory search is submitted from the real category page and preserves both selected category and q. Show selected category, retained query and matching/empty results. Test the same keyword across two categories and a no-match query within one category. The sidebar count is visibly rendered and counts active (non-trashed) records only; compare with the API and actual list after move, delete, and restore. Move, delete, restore and open are attributed to the selected row via `data-record-id`; open assertion verifies actual link/navigation target and exact saved URL. Form errors must not cause 5xx or mutate data; malformed JSON retains the existing `bad_request` and no-write behavior. Keep existing JSON API acceptance. Remove the unpaired “edit entry” UI promise; do not add a new P0 record-editing feature. Preserve any existing URL-update API contract and recalculate hostname if URL changes.\n\n### Existing assertions and decision explanations\n\nPreserve all existing P0 obligations not explicitly listed as additions or the A02 replacement: save and stable cross-restart data (A01), default/preseeded category and save behavior (A03), category move/persistence (A05), category filtering and counts (A06), keyword fields and empty result (A07), exact original URL opening/unknown ID (A08), soft-delete/restart/restore (A09), unknown IDs and malformed request non-mutation (A10), health/empty shell (A11), and invalid category save/move non-mutation (A12). Do not weaken status/error/data-integrity assertions for convenience. Keep D04's repair-2 impact correction: `trashed_at`, default list filtering, and `/restore`; do not reintroduce undefined `purge`. Clarify D07 with category-plus-keyword and active-only count behavior. Clarify D08 to describe the Python-web/SQLite/SSR target and its independent HTTP acceptance. D12 concerns flat category depth, not schema migration. The architecture describes `schema_meta(version)` and transactional versioned migrations; remove the erroneous attribution of migration strategy to D12.\n\n### Case adaptation input and source/target boundary\n\nRun case adaptation under a new `case-adaptation-aggregate-v1` input/revision while retaining logical retry scope `case-adaptation`. The actual formal adaptation input must include target profile `{delivery_profile: python-web, python: 3.12, storage: SQLite, rendering: server-rendered HTML}`, the URL policy stated above, and explicit adaptations: F08/F11 IndexedDB/Dexie + SPA are source facts while target uses SQLite + SSR; preserve local persistence/cross-session and single-user intent but mark implementation adjusted; preserve upstream dotted-host regex as source fact but map it as adjusted; source observations are not target requirements. Correct case-design explanations and derived `PRODUCT.md`: F08 must say persistence behavior is adopted but storage implementation is adjusted; F11 must say target is SSR rather than an adopted SPA shell. Use only valid IDs from the fixed case evidence basis for adopted/adjusted/not_adopted, and no invented evidence IDs. New target policies may cite this explicit instruction, not claim upstream evidence. Preserve fixed case revision, upstream commit, case-basis digest, and all 29 immutable facts.\n\n### Allowed files and exact comparison\n\nThe only authorized program paths are `acceptance/p0_library.py`, `acceptance/p0_organize.py`, `acceptance/p0_find_open.py`, `acceptance/p0_recovery.py`, and `acceptance/README.md`. Keep all other existing acceptance/reference program files and their assertion intents. Do not edit `acceptance/plan.json`, dependencies, or application code. `common.py` is not authorized absent a demonstrated concrete helper gap; if such a gap is found, stop and prepare a separately reviewed scope instead of expanding this request. The host must compare authored fields and program files to the pinned baseline before freezing. Review the exact pre-freeze authored diff and program diff, including unchanged identities/phases/current-required statuses and all preserved assertions. Rendered `template.json`, product docs, host metadata and integrity files are derived outputs and are guarded by authored scope plus host digests, not treated as acceptance program edits.\n\n### Historical repair-2 reconciliation\n\nThe earlier repair-2 request was spec-only and never froze. Preserve its history and baseline. Carry forward its `bad_request` malformed-JSON correction and corrected D04 impact. Do not carry forward its dotted-host restriction: this request's explicit target URL policy supersedes that one patch. The original three-point request remains historical evidence and is not treated as the current complete scope.",
+  "reviews": [
+   {
+    "artifact_id": "tpl_7f4c17e834c342e7b462e6bb8b6379e4",
+    "checks": [
+     {
+      "dimension": "category_evidence",
+      "files": [
+       "CATEGORY.md",
+       "inputs/case-basis.json"
+      ],
+      "outcome": "passed",
+      "reason": "CATEGORY.md 明确区分 S01 已确认输入与 S02–S22 逐条上游观测（固定 commit 539881b + 文件:行，如 store.ts 与 App.tsrx），并单列「待验证」未知项（运行时未观测、Dexie/第三方端点未验证、Research Notes 未随包提供、host 排除 obs-no-test-files 等）。授权表述保守：逐条标注 Fixed source license/NOTICE hashes，注明 legal reuse review not performed；case-basis.json 明确 MIT 仅来自默认分支补充、不代表固定 commit，未对许可作无依据主张。符合引证与未知项分离、审慎许可的要求。"
+     },
+     {
+      "dimension": "scenario_scope",
+      "files": [
+       "PRODUCT.md",
+       "ROADMAP.md",
+       "inputs/scenario.json"
+      ],
+      "outcome": "passed",
+      "reason": "场景为单用户本地采集箱（objective 为留存链接、日后回到原页）。F01–F11 覆盖保存、默认未整理、归类增删改、移动、归类浏览计数、关键字检索、打开回跳、多会话持久化、删除撤销与错误合同，正好对应 scenario 的 4 条 acceptance 与 5 步 workflow；F15（扩展/分享目标）、F16（云同步）、F21（分享协作）、F22（稍后阅读）等标 not applicable 并给出理由，未把多用户/云/分享等无关能力强加进范围。范围与已确认场景吻合。"
+     },
+     {
+      "dimension": "product_completeness",
+      "files": [
+       "PRODUCT.md",
+       "ARCHITECTURE.md",
+       "DECISIONS.md"
+      ],
+      "outcome": "passed",
+      "reason": "角色 R01 收藏者/R02 应用壳/R03 独立验收者齐备；正常流（保存→归类→浏览/检索→打开）与失败流（非法 URL/归类、未知 id、畸形请求、删除恢复）都有定义；数据生命周期完整（created_at/updated_at、软删 trashed_at、restore、归类删除迁回默认、P1 导入导出）。权限/计费/管理/审计对单机单用户不适用，并在 D09（无认证）、F16/F21（无云与协作）给出适用性理由；导出列 P1/F13、恢复列 P0/F09，符合「不要求不适用的企业能力」。"
+     },
+     {
+      "dimension": "architecture_contract",
+      "files": [
+       "ARCHITECTURE.md",
+       "acceptance/p0_library.py",
+       "acceptance/p0_recovery.py"
+      ],
+      "outcome": "uncertain",
+      "reason": "数据模型（categories/bookmarks 列与索引）、API/错误合同、UI 适配器合同与验收适配器合同（--base-url/--app-root/--data-dir、每实例隔离启动、离线绑定 127.0.0.1）均已定义，默认栈与理由清楚。但契约不足以完全支撑所断言行为：invalid_url 仅写「非 http/https、hostname 为空」，未写明 A02 dotless-host 依赖的「必须含点域名」拒绝规则（该规则来自被采用的 S08 getHostname，架构只隐含），按字面实现 urlsplit().hostname 对 http://atlas-a02-xxxx 非空，可能被接受而使 A02 失败；通用错误合同只列举各端点码，未枚举 A10 断言的 bad_request（畸形 JSON）。证据充分但契约表述有缺口，故标 uncertain 要求澄清，而非判为通过。"
+     },
+     {
+      "dimension": "phase_acceptance",
+      "files": [
+       "acceptance/plan.json",
+       "acceptance/p0_library.py",
+       "acceptance/p0_organize.py",
+       "acceptance/p0_find_open.py",
+       "acceptance/p0_recovery.py",
+       "acceptance/p1_maturity.py",
+       "acceptance/runner.json",
+       "acceptance/common.py"
+      ],
+      "outcome": "passed",
+      "reason": "阶段=交付顺序且双向覆盖：F01–F14 均在引入阶段有验收（P0→A01–A12，P1→A13–A15），A01–A15 各恰映射到特性；P0 用例只用 P0 接口，未使用 export/import/allow_duplicate 等 P1 API。程序是真实行为断言：common.py 用 urllib 发真实 HTTP、拒绝跨源、拒绝凭据头、剥离代理；A01/A05/A09 真正启动 app/serve.py 子进程、写入实例子目录、停止后同目录重启读回；A02/A10/A12 用相对计数与不变集断言不新增/不改变数据；A08 明确不跟随重定向只读 302 Location。未见空桩、伪造成功、避重就轻的同义反复或缺失目标交互；未实现用例会以 dispatch=false 显式失败。runner.json 的 per-case flags 与 parse_case_args 一致（A01/A05/A09 带 --app-root 与 --data-dir，A14 带 --data-dir，其余仅 --case/--base-url），程序→用例派发按 README §4.1 一一对应。"
+     },
+     {
+      "dimension": "decisions_defaults",
+      "files": [
+       "DECISIONS.md",
+       "ARCHITECTURE.md"
+      ],
+      "outcome": "passed",
+      "reason": "D01–D13 均含明确默认值与「When to ask / 询问条件」，状态分 decided/deferred/open，覆盖单选归类、默认未整理、新归类自动创建、软删撤销、本地优先图标、去重、检索字段、运行时、认证、导入导出格式等关键取舍，触发条件具体可操作。小瑕疵：D04 影响行提到「/restore 与 purge 接口」，而 ARCHITECTURE.md 只定义了 /restore、未定义 purge，属决策影响与 API 合同的措辞不一致（见 suggestions）。"
+     },
+     {
+      "dimension": "agent_handoff",
+      "files": [
+       "AGENT.md",
+       "README.md"
+      ],
+      "outcome": "passed",
+      "reason": "AGENT.md 明确要求先核对既有项目/指令/已确认决定，原包先核对 PRODUCT 与 ROADMAP 当前阶段，实现前读 ARCHITECTURE 契约、选型查 CATEGORY、执行验收前读对应程序；要求只选当前阶段并完成其完整用户闭环、不预读全部后期材料；准备专用测试实例、运行真实 HTTP 验收并记录实际命令/通过失败/日志；不得删除断言、硬编码测试值或谎报未运行测试通过；不覆盖已有数据/决定，proposed 决策视为待采纳建议；并声明包内内容不授予外部访问/凭据/发布/破坏性权限。尊重既有用户决定且分阶段推进。"
+     },
+     {
+      "dimension": "evidence_honesty",
+      "files": [
+       "README.md",
+       "VALIDATION.md",
+       "template.json",
+       "integrity.json",
+       "CATEGORY.md"
+      ],
+      "outcome": "passed",
+      "reason": "README「认知开发包候选；不是已实现应用」、VALIDATION「仅校验结构、引用、阶段映射与摘要；包内验收与参考代码尚未执行」、template.json status「candidate; programs not executed」三处一致，未声称运行过任何测试；integrity.json 的 sha256 清单与 source_inventory 文件一一对应；CATEGORY.md 的「待验证」与 host 排除证据（obs-no-test-files / inf-no-tests）如实披露；上游许可只作哈希固定与未做法律审查的说明，未作无依据主张。审阅未运行任何程序，故不对通过与否背书。"
+     }
+    ],
+    "created_at": "2026-10-19T07:47:09.120005+00:00",
+    "digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+    "id": "acc_47f195cff47e4178bde944d67384a207",
+    "job_id": "job_8c13691fd4ac4591a83308c02cd4e267",
+    "method": "cognitive-review",
+    "outcome": "uncertain",
+    "scope": "Independent static cognition and acceptance-program review only; no program execution, source re-fetch, downstream runtime or publication.",
+    "suggestions": [
+     "在 ARCHITECTURE.md 的 invalid_url 定义中显式补上「URL 必须含点域名（可复用 S08 getHostname 的规则）」，使 A02 的 dotless-host 用例有契约依据，消除架构与 ROADMAP/A02 的表述差。",
+     "在 ARCHITECTURE.md 错误码清单中补列通用码（至少 bad_request 用于畸形 JSON），使 A10 的断言与错误合同一致。",
+     "对齐 D04 与 API：要么定义/实现 purge 与永久删除路径，要么删除 D04 影响行中的 purge 提法，避免决策影响与架构合同不符。",
+     "补充负向覆盖：归类重命名撞名 409 duplicate_category、POST /api/categories 空名/超长名 400 invalid_name（P0），以及恢复时同 URL 已有活动记录 409 duplicate_url 且不改数据（P1，数据完整性路径）。",
+     "增加默认排序的行为断言（created_at 倒序、同值以 id 兜底），否则该架构承诺无验收支撑。",
+     "强化既有用例：A01 跨重启除 id/url 外再断言 title/description 稳定；A14 用 /api/export 的原样输出回导并断言 imported 计数，形成导出↔导入闭环，而非另造 HTML。",
+     "为打开回跳补一条 UI 层断言（rel=noopener / target=_blank）或明确说明套件不驱动浏览器、该安全属性不被验证，避免安全约定悬空。",
+     "在交付说明中重申 start 使用 0.0.0.0 仅限隔离验收网络、日常须绑定 127.0.0.1；无认证本地库若被照抄暴露到局域网会形成未授权访问风险。"
+    ],
+    "summary": "对冻结的认知产品蓝图（书签管理器 / 生活待购与灵感收藏夹）做了逐文件独立审阅：本包只有蓝图与验收程序，没有任何应用实现（app/serve.py 不存在），template.json 标注 candidate；programs not executed，我也未运行任何测试，故不对行为是否正确下断言，只审阅文本与程序语义。结论：场景收窄合理、产品与阶段闭环完整、验收程序是真实 HTTP 语义断言而非空桩或伪造成功、无凭据外泄；唯一实质缺陷是 ARCHITECTURE.md 的 invalid_url / 通用错误合同表述不足以完全支撑 A02、A10 所断言的行为（无点域名拒绝、bad_request 码）。此外有一批可改进的负向覆盖与契约一致性项，均属建议，不构成核心旅程阻塞。"
+   },
+   {
+    "artifact_id": "tpl_7f4c17e834c342e7b462e6bb8b6379e4",
+    "code": "cli_failed",
+    "created_at": "2026-10-19T07:42:26.175079+00:00",
+    "digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+    "error": "OpenCode CLI failed: {'type': 'provider.invalid-output', 'message': 'OpenAI Chat stream ended without finish_reason', 'status': 200}; {'type': 'provider.invalid-output', 'message': 'OpenAI Chat stream ended without finish_reason', 'status': 200}",
+    "id": "acc_14619994f11a4b2380808b2eb278430b",
+    "job_id": "job_8c13691fd4ac4591a83308c02cd4e267",
+    "method": "cognitive-review",
+    "outcome": "unavailable",
+    "scope": "Acceptance did not complete; no successful review or runtime claim"
+   },
+   {
+    "artifact_id": "tpl_7f4c17e834c342e7b462e6bb8b6379e4",
+    "code": "cli_failed",
+    "created_at": "2026-10-19T07:38:56.430648+00:00",
+    "digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+    "error": "OpenCode CLI failed: {'type': 'provider.invalid-output', 'message': 'OpenAI Chat stream ended without finish_reason', 'status': 200}; {'type': 'provider.invalid-output', 'message': 'OpenAI Chat stream ended without finish_reason', 'status': 200}",
+    "id": "acc_fb5752aac18745268bc3048f1a3c99e6",
+    "job_id": "job_8c13691fd4ac4591a83308c02cd4e267",
+    "method": "cognitive-review",
+    "outcome": "unavailable",
+    "scope": "Acceptance did not complete; no successful review or runtime claim"
+   }
+  ],
+  "previous": "source/previous",
+  "edit_paths": [
+   "acceptance/p0_library.py",
+   "acceptance/p0_organize.py",
+   "acceptance/p0_find_open.py",
+   "acceptance/p0_recovery.py",
+   "acceptance/README.md"
+  ],
+  "repair_scope_file": "source/REPAIR_SCOPE.json"
+ },
+ "source_inventory": [
+  "ACCEPTED_CASE_FACTS.json",
+  "CASE_BASIS.json",
+  "CASE_DESIGN.json",
+  "FORMAT.md",
+  "REPAIR_SCOPE.json",
+  "RESEARCH.md",
+  "REVIEWS.md",
+  "REVISION.md",
+  "RUNTIME_CONTRACT.md",
+  "RUNTIME_PROTOCOL.md",
+  "previous/AGENT.md",
+  "previous/ARCHITECTURE.md",
+  "previous/CATEGORY.md",
+  "previous/DECISIONS.md",
+  "previous/PRODUCT.md",
+  "previous/README.md",
+  "previous/ROADMAP.md",
+  "previous/VALIDATION.md",
+  "previous/acceptance/README.md",
+  "previous/acceptance/common.py",
+  "previous/acceptance/p0_find_open.py",
+  "previous/acceptance/p0_library.py",
+  "previous/acceptance/p0_organize.py",
+  "previous/acceptance/p0_recovery.py",
+  "previous/acceptance/p1_maturity.py",
+  "previous/acceptance/plan.json",
+  "previous/acceptance/requirements.txt",
+  "previous/acceptance/runner.json",
+  "previous/inputs/accepted-case-facts.json",
+  "previous/inputs/case-basis.json",
+  "previous/inputs/case-design.json",
+  "previous/inputs/scenario.json",
+  "previous/integrity.json",
+  "previous/template.json"
+ ]
+}

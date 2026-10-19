@@ -1,6 +1,7 @@
 """Cognition queue/production contracts with fake CLI. Not model-quality evidence."""
 
 from copy import deepcopy
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -10,6 +11,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import test_blueprints as blueprint_fixtures
+from template_factory.artifacts import copy_tree
 from template_factory.blueprints import import_blueprint
 from template_factory.cognition import (
     DESIGN_DIMENSIONS,
@@ -21,13 +23,15 @@ from template_factory.cognition import (
     research_context,
     require_aggregate_semantic_review_pass,
     scoped_file_plan,
+    _normalize_generation_envelope,
+    _recover_prior_generation_delivery,
     validate_aggregate_semantic_review,
     validate_file_plan,
     validate_research,
     validate_review,
 )
 from template_factory.budget import BudgetLedger
-from template_factory.contract_scope import aggregate_semantic_budget_stage
+from template_factory.contract_scope import aggregate_semantic_budget_stage, validate_repair_diff
 from template_factory.pipeline import Pipeline
 from template_factory.store import FactoryError, canonical, digest
 
@@ -55,6 +59,10 @@ class FakeCognitionCLI:
         self.fail_design_dimension_once = None
         self.research_with_reserved_source = False
         self.fail_research_repair = False
+        self.outer_coverage_generation = False
+        self.record_generation_delivery = False
+        self.scope_repair_baseline = None
+        self.scope_proposal_out_of_scope = False
 
     def info(self, *args, **kwargs):
         return {"available": True, "backend": "test-double"}
@@ -149,6 +157,22 @@ class FakeCognitionCLI:
                 current = json.loads(
                     (directory / "source/SPECIFICATION.json").read_text()
                 )["spec"]
+                if self.scope_repair_baseline is not None:
+                    baseline = self.scope_repair_baseline
+                    changes = []
+                    for field in ("title", "architecture_markdown", "limits"):
+                        if current.get(field) != baseline.get(field):
+                            changes.append({"path": [field], "old": current.get(field), "new": baseline.get(field)})
+                    for field in ("roles", "features", "decisions", "phases", "acceptance"):
+                        baseline_rows = {row["id"]: row for row in baseline.get(field, [])}
+                        current_rows = {row["id"]: row for row in current.get(field, [])}
+                        if baseline_rows.keys() != current_rows.keys():
+                            continue
+                        for row_id, baseline_row in baseline_rows.items():
+                            for key in baseline_row.keys() | current_rows[row_id].keys():
+                                if baseline_row.get(key) != current_rows[row_id].get(key):
+                                    changes.append({"path": [field, row_id, key], "old": current_rows[row_id].get(key), "new": baseline_row.get(key)})
+                    return {"base_proposal_digest": supplied["base_proposal_digest"], "spec_changes": changes}
                 if current["features"][0]["sources"] == ["missing"]:
                     return {
                         "spec_changes": [
@@ -172,25 +196,31 @@ class FakeCognitionCLI:
                         }
                     ]
                 }
-            spec = {
-                key: deepcopy(fixture[key])
-                for key in [
-                    "title",
-                    "roles",
-                    "features",
-                    "decisions",
-                    "phases",
-                    "acceptance",
-                    "architecture_markdown",
-                    "limits",
-                ]
-            }
+            authored_fields = [
+                "title", "roles", "features", "decisions", "phases", "acceptance",
+                "architecture_markdown", "limits",
+            ]
+            if self.scope_repair_baseline is not None and supplied.get("revision"):
+                spec = {
+                    key: deepcopy(self.scope_repair_baseline[key])
+                    for key in authored_fields
+                }
+                if "contract_coverage" in self.scope_repair_baseline:
+                    spec["contract_coverage"] = deepcopy(self.scope_repair_baseline["contract_coverage"])
+                if self.scope_proposal_out_of_scope:
+                    spec["roles"][0]["name"] += " changed outside scope"
+                    spec["features"][0]["reason"] += " changed outside scope"
+                    spec["decisions"][0]["impact"] += " changed outside scope"
+                    spec["decisions"][0]["default"] += " changed outside scope"
+                    spec["limits"] = [*spec["limits"], "New unauthorized limit"]
+            else:
+                spec = {key: deepcopy(fixture[key]) for key in authored_fields}
             required = [
                 feature for feature in spec["features"]
                 if feature.get("phase") == "P0"
                 and feature.get("applicability") == "current required"
             ]
-            spec["contract_coverage"] = {
+            generated_coverage = spec.pop("contract_coverage", None) or {
                 "schema": "atlas.contract-coverage.v1",
                 "review_rules_version": "atlas.current-required-contract.v1",
                 "features": [
@@ -212,10 +242,11 @@ class FakeCognitionCLI:
                 spec["features"][0]["sources"] = ["missing"]
                 self.bad_structure_once = False
             # Even unsupported author claims must not become execution facts.
-            for case in spec["acceptance"]:
-                case["status"] = "passed"
-            for phase in spec["phases"]:
-                phase["status"] = "implemented"
+            if self.scope_repair_baseline is None or not supplied.get("revision"):
+                for case in spec["acceptance"]:
+                    case["status"] = "passed"
+                for phase in spec["phases"]:
+                    phase["status"] = "implemented"
             files = {
                 p.relative_to(self.source).as_posix(): p.read_text()
                 for base in ["acceptance", "references"]
@@ -224,7 +255,7 @@ class FakeCognitionCLI:
                 and p.name != "plan.json"
                 and "__pycache__" not in p.parts
             }
-            return {
+            generated = {
                 "spec": spec,
                 "file_plan": [
                     {
@@ -235,6 +266,26 @@ class FakeCognitionCLI:
                     for name in files
                 ],
             }
+            if generated_coverage is not None:
+                generated["spec"]["contract_coverage"] = generated_coverage
+            if self.outer_coverage_generation:
+                coverage = generated["spec"].pop("contract_coverage")
+                generated["contract_coverage"] = coverage
+            if self.record_generation_delivery:
+                stdout = json.dumps(
+                    {"type": "text", "part": {"text": json.dumps(generated)}},
+                    ensure_ascii=False,
+                ).encode()
+                (directory / "stdout.log").write_bytes(stdout)
+                (directory / "cli-summary.json").write_text(json.dumps({
+                    "requested_model": model,
+                    "cli_status": "completed",
+                    "exit_code": 0,
+                    "delivery_status": "delivered",
+                    "failure_code": None,
+                    "stdout_sha256": hashlib.sha256(stdout).hexdigest(),
+                }))
+            return generated
         if stage.startswith("blueprint-code"):
             if self.fail_file_once and stage.endswith("-1"):
                 self.fail_file_once = False
@@ -677,6 +728,215 @@ class CognitionTests(unittest.TestCase):
             all(phase["status"] == "not implemented" for phase in spec["phases"])
         )
         self.assertIn("NOT been executed", (candidate / "VALIDATION.md").read_text())
+
+    def test_outer_coverage_delivery_is_recovered_without_second_generation_call(self):
+        self.batch()
+        self.cli = FakeCognitionCLI(self.source)
+        self.cli.outer_coverage_generation = True
+        self.cli.record_generation_delivery = True
+        pipeline = Pipeline(self.store, cli=self.cli)
+        job = self.store.claim("outer coverage delivery", "production")
+        original_validate = validate_file_plan
+        calls = 0
+
+        def fail_after_delivery_once(value, **kwargs):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                raise FactoryError("synthetic stop after delivered result")
+            return original_validate(value, **kwargs)
+
+        with patch("template_factory.cognition.validate_file_plan", side_effect=fail_after_delivery_once):
+            with self.assertRaisesRegex(FactoryError, "synthetic stop"):
+                pipeline.run(job)
+
+        first_stage = self.store.root / "jobs" / job["id"] / "attempt-1/blueprint-generate-0"
+        old_evidence = {
+            name: (first_stage / name).read_bytes()
+            for name in ("input.json", "stdout.log", "result.json", "cli-summary.json")
+        }
+        self.assertEqual(set(json.loads(old_evidence["result.json"])), {"spec", "file_plan", "contract_coverage"})
+        self.store.retry(job["id"])
+        with patch("template_factory.cognition.validate_file_plan", side_effect=fail_after_delivery_once):
+            pipeline.run(self.store.claim("outer coverage delivery retry", "production"))
+
+        self.assertEqual(self.cli.calls.count("blueprint-generate-0"), 1)
+        recovered_stage = self.store.root / "jobs" / job["id"] / "attempt-2/blueprint-generate-0"
+        receipt = json.loads((recovered_stage / "recovery-receipt.json").read_text())
+        self.assertTrue(receipt["no_new_cli_call"])
+        self.assertEqual(receipt["prior_stage"], "attempt-1/blueprint-generate-0")
+        self.assertFalse((recovered_stage / "cli-summary.json").exists())
+        for name, content in old_evidence.items():
+            self.assertEqual((first_stage / name).read_bytes(), content)
+        checkpoint = self.store.checkpoint(job["id"], "blueprint-plan-0")
+        self.assertIn("contract_coverage", checkpoint["result"]["spec"])
+        self.assertEqual(
+            json.loads((recovered_stage / "result.json").read_text()),
+            json.loads(old_evidence["result.json"]),
+        )
+
+    def test_generation_recovery_rejects_evidence_drift(self):
+        fixture = json.loads((self.source / "template.json").read_text())
+        spec = {key: deepcopy(fixture[key]) for key in (
+            "title", "roles", "features", "decisions", "phases", "acceptance",
+            "architecture_markdown", "limits",
+        )}
+        coverage = {
+            "schema": "atlas.contract-coverage.v1",
+            "review_rules_version": "atlas.current-required-contract.v1",
+            "features": [
+                {
+                    "feature_id": row["id"], "design_basis": "Scenario commitment",
+                    "entry": "Reachable page", "action": "Submit form",
+                    "success_state": "Visible result", "navigation": "Return to list",
+                    "failure": "Visible error", "recovery": "Correct and resubmit",
+                    "acceptance_ids": list(row["acceptance"]),
+                }
+                for row in spec["features"]
+                if row.get("phase") == "P0" and row.get("applicability") == "current required"
+            ],
+        }
+        raw_result = {
+            "spec": spec,
+            "contract_coverage": coverage,
+            "file_plan": [{"path": "acceptance/README.md", "purpose": "Document real target setup."}],
+        }
+        self.assertNotIn("contract_coverage", spec)
+        normalized, receipt = _normalize_generation_envelope(raw_result)
+        self.assertEqual(normalized["spec"]["contract_coverage"], coverage)
+        self.assertEqual(receipt["raw_result_digest"], digest(raw_result))
+        self.assertNotIn("contract_coverage", raw_result["spec"])
+        with self.assertRaises(FactoryError):
+            _normalize_generation_envelope({**raw_result, "unexpected": True})
+        with self.assertRaises(FactoryError):
+            _normalize_generation_envelope({**raw_result, "spec": {**spec, "contract_coverage": coverage}})
+
+        def write_delivery(job_id):
+            job_root = self.store.root / "jobs" / job_id
+            prior = job_root / "attempt-1/blueprint-generate-0"
+            prior.mkdir(parents=True)
+            current_source = self.store.root / (job_id + "-current-source")
+            copy_tree(self.source, current_source)
+            copy_tree(self.source, prior / "source")
+            current_input = {"scenario": {"id": "fixture"}, "language": "en"}
+            (prior / "input.json").write_text(json.dumps(current_input))
+            stdout = json.dumps({"type": "text", "part": {"text": json.dumps(raw_result)}}).encode()
+            (prior / "stdout.log").write_bytes(stdout)
+            (prior / "cli-summary.json").write_text(json.dumps({
+                "requested_model": "fake/flash", "cli_status": "completed", "exit_code": 0,
+                "delivery_status": "delivered", "failure_code": None,
+                "stdout_sha256": hashlib.sha256(stdout).hexdigest(),
+            }))
+            (prior / "result.json").write_text(json.dumps(raw_result))
+            return prior, current_source, current_input
+
+        for drift in ("input", "source", "model", "stdout", "result", "failure_code"):
+            with self.subTest(drift=drift):
+                job_id = "recovery-" + drift
+                prior, current_source, current_input = write_delivery(job_id)
+                requested_model = "fake/flash"
+                if drift == "input":
+                    current_input = {**current_input, "language": "zh"}
+                elif drift == "source":
+                    (current_source / "DRIFT.md").write_text("changed source")
+                elif drift == "model":
+                    requested_model = "fake/other"
+                elif drift == "stdout":
+                    (prior / "stdout.log").write_bytes((prior / "stdout.log").read_bytes() + b" ")
+                elif drift == "result":
+                    (prior / "result.json").write_text(json.dumps({**raw_result, "changed": True}))
+                elif drift == "failure_code":
+                    summary = json.loads((prior / "cli-summary.json").read_text())
+                    summary["failure_code"] = "cli_failed"
+                    (prior / "cli-summary.json").write_text(json.dumps(summary))
+                self.assertIsNone(_recover_prior_generation_delivery(
+                    store_root=self.store.root, job_id=job_id, current_attempt=2,
+                    current_input=current_input, current_source=current_source,
+                    requested_model=requested_model,
+                ))
+
+        job_id = "recovery-research-key-order"
+        prior, current_source, current_input = write_delivery(job_id)
+        (current_source / "RESEARCH.md").write_text('summary: "same semantic value"\n')
+        (prior / "source/RESEARCH.md").write_text('summary: "same semantic value"\n\n')
+        self.assertIsNone(_recover_prior_generation_delivery(
+            store_root=self.store.root, job_id=job_id, current_attempt=2,
+            current_input=current_input, current_source=current_source,
+            requested_model="fake/flash",
+        ))
+
+    def test_aggregate_scope_violation_stops_before_review_and_repairs_from_baseline(self):
+        _, _, original = self.produce()
+        original_source = self.store.root / original["bundle_path"] / "source"
+        baseline_spec = json.loads((original_source / "template.json").read_text())
+        scope = {
+            "version": "atlas.aggregate-repair-scope.v1",
+            "known_blockers": [{
+                "feature_id": "F03", "acceptance_id": "A04", "decision_id": "D03",
+                "basis": "Repair the confirmed category workflow.",
+            }],
+            "authorized_assertion_changes": [{
+                "acceptance_id": "A02",
+                "change": "single_label_hostname_negative_to_positive",
+                "rationale": "Valid single-label hosts are accepted by the declared URL policy.",
+            }],
+            "authored_field_paths": [["architecture_markdown"]],
+            "edit_paths": ["acceptance/README.md"],
+        }
+        queued = self.store.create_repair(original["id"], {
+            "expected_digest": original["digest"],
+            "note": "Close the known aggregate repair blockers.",
+            "model": "fake/flash", "reuse_spec": False,
+            "edit_paths": scope["edit_paths"], "repair_scope": scope,
+        })
+        self.cli = FakeCognitionCLI(self.source)
+        self.cli.outer_coverage_generation = True
+        self.cli.record_generation_delivery = True
+        self.cli.scope_repair_baseline = baseline_spec
+        self.cli.scope_proposal_out_of_scope = True
+        pipeline = Pipeline(self.store, cli=self.cli)
+        job = self.store.claim("aggregate scoped repair", "production")
+        self.assertEqual(job["id"], queued["jobs"][0]["id"])
+        original_validate = validate_file_plan
+        calls = 0
+
+        def fail_after_delivery_once(value, **kwargs):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                raise FactoryError("synthetic stop after delivered result")
+            return original_validate(value, **kwargs)
+
+        with patch("template_factory.cognition.validate_file_plan", side_effect=fail_after_delivery_once):
+            with self.assertRaisesRegex(FactoryError, "synthetic stop"):
+                pipeline.run(job)
+        self.store.retry(job["id"])
+        with patch("template_factory.cognition.validate_file_plan", side_effect=fail_after_delivery_once):
+            pipeline.run(self.store.claim("aggregate scoped repair retry", "production"))
+
+        self.assertEqual(self.cli.calls.count("blueprint-generate-0"), 1)
+        self.assertNotIn("blueprint-spec-review-0", self.cli.calls)
+        self.assertFalse(any(name.startswith("blueprint-code-0-") for name in self.cli.calls))
+        self.assertIn("blueprint-generate-1", self.cli.calls)
+        self.assertTrue(any(name.startswith("blueprint-spec-review-1-") for name in self.cli.calls))
+        self.assertTrue(any(name.startswith("blueprint-code-1-") for name in self.cli.calls))
+        retry_context = self.store.root / "jobs" / job["id"] / "attempt-2/context"
+        failure = json.loads((retry_context / "SCOPE_FAILURE_0.json").read_text())
+        restoration_paths = {tuple(row["path"]) for row in failure["baseline_restorations"]}
+        self.assertIn(("roles", baseline_spec["roles"][0]["id"], "name"), restoration_paths)
+        self.assertIn(("features", baseline_spec["features"][0]["id"], "reason"), restoration_paths)
+        self.assertIn(("decisions", baseline_spec["decisions"][0]["id"], "impact"), restoration_paths)
+        self.assertIn(("decisions", baseline_spec["decisions"][0]["id"], "default"), restoration_paths)
+        self.assertIn(("limits",), restoration_paths)
+        self.assertIn("not permission to expand", (retry_context / "DESIGN_FEEDBACK.md").read_text())
+        revision = json.loads((retry_context / "SPEC_REVISION_1.json").read_text())
+        self.assertEqual(revision["scope_failure_receipt"], "SCOPE_FAILURE_0.json")
+        final = next(item for item in self.store.artifacts() if item["id"] != original["id"])
+        validate_repair_diff(
+            baseline_spec,
+            json.loads((self.store.root / final["bundle_path"] / "source/template.json").read_text()),
+            {}, {}, scope,
+        )
 
     def test_runtime_enabled_production_authors_binding_and_revision_retains_protocol(self):
         fixture = json.loads((self.source / "template.json").read_text())

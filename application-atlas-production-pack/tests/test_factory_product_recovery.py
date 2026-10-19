@@ -219,6 +219,52 @@ class ProductRecoveryTests(unittest.TestCase):
         self.assertEqual(tuple(old), ("paused_budget", "budget exceeded", successor["id"]))
         self.assertEqual(self.amendments.list()[0]["activated_at"] is not None, True)
 
+        with self.store.connect() as con:
+            old_before_retry = con.execute(
+                "SELECT state,attempt,token,lease,error FROM job WHERE id=?", (self.old_job,)
+            ).fetchone()
+            repair_count_before_retry = con.execute(
+                "SELECT COUNT(*) FROM tf_budget_repair WHERE campaign_id=? AND product_id=?",
+                (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT),
+            ).fetchone()[0]
+        with self.assertRaises(FactoryError) as caught:
+            self.store.retry(self.old_job)
+        self.assertEqual(caught.exception.code, "job_superseded")
+        self.assertEqual(caught.exception.status, 409)
+        with self.store.connect() as con:
+            old_after_retry = con.execute(
+                "SELECT state,attempt,token,lease,error FROM job WHERE id=?", (self.old_job,)
+            ).fetchone()
+            self.assertEqual(old_after_retry, old_before_retry)
+            self.assertEqual(
+                con.execute("SELECT COUNT(*) FROM tf_budget_repair WHERE campaign_id=? AND product_id=?",
+                            (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchone()[0],
+                repair_count_before_retry,
+            )
+            self.assertEqual(
+                con.execute("SELECT successor_job_id FROM tf_job_supersession WHERE old_job_id=?",
+                            (self.old_job,)).fetchone()[0],
+                successor["id"],
+            )
+
+    def test_legacy_cancelled_job_without_supersession_table_remains_retriable(self):
+        batch_id, job_id = "bat_" + "3" * 32, "job_" + "3" * 32
+        with self.store.connect(True) as con:
+            con.execute("INSERT INTO batch VALUES(?,?,?,?)",
+                        (batch_id, "running", "{}", "2026-10-19T00:00:01Z"))
+            con.execute("INSERT INTO job VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+                        (job_id, batch_id, "blueprint-production", "cancelled", "blueprint-generate", 2,
+                         None, None, "{}", "cancelled by operator", "2026-10-19T00:00:01Z",
+                         "2026-10-19T00:00:01Z"))
+            self.assertIsNone(con.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='tf_job_supersession'"
+            ).fetchone())
+
+        retried = self.store.retry(job_id)
+        self.assertEqual(retried["state"], "queued")
+        self.assertEqual(retried["attempt"], 3)
+        self.assertIsNone(retried["error"])
+
     def test_real_recovery_rejects_case_basis_drift_before_activation(self):
         self._prepare_real_frozen_candidate()
         changed = self.store.job(self.old_job)["snapshot"]
