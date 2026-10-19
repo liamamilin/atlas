@@ -167,7 +167,7 @@ class Pipeline:
             atomic_json(directory / "input.json", payload)
             if source:
                 copy_tree(source, directory / "source")
-            stage(name, "OpenCode CLI started")
+            stage(name, "OpenCode CLI preparing; budget reservation pending")
             budget_options = {}
             if snapshot.get("v1"):
                 from .budget import BudgetLedger
@@ -193,6 +193,13 @@ class Pipeline:
                     "identity": identity["product_id"], "phase": identity["segment"],
                     "plan_id": identity.get("plan_id"),
                     "stage": operation, "retry_scope": budget_scope or retry_scope, "job_id": jid,
+                    "protocol_context": {
+                        "input_digest": digest({key: value for key, value in payload.items() if key != "language"}),
+                        "input_sha256": hashlib.sha256((directory / "input.json").read_bytes()).hexdigest(),
+                        "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+                        "source_tree_digest": digest(tree_manifest(directory / "source")) if source else None,
+                        "projection_digest": payload.get("projection_digest"),
+                    },
                     **({"retry": retry} if retry is not None else {}),
                     "kind": "review" if "review" in name else "research" if "case-" in name else "production",
                 }}

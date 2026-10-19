@@ -89,6 +89,9 @@ class BudgetLedger:
             "CREATE TABLE IF NOT EXISTS tf_budget_amendment (id TEXT PRIMARY KEY, campaign_id TEXT NOT NULL, product_id TEXT NOT NULL, plan_id TEXT NOT NULL, source_ref TEXT NOT NULL, source_digest TEXT NOT NULL, summary TEXT NOT NULL, reason TEXT NOT NULL, idempotency_key TEXT NOT NULL, version INTEGER NOT NULL, old_repair_limit INTEGER NOT NULL, new_repair_limit INTEGER NOT NULL, baseline_repair_count INTEGER NOT NULL, baseline_cli_sessions INTEGER NOT NULL, old_deadline REAL NOT NULL, window_seconds INTEGER NOT NULL, created_at REAL NOT NULL, activated_at REAL, new_deadline REAL, UNIQUE(campaign_id,product_id,idempotency_key))",
             "CREATE TABLE IF NOT EXISTS tf_budget_amendment_binding (amendment_id TEXT PRIMARY KEY, request_json TEXT NOT NULL, request_digest TEXT NOT NULL)",
             "CREATE UNIQUE INDEX IF NOT EXISTS tf_budget_amendment_version ON tf_budget_amendment(campaign_id,product_id,version)",
+            "CREATE TABLE IF NOT EXISTS tf_protocol_retry_grant (id TEXT PRIMARY KEY, campaign_id TEXT NOT NULL, plan_id TEXT NOT NULL, product_id TEXT NOT NULL, job_id TEXT NOT NULL, source_ref TEXT NOT NULL, source_digest TEXT NOT NULL, request_json TEXT NOT NULL, request_digest TEXT NOT NULL, idempotency_key TEXT NOT NULL, status TEXT NOT NULL, consumed_reservation_id TEXT, created_at REAL NOT NULL, UNIQUE(campaign_id,idempotency_key))",
+            "CREATE TABLE IF NOT EXISTS tf_protocol_retry_grant_use (grant_id TEXT NOT NULL, reservation_id TEXT NOT NULL UNIQUE, status TEXT NOT NULL, created_at REAL NOT NULL, released_at REAL, PRIMARY KEY(grant_id,reservation_id))",
+            "CREATE UNIQUE INDEX IF NOT EXISTS tf_protocol_retry_grant_one_live_use ON tf_protocol_retry_grant_use(grant_id) WHERE status IN ('reserved','started','uncertain','consumed')",
         )
         with store.connect(True) as con:
             for statement in statements:
@@ -150,7 +153,7 @@ class BudgetLedger:
 
     def reserve(self, identity, phase, kind="production", timeout=None, *, job_id=None,
                 requested_model=None, requested_effort=None, stage=None, retry=None,
-                retry_scope=None, plan_id=None):
+                retry_scope=None, plan_id=None, protocol_context=None):
         if not identity or not phase:
             raise FactoryError("budget identity and phase are required", "budget_identity_required", 400)
         if kind not in {"production", "runtime", "review", "research", "transient_retry"}:
@@ -188,6 +191,7 @@ class BudgetLedger:
             ).fetchone()[0]
             if same_group >= active_limit:
                 raise FactoryError("global model-call concurrency limit reached", "budget_concurrency", 409)
+            protocol_grant = None
             if retry is not None:
                 if (isinstance(retry, bool) or not isinstance(retry, int) or retry < 1
                         or retry > self.limits["transient_retries"]):
@@ -202,7 +206,17 @@ class BudgetLedger:
                     if (row[0] == scope if row[0] is not None else _legacy_retry_scope(row[1]) == scope)
                 )
                 if count >= self.limits["transient_retries"]:
-                    raise FactoryError("transient retry limit exhausted", "budget_retry_limit", 409)
+                    if self.limits["transient_retries"] >= 2:
+                        from .protocol_grants import ProtocolRetryGrantService
+                        grant_service = ProtocolRetryGrantService(self.store, clock=self.clock, initialize=False)
+                        protocol_grant = grant_service.find_for_reservation_locked(
+                            con, identity=str(identity), phase=str(phase), plan_id=plan_id,
+                            job_id=job_id, stage=stage, requested_model=requested_model,
+                            retry=retry, retry_scope=scope, context=protocol_context,
+                            kind=kind, campaign_id=self.campaign_id,
+                        )
+                    if protocol_grant is None:
+                        raise FactoryError("transient retry limit exhausted", "budget_retry_limit", 409)
             if retry is None and retry_scope:
                 duplicate = con.execute(
                     "SELECT 1 FROM tf_budget_reservation WHERE campaign_id=? AND identity=? AND stage=? AND status!='not_started' LIMIT 1",
@@ -217,8 +231,14 @@ class BudgetLedger:
                  "runtime" if kind == "runtime" else "production",
                  str(retry_scope) if retry_scope else None),
             )
+            if retry is not None and protocol_grant is not None:
+                con.execute("INSERT INTO tf_protocol_retry_grant_use(grant_id,reservation_id,status,created_at) VALUES(?,?,?,?)",
+                            (protocol_grant["id"], reservation_id, "reserved", now))
+                con.execute("UPDATE tf_protocol_retry_grant SET status='reserved',consumed_reservation_id=? WHERE id=?",
+                            (reservation_id, protocol_grant["id"]))
         cap = min(float(timeout), remaining) if timeout is not None else remaining
-        return {"id": reservation_id, "timeout": max(0.0, cap), "deadline": deadline}
+        return {"id": reservation_id, "timeout": max(0.0, cap), "deadline": deadline,
+                "protocol_grant_id": protocol_grant["id"] if retry is not None and protocol_grant is not None else None}
 
     def record_repair(self, identity, operation_key, *, con=None, plan_id=None):
         """Count a business repair once, independent of job IDs or CLI calls."""
@@ -295,6 +315,8 @@ class BudgetLedger:
             if row[0] == "reserved":
                 con.execute("UPDATE tf_budget_reservation SET status='started',started=? WHERE id=?",
                             (float(self.clock()), reservation_id))
+                con.execute("UPDATE tf_protocol_retry_grant_use SET status='started' WHERE reservation_id=? AND status='reserved'", (reservation_id,))
+                con.execute("UPDATE tf_protocol_retry_grant SET status='consumed' WHERE consumed_reservation_id=? AND status='reserved'", (reservation_id,))
 
     def finish(self, reservation_id, status="completed", *, observed_model=None,
                observed_effort=None, outcome=None):
@@ -309,6 +331,10 @@ class BudgetLedger:
             final = "uncertain" if row[0] == "uncertain" else status
             con.execute("UPDATE tf_budget_reservation SET status=?,finished=?,observed_model=?,observed_effort=?,outcome=? WHERE id=?",
                         (final, float(self.clock()), observed_model, observed_effort, outcome, reservation_id))
+            con.execute("UPDATE tf_protocol_retry_grant_use SET status=? WHERE reservation_id=? AND status IN ('reserved','started','uncertain')",
+                        ("consumed" if final in {"completed", "failed"} else "uncertain", reservation_id))
+            con.execute("UPDATE tf_protocol_retry_grant SET status=? WHERE consumed_reservation_id=? AND status IN ('reserved','consumed')",
+                        ("consumed" if final in {"completed", "failed"} else "uncertain", reservation_id))
 
     def release_not_started(self, reservation_id):
         """Release only when caller has direct evidence subprocess creation failed."""
@@ -317,6 +343,10 @@ class BudgetLedger:
                               (float(self.clock()), reservation_id, self.campaign_id))
             if cur.rowcount != 1:
                 raise FactoryError("reservation start is not provably absent", "budget_release_denied", 409)
+            con.execute("UPDATE tf_protocol_retry_grant_use SET status='not_started',released_at=? WHERE reservation_id=? AND status='reserved'",
+                        (float(self.clock()), reservation_id))
+            con.execute("UPDATE tf_protocol_retry_grant SET status='available',consumed_reservation_id=NULL WHERE consumed_reservation_id=? AND status='reserved'",
+                        (reservation_id,))
 
     def phase_remaining(self, identity, phase=None, *, plan_id=None):
         # ``identity`` is retained for older callers; segment deadlines are
@@ -365,6 +395,12 @@ class BudgetLedger:
             control = con.execute("SELECT paused,paused_at,pause_reason FROM tf_budget_control WHERE campaign_id=?", (self.campaign_id,)).fetchone()
             repairs = [dict(r) for r in con.execute("SELECT product_id,COUNT(*) AS repairs_used FROM tf_budget_repair WHERE campaign_id=? GROUP BY product_id", (self.campaign_id,))]
             amendments = [dict(r) for r in con.execute("SELECT * FROM tf_budget_amendment WHERE campaign_id=? ORDER BY version", (self.campaign_id,))]
+            protocol_grants = [dict(r) for r in con.execute(
+                "SELECT id,job_id,plan_id,product_id,idempotency_key,request_digest,status,consumed_reservation_id,created_at FROM tf_protocol_retry_grant WHERE campaign_id=? ORDER BY created_at,id",
+                (self.campaign_id,))]
+            protocol_grant_uses = [dict(r) for r in con.execute(
+                "SELECT grant_id,reservation_id,status,created_at,released_at FROM tf_protocol_retry_grant_use WHERE grant_id IN (SELECT id FROM tf_protocol_retry_grant WHERE campaign_id=?) ORDER BY created_at,reservation_id",
+                (self.campaign_id,))]
         now = float(self.clock())
         for segment in segments:
             segment["remaining_seconds"] = max(0.0, segment["deadline"] - now)
@@ -375,6 +411,8 @@ class BudgetLedger:
                 "paused_at": control[1] if control else None,
                 "pause_reason": control[2] if control else None,
                 "repairs": repairs, "amendments": amendments,
+                "protocol_retry_grants": protocol_grants,
+                "protocol_retry_grant_uses": protocol_grant_uses,
                 "provider_requests": None, "cost": None}
 
     status = snapshot

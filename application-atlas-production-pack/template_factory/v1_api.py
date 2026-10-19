@@ -20,6 +20,19 @@ def dispatch_v1(method, route, query, body, store):
     if method == "POST" and match:
         from .r5_execution import R5ExecutionService
         return R5ExecutionService(store).queue(match[1], body), 202
+    match = re.fullmatch(r"jobs/(job_[a-f0-9]{32})/recover-protocol", route)
+    if method == "POST" and match:
+        from .protocol_recovery import ProtocolRecoveryService
+        # Recovery leaves the parent paused for explicit operator verification.
+        return ProtocolRecoveryService(store).recover(match[1], body), 202
+    if route == "budget/protocol-grants":
+        from .protocol_grants import ProtocolRetryGrantService
+        if method == "POST":
+            return ProtocolRetryGrantService(store).register(body), 201
+    match = re.fullmatch(r"budget/protocol-grants/([A-Za-z0-9_-]+)", route)
+    if method == "GET" and match:
+        from .protocol_grants import ProtocolRetryGrantService
+        return ProtocolRetryGrantService(store).get(match[1]), 200
     library = CaseLibrary(store)
     params = parse_qs(query)
     if route == "budget/amendments":

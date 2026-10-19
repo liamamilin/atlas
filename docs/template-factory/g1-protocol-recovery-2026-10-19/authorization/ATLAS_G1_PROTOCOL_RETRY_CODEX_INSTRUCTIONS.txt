@@ -1,0 +1,206 @@
+Atlas G1 一次性协议重试与同任务恢复指令
+文件名：ATLAS_G1_PROTOCOL_RETRY_CODEX_INSTRUCTIONS.txt
+版本：2026-10-19 / r1
+仓库：https://github.com/liamamilin/atlas
+核验基线：e43063544122589453c7c6b667b8acab7b031fed
+对应生产源码：204d4e5beb7d6ce75a462ed342d01a9c03c43df2
+工作分支：codex/stabilize-atlas
+
+一、执行目标与明确授权
+
+用户将本文件交给 Codex 并要求执行时，本文件构成一次受限的协议恢复授权：
+仅为当前书签 G1、当前 job、当前 phase_acceptance 的固定输入，允许额外一次协议重试。
+保留历史两次追加重试，在正式台账中单独记录本次一次性授权和实际消耗。
+这一授权不增加业务修复额度，不重做规格，也不改变已通过的三个设计维度。
+
+授权生效前必须完成下面的正式预算与恢复入口实现、必要回归、同新代码 SHA 的远端 CI。
+在范围内连续执行，不停在“具备恢复条件”；协议交付完整后，继续原 R5 已授权的 G1/T08 主链。
+本文件生成不等于台账已经生效；实际操作由 Codex 经正式服务完成。
+
+保留的限额：
+- CLI 累计目前 56/500；恢复后若真的启动本次重试，通常先到 57/500。
+  后续首次正常工作照常记账；不要把 57 写成整个任务的最终调用上限或实际已发生值。
+- 书签业务修复保持 5/5，本文件没有第 6 轮授权。
+- 当前逻辑阶段已有两次历史追加；本次额外机会只属于下面固定的 operation，
+  不把全局 transient_retries 从 2 改成 3，不让其他维度、候选、产品或 T08 获得同一例外。
+- 生产/静态审阅并发 2、运行并发 1；其余既有更低限制、模型/provider 配置保持。
+- G1 唯一有效截止：1792437223.754534。
+  UTC 2026-10-19 19:13:43.754534；北京时间 2026-10-20 03:13:43.754534。
+  暂停不冻结时间。本文件不延长 G1，也不修改任何 base 或 version1/version2 时间字段。
+- 如 G1 未通过且执行时已过期，完成离线代码、检查和交付，停止新 G1 生产调用。
+- T08 继续按既有独立 segment 规则，只在真实 G1 通过后启动；共用原 500 次总账。
+- 若完整审阅返回 blocked/uncertain，按真实语义结果处理，不使用协议重试换意见。
+- 本次额外机会耗尽后不得再补发，除非用户另有明确授权。
+
+二、固定现场与证据
+
+进入现有 application-atlas git 工作区，优先使用此前用户路径：
+/Users/milin/2026/软件开发/application-atlas
+读取适用 AGENTS.md；检查 HEAD/分支/工作区。若有更新，审阅与本次路径相关的增量并保留已有工作。
+真实工厂根此前为 application-atlas-production-pack/atlas/template-factory，按现场配置核对。
+不重置工作区，不直接修改生产 SQL/历史目录/冻结记录来补通过。
+
+本轮主要资料：
+docs/template-factory/g1-r5-2026-10-19/ 下的
+DELIVERY.md、CONTRACTS.md、OPERATIONS.md、STOP_RECORD.json、
+phase-acceptance-call-history.json、phase-acceptance-incomplete-raw.txt、
+protocol-recovery-proof.json、prepared-real-consumption.json、job-latest.json、
+real-checkpoints/、real-pre-reviews/attempt-1/ 和 attempt-2/。
+此前 R5 完整授权已原样归档在该目录 authorization/ 下；未被本文件替换的要求继续有效。
+
+固定绑定：
+- campaign：atlas-v1-first-production-2026-10-19
+- G1 plan：plan_87059846caf345d2b2fe690657cf324f
+- product：product-c42848f63251507bd9d911a5
+- 当前 job：job_7742b1c124be4c9ab3a0096da5cdd772
+- batch：bat_e27a638b741d4a2b9573aad25d8617b5
+- 当前停止：attempt 2，paused_budget，budget_retry_limit；父计划 paused。
+- 原协议失败：attempt 1，cli_protocol，incomplete cognitive JSON; no fields recovered。
+- 原失败 reservation：bud_1806199dfa08411d8f71ee84ea06676f
+- stage：blueprint-spec-review-0-bbc43771a1bbbe99-phase_acceptance
+- operation：blueprint-spec-review-0-bbc43771a1bbbe99-phase_acceptance:449b8a5093505d77
+- logical retry scope：blueprint-spec-review:phase_acceptance
+- proposal digest：f190b65275ab7c7136f523ba92aecde7c9392440d7676b070393e62ff9137b58
+- projection digest：4cf088a2964bca2a1917f50505e675d7c5f580694b88c103c98e15eee250695c
+- operation 完整输入摘要（沿现有算法，排除 language）：
+  449b8a5093505d77cf97ec22db4d9f9a952ff15e324a92da140bc93b3b05bd23
+- 归档 input.json 原始字节 SHA-256：
+  44e258910a36e18c6bae070dbcc6a003c345a7f9623f6f2b474b5de633ed0c97
+- 原 stdout SHA-256：
+  00227a3ec72d61eb677d39174f042078cdff5969d0df248771fa630d57ad1b20
+- 请求模型：opencode-go/deepseek-v4.1-flash；实际观察模型身份仍 unknown。
+- 本次检查点已复用：scenario_scope、product_completeness、architecture_contract。
+- 案例适配 choices digest：
+  aaf080ba5261112683c0151f653251c3e6686d66cd156f2aa4dc3f61c68ba0ea
+
+以上身份、digest、来源文件、规则版本及程序/案例依据必须通过实际读取重新核对。
+字节 SHA 与 canonical JSON SHA 分开使用；不要用序列化后的文件替换原始证据后再比字节。
+首次新增授权基准：56 次已计入台账的 CLI 会话、书签 5 次业务修复、逻辑阶段历史追加 2 次、活动调用 0。
+先查是否已经执行过本次幂等请求。发现其他未说明漂移时，报告具体差异，不能改账凑基准。
+
+三、实现一次性协议 grant 与正式恢复
+
+当前代码的真实边界：
+- pipeline 根据固定 operation 判断重试序号；
+- ledger 根据 campaign/product/logical scope 统计历史追加，跨旧 job/候选保留；
+- 当前恢复所需的是本 operation 第一次追加，但逻辑 scope 已有历史两次；
+- store.retry 不接受 paused_budget，plan resume 只恢复批次；
+- queue-r5 幂等重放只返回原任务，不会重启当前阶段。
+
+因此必须同时实现“受限额外协议预留”和“同 job 的正式暂停恢复”。
+沿现有预算/队列服务增加最小能力，不建设新权限平台，不调用 queue_repair 新开业务修订。
+
+A. 追加授权记录
+保存本文件原始字节，计算实际 SHA-256，作为新的 source_ref/source_digest。
+不要沿用 R5 文件摘要，不在本文件里填自指全文摘要，不伪造人工点击。
+记录独立稳定幂等键，例如 atlas-g1-phase-protocol-once-2026-10-19-v1。
+grant 固定第二节的 campaign/plan/product/job/operation、原失败 reservation、输入/投影、
+请求模型、原 stdout、历史重试基准、原截止及 max_extra_calls=1。
+保存 source tree/prompt/输入来源等已有可核验身份，使代码收尾不改变被审材料或模型请求。
+同键相同完整请求返回原记录，同键不同绑定拒绝；不同 key 也不能重复授权这一额外机会。
+新登记检查在事务中执行；成功请求重放须先幂等查询，再检查首次 56/5 基准。
+
+B. 与真实预留统一
+在 BudgetLedger.reserve 的同一写事务中检查并占用 grant，再生成与其关联的 reservation。
+通常限制仍为 2；只有这份精确匹配、有效、未消耗的 grant 可允许此次历史上限外的调用。
+pipeline 的前置判断与 ledger 的事务判断应使用一致例外规则，不能只改其中一处。
+保留 operation 重试序号原有含义；不要把逻辑 scope 的历史第三次追加硬写成 retry=3，
+从而与当前 operation 的第一次追加或字段范围检查混淆。
+明确记录 grant_id、reservation_id 和实际消耗；并发、重放、重启不得重复领取。
+预留即占用；仅确定未启动时可按现有 not_started 规则释放并保留完整关联记录。
+已启动或启动状态不确定的调用照常消耗，不假定免费，不用退款机制形成额外机会。
+仍受 500 次总额、有效截止、并发和其他原有限制约束。
+本次协议恢复不得调用 record_repair，也不得增加原 campaign/product 的业务修复计数；书签保持 5/5。
+T08 其他产品仍按原各产品限额执行，不以整张表行数判断书签上限；旧重试和旧调用记录不更改。
+
+C. 恢复同一个 job
+增加受限的正式恢复服务/API/CLI；现有项目尚无可直接使用的本次入口，按实际实现写文档。
+服务必须验证 grant、当前 job/attempt/state/error、对应原始协议失败及精确输入/检查点。
+只将当前 job 正式进入下一 attempt，保留 snapshot、已有 checkpoint 和旧 attempt 原始目录。
+恢复前把当前暂停原因/attempt/授权关系持久归档，不能只清空 error。
+用稳定恢复幂等键：相同请求重放返回同一恢复结果，不重复 attempt++，不重复排队/记账。
+旧 lease/token 必须失效；迟到 worker 不能覆盖新 attempt。
+父计划继续暂停，核对返回状态后，再沿原 plan resume 恢复父/关联子批次。
+不得把所有 paused_budget 无条件加入 retry 白名单，不修改状态为 failed 来绕过原限制。
+不得新建 R6 candidate，不再 queue-r5/queue_repair，不重试旧 a53 或旧 4f30。
+
+不要用“新增 budget amendment version3”后直接调用旧 activate 算法处理本次 grant：
+本次没有业务修复增额和窗口授权，不能意外进入 now + window_seconds 的分支。
+可以复用已有审计设施，但协议额度、业务修复额度、时间继承必须各自准确。
+
+四、保持严格交付，修正一处状态观测
+
+本次外层 OpenCode JSONL 完整，内层审阅 JSON 未闭合；现有归档没有完整成功结果。
+- 原不完整输出只作为失败证据和离线负向样例。
+- 不补 ]}、不从嵌套 checks 提取 passed，不手写 result/report/checkpoint。
+- 不将结构未完成的建议变成业务修订输入，不调整 A04/A12、prepared 规格或五文件 scope。
+- 不把错误归因为已证实的 token 上限、网络或 provider 限制；当前证据没有证明这些原因。
+- 成功架构审阅也未观测到最终文本的 step_finish，因此不新增强制终止事件门禁，
+  不追溯撤销前三个完整合法结果；终止信息未知如实保留。
+- 不私自切换模型/provider、增加免费探针或修改固定 input/prompt 来取得一次“新首次调用”。
+
+pipeline 目前在预算检查前发 OpenCode CLI started，产生了没有进程却显示 started 的事件。
+将预算前事件改为 pending/preparing；真正 started 只在 Popen 成功和账本 mark_started 后发出。
+复用已有 progress 回调及受保护的执行/清理流程，不破坏子进程清理。
+保留旧日志；当前修复只改变后续事件含义。
+
+五、必要回归与代码门禁
+
+使用临时库/临时目录/假 CLI，复用已有 R5 测试和归档证据，聚焦以下路径：
+1. 装载真实形状：历史两次追加 + 当前固定输入首次 cli_protocol + attempt2 paused_budget。
+2. 无 grant 拒绝；正确 grant 可预留一次；重复或并发不能多领；错误绑定/输入/模型拒绝。
+3. grant 幂等重放在合法后续计数变化后仍返回原记录。
+4. 同 job 正式恢复不增加业务修复，恢复重放不再次 attempt++；父暂停仍阻止 claim。
+5. 正式 resume/claim/Pipeline 复用前三维、prepared plan 和案例适配，
+   只向 phase_acceptance 发出一次额外模型请求，不重生成整份规格或适配。
+6. 截止后、事务失败或 grant 耗尽拒绝额外调用；默认其他 scope 限制保持。
+7. 本次原始坏 JSON 仍被拒绝；预算拒绝不发真正 started、不创建 process、不新增调用。
+
+以上可以组合为少量参数化或集成测试，不扩展成全面平台重构。
+执行改动相关回归及项目既定完整门禁，推送既有工作分支，确认同一新代码 SHA 的远端 CI。
+之后按正式服务登记/恢复/运行，不停在实现完成。
+只读/离线工作可先完成；真实调用前重查绝对截止和现场状态。
+
+六、真实续作顺序
+
+1. 核对当前 e430635 后的实际代码增量、原失败、固定输入、56/5/2与有效截止。
+2. 通过新正式服务登记一次性 grant，保存原授权与待消费状态。
+3. 正式恢复 job_7742… 到下一 attempt；核对同 job、同 snapshot/检查点、业务仍5。
+4. 正式恢复父计划，worker 从已完成检查点继续，仅重试 phase_acceptance。
+5. 新结果必须完整解析并通过原审阅校验，保留原始 stdout、summary、result、report 与 checkpoint。
+6. 当前还剩 decisions_defaults 与 runtime_protocol 两项首次预审，随后按原流程继续。
+   它们不获得本次额外 grant；按既有合法首次调用、重试及门禁处理。
+7. 全维度通过后，继续原五文件生成、程序语义审阅、冻结、冻结后审阅、目录发布、
+   标准交接实际消费、真实 P0、冻结套件和独立浏览器执行、精确 phase proof、宿主 G1。
+8. G1 通过后继续原固定三场景 T08；G1 未通过则 T08 保持未启动。
+9. 新的完整语义失败、需要第6轮、额外协议机会耗尽或截止到期时，正式停止相关生产，
+   保存完整证据；继续不受阻的代码/检查/交付，不重试换结论。
+
+七、交付
+
+建议放入 docs/template-factory/g1-protocol-recovery-2026-10-19/：
+- DELIVERY/CONTRACTS/OPERATIONS：准确结果、已实现的真实接口和可执行命令；
+- 原授权文件及实际字节摘要、grant 请求/记录/预留消耗关系、恢复幂等与旧/新 attempt 关系；
+- 本次代码 SHA/CI、历史保留和 deadline 不变证据；
+- 原始失败、同输入验证、前三checkpoint复用、新 phase 完整交付或实际失败；
+- 后续真实模板/P0/G1/T08证据，所有未运行项明确保留。
+
+最终先报告：
+G1 / T08；当前 stage/job/attempt；
+CLI已用/500；书签业务修复已用/5，其他产品分别报告；原历史追加次数及本 grant 使用0/1或1/1；
+有效截止/是否到期；正式模板数、真实P0数、新增/复用案例数；
+实际生产源码 SHA、最终 HEAD、对应 CI，真实停止原因与下一步。
+模板/应用/案例数量仍按原定义，不把设计预审或 fixture 算成真实产品通过。
+本轮仅补充协议恢复；原 R5 已授权且未被本文件变更的后续工作持续有效。
+
+核验来源：
+https://github.com/liamamilin/atlas/commit/e43063544122589453c7c6b667b8acab7b031fed
+https://github.com/liamamilin/atlas/blob/e43063544122589453c7c6b667b8acab7b031fed/docs/template-factory/g1-r5-2026-10-19/STOP_RECORD.json
+https://github.com/liamamilin/atlas/blob/e43063544122589453c7c6b667b8acab7b031fed/docs/template-factory/g1-r5-2026-10-19/phase-acceptance-call-history.json
+https://github.com/liamamilin/atlas/blob/e43063544122589453c7c6b667b8acab7b031fed/application-atlas-production-pack/template_factory/pipeline.py
+https://github.com/liamamilin/atlas/blob/e43063544122589453c7c6b667b8acab7b031fed/application-atlas-production-pack/template_factory/budget.py
+https://github.com/liamamilin/atlas/blob/e43063544122589453c7c6b667b8acab7b031fed/application-atlas-production-pack/template_factory/store.py
+https://github.com/liamamilin/atlas/blob/e43063544122589453c7c6b667b8acab7b031fed/application-atlas-production-pack/template_factory/cli.py
+
+本文件结束。
+

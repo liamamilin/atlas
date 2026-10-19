@@ -36,6 +36,13 @@ def main(argv=None):
     r5 = commands.add_parser("queue-r5", help="Atomically activate inherited-deadline R5 authorization and queue exact prepared repair")
     r5.add_argument("plan_id")
     r5.add_argument("--request", type=Path, required=True)
+    grant_register = commands.add_parser("protocol-grant-register", help="Register the fixed one-call protocol retry grant")
+    grant_register.add_argument("--request", type=Path, required=True)
+    grant_status = commands.add_parser("protocol-grant-status", help="Show one protocol retry grant")
+    grant_status.add_argument("grant_id")
+    protocol_recovery = commands.add_parser("recover-protocol", help="Resume the fixed paused protocol failure on the same job")
+    protocol_recovery.add_argument("job_id")
+    protocol_recovery.add_argument("--request", type=Path, required=True)
     args = parser.parse_args(argv)
     store = FactoryStore(args.root, args.pack)
     service = BatchService(store)
@@ -43,6 +50,16 @@ def main(argv=None):
         if args.command == "queue-r5":
             from .r5_execution import R5ExecutionService
             result = R5ExecutionService(store).queue(args.plan_id, json.loads(args.request.read_text()))
+        elif args.command == "protocol-grant-register":
+            from .protocol_grants import ProtocolRetryGrantService
+            request = json.loads(args.request.read_text())
+            result = ProtocolRetryGrantService(store).register(request)
+        elif args.command == "protocol-grant-status":
+            from .protocol_grants import ProtocolRetryGrantService
+            result = ProtocolRetryGrantService(store).get(args.grant_id)
+        elif args.command == "recover-protocol":
+            from .protocol_recovery import ProtocolRecoveryService
+            result = ProtocolRecoveryService(store).recover(args.job_id, json.loads(args.request.read_text()))
         elif args.command == "prepare-revision":
             from .plan_revision import PreparedRevisionService
             result = PreparedRevisionService(store).prepare(args.job_id, json.loads(args.request.read_text()))

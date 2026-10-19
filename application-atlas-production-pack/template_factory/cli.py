@@ -152,6 +152,7 @@ class CLI:
                 retry=budget.get("retry"),
                 retry_scope=budget.get("retry_scope"),
                 plan_id=budget.get("plan_id"),
+                protocol_context=budget.get("protocol_context"),
             )
             timeout = reservation["timeout"]
         elif budget_required:
@@ -395,8 +396,6 @@ class CLI:
             )
         if _state is not None:
             _state["started"] = True
-        if _budget_ledger is not None:
-            _budget_ledger.mark_started(_budget_reservation)
         exit_code = None
         failure = None
         delivery_status = "pending"
@@ -456,6 +455,8 @@ class CLI:
             if event_type in {"tool_use", "tool", "step_start", "step_finish", "error"}:
                 progress("OpenCode: " + event_type)
         try:
+            if _budget_ledger is not None:
+                _budget_ledger.mark_started(_budget_reservation)
             selector = selectors.DefaultSelector()
             selector.register(process.stdout, selectors.EVENT_READ, "stdout")
             selector.register(process.stderr, selectors.EVENT_READ, "stderr")
@@ -463,6 +464,7 @@ class CLI:
                 directory / "process.json",
                 {"pid": process.pid, "model": model, "started": time.time()},
             )
+            progress("OpenCode CLI started")
             while selector.get_map():
                 if cancelled():
                     raise FactoryError(

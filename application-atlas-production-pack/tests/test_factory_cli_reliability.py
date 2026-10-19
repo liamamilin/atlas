@@ -15,6 +15,73 @@ from template_factory.store import FactoryError
 
 
 class FactoryCLIReliabilityTests(unittest.TestCase):
+    def test_budget_rejection_never_announces_or_spawns_cli(self):
+        class DeniedLedger:
+            def reserve(self, *args, **kwargs):
+                raise FactoryError("retry exhausted", "budget_retry_limit", 409)
+
+        with tempfile.TemporaryDirectory() as root:
+            exe, work = self.fake(root, 'print(json.dumps({"ok": True}))\n')
+            events = []
+            with patch("template_factory.cli.subprocess.Popen") as spawn:
+                with self.assertRaises(FactoryError) as caught:
+                    self.run_cli(exe, work, progress=events.append,
+                                 budget={"ledger": DeniedLedger(), "identity": "p", "phase": "G1"})
+                spawn.assert_not_called()
+            self.assertEqual(caught.exception.code, "budget_retry_limit")
+            self.assertNotIn("OpenCode CLI started", events)
+            self.assertFalse((work / "process.json").exists())
+
+    def test_started_event_follows_spawn_and_ledger_start_and_failure_cleans_process(self):
+        for deny_start in (False, True):
+            with self.subTest(deny_start=deny_start), tempfile.TemporaryDirectory() as root:
+                events, processes = [], []
+
+                class Ledger:
+                    def reserve(self, *args, **kwargs):
+                        return {"id": "fixture-reservation", "timeout": 3}
+
+                    def mark_started(self, reservation_id):
+                        events.append("mark_started")
+                        if deny_start:
+                            raise FactoryError("start ledger failed", "fixture_start_failed", 409)
+
+                    def finish(self, *args, **kwargs):
+                        events.append("finish")
+
+                exe, work = self.fake(root, 'print(json.dumps({"ok": True}))\n')
+                real_spawn = subprocess.Popen
+
+                def spawn(argv, **kwargs):
+                    process = real_spawn(argv, **kwargs)
+                    if "run" in argv:
+                        processes.append(process)
+                        events.append("spawn")
+                    return process
+
+                with patch("template_factory.cli.subprocess.Popen", side_effect=spawn):
+                    if deny_start:
+                        with self.assertRaises(FactoryError) as caught:
+                            self.run_cli(exe, work, progress=events.append,
+                                         budget={"ledger": Ledger(), "identity": "p", "phase": "G1"})
+                        self.assertEqual(caught.exception.code, "fixture_start_failed")
+                        self.assertNotIn("OpenCode CLI started", events)
+                    else:
+                        self.assertEqual(self.run_cli(exe, work, progress=events.append,
+                                                     budget={"ledger": Ledger(), "identity": "p", "phase": "G1"}), {"ok": True})
+                        self.assertLess(events.index("spawn"), events.index("mark_started"))
+                        self.assertLess(events.index("mark_started"), events.index("OpenCode CLI started"))
+                self.assertEqual(len(processes), 1)
+                self.assertIsNotNone(processes[0].poll())
+
+    def test_archived_inner_incomplete_review_is_not_repaired(self):
+        from template_factory.cli import recover_cognitive_framing
+
+        source = Path(__file__).resolve().parents[2] / "docs/template-factory/g1-r5-2026-10-19/phase-acceptance-incomplete-raw.txt"
+        with self.assertRaises(FactoryError) as caught:
+            recover_cognitive_framing(source.read_text())
+        self.assertEqual(caught.exception.code, "cli_protocol")
+
     def fake(self, root, body):
         executable = Path(root) / "fake-opencode"
         executable.write_text(
