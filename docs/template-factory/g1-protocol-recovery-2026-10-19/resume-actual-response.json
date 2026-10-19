@@ -1,0 +1,493 @@
+{
+  "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+  "plan_digest": "1f7701fbf5f52dde011dee76196b2cb01697e10190c6ad17c1273f4b5dcc3d30",
+  "batch": {
+    "id": "bat_d13dc5920a574140be85da0ea6f5395b",
+    "state": "needs_attention",
+    "config": {
+      "acceptance_protocol": "atlas.acceptance-runner.v1",
+      "cognition_guidance": "首期 python-web，Python 标准库与 SQLite；P0 完成已确认场景全部核心旅程，包括保存、分类/移动、搜索、重开保留、打开原链接及可恢复失败。使用紧凑标准库 HTTP 行为验收程序，冻结 API/HTML 表单合同；不要引入外部依赖，不要生成应用实现或自报运行。成熟能力按适用性分期，保留未知。",
+      "concurrency": 2,
+      "kind": "v1-production",
+      "language": "zh",
+      "model": "opencode-go/deepseek-v4.1-flash",
+      "name": "Atlas V1 G1 书签完整主链",
+      "repair_attempts": 1,
+      "timeout": 600
+    },
+    "created_at": "2026-10-19T06:02:34.633361+00:00",
+    "jobs": [
+      {
+        "id": "job_d59605a1fbac430e84966ff143871068",
+        "batch_id": "bat_d13dc5920a574140be85da0ea6f5395b",
+        "kind": "case-research",
+        "state": "completed",
+        "stage": "case-committed",
+        "attempt": 5,
+        "snapshot": {
+          "admission": {
+            "kind": "human_confirmed",
+            "revision": 2
+          },
+          "case_basis": null,
+          "case_catalog_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "config": {
+            "acceptance_protocol": "atlas.acceptance-runner.v1",
+            "cognition_guidance": "首期 python-web，Python 标准库与 SQLite；P0 完成已确认场景全部核心旅程，包括保存、分类/移动、搜索、重开保留、打开原链接及可恢复失败。使用紧凑标准库 HTTP 行为验收程序，冻结 API/HTML 表单合同；不要引入外部依赖，不要生成应用实现或自报运行。成熟能力按适用性分期，保留未知。",
+            "concurrency": 2,
+            "kind": "v1-production",
+            "language": "zh",
+            "model": "opencode-go/deepseek-v4.1-flash",
+            "name": "Atlas V1 G1 书签完整主链",
+            "repair_attempts": 1,
+            "timeout": 600
+          },
+          "leaf": {
+            "fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+            "name": "Bookmark Manager",
+            "name_zh": "书签管理器",
+            "slug": "bookmark-manager"
+          },
+          "next_stage": "case-research",
+          "product_id": "product-c42848f63251507bd9d911a5",
+          "repository_hints": [
+            {
+              "reason": "已有公开候选基础，本轮重新取得实际版本并研究；历史报告不作本轮证据。",
+              "repository": "https://github.com/LakhindarPal/bookmark-manager"
+            }
+          ],
+          "runtime_sample": true,
+          "scenario": {
+            "acceptance": [
+              "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+              "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+              "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+              "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+            ],
+            "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+            "id": "scn_7756e0007f6a463a97316f3f49c15248",
+            "leaf": "bookmark-manager",
+            "leaf_name": "书签管理器",
+            "name": "生活待购与灵感收藏夹",
+            "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+            "revision": 2,
+            "status": "ready",
+            "updated_at": "2026-10-16T14:18:20.407897+00:00",
+            "workflow": [
+              "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+              "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+              "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+              "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+              "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+            ]
+          },
+          "scenario_digest": "f57cbe177ca9c476d8dd783aa6ac0847d94e5397624923cec6c4c72bcc0c20a9",
+          "source_url": "",
+          "template_input_ready": false,
+          "v1": {
+            "campaign_id": "atlas-v1-first-production-2026-10-19",
+            "plan_digest": "1f7701fbf5f52dde011dee76196b2cb01697e10190c6ad17c1273f4b5dcc3d30",
+            "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+            "policy_version": "atlas.factory-v1.1",
+            "product_id": "product-c42848f63251507bd9d911a5",
+            "segment": "G1"
+          }
+        },
+        "error": null,
+        "created_at": "2026-10-19T06:02:34.633361+00:00",
+        "updated_at": "2026-10-19T06:21:07.842974+00:00"
+      },
+      {
+        "id": "job_d0d9d80dc9f64dd9890fc0b728bd9a5d",
+        "batch_id": "bat_d13dc5920a574140be85da0ea6f5395b",
+        "kind": "blueprint-production",
+        "state": "completed",
+        "stage": "completed",
+        "attempt": 5,
+        "snapshot": {
+          "admission": {
+            "kind": "human_confirmed",
+            "revision": 2
+          },
+          "case_basis": {
+            "basis_digest": "a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589",
+            "case_refs": [
+              {
+                "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+                "digest": "d58ca8ae2ad37f581bbc79d1743df34657cdd651a43320db32ad3c4aeb275caf",
+                "evidence_digest": "706fa40ddf461e7cf1256f4b133979d5a019c6e7b848878c1be27bc75bd00d06",
+                "revision": 1
+              }
+            ],
+            "evidence_digest": "3226e826ef6d4f2b0a3051bb57fbe4023613fe756d9b7b5cbf0b7363d2efe88a",
+            "evidence_digests": {
+              "ev_ba200adf6e2c_05babdea64ba9858": "2be642fc8f35015df2b623af261894b765c1fb9106932c90805f80a6db2449fd",
+              "ev_ba200adf6e2c_06c81a165e03c96a": "b4373de490abd2fc3e1545595bc1aef7af5f1953c48b0816e39527dd68cdd600",
+              "ev_ba200adf6e2c_1596da4a90687ca5": "9738ecfec828bc93a93274ef07cd0eb86963a8ef677eb5fb0ce111beb3d2a41c",
+              "ev_ba200adf6e2c_2288b28e90cd8450": "1ebeb1e40d63cadc38f496131bc9f48610c3139b391ac6adb08b097ff39ad2e9",
+              "ev_ba200adf6e2c_3168bcd465b6a043": "389846b2bf6635cde3ef8161f1027bc19d99f423d7aee1c75c13bdb72936aa50",
+              "ev_ba200adf6e2c_35e41aab676021eb": "d6e7ebaee80c4ec90fb0e73e82b9df7b114ae35a66f5b44151c1377471ea5d3c",
+              "ev_ba200adf6e2c_3b553994c375aea5": "c90500dc23152ef3169a31cffd3461e6658c44a59c78717de9c86347de959c9c",
+              "ev_ba200adf6e2c_4c56ef30a1785be1": "afc1f95277bba05677cc73f352b93faf89c2396c957e36f962dedcc2bee005f1",
+              "ev_ba200adf6e2c_5011700a24e503c7": "d51afa6a8eea6ab32450d028bf4ffc560b2c0007698bd9ff6bf8402b2ea79a22",
+              "ev_ba200adf6e2c_515aa5d072bd2ec4": "49ea8eb4be0e58f25ff563a88a802f0e376b61cf72a9e0401a85d5969c976c59",
+              "ev_ba200adf6e2c_5d51c18a989c01f8": "377aeaeae058465469b6fe1959717ca365afd37673ba179c231e244e255e17eb",
+              "ev_ba200adf6e2c_6805376f7e2ee383": "4ea50a75bb0e27a6e885708b1593f7292c686a9b8f7212a4826fdafa38c93e45",
+              "ev_ba200adf6e2c_6bbd7a588896fe31": "a10fc2b280ae2e83eda3562e52f62fa390b5962f5fc8a32f5a1eba5f196d57ab",
+              "ev_ba200adf6e2c_7150b0ac7a5678db": "417f58299cbd24f45c2abf5da20809db08d1d4449513e6fce604746c740ceeb8",
+              "ev_ba200adf6e2c_7d47d725a2e9b759": "61df1547455c601ea568f92bc65237af3f6dc7298abc18a837f8943a283a1fed",
+              "ev_ba200adf6e2c_86ed2327f33a3ca8": "aaec85f888e49f2f7bf49cbb2c85bb7ecb79bfdbefb451f54c0513ffe217015e",
+              "ev_ba200adf6e2c_8e11efc61a4650ba": "5b5992d70729f93b9fbb0cb638e3f411035b63c039b315be37b48118e72576d5",
+              "ev_ba200adf6e2c_922f1dbc84912d99": "ac91e57b3dba519d9ffb913ca79f58946e36c37beccba7fad8d776ef436e038f",
+              "ev_ba200adf6e2c_93ef917a193a45ab": "5a62fabe586db5e0860e7f15b7618ca09a326564cbe846fffd5edf767dad4836",
+              "ev_ba200adf6e2c_93ff254508846f11": "5140e0f21c0580e0819eba9058916919e81482cab61d27274a444435732adb0d",
+              "ev_ba200adf6e2c_9ab6b0e51811a16d": "75434817f5a108c7b7b39668c58497de2b976947bdaa60495a5976f1ea5595b9",
+              "ev_ba200adf6e2c_9c7f6060878383fa": "7fe14da0e40fc7a3971695a98e45db3905cd89980fbfbe01fd719bf357d14315",
+              "ev_ba200adf6e2c_a2ebc864c5b6b3e7": "590e1663da363c0d40628033b036e2a9fca8adac9d36f7c06ec77c68b311c504",
+              "ev_ba200adf6e2c_b1ca64cf2ad02998": "eb9d0a5e4ed877eac8c088c53461ae82b096ba848c5a783cd29b30e3d16e5b25",
+              "ev_ba200adf6e2c_c4ad7e52e5713628": "267281aac7c69c5885e3382f0d16023a79d7b47575b8fe6356b76ae4407eacbf",
+              "ev_ba200adf6e2c_e62ae7e0a2c68ba1": "bedaf525785c18f436a430e24489689d9ad973b6e3be5b1896281550222371cb",
+              "ev_ba200adf6e2c_e7dd8d32c05c39f9": "134199e7260f757d7c708010991955293b629b4022be9c00b78a7de5df6e52e5",
+              "ev_ba200adf6e2c_ec303a2fd1afa287": "f2e6082bf490d98e7f508b61d6a29a5f05561c99fc07f308e61dd83888728c18",
+              "ev_ba200adf6e2c_f30eb4285ca66219": "51c3bca2ca4c2a10017a498dd2a0f533426b51ac3aeb4bf627fec81b7ab52ada"
+            },
+            "evidence_ids": [
+              "ev_ba200adf6e2c_05babdea64ba9858",
+              "ev_ba200adf6e2c_06c81a165e03c96a",
+              "ev_ba200adf6e2c_1596da4a90687ca5",
+              "ev_ba200adf6e2c_2288b28e90cd8450",
+              "ev_ba200adf6e2c_3168bcd465b6a043",
+              "ev_ba200adf6e2c_35e41aab676021eb",
+              "ev_ba200adf6e2c_3b553994c375aea5",
+              "ev_ba200adf6e2c_4c56ef30a1785be1",
+              "ev_ba200adf6e2c_5011700a24e503c7",
+              "ev_ba200adf6e2c_515aa5d072bd2ec4",
+              "ev_ba200adf6e2c_5d51c18a989c01f8",
+              "ev_ba200adf6e2c_6805376f7e2ee383",
+              "ev_ba200adf6e2c_6bbd7a588896fe31",
+              "ev_ba200adf6e2c_7150b0ac7a5678db",
+              "ev_ba200adf6e2c_7d47d725a2e9b759",
+              "ev_ba200adf6e2c_86ed2327f33a3ca8",
+              "ev_ba200adf6e2c_8e11efc61a4650ba",
+              "ev_ba200adf6e2c_922f1dbc84912d99",
+              "ev_ba200adf6e2c_93ef917a193a45ab",
+              "ev_ba200adf6e2c_93ff254508846f11",
+              "ev_ba200adf6e2c_9ab6b0e51811a16d",
+              "ev_ba200adf6e2c_9c7f6060878383fa",
+              "ev_ba200adf6e2c_a2ebc864c5b6b3e7",
+              "ev_ba200adf6e2c_b1ca64cf2ad02998",
+              "ev_ba200adf6e2c_c4ad7e52e5713628",
+              "ev_ba200adf6e2c_e62ae7e0a2c68ba1",
+              "ev_ba200adf6e2c_e7dd8d32c05c39f9",
+              "ev_ba200adf6e2c_ec303a2fd1afa287",
+              "ev_ba200adf6e2c_f30eb4285ca66219"
+            ],
+            "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+            "scenario_revision": 2,
+            "source_snapshots": [
+              {
+                "archive_sha256": "8d7d5423093436727aa1dbb47ce8dc1bae715de309ac22bc65e650913f91af39",
+                "collected_at": "2026-10-19T06:03:21.864088+00:00",
+                "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+                "excluded_paths": [],
+                "file_manifest_digest": "b2af66143ffc52e3591c248ca1cdff66e6f24388ae797e9784dc9908fdf6ce4b",
+                "files": {
+                  ".gitignore": "20e30f7d2feddb1cf1914aec96dc9a694c2aca0f02efbac0523d5a846dc82dc1",
+                  ".prettierignore": "dc4cc2ab6231b00bb0dc801c9b7d463f8273b1557f98519b3d18570a487d03fe",
+                  ".prettierrc": "d4eeddaeb3c416ceedf4c165dd4048d8d4596a6a5216fb54e54751fe2b80634b",
+                  ".vscode/settings.json": "fa8d97f9abffb85cca63607cb22ba9cbf4e18d841a087e75d8edc02822d8bf1f",
+                  "LICENSE": "17e5ccdd3ca04fa001985e8b3370d70d357f858d491b5691a461fd5985834a44",
+                  "README.md": "b49b8acb566472b0d377438114d662854b4fb93c90b4cbde180c7dac588e3a93",
+                  "bun.lock": "60d16e5afd1af76799de1e459bea78c1b66a0d022388ebc9c10daa9920023086",
+                  "eslint.config.js": "21723b58d2f8d88320bcf607dde20041f6fd52a6b06864636776b76b4c2b5c0e",
+                  "favicon.svg": "11ed7b3e1c389fe1b736dff5bf8df3dc700dcd9e1fdaebda6fbd9417c0e6b69e",
+                  "index.html": "6cbf0e25606a5627e6e3e6ceff394929691edf2d6417df922ecdca3321524eab",
+                  "package.json": "a0df38a4bf76cb70e4a46fed0487345b3bd89ee98ec8b69f48bfca95260c6e90",
+                  "preview.png": "346d46f64f374faf3f7f901e53273df285f9eb2f34c4aabc712b32a0ceb945b9",
+                  "src/App.tsrx": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+                  "src/includes/Icon.tsrx": "b807d863fd08b06210341652a6a5a85dd063122d3fc12aef1163c45c85d7e23e",
+                  "src/includes/store.ts": "b4dc58a7a48cd9929f3d35f31aef9fd5eb2b0b0606cdf735ce436a1e162b07ed",
+                  "src/includes/utils.ts": "d581eb982ce67b285056a74ab02d31a6a6a957423340da078e4ae89d9004189c",
+                  "src/index.css": "6c319086d7e7fa9298abab36a28618932d4f3a4a2c69f969b774ff6cf3aef3d7",
+                  "src/index.ts": "8fd34f45b8e3392cfad6650602b1704af7e4b150cae22e74332555ce69406ba8",
+                  "tsconfig.json": "db25efbcc189ea0e0679f48928d8491ef10358c569977399031018ce0b5f438f",
+                  "vite.config.js": "ffd99be0c5dda12dbc1d6dd21ea11c94581a9df9ed9df3659c645c6a0f9c5974"
+                },
+                "license": {
+                  "notice_hashes": {
+                    "LICENSE": "17e5ccdd3ca04fa001985e8b3370d70d357f858d491b5691a461fd5985834a44"
+                  },
+                  "spdx_id_supplement": "MIT",
+                  "supplement_collected_at": "2026-10-19T06:03:21.864088+00:00",
+                  "supplement_source": "GitHub repository metadata for the current default branch; not evidence of the pinned commit license"
+                },
+                "license_files": [
+                  "LICENSE"
+                ],
+                "license_uncertainties": [
+                  "Repository API license metadata is a current default-branch supplement; pinned-version terms are represented by fixed LICENSE/NOTICE files and their hashes."
+                ],
+                "repo_id": "1247664857",
+                "repository": "https://github.com/lakhindarpal/bookmark-manager",
+                "snapshot_id": "src_3a8113f49b44ef3b3d7a7fca",
+                "strategy_version": "github-safe-archive-v1"
+              }
+            ]
+          },
+          "case_catalog_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "config": {
+            "acceptance_protocol": "atlas.acceptance-runner.v1",
+            "cognition_guidance": "首期 python-web，Python 标准库与 SQLite；P0 完成已确认场景全部核心旅程，包括保存、分类/移动、搜索、重开保留、打开原链接及可恢复失败。使用紧凑标准库 HTTP 行为验收程序，冻结 API/HTML 表单合同；不要引入外部依赖，不要生成应用实现或自报运行。成熟能力按适用性分期，保留未知。",
+            "concurrency": 2,
+            "kind": "v1-production",
+            "language": "zh",
+            "model": "opencode-go/deepseek-v4.1-flash",
+            "name": "Atlas V1 G1 书签完整主链",
+            "repair_attempts": 1,
+            "timeout": 600
+          },
+          "leaf": {
+            "fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+            "name": "Bookmark Manager",
+            "name_zh": "书签管理器",
+            "slug": "bookmark-manager"
+          },
+          "next_stage": "template",
+          "product_id": "product-c42848f63251507bd9d911a5",
+          "repository_hints": [
+            {
+              "reason": "已有公开候选基础，本轮重新取得实际版本并研究；历史报告不作本轮证据。",
+              "repository": "https://github.com/LakhindarPal/bookmark-manager"
+            }
+          ],
+          "runtime_sample": true,
+          "scenario": {
+            "acceptance": [
+              "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+              "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+              "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+              "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+            ],
+            "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+            "id": "scn_7756e0007f6a463a97316f3f49c15248",
+            "leaf": "bookmark-manager",
+            "leaf_name": "书签管理器",
+            "name": "生活待购与灵感收藏夹",
+            "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+            "revision": 2,
+            "status": "ready",
+            "updated_at": "2026-10-16T14:18:20.407897+00:00",
+            "workflow": [
+              "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+              "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+              "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+              "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+              "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+            ]
+          },
+          "scenario_digest": "f57cbe177ca9c476d8dd783aa6ac0847d94e5397624923cec6c4c72bcc0c20a9",
+          "source_url": "",
+          "template_input_ready": false,
+          "v1": {
+            "campaign_id": "atlas-v1-first-production-2026-10-19",
+            "plan_digest": "1f7701fbf5f52dde011dee76196b2cb01697e10190c6ad17c1273f4b5dcc3d30",
+            "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+            "policy_version": "atlas.factory-v1.1",
+            "product_id": "product-c42848f63251507bd9d911a5",
+            "segment": "G1"
+          }
+        },
+        "error": null,
+        "created_at": "2026-10-19T06:21:07.842974+00:00",
+        "updated_at": "2026-10-19T07:34:44.395312+00:00"
+      },
+      {
+        "id": "job_8c13691fd4ac4591a83308c02cd4e267",
+        "batch_id": "bat_d13dc5920a574140be85da0ea6f5395b",
+        "kind": "cognitive-review",
+        "state": "needs_review",
+        "stage": "acceptance",
+        "attempt": 3,
+        "snapshot": {
+          "artifact_digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+          "artifact_id": "tpl_7f4c17e834c342e7b462e6bb8b6379e4",
+          "bundle_path": "jobs/job_d0d9d80dc9f64dd9890fc0b728bd9a5d/attempt-5/bundle",
+          "case_basis": {
+            "basis_digest": "a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589",
+            "case_refs": [
+              {
+                "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+                "digest": "d58ca8ae2ad37f581bbc79d1743df34657cdd651a43320db32ad3c4aeb275caf",
+                "evidence_digest": "706fa40ddf461e7cf1256f4b133979d5a019c6e7b848878c1be27bc75bd00d06",
+                "revision": 1
+              }
+            ],
+            "evidence_digest": "3226e826ef6d4f2b0a3051bb57fbe4023613fe756d9b7b5cbf0b7363d2efe88a",
+            "evidence_digests": {
+              "ev_ba200adf6e2c_05babdea64ba9858": "2be642fc8f35015df2b623af261894b765c1fb9106932c90805f80a6db2449fd",
+              "ev_ba200adf6e2c_06c81a165e03c96a": "b4373de490abd2fc3e1545595bc1aef7af5f1953c48b0816e39527dd68cdd600",
+              "ev_ba200adf6e2c_1596da4a90687ca5": "9738ecfec828bc93a93274ef07cd0eb86963a8ef677eb5fb0ce111beb3d2a41c",
+              "ev_ba200adf6e2c_2288b28e90cd8450": "1ebeb1e40d63cadc38f496131bc9f48610c3139b391ac6adb08b097ff39ad2e9",
+              "ev_ba200adf6e2c_3168bcd465b6a043": "389846b2bf6635cde3ef8161f1027bc19d99f423d7aee1c75c13bdb72936aa50",
+              "ev_ba200adf6e2c_35e41aab676021eb": "d6e7ebaee80c4ec90fb0e73e82b9df7b114ae35a66f5b44151c1377471ea5d3c",
+              "ev_ba200adf6e2c_3b553994c375aea5": "c90500dc23152ef3169a31cffd3461e6658c44a59c78717de9c86347de959c9c",
+              "ev_ba200adf6e2c_4c56ef30a1785be1": "afc1f95277bba05677cc73f352b93faf89c2396c957e36f962dedcc2bee005f1",
+              "ev_ba200adf6e2c_5011700a24e503c7": "d51afa6a8eea6ab32450d028bf4ffc560b2c0007698bd9ff6bf8402b2ea79a22",
+              "ev_ba200adf6e2c_515aa5d072bd2ec4": "49ea8eb4be0e58f25ff563a88a802f0e376b61cf72a9e0401a85d5969c976c59",
+              "ev_ba200adf6e2c_5d51c18a989c01f8": "377aeaeae058465469b6fe1959717ca365afd37673ba179c231e244e255e17eb",
+              "ev_ba200adf6e2c_6805376f7e2ee383": "4ea50a75bb0e27a6e885708b1593f7292c686a9b8f7212a4826fdafa38c93e45",
+              "ev_ba200adf6e2c_6bbd7a588896fe31": "a10fc2b280ae2e83eda3562e52f62fa390b5962f5fc8a32f5a1eba5f196d57ab",
+              "ev_ba200adf6e2c_7150b0ac7a5678db": "417f58299cbd24f45c2abf5da20809db08d1d4449513e6fce604746c740ceeb8",
+              "ev_ba200adf6e2c_7d47d725a2e9b759": "61df1547455c601ea568f92bc65237af3f6dc7298abc18a837f8943a283a1fed",
+              "ev_ba200adf6e2c_86ed2327f33a3ca8": "aaec85f888e49f2f7bf49cbb2c85bb7ecb79bfdbefb451f54c0513ffe217015e",
+              "ev_ba200adf6e2c_8e11efc61a4650ba": "5b5992d70729f93b9fbb0cb638e3f411035b63c039b315be37b48118e72576d5",
+              "ev_ba200adf6e2c_922f1dbc84912d99": "ac91e57b3dba519d9ffb913ca79f58946e36c37beccba7fad8d776ef436e038f",
+              "ev_ba200adf6e2c_93ef917a193a45ab": "5a62fabe586db5e0860e7f15b7618ca09a326564cbe846fffd5edf767dad4836",
+              "ev_ba200adf6e2c_93ff254508846f11": "5140e0f21c0580e0819eba9058916919e81482cab61d27274a444435732adb0d",
+              "ev_ba200adf6e2c_9ab6b0e51811a16d": "75434817f5a108c7b7b39668c58497de2b976947bdaa60495a5976f1ea5595b9",
+              "ev_ba200adf6e2c_9c7f6060878383fa": "7fe14da0e40fc7a3971695a98e45db3905cd89980fbfbe01fd719bf357d14315",
+              "ev_ba200adf6e2c_a2ebc864c5b6b3e7": "590e1663da363c0d40628033b036e2a9fca8adac9d36f7c06ec77c68b311c504",
+              "ev_ba200adf6e2c_b1ca64cf2ad02998": "eb9d0a5e4ed877eac8c088c53461ae82b096ba848c5a783cd29b30e3d16e5b25",
+              "ev_ba200adf6e2c_c4ad7e52e5713628": "267281aac7c69c5885e3382f0d16023a79d7b47575b8fe6356b76ae4407eacbf",
+              "ev_ba200adf6e2c_e62ae7e0a2c68ba1": "bedaf525785c18f436a430e24489689d9ad973b6e3be5b1896281550222371cb",
+              "ev_ba200adf6e2c_e7dd8d32c05c39f9": "134199e7260f757d7c708010991955293b629b4022be9c00b78a7de5df6e52e5",
+              "ev_ba200adf6e2c_ec303a2fd1afa287": "f2e6082bf490d98e7f508b61d6a29a5f05561c99fc07f308e61dd83888728c18",
+              "ev_ba200adf6e2c_f30eb4285ca66219": "51c3bca2ca4c2a10017a498dd2a0f533426b51ac3aeb4bf627fec81b7ab52ada"
+            },
+            "evidence_ids": [
+              "ev_ba200adf6e2c_05babdea64ba9858",
+              "ev_ba200adf6e2c_06c81a165e03c96a",
+              "ev_ba200adf6e2c_1596da4a90687ca5",
+              "ev_ba200adf6e2c_2288b28e90cd8450",
+              "ev_ba200adf6e2c_3168bcd465b6a043",
+              "ev_ba200adf6e2c_35e41aab676021eb",
+              "ev_ba200adf6e2c_3b553994c375aea5",
+              "ev_ba200adf6e2c_4c56ef30a1785be1",
+              "ev_ba200adf6e2c_5011700a24e503c7",
+              "ev_ba200adf6e2c_515aa5d072bd2ec4",
+              "ev_ba200adf6e2c_5d51c18a989c01f8",
+              "ev_ba200adf6e2c_6805376f7e2ee383",
+              "ev_ba200adf6e2c_6bbd7a588896fe31",
+              "ev_ba200adf6e2c_7150b0ac7a5678db",
+              "ev_ba200adf6e2c_7d47d725a2e9b759",
+              "ev_ba200adf6e2c_86ed2327f33a3ca8",
+              "ev_ba200adf6e2c_8e11efc61a4650ba",
+              "ev_ba200adf6e2c_922f1dbc84912d99",
+              "ev_ba200adf6e2c_93ef917a193a45ab",
+              "ev_ba200adf6e2c_93ff254508846f11",
+              "ev_ba200adf6e2c_9ab6b0e51811a16d",
+              "ev_ba200adf6e2c_9c7f6060878383fa",
+              "ev_ba200adf6e2c_a2ebc864c5b6b3e7",
+              "ev_ba200adf6e2c_b1ca64cf2ad02998",
+              "ev_ba200adf6e2c_c4ad7e52e5713628",
+              "ev_ba200adf6e2c_e62ae7e0a2c68ba1",
+              "ev_ba200adf6e2c_e7dd8d32c05c39f9",
+              "ev_ba200adf6e2c_ec303a2fd1afa287",
+              "ev_ba200adf6e2c_f30eb4285ca66219"
+            ],
+            "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+            "scenario_revision": 2,
+            "source_snapshots": [
+              {
+                "archive_sha256": "8d7d5423093436727aa1dbb47ce8dc1bae715de309ac22bc65e650913f91af39",
+                "collected_at": "2026-10-19T06:03:21.864088+00:00",
+                "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+                "excluded_paths": [],
+                "file_manifest_digest": "b2af66143ffc52e3591c248ca1cdff66e6f24388ae797e9784dc9908fdf6ce4b",
+                "files": {
+                  ".gitignore": "20e30f7d2feddb1cf1914aec96dc9a694c2aca0f02efbac0523d5a846dc82dc1",
+                  ".prettierignore": "dc4cc2ab6231b00bb0dc801c9b7d463f8273b1557f98519b3d18570a487d03fe",
+                  ".prettierrc": "d4eeddaeb3c416ceedf4c165dd4048d8d4596a6a5216fb54e54751fe2b80634b",
+                  ".vscode/settings.json": "fa8d97f9abffb85cca63607cb22ba9cbf4e18d841a087e75d8edc02822d8bf1f",
+                  "LICENSE": "17e5ccdd3ca04fa001985e8b3370d70d357f858d491b5691a461fd5985834a44",
+                  "README.md": "b49b8acb566472b0d377438114d662854b4fb93c90b4cbde180c7dac588e3a93",
+                  "bun.lock": "60d16e5afd1af76799de1e459bea78c1b66a0d022388ebc9c10daa9920023086",
+                  "eslint.config.js": "21723b58d2f8d88320bcf607dde20041f6fd52a6b06864636776b76b4c2b5c0e",
+                  "favicon.svg": "11ed7b3e1c389fe1b736dff5bf8df3dc700dcd9e1fdaebda6fbd9417c0e6b69e",
+                  "index.html": "6cbf0e25606a5627e6e3e6ceff394929691edf2d6417df922ecdca3321524eab",
+                  "package.json": "a0df38a4bf76cb70e4a46fed0487345b3bd89ee98ec8b69f48bfca95260c6e90",
+                  "preview.png": "346d46f64f374faf3f7f901e53273df285f9eb2f34c4aabc712b32a0ceb945b9",
+                  "src/App.tsrx": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+                  "src/includes/Icon.tsrx": "b807d863fd08b06210341652a6a5a85dd063122d3fc12aef1163c45c85d7e23e",
+                  "src/includes/store.ts": "b4dc58a7a48cd9929f3d35f31aef9fd5eb2b0b0606cdf735ce436a1e162b07ed",
+                  "src/includes/utils.ts": "d581eb982ce67b285056a74ab02d31a6a6a957423340da078e4ae89d9004189c",
+                  "src/index.css": "6c319086d7e7fa9298abab36a28618932d4f3a4a2c69f969b774ff6cf3aef3d7",
+                  "src/index.ts": "8fd34f45b8e3392cfad6650602b1704af7e4b150cae22e74332555ce69406ba8",
+                  "tsconfig.json": "db25efbcc189ea0e0679f48928d8491ef10358c569977399031018ce0b5f438f",
+                  "vite.config.js": "ffd99be0c5dda12dbc1d6dd21ea11c94581a9df9ed9df3659c645c6a0f9c5974"
+                },
+                "license": {
+                  "notice_hashes": {
+                    "LICENSE": "17e5ccdd3ca04fa001985e8b3370d70d357f858d491b5691a461fd5985834a44"
+                  },
+                  "spdx_id_supplement": "MIT",
+                  "supplement_collected_at": "2026-10-19T06:03:21.864088+00:00",
+                  "supplement_source": "GitHub repository metadata for the current default branch; not evidence of the pinned commit license"
+                },
+                "license_files": [
+                  "LICENSE"
+                ],
+                "license_uncertainties": [
+                  "Repository API license metadata is a current default-branch supplement; pinned-version terms are represented by fixed LICENSE/NOTICE files and their hashes."
+                ],
+                "repo_id": "1247664857",
+                "repository": "https://github.com/lakhindarpal/bookmark-manager",
+                "snapshot_id": "src_3a8113f49b44ef3b3d7a7fca",
+                "strategy_version": "github-safe-archive-v1"
+              }
+            ]
+          },
+          "config": {
+            "concurrency": 1,
+            "kind": "cognitive-review",
+            "language": "zh",
+            "model": "opencode-go/deepseek-v4.1-flash",
+            "name": "Independent acceptance: 生活待购与灵感收藏夹",
+            "timeout": 600
+          },
+          "leaf": {
+            "fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+            "name": "Bookmark Manager",
+            "name_zh": "书签管理器",
+            "slug": "bookmark-manager"
+          },
+          "scenario": {
+            "acceptance": [
+              "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+              "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+              "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+              "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+            ],
+            "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+            "id": "scn_7756e0007f6a463a97316f3f49c15248",
+            "leaf": "bookmark-manager",
+            "leaf_name": "书签管理器",
+            "name": "生活待购与灵感收藏夹",
+            "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+            "revision": 2,
+            "status": "ready",
+            "updated_at": "2026-10-16T14:18:20.407897+00:00",
+            "workflow": [
+              "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+              "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+              "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+              "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+              "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+            ]
+          },
+          "v1": {
+            "campaign_id": "atlas-v1-first-production-2026-10-19",
+            "plan_digest": "1f7701fbf5f52dde011dee76196b2cb01697e10190c6ad17c1273f4b5dcc3d30",
+            "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+            "policy_version": "atlas.factory-v1.1",
+            "product_id": "product-c42848f63251507bd9d911a5",
+            "segment": "G1"
+          }
+        },
+        "error": null,
+        "created_at": "2026-10-19T07:34:44.417098+00:00",
+        "updated_at": "2026-10-19T07:47:09.120599+00:00"
+      }
+    ]
+  }
+}

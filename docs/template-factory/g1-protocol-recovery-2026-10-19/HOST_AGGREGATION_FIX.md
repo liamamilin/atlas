@@ -1,0 +1,11 @@
+# 六项设计审阅汇总的材料路径修复
+
+真实attempt3已取得六项有效passed子审阅：前三旧CP核验复用，本次额外phase_acceptance及正常decisions_defaults/runtime_protocol完成；累计CLI59、业务5、grant1。汇总失败原因是architecture子审阅合法引用CASE_ADAPTATION_POLICY.json，但全局context缺该文件，validate_review严格文件校验拒绝；不是完整语义blocked/uncertain，也不是额外协议重试失败。
+
+最小修复只在V1 case_basis/绑定policy存在时，用已有稳定writer写入全局context的CASE_ADAPTATION_POLICY.json。旧CASE_DESIGN writer/字节、prompt、独立投影、prepared plan、案例依据和scope完全不改；validate_review也不改。原attempt3材料不手改。
+
+回归test_factory_review_aggregation用真实六项CP、实际Pipeline和临时完整V1案例库，验证严格引用校验通过、只到首个blueprint-code入口、没有任何新预审或整规格/案例适配调用、六个CP原文保留、CASE_DESIGN字节不变。独立Sol只读审查未发现明确阻断，完整检查/新源码CI另留证。
+
+新代码门禁后，通过现有同job failed retry进入attempt4（不调用queue_repair、不记录业务修复、不新登记grant），先核对真实queued/父paused、snapshot及六CP/59/5/grant1保持，再resume原plan。此为宿主缺陷恢复，不新增业务第6轮或额外协议机会。所有模型调用仍受原500、并发和绝对截止。
+
+新代码13项完整检查全部通过：后端613项（8项既有可选跳过），前端单测9、普通E2E17、工厂E2E27、Docker20（零跳过）；source tree c14e6ad87cf501e367ad25620908472351fde7959283fc9b8ed16ed3246f3a28，检查前后未变。

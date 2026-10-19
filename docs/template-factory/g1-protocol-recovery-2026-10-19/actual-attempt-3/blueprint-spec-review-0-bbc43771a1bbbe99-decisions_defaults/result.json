@@ -1,0 +1,19 @@
+{
+ "summary": "仅审阅 decisions_defaults：适用决策均已显式化，默认可逆并配有真实的复查触发条件；未发现阻断核心旅程或虚假验收承诺的缺口。",
+ "checks": [
+  {
+   "dimension": "decisions_defaults",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "D01–D13 均包含 default、impact、question 与 when_to_ask：D01–D10 为已决的可逆默认（单归类 D01、默认“未整理” D02、自动建类 D03、软删除 D04、本地优先 D05、P1 去重 D06、检索字段 D07、python-web D08、无认证 D09、Netscape 交换 D10），D11/D12 为 deferred、D13 为 open，触发条件均落在真实用户反馈或部署变化上。与 F01–F24、limits 及 ARCHITECTURE 的默认归类、软删除迁移、P1 去重和仅隔离验收网络使用 0.0.0.0 的边界一致；显式空归类返回 400、P1 重复返回 409 等阶段例外也已在架构中收口。"
+  }
+ ],
+ "suggestions": [
+  "将 D02 的“保存始终成功”明确限定为“有效 URL 且未触发 P1 重复规则时，省略归类仍落入未整理”，避免与 D06 的 409 duplicate_url 及非法 URL、显式空归类的 400 冲突。",
+  "D05 写“图标由域名派生本地路由”，但 ARCHITECTURE 仅定义可空 favicon_url 且把图标/元数据列为 P1 可选增强；在编写 P1 前补明本地图标路由或占位策略，或删去“本地路由”措辞。",
+  "归类删除会把该归类下活动与软删记录整体迁到默认归类，属不可逆的归类归属变更；建议在 D04 或 UI 合同中明确这是有意接受的静默迁移，或补充确认/撤销语义。"
+ ]
+}

@@ -1,0 +1,24 @@
+{
+ "outcome": "passed",
+ "summary": "runtime_protocol 审查通过：交付 profile、程序导入、app_root/data_dir 隔离、重启适配器、base_url 使用与字面 start argv 均与 RUNTIME_CONTRACT.md 一致；未发现需要阻断的运行时协议冲突。",
+ "checks": [
+  {
+   "dimension": "runtime_protocol",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "ARCHITECTURE.md 明确交付 profile 为 python-web（Python 3.12 标准库）；common.py 用 os.path.dirname(os.path.abspath(__file__)) 自举 sys.path，不依赖 cwd；--app-root 只读，--data-dir 仅为测试者草稿根，应用数据库位于每实例 data_dir/instances/<uuid>，未把测试者 data_dir 根当作应用库；A01/A05/A09 要求 --app-root/--data-dir，并由 common.launch_app 启动 app/serve.py，执行真实表单写入、SIGTERM、同目录重启并读回，健康检查未被当作重启证据；全部 Web 用例使用 --base-url，未发现绕过 base_url 的断言；README 的 start 为字面 argv，未发现 {port}/{data_dir} 插值假设，也未发现向保存外链、元数据或 favicon 发起请求的验收承诺。"
+  }
+ ],
+ "suggestions": [
+  "将“所有请求限定在 base_url 精确 origin”改为“每个 HttpClient 只访问其绑定的 origin”；对 common.launch_app 启动的重启实例使用该实例的 origin，同时保留 --base-url 目标断言，避免与 A01/A05/A09 的本地重启实例产生字面冲突。",
+  "在 A01/A05/A09 中明确重启断言针对 common.launch_app 启动的同一本地实例；若 --base-url 是不可重启的只读外部目标，应单独标注其重启行为未验证，不得以独立实例替代该目标的结论。"
+ ],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "review_rules_version": "atlas.current-required-contract.v1",
+ "proposal_digest": "f190b65275ab7c7136f523ba92aecde7c9392440d7676b070393e62ff9137b58",
+ "projection_digest": "0455d982eea1163b8acf784c572f5bf9d61ea7f9d465a252c3a3e37c8b8f08e1",
+ "stage": "blueprint-spec-review-0-bbc43771a1bbbe99-runtime_protocol-v1"
+}

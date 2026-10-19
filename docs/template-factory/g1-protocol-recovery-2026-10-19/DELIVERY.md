@@ -1,3 +1,5 @@
+> 续作更新：原CI等待已解除，grant在同job attempt3消费1/1，phase_acceptance、decisions_defaults、runtime_protocol均完整passed，原前三CP复用。累计59/500、修复5/5。六项汇总遇到宿主目录遗漏CASE_ADAPTATION_POLICY.json的确定缺陷，计划已正式暂停；最小代码修复与零新增预审回归通过，正在执行新源码门禁。下文保留前次外部停止历史，最终结果以实际续作证据更新。
+
 # 一次性协议恢复：代码交付与真实外部停止
 
 **G1 blocked；T08 not_started（0/3）。当前job_7742b1c124be4c9ab3a0096da5cdd772仍为attempt2 / paused_budget，stage为blueprint-spec-review-0-bbc43771a1bbbe99-phase_acceptance。CLI56/500、书签业务修复5/5、历史阶段追加2；本次一次性授权0/1（尚未登记或消费），活动调用0。正式模板0、真实P0通过0；案例新增0，原G1固定依据复用书签案例1。**

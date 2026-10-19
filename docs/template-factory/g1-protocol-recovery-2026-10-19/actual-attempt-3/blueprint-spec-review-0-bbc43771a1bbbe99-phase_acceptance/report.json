@@ -1,0 +1,28 @@
+{
+ "outcome": "passed",
+ "summary": "phase_acceptance 通过：P0 先用 A01–A12 覆盖确认场景的完整核心旅程，F12–F14 与 A13–A15 明确保留为 P1 后期增强；各案例的实现文件、runner 参数绑定及 common/ARCHITECTURE 文件接口基本一致。未发现阶段顺序、能力依赖或文件接口的阻断性缺陷，仅有少量需澄清的覆盖与案例归属细节。",
+ "checks": [
+  {
+   "dimension": "phase_acceptance",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md",
+    "REVISION.md"
+   ],
+   "reason": "P0 先安排 A01–A12：A01–A03 覆盖保存与默认归类，A04–A05 覆盖归类管理、移动，A06–A07 覆盖计数浏览与关键字检索，A08 覆盖打开原页，A09 覆盖软删除与恢复，A10/A12 覆盖错误路径，A11 覆盖首启外壳；A01/A05/A09 通过 --app-root/--data-dir 以同一实例目录重启验证持久化。F12–F14 及 A13–A15 留在 P1，未发现核心步骤后置或 P0 依赖 P1 能力。file_plan 中每个 Axx 均映射到 p0_library、p0_organize、p0_find_open、p0_recovery 或 p1_maturity，runner 的 A01/A05/A09 app-root/data-dir 与 A14 data-dir 绑定同 ARCHITECTURE 及 common.launch_app/parse_case_args 一致；status 均为 not implemented/not_run，未作已通过声明。非阻断问题包括：A05 未明确新建归类跨重启，A02 缺 JSON 单标签主机正向断言，A11 空库前置未由 flags 保证，p0_recovery/A10 另测归类表单非法 name 与 A12“invalid_name 仅属 A04”的归属声明重叠。"
+  }
+ ],
+ "suggestions": [
+  "在 A05（或 A04）的隔离实例中显式新建一个归类，移动记录后停止并用同一实例目录重启，断言新归类仍存在且记录归属保持；当前 A04 只做同进程归类创建，A05 的跨重启断言只明确覆盖移动。",
+  "从 p0_recovery/A10 移除对归类创建/重命名非法 name 的断言，或明确标注为 A04 的重复检查，使 invalid_name 分支与 A12“仅属 A04”及 contract_coverage 的案例归属一致。",
+  "A02 增加 JSON 保存单标签主机 URL（如 http://atlas-a02-xxxx）的正向断言，以匹配“保存表单与 JSON 均接受”的目标；当前计划只明确表单正向与双方负向。",
+  "A11 的空库断言应通过 --app-root/--data-dir 启动隔离空实例，或将目标改写为仅验证空归类视图与首页外壳，避免在已有数据的 --base-url 上把非空库当作空库。",
+  "在 common.py 接口说明中明确 /go 请求使用不跟随重定向并返回 Location（而非把跨源 302 当作 ExternalNavigationBlocked），以匹配 A08 的 302 Location 断言。"
+ ],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "review_rules_version": "atlas.current-required-contract.v1",
+ "proposal_digest": "f190b65275ab7c7136f523ba92aecde7c9392440d7676b070393e62ff9137b58",
+ "projection_digest": "4cf088a2964bca2a1917f50505e675d7c5f580694b88c103c98e15eee250695c",
+ "stage": "blueprint-spec-review-0-bbc43771a1bbbe99-phase_acceptance"
+}

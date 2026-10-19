@@ -1295,6 +1295,12 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
         snapshot["case_design"] = choices
         library.require_design_evidence(snapshot["case_basis"], choices)
         _atomic_context_json(context / "CASE_DESIGN.json", choices)
+        if policy:
+            # A cached architecture subreview skips its review closure, so its
+            # bound policy must also exist in shared context for aggregate
+            # citation validation. Preserve CASE_DESIGN bytes and write only
+            # the exact host-owned policy already used by that subreview.
+            _atomic_context_json(context / "CASE_ADAPTATION_POLICY.json", policy)
     runtime_protocol = config.get("acceptance_protocol")
     design_dimensions = DESIGN_DIMENSIONS + (
         ("runtime_protocol",) if runtime_protocol else ()

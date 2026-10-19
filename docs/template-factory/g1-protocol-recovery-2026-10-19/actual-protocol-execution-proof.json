@@ -1,0 +1,120 @@
+{
+  "job_id": "job_7742b1c124be4c9ab3a0096da5cdd772",
+  "attempt": 3,
+  "input_bytes_identical": true,
+  "input_sha256": "44e258910a36e18c6bae070dbcc6a003c345a7f9623f6f2b474b5de633ed0c97",
+  "input_digest": "449b8a5093505d77cf97ec22db4d9f9a952ff15e324a92da140bc93b3b05bd23",
+  "source_tree_digest": "4cf088a2964bca2a1917f50505e675d7c5f580694b88c103c98e15eee250695c",
+  "projection_digest": "4cf088a2964bca2a1917f50505e675d7c5f580694b88c103c98e15eee250695c",
+  "prompt_sha256": "c8ae350e5eb1b66a0f4de936a3d39ca862eab6351758069f8f613d72cac84480",
+  "process": {
+    "pid": 49813,
+    "model": "opencode-go/deepseek-v4.1-flash",
+    "started": 1792432199.501219
+  },
+  "reused_events": [
+    {
+      "seq": 3204,
+      "attempt": 3,
+      "at": "2026-10-19T17:49:59.368427+00:00",
+      "stage": "blueprint-design-check-0-architecture_contract-bbc43771a1bbbe99",
+      "message": "Resuming completed checkpoint"
+    },
+    {
+      "seq": 3203,
+      "attempt": 3,
+      "at": "2026-10-19T17:49:59.356430+00:00",
+      "stage": "blueprint-design-check-0-product_completeness",
+      "message": "Resuming completed checkpoint"
+    },
+    {
+      "seq": 3202,
+      "attempt": 3,
+      "at": "2026-10-19T17:49:59.344333+00:00",
+      "stage": "blueprint-design-check-0-scenario_scope",
+      "message": "Resuming completed checkpoint"
+    },
+    {
+      "seq": 3201,
+      "attempt": 3,
+      "at": "2026-10-19T17:49:59.321864+00:00",
+      "stage": "blueprint-plan-0",
+      "message": "Resuming completed checkpoint"
+    },
+    {
+      "seq": 3200,
+      "attempt": 3,
+      "at": "2026-10-19T17:49:59.294846+00:00",
+      "stage": "case-adaptation-prepared-aaf080ba52611126",
+      "message": "Resuming completed checkpoint"
+    },
+    {
+      "seq": 3199,
+      "attempt": 3,
+      "at": "2026-10-19T17:49:59.280488+00:00",
+      "stage": "blueprint-accepted-facts-view",
+      "message": "Resuming completed checkpoint"
+    },
+    {
+      "seq": 3198,
+      "attempt": 3,
+      "at": "2026-10-19T17:49:59.270025+00:00",
+      "stage": "blueprint-research",
+      "message": "Resuming completed checkpoint"
+    }
+  ],
+  "grant_use": [
+    {
+      "grant_id": "pgrant_f3595368c14d4b23b6ab536f6d198007",
+      "reservation_id": "bud_9a81a7a4adc14f49b46239ec68ee2fdb",
+      "status": "started",
+      "created_at": 1792432199.389308,
+      "released_at": null
+    }
+  ],
+  "reservation": {
+    "id": "bud_9a81a7a4adc14f49b46239ec68ee2fdb",
+    "campaign_id": "atlas-v1-first-production-2026-10-19",
+    "identity": "product-c42848f63251507bd9d911a5",
+    "phase": "G1",
+    "kind": "review",
+    "status": "started",
+    "created": 1792432199.389308,
+    "started": 1792432199.4981382,
+    "finished": null,
+    "job_id": "job_7742b1c124be4c9ab3a0096da5cdd772",
+    "requested_model": "opencode-go/deepseek-v4.1-flash",
+    "requested_effort": null,
+    "stage": "blueprint-spec-review-0-bbc43771a1bbbe99-phase_acceptance:449b8a5093505d77",
+    "retry": 1,
+    "observed_model": null,
+    "observed_effort": null,
+    "outcome": null,
+    "group_kind": "production",
+    "retry_scope": "blueprint-spec-review:phase_acceptance"
+  },
+  "formal_recovery": {
+    "job_id": "job_7742b1c124be4c9ab3a0096da5cdd772",
+    "grant_id": "pgrant_f3595368c14d4b23b6ab536f6d198007",
+    "idempotency_key": "atlas-g1-phase-protocol-resume-2026-10-19-v1",
+    "request_digest": "f4b3362fbd0ad9d8a7bfc44d6e331c13ae52b6840a8a5700388f633cc64d1b22",
+    "old_state": "paused_budget",
+    "old_error": "budget_retry_limit: transient retry limit exhausted",
+    "old_stage": "blueprint-spec-review-0-bbc43771a1bbbe99-phase_acceptance",
+    "old_attempt": 2,
+    "old_updated_at": "2026-10-19T15:10:59.501212+00:00",
+    "old_token": "ca343ad9a722414787bf8c44446b16da:87a6359f8128468abdd4c749181ee63d",
+    "old_lease": 1792422719.385808,
+    "snapshot_digest": "57b9178566f0b5a6cdd6aac6cb142f32f3c78f727abaf9077ff9abd83cc6a3d7",
+    "checkpoint_digest": "113f2905ff9e0e2dd0f1e2e5b615a5a58bbbe2048dc3c2c8368588af438b4714",
+    "checkpoint_names": "[\"blueprint-accepted-facts-view\",\"blueprint-design-check-0-architecture_contract-bbc43771a1bbbe99\",\"blueprint-design-check-0-product_completeness\",\"blueprint-design-check-0-scenario_scope\",\"blueprint-plan-0\",\"blueprint-research\",\"case-adaptation-prepared-aaf080ba52611126\"]",
+    "campaign_id": "atlas-v1-first-production-2026-10-19",
+    "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+    "product_id": "product-c42848f63251507bd9d911a5",
+    "operation": "blueprint-spec-review-0-bbc43771a1bbbe99-phase_acceptance:449b8a5093505d77",
+    "input_digest": "449b8a5093505d77cf97ec22db4d9f9a952ff15e324a92da140bc93b3b05bd23",
+    "input_sha256": "44e258910a36e18c6bae070dbcc6a003c345a7f9623f6f2b474b5de633ed0c97",
+    "stdout_sha256": "00227a3ec72d61eb677d39174f042078cdff5969d0df248771fa630d57ad1b20",
+    "created_at": "2026-10-19T17:49:55.216631+00:00"
+  }
+}
