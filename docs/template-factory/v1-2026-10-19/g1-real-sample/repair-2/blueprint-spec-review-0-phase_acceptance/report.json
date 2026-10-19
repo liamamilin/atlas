@@ -1,0 +1,23 @@
+{
+ "outcome": "passed",
+ "summary": "规格审查结论（phase_acceptance）：P0 先覆盖已确认核心旅程，P1 仅安排后期增强；验收用例、阶段归属与 file_plan/架构接口一致，未发现阻断性阶段缺陷。所有 acceptance 仍为 not_run，本结论不表示运行时通过。",
+ "checks": [
+  {
+   "dimension": "phase_acceptance",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "P0 的 A01–A12 与 F01–F11 覆盖保存（可选归类或默认“未整理”）、归类新建/重命名/删除与移动、按归类浏览及计数、标题/域名/描述检索、/go/{id} 回跳、删除/撤销、输入错误合同和跨重启持久化；P1 的 A13–A15 仅涉及元数据/图标离线降级、书签 HTML 导入导出和重复 URL 检测，均非已确认核心旅程的必要步骤。每个 acceptance 行都指向 file_plan 中已有的 acceptance/*.py，所需 /api/bookmarks、/api/categories、/go/{id}、/api/export、/api/import 及重启适配器均已在 ARCHITECTURE.md 声明，未发现 P0 依赖 P1 能力或核心步骤被推迟。"
+  }
+ ],
+ "suggestions": [
+  "建议澄清 A04 的归类新建/重命名/删除是否通过同一夹具在重启后验证；A05 未说明其目标归类是否由 A04 新建，因此“新建归类在重开后仍有效”这一核心语义的覆盖存在范围歧义。",
+  "建议明确 A09 的“删除跨重启保持”分支与“撤销恢复”分支使用不同记录或不同实例；若对同一条记录先恢复再重启，无法同时证明删除持久化。"
+ ],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "proposal_digest": "4c3f1c2a6e4ccfb95c8ffaeb569098e6733d7ad22913f9adb775cf2301efafeb",
+ "projection_digest": "8245db3ee4a646cdb893055bad6cd74a082374752965aaa8197d5b978e7bb538",
+ "stage": "blueprint-spec-review-0-phase_acceptance"
+}

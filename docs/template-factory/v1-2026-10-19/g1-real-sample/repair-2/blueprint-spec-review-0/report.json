@@ -1,0 +1,221 @@
+{
+ "outcome": "blocked",
+ "summary": "scenario_scope: passed; product_completeness: blocked; architecture_contract: blocked; phase_acceptance: passed; decisions_defaults: passed; runtime_protocol: passed",
+ "checks": [
+  {
+   "dimension": "scenario_scope",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "DRAFT 的 P0 功能 F01-F11 对应确认流程五步与四条验收：F01/F02 保存并支持默认“未整理”，F03/F04 新建归类与移动记录，F05/F06 归类浏览与标题/域名/描述检索，F07 通过 /go/{id} 打开原页，F08 跨重启持久化；F09-F11 提供删除恢复、校验错误合同与本地外壳。角色 R01/R02/R03 分别对应收藏者、本地应用与独立验收者，未引入多用户或协作角色。F12-F14 位于 P1，F15/F16/F20-F24 明确不适用，F17-F19 为待决策且未进入当前阶段，均未挤占核心旅程。ARCHITECTURE 的 UI 合同包含保存、归类创建、移动、检索、打开、删除/恢复入口，P0 核心动作均有浏览器入口。"
+  },
+  {
+   "dimension": "product_completeness",
+   "outcome": "blocked",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "DRAFT.md 的 F03 把归类重命名/删除列为 P0 current required，A04 也验收重名拒绝和删除后记录回到“未整理”；ARCHITECTURE.md 的 UI 适配器合同却只声明 /categories/new 新建表单，没有重命名/删除入口。F06/A07 要求关键字检索可与归类叠加，但检索表单只有 q 字段且 action=/，提交会丢失当前 category。UI 合同还声明“编辑入口”却未给出编辑表单端点；表单失败合同只承诺 400，而 API 对重名归类/重复 URL 返回 409，浏览器用户没有声明的 409 展示与恢复路径。F05/A06 的侧栏条目计数也未在 UI 合同中声明渲染。"
+  },
+  {
+   "dimension": "architecture_contract",
+   "outcome": "blocked",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "F03 标注 P0/current required，名称包含归类新建、重命名、删除；ARCHITECTURE 的 UI 适配器合同只声明 `/categories/new` 新建表单和侧栏链接，未声明重命名/删除入口，JSON API 的 PATCH/DELETE 不能替代浏览器 UI 能力。F05 同样为 P0/current required 且名称含“条目计数”，UI 合同只列侧栏归类链接，未要求展示 `GET /api/categories` 的 count；count 是否排除 `trashed_at` 记录也未定义，可能与 D04 默认视图排除软删除记录不一致。UI 合同还只写“编辑入口”而未给出编辑表单/动作，且称表单失败一律 400，而 JSON API 对重复归类/重复 URL 返回 409、未知资源 404，二者“语义一致”的映射未说明。"
+  },
+  {
+   "dimension": "phase_acceptance",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "P0 的 A01–A12 与 F01–F11 覆盖保存（可选归类或默认“未整理”）、归类新建/重命名/删除与移动、按归类浏览及计数、标题/域名/描述检索、/go/{id} 回跳、删除/撤销、输入错误合同和跨重启持久化；P1 的 A13–A15 仅涉及元数据/图标离线降级、书签 HTML 导入导出和重复 URL 检测，均非已确认核心旅程的必要步骤。每个 acceptance 行都指向 file_plan 中已有的 acceptance/*.py，所需 /api/bookmarks、/api/categories、/go/{id}、/api/export、/api/import 及重启适配器均已在 ARCHITECTURE.md 声明，未发现 P0 依赖 P1 能力或核心步骤被推迟。"
+  },
+  {
+   "dimension": "decisions_defaults",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "D01–D10 以 status=decided 明确单选归类、默认“未整理”、自动建类、软删除、离线优先、P1 去重、检索字段、标准库栈、无认证与 Netscape 交换格式，并逐条给出可逆迁移方向；D11–D13 以 deferred/open 区分未决范围，when_to_ask 均绑定具体用户证据或部署条件。D04.impact 已只保留 trashed_at、列表过滤与 /restore，不再引用未定义的 purge API。与 ARCHITECTURE 的保存/移动/恢复接口交叉核对，P0 未出现阻断性默认冲突；D06 的 P1 去重边界与 P0 restore/PATCH 409 的关系仍需明确。"
+  },
+  {
+   "dimension": "runtime_protocol",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "架构明确交付 profile 为 python-web；交付 start 是字面 argv 数组 [\"python3\",\"app/serve.py\",\"--host\",\"0.0.0.0\",\"--port\",\"8000\",\"--data-dir\",\"/state/app-data\"]，未使用 {port}/{data_dir} 参数插值。验收合同要求通过 --base-url 驱动运行中的实例，A05/A09 也明确在给定 base_url 目标上执行。重启断言具备具体适配器：launch_app 从只读 app_root 启动同一冻结应用，在 {data_dir}/instances/<uuid>/ 下创建每实例隔离 scratch，轮询 /api/health，执行真实 HTTP 动作后终止，再用相同实例子目录重启并观察持久化行为；同时明确 {data_dir} 根目录不是应用数据库，应用源码只读。目标为本机可重启应用，不涉及无法重启的只读外部目标，因此无需另行标记外部验证。file_plan 仅保留既有验收程序且本次为规格修复，未出现与上述运行时契约冲突的文件接口承诺。"
+  }
+ ],
+ "suggestions": [
+  "F03 将“重命名/删除归类”列为 P0、F05 将“条目计数”列为 P0，但 ARCHITECTURE 的 HTML UI 合同只声明了归类创建入口和归类链接，未声明重命名/删除表单或计数展示；建议补充对应浏览器入口，或收窄 F03/F05 的 P0 文案，使能力声明与界面合同一致。",
+  "在 UI 适配器合同中补充归类重命名/删除的表单端点、成功跳转和错误展示，或把 F03/A04 收窄为仅新建并同步修改验收。",
+  "让检索表单保留当前 category（隐藏字段或侧栏链接携带 q），使 F06/A07 的归类内检索可由浏览器用户完成。",
+  "为“编辑入口”声明实际编辑表单端点，或移除该入口，避免不可达的 UI 承诺。",
+  "扩展表单错误合同以覆盖 409 duplicate_category/duplicate_url（并展示 existing_id 的查看入口）及必要的 404 恢复路径。",
+  "在侧栏明确渲染 F05/A06 的条目计数，或把计数断言限定为 API 并相应调整 F05 描述。",
+  "在 UI 适配器合同中补齐归类重命名/删除表单、侧栏计数展示和编辑表单/动作；若本期只要求新建归类，则同步收窄 F03/F05 的 P0 范围，避免 current required 与 UI 能力不一致。",
+  "明确 `GET /api/categories` 的 count 仅统计未软删除记录，与 D04 默认视图一致。",
+  "明确 HTML 表单失败如何映射 JSON API 的 400/404/409（至少保留 duplicate_category/duplicate_url 语义），或统一表单错误状态合同。",
+  "明确 `PATCH /api/bookmarks/{id}` 更新 url 时同步重算 hostname，并明确删除归类时同时迁移 trashed 记录，避免 hostname 检索陈旧或 category_id 孤儿。",
+  "修正迁移段落对 D12 的误引用，改为 schema_meta 版本迁移策略。",
+  "建议澄清 A04 的归类新建/重命名/删除是否通过同一夹具在重启后验证；A05 未说明其目标归类是否由 A04 新建，因此“新建归类在重开后仍有效”这一核心语义的覆盖存在范围歧义。",
+  "建议明确 A09 的“删除跨重启保持”分支与“撤销恢复”分支使用不同记录或不同实例；若对同一条记录先恢复再重启，无法同时证明删除持久化。",
+  "D06 的 impact 提到导入时的合并/跳过策略，但 default 只规定保存路径；请在 P1 前明确导入遇到重复 URL 时是跳过、合并还是允许重复，并说明 P0 的 restore/PATCH 409 是数据完整性守卫还是 F14 去重的一部分。",
+  "D13 将网页快照与失效链接检测合并为一个 open 问题；建议拆成两个独立决策与触发条件，避免用户只想要其中一项时无法分别回答。"
+ ],
+ "scope": "Independent dimension-by-dimension specification design review of pinned proposal projections before new programs are authored; no execution or frozen-candidate acceptance. Full research facts and authored programs remain for separate frozen-candidate review.",
+ "proposal_digest": "4c3f1c2a6e4ccfb95c8ffaeb569098e6733d7ad22913f9adb775cf2301efafeb",
+ "subreviews": [
+  {
+   "outcome": "passed",
+   "summary": "确认场景与当前 P0/P1 划分一致：P0 完整覆盖保存（可选归类或默认“未整理”）、归类新建与记录移动、按归类/关键字找回、打开原页、跨会话持久化及错误恢复；P1 仅承载元数据、导入导出、去重等可选成熟增强。未发现核心流程被推迟到 P1，也未发现与确认目标冲突的扩展；REVISION.md 仅要求架构文本修正并保留现有阶段与能力。",
+   "checks": [
+    {
+     "dimension": "scenario_scope",
+     "outcome": "passed",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "reason": "DRAFT 的 P0 功能 F01-F11 对应确认流程五步与四条验收：F01/F02 保存并支持默认“未整理”，F03/F04 新建归类与移动记录，F05/F06 归类浏览与标题/域名/描述检索，F07 通过 /go/{id} 打开原页，F08 跨重启持久化；F09-F11 提供删除恢复、校验错误合同与本地外壳。角色 R01/R02/R03 分别对应收藏者、本地应用与独立验收者，未引入多用户或协作角色。F12-F14 位于 P1，F15/F16/F20-F24 明确不适用，F17-F19 为待决策且未进入当前阶段，均未挤占核心旅程。ARCHITECTURE 的 UI 合同包含保存、归类创建、移动、检索、打开、删除/恢复入口，P0 核心动作均有浏览器入口。"
+    }
+   ],
+   "suggestions": [
+    "F03 将“重命名/删除归类”列为 P0、F05 将“条目计数”列为 P0，但 ARCHITECTURE 的 HTML UI 合同只声明了归类创建入口和归类链接，未声明重命名/删除表单或计数展示；建议补充对应浏览器入口，或收窄 F03/F05 的 P0 文案，使能力声明与界面合同一致。"
+   ],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "4c3f1c2a6e4ccfb95c8ffaeb569098e6733d7ad22913f9adb775cf2301efafeb",
+   "projection_digest": "307659db61397366fc4d29dd17f6a388aba32bd1a0a4f98e7034b216ac2e5732",
+   "stage": "blueprint-spec-review-0-scenario_scope"
+  },
+  {
+   "outcome": "blocked",
+   "summary": "P0 的保存→归类/移动→浏览/检索→打开→删除/撤销主链路在声明的 UI 合同中基本可达，但归类管理、归类内检索及若干失败恢复只落在 JSON API 与验收中，浏览器用户没有声明的入口，当前规格尚未完整闭合。",
+   "checks": [
+    {
+     "dimension": "product_completeness",
+     "outcome": "blocked",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "reason": "DRAFT.md 的 F03 把归类重命名/删除列为 P0 current required，A04 也验收重名拒绝和删除后记录回到“未整理”；ARCHITECTURE.md 的 UI 适配器合同却只声明 /categories/new 新建表单，没有重命名/删除入口。F06/A07 要求关键字检索可与归类叠加，但检索表单只有 q 字段且 action=/，提交会丢失当前 category。UI 合同还声明“编辑入口”却未给出编辑表单端点；表单失败合同只承诺 400，而 API 对重名归类/重复 URL 返回 409，浏览器用户没有声明的 409 展示与恢复路径。F05/A06 的侧栏条目计数也未在 UI 合同中声明渲染。"
+    }
+   ],
+   "suggestions": [
+    "在 UI 适配器合同中补充归类重命名/删除的表单端点、成功跳转和错误展示，或把 F03/A04 收窄为仅新建并同步修改验收。",
+    "让检索表单保留当前 category（隐藏字段或侧栏链接携带 q），使 F06/A07 的归类内检索可由浏览器用户完成。",
+    "为“编辑入口”声明实际编辑表单端点，或移除该入口，避免不可达的 UI 承诺。",
+    "扩展表单错误合同以覆盖 409 duplicate_category/duplicate_url（并展示 existing_id 的查看入口）及必要的 404 恢复路径。",
+    "在侧栏明确渲染 F05/A06 的条目计数，或把计数断言限定为 API 并相应调整 F05 描述。"
+   ],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "4c3f1c2a6e4ccfb95c8ffaeb569098e6733d7ad22913f9adb775cf2301efafeb",
+   "projection_digest": "f53d24962bf44af5a6e5aa3a596e8a6f150898559addf54ca9bebc8eae471220",
+   "stage": "blueprint-spec-review-0-product_completeness"
+  },
+  {
+   "outcome": "blocked",
+   "summary": "架构的数据模型、默认归类、URL/错误合同与本地无认证部署总体自洽，REVISION 要求的三处修正也已体现；但 P0 当前承诺的 F03/F05 与 UI 适配器合同不一致，浏览器端只声明了新建归类和侧栏链接，没有重命名/删除入口或计数展示，编辑入口也缺少表单合同，且计数与表单错误映射未定。",
+   "checks": [
+    {
+     "dimension": "architecture_contract",
+     "outcome": "blocked",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "reason": "F03 标注 P0/current required，名称包含归类新建、重命名、删除；ARCHITECTURE 的 UI 适配器合同只声明 `/categories/new` 新建表单和侧栏链接，未声明重命名/删除入口，JSON API 的 PATCH/DELETE 不能替代浏览器 UI 能力。F05 同样为 P0/current required 且名称含“条目计数”，UI 合同只列侧栏归类链接，未要求展示 `GET /api/categories` 的 count；count 是否排除 `trashed_at` 记录也未定义，可能与 D04 默认视图排除软删除记录不一致。UI 合同还只写“编辑入口”而未给出编辑表单/动作，且称表单失败一律 400，而 JSON API 对重复归类/重复 URL 返回 409、未知资源 404，二者“语义一致”的映射未说明。"
+    }
+   ],
+   "suggestions": [
+    "在 UI 适配器合同中补齐归类重命名/删除表单、侧栏计数展示和编辑表单/动作；若本期只要求新建归类，则同步收窄 F03/F05 的 P0 范围，避免 current required 与 UI 能力不一致。",
+    "明确 `GET /api/categories` 的 count 仅统计未软删除记录，与 D04 默认视图一致。",
+    "明确 HTML 表单失败如何映射 JSON API 的 400/404/409（至少保留 duplicate_category/duplicate_url 语义），或统一表单错误状态合同。",
+    "明确 `PATCH /api/bookmarks/{id}` 更新 url 时同步重算 hostname，并明确删除归类时同时迁移 trashed 记录，避免 hostname 检索陈旧或 category_id 孤儿。",
+    "修正迁移段落对 D12 的误引用，改为 schema_meta 版本迁移策略。"
+   ],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "4c3f1c2a6e4ccfb95c8ffaeb569098e6733d7ad22913f9adb775cf2301efafeb",
+   "projection_digest": "fa29b317b0cfc9fed1eaae7bc08b1d56858e2d0a4ee0e61d5064483febe2af8f",
+   "stage": "blueprint-spec-review-0-architecture_contract"
+  },
+  {
+   "outcome": "passed",
+   "summary": "规格审查结论（phase_acceptance）：P0 先覆盖已确认核心旅程，P1 仅安排后期增强；验收用例、阶段归属与 file_plan/架构接口一致，未发现阻断性阶段缺陷。所有 acceptance 仍为 not_run，本结论不表示运行时通过。",
+   "checks": [
+    {
+     "dimension": "phase_acceptance",
+     "outcome": "passed",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "reason": "P0 的 A01–A12 与 F01–F11 覆盖保存（可选归类或默认“未整理”）、归类新建/重命名/删除与移动、按归类浏览及计数、标题/域名/描述检索、/go/{id} 回跳、删除/撤销、输入错误合同和跨重启持久化；P1 的 A13–A15 仅涉及元数据/图标离线降级、书签 HTML 导入导出和重复 URL 检测，均非已确认核心旅程的必要步骤。每个 acceptance 行都指向 file_plan 中已有的 acceptance/*.py，所需 /api/bookmarks、/api/categories、/go/{id}、/api/export、/api/import 及重启适配器均已在 ARCHITECTURE.md 声明，未发现 P0 依赖 P1 能力或核心步骤被推迟。"
+    }
+   ],
+   "suggestions": [
+    "建议澄清 A04 的归类新建/重命名/删除是否通过同一夹具在重启后验证；A05 未说明其目标归类是否由 A04 新建，因此“新建归类在重开后仍有效”这一核心语义的覆盖存在范围歧义。",
+    "建议明确 A09 的“删除跨重启保持”分支与“撤销恢复”分支使用不同记录或不同实例；若对同一条记录先恢复再重启，无法同时证明删除持久化。"
+   ],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "4c3f1c2a6e4ccfb95c8ffaeb569098e6733d7ad22913f9adb775cf2301efafeb",
+   "projection_digest": "8245db3ee4a646cdb893055bad6cd74a082374752965aaa8197d5b978e7bb538",
+   "stage": "blueprint-spec-review-0-phase_acceptance"
+  },
+  {
+   "outcome": "passed",
+   "summary": "在 decisions_defaults 维度，P0 的 D01–D10 均给出可逆默认、影响与具体 when_to_ask，D11–D13 以 deferred/open 区分未决项，未发现阻断核心旅程的决策缺陷；P1 的 D06 导入去重策略与 D13 的问题粒度需在进入 P1 前澄清。",
+   "checks": [
+    {
+     "dimension": "decisions_defaults",
+     "outcome": "passed",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "reason": "D01–D10 以 status=decided 明确单选归类、默认“未整理”、自动建类、软删除、离线优先、P1 去重、检索字段、标准库栈、无认证与 Netscape 交换格式，并逐条给出可逆迁移方向；D11–D13 以 deferred/open 区分未决范围，when_to_ask 均绑定具体用户证据或部署条件。D04.impact 已只保留 trashed_at、列表过滤与 /restore，不再引用未定义的 purge API。与 ARCHITECTURE 的保存/移动/恢复接口交叉核对，P0 未出现阻断性默认冲突；D06 的 P1 去重边界与 P0 restore/PATCH 409 的关系仍需明确。"
+    }
+   ],
+   "suggestions": [
+    "D06 的 impact 提到导入时的合并/跳过策略，但 default 只规定保存路径；请在 P1 前明确导入遇到重复 URL 时是跳过、合并还是允许重复，并说明 P0 的 restore/PATCH 409 是数据完整性守卫还是 F14 去重的一部分。",
+    "D13 将网页快照与失效链接检测合并为一个 open 问题；建议拆成两个独立决策与触发条件，避免用户只想要其中一项时无法分别回答。"
+   ],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "4c3f1c2a6e4ccfb95c8ffaeb569098e6733d7ad22913f9adb775cf2301efafeb",
+   "projection_digest": "fa29b317b0cfc9fed1eaae7bc08b1d56858e2d0a4ee0e61d5064483febe2af8f",
+   "stage": "blueprint-spec-review-0-decisions_defaults"
+  },
+  {
+   "outcome": "passed",
+   "summary": "运行时协议范围内的结论：当前草稿的交付 profile、启动命令、base_url 使用、数据目录隔离与重启持久化适配器均与 RUNTIME_CONTRACT.md 相容；未发现需要阻断的具体矛盾。本次仅评审规格，不声称任何程序或运行结果已通过。",
+   "checks": [
+    {
+     "dimension": "runtime_protocol",
+     "outcome": "passed",
+     "files": [
+      "DRAFT.md",
+      "ARCHITECTURE.md"
+     ],
+     "reason": "架构明确交付 profile 为 python-web；交付 start 是字面 argv 数组 [\"python3\",\"app/serve.py\",\"--host\",\"0.0.0.0\",\"--port\",\"8000\",\"--data-dir\",\"/state/app-data\"]，未使用 {port}/{data_dir} 参数插值。验收合同要求通过 --base-url 驱动运行中的实例，A05/A09 也明确在给定 base_url 目标上执行。重启断言具备具体适配器：launch_app 从只读 app_root 启动同一冻结应用，在 {data_dir}/instances/<uuid>/ 下创建每实例隔离 scratch，轮询 /api/health，执行真实 HTTP 动作后终止，再用相同实例子目录重启并观察持久化行为；同时明确 {data_dir} 根目录不是应用数据库，应用源码只读。目标为本机可重启应用，不涉及无法重启的只读外部目标，因此无需另行标记外部验证。file_plan 仅保留既有验收程序且本次为规格修复，未出现与上述运行时契约冲突的文件接口承诺。"
+    }
+   ],
+   "suggestions": [],
+   "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+   "proposal_digest": "4c3f1c2a6e4ccfb95c8ffaeb569098e6733d7ad22913f9adb775cf2301efafeb",
+   "projection_digest": "aee9cb6741804eefbb2482ebaa93c06497d487a3cb37b12d260398fc9146826c",
+   "stage": "blueprint-spec-review-0-runtime_protocol-v1"
+  }
+ ]
+}

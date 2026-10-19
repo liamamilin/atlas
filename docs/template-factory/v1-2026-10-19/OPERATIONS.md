@@ -37,3 +37,17 @@ PYTHONPATH=application-atlas-production-pack python3 -m template_factory.v1_chec
 - API/worker重启：scheduler专属锁阻止两个调度器同时恢复；outbox补齐后继审阅，lease/token拒绝迟到写入。进程清理只针对已证明属于本任务的PID/PGID/工作区或标签容器。没有证明时活动调用保持uncertain及原计数。
 - 案例已提交而模板失败：从应用实证读取固定case版本，修复模板阶段；不删除研究、不重做搜索掩盖失败。
 - 验收程序本身错误：走模板正式repair生成新版本、重新审阅、重新导出与运行；不能直接修改冻结包或弱化断言。应用实现错误则绑定真实失败报告修应用，模板不变。
+
+## 本轮实际停止点（质量与修复额度）
+
+G1计划已通过正式pause停止；42/500次CLI、active=0，书签产品业务修复2/2。最后job `job_4f30d0f41ce94a2cbd16ae7996fb27ab` 为paused_budget / budget_repair_limit。不要直接调用retry/resume期待继续修复：它们不清零额度，当前检查点仍会阻断。
+
+下一次明确的产品修订需要补齐浏览器分类重命名/删除/计数、分类内搜索保留条件、编辑入口及错误映射合同，同时保持P0完整旅程和负向断言。只能通过正式repair产生新冻结版本并重新审阅；本轮2轮上限已满，不能自动抬高、改写计数、换语言/新job/campaign续跑。继续生产需要显式决定新的范围与限额，原运行/失败仍保留，绝不能把历史尝试重新标成通过。
+
+[T08_REPORT.json](T08_REPORT.json)记录首批没有启动。新计划决策后仍须重新满足G1所有真实条件，使用本轮共享案例并固定其版本；G1通过前不执行T08。宿主门禁报告和代码修复不替代模型生成应用与独立运行。
+
+## 独立执行器当前入口
+
+`python3 docs/template-factory/v1-2026-10-19/independent/docker_acceptance.py --help` 已实际执行通过。它接收正式V1 submission（application.zip、delivery-receipt.json、application/），必须由宿主提供真实runtime target_binding、归档SHA、template/suite/case-basis摘要、P0和固定计划摘要；没有这些实际目标不得调用或自造proof。`--template-digest`对应正式binding的artifact_digest，`--phase`对应selected_phase。
+
+容器固定network none且不发布端口；宿主loopback中继只通过有界docker-exec/stdin请求固定容器的127.0.0.1端口，原URL由宿主Chromium访问受控fixture。不得加bridge回退。独立执行须等待正式runtime结束、持有唯一运行时隙；结果全通过、源码未变及资源清理证明完成后，才能通过宿主register_phase_evidence登记精确run证据。本轮未产生这些实际输入或proof。

@@ -1,0 +1,57 @@
+{
+ "baseline_artifact_digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+ "baseline_spec_digest": "1e18c8c8b73c952b3ff1827438b0bf143057384d46f534b75ee978d3045eec8b",
+ "base_proposal_digest": "c6b6ec0e917b8dadac3c67db1df5afa64f67fa6d7b0eabf0f1e4897e95144ceb",
+ "model_response": {
+  "base_proposal_digest": "c6b6ec0e917b8dadac3c67db1df5afa64f67fa6d7b0eabf0f1e4897e95144ceb",
+  "spec_changes": [
+   {
+    "path": [
+     "architecture_markdown"
+    ],
+    "replacements": [
+     {
+      "old": "非法 URL（非 http/https、hostname 为空）400 `invalid_url`",
+      "new": "非法 URL（非 http/https、hostname 为空或不含点号，即域名必须含“.”）400 `invalid_url`"
+     },
+     {
+      "old": "错误合同：所有校验失败返回 `{error:{code,message,field}}` 且状态码为 400/404/409；校验类错误绝不产生 5xx；响应体固定可解析。",
+      "new": "错误合同：所有校验失败返回 `{error:{code,message,field}}` 且状态码为 400/404/409；校验类错误绝不产生 5xx；响应体固定可解析。请求体不是合法 JSON 或结构畸形时返回 400 `bad_request`，且不改变现有数据。"
+     }
+    ]
+   },
+   {
+    "path": [
+     "decisions",
+     "D04",
+     "impact"
+    ],
+    "new": "决定数据模型的 trashed_at 列、列表过滤条件，以及 /restore 恢复接口。"
+   }
+  ]
+ },
+ "model_response_digest": "8d83a7d350852d3ff2499e76dac11bc1d86ea958675012d64022900620a0509f",
+ "effective_proposal_digest": "4c3f1c2a6e4ccfb95c8ffaeb569098e6733d7ad22913f9adb775cf2301efafeb",
+ "changed_fields": [
+  [
+   "architecture_markdown"
+  ],
+  [
+   "decisions",
+   "D04",
+   "impact"
+  ]
+ ],
+ "file_plan_changes": [],
+ "scope": [
+  [
+   "architecture_markdown"
+  ],
+  [
+   "decisions",
+   "D04",
+   "impact"
+  ]
+ ],
+ "scope_description": "Host-enforced exact specification patch; complete pinned program inventory reused byte-for-byte; not acceptance evidence."
+}

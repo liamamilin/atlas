@@ -1,0 +1,26 @@
+{
+ "outcome": "blocked",
+ "summary": "架构的数据模型、默认归类、URL/错误合同与本地无认证部署总体自洽，REVISION 要求的三处修正也已体现；但 P0 当前承诺的 F03/F05 与 UI 适配器合同不一致，浏览器端只声明了新建归类和侧栏链接，没有重命名/删除入口或计数展示，编辑入口也缺少表单合同，且计数与表单错误映射未定。",
+ "checks": [
+  {
+   "dimension": "architecture_contract",
+   "outcome": "blocked",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "F03 标注 P0/current required，名称包含归类新建、重命名、删除；ARCHITECTURE 的 UI 适配器合同只声明 `/categories/new` 新建表单和侧栏链接，未声明重命名/删除入口，JSON API 的 PATCH/DELETE 不能替代浏览器 UI 能力。F05 同样为 P0/current required 且名称含“条目计数”，UI 合同只列侧栏归类链接，未要求展示 `GET /api/categories` 的 count；count 是否排除 `trashed_at` 记录也未定义，可能与 D04 默认视图排除软删除记录不一致。UI 合同还只写“编辑入口”而未给出编辑表单/动作，且称表单失败一律 400，而 JSON API 对重复归类/重复 URL 返回 409、未知资源 404，二者“语义一致”的映射未说明。"
+  }
+ ],
+ "suggestions": [
+  "在 UI 适配器合同中补齐归类重命名/删除表单、侧栏计数展示和编辑表单/动作；若本期只要求新建归类，则同步收窄 F03/F05 的 P0 范围，避免 current required 与 UI 能力不一致。",
+  "明确 `GET /api/categories` 的 count 仅统计未软删除记录，与 D04 默认视图一致。",
+  "明确 HTML 表单失败如何映射 JSON API 的 400/404/409（至少保留 duplicate_category/duplicate_url 语义），或统一表单错误状态合同。",
+  "明确 `PATCH /api/bookmarks/{id}` 更新 url 时同步重算 hostname，并明确删除归类时同时迁移 trashed 记录，避免 hostname 检索陈旧或 category_id 孤儿。",
+  "修正迁移段落对 D12 的误引用，改为 schema_meta 版本迁移策略。"
+ ],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "proposal_digest": "4c3f1c2a6e4ccfb95c8ffaeb569098e6733d7ad22913f9adb775cf2301efafeb",
+ "projection_digest": "fa29b317b0cfc9fed1eaae7bc08b1d56858e2d0a4ee0e61d5064483febe2af8f",
+ "stage": "blueprint-spec-review-0-architecture_contract"
+}

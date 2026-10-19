@@ -22,7 +22,7 @@ G1 与首批共用最多500次可控 CLI 会话；provider 内部请求数/费�
 | T04 | 固定案例输入、结构/语义审阅、认知发布/撤回/修订/目录 | 代码与专项合同已接通；本轮书签候选 tpl_7f4c17e834c342e7b462e6bb8b6379e4 已冻结（digest 8d9229d3895b…），独立审阅返回 uncertain（URL/畸形JSON合同待澄清），尚无正式发布或下游通过；[实际冻结内容](g1-real-sample/template-8d9229d3895b/manifest.json) |
 | T05 | 标准导出/导入、阶段必要证据、真实P0、来源/套件绑定 | 服务、API、合同与独立执行器已实现；当前真实下游尚未生成/运行，保持未通过 |
 | T06 | 固定预览、幂等、预算、累计计数、恢复、报告、四处UI | 已实现；跨worker、outbox、预算竞争、取消/暂停、请求重放专项测试；已补无本地缓存的计划深链恢复、逐目标运行状态回归；前端专项定点与最新完整27项均通过 |
-| T07 | 全量离线、工厂E2E、必要真实Docker、G1机器与可读报告 | [当前源码完整门禁通过](verification/FINAL_CHECKS.md)：后端544项（536执行通过/8已知可选skip）、网页单元9/主线17/工厂27、严格Docker20零skip；source_changed=false。失败及修复过程归档保留；真实G1样例仍未通过 |
+| T07 | 全量离线、工厂E2E、必要真实Docker、G1机器与可读报告 | [当前源码完整门禁通过](verification/FINAL_CHECKS.md)：后端545项（537执行通过/8已知可选skip）、网页单元9/主线17/工厂27、严格Docker20零skip；source_changed=false。失败及修复过程归档保留；真实G1样例受质量与业务修复上限阻断，已正式评估未通过 |
 | T08 | G1后自动启动固定最多10产品；预定3场景运行抽验/首批报告 | 未启动；[3个预定抽验场景](SAMPLING_PLAN.json)，不替换失败场景、不降低门槛；G1通过后按同campaign剩余额度启动 |
 
 
@@ -50,6 +50,14 @@ G1 与首批共用最多500次可控 CLI 会话；provider 内部请求数/费�
 - campaign：`atlas-v1-first-production-2026-10-19`。G1 plan：`plan_87059846caf345d2b2fe690657cf324f`，digest `1f7701fbf5f52dde011dee76196b2cb01697e10190c6ad17c1273f4b5dcc3d30`。
 - 书签场景 r2 `scn_7756e0007f6a463a97316f3f49c15248`；case `case:product-c42848f63251507bd9d911a5:faa52e6b1414` r1。
 - 上游 `lakhindarpal/bookmark-manager` 固定 SHA `539881bc67099d491e8ab6f85de0f443fa7de623`；这是源码研究及独立证据审阅，不是上游运行通过。
-- 研究 job `job_d59605a1fbac430e84966ff143871068` 已完成。模板 job `job_d0d9d80dc9f64dd9890fc0b728bd9a5d` 已冻结候选，后继独立认知审阅第三次取得有效 uncertain 结论，前两次provider协议错误和有限重试均保留；累计预算scope与受控规范修订已实现、专项和独立审查通过；正式第2轮修订job_4f30d0f41ce94a2cbd16ae7996fb27ab已入队并恢复计划，业务修复2/2，原deadline不变。首次独立运行协议审阅 blocked 后计入第1轮业务修正，原意见保留。审阅 JSON 协议失败及程序文件生成的 provider 流缺少 finish_reason 均使用同 job/checkpoint 的有限瞬态重试，计入调用；未更换模型或提高限额。
+- 研究 job `job_d59605a1fbac430e84966ff143871068` 已完成。模板 job `job_d0d9d80dc9f64dd9890fc0b728bd9a5d` 已冻结候选，后继独立认知审阅第三次取得有效 uncertain 结论，前两次provider协议错误和有限重试均保留；累计预算scope与受控规范修订已实现、专项和独立审查通过；正式第2轮修订job_4f30d0f41ce94a2cbd16ae7996fb27ab完成限定文本patch，但product_completeness与architecture_contract仍blocked；继续修订在第3轮调用前被budget_repair_limit阻止，job保留paused_budget，计划已正式pause，业务修复2/2，原deadline不变。首次独立运行协议审阅 blocked 后计入第1轮业务修正，原意见保留。审阅 JSON 协议失败及程序文件生成的 provider 流缺少 finish_reason 均使用同 job/checkpoint 的有限瞬态重试，计入调用；未更换模型或提高限额。
 - 调用台账在首次模型启动前持久化；正式起点 epoch `1792389754.633465`，G1截止 `1792418554.633465`，不因恢复延长。费用、provider内部请求数、无事件证明的模型身份保持未知；原始step计量分项保留，不把重叠token字段相加。
 - 实际源码归档、CLI原始会话和运行工作区保存在仓库既有本地 `application-atlas-production-pack/atlas/template-factory/`，规范记录、报告和受控摘要在本目录。未运行的证据不补造。
+
+## 本轮停止边界
+
+- 生产共42/500次CLI调用、活动0；停止原因是产品级业务修复2/2用尽，不能因全局余额458而续开该产品。不是当前provider不可用；此前provider协议失败与本次设计缺陷分别保留。
+- 限定patch的精确变更和[阻断维度报告](g1-real-sample/repair-2/blueprint-spec-review-0/report.json)已归档。新版本未冻结；原候选仍draft/uncertain；没有真实P0应用、运行或独立运行proof。
+- [宿主G1评估](G1_ASSESSMENT.json)为blocked；[批次报告](G1_BATCH_REPORT.json)保留实际队列、案例增量、用量和限额。
+- [T08报告](T08_REPORT.json)明确not_started，三个抽验均not_run，不替换、不伪造通过。首批固定请求仍保留，未正式preview/run。
+- 执行器与host门禁解析器的缺陷属于可继续完成的代码工作，修复/验证不会消耗生产业务修复额度，不据此重新启动模型生产。

@@ -1,0 +1,20 @@
+{
+ "outcome": "passed",
+ "summary": "运行时协议范围内的结论：当前草稿的交付 profile、启动命令、base_url 使用、数据目录隔离与重启持久化适配器均与 RUNTIME_CONTRACT.md 相容；未发现需要阻断的具体矛盾。本次仅评审规格，不声称任何程序或运行结果已通过。",
+ "checks": [
+  {
+   "dimension": "runtime_protocol",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "架构明确交付 profile 为 python-web；交付 start 是字面 argv 数组 [\"python3\",\"app/serve.py\",\"--host\",\"0.0.0.0\",\"--port\",\"8000\",\"--data-dir\",\"/state/app-data\"]，未使用 {port}/{data_dir} 参数插值。验收合同要求通过 --base-url 驱动运行中的实例，A05/A09 也明确在给定 base_url 目标上执行。重启断言具备具体适配器：launch_app 从只读 app_root 启动同一冻结应用，在 {data_dir}/instances/<uuid>/ 下创建每实例隔离 scratch，轮询 /api/health，执行真实 HTTP 动作后终止，再用相同实例子目录重启并观察持久化行为；同时明确 {data_dir} 根目录不是应用数据库，应用源码只读。目标为本机可重启应用，不涉及无法重启的只读外部目标，因此无需另行标记外部验证。file_plan 仅保留既有验收程序且本次为规格修复，未出现与上述运行时契约冲突的文件接口承诺。"
+  }
+ ],
+ "suggestions": [],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "proposal_digest": "4c3f1c2a6e4ccfb95c8ffaeb569098e6733d7ad22913f9adb775cf2301efafeb",
+ "projection_digest": "aee9cb6741804eefbb2482ebaa93c06497d487a3cb37b12d260398fc9146826c",
+ "stage": "blueprint-spec-review-0-runtime_protocol-v1"
+}

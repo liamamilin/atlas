@@ -2,13 +2,13 @@
 > test:e2e:factory
 > playwright test --config playwright.factory.config.ts --reporter=line
 
-[WebServer] (node:4861) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (node:12953) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 [WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
 
 
 Running 27 tests using 1 worker
 
-(node:4863) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(node:12955) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 (Use `node --trace-warnings ...` to show where the warning was created)
 
 
@@ -39,4 +39,4 @@ Running 27 tests using 1 worker
 [25/27] e2e/factory-tests/v1.spec.ts:43:1 › V1 plan survives run, pause, resume and reload with a stable idempotency key
 [26/27] e2e/factory-tests/v1.spec.ts:98:1 › V1 catalog shows each blueprint runtime result per run and target, with no aggregate fallback
 [27/27] e2e/factory-tests/v1.spec.ts:126:1 › fresh deep link restores a running plan, polls its report, pauses by plan ID, then stops at terminal state
-  27 passed (48.7s)
+  27 passed (49.0s)

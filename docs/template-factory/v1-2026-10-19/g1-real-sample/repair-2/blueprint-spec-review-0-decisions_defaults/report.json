@@ -1,0 +1,23 @@
+{
+ "outcome": "passed",
+ "summary": "在 decisions_defaults 维度，P0 的 D01–D10 均给出可逆默认、影响与具体 when_to_ask，D11–D13 以 deferred/open 区分未决项，未发现阻断核心旅程的决策缺陷；P1 的 D06 导入去重策略与 D13 的问题粒度需在进入 P1 前澄清。",
+ "checks": [
+  {
+   "dimension": "decisions_defaults",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "D01–D10 以 status=decided 明确单选归类、默认“未整理”、自动建类、软删除、离线优先、P1 去重、检索字段、标准库栈、无认证与 Netscape 交换格式，并逐条给出可逆迁移方向；D11–D13 以 deferred/open 区分未决范围，when_to_ask 均绑定具体用户证据或部署条件。D04.impact 已只保留 trashed_at、列表过滤与 /restore，不再引用未定义的 purge API。与 ARCHITECTURE 的保存/移动/恢复接口交叉核对，P0 未出现阻断性默认冲突；D06 的 P1 去重边界与 P0 restore/PATCH 409 的关系仍需明确。"
+  }
+ ],
+ "suggestions": [
+  "D06 的 impact 提到导入时的合并/跳过策略，但 default 只规定保存路径；请在 P1 前明确导入遇到重复 URL 时是跳过、合并还是允许重复，并说明 P0 的 restore/PATCH 409 是数据完整性守卫还是 F14 去重的一部分。",
+  "D13 将网页快照与失效链接检测合并为一个 open 问题；建议拆成两个独立决策与触发条件，避免用户只想要其中一项时无法分别回答。"
+ ],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "proposal_digest": "4c3f1c2a6e4ccfb95c8ffaeb569098e6733d7ad22913f9adb775cf2301efafeb",
+ "projection_digest": "fa29b317b0cfc9fed1eaae7bc08b1d56858e2d0a4ee0e61d5064483febe2af8f",
+ "stage": "blueprint-spec-review-0-decisions_defaults"
+}

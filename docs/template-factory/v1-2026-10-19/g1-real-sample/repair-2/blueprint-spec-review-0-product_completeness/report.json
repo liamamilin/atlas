@@ -1,0 +1,26 @@
+{
+ "outcome": "blocked",
+ "summary": "P0 的保存→归类/移动→浏览/检索→打开→删除/撤销主链路在声明的 UI 合同中基本可达，但归类管理、归类内检索及若干失败恢复只落在 JSON API 与验收中，浏览器用户没有声明的入口，当前规格尚未完整闭合。",
+ "checks": [
+  {
+   "dimension": "product_completeness",
+   "outcome": "blocked",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "DRAFT.md 的 F03 把归类重命名/删除列为 P0 current required，A04 也验收重名拒绝和删除后记录回到“未整理”；ARCHITECTURE.md 的 UI 适配器合同却只声明 /categories/new 新建表单，没有重命名/删除入口。F06/A07 要求关键字检索可与归类叠加，但检索表单只有 q 字段且 action=/，提交会丢失当前 category。UI 合同还声明“编辑入口”却未给出编辑表单端点；表单失败合同只承诺 400，而 API 对重名归类/重复 URL 返回 409，浏览器用户没有声明的 409 展示与恢复路径。F05/A06 的侧栏条目计数也未在 UI 合同中声明渲染。"
+  }
+ ],
+ "suggestions": [
+  "在 UI 适配器合同中补充归类重命名/删除的表单端点、成功跳转和错误展示，或把 F03/A04 收窄为仅新建并同步修改验收。",
+  "让检索表单保留当前 category（隐藏字段或侧栏链接携带 q），使 F06/A07 的归类内检索可由浏览器用户完成。",
+  "为“编辑入口”声明实际编辑表单端点，或移除该入口，避免不可达的 UI 承诺。",
+  "扩展表单错误合同以覆盖 409 duplicate_category/duplicate_url（并展示 existing_id 的查看入口）及必要的 404 恢复路径。",
+  "在侧栏明确渲染 F05/A06 的条目计数，或把计数断言限定为 API 并相应调整 F05 描述。"
+ ],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "proposal_digest": "4c3f1c2a6e4ccfb95c8ffaeb569098e6733d7ad22913f9adb775cf2301efafeb",
+ "projection_digest": "f53d24962bf44af5a6e5aa3a596e8a6f150898559addf54ca9bebc8eae471220",
+ "stage": "blueprint-spec-review-0-product_completeness"
+}

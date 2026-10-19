@@ -40,9 +40,16 @@ async function main() {
       phase: process.env.PHASE,
       scenarioId: process.env.SCENARIO_ID,
       runId: process.env.RUN_ID || null,
+      initialMetadata: process.env.INITIAL_METADATA_JSON ? JSON.parse(process.env.INITIAL_METADATA_JSON) : null,
     });
     if (!result || !Array.isArray(result.assertions)) throw new Error('adapter result must contain assertions[]');
     const observed = new Set(result.assertions.map(item => item && item.id));
+    if (process.env.PHASE === 'initial') {
+      const prematureRestart = result.assertions
+        .map(item => item && item.id)
+        .filter(id => typeof id === 'string' && id.toLowerCase().includes('restart'));
+      if (prematureRestart.length) throw new Error(`restart assertion cannot pass before container restart: ${prematureRestart.join(', ')}`);
+    }
     const missing = required.filter(id => !observed.has(id));
     if (missing.length) throw new Error(`adapter omitted required assertions: ${missing.join(', ')}`);
     if (denied.length) throw new Error(`browser attempted off-origin requests: ${denied.join(', ')}`);

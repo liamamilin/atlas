@@ -1,0 +1,22 @@
+{
+ "outcome": "passed",
+ "summary": "确认场景与当前 P0/P1 划分一致：P0 完整覆盖保存（可选归类或默认“未整理”）、归类新建与记录移动、按归类/关键字找回、打开原页、跨会话持久化及错误恢复；P1 仅承载元数据、导入导出、去重等可选成熟增强。未发现核心流程被推迟到 P1，也未发现与确认目标冲突的扩展；REVISION.md 仅要求架构文本修正并保留现有阶段与能力。",
+ "checks": [
+  {
+   "dimension": "scenario_scope",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "DRAFT 的 P0 功能 F01-F11 对应确认流程五步与四条验收：F01/F02 保存并支持默认“未整理”，F03/F04 新建归类与移动记录，F05/F06 归类浏览与标题/域名/描述检索，F07 通过 /go/{id} 打开原页，F08 跨重启持久化；F09-F11 提供删除恢复、校验错误合同与本地外壳。角色 R01/R02/R03 分别对应收藏者、本地应用与独立验收者，未引入多用户或协作角色。F12-F14 位于 P1，F15/F16/F20-F24 明确不适用，F17-F19 为待决策且未进入当前阶段，均未挤占核心旅程。ARCHITECTURE 的 UI 合同包含保存、归类创建、移动、检索、打开、删除/恢复入口，P0 核心动作均有浏览器入口。"
+  }
+ ],
+ "suggestions": [
+  "F03 将“重命名/删除归类”列为 P0、F05 将“条目计数”列为 P0，但 ARCHITECTURE 的 HTML UI 合同只声明了归类创建入口和归类链接，未声明重命名/删除表单或计数展示；建议补充对应浏览器入口，或收窄 F03/F05 的 P0 文案，使能力声明与界面合同一致。"
+ ],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "proposal_digest": "4c3f1c2a6e4ccfb95c8ffaeb569098e6733d7ad22913f9adb775cf2301efafeb",
+ "projection_digest": "307659db61397366fc4d29dd17f6a388aba32bd1a0a4f98e7034b216ac2e5732",
+ "stage": "blueprint-spec-review-0-scenario_scope"
+}

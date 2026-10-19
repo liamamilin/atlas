@@ -1,0 +1,266 @@
+{
+  "schema": "atlas.g1-verification-manifest.v1",
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+  "plan_digest": "1f7701fbf5f52dde011dee76196b2cb01697e10190c6ad17c1273f4b5dcc3d30",
+  "sample_scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+  "support_scope": {
+    "network": "none",
+    "production_concurrency": 2,
+    "profiles": [
+      "python-web"
+    ],
+    "runtime_concurrency": 1
+  },
+  "source_tree_sha256": "ab3fe454ce8533dec733de9c8d3ec182fdc97550f32bb79195cfea7ec5a71fb8",
+  "checks": {
+    "python_audit": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "pip-audit",
+        "-r",
+        "requirements.txt"
+      ],
+      "cwd": ".",
+      "env": {},
+      "started_epoch": 1792398675.752797,
+      "duration_seconds": 24.232,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/v1-2026-10-19/verification/final/python_audit.txt",
+      "log_sha256": "15950a68a7ed99c59779717acefdceb3f69cfd31bde67d2c954f2a3cea4d7955"
+    },
+    "ruff": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "ruff",
+        "check",
+        "application-atlas-production-pack/privacy.py",
+        "application-atlas-production-pack/drafts_api.py",
+        "application-atlas-production-pack/drafts_engines/__init__.py",
+        "application-atlas-production-pack/mcp_atlas.py",
+        "application-atlas-production-pack/execution_service.py",
+        "application-atlas-production-pack/execution_state.py",
+        "application-atlas-production-pack/execution_workspace.py",
+        "application-atlas-production-pack/opencode_client.py",
+        "application-atlas-production-pack/opencode_cli_adapter.py",
+        "application-atlas-production-pack/opencode_permissions.py",
+        "application-atlas-production-pack/opencode_runtime.py",
+        "application-atlas-production-pack/project_export.py",
+        "application-atlas-production-pack/project_generation.py",
+        "application-atlas-production-pack/project_store.py",
+        "application-atlas-production-pack/project_backup.py",
+        "application-atlas-production-pack/runtime_recovery.py",
+        "application-atlas-production-pack/template_factory",
+        "atlas-web/scripts/gen-data.py",
+        "atlas-web/scripts/verify-web-data.py"
+      ],
+      "cwd": ".",
+      "env": {},
+      "started_epoch": 1792398699.9854121,
+      "duration_seconds": 0.012,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/v1-2026-10-19/verification/final/ruff.txt",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "backend_tests": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "application-atlas-production-pack/tests",
+        "-v"
+      ],
+      "cwd": ".",
+      "env": {},
+      "started_epoch": 1792398699.9983191,
+      "duration_seconds": 46.037,
+      "tests_run": 545,
+      "skipped": 8,
+      "log_path": "docs/template-factory/v1-2026-10-19/verification/final/backend_tests.txt",
+      "log_sha256": "87eef3dbf8b04e914aeaaf3ab7eb547872d7e0616d5f79b6a7e12d412435e18d"
+    },
+    "atlas_export": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "python",
+        "application-atlas-production-pack/export_atlas.py"
+      ],
+      "cwd": ".",
+      "env": {},
+      "started_epoch": 1792398746.035566,
+      "duration_seconds": 10.431,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/v1-2026-10-19/verification/final/atlas_export.txt",
+      "log_sha256": "45b9b30284cac774a94cfb10e40f0dcf1158ba62e7a08c23b7876ec7e0f0866a"
+    },
+    "web_gen": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "npm",
+        "run",
+        "gen"
+      ],
+      "cwd": "atlas-web",
+      "env": {},
+      "started_epoch": 1792398756.466659,
+      "duration_seconds": 1.211,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/v1-2026-10-19/verification/final/web_gen.txt",
+      "log_sha256": "595f500fa4212ef337070005c919ecaf7d78627444fcca6e8e725ff4ae260ed1"
+    },
+    "web_verify_data": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "npm",
+        "run",
+        "verify-data"
+      ],
+      "cwd": "atlas-web",
+      "env": {},
+      "started_epoch": 1792398757.678314,
+      "duration_seconds": 0.715,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/v1-2026-10-19/verification/final/web_verify_data.txt",
+      "log_sha256": "22094869da48cb7d339d98117b76165cc372f560687f5145f94403c08f67b300"
+    },
+    "npm_audit": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "npm",
+        "audit",
+        "--registry=https://registry.npmjs.org",
+        "--audit-level=high"
+      ],
+      "cwd": "atlas-web",
+      "env": {},
+      "started_epoch": 1792398758.393628,
+      "duration_seconds": 2.081,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/v1-2026-10-19/verification/final/npm_audit.txt",
+      "log_sha256": "c37e5556b203fd3c6beb12a0ecaf8f8af2fc342dc2fd2b4aa183a1b5ac08ea68"
+    },
+    "web_typecheck": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "cwd": "atlas-web",
+      "env": {},
+      "started_epoch": 1792398760.4754891,
+      "duration_seconds": 2.33,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/v1-2026-10-19/verification/final/web_typecheck.txt",
+      "log_sha256": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+    },
+    "web_unit": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "npm",
+        "test"
+      ],
+      "cwd": "atlas-web",
+      "env": {},
+      "started_epoch": 1792398762.80604,
+      "duration_seconds": 0.176,
+      "tests_run": 9,
+      "skipped": 0,
+      "log_path": "docs/template-factory/v1-2026-10-19/verification/final/web_unit.txt",
+      "log_sha256": "d8f3307e0dab4f3bfd525e967c08a46708a8035bdd522f9fca6c1fbd8b6c5e67"
+    },
+    "web_build": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "atlas-web",
+      "env": {},
+      "started_epoch": 1792398762.9824178,
+      "duration_seconds": 2.18,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/v1-2026-10-19/verification/final/web_build.txt",
+      "log_sha256": "1271fc6e5812f80cb40f8ba7b846cc6908ebe6cc43aa29212ead4f252c6dd624"
+    },
+    "default_e2e": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "npm",
+        "run",
+        "test:e2e"
+      ],
+      "cwd": "atlas-web",
+      "env": {},
+      "started_epoch": 1792398765.163331,
+      "duration_seconds": 42.905,
+      "tests_run": 17,
+      "skipped": 0,
+      "log_path": "docs/template-factory/v1-2026-10-19/verification/final/default_e2e.txt",
+      "log_sha256": "df75356219f912fccf6e4db7fbc15aef1404b47dcb1f8310828b961f7254c080"
+    },
+    "factory_e2e": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "npm",
+        "run",
+        "test:e2e:factory",
+        "--",
+        "--reporter=line"
+      ],
+      "cwd": "atlas-web",
+      "env": {},
+      "started_epoch": 1792398808.068474,
+      "duration_seconds": 49.372,
+      "tests_run": 27,
+      "skipped": 0,
+      "log_path": "docs/template-factory/v1-2026-10-19/verification/final/factory_e2e.txt",
+      "log_sha256": "dcdf44d7bffa32e5d6fcb7bc16f908bb0b09dfff4ddbaec027168bbeaeb9d298"
+    },
+    "docker_integration": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "python",
+        "application-atlas-production-pack/tests/run_required_docker_integration.py"
+      ],
+      "cwd": ".",
+      "env": {
+        "ATLAS_RUN_DOCKER_INTEGRATION": "1"
+      },
+      "started_epoch": 1792398857.441566,
+      "duration_seconds": 57.56,
+      "tests_run": 20,
+      "skipped": 0,
+      "log_path": "docs/template-factory/v1-2026-10-19/verification/final/docker_integration.txt",
+      "log_sha256": "8f6292179db4d903e0e25c3b8ce5812e2c4ef2ad19a1badb749a25bf4e2d6634"
+    }
+  },
+  "development_export": null,
+  "observed_at": "2026-10-19T08:36:01.309341+00:00",
+  "observation": "真实设计缺陷需继续业务修复，但已耗尽2轮修复限额；无P0交付/运行，不以候选导出替代。"
+}

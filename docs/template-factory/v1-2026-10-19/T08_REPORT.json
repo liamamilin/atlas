@@ -1,0 +1,61 @@
+{
+  "schema": "atlas.first-batch-delivery-observation.v1",
+  "status": "not_started",
+  "reason": "G1_not_passed",
+  "formal_plan_id": null,
+  "formal_execution_id": null,
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "prespecified_request": "docs/template-factory/v1-2026-10-19/t08-request.json",
+  "request_sha256": "774436e5f3d47829c5d3510677cd7da10223150834ab95c2e9e18fa4523e5520",
+  "sampling_plan": "docs/template-factory/v1-2026-10-19/SAMPLING_PLAN.json",
+  "sampling_plan_sha256": "0e9a948e1e4e0799c2a51614e858577956e38d848b3c6949791c115408b37037",
+  "maximum_products": 10,
+  "intended_products_including_G1_reuse": 3,
+  "runtime_samples_replaced": false,
+  "products": [
+    {
+      "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+      "revision": 2,
+      "name": "生活待购与灵感收藏夹",
+      "risk": "持久化、分类/搜索/真实链接、非法输入、并发保存",
+      "status": "not_started",
+      "template_artifact_id": null,
+      "development_job_id": null,
+      "runtime_run_id": null,
+      "independent_journey": "not_run"
+    },
+    {
+      "scenario_id": "scn_6fb4896d9eb0428aa1c080df0a137813",
+      "revision": 1,
+      "name": "个人极简月度预算：先查剩余再消费",
+      "risk": "金额/剩余额度口径、月度边界、错误恢复与持久化",
+      "status": "not_started",
+      "template_artifact_id": null,
+      "development_job_id": null,
+      "runtime_run_id": null,
+      "independent_journey": "not_run"
+    },
+    {
+      "scenario_id": "scn_805c99ffe8da4532817592bb466a505e",
+      "revision": 1,
+      "name": "多项目会议结论的归档与回查",
+      "risk": "按项目归档、历史检索、内容保留与重新读取",
+      "status": "not_started",
+      "template_artifact_id": null,
+      "development_job_id": null,
+      "runtime_run_id": null,
+      "independent_journey": "not_run"
+    }
+  ],
+  "T08_new_case_revisions": 0,
+  "T08_published_templates": 0,
+  "T08_actual_runtime_samples": 0,
+  "T08_model_calls": 0,
+  "G1_reusable_research": {
+    "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+    "revision": 1,
+    "evidence_digest": "706fa40ddf461e7cf1256f4b133979d5a019c6e7b848878c1be27bc75bd00d06",
+    "note": "G1案例已入共享应用实证，模板失败不删除；T08未执行，无假复用通过。"
+  },
+  "resume_condition": "先显式解决本轮业务修复硬边界并重新取得真实G1通过，再正式preview固定输入；不自动抬限额或换campaign绕过。"
+}

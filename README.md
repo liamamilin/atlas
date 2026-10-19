@@ -13,6 +13,7 @@
 
 叶子类型与应用场景构成生产目录；OpenCode CLI 批量生产冻结候选，Harness 审阅及运行验收独立排队，已发布模板可确定性创建应用包。
 
+- [模板工厂 V1 本轮交付与未通过项](docs/template-factory/v1-2026-10-19/DELIVERY.md)：代码门禁与真实 G1 分开；书签真实生产触及业务修复上限，G1 未通过、首批未启动。
 - [开发计划与范围](docs/TEMPLATE_FACTORY_PLAN.md)
 - [使用说明](docs/TEMPLATE_FACTORY_GUIDE.md)
 - [验证记录](docs/TEMPLATE_FACTORY_VALIDATION.md)
