@@ -1,0 +1,957 @@
+﻿2026-10-19T08:51:46.7675381Z Current runner version: '2.337.0'
+2026-10-19T08:51:46.7711998Z ##[group]Runner Image Provisioner
+2026-10-19T08:51:46.7713294Z Hosted Compute Agent
+2026-10-19T08:51:46.7714124Z Version: 20261012.601
+2026-10-19T08:51:46.7714990Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-19T08:51:46.7716141Z Build Date: 2026-10-12T17:48:21Z
+2026-10-19T08:51:46.7717535Z Worker ID: {98660792-5fa1-470d-89db-b587eeda2f51}
+2026-10-19T08:51:46.7718622Z Region: eastus
+2026-10-19T08:51:46.7719487Z Cloud: Azure
+2026-10-19T08:51:46.7720848Z ##[endgroup]
+2026-10-19T08:51:46.7723328Z ##[group]Operating System
+2026-10-19T08:51:46.7724297Z Ubuntu
+2026-10-19T08:51:46.7725140Z 24.04.5
+2026-10-19T08:51:46.7725918Z LTS
+2026-10-19T08:51:46.7726700Z ##[endgroup]
+2026-10-19T08:51:46.7727690Z ##[group]Runner Image
+2026-10-19T08:51:46.7728634Z Image: ubuntu-24.04
+2026-10-19T08:51:46.7729510Z Version: 20261012.334.1
+2026-10-19T08:51:46.7731408Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-19T08:51:46.7733850Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+2026-10-19T08:51:46.7735342Z ##[endgroup]
+2026-10-19T08:51:46.7737273Z ##[group]GITHUB_TOKEN Permissions
+2026-10-19T08:51:46.7740244Z Contents: read
+2026-10-19T08:51:46.7741104Z Metadata: read
+2026-10-19T08:51:46.7741977Z ##[endgroup]
+2026-10-19T08:51:46.7745077Z Secret source: Actions
+2026-10-19T08:51:46.7746363Z Cache mode: write
+2026-10-19T08:51:46.7748154Z Prepare workflow directory
+2026-10-19T08:51:46.8181184Z Prepare all required actions
+2026-10-19T08:51:46.8247993Z Getting action download info
+2026-10-19T08:51:47.0268620Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-19T08:51:47.1442920Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-19T08:51:47.3272208Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-10-19T08:51:47.5758622Z Complete job name: check
+2026-10-19T08:51:47.6544161Z ##[group]Run actions/checkout@v4
+2026-10-19T08:51:47.6545079Z with:
+2026-10-19T08:51:47.6545511Z   repository: liamamilin/atlas
+2026-10-19T08:51:47.6549465Z   token: ***
+2026-10-19T08:51:47.6549905Z   ssh-strict: true
+2026-10-19T08:51:47.6550333Z   ssh-user: git
+2026-10-19T08:51:47.6550762Z   persist-credentials: true
+2026-10-19T08:51:47.6551229Z   clean: true
+2026-10-19T08:51:47.6551662Z   sparse-checkout-cone-mode: true
+2026-10-19T08:51:47.6552164Z   fetch-depth: 1
+2026-10-19T08:51:47.6552571Z   fetch-tags: false
+2026-10-19T08:51:47.6552998Z   show-progress: true
+2026-10-19T08:51:47.6553429Z   lfs: false
+2026-10-19T08:51:47.6553835Z   submodules: false
+2026-10-19T08:51:47.6554279Z   set-safe-directory: true
+2026-10-19T08:51:47.6554764Z   allow-unsafe-pr-checkout: false
+2026-10-19T08:51:47.6555491Z ##[endgroup]
+2026-10-19T08:51:47.7513126Z Syncing repository: liamamilin/atlas
+2026-10-19T08:51:47.7515740Z ##[group]Getting Git version info
+2026-10-19T08:51:47.7517076Z Working directory is '/home/runner/work/atlas/atlas'
+2026-10-19T08:51:47.7518627Z [command]/usr/bin/git version
+2026-10-19T08:51:47.7570775Z git version 2.55.0
+2026-10-19T08:51:47.7603068Z ##[endgroup]
+2026-10-19T08:51:47.7623166Z Temporarily overriding HOME='/home/runner/work/_temp/27aec66e-0f26-4bd9-9ffd-173d47461e32' before making global git config changes
+2026-10-19T08:51:47.7625539Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-19T08:51:47.7629305Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/atlas/atlas
+2026-10-19T08:51:47.7694708Z Deleting the contents of '/home/runner/work/atlas/atlas'
+2026-10-19T08:51:47.7699763Z ##[group]Initializing the repository
+2026-10-19T08:51:47.7704602Z [command]/usr/bin/git init /home/runner/work/atlas/atlas
+2026-10-19T08:51:47.7809086Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-19T08:51:47.7811288Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-19T08:51:47.7814566Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-19T08:51:47.7815916Z hint: call:
+2026-10-19T08:51:47.7816673Z hint:
+2026-10-19T08:51:47.7817998Z hint: 	git config --global init.defaultBranch <name>
+2026-10-19T08:51:47.7819058Z hint:
+2026-10-19T08:51:47.7820078Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-19T08:51:47.7821738Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-19T08:51:47.7824751Z hint:
+2026-10-19T08:51:47.7825808Z hint: 	git branch -m <name>
+2026-10-19T08:51:47.7827096Z hint:
+2026-10-19T08:51:47.7828386Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-19T08:51:47.7831561Z Initialized empty Git repository in /home/runner/work/atlas/atlas/.git/
+2026-10-19T08:51:47.7834793Z [command]/usr/bin/git remote add origin https://github.com/liamamilin/atlas
+2026-10-19T08:51:47.7889239Z ##[endgroup]
+2026-10-19T08:51:47.7890754Z ##[group]Disabling automatic garbage collection
+2026-10-19T08:51:47.7894052Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-19T08:51:47.7978454Z ##[endgroup]
+2026-10-19T08:51:47.7979188Z ##[group]Setting up auth
+2026-10-19T08:51:47.8000778Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T08:51:47.8040958Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-19T08:51:47.8445508Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T08:51:47.8486171Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-19T08:51:47.8739998Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-19T08:51:47.8777104Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-19T08:51:47.9000740Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-19T08:51:47.9041615Z ##[endgroup]
+2026-10-19T08:51:47.9042399Z ##[group]Fetching the repository
+2026-10-19T08:51:47.9050758Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +9eb88db1b42351804e72dec3491a31533e7fa03d:refs/remotes/origin/codex/stabilize-atlas
+2026-10-19T08:51:50.1717078Z From https://github.com/liamamilin/atlas
+2026-10-19T08:51:50.1719620Z  * [new ref]         9eb88db1b42351804e72dec3491a31533e7fa03d -> origin/codex/stabilize-atlas
+2026-10-19T08:51:50.1732538Z ##[endgroup]
+2026-10-19T08:51:50.1733674Z ##[group]Determining the checkout info
+2026-10-19T08:51:50.1734947Z ##[endgroup]
+2026-10-19T08:51:50.1735723Z [command]/usr/bin/git sparse-checkout disable
+2026-10-19T08:51:50.1785171Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-19T08:51:50.1821703Z ##[group]Checking out the ref
+2026-10-19T08:51:50.1826317Z [command]/usr/bin/git checkout --progress --force -B codex/stabilize-atlas refs/remotes/origin/codex/stabilize-atlas
+2026-10-19T08:51:51.1310285Z Switched to a new branch 'codex/stabilize-atlas'
+2026-10-19T08:51:51.1312253Z branch 'codex/stabilize-atlas' set up to track 'origin/codex/stabilize-atlas'.
+2026-10-19T08:51:51.1331137Z ##[endgroup]
+2026-10-19T08:51:51.1385657Z [command]/usr/bin/git log -1 --format=%H
+2026-10-19T08:51:51.1419749Z 9eb88db1b42351804e72dec3491a31533e7fa03d
+2026-10-19T08:51:51.1763734Z ##[group]Run actions/setup-python@v5
+2026-10-19T08:51:51.1764048Z with:
+2026-10-19T08:51:51.1764254Z   python-version: 3.11
+2026-10-19T08:51:51.1764464Z   cache: pip
+2026-10-19T08:51:51.1764649Z   check-latest: false
+2026-10-19T08:51:51.1767718Z   token: ***
+2026-10-19T08:51:51.1767934Z   update-environment: true
+2026-10-19T08:51:51.1768168Z   allow-prereleases: false
+2026-10-19T08:51:51.1768391Z   freethreaded: false
+2026-10-19T08:51:51.1768598Z ##[endgroup]
+2026-10-19T08:51:51.3057459Z ##[group]Installed versions
+2026-10-19T08:51:51.3834705Z (node:2088) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-19T08:51:51.3835531Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-19T08:51:51.3836046Z Successfully set up CPython (3.11.17)
+2026-10-19T08:51:51.3836530Z ##[endgroup]
+2026-10-19T08:51:51.8400062Z [command]/opt/hostedtoolcache/Python/3.11.17/x64/bin/pip cache dir
+2026-10-19T08:51:53.6879798Z /home/runner/.cache/pip
+2026-10-19T08:51:53.7740370Z pip cache is not found
+2026-10-19T08:51:53.7905440Z ##[group]Run pip install -r requirements.txt
+2026-10-19T08:51:53.7905854Z [36;1mpip install -r requirements.txt[0m
+2026-10-19T08:51:53.8136267Z shell: /usr/bin/bash -e {0}
+2026-10-19T08:51:53.8136538Z env:
+2026-10-19T08:51:53.8136803Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:51:53.8137441Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T08:51:53.8137837Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:51:53.8138190Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:51:53.8138527Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:51:53.8138875Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T08:51:53.8139171Z ##[endgroup]
+2026-10-19T08:51:55.0855051Z Collecting numpy==1.26.4 (from -r requirements.txt (line 2))
+2026-10-19T08:51:55.1316655Z   Downloading numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)
+2026-10-19T08:51:55.3438179Z Collecting mcp==1.30.0 (from -r requirements.txt (line 3))
+2026-10-19T08:51:55.3482343Z   Downloading mcp-1.30.0-py3-none-any.whl.metadata (9.3 kB)
+2026-10-19T08:51:55.5264377Z Collecting anyio>=4.5 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:55.5303037Z   Downloading anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
+2026-10-19T08:51:55.5410155Z Collecting httpx-sse>=0.4 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:55.5449531Z   Downloading httpx_sse-0.4.3-py3-none-any.whl.metadata (9.7 kB)
+2026-10-19T08:51:55.6755352Z Collecting httpx<1.0.0,>=0.27.1 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:55.6791191Z   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+2026-10-19T08:51:55.6962301Z Collecting jsonschema>=4.20.0 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:55.7000986Z   Downloading jsonschema-4.26.0-py3-none-any.whl.metadata (7.6 kB)
+2026-10-19T08:51:55.7137732Z Collecting pydantic-settings>=2.5.2 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:55.7176650Z   Downloading pydantic_settings-2.16.0-py3-none-any.whl.metadata (4.0 kB)
+2026-10-19T08:51:55.7964869Z Collecting pydantic<3.0.0,>=2.11.0 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:55.8006199Z   Downloading pydantic-2.14.1-py3-none-any.whl.metadata (133 kB)
+2026-10-19T08:51:55.8235376Z Collecting pyjwt>=2.10.1 (from pyjwt[crypto]>=2.10.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:55.8273631Z   Downloading pyjwt-2.15.1-py3-none-any.whl.metadata (3.5 kB)
+2026-10-19T08:51:55.8383678Z Collecting python-multipart>=0.0.9 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:55.8420240Z   Downloading python_multipart-0.0.32-py3-none-any.whl.metadata (2.1 kB)
+2026-10-19T08:51:55.8559254Z Collecting sse-starlette>=1.6.1 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:55.8596793Z   Downloading sse_starlette-3.5.0-py3-none-any.whl.metadata (15 kB)
+2026-10-19T08:51:55.8802879Z Collecting starlette>=0.27 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:55.8838615Z   Downloading starlette-1.9.0-py3-none-any.whl.metadata (6.6 kB)
+2026-10-19T08:51:55.9070264Z Collecting typing-extensions>=4.9.0 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:55.9116737Z   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+2026-10-19T08:51:55.9210855Z Collecting typing-inspection>=0.4.1 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:55.9246683Z   Downloading typing_inspection-0.4.4-py3-none-any.whl.metadata (2.6 kB)
+2026-10-19T08:51:55.9426295Z Collecting uvicorn>=0.31.1 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:55.9463620Z   Downloading uvicorn-0.54.0-py3-none-any.whl.metadata (6.6 kB)
+2026-10-19T08:51:55.9626688Z Collecting certifi (from httpx<1.0.0,>=0.27.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:55.9664564Z   Downloading certifi-2026.10.18-py3-none-any.whl.metadata (2.5 kB)
+2026-10-19T08:51:55.9986000Z Collecting httpcore==1.* (from httpx<1.0.0,>=0.27.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:56.0023187Z   Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+2026-10-19T08:51:56.0158275Z Collecting idna (from httpx<1.0.0,>=0.27.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:56.0196043Z   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+2026-10-19T08:51:56.0299901Z Collecting h11>=0.16 (from httpcore==1.*->httpx<1.0.0,>=0.27.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:56.0334979Z   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+2026-10-19T08:51:56.0436124Z Collecting annotated-types>=0.6.0 (from pydantic<3.0.0,>=2.11.0->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:56.0475103Z   Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+2026-10-19T08:51:56.6235074Z Collecting pydantic-core==2.50.1 (from pydantic<3.0.0,>=2.11.0->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:56.6279037Z   Downloading pydantic_core-2.50.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.5 kB)
+2026-10-19T08:51:56.6452417Z Collecting attrs>=22.2.0 (from jsonschema>=4.20.0->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:56.6489801Z   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+2026-10-19T08:51:56.6598597Z Collecting jsonschema-specifications>=2023.03.6 (from jsonschema>=4.20.0->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:56.6634874Z   Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)
+2026-10-19T08:51:56.7007631Z Collecting referencing>=0.28.4 (from jsonschema>=4.20.0->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:56.7044478Z   Downloading referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)
+2026-10-19T08:51:56.9456723Z Collecting rpds-py>=0.25.0 (from jsonschema>=4.20.0->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:56.9497998Z   Downloading rpds_py-2026.9.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)
+2026-10-19T08:51:57.1141973Z Collecting python-dotenv>=1.2.2 (from pydantic-settings>=2.5.2->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:57.1177613Z   Downloading python_dotenv-1.2.4-py3-none-any.whl.metadata (29 kB)
+2026-10-19T08:51:57.2685722Z Collecting cryptography>=3.4.0 (from pyjwt[crypto]>=2.10.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:57.2741231Z   Downloading cryptography-50.0.2-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (4.4 kB)
+2026-10-19T08:51:57.4110447Z Collecting cffi>=2.0.0 (from cryptography>=3.4.0->pyjwt[crypto]>=2.10.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:57.4153636Z   Downloading cffi-2.1.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.5 kB)
+2026-10-19T08:51:57.4265887Z Collecting pycparser (from cffi>=2.0.0->cryptography>=3.4.0->pyjwt[crypto]>=2.10.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:57.4303125Z   Downloading pycparser-3.11-py3-none-any.whl.metadata (8.2 kB)
+2026-10-19T08:51:57.4546087Z Collecting click>=7.0 (from uvicorn>=0.31.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T08:51:57.4582527Z   Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+2026-10-19T08:51:57.4667256Z Downloading numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (18.3 MB)
+2026-10-19T08:51:57.6395843Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 18.3/18.3 MB 106.8 MB/s  0:00:00
+2026-10-19T08:51:57.6435883Z Downloading mcp-1.30.0-py3-none-any.whl (234 kB)
+2026-10-19T08:51:57.6502334Z Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+2026-10-19T08:51:57.6662227Z Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+2026-10-19T08:51:57.6718638Z Downloading pydantic-2.14.1-py3-none-any.whl (488 kB)
+2026-10-19T08:51:57.6803690Z Downloading pydantic_core-2.50.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.2 MB)
+2026-10-19T08:51:57.6994851Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 111.9 MB/s  0:00:00
+2026-10-19T08:51:57.7032550Z Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+2026-10-19T08:51:57.7086120Z Downloading anyio-4.15.1-py3-none-any.whl (132 kB)
+2026-10-19T08:51:57.7145550Z Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+2026-10-19T08:51:57.7198402Z Downloading httpx_sse-0.4.3-py3-none-any.whl (9.0 kB)
+2026-10-19T08:51:57.7250934Z Downloading idna-3.20-py3-none-any.whl (69 kB)
+2026-10-19T08:51:57.7311004Z Downloading jsonschema-4.26.0-py3-none-any.whl (90 kB)
+2026-10-19T08:51:57.7382725Z Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+2026-10-19T08:51:57.7437661Z Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+2026-10-19T08:51:57.7493117Z Downloading pydantic_settings-2.16.0-py3-none-any.whl (80 kB)
+2026-10-19T08:51:57.7566469Z Downloading pyjwt-2.15.1-py3-none-any.whl (33 kB)
+2026-10-19T08:51:57.7628202Z Downloading cryptography-50.0.2-cp311-abi3-manylinux_2_34_x86_64.whl (4.8 MB)
+2026-10-19T08:51:57.8003109Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.8/4.8 MB 129.4 MB/s  0:00:00
+2026-10-19T08:51:57.8051589Z Downloading cffi-2.1.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (217 kB)
+2026-10-19T08:51:57.8118938Z Downloading python_dotenv-1.2.4-py3-none-any.whl (23 kB)
+2026-10-19T08:51:57.8176516Z Downloading python_multipart-0.0.32-py3-none-any.whl (30 kB)
+2026-10-19T08:51:57.8235015Z Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+2026-10-19T08:51:57.8288713Z Downloading rpds_py-2026.9.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (375 kB)
+2026-10-19T08:51:57.8365331Z Downloading sse_starlette-3.5.0-py3-none-any.whl (17 kB)
+2026-10-19T08:51:57.8417469Z Downloading starlette-1.9.0-py3-none-any.whl (80 kB)
+2026-10-19T08:51:57.8476791Z Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+2026-10-19T08:51:57.8528529Z Downloading typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+2026-10-19T08:51:57.8772124Z Downloading uvicorn-0.54.0-py3-none-any.whl (87 kB)
+2026-10-19T08:51:57.8830335Z Downloading click-8.5.0-py3-none-any.whl (125 kB)
+2026-10-19T08:51:57.8884986Z Downloading certifi-2026.10.18-py3-none-any.whl (134 kB)
+2026-10-19T08:51:57.8949362Z Downloading pycparser-3.11-py3-none-any.whl (51 kB)
+2026-10-19T08:51:58.1660309Z Installing collected packages: typing-extensions, rpds-py, python-multipart, python-dotenv, pyjwt, pycparser, numpy, idna, httpx-sse, h11, click, certifi, attrs, annotated-types, uvicorn, typing-inspection, referencing, pydantic-core, httpcore, cffi, anyio, starlette, pydantic, jsonschema-specifications, httpx, cryptography, sse-starlette, pydantic-settings, jsonschema, mcp
+2026-10-19T08:52:02.5748509Z 
+2026-10-19T08:52:02.5766243Z Successfully installed annotated-types-0.8.0 anyio-4.15.1 attrs-26.1.0 certifi-2026.10.18 cffi-2.1.1 click-8.5.0 cryptography-50.0.2 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 httpx-sse-0.4.3 idna-3.20 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 mcp-1.30.0 numpy-1.26.4 pycparser-3.11 pydantic-2.14.1 pydantic-core-2.50.1 pydantic-settings-2.16.0 pyjwt-2.15.1 python-dotenv-1.2.4 python-multipart-0.0.32 referencing-0.37.0 rpds-py-2026.9.1 sse-starlette-3.5.0 starlette-1.9.0 typing-extensions-4.16.0 typing-inspection-0.4.4 uvicorn-0.54.0
+2026-10-19T08:52:02.8278751Z ##[group]Run python -m pip install pip-audit==2.10.1 ruff==0.15.17
+2026-10-19T08:52:02.8279436Z [36;1mpython -m pip install pip-audit==2.10.1 ruff==0.15.17[0m
+2026-10-19T08:52:02.8350700Z shell: /usr/bin/bash -e {0}
+2026-10-19T08:52:02.8350951Z env:
+2026-10-19T08:52:02.8351202Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:52:02.8351598Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T08:52:02.8351990Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:52:02.8352340Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:52:02.8352676Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:52:02.8353015Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T08:52:02.8353304Z ##[endgroup]
+2026-10-19T08:52:03.4855936Z Collecting pip-audit==2.10.1
+2026-10-19T08:52:03.5341622Z   Downloading pip_audit-2.10.1-py3-none-any.whl.metadata (28 kB)
+2026-10-19T08:52:04.2436041Z Collecting ruff==0.15.17
+2026-10-19T08:52:04.2486450Z   Downloading ruff-0.15.17-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (26 kB)
+2026-10-19T08:52:04.7460660Z Collecting CacheControl>=0.13.0 (from CacheControl[filecache]>=0.13.0->pip-audit==2.10.1)
+2026-10-19T08:52:04.7502710Z   Downloading cachecontrol-0.14.4-py3-none-any.whl.metadata (3.1 kB)
+2026-10-19T08:52:04.7737296Z Collecting cyclonedx-python-lib<12,>=5 (from pip-audit==2.10.1)
+2026-10-19T08:52:04.7783022Z   Downloading cyclonedx_python_lib-11.12.0-py3-none-any.whl.metadata (6.9 kB)
+2026-10-19T08:52:04.7918615Z Collecting packaging>=23.0.0 (from pip-audit==2.10.1)
+2026-10-19T08:52:04.7957008Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+2026-10-19T08:52:04.8065219Z Collecting pip-api>=0.0.28 (from pip-audit==2.10.1)
+2026-10-19T08:52:04.8103235Z   Downloading pip_api-0.0.35-py3-none-any.whl.metadata (17 kB)
+2026-10-19T08:52:04.8371311Z Collecting pip-requirements-parser>=32.0.0 (from pip-audit==2.10.1)
+2026-10-19T08:52:04.8412678Z   Downloading pip_requirements_parser-32.0.1-py3-none-any.whl.metadata (9.3 kB)
+2026-10-19T08:52:04.9154522Z Collecting requests>=2.31.0 (from pip-audit==2.10.1)
+2026-10-19T08:52:04.9195708Z   Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+2026-10-19T08:52:04.9920500Z Collecting rich>=12.4 (from pip-audit==2.10.1)
+2026-10-19T08:52:04.9962400Z   Downloading rich-15.0.0-py3-none-any.whl.metadata (18 kB)
+2026-10-19T08:52:05.0884880Z Collecting tomli>=2.2.1 (from pip-audit==2.10.1)
+2026-10-19T08:52:05.0932001Z   Downloading tomli-2.5.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (10 kB)
+2026-10-19T08:52:05.2100165Z Collecting tomli-w>=1.2.0 (from pip-audit==2.10.1)
+2026-10-19T08:52:05.2143303Z   Downloading tomli_w-1.2.0-py3-none-any.whl.metadata (5.7 kB)
+2026-10-19T08:52:05.2883271Z Collecting platformdirs>=4.2.0 (from pip-audit==2.10.1)
+2026-10-19T08:52:05.2925341Z   Downloading platformdirs-4.13.5-py3-none-any.whl.metadata (5.5 kB)
+2026-10-19T08:52:05.3895549Z Collecting license-expression<31,>=30 (from cyclonedx-python-lib<12,>=5->pip-audit==2.10.1)
+2026-10-19T08:52:05.3936740Z   Downloading license_expression-30.4.4-py3-none-any.whl.metadata (11 kB)
+2026-10-19T08:52:05.4277899Z Collecting packageurl-python<2,>=0.11 (from cyclonedx-python-lib<12,>=5->pip-audit==2.10.1)
+2026-10-19T08:52:05.4314975Z   Downloading packageurl_python-0.17.6-py3-none-any.whl.metadata (5.1 kB)
+2026-10-19T08:52:05.4446011Z Collecting py-serializable<3.0.0,>=2.1.0 (from cyclonedx-python-lib<12,>=5->pip-audit==2.10.1)
+2026-10-19T08:52:05.4483386Z   Downloading py_serializable-2.1.0-py3-none-any.whl.metadata (4.3 kB)
+2026-10-19T08:52:05.4600286Z Collecting sortedcontainers<3.0.0,>=2.4.0 (from cyclonedx-python-lib<12,>=5->pip-audit==2.10.1)
+2026-10-19T08:52:05.4652890Z   Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl.metadata (10 kB)
+2026-10-19T08:52:05.4687823Z Requirement already satisfied: typing_extensions<5.0,>=4.6 in /opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages (from cyclonedx-python-lib<12,>=5->pip-audit==2.10.1) (4.16.0)
+2026-10-19T08:52:05.4960131Z Collecting boolean.py>=4.0 (from license-expression<31,>=30->cyclonedx-python-lib<12,>=5->pip-audit==2.10.1)
+2026-10-19T08:52:05.4998053Z   Downloading boolean_py-5.0-py3-none-any.whl.metadata (2.3 kB)
+2026-10-19T08:52:05.5105685Z Collecting defusedxml<0.8.0,>=0.7.1 (from py-serializable<3.0.0,>=2.1.0->cyclonedx-python-lib<12,>=5->pip-audit==2.10.1)
+2026-10-19T08:52:05.5142582Z   Downloading defusedxml-0.7.1-py2.py3-none-any.whl.metadata (32 kB)
+2026-10-19T08:52:05.5844420Z Collecting msgpack<2.0.0,>=0.5.2 (from CacheControl>=0.13.0->CacheControl[filecache]>=0.13.0->pip-audit==2.10.1)
+2026-10-19T08:52:05.5887942Z   Downloading msgpack-1.2.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.3 kB)
+2026-10-19T08:52:05.6104224Z Collecting filelock>=3.8.0 (from CacheControl[filecache]>=0.13.0->pip-audit==2.10.1)
+2026-10-19T08:52:05.6145557Z   Downloading filelock-4.2.4-py3-none-any.whl.metadata (2.0 kB)
+2026-10-19T08:52:05.6186661Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages (from pip-api>=0.0.28->pip-audit==2.10.1) (26.2.1)
+2026-10-19T08:52:05.6360841Z Collecting pyparsing (from pip-requirements-parser>=32.0.0->pip-audit==2.10.1)
+2026-10-19T08:52:05.6401484Z   Downloading pyparsing-3.3.3-py3-none-any.whl.metadata (5.9 kB)
+2026-10-19T08:52:05.7403877Z Collecting charset_normalizer<4,>=2 (from requests>=2.31.0->pip-audit==2.10.1)
+2026-10-19T08:52:05.7449614Z   Downloading charset_normalizer-3.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (46 kB)
+2026-10-19T08:52:05.7503170Z Requirement already satisfied: idna<4,>=2.5 in /opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages (from requests>=2.31.0->pip-audit==2.10.1) (3.20)
+2026-10-19T08:52:05.7643997Z Collecting urllib3<3,>=1.26 (from requests>=2.31.0->pip-audit==2.10.1)
+2026-10-19T08:52:05.7683304Z   Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+2026-10-19T08:52:05.7904178Z Requirement already satisfied: certifi>=2023.5.7 in /opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages (from requests>=2.31.0->pip-audit==2.10.1) (2026.10.18)
+2026-10-19T08:52:05.8022325Z Collecting markdown-it-py>=2.2.0 (from rich>=12.4->pip-audit==2.10.1)
+2026-10-19T08:52:05.8062085Z   Downloading markdown_it_py-4.2.0-py3-none-any.whl.metadata (7.4 kB)
+2026-10-19T08:52:05.8218090Z Collecting pygments<3.0.0,>=2.13.0 (from rich>=12.4->pip-audit==2.10.1)
+2026-10-19T08:52:05.8254446Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+2026-10-19T08:52:05.8345564Z Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich>=12.4->pip-audit==2.10.1)
+2026-10-19T08:52:05.8382888Z   Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+2026-10-19T08:52:05.8470218Z Downloading pip_audit-2.10.1-py3-none-any.whl (62 kB)
+2026-10-19T08:52:05.8525087Z Downloading ruff-0.15.17-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (11.6 MB)
+2026-10-19T08:52:05.9629857Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.6/11.6 MB 108.3 MB/s  0:00:00
+2026-10-19T08:52:05.9671986Z Downloading cyclonedx_python_lib-11.12.0-py3-none-any.whl (529 kB)
+2026-10-19T08:52:05.9739322Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 529.5/529.5 kB 55.9 MB/s  0:00:00
+2026-10-19T08:52:05.9779403Z Downloading license_expression-30.4.4-py3-none-any.whl (120 kB)
+2026-10-19T08:52:05.9837255Z Downloading packageurl_python-0.17.6-py3-none-any.whl (36 kB)
+2026-10-19T08:52:05.9898899Z Downloading py_serializable-2.1.0-py3-none-any.whl (23 kB)
+2026-10-19T08:52:05.9959016Z Downloading defusedxml-0.7.1-py2.py3-none-any.whl (25 kB)
+2026-10-19T08:52:06.0012122Z Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl (29 kB)
+2026-10-19T08:52:06.0068364Z Downloading boolean_py-5.0-py3-none-any.whl (26 kB)
+2026-10-19T08:52:06.0311232Z Downloading cachecontrol-0.14.4-py3-none-any.whl (22 kB)
+2026-10-19T08:52:06.0365128Z Downloading msgpack-1.2.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (477 kB)
+2026-10-19T08:52:06.0438307Z Downloading filelock-4.2.4-py3-none-any.whl (162 kB)
+2026-10-19T08:52:06.0499243Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+2026-10-19T08:52:06.0557404Z Downloading pip_api-0.0.35-py3-none-any.whl (123 kB)
+2026-10-19T08:52:06.0619539Z Downloading pip_requirements_parser-32.0.1-py3-none-any.whl (35 kB)
+2026-10-19T08:52:06.0676992Z Downloading platformdirs-4.13.5-py3-none-any.whl (32 kB)
+2026-10-19T08:52:06.0731338Z Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+2026-10-19T08:52:06.0788403Z Downloading charset_normalizer-3.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (269 kB)
+2026-10-19T08:52:06.0847715Z Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+2026-10-19T08:52:06.0901988Z Downloading rich-15.0.0-py3-none-any.whl (310 kB)
+2026-10-19T08:52:06.0968277Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+2026-10-19T08:52:06.1084995Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 106.0 MB/s  0:00:00
+2026-10-19T08:52:06.1121781Z Downloading markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+2026-10-19T08:52:06.1181960Z Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+2026-10-19T08:52:06.1233889Z Downloading tomli-2.5.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (276 kB)
+2026-10-19T08:52:06.1299152Z Downloading tomli_w-1.2.0-py3-none-any.whl (6.7 kB)
+2026-10-19T08:52:06.1353518Z Downloading pyparsing-3.3.3-py3-none-any.whl (126 kB)
+2026-10-19T08:52:06.2545320Z Installing collected packages: sortedcontainers, boolean.py, urllib3, tomli-w, tomli, ruff, pyparsing, pygments, platformdirs, pip-api, packaging, packageurl-python, msgpack, mdurl, license-expression, filelock, defusedxml, charset_normalizer, requests, py-serializable, pip-requirements-parser, markdown-it-py, rich, cyclonedx-python-lib, CacheControl, pip-audit
+2026-10-19T08:52:08.0128111Z 
+2026-10-19T08:52:08.0150901Z Successfully installed CacheControl-0.14.4 boolean.py-5.0 charset_normalizer-3.5.2 cyclonedx-python-lib-11.12.0 defusedxml-0.7.1 filelock-4.2.4 license-expression-30.4.4 markdown-it-py-4.2.0 mdurl-0.1.2 msgpack-1.2.3 packageurl-python-0.17.6 packaging-26.3 pip-api-0.0.35 pip-audit-2.10.1 pip-requirements-parser-32.0.1 platformdirs-4.13.5 py-serializable-2.1.0 pygments-2.21.0 pyparsing-3.3.3 requests-2.34.2 rich-15.0.0 ruff-0.15.17 sortedcontainers-2.4.0 tomli-2.5.0 tomli-w-1.2.0 urllib3-2.8.0
+2026-10-19T08:52:08.1348943Z ##[group]Run pip-audit -r requirements.txt
+2026-10-19T08:52:08.1349294Z [36;1mpip-audit -r requirements.txt[0m
+2026-10-19T08:52:08.1414795Z shell: /usr/bin/bash -e {0}
+2026-10-19T08:52:08.1415034Z env:
+2026-10-19T08:52:08.1415290Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:52:08.1415701Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T08:52:08.1416112Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:52:08.1416466Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:52:08.1416800Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:52:08.1417340Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T08:52:08.1417632Z ##[endgroup]
+2026-10-19T08:52:17.3765506Z No known vulnerabilities found
+2026-10-19T08:52:17.4300031Z ##[group]Run ruff check application-atlas-production-pack/privacy.py application-atlas-production-pack/drafts_api.py application-atlas-production-pack/drafts_engines/__init__.py application-atlas-production-pack/mcp_atlas.py application-atlas-production-pack/execution_service.py application-atlas-production-pack/execution_state.py application-atlas-production-pack/execution_workspace.py application-atlas-production-pack/opencode_client.py application-atlas-production-pack/opencode_cli_adapter.py application-atlas-production-pack/opencode_permissions.py application-atlas-production-pack/opencode_runtime.py application-atlas-production-pack/project_export.py application-atlas-production-pack/project_generation.py application-atlas-production-pack/project_store.py application-atlas-production-pack/project_backup.py application-atlas-production-pack/runtime_recovery.py application-atlas-production-pack/template_factory atlas-web/scripts/gen-data.py atlas-web/scripts/verify-web-data.py
+2026-10-19T08:52:17.4306420Z [36;1mruff check application-atlas-production-pack/privacy.py application-atlas-production-pack/drafts_api.py application-atlas-production-pack/drafts_engines/__init__.py application-atlas-production-pack/mcp_atlas.py application-atlas-production-pack/execution_service.py application-atlas-production-pack/execution_state.py application-atlas-production-pack/execution_workspace.py application-atlas-production-pack/opencode_client.py application-atlas-production-pack/opencode_cli_adapter.py application-atlas-production-pack/opencode_permissions.py application-atlas-production-pack/opencode_runtime.py application-atlas-production-pack/project_export.py application-atlas-production-pack/project_generation.py application-atlas-production-pack/project_store.py application-atlas-production-pack/project_backup.py application-atlas-production-pack/runtime_recovery.py application-atlas-production-pack/template_factory atlas-web/scripts/gen-data.py atlas-web/scripts/verify-web-data.py[0m
+2026-10-19T08:52:17.4374252Z shell: /usr/bin/bash -e {0}
+2026-10-19T08:52:17.4374487Z env:
+2026-10-19T08:52:17.4374734Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:52:17.4375126Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T08:52:17.4375490Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:52:17.4375828Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:52:17.4376168Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:52:17.4376553Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T08:52:17.4377068Z ##[endgroup]
+2026-10-19T08:52:17.4686496Z All checks passed!
+2026-10-19T08:52:17.4726679Z ##[group]Run python -m unittest discover -s application-atlas-production-pack/tests -v
+2026-10-19T08:52:17.4727458Z [36;1mpython -m unittest discover -s application-atlas-production-pack/tests -v[0m
+2026-10-19T08:52:17.4791690Z shell: /usr/bin/bash -e {0}
+2026-10-19T08:52:17.4791931Z env:
+2026-10-19T08:52:17.4792194Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:52:17.4792591Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T08:52:17.4792978Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:52:17.4793318Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:52:17.4793654Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T08:52:17.4793988Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T08:52:17.4794297Z ##[endgroup]
+2026-10-19T08:52:18.2755318Z test_cancellation_removes_containers_and_preserves_report (test_blueprint_runtime.BlueprintRuntimeTests.test_cancellation_removes_containers_and_preserves_report) ... ok
+2026-10-19T08:52:18.2763879Z test_duplicate_json_fields_are_not_accepted (test_blueprint_runtime.BlueprintRuntimeTests.test_duplicate_json_fields_are_not_accepted) ... ok
+2026-10-19T08:52:18.2840141Z test_exit_zero_with_invalid_or_false_protocol_never_passes (test_blueprint_runtime.BlueprintRuntimeTests.test_exit_zero_with_invalid_or_false_protocol_never_passes) ... ok
+2026-10-19T08:52:18.2860212Z test_manifest_requires_exact_normative_ids_and_prerequisite_phase (test_blueprint_runtime.BlueprintRuntimeTests.test_manifest_requires_exact_normative_ids_and_prerequisite_phase) ... ok
+2026-10-19T08:52:18.2867904Z test_missing_legacy_binding_is_unavailable (test_blueprint_runtime.BlueprintRuntimeTests.test_missing_legacy_binding_is_unavailable) ... ok
+2026-10-19T08:52:18.2911735Z test_partial_tester_creation_is_cleaned_without_false_cleanup_failure (test_blueprint_runtime.BlueprintRuntimeTests.test_partial_tester_creation_is_cleaned_without_false_cleanup_failure) ... ok
+2026-10-19T08:52:18.2951540Z test_passing_suite_with_missing_required_phase_evidence_is_unverified (test_blueprint_runtime.BlueprintRuntimeTests.test_passing_suite_with_missing_required_phase_evidence_is_unverified) ... ok
+2026-10-19T08:52:18.2994939Z test_protocol_uses_stdout_while_retaining_stderr_diagnostics (test_blueprint_runtime.BlueprintRuntimeTests.test_protocol_uses_stdout_while_retaining_stderr_diagnostics) ... ok
+2026-10-19T08:52:18.3036267Z test_startup_failure_prevents_cases_and_cleanup_runs (test_blueprint_runtime.BlueprintRuntimeTests.test_startup_failure_prevents_cases_and_cleanup_runs) ... ok
+2026-10-19T08:52:18.3077303Z test_success_uses_read_only_suite_and_application_mounts_and_separate_images (test_blueprint_runtime.BlueprintRuntimeTests.test_success_uses_read_only_suite_and_application_mounts_and_separate_images) ... ok
+2026-10-19T08:52:18.3115731Z test_total_deadline_is_applied_before_startup_and_still_cleans_up (test_blueprint_runtime.BlueprintRuntimeTests.test_total_deadline_is_applied_before_startup_and_still_cleans_up) ... ok
+2026-10-19T08:52:18.3241295Z test_truncated_and_multiple_json_objects_never_pass (test_blueprint_runtime.BlueprintRuntimeTests.test_truncated_and_multiple_json_objects_never_pass) ... ok
+2026-10-19T08:52:18.3266077Z test_unknown_placeholder_and_unsupported_legacy_program_are_rejected (test_blueprint_runtime.BlueprintRuntimeTests.test_unknown_placeholder_and_unsupported_legacy_program_are_rejected) ... ok
+2026-10-19T08:52:18.3336561Z test_valid_failure_with_nonzero_exit_is_blocked_but_conflicting_pass_is_unverified (test_blueprint_runtime.BlueprintRuntimeTests.test_valid_failure_with_nonzero_exit_is_blocked_but_conflicting_pass_is_unverified) ... ok
+2026-10-19T08:52:18.3359006Z test_cli_smoke_and_mixed_python_node_acceptance (test_blueprint_runtime_docker.BlueprintRuntimeDockerTests.test_cli_smoke_and_mixed_python_node_acceptance) ... skipped 'set ATLAS_RUN_DOCKER_INTEGRATION=1 to run isolated local Docker tests'
+2026-10-19T08:52:18.3369015Z test_mixed_python_node_cases_pass_against_stdlib_web_app_and_preserve_source (test_blueprint_runtime_docker.BlueprintRuntimeDockerTests.test_mixed_python_node_cases_pass_against_stdlib_web_app_and_preserve_source) ... skipped 'set ATLAS_RUN_DOCKER_INTEGRATION=1 to run isolated local Docker tests'
+2026-10-19T08:52:18.3370834Z test_negative_acceptance_valid_failed_json_and_nonzero_exit_is_blocked (test_blueprint_runtime_docker.BlueprintRuntimeDockerTests.test_negative_acceptance_valid_failed_json_and_nonzero_exit_is_blocked) ... skipped 'set ATLAS_RUN_DOCKER_INTEGRATION=1 to run isolated local Docker tests'
+2026-10-19T08:52:18.3372476Z test_node_web_launcher_serves_real_request_to_python_tester (test_blueprint_runtime_docker.BlueprintRuntimeDockerTests.test_node_web_launcher_serves_real_request_to_python_tester) ... skipped 'set ATLAS_RUN_DOCKER_INTEGRATION=1 to run isolated local Docker tests'
+2026-10-19T08:52:18.3374099Z test_startup_exception_exit_is_blocked_and_traceback_is_preserved (test_blueprint_runtime_docker.BlueprintRuntimeDockerTests.test_startup_exception_exit_is_blocked_and_traceback_is_preserved) ... skipped 'set ATLAS_RUN_DOCKER_INTEGRATION=1 to run isolated local Docker tests'
+2026-10-19T08:52:18.3375665Z test_startup_exception_traceback_is_captured_from_stderr (test_blueprint_runtime_docker.BlueprintRuntimeDockerTests.test_startup_exception_traceback_is_captured_from_stderr) ... skipped 'set ATLAS_RUN_DOCKER_INTEGRATION=1 to run isolated local Docker tests'
+2026-10-19T08:52:18.3377426Z test_total_timeout_removes_every_owned_container (test_blueprint_runtime_docker.BlueprintRuntimeDockerTests.test_total_timeout_removes_every_owned_container) ... skipped 'set ATLAS_RUN_DOCKER_INTEGRATION=1 to run isolated local Docker tests'
+2026-10-19T08:52:18.4492033Z test_changed_frozen_suite_is_rejected_before_runtime_execution (test_blueprint_runtime_jobs.RuntimeJobTests.test_changed_frozen_suite_is_rejected_before_runtime_execution) ... ok
+2026-10-19T08:52:18.5456232Z test_changed_source_is_rejected_before_any_container_or_model_call (test_blueprint_runtime_jobs.RuntimeJobTests.test_changed_source_is_rejected_before_any_container_or_model_call) ... ok
+2026-10-19T08:52:18.6974524Z test_consent_version_phase_and_duplicate_submission_are_enforced (test_blueprint_runtime_jobs.RuntimeJobTests.test_consent_version_phase_and_duplicate_submission_are_enforced) ... ok
+2026-10-19T08:52:18.7805799Z test_delayed_runtime_rechecks_segment_deadline_before_container_start (test_blueprint_runtime_jobs.RuntimeJobTests.test_delayed_runtime_rechecks_segment_deadline_before_container_start) ... ok
+2026-10-19T08:52:18.8532678Z test_imported_runtime_enabled_revision_retains_frozen_protocol (test_blueprint_runtime_jobs.RuntimeJobTests.test_imported_runtime_enabled_revision_retains_frozen_protocol) ... ok
+2026-10-19T08:52:18.9477468Z test_legacy_is_readable_but_runtime_is_explicitly_unavailable (test_blueprint_runtime_jobs.RuntimeJobTests.test_legacy_is_readable_but_runtime_is_explicitly_unavailable) ... ok
+2026-10-19T08:52:19.1221079Z test_missing_docker_records_unavailable_but_cancellation_does_not_complete (test_blueprint_runtime_jobs.RuntimeJobTests.test_missing_docker_records_unavailable_but_cancellation_does_not_complete) ... ok
+2026-10-19T08:52:19.2501774Z test_missing_phase_evidence_stays_unverified_until_bound_host_record_is_registered (test_blueprint_runtime_jobs.RuntimeJobTests.test_missing_phase_evidence_stays_unverified_until_bound_host_record_is_registered) ... ok
+2026-10-19T08:52:19.2809295Z test_new_production_can_request_binding_without_changing_legacy_default (test_blueprint_runtime_jobs.RuntimeJobTests.test_new_production_can_request_binding_without_changing_legacy_default) ... ok
+2026-10-19T08:52:19.2810598Z test_real_docker_through_api_queue_and_pinned_frozen_source (test_blueprint_runtime_jobs.RuntimeJobTests.test_real_docker_through_api_queue_and_pinned_frozen_source) ... skipped 'opt-in synthetic Docker queue integration'
+2026-10-19T08:52:19.3928954Z test_runtime_child_inherits_fixed_plan_pause_and_cancellation (test_blueprint_runtime_jobs.RuntimeJobTests.test_runtime_child_inherits_fixed_plan_pause_and_cancellation) ... ok
+2026-10-19T08:52:19.4954378Z test_runtime_infrastructure_failure_records_unavailable_with_partial_evidence (test_blueprint_runtime_jobs.RuntimeJobTests.test_runtime_infrastructure_failure_records_unavailable_with_partial_evidence) ... ok
+2026-10-19T08:52:19.5994932Z test_runtime_job_pins_application_runs_without_model_and_does_not_promote (test_blueprint_runtime_jobs.RuntimeJobTests.test_runtime_job_pins_application_runs_without_model_and_does_not_promote) ... ok
+2026-10-19T08:52:19.6453835Z test_archive_rejects_bomb_and_bad_base64_without_database_writes (test_blueprints.BlueprintTests.test_archive_rejects_bomb_and_bad_base64_without_database_writes) ... ok
+2026-10-19T08:52:19.7596743Z test_archive_rejects_traversal_duplicates_secrets_and_symlinks (test_blueprints.BlueprintTests.test_archive_rejects_traversal_duplicates_secrets_and_symlinks) ... /opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/zipfile.py:1606: UserWarning: Duplicate name: 'x'
+2026-10-19T08:52:19.7598633Z   return self._open_to_write(zinfo, force_zip64=force_zip64)
+2026-10-19T08:52:19.7614772Z ok
+2026-10-19T08:52:19.8297945Z test_bundled_sample_is_self_contained_without_history_or_local_zip (test_blueprints.BlueprintTests.test_bundled_sample_is_self_contained_without_history_or_local_zip) ... ok
+2026-10-19T08:52:19.9190781Z test_cognitive_revision_request_replays_terminal_job_instead_of_free_new_round (test_blueprints.BlueprintTests.test_cognitive_revision_request_replays_terminal_job_instead_of_free_new_round) ... ok
+2026-10-19T08:52:19.9768629Z test_declared_reports_never_assign_factory_acceptance (test_blueprints.BlueprintTests.test_declared_reports_never_assign_factory_acceptance) ... ok
+2026-10-19T08:52:20.0246625Z test_dependency_manifest_must_parse_before_accepting_a_package (test_blueprints.BlueprintTests.test_dependency_manifest_must_parse_before_accepting_a_package) ... ok
+2026-10-19T08:52:20.1171111Z test_export_rejects_stale_digest_bad_project_and_unknown_phase (test_blueprints.BlueprintTests.test_export_rejects_stale_digest_bad_project_and_unknown_phase) ... ok
+2026-10-19T08:52:20.2164621Z test_export_still_accepts_legacy_package_without_optional_limits (test_blueprints.BlueprintTests.test_export_still_accepts_legacy_package_without_optional_limits) ... ok
+2026-10-19T08:52:20.3224159Z test_import_is_idempotent_even_when_concurrent (test_blueprints.BlueprintTests.test_import_is_idempotent_even_when_concurrent) ... ok
+2026-10-19T08:52:20.4532643Z test_json_api_read_and_development_export_preserve_blueprint (test_blueprints.BlueprintTests.test_json_api_read_and_development_export_preserve_blueprint) ... ok
+2026-10-19T08:52:20.5034349Z test_later_cases_can_regress_earlier_features_but_not_the_reverse (test_blueprints.BlueprintTests.test_later_cases_can_regress_earlier_features_but_not_the_reverse) ... ok
+2026-10-19T08:52:20.6009099Z test_later_phase_handoff_preserves_prerequisites_and_regression_cases (test_blueprints.BlueprintTests.test_later_phase_handoff_preserves_prerequisites_and_regression_cases) ... ok
+2026-10-19T08:52:20.6239768Z test_later_regression_does_not_replace_introduction_phase_acceptance (test_blueprints.BlueprintTests.test_later_regression_does_not_replace_introduction_phase_acceptance) ... ok
+2026-10-19T08:52:20.6474974Z test_missing_acceptance_program_rejected (test_blueprints.BlueprintTests.test_missing_acceptance_program_rejected) ... ok
+2026-10-19T08:52:20.7374069Z test_old_publication_acceptance_and_repair_are_not_reused (test_blueprints.BlueprintTests.test_old_publication_acceptance_and_repair_are_not_reused) ... ok
+2026-10-19T08:52:20.8298338Z test_phase_summary_omits_future_regression_links_without_mutating_source (test_blueprints.BlueprintTests.test_phase_summary_omits_future_regression_links_without_mutating_source) ... ok
+2026-10-19T08:52:20.8986388Z test_rejects_source_tamper_even_with_rewritten_inventory (test_blueprints.BlueprintTests.test_rejects_source_tamper_even_with_rewritten_inventory) ... ok
+2026-10-19T08:52:20.9708281Z test_sample_validates_without_executing_code (test_blueprints.BlueprintTests.test_sample_validates_without_executing_code) ... ok
+2026-10-19T08:52:21.0446510Z test_structural_references_checked_beyond_file_hashes (test_blueprints.BlueprintTests.test_structural_references_checked_beyond_file_hashes) ... ok
+2026-10-19T08:52:21.0621895Z test_addressed_field_replace_requires_exact_proposal_version (test_cognition.CognitionTests.test_addressed_field_replace_requires_exact_proposal_version) ... ok
+2026-10-19T08:52:21.8084438Z test_bad_patch_repairs_only_failed_file_with_bounded_feedback (test_cognition.CognitionTests.test_bad_patch_repairs_only_failed_file_with_bounded_feedback) ... ok
+2026-10-19T08:52:21.8388467Z test_batch_rejects_draft_stale_and_active_duplicates (test_cognition.CognitionTests.test_batch_rejects_draft_stale_and_active_duplicates) ... ok
+2026-10-19T08:52:22.4363023Z test_blocked_uncertain_and_unavailable_reviews_never_mark_passed (test_cognition.CognitionTests.test_blocked_uncertain_and_unavailable_reviews_never_mark_passed) ... ok
+2026-10-19T08:52:22.6830202Z test_cancellation_between_freeze_and_auto_queue_prevents_new_call (test_cognition.CognitionTests.test_cancellation_between_freeze_and_auto_queue_prevents_new_call) ... ok
+2026-10-19T08:52:22.7387620Z test_cancelled_production_cannot_register_or_queue_review (test_cognition.CognitionTests.test_cancelled_production_cannot_register_or_queue_review) ... ok
+2026-10-19T08:52:23.0715297Z test_design_feedback_repairs_spec_once_then_authors_programs (test_cognition.CognitionTests.test_design_feedback_repairs_spec_once_then_authors_programs) ... ok
+2026-10-19T08:52:23.2958601Z test_design_review_blocks_before_any_program_and_exposes_findings (test_cognition.CognitionTests.test_design_review_blocks_before_any_program_and_exposes_findings) ... ok
+2026-10-19T08:52:23.5326602Z test_design_uncertainty_is_retained_without_becoming_an_automatic_block (test_cognition.CognitionTests.test_design_uncertainty_is_retained_without_becoming_an_automatic_block) ... ok
+2026-10-19T08:52:23.7863043Z test_end_to_end_generation_freezes_then_independently_reviews_without_runtime (test_cognition.CognitionTests.test_end_to_end_generation_freezes_then_independently_reviews_without_runtime) ... ok
+2026-10-19T08:52:23.8082541Z test_exact_file_patch_preserves_prior_and_rejects_ambiguous_edits (test_cognition.CognitionTests.test_exact_file_patch_preserves_prior_and_rejects_ambiguous_edits) ... ok
+2026-10-19T08:52:24.0753977Z test_failed_design_dimension_cannot_pass_and_retry_reuses_completed_checks (test_cognition.CognitionTests.test_failed_design_dimension_cannot_pass_and_retry_reuses_completed_checks) ... ok
+2026-10-19T08:52:24.3233581Z test_failed_generation_retry_reuses_immutable_research_checkpoint (test_cognition.CognitionTests.test_failed_generation_retry_reuses_immutable_research_checkpoint) ... ok
+2026-10-19T08:52:24.8021391Z test_formal_queue_repair_new_artifact_review_keeps_old_retry_allowance (test_cognition.CognitionTests.test_formal_queue_repair_new_artifact_review_keeps_old_retry_allowance) ... ok
+2026-10-19T08:52:25.0555803Z test_invalid_dependency_manifest_repairs_only_that_file_and_keeps_original (test_cognition.CognitionTests.test_invalid_dependency_manifest_repairs_only_that_file_and_keeps_original) ... ok
+2026-10-19T08:52:25.4872287Z test_invalid_structure_is_repaired_with_actual_failed_proposal (test_cognition.CognitionTests.test_invalid_structure_is_repaired_with_actual_failed_proposal) ... ok
+2026-10-19T08:52:25.7544341Z test_legacy_five_dimension_aggregate_checkpoint_does_not_skip_runtime_review (test_cognition.CognitionTests.test_legacy_five_dimension_aggregate_checkpoint_does_not_skip_runtime_review) ... ok
+2026-10-19T08:52:25.9903796Z test_legacy_normalized_research_checkpoint_survives_generation_retry (test_cognition.CognitionTests.test_legacy_normalized_research_checkpoint_survives_generation_retry) ... ok
+2026-10-19T08:52:26.2593666Z test_legacy_revision_uses_original_structured_checkpoint_and_rejects_tampering (test_cognition.CognitionTests.test_legacy_revision_uses_original_structured_checkpoint_and_rejects_tampering) ... ok
+2026-10-19T08:52:26.2792448Z test_missing_or_reserved_spec_fields_rejected_before_program_authoring (test_cognition.CognitionTests.test_missing_or_reserved_spec_fields_rejected_before_program_authoring) ... ok
+2026-10-19T08:52:26.6811529Z test_program_only_revision_keeps_spec_and_skips_model_planning (test_cognition.CognitionTests.test_program_only_revision_keeps_spec_and_skips_model_planning) ... ok
+2026-10-19T08:52:26.9233924Z test_rejected_reserved_non_https_source_is_removed_by_bounded_protocol_repair (test_cognition.CognitionTests.test_rejected_reserved_non_https_source_is_removed_by_bounded_protocol_repair) ... ok
+2026-10-19T08:52:27.4844905Z test_repair_design_review_sees_only_proposed_spec_and_requirements (test_cognition.CognitionTests.test_repair_design_review_sees_only_proposed_spec_and_requirements) ... ok
+2026-10-19T08:52:27.5033916Z test_research_context_keeps_full_long_prose_readable (test_cognition.CognitionTests.test_research_context_keeps_full_long_prose_readable) ... ok
+2026-10-19T08:52:27.5469886Z test_research_protocol_repair_failure_stops_without_publishing (test_cognition.CognitionTests.test_research_protocol_repair_failure_stops_without_publishing) ... ok
+2026-10-19T08:52:27.5898264Z test_review_reference_repair_only_removes_invalid_indexes_and_preserves_judgments (test_cognition.CognitionTests.test_review_reference_repair_only_removes_invalid_indexes_and_preserves_judgments) ... ok
+2026-10-19T08:52:27.6127084Z test_review_reference_repair_rejects_all_invalid_bad_indexes_valid_deletion_and_verdict_edit (test_cognition.CognitionTests.test_review_reference_repair_rejects_all_invalid_bad_indexes_valid_deletion_and_verdict_edit) ... ok
+2026-10-19T08:52:27.6348254Z test_review_rejects_coverage_holes_bad_references_and_derives_outcome (test_cognition.CognitionTests.test_review_rejects_coverage_holes_bad_references_and_derives_outcome) ... ok
+2026-10-19T08:52:27.6601888Z test_review_source_prefix_maps_only_to_an_existing_exact_file (test_cognition.CognitionTests.test_review_source_prefix_maps_only_to_an_existing_exact_file) ... ok
+2026-10-19T08:52:27.9367086Z test_review_with_one_invalid_citation_repairs_once_and_retains_original_response (test_cognition.CognitionTests.test_review_with_one_invalid_citation_repairs_once_and_retains_original_response) ... ok
+2026-10-19T08:52:28.4259014Z test_revision_pins_prior_scenario_and_preserves_original_with_no_new_research (test_cognition.CognitionTests.test_revision_pins_prior_scenario_and_preserves_original_with_no_new_research) ... ok
+2026-10-19T08:52:28.6957626Z test_runtime_enabled_production_authors_binding_and_revision_retains_protocol (test_cognition.CognitionTests.test_runtime_enabled_production_authors_binding_and_revision_retains_protocol) ... ok
+2026-10-19T08:52:29.0970419Z test_runtime_protocol_block_repairs_spec_before_any_program_authoring (test_cognition.CognitionTests.test_runtime_protocol_block_repairs_spec_before_any_program_authoring) ... ok
+2026-10-19T08:52:29.6238518Z test_scoped_revision_copies_unselected_files_even_when_author_ignores_reuse (test_cognition.CognitionTests.test_scoped_revision_copies_unselected_files_even_when_author_ignores_reuse) ... ok
+2026-10-19T08:52:29.8939955Z test_single_file_failure_reuses_plan_and_completed_programs (test_cognition.CognitionTests.test_single_file_failure_reuses_plan_and_completed_programs) ... ok
+2026-10-19T08:52:29.9101244Z test_spec_delta_preserves_unaddressed_contracts_rows_and_original (test_cognition.CognitionTests.test_spec_delta_preserves_unaddressed_contracts_rows_and_original) ... ok
+2026-10-19T08:52:29.9259508Z test_spec_delta_rejects_identity_evidence_inventory_and_fuzzy_edits (test_cognition.CognitionTests.test_spec_delta_rejects_identity_evidence_inventory_and_fuzzy_edits) ... ok
+2026-10-19T08:52:29.9642626Z test_business_repairs_are_idempotent_and_cumulative_across_new_jobs (test_factory_budget_v1.FactoryBudgetV1Tests.test_business_repairs_are_idempotent_and_cumulative_across_new_jobs) ... ok
+2026-10-19T08:52:29.9793607Z test_changed_operation_stays_initial_but_explicit_protocol_repair_uses_scope_retry (test_factory_budget_v1.FactoryBudgetV1Tests.test_changed_operation_stays_initial_but_explicit_protocol_repair_uses_scope_retry) ... ok
+2026-10-19T08:52:30.0513597Z test_cli_records_only_model_and_effort_explicitly_observed_in_execution_event (test_factory_budget_v1.FactoryBudgetV1Tests.test_cli_records_only_model_and_effort_explicitly_observed_in_execution_event) ... ok
+2026-10-19T08:52:30.1360191Z test_cli_requires_budget_when_marked_v1_and_observed_model_requires_event (test_factory_budget_v1.FactoryBudgetV1Tests.test_cli_requires_budget_when_marked_v1_and_observed_model_requires_event) ... ok
+2026-10-19T08:52:30.1537532Z test_concurrent_duplicate_initial_calls_cannot_both_bypass_retry_scope (test_factory_budget_v1.FactoryBudgetV1Tests.test_concurrent_duplicate_initial_calls_cannot_both_bypass_retry_scope) ... ok
+2026-10-19T08:52:30.1963127Z test_concurrent_reservations_are_atomic_and_reservation_counts_against_limit (test_factory_budget_v1.FactoryBudgetV1Tests.test_concurrent_reservations_are_atomic_and_reservation_counts_against_limit) ... ok
+2026-10-19T08:52:30.2220961Z test_dependency_manifest_repairs_consume_real_code_scope_retry_allowance (test_factory_budget_v1.FactoryBudgetV1Tests.test_dependency_manifest_repairs_consume_real_code_scope_retry_allowance) ... ok
+2026-10-19T08:52:30.2345195Z test_fixed_input_identity_ignores_language_but_retains_legacy_hash_aliases (test_factory_budget_v1.FactoryBudgetV1Tests.test_fixed_input_identity_ignores_language_but_retains_legacy_hash_aliases) ... ok
+2026-10-19T08:52:30.2463998Z test_indexed_legacy_cognitive_stages_normalize_without_merging_review_dimensions (test_factory_budget_v1.FactoryBudgetV1Tests.test_indexed_legacy_cognitive_stages_normalize_without_merging_review_dimensions) ... ok
+2026-10-19T08:52:30.2693084Z test_indexed_legacy_review_retries_are_counted_only_for_the_same_dimension (test_factory_budget_v1.FactoryBudgetV1Tests.test_indexed_legacy_review_retries_are_counted_only_for_the_same_dimension) ... ok
+2026-10-19T08:52:30.2957113Z test_legacy_initial_and_two_retries_remain_visible_after_language_changes (test_factory_budget_v1.FactoryBudgetV1Tests.test_legacy_initial_and_two_retries_remain_visible_after_language_changes) ... ok
+2026-10-19T08:52:30.3173983Z test_legacy_p0_digest_retries_count_toward_stable_delivery_scope (test_factory_budget_v1.FactoryBudgetV1Tests.test_legacy_p0_digest_retries_count_toward_stable_delivery_scope) ... ok
+2026-10-19T08:52:30.3405813Z test_old_ledger_reloads_lower_limits_and_new_instance_cannot_raise_them (test_factory_budget_v1.FactoryBudgetV1Tests.test_old_ledger_reloads_lower_limits_and_new_instance_cannot_raise_them) ... ok
+2026-10-19T08:52:30.3575332Z test_pause_or_restart_does_not_reset_expired_deadline (test_factory_budget_v1.FactoryBudgetV1Tests.test_pause_or_restart_does_not_reset_expired_deadline) ... ok
+2026-10-19T08:52:30.3769399Z test_recovery_frees_concurrency_only_after_host_proves_owned_process_stopped (test_factory_budget_v1.FactoryBudgetV1Tests.test_recovery_frees_concurrency_only_after_host_proves_owned_process_stopped) ... ok
+2026-10-19T08:52:30.4494158Z test_repeating_legitimate_stage_calls_does_not_infer_transient_retries (test_factory_budget_v1.FactoryBudgetV1Tests.test_repeating_legitimate_stage_calls_does_not_infer_transient_retries) ... ok
+2026-10-19T08:52:30.4721931Z test_restart_and_new_job_do_not_reset_segment_deadline_or_call_count (test_factory_budget_v1.FactoryBudgetV1Tests.test_restart_and_new_job_do_not_reset_segment_deadline_or_call_count) ... ok
+2026-10-19T08:52:30.4936415Z test_retry_budget_is_cumulative_by_product_and_stage_not_job (test_factory_budget_v1.FactoryBudgetV1Tests.test_retry_budget_is_cumulative_by_product_and_stage_not_job) ... ok
+2026-10-19T08:52:30.5234908Z test_segment_deadline_begins_at_official_start_and_pause_does_not_reset_it (test_factory_budget_v1.FactoryBudgetV1Tests.test_segment_deadline_begins_at_official_start_and_pause_does_not_reset_it) ... ok
+2026-10-19T08:52:30.5508051Z test_stable_scope_counts_legacy_cognitive_review_retries_across_new_artifacts (test_factory_budget_v1.FactoryBudgetV1Tests.test_stable_scope_counts_legacy_cognitive_review_retries_across_new_artifacts) ... ok
+2026-10-19T08:52:30.5743638Z test_uncertain_reservation_survives_restart_and_cannot_be_refunded (test_factory_budget_v1.FactoryBudgetV1Tests.test_uncertain_reservation_survives_restart_and_cannot_be_refunded) ... ok
+2026-10-19T08:52:30.6125511Z test_code_location_hash_is_host_verified_and_revision_is_immutable (test_factory_cases_v1.CaseLibraryV1Tests.test_code_location_hash_is_host_verified_and_revision_is_immutable) ... ok
+2026-10-19T08:52:30.6776015Z test_empty_database_migration_rollback_then_retry (test_factory_cases_v1.CaseLibraryV1Tests.test_empty_database_migration_rollback_then_retry) ... ok
+2026-10-19T08:52:30.7060049Z test_evidence_ids_cannot_ambiguous_across_case_refs (test_factory_cases_v1.CaseLibraryV1Tests.test_evidence_ids_cannot_ambiguous_across_case_refs) ... ok
+2026-10-19T08:52:30.7292338Z test_github_repository_identity_is_normalized (test_factory_cases_v1.CaseLibraryV1Tests.test_github_repository_identity_is_normalized) ... ok
+2026-10-19T08:52:30.7642091Z test_idempotent_commit_and_many_to_many_fixed_revisions (test_factory_cases_v1.CaseLibraryV1Tests.test_idempotent_commit_and_many_to_many_fixed_revisions) ... ok
+2026-10-19T08:52:30.7862261Z test_legacy_app_catalog_reference_fingerprint_semantics_are_unchanged (test_factory_cases_v1.CaseLibraryV1Tests.test_legacy_app_catalog_reference_fingerprint_semantics_are_unchanged) ... ok
+2026-10-19T08:52:30.8149288Z test_legacy_catalog_imports_33_stable_catalog_only_apps_and_reruns (test_factory_cases_v1.CaseLibraryV1Tests.test_legacy_catalog_imports_33_stable_catalog_only_apps_and_reruns) ... ok
+2026-10-19T08:52:30.8602227Z test_rejected_observation_cannot_be_borrowed_as_accepted_design_fact (test_factory_cases_v1.CaseLibraryV1Tests.test_rejected_observation_cannot_be_borrowed_as_accepted_design_fact) ... ok
+2026-10-19T08:52:30.9079434Z test_rejects_unknown_app_path_escape_root_and_unverified_runtime (test_factory_cases_v1.CaseLibraryV1Tests.test_rejects_unknown_app_path_escape_root_and_unverified_runtime) ... ok
+2026-10-19T08:52:30.9411443Z test_review_is_separate_from_observation_and_basis_is_digest_bound (test_factory_cases_v1.CaseLibraryV1Tests.test_review_is_separate_from_observation_and_basis_is_digest_bound) ... ok
+2026-10-19T08:52:30.9657354Z test_scenario_revision_and_source_location_are_host_validated (test_factory_cases_v1.CaseLibraryV1Tests.test_scenario_revision_and_source_location_are_host_validated) ... ok
+2026-10-19T08:52:30.9927417Z test_snapshot_dedup_ignores_volatile_current_license_metadata (test_factory_cases_v1.CaseLibraryV1Tests.test_snapshot_dedup_ignores_volatile_current_license_metadata) ... ok
+2026-10-19T08:52:30.9932622Z test_counts_preserve_optional_skips_and_read_strict_json_summary (test_factory_check_records_v1.CheckRecordTests.test_counts_preserve_optional_skips_and_read_strict_json_summary) ... ok
+2026-10-19T08:52:30.9934339Z test_missing_runner_counts_are_unknown_not_zero_or_success (test_factory_check_records_v1.CheckRecordTests.test_missing_runner_counts_are_unknown_not_zero_or_success) ... ok
+2026-10-19T08:52:31.3825776Z test_cancel_and_timeout_terminate_process_and_record_null_exit_if_unstarted (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_cancel_and_timeout_terminate_process_and_record_null_exit_if_unstarted) ... ok
+2026-10-19T08:52:31.4936519Z test_cleanup_failure_blocks_success_and_does_not_replace_primary_failure (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_cleanup_failure_blocks_success_and_does_not_replace_primary_failure) ... ok
+2026-10-19T08:52:31.5480181Z test_cli_processes_do_not_inherit_stdin (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_cli_processes_do_not_inherit_stdin) ... ok
+2026-10-19T08:52:31.6695863Z test_info_probes_are_stdin_isolated_and_summary_redacts_session_ids (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_info_probes_are_stdin_isolated_and_summary_redacts_session_ids) ... ok
+2026-10-19T08:52:31.7774671Z test_nonzero_and_provider_error_write_failure_summary (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_nonzero_and_provider_error_write_failure_summary) ... ok
+2026-10-19T08:52:31.8638518Z test_prestart_and_postspawn_setup_failures_write_summary_and_clean_process (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_prestart_and_postspawn_setup_failures_write_summary_and_clean_process) ... ok
+2026-10-19T08:52:31.9722731Z test_protocol_failure_and_tail_length_event_are_summarized (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_protocol_failure_and_tail_length_event_are_summarized) ... ok
+2026-10-19T08:52:33.0147887Z test_sigterm_ignoring_descendant_is_killed_after_leader_exits (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_sigterm_ignoring_descendant_is_killed_after_leader_exits) ... ok
+2026-10-19T08:52:33.1319270Z test_successful_cli_cannot_leave_pipe_closed_sigterm_ignoring_descendant (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_successful_cli_cannot_leave_pipe_closed_sigterm_ignoring_descendant) ... ok
+2026-10-19T08:52:33.8251792Z test_timeout_kills_process_group_after_cli_leader_exits (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_timeout_kills_process_group_after_cli_leader_exits) ... ok
+2026-10-19T08:52:33.8382047Z test_unsupported_model_option_has_prestart_summary (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_unsupported_model_option_has_prestart_summary) ... ok
+2026-10-19T08:52:33.8915368Z test_step_usage_is_preserved_and_missing_fields_stay_null (test_factory_cli_usage.FactoryCLIUsageTests.test_step_usage_is_preserved_and_missing_fields_stay_null) ... ok
+2026-10-19T08:52:34.0648437Z test_usage_events_are_bounded_and_truncation_is_explicit (test_factory_cli_usage.FactoryCLIUsageTests.test_usage_events_are_bounded_and_truncation_is_explicit) ... ok
+2026-10-19T08:52:34.2284728Z test_reinitialization_and_budget_snapshots_survive_concurrent_threads (test_factory_concurrency_v1.FactoryConcurrencyV1Tests.test_reinitialization_and_budget_snapshots_survive_concurrent_threads) ... ok
+2026-10-19T08:52:34.2478709Z test_wal_writer_commit_does_not_block_or_change_open_reader_snapshot (test_factory_concurrency_v1.FactoryConcurrencyV1Tests.test_wal_writer_commit_does_not_block_or_change_open_reader_snapshot) ... ok
+2026-10-19T08:52:34.2492802Z test_preparation_never_runs_uploaded_commands (test_factory_delivery.FactoryDeliveryTests.test_preparation_never_runs_uploaded_commands) ... ok
+2026-10-19T08:52:34.2517337Z test_rejects_ambiguous_app_aliases_duplicate_and_undeclared_files (test_factory_delivery.FactoryDeliveryTests.test_rejects_ambiguous_app_aliases_duplicate_and_undeclared_files) ... /opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/zipfile.py:1606: UserWarning: Duplicate name: 'app.py'
+2026-10-19T08:52:34.2519036Z   return self._open_to_write(zinfo, force_zip64=force_zip64)
+2026-10-19T08:52:34.2522979Z ok
+2026-10-19T08:52:34.2549961Z test_rejects_repeated_app_prefix_aliases_but_accepts_exact_nested_paths (test_factory_delivery.FactoryDeliveryTests.test_rejects_repeated_app_prefix_aliases_but_accepts_exact_nested_paths) ... ok
+2026-10-19T08:52:34.2559048Z test_rejects_secret_internal_and_symlink_entries (test_factory_delivery.FactoryDeliveryTests.test_rejects_secret_internal_and_symlink_entries) ... ok
+2026-10-19T08:52:34.2594021Z test_rejects_traversal_absolute_backslash_and_repeated_prefix (test_factory_delivery.FactoryDeliveryTests.test_rejects_traversal_absolute_backslash_and_repeated_prefix) ... ok
+2026-10-19T08:52:34.2617374Z test_root_and_single_app_prefix_normalization_have_equivalent_inventory (test_factory_delivery.FactoryDeliveryTests.test_root_and_single_app_prefix_normalization_have_equivalent_inventory) ... ok
+2026-10-19T08:52:34.2635733Z test_root_app_allows_only_app_tree_and_keeps_metadata_out_of_inventory (test_factory_delivery.FactoryDeliveryTests.test_root_app_allows_only_app_tree_and_keeps_metadata_out_of_inventory) ... ok
+2026-10-19T08:52:34.2698091Z test_runtime_schema_and_command_allowlist_are_enforced (test_factory_delivery.FactoryDeliveryTests.test_runtime_schema_and_command_allowlist_are_enforced) ... ok
+2026-10-19T08:52:34.4636485Z test_bad_delivery_is_bounded_and_never_completes_or_claims_pass (test_factory_development_v1.DevelopmentV1Tests.test_bad_delivery_is_bounded_and_never_completes_or_claims_pass) ... ok
+2026-10-19T08:52:34.6444995Z test_charged_ancestry_cannot_authorize_second_initial_for_same_artifact (test_factory_development_v1.DevelopmentV1Tests.test_charged_ancestry_cannot_authorize_second_initial_for_same_artifact) ... ok
+2026-10-19T08:52:34.7292351Z test_materializer_rejects_escape_and_invalid_exact_manifest (test_factory_development_v1.DevelopmentV1Tests.test_materializer_rejects_escape_and_invalid_exact_manifest) ... ok
+2026-10-19T08:52:34.9018046Z test_model_repair_receives_previous_app_and_failure_report_as_read_only_context (test_factory_development_v1.DevelopmentV1Tests.test_model_repair_receives_previous_app_and_failure_report_as_read_only_context) ... ok
+2026-10-19T08:52:35.0856231Z test_only_host_counted_cognitive_revision_can_start_new_initial_p0 (test_factory_development_v1.DevelopmentV1Tests.test_only_host_counted_cognitive_revision_can_start_new_initial_p0) ... ok
+2026-10-19T08:52:35.2777342Z test_parent_batch_pause_and_cancel_are_inherited (test_factory_development_v1.DevelopmentV1Tests.test_parent_batch_pause_and_cancel_are_inherited) ... ok
+2026-10-19T08:52:35.3579242Z test_queue_requires_current_review_phase_and_version (test_factory_development_v1.DevelopmentV1Tests.test_queue_requires_current_review_phase_and_version) ... ok
+2026-10-19T08:52:35.6674620Z test_repair_requires_failed_bound_acceptance_and_counts_business_feedback (test_factory_development_v1.DevelopmentV1Tests.test_repair_requires_failed_bound_acceptance_and_counts_business_feedback) ... ok
+2026-10-19T08:52:35.8942022Z test_standard_handoff_is_pinned_idempotently_and_p0_delivered (test_factory_development_v1.DevelopmentV1Tests.test_standard_handoff_is_pinned_idempotently_and_p0_delivered) ... ok
+2026-10-19T08:52:35.9514921Z test_frozen_package_requires_view_digest_and_exact_input_mirror (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests.test_frozen_package_requires_view_digest_and_exact_input_mirror) ... ok
+2026-10-19T08:52:35.9849652Z test_legacy_mixed_checkpoints_block_but_all_accepted_are_labeled_legacy (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests.test_legacy_mixed_checkpoints_block_but_all_accepted_are_labeled_legacy) ... ok
+2026-10-19T08:52:36.0358418Z test_real_produce_repair_rejects_predecessor_with_newly_rejected_fact (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests.test_real_produce_repair_rejects_predecessor_with_newly_rejected_fact) ... ok
+2026-10-19T08:52:36.0744218Z test_real_produce_resume_blocks_old_adaptation_even_without_plan_checkpoint (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests.test_real_produce_resume_blocks_old_adaptation_even_without_plan_checkpoint) ... ok
+2026-10-19T08:52:36.1254891Z test_rejected_narrative_is_audit_only_and_cannot_enter_generation_context (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests.test_rejected_narrative_is_audit_only_and_cannot_enter_generation_context) ... ok
+2026-10-19T08:52:36.1663136Z test_view_tamper_or_later_review_revocation_invalidates_publication (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests.test_view_tamper_or_later_review_revocation_invalidates_publication) ... ok
+2026-10-19T08:52:36.9132075Z test_complete_persisted_fixture_chain_can_pass_and_mutations_block (test_factory_milestone_v1.FactoryMilestoneV1Tests.test_complete_persisted_fixture_chain_can_pass_and_mutations_block) ... ok
+2026-10-19T08:52:36.9629129Z test_default_campaign_continues_current_campaign_and_explicit_override_is_preserved (test_factory_milestone_v1.FactoryMilestoneV1Tests.test_default_campaign_continues_current_campaign_and_explicit_override_is_preserved) ... ok
+2026-10-19T08:52:36.9983108Z test_legacy_global_or_other_campaign_gate_cannot_unlock_t08 (test_factory_milestone_v1.FactoryMilestoneV1Tests.test_legacy_global_or_other_campaign_gate_cannot_unlock_t08) ... ok
+2026-10-19T08:52:37.0373266Z test_missing_or_boolean_only_manifest_records_blocked_assessment_not_a_pass (test_factory_milestone_v1.FactoryMilestoneV1Tests.test_missing_or_boolean_only_manifest_records_blocked_assessment_not_a_pass) ... ok
+2026-10-19T08:52:37.0775315Z test_npm_audit_evidence_obeys_high_threshold_and_requires_summary (test_factory_milestone_v1.FactoryMilestoneV1Tests.test_npm_audit_evidence_obeys_high_threshold_and_requires_summary) ... ok
+2026-10-19T08:52:37.2671732Z test_plan_control_updates_parent_and_existing_runtime_descendant_atomically (test_factory_milestone_v1.FactoryMilestoneV1Tests.test_plan_control_updates_parent_and_existing_runtime_descendant_atomically) ... ok
+2026-10-19T08:52:37.3213892Z test_stale_campaign_gate_source_digest_cannot_unlock_t08 (test_factory_milestone_v1.FactoryMilestoneV1Tests.test_stale_campaign_gate_source_digest_cannot_unlock_t08) ... ok
+2026-10-19T08:52:37.3425403Z test_mismatched_pid_marker_does_not_kill_or_release_unknown_reservation (test_factory_recovery_v1.FactoryRecoveryV1Tests.test_mismatched_pid_marker_does_not_kill_or_release_unknown_reservation) ... ok
+2026-10-19T08:52:37.3691493Z test_proven_stop_frees_concurrency_but_keeps_call_charged (test_factory_recovery_v1.FactoryRecoveryV1Tests.test_proven_stop_frees_concurrency_but_keeps_call_charged) ... ok
+2026-10-19T08:52:37.3803582Z test_sigkill_escalation_requires_final_empty_process_group_probe (test_factory_recovery_v1.FactoryRecoveryV1Tests.test_sigkill_escalation_requires_final_empty_process_group_probe) ... ok
+2026-10-19T08:52:37.3999524Z test_unproved_termination_keeps_reservation_active (test_factory_recovery_v1.FactoryRecoveryV1Tests.test_unproved_termination_keeps_reservation_active) ... ok
+2026-10-19T08:52:37.4374002Z test_all_prior_attempts_are_included_with_bounded_safe_sources (test_factory_reporting_v1.FactoryReportEnrichmentTests.test_all_prior_attempts_are_included_with_bounded_safe_sources) ... ok
+2026-10-19T08:52:37.4765386Z test_enrichment_traces_case_increment_and_reports_safe_usage_without_mutation (test_factory_reporting_v1.FactoryReportEnrichmentTests.test_enrichment_traces_case_increment_and_reports_safe_usage_without_mutation) ... ok
+2026-10-19T08:52:37.5106754Z test_legacy_usage_extracts_only_step_finish_and_keeps_unknown_currency (test_factory_reporting_v1.FactoryReportEnrichmentTests.test_legacy_usage_extracts_only_step_finish_and_keeps_unknown_currency) ... ok
+2026-10-19T08:52:37.5662740Z test_malformed_legacy_summary_is_reported_as_truncated_without_reading_symlink (test_factory_reporting_v1.FactoryReportEnrichmentTests.test_malformed_legacy_summary_is_reported_as_truncated_without_reading_symlink) ... ok
+2026-10-19T08:52:37.6001939Z test_ratio_denominators_are_explicit_and_zero_ratio_is_unknown (test_factory_reporting_v1.FactoryReportEnrichmentTests.test_ratio_denominators_are_explicit_and_zero_ratio_is_unknown) ... ok
+2026-10-19T08:52:37.6362822Z test_report_record_and_source_byte_caps_are_explicit (test_factory_reporting_v1.FactoryReportEnrichmentTests.test_report_record_and_source_byte_caps_are_explicit) ... ok
+2026-10-19T08:52:37.6907964Z test_commit_sha_is_checkpointed_before_failed_download_and_reused (test_factory_research_v1.CaseResearchV1Tests.test_commit_sha_is_checkpointed_before_failed_download_and_reused) ... ok
+2026-10-19T08:52:37.7448448Z test_discovery_used_only_when_hints_are_empty (test_factory_research_v1.CaseResearchV1Tests.test_discovery_used_only_when_hints_are_empty) ... ok
+2026-10-19T08:52:37.8279703Z test_end_to_end_research_pins_hashes_reviews_and_completes_case_basis (test_factory_research_v1.CaseResearchV1Tests.test_end_to_end_research_pins_hashes_reviews_and_completes_case_basis) ... ok
+2026-10-19T08:52:37.8468012Z test_exact_source_mount_prefix_normalizes_only_existing_files (test_factory_research_v1.CaseResearchV1Tests.test_exact_source_mount_prefix_normalizes_only_existing_files) ... ok
+2026-10-19T08:52:37.8657636Z test_host_evidence_ids_are_unique_per_logical_case_revision (test_factory_research_v1.CaseResearchV1Tests.test_host_evidence_ids_are_unique_per_logical_case_revision) ... ok
+2026-10-19T08:52:37.9218088Z test_invalid_delivered_response_can_use_bounded_protocol_correction (test_factory_research_v1.CaseResearchV1Tests.test_invalid_delivered_response_can_use_bounded_protocol_correction) ... ok
+2026-10-19T08:52:37.9753209Z test_invalid_source_path_is_rejected_before_persisting_case (test_factory_research_v1.CaseResearchV1Tests.test_invalid_source_path_is_rejected_before_persisting_case) ... ok
+2026-10-19T08:52:38.0250118Z test_late_worker_cannot_commit_case_after_ownership_is_cancelled (test_factory_research_v1.CaseResearchV1Tests.test_late_worker_cannot_commit_case_after_ownership_is_cancelled) ... ok
+2026-10-19T08:52:38.0634850Z test_late_worker_cannot_commit_review_after_ownership_is_cancelled (test_factory_research_v1.CaseResearchV1Tests.test_late_worker_cannot_commit_review_after_ownership_is_cancelled) ... ok
+2026-10-19T08:52:38.1227329Z test_malformed_independent_review_keeps_case_but_does_not_queue_template (test_factory_research_v1.CaseResearchV1Tests.test_malformed_independent_review_keeps_case_but_does_not_queue_template) ... ok
+2026-10-19T08:52:38.4795349Z test_unlocated_observation_is_quarantined_without_rewriting_kept_claims (test_factory_research_v1.CaseResearchV1Tests.test_unlocated_observation_is_quarantined_without_rewriting_kept_claims) ... ok
+2026-10-19T08:52:38.6311954Z test_fast_oversized_output_is_rejected_after_exit (test_factory_runtime_transport.RuntimeTransportTests.test_fast_oversized_output_is_rejected_after_exit) ... ok
+2026-10-19T08:52:38.7842865Z test_protocol_parser_sees_both_objects_despite_display_tail_cut (test_factory_runtime_transport.RuntimeTransportTests.test_protocol_parser_sees_both_objects_despite_display_tail_cut) ... ok
+2026-10-19T08:52:38.9354303Z test_protocol_stdout_and_diagnostic_stderr_stay_separate (test_factory_runtime_transport.RuntimeTransportTests.test_protocol_stdout_and_diagnostic_stderr_stay_separate) ... ok
+2026-10-19T08:52:39.0865222Z test_runtime_commands_cannot_inherit_parent_stdin (test_factory_runtime_transport.RuntimeTransportTests.test_runtime_commands_cannot_inherit_parent_stdin) ... ok
+2026-10-19T08:52:39.2449466Z test_truncated_protocol_output_is_explicit_and_uses_prefix (test_factory_runtime_transport.RuntimeTransportTests.test_truncated_protocol_output_is_explicit_and_uses_prefix) ... ok
+2026-10-19T08:52:39.4906489Z test_legacy_repair_digest_replay_reuses_existing_job (test_factory_spec_patch_v1.SpecPatchTests.test_legacy_repair_digest_replay_reuses_existing_job) ... ok
+2026-10-19T08:52:40.0577407Z test_spec_patch_host_rejects_model_scope_and_file_plan_overreach (test_factory_spec_patch_v1.SpecPatchTests.test_spec_patch_host_rejects_model_scope_and_file_plan_overreach) ... ok
+2026-10-19T08:52:40.5489467Z test_spec_patch_queue_and_produce_reuses_all_programs_and_keeps_review_gate (test_factory_spec_patch_v1.SpecPatchTests.test_spec_patch_queue_and_produce_reuses_all_programs_and_keeps_review_gate) ... ok
+2026-10-19T08:52:40.7972838Z test_spec_patch_queue_rejects_unauthorized_fields_and_mixed_modes (test_factory_spec_patch_v1.SpecPatchTests.test_spec_patch_queue_rejects_unauthorized_fields_and_mixed_modes) ... ok
+2026-10-19T08:52:40.8291250Z test_api_legacy_catalog_and_v1_report_quality_do_not_claim_pass (test_factory_v1_contracts.FactoryV1Contracts.test_api_legacy_catalog_and_v1_report_quality_do_not_claim_pass) ... ok
+2026-10-19T08:52:40.9101299Z test_atomic_outbox_recovers_before_and_after_successor_queue (test_factory_v1_contracts.FactoryV1Contracts.test_atomic_outbox_recovers_before_and_after_successor_queue) ... ok
+2026-10-19T08:52:40.9632972Z test_global_production_limit_spans_batches_and_workers (test_factory_v1_contracts.FactoryV1Contracts.test_global_production_limit_spans_batches_and_workers) ... ok
+2026-10-19T08:52:41.0129657Z test_latest_review_request_cannot_fall_back_to_old_pass (test_factory_v1_contracts.FactoryV1Contracts.test_latest_review_request_cannot_fall_back_to_old_pass) ... ok
+2026-10-19T08:52:41.0405536Z test_leaf_fingerprint_change_rejects_old_preview (test_factory_v1_contracts.FactoryV1Contracts.test_leaf_fingerprint_change_rejects_old_preview) ... ok
+2026-10-19T08:52:41.0736658Z test_plan_digest_and_idempotency_key_conflicts (test_factory_v1_contracts.FactoryV1Contracts.test_plan_digest_and_idempotency_key_conflicts) ... ok
+2026-10-19T08:52:41.1243018Z test_preview_is_model_free_and_idempotent_execution_pins_inputs (test_factory_v1_contracts.FactoryV1Contracts.test_preview_is_model_free_and_idempotent_execution_pins_inputs) ... ok
+2026-10-19T08:52:41.1539899Z test_stale_scenario_rejects_without_queue_or_ledger_call (test_factory_v1_contracts.FactoryV1Contracts.test_stale_scenario_rejects_without_queue_or_ledger_call) ... ok
+2026-10-19T08:52:41.1881762Z test_t08_requires_gate_and_prespecified_three_samples (test_factory_v1_contracts.FactoryV1Contracts.test_t08_requires_gate_and_prespecified_three_samples) ... ok
+2026-10-19T08:52:41.2866802Z test_frozen_source_phase_contract_and_manifest_are_complete (test_handoff_views.HandoffViewTests.test_frozen_source_phase_contract_and_manifest_are_complete) ... ok
+2026-10-19T08:52:41.4206010Z test_views_are_deterministic_across_exports (test_handoff_views.HandoffViewTests.test_views_are_deterministic_across_exports) ... ok
+2026-10-19T08:52:41.4208413Z test_json_body_is_bounded_and_must_be_an_object (test_reliability.ApiRequestBoundaryTests.test_json_body_is_bounded_and_must_be_an_object) ... ok
+2026-10-19T08:52:41.4210028Z test_local_host_and_origin_allowlist (test_reliability.ApiRequestBoundaryTests.test_local_host_and_origin_allowlist) ... ok
+2026-10-19T08:52:41.4212294Z test_request_guard_rejects_unsafe_requests (test_reliability.ApiRequestBoundaryTests.test_request_guard_rejects_unsafe_requests) ... ok
+2026-10-19T08:52:41.4221514Z test_arguments_are_rejected_when_missing_required_field (test_reliability.AskHarnessTests.test_arguments_are_rejected_when_missing_required_field) ... ok
+2026-10-19T08:52:41.4228346Z test_bad_arguments_are_reported_as_data (test_reliability.AskHarnessTests.test_bad_arguments_are_reported_as_data) ... ok
+2026-10-19T08:52:41.4237649Z test_citations_are_deduplicated_and_bounded (test_reliability.AskHarnessTests.test_citations_are_deduplicated_and_bounded) ... ok
+2026-10-19T08:52:41.4244378Z test_citations_only_include_slugs_a_tool_surfaced (test_reliability.AskHarnessTests.test_citations_only_include_slugs_a_tool_surfaced) ... ok
+2026-10-19T08:52:41.4787753Z test_concurrent_question_on_one_thread_is_refused (test_reliability.AskHarnessTests.test_concurrent_question_on_one_thread_is_refused) ... ok
+2026-10-19T08:52:41.4807748Z test_empty_question_is_rejected_before_spawning (test_reliability.AskHarnessTests.test_empty_question_is_rejected_before_spawning) ... ok
+2026-10-19T08:52:41.4814834Z test_invalid_thread_id_is_not_found (test_reliability.AskHarnessTests.test_invalid_thread_id_is_not_found) ... ok
+2026-10-19T08:52:41.4821695Z test_limit_is_clamped (test_reliability.AskHarnessTests.test_limit_is_clamped) ... ok
+2026-10-19T08:52:41.4828415Z test_no_answer_yields_no_citations (test_reliability.AskHarnessTests.test_no_answer_yields_no_citations) ... ok
+2026-10-19T08:52:41.4834957Z test_only_read_only_tools_are_exposed (test_reliability.AskHarnessTests.test_only_read_only_tools_are_exposed) ... ok
+2026-10-19T08:52:41.4850802Z test_over_long_question_is_rejected (test_reliability.AskHarnessTests.test_over_long_question_is_rejected) ... ok
+2026-10-19T08:52:41.4857409Z test_run_limits_are_finite_and_sane (test_reliability.AskHarnessTests.test_run_limits_are_finite_and_sane) ... ok
+2026-10-19T08:52:41.4864038Z test_schemas_match_the_dispatch_table (test_reliability.AskHarnessTests.test_schemas_match_the_dispatch_table) ... ok
+2026-10-19T08:52:41.4870792Z test_slug_is_bounded (test_reliability.AskHarnessTests.test_slug_is_bounded) ... ok
+2026-10-19T08:52:41.5407534Z test_step_records_carry_a_readable_summary (test_reliability.AskHarnessTests.test_step_records_carry_a_readable_summary) ... ok
+2026-10-19T08:52:41.5413647Z test_summarize_reports_errors_compactly (test_reliability.AskHarnessTests.test_summarize_reports_errors_compactly) ... ok
+2026-10-19T08:52:41.5420688Z test_thread_id_cannot_escape_the_root (test_reliability.AskHarnessTests.test_thread_id_cannot_escape_the_root) ... ok
+2026-10-19T08:52:41.5641632Z test_thread_round_trip_and_delete_confirmation (test_reliability.AskHarnessTests.test_thread_round_trip_and_delete_confirmation) ... ok
+2026-10-19T08:52:41.5648845Z test_tool_output_is_redacted_before_storage (test_reliability.AskHarnessTests.test_tool_output_is_redacted_before_storage) ... ok
+2026-10-19T08:52:41.5657849Z test_tool_result_text_is_fenced_as_data (test_reliability.AskHarnessTests.test_tool_result_text_is_fenced_as_data) ... ok
+2026-10-19T08:52:41.6192449Z test_turn_limit_stops_a_tool_loop_that_never_answers (test_reliability.AskHarnessTests.test_turn_limit_stops_a_tool_loop_that_never_answers) ... ok
+2026-10-19T08:52:41.6199283Z test_type_collection_records_names_from_search_results (test_reliability.AskHarnessTests.test_type_collection_records_names_from_search_results) ... ok
+2026-10-19T08:52:41.6205742Z test_unknown_tool_is_refused_not_executed (test_reliability.AskHarnessTests.test_unknown_tool_is_refused_not_executed) ... ok
+2026-10-19T08:52:41.6739694Z test_usage_accumulates_across_turns (test_reliability.AskHarnessTests.test_usage_accumulates_across_turns) ... ok
+2026-10-19T08:52:41.7270305Z test_usage_is_null_when_the_provider_reports_nothing (test_reliability.AskHarnessTests.test_usage_is_null_when_the_provider_reports_nothing) ... ok
+2026-10-19T08:52:41.7803141Z test_worker_records_a_failed_message_instead_of_hanging (test_reliability.AskHarnessTests.test_worker_records_a_failed_message_instead_of_hanging) ... ok
+2026-10-19T08:52:41.7809109Z test_terminal_entry_defaults_to_read_only_and_renders_chinese (test_reliability.AtlasCliTests.test_terminal_entry_defaults_to_read_only_and_renders_chinese) ... ok
+2026-10-19T08:52:41.7816274Z test_terminal_entry_exposes_keyboard_slice_without_changing_api_contract (test_reliability.AtlasCliTests.test_terminal_entry_exposes_keyboard_slice_without_changing_api_contract) ... ok
+2026-10-19T08:52:41.7826018Z test_terminal_entry_requires_explicit_start_or_cleanup_for_mutations (test_reliability.AtlasCliTests.test_terminal_entry_requires_explicit_start_or_cleanup_for_mutations) ... ok
+2026-10-19T08:52:41.7827582Z test_terminal_execution_summary_keeps_verification_transport_fields (test_reliability.AtlasCliTests.test_terminal_execution_summary_keeps_verification_transport_fields) ... ok
+2026-10-19T08:52:41.7828527Z test_terminal_status_labels_cover_acceptance_states (test_reliability.AtlasCliTests.test_terminal_status_labels_cover_acceptance_states) ... ok
+2026-10-19T08:52:41.7833906Z test_classify_uses_explicit_model_and_returns_stable_metadata (test_reliability.ClassificationProviderTests.test_classify_uses_explicit_model_and_returns_stable_metadata) ... ok
+2026-10-19T08:52:41.7839843Z test_provider_credential_is_never_echoed (test_reliability.ClassificationProviderTests.test_provider_credential_is_never_echoed) ... ok
+2026-10-19T08:52:41.7854694Z test_provider_http_failure_is_retryable_without_fallback (test_reliability.ClassificationProviderTests.test_provider_http_failure_is_retryable_without_fallback) ... ok
+2026-10-19T08:52:41.7859467Z test_unavailable_model_is_redacted_and_not_retried (test_reliability.ClassificationProviderTests.test_unavailable_model_is_redacted_and_not_retried) ... ok
+2026-10-19T08:52:41.9363300Z test_alias_of_an_existing_acronym_name_keeps_canonical_slug (test_reliability.CorpusTests.test_alias_of_an_existing_acronym_name_keeps_canonical_slug) ... ok
+2026-10-19T08:52:42.0287216Z test_api_does_not_enqueue_a_draft_already_promoting_in_another_process (test_reliability.CorpusTests.test_api_does_not_enqueue_a_draft_already_promoting_in_another_process) ... ok
+2026-10-19T08:52:42.1003590Z test_api_rejects_stale_review_before_starting_background_work (test_reliability.CorpusTests.test_api_rejects_stale_review_before_starting_background_work) ... ok
+2026-10-19T08:52:42.1740086Z test_concurrent_create_of_same_slug_has_one_winner (test_reliability.CorpusTests.test_concurrent_create_of_same_slug_has_one_winner) ... ok
+2026-10-19T08:52:42.2610407Z test_create_rejects_empty_slug_without_writing (test_reliability.CorpusTests.test_create_rejects_empty_slug_without_writing) ... ok
+2026-10-19T08:52:42.3372273Z test_dedupe_rejects_a_second_writer_while_slug_is_locked (test_reliability.CorpusTests.test_dedupe_rejects_a_second_writer_while_slug_is_locked) ... ok
+2026-10-19T08:52:42.4140982Z test_delete_removes_review_record_with_draft (test_reliability.CorpusTests.test_delete_removes_review_record_with_draft) ... ok
+2026-10-19T08:52:42.5077671Z test_draft_body_revision_rejects_stale_save_and_promote (test_reliability.CorpusTests.test_draft_body_revision_rejects_stale_save_and_promote) ... ok
+2026-10-19T08:52:42.6230844Z test_export_failure_leaves_database_intact (test_reliability.CorpusTests.test_export_failure_leaves_database_intact) ... ok
+2026-10-19T08:52:42.8564610Z test_export_preserves_unchanged_embeddings_and_accepts_aliases (test_reliability.CorpusTests.test_export_preserves_unchanged_embeddings_and_accepts_aliases) ... ok
+2026-10-19T08:52:42.9303233Z test_failed_generation_can_be_explicitly_restarted (test_reliability.CorpusTests.test_failed_generation_can_be_explicitly_restarted) ... ok
+2026-10-19T08:52:43.2197534Z test_low_gate_does_not_modify_live_corpus (test_reliability.CorpusTests.test_low_gate_does_not_modify_live_corpus) ... ok
+2026-10-19T08:52:43.5269335Z test_merge_rebuilds_data_without_adding_a_leaf (test_reliability.CorpusTests.test_merge_rebuilds_data_without_adding_a_leaf) ... ok
+2026-10-19T08:52:43.6041339Z test_missing_stale_or_variant_review_cannot_create_leaf (test_reliability.CorpusTests.test_missing_stale_or_variant_review_cannot_create_leaf) ... ok
+2026-10-19T08:52:43.7085745Z test_pipeline_exception_preserves_draft_research_and_database (test_reliability.CorpusTests.test_pipeline_exception_preserves_draft_research_and_database) ... ok
+2026-10-19T08:52:44.0287217Z test_published_review_conflict_is_read_only (test_reliability.CorpusTests.test_published_review_conflict_is_read_only) ... ok
+2026-10-19T08:52:44.1062128Z test_restart_fails_closed_for_generation_and_translation (test_reliability.CorpusTests.test_restart_fails_closed_for_generation_and_translation) ... ok
+2026-10-19T08:52:44.1800983Z test_saving_body_invalidates_old_translation (test_reliability.CorpusTests.test_saving_body_invalidates_old_translation) ... ok
+2026-10-19T08:52:44.4878934Z test_success_publishes_and_keeps_draft_id (test_reliability.CorpusTests.test_success_publishes_and_keeps_draft_id) ... ok
+2026-10-19T08:52:44.5608774Z test_translation_start_is_single_flight_and_durable_state (test_reliability.CorpusTests.test_translation_start_is_single_flight_and_durable_state) ... ok
+2026-10-19T08:52:44.6831489Z test_web_data_generation_removes_stale_files_and_matches_leaf_index (test_reliability.CorpusTests.test_web_data_generation_removes_stale_files_and_matches_leaf_index) ... ok
+2026-10-19T08:52:44.6911635Z test_draft_engine_uses_temporary_exact_config_and_redacts_log (test_reliability.DraftEngineTests.test_draft_engine_uses_temporary_exact_config_and_redacts_log) ... ok
+2026-10-19T08:52:44.6919626Z test_draft_permissions_deny_shell_web_and_undeclared_edits (test_reliability.DraftEngineTests.test_draft_permissions_deny_shell_web_and_undeclared_edits) ... ok
+2026-10-19T08:52:45.1869096Z test_read_only_mcp_refuses_classification_side_effect (test_reliability.DraftEngineTests.test_read_only_mcp_refuses_classification_side_effect) ... ok
+2026-10-19T08:52:45.2110880Z test_api_tasks_require_fixed_document_and_requirement_inputs (test_reliability.ExecutionServiceTests.test_api_tasks_require_fixed_document_and_requirement_inputs) ... ok
+2026-10-19T08:52:45.3288414Z test_applied_result_recovers_an_interrupted_baseline_adoption (test_reliability.ExecutionServiceTests.test_applied_result_recovers_an_interrupted_baseline_adoption) ... ok
+2026-10-19T08:52:45.4466564Z test_applied_result_without_adopted_baseline_cannot_pass_acceptance (test_reliability.ExecutionServiceTests.test_applied_result_without_adopted_baseline_cannot_pass_acceptance) ... ok
+2026-10-19T08:52:45.5450458Z test_cleanup_does_not_remove_a_workdir_reused_by_follow_up (test_reliability.ExecutionServiceTests.test_cleanup_does_not_remove_a_workdir_reused_by_follow_up) ... ok
+2026-10-19T08:52:45.6670699Z test_cleanup_requires_terminal_execution_and_preserves_evidence (test_reliability.ExecutionServiceTests.test_cleanup_requires_terminal_execution_and_preserves_evidence) ... ok
+2026-10-19T08:52:45.7259858Z test_cli_failure_and_timeout_evidence_remain_distinguishable (test_reliability.ExecutionServiceTests.test_cli_failure_and_timeout_evidence_remain_distinguishable) ... ok
+2026-10-19T08:52:45.7692819Z test_cli_run_evidence_is_persisted_outside_workspace_and_indexed (test_reliability.ExecutionServiceTests.test_cli_run_evidence_is_persisted_outside_workspace_and_indexed) ... ok
+2026-10-19T08:52:45.8948495Z test_cli_transport_runs_in_isolation_and_records_terminal_evidence (test_reliability.ExecutionServiceTests.test_cli_transport_runs_in_isolation_and_records_terminal_evidence) ... ok
+2026-10-19T08:52:46.9630214Z test_cli_verification_maps_steps_and_timeout (test_reliability.ExecutionServiceTests.test_cli_verification_maps_steps_and_timeout) ... ok
+2026-10-19T08:52:46.9881743Z test_completion_report_rejects_missing_or_mismatched_requirements (test_reliability.ExecutionServiceTests.test_completion_report_rejects_missing_or_mismatched_requirements) ... ok
+2026-10-19T08:52:47.1402739Z test_execution_freezes_inputs_and_reconciles_real_file_changes (test_reliability.ExecutionServiceTests.test_execution_freezes_inputs_and_reconciles_real_file_changes) ... ok
+2026-10-19T08:52:47.1755617Z test_execution_rejects_a_project_database_inside_the_source (test_reliability.ExecutionServiceTests.test_execution_rejects_a_project_database_inside_the_source) ... ok
+2026-10-19T08:52:47.2013820Z test_explicit_apply_recovery_restores_a_journaled_backup (test_reliability.ExecutionServiceTests.test_explicit_apply_recovery_restores_a_journaled_backup) ... ok
+2026-10-19T08:52:47.2699700Z test_failed_or_stopped_execution_cannot_pass_acceptance (test_reliability.ExecutionServiceTests.test_failed_or_stopped_execution_cannot_pass_acceptance) ... ok
+2026-10-19T08:52:47.3089638Z test_failed_product_acceptance_can_start_a_new_execution (test_reliability.ExecutionServiceTests.test_failed_product_acceptance_can_start_a_new_execution) ... ok
+2026-10-19T08:52:47.3630407Z test_fixed_verification_excludes_unplanned_commands (test_reliability.ExecutionServiceTests.test_fixed_verification_excludes_unplanned_commands) ... ok
+2026-10-19T08:52:47.3868422Z test_fixed_verifier_rejects_modified_protected_tests (test_reliability.ExecutionServiceTests.test_fixed_verifier_rejects_modified_protected_tests) ... ok
+2026-10-19T08:52:47.4865918Z test_follow_up_rejects_an_unrecorded_change_in_the_isolated_copy (test_reliability.ExecutionServiceTests.test_follow_up_rejects_an_unrecorded_change_in_the_isolated_copy) ... ok
+2026-10-19T08:52:47.6656427Z test_follow_up_reuses_session_and_creates_a_new_snapshot_boundary (test_reliability.ExecutionServiceTests.test_follow_up_reuses_session_and_creates_a_new_snapshot_boundary) ... ok
+2026-10-19T08:52:47.8098682Z test_http_apply_route_uses_the_recorded_isolated_result (test_reliability.ExecutionServiceTests.test_http_apply_route_uses_the_recorded_isolated_result) ... ok
+2026-10-19T08:52:47.9211948Z test_http_continue_route_uses_the_existing_execution (test_reliability.ExecutionServiceTests.test_http_continue_route_uses_the_existing_execution) ... ok
+2026-10-19T08:52:47.9775633Z test_http_recover_apply_route_requires_explicit_service_call (test_reliability.ExecutionServiceTests.test_http_recover_apply_route_requires_explicit_service_call) ... ok
+2026-10-19T08:52:48.0981365Z test_interrupted_apply_recovers_the_intended_result (test_reliability.ExecutionServiceTests.test_interrupted_apply_recovers_the_intended_result) ... ok
+2026-10-19T08:52:48.1227579Z test_isolated_copy_rejects_symlinks_outside_the_project (test_reliability.ExecutionServiceTests.test_isolated_copy_rejects_symlinks_outside_the_project) ... ok
+2026-10-19T08:52:48.2599579Z test_iteration_baseline_requires_an_explicit_rebase (test_reliability.ExecutionServiceTests.test_iteration_baseline_requires_an_explicit_rebase) ... ok
+2026-10-19T08:52:48.2983456Z test_iteration_requires_core_inputs_and_workspace_baseline (test_reliability.ExecutionServiceTests.test_iteration_requires_core_inputs_and_workspace_baseline) ... ok
+2026-10-19T08:52:48.3826976Z test_missing_engine_session_does_not_rewrite_terminal_execution (test_reliability.ExecutionServiceTests.test_missing_engine_session_does_not_rewrite_terminal_execution) ... ok
+2026-10-19T08:52:48.4424048Z test_missing_session_can_be_closed_as_a_stopped_execution (test_reliability.ExecutionServiceTests.test_missing_session_can_be_closed_as_a_stopped_execution) ... ok
+2026-10-19T08:52:48.5434846Z test_new_retry_supersedes_the_previous_unapplied_result (test_reliability.ExecutionServiceTests.test_new_retry_supersedes_the_previous_unapplied_result) ... ok
+2026-10-19T08:52:48.6334674Z test_out_of_scope_change_is_preserved_and_flagged (test_reliability.ExecutionServiceTests.test_out_of_scope_change_is_preserved_and_flagged) ... ok
+2026-10-19T08:52:48.6930150Z test_permission_replies_cannot_create_persistent_grants (test_reliability.ExecutionServiceTests.test_permission_replies_cannot_create_persistent_grants) ... ok
+2026-10-19T08:52:48.7306716Z test_permission_reply_rejects_resource_outside_task_write_paths (test_reliability.ExecutionServiceTests.test_permission_reply_rejects_resource_outside_task_write_paths) ... ok
+2026-10-19T08:52:48.7951371Z test_process_crash_leaves_a_recoverable_apply_journal (test_reliability.ExecutionServiceTests.test_process_crash_leaves_a_recoverable_apply_journal) ... ok
+2026-10-19T08:52:48.8322682Z test_reconcile_keeps_permission_as_first_class_interaction (test_reliability.ExecutionServiceTests.test_reconcile_keeps_permission_as_first_class_interaction) ... ok
+2026-10-19T08:52:48.8582428Z test_requirement_revisions_are_frozen_into_iterations_and_tasks (test_reliability.ExecutionServiceTests.test_requirement_revisions_are_frozen_into_iterations_and_tasks) ... ok
+2026-10-19T08:52:48.9698679Z test_result_application_detects_source_workspace_conflict (test_reliability.ExecutionServiceTests.test_result_application_detects_source_workspace_conflict) ... ok
+2026-10-19T08:52:49.0758667Z test_result_application_rechecks_each_target_before_replace (test_reliability.ExecutionServiceTests.test_result_application_rechecks_each_target_before_replace) ... ok
+2026-10-19T08:52:49.2258715Z test_result_application_rolls_back_a_partial_filesystem_failure (test_reliability.ExecutionServiceTests.test_result_application_rolls_back_a_partial_filesystem_failure) ... ok
+2026-10-19T08:52:49.2733035Z test_stopped_http_cleanup_materializes_evidence (test_reliability.ExecutionServiceTests.test_stopped_http_cleanup_materializes_evidence) ... ok
+2026-10-19T08:52:49.2948560Z test_task_boundaries_reject_analysis_writes_and_parent_paths (test_reliability.ExecutionServiceTests.test_task_boundaries_reject_analysis_writes_and_parent_paths) ... ok
+2026-10-19T08:52:50.3200077Z test_task_timeout_overrides_project_timeout_for_verification (test_reliability.ExecutionServiceTests.test_task_timeout_overrides_project_timeout_for_verification) ... ok
+2026-10-19T08:52:50.3608263Z test_unknown_execution_workspace_can_be_cleaned_after_explicit_review (test_reliability.ExecutionServiceTests.test_unknown_execution_workspace_can_be_cleaned_after_explicit_review) ... ok
+2026-10-19T08:52:50.3833129Z test_verification_registry_rejects_inline_absolute_and_unknown_commands (test_reliability.ExecutionServiceTests.test_verification_registry_rejects_inline_absolute_and_unknown_commands) ... ok
+2026-10-19T08:52:50.4182860Z test_verification_rejects_shell_chaining_and_scrubs_environment (test_reliability.ExecutionServiceTests.test_verification_rejects_shell_chaining_and_scrubs_environment) ... ok
+2026-10-19T08:52:50.4441022Z test_workspace_change_blocks_execution_before_engine_session (test_reliability.ExecutionServiceTests.test_workspace_change_blocks_execution_before_engine_session) ... ok
+2026-10-19T08:52:50.4442431Z test_abort_and_other_errors_are_distinct (test_reliability.ExecutionStateTests.test_abort_and_other_errors_are_distinct) ... ok
+2026-10-19T08:52:50.4443703Z test_completed_requires_a_completed_stop_message (test_reliability.ExecutionStateTests.test_completed_requires_a_completed_stop_message) ... ok
+2026-10-19T08:52:50.4444947Z test_idle_alone_is_not_completion (test_reliability.ExecutionStateTests.test_idle_alone_is_not_completion) ... ok
+2026-10-19T08:52:50.4446043Z test_partial_assistant_message_without_terminal_outcome_stays_running (test_reliability.ExecutionStateTests.test_partial_assistant_message_without_terminal_outcome_stays_running) ... ok
+2026-10-19T08:52:50.4447192Z test_permission_has_precedence_over_busy (test_reliability.ExecutionStateTests.test_permission_has_precedence_over_busy) ... ok
+2026-10-19T08:52:50.4447999Z test_unrelated_permission_does_not_capture_task (test_reliability.ExecutionStateTests.test_unrelated_permission_does_not_capture_task) ... ok
+2026-10-19T08:52:50.4448872Z test_user_message_without_assistant_response_stays_queued (test_reliability.ExecutionStateTests.test_user_message_without_assistant_response_stays_queued) ... ok
+2026-10-19T08:52:50.4449766Z test_accepted_labels_are_explicit_and_partial_results_fail (test_reliability.GateTests.test_accepted_labels_are_explicit_and_partial_results_fail) ... ok
+2026-10-19T08:52:50.4450575Z test_request_failure_is_recorded_and_cannot_pass (test_reliability.GateTests.test_request_failure_is_recorded_and_cannot_pass) ... ok
+2026-10-19T08:52:50.4455682Z test_base_url_must_be_absolute_http (test_reliability.ModelSettingsTests.test_base_url_must_be_absolute_http) ... ok
+2026-10-19T08:52:50.4484408Z test_blank_key_keeps_stored_value_and_null_clears_it (test_reliability.ModelSettingsTests.test_blank_key_keeps_stored_value_and_null_clears_it) ... ok
+2026-10-19T08:52:50.4498617Z test_complete_text_falls_back_to_reasoning (test_reliability.ModelSettingsTests.test_complete_text_falls_back_to_reasoning) ... ok
+2026-10-19T08:52:50.4513803Z test_credentials_are_write_only (test_reliability.ModelSettingsTests.test_credentials_are_write_only) ... ok
+2026-10-19T08:52:50.4533467Z test_delete_requires_explicit_confirmation (test_reliability.ModelSettingsTests.test_delete_requires_explicit_confirmation) ... ok
+2026-10-19T08:52:50.4560030Z test_deleting_the_default_clears_the_default (test_reliability.ModelSettingsTests.test_deleting_the_default_clears_the_default) ... ok
+2026-10-19T08:52:50.4568181Z test_http_error_mapping (test_reliability.ModelSettingsTests.test_http_error_mapping) ... ok
+2026-10-19T08:52:50.4605488Z test_import_reads_credentials_from_the_sqlite_store (test_reliability.ModelSettingsTests.test_import_reads_credentials_from_the_sqlite_store) ... ok
+2026-10-19T08:52:50.4619618Z test_missing_credential_is_reported (test_reliability.ModelSettingsTests.test_missing_credential_is_reported) ... ok
+2026-10-19T08:52:50.4626534Z test_model_unavailable_is_not_retryable (test_reliability.ModelSettingsTests.test_model_unavailable_is_not_retryable) ... ok
+2026-10-19T08:52:50.4633520Z test_provider_error_messages_do_not_leak_the_credential (test_reliability.ModelSettingsTests.test_provider_error_messages_do_not_leak_the_credential) ... ok
+2026-10-19T08:52:50.4660571Z test_role_model_falls_back_to_the_default (test_reliability.ModelSettingsTests.test_role_model_falls_back_to_the_default) ... ok
+2026-10-19T08:52:50.4684872Z test_role_model_naming_a_served_model_is_honored (test_reliability.ModelSettingsTests.test_role_model_naming_a_served_model_is_honored) ... ok
+2026-10-19T08:52:50.4709967Z test_role_model_the_provider_lacks_is_ignored (test_reliability.ModelSettingsTests.test_role_model_the_provider_lacks_is_ignored) ... ok
+2026-10-19T08:52:50.4722948Z test_saved_file_is_owner_only (test_reliability.ModelSettingsTests.test_saved_file_is_owner_only) ... ok
+2026-10-19T08:52:50.4729904Z test_settings_route_reports_config_errors_with_codes (test_reliability.ModelSettingsTests.test_settings_route_reports_config_errors_with_codes) ... ok
+2026-10-19T08:52:50.4746511Z test_settings_routes_return_masked_views (test_reliability.ModelSettingsTests.test_settings_routes_return_masked_views) ... ok
+2026-10-19T08:52:50.4761188Z test_tool_calls_are_normalized (test_reliability.ModelSettingsTests.test_tool_calls_are_normalized) ... ok
+2026-10-19T08:52:50.4768326Z test_unknown_provider_is_reported_as_not_configured (test_reliability.ModelSettingsTests.test_unknown_provider_is_reported_as_not_configured) ... ok
+2026-10-19T08:52:50.4782607Z test_usage_omits_unknown_numbers_rather_than_guessing (test_reliability.ModelSettingsTests.test_usage_omits_unknown_numbers_rather_than_guessing) ... ok
+2026-10-19T08:52:50.4788312Z test_build_run_argv_is_shell_free_and_scoped (test_reliability.OpenCodeCliAdapterTests.test_build_run_argv_is_shell_free_and_scoped) ... ok
+2026-10-19T08:52:50.4842416Z test_cli_runner_uses_atlas_owned_v2_permissions (test_reliability.OpenCodeCliAdapterTests.test_cli_runner_uses_atlas_owned_v2_permissions) ... ok
+2026-10-19T08:52:50.4849450Z test_preflight_marks_provider_check_failure_without_leaking_output (test_reliability.OpenCodeCliAdapterTests.test_preflight_marks_provider_check_failure_without_leaking_output) ... ok
+2026-10-19T08:52:50.4855883Z test_preflight_marks_timeout_as_failed (test_reliability.OpenCodeCliAdapterTests.test_preflight_marks_timeout_as_failed) ... ok
+2026-10-19T08:52:50.4861147Z test_preflight_rejects_version_below_baseline (test_reliability.OpenCodeCliAdapterTests.test_preflight_rejects_version_below_baseline) ... ok
+2026-10-19T08:52:50.4866347Z test_preflight_returns_safe_evidence_without_command_output (test_reliability.OpenCodeCliAdapterTests.test_preflight_returns_safe_evidence_without_command_output) ... ok
+2026-10-19T08:52:50.4875100Z test_run_prompt_returns_stable_summary_alongside_raw_output (test_reliability.OpenCodeCliAdapterTests.test_run_prompt_returns_stable_summary_alongside_raw_output) ... ok
+2026-10-19T08:52:50.4877410Z test_summarize_run_classifies_local_log_access_failure (test_reliability.OpenCodeCliAdapterTests.test_summarize_run_classifies_local_log_access_failure) ... ok
+2026-10-19T08:52:50.4879511Z test_summarize_run_classifies_provider_failure_without_raw_message (test_reliability.OpenCodeCliAdapterTests.test_summarize_run_classifies_provider_failure_without_raw_message) ... ok
+2026-10-19T08:52:50.4881504Z test_summarize_run_distinguishes_timeout_and_failure (test_reliability.OpenCodeCliAdapterTests.test_summarize_run_distinguishes_timeout_and_failure) ... ok
+2026-10-19T08:52:50.4883807Z test_summarize_run_normalizes_json_events_and_transport_state (test_reliability.OpenCodeCliAdapterTests.test_summarize_run_normalizes_json_events_and_transport_state) ... ok
+2026-10-19T08:52:50.4891149Z test_write_run_evidence_creates_self_contained_files (test_reliability.OpenCodeCliAdapterTests.test_write_run_evidence_creates_self_contained_files) ... ok
+2026-10-19T08:52:50.5354737Z test_write_run_evidence_redacts_secrets_and_uses_private_permissions (test_reliability.OpenCodeCliAdapterTests.test_write_run_evidence_redacts_secrets_and_uses_private_permissions) ... ok
+2026-10-19T08:52:50.5359365Z test_async_message_uses_nonblocking_endpoint (test_reliability.OpenCodeClientTests.test_async_message_uses_nonblocking_endpoint) ... ok
+2026-10-19T08:52:50.5360701Z test_client_scopes_session_requests_to_directory (test_reliability.OpenCodeClientTests.test_client_scopes_session_requests_to_directory) ... ok
+2026-10-19T08:52:50.5361941Z test_permission_reply_uses_current_nondeprecated_endpoint (test_reliability.OpenCodeClientTests.test_permission_reply_uses_current_nondeprecated_endpoint) ... ok
+2026-10-19T08:52:50.5363225Z test_question_reply_uses_current_endpoint_and_answer_shape (test_reliability.OpenCodeClientTests.test_question_reply_uses_current_endpoint_and_answer_shape) ... ok
+2026-10-19T08:52:50.5366700Z test_reconcile_reads_authoritative_endpoints_and_filters_permissions (test_reliability.OpenCodeClientTests.test_reconcile_reads_authoritative_endpoints_and_filters_permissions) ... ok
+2026-10-19T08:52:50.5375700Z test_reconcile_treats_missing_diff_as_empty (test_reliability.OpenCodeClientTests.test_reconcile_treats_missing_diff_as_empty) ... ok
+2026-10-19T08:52:50.5377451Z test_rejects_remote_servers_and_invalid_ids (test_reliability.OpenCodeClientTests.test_rejects_remote_servers_and_invalid_ids) ... ok
+2026-10-19T08:52:50.5378760Z test_sse_parser_and_session_filter (test_reliability.OpenCodeClientTests.test_sse_parser_and_session_filter) ... ok
+2026-10-19T08:52:50.5380418Z test_v2_permission_and_form_replies_use_session_scoped_endpoints (test_reliability.OpenCodeClientTests.test_v2_permission_and_form_replies_use_session_scoped_endpoints) ... ok
+2026-10-19T08:52:50.5384788Z test_v2_transport_uses_api_auth_and_normalizes_messages (test_reliability.OpenCodeClientTests.test_v2_transport_uses_api_auth_and_normalizes_messages) ... ok
+2026-10-19T08:52:50.5393397Z test_permission_policy_rejects_a_symlinked_config (test_reliability.OpenCodePermissionTests.test_permission_policy_rejects_a_symlinked_config) ... ok
+2026-10-19T08:52:50.5403815Z test_unmanaged_opencode_url_requires_explicit_trust_override (test_reliability.OpenCodePermissionTests.test_unmanaged_opencode_url_requires_explicit_trust_override) ... ok
+2026-10-19T08:52:50.5434435Z test_v1_policy_uses_direct_config_and_denies_shell (test_reliability.OpenCodePermissionTests.test_v1_policy_uses_direct_config_and_denies_shell) ... ok
+2026-10-19T08:52:50.5475970Z test_v2_policy_is_restored_after_a_temporary_run (test_reliability.OpenCodePermissionTests.test_v2_policy_is_restored_after_a_temporary_run) ... ok
+2026-10-19T08:52:50.5484249Z test_version_detection_handles_opencode_v_prefix (test_reliability.OpenCodePermissionTests.test_version_detection_handles_opencode_v_prefix) ... ok
+2026-10-19T08:52:50.6058232Z test_backup_is_project_scoped_and_restores_to_a_new_store (test_reliability.ProjectBackupTests.test_backup_is_project_scoped_and_restores_to_a_new_store) ... ok
+2026-10-19T08:52:50.6347276Z test_backup_redacts_legacy_execution_evidence_in_the_copy (test_reliability.ProjectBackupTests.test_backup_redacts_legacy_execution_evidence_in_the_copy) ... ok
+2026-10-19T08:52:50.6521462Z test_backup_refuses_active_work (test_reliability.ProjectBackupTests.test_backup_refuses_active_work) ... ok
+2026-10-19T08:52:50.6789185Z test_backup_refuses_unapplied_completed_results (test_reliability.ProjectBackupTests.test_backup_refuses_unapplied_completed_results) ... ok
+2026-10-19T08:52:50.7029486Z test_backup_validation_detects_tampering (test_reliability.ProjectBackupTests.test_backup_validation_detects_tampering) ... ok
+2026-10-19T08:52:50.7300193Z test_browser_backup_delete_and_restore_cleanup_are_explicit (test_reliability.ProjectBackupTests.test_browser_backup_delete_and_restore_cleanup_are_explicit) ... ok
+2026-10-19T08:52:50.7886264Z test_browser_backup_list_and_restore_target_are_controlled (test_reliability.ProjectBackupTests.test_browser_backup_list_and_restore_target_are_controlled) ... ok
+2026-10-19T08:52:50.8758983Z test_interrupted_restore_keeps_journal_until_explicit_cleanup (test_reliability.ProjectBackupTests.test_interrupted_restore_keeps_journal_until_explicit_cleanup) ... ok
+2026-10-19T08:52:50.8957061Z test_prepare_restore_target_rejects_workspace_overlap (test_reliability.ProjectBackupTests.test_prepare_restore_target_rejects_workspace_overlap) ... ok
+2026-10-19T08:52:50.9996269Z test_restore_artifact_journal_precedes_atomic_install (test_reliability.ProjectBackupTests.test_restore_artifact_journal_precedes_atomic_install) ... ok
+2026-10-19T08:52:51.0992595Z test_restore_database_link_crash_window_is_explicitly_recoverable (test_reliability.ProjectBackupTests.test_restore_database_link_crash_window_is_explicitly_recoverable) ... ok
+2026-10-19T08:52:51.1829310Z test_restore_recovery_refuses_replaced_artifact (test_reliability.ProjectBackupTests.test_restore_recovery_refuses_replaced_artifact) ... ok
+2026-10-19T08:52:51.2600109Z test_restore_recovery_refuses_replaced_database (test_reliability.ProjectBackupTests.test_restore_recovery_refuses_replaced_database) ... ok
+2026-10-19T08:52:51.2932412Z test_restore_validates_and_extracts_the_same_archive_handle (test_reliability.ProjectBackupTests.test_restore_validates_and_extracts_the_same_archive_handle) ... ok
+2026-10-19T08:52:51.3115017Z test_acceptance_focus_paths_do_not_replace_default_snapshot_ignores (test_reliability.ProjectStoreTests.test_acceptance_focus_paths_do_not_replace_default_snapshot_ignores) ... ok
+2026-10-19T08:52:51.3363893Z test_acceptance_records_server_owned_execution_and_input_binding (test_reliability.ProjectStoreTests.test_acceptance_records_server_owned_execution_and_input_binding) ... ok
+2026-10-19T08:52:51.3569038Z test_acceptance_route_requires_and_persists_condition_results (test_reliability.ProjectStoreTests.test_acceptance_route_requires_and_persists_condition_results) ... ok
+2026-10-19T08:52:51.3693491Z test_ai_scope_recommendation_is_not_user_confirmation (test_reliability.ProjectStoreTests.test_ai_scope_recommendation_is_not_user_confirmation) ... ok
+2026-10-19T08:52:51.3975851Z test_analysis_generation_is_grounded_reviewable_and_applied_once (test_reliability.ProjectStoreTests.test_analysis_generation_is_grounded_reviewable_and_applied_once) ... ok
+2026-10-19T08:52:51.4083306Z test_app_catalog_reference_declares_depth_and_tracks_its_record (test_reliability.ProjectStoreTests.test_app_catalog_reference_declares_depth_and_tracks_its_record) ... ok
+2026-10-19T08:52:51.4139562Z test_artifact_cleanup_does_not_follow_symlink_roots (test_reliability.ProjectStoreTests.test_artifact_cleanup_does_not_follow_symlink_roots) ... ok
+2026-10-19T08:52:51.4233852Z test_atlas_reference_keeps_excerpt_and_reports_source_update (test_reliability.ProjectStoreTests.test_atlas_reference_keeps_excerpt_and_reports_source_update) ... ok
+2026-10-19T08:52:51.4314313Z test_decisions_and_references_cannot_cross_projects (test_reliability.ProjectStoreTests.test_decisions_and_references_cannot_cross_projects) ... ok
+2026-10-19T08:52:51.4682669Z test_document_basis_tracks_authorship_and_upstream_changes (test_reliability.ProjectStoreTests.test_document_basis_tracks_authorship_and_upstream_changes) ... ok
+2026-10-19T08:52:51.5233296Z test_document_bundle_is_complete_ordered_and_applied_by_dependency (test_reliability.ProjectStoreTests.test_document_bundle_is_complete_ordered_and_applied_by_dependency) ... ok
+2026-10-19T08:52:51.5631705Z test_document_generation_uses_confirmed_scope_and_will_not_overwrite_newer_edit (test_reliability.ProjectStoreTests.test_document_generation_uses_confirmed_scope_and_will_not_overwrite_newer_edit) ... ok
+2026-10-19T08:52:51.5783908Z test_document_review_and_requirement_confirmation_use_revision_cas (test_reliability.ProjectStoreTests.test_document_review_and_requirement_confirmation_use_revision_cas) ... ok
+2026-10-19T08:52:51.5875459Z test_document_versions_are_immutable_and_conflicts_are_explicit (test_reliability.ProjectStoreTests.test_document_versions_are_immutable_and_conflicts_are_explicit) ... ok
+2026-10-19T08:52:51.6009212Z test_empty_workspace_is_rejected (test_reliability.ProjectStoreTests.test_empty_workspace_is_rejected) ... ok
+2026-10-19T08:52:51.6126038Z test_execution_completion_does_not_imply_acceptance (test_reliability.ProjectStoreTests.test_execution_completion_does_not_imply_acceptance) ... ok
+2026-10-19T08:52:51.6326245Z test_execution_evidence_and_export_redact_known_secrets (test_reliability.ProjectStoreTests.test_execution_evidence_and_export_redact_known_secrets) ... ok
+2026-10-19T08:52:51.6424312Z test_execution_get_is_read_only_and_reconcile_is_explicit_post (test_reliability.ProjectStoreTests.test_execution_get_is_read_only_and_reconcile_is_explicit_post) ... ok
+2026-10-19T08:52:51.6694454Z test_execution_updates_task_and_keeps_raw_projection (test_reliability.ProjectStoreTests.test_execution_updates_task_and_keeps_raw_projection) ... ok
+2026-10-19T08:52:51.6753871Z test_failed_transaction_does_not_leave_partial_task (test_reliability.ProjectStoreTests.test_failed_transaction_does_not_leave_partial_task) ... ok
+2026-10-19T08:52:51.7127791Z test_generation_accepts_result_written_in_persistent_engine_directory (test_reliability.ProjectStoreTests.test_generation_accepts_result_written_in_persistent_engine_directory) ... ok
+2026-10-19T08:52:51.7532827Z test_generation_apply_is_receipt_backed_and_staleness_aware (test_reliability.ProjectStoreTests.test_generation_apply_is_receipt_backed_and_staleness_aware) ... ok
+2026-10-19T08:52:51.8084535Z test_generation_engine_log_is_redacted_and_bounded (test_reliability.ProjectStoreTests.test_generation_engine_log_is_redacted_and_bounded) ... ok
+2026-10-19T08:52:51.8369576Z test_generation_keeps_provider_result_in_disposable_runtime (test_reliability.ProjectStoreTests.test_generation_keeps_provider_result_in_disposable_runtime) ... ok
+2026-10-19T08:52:51.8493241Z test_generation_markdown_keeps_long_fixed_evidence_readable (test_reliability.ProjectStoreTests.test_generation_markdown_keeps_long_fixed_evidence_readable) ... ok
+2026-10-19T08:52:51.8552921Z test_generation_recovers_only_matching_complete_json_text (test_reliability.ProjectStoreTests.test_generation_recovers_only_matching_complete_json_text) ... ok
+2026-10-19T08:52:51.8713197Z test_generation_rejects_provider_artifact_outside_runtime (test_reliability.ProjectStoreTests.test_generation_rejects_provider_artifact_outside_runtime) ... ok
+2026-10-19T08:52:51.9337609Z test_generation_rejects_wrong_input_fingerprint_and_unknown_evidence (test_reliability.ProjectStoreTests.test_generation_rejects_wrong_input_fingerprint_and_unknown_evidence) ... ok
+2026-10-19T08:52:51.9775561Z test_generation_staleness_tracks_confirmation_and_document_state (test_reliability.ProjectStoreTests.test_generation_staleness_tracks_confirmation_and_document_state) ... ok
+2026-10-19T08:52:51.9959787Z test_generation_without_basis_fingerprint_fails_closed (test_reliability.ProjectStoreTests.test_generation_without_basis_fingerprint_fails_closed) ... ok
+2026-10-19T08:52:52.0194160Z test_handoff_uses_fixed_inputs_and_flags_missing_recovery_evidence (test_reliability.ProjectStoreTests.test_handoff_uses_fixed_inputs_and_flags_missing_recovery_evidence) ... ok
+2026-10-19T08:52:52.0778097Z test_improvement_generation_binds_goal_workspace_evidence_and_review (test_reliability.ProjectStoreTests.test_improvement_generation_binds_goal_workspace_evidence_and_review) ... ok
+2026-10-19T08:52:52.1031724Z test_improvement_generation_rejects_workspace_change_after_preparation (test_reliability.ProjectStoreTests.test_improvement_generation_rejects_workspace_change_after_preparation) ... ok
+2026-10-19T08:52:52.1413548Z test_improvement_result_requires_baseline_basis_and_complete_plan (test_reliability.ProjectStoreTests.test_improvement_result_requires_baseline_basis_and_complete_plan) ... ok
+2026-10-19T08:52:52.1719599Z test_iteration_completion_requires_task_acceptance (test_reliability.ProjectStoreTests.test_iteration_completion_requires_task_acceptance) ... ok
+2026-10-19T08:52:52.1869980Z test_iteration_freezes_scope_and_allows_only_one_active_iteration (test_reliability.ProjectStoreTests.test_iteration_freezes_scope_and_allows_only_one_active_iteration) ... ok
+2026-10-19T08:52:52.2029544Z test_late_execution_update_does_not_overwrite_latest_task_status (test_reliability.ProjectStoreTests.test_late_execution_update_does_not_overwrite_latest_task_status) ... ok
+2026-10-19T08:52:52.2180093Z test_legacy_acceptance_migration_is_dry_run_explicit_and_idempotent (test_reliability.ProjectStoreTests.test_legacy_acceptance_migration_is_dry_run_explicit_and_idempotent) ... ok
+2026-10-19T08:52:52.2326038Z test_legacy_acceptance_migration_routes_require_confirmation (test_reliability.ProjectStoreTests.test_legacy_acceptance_migration_routes_require_confirmation) ... ok
+2026-10-19T08:52:52.2820225Z test_nested_workspace_git_state_ignores_parent_repository_siblings (test_reliability.ProjectStoreTests.test_nested_workspace_git_state_ignores_parent_repository_siblings) ... ok
+2026-10-19T08:52:52.3092734Z test_open_items_merge_dispositions_and_convert_to_records (test_reliability.ProjectStoreTests.test_open_items_merge_dispositions_and_convert_to_records) ... ok
+2026-10-19T08:52:52.3227697Z test_outside_scope_change_is_visible_without_forcing_focus_review (test_reliability.ProjectStoreTests.test_outside_scope_change_is_visible_without_forcing_focus_review) ... ok
+2026-10-19T08:52:52.3519214Z test_passed_acceptance_requires_a_completed_and_applied_execution (test_reliability.ProjectStoreTests.test_passed_acceptance_requires_a_completed_and_applied_execution) ... ok
+2026-10-19T08:52:52.3592211Z test_project_data_is_separate_and_persistent (test_reliability.ProjectStoreTests.test_project_data_is_separate_and_persistent) ... ok
+2026-10-19T08:52:52.3734260Z test_project_delete_blocks_an_applying_result (test_reliability.ProjectStoreTests.test_project_delete_blocks_an_applying_result) ... ok
+2026-10-19T08:52:52.4115485Z test_project_delete_removes_owned_records_preserves_workspace_and_blocks_active_run (test_reliability.ProjectStoreTests.test_project_delete_removes_owned_records_preserves_workspace_and_blocks_active_run) ... ok
+2026-10-19T08:52:52.4318190Z test_project_delete_uses_generation_lifecycle_lock (test_reliability.ProjectStoreTests.test_project_delete_uses_generation_lifecycle_lock) ... ok
+2026-10-19T08:52:52.4497724Z test_project_export_is_self_contained_and_keeps_confirmation_separate (test_reliability.ProjectStoreTests.test_project_export_is_self_contained_and_keeps_confirmation_separate) ... ok
+2026-10-19T08:52:52.4589076Z test_project_http_create_list_get_and_validation (test_reliability.ProjectStoreTests.test_project_http_create_list_get_and_validation) ... ok
+2026-10-19T08:52:52.4811366Z test_project_http_starter_reference_and_confirmed_delete (test_reliability.ProjectStoreTests.test_project_http_starter_reference_and_confirmed_delete) ... ok
+2026-10-19T08:52:52.4987695Z test_project_reference_http_create_list_and_update (test_reliability.ProjectStoreTests.test_project_reference_http_create_list_and_update) ... ok
+2026-10-19T08:52:52.5255216Z test_project_workflow_http_keeps_recommendation_confirmation_and_versions_distinct (test_reliability.ProjectStoreTests.test_project_workflow_http_keeps_recommendation_confirmation_and_versions_distinct) ... ok
+2026-10-19T08:52:52.5378964Z test_references_are_unique_editable_and_project_scoped (test_reliability.ProjectStoreTests.test_references_are_unique_editable_and_project_scoped) ... ok
+2026-10-19T08:52:52.5819038Z test_section_revision_preserves_outside_content_and_checks_version (test_reliability.ProjectStoreTests.test_section_revision_preserves_outside_content_and_checks_version) ... ok
+2026-10-19T08:52:52.5897801Z test_source_reference_rejects_a_stale_displayed_fingerprint (test_reliability.ProjectStoreTests.test_source_reference_rejects_a_stale_displayed_fingerprint) ... ok
+2026-10-19T08:52:52.5986220Z test_task_inputs_must_belong_to_same_project (test_reliability.ProjectStoreTests.test_task_inputs_must_belong_to_same_project) ... ok
+2026-10-19T08:52:52.6766232Z test_value_analysis_is_advisory_grounded_and_never_changes_scope (test_reliability.ProjectStoreTests.test_value_analysis_is_advisory_grounded_and_never_changes_scope) ... ok
+2026-10-19T08:52:52.6907043Z test_version_one_store_migrates_without_losing_tasks (test_reliability.ProjectStoreTests.test_version_one_store_migrates_without_losing_tasks) ... ok
+2026-10-19T08:52:52.7056373Z test_version_two_store_adds_document_authorship (test_reliability.ProjectStoreTests.test_version_two_store_adds_document_authorship) ... ok
+2026-10-19T08:52:52.7161513Z test_waived_acceptance_requires_an_explicit_reason (test_reliability.ProjectStoreTests.test_waived_acceptance_requires_an_explicit_reason) ... ok
+2026-10-19T08:52:52.7297271Z test_workspace_allows_only_one_active_execution (test_reliability.ProjectStoreTests.test_workspace_allows_only_one_active_execution) ... ok
+2026-10-19T08:52:52.7562387Z test_workspace_baseline_http_capture_check_list_and_conflict (test_reliability.ProjectStoreTests.test_workspace_baseline_http_capture_check_list_and_conflict) ... ok
+2026-10-19T08:52:52.7822122Z test_workspace_baseline_separates_evidence_and_adopts_reviewed_changes (test_reliability.ProjectStoreTests.test_workspace_baseline_separates_evidence_and_adopts_reviewed_changes) ... ok
+2026-10-19T08:52:52.7894241Z test_workspace_focus_paths_must_exist_and_remain_inside_root (test_reliability.ProjectStoreTests.test_workspace_focus_paths_must_exist_and_remain_inside_root) ... ok
+2026-10-19T08:52:52.7898666Z test_corpus_lock_prevents_concurrent_updates (test_reliability.PublicationTests.test_corpus_lock_prevents_concurrent_updates) ... ok
+2026-10-19T08:52:52.7928962Z test_failure_rolls_back_all_files (test_reliability.PublicationTests.test_failure_rolls_back_all_files) ... ok
+2026-10-19T08:52:52.7945367Z test_recover_interrupted_cutover (test_reliability.PublicationTests.test_recover_interrupted_cutover) ... ok
+2026-10-19T08:52:52.8282772Z test_review_updates_do_not_clobber_other_drafts (test_reliability.PublicationTests.test_review_updates_do_not_clobber_other_drafts) ... ok
+2026-10-19T08:52:52.8343182Z test_web_data_publish_rolls_back_an_interrupted_directory_swap (test_reliability.PublicationTests.test_web_data_publish_rolls_back_an_interrupted_directory_swap) ... ok
+2026-10-19T08:52:52.8735964Z test_cache_reloads_after_atomic_database_replacement (test_reliability.RetrievalTests.test_cache_reloads_after_atomic_database_replacement) ... ok
+2026-10-19T08:52:52.8743332Z test_scores_follow_slug_and_neighbors_are_unique (test_reliability.RetrievalTests.test_scores_follow_slug_and_neighbors_are_unique) ... ok
+2026-10-19T08:52:52.8857448Z test_project_store_process_lock_prevents_two_api_owners (test_reliability.RuntimeRecoveryTests.test_project_store_process_lock_prevents_two_api_owners) ... ok
+2026-10-19T08:52:52.9194684Z test_startup_recovery_marks_active_work_unknown_without_replay (test_reliability.RuntimeRecoveryTests.test_startup_recovery_marks_active_work_unknown_without_replay) ... ok
+2026-10-19T08:52:52.9335462Z test_startup_recovery_reports_a_journaled_apply_stage (test_reliability.RuntimeRecoveryTests.test_startup_recovery_reports_a_journaled_apply_stage) ... ok
+2026-10-19T08:52:52.9419112Z test_startup_recovery_reports_malformed_generation_runs (test_reliability.RuntimeRecoveryTests.test_startup_recovery_reports_malformed_generation_runs) ... ok
+2026-10-19T08:52:52.9544812Z test_new_idea_and_existing_project_samples_have_complete_links (test_reliability.SamplePackageTests.test_new_idea_and_existing_project_samples_have_complete_links) ... FAIL
+2026-10-19T08:52:52.9552346Z test_heading_read_includes_nested_sections_and_stops_at_peer (test_reliability.SourceReadingTests.test_heading_read_includes_nested_sections_and_stops_at_peer) ... ok
+2026-10-19T08:52:52.9558885Z test_invalid_paths_and_offsets_fail_closed (test_reliability.SourceReadingTests.test_invalid_paths_and_offsets_fail_closed) ... ok
+2026-10-19T08:52:52.9566450Z test_manifest_reports_both_sources_with_stable_outlines (test_reliability.SourceReadingTests.test_manifest_reports_both_sources_with_stable_outlines) ... ok
+2026-10-19T08:52:52.9575019Z test_missing_source_manifest_returns_a_stable_empty_contract (test_reliability.SourceReadingTests.test_missing_source_manifest_returns_a_stable_empty_contract) ... ok
+2026-10-19T08:52:52.9582575Z test_pagination_never_hides_truncation (test_reliability.SourceReadingTests.test_pagination_never_hides_truncation) ... ok
+2026-10-19T08:52:52.9602305Z test_web_fetch_extracts_text_through_validated_pinned_connection (test_reliability.WebFetchSafetyTests.test_web_fetch_extracts_text_through_validated_pinned_connection) ... ok
+2026-10-19T08:52:52.9617234Z test_web_fetch_rejects_mixed_dns_binary_and_oversized_responses (test_reliability.WebFetchSafetyTests.test_web_fetch_rejects_mixed_dns_binary_and_oversized_responses) ... ok
+2026-10-19T08:52:52.9621233Z test_web_fetch_rejects_non_http_credentials_and_local_targets (test_reliability.WebFetchSafetyTests.test_web_fetch_rejects_non_http_credentials_and_local_targets) ... ok
+2026-10-19T08:52:52.9625549Z test_web_fetch_revalidates_redirect_targets (test_reliability.WebFetchSafetyTests.test_web_fetch_revalidates_redirect_targets) ... ok
+2026-10-19T08:52:52.9639142Z test_detects_added_removed_and_modified_files (test_reliability.WorkspaceSnapshotTests.test_detects_added_removed_and_modified_files) ... ok
+2026-10-19T08:52:52.9648855Z test_different_roots_cannot_be_compared (test_reliability.WorkspaceSnapshotTests.test_different_roots_cannot_be_compared) ... ok
+2026-10-19T08:52:52.9659800Z test_snapshot_rejects_broad_roots_and_resource_limits (test_reliability.WorkspaceSnapshotTests.test_snapshot_rejects_broad_roots_and_resource_limits) ... ok
+2026-10-19T08:52:52.9667619Z test_symlink_target_is_recorded_without_following_it (test_reliability.WorkspaceSnapshotTests.test_symlink_target_is_recorded_without_following_it) ... ok
+2026-10-19T08:52:52.9676763Z test_unchanged_content_is_not_modified (test_reliability.WorkspaceSnapshotTests.test_unchanged_content_is_not_modified) ... ok
+2026-10-19T08:52:53.0051959Z test_cancel_terminates_owned_process_group (test_template_factory.CliProcessTests.test_cancel_terminates_owned_process_group) ... ok
+2026-10-19T08:52:53.0053911Z test_cognition_framing_accepts_only_complete_objects_with_extra_closing (test_template_factory.CliProcessTests.test_cognition_framing_accepts_only_complete_objects_with_extra_closing) ... ok
+2026-10-19T08:52:53.0600503Z test_cognition_output_length_stops_before_continuation (test_template_factory.CliProcessTests.test_cognition_output_length_stops_before_continuation) ... ok
+2026-10-19T08:52:53.4299959Z test_cognition_stages_cannot_search_or_fetch_external_content (test_template_factory.CliProcessTests.test_cognition_stages_cannot_search_or_fetch_external_content) ... ok
+2026-10-19T08:52:53.4304262Z test_cognitive_framing_recovery_never_fills_missing_data_or_changes_strings (test_template_factory.CliProcessTests.test_cognitive_framing_recovery_never_fills_missing_data_or_changes_strings) ... ok
+2026-10-19T08:52:53.4306519Z test_cognitive_framing_tolerates_only_known_provider_closing_markers (test_template_factory.CliProcessTests.test_cognitive_framing_tolerates_only_known_provider_closing_markers) ... ok
+2026-10-19T08:52:53.4310474Z test_cognitive_plan_recovers_premature_spec_closer_without_value_changes (test_template_factory.CliProcessTests.test_cognitive_plan_recovers_premature_spec_closer_without_value_changes) ... ok
+2026-10-19T08:52:53.4846091Z test_error_without_final_newline_overrides_prior_valid_text (test_template_factory.CliProcessTests.test_error_without_final_newline_overrides_prior_valid_text) ... ok
+2026-10-19T08:52:53.6991403Z test_explicit_deepseek_effort_is_scoped_to_one_cli_v2_invocation (test_template_factory.CliProcessTests.test_explicit_deepseek_effort_is_scoped_to_one_cli_v2_invocation) ... ok
+2026-10-19T08:52:53.7533982Z test_reads_real_jsonl_stream_and_final_line_without_newline (test_template_factory.CliProcessTests.test_reads_real_jsonl_stream_and_final_line_without_newline) ... ok
+2026-10-19T08:52:53.8426441Z test_scenario_reviewer_cannot_search_or_fetch_external_content (test_template_factory.CliProcessTests.test_scenario_reviewer_cannot_search_or_fetch_external_content) ... ok
+2026-10-19T08:52:53.8970597Z test_zero_exit_error_event_is_failure (test_template_factory.CliProcessTests.test_zero_exit_error_event_is_failure) ... ok
+2026-10-19T08:52:53.9453419Z test_agent_cannot_remove_licenses (test_template_factory.FactoryTests.test_agent_cannot_remove_licenses) ... ok
+2026-10-19T08:52:53.9729402Z test_agent_receives_an_exact_markdown_leaf_alongside_json (test_template_factory.FactoryTests.test_agent_receives_an_exact_markdown_leaf_alongside_json) ... ok
+2026-10-19T08:52:53.9911116Z test_archives_contain_metadata_and_instance_has_no_runtime_secrets (test_template_factory.FactoryTests.test_archives_contain_metadata_and_instance_has_no_runtime_secrets) ... ok
+2026-10-19T08:52:54.0550635Z test_atomic_claim_respects_concurrency (test_template_factory.FactoryTests.test_atomic_claim_respects_concurrency) ... ok
+2026-10-19T08:52:54.0764179Z test_batch_pins_scenario_and_leaf (test_template_factory.FactoryTests.test_batch_pins_scenario_and_leaf) ... ok
+2026-10-19T08:52:54.1400890Z test_cancelled_acceptance_cannot_publish_late_evidence (test_template_factory.FactoryTests.test_cancelled_acceptance_cannot_publish_late_evidence) ... ok
+2026-10-19T08:52:54.1527465Z test_cli_final_json_can_follow_assistant_preamble (test_template_factory.FactoryTests.test_cli_final_json_can_follow_assistant_preamble) ... ok
+2026-10-19T08:52:54.1647482Z test_cli_protocol_not_zero_exit_success (test_template_factory.FactoryTests.test_cli_protocol_not_zero_exit_success) ... ok
+2026-10-19T08:52:54.1833260Z test_corpus_truth_and_confirmation_gate (test_template_factory.FactoryTests.test_corpus_truth_and_confirmation_gate) ... ok
+2026-10-19T08:52:54.2042236Z test_deterministic_instantiation_and_parameter_validation (test_template_factory.FactoryTests.test_deterministic_instantiation_and_parameter_validation) ... ok
+2026-10-19T08:52:54.2483671Z test_empty_proposal_without_explanation_fails_and_saves_nothing (test_template_factory.FactoryTests.test_empty_proposal_without_explanation_fails_and_saves_nothing) ... ok
+2026-10-19T08:52:54.2902056Z test_expired_lease_cannot_publish_or_renew (test_template_factory.FactoryTests.test_expired_lease_cannot_publish_or_renew) ... ok
+2026-10-19T08:52:54.4140722Z test_explicit_repair_creates_new_immutable_artifact (test_template_factory.FactoryTests.test_explicit_repair_creates_new_immutable_artifact) ... ok
+2026-10-19T08:52:54.4839995Z test_factory_api_instantiates_without_model_call_and_no_host_path (test_template_factory.FactoryTests.test_factory_api_instantiates_without_model_call_and_no_host_path) ... ok
+2026-10-19T08:52:54.5844729Z test_failed_acceptance_keeps_produced_candidate_and_does_not_block_production (test_template_factory.FactoryTests.test_failed_acceptance_keeps_produced_candidate_and_does_not_block_production) ... ok
+2026-10-19T08:52:54.6019573Z test_frozen_content_tamper_rejected (test_template_factory.FactoryTests.test_frozen_content_tamper_rejected) ... ok
+2026-10-19T08:52:54.6709648Z test_full_pipeline_and_explicit_publication (test_template_factory.FactoryTests.test_full_pipeline_and_explicit_publication) ... ok
+2026-10-19T08:52:54.6932644Z test_generated_siblings_review_each_other_in_an_independent_lane (test_template_factory.FactoryTests.test_generated_siblings_review_each_other_in_an_independent_lane) ... ok
+2026-10-19T08:52:54.7231943Z test_generation_pins_existing_scenarios_and_output_language (test_template_factory.FactoryTests.test_generation_pins_existing_scenarios_and_output_language) ... ok
+2026-10-19T08:52:54.7612201Z test_generation_queue_blocks_concurrent_duplicate_leaf (test_template_factory.FactoryTests.test_generation_queue_blocks_concurrent_duplicate_leaf) ... ok
+2026-10-19T08:52:54.7719535Z test_git_url_validation (test_template_factory.FactoryTests.test_git_url_validation) ... ok
+2026-10-19T08:52:54.7835896Z test_invalid_generation_language_creates_no_batch (test_template_factory.FactoryTests.test_invalid_generation_language_creates_no_batch) ... ok
+2026-10-19T08:52:54.8581547Z test_leaf_only_lists_its_published_templates (test_template_factory.FactoryTests.test_leaf_only_lists_its_published_templates) ... ok
+2026-10-19T08:52:54.8793354Z test_link_acceptance_requires_a_specific_http_target (test_template_factory.FactoryTests.test_link_acceptance_requires_a_specific_http_target) ... ok
+2026-10-19T08:52:55.0930565Z test_literal_repair_changes_only_a_unique_match (test_template_factory.FactoryTests.test_literal_repair_changes_only_a_unique_match) ... ok
+2026-10-19T08:52:55.1112785Z test_nonterminal_job_cannot_retry (test_template_factory.FactoryTests.test_nonterminal_job_cannot_retry) ... ok
+2026-10-19T08:52:55.1235122Z test_notice_cannot_be_parameterized (test_template_factory.FactoryTests.test_notice_cannot_be_parameterized) ... ok
+2026-10-19T08:52:55.1497299Z test_pause_resume_and_cancel_fence_late_worker (test_template_factory.FactoryTests.test_pause_resume_and_cancel_fence_late_worker) ... ok
+2026-10-19T08:52:55.1629012Z test_plan_commands_must_exist_in_selected_image (test_template_factory.FactoryTests.test_plan_commands_must_exist_in_selected_image) ... ok
+2026-10-19T08:52:55.1754674Z test_plan_requires_observable_coverage (test_template_factory.FactoryTests.test_plan_requires_observable_coverage) ... ok
+2026-10-19T08:52:55.2585104Z test_production_does_not_call_docker (test_template_factory.FactoryTests.test_production_does_not_call_docker) ... ok
+2026-10-19T08:52:55.3305489Z test_provider_review_failure_is_visible_without_failing_production (test_template_factory.FactoryTests.test_provider_review_failure_is_visible_without_failing_production) ... ok
+2026-10-19T08:52:55.4330222Z test_repair_plan_changes_require_an_explicit_option (test_template_factory.FactoryTests.test_repair_plan_changes_require_an_explicit_option) ... ok
+2026-10-19T08:52:55.4650753Z test_restart_marks_interrupted_and_explicit_retry_new_owner (test_template_factory.FactoryTests.test_restart_marks_interrupted_and_explicit_retry_new_owner) ... ok
+2026-10-19T08:52:55.5328369Z test_retry_reuses_source_checkpoint_after_failed_generation (test_template_factory.FactoryTests.test_retry_reuses_source_checkpoint_after_failed_generation) ... ok
+2026-10-19T08:52:55.5522407Z test_review_line_references_extract_exact_markdown_and_reject_invalid_ranges (test_template_factory.FactoryTests.test_review_line_references_extract_exact_markdown_and_reject_invalid_ranges) ... ok
+2026-10-19T08:52:55.5647914Z test_review_only_plan_can_be_produced_without_runtime (test_template_factory.FactoryTests.test_review_only_plan_can_be_produced_without_runtime) ... ok
+2026-10-19T08:52:55.6448696Z test_runtime_unavailable_is_recorded_and_harness_acceptance_can_pass (test_template_factory.FactoryTests.test_runtime_unavailable_is_recorded_and_harness_acceptance_can_pass) ... ok
+2026-10-19T08:52:55.7000393Z test_safe_generation_rejects_existing_archived_and_completed_zero (test_template_factory.FactoryTests.test_safe_generation_rejects_existing_archived_and_completed_zero) ... ok
+2026-10-19T08:52:55.7218566Z test_scenario_discovery_creates_drafts_not_production_jobs (test_template_factory.FactoryTests.test_scenario_discovery_creates_drafts_not_production_jobs) ... ok
+2026-10-19T08:52:55.7628682Z test_scenario_generation_queues_independent_review_and_preserves_draft_on_failure (test_template_factory.FactoryTests.test_scenario_generation_queues_independent_review_and_preserves_draft_on_failure) ... ok
+2026-10-19T08:52:55.7936581Z test_scenario_review_context_changes_expire_reports (test_template_factory.FactoryTests.test_scenario_review_context_changes_expire_reports) ... ok
+2026-10-19T08:52:55.8229887Z test_scenario_review_invalid_result_fails_without_a_pass (test_template_factory.FactoryTests.test_scenario_review_invalid_result_fails_without_a_pass) ... ok
+2026-10-19T08:52:55.8458230Z test_scenario_review_leaf_changes_and_late_completion_are_historical (test_template_factory.FactoryTests.test_scenario_review_leaf_changes_and_late_completion_are_historical) ... ok
+2026-10-19T08:52:55.8800662Z test_scenario_review_pins_inputs_and_never_confirms (test_template_factory.FactoryTests.test_scenario_review_pins_inputs_and_never_confirms) ... ok
+2026-10-19T08:52:55.9240751Z test_scenario_review_queue_cas_duplicates_and_cancel_are_atomic (test_template_factory.FactoryTests.test_scenario_review_queue_cas_duplicates_and_cancel_are_atomic) ... ok
+2026-10-19T08:52:55.9429345Z test_scenario_review_schema_rejects_unsupported_claims (test_template_factory.FactoryTests.test_scenario_review_schema_rejects_unsupported_claims) ... ok
+2026-10-19T08:52:55.9583743Z test_scenarios_have_revision_compare_and_swap (test_template_factory.FactoryTests.test_scenarios_have_revision_compare_and_swap) ... ok
+2026-10-19T08:52:56.0255066Z test_scheduler_runs_acceptance_while_production_waits (test_template_factory.FactoryTests.test_scheduler_runs_acceptance_while_production_waits) ... ok
+2026-10-19T08:52:56.0374638Z test_skip_generated_requires_boolean (test_template_factory.FactoryTests.test_skip_generated_requires_boolean) ... ok
+2026-10-19T08:52:56.0528186Z test_source_archive_sanitizes_configs_and_pins_notices (test_template_factory.FactoryTests.test_source_archive_sanitizes_configs_and_pins_notices) ... ok
+2026-10-19T08:52:56.0871188Z test_symlinks_and_secret_files_rejected (test_template_factory.FactoryTests.test_symlinks_and_secret_files_rejected) ... ok
+2026-10-19T08:52:56.1754365Z test_verification_lane_and_production_lane_are_independent (test_template_factory.FactoryTests.test_verification_lane_and_production_lane_are_independent) ... ok
+2026-10-19T08:52:56.2038239Z test_zero_scenarios_complete_without_extra_reviews_or_catalog_changes (test_template_factory.FactoryTests.test_zero_scenarios_complete_without_extra_reviews_or_catalog_changes) ... ok
+2026-10-19T08:52:56.2039266Z 
+2026-10-19T08:52:56.2039443Z ======================================================================
+2026-10-19T08:52:56.2040590Z FAIL: test_new_idea_and_existing_project_samples_have_complete_links (test_reliability.SamplePackageTests.test_new_idea_and_existing_project_samples_have_complete_links)
+2026-10-19T08:52:56.2041530Z ----------------------------------------------------------------------
+2026-10-19T08:52:56.2041908Z Traceback (most recent call last):
+2026-10-19T08:52:56.2048019Z   File "/home/runner/work/atlas/atlas/application-atlas-production-pack/tests/test_reliability.py", line 4148, in test_new_idea_and_existing_project_samples_have_complete_links
+2026-10-19T08:52:56.2048820Z     self.assertEqual(existing['errors'], [])
+2026-10-19T08:52:56.2049270Z AssertionError: Lists differ: ['historical source unavailable: EP-S1', '[153 chars]-S5'] != []
+2026-10-19T08:52:56.2049596Z 
+2026-10-19T08:52:56.2049709Z First list contains 5 additional elements.
+2026-10-19T08:52:56.2050003Z First extra element 0:
+2026-10-19T08:52:56.2050257Z 'historical source unavailable: EP-S1'
+2026-10-19T08:52:56.2050737Z 
+2026-10-19T08:52:56.2050834Z + []
+2026-10-19T08:52:56.2051059Z - ['historical source unavailable: EP-S1',
+2026-10-19T08:52:56.2051352Z -  'historical source unavailable: EP-S2',
+2026-10-19T08:52:56.2051647Z -  'historical source unavailable: EP-S3',
+2026-10-19T08:52:56.2051926Z -  'historical source unavailable: EP-S4',
+2026-10-19T08:52:56.2052198Z -  'historical source unavailable: EP-S5']
+2026-10-19T08:52:56.2052372Z 
+2026-10-19T08:52:56.2052509Z ----------------------------------------------------------------------
+2026-10-19T08:52:56.2052822Z Ran 545 tests in 37.948s
+2026-10-19T08:52:56.2052962Z 
+2026-10-19T08:52:56.2053065Z FAILED (failures=1, skipped=8)
+2026-10-19T08:52:56.3429774Z ##[error]Process completed with exit code 1.
+2026-10-19T08:52:56.3581808Z Post job cleanup.
+2026-10-19T08:52:56.4395006Z [command]/usr/bin/git version
+2026-10-19T08:52:56.4435095Z git version 2.55.0
+2026-10-19T08:52:56.4469638Z Temporarily overriding HOME='/home/runner/work/_temp/f5eb67b8-12ef-4cea-bc72-779b6c5f9d18' before making global git config changes
+2026-10-19T08:52:56.4470982Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-19T08:52:56.4474808Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/atlas/atlas
+2026-10-19T08:52:56.4513184Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T08:52:56.4546490Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-19T08:52:56.4800858Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T08:52:56.4829442Z http.https://github.com/.extraheader
+2026-10-19T08:52:56.4839719Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-19T08:52:56.4873835Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-19T08:52:56.5177903Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-19T08:52:56.5239283Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-19T08:52:56.5655862Z Cleaning up orphan processes
+2026-10-19T08:52:56.5952517Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+
