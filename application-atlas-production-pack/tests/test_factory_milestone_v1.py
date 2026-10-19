@@ -12,7 +12,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from template_factory.store import FactoryError, FactoryStore, canonical, digest, now
-from template_factory.v1_batches import BatchService, DEFAULT_CAMPAIGN_ID, G1_REQUIRED_CHECKS, _g1_source_digest
+from template_factory.v1_batches import BatchService, DEFAULT_CAMPAIGN_ID, G1_REQUIRED_CHECKS, _g1_source_digest, _npm_audit_report_passes
 from template_factory.cases import CaseLibrary
 
 PACK = Path(__file__).resolve().parents[1]
@@ -355,6 +355,28 @@ class FactoryMilestoneV1Tests(unittest.TestCase):
         self.assertFalse(rejected_suite["passed"])
         self.assertTrue(any("integrity_failed" in reason or "frozen_template" in reason for reason in rejected_suite["reasons"]))
         bundle.write_bytes(original_suite)
+
+    def test_npm_audit_evidence_obeys_high_threshold_and_requires_summary(self):
+        moderate = """# npm audit report
+postcss-selector-parser <7.1.6
+Severity: moderate
+2 moderate severity vulnerabilities
+To address all issues, run npm audit fix.
+"""
+        self.assertTrue(_npm_audit_report_passes(moderate))
+        self.assertTrue(_npm_audit_report_passes("found 0 vulnerabilities\n"))
+        self.assertTrue(_npm_audit_report_passes("found 1 low severity vulnerability\n"))
+        self.assertFalse(_npm_audit_report_passes("1 high severity vulnerability\n"))
+        self.assertFalse(_npm_audit_report_passes(
+            "Severity: high\nfound 0 vulnerabilities\n"
+        ))
+        self.assertFalse(_npm_audit_report_passes(""))
+        self.assertFalse(_npm_audit_report_passes("npm ERR! audit failed\nfound 0 vulnerabilities\n"))
+        self.assertFalse(_npm_audit_report_passes(
+            "Severity: unknown\n1 moderate severity vulnerability\n"
+        ))
+        self.assertFalse(_npm_audit_report_passes("# npm audit report\nSeverity: moderate\n"))
+        self.assertFalse(_npm_audit_report_passes("2 moderate vulnerabilities\n"))
 
     def tearDown(self):
         self.temp.cleanup()

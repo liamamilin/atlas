@@ -84,6 +84,45 @@ def _sha256_file(path):
     return value.hexdigest()
 
 
+def _npm_audit_report_passes(log):
+    """Accept only a complete npm text summary meeting the fixed high threshold."""
+    lines = str(log).splitlines()
+    if not any(line.strip() for line in lines):
+        return False
+    if any(re.match(r"^\s*(?:npm\s+ERR!|error\b)", line, re.IGNORECASE) for line in lines):
+        return False
+    known = {"info", "low", "moderate", "high", "critical"}
+    severities = re.findall(r"^\s*Severity:\s*(\S+)\s*$", str(log), re.IGNORECASE | re.MULTILINE)
+    normalized = [value.lower() for value in severities]
+    if any(value not in known or value in {"high", "critical"} for value in normalized):
+        return False
+
+    summaries = []
+    zero = re.compile(r"^\s*found\s+0\s+vulnerabilities\s*$", re.IGNORECASE)
+    counts = re.compile(
+        r"^\s*(?:found\s+)?(?P<items>\d+\s+(?:info|low|moderate|high|critical)"
+        r"(?:\s*,\s*\d+\s+(?:info|low|moderate|high|critical))*)"
+        r"\s+severity\s+vulnerabilit(?:y|ies)\s*$",
+        re.IGNORECASE,
+    )
+    for line in lines:
+        if zero.fullmatch(line):
+            summaries.append([])
+            continue
+        match = counts.fullmatch(line)
+        if match:
+            summaries.append([
+                (int(amount), severity.lower())
+                for amount, severity in re.findall(
+                    r"(\d+)\s+(info|low|moderate|high|critical)",
+                    match.group("items"), re.IGNORECASE,
+                )
+            ])
+    if len(summaries) != 1:
+        return False
+    return all(severity not in {"high", "critical"} for _, severity in summaries[0])
+
+
 def _g1_source_digest(root):
     """Bind the G1 checks to the current factory, tests, web source and CI files."""
     root = Path(root).resolve()
@@ -253,7 +292,7 @@ def _manifest_check_failures(path, plan, sample_scenario_id):
             failures.append("check_execution_not_proven:" + name)
         elif name == "atlas_export" and ("sqlite ->" not in log.lower() or "json   ->" not in log.lower()):
             failures.append("check_execution_not_proven:" + name)
-        elif name == "npm_audit" and ("found 0 vulnerabilities" not in log.lower()):
+        elif name == "npm_audit" and not _npm_audit_report_passes(log):
             failures.append("check_execution_not_proven:" + name)
         elif name == "web_typecheck" and ("tsc --noEmit" not in log or re.search(r"error TS\d+", log)):
             failures.append("check_execution_not_proven:" + name)
