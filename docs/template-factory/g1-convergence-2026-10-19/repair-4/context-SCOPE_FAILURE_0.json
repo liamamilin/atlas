@@ -1,0 +1,35 @@
+{
+ "schema": "atlas.aggregate-spec-scope-failure.v1",
+ "scope_version": "atlas.aggregate-repair-scope.v1",
+ "baseline_artifact_digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+ "baseline_authored_digest": "1e18c8c8b73c952b3ff1827438b0bf143057384d46f534b75ee978d3045eec8b",
+ "proposal_digest": "240d7a0ea73d9a84200990e299066b2d0058ccc2f58b195e8a2497fe13dec46d",
+ "error": "aggregate repair changed an unauthorized authored field",
+ "baseline_restorations": [
+  {
+   "path": [
+    "limits"
+   ],
+   "baseline_value": [
+    "不实现云同步、多用户共享或托管部署（D11、F16、F21）。",
+    "不保存网页快照、不做正文全文检索、不做失效链接检测（F17、F18、D13）。",
+    "不引入置顶/归档、多排序模式、复制 URL 与访问计数（F20、F23、F24）。",
+    "归类为扁平单选，不支持嵌套层级或多标签并存（F19、D01）。",
+    "第三方元数据与图标抓取未验证可达性，仅作可选增强且失败静默降级（F12、D05）。",
+    "验收不携带认证凭据；若目标要求认证，验收必须显式报告基础设施未就绪而非跳过或通过（D09）。",
+    "不设置未经验证的性能或成本目标。"
+   ],
+   "proposed_value": [
+    "不实现云同步、多用户共享或托管部署（D11、F16、F21）。",
+    "不保存网页快照、不做正文全文检索、不做失效链接检测（F17、F18、D13）。",
+    "不引入置顶/归档、多排序模式、复制 URL 与访问计数（F20、F23、F24）。",
+    "归类为扁平单选，不支持嵌套层级或多标签并存（F19、D01）。",
+    "第三方元数据与图标抓取未验证可达性，仅作可选增强且失败静默降级（F12、D05）。",
+    "验收不携带认证凭据；若目标要求认证，验收必须显式报告基础设施未就绪而非跳过或通过（D09）。",
+    "不设置未经验证的性能或成本目标。",
+    "P0 不启用重复 URL 拒绝；F14/A15 保持 P1。"
+   ]
+  }
+ ],
+ "instruction": "Restore listed unauthorized authored values exactly to baseline; this restores the original authorization boundary and does not expand scope."
+}

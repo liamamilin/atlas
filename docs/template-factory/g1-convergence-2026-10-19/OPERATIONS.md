@@ -47,3 +47,21 @@ PYTHONPATH=application-atlas-production-pack python3 -m template_factory.batch_c
 协议修复完成并取得新代码完整本地/远端通过后，可通过已有 `POST /api/factory/jobs/job_a53c47f3694047489c4f82cfc2e346be/retry` 入队同一任务，再用原plan正式resume。此处普通retry仅恢复这个 failed 后继，不能复用为 paused_budget 的通用恢复，也不能再调用首次 resume-product。恢复 receipt 必须证明旧生成交付的完整input/source/model/stdout/result均匹配；原CLI已收费，不退款、不重复生成。严格源树只读恢复核对见 `repair-3/recovery-readonly-check.json`，它不代表实际重试已执行。
 
 若早期scope检查发现原提案越界，保存精确还原反馈后使用既有index1业务修复，占用第4轮。达到4后不允许额外模板/内部规格/应用业务修复；瞬时协议重试也不重置历史。停止时保留正式状态和原失败，不能通过改job身份继续。
+
+## 本轮最终停止与恢复边界
+
+已正式停止：原后继attempt2为failed（cognition_design_blocked），原plan为paused；六项预审五过一阻断，52/500次CLI、4/4轮业务修复、活动0。原失败、窗口和全部身份保留，T08尚未preview/run。具体不一致及全部raw见G1_REPORT、STOP_RECORD和repair-4；新模板/P0/phase proof未取得。
+
+现在可执行的只读检查：
+
+```sh
+PYTHONPATH=application-atlas-production-pack python3 -m template_factory.batch_cli report plan_87059846caf345d2b2fe690657cf324f
+```
+
+API的`GET /api/factory/jobs/job_a53c47f3694047489c4f82cfc2e346be`及`GET /api/factory/v1/jobs/job_a53c47f3694047489c4f82cfc2e346be/effective-budget`可核对失败与原有效截止时间。生产根整个目录应保留（含DB/WAL、jobs、源快照、制品、检查点），仅复制报告不能恢复业务库。
+
+当前没有获授权的第5轮执行命令。普通retry会复用已有blocked预审，不能改规格、抹掉否决或增加修复额度；再次调用首次resume-product也不会获得新窗口。现有amendment实现只接本次2→4的唯一例外，不能编造更高的register请求。
+
+若后续另有明确追加授权，先在原append-only服务中支持该明确增量并验证历史/并发/时间边界，再通过正式新修订绑定本次failed job、plan-1和phase_acceptance证据。最小业务修正为：A04程序计划补创建/重命名空名与121字符名的invalid_name、form-error、无写入断言；A12仅处理保存/移动category字段的invalid_category，不把归类管理表单混入。保留全部原断言及本轮URL政策，不能通过改变case、阶段或更换样本避开失败。随后仍须完成预审、五程序修订、精确差分语义审阅、冻结后独立审阅、发布、标准交接真实消费、P0、独立运行/proof及宿主评估。窗口到期后需要相应明确时间授权；不自动延期。
+
+G1实际通过后才启动原三个场景的T08；本次未授权或排队其他候选。限额建议是先处理这一个确定根因，保持全局500、并发2/1和其他产品2轮，不清零历史、不预先扩到十个。

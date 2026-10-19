@@ -1,0 +1,21 @@
+{
+ "outcome": "passed",
+ "summary": "decisions_defaults 设计评审通过：D01-D13 均有明确默认、影响和可执行的 when_to_ask；D01-D10 为已定默认（D05/D06/D10 对应后期能力），D11-D13 以 deferred/open 标明后期或待定，并保留反转触发条件。默认与架构的单选归类、默认收件区、软删除/恢复、P1 去重、检索字段、python-web/SQLite/SSR、无认证及扁平归类一致，未发现破坏核心旅程或当前承诺的矛盾。",
+ "checks": [
+  {
+   "dimension": "decisions_defaults",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "逐项核对 D01-D13 的 default/status/when_to_ask：D01 单选归类并保留关联表迁移路径；D02 缺省归入“未整理”；D03 归类名大小写不敏感自动创建/复用，拼写碎片化时改为仅选既有归类；D04 软删除、默认过滤与 /restore，且明确不引入 purge；D05 本地图标派生、第三方增强可选且失败降级；D06 仅 P1/F14 启用重复检测并支持 allow_duplicate；D07 标题/hostname/描述检索、category 与 q 叠加、只计活动记录；D08 python-web/Python 3.12/SQLite/SSR 与独立 HTTP 验收；D09 默认无认证，局域网/公网暴露时触发认证；D10 Netscape HTML；D11-D13 分别以 deferred/deferred/open 保留云同步、嵌套/标签、快照/死链检测的后期选择。上述默认与 ARCHITECTURE.md 的接口、错误合同和 limits 一致，未把后续能力写成 P0 承诺。"
+  }
+ ],
+ "suggestions": [],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "review_rules_version": "atlas.current-required-contract.v1",
+ "proposal_digest": "b82eaafd6126d5e21e1ccd734a590b5e8a417f51497465e72a4574ab20873894",
+ "projection_digest": "9f8e40c623fb928ad0f412ed456c84dfad9991dec02259c3f9cf4a634bf4da95",
+ "stage": "blueprint-spec-review-1-decisions_defaults"
+}

@@ -1,0 +1,216 @@
+{
+ "result": {
+  "outcome": "blocked",
+  "summary": "scenario_scope: passed; product_completeness: passed; architecture_contract: passed; phase_acceptance: blocked; decisions_defaults: passed; runtime_protocol: passed",
+  "checks": [
+   {
+    "dimension": "scenario_scope",
+    "outcome": "passed",
+    "files": [
+     "DRAFT.md",
+     "ARCHITECTURE.md"
+    ],
+    "reason": "DRAFT 的 P0 将场景第1–5步落到 F01/F02（保存与默认/预置归类）、F03/F04（新建与移动归类）、F05/F06（归类浏览/计数与标题、域名、描述检索）、F07（打开保存时原始 URL）、F08（跨会话/重启持久化），F09–F11 提供清理撤销、校验错误与首启空库外壳；ARCHITECTURE 的预置「未整理/待购/家居改造/以后看看」、分类计数及表单/打开链接契约与这些能力一致。P0 列入 A01–A12，覆盖场景四条验收所涉能力；P1 的 F12–F14 属可延后的成熟增强，不计入核心旅程。"
+   },
+   {
+    "dimension": "product_completeness",
+    "outcome": "passed",
+    "files": [
+     "DRAFT.md",
+     "ARCHITECTURE.md"
+    ],
+    "reason": "逐行核对 F01–F11：F01/F02 由首页 form[action=/bookmarks/new] 提供保存与默认/新归类；F03 经 a[data-testid=category-manager] 进入 /categories 的新建、重命名、删除表单；F04/F09 由每条 record-row 的 move/delete 表单执行并在 /?trash=1 提供 restore 表单；F05/F06 由侧栏计数、归类链接与检索表单完成浏览和检索；F07 由 record-open-link 与 /go/{id} 完成原 URL 打开；F08 用同一 app_root 与实例数据目录重启验证持久化；F10/F11 提供 form-error、JSON 错误与首页/health 入口。各行均声明了成功状态、303/GET 导航、用户可见失败和修正重试，且与 ARCHITECTURE 的 UI/API 合同一致；未发现 P0 必需步骤被推迟到 P1。"
+   },
+   {
+    "dimension": "architecture_contract",
+    "outcome": "passed",
+    "files": [
+     "DRAFT.md",
+     "ARCHITECTURE.md",
+     "REVISION.md"
+    ],
+    "reason": "DRAFT.md 的 F01-F11 与 ARCHITECTURE.md 的 SQLite 模型一致：预置「未整理」及省略/null category 回退、BOOKMARK.category_id 非空、软删记录在默认列表与计数中排除、回收站恢复、删除归类时活动与软删记录同迁默认归类均有对应事务与 API。API 明确 invalid_url、invalid_category、invalid_name、duplicate_category、protected_category、bad_request、not_found 的 400/404/409 语义，HTML 适配器保留输入并显示 form-error；URL 保留原始字符串、PATCH 变更时重算 hostname，P0 不抓取目标页。D09 的无认证仅限本机或隔离验收网络，加上仅允许 HTTP(S) 与 target=_blank/rel=noopener，未发现与数据或安全合同冲突；F14/A15 仍保持 P1，A02 的单标签主机策略与 REVISION.md 一致。"
+   },
+   {
+    "dimension": "phase_acceptance",
+    "outcome": "blocked",
+    "files": [
+     "DRAFT.md",
+     "ARCHITECTURE.md",
+     "REVISION.md"
+    ],
+    "reason": "阶段安排本身符合要求：DRAFT.md 将 F01–F11/A01–A12 放在 P0，覆盖保存、默认归类、归类管理/移动、计数、检索、打开、软删除/恢复与跨重启持久化；F12–F14/A13–A15 仅在 P1，属可选成熟增强，未把确认场景的必需步骤推迟。缺陷在 A04/A12 的归类名校验：A04 目标要求“重名、非法名与默认归类保护”均给出可读 form-error，但 p0_organize.py 只安排了重名 409 duplicate_category 和默认归类保护 400 protected_category，缺少空名/超长名的 invalid_name 分支；A12 却计划通过“保存/移动/归类表单”提交空名、121 字符名并统一断言 400 invalid_category。ARCHITECTURE.md 规定归类管理表单空名/超长名为 400 invalid_name，REVISION.md 也把 A12 固定为 invalid category save/move；按此计划 A12 会断言与架构不兼容的错误码，A04 又缺少其目标要求的校验分支。"
+   },
+   {
+    "dimension": "decisions_defaults",
+    "outcome": "passed",
+    "files": [
+     "DRAFT.md",
+     "ARCHITECTURE.md"
+    ],
+    "reason": "逐项核对 D01-D13 的 default/status/when_to_ask：D01 单选归类并保留关联表迁移路径；D02 缺省归入“未整理”；D03 归类名大小写不敏感自动创建/复用，拼写碎片化时改为仅选既有归类；D04 软删除、默认过滤与 /restore，且明确不引入 purge；D05 本地图标派生、第三方增强可选且失败降级；D06 仅 P1/F14 启用重复检测并支持 allow_duplicate；D07 标题/hostname/描述检索、category 与 q 叠加、只计活动记录；D08 python-web/Python 3.12/SQLite/SSR 与独立 HTTP 验收；D09 默认无认证，局域网/公网暴露时触发认证；D10 Netscape HTML；D11-D13 分别以 deferred/deferred/open 保留云同步、嵌套/标签、快照/死链检测的后期选择。上述默认与 ARCHITECTURE.md 的接口、错误合同和 limits 一致，未把后续能力写成 P0 承诺。"
+   },
+   {
+    "dimension": "runtime_protocol",
+    "outcome": "passed",
+    "files": [
+     "DRAFT.md",
+     "ARCHITECTURE.md"
+    ],
+    "reason": "ARCHITECTURE.md 与 DRAFT.md 的架构、验收适配器合同及 file_plan 明确：交付 profile 为 python-web；验收程序从文件位置导入 common；A01/A05/A09 通过 common.launch_app 从只读 app_root 启动 app/serve.py，在 data_dir/instances/<id> 隔离实例上执行真实表单写入、SIGTERM、同目录重启并读回；测试者 data_dir 根不作为应用数据库；所有用例使用 --base-url；start 为字面 argv；README 要求不得声称通过。未发现与 RUNTIME_CONTRACT.md 的具体冲突。"
+   }
+  ],
+  "suggestions": [
+   "F09 的 reason 写作「场景要求可恢复的失败」，但已确认场景的四条验收并未要求删除或撤销；建议改为以「误存条目清理/上游 Undo」为依据，保留该 P0 能力但不把它表述为场景硬性要求。",
+   "建议在首页或归类视图增加常驻回收站入口（例如 a[data-testid=trash-link] 指向 /?trash=1），否则用户离开删除后的 303 落地页后无法再通过 UI 发现恢复功能；可在 A09 中覆盖该入口。",
+   "明确首页保存表单 category 字段的控件形态（例如 input+datalist），使 F01 的「选择已有归类」与 A03/D03 的「输入新归类名」都能由真实控件完成；当前 ARCHITECTURE 仅声明该字段预填「未整理」。",
+   "在 /categories 明确 rename/delete 表单与具体归类行的关联（行级容器或隐藏 category_id），并声明 move/delete/restore 表单的 action；否则真实表单验收只能依赖通用 testid，默认归类 protected_category 的 form-error 触发方式也不明确。",
+   "F07 的「URL 有误可由 PATCH API 更新」应标注为 API 维护路径，而不是浏览器用户已声明的恢复控件；用户侧恢复仍应落到返回列表或删除后重存。",
+   "在 A04 的 p0_organize.py 用例中补充归类创建/重命名的空名与 121 字符名分支，断言 400 invalid_name、form-error 且归类集合不变。",
+   "将 A12 限定为保存/移动表单的 category/category_id 非法值（空、超长、非法归类），只断言 400 invalid_category，与 ARCHITECTURE.md 的分类表单错误合同及 REVISION.md 的 A12 范围一致。"
+  ],
+  "scope": "Independent dimension-by-dimension specification design review of pinned proposal projections before new programs are authored; no execution or frozen-candidate acceptance. Full research facts and authored programs remain for separate frozen-candidate review.",
+  "proposal_digest": "b82eaafd6126d5e21e1ccd734a590b5e8a417f51497465e72a4574ab20873894",
+  "subreviews": [
+   {
+    "outcome": "passed",
+    "summary": "已按 scn_7756e0007f6a463a97316f3f49c15248「生活待购与灵感收藏夹」的目标与五步流程核对：P0（F01–F11）完整覆盖保存（可选归类或落入默认「未整理」）、新建与移动归类、按归类浏览与计数、关键字检索、按保存时的原始 URL 打开、跨重启持久化，以及失败恢复所需的外壳与校验；没有把不可或缺的捕获、整理、找回步骤推迟到 P1。P1 仅含可选的元数据/图标、导入导出和去重增强；浏览器扩展、云同步、置顶/归档、分享、稍后读、复制 URL、访问计数，以及快照/失效检测等排除或未决项，与场景边界一致，未发现阻断性范围缺口。",
+    "checks": [
+     {
+      "dimension": "scenario_scope",
+      "outcome": "passed",
+      "files": [
+       "DRAFT.md",
+       "ARCHITECTURE.md"
+      ],
+      "reason": "DRAFT 的 P0 将场景第1–5步落到 F01/F02（保存与默认/预置归类）、F03/F04（新建与移动归类）、F05/F06（归类浏览/计数与标题、域名、描述检索）、F07（打开保存时原始 URL）、F08（跨会话/重启持久化），F09–F11 提供清理撤销、校验错误与首启空库外壳；ARCHITECTURE 的预置「未整理/待购/家居改造/以后看看」、分类计数及表单/打开链接契约与这些能力一致。P0 列入 A01–A12，覆盖场景四条验收所涉能力；P1 的 F12–F14 属可延后的成熟增强，不计入核心旅程。"
+     }
+    ],
+    "suggestions": [
+     "F09 的 reason 写作「场景要求可恢复的失败」，但已确认场景的四条验收并未要求删除或撤销；建议改为以「误存条目清理/上游 Undo」为依据，保留该 P0 能力但不把它表述为场景硬性要求。"
+    ],
+    "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+    "review_rules_version": "atlas.current-required-contract.v1",
+    "proposal_digest": "b82eaafd6126d5e21e1ccd734a590b5e8a417f51497465e72a4574ab20873894",
+    "projection_digest": "93bc175692c8b0201299602d6c3ea6f7e87596bf5a34e6c79baaa45a1870f777",
+    "stage": "blueprint-spec-review-1-scenario_scope"
+   },
+   {
+    "outcome": "passed",
+    "summary": "仅就 product_completeness 复核：当前 P0 的 F01–F11 与 A01–A12 已覆盖确认场景的保存、归类、移动、检索、打开及删除/恢复闭环，未发现断链、虚假成功承诺或必须阻断的恢复缺口；程序尚未编写，本结论不包含运行通过声明。",
+    "checks": [
+     {
+      "dimension": "product_completeness",
+      "outcome": "passed",
+      "files": [
+       "DRAFT.md",
+       "ARCHITECTURE.md"
+      ],
+      "reason": "逐行核对 F01–F11：F01/F02 由首页 form[action=/bookmarks/new] 提供保存与默认/新归类；F03 经 a[data-testid=category-manager] 进入 /categories 的新建、重命名、删除表单；F04/F09 由每条 record-row 的 move/delete 表单执行并在 /?trash=1 提供 restore 表单；F05/F06 由侧栏计数、归类链接与检索表单完成浏览和检索；F07 由 record-open-link 与 /go/{id} 完成原 URL 打开；F08 用同一 app_root 与实例数据目录重启验证持久化；F10/F11 提供 form-error、JSON 错误与首页/health 入口。各行均声明了成功状态、303/GET 导航、用户可见失败和修正重试，且与 ARCHITECTURE 的 UI/API 合同一致；未发现 P0 必需步骤被推迟到 P1。"
+     }
+    ],
+    "suggestions": [
+     "建议在首页或归类视图增加常驻回收站入口（例如 a[data-testid=trash-link] 指向 /?trash=1），否则用户离开删除后的 303 落地页后无法再通过 UI 发现恢复功能；可在 A09 中覆盖该入口。",
+     "明确首页保存表单 category 字段的控件形态（例如 input+datalist），使 F01 的「选择已有归类」与 A03/D03 的「输入新归类名」都能由真实控件完成；当前 ARCHITECTURE 仅声明该字段预填「未整理」。",
+     "在 /categories 明确 rename/delete 表单与具体归类行的关联（行级容器或隐藏 category_id），并声明 move/delete/restore 表单的 action；否则真实表单验收只能依赖通用 testid，默认归类 protected_category 的 form-error 触发方式也不明确。",
+     "F07 的「URL 有误可由 PATCH API 更新」应标注为 API 维护路径，而不是浏览器用户已声明的恢复控件；用户侧恢复仍应落到返回列表或删除后重存。"
+    ],
+    "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+    "review_rules_version": "atlas.current-required-contract.v1",
+    "proposal_digest": "b82eaafd6126d5e21e1ccd734a590b5e8a417f51497465e72a4574ab20873894",
+    "projection_digest": "f4ca9aef72ded6035430d83c07a6e370f0581ff1b0df12a87e0b9d9f8d3304a1",
+    "stage": "blueprint-spec-review-1-product_completeness"
+   },
+   {
+    "outcome": "passed",
+    "summary": "architecture_contract 维度未发现阻塞性矛盾：默认归类与补种、SQLite 数据约束、软删除/恢复、归类删除迁移、JSON 与 HTML 错误合同、URL 策略及本地无认证安全边界可由当前架构实现，并与 REVISION.md 的固定约束一致。",
+    "checks": [
+     {
+      "dimension": "architecture_contract",
+      "outcome": "passed",
+      "files": [
+       "DRAFT.md",
+       "ARCHITECTURE.md",
+       "REVISION.md"
+      ],
+      "reason": "DRAFT.md 的 F01-F11 与 ARCHITECTURE.md 的 SQLite 模型一致：预置「未整理」及省略/null category 回退、BOOKMARK.category_id 非空、软删记录在默认列表与计数中排除、回收站恢复、删除归类时活动与软删记录同迁默认归类均有对应事务与 API。API 明确 invalid_url、invalid_category、invalid_name、duplicate_category、protected_category、bad_request、not_found 的 400/404/409 语义，HTML 适配器保留输入并显示 form-error；URL 保留原始字符串、PATCH 变更时重算 hostname，P0 不抓取目标页。D09 的无认证仅限本机或隔离验收网络，加上仅允许 HTTP(S) 与 target=_blank/rel=noopener，未发现与数据或安全合同冲突；F14/A15 仍保持 P1，A02 的单标签主机策略与 REVISION.md 一致。"
+     }
+    ],
+    "suggestions": [],
+    "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+    "review_rules_version": "atlas.current-required-contract.v1",
+    "proposal_digest": "b82eaafd6126d5e21e1ccd734a590b5e8a417f51497465e72a4574ab20873894",
+    "projection_digest": "2f62e8c914b448614277d047f668e7bc34f69adbac1420b2c6ee0d709aef0d91",
+    "stage": "blueprint-spec-review-1-architecture_contract"
+   },
+   {
+    "outcome": "blocked",
+    "summary": "P0/P1 阶段顺序与确认场景的核心旅程基本正确；但 A04/A12 的归类名校验计划与架构中的错误约定冲突，P0 规格需先修正。",
+    "checks": [
+     {
+      "dimension": "phase_acceptance",
+      "outcome": "blocked",
+      "files": [
+       "DRAFT.md",
+       "ARCHITECTURE.md",
+       "REVISION.md"
+      ],
+      "reason": "阶段安排本身符合要求：DRAFT.md 将 F01–F11/A01–A12 放在 P0，覆盖保存、默认归类、归类管理/移动、计数、检索、打开、软删除/恢复与跨重启持久化；F12–F14/A13–A15 仅在 P1，属可选成熟增强，未把确认场景的必需步骤推迟。缺陷在 A04/A12 的归类名校验：A04 目标要求“重名、非法名与默认归类保护”均给出可读 form-error，但 p0_organize.py 只安排了重名 409 duplicate_category 和默认归类保护 400 protected_category，缺少空名/超长名的 invalid_name 分支；A12 却计划通过“保存/移动/归类表单”提交空名、121 字符名并统一断言 400 invalid_category。ARCHITECTURE.md 规定归类管理表单空名/超长名为 400 invalid_name，REVISION.md 也把 A12 固定为 invalid category save/move；按此计划 A12 会断言与架构不兼容的错误码，A04 又缺少其目标要求的校验分支。"
+     }
+    ],
+    "suggestions": [
+     "在 A04 的 p0_organize.py 用例中补充归类创建/重命名的空名与 121 字符名分支，断言 400 invalid_name、form-error 且归类集合不变。",
+     "将 A12 限定为保存/移动表单的 category/category_id 非法值（空、超长、非法归类），只断言 400 invalid_category，与 ARCHITECTURE.md 的分类表单错误合同及 REVISION.md 的 A12 范围一致。"
+    ],
+    "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+    "review_rules_version": "atlas.current-required-contract.v1",
+    "proposal_digest": "b82eaafd6126d5e21e1ccd734a590b5e8a417f51497465e72a4574ab20873894",
+    "projection_digest": "1dc92da9fef62083c0f4df8e8caaad316032d5a65be1060032ad7100588431bc",
+    "stage": "blueprint-spec-review-1-phase_acceptance"
+   },
+   {
+    "outcome": "passed",
+    "summary": "decisions_defaults 设计评审通过：D01-D13 均有明确默认、影响和可执行的 when_to_ask；D01-D10 为已定默认（D05/D06/D10 对应后期能力），D11-D13 以 deferred/open 标明后期或待定，并保留反转触发条件。默认与架构的单选归类、默认收件区、软删除/恢复、P1 去重、检索字段、python-web/SQLite/SSR、无认证及扁平归类一致，未发现破坏核心旅程或当前承诺的矛盾。",
+    "checks": [
+     {
+      "dimension": "decisions_defaults",
+      "outcome": "passed",
+      "files": [
+       "DRAFT.md",
+       "ARCHITECTURE.md"
+      ],
+      "reason": "逐项核对 D01-D13 的 default/status/when_to_ask：D01 单选归类并保留关联表迁移路径；D02 缺省归入“未整理”；D03 归类名大小写不敏感自动创建/复用，拼写碎片化时改为仅选既有归类；D04 软删除、默认过滤与 /restore，且明确不引入 purge；D05 本地图标派生、第三方增强可选且失败降级；D06 仅 P1/F14 启用重复检测并支持 allow_duplicate；D07 标题/hostname/描述检索、category 与 q 叠加、只计活动记录；D08 python-web/Python 3.12/SQLite/SSR 与独立 HTTP 验收；D09 默认无认证，局域网/公网暴露时触发认证；D10 Netscape HTML；D11-D13 分别以 deferred/deferred/open 保留云同步、嵌套/标签、快照/死链检测的后期选择。上述默认与 ARCHITECTURE.md 的接口、错误合同和 limits 一致，未把后续能力写成 P0 承诺。"
+     }
+    ],
+    "suggestions": [],
+    "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+    "review_rules_version": "atlas.current-required-contract.v1",
+    "proposal_digest": "b82eaafd6126d5e21e1ccd734a590b5e8a417f51497465e72a4574ab20873894",
+    "projection_digest": "9f8e40c623fb928ad0f412ed456c84dfad9991dec02259c3f9cf4a634bf4da95",
+    "stage": "blueprint-spec-review-1-decisions_defaults"
+   },
+   {
+    "outcome": "passed",
+    "summary": "runtime_protocol 设计符合隔离验收契约：交付 profile 为 python-web；验收程序以 __file__ 自举 sys.path；所有 Web 用例通过 --base-url；重启用例由 common.launch_app 从只读 app_root 启动同一应用，使用 data_dir/instances/<id> 的独立草稿并真实写入、SIGTERM、同目录重启后经 HTTP 读回；app_root 与测试者 data_dir 的边界、字面 start argv 和无占位符插值均已声明；未发现需阻塞的运行时协议冲突。",
+    "checks": [
+     {
+      "dimension": "runtime_protocol",
+      "outcome": "passed",
+      "files": [
+       "DRAFT.md",
+       "ARCHITECTURE.md"
+      ],
+      "reason": "ARCHITECTURE.md 与 DRAFT.md 的架构、验收适配器合同及 file_plan 明确：交付 profile 为 python-web；验收程序从文件位置导入 common；A01/A05/A09 通过 common.launch_app 从只读 app_root 启动 app/serve.py，在 data_dir/instances/<id> 隔离实例上执行真实表单写入、SIGTERM、同目录重启并读回；测试者 data_dir 根不作为应用数据库；所有用例使用 --base-url；start 为字面 argv；README 要求不得声称通过。未发现与 RUNTIME_CONTRACT.md 的具体冲突。"
+     }
+    ],
+    "suggestions": [],
+    "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+    "review_rules_version": "atlas.current-required-contract.v1",
+    "proposal_digest": "b82eaafd6126d5e21e1ccd734a590b5e8a417f51497465e72a4574ab20873894",
+    "projection_digest": "28f7d24bd55808ec822d1c35273a14e66569ab84e1ccf374612645cf1438d1e9",
+    "stage": "blueprint-spec-review-1-runtime_protocol-v1"
+   }
+  ]
+ },
+ "digest": "5d31b69c08c648f345abfd2ae4717ef013ba95786202db4930db0dafd45946a2"
+}

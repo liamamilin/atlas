@@ -29,3 +29,5 @@
 Sol 独立只读复核确认真实 V1 accepted-facts 重建 RESEARCH.md 与原始 source 字节完全相同，因此没有加入字段顺序等价或放宽 source gate。早期 authored scope 门禁在真实提案与 SPECIFICATION/ARCHITECTURE 保存后、规格审阅和程序生成前；越界产生精确 baseline restoration feedback，再走既有 index1 patch 与稳定的正式 repair 计费。宿主不静默恢复模型字段。最终 scope、预冻结独立语义审阅、冻结后独立审阅均保留。新增 Pipeline 夹具验证 aggregate 分支恢复、0 次重复 generate、0 次 index0 设计/程序、显式 patch 和范围恢复；该夹具不等于真实模型或真实 P0 证据。
 
 恢复入口复核另发现P1：普通 `POST jobs/{id}/retry` 接受 cancelled，可使已有 supersession 的旧任务重新入队并获得新 token。当前生产plan暂停且旧任务未被重试，没有发生双重执行。定点修复在 retry 原事务内检查正式 supersession 记录，返回409，保留旧任务 error/attempt/终态；兼容尚无该表的旧数据库与普通取消重试。该修复后的最终检查单独保存，不能用此前 source 为 ce6631… 的通过结果代替。
+
+独立当前模板合同复核发现恢复执行器在首页或/categories找restore，而当前plan-1定义在/?trash=1；已修复两路径并保留表单提交/API只读确认/计数与迁移断言。新增真实Chromium仅回收站控件的正控及缺失/无效恢复负控通过；machineplan不变，实际P0仍未运行。最终完整本地检查见verification/trash-adapter-final；独立只读复核无新阻断。另核对旧attempt1与当前plan-1的归类文字，未把旧提案歧义误列为当前缺陷。

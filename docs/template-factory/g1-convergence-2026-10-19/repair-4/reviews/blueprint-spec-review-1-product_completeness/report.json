@@ -1,0 +1,26 @@
+{
+ "outcome": "passed",
+ "summary": "仅就 product_completeness 复核：当前 P0 的 F01–F11 与 A01–A12 已覆盖确认场景的保存、归类、移动、检索、打开及删除/恢复闭环，未发现断链、虚假成功承诺或必须阻断的恢复缺口；程序尚未编写，本结论不包含运行通过声明。",
+ "checks": [
+  {
+   "dimension": "product_completeness",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "逐行核对 F01–F11：F01/F02 由首页 form[action=/bookmarks/new] 提供保存与默认/新归类；F03 经 a[data-testid=category-manager] 进入 /categories 的新建、重命名、删除表单；F04/F09 由每条 record-row 的 move/delete 表单执行并在 /?trash=1 提供 restore 表单；F05/F06 由侧栏计数、归类链接与检索表单完成浏览和检索；F07 由 record-open-link 与 /go/{id} 完成原 URL 打开；F08 用同一 app_root 与实例数据目录重启验证持久化；F10/F11 提供 form-error、JSON 错误与首页/health 入口。各行均声明了成功状态、303/GET 导航、用户可见失败和修正重试，且与 ARCHITECTURE 的 UI/API 合同一致；未发现 P0 必需步骤被推迟到 P1。"
+  }
+ ],
+ "suggestions": [
+  "建议在首页或归类视图增加常驻回收站入口（例如 a[data-testid=trash-link] 指向 /?trash=1），否则用户离开删除后的 303 落地页后无法再通过 UI 发现恢复功能；可在 A09 中覆盖该入口。",
+  "明确首页保存表单 category 字段的控件形态（例如 input+datalist），使 F01 的「选择已有归类」与 A03/D03 的「输入新归类名」都能由真实控件完成；当前 ARCHITECTURE 仅声明该字段预填「未整理」。",
+  "在 /categories 明确 rename/delete 表单与具体归类行的关联（行级容器或隐藏 category_id），并声明 move/delete/restore 表单的 action；否则真实表单验收只能依赖通用 testid，默认归类 protected_category 的 form-error 触发方式也不明确。",
+  "F07 的「URL 有误可由 PATCH API 更新」应标注为 API 维护路径，而不是浏览器用户已声明的恢复控件；用户侧恢复仍应落到返回列表或删除后重存。"
+ ],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "review_rules_version": "atlas.current-required-contract.v1",
+ "proposal_digest": "b82eaafd6126d5e21e1ccd734a590b5e8a417f51497465e72a4574ab20873894",
+ "projection_digest": "f4ca9aef72ded6035430d83c07a6e370f0581ff1b0df12a87e0b9d9f8d3304a1",
+ "stage": "blueprint-spec-review-1-product_completeness"
+}

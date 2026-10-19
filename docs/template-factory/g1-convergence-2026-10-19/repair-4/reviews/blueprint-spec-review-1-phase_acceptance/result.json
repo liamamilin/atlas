@@ -1,0 +1,19 @@
+{
+ "summary": "P0/P1 阶段顺序与确认场景的核心旅程基本正确；但 A04/A12 的归类名校验计划与架构中的错误约定冲突，P0 规格需先修正。",
+ "checks": [
+  {
+   "dimension": "phase_acceptance",
+   "outcome": "blocked",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md",
+    "REVISION.md"
+   ],
+   "reason": "阶段安排本身符合要求：DRAFT.md 将 F01–F11/A01–A12 放在 P0，覆盖保存、默认归类、归类管理/移动、计数、检索、打开、软删除/恢复与跨重启持久化；F12–F14/A13–A15 仅在 P1，属可选成熟增强，未把确认场景的必需步骤推迟。缺陷在 A04/A12 的归类名校验：A04 目标要求“重名、非法名与默认归类保护”均给出可读 form-error，但 p0_organize.py 只安排了重名 409 duplicate_category 和默认归类保护 400 protected_category，缺少空名/超长名的 invalid_name 分支；A12 却计划通过“保存/移动/归类表单”提交空名、121 字符名并统一断言 400 invalid_category。ARCHITECTURE.md 规定归类管理表单空名/超长名为 400 invalid_name，REVISION.md 也把 A12 固定为 invalid category save/move；按此计划 A12 会断言与架构不兼容的错误码，A04 又缺少其目标要求的校验分支。"
+  }
+ ],
+ "suggestions": [
+  "在 A04 的 p0_organize.py 用例中补充归类创建/重命名的空名与 121 字符名分支，断言 400 invalid_name、form-error 且归类集合不变。",
+  "将 A12 限定为保存/移动表单的 category/category_id 非法值（空、超长、非法归类），只断言 400 invalid_category，与 ARCHITECTURE.md 的分类表单错误合同及 REVISION.md 的 A12 范围一致。"
+ ]
+}

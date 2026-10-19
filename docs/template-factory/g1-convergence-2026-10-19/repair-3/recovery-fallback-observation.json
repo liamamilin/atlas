@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.g1-recovery-fallback-observation.v1",
+  "job_id": "job_a53c47f3694047489c4f82cfc2e346be",
+  "attempt": 2,
+  "prior_source_tree_digest": "3a6d913fa89dcd003aad9730b4ebb40345791fd9eee7ab3582943a6e2b900e7b",
+  "current_source_tree_digest": "3a4a05c87de1ac2165fff1202833d862dfe50bf385f05930e85c7c5137858cb0",
+  "changed_source_files": [
+    {
+      "path": "ACCEPTED_CASE_FACTS.json",
+      "prior_sha256": "8f237c5c19cc7fafb22e0999a4add0316bf257e66187a5be69921519e729dc10",
+      "current_sha256": "4287828734d7adf1f0e0223ad3ea2164207ddc94fec28ce46857614727011f98",
+      "json_value_equal": true
+    },
+    {
+      "path": "CASE_DESIGN.json",
+      "prior_sha256": "b3eea7dba657992a8921c30f10d3b87704a9ba4862899e6e3984cfd5cea57cec",
+      "current_sha256": "46f88eb6fcfc5990378d35061de81abed60a10e37e092ca712cc8e750899ded0",
+      "json_value_equal": true
+    }
+  ],
+  "input_equal": true,
+  "recovery_used": false,
+  "reason": "Strict full source-byte gate correctly rejected key-order-different host JSON; normal formally budgeted generation path used. No history or source rewritten. Readonly rehearsal reconstructed RESEARCH only and did not represent the actual complete re-render."
+}

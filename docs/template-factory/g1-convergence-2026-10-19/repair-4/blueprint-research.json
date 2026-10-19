@@ -1,0 +1,208 @@
+{
+ "result": {
+  "sources": [
+   {
+    "id": "S02",
+    "name": "ev_ba200adf6e2c_05babdea64ba9858",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "New records are built with id `bm-${crypto.randomUUID()}`, hostname from getHostname(url), and defaults visitCount=0, visitedAt=null, isPinned=false, isArchived=false, createdAt=Date.now(); edits preserve the previous id, isPinned, isArchived, visitCount, createdAt, and visitedAt.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S03",
+    "name": "ev_ba200adf6e2c_06c81a165e03c96a",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "Pin/Unpin and Edit actions are rendered only when the item is not archived, and Edit loads the item's url/title/description/tags/favicon into the dialog.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S04",
+    "name": "ev_ba200adf6e2c_1596da4a90687ca5",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "The Valibot BookmarkFormSchema requires a non-empty URL matching /^https?:\\/\\/(?:[\\w-]+\\.)+[a-zA-Z]{2,}(?:\\/\\S*)?$/ and v.url, a non-empty title up to 100 chars, a non-empty description up to 280 chars, and 1-5 tags each up to 30 chars.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S05",
+    "name": "ev_ba200adf6e2c_2288b28e90cd8450",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "Tab, tag filters, sort, and search are held in component-local tracked state initialized to 'Home', [], 'Recently Added', and '' respectively, with no persistence to Dexie.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S06",
+    "name": "ev_ba200adf6e2c_35e41aab676021eb",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "saveBookmark sets the record in the in-memory map then awaits db.bookmarks.put(bm); deleteBookmark removes from the map then awaits db.bookmarks.delete(id).",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S07",
+    "name": "ev_ba200adf6e2c_4c56ef30a1785be1",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "A Delete action is rendered only for archived items; it calls deleteBookmark and shows an error-type toast with an Undo action that calls saveBookmark(item) to restore the record.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S08",
+    "name": "ev_ba200adf6e2c_5011700a24e503c7",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/includes/utils.ts",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "getHostname returns '' unless the URL matches an http/https regex with a dotted domain, otherwise returns new URL(url).hostname; getBlobUrl caches object URLs per Blob in a WeakMap; formatDate returns 'Never' for falsy timestamps else a locale date string.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S09",
+    "name": "ev_ba200adf6e2c_515aa5d072bd2ec4",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/includes/store.ts",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "A Dexie database named 'BookmarkDB' version 1 declares a single 'bookmarks' EntityTable keyed by id and indexed on createdAt and visitCount.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S10",
+    "name": "ev_ba200adf6e2c_5d51c18a989c01f8",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/index.html",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "index.html defines the #root div and loads /src/index.ts as a module for the Bookmark Manager SPA.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S11",
+    "name": "ev_ba200adf6e2c_6805376f7e2ee383",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/README.md",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "README describes the app as local-first with bookmarks stored in IndexedDB and featuring tagging, sorting by recently added/visited/most visited, and archiving/pinning.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted documentation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S12",
+    "name": "ev_ba200adf6e2c_7150b0ac7a5678db",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "A Copy URL action writes item.url to the clipboard and shows a success toast.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S13",
+    "name": "ev_ba200adf6e2c_86ed2327f33a3ca8",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "An effect on component creation calls db.bookmarks.toArray() and inserts each returned bookmark into an in-memory RippleMap keyed by bookmark id.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S14",
+    "name": "ev_ba200adf6e2c_8e11efc61a4650ba",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "On submit, if no favicon exists and a hostname is derivable, the code fetches a Google s2 favicon proxied through images.weserv.nl inside a try/catch that only logs failure.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S15",
+    "name": "ev_ba200adf6e2c_93ff254508846f11",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "The Visit action builds an updated bookmark with visitedAt=Date.now() and visitCount+1, calls saveBookmark(updated), then opens the URL with window.open(item.url, '_blank', 'noopener,noreferrer').",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S16",
+    "name": "ev_ba200adf6e2c_9ab6b0e51811a16d",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "The displayed list filters by isArchived matching the active tab, requires every selected tag to be present in bookmark.tags, matches search only against bookmark.title.toLowerCase(), and sorts pinned-first then by the chosen sort mode with createdAt descending as fallback.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S17",
+    "name": "ev_ba200adf6e2c_9c7f6060878383fa",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/includes/store.ts",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "The Bookmark type stores id, title, url, hostname, favicon Blob, description, tags string array, isPinned, isArchived, visitCount, createdAt, and visitedAt.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S18",
+    "name": "ev_ba200adf6e2c_a2ebc864c5b6b3e7",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/index.ts",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "The entry point imports index.css, mounts the App component into #root via ripple's mount, and throws if the root element is missing.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S19",
+    "name": "ev_ba200adf6e2c_b1ca64cf2ad02998",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "The Archive/Unarchive action toggles isArchived and, when archiving, forces isPinned=false before saving.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S20",
+    "name": "ev_ba200adf6e2c_c4ad7e52e5713628",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "Tag counts are derived by iterating all in-memory bookmarks and counting each tag occurrence, then sorted alphabetically for the sidebar.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S21",
+    "name": "ev_ba200adf6e2c_ec303a2fd1afa287",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "fetchMeta calls https://api.microlink.io/?url=... and, on success with result.data, sets title/description and fetches the logo through https://images.weserv.nl/; errors are only console.error'd and the finally block resets loading.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   },
+   {
+    "id": "S22",
+    "name": "ev_ba200adf6e2c_f30eb4285ca66219",
+    "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/package.json",
+    "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "facts": "package.json scripts are start, dev, build, lint, typecheck, serve, format, and check; there is no test script and no test dependency.",
+    "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+    "reuse": "Independently accepted code_observation; design adaptation is recorded separately; upstream not run."
+   }
+  ],
+  "summary": "The pinned upstream tree at commit 539881b (github.com/lakhindarpal/bookmark-manager, materialized under source/) is a client-only bookmark manager built with Ripple TS, Vite, Tailwind/DaisyUI, Valibot, and Dexie/IndexedDB. A single Bookmark record type carries id, title, url, hostname, favicon Blob, description, flat tags[], isPinned, isArchived, visitCount, createdAt, visitedAt (source/src/includes/store.ts:3-16). The DB 'BookmarkDB' v1 has one table 'bookmarks' keyed by id with createdAt and visitCount indexes (source/src/includes/store.ts:41-47). The single component App.tsrx implements: an add/edit dialog with Valibot validation (URL http/https, title, description, 1-5 tags), a library grid with Home/Archived tabs, tag-filter sidebar with per-tag counts, title-only search, three sort modes with pinned-first, Visit (increments visitCount/visitedAt then window.open), Copy URL, Pin/Unpin, Edit, Archive/Unarchive, and a Delete action available only on archived items with a 5-second Undo toast. Metadata/favicons are fetched opportunistically from third-party services (api.microlink.io, images.weserv.nl, Google favicon) behind a 'sparkles' button and a fallback path, with failures only console.error'd. No test files, no import/export, no collections/folders, no sync, no preserved page copies, and no test script exist in the supplied manifest.",
+  "gaps": [
+   "Runtime behavior was not observed; all claims are static reading of source files.",
+   "Whether Dexie/IndexedDB persistence behaves correctly in real browsers at this commit is unverified.",
+   "Whether the third-party metadata/favicon endpoints (api.microlink.io, images.weserv.nl, Google s2 favicons) are reachable, rate-limited, or CORS-permitted at runtime is unverified.",
+   "The paired Research Notes referenced by leaf.md were not supplied, so product-level evidence beyond the pinned repository is unavailable.",
+   "No automated tests exist in the manifest, so none of the described behaviors are test-confirmed.",
+   "Behavior of Ripple TS reactivity primitives (track/effect/bindGroup/bindValue) at this pinned version was not validated.",
+   "The full commit tree was inferred from the supplied source_manifest and the on-disk source/ directory; files outside it were not inspected.",
+   "Host excluded unsupported evidence obs-no-test-files: observation cites an unknown source path: source/src",
+   "Host excluded unsupported evidence inf-no-tests: Depends on a quarantined, unlocated observation"
+  ]
+ },
+ "digest": "9053da8cb157b5bec6ce698e163e208b5a500a3c121d12a6b1b8855aadba0238"
+}

@@ -1,0 +1,21 @@
+{
+ "outcome": "passed",
+ "summary": "runtime_protocol 设计符合隔离验收契约：交付 profile 为 python-web；验收程序以 __file__ 自举 sys.path；所有 Web 用例通过 --base-url；重启用例由 common.launch_app 从只读 app_root 启动同一应用，使用 data_dir/instances/<id> 的独立草稿并真实写入、SIGTERM、同目录重启后经 HTTP 读回；app_root 与测试者 data_dir 的边界、字面 start argv 和无占位符插值均已声明；未发现需阻塞的运行时协议冲突。",
+ "checks": [
+  {
+   "dimension": "runtime_protocol",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "ARCHITECTURE.md 与 DRAFT.md 的架构、验收适配器合同及 file_plan 明确：交付 profile 为 python-web；验收程序从文件位置导入 common；A01/A05/A09 通过 common.launch_app 从只读 app_root 启动 app/serve.py，在 data_dir/instances/<id> 隔离实例上执行真实表单写入、SIGTERM、同目录重启并读回；测试者 data_dir 根不作为应用数据库；所有用例使用 --base-url；start 为字面 argv；README 要求不得声称通过。未发现与 RUNTIME_CONTRACT.md 的具体冲突。"
+  }
+ ],
+ "suggestions": [],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "review_rules_version": "atlas.current-required-contract.v1",
+ "proposal_digest": "b82eaafd6126d5e21e1ccd734a590b5e8a417f51497465e72a4574ab20873894",
+ "projection_digest": "28f7d24bd55808ec822d1c35273a14e66569ab84e1ccf374612645cf1438d1e9",
+ "stage": "blueprint-spec-review-1-runtime_protocol-v1"
+}

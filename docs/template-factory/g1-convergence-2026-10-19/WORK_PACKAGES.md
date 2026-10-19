@@ -16,3 +16,9 @@
 合成/fixture/真实Docker基础路径与真实模型应用分开记录。任何累计上限/有效窗口/外部阻塞留正式停止状态，禁止伪造通过。
 
 协议恢复与旧任务重试fence的最终本地检查：`verification/recovery-fenced-final/checks.json`，13项全部通过，源码摘要c5084b5b37c04b32ff0b218c5b08d4484ad8dc00675b918ccbe4883683ad1ae2，执行期间无漂移；571后端/8可选skip、9web单元、17默认E2E、27工厂E2E、20严格Docker/0skip。此前protocol-recovery的2项夹具失败及protocol-recovery-final的旧源码通过均保留。当前准备提交并核对新SHA远端结果，生产仍暂停。
+
+最终修复代码已提交 `76db363df26bec71ce28abc1896b6aba556e9456`，同SHA远端39247348464两job及全部必要step成功，原始日志见ci-recovery-fenced-*。已通过正式API将原job重试为attempt2并恢复原plan。实际全源字节比对发现CASE_DESIGN.json与ACCEPTED_CASE_FACTS.json仅键序不同，严格恢复器拒绝复用；走正式预算生成路径，累计45次CLI、3轮修复。没有改写旧source或账本。完整偏差见repair-3/recovery-fallback-observation.json；先前只读rehearsal不代表实际attempt2复用。当前生成执行中，G1与T08仍未通过/未启动。
+
+## 最终受控停止
+
+C01–C05实现及最新本地13项检查完成；回收站执行器修正、真实Chromium正负控及独立代码复核完成。C06在当前plan-1的phase_acceptance预审受阻，job实际failed，宿主G1_ASSESSMENT为blocked，随后通过正式服务暂停原plan。累计52/500次CLI、4/4轮修复、活动0；五项预审通过、一项阻断。未进入新程序作者/冻结/发布/交接/P0。C07保持not_started，实际T08计划为空、原三场景请求未改。C08交付G1_REPORT/DELIVERY/STOP_RECORD/T08_STATUS及全部原始停止样例，最终代码与证据继续推送原分支。

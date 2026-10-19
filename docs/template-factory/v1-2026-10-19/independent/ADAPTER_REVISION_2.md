@@ -22,3 +22,9 @@ Real runs require a host-pinned response from `GET /api/factory/v1/jobs/{job_id}
 ## Exact preparation checks
 
 The revision is prepared only with synthetic local browser fixtures and budget-context unit fixtures. These checks do not use or produce the real downstream target binding, Docker application run, phase evidence, or G1 result.
+
+## Erratum: trash-view restore path (adapter re-freeze before P0)
+
+Both restore journeys now navigate to the already-promised read-only trash view at `/?trash=1` after checking the active category count, locate the selected `record-restore-form` there, and submit that HTML form. This applies to the primary soft-delete/restore journey and to restoring a soft-deleted record after category deletion has migrated it to `未整理`. The adapter does not require a new trash link, selector, or API restore endpoint; its only required restore control remains `form[data-testid="record-restore-form"]` with the exact `record_id`. The existing independent API read is used to verify that the submitted form actually restored the record.
+
+The Chromium fixture now renders no restore controls on `/` or `/categories` and exposes the two record restore forms only on `/?trash=1`. It verifies both shared restore flows through submitted HTML forms and asserts no API restore request occurred. Negative fixtures still reject a missing restore form and an ineffective restore submission. These are adapter/fixture checks only, not target-application evidence. Re-freeze this adapter contract and runner input before the real P0 execution; `machineplan.json` and its digest remain unchanged.

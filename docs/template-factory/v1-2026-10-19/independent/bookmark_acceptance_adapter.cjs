@@ -208,10 +208,7 @@ async function trashAndRestoreViaUi(page, appUrl, recordId) {
   const categoryRecord = recordsFrom(categoryResponse.data).find(item => item.name === categoryLabel);
   if (!categoryRecord) throw new Error('soft-deleted record category could not be resolved for count check');
   await verifyVisibleCategoryCount(page, categoryRecord.id, 1);
-  const restore = page.locator(`${UI.recordRestore}:has(input[name="record_id"][value="${String(recordId)}"])`);
-  if (await restore.count() !== 1) throw new Error('undo/restore control is missing after soft delete');
-  await clickForm(restore);
-  const restored = await getById(page, recordId);
+  const restored = await restoreViaTrashPage(page, appUrl, recordId);
   if (restored.trashed_at) throw new Error('UI restore did not return the record to the active list');
   await page.goto(checks.rootUrl(appUrl), { waitUntil: 'domcontentloaded' });
   await verifyVisibleCategoryCount(page, categoryRecord.id, 2);
@@ -226,6 +223,16 @@ async function verifyVisibleCategoryCount(page, categoryId, expected) {
   if (activeRows.length !== expected || await count.count() !== 1 || Number((await count.innerText()).trim()) !== activeRows.length) {
     throw new Error(`visible active category count mismatch for ${categoryId}; expected ${expected}`);
   }
+}
+
+async function restoreViaTrashPage(page, appUrl, recordId) {
+  await page.goto(checks.rootUrl(appUrl, { trash: '1' }), { waitUntil: 'domcontentloaded' });
+  const restore = page.locator(`${UI.recordRestore}:has(input[name="record_id"][value="${String(recordId)}"])`);
+  if (await restore.count() !== 1) throw new Error('undo/restore control is missing from the trash view');
+  await clickForm(restore);
+  const restored = await getById(page, recordId);
+  if (!restored || restored.trashed_at) throw new Error('UI restore form did not return the record to the active list');
+  return restored;
 }
 
 async function exerciseCategoryManagement(page, appUrl, token, category) {
@@ -272,10 +279,7 @@ async function exerciseCategoryManagement(page, appUrl, token, category) {
     const name = typeof assigned === 'string' ? assigned : assigned && assigned.name;
     if (name !== '未整理') throw new Error('deleting a category did not move active and soft-deleted records to the default category');
   }
-  const restore = page.locator(`${UI.recordRestore}:has(input[name="record_id"][value="${String(trashedChild.id)}"])`);
-  if (await restore.count() !== 1) throw new Error('migrated soft-deleted record cannot be restored through the UI');
-  await clickForm(restore);
-  const restoredTrashed = await getById(page, trashedChild.id);
+  const restoredTrashed = await restoreViaTrashPage(page, appUrl, trashedChild.id);
   const restoredCategory = restoredTrashed.category ?? restoredTrashed.category_name;
   const restoredName = typeof restoredCategory === 'string' ? restoredCategory : restoredCategory && restoredCategory.name;
   if (restoredTrashed.trashed_at || restoredName !== '未整理') {
@@ -447,6 +451,8 @@ async function verifyPersisted(page, metadata) {
 }
 
 exports.validateUiContract = validateUiContract;
+// Test-only seam used by the synthetic Chromium regression; default adapter API is unchanged.
+exports.__test = Object.freeze({ restoreViaTrashPage });
 exports.run = async ({ page, appUrl, fixtureBase, phase, runId, initialMetadata }) => {
   const token = `independent-${String(runId || 'missing-run-id').replace(/[^a-zA-Z0-9-]/g, '')}`;
   if (!runId) throw new Error('runner must preserve RUN_ID across the container restart');

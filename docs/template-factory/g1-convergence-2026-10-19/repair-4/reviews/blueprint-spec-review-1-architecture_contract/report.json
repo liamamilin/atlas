@@ -1,0 +1,22 @@
+{
+ "outcome": "passed",
+ "summary": "architecture_contract 维度未发现阻塞性矛盾：默认归类与补种、SQLite 数据约束、软删除/恢复、归类删除迁移、JSON 与 HTML 错误合同、URL 策略及本地无认证安全边界可由当前架构实现，并与 REVISION.md 的固定约束一致。",
+ "checks": [
+  {
+   "dimension": "architecture_contract",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md",
+    "REVISION.md"
+   ],
+   "reason": "DRAFT.md 的 F01-F11 与 ARCHITECTURE.md 的 SQLite 模型一致：预置「未整理」及省略/null category 回退、BOOKMARK.category_id 非空、软删记录在默认列表与计数中排除、回收站恢复、删除归类时活动与软删记录同迁默认归类均有对应事务与 API。API 明确 invalid_url、invalid_category、invalid_name、duplicate_category、protected_category、bad_request、not_found 的 400/404/409 语义，HTML 适配器保留输入并显示 form-error；URL 保留原始字符串、PATCH 变更时重算 hostname，P0 不抓取目标页。D09 的无认证仅限本机或隔离验收网络，加上仅允许 HTTP(S) 与 target=_blank/rel=noopener，未发现与数据或安全合同冲突；F14/A15 仍保持 P1，A02 的单标签主机策略与 REVISION.md 一致。"
+  }
+ ],
+ "suggestions": [],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "review_rules_version": "atlas.current-required-contract.v1",
+ "proposal_digest": "b82eaafd6126d5e21e1ccd734a590b5e8a417f51497465e72a4574ab20873894",
+ "projection_digest": "2f62e8c914b448614277d047f668e7bc34f69adbac1420b2c6ee0d709aef0d91",
+ "stage": "blueprint-spec-review-1-architecture_contract"
+}
