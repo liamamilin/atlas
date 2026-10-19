@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const checks = require('./bookmark_contract_checks.cjs');
 
 const target = { id: 'target-1', title: 'Acceptance token-1', url: 'http://fixture/original', category: 'Destination' };
-const categoryControl = { id: 'control-1', title: 'Unrelated category control', url: 'http://fixture/second', category: 'Control' };
+const categoryControl = { id: 'control-1', title: 'Cross-category token-1 control', url: 'http://fixture/second', category: 'Control' };
 const keywordControl = { id: 'keyword-control-1', title: 'Unrelated keyword control', url: 'http://fixture/keyword', category: 'Destination' };
 
 assert.equal(checks.rootUrl('http://127.0.0.1:8000/', { category: 'a b', q: 'x' }),
@@ -18,7 +18,10 @@ assert.throws(() => checks.assertMoveState({ record: { ...target, category: '待
   newCategory: 'Destination', oldCategoryRows: [target], newCategoryRows: [target] }), /no-op|filters/);
 
 checks.assertFindState({ recordId: target.id, categoryControlId: categoryControl.id, keywordControlId: keywordControl.id,
-  byCategory: [target, keywordControl], byCombined: [target], byKeyword: [target], keywordMiss: [] });
+  byCategory: [target, keywordControl], byCombined: [target], byKeyword: [target, categoryControl], keywordMiss: [] });
+// A query-only implementation must fail: the same-keyword control is in another category.
+assert.throws(() => checks.assertFindState({ recordId: target.id, categoryControlId: categoryControl.id, keywordControlId: keywordControl.id,
+  byCategory: [target, keywordControl], byCombined: [target, categoryControl], byKeyword: [target, categoryControl], keywordMiss: [] }), /filters/);
 assert.throws(() => checks.assertFindState({ recordId: target.id, categoryControlId: categoryControl.id, keywordControlId: keywordControl.id,
   byCategory: [target, categoryControl, keywordControl], byCombined: [target], byKeyword: [target], keywordMiss: [] }), /filters/);
 assert.throws(() => checks.assertFindState({ recordId: target.id, categoryControlId: categoryControl.id, keywordControlId: keywordControl.id,

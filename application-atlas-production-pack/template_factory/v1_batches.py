@@ -901,10 +901,19 @@ class BatchService:
         if batch:
             with self.store.connect() as con:
                 related = [self.store._job(r) for r in con.execute("SELECT * FROM job WHERE json_extract(snapshot,'$.v1.plan_id')=? ORDER BY created_at,rowid", (plan_id,))]
+                superseded = {row[0]: row[1] for row in con.execute(
+                    "SELECT old_job_id,successor_job_id FROM tf_job_supersession WHERE plan_id=?", (plan_id,)
+                )} if con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='tf_job_supersession'").fetchone() else {}
+            for job in related:
+                if job["id"] in superseded:
+                    job["superseded_by"] = superseded[job["id"]]
+            operational_jobs = [job for job in related if job["id"] not in superseded]
             jobs = related
             batch["jobs"] = related
             if batch["state"] not in {"paused", "cancelled"}:
-                batch["state"] = "running" if any(j["state"] in {"queued", "running"} for j in related) else "completed" if all(j["state"] == "completed" for j in related) else "needs_attention"
+                batch["state"] = "running" if any(j["state"] in {"queued", "running"} for j in operational_jobs) else "completed" if operational_jobs and all(j["state"] == "completed" for j in operational_jobs) else "needs_attention"
+        else:
+            superseded = {}
         n = len(plan["seeds"])
         sample_ids = [s["scenario"]["id"] for s in plan["seeds"] if s["runtime_sample"]]
         sample_passed = [s["scenario"]["id"] for s in plan["seeds"] if s["runtime_sample"] and products.get(s["product_id"], {}).get("p0_runtime")]
@@ -913,7 +922,9 @@ class BatchService:
                   "reviewed_products": sum(p["reviewed"] for p in products.values()),
                   "published_products": sum(p["published"] for p in products.values()),
                   "p0_runtime_products": sum(p["p0_runtime"] for p in products.values()),
-                  "queue_completed": sum(j["state"] == "completed" for j in jobs), "queue_total": len(jobs),
+                  "queue_completed": sum(j["state"] == "completed" for j in jobs if j["id"] not in superseded),
+                  "queue_total": sum(j["id"] not in superseded for j in jobs),
+                  "superseded_history_jobs": len(superseded),
                   "sample_passed": len(sample_passed), "sample_required": len(sample_ids)}
         quality = "not_run" if not batch else "in_progress"
         if batch and batch["state"] in {"completed", "needs_attention", "cancelled"}:
@@ -925,7 +936,7 @@ class BatchService:
                 "runtime_targets": [{"artifact_id": a["id"], "artifact_digest": a["digest"], "run_id": r["id"], "phase_status": r.get("phase_status"), "target_binding": r.get("target_binding"), "environment": r.get("environment"), "report": r.get("job_id")} for a in artifacts for r in a["acceptances"] if r.get("method") == "blueprint-runtime"],
                 "runtime_sampling_gate": "passed" if len(sample_ids) >= 3 and sample_ids == sample_passed else "not_passed",
                 "failed_items": [{"job_id": j["id"], "stage": j["stage"], "state": j["state"], "error": j["error"],
-                                  "recovery": "/api/factory/jobs/" + j["id"] + "/retry"} for j in jobs if j["state"] in {"failed", "interrupted", "needs_review", "paused_budget"}],
+                                  "recovery": "/api/factory/jobs/" + j["id"] + "/retry"} for j in jobs if j["id"] not in superseded and j["state"] in {"failed", "interrupted", "needs_review", "paused_budget"}],
                 "budget": ledger.status(), "provider_requests": None, "cost": None,
                 "next_batch": {"automatic_expansion": False, "recommendation": "Review this fixed batch, address missing evidence, then explicitly freeze the next range."}}
         from .v1_reporting import enrich_report

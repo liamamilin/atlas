@@ -280,7 +280,7 @@ def run_research(pipeline, job, attempt, agent, stage, checkpoint):
     def deadline_fetch(url, limit=2_000_000):
         from .budget import BudgetLedger
         remaining = BudgetLedger(store, campaign_id=identity["campaign_id"]).phase_remaining(
-            identity["product_id"], identity["segment"]
+            identity["product_id"], identity["segment"], plan_id=identity.get("plan_id")
         )
         if remaining is not None and remaining <= 0:
             raise FactoryError("case research segment deadline exhausted", "budget_deadline", 409)

@@ -14,7 +14,7 @@ function assertMoveState({ record, recordId, newCategory, oldCategoryRows, newCa
 function assertFindState({ recordId, categoryControlId, keywordControlId, byCategory, byCombined, byKeyword, keywordMiss }) {
   if (!hasId(byCategory, recordId) || hasId(byCategory, categoryControlId)
       || !hasId(byCombined, recordId) || hasId(byCombined, categoryControlId) || hasId(byCombined, keywordControlId)
-      || !hasId(byKeyword, recordId) || hasId(byKeyword, categoryControlId) || hasId(byKeyword, keywordControlId)
+      || !hasId(byKeyword, recordId) || !hasId(byKeyword, categoryControlId) || hasId(byKeyword, keywordControlId)
       || hasId(keywordMiss, recordId)) {
     throw new Error('category or keyword filters failed to distinguish target from control/nonmatching rows');
   }

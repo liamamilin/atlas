@@ -578,6 +578,7 @@ def queue_development(store, artifact, value):
                         v1["product_id"],
                         "application-development:" + request_digest,
                         con=con,
+                        plan_id=v1.get("plan_id"),
                     )
                 con.execute(
                     "INSERT INTO batch VALUES(?,?,?,?)",

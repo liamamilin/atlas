@@ -19,12 +19,15 @@ from template_factory.cognition import (
     apply_spec_revision,
     pinned_research,
     research_context,
+    require_aggregate_semantic_review_pass,
     scoped_file_plan,
+    validate_aggregate_semantic_review,
     validate_file_plan,
     validate_research,
     validate_review,
 )
 from template_factory.budget import BudgetLedger
+from template_factory.contract_scope import aggregate_semantic_budget_stage
 from template_factory.pipeline import Pipeline
 from template_factory.store import FactoryError, canonical, digest
 
@@ -182,6 +185,29 @@ class FakeCognitionCLI:
                     "limits",
                 ]
             }
+            required = [
+                feature for feature in spec["features"]
+                if feature.get("phase") == "P0"
+                and feature.get("applicability") == "current required"
+            ]
+            spec["contract_coverage"] = {
+                "schema": "atlas.contract-coverage.v1",
+                "review_rules_version": "atlas.current-required-contract.v1",
+                "features": [
+                    {
+                        "feature_id": feature["id"],
+                        "design_basis": "Confirmed scenario workflow",
+                        "entry": "Reachable application form or supporting journey",
+                        "action": "Submit the documented user action",
+                        "success_state": "Expected persistent record state",
+                        "navigation": "Return to the resulting list",
+                        "failure": "Visible validation error",
+                        "recovery": "Correct input and resubmit",
+                        "acceptance_ids": list(feature["acceptance"]),
+                    }
+                    for feature in required
+                ],
+            }
             if self.bad_structure_once:
                 spec["features"][0]["sources"] = ["missing"]
                 self.bad_structure_once = False
@@ -247,6 +273,21 @@ class FakeCognitionCLI:
                     if any(path not in supplied["source_inventory"] for path in row["files"])
                 ]
             }
+        if stage == "aggregate-semantic-review":
+            supplied = json.loads((directory / "input.json").read_text())
+            outcome = getattr(self, "aggregate_semantic_outcome", "passed")
+            check_outcome = "blocked" if outcome == "blocked" else outcome
+            return {
+                "identity": supplied["identity"],
+                "outcome": outcome,
+                "summary": "Synthetic semantic review fixture; no model-quality evidence.",
+                "checks": [
+                    {"id": "assertion_intent_preserved", "outcome": check_outcome, "reason": "Fixture marks the program diff as a weakened assertion." if outcome == "blocked" else "Fixture pass only."},
+                    {"id": "scope_fidelity", "outcome": "passed", "reason": "Fixture scope is exact."},
+                    {"id": "case_adaptation", "outcome": "passed", "reason": "Fixture case adaptation is not evaluated."},
+                ],
+                "findings": ([{"severity": "blocker", "basis": "Synthetic fixture deliberately removed the category-management acceptance assertions."}] if outcome == "blocked" else []),
+            }
         if stage == "cognitive-review":
             return {
                 "outcome": "passed",
@@ -302,6 +343,51 @@ class CognitionTests(unittest.TestCase):
 
     tearDown = blueprint_fixtures.BlueprintTests.tearDown
     data = blueprint_fixtures.BlueprintTests.data
+
+    def test_aggregate_semantic_review_requires_bound_fully_passed_findings(self):
+        identity = {
+            "scope_digest": "scope", "diff_digest": "diff", "baseline_digest": "baseline",
+            "candidate_authored_digest": "authored", "baseline_program_digest": "program-old",
+            "candidate_program_digest": "program-new",
+        }
+        report = {
+            "identity": identity, "outcome": "passed", "summary": "All semantic checks passed.",
+            "checks": [
+                {"id": key, "outcome": "passed", "reason": "Reviewed exact authored and program content."}
+                for key in ("assertion_intent_preserved", "scope_fidelity", "case_adaptation")
+            ],
+            "findings": [],
+        }
+        self.assertEqual(validate_aggregate_semantic_review(report, identity), report)
+        self.assertEqual(require_aggregate_semantic_review_pass(report), report)
+        for invalid in (
+            {**report, "identity": {**identity, "diff_digest": "other"}},
+        ):
+            with self.subTest(invalid=invalid), self.assertRaises(FactoryError):
+                validate_aggregate_semantic_review(invalid, identity)
+        for nonpassing in (
+            {**report, "findings": [{"severity": "uncertain", "basis": "Unresolved semantic evidence."}]},
+            {**report, "checks": [*report["checks"][:-1], {**report["checks"][-1], "outcome": "uncertain"}]},
+            {**report, "outcome": "blocked"},
+        ):
+            self.assertEqual(validate_aggregate_semantic_review(nonpassing, identity), nonpassing)
+            with self.assertRaises(FactoryError):
+                require_aggregate_semantic_review_pass(nonpassing)
+
+    def test_new_aggregate_revision_has_a_first_call_stage_under_same_retry_scope(self):
+        ledger = BudgetLedger(self.store, campaign_id="aggregate-semantic-stage-test")
+        old_stage = aggregate_semantic_budget_stage("a" * 64)
+        new_stage = aggregate_semantic_budget_stage("b" * 64)
+        self.assertNotEqual(old_stage, new_stage)
+        first = ledger.reserve("product", "G1", "review", 60, stage=old_stage,
+                               retry_scope="aggregate-semantic-review", job_id="old-revision")
+        ledger.mark_started(first["id"])
+        ledger.finish(first["id"], "completed")
+        # A changed semantic digest is a new official review operation; its
+        # initial call is not charged as a transient retry of the old input.
+        second = ledger.reserve("product", "G1", "review", 60, stage=new_stage,
+                                retry_scope="aggregate-semantic-review", job_id="new-revision")
+        self.assertIsNotNone(second["id"])
 
     def test_review_source_prefix_maps_only_to_an_existing_exact_file(self):
         report = {
@@ -1483,6 +1569,7 @@ class CognitionTests(unittest.TestCase):
                 "phases",
                 "acceptance",
                 "limits",
+                "contract_coverage",
             },
         )
         self.assertTrue(

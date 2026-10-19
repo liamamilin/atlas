@@ -191,6 +191,7 @@ class Pipeline:
                 budget_options = {"budget_required": True, "budget": {
                     "ledger": ledger,
                     "identity": identity["product_id"], "phase": identity["segment"],
+                    "plan_id": identity.get("plan_id"),
                     "stage": operation, "retry_scope": budget_scope or retry_scope, "job_id": jid,
                     **({"retry": retry} if retry is not None else {}),
                     "kind": "review" if "review" in name else "research" if "case-" in name else "production",

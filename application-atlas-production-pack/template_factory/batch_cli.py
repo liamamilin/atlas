@@ -25,6 +25,11 @@ def main(argv=None):
     for name in ("status", "report", "pause", "resume", "cancel"):
         sub = commands.add_parser(name)
         sub.add_argument("plan_id")
+    amendment = commands.add_parser("amendment-register", help="Append one narrowly authorized budget amendment")
+    amendment.add_argument("--request", type=Path, required=True)
+    recovery = commands.add_parser("resume-product", help="Supersede one paused G1 job with a scoped product repair")
+    recovery.add_argument("plan_id")
+    recovery.add_argument("--request", type=Path, required=True)
     args = parser.parse_args(argv)
     store = FactoryStore(args.root, args.pack)
     service = BatchService(store)
@@ -33,6 +38,14 @@ def main(argv=None):
             result = service.preview(json.loads(args.request.read_text()))
         elif args.command == "run":
             result = service.run(args.plan_id, {"expected_plan_digest": args.expected_plan_digest, "idempotency_key": args.idempotency_key})
+            ensure_worker(store)
+        elif args.command == "amendment-register":
+            from .budget import BudgetAmendmentService
+            request = json.loads(args.request.read_text())
+            result = BudgetAmendmentService(store, campaign_id=request.get("campaign_id", "atlas-v1-first-production-2026-10-19")).register(request)
+        elif args.command == "resume-product":
+            from .product_recovery import ProductRecoveryService
+            result = ProductRecoveryService(store).resume_product(args.plan_id, json.loads(args.request.read_text()))
             ensure_worker(store)
         elif args.command in {"status", "report"}:
             result = service.report(args.plan_id)

@@ -14,6 +14,42 @@ def dispatch_v1(method, route, query, body, store):
     from .worker import ensure_worker
     library = CaseLibrary(store)
     params = parse_qs(query)
+    if route == "budget/amendments":
+        from .budget import BudgetAmendmentService, BudgetLedger
+        campaign_id = body.get("campaign_id") if method == "POST" else params.get("campaign_id", ["atlas-v1-first-production-2026-10-19"])[0]
+        service_amendment = BudgetAmendmentService(store, campaign_id=campaign_id)
+        if method == "POST":
+            return service_amendment.register(body), 201
+        if method == "GET":
+            return {"campaign_id": campaign_id, "amendments": service_amendment.list(),
+                    "budget": BudgetLedger(store, campaign_id=campaign_id).snapshot()}, 200
+    match = re.fullmatch(r"jobs/(job_[a-f0-9]{32})/effective-budget", route)
+    if method == "GET" and match:
+        from .budget import BudgetLedger
+        job = store.job(match[1])
+        v1 = job.get("snapshot", {}).get("v1", {})
+        if (not v1 or v1.get("segment") not in {"G1", "T08"}
+                or not v1.get("campaign_id") or not v1.get("plan_id") or not v1.get("product_id")):
+            raise FactoryError("job has no G1 budget binding", "budget_binding_missing", 409)
+        plan = BatchService(store).plan(v1["plan_id"])
+        seeds = [seed for seed in plan.get("seeds", []) if seed.get("product_id") == v1["product_id"]]
+        if (plan.get("campaign_id") != v1["campaign_id"] or plan.get("segment") != v1["segment"]
+                or len(seeds) != 1):
+            raise FactoryError("job budget identity does not match its fixed plan", "budget_binding_missing", 409)
+        return BudgetLedger(store, campaign_id=v1["campaign_id"]).effective_deadline_snapshot(
+            v1["product_id"], v1["segment"], plan_id=v1["plan_id"], job_id=job["id"]), 200
+    match = re.fullmatch(r"plans/(plan_[a-f0-9]{32})/budget", route)
+    if method == "GET" and match:
+        from .budget import BudgetLedger
+        plan = BatchService(store).plan(match[1])
+        product_id = params.get("product_id", [None])[0]
+        seeds = [seed for seed in plan.get("seeds", []) if seed.get("product_id") == product_id]
+        if (len(seeds) != 1 or not product_id
+                or plan.get("segment") not in {"G1", "T08"}
+                or not plan.get("campaign_id")):
+            raise FactoryError("product does not uniquely bind to this plan", "budget_binding_missing", 404)
+        return BudgetLedger(store, campaign_id=plan["campaign_id"]).effective_deadline_snapshot(
+            product_id, plan["segment"], plan_id=plan["id"]), 200
     if method == "GET" and route == "applications":
         return library.list_apps(), 200
     if method == "GET" and route == "cases":
@@ -38,7 +74,7 @@ def dispatch_v1(method, route, query, body, store):
     service = BatchService(store)
     if method == "POST" and route == "plans/preview":
         return service.preview(body), 201
-    match = re.fullmatch(r"plans/(plan_[a-f0-9]{32})(?:/(run|report|pause|resume|cancel))?", route)
+    match = re.fullmatch(r"plans/(plan_[a-f0-9]{32})(?:/(run|report|pause|resume|resume-product|cancel))?", route)
     if match:
         pid, action = match[1], match[2]
         if method == "GET" and not action:
@@ -51,6 +87,11 @@ def dispatch_v1(method, route, query, body, store):
             return result, 200
         if method == "POST" and action == "run":
             result = service.run(pid, body)
+            ensure_worker(store)
+            return result, 202
+        if method == "POST" and action == "resume-product":
+            from .product_recovery import ProductRecoveryService
+            result = ProductRecoveryService(store).resume_product(pid, body)
             ensure_worker(store)
             return result, 202
         if method == "POST" and action in {"pause", "resume", "cancel"}:

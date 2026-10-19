@@ -702,6 +702,40 @@ def verify_network_none(meta):
         raise RuntimeError("network=none container unexpectedly exposes an effective host port")
 
 
+def read_pinned_budget_context(path, expected_sha256, expected_binding):
+    if not path.is_file() or path.is_symlink():
+        raise ValueError("official effective-budget context must be a regular non-symlink JSON file")
+    actual_sha = sha256(path)
+    if actual_sha != expected_sha256:
+        raise ValueError("effective-budget context SHA-256 differs from the host-pinned digest")
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"effective-budget context is not readable JSON: {exc}") from exc
+    if not isinstance(payload, dict) or payload.get("schema") != "atlas.g1-effective-budget.v1":
+        raise ValueError("effective-budget context has an unexpected schema")
+    binding = payload.get("binding")
+    if not isinstance(binding, dict) or binding != expected_binding:
+        raise ValueError("effective-budget context binding does not match the selected runtime job")
+    deadline = payload.get("effective_deadline")
+    generated = payload.get("generated_at")
+    if not isinstance(deadline, (int, float)) or isinstance(deadline, bool):
+        raise ValueError("effective-budget context has no numeric effective_deadline")
+    if not isinstance(generated, (int, float)) or isinstance(generated, bool):
+        raise ValueError("effective-budget context has no numeric generated_at")
+    if payload.get("deadline_source") not in ("base", "amendment"):
+        raise ValueError("effective-budget context has an unknown deadline source")
+    if binding.get("segment") == "T08" and payload.get("deadline_source") != "base":
+        raise ValueError("T08 cannot use the G1 amendment deadline")
+    if payload.get("deadline_source") == "amendment" and (not payload.get("amendment_id") or not payload.get("activated_at")):
+        raise ValueError("amended effective deadline lacks its official amendment and activation references")
+    if generated > time.time() + 5:
+        raise ValueError("effective-budget context timestamp is in the future")
+    if deadline <= time.time():
+        raise ValueError("effective production deadline has expired")
+    return payload
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--bundle", required=True, type=Path,
@@ -723,6 +757,15 @@ def main():
     parser.add_argument("--suite-digest", required=True)
     parser.add_argument("--case-basis-digest", required=True)
     parser.add_argument("--plan-digest", required=True)
+    parser.add_argument("--budget-context", required=True, type=Path,
+                        help="Host-pinned JSON response from the official effective-budget API for the actual runtime job")
+    parser.add_argument("--budget-context-sha256", required=True,
+                        help="Host-pinned SHA-256 of the official effective-budget response")
+    parser.add_argument("--campaign-id", required=True)
+    parser.add_argument("--segment", choices=("G1", "T08"), default="G1")
+    parser.add_argument("--plan-id", required=True)
+    parser.add_argument("--product-id", required=True)
+    parser.add_argument("--job-id", required=True)
     args = parser.parse_args()
     if not args.scenario_id.startswith("scn_"):
         parser.error("--scenario-id must be a real scn_ identifier")
@@ -738,6 +781,17 @@ def main():
         parser.error("required assertions must be a non-empty JSON array of assertion IDs")
     if len(set(required_assertions)) != len(required_assertions):
         parser.error("required assertion IDs must be unique")
+    if not re.fullmatch(r"[0-9a-f]{64}", args.budget_context_sha256):
+        parser.error("--budget-context-sha256 must be a lowercase SHA-256 digest")
+    expected_budget_binding = {
+        "campaign_id": args.campaign_id, "plan_id": args.plan_id, "product_id": args.product_id,
+        "segment": args.segment, "job_id": args.job_id,
+    }
+    try:
+        budget_context = read_pinned_budget_context(args.budget_context, args.budget_context_sha256,
+                                                    expected_budget_binding)
+    except ValueError as exc:
+        parser.error(str(exc))
     for label, value in (("template digest", args.template_digest), ("archive SHA-256", args.archive_sha256), ("suite digest", args.suite_digest),
                          ("case basis digest", args.case_basis_digest), ("plan digest", args.plan_digest)):
         if not re.fullmatch(r"[0-9a-f]{64}", value):
@@ -798,6 +852,16 @@ def main():
         "template_digest": args.template_digest,
         "suite_digest": args.suite_digest,
         "case_basis_digest": args.case_basis_digest,
+        "budget_context": {
+            "schema": budget_context["schema"],
+            "binding": budget_context["binding"],
+            "effective_deadline": budget_context["effective_deadline"],
+            "deadline_source": budget_context["deadline_source"],
+            "amendment_id": budget_context.get("amendment_id"),
+            "activated_at": budget_context.get("activated_at"),
+            "generated_at": budget_context["generated_at"],
+            "file_sha256": args.budget_context_sha256,
+        },
         "plan_digest": args.plan_digest,
         "plan_file": str(frozen_plan_path),
         "plan_file_sha256": frozen_plan_hash,
@@ -816,7 +880,7 @@ def main():
         "app_url": app_url,
         "acceptance_adapter": str(args.acceptance_adapter.resolve()),
         "acceptance_adapter_sha256": sha256(args.acceptance_adapter),
-        "acceptance_adapter_version": "bookmark-independent-adapter/1.0.0",
+        "acceptance_adapter_version": "bookmark-independent-adapter/2.0.0",
         "fixture_base": fixture_base,
         "browser_policy": "Chromium requests permitted only to exact app origin and exact local fixture origin; all other requests aborted",
         "docker_network_mode": "none; no container network interface",
@@ -858,9 +922,20 @@ def main():
         report["stage_events"].append({"stage": name, "state": "completed", "at": time.time(), "details": details or {}})
         persist()
 
+    def ensure_budget_active(boundary):
+        current = read_pinned_budget_context(args.budget_context, args.budget_context_sha256,
+                                             expected_budget_binding)
+        if current["effective_deadline"] != budget_context["effective_deadline"]:
+            raise RuntimeError("effective G1 deadline changed after the host-pinned snapshot")
+        report.setdefault("budget_checks", []).append({"boundary": boundary, "at": time.time(),
+                                                       "effective_deadline": current["effective_deadline"],
+                                                       "context_sha256": args.budget_context_sha256})
+        persist()
+
     # This first durable snapshot precedes creation of local servers or a container.
     persist()
     try:
+        ensure_budget_active("before-local-runtime-setup")
         stage("temporary_data_setup")
         temp_root.mkdir(mode=0o700)
         data_dir.mkdir()
@@ -909,6 +984,7 @@ def main():
         })
 
         stage("docker_daemon_preflight")
+        ensure_budget_active("before-docker-preflight")
         docker("info", timeout=10)
         stage_done("docker_daemon_preflight")
         stage("local_image_preflight")
@@ -989,6 +1065,7 @@ def main():
         stage_done("browser_setup", {"executable": module_result.stdout})
 
         def run_phase(phase, run_id=None):
+            ensure_budget_active(f"before-ui-{phase}")
             stage(f"ui_{phase}")
             phase_env["PHASE"] = phase
             phase_required = (sorted(set(required_assertions) - restart_assertions)
@@ -1018,6 +1095,7 @@ def main():
             persist()
             if proc.returncode:
                 raise RuntimeError(f"Chromium UI phase {phase} failed (exit {proc.returncode}): {proc.stderr[-4000:]}")
+            ensure_budget_active(f"after-ui-{phase}")
             parsed = json.loads(proc.stdout)
             assertions = parsed.get("assertions") if isinstance(parsed, dict) else None
             if not isinstance(assertions, list):
@@ -1041,6 +1119,7 @@ def main():
         stage_done("pre_restart_snapshot", {"started_at": before_restart["state"]["StartedAt"]})
 
         stage("docker_restart")
+        ensure_budget_active("before-container-restart")
         restart_output = docker("restart", "--time", "5", container, timeout=30).stdout.strip()
         stage_done("docker_restart", {"stdout": restart_output})
         stage("post_restart_readiness")
@@ -1170,6 +1249,11 @@ def main():
                 break
             phase_assertions.extend({"phase": phase, **item} for item in phase_result.get("assertions", []))
         if report.get("status") == "passed":
+            try:
+                ensure_budget_active("before-phase-proof")
+            except (ValueError, RuntimeError) as exc:
+                report.update(status="failed", failure_kind="budget_deadline", error=str(exc))
+        if report.get("status") == "passed":
             proof = {
                 "schema": "atlas.phase-evidence.v1",
                 "requirement_id": "independent-core-journey",
@@ -1184,6 +1268,8 @@ def main():
                 "template_digest": args.template_digest,
                 "suite_digest": args.suite_digest,
                 "case_basis_digest": args.case_basis_digest,
+                "budget_context": report.get("budget_context"),
+                "budget_checks": report.get("budget_checks", []),
                 "actual_assertions": phase_assertions,
                 "environment": {
                     "profile": "python-web", "os": os.sys.platform,

@@ -8,7 +8,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from template_factory.budget import BudgetLedger
+from template_factory.budget import BudgetAmendmentService, BudgetLedger, G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_OLD_DEADLINE, G1_AMENDMENT_PLAN, G1_AMENDMENT_PRODUCT, G1_AUTHORIZATION_SOURCE_DIGEST
 from template_factory.cli import CLI
 from template_factory.pipeline import _budget_next_retry, _budget_operation_identity, _budget_prior_calls, _budget_scope_history, _is_forced_transient_retry, _stable_retry_scope
 from template_factory.store import FactoryError, FactoryStore
@@ -29,6 +29,107 @@ class FactoryBudgetV1Tests(unittest.TestCase):
 
     def reserve(self, identity="product-a", phase="G1", kind="production", **kwargs):
         return self.ledger.reserve(identity, phase, kind, 3600, **kwargs)
+
+    def _amendment_request(self, **overrides):
+        return {"product_id": G1_AMENDMENT_PRODUCT, "plan_id": G1_AMENDMENT_PLAN,
+                "source_ref": "ATLAS_G1_CONVERGENCE_CODEX_INSTRUCTIONS.txt",
+                "source_digest": G1_AUTHORIZATION_SOURCE_DIGEST, "summary": "User-authorized G1 bounded amendment",
+                "reason": "Finish the explicitly authorized single G1 continuation.",
+                "idempotency_key": "g1-continuation-v1", **overrides}
+
+    def _seed_original_g1_deadline(self):
+        with self.store.connect(True) as con:
+            con.execute("INSERT INTO tf_budget_phase VALUES(?,?,?,?,?)",
+                        (G1_AMENDMENT_CAMPAIGN, "__campaign_segment__", "G1", 100.0, G1_AMENDMENT_OLD_DEADLINE))
+            for index in range(2):
+                con.execute("INSERT INTO tf_budget_repair VALUES(?,?,?,?)",
+                            (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT, f"old-repair-{index}", 100.0 + index))
+            for index in range(42):
+                con.execute("INSERT INTO tf_budget_reservation(id,campaign_id,identity,phase,kind,status,created,group_kind) VALUES(?,?,?,?,?,?,?,?)",
+                            (f"old-reservation-{index}", G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT, "G1", "production", "completed", 500.0 + index, "production"))
+
+    def test_g1_amendment_is_scoped_append_only_and_activates_once(self):
+        self.now[0] = G1_AMENDMENT_OLD_DEADLINE + 10
+        service = BudgetAmendmentService(self.store, clock=lambda: self.now[0])
+        ledger = BudgetLedger(self.store, campaign_id=G1_AMENDMENT_CAMPAIGN, clock=lambda: self.now[0])
+        with self.assertRaises(FactoryError) as caught:
+            service.register(self._amendment_request(product_id="other-product"))
+        self.assertEqual(caught.exception.code, "budget_amendment_scope")
+        self._seed_original_g1_deadline()
+        self.assertEqual(ledger.snapshot()["cli_sessions_used"], 42)
+        self.assertEqual(ledger.snapshot()["limits"]["cli_sessions"], 500)
+        self.assertEqual(ledger.snapshot()["limits"]["product_repairs"], 2)
+        amendment = service.register(self._amendment_request())
+        self.assertEqual(amendment["baseline_repair_count"], 2)
+        self.assertEqual(amendment["baseline_cli_sessions"], 42)
+        self.assertIsNone(amendment["activated_at"])
+        replay = service.register(self._amendment_request())
+        self.assertEqual(replay["id"], amendment["id"])
+        self.assertEqual(len(service.list()), 1)
+        with self.assertRaises(FactoryError):
+            ledger.record_repair(G1_AMENDMENT_PRODUCT, "before-activation")
+        activated = service.activate(amendment["id"])
+        self.assertEqual(activated["new_deadline"], self.now[0] + 8 * 60 * 60)
+        self.assertEqual(ledger.effective_deadline(G1_AMENDMENT_PRODUCT, plan_id=G1_AMENDMENT_PLAN), activated["new_deadline"])
+        self.assertEqual(ledger.effective_deadline(G1_AMENDMENT_PRODUCT), G1_AMENDMENT_OLD_DEADLINE)
+        self.assertEqual(ledger.effective_deadline(G1_AMENDMENT_PRODUCT, plan_id="plan_other"), G1_AMENDMENT_OLD_DEADLINE)
+        self.assertEqual(ledger.effective_deadline("other-product"), G1_AMENDMENT_OLD_DEADLINE)
+        with self.assertRaises(FactoryError):
+            ledger.record_repair(G1_AMENDMENT_PRODUCT, "wrong-plan-extra", plan_id="plan_other")
+        for index in range(2, 4):
+            result = ledger.record_repair(G1_AMENDMENT_PRODUCT, f"authorized-{index}", plan_id=G1_AMENDMENT_PLAN)
+            self.assertEqual(result["repair_limit"], 4)
+        with self.assertRaises(FactoryError):
+            ledger.record_repair(G1_AMENDMENT_PRODUCT, "unauthorized-fifth", plan_id=G1_AMENDMENT_PLAN)
+        same = service.activate(amendment["id"])
+        self.assertEqual(same["new_deadline"], activated["new_deadline"])
+        self.assertEqual(ledger.phase_remaining(G1_AMENDMENT_PRODUCT, "G1", plan_id=G1_AMENDMENT_PLAN), 8 * 60 * 60)
+        self.assertEqual(ledger.phase_remaining("other-product", "G1"), 0)
+        for index in range(2):
+            ledger.record_repair("other-product", f"other-{index}")
+        with self.assertRaises(FactoryError):
+            ledger.record_repair("other-product", "other-third")
+
+    def test_g1_amendment_rejects_other_campaign_and_mismatched_idempotent_request(self):
+        self._seed_original_g1_deadline()
+        service = BudgetAmendmentService(self.store, clock=lambda: self.now[0])
+        amendment = service.register(self._amendment_request())
+        with self.assertRaises(FactoryError) as caught:
+            BudgetAmendmentService(self.store, campaign_id="other-campaign").register(self._amendment_request())
+        self.assertEqual(caught.exception.code, "budget_amendment_scope")
+        with self.assertRaises(FactoryError) as caught:
+            service.register(self._amendment_request(summary="Changed replay payload"))
+        self.assertEqual(caught.exception.code, "idempotency_conflict")
+        self.assertIsNone(amendment["activated_at"])
+
+    def test_first_amendment_registration_migrates_legacy_budget_schema(self):
+        legacy_root = self.root / "legacy"
+        legacy_root.mkdir()
+        legacy_pack = legacy_root / "pack"
+        legacy_pack.mkdir()
+        legacy_store = FactoryStore(legacy_root / "state", legacy_pack)
+        with legacy_store.connect(True) as con:
+            con.execute("CREATE TABLE tf_budget_phase (campaign_id TEXT NOT NULL, identity TEXT NOT NULL, phase TEXT NOT NULL, started REAL NOT NULL, deadline REAL NOT NULL, PRIMARY KEY(campaign_id,identity,phase))")
+            con.execute("CREATE TABLE tf_budget_reservation (id TEXT PRIMARY KEY,campaign_id TEXT NOT NULL,identity TEXT NOT NULL,phase TEXT NOT NULL,kind TEXT NOT NULL,status TEXT NOT NULL,created REAL NOT NULL,started REAL,finished REAL,job_id TEXT,requested_model TEXT,requested_effort TEXT,stage TEXT,retry INTEGER,observed_model TEXT,observed_effort TEXT,outcome TEXT,group_kind TEXT NOT NULL DEFAULT 'production')")
+            con.execute("CREATE TABLE tf_budget_repair (campaign_id TEXT NOT NULL,product_id TEXT NOT NULL,operation_key TEXT NOT NULL,created REAL NOT NULL,PRIMARY KEY(campaign_id,product_id,operation_key))")
+            con.execute("INSERT INTO tf_budget_phase VALUES(?,?,?,?,?)",
+                        (G1_AMENDMENT_CAMPAIGN, "__campaign_segment__", "G1", 100.0, G1_AMENDMENT_OLD_DEADLINE))
+            for index in range(2):
+                con.execute("INSERT INTO tf_budget_repair VALUES(?,?,?,?)",
+                            (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT, f"legacy-repair-{index}", 200.0 + index))
+            for index in range(42):
+                con.execute("INSERT INTO tf_budget_reservation(id,campaign_id,identity,phase,kind,status,created) VALUES(?,?,?,?,?,?,?)",
+                            (f"legacy-call-{index}", G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT,
+                             "G1", "production", "completed", 300.0 + index))
+            self.assertIsNone(con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='tf_budget_amendment'").fetchone())
+        service = BudgetAmendmentService(legacy_store, clock=lambda: 400.0)
+        amendment = service.register(self._amendment_request())
+        self.assertIsNone(amendment["activated_at"])
+        snapshot = BudgetLedger(legacy_store, campaign_id=G1_AMENDMENT_CAMPAIGN).snapshot()
+        self.assertEqual(snapshot["cli_sessions_used"], 42)
+        self.assertEqual(snapshot["limits"]["cli_sessions"], 500)
+        self.assertEqual(snapshot["limits"]["product_repairs"], 2)
+        self.assertEqual(snapshot["repairs"], [{"product_id": G1_AMENDMENT_PRODUCT, "repairs_used": 2}])
 
     def test_concurrent_reservations_are_atomic_and_reservation_counts_against_limit(self):
         ledger = BudgetLedger(self.store, limits={"production_concurrency": 1}, clock=lambda: self.now[0])

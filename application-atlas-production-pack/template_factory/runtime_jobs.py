@@ -61,7 +61,8 @@ def queue_runtime(store, artifact, value):
     v1 = artifact.get("provenance", {}).get("v1")
     if v1:
         from .budget import BudgetLedger
-        remaining = BudgetLedger(store, campaign_id=v1["campaign_id"]).phase_remaining(v1["product_id"], v1["segment"])
+        remaining = BudgetLedger(store, campaign_id=v1["campaign_id"]).phase_remaining(
+            v1["product_id"], v1["segment"], plan_id=v1.get("plan_id"))
         if remaining is not None:
             if remaining <= 0:
                 raise FactoryError("runtime segment deadline exhausted", "budget_deadline", 409)
@@ -288,7 +289,7 @@ def run_runtime(pipeline, job, attempt, stage, cancelled):
         budget = ledger.snapshot()
         if budget["paused"]:
             raise FactoryError("campaign budget is paused", "budget_paused", 409)
-        remaining = ledger.phase_remaining(v1["product_id"], v1["segment"])
+        remaining = ledger.phase_remaining(v1["product_id"], v1["segment"], plan_id=v1.get("plan_id"))
         if remaining is not None:
             if remaining <= 0:
                 raise FactoryError("runtime segment deadline exhausted", "budget_deadline", 409)

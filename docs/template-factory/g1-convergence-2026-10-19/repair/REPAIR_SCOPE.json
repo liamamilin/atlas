@@ -1,0 +1,167 @@
+{
+  "version": "atlas.aggregate-repair-scope.v1",
+  "baseline": {
+    "artifact_id": "tpl_7f4c17e834c342e7b462e6bb8b6379e4",
+    "expected_digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+    "case_basis_digest": "a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589",
+    "immutable_case_facts": 29
+  },
+  "known_blockers": [
+    {
+      "feature_id": "F03",
+      "acceptance_id": "A04",
+      "decision_id": "D03",
+      "basis": "Category management needs actual HTML create/rename/delete journeys, protection, validation and reassignment of active and soft-deleted records."
+    },
+    {
+      "feature_id": "F04",
+      "acceptance_id": "A05",
+      "decision_id": "D03",
+      "basis": "The existing move capability needs browser form coverage and visible result/feedback while preserving persistence checks."
+    },
+    {
+      "feature_id": "F05",
+      "acceptance_id": "A06",
+      "decision_id": "D07",
+      "basis": "P0 category browsing requires visible counts that include active records only and agree with API/list results after state changes."
+    },
+    {
+      "feature_id": "F06",
+      "acceptance_id": "A07",
+      "decision_id": "D07",
+      "basis": "Category-scoped search must submit category and q together and show selected category, retained query, and matching/empty results."
+    },
+    {
+      "feature_id": "F08",
+      "acceptance_id": "A01",
+      "decision_id": "D08",
+      "basis": "The source IndexedDB/Dexie implementation is not the target Python/SQLite persistence implementation; correct target rationale while preserving restart assertion."
+    },
+    {
+      "feature_id": "F09",
+      "acceptance_id": "A09",
+      "decision_id": "D04",
+      "basis": "HTML soft-delete/restore recovery must be exercised; category deletion also needs trashed records to remain recoverable."
+    },
+    {
+      "feature_id": "F10",
+      "acceptance_id": "A10",
+      "decision_id": null,
+      "basis": "Malformed requests and form validation need explicit non-mutating feedback/recovery; retain JSON bad_request and existing API behavior."
+    },
+    {
+      "feature_id": "F10",
+      "acceptance_id": "A02",
+      "decision_id": null,
+      "basis": "Correct the URL boundary from dotted-host rejection to absolute parseable HTTP(S) with a valid nonempty hostname."
+    },
+    {
+      "feature_id": "F10",
+      "acceptance_id": "A12",
+      "decision_id": "D03",
+      "basis": "Invalid category input must retain failure/no-mutation semantics with usable HTML feedback."
+    },
+    {
+      "feature_id": "F11",
+      "acceptance_id": "A11",
+      "decision_id": "D08",
+      "basis": "The target shell is Python server-rendered HTML, not the source SPA mount; preserve the empty-library readiness contract."
+    }
+  ],
+  "authorized_assertion_changes": [
+    {
+      "acceptance_id": "A02",
+      "change": "single_label_hostname_negative_to_positive",
+      "rationale": "The explicit target policy accepts any absolute parseable HTTP(S) URL with a valid nonempty hostname, without requiring DNS or a dot. This is the sole authorized semantic replacement of an existing assertion; malformed scheme, non-HTTP(S), empty/invalid hostname and no-write-on-failure negatives remain."
+    }
+  ],
+  "authored_field_paths": [
+    [
+      "architecture_markdown"
+    ],
+    [
+      "features",
+      "F08",
+      "reason"
+    ],
+    [
+      "features",
+      "F11",
+      "reason"
+    ],
+    [
+      "acceptance",
+      "A02",
+      "goal"
+    ],
+    [
+      "acceptance",
+      "A04",
+      "goal"
+    ],
+    [
+      "acceptance",
+      "A06",
+      "goal"
+    ],
+    [
+      "acceptance",
+      "A07",
+      "goal"
+    ],
+    [
+      "acceptance",
+      "A09",
+      "goal"
+    ],
+    [
+      "acceptance",
+      "A10",
+      "goal"
+    ],
+    [
+      "acceptance",
+      "A12",
+      "goal"
+    ],
+    [
+      "decisions",
+      "D03",
+      "impact"
+    ],
+    [
+      "decisions",
+      "D04",
+      "impact"
+    ],
+    [
+      "decisions",
+      "D07",
+      "impact"
+    ],
+    [
+      "decisions",
+      "D08",
+      "impact"
+    ],
+    [
+      "contract_coverage",
+      "schema"
+    ],
+    [
+      "contract_coverage",
+      "review_rules_version"
+    ],
+    [
+      "contract_coverage",
+      "features"
+    ]
+  ],
+  "edit_paths": [
+    "acceptance/p0_library.py",
+    "acceptance/p0_organize.py",
+    "acceptance/p0_find_open.py",
+    "acceptance/p0_recovery.py",
+    "acceptance/README.md"
+  ]
+}

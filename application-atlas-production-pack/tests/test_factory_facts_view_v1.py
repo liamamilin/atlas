@@ -254,7 +254,7 @@ class FactoryAcceptedFactsViewTests(unittest.TestCase):
         pipeline, job, attempt, checkpoint = self._producer_fixture(repair=repair)
         calls = []
 
-        def agent(name, prompt, payload, source=None):
+        def agent(name, prompt, payload, source=None, **kwargs):
             calls.append(name)
             return {"choices": [{"evidence_ids": ["ev-accepted"], "disposition": "adopted",
                                  "capability": "Complete tasks", "reason": "Supported by accepted code"}]}

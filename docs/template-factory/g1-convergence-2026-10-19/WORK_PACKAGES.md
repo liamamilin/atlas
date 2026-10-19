@@ -4,11 +4,11 @@
 
 | 包 | 范围 | 证据/状态 |
 |---|---|---|
-| C01 | 现场与远端CI浅历史修复 | BASELINE.json；旧Checks48失败已实际核验，checkout改fetch-depth0，不删来源断言 |
-| C02 | 统一规则、CONTRACT_COVERAGE、REPAIR_SCOPE、目标适配/URL政策 | 开发中；固定旧案例29观察与casebasis |
-| C03 | 真UI操作与负控、独立执行器边界 | 开发中；原plan/网络none/receipt机制保留 |
-| C04 | append-only授权、有效限额/窗口、原子取代和正式恢复 | 开发中；实际额度尚未追加或激活 |
-| C05 | 独立代码审查、本地完整检查、同新SHA远端完整CI | 待C02–04冻结后执行，历史CI不替代 |
+| C01 | 现场与远端CI浅历史修复 | 96fb75b同SHA实际远端两job全通过；ci-history-fix-*.log。checkout完整历史，不删断言；这仅是起点CI修复，不能代替最终新代码CI |
+| C02 | 统一规则、CONTRACT_COVERAGE、REPAIR_SCOPE、目标适配/URL政策 | 源码和聚合请求已冻结；83项聚焦检查通过。固定旧案例29观察与casebasis；scope fd3746…，仅A02单标签例负转正，其他断言意图保留 |
+| C03 | 真UI操作与负控、独立执行器边界 | 真Chromium两负控、23执行器合同fixture及helper通过；原machineplan/网络none/receipt机制保留。仅准备证据，不是实际应用运行 |
+| C04 | append-only授权、有效限额/窗口、原子取代和正式恢复 | 32项预算/真实临时库恢复测试通过；scope、旧job/candidate和checkpoint固定，过期/失败回滚；实际授权尚未登记或激活 |
+| C05 | 独立代码审查、本地完整检查、同新SHA远端完整CI | CODE_REVIEW.md及修复回归；verification/final-2完整13项全过且source无漂移，566后端/8可选skip、9web单元、17默认E2E、27工厂E2E、20严格Docker/0skip。当前推送最终新SHA核对远端，尚未激活补充窗口 |
 | C06 | 聚合修订、冻结、独立审阅、发布、标准包真实消费、P0/phase proof/宿主G1 | 未开始，等待前置；所有生产走正式服务 |
 | C07 | 原三场景T08实际生产/开发/抽验 | G1通过后直接执行，固定分母3不替换 |
 | C08 | 代码阶段推送、证据/失败/恢复/下一批建议 | 随步骤记录；不自动扩大范围或额度 |

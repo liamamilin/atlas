@@ -19,6 +19,7 @@ from atlas_runtime import atomic_json
 from .artifacts import archive_tree, copy_tree, relative, tree_manifest
 from .handoff import write_handoff
 from .store import FactoryError, canonical, digest, now, text, uid
+from .contract_scope import validate_contract_coverage
 
 KIND = "product-blueprint"
 SCHEMA = "atlas.product-blueprint.v0"
@@ -182,6 +183,10 @@ def validate_blueprint(source):
         or spec.get("kind") != KIND
     ):
         raise FactoryError("unsupported cognitive blueprint schema")
+    validate_contract_coverage(
+        spec,
+        required=spec.get("review_rules_version") == "atlas.current-required-contract.v1",
+    )
     for field in ("id", "version", "title", "architecture_markdown"):
         text(
             spec.get(field),

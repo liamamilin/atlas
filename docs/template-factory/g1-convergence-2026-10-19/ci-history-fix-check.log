@@ -1,0 +1,1513 @@
+﻿2026-10-19T10:37:39.9698462Z Current runner version: '2.337.0'
+2026-10-19T10:37:39.9721787Z ##[group]Runner Image Provisioner
+2026-10-19T10:37:39.9722642Z Hosted Compute Agent
+2026-10-19T10:37:39.9723509Z Version: 20261012.601
+2026-10-19T10:37:39.9724127Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-19T10:37:39.9724818Z Build Date: 2026-10-12T17:48:21Z
+2026-10-19T10:37:39.9725429Z Worker ID: {ae19a1ae-66a2-4833-a942-31c4c0770fe2}
+2026-10-19T10:37:39.9726092Z Region: westus3
+2026-10-19T10:37:39.9726587Z Cloud: Azure
+2026-10-19T10:37:39.9727082Z ##[endgroup]
+2026-10-19T10:37:39.9728610Z ##[group]Operating System
+2026-10-19T10:37:39.9729161Z Ubuntu
+2026-10-19T10:37:39.9729718Z 24.04.5
+2026-10-19T10:37:39.9730188Z LTS
+2026-10-19T10:37:39.9730991Z ##[endgroup]
+2026-10-19T10:37:39.9731504Z ##[group]Runner Image
+2026-10-19T10:37:39.9732088Z Image: ubuntu-24.04
+2026-10-19T10:37:39.9732623Z Version: 20261012.334.1
+2026-10-19T10:37:39.9734150Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-19T10:37:39.9735576Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+2026-10-19T10:37:39.9736439Z ##[endgroup]
+2026-10-19T10:37:39.9737438Z ##[group]GITHUB_TOKEN Permissions
+2026-10-19T10:37:39.9739546Z Contents: read
+2026-10-19T10:37:39.9740129Z Metadata: read
+2026-10-19T10:37:39.9740645Z ##[endgroup]
+2026-10-19T10:37:39.9742692Z Secret source: Actions
+2026-10-19T10:37:39.9743742Z Cache mode: write
+2026-10-19T10:37:39.9744369Z Prepare workflow directory
+2026-10-19T10:37:40.0113917Z Prepare all required actions
+2026-10-19T10:37:40.0162267Z Getting action download info
+2026-10-19T10:37:40.3407949Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-19T10:37:40.4374449Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-19T10:37:40.5051171Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-10-19T10:37:40.6698115Z Complete job name: check
+2026-10-19T10:37:40.7549051Z ##[group]Run actions/checkout@v4
+2026-10-19T10:37:40.7550075Z with:
+2026-10-19T10:37:40.7550472Z   fetch-depth: 0
+2026-10-19T10:37:40.7550883Z   repository: liamamilin/atlas
+2026-10-19T10:37:40.7554834Z   token: ***
+2026-10-19T10:37:40.7555231Z   ssh-strict: true
+2026-10-19T10:37:40.7555627Z   ssh-user: git
+2026-10-19T10:37:40.7556025Z   persist-credentials: true
+2026-10-19T10:37:40.7556453Z   clean: true
+2026-10-19T10:37:40.7557080Z   sparse-checkout-cone-mode: true
+2026-10-19T10:37:40.7557887Z   fetch-tags: false
+2026-10-19T10:37:40.7558457Z   show-progress: true
+2026-10-19T10:37:40.7558961Z   lfs: false
+2026-10-19T10:37:40.7559479Z   submodules: false
+2026-10-19T10:37:40.7559883Z   set-safe-directory: true
+2026-10-19T10:37:40.7560341Z   allow-unsafe-pr-checkout: false
+2026-10-19T10:37:40.7561671Z ##[endgroup]
+2026-10-19T10:37:40.8577478Z Syncing repository: liamamilin/atlas
+2026-10-19T10:37:40.8579202Z ##[group]Getting Git version info
+2026-10-19T10:37:40.8579889Z Working directory is '/home/runner/work/atlas/atlas'
+2026-10-19T10:37:40.8580739Z [command]/usr/bin/git version
+2026-10-19T10:37:40.8708330Z git version 2.55.0
+2026-10-19T10:37:40.8737876Z ##[endgroup]
+2026-10-19T10:37:40.8756708Z Temporarily overriding HOME='/home/runner/work/_temp/cda0d36e-ad70-41b5-b531-4d4a519a02a9' before making global git config changes
+2026-10-19T10:37:40.8758671Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-19T10:37:40.8763755Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/atlas/atlas
+2026-10-19T10:37:40.8811335Z Deleting the contents of '/home/runner/work/atlas/atlas'
+2026-10-19T10:37:40.8816960Z ##[group]Initializing the repository
+2026-10-19T10:37:40.8820197Z [command]/usr/bin/git init /home/runner/work/atlas/atlas
+2026-10-19T10:37:40.8911762Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-19T10:37:40.8914340Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-19T10:37:40.8916153Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-19T10:37:40.8917594Z hint: call:
+2026-10-19T10:37:40.8918448Z hint:
+2026-10-19T10:37:40.8919473Z hint: 	git config --global init.defaultBranch <name>
+2026-10-19T10:37:40.8920679Z hint:
+2026-10-19T10:37:40.8921745Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-19T10:37:40.8924017Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-19T10:37:40.8925527Z hint:
+2026-10-19T10:37:40.8926349Z hint: 	git branch -m <name>
+2026-10-19T10:37:40.8926907Z hint:
+2026-10-19T10:37:40.8927581Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-19T10:37:40.8929534Z Initialized empty Git repository in /home/runner/work/atlas/atlas/.git/
+2026-10-19T10:37:40.8933041Z [command]/usr/bin/git remote add origin https://github.com/liamamilin/atlas
+2026-10-19T10:37:40.8966803Z ##[endgroup]
+2026-10-19T10:37:40.8968370Z ##[group]Disabling automatic garbage collection
+2026-10-19T10:37:40.8969753Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-19T10:37:40.9000330Z ##[endgroup]
+2026-10-19T10:37:40.9001455Z ##[group]Setting up auth
+2026-10-19T10:37:40.9007709Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T10:37:40.9040089Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-19T10:37:40.9362016Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T10:37:40.9407192Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-19T10:37:40.9637855Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-19T10:37:40.9678873Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-19T10:37:40.9898533Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-19T10:37:40.9950282Z ##[endgroup]
+2026-10-19T10:37:40.9951100Z ##[group]Fetching the repository
+2026-10-19T10:37:40.9960226Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-10-19T10:37:43.8427960Z From https://github.com/liamamilin/atlas
+2026-10-19T10:37:43.8430684Z  * [new branch]      codex/stabilize-atlas -> origin/codex/stabilize-atlas
+2026-10-19T10:37:43.8441381Z [command]/usr/bin/git branch --list --remote origin/codex/stabilize-atlas
+2026-10-19T10:37:43.8465199Z   origin/codex/stabilize-atlas
+2026-10-19T10:37:43.8473980Z [command]/usr/bin/git rev-parse refs/remotes/origin/codex/stabilize-atlas
+2026-10-19T10:37:43.8494011Z 96fb75b3da089e69f0e304b81d0f37d889616485
+2026-10-19T10:37:43.8499884Z ##[endgroup]
+2026-10-19T10:37:43.8502375Z ##[group]Determining the checkout info
+2026-10-19T10:37:43.8505232Z ##[endgroup]
+2026-10-19T10:37:43.8506969Z [command]/usr/bin/git sparse-checkout disable
+2026-10-19T10:37:43.8553345Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-19T10:37:43.8579455Z ##[group]Checking out the ref
+2026-10-19T10:37:43.8583045Z [command]/usr/bin/git checkout --progress --force -B codex/stabilize-atlas refs/remotes/origin/codex/stabilize-atlas
+2026-10-19T10:37:44.7776796Z Switched to a new branch 'codex/stabilize-atlas'
+2026-10-19T10:37:44.7780245Z branch 'codex/stabilize-atlas' set up to track 'origin/codex/stabilize-atlas'.
+2026-10-19T10:37:44.7795336Z ##[endgroup]
+2026-10-19T10:37:44.7835912Z [command]/usr/bin/git log -1 --format=%H
+2026-10-19T10:37:44.7858555Z 96fb75b3da089e69f0e304b81d0f37d889616485
+2026-10-19T10:37:44.8086473Z ##[group]Run actions/setup-python@v5
+2026-10-19T10:37:44.8086825Z with:
+2026-10-19T10:37:44.8087088Z   python-version: 3.11
+2026-10-19T10:37:44.8087346Z   cache: pip
+2026-10-19T10:37:44.8087582Z   check-latest: false
+2026-10-19T10:37:44.8089999Z   token: ***
+2026-10-19T10:37:44.8090268Z   update-environment: true
+2026-10-19T10:37:44.8090595Z   allow-prereleases: false
+2026-10-19T10:37:44.8090875Z   freethreaded: false
+2026-10-19T10:37:44.8091136Z ##[endgroup]
+2026-10-19T10:37:44.9394417Z ##[group]Installed versions
+2026-10-19T10:37:44.9488654Z (node:2299) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-19T10:37:44.9489576Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-19T10:37:44.9490372Z Successfully set up CPython (3.11.17)
+2026-10-19T10:37:44.9491021Z ##[endgroup]
+2026-10-19T10:37:45.4517855Z [command]/opt/hostedtoolcache/Python/3.11.17/x64/bin/pip cache dir
+2026-10-19T10:37:47.3932543Z /home/runner/.cache/pip
+2026-10-19T10:37:47.6248090Z pip cache is not found
+2026-10-19T10:37:47.6379579Z ##[group]Run pip install -r requirements.txt
+2026-10-19T10:37:47.6380066Z [36;1mpip install -r requirements.txt[0m
+2026-10-19T10:37:47.6544750Z shell: /usr/bin/bash -e {0}
+2026-10-19T10:37:47.6545066Z env:
+2026-10-19T10:37:47.6545345Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:37:47.6545772Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T10:37:47.6546184Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:37:47.6546557Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:37:47.6546920Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:37:47.6547303Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T10:37:47.6547618Z ##[endgroup]
+2026-10-19T10:37:49.1510370Z Collecting numpy==1.26.4 (from -r requirements.txt (line 2))
+2026-10-19T10:37:49.2031134Z   Downloading numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)
+2026-10-19T10:37:49.2488311Z Collecting mcp==1.30.0 (from -r requirements.txt (line 3))
+2026-10-19T10:37:49.2532519Z   Downloading mcp-1.30.0-py3-none-any.whl.metadata (9.3 kB)
+2026-10-19T10:37:49.2806793Z Collecting anyio>=4.5 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.2840301Z   Downloading anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
+2026-10-19T10:37:49.3016064Z Collecting httpx-sse>=0.4 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.3049423Z   Downloading httpx_sse-0.4.3-py3-none-any.whl.metadata (9.7 kB)
+2026-10-19T10:37:49.3283097Z Collecting httpx<1.0.0,>=0.27.1 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.3321411Z   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+2026-10-19T10:37:49.3586136Z Collecting jsonschema>=4.20.0 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.3625346Z   Downloading jsonschema-4.26.0-py3-none-any.whl.metadata (7.6 kB)
+2026-10-19T10:37:49.3852790Z Collecting pydantic-settings>=2.5.2 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.3889459Z   Downloading pydantic_settings-2.16.0-py3-none-any.whl.metadata (4.0 kB)
+2026-10-19T10:37:49.4977796Z Collecting pydantic<3.0.0,>=2.11.0 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.5013326Z   Downloading pydantic-2.14.1-py3-none-any.whl.metadata (133 kB)
+2026-10-19T10:37:49.5287868Z Collecting pyjwt>=2.10.1 (from pyjwt[crypto]>=2.10.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.5330698Z   Downloading pyjwt-2.15.1-py3-none-any.whl.metadata (3.5 kB)
+2026-10-19T10:37:49.5522022Z Collecting python-multipart>=0.0.9 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.5554283Z   Downloading python_multipart-0.0.32-py3-none-any.whl.metadata (2.1 kB)
+2026-10-19T10:37:49.5780161Z Collecting sse-starlette>=1.6.1 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.5811036Z   Downloading sse_starlette-3.5.0-py3-none-any.whl.metadata (15 kB)
+2026-10-19T10:37:49.6116383Z Collecting starlette>=0.27 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.6151978Z   Downloading starlette-1.9.0-py3-none-any.whl.metadata (6.6 kB)
+2026-10-19T10:37:49.6371295Z Collecting typing-extensions>=4.9.0 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.6414112Z   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+2026-10-19T10:37:49.6578854Z Collecting typing-inspection>=0.4.1 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.6611543Z   Downloading typing_inspection-0.4.4-py3-none-any.whl.metadata (2.6 kB)
+2026-10-19T10:37:49.6885015Z Collecting uvicorn>=0.31.1 (from mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.6921594Z   Downloading uvicorn-0.54.0-py3-none-any.whl.metadata (6.6 kB)
+2026-10-19T10:37:49.7164386Z Collecting certifi (from httpx<1.0.0,>=0.27.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.7196912Z   Downloading certifi-2026.10.18-py3-none-any.whl.metadata (2.5 kB)
+2026-10-19T10:37:49.7402379Z Collecting httpcore==1.* (from httpx<1.0.0,>=0.27.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.7437249Z   Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+2026-10-19T10:37:49.7641470Z Collecting idna (from httpx<1.0.0,>=0.27.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.7675213Z   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+2026-10-19T10:37:49.7862244Z Collecting h11>=0.16 (from httpcore==1.*->httpx<1.0.0,>=0.27.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.7895343Z   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+2026-10-19T10:37:49.8065756Z Collecting annotated-types>=0.6.0 (from pydantic<3.0.0,>=2.11.0->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:49.8097382Z   Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+2026-10-19T10:37:50.4359775Z Collecting pydantic-core==2.50.1 (from pydantic<3.0.0,>=2.11.0->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:50.4398116Z   Downloading pydantic_core-2.50.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.5 kB)
+2026-10-19T10:37:50.4636772Z Collecting attrs>=22.2.0 (from jsonschema>=4.20.0->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:50.4670977Z   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+2026-10-19T10:37:50.4851109Z Collecting jsonschema-specifications>=2023.03.6 (from jsonschema>=4.20.0->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:50.4882304Z   Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)
+2026-10-19T10:37:50.5116118Z Collecting referencing>=0.28.4 (from jsonschema>=4.20.0->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:50.5147711Z   Downloading referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)
+2026-10-19T10:37:50.7616175Z Collecting rpds-py>=0.25.0 (from jsonschema>=4.20.0->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:50.7650322Z   Downloading rpds_py-2026.9.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)
+2026-10-19T10:37:50.7889905Z Collecting python-dotenv>=1.2.2 (from pydantic-settings>=2.5.2->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:50.7923164Z   Downloading python_dotenv-1.2.4-py3-none-any.whl.metadata (29 kB)
+2026-10-19T10:37:50.9546782Z Collecting cryptography>=3.4.0 (from pyjwt[crypto]>=2.10.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:50.9583507Z   Downloading cryptography-50.0.2-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (4.4 kB)
+2026-10-19T10:37:51.0521203Z Collecting cffi>=2.0.0 (from cryptography>=3.4.0->pyjwt[crypto]>=2.10.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:51.0555666Z   Downloading cffi-2.1.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.5 kB)
+2026-10-19T10:37:51.0734923Z Collecting pycparser (from cffi>=2.0.0->cryptography>=3.4.0->pyjwt[crypto]>=2.10.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:51.0770640Z   Downloading pycparser-3.11-py3-none-any.whl.metadata (8.2 kB)
+2026-10-19T10:37:51.1080047Z Collecting click>=7.0 (from uvicorn>=0.31.1->mcp==1.30.0->-r requirements.txt (line 3))
+2026-10-19T10:37:51.1113150Z   Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+2026-10-19T10:37:51.1187462Z Downloading numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (18.3 MB)
+2026-10-19T10:37:51.1758021Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 18.3/18.3 MB 339.3 MB/s  0:00:00
+2026-10-19T10:37:51.1795432Z Downloading mcp-1.30.0-py3-none-any.whl (234 kB)
+2026-10-19T10:37:51.1850230Z Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+2026-10-19T10:37:51.1899028Z Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+2026-10-19T10:37:51.1950732Z Downloading pydantic-2.14.1-py3-none-any.whl (488 kB)
+2026-10-19T10:37:51.2010713Z Downloading pydantic_core-2.50.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.2 MB)
+2026-10-19T10:37:51.2094488Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 318.8 MB/s  0:00:00
+2026-10-19T10:37:51.2126981Z Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+2026-10-19T10:37:51.2173728Z Downloading anyio-4.15.1-py3-none-any.whl (132 kB)
+2026-10-19T10:37:51.2221681Z Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+2026-10-19T10:37:51.2272646Z Downloading httpx_sse-0.4.3-py3-none-any.whl (9.0 kB)
+2026-10-19T10:37:51.2320898Z Downloading idna-3.20-py3-none-any.whl (69 kB)
+2026-10-19T10:37:51.2371581Z Downloading jsonschema-4.26.0-py3-none-any.whl (90 kB)
+2026-10-19T10:37:51.2420457Z Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+2026-10-19T10:37:51.2468564Z Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+2026-10-19T10:37:51.2515832Z Downloading pydantic_settings-2.16.0-py3-none-any.whl (80 kB)
+2026-10-19T10:37:51.2565640Z Downloading pyjwt-2.15.1-py3-none-any.whl (33 kB)
+2026-10-19T10:37:51.2616786Z Downloading cryptography-50.0.2-cp311-abi3-manylinux_2_34_x86_64.whl (4.8 MB)
+2026-10-19T10:37:51.2776684Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.8/4.8 MB 348.9 MB/s  0:00:00
+2026-10-19T10:37:51.2811809Z Downloading cffi-2.1.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (217 kB)
+2026-10-19T10:37:51.2876666Z Downloading python_dotenv-1.2.4-py3-none-any.whl (23 kB)
+2026-10-19T10:37:51.2927718Z Downloading python_multipart-0.0.32-py3-none-any.whl (30 kB)
+2026-10-19T10:37:51.2977472Z Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+2026-10-19T10:37:51.3025115Z Downloading rpds_py-2026.9.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (375 kB)
+2026-10-19T10:37:51.3079724Z Downloading sse_starlette-3.5.0-py3-none-any.whl (17 kB)
+2026-10-19T10:37:51.3128742Z Downloading starlette-1.9.0-py3-none-any.whl (80 kB)
+2026-10-19T10:37:51.3176052Z Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+2026-10-19T10:37:51.3220454Z Downloading typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+2026-10-19T10:37:51.3267690Z Downloading uvicorn-0.54.0-py3-none-any.whl (87 kB)
+2026-10-19T10:37:51.3313756Z Downloading click-8.5.0-py3-none-any.whl (125 kB)
+2026-10-19T10:37:51.3360570Z Downloading certifi-2026.10.18-py3-none-any.whl (134 kB)
+2026-10-19T10:37:51.3409433Z Downloading pycparser-3.11-py3-none-any.whl (51 kB)
+2026-10-19T10:37:51.6448425Z Installing collected packages: typing-extensions, rpds-py, python-multipart, python-dotenv, pyjwt, pycparser, numpy, idna, httpx-sse, h11, click, certifi, attrs, annotated-types, uvicorn, typing-inspection, referencing, pydantic-core, httpcore, cffi, anyio, starlette, pydantic, jsonschema-specifications, httpx, cryptography, sse-starlette, pydantic-settings, jsonschema, mcp
+2026-10-19T10:37:54.6235807Z 
+2026-10-19T10:37:54.6253820Z Successfully installed annotated-types-0.8.0 anyio-4.15.1 attrs-26.1.0 certifi-2026.10.18 cffi-2.1.1 click-8.5.0 cryptography-50.0.2 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 httpx-sse-0.4.3 idna-3.20 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 mcp-1.30.0 numpy-1.26.4 pycparser-3.11 pydantic-2.14.1 pydantic-core-2.50.1 pydantic-settings-2.16.0 pyjwt-2.15.1 python-dotenv-1.2.4 python-multipart-0.0.32 referencing-0.37.0 rpds-py-2026.9.1 sse-starlette-3.5.0 starlette-1.9.0 typing-extensions-4.16.0 typing-inspection-0.4.4 uvicorn-0.54.0
+2026-10-19T10:37:54.7400173Z ##[group]Run python -m pip install pip-audit==2.10.1 ruff==0.15.17
+2026-10-19T10:37:54.7400628Z [36;1mpython -m pip install pip-audit==2.10.1 ruff==0.15.17[0m
+2026-10-19T10:37:54.7440239Z shell: /usr/bin/bash -e {0}
+2026-10-19T10:37:54.7440502Z env:
+2026-10-19T10:37:54.7440765Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:37:54.7441187Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T10:37:54.7441593Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:37:54.7441969Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:37:54.7442333Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:37:54.7442717Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T10:37:54.7443122Z ##[endgroup]
+2026-10-19T10:37:55.0819173Z Collecting pip-audit==2.10.1
+2026-10-19T10:37:55.1483528Z   Downloading pip_audit-2.10.1-py3-none-any.whl.metadata (28 kB)
+2026-10-19T10:37:55.4510973Z Collecting ruff==0.15.17
+2026-10-19T10:37:55.4625695Z   Downloading ruff-0.15.17-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (26 kB)
+2026-10-19T10:37:55.4767492Z Collecting CacheControl>=0.13.0 (from CacheControl[filecache]>=0.13.0->pip-audit==2.10.1)
+2026-10-19T10:37:55.4868636Z   Downloading cachecontrol-0.14.4-py3-none-any.whl.metadata (3.1 kB)
+2026-10-19T10:37:55.5101644Z Collecting cyclonedx-python-lib<12,>=5 (from pip-audit==2.10.1)
+2026-10-19T10:37:55.5206306Z   Downloading cyclonedx_python_lib-11.12.0-py3-none-any.whl.metadata (6.9 kB)
+2026-10-19T10:37:55.5358425Z Collecting packaging>=23.0.0 (from pip-audit==2.10.1)
+2026-10-19T10:37:55.5459807Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+2026-10-19T10:37:55.5575244Z Collecting pip-api>=0.0.28 (from pip-audit==2.10.1)
+2026-10-19T10:37:55.5677161Z   Downloading pip_api-0.0.35-py3-none-any.whl.metadata (17 kB)
+2026-10-19T10:37:55.5792523Z Collecting pip-requirements-parser>=32.0.0 (from pip-audit==2.10.1)
+2026-10-19T10:37:55.5894787Z   Downloading pip_requirements_parser-32.0.1-py3-none-any.whl.metadata (9.3 kB)
+2026-10-19T10:37:55.6073092Z Collecting requests>=2.31.0 (from pip-audit==2.10.1)
+2026-10-19T10:37:55.6178494Z   Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+2026-10-19T10:37:55.6415437Z Collecting rich>=12.4 (from pip-audit==2.10.1)
+2026-10-19T10:37:55.6518291Z   Downloading rich-15.0.0-py3-none-any.whl.metadata (18 kB)
+2026-10-19T10:37:55.6758279Z Collecting tomli>=2.2.1 (from pip-audit==2.10.1)
+2026-10-19T10:37:55.6864467Z   Downloading tomli-2.5.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (10 kB)
+2026-10-19T10:37:55.6956710Z Collecting tomli-w>=1.2.0 (from pip-audit==2.10.1)
+2026-10-19T10:37:55.7057798Z   Downloading tomli_w-1.2.0-py3-none-any.whl.metadata (5.7 kB)
+2026-10-19T10:37:55.7219859Z Collecting platformdirs>=4.2.0 (from pip-audit==2.10.1)
+2026-10-19T10:37:55.7322222Z   Downloading platformdirs-4.13.5-py3-none-any.whl.metadata (5.5 kB)
+2026-10-19T10:37:55.7462379Z Collecting license-expression<31,>=30 (from cyclonedx-python-lib<12,>=5->pip-audit==2.10.1)
+2026-10-19T10:37:55.7565401Z   Downloading license_expression-30.4.4-py3-none-any.whl.metadata (11 kB)
+2026-10-19T10:37:55.7724998Z Collecting packageurl-python<2,>=0.11 (from cyclonedx-python-lib<12,>=5->pip-audit==2.10.1)
+2026-10-19T10:37:55.7832032Z   Downloading packageurl_python-0.17.6-py3-none-any.whl.metadata (5.1 kB)
+2026-10-19T10:37:55.7977166Z Collecting py-serializable<3.0.0,>=2.1.0 (from cyclonedx-python-lib<12,>=5->pip-audit==2.10.1)
+2026-10-19T10:37:55.8081159Z   Downloading py_serializable-2.1.0-py3-none-any.whl.metadata (4.3 kB)
+2026-10-19T10:37:55.8196932Z Collecting sortedcontainers<3.0.0,>=2.4.0 (from cyclonedx-python-lib<12,>=5->pip-audit==2.10.1)
+2026-10-19T10:37:55.8300778Z   Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl.metadata (10 kB)
+2026-10-19T10:37:55.8337022Z Requirement already satisfied: typing_extensions<5.0,>=4.6 in /opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages (from cyclonedx-python-lib<12,>=5->pip-audit==2.10.1) (4.16.0)
+2026-10-19T10:37:55.8599261Z Collecting boolean.py>=4.0 (from license-expression<31,>=30->cyclonedx-python-lib<12,>=5->pip-audit==2.10.1)
+2026-10-19T10:37:55.8704158Z   Downloading boolean_py-5.0-py3-none-any.whl.metadata (2.3 kB)
+2026-10-19T10:37:55.8820633Z Collecting defusedxml<0.8.0,>=0.7.1 (from py-serializable<3.0.0,>=2.1.0->cyclonedx-python-lib<12,>=5->pip-audit==2.10.1)
+2026-10-19T10:37:55.8922534Z   Downloading defusedxml-0.7.1-py2.py3-none-any.whl.metadata (32 kB)
+2026-10-19T10:37:55.9675047Z Collecting msgpack<2.0.0,>=0.5.2 (from CacheControl>=0.13.0->CacheControl[filecache]>=0.13.0->pip-audit==2.10.1)
+2026-10-19T10:37:55.9780813Z   Downloading msgpack-1.2.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.3 kB)
+2026-10-19T10:37:55.9997477Z Collecting filelock>=3.8.0 (from CacheControl[filecache]>=0.13.0->pip-audit==2.10.1)
+2026-10-19T10:37:56.0103557Z   Downloading filelock-4.2.4-py3-none-any.whl.metadata (2.0 kB)
+2026-10-19T10:37:56.0142121Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages (from pip-api>=0.0.28->pip-audit==2.10.1) (26.2.1)
+2026-10-19T10:37:56.0319068Z Collecting pyparsing (from pip-requirements-parser>=32.0.0->pip-audit==2.10.1)
+2026-10-19T10:37:56.0425586Z   Downloading pyparsing-3.3.3-py3-none-any.whl.metadata (5.9 kB)
+2026-10-19T10:37:56.1662245Z Collecting charset_normalizer<4,>=2 (from requests>=2.31.0->pip-audit==2.10.1)
+2026-10-19T10:37:56.1767168Z   Downloading charset_normalizer-3.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (46 kB)
+2026-10-19T10:37:56.1841714Z Requirement already satisfied: idna<4,>=2.5 in /opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages (from requests>=2.31.0->pip-audit==2.10.1) (3.20)
+2026-10-19T10:37:56.1985612Z Collecting urllib3<3,>=1.26 (from requests>=2.31.0->pip-audit==2.10.1)
+2026-10-19T10:37:56.2102614Z   Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+2026-10-19T10:37:56.2138304Z Requirement already satisfied: certifi>=2023.5.7 in /opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages (from requests>=2.31.0->pip-audit==2.10.1) (2026.10.18)
+2026-10-19T10:37:56.2252056Z Collecting markdown-it-py>=2.2.0 (from rich>=12.4->pip-audit==2.10.1)
+2026-10-19T10:37:56.2358077Z   Downloading markdown_it_py-4.2.0-py3-none-any.whl.metadata (7.4 kB)
+2026-10-19T10:37:56.2520810Z Collecting pygments<3.0.0,>=2.13.0 (from rich>=12.4->pip-audit==2.10.1)
+2026-10-19T10:37:56.2623335Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+2026-10-19T10:37:56.2720479Z Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich>=12.4->pip-audit==2.10.1)
+2026-10-19T10:37:56.2825816Z   Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+2026-10-19T10:37:56.2990115Z Downloading pip_audit-2.10.1-py3-none-any.whl (62 kB)
+2026-10-19T10:37:56.3141501Z Downloading ruff-0.15.17-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (11.6 MB)
+2026-10-19T10:37:56.4313546Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.6/11.6 MB 114.0 MB/s  0:00:00
+2026-10-19T10:37:56.4425237Z Downloading cyclonedx_python_lib-11.12.0-py3-none-any.whl (529 kB)
+2026-10-19T10:37:56.4469588Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 529.5/529.5 kB 116.1 MB/s  0:00:00
+2026-10-19T10:37:56.4577165Z Downloading license_expression-30.4.4-py3-none-any.whl (120 kB)
+2026-10-19T10:37:56.4700385Z Downloading packageurl_python-0.17.6-py3-none-any.whl (36 kB)
+2026-10-19T10:37:56.4822629Z Downloading py_serializable-2.1.0-py3-none-any.whl (23 kB)
+2026-10-19T10:37:56.4946735Z Downloading defusedxml-0.7.1-py2.py3-none-any.whl (25 kB)
+2026-10-19T10:37:56.5065741Z Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl (29 kB)
+2026-10-19T10:37:56.5184510Z Downloading boolean_py-5.0-py3-none-any.whl (26 kB)
+2026-10-19T10:37:56.5302223Z Downloading cachecontrol-0.14.4-py3-none-any.whl (22 kB)
+2026-10-19T10:37:56.5431078Z Downloading msgpack-1.2.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (477 kB)
+2026-10-19T10:37:56.5561264Z Downloading filelock-4.2.4-py3-none-any.whl (162 kB)
+2026-10-19T10:37:56.5687049Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+2026-10-19T10:37:56.5861971Z Downloading pip_api-0.0.35-py3-none-any.whl (123 kB)
+2026-10-19T10:37:56.5988383Z Downloading pip_requirements_parser-32.0.1-py3-none-any.whl (35 kB)
+2026-10-19T10:37:56.6107464Z Downloading platformdirs-4.13.5-py3-none-any.whl (32 kB)
+2026-10-19T10:37:56.6229868Z Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+2026-10-19T10:37:56.6355414Z Downloading charset_normalizer-3.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (269 kB)
+2026-10-19T10:37:56.6486808Z Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+2026-10-19T10:37:56.6610659Z Downloading rich-15.0.0-py3-none-any.whl (310 kB)
+2026-10-19T10:37:56.6737317Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+2026-10-19T10:37:56.6802197Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 252.1 MB/s  0:00:00
+2026-10-19T10:37:56.6904455Z Downloading markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+2026-10-19T10:37:56.7024583Z Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+2026-10-19T10:37:56.7147948Z Downloading tomli-2.5.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (276 kB)
+2026-10-19T10:37:56.7270041Z Downloading tomli_w-1.2.0-py3-none-any.whl (6.7 kB)
+2026-10-19T10:37:56.7391834Z Downloading pyparsing-3.3.3-py3-none-any.whl (126 kB)
+2026-10-19T10:37:56.8688456Z Installing collected packages: sortedcontainers, boolean.py, urllib3, tomli-w, tomli, ruff, pyparsing, pygments, platformdirs, pip-api, packaging, packageurl-python, msgpack, mdurl, license-expression, filelock, defusedxml, charset_normalizer, requests, py-serializable, pip-requirements-parser, markdown-it-py, rich, cyclonedx-python-lib, CacheControl, pip-audit
+2026-10-19T10:37:58.4431999Z 
+2026-10-19T10:37:58.4456330Z Successfully installed CacheControl-0.14.4 boolean.py-5.0 charset_normalizer-3.5.2 cyclonedx-python-lib-11.12.0 defusedxml-0.7.1 filelock-4.2.4 license-expression-30.4.4 markdown-it-py-4.2.0 mdurl-0.1.2 msgpack-1.2.3 packageurl-python-0.17.6 packaging-26.3 pip-api-0.0.35 pip-audit-2.10.1 pip-requirements-parser-32.0.1 platformdirs-4.13.5 py-serializable-2.1.0 pygments-2.21.0 pyparsing-3.3.3 requests-2.34.2 rich-15.0.0 ruff-0.15.17 sortedcontainers-2.4.0 tomli-2.5.0 tomli-w-1.2.0 urllib3-2.8.0
+2026-10-19T10:37:58.5285309Z ##[group]Run pip-audit -r requirements.txt
+2026-10-19T10:37:58.5285642Z [36;1mpip-audit -r requirements.txt[0m
+2026-10-19T10:37:58.5321964Z shell: /usr/bin/bash -e {0}
+2026-10-19T10:37:58.5322220Z env:
+2026-10-19T10:37:58.5322501Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:37:58.5323097Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T10:37:58.5323515Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:37:58.5323884Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:37:58.5324251Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:37:58.5324622Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T10:37:58.5324931Z ##[endgroup]
+2026-10-19T10:38:06.6111053Z No known vulnerabilities found
+2026-10-19T10:38:06.6644939Z ##[group]Run ruff check application-atlas-production-pack/privacy.py application-atlas-production-pack/drafts_api.py application-atlas-production-pack/drafts_engines/__init__.py application-atlas-production-pack/mcp_atlas.py application-atlas-production-pack/execution_service.py application-atlas-production-pack/execution_state.py application-atlas-production-pack/execution_workspace.py application-atlas-production-pack/opencode_client.py application-atlas-production-pack/opencode_cli_adapter.py application-atlas-production-pack/opencode_permissions.py application-atlas-production-pack/opencode_runtime.py application-atlas-production-pack/project_export.py application-atlas-production-pack/project_generation.py application-atlas-production-pack/project_store.py application-atlas-production-pack/project_backup.py application-atlas-production-pack/runtime_recovery.py application-atlas-production-pack/template_factory atlas-web/scripts/gen-data.py atlas-web/scripts/verify-web-data.py
+2026-10-19T10:38:06.6657100Z [36;1mruff check application-atlas-production-pack/privacy.py application-atlas-production-pack/drafts_api.py application-atlas-production-pack/drafts_engines/__init__.py application-atlas-production-pack/mcp_atlas.py application-atlas-production-pack/execution_service.py application-atlas-production-pack/execution_state.py application-atlas-production-pack/execution_workspace.py application-atlas-production-pack/opencode_client.py application-atlas-production-pack/opencode_cli_adapter.py application-atlas-production-pack/opencode_permissions.py application-atlas-production-pack/opencode_runtime.py application-atlas-production-pack/project_export.py application-atlas-production-pack/project_generation.py application-atlas-production-pack/project_store.py application-atlas-production-pack/project_backup.py application-atlas-production-pack/runtime_recovery.py application-atlas-production-pack/template_factory atlas-web/scripts/gen-data.py atlas-web/scripts/verify-web-data.py[0m
+2026-10-19T10:38:06.6698111Z shell: /usr/bin/bash -e {0}
+2026-10-19T10:38:06.6698365Z env:
+2026-10-19T10:38:06.6698636Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:06.6699049Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T10:38:06.6699459Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:06.6699818Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:06.6700180Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:06.6700543Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T10:38:06.6700860Z ##[endgroup]
+2026-10-19T10:38:06.7003629Z All checks passed!
+2026-10-19T10:38:06.7038769Z ##[group]Run python -m unittest discover -s application-atlas-production-pack/tests -v
+2026-10-19T10:38:06.7039359Z [36;1mpython -m unittest discover -s application-atlas-production-pack/tests -v[0m
+2026-10-19T10:38:06.7076600Z shell: /usr/bin/bash -e {0}
+2026-10-19T10:38:06.7076860Z env:
+2026-10-19T10:38:06.7077120Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:06.7077540Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T10:38:06.7077944Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:06.7078314Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:06.7078665Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:06.7079022Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T10:38:06.7079324Z ##[endgroup]
+2026-10-19T10:38:07.4712231Z test_cancellation_removes_containers_and_preserves_report (test_blueprint_runtime.BlueprintRuntimeTests.test_cancellation_removes_containers_and_preserves_report) ... ok
+2026-10-19T10:38:07.4717685Z test_duplicate_json_fields_are_not_accepted (test_blueprint_runtime.BlueprintRuntimeTests.test_duplicate_json_fields_are_not_accepted) ... ok
+2026-10-19T10:38:07.4771003Z test_exit_zero_with_invalid_or_false_protocol_never_passes (test_blueprint_runtime.BlueprintRuntimeTests.test_exit_zero_with_invalid_or_false_protocol_never_passes) ... ok
+2026-10-19T10:38:07.4786517Z test_manifest_requires_exact_normative_ids_and_prerequisite_phase (test_blueprint_runtime.BlueprintRuntimeTests.test_manifest_requires_exact_normative_ids_and_prerequisite_phase) ... ok
+2026-10-19T10:38:07.4792392Z test_missing_legacy_binding_is_unavailable (test_blueprint_runtime.BlueprintRuntimeTests.test_missing_legacy_binding_is_unavailable) ... ok
+2026-10-19T10:38:07.4823154Z test_partial_tester_creation_is_cleaned_without_false_cleanup_failure (test_blueprint_runtime.BlueprintRuntimeTests.test_partial_tester_creation_is_cleaned_without_false_cleanup_failure) ... ok
+2026-10-19T10:38:07.4853300Z test_passing_suite_with_missing_required_phase_evidence_is_unverified (test_blueprint_runtime.BlueprintRuntimeTests.test_passing_suite_with_missing_required_phase_evidence_is_unverified) ... ok
+2026-10-19T10:38:07.4884510Z test_protocol_uses_stdout_while_retaining_stderr_diagnostics (test_blueprint_runtime.BlueprintRuntimeTests.test_protocol_uses_stdout_while_retaining_stderr_diagnostics) ... ok
+2026-10-19T10:38:07.4912715Z test_startup_failure_prevents_cases_and_cleanup_runs (test_blueprint_runtime.BlueprintRuntimeTests.test_startup_failure_prevents_cases_and_cleanup_runs) ... ok
+2026-10-19T10:38:07.4945495Z test_success_uses_read_only_suite_and_application_mounts_and_separate_images (test_blueprint_runtime.BlueprintRuntimeTests.test_success_uses_read_only_suite_and_application_mounts_and_separate_images) ... ok
+2026-10-19T10:38:07.4971200Z test_total_deadline_is_applied_before_startup_and_still_cleans_up (test_blueprint_runtime.BlueprintRuntimeTests.test_total_deadline_is_applied_before_startup_and_still_cleans_up) ... ok
+2026-10-19T10:38:07.5062033Z test_truncated_and_multiple_json_objects_never_pass (test_blueprint_runtime.BlueprintRuntimeTests.test_truncated_and_multiple_json_objects_never_pass) ... ok
+2026-10-19T10:38:07.5079063Z test_unknown_placeholder_and_unsupported_legacy_program_are_rejected (test_blueprint_runtime.BlueprintRuntimeTests.test_unknown_placeholder_and_unsupported_legacy_program_are_rejected) ... ok
+2026-10-19T10:38:07.5128400Z test_valid_failure_with_nonzero_exit_is_blocked_but_conflicting_pass_is_unverified (test_blueprint_runtime.BlueprintRuntimeTests.test_valid_failure_with_nonzero_exit_is_blocked_but_conflicting_pass_is_unverified) ... ok
+2026-10-19T10:38:07.5129973Z test_cli_smoke_and_mixed_python_node_acceptance (test_blueprint_runtime_docker.BlueprintRuntimeDockerTests.test_cli_smoke_and_mixed_python_node_acceptance) ... skipped 'set ATLAS_RUN_DOCKER_INTEGRATION=1 to run isolated local Docker tests'
+2026-10-19T10:38:07.5132725Z test_mixed_python_node_cases_pass_against_stdlib_web_app_and_preserve_source (test_blueprint_runtime_docker.BlueprintRuntimeDockerTests.test_mixed_python_node_cases_pass_against_stdlib_web_app_and_preserve_source) ... skipped 'set ATLAS_RUN_DOCKER_INTEGRATION=1 to run isolated local Docker tests'
+2026-10-19T10:38:07.5135713Z test_negative_acceptance_valid_failed_json_and_nonzero_exit_is_blocked (test_blueprint_runtime_docker.BlueprintRuntimeDockerTests.test_negative_acceptance_valid_failed_json_and_nonzero_exit_is_blocked) ... skipped 'set ATLAS_RUN_DOCKER_INTEGRATION=1 to run isolated local Docker tests'
+2026-10-19T10:38:07.5137427Z test_node_web_launcher_serves_real_request_to_python_tester (test_blueprint_runtime_docker.BlueprintRuntimeDockerTests.test_node_web_launcher_serves_real_request_to_python_tester) ... skipped 'set ATLAS_RUN_DOCKER_INTEGRATION=1 to run isolated local Docker tests'
+2026-10-19T10:38:07.5139095Z test_startup_exception_exit_is_blocked_and_traceback_is_preserved (test_blueprint_runtime_docker.BlueprintRuntimeDockerTests.test_startup_exception_exit_is_blocked_and_traceback_is_preserved) ... skipped 'set ATLAS_RUN_DOCKER_INTEGRATION=1 to run isolated local Docker tests'
+2026-10-19T10:38:07.5140758Z test_startup_exception_traceback_is_captured_from_stderr (test_blueprint_runtime_docker.BlueprintRuntimeDockerTests.test_startup_exception_traceback_is_captured_from_stderr) ... skipped 'set ATLAS_RUN_DOCKER_INTEGRATION=1 to run isolated local Docker tests'
+2026-10-19T10:38:07.5142324Z test_total_timeout_removes_every_owned_container (test_blueprint_runtime_docker.BlueprintRuntimeDockerTests.test_total_timeout_removes_every_owned_container) ... skipped 'set ATLAS_RUN_DOCKER_INTEGRATION=1 to run isolated local Docker tests'
+2026-10-19T10:38:07.5878517Z test_changed_frozen_suite_is_rejected_before_runtime_execution (test_blueprint_runtime_jobs.RuntimeJobTests.test_changed_frozen_suite_is_rejected_before_runtime_execution) ... ok
+2026-10-19T10:38:07.6669044Z test_changed_source_is_rejected_before_any_container_or_model_call (test_blueprint_runtime_jobs.RuntimeJobTests.test_changed_source_is_rejected_before_any_container_or_model_call) ... ok
+2026-10-19T10:38:07.7808744Z test_consent_version_phase_and_duplicate_submission_are_enforced (test_blueprint_runtime_jobs.RuntimeJobTests.test_consent_version_phase_and_duplicate_submission_are_enforced) ... ok
+2026-10-19T10:38:07.8495566Z test_delayed_runtime_rechecks_segment_deadline_before_container_start (test_blueprint_runtime_jobs.RuntimeJobTests.test_delayed_runtime_rechecks_segment_deadline_before_container_start) ... ok
+2026-10-19T10:38:07.9079738Z test_imported_runtime_enabled_revision_retains_frozen_protocol (test_blueprint_runtime_jobs.RuntimeJobTests.test_imported_runtime_enabled_revision_retains_frozen_protocol) ... ok
+2026-10-19T10:38:07.9751529Z test_legacy_is_readable_but_runtime_is_explicitly_unavailable (test_blueprint_runtime_jobs.RuntimeJobTests.test_legacy_is_readable_but_runtime_is_explicitly_unavailable) ... ok
+2026-10-19T10:38:08.0937120Z test_missing_docker_records_unavailable_but_cancellation_does_not_complete (test_blueprint_runtime_jobs.RuntimeJobTests.test_missing_docker_records_unavailable_but_cancellation_does_not_complete) ... ok
+2026-10-19T10:38:08.1944960Z test_missing_phase_evidence_stays_unverified_until_bound_host_record_is_registered (test_blueprint_runtime_jobs.RuntimeJobTests.test_missing_phase_evidence_stays_unverified_until_bound_host_record_is_registered) ... ok
+2026-10-19T10:38:08.2152433Z test_new_production_can_request_binding_without_changing_legacy_default (test_blueprint_runtime_jobs.RuntimeJobTests.test_new_production_can_request_binding_without_changing_legacy_default) ... ok
+2026-10-19T10:38:08.2154127Z test_real_docker_through_api_queue_and_pinned_frozen_source (test_blueprint_runtime_jobs.RuntimeJobTests.test_real_docker_through_api_queue_and_pinned_frozen_source) ... skipped 'opt-in synthetic Docker queue integration'
+2026-10-19T10:38:08.2949278Z test_runtime_child_inherits_fixed_plan_pause_and_cancellation (test_blueprint_runtime_jobs.RuntimeJobTests.test_runtime_child_inherits_fixed_plan_pause_and_cancellation) ... ok
+2026-10-19T10:38:08.3772177Z test_runtime_infrastructure_failure_records_unavailable_with_partial_evidence (test_blueprint_runtime_jobs.RuntimeJobTests.test_runtime_infrastructure_failure_records_unavailable_with_partial_evidence) ... ok
+2026-10-19T10:38:08.4628205Z test_runtime_job_pins_application_runs_without_model_and_does_not_promote (test_blueprint_runtime_jobs.RuntimeJobTests.test_runtime_job_pins_application_runs_without_model_and_does_not_promote) ... ok
+2026-10-19T10:38:08.5087819Z test_archive_rejects_bomb_and_bad_base64_without_database_writes (test_blueprints.BlueprintTests.test_archive_rejects_bomb_and_bad_base64_without_database_writes) ... ok
+2026-10-19T10:38:08.5906569Z test_archive_rejects_traversal_duplicates_secrets_and_symlinks (test_blueprints.BlueprintTests.test_archive_rejects_traversal_duplicates_secrets_and_symlinks) ... /opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/zipfile.py:1606: UserWarning: Duplicate name: 'x'
+2026-10-19T10:38:08.5907915Z   return self._open_to_write(zinfo, force_zip64=force_zip64)
+2026-10-19T10:38:08.5915322Z ok
+2026-10-19T10:38:08.6382254Z test_bundled_sample_is_self_contained_without_history_or_local_zip (test_blueprints.BlueprintTests.test_bundled_sample_is_self_contained_without_history_or_local_zip) ... ok
+2026-10-19T10:38:08.7137781Z test_cognitive_revision_request_replays_terminal_job_instead_of_free_new_round (test_blueprints.BlueprintTests.test_cognitive_revision_request_replays_terminal_job_instead_of_free_new_round) ... ok
+2026-10-19T10:38:08.7593706Z test_declared_reports_never_assign_factory_acceptance (test_blueprints.BlueprintTests.test_declared_reports_never_assign_factory_acceptance) ... ok
+2026-10-19T10:38:08.7789268Z test_dependency_manifest_must_parse_before_accepting_a_package (test_blueprints.BlueprintTests.test_dependency_manifest_must_parse_before_accepting_a_package) ... ok
+2026-10-19T10:38:08.8547581Z test_export_rejects_stale_digest_bad_project_and_unknown_phase (test_blueprints.BlueprintTests.test_export_rejects_stale_digest_bad_project_and_unknown_phase) ... ok
+2026-10-19T10:38:08.9283623Z test_export_still_accepts_legacy_package_without_optional_limits (test_blueprints.BlueprintTests.test_export_still_accepts_legacy_package_without_optional_limits) ... ok
+2026-10-19T10:38:08.9959007Z test_import_is_idempotent_even_when_concurrent (test_blueprints.BlueprintTests.test_import_is_idempotent_even_when_concurrent) ... ok
+2026-10-19T10:38:09.1099668Z test_json_api_read_and_development_export_preserve_blueprint (test_blueprints.BlueprintTests.test_json_api_read_and_development_export_preserve_blueprint) ... ok
+2026-10-19T10:38:09.1328883Z test_later_cases_can_regress_earlier_features_but_not_the_reverse (test_blueprints.BlueprintTests.test_later_cases_can_regress_earlier_features_but_not_the_reverse) ... ok
+2026-10-19T10:38:09.2064455Z test_later_phase_handoff_preserves_prerequisites_and_regression_cases (test_blueprints.BlueprintTests.test_later_phase_handoff_preserves_prerequisites_and_regression_cases) ... ok
+2026-10-19T10:38:09.2237243Z test_later_regression_does_not_replace_introduction_phase_acceptance (test_blueprints.BlueprintTests.test_later_regression_does_not_replace_introduction_phase_acceptance) ... ok
+2026-10-19T10:38:09.2402361Z test_missing_acceptance_program_rejected (test_blueprints.BlueprintTests.test_missing_acceptance_program_rejected) ... ok
+2026-10-19T10:38:09.3135514Z test_old_publication_acceptance_and_repair_are_not_reused (test_blueprints.BlueprintTests.test_old_publication_acceptance_and_repair_are_not_reused) ... ok
+2026-10-19T10:38:09.3883999Z test_phase_summary_omits_future_regression_links_without_mutating_source (test_blueprints.BlueprintTests.test_phase_summary_omits_future_regression_links_without_mutating_source) ... ok
+2026-10-19T10:38:09.4440265Z test_rejects_source_tamper_even_with_rewritten_inventory (test_blueprints.BlueprintTests.test_rejects_source_tamper_even_with_rewritten_inventory) ... ok
+2026-10-19T10:38:09.4914472Z test_sample_validates_without_executing_code (test_blueprints.BlueprintTests.test_sample_validates_without_executing_code) ... ok
+2026-10-19T10:38:09.5516995Z test_structural_references_checked_beyond_file_hashes (test_blueprints.BlueprintTests.test_structural_references_checked_beyond_file_hashes) ... ok
+2026-10-19T10:38:09.5648632Z test_addressed_field_replace_requires_exact_proposal_version (test_cognition.CognitionTests.test_addressed_field_replace_requires_exact_proposal_version) ... ok
+2026-10-19T10:38:10.1283329Z test_bad_patch_repairs_only_failed_file_with_bounded_feedback (test_cognition.CognitionTests.test_bad_patch_repairs_only_failed_file_with_bounded_feedback) ... ok
+2026-10-19T10:38:10.1497438Z test_batch_rejects_draft_stale_and_active_duplicates (test_cognition.CognitionTests.test_batch_rejects_draft_stale_and_active_duplicates) ... ok
+2026-10-19T10:38:10.5627898Z test_blocked_uncertain_and_unavailable_reviews_never_mark_passed (test_cognition.CognitionTests.test_blocked_uncertain_and_unavailable_reviews_never_mark_passed) ... ok
+2026-10-19T10:38:10.7378348Z test_cancellation_between_freeze_and_auto_queue_prevents_new_call (test_cognition.CognitionTests.test_cancellation_between_freeze_and_auto_queue_prevents_new_call) ... ok
+2026-10-19T10:38:10.7724777Z test_cancelled_production_cannot_register_or_queue_review (test_cognition.CognitionTests.test_cancelled_production_cannot_register_or_queue_review) ... ok
+2026-10-19T10:38:11.0115964Z test_design_feedback_repairs_spec_once_then_authors_programs (test_cognition.CognitionTests.test_design_feedback_repairs_spec_once_then_authors_programs) ... ok
+2026-10-19T10:38:11.1854083Z test_design_review_blocks_before_any_program_and_exposes_findings (test_cognition.CognitionTests.test_design_review_blocks_before_any_program_and_exposes_findings) ... ok
+2026-10-19T10:38:11.3513334Z test_design_uncertainty_is_retained_without_becoming_an_automatic_block (test_cognition.CognitionTests.test_design_uncertainty_is_retained_without_becoming_an_automatic_block) ... ok
+2026-10-19T10:38:11.5315401Z test_end_to_end_generation_freezes_then_independently_reviews_without_runtime (test_cognition.CognitionTests.test_end_to_end_generation_freezes_then_independently_reviews_without_runtime) ... ok
+2026-10-19T10:38:11.5429107Z test_exact_file_patch_preserves_prior_and_rejects_ambiguous_edits (test_cognition.CognitionTests.test_exact_file_patch_preserves_prior_and_rejects_ambiguous_edits) ... ok
+2026-10-19T10:38:11.7429429Z test_failed_design_dimension_cannot_pass_and_retry_reuses_completed_checks (test_cognition.CognitionTests.test_failed_design_dimension_cannot_pass_and_retry_reuses_completed_checks) ... ok
+2026-10-19T10:38:11.9210064Z test_failed_generation_retry_reuses_immutable_research_checkpoint (test_cognition.CognitionTests.test_failed_generation_retry_reuses_immutable_research_checkpoint) ... ok
+2026-10-19T10:38:12.2745871Z test_formal_queue_repair_new_artifact_review_keeps_old_retry_allowance (test_cognition.CognitionTests.test_formal_queue_repair_new_artifact_review_keeps_old_retry_allowance) ... ok
+2026-10-19T10:38:12.4520602Z test_invalid_dependency_manifest_repairs_only_that_file_and_keeps_original (test_cognition.CognitionTests.test_invalid_dependency_manifest_repairs_only_that_file_and_keeps_original) ... ok
+2026-10-19T10:38:12.7505125Z test_invalid_structure_is_repaired_with_actual_failed_proposal (test_cognition.CognitionTests.test_invalid_structure_is_repaired_with_actual_failed_proposal) ... ok
+2026-10-19T10:38:12.9390723Z test_legacy_five_dimension_aggregate_checkpoint_does_not_skip_runtime_review (test_cognition.CognitionTests.test_legacy_five_dimension_aggregate_checkpoint_does_not_skip_runtime_review) ... ok
+2026-10-19T10:38:13.1065810Z test_legacy_normalized_research_checkpoint_survives_generation_retry (test_cognition.CognitionTests.test_legacy_normalized_research_checkpoint_survives_generation_retry) ... ok
+2026-10-19T10:38:13.2759789Z test_legacy_revision_uses_original_structured_checkpoint_and_rejects_tampering (test_cognition.CognitionTests.test_legacy_revision_uses_original_structured_checkpoint_and_rejects_tampering) ... ok
+2026-10-19T10:38:13.2865292Z test_missing_or_reserved_spec_fields_rejected_before_program_authoring (test_cognition.CognitionTests.test_missing_or_reserved_spec_fields_rejected_before_program_authoring) ... ok
+2026-10-19T10:38:13.5678085Z test_program_only_revision_keeps_spec_and_skips_model_planning (test_cognition.CognitionTests.test_program_only_revision_keeps_spec_and_skips_model_planning) ... ok
+2026-10-19T10:38:13.7475793Z test_rejected_reserved_non_https_source_is_removed_by_bounded_protocol_repair (test_cognition.CognitionTests.test_rejected_reserved_non_https_source_is_removed_by_bounded_protocol_repair) ... ok
+2026-10-19T10:38:14.1522240Z test_repair_design_review_sees_only_proposed_spec_and_requirements (test_cognition.CognitionTests.test_repair_design_review_sees_only_proposed_spec_and_requirements) ... ok
+2026-10-19T10:38:14.1657123Z test_research_context_keeps_full_long_prose_readable (test_cognition.CognitionTests.test_research_context_keeps_full_long_prose_readable) ... ok
+2026-10-19T10:38:14.1981653Z test_research_protocol_repair_failure_stops_without_publishing (test_cognition.CognitionTests.test_research_protocol_repair_failure_stops_without_publishing) ... ok
+2026-10-19T10:38:14.2151285Z test_review_reference_repair_only_removes_invalid_indexes_and_preserves_judgments (test_cognition.CognitionTests.test_review_reference_repair_only_removes_invalid_indexes_and_preserves_judgments) ... ok
+2026-10-19T10:38:14.2323719Z test_review_reference_repair_rejects_all_invalid_bad_indexes_valid_deletion_and_verdict_edit (test_cognition.CognitionTests.test_review_reference_repair_rejects_all_invalid_bad_indexes_valid_deletion_and_verdict_edit) ... ok
+2026-10-19T10:38:14.2487641Z test_review_rejects_coverage_holes_bad_references_and_derives_outcome (test_cognition.CognitionTests.test_review_rejects_coverage_holes_bad_references_and_derives_outcome) ... ok
+2026-10-19T10:38:14.2665709Z test_review_source_prefix_maps_only_to_an_existing_exact_file (test_cognition.CognitionTests.test_review_source_prefix_maps_only_to_an_existing_exact_file) ... ok
+2026-10-19T10:38:14.4615433Z test_review_with_one_invalid_citation_repairs_once_and_retains_original_response (test_cognition.CognitionTests.test_review_with_one_invalid_citation_repairs_once_and_retains_original_response) ... ok
+2026-10-19T10:38:14.8203095Z test_revision_pins_prior_scenario_and_preserves_original_with_no_new_research (test_cognition.CognitionTests.test_revision_pins_prior_scenario_and_preserves_original_with_no_new_research) ... ok
+2026-10-19T10:38:15.0213130Z test_runtime_enabled_production_authors_binding_and_revision_retains_protocol (test_cognition.CognitionTests.test_runtime_enabled_production_authors_binding_and_revision_retains_protocol) ... ok
+2026-10-19T10:38:15.2983222Z test_runtime_protocol_block_repairs_spec_before_any_program_authoring (test_cognition.CognitionTests.test_runtime_protocol_block_repairs_spec_before_any_program_authoring) ... ok
+2026-10-19T10:38:15.6796739Z test_scoped_revision_copies_unselected_files_even_when_author_ignores_reuse (test_cognition.CognitionTests.test_scoped_revision_copies_unselected_files_even_when_author_ignores_reuse) ... ok
+2026-10-19T10:38:15.8690367Z test_single_file_failure_reuses_plan_and_completed_programs (test_cognition.CognitionTests.test_single_file_failure_reuses_plan_and_completed_programs) ... ok
+2026-10-19T10:38:15.8801243Z test_spec_delta_preserves_unaddressed_contracts_rows_and_original (test_cognition.CognitionTests.test_spec_delta_preserves_unaddressed_contracts_rows_and_original) ... ok
+2026-10-19T10:38:15.8909347Z test_spec_delta_rejects_identity_evidence_inventory_and_fuzzy_edits (test_cognition.CognitionTests.test_spec_delta_rejects_identity_evidence_inventory_and_fuzzy_edits) ... ok
+2026-10-19T10:38:15.9037875Z test_business_repairs_are_idempotent_and_cumulative_across_new_jobs (test_factory_budget_v1.FactoryBudgetV1Tests.test_business_repairs_are_idempotent_and_cumulative_across_new_jobs) ... ok
+2026-10-19T10:38:15.9151710Z test_changed_operation_stays_initial_but_explicit_protocol_repair_uses_scope_retry (test_factory_budget_v1.FactoryBudgetV1Tests.test_changed_operation_stays_initial_but_explicit_protocol_repair_uses_scope_retry) ... ok
+2026-10-19T10:38:15.9758034Z test_cli_records_only_model_and_effort_explicitly_observed_in_execution_event (test_factory_budget_v1.FactoryBudgetV1Tests.test_cli_records_only_model_and_effort_explicitly_observed_in_execution_event) ... ok
+2026-10-19T10:38:16.0357659Z test_cli_requires_budget_when_marked_v1_and_observed_model_requires_event (test_factory_budget_v1.FactoryBudgetV1Tests.test_cli_requires_budget_when_marked_v1_and_observed_model_requires_event) ... ok
+2026-10-19T10:38:16.0480106Z test_concurrent_duplicate_initial_calls_cannot_both_bypass_retry_scope (test_factory_budget_v1.FactoryBudgetV1Tests.test_concurrent_duplicate_initial_calls_cannot_both_bypass_retry_scope) ... ok
+2026-10-19T10:38:16.0616200Z test_concurrent_reservations_are_atomic_and_reservation_counts_against_limit (test_factory_budget_v1.FactoryBudgetV1Tests.test_concurrent_reservations_are_atomic_and_reservation_counts_against_limit) ... ok
+2026-10-19T10:38:16.0827527Z test_dependency_manifest_repairs_consume_real_code_scope_retry_allowance (test_factory_budget_v1.FactoryBudgetV1Tests.test_dependency_manifest_repairs_consume_real_code_scope_retry_allowance) ... ok
+2026-10-19T10:38:16.0916862Z test_fixed_input_identity_ignores_language_but_retains_legacy_hash_aliases (test_factory_budget_v1.FactoryBudgetV1Tests.test_fixed_input_identity_ignores_language_but_retains_legacy_hash_aliases) ... ok
+2026-10-19T10:38:16.1006346Z test_indexed_legacy_cognitive_stages_normalize_without_merging_review_dimensions (test_factory_budget_v1.FactoryBudgetV1Tests.test_indexed_legacy_cognitive_stages_normalize_without_merging_review_dimensions) ... ok
+2026-10-19T10:38:16.1178202Z test_indexed_legacy_review_retries_are_counted_only_for_the_same_dimension (test_factory_budget_v1.FactoryBudgetV1Tests.test_indexed_legacy_review_retries_are_counted_only_for_the_same_dimension) ... ok
+2026-10-19T10:38:16.1380381Z test_legacy_initial_and_two_retries_remain_visible_after_language_changes (test_factory_budget_v1.FactoryBudgetV1Tests.test_legacy_initial_and_two_retries_remain_visible_after_language_changes) ... ok
+2026-10-19T10:38:16.1540924Z test_legacy_p0_digest_retries_count_toward_stable_delivery_scope (test_factory_budget_v1.FactoryBudgetV1Tests.test_legacy_p0_digest_retries_count_toward_stable_delivery_scope) ... ok
+2026-10-19T10:38:16.1714062Z test_old_ledger_reloads_lower_limits_and_new_instance_cannot_raise_them (test_factory_budget_v1.FactoryBudgetV1Tests.test_old_ledger_reloads_lower_limits_and_new_instance_cannot_raise_them) ... ok
+2026-10-19T10:38:16.1841900Z test_pause_or_restart_does_not_reset_expired_deadline (test_factory_budget_v1.FactoryBudgetV1Tests.test_pause_or_restart_does_not_reset_expired_deadline) ... ok
+2026-10-19T10:38:16.1973118Z test_recovery_frees_concurrency_only_after_host_proves_owned_process_stopped (test_factory_budget_v1.FactoryBudgetV1Tests.test_recovery_frees_concurrency_only_after_host_proves_owned_process_stopped) ... ok
+2026-10-19T10:38:16.2346272Z test_repeating_legitimate_stage_calls_does_not_infer_transient_retries (test_factory_budget_v1.FactoryBudgetV1Tests.test_repeating_legitimate_stage_calls_does_not_infer_transient_retries) ... ok
+2026-10-19T10:38:16.2512561Z test_restart_and_new_job_do_not_reset_segment_deadline_or_call_count (test_factory_budget_v1.FactoryBudgetV1Tests.test_restart_and_new_job_do_not_reset_segment_deadline_or_call_count) ... ok
+2026-10-19T10:38:16.2688087Z test_retry_budget_is_cumulative_by_product_and_stage_not_job (test_factory_budget_v1.FactoryBudgetV1Tests.test_retry_budget_is_cumulative_by_product_and_stage_not_job) ... ok
+2026-10-19T10:38:16.2868844Z test_segment_deadline_begins_at_official_start_and_pause_does_not_reset_it (test_factory_budget_v1.FactoryBudgetV1Tests.test_segment_deadline_begins_at_official_start_and_pause_does_not_reset_it) ... ok
+2026-10-19T10:38:16.3059134Z test_stable_scope_counts_legacy_cognitive_review_retries_across_new_artifacts (test_factory_budget_v1.FactoryBudgetV1Tests.test_stable_scope_counts_legacy_cognitive_review_retries_across_new_artifacts) ... ok
+2026-10-19T10:38:16.3226681Z test_uncertain_reservation_survives_restart_and_cannot_be_refunded (test_factory_budget_v1.FactoryBudgetV1Tests.test_uncertain_reservation_survives_restart_and_cannot_be_refunded) ... ok
+2026-10-19T10:38:16.3491144Z test_code_location_hash_is_host_verified_and_revision_is_immutable (test_factory_cases_v1.CaseLibraryV1Tests.test_code_location_hash_is_host_verified_and_revision_is_immutable) ... ok
+2026-10-19T10:38:16.3822137Z test_empty_database_migration_rollback_then_retry (test_factory_cases_v1.CaseLibraryV1Tests.test_empty_database_migration_rollback_then_retry) ... ok
+2026-10-19T10:38:16.4046421Z test_evidence_ids_cannot_ambiguous_across_case_refs (test_factory_cases_v1.CaseLibraryV1Tests.test_evidence_ids_cannot_ambiguous_across_case_refs) ... ok
+2026-10-19T10:38:16.4242302Z test_github_repository_identity_is_normalized (test_factory_cases_v1.CaseLibraryV1Tests.test_github_repository_identity_is_normalized) ... ok
+2026-10-19T10:38:16.4536342Z test_idempotent_commit_and_many_to_many_fixed_revisions (test_factory_cases_v1.CaseLibraryV1Tests.test_idempotent_commit_and_many_to_many_fixed_revisions) ... ok
+2026-10-19T10:38:16.4710025Z test_legacy_app_catalog_reference_fingerprint_semantics_are_unchanged (test_factory_cases_v1.CaseLibraryV1Tests.test_legacy_app_catalog_reference_fingerprint_semantics_are_unchanged) ... ok
+2026-10-19T10:38:16.4898686Z test_legacy_catalog_imports_33_stable_catalog_only_apps_and_reruns (test_factory_cases_v1.CaseLibraryV1Tests.test_legacy_catalog_imports_33_stable_catalog_only_apps_and_reruns) ... ok
+2026-10-19T10:38:16.5161356Z test_rejected_observation_cannot_be_borrowed_as_accepted_design_fact (test_factory_cases_v1.CaseLibraryV1Tests.test_rejected_observation_cannot_be_borrowed_as_accepted_design_fact) ... ok
+2026-10-19T10:38:16.5367454Z test_rejects_unknown_app_path_escape_root_and_unverified_runtime (test_factory_cases_v1.CaseLibraryV1Tests.test_rejects_unknown_app_path_escape_root_and_unverified_runtime) ... ok
+2026-10-19T10:38:16.5638408Z test_review_is_separate_from_observation_and_basis_is_digest_bound (test_factory_cases_v1.CaseLibraryV1Tests.test_review_is_separate_from_observation_and_basis_is_digest_bound) ... ok
+2026-10-19T10:38:16.5837849Z test_scenario_revision_and_source_location_are_host_validated (test_factory_cases_v1.CaseLibraryV1Tests.test_scenario_revision_and_source_location_are_host_validated) ... ok
+2026-10-19T10:38:16.6051625Z test_snapshot_dedup_ignores_volatile_current_license_metadata (test_factory_cases_v1.CaseLibraryV1Tests.test_snapshot_dedup_ignores_volatile_current_license_metadata) ... ok
+2026-10-19T10:38:16.6057185Z test_counts_preserve_optional_skips_and_read_strict_json_summary (test_factory_check_records_v1.CheckRecordTests.test_counts_preserve_optional_skips_and_read_strict_json_summary) ... ok
+2026-10-19T10:38:16.6059103Z test_missing_runner_counts_are_unknown_not_zero_or_success (test_factory_check_records_v1.CheckRecordTests.test_missing_runner_counts_are_unknown_not_zero_or_success) ... ok
+2026-10-19T10:38:16.9663500Z test_cancel_and_timeout_terminate_process_and_record_null_exit_if_unstarted (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_cancel_and_timeout_terminate_process_and_record_null_exit_if_unstarted) ... ok
+2026-10-19T10:38:17.0634356Z test_cleanup_failure_blocks_success_and_does_not_replace_primary_failure (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_cleanup_failure_blocks_success_and_does_not_replace_primary_failure) ... ok
+2026-10-19T10:38:17.1109447Z test_cli_processes_do_not_inherit_stdin (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_cli_processes_do_not_inherit_stdin) ... ok
+2026-10-19T10:38:17.2123190Z test_info_probes_are_stdin_isolated_and_summary_redacts_session_ids (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_info_probes_are_stdin_isolated_and_summary_redacts_session_ids) ... ok
+2026-10-19T10:38:17.3083029Z test_nonzero_and_provider_error_write_failure_summary (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_nonzero_and_provider_error_write_failure_summary) ... ok
+2026-10-19T10:38:17.3717440Z test_prestart_and_postspawn_setup_failures_write_summary_and_clean_process (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_prestart_and_postspawn_setup_failures_write_summary_and_clean_process) ... ok
+2026-10-19T10:38:17.4682510Z test_protocol_failure_and_tail_length_event_are_summarized (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_protocol_failure_and_tail_length_event_are_summarized) ... ok
+2026-10-19T10:38:18.5080554Z test_sigterm_ignoring_descendant_is_killed_after_leader_exits (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_sigterm_ignoring_descendant_is_killed_after_leader_exits) ... ok
+2026-10-19T10:38:18.6180481Z test_successful_cli_cannot_leave_pipe_closed_sigterm_ignoring_descendant (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_successful_cli_cannot_leave_pipe_closed_sigterm_ignoring_descendant) ... ok
+2026-10-19T10:38:19.3053015Z test_timeout_kills_process_group_after_cli_leader_exits (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_timeout_kills_process_group_after_cli_leader_exits) ... ok
+2026-10-19T10:38:19.3162031Z test_unsupported_model_option_has_prestart_summary (test_factory_cli_reliability.FactoryCLIReliabilityTests.test_unsupported_model_option_has_prestart_summary) ... ok
+2026-10-19T10:38:19.3628817Z test_step_usage_is_preserved_and_missing_fields_stay_null (test_factory_cli_usage.FactoryCLIUsageTests.test_step_usage_is_preserved_and_missing_fields_stay_null) ... ok
+2026-10-19T10:38:19.5298837Z test_usage_events_are_bounded_and_truncation_is_explicit (test_factory_cli_usage.FactoryCLIUsageTests.test_usage_events_are_bounded_and_truncation_is_explicit) ... ok
+2026-10-19T10:38:19.6608522Z test_reinitialization_and_budget_snapshots_survive_concurrent_threads (test_factory_concurrency_v1.FactoryConcurrencyV1Tests.test_reinitialization_and_budget_snapshots_survive_concurrent_threads) ... ok
+2026-10-19T10:38:19.6776196Z test_wal_writer_commit_does_not_block_or_change_open_reader_snapshot (test_factory_concurrency_v1.FactoryConcurrencyV1Tests.test_wal_writer_commit_does_not_block_or_change_open_reader_snapshot) ... ok
+2026-10-19T10:38:19.6789419Z test_preparation_never_runs_uploaded_commands (test_factory_delivery.FactoryDeliveryTests.test_preparation_never_runs_uploaded_commands) ... ok
+2026-10-19T10:38:19.6812585Z test_rejects_ambiguous_app_aliases_duplicate_and_undeclared_files (test_factory_delivery.FactoryDeliveryTests.test_rejects_ambiguous_app_aliases_duplicate_and_undeclared_files) ... /opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/zipfile.py:1606: UserWarning: Duplicate name: 'app.py'
+2026-10-19T10:38:19.6813820Z   return self._open_to_write(zinfo, force_zip64=force_zip64)
+2026-10-19T10:38:19.6816822Z ok
+2026-10-19T10:38:19.6840110Z test_rejects_repeated_app_prefix_aliases_but_accepts_exact_nested_paths (test_factory_delivery.FactoryDeliveryTests.test_rejects_repeated_app_prefix_aliases_but_accepts_exact_nested_paths) ... ok
+2026-10-19T10:38:19.6848518Z test_rejects_secret_internal_and_symlink_entries (test_factory_delivery.FactoryDeliveryTests.test_rejects_secret_internal_and_symlink_entries) ... ok
+2026-10-19T10:38:19.6880274Z test_rejects_traversal_absolute_backslash_and_repeated_prefix (test_factory_delivery.FactoryDeliveryTests.test_rejects_traversal_absolute_backslash_and_repeated_prefix) ... ok
+2026-10-19T10:38:19.6901195Z test_root_and_single_app_prefix_normalization_have_equivalent_inventory (test_factory_delivery.FactoryDeliveryTests.test_root_and_single_app_prefix_normalization_have_equivalent_inventory) ... ok
+2026-10-19T10:38:19.6917076Z test_root_app_allows_only_app_tree_and_keeps_metadata_out_of_inventory (test_factory_delivery.FactoryDeliveryTests.test_root_app_allows_only_app_tree_and_keeps_metadata_out_of_inventory) ... ok
+2026-10-19T10:38:19.6972106Z test_runtime_schema_and_command_allowlist_are_enforced (test_factory_delivery.FactoryDeliveryTests.test_runtime_schema_and_command_allowlist_are_enforced) ... ok
+2026-10-19T10:38:19.8503788Z test_bad_delivery_is_bounded_and_never_completes_or_claims_pass (test_factory_development_v1.DevelopmentV1Tests.test_bad_delivery_is_bounded_and_never_completes_or_claims_pass) ... ok
+2026-10-19T10:38:20.0088106Z test_charged_ancestry_cannot_authorize_second_initial_for_same_artifact (test_factory_development_v1.DevelopmentV1Tests.test_charged_ancestry_cannot_authorize_second_initial_for_same_artifact) ... ok
+2026-10-19T10:38:20.0732467Z test_materializer_rejects_escape_and_invalid_exact_manifest (test_factory_development_v1.DevelopmentV1Tests.test_materializer_rejects_escape_and_invalid_exact_manifest) ... ok
+2026-10-19T10:38:20.2245323Z test_model_repair_receives_previous_app_and_failure_report_as_read_only_context (test_factory_development_v1.DevelopmentV1Tests.test_model_repair_receives_previous_app_and_failure_report_as_read_only_context) ... ok
+2026-10-19T10:38:20.3406873Z test_only_host_counted_cognitive_revision_can_start_new_initial_p0 (test_factory_development_v1.DevelopmentV1Tests.test_only_host_counted_cognitive_revision_can_start_new_initial_p0) ... ok
+2026-10-19T10:38:20.5043002Z test_parent_batch_pause_and_cancel_are_inherited (test_factory_development_v1.DevelopmentV1Tests.test_parent_batch_pause_and_cancel_are_inherited) ... ok
+2026-10-19T10:38:20.5711683Z test_queue_requires_current_review_phase_and_version (test_factory_development_v1.DevelopmentV1Tests.test_queue_requires_current_review_phase_and_version) ... ok
+2026-10-19T10:38:20.7963058Z test_repair_requires_failed_bound_acceptance_and_counts_business_feedback (test_factory_development_v1.DevelopmentV1Tests.test_repair_requires_failed_bound_acceptance_and_counts_business_feedback) ... ok
+2026-10-19T10:38:20.9841572Z test_standard_handoff_is_pinned_idempotently_and_p0_delivered (test_factory_development_v1.DevelopmentV1Tests.test_standard_handoff_is_pinned_idempotently_and_p0_delivered) ... ok
+2026-10-19T10:38:21.0305471Z test_frozen_package_requires_view_digest_and_exact_input_mirror (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests.test_frozen_package_requires_view_digest_and_exact_input_mirror) ... ok
+2026-10-19T10:38:21.0583930Z test_legacy_mixed_checkpoints_block_but_all_accepted_are_labeled_legacy (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests.test_legacy_mixed_checkpoints_block_but_all_accepted_are_labeled_legacy) ... ok
+2026-10-19T10:38:21.1018361Z test_real_produce_repair_rejects_predecessor_with_newly_rejected_fact (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests.test_real_produce_repair_rejects_predecessor_with_newly_rejected_fact) ... ok
+2026-10-19T10:38:21.1310444Z test_real_produce_resume_blocks_old_adaptation_even_without_plan_checkpoint (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests.test_real_produce_resume_blocks_old_adaptation_even_without_plan_checkpoint) ... ok
+2026-10-19T10:38:21.1566441Z test_rejected_narrative_is_audit_only_and_cannot_enter_generation_context (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests.test_rejected_narrative_is_audit_only_and_cannot_enter_generation_context) ... ok
+2026-10-19T10:38:21.1890233Z test_view_tamper_or_later_review_revocation_invalidates_publication (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests.test_view_tamper_or_later_review_revocation_invalidates_publication) ... ok
+2026-10-19T10:38:21.8606055Z test_complete_persisted_fixture_chain_can_pass_and_mutations_block (test_factory_milestone_v1.FactoryMilestoneV1Tests.test_complete_persisted_fixture_chain_can_pass_and_mutations_block) ... ok
+2026-10-19T10:38:21.9016578Z test_default_campaign_continues_current_campaign_and_explicit_override_is_preserved (test_factory_milestone_v1.FactoryMilestoneV1Tests.test_default_campaign_continues_current_campaign_and_explicit_override_is_preserved) ... ok
+2026-10-19T10:38:21.9326109Z test_legacy_global_or_other_campaign_gate_cannot_unlock_t08 (test_factory_milestone_v1.FactoryMilestoneV1Tests.test_legacy_global_or_other_campaign_gate_cannot_unlock_t08) ... ok
+2026-10-19T10:38:21.9651737Z test_missing_or_boolean_only_manifest_records_blocked_assessment_not_a_pass (test_factory_milestone_v1.FactoryMilestoneV1Tests.test_missing_or_boolean_only_manifest_records_blocked_assessment_not_a_pass) ... ok
+2026-10-19T10:38:21.9801030Z test_npm_audit_evidence_obeys_high_threshold_and_requires_summary (test_factory_milestone_v1.FactoryMilestoneV1Tests.test_npm_audit_evidence_obeys_high_threshold_and_requires_summary) ... ok
+2026-10-19T10:38:22.0137520Z test_plan_control_updates_parent_and_existing_runtime_descendant_atomically (test_factory_milestone_v1.FactoryMilestoneV1Tests.test_plan_control_updates_parent_and_existing_runtime_descendant_atomically) ... ok
+2026-10-19T10:38:22.0435693Z test_stale_campaign_gate_source_digest_cannot_unlock_t08 (test_factory_milestone_v1.FactoryMilestoneV1Tests.test_stale_campaign_gate_source_digest_cannot_unlock_t08) ... ok
+2026-10-19T10:38:22.0601353Z test_mismatched_pid_marker_does_not_kill_or_release_unknown_reservation (test_factory_recovery_v1.FactoryRecoveryV1Tests.test_mismatched_pid_marker_does_not_kill_or_release_unknown_reservation) ... ok
+2026-10-19T10:38:22.0844925Z test_proven_stop_frees_concurrency_but_keeps_call_charged (test_factory_recovery_v1.FactoryRecoveryV1Tests.test_proven_stop_frees_concurrency_but_keeps_call_charged) ... ok
+2026-10-19T10:38:22.0944147Z test_sigkill_escalation_requires_final_empty_process_group_probe (test_factory_recovery_v1.FactoryRecoveryV1Tests.test_sigkill_escalation_requires_final_empty_process_group_probe) ... ok
+2026-10-19T10:38:22.1118847Z test_unproved_termination_keeps_reservation_active (test_factory_recovery_v1.FactoryRecoveryV1Tests.test_unproved_termination_keeps_reservation_active) ... ok
+2026-10-19T10:38:22.1443749Z test_all_prior_attempts_are_included_with_bounded_safe_sources (test_factory_reporting_v1.FactoryReportEnrichmentTests.test_all_prior_attempts_are_included_with_bounded_safe_sources) ... ok
+2026-10-19T10:38:22.1795140Z test_enrichment_traces_case_increment_and_reports_safe_usage_without_mutation (test_factory_reporting_v1.FactoryReportEnrichmentTests.test_enrichment_traces_case_increment_and_reports_safe_usage_without_mutation) ... ok
+2026-10-19T10:38:22.2087022Z test_legacy_usage_extracts_only_step_finish_and_keeps_unknown_currency (test_factory_reporting_v1.FactoryReportEnrichmentTests.test_legacy_usage_extracts_only_step_finish_and_keeps_unknown_currency) ... ok
+2026-10-19T10:38:22.2370460Z test_malformed_legacy_summary_is_reported_as_truncated_without_reading_symlink (test_factory_reporting_v1.FactoryReportEnrichmentTests.test_malformed_legacy_summary_is_reported_as_truncated_without_reading_symlink) ... ok
+2026-10-19T10:38:22.2657512Z test_ratio_denominators_are_explicit_and_zero_ratio_is_unknown (test_factory_reporting_v1.FactoryReportEnrichmentTests.test_ratio_denominators_are_explicit_and_zero_ratio_is_unknown) ... ok
+2026-10-19T10:38:22.2967370Z test_report_record_and_source_byte_caps_are_explicit (test_factory_reporting_v1.FactoryReportEnrichmentTests.test_report_record_and_source_byte_caps_are_explicit) ... ok
+2026-10-19T10:38:22.3360707Z test_commit_sha_is_checkpointed_before_failed_download_and_reused (test_factory_research_v1.CaseResearchV1Tests.test_commit_sha_is_checkpointed_before_failed_download_and_reused) ... ok
+2026-10-19T10:38:22.3743280Z test_discovery_used_only_when_hints_are_empty (test_factory_research_v1.CaseResearchV1Tests.test_discovery_used_only_when_hints_are_empty) ... ok
+2026-10-19T10:38:22.4133122Z test_end_to_end_research_pins_hashes_reviews_and_completes_case_basis (test_factory_research_v1.CaseResearchV1Tests.test_end_to_end_research_pins_hashes_reviews_and_completes_case_basis) ... ok
+2026-10-19T10:38:22.4287800Z test_exact_source_mount_prefix_normalizes_only_existing_files (test_factory_research_v1.CaseResearchV1Tests.test_exact_source_mount_prefix_normalizes_only_existing_files) ... ok
+2026-10-19T10:38:22.4444116Z test_host_evidence_ids_are_unique_per_logical_case_revision (test_factory_research_v1.CaseResearchV1Tests.test_host_evidence_ids_are_unique_per_logical_case_revision) ... ok
+2026-10-19T10:38:22.4880335Z test_invalid_delivered_response_can_use_bounded_protocol_correction (test_factory_research_v1.CaseResearchV1Tests.test_invalid_delivered_response_can_use_bounded_protocol_correction) ... ok
+2026-10-19T10:38:22.5218857Z test_invalid_source_path_is_rejected_before_persisting_case (test_factory_research_v1.CaseResearchV1Tests.test_invalid_source_path_is_rejected_before_persisting_case) ... ok
+2026-10-19T10:38:22.5455277Z test_late_worker_cannot_commit_case_after_ownership_is_cancelled (test_factory_research_v1.CaseResearchV1Tests.test_late_worker_cannot_commit_case_after_ownership_is_cancelled) ... ok
+2026-10-19T10:38:22.5778600Z test_late_worker_cannot_commit_review_after_ownership_is_cancelled (test_factory_research_v1.CaseResearchV1Tests.test_late_worker_cannot_commit_review_after_ownership_is_cancelled) ... ok
+2026-10-19T10:38:22.6229158Z test_malformed_independent_review_keeps_case_but_does_not_queue_template (test_factory_research_v1.CaseResearchV1Tests.test_malformed_independent_review_keeps_case_but_does_not_queue_template) ... ok
+2026-10-19T10:38:22.6387768Z test_unlocated_observation_is_quarantined_without_rewriting_kept_claims (test_factory_research_v1.CaseResearchV1Tests.test_unlocated_observation_is_quarantined_without_rewriting_kept_claims) ... ok
+2026-10-19T10:38:22.7900107Z test_fast_oversized_output_is_rejected_after_exit (test_factory_runtime_transport.RuntimeTransportTests.test_fast_oversized_output_is_rejected_after_exit) ... ok
+2026-10-19T10:38:22.9433132Z test_protocol_parser_sees_both_objects_despite_display_tail_cut (test_factory_runtime_transport.RuntimeTransportTests.test_protocol_parser_sees_both_objects_despite_display_tail_cut) ... ok
+2026-10-19T10:38:23.0946709Z test_protocol_stdout_and_diagnostic_stderr_stay_separate (test_factory_runtime_transport.RuntimeTransportTests.test_protocol_stdout_and_diagnostic_stderr_stay_separate) ... ok
+2026-10-19T10:38:23.2453927Z test_runtime_commands_cannot_inherit_parent_stdin (test_factory_runtime_transport.RuntimeTransportTests.test_runtime_commands_cannot_inherit_parent_stdin) ... ok
+2026-10-19T10:38:23.4050708Z test_truncated_protocol_output_is_explicit_and_uses_prefix (test_factory_runtime_transport.RuntimeTransportTests.test_truncated_protocol_output_is_explicit_and_uses_prefix) ... ok
+2026-10-19T10:38:23.6021754Z test_legacy_repair_digest_replay_reuses_existing_job (test_factory_spec_patch_v1.SpecPatchTests.test_legacy_repair_digest_replay_reuses_existing_job) ... ok
+2026-10-19T10:38:24.0299475Z test_spec_patch_host_rejects_model_scope_and_file_plan_overreach (test_factory_spec_patch_v1.SpecPatchTests.test_spec_patch_host_rejects_model_scope_and_file_plan_overreach) ... ok
+2026-10-19T10:38:24.3851944Z test_spec_patch_queue_and_produce_reuses_all_programs_and_keeps_review_gate (test_factory_spec_patch_v1.SpecPatchTests.test_spec_patch_queue_and_produce_reuses_all_programs_and_keeps_review_gate) ... ok
+2026-10-19T10:38:24.5752454Z test_spec_patch_queue_rejects_unauthorized_fields_and_mixed_modes (test_factory_spec_patch_v1.SpecPatchTests.test_spec_patch_queue_rejects_unauthorized_fields_and_mixed_modes) ... ok
+2026-10-19T10:38:24.6000187Z test_api_legacy_catalog_and_v1_report_quality_do_not_claim_pass (test_factory_v1_contracts.FactoryV1Contracts.test_api_legacy_catalog_and_v1_report_quality_do_not_claim_pass) ... ok
+2026-10-19T10:38:24.6440345Z test_atomic_outbox_recovers_before_and_after_successor_queue (test_factory_v1_contracts.FactoryV1Contracts.test_atomic_outbox_recovers_before_and_after_successor_queue) ... ok
+2026-10-19T10:38:24.6886889Z test_global_production_limit_spans_batches_and_workers (test_factory_v1_contracts.FactoryV1Contracts.test_global_production_limit_spans_batches_and_workers) ... ok
+2026-10-19T10:38:24.7280753Z test_latest_review_request_cannot_fall_back_to_old_pass (test_factory_v1_contracts.FactoryV1Contracts.test_latest_review_request_cannot_fall_back_to_old_pass) ... ok
+2026-10-19T10:38:24.7484617Z test_leaf_fingerprint_change_rejects_old_preview (test_factory_v1_contracts.FactoryV1Contracts.test_leaf_fingerprint_change_rejects_old_preview) ... ok
+2026-10-19T10:38:24.7726972Z test_plan_digest_and_idempotency_key_conflicts (test_factory_v1_contracts.FactoryV1Contracts.test_plan_digest_and_idempotency_key_conflicts) ... ok
+2026-10-19T10:38:24.7988705Z test_preview_is_model_free_and_idempotent_execution_pins_inputs (test_factory_v1_contracts.FactoryV1Contracts.test_preview_is_model_free_and_idempotent_execution_pins_inputs) ... ok
+2026-10-19T10:38:24.8213809Z test_stale_scenario_rejects_without_queue_or_ledger_call (test_factory_v1_contracts.FactoryV1Contracts.test_stale_scenario_rejects_without_queue_or_ledger_call) ... ok
+2026-10-19T10:38:24.8493081Z test_t08_requires_gate_and_prespecified_three_samples (test_factory_v1_contracts.FactoryV1Contracts.test_t08_requires_gate_and_prespecified_three_samples) ... ok
+2026-10-19T10:38:24.9267269Z test_frozen_source_phase_contract_and_manifest_are_complete (test_handoff_views.HandoffViewTests.test_frozen_source_phase_contract_and_manifest_are_complete) ... ok
+2026-10-19T10:38:25.0333367Z test_views_are_deterministic_across_exports (test_handoff_views.HandoffViewTests.test_views_are_deterministic_across_exports) ... ok
+2026-10-19T10:38:25.0335516Z test_json_body_is_bounded_and_must_be_an_object (test_reliability.ApiRequestBoundaryTests.test_json_body_is_bounded_and_must_be_an_object) ... ok
+2026-10-19T10:38:25.0337217Z test_local_host_and_origin_allowlist (test_reliability.ApiRequestBoundaryTests.test_local_host_and_origin_allowlist) ... ok
+2026-10-19T10:38:25.0339535Z test_request_guard_rejects_unsafe_requests (test_reliability.ApiRequestBoundaryTests.test_request_guard_rejects_unsafe_requests) ... ok
+2026-10-19T10:38:25.0349252Z test_arguments_are_rejected_when_missing_required_field (test_reliability.AskHarnessTests.test_arguments_are_rejected_when_missing_required_field) ... ok
+2026-10-19T10:38:25.0356521Z test_bad_arguments_are_reported_as_data (test_reliability.AskHarnessTests.test_bad_arguments_are_reported_as_data) ... ok
+2026-10-19T10:38:25.0367949Z test_citations_are_deduplicated_and_bounded (test_reliability.AskHarnessTests.test_citations_are_deduplicated_and_bounded) ... ok
+2026-10-19T10:38:25.0375191Z test_citations_only_include_slugs_a_tool_surfaced (test_reliability.AskHarnessTests.test_citations_only_include_slugs_a_tool_surfaced) ... ok
+2026-10-19T10:38:25.0918519Z test_concurrent_question_on_one_thread_is_refused (test_reliability.AskHarnessTests.test_concurrent_question_on_one_thread_is_refused) ... ok
+2026-10-19T10:38:25.0938583Z test_empty_question_is_rejected_before_spawning (test_reliability.AskHarnessTests.test_empty_question_is_rejected_before_spawning) ... ok
+2026-10-19T10:38:25.0946767Z test_invalid_thread_id_is_not_found (test_reliability.AskHarnessTests.test_invalid_thread_id_is_not_found) ... ok
+2026-10-19T10:38:25.0954035Z test_limit_is_clamped (test_reliability.AskHarnessTests.test_limit_is_clamped) ... ok
+2026-10-19T10:38:25.0960841Z test_no_answer_yields_no_citations (test_reliability.AskHarnessTests.test_no_answer_yields_no_citations) ... ok
+2026-10-19T10:38:25.0967911Z test_only_read_only_tools_are_exposed (test_reliability.AskHarnessTests.test_only_read_only_tools_are_exposed) ... ok
+2026-10-19T10:38:25.0986018Z test_over_long_question_is_rejected (test_reliability.AskHarnessTests.test_over_long_question_is_rejected) ... ok
+2026-10-19T10:38:25.0993986Z test_run_limits_are_finite_and_sane (test_reliability.AskHarnessTests.test_run_limits_are_finite_and_sane) ... ok
+2026-10-19T10:38:25.1000802Z test_schemas_match_the_dispatch_table (test_reliability.AskHarnessTests.test_schemas_match_the_dispatch_table) ... ok
+2026-10-19T10:38:25.1007653Z test_slug_is_bounded (test_reliability.AskHarnessTests.test_slug_is_bounded) ... ok
+2026-10-19T10:38:25.1540714Z test_step_records_carry_a_readable_summary (test_reliability.AskHarnessTests.test_step_records_carry_a_readable_summary) ... ok
+2026-10-19T10:38:25.1548277Z test_summarize_reports_errors_compactly (test_reliability.AskHarnessTests.test_summarize_reports_errors_compactly) ... ok
+2026-10-19T10:38:25.1556228Z test_thread_id_cannot_escape_the_root (test_reliability.AskHarnessTests.test_thread_id_cannot_escape_the_root) ... ok
+2026-10-19T10:38:25.1577562Z test_thread_round_trip_and_delete_confirmation (test_reliability.AskHarnessTests.test_thread_round_trip_and_delete_confirmation) ... ok
+2026-10-19T10:38:25.1584858Z test_tool_output_is_redacted_before_storage (test_reliability.AskHarnessTests.test_tool_output_is_redacted_before_storage) ... ok
+2026-10-19T10:38:25.1594564Z test_tool_result_text_is_fenced_as_data (test_reliability.AskHarnessTests.test_tool_result_text_is_fenced_as_data) ... ok
+2026-10-19T10:38:25.2129822Z test_turn_limit_stops_a_tool_loop_that_never_answers (test_reliability.AskHarnessTests.test_turn_limit_stops_a_tool_loop_that_never_answers) ... ok
+2026-10-19T10:38:25.2137706Z test_type_collection_records_names_from_search_results (test_reliability.AskHarnessTests.test_type_collection_records_names_from_search_results) ... ok
+2026-10-19T10:38:25.2144717Z test_unknown_tool_is_refused_not_executed (test_reliability.AskHarnessTests.test_unknown_tool_is_refused_not_executed) ... ok
+2026-10-19T10:38:25.2683323Z test_usage_accumulates_across_turns (test_reliability.AskHarnessTests.test_usage_accumulates_across_turns) ... ok
+2026-10-19T10:38:25.3221504Z test_usage_is_null_when_the_provider_reports_nothing (test_reliability.AskHarnessTests.test_usage_is_null_when_the_provider_reports_nothing) ... ok
+2026-10-19T10:38:25.3764442Z test_worker_records_a_failed_message_instead_of_hanging (test_reliability.AskHarnessTests.test_worker_records_a_failed_message_instead_of_hanging) ... ok
+2026-10-19T10:38:25.3772069Z test_terminal_entry_defaults_to_read_only_and_renders_chinese (test_reliability.AtlasCliTests.test_terminal_entry_defaults_to_read_only_and_renders_chinese) ... ok
+2026-10-19T10:38:25.3782358Z test_terminal_entry_exposes_keyboard_slice_without_changing_api_contract (test_reliability.AtlasCliTests.test_terminal_entry_exposes_keyboard_slice_without_changing_api_contract) ... ok
+2026-10-19T10:38:25.3796313Z test_terminal_entry_requires_explicit_start_or_cleanup_for_mutations (test_reliability.AtlasCliTests.test_terminal_entry_requires_explicit_start_or_cleanup_for_mutations) ... ok
+2026-10-19T10:38:25.3798882Z test_terminal_execution_summary_keeps_verification_transport_fields (test_reliability.AtlasCliTests.test_terminal_execution_summary_keeps_verification_transport_fields) ... ok
+2026-10-19T10:38:25.3801295Z test_terminal_status_labels_cover_acceptance_states (test_reliability.AtlasCliTests.test_terminal_status_labels_cover_acceptance_states) ... ok
+2026-10-19T10:38:25.3807624Z test_classify_uses_explicit_model_and_returns_stable_metadata (test_reliability.ClassificationProviderTests.test_classify_uses_explicit_model_and_returns_stable_metadata) ... ok
+2026-10-19T10:38:25.3815229Z test_provider_credential_is_never_echoed (test_reliability.ClassificationProviderTests.test_provider_credential_is_never_echoed) ... ok
+2026-10-19T10:38:25.3833781Z test_provider_http_failure_is_retryable_without_fallback (test_reliability.ClassificationProviderTests.test_provider_http_failure_is_retryable_without_fallback) ... ok
+2026-10-19T10:38:25.3839863Z test_unavailable_model_is_redacted_and_not_retried (test_reliability.ClassificationProviderTests.test_unavailable_model_is_redacted_and_not_retried) ... ok
+2026-10-19T10:38:25.5162505Z test_alias_of_an_existing_acronym_name_keeps_canonical_slug (test_reliability.CorpusTests.test_alias_of_an_existing_acronym_name_keeps_canonical_slug) ... ok
+2026-10-19T10:38:25.5834711Z test_api_does_not_enqueue_a_draft_already_promoting_in_another_process (test_reliability.CorpusTests.test_api_does_not_enqueue_a_draft_already_promoting_in_another_process) ... ok
+2026-10-19T10:38:25.6507922Z test_api_rejects_stale_review_before_starting_background_work (test_reliability.CorpusTests.test_api_rejects_stale_review_before_starting_background_work) ... ok
+2026-10-19T10:38:25.7187697Z test_concurrent_create_of_same_slug_has_one_winner (test_reliability.CorpusTests.test_concurrent_create_of_same_slug_has_one_winner) ... ok
+2026-10-19T10:38:25.7834488Z test_create_rejects_empty_slug_without_writing (test_reliability.CorpusTests.test_create_rejects_empty_slug_without_writing) ... ok
+2026-10-19T10:38:25.8516243Z test_dedupe_rejects_a_second_writer_while_slug_is_locked (test_reliability.CorpusTests.test_dedupe_rejects_a_second_writer_while_slug_is_locked) ... ok
+2026-10-19T10:38:25.9176012Z test_delete_removes_review_record_with_draft (test_reliability.CorpusTests.test_delete_removes_review_record_with_draft) ... ok
+2026-10-19T10:38:25.9868392Z test_draft_body_revision_rejects_stale_save_and_promote (test_reliability.CorpusTests.test_draft_body_revision_rejects_stale_save_and_promote) ... ok
+2026-10-19T10:38:26.0989959Z test_export_failure_leaves_database_intact (test_reliability.CorpusTests.test_export_failure_leaves_database_intact) ... ok
+2026-10-19T10:38:26.3306312Z test_export_preserves_unchanged_embeddings_and_accepts_aliases (test_reliability.CorpusTests.test_export_preserves_unchanged_embeddings_and_accepts_aliases) ... ok
+2026-10-19T10:38:26.3977149Z test_failed_generation_can_be_explicitly_restarted (test_reliability.CorpusTests.test_failed_generation_can_be_explicitly_restarted) ... ok
+2026-10-19T10:38:26.6533279Z test_low_gate_does_not_modify_live_corpus (test_reliability.CorpusTests.test_low_gate_does_not_modify_live_corpus) ... ok
+2026-10-19T10:38:26.9067719Z test_merge_rebuilds_data_without_adding_a_leaf (test_reliability.CorpusTests.test_merge_rebuilds_data_without_adding_a_leaf) ... ok
+2026-10-19T10:38:26.9730185Z test_missing_stale_or_variant_review_cannot_create_leaf (test_reliability.CorpusTests.test_missing_stale_or_variant_review_cannot_create_leaf) ... ok
+2026-10-19T10:38:27.0434157Z test_pipeline_exception_preserves_draft_research_and_database (test_reliability.CorpusTests.test_pipeline_exception_preserves_draft_research_and_database) ... ok
+2026-10-19T10:38:27.1092354Z test_published_review_conflict_is_read_only (test_reliability.CorpusTests.test_published_review_conflict_is_read_only) ... ok
+2026-10-19T10:38:27.1744718Z test_restart_fails_closed_for_generation_and_translation (test_reliability.CorpusTests.test_restart_fails_closed_for_generation_and_translation) ... ok
+2026-10-19T10:38:27.2407640Z test_saving_body_invalidates_old_translation (test_reliability.CorpusTests.test_saving_body_invalidates_old_translation) ... ok
+2026-10-19T10:38:27.5090030Z test_success_publishes_and_keeps_draft_id (test_reliability.CorpusTests.test_success_publishes_and_keeps_draft_id) ... ok
+2026-10-19T10:38:27.5749439Z test_translation_start_is_single_flight_and_durable_state (test_reliability.CorpusTests.test_translation_start_is_single_flight_and_durable_state) ... ok
+2026-10-19T10:38:27.6823898Z test_web_data_generation_removes_stale_files_and_matches_leaf_index (test_reliability.CorpusTests.test_web_data_generation_removes_stale_files_and_matches_leaf_index) ... ok
+2026-10-19T10:38:27.6890764Z test_draft_engine_uses_temporary_exact_config_and_redacts_log (test_reliability.DraftEngineTests.test_draft_engine_uses_temporary_exact_config_and_redacts_log) ... ok
+2026-10-19T10:38:27.6896895Z test_draft_permissions_deny_shell_web_and_undeclared_edits (test_reliability.DraftEngineTests.test_draft_permissions_deny_shell_web_and_undeclared_edits) ... ok
+2026-10-19T10:38:28.1924409Z test_read_only_mcp_refuses_classification_side_effect (test_reliability.DraftEngineTests.test_read_only_mcp_refuses_classification_side_effect) ... ok
+2026-10-19T10:38:28.2127719Z test_api_tasks_require_fixed_document_and_requirement_inputs (test_reliability.ExecutionServiceTests.test_api_tasks_require_fixed_document_and_requirement_inputs) ... ok
+2026-10-19T10:38:28.3437631Z test_applied_result_recovers_an_interrupted_baseline_adoption (test_reliability.ExecutionServiceTests.test_applied_result_recovers_an_interrupted_baseline_adoption) ... ok
+2026-10-19T10:38:28.4391027Z test_applied_result_without_adopted_baseline_cannot_pass_acceptance (test_reliability.ExecutionServiceTests.test_applied_result_without_adopted_baseline_cannot_pass_acceptance) ... ok
+2026-10-19T10:38:28.5325316Z test_cleanup_does_not_remove_a_workdir_reused_by_follow_up (test_reliability.ExecutionServiceTests.test_cleanup_does_not_remove_a_workdir_reused_by_follow_up) ... ok
+2026-10-19T10:38:28.6404036Z test_cleanup_requires_terminal_execution_and_preserves_evidence (test_reliability.ExecutionServiceTests.test_cleanup_requires_terminal_execution_and_preserves_evidence) ... ok
+2026-10-19T10:38:28.6949504Z test_cli_failure_and_timeout_evidence_remain_distinguishable (test_reliability.ExecutionServiceTests.test_cli_failure_and_timeout_evidence_remain_distinguishable) ... ok
+2026-10-19T10:38:28.7288158Z test_cli_run_evidence_is_persisted_outside_workspace_and_indexed (test_reliability.ExecutionServiceTests.test_cli_run_evidence_is_persisted_outside_workspace_and_indexed) ... ok
+2026-10-19T10:38:28.8197004Z test_cli_transport_runs_in_isolation_and_records_terminal_evidence (test_reliability.ExecutionServiceTests.test_cli_transport_runs_in_isolation_and_records_terminal_evidence) ... ok
+2026-10-19T10:38:29.8816492Z test_cli_verification_maps_steps_and_timeout (test_reliability.ExecutionServiceTests.test_cli_verification_maps_steps_and_timeout) ... ok
+2026-10-19T10:38:29.9023460Z test_completion_report_rejects_missing_or_mismatched_requirements (test_reliability.ExecutionServiceTests.test_completion_report_rejects_missing_or_mismatched_requirements) ... ok
+2026-10-19T10:38:30.0162816Z test_execution_freezes_inputs_and_reconciles_real_file_changes (test_reliability.ExecutionServiceTests.test_execution_freezes_inputs_and_reconciles_real_file_changes) ... ok
+2026-10-19T10:38:30.0436171Z test_execution_rejects_a_project_database_inside_the_source (test_reliability.ExecutionServiceTests.test_execution_rejects_a_project_database_inside_the_source) ... ok
+2026-10-19T10:38:30.0639062Z test_explicit_apply_recovery_restores_a_journaled_backup (test_reliability.ExecutionServiceTests.test_explicit_apply_recovery_restores_a_journaled_backup) ... ok
+2026-10-19T10:38:30.0988981Z test_failed_or_stopped_execution_cannot_pass_acceptance (test_reliability.ExecutionServiceTests.test_failed_or_stopped_execution_cannot_pass_acceptance) ... ok
+2026-10-19T10:38:30.1303370Z test_failed_product_acceptance_can_start_a_new_execution (test_reliability.ExecutionServiceTests.test_failed_product_acceptance_can_start_a_new_execution) ... ok
+2026-10-19T10:38:30.1491476Z test_fixed_verification_excludes_unplanned_commands (test_reliability.ExecutionServiceTests.test_fixed_verification_excludes_unplanned_commands) ... ok
+2026-10-19T10:38:30.1686738Z test_fixed_verifier_rejects_modified_protected_tests (test_reliability.ExecutionServiceTests.test_fixed_verifier_rejects_modified_protected_tests) ... ok
+2026-10-19T10:38:30.2495071Z test_follow_up_rejects_an_unrecorded_change_in_the_isolated_copy (test_reliability.ExecutionServiceTests.test_follow_up_rejects_an_unrecorded_change_in_the_isolated_copy) ... ok
+2026-10-19T10:38:30.4070327Z test_follow_up_reuses_session_and_creates_a_new_snapshot_boundary (test_reliability.ExecutionServiceTests.test_follow_up_reuses_session_and_creates_a_new_snapshot_boundary) ... ok
+2026-10-19T10:38:30.5078932Z test_http_apply_route_uses_the_recorded_isolated_result (test_reliability.ExecutionServiceTests.test_http_apply_route_uses_the_recorded_isolated_result) ... ok
+2026-10-19T10:38:30.5964012Z test_http_continue_route_uses_the_existing_execution (test_reliability.ExecutionServiceTests.test_http_continue_route_uses_the_existing_execution) ... ok
+2026-10-19T10:38:30.6264693Z test_http_recover_apply_route_requires_explicit_service_call (test_reliability.ExecutionServiceTests.test_http_recover_apply_route_requires_explicit_service_call) ... ok
+2026-10-19T10:38:30.7221328Z test_interrupted_apply_recovers_the_intended_result (test_reliability.ExecutionServiceTests.test_interrupted_apply_recovers_the_intended_result) ... ok
+2026-10-19T10:38:30.7415269Z test_isolated_copy_rejects_symlinks_outside_the_project (test_reliability.ExecutionServiceTests.test_isolated_copy_rejects_symlinks_outside_the_project) ... ok
+2026-10-19T10:38:30.8555156Z test_iteration_baseline_requires_an_explicit_rebase (test_reliability.ExecutionServiceTests.test_iteration_baseline_requires_an_explicit_rebase) ... ok
+2026-10-19T10:38:30.8882053Z test_iteration_requires_core_inputs_and_workspace_baseline (test_reliability.ExecutionServiceTests.test_iteration_requires_core_inputs_and_workspace_baseline) ... ok
+2026-10-19T10:38:30.9671236Z test_missing_engine_session_does_not_rewrite_terminal_execution (test_reliability.ExecutionServiceTests.test_missing_engine_session_does_not_rewrite_terminal_execution) ... ok
+2026-10-19T10:38:31.0057179Z test_missing_session_can_be_closed_as_a_stopped_execution (test_reliability.ExecutionServiceTests.test_missing_session_can_be_closed_as_a_stopped_execution) ... ok
+2026-10-19T10:38:31.0973063Z test_new_retry_supersedes_the_previous_unapplied_result (test_reliability.ExecutionServiceTests.test_new_retry_supersedes_the_previous_unapplied_result) ... ok
+2026-10-19T10:38:31.1771958Z test_out_of_scope_change_is_preserved_and_flagged (test_reliability.ExecutionServiceTests.test_out_of_scope_change_is_preserved_and_flagged) ... ok
+2026-10-19T10:38:31.2145048Z test_permission_replies_cannot_create_persistent_grants (test_reliability.ExecutionServiceTests.test_permission_replies_cannot_create_persistent_grants) ... ok
+2026-10-19T10:38:31.2487683Z test_permission_reply_rejects_resource_outside_task_write_paths (test_reliability.ExecutionServiceTests.test_permission_reply_rejects_resource_outside_task_write_paths) ... ok
+2026-10-19T10:38:31.3086854Z test_process_crash_leaves_a_recoverable_apply_journal (test_reliability.ExecutionServiceTests.test_process_crash_leaves_a_recoverable_apply_journal) ... ok
+2026-10-19T10:38:31.3447153Z test_reconcile_keeps_permission_as_first_class_interaction (test_reliability.ExecutionServiceTests.test_reconcile_keeps_permission_as_first_class_interaction) ... ok
+2026-10-19T10:38:31.3697440Z test_requirement_revisions_are_frozen_into_iterations_and_tasks (test_reliability.ExecutionServiceTests.test_requirement_revisions_are_frozen_into_iterations_and_tasks) ... ok
+2026-10-19T10:38:31.4567160Z test_result_application_detects_source_workspace_conflict (test_reliability.ExecutionServiceTests.test_result_application_detects_source_workspace_conflict) ... ok
+2026-10-19T10:38:31.5410009Z test_result_application_rechecks_each_target_before_replace (test_reliability.ExecutionServiceTests.test_result_application_rechecks_each_target_before_replace) ... ok
+2026-10-19T10:38:31.6266307Z test_result_application_rolls_back_a_partial_filesystem_failure (test_reliability.ExecutionServiceTests.test_result_application_rolls_back_a_partial_filesystem_failure) ... ok
+2026-10-19T10:38:31.6643597Z test_stopped_http_cleanup_materializes_evidence (test_reliability.ExecutionServiceTests.test_stopped_http_cleanup_materializes_evidence) ... ok
+2026-10-19T10:38:31.6828950Z test_task_boundaries_reject_analysis_writes_and_parent_paths (test_reliability.ExecutionServiceTests.test_task_boundaries_reject_analysis_writes_and_parent_paths) ... ok
+2026-10-19T10:38:32.7049597Z test_task_timeout_overrides_project_timeout_for_verification (test_reliability.ExecutionServiceTests.test_task_timeout_overrides_project_timeout_for_verification) ... ok
+2026-10-19T10:38:32.7421543Z test_unknown_execution_workspace_can_be_cleaned_after_explicit_review (test_reliability.ExecutionServiceTests.test_unknown_execution_workspace_can_be_cleaned_after_explicit_review) ... ok
+2026-10-19T10:38:32.7620792Z test_verification_registry_rejects_inline_absolute_and_unknown_commands (test_reliability.ExecutionServiceTests.test_verification_registry_rejects_inline_absolute_and_unknown_commands) ... ok
+2026-10-19T10:38:32.7925315Z test_verification_rejects_shell_chaining_and_scrubs_environment (test_reliability.ExecutionServiceTests.test_verification_rejects_shell_chaining_and_scrubs_environment) ... ok
+2026-10-19T10:38:32.8157180Z test_workspace_change_blocks_execution_before_engine_session (test_reliability.ExecutionServiceTests.test_workspace_change_blocks_execution_before_engine_session) ... ok
+2026-10-19T10:38:32.8158905Z test_abort_and_other_errors_are_distinct (test_reliability.ExecutionStateTests.test_abort_and_other_errors_are_distinct) ... ok
+2026-10-19T10:38:32.8160177Z test_completed_requires_a_completed_stop_message (test_reliability.ExecutionStateTests.test_completed_requires_a_completed_stop_message) ... ok
+2026-10-19T10:38:32.8161264Z test_idle_alone_is_not_completion (test_reliability.ExecutionStateTests.test_idle_alone_is_not_completion) ... ok
+2026-10-19T10:38:32.8162707Z test_partial_assistant_message_without_terminal_outcome_stays_running (test_reliability.ExecutionStateTests.test_partial_assistant_message_without_terminal_outcome_stays_running) ... ok
+2026-10-19T10:38:32.8164034Z test_permission_has_precedence_over_busy (test_reliability.ExecutionStateTests.test_permission_has_precedence_over_busy) ... ok
+2026-10-19T10:38:32.8164919Z test_unrelated_permission_does_not_capture_task (test_reliability.ExecutionStateTests.test_unrelated_permission_does_not_capture_task) ... ok
+2026-10-19T10:38:32.8165887Z test_user_message_without_assistant_response_stays_queued (test_reliability.ExecutionStateTests.test_user_message_without_assistant_response_stays_queued) ... ok
+2026-10-19T10:38:32.8166881Z test_accepted_labels_are_explicit_and_partial_results_fail (test_reliability.GateTests.test_accepted_labels_are_explicit_and_partial_results_fail) ... ok
+2026-10-19T10:38:32.8167997Z test_request_failure_is_recorded_and_cannot_pass (test_reliability.GateTests.test_request_failure_is_recorded_and_cannot_pass) ... ok
+2026-10-19T10:38:32.8173749Z test_base_url_must_be_absolute_http (test_reliability.ModelSettingsTests.test_base_url_must_be_absolute_http) ... ok
+2026-10-19T10:38:32.8202569Z test_blank_key_keeps_stored_value_and_null_clears_it (test_reliability.ModelSettingsTests.test_blank_key_keeps_stored_value_and_null_clears_it) ... ok
+2026-10-19T10:38:32.8216140Z test_complete_text_falls_back_to_reasoning (test_reliability.ModelSettingsTests.test_complete_text_falls_back_to_reasoning) ... ok
+2026-10-19T10:38:32.8230810Z test_credentials_are_write_only (test_reliability.ModelSettingsTests.test_credentials_are_write_only) ... ok
+2026-10-19T10:38:32.8249535Z test_delete_requires_explicit_confirmation (test_reliability.ModelSettingsTests.test_delete_requires_explicit_confirmation) ... ok
+2026-10-19T10:38:32.8271896Z test_deleting_the_default_clears_the_default (test_reliability.ModelSettingsTests.test_deleting_the_default_clears_the_default) ... ok
+2026-10-19T10:38:32.8280234Z test_http_error_mapping (test_reliability.ModelSettingsTests.test_http_error_mapping) ... ok
+2026-10-19T10:38:32.8315080Z test_import_reads_credentials_from_the_sqlite_store (test_reliability.ModelSettingsTests.test_import_reads_credentials_from_the_sqlite_store) ... ok
+2026-10-19T10:38:32.8330850Z test_missing_credential_is_reported (test_reliability.ModelSettingsTests.test_missing_credential_is_reported) ... ok
+2026-10-19T10:38:32.8339162Z test_model_unavailable_is_not_retryable (test_reliability.ModelSettingsTests.test_model_unavailable_is_not_retryable) ... ok
+2026-10-19T10:38:32.8346290Z test_provider_error_messages_do_not_leak_the_credential (test_reliability.ModelSettingsTests.test_provider_error_messages_do_not_leak_the_credential) ... ok
+2026-10-19T10:38:32.8372096Z test_role_model_falls_back_to_the_default (test_reliability.ModelSettingsTests.test_role_model_falls_back_to_the_default) ... ok
+2026-10-19T10:38:32.8395741Z test_role_model_naming_a_served_model_is_honored (test_reliability.ModelSettingsTests.test_role_model_naming_a_served_model_is_honored) ... ok
+2026-10-19T10:38:32.8417518Z test_role_model_the_provider_lacks_is_ignored (test_reliability.ModelSettingsTests.test_role_model_the_provider_lacks_is_ignored) ... ok
+2026-10-19T10:38:32.8430487Z test_saved_file_is_owner_only (test_reliability.ModelSettingsTests.test_saved_file_is_owner_only) ... ok
+2026-10-19T10:38:32.8437531Z test_settings_route_reports_config_errors_with_codes (test_reliability.ModelSettingsTests.test_settings_route_reports_config_errors_with_codes) ... ok
+2026-10-19T10:38:32.8454103Z test_settings_routes_return_masked_views (test_reliability.ModelSettingsTests.test_settings_routes_return_masked_views) ... ok
+2026-10-19T10:38:32.8468455Z test_tool_calls_are_normalized (test_reliability.ModelSettingsTests.test_tool_calls_are_normalized) ... ok
+2026-10-19T10:38:32.8475771Z test_unknown_provider_is_reported_as_not_configured (test_reliability.ModelSettingsTests.test_unknown_provider_is_reported_as_not_configured) ... ok
+2026-10-19T10:38:32.8490231Z test_usage_omits_unknown_numbers_rather_than_guessing (test_reliability.ModelSettingsTests.test_usage_omits_unknown_numbers_rather_than_guessing) ... ok
+2026-10-19T10:38:32.8495927Z test_build_run_argv_is_shell_free_and_scoped (test_reliability.OpenCodeCliAdapterTests.test_build_run_argv_is_shell_free_and_scoped) ... ok
+2026-10-19T10:38:32.8526111Z test_cli_runner_uses_atlas_owned_v2_permissions (test_reliability.OpenCodeCliAdapterTests.test_cli_runner_uses_atlas_owned_v2_permissions) ... ok
+2026-10-19T10:38:32.8532672Z test_preflight_marks_provider_check_failure_without_leaking_output (test_reliability.OpenCodeCliAdapterTests.test_preflight_marks_provider_check_failure_without_leaking_output) ... ok
+2026-10-19T10:38:32.8539265Z test_preflight_marks_timeout_as_failed (test_reliability.OpenCodeCliAdapterTests.test_preflight_marks_timeout_as_failed) ... ok
+2026-10-19T10:38:32.8544667Z test_preflight_rejects_version_below_baseline (test_reliability.OpenCodeCliAdapterTests.test_preflight_rejects_version_below_baseline) ... ok
+2026-10-19T10:38:32.8549791Z test_preflight_returns_safe_evidence_without_command_output (test_reliability.OpenCodeCliAdapterTests.test_preflight_returns_safe_evidence_without_command_output) ... ok
+2026-10-19T10:38:32.8558074Z test_run_prompt_returns_stable_summary_alongside_raw_output (test_reliability.OpenCodeCliAdapterTests.test_run_prompt_returns_stable_summary_alongside_raw_output) ... ok
+2026-10-19T10:38:32.8559983Z test_summarize_run_classifies_local_log_access_failure (test_reliability.OpenCodeCliAdapterTests.test_summarize_run_classifies_local_log_access_failure) ... ok
+2026-10-19T10:38:32.8561818Z test_summarize_run_classifies_provider_failure_without_raw_message (test_reliability.OpenCodeCliAdapterTests.test_summarize_run_classifies_provider_failure_without_raw_message) ... ok
+2026-10-19T10:38:32.8563510Z test_summarize_run_distinguishes_timeout_and_failure (test_reliability.OpenCodeCliAdapterTests.test_summarize_run_distinguishes_timeout_and_failure) ... ok
+2026-10-19T10:38:32.8565580Z test_summarize_run_normalizes_json_events_and_transport_state (test_reliability.OpenCodeCliAdapterTests.test_summarize_run_normalizes_json_events_and_transport_state) ... ok
+2026-10-19T10:38:32.8571922Z test_write_run_evidence_creates_self_contained_files (test_reliability.OpenCodeCliAdapterTests.test_write_run_evidence_creates_self_contained_files) ... ok
+2026-10-19T10:38:32.9052492Z test_write_run_evidence_redacts_secrets_and_uses_private_permissions (test_reliability.OpenCodeCliAdapterTests.test_write_run_evidence_redacts_secrets_and_uses_private_permissions) ... ok
+2026-10-19T10:38:32.9056921Z test_async_message_uses_nonblocking_endpoint (test_reliability.OpenCodeClientTests.test_async_message_uses_nonblocking_endpoint) ... ok
+2026-10-19T10:38:32.9058191Z test_client_scopes_session_requests_to_directory (test_reliability.OpenCodeClientTests.test_client_scopes_session_requests_to_directory) ... ok
+2026-10-19T10:38:32.9060472Z test_permission_reply_uses_current_nondeprecated_endpoint (test_reliability.OpenCodeClientTests.test_permission_reply_uses_current_nondeprecated_endpoint) ... ok
+2026-10-19T10:38:32.9062521Z test_question_reply_uses_current_endpoint_and_answer_shape (test_reliability.OpenCodeClientTests.test_question_reply_uses_current_endpoint_and_answer_shape) ... ok
+2026-10-19T10:38:32.9065678Z test_reconcile_reads_authoritative_endpoints_and_filters_permissions (test_reliability.OpenCodeClientTests.test_reconcile_reads_authoritative_endpoints_and_filters_permissions) ... ok
+2026-10-19T10:38:32.9075934Z test_reconcile_treats_missing_diff_as_empty (test_reliability.OpenCodeClientTests.test_reconcile_treats_missing_diff_as_empty) ... ok
+2026-10-19T10:38:32.9077659Z test_rejects_remote_servers_and_invalid_ids (test_reliability.OpenCodeClientTests.test_rejects_remote_servers_and_invalid_ids) ... ok
+2026-10-19T10:38:32.9079224Z test_sse_parser_and_session_filter (test_reliability.OpenCodeClientTests.test_sse_parser_and_session_filter) ... ok
+2026-10-19T10:38:32.9081029Z test_v2_permission_and_form_replies_use_session_scoped_endpoints (test_reliability.OpenCodeClientTests.test_v2_permission_and_form_replies_use_session_scoped_endpoints) ... ok
+2026-10-19T10:38:32.9086398Z test_v2_transport_uses_api_auth_and_normalizes_messages (test_reliability.OpenCodeClientTests.test_v2_transport_uses_api_auth_and_normalizes_messages) ... ok
+2026-10-19T10:38:32.9092427Z test_permission_policy_rejects_a_symlinked_config (test_reliability.OpenCodePermissionTests.test_permission_policy_rejects_a_symlinked_config) ... ok
+2026-10-19T10:38:32.9102765Z test_unmanaged_opencode_url_requires_explicit_trust_override (test_reliability.OpenCodePermissionTests.test_unmanaged_opencode_url_requires_explicit_trust_override) ... ok
+2026-10-19T10:38:32.9130149Z test_v1_policy_uses_direct_config_and_denies_shell (test_reliability.OpenCodePermissionTests.test_v1_policy_uses_direct_config_and_denies_shell) ... ok
+2026-10-19T10:38:32.9161687Z test_v2_policy_is_restored_after_a_temporary_run (test_reliability.OpenCodePermissionTests.test_v2_policy_is_restored_after_a_temporary_run) ... ok
+2026-10-19T10:38:32.9169778Z test_version_detection_handles_opencode_v_prefix (test_reliability.OpenCodePermissionTests.test_version_detection_handles_opencode_v_prefix) ... ok
+2026-10-19T10:38:32.9671746Z test_backup_is_project_scoped_and_restores_to_a_new_store (test_reliability.ProjectBackupTests.test_backup_is_project_scoped_and_restores_to_a_new_store) ... ok
+2026-10-19T10:38:32.9925146Z test_backup_redacts_legacy_execution_evidence_in_the_copy (test_reliability.ProjectBackupTests.test_backup_redacts_legacy_execution_evidence_in_the_copy) ... ok
+2026-10-19T10:38:33.0078677Z test_backup_refuses_active_work (test_reliability.ProjectBackupTests.test_backup_refuses_active_work) ... ok
+2026-10-19T10:38:33.0236624Z test_backup_refuses_unapplied_completed_results (test_reliability.ProjectBackupTests.test_backup_refuses_unapplied_completed_results) ... ok
+2026-10-19T10:38:33.0446471Z test_backup_validation_detects_tampering (test_reliability.ProjectBackupTests.test_backup_validation_detects_tampering) ... ok
+2026-10-19T10:38:33.0673421Z test_browser_backup_delete_and_restore_cleanup_are_explicit (test_reliability.ProjectBackupTests.test_browser_backup_delete_and_restore_cleanup_are_explicit) ... ok
+2026-10-19T10:38:33.1003896Z test_browser_backup_list_and_restore_target_are_controlled (test_reliability.ProjectBackupTests.test_browser_backup_list_and_restore_target_are_controlled) ... ok
+2026-10-19T10:38:33.1760897Z test_interrupted_restore_keeps_journal_until_explicit_cleanup (test_reliability.ProjectBackupTests.test_interrupted_restore_keeps_journal_until_explicit_cleanup) ... ok
+2026-10-19T10:38:33.1936825Z test_prepare_restore_target_rejects_workspace_overlap (test_reliability.ProjectBackupTests.test_prepare_restore_target_rejects_workspace_overlap) ... ok
+2026-10-19T10:38:33.2680059Z test_restore_artifact_journal_precedes_atomic_install (test_reliability.ProjectBackupTests.test_restore_artifact_journal_precedes_atomic_install) ... ok
+2026-10-19T10:38:33.3423009Z test_restore_database_link_crash_window_is_explicitly_recoverable (test_reliability.ProjectBackupTests.test_restore_database_link_crash_window_is_explicitly_recoverable) ... ok
+2026-10-19T10:38:33.4199322Z test_restore_recovery_refuses_replaced_artifact (test_reliability.ProjectBackupTests.test_restore_recovery_refuses_replaced_artifact) ... ok
+2026-10-19T10:38:33.4949887Z test_restore_recovery_refuses_replaced_database (test_reliability.ProjectBackupTests.test_restore_recovery_refuses_replaced_database) ... ok
+2026-10-19T10:38:33.5280596Z test_restore_validates_and_extracts_the_same_archive_handle (test_reliability.ProjectBackupTests.test_restore_validates_and_extracts_the_same_archive_handle) ... ok
+2026-10-19T10:38:33.5451792Z test_acceptance_focus_paths_do_not_replace_default_snapshot_ignores (test_reliability.ProjectStoreTests.test_acceptance_focus_paths_do_not_replace_default_snapshot_ignores) ... ok
+2026-10-19T10:38:33.5616193Z test_acceptance_records_server_owned_execution_and_input_binding (test_reliability.ProjectStoreTests.test_acceptance_records_server_owned_execution_and_input_binding) ... ok
+2026-10-19T10:38:33.5791756Z test_acceptance_route_requires_and_persists_condition_results (test_reliability.ProjectStoreTests.test_acceptance_route_requires_and_persists_condition_results) ... ok
+2026-10-19T10:38:33.5916802Z test_ai_scope_recommendation_is_not_user_confirmation (test_reliability.ProjectStoreTests.test_ai_scope_recommendation_is_not_user_confirmation) ... ok
+2026-10-19T10:38:33.6189719Z test_analysis_generation_is_grounded_reviewable_and_applied_once (test_reliability.ProjectStoreTests.test_analysis_generation_is_grounded_reviewable_and_applied_once) ... ok
+2026-10-19T10:38:33.6269720Z test_app_catalog_reference_declares_depth_and_tracks_its_record (test_reliability.ProjectStoreTests.test_app_catalog_reference_declares_depth_and_tracks_its_record) ... ok
+2026-10-19T10:38:33.6326214Z test_artifact_cleanup_does_not_follow_symlink_roots (test_reliability.ProjectStoreTests.test_artifact_cleanup_does_not_follow_symlink_roots) ... ok
+2026-10-19T10:38:33.6422358Z test_atlas_reference_keeps_excerpt_and_reports_source_update (test_reliability.ProjectStoreTests.test_atlas_reference_keeps_excerpt_and_reports_source_update) ... ok
+2026-10-19T10:38:33.6498258Z test_decisions_and_references_cannot_cross_projects (test_reliability.ProjectStoreTests.test_decisions_and_references_cannot_cross_projects) ... ok
+2026-10-19T10:38:33.6653614Z test_document_basis_tracks_authorship_and_upstream_changes (test_reliability.ProjectStoreTests.test_document_basis_tracks_authorship_and_upstream_changes) ... ok
+2026-10-19T10:38:33.7158673Z test_document_bundle_is_complete_ordered_and_applied_by_dependency (test_reliability.ProjectStoreTests.test_document_bundle_is_complete_ordered_and_applied_by_dependency) ... ok
+2026-10-19T10:38:33.7538256Z test_document_generation_uses_confirmed_scope_and_will_not_overwrite_newer_edit (test_reliability.ProjectStoreTests.test_document_generation_uses_confirmed_scope_and_will_not_overwrite_newer_edit) ... ok
+2026-10-19T10:38:33.7670497Z test_document_review_and_requirement_confirmation_use_revision_cas (test_reliability.ProjectStoreTests.test_document_review_and_requirement_confirmation_use_revision_cas) ... ok
+2026-10-19T10:38:33.7756058Z test_document_versions_are_immutable_and_conflicts_are_explicit (test_reliability.ProjectStoreTests.test_document_versions_are_immutable_and_conflicts_are_explicit) ... ok
+2026-10-19T10:38:33.7871520Z test_empty_workspace_is_rejected (test_reliability.ProjectStoreTests.test_empty_workspace_is_rejected) ... ok
+2026-10-19T10:38:33.7976646Z test_execution_completion_does_not_imply_acceptance (test_reliability.ProjectStoreTests.test_execution_completion_does_not_imply_acceptance) ... ok
+2026-10-19T10:38:33.8157221Z test_execution_evidence_and_export_redact_known_secrets (test_reliability.ProjectStoreTests.test_execution_evidence_and_export_redact_known_secrets) ... ok
+2026-10-19T10:38:33.8243612Z test_execution_get_is_read_only_and_reconcile_is_explicit_post (test_reliability.ProjectStoreTests.test_execution_get_is_read_only_and_reconcile_is_explicit_post) ... ok
+2026-10-19T10:38:33.8369962Z test_execution_updates_task_and_keeps_raw_projection (test_reliability.ProjectStoreTests.test_execution_updates_task_and_keeps_raw_projection) ... ok
+2026-10-19T10:38:33.8431178Z test_failed_transaction_does_not_leave_partial_task (test_reliability.ProjectStoreTests.test_failed_transaction_does_not_leave_partial_task) ... ok
+2026-10-19T10:38:33.8577950Z test_generation_accepts_result_written_in_persistent_engine_directory (test_reliability.ProjectStoreTests.test_generation_accepts_result_written_in_persistent_engine_directory) ... ok
+2026-10-19T10:38:33.8949193Z test_generation_apply_is_receipt_backed_and_staleness_aware (test_reliability.ProjectStoreTests.test_generation_apply_is_receipt_backed_and_staleness_aware) ... ok
+2026-10-19T10:38:33.9488998Z test_generation_engine_log_is_redacted_and_bounded (test_reliability.ProjectStoreTests.test_generation_engine_log_is_redacted_and_bounded) ... ok
+2026-10-19T10:38:33.9645106Z test_generation_keeps_provider_result_in_disposable_runtime (test_reliability.ProjectStoreTests.test_generation_keeps_provider_result_in_disposable_runtime) ... ok
+2026-10-19T10:38:33.9768546Z test_generation_markdown_keeps_long_fixed_evidence_readable (test_reliability.ProjectStoreTests.test_generation_markdown_keeps_long_fixed_evidence_readable) ... ok
+2026-10-19T10:38:33.9825350Z test_generation_recovers_only_matching_complete_json_text (test_reliability.ProjectStoreTests.test_generation_recovers_only_matching_complete_json_text) ... ok
+2026-10-19T10:38:33.9970694Z test_generation_rejects_provider_artifact_outside_runtime (test_reliability.ProjectStoreTests.test_generation_rejects_provider_artifact_outside_runtime) ... ok
+2026-10-19T10:38:34.0297798Z test_generation_rejects_wrong_input_fingerprint_and_unknown_evidence (test_reliability.ProjectStoreTests.test_generation_rejects_wrong_input_fingerprint_and_unknown_evidence) ... ok
+2026-10-19T10:38:34.0733537Z test_generation_staleness_tracks_confirmation_and_document_state (test_reliability.ProjectStoreTests.test_generation_staleness_tracks_confirmation_and_document_state) ... ok
+2026-10-19T10:38:34.0912547Z test_generation_without_basis_fingerprint_fails_closed (test_reliability.ProjectStoreTests.test_generation_without_basis_fingerprint_fails_closed) ... ok
+2026-10-19T10:38:34.1150581Z test_handoff_uses_fixed_inputs_and_flags_missing_recovery_evidence (test_reliability.ProjectStoreTests.test_handoff_uses_fixed_inputs_and_flags_missing_recovery_evidence) ... ok
+2026-10-19T10:38:34.1709728Z test_improvement_generation_binds_goal_workspace_evidence_and_review (test_reliability.ProjectStoreTests.test_improvement_generation_binds_goal_workspace_evidence_and_review) ... ok
+2026-10-19T10:38:34.1942644Z test_improvement_generation_rejects_workspace_change_after_preparation (test_reliability.ProjectStoreTests.test_improvement_generation_rejects_workspace_change_after_preparation) ... ok
+2026-10-19T10:38:34.2296687Z test_improvement_result_requires_baseline_basis_and_complete_plan (test_reliability.ProjectStoreTests.test_improvement_result_requires_baseline_basis_and_complete_plan) ... ok
+2026-10-19T10:38:34.2409482Z test_iteration_completion_requires_task_acceptance (test_reliability.ProjectStoreTests.test_iteration_completion_requires_task_acceptance) ... ok
+2026-10-19T10:38:34.2556487Z test_iteration_freezes_scope_and_allows_only_one_active_iteration (test_reliability.ProjectStoreTests.test_iteration_freezes_scope_and_allows_only_one_active_iteration) ... ok
+2026-10-19T10:38:34.2710297Z test_late_execution_update_does_not_overwrite_latest_task_status (test_reliability.ProjectStoreTests.test_late_execution_update_does_not_overwrite_latest_task_status) ... ok
+2026-10-19T10:38:34.2863105Z test_legacy_acceptance_migration_is_dry_run_explicit_and_idempotent (test_reliability.ProjectStoreTests.test_legacy_acceptance_migration_is_dry_run_explicit_and_idempotent) ... ok
+2026-10-19T10:38:34.3001464Z test_legacy_acceptance_migration_routes_require_confirmation (test_reliability.ProjectStoreTests.test_legacy_acceptance_migration_routes_require_confirmation) ... ok
+2026-10-19T10:38:34.3421728Z test_nested_workspace_git_state_ignores_parent_repository_siblings (test_reliability.ProjectStoreTests.test_nested_workspace_git_state_ignores_parent_repository_siblings) ... ok
+2026-10-19T10:38:34.3675937Z test_open_items_merge_dispositions_and_convert_to_records (test_reliability.ProjectStoreTests.test_open_items_merge_dispositions_and_convert_to_records) ... ok
+2026-10-19T10:38:34.3798506Z test_outside_scope_change_is_visible_without_forcing_focus_review (test_reliability.ProjectStoreTests.test_outside_scope_change_is_visible_without_forcing_focus_review) ... ok
+2026-10-19T10:38:34.4043637Z test_passed_acceptance_requires_a_completed_and_applied_execution (test_reliability.ProjectStoreTests.test_passed_acceptance_requires_a_completed_and_applied_execution) ... ok
+2026-10-19T10:38:34.4119665Z test_project_data_is_separate_and_persistent (test_reliability.ProjectStoreTests.test_project_data_is_separate_and_persistent) ... ok
+2026-10-19T10:38:34.4252507Z test_project_delete_blocks_an_applying_result (test_reliability.ProjectStoreTests.test_project_delete_blocks_an_applying_result) ... ok
+2026-10-19T10:38:34.4456201Z test_project_delete_removes_owned_records_preserves_workspace_and_blocks_active_run (test_reliability.ProjectStoreTests.test_project_delete_removes_owned_records_preserves_workspace_and_blocks_active_run) ... ok
+2026-10-19T10:38:34.4646907Z test_project_delete_uses_generation_lifecycle_lock (test_reliability.ProjectStoreTests.test_project_delete_uses_generation_lifecycle_lock) ... ok
+2026-10-19T10:38:34.4804224Z test_project_export_is_self_contained_and_keeps_confirmation_separate (test_reliability.ProjectStoreTests.test_project_export_is_self_contained_and_keeps_confirmation_separate) ... ok
+2026-10-19T10:38:34.4891460Z test_project_http_create_list_get_and_validation (test_reliability.ProjectStoreTests.test_project_http_create_list_get_and_validation) ... ok
+2026-10-19T10:38:34.5105271Z test_project_http_starter_reference_and_confirmed_delete (test_reliability.ProjectStoreTests.test_project_http_starter_reference_and_confirmed_delete) ... ok
+2026-10-19T10:38:34.5198206Z test_project_reference_http_create_list_and_update (test_reliability.ProjectStoreTests.test_project_reference_http_create_list_and_update) ... ok
+2026-10-19T10:38:34.5440725Z test_project_workflow_http_keeps_recommendation_confirmation_and_versions_distinct (test_reliability.ProjectStoreTests.test_project_workflow_http_keeps_recommendation_confirmation_and_versions_distinct) ... ok
+2026-10-19T10:38:34.5554712Z test_references_are_unique_editable_and_project_scoped (test_reliability.ProjectStoreTests.test_references_are_unique_editable_and_project_scoped) ... ok
+2026-10-19T10:38:34.5959720Z test_section_revision_preserves_outside_content_and_checks_version (test_reliability.ProjectStoreTests.test_section_revision_preserves_outside_content_and_checks_version) ... ok
+2026-10-19T10:38:34.6038646Z test_source_reference_rejects_a_stale_displayed_fingerprint (test_reliability.ProjectStoreTests.test_source_reference_rejects_a_stale_displayed_fingerprint) ... ok
+2026-10-19T10:38:34.6119518Z test_task_inputs_must_belong_to_same_project (test_reliability.ProjectStoreTests.test_task_inputs_must_belong_to_same_project) ... ok
+2026-10-19T10:38:34.6678009Z test_value_analysis_is_advisory_grounded_and_never_changes_scope (test_reliability.ProjectStoreTests.test_value_analysis_is_advisory_grounded_and_never_changes_scope) ... ok
+2026-10-19T10:38:34.6810367Z test_version_one_store_migrates_without_losing_tasks (test_reliability.ProjectStoreTests.test_version_one_store_migrates_without_losing_tasks) ... ok
+2026-10-19T10:38:34.6944637Z test_version_two_store_adds_document_authorship (test_reliability.ProjectStoreTests.test_version_two_store_adds_document_authorship) ... ok
+2026-10-19T10:38:34.7025651Z test_waived_acceptance_requires_an_explicit_reason (test_reliability.ProjectStoreTests.test_waived_acceptance_requires_an_explicit_reason) ... ok
+2026-10-19T10:38:34.7149006Z test_workspace_allows_only_one_active_execution (test_reliability.ProjectStoreTests.test_workspace_allows_only_one_active_execution) ... ok
+2026-10-19T10:38:34.7374819Z test_workspace_baseline_http_capture_check_list_and_conflict (test_reliability.ProjectStoreTests.test_workspace_baseline_http_capture_check_list_and_conflict) ... ok
+2026-10-19T10:38:34.7604170Z test_workspace_baseline_separates_evidence_and_adopts_reviewed_changes (test_reliability.ProjectStoreTests.test_workspace_baseline_separates_evidence_and_adopts_reviewed_changes) ... ok
+2026-10-19T10:38:34.7674010Z test_workspace_focus_paths_must_exist_and_remain_inside_root (test_reliability.ProjectStoreTests.test_workspace_focus_paths_must_exist_and_remain_inside_root) ... ok
+2026-10-19T10:38:34.7677898Z test_corpus_lock_prevents_concurrent_updates (test_reliability.PublicationTests.test_corpus_lock_prevents_concurrent_updates) ... ok
+2026-10-19T10:38:34.7703556Z test_failure_rolls_back_all_files (test_reliability.PublicationTests.test_failure_rolls_back_all_files) ... ok
+2026-10-19T10:38:34.7717081Z test_recover_interrupted_cutover (test_reliability.PublicationTests.test_recover_interrupted_cutover) ... ok
+2026-10-19T10:38:34.7959805Z test_review_updates_do_not_clobber_other_drafts (test_reliability.PublicationTests.test_review_updates_do_not_clobber_other_drafts) ... ok
+2026-10-19T10:38:34.8016141Z test_web_data_publish_rolls_back_an_interrupted_directory_swap (test_reliability.PublicationTests.test_web_data_publish_rolls_back_an_interrupted_directory_swap) ... ok
+2026-10-19T10:38:34.8109309Z test_cache_reloads_after_atomic_database_replacement (test_reliability.RetrievalTests.test_cache_reloads_after_atomic_database_replacement) ... ok
+2026-10-19T10:38:34.8116089Z test_scores_follow_slug_and_neighbors_are_unique (test_reliability.RetrievalTests.test_scores_follow_slug_and_neighbors_are_unique) ... ok
+2026-10-19T10:38:34.8185013Z test_project_store_process_lock_prevents_two_api_owners (test_reliability.RuntimeRecoveryTests.test_project_store_process_lock_prevents_two_api_owners) ... ok
+2026-10-19T10:38:34.8485364Z test_startup_recovery_marks_active_work_unknown_without_replay (test_reliability.RuntimeRecoveryTests.test_startup_recovery_marks_active_work_unknown_without_replay) ... ok
+2026-10-19T10:38:34.8619625Z test_startup_recovery_reports_a_journaled_apply_stage (test_reliability.RuntimeRecoveryTests.test_startup_recovery_reports_a_journaled_apply_stage) ... ok
+2026-10-19T10:38:34.8698133Z test_startup_recovery_reports_malformed_generation_runs (test_reliability.RuntimeRecoveryTests.test_startup_recovery_reports_malformed_generation_runs) ... ok
+2026-10-19T10:38:34.8812369Z test_new_idea_and_existing_project_samples_have_complete_links (test_reliability.SamplePackageTests.test_new_idea_and_existing_project_samples_have_complete_links) ... ok
+2026-10-19T10:38:34.8818574Z test_heading_read_includes_nested_sections_and_stops_at_peer (test_reliability.SourceReadingTests.test_heading_read_includes_nested_sections_and_stops_at_peer) ... ok
+2026-10-19T10:38:34.8823438Z test_invalid_paths_and_offsets_fail_closed (test_reliability.SourceReadingTests.test_invalid_paths_and_offsets_fail_closed) ... ok
+2026-10-19T10:38:34.8829605Z test_manifest_reports_both_sources_with_stable_outlines (test_reliability.SourceReadingTests.test_manifest_reports_both_sources_with_stable_outlines) ... ok
+2026-10-19T10:38:34.8837544Z test_missing_source_manifest_returns_a_stable_empty_contract (test_reliability.SourceReadingTests.test_missing_source_manifest_returns_a_stable_empty_contract) ... ok
+2026-10-19T10:38:34.8844103Z test_pagination_never_hides_truncation (test_reliability.SourceReadingTests.test_pagination_never_hides_truncation) ... ok
+2026-10-19T10:38:34.8866538Z test_web_fetch_extracts_text_through_validated_pinned_connection (test_reliability.WebFetchSafetyTests.test_web_fetch_extracts_text_through_validated_pinned_connection) ... ok
+2026-10-19T10:38:34.8877434Z test_web_fetch_rejects_mixed_dns_binary_and_oversized_responses (test_reliability.WebFetchSafetyTests.test_web_fetch_rejects_mixed_dns_binary_and_oversized_responses) ... ok
+2026-10-19T10:38:34.8880809Z test_web_fetch_rejects_non_http_credentials_and_local_targets (test_reliability.WebFetchSafetyTests.test_web_fetch_rejects_non_http_credentials_and_local_targets) ... ok
+2026-10-19T10:38:34.8888417Z test_web_fetch_revalidates_redirect_targets (test_reliability.WebFetchSafetyTests.test_web_fetch_revalidates_redirect_targets) ... ok
+2026-10-19T10:38:34.8899815Z test_detects_added_removed_and_modified_files (test_reliability.WorkspaceSnapshotTests.test_detects_added_removed_and_modified_files) ... ok
+2026-10-19T10:38:34.8907848Z test_different_roots_cannot_be_compared (test_reliability.WorkspaceSnapshotTests.test_different_roots_cannot_be_compared) ... ok
+2026-10-19T10:38:34.8917309Z test_snapshot_rejects_broad_roots_and_resource_limits (test_reliability.WorkspaceSnapshotTests.test_snapshot_rejects_broad_roots_and_resource_limits) ... ok
+2026-10-19T10:38:34.8923283Z test_symlink_target_is_recorded_without_following_it (test_reliability.WorkspaceSnapshotTests.test_symlink_target_is_recorded_without_following_it) ... ok
+2026-10-19T10:38:34.8934654Z test_unchanged_content_is_not_modified (test_reliability.WorkspaceSnapshotTests.test_unchanged_content_is_not_modified) ... ok
+2026-10-19T10:38:34.9244562Z test_cancel_terminates_owned_process_group (test_template_factory.CliProcessTests.test_cancel_terminates_owned_process_group) ... ok
+2026-10-19T10:38:34.9246198Z test_cognition_framing_accepts_only_complete_objects_with_extra_closing (test_template_factory.CliProcessTests.test_cognition_framing_accepts_only_complete_objects_with_extra_closing) ... ok
+2026-10-19T10:38:34.9711264Z test_cognition_output_length_stops_before_continuation (test_template_factory.CliProcessTests.test_cognition_output_length_stops_before_continuation) ... ok
+2026-10-19T10:38:35.2750152Z test_cognition_stages_cannot_search_or_fetch_external_content (test_template_factory.CliProcessTests.test_cognition_stages_cannot_search_or_fetch_external_content) ... ok
+2026-10-19T10:38:35.2754358Z test_cognitive_framing_recovery_never_fills_missing_data_or_changes_strings (test_template_factory.CliProcessTests.test_cognitive_framing_recovery_never_fills_missing_data_or_changes_strings) ... ok
+2026-10-19T10:38:35.2755849Z test_cognitive_framing_tolerates_only_known_provider_closing_markers (test_template_factory.CliProcessTests.test_cognitive_framing_tolerates_only_known_provider_closing_markers) ... ok
+2026-10-19T10:38:35.2759665Z test_cognitive_plan_recovers_premature_spec_closer_without_value_changes (test_template_factory.CliProcessTests.test_cognitive_plan_recovers_premature_spec_closer_without_value_changes) ... ok
+2026-10-19T10:38:35.3251099Z test_error_without_final_newline_overrides_prior_valid_text (test_template_factory.CliProcessTests.test_error_without_final_newline_overrides_prior_valid_text) ... ok
+2026-10-19T10:38:35.5005519Z test_explicit_deepseek_effort_is_scoped_to_one_cli_v2_invocation (test_template_factory.CliProcessTests.test_explicit_deepseek_effort_is_scoped_to_one_cli_v2_invocation) ... ok
+2026-10-19T10:38:35.5494250Z test_reads_real_jsonl_stream_and_final_line_without_newline (test_template_factory.CliProcessTests.test_reads_real_jsonl_stream_and_final_line_without_newline) ... ok
+2026-10-19T10:38:35.6089589Z test_scenario_reviewer_cannot_search_or_fetch_external_content (test_template_factory.CliProcessTests.test_scenario_reviewer_cannot_search_or_fetch_external_content) ... ok
+2026-10-19T10:38:35.6577913Z test_zero_exit_error_event_is_failure (test_template_factory.CliProcessTests.test_zero_exit_error_event_is_failure) ... ok
+2026-10-19T10:38:35.6921133Z test_agent_cannot_remove_licenses (test_template_factory.FactoryTests.test_agent_cannot_remove_licenses) ... ok
+2026-10-19T10:38:35.7121283Z test_agent_receives_an_exact_markdown_leaf_alongside_json (test_template_factory.FactoryTests.test_agent_receives_an_exact_markdown_leaf_alongside_json) ... ok
+2026-10-19T10:38:35.7249382Z test_archives_contain_metadata_and_instance_has_no_runtime_secrets (test_template_factory.FactoryTests.test_archives_contain_metadata_and_instance_has_no_runtime_secrets) ... ok
+2026-10-19T10:38:35.7637778Z test_atomic_claim_respects_concurrency (test_template_factory.FactoryTests.test_atomic_claim_respects_concurrency) ... ok
+2026-10-19T10:38:35.7782364Z test_batch_pins_scenario_and_leaf (test_template_factory.FactoryTests.test_batch_pins_scenario_and_leaf) ... ok
+2026-10-19T10:38:35.8276395Z test_cancelled_acceptance_cannot_publish_late_evidence (test_template_factory.FactoryTests.test_cancelled_acceptance_cannot_publish_late_evidence) ... ok
+2026-10-19T10:38:35.8371902Z test_cli_final_json_can_follow_assistant_preamble (test_template_factory.FactoryTests.test_cli_final_json_can_follow_assistant_preamble) ... ok
+2026-10-19T10:38:35.8469401Z test_cli_protocol_not_zero_exit_success (test_template_factory.FactoryTests.test_cli_protocol_not_zero_exit_success) ... ok
+2026-10-19T10:38:35.8587748Z test_corpus_truth_and_confirmation_gate (test_template_factory.FactoryTests.test_corpus_truth_and_confirmation_gate) ... ok
+2026-10-19T10:38:35.8749854Z test_deterministic_instantiation_and_parameter_validation (test_template_factory.FactoryTests.test_deterministic_instantiation_and_parameter_validation) ... ok
+2026-10-19T10:38:35.9110396Z test_empty_proposal_without_explanation_fails_and_saves_nothing (test_template_factory.FactoryTests.test_empty_proposal_without_explanation_fails_and_saves_nothing) ... ok
+2026-10-19T10:38:35.9268193Z test_expired_lease_cannot_publish_or_renew (test_template_factory.FactoryTests.test_expired_lease_cannot_publish_or_renew) ... ok
+2026-10-19T10:38:36.0133128Z test_explicit_repair_creates_new_immutable_artifact (test_template_factory.FactoryTests.test_explicit_repair_creates_new_immutable_artifact) ... ok
+2026-10-19T10:38:36.0614052Z test_factory_api_instantiates_without_model_call_and_no_host_path (test_template_factory.FactoryTests.test_factory_api_instantiates_without_model_call_and_no_host_path) ... ok
+2026-10-19T10:38:36.1223665Z test_failed_acceptance_keeps_produced_candidate_and_does_not_block_production (test_template_factory.FactoryTests.test_failed_acceptance_keeps_produced_candidate_and_does_not_block_production) ... ok
+2026-10-19T10:38:36.1371450Z test_frozen_content_tamper_rejected (test_template_factory.FactoryTests.test_frozen_content_tamper_rejected) ... ok
+2026-10-19T10:38:36.1947243Z test_full_pipeline_and_explicit_publication (test_template_factory.FactoryTests.test_full_pipeline_and_explicit_publication) ... ok
+2026-10-19T10:38:36.2132690Z test_generated_siblings_review_each_other_in_an_independent_lane (test_template_factory.FactoryTests.test_generated_siblings_review_each_other_in_an_independent_lane) ... ok
+2026-10-19T10:38:36.2379845Z test_generation_pins_existing_scenarios_and_output_language (test_template_factory.FactoryTests.test_generation_pins_existing_scenarios_and_output_language) ... ok
+2026-10-19T10:38:36.2621588Z test_generation_queue_blocks_concurrent_duplicate_leaf (test_template_factory.FactoryTests.test_generation_queue_blocks_concurrent_duplicate_leaf) ... ok
+2026-10-19T10:38:36.2716932Z test_git_url_validation (test_template_factory.FactoryTests.test_git_url_validation) ... ok
+2026-10-19T10:38:36.2817053Z test_invalid_generation_language_creates_no_batch (test_template_factory.FactoryTests.test_invalid_generation_language_creates_no_batch) ... ok
+2026-10-19T10:38:36.3390308Z test_leaf_only_lists_its_published_templates (test_template_factory.FactoryTests.test_leaf_only_lists_its_published_templates) ... ok
+2026-10-19T10:38:36.3564727Z test_link_acceptance_requires_a_specific_http_target (test_template_factory.FactoryTests.test_link_acceptance_requires_a_specific_http_target) ... ok
+2026-10-19T10:38:36.5013352Z test_literal_repair_changes_only_a_unique_match (test_template_factory.FactoryTests.test_literal_repair_changes_only_a_unique_match) ... ok
+2026-10-19T10:38:36.5147587Z test_nonterminal_job_cannot_retry (test_template_factory.FactoryTests.test_nonterminal_job_cannot_retry) ... ok
+2026-10-19T10:38:36.5245227Z test_notice_cannot_be_parameterized (test_template_factory.FactoryTests.test_notice_cannot_be_parameterized) ... ok
+2026-10-19T10:38:36.5459180Z test_pause_resume_and_cancel_fence_late_worker (test_template_factory.FactoryTests.test_pause_resume_and_cancel_fence_late_worker) ... ok
+2026-10-19T10:38:36.5570246Z test_plan_commands_must_exist_in_selected_image (test_template_factory.FactoryTests.test_plan_commands_must_exist_in_selected_image) ... ok
+2026-10-19T10:38:36.5674652Z test_plan_requires_observable_coverage (test_template_factory.FactoryTests.test_plan_requires_observable_coverage) ... ok
+2026-10-19T10:38:36.6096096Z test_production_does_not_call_docker (test_template_factory.FactoryTests.test_production_does_not_call_docker) ... ok
+2026-10-19T10:38:36.6655183Z test_provider_review_failure_is_visible_without_failing_production (test_template_factory.FactoryTests.test_provider_review_failure_is_visible_without_failing_production) ... ok
+2026-10-19T10:38:36.7500260Z test_repair_plan_changes_require_an_explicit_option (test_template_factory.FactoryTests.test_repair_plan_changes_require_an_explicit_option) ... ok
+2026-10-19T10:38:36.7679764Z test_restart_marks_interrupted_and_explicit_retry_new_owner (test_template_factory.FactoryTests.test_restart_marks_interrupted_and_explicit_retry_new_owner) ... ok
+2026-10-19T10:38:36.8204143Z test_retry_reuses_source_checkpoint_after_failed_generation (test_template_factory.FactoryTests.test_retry_reuses_source_checkpoint_after_failed_generation) ... ok
+2026-10-19T10:38:36.8290356Z test_review_line_references_extract_exact_markdown_and_reject_invalid_ranges (test_template_factory.FactoryTests.test_review_line_references_extract_exact_markdown_and_reject_invalid_ranges) ... ok
+2026-10-19T10:38:36.8387830Z test_review_only_plan_can_be_produced_without_runtime (test_template_factory.FactoryTests.test_review_only_plan_can_be_produced_without_runtime) ... ok
+2026-10-19T10:38:36.8989425Z test_runtime_unavailable_is_recorded_and_harness_acceptance_can_pass (test_template_factory.FactoryTests.test_runtime_unavailable_is_recorded_and_harness_acceptance_can_pass) ... ok
+2026-10-19T10:38:36.9285171Z test_safe_generation_rejects_existing_archived_and_completed_zero (test_template_factory.FactoryTests.test_safe_generation_rejects_existing_archived_and_completed_zero) ... ok
+2026-10-19T10:38:36.9468079Z test_scenario_discovery_creates_drafts_not_production_jobs (test_template_factory.FactoryTests.test_scenario_discovery_creates_drafts_not_production_jobs) ... ok
+2026-10-19T10:38:36.9789550Z test_scenario_generation_queues_independent_review_and_preserves_draft_on_failure (test_template_factory.FactoryTests.test_scenario_generation_queues_independent_review_and_preserves_draft_on_failure) ... ok
+2026-10-19T10:38:37.0015775Z test_scenario_review_context_changes_expire_reports (test_template_factory.FactoryTests.test_scenario_review_context_changes_expire_reports) ... ok
+2026-10-19T10:38:37.0206526Z test_scenario_review_invalid_result_fails_without_a_pass (test_template_factory.FactoryTests.test_scenario_review_invalid_result_fails_without_a_pass) ... ok
+2026-10-19T10:38:37.0393442Z test_scenario_review_leaf_changes_and_late_completion_are_historical (test_template_factory.FactoryTests.test_scenario_review_leaf_changes_and_late_completion_are_historical) ... ok
+2026-10-19T10:38:37.0604390Z test_scenario_review_pins_inputs_and_never_confirms (test_template_factory.FactoryTests.test_scenario_review_pins_inputs_and_never_confirms) ... ok
+2026-10-19T10:38:37.0792510Z test_scenario_review_queue_cas_duplicates_and_cancel_are_atomic (test_template_factory.FactoryTests.test_scenario_review_queue_cas_duplicates_and_cancel_are_atomic) ... ok
+2026-10-19T10:38:37.0925385Z test_scenario_review_schema_rejects_unsupported_claims (test_template_factory.FactoryTests.test_scenario_review_schema_rejects_unsupported_claims) ... ok
+2026-10-19T10:38:37.1042536Z test_scenarios_have_revision_compare_and_swap (test_template_factory.FactoryTests.test_scenarios_have_revision_compare_and_swap) ... ok
+2026-10-19T10:38:37.1568689Z test_scheduler_runs_acceptance_while_production_waits (test_template_factory.FactoryTests.test_scheduler_runs_acceptance_while_production_waits) ... ok
+2026-10-19T10:38:37.1658033Z test_skip_generated_requires_boolean (test_template_factory.FactoryTests.test_skip_generated_requires_boolean) ... ok
+2026-10-19T10:38:37.1768045Z test_source_archive_sanitizes_configs_and_pins_notices (test_template_factory.FactoryTests.test_source_archive_sanitizes_configs_and_pins_notices) ... ok
+2026-10-19T10:38:37.1851637Z test_symlinks_and_secret_files_rejected (test_template_factory.FactoryTests.test_symlinks_and_secret_files_rejected) ... ok
+2026-10-19T10:38:37.2343693Z test_verification_lane_and_production_lane_are_independent (test_template_factory.FactoryTests.test_verification_lane_and_production_lane_are_independent) ... ok
+2026-10-19T10:38:37.2536821Z test_zero_scenarios_complete_without_extra_reviews_or_catalog_changes (test_template_factory.FactoryTests.test_zero_scenarios_complete_without_extra_reviews_or_catalog_changes) ... ok
+2026-10-19T10:38:37.2537977Z 
+2026-10-19T10:38:37.2538136Z ----------------------------------------------------------------------
+2026-10-19T10:38:37.2538491Z Ran 545 tests in 29.787s
+2026-10-19T10:38:37.2538636Z 
+2026-10-19T10:38:37.2538777Z OK (skipped=8)
+2026-10-19T10:38:37.3721713Z ##[group]Run actions/setup-node@v4
+2026-10-19T10:38:37.3721985Z with:
+2026-10-19T10:38:37.3722189Z   node-version: 22
+2026-10-19T10:38:37.3722379Z   cache: npm
+2026-10-19T10:38:37.3722623Z   cache-dependency-path: atlas-web/package-lock.json
+2026-10-19T10:38:37.3723232Z   always-auth: false
+2026-10-19T10:38:37.3723450Z   check-latest: false
+2026-10-19T10:38:37.3725743Z   token: ***
+2026-10-19T10:38:37.3725923Z env:
+2026-10-19T10:38:37.3726172Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:37.3726705Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T10:38:37.3727112Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:37.3727470Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:37.3727828Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:37.3728185Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T10:38:37.3728533Z ##[endgroup]
+2026-10-19T10:38:37.5140328Z Found in cache @ /opt/hostedtoolcache/node/22.23.3/x64
+2026-10-19T10:38:37.5144849Z (node:3062) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-19T10:38:37.5145989Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-19T10:38:37.5147218Z ##[group]Environment details
+2026-10-19T10:38:37.8853367Z node: v22.23.3
+2026-10-19T10:38:37.8853645Z npm: 10.9.9
+2026-10-19T10:38:37.8853833Z yarn: 1.22.22
+2026-10-19T10:38:37.8854792Z ##[endgroup]
+2026-10-19T10:38:37.8873375Z [command]/opt/hostedtoolcache/node/22.23.3/x64/bin/npm config get cache
+2026-10-19T10:38:38.2015444Z /home/runner/.npm
+2026-10-19T10:38:38.4095517Z npm cache is not found
+2026-10-19T10:38:38.4196229Z ##[group]Run npm ci --registry=https://registry.npmjs.org --replace-registry-host=always
+2026-10-19T10:38:38.4196821Z [36;1mnpm ci --registry=https://registry.npmjs.org --replace-registry-host=always[0m
+2026-10-19T10:38:38.4236763Z shell: /usr/bin/bash -e {0}
+2026-10-19T10:38:38.4237020Z env:
+2026-10-19T10:38:38.4237288Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:38.4237722Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T10:38:38.4238126Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:38.4238488Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:38.4238859Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:38.4239238Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T10:38:38.4239550Z ##[endgroup]
+2026-10-19T10:38:43.8500719Z 
+2026-10-19T10:38:43.8507119Z added 199 packages, and audited 200 packages in 5s
+2026-10-19T10:38:43.8507490Z 
+2026-10-19T10:38:43.8507674Z 100 packages are looking for funding
+2026-10-19T10:38:43.8507973Z   run `npm fund` for details
+2026-10-19T10:38:43.8530062Z 
+2026-10-19T10:38:43.8530818Z 2 moderate severity vulnerabilities
+2026-10-19T10:38:43.8531279Z 
+2026-10-19T10:38:43.8531744Z To address all issues (including breaking changes), run:
+2026-10-19T10:38:43.8532427Z   npm audit fix --force
+2026-10-19T10:38:43.8532748Z 
+2026-10-19T10:38:43.8533181Z Run `npm audit` for details.
+2026-10-19T10:38:43.8832085Z ##[group]Run python application-atlas-production-pack/export_atlas.py
+2026-10-19T10:38:43.8832602Z [36;1mpython application-atlas-production-pack/export_atlas.py[0m
+2026-10-19T10:38:43.8870988Z shell: /usr/bin/bash -e {0}
+2026-10-19T10:38:43.8871250Z env:
+2026-10-19T10:38:43.8871536Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:43.8871954Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T10:38:43.8872372Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:43.8872739Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:43.8873328Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:38:43.8873699Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T10:38:43.8874015Z ##[endgroup]
+2026-10-19T10:39:04.7824842Z directory: 270 sections, 1805 leaf entries, 0 duplicate names
+2026-10-19T10:39:04.7825386Z parsed 1805 leaf documents
+2026-10-19T10:39:04.7825857Z directory slugs matched: 1805, unresolved: 0
+2026-10-19T10:39:04.7828284Z distinct Relationship values: 5016 (top 25: ['', 'adjacent', 'downstream', 'downstream consumer', 'closest sibling', 'upstream', 'adjacent sibling', 'sibling', 'complementary', 'different domain', 'substrate', 'broader', 'different object', 'downstream sibling', 'capability overlap', 'capability slice', 'upstream sibling', 'name collision only', 'adjacent, often bundled', 'overlapping capability', 'adjacent, upstream', 'broader suite', 'downstream neighbor', 'consumer', 'component'])
+2026-10-19T10:39:04.7831766Z canonical enumeration: {'related': 5148, 'adjacent': 3436, 'other': 2081, 'sibling': 1478, 'downstream': 691, 'overlaps': 629, 'capability_of': 475, 'upstream': 459, 'broader': 431, 'counterpart': 263, 'complementary': 185, 'narrower': 133, 'substrate': 122, 'contrasts': 95, 'authority': 14, 'alternative': 1}
+2026-10-19T10:39:04.7833285Z relations total 15641, resolved 14427, unmapped 1214
+2026-10-19T10:39:04.7833691Z translations loaded: 1805
+2026-10-19T10:39:04.7834313Z sqlite -> /home/runner/work/atlas/atlas/application-atlas-production-pack/atlas/atlas.sqlite
+2026-10-19T10:39:04.7835175Z json   -> /home/runner/work/atlas/atlas/application-atlas-production-pack/atlas/atlas.json
+2026-10-19T10:39:04.8089333Z ##[group]Run npm run gen && npm run verify-data
+2026-10-19T10:39:04.8089741Z [36;1mnpm run gen && npm run verify-data[0m
+2026-10-19T10:39:04.8130394Z shell: /usr/bin/bash -e {0}
+2026-10-19T10:39:04.8130646Z env:
+2026-10-19T10:39:04.8130917Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:39:04.8131346Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T10:39:04.8131749Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:39:04.8132114Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:39:04.8132481Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:39:04.8133005Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T10:39:04.8133379Z ##[endgroup]
+2026-10-19T10:39:04.9158212Z 
+2026-10-19T10:39:04.9158821Z > gen
+2026-10-19T10:39:04.9159430Z > python3 scripts/gen-data.py
+2026-10-19T10:39:04.9159761Z 
+2026-10-19T10:39:06.5006683Z generated: 1805 leaves, 270 sections, 33 apps
+2026-10-19T10:39:06.6035259Z 
+2026-10-19T10:39:06.6035923Z > verify-data
+2026-10-19T10:39:06.6036408Z > python3 scripts/verify-web-data.py
+2026-10-19T10:39:06.6036610Z 
+2026-10-19T10:39:07.8121889Z verified: 1805 leaves, 270 sections, 33 apps; no missing or stale generated files
+2026-10-19T10:39:07.8252633Z ##[group]Run npx playwright install --with-deps chromium
+2026-10-19T10:39:07.8253378Z [36;1mnpx playwright install --with-deps chromium[0m
+2026-10-19T10:39:07.8290005Z shell: /usr/bin/bash -e {0}
+2026-10-19T10:39:07.8290270Z env:
+2026-10-19T10:39:07.8290552Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:39:07.8290985Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T10:39:07.8291390Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:39:07.8291749Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:39:07.8292114Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:39:07.8292494Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T10:39:07.8292798Z ##[endgroup]
+2026-10-19T10:39:08.6135850Z Installing dependencies...
+2026-10-19T10:39:08.6196450Z Switching to root user to install dependencies...
+2026-10-19T10:39:08.7455246Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-10-19T10:39:08.7622037Z Get:6 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+2026-10-19T10:39:08.7934635Z Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+2026-10-19T10:39:08.7944492Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+2026-10-19T10:39:08.7996522Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+2026-10-19T10:39:08.8069308Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+2026-10-19T10:39:08.9106344Z Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [557 kB]
+2026-10-19T10:39:08.9374995Z Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [618 kB]
+2026-10-19T10:39:08.9420046Z Get:9 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [12.4 kB]
+2026-10-19T10:39:09.0057917Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1397 kB]
+2026-10-19T10:39:09.0140666Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [308 kB]
+2026-10-19T10:39:09.0146349Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1704 kB]
+2026-10-19T10:39:09.0224218Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [342 kB]
+2026-10-19T10:39:09.0275503Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1805 kB]
+2026-10-19T10:39:09.0378967Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [411 kB]
+2026-10-19T10:39:09.0923500Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [1144 kB]
+2026-10-19T10:39:09.0980670Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [231 kB]
+2026-10-19T10:39:09.0994774Z Get:18 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1222 kB]
+2026-10-19T10:39:09.1049443Z Get:19 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [246 kB]
+2026-10-19T10:39:09.1550551Z Get:20 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [1713 kB]
+2026-10-19T10:39:09.1624152Z Get:21 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [392 kB]
+2026-10-19T10:39:15.1501208Z Fetched 12.5 MB in 1s (9379 kB/s)
+2026-10-19T10:39:16.0994127Z Reading package lists...
+2026-10-19T10:39:16.1240295Z Reading package lists...
+2026-10-19T10:39:16.3332401Z Building dependency tree...
+2026-10-19T10:39:16.3338331Z Reading state information...
+2026-10-19T10:39:16.4831803Z libasound2t64 is already the newest version (1.2.11-1ubuntu0.3).
+2026-10-19T10:39:16.4832657Z libasound2t64 set to manually installed.
+2026-10-19T10:39:16.4833562Z libatk-bridge2.0-0t64 is already the newest version (2.52.0-1build1).
+2026-10-19T10:39:16.4834603Z libatk-bridge2.0-0t64 set to manually installed.
+2026-10-19T10:39:16.4835812Z libatk1.0-0t64 is already the newest version (2.52.0-1build1).
+2026-10-19T10:39:16.4836510Z libatk1.0-0t64 set to manually installed.
+2026-10-19T10:39:16.4837209Z libatspi2.0-0t64 is already the newest version (2.52.0-1build1).
+2026-10-19T10:39:16.4837888Z libatspi2.0-0t64 set to manually installed.
+2026-10-19T10:39:16.4838620Z libcairo2 is already the newest version (1.18.0-3build1).
+2026-10-19T10:39:16.4839324Z libcairo2 set to manually installed.
+2026-10-19T10:39:16.4840096Z libcups2t64 is already the newest version (2.4.7-1.2ubuntu7.14).
+2026-10-19T10:39:16.4840844Z libcups2t64 set to manually installed.
+2026-10-19T10:39:16.4841626Z libdbus-1-3 is already the newest version (1.14.10-4ubuntu4.1).
+2026-10-19T10:39:16.4842420Z libdbus-1-3 set to manually installed.
+2026-10-19T10:39:16.4843439Z libdrm2 is already the newest version (2.4.125-1ubuntu0.1~24.04.2).
+2026-10-19T10:39:16.4844232Z libdrm2 set to manually installed.
+2026-10-19T10:39:16.4845136Z libgbm1 is already the newest version (25.2.8-0ubuntu0.24.04.4).
+2026-10-19T10:39:16.4845943Z libgbm1 set to manually installed.
+2026-10-19T10:39:16.4846784Z libglib2.0-0t64 is already the newest version (2.80.0-6ubuntu3.9).
+2026-10-19T10:39:16.4847642Z libglib2.0-0t64 set to manually installed.
+2026-10-19T10:39:16.4848468Z libnspr4 is already the newest version (2:4.35-1.1build1).
+2026-10-19T10:39:16.4849249Z libnspr4 set to manually installed.
+2026-10-19T10:39:16.4850044Z libnss3 is already the newest version (2:3.98-1ubuntu0.2).
+2026-10-19T10:39:16.4850827Z libnss3 set to manually installed.
+2026-10-19T10:39:16.4851697Z libpango-1.0-0 is already the newest version (1.52.1+ds-1build1).
+2026-10-19T10:39:16.4852540Z libpango-1.0-0 set to manually installed.
+2026-10-19T10:39:16.4853912Z libx11-6 is already the newest version (2:1.8.7-1ubuntu0.1).
+2026-10-19T10:39:16.4854720Z libx11-6 set to manually installed.
+2026-10-19T10:39:16.4855477Z libxcb1 is already the newest version (1.15-1ubuntu2).
+2026-10-19T10:39:16.4856297Z libxcb1 set to manually installed.
+2026-10-19T10:39:16.4857119Z libxcomposite1 is already the newest version (1:0.4.5-1build3).
+2026-10-19T10:39:16.4857927Z libxcomposite1 set to manually installed.
+2026-10-19T10:39:16.4858747Z libxdamage1 is already the newest version (1:1.1.6-1build1).
+2026-10-19T10:39:16.4859540Z libxdamage1 set to manually installed.
+2026-10-19T10:39:16.4860313Z libxext6 is already the newest version (2:1.3.4-1build2).
+2026-10-19T10:39:16.4861040Z libxext6 set to manually installed.
+2026-10-19T10:39:16.4861789Z libxfixes3 is already the newest version (1:6.0.0-2build1).
+2026-10-19T10:39:16.4862580Z libxfixes3 set to manually installed.
+2026-10-19T10:39:16.4863597Z libxkbcommon0 is already the newest version (1.6.0-1build1).
+2026-10-19T10:39:16.4864425Z libxkbcommon0 set to manually installed.
+2026-10-19T10:39:16.4865304Z libxrandr2 is already the newest version (2:1.5.2-2build1).
+2026-10-19T10:39:16.4866153Z libxrandr2 set to manually installed.
+2026-10-19T10:39:16.4867025Z xvfb is already the newest version (2:21.1.12-1ubuntu1.8).
+2026-10-19T10:39:16.4868278Z fonts-noto-color-emoji is already the newest version (2.047-0ubuntu0.24.04.1).
+2026-10-19T10:39:16.4869485Z libfontconfig1 is already the newest version (2.15.0-1.1ubuntu2).
+2026-10-19T10:39:16.4870403Z libfontconfig1 set to manually installed.
+2026-10-19T10:39:16.4871377Z libfreetype6 is already the newest version (2.13.2+dfsg-1ubuntu0.2).
+2026-10-19T10:39:16.4872313Z libfreetype6 set to manually installed.
+2026-10-19T10:39:16.4873330Z fonts-liberation is already the newest version (1:2.1.5-3).
+2026-10-19T10:39:16.4874211Z fonts-liberation set to manually installed.
+2026-10-19T10:39:16.4875054Z The following additional packages will be installed:
+2026-10-19T10:39:16.4875826Z   xfonts-encodings xfonts-utils
+2026-10-19T10:39:16.4876451Z Recommended packages:
+2026-10-19T10:39:16.4877035Z   fonts-ipafont-mincho fonts-tlwg-loma
+2026-10-19T10:39:16.5262035Z The following NEW packages will be installed:
+2026-10-19T10:39:16.5262593Z   fonts-freefont-ttf fonts-ipafont-gothic fonts-tlwg-loma-otf fonts-unifont
+2026-10-19T10:39:16.5273196Z   fonts-wqy-zenhei xfonts-cyrillic xfonts-encodings xfonts-scalable
+2026-10-19T10:39:16.5273641Z   xfonts-utils
+2026-10-19T10:39:16.5439372Z 0 upgraded, 9 newly installed, 0 to remove and 44 not upgraded.
+2026-10-19T10:39:16.5439827Z Need to get 21.1 MB of archives.
+2026-10-19T10:39:16.5440255Z After this operation, 79.5 MB of additional disk space will be used.
+2026-10-19T10:39:16.5440755Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-10-19T10:39:16.6325872Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-ipafont-gothic all 00303-21ubuntu1 [3513 kB]
+2026-10-19T10:39:16.7670268Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 fonts-freefont-ttf all 20211204+svn4273-2 [5641 kB]
+2026-10-19T10:39:16.9450167Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-tlwg-loma-otf all 1:0.7.3-1 [107 kB]
+2026-10-19T10:39:17.0104703Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-unifont all 1:15.1.01-1build1 [2993 kB]
+2026-10-19T10:39:17.1343930Z Get:6 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-wqy-zenhei all 0.9.45-8 [7472 kB]
+2026-10-19T10:39:17.3495103Z Get:7 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-encodings all 1:1.0.5-0ubuntu2 [578 kB]
+2026-10-19T10:39:17.4253748Z Get:8 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-utils amd64 1:7.7+6build3 [94.4 kB]
+2026-10-19T10:39:17.4900116Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 xfonts-cyrillic all 1:1.0.5+nmu1 [384 kB]
+2026-10-19T10:39:17.5613688Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-scalable all 1:1.0.3-1.3 [304 kB]
+2026-10-19T10:39:17.8310734Z Fetched 21.1 MB in 1s (20.2 MB/s)
+2026-10-19T10:39:17.8755350Z Selecting previously unselected package fonts-ipafont-gothic.
+2026-10-19T10:39:17.9238961Z (Reading database ... 
+2026-10-19T10:39:17.9239862Z (Reading database ... 5%
+2026-10-19T10:39:17.9240195Z (Reading database ... 10%
+2026-10-19T10:39:17.9240511Z (Reading database ... 15%
+2026-10-19T10:39:17.9240747Z (Reading database ... 20%
+2026-10-19T10:39:17.9240980Z (Reading database ... 25%
+2026-10-19T10:39:17.9241209Z (Reading database ... 30%
+2026-10-19T10:39:17.9241437Z (Reading database ... 35%
+2026-10-19T10:39:17.9241799Z (Reading database ... 40%
+2026-10-19T10:39:17.9242181Z (Reading database ... 45%
+2026-10-19T10:39:17.9242555Z (Reading database ... 50%
+2026-10-19T10:39:17.9701336Z (Reading database ... 55%
+2026-10-19T10:39:18.3902300Z (Reading database ... 60%
+2026-10-19T10:39:18.7311067Z (Reading database ... 65%
+2026-10-19T10:39:19.0840163Z (Reading database ... 70%
+2026-10-19T10:39:19.4783832Z (Reading database ... 75%
+2026-10-19T10:39:19.9279104Z (Reading database ... 80%
+2026-10-19T10:39:20.5745958Z (Reading database ... 85%
+2026-10-19T10:39:21.4498063Z (Reading database ... 90%
+2026-10-19T10:39:22.2185959Z (Reading database ... 95%
+2026-10-19T10:39:22.2186555Z (Reading database ... 100%
+2026-10-19T10:39:22.2187296Z (Reading database ... 203540 files and directories currently installed.)
+2026-10-19T10:39:22.2238247Z Preparing to unpack .../0-fonts-ipafont-gothic_00303-21ubuntu1_all.deb ...
+2026-10-19T10:39:22.2333521Z Unpacking fonts-ipafont-gothic (00303-21ubuntu1) ...
+2026-10-19T10:39:22.4633786Z Selecting previously unselected package fonts-freefont-ttf.
+2026-10-19T10:39:22.4744523Z Preparing to unpack .../1-fonts-freefont-ttf_20211204+svn4273-2_all.deb ...
+2026-10-19T10:39:22.4750795Z Unpacking fonts-freefont-ttf (20211204+svn4273-2) ...
+2026-10-19T10:39:22.5463891Z Selecting previously unselected package fonts-tlwg-loma-otf.
+2026-10-19T10:39:22.5573034Z Preparing to unpack .../2-fonts-tlwg-loma-otf_1%3a0.7.3-1_all.deb ...
+2026-10-19T10:39:22.5576961Z Unpacking fonts-tlwg-loma-otf (1:0.7.3-1) ...
+2026-10-19T10:39:22.5779431Z Selecting previously unselected package fonts-unifont.
+2026-10-19T10:39:22.5889324Z Preparing to unpack .../3-fonts-unifont_1%3a15.1.01-1build1_all.deb ...
+2026-10-19T10:39:22.5894234Z Unpacking fonts-unifont (1:15.1.01-1build1) ...
+2026-10-19T10:39:22.6877340Z Selecting previously unselected package fonts-wqy-zenhei.
+2026-10-19T10:39:22.6989103Z Preparing to unpack .../4-fonts-wqy-zenhei_0.9.45-8_all.deb ...
+2026-10-19T10:39:22.7081386Z Unpacking fonts-wqy-zenhei (0.9.45-8) ...
+2026-10-19T10:39:23.1818245Z Selecting previously unselected package xfonts-encodings.
+2026-10-19T10:39:23.1927151Z Preparing to unpack .../5-xfonts-encodings_1%3a1.0.5-0ubuntu2_all.deb ...
+2026-10-19T10:39:23.1931881Z Unpacking xfonts-encodings (1:1.0.5-0ubuntu2) ...
+2026-10-19T10:39:23.2133393Z Selecting previously unselected package xfonts-utils.
+2026-10-19T10:39:23.2246567Z Preparing to unpack .../6-xfonts-utils_1%3a7.7+6build3_amd64.deb ...
+2026-10-19T10:39:23.2256191Z Unpacking xfonts-utils (1:7.7+6build3) ...
+2026-10-19T10:39:23.2957439Z Selecting previously unselected package xfonts-cyrillic.
+2026-10-19T10:39:23.3068380Z Preparing to unpack .../7-xfonts-cyrillic_1%3a1.0.5+nmu1_all.deb ...
+2026-10-19T10:39:23.3077116Z Unpacking xfonts-cyrillic (1:1.0.5+nmu1) ...
+2026-10-19T10:39:23.3323104Z Selecting previously unselected package xfonts-scalable.
+2026-10-19T10:39:23.3434401Z Preparing to unpack .../8-xfonts-scalable_1%3a1.0.3-1.3_all.deb ...
+2026-10-19T10:39:23.3443377Z Unpacking xfonts-scalable (1:1.0.3-1.3) ...
+2026-10-19T10:39:23.3797810Z Setting up fonts-wqy-zenhei (0.9.45-8) ...
+2026-10-19T10:39:23.3897816Z Setting up fonts-freefont-ttf (20211204+svn4273-2) ...
+2026-10-19T10:39:23.3910969Z Setting up fonts-tlwg-loma-otf (1:0.7.3-1) ...
+2026-10-19T10:39:23.3922320Z Setting up xfonts-encodings (1:1.0.5-0ubuntu2) ...
+2026-10-19T10:39:23.3935281Z Setting up fonts-ipafont-gothic (00303-21ubuntu1) ...
+2026-10-19T10:39:23.3983876Z update-alternatives: using /usr/share/fonts/opentype/ipafont-gothic/ipag.ttf to provide /usr/share/fonts/truetype/fonts-japanese-gothic.ttf (fonts-japanese-gothic.ttf) in auto mode
+2026-10-19T10:39:23.3995549Z Setting up fonts-unifont (1:15.1.01-1build1) ...
+2026-10-19T10:39:23.4008018Z Setting up xfonts-utils (1:7.7+6build3) ...
+2026-10-19T10:39:23.4038442Z Setting up xfonts-cyrillic (1:1.0.5+nmu1) ...
+2026-10-19T10:39:23.4621406Z Setting up xfonts-scalable (1:1.0.3-1.3) ...
+2026-10-19T10:39:23.4905939Z Processing triggers for man-db (2.12.0-4build2) ...
+2026-10-19T10:39:23.4923651Z Not building database; man-db/auto-update is not 'true'.
+2026-10-19T10:39:23.4933686Z Processing triggers for fontconfig (2.15.0-1.1ubuntu2) ...
+2026-10-19T10:39:24.9891207Z 
+2026-10-19T10:39:24.9891826Z Running kernel seems to be up-to-date.
+2026-10-19T10:39:24.9892201Z 
+2026-10-19T10:39:24.9892376Z No services need to be restarted.
+2026-10-19T10:39:24.9892544Z 
+2026-10-19T10:39:24.9892688Z No containers need to be restarted.
+2026-10-19T10:39:24.9894210Z 
+2026-10-19T10:39:24.9894393Z No user sessions are running outdated binaries.
+2026-10-19T10:39:24.9894604Z 
+2026-10-19T10:39:24.9894861Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+2026-10-19T10:39:25.9299575Z Downloading Chrome for Testing 153.0.8010.12 (playwright chromium v1243) from https://cdn.playwright.dev/builds/cft/153.0.8010.12/linux64/chrome-linux64.zip
+2026-10-19T10:39:26.3606745Z |                                                                                |   0% of 186.8 MiB
+2026-10-19T10:39:26.6196195Z |■■■■■■■■                                                                        |  10% of 186.8 MiB
+2026-10-19T10:39:26.7045064Z |■■■■■■■■■■■■■■■■                                                                |  20% of 186.8 MiB
+2026-10-19T10:39:26.7668468Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 186.8 MiB
+2026-10-19T10:39:26.8188611Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 186.8 MiB
+2026-10-19T10:39:26.8666957Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 186.8 MiB
+2026-10-19T10:39:26.9151008Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 186.8 MiB
+2026-10-19T10:39:26.9592208Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 186.8 MiB
+2026-10-19T10:39:27.0045180Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 186.8 MiB
+2026-10-19T10:39:27.0499077Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 186.8 MiB
+2026-10-19T10:39:27.0981574Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 186.8 MiB
+2026-10-19T10:39:29.6107553Z Chrome for Testing 153.0.8010.12 (playwright chromium v1243) downloaded to /home/runner/.cache/ms-playwright/chromium-1243
+2026-10-19T10:39:29.6110124Z Downloading FFmpeg (playwright ffmpeg v1011) from https://cdn.playwright.dev/dbazure/download/playwright/builds/ffmpeg/1011/ffmpeg-linux.zip
+2026-10-19T10:39:29.9636001Z |                                                                                |   0% of 2.3 MiB
+2026-10-19T10:39:29.9666917Z |■■■■■■■■                                                                        |  10% of 2.3 MiB
+2026-10-19T10:39:29.9695109Z |■■■■■■■■■■■■■■■■                                                                |  20% of 2.3 MiB
+2026-10-19T10:39:29.9728878Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 2.3 MiB
+2026-10-19T10:39:29.9744580Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 2.3 MiB
+2026-10-19T10:39:29.9764294Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 2.3 MiB
+2026-10-19T10:39:29.9772717Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 2.3 MiB
+2026-10-19T10:39:29.9788519Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 2.3 MiB
+2026-10-19T10:39:29.9800791Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 2.3 MiB
+2026-10-19T10:39:29.9813791Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 2.3 MiB
+2026-10-19T10:39:29.9820925Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 2.3 MiB
+2026-10-19T10:39:30.0385712Z FFmpeg (playwright ffmpeg v1011) downloaded to /home/runner/.cache/ms-playwright/ffmpeg-1011
+2026-10-19T10:39:30.0389394Z Downloading Chrome Headless Shell 153.0.8010.12 (playwright chromium-headless-shell v1243) from https://cdn.playwright.dev/builds/cft/153.0.8010.12/linux64/chrome-headless-shell-linux64.zip
+2026-10-19T10:39:30.4287894Z |                                                                                |   0% of 114.3 MiB
+2026-10-19T10:39:30.6984761Z |■■■■■■■■                                                                        |  10% of 114.3 MiB
+2026-10-19T10:39:30.8330688Z |■■■■■■■■■■■■■■■■                                                                |  20% of 114.3 MiB
+2026-10-19T10:39:30.8746771Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 114.3 MiB
+2026-10-19T10:39:30.9154685Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 114.3 MiB
+2026-10-19T10:39:30.9516181Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 114.3 MiB
+2026-10-19T10:39:30.9815509Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 114.3 MiB
+2026-10-19T10:39:31.0119212Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 114.3 MiB
+2026-10-19T10:39:31.0389253Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 114.3 MiB
+2026-10-19T10:39:31.0693099Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 114.3 MiB
+2026-10-19T10:39:31.1024598Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 114.3 MiB
+2026-10-19T10:39:32.8628488Z Chrome Headless Shell 153.0.8010.12 (playwright chromium-headless-shell v1243) downloaded to /home/runner/.cache/ms-playwright/chromium_headless_shell-1243
+2026-10-19T10:39:32.8811221Z ##[group]Run npm audit --registry=https://registry.npmjs.org --audit-level=high
+2026-10-19T10:39:32.8811823Z [36;1mnpm audit --registry=https://registry.npmjs.org --audit-level=high[0m
+2026-10-19T10:39:32.8847664Z shell: /usr/bin/bash -e {0}
+2026-10-19T10:39:32.8847934Z env:
+2026-10-19T10:39:32.8848190Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:39:32.8848606Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T10:39:32.8849004Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:39:32.8849391Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:39:32.8849746Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:39:32.8850106Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T10:39:32.8850412Z ##[endgroup]
+2026-10-19T10:39:33.2923515Z # npm audit report
+2026-10-19T10:39:33.2923891Z 
+2026-10-19T10:39:33.2924316Z postcss-selector-parser  <7.1.6
+2026-10-19T10:39:33.2924937Z Severity: moderate
+2026-10-19T10:39:33.2926390Z PostCSS: Quadratic complexity in flat selector parsing allows CPU exhaustion - https://github.com/advisories/GHSA-rj75-hqrm-r3gf
+2026-10-19T10:39:33.2927813Z fix available via `npm audit fix --force`
+2026-10-19T10:39:33.2928788Z Will install @tailwindcss/typography@0.5.4, which is a breaking change
+2026-10-19T10:39:33.2929721Z node_modules/postcss-selector-parser
+2026-10-19T10:39:33.2930557Z   @tailwindcss/typography  <=0.0.0-insiders.fda8ce5 || >=0.5.5
+2026-10-19T10:39:33.2931525Z   Depends on vulnerable versions of postcss-selector-parser
+2026-10-19T10:39:33.2932337Z   node_modules/@tailwindcss/typography
+2026-10-19T10:39:33.2932729Z 
+2026-10-19T10:39:33.2933224Z 2 moderate severity vulnerabilities
+2026-10-19T10:39:33.2933617Z 
+2026-10-19T10:39:33.2934083Z To address all issues (including breaking changes), run:
+2026-10-19T10:39:33.2934809Z   npm audit fix --force
+2026-10-19T10:39:33.3041968Z ##[group]Run npm run typecheck && npm test && npm run build && npm run test:e2e
+2026-10-19T10:39:33.3042584Z [36;1mnpm run typecheck && npm test && npm run build && npm run test:e2e[0m
+2026-10-19T10:39:33.3079170Z shell: /usr/bin/bash -e {0}
+2026-10-19T10:39:33.3079434Z env:
+2026-10-19T10:39:33.3079693Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:39:33.3080113Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T10:39:33.3080513Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:39:33.3080874Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:39:33.3081359Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:39:33.3081729Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T10:39:33.3082038Z ##[endgroup]
+2026-10-19T10:39:33.3998467Z 
+2026-10-19T10:39:33.3999231Z > typecheck
+2026-10-19T10:39:33.3999713Z > tsc --noEmit
+2026-10-19T10:39:33.4000030Z 
+2026-10-19T10:39:39.5297599Z 
+2026-10-19T10:39:39.5298103Z > test
+2026-10-19T10:39:39.5298423Z > node --test tests/*.test.ts
+2026-10-19T10:39:39.5298602Z 
+2026-10-19T10:39:39.5796215Z TAP version 13
+2026-10-19T10:39:39.8894328Z # Subtest: execution polling reconciles through an explicit JSON POST
+2026-10-19T10:39:39.8944131Z ok 1 - execution polling reconciles through an explicit JSON POST
+2026-10-19T10:39:39.8953708Z   ---
+2026-10-19T10:39:39.8970011Z   duration_ms: 27.809844
+2026-10-19T10:39:39.8971378Z   type: 'test'
+2026-10-19T10:39:39.8971713Z   ...
+2026-10-19T10:39:39.8972371Z # Subtest: legacy acceptance migration is read-only until explicit backfill
+2026-10-19T10:39:39.8973507Z ok 2 - legacy acceptance migration is read-only until explicit backfill
+2026-10-19T10:39:39.8974072Z   ---
+2026-10-19T10:39:39.8974360Z   duration_ms: 0.992205
+2026-10-19T10:39:39.8974743Z   type: 'test'
+2026-10-19T10:39:39.8975078Z   ...
+2026-10-19T10:39:39.8975642Z # Subtest: API errors expose stable code and retryability
+2026-10-19T10:39:39.8976422Z ok 3 - API errors expose stable code and retryability
+2026-10-19T10:39:39.8976952Z   ---
+2026-10-19T10:39:39.8977286Z   duration_ms: 0.840283
+2026-10-19T10:39:39.8977673Z   type: 'test'
+2026-10-19T10:39:39.8978002Z   ...
+2026-10-19T10:39:39.8978532Z # Subtest: generation list bypasses the shared read cache
+2026-10-19T10:39:39.8979220Z ok 4 - generation list bypasses the shared read cache
+2026-10-19T10:39:39.8979504Z   ---
+2026-10-19T10:39:39.8979686Z   duration_ms: 0.536154
+2026-10-19T10:39:39.8979901Z   type: 'test'
+2026-10-19T10:39:39.8980081Z   ...
+2026-10-19T10:39:39.9035628Z # Subtest: new projects expose setup blockers instead of an empty state
+2026-10-19T10:39:39.9036317Z ok 5 - new projects expose setup blockers instead of an empty state
+2026-10-19T10:39:39.9036736Z   ---
+2026-10-19T10:39:39.9036934Z   duration_ms: 1.419201
+2026-10-19T10:39:39.9037149Z   type: 'test'
+2026-10-19T10:39:39.9037336Z   ...
+2026-10-19T10:39:39.9037682Z # Subtest: a current but unapproved document is not ready to freeze
+2026-10-19T10:39:39.9038141Z ok 6 - a current but unapproved document is not ready to freeze
+2026-10-19T10:39:39.9038448Z   ---
+2026-10-19T10:39:39.9038630Z   duration_ms: 0.537952
+2026-10-19T10:39:39.9038838Z   type: 'test'
+2026-10-19T10:39:39.9039024Z   ...
+2026-10-19T10:39:39.9039378Z # Subtest: failed stopped and unknown executions never count as completed
+2026-10-19T10:39:39.9039872Z ok 7 - failed stopped and unknown executions never count as completed
+2026-10-19T10:39:39.9040195Z   ---
+2026-10-19T10:39:39.9040371Z   duration_ms: 0.928879
+2026-10-19T10:39:39.9040575Z   type: 'test'
+2026-10-19T10:39:39.9040753Z   ...
+2026-10-19T10:39:39.9041092Z # Subtest: a completed applied task waits for independent acceptance
+2026-10-19T10:39:39.9041559Z ok 8 - a completed applied task waits for independent acceptance
+2026-10-19T10:39:39.9041864Z   ---
+2026-10-19T10:39:39.9042039Z   duration_ms: 0.371326
+2026-10-19T10:39:39.9042246Z   type: 'test'
+2026-10-19T10:39:39.9042770Z   ...
+2026-10-19T10:39:39.9043481Z # Subtest: a completed historical iteration remains complete for legacy records
+2026-10-19T10:39:39.9044073Z ok 9 - a completed historical iteration remains complete for legacy records
+2026-10-19T10:39:39.9044512Z   ---
+2026-10-19T10:39:39.9044724Z   duration_ms: 0.255883
+2026-10-19T10:39:39.9044934Z   type: 'test'
+2026-10-19T10:39:39.9045122Z   ...
+2026-10-19T10:39:39.9045293Z 1..9
+2026-10-19T10:39:39.9045468Z # tests 9
+2026-10-19T10:39:39.9045648Z # suites 0
+2026-10-19T10:39:39.9045831Z # pass 9
+2026-10-19T10:39:39.9046006Z # fail 0
+2026-10-19T10:39:39.9046184Z # cancelled 0
+2026-10-19T10:39:39.9046378Z # skipped 0
+2026-10-19T10:39:39.9046708Z # todo 0
+2026-10-19T10:39:39.9046915Z # duration_ms 337.809819
+2026-10-19T10:39:39.9960912Z 
+2026-10-19T10:39:39.9961321Z > build
+2026-10-19T10:39:39.9961855Z > npm run clean:build-metadata && vite build && npm run clean:build-metadata
+2026-10-19T10:39:39.9962193Z 
+2026-10-19T10:39:40.0851322Z 
+2026-10-19T10:39:40.0851904Z > clean:build-metadata
+2026-10-19T10:39:40.0852293Z > node scripts/clean-build-metadata.mjs
+2026-10-19T10:39:40.0852516Z 
+2026-10-19T10:39:40.8673854Z [36mvite v7.3.6 [32mbuilding client environment for production...[36m[39m
+2026-10-19T10:39:40.9351209Z transforming...
+2026-10-19T10:39:44.1795385Z [32m✓[39m 1980 modules transformed.
+2026-10-19T10:39:44.5250250Z rendering chunks...
+2026-10-19T10:39:44.6948939Z computing gzip size...
+2026-10-19T10:39:44.7405290Z [2mdist/[22m[32mindex.html                               [39m[1m[2m  0.49 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+2026-10-19T10:39:44.7406827Z [2mdist/[22m[2massets/[22m[35mindex-Bt2lkd3M.css                [39m[1m[2m 57.02 kB[22m[1m[22m[2m │ gzip:   9.79 kB[22m
+2026-10-19T10:39:44.7408075Z [2mdist/[22m[2massets/[22m[36mchevron-down-4M62GrMY.js          [39m[1m[2m  0.14 kB[22m[1m[22m[2m │ gzip:   0.15 kB[22m
+2026-10-19T10:39:44.7409600Z [2mdist/[22m[2massets/[22m[36mplus-S0a_2jZ9.js                  [39m[1m[2m  0.17 kB[22m[1m[22m[2m │ gzip:   0.16 kB[22m
+2026-10-19T10:39:44.7411126Z [2mdist/[22m[2massets/[22m[36marrow-right-DiYpPg5b.js           [39m[1m[2m  0.18 kB[22m[1m[22m[2m │ gzip:   0.17 kB[22m
+2026-10-19T10:39:44.7412672Z [2mdist/[22m[2massets/[22m[36msearch-CZiXKt42.js                [39m[1m[2m  0.18 kB[22m[1m[22m[2m │ gzip:   0.17 kB[22m
+2026-10-19T10:39:44.7414390Z [2mdist/[22m[2massets/[22m[36mcircle-check-D8mNKmWg.js          [39m[1m[2m  0.19 kB[22m[1m[22m[2m │ gzip:   0.18 kB[22m
+2026-10-19T10:39:44.7415305Z [2mdist/[22m[2massets/[22m[36mloader-circle-iY8IE2Uf.js         [39m[1m[2m  0.23 kB[22m[1m[22m[2m │ gzip:   0.20 kB[22m
+2026-10-19T10:39:44.7416197Z [2mdist/[22m[2massets/[22m[36mdownload-LW3iyTiF.js              [39m[1m[2m  0.24 kB[22m[1m[22m[2m │ gzip:   0.20 kB[22m
+2026-10-19T10:39:44.7417180Z [2mdist/[22m[2massets/[22m[36mexternal-link-R--eClac.js         [39m[1m[2m  0.26 kB[22m[1m[22m[2m │ gzip:   0.21 kB[22m
+2026-10-19T10:39:44.7418352Z [2mdist/[22m[2massets/[22m[36mtriangle-alert-CVJP1r4V.js        [39m[1m[2m  0.28 kB[22m[1m[22m[2m │ gzip:   0.23 kB[22m
+2026-10-19T10:39:44.7419387Z [2mdist/[22m[2massets/[22m[36mbookmark-plus-BVgowwzL.js         [39m[1m[2m  0.29 kB[22m[1m[22m[2m │ gzip:   0.23 kB[22m
+2026-10-19T10:39:44.7420803Z [2mdist/[22m[2massets/[22m[36mbook-open-D1ZFyOY7.js             [39m[1m[2m  0.29 kB[22m[1m[22m[2m │ gzip:   0.22 kB[22m
+2026-10-19T10:39:44.7421694Z [2mdist/[22m[2massets/[22m[36mwrench-B9P65FcX.js                [39m[1m[2m  0.31 kB[22m[1m[22m[2m │ gzip:   0.25 kB[22m
+2026-10-19T10:39:44.7422577Z [2mdist/[22m[2massets/[22m[36mrefresh-cw-DRZAgGfI.js            [39m[1m[2m  0.33 kB[22m[1m[22m[2m │ gzip:   0.24 kB[22m
+2026-10-19T10:39:44.7423698Z [2mdist/[22m[2massets/[22m[36msave-q1UlZN8e.js                  [39m[1m[2m  0.34 kB[22m[1m[22m[2m │ gzip:   0.24 kB[22m
+2026-10-19T10:39:44.7424843Z [2mdist/[22m[2massets/[22m[36mtrash-2-BhXRmbFG.js               [39m[1m[2m  0.34 kB[22m[1m[22m[2m │ gzip:   0.23 kB[22m
+2026-10-19T10:39:44.7425754Z [2mdist/[22m[2massets/[22m[36mfile-text-D-WHEVTp.js             [39m[1m[2m  0.35 kB[22m[1m[22m[2m │ gzip:   0.23 kB[22m
+2026-10-19T10:39:44.7426642Z [2mdist/[22m[2massets/[22m[36mfolder-kanban-BRQVdVdF.js         [39m[1m[2m  0.36 kB[22m[1m[22m[2m │ gzip:   0.26 kB[22m
+2026-10-19T10:39:44.7427525Z [2mdist/[22m[2massets/[22m[36msparkles-RMUg15i4.js              [39m[1m[2m  0.51 kB[22m[1m[22m[2m │ gzip:   0.29 kB[22m
+2026-10-19T10:39:44.7428416Z [2mdist/[22m[2massets/[22m[36mproject-selection-DifhG-P2.js     [39m[1m[2m  0.54 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+2026-10-19T10:39:44.7429408Z [2mdist/[22m[2massets/[22m[36mbadge-BPaW2khM.js                 [39m[1m[2m  0.55 kB[22m[1m[22m[2m │ gzip:   0.36 kB[22m
+2026-10-19T10:39:44.7430276Z [2mdist/[22m[2massets/[22m[36mleaf-card-Cj4fjx0c.js             [39m[1m[2m  0.67 kB[22m[1m[22m[2m │ gzip:   0.40 kB[22m
+2026-10-19T10:39:44.7431146Z [2mdist/[22m[2massets/[22m[36mfactory-v1-Bu26Gk6l.js            [39m[1m[2m  0.76 kB[22m[1m[22m[2m │ gzip:   0.50 kB[22m
+2026-10-19T10:39:44.7432016Z [2mdist/[22m[2massets/[22m[36mfactory-pYP6cBht.js               [39m[1m[2m  0.80 kB[22m[1m[22m[2m │ gzip:   0.51 kB[22m
+2026-10-19T10:39:44.7433067Z [2mdist/[22m[2massets/[22m[36mboxes-DKHHIJrO.js                 [39m[1m[2m  0.86 kB[22m[1m[22m[2m │ gzip:   0.41 kB[22m
+2026-10-19T10:39:44.7433963Z [2mdist/[22m[2massets/[22m[36mcreateLucideIcon-Do3XyIfH.js      [39m[1m[2m  1.17 kB[22m[1m[22m[2m │ gzip:   0.68 kB[22m
+2026-10-19T10:39:44.7434851Z [2mdist/[22m[2massets/[22m[36mprose-CewFOJeb.js                 [39m[1m[2m  1.35 kB[22m[1m[22m[2m │ gzip:   0.74 kB[22m
+2026-10-19T10:39:44.7435747Z [2mdist/[22m[2massets/[22m[36mapp-reference-button-CCR8K1fi.js  [39m[1m[2m  1.42 kB[22m[1m[22m[2m │ gzip:   0.84 kB[22m
+2026-10-19T10:39:44.7436651Z [2mdist/[22m[2massets/[22m[36mbrowse-CPwS3yqf.js                [39m[1m[2m  2.89 kB[22m[1m[22m[2m │ gzip:   1.42 kB[22m
+2026-10-19T10:39:44.7437509Z [2mdist/[22m[2massets/[22m[36mbutton-CuthmRCS.js                [39m[1m[2m  4.54 kB[22m[1m[22m[2m │ gzip:   2.08 kB[22m
+2026-10-19T10:39:44.7438359Z [2mdist/[22m[2massets/[22m[36msearch-BjneeLGw.js                [39m[1m[2m  6.77 kB[22m[1m[22m[2m │ gzip:   2.83 kB[22m
+2026-10-19T10:39:44.7439205Z [2mdist/[22m[2massets/[22m[36mhome-B4hzd9kR.js                  [39m[1m[2m  7.76 kB[22m[1m[22m[2m │ gzip:   3.17 kB[22m
+2026-10-19T10:39:44.7440045Z [2mdist/[22m[2massets/[22m[36mask-Dj12oBsx.js                   [39m[1m[2m 11.52 kB[22m[1m[22m[2m │ gzip:   4.72 kB[22m
+2026-10-19T10:39:44.7440889Z [2mdist/[22m[2massets/[22m[36mapps-DdC0JZVP.js                  [39m[1m[2m 17.34 kB[22m[1m[22m[2m │ gzip:   6.04 kB[22m
+2026-10-19T10:39:44.7441754Z [2mdist/[22m[2massets/[22m[36msettings-xdkZ2qNl.js              [39m[1m[2m 18.67 kB[22m[1m[22m[2m │ gzip:   6.35 kB[22m
+2026-10-19T10:39:44.7442638Z [2mdist/[22m[2massets/[22m[36mleaf-m5YklSNF.js                  [39m[1m[2m 19.92 kB[22m[1m[22m[2m │ gzip:   6.63 kB[22m
+2026-10-19T10:39:44.7443636Z [2mdist/[22m[2massets/[22m[36mprojects-DdiBEryL.js              [39m[1m[2m 23.87 kB[22m[1m[22m[2m │ gzip:   8.17 kB[22m
+2026-10-19T10:39:44.7444499Z [2mdist/[22m[2massets/[22m[36mdrafts-Mxt-PkoC.js                [39m[1m[2m 24.64 kB[22m[1m[22m[2m │ gzip:   8.06 kB[22m
+2026-10-19T10:39:44.7445371Z [2mdist/[22m[2massets/[22m[36mtutorial-DLu-TlgO.js              [39m[1m[2m 33.55 kB[22m[1m[22m[2m │ gzip:  14.25 kB[22m
+2026-10-19T10:39:44.7446250Z [2mdist/[22m[2massets/[22m[36mfactory-CL1bxmfP.js               [39m[1m[2m106.76 kB[22m[1m[22m[2m │ gzip:  33.13 kB[22m
+2026-10-19T10:39:44.7447241Z [2mdist/[22m[2massets/[22m[36mproject-detail-_xGwSCDk.js        [39m[1m[2m133.82 kB[22m[1m[22m[2m │ gzip:  37.56 kB[22m
+2026-10-19T10:39:44.7448141Z [2mdist/[22m[2massets/[22m[36mindex-Dgg33gCp.js                 [39m[1m[2m157.29 kB[22m[1m[22m[2m │ gzip:  47.68 kB[22m
+2026-10-19T10:39:44.7449008Z [2mdist/[22m[2massets/[22m[36mindex-u0kTYpbB.js                 [39m[1m[2m389.84 kB[22m[1m[22m[2m │ gzip: 124.71 kB[22m
+2026-10-19T10:39:44.7449545Z [32m✓ built in 3.85s[39m
+2026-10-19T10:39:44.8771153Z 
+2026-10-19T10:39:44.8771696Z > clean:build-metadata
+2026-10-19T10:39:44.8772300Z > node scripts/clean-build-metadata.mjs
+2026-10-19T10:39:44.8772629Z 
+2026-10-19T10:39:45.0151084Z 
+2026-10-19T10:39:45.0152157Z > test:e2e
+2026-10-19T10:39:45.0163346Z > playwright test
+2026-10-19T10:39:45.0163609Z 
+2026-10-19T10:39:48.5625207Z 
+2026-10-19T10:39:48.5626122Z Running 17 tests using 1 worker
+2026-10-19T10:39:48.5626631Z 
+2026-10-19T10:39:50.7883199Z   ✓   1 e2e/tests/core.spec.ts:24:1 › browse opens a generated type leaf without browser errors (1.3s)
+2026-10-19T10:39:51.9373907Z   ✓   2 e2e/tests/core.spec.ts:45:1 › type page uses a stable source fallback without canonical API files (1.1s)
+2026-10-19T10:39:53.3592272Z   ✓   3 e2e/tests/core.spec.ts:55:1 › draft editor exposes dirty state and saves before deletion (1.4s)
+2026-10-19T10:39:58.4196924Z   ✓   4 e2e/tests/core.spec.ts:90:1 › draft generation completion hydrates the editor (5.0s)
+2026-10-19T10:40:03.5178513Z   ✓   5 e2e/tests/core.spec.ts:99:1 › draft polling exposes a stale state and retry affordance (5.1s)
+2026-10-19T10:40:04.7632350Z   ✓   6 e2e/tests/core.spec.ts:124:1 › search matches type and application aliases (1.2s)
+2026-10-19T10:40:05.2383339Z   ✓   7 e2e/tests/core.spec.ts:135:1 › unknown routes render a real not-found page (462ms)
+2026-10-19T10:40:06.2579227Z   ✓   8 e2e/tests/core.spec.ts:144:1 › apps hash links focus the target and invalid hashes explain recovery (1.0s)
+2026-10-19T10:40:07.5486883Z   ✓   9 e2e/tests/core.spec.ts:153:1 › mobile pages avoid horizontal overflow and name the draft editor (1.3s)
+2026-10-19T10:40:09.9782720Z   ✓  10 e2e/tests/core.spec.ts:167:1 › public catalog exposes bilingual labels and navigable canonical links (2.4s)
+2026-10-19T10:40:11.8296294Z   ✓  11 e2e/tests/core.spec.ts:183:1 › project detail state follows the selected project (1.8s)
+2026-10-19T10:40:12.7289895Z   ✓  12 e2e/tests/core.spec.ts:207:1 › English tutorial does not fall back to the long Chinese source (887ms)
+2026-10-19T10:40:13.9441801Z   ✓  13 e2e/tests/core.spec.ts:214:1 › local API initializes recovery, backup download, and controlled restore (1.2s)
+2026-10-19T10:40:25.8624643Z   ✓  14 e2e/tests/matrix.spec.ts:71:1 › normal route matrix passes at 375px and 768px (11.9s)
+2026-10-19T10:40:32.2118054Z   ✓  15 e2e/tests/matrix.spec.ts:87:1 › language and accessible names hold across the route matrix (6.3s)
+2026-10-19T10:40:37.8636936Z   ✓  16 e2e/tests/matrix.spec.ts:121:1 › route error matrix exposes a recoverable alert (5.6s)
+2026-10-19T10:40:42.3629082Z   ✓  17 e2e/tests/matrix.spec.ts:156:1 › representative empty states remain explicit and navigable (4.5s)
+2026-10-19T10:40:42.4453814Z 
+2026-10-19T10:40:42.4457850Z   17 passed (56.9s)
+2026-10-19T10:40:42.4617601Z ##[group]Run npm run test:e2e:factory -- --reporter=line
+2026-10-19T10:40:42.4617985Z [36;1mnpm run test:e2e:factory -- --reporter=line[0m
+2026-10-19T10:40:42.4653928Z shell: /usr/bin/bash -e {0}
+2026-10-19T10:40:42.4654188Z env:
+2026-10-19T10:40:42.4654456Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:40:42.4654871Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-19T10:40:42.4655275Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:40:42.4655659Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:40:42.4656028Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-19T10:40:42.4656393Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-19T10:40:42.4656707Z ##[endgroup]
+2026-10-19T10:40:42.5556161Z 
+2026-10-19T10:40:42.5556660Z > test:e2e:factory
+2026-10-19T10:40:42.5557626Z > playwright test --config playwright.factory.config.ts --reporter=line
+2026-10-19T10:40:42.5558149Z 
+2026-10-19T10:40:45.7688887Z 
+2026-10-19T10:40:45.7689771Z Running 27 tests using 1 worker
+2026-10-19T10:40:45.7690643Z 
+2026-10-19T10:40:46.2917394Z [1/27] e2e/factory-tests/blueprint-runtime.spec.ts:23:1 › blueprint runtime submission requires adapter, source ZIP and execution consent, without a model field
+2026-10-19T10:40:48.6284831Z [2/27] e2e/factory-tests/blueprint-runtime.spec.ts:45:1 › runtime deep link exposes startup diagnostics, case evidence and cleanup errors
+2026-10-19T10:40:51.1270725Z [3/27] e2e/factory-tests/blueprint-runtime.spec.ts:65:1 › blueprint with no frozen runner adapter explains runtime acceptance is unavailable
+2026-10-19T10:40:52.8237360Z [4/27] e2e/factory-tests/factory.spec.ts:7:1 › factory catalog saves, confirms, pins and cancels a batch without a provider call
+2026-10-19T10:40:57.7103186Z [5/27] e2e/factory-tests/factory.spec.ts:34:1 › catalog groups scenarios by type and preserves cross-group selection through collapse, search and refresh
+2026-10-19T10:41:06.2778996Z [6/27] e2e/factory-tests/factory.spec.ts:88:1 › visible generation entry filters covered leaves, marks zero additions and blocks active generation
+2026-10-19T10:41:11.4444076Z [7/27] e2e/factory-tests/factory.spec.ts:156:1 › leaf exposes confirmed scenarios and links to factory
+2026-10-19T10:41:13.1879795Z [8/27] e2e/factory-tests/factory.spec.ts:165:1 › draft scenarios can queue an independent pinned review without confirmation or provider calls
+2026-10-19T10:41:16.0006419Z [9/27] e2e/factory-tests/factory.spec.ts:187:1 › review actions distinguish first, repeat and retry; passed drafts still need human confirmation
+2026-10-19T10:41:20.5784852Z [10/27] e2e/factory-tests/factory.spec.ts:243:1 › scenario review displays reasons, revisions, failed attempts and bilingual stale evidence
+2026-10-19T10:41:25.1867461Z [11/27] e2e/factory-tests/factory.spec.ts:266:1 › covered types can complete without new drafts and explain their pinned output language
+2026-10-19T10:41:27.0135327Z [12/27] e2e/factory-tests/factory.spec.ts:281:1 › factory supports mobile, English, empty artifacts and recoverable errors
+2026-10-19T10:41:30.4465643Z [13/27] e2e/factory-tests/factory.spec.ts:297:1 › artifact distinguishes source review from runtime acceptance and can instantiate L0
+2026-10-19T10:41:32.5832814Z [14/27] e2e/factory-tests/factory.spec.ts:333:1 › leaf published template creates an application and explains review scope
+2026-10-19T10:41:33.8272311Z [15/27] e2e/factory-tests/factory.spec.ts:347:1 › cognitive sample imports once, reads definitions and exports a phased development handoff without provider calls
+2026-10-19T10:41:37.7786916Z [16/27] e2e/factory-tests/factory.spec.ts:396:1 › invalid cognitive ZIP shows an error and keeps imported candidates
+2026-10-19T10:41:39.6514744Z [17/27] e2e/factory-tests/factory.spec.ts:408:1 › cognitive document reader does not load remote images or execute embedded HTML
+2026-10-19T10:41:41.5535486Z [18/27] e2e/factory-tests/factory.spec.ts:430:1 › confirmed scenarios queue pinned cognition production separately from code templates
+2026-10-19T10:41:43.7585549Z [19/27] e2e/factory-tests/factory.spec.ts:446:1 › cognitive review queues independently, can retry after cancellation and produces a new pinned revision
+2026-10-19T10:41:50.4635956Z [20/27] e2e/factory-tests/factory.spec.ts:478:1 › 规范预审阻断可见，意见可带回生产补充要求
+2026-10-19T10:41:53.0428147Z [21/27] e2e/factory-tests/leaf-blueprint.spec.ts:32:1 › published product blueprint links to phase export and does not offer runnable instantiate
+2026-10-19T10:41:53.8449966Z [22/27] e2e/factory-tests/leaf-blueprint.spec.ts:40:1 › published runnable starter keeps its application archive flow
+2026-10-19T10:41:54.6914613Z [23/27] e2e/factory-tests/v1.spec.ts:18:1 › shared cases show fixed source, evidence, unknowns and keep legacy cards when the dynamic API is unavailable
+2026-10-19T10:41:55.4837275Z [24/27] e2e/factory-tests/v1.spec.ts:28:1 › case revisions expose observed evidence separately from unknown runtime and link into factory
+2026-10-19T10:41:56.2904162Z [25/27] e2e/factory-tests/v1.spec.ts:43:1 › V1 plan survives run, pause, resume and reload with a stable idempotency key
+2026-10-19T10:41:59.1077168Z [26/27] e2e/factory-tests/v1.spec.ts:98:1 › V1 catalog shows each blueprint runtime result per run and target, with no aggregate fallback
+2026-10-19T10:41:59.9194427Z [27/27] e2e/factory-tests/v1.spec.ts:126:1 › fresh deep link restores a running plan, polls its report, pauses by plan ID, then stops at terminal state
+2026-10-19T10:42:05.4104736Z   27 passed (1.4m)
+2026-10-19T10:42:05.4321222Z Post job cleanup.
+2026-10-19T10:42:05.5551018Z (node:5178) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-19T10:42:05.5552342Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-19T10:42:05.5773243Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/atlas/atlas --files-from manifest.txt --use-compress-program zstdmt
+2026-10-19T10:42:05.9389453Z (node:5178) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-19T10:42:06.9301434Z Sent 23527424 of 37760914 (62.3%), 22.5 MBs/sec
+2026-10-19T10:42:07.4433290Z Sent 37760914 of 37760914 (100.0%), 23.8 MBs/sec
+2026-10-19T10:42:07.7204111Z Cache saved with the key: node-cache-Linux-x64-npm-fd692e1302e14d30fe51cd1152f75ad2a0c00717dc78716e3124263364a0d7f9
+2026-10-19T10:42:07.7351395Z Post job cleanup.
+2026-10-19T10:42:07.8524402Z (node:5200) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-19T10:42:07.8525993Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-19T10:42:07.8722400Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/atlas/atlas --files-from manifest.txt --use-compress-program zstdmt
+2026-10-19T10:42:08.2046470Z (node:5200) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-19T10:42:09.1960625Z Sent 41680896 of 52119047 (80.0%), 39.8 MBs/sec
+2026-10-19T10:42:09.4999701Z Sent 52119047 of 52119047 (100.0%), 38.1 MBs/sec
+2026-10-19T10:42:09.7203736Z Cache saved with the key: setup-python-Linux-x64-24.04-Ubuntu-python-3.11.17-pip-efad22bda6be613833bf0f6e5b44b81f8f1de89310ba2fb0d1af09538cb10180
+2026-10-19T10:42:09.7355683Z Post job cleanup.
+2026-10-19T10:42:09.8141022Z [command]/usr/bin/git version
+2026-10-19T10:42:09.8178357Z git version 2.55.0
+2026-10-19T10:42:09.8215763Z Temporarily overriding HOME='/home/runner/work/_temp/55873a24-8ced-436c-b7ec-2b7cc489fc08' before making global git config changes
+2026-10-19T10:42:09.8217712Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-19T10:42:09.8219252Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/atlas/atlas
+2026-10-19T10:42:09.8254190Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T10:42:09.8287489Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-19T10:42:09.8517270Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T10:42:09.8540266Z http.https://github.com/.extraheader
+2026-10-19T10:42:09.8551896Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-19T10:42:09.8581823Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-19T10:42:09.8799186Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-19T10:42:09.8830876Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-19T10:42:09.9176006Z Cleaning up orphan processes
+2026-10-19T10:42:09.9437446Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

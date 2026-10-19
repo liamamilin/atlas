@@ -51,6 +51,11 @@ jobs:
         working-directory: atlas-web
       - run: npx playwright install --with-deps chromium
         working-directory: atlas-web
+      - name: Verify independent executor contracts and browser negative controls
+        run: |
+          python -m unittest discover -s docs/template-factory/v1-2026-10-19/independent -p '*fixture_test.py' -v
+          node docs/template-factory/v1-2026-10-19/independent/bookmark_contract_fixture_test.cjs
+          node docs/template-factory/v1-2026-10-19/independent/ui_contract_fixture_test.cjs
       - run: npm audit --registry=https://registry.npmjs.org --audit-level=high
         working-directory: atlas-web
       - run: npm run typecheck && npm test && npm run build && npm run test:e2e
