@@ -17,3 +17,5 @@
 | 支持范围、迁移、固定引用和运行合同 | [CONTRACTS_ADDENDUM.md](CONTRACTS_ADDENDUM.md)、[原CONTRACTS.md](../v1-2026-10-19/CONTRACTS.md)、[OPERATIONS.md](OPERATIONS.md) |
 
 完整真实下游样例未取得：本轮止于规格预审，没有新模板归档、交接消费、应用归档、运行抽验或phase proof。旧冻结样例保留在原v1-2026-10-19目录，不能作为本轮新通过证据。
+
+最终执行器实现提交784dedc已通过[远端完整CI](https://github.com/liamamilin/atlas/actions/runs/39252090447)，原始记录ci-final-*。页面证据：[失败与P0未运行](ui/formal-stop-failure.png)。

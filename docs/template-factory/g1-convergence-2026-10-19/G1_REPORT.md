@@ -16,7 +16,7 @@ G1 **blocked**；T08 **not_started**。本轮新增冻结模板0、正式发布�
 
 [独立执行器fixture](verification/trash-executor/checks.json)实际运行Chromium，覆盖仅回收站呈现恢复表单、控件缺失和无效提交，恢复通过HTML表单而非API。它没有运行生成应用，不能充当phase proof。新adapter SHA为aac08fb0bed2f77b4f2f6388205659e38cb97ad6168d77eea2e0adc24f56b488；runner SHA为7dfa5cc10d61adde10178818d5e161bec5f79261cf552d45857ba9065d0bb508；machineplan仍为5e352e1cdbad18d5dbf827e37e9e0f394f0e7fbf919b0dd18713f7affb6ebb3a。
 
-代码提交76db363的远端完整CI已实际通过：[39247348464](https://github.com/liamamilin/atlas/actions/runs/39247348464)，原始记录见ci-recovery-fenced-*。回收站执行器增量将在本轮最终提交再次跑完整Checks，最终结果另存CI记录并由GitHub提交检查关联。
+代码提交76db363的远端完整CI已实际通过：[39247348464](https://github.com/liamamilin/atlas/actions/runs/39247348464)，原始记录见ci-recovery-fenced-*。包含回收站执行器最终修复的784dedc9e27f53325a5774bb8f599b5546d25922已再次远端全部通过：[39252090447](https://github.com/liamamilin/atlas/actions/runs/39252090447)，两job及必要步骤均success，包含真实Chromium正负控；原始结果和日志为ci-final-*。后续提交仅归档这次CI与截图，源码/执行器摘要保持一致。
 
 ## 本轮真实生产结果
 
@@ -49,3 +49,5 @@ amendment `bamd_9378738d1e274c409f756d92ec9c2ac5` 在1792408423.754534激活一�
 [案例增量](catalog-after.json)与起点逐项对照：规范案例1份、应用记录34份，均无新增。原规范案例[当前正式读取](repair-4/canonical-case-current.json)的修订摘要仍d58ca8ae…，case_basis仍a22ff1c0…，上游commit仍539881bc67099d491e8ab6f85de0f443fa7de623。静态源码观察、设计推断和文档声明不等于上游应用运行，研究成果在模板失败后仍可从应用实证复用。
 
 [T08_STATUS.json](T08_STATUS.json)固定原书签、月度预算、多项目会议笔记，分母3，运行通过0；实际T08计划查询为空，未preview/run、未激活T08窗口。G1未通过，不能移入T08绕过失败。恢复前置与限额建议见[OPERATIONS.md](OPERATIONS.md)。
+
+实际页面截图：[失败项](ui/formal-stop-failure.png)、[用量和未发布状态](ui/formal-stop.png)。页面批次quality汇总仍显示in_progress，不能将其作为G1通过；正式宿主评估为blocked，计划已暂停。

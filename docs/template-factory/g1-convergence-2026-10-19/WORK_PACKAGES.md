@@ -22,3 +22,5 @@
 ## 最终受控停止
 
 C01–C05实现及最新本地13项检查完成；回收站执行器修正、真实Chromium正负控及独立代码复核完成。C06在当前plan-1的phase_acceptance预审受阻，job实际failed，宿主G1_ASSESSMENT为blocked，随后通过正式服务暂停原plan。累计52/500次CLI、4/4轮修复、活动0；五项预审通过、一项阻断。未进入新程序作者/冻结/发布/交接/P0。C07保持not_started，实际T08计划为空、原三场景请求未改。C08交付G1_REPORT/DELIVERY/STOP_RECORD/T08_STATUS及全部原始停止样例，最终代码与证据继续推送原分支。
+
+最终实现提交784dedc9e27f53325a5774bb8f599b5546d25922的远端39252090447全部通过，含新的回收站Chromium正负控；ci-final-*为原始证据。正式停止的页面截图见ui/formal-stop*.png。后续仅归档CI与截图，不改变生产、限额、失败或源码。

@@ -65,3 +65,7 @@ API的`GET /api/factory/jobs/job_a53c47f3694047489c4f82cfc2e346be`及`GET /api/f
 若后续另有明确追加授权，先在原append-only服务中支持该明确增量并验证历史/并发/时间边界，再通过正式新修订绑定本次failed job、plan-1和phase_acceptance证据。最小业务修正为：A04程序计划补创建/重命名空名与121字符名的invalid_name、form-error、无写入断言；A12仅处理保存/移动category字段的invalid_category，不把归类管理表单混入。保留全部原断言及本轮URL政策，不能通过改变case、阶段或更换样本避开失败。随后仍须完成预审、五程序修订、精确差分语义审阅、冻结后独立审阅、发布、标准交接真实消费、P0、独立运行/proof及宿主评估。窗口到期后需要相应明确时间授权；不自动延期。
 
 G1实际通过后才启动原三个场景的T08；本次未授权或排队其他候选。限额建议是先处理这一个确定根因，保持全局500、并发2/1和其他产品2轮，不清零历史、不预先扩到十个。
+
+后续生产前还应修正宿主源JSON的确定性渲染：本轮ACCEPTED_CASE_FACTS/CASE_DESIGN首次返回与检查点重载仅键序不同，导致严格raw恢复保守拒绝并多用一次CLI。当前没有放宽源字节门禁；正式checkpoint复用与累计记账保留。后续应以真实V1首次生成→持久重载回归验证稳定渲染，不能把本轮局部只读rehearsal当作该完整路径已通过。
+
+页面的`quality=in_progress`是批次汇总，`limits.product_repairs=2`是不可变基础额度；原书签有效4轮及新deadline在amendments中。正式G1结论以G1_ASSESSMENT为blocked为准。后续UI应更直接显示宿主门禁与有效额度，避免将基础值或汇总进度当成通过结论；本轮截图保留实际表现。
