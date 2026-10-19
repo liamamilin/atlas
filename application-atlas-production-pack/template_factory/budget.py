@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import time
 import uuid
 
@@ -17,6 +18,25 @@ DEFAULT_LIMITS = {
     "transient_retries": 2,
     "phase_seconds": 8 * 60 * 60,
 }
+
+
+def _legacy_retry_scope(stage):
+    """Map historical indexed stage names to today's stable retry scopes."""
+    base = str(stage or "").split(":", 1)[0]
+    match = re.fullmatch(r"blueprint-spec-review-\d+-(.+?)(?:-v1)?", base)
+    if match:
+        return "blueprint-spec-review:" + match.group(1)
+    if base.startswith("blueprint-code-"):
+        return "blueprint-code"
+    if base.startswith("blueprint-generate-research-repair-") or base.startswith("blueprint-research"):
+        return "blueprint-research"
+    if base.startswith("blueprint-generate-"):
+        return "blueprint-generate"
+    if base.startswith("cognitive-review-reference-repair"):
+        return "cognitive-review"
+    if base.startswith("p0-delivery"):
+        return "p0-delivery"
+    return base
 
 
 class BudgetLedger:
@@ -48,6 +68,9 @@ class BudgetLedger:
         with store.connect(True) as con:
             for statement in statements:
                 con.execute(statement)
+            reservation_columns = {row[1] for row in con.execute("PRAGMA table_info(tf_budget_reservation)")}
+            if "retry_scope" not in reservation_columns:
+                con.execute("ALTER TABLE tf_budget_reservation ADD COLUMN retry_scope TEXT")
             row = con.execute("SELECT limits_json FROM tf_budget_campaign WHERE campaign_id=?", (self.campaign_id,)).fetchone()
             if row:
                 recorded = {**DEFAULT_LIMITS, **json.loads(row[0])}
@@ -92,7 +115,8 @@ class BudgetLedger:
         return deadline
 
     def reserve(self, identity, phase, kind="production", timeout=None, *, job_id=None,
-                requested_model=None, requested_effort=None, stage=None, retry=None):
+                requested_model=None, requested_effort=None, stage=None, retry=None,
+                retry_scope=None):
         if not identity or not phase:
             raise FactoryError("budget identity and phase are required", "budget_identity_required", 400)
         if kind not in {"production", "runtime", "review", "research", "transient_retry"}:
@@ -131,17 +155,30 @@ class BudgetLedger:
                 if (isinstance(retry, bool) or not isinstance(retry, int) or retry < 1
                         or retry > self.limits["transient_retries"]):
                     raise FactoryError("retry must be a positive integer", "budget_retry_invalid", 400)
-                count = con.execute(
-                    "SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND identity=? AND stage=? AND retry IS NOT NULL AND status!='not_started'",
-                    (self.campaign_id, str(identity), str(stage or phase)),
-                ).fetchone()[0]
+                scope = str(retry_scope or stage or phase)
+                rows = con.execute(
+                    "SELECT retry_scope,stage FROM tf_budget_reservation WHERE campaign_id=? AND identity=? AND retry IS NOT NULL AND status!='not_started'",
+                    (self.campaign_id, str(identity)),
+                ).fetchall()
+                count = sum(
+                    1 for row in rows
+                    if (row[0] == scope if row[0] is not None else _legacy_retry_scope(row[1]) == scope)
+                )
                 if count >= self.limits["transient_retries"]:
                     raise FactoryError("transient retry limit exhausted", "budget_retry_limit", 409)
+            if retry is None and retry_scope:
+                duplicate = con.execute(
+                    "SELECT 1 FROM tf_budget_reservation WHERE campaign_id=? AND identity=? AND stage=? AND status!='not_started' LIMIT 1",
+                    (self.campaign_id, str(identity), str(stage or phase)),
+                ).fetchone()
+                if duplicate:
+                    raise FactoryError("repeated fixed-input call must consume retry budget", "budget_retry_limit", 409)
             con.execute(
-                "INSERT INTO tf_budget_reservation(id,campaign_id,identity,phase,kind,status,created,job_id,requested_model,requested_effort,stage,retry,group_kind) VALUES(?,?,?,?,?,'reserved',?,?,?,?,?,?,?)",
+                "INSERT INTO tf_budget_reservation(id,campaign_id,identity,phase,kind,status,created,job_id,requested_model,requested_effort,stage,retry,group_kind,retry_scope) VALUES(?,?,?,?,?,'reserved',?,?,?,?,?,?,?,?)",
                 (reservation_id, self.campaign_id, str(identity), str(phase), kind, now, job_id,
                  requested_model, requested_effort, stage, retry,
-                 "runtime" if kind == "runtime" else "production"),
+                 "runtime" if kind == "runtime" else "production",
+                 str(retry_scope) if retry_scope else None),
             )
         cap = min(float(timeout), remaining) if timeout is not None else remaining
         return {"id": reservation_id, "timeout": max(0.0, cap), "deadline": deadline}

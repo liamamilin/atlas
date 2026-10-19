@@ -242,7 +242,7 @@ def dispatch(method, path, query="", body=None, store=None):
                 return result, 202
             if match[2] != "download":
                 raise FactoryError(
-                    "Use cognitive reading, download, development export, cognitive-review, blueprint-runtime (when a frozen runner adapter exists), or repair. Cognitive publication is not available yet.",
+                    "Use cognitive reading, download, development export, cognitive-review, blueprint-runtime (when a frozen runner adapter exists), or repair. Eligible versions can be published through the digest-bound review endpoint.",
                     "blueprint_operation_unavailable",
                     409,
                 )

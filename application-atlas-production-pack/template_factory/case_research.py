@@ -374,7 +374,8 @@ def run_research(pipeline, job, attempt, agent, stage, checkpoint):
                     raw = checkpoint(study_name + f"-protocol-response-{protocol_round + 1}", lambda: agent(
                         study_name + f"-protocol-repair-{protocol_round + 1}",
                         RESEARCH_PROMPT + "\nCorrect the supplied PRIOR_STUDY.json protocol using VALIDATION_ERROR.json and these SAME pinned source bytes. Never invent locations or remove core workflow scope. Return a complete corrected study, not a verdict. Prior valid claims should stay unchanged unless their actual source disproves them.",
-                        payload, source=repair_source, budget_stage=operation))
+                        payload, source=repair_source, budget_stage=operation,
+                        budget_scope=study_name))
 
         study = checkpoint(
             study_name,
@@ -458,4 +459,3 @@ def _validate_study(study, repository, commit, files, root):
     _strings(scenario_fit.get("adopted_scope"), "adopted scope")
     _strings(scenario_fit.get("exclusions"), "scenario exclusions")
     _observation_payload(study, repository, commit, files, root, "study-check")
-

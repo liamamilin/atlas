@@ -35,6 +35,10 @@ def catalog_eligibility(store, artifact):
                 from .api import controlled_path
                 from .blueprints import verify_frozen
                 spec = verify_frozen(controlled_path(store, artifact["bundle_path"]), artifact["digest"])
+                if spec.get("case_facts_view") is None:
+                    library.legacy_facts_marker(basis)
+                else:
+                    library.validate_facts_view(spec["case_facts_view"], basis)
                 library.require_design_evidence(basis, spec.get("case_design", []))
             except FactoryError as error:
                 blockers.append({"code": error.code, "reason": str(error)})
@@ -55,6 +59,10 @@ def publish(store, con, row, body, value, review):
             raise FactoryError("legacy/unverified package lacks fixed canonical case evidence", "case_evidence_required", 409)
         library = CaseLibrary(store, initialize=False)
         library.require_admissible(basis)
+        if spec.get("case_facts_view") is None:
+            library.legacy_facts_marker(basis)
+        else:
+            library.validate_facts_view(spec["case_facts_view"], basis)
         library.require_design_evidence(basis, spec.get("case_design", []))
         if review_status(con, row["id"], row["digest"]) != "passed":
             raise FactoryError("latest independent review of this exact digest must pass", "cognitive_review_required", 409)

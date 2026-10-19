@@ -1,0 +1,185 @@
+{
+ "schema": "atlas.acceptance-contract.v1",
+ "template_digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+ "selected_phase": "P0",
+ "required_case_ids": [
+  "A01",
+  "A02",
+  "A03",
+  "A04",
+  "A05",
+  "A06",
+  "A07",
+  "A08",
+  "A09",
+  "A10",
+  "A11",
+  "A12"
+ ],
+ "cases": [
+  {
+   "id": "A01",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "保存一条链接后，同进程与重启后的新进程都能读到该记录，且 id 与内容稳定。",
+   "features": [
+    "F01",
+    "F08"
+   ],
+   "implementation": "acceptance/p0_library.py",
+   "implementation_sha256": "db7911754c6ed37f90f61146e3a352cb7a28028b280d5a24878918490b62b6ef"
+  },
+  {
+   "id": "A02",
+   "phase": "P0",
+   "type": "negative",
+   "goal": "缺协议、非 http/https、无点域名的 URL 被拒绝并返回结构化错误，且库中不新增记录。",
+   "features": [
+    "F01",
+    "F10"
+   ],
+   "implementation": "acceptance/p0_library.py",
+   "implementation_sha256": "db7911754c6ed37f90f61146e3a352cb7a28028b280d5a24878918490b62b6ef"
+  },
+  {
+   "id": "A03",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "不选归类保存时记录落入“未整理”，保存时给出的新归类名被自动创建，首启可见预置归类。",
+   "features": [
+    "F01",
+    "F02"
+   ],
+   "implementation": "acceptance/p0_library.py",
+   "implementation_sha256": "db7911754c6ed37f90f61146e3a352cb7a28028b280d5a24878918490b62b6ef"
+  },
+  {
+   "id": "A04",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "可新建、重命名、删除归类；重名被拒；删除归类后其记录回到“未整理”。",
+   "features": [
+    "F03"
+   ],
+   "implementation": "acceptance/p0_organize.py",
+   "implementation_sha256": "7d74bde76a8fcd6a52cdfa8aa31034f43f8c4d1dc50255f8d82e1cd356d1760b"
+  },
+  {
+   "id": "A05",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "在给定的 base_url 目标把记录从“未整理”移动到另一归类，并用独立实例证明该归属跨重启仍然有效。",
+   "features": [
+    "F04",
+    "F08"
+   ],
+   "implementation": "acceptance/p0_organize.py",
+   "implementation_sha256": "7d74bde76a8fcd6a52cdfa8aa31034f43f8c4d1dc50255f8d82e1cd356d1760b"
+  },
+  {
+   "id": "A06",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "按归类浏览只返回该归类记录，侧栏/接口给出的条目计数与实际一致。",
+   "features": [
+    "F05"
+   ],
+   "implementation": "acceptance/p0_organize.py",
+   "implementation_sha256": "7d74bde76a8fcd6a52cdfa8aa31034f43f8c4d1dc50255f8d82e1cd356d1760b"
+  },
+  {
+   "id": "A07",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "关键字检索匹配标题、域名与描述，可与归类叠加，无匹配时返回空集而非错误。",
+   "features": [
+    "F06"
+   ],
+   "implementation": "acceptance/p0_find_open.py",
+   "implementation_sha256": "5ccd5115753b40267036a64e330e2c81b9ffd42e6ad00cc96565642e3941444a"
+  },
+  {
+   "id": "A08",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "打开记录跳转到保存时的原始 URL（302 Location 等于保存值），未知 id 返回 404。",
+   "features": [
+    "F07"
+   ],
+   "implementation": "acceptance/p0_find_open.py",
+   "implementation_sha256": "5ccd5115753b40267036a64e330e2c81b9ffd42e6ad00cc96565642e3941444a"
+  },
+  {
+   "id": "A09",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "在给定的 base_url 目标删除记录后默认视图排除它、撤销恢复后记录内容重新可见，并用独立实例证明删除跨重启保持。",
+   "features": [
+    "F08",
+    "F09"
+   ],
+   "implementation": "acceptance/p0_recovery.py",
+   "implementation_sha256": "b6caae610999680fccc101293cb43eceef07c8b79c93bbe2666bfb765c2b4927"
+  },
+  {
+   "id": "A10",
+   "phase": "P0",
+   "type": "negative",
+   "goal": "未知 id 与畸形请求返回结构化错误码，且不产生 5xx、不改变现有数据。",
+   "features": [
+    "F10"
+   ],
+   "implementation": "acceptance/p0_recovery.py",
+   "implementation_sha256": "b6caae610999680fccc101293cb43eceef07c8b79c93bbe2666bfb765c2b4927"
+  },
+  {
+   "id": "A11",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "健康检查返回就绪，首页外壳在空库下渲染录入表单与列表容器，入口不报错。",
+   "features": [
+    "F11"
+   ],
+   "implementation": "acceptance/p0_library.py",
+   "implementation_sha256": "db7911754c6ed37f90f61146e3a352cb7a28028b280d5a24878918490b62b6ef"
+  },
+  {
+   "id": "A12",
+   "phase": "P0",
+   "type": "negative",
+   "goal": "保存或移动到空名/超长名的非法归类时返回 400 invalid_category，且现有归类与记录不变。",
+   "features": [
+    "F04",
+    "F10"
+   ],
+   "implementation": "acceptance/p0_organize.py",
+   "implementation_sha256": "7d74bde76a8fcd6a52cdfa8aa31034f43f8c4d1dc50255f8d82e1cd356d1760b"
+  }
+ ],
+ "suite_sha256": {
+  "acceptance/README.md": "5963afe2168d60c09f03d57619d5f07a425e5a7525245615d2c0017d161e70ce",
+  "acceptance/common.py": "7f0d7d28d8336bdde3da267795e24d13e430f05e53063ee01ed5611236325d37",
+  "acceptance/p0_find_open.py": "5ccd5115753b40267036a64e330e2c81b9ffd42e6ad00cc96565642e3941444a",
+  "acceptance/p0_library.py": "db7911754c6ed37f90f61146e3a352cb7a28028b280d5a24878918490b62b6ef",
+  "acceptance/p0_organize.py": "7d74bde76a8fcd6a52cdfa8aa31034f43f8c4d1dc50255f8d82e1cd356d1760b",
+  "acceptance/p0_recovery.py": "b6caae610999680fccc101293cb43eceef07c8b79c93bbe2666bfb765c2b4927",
+  "acceptance/p1_maturity.py": "d44e17c87314db18084b3b88bd2c700a75bfe583d108e9b518040fb8378601a3",
+  "acceptance/plan.json": "7a2e79dbee7f599a539afd48d4ff23286418f77b4bec3d6f9c34f0c762f38a2b",
+  "acceptance/requirements.txt": "f1fc18b605a1eea93892d319d09122d91033a48dfd4b913f8f262a4dc8633deb",
+  "acceptance/runner.json": "f9448d370749dcca44fb2024b1b4b6d761d127edaf98a523063a590db5c69375"
+ },
+ "suite_digest": "512fb2d20d102f63b7d3a933d2af5d0e2b78206e252e0a88c559e377737d33d9",
+ "suite_digest_scope": "all-frozen-blueprint-source; identical to managed runtime binding",
+ "program_inventory_digest": "cf05e090f2a2100b0aac310f37a3bde23bfbb6ea5d9c74540a624a7ddb40d57e",
+ "case_basis_digest": "a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589",
+ "scenario_revision": 2,
+ "phase_required_evidence": [
+  {
+   "id": "independent-core-journey",
+   "kind": "external",
+   "executor": "atlas-independent-acceptance-v1",
+   "description": "Independent user-entry/core-journey and risk verification against the same frozen source; suite results alone do not satisfy this item."
+  }
+ ],
+ "status": "not_run"
+}

@@ -28,9 +28,13 @@
 
 研究作业先保存仓库选择与 commit，再采集源码和研究。故障重试保留 SHA 与已完成 checkpoint；显式新研究和重放不同。源路径纠正仅允许确定的 source/ 挂载前缀；无法定位的观察及依赖推断隔离保留，不编造位置。剩余观察仍须严格校验及独立审阅。原始响应和隔离凭据保留。
 
-模型依据已提交证据提出 adopted / adjusted / new_design / not_adopted 设计。借鉴只允许最新独立审阅 accepted 的观察，未采用的拒绝证据可保留解释。完整案例记录保留事实、推断、未知和历史意见。
+模型依据已提交证据提出 adopted / adjusted / new_design / not_adopted 设计。借鉴只允许最新独立审阅 accepted 的观察，未采用的拒绝证据可保留解释。完整案例记录保留事实、推断、未知和历史意见。宿主事实视图保留 canonical unknowns，但只放入明确未验证的限制区，不给未知项 accepted 事实身份。
+
+新生产在原始研究 checkpoint 之后派生 `atlas.accepted-case-facts.v1` 宿主事实视图；生成摘要由已接受且属于固定场景关联的观察 ID、种类和原陈述组成，不把原研究自由文本摘要重新当作事实。视图绑定 case basis、原研究 digest、策略和自身 digest，同步进入冻结规范、`inputs/accepted-case-facts.json` 和 provenance。发布时重算当前证据审阅；撤销接受使旧视图失效。旧生成检查点或前版修订内容不能静默升级为新视图：缺少视图时只有所有固定观察均 accepted 才允许明确标记 `legacy_all_accepted` 的兼容读取；混合接受/拒绝则阻断隐式复用，原始资料保留供审计。
 
 发布状态 draft / published / withdrawn，认知审阅 passed / blocked / uncertain / unavailable，与具体 runtime target/phase/run 分开。最新审阅请求未完成或失败时，旧 passed 不会覆盖。发布检查 expected_digest、冻结内容、canonical case basis、语义审阅和 runner 合同。reviewed / not_run 可以正式入库，但不能显示 P0 运行通过。旧包无依据时显示 legacy/unverified，不补造来源。
+
+规范局部修订可在正式 repair 请求中指定 `spec_edit_paths`（例如 `[["architecture_markdown"],["decisions","D04","impact"]]`），与程序 edit_paths / reuse_spec 互斥。仅允许现有架构和决策文本字段，宿主使用基线摘要与精确 patch 检查，拒绝未授权字段和任何 file_plan_changes；场景、feature/phase/acceptance、其他字段及全部验收/参考程序字节保留。修订生成新冻结 digest，仍计一次业务修复，仍需分维度和独立认知审阅；不能沿用旧运行通过。未使用新模式的旧请求摘要保持原算法。
 
 制品提交与后继审阅使用事务 outbox；恢复重放幂等。全局领取限制生产及静态审阅合计 2、运行 1。计划暂停/取消对当前后继批次原子传播，子任务领取再次检查父计划状态；取消撤销租约，迟到提交被拒绝。
 
@@ -71,6 +75,6 @@ suite_status 和 phase_status 独立。冻结套件全部通过而独立核心�
 
 ## 限额及恢复
 
-同 campaign 最多 500 个可控 OpenCode CLI 会话，G1 与 T08 共用；provider 内部请求数和未证明的计量保持 unknown。每产品业务修复最多 2 轮（含规格、模板与应用），每逻辑阶段追加瞬时重试最多 2 次；新 job ID、修复版本或请求别名不清零。G1/T08 各 8 小时，从正式启动持久化，暂停不延长，调用 timeout 不超过剩余时间。
+同 campaign 最多 500 个可控 OpenCode CLI 会话，G1 与 T08 共用；provider 内部请求数和未证明的计量保持 unknown。每产品业务修复最多 2 轮（含规格、模板与应用），每逻辑阶段追加瞬时重试最多 2 次；新 job ID、修复版本或请求别名不清零。调用操作身份固定输入／版本；独立的 `retry_scope` 按 campaign＋product＋稳定逻辑阶段累计追加次数。nullable 加法迁移保留原台账，旧格式 stage 的已发生重试按宿主规则归入 scope，不改原始行；zh/en 展示语言别名不能创造新的初次调用。合法业务新版本和不同程序文件可各有初次调用，显式协议／patch纠正计瞬态；程序生成保守地在整类共享2次重试，规范预审按维度区分。G1/T08 各 8 小时，从正式启动持久化，暂停不延长，调用 timeout 不超过剩余时间。
 
 进程崩溃后，仅当宿主证明当前作业的专属 PID/PGID、可执行程序及工作区匹配并全部终止，才释放活动并发占用；已耗用会话仍计数。无法证明的结果 uncertain，不能返还调用。预算或截止时间耗尽保留检查点为 paused_budget；不自动提高限额。凭据/网络/镜像真实缺失记 blocked_external，未取得的运行证据不得通过。

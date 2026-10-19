@@ -19,10 +19,10 @@ from .artifacts import command
 from .store import FactoryError
 
 IMAGES = {
-    "static-web": "python:3.12-slim",
-    "python-web": "python:3.12-slim",
-    "cli": "python:3.12-slim",
-    "node-web": "node:22-bookworm-slim",
+    "static-web": "docker.io/library/python:3.12-slim",
+    "python-web": "docker.io/library/python:3.12-slim",
+    "cli": "docker.io/library/python:3.12-slim",
+    "node-web": "docker.io/library/node:22-bookworm-slim",
 }
 
 

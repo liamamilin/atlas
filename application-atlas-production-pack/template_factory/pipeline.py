@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 
 from atlas_runtime import atomic_json, atomic_write
 from .artifacts import (
@@ -15,11 +16,76 @@ from .artifacts import (
     tree_manifest,
     validate_plan,
 )
+from .budget import _legacy_retry_scope
 from .cli import CLI
 from .runtime import DockerVerifier
 from .sources import fetch_source, github_repo
 from .store import FactoryError, digest, now
 from .scenario_review import PROMPT as SCENARIO_REVIEW_PROMPT
+
+
+def _budget_operation_identity(name, payload, budget_stage=None):
+    """Return stable operation identity plus historical language-sensitive aliases."""
+    if budget_stage:
+        return str(budget_stage), (str(budget_stage),)
+    canonical = {key: value for key, value in payload.items() if key != "language"}
+    operation = name + ":" + digest(canonical)[:16]
+    aliases = {operation}
+    if "language" in payload:
+        for language in ("zh", "en"):
+            legacy = dict(payload)
+            legacy["language"] = language
+            aliases.add(name + ":" + digest(legacy)[:16])
+    return operation, tuple(sorted(aliases))
+
+
+def _stable_retry_scope(name, budget_scope=None):
+    return str(budget_scope) if budget_scope else _legacy_retry_scope(name)
+
+
+def _budget_prior_calls(con, campaign_id, product_id, operation_aliases):
+    placeholders = ",".join("?" for _ in operation_aliases)
+    return con.execute(
+        f"SELECT count(*) FROM tf_budget_reservation WHERE campaign_id=? AND identity=? AND stage IN ({placeholders}) AND status!='not_started'",
+        (campaign_id, product_id, *operation_aliases),
+    ).fetchone()[0]
+
+
+def _budget_scope_history(con, campaign_id, product_id, retry_scope, job_id):
+    rows = con.execute(
+        "SELECT retry_scope,stage,retry,job_id FROM tf_budget_reservation WHERE campaign_id=? AND identity=? AND status!='not_started'",
+        (campaign_id, product_id),
+    ).fetchall()
+    matched = [
+        row for row in rows
+        if (row[0] == retry_scope if row[0] is not None else _legacy_retry_scope(row[1]) == retry_scope)
+    ]
+    return {"retries": sum(1 for row in matched if row[2] is not None)}
+
+
+def _is_forced_transient_retry(name):
+    """Recognize explicit protocol-correction calls, not ordinary new work."""
+    value = str(name)
+    return (
+        "-patch-repair-" in value
+        or "-protocol-repair-" in value
+        or re.fullmatch(r"blueprint-code-\d+-\d+-repair-\d+", value) is not None
+        or value.startswith("cognitive-review-reference-repair")
+        or value.startswith("blueprint-generate-research-repair-")
+        or "-reference-repair-" in value
+    )
+
+
+def _budget_next_retry(prior_calls, retry_limit, *, forced_transient=False, scope_retries=0):
+    if forced_transient:
+        retry = max(prior_calls, scope_retries + 1)
+    elif prior_calls:
+        retry = prior_calls
+    else:
+        retry = 0
+    if retry > retry_limit:
+        raise FactoryError("transient retry limit exhausted", "budget_retry_limit", 409)
+    return retry or None
 
 SCENARIO_PROMPT = """Propose zero to three useful, distinct practical application scenarios for this Atlas leaf, after reading its complete leaf document and input.existing_scenarios.
 Return {"scenarios":[{"name":"...","audience":"...","objective":"...","workflow":["..."],"acceptance":["observable behavior"]}],"reason":"why these add value, or why no new distinct scenario is needed"}.
@@ -88,7 +154,7 @@ class Pipeline:
         def stage(name, message):
             self.store.update(jid, token, name, message)
 
-        def agent(name, prompt, payload, source=None, *, budget_stage=None):
+        def agent(name, prompt, payload, source=None, *, budget_stage=None, budget_scope=None):
             directory = attempt / name
             directory.mkdir()
             # JSON escapes a multiline document into one long line. OpenCode's
@@ -106,14 +172,27 @@ class Pipeline:
             if snapshot.get("v1"):
                 from .budget import BudgetLedger
                 identity = snapshot["v1"]
-                operation = budget_stage or (name + ":" + digest(payload)[:16])
+                operation, operation_aliases = _budget_operation_identity(name, payload, budget_stage)
+                retry_scope = _stable_retry_scope(name, budget_scope)
+                ledger = BudgetLedger(self.store, campaign_id=identity["campaign_id"])
                 with self.store.connect() as con:
-                    prior_calls = con.execute("SELECT count(*) FROM tf_budget_reservation WHERE campaign_id=? AND identity=? AND stage=? AND status!='not_started'", (identity["campaign_id"], identity["product_id"], operation)).fetchone()[0]
+                    prior_calls = _budget_prior_calls(
+                        con, identity["campaign_id"], identity["product_id"], operation_aliases
+                    )
+                    scope_history = _budget_scope_history(
+                        con, identity["campaign_id"], identity["product_id"], retry_scope, jid
+                    )
+                retry = _budget_next_retry(
+                    prior_calls,
+                    ledger.limits["transient_retries"],
+                    forced_transient=_is_forced_transient_retry(name),
+                    scope_retries=scope_history["retries"],
+                )
                 budget_options = {"budget_required": True, "budget": {
-                    "ledger": BudgetLedger(self.store, campaign_id=identity["campaign_id"]),
+                    "ledger": ledger,
                     "identity": identity["product_id"], "phase": identity["segment"],
-                    "stage": operation, "job_id": jid,
-                    **({"retry": prior_calls} if prior_calls else {}),
+                    "stage": operation, "retry_scope": budget_scope or retry_scope, "job_id": jid,
+                    **({"retry": retry} if retry is not None else {}),
                     "kind": "review" if "review" in name else "research" if "case-" in name else "production",
                 }}
             result = self.cli.run(

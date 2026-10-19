@@ -42,12 +42,13 @@ test('blueprint runtime submission requires adapter, source ZIP and execution co
   expect(String(body?.source_archive_base64)).toBe(Buffer.from('zip-fixture').toString('base64'));
 });
 
-test('runtime result exposes startup diagnostics, case evidence and cleanup errors',async({page})=>{
+test('runtime deep link exposes startup diagnostics, case evidence and cleanup errors',async({page})=>{
   await setup(page,true,[{id:'acc_runtime',job_id:'job_runtime',digest,method:'blueprint-runtime',outcome:'blocked',scope:'Frozen cases for P0',created_at:new Date().toISOString(),failure:'web application did not pass HTTP readiness',startup:{status:'blocked',captured_output:{stdout:'server booting',stderr:'Traceback: bind failed'},readiness:{passed:false,output:'HTTP 500 during readiness'}},case_results:[{id:'A01',status:'failed',reason:'an assertion failed',output:'HTTP 500 from /health',assertions:[{id:'health-response',passed:false,detail:'expected 200 but observed 500'}]}],cleanup:{status:'failed',errors:['container remained after cleanup']}}]);
+  await page.goto(`/factory?view=artifacts&artifact_id=${artifact.id}&runtime_run_id=acc_runtime`);
   const card=page.getByRole('article',{name:/Cognitive template Bookmark blueprint/});
   await card.getByRole('button',{name:'Read cognitive content',exact:true}).click();
   const runtime=card.getByRole('region',{name:'Independent runtime acceptance'});
-  await runtime.getByText(/^Blocked ·/).click();
+  await expect(runtime.getByText('Frozen cases for P0',{exact:true})).toBeVisible();
   await runtime.getByText('Startup diagnostics',{exact:true}).click();
   await expect(runtime.getByText('Traceback: bind failed',{exact:true})).toBeVisible();
   await expect(runtime.getByText('HTTP 500 during readiness',{exact:true})).toBeVisible();

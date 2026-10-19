@@ -210,8 +210,8 @@ class BlueprintRuntimeTests(unittest.TestCase):
         self.assertIn("dst=/application,readonly", " ".join(test_run))
         image_bindings = report["environment"]["images"]
         references = {value["reference"] for value in image_bindings.values()}
-        self.assertIn("python:3.12-slim", references)
-        self.assertIn("node:22-bookworm-slim", references)
+        self.assertIn("docker.io/library/python:3.12-slim", references)
+        self.assertIn("docker.io/library/node:22-bookworm-slim", references)
         self.assertTrue(all(key.startswith("sha256:") for key in image_bindings))
         self.assertEqual(report["app_source_unchanged"], True)
         self.assertTrue(report["cleanup"]["workspace_removed"])

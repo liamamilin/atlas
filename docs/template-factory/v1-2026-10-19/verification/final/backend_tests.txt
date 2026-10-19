@@ -66,6 +66,7 @@ test_end_to_end_generation_freezes_then_independently_reviews_without_runtime (t
 test_exact_file_patch_preserves_prior_and_rejects_ambiguous_edits (test_cognition.CognitionTests) ... ok
 test_failed_design_dimension_cannot_pass_and_retry_reuses_completed_checks (test_cognition.CognitionTests) ... ok
 test_failed_generation_retry_reuses_immutable_research_checkpoint (test_cognition.CognitionTests) ... ok
+test_formal_queue_repair_new_artifact_review_keeps_old_retry_allowance (test_cognition.CognitionTests) ... ok
 test_invalid_dependency_manifest_repairs_only_that_file_and_keeps_original (test_cognition.CognitionTests) ... ok
 test_invalid_structure_is_repaired_with_actual_failed_proposal (test_cognition.CognitionTests) ... ok
 test_legacy_five_dimension_aggregate_checkpoint_does_not_skip_runtime_review (test_cognition.CognitionTests) ... ok
@@ -90,9 +91,17 @@ test_single_file_failure_reuses_plan_and_completed_programs (test_cognition.Cogn
 test_spec_delta_preserves_unaddressed_contracts_rows_and_original (test_cognition.CognitionTests) ... ok
 test_spec_delta_rejects_identity_evidence_inventory_and_fuzzy_edits (test_cognition.CognitionTests) ... ok
 test_business_repairs_are_idempotent_and_cumulative_across_new_jobs (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_changed_operation_stays_initial_but_explicit_protocol_repair_uses_scope_retry (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
 test_cli_records_only_model_and_effort_explicitly_observed_in_execution_event (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
 test_cli_requires_budget_when_marked_v1_and_observed_model_requires_event (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_concurrent_duplicate_initial_calls_cannot_both_bypass_retry_scope (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
 test_concurrent_reservations_are_atomic_and_reservation_counts_against_limit (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_dependency_manifest_repairs_consume_real_code_scope_retry_allowance (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_fixed_input_identity_ignores_language_but_retains_legacy_hash_aliases (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_indexed_legacy_cognitive_stages_normalize_without_merging_review_dimensions (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_indexed_legacy_review_retries_are_counted_only_for_the_same_dimension (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_legacy_initial_and_two_retries_remain_visible_after_language_changes (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_legacy_p0_digest_retries_count_toward_stable_delivery_scope (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
 test_old_ledger_reloads_lower_limits_and_new_instance_cannot_raise_them (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
 test_pause_or_restart_does_not_reset_expired_deadline (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
 test_recovery_frees_concurrency_only_after_host_proves_owned_process_stopped (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
@@ -100,6 +109,7 @@ test_repeating_legitimate_stage_calls_does_not_infer_transient_retries (test_fac
 test_restart_and_new_job_do_not_reset_segment_deadline_or_call_count (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
 test_retry_budget_is_cumulative_by_product_and_stage_not_job (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
 test_segment_deadline_begins_at_official_start_and_pause_does_not_reset_it (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_stable_scope_counts_legacy_cognitive_review_retries_across_new_artifacts (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
 test_uncertain_reservation_survives_restart_and_cannot_be_refunded (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
 test_code_location_hash_is_host_verified_and_revision_is_immutable (test_factory_cases_v1.CaseLibraryV1Tests) ... ok
 test_empty_database_migration_rollback_then_retry (test_factory_cases_v1.CaseLibraryV1Tests) ... ok
@@ -149,6 +159,12 @@ test_parent_batch_pause_and_cancel_are_inherited (test_factory_development_v1.De
 test_queue_requires_current_review_phase_and_version (test_factory_development_v1.DevelopmentV1Tests) ... ok
 test_repair_requires_failed_bound_acceptance_and_counts_business_feedback (test_factory_development_v1.DevelopmentV1Tests) ... ok
 test_standard_handoff_is_pinned_idempotently_and_p0_delivered (test_factory_development_v1.DevelopmentV1Tests) ... ok
+test_frozen_package_requires_view_digest_and_exact_input_mirror (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests) ... ok
+test_legacy_mixed_checkpoints_block_but_all_accepted_are_labeled_legacy (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests) ... ok
+test_real_produce_repair_rejects_predecessor_with_newly_rejected_fact (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests) ... ok
+test_real_produce_resume_blocks_old_adaptation_even_without_plan_checkpoint (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests) ... ok
+test_rejected_narrative_is_audit_only_and_cannot_enter_generation_context (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests) ... ok
+test_view_tamper_or_later_review_revocation_invalidates_publication (test_factory_facts_view_v1.FactoryAcceptedFactsViewTests) ... ok
 test_complete_persisted_fixture_chain_can_pass_and_mutations_block (test_factory_milestone_v1.FactoryMilestoneV1Tests) ... ok
 test_default_campaign_continues_current_campaign_and_explicit_override_is_preserved (test_factory_milestone_v1.FactoryMilestoneV1Tests) ... ok
 test_legacy_global_or_other_campaign_gate_cannot_unlock_t08 (test_factory_milestone_v1.FactoryMilestoneV1Tests) ... ok
@@ -159,9 +175,12 @@ test_mismatched_pid_marker_does_not_kill_or_release_unknown_reservation (test_fa
 test_proven_stop_frees_concurrency_but_keeps_call_charged (test_factory_recovery_v1.FactoryRecoveryV1Tests) ... ok
 test_sigkill_escalation_requires_final_empty_process_group_probe (test_factory_recovery_v1.FactoryRecoveryV1Tests) ... ok
 test_unproved_termination_keeps_reservation_active (test_factory_recovery_v1.FactoryRecoveryV1Tests) ... ok
+test_all_prior_attempts_are_included_with_bounded_safe_sources (test_factory_reporting_v1.FactoryReportEnrichmentTests) ... ok
 test_enrichment_traces_case_increment_and_reports_safe_usage_without_mutation (test_factory_reporting_v1.FactoryReportEnrichmentTests) ... ok
 test_legacy_usage_extracts_only_step_finish_and_keeps_unknown_currency (test_factory_reporting_v1.FactoryReportEnrichmentTests) ... ok
+test_malformed_legacy_summary_is_reported_as_truncated_without_reading_symlink (test_factory_reporting_v1.FactoryReportEnrichmentTests) ... ok
 test_ratio_denominators_are_explicit_and_zero_ratio_is_unknown (test_factory_reporting_v1.FactoryReportEnrichmentTests) ... ok
+test_report_record_and_source_byte_caps_are_explicit (test_factory_reporting_v1.FactoryReportEnrichmentTests) ... ok
 test_commit_sha_is_checkpointed_before_failed_download_and_reused (test_factory_research_v1.CaseResearchV1Tests) ... ok
 test_discovery_used_only_when_hints_are_empty (test_factory_research_v1.CaseResearchV1Tests) ... ok
 test_end_to_end_research_pins_hashes_reviews_and_completes_case_basis (test_factory_research_v1.CaseResearchV1Tests) ... ok
@@ -178,6 +197,10 @@ test_protocol_parser_sees_both_objects_despite_display_tail_cut (test_factory_ru
 test_protocol_stdout_and_diagnostic_stderr_stay_separate (test_factory_runtime_transport.RuntimeTransportTests) ... ok
 test_runtime_commands_cannot_inherit_parent_stdin (test_factory_runtime_transport.RuntimeTransportTests) ... ok
 test_truncated_protocol_output_is_explicit_and_uses_prefix (test_factory_runtime_transport.RuntimeTransportTests) ... ok
+test_legacy_repair_digest_replay_reuses_existing_job (test_factory_spec_patch_v1.SpecPatchTests) ... ok
+test_spec_patch_host_rejects_model_scope_and_file_plan_overreach (test_factory_spec_patch_v1.SpecPatchTests) ... ok
+test_spec_patch_queue_and_produce_reuses_all_programs_and_keeps_review_gate (test_factory_spec_patch_v1.SpecPatchTests) ... ok
+test_spec_patch_queue_rejects_unauthorized_fields_and_mixed_modes (test_factory_spec_patch_v1.SpecPatchTests) ... ok
 test_api_legacy_catalog_and_v1_report_quality_do_not_claim_pass (test_factory_v1_contracts.FactoryV1Contracts) ... ok
 test_atomic_outbox_recovers_before_and_after_successor_queue (test_factory_v1_contracts.FactoryV1Contracts) ... ok
 test_global_production_limit_spans_batches_and_workers (test_factory_v1_contracts.FactoryV1Contracts) ... ok
@@ -525,6 +548,6 @@ test_verification_lane_and_production_lane_are_independent (test_template_factor
 test_zero_scenarios_complete_without_extra_reviews_or_catalog_changes (test_template_factory.FactoryTests) ... ok
 
 ----------------------------------------------------------------------
-Ran 521 tests in 46.674s
+Ran 544 tests in 44.307s
 
 OK (skipped=8)

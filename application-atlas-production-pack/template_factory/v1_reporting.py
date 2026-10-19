@@ -9,6 +9,9 @@ from pathlib import Path
 
 
 MAX_USAGE_EVENTS_PER_STAGE = 1000
+MAX_USAGE_EVENTS_PER_REPORT = 5000
+MAX_USAGE_RECORDS_PER_REPORT = 5000
+MAX_USAGE_SOURCE_BYTES_PER_REPORT = 32 * 1024 * 1024
 MAX_SUMMARY_BYTES = 1024 * 1024
 MAX_EVENTS_BYTES = 8 * 1024 * 1024
 
@@ -37,13 +40,15 @@ def _safe_path(root, path, *, max_size=None):
     root = Path(root).resolve()
     path = Path(path)
     try:
-        resolved = path.resolve(strict=True)
-        resolved.relative_to(root)
+        candidate = path if path.is_absolute() else root / path
+        lexical = candidate.absolute().relative_to(root)
         current = root
-        for part in resolved.relative_to(root).parts:
+        for part in lexical.parts:
             current = current / part
             if current.is_symlink():
                 return None
+        resolved = candidate.resolve(strict=True)
+        resolved.relative_to(root)
         if not resolved.is_file() or (max_size is not None and resolved.stat().st_size > max_size):
             return None
         return resolved
@@ -57,6 +62,40 @@ def _sha256(path):
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             hasher.update(block)
     return hasher.hexdigest()
+
+
+def _read_bounded(root, path, tracker, *, per_file_limit):
+    """Read and hash only bounded bytes; report prefix hashes when truncated."""
+    resolved = _safe_path(root, path)
+    if resolved is None:
+        tracker["unsafe_files"] += 1
+        return None
+    try:
+        size = resolved.stat().st_size
+        allowance = min(per_file_limit, tracker["remaining_bytes"])
+        if allowance <= 0:
+            tracker["truncated"] = True
+            return {"path": resolved, "data": b"", "sha256": None, "read_bytes": 0,
+                    "truncated": True, "size": size, "hash_scope": "unavailable"}
+        with resolved.open("rb") as stream:
+            data = stream.read(allowance + 1)
+        truncated = len(data) > allowance or size > allowance
+        data = data[:allowance]
+        tracker["remaining_bytes"] -= len(data)
+        if truncated:
+            tracker["truncated"] = True
+        return {
+            "path": resolved,
+            "data": data,
+            "sha256": hashlib.sha256(data).hexdigest(),
+            "read_bytes": len(data),
+            "truncated": truncated,
+            "size": size,
+            "hash_scope": "read_prefix" if truncated else "full_file",
+        }
+    except OSError:
+        tracker["unsafe_files"] += 1
+        return None
 
 
 def _number(value):
@@ -122,24 +161,21 @@ def _safe_usage_event(event):
     }
 
 
-def _legacy_usage_events(events_path):
-    if not events_path.is_file() or events_path.is_symlink():
-        return [], None, False
-    resolved = _safe_path(events_path.parents[3], events_path, max_size=None)
-    if resolved is None:
-        return [], None, False
-    try:
-        size = resolved.stat().st_size
-        raw = resolved.read_bytes()[:MAX_EVENTS_BYTES]
-    except OSError:
-        return [], None, False
-    truncated = size > MAX_EVENTS_BYTES
+def _legacy_usage_events(events_path, root, tracker):
+    read = _read_bounded(root, events_path, tracker, per_file_limit=MAX_EVENTS_BYTES)
+    if read is None:
+        return [], None, False, 0, "unavailable"
+    if read["sha256"] is None:
+        return [], None, True, read["read_bytes"], read["hash_scope"]
+    raw = read["data"]
+    truncated = read["truncated"]
     events = []
     from .cli import _usage_event
 
     for line in raw.splitlines():
-        if len(events) >= MAX_USAGE_EVENTS_PER_STAGE:
+        if len(events) >= min(MAX_USAGE_EVENTS_PER_STAGE, tracker["remaining_events"]):
             truncated = True
+            tracker["truncated"] = True
             break
         try:
             event = json.loads(line)
@@ -149,10 +185,11 @@ def _legacy_usage_events(events_path):
             part = event.get("part")
             event_record = _usage_event(event, part if isinstance(part, dict) else {})
             events.append(event_record)
-    return events, _sha256(resolved), truncated
+            tracker["remaining_events"] -= 1
+    return events, read["sha256"], truncated, read["read_bytes"], read["hash_scope"]
 
 
-def _usage_stage(store, job):
+def _usage_stage(store, job, tracker):
     job_id, attempt = job.get("id"), job.get("attempt")
     if (
         not isinstance(job_id, str)
@@ -163,64 +200,94 @@ def _usage_stage(store, job):
         or attempt < 1
     ):
         return []
-    attempt_root = Path(store.root) / "jobs" / job_id / f"attempt-{attempt}"
-    try:
-        if attempt_root.is_symlink() or not attempt_root.is_dir():
-            return []
-        summary_paths = sorted(attempt_root.rglob("cli-summary.json"))
-    except OSError:
-        return []
     output = []
-    for summary_path in summary_paths:
-        summary_path = _safe_path(attempt_root, summary_path, max_size=MAX_SUMMARY_BYTES)
-        if summary_path is None:
-            continue
-        summary_hash = _sha256(summary_path)
+    for attempt_number in range(1, attempt + 1):
+        attempt_root = Path(store.root) / "jobs" / job_id / f"attempt-{attempt_number}"
         try:
-            summary = json.loads(summary_path.read_text(encoding="utf-8"))
-        except (OSError, UnicodeError, ValueError):
-            summary = {}
-        if not isinstance(summary, dict):
-            summary = {}
-        stage_directory = summary_path.parent
-        stage_relative = stage_directory.relative_to(attempt_root).as_posix()
-        events_present = isinstance(summary.get("usage_events"), list)
-        if events_present:
-            raw_events = summary["usage_events"]
-            events = [_safe_usage_event(item) for item in raw_events[:MAX_USAGE_EVENTS_PER_STAGE]]
-            events = [item for item in events if item is not None]
-            truncated = bool(summary.get("usage_events_truncated")) or len(raw_events) > MAX_USAGE_EVENTS_PER_STAGE
-            usage_source_path = summary_path
-            usage_source_hash = summary_hash
-            source_kind = "cli-summary"
-        else:
-            legacy_path = stage_directory / "events.jsonl"
-            legacy, legacy_hash, truncated = _legacy_usage_events(legacy_path)
-            events = [_safe_usage_event(item) for item in legacy[:MAX_USAGE_EVENTS_PER_STAGE]]
-            events = [item for item in events if item is not None]
-            usage_source_path = legacy_path if legacy_hash else summary_path
-            usage_source_hash = legacy_hash or summary_hash
-            source_kind = "events.jsonl" if legacy_hash else "cli-summary-missing-usage"
-        output.append({
-            "job_id": job_id,
-            "job_kind": job.get("kind"),
-            "job_state": job.get("state"),
-            "attempt": attempt,
-            "stage": stage_relative,
-            "summary_path": summary_path.relative_to(store.root).as_posix(),
-            "summary_sha256": summary_hash,
-            "usage_source": source_kind,
-            "usage_source_path": usage_source_path.relative_to(store.root).as_posix(),
-            "usage_source_sha256": usage_source_hash,
-            "requested_model": _identifier(summary.get("requested_model") or summary.get("model")),
-            "observed_model": _identifier(summary.get("observed_model") or summary.get("actual_model")),
-            "requested_reasoning_effort": _identifier(summary.get("requested_effort") or summary.get("reasoning_effort")),
-            "observed_reasoning_effort": _identifier(summary.get("observed_effort") or summary.get("actual_reasoning_effort")),
-            "usage_events": events,
-            "usage_events_truncated": truncated,
-            "cost_currency": None,
-            "provider_requests": None,
-        })
+            if attempt_root.is_symlink() or not attempt_root.is_dir():
+                continue
+            # CLI creates one host-owned summary directly inside the stage
+            # directory; never recurse into source archives or generated trees.
+            summary_paths = sorted(attempt_root.glob("*/cli-summary.json"))
+        except OSError:
+            tracker["unsafe_files"] += 1
+            continue
+        for summary_candidate in summary_paths:
+            if tracker["remaining_events"] <= 0 or tracker["remaining_bytes"] <= 0:
+                tracker["truncated"] = True
+                return output
+            if tracker["remaining_records"] <= 0:
+                tracker["truncated"] = True
+                return output
+            summary_read = _read_bounded(store.root, summary_candidate, tracker, per_file_limit=MAX_SUMMARY_BYTES)
+            if summary_read is None:
+                continue
+            summary_path = summary_read["path"]
+            summary_valid = True
+            try:
+                summary = json.loads(summary_read["data"].decode("utf-8"))
+            except (UnicodeError, ValueError):
+                summary = {}
+                summary_valid = False
+            if not isinstance(summary, dict):
+                summary = {}
+                summary_valid = False
+            stage_directory = summary_path.parent
+            stage_relative = stage_directory.relative_to(attempt_root).as_posix()
+            events_present = isinstance(summary.get("usage_events"), list)
+            truncated = summary_read["truncated"] or not summary_valid
+            if events_present:
+                raw_events = summary["usage_events"]
+                event_limit = min(MAX_USAGE_EVENTS_PER_STAGE, tracker["remaining_events"])
+                events = [_safe_usage_event(item) for item in raw_events[:event_limit]]
+                events = [item for item in events if item is not None]
+                tracker["remaining_events"] -= len(events)
+                truncated |= bool(summary.get("usage_events_truncated")) or len(raw_events) > event_limit
+                usage_source_path = summary_path
+                usage_source_hash = summary_read["sha256"]
+                usage_hash_scope = summary_read["hash_scope"]
+                usage_source_bytes = summary_read["read_bytes"]
+                source_kind = "cli-summary"
+            else:
+                legacy_path = stage_directory / "events.jsonl"
+                legacy, legacy_hash, legacy_truncated, event_bytes, hash_scope = _legacy_usage_events(legacy_path, store.root, tracker)
+                events = [_safe_usage_event(item) for item in legacy]
+                events = [item for item in events if item is not None]
+                truncated |= legacy_truncated
+                usage_source_path = legacy_path if legacy_hash else summary_path
+                usage_source_hash = legacy_hash or summary_read["sha256"]
+                usage_hash_scope = hash_scope if legacy_hash else summary_read["hash_scope"]
+                usage_source_bytes = event_bytes if legacy_hash else summary_read["read_bytes"]
+                source_kind = "events.jsonl" if legacy_hash else "cli-summary-missing-usage"
+            tracker["truncated"] |= truncated
+            tracker["remaining_records"] -= 1
+            output.append({
+                "job_id": job_id,
+                "job_kind": job.get("kind"),
+                "job_state": job.get("state"),
+                "attempt": attempt_number,
+                "stage": stage_relative,
+                "exit_code": summary.get("exit_code") if type(summary.get("exit_code")) is int else None,
+                "cli_status": summary.get("cli_status") if isinstance(summary.get("cli_status"), str) and summary["cli_status"] in {"completed", "interrupted", "not_started", "failed"} else None,
+                "delivery_status": summary.get("delivery_status") if isinstance(summary.get("delivery_status"), str) and summary["delivery_status"] in {"delivered", "failed", "unverified"} else None,
+                "failure_code": _identifier(summary.get("failure_code")),
+                "summary_path": summary_path.relative_to(store.root).as_posix(),
+                "summary_sha256": summary_read["sha256"],
+                "summary_hash_scope": summary_read["hash_scope"],
+                "usage_source": source_kind,
+                "usage_source_path": usage_source_path.relative_to(store.root).as_posix(),
+                "usage_source_sha256": usage_source_hash,
+                "usage_hash_scope": usage_hash_scope,
+                "usage_source_bytes_read": usage_source_bytes,
+                "requested_model": _identifier(summary.get("requested_model") or summary.get("model")),
+                "observed_model": _identifier(summary.get("observed_model") or summary.get("actual_model")),
+                "requested_reasoning_effort": _identifier(summary.get("requested_effort") or summary.get("reasoning_effort")),
+                "observed_reasoning_effort": _identifier(summary.get("observed_effort") or summary.get("actual_reasoning_effort")),
+                "usage_events": events,
+                "usage_events_truncated": truncated,
+                "cost_currency": None,
+                "provider_requests": None,
+            })
     return output
 
 
@@ -459,8 +526,18 @@ def enrich_report(store, report):
     first_success_ids = _ids(first_success_ids)
 
     usage_stages = []
+    usage_tracker = {
+        "remaining_events": MAX_USAGE_EVENTS_PER_REPORT,
+        "remaining_records": MAX_USAGE_RECORDS_PER_REPORT,
+        "remaining_bytes": MAX_USAGE_SOURCE_BYTES_PER_REPORT,
+        "truncated": False,
+        "unsafe_files": 0,
+    }
     for job in jobs:
-        usage_stages.extend(_usage_stage(store, job))
+        usage_stages.extend(_usage_stage(store, job, usage_tracker))
+        if usage_tracker["remaining_records"] <= 0 or usage_tracker["remaining_bytes"] <= 0:
+            usage_tracker["truncated"] = True
+            break
     usage_stages.sort(key=lambda item: (item["job_id"], item["attempt"], item["stage"]))
 
     return {
@@ -533,6 +610,10 @@ def enrich_report(store, report):
             "cost_currency": None,
             "cost_currency_reason": "OpenCode step_finish events report cost without a currency field.",
             "token_aggregation": "per-step raw fields only; step totals may overlap and are not summed",
+            "truncated": usage_tracker["truncated"],
+            "record_limit": MAX_USAGE_RECORDS_PER_REPORT,
+            "read_byte_limit": MAX_USAGE_SOURCE_BYTES_PER_REPORT,
+            "unsafe_files_skipped": usage_tracker["unsafe_files"],
             "stages": usage_stages,
         },
     }

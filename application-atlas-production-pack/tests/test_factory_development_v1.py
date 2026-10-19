@@ -1,7 +1,9 @@
 """P0 development handoff and safe application delivery contracts; no model calls."""
 
 import json
+import hashlib
 from pathlib import Path
+import shutil
 import sys
 import tempfile
 import unittest
@@ -42,11 +44,44 @@ class DevelopmentV1Tests(unittest.TestCase):
         )
         imported = import_blueprint(self.store, self.data())
         self.artifact = imported
-        basis = {
-            "schema": "atlas.case-basis.v1",
-            "case_refs": [],
-            "basis_digest": "f" * 64,
+        shutil.copy(PACK / "mvp_apps.json", self.pack / "mvp_apps.json")
+        library = CaseLibrary(self.store)
+        snapshot_root = self.store.root / "snapshots" / "development-fixture"
+        source_path = snapshot_root / "src/main.py"
+        source_path.parent.mkdir(parents=True)
+        source_path.write_text("def save_bookmark():\n    return True\n", encoding="utf-8")
+        license_path = snapshot_root / "LICENSE"
+        license_path.write_text("MIT\n", encoding="utf-8")
+        files = {
+            "src/main.py": hashlib.sha256(source_path.read_bytes()).hexdigest(),
+            "LICENSE": hashlib.sha256(license_path.read_bytes()).hexdigest(),
         }
+        research = library.commit_research({
+            "app_id": "todoist", "case_id": "case:development-fixture",
+            "source_snapshots": [{
+                "repository": "https://github.com/example/development-fixture",
+                "repo_id": "github:development-fixture", "commit_sha": "a" * 40,
+                "collected_at": "2026-10-19T10:00:00Z", "strategy_version": "archive-v1",
+                "local_root": str(snapshot_root), "files": files, "license_files": ["LICENSE"],
+                "license": {"spdx_id_supplement": "MIT", "supplement_source": "test fixture",
+                            "supplement_collected_at": "2026-10-19T10:00:00Z", "notice_hashes": {"LICENSE": files["LICENSE"]}},
+            }],
+            "research": {"summary": "Pinned implementation saves a bookmark.", "scope": "Save", "unknowns": [],
+                          "input_digest": "development-fixture", "task_id": "research-development-fixture"},
+            "observations": [{
+                "evidence_id": "ev-development-fixture", "kind": "code_observation",
+                "statement": "The pinned save function returns success after saving.",
+                "location": {"commit_sha": "a" * 40, "path": "src/main.py", "file_digest": files["src/main.py"], "symbol": "save_bookmark"},
+            }],
+            "scenario_links": [{
+                "scenario_id": self.scene["id"], "scenario_revision": self.scene["revision"],
+                "reason": "The source operation supports saving bookmarks.", "workflow_support": ["Save"],
+                "adopted_scope": ["Save"], "exclusions": [], "evidence_ids": ["ev-development-fixture"],
+            }],
+        }, "development-fixture")
+        library.record_evidence_review(research["case"]["case_id"], 1, "ev-development-fixture", "accepted", "test-reviewer", "independent_agent")
+        basis = library.evidence_basis([{"case_id": research["case"]["case_id"], "revision": 1}], self.scene["id"], self.scene["revision"])
+        library.require_admissible(basis)
         origin = self.store.job(imported["job_id"])
         origin_snapshot = origin["snapshot"]
         origin_snapshot.update(
@@ -147,11 +182,7 @@ class DevelopmentV1Tests(unittest.TestCase):
             "project_name": "bookmark-p0",
         }
         value.update(changes)
-        with (
-            patch.object(CaseLibrary, "validate_basis"),
-            patch.object(CaseLibrary, "require_admissible"),
-        ):
-            return queue_development(self.store, self.artifact, value)
+        return queue_development(self.store, self.artifact, value)
 
     def test_standard_handoff_is_pinned_idempotently_and_p0_delivered(self):
         first = self.queue()
@@ -259,15 +290,11 @@ class DevelopmentV1Tests(unittest.TestCase):
                 "request_key": "phase",
             },
         ]
-        with (
-            patch.object(CaseLibrary, "validate_basis"),
-            patch.object(CaseLibrary, "require_admissible"),
-        ):
-            for value in cases:
-                with self.subTest(value=value), self.assertRaises(FactoryError):
-                    queue_development(
-                        self.store, self.artifact, {**value, "model": "fixture/model"}
-                    )
+        for value in cases:
+            with self.subTest(value=value), self.assertRaises(FactoryError):
+                queue_development(
+                    self.store, self.artifact, {**value, "model": "fixture/model"}
+                )
         with self.store.connect() as con:
             self.assertEqual(
                 con.execute(
@@ -278,22 +305,18 @@ class DevelopmentV1Tests(unittest.TestCase):
 
     def test_repair_requires_failed_bound_acceptance_and_counts_business_feedback(self):
         reports = [self._failed_runtime_input(i) for i in range(1)]
-        with (
-            patch.object(CaseLibrary, "validate_basis"),
-            patch.object(CaseLibrary, "require_admissible"),
-        ):
-            with self.assertRaises(FactoryError):
-                queue_development(
-                    self.store,
-                    self.artifact,
-                    {
-                        "expected_digest": self.artifact["digest"],
-                        "phase": "P0",
-                        "request_key": "invalid-repair",
-                        "repair_of": "not-a-real-run",
-                    },
-                )
-            first_value = {
+        with self.assertRaises(FactoryError):
+            queue_development(
+                self.store,
+                self.artifact,
+                {
+                    "expected_digest": self.artifact["digest"],
+                    "phase": "P0",
+                    "request_key": "invalid-repair",
+                    "repair_of": "not-a-real-run",
+                },
+            )
+        first_value = {
                 "expected_digest": self.artifact["digest"],
                 "phase": "P0",
                 "request_key": "repair-first",
@@ -301,34 +324,34 @@ class DevelopmentV1Tests(unittest.TestCase):
                 "model": "fixture/model",
                 "repair_of": reports[0],
             }
-            batch = queue_development(self.store, self.artifact, first_value)
-            snapshot = batch["jobs"][0]["snapshot"]
-            self.assertEqual(
+        batch = queue_development(self.store, self.artifact, first_value)
+        snapshot = batch["jobs"][0]["snapshot"]
+        self.assertEqual(
                 snapshot["previous_application_sha256"],
                 self.store.job(snapshot["failure_report"]["job_id"])["snapshot"][
                     "archive_sha256"
                 ],
             )
-            self.assertEqual(
+        self.assertEqual(
                 snapshot["failure_report_digest"], digest(snapshot["failure_report"])
             )
-            alias = queue_development(
+        alias = queue_development(
                 self.store,
                 self.artifact,
                 {**first_value, "request_key": "repair-alias"},
             )
-            self.assertEqual(alias["id"], batch["id"])
+        self.assertEqual(alias["id"], batch["id"])
 
-            second_value = {
+        second_value = {
                 **first_value,
                 "request_key": "repair-second",
                 "project_name": "repair-second",
                 "model": "other/model",
             }
-            second = queue_development(self.store, self.artifact, second_value)
-            self.assertNotEqual(second["id"], batch["id"])
-            with self.assertRaisesRegex(FactoryError, "repair limit"):
-                queue_development(
+        second = queue_development(self.store, self.artifact, second_value)
+        self.assertNotEqual(second["id"], batch["id"])
+        with self.assertRaisesRegex(FactoryError, "repair limit"):
+            queue_development(
                     self.store,
                     self.artifact,
                     {
@@ -541,22 +564,18 @@ class DevelopmentV1Tests(unittest.TestCase):
         self,
     ):
         run_id = self._failed_runtime_input(99)
-        with (
-            patch.object(CaseLibrary, "validate_basis"),
-            patch.object(CaseLibrary, "require_admissible"),
-        ):
-            batch = queue_development(
-                self.store,
-                self.artifact,
-                {
+        batch = queue_development(
+            self.store,
+            self.artifact,
+            {
                     "expected_digest": self.artifact["digest"],
                     "phase": "P0",
                     "request_key": "actual-repair",
                     "project_name": "actual-repair",
                     "model": "fixture/model",
                     "repair_of": run_id,
-                },
-            )
+            },
+        )
         job = self.store.claim("development-worker")
         self.assertEqual(job["id"], batch["jobs"][0]["id"])
         attempt = self.root / "repair-attempt"
@@ -565,6 +584,8 @@ class DevelopmentV1Tests(unittest.TestCase):
         def agent(name, prompt, payload, source=None, **budget):
             self.assertEqual(name, "p0-application-repair")
             self.assertEqual(payload["repair_of"], run_id)
+            self.assertEqual(budget["budget_scope"], "p0-delivery")
+            self.assertEqual(budget["budget_stage"], "p0-delivery:" + job["snapshot"]["input_digest"])
             self.assertTrue((source / "previous-application/index.html").is_file())
             report = json.loads((source / "FAILURE_REPORT.json").read_text())
             self.assertEqual(

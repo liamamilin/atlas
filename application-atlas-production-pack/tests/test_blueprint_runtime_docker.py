@@ -199,8 +199,8 @@ class BlueprintRuntimeDockerTests(unittest.TestCase):
         report = self.verifier.verify(self.app, source, spec, "P0", self.evidence, runtime)
         self.assertTrue(report["passed"], report)
         refs = {item["reference"] for item in report["environment"]["images"].values()}
-        self.assertIn("node:22-bookworm-slim", refs)
-        self.assertIn("python:3.12-slim", refs)
+        self.assertIn("docker.io/library/node:22-bookworm-slim", refs)
+        self.assertIn("docker.io/library/python:3.12-slim", refs)
         self.assertIn("node synthetic startup capture", report["startup"]["captured_output"]["stderr"])
 
     def test_cli_smoke_and_mixed_python_node_acceptance(self):

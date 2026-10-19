@@ -24,8 +24,9 @@ from template_factory.cognition import (
     validate_research,
     validate_review,
 )
+from template_factory.budget import BudgetLedger
 from template_factory.pipeline import Pipeline
-from template_factory.store import FactoryError, digest
+from template_factory.store import FactoryError, canonical, digest
 
 
 class FakeCognitionCLI:
@@ -624,6 +625,92 @@ class CognitionTests(unittest.TestCase):
                 for row in fixture["acceptance"]
             },
         }))
+
+    def test_formal_queue_repair_new_artifact_review_keeps_old_retry_allowance(self):
+        _, pipeline, original = self.produce()
+        pipeline.run(self.store.claim("test", "verification"))
+        original = next(item for item in self.store.artifacts() if item["id"] == original["id"])
+        v1 = {"campaign_id": "budget-test", "product_id": "product-a", "segment": "G1"}
+        with self.store.connect(True) as con:
+            origin = self.store.job(original["job_id"])
+            origin_snapshot = {**origin["snapshot"], "v1": v1}
+            con.execute("UPDATE job SET snapshot=? WHERE id=?", (canonical(origin_snapshot), original["job_id"]))
+
+        # Preserve two old-schema retry rows; no retry_scope column value is set.
+        ledger = BudgetLedger(self.store, campaign_id=v1["campaign_id"])
+        for retry in (1, 2):
+            reservation = ledger.reserve(
+                v1["product_id"], v1["segment"], "review", 60,
+                stage="cognitive-review:legacy-input", retry=retry,
+                job_id=f"legacy-review-{retry}",
+            )
+            ledger.mark_started(reservation["id"])
+            ledger.finish(reservation["id"], "failed")
+
+        revision_batch = self.store.create_repair(original["id"], {
+            "note": "Preserve the frozen product contracts and clarify the decision basis.",
+            "model": "fake/flash", "expected_digest": original["digest"], "language": "zh",
+            "reuse_spec": True, "edit_paths": ["references/url-policy.mjs"],
+        })
+        revision_job_id = revision_batch["jobs"][0]["id"]
+        # This test isolates review accounting; the repair route and job remain real,
+        # while its production execution is not charged by this synthetic fixture.
+        with self.store.connect(True) as con:
+            revision_job = self.store.job(revision_job_id)
+            repair_snapshot = dict(revision_job["snapshot"])
+            repair_snapshot.pop("v1", None)
+            con.execute("UPDATE job SET snapshot=? WHERE id=?", (canonical(repair_snapshot), revision_job_id))
+        pipeline.run(self.store.claim("test", "production"))
+        revised = next(item for item in self.store.artifacts() if item["id"] != original["id"])
+        with self.store.connect(True) as con:
+            revised_job = self.store.job(revised["job_id"])
+            revised_snapshot = {**revised_job["snapshot"], "v1": v1}
+            con.execute("UPDATE job SET snapshot=? WHERE id=?", (canonical(revised_snapshot), revised["job_id"]))
+            review_row = con.execute(
+                "SELECT id,snapshot FROM job WHERE kind='cognitive-review' AND json_extract(snapshot,'$.artifact_id')=? ORDER BY created_at DESC LIMIT 1",
+                (revised["id"],),
+            ).fetchone()
+            review_snapshot = {**json.loads(review_row["snapshot"]), "v1": v1}
+            con.execute("UPDATE job SET snapshot=? WHERE id=?", (canonical(review_snapshot), review_row["id"]))
+
+        unbudgeted_run = self.cli.run
+
+        def budget_aware_run(directory, prompt, model, timeout, cancelled, progress, **options):
+            budget = options.get("budget")
+            if budget is None:
+                return unbudgeted_run(directory, prompt, model, timeout, cancelled, progress)
+            reservation = budget["ledger"].reserve(
+                budget["identity"], budget["phase"], budget["kind"], timeout,
+                job_id=budget["job_id"], stage=budget["stage"], retry=budget.get("retry"),
+                retry_scope=budget.get("retry_scope"),
+            )
+            budget["ledger"].mark_started(reservation["id"])
+            try:
+                value = unbudgeted_run(directory, prompt, model, timeout, cancelled, progress)
+            except Exception:
+                budget["ledger"].finish(reservation["id"], "failed")
+                raise
+            budget["ledger"].finish(reservation["id"], "completed")
+            return value
+
+        self.cli.run = budget_aware_run
+        review = self.store.claim("test", "verification")
+        self.assertEqual(review["snapshot"]["artifact_id"], revised["id"])
+        pipeline.run(review)
+        calls_after_initial = len(self.cli.calls)
+        charged_before_retry = ledger.snapshot()["cli_sessions_used"]
+
+        retry_batch = self.store.create_acceptance(revised["id"], {
+            "method": "cognitive-review", "model": "fake/flash",
+            "expected_digest": revised["digest"], "language": "en",
+        })
+        retry_job = next(item for item in retry_batch["jobs"] if item["kind"] == "cognitive-review")
+        with self.assertRaises(FactoryError) as caught:
+            pipeline.run(self.store.claim("test", "verification"))
+        self.assertEqual(caught.exception.code, "budget_retry_limit")
+        self.assertEqual(len(self.cli.calls), calls_after_initial)
+        self.assertEqual(ledger.snapshot()["cli_sessions_used"], charged_before_retry)
+        self.assertEqual(retry_job["snapshot"]["artifact_digest"], revised["digest"])
 
     def test_runtime_protocol_block_repairs_spec_before_any_program_authoring(self):
         self._configure_runtime_protocol()

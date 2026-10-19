@@ -1,0 +1,17 @@
+{
+  "expected_digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+  "model": "opencode-go/deepseek-v4.1-flash",
+  "language": "zh",
+  "timeout": 600,
+  "spec_edit_paths": [
+    [
+      "architecture_markdown"
+    ],
+    [
+      "decisions",
+      "D04",
+      "impact"
+    ]
+  ],
+  "note": "Address only the current independent review architecture_contract uncertainty. Return an exact-spec-patch, not a full proposal. In architecture_markdown explicitly state that invalid_url rejects hostnames without a dot, matching the existing A02 assertion and adopted S08 behavior; explicitly state that malformed JSON requests return HTTP 400 with error code bad_request and do not mutate data, matching existing A10. In decisions.D04.impact remove the reference to an undefined purge API, retaining the existing trashed_at/list filtering/restore obligations and existing when_to_ask. Do not invent a permanent-delete endpoint. Preserve every other authored field, scenario, role, capability, phase, acceptance row and ID. Do not change, add or remove any program, dependency, assertion or file-plan entry. All existing acceptance and reference programs must be reused byte-for-byte. Do not implement optional reviewer suggestions or any application code. No claim of runtime success. Use only authorized_spec_paths, copy base_proposal_digest exactly, architecture changes must be exact unique text replacements, and omit file_plan_changes."
+}

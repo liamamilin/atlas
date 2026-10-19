@@ -1,0 +1,87 @@
+
+> test:e2e:factory
+> playwright test --config playwright.factory.config.ts --reporter=line
+
+[WebServer] (node:83923) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 26 tests using 1 worker
+
+(node:83925) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/26] e2e/factory-tests/blueprint-runtime.spec.ts:23:1 › blueprint runtime submission requires adapter, source ZIP and execution consent, without a model field
+[2/26] e2e/factory-tests/blueprint-runtime.spec.ts:45:1 › runtime result exposes startup diagnostics, case evidence and cleanup errors
+[3/26] e2e/factory-tests/blueprint-runtime.spec.ts:64:1 › blueprint with no frozen runner adapter explains runtime acceptance is unavailable
+[4/26] e2e/factory-tests/factory.spec.ts:7:1 › factory catalog saves, confirms, pins and cancels a batch without a provider call
+[5/26] e2e/factory-tests/factory.spec.ts:34:1 › catalog groups scenarios by type and preserves cross-group selection through collapse, search and refresh
+[6/26] e2e/factory-tests/factory.spec.ts:88:1 › visible generation entry filters covered leaves, marks zero additions and blocks active generation
+[7/26] e2e/factory-tests/factory.spec.ts:156:1 › leaf exposes confirmed scenarios and links to factory
+[8/26] e2e/factory-tests/factory.spec.ts:165:1 › draft scenarios can queue an independent pinned review without confirmation or provider calls
+[9/26] e2e/factory-tests/factory.spec.ts:187:1 › review actions distinguish first, repeat and retry; passed drafts still need human confirmation
+[10/26] e2e/factory-tests/factory.spec.ts:243:1 › scenario review displays reasons, revisions, failed attempts and bilingual stale evidence
+[11/26] e2e/factory-tests/factory.spec.ts:266:1 › covered types can complete without new drafts and explain their pinned output language
+[12/26] e2e/factory-tests/factory.spec.ts:281:1 › factory supports mobile, English, empty artifacts and recoverable errors
+[13/26] e2e/factory-tests/factory.spec.ts:297:1 › artifact distinguishes source review from runtime acceptance and can instantiate L0
+[14/26] e2e/factory-tests/factory.spec.ts:333:1 › leaf published template creates an application and explains review scope
+[15/26] e2e/factory-tests/factory.spec.ts:347:1 › cognitive sample imports once, reads definitions and exports a phased development handoff without provider calls
+  1) e2e/factory-tests/factory.spec.ts:347:1 › cognitive sample imports once, reads definitions and exports a phased development handoff without provider calls 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('article', { name: '认知模板 生活待购与灵感收藏夹：个人本地认知模板', exact: true })
+    Expected substring: "不等于工厂重新验收"
+    Received string:    "认知模板 · 已冻结候选 · v0.1.1生活待购与灵感收藏夹：个人本地认知模板生活待购与灵感收藏夹 · r2下载冻结包把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面18 项能力 · 8 个决策 · 3 个阶段 · 17 个验收用例冻结检查覆盖结构、引用、阶段映射与文件摘要，本身不执行包内程序。包内报告作为来源声明保留；工厂独立审阅和每个下游目标的运行结果分别记录。符合当前审阅与固定案例证据要求的模板，可在 V1 工厂中管理目录发布。1. 完整认知库查看已冻结章节，或下载包含完整 blueprint/ 来源文件的原始冻结包。独立认知审阅：未发起发起认知审阅会向所选模型发送冻结认知包与对应叶子、场景，可能计费；这是静态审阅，不证明下游应用运行成功。按冻结场景生产认知修订版认知修订要求复用原调研和场景，连同原包、审阅意见发给所选模型；创建新候选并再次独立审阅，保留原版本。可能计费。生产认知修订版查看认知内容2. 当前阶段执行包按阶段导出，从 HANDOFF.md 开始，再按需加载完整认知和契约；无需一开始预加载全部材料。旧包阶段可能未覆盖完整场景，应对照已确认场景核实范围；不能静默更改冻结承诺或视为已完成。导出不会运行验收。开发项目名称本次开发阶段P0 · 可用个人收藏闭环P1 · 数据生命周期与可带走P2 · 长期整理效率创建开发包3. 独立验收：运行冻结用例与静态认知审阅分开记录。仅在冻结包声明支持适配器时可提交；容器运行时是否可用由提交结果确认。不会调用模型。先读取冻结包能力以确认是否有运行适配器。"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" getByRole('article', { name: '认知模板 生活待购与灵感收藏夹：个人本地认知模板', exact: true }) with timeout 5000ms
+      - waiting for getByRole('article', { name: '认知模板 生活待购与灵感收藏夹：个人本地认知模板', exact: true })
+        14 × locator resolved to <article aria-label="认知模板 生活待购与灵感收藏夹：个人本地认知模板" class="rounded-xl bg-surface p-5 shadow-card">…</article>
+           - unexpected value "认知模板 · 已冻结候选 · v0.1.1生活待购与灵感收藏夹：个人本地认知模板生活待购与灵感收藏夹 · r2下载冻结包把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面18 项能力 · 8 个决策 · 3 个阶段 · 17 个验收用例冻结检查覆盖结构、引用、阶段映射与文件摘要，本身不执行包内程序。包内报告作为来源声明保留；工厂独立审阅和每个下游目标的运行结果分别记录。符合当前审阅与固定案例证据要求的模板，可在 V1 工厂中管理目录发布。1. 完整认知库查看已冻结章节，或下载包含完整 blueprint/ 来源文件的原始冻结包。独立认知审阅：未发起发起认知审阅会向所选模型发送冻结认知包与对应叶子、场景，可能计费；这是静态审阅，不证明下游应用运行成功。按冻结场景生产认知修订版认知修订要求复用原调研和场景，连同原包、审阅意见发给所选模型；创建新候选并再次独立审阅，保留原版本。可能计费。生产认知修订版查看认知内容2. 当前阶段执行包按阶段导出，从 HANDOFF.md 开始，再按需加载完整认知和契约；无需一开始预加载全部材料。旧包阶段可能未覆盖完整场景，应对照已确认场景核实范围；不能静默更改冻结承诺或视为已完成。导出不会运行验收。开发项目名称本次开发阶段P0 · 可用个人收藏闭环P1 · 数据生命周期与可带走P2 · 长期整理效率创建开发包3. 独立验收：运行冻结用例与静态认知审阅分开记录。仅在冻结包声明支持适配器时可提交；容器运行时是否可用由提交结果确认。不会调用模型。先读取冻结包能力以确认是否有运行适配器。"
+
+
+      356 |   await expect(card).toBeVisible();
+      357 |   await expect(card).toContainText('18 项能力 · 8 个决策 · 3 个阶段 · 17 个验收用例');
+    > 358 |   await expect(card).toContainText('不等于工厂重新验收');
+          |                      ^
+      359 |   await expect(card).toContainText('从 HANDOFF.md 开始');
+      360 |   await expect(card).toContainText('旧包阶段可能未覆盖完整场景');
+      361 |   await expect(card.getByRole('button',{name:'审阅并发布',exact:true})).toHaveCount(0);
+        at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/factory-tests/factory.spec.ts:358:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/factory-cognitive-sample-i-995e3-doff-without-provider-calls/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/factory-cognitive-sample-i-995e3-doff-without-provider-calls/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/factory-cognitive-sample-i-995e3-doff-without-provider-calls/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/factory-cognitive-sample-i-995e3-doff-without-provider-calls/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+(node:84046) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[16/26] e2e/factory-tests/factory.spec.ts:396:1 › invalid cognitive ZIP shows an error and keeps imported candidates
+[17/26] e2e/factory-tests/factory.spec.ts:408:1 › cognitive document reader does not load remote images or execute embedded HTML
+[18/26] e2e/factory-tests/factory.spec.ts:430:1 › confirmed scenarios queue pinned cognition production separately from code templates
+[19/26] e2e/factory-tests/factory.spec.ts:446:1 › cognitive review queues independently, can retry after cancellation and produces a new pinned revision
+[20/26] e2e/factory-tests/factory.spec.ts:478:1 › 规范预审阻断可见，意见可带回生产补充要求
+[21/26] e2e/factory-tests/leaf-blueprint.spec.ts:32:1 › published product blueprint links to phase export and does not offer runnable instantiate
+[22/26] e2e/factory-tests/leaf-blueprint.spec.ts:40:1 › published runnable starter keeps its application archive flow
+[23/26] e2e/factory-tests/v1.spec.ts:18:1 › shared cases show fixed source, evidence, unknowns and keep legacy cards when the dynamic API is unavailable
+[24/26] e2e/factory-tests/v1.spec.ts:28:1 › case revisions expose observed evidence separately from unknown runtime and link into factory
+[25/26] e2e/factory-tests/v1.spec.ts:43:1 › V1 plan survives run, pause, resume and reload with a stable idempotency key
+[26/26] e2e/factory-tests/v1.spec.ts:98:1 › fresh deep link restores a running plan, polls its report, pauses by plan ID, then stops at terminal state
+  1 failed
+    e2e/factory-tests/factory.spec.ts:347:1 › cognitive sample imports once, reads definitions and exports a phased development handoff without provider calls 
+  25 passed (53.4s)

@@ -151,6 +151,28 @@ def validate_blueprint(source):
             raise FactoryError("case basis is bound to another scenario", "evidence_basis_invalid", 409)
         if read_json(source / "inputs/case-basis.json") != basis:
             raise FactoryError("case basis and normative input differ", "evidence_basis_invalid", 409)
+        facts_view = spec.get("case_facts_view")
+        if facts_view is not None:
+            if (
+                not isinstance(facts_view, dict)
+                or facts_view.get("schema") != "atlas.accepted-case-facts.v1"
+                or facts_view.get("basis_digest") != basis.get("basis_digest")
+                or digest({key: value for key, value in facts_view.items() if key != "view_digest"}) != facts_view.get("view_digest")
+                or read_json(source / "inputs/accepted-case-facts.json") != facts_view
+            ):
+                raise FactoryError("accepted case facts view digest or mirror differs", "case_facts_view_invalid", 409)
+            if facts_view.get("status") == "accepted":
+                facts = facts_view.get("facts")
+                if not isinstance(facts, list) or not facts or any(
+                    not isinstance(item, dict) or not isinstance(item.get("evidence_id"), str)
+                    for item in facts
+                ):
+                    raise FactoryError("accepted case facts must contain observation objects", "case_facts_view_invalid", 409)
+                ids = [item["evidence_id"] for item in facts]
+                if sorted(ids) != facts_view.get("accepted_evidence_ids") or not isinstance(facts_view.get("source_research_digest"), str):
+                    raise FactoryError("accepted case facts view contents are invalid", "case_facts_view_invalid", 409)
+            elif facts_view.get("status") != "legacy_all_accepted":
+                raise FactoryError("accepted case facts view status is invalid", "case_facts_view_invalid", 409)
         for choice in spec.get("case_design", []):
             if not set(choice.get("evidence_ids", [])) <= set(basis.get("evidence_ids", [])):
                 raise FactoryError("case design references unknown evidence", "evidence_basis_invalid", 409)
@@ -416,6 +438,10 @@ def import_blueprint(store, data, origin="imported-blueprint"):
                     "package_digest": package_digest,
                     "note": "Imported declarations and evidence are not factory acceptance; no code or model executed.",
                 }
+                if spec.get("factory_policy") == "atlas.factory-v1.1":
+                    provenance["case_basis"] = spec.get("case_basis")
+                    if spec.get("case_facts_view") is not None:
+                        provenance["case_facts_view"] = spec["case_facts_view"]
                 frozen_result = freeze_blueprint(
                     source, target, provenance, existing_target=True
                 )
@@ -534,6 +560,9 @@ def verify_frozen(bundle, expected_digest):
         or frozen["manifest"] != manifest
     ):
         raise FactoryError("blueprint changed after freezing", "artifact_changed", 409)
+    view = spec.get("case_facts_view")
+    if view is not None and frozen["provenance"].get("case_facts_view") != view:
+        raise FactoryError("accepted case facts provenance differs from frozen specification", "case_facts_view_invalid", 409)
     return spec
 
 

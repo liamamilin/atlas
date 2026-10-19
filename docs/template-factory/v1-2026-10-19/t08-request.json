@@ -1,0 +1,22 @@
+{
+  "name": "Atlas V1 首批受控生产：三类固定场景",
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "segment": "T08",
+  "scenario_ids": [
+    "scn_7756e0007f6a463a97316f3f49c15248",
+    "scn_6fb4896d9eb0428aa1c080df0a137813",
+    "scn_805c99ffe8da4532817592bb466a505e"
+  ],
+  "runtime_sample_ids": [
+    "scn_7756e0007f6a463a97316f3f49c15248",
+    "scn_6fb4896d9eb0428aa1c080df0a137813",
+    "scn_805c99ffe8da4532817592bb466a505e"
+  ],
+  "admission_policy": "reviewed-draft-v1",
+  "model": "opencode-go/deepseek-v4.1-flash",
+  "language": "zh",
+  "concurrency": 2,
+  "timeout": 600,
+  "repair_attempts": 1,
+  "cognition_guidance": "首期只支持 python-web、Python3.12标准库/SQLite、离线隔离执行。P0完整覆盖已准入场景全部核心旅程，不把核心步骤拖到后续；成熟能力明确适用/不适用/后续。以共享案例证据构造认知库，不克隆整个上游。冻结清晰 API/HTML 表单合同与真实负向行为验收。应用供独立测试者访问时必须监听0.0.0.0；持久状态位于可写目录，不能写只读源码。验收严格遵守提供的RUNTIME_CONTRACT、base_url/app_root/data_dir合同；独立核心旅程、真正同容器重启和场景风险由外部执行器另证，不自报通过。未知项保留。"
+}

@@ -21,8 +21,14 @@ function readSavedPlan(planIdFromUrl?: string | null): V1Plan | null {
     const id = planIdFromUrl || localStorage.getItem(savedPlanKey);
     if (!id) return null;
     const value = localStorage.getItem(`atlas.factory.v1.plan:${id}`);
-    return value ? JSON.parse(value) as V1Plan : null;
+    if (!value) return null;
+    const saved = JSON.parse(value) as V1Plan;
+    return planId(saved) && planId(saved) !== id ? null : saved;
   } catch { return null; }
+}
+function initialPlan(planIdFromUrl: string | null): V1Plan | null {
+  if (!planIdFromUrl) return readSavedPlan();
+  return readSavedPlan(planIdFromUrl) || { plan_id: planIdFromUrl, state: "loading" };
 }
 function mergeBatchResult(base: V1Plan, value: unknown): V1Plan {
   const outer = value && typeof value === "object" ? value as Record<string, unknown> : {};
@@ -57,7 +63,7 @@ export function FactoryV1() {
   const [segment, setSegment] = useState<"G1" | "T08">("G1");
   const [runtimeIds, setRuntimeIds] = useState("");
   const [repositoryHints, setRepositoryHints] = useState("");
-  const [plan, setPlan] = useState<V1Plan | null>(() => readSavedPlan(params.get("plan")));
+  const [plan, setPlan] = useState<V1Plan | null>(() => initialPlan(params.get("plan")));
   const [report, setReport] = useState<Record<string, unknown> | null>(null);
   const [basis, setBasis] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,7 +74,7 @@ export function FactoryV1() {
   const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({});
   const [autoRefresh, setAutoRefresh] = useState(() => {
     const state = plan?.state || plan?.batch?.state || plan?.status;
-    return !!state && state !== "preview" && !terminal(state);
+    return !!state && state !== "preview" && state !== "loading" && !terminal(state);
   });
 
   const eligible = useMemo(() => scenarios.filter(item => item.status !== "archived" && (policy === "ready-only-v1" ? item.status === "ready" : item.status === "ready" || item.status === "draft")), [scenarios, policy]);
@@ -133,12 +139,35 @@ export function FactoryV1() {
       const currentWithState = batch ? mergeBatchResult(current, { batch: { ...batch, state: batchState } }) : current;
       setPlan(currentWithState);
       const state = currentWithState.state || currentWithState.status;
+      const recoveredIds = planItems(currentWithState).map(value => {
+        if (!value || typeof value !== "object") return "";
+        const item = value as Record<string, unknown>;
+        const scenario = item.scenario && typeof item.scenario === "object" ? item.scenario as Record<string, unknown> : {};
+        return typeof item.scenario_id === "string" ? item.scenario_id : typeof scenario.id === "string" ? scenario.id : "";
+      }).filter(Boolean);
+      if (recoveredIds.length) {
+        setSelected(recoveredIds);
+        const samples = planItems(currentWithState).flatMap(value => {
+          if (!value || typeof value !== "object") return [];
+          const item = value as Record<string, unknown>;
+          if (item.runtime_sample !== true) return [];
+          const nested = item.scenario && typeof item.scenario === "object" ? item.scenario as Record<string, unknown> : {};
+          const id = typeof item.scenario_id === "string" ? item.scenario_id : typeof nested.id === "string" ? nested.id : "";
+          return id ? [id] : [];
+        });
+        setRuntimeIds(samples.join("\n"));
+      }
+      if (currentWithState.segment === "G1" || currentWithState.segment === "T08") setSegment(currentWithState.segment);
+      if (currentWithState.admission_policy === "ready-only-v1" || currentWithState.admission_policy === "reviewed-draft-v1") {
+        setPolicy(currentWithState.admission_policy);
+      }
       if (terminal(state)) {
         setAutoRefresh(false);
         setReport(executionReport);
       } else if (executionReport) {
         setReport(executionReport);
       }
+      setAutoRefresh(!!state && state !== "preview" && state !== "loading" && !terminal(state));
     } catch (cause) { if (!signal?.aborted) setError(String(cause)); }
     finally { if (!signal?.aborted && !quiet) setRefreshing(false); }
   }
@@ -165,6 +194,15 @@ export function FactoryV1() {
     // Refresh a restored or newly-previewed plan once to recover server state.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPlanId]);
+
+  useEffect(() => {
+    const urlPlanId = params.get("plan");
+    if (!urlPlanId || urlPlanId === currentPlanId) return;
+    const restored = readSavedPlan(urlPlanId) || { plan_id: urlPlanId, state: "loading" };
+    setPlan(restored);
+    const state = restored.state || restored.batch?.state || restored.status;
+    setAutoRefresh(!!state && state !== "preview" && state !== "loading" && !terminal(state));
+  }, [params, currentPlanId]);
 
   async function preview() {
     setBusy(true); setError(""); setNotice(""); setReport(null);
@@ -284,7 +322,22 @@ export function FactoryV1() {
         const canPublish = reviewStatus === "passed" && evidenceStatus === "fixed_case_basis";
         const manifest = artifact.manifest && typeof artifact.manifest === "object" ? artifact.manifest as Record<string, unknown> : {};
         const published = publicationStatus === "published";
-        return <article key={id} className="rounded-lg border border-border p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><h3 className="font-medium">{String(manifest.name || id)}</h3><p className="mt-1 break-all text-xs text-muted">{id} · {zh ? "发布" : "Publication"}: {publicationStatus} · {zh ? "审阅" : "Review"}: {reviewStatus} · {zh ? "案例依据" : "Case basis"}: {evidenceStatus} · {zh ? "运行" : "Runtime"}: {String(artifact.runtime_status || "not_run")}</p></div><Link to={`/factory?view=artifacts&artifact_id=${encodeURIComponent(id)}`} className="inline-flex items-center gap-1 text-xs text-primary underline">{zh ? "阅读 / 导出" : "Read / export"}<ExternalLink className="size-3"/></Link></div>
+        const runtimeRuns = Array.isArray(artifact.acceptances)
+          ? (artifact.acceptances as Record<string, unknown>[]).filter(item => item.method === "blueprint-runtime")
+          : [];
+        return <article key={id} className="rounded-lg border border-border p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><h3 className="font-medium">{String(manifest.name || id)}</h3><p className="mt-1 break-all text-xs text-muted">{id} · {zh ? "发布" : "Publication"}: {publicationStatus} · {zh ? "审阅" : "Review"}: {reviewStatus} · {zh ? "案例依据" : "Case basis"}: {evidenceStatus}</p></div><Link to={`/factory?view=artifacts&artifact_id=${encodeURIComponent(id)}`} className="inline-flex items-center gap-1 text-xs text-primary underline">{zh ? "阅读 / 导出" : "Read / export"}<ExternalLink className="size-3"/></Link></div>
+          <section className="mt-3 rounded-md bg-bg-elevated p-3" aria-label={zh ? "目标运行记录" : "Target runtime records"}>
+            <h4 className="text-xs font-medium">{zh ? "目标运行记录" : "Target runtime records"}</h4>
+            {runtimeRuns.length ? <ul className="mt-2 space-y-2">{runtimeRuns.map((run, index) => {
+              const binding = run.target_binding && typeof run.target_binding === "object" ? run.target_binding as Record<string, unknown> : {};
+              const runId = String(run.id || run.run_id || run.job_id || `runtime-${index + 1}`);
+              const targetId = String(binding.application_digest || run.application_digest || "unknown");
+              const phase = String(run.selected_phase || binding.selected_phase || "unknown");
+              const suiteStatus = String(run.suite_status || "unknown");
+              const phaseStatus = String(run.phase_status || "unknown");
+              return <li key={runId} className="flex flex-wrap items-center justify-between gap-2 text-xs"><span className="break-all">{zh ? "运行" : "Run"}: {runId} · {zh ? "目标" : "Target"}: {targetId} · {zh ? "阶段" : "Phase"}: {phase} · suite_status: {suiteStatus} · phase_status: {phaseStatus}</span><Link to={`/factory?view=artifacts&artifact_id=${encodeURIComponent(id)}&runtime_run_id=${encodeURIComponent(runId)}`} className="shrink-0 text-primary underline">{zh ? "查看运行断言" : "View run assertions"}<ExternalLink className="ml-1 inline size-3"/></Link></li>;
+            })}</ul> : <p className="mt-2 text-xs text-muted">{zh ? "未运行" : "Not run"}</p>}
+          </section>
           <label className="mt-3 block text-xs">{zh ? "审阅记录（必填）" : "Review note (required)"}<textarea className={field} rows={2} value={reviewNotes[id] || ""} onChange={event => setReviewNotes(current => ({ ...current, [id]: event.target.value }))} placeholder={zh ? "说明发布或撤回的决定及依据" : "Record the decision and its basis"}/></label>
           <div className="mt-3 flex flex-wrap items-center gap-2">{published ? <Button size="sm" variant="outline" disabled={busy || !reviewNotes[id]?.trim()} onClick={() => void publicationAction(artifact, "withdraw")}>{zh ? "撤回目录发布" : "Withdraw publication"}</Button> : <Button size="sm" disabled={busy || !canPublish || !reviewNotes[id]?.trim()} onClick={() => void publicationAction(artifact, "publish")}>{zh ? "发布到正式目录" : "Publish to catalog"}</Button>}{!canPublish && !published ? <span className="text-xs text-warn">{zh ? `发布阻塞：审阅 ${reviewStatus}，固定案例依据 ${evidenceStatus}。` : `Publication blocked: review ${reviewStatus}; fixed case basis ${evidenceStatus}.`}</span> : null}</div>
         </article>;

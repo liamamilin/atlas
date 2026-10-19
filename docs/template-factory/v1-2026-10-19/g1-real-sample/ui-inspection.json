@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.live-ui-inspection.v1",
+  "executor": "Codex CUA browser inspection",
+  "fixture": false,
+  "checks": [
+    {
+      "scope": "application_evidence",
+      "url": "http://127.0.0.1:5188/apps",
+      "observed_app": "bookmark-manager · research_discovered",
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "revision": 1,
+      "evidence_digest": "706fa40ddf461e7cf1256f4b133979d5a019c6e7b848878c1be27bc75bd00d06",
+      "observations": 29,
+      "kinds": {
+        "code_observation": 20,
+        "inference": 8,
+        "documentation": 1
+      },
+      "source_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "result": "visible"
+    },
+    {
+      "scope": "fresh_plan_deep_link",
+      "url": "http://127.0.0.1:5188/factory?view=v1&plan=plan_87059846caf345d2b2fe690657cf324f",
+      "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+      "plan_digest": "1f7701fbf5f52dde011dee76196b2cb01697e10190c6ad17c1273f4b5dcc3d30",
+      "observed_state": "running",
+      "pause_control_visible": true,
+      "cli_limit_visible": 500,
+      "result": "visible"
+    },
+    {
+      "scope": "frozen_candidate_detail_and_standard_P0_export",
+      "url": "http://127.0.0.1:5188/factory?view=artifacts&artifact_id=tpl_7f4c17e834c342e7b462e6bb8b6379e4",
+      "artifact_id": "tpl_7f4c17e834c342e7b462e6bb8b6379e4",
+      "artifact_digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+      "observed_publication": "draft",
+      "observed_review": "uncertain",
+      "selected_phase": "P0",
+      "project_name": "g1-candidate-inspection",
+      "read_content_visible": true,
+      "phase_export_result": "created through actual UI, without model/install/application execution",
+      "archive_path": "application-atlas-production-pack/atlas/template-factory/downloads/bc7b6cf562d541e2bb4051ed8ad185fa.zip",
+      "archive_sha256": "ce7d690d724b4fc8012fdadae713f0a0fe0b10e9b87ff9484771d13a22e38912",
+      "readback_phase_template_digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+      "readback_contract_template_digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+      "screenshot": "g1-real-sample/candidate-phase-export.png",
+      "scope_limit": "Candidate inspection only. Not downstream development, official publication, phase pass, or G1 completion."
+    }
+  ],
+  "not_yet_verified": [
+    "published_template_consumer_path",
+    "real_downstream_P0_and_independent_core_journey"
+  ]
+}

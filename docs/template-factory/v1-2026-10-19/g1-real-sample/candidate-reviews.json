@@ -1,0 +1,139 @@
+{
+  "artifact_id": "tpl_7f4c17e834c342e7b462e6bb8b6379e4",
+  "artifact_digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+  "records": [
+    {
+      "artifact_id": "tpl_7f4c17e834c342e7b462e6bb8b6379e4",
+      "checks": [
+        {
+          "dimension": "category_evidence",
+          "files": [
+            "CATEGORY.md",
+            "inputs/case-basis.json"
+          ],
+          "outcome": "passed",
+          "reason": "CATEGORY.md 明确区分 S01 已确认输入与 S02–S22 逐条上游观测（固定 commit 539881b + 文件:行，如 store.ts 与 App.tsrx），并单列「待验证」未知项（运行时未观测、Dexie/第三方端点未验证、Research Notes 未随包提供、host 排除 obs-no-test-files 等）。授权表述保守：逐条标注 Fixed source license/NOTICE hashes，注明 legal reuse review not performed；case-basis.json 明确 MIT 仅来自默认分支补充、不代表固定 commit，未对许可作无依据主张。符合引证与未知项分离、审慎许可的要求。"
+        },
+        {
+          "dimension": "scenario_scope",
+          "files": [
+            "PRODUCT.md",
+            "ROADMAP.md",
+            "inputs/scenario.json"
+          ],
+          "outcome": "passed",
+          "reason": "场景为单用户本地采集箱（objective 为留存链接、日后回到原页）。F01–F11 覆盖保存、默认未整理、归类增删改、移动、归类浏览计数、关键字检索、打开回跳、多会话持久化、删除撤销与错误合同，正好对应 scenario 的 4 条 acceptance 与 5 步 workflow；F15（扩展/分享目标）、F16（云同步）、F21（分享协作）、F22（稍后阅读）等标 not applicable 并给出理由，未把多用户/云/分享等无关能力强加进范围。范围与已确认场景吻合。"
+        },
+        {
+          "dimension": "product_completeness",
+          "files": [
+            "PRODUCT.md",
+            "ARCHITECTURE.md",
+            "DECISIONS.md"
+          ],
+          "outcome": "passed",
+          "reason": "角色 R01 收藏者/R02 应用壳/R03 独立验收者齐备；正常流（保存→归类→浏览/检索→打开）与失败流（非法 URL/归类、未知 id、畸形请求、删除恢复）都有定义；数据生命周期完整（created_at/updated_at、软删 trashed_at、restore、归类删除迁回默认、P1 导入导出）。权限/计费/管理/审计对单机单用户不适用，并在 D09（无认证）、F16/F21（无云与协作）给出适用性理由；导出列 P1/F13、恢复列 P0/F09，符合「不要求不适用的企业能力」。"
+        },
+        {
+          "dimension": "architecture_contract",
+          "files": [
+            "ARCHITECTURE.md",
+            "acceptance/p0_library.py",
+            "acceptance/p0_recovery.py"
+          ],
+          "outcome": "uncertain",
+          "reason": "数据模型（categories/bookmarks 列与索引）、API/错误合同、UI 适配器合同与验收适配器合同（--base-url/--app-root/--data-dir、每实例隔离启动、离线绑定 127.0.0.1）均已定义，默认栈与理由清楚。但契约不足以完全支撑所断言行为：invalid_url 仅写「非 http/https、hostname 为空」，未写明 A02 dotless-host 依赖的「必须含点域名」拒绝规则（该规则来自被采用的 S08 getHostname，架构只隐含），按字面实现 urlsplit().hostname 对 http://atlas-a02-xxxx 非空，可能被接受而使 A02 失败；通用错误合同只列举各端点码，未枚举 A10 断言的 bad_request（畸形 JSON）。证据充分但契约表述有缺口，故标 uncertain 要求澄清，而非判为通过。"
+        },
+        {
+          "dimension": "phase_acceptance",
+          "files": [
+            "acceptance/plan.json",
+            "acceptance/p0_library.py",
+            "acceptance/p0_organize.py",
+            "acceptance/p0_find_open.py",
+            "acceptance/p0_recovery.py",
+            "acceptance/p1_maturity.py",
+            "acceptance/runner.json",
+            "acceptance/common.py"
+          ],
+          "outcome": "passed",
+          "reason": "阶段=交付顺序且双向覆盖：F01–F14 均在引入阶段有验收（P0→A01–A12，P1→A13–A15），A01–A15 各恰映射到特性；P0 用例只用 P0 接口，未使用 export/import/allow_duplicate 等 P1 API。程序是真实行为断言：common.py 用 urllib 发真实 HTTP、拒绝跨源、拒绝凭据头、剥离代理；A01/A05/A09 真正启动 app/serve.py 子进程、写入实例子目录、停止后同目录重启读回；A02/A10/A12 用相对计数与不变集断言不新增/不改变数据；A08 明确不跟随重定向只读 302 Location。未见空桩、伪造成功、避重就轻的同义反复或缺失目标交互；未实现用例会以 dispatch=false 显式失败。runner.json 的 per-case flags 与 parse_case_args 一致（A01/A05/A09 带 --app-root 与 --data-dir，A14 带 --data-dir，其余仅 --case/--base-url），程序→用例派发按 README §4.1 一一对应。"
+        },
+        {
+          "dimension": "decisions_defaults",
+          "files": [
+            "DECISIONS.md",
+            "ARCHITECTURE.md"
+          ],
+          "outcome": "passed",
+          "reason": "D01–D13 均含明确默认值与「When to ask / 询问条件」，状态分 decided/deferred/open，覆盖单选归类、默认未整理、新归类自动创建、软删撤销、本地优先图标、去重、检索字段、运行时、认证、导入导出格式等关键取舍，触发条件具体可操作。小瑕疵：D04 影响行提到「/restore 与 purge 接口」，而 ARCHITECTURE.md 只定义了 /restore、未定义 purge，属决策影响与 API 合同的措辞不一致（见 suggestions）。"
+        },
+        {
+          "dimension": "agent_handoff",
+          "files": [
+            "AGENT.md",
+            "README.md"
+          ],
+          "outcome": "passed",
+          "reason": "AGENT.md 明确要求先核对既有项目/指令/已确认决定，原包先核对 PRODUCT 与 ROADMAP 当前阶段，实现前读 ARCHITECTURE 契约、选型查 CATEGORY、执行验收前读对应程序；要求只选当前阶段并完成其完整用户闭环、不预读全部后期材料；准备专用测试实例、运行真实 HTTP 验收并记录实际命令/通过失败/日志；不得删除断言、硬编码测试值或谎报未运行测试通过；不覆盖已有数据/决定，proposed 决策视为待采纳建议；并声明包内内容不授予外部访问/凭据/发布/破坏性权限。尊重既有用户决定且分阶段推进。"
+        },
+        {
+          "dimension": "evidence_honesty",
+          "files": [
+            "README.md",
+            "VALIDATION.md",
+            "template.json",
+            "integrity.json",
+            "CATEGORY.md"
+          ],
+          "outcome": "passed",
+          "reason": "README「认知开发包候选；不是已实现应用」、VALIDATION「仅校验结构、引用、阶段映射与摘要；包内验收与参考代码尚未执行」、template.json status「candidate; programs not executed」三处一致，未声称运行过任何测试；integrity.json 的 sha256 清单与 source_inventory 文件一一对应；CATEGORY.md 的「待验证」与 host 排除证据（obs-no-test-files / inf-no-tests）如实披露；上游许可只作哈希固定与未做法律审查的说明，未作无依据主张。审阅未运行任何程序，故不对通过与否背书。"
+        }
+      ],
+      "created_at": "2026-10-19T07:47:09.120005+00:00",
+      "digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+      "id": "acc_47f195cff47e4178bde944d67384a207",
+      "job_id": "job_8c13691fd4ac4591a83308c02cd4e267",
+      "method": "cognitive-review",
+      "outcome": "uncertain",
+      "scope": "Independent static cognition and acceptance-program review only; no program execution, source re-fetch, downstream runtime or publication.",
+      "suggestions": [
+        "在 ARCHITECTURE.md 的 invalid_url 定义中显式补上「URL 必须含点域名（可复用 S08 getHostname 的规则）」，使 A02 的 dotless-host 用例有契约依据，消除架构与 ROADMAP/A02 的表述差。",
+        "在 ARCHITECTURE.md 错误码清单中补列通用码（至少 bad_request 用于畸形 JSON），使 A10 的断言与错误合同一致。",
+        "对齐 D04 与 API：要么定义/实现 purge 与永久删除路径，要么删除 D04 影响行中的 purge 提法，避免决策影响与架构合同不符。",
+        "补充负向覆盖：归类重命名撞名 409 duplicate_category、POST /api/categories 空名/超长名 400 invalid_name（P0），以及恢复时同 URL 已有活动记录 409 duplicate_url 且不改数据（P1，数据完整性路径）。",
+        "增加默认排序的行为断言（created_at 倒序、同值以 id 兜底），否则该架构承诺无验收支撑。",
+        "强化既有用例：A01 跨重启除 id/url 外再断言 title/description 稳定；A14 用 /api/export 的原样输出回导并断言 imported 计数，形成导出↔导入闭环，而非另造 HTML。",
+        "为打开回跳补一条 UI 层断言（rel=noopener / target=_blank）或明确说明套件不驱动浏览器、该安全属性不被验证，避免安全约定悬空。",
+        "在交付说明中重申 start 使用 0.0.0.0 仅限隔离验收网络、日常须绑定 127.0.0.1；无认证本地库若被照抄暴露到局域网会形成未授权访问风险。"
+      ],
+      "summary": "对冻结的认知产品蓝图（书签管理器 / 生活待购与灵感收藏夹）做了逐文件独立审阅：本包只有蓝图与验收程序，没有任何应用实现（app/serve.py 不存在），template.json 标注 candidate；programs not executed，我也未运行任何测试，故不对行为是否正确下断言，只审阅文本与程序语义。结论：场景收窄合理、产品与阶段闭环完整、验收程序是真实 HTTP 语义断言而非空桩或伪造成功、无凭据外泄；唯一实质缺陷是 ARCHITECTURE.md 的 invalid_url / 通用错误合同表述不足以完全支撑 A02、A10 所断言的行为（无点域名拒绝、bad_request 码）。此外有一批可改进的负向覆盖与契约一致性项，均属建议，不构成核心旅程阻塞。"
+    },
+    {
+      "artifact_id": "tpl_7f4c17e834c342e7b462e6bb8b6379e4",
+      "code": "cli_failed",
+      "created_at": "2026-10-19T07:42:26.175079+00:00",
+      "digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+      "error": "OpenCode CLI failed: {'type': 'provider.invalid-output', 'message': 'OpenAI Chat stream ended without finish_reason', 'status': 200}; {'type': 'provider.invalid-output', 'message': 'OpenAI Chat stream ended without finish_reason', 'status': 200}",
+      "id": "acc_14619994f11a4b2380808b2eb278430b",
+      "job_id": "job_8c13691fd4ac4591a83308c02cd4e267",
+      "method": "cognitive-review",
+      "outcome": "unavailable",
+      "scope": "Acceptance did not complete; no successful review or runtime claim"
+    },
+    {
+      "artifact_id": "tpl_7f4c17e834c342e7b462e6bb8b6379e4",
+      "code": "cli_failed",
+      "created_at": "2026-10-19T07:38:56.430648+00:00",
+      "digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+      "error": "OpenCode CLI failed: {'type': 'provider.invalid-output', 'message': 'OpenAI Chat stream ended without finish_reason', 'status': 200}; {'type': 'provider.invalid-output', 'message': 'OpenAI Chat stream ended without finish_reason', 'status': 200}",
+      "id": "acc_fb5752aac18745268bc3048f1a3c99e6",
+      "job_id": "job_8c13691fd4ac4591a83308c02cd4e267",
+      "method": "cognitive-review",
+      "outcome": "unavailable",
+      "scope": "Acceptance did not complete; no successful review or runtime claim"
+    }
+  ],
+  "publication": "draft",
+  "scope": "Current candidate is uncertain after two provider failures, never a runtime pass. Historical failures retained."
+}

@@ -1,3 +1,4 @@
+import hashlib
 import json
 from pathlib import Path
 import tempfile
@@ -9,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from template_factory.budget import BudgetLedger
 from template_factory.cli import CLI
+from template_factory.pipeline import _budget_next_retry, _budget_operation_identity, _budget_prior_calls, _budget_scope_history, _is_forced_transient_retry, _stable_retry_scope
 from template_factory.store import FactoryError, FactoryStore
 
 
@@ -48,6 +50,77 @@ class FactoryBudgetV1Tests(unittest.TestCase):
         self.assertEqual(sum(isinstance(item, dict) for item in outcomes), 1)
         self.assertIn("budget_concurrency", outcomes)
         self.assertEqual(ledger.snapshot()["active"], 1)
+
+    def test_concurrent_duplicate_initial_calls_cannot_both_bypass_retry_scope(self):
+        outcomes = []
+        barrier = threading.Barrier(2)
+
+        def reserve():
+            barrier.wait()
+            try:
+                outcomes.append(self.ledger.reserve(
+                    "product-a", "G1", "review", 60, stage="review:fixed-input",
+                    retry_scope="cognitive-review", job_id="same-operation",
+                ))
+            except FactoryError as error:
+                outcomes.append(error.code)
+
+        threads = [threading.Thread(target=reserve) for _ in range(2)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        self.assertEqual(sum(isinstance(value, dict) for value in outcomes), 1)
+        self.assertIn("budget_retry_limit", outcomes)
+        self.assertEqual(self.ledger.snapshot()["cli_sessions_used"], 1)
+
+    def test_changed_operation_stays_initial_but_explicit_protocol_repair_uses_scope_retry(self):
+        self.assertIsNone(_budget_next_retry(0, 2, scope_retries=2))
+        self.assertEqual(_budget_next_retry(0, 2, forced_transient=True, scope_retries=0), 1)
+        with self.assertRaises(FactoryError) as caught:
+            _budget_next_retry(0, 2, forced_transient=True, scope_retries=2)
+        self.assertEqual(caught.exception.code, "budget_retry_limit")
+        self.assertTrue(_is_forced_transient_retry("blueprint-code-0-patch-repair-1"))
+        self.assertTrue(_is_forced_transient_retry("blueprint-code-2-4-repair-0"))
+        self.assertTrue(_is_forced_transient_retry("blueprint-research-protocol-repair-1"))
+        self.assertFalse(_is_forced_transient_retry("blueprint-code-2-5"))
+        self.assertFalse(_is_forced_transient_retry("blueprint-code-8-3"))
+        self.assertFalse(_is_forced_transient_retry("blueprint-generate-1"))
+        first = self.ledger.reserve("product-a", "G1", "production", 50,
+                                    stage="blueprint-generate-0", retry=1,
+                                    retry_scope="blueprint-generate")
+        self.ledger.mark_started(first["id"])
+        with self.store.connect() as con:
+            history = _budget_scope_history(con, "default", "product-a", "blueprint-generate", "job-2")
+        self.assertEqual(history, {"retries": 1})
+
+    def test_dependency_manifest_repairs_consume_real_code_scope_retry_allowance(self):
+        initial = self.ledger.reserve(
+            "product-a", "G1", "production", 50,
+            stage="blueprint-code-2-4", retry_scope="blueprint-code", job_id="job-code",
+        )
+        self.ledger.mark_started(initial["id"])
+        self.ledger.finish(initial["id"], "completed")
+
+        for fix in (0, 1):
+            repair_name = f"blueprint-code-2-4-repair-{fix}"
+            self.assertTrue(_is_forced_transient_retry(repair_name))
+            with self.store.connect() as con:
+                history = _budget_scope_history(con, "default", "product-a", "blueprint-code", "job-code")
+            retry = _budget_next_retry(0, 2, forced_transient=True, scope_retries=history["retries"])
+            reservation = self.ledger.reserve(
+                "product-a", "G1", "production", 50, stage=repair_name,
+                retry=retry, retry_scope="blueprint-code", job_id="job-code",
+            )
+            self.ledger.mark_started(reservation["id"])
+            self.ledger.finish(reservation["id"], "failed")
+            self.assertEqual(retry, fix + 1)
+
+        with self.store.connect() as con:
+            history = _budget_scope_history(con, "default", "product-a", "blueprint-code", "job-code")
+        with self.assertRaises(FactoryError) as caught:
+            _budget_next_retry(0, 2, forced_transient=True, scope_retries=history["retries"])
+        self.assertEqual(caught.exception.code, "budget_retry_limit")
 
     def test_restart_and_new_job_do_not_reset_segment_deadline_or_call_count(self):
         ledger = BudgetLedger(self.store, limits={"cli_sessions": 2, "phase_seconds": 100}, clock=lambda: self.now[0])
@@ -98,6 +171,99 @@ class FactoryBudgetV1Tests(unittest.TestCase):
                                 stage="generate-0", retry=1, job_id="new-job")
         self.assertEqual(caught.exception.code, "budget_retry_limit")
 
+    def test_stable_scope_counts_legacy_cognitive_review_retries_across_new_artifacts(self):
+        for retry, stage in ((1, "cognitive-review:old-zh-input"), (2, "cognitive-review:old-zh-input")):
+            reservation = self.ledger.reserve("product-a", "G1", "review", 50,
+                                              stage=stage, retry=retry, job_id=f"legacy-{retry}")
+            self.ledger.mark_started(reservation["id"])
+            self.ledger.finish(reservation["id"], "failed")
+        # A repaired artifact is allowed a fresh initial call, but its next retry
+        # remains inside the same campaign/product/review allowance.
+        initial = self.ledger.reserve("product-a", "G1", "review", 50,
+                                      stage="cognitive-review:new-artifact", job_id="repair-review",
+                                      retry_scope="cognitive-review")
+        self.ledger.mark_started(initial["id"])
+        self.ledger.finish(initial["id"], "completed")
+        with self.assertRaises(FactoryError) as caught:
+            self.ledger.reserve("product-a", "G1", "review", 50,
+                                stage="cognitive-review:new-artifact", retry=1,
+                                retry_scope="cognitive-review", job_id="repair-review-retry")
+        self.assertEqual(caught.exception.code, "budget_retry_limit")
+
+    def test_legacy_p0_digest_retries_count_toward_stable_delivery_scope(self):
+        for retry, stage in ((1, "p0-delivery:old-digest"), (2, "p0-delivery:old-digest")):
+            reservation = self.ledger.reserve("product-a", "G1", "production", 50,
+                                              stage=stage, retry=retry, job_id=f"p0-{retry}")
+            self.ledger.mark_started(reservation["id"])
+            self.ledger.finish(reservation["id"], "failed")
+        with self.assertRaises(FactoryError) as caught:
+            self.ledger.reserve("product-a", "G1", "production", 50,
+                                stage="p0-delivery:new-digest", retry=1,
+                                retry_scope="p0-delivery", job_id="p0-new-retry")
+        self.assertEqual(caught.exception.code, "budget_retry_limit")
+
+    def test_indexed_legacy_cognitive_stages_normalize_without_merging_review_dimensions(self):
+        self.assertEqual(_stable_retry_scope("blueprint-generate-3-patch-repair-0"), "blueprint-generate")
+        self.assertEqual(_stable_retry_scope("blueprint-spec-review-0-category_evidence"), "blueprint-spec-review:category_evidence")
+        self.assertEqual(_stable_retry_scope("blueprint-spec-review-2-phase_acceptance"), "blueprint-spec-review:phase_acceptance")
+        self.assertNotEqual(
+            _stable_retry_scope("blueprint-spec-review-0-category_evidence"),
+            _stable_retry_scope("blueprint-spec-review-2-phase_acceptance"),
+        )
+
+    def test_indexed_legacy_review_retries_are_counted_only_for_the_same_dimension(self):
+        for retry, stage in ((1, "blueprint-spec-review-0-category_evidence:old-a"),
+                             (2, "blueprint-spec-review-1-category_evidence:old-b")):
+            reservation = self.ledger.reserve("product-a", "G1", "production", 50,
+                                              stage=stage, retry=retry, job_id=f"review-{retry}")
+            self.ledger.mark_started(reservation["id"])
+            self.ledger.finish(reservation["id"], "failed")
+        with self.assertRaises(FactoryError) as caught:
+            self.ledger.reserve("product-a", "G1", "production", 50,
+                                stage="blueprint-spec-review-2-category_evidence:new",
+                                retry=1, retry_scope="blueprint-spec-review:category_evidence")
+        self.assertEqual(caught.exception.code, "budget_retry_limit")
+        other_dimension = self.ledger.reserve(
+            "product-a", "G1", "production", 50,
+            stage="blueprint-spec-review-2-phase_acceptance:new", retry=1,
+            retry_scope="blueprint-spec-review:phase_acceptance",
+        )
+        self.assertIsNotNone(other_dimension["id"])
+
+    def test_fixed_input_identity_ignores_language_but_retains_legacy_hash_aliases(self):
+        zh, zh_aliases = _budget_operation_identity("cognitive-review", {"artifact_digest": "same", "language": "zh"})
+        en, en_aliases = _budget_operation_identity("cognitive-review", {"artifact_digest": "same", "language": "en"})
+        repaired, _ = _budget_operation_identity("cognitive-review", {"artifact_digest": "new", "language": "en"})
+        self.assertEqual(zh, en)
+        self.assertIn("cognitive-review:" + hashlib.sha256(
+            json.dumps({"artifact_digest": "same", "language": "zh"}, ensure_ascii=False,
+                       sort_keys=True, separators=(",", ":")).encode()).hexdigest()[:16], en_aliases)
+        self.assertEqual(set(zh_aliases), set(en_aliases))
+        self.assertNotEqual(zh, repaired)
+
+    def test_legacy_initial_and_two_retries_remain_visible_after_language_changes(self):
+        original_payload = {"artifact_digest": "fixed-artifact", "language": "zh"}
+        legacy_operation = "cognitive-review:" + hashlib.sha256(
+            json.dumps(original_payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()[:16]
+        for retry in (None, 1, 2):
+            reservation = self.ledger.reserve(
+                "product-a", "G1", "review", 50, stage=legacy_operation,
+                retry=retry, job_id=f"legacy-review-{retry}",
+            )
+            self.ledger.mark_started(reservation["id"])
+            self.ledger.finish(reservation["id"], "failed")
+        _, aliases = _budget_operation_identity("cognitive-review", {"artifact_digest": "fixed-artifact", "language": "en"})
+        with self.store.connect() as con:
+            prior_calls = _budget_prior_calls(con, "default", "product-a", aliases)
+            self.assertEqual(prior_calls, 3)
+        with self.assertRaises(FactoryError) as caught:
+            _budget_next_retry(prior_calls, self.ledger.limits["transient_retries"])
+        self.assertEqual(caught.exception.code, "budget_retry_limit")
+        before = self.ledger.snapshot()["cli_sessions_used"]
+        self.assertEqual(before, 3)
+        self.assertEqual(self.ledger.snapshot()["cli_sessions_used"], before)
+
     def test_segment_deadline_begins_at_official_start_and_pause_does_not_reset_it(self):
         ledger = BudgetLedger(self.store, limits={"phase_seconds": 100}, clock=lambda: self.now[0])
         ledger.begin_segment("G1")
@@ -144,12 +310,21 @@ class FactoryBudgetV1Tests(unittest.TestCase):
         self.assertEqual(self.ledger.record_repair("product-b", "job-repair-1")["repairs_used"], 1)
 
     def test_repeating_legitimate_stage_calls_does_not_infer_transient_retries(self):
-        for job in ("job-file-1", "job-file-2", "job-file-3"):
+        # Nine independent authoring file calls are fresh operations, regardless
+        # of sharing the blueprint-code retry scope.
+        for index in range(9):
+            self.assertIsNone(_budget_next_retry(0, 2, scope_retries=min(index, 2)))
             reservation = self.ledger.reserve("product-a", "G1", "production", 30,
-                                              stage="blueprint-code-0", job_id=job)
+                                              stage=f"blueprint-code-0-{index}",
+                                              retry_scope="blueprint-code", job_id=f"job-file-{index}")
             self.ledger.mark_started(reservation["id"])
             self.ledger.finish(reservation["id"], "completed")
-        self.assertEqual(self.ledger.snapshot()["cli_sessions_used"], 3)
+        self.assertEqual(self.ledger.snapshot()["cli_sessions_used"], 9)
+        self.assertEqual(_budget_next_retry(0, 2, forced_transient=True, scope_retries=0), 1)
+        self.assertEqual(_budget_next_retry(0, 2, forced_transient=True, scope_retries=1), 2)
+        with self.assertRaises(FactoryError) as caught:
+            _budget_next_retry(0, 2, forced_transient=True, scope_retries=2)
+        self.assertEqual(caught.exception.code, "budget_retry_limit")
         with self.assertRaises(FactoryError) as caught:
             self.ledger.reserve("product-a", "G1", "transient_retry", 30,
                                 stage="blueprint-code-0", retry=3, job_id="job-retry-3")

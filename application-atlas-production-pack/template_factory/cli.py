@@ -150,6 +150,7 @@ class CLI:
                 job_id=budget.get("job_id"), requested_model=model,
                 requested_effort=reasoning_effort, stage=budget.get("stage"),
                 retry=budget.get("retry"),
+                retry_scope=budget.get("retry_scope"),
             )
             timeout = reservation["timeout"]
         elif budget_required:

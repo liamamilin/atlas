@@ -7,6 +7,7 @@ import sqlite3
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from template_factory.store import FactoryStore, canonical, now
@@ -152,6 +153,97 @@ class FactoryReportEnrichmentTests(unittest.TestCase):
         self.assertEqual(item["usage_events"][0]["tokens"]["input"], 7)
         self.assertIsNone(item["usage_events"][0]["cost_currency"])
         self.assertNotIn("private prompt", json.dumps(enriched))
+
+    def test_all_prior_attempts_are_included_with_bounded_safe_sources(self):
+        job = self.report["batch"]["jobs"][0]
+        with self.store.connect(True) as con:
+            con.execute("UPDATE job SET attempt=3 WHERE id=?", (job["id"],))
+        jobs_root = self.root / "state" / "jobs" / job["id"]
+
+        first = jobs_root / "attempt-1" / "generate"
+        first.mkdir(parents=True)
+        (first / "cli-summary.json").write_text(json.dumps({
+            "requested_model": "requested/old", "observed_model": "observed/old",
+            "exit_code": 1, "cli_status": "completed", "delivery_status": "failed", "failure_code": "cli_failed",
+            "usage_events": [{"event_type": "step_finish", "event_id": "old-step", "cost": 1.0,
+                              "tokens": {"input": 11, "output": 2}}],
+        }))
+
+        second = jobs_root / "attempt-2" / "research"
+        second.mkdir(parents=True)
+        (second / "cli-summary.json").write_text(json.dumps({"requested_model": "requested/middle", "cli_status": {}, "delivery_status": []}))
+        (second / "events.jsonl").write_text(json.dumps({"type": "step_finish", "id": "middle-step",
+            "part": {"cost": 2.0, "tokens": {"input": 22, "output": 3}}}) + "\n")
+
+        third = jobs_root / "attempt-3" / "review"
+        third.mkdir(parents=True)
+        (third / "cli-summary.json").write_text(json.dumps({
+            "requested_model": "requested/current", "usage_events": [{
+                "event_type": "step_finish", "event_id": "current-step", "cost": 3.0,
+                "tokens": {"input": 33, "output": 4},
+            }],
+        }))
+
+        # Nested generated/source trees are not host stage summaries and must not be read.
+        nested = first / "source-untrusted" / "fake-stage"
+        nested.mkdir(parents=True)
+        (nested / "cli-summary.json").write_text(json.dumps({"usage_events": [{"event_id": "fake"}]}))
+        # A symlink to data outside the store is skipped, never followed.
+        outside = self.root / "outside.json"
+        outside.write_text(json.dumps({"usage_events": [{"event_id": "escaped"}]}))
+        linked = jobs_root / "attempt-1" / "linked"
+        linked.mkdir()
+        (linked / "cli-summary.json").symlink_to(outside)
+
+        enriched = enrich_report(self.store, self.report)
+        records = [item for item in enriched["usage"]["stages"] if item["job_id"] == job["id"]]
+        records.sort(key=lambda item: item["attempt"])
+        self.assertEqual([item["attempt"] for item in records], [1, 2, 3])
+        self.assertEqual([item["usage_events"][0]["event_id"] for item in records],
+                         ["old-step", "middle-step", "current-step"])
+        self.assertEqual(records[0]["requested_model"], "requested/old")
+        self.assertEqual(records[0]["exit_code"], 1)
+        self.assertEqual(records[0]["delivery_status"], "failed")
+        self.assertEqual(records[0]["failure_code"], "cli_failed")
+        self.assertIsNone(records[1]["exit_code"])
+        self.assertIsNone(records[1]["cli_status"])
+        self.assertIsNone(records[1]["delivery_status"])
+        self.assertEqual(records[2]["requested_model"], "requested/current")
+        self.assertTrue(all(item["usage_source_sha256"] for item in records))
+        self.assertEqual(enriched["usage"]["unsafe_files_skipped"], 1)
+        self.assertNotIn("fake", json.dumps(enriched))
+        self.assertNotIn("escaped", json.dumps(enriched))
+
+    def test_malformed_legacy_summary_is_reported_as_truncated_without_reading_symlink(self):
+        job = self.report["batch"]["jobs"][0]
+        stage = self.root / "state" / "jobs" / job["id"] / f"attempt-{job['attempt']}" / "malformed"
+        stage.mkdir(parents=True)
+        (stage / "cli-summary.json").write_text("{invalid json")
+        enriched = enrich_report(self.store, self.report)
+        item = next(record for record in enriched["usage"]["stages"] if record["stage"] == "malformed")
+        self.assertTrue(item["usage_events_truncated"])
+        self.assertEqual(item["usage_events"], [])
+        self.assertTrue(item["summary_sha256"])
+
+    def test_report_record_and_source_byte_caps_are_explicit(self):
+        job = self.report["batch"]["jobs"][0]
+        for attempt in (1, 2):
+            stage = self.root / "state" / "jobs" / job["id"] / f"attempt-{attempt}" / "generate"
+            stage.mkdir(parents=True)
+            (stage / "cli-summary.json").write_text(json.dumps({
+                "usage_events": [{"event_type": "step_finish", "event_id": f"step-{attempt}",
+                                  "tokens": {"input": attempt}}],
+            }))
+        with patch("template_factory.v1_reporting.MAX_USAGE_RECORDS_PER_REPORT", 1):
+            limited_records = enrich_report(self.store, self.report)
+        self.assertEqual(len(limited_records["usage"]["stages"]), 1)
+        self.assertTrue(limited_records["usage"]["truncated"])
+
+        with patch("template_factory.v1_reporting.MAX_USAGE_SOURCE_BYTES_PER_REPORT", 1):
+            limited_bytes = enrich_report(self.store, self.report)
+        self.assertTrue(limited_bytes["usage"]["truncated"])
+        self.assertEqual(limited_bytes["usage"]["stages"][0]["usage_events"], [])
+        self.assertEqual(limited_bytes["usage"]["stages"][0]["summary_hash_scope"], "read_prefix")
 
 
 if __name__ == "__main__":

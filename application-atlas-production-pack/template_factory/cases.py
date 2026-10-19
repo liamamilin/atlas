@@ -500,6 +500,81 @@ class CaseLibrary:
                     accepted.add(observation["evidence_id"])
         return accepted
 
+    def accepted_facts_view(self, basis, source_research_digest):
+        """Build a deterministic generation view from currently accepted linked observations."""
+        fixed = self.require_admissible(basis)
+        if not isinstance(source_research_digest, str) or not re.fullmatch(r"[0-9a-f]{64}", source_research_digest):
+            raise FactoryError("raw research checkpoint digest is invalid", "case_facts_view_invalid", 409)
+        accepted = self.accepted_evidence_ids(fixed)
+        facts, unknowns = [], []
+        scenario_id = fixed["scenario_id"]
+        scenario_revision = fixed["scenario_revision"]
+        for ref in fixed["case_refs"]:
+            case = self.get_case(ref["case_id"], ref["revision"])
+            unknowns.extend({"case_id": ref["case_id"], "case_revision": ref["revision"], "statement": value}
+                            for value in case["research"].get("unknowns", []))
+            linked_ids = set()
+            for link in case["scenario_links"]:
+                if link["scenario_id"] == scenario_id and link["scenario_revision"] == scenario_revision:
+                    linked_ids.update(link["evidence_ids"])
+            for observation in case["observations"]:
+                evidence_id = observation["evidence_id"]
+                if evidence_id in accepted and evidence_id in linked_ids:
+                    facts.append({
+                        "case_id": ref["case_id"],
+                        "case_revision": ref["revision"],
+                        "evidence_id": evidence_id,
+                        "kind": observation["kind"],
+                        "statement": observation["statement"],
+                    })
+        facts.sort(key=lambda item: (item["case_id"], item["case_revision"], item["evidence_id"]))
+        view = {
+            "schema": "atlas.accepted-case-facts.v1",
+            "policy": "accepted-linked-observations-only-v1",
+            "status": "accepted",
+            "basis_digest": fixed["basis_digest"],
+            "source_research_digest": source_research_digest,
+            "accepted_evidence_ids": sorted(item["evidence_id"] for item in facts),
+            "facts": facts,
+            "unknowns": sorted(unknowns, key=lambda item: (item["case_id"], item["case_revision"], item["statement"])),
+        }
+        view["view_digest"] = digest(view)
+        return view
+
+    def legacy_facts_marker(self, basis):
+        """Permit old checkpoints only when every pinned observation is accepted."""
+        fixed = self.require_admissible(basis)
+        accepted = self.accepted_evidence_ids(fixed)
+        all_ids = set(fixed["evidence_ids"])
+        if accepted != all_ids:
+            raise FactoryError(
+                "legacy generation checkpoint includes a mixed accepted/rejected case basis; create a formal case revision",
+                "case_facts_view_required", 409,
+            )
+        marker = {
+            "schema": "atlas.accepted-case-facts.v1",
+            "policy": "legacy-checkpoint-all-canonical-observations-accepted-v1",
+            "status": "legacy_all_accepted",
+            "basis_digest": fixed["basis_digest"],
+            "accepted_evidence_ids": sorted(all_ids),
+        }
+        marker["view_digest"] = digest(marker)
+        return marker
+
+    def validate_facts_view(self, view, basis):
+        """Bind a frozen facts view to current evidence/review state."""
+        if not isinstance(view, dict):
+            return self.legacy_facts_marker(basis)
+        if view.get("status") == "legacy_all_accepted":
+            expected = self.legacy_facts_marker(basis)
+        elif view.get("status") == "accepted":
+            expected = self.accepted_facts_view(basis, view.get("source_research_digest"))
+        else:
+            raise FactoryError("unknown accepted facts view status", "case_facts_view_invalid", 409)
+        if view != expected:
+            raise FactoryError("accepted facts view is stale or altered", "case_facts_view_invalid", 409)
+        return expected
+
     def require_design_evidence(self, basis, choices):
         accepted = self.accepted_evidence_ids(basis)
         known = set(basis.get("evidence_ids", []))

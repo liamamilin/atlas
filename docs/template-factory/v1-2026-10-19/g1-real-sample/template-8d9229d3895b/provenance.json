@@ -1,0 +1,752 @@
+{
+ "origin": "opencode-cognition",
+ "leaf": "bookmark-manager",
+ "leaf_fingerprint": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+ "scenario": {
+  "acceptance": [
+   "用户主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏",
+   "每条记录都以 URL 锚定到外部网页，打开记录即跳转到该页面",
+   "用户可以在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效",
+   "通过归类浏览或关键字检索，用户能找到此前存入的特定链接"
+  ],
+  "audience": "习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户",
+  "id": "scn_7756e0007f6a463a97316f3f49c15248",
+  "leaf": "bookmark-manager",
+  "leaf_name": "书签管理器",
+  "name": "生活待购与灵感收藏夹",
+  "objective": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+  "revision": 2,
+  "status": "ready",
+  "updated_at": "2026-10-16T14:18:20.407897+00:00",
+  "workflow": [
+   "用户在浏览时看到想记住的商品页、教程或灵感图片，主动保存该链接",
+   "保存时选择一个简单归类，如“待购”“家居改造”或“以后看看”",
+   "未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置",
+   "用户在需要实际处理时打开个人库，浏览或检索相关归类",
+   "用户从记录打开链接，回到原始网页继续购买、阅读或参考"
+  ]
+ },
+ "model": "opencode-go/deepseek-v4.1-flash",
+ "research_digest": "e6100658c83ecec089a7af2fd51638dcc5f2d2b58f7670e4dd79e2b1279d8ac8",
+ "sources": [
+  {
+   "facts": "New records are built with id `bm-${crypto.randomUUID()}`, hostname from getHostname(url), and defaults visitCount=0, visitedAt=null, isPinned=false, isArchived=false, createdAt=Date.now(); edits preserve the previous id, isPinned, isArchived, visitCount, createdAt, and visitedAt.",
+   "id": "S02",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_05babdea64ba9858",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "Pin/Unpin and Edit actions are rendered only when the item is not archived, and Edit loads the item's url/title/description/tags/favicon into the dialog.",
+   "id": "S03",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_06c81a165e03c96a",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "The Valibot BookmarkFormSchema requires a non-empty URL matching /^https?:\\/\\/(?:[\\w-]+\\.)+[a-zA-Z]{2,}(?:\\/\\S*)?$/ and v.url, a non-empty title up to 100 chars, a non-empty description up to 280 chars, and 1-5 tags each up to 30 chars.",
+   "id": "S04",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_1596da4a90687ca5",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "Tab, tag filters, sort, and search are held in component-local tracked state initialized to 'Home', [], 'Recently Added', and '' respectively, with no persistence to Dexie.",
+   "id": "S05",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_2288b28e90cd8450",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "saveBookmark sets the record in the in-memory map then awaits db.bookmarks.put(bm); deleteBookmark removes from the map then awaits db.bookmarks.delete(id).",
+   "id": "S06",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_35e41aab676021eb",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "A Delete action is rendered only for archived items; it calls deleteBookmark and shows an error-type toast with an Undo action that calls saveBookmark(item) to restore the record.",
+   "id": "S07",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_4c56ef30a1785be1",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "getHostname returns '' unless the URL matches an http/https regex with a dotted domain, otherwise returns new URL(url).hostname; getBlobUrl caches object URLs per Blob in a WeakMap; formatDate returns 'Never' for falsy timestamps else a locale date string.",
+   "id": "S08",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_5011700a24e503c7",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/includes/utils.ts",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "A Dexie database named 'BookmarkDB' version 1 declares a single 'bookmarks' EntityTable keyed by id and indexed on createdAt and visitCount.",
+   "id": "S09",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_515aa5d072bd2ec4",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/includes/store.ts",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "index.html defines the #root div and loads /src/index.ts as a module for the Bookmark Manager SPA.",
+   "id": "S10",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_5d51c18a989c01f8",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/index.html",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "README describes the app as local-first with bookmarks stored in IndexedDB and featuring tagging, sorting by recently added/visited/most visited, and archiving/pinning.",
+   "id": "S11",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_6805376f7e2ee383",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/README.md",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "A Copy URL action writes item.url to the clipboard and shows a success toast.",
+   "id": "S12",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_7150b0ac7a5678db",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "An effect on component creation calls db.bookmarks.toArray() and inserts each returned bookmark into an in-memory RippleMap keyed by bookmark id.",
+   "id": "S13",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_86ed2327f33a3ca8",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "On submit, if no favicon exists and a hostname is derivable, the code fetches a Google s2 favicon proxied through images.weserv.nl inside a try/catch that only logs failure.",
+   "id": "S14",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_8e11efc61a4650ba",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "The Visit action builds an updated bookmark with visitedAt=Date.now() and visitCount+1, calls saveBookmark(updated), then opens the URL with window.open(item.url, '_blank', 'noopener,noreferrer').",
+   "id": "S15",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_93ff254508846f11",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "The displayed list filters by isArchived matching the active tab, requires every selected tag to be present in bookmark.tags, matches search only against bookmark.title.toLowerCase(), and sorts pinned-first then by the chosen sort mode with createdAt descending as fallback.",
+   "id": "S16",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_9ab6b0e51811a16d",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "The Bookmark type stores id, title, url, hostname, favicon Blob, description, tags string array, isPinned, isArchived, visitCount, createdAt, and visitedAt.",
+   "id": "S17",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_9c7f6060878383fa",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/includes/store.ts",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "The entry point imports index.css, mounts the App component into #root via ripple's mount, and throws if the root element is missing.",
+   "id": "S18",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_a2ebc864c5b6b3e7",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/index.ts",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "The Archive/Unarchive action toggles isArchived and, when archiving, forces isPinned=false before saving.",
+   "id": "S19",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_b1ca64cf2ad02998",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "Tag counts are derived by iterating all in-memory bookmarks and counting each tag occurrence, then sorted alphabetically for the sidebar.",
+   "id": "S20",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_c4ad7e52e5713628",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "fetchMeta calls https://api.microlink.io/?url=... and, on success with result.data, sets title/description and fetches the logo through https://images.weserv.nl/; errors are only console.error'd and the finally block resets loading.",
+   "id": "S21",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_ec303a2fd1afa287",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  },
+  {
+   "facts": "package.json scripts are start, dev, build, lint, typecheck, serve, format, and check; there is no test script and no test dependency.",
+   "id": "S22",
+   "license": "Fixed source license/NOTICE hashes in inputs/case-basis.json; legal reuse review not performed.",
+   "name": "ev_ba200adf6e2c_f30eb4285ca66219",
+   "reuse": "Reviewed code observation; design adaptation is recorded separately; upstream not run.",
+   "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/package.json",
+   "version": "539881bc67099d491e8ab6f85de0f443fa7de623"
+  }
+ ],
+ "case_facts_view": {
+  "schema": "atlas.accepted-case-facts.v1",
+  "policy": "legacy-checkpoint-all-canonical-observations-accepted-v1",
+  "status": "legacy_all_accepted",
+  "basis_digest": "a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589",
+  "accepted_evidence_ids": [
+   "ev_ba200adf6e2c_05babdea64ba9858",
+   "ev_ba200adf6e2c_06c81a165e03c96a",
+   "ev_ba200adf6e2c_1596da4a90687ca5",
+   "ev_ba200adf6e2c_2288b28e90cd8450",
+   "ev_ba200adf6e2c_3168bcd465b6a043",
+   "ev_ba200adf6e2c_35e41aab676021eb",
+   "ev_ba200adf6e2c_3b553994c375aea5",
+   "ev_ba200adf6e2c_4c56ef30a1785be1",
+   "ev_ba200adf6e2c_5011700a24e503c7",
+   "ev_ba200adf6e2c_515aa5d072bd2ec4",
+   "ev_ba200adf6e2c_5d51c18a989c01f8",
+   "ev_ba200adf6e2c_6805376f7e2ee383",
+   "ev_ba200adf6e2c_6bbd7a588896fe31",
+   "ev_ba200adf6e2c_7150b0ac7a5678db",
+   "ev_ba200adf6e2c_7d47d725a2e9b759",
+   "ev_ba200adf6e2c_86ed2327f33a3ca8",
+   "ev_ba200adf6e2c_8e11efc61a4650ba",
+   "ev_ba200adf6e2c_922f1dbc84912d99",
+   "ev_ba200adf6e2c_93ef917a193a45ab",
+   "ev_ba200adf6e2c_93ff254508846f11",
+   "ev_ba200adf6e2c_9ab6b0e51811a16d",
+   "ev_ba200adf6e2c_9c7f6060878383fa",
+   "ev_ba200adf6e2c_a2ebc864c5b6b3e7",
+   "ev_ba200adf6e2c_b1ca64cf2ad02998",
+   "ev_ba200adf6e2c_c4ad7e52e5713628",
+   "ev_ba200adf6e2c_e62ae7e0a2c68ba1",
+   "ev_ba200adf6e2c_e7dd8d32c05c39f9",
+   "ev_ba200adf6e2c_ec303a2fd1afa287",
+   "ev_ba200adf6e2c_f30eb4285ca66219"
+  ],
+  "view_digest": "bf3c53f6035e5f42375c939348e05d254dc2670905f4d870c300a65a29cb4a8e"
+ },
+ "supersedes": null,
+ "edit_paths": null,
+ "reuse_spec": false,
+ "spec_review": {
+  "checks": [
+   {
+    "dimension": "scenario_scope",
+    "files": [
+     "DRAFT.md"
+    ],
+    "outcome": "passed",
+    "reason": "已确认场景的目标「留存外部网页链接、日后找回并回到原页」对应 F01/F06/F07，五步流程第1–5步分别由 F01+F02、F02、F04、F05+F06、F07 覆盖，且四条验收（跨会话持久、URL 锚定并打开、归类移动/新建后重开仍有效、按归类或关键字找回）由 F08(A01/A05/A09)、F07(A08)、F03/F04(A04/A05/A12)、F05/F06(A06/A07) 逐条落实；phases.P0 的 features 为 F01–F11、acceptance 为 A01–A12，已包含保存、归类、检索、打开回跳与重启持久化等全部必需步骤，P1 仅承载 F12–F14 成熟增强（A13–A15），无不必要的前置扩张；F15–F24 的 not applicable/decision needed 归类与 limits 的排除说明（不云同步、不存快照、不失效检测、扁平单选、无置顶归档/复制/访问计数、不设未验证性能目标）与场景「选择一个简单归类」「本地单机个人收藏箱」的定位一致，未出现与当前修订相矛盾的承诺。"
+   },
+   {
+    "dimension": "product_completeness",
+    "files": [
+     "DRAFT.md",
+     "ARCHITECTURE.md"
+    ],
+    "outcome": "passed",
+    "reason": "确认场景四类验收与工作流步骤均有对应 UI 入口：F01→/bookmarks/new（url/title/description/category，默认「未整理」+datalist），F02→默认归类，F03→/categories/new，F04→/bookmarks/{id}/move，F05→侧栏 /?category=…，F06→GET / q 表单，F07→href=/go/{id} target=_blank，F09→/bookmarks/{id}/delete 与紧随的 /bookmarks/{id}/restore 撤销表单，F11→GET / 空库外壳。ARCHITECTURE.md「UI 适配器合同」明确表单端点成功 303、失败 400 并显示错误，与「API 与错误合同」的 invalid_url/invalid_category/not_found/duplicate_url 语义一致，浏览器用户不依赖仅 API 的能力即完成主旅程；P0 验收 A01–A12 恰好覆盖保存、归类、浏览检索、回跳、删除撤销与错误恢复。"
+   },
+   {
+    "dimension": "architecture_contract",
+    "files": [
+     "DRAFT.md",
+     "ARCHITECTURE.md"
+    ],
+    "outcome": "passed",
+    "reason": "ARCHITECTURE.md 的 categories/bookmarks 表落实了 D01/D02/D04/D06/D07：默认「未整理」、归类名 NOCASE 唯一、trashed_at 软删除、活动记录 URL 判重；保存/移动/重命名/恢复路径共用 400/404/409 的 {error:{code,message,field}} 合同；--data-dir 子目录、只读 --app-root、launch_app 同应用重启及 --base-url 验收与 D08/D09 的离线、无认证、隔离边界一致。P0 场景动作（保存、归类创建、移动、浏览/检索、打开、删除/撤销）均有对应 UI 与 API 入口。"
+   },
+   {
+    "dimension": "phase_acceptance",
+    "files": [
+     "DRAFT.md",
+     "ARCHITECTURE.md"
+    ],
+    "outcome": "passed",
+    "reason": "P0 的 acceptance A01–A12 逐条覆盖 F01–F11：A01/A02/A03 覆盖保存与 URL/归类校验，A04 归类增删改，A05 归类间移动，A06 归类浏览与计数，A07 标题/域名/描述检索，A08 /go/{id} 302 打开原页，A09 删除+restore 恢复，A10 结构化错误无 5xx，A11 /api/health 与 GET / 表单外壳，A12 非法归类 400 invalid_category；F08 持久化经 A01/A05/A09 由同一冻结应用的 --app-root/--data-dir 每实例隔离 scratch 重启适配器验证，未以 base_url 结果替代。P1 仅含 F12–F14/A13–A15（离线降级、Netscape 导入导出、duplicate_url），属可选成熟项，P0 核心用例不依赖之。file_plan 中各 acceptance 实现路径与条目一致（A11 归 p0_library.py 等），runner.json 的 A01/A05/A09 带 --app-root/--data-dir、A14 带 --data-dir、其余仅 --base-url，与 common.py 及各程序声明的 flag 相符，接口可用且兼容。"
+   },
+   {
+    "dimension": "decisions_defaults",
+    "files": [
+     "DRAFT.md",
+     "ARCHITECTURE.md"
+    ],
+    "outcome": "passed",
+    "reason": "全部 13 条决策均显式含 default/impact/question/status/when_to_ask，且默认可逆并有真实触发：D01 单选归类标注可迁移到关联表不丢数据、D02 缺省归类落入“未整理”、D03 NOCASE 自动创建复用、D04 软删除加撤销且可后续加永久删除、D06 默认 409 附 existing_id 并可 allow_duplicate 放宽、D08/D09 属可替换的运行时与认证默认（暴露到局域网/公网即触发加认证）、D11/D12/D13 以 deferred/open 明确留待人类裁定；限值与架构中的默认（schema_meta、categories NOCASE UNIQUE、无 url 唯一索引、P1/F14 去重、验收不携带凭据）与决策陈述一致，未发现默认与确认场景冲突或虚假验收承诺。"
+   },
+   {
+    "dimension": "runtime_protocol",
+    "files": [
+     "DRAFT.md",
+     "ARCHITECTURE.md"
+    ],
+    "outcome": "passed",
+    "reason": "交付 profile 为 python-web（合法，未出现无效的 web）（DRAFT.md architecture_markdown 首段、D08）。common.py 计划以 `os.path.dirname(os.path.abspath(__file__))` 自举 sys.path、“不依赖工作目录”，各用例以 `import common` 由脚本所在目录解析，符合 python /suite/acceptance/x.py 且 cwd 不定 的导入要求。`launch_app(app_root, data_dir, port)` 在 `{data_dir}/instances/<uuid>/` 建每实例隔离 scratch 并只把该子目录传给应用 `--data-dir`，架构与 file_plan 均明确“宿主 {data_dir} 根目录绝不是应用数据库”，满足 app_root 只读、data_dir 仅为测试者草稿 的隔离要求。A01/A05/A09 的重启适配器描述为：由只读 app_root 启动同一冻结应用 [python3, <app_root>/app/serve.py, --host, 127.0.0.1, --port, <空闲端口>, --data-dir, <实例子目录>]，轮询 /api/health 就绪、执行真实 HTTP 动作、终止进程、以相同实例子目录重启并观察持久化，正是契约要求的 same-application 进程适配器（DRAFT.md architecture_markdown「重启与持久化」、p0_library/p0_organize/p0_recovery 的 purpose）。所有 web 用例的 runner args 均含 --base-url（A01/A05/A09 另含 --app-root/--data-dir，A14 另含 --data-dir），未出现绕过 base_url 的行为断言；A05/A09 明确“重启适配器结果不替代 base_url 行为证据”。交付 start 为字面 argv [\"python3\",\"app/serve.py\",\"--host\",\"0.0.0.0\",\"--port\",\"8000\",\"--data-dir\",\"/state/app-data\"]，端口与路径为字面量，无 `{port}`/`{data_dir}` 内插；runner.json 仅在整段 argv 元素位置使用 {case_id}/{base_url}/{app_root}/{data_dir}。对只读外部目标未主张重启通过，而是用自身适配器证明持久化。"
+   }
+  ],
+  "outcome": "passed",
+  "proposal_digest": "08ee02dc05613265bdb86fa501dc18ee8ca0c47031c09bdad1abea2935868684",
+  "scope": "Independent dimension-by-dimension specification design review of pinned proposal projections before new programs are authored; no execution or frozen-candidate acceptance. Full research facts and authored programs remain for separate frozen-candidate review.",
+  "subreviews": [
+   {
+    "checks": [
+     {
+      "dimension": "scenario_scope",
+      "files": [
+       "DRAFT.md"
+      ],
+      "outcome": "passed",
+      "reason": "已确认场景的目标「留存外部网页链接、日后找回并回到原页」对应 F01/F06/F07，五步流程第1–5步分别由 F01+F02、F02、F04、F05+F06、F07 覆盖，且四条验收（跨会话持久、URL 锚定并打开、归类移动/新建后重开仍有效、按归类或关键字找回）由 F08(A01/A05/A09)、F07(A08)、F03/F04(A04/A05/A12)、F05/F06(A06/A07) 逐条落实；phases.P0 的 features 为 F01–F11、acceptance 为 A01–A12，已包含保存、归类、检索、打开回跳与重启持久化等全部必需步骤，P1 仅承载 F12–F14 成熟增强（A13–A15），无不必要的前置扩张；F15–F24 的 not applicable/decision needed 归类与 limits 的排除说明（不云同步、不存快照、不失效检测、扁平单选、无置顶归档/复制/访问计数、不设未验证性能目标）与场景「选择一个简单归类」「本地单机个人收藏箱」的定位一致，未出现与当前修订相矛盾的承诺。"
+     }
+    ],
+    "outcome": "passed",
+    "projection_digest": "410aefafc420ab42f258664235bab61a286e479aa955afd114f6838fbdfce8ed",
+    "proposal_digest": "08ee02dc05613265bdb86fa501dc18ee8ca0c47031c09bdad1abea2935868684",
+    "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+    "stage": "blueprint-spec-review-1-scenario_scope",
+    "suggestions": [
+     "F03 的重命名/删除归类与 F09 的删除+撤销恢复（5 秒 Undo）并不直接出现在已确认场景的五步流程与四条验收文字中，建议在对应 reason 中显式标注它们服务于 GUIDANCE 的「可恢复的失败」与个人库误存清理，避免被读作范围外扩张。",
+     "F13 导入/导出与 F14 重复链接检测在 DRAFT 中 sources 为空、以「成熟产品的标准配置/趋向一址一记录」为由归入 P1，建议明确标注为可延后的成熟增强而非已确认需求，以免被误当作首期必须验收的能力。"
+    ],
+    "summary": "在 scenario_scope 维度上，DRAFT.md 的范围与已确认场景（scn_7756e0007f6a463a97316f3f49c15248，生活待购与灵感收藏夹）基本一致，且首期 P0 已闭环核心旅程：F01 保存、F02 默认「未整理」与「待购/家居改造/以后看看」预置归类、F03/F04 归类新建与记录迁移、F05 归类浏览计数、F06 按标题/域名/描述检索、F07 经 /go/{id} 回跳原页、F08 多会话与重启持久化、F09 可恢复删除、F10 校验与错误合同、F11 本地外壳首启，全部落在 P0（A01–A12）。场景五步流程与四条验收均有对应能力，无必需步骤被推迟到 P1；F12 元数据/图标、F13 导入导出、F14 重复检测作为成熟增强留在 P1，F15–F24 的排除项（扩展抓取、云同步、快照、失效检测、嵌套/多标签、置顶归档、分享协作、稍后读、复制 URL、访问计数）与 limits 及各 feature 的 reason 一致，未发现与当前承诺矛盾或虚假验收承诺。role 划分（R01 个人收藏者、R02 本地服务与页面外壳、R03 独立验收者）与场景受众及本地单机定位匹配。结论：范围匹配，无阻断项；仅建议对个别超出场景验收文字的辅助能力做显式定位说明。"
+   },
+   {
+    "checks": [
+     {
+      "dimension": "product_completeness",
+      "files": [
+       "DRAFT.md",
+       "ARCHITECTURE.md"
+      ],
+      "outcome": "passed",
+      "reason": "确认场景四类验收与工作流步骤均有对应 UI 入口：F01→/bookmarks/new（url/title/description/category，默认「未整理」+datalist），F02→默认归类，F03→/categories/new，F04→/bookmarks/{id}/move，F05→侧栏 /?category=…，F06→GET / q 表单，F07→href=/go/{id} target=_blank，F09→/bookmarks/{id}/delete 与紧随的 /bookmarks/{id}/restore 撤销表单，F11→GET / 空库外壳。ARCHITECTURE.md「UI 适配器合同」明确表单端点成功 303、失败 400 并显示错误，与「API 与错误合同」的 invalid_url/invalid_category/not_found/duplicate_url 语义一致，浏览器用户不依赖仅 API 的能力即完成主旅程；P0 验收 A01–A12 恰好覆盖保存、归类、浏览检索、回跳、删除撤销与错误恢复。"
+     }
+    ],
+    "outcome": "passed",
+    "projection_digest": "4c46f8698b0101c23568214a63c77f0567af268bc53c18e75c499c473cdc0df5",
+    "proposal_digest": "08ee02dc05613265bdb86fa501dc18ee8ca0c47031c09bdad1abea2935868684",
+    "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+    "stage": "blueprint-spec-review-1-product_completeness",
+    "suggestions": [
+     "F03 声明「归类管理（新建/重命名/删除）」但 UI 适配器合同只给出侧栏新建表单 /categories/new，未声明重命名/删除归类的浏览器入口：若这两项也属用户旅程，应补充对应界面表单，或明确其仅由 API 与 A04 验收覆盖（当前场景只显式要求「新建归类」，故不作为阻断）。",
+     "表单失败合同统一写为「失败返回 400 并显示错误信息」，但 JSON 合同把重复 URL（P1/F14）与恢复冲突定为 409 duplicate_url 且附 existing_id；建议明确 HTML 表单在 409 时同样回显错误与已有记录入口，避免浏览器用户遇到无提示的失败。",
+     "A06 要求「侧栏/接口给出的条目计数与实际一致」，而 UI 合同未明确侧栏是否渲染各归类计数；建议补一句说明侧栏展示 count，使该人类可见能力与验收断言对齐。"
+    ],
+    "summary": "就 product_completeness 而言，已确认场景的全部核心旅程均可经已声明界面到达：保存链接（含可选归类或落入「未整理」）经 /bookmarks/new 表单；新建归类经 /categories/new；在归类间移动经 /bookmarks/{id}/move；按归类浏览经侧栏 /?category=… 链接；关键字检索经 GET / 的 q 表单；打开原页经 /go/{id} 的 target=_blank 链接；删除与撤销经 /bookmarks/{id}/delete 与 /bookmarks/{id}/restore；空库首启由 GET / 渲染表单与列表容器。失败可恢复路径齐备：非法 URL/归类名经 HTML 表单返回 400 并显示错误，未知 id 返回 404，删除后用撤销表单恢复，D04 软删除与 A09 交付了场景要求的「可恢复失败」，多会话/重启保留由 F08 与实例隔离启动承接。未见阻断主旅程或与当前承诺矛盾之处。"
+   },
+   {
+    "checks": [
+     {
+      "dimension": "architecture_contract",
+      "files": [
+       "DRAFT.md",
+       "ARCHITECTURE.md"
+      ],
+      "outcome": "passed",
+      "reason": "ARCHITECTURE.md 的 categories/bookmarks 表落实了 D01/D02/D04/D06/D07：默认「未整理」、归类名 NOCASE 唯一、trashed_at 软删除、活动记录 URL 判重；保存/移动/重命名/恢复路径共用 400/404/409 的 {error:{code,message,field}} 合同；--data-dir 子目录、只读 --app-root、launch_app 同应用重启及 --base-url 验收与 D08/D09 的离线、无认证、隔离边界一致。P0 场景动作（保存、归类创建、移动、浏览/检索、打开、删除/撤销）均有对应 UI 与 API 入口。"
+     }
+    ],
+    "outcome": "passed",
+    "projection_digest": "1e88321503f9d829a0a3a8407bfa9870e150ece6f9e048b9c9d5c87df83c036a",
+    "proposal_digest": "08ee02dc05613265bdb86fa501dc18ee8ca0c47031c09bdad1abea2935868684",
+    "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+    "stage": "blueprint-spec-review-1-architecture_contract",
+    "suggestions": [
+     "明确 duplicate_url 409 的相位：D06/F14 将重复检测放在 P1，但 ARCHITECTURE.md 对 PATCH /api/bookmarks/{id} 与 /restore 的 409 未加相位限定；建议注明仅在 F14 启用后生效，或定义 P0 允许重复 URL 时的恢复行为。",
+     "明确 GET /api/categories 的 count 是否排除 trashed 记录，并固定分类按 position 排序，避免侧栏计数/顺序与默认列表不一致。",
+     "P1 导入/导出建议补充归类文件夹映射、skipped 对重复/非法项的规则及重复 URL 的规范化口径，使 D10/F14 的承诺可直接验收。"
+    ],
+    "summary": "architecture_contract 维度未发现阻断性问题：P0 核心旅程所需的默认归类、SQLite 数据模型、JSON 错误码、无认证隔离网络及每实例 data-dir/重启持久化合同相互一致，且可用 Python 标准库实现。"
+   },
+   {
+    "checks": [
+     {
+      "dimension": "phase_acceptance",
+      "files": [
+       "DRAFT.md",
+       "ARCHITECTURE.md"
+      ],
+      "outcome": "passed",
+      "reason": "P0 的 acceptance A01–A12 逐条覆盖 F01–F11：A01/A02/A03 覆盖保存与 URL/归类校验，A04 归类增删改，A05 归类间移动，A06 归类浏览与计数，A07 标题/域名/描述检索，A08 /go/{id} 302 打开原页，A09 删除+restore 恢复，A10 结构化错误无 5xx，A11 /api/health 与 GET / 表单外壳，A12 非法归类 400 invalid_category；F08 持久化经 A01/A05/A09 由同一冻结应用的 --app-root/--data-dir 每实例隔离 scratch 重启适配器验证，未以 base_url 结果替代。P1 仅含 F12–F14/A13–A15（离线降级、Netscape 导入导出、duplicate_url），属可选成熟项，P0 核心用例不依赖之。file_plan 中各 acceptance 实现路径与条目一致（A11 归 p0_library.py 等），runner.json 的 A01/A05/A09 带 --app-root/--data-dir、A14 带 --data-dir、其余仅 --base-url，与 common.py 及各程序声明的 flag 相符，接口可用且兼容。"
+     }
+    ],
+    "outcome": "passed",
+    "projection_digest": "d0b7bd3f659edcea203cf71e64c355dd2f9b571723bb267fbcfec8e01c1b63e2",
+    "proposal_digest": "08ee02dc05613265bdb86fa501dc18ee8ca0c47031c09bdad1abea2935868684",
+    "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+    "stage": "blueprint-spec-review-1-phase_acceptance",
+    "suggestions": [
+     "A02 断言“无点域名”被拒，但 ARCHITECTURE 的非法 URL 合同仅定义“非 http/https 或 hostname 为空”，无点主机名（如 http://localhost）按合同应被接受；请从 A02 移除该子情形，或在错误合同中显式加入无点主机名拒绝规则，消除用例与冻结合同的冲突。",
+     "p1_maturity.py 的 A13 引用 `GET /record/{id}`，该路由未在 API 或 UI 适配器合同中定义；请改用已定义的 `GET /api/bookmarks/{id}` 或列表页，避免引用不存在的接口。",
+     "P0 核心旅程验收几乎全部走 JSON API，仅 A11 校验 HTML 表单存在；建议至少一条保存/移动/删除经已声明的表单端点（/bookmarks/new 等，303 重定向）验证，或在验收说明中明确 JSON API 代表共享服务层的表单语义，以免浏览器用户界面能力仅停留在存在性检查。"
+    ],
+    "summary": "以 phase_acceptance 维度审查 DRAFT.md 的阶段/验收映射：P0 完整承载已确认核心旅程（保存、可选归类、未整理默认桶、移动、归类浏览计数、关键字检索、打开原页、删除与撤销、跨重启持久化、错误合同、空库外壳），P1 仅承接离线降级、导入导出与重复检测等成熟增强，无必需旅程步骤被推迟；A01–A15 的实现文件与 phases/features 一致，runner.json 的 flags 与 common.py/各程序声明吻合，A01/A05/A09 的重启持久化复用同一冻结应用的每实例隔离 scratch 子目录，符合适配器要求。总体通过；仅有两处用例与冻结接口合同的细节不一致需澄清。"
+   },
+   {
+    "checks": [
+     {
+      "dimension": "decisions_defaults",
+      "files": [
+       "DRAFT.md",
+       "ARCHITECTURE.md"
+      ],
+      "outcome": "passed",
+      "reason": "全部 13 条决策均显式含 default/impact/question/status/when_to_ask，且默认可逆并有真实触发：D01 单选归类标注可迁移到关联表不丢数据、D02 缺省归类落入“未整理”、D03 NOCASE 自动创建复用、D04 软删除加撤销且可后续加永久删除、D06 默认 409 附 existing_id 并可 allow_duplicate 放宽、D08/D09 属可替换的运行时与认证默认（暴露到局域网/公网即触发加认证）、D11/D12/D13 以 deferred/open 明确留待人类裁定；限值与架构中的默认（schema_meta、categories NOCASE UNIQUE、无 url 唯一索引、P1/F14 去重、验收不携带凭据）与决策陈述一致，未发现默认与确认场景冲突或虚假验收承诺。"
+     }
+    ],
+    "outcome": "passed",
+    "projection_digest": "1e88321503f9d829a0a3a8407bfa9870e150ece6f9e048b9c9d5c87df83c036a",
+    "proposal_digest": "08ee02dc05613265bdb86fa501dc18ee8ca0c47031c09bdad1abea2935868684",
+    "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+    "stage": "blueprint-spec-review-1-decisions_defaults",
+    "suggestions": [
+     "修正 ARCHITECTURE.md 第 14 行“后续按技术决策 D12 演进版本”的引用：D12 的实际主题是扁平单选归类与嵌套/标签延后，与 schema 迁移版本无关，应改为明确描述迁移版本决策或引用正确编号，避免决策编号被误用。",
+     "对齐 D12 状态“deferred”与 F19 applicability“decision needed”的措辞：若已判定嵌套/多标签延后到后期，宜在决策与特性条目间统一表述（deferred 对应延后期能力），或明确 F19 待用户裁定的具体触发阈值（如扁平归类数量或跨主题交叉检索需求），避免同一事项在两处呈现不同决策状态。"
+    ],
+    "summary": "decisions_defaults 维度通过：D01–D13 覆盖了数据模型、归类语义、默认收件区、去重、删除可恢复、检索字段、运行时/持久化、认证暴露、导入导出格式与云同步/嵌套/快照等适用面；每条均给出可逆的 documented default、影响面、问题与真实 when_to_ask 触发，并以 decided/deferred/open 区分默认决策与留待人类的决策，架构与 limits 中的默认值（NOCASE 归一、无 url 唯一索引、P1 去重、P0 无认证、0.0.0.0 仅隔离验收网络）与决策一致。仅发现编号引用与状态措辞两处非阻塞不一致，属澄清建议，不构成对已确认旅程、数据完整性或安全承诺的实质矛盾。"
+   },
+   {
+    "checks": [
+     {
+      "dimension": "runtime_protocol",
+      "files": [
+       "DRAFT.md",
+       "ARCHITECTURE.md"
+      ],
+      "outcome": "passed",
+      "reason": "交付 profile 为 python-web（合法，未出现无效的 web）（DRAFT.md architecture_markdown 首段、D08）。common.py 计划以 `os.path.dirname(os.path.abspath(__file__))` 自举 sys.path、“不依赖工作目录”，各用例以 `import common` 由脚本所在目录解析，符合 python /suite/acceptance/x.py 且 cwd 不定 的导入要求。`launch_app(app_root, data_dir, port)` 在 `{data_dir}/instances/<uuid>/` 建每实例隔离 scratch 并只把该子目录传给应用 `--data-dir`，架构与 file_plan 均明确“宿主 {data_dir} 根目录绝不是应用数据库”，满足 app_root 只读、data_dir 仅为测试者草稿 的隔离要求。A01/A05/A09 的重启适配器描述为：由只读 app_root 启动同一冻结应用 [python3, <app_root>/app/serve.py, --host, 127.0.0.1, --port, <空闲端口>, --data-dir, <实例子目录>]，轮询 /api/health 就绪、执行真实 HTTP 动作、终止进程、以相同实例子目录重启并观察持久化，正是契约要求的 same-application 进程适配器（DRAFT.md architecture_markdown「重启与持久化」、p0_library/p0_organize/p0_recovery 的 purpose）。所有 web 用例的 runner args 均含 --base-url（A01/A05/A09 另含 --app-root/--data-dir，A14 另含 --data-dir），未出现绕过 base_url 的行为断言；A05/A09 明确“重启适配器结果不替代 base_url 行为证据”。交付 start 为字面 argv [\"python3\",\"app/serve.py\",\"--host\",\"0.0.0.0\",\"--port\",\"8000\",\"--data-dir\",\"/state/app-data\"]，端口与路径为字面量，无 `{port}`/`{data_dir}` 内插；runner.json 仅在整段 argv 元素位置使用 {case_id}/{base_url}/{app_root}/{data_dir}。对只读外部目标未主张重启通过，而是用自身适配器证明持久化。"
+     }
+    ],
+    "outcome": "passed",
+    "projection_digest": "e09137511131e9978726c01a172ef9521187ea84312feb94f4aba774c38ccb0a",
+    "proposal_digest": "08ee02dc05613265bdb86fa501dc18ee8ca0c47031c09bdad1abea2935868684",
+    "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+    "stage": "blueprint-spec-review-1-runtime_protocol-v1",
+    "suggestions": [
+     "明确 `launch_app` 的实例复用接口（例如接受/返回实例子目录或实例 ID），使“以相同实例子目录重新启动”可实现；当前签名 `launch_app(app_root, data_dir, port)` 内部生成 uuid，若二次调用新建 uuid 会变成对全新库的断言而非持久化证据。",
+     "在 common.py 契约中明确 `parse_case_args()` 的 --app-root/--data-dir 为按用例可选：runner.json 只为 A01/A05/A09 提供 --app-root、只为 A14 提供 --data-dir，若解析器把缺参一律判非零将导致 A13/A15 误失败。",
+     "A13 计划中的 `GET /record/{id}` 不在 API/路由契约内，建议改用已有路由（`GET /` 或 `GET /api/bookmarks/{id}`），避免验收指向未定义接口。",
+     "澄清交付 start 的字面 `--data-dir /state/app-data` 是已部署应用自身的存储路径，与测试者 data_dir 草稿根（/state）及适配器每实例子目录 `/state/instances/<uuid>/` 相互区分，以免与 README「宿主 data_dir 根目录不作数据库」的表述相互混淆。"
+    ],
+    "summary": "按 RUNTIME_CONTRACT.md 逐条核对当前草案（DRAFT.md 含 architecture_markdown、acceptance、file_plan、README 计划）后，runtime_protocol 维度未发现与隔离测试者契约冲突的硬性缺陷：交付 profile 为合法的 python-web；验收程序仅用 Python 3.12 标准库并以 `os.path.dirname(os.path.abspath(__file__))` 自举 sys.path，不依赖工作目录；launch_app 在 `{data_dir}/instances/<uuid>/` 建每实例隔离 scratch 并把该子目录传给应用 `--data-dir`，宿主 data_dir 根不作应用数据库；A01/A05/A09 具备从只读 app_root 启动同一冻结应用、执行真实动作、终止并以相同实例子目录重启观察持久化的适配器，且明确其结论不替代 base_url 证据；所有 web 用例均以 `--base-url` 驱动；交付 start 为字面 argv 数组、无占位符内插；未对只读外部目标声称可重启。仅存可澄清的接口细节，不影响准入。"
+   }
+  ],
+  "suggestions": [
+   "F03 的重命名/删除归类与 F09 的删除+撤销恢复（5 秒 Undo）并不直接出现在已确认场景的五步流程与四条验收文字中，建议在对应 reason 中显式标注它们服务于 GUIDANCE 的「可恢复的失败」与个人库误存清理，避免被读作范围外扩张。",
+   "F13 导入/导出与 F14 重复链接检测在 DRAFT 中 sources 为空、以「成熟产品的标准配置/趋向一址一记录」为由归入 P1，建议明确标注为可延后的成熟增强而非已确认需求，以免被误当作首期必须验收的能力。",
+   "F03 声明「归类管理（新建/重命名/删除）」但 UI 适配器合同只给出侧栏新建表单 /categories/new，未声明重命名/删除归类的浏览器入口：若这两项也属用户旅程，应补充对应界面表单，或明确其仅由 API 与 A04 验收覆盖（当前场景只显式要求「新建归类」，故不作为阻断）。",
+   "表单失败合同统一写为「失败返回 400 并显示错误信息」，但 JSON 合同把重复 URL（P1/F14）与恢复冲突定为 409 duplicate_url 且附 existing_id；建议明确 HTML 表单在 409 时同样回显错误与已有记录入口，避免浏览器用户遇到无提示的失败。",
+   "A06 要求「侧栏/接口给出的条目计数与实际一致」，而 UI 合同未明确侧栏是否渲染各归类计数；建议补一句说明侧栏展示 count，使该人类可见能力与验收断言对齐。",
+   "明确 duplicate_url 409 的相位：D06/F14 将重复检测放在 P1，但 ARCHITECTURE.md 对 PATCH /api/bookmarks/{id} 与 /restore 的 409 未加相位限定；建议注明仅在 F14 启用后生效，或定义 P0 允许重复 URL 时的恢复行为。",
+   "明确 GET /api/categories 的 count 是否排除 trashed 记录，并固定分类按 position 排序，避免侧栏计数/顺序与默认列表不一致。",
+   "P1 导入/导出建议补充归类文件夹映射、skipped 对重复/非法项的规则及重复 URL 的规范化口径，使 D10/F14 的承诺可直接验收。",
+   "A02 断言“无点域名”被拒，但 ARCHITECTURE 的非法 URL 合同仅定义“非 http/https 或 hostname 为空”，无点主机名（如 http://localhost）按合同应被接受；请从 A02 移除该子情形，或在错误合同中显式加入无点主机名拒绝规则，消除用例与冻结合同的冲突。",
+   "p1_maturity.py 的 A13 引用 `GET /record/{id}`，该路由未在 API 或 UI 适配器合同中定义；请改用已定义的 `GET /api/bookmarks/{id}` 或列表页，避免引用不存在的接口。",
+   "P0 核心旅程验收几乎全部走 JSON API，仅 A11 校验 HTML 表单存在；建议至少一条保存/移动/删除经已声明的表单端点（/bookmarks/new 等，303 重定向）验证，或在验收说明中明确 JSON API 代表共享服务层的表单语义，以免浏览器用户界面能力仅停留在存在性检查。",
+   "修正 ARCHITECTURE.md 第 14 行“后续按技术决策 D12 演进版本”的引用：D12 的实际主题是扁平单选归类与嵌套/标签延后，与 schema 迁移版本无关，应改为明确描述迁移版本决策或引用正确编号，避免决策编号被误用。",
+   "对齐 D12 状态“deferred”与 F19 applicability“decision needed”的措辞：若已判定嵌套/多标签延后到后期，宜在决策与特性条目间统一表述（deferred 对应延后期能力），或明确 F19 待用户裁定的具体触发阈值（如扁平归类数量或跨主题交叉检索需求），避免同一事项在两处呈现不同决策状态。",
+   "明确 `launch_app` 的实例复用接口（例如接受/返回实例子目录或实例 ID），使“以相同实例子目录重新启动”可实现；当前签名 `launch_app(app_root, data_dir, port)` 内部生成 uuid，若二次调用新建 uuid 会变成对全新库的断言而非持久化证据。",
+   "在 common.py 契约中明确 `parse_case_args()` 的 --app-root/--data-dir 为按用例可选：runner.json 只为 A01/A05/A09 提供 --app-root、只为 A14 提供 --data-dir，若解析器把缺参一律判非零将导致 A13/A15 误失败。",
+   "A13 计划中的 `GET /record/{id}` 不在 API/路由契约内，建议改用已有路由（`GET /` 或 `GET /api/bookmarks/{id}`），避免验收指向未定义接口。",
+   "澄清交付 start 的字面 `--data-dir /state/app-data` 是已部署应用自身的存储路径，与测试者 data_dir 草稿根（/state）及适配器每实例子目录 `/state/instances/<uuid>/` 相互区分，以免与 README「宿主 data_dir 根目录不作数据库」的表述相互混淆。"
+  ],
+  "summary": "scenario_scope: passed; product_completeness: passed; architecture_contract: passed; phase_acceptance: passed; decisions_defaults: passed; runtime_protocol: passed"
+ },
+ "case_basis": {
+  "basis_digest": "a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589",
+  "case_refs": [
+   {
+    "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+    "digest": "d58ca8ae2ad37f581bbc79d1743df34657cdd651a43320db32ad3c4aeb275caf",
+    "evidence_digest": "706fa40ddf461e7cf1256f4b133979d5a019c6e7b848878c1be27bc75bd00d06",
+    "revision": 1
+   }
+  ],
+  "evidence_digest": "3226e826ef6d4f2b0a3051bb57fbe4023613fe756d9b7b5cbf0b7363d2efe88a",
+  "evidence_digests": {
+   "ev_ba200adf6e2c_05babdea64ba9858": "2be642fc8f35015df2b623af261894b765c1fb9106932c90805f80a6db2449fd",
+   "ev_ba200adf6e2c_06c81a165e03c96a": "b4373de490abd2fc3e1545595bc1aef7af5f1953c48b0816e39527dd68cdd600",
+   "ev_ba200adf6e2c_1596da4a90687ca5": "9738ecfec828bc93a93274ef07cd0eb86963a8ef677eb5fb0ce111beb3d2a41c",
+   "ev_ba200adf6e2c_2288b28e90cd8450": "1ebeb1e40d63cadc38f496131bc9f48610c3139b391ac6adb08b097ff39ad2e9",
+   "ev_ba200adf6e2c_3168bcd465b6a043": "389846b2bf6635cde3ef8161f1027bc19d99f423d7aee1c75c13bdb72936aa50",
+   "ev_ba200adf6e2c_35e41aab676021eb": "d6e7ebaee80c4ec90fb0e73e82b9df7b114ae35a66f5b44151c1377471ea5d3c",
+   "ev_ba200adf6e2c_3b553994c375aea5": "c90500dc23152ef3169a31cffd3461e6658c44a59c78717de9c86347de959c9c",
+   "ev_ba200adf6e2c_4c56ef30a1785be1": "afc1f95277bba05677cc73f352b93faf89c2396c957e36f962dedcc2bee005f1",
+   "ev_ba200adf6e2c_5011700a24e503c7": "d51afa6a8eea6ab32450d028bf4ffc560b2c0007698bd9ff6bf8402b2ea79a22",
+   "ev_ba200adf6e2c_515aa5d072bd2ec4": "49ea8eb4be0e58f25ff563a88a802f0e376b61cf72a9e0401a85d5969c976c59",
+   "ev_ba200adf6e2c_5d51c18a989c01f8": "377aeaeae058465469b6fe1959717ca365afd37673ba179c231e244e255e17eb",
+   "ev_ba200adf6e2c_6805376f7e2ee383": "4ea50a75bb0e27a6e885708b1593f7292c686a9b8f7212a4826fdafa38c93e45",
+   "ev_ba200adf6e2c_6bbd7a588896fe31": "a10fc2b280ae2e83eda3562e52f62fa390b5962f5fc8a32f5a1eba5f196d57ab",
+   "ev_ba200adf6e2c_7150b0ac7a5678db": "417f58299cbd24f45c2abf5da20809db08d1d4449513e6fce604746c740ceeb8",
+   "ev_ba200adf6e2c_7d47d725a2e9b759": "61df1547455c601ea568f92bc65237af3f6dc7298abc18a837f8943a283a1fed",
+   "ev_ba200adf6e2c_86ed2327f33a3ca8": "aaec85f888e49f2f7bf49cbb2c85bb7ecb79bfdbefb451f54c0513ffe217015e",
+   "ev_ba200adf6e2c_8e11efc61a4650ba": "5b5992d70729f93b9fbb0cb638e3f411035b63c039b315be37b48118e72576d5",
+   "ev_ba200adf6e2c_922f1dbc84912d99": "ac91e57b3dba519d9ffb913ca79f58946e36c37beccba7fad8d776ef436e038f",
+   "ev_ba200adf6e2c_93ef917a193a45ab": "5a62fabe586db5e0860e7f15b7618ca09a326564cbe846fffd5edf767dad4836",
+   "ev_ba200adf6e2c_93ff254508846f11": "5140e0f21c0580e0819eba9058916919e81482cab61d27274a444435732adb0d",
+   "ev_ba200adf6e2c_9ab6b0e51811a16d": "75434817f5a108c7b7b39668c58497de2b976947bdaa60495a5976f1ea5595b9",
+   "ev_ba200adf6e2c_9c7f6060878383fa": "7fe14da0e40fc7a3971695a98e45db3905cd89980fbfbe01fd719bf357d14315",
+   "ev_ba200adf6e2c_a2ebc864c5b6b3e7": "590e1663da363c0d40628033b036e2a9fca8adac9d36f7c06ec77c68b311c504",
+   "ev_ba200adf6e2c_b1ca64cf2ad02998": "eb9d0a5e4ed877eac8c088c53461ae82b096ba848c5a783cd29b30e3d16e5b25",
+   "ev_ba200adf6e2c_c4ad7e52e5713628": "267281aac7c69c5885e3382f0d16023a79d7b47575b8fe6356b76ae4407eacbf",
+   "ev_ba200adf6e2c_e62ae7e0a2c68ba1": "bedaf525785c18f436a430e24489689d9ad973b6e3be5b1896281550222371cb",
+   "ev_ba200adf6e2c_e7dd8d32c05c39f9": "134199e7260f757d7c708010991955293b629b4022be9c00b78a7de5df6e52e5",
+   "ev_ba200adf6e2c_ec303a2fd1afa287": "f2e6082bf490d98e7f508b61d6a29a5f05561c99fc07f308e61dd83888728c18",
+   "ev_ba200adf6e2c_f30eb4285ca66219": "51c3bca2ca4c2a10017a498dd2a0f533426b51ac3aeb4bf627fec81b7ab52ada"
+  },
+  "evidence_ids": [
+   "ev_ba200adf6e2c_05babdea64ba9858",
+   "ev_ba200adf6e2c_06c81a165e03c96a",
+   "ev_ba200adf6e2c_1596da4a90687ca5",
+   "ev_ba200adf6e2c_2288b28e90cd8450",
+   "ev_ba200adf6e2c_3168bcd465b6a043",
+   "ev_ba200adf6e2c_35e41aab676021eb",
+   "ev_ba200adf6e2c_3b553994c375aea5",
+   "ev_ba200adf6e2c_4c56ef30a1785be1",
+   "ev_ba200adf6e2c_5011700a24e503c7",
+   "ev_ba200adf6e2c_515aa5d072bd2ec4",
+   "ev_ba200adf6e2c_5d51c18a989c01f8",
+   "ev_ba200adf6e2c_6805376f7e2ee383",
+   "ev_ba200adf6e2c_6bbd7a588896fe31",
+   "ev_ba200adf6e2c_7150b0ac7a5678db",
+   "ev_ba200adf6e2c_7d47d725a2e9b759",
+   "ev_ba200adf6e2c_86ed2327f33a3ca8",
+   "ev_ba200adf6e2c_8e11efc61a4650ba",
+   "ev_ba200adf6e2c_922f1dbc84912d99",
+   "ev_ba200adf6e2c_93ef917a193a45ab",
+   "ev_ba200adf6e2c_93ff254508846f11",
+   "ev_ba200adf6e2c_9ab6b0e51811a16d",
+   "ev_ba200adf6e2c_9c7f6060878383fa",
+   "ev_ba200adf6e2c_a2ebc864c5b6b3e7",
+   "ev_ba200adf6e2c_b1ca64cf2ad02998",
+   "ev_ba200adf6e2c_c4ad7e52e5713628",
+   "ev_ba200adf6e2c_e62ae7e0a2c68ba1",
+   "ev_ba200adf6e2c_e7dd8d32c05c39f9",
+   "ev_ba200adf6e2c_ec303a2fd1afa287",
+   "ev_ba200adf6e2c_f30eb4285ca66219"
+  ],
+  "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+  "scenario_revision": 2,
+  "source_snapshots": [
+   {
+    "archive_sha256": "8d7d5423093436727aa1dbb47ce8dc1bae715de309ac22bc65e650913f91af39",
+    "collected_at": "2026-10-19T06:03:21.864088+00:00",
+    "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+    "excluded_paths": [],
+    "file_manifest_digest": "b2af66143ffc52e3591c248ca1cdff66e6f24388ae797e9784dc9908fdf6ce4b",
+    "files": {
+     ".gitignore": "20e30f7d2feddb1cf1914aec96dc9a694c2aca0f02efbac0523d5a846dc82dc1",
+     ".prettierignore": "dc4cc2ab6231b00bb0dc801c9b7d463f8273b1557f98519b3d18570a487d03fe",
+     ".prettierrc": "d4eeddaeb3c416ceedf4c165dd4048d8d4596a6a5216fb54e54751fe2b80634b",
+     ".vscode/settings.json": "fa8d97f9abffb85cca63607cb22ba9cbf4e18d841a087e75d8edc02822d8bf1f",
+     "LICENSE": "17e5ccdd3ca04fa001985e8b3370d70d357f858d491b5691a461fd5985834a44",
+     "README.md": "b49b8acb566472b0d377438114d662854b4fb93c90b4cbde180c7dac588e3a93",
+     "bun.lock": "60d16e5afd1af76799de1e459bea78c1b66a0d022388ebc9c10daa9920023086",
+     "eslint.config.js": "21723b58d2f8d88320bcf607dde20041f6fd52a6b06864636776b76b4c2b5c0e",
+     "favicon.svg": "11ed7b3e1c389fe1b736dff5bf8df3dc700dcd9e1fdaebda6fbd9417c0e6b69e",
+     "index.html": "6cbf0e25606a5627e6e3e6ceff394929691edf2d6417df922ecdca3321524eab",
+     "package.json": "a0df38a4bf76cb70e4a46fed0487345b3bd89ee98ec8b69f48bfca95260c6e90",
+     "preview.png": "346d46f64f374faf3f7f901e53273df285f9eb2f34c4aabc712b32a0ceb945b9",
+     "src/App.tsrx": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+     "src/includes/Icon.tsrx": "b807d863fd08b06210341652a6a5a85dd063122d3fc12aef1163c45c85d7e23e",
+     "src/includes/store.ts": "b4dc58a7a48cd9929f3d35f31aef9fd5eb2b0b0606cdf735ce436a1e162b07ed",
+     "src/includes/utils.ts": "d581eb982ce67b285056a74ab02d31a6a6a957423340da078e4ae89d9004189c",
+     "src/index.css": "6c319086d7e7fa9298abab36a28618932d4f3a4a2c69f969b774ff6cf3aef3d7",
+     "src/index.ts": "8fd34f45b8e3392cfad6650602b1704af7e4b150cae22e74332555ce69406ba8",
+     "tsconfig.json": "db25efbcc189ea0e0679f48928d8491ef10358c569977399031018ce0b5f438f",
+     "vite.config.js": "ffd99be0c5dda12dbc1d6dd21ea11c94581a9df9ed9df3659c645c6a0f9c5974"
+    },
+    "license": {
+     "notice_hashes": {
+      "LICENSE": "17e5ccdd3ca04fa001985e8b3370d70d357f858d491b5691a461fd5985834a44"
+     },
+     "spdx_id_supplement": "MIT",
+     "supplement_collected_at": "2026-10-19T06:03:21.864088+00:00",
+     "supplement_source": "GitHub repository metadata for the current default branch; not evidence of the pinned commit license"
+    },
+    "license_files": [
+     "LICENSE"
+    ],
+    "license_uncertainties": [
+     "Repository API license metadata is a current default-branch supplement; pinned-version terms are represented by fixed LICENSE/NOTICE files and their hashes."
+    ],
+    "repo_id": "1247664857",
+    "repository": "https://github.com/lakhindarpal/bookmark-manager",
+    "snapshot_id": "src_3a8113f49b44ef3b3d7a7fca",
+    "strategy_version": "github-safe-archive-v1"
+   }
+  ]
+ },
+ "v1": {
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "plan_digest": "1f7701fbf5f52dde011dee76196b2cb01697e10190c6ad17c1273f4b5dcc3d30",
+  "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+  "policy_version": "atlas.factory-v1.1",
+  "product_id": "product-c42848f63251507bd9d911a5",
+  "segment": "G1"
+ },
+ "case_design": [
+  {
+   "capability": "个人收藏库本地持久化：整个收藏集合写入浏览器 IndexedDB 单表，应用每次打开时全量载入，保存或删除立即落盘，关闭再打开后仍在。",
+   "disposition": "adopted",
+   "evidence_ids": [
+    "ev_ba200adf6e2c_515aa5d072bd2ec4",
+    "ev_ba200adf6e2c_35e41aab676021eb",
+    "ev_ba200adf6e2c_86ed2327f33a3ca8",
+    "ev_ba200adf6e2c_6805376f7e2ee383"
+   ],
+   "reason": "场景验收第1条要求“主动保存的链接在多次会话之间持久保留，形成不断增长的个人收藏”，上游 Dexie 单表 + 内存映射 + put/delete 落盘已直接满足，README 也定位为 local-first。差异仅在于记录结构增加归类字段，持久化机制原样沿用。"
+  },
+  {
+   "capability": "记录以外部网页 URL 锚定：每条收藏持有 id、url、hostname（及可选标题/图标），点击记录在新标签打开原始网页。",
+   "disposition": "adopted",
+   "evidence_ids": [
+    "ev_ba200adf6e2c_9c7f6060878383fa",
+    "ev_ba200adf6e2c_93ff254508846f11",
+    "ev_ba200adf6e2c_5011700a24e503c7"
+   ],
+   "reason": "场景验收第2条与流程第5步要求“打开记录即跳转到该页面，回到原始网页继续购买、阅读或参考”。上游 Visit 正是保存后以 window.open(noopener,noreferrer) 打开，hostname 由 URL 派生。差异是场景不需要访问计数与 visitedAt，只保留打开动作与域名派生。"
+  },
+  {
+   "capability": "新增/编辑收藏的表单：填写 URL 与标题，URL 必须为合法 http/https 且含点域名，编辑时回填原字段并保留 id 与创建时间。",
+   "disposition": "adopted",
+   "evidence_ids": [
+    "ev_ba200adf6e2c_05babdea64ba9858",
+    "ev_ba200adf6e2c_06c81a165e03c96a",
+    "ev_ba200adf6e2c_1596da4a90687ca5"
+   ],
+   "reason": "场景流程第1-2步是“浏览中看到想记住的页面便主动保存”，需要可信录入与校验。上游 Valibot 表单校验、编辑回填并保留 id/createdAt 的行为可复用；差异是把“1-5 个标签必填”改为“选择或新建一个归类”，描述字段按场景需要保留为可选。"
+  },
+  {
+   "capability": "用单一“归类”字段取代多标签：每条记录只归属一个归类，侧栏按归类聚合条目数并支持按归类筛选浏览。",
+   "disposition": "adjusted",
+   "evidence_ids": [
+    "ev_ba200adf6e2c_9c7f6060878383fa",
+    "ev_ba200adf6e2c_9ab6b0e51811a16d",
+    "ev_ba200adf6e2c_c4ad7e52e5713628"
+   ],
+   "reason": "场景明确“保存时选择一个简单归类”，是单归属分类而非多标签。上游是扁平 tags[] + 标签侧栏 + 计数 + 多标签交集筛选，需要把多值匹配改造为单选归属；计数与侧栏交互逻辑沿用，语义由“标签出现次数”变为“每归类条目数”。"
+  },
+  {
+   "capability": "默认归类：未选择归类即保存的链接自动落入“未整理”默认归类，之后可被手动移动。",
+   "disposition": "new_design",
+   "evidence_ids": [],
+   "reason": "场景流程第3步“未经整理的链接可先进入默认归类，之后再手动移动到更合适的位置”是上游完全没有的概念——上游只有 Home/Archived 两个视图，没有默认桶。快速保存不打断浏览依赖这一设计，属场景新增。"
+  },
+  {
+   "capability": "归类管理：用户可新建归类（如“待购”“家居改造”“以后看看”），并把记录从一个归类移动到另一个归类，移动结果持久化。",
+   "disposition": "new_design",
+   "evidence_ids": [],
+   "reason": "场景验收第3条要求“在归类之间移动记录或新建归类，操作结果在重新打开后仍然有效”。上游明确没有 collections/folders，也不持久化任何视图状态，因此新建归类与移动归类必须新设计并落库。"
+  },
+  {
+   "capability": "归类浏览与关键字检索：先按归类列出，再在结果内用关键字匹配标题与域名（必要时含描述），默认按最近保存倒序。",
+   "disposition": "adjusted",
+   "evidence_ids": [
+    "ev_ba200adf6e2c_9ab6b0e51811a16d",
+    "ev_ba200adf6e2c_c4ad7e52e5713628"
+   ],
+   "reason": "场景验收第4条要求“通过归类浏览或关键字检索找到此前存入的特定链接”。上游检索只匹配 title.toLowerCase() 且带 pinned-first 排序，多值标签筛选也需并入归类。差异是扩大匹配字段到 hostname/描述，以覆盖“只记得是哪个网站”的找回场景。"
+  },
+  {
+   "capability": "首次使用的起始归类集合：预置“待购”“家居改造”“以后看看”与默认“未整理”，用户可在此基础上增删。",
+   "disposition": "adjusted",
+   "evidence_ids": [
+    "ev_ba200adf6e2c_05babdea64ba9858"
+   ],
+   "reason": "场景把这三类作为保存时的直接选项，属场景语境的默认数据。上游新建记录只写入 id/hostname/时间等默认字段，没有任何预置分类。这里借用其“新记录写入默认字段”的初始化思路，把预置归类作为应用初始数据而非记录字段。"
+  },
+  {
+   "capability": "删除收藏并支持短时撤销：删除任意记录并弹出带“撤销”的操作提示，点击撤销即恢复。",
+   "disposition": "adjusted",
+   "evidence_ids": [
+    "ev_ba200adf6e2c_4c56ef30a1785be1"
+   ],
+   "reason": "上游删除仅对归档项开放且配 5 秒 Undo 恢复。场景没有归档，用户会想直接清理误存链接。保留“删除 + 撤销恢复”的错误兜底机制，去掉“仅归档可删”的前置限制。"
+  },
+  {
+   "capability": "不做置顶/归档：不引入 isPinned/isArchived，也不让编辑、删除出现“仅归档项可用”的分支。",
+   "disposition": "not_adopted",
+   "evidence_ids": [
+    "ev_ba200adf6e2c_b1ca64cf2ad02998",
+    "ev_ba200adf6e2c_06c81a165e03c96a"
+   ],
+   "reason": "场景是“先留存、稍后再处理”的收藏箱，没有归档-清空的工作流，置顶也不解决“待购/灵感”的浏览诉求；保留归档反而给编辑与删除加额外前置条件，与快速保存、快速清理相冲突。"
+  },
+  {
+   "capability": "图标与元数据的轻量获取：保存时优先由域名派生 favicon 本地显示，第三方元数据（标题/描述/封面）仅作可选增强，失败静默降级。",
+   "disposition": "adjusted",
+   "evidence_ids": [
+    "ev_ba200adf6e2c_8e11efc61a4650ba",
+    "ev_ba200adf6e2c_ec303a2fd1afa287",
+    "ev_ba200adf6e2c_5011700a24e503c7"
+   ],
+   "reason": "场景希望能一眼辨认“商品页/教程/灵感图”，但上游依赖 api.microlink.io、images.weserv.nl、Google s2 三个未经运行验证的第三方端点，失败只 console.error。差异是把可用性依赖降为本地域名派生，把外部抓取降级为增强，避免保存流程被第三方可达性阻塞。"
+  },
+  {
+   "capability": "不做多排序模式与置顶优先：只保留“最近保存”倒序一种默认顺序。",
+   "disposition": "not_adopted",
+   "evidence_ids": [
+    "ev_ba200adf6e2c_9ab6b0e51811a16d"
+   ],
+   "reason": "场景关注“找到此前存下的东西”，不涉及按访问次数排序或置顶。上游三种排序（最近添加/最近访问/访问最多）+ pinned-first 属书签阅读器语境，对收藏箱是冗余操作面。"
+  },
+  {
+   "capability": "不做“复制 URL”动作：收藏箱的目标是回到原页而非分发链接。",
+   "disposition": "not_adopted",
+   "evidence_ids": [
+    "ev_ba200adf6e2c_7150b0ac7a5678db"
+   ],
+   "reason": "上游 Copy URL 面向分享或复用链接；本场景流程终点是“从记录打开链接，回到原始网页继续购买、阅读或参考”，复制并非必需，去掉可减少每条记录的操作噪音。"
+  },
+  {
+   "capability": "单页应用外壳：index.html 提供 #root，入口模块挂载应用并在根节点缺失时报错。",
+   "disposition": "adopted",
+   "evidence_ids": [
+    "ev_ba200adf6e2c_5d51c18a989c01f8",
+    "ev_ba200adf6e2c_a2ebc864c5b6b3e7"
+   ],
+   "reason": "场景是纯个人本地工具、无服务端需求，上游 SPA 挂载方式与本地优先定位一致，可直接沿用为运行外壳。差异仅在挂载的组件内部替换为收藏箱视图，属于结构性沿用。"
+  },
+  {
+   "capability": "浏览视图状态（当前选中归类、搜索词）仅保留在会话内存中，不写入本地库。",
+   "disposition": "adopted",
+   "evidence_ids": [
+    "ev_ba200adf6e2c_2288b28e90cd8450"
+   ],
+   "reason": "场景只要求“归类归属与移动结果在重开后仍然有效”，并未要求记住上次浏览位置。上游把 tab/标签筛选/排序/搜索放在组件本地状态而不落库，恰好划出“数据持久、视图不持久”的边界，避免浏览状态污染收藏数据。"
+  }
+ ]
+}

@@ -244,6 +244,20 @@ def research_context(research):
     )
 
 
+def research_from_accepted_facts(raw_research, facts_view):
+    """Make generation-facing research from the immutable host facts view only."""
+    accepted_ids = set(facts_view.get("accepted_evidence_ids", []))
+    sources = [source for source in raw_research["sources"] if source.get("name") in accepted_ids]
+    summary = "\n\n".join(
+        f'{fact["evidence_id"]} [{fact["kind"]}]: {fact["statement"]}'
+        for fact in facts_view["facts"]
+    )
+    gaps = []
+    for item in facts_view.get("unknowns", []):
+        gaps.extend([f'Unverified case limitation ({item["case_id"]} r{item["case_revision"]}); not accepted evidence:', item["statement"]])
+    return validate_research({"sources": sources, "summary": summary, "gaps": gaps})
+
+
 def validate_file_plan(value, allow_reuse=False, require_runtime=False):
     if (
         not isinstance(value, dict)
@@ -367,7 +381,7 @@ def replace_exact(content, changes, label):
     return content
 
 
-def apply_spec_revision(plan, response):
+def apply_spec_revision(plan, response, allowed_paths=None):
     """Apply value-checked deltas, retaining all unaddressed proposal fields."""
     if not isinstance(response, dict) or not set(response) <= {
         "spec_changes",
@@ -394,6 +408,8 @@ def apply_spec_revision(plan, response):
         if not isinstance(path, list) or not all(isinstance(p, str) for p in path):
             raise FactoryError("invalid spec field path")
         key = tuple(path)
+        if allowed_paths is not None and key not in allowed_paths:
+            raise FactoryError("spec change is outside the queued field scope", "patch_conflict", 409)
         if key in seen:
             raise FactoryError("duplicate spec field change")
         seen.add(key)
@@ -509,6 +525,7 @@ def render_candidate(result, research, snapshot, candidate, job_id):
     if snapshot.get("v1"):
         value.update({"factory_policy": "atlas.factory-v1.1", "case_basis": snapshot["case_basis"],
                       "admission": snapshot.get("admission"), "case_design": snapshot.get("case_design", []),
+                      "case_facts_view": snapshot.get("case_facts_view"),
                       "phase_required_evidence": {spec["phases"][0]["id"]: [
                           {"id": "independent-core-journey", "kind": "external",
                            "executor": "atlas-independent-acceptance-v1",
@@ -523,7 +540,11 @@ def render_candidate(result, research, snapshot, candidate, job_id):
     if snapshot.get("v1"):
         atomic_json(candidate / "inputs/case-basis.json", snapshot["case_basis"])
         atomic_json(candidate / "inputs/case-design.json", snapshot.get("case_design", []))
-        value["evidence"] = [{"path": "inputs/case-basis.json", "scope": "Fixed shared case revisions and evidence digests; no upstream/downstream runtime claim."}]
+        atomic_json(candidate / "inputs/accepted-case-facts.json", snapshot["case_facts_view"])
+        value["evidence"] = [
+            {"path": "inputs/case-basis.json", "scope": "Fixed shared case revisions and evidence digests; no upstream/downstream runtime claim."},
+            {"path": "inputs/accepted-case-facts.json", "scope": "Host-derived accepted observation view; legacy checkpoints remain explicitly labeled and are not upgraded."},
+        ]
         atomic_json(candidate / "template.json", value)
     atomic_json(
         candidate / "acceptance/plan.json",
@@ -909,11 +930,34 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                 apply_research_protocol_repair(raw_research, repair_response)
             )
         research = checkpoint("blueprint-research", lambda: research)
+    if snapshot.get("v1"):
+        library = CaseLibrary(pipeline.store, initialize=False)
+        accepted_checkpoint = pipeline.store.checkpoint(job["id"], "blueprint-accepted-facts-view")
+        with pipeline.store.connect() as con:
+            prior_plan = con.execute(
+                "SELECT 1 FROM checkpoint WHERE job_id=? AND (name='case-adaptation' OR "
+                "(name LIKE 'blueprint-%' AND name NOT LIKE 'blueprint-research%' "
+                "AND name!='blueprint-accepted-facts-view')) LIMIT 1",
+                (job["id"],),
+            ).fetchone()
+        if prior_plan and accepted_checkpoint is None:
+            # A legacy plan checkpoint is never silently reinterpreted. It may
+            # resume only while every pinned canonical observation is accepted.
+            snapshot["case_facts_view"] = library.legacy_facts_marker(snapshot["case_basis"])
+        else:
+            facts_view = checkpoint(
+                "blueprint-accepted-facts-view",
+                lambda: library.accepted_facts_view(snapshot["case_basis"], digest(research)),
+            )
+            library.validate_facts_view(facts_view, snapshot["case_basis"])
+            research = research_from_accepted_facts(research, facts_view)
+            snapshot["case_facts_view"] = facts_view
     context = attempt / "context"
     context.mkdir()
     (context / "RESEARCH.md").write_text(research_context(research))
     if snapshot.get("v1"):
         atomic_json(context / "CASE_BASIS.json", snapshot["case_basis"])
+        atomic_json(context / "ACCEPTED_CASE_FACTS.json", snapshot["case_facts_view"])
         adaptation = checkpoint("case-adaptation", lambda: agent(
             "case-adaptation", "Read source/CASE_BASIS.json and source/RESEARCH.md. These are fixed shared canonical case facts, never rewrite identities or claim runtime. Return {\"choices\":[{\"evidence_ids\":[\"existing ID\"],\"disposition\":\"adopted|adjusted|new_design|not_adopted\",\"capability\":\"concrete scene capability\",\"reason\":\"why and difference\"}]}. Explain actual scenario adaptation, not a generic list. New design may use an empty evidence list; all borrowed decisions must reference existing evidence IDs. Do not search or execute.",
             {"scenario": snapshot["scenario"], "language": config.get("language", "zh")}, context))
@@ -937,7 +981,7 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
     )
     (context / "FORMAT.md").write_text(
         GENERATE_PROMPT + ("\n" + RUNTIME_PROTOCOL_GUIDANCE if runtime_protocol else "")
-        + ("\nV1: Read CASE_BASIS.json and CASE_DESIGN.json. Host-owned fixed case/evidence IDs are immutable; use research source IDs in features. Distinguish borrowed behavior, adaptations and new designs in architecture and reasons. V1 downstream profile is python-web on Python3.12 with standard library/SQLite; acceptance must use Python standard library, not npm/Playwright dependencies. Real UI journey will also be checked by an independent executor outside the suite. Do not invent runtime results. Keep P0 complete and executable offline. Cases and source have already been researched; do not search again." if snapshot.get("v1") else "")
+        + ("\nV1: Read CASE_BASIS.json, ACCEPTED_CASE_FACTS.json, and CASE_DESIGN.json. Host-owned fixed case/evidence IDs are immutable; use research source IDs in features. Distinguish borrowed behavior, adaptations and new designs in architecture and reasons. V1 downstream profile is python-web on Python3.12 with standard library/SQLite; acceptance must use Python standard library, not npm/Playwright dependencies. Real UI journey will also be checked by an independent executor outside the suite. Do not invent runtime results. Keep P0 complete and executable offline. Cases and source have already been researched; do not search again." if snapshot.get("v1") else "")
     )
     if runtime_protocol:
         (context / "RUNTIME_PROTOCOL.md").write_text(RUNTIME_PROTOCOL_GUIDANCE)
@@ -953,7 +997,13 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
         from .artifacts import copy_tree
 
         previous = controlled_path(pipeline.store, repair["bundle_path"])
-        verify_frozen(previous, repair["digest"])
+        previous_spec = verify_frozen(previous, repair["digest"])
+        if snapshot.get("v1"):
+            from .cases import CaseLibrary
+            library = CaseLibrary(pipeline.store, initialize=False)
+            if previous_spec.get("case_basis") != snapshot.get("case_basis"):
+                raise FactoryError("previous template case basis differs; create a formal case/template rebase", "case_facts_view_invalid", 409)
+            library.validate_facts_view(previous_spec.get("case_facts_view"), snapshot["case_basis"])
         copy_tree(previous / "source", context / "previous")
         (context / "REVISION.md").write_text(
             "\n".join(
@@ -1000,6 +1050,69 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
         prior_plan = plan
 
         def propose():
+            if repair and repair.get("spec_edit_paths") is not None:
+                pinned = verify_frozen(previous, repair["digest"])
+                fields = tuple(sorted(AUTHORED_FIELDS))
+                base_plan = {
+                    "spec": {key: pinned[key] for key in fields},
+                    "file_plan": [
+                        {
+                            "path": name,
+                            "purpose": "Pinned program retained byte-for-byte during the queued specification-only repair.",
+                            "reuse": True,
+                        }
+                        for name in sorted(tree_manifest(previous / "source"))
+                        if name.startswith(("acceptance/", "references/"))
+                        and name != "acceptance/plan.json"
+                    ],
+                }
+                repair_context = attempt / ("spec-edit-context-" + str(index))
+                repair_context.mkdir(exist_ok=True)
+                for filename in (
+                    "SPECIFICATION.json", "ARCHITECTURE.md", "DESIGN_FEEDBACK.md",
+                    "REVISION.md", "GUIDANCE.md", "RUNTIME_PROTOCOL.md", "RUNTIME_CONTRACT.md",
+                ):
+                    source_file = context / filename
+                    if source_file.exists():
+                        (repair_context / filename).write_text(source_file.read_text())
+                atomic_json(repair_context / "SPECIFICATION.json", base_plan)
+                (repair_context / "ARCHITECTURE.md").write_text(pinned["architecture_markdown"])
+                raw = agent(
+                    "blueprint-generate-" + str(index) + "-spec-patch",
+                    SPEC_REPAIR_PROMPT,
+                    {
+                        "language": config.get("language", "zh"),
+                        "repair_mode": "exact-spec-patch",
+                        "base_proposal_digest": digest(base_plan),
+                        "confirmed_scenario": snapshot["scenario"],
+                        "failure_evidence": errors,
+                        "authorized_spec_paths": repair["spec_edit_paths"],
+                        "source_inventory": sorted(tree_manifest(repair_context)),
+                    },
+                    repair_context,
+                    budget_scope="blueprint-generate",
+                )
+                revised = apply_spec_revision(
+                    base_plan, raw, {tuple(path) for path in repair["spec_edit_paths"]}
+                )
+                if raw.get("file_plan_changes"):
+                    raise FactoryError("spec-only repair cannot change the program file plan", "patch_conflict", 409)
+                if any(not row.get("reuse") for row in revised["file_plan"]):
+                    raise FactoryError("spec-only repair must reuse every pinned program", "patch_conflict", 409)
+                validate_file_plan(revised, allow_reuse=True, require_runtime=bool(runtime_protocol))
+                atomic_json(context / ("SPEC_REVISION_" + str(index) + ".json"), {
+                    "baseline_artifact_digest": repair["digest"],
+                    "baseline_spec_digest": repair["spec_baseline_digest"],
+                    "base_proposal_digest": digest(base_plan),
+                    "model_response": raw,
+                    "model_response_digest": digest(raw),
+                    "effective_proposal_digest": digest(revised),
+                    "changed_fields": [change["path"] for change in raw["spec_changes"]],
+                    "file_plan_changes": raw.get("file_plan_changes", []),
+                    "scope": repair["spec_edit_paths"],
+                    "scope_description": "Host-enforced exact specification patch; complete pinned program inventory reused byte-for-byte; not acceptance evidence.",
+                })
+                return revised
             if repair and repair.get("reuse_spec"):
                 pinned = verify_frozen(previous, repair["digest"])
                 fields = (
@@ -1469,9 +1582,13 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             "model": config["model"],
             "research_digest": digest(research),
             "sources": research["sources"],
+            "case_facts_view": snapshot.get("case_facts_view"),
             "supersedes": snapshot.get("cognitive_repair", {}).get("id"),
             "edit_paths": snapshot.get("cognitive_repair", {}).get("edit_paths"),
             "reuse_spec": snapshot.get("cognitive_repair", {}).get("reuse_spec", False),
+            "spec_edit_paths": snapshot.get("cognitive_repair", {}).get("spec_edit_paths"),
+            "spec_patch_baseline_digest": snapshot.get("cognitive_repair", {}).get("spec_baseline_digest"),
+            "repair_request_digest": snapshot.get("repair_request_digest"),
             "spec_review": design_report,
             **({"case_basis": snapshot["case_basis"], "v1": snapshot["v1"], "case_design": snapshot.get("case_design", [])} if snapshot.get("v1") else {}),
         },
@@ -1682,8 +1799,10 @@ def queue_repair(store, artifact, value):
     bundle = controlled_path(store, artifact["bundle_path"])
     spec = verify_frozen(bundle, artifact["digest"])
     edit_paths = value.get("edit_paths")
+    spec_edit_paths = value.get("spec_edit_paths")
     reuse_spec = value.get("reuse_spec", False)
-    if not isinstance(reuse_spec, bool) or (reuse_spec and edit_paths is None):
+    if (not isinstance(reuse_spec, bool) or (reuse_spec and edit_paths is None)
+            or (spec_edit_paths is not None and (reuse_spec or edit_paths is not None))):
         raise FactoryError("reuse_spec requires an explicit program edit scope")
     if edit_paths is not None:
         if not isinstance(edit_paths, list) or not edit_paths or len(edit_paths) > 200:
@@ -1696,6 +1815,26 @@ def queue_repair(store, artifact, value):
             for path in edit_paths
         ):
             raise FactoryError("edit_paths must name unique pinned program files")
+    allowed_spec_paths = None
+    if spec_edit_paths is not None:
+        if not isinstance(spec_edit_paths, list) or not spec_edit_paths or len(spec_edit_paths) > 200:
+            raise FactoryError("spec_edit_paths must be a nonempty bounded path list")
+        fields = spec.get("decisions", [])
+        allowed_spec_paths = set()
+        for path in spec_edit_paths:
+            if (not isinstance(path, list) or not path or not all(isinstance(p, str) and p for p in path)):
+                raise FactoryError("spec_edit_paths must contain field paths")
+            key = tuple(path)
+            if key == ("architecture_markdown",):
+                exists = isinstance(spec.get("architecture_markdown"), str)
+            elif len(key) == 3 and key[0] == "decisions" and key[2] not in {"id", "status"}:
+                matches = [row for row in fields if row.get("id") == key[1]]
+                exists = len(matches) == 1 and key[2] in matches[0] and isinstance(matches[0][key[2]], str)
+            else:
+                exists = False
+            if not exists or key in allowed_spec_paths:
+                raise FactoryError("spec_edit_paths must name unique existing architecture or decision text fields")
+            allowed_spec_paths.add(key)
     model = text(
         value.get("model", artifact["provenance"].get("model")), "provider/model", 200
     )
@@ -1750,14 +1889,25 @@ def queue_repair(store, artifact, value):
             "note": note,
             "edit_paths": edit_paths,
             "reuse_spec": reuse_spec,
+            "spec_edit_paths": [list(path) for path in sorted(allowed_spec_paths)] if allowed_spec_paths is not None else None,
+            "spec_baseline_digest": digest({key: spec[key] for key in AUTHORED_FIELDS}),
             "acceptances": artifact["acceptances"],
             "research": pinned_research(store, artifact, bundle, spec),
         },
     }
     if original.get("v1"):
         snapshot.update({key: original[key] for key in ("v1", "case_basis", "admission") if key in original})
-    request_digest = digest({"artifact_id": artifact["id"], "artifact_digest": artifact["digest"],
-                             "note": note, "scope": edit_paths, "reuse": reuse_spec, "config": config})
+    request_identity = {
+        "artifact_id": artifact["id"],
+        "artifact_digest": artifact["digest"],
+        "note": note,
+        "scope": edit_paths,
+        "reuse": reuse_spec,
+        "config": config,
+    }
+    if snapshot["cognitive_repair"]["spec_edit_paths"] is not None:
+        request_identity["spec_scope"] = snapshot["cognitive_repair"]["spec_edit_paths"]
+    request_digest = digest(request_identity)
     snapshot["repair_request_digest"] = request_digest
     batch_id, job_id, at = uid("bat"), uid("job"), now()
     ledger = None

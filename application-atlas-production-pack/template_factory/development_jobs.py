@@ -837,7 +837,8 @@ def run_development(pipeline, job, attempt, agent, stage, checkpoint):
             "development-response-" + str(index),
             lambda name=name, prompt=prompt, payload=payload, source=agent_source if (index or business_repair) else root: (
                 agent(name, prompt, payload, source,
-                      budget_stage="p0-delivery:" + snapshot["input_digest"])
+                      budget_stage="p0-delivery:" + snapshot["input_digest"],
+                      budget_scope="p0-delivery")
             ),
         )
         try:

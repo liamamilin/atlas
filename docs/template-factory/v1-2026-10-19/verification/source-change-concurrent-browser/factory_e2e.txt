@@ -1,0 +1,453 @@
+
+> test:e2e:factory
+> playwright test --config playwright.factory.config.ts --reporter=line
+
+[WebServer] (node:88220) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 27 tests using 1 worker
+
+(node:88222) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/27] e2e/factory-tests/blueprint-runtime.spec.ts:23:1 › blueprint runtime submission requires adapter, source ZIP and execution consent, without a model field
+[2/27] e2e/factory-tests/blueprint-runtime.spec.ts:45:1 › runtime result exposes startup diagnostics, case evidence and cleanup errors
+  1) e2e/factory-tests/blueprint-runtime.spec.ts:45:1 › runtime result exposes startup diagnostics, case evidence and cleanup errors 
+
+    Error: browserContext.close: ENOENT: no such file or directory, open '/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results/.playwright-artifacts-0/traces/93ef0e820304ab05745a-443f943ceac811c00094-recording2.network'
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/blueprint-runtime-runtime--caa12-evidence-and-cleanup-errors/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/blueprint-runtime-runtime--caa12-evidence-and-cleanup-errors/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/blueprint-runtime-runtime--caa12-evidence-and-cleanup-errors/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/blueprint-runtime-runtime--caa12-evidence-and-cleanup-errors/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+(node:88380) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[3/27] e2e/factory-tests/blueprint-runtime.spec.ts:64:1 › blueprint with no frozen runner adapter explains runtime acceptance is unavailable
+[4/27] e2e/factory-tests/factory.spec.ts:7:1 › factory catalog saves, confirms, pins and cancels a batch without a provider call
+  2) e2e/factory-tests/factory.spec.ts:7:1 › factory catalog saves, confirms, pins and cancels a batch without a provider call 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('heading', { name: '浏览器工厂验收', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('heading', { name: '浏览器工厂验收', exact: true }) with timeout 5000ms
+      - waiting for getByRole('heading', { name: '浏览器工厂验收', exact: true })
+
+
+      18 |   await page.getByLabel('场景状态',{exact:true}).selectOption('ready');
+      19 |   await page.getByRole('button',{name:'保存场景',exact:true}).click();
+    > 20 |   await expect(page.getByRole('heading',{name:'浏览器工厂验收',exact:true})).toBeVisible();
+         |                                                                       ^
+      21 |   await page.getByRole('checkbox',{name:'选择 浏览器工厂验收',exact:true}).check();
+      22 |   const response=page.waitForResponse(r=>r.request().method()==='POST'&&r.url().endsWith('/api/factory/batches'));
+      23 |   await page.getByRole('button',{name:'生产代码模板（1）',exact:true}).click();
+        at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/factory-tests/factory.spec.ts:20:71
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/factory-factory-catalog-sa-e952a-tch-without-a-provider-call/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/factory-factory-catalog-sa-e952a-tch-without-a-provider-call/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/factory-factory-catalog-sa-e952a-tch-without-a-provider-call/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/factory-factory-catalog-sa-e952a-tch-without-a-provider-call/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+(node:88441) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[5/27] e2e/factory-tests/factory.spec.ts:34:1 › catalog groups scenarios by type and preserves cross-group selection through collapse, search and refresh
+  3) e2e/factory-tests/factory.spec.ts:34:1 › catalog groups scenarios by type and preserves cross-group selection through collapse, search and refresh 
+
+    Error: browserContext.close: ENOENT: no such file or directory, open '/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results/.playwright-artifacts-2/traces/e672a58c7e88234a702e-567dcca5185800a70fcb.trace'
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/factory-catalog-groups-sce-55d48-collapse-search-and-refresh/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/factory-catalog-groups-sce-55d48-collapse-search-and-refresh/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/factory-catalog-groups-sce-55d48-collapse-search-and-refresh/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/factory-catalog-groups-sce-55d48-collapse-search-and-refresh/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+(node:88642) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[6/27] e2e/factory-tests/factory.spec.ts:88:1 › visible generation entry filters covered leaves, marks zero additions and blocks active generation
+[7/27] e2e/factory-tests/factory.spec.ts:156:1 › leaf exposes confirmed scenarios and links to factory
+  4) e2e/factory-tests/factory.spec.ts:156:1 › leaf exposes confirmed scenarios and links to factory 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('section').filter({ has: getByRole('heading', { name: '应用场景与模板', exact: true }) }).getByText('叶子场景验收', { exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('section').filter({ has: getByRole('heading', { name: '应用场景与模板', exact: true }) }).getByText('叶子场景验收', { exact: true }) with timeout 5000ms
+      - waiting for locator('section').filter({ has: getByRole('heading', { name: '应用场景与模板', exact: true }) }).getByText('叶子场景验收', { exact: true })
+
+
+      158 |   await mockStatus(page);await page.goto(`/types/${type}`);
+      159 |   const section=page.locator('section').filter({has:page.getByRole('heading',{name:'应用场景与模板',exact:true})});
+    > 160 |   await expect(section.getByText('叶子场景验收',{exact:true})).toBeVisible();
+          |                                                          ^
+      161 |   await section.getByRole('link',{name:'打开模板工厂'}).click();
+      162 |   await expect(page).toHaveURL(new RegExp(`/factory\\?leaf=${type}`));
+      163 | });
+        at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/factory-tests/factory.spec.ts:160:58
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/factory-leaf-exposes-confi-f3237-narios-and-links-to-factory/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/factory-leaf-exposes-confi-f3237-narios-and-links-to-factory/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/factory-leaf-exposes-confi-f3237-narios-and-links-to-factory/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/factory-leaf-exposes-confi-f3237-narios-and-links-to-factory/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+(node:88801) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[8/27] e2e/factory-tests/factory.spec.ts:165:1 › draft scenarios can queue an independent pinned review without confirmation or provider calls
+  5) e2e/factory-tests/factory.spec.ts:165:1 › draft scenarios can queue an independent pinned review without confirmation or provider calls 
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator: locator('article').filter({ has: getByRole('heading') }).getByRole('checkbox', { name: '选择 undefined', exact: true })
+    Expected: enabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeEnabled" locator('article').filter({ has: getByRole('heading') }).getByRole('checkbox', { name: '选择 undefined', exact: true }) with timeout 5000ms
+      - waiting for locator('article').filter({ has: getByRole('heading') }).getByRole('checkbox', { name: '选择 undefined', exact: true })
+
+
+      168 |   await mockStatus(page);await page.goto(`/factory?leaf=${type}`);
+      169 |   const card=page.locator('article').filter({has:page.getByRole('heading',{name:scene.name,exact:true})});
+    > 170 |   await expect(card.getByRole('checkbox',{name:`选择 ${scene.name}`,exact:true})).toBeEnabled();
+          |                                                                                 ^
+      171 |   await card.getByRole('checkbox',{name:`选择 ${scene.name}`,exact:true}).check();
+      172 |   await expect(page.getByRole('button',{name:'生产代码模板（0）',exact:true})).toBeDisabled();
+      173 |   await expect(page.getByRole('button',{name:'生产认知模板（0）',exact:true})).toBeDisabled();
+        at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/factory-tests/factory.spec.ts:170:81
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/factory-draft-scenarios-ca-436db-firmation-or-provider-calls/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/factory-draft-scenarios-ca-436db-firmation-or-provider-calls/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/factory-draft-scenarios-ca-436db-firmation-or-provider-calls/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/factory-draft-scenarios-ca-436db-firmation-or-provider-calls/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+(node:88860) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[9/27] e2e/factory-tests/factory.spec.ts:187:1 › review actions distinguish first, repeat and retry; passed drafts still need human confirmation
+[10/27] e2e/factory-tests/factory.spec.ts:243:1 › scenario review displays reasons, revisions, failed attempts and bilingual stale evidence
+[11/27] e2e/factory-tests/factory.spec.ts:266:1 › covered types can complete without new drafts and explain their pinned output language
+[12/27] e2e/factory-tests/factory.spec.ts:281:1 › factory supports mobile, English, empty artifacts and recoverable errors
+[13/27] e2e/factory-tests/factory.spec.ts:297:1 › artifact distinguishes source review from runtime acceptance and can instantiate L0
+  6) e2e/factory-tests/factory.spec.ts:297:1 › artifact distinguishes source review from runtime acceptance and can instantiate L0 
+
+    Error: browserContext.close: ENOENT: no such file or directory, open '/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results/.playwright-artifacts-5/traces/e672a58c7e88234a702e-acd256f3cb2ff6e63d59-recording8.network'
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/factory-artifact-distingui-bd865-ance-and-can-instantiate-L0/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/factory-artifact-distingui-bd865-ance-and-can-instantiate-L0/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/factory-artifact-distingui-bd865-ance-and-can-instantiate-L0/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/factory-artifact-distingui-bd865-ance-and-can-instantiate-L0/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+(node:89152) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[14/27] e2e/factory-tests/factory.spec.ts:333:1 › leaf published template creates an application and explains review scope
+[15/27] e2e/factory-tests/factory.spec.ts:347:1 › cognitive sample imports once, reads definitions and exports a phased development handoff without provider calls
+  7) e2e/factory-tests/factory.spec.ts:347:1 › cognitive sample imports once, reads definitions and exports a phased development handoff without provider calls 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('article', { name: '认知模板 生活待购与灵感收藏夹：个人本地认知模板', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('article', { name: '认知模板 生活待购与灵感收藏夹：个人本地认知模板', exact: true }) with timeout 5000ms
+      - waiting for getByRole('article', { name: '认知模板 生活待购与灵感收藏夹：个人本地认知模板', exact: true })
+
+
+      354 |   await entry.getByRole('button',{name:'载入书签认知样板',exact:true}).click();
+      355 |   const card=page.getByRole('article',{name:'认知模板 生活待购与灵感收藏夹：个人本地认知模板',exact:true});
+    > 356 |   await expect(card).toBeVisible();
+          |                      ^
+      357 |   await expect(card).toContainText('18 项能力 · 8 个决策 · 3 个阶段 · 17 个验收用例');
+      358 |   await expect(card).toContainText('不等于工厂重新验收');
+      359 |   await expect(card).toContainText('从 HANDOFF.md 开始');
+        at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/factory-tests/factory.spec.ts:356:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/factory-cognitive-sample-i-995e3-doff-without-provider-calls/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/factory-cognitive-sample-i-995e3-doff-without-provider-calls/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/factory-cognitive-sample-i-995e3-doff-without-provider-calls/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/factory-cognitive-sample-i-995e3-doff-without-provider-calls/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+(node:89215) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[16/27] e2e/factory-tests/factory.spec.ts:396:1 › invalid cognitive ZIP shows an error and keeps imported candidates
+  8) e2e/factory-tests/factory.spec.ts:396:1 › invalid cognitive ZIP shows an error and keeps imported candidates 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('article', { name: '认知模板 生活待购与灵感收藏夹：个人本地认知模板', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('article', { name: '认知模板 生活待购与灵感收藏夹：个人本地认知模板', exact: true }) with timeout 5000ms
+      - waiting for getByRole('article', { name: '认知模板 生活待购与灵感收藏夹：个人本地认知模板', exact: true })
+
+
+      398 |   const entry=page.getByRole('region',{name:'认知模板入口',exact:true});
+      399 |   await entry.getByRole('button',{name:'载入书签认知样板',exact:true}).click();
+    > 400 |   await expect(page.getByRole('article',{name:'认知模板 生活待购与灵感收藏夹：个人本地认知模板',exact:true})).toBeVisible();
+          |                                                                                        ^
+      401 |   await entry.getByText('导入其他认知包',{exact:true}).click();
+      402 |   await entry.getByLabel('认知模板 ZIP',{exact:true}).setInputFiles({name:'bad.zip',mimeType:'application/zip',buffer:Buffer.from('not a zip')});
+      403 |   await entry.getByRole('button',{name:'校验并导入',exact:true}).click();
+        at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/factory-tests/factory.spec.ts:400:88
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/factory-invalid-cognitive--70994-d-keeps-imported-candidates/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/factory-invalid-cognitive--70994-d-keeps-imported-candidates/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/factory-invalid-cognitive--70994-d-keeps-imported-candidates/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/factory-invalid-cognitive--70994-d-keeps-imported-candidates/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+(node:89367) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[17/27] e2e/factory-tests/factory.spec.ts:408:1 › cognitive document reader does not load remote images or execute embedded HTML
+  9) e2e/factory-tests/factory.spec.ts:408:1 › cognitive document reader does not load remote images or execute embedded HTML 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('article', { name: '认知模板 生活待购与灵感收藏夹：个人本地认知模板', exact: true }).getByRole('button', { name: '查看认知内容', exact: true })
+
+
+      419 |   await page.getByRole('button',{name:'载入书签认知样板',exact:true}).click();
+      420 |   const card=page.getByRole('article',{name:'认知模板 生活待购与灵感收藏夹：个人本地认知模板',exact:true});
+    > 421 |   await card.getByRole('button',{name:'查看认知内容',exact:true}).click();
+          |                                                             ^
+      422 |   const chapter=card.getByRole('region',{name:'章节正文',exact:true});
+      423 |   await expect(chapter.getByRole('heading',{name:'仅正文',exact:true})).toBeVisible();
+      424 |   await expect(chapter.locator('img,script,iframe')).toHaveCount(0);
+        at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/factory-tests/factory.spec.ts:421:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/factory-cognitive-document-c0e8e-es-or-execute-embedded-HTML/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/factory-cognitive-document-c0e8e-es-or-execute-embedded-HTML/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/factory-cognitive-document-c0e8e-es-or-execute-embedded-HTML/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/factory-cognitive-document-c0e8e-es-or-execute-embedded-HTML/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+(node:89613) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[18/27] e2e/factory-tests/factory.spec.ts:430:1 › confirmed scenarios queue pinned cognition production separately from code templates
+  10) e2e/factory-tests/factory.spec.ts:430:1 › confirmed scenarios queue pinned cognition production separately from code templates 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 503
+
+      431 |   await mockStatus(page);
+      432 |   const created=await page.request.post('/api/factory/scenarios',{data:{leaf:'bookmark-manager',name:'认知生产浏览器场景',audience:'个人用户',objective:'保存、检索并返回链接',workflow:['保存链接','重新查找并打开'],acceptance:['刷新后仍能找到并打开链接'],status:'ready'}});
+    > 433 |   expect(created.status()).toBe(201);const scene=await created.json();
+          |                            ^
+      434 |   await page.goto('/factory?leaf=bookmark-manager');
+      435 |   await page.getByRole('checkbox',{name:'选择 认知生产浏览器场景',exact:true}).check();
+      436 |   const response=page.waitForResponse(r=>r.url().endsWith('/api/factory/batches')&&r.request().method()==='POST');
+        at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/factory-tests/factory.spec.ts:433:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/factory-confirmed-scenario-28dbb-arately-from-code-templates/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/factory-confirmed-scenario-28dbb-arately-from-code-templates/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/factory-confirmed-scenario-28dbb-arately-from-code-templates/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/factory-confirmed-scenario-28dbb-arately-from-code-templates/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+(node:89622) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[19/27] e2e/factory-tests/factory.spec.ts:446:1 › cognitive review queues independently, can retry after cancellation and produces a new pinned revision
+  11) e2e/factory-tests/factory.spec.ts:446:1 › cognitive review queues independently, can retry after cancellation and produces a new pinned revision 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForResponse: Test timeout of 30000ms exceeded.
+
+      448 |   await page.getByRole('button',{name:'载入书签认知样板',exact:true}).click();
+      449 |   const card=page.getByRole('article',{name:'认知模板 生活待购与灵感收藏夹：个人本地认知模板',exact:true});
+    > 450 |   const wait=page.waitForResponse(r=>r.url().endsWith('/accept')&&r.request().method()==='POST');
+          |                   ^
+      451 |   await card.getByRole('button',{name:'发起认知审阅',exact:true}).click();
+      452 |   const response=await wait;expect(response.status()).toBe(202);expect(response.request().postDataJSON()).toMatchObject({method:'cognitive-review',language:'zh'});
+      453 |   const reviewBatch=await response.json();expect(reviewBatch.jobs[0].kind).toBe('cognitive-review');
+        at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/factory-tests/factory.spec.ts:450:19
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('article', { name: '认知模板 生活待购与灵感收藏夹：个人本地认知模板', exact: true }).getByRole('button', { name: '发起认知审阅', exact: true })
+
+
+      449 |   const card=page.getByRole('article',{name:'认知模板 生活待购与灵感收藏夹：个人本地认知模板',exact:true});
+      450 |   const wait=page.waitForResponse(r=>r.url().endsWith('/accept')&&r.request().method()==='POST');
+    > 451 |   await card.getByRole('button',{name:'发起认知审阅',exact:true}).click();
+          |                                                             ^
+      452 |   const response=await wait;expect(response.status()).toBe(202);expect(response.request().postDataJSON()).toMatchObject({method:'cognitive-review',language:'zh'});
+      453 |   const reviewBatch=await response.json();expect(reviewBatch.jobs[0].kind).toBe('cognitive-review');
+      454 |   await expect(card.getByRole('button',{name:'等待认知审阅',exact:true})).toBeDisabled();
+        at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/factory-tests/factory.spec.ts:451:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/factory-cognitive-review-q-2168a-duces-a-new-pinned-revision/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/factory-cognitive-review-q-2168a-duces-a-new-pinned-revision/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/factory-cognitive-review-q-2168a-duces-a-new-pinned-revision/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/factory-cognitive-review-q-2168a-duces-a-new-pinned-revision/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+(node:89852) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[20/27] e2e/factory-tests/factory.spec.ts:478:1 › 规范预审阻断可见，意见可带回生产补充要求
+[21/27] e2e/factory-tests/leaf-blueprint.spec.ts:32:1 › published product blueprint links to phase export and does not offer runnable instantiate
+[22/27] e2e/factory-tests/leaf-blueprint.spec.ts:40:1 › published runnable starter keeps its application archive flow
+[23/27] e2e/factory-tests/v1.spec.ts:18:1 › shared cases show fixed source, evidence, unknowns and keep legacy cards when the dynamic API is unavailable
+[24/27] e2e/factory-tests/v1.spec.ts:28:1 › case revisions expose observed evidence separately from unknown runtime and link into factory
+[25/27] e2e/factory-tests/v1.spec.ts:43:1 › V1 plan survives run, pause, resume and reload with a stable idempotency key
+[26/27] e2e/factory-tests/v1.spec.ts:98:1 › V1 catalog shows each blueprint runtime result per run and target, with no aggregate fallback
+[27/27] e2e/factory-tests/v1.spec.ts:126:1 › fresh deep link restores a running plan, polls its report, pauses by plan ID, then stops at terminal state
+  11 failed
+    e2e/factory-tests/blueprint-runtime.spec.ts:45:1 › runtime result exposes startup diagnostics, case evidence and cleanup errors 
+    e2e/factory-tests/factory.spec.ts:7:1 › factory catalog saves, confirms, pins and cancels a batch without a provider call 
+    e2e/factory-tests/factory.spec.ts:34:1 › catalog groups scenarios by type and preserves cross-group selection through collapse, search and refresh 
+    e2e/factory-tests/factory.spec.ts:156:1 › leaf exposes confirmed scenarios and links to factory 
+    e2e/factory-tests/factory.spec.ts:165:1 › draft scenarios can queue an independent pinned review without confirmation or provider calls 
+    e2e/factory-tests/factory.spec.ts:297:1 › artifact distinguishes source review from runtime acceptance and can instantiate L0 
+    e2e/factory-tests/factory.spec.ts:347:1 › cognitive sample imports once, reads definitions and exports a phased development handoff without provider calls 
+    e2e/factory-tests/factory.spec.ts:396:1 › invalid cognitive ZIP shows an error and keeps imported candidates 
+    e2e/factory-tests/factory.spec.ts:408:1 › cognitive document reader does not load remote images or execute embedded HTML 
+    e2e/factory-tests/factory.spec.ts:430:1 › confirmed scenarios queue pinned cognition production separately from code templates 
+    e2e/factory-tests/factory.spec.ts:446:1 › cognitive review queues independently, can retry after cancellation and produces a new pinned revision 
+  16 passed (2.1m)

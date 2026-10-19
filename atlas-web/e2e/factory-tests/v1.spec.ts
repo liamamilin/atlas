@@ -94,3 +94,90 @@ test("V1 plan survives run, pause, resume and reload with a stable idempotency k
   await page.getByRole("button", { name: "暂停", exact: true }).click();
   expect(page.url()).toContain("/factory");
 });
+
+test("V1 catalog shows each blueprint runtime result per run and target, with no aggregate fallback", async ({ page }) => {
+  const artifact = (id: string, acceptances: Record<string, unknown>[], runtime_status?: string) => ({
+    id, artifact_type: "product-blueprint", digest: `${id}-digest`, state: "draft",
+    runtime_status, review_status: "unavailable", evidence_status: "legacy_unverified",
+    manifest: { name: id }, acceptances,
+  });
+  const runs = [
+    { id: "run_passed_01", method: "blueprint-runtime", outcome: "passed", selected_phase: "P0", suite_status: "passed", phase_status: "passed", target_binding: { application_digest: "target-app-001" } },
+    { id: "run_failed_02", method: "blueprint-runtime", outcome: "failed", selected_phase: "P1", suite_status: "failed", phase_status: "blocked", target_binding: { application_digest: "target-app-002" } },
+  ];
+  await page.route("**/api/factory/catalog", route => route.fulfill({ json: [] }));
+  await page.route("**/api/factory/batches", route => route.fulfill({ json: [] }));
+  await page.route("**/api/factory/artifacts", route => route.fulfill({ json: [
+    artifact("artifact-with-runs", runs, "passed"), artifact("artifact-without-runs", [], "passed"),
+  ] }));
+  await page.route("**/api/factory/status", route => route.fulfill({ json: { cli: { available: true, models: [] }, runtime: { available: true } } }));
+  await page.route("**/api/factory/v1/applications", route => route.fulfill({ json: [] }));
+  await page.route("**/data/apps.json", route => route.fulfill({ json: [] }));
+
+  await page.goto("/factory?view=v1");
+  await expect(page.getByRole("heading", { name: "模板审阅、发布与撤回" })).toBeVisible();
+  const withRuns = page.locator("article").filter({ hasText: "artifact-with-runs" });
+  await expect(withRuns.getByText(/run_passed_01.*target-app-001.*P0.*suite_status: passed.*phase_status: passed/)).toBeVisible();
+  await expect(withRuns.getByText(/run_failed_02.*target-app-002.*P1.*suite_status: failed.*phase_status: blocked/)).toBeVisible();
+  await expect(withRuns.getByRole("link", { name: "查看运行断言" }).first()).toHaveAttribute("href", /view=artifacts&artifact_id=artifact-with-runs&runtime_run_id=run_passed_01/);
+  await expect(page.locator("article").filter({ hasText: "artifact-without-runs" }).getByText("未运行", { exact: true })).toBeVisible();
+});
+
+test("fresh deep link restores a running plan, polls its report, pauses by plan ID, then stops at terminal state", async ({ page }) => {
+  const planId = "plan_1234567890abcdef1234567890abcdef";
+  const digest = "9".repeat(64);
+  const batchId = "bat_abcdef1234567890abcdef1234567890";
+  let state = "running";
+  let reportRequests = 0;
+  let planRequests = 0;
+  let pauseRequestUrl = "";
+  const plan = {
+    id: planId, digest, campaign_id: "atlas-v1-first-production-2026-10-19", segment: "G1",
+    seeds: [{ product_id: "product_1", scenario, runtime_sample: true, next_stage: "template" }],
+    excluded: [], limits: { cli_sessions: 500, segment_seconds: 28800, production: 2, runtime: 1 },
+  };
+  await page.addInitScript(() => localStorage.clear());
+  await page.route("**/api/factory/catalog", route => route.fulfill({ json: [scenario] }));
+  await page.route("**/api/factory/batches", route => route.fulfill({ json: [] }));
+  await page.route("**/api/factory/artifacts", route => route.fulfill({ json: [] }));
+  await page.route("**/api/factory/status", route => route.fulfill({ json: { cli: { available: true, models: ["opencode-go/deepseek-v4.1-flash"] }, runtime: { available: true } } }));
+  await page.route("**/api/factory/v1/applications", route => route.fulfill({ json: [app] }));
+  await page.route(`**/api/factory/v1/scenarios/${scenario.id}/basis`, route => route.fulfill({ json: { scenario_id: scenario.id, stage: "template_production", blockers: [] } }));
+  await page.route("**/data/apps.json", route => route.fulfill({ json: [] }));
+  await page.route(`**/api/factory/v1/plans/${planId}`, route => {
+    planRequests += 1;
+    return route.fulfill({ json: { ...plan, state } });
+  });
+  await page.route(`**/api/factory/v1/plans/${planId}/report`, route => {
+    reportRequests += 1;
+    return route.fulfill({ json: {
+      batch: { id: batchId, state, jobs: [] }, quality_result: "in_progress",
+      budget: { cli_sessions_used: 37, cli_sessions_limit: 500, remaining_seconds: 28000 },
+    } });
+  });
+  await page.route(`**/api/factory/v1/plans/${planId}/pause`, async route => {
+    pauseRequestUrl = new URL(route.request().url()).pathname;
+    state = "paused";
+    await route.fulfill({ json: { id: batchId, state } });
+  });
+  await page.goto(`/factory?view=v1&plan=${planId}`);
+  const planRegion = page.getByRole("region", { name: "批次计划" });
+  await expect(planRegion.getByText(planId, { exact: false })).toBeVisible();
+  await expect(planRegion).toContainText(digest);
+  await expect(planRegion).toContainText("cli_sessions_used");
+  await expect(planRegion).toContainText("37");
+  await expect(page.getByRole("group", { name: "运行抽验场景" }).getByRole("checkbox")).toBeChecked();
+  await expect.poll(() => reportRequests).toBeGreaterThan(1);
+  await expect(page.getByRole("button", { name: "暂停", exact: true })).toBeEnabled();
+  await page.getByRole("button", { name: "暂停", exact: true }).click();
+  await expect(planRegion).toContainText(/已暂停|暂停/);
+  expect(pauseRequestUrl).toBe(`/api/factory/v1/plans/${planId}/pause`);
+
+  state = "completed";
+  await page.getByRole("button", { name: "刷新计划", exact: true }).click();
+  await expect(planRegion).toContainText(/已完成|completed/);
+  const terminalReportCount = reportRequests;
+  await page.waitForTimeout(4300);
+  expect(reportRequests).toBe(terminalReportCount);
+  expect(planRequests).toBeGreaterThan(0);
+});

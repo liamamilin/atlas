@@ -25,7 +25,7 @@ def observed_counts(name, output):
     if name in {"backend_tests", "docker_integration"}:
         matches = re.findall(r"Ran (\d+) tests? in", output)
         tests = int(matches[-1]) if matches else None
-        skips = re.findall(r"OK \(skipped=(\d+)\)", output)
+        skips = re.findall(r"^(?:OK|FAILED) \([^\n]*\bskipped=(\d+)[^\n]*\)", output, re.MULTILINE)
         skipped = int(skips[-1]) if skips else 0
         if name == "docker_integration":
             for line in reversed(output.splitlines()):

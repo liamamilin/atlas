@@ -1,0 +1,63 @@
+
+> test:e2e
+> playwright test
+
+[WebServer] (node:77306) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 17 tests using 1 worker
+
+(node:77371) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/tests/core.spec.ts:24:1 › browse opens a generated type leaf without browser errors (798ms)
+[WebServer] ----------------------------------------
+[WebServer] Exception occurred during processing of request from ('127.0.0.1', 59880)
+[WebServer] Traceback (most recent call last):
+[WebServer]   File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py", line 683, in process_request_thread
+[WebServer]     self.finish_request(request, client_address)
+[WebServer]   File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py", line 360, in finish_request
+[WebServer]     self.RequestHandlerClass(request, client_address, self)
+[WebServer]   File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py", line 747, in __init__
+[WebServer]     self.handle()
+[WebServer]   File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/http/server.py", line 433, in handle
+[WebServer]     self.handle_one_request()
+[WebServer]   File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/http/server.py", line 421, in handle_one_request
+[WebServer]     method()
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/drafts_api.py", line 1563, in do_GET
+[WebServer]     return self._factory("GET", parsed)
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/drafts_api.py", line 1401, in _factory
+[WebServer]     result = factory_api.dispatch(method, unquote(parsed.path), parsed.query,
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/template_factory/api.py", line 68, in dispatch
+[WebServer]     store = store or get_store()
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/template_factory/api.py", line 36, in get_store
+[WebServer]     return _initialized_store(
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/template_factory/api.py", line 32, in _initialized_store
+[WebServer]     return FactoryStore(root, pack)
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/template_factory/store.py", line 77, in __init__
+[WebServer]     con.execute("PRAGMA journal_mode=WAL")
+[WebServer] sqlite3.OperationalError: database is locked
+[WebServer] ----------------------------------------
+[WebServer] 3:31:11 PM [vite] http proxy error: /api/factory/artifacts?leaf=business-messaging-application&published=1
+[WebServer] Error: socket hang up
+[WebServer]     at Socket.socketOnEnd (node:_http_client:598:25)
+[WebServer]     at Socket.emit (node:events:531:35)
+[WebServer]     at endReadableNT (node:internal/streams/readable:1698:12)
+[WebServer]     at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+  ✓   2 e2e/tests/core.spec.ts:45:1 › type page uses a stable source fallback without canonical API files (621ms)
+  ✓   3 e2e/tests/core.spec.ts:55:1 › draft editor exposes dirty state and saves before deletion (709ms)
+  ✓   4 e2e/tests/core.spec.ts:90:1 › draft generation completion hydrates the editor (4.9s)
+  ✓   5 e2e/tests/core.spec.ts:99:1 › draft polling exposes a stale state and retry affordance (4.9s)
+  ✓   6 e2e/tests/core.spec.ts:124:1 › search matches type and application aliases (1.1s)
+  ✓   7 e2e/tests/core.spec.ts:135:1 › unknown routes render a real not-found page (236ms)
+  ✓   8 e2e/tests/core.spec.ts:144:1 › apps hash links focus the target and invalid hashes explain recovery (623ms)
+  ✓   9 e2e/tests/core.spec.ts:153:1 › mobile pages avoid horizontal overflow and name the draft editor (776ms)
+  ✓  10 e2e/tests/core.spec.ts:167:1 › public catalog exposes bilingual labels and navigable canonical links (1.4s)
+  ✓  11 e2e/tests/core.spec.ts:183:1 › project detail state follows the selected project (878ms)
+  ✓  12 e2e/tests/core.spec.ts:207:1 › English tutorial does not fall back to the long Chinese source (370ms)
+  ✓  13 e2e/tests/core.spec.ts:214:1 › local API initializes recovery, backup download, and controlled restore (857ms)
+  ✓  14 e2e/tests/matrix.spec.ts:71:1 › normal route matrix passes at 375px and 768px (8.8s)
+  ✓  15 e2e/tests/matrix.spec.ts:87:1 › language and accessible names hold across the route matrix (4.7s)
+  ✓  16 e2e/tests/matrix.spec.ts:121:1 › route error matrix exposes a recoverable alert (5.2s)
+  ✓  17 e2e/tests/matrix.spec.ts:156:1 › representative empty states remain explicit and navigable (3.9s)
+
+  17 passed (42.7s)
