@@ -360,7 +360,7 @@ def _recover_prior_generation_delivery(
             continue
     return None
 
-AGGREGATE_SEMANTIC_REVIEW_PROMPT = """Independently review a proposed aggregate repair BEFORE it is frozen. Read input.json and compare source/baseline/ with source/candidate/ directly. Read each baseline/ARCHITECTURE.md and candidate/ARCHITECTURE.md in full as the line-preserving projection of architecture_markdown; cross-check against the corresponding AUTHORED_FIELDS.json. The supplied scope and exact diff are the authorization boundary. Judge semantic assertion intent, not keywords or superficial AST/count patterns. Confirm every prior assertion intent remains except explicitly authorized changes; all other changes must preserve or add coverage. Added/changed tests must be direct UI adaptations/additions, not weakened existing obligations. Check the authored specification preserves feature identities, phases and current-required status; evaluate contract coverage as real reachable journeys rather than populated fields. When host-owned case adaptation and scenario-policy files are supplied, read them and compare the adaptation against those exact files and the bound scenario identity. Return one JSON object with identity copied exactly from input.identity (including case_policy_digest): {\"identity\":{\"scope_digest\":\"...\",\"diff_digest\":\"...\",\"baseline_digest\":\"...\",\"candidate_authored_digest\":\"...\",\"baseline_program_digest\":\"...\",\"candidate_program_digest\":\"...\",\"case_policy_digest\":null},\"outcome\":\"passed|blocked|uncertain\",\"summary\":\"...\",\"checks\":[{\"id\":\"assertion_intent_preserved\",\"outcome\":\"passed|blocked|uncertain\",\"reason\":\"...\"},{\"id\":\"scope_fidelity\",\"outcome\":\"passed|blocked|uncertain\",\"reason\":\"...\"},{\"id\":\"case_adaptation\",\"outcome\":\"passed|blocked|uncertain\",\"reason\":\"...\"}],\"findings\":[{\"severity\":\"blocker|uncertain|suggestion\",\"basis\":\"...\"}]}.  Use only passed when the exact intent is preserved and every check is substantively satisfied. Any weakened or removed unauthorized assertion is blocked; unresolved evidence is uncertain. Do not execute programs or claim runtime/test success. This review is an additional freeze gate and does not replace frozen-candidate cognitive review."""
+AGGREGATE_SEMANTIC_REVIEW_PROMPT = """Independently review a proposed aggregate repair BEFORE it is frozen. Read input.json and compare source/baseline/ with source/candidate/ directly. The exact program inventory is the formal file plan summarized by exact_diff.program_file_hashes_before and program_file_hashes_after; do not count host-generated acceptance/plan.json as a program. Review that generated acceptance metadata separately using exact_diff.generated_metadata and the supplied source/baseline/generated-metadata/ and source/candidate/generated-metadata/ files. Read each baseline/ARCHITECTURE.md and candidate/ARCHITECTURE.md in full as the line-preserving projection of architecture_markdown; cross-check against the corresponding AUTHORED_FIELDS.json. The supplied scope and exact diff are the authorization boundary. Judge semantic assertion intent, not keywords or superficial AST/count patterns. Confirm every prior assertion intent remains except explicitly authorized changes; all other changes must preserve or add coverage. Added/changed tests must be direct UI adaptations/additions, not weakened existing obligations. Check the authored specification preserves feature identities, phases and current-required status; evaluate contract coverage as real reachable journeys rather than populated fields. When host-owned case adaptation and scenario-policy files are supplied, read them and compare the adaptation against those exact files and the bound scenario identity. Return one JSON object with identity copied exactly from input.identity (including case_policy_digest): {\"identity\":{\"scope_digest\":\"...\",\"diff_digest\":\"...\",\"baseline_digest\":\"...\",\"candidate_authored_digest\":\"...\",\"baseline_program_digest\":\"...\",\"candidate_program_digest\":\"...\",\"case_policy_digest\":null},\"outcome\":\"passed|blocked|uncertain\",\"summary\":\"...\",\"checks\":[{\"id\":\"assertion_intent_preserved\",\"outcome\":\"passed|blocked|uncertain\",\"reason\":\"...\"},{\"id\":\"scope_fidelity\",\"outcome\":\"passed|blocked|uncertain\",\"reason\":\"...\"},{\"id\":\"case_adaptation\",\"outcome\":\"passed|blocked|uncertain\",\"reason\":\"...\"}],\"findings\":[{\"severity\":\"blocker|uncertain|suggestion\",\"basis\":\"...\"}]}.  Use only passed when the exact intent is preserved and every check is substantively satisfied. Any weakened or removed unauthorized assertion is blocked; unresolved evidence is uncertain. Do not execute programs or claim runtime/test success. This review is an additional freeze gate and does not replace frozen-candidate cognitive review."""
 
 
 def validate_aggregate_semantic_review(report, identity):
@@ -2184,10 +2184,32 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
         before_files = tree_manifest(previous / "source")
         after_files = tree_manifest(candidate)
         validate_repair_diff(before_spec, after_spec, before_files, after_files, repair_scope)
+        prepared_for_diff = repair.get("prepared_revision") if repair else None
+        effective_plan = prepared_for_diff.get("effective_plan") if isinstance(prepared_for_diff, dict) else None
+        if isinstance(effective_plan, dict) and isinstance(effective_plan.get("file_plan"), list):
+            program_paths = sorted({
+                row.get("path") for row in effective_plan["file_plan"]
+                if isinstance(row, dict) and isinstance(row.get("path"), str)
+            })
+            if not program_paths or len(program_paths) != len(effective_plan["file_plan"]):
+                raise FactoryError("prepared formal file plan has invalid program inventory", "patch_conflict", 409)
+        else:
+            # Older unprepared repairs predate a host-bound file plan. Preserve
+            # their established behavior while always excluding generated plan
+            # metadata from the program inventory.
+            program_paths = sorted(
+                path for path in set(before_files) | set(after_files)
+                if path.startswith(("acceptance/", "references/"))
+                and path != "acceptance/plan.json"
+            )
+        if any(path not in before_files or path not in after_files for path in program_paths):
+            raise FactoryError("formal program inventory is missing from the aggregate candidate", "patch_conflict", 409)
+        if isinstance(prepared_for_diff, dict) and prepared_for_diff.get("schema") == "atlas.failed-plan-revision.v2":
+            manifest_paths = sorted({entry.get("path") for entry in prepared_for_diff.get("prepared_program_reuse", {}).get("entries", [])})
+            if program_paths != manifest_paths:
+                raise FactoryError("formal file plan differs from the prepared program-reuse manifest", "patch_conflict", 409)
         program_diffs = {}
-        for rel in sorted(set(before_files) | set(after_files)):
-            if not rel.startswith(("acceptance/", "references/")) or rel == "acceptance/plan.json":
-                continue
+        for rel in program_paths:
             before_path, after_path = previous / "source" / rel, candidate / rel
             if before_path.is_file() and after_path.is_file() and before_files.get(rel) != after_files.get(rel):
                 try:
@@ -2196,6 +2218,29 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                 except UnicodeDecodeError:
                     continue
                 program_diffs[rel] = "".join(difflib.unified_diff(before_text, after_text, fromfile="baseline/" + rel, tofile="candidate/" + rel))
+        metadata_paths = [path for path in ("acceptance/plan.json",)
+                          if path in before_files or path in after_files]
+        generated_metadata = {"schema": "atlas.generated-review-metadata.v1", "files": {}}
+        for rel in metadata_paths:
+            before_path, after_path = previous / "source" / rel, candidate / rel
+            before_content = before_path.read_text(encoding="utf-8") if before_path.is_file() else None
+            after_content = after_path.read_text(encoding="utf-8") if after_path.is_file() else None
+            before_bytes = before_path.read_bytes() if before_path.is_file() else None
+            after_bytes = after_path.read_bytes() if after_path.is_file() else None
+            generated_metadata["files"][rel] = {
+                "role": "host-generated-acceptance-plan-metadata",
+                "baseline_sha256": hashlib.sha256(before_bytes).hexdigest() if before_bytes is not None else None,
+                "candidate_sha256": hashlib.sha256(after_bytes).hexdigest() if after_bytes is not None else None,
+                "changed": before_bytes != after_bytes,
+                "unified_diff": "".join(difflib.unified_diff(
+                    (before_content or "").splitlines(keepends=True),
+                    (after_content or "").splitlines(keepends=True),
+                    fromfile="baseline-generated-metadata/" + rel,
+                    tofile="candidate-generated-metadata/" + rel,
+                )),
+                "baseline_review_path": "source/baseline/generated-metadata/" + rel,
+                "candidate_review_path": "source/candidate/generated-metadata/" + rel,
+            }
         aggregate_diff = {
             "schema": "atlas.aggregate-repair-diff.v1",
             "scope_version": repair_scope["version"],
@@ -2206,18 +2251,16 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             "case_adaptation_input": snapshot.get("case_adaptation_input"),
             "authored_fields_before": {key: before_spec.get(key) for key in (AUTHORED_FIELDS | OPTIONAL_AUTHORED_FIELDS) if key in before_spec},
             "authored_fields_after": {key: after_spec.get(key) for key in (AUTHORED_FIELDS | OPTIONAL_AUTHORED_FIELDS) if key in after_spec},
-            "program_file_hashes_before": before_files,
-            "program_file_hashes_after": after_files,
+            "program_file_hashes_before": {path: before_files[path] for path in program_paths},
+            "program_file_hashes_after": {path: after_files[path] for path in program_paths},
             "program_diffs": program_diffs,
+            "generated_metadata": generated_metadata,
             "diff_digest": None,
             "rendered_tree_diff_digest": digest({"before": before_files, "after": after_files}),
         }
         r6_incremental_diff = None
-        before_programs = {path for path in before_files if path.startswith(("acceptance/", "references/")) and path != "acceptance/plan.json"}
-        after_programs = {path for path in after_files if path.startswith(("acceptance/", "references/")) and path != "acceptance/plan.json"}
-        baseline_program_hashes = {path: before_files[path] for path in sorted(before_programs)}
-        candidate_program_hashes = {path: after_files[path] for path in sorted(after_programs)}
-        prepared_for_diff = repair.get("prepared_revision") if repair else None
+        baseline_program_hashes = aggregate_diff["program_file_hashes_before"]
+        candidate_program_hashes = aggregate_diff["program_file_hashes_after"]
         if isinstance(prepared_for_diff, dict) and prepared_for_diff.get("schema") == "atlas.failed-plan-revision.v2":
             manifest = prepared_for_diff["prepared_program_reuse"]
             source_program_hashes = {entry["path"]: entry["sha256"] for entry in manifest["entries"]}
@@ -2260,11 +2303,11 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             case_adaptation_revision=aggregate_diff["case_adaptation_revision"],
             case_adaptation_input=aggregate_diff["case_adaptation_input"],
         )
-        aggregate_diff["diff_digest"] = (
-            digest({"cumulative_diff_digest": cumulative_diff_digest,
-                    "r6_incremental_diff": r6_incremental_diff})
-            if r6_incremental_diff is not None else cumulative_diff_digest
-        )
+        aggregate_diff["diff_digest"] = digest({
+            "cumulative_diff_digest": cumulative_diff_digest,
+            "r6_incremental_diff": r6_incremental_diff,
+            "generated_metadata_digest": digest(generated_metadata),
+        })
         atomic_json(candidate / "inputs/repair-scope.json", repair_scope)
         atomic_json(candidate / "inputs/aggregate-repair-diff.json", aggregate_diff)
         if r6_incremental_diff is not None:
@@ -2272,7 +2315,7 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
         template_json = json.loads((candidate / "template.json").read_text(encoding="utf-8"))
         evidence_rows = [
             {"path": "inputs/repair-scope.json", "scope": "Host-authorized authored field and program paths for this aggregate revision."},
-            {"path": "inputs/aggregate-repair-diff.json", "scope": "Exact pre-freeze authored spec and text program diffs against the pinned baseline; semantic weakening is independently reviewed."},
+            {"path": "inputs/aggregate-repair-diff.json", "scope": "Exact pre-freeze authored spec and formal-plan program diffs against the pinned baseline, plus separately disclosed generated acceptance metadata; generated metadata is not counted as a program."},
         ]
         if r6_incremental_diff is not None:
             evidence_rows.append({"path": "inputs/r6-incremental-diff.json", "scope": "Exact source-alignment spec delta from the failed R6 proposal and proof that all nine program hashes were reused unchanged."})
@@ -2296,13 +2339,23 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
         }
         review_source = attempt / "aggregate-semantic-review-source"
         review_source.mkdir(parents=True, exist_ok=True)
-        for rel in sorted(before_programs):
+        for rel in program_paths:
             baseline_target = review_source / "baseline" / rel
             candidate_target = review_source / "candidate" / rel
             baseline_target.parent.mkdir(parents=True, exist_ok=True)
             candidate_target.parent.mkdir(parents=True, exist_ok=True)
             baseline_target.write_bytes((previous / "source" / rel).read_bytes())
             candidate_target.write_bytes((candidate / rel).read_bytes())
+        for rel in metadata_paths:
+            before_path, after_path = previous / "source" / rel, candidate / rel
+            if before_path.is_file():
+                target = review_source / "baseline/generated-metadata" / rel
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(before_path.read_bytes())
+            if after_path.is_file():
+                target = review_source / "candidate/generated-metadata" / rel
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(after_path.read_bytes())
         atomic_json(review_source / "baseline/AUTHORED_FIELDS.json", baseline_authored)
         atomic_json(review_source / "candidate/AUTHORED_FIELDS.json", candidate_authored)
         if policy:

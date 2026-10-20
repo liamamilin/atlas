@@ -106,6 +106,14 @@ class FreshReviewFixtureCLI:
         diff = payload.get("exact_diff")
         if not isinstance(diff, dict):
             raise AssertionError("aggregate review did not receive the exact rendered diff")
+        before_programs = diff.get("program_file_hashes_before")
+        after_programs = diff.get("program_file_hashes_after")
+        if (not isinstance(before_programs, dict) or not isinstance(after_programs, dict)
+                or set(before_programs) != set(R6_PROGRAM_PATHS)
+                or set(after_programs) != set(R6_PROGRAM_PATHS)
+                or "acceptance/plan.json" in before_programs
+                or "acceptance/plan.json" in after_programs):
+            raise AssertionError("aggregate program inventory must contain only the nine formal file-plan paths")
         incremental = diff.get("r6_incremental_diff")
         if not isinstance(incremental, dict) or incremental.get("program_byte_changes") != 0:
             raise AssertionError("aggregate diff lacks the zero-change R6 incremental proof")
@@ -115,6 +123,11 @@ class FreshReviewFixtureCLI:
         after = incremental.get("program_file_hashes_after")
         if before != after or before != self.expected_program_hashes:
             raise AssertionError("incremental diff does not prove all nine archived program bytes")
+        metadata = diff.get("generated_metadata", {}).get("files", {}).get("acceptance/plan.json")
+        if not isinstance(metadata, dict) or metadata.get("role") != "host-generated-acceptance-plan-metadata":
+            raise AssertionError("generated acceptance plan must be disclosed separately from programs")
+        if not metadata.get("changed") or not metadata.get("unified_diff"):
+            raise AssertionError("changed generated metadata needs explicit hashes and diff")
         candidate = directory / "source/candidate"
         actual = {}
         for path in R6_PROGRAM_PATHS:
@@ -122,6 +135,13 @@ class FreshReviewFixtureCLI:
             actual[path] = hashlib.sha256(raw).hexdigest()
         if actual != self.expected_program_hashes:
             raise AssertionError("rendered candidate differs from the attempt-4 program bytes")
+        for side, key in (("baseline", "baseline_sha256"), ("candidate", "candidate_sha256")):
+            archived = directory / "source" / side / "generated-metadata/acceptance/plan.json"
+            if not archived.is_file():
+                raise AssertionError("review source is missing the actual generated plan metadata")
+            actual_hash = hashlib.sha256(archived.read_bytes()).hexdigest()
+            if actual_hash != metadata[key]:
+                raise AssertionError("generated metadata digest differs from supplied review file")
 
 
 class R6PositivePipelineLinkTests(unittest.TestCase):
