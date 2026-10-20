@@ -188,11 +188,148 @@ def _read_r7_review_authorization(store, prepared_request):
     }
 
 
+def _r7_design_program_evidence(store, prepared, prepared_request, prepared_contents):
+    """Build bounded phase-review materials from a validated R7 revision only."""
+    if (not isinstance(prepared, dict)
+            or prepared.get("schema") != "atlas.failed-plan-revision.v3"):
+        return None
+    if (not isinstance(prepared_request, dict)
+            or prepared_request.get("schema") != "atlas.failed-plan-revision.v3"):
+        raise FactoryError("R7 prepared request is missing before program review", "checkpoint_changed", 409)
+    from .plan_revision import R7_PROGRAM_PATHS, PreparedRevisionService, program_revision_contents
+
+    def changed(message, cause=None):
+        raise FactoryError(message, "checkpoint_changed", 409) from cause
+
+    try:
+        fresh = PreparedRevisionService(store).prepare(
+            prepared_request.get("binding", {}).get("job_id"), prepared_request
+        )
+        checked_contents = program_revision_contents(
+            store, prepared.get("prepared_program_revision")
+        )
+    except FactoryError as error:
+        changed("R7 program review evidence changed before review: " + str(error), error)
+    if digest(fresh) != digest(prepared) or checked_contents != prepared_contents:
+        changed("R7 prepared response or program bytes changed before review")
+
+    entries = prepared["prepared_program_revision"].get("entries")
+    if (not isinstance(entries, list) or len(entries) != len(R7_PROGRAM_PATHS)
+            or {row.get("path") for row in entries if isinstance(row, dict)} != set(R7_PROGRAM_PATHS)):
+        changed("R7 review manifest does not bind the exact nine program paths")
+    evidence_root = store.root.resolve()
+    files = {}
+    rows = []
+    for entry in entries:
+        path = entry["path"]
+        source_rel = Path("jobs") / entry["source_job_id"] / f"attempt-{entry['source_attempt']}" / "context/generated-0" / path
+        source_path = (evidence_root / source_rel).resolve()
+        try:
+            source_path.relative_to(evidence_root)
+            source_bytes = source_path.read_bytes()
+            prepared_bytes = checked_contents[path].encode("utf-8")
+        except (OSError, ValueError, KeyError, UnicodeError) as error:
+            changed("R7 source program is unavailable: " + path, error)
+        if hashlib.sha256(source_bytes).hexdigest() != entry.get("before_sha256"):
+            changed("R7 source program checkpoint changed: " + path)
+        if hashlib.sha256(prepared_bytes).hexdigest() != entry.get("after_sha256"):
+            changed("R7 prepared program digest changed: " + path)
+        if entry.get("mode") == "reuse" and source_bytes != prepared_bytes:
+            changed("R7 reused source program bytes changed: " + path)
+        files[f"program-evidence/source/{path}"] = source_bytes
+        files[f"program-evidence/prepared/{path}"] = prepared_bytes
+        rows.append({
+            "path": path,
+            "mode": entry["mode"],
+            "source_job_id": entry["source_job_id"],
+            "source_attempt": entry["source_attempt"],
+            "checkpoint_name": entry["checkpoint_name"],
+            "checkpoint_digest": entry["checkpoint_digest"],
+            "source_sha256": entry["before_sha256"],
+            "prepared_sha256": entry["after_sha256"],
+            "patch_digest": entry["patch_digest"],
+            "authorization_clause": entry["authorization_clause"],
+        })
+
+    authorization = _read_r7_review_authorization(store, prepared_request)
+    for rel, raw in authorization["files"].items():
+        files["program-evidence/" + rel] = raw
+    repo_root = store.pack.resolve().parent
+    bound_docs = {
+        "program-evidence/authorization/FINDINGS_DISPOSITION.json": "docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/FINDINGS_DISPOSITION.json",
+    }
+    for target, reference in bound_docs.items():
+        source = (repo_root / reference).resolve()
+        try:
+            source.relative_to(repo_root)
+            files[target] = source.read_bytes()
+        except (OSError, ValueError) as error:
+            changed("R7 finding-disposition evidence is unavailable: " + reference, error)
+    disposition_bytes = files.pop("program-evidence/authorization/FINDINGS_DISPOSITION.json")
+    try:
+        disposition = json.loads(disposition_bytes)
+    except (ValueError, TypeError) as error:
+        changed("R7 findings disposition is malformed", error)
+    if (not isinstance(disposition, dict)
+            or disposition.get("schema") != "atlas.r7-findings-disposition.v1"
+            or not isinstance(disposition.get("items"), list)):
+        changed("R7 findings disposition has the wrong schema")
+    a05_dispositions = [row for row in disposition["items"]
+                        if isinstance(row, dict)
+                        and ("A05" in row.get("text", "")
+                             or "A05" in row.get("reason", "")
+                             or "A05" in row.get("evidence", ""))]
+    if not a05_dispositions:
+        changed("R7 findings disposition does not include the A05 program evidence")
+    files["program-evidence/authorization/A05_FINDING_DISPOSITION.json"] = json.dumps(
+        {"schema": disposition["schema"], "items": a05_dispositions,
+         "claim_boundary": disposition.get("claim_boundary")},
+        ensure_ascii=False, indent=2, sort_keys=True,
+    ).encode("utf-8")
+    evidence_manifest = {
+        "schema": "atlas.r7-phase-review-program-evidence.v1",
+        "prepared_request_digest": prepared.get("request_digest"),
+        "effective_plan_digest": prepared.get("effective_plan_digest"),
+        "prepared_program_revision": prepared["prepared_program_revision"],
+        "programs": rows,
+        "authorization_material_digest": digest({
+            key: value for key, value in authorization.items() if key != "files"
+        }),
+        "findings_disposition_sha256": hashlib.sha256(
+            files["program-evidence/authorization/A05_FINDING_DISPOSITION.json"]
+        ).hexdigest(),
+    }
+    files["program-evidence/PROGRAM_EVIDENCE.json"] = json.dumps(
+        evidence_manifest, ensure_ascii=False, indent=2, sort_keys=True
+    ).encode("utf-8")
+    return {"manifest": evidence_manifest, "files": files, "digest": digest(evidence_manifest)}
+
+
 def _case_adaptation_review_digest(case_design, policy):
     """Bind design-review cache identity to prepared choices and scenario policy."""
     if policy is None:
         return None
     return digest({"case_design": case_design, "policy": policy})
+
+
+def _r7_phase_acceptance_prompt(evidence):
+    if evidence is None:
+        return DESIGN_REVIEW_PROMPT
+    prompt = DESIGN_REVIEW_PROMPT.replace(
+        "Historical programs are deliberately excluded; do not seek them or infer defects in their bodies.",
+        "For this prepared R7 phase review, inspect only the host-verified source and prepared program evidence explicitly listed in source/program-evidence/; do not seek any other historical programs.",
+    ).replace(
+        "Programs do not exist yet: do not block merely for no code or no runtime evidence and never claim they passed.",
+        "These authorized R7 programs exist as static prepared bytes, not as a runtime-verified candidate; do not execute them or claim they passed.",
+    )
+    return prompt + (
+        " This R7 phase-acceptance projection includes host-verified program evidence under "
+        "source/program-evidence/: read PROGRAM_EVIDENCE.json, the A05 source and prepared "
+        "program bytes, the fixed authorization/patch, and A05_FINDING_DISPOSITION.json. "
+        "Use the actual acceptance/p0_organize.py A05 lifecycle as static implementation "
+        "context. Cite only paths listed in input.source_inventory. This remains a static "
+        "design review: do not execute programs or claim runtime success."
+    )
 
 
 def _validate_design_review_checkpoint(report, plan, case_design, policy):
@@ -201,6 +338,14 @@ def _validate_design_review_checkpoint(report, plan, case_design, policy):
     expected_adaptation_digest = _case_adaptation_review_digest(case_design, policy)
     if expected_adaptation_digest is not None and report.get("case_adaptation_review_digest") != expected_adaptation_digest:
         raise FactoryError("design review case adaptation changed", "checkpoint_changed", 409)
+    return report
+
+
+def _validate_design_review_projection_checkpoint(report, plan, projection_digest):
+    if (not isinstance(report, dict)
+            or report.get("proposal_digest") != digest(plan)
+            or report.get("projection_digest") != projection_digest):
+        raise FactoryError("design review projection changed", "checkpoint_changed", 409)
     return report
 
 
@@ -1320,6 +1465,7 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
     snapshot, config = job["snapshot"], job["snapshot"]["config"]
     repair = snapshot.get("cognitive_repair")
     prepared_program_contents = None
+    prepared_r7_review_evidence = None
     if repair and isinstance(repair.get("prepared_revision"), dict):
         prepared = repair["prepared_revision"]
         if prepared.get("schema") == "atlas.failed-plan-revision.v2":
@@ -1342,9 +1488,16 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                 raise FactoryError("prepared R7 program revision manifest is missing", "patch_conflict", 409)
             from .plan_revision import program_revision_contents
 
-            prepared_program_contents = program_revision_contents(
-                pipeline.store, manifest
-            )
+            try:
+                prepared_program_contents = program_revision_contents(
+                    pipeline.store, manifest
+                )
+            except FactoryError as error:
+                raise FactoryError(
+                    "R7 prepared program manifest or source checkpoint changed",
+                    "checkpoint_changed",
+                    409,
+                ) from error
             expected_paths = {
                 row.get("path") for row in prepared["effective_plan"].get("file_plan", [])
                 if isinstance(row, dict) and isinstance(row.get("path"), str)
@@ -1461,6 +1614,14 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             snapshot["case_facts_view"] = facts_view
     context = attempt / "context"
     context.mkdir()
+    if (repair and isinstance(repair.get("prepared_revision"), dict)
+            and repair["prepared_revision"].get("schema") == "atlas.failed-plan-revision.v3"):
+        prepared_r7_review_evidence = _r7_design_program_evidence(
+            pipeline.store,
+            repair["prepared_revision"],
+            repair.get("prepared_revision_request"),
+            prepared_program_contents,
+        )
     if prepared_program_contents is not None:
         prepared = repair["prepared_revision"]
         r7 = prepared.get("schema") == "atlas.failed-plan-revision.v3"
@@ -1996,6 +2157,12 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                         projection["source_citation_matrix"] = source_citation_matrix
                     if dimension == "phase_acceptance":
                         projection["file_plan"] = file_plan
+                        if prepared_r7_review_evidence is not None:
+                            projection["prepared_program_evidence_digest"] = prepared_r7_review_evidence["digest"]
+                            for relative_path, raw in prepared_r7_review_evidence["files"].items():
+                                target = design_context / relative_path
+                                target.parent.mkdir(parents=True, exist_ok=True)
+                                target.write_bytes(raw)
                     if dimension == "runtime_protocol":
                         (design_context / "RUNTIME_CONTRACT.md").write_text(
                             RUNTIME_CONTRACT
@@ -2049,9 +2216,13 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                         design_context=design_context,
                         view_digest=view_digest,
                     ):
+                        review_prompt = _r7_phase_acceptance_prompt(
+                            prepared_r7_review_evidence
+                            if dimension == "phase_acceptance" else None
+                        )
                         raw = agent(
                             name,
-                            DESIGN_REVIEW_PROMPT,
+                            review_prompt,
                             {
                                 "language": config.get("language", "zh"),
                                 "guidance_file": "source/GUIDANCE.md"
@@ -2071,6 +2242,9 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                                 "source_inventory": sorted(
                                     tree_manifest(design_context)
                                 ),
+                                **({
+                                    "prepared_program_evidence_digest": prepared_r7_review_evidence["digest"]
+                                } if dimension == "phase_acceptance" and prepared_r7_review_evidence is not None else {}),
                             },
                             design_context,
                         )
@@ -2093,15 +2267,7 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                     if dimension == "architecture_contract" and design_binding:
                         dimension_checkpoint += "-" + design_binding
                     part = checkpoint(dimension_checkpoint, review_one)
-                    if (
-                        part["proposal_digest"] != digest(plan)
-                        or part["projection_digest"] != view_digest
-                    ):
-                        raise FactoryError(
-                            "design review projection changed",
-                            "checkpoint_changed",
-                            409,
-                        )
+                    _validate_design_review_projection_checkpoint(part, plan, view_digest)
                     subreviews.append(part)
                 checks = [check for part in subreviews for check in part["checks"]]
                 report = validate_review(

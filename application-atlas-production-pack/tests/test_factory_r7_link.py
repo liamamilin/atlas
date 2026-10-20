@@ -111,6 +111,10 @@ class R7PositivePipelineLinkTests(unittest.TestCase):
             target = self.root / rel
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / rel, target)
+        disposition = "docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/FINDINGS_DISPOSITION.json"
+        target = self.root / disposition
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / disposition, target)
         target_programs = self.root / R7_PROGRAMS_REF
         if target_programs.exists():
             shutil.rmtree(target_programs)
