@@ -1,0 +1,301 @@
+{
+  "scenario_record": {
+    "acceptance": [
+      "计划页对每个分配项同时显示计划金额、实际金额与剩余额度，并在录入支出后立即更新",
+      "任何一笔支出录入后，其所属分配项的剩余额度按该支出金额减少",
+      "分配项的实际支出超过计划金额后，其剩余额度显示为负数或明确的超支标记，而不是归零或隐藏",
+      "从分配项 A 转移金额到分配项 B 后，A 的剩余减少额与 B 的剩余增加额相同，计划总额不变",
+      "进入下一期后各分配项的计划金额回到模板数值，上一期剩余不被带入（未启用结转时）"
+    ],
+    "audience": "希望用预先承诺约束日常开支、且不连接银行账户的个人用户（如刚独立生活的年轻上班族）",
+    "id": "scn_6fb4896d9eb0428aa1c080df0a137813",
+    "leaf": "budgeting-application",
+    "leaf_name": "预算应用",
+    "name": "个人极简月度预算：先查剩余再消费",
+    "objective": "为一个月的各项用途预先设定计划金额，并在每次消费前查看该用途的剩余额度，让计划真正影响消费决策。",
+    "revision": 1,
+    "status": "draft",
+    "updated_at": "2026-10-17T01:05:15.622841+00:00",
+    "workflow": [
+      "新建本期（月度）计划，为食品、房租、交通、娱乐等用途创建分配项并填写计划金额",
+      "登记本期可用的预期收入，检查各分配项计划金额之和是否超过收入",
+      "消费后手动录入一笔支出并归属到对应分配项，该分配项剩余额度随即减少",
+      "购买前打开计划页，查看相关分配项及整体的剩余额度，据此决定是否购买或缩减金额",
+      "月中某分配项即将用尽，从其他分配项转移金额，或让超出部分留在该分配项上形成超支",
+      "期末查看各分配项的计划、实际与剩余对照，未使用金额留在本期，并按模板数值开始下一期计划"
+    ]
+  },
+  "case_ref": {
+    "case_id": "case:assisted-budget-actual",
+    "revision": 1,
+    "digest": "36729c5ed3f35e8732580af41fa69c27e16eacaaa067f38b9e73bfc0eaff12f0"
+  },
+  "research": {
+    "summary": "按同一规范共享case记录研究；代码观察与目标推断分别标识，证据独立审阅pending，上游运行not_run。\nev_assisted_budget_design [inference]: 本地单用户、人民币两位小数转整数分、预计收入、正数支出、无结转模板月度启动，是本场景的适配设计；不声称上游与本应用语义完全相同。\nev_assisted_budget_docs [documentation]: 入门文档说明信封预算可在分类间移动可用资金，并介绍按月份分配预算及对照预算与实际支出。\nev_assisted_budget_minor [code_observation]: CLI set-amount显式要求month、category和以cents为单位的amount，通过parseIntFlag解析整数再调用setBudgetAmount。\nev_assisted_budget_recompute [code_observation]: 账户相关属性变化处理按月份枚举交易分类，并调用sheet.recompute重新计算sum-amount；这是上游重算机制的静态代码观察。\nev_assisted_budget_sum [code_observation]: 预算源码通过SQL按交易日期月份和分类GROUP BY聚合SUM(t.amount)，并以month-category键保存分类月度支出；该观察不说明本试用程序已运行。",
+    "sources": [
+      {
+        "id": "S02",
+        "name": "ev_assisted_budget_design",
+        "url": "https://github.com/actualbudget/actual/blob/8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc/LICENSE.txt",
+        "version": "8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc",
+        "facts": "inference: 本地单用户、人民币两位小数转整数分、预计收入、正数支出、无结转模板月度启动，是本场景的适配设计；不声称上游与本应用语义完全相同。",
+        "license": "上游LICENSE.txt为MIT；本包只引用设计证据，不复制实现。",
+        "license_url": "https://github.com/actualbudget/actual/blob/8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc/LICENSE.txt",
+        "reuse": "参考，不直接复用代码；独立审阅pending，上游运行not_run"
+      },
+      {
+        "id": "S03",
+        "name": "ev_assisted_budget_docs",
+        "url": "https://github.com/actualbudget/actual/blob/8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc/packages/docs/docs/getting-started/starting-fresh.md",
+        "version": "8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc",
+        "facts": "documentation: 入门文档说明信封预算可在分类间移动可用资金，并介绍按月份分配预算及对照预算与实际支出。",
+        "license": "上游LICENSE.txt为MIT；本包只引用设计证据，不复制实现。",
+        "license_url": "https://github.com/actualbudget/actual/blob/8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc/LICENSE.txt",
+        "reuse": "参考，不直接复用代码；独立审阅pending，上游运行not_run"
+      },
+      {
+        "id": "S04",
+        "name": "ev_assisted_budget_minor",
+        "url": "https://github.com/actualbudget/actual/blob/8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc/packages/cli/src/commands/budgets.ts",
+        "version": "8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc",
+        "facts": "code_observation: CLI set-amount显式要求month、category和以cents为单位的amount，通过parseIntFlag解析整数再调用setBudgetAmount。",
+        "license": "上游LICENSE.txt为MIT；本包只引用设计证据，不复制实现。",
+        "license_url": "https://github.com/actualbudget/actual/blob/8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc/LICENSE.txt",
+        "reuse": "参考，不直接复用代码；独立审阅pending，上游运行not_run"
+      },
+      {
+        "id": "S05",
+        "name": "ev_assisted_budget_recompute",
+        "url": "https://github.com/actualbudget/actual/blob/8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc/packages/loot-core/src/server/budget/base.ts",
+        "version": "8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc",
+        "facts": "code_observation: 账户相关属性变化处理按月份枚举交易分类，并调用sheet.recompute重新计算sum-amount；这是上游重算机制的静态代码观察。",
+        "license": "上游LICENSE.txt为MIT；本包只引用设计证据，不复制实现。",
+        "license_url": "https://github.com/actualbudget/actual/blob/8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc/LICENSE.txt",
+        "reuse": "参考，不直接复用代码；独立审阅pending，上游运行not_run"
+      },
+      {
+        "id": "S06",
+        "name": "ev_assisted_budget_sum",
+        "url": "https://github.com/actualbudget/actual/blob/8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc/packages/loot-core/src/server/budget/base.ts",
+        "version": "8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc",
+        "facts": "code_observation: 预算源码通过SQL按交易日期月份和分类GROUP BY聚合SUM(t.amount)，并以month-category键保存分类月度支出；该观察不说明本试用程序已运行。",
+        "license": "上游LICENSE.txt为MIT；本包只引用设计证据，不复制实现。",
+        "license_url": "https://github.com/actualbudget/actual/blob/8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc/LICENSE.txt",
+        "reuse": "参考，不直接复用代码；独立审阅pending，上游运行not_run"
+      }
+    ],
+    "gaps": [
+      "未运行上游；无独立证据审阅通过声明",
+      "本应用以全新Python代码实现，不复制上游实现；预计收入/无结转/月度模板为本场景设计"
+    ]
+  },
+  "spec": {
+    "title": "月有度 · 个人极简月度预算",
+    "roles": [
+      {
+        "id": "R01",
+        "name": "个人用户",
+        "responsibility": "手工设定月度收入与用途预算、录入与纠错、消费前查剩余。"
+      }
+    ],
+    "features": [
+      {
+        "id": "F01",
+        "name": "月度计划、收入与精确金额",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "创建月份、收入与分类预算，手工录入35.50和12.30元支出，汇总47.80元；整数分存储。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S06"
+        ],
+        "acceptance": [
+          "B01"
+        ]
+      },
+      {
+        "id": "F02",
+        "name": "修改支出后重算",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "35.50改为30.50，实际合计42.80，原记录只更新不重复扣减。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S06"
+        ],
+        "acceptance": [
+          "B02"
+        ]
+      },
+      {
+        "id": "F03",
+        "name": "分类转移、月份隔离和模板",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "分类计划转移等额且总额不变；显式保存月度模板，新月份只复制计划不复制交易或剩余，旧月不变。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S06"
+        ],
+        "acceptance": [
+          "B03"
+        ]
+      },
+      {
+        "id": "F04",
+        "name": "错误输入零写入",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "拒绝负数、0支出、超过两位小数、NaN、指数与日期跨月；显示可恢复错误，不改既有数据。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S06"
+        ],
+        "acceptance": [
+          "B04"
+        ]
+      },
+      {
+        "id": "F05",
+        "name": "跨进程持久化",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "停止实际进程，同一SQLite目录重启，计划、支出、月份完整保留；不能以新HTTP客户端代替重启。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S06"
+        ],
+        "acceptance": [
+          "B05"
+        ]
+      },
+      {
+        "id": "F06",
+        "name": "银行联接、多币种、多人、完整导出审计",
+        "phase": null,
+        "applicability": "later",
+        "reason": "本机单人首版不需要；以后有真实需求再设计。",
+        "sources": [
+          "S01"
+        ],
+        "acceptance": []
+      }
+    ],
+    "decisions": [
+      {
+        "id": "D01",
+        "question": "金额和货币如何处理？",
+        "default": "固定人民币，最多两位小数，整数分持久化。",
+        "when_to_ask": "需要其他货币或精度时再询问用户。",
+        "impact": "禁止浮点、静默四舍五入及货币混合。",
+        "status": "local trial default"
+      },
+      {
+        "id": "D02",
+        "question": "下月是否结转？",
+        "default": "显式模板复制计划，不结转剩余或复制支出。",
+        "when_to_ask": "用户确需结转时再增加独立规则。",
+        "impact": "月份隔离和可解释汇总。",
+        "status": "local trial default"
+      },
+      {
+        "id": "D03",
+        "question": "是否银行同步/账户体系？",
+        "default": "单用户本机手工录入，不联网抓取或联接银行。",
+        "when_to_ask": "用户明确要求托管或同步时。",
+        "impact": "不扩大隐私数据与运行依赖。",
+        "status": "local trial default"
+      }
+    ],
+    "phases": [
+      {
+        "id": "P0",
+        "title": "手工月度预算核心",
+        "goal": "设置用途计划与预计收入，录入/修改消费并查准确剩余，分类转移、无结转开始下一期并跨重启保留。",
+        "features": [
+          "F01",
+          "F02",
+          "F03",
+          "F04",
+          "F05"
+        ],
+        "acceptance": [
+          "B01",
+          "B02",
+          "B03",
+          "B04",
+          "B05"
+        ]
+      }
+    ],
+    "acceptance": [
+      {
+        "id": "B01",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "创建月份、收入与分类预算，手工录入35.50和12.30元支出，汇总47.80元；整数分存储。",
+        "features": [
+          "F01"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "B02",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "35.50改为30.50，实际合计42.80，原记录只更新不重复扣减。",
+        "features": [
+          "F02"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "B03",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "分类计划转移等额且总额不变；显式保存月度模板，新月份只复制计划不复制交易或剩余，旧月不变。",
+        "features": [
+          "F03"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "B04",
+        "phase": "P0",
+        "type": "negative",
+        "goal": "拒绝负数、0支出、超过两位小数、NaN、指数与日期跨月；显示可恢复错误，不改既有数据。",
+        "features": [
+          "F04"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "B05",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "停止实际进程，同一SQLite目录重启，计划、支出、月份完整保留；不能以新HTTP客户端代替重启。",
+        "features": [
+          "F05"
+        ],
+        "implementation": "acceptance/probe.py"
+      }
+    ],
+    "architecture_markdown": "## 默认实现\nPython标准库http.server＋SQLite；全新服务端HTML表单，零第三方依赖。单用户本机127.0.0.1，无账户/云同步，不连接银行；固定CNY。\n\n## 数据与金额\nmonths(month PRIMARY KEY,income_minor INTEGER)；categories(id,month,name,planned_minor INTEGER, UNIQUE(month,name))；expenses(id,month,date,category_id,amount_minor INTEGER,note)；template(name PRIMARY KEY,planned_minor INTEGER)。金额输入仅十进制定点字符串，最多两位小数，不接受NaN/Inf/科学记数法；Decimal转整数分，收入/预算>=0、支出/转移>0，单项上限999999999.99；不使用浮点求和。\n按月份和分类聚合；实际=本月交易SUM，剩余=计划-实际，允许超支为负；未分配=收入-计划，负数明确提示。修改交易原行更新，每次查询重新聚合，不维护容易漂移的余额缓存。事务内校验分类/日期归属与金额，失败零写入。GET不隐式创建月份。\n分类转移只修改同月两个planned_minor，不允许转出超过源分类计划，不转移交易，计划总额保持不变。月度模板通过显式保存计划覆盖；新月份显式创建，从模板复制分类/计划/预计收入但绝不复制交易或剩余；没有模板时为空月。已有月份重建应409不覆盖。\n\n## JSON接口\nGET /api/health；GET /api/state?month=YYYY-MM 返回initialized、month、income_minor、categories、expenses、totals(planned_minor/spent_minor/remaining_minor/unallocated_minor)。\nPOST /api/months/start {month}→201；POST /api/income {month,income}→200；POST /api/categories {month,name,amount}→201；POST /api/categories/update {id,month,amount}→200；POST /api/expenses {month,date,category_id,amount,note}→201；POST /api/expenses/update {id,month,date,category_id,amount,note}→200；POST /api/transfer {month,source_id,target_id,amount}→200；POST /api/template {month}→200。金额字段为元字符串，输出*_minor为整数分。\n400 invalid_amount/invalid_date/invalid_month/invalid_category/invalid_name/bad_request，404 not_found，409 already_exists；{error:{code,message}}。不向外部请求，不使用真实财务资料作为演示。\n\n## HTML与恢复\nGET /?month=YYYY-MM 顶部month-form选择月份；未创建显示明确“创建本月计划”；已创建显示收入/预算/实际/剩余、分类行、支出表与新增支出表单。所有写表单POST至与API共用服务的对应路径，无JS假列表；成功303回所选月，失败400/409可读role=alert并保留输入及月份。每笔支出“编辑”进入/expense/{id}/edit，原值回填、保存后重算；分类行支持预算修改；转移与模板独立有说明。默认小样本演示仅显式--demo且新库一次性加入。\n\n## 范围\n无结转（场景要求）；本月剩余不带下月。正文无银行同步/汇率/账户簿/投资建议；不宣称上游运行、自动独审或严格G1通过。保留普通顺序使用、事务一致性和重启持久化。",
+    "limits": [
+      "辅助试用；正式场景仍draft，不冒充发布或严格G1/T08。",
+      "上游未运行；共享案例证据独审pending。",
+      "完整财务/并发/多用户/导出矩阵后置。"
+    ]
+  },
+  "trial_scope": "# 辅助试用范围\n\n用户指定scn_6fb4896d9eb0428aa1c080df0a137813 r1，本地确认用于辅助开发，原正式draft记录不变。\n\n核心：预算/预计收入、正数支出、汇总、修改重算、超支负数、分类转移、无结转模板、月份隔离、重启持久化。无银行同步、多币种、账户/云端、复杂报告；不宣称严格P0/G1/T08通过。\n\n先固定共享case与模板、导出标准开发包，再由Codex消费实现；本轮不调用OpenCode。"
+}

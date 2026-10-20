@@ -1,0 +1,63 @@
+{
+ "origin": "assisted-trial",
+ "template_digest": "bb0412f604e04d6f6343c18d111d05e368be0b2268d6e852f43e78e66c5b190c",
+ "export": {
+  "phase": "P0",
+  "project_name": "budget-trial",
+  "template_digest": "bb0412f604e04d6f6343c18d111d05e368be0b2268d6e852f43e78e66c5b190c",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1"
+ },
+ "provenance": {
+  "origin": "assisted-trial",
+  "scenario": {
+   "acceptance": [
+    "计划页对每个分配项同时显示计划金额、实际金额与剩余额度，并在录入支出后立即更新",
+    "任何一笔支出录入后，其所属分配项的剩余额度按该支出金额减少",
+    "分配项的实际支出超过计划金额后，其剩余额度显示为负数或明确的超支标记，而不是归零或隐藏",
+    "从分配项 A 转移金额到分配项 B 后，A 的剩余减少额与 B 的剩余增加额相同，计划总额不变",
+    "进入下一期后各分配项的计划金额回到模板数值，上一期剩余不被带入（未启用结转时）"
+   ],
+   "audience": "希望用预先承诺约束日常开支、且不连接银行账户的个人用户（如刚独立生活的年轻上班族）",
+   "id": "scn_6fb4896d9eb0428aa1c080df0a137813",
+   "leaf": "budgeting-application",
+   "leaf_name": "预算应用",
+   "name": "个人极简月度预算：先查剩余再消费",
+   "objective": "为一个月的各项用途预先设定计划金额，并在每次消费前查看该用途的剩余额度，让计划真正影响消费决策。",
+   "revision": 1,
+   "status": "draft",
+   "updated_at": "2026-10-17T01:05:15.622841+00:00",
+   "workflow": [
+    "新建本期（月度）计划，为食品、房租、交通、娱乐等用途创建分配项并填写计划金额",
+    "登记本期可用的预期收入，检查各分配项计划金额之和是否超过收入",
+    "消费后手动录入一笔支出并归属到对应分配项，该分配项剩余额度随即减少",
+    "购买前打开计划页，查看相关分配项及整体的剩余额度，据此决定是否购买或缩减金额",
+    "月中某分配项即将用尽，从其他分配项转移金额，或让超出部分留在该分配项上形成超支",
+    "期末查看各分配项的计划、实际与剩余对照，未使用金额留在本期，并按模板数值开始下一期计划"
+   ]
+  },
+  "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+  "case_ref": {
+   "case_id": "case:assisted-budget-actual",
+   "revision": 1,
+   "digest": "36729c5ed3f35e8732580af41fa69c27e16eacaaa067f38b9e73bfc0eaff12f0"
+  },
+  "case_record_sha256": "87847cb466a1ba8bda31ecf8ba04224b5bfdfb9a53fc3a18a41adfc8d6b2ce8e",
+  "definition_digest": "3d68ca5bc62166afb0172c680cf94f579e667cd15f609c9eb30ba4c8af65f936",
+  "official_publication": false,
+  "upstream_runtime": "not_run",
+  "independent_evidence_review": "pending",
+  "note": "Static Codex source study; no model review or formal queue consumption. Local freeze fixes inputs only."
+ },
+ "controlled_opencode_calls_added": 0,
+ "official_queue_consumed": false,
+ "archives": {
+  "template-snapshot.zip": "e5f58d0641f02ecaa27b06bd89a8844c3ab0ba7a7a2184f6c9875681c5896d79",
+  "development-package.zip": "1f78e45513dde3f3a50f1ea88fd708f5bd8a5095b00f359409b5e4852dcb6fc7"
+ }
+}

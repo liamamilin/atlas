@@ -1,0 +1,134 @@
+{
+  "case_id": "case:assisted-budget-actual",
+  "app_name": "Actual Budget",
+  "source_snapshots": [
+    {
+      "repository": "https://github.com/actualbudget/actual",
+      "commit_sha": "8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc",
+      "strategy_version": "assisted-core-source-v1",
+      "collected_at": "2026-10-20T15:57:35.354951+00:00",
+      "local_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/sources/assisted-trials/actual-8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc",
+      "files": {
+        "LICENSE.txt": "71e4b3053e4622e1f5fc5d8aa5336350de32ead39247924c596d659b89b47b6f",
+        "packages/docs/docs/getting-started/starting-fresh.md": "4b9e45063e43ebd05be174b1e3e20697048bd3f364563fed667734c1cb64f3ab",
+        "packages/loot-core/src/server/budget/base.ts": "0e55e0f309adb0cebb015ec92f56d95ebb385ce21093a8f32d3be0adc7e26f6e",
+        "packages/loot-core/src/server/budget/actions.ts": "5fa3915814c773ee998e6836e5fe7c5a562cad643b310a1ac74faad662ec3294",
+        "packages/cli/src/commands/budgets.ts": "a640afc468dc8c4550c9c0ad781758b247492a76eccb49f1e0498dcbb76de919"
+      },
+      "license_files": [
+        "LICENSE.txt"
+      ],
+      "license": {
+        "status": "located",
+        "spdx": "MIT",
+        "notice_hashes": {
+          "LICENSE.txt": "71e4b3053e4622e1f5fc5d8aa5336350de32ead39247924c596d659b89b47b6f"
+        }
+      },
+      "license_uncertainties": [],
+      "excluded_paths": [
+        "All unselected files; no build or upstream execution"
+      ]
+    }
+  ],
+  "research": {
+    "summary": "固定Actual Budget源码与文档，研究按月份/分类的金额聚合、整数小单位输入和重算设计；目标为极简个人预算而非复刻完整Actual。",
+    "scope": "月度分类预算、支出汇总、改后重算；辅助试用设计参考",
+    "unknowns": [
+      "上游未安装或运行",
+      "独立证据审阅pending",
+      "预计收入和无结转模板复制是目标设计，不宣称上游观察"
+    ],
+    "input_digest": "7b4c280185115cff93007dc613e44a9d39093f1bd93878aee93d587fcbd35417",
+    "task_id": "assisted-trial-budget-2026-10-21"
+  },
+  "observations": [
+    {
+      "evidence_id": "ev_assisted_budget_sum",
+      "kind": "code_observation",
+      "statement": "预算源码通过SQL按交易日期月份和分类GROUP BY聚合SUM(t.amount)，并以month-category键保存分类月度支出；该观察不说明本试用程序已运行。",
+      "location": {
+        "commit_sha": "8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc",
+        "path": "packages/loot-core/src/server/budget/base.ts",
+        "file_digest": "0e55e0f309adb0cebb015ec92f56d95ebb385ce21093a8f32d3be0adc7e26f6e",
+        "line_start": 62,
+        "line_end": 89
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_budget_minor",
+      "kind": "code_observation",
+      "statement": "CLI set-amount显式要求month、category和以cents为单位的amount，通过parseIntFlag解析整数再调用setBudgetAmount。",
+      "location": {
+        "commit_sha": "8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc",
+        "path": "packages/cli/src/commands/budgets.ts",
+        "file_digest": "a640afc468dc8c4550c9c0ad781758b247492a76eccb49f1e0498dcbb76de919",
+        "line_start": 77,
+        "line_end": 94
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_budget_recompute",
+      "kind": "code_observation",
+      "statement": "账户相关属性变化处理按月份枚举交易分类，并调用sheet.recompute重新计算sum-amount；这是上游重算机制的静态代码观察。",
+      "location": {
+        "commit_sha": "8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc",
+        "path": "packages/loot-core/src/server/budget/base.ts",
+        "file_digest": "0e55e0f309adb0cebb015ec92f56d95ebb385ce21093a8f32d3be0adc7e26f6e",
+        "line_start": 157,
+        "line_end": 180
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_budget_docs",
+      "kind": "documentation",
+      "statement": "入门文档说明信封预算可在分类间移动可用资金，并介绍按月份分配预算及对照预算与实际支出。",
+      "location": {
+        "url": "https://github.com/actualbudget/actual/blob/8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc/packages/docs/docs/getting-started/starting-fresh.md",
+        "material_version": "8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc",
+        "content_digest": "4b9e45063e43ebd05be174b1e3e20697048bd3f364563fed667734c1cb64f3ab"
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_budget_design",
+      "kind": "inference",
+      "statement": "本地单用户、人民币两位小数转整数分、预计收入、正数支出、无结转模板月度启动，是本场景的适配设计；不声称上游与本应用语义完全相同。",
+      "depends_on": [
+        "ev_assisted_budget_sum",
+        "ev_assisted_budget_minor",
+        "ev_assisted_budget_docs"
+      ],
+      "reasoning": "保留月度分类汇总与小单位金额思路，省略银行连接/账户同步，用SQLite事务支持手工记账与显式模板复制。",
+      "assumptions": [
+        "本机单人",
+        "一种货币CNY",
+        "无银行联接",
+        "本轮不运行上游"
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "scenario_id": "scn_6fb4896d9eb0428aa1c080df0a137813",
+      "scenario_revision": 1,
+      "reason": "支撑同一固定月度预算场景的分类/月度支出与金额设计",
+      "evidence_ids": [
+        "ev_assisted_budget_sum",
+        "ev_assisted_budget_minor",
+        "ev_assisted_budget_recompute",
+        "ev_assisted_budget_docs",
+        "ev_assisted_budget_design"
+      ],
+      "adopted_scope": [
+        "月度/分类聚合",
+        "整数金额",
+        "修改后重算"
+      ],
+      "exclusions": [
+        "银行同步",
+        "多用户",
+        "上游运行认证"
+      ]
+    }
+  ]
+}

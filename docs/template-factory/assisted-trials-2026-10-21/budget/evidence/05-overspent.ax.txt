@@ -1,0 +1,150 @@
+Browser tab: 6, Title: "月有度 · 个人预算", URL: "http://127.0.0.1:5274/?month=2026-10&saved=1".
+1 AXWebArea 月有度 · 个人预算, URL: 127.0.0.1:5274/?month=2026-10&saved=1
+	2 container
+		3 link Description: 月有度 · 个人预算, Value: 127.0.0.1:5274/
+		4 text 本机保存 · 辅助试用版
+	5 container
+		6 heading 每个月，都心中有数。, Value: 1
+			7 text 每个月，都心中有数。
+		8 text 计划先行，消费前看一眼剩余。金额单位：人民币元。
+		9 text 查看月份
+		10 date field (settable) 查看月份, Value: 2026-10, ID: month-6e743bd1
+			11 container
+				12 stepper
+				13 stepper
+			14 pop up button 显示月份选择器 显示月份选择器
+		15 button 查看月份
+		16 text 已保存，金额已重新计算。 计划支出 ¥220.00 2026-10 已花费 ¥42.80 2026-10 计划剩余 ¥177.20 2026-10 收入未分配 ¥4780.00 2026-10
+		17 heading 2026-10 · 用途预算, Value: 2
+			18 text 2026-10 · 用途预算
+		19 container
+			20 text 本月预计收入（元）
+			21 text field (settable) 本月预计收入（元）, Value: 5000.00, ID: income-a199d6b7
+			22 button 保存收入
+		23 table
+			24 row
+				25 cell
+					26 text 用途
+				27 cell
+					28 text 计划
+				29 cell
+					30 text 实际
+				31 cell
+					32 text 剩余
+				33 cell
+					34 text 调整
+			35 row
+				36 cell
+					37 text 食品
+				38 cell
+					39 text 20.00
+				40 cell
+					41 text 42.80
+				42 cell
+					43 text -22.80
+				44 cell
+					45 container
+						46 text field (settable) Description: 食品预算, Value: 20.00
+						47 button 改预算
+			48 row
+				49 cell
+					50 text 交通
+				51 cell
+					52 text 200.00
+				53 cell
+					54 text 0.00
+				55 cell
+					56 text 200.00
+				57 cell
+					58 container
+						59 text field (settable) Description: 交通预算, Value: 200.00
+						60 button 改预算
+		61 heading 添加用途, Value: 3
+			62 text 添加用途
+		63 container
+			64 text 用途名称
+			65 text field (settable) 用途名称, ID: name-80d81243
+			66 text 计划金额（元）
+			67 text field (settable) 计划金额（元）, ID: amount-cc93ad2b
+			68 button 添加用途
+		69 heading 本月支出, Value: 2
+			70 text 本月支出
+		71 table
+			72 row
+				73 cell
+					74 text 日期
+				75 cell
+					76 text 用途
+				77 cell
+					78 text 备注
+				79 cell
+					80 text 金额
+				81 cell
+					82 text 操作
+			83 row
+				84 cell
+					85 text 2026-10-21
+				86 cell
+					87 text 食品
+				88 cell
+					89 text [试用] 午餐
+				90 cell
+					91 text 12.30
+				92 cell
+					93 link Description: 编辑, Value: 127.0.0.1:5274/expense/ae3656c479f849eda0d22dc31d01b50e/edit
+			94 row
+				95 cell
+					96 text 2026-10-21
+				97 cell
+					98 text 食品
+				99 cell
+					100 text [试用] 早餐
+				101 cell
+					102 text 30.50
+				103 cell
+					104 link Description: 编辑, Value: 127.0.0.1:5274/expense/8e598917b4624b3c83bd89d2aeedc701/edit
+		105 heading 在用途之间调整计划, Value: 2
+			106 text 在用途之间调整计划
+		107 text 只移动计划金额，不改历史支出，计划总额保持不变。
+		108 container
+			109 text 从
+			110 pop up button (collapsed, settable) 从, Value: 食品, ID: source_id, Secondary Actions: Expand
+				111 menu
+					112 (selected) 食品
+					113 交通
+			114 text 转入
+			115 pop up button (collapsed, settable) 转入, Value: 食品, ID: target_id, Secondary Actions: Expand
+				116 menu
+					117 (selected) 食品
+					118 交通
+			119 text 转移金额
+			120 text field (settable) 转移金额, ID: amount-4b68c848
+			121 button 转移计划金额
+		122 container
+			123 heading ＋ 记一笔支出, Value: 2
+				124 text ＋ 记一笔支出
+			125 text 日期
+			126 date field (settable) 日期, Value: 2026-10-21, ID: date-9893f385
+				127 container
+					128 stepper
+					129 stepper
+					130 stepper
+				131 pop up button 显示日期选择器 显示日期选择器
+			132 text 归属用途
+			133 pop up button (collapsed, settable) 归属用途, Value: 食品, ID: category_id, Secondary Actions: Expand
+				134 menu
+					135 (selected) 食品
+					136 交通
+			137 text 支出金额（元）
+			138 text field (settable) 支出金额（元）, ID: amount-6bbbc08c
+			139 text 备注（可选）
+			140 text field (settable) 备注（可选）, ID: note-c7cb5d1f
+			141 button 记录支出
+		142 container
+			143 heading 为下个月留个模板, Value: 2
+				144 text 为下个月留个模板
+			145 text 保存当前用途预算和预计收入为模板。下个月创建计划时使用；不带入任何支出或剩余。
+			146 button 保存本月计划为模板
+		147 text 源自 Atlas 场景与固定开源案例 · SQLite 本机持久化 · Codex 辅助实现
+
+The focused UI element is 1 AXWebArea 月有度 · 个人预算, URL: 127.0.0.1:5274/?month=2026-10&saved=1
