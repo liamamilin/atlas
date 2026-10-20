@@ -1,0 +1,19 @@
+{
+ "summary": "architecture_contract 通过：默认归类、SQLite 数据模型、软删除/恢复、URL 策略、JSON/HTML 错误合同、UI 适配器与 A03/A11/A13 验收适配器相互一致且可实施；R8 已明确软删除记录按 ID 读取为 200 只读，并将 32 条错误分支限定为分类输入错误、其余错误由完整合同和既有 A02/A08/A10 覆盖。",
+ "checks": [
+  {
+   "dimension": "architecture_contract",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md",
+    "CASE_DESIGN.json",
+    "CASE_ADAPTATION_POLICY.json",
+    "REVISION.md",
+    "program-evidence/PROGRAM_EVIDENCE.json"
+   ],
+   "reason": "ARCHITECTURE.md 明确 categories/bookmarks 表、预置归类仅首次初始化创建、trashed_at 软删除及归类删除时活动与软删记录同事务迁入默认归类；GET /api/bookmarks/{id} 对活动与软删记录均返回 200 且只读，仅不存在 ID 返回 404；GET 的 category 缺省/空/未知语义与保存、移动显式空 category 的 400 invalid_category 明确分离。错误合同给出 JSON 错误结构与 atlas.bookmark-error-contract.v2 的 32 条分类输入分支范围说明，并列出 invalid_url、bad_request、not_found、duplicate_category、protected_category、duplicate_url 等完整合同，避免把机器枚举误当全部产品错误。UI 表单、data-testid、303/400/409 行为，以及 A03/A11 fresh 首启、A13 目标行原始 URL 与离线证据边界，均与 DRAFT、CASE_DESIGN、CASE_ADAPTATION_POLICY 及授权修订一致。"
+  }
+ ],
+ "suggestions": []
+}

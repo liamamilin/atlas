@@ -1,0 +1,34 @@
+{
+  "source_commit": "67d7da5d947c552fc32e794f34f46d6cc45b7259",
+  "factory_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory",
+  "started_epoch": 1792506603.917532,
+  "processes": [
+    {
+      "name": "api",
+      "pid": 34195,
+      "argv": [
+        "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+        "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/drafts_api.py",
+        "--port",
+        "5199"
+      ],
+      "cwd": "/Users/milin/2026/软件开发/application-atlas"
+    },
+    {
+      "name": "web",
+      "pid": 34196,
+      "argv": [
+        "npm",
+        "run",
+        "dev",
+        "--",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "5188",
+        "--strictPort"
+      ],
+      "cwd": "/Users/milin/2026/软件开发/application-atlas/atlas-web"
+    }
+  ]
+}

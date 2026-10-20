@@ -1,0 +1,220 @@
+{
+  "scope": "Actual R8 production observations; only archived completed CLI sessions. Missing stages are not run/passed.",
+  "captured_epoch": 1792507889.088643,
+  "job": {
+    "id": "job_dcb163d70a8e400fb07bc606570e2313",
+    "batch_id": "bat_110b70c765c04e57a76c168b1c33f83c",
+    "kind": "blueprint-production",
+    "state": "failed",
+    "stage": "blueprint-spec-review-0-ad1379367f3e742a-phase_acceptance",
+    "attempt": 1,
+    "error": "incomplete cognitive JSON; no fields recovered",
+    "created_at": "2026-10-20T14:29:11.300785+00:00",
+    "updated_at": "2026-10-20T14:44:52.320653+00:00"
+  },
+  "calls": [
+    {
+      "stage": "blueprint-spec-review-0-ad1379367f3e742a-architecture_contract",
+      "exit_code": 0,
+      "duration_seconds": 239.74,
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "observed_model": "unknown",
+      "effective_timeout_seconds": 1799.8982667922974,
+      "reservation_id": "bud_24f7e508fe22417eaf67b6272bad817b",
+      "outcome": "passed",
+      "checks": [
+        {
+          "dimension": "architecture_contract",
+          "outcome": "passed",
+          "files": [
+            "DRAFT.md",
+            "ARCHITECTURE.md",
+            "CASE_DESIGN.json",
+            "CASE_ADAPTATION_POLICY.json",
+            "REVISION.md",
+            "program-evidence/PROGRAM_EVIDENCE.json"
+          ],
+          "reason": "ARCHITECTURE.md 明确 categories/bookmarks 表、预置归类仅首次初始化创建、trashed_at 软删除及归类删除时活动与软删记录同事务迁入默认归类；GET /api/bookmarks/{id} 对活动与软删记录均返回 200 且只读，仅不存在 ID 返回 404；GET 的 category 缺省/空/未知语义与保存、移动显式空 category 的 400 invalid_category 明确分离。错误合同给出 JSON 错误结构与 atlas.bookmark-error-contract.v2 的 32 条分类输入分支范围说明，并列出 invalid_url、bad_request、not_found、duplicate_category、protected_category、duplicate_url 等完整合同，避免把机器枚举误当全部产品错误。UI 表单、data-testid、303/400/409 行为，以及 A03/A11 fresh 首启、A13 目标行原始 URL 与离线证据边界，均与 DRAFT、CASE_DESIGN、CASE_ADAPTATION_POLICY 及授权修订一致。"
+        }
+      ],
+      "source_manifest_sha256": "923197a9d0b6ba48dd796a8b8fbae03779de24b262d872e3322ec9a6b4fd8757"
+    },
+    {
+      "stage": "blueprint-spec-review-0-ad1379367f3e742a-phase_acceptance",
+      "exit_code": 0,
+      "duration_seconds": 299.22,
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "observed_model": "unknown",
+      "effective_timeout_seconds": 1799.891492540948,
+      "reservation_id": "bud_6ef81bf5f9b64e168919d3d65b2a082c",
+      "outcome": null,
+      "checks": null,
+      "source_manifest_sha256": "98da487337dd55bb03205680b832eb0e869f320d169d1faea2b779449a8a6f58"
+    },
+    {
+      "stage": "blueprint-spec-review-0-ad1379367f3e742a-product_completeness",
+      "exit_code": 0,
+      "duration_seconds": 292.34,
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "observed_model": "unknown",
+      "effective_timeout_seconds": 1799.8935197927058,
+      "reservation_id": "bud_c80cab55ab5049aa8f64f01fa2285932",
+      "outcome": "passed",
+      "checks": [
+        {
+          "dimension": "product_completeness",
+          "outcome": "passed",
+          "files": [
+            "DRAFT.md",
+            "ARCHITECTURE.md"
+          ],
+          "reason": "逐项追踪：F01 首页 form[action=/bookmarks/new] 保存并 303 到 /?category=...，失败保留 url/title/description/category；F02 省略归类落“未整理”且首启四预置；F03 首页 category-manager 进入 /categories，create/rename/delete 表单与 303、duplicate_category/protected_category 错误及保留值恢复；F04 每行 record-move-form 用 category_id 移动并 303 到目标归类；F05 侧栏 category-count 与 GET /?category= 浏览、只计活动记录；F06 category-search-form 提交 category+q 并保留查询/空结果；F07 record-open-link 指向原始 URL、/go/{id} 302、未知 id 404；F08 通过 --app-root/--data-dir 同目录重启读回；F09 record-delete-form 软删、/?trash=1 的 record-restore-form 恢复并 303 回归类；F10 所有表单/JSON 端点按错误合同返回 400/404/409 且零写入；F11 GET / 空库外壳与 /api/health。A01–A12 与 error_contract 的 HTML/JSON 分支均有对应入口、动作、成功导航、错误反馈与恢复；F12–F14 留在 P1，不阻塞 P0。未发现 API-only 的 P0 核心动作：F03/F04/F09 均有真实表单，F07 有记录行链接与 /go。"
+        }
+      ],
+      "source_manifest_sha256": "7d83245b5039fe080f547465bf50a62017bf6f326766824f662f80e79019b067"
+    },
+    {
+      "stage": "blueprint-spec-review-0-ad1379367f3e742a-scenario_scope",
+      "exit_code": 0,
+      "duration_seconds": 82.52,
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "observed_model": "unknown",
+      "effective_timeout_seconds": 1799.7769747078419,
+      "reservation_id": "bud_6c63807885ee4db787601d309dc10c5b",
+      "outcome": "passed",
+      "checks": [
+        {
+          "dimension": "scenario_scope",
+          "outcome": "passed",
+          "files": [
+            "DRAFT.md",
+            "ARCHITECTURE.md",
+            "REVISION.md"
+          ],
+          "reason": "DRAFT 的四条确认验收和五步工作流都在 P0 有对应能力：F01/F02/F08 覆盖主动保存、默认「未整理」及跨重启保留，F03/F04 覆盖新建归类与归类间移动，F05/F06 覆盖归类浏览与关键字检索，F07 覆盖以原始 URL 打开原页；F10/F11 提供输入错误恢复和本地页面外壳。ARCHITECTURE 为保存、归类管理、移动、检索、打开和回收站恢复声明了 HTML 表单或链接入口，不是仅暴露 API。P0 的 F01-F11/A01-A12 先完成核心旅程；P1 仅追加 F12-F14/A13-A15。F15/F16/F20-F24 明确排除，F17-F19 保留为 decision needed，未发现核心步骤外移或无关范围扩张。"
+        }
+      ],
+      "source_manifest_sha256": "e4e665dcf31578d3a3e4b7f59410e99ca71f7130a52aea80b99da5f7b7c574e0"
+    }
+  ],
+  "reservations": [
+    {
+      "id": "bud_6c63807885ee4db787601d309dc10c5b",
+      "campaign_id": "atlas-v1-first-production-2026-10-19",
+      "identity": "product-c42848f63251507bd9d911a5",
+      "phase": "G1",
+      "kind": "review",
+      "status": "completed",
+      "created": 1792506577.75824,
+      "started": 1792506577.9883058,
+      "finished": 1792506660.5053608,
+      "job_id": "job_dcb163d70a8e400fb07bc606570e2313",
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "requested_effort": null,
+      "stage": "blueprint-spec-review-0-ad1379367f3e742a-scenario_scope:00c45d5384508555",
+      "retry": null,
+      "observed_model": null,
+      "observed_effort": null,
+      "outcome": null,
+      "group_kind": "production",
+      "retry_scope": "blueprint-spec-review:scenario_scope",
+      "worker_token": "7efb8f25f0a14a868d3140913003c712:24abf09154c2402e8c5dc33e46eeb48b"
+    },
+    {
+      "id": "bud_c80cab55ab5049aa8f64f01fa2285932",
+      "campaign_id": "atlas-v1-first-production-2026-10-19",
+      "identity": "product-c42848f63251507bd9d911a5",
+      "phase": "G1",
+      "kind": "review",
+      "status": "completed",
+      "created": 1792506660.544482,
+      "started": 1792506660.6602361,
+      "finished": 1792506953.003335,
+      "job_id": "job_dcb163d70a8e400fb07bc606570e2313",
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "requested_effort": null,
+      "stage": "blueprint-spec-review-0-ad1379367f3e742a-product_completeness:1cb4309055c7e995",
+      "retry": null,
+      "observed_model": null,
+      "observed_effort": null,
+      "outcome": null,
+      "group_kind": "production",
+      "retry_scope": "blueprint-spec-review:product_completeness",
+      "worker_token": "7efb8f25f0a14a868d3140913003c712:24abf09154c2402e8c5dc33e46eeb48b"
+    },
+    {
+      "id": "bud_24f7e508fe22417eaf67b6272bad817b",
+      "campaign_id": "atlas-v1-first-production-2026-10-19",
+      "identity": "product-c42848f63251507bd9d911a5",
+      "phase": "G1",
+      "kind": "review",
+      "status": "completed",
+      "created": 1792506953.0619671,
+      "started": 1792506953.171573,
+      "finished": 1792507192.9131289,
+      "job_id": "job_dcb163d70a8e400fb07bc606570e2313",
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "requested_effort": null,
+      "stage": "blueprint-spec-review-0-ad1379367f3e742a-architecture_contract:47f2d0bea227ae2f",
+      "retry": null,
+      "observed_model": null,
+      "observed_effort": null,
+      "outcome": null,
+      "group_kind": "production",
+      "retry_scope": "blueprint-spec-review:architecture_contract",
+      "worker_token": "7efb8f25f0a14a868d3140913003c712:24abf09154c2402e8c5dc33e46eeb48b"
+    },
+    {
+      "id": "bud_6ef81bf5f9b64e168919d3d65b2a082c",
+      "campaign_id": "atlas-v1-first-production-2026-10-19",
+      "identity": "product-c42848f63251507bd9d911a5",
+      "phase": "G1",
+      "kind": "review",
+      "status": "failed",
+      "created": 1792507192.970658,
+      "started": 1792507193.0871491,
+      "finished": 1792507492.31547,
+      "job_id": "job_dcb163d70a8e400fb07bc606570e2313",
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "requested_effort": null,
+      "stage": "blueprint-spec-review-0-ad1379367f3e742a-phase_acceptance:e1d438aee4bbd55c",
+      "retry": null,
+      "observed_model": null,
+      "observed_effort": null,
+      "outcome": "cli_protocol",
+      "group_kind": "production",
+      "retry_scope": "blueprint-spec-review:phase_acceptance",
+      "worker_token": "7efb8f25f0a14a868d3140913003c712:24abf09154c2402e8c5dc33e46eeb48b"
+    }
+  ],
+  "checkpoints": [
+    {
+      "name": "blueprint-accepted-facts-view",
+      "digest": "8598295bca5580dec40dc1fa56b9b421d775d668a498b3ea3115fbae29141d4f"
+    },
+    {
+      "name": "blueprint-design-check-0-architecture_contract-ad1379367f3e742a",
+      "digest": "3303000103769a2956c4bde8eec6b9015812d07d18a06ca8a31b22dc10df760a"
+    },
+    {
+      "name": "blueprint-design-check-0-product_completeness",
+      "digest": "5d0cd760438afe719f20666149c84773adf19c058da1952d4b766b3b7fcfaabd"
+    },
+    {
+      "name": "blueprint-design-check-0-scenario_scope",
+      "digest": "d437fdf57d01115918df72cb96a825493ad33166866a880cc785f687f4dab30c"
+    },
+    {
+      "name": "blueprint-plan-0",
+      "digest": "8bf361dbaae383b02cb3fd48020cfa6d9a229edc2f08a00e5f92029fb8c3e3a4"
+    },
+    {
+      "name": "blueprint-research",
+      "digest": "9053da8cb157b5bec6ce698e163e208b5a500a3c121d12a6b1b8855aadba0238"
+    },
+    {
+      "name": "case-adaptation-prepared-0b627399d035068e",
+      "digest": "9b67a9576cc5825f449e3175211ded44b0497f43d372622e5ea928fe12235fc9"
+    }
+  ]
+}

@@ -1,0 +1,256 @@
+{
+  "schema": "atlas.g1-verification-manifest.v1",
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+  "plan_digest": "1f7701fbf5f52dde011dee76196b2cb01697e10190c6ad17c1273f4b5dcc3d30",
+  "sample_scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+  "source_tree_sha256": "d7f89d80e154d2e66becd0d2627eba9d123806c111a61425bf7c5329283b6458",
+  "checks": {
+    "python_audit": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "pip-audit",
+        "-r",
+        "requirements.txt"
+      ],
+      "cwd": ".",
+      "env": {},
+      "started_epoch": 1792505626.7259898,
+      "duration_seconds": 9.148,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/verification/verified/python_audit.txt",
+      "log_sha256": "15950a68a7ed99c59779717acefdceb3f69cfd31bde67d2c954f2a3cea4d7955"
+    },
+    "ruff": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "ruff",
+        "check",
+        "application-atlas-production-pack/privacy.py",
+        "application-atlas-production-pack/drafts_api.py",
+        "application-atlas-production-pack/drafts_engines/__init__.py",
+        "application-atlas-production-pack/mcp_atlas.py",
+        "application-atlas-production-pack/execution_service.py",
+        "application-atlas-production-pack/execution_state.py",
+        "application-atlas-production-pack/execution_workspace.py",
+        "application-atlas-production-pack/opencode_client.py",
+        "application-atlas-production-pack/opencode_cli_adapter.py",
+        "application-atlas-production-pack/opencode_permissions.py",
+        "application-atlas-production-pack/opencode_runtime.py",
+        "application-atlas-production-pack/project_export.py",
+        "application-atlas-production-pack/project_generation.py",
+        "application-atlas-production-pack/project_store.py",
+        "application-atlas-production-pack/project_backup.py",
+        "application-atlas-production-pack/runtime_recovery.py",
+        "application-atlas-production-pack/template_factory",
+        "atlas-web/scripts/gen-data.py",
+        "atlas-web/scripts/verify-web-data.py"
+      ],
+      "cwd": ".",
+      "env": {},
+      "started_epoch": 1792505635.874548,
+      "duration_seconds": 0.037,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/verification/verified/ruff.txt",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "backend_tests": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "application-atlas-production-pack/tests",
+        "-v"
+      ],
+      "cwd": ".",
+      "env": {},
+      "started_epoch": 1792505635.912145,
+      "duration_seconds": 137.859,
+      "tests_run": 760,
+      "skipped": 8,
+      "log_path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/verification/verified/backend_tests.txt",
+      "log_sha256": "4329567c63d50e5a4a52032e91907bf3be93e1ea6db59e422da425c3ae139508"
+    },
+    "atlas_export": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "python",
+        "application-atlas-production-pack/export_atlas.py"
+      ],
+      "cwd": ".",
+      "env": {},
+      "started_epoch": 1792505773.7714188,
+      "duration_seconds": 12.886,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/verification/verified/atlas_export.txt",
+      "log_sha256": "45b9b30284cac774a94cfb10e40f0dcf1158ba62e7a08c23b7876ec7e0f0866a"
+    },
+    "web_gen": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "npm",
+        "run",
+        "gen"
+      ],
+      "cwd": "atlas-web",
+      "env": {},
+      "started_epoch": 1792505786.657658,
+      "duration_seconds": 1.557,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/verification/verified/web_gen.txt",
+      "log_sha256": "595f500fa4212ef337070005c919ecaf7d78627444fcca6e8e725ff4ae260ed1"
+    },
+    "web_verify_data": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "npm",
+        "run",
+        "verify-data"
+      ],
+      "cwd": "atlas-web",
+      "env": {},
+      "started_epoch": 1792505788.214997,
+      "duration_seconds": 0.902,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/verification/verified/web_verify_data.txt",
+      "log_sha256": "22094869da48cb7d339d98117b76165cc372f560687f5145f94403c08f67b300"
+    },
+    "npm_audit": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "npm",
+        "audit",
+        "--registry=https://registry.npmjs.org",
+        "--audit-level=high"
+      ],
+      "cwd": "atlas-web",
+      "env": {},
+      "started_epoch": 1792505789.117413,
+      "duration_seconds": 2.291,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/verification/verified/npm_audit.txt",
+      "log_sha256": "c37e5556b203fd3c6beb12a0ecaf8f8af2fc342dc2fd2b4aa183a1b5ac08ea68"
+    },
+    "web_typecheck": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "cwd": "atlas-web",
+      "env": {},
+      "started_epoch": 1792505791.408986,
+      "duration_seconds": 2.601,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/verification/verified/web_typecheck.txt",
+      "log_sha256": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+    },
+    "web_unit": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "npm",
+        "test"
+      ],
+      "cwd": "atlas-web",
+      "env": {},
+      "started_epoch": 1792505794.0106392,
+      "duration_seconds": 0.189,
+      "tests_run": 9,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/verification/verified/web_unit.txt",
+      "log_sha256": "2158f044533ed36d404218e9ebbc1bca2347ec38069ebce6e1fdb4568e928b2d"
+    },
+    "web_build": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "atlas-web",
+      "env": {},
+      "started_epoch": 1792505794.200395,
+      "duration_seconds": 2.976,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/verification/verified/web_build.txt",
+      "log_sha256": "8d2934355be0a16cc60d7375533e5748a3dfe9e25aa250cd2c66335eab308a61"
+    },
+    "default_e2e": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "npm",
+        "run",
+        "test:e2e"
+      ],
+      "cwd": "atlas-web",
+      "env": {},
+      "started_epoch": 1792505837.335217,
+      "duration_seconds": 43.397,
+      "tests_run": 17,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/verification/verified/default_e2e.txt",
+      "log_sha256": "de1fa4f72f64caf6655e151575645af773c4936b27a76f7a3c691fc66c83679e"
+    },
+    "factory_e2e": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "npm",
+        "run",
+        "test:e2e:factory",
+        "--",
+        "--reporter=line"
+      ],
+      "cwd": "atlas-web",
+      "env": {},
+      "started_epoch": 1792505880.7330072,
+      "duration_seconds": 50.258,
+      "tests_run": 27,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/verification/verified/factory_e2e.txt",
+      "log_sha256": "aa3612c17ec6628b48895e580f6150803145a884cda76de7c5fa3bc6ae0137d7"
+    },
+    "docker_integration": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "python",
+        "application-atlas-production-pack/tests/run_required_docker_integration.py"
+      ],
+      "cwd": ".",
+      "env": {
+        "ATLAS_RUN_DOCKER_INTEGRATION": "1"
+      },
+      "started_epoch": 1792505930.991714,
+      "duration_seconds": 56.979,
+      "tests_run": 20,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/verification/verified/docker_integration.txt",
+      "log_sha256": "e4ea36ad926b97a8365389870a034387dc20e03d09bc0c45631e7d98bc500929"
+    }
+  },
+  "scope": "Actual passed host checks only; no new published template/standard handoff/P0/runtime proof exists. Assessment is expected to remain blocked."
+}

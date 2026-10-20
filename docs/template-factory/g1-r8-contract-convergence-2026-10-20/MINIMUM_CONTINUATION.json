@@ -1,0 +1,71 @@
+{
+  "schema": "atlas.continuation-proposal.v1",
+  "status": "not_authorized_not_registered_not_queued",
+  "reason": "Invalid phase_acceptance JSON delivery; existing ordinary retry allowance exhausted and no applicable unused exception grant. No template business defect has been accepted from this malformed delivery.",
+  "requested_minimum": {
+    "same_job": true,
+    "same_input": true,
+    "one_extra_protocol_review_cli": 1,
+    "business_repairs_remain": "8/8",
+    "global_cli_limit": 500,
+    "deadline_unchanged": 1792592951.1518772,
+    "template_author_calls": 0,
+    "content_changes": false,
+    "new_campaign_or_product": false
+  },
+  "binding": {
+    "campaign_id": "atlas-v1-first-production-2026-10-19",
+    "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+    "product_id": "product-c42848f63251507bd9d911a5",
+    "job_id": "job_dcb163d70a8e400fb07bc606570e2313",
+    "attempt": 1,
+    "operation": "blueprint-spec-review-0-ad1379367f3e742a-phase_acceptance:e1d438aee4bbd55c",
+    "logical_retry_scope": "blueprint-spec-review:phase_acceptance",
+    "failed_reservation_id": "bud_6ef81bf5f9b64e168919d3d65b2a082c",
+    "input_sha256": "5e164e3a251e10ea945ebf8ff46928a4b05084570d3bca2ebf366346f30739b3",
+    "full_payload_digest": "dc0da762b689e2217b8eb15206488928993c0019379605e603cd4ffd4392b41b",
+    "budget_input_digest": "e1d438aee4bbd55c13b405279900c4bc1c6da68237c54c57675c9ea545120c5c",
+    "source_tree_digest": "b2d9f5b495507847b506d5e1e091282ab09dea333177822daf0b1e4bf32ba47d",
+    "projection_digest": "b2d9f5b495507847b506d5e1e091282ab09dea333177822daf0b1e4bf32ba47d",
+    "prompt_sha256_reconstructed_from_exact_checked_host_source": "0ef68ec6fc9217c8a7314c13a1e51d05c1324dea5c5d7ae62060bada1fab6c4d",
+    "job_snapshot_digest": "884415c956bec323defd433884c59ab9dd2cd672eb3393b94ee40b9d013b9d24",
+    "source_commit": "67d7da5d947c552fc32e794f34f46d6cc45b7259"
+  },
+  "passed_checkpoints_to_validate_and_reuse": [
+    {
+      "name": "blueprint-design-check-0-architecture_contract-ad1379367f3e742a",
+      "digest": "3303000103769a2956c4bde8eec6b9015812d07d18a06ca8a31b22dc10df760a",
+      "outcome": "passed",
+      "proposal_digest": "8bf361dbaae383b02cb3fd48020cfa6d9a229edc2f08a00e5f92029fb8c3e3a4",
+      "projection_digest": "da8b8a65302458d7356f52415f21d343d1e782b21186097dc754cfd7cd13bdb2"
+    },
+    {
+      "name": "blueprint-design-check-0-product_completeness",
+      "digest": "5d0cd760438afe719f20666149c84773adf19c058da1952d4b766b3b7fcfaabd",
+      "outcome": "passed",
+      "proposal_digest": "8bf361dbaae383b02cb3fd48020cfa6d9a229edc2f08a00e5f92029fb8c3e3a4",
+      "projection_digest": "45f862116f4dfcc966158a69b41a1bd8fd5951b4d60edf9d1577da5f0338ccfd"
+    },
+    {
+      "name": "blueprint-design-check-0-scenario_scope",
+      "digest": "d437fdf57d01115918df72cb96a825493ad33166866a880cc785f687f4dab30c",
+      "outcome": "passed",
+      "proposal_digest": "8bf361dbaae383b02cb3fd48020cfa6d9a229edc2f08a00e5f92029fb8c3e3a4",
+      "projection_digest": "46cc409e797efa2a7d0f18cffe5785619b8f6fdd60eeea14db6bcde9116ebace"
+    }
+  ],
+  "resume_policy": "Use an explicitly authorized, input-bound formal grant/recovery; ordinary retry has no remaining allowance. First validate all bindings; do not rewrite the malformed original, reconstruct its missing brace, alter source/program bytes, or rerun the first three checks without an input identity change.",
+  "following_original_sequence": [
+    "phase_acceptance valid result",
+    "decisions_defaults",
+    "runtime_protocol",
+    "aggregate review",
+    "new freeze",
+    "independent frozen review",
+    "publish",
+    "standard handoff consumed by real P0 job",
+    "real frozen P0 suite and independent browser",
+    "exact phase proof and host G1 assessment",
+    "original T08 three scenarios after G1 passed"
+  ]
+}

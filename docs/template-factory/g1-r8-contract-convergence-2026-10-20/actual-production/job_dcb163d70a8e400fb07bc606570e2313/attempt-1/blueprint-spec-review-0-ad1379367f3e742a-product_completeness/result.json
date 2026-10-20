@@ -1,0 +1,20 @@
+{
+ "summary": "当前 required P0 旅程在语义与可达性上完整：F01–F11 均有真实 HTML 表单或页面入口，成功后有 303 导航与持久化读回，错误有可读 form-error 或结构化 JSON 与可重试表单；contract_coverage 的 32 个错误分支均落到声明的表单/API，未发现阻断性缺口。仅有三处非阻断澄清：回收站导航、归类跨重启验收、PATCH 恢复措辞。",
+ "checks": [
+  {
+   "dimension": "product_completeness",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "逐项追踪：F01 首页 form[action=/bookmarks/new] 保存并 303 到 /?category=...，失败保留 url/title/description/category；F02 省略归类落“未整理”且首启四预置；F03 首页 category-manager 进入 /categories，create/rename/delete 表单与 303、duplicate_category/protected_category 错误及保留值恢复；F04 每行 record-move-form 用 category_id 移动并 303 到目标归类；F05 侧栏 category-count 与 GET /?category= 浏览、只计活动记录；F06 category-search-form 提交 category+q 并保留查询/空结果；F07 record-open-link 指向原始 URL、/go/{id} 302、未知 id 404；F08 通过 --app-root/--data-dir 同目录重启读回；F09 record-delete-form 软删、/?trash=1 的 record-restore-form 恢复并 303 回归类；F10 所有表单/JSON 端点按错误合同返回 400/404/409 且零写入；F11 GET / 空库外壳与 /api/health。A01–A12 与 error_contract 的 HTML/JSON 分支均有对应入口、动作、成功导航、错误反馈与恢复；F12–F14 留在 P1，不阻塞 P0。未发现 API-only 的 P0 核心动作：F03/F04/F09 均有真实表单，F07 有记录行链接与 /go。",
+   "outcome_reason": "passed"
+  }
+ ],
+ "suggestions": [
+  "为 F09 在首页/列表外壳增加持久的“回收站”链接（含稳定 data-testid），使删除 303 之后及重启后的恢复表单不只依赖手输 /?trash=1；若不增加，请在 F09/A09 明确回收站仅为 URL 可达。",
+  "为 F03 的用户新建/重命名/删除归类补一条与 A01/A05/A09 同类的重启读回断言（至少覆盖新建归类和删除迁移后的归属），以兑现确认场景“新建归类后重新打开仍有效”和 F03 的持久化声明；或明确 F08 的跨重启范围仅指书签行。",
+  "F07 的“URL 有误可由 PATCH API 更新”不是浏览器用户的 UI 恢复路径；改为删除/重新保存的可达路径，或明确标注 PATCH 仅为 API 能力，避免把 API 当作 UI 恢复。"
+ ]
+}
