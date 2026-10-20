@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from template_factory.budget import BudgetAmendmentService, BudgetLedger
 from template_factory.pipeline import Pipeline
 from template_factory.r5_execution import R5ExecutionService
-from template_factory.store import FactoryStore, canonical, digest, now
+from template_factory.store import FactoryError, FactoryStore, canonical, digest, now
 from template_factory.v1_batches import BatchService, migrate as migrate_batches
 
 PACK = Path(__file__).resolve().parents[1]
@@ -289,21 +289,15 @@ class R5PreparedLinkTests(unittest.TestCase):
         self.assertEqual(claimed["snapshot"]["v1"]["plan_id"], PLAN_ID)
         spy = DesignReviewSpy(prepared["effective_plan_digest"])
         pipeline = Pipeline(self.store, cli=spy)
-        with self.assertRaises(StopAtArchitectureReview):
+        with self.assertRaises(FactoryError) as rejected:
             pipeline.run(claimed)
-
-        self.assertEqual([call[1]["review_dimensions"][0] for call in spy.calls], [
-            "scenario_scope", "product_completeness", "architecture_contract"])
-        self.assertIn("case_design", spy.materials)
-        self.assertIn("case_policy", spy.materials)
-        self.assertEqual(spy.materials["case_design"], prepared["case_design"])
-        self.assertEqual(spy.materials["case_policy"]["scenario_id"], self.job_fixture["snapshot"]["scenario"]["id"])
-        self.assertEqual(spy.materials["case_policy"]["product_id"], PRODUCT)
-        self.assertFalse(any(name.startswith(("blueprint-generate", "blueprint-research", "case-adaptation"))
-                             for name, _, _ in spy.calls))
-        self.assertEqual(len(spy.calls), 3)
-        # The fake design-review boundary itself does not consume CLI sessions;
-        # exactly one synthetic later completed session was charged above.
+        self.assertEqual(rejected.exception.code, "invalid_feature_sources")
+        self.assertIn("S17", str(rejected.exception))
+        # Formal authorization, prepared R5 successor creation, replay, claim,
+        # and budget activation above remain covered. The stale legacy source
+        # references now stop at the shared early gate before any model call.
+        self.assertEqual(spy.calls, [])
+        self.assertIsNone(spy.materials)
         self.assertEqual(BudgetLedger(self.store, campaign_id=CAMPAIGN, clock=lambda: FIXED_CLOCK).snapshot()["cli_sessions_used"], 53)
         self.assertEqual(self.store.job(JOB_ID)["state"], "failed")
         self.assertEqual(self.store.job(ARTIFACT_JOB_ID)["state"], "completed")
