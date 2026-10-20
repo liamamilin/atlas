@@ -8,13 +8,20 @@ from .store import FactoryError, canonical, now
 
 def review_status(con, artifact_id, artifact_digest):
     """Latest request wins, including incomplete/failed requests; no historical-pass fallback."""
-    job = con.execute("SELECT id,state FROM job WHERE kind='cognitive-review' AND "
+    job = con.execute("SELECT id,state,attempt FROM job WHERE kind='cognitive-review' AND "
                       "json_extract(snapshot,'$.artifact_id')=? AND json_extract(snapshot,'$.artifact_digest')=? "
                       "ORDER BY created_at DESC,rowid DESC LIMIT 1", (artifact_id, artifact_digest)).fetchone()
     if not job:
         return "unavailable"
     result = con.execute("SELECT body FROM acceptance WHERE job_id=? AND digest=? ORDER BY created_at DESC,rowid DESC LIMIT 1", (job["id"], artifact_digest)).fetchone()
-    return json.loads(result[0]).get("outcome", "unavailable") if result and job["state"] not in {"queued", "running", "failed", "cancelled", "interrupted"} else "unavailable"
+    if not result or job["state"] in {"queued", "running", "failed", "cancelled", "interrupted", "paused_budget"}:
+        return "unavailable"
+    body = json.loads(result[0])
+    # Legacy attempt-one records predate job_attempt. A recovered job cannot
+    # inherit such a verdict while its own acceptance has not been committed.
+    if body.get("job_attempt", 1) != job["attempt"]:
+        return "unavailable"
+    return body.get("outcome", "unavailable")
 
 
 def catalog_eligibility(store, artifact):

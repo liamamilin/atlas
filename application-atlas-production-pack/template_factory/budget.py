@@ -65,6 +65,7 @@ G1_R7_IDEMPOTENCY_KEY = "atlas-g1-r7-acceptance-alignment-2026-10-20-v1"
 G1_R7_EVIDENCE_JOB = "job_3a658ba085e8417ea6faad5cb0cdd493"
 G1_R7_EVIDENCE_SCOPE = "blueprint-spec-review:phase_acceptance"
 G1_R7_EVIDENCE_STAGE_PREFIX = "blueprint-spec-review-0-ad1379367f3e742a-phase_acceptance"
+FROZEN_REVIEW_JOB = "job_b01427592b164863aab5bedf7b3863bb"
 
 
 def build_r7_authorization_request(store, prepared_request, *, summary, reason,
@@ -298,6 +299,8 @@ class BudgetLedger:
             remaining = deadline - now
             if remaining <= 0:
                 raise FactoryError("phase deadline exhausted", "budget_deadline", 409)
+            if job_id == FROZEN_REVIEW_JOB and remaining < 2700:
+                raise FactoryError("frozen-review call lacks its required deadline reserve", "budget_deadline", 409)
             if evidence_recovery_id:
                 owner = con.execute("SELECT state,token,lease FROM job WHERE id=?", (job_id,)).fetchone()
                 if (not job_token or owner is None or owner["state"] != "running"
@@ -327,6 +330,19 @@ class BudgetLedger:
                      or _legacy_retry_scope(stage) == G1_R7_EVIDENCE_SCOPE
                      or str(stage or "").startswith(G1_R7_EVIDENCE_STAGE_PREFIX))
             )
+            frozen_review_scope = (
+                self.campaign_id == G1_AMENDMENT_CAMPAIGN
+                and str(identity) == G1_AMENDMENT_PRODUCT
+                and plan_id == G1_AMENDMENT_PLAN
+                and job_id == FROZEN_REVIEW_JOB
+                and str(phase) == "G1"
+            )
+            if frozen_review_scope and not evidence_recovery_id:
+                raise FactoryError("frozen-review job reservations require its exact one-use grant", "evidence_grant_binding", 409)
+            if frozen_review_scope and (retry != 1 or kind != "review" or not retry_scope or not stage):
+                raise FactoryError("frozen-review grant requires its bound review retry", "evidence_grant_binding", 409)
+            if frozen_review_scope and timeout != 1800:
+                raise FactoryError("frozen-review grant requires its exact 1800 second timeout", "evidence_grant_binding", 409)
             if r7_evidence_scope:
                 if evidence_recovery_id and (
                     str(retry_scope or "") != G1_R7_EVIDENCE_SCOPE
@@ -372,8 +388,17 @@ class BudgetLedger:
                         campaign_id=self.campaign_id, identity=str(identity), plan_id=plan_id,
                         job_id=job_id, phase=str(phase), stage=stage, retry=retry,
                         retry_scope=scope, requested_model=requested_model, kind=kind,
-                        deadline=deadline,
+                        deadline=deadline, timeout=timeout,
                     )
+                    if evidence_grant:
+                        grant_row = con.execute("SELECT request_json FROM tf_evidence_recovery_grant WHERE id=?",
+                                                (evidence_grant["id"],)).fetchone()
+                        proposal = json.loads(grant_row[0]) if grant_row else {}
+                        if proposal.get("schema") == "atlas.frozen-review-recovery-proposal.v1":
+                            from .v1_batches import _g1_source_digest
+                            approved = proposal.get("source_gate", {}).get("source_tree_digest")
+                            if not approved or _g1_source_digest(self.store.pack.parent) != approved:
+                                raise FactoryError("frozen-review host source changed after authorization", "evidence_source_gate", 409)
                 elif count >= self.limits["transient_retries"]:
                     if self.limits["transient_retries"] >= 2:
                         from .protocol_grants import ProtocolRetryGrantService
@@ -481,11 +506,18 @@ class BudgetLedger:
 
     def mark_started(self, reservation_id):
         with self.store.connect(True) as con:
-            row = con.execute("SELECT status FROM tf_budget_reservation WHERE id=? AND campaign_id=?",
+            row = con.execute("SELECT status,job_id,worker_token FROM tf_budget_reservation WHERE id=? AND campaign_id=?",
                               (reservation_id, self.campaign_id)).fetchone()
             if not row:
                 raise FactoryError("budget reservation not found", "budget_reservation_missing", 404)
             if row[0] == "reserved":
+                evidence = con.execute("SELECT u.grant_id,g.call_attempt,j.attempt,j.state,j.token,j.lease FROM tf_evidence_recovery_grant_use u JOIN tf_evidence_recovery_grant g ON g.id=u.grant_id JOIN job j ON j.id=? WHERE u.reservation_id=? AND u.status='spawn_intent'", (row[1], reservation_id)).fetchone()
+                if evidence:
+                    now = float(self.clock())
+                    if (evidence["state"] != "running" or evidence["token"] != row[2]
+                            or evidence["lease"] is None or evidence["lease"] <= now
+                            or evidence["attempt"] != evidence["call_attempt"]):
+                        raise FactoryError("evidence call lost its current token or attempt before start", "lease_lost", 409)
                 con.execute("UPDATE tf_budget_reservation SET status='started',started=? WHERE id=?",
                             (float(self.clock()), reservation_id))
                 con.execute("UPDATE tf_protocol_retry_grant_use SET status='started' WHERE reservation_id=? AND status='reserved'", (reservation_id,))
@@ -507,10 +539,31 @@ class BudgetLedger:
                     raise FactoryError("evidence call CLI configuration path is required", "evidence_grant_binding", 409)
                 try:
                     config = json.loads((__import__("pathlib").Path(directory) / "opencode.json").read_text(encoding="utf-8"))
-                    from .evidence_views import readonly_cli_config_identity
-                    actual_identity = readonly_cli_config_identity(config, directory)
                     proposal_row = con.execute("SELECT request_json FROM tf_evidence_recovery_grant WHERE id=?", (grant[0],)).fetchone()
-                    expected_identity = json.loads(proposal_row[0])["materials"]["new_phase"]["cli_config_identity"]
+                    from .evidence_grants import FROZEN_REVIEW_SCHEMA, get_call_binding
+                    proposal = json.loads(proposal_row[0])
+                    binding = get_call_binding(proposal)
+                    if proposal.get("schema") == FROZEN_REVIEW_SCHEMA:
+                        from .v1_batches import _g1_source_digest
+                        approved_source = proposal.get("source_gate", {}).get("source_tree_digest")
+                        if not approved_source or _g1_source_digest(self.store.pack.parent) != approved_source:
+                            raise ValueError("frozen-review host source changed after authorization")
+                        from .frozen_review_materials import registered_read_resources, validate_readonly_config
+                        from .artifacts import tree_manifest
+                        call = binding
+                        attempt_dir = __import__("pathlib").Path(directory)
+                        if (hashlib.sha256((attempt_dir / "input.json").read_bytes()).hexdigest() != call["input_sha256"]
+                                or hashlib.sha256((attempt_dir / "prompt.txt").read_bytes()).hexdigest() != call["prompt_sha256"]
+                                or digest(tree_manifest(attempt_dir / "source")) != call["source_tree_digest"]):
+                            raise ValueError("frozen-review call files changed before spawn")
+                        registered = registered_read_resources(directory,
+                            expected_manifest_digest=binding["materials_manifest_digest"],
+                            expected_tree_digest=binding["materials_tree_digest"])
+                        actual_identity = validate_readonly_config(config, directory, registered["manifest"], binding["cli_config_identity"])
+                    else:
+                        from .evidence_views import readonly_cli_config_identity
+                        actual_identity = readonly_cli_config_identity(config, directory)
+                    expected_identity = binding["cli_config_identity"]
                 except (OSError, ValueError, KeyError, ImportError) as exc:
                     raise FactoryError("evidence call CLI configuration cannot be verified", "evidence_grant_binding", 409) from exc
                 if actual_identity != expected_identity:
@@ -518,12 +571,19 @@ class BudgetLedger:
                 now = float(self.clock())
                 grant_record = json.loads(proposal_row[0])
                 fixed_deadline = float(grant_record["materials"]["binding"]["deadline"])
-                if now >= fixed_deadline:
+                frozen = grant_record.get("schema") == "atlas.frozen-review-recovery-proposal.v1"
+                minimum_slack = 2700 if frozen else 0
+                if now >= fixed_deadline or fixed_deadline - now < minimum_slack:
                     raise FactoryError("evidence recovery authorization deadline has passed", "budget_deadline", 409)
                 owner = con.execute("SELECT state,token,lease FROM job WHERE id=?", (row[1],)).fetchone()
                 if (owner is None or owner["state"] != "running" or owner["token"] != row[2]
                         or owner["lease"] is None or owner["lease"] <= now):
                     raise FactoryError("evidence review job token or lease is no longer current", "lease_lost", 409)
+                if frozen:
+                    attempt_row = con.execute("SELECT call_attempt FROM tf_evidence_recovery_grant WHERE id=? AND consumed_reservation_id=?", (grant[0], reservation_id)).fetchone()
+                    owner_attempt = con.execute("SELECT attempt FROM job WHERE id=?", (row[1],)).fetchone()
+                    if not attempt_row or attempt_row["call_attempt"] != owner_attempt["attempt"]:
+                        raise FactoryError("frozen-review call attempt changed before spawn", "evidence_grant_binding", 409)
                 changed = con.execute("UPDATE tf_evidence_recovery_grant SET status='spawn_intent' WHERE id=? AND consumed_reservation_id=? AND status='reserved'", (grant[0], reservation_id)).rowcount
                 if changed != 1:
                     raise FactoryError("evidence grant cannot enter spawn intent", "evidence_grant_used", 409)

@@ -1,0 +1,680 @@
+{
+  "old_prompt_sha256": "9cdd40b5ee69c3b14675fa60569b9f9fb948949dd7be493fe6ff7436a1c9ce09",
+  "append_text": "\n\nFrozen-review reading materials:\n- Read review-materials/INDEX.md first. The registered files there are lossless UTF-8 presentations of long strings from the original input.json, leaf.md, or frozen source/; they are not summaries.\n- Read every indexed review diff and text through its end. When an entry lists offset segments, read every part and use the offsets to reconstruct the exact physical line; segment boundaries are display-only. Continue paged reads until the file ends.\n- If identical original text has multiple origins, one byte-verified derived copy is sufficient; the manifest preserves every origin. All original source/ remains available and must be checked against its presentation.\n- Preserve the original eight review dimensions, assertions, repair scope, existing unknowns, and suggestions. No outside historical review conclusions are added. Do not assume a pass; mark uncertain when evidence is insufficient.\n- Final `files` references may name only existing frozen files in input.source_inventory. review-materials/, its manifest, leaf.md, and input.json are reading context, not frozen files or new case facts.",
+  "append_sha256": "7a3436f48b58a17625504b37c2c13477886d1406c651ad9f12a7b0097df9839d",
+  "new_prompt_sha256": "e944a32a1986c44ab71af7a1dfdbbf439335264b252387c9baae371876dae47f",
+  "original_cli_config_sha256": "4f9ccd08779372c77b2e1454e6bb8bd519082b8236b9f6fe27bee9b9438a4115",
+  "effective_cli_config_identity": {
+    "schema": "atlas.frozen-review-readonly-config.v1",
+    "default_permission": "deny",
+    "relative_read_resources": [
+      "input.json",
+      "leaf.md",
+      "source",
+      "source/**",
+      "review-materials",
+      "review-materials/INDEX.md",
+      "review-materials/manifest.json",
+      "review-materials/text",
+      "review-materials/text/0001.md",
+      "review-materials/text/0002.md",
+      "review-materials/text/0003.diff",
+      "review-materials/text/0004.diff",
+      "review-materials/text/0005.diff",
+      "review-materials/text/0006.diff",
+      "review-materials/text/0007.diff",
+      "review-materials/text/0008.diff",
+      "review-materials/text/0009.diff",
+      "review-materials/text/0010.txt",
+      "review-materials/text/0011.diff",
+      "review-materials/text/0012.diff",
+      "review-materials/text/0013.diff",
+      "review-materials/text/0014.diff",
+      "review-materials/text/0015.md",
+      "review-materials/text/0016.txt"
+    ],
+    "absolute_material_reads": [
+      "{attempt}/review-materials",
+      "{attempt}/review-materials/INDEX.md",
+      "{attempt}/review-materials/manifest.json",
+      "{attempt}/review-materials/text",
+      "{attempt}/review-materials/text/0001.md",
+      "{attempt}/review-materials/text/0002.md",
+      "{attempt}/review-materials/text/0003.diff",
+      "{attempt}/review-materials/text/0004.diff",
+      "{attempt}/review-materials/text/0005.diff",
+      "{attempt}/review-materials/text/0006.diff",
+      "{attempt}/review-materials/text/0007.diff",
+      "{attempt}/review-materials/text/0008.diff",
+      "{attempt}/review-materials/text/0009.diff",
+      "{attempt}/review-materials/text/0010.txt",
+      "{attempt}/review-materials/text/0011.diff",
+      "{attempt}/review-materials/text/0012.diff",
+      "{attempt}/review-materials/text/0013.diff",
+      "{attempt}/review-materials/text/0014.diff",
+      "{attempt}/review-materials/text/0015.md",
+      "{attempt}/review-materials/text/0016.txt"
+    ],
+    "agent": {
+      "name": "atlas-factory-{attempt_sha256_12}",
+      "mode": "primary",
+      "description": "Atlas read-only factory proposal agent"
+    },
+    "policies": [
+      {
+        "action": "tool.use",
+        "resource": "shell:*",
+        "effect": "deny"
+      },
+      {
+        "action": "tool.use",
+        "resource": "execute:*",
+        "effect": "deny"
+      },
+      {
+        "action": "plugin.use",
+        "resource": "*",
+        "effect": "deny"
+      },
+      {
+        "action": "mcp.use",
+        "resource": "*",
+        "effect": "deny"
+      },
+      {
+        "action": "skill.use",
+        "resource": "*",
+        "effect": "deny"
+      }
+    ],
+    "materials_manifest_digest": "5e0bc6f9ad0376f50b9e01bf2be0d4c655764f980f053cc5f8af814e69e21d6f",
+    "config_digest": "6867650df2ee780eb27ae62cf76a74afffb2130d6e4179bd01e835addea96d18"
+  },
+  "effective_config": {
+    "$schema": "https://opencode.ai/config.json",
+    "permissions": [
+      {
+        "action": "*",
+        "resource": "*",
+        "effect": "deny"
+      },
+      {
+        "action": "read",
+        "resource": "input.json",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "leaf.md",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "source",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "source/**",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/input.json",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/leaf.md",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/source",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/source/**",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/INDEX.md",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/manifest.json",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text/0001.md",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text/0002.md",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text/0003.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text/0004.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text/0005.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text/0006.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text/0007.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text/0008.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text/0009.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text/0010.txt",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text/0011.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text/0012.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text/0013.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text/0014.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text/0015.md",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "review-materials/text/0016.txt",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/INDEX.md",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/manifest.json",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0001.md",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0002.md",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0003.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0004.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0005.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0006.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0007.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0008.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0009.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0010.txt",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0011.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0012.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0013.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0014.diff",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0015.md",
+        "effect": "allow"
+      },
+      {
+        "action": "read",
+        "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0016.txt",
+        "effect": "allow"
+      }
+    ],
+    "agents": {
+      "atlas-factory-7e11ae6c38e4": {
+        "mode": "primary",
+        "description": "Atlas read-only factory proposal agent",
+        "permissions": [
+          {
+            "action": "*",
+            "resource": "*",
+            "effect": "deny"
+          },
+          {
+            "action": "read",
+            "resource": "input.json",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "leaf.md",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "source",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "source/**",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/input.json",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/leaf.md",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/source",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/source/**",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/INDEX.md",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/manifest.json",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text/0001.md",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text/0002.md",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text/0003.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text/0004.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text/0005.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text/0006.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text/0007.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text/0008.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text/0009.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text/0010.txt",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text/0011.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text/0012.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text/0013.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text/0014.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text/0015.md",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "review-materials/text/0016.txt",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/INDEX.md",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/manifest.json",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0001.md",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0002.md",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0003.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0004.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0005.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0006.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0007.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0008.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0009.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0010.txt",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0011.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0012.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0013.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0014.diff",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0015.md",
+            "effect": "allow"
+          },
+          {
+            "action": "read",
+            "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0016.txt",
+            "effect": "allow"
+          }
+        ]
+      }
+    },
+    "policies": [
+      {
+        "action": "tool.use",
+        "resource": "shell:*",
+        "effect": "deny"
+      },
+      {
+        "action": "tool.use",
+        "resource": "execute:*",
+        "effect": "deny"
+      },
+      {
+        "action": "plugin.use",
+        "resource": "*",
+        "effect": "deny"
+      },
+      {
+        "action": "mcp.use",
+        "resource": "*",
+        "effect": "deny"
+      },
+      {
+        "action": "skill.use",
+        "resource": "*",
+        "effect": "deny"
+      }
+    ]
+  },
+  "material_manifest_sha256": "ad76380a71a55b277dabb663bb039c5df8e29ed738ffeb7f4b290ad75f5b5460",
+  "material_tree_digest": "20abaed83c7348e1857e25b3c02bd9252d7d1f6a105fc8c1762df99e4118681a",
+  "frozen_source_inventory_unchanged": true,
+  "call_timeout_seconds": 1800,
+  "snapshot_timeout_seconds": 600,
+  "existing_original_read_resources": [
+    "input.json",
+    "leaf.md",
+    "source",
+    "source/**",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-1/cognitive-review/input.json",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-1/cognitive-review/leaf.md",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-1/cognitive-review/source",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-1/cognitive-review/source/**"
+  ],
+  "added_read_resources": [
+    "review-materials",
+    "review-materials/INDEX.md",
+    "review-materials/manifest.json",
+    "review-materials/text",
+    "review-materials/text/0001.md",
+    "review-materials/text/0002.md",
+    "review-materials/text/0003.diff",
+    "review-materials/text/0004.diff",
+    "review-materials/text/0005.diff",
+    "review-materials/text/0006.diff",
+    "review-materials/text/0007.diff",
+    "review-materials/text/0008.diff",
+    "review-materials/text/0009.diff",
+    "review-materials/text/0010.txt",
+    "review-materials/text/0011.diff",
+    "review-materials/text/0012.diff",
+    "review-materials/text/0013.diff",
+    "review-materials/text/0014.diff",
+    "review-materials/text/0015.md",
+    "review-materials/text/0016.txt",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/INDEX.md",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/manifest.json",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0001.md",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0002.md",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0003.diff",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0004.diff",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0005.diff",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0006.diff",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0007.diff",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0008.diff",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0009.diff",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0010.txt",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0011.diff",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0012.diff",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0013.diff",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0014.diff",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0015.md",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_b01427592b164863aab5bedf7b3863bb/attempt-2/cognitive-review/review-materials/text/0016.txt"
+  ]
+}

@@ -1,0 +1,632 @@
+# Atlas G1：冻结独审可读性修复与一次性恢复指令
+
+版本：1.0
+核对日期：2026-10-20（北京时间）
+目标仓库：https://github.com/liamamilin/atlas
+目标分支：codex/stabilize-atlas
+已核对证据 HEAD：212f3bc6781bc1aed190e2a87392b8e9a05c9708
+对应宿主源码：a411f8f7991a00633a8843ce3bb998029bf67162
+
+本文件供用户转交 Codex，并配合明确的执行授权使用。本文件和已有 FROZEN_REVIEW_RECOVERY_BINDING.json 都不是已经登记的 grant，也不是已执行的恢复回执。用户明确授权按本文件执行后，应自主完成限定开发、验证、正式登记、一次真实冻结独审及条件满足后的既有下游生产，不要再次停在“准备已完成”。不得把本文件解释为无限重试、业务修订或延期授权。
+
+## 0. 这一次到底要完成什么
+
+当前已经真实完成：
+- 同一 R7 生产任务 attempt 2 的补证审阅；
+- 新 phase_acceptance 加五项身份相同的旧通过结果，形成有效的六项组合；
+- 聚合独立静态审阅；
+- 同一组九份交付字节生成并冻结一个新候选。
+
+当前未完成：
+- 冻结后独立认知审阅的有效结论；
+- 正式发布、标准交接实际消费、首次真实 P0、冻结套件与独立浏览器运行；
+- 宿主 G1 passed 与 T08 原三场景。
+
+当前冻结独审是 cli_timeout，不是有效的内容 blocked。600.48 秒没有取得最终 JSON 或文本，不能改写成 passed，也不能声称审阅确认了模板缺陷。
+
+本轮目标：
+1. 修复已经观察到的冻结独审材料读取截断，限于原文的确定性呈现。
+2. 在同一冻结候选、同一审阅 job 上，正式登记一次额外 cognitive-review 资格。
+3. 对该次调用明确使用 1800 秒上限，继续受原绝对截止约束。
+4. 若取得完整 passed，则沿原授权继续发布、交接、首次真实 P0、独立运行和 G1；G1 正式 passed 后才启动 T08。
+5. 若再次失败、审阅不通过、需要内容修改或超出时间/预算，保留真实证据并正式暂停。
+
+这不是第八轮业务修复。书签业务修复仍为 7/7，本冻结候选恢复阶段的模板 author 调用为 0。后续 T08 其他固定场景的原授权正常生产调用，按原合同独立统计。
+
+## 1. 本次执行授权的范围
+
+### 1.1 允许
+
+- 在宿主实现一个窄范围、类型明确的冻结独审恢复类型，复用现有 grant/use、reservation、call_attempt、spawn_intent、token/lease 和同任务入队。
+- 新增原文逐行可读的差分/文本副本与来源索引；保留原始 input.json、leaf.md、source/、冻结归档及九份程序文件字节。
+- 在现有 REVIEW_PROMPT 后附加一段纯阅读入口说明；不改变八维标准、通过条件、断言保全要求或诚实性要求。
+- 只增加该次只读审阅所需的派生材料目录读取权限；仍禁止 shell、执行、搜索、安装、插件和写入。
+- 为当前冻结独审任务增加且只增加 1 次真实 CLI 会话；上限固定为 1800 秒。
+- 同 job 从失败 attempt 1 正式恢复到 attempt 2，保留原失败与 unavailable acceptance。
+- 对已经保存并严格绑定的真实结果，允许无模型的宿主继续提交；缺少有效结果时不得借此重新调用。
+- 修复本轮新增宿主机制中发现的实现错误并完成测试、提交、推送；只有符合本文件全部约束的正式入口才能用于生产。
+- 冻结独审 passed 后，继续原已授权下游的合法调用；这些调用逐次进入原 500 次台账，不包含在本次“额外冻结独审 1 次”之内，且不因此取得新的业务修复或阶段重试额度。
+
+### 1.2 保持不变
+
+- campaign、plan、product、scenario、case basis、事实范围、冻结 artifact ID/digest、九份交付字节。
+- 当前生产任务已完成的 phase、六项组合和 aggregate 结果；不重新生成、不重审换意见、不改旧结果。
+- CLI 总上限 500；本轮现场起点 80，active 0；业务修复 7/7。
+- cognitive-review 历史普通追加重试 2/2 已耗尽，旧记录原样保留。
+- 旧协议 grant 和上一轮补证 grant 均已消费 1/1，不复活、不转移。
+- 请求模型仍为 opencode-go/deepseek-v4.1-flash；不换模型、账号、provider、推理档位或工具权限来获取新资格。
+- 原并发、队列、独立运行、固定采样和其他产品限额。
+- 绝对截止：1792495312.855422，即北京时间 2026-10-20 19:21:52.855422 / UTC 2026-10-20 11:21:52.855422。
+- 不以恢复时间重新计算窗口，不延期，不重建 campaign/job/candidate 规避历史。
+
+### 1.3 明确不允许
+
+- 修改冻结 README、程序、runner、验收计划、规格、功能范围、案例事实或架构合同。
+- 应用 README-A11-NOT-APPLIED.diff，或把已知建议偷偷修入派生材料。
+- 删除已知建议、unknowns、累计历史差分、增量差分，或用模型摘要代替完整原文。
+- 调整八维审阅判据，要求忽略问题或强迫 passed。
+- 复用 phase 专属 recover-evidence / resume-evidence-result 恢复另一个 job。
+- 在本冻结独审恢复阶段自动执行 cognitive-review-reference-repair 或任何第二次模型调用；第13节原授权下游调用另按其额度执行。
+- 直接写库、重置预算、删除旧 checkpoint、手工写 passed/catalog_eligible/G1 passed。
+- 在 G1 未通过前启动月度预算、会议笔记，或更换三个固定抽验场景。
+
+## 2. 必须绑定的真实现场
+
+campaign：atlas-v1-first-production-2026-10-19
+plan：plan_87059846caf345d2b2fe690657cf324f
+product：product-c42848f63251507bd9d911a5
+scenario：scn_7756e0007f6a463a97316f3f49c15248，revision 2
+case basis digest：a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589
+
+已完成的 R7 生产 job：
+job_3a658ba085e8417ea6faad5cb0cdd493
+attempt 2，completed。它不是本次恢复目标。
+
+本次恢复目标：
+job_b01427592b164863aab5bedf7b3863bb
+job kind：cognitive-review
+失败 attempt：1
+当前状态：needs_review
+队列显示的末阶段：acceptance
+真正失败的 CLI stage / logical retry scope：cognitive-review
+failure_code：cli_timeout
+实际 duration_seconds：600.48
+exit_code：130
+无有效 result.json / report.json / 最终 text
+现有异常分支可能已写 outcome=unavailable 的 acceptance；必须从正式 store 查询并保留，不能把“无有效报告”写成“表内无记录”。
+
+冻结 artifact：
+tpl_f7ecff8d8fef4deba828aa2a8ef82918
+artifact digest：
+ec3f2fc668c20d24b78c22f15eed40779ed38b835c10b7b452aaba725dbb7105
+archive_sha256：
+20d602d7a4eba259a88126366780b571aefae6821b32c123f2d1d9614cc83bee
+当前 publication state：draft；正式发布 0。
+
+原失败调用绑定：
+operation：cognitive-review:572da86649b4face
+reservation：bud_0be070e3a2624ce3989d7eaec26da107
+input.json 原始字节 SHA256：
+394209fae774d75bcf1fa06c4eb091f26c727438836476cb86471c3adbc1d242
+full_payload_digest：
+b4061425b435f346cd6b5e19745185ad99bebee3b5a3b983759e28e56ff6b0fa
+budget_input_digest：
+572da86649b4faced76c4c2e4f4d91102be17ef6b2127ec1572a8d44c4c28d38
+frozen source_tree_digest：
+c56d550a62c929f0429006c6252058f0e588067f2107a1afb0b2d8026dc4c636
+原 REVIEW_PROMPT SHA256：
+9cdd40b5ee69c3b14675fa60569b9f9fb948949dd7be493fe6ff7436a1c9ce09
+原 cli-summary.json SHA256：
+d5c9b3ae369bd3c0f079de9ceb1c661accdb2d24435c3a54872ce9adccba8f72
+
+已消费资格：
+- pgrant_f3595368c14d4b23b6ab536f6d198007：旧协议资格，1/1。
+- egrant_dd03245306034022bbc046e3b9428955：上一轮 phase 补证资格，1/1。
+两者均不能用于当前冻结独审。
+
+统计基线：
+CLI 80/500，活动 0，书签业务修复 7/7。
+本轮新冻结候选 1；campaign 冻结版本累计 2。
+正式模板 0；真实 P0 交付/通过 0/0。
+案例新增/复用 0/1。
+G1 blocked；T08 not_started，0/3。
+
+原 source CI：
+https://github.com/liamamilin/atlas/actions/runs/39390500949
+证据 HEAD CI：
+https://github.com/liamamilin/atlas/actions/runs/39395147319
+已核对这两次的 check 与 docker-integration 均 success。
+这些只能证明原宿主源码门禁，不替代未来新恢复源码的检查，也不是 P0 运行证据。
+
+## 3. 先做只读准备，不能假定现场仍等于报告
+
+读取适用 AGENTS.md、当前分支和工作区。保留现有改动，不 reset，不覆盖其他人在进行的修改。
+
+固定证据目录：
+docs/template-factory/g1-r7-evidence-recovery-2026-10-20/
+
+至少读取：
+- DELIVERY.md、RECOVERY.md、STOP_RECORD.json；
+- FROZEN_REVIEW_FAILURE.json、FROZEN_REVIEW_RECOVERY_BINDING.json；
+- RETRY_SCOPE_STOP_PROOF.json、BUDGET_FINAL.json、G1_ASSESSMENT.json；
+- README_A11_ERRATUM.json、README_A11_FORMAL_REVIEW_OBSERVATION.json；
+- EVIDENCE_CONSUMPTION_PROOF.json；
+- actual-attempt-2/ 的有效六项组合、新 phase 与 aggregate 报告；
+- produced/tpl_f7ecff8d8fef4deba828aa2a8ef82918/ 的实际冻结 artifact 与归档；
+- actual-frozen-review/job_b01427592b164863aab5bedf7b3863bb/ 的 input.json、source/、events.jsonl、cli-summary.json、process.json 与归档清单；
+- 原 G1、T08 和独立执行器固定合同、原授权与补证授权原文。
+
+源码重点：
+application-atlas-production-pack/template_factory/ 下的 cognition.py、pipeline.py、cli.py、evidence_views.py、evidence_grants.py、evidence_recovery.py、budget.py、store.py、v1_catalog.py，以及现有 API/CLI/队列入口与测试。
+
+通过正式 GET/服务读操作核对：
+- 同 job 当前状态、attempt、完整 snapshot、所属 batch/parent batch；
+- 当前 artifact/digest、冻结归档和所有 source 哈希；
+- 当前 accepted case basis 与当前场景事实视图；
+- 预算、grant、reservation、call_attempt、活动 worker/token/lease；
+- 已有 acceptance 的真实身份与顺序；
+- 原截止和当前时间。
+
+job snapshot digest、batch ID、旧 unavailable acceptance ID、规范化 CLI config identity 等未在本文提供的值，必须从正式现场取得；不得抄用旧生产 job 的值或猜测。
+
+若发现新 attempt、新结果、另一项恢复资格、并发 worker 或未解释的身份变化，先只读核实。本文不授权从一个不同现场继续消耗资格。若已经完成本次相同请求，返回原回执和当前状态，不重复运行。
+
+## 4. 已观察到的可读性缺陷与修复范围
+
+### 4.1 事实边界
+
+原冻结独审 input.json 约 524 KB，source_inventory 27 个文件，source 合计约 1.11 MB。若干差分又在 input 与 source 中重复出现。
+
+原 events.jsonl 有 68 个事件：
+18 step_start、17 step_finish、33 tool_use。
+33 次工具均为已完成的 read，没有执行测试/安装/shell。
+原 input.json 读取返回中的 program_diffs 五个字符串被标记为 line truncated to 2000 chars；R7 增量差分中的若干 program_diffs 也发生同样截断。
+input 和若干大 JSON 文件还存在未读完的后续分页。
+
+这证明材料呈现有缺口；不证明它是超时唯一根因。最后一个未完成步骤约 260 秒没有后续事件，无法分解为模型推理、provider 等待或其他内部耗时。不得编造确定根因或声称 1800 秒保证成功。
+
+### 4.2 优先使用最小呈现补修
+
+保持原 input.json、leaf.md、source/ 及 source_inventory 完全不变。
+
+在 attempt 的 source/ 之外新增一个只读目录，例如 review-materials/：
+- INDEX.md：短索引与阅读入口，不写评审结论；
+- manifest.json：派生原文到原始文件/JSON pointer 的完整映射；
+- 从原 JSON 字符串解码后原样写出的 .diff/.md/.txt 文件。
+
+优先直接展开原有换行，形成普通逐行文本。先实测实际物理行长度；若所有派生行均低于原工具截断阈值，就不要为本案建立新的分块协议、检索平台或复杂缓存系统。
+
+至少覆盖实际截断的：
+1. 累计 aggregate_repair_diff.program_diffs 中的全部键（当前共六项，其中原读取有五项发生截断，runner.json 这一项也须保留）；同时与 frozen source/inputs/aggregate-repair-diff.json 的同源值核对。
+2. source/inputs/r7-incremental-diff.json 中的全部程序差分及仍作为长字符串的 old/new 正文。
+3. 累计差分中其他影响验收/规格的长字符串，如生成 metadata 的 unified_diff、architecture/authoring old/new。
+4. 已有 leaf.md 的真实阅读入口；不得继续让模型只看到 input 中被截断的 leaf 字符串。
+5. 原 input/source 中已存在的限制、unknowns 和相关正文的可完整到达路径；不能漏掉因为长 JSON 字符串而不可读的内容。
+
+已核对原 source/template.json 不含 artifact 的 provenance。旧六项/aggregate 的建议和判定保留在正式 artifact 及历史审计记录中，供 Codex 核对和交付报告使用；不能声称它们原来都在独审 source 中。本轮派生材料仅来自原 input.json、leaf.md 和冻结 source/，不额外注入外部历史 passed/blocked 判定或自行编写的问题摘要。原文件中实际存在的问题保持可见，由新的独审自行判断。
+
+对相关输入做一次确定性的长行/分页可读性扫描，记录实际发现，不凭上述清单漏掉其他同类字段。已经逐行可读的程序和文档无需复制一整套。
+
+manifest 至少记录：
+- 原文件相对路径及 SHA256；
+- 原 JSON pointer（或原文文件路径）；
+- 解码后 UTF-8 字节 SHA256、字节数、行数和最长物理行；
+- 派生文件路径、字节 SHA256；
+- 对应原冻结文件/差分涉及的目标路径；
+- 相同内容出现多个来源时，保留所有来源映射。
+
+不做摘要、不改写、不去掉负面信息、不补上遗漏参数、不重算不同范围的 diff。
+相同原文可以只存一份派生文件，但必须保留全部来源，不能以“去重”为由合并不相同的文本。
+manifest 中的索引和统计不是语义审阅结论。
+
+如果解码后仍有超过读取工具单行上限的真实物理行：
+- 仅在这些位置提供确定性、有偏移记录、可无损拼回原字节的分段显示；
+- 原始完整文本仍保留，分段与原字节的 round-trip 校验必须通过；
+- 明确哪些是显示边界，不能让人工换行改变程序或 diff 含义。
+不要因为可能存在长行而预先对全仓库建立一套大型分页协议。
+
+较长但没有超长物理行的文件，索引给出按 offset/limit 读到末尾的提示。可以提供有限大小的逐行页副本，但不得丢行、重排或换摘要。
+
+### 4.3 提示与读取权限增量
+
+原 REVIEW_PROMPT 主体保持逐字不变，只在末尾追加窄说明：
+- 先看 review-materials/INDEX.md；
+- 派生文件是原 input/source 字符串的无损阅读形式；
+- 对索引中要求检查的全部差分逐项读到末尾，分页未结束时继续；
+- 阅读同一原文的一个已核对副本即可，无需把相同大字符串重复读入上下文；
+- 全部原 source 仍可访问，当前实现应与原文件核对；
+- 八维判据、原 assertions/repair scope，以及原材料中已有的 unknowns/建议保持；不额外注入外部历史审阅判定；
+- 最终 files 只允许引用原 input.source_inventory 中的 frozen source 文件；
+- review-materials、leaf.md、input.json 和 manifest 不是新增可引用的冻结文件，也不是新的案例事实；
+- 不要求通过；材料不足必须 uncertain。
+
+原 prompt 要求读 input.json。可用原 input 配合上述字段映射完成阅读；不能以索引代替所有业务内容，更不能偷偷删去原 prompt 的阅读要求。
+
+输出并绑定：
+old_prompt_sha256、新 prompt_sha256、精确 append 文本及其 SHA256、派生 manifest 和整个派生材料树摘要。
+
+只读 ACL 在原白名单基础上，仅增加经校验 manifest 列出的实际派生文件和必要的目录读取；相对/绝对路径须按 attempt 工作区严格归一。派生文件名由宿主生成稳定编号，不以任意 JSON 内容拼接路径；拒绝目录外路径、symlink 和未登记附加文件。不得放行整个工作区。
+保留 deny-by-default，禁止 shell/execute/search/install/plugin/MCP/skill/write。
+不得把 source_inventory 扩成包含派生目录，也不得放宽 validate_review 的真实 source 引用校验。
+
+## 5. 精确身份：哪些保持，哪些明确变化
+
+保持以下摘要与原失败调用一致：
+- artifact ID/digest/归档；
+- snapshot、冻结 source tree；
+- 原 input.json 字节、完整 payload、预算规范化 payload；
+- leaf 内容、scenario、language、review_rules_version、模型；
+- 预算 operation 与 logical scope；
+- 九份交付程序及全部已有审阅结果。
+
+明确新增并绑定：
+- 新授权原文、路径/来源与 SHA256；
+- 无损呈现 manifest/tree；
+- 原 prompt 后的窄追加、新 prompt SHA256；
+- 只读 ACL 的明确增量与新规范化 config identity；
+- 本次 timeout_seconds=1800；
+- 同 job 恢复 attempt 2 的 recovery/grant/request 身份；
+- 实现本机制的宿主源码 commit/tree 和精确 CI。
+
+“冻结字节不变”不能被写成“整个模型输入完全不变”。原 payload 不变，但 prompt、可见派生材料和 ACL 已有明确的呈现增量，必须如实记录。
+
+pipeline.agent 会为 leaf 写 companion 并注入 leaf.content_file，再计算 payload 摘要：
+- input_sha256 是写出后 input.json 的字节 SHA256；
+- full_payload_digest 包含 language；
+- budget_input_digest 去掉顶层 language；
+- operation 使用预算 digest 前缀。
+prepare 与实际 worker 复用同一纯构建/序列化逻辑，不能各实现一份。
+仅 language 变了即使 operation 未变，也必须因 raw/full 摘要不符拒绝。
+
+本案保持原 payload，因此不得把呈现修复改成新 operation，声称这是免费首次审阅。
+新 prompt/materials/ACL 的差异仅由本次专用资格授权，不能借用其他 grant。
+
+上述 frozen source_tree_digest 与宿主源码门禁的 source_tree_digest 是不同对象，分别命名和校验。
+
+## 6. 最小的正式恢复实现
+
+可新增严格 schema/type，例如 atlas.frozen-review-recovery-proposal.v1。名称可遵循仓库既有命名，但实现完成后必须记录实际 schema、正式 API/CLI 和示例请求，不能把本文中的建议名称声称为现成入口。
+
+优先复用：
+- tf_evidence_recovery_grant/use 与已有唯一约束；
+- 现有 reservation、call_attempt 和原子预算占用；
+- worker token/lease 与恢复 receipt；
+- 同 job 的 CAS 恢复和幂等入队。
+
+旧 phase 类型的 schema 和校验行为保持。将现有代码中直接读取 materials.new_phase 的部分，提取成严格按类型获取 call binding 的小接口；新类型返回 frozen_review_call。必须同时覆盖注册校验、occupy、spawn_intent/started、结果提交，不能只在 HTTP 入口放行。
+
+本轮不要：
+- 复制第二套预算账本、token、lease、scheduler；
+- 增加新的 G1_R8_* 硬编码生产常量；
+- 为冻结独审强行制造 phase checkpoint；
+- 在 runtime 中按字符串模糊匹配授予例外。
+
+本案 cognitive-review 的正常路径是：
+verify_frozen → agent → validate_review → complete_acceptance。
+没有 phase checkpoint 选择/合并步骤。
+旧 checkpoint 集合可以为空；保留原集合即可，不重跑 phase、六项或 aggregate。
+
+### 6.1 prepare
+
+只读准备，不入队、不创建生产 grant、不启动 worker、不调用模型。可在临时目录构造并验证派生材料，返回可审查的 proposal。
+
+proposal 绑定：
+- 当前 campaign/plan/product、同 job/attempt1、真实 batch/parent、完整 snapshot digest；
+- 同 artifact/digest、冻结归档和 source 身份；
+- 原 failure/reservation/summary/input/payload/prompt/config；
+- 原 unavailable acceptance 身份与摘要、现有 events/checkpoints 摘要；
+- 原截止、限额、已消费资格和当前活动状态；
+- 新 prompt/materials/ACL/timeout；
+- 新用户授权原文 SHA256；
+- 新宿主源码门禁。
+
+### 6.2 register 与 recover
+
+使用正式服务/API/CLI；注册与恢复按现有事务合同完成。
+建议 request_key：
+atlas-g1-r7-frozen-review-recovery-2026-10-20-once
+
+同 key + 同完整 proposal：返回原 grant。
+同 key + 不同摘要、timeout、授权或 source gate：409 冲突。
+同 recover 请求重放：只返回原 receipt，不增加 attempt、不重复入队。
+并发 recover：最多一次 attempt 1→2。
+新资格只属于这一 job、artifact、operation、scope 和一次调用。
+
+旧 recover-evidence、resume-evidence-result、protocol grant 均不能升级成新类型。
+旧资格已消费的事实不修改。
+
+### 6.3 reserve、spawn 和消费
+
+沿用已有事务保证：
+- reserve 使用有效 token/lease，在事务中核对身份、预算与 grant 后原子占用；
+- Popen 前 durable spawn_intent；
+- 成功启动后 durable started；
+- 实际启动后，无论通过、超时、协议错误、取消，都计为已使用 1/1；
+- 只有可证明根本没有启动的 pre-spawn/OSError 失败才允许归还同一资格；
+- 启动不确定保持 uncertain 和占用，不能因为没有 result 就再次启动；
+- 杀掉孤儿进程可以释放活动并发，不等于退还调用资格。
+
+每次身份与材料复核应尽量在 reserve 前完成，并在 spawn 前防止 TOCTOU。
+预算边界必须强制保护已登记此恢复的目标 job：它的任何新模型 reservation 都必须携带该未消费 grant 并完全匹配 effective call。省略恢复上下文/grant、retry=None、换 stage/scope/operation/payload 均拒绝，不能因走普通 agent/retry 入口而绕过单次限制。
+attempt 创建目录变化可以按已验证的工作区派生字段归一；不是忽略任意 config 差异的理由。
+旧 worker 失去 lease 后不能启动或提交 acceptance。
+
+新真实调用启动时正常台账预期由 80→81；其他下游调用另列。
+历史 scope 普通追加 2/2 保留；本次特批单列 0/1→1/1。
+该 operation 的局部 retry 序号与跨 operation 的历史 scope 计数不是同一概念，分别展示，不改历史序号伪造余额。
+
+## 7. Timeout 与原窗口
+
+仅本次被 grant 严格绑定的 cognitive-review 调用授权 1800 秒上限。
+不得修改原 job snapshot 的 timeout=600，不改变全平台其他阶段的默认 timeout。
+通过本次恢复上下文施加一次性覆盖，并记录授权值、实际生效值和原值。
+
+绝对截止：
+2026-10-20 19:21:52.855422 北京时间。
+原 ledger、reserve、spawn 和 CLI 都继续检查它。
+
+本轮额外要求给结果校验、归档与正式暂停预留至少 900 秒：
+- 真实启动前，剩余时间不足 1800+900 秒，不启动这次 CLI；
+- 因此完整本次调用最迟启动时间为北京时间 18:36:52.855422；
+- prepare、登记、排队时判断通过，不能替代 spawn 前重新判断；
+- 如队列/配置准备吃掉时间，spawn 前拒绝，保留“未启动”证据；
+- 已启动的单次运行仍同时受 1800 秒与原绝对截止约束，不滚动延长；
+- 900 秒是这次恢复的保留时间，不是延长下游生产的授权。
+
+如果源码/CI/准备未能在这一启动边界前就绪：
+完成可做的宿主开发、验证和交付，但不要消耗真实资格；记录尚未启动及明确原因。
+窗口过期后可以只读、开发、测试、归档；生产注册、入队、占用或启动不得继续。
+不自动提出并执行新窗口，不用修改系统时钟规避。
+
+1800 秒是针对本次样本的有界操作选择，不是已经验证足够的性能保证。
+
+## 8. 严格限制为一次模型调用
+
+恢复上下文对该 job 只允许所绑定的 cognitive-review。
+stage、operation、payload、模型或候选变化都不能开出第二次机会。
+
+尤其处理当前 cognition.review 的现有行为：
+当 validate_review 报 review cites nonexistent source file 时，会调用 cognitive-review-reference-repair。
+本次恢复模式必须关闭该模型分支。
+保存原始无效报告和校验失败，正式停止；不能把它变成第二次模型调用，也不能为了通过删除模型引用。
+
+既有、不调用模型的外层 framing 清理可以沿用：
+- 保存原始输出与确定性处理 receipt；
+- 不能补齐缺失维度、补写理由、改变 outcome、删除内容问题；
+- 无 final/result 的超时不得被 framing 修复伪造为可用结果。
+
+不得做未记账的“试运行模型”“探测一下 provider”“先让另一个 agent 看看真实模板是否能过”。隔离 fake CLI 回归不计真实生产，但要明确标为 fixture。
+
+## 9. 结果保存、恢复与目录资格
+
+新真实结果必须按既有 validate_review 完整校验八维，恰好各一次：
+category_evidence
+scenario_scope
+product_completeness
+architecture_contract
+phase_acceptance
+decisions_defaults
+agent_handoff
+evidence_honesty
+
+每项 files 必须是原冻结 source_inventory 中真实存在的文件。
+总体 outcome 由宿主按维度得出，不采信模型自行给的整体分数：
+- 全部 passed 才 passed；
+- 任一 blocked 则 blocked；
+- 无 blocked 但有 uncertain 则 uncertain；
+- 缺输出、缺维度、非法引用、timeout 等保留为 unavailable/实际失败，不伪装成内容结论。
+
+通过原 complete_acceptance 追加新记录，保留 attempt1 的 unavailable。
+新记录至少关联：
+job_id、job_attempt、artifact/digest、recovery/grant/reservation/call_attempt、raw result/report 摘要、input/prompt/source/materials 身份、实际 timeout、模型可观测字段。
+
+提交 acceptance 前再次验证当前 token/lease、同 artifact/digest、真实已启动且已计账的 call_attempt。
+提交有效审阅及 host-only 续提交，还必须确认该 grant 对应 reservation 已正常完成，CLI summary 为 delivery_status=delivered、无 failure_code/启动不确定状态，result/report 与本次原始交付证据一致。failed/uncertain 的已计账 reservation 不能仅凭磁盘上有可解析 JSON 被当成有效交付。这里区分 CLI 成功交付与报告内容是否通过；完整交付的 blocked/uncertain 仍应按真实内容保存。
+不得用 fixture、其他候选或无关 attempt 的结果提交。合法 host-only continuation 必须继续绑定本次 grant 已保存的真实模型 call_attempt，不能取另一轮审阅结果。
+
+若已经保存真实合法 result，但宿主在 acceptance 提交前中断：
+- 可通过正式 host-only continuation 重新验证全部绑定后继续提交；
+- cli_allowed=false；
+- 不再次消费或重开资格；
+- 不把缺 result、残缺 JSON 或未确定启动当成此情况。
+首次模型恢复必须是同 job 的 attempt 1→2。此后若正式队列为 host-only continuation 需要新的宿主 attempt，可在同 job 上追加并保留正式回执，但 cli_allowed 必须为 false。分别记录 model_call_attempt=2 与实际 host_commit_attempt；新 token 只用于验证并提交原真实结果，不生成另一个模型调用机会。
+优先复用已有事务/receipt 与日志，不开发通用的大规模作业修复平台。
+
+目录资格沿既有 latest-request-wins gate：
+- pending/running/failed 的新请求不能回落到旧 pass；
+- 新 acceptance 必须与当前 attempt/recovery 关联，不能误取旧同 job 结果；
+- 独审 passed 只解除这一门禁；
+- 未正式 publish 仍非 catalog eligible；
+- 不直接写 catalog_eligible。
+
+## 10. 必须继续暴露的已知内容与证据边界
+
+这些是原正式审阅中已有的建议/限制，不是本轮新发明的 blocker，也不是已解决事项：
+
+1. README §4.1 的 A11 表格仍缺 --app-root / --data-dir；runner、README 示例和程序要求正确。
+   原 phase 和 aggregate 都记录此问题后通过；不能在冻结字节中偷偷修，也不能要求新的独立审阅忽略。
+2. A04 分类重命名跨重启仍是未验证 scope limitation。
+3. case-design 的 no-referrer 意图与架构中的 rel=noopener 合同存在已记录的解释建议。
+4. F17/F18/F19 的永久范围措辞与 decision-needed 分类、回收站入口、API-only URL 修正等建议。
+5. D03 重名复用与分类管理 409 的边界、D04 撤销/回收站期限等原有建议。
+6. accepted facts、case basis、case design 中的 static-only / unknowns 全保留。
+   20 条 accepted facts 与 basis 中 29 个 evidence IDs 是不同计数；没有运行上游案例，不能说上游已实证通过。
+7. phase/aggregate 为静态审阅，程序实际运行和真实 P0 仍未验证。
+
+所有历史建议以实际冻结 artifact provenance 和原 report 为准，完整保留在审计中，不只保留上面的节选。它们不因此自动成为新增的模型输入；本轮送审源限制仍按第4节执行。
+新独审可以独立判为 passed、blocked 或 uncertain。出现实质内容修订需求后，业务仍 7/7，本文件不授权修改。
+若当前八维真实报告经宿主判定为 passed，且只保留非阻断 suggestions，应按既有门禁继续下游；不自动修改建议，也不擅自把建议升级为 blocker。停止条件中的“需要内容修改”指当前正式门禁未通过，或下游确实无法在原冻结合同内继续，不能仅因上述已知建议仍存在而停在静态通过。
+
+## 11. 有意义的验证
+
+先复用现有测试和回归，仅为本次新增边界补有辨别力的 fixtures。用隔离临时库与可计数 fake CLI，禁止在真实库模拟状态。
+
+至少覆盖以下外部可观察行为：
+
+1. 完整正路径：
+   同冻结 job 1→2，旧 input/source/九文件不变，派生材料确定，恰好一次 fake CLI，旧失败保留，新增 acceptance，调用 80→81，修复仍7。
+2. 可读性：
+   真实旧证据中至少一条 >2000 字符的转义 diff，被逐行完整展开；
+   提取内容 SHA 和 UTF-8 round-trip 相等；
+   所有实际检测出的关键差分都在 manifest，无漏行、无改字；
+   重复输入派生一致。
+3. 提示与 ACL：
+   原 prompt 主体逐字不变，只增加允许的尾段；
+   仅新增派生目录 read，仍无执行权限；
+   派生路径不能作为正式 files 引用。
+4. 身份篡改：
+   language、job、artifact/digest、snapshot、input、source、原 reservation、prompt 主体、派生文本、模型或授权任一不符，spawn 前拒绝且模型调用0。
+5. 旧授权隔离：
+   phase/protocol 已消费 grant、未知 schema、旧入口不能获得这次资格；旧 v1 正反例不回归。
+6. 预算与时间：
+   总额不足、活动超限、有效更严限额、过期、少于2700秒的启动余量均拒绝；
+   1800只对本次生效，snapshot/其他job仍原timeout；
+   禁止超时后再提高到更大值。
+7. 幂等与并发：
+   register/recover重放返回同receipt；
+   key冲突409；
+   两个recover仅一次attempt变更；两个reserve仅一个成功。
+8. 进程边界：
+   pre-spawn明确未启动可归还同机会；
+   spawn_intent后不确定/启动后记账中断不重开；
+   stale token/lease不能启动或提交。
+9. 第二调用：
+   首次返回非法source引用、改stage或诱发reference repair，真实/fake模型调用总数仍为1。
+10. 结果与资格：
+    passed、blocked、uncertain、缺维度、无final、timeout各有正确状态；
+    旧unavailable不被覆盖；
+    独审pass未publish仍不eligible；
+    有绑定result的host-only提交零新增调用，缺result拒绝。
+
+完成现有规定的13组本地完整门禁，并让新实际宿主源码对应的远端 check / docker-integration 均成功。
+这不是要求每个小改动重跑全套；先做有针对性的回归，最终源码完整跑一次，后续只针对改变和具体剩余风险补验证。
+若更改影响其他必要门禁，按仓库既有合同执行，不能虚报覆盖。
+
+区分：
+- fixtures、协议回归、Docker合成探针；
+- 实际冻结审阅；
+- 真实P0及独立运行。
+前两者不能替代第三者。
+统计中保留规定skip和实际未运行项。
+
+## 12. 正式执行顺序
+
+A. 完成只读现场核对，保存 BASELINE 和原绑定。
+B. 完成确定性可读材料、窄prompt/ACL增量和类型化一次恢复。
+C. 完成有意义回归、13组门禁与精确宿主源码CI。
+D. 使用同一构建器做正式只读prepare，核对原摘要均一致；输出实际新presentation/prompt/config摘要、授权材料及预算差分。
+E. 再检查当前时间、窗口、活动数与任务身份；满足全部约束后正式register。
+F. 正式recover同一冻结审阅job，仅推进attempt1→2；按服务合同受控恢复原计划及必要worker，防止其他未准许生产被顺带启动。
+G. 启动前再次校验源、资格与至少2700秒余量，执行唯一一次cognitive-review。
+H. 保存原始日志、结果、验证报告与预算；查询当前job状态，不能拿旧queued receipt当作最终状态。
+I. 若有效passed，继续第13节；否则正式pause原计划和必要子batch，确认active0，保留失败。
+
+遇到本文件范围内的宿主实现错误，可在不改业务内容、不追加模型调用、不延期的前提下修复并重新通过源码门禁。
+不能把同一已启动的失败调用改写成“没用过”后再跑。
+若已消耗唯一机会但没有合法结果，立即停止本阶段；不要自行申请并消费新grant。
+
+## 13. passed 后应继续实际主链，不停在静态通过
+
+本次授权不是只做一份准备报告。独审有效 passed、时间和既有预算允许时，沿正式机制继续：
+
+1. 正式发布同一个 artifact/digest。
+   保存 publish request/receipt；复验最新独审、冻结摘要和 case basis。
+2. 导出真实下游将消费的标准 P0 development package。
+   候选页面下载检查不能代替正式开发作业消费。
+3. 创建/推进原授权的首次 application-development，绑定精确模板版本、阶段、标准交接包与包摘要。
+   保存交付checkpoint、真实app_root和应用归档。
+4. 对精确交付应用运行冻结验收套件。
+   不改冻结断言以适配失败实现；不拿fixture冒充真实产品。
+5. 通过既定独立执行器运行浏览器核心旅程、同容器/规定方式重启、非法输入无写入、并发写入及原合同要求。
+   绑定actual app_root、runtime和phase proof；保留清理与原始证据。
+6. 通过正式 BatchService.assess_g1 使用当前新候选、真实交付和runtime证据评估。
+   准确解释queue状态，暂停且active0不等于死锁。
+7. 只有宿主正式G1 passed后，按原T08 preview/run与固定抽样计划继续：
+   书签、月度预算、多项目会议笔记。
+   本轮首批3个、包含G1复用，原首批最多10产品的上限不改变；不换失败样本。
+8. 每一步都受原deadline、全局500、阶段/业务额度与已有并发限制。
+   首次P0正常开发调用不等于模板author调用；分别统计。
+   本次没有授予任何新的业务修复、其他阶段重试或T08放宽。
+
+若发布后下游失败，报告“正式模板已发布但G1仍失败”等真实分层状态。
+除非既有合同要求，不因G1失败自动删除已积累案例或撤掉真实历史记录。
+不为了报告整齐而把已发生的发布/交付数量改回0，也不为了宣布成功而省略未完成的下游。
+
+## 14. 真实停止条件
+
+出现以下任一情况，停止新增真实调用并通过正式入口pause，保存准确状态：
+- 原现场身份与授权绑定不同，且无法证明只是本文件允许的变更；
+- 当前CI/必需检查未通过；
+- 呈现文本不能证明与原文一致；
+- 恢复资格已消费、活动调用冲突、预算/时间/lease不满足；
+- 真实启动前不足2700秒余量，或原绝对截止到达；
+- 新独审timeout、无有效输出、非法JSON/引用/维度；
+- 新独审blocked/uncertain；
+- 当前正式门禁未通过或下游确实无法按原合同继续，必须改变冻结程序、README、runner、规格、case scope或判据；仅有非阻断suggestions且正式passed不触发本条；
+- 后续生产在既有合同内无法继续，或需新增业务/阶段资格。
+
+停止记录须区分：
+- 未登记/未入队；
+- 已登记但可证明未启动；
+- 已实际启动并消费；
+- 启动不确定；
+- 有真实结果但仅宿主提交未完成；
+- 内容门禁未通过。
+“活动0”不能单独证明“没有启动或没有消费”。
+
+停止后不自动延长窗口、改上限、换候选或重排其他场景。
+
+## 15. 交付证据与报告格式
+
+建议新目录：
+docs/template-factory/g1-frozen-review-recovery-2026-10-20/
+
+至少交付：
+- DELIVERY.md：实际完成/未完成及最后准确停止点；
+- BASELINE.json：本轮开始的正式身份、预算、时间、任务与候选；
+- READABILITY_MANIFEST.json 及实际派生材料/完整性证明；
+- PROMPT_AND_PERMISSION_DELTA：原prompt、只追加的尾段、只读ACL差分及摘要；
+- PREPARE/GRANT/RECOVER 的实际请求和回执、用户授权原文与SHA；
+- 本轮源码、完整本地门禁、精确远端CI及commit绑定；
+- 新attempt真实原始CLI日志、summary、result/report（若存在）、新acceptance和消费记录；
+- 旧失败/旧acceptance/原grant/原计数保存证明；
+- 80→实际最终值的逐阶段预算差分，单列本次额外冻结独审0/1或1/1；
+- 发布、标准交接、P0、独立运行、G1评估与T08实际发生的证据；
+- STOP_RECORD.json / RECOVERY.md：未完成时的边界与正式可用入口；没有入口就明确没有，不能给看似可执行的伪命令。
+
+交付说明需直接回答：
+1. 本次新增宿主机制是否完成，是否已实际使用？
+2. frozen job最终attempt/state，候选ID/digest是否完全保持？
+3. 原input/source/九文件是否原字节？prompt/materials/ACL实际改变是什么？
+4. 是否仅一次额外冻结独审？用了多久？输出有效吗？八维结果是什么？
+5. 原历史2/2、业务7/7、旧两个grant是否完整保留？
+6. 新正式模板数、真实P0交付/通过数、case新增/复用数、T08实际进度。
+7. 标准交接是否被实际开发作业消费，phase proof是否绑定精确应用？
+8. 当前G1正式评估结果和具体原因，而不是“所有测试都绿”。
+9. 原deadline是否保持，实际停止时间为何？
+10. 哪些结果为fixture、静态review、真实生产和真实运行？
+
+requested model和observed model分开。没有观测到实际模型/内部请求/费用，就保持unknown。
+不要声称33次read等于完整逐字阅读，或已有目录中的所有证据都被模型消费。
+只报告原始事件能支持的读取与输出事实。
+
+完成后提交并推送已有分支，保留工作区原有改动；记录生产实际源码与证据HEAD，精确区分源码检查与纯文档追加。不得重写历史或强推。
+最终回复先报G1/T08、正式模板/P0、准确停止点和预算，再给交付链接。
+
+## 16. 本轮成功的定义
+
+恢复机制成功：
+原冻结字节保持，呈现可完整核对，同job首次恢复到attempt2，只消费一次已授权模型会话，取得有效独立报告，历史记录和预算完整。若随后仅做合法host-only提交，单列宿主attempt并继续绑定原模型attempt2，模型调用仍只有一次。
+这可以是passed，也可以是真实blocked/uncertain；合法执行不等于产品通过。
+
+冻结独审通过：
+新的真实报告八维全部passed，正式acceptance与当前attempt、候选和调用绑定正确。
+
+模板生产主链走通：
+同一条真实链上取得合法冻结审阅、正式发布、标准交接实际消费、真实P0交付、冻结套件/独立浏览器/精确phase proof，并由宿主正式评估G1 passed。
+
+批量里程碑完成：
+在G1 passed后，按固定T08三场景及原预算实际执行并交付结果；失败与未运行不能换样本或隐去。
+
+不要把上述四种成功混成一句“已全部完成”。
+

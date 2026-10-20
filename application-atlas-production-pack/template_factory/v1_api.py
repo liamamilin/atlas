@@ -12,6 +12,19 @@ from .v1_batches import BatchService, select_case_basis
 
 def dispatch_v1(method, route, query, body, store):
     from .worker import ensure_worker
+    match = re.fullmatch(r"jobs/(job_[a-f0-9]{32})/(prepare-frozen-review|recover-frozen-review|resume-frozen-review-result)", route)
+    if method == "POST" and match:
+        from .frozen_review_recovery import FrozenReviewRecoveryService
+        frozen_service = FrozenReviewRecoveryService(store)
+        handler = {"prepare-frozen-review": frozen_service.prepare,
+                   "recover-frozen-review": frozen_service.recover,
+                   "resume-frozen-review-result": frozen_service.resume_saved_result}[match[2]]
+        return handler(match[1], body), 200 if match[2] == "prepare-frozen-review" else 202
+    if method == "POST" and route == "budget/frozen-review-grants":
+        from .frozen_review_recovery import FrozenReviewRecoveryService
+        if not isinstance(body, dict) or set(body) != {"prepared_proposal", "request"}:
+            raise FactoryError("grant registration requires prepared_proposal and request", "frozen_recovery_schema", 400)
+        return FrozenReviewRecoveryService(store).register(body["prepared_proposal"], body["request"]), 201
     match = re.fullmatch(r"jobs/(job_[a-f0-9]{32})/prepare-revision", route)
     if method == "POST" and match:
         from .plan_revision import PreparedRevisionService

@@ -1,0 +1,58 @@
+--- R6-attempt-1/acceptance/README.md
++++ R7/acceptance/README.md
+@@ -7,8 +7,8 @@
+ | 参数 | 适用范围 | 用途 |
+ | --- | --- | --- |
+ | `--base-url` | A01–A15（全部） | 已部署 python-web 实例的 http/https 根 URL；所有 base_url 行为断言都发往该 origin。 |
+-| `--app-root` | A01、A05、A09 | 只读应用源码根；必须包含 `app/serve.py`，用于启动同一冻结应用的隔离实例。 |
+-| `--data-dir` | A01、A05、A09、A14 | 测试者可变草稿根；重启适配器在其 `instances/` 下创建每实例目录；A14 在此生成导入 HTML。 |
++| `--app-root` | A01、A05、A09、A11 | 只读应用源码根；必须包含 `app/serve.py`，用于启动同一冻结应用的隔离实例。 |
++| `--data-dir` | A01、A05、A09、A11、A14 | 测试者可变草稿根；重启适配器在其 `instances/` 下创建每实例目录；A14 在此生成导入 HTML。 |
+ 
+ ### 1.1 `--base-url`
+ 
+@@ -59,7 +59,7 @@
+ 
+ ## 4. 逐用例精确参数与调用示例
+ 
+-`acceptance/runner.json` 的唯一作用是为 Atlas 提供每个用例的 argv；实现程序由固定 spec 选择。所有用例都必须带 `--base-url`，A01/A05/A09 还必须带 `--app-root` 与 `--data-dir`，A14 还必须带 `--data-dir`。未知或缺失参数由参数解析器显式报错并非零退出。
++`acceptance/runner.json` 的唯一作用是为 Atlas 提供每个用例的 argv；实现程序由固定 spec 选择。所有用例都必须带 `--base-url`，A01/A05/A09/A11 还必须带 `--app-root` 与 `--data-dir`，A14 还必须带 `--data-dir`。未知或缺失参数由参数解析器显式报错并非零退出。
+ 
+ ### 4.1 与 runner.json 一致的 args
+ 
+@@ -93,7 +93,7 @@
+ python3 /suite/acceptance/p0_library.py --case A01 --base-url "$BASE_URL" --app-root "$APP_ROOT" --data-dir "$DATA_DIR"
+ python3 /suite/acceptance/p0_library.py --case A02 --base-url "$BASE_URL"
+ python3 /suite/acceptance/p0_library.py --case A03 --base-url "$BASE_URL"
+-python3 /suite/acceptance/p0_library.py --case A11 --base-url "$BASE_URL"
++python3 /suite/acceptance/p0_library.py --case A11 --base-url "$BASE_URL" --app-root "$APP_ROOT" --data-dir "$DATA_DIR"
+ python3 /suite/acceptance/p0_organize.py --case A04 --base-url "$BASE_URL"
+ python3 /suite/acceptance/p0_organize.py --case A05 --base-url "$BASE_URL" --app-root "$APP_ROOT" --data-dir "$DATA_DIR"
+ python3 /suite/acceptance/p0_organize.py --case A06 --base-url "$BASE_URL"
+@@ -112,16 +112,16 @@
+ | 用例 | 行为证据 |
+ | --- | --- |
+ | A01 | 对 base_url 做健康检查，经真实保存表单提交唯一 URL/标题/描述并跟随 303，断言 HTML 记录行与 JSON 读回；再用 `--app-root`/`--data-dir` 启动隔离实例，经真实表单保存，停止后以同一实例子目录重启，断言 id、原始 URL、标题与描述稳定。 |
+-| A02 | 用保存表单提交单标签主机 URL（如 `http://atlas-a02-<token>`）作为显式正向边界：断言 303、原始字符串持久化且行内 href 精确；同一表单与 JSON 分别提交缺协议、`javascript:`、`ftp://`、`http://` 空主机、含空格/非法 hostname 的值，断言 400 `invalid_url`、`form-error` 可读、相对计数不新增且被拒 URL 不出现在列表。单标签主机是接受策略，不要求点域名。 |
++| A02 | 用保存表单提交单标签主机 URL（如 `http://atlas-a02-<token>`）作为显式正向边界：断言 303、原始字符串持久化且行内 href 精确；同一表单与 JSON 分别提交缺协议、`javascript:`、`ftp://`、`http://` 空主机、含空格/非法 hostname 的值，断言 400 `invalid_url`、`form-error` 可读、相对计数不新增且被拒 URL 不出现在列表。另用独立唯一单标签 hostname URL 经 JSON POST 保存，断言 201、新 id、独立 GET/列表中同一 id 与原始 URL；非法输入的 before 快照在两条合法创建后取得。单标签主机是接受策略，不要求点域名。 |
+ | A03 | 预置归类（未整理、待购、家居改造、以后看看）在 HTML 与 API 可见；真实表单省略 category 保存落入未整理；表单输入新归类名保存后自动创建，并可按该归类筛选。 |
+-| A04 | 从首页 `a[data-testid=category-manager]` 进入 `/categories`；用 `category-create-form` 的真实 `name` 新建（303 后可见且计数正确）；用重名及大小写变体提交 create/rename 表单，断言 409 `duplicate_category`、`form-error`、输入保留且集合不变；用 `category-rename-form` 提交 `category_id`+`name` 重命名，记录跟随；用 `category-delete-form` 删除归类，断言活动与软删记录都迁回未整理、软删记录在 `/?trash=1` 可恢复；对默认归类做 rename/delete，断言 400 `protected_category` 且不变；同时保留 JSON API 的同等断言。create/rename 分别提交省略 name、空字符串、纯空白、121 字符名（JSON 另含显式 null），均断言 400 `invalid_name`、`form-error`、提交值保留、分类与记录集合及归属不变。 |
++| A04 | 从首页 `a[data-testid=category-manager]` 进入 `/categories`；用 `category-create-form` 的真实 `name` 新建（303 后可见且计数正确）；用重名及大小写变体提交 create/rename 表单，断言 409 `duplicate_category`、`form-error`、输入保留且集合不变；用 `category-rename-form` 提交 `category_id`+`name` 重命名，记录跟随；用 `category-delete-form` 删除归类，断言活动与软删记录都迁回未整理、软删记录在 `/?trash=1` 可恢复；对默认归类做 rename/delete，断言 400 `protected_category` 且不变；JSON API 保留已有非法名称、重复名称及默认分类保护断言；不宣称成功 JSON rename/delete 已覆盖。create/rename 分别提交省略 name、空字符串、纯空白、121 字符名（JSON 另含显式 null），均断言 400 `invalid_name`、`form-error`、提交值保留、分类与记录集合及归属不变。 |
+ | A05 | 用 `record-move-form` 的真实 `record_id` 与 `select name=category_id` 移动，303 到目标归类后旧归类消失、新归类可见、JSON 读回归类正确；再用 `--app-root`/`--data-dir` 启动隔离实例，经真实表单移动，停止后同目录重启读回归属。 |
+ | A06 | 两个归类各两条记录，读取 HTML `[data-testid=category-count][data-category-id]` 与记录行，并与 `/api/categories` 的 count 和 `/api/bookmarks` 列表比对；通过真实移动、删除、恢复表单改变状态，逐步断言 count 只计活动记录且与列表一致，软删记录仍在 `include_trashed=1` 中。 |
+-| A07 | 用真实 `category-search-form` 提交 `category` 与 `q`，断言 200、表单的 category 与 q 值均保留、页面显示所选归类/查询/匹配行；用同一关键字分别在两个归类提交，断言各自只命中本归类记录；在某归类提交无匹配 q，断言显示明确空结果且无记录行；同时保留 JSON 断言：标题、hostname、描述的子串大小写不敏感命中，category+q 叠加，无匹配返回 200 空数组。 |
++| A07 | 用真实 `category-search-form` 提交 `category` 与 `q`，断言 200、表单的 category 与 q 值均保留、页面显示所选归类/查询/匹配行；用同一关键字分别在两个归类提交，断言各自只命中本归类记录；在某归类提交无匹配 q，断言显示明确空结果且无记录行；同时保留 JSON 断言：标题、hostname、描述的子串大小写不敏感命中，category+q 叠加，无匹配返回 200 空数组；仅存在 URL path、URL query 或分类名的唯一 token 经 JSON 与实际 HTML 搜索表单查询不得命中目标记录，以 id/行集合判断而非页面回显，保留允许字段的正向控制。 |
+ | A08 | 经真实保存表单创建带 query 的原始 URL，解析 `tr[data-record-id]` 内 `a[data-testid=record-open-link]`，断言 href 精确等于保存值、`target=_blank`、`rel` 含 `noopener`，并以 `urljoin` 验证它是实际导航目标；再 `GET /go/{id}` 不跟随重定向，断言 302 Location 精确等于原始 URL；未知 id 404 `not_found`；读回记录 URL 未被改写。P0 不请求目标外链。 |
+ | A09 | 经真实保存表单创建记录，用 `record-delete-form` 软删除并跟随 303，断言默认列表/计数排除、`/api/bookmarks?include_trashed=1` 仍存在、`/?trash=1` 显示 `record-restore-form`；用该表单恢复，断言 URL/标题/描述/归类回归且重新可见；再创建归类与记录、软删除记录后用 `category-delete-form` 删除归类，断言软删记录迁到未整理且仍可在回收站恢复，恢复后无孤儿；最后用 `--app-root`/`--data-dir` 启动隔离实例，真实删除后停止、同目录重启，断言删除状态与回收站内容保持，并可恢复。 |
+ | A10 | JSON 路径保留未知 id 的 GET/PATCH/DELETE/move 均 404 `not_found`，三类畸形 JSON 均 400 `bad_request`，无 5xx、记录集合与锚点字段不变；HTML 路径用保存表单提交非法 URL，断言 400、`form-error`、url/title 输入保留、无新增记录，再用同一表单提交修正 URL 断言 303 且只新增一条；用归类表单提交非法 name，断言 `form-error` 且无写入。 |
+-| A11 | `/api/health` 返回 200 JSON；`GET /` 返回 200 text/html，含 `action=/bookmarks/new` 表单、`name=url`、`category-manager` 链接与列表容器；用不存在的归类过滤得到明确空状态。 |
++| A11 | `/api/health` 返回 200 JSON；`GET /` 返回 200 text/html，含 `action=/bookmarks/new` 表单、`name=url`、`category-manager` 链接与列表容器；用不存在的归类过滤得到明确空状态（a11-base-*，仅当前部署入口）。另必须使用同一冻结 app_root 与 data_dir 创建 fresh=True 的新隔离实例，业务写入前证明 health、未过滤全库含软删除均为空、四预置分类合法唯一 ID/count=0、未过滤首页表单/URL/分类入口/列表/明确空态且无记录行（a11-fresh-*）；finally 关闭 client 并停止拥有的进程、确认退出，缺参数/启动失败/清理失败不得通过。这不证明 base_url 被清空或同容器重启。 |
+ | A12 | 只处理书签保存/移动，不使用分类创建或重命名表单。HTML 保存 `category`（名称）显式空/纯空白/121 字符为 400 `invalid_category`，省略则默认未整理；HTML 移动 `category_id`（ID）省略/空/未知为 400 `invalid_category`；JSON 保存 `category`（名称）省略/null 默认未整理，显式空/纯空白/121 字符为 400 `invalid_category`；JSON move `category`（名称）省略/null/空/纯空白/121 字符为 400 `invalid_category`。有效新名称可自动创建；HTML 未知 ID 不得变为新名称；JSON 不新增 `category_id` 字段。每个负向 HTML 为 400/`form-error`/输入保留，JSON 为 400/`error.code=invalid_category`，分类集合/记录集合/锚点归属均不变；修正有效值可恢复。 |
+ | A13 | 仅凭 URL 保存 201；hostname 由 URL 派生，title 允许缺失或字符串降级，favicon 缺失/内联/同源；首页可渲染记录且 HTML 资源引用不含外部 URL。 |
+ | A14 | `GET /api/export` 返回 200 text/html，含 Netscape 书签头与两条已存 URL；在 data_dir 生成导入 HTML，POST `/api/import` 返回 imported=2/skipped=0，导入 URL 可检索。 |
+@@ -193,3 +193,5 @@
+ - `port` 必须与 start 中显式端口 `8000` 一致。
+ - `/state/app-data` 是交付进程自己的持久化目录；验收调用中的 `--data-dir` 是测试者草稿根，二者角色不同，不要混用。
+ - `0.0.0.0` 仅用于隔离验收网络；日常本机运行可绑定 `127.0.0.1`，但交付示例保持上述字面值。该示例只描述交付合同，不代表应用已实现、已启动或已通过验收。
++
++A11 单独使用 common.launch_app(app_root, data_dir, 0, fresh=True)：每次新建 instances/<uuid>，不传旧 instance_dir、不删除已有数据；其首启证据属于 A11 自己，不借用 A01 receipt。实际 G1 必须绑定交付应用源码，准备 fixture 不能替代真实 P0。

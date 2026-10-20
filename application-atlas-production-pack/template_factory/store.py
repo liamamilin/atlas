@@ -1240,6 +1240,8 @@ class FactoryStore:
             outcome = result.get("outcome")
             if outcome not in {"passed", "blocked", "uncertain", "unavailable"}:
                 raise FactoryError("invalid acceptance outcome")
+            from .frozen_review_recovery import FrozenReviewRecoveryService
+            FrozenReviewRecoveryService(self).validate_acceptance_locked(con, row, result)
             body = redact_value(
                 {
                     **result,
@@ -1248,6 +1250,7 @@ class FactoryStore:
                     "artifact_id": snapshot["artifact_id"],
                     "digest": snapshot["artifact_digest"],
                     "job_id": job_id,
+                    "job_attempt": row["attempt"],
                     "created_at": now(),
                 }
             )

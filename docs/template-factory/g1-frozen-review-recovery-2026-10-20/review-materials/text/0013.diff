@@ -1,0 +1,205 @@
+--- R6-attempt-1/acceptance/p0_library.py
++++ R7/acceptance/p0_library.py
+@@ -887,6 +887,26 @@
+                     _record_url(record) == boundary,
+                     f'JSON url={_record_url(record)!r}（期望原始字符串 {boundary!r}）',
+                 )
++        # Independent JSON positive: not an HTML-created record read through JSON.
++        before_json_ids = _record_ids(_fetch_bookmarks(client, recorder, 'a02-json-before-create'))
++        json_boundary = f'https://atlas-a02-json-{token}/original?keep=1'
++        positive = client.post_json('/api/bookmarks', {
++            'url': json_boundary, 'title': f'A02 JSON {token}',
++            'description': f'A02 JSON positive {token}',
++        })
++        recorder.expect_status(positive, 201, aid='a02-json-boundary-create-status')
++        json_id = _record_id(_extract_record(_safe_json(positive)))
++        recorder.check('a02-json-boundary-new-id', bool(json_id) and json_id not in before_json_ids,
++                       f'独立 JSON POST 返回新的非空 id={json_id!r}')
++        if json_id:
++            saved = _get_record(client, recorder, json_id, 'a02-json-boundary')
++            recorder.check('a02-json-boundary-readback',
++                           _record_id(saved) == json_id and _record_url(saved) == json_boundary,
++                           '独立 GET 读回同一 id 与精确原始 URL')
++            listed_positive = _fetch_bookmarks(client, recorder, 'a02-json-positive')
++            recorder.check('a02-json-boundary-listed', any(
++                _record_id(item) == json_id and _record_url(item) == json_boundary
++                for item in listed_positive), '列表包含同一 JSON 创建记录与原始 URL')
+         before = _fetch_bookmarks(client, recorder, 'a02-before')
+         before_total = len(before)
+         before_token = sum(1 for item in before if token in (_record_url(item) or ''))
+@@ -1076,40 +1096,40 @@
+         client.close()
+ 
+ 
+-def _case_a11(args, recorder):
++def _case_a11_base(args, recorder):
+     client = common.HttpClient(args.base_url)
+     unknown = f'不存在归类-{uuid.uuid4().hex[:10]}'
+     try:
+         health = client.get('/api/health')
+-        recorder.expect_status(health, 200, aid='a11-health-status')
++        recorder.expect_status(health, 200, aid='a11-base-health-status')
+         health_payload = _safe_json(health)
+         recorder.check(
+-            'a11-health-json',
++            'a11-base-health-json',
+             isinstance(health_payload, dict) and bool(health_payload),
+             f'/api/health 返回非空 JSON 对象，实际 {type(health_payload).__name__}',
+         )
+         page = client.get('/', accept='text/html')
+-        recorder.expect_status(page, 200, aid='a11-home-status')
+-        recorder.check(
+-            'a11-home-content-type',
++        recorder.expect_status(page, 200, aid='a11-base-home-status')
++        recorder.check(
++            'a11-base-home-content-type',
+             'text/html' in page.content_type.lower(),
+             f'首页 Content-Type={page.content_type!r}',
+         )
+         doc = _parse_html(page.text)
+         form = doc.save_form()
+         recorder.check(
+-            'a11-entry-form',
++            'a11-base-entry-form',
+             form is not None,
+             '首页含 action=/bookmarks/new 且 method=post 的录入表单',
+         )
+         if form is not None:
+             recorder.check(
+-                'a11-entry-action',
++                'a11-base-entry-action',
+                 _action_path(form.action) == '/bookmarks/new',
+                 f'录入表单 action={form.action!r}',
+             )
+             recorder.check(
+-                'a11-url-field',
++                'a11-base-url-field',
+                 form.has_name('url'),
+                 '录入表单含 name=url 输入字段',
+             )
+@@ -1125,32 +1145,100 @@
+             except ValueError:
+                 manager_path = ''
+         recorder.check(
+-            'a11-category-manager',
++            'a11-base-category-manager',
+             manager is not None and manager_path == '/categories',
+             f'首页 category-manager 链接 href={manager_href!r}（期望指向 /categories）',
+         )
+         recorder.check(
+-            'a11-list-container',
++            'a11-base-list-container',
+             _has_list_container(doc),
+             '首页含记录列表容器',
+         )
+         empty_page = client.get('/', params={'category': unknown}, accept='text/html')
+-        recorder.expect_status(empty_page, 200, aid='a11-unknown-status')
++        recorder.expect_status(empty_page, 200, aid='a11-base-unknown-status')
+         empty_doc = _parse_html(empty_page.text)
+         recorder.check(
+-            'a11-unknown-filter-empty',
++            'a11-base-unknown-filter-empty',
+             len(empty_doc.rows) == 0,
+             f'不存在归类 {unknown!r} 过滤后记录行数={len(empty_doc.rows)}（期望 0）',
+         )
+         marker = _empty_state_marker(empty_doc)
+         recorder.check(
+-            'a11-unknown-empty-state',
++            'a11-base-unknown-empty-state',
+             bool(marker),
+             f'不存在归类过滤显示明确空状态，标记={marker!r}',
+         )
+     finally:
+         client.close()
+ 
++
++def _case_a11(args, recorder):
++    # The base deployment may already contain records. Only fresh proves first init.
++    if not recorder.check('a11-fresh-required-flags', bool(args.app_root and args.data_dir),
++                          'A11 必须绑定实际冻结 app_root 与测试者 data_dir'):
++        return
++    _case_a11_base(args, recorder)
++    proc = None
++    client = None
++    try:
++        proc = common.launch_app(args.app_root, args.data_dir, 0, fresh=True)
++        recorder.check('a11-fresh-owned-source',
++                       os.path.realpath(proc.app_root) == os.path.realpath(args.app_root),
++                       'fresh 实例来自同一冻结交付源码')
++        client = common.HttpClient(proc.base_url)
++        health = client.get('/api/health')
++        recorder.expect_status(health, 200, aid='a11-fresh-health-status')
++        recorder.check('a11-fresh-health-json', isinstance(_safe_json(health), dict),
++                       'fresh 健康检查返回 JSON 对象')
++        # No business write precedes these unfiltered observations.
++        for name, params in (('active', None), ('including-trash', {'include_trashed': '1'})):
++            records = _fetch_bookmarks(client, recorder, f'a11-fresh-{name}', params)
++            recorder.check(f'a11-fresh-{name}-empty', records == [],
++                           f'未过滤全库 {name} 记录数={len(records)}，首次初始化必须为0')
++        categories = _fetch_categories(client, recorder, 'a11-fresh')
++        ids = []
++        for index, preset in enumerate(common.PRESET_CATEGORIES, 1):
++            matches = [item for item in categories if isinstance(item, dict) and item.get('name') == preset]
++            recorder.check(f'a11-fresh-preset-{index}', len(matches) == 1,
++                           f'首次初始化准确存在预置分类 {preset!r}')
++            if len(matches) == 1:
++                item = matches[0]
++                cid = item.get('id')
++                legal = isinstance(cid, (str, int)) and not isinstance(cid, bool) and bool(str(cid).strip())
++                recorder.check(f'a11-fresh-preset-{index}-id', legal, f'分类 ID={cid!r}')
++                recorder.check(f'a11-fresh-preset-{index}-count', item.get('count') == 0,
++                               f'预置分类活动记录 count={item.get("count")!r}')
++                ids.append(str(cid))
++        recorder.check('a11-fresh-preset-unique-ids', len(ids) == 4 and len(set(ids)) == 4,
++                       '四个预置分类 ID 各自唯一')
++        page = client.get('/', accept='text/html')
++        recorder.expect_status(page, 200, aid='a11-fresh-home-status')
++        recorder.check('a11-fresh-home-content-type', 'text/html' in page.content_type.lower(),
++                       '未过滤首页是 HTML')
++        doc = _parse_html(page.text)
++        form = doc.save_form()
++        recorder.check('a11-fresh-save-form', form is not None and
++                       _action_path(form.action) == '/bookmarks/new' and form.has_name('url'),
++                       '未过滤首页具备保存表单与 URL 字段')
++        recorder.check('a11-fresh-category-entry', any(
++            a.testid == 'category-manager' and _action_path(a.href) == '/categories'
++            for a in doc.anchors), '未过滤首页有分类管理入口')
++        recorder.check('a11-fresh-list-container', _has_list_container(doc), '未过滤首页有列表容器')
++        recorder.check('a11-fresh-no-record-rows', not doc.rows, '首次初始化未过滤首页没有记录行')
++        recorder.check('a11-fresh-explicit-empty-state', bool(_empty_state_marker(doc)),
++                       '首次初始化未过滤首页有明确空状态')
++    finally:
++        try:
++            if client is not None:
++                client.close()
++        finally:
++            if proc is not None:
++                try:
++                    common.stop_app(proc)
++                except Exception as exc:
++                    recorder.check('a11-fresh-cleanup', False, f'清理异常：{exc}')
++                recorder.check('a11-fresh-process-stopped', proc.poll() is not None,
++                               '本用例拥有的 fresh 子进程已结束')
+ 
+ _HANDLERS = {
+     'A01': _case_a01,
+@@ -1161,7 +1249,18 @@
+ 
+ 
+ def main(argv=None):
+-    args = common.parse_case_args(argv)
++    try:
++        args = common.parse_case_args(argv)
++    except SystemExit as exc:
++        raw_args = list(sys.argv[1:] if argv is None else argv)
++        requested_a11 = '--case=A11' in raw_args or any(
++            value == '--case' and index + 1 < len(raw_args) and raw_args[index + 1] == 'A11'
++            for index, value in enumerate(raw_args))
++        if not exc.code or not requested_a11:
++            raise
++        failed = common.Recorder('A11')
++        failed.check('a11-fresh-arguments', False, 'A11 参数无效；详见 stderr，不降级或跳过')
++        return failed.finish('A11')
+     recorder = common.Recorder(args.case)
+     handler = _HANDLERS.get(args.case)
+     if handler is None:

@@ -27,6 +27,34 @@ RETRY_SCOPE = "blueprint-spec-review:phase_acceptance"
 STAGE_NAME = "blueprint-spec-review-0-ad1379367f3e742a-phase_acceptance"
 REQUESTED_MODEL = "opencode-go/deepseek-v4.1-flash"
 MAX_EXTRA_CALLS = 1
+FROZEN_REVIEW_SCHEMA = "atlas.frozen-review-recovery-proposal.v1"
+FROZEN_REVIEW_JOB = "job_b01427592b164863aab5bedf7b3863bb"
+FROZEN_REVIEW_DEADLINE = 1792495312.855422
+
+
+def get_call_binding(proposal):
+    """Return the exact, versioned binding for a supported one-use grant.
+
+    Keeping this dispatch explicit prevents a new recovery type from being
+    mistaken for the old phase retry format merely because both carry fields
+    named ``operation`` or ``payload``.
+    """
+    if not isinstance(proposal, dict):
+        raise FactoryError("evidence grant proposal must be an object", "evidence_grant_schema", 400)
+    schema = proposal.get("schema")
+    materials = proposal.get("materials")
+    if not isinstance(materials, dict):
+        raise FactoryError("evidence grant materials are missing", "evidence_grant_binding", 409)
+    if schema == SCHEMA:
+        key = "new_phase"
+    elif schema == FROZEN_REVIEW_SCHEMA:
+        key = "frozen_review_call"
+    else:
+        raise FactoryError("unsupported evidence grant proposal schema", "evidence_grant_schema", 400)
+    binding = materials.get(key)
+    if not isinstance(binding, dict):
+        raise FactoryError(f"{key} call binding is missing", "evidence_grant_binding", 409)
+    return binding
 
 
 class EvidenceGrantService:
@@ -122,6 +150,8 @@ class EvidenceGrantService:
         return digest({key: value for key, value in proposal.items() if key != "proposal_digest"})
 
     def _validate_proposal(self, proposal, request):
+        if isinstance(proposal, dict) and proposal.get("schema") == FROZEN_REVIEW_SCHEMA:
+            return self._validate_frozen_proposal(proposal, request)
         if not isinstance(proposal, dict) or proposal.get("schema") != SCHEMA:
             raise FactoryError("unsupported evidence recovery proposal schema", "evidence_grant_schema", 400)
         if proposal.get("proposal_digest") != self._proposal_digest(proposal):
@@ -194,6 +224,76 @@ class EvidenceGrantService:
         self._verify_source_gate(proposal)
         return request_key, binding, phase
 
+    def _validate_frozen_proposal(self, proposal, request):
+        if proposal.get("proposal_digest") != self._proposal_digest(proposal):
+            raise FactoryError("frozen-review proposal digest does not match", "evidence_grant_binding", 409)
+        request_key = proposal.get("request_key")
+        supplied = request.get("request_key") if isinstance(request, dict) else None
+        if not isinstance(request_key, str) or supplied != request_key:
+            raise FactoryError("frozen-review request key differs", "evidence_grant_binding", 403)
+        if (request.get("schema") != "atlas.frozen-review-prepare.v1"
+                or request.get("source_authorization") != proposal.get("source_authorization")
+                or request.get("source_gate") != proposal.get("source_gate")):
+            raise FactoryError("frozen-review registration request differs from proposal", "evidence_grant_binding", 409)
+        authorization = proposal.get("source_authorization")
+        auth_ref = "docs/template-factory/g1-frozen-review-recovery-2026-10-20/authorization/ATLAS_G1_FROZEN_REVIEW_RECOVERY_CODEX_INSTRUCTIONS.txt"
+        auth_digest = "65976f3c72613dfc7208d86cea7ce4c9ec0688ef04c881efba8abacf7f642101"
+        if authorization != {"source_ref": auth_ref, "source_digest": auth_digest}:
+            raise FactoryError("frozen-review authorization differs", "evidence_grant_binding", 403)
+        try:
+            actual = hashlib.sha256((self.store.pack.parent / auth_ref).read_bytes()).hexdigest()
+        except OSError as exc:
+            raise FactoryError("frozen-review authorization source is unavailable", "evidence_grant_source", 409) from exc
+        if actual != auth_digest:
+            raise FactoryError("frozen-review authorization bytes differ", "evidence_grant_source", 409)
+        materials = proposal.get("materials")
+        binding = materials.get("binding") if isinstance(materials, dict) else None
+        call = materials.get("frozen_review_call") if isinstance(materials, dict) else None
+        fixed = {"campaign_id": CAMPAIGN_ID, "plan_id": PLAN_ID, "product_id": PRODUCT_ID,
+                 "job_id": "job_b01427592b164863aab5bedf7b3863bb", "attempt": 1,
+                 "snapshot_digest": "db51b4ca834dd031135025d761b46407f02b2850ad993c950f55407a0f95fcf6",
+                 "batch_id": "bat_6b4fc8bf5b4e42d79bc6a9069277e9f0", "deadline": 1792495312.855422,
+                 "artifact_id": "tpl_f7ecff8d8fef4deba828aa2a8ef82918",
+                 "artifact_digest": "ec3f2fc668c20d24b78c22f15eed40779ed38b835c10b7b452aaba725dbb7105"}
+        if not isinstance(binding, dict) or any(binding.get(k) != v for k, v in fixed.items()):
+            raise FactoryError("frozen-review binding differs from the fixed job", "evidence_grant_binding", 409)
+        required = ("payload", "input_json", "prompt", "input_sha256", "full_payload_digest", "budget_input_digest", "prompt_sha256",
+                    "source_tree_digest", "projection_digest", "stage_name", "operation", "logical_retry_scope",
+                    "requested_model", "cli_config_identity", "materials_manifest_digest", "materials_tree_digest", "leaf_sha256")
+        if not isinstance(call, dict) or any(key not in call for key in required):
+            raise FactoryError("frozen-review call binding is incomplete", "evidence_grant_binding", 409)
+        if (call["stage_name"] != "cognitive-review" or call["logical_retry_scope"] != "cognitive-review"
+                or call["operation"] != "cognitive-review:572da86649b4face"
+                or call["requested_model"] != "opencode-go/deepseek-v4.1-flash"
+                or digest(call["payload"]) != call["full_payload_digest"]
+                or digest({k: v for k, v in call["payload"].items() if k != "language"}) != call["budget_input_digest"]
+                or call["timeout_seconds"] != 1800):
+            raise FactoryError("frozen-review call identity differs", "evidence_grant_binding", 409)
+        try:
+            from .cognition import REVIEW_PROMPT
+            from .frozen_review_materials import append_review_prompt
+            derived_prompt, _ = append_review_prompt(REVIEW_PROMPT)
+            input_json = call["input_json"]
+            if (hashlib.sha256(input_json.encode("utf-8")).hexdigest() != call["input_sha256"]
+                    or json.loads(input_json) != call["payload"]
+                    or derived_prompt != call["prompt"]
+                    or hashlib.sha256(derived_prompt.encode("utf-8")).hexdigest() != call["prompt_sha256"]):
+                raise ValueError("call bytes differ")
+        except (KeyError, ValueError, TypeError) as exc:
+            raise FactoryError("frozen-review raw call binding is invalid", "evidence_grant_binding", 409) from exc
+        old = materials.get("old_phase")
+        if (not isinstance(old, dict) or old.get("reservation_id") != "bud_0be070e3a2624ce3989d7eaec26da107"
+                or old.get("input_sha256") != "394209fae774d75bcf1fa06c4eb091f26c727438836476cb86471c3adbc1d242"
+                or old.get("full_payload_digest") != "b4061425b435f346cd6b5e19745185ad99bebee3b5a3b983759e28e56ff6b0fa"
+                or old.get("budget_input_digest") != "572da86649b4faced76c4c2e4f4d91102be17ef6b2127ec1572a8d44c4c28d38"
+                or old.get("prompt_sha256") != "9cdd40b5ee69c3b14675fa60569b9f9fb948949dd7be493fe6ff7436a1c9ce09"
+                or old.get("summary_sha256") != "d5c9b3ae369bd3c0f079de9ceb1c661accdb2d24435c3a54872ce9adccba8f72"):
+            raise FactoryError("original frozen review call differs", "evidence_grant_binding", 409)
+        self._verify_source_gate(proposal)
+        if float(self.clock()) >= 1792495312.855422:
+            raise FactoryError("frozen-review deadline has passed", "budget_deadline", 409)
+        return request_key, binding, call
+
     @staticmethod
     def _record(row):
         result = dict(row)
@@ -209,7 +309,7 @@ class EvidenceGrantService:
         # state or the authorization deadline passes. Validate the immutable
         # proposal bytes/key first, then return an exact stored proposal before
         # consulting any time-sensitive baseline.
-        if not isinstance(prepared_proposal, dict) or prepared_proposal.get("schema") != SCHEMA:
+        if not isinstance(prepared_proposal, dict) or prepared_proposal.get("schema") not in {SCHEMA, FROZEN_REVIEW_SCHEMA}:
             raise FactoryError("unsupported evidence recovery proposal schema", "evidence_grant_schema", 400)
         request_key = prepared_proposal.get("request_key")
         supplied_key = request.get("request_key", request.get("idempotency_key")) if isinstance(request, dict) else None
@@ -247,16 +347,20 @@ class EvidenceGrantService:
                 return record
             prior = con.execute(
                 "SELECT 1 FROM tf_evidence_recovery_grant WHERE campaign_id=? AND job_id=?",
-                (CAMPAIGN_ID, JOB_ID),
+                (CAMPAIGN_ID, binding.get("job_id", JOB_ID)),
             ).fetchone()
             if prior:
                 raise FactoryError("this failed job already has an evidence recovery grant", "evidence_grant_conflict", 409)
-            self._verify_budget_baseline_locked(con)
+            if prepared_proposal.get("schema") == SCHEMA:
+                self._verify_budget_baseline_locked(con)
+            else:
+                from .frozen_review_recovery import FrozenReviewRecoveryService
+                FrozenReviewRecoveryService(self.store, clock=self.clock)._verify_baseline_locked(con)
             grant_id = "egrant_" + uuid.uuid4().hex
             now = float(self.clock())
             con.execute(
                 "INSERT INTO tf_evidence_recovery_grant(id,campaign_id,product_id,plan_id,job_id,request_key,proposal_digest,request_json,status,created_at) VALUES(?,?,?,?,?,?,?,?,'registered',?)",
-                (grant_id, CAMPAIGN_ID, PRODUCT_ID, PLAN_ID, JOB_ID, request_key,
+                (grant_id, CAMPAIGN_ID, PRODUCT_ID, PLAN_ID, binding.get("job_id", JOB_ID), request_key,
                  prepared_proposal["proposal_digest"], encoded, now),
             )
             return self._record(con.execute("SELECT * FROM tf_evidence_recovery_grant WHERE id=?", (grant_id,)).fetchone())
@@ -294,7 +398,7 @@ class EvidenceGrantService:
         return cls._record(con.execute("SELECT * FROM tf_evidence_recovery_grant WHERE id=?", (grant_id,)).fetchone())
 
     @classmethod
-    def occupy_locked(cls, con, grant_id, context, reservation_id, now, *, campaign_id, identity, plan_id, job_id, phase, stage, retry, retry_scope, requested_model, kind, deadline):
+    def occupy_locked(cls, con, grant_id, context, reservation_id, now, *, campaign_id, identity, plan_id, job_id, phase, stage, retry, retry_scope, requested_model, kind, deadline, timeout=None):
         row = con.execute("SELECT * FROM tf_evidence_recovery_grant WHERE id=?", (grant_id,)).fetchone()
         if row is None:
             raise FactoryError("evidence recovery grant not found", "evidence_grant_missing", 404)
@@ -303,16 +407,22 @@ class EvidenceGrantService:
         proposal = json.loads(row["request_json"])
         materials = proposal["materials"]
         binding = materials["binding"]
-        expected_phase = materials["new_phase"]
+        expected_phase = get_call_binding(proposal)
         owner = con.execute("SELECT state,attempt FROM job WHERE id=?", (job_id,)).fetchone()
+        frozen = proposal.get("schema") == FROZEN_REVIEW_SCHEMA
+        expected_job = FROZEN_REVIEW_JOB if frozen else JOB_ID
+        expected_deadline = FROZEN_REVIEW_DEADLINE if frozen else OLD_DEADLINE
+        expected_scope = expected_phase.get("logical_retry_scope")
+        expected_model = expected_phase.get("requested_model")
         if (campaign_id != CAMPAIGN_ID or identity != PRODUCT_ID or plan_id != PLAN_ID
-                or job_id != JOB_ID or phase != "G1" or retry != 1
-                or retry_scope != RETRY_SCOPE or kind != "review"
-                or str(stage) != str(expected_phase["operation"])
-                or requested_model != REQUESTED_MODEL
+                or job_id != expected_job or phase != "G1" or retry != 1
+                or retry_scope != expected_scope or kind != "review"
+                or str(stage) != str(expected_phase.get("operation"))
+                or requested_model != expected_model
                 or owner is None or owner["state"] != "running" or owner["attempt"] < 2
-                or binding.get("deadline") != OLD_DEADLINE
-                or float(deadline) != OLD_DEADLINE or float(now) >= OLD_DEADLINE):
+                or binding.get("deadline") != expected_deadline
+                or float(deadline) != expected_deadline or float(now) >= expected_deadline
+                or (frozen and owner["attempt"] not in {2, 3, 4})):
             raise FactoryError("call identity does not match the evidence grant", "evidence_grant_binding", 409)
         if not isinstance(context, dict):
             raise FactoryError("evidence call context is required", "evidence_grant_binding", 409)
@@ -328,6 +438,15 @@ class EvidenceGrantService:
                 expected = expected_phase.get("budget_input_digest")
             if actual != expected:
                 raise FactoryError("evidence call payload, prompt, source or projection differs", "evidence_grant_binding", 409)
+        if frozen:
+            extra_fields = ("materials_manifest_digest", "materials_tree_digest", "cli_config_identity")
+            for key in extra_fields:
+                if context.get(key) != expected_phase.get(key):
+                    raise FactoryError("frozen-review materials or ACL differ from the grant", "evidence_grant_binding", 409)
+            if context.get("timeout_seconds") != 1800:
+                raise FactoryError("frozen-review timeout differs from the grant", "evidence_grant_binding", 409)
+            if timeout != 1800:
+                raise FactoryError("frozen-review reservation timeout must be exactly 1800 seconds", "evidence_grant_binding", 409)
         con.execute("UPDATE tf_evidence_recovery_grant SET status='reserved',consumed_reservation_id=?,call_attempt=? WHERE id=? AND status='queued'",
                     (reservation_id, owner["attempt"], grant_id))
         return {"id": grant_id, "proposal_digest": row["proposal_digest"], "reservation_id": reservation_id,

@@ -3032,6 +3032,20 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
     )
 
 
+def frozen_review_payload(snapshot, source):
+    """The frozen review's unchanged business payload, shared with recovery preparation."""
+    return {
+        "leaf": snapshot["leaf"],
+        "scenario": snapshot["scenario"],
+        "language": snapshot["config"].get("language", "zh"),
+        "source_inventory": sorted(tree_manifest(source)),
+        "artifact_digest": snapshot["artifact_digest"],
+        "review_rules_version": json.loads((source / "template.json").read_text(encoding="utf-8")).get("review_rules_version"),
+        "aggregate_repair_scope": json.loads((source / "inputs/repair-scope.json").read_text(encoding="utf-8")) if (source / "inputs/repair-scope.json").is_file() else None,
+        "aggregate_repair_diff": json.loads((source / "inputs/aggregate-repair-diff.json").read_text(encoding="utf-8")) if (source / "inputs/aggregate-repair-diff.json").is_file() else None,
+    }
+
+
 def review(pipeline, job, attempt, agent):
     from .api import controlled_path
 
@@ -3039,25 +3053,32 @@ def review(pipeline, job, attempt, agent):
     bundle = controlled_path(pipeline.store, snapshot["bundle_path"])
     verify_frozen(bundle, snapshot["artifact_digest"])
     source = bundle / "source"
-    result = agent(
-        "cognitive-review",
-        REVIEW_PROMPT,
-        {
-            "leaf": snapshot["leaf"],
-            "scenario": snapshot["scenario"],
-            "language": snapshot["config"].get("language", "zh"),
-            "source_inventory": sorted(tree_manifest(source)),
-            "artifact_digest": snapshot["artifact_digest"],
-            "review_rules_version": json.loads((source / "template.json").read_text(encoding="utf-8")).get("review_rules_version"),
-            "aggregate_repair_scope": json.loads((source / "inputs/repair-scope.json").read_text(encoding="utf-8")) if (source / "inputs/repair-scope.json").is_file() else None,
-            "aggregate_repair_diff": json.loads((source / "inputs/aggregate-repair-diff.json").read_text(encoding="utf-8")) if (source / "inputs/aggregate-repair-diff.json").is_file() else None,
-        },
-        source,
-    )
+    from .frozen_review_recovery import FrozenReviewRecoveryService
+    from .evidence_grants import get_call_binding
+    recovery_service = FrozenReviewRecoveryService(pipeline.store)
+    recovery_context = recovery_service.active_for_job(job["id"])
+    payload = frozen_review_payload(snapshot, source)
+    if recovery_context:
+        call = get_call_binding(recovery_context["proposal"])
+        if recovery_context.get("cli_allowed") is False:
+            result = recovery_service.validate_saved_result(job, recovery_context)
+        else:
+            # Recover the original insertion order as well as its values. The
+            # shared builder verifies the raw/full/language-sensitive identity.
+            result = agent("cognitive-review", call["prompt"], json.loads(call["input_json"]), source,
+                           budget_stage=call["operation"], budget_scope=call["logical_retry_scope"],
+                           evidence_recovery_id=recovery_context["grant_id"],
+                           frozen_review_context=recovery_context)
+    else:
+        result = agent("cognitive-review", REVIEW_PROMPT, payload, source)
     try:
         report = validate_review(result, source)
     except FactoryError as error:
         if str(error) != "review cites nonexistent source file":
+            raise
+        if recovery_context:
+            atomic_json(attempt / "cognitive-review/reference-validation-error.json",
+                        {"message": str(error), "code": error.code, "automatic_repair_allowed": False})
             raise
         review_dir = attempt / "cognitive-review"
         review_dir.mkdir(exist_ok=True)
@@ -3127,6 +3148,8 @@ def review(pipeline, job, attempt, agent):
             for note in (report.get("protocol_note"), framing_note)
             if note
         )
+    if recovery_context:
+        report["frozen_review_recovery"] = recovery_service.acceptance_binding(job, recovery_context, result)
     atomic_json(attempt / "cognitive-review/report.json", report)
     pipeline.store.complete_acceptance(job["id"], job["token"], report)
 

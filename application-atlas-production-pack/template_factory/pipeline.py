@@ -155,19 +155,24 @@ class Pipeline:
             self.store.update(jid, token, name, message)
 
         def agent(name, prompt, payload, source=None, *, budget_stage=None, budget_scope=None,
-                  evidence_recovery_id=None):
+                  evidence_recovery_id=None, frozen_review_context=None):
             directory = attempt / name
             directory.mkdir()
             # JSON escapes a multiline document into one long line. OpenCode's
             # read tool truncates individual lines, so provide a byte-faithful
             # Markdown companion without changing the immutable input snapshot.
-            leaf = payload.get("leaf")
-            if isinstance(leaf, dict) and isinstance(leaf.get("content"), str):
-                atomic_write(directory / "leaf.md", leaf["content"])
-                payload = {**payload, "leaf": {**leaf, "content_file": "leaf.md"}}
-            atomic_json(directory / "input.json", payload)
+            from .agent_inputs import build_agent_input
+            payload, input_raw, leaf_raw = build_agent_input(payload)
+            if leaf_raw is not None:
+                atomic_write(directory / "leaf.md", leaf_raw)
+            atomic_write(directory / "input.json", input_raw)
             if source:
                 copy_tree(source, directory / "source")
+            if frozen_review_context:
+                from .frozen_review_recovery import FrozenReviewRecoveryService
+                FrozenReviewRecoveryService(self.store).prepare_call(
+                    job, directory, prompt, payload, frozen_review_context
+                )
             stage(name, "OpenCode CLI preparing; budget reservation pending")
             budget_options = {}
             if snapshot.get("v1"):
@@ -216,11 +221,20 @@ class Pipeline:
                     **({"retry": retry} if retry is not None else {}),
                     "kind": "review" if "review" in name else "research" if "case-" in name else "production",
                 }}
+                if frozen_review_context:
+                    from .evidence_grants import get_call_binding
+                    call = get_call_binding(frozen_review_context["proposal"])
+                    budget_options["budget"]["protocol_context"].update({
+                        key: call[key] for key in (
+                            "materials_manifest_digest", "materials_tree_digest",
+                            "cli_config_identity", "timeout_seconds", "projection_digest"
+                        )
+                    })
             result = self.cli.run(
                 directory,
                 prompt,
                 config["model"],
-                config["timeout"],
+                1800 if frozen_review_context else config["timeout"],
                 cancelled,
                 lambda m: stage(name, m),
                 **budget_options,

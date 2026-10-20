@@ -54,11 +54,33 @@ def main(argv=None):
     evidence_saved = commands.add_parser("resume-evidence-result", help="Queue a checked host-only continuation with the saved result; no CLI retry")
     evidence_saved.add_argument("job_id")
     evidence_saved.add_argument("--request", type=Path, required=True)
+    for name, help_text in (("frozen-review-prepare", "Read-only prepare for frozen review recovery"),
+                            ("recover-frozen-review", "Recover the same frozen review once"),
+                            ("resume-frozen-review-result", "Host-only submission of the saved frozen review")):
+        sub = commands.add_parser(name, help=help_text)
+        sub.add_argument("job_id")
+        sub.add_argument("--request", type=Path, required=True)
+    sub = commands.add_parser("frozen-review-grant-register", help="Register one prepared frozen review grant")
+    sub.add_argument("--request", type=Path, required=True)
     args = parser.parse_args(argv)
     store = FactoryStore(args.root, args.pack)
     service = BatchService(store)
     try:
-        if args.command == "queue-r5":
+        if args.command in {"frozen-review-prepare", "frozen-review-grant-register", "recover-frozen-review", "resume-frozen-review-result"}:
+            from .frozen_review_recovery import FrozenReviewRecoveryService
+            frozen_service = FrozenReviewRecoveryService(store)
+            request = json.loads(args.request.read_text())
+            if args.command == "frozen-review-prepare":
+                result = frozen_service.prepare(args.job_id, request)
+            elif args.command == "frozen-review-grant-register":
+                if not isinstance(request, dict) or set(request) != {"prepared_proposal", "request"}:
+                    raise FactoryError("grant registration requires prepared_proposal and request", "frozen_recovery_schema", 400)
+                result = frozen_service.register(request["prepared_proposal"], request["request"])
+            elif args.command == "recover-frozen-review":
+                result = frozen_service.recover(args.job_id, request)
+            else:
+                result = frozen_service.resume_saved_result(args.job_id, request)
+        elif args.command == "queue-r5":
             from .r5_execution import R5ExecutionService
             result = R5ExecutionService(store).queue(args.plan_id, json.loads(args.request.read_text()))
         elif args.command == "protocol-grant-register":

@@ -162,11 +162,17 @@ class CLI:
         elif budget_required:
             raise FactoryError("V1 model call requires a durable budget ledger", "budget_required", 409)
         try:
+            frozen_recovery = False
+            if reservation and reservation.get("evidence_recovery_id") and getattr(ledger, "store", None) is not None:
+                from .evidence_grants import EvidenceGrantService, FROZEN_REVIEW_SCHEMA
+                grant = EvidenceGrantService(ledger.store, initialize=False).get(reservation["evidence_recovery_id"])
+                frozen_recovery = grant["proposal"]["schema"] == FROZEN_REVIEW_SCHEMA
             return self._run(directory, prompt, model, timeout, cancelled, progress,
                              reasoning_effort=reasoning_effort, _state=state,
                              _budget_ledger=ledger,
                              _budget_reservation=reservation["id"] if reservation else None,
-                             _evidence_recovery=bool(reservation and reservation.get("evidence_recovery_id")))
+                             _evidence_recovery=bool(reservation and reservation.get("evidence_recovery_id")),
+                             _frozen_review_recovery=frozen_recovery)
         except BaseException as error:
             if ledger is not None and reservation is not None:
                 proven_not_started = (not state["spawn_attempted"] or state["spawn_failed_proven"])
@@ -223,6 +229,7 @@ class CLI:
         _budget_ledger=None,
         _budget_reservation=None,
         _evidence_recovery=False,
+        _frozen_review_recovery=False,
     ):
         call_started = time.monotonic()
         if not self.executable:
@@ -263,6 +270,16 @@ class CLI:
             str(directory.resolve() / "source"),
             str(directory.resolve() / "source/**"),
         ]
+        # Only a registered frozen-review recovery may supply this directory.
+        # The budget's spawn check independently verifies the complete bound
+        # tree/config; merely placing a manifest cannot authorize a model call.
+        materials_manifest = directory / "review-materials/manifest.json"
+        if materials_manifest.exists():
+            if not _frozen_review_recovery:
+                raise FactoryError("derived review reads require the typed frozen-review grant", "evidence_grant_binding", 409)
+            from .frozen_review_materials import registered_read_resources
+            registered = registered_read_resources(directory)
+            allowed_reads.extend(registered["relative"] + registered["absolute"])
         allow_search = directory.name not in {
             "scenario-review",
             "cognitive-review",
@@ -454,6 +471,8 @@ class CLI:
         observed_effort = None
         usage_events = []
         usage_events_truncated = False
+        result = None
+        result_text = None
         def consume(raw):
             nonlocal session_id, observed_model, observed_effort, usage_events_truncated
             event = json.loads(raw)
@@ -562,6 +581,7 @@ class CLI:
             # object for compatible CLI versions, but never treat events as data.
             if not result_text:
                 result_text = chunks["stdout"].decode(errors="replace").strip()
+            atomic_json(directory / "original-response.json", {"text": result_text})
             cognitive = (
                 directory.name.startswith(
                     ("blueprint-generate", "blueprint-code", "blueprint-spec-review")
@@ -663,6 +683,14 @@ class CLI:
                 "failure_code": getattr(failure, "code", "cli_process_failed" if failure else "cli_cleanup_failed" if cleanup_error else None),
                 "stdout_sha256": hashlib.sha256(chunks["stdout"]).hexdigest(),
                 "stderr_sha256": hashlib.sha256(chunks["stderr"]).hexdigest(),
+                "reservation_id": _budget_reservation,
+                "result_sha256": hashlib.sha256(
+                    (json.dumps(result, ensure_ascii=False, indent=1) + "\n").encode("utf-8")
+                ).hexdigest() if delivery_status == "delivered" else None,
+                "original_response_sha256": hashlib.sha256(
+                    (directory / "original-response.json").read_bytes()
+                ).hexdigest() if result_text is not None else None,
+                "effective_timeout_seconds": timeout,
             }
             try:
                 atomic_json(directory / "cli-summary.json", redact_value(summary))
