@@ -31,6 +31,7 @@ from .contract_scope import (
     validate_repair_scope,
     validate_repair_diff,
 )
+from .source_references import validate_feature_source_references
 
 AUTHORED_FIELDS = {
     "title",
@@ -114,6 +115,94 @@ def _atomic_context_json(path, value):
     from atlas_runtime import atomic_write
 
     atomic_write(path, json.dumps(value, ensure_ascii=False, indent=1, sort_keys=True) + "\n")
+
+
+def _source_projection_material(research, cases, snapshot, spec):
+    """Build the scenario-scoped source manifest and feature citation matrix."""
+    facts_view = snapshot.get("case_facts_view") or {}
+    facts_digest = facts_view.get("view_digest")
+    scenario = snapshot.get("scenario") or {}
+    observations = {}
+    for case in cases:
+        for observation in case.get("observations", []):
+            observations[observation.get("evidence_id")] = observation
+    sources = [{
+        "id": "S01",
+        "evidence_id": None,
+        "kind": "confirmed_input",
+        "source_path": "inputs/scenario.json",
+        "source_url": None,
+        "version": f"{scenario.get('id')}@{scenario.get('revision')}",
+        "facts": scenario.get("objective", "Fixed scenario input"),
+        "input_digest": digest(scenario),
+        "facts_view_digest": facts_digest,
+    }]
+    for row in research.get("sources", []):
+        observation = observations.get(row.get("name"), {})
+        location = observation.get("location") if isinstance(observation, dict) else {}
+        location = location if isinstance(location, dict) else {}
+        kind = observation.get("kind")
+        source_url = location.get("url") or row.get("url")
+        source_path = location.get("path") or location.get("source_path")
+        source_version = row.get("version") or location.get("material_version") or location.get("collected_at")
+        content_digest = location.get("content_digest")
+        if kind == "documentation":
+            # Documentation evidence is pinned by URL and a version or content
+            # digest; unlike code observations it need not have a repository
+            # file path. Preserve any supplied source_path as a useful label.
+            if not source_path:
+                source_path = source_url
+            if not source_version and isinstance(content_digest, str) and content_digest:
+                source_version = "sha256:" + content_digest
+        if (
+            not isinstance(source_path, str) or not source_path
+            or not isinstance(source_version, str) or not source_version
+            or (kind == "code_observation" and not location.get("path"))
+            or (kind == "documentation"
+                and (not isinstance(source_url, str) or not source_url.startswith("https://")))
+            or kind not in {"code_observation", "documentation"}
+        ):
+            raise FactoryError(
+                "scenario source manifest is missing its fixed path, version, or evidence kind",
+                "case_facts_view_invalid",
+                409,
+            )
+        sources.append({
+            "id": row["id"],
+            "evidence_id": row.get("name"),
+            "kind": observation.get("kind", "unknown"),
+            "source_path": source_path,
+            "source_url": source_url,
+            "version": source_version,
+            "facts": row.get("facts"),
+            "facts_view_digest": facts_digest,
+            **({"content_digest": content_digest} if content_digest else {}),
+        })
+    manifest = {
+        "schema": "atlas.source-manifest.v1",
+        "scenario_id": scenario.get("id"),
+        "scenario_revision": scenario.get("revision"),
+        "facts_view_digest": facts_digest,
+        "sources": sources,
+    }
+    by_id = {item["id"]: item for item in sources}
+    matrix = {
+        "schema": "atlas.source-citation-matrix.v1",
+        "facts_view_digest": facts_digest,
+        "features": [
+            {
+                "feature_id": feature.get("id"),
+                "source_ids": list(feature.get("sources", [])),
+                "sources": [
+                    {key: by_id[source_id].get(key) for key in
+                     ("id", "evidence_id", "kind", "source_path", "version")}
+                    for source_id in feature.get("sources", []) if source_id in by_id
+                ],
+            }
+            for feature in spec.get("features", []) if isinstance(feature, dict)
+        ],
+    }
+    return manifest, matrix
 
 
 def _aggregate_scope_restorations(before_spec, after_spec, scope):
@@ -1136,6 +1225,21 @@ def apply_review_reference_repair(result, response, source):
 def produce(pipeline, job, attempt, agent, stage, checkpoint):
     snapshot, config = job["snapshot"], job["snapshot"]["config"]
     repair = snapshot.get("cognitive_repair")
+    prepared_program_reuse_contents = None
+    if repair and isinstance(repair.get("prepared_revision"), dict):
+        prepared = repair["prepared_revision"]
+        if prepared.get("schema") == "atlas.failed-plan-revision.v2":
+            if digest(prepared.get("effective_plan")) != prepared.get("effective_plan_digest"):
+                raise FactoryError("prepared revision changed", "patch_conflict", 409)
+            from .plan_revision import program_reuse_contents
+
+            prepared_program_reuse_contents = program_reuse_contents(
+                pipeline.store, prepared.get("prepared_program_reuse")
+            )
+            if set(prepared_program_reuse_contents) != set(
+                row.get("path") for row in prepared["effective_plan"].get("file_plan", [])
+            ):
+                raise FactoryError("prepared program reuse does not cover the complete effective file plan", "patch_conflict", 409)
     if snapshot.get("v1"):
         from .cases import CaseLibrary
         library = CaseLibrary(pipeline.store)
@@ -1243,6 +1347,15 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             snapshot["case_facts_view"] = facts_view
     context = attempt / "context"
     context.mkdir()
+    if prepared_program_reuse_contents is not None:
+        prepared = repair["prepared_revision"]
+        _atomic_context_json(context / "PREPARED_PROGRAM_REUSE.json", {
+            "schema": "atlas.prepared-program-reuse-receipt.v1",
+            "prepared_plan_digest": prepared["effective_plan_digest"],
+            "manifest": prepared["prepared_program_reuse"],
+            "reused_paths": sorted(prepared_program_reuse_contents),
+            "all_program_bytes_bound_before_authoring": True,
+        })
     policy = scenario_policy_for(
         snapshot.get("scenario"), snapshot.get("v1", {}).get("product_id")
     )
@@ -1567,11 +1680,11 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             recovered = None
             can_recover_generation = (
                 not repair
-                or (
+                or (not repair.get("prepared_program_reuse") and (
                     bool(repair.get("repair_scope"))
                     and not repair.get("reuse_spec")
                     and repair.get("spec_edit_paths") is None
-                )
+                ))
             )
             if can_recover_generation and index == 0 and plan is None:
                 recovered = _recover_prior_generation_delivery(
@@ -1618,6 +1731,30 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             repair.get("edit_paths") if repair else None,
         )
         plan = {**plan, "file_plan": file_plan}
+        source_reference_report = None
+        if snapshot.get("v1"):
+            available_source_ids = ["S01", *[row["id"] for row in research["sources"]]]
+            source_binding = {
+                "scenario_id": snapshot.get("scenario", {}).get("id"),
+                "scenario_revision": snapshot.get("scenario", {}).get("revision"),
+                "case_basis_digest": (snapshot.get("case_basis") or {}).get("basis_digest"),
+                "facts_view_digest": snapshot.get("case_facts_view", {}).get("view_digest"),
+                "research_source_ids": [row["id"] for row in research["sources"]],
+                "file_plan_digest": digest(file_plan),
+            }
+            source_reference_report = validate_feature_source_references(
+                plan["spec"], available_source_ids, binding=source_binding
+            )
+            source_manifest, source_citation_matrix = _source_projection_material(
+                research, cases, snapshot, plan["spec"]
+            )
+            # The combined six-dimension report validates citations against
+            # the shared job context, so keep the same host-owned source index
+            # there as well as in each digest-bound reviewer projection.
+            _atomic_context_json(context / "SOURCE_MANIFEST.json", source_manifest)
+            _atomic_context_json(context / "SOURCE_CITATION_MATRIX.json", source_citation_matrix)
+        else:
+            source_manifest, source_citation_matrix = None, None
         if repair and repair.get("edit_paths") is not None:
             atomic_json(
                 context / "FILE_SCOPE.json",
@@ -1633,6 +1770,8 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                 },
             )
         _atomic_context_json(context / "SPECIFICATION.json", plan)
+        if source_reference_report is not None:
+            _atomic_context_json(context / "SOURCE_REFERENCE_REPORT.json", source_reference_report)
         (context / "ARCHITECTURE.md").write_text(plan["spec"]["architecture_markdown"])
         if repair and repair.get("repair_scope") and not repair.get("reuse_spec") and repair.get("spec_edit_paths") is None:
             baseline_spec = verify_frozen(previous, repair["digest"])
@@ -1737,11 +1876,22 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                         projection[key] = (
                             file_plan if key == "file_plan" else plan["spec"].get(key)
                         )
+                    if source_manifest is not None:
+                        projection["source_manifest_digest"] = digest(source_manifest)
+                        projection["source_citation_matrix"] = source_citation_matrix
                     if dimension == "phase_acceptance":
                         projection["file_plan"] = file_plan
                     if dimension == "runtime_protocol":
                         (design_context / "RUNTIME_CONTRACT.md").write_text(
                             RUNTIME_CONTRACT
+                        )
+                    if source_manifest is not None:
+                        _atomic_context_json(
+                            design_context / "SOURCE_MANIFEST.json", source_manifest
+                        )
+                        _atomic_context_json(
+                            design_context / "SOURCE_CITATION_MATRIX.json",
+                            source_citation_matrix,
                         )
                     prose = json.dumps(
                         projection, ensure_ascii=False, indent=2, sort_keys=True
@@ -1907,6 +2057,15 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                 prior = previous / "source" if previous else None
                 if prior:
                     verify_frozen(previous, repair["digest"])
+                if prepared_program_reuse_contents is not None:
+                    content = prepared_program_reuse_contents.get(file["path"])
+                    if content is None:
+                        raise FactoryError("prepared program reuse is missing " + file["path"], "patch_conflict", 409)
+                    return {
+                        "path": file["path"],
+                        "content": content,
+                        "reused_sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+                    }
                 if file.get("reuse"):
                     if not prior or not (prior / file["path"]).is_file():
                         raise FactoryError("pinned reuse file is missing")
@@ -2053,13 +2212,43 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             "diff_digest": None,
             "rendered_tree_diff_digest": digest({"before": before_files, "after": after_files}),
         }
-        baseline_authored = {key: before_spec.get(key) for key in (AUTHORED_FIELDS | OPTIONAL_AUTHORED_FIELDS) if key in before_spec}
-        candidate_authored = {key: after_spec.get(key) for key in (AUTHORED_FIELDS | OPTIONAL_AUTHORED_FIELDS) if key in after_spec}
+        r6_incremental_diff = None
         before_programs = {path for path in before_files if path.startswith(("acceptance/", "references/")) and path != "acceptance/plan.json"}
         after_programs = {path for path in after_files if path.startswith(("acceptance/", "references/")) and path != "acceptance/plan.json"}
         baseline_program_hashes = {path: before_files[path] for path in sorted(before_programs)}
         candidate_program_hashes = {path: after_files[path] for path in sorted(after_programs)}
-        aggregate_diff["diff_digest"] = aggregate_semantic_diff_digest(
+        prepared_for_diff = repair.get("prepared_revision") if repair else None
+        if isinstance(prepared_for_diff, dict) and prepared_for_diff.get("schema") == "atlas.failed-plan-revision.v2":
+            manifest = prepared_for_diff["prepared_program_reuse"]
+            source_program_hashes = {entry["path"]: entry["sha256"] for entry in manifest["entries"]}
+            if source_program_hashes != candidate_program_hashes:
+                raise FactoryError(
+                    "R6 candidate program bytes differ from the nine prepared attempt-4 programs",
+                    "patch_conflict",
+                    409,
+                )
+            source_plan = pipeline.store.checkpoint(
+                prepared_for_diff["binding"]["job_id"],
+                prepared_for_diff["binding"]["checkpoint_name"],
+            )
+            if (not source_plan
+                    or source_plan.get("digest") != prepared_for_diff["base_proposal_digest"]
+                    or digest(source_plan.get("result")) != source_plan.get("digest")):
+                raise FactoryError("R6 incremental baseline plan changed", "checkpoint_changed", 409)
+            r6_incremental_diff = {
+                "schema": "atlas.r6-incremental-diff.v1",
+                "baseline_proposal_digest": source_plan["digest"],
+                "prepared_effective_plan_digest": prepared_for_diff["effective_plan_digest"],
+                "spec_changes": prepared_for_diff["incremental_diff"]["spec_changes"],
+                "program_file_hashes_before": source_program_hashes,
+                "program_file_hashes_after": candidate_program_hashes,
+                "program_byte_changes": 0,
+                "program_reuse_manifest_digest": digest(manifest),
+            }
+            aggregate_diff["r6_incremental_diff"] = r6_incremental_diff
+        baseline_authored = {key: before_spec.get(key) for key in (AUTHORED_FIELDS | OPTIONAL_AUTHORED_FIELDS) if key in before_spec}
+        candidate_authored = {key: after_spec.get(key) for key in (AUTHORED_FIELDS | OPTIONAL_AUTHORED_FIELDS) if key in after_spec}
+        cumulative_diff_digest = aggregate_semantic_diff_digest(
             scope=repair_scope,
             baseline_digest=repair["digest"],
             before_spec=aggregate_diff["authored_fields_before"],
@@ -2071,19 +2260,31 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             case_adaptation_revision=aggregate_diff["case_adaptation_revision"],
             case_adaptation_input=aggregate_diff["case_adaptation_input"],
         )
+        aggregate_diff["diff_digest"] = (
+            digest({"cumulative_diff_digest": cumulative_diff_digest,
+                    "r6_incremental_diff": r6_incremental_diff})
+            if r6_incremental_diff is not None else cumulative_diff_digest
+        )
         atomic_json(candidate / "inputs/repair-scope.json", repair_scope)
         atomic_json(candidate / "inputs/aggregate-repair-diff.json", aggregate_diff)
+        if r6_incremental_diff is not None:
+            atomic_json(candidate / "inputs/r6-incremental-diff.json", r6_incremental_diff)
         template_json = json.loads((candidate / "template.json").read_text(encoding="utf-8"))
-        template_json.setdefault("evidence", []).extend([
+        evidence_rows = [
             {"path": "inputs/repair-scope.json", "scope": "Host-authorized authored field and program paths for this aggregate revision."},
             {"path": "inputs/aggregate-repair-diff.json", "scope": "Exact pre-freeze authored spec and text program diffs against the pinned baseline; semantic weakening is independently reviewed."},
-        ])
+        ]
+        if r6_incremental_diff is not None:
+            evidence_rows.append({"path": "inputs/r6-incremental-diff.json", "scope": "Exact source-alignment spec delta from the failed R6 proposal and proof that all nine program hashes were reused unchanged."})
+        template_json.setdefault("evidence", []).extend(evidence_rows)
         atomic_json(candidate / "template.json", template_json)
         atomic_json(candidate / "integrity.json", {
             "template_version": template_json["version"],
             "sha256": {key: value for key, value in tree_manifest(candidate).items() if key != "integrity.json"},
         })
         _atomic_context_json(context / "AGGREGATE_REPAIR_DIFF.json", aggregate_diff)
+        if r6_incremental_diff is not None:
+            _atomic_context_json(context / "R6_INCREMENTAL_DIFF.json", r6_incremental_diff)
         review_identity = {
             "scope_digest": digest(repair_scope),
             "case_policy_digest": digest(policy) if policy else None,
@@ -2400,12 +2601,14 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
     spec_edit_paths = value.get("spec_edit_paths")
     reuse_spec = value.get("reuse_spec", False)
     prepared = None
+    r6_prepared = False
     if value.get("prepared_revision") is not None:
         from .plan_revision import PreparedRevisionService
         request = value["prepared_revision"]
         if not isinstance(request, dict) or not isinstance(request.get("binding"), dict):
             raise FactoryError("prepared revision requires its exact request and job binding", "patch_conflict", 409)
         prepared = PreparedRevisionService(store).prepare(request["binding"].get("job_id"), request)
+        r6_prepared = prepared.get("schema") == "atlas.failed-plan-revision.v2"
         failed = store.job(prepared["binding"]["job_id"])["snapshot"]
         failed_repair = failed.get("cognitive_repair", {})
         if (reuse_spec or spec_edit_paths is not None or not repair_scope
@@ -2414,10 +2617,20 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
                 or failed_repair.get("edit_paths") != edit_paths
                 or failed.get("case_basis") != spec.get("case_basis")):
             raise FactoryError("prepared revision differs from its frozen repair baseline", "patch_conflict", 409)
-        expected_scope = json.loads(json.dumps(failed_repair["repair_scope"]))
-        expected_scope["authored_field_paths"].append(["contract_coverage", "error_contract"])
+        if r6_prepared:
+            if (digest(prepared.get("effective_plan")) != prepared.get("effective_plan_digest")
+                    or not isinstance(prepared.get("prepared_program_reuse"), dict)
+                    or not isinstance(prepared.get("source_reference_report"), dict)
+                    or not prepared["source_reference_report"].get("valid")):
+                raise FactoryError("R6 prepared plan or bindings are incomplete", "patch_conflict", 409)
+            expected_scope = prepared.get("cumulative_repair_scope")
+            if not isinstance(expected_scope, dict):
+                raise FactoryError("R6 preparation is missing its cumulative repair scope", "patch_conflict", 409)
+        else:
+            expected_scope = json.loads(json.dumps(failed_repair["repair_scope"]))
+            expected_scope["authored_field_paths"].append(["contract_coverage", "error_contract"])
         if repair_scope != expected_scope:
-            raise FactoryError("prepared revision must retain the existing repair scope plus host error-contract mapping", "patch_conflict", 409)
+            raise FactoryError("prepared revision must retain its exact authorized cumulative repair scope", "patch_conflict", 409)
     if (not isinstance(reuse_spec, bool) or (reuse_spec and edit_paths is None)
             or (spec_edit_paths is not None and (reuse_spec or edit_paths is not None))):
         raise FactoryError("reuse_spec requires an explicit program edit scope")
@@ -2456,8 +2669,12 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
             if not exists or key in allowed_spec_paths:
                 raise FactoryError("spec_edit_paths must name unique existing architecture or decision text fields")
             allowed_spec_paths.add(key)
+    r6_source_config = None
+    if r6_prepared:
+        r6_source_config = store.job(prepared["binding"]["job_id"])["snapshot"]["config"]
     model = text(
-        value.get("model", artifact["provenance"].get("model")), "provider/model", 200
+        value.get("model", r6_source_config["model"] if r6_source_config else artifact["provenance"].get("model")),
+        "provider/model", 200
     )
     import re
 
@@ -2467,16 +2684,21 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
         or model.startswith("-")
     ):
         raise FactoryError("model must use provider/model format")
-    language = value.get("language", "zh")
+    language = value.get("language", r6_source_config.get("language", "zh") if r6_source_config else "zh")
     if language not in ("zh", "en"):
         raise FactoryError("language must be zh or en")
+    timeout = value.get("timeout", r6_source_config.get("timeout", 600) if r6_source_config else 900)
+    if r6_source_config and (model != r6_source_config.get("model")
+                            or language != r6_source_config.get("language")
+                            or timeout != r6_source_config.get("timeout")):
+        raise FactoryError("R6 must preserve the failed job model, language and timeout", "patch_conflict", 409)
     config = {
         "kind": "blueprint-production",
         "name": "Cognitive revision: " + artifact["manifest"]["name"],
         "model": model,
         "language": language,
         "concurrency": 1,
-        "timeout": integer(value.get("timeout", 900), "timeout", 30, 7200),
+        "timeout": integer(timeout, "timeout", 30, 7200),
         "repair_attempts": 1,
     }
     if prepared:
@@ -2559,6 +2781,67 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
                 return store.batch(prior[0])
             row = con.execute("SELECT id FROM job WHERE batch_id=? ORDER BY rowid LIMIT 1", (prior[0],)).fetchone()
             return {"batch_id": prior[0], "job_id": row[0] if row else None, "created": False}
+        if r6_prepared:
+            from .source_references import validate_feature_source_references
+            from .plan_revision import program_reuse_contents
+
+            binding = prepared["binding"]
+            source_job = con.execute(
+                "SELECT state,attempt,snapshot FROM job WHERE id=?",
+                (binding["job_id"],),
+            ).fetchone()
+            if not source_job:
+                raise FactoryError("R6 source job disappeared before queue", "patch_conflict", 409)
+            source_snapshot = json.loads(source_job["snapshot"])
+            if (source_job["state"] != "failed" or source_job["attempt"] != 4
+                    or digest(source_snapshot) != binding["snapshot_digest"]
+                    or source_snapshot.get("case_basis", {}).get("basis_digest") != binding["case_basis_digest"]):
+                raise FactoryError("R6 source job binding changed before queue", "patch_conflict", 409)
+
+            def checked_checkpoint(name, expected_digest):
+                row = con.execute(
+                    "SELECT body FROM checkpoint WHERE job_id=? AND name=?",
+                    (binding["job_id"], name),
+                ).fetchone()
+                body = json.loads(row[0]) if row else None
+                if (not isinstance(body, dict) or not isinstance(body.get("result"), dict)
+                        or (expected_digest is not None
+                            and (body.get("digest") != expected_digest
+                                 or digest(body["result"]) != expected_digest))):
+                    raise FactoryError("R6 source checkpoint changed before queue: " + name, "checkpoint_changed", 409)
+                return body["result"]
+
+            facts_view = checked_checkpoint(
+                binding["facts_view_checkpoint_name"],
+                binding["facts_view_checkpoint_digest"],
+            )
+            if facts_view.get("view_digest") != binding["facts_view_digest"]:
+                raise FactoryError("R6 accepted facts view changed before queue", "case_facts_view_invalid", 409)
+            research = checked_checkpoint("blueprint-research", None)
+            # The research checkpoint is bound by the immutable snapshot digest;
+            # validate its stored self-digest before filtering by the current view.
+            research_row = con.execute(
+                "SELECT body FROM checkpoint WHERE job_id=? AND name='blueprint-research'",
+                (binding["job_id"],),
+            ).fetchone()
+            research_body = json.loads(research_row[0]) if research_row else {}
+            if research_body.get("digest") != digest(research):
+                raise FactoryError("R6 research source checkpoint changed before queue", "checkpoint_changed", 409)
+            if facts_view.get("source_research_digest") != digest(research):
+                raise FactoryError("R6 facts view is detached from its research checkpoint", "case_facts_view_invalid", 409)
+            accepted = set(facts_view.get("accepted_evidence_ids", []))
+            available = [row for row in research.get("sources", [])
+                         if isinstance(row, dict) and row.get("name") in accepted]
+            available.append({"id": "S01"})
+            report = validate_feature_source_references(
+                prepared["effective_plan"]["spec"], available,
+                binding={"job_id": binding["job_id"], "attempt": 4,
+                         "facts_view_digest": binding["facts_view_digest"],
+                         "case_basis_digest": binding["case_basis_digest"]},
+            )
+            if report != prepared["source_reference_report"]:
+                raise FactoryError("R6 source-reference report changed before queue", "checkpoint_changed", 409)
+            program_reuse_contents(store, prepared["prepared_program_reuse"])
         parent_state = parent_state_override or "running"
         if original.get("v1", {}).get("plan_id"):
             parent = con.execute("SELECT b.state FROM v1_execution e JOIN batch b ON b.id=e.batch_id WHERE e.plan_id=?", (original["v1"]["plan_id"],)).fetchone()

@@ -20,6 +20,7 @@ from .artifacts import archive_tree, copy_tree, relative, tree_manifest
 from .handoff import write_handoff
 from .store import FactoryError, canonical, digest, now, text, uid
 from .contract_scope import validate_contract_coverage
+from .source_references import validate_feature_source_references
 
 KIND = "product-blueprint"
 SCHEMA = "atlas.product-blueprint.v0"
@@ -230,6 +231,7 @@ def validate_blueprint(source):
         key: _items(spec, key)
         for key in ("sources", "roles", "features", "decisions", "phases", "acceptance")
     }
+    validate_feature_source_references(spec, list(groups["sources"]))
     phase_order = {
         identifier: index for index, identifier in enumerate(groups["phases"])
     }
@@ -250,7 +252,6 @@ def validate_blueprint(source):
     for row in groups["features"].values():
         for field in ("name", "applicability", "reason"):
             text(row.get(field), "feature " + field, 20_000)
-        _refs(row.get("sources"), groups["sources"], "feature sources")
         cases = _refs(row.get("acceptance"), groups["acceptance"], "feature acceptance")
         phase = row.get("phase")
         if phase is not None and not isinstance(phase, str):

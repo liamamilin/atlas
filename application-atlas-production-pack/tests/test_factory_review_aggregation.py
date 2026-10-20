@@ -8,21 +8,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import test_factory_protocol_link as protocol_fixture
-from template_factory.cognition import _case_adaptation_review_digest
 from template_factory.pipeline import Pipeline
-from template_factory.scenario_policy import policy_for
-from template_factory.store import FactoryError, digest
+from template_factory.store import FactoryError
 from template_factory.v1_batches import BatchService
 
 ARCHIVE = Path(__file__).resolve().parents[2] / "docs/template-factory/g1-protocol-recovery-2026-10-19"
 PLAN_ID = "plan_87059846caf345d2b2fe690657cf324f"
 JOB_ID = "job_7742b1c124be4c9ab3a0096da5cdd772"
 PRODUCT_ID = "product-c42848f63251507bd9d911a5"
-
-
-class StopBeforeProvider(FactoryError):
-    def __init__(self):
-        super().__init__("temporary test stops before any provider call", "fixture_stop", 409)
 
 
 class ReviewAggregationTests(unittest.TestCase):
@@ -45,57 +38,38 @@ class ReviewAggregationTests(unittest.TestCase):
         self.job = self.store.claim("review-aggregation-fixture")
         self.assertEqual((self.job["id"], self.job["attempt"]), (JOB_ID, 4))
 
-    def test_cached_six_subreviews_aggregate_with_strict_policy_citation_and_no_review_call(self):
+    def test_real_legacy_source_conflict_is_rejected_before_cached_reviews_or_authoring(self):
         subreview_rows = [row for row in self.checkpoint_rows if row["name"].startswith("blueprint-design-check-0-")]
         self.assertEqual(len(subreview_rows), 6)
         original_checkpoint_bytes = {row["name"]: row["body"] for row in subreview_rows}
         cli_calls = []
 
-        class StopAtFirstCodeGeneration:
-            def __init__(self, test_case, job):
-                self.test_case, self.job = test_case, job
-
+        class NoProviderBeforeSourceGate:
             def info(self):
                 return {"provider_called": False}
 
             def run(self, directory, prompt, model, timeout, cancelled, on_progress, **kwargs):
                 cli_calls.append(Path(directory).name)
-                self.assert_code_stage(directory)
-                raise StopBeforeProvider()
+                raise AssertionError("source conflict must be rejected before provider invocation")
 
-            def assert_code_stage(self, directory):
-                test = self.test_case
-                test.assertRegex(Path(directory).name, r"^blueprint-code-0-[0-9]+$")
-                source = Path(directory) / "source"
-                policy = policy_for(self.job["snapshot"]["scenario"], PRODUCT_ID)
-                policy_bytes = (source / "CASE_ADAPTATION_POLICY.json").read_bytes()
-                test.assertEqual(json.loads(policy_bytes), policy)
-                test.assertEqual(policy_bytes.decode("utf-8"), json.dumps(policy, ensure_ascii=False, indent=1, sort_keys=True) + "\n")
-                # CASE_DESIGN remains the existing stable root-context serialization;
-                # the architecture subreview's differently indented copy is not used.
-                design_bytes = (source / "CASE_DESIGN.json").read_bytes()
-                test.assertEqual(json.loads(design_bytes), self.job["snapshot"]["case_design"])
-                test.assertEqual(design_bytes.decode("utf-8"), json.dumps(self.job["snapshot"]["case_design"], ensure_ascii=False, indent=1, sort_keys=True) + "\n")
-
-        with self.assertRaises(FactoryError) as stopped:
-            Pipeline(self.store, cli=StopAtFirstCodeGeneration(self, self.job)).run(self.job)
-        self.assertEqual(stopped.exception.code, "fixture_stop")
-        self.assertEqual(len(cli_calls), 1)
-        self.assertRegex(cli_calls[0], r"^blueprint-code-0-[0-9]+$")
-
-        adaptation_digest = _case_adaptation_review_digest(
-            self.job["snapshot"]["case_design"],
-            policy_for(self.job["snapshot"]["scenario"], PRODUCT_ID),
+        with self.assertRaises(FactoryError) as rejected:
+            Pipeline(self.store, cli=NoProviderBeforeSourceGate()).run(self.job)
+        self.assertEqual(rejected.exception.code, "invalid_feature_sources")
+        report = json.loads(str(rejected.exception).split("report=", 1)[1])
+        self.assertFalse(report["valid"])
+        self.assertEqual(
+            report["available_source_ids"],
+            ["S01", "S02", "S03", "S04", "S06", "S07", "S12", "S13", "S14", "S15", "S16", "S19", "S20", "S21"],
         )
-        aggregate_name = "blueprint-spec-review-0-" + adaptation_digest[:16] + "-runtime-v1"
-        aggregate = self.store.checkpoint(JOB_ID, aggregate_name)
-        self.assertIsNotNone(aggregate)
-        self.assertEqual(aggregate["digest"], digest(aggregate["result"]))
-        report = aggregate["result"]
-        self.assertEqual(report["outcome"], "passed")
-        self.assertEqual(len(report["checks"]), 6)
-        self.assertTrue(all(check["outcome"] == "passed" for check in report["checks"]))
-        self.assertEqual(report["case_adaptation_review_digest"], adaptation_digest)
+        by_feature = {row["feature_id"]: row for row in report["features"]}
+        self.assertEqual(by_feature["F01"]["missing_source_ids"], ["S17"])
+        self.assertEqual(by_feature["F07"]["missing_source_ids"], ["S08"])
+        self.assertEqual(by_feature["F08"]["missing_source_ids"], ["S09", "S11"])
+        self.assertEqual(by_feature["F10"]["missing_source_ids"], ["S08"])
+        self.assertEqual(by_feature["F11"]["missing_source_ids"], ["S10", "S18"])
+        self.assertEqual(by_feature["F12"]["missing_source_ids"], ["S08"])
+        self.assertEqual(by_feature["F24"]["missing_source_ids"], ["S17"])
+        self.assertEqual(cli_calls, [])
         for name, body in original_checkpoint_bytes.items():
             with self.store.connect() as con:
                 row = con.execute("SELECT body FROM checkpoint WHERE job_id=? AND name=?", (JOB_ID, name)).fetchone()

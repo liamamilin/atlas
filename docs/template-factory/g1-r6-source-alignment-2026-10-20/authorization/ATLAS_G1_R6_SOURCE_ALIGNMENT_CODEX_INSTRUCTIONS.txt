@@ -1,0 +1,337 @@
+# Atlas G1 R6：来源引用对齐、生成前校验与受限真实生产
+
+文件用途：交给 Codex 的完整执行指令。
+适用仓库：https://github.com/liamamilin/atlas
+本轮基线：8b8ebef287b97991b3cd8b8ad4330fe59c57ed58
+已审查宿主源码：f94dc8c05d59819927d445074a8f6a733c84b1fa
+
+## 0. 授权如何生效
+
+本文件是具体的新执行范围。用户将本文件交给 Codex，并明确要求“按本文件执行”时，授权本文件内的宿主修复、一次 R6 业务修订、一次新 G1 八小时窗口，以及在下述门禁内继续 G1/T08。
+分析和文件交付本身不修改生产预算；旧一次性协议授权不包含本轮变更。
+
+新增授权只有：
+- 原书签产品业务修复上限从 5 提高到 6，已用 5 完整保留；只允许本文件规定的一次来源/依据解释修订。
+- 原 G1 计划取得一次新的 28,800 秒生产窗口。准备、源码检查及精确提交 CI 成功后，与首次正式 R6 后继入队一起原子激活。新截止 = 首次 activated_at + 28,800；重放、暂停、重启均不重新计算。
+- 为以上范围实现必要的正式准备、预算变更、后继入队和已交付程序复用能力；完成检查后实际执行，不停在“准备就绪”。
+
+保持原总 CLI 上限 500、原 campaign/plan/product/scenario、历史业务修复和重试记录、已消费 grant 1/1、T08 原三个固定样本及其原额度。
+不授权第二个协议 grant、全局额外重试额度、第七轮书签修复、案例事实扩容、延期重放或新 campaign。
+本文件范围内的开发、只读检查、精确修订和正式执行已经授权，无需逐步重复确认。发现超出本范围的真实阻断时才停止并具体说明。
+
+## 1. 基线与已取得的真实进展
+
+原 campaign：atlas-v1-first-production-2026-10-19
+原 G1 plan：plan_87059846caf345d2b2fe690657cf324f
+原产品：product-c42848f63251507bd9d911a5
+原场景：scn_7756e0007f6a463a97316f3f49c15248，revision 2
+当前失败 job：job_7742b1c124be4c9ab3a0096da5cdd772，attempt 4 / failed
+当前错误：cognition generation failed structural checks: invalid blueprint references: feature sources
+真正失败位置：五文件交付之后的 render_candidate；最后事件 blueprint-code-0-7 不是 README 调用失败。
+
+正式基线：CLI 64/500、活动 0、书签业务修复 5/5、月度预算和会议笔记均未开始。
+原两次阶段追加重试保留；一次性协议 grant：
+pgrant_f3595368c14d4b23b6ab536f6d198007
+已消费 reservation：
+bud_9a81a7a4adc14f49b46239ec68ee2fdb
+grant 使用 1/1，phase_acceptance 已完整通过。
+注意：该逻辑 scope 的非空 retry 台账现在共 3 条，即原两条 + 上述 grant 一条。不能把“保留历史两次”写成 COUNT(retry IS NOT NULL)=2 来校验当前基线。
+
+原 G1 有效截止：1792437223.754534，即北京时间 2026-10-20 03:13:43.754534。该窗口现在已经过期。保留原截止与历史起点，以新增明确授权记录提供新有效截止；不能改写旧时间行或旧 V1/V2 记录。
+
+六项设计预审均已通过并在原输入下复用；五份授权文件真实新交付，另外四份原程序复用，合计九份程序材料。程序尚未经过本轮聚合语义审阅、正式新冻结、真实 P0 或运行验收。
+正式新模板 0、真实 P0 通过 0、案例新增 0/复用 1，T08 0/3。
+
+固定案例：
+case:product-c42848f63251507bd9d911a5:faa52e6b1414，revision 1
+上游：lakhindarpal/bookmark-manager@539881bc67099d491e8ab6f85de0f443fa7de623
+case_basis_digest：
+a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589
+当前事实视图 view_digest：
+241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b
+当前 prepared/effective plan digest：
+f190b65275ab7c7136f523ba92aecde7c9392440d7676b070393e62ff9137b58
+
+完整案例有 29 条观察；本轮场景事实视图是 20 条（13 条代码观察 + 7 条推断），生成来源索引是 13 条研究来源加 S01，共 14 个 S 编号。不要混淆三种计数。
+当前事实视图政策保持 accepted-linked-observations-only-v1；已确认事实、推断、未知项和“未运行上游”的性质均保留。
+
+## 2. 开始前读取与固定材料
+
+在用户现有工作区继续，先检查 AGENTS.md、当前分支/HEAD、工作区与正在执行的作业，不重置用户修改。已有分支为 codex/stabilize-atlas；若 HEAD 更新，先验证后续变更与本轮范围的关系。
+
+从正式 API/CLI 读取当前生产状态，确认使用原生产根：
+application-atlas-production-pack/atlas/template-factory
+检查 ATLAS_FACTORY_ROOT 的实际解析值，不能误用临时测试库。
+
+主要证据目录：
+docs/template-factory/g1-protocol-recovery-2026-10-19/
+
+至少读取：
+- DELIVERY.md、STOP_RECORD.json、OPERATIONS.md、CONTRACTS.md
+- actual-feature-source-conflict.json、actual-source-eligibility-proof.json
+- independent-source-scope-review.json
+- actual-final-ledger-history.json、actual-final-checkpoint-preservation.json
+- actual-six-checkpoint-reuse-proof.json、actual-attempt-4-raw-index.json
+- candidate-attempt-4-not-frozen/template.json 及该目录的程序文件
+- 原正式 job 的 blueprint-plan-0、九个程序检查点及原始交付记录
+- docs/template-factory/v1-2026-10-19/g1-real-sample/case-record.json
+- 仓库中的既有 R5 和协议授权原件及对应正式请求、变更记录。
+
+candidate-attempt-4-not-frozen 仅为失败产物证据，不能替代正式检查点或被直接宣布冻结。
+在本轮新目录 docs/template-factory/g1-r6-source-alignment-2026-10-20/ 保存本文件原始字节、计算 SHA256，并建立精确请求与基线证据索引。
+不得为满足下面列出的值而改写现场；若已存在本轮幂等记录，校验并接续；若状态发生未解释变化，先确定权威后继和原因。
+
+## 3. 根因与本轮选定路线
+
+旧规格的 features.sources 从 legacy_all_accepted 旧模板继承，当前来源视图则只包含本场景已关联事实。来源过滤正确保留了原编号，但规格引用没有同步对齐。
+
+缺失来源：
+S08 = ev_ba200adf6e2c_5011700a24e503c7，utils.ts 的 URL/hostname 等工具
+S09 = ev_ba200adf6e2c_515aa5d072bd2ec4，store.ts 的 Dexie 表定义
+S10 = ev_ba200adf6e2c_5d51c18a989c01f8，index.html 的 root/模块入口
+S11 = ev_ba200adf6e2c_6805376f7e2ee383，README 的本地存储说明
+S17 = ev_ba200adf6e2c_9c7f6060878383fa，store.ts 的 Bookmark 字段类型
+S18 = ev_ba200adf6e2c_a2ebc864c5b6b3e7，src/index.ts 的挂载入口
+
+六条都有案例级 accepted 审阅且摘要匹配；并非伪造或全局拒绝。原场景 adopted_scope 文字也提及相关实现，但结构化 evidence_ids 未纳入它们。
+本轮选择保持 r1、固定场景、20 条事实及其关联不变，通过正确引用已有合格来源与明确目标设计来修订规格。
+
+不采用以下替代操作：
+- 将案例层 accepted 全集并入场景；
+- 原地补六条旧链接、创建 r2 或恢复 legacy 29 条政策；
+- 自动删除整个功能、阶段或验收承诺；
+- 更换 source ID 对应的事实内容，或过滤后重新编号；
+- 把来源缺失的功能一律随意挂到 S01。
+
+案例的关联质量可在后续单独处理；本轮不改变共享应用实证记录，也不计新增案例。
+
+## 4. 本轮允许的精确规格修订
+
+先以当前正式 blueprint-plan-0 的 spec 为基线，生成包含旧值、新值、JSON path、理由及绑定摘要的机器差分。按 feature.id 定位，生成实际下标后必须校验旧值；不得按猜测下标覆盖。
+
+### 4.1 七个结构化来源数组
+
+F01：["S02","S04","S06","S17"] → ["S02","S04","S06"]
+F07：["S15","S08"] → ["S15"]
+F08：["S09","S13","S06","S11"] → ["S01","S06","S13"]
+F10：["S04","S08"] → ["S04","S02"]
+F11：["S10","S18"] → []
+F12：["S14","S21","S08"] → ["S14","S21"]
+F24：["S15","S17"] → ["S15"]
+
+含义：
+- S02 已说明新记录字段及 hostname 派生，S04 已说明上游表单 URL 校验，S06 已说明写入。
+- S15 直接说明原 URL 打开及 visitCount/visitedAt；不需要额外引用工具或类型定义。
+- S06/S13 说明上游保存与重新载入行为；S01 是固定场景要求。SQLite、服务端跨重启与事务处理是目标设计，不冒充上游实现。
+- F11 的服务端 HTML 外壳是目标交付设计，允许无上游来源引用。空数组保持现行合法语义。
+- S14/S21 已直接涵盖 favicon 与 metadata 外部调用；F12 的 P1 和降级定位保持不变。
+其他 features.sources 数组不变，尤其 F13/F14 已有 [] 不需要补造来源。
+
+### 4.2 同步修订依据解释
+
+允许编辑以下 feature.reason 的来源归属、事实/设计区分及无依据措辞：
+F01、F02、F03、F07、F08、F09、F10、F11、F12、F13、F14、F17、F24。
+只修改审计确有必要的句子；本列表是解释字段上限，不是任意重新设计授权。每一实际修改均进入精确 before/after 差分。
+
+必须处理：
+- F07/F08/F10/F11/F12/F24 理由中对应的旧 S 编号，不能只改数组留正文。
+- F13：去掉以 S22“无测试脚本”证明“无导入导出”的推断。保留 F13/P1/A14，写为本模板后期互操作设计选择。
+- F14：去掉以 S16/S17 证明项目完全没有去重的推断。保留 F14/P1/A15、原 D06 与保存/导入路径的既定目标，写为本模板后期设计；不要宣称上游已经验证不具备该能力。
+- F01：引用只支持其确实描述的字段、校验、保存；不要把 S04 的校验声明写成编辑回填观察。
+- F02/F03：把默认归类和独立归类实体明确为目标新设计；如解释上游限制，使用当前 facts view 与 case-design 中已有合格推断，不把单条列表筛选事实当成完整项目的否定证明。
+- F09：如固定事实未给出“5 秒”，删除来源描述中的精确时长；目标删除/恢复合同及断言不变。
+- F17：保留网页副本仍为 decision needed、P0 仅保存引用的现有边界；不靠当前不可用类型来源声称上游完整能力边界。
+
+同时将 architecture_markdown 中以下唯一来源解释句进行精确替换：
+旧：
+- 上游 S04 的点域名正则与 S08 getHostname 是源观察，映射为 adjusted：点不是通用 URL 有效性要求；target 采用上述解析策略。
+新：
+- 上游 S04 记录点域名正则限制，S02 记录新记录包含派生 hostname；这些是固定来源观察。target 的绝对 HTTP(S) URL 解析、允许单标签 hostname 与保留原始 URL 文本，是本模板的 adjusted 设计，采用上述解析策略。
+
+除该来源解释句外，architecture_markdown 的产品、UI、API、数据及错误合同不变。
+其余作者字段只读审计。若发现更广泛的业务语义缺陷，记录并停止实际激活，不借“解释修订”改变功能。
+
+### 4.3 不变项与交付前证明
+
+保持：
+- 所有 feature ID/name/applicability/phase/acceptance 和全部功能范围；
+- acceptance、phases、decisions（包括 D06）、roles、limits、contract_coverage；
+- A04/A12、32 个错误分支、分类 UI、搜索 title/hostname/description、原 URL 精确保留等既定合同；
+- 原 case_basis、r1 场景关联、20 条事实视图、case-design/适配选择和事实类型；
+- 九份程序的实际字节、验收断言、runner 协议、独立 machineplan。
+
+来源索引与 PRODUCT/ARCHITECTURE 等派生文档须由新规格正常重渲染。派生文档变化不允许反向改变上述程序字节。
+不要通过修改 source facts、缩小功能或删断言来消除引用问题。
+输出全部作者字段的引用审计矩阵，区分直接事实、已接受推断、调整后的设计、新设计及不采用能力；通过新版本独立审阅验证语义。
+
+## 5. 必要宿主修复：同一规则前移
+
+### 5.1 共享纯来源校验器
+
+从 blueprints.py 的 _refs 与 validate_blueprint 的 feature sources 规则提取可复用的纯校验函数：
+- 输入明确 spec 与当前合格 sources；
+- 保留列表/字符串/唯一性/集合包含规则，允许合法空数组；
+- 不调用模型、不改规格、不读写生产状态；
+- 一次报告全部 feature ID、缺失 source ID、当前可用来源和绑定摘要；
+- 最终 validate_blueprint/render_candidate 继续调用同一规则。
+
+不能新增一套宽松预检，再保留另一套不一致的最终校验。
+
+在 cognition.produce 的所有 prepared、普通生成、缓存恢复路径汇合处，即 scoped_file_plan 形成有效 plan 后、独立设计预审和文件生成之前执行。
+R6 的正式 prepare 阶段也执行该校验，返回 prepared_not_queued 前必须通过。
+恢复使用缓存计划时仍执行当前确定性检查，不让旧 checkpoint 绕过。
+
+### 5.2 给预审真实来源索引
+
+当前各维 RESEARCH.md 主要是 summary/gaps，没有 Sxx 到固定事实的映射。
+为新预审添加宿主生成的 SOURCE_MANIFEST.json 与精简引用矩阵，在 projection digest 计算之前写入并被摘要覆盖。
+
+manifest 的 S 来源集合严格来自当前过滤 research.sources + 宿主 S01，共 14 个原始编号。
+记录 S ID、evidence ID、kind、固定源路径/版本、事实文字及 facts-view digest；S01 保持 confirmed_input 身份。
+7 条 inference 仍在事实视图中保留推断身份，可作为已有 case-design 的依据；不要为了凑 source 索引把它们升级为代码观察或发明新 S 编号。
+不能使用 case_basis 中全部 29 条观察作为允许引用的来源集合。
+
+结构化数组由纯函数检查；reason/architecture 的支持关系由本轮完整审计及独立审阅检查。不要靠扫描到任意 S 字符串就认定所有事实关系正确。
+
+## 6. 正式修订、预算和后继：小范围版本化扩展
+
+以下是需要实现的能力，不是假称当前 CLI 已支持的新命令。先阅读现有实现并复用正式接口，记录最终实际请求和命令。
+
+优先扩展现有 PreparedRevisionService、BudgetAmendmentService、ProductRecoveryService 的请求版本；旧请求与硬边界保留。业务 ID、源编号和新差分摘要由固定授权/准备请求携带，不再新建只会处理本产品常量的 R6ExecutionService。
+新的请求版本仍须严格绑定本文件、现场基线及具体允许字段，不能将旧精确准备入口泛化成任意 patch API。
+
+准备请求绑定：
+- 原 failed job/attempt/snapshot、原 plan/spec 摘要；
+- 本文件原始字节 SHA、原始授权记录与本次精确差分；
+- 原 case_basis、facts view、case-design；
+- 九份已交付程序 manifest 与原检查点；
+- 同一 campaign/plan/product/scenario；
+- 业务修复 5→6、CLI 基线 64、原截止、28,800 秒窗口、已消费 grant。
+
+准备和登记不启动 worker、不新增 CLI、不消费第六轮、不开始新窗口。
+完成源代码规定检查、精确源码 SHA 远端 CI 和合法准备差分后，在一次正式事务内：
+1. 复核权威原失败、预算和 prepared 绑定；
+2. 首次激活新 amendment，确定新有效截止；
+3. 以稳定业务幂等键记账唯一第六轮；
+4. 创建受限业务后继及明确 supersession/receipt；
+5. 保持原 plan 和父批次暂停，供正式查询核对。
+
+激活事务与内部 queue_repair 共用同一个稳定业务记账操作，不得外层记一次、内部再记一次；第六轮记账、入队、supersession 和收据必须一并提交或回滚。
+R6 模板后继明确设置 config.repair_attempts = 0：新的语义失败保留其原始报告并正式停止，不进入自动 spec-repair 循环申请第七轮。其余既有模型、超时及并发配置保持。
+
+原 job 保留 failed / attempt4、原错误及检查点。此轮是业务修订后继，不应伪装成原 job 的纯协议 attempt5。
+后继保持原 campaign、plan、product、scenario 与 case r1，不能新建身份获得空预算。
+查询实际后继、预算、旧失败与父暂停均正确后，再用原 plan 的正式 resume 入口启动。
+
+预算版本必须有显式分支：
+- 保留历史基础时间、V1/V2 与原截止；
+- 本轮新增明确定义的 amendment/version，记录 predecessor 和本次授权；
+- 新截止只能首次激活时计算一次；
+- 未知版本明确拒绝，不能让 version3 静默落入旧的 else 激活算法；
+- 并发、异常、重复请求不能多记修复、多建后继或重复延期。
+
+不改变原 500 总额；不重发已消费 grant；历史两次普通追加和一次 grant 消费分开核对，逻辑 scope 合计三条保留。
+新 proposal/input 的合法首次审阅可以按原规则执行；历史 scope 的额外重试额度不因新 job 或新窗口重置。不能为获得首次调用机会伪造输入差异。
+
+## 7. 两个基线与九份程序复用
+
+必须同时维护两个差分基线：
+
+A. 本轮增量：
+当前 failed prepared plan f190... 与 attempt4 九份程序。
+本轮只改第4节批准的引用/解释，程序字节变化为 0。
+
+B. 最终累计：
+原旧冻结模板。
+原 R5 已授权的合同和五文件修订继续有效，并在累计差分中与本轮来源修订分别列明。不能把本轮窄 scope 当作自旧冻结模板以来的全部授权，也不能因此放宽整个 spec。
+
+九份程序从原正式 attempt4 的检查点、生成结果和实际文件绑定后复用：
+- 五份新交付 + 四份原字节复用；
+- 每份记录 path、内容 SHA、原 job/attempt、checkpoint 身份/摘要、生成输入/来源身份及交付结果；
+- 文件清单以原正式 file_plan 与九个检查点核对，不把自动生成的其他包元数据误算程序；
+- 从这个已验证 manifest 复制字节，保存继承收据；
+- 新产物仍是“继承已交付、尚未验收”，不是程序已通过。
+
+当前 author(reuse=True) 只从旧冻结 previous/source 读取。仅把九项全改成 reuse 会退回过时的五份旧文件，严禁这种实现。
+增加受限 prepared_program_reuse 来源并明确优先级，保持原 file_plan 语义；旧冻结包仍为累计差分历史基线。
+不重跑五个已经成功的 author 模型调用，不把未冻结目录直接注册为正式模板。复用失败时在新模型调用前报出具体绑定差异。
+
+六项设计预审需要针对新 proposal/projection 正式重新取得：
+scenario_scope、product_completeness、architecture_contract、phase_acceptance、decisions_defaults、runtime_protocol。
+现有各项同时绑定完整 proposal_digest；来源或 reason 改变后不能把旧六项通过复制成新通过。新来源材料也必须进入投影摘要。
+旧检查点全部保留历史，新结果具有新身份。程序字节复用不豁免聚合语义审阅、冻结后独立审阅或实际运行。
+
+## 8. 必要验证：覆盖这次已经发生的失败
+
+不要以旧 fixture 的“通过”代替新路径。需要以下有明确风险对应的回归：
+
+1. 用真实旧 plan + 当前20条视图重现7功能/6来源的结构化冲突，准备和缓存恢复均在新增预审/author调用之前拒绝，新增模型调用0。
+2. 当前案例级 accepted 但未关联场景的来源仍拒绝；不恢复 legacy、不全量并入、不重编号。
+3. 合法精确 R6 patch 通过同一早期/最终校验；正文旧引用和 F13/F14 错误依据纳入语义检查。
+4. 临时库装入64次台账、业务5、旧scope2+grant1、原窗口已过期、原failed job和六审阅/九程序：
+   无新授权不能生产；登记/准备不启动窗口；
+   正式后继事务首次产生业务6和新窗口；
+   并发、异常与重放不产生第二后继、第二修复或第二次延期。
+5. 新 proposal 不复用旧六项通过；对新六项取得有效 fixture 审阅后，全部九份程序来自attempt4正确字节，author调用0，实际进入 render_candidate 和后续审阅入口。
+6. 保留旧事实视图、原scenario link、原case revision、原job/checkpoint/grant/预算时间记录；其他产品和T08额度不变。
+7. 验证未知预算版本拒绝，当前scope三条不误判成“历史2被篡改”，确认启动事件依旧真实。
+
+现有 aggregation-fix fixture 含本次真实坏引用。检查前移后，将其拆成“旧坏输入应早拒绝”的负例和“合法新准备输入可继续”的正例，不能关掉校验维持原预期。
+
+运行项目现有必须的完整13组检查及精确源码SHA的远端CI，包括既定严格Docker、web/E2E、独立执行器门禁。
+不因fixture通过宣称真实G1/P0通过。源码未再变化且所有规定门禁已通过时，不重复整套可选检查消耗生产窗口。
+
+## 9. 实际执行到 G1 与固定 T08
+
+上述工作就绪后执行正式 R6，而非再交付一份“等待授权”的准备报告：
+- 登记本轮授权/准备请求；
+- 原子激活新窗口并入队唯一后继；
+- 核对实际记录后正式resume原计划；
+- 六项新设计预审；
+- 复用九份正确程序字节，完整构造候选；
+- 聚合程序语义审阅、合法新冻结、冻结后独立审阅、目录发布；
+- 由真正 application-development 作业消费标准开发交接包，完成真实P0；
+- 冻结验收套件与独立浏览器核心旅程在精确绑定的实际应用上运行；
+- 保存真实app_root/内容摘要、运行绑定、submission/receipt、phase proof；
+- 由正式宿主 assess_g1 评估。
+
+真实书签旅程保持既有保存、分类管理与移动、搜索、精确原URL打开、同容器重启、非法URL无写入及并发写入不丢失等固定要求。不得缩小P0或删除断言。
+
+G1正式通过后，继续原T08固定三样本：书签、月度预算、多项目会议笔记，书签按原规则复用G1。T08的既有窗口与预算规则保持；不替换失败样本，不扩大首批数量。
+剩余CLI会话全部从原64/500连续计入，provider内部请求次数、实际模型身份或费用没有观测则保持unknown。
+
+如出现新的业务语义阻断、需要本范围之外的程序/规格修改、额外重试额度耗尽或新窗口到期，正式暂停、归档真实错误并再次评估G1。
+同一轮中发现的宿主实现缺陷，可以在本文件目标范围内修复、通过所需门禁并依法恢复；不借宿主修复改业务输入或重置预算。
+正式执行从头到尾坚持一个授权范围、一个新增业务轮次和一个新增时间窗口，不每步重新申请。
+
+## 10. 交付内容与准确汇报
+
+本轮目录至少包含：
+- 本文件原始授权、来源SHA、实际baseline/新amendment/prepared/queue请求及收据；
+- SOURCE_REFERENCE_AUDIT：全规格引用矩阵、7数组和相关解释的具体修正理由；
+- current-to-r6.diff / 机器JSON差分及允许字段、业务不变证明；
+- 九程序manifest、逐字节比较与继承收据；
+- 原六审阅保全、新六审阅输入身份和结果；
+- 生成前负例与正式V1联接回归、13组门禁和精确提交CI；
+- 原64条调用/5次业务/grant1的保全，与新增实际用量；
+- 原截止、新激活时间与新截止的明确对照；
+- 完整真实候选/发布/交接/P0/独立运行/phase proof证据，或准确未运行列表；
+- DELIVERY、STOP_RECORD或成功验收记录、正式G1/T08评估与报告。
+
+已有原始证据通过固定路径/摘要引用，新增原始输出完整保留，避免重复粘贴整套历史快照。
+源码和必要证据提交推送既有分支，报告精确HEAD及CI；不要把本地通过写成远端通过，也不要把文档提交当最后真实生产源码。
+
+最终首先报告：G1/T08、正式模板/真实P0、新增/复用案例、CLI累计与活动数、业务修复、旧grant使用、原/新截止以及真正停止阶段。
+若完成，指出首个完整真实主链样例和三场景实际结果；若阻断，说明新缺陷的字段/证据和已用额度，不能将“机制完整、fixture通过”称为里程碑完成。
+
+## 核验来源（本文件分析基线）
+
+最终提交：https://github.com/liamamilin/atlas/commit/8b8ebef287b97991b3cd8b8ad4330fe59c57ed58
+源码CI：https://github.com/liamamilin/atlas/actions/runs/39300021349
+最终CI：https://github.com/liamamilin/atlas/actions/runs/39304721698
+交付：https://github.com/liamamilin/atlas/blob/8b8ebef287b97991b3cd8b8ad4330fe59c57ed58/docs/template-factory/g1-protocol-recovery-2026-10-19/DELIVERY.md
+冲突：https://github.com/liamamilin/atlas/blob/8b8ebef287b97991b3cd8b8ad4330fe59c57ed58/docs/template-factory/g1-protocol-recovery-2026-10-19/actual-feature-source-conflict.json
+来源资格：https://github.com/liamamilin/atlas/blob/8b8ebef287b97991b3cd8b8ad4330fe59c57ed58/docs/template-factory/g1-protocol-recovery-2026-10-19/actual-source-eligibility-proof.json
+原案例：https://github.com/liamamilin/atlas/blob/8b8ebef287b97991b3cd8b8ad4330fe59c57ed58/docs/template-factory/v1-2026-10-19/g1-real-sample/case-record.json
+当前规格：https://github.com/liamamilin/atlas/blob/8b8ebef287b97991b3cd8b8ad4330fe59c57ed58/docs/template-factory/g1-protocol-recovery-2026-10-19/candidate-attempt-4-not-frozen/template.json
+

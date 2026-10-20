@@ -4,7 +4,10 @@ from __future__ import annotations
 import json
 import time
 
-from .budget import BudgetAmendmentService, G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PLAN, G1_AMENDMENT_PRODUCT
+from .budget import (BudgetAmendmentService, G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PLAN,
+                     G1_AMENDMENT_PRODUCT, G1_R6_AUTHORIZATION_SCHEMA, G1_R6_FAILED_JOB,
+                     G1_R6_FAILED_ATTEMPT, G1_R6_FAILED_STAGE,
+                     G1_R6_WINDOW_SECONDS)
 from .budget import BudgetLedger
 from .store import FactoryError, canonical, digest, now
 
@@ -28,6 +31,8 @@ class ProductRecoveryService:
             con.execute("CREATE TABLE IF NOT EXISTS tf_product_resume(plan_id TEXT NOT NULL, old_job_id TEXT NOT NULL, idempotency_key TEXT NOT NULL, request_digest TEXT NOT NULL, amendment_id TEXT NOT NULL, successor_batch_id TEXT NOT NULL, successor_job_id TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY(plan_id,old_job_id), UNIQUE(idempotency_key))")
 
     def resume_product(self, plan_id, request):
+        if isinstance(request, dict) and request.get("schema") == "atlas.product-resume.v2":
+            return self.resume_product_r6(plan_id, request)
         from .cognition import queue_repair
         from .v1_batches import BatchService
 
@@ -151,6 +156,162 @@ class ProductRecoveryService:
             con.execute(f"UPDATE batch SET state='running' WHERE id IN ({placeholders}) AND state='paused'", tuple(sorted(batch_ids)))
             record = con.execute("SELECT * FROM tf_product_resume WHERE plan_id=? AND old_job_id=?", (plan_id, row["id"])).fetchone()
         return self._result(record, replay=False)
+
+    def resume_product_r6(self, plan_id, request):
+        """Queue the exact R6 source-alignment successor without resuming parents."""
+        from .api import controlled_path
+        from .blueprints import verify_frozen
+        from .cognition import queue_repair
+        from .plan_revision import PreparedRevisionService
+        from .v1_batches import BatchService
+
+        if (set(request) != {"schema", "old_job_id", "artifact_id", "expected_digest",
+                             "amendment_id", "idempotency_key", "repair"}
+                or request.get("schema") != "atlas.product-resume.v2"):
+            raise FactoryError("R6 product resume request has missing or unknown fields", "resume_request_invalid", 400)
+        if (plan_id != G1_AMENDMENT_PLAN or request["old_job_id"] != G1_R6_FAILED_JOB
+                or request["artifact_id"] != G1_OLD_ARTIFACT_ID
+                or request["expected_digest"] != G1_OLD_ARTIFACT_DIGEST
+                or not isinstance(request["amendment_id"], str) or not request["amendment_id"].startswith("bamd_")
+                or not isinstance(request["idempotency_key"], str) or not request["idempotency_key"].strip()
+                or not isinstance(request["repair"], dict)):
+            raise FactoryError("R6 resume is outside the fixed G1 source-alignment binding", "resume_scope", 403)
+        repair = request["repair"]
+        prepared_request = repair.get("prepared_revision")
+        if not isinstance(prepared_request, dict) or prepared_request.get("schema") != "atlas.failed-plan-revision.v2":
+            raise FactoryError("R6 resume requires the exact v2 prepared revision request", "resume_request_invalid", 400)
+        request_digest = digest({key: value for key, value in request.items() if key != "idempotency_key"})
+        amendment_service = BudgetAmendmentService(self.store, campaign_id=G1_AMENDMENT_CAMPAIGN, clock=self.clock)
+        ledger = BudgetLedger(self.store, campaign_id=G1_AMENDMENT_CAMPAIGN, clock=self.clock)
+        # BatchService.migrate performs schema writes, so initialize it before
+        # opening the caller-owned queue transaction.
+        batch_service = BatchService(self.store)
+
+        with self.store.connect(True) as con:
+            prior = con.execute("SELECT * FROM tf_product_resume WHERE plan_id=? AND old_job_id=?",
+                                (plan_id, request["old_job_id"])).fetchone()
+            if prior:
+                if prior["request_digest"] != request_digest or prior["idempotency_key"] != request["idempotency_key"]:
+                    raise FactoryError("failed G1 job already has a different R6 successor", "resume_conflict", 409)
+                prior_amendment = con.execute("SELECT new_deadline FROM tf_budget_amendment WHERE id=? AND version=3",
+                                              (prior["amendment_id"],)).fetchone()
+                if not prior_amendment or prior_amendment["new_deadline"] is None:
+                    raise FactoryError("R6 replay receipt has no activated deadline", "budget_amendment_basis", 409)
+                return {**self._result(prior, replay=True), "schema": "atlas.product-resume-result.v2",
+                        "effective_deadline": prior_amendment["new_deadline"]}
+            reused_key = con.execute("SELECT request_digest FROM tf_product_resume WHERE idempotency_key=?",
+                                     (request["idempotency_key"],)).fetchone()
+            if reused_key:
+                raise FactoryError("idempotency key was already used for another product resume", "idempotency_conflict", 409)
+            amendment = con.execute("SELECT * FROM tf_budget_amendment WHERE id=? AND campaign_id=? AND product_id=?",
+                                    (request["amendment_id"], G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchone()
+            binding = con.execute("SELECT request_json,request_digest FROM tf_budget_amendment_binding WHERE amendment_id=?",
+                                  (request["amendment_id"],)).fetchone()
+            if (not amendment or amendment["version"] != 3 or amendment["activated_at"] is not None
+                    or amendment["new_deadline"] is not None or not binding):
+                raise FactoryError("R6 amendment is missing, already activated or has the wrong version", "budget_amendment_basis", 409)
+            authorization = json.loads(binding["request_json"])
+            if (digest(authorization) != binding["request_digest"]
+                    or authorization.get("schema") != G1_R6_AUTHORIZATION_SCHEMA
+                    or authorization.get("prepared_revision") != prepared_request
+                    or authorization.get("prepared_revision_digest") != digest(prepared_request)):
+                raise FactoryError("resume request differs from the registered R6 prepared revision", "resume_request_invalid", 409)
+
+            plan = batch_service.plan(plan_id)
+            product_seeds = [seed for seed in plan.get("seeds", []) if seed.get("product_id") == G1_AMENDMENT_PRODUCT]
+            if plan.get("campaign_id") != G1_AMENDMENT_CAMPAIGN or plan.get("segment") != "G1" or len(product_seeds) != 1:
+                raise FactoryError("fixed G1 plan does not contain the authorized product", "resume_scope", 409)
+            artifact = next((item for item in self.store.artifacts() if item.get("id") == request["artifact_id"]), None)
+            v1 = (artifact or {}).get("provenance", {}).get("v1", {})
+            if (not artifact or artifact.get("digest") != request["expected_digest"]
+                    or v1.get("campaign_id") != G1_AMENDMENT_CAMPAIGN
+                    or v1.get("plan_id") != plan_id or v1.get("product_id") != G1_AMENDMENT_PRODUCT):
+                raise FactoryError("R6 source-alignment base artifact is not the pinned product revision", "resume_candidate_mismatch", 409)
+            verify_frozen(controlled_path(self.store, artifact["bundle_path"]), artifact["digest"])
+
+            # Re-prepare inside the transaction; this is deterministic host work,
+            # not a worker/provider call. queue_repair revalidates the same request
+            # again on its insertion path.
+            prepared = PreparedRevisionService(self.store).prepare(G1_R6_FAILED_JOB, prepared_request)
+            if (prepared.get("request_digest") != authorization.get("prepared_revision_digest")
+                    or prepared.get("effective_plan_digest") != authorization.get("effective_plan_digest")
+                    or prepared.get("case_design_digest") != authorization.get("case_design_digest")
+                    or digest(prepared.get("prepared_program_reuse")) != authorization.get("program_manifest_digest")):
+                raise FactoryError("R6 prepared plan, case design or program reuse manifest changed", "resume_request_invalid", 409)
+
+            row = con.execute("SELECT * FROM job WHERE id=?", (G1_R6_FAILED_JOB,)).fetchone()
+            if not row:
+                raise FactoryError("R6 failed job not found", "not_found", 404)
+            snapshot = json.loads(row["snapshot"])
+            old_v1 = snapshot.get("v1", {})
+            old_repair = snapshot.get("cognitive_repair", {})
+            if (row["state"] != "failed" or row["attempt"] != G1_R6_FAILED_ATTEMPT
+                    or row["stage"] != G1_R6_FAILED_STAGE
+                    or row["error"] != authorization.get("old_job_error")
+                    or digest(snapshot) != authorization.get("old_job_snapshot_digest")
+                    or old_v1.get("campaign_id") != G1_AMENDMENT_CAMPAIGN
+                    or old_v1.get("plan_id") != plan_id
+                    or old_v1.get("product_id") != G1_AMENDMENT_PRODUCT
+                    or old_repair.get("id") != request["artifact_id"]
+                    or old_repair.get("digest") != request["expected_digest"]):
+                raise FactoryError("R6 failed job state, attempt, snapshot or artifact binding changed", "resume_old_job_invalid", 409)
+            old_scenario = snapshot.get("scenario") or {}
+            plan_scenario = product_seeds[0].get("scenario") or {}
+            artifact_scenario = (artifact.get("provenance", {}).get("scenario") or {})
+            def scenario_key(value): return (value.get("id"), value.get("revision"))
+            if (scenario_key(old_scenario) != scenario_key(plan_scenario)
+                    or scenario_key(old_scenario) != scenario_key(artifact_scenario)):
+                raise FactoryError("R6 scenario identity changed", "resume_scenario_mismatch", 409)
+            if (snapshot.get("case_basis") != artifact.get("provenance", {}).get("case_basis")
+                    or snapshot.get("case_basis", {}).get("basis_digest") != authorization.get("case_basis_digest")
+                    or prepared.get("binding", {}).get("facts_view_digest") != authorization.get("facts_view_digest")):
+                raise FactoryError("R6 case basis or accepted facts-view binding changed", "resume_case_basis_mismatch", 409)
+            execution = con.execute("SELECT batch_id FROM v1_execution WHERE plan_id=?", (plan_id,)).fetchone()
+            parent = con.execute("SELECT state FROM batch WHERE id=?", (execution[0],)).fetchone() if execution else None
+            if not parent or parent[0] != "paused":
+                raise FactoryError("R6 parent must remain paused until the new successor is verified", "resume_parent_invalid", 409)
+
+            activated = amendment_service.activate_r6_locked(con, request["amendment_id"])
+            if activated["activated_at"] is None or activated["new_deadline"] != activated["activated_at"] + G1_R6_WINDOW_SECONDS:
+                raise FactoryError("R6 window did not activate exactly once", "budget_amendment_activation_conflict", 409)
+            queued = queue_repair(self.store, artifact, repair, con=con,
+                                  parent_state_override="paused", ledger=ledger)
+            successor_batch_id, successor_job_id = queued["batch_id"], queued["job_id"]
+            if not successor_job_id or successor_job_id == row["id"]:
+                raise FactoryError("R6 successor job was not created", "resume_successor_invalid", 409)
+            successor = con.execute("SELECT snapshot,state FROM job WHERE id=?", (successor_job_id,)).fetchone()
+            successor_snapshot = json.loads(successor["snapshot"])
+            if (successor["state"] != "queued" or successor_snapshot.get("config", {}).get("repair_attempts") != 0
+                    or successor_snapshot.get("v1") != snapshot.get("v1")
+                    or successor_snapshot.get("scenario") != snapshot.get("scenario")
+                    or successor_snapshot.get("case_basis") != snapshot.get("case_basis")):
+                raise FactoryError("R6 successor is not the exact zero-auto-repair G1 product continuation", "resume_successor_invalid", 409)
+            repairs = con.execute("SELECT COUNT(*) FROM tf_budget_repair WHERE campaign_id=? AND product_id=?",
+                                  (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchone()[0]
+            calls = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status!='not_started'",
+                                (G1_AMENDMENT_CAMPAIGN,)).fetchone()[0]
+            active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','started','uncertain')",
+                                 (G1_AMENDMENT_CAMPAIGN,)).fetchone()[0]
+            old_again = con.execute("SELECT state,attempt,error,snapshot FROM job WHERE id=?", (row["id"],)).fetchone()
+            if (repairs != 6 or calls != 64 or active != 0 or old_again["state"] != "failed"
+                    or old_again["attempt"] != G1_R6_FAILED_ATTEMPT or old_again["error"] != row["error"]
+                    or old_again["snapshot"] != row["snapshot"]):
+                raise FactoryError("R6 transaction did not preserve the old failure and record exactly the sixth repair", "budget_amendment_basis", 409)
+            at = now()
+            reason = "R6 source-alignment successor " + successor_job_id
+            con.execute("INSERT INTO tf_job_supersession VALUES(?,?,?,?,?,?,?,?,?,?)",
+                        (row["id"], successor_job_id, plan_id, reason, row["state"], row["error"], row["stage"], row["attempt"], row["updated_at"], at))
+            con.execute("INSERT INTO event(job_id,attempt,at,stage,message) VALUES(?,?,?,?,?)",
+                        (row["id"], row["attempt"], at, "source_alignment_successor", reason))
+            con.execute("INSERT INTO tf_product_resume VALUES(?,?,?,?,?,?,?,?)",
+                        (plan_id, row["id"], request["idempotency_key"], request_digest,
+                         request["amendment_id"], successor_batch_id, successor_job_id, at))
+            record = con.execute("SELECT * FROM tf_product_resume WHERE plan_id=? AND old_job_id=?",
+                                 (plan_id, row["id"])).fetchone()
+            result = self._result(record, replay=False)
+        return {**result, "schema": "atlas.product-resume-result.v2",
+                "activated_at": activated["activated_at"], "effective_deadline": activated["new_deadline"],
+                "parent_remains_paused": True, "old_job_remains_failed": True}
 
     @staticmethod
     def _result(row, *, replay):

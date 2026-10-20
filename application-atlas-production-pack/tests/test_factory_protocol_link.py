@@ -4,7 +4,6 @@ from pathlib import Path
 import shutil
 import sys
 import unittest
-from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -13,11 +12,11 @@ import test_factory_r5_link as r5_fixture
 from template_factory.budget import BudgetLedger
 from template_factory.pipeline import Pipeline
 from template_factory.protocol_grants import (
-    CONTEXT_KEYS, JOB_ID, OPERATION_ID, STAGE, ProtocolRetryGrantService,
+    JOB_ID, STAGE, ProtocolRetryGrantService,
     protocol_retry_request,
 )
 from template_factory.protocol_recovery import ProtocolRecoveryService, RECOVERY_KEY
-from template_factory.store import FactoryError, digest
+from template_factory.store import FactoryError
 from template_factory.v1_batches import BatchService
 
 DOCS = Path(__file__).resolve().parents[2] / "docs/template-factory"
@@ -61,7 +60,7 @@ class ProtocolPipelineLinkTests(unittest.TestCase):
                 con.execute("INSERT INTO checkpoint VALUES(?,?,?)", (row["job_id"], row["name"], row["body"]))
         self.request = protocol_retry_request(self.store)
 
-    def test_formal_register_recover_resume_claim_and_pipeline_only_retries_phase(self):
+    def test_formal_register_recover_resume_claim_then_old_source_conflict_stops_before_provider(self):
         grant_service = ProtocolRetryGrantService(self.store, clock=lambda: NOW)
         grant = grant_service.register(self.request)
         before = self.store.job(JOB_ID)
@@ -76,44 +75,22 @@ class ProtocolPipelineLinkTests(unittest.TestCase):
         BatchService(self.store).action(PLAN, "resume")
         claimed = self.store.claim("temporary-fixture-worker")
         self.assertEqual((claimed["id"], claimed["attempt"]), (JOB_ID, 3))
-        calls, next_work = [], []
-        expected_context = {key: self.request[key] for key in CONTEXT_KEYS}
-        test = self
-
-        class OnlyPhaseCLI:
+        provider_calls = []
+        class NoProviderBeforeSourceGate:
             def info(self):
                 return {"provider_called": False}
 
             def run(self, directory, prompt, model, timeout, cancelled, progress, **kwargs):
-                if Path(directory).name != STAGE:
-                    next_work.append(Path(directory).name)
-                    raise FactoryError("Fixture ends before next normal dimension; no real provider", "fixture_end", 409)
-                budget = kwargs["budget"]
-                test.assertEqual(budget["stage"], OPERATION_ID)
-                test.assertEqual(budget["retry"], 1)
-                test.assertEqual(budget["protocol_context"], expected_context)
-                ledger = budget["ledger"]
-                reservation = ledger.reserve(budget["identity"], budget["phase"], budget["kind"], timeout,
-                    job_id=budget["job_id"], requested_model=model, stage=budget["stage"], retry=budget["retry"],
-                    retry_scope=budget["retry_scope"], plan_id=budget["plan_id"], protocol_context=budget["protocol_context"])
-                test.assertEqual(reservation["protocol_grant_id"], grant["id"])
-                ledger.mark_started(reservation["id"])
-                ledger.finish(reservation["id"], "completed", outcome="fake CLI fixture; not real review")
-                calls.append(reservation)
-                return {"summary": "Fixture only, not a real model review.", "checks": [{"dimension": "phase_acceptance", "outcome": "passed", "files": ["DRAFT.md"], "reason": "Fixture protocol response."}], "suggestions": []}
+                provider_calls.append(Path(directory).name)
+                raise AssertionError("legacy source conflict must stop before provider invocation")
 
-        real_ledger = BudgetLedger
-        def fixed_ledger(store, **kwargs):
-            return real_ledger(store, **{**kwargs, "clock": lambda: NOW})
-        with patch("template_factory.budget.BudgetLedger", side_effect=fixed_ledger):
-            with self.assertRaises(FactoryError) as stopped:
-                Pipeline(self.store, cli=OnlyPhaseCLI()).run(claimed)
-            self.assertEqual(stopped.exception.code, "fixture_end")
-        self.assertEqual(len(calls), 1)
-        self.assertEqual(len(next_work), 1)
-        self.assertIn("decisions_defaults", next_work[0])
-        self.assertEqual(self.ledger.snapshot()["cli_sessions_used"], 57)
-        self.assertEqual(grant_service.get(grant["id"])["status"], "consumed")
+        with self.assertRaises(FactoryError) as stopped:
+            Pipeline(self.store, cli=NoProviderBeforeSourceGate()).run(claimed)
+        self.assertEqual(stopped.exception.code, "invalid_feature_sources")
+        self.assertIn("S17", str(stopped.exception))
+        self.assertEqual(provider_calls, [])
+        self.assertEqual(self.ledger.snapshot()["cli_sessions_used"], 56)
+        self.assertEqual(grant_service.get(grant["id"])["status"], "available")
         self.assertEqual(grant_service.register(self.request)["id"], grant["id"])
         self.assertEqual(recovery.recover(JOB_ID, request)["attempt"], 3)
         with self.store.connect() as con:
@@ -121,8 +98,7 @@ class ProtocolPipelineLinkTests(unittest.TestCase):
         for row in json.loads((self.archive / "baseline-records.json").read_text())["checkpoints"]:
             self.assertEqual(self.store.checkpoint(JOB_ID, row["name"]), json.loads(row["body"]))
         completed = self.store.checkpoint(JOB_ID, "blueprint-design-check-0-phase_acceptance")
-        self.assertEqual(completed["digest"], digest(completed["result"]))
-        self.assertEqual(completed["result"]["outcome"], "passed")
+        self.assertIsNone(completed)
         attempt = self.store.root / "jobs" / JOB_ID / "attempt-3"
         self.assertFalse(list(attempt.glob("blueprint-generate*")))
         self.assertFalse(list(attempt.glob("case-*")))

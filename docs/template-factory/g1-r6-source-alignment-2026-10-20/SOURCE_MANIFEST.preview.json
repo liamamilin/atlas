@@ -1,0 +1,149 @@
+{
+  "schema": "atlas.source-manifest.v1",
+  "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+  "scenario_revision": 2,
+  "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b",
+  "sources": [
+    {
+      "id": "S01",
+      "evidence_id": null,
+      "kind": "confirmed_input",
+      "source_path": "inputs/scenario.json",
+      "source_url": null,
+      "version": "scn_7756e0007f6a463a97316f3f49c15248@2",
+      "facts": "把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面",
+      "input_digest": "f57cbe177ca9c476d8dd783aa6ac0847d94e5397624923cec6c4c72bcc0c20a9",
+      "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b"
+    },
+    {
+      "id": "S02",
+      "evidence_id": "ev_ba200adf6e2c_05babdea64ba9858",
+      "kind": "code_observation",
+      "source_path": "src/App.tsrx",
+      "source_url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "New records are built with id `bm-${crypto.randomUUID()}`, hostname from getHostname(url), and defaults visitCount=0, visitedAt=null, isPinned=false, isArchived=false, createdAt=Date.now(); edits preserve the previous id, isPinned, isArchived, visitCount, createdAt, and visitedAt.",
+      "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b"
+    },
+    {
+      "id": "S03",
+      "evidence_id": "ev_ba200adf6e2c_06c81a165e03c96a",
+      "kind": "code_observation",
+      "source_path": "src/App.tsrx",
+      "source_url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "Pin/Unpin and Edit actions are rendered only when the item is not archived, and Edit loads the item's url/title/description/tags/favicon into the dialog.",
+      "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b"
+    },
+    {
+      "id": "S04",
+      "evidence_id": "ev_ba200adf6e2c_1596da4a90687ca5",
+      "kind": "code_observation",
+      "source_path": "src/App.tsrx",
+      "source_url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "The Valibot BookmarkFormSchema requires a non-empty URL matching /^https?:\\/\\/(?:[\\w-]+\\.)+[a-zA-Z]{2,}(?:\\/\\S*)?$/ and v.url, a non-empty title up to 100 chars, a non-empty description up to 280 chars, and 1-5 tags each up to 30 chars.",
+      "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b"
+    },
+    {
+      "id": "S06",
+      "evidence_id": "ev_ba200adf6e2c_35e41aab676021eb",
+      "kind": "code_observation",
+      "source_path": "src/App.tsrx",
+      "source_url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "saveBookmark sets the record in the in-memory map then awaits db.bookmarks.put(bm); deleteBookmark removes from the map then awaits db.bookmarks.delete(id).",
+      "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b"
+    },
+    {
+      "id": "S07",
+      "evidence_id": "ev_ba200adf6e2c_4c56ef30a1785be1",
+      "kind": "code_observation",
+      "source_path": "src/App.tsrx",
+      "source_url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "A Delete action is rendered only for archived items; it calls deleteBookmark and shows an error-type toast with an Undo action that calls saveBookmark(item) to restore the record.",
+      "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b"
+    },
+    {
+      "id": "S12",
+      "evidence_id": "ev_ba200adf6e2c_7150b0ac7a5678db",
+      "kind": "code_observation",
+      "source_path": "src/App.tsrx",
+      "source_url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "A Copy URL action writes item.url to the clipboard and shows a success toast.",
+      "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b"
+    },
+    {
+      "id": "S13",
+      "evidence_id": "ev_ba200adf6e2c_86ed2327f33a3ca8",
+      "kind": "code_observation",
+      "source_path": "src/App.tsrx",
+      "source_url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "An effect on component creation calls db.bookmarks.toArray() and inserts each returned bookmark into an in-memory RippleMap keyed by bookmark id.",
+      "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b"
+    },
+    {
+      "id": "S14",
+      "evidence_id": "ev_ba200adf6e2c_8e11efc61a4650ba",
+      "kind": "code_observation",
+      "source_path": "src/App.tsrx",
+      "source_url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "On submit, if no favicon exists and a hostname is derivable, the code fetches a Google s2 favicon proxied through images.weserv.nl inside a try/catch that only logs failure.",
+      "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b"
+    },
+    {
+      "id": "S15",
+      "evidence_id": "ev_ba200adf6e2c_93ff254508846f11",
+      "kind": "code_observation",
+      "source_path": "src/App.tsrx",
+      "source_url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "The Visit action builds an updated bookmark with visitedAt=Date.now() and visitCount+1, calls saveBookmark(updated), then opens the URL with window.open(item.url, '_blank', 'noopener,noreferrer').",
+      "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b"
+    },
+    {
+      "id": "S16",
+      "evidence_id": "ev_ba200adf6e2c_9ab6b0e51811a16d",
+      "kind": "code_observation",
+      "source_path": "src/App.tsrx",
+      "source_url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "The displayed list filters by isArchived matching the active tab, requires every selected tag to be present in bookmark.tags, matches search only against bookmark.title.toLowerCase(), and sorts pinned-first then by the chosen sort mode with createdAt descending as fallback.",
+      "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b"
+    },
+    {
+      "id": "S19",
+      "evidence_id": "ev_ba200adf6e2c_b1ca64cf2ad02998",
+      "kind": "code_observation",
+      "source_path": "src/App.tsrx",
+      "source_url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "The Archive/Unarchive action toggles isArchived and, when archiving, forces isPinned=false before saving.",
+      "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b"
+    },
+    {
+      "id": "S20",
+      "evidence_id": "ev_ba200adf6e2c_c4ad7e52e5713628",
+      "kind": "code_observation",
+      "source_path": "src/App.tsrx",
+      "source_url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "Tag counts are derived by iterating all in-memory bookmarks and counting each tag occurrence, then sorted alphabetically for the sidebar.",
+      "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b"
+    },
+    {
+      "id": "S21",
+      "evidence_id": "ev_ba200adf6e2c_ec303a2fd1afa287",
+      "kind": "code_observation",
+      "source_path": "src/App.tsrx",
+      "source_url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/src/App.tsrx",
+      "version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+      "facts": "fetchMeta calls https://api.microlink.io/?url=... and, on success with result.data, sets title/description and fetches the logo through https://images.weserv.nl/; errors are only console.error'd and the finally block resets loading.",
+      "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b"
+    }
+  ]
+}

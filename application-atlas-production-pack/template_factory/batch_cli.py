@@ -74,8 +74,10 @@ def main(argv=None):
             result = BudgetAmendmentService(store, campaign_id=request.get("campaign_id", "atlas-v1-first-production-2026-10-19")).register(request)
         elif args.command == "resume-product":
             from .product_recovery import ProductRecoveryService
-            result = ProductRecoveryService(store).resume_product(args.plan_id, json.loads(args.request.read_text()))
-            ensure_worker(store)
+            request = json.loads(args.request.read_text())
+            result = ProductRecoveryService(store).resume_product(args.plan_id, request)
+            if request.get("schema") != "atlas.product-resume.v2":
+                ensure_worker(store)
         elif args.command in {"status", "report"}:
             result = service.report(args.plan_id)
         else:

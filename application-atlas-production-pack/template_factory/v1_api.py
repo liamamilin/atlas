@@ -113,7 +113,8 @@ def dispatch_v1(method, route, query, body, store):
         if method == "POST" and action == "resume-product":
             from .product_recovery import ProductRecoveryService
             result = ProductRecoveryService(store).resume_product(pid, body)
-            ensure_worker(store)
+            if body.get("schema") != "atlas.product-resume.v2":
+                ensure_worker(store)
             return result, 202
         if method == "POST" and action in {"pause", "resume", "cancel"}:
             result = service.action(pid, action)
