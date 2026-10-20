@@ -1,0 +1,408 @@
+{
+ "schema": "atlas.r7-incremental-diff.v1",
+ "source_binding": {
+  "absolute_deadline": 1792495312.855422,
+  "active_jobs": 0,
+  "aggregate_checkpoint_digest": "78150ff8071af6e1e4a35365d965b8644140d2157ad27356e91ccad644981672",
+  "aggregate_checkpoint_name": "aggregate-semantic-review-f153e3550ceaeeb5",
+  "attempt": 1,
+  "business_repairs_used": 6,
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "candidate_path": "jobs/job_f3e32b56036b4ec7bea0c00d6a2a8dc4/attempt-1/candidate-0/template.json",
+  "candidate_sha256": "3259239fd8a87fc3f4bf6c6ccd442f507a572db54e8e70b9dc9889c68f3855d3",
+  "case_basis_digest": "a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589",
+  "case_design_checkpoint_digest": "b49f90a92a4830354af2946a83ab56dcc4f5539f5c085a3c862902f067d253c2",
+  "case_design_checkpoint_name": "case-adaptation-prepared-aaf080ba52611126",
+  "cli_total": 71,
+  "facts_view_checkpoint_digest": "8598295bca5580dec40dc1fa56b9b421d775d668a498b3ea3115fbae29141d4f",
+  "facts_view_checkpoint_name": "blueprint-accepted-facts-view",
+  "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b",
+  "job_error_digest": "875228a6789a5f44128a071fa9eeb31097d2adc4d9eed516f5b42ad2da925f41",
+  "job_id": "job_f3e32b56036b4ec7bea0c00d6a2a8dc4",
+  "old_grant_id": "pgrant_f3595368c14d4b23b6ab536f6d198007",
+  "old_grant_used": 1,
+  "plan_checkpoint_digest": "6f806d9416cd1c5a724e980dece7330dac651c8a838d469db409d940a493f158",
+  "plan_checkpoint_name": "blueprint-plan-0",
+  "plan_digest": "1f7701fbf5f52dde011dee76196b2cb01697e10190c6ad17c1273f4b5dcc3d30",
+  "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+  "previous_amendment_id": "bamd_100a302fe8424d9493dafe62d6e43db9",
+  "product_id": "product-c42848f63251507bd9d911a5",
+  "proposal_digest": "6f806d9416cd1c5a724e980dece7330dac651c8a838d469db409d940a493f158",
+  "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+  "scenario_revision": 2,
+  "snapshot_digest": "23ecd1327b4dc8bcda041575d28a74fe118c38914e2117278fff31304e60cdae",
+  "stage": "aggregate-semantic-review"
+ },
+ "prepared_effective_plan_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+ "case_design_digest": "0b627399d035068eab902f1fa28a01eb9f6b32d3513d70441b77894e7f0b77c6",
+ "prepared_incremental_diff": {
+  "base_proposal_digest": "6f806d9416cd1c5a724e980dece7330dac651c8a838d469db409d940a493f158",
+  "case_design_changes": [
+   {
+    "choice_id": "F11: the library is delivered as server-rendered HTML pages and forms with POST/redirect/GET for add, edit and organize actions, including a ready empty-library view.",
+    "new": "F11: the library is delivered as Python server-rendered HTML pages and forms using POST/redirect/GET for saving records, managing categories, moving records between categories, and soft-delete/restore, including a ready empty-library view. P0 has no standalone record-editing page; record URL updates retain only the existing PATCH /api/bookmarks/{id} contract.",
+    "old": "F11: the library is delivered as server-rendered HTML pages and forms with POST/redirect/GET for add, edit and organize actions, including a ready empty-library view.",
+    "path": [
+     "capability"
+    ]
+   },
+   {
+    "choice_id": "F11: the library is delivered as server-rendered HTML pages and forms with POST/redirect/GET for add, edit and organize actions, including a ready empty-library view.",
+    "new": "The evidence describes a client-mounted SPA: Edit is an in-page dialog populated from item fields, and component creation loads Dexie rows into a client RippleMap. The target implements the already-declared P0 save, category-management, move and soft-delete/restore journeys as Python 3.12 HTML responses. Source SPA mounting, client-side dialog state and Dexie hydration are not carried over. The source Edit dialog does not imply a target record-editing UI; the existing PATCH API retains URL updates and recomputes hostname when the URL changes. The save-now/find-later loop and ready empty state remain the target intent.",
+    "old": "The evidence describes a client-mounted SPA: Edit is an in-page dialog populated from item fields, and component creation loads Dexie rows into a client RippleMap. The target renders lists, forms and empty state as Python 3.12 HTML responses, so the SPA mount, client-side dialog state and Dexie hydration are not carried over; only the save-now/find-later user loop is retained.",
+    "path": [
+     "reason"
+    ]
+   },
+   {
+    "choice_id": "A deliberate save creates a URL-anchored record with a stable id, derived hostname, createdAt and initial state, and later edits preserve the record identity and creation/visit fields.",
+    "new": "A deliberate save creates a URL-anchored record with a stable id, a locally derived hostname, creation time and initial active state. Later changes preserve the record id and creation time; updating the URL recomputes hostname from the new URL. The adopted capability is this identity and creation lifecycle; visitCount and visitedAt are not target fields or P0 obligations.",
+    "old": "A deliberate save creates a URL-anchored record with a stable id, derived hostname, createdAt and initial state, and later edits preserve the record identity and creation/visit fields.",
+    "path": [
+     "capability"
+    ]
+   },
+   {
+    "choice_id": "A deliberate save creates a URL-anchored record with a stable id, derived hostname, createdAt and initial state, and later edits preserve the record identity and creation/visit fields.",
+    "new": "The accepted observation records the source's bm-prefixed UUID identity, hostname derivation, createdAt, initial flags and visit fields, and preservation of identity and creation/visit fields on edit. These remain source observations. The target adopts stable record identity and creation time, represented by its existing id/created_at model and made durable by SQLite; it does not import the source's visitCount/visitedAt fields, which F24 excludes. URL updates follow the existing PATCH contract and derive hostname again. The source's tag constraints and other state fields are not silently imported into the category or target data model.",
+    "old": "Evidence defines bm-prefixed UUID identity, hostname derivation, createdAt and default state, and preserves id/createdAt/visit fields on edit. The target adopts this record lifecycle as a user-facing capability, with SQLite providing durability; the source's free-text tag constraints are treated separately in the category decision, not silently imported as target rules.",
+    "path": [
+     "reason"
+    ]
+   }
+  ],
+  "effective_plan_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+  "program_changes": [
+   {
+    "after_sha256": "5923bdd1d15e7d98bcf2c3b91123b36d986c0c69cbc6a1a7fdab80ce4c437d6e",
+    "before_sha256": "8a5ce953288f2b09b9cc0256d869fc7dca2a3dcd3ff255dc5dd5dfa2fa51fb67",
+    "patch_digest": "98753fcaafc6bb575e92d70cae8841919fe32f894bd0de48de4ed7e9ad8713fb",
+    "path": "acceptance/p0_library.py"
+   },
+   {
+    "after_sha256": "342e38d2298cf48e22fb97d76e080ce4a67c3c10a942502c5ef205954878d667",
+    "before_sha256": "4ba2fa6d2a6d3b306d6be5f82ef63604b836cf3d84bd0fc5efddf4d64683a6da",
+    "patch_digest": "ba5c0ac00060bbeb1558b13172afec12e1d5a06de6edf3c6a1ac135aece0037b",
+    "path": "acceptance/p0_find_open.py"
+   },
+   {
+    "after_sha256": "9e73ee6233e5b991a9682bb0bcaa235783bd4c7a6d399d5be38c100face9db6e",
+    "before_sha256": "01cf57941aeed3e0bfa431349b832429f4518addebd00528e8bc1a33ff189459",
+    "patch_digest": "6249f00b1e87bb790c446cfb85f31c89de16fd44817cb17e9d8c968bc8faa89c",
+    "path": "acceptance/README.md"
+   },
+   {
+    "after_sha256": "3e71774a5bb0fb2b29cbb334983127264d5f377cc9e3a680b12f11da9268e201",
+    "before_sha256": "f9448d370749dcca44fb2024b1b4b6d761d127edaf98a523063a590db5c69375",
+    "patch_digest": "fbd74c98b88c86d974b7fe9749dc17ae5f2ac97e73fb6bbbe9ede18a1a01d3b6",
+    "path": "acceptance/runner.json"
+   }
+  ],
+  "program_revision_digest": "c340078dc08e58f1170d23d5fcde4ebba3f9a4ef9a863142c95507e97b8ef969",
+  "reuse_paths": [
+   "acceptance/common.py",
+   "acceptance/p0_organize.py",
+   "acceptance/p0_recovery.py",
+   "acceptance/p1_maturity.py",
+   "acceptance/requirements.txt"
+  ],
+  "spec_changes": [
+   {
+    "new": [
+     "A01",
+     "A02",
+     "A03",
+     "A12"
+    ],
+    "old": [
+     "A01",
+     "A02",
+     "A03"
+    ],
+    "path": [
+     "features",
+     "F01",
+     "acceptance"
+    ]
+   },
+   {
+    "new": [
+     "F01",
+     "F04",
+     "F10"
+    ],
+    "old": [
+     "F04",
+     "F10"
+    ],
+    "path": [
+     "acceptance",
+     "A12",
+     "features"
+    ]
+   },
+   {
+    "new": [
+     "F01",
+     "F10"
+    ],
+    "old": [
+     "F04",
+     "F10"
+    ],
+    "path": [
+     "contract_coverage",
+     "error_contract",
+     "branches",
+     "html.bookmark_save.category.empty",
+     "feature_ids"
+    ]
+   },
+   {
+    "new": [
+     "F01",
+     "F10"
+    ],
+    "old": [
+     "F04",
+     "F10"
+    ],
+    "path": [
+     "contract_coverage",
+     "error_contract",
+     "branches",
+     "html.bookmark_save.category.whitespace",
+     "feature_ids"
+    ]
+   },
+   {
+    "new": [
+     "F01",
+     "F10"
+    ],
+    "old": [
+     "F04",
+     "F10"
+    ],
+    "path": [
+     "contract_coverage",
+     "error_contract",
+     "branches",
+     "html.bookmark_save.category.overlong_121",
+     "feature_ids"
+    ]
+   },
+   {
+    "new": [
+     "F01",
+     "F10"
+    ],
+    "old": [
+     "F04",
+     "F10"
+    ],
+    "path": [
+     "contract_coverage",
+     "error_contract",
+     "branches",
+     "json.bookmark_save.category.empty",
+     "feature_ids"
+    ]
+   },
+   {
+    "new": [
+     "F01",
+     "F10"
+    ],
+    "old": [
+     "F04",
+     "F10"
+    ],
+    "path": [
+     "contract_coverage",
+     "error_contract",
+     "branches",
+     "json.bookmark_save.category.whitespace",
+     "feature_ids"
+    ]
+   },
+   {
+    "new": [
+     "F01",
+     "F10"
+    ],
+    "old": [
+     "F04",
+     "F10"
+    ],
+    "path": [
+     "contract_coverage",
+     "error_contract",
+     "branches",
+     "json.bookmark_save.category.overlong_121",
+     "feature_ids"
+    ]
+   },
+   {
+    "new": "atlas.bookmark-error-contract.v2",
+    "old": "atlas.bookmark-error-contract.v1",
+    "path": [
+     "contract_coverage",
+     "error_contract",
+     "schema"
+    ]
+   },
+   {
+    "new": [
+     "A01",
+     "A02",
+     "A03",
+     "A12"
+    ],
+    "old": [
+     "A01",
+     "A02",
+     "A03"
+    ],
+    "path": [
+     "contract_coverage",
+     "features",
+     "F01",
+     "acceptance_ids"
+    ]
+   },
+   {
+    "new": [
+     "html.bookmark_save.category.empty",
+     "html.bookmark_save.category.whitespace",
+     "html.bookmark_save.category.overlong_121",
+     "json.bookmark_save.category.empty",
+     "json.bookmark_save.category.whitespace",
+     "json.bookmark_save.category.overlong_121"
+    ],
+    "old": null,
+    "path": [
+     "contract_coverage",
+     "features",
+     "F01",
+     "error_branch_ids"
+    ]
+   },
+   {
+    "new": "重试保存；仅首次初始化数据库时事务创建四个预置归类。后续启动保留已持久化的分类变更，不复活用户已删除或重命名的非默认分类；默认「未整理」仍遵守既有保护与初始化合同。",
+    "old": "重试保存；应用启动时在事务中补齐预置归类。",
+    "path": [
+     "contract_coverage",
+     "features",
+     "F02",
+     "recovery"
+    ]
+   },
+   {
+    "new": "记录的 category_id 为默认「未整理」，可在 /?category=未整理 看到；首次初始化时“未整理”“待购”“家居改造”“以后看看”均可见，之后显示真实持久化的用户分类状态。",
+    "old": "记录的 category_id 为默认「未整理」，可在 /?category=未整理 看到；“未整理”“待购”“家居改造”“以后看看”均可见。",
+    "path": [
+     "contract_coverage",
+     "features",
+     "F02",
+     "success_state"
+    ]
+   },
+   {
+    "new": [
+     "html.bookmark_move.category_id.omitted",
+     "html.bookmark_move.category_id.empty",
+     "html.bookmark_move.category_id.unknown_id",
+     "json.bookmark_move.category.empty",
+     "json.bookmark_move.category.whitespace",
+     "json.bookmark_move.category.overlong_121",
+     "json.bookmark_move.category.omitted",
+     "json.bookmark_move.category.null"
+    ],
+    "old": [
+     "html.bookmark_save.category.empty",
+     "html.bookmark_save.category.whitespace",
+     "html.bookmark_save.category.overlong_121",
+     "html.bookmark_move.category_id.omitted",
+     "html.bookmark_move.category_id.empty",
+     "html.bookmark_move.category_id.unknown_id",
+     "json.bookmark_save.category.empty",
+     "json.bookmark_save.category.whitespace",
+     "json.bookmark_save.category.overlong_121",
+     "json.bookmark_move.category.empty",
+     "json.bookmark_move.category.whitespace",
+     "json.bookmark_move.category.overlong_121",
+     "json.bookmark_move.category.omitted",
+     "json.bookmark_move.category.null"
+    ],
+    "path": [
+     "contract_coverage",
+     "features",
+     "F04",
+     "error_branch_ids"
+    ]
+   },
+   {
+    "new": "200 text/html；含保存表单 name=url、归类管理链接、记录列表/空状态容器；预置归类与空库不报错；health 200 JSON。 A11 自身区分 base_url 当前部署入口与绑定同一冻结 app_root 的 fresh 新实例，后者独立证明首启预置及未过滤真空库；不宣称 base_url 被清空或同容器重启。",
+    "old": "200 text/html；含保存表单 name=url、归类管理链接、记录列表/空状态容器；预置归类与空库不报错；health 200 JSON。",
+    "path": [
+     "contract_coverage",
+     "features",
+     "F11",
+     "success_state"
+    ]
+   },
+   {
+    "new": "# 架构与契约\n\n## 默认技术栈与理由\n\n- 交付 profile：python-web。Python 3.12 标准库（http.server、sqlite3、urllib、json、html.parser），零第三方依赖；服务端渲染 HTML 表单，JSON API 与 HTML 适配器共用同一服务层。\n- 备选 Flask/FastAPI 需安装依赖；Node + IndexedDB/SPA 需 npm/浏览器工具且把数据放在浏览器 profile。二者与离线、可独立验收、单用户本地库的约束冲突，故不采用。\n- 数据文件位于应用 `--data-dir/bookmarks.sqlite3`；验收的每实例隔离目录由测试适配器创建，测试者 `--data-dir` 根目录不是应用数据库。\n- 单用户、本地优先；无认证、无云同步。日常绑定 127.0.0.1；仅隔离验收网络使用 0.0.0.0。\n\n## 数据模型（SQLite）\n\n- `schema_meta(version INTEGER)`：迁移版本单行。启动时在一个事务内创建/升级 schema，v1 建表并写入预置归类；版本演进只通过事务化迁移，不回退、不依赖客户端存储。\n- `categories(id TEXT PRIMARY KEY, name TEXT NOT NULL UNIQUE COLLATE NOCASE, is_default INTEGER NOT NULL DEFAULT 0, position INTEGER NOT NULL, created_at INTEGER NOT NULL)`：首启预置「未整理」(is_default=1)、「待购」、「家居改造」、「以后看看」。\n- `bookmarks(id TEXT PRIMARY KEY, url TEXT NOT NULL, hostname TEXT NOT NULL, title TEXT NULL, description TEXT NULL, category_id TEXT NOT NULL REFERENCES categories(id), favicon_url TEXT NULL, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, trashed_at INTEGER NULL)`。\n- 索引：category_id、created_at、hostname；url 不设唯一索引。P1/F14 的重复检测由服务层查询活动记录完成；P0 不启用重复拒绝。\n- trashed_at 为 NULL 表示活动记录；非 NULL 为软删除。默认列表与计数只统计 trashed_at IS NULL；恢复清空 trashed_at。删除归类在单一事务内把该归类下的活动记录与软删除记录都改到默认归类，因此恢复不会产生无归类记录。\n- 排序固定为 created_at DESC、id ASC；category 与 q 只作请求参数，不落库。\n\n## URL 策略\n\n- 记录 URL 必须是绝对、可解析的 HTTP(S) URL，且 hostname 有效且非空。单标签主机（如 http://localhost）与 IP 字面量均有效；不做 DNS 查询、可达性检查或目标页抓取。\n- 保存与打开都保留用户提交的原始字符串（不补斜杠、不改大小写、不重写路径）；hostname 由解析结果派生。若 PATCH 更新 URL，必须用新 URL 重新派生 hostname。\n- 拒绝：缺少 scheme、非 http/https、缺少/非法 hostname、无法解析的字符串；返回 400 invalid_url 且不写入。\n- 上游 S04 记录点域名正则限制，S02 记录新记录包含派生 hostname；这些是固定来源观察。target 的绝对 HTTP(S) URL 解析、允许单标签 hostname 与保留原始 URL 文本，是本模板的 adjusted 设计，采用上述解析策略。\n- 保存、打开、抓取三者分离：P0 保存与列表均不请求目标页；打开只产生浏览器导航或 /go 302。\n\n## API、错误与状态合同\n\n- `GET /api/health` → 200 JSON，含就绪与 schema 版本。\n- `GET /api/categories` → 200 数组，每项 id、name、count、is_default；count 只计活动记录。\n- `POST /api/categories` name → 201；重名 409 duplicate_category；空名或超过 120 字符 400 invalid_name。\n- `PATCH /api/categories/{id}` name → 200；同上校验；默认归类 400 protected_category。`DELETE /api/categories/{id}` → 200；默认归类 400 protected_category；否则事务内把活动与软删记录迁到默认归类。\n- `GET /api/bookmarks?category=<name|id>&q=<str>&include_trashed=0|1` → 200 数组；默认排序 created_at DESC、id ASC；q 对标题、hostname、描述做大小写不敏感子串匹配并与 category 叠加；未知归类返回空数组。\n- `POST /api/bookmarks` url 必填，title、description、category 可选，allow_duplicate 为 P1；201；category 省略/null 时归入默认「未整理」；显式空字符串或超过 120 字符 400 invalid_category；新名称按 NOCASE 自动创建并复用；非法 URL 400 invalid_url；P1 重复 409 duplicate_url 且附 existing_id。\n- `GET /api/bookmarks/{id}` 200 或 404 not_found；`PATCH` 更新字段；URL 变化时重算 hostname；非法 URL 400 invalid_url，非法归类 400 invalid_category；P1 重复 409 duplicate_url。`POST /api/bookmarks/{id}/move` body category 必填；省略/空/超长 400 invalid_category；新名称自动创建。`DELETE /api/bookmarks/{id}` 软删除 200；`POST /api/bookmarks/{id}/restore` 恢复；P1 同 URL 活动冲突 409 duplicate_url 且不改数据。\n- `GET /go/{id}` 302，Location 为保存时原始 URL；未知 id 404 not_found。HTML 打开链接使用原始 URL，target=_blank、rel=noopener。\n- P1：`GET /api/export` Netscape HTML；`POST /api/import` 同格式，返回 imported/skipped。\n- 错误合同：JSON 失败返回 `{error:{code,message,field}}`；通用 bad_request（畸形/不可解析 JSON，400）、invalid_url、invalid_category、invalid_name、not_found、duplicate_category、protected_category、duplicate_url。校验错误不产生 5xx，不产生部分写入；畸形 JSON 一律 bad_request 且不写。\n- 状态合同：GET 幂等；写操作事务化；校验失败保持提交前状态；分类与 q 为视图状态；删除与恢复改变 trashed_at 但不删除行。\n\n## UI/HTML 适配器合同（供真实表单验收与独立浏览器执行者）\n\n- `GET /`：保存表单 `form[action=/bookmarks/new]`（method=post，字段 url/title/description/category；category 预填「未整理」）；`a[data-testid=category-manager]` 指向 /categories；`form[data-testid=category-search-form]` 为 GET /，含 select 或 input name=category（归类名）与 input name=q；记录行 `tr[data-testid=record-row][data-record-id]`；打开链接 `a[data-testid=record-open-link]` 的 href 必须等于保存时原始 URL，target=_blank，rel 含 noopener；每行含 `form[data-testid=record-move-form]`（input record_id、select name=category_id，值为 API 归类 ID）、`form[data-testid=record-delete-form]`（input record_id）；回收站或 `GET /?trash=1` 的软删记录行含 `form[data-testid=record-restore-form]`（input record_id）。\n- `GET /categories`：`form[data-testid=category-create-form]`（input name）、`form[data-testid=category-rename-form]`（input category_id、name）、`form[data-testid=category-delete-form]`（input category_id）；每个归类行/侧栏计数为 `[data-testid=category-count][data-category-id=...]`，只显示活动记录数；归类名/计数与 JSON 一致。\n- 表单成功：save 303 到 /?category=...；move 303 到目标归类；delete 303 到 /?trash=1；restore 303 到恢复后归类；category create/rename/delete 303 到 /categories。失败：400/409 渲染当前页，含 `[data-testid=form-error]` 可读消息，保留 url/title/description/category/name/category_id/record_id 中已提交的值，并保留可重新提交的表单；不得 5xx 或写入。\n- 归类搜索：提交 category 与 q，成功后 URL 与表单同时保留两者；页面显示所选归类、保留的查询和匹配行；同一关键字在两个归类分别得到各自结果；某归类无匹配时显示明确空结果，不是错误。\n- 记录移动由 HTML 适配器把 category_id 翻译成归类名，再调用现有 move 服务；归类删除仍按 API 事务迁移活动与软删记录。默认归类不可重命名/删除。\n- P0 不提供孤立的记录编辑界面；仅保留 PATCH /api/bookmarks/{id} 的现有 URL 更新合同（URL 变化重算 hostname）。打开链接的实际导航目标由 href 与 /go 302 双重验证，不抓取目标页。\n\n## 验收适配器合同\n\n- 全部程序使用 `--base-url` 指向真实 python-web 目标；A01/A05/A09 另需 `--app-root` 与 `--data-dir` 做既有重启检查；A11 也必需二者，用同一冻结源码的 fresh 新实例独立证明首次初始化/未过滤空库，base_url 只观察当前部署入口，两组在 A11 输出中区分；A14 仍仅需 `--data-dir`。A11 不属于同容器重启证明。\n- `--app-root` 只读；`--data-dir` 是测试者草稿根。重启用例通过 common.launch_app 在同一 `--data-dir/instances/<id>` 上启动 `app/serve.py`，真实写入、SIGTERM、同一目录重启并读回；健康检查不是重启证据。\n- HTML 用例以标准库 urllib 提交 application/x-www-form-urlencoded 表单并解析响应 HTML 的 data-testid、表单字段、链接与文本；不以 API 调用代替声明的 HTML 表单，不驱动 JS/DOM。独立浏览器执行者可复用同一契约。\n- 所有请求限定在 base_url 精确 origin；/go 不跟随重定向；不请求保存的外链、元数据或 favicon；不附加凭据；目标要求认证时显式报告基础设施未就绪。\n- 结果：stdout 单个 atlas.acceptance-result.v1 JSON；断言失败或基础设施错误 exit nonzero；不声称已运行。\n\n## 非功能需求\n\n- 离线可用：保存/浏览/检索不依赖外部服务；不设置外部抓取为 P0 要求。\n- 数据完整性：写事务化；归类删除与恢复保持引用完整；校验失败零写入。\n- 确定性：排序、错误码、重定向稳定；GET 幂等。\n- 可访问/可测试：语义化 HTML、表单 label 或 aria、稳定 data-testid；服务端输出 UTF-8。\n- 单用户本机：无认证；日常 127.0.0.1，0.0.0.0 仅隔离验收网络。\n- 不设未经验证的时延/吞吐/成本目标；只要求请求可顺序处理。\n\n## 边界与限制\n\n- 不实现云同步、多设备、协作、分享、浏览器扩展/移动分享目标。\n- 不保存网页副本、不抓取正文、不做失效链接检测（F17/F18）。\n- 不引入置顶/归档/多排序/复制 URL/访问计数（F20/F23/F24）。\n- 归类为扁平单选；嵌套/标签属后期（F19/D12）。\n- P0 不做重复拒绝；F14/A15 保持 P1。\n- 第三方元数据/图标仅 P1 可选增强，失败不影响保存；离线验收不验证其可达性。\n\n## A04/A12 分类输入澄清（本次受限修订）\n\n- A04 仅分类管理：HTML create/rename 表单的 name 与 JSON create/rename 的 name 同为归类名称；省略、空字符串、纯空白、121 字符均 400 invalid_name，JSON 显式 null 同样 invalid_name。既有重名 duplicate_category、默认分类 protected_category、删除迁移/恢复均保留。\n- A12 仅书签保存和移动，不将分类管理 name 校验混为 invalid_category。HTML 保存使用名称 category；省略时未整理，显式空/纯空白/121 字符为 400 invalid_category。HTML 无 JSON null 这种原生值，不能把字面字符串 null 当 JSON null。\n- JSON 保存使用名称 category；省略或显式 null 均默认未整理，显式空/纯空白/121 字符为 invalid_category。JSON move 的名称 category 必填；省略、null、空/纯空白/121 字符为 invalid_category。有效新名称可自动创建并复用，未知名称不等于非法 ID。\n- HTML move 使用 category_id（API 已有分类 ID），必须解析为已有名称再调用服务；省略、空或未知 ID 为 invalid_category，不能把未知 ID 当新名称创建。JSON 保存/move 合同不新增 category_id 字段；GET category 未知值的空结果语义不改。\n- 错误分支一律零写入：HTML 400、form-error 可读、保留已提交字段并提供可重试表单；JSON 400、error.code/message/field，无导航。成功流程、303 导航、阶段、能力与既有断言意图保留。\n- 搜索仍仅对 title、hostname、description 做大小写不敏感子串匹配，并叠加分类；不扩展为 URL 全文、分类名或标签检索。此处对齐目标设计，不更改案例来源观察。\n",
+    "old": "# 架构与契约\n\n## 默认技术栈与理由\n\n- 交付 profile：python-web。Python 3.12 标准库（http.server、sqlite3、urllib、json、html.parser），零第三方依赖；服务端渲染 HTML 表单，JSON API 与 HTML 适配器共用同一服务层。\n- 备选 Flask/FastAPI 需安装依赖；Node + IndexedDB/SPA 需 npm/浏览器工具且把数据放在浏览器 profile。二者与离线、可独立验收、单用户本地库的约束冲突，故不采用。\n- 数据文件位于应用 `--data-dir/bookmarks.sqlite3`；验收的每实例隔离目录由测试适配器创建，测试者 `--data-dir` 根目录不是应用数据库。\n- 单用户、本地优先；无认证、无云同步。日常绑定 127.0.0.1；仅隔离验收网络使用 0.0.0.0。\n\n## 数据模型（SQLite）\n\n- `schema_meta(version INTEGER)`：迁移版本单行。启动时在一个事务内创建/升级 schema，v1 建表并写入预置归类；版本演进只通过事务化迁移，不回退、不依赖客户端存储。\n- `categories(id TEXT PRIMARY KEY, name TEXT NOT NULL UNIQUE COLLATE NOCASE, is_default INTEGER NOT NULL DEFAULT 0, position INTEGER NOT NULL, created_at INTEGER NOT NULL)`：首启预置「未整理」(is_default=1)、「待购」、「家居改造」、「以后看看」。\n- `bookmarks(id TEXT PRIMARY KEY, url TEXT NOT NULL, hostname TEXT NOT NULL, title TEXT NULL, description TEXT NULL, category_id TEXT NOT NULL REFERENCES categories(id), favicon_url TEXT NULL, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, trashed_at INTEGER NULL)`。\n- 索引：category_id、created_at、hostname；url 不设唯一索引。P1/F14 的重复检测由服务层查询活动记录完成；P0 不启用重复拒绝。\n- trashed_at 为 NULL 表示活动记录；非 NULL 为软删除。默认列表与计数只统计 trashed_at IS NULL；恢复清空 trashed_at。删除归类在单一事务内把该归类下的活动记录与软删除记录都改到默认归类，因此恢复不会产生无归类记录。\n- 排序固定为 created_at DESC、id ASC；category 与 q 只作请求参数，不落库。\n\n## URL 策略\n\n- 记录 URL 必须是绝对、可解析的 HTTP(S) URL，且 hostname 有效且非空。单标签主机（如 http://localhost）与 IP 字面量均有效；不做 DNS 查询、可达性检查或目标页抓取。\n- 保存与打开都保留用户提交的原始字符串（不补斜杠、不改大小写、不重写路径）；hostname 由解析结果派生。若 PATCH 更新 URL，必须用新 URL 重新派生 hostname。\n- 拒绝：缺少 scheme、非 http/https、缺少/非法 hostname、无法解析的字符串；返回 400 invalid_url 且不写入。\n- 上游 S04 记录点域名正则限制，S02 记录新记录包含派生 hostname；这些是固定来源观察。target 的绝对 HTTP(S) URL 解析、允许单标签 hostname 与保留原始 URL 文本，是本模板的 adjusted 设计，采用上述解析策略。\n- 保存、打开、抓取三者分离：P0 保存与列表均不请求目标页；打开只产生浏览器导航或 /go 302。\n\n## API、错误与状态合同\n\n- `GET /api/health` → 200 JSON，含就绪与 schema 版本。\n- `GET /api/categories` → 200 数组，每项 id、name、count、is_default；count 只计活动记录。\n- `POST /api/categories` name → 201；重名 409 duplicate_category；空名或超过 120 字符 400 invalid_name。\n- `PATCH /api/categories/{id}` name → 200；同上校验；默认归类 400 protected_category。`DELETE /api/categories/{id}` → 200；默认归类 400 protected_category；否则事务内把活动与软删记录迁到默认归类。\n- `GET /api/bookmarks?category=<name|id>&q=<str>&include_trashed=0|1` → 200 数组；默认排序 created_at DESC、id ASC；q 对标题、hostname、描述做大小写不敏感子串匹配并与 category 叠加；未知归类返回空数组。\n- `POST /api/bookmarks` url 必填，title、description、category 可选，allow_duplicate 为 P1；201；category 省略/null 时归入默认「未整理」；显式空字符串或超过 120 字符 400 invalid_category；新名称按 NOCASE 自动创建并复用；非法 URL 400 invalid_url；P1 重复 409 duplicate_url 且附 existing_id。\n- `GET /api/bookmarks/{id}` 200 或 404 not_found；`PATCH` 更新字段；URL 变化时重算 hostname；非法 URL 400 invalid_url，非法归类 400 invalid_category；P1 重复 409 duplicate_url。`POST /api/bookmarks/{id}/move` body category 必填；省略/空/超长 400 invalid_category；新名称自动创建。`DELETE /api/bookmarks/{id}` 软删除 200；`POST /api/bookmarks/{id}/restore` 恢复；P1 同 URL 活动冲突 409 duplicate_url 且不改数据。\n- `GET /go/{id}` 302，Location 为保存时原始 URL；未知 id 404 not_found。HTML 打开链接使用原始 URL，target=_blank、rel=noopener。\n- P1：`GET /api/export` Netscape HTML；`POST /api/import` 同格式，返回 imported/skipped。\n- 错误合同：JSON 失败返回 `{error:{code,message,field}}`；通用 bad_request（畸形/不可解析 JSON，400）、invalid_url、invalid_category、invalid_name、not_found、duplicate_category、protected_category、duplicate_url。校验错误不产生 5xx，不产生部分写入；畸形 JSON 一律 bad_request 且不写。\n- 状态合同：GET 幂等；写操作事务化；校验失败保持提交前状态；分类与 q 为视图状态；删除与恢复改变 trashed_at 但不删除行。\n\n## UI/HTML 适配器合同（供真实表单验收与独立浏览器执行者）\n\n- `GET /`：保存表单 `form[action=/bookmarks/new]`（method=post，字段 url/title/description/category；category 预填「未整理」）；`a[data-testid=category-manager]` 指向 /categories；`form[data-testid=category-search-form]` 为 GET /，含 select 或 input name=category（归类名）与 input name=q；记录行 `tr[data-testid=record-row][data-record-id]`；打开链接 `a[data-testid=record-open-link]` 的 href 必须等于保存时原始 URL，target=_blank，rel 含 noopener；每行含 `form[data-testid=record-move-form]`（input record_id、select name=category_id，值为 API 归类 ID）、`form[data-testid=record-delete-form]`（input record_id）；回收站或 `GET /?trash=1` 的软删记录行含 `form[data-testid=record-restore-form]`（input record_id）。\n- `GET /categories`：`form[data-testid=category-create-form]`（input name）、`form[data-testid=category-rename-form]`（input category_id、name）、`form[data-testid=category-delete-form]`（input category_id）；每个归类行/侧栏计数为 `[data-testid=category-count][data-category-id=...]`，只显示活动记录数；归类名/计数与 JSON 一致。\n- 表单成功：save 303 到 /?category=...；move 303 到目标归类；delete 303 到 /?trash=1；restore 303 到恢复后归类；category create/rename/delete 303 到 /categories。失败：400/409 渲染当前页，含 `[data-testid=form-error]` 可读消息，保留 url/title/description/category/name/category_id/record_id 中已提交的值，并保留可重新提交的表单；不得 5xx 或写入。\n- 归类搜索：提交 category 与 q，成功后 URL 与表单同时保留两者；页面显示所选归类、保留的查询和匹配行；同一关键字在两个归类分别得到各自结果；某归类无匹配时显示明确空结果，不是错误。\n- 记录移动由 HTML 适配器把 category_id 翻译成归类名，再调用现有 move 服务；归类删除仍按 API 事务迁移活动与软删记录。默认归类不可重命名/删除。\n- P0 不提供孤立的记录编辑界面；仅保留 PATCH /api/bookmarks/{id} 的现有 URL 更新合同（URL 变化重算 hostname）。打开链接的实际导航目标由 href 与 /go 302 双重验证，不抓取目标页。\n\n## 验收适配器合同\n\n- 全部程序使用 `--base-url` 指向真实 python-web 目标；A01/A05/A09 另需 `--app-root` 与 `--data-dir`，A14 需 `--data-dir`。\n- `--app-root` 只读；`--data-dir` 是测试者草稿根。重启用例通过 common.launch_app 在同一 `--data-dir/instances/<id>` 上启动 `app/serve.py`，真实写入、SIGTERM、同一目录重启并读回；健康检查不是重启证据。\n- HTML 用例以标准库 urllib 提交 application/x-www-form-urlencoded 表单并解析响应 HTML 的 data-testid、表单字段、链接与文本；不以 API 调用代替声明的 HTML 表单，不驱动 JS/DOM。独立浏览器执行者可复用同一契约。\n- 所有请求限定在 base_url 精确 origin；/go 不跟随重定向；不请求保存的外链、元数据或 favicon；不附加凭据；目标要求认证时显式报告基础设施未就绪。\n- 结果：stdout 单个 atlas.acceptance-result.v1 JSON；断言失败或基础设施错误 exit nonzero；不声称已运行。\n\n## 非功能需求\n\n- 离线可用：保存/浏览/检索不依赖外部服务；不设置外部抓取为 P0 要求。\n- 数据完整性：写事务化；归类删除与恢复保持引用完整；校验失败零写入。\n- 确定性：排序、错误码、重定向稳定；GET 幂等。\n- 可访问/可测试：语义化 HTML、表单 label 或 aria、稳定 data-testid；服务端输出 UTF-8。\n- 单用户本机：无认证；日常 127.0.0.1，0.0.0.0 仅隔离验收网络。\n- 不设未经验证的时延/吞吐/成本目标；只要求请求可顺序处理。\n\n## 边界与限制\n\n- 不实现云同步、多设备、协作、分享、浏览器扩展/移动分享目标。\n- 不保存网页副本、不抓取正文、不做失效链接检测（F17/F18）。\n- 不引入置顶/归档/多排序/复制 URL/访问计数（F20/F23/F24）。\n- 归类为扁平单选；嵌套/标签属后期（F19/D12）。\n- P0 不做重复拒绝；F14/A15 保持 P1。\n- 第三方元数据/图标仅 P1 可选增强，失败不影响保存；离线验收不验证其可达性。\n\n## A04/A12 分类输入澄清（本次受限修订）\n\n- A04 仅分类管理：HTML create/rename 表单的 name 与 JSON create/rename 的 name 同为归类名称；省略、空字符串、纯空白、121 字符均 400 invalid_name，JSON 显式 null 同样 invalid_name。既有重名 duplicate_category、默认分类 protected_category、删除迁移/恢复均保留。\n- A12 仅书签保存和移动，不将分类管理 name 校验混为 invalid_category。HTML 保存使用名称 category；省略时未整理，显式空/纯空白/121 字符为 400 invalid_category。HTML 无 JSON null 这种原生值，不能把字面字符串 null 当 JSON null。\n- JSON 保存使用名称 category；省略或显式 null 均默认未整理，显式空/纯空白/121 字符为 invalid_category。JSON move 的名称 category 必填；省略、null、空/纯空白/121 字符为 invalid_category。有效新名称可自动创建并复用，未知名称不等于非法 ID。\n- HTML move 使用 category_id（API 已有分类 ID），必须解析为已有名称再调用服务；省略、空或未知 ID 为 invalid_category，不能把未知 ID 当新名称创建。JSON 保存/move 合同不新增 category_id 字段；GET category 未知值的空结果语义不改。\n- 错误分支一律零写入：HTML 400、form-error 可读、保留已提交字段并提供可重试表单；JSON 400、error.code/message/field，无导航。成功流程、303 导航、阶段、能力与既有断言意图保留。\n- 搜索仍仅对 title、hostname、description 做大小写不敏感子串匹配，并叠加分类；不扩展为 URL 全文、分类名或标签检索。此处对齐目标设计，不更改案例来源观察。\n",
+    "path": [
+     "architecture_markdown"
+    ]
+   }
+  ]
+ },
+ "program_file_hashes_before": {
+  "acceptance/common.py": "7f0d7d28d8336bdde3da267795e24d13e430f05e53063ee01ed5611236325d37",
+  "acceptance/p0_library.py": "8a5ce953288f2b09b9cc0256d869fc7dca2a3dcd3ff255dc5dd5dfa2fa51fb67",
+  "acceptance/p0_organize.py": "93ae82c74946811fac3b1dd213cc077cf89acc6ecfb45e64ec2830e3482b7f60",
+  "acceptance/p0_find_open.py": "4ba2fa6d2a6d3b306d6be5f82ef63604b836cf3d84bd0fc5efddf4d64683a6da",
+  "acceptance/p0_recovery.py": "372c75aa2944a10cc5146859dc0bacd0e03111defe7c8aa75ece2d28ec45aff3",
+  "acceptance/p1_maturity.py": "d44e17c87314db18084b3b88bd2c700a75bfe583d108e9b518040fb8378601a3",
+  "acceptance/requirements.txt": "f1fc18b605a1eea93892d319d09122d91033a48dfd4b913f8f262a4dc8633deb",
+  "acceptance/README.md": "01cf57941aeed3e0bfa431349b832429f4518addebd00528e8bc1a33ff189459",
+  "acceptance/runner.json": "f9448d370749dcca44fb2024b1b4b6d761d127edaf98a523063a590db5c69375"
+ },
+ "program_file_hashes_after": {
+  "acceptance/README.md": "9e73ee6233e5b991a9682bb0bcaa235783bd4c7a6d399d5be38c100face9db6e",
+  "acceptance/common.py": "7f0d7d28d8336bdde3da267795e24d13e430f05e53063ee01ed5611236325d37",
+  "acceptance/p0_find_open.py": "342e38d2298cf48e22fb97d76e080ce4a67c3c10a942502c5ef205954878d667",
+  "acceptance/p0_library.py": "5923bdd1d15e7d98bcf2c3b91123b36d986c0c69cbc6a1a7fdab80ce4c437d6e",
+  "acceptance/p0_organize.py": "93ae82c74946811fac3b1dd213cc077cf89acc6ecfb45e64ec2830e3482b7f60",
+  "acceptance/p0_recovery.py": "372c75aa2944a10cc5146859dc0bacd0e03111defe7c8aa75ece2d28ec45aff3",
+  "acceptance/p1_maturity.py": "d44e17c87314db18084b3b88bd2c700a75bfe583d108e9b518040fb8378601a3",
+  "acceptance/requirements.txt": "f1fc18b605a1eea93892d319d09122d91033a48dfd4b913f8f262a4dc8633deb",
+  "acceptance/runner.json": "3e71774a5bb0fb2b29cbb334983127264d5f377cc9e3a680b12f11da9268e201"
+ },
+ "replaced_paths": [
+  "acceptance/README.md",
+  "acceptance/p0_find_open.py",
+  "acceptance/p0_library.py",
+  "acceptance/runner.json"
+ ],
+ "reused_paths": [
+  "acceptance/common.py",
+  "acceptance/p0_organize.py",
+  "acceptance/p0_recovery.py",
+  "acceptance/p1_maturity.py",
+  "acceptance/requirements.txt"
+ ],
+ "program_diffs": {
+  "acceptance/p0_library.py": "--- R6-attempt-1/acceptance/p0_library.py\n+++ R7/acceptance/p0_library.py\n@@ -887,6 +887,26 @@\n                     _record_url(record) == boundary,\n                     f'JSON url={_record_url(record)!r}（期望原始字符串 {boundary!r}）',\n                 )\n+        # Independent JSON positive: not an HTML-created record read through JSON.\n+        before_json_ids = _record_ids(_fetch_bookmarks(client, recorder, 'a02-json-before-create'))\n+        json_boundary = f'https://atlas-a02-json-{token}/original?keep=1'\n+        positive = client.post_json('/api/bookmarks', {\n+            'url': json_boundary, 'title': f'A02 JSON {token}',\n+            'description': f'A02 JSON positive {token}',\n+        })\n+        recorder.expect_status(positive, 201, aid='a02-json-boundary-create-status')\n+        json_id = _record_id(_extract_record(_safe_json(positive)))\n+        recorder.check('a02-json-boundary-new-id', bool(json_id) and json_id not in before_json_ids,\n+                       f'独立 JSON POST 返回新的非空 id={json_id!r}')\n+        if json_id:\n+            saved = _get_record(client, recorder, json_id, 'a02-json-boundary')\n+            recorder.check('a02-json-boundary-readback',\n+                           _record_id(saved) == json_id and _record_url(saved) == json_boundary,\n+                           '独立 GET 读回同一 id 与精确原始 URL')\n+            listed_positive = _fetch_bookmarks(client, recorder, 'a02-json-positive')\n+            recorder.check('a02-json-boundary-listed', any(\n+                _record_id(item) == json_id and _record_url(item) == json_boundary\n+                for item in listed_positive), '列表包含同一 JSON 创建记录与原始 URL')\n         before = _fetch_bookmarks(client, recorder, 'a02-before')\n         before_total = len(before)\n         before_token = sum(1 for item in before if token in (_record_url(item) or ''))\n@@ -1076,40 +1096,40 @@\n         client.close()\n \n \n-def _case_a11(args, recorder):\n+def _case_a11_base(args, recorder):\n     client = common.HttpClient(args.base_url)\n     unknown = f'不存在归类-{uuid.uuid4().hex[:10]}'\n     try:\n         health = client.get('/api/health')\n-        recorder.expect_status(health, 200, aid='a11-health-status')\n+        recorder.expect_status(health, 200, aid='a11-base-health-status')\n         health_payload = _safe_json(health)\n         recorder.check(\n-            'a11-health-json',\n+            'a11-base-health-json',\n             isinstance(health_payload, dict) and bool(health_payload),\n             f'/api/health 返回非空 JSON 对象，实际 {type(health_payload).__name__}',\n         )\n         page = client.get('/', accept='text/html')\n-        recorder.expect_status(page, 200, aid='a11-home-status')\n-        recorder.check(\n-            'a11-home-content-type',\n+        recorder.expect_status(page, 200, aid='a11-base-home-status')\n+        recorder.check(\n+            'a11-base-home-content-type',\n             'text/html' in page.content_type.lower(),\n             f'首页 Content-Type={page.content_type!r}',\n         )\n         doc = _parse_html(page.text)\n         form = doc.save_form()\n         recorder.check(\n-            'a11-entry-form',\n+            'a11-base-entry-form',\n             form is not None,\n             '首页含 action=/bookmarks/new 且 method=post 的录入表单',\n         )\n         if form is not None:\n             recorder.check(\n-                'a11-entry-action',\n+                'a11-base-entry-action',\n                 _action_path(form.action) == '/bookmarks/new',\n                 f'录入表单 action={form.action!r}',\n             )\n             recorder.check(\n-                'a11-url-field',\n+                'a11-base-url-field',\n                 form.has_name('url'),\n                 '录入表单含 name=url 输入字段',\n             )\n@@ -1125,32 +1145,100 @@\n             except ValueError:\n                 manager_path = ''\n         recorder.check(\n-            'a11-category-manager',\n+            'a11-base-category-manager',\n             manager is not None and manager_path == '/categories',\n             f'首页 category-manager 链接 href={manager_href!r}（期望指向 /categories）',\n         )\n         recorder.check(\n-            'a11-list-container',\n+            'a11-base-list-container',\n             _has_list_container(doc),\n             '首页含记录列表容器',\n         )\n         empty_page = client.get('/', params={'category': unknown}, accept='text/html')\n-        recorder.expect_status(empty_page, 200, aid='a11-unknown-status')\n+        recorder.expect_status(empty_page, 200, aid='a11-base-unknown-status')\n         empty_doc = _parse_html(empty_page.text)\n         recorder.check(\n-            'a11-unknown-filter-empty',\n+            'a11-base-unknown-filter-empty',\n             len(empty_doc.rows) == 0,\n             f'不存在归类 {unknown!r} 过滤后记录行数={len(empty_doc.rows)}（期望 0）',\n         )\n         marker = _empty_state_marker(empty_doc)\n         recorder.check(\n-            'a11-unknown-empty-state',\n+            'a11-base-unknown-empty-state',\n             bool(marker),\n             f'不存在归类过滤显示明确空状态，标记={marker!r}',\n         )\n     finally:\n         client.close()\n \n+\n+def _case_a11(args, recorder):\n+    # The base deployment may already contain records. Only fresh proves first init.\n+    if not recorder.check('a11-fresh-required-flags', bool(args.app_root and args.data_dir),\n+                          'A11 必须绑定实际冻结 app_root 与测试者 data_dir'):\n+        return\n+    _case_a11_base(args, recorder)\n+    proc = None\n+    client = None\n+    try:\n+        proc = common.launch_app(args.app_root, args.data_dir, 0, fresh=True)\n+        recorder.check('a11-fresh-owned-source',\n+                       os.path.realpath(proc.app_root) == os.path.realpath(args.app_root),\n+                       'fresh 实例来自同一冻结交付源码')\n+        client = common.HttpClient(proc.base_url)\n+        health = client.get('/api/health')\n+        recorder.expect_status(health, 200, aid='a11-fresh-health-status')\n+        recorder.check('a11-fresh-health-json', isinstance(_safe_json(health), dict),\n+                       'fresh 健康检查返回 JSON 对象')\n+        # No business write precedes these unfiltered observations.\n+        for name, params in (('active', None), ('including-trash', {'include_trashed': '1'})):\n+            records = _fetch_bookmarks(client, recorder, f'a11-fresh-{name}', params)\n+            recorder.check(f'a11-fresh-{name}-empty', records == [],\n+                           f'未过滤全库 {name} 记录数={len(records)}，首次初始化必须为0')\n+        categories = _fetch_categories(client, recorder, 'a11-fresh')\n+        ids = []\n+        for index, preset in enumerate(common.PRESET_CATEGORIES, 1):\n+            matches = [item for item in categories if isinstance(item, dict) and item.get('name') == preset]\n+            recorder.check(f'a11-fresh-preset-{index}', len(matches) == 1,\n+                           f'首次初始化准确存在预置分类 {preset!r}')\n+            if len(matches) == 1:\n+                item = matches[0]\n+                cid = item.get('id')\n+                legal = isinstance(cid, (str, int)) and not isinstance(cid, bool) and bool(str(cid).strip())\n+                recorder.check(f'a11-fresh-preset-{index}-id', legal, f'分类 ID={cid!r}')\n+                recorder.check(f'a11-fresh-preset-{index}-count', item.get('count') == 0,\n+                               f'预置分类活动记录 count={item.get(\"count\")!r}')\n+                ids.append(str(cid))\n+        recorder.check('a11-fresh-preset-unique-ids', len(ids) == 4 and len(set(ids)) == 4,\n+                       '四个预置分类 ID 各自唯一')\n+        page = client.get('/', accept='text/html')\n+        recorder.expect_status(page, 200, aid='a11-fresh-home-status')\n+        recorder.check('a11-fresh-home-content-type', 'text/html' in page.content_type.lower(),\n+                       '未过滤首页是 HTML')\n+        doc = _parse_html(page.text)\n+        form = doc.save_form()\n+        recorder.check('a11-fresh-save-form', form is not None and\n+                       _action_path(form.action) == '/bookmarks/new' and form.has_name('url'),\n+                       '未过滤首页具备保存表单与 URL 字段')\n+        recorder.check('a11-fresh-category-entry', any(\n+            a.testid == 'category-manager' and _action_path(a.href) == '/categories'\n+            for a in doc.anchors), '未过滤首页有分类管理入口')\n+        recorder.check('a11-fresh-list-container', _has_list_container(doc), '未过滤首页有列表容器')\n+        recorder.check('a11-fresh-no-record-rows', not doc.rows, '首次初始化未过滤首页没有记录行')\n+        recorder.check('a11-fresh-explicit-empty-state', bool(_empty_state_marker(doc)),\n+                       '首次初始化未过滤首页有明确空状态')\n+    finally:\n+        try:\n+            if client is not None:\n+                client.close()\n+        finally:\n+            if proc is not None:\n+                try:\n+                    common.stop_app(proc)\n+                except Exception as exc:\n+                    recorder.check('a11-fresh-cleanup', False, f'清理异常：{exc}')\n+                recorder.check('a11-fresh-process-stopped', proc.poll() is not None,\n+                               '本用例拥有的 fresh 子进程已结束')\n \n _HANDLERS = {\n     'A01': _case_a01,\n@@ -1161,7 +1249,18 @@\n \n \n def main(argv=None):\n-    args = common.parse_case_args(argv)\n+    try:\n+        args = common.parse_case_args(argv)\n+    except SystemExit as exc:\n+        raw_args = list(sys.argv[1:] if argv is None else argv)\n+        requested_a11 = '--case=A11' in raw_args or any(\n+            value == '--case' and index + 1 < len(raw_args) and raw_args[index + 1] == 'A11'\n+            for index, value in enumerate(raw_args))\n+        if not exc.code or not requested_a11:\n+            raise\n+        failed = common.Recorder('A11')\n+        failed.check('a11-fresh-arguments', False, 'A11 参数无效；详见 stderr，不降级或跳过')\n+        return failed.finish('A11')\n     recorder = common.Recorder(args.case)\n     handler = _HANDLERS.get(args.case)\n     if handler is None:\n",
+  "acceptance/p0_find_open.py": "--- R6-attempt-1/acceptance/p0_find_open.py\n+++ R7/acceptance/p0_find_open.py\n@@ -509,7 +509,9 @@\n         desc_token = f'descr{uuid.uuid4().hex[:12]}'\n         unmatched = f'absent{uuid.uuid4().hex[:12]}'\n \n-        url_a = f'https://{host_token}.atlas-acceptance.example/notes/{uuid.uuid4().hex[:10]}'\n+        path_only = f'pathonly{uuid.uuid4().hex[:12]}'\n+        query_only = f'queryonly{uuid.uuid4().hex[:12]}'\n+        url_a = f'https://{host_token}.atlas-acceptance.example/{path_only}?q={query_only}'\n         title_a = f'{shared} 收藏甲'\n         desc_a = f'备注 {desc_token}'\n         created_a = client.post_json(\n@@ -639,6 +641,29 @@\n             f'归类 {cat_b!r} 的搜索结果排除记录甲：{sorted(ids_b)}',\n         )\n \n+        # Tokens occur only in excluded fields of this target, never in allowed ones.\n+        for label, token_value in (('url-path', path_only), ('url-query', query_only), ('category-name', cat_a)):\n+            allowed_text = ' '.join((title_a, host_token + '.atlas-acceptance.example', desc_a)).lower()\n+            recorder.check(f'a07-{label}-isolated-token', token_value.lower() not in allowed_text,\n+                           '负例 token 不在目标记录 title/hostname/description')\n+            for scoped in (False, True):\n+                aid = f'a07-excludes-{label}-' + ('category' if scoped else 'all')\n+                params = {'q': token_value}\n+                if scoped:\n+                    params['category'] = cat_a\n+                results = _search(client, recorder, aid + '-json', params)\n+                recorder.check(aid + '-json-target-absent', id_a not in _record_ids(results),\n+                               'JSON 不因 URL path/query 或分类名而命中目标记录')\n+                html = _html_search(client, recorder, aid + '-html', search_form,\n+                                    cat_a if scoped else '', token_value)\n+                recorder.check(aid + '-html-target-absent', id_a not in _row_ids(html),\n+                               '实际搜索表单的记录行不因排除字段命中；不检查页面回显')\n+        # These positive controls also prove both entry points do not return always-empty.\n+        for label, positive_token in (('title', shared), ('hostname', host_token), ('description', desc_token)):\n+            positive_doc = _html_search(client, recorder, f'a07-html-positive-{label}',\n+                                        search_form, cat_a, positive_token.upper())\n+            recorder.check(f'a07-html-positive-{label}-hit', id_a in _row_ids(positive_doc),\n+                           '允许字段经真实 HTML 搜索表单仍命中同一记录')\n         doc_empty = _html_search(client, recorder, 'a07-html-empty', search_form, cat_a, unmatched)\n         empty_ids = _row_ids(doc_empty)\n         recorder.check(\n",
+  "acceptance/README.md": "--- R6-attempt-1/acceptance/README.md\n+++ R7/acceptance/README.md\n@@ -7,8 +7,8 @@\n | 参数 | 适用范围 | 用途 |\n | --- | --- | --- |\n | `--base-url` | A01–A15（全部） | 已部署 python-web 实例的 http/https 根 URL；所有 base_url 行为断言都发往该 origin。 |\n-| `--app-root` | A01、A05、A09 | 只读应用源码根；必须包含 `app/serve.py`，用于启动同一冻结应用的隔离实例。 |\n-| `--data-dir` | A01、A05、A09、A14 | 测试者可变草稿根；重启适配器在其 `instances/` 下创建每实例目录；A14 在此生成导入 HTML。 |\n+| `--app-root` | A01、A05、A09、A11 | 只读应用源码根；必须包含 `app/serve.py`，用于启动同一冻结应用的隔离实例。 |\n+| `--data-dir` | A01、A05、A09、A11、A14 | 测试者可变草稿根；重启适配器在其 `instances/` 下创建每实例目录；A14 在此生成导入 HTML。 |\n \n ### 1.1 `--base-url`\n \n@@ -59,7 +59,7 @@\n \n ## 4. 逐用例精确参数与调用示例\n \n-`acceptance/runner.json` 的唯一作用是为 Atlas 提供每个用例的 argv；实现程序由固定 spec 选择。所有用例都必须带 `--base-url`，A01/A05/A09 还必须带 `--app-root` 与 `--data-dir`，A14 还必须带 `--data-dir`。未知或缺失参数由参数解析器显式报错并非零退出。\n+`acceptance/runner.json` 的唯一作用是为 Atlas 提供每个用例的 argv；实现程序由固定 spec 选择。所有用例都必须带 `--base-url`，A01/A05/A09/A11 还必须带 `--app-root` 与 `--data-dir`，A14 还必须带 `--data-dir`。未知或缺失参数由参数解析器显式报错并非零退出。\n \n ### 4.1 与 runner.json 一致的 args\n \n@@ -93,7 +93,7 @@\n python3 /suite/acceptance/p0_library.py --case A01 --base-url \"$BASE_URL\" --app-root \"$APP_ROOT\" --data-dir \"$DATA_DIR\"\n python3 /suite/acceptance/p0_library.py --case A02 --base-url \"$BASE_URL\"\n python3 /suite/acceptance/p0_library.py --case A03 --base-url \"$BASE_URL\"\n-python3 /suite/acceptance/p0_library.py --case A11 --base-url \"$BASE_URL\"\n+python3 /suite/acceptance/p0_library.py --case A11 --base-url \"$BASE_URL\" --app-root \"$APP_ROOT\" --data-dir \"$DATA_DIR\"\n python3 /suite/acceptance/p0_organize.py --case A04 --base-url \"$BASE_URL\"\n python3 /suite/acceptance/p0_organize.py --case A05 --base-url \"$BASE_URL\" --app-root \"$APP_ROOT\" --data-dir \"$DATA_DIR\"\n python3 /suite/acceptance/p0_organize.py --case A06 --base-url \"$BASE_URL\"\n@@ -112,16 +112,16 @@\n | 用例 | 行为证据 |\n | --- | --- |\n | A01 | 对 base_url 做健康检查，经真实保存表单提交唯一 URL/标题/描述并跟随 303，断言 HTML 记录行与 JSON 读回；再用 `--app-root`/`--data-dir` 启动隔离实例，经真实表单保存，停止后以同一实例子目录重启，断言 id、原始 URL、标题与描述稳定。 |\n-| A02 | 用保存表单提交单标签主机 URL（如 `http://atlas-a02-<token>`）作为显式正向边界：断言 303、原始字符串持久化且行内 href 精确；同一表单与 JSON 分别提交缺协议、`javascript:`、`ftp://`、`http://` 空主机、含空格/非法 hostname 的值，断言 400 `invalid_url`、`form-error` 可读、相对计数不新增且被拒 URL 不出现在列表。单标签主机是接受策略，不要求点域名。 |\n+| A02 | 用保存表单提交单标签主机 URL（如 `http://atlas-a02-<token>`）作为显式正向边界：断言 303、原始字符串持久化且行内 href 精确；同一表单与 JSON 分别提交缺协议、`javascript:`、`ftp://`、`http://` 空主机、含空格/非法 hostname 的值，断言 400 `invalid_url`、`form-error` 可读、相对计数不新增且被拒 URL 不出现在列表。另用独立唯一单标签 hostname URL 经 JSON POST 保存，断言 201、新 id、独立 GET/列表中同一 id 与原始 URL；非法输入的 before 快照在两条合法创建后取得。单标签主机是接受策略，不要求点域名。 |\n | A03 | 预置归类（未整理、待购、家居改造、以后看看）在 HTML 与 API 可见；真实表单省略 category 保存落入未整理；表单输入新归类名保存后自动创建，并可按该归类筛选。 |\n-| A04 | 从首页 `a[data-testid=category-manager]` 进入 `/categories`；用 `category-create-form` 的真实 `name` 新建（303 后可见且计数正确）；用重名及大小写变体提交 create/rename 表单，断言 409 `duplicate_category`、`form-error`、输入保留且集合不变；用 `category-rename-form` 提交 `category_id`+`name` 重命名，记录跟随；用 `category-delete-form` 删除归类，断言活动与软删记录都迁回未整理、软删记录在 `/?trash=1` 可恢复；对默认归类做 rename/delete，断言 400 `protected_category` 且不变；同时保留 JSON API 的同等断言。create/rename 分别提交省略 name、空字符串、纯空白、121 字符名（JSON 另含显式 null），均断言 400 `invalid_name`、`form-error`、提交值保留、分类与记录集合及归属不变。 |\n+| A04 | 从首页 `a[data-testid=category-manager]` 进入 `/categories`；用 `category-create-form` 的真实 `name` 新建（303 后可见且计数正确）；用重名及大小写变体提交 create/rename 表单，断言 409 `duplicate_category`、`form-error`、输入保留且集合不变；用 `category-rename-form` 提交 `category_id`+`name` 重命名，记录跟随；用 `category-delete-form` 删除归类，断言活动与软删记录都迁回未整理、软删记录在 `/?trash=1` 可恢复；对默认归类做 rename/delete，断言 400 `protected_category` 且不变；JSON API 保留已有非法名称、重复名称及默认分类保护断言；不宣称成功 JSON rename/delete 已覆盖。create/rename 分别提交省略 name、空字符串、纯空白、121 字符名（JSON 另含显式 null），均断言 400 `invalid_name`、`form-error`、提交值保留、分类与记录集合及归属不变。 |\n | A05 | 用 `record-move-form` 的真实 `record_id` 与 `select name=category_id` 移动，303 到目标归类后旧归类消失、新归类可见、JSON 读回归类正确；再用 `--app-root`/`--data-dir` 启动隔离实例，经真实表单移动，停止后同目录重启读回归属。 |\n | A06 | 两个归类各两条记录，读取 HTML `[data-testid=category-count][data-category-id]` 与记录行，并与 `/api/categories` 的 count 和 `/api/bookmarks` 列表比对；通过真实移动、删除、恢复表单改变状态，逐步断言 count 只计活动记录且与列表一致，软删记录仍在 `include_trashed=1` 中。 |\n-| A07 | 用真实 `category-search-form` 提交 `category` 与 `q`，断言 200、表单的 category 与 q 值均保留、页面显示所选归类/查询/匹配行；用同一关键字分别在两个归类提交，断言各自只命中本归类记录；在某归类提交无匹配 q，断言显示明确空结果且无记录行；同时保留 JSON 断言：标题、hostname、描述的子串大小写不敏感命中，category+q 叠加，无匹配返回 200 空数组。 |\n+| A07 | 用真实 `category-search-form` 提交 `category` 与 `q`，断言 200、表单的 category 与 q 值均保留、页面显示所选归类/查询/匹配行；用同一关键字分别在两个归类提交，断言各自只命中本归类记录；在某归类提交无匹配 q，断言显示明确空结果且无记录行；同时保留 JSON 断言：标题、hostname、描述的子串大小写不敏感命中，category+q 叠加，无匹配返回 200 空数组；仅存在 URL path、URL query 或分类名的唯一 token 经 JSON 与实际 HTML 搜索表单查询不得命中目标记录，以 id/行集合判断而非页面回显，保留允许字段的正向控制。 |\n | A08 | 经真实保存表单创建带 query 的原始 URL，解析 `tr[data-record-id]` 内 `a[data-testid=record-open-link]`，断言 href 精确等于保存值、`target=_blank`、`rel` 含 `noopener`，并以 `urljoin` 验证它是实际导航目标；再 `GET /go/{id}` 不跟随重定向，断言 302 Location 精确等于原始 URL；未知 id 404 `not_found`；读回记录 URL 未被改写。P0 不请求目标外链。 |\n | A09 | 经真实保存表单创建记录，用 `record-delete-form` 软删除并跟随 303，断言默认列表/计数排除、`/api/bookmarks?include_trashed=1` 仍存在、`/?trash=1` 显示 `record-restore-form`；用该表单恢复，断言 URL/标题/描述/归类回归且重新可见；再创建归类与记录、软删除记录后用 `category-delete-form` 删除归类，断言软删记录迁到未整理且仍可在回收站恢复，恢复后无孤儿；最后用 `--app-root`/`--data-dir` 启动隔离实例，真实删除后停止、同目录重启，断言删除状态与回收站内容保持，并可恢复。 |\n | A10 | JSON 路径保留未知 id 的 GET/PATCH/DELETE/move 均 404 `not_found`，三类畸形 JSON 均 400 `bad_request`，无 5xx、记录集合与锚点字段不变；HTML 路径用保存表单提交非法 URL，断言 400、`form-error`、url/title 输入保留、无新增记录，再用同一表单提交修正 URL 断言 303 且只新增一条；用归类表单提交非法 name，断言 `form-error` 且无写入。 |\n-| A11 | `/api/health` 返回 200 JSON；`GET /` 返回 200 text/html，含 `action=/bookmarks/new` 表单、`name=url`、`category-manager` 链接与列表容器；用不存在的归类过滤得到明确空状态。 |\n+| A11 | `/api/health` 返回 200 JSON；`GET /` 返回 200 text/html，含 `action=/bookmarks/new` 表单、`name=url`、`category-manager` 链接与列表容器；用不存在的归类过滤得到明确空状态（a11-base-*，仅当前部署入口）。另必须使用同一冻结 app_root 与 data_dir 创建 fresh=True 的新隔离实例，业务写入前证明 health、未过滤全库含软删除均为空、四预置分类合法唯一 ID/count=0、未过滤首页表单/URL/分类入口/列表/明确空态且无记录行（a11-fresh-*）；finally 关闭 client 并停止拥有的进程、确认退出，缺参数/启动失败/清理失败不得通过。这不证明 base_url 被清空或同容器重启。 |\n | A12 | 只处理书签保存/移动，不使用分类创建或重命名表单。HTML 保存 `category`（名称）显式空/纯空白/121 字符为 400 `invalid_category`，省略则默认未整理；HTML 移动 `category_id`（ID）省略/空/未知为 400 `invalid_category`；JSON 保存 `category`（名称）省略/null 默认未整理，显式空/纯空白/121 字符为 400 `invalid_category`；JSON move `category`（名称）省略/null/空/纯空白/121 字符为 400 `invalid_category`。有效新名称可自动创建；HTML 未知 ID 不得变为新名称；JSON 不新增 `category_id` 字段。每个负向 HTML 为 400/`form-error`/输入保留，JSON 为 400/`error.code=invalid_category`，分类集合/记录集合/锚点归属均不变；修正有效值可恢复。 |\n | A13 | 仅凭 URL 保存 201；hostname 由 URL 派生，title 允许缺失或字符串降级，favicon 缺失/内联/同源；首页可渲染记录且 HTML 资源引用不含外部 URL。 |\n | A14 | `GET /api/export` 返回 200 text/html，含 Netscape 书签头与两条已存 URL；在 data_dir 生成导入 HTML，POST `/api/import` 返回 imported=2/skipped=0，导入 URL 可检索。 |\n@@ -193,3 +193,5 @@\n - `port` 必须与 start 中显式端口 `8000` 一致。\n - `/state/app-data` 是交付进程自己的持久化目录；验收调用中的 `--data-dir` 是测试者草稿根，二者角色不同，不要混用。\n - `0.0.0.0` 仅用于隔离验收网络；日常本机运行可绑定 `127.0.0.1`，但交付示例保持上述字面值。该示例只描述交付合同，不代表应用已实现、已启动或已通过验收。\n+\n+A11 单独使用 common.launch_app(app_root, data_dir, 0, fresh=True)：每次新建 instances/<uuid>，不传旧 instance_dir、不删除已有数据；其首启证据属于 A11 自己，不借用 A01 receipt。实际 G1 必须绑定交付应用源码，准备 fixture 不能替代真实 P0。\n",
+  "acceptance/runner.json": "--- R6-attempt-1/acceptance/runner.json\n+++ R7/acceptance/runner.json\n@@ -33,7 +33,12 @@\n       \"args\": [\"--case\", \"{case_id}\", \"--base-url\", \"{base_url}\"]\n     },\n     \"A11\": {\n-      \"args\": [\"--case\", \"{case_id}\", \"--base-url\", \"{base_url}\"]\n+      \"args\": [\"--case\", \"{case_id}\", \"--base-url\", \"{base_url}\",\n+        \"--app-root\",\n+        \"{app_root}\",\n+        \"--data-dir\",\n+        \"{data_dir}\"\n+      ]\n     },\n     \"A12\": {\n       \"args\": [\"--case\", \"{case_id}\", \"--base-url\", \"{base_url}\"]\n"
+ },
+ "program_byte_change_count": 4,
+ "program_revision_manifest_digest": "c340078dc08e58f1170d23d5fcde4ebba3f9a4ef9a863142c95507e97b8ef969",
+ "authorization_material_digest": "6bab6cf15f0c238fa8a7b7bc5a192caf704ef84b33055ad95543db41edcf00ae"
+}

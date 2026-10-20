@@ -22,4 +22,4 @@
 
 新增回归包含：原input字节与leaf companion、无损差分和确定派生、精确只读ACL、同job唯一资格与幂等恢复、输入/模型/材料/时限篡改拒绝、普通路径绕过拒绝、失效lease、宿主源码变化、八维完整结果与实际原响应绑定、已知framing凭据、合法交付后宿主中断的无CLI续交、同overall passed但checks篡改拒绝、latest-attempt优先。
 
-旧phase/protocol/evidence及CLI可靠性回归均纳入719项后端检查。真实生产资格尚未登记；远端新提交CI待独立核对。
+旧phase/protocol/evidence及CLI可靠性回归均纳入719项后端检查。c509077精确提交远端CI已核completed/success，两项均通过。之后真实资格登记并启动一次，provider429阻塞，无语义审阅报告；详见DELIVERY.md。

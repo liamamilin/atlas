@@ -1,0 +1,262 @@
+{
+  "schema": "atlas.frozen-review-lineage-proof.v1",
+  "job_id": "job_b01427592b164863aab5bedf7b3863bb",
+  "model_call_attempt": 2,
+  "host_commit_attempt": 2,
+  "recovery_id": "frec_0f8f066dc0b2495b9ec117713ad1fd94",
+  "grant_id": "egrant_c06325f363b84bd9bb1c8fa46f93f945",
+  "grant_status": "consumed",
+  "reservation": {
+    "id": "bud_c06f643f77bb4ce9a7bad57f30f161e1",
+    "campaign_id": "atlas-v1-first-production-2026-10-19",
+    "identity": "product-c42848f63251507bd9d911a5",
+    "phase": "G1",
+    "kind": "review",
+    "status": "failed",
+    "created": 1792490676.306466,
+    "started": 1792490676.564536,
+    "finished": 1792490680.240822,
+    "job_id": "job_b01427592b164863aab5bedf7b3863bb",
+    "requested_model": "opencode-go/deepseek-v4.1-flash",
+    "requested_effort": null,
+    "stage": "cognitive-review:572da86649b4face",
+    "retry": 1,
+    "observed_model": null,
+    "observed_effort": null,
+    "outcome": "cli_failed",
+    "group_kind": "production",
+    "retry_scope": "cognitive-review",
+    "worker_token": "b4f1da99fda4472e9ba1ef4e75a9295b:26edeaf6f5e04c5297ee151420f340e7"
+  },
+  "new_acceptance_id": "acc_c0cbb5e84d6f475dade4875d8af60174",
+  "new_acceptance_outcome": "unavailable",
+  "old_acceptance_id": "acc_74476c79fca949a7a0bd4e4c043d31a6",
+  "operation": "cognitive-review:572da86649b4face",
+  "logical_scope": "cognitive-review",
+  "snapshot_digest": "db51b4ca834dd031135025d761b46407f02b2850ad993c950f55407a0f95fcf6",
+  "artifact_id": "tpl_f7ecff8d8fef4deba828aa2a8ef82918",
+  "artifact_digest": "ec3f2fc668c20d24b78c22f15eed40779ed38b835c10b7b452aaba725dbb7105",
+  "input_sha256": "394209fae774d75bcf1fa06c4eb091f26c727438836476cb86471c3adbc1d242",
+  "full_payload_digest": "b4061425b435f346cd6b5e19745185ad99bebee3b5a3b983759e28e56ff6b0fa",
+  "budget_input_digest": "572da86649b4faced76c4c2e4f4d91102be17ef6b2127ec1572a8d44c4c28d38",
+  "frozen_source_tree_digest": "c56d550a62c929f0429006c6252058f0e588067f2107a1afb0b2d8026dc4c636",
+  "leaf_sha256": "d3e620d0d1e3e2d47b8aa464b677afb013a4d113a1ad89afabe9c50ed1cabec6",
+  "new_prompt_sha256": "e944a32a1986c44ab71af7a1dfdbbf439335264b252387c9baae371876dae47f",
+  "old_prompt_sha256": "9cdd40b5ee69c3b14675fa60569b9f9fb948949dd7be493fe6ff7436a1c9ce09",
+  "materials_manifest_digest": "ad76380a71a55b277dabb663bb039c5df8e29ed738ffeb7f4b290ad75f5b5460",
+  "materials_tree_digest": "20abaed83c7348e1857e25b3c02bd9252d7d1f6a105fc8c1762df99e4118681a",
+  "cli_config_identity": {
+    "schema": "atlas.frozen-review-readonly-config.v1",
+    "default_permission": "deny",
+    "relative_read_resources": [
+      "input.json",
+      "leaf.md",
+      "source",
+      "source/**",
+      "review-materials",
+      "review-materials/INDEX.md",
+      "review-materials/manifest.json",
+      "review-materials/text",
+      "review-materials/text/0001.md",
+      "review-materials/text/0002.md",
+      "review-materials/text/0003.diff",
+      "review-materials/text/0004.diff",
+      "review-materials/text/0005.diff",
+      "review-materials/text/0006.diff",
+      "review-materials/text/0007.diff",
+      "review-materials/text/0008.diff",
+      "review-materials/text/0009.diff",
+      "review-materials/text/0010.txt",
+      "review-materials/text/0011.diff",
+      "review-materials/text/0012.diff",
+      "review-materials/text/0013.diff",
+      "review-materials/text/0014.diff",
+      "review-materials/text/0015.md",
+      "review-materials/text/0016.txt"
+    ],
+    "absolute_material_reads": [
+      "{attempt}/review-materials",
+      "{attempt}/review-materials/INDEX.md",
+      "{attempt}/review-materials/manifest.json",
+      "{attempt}/review-materials/text",
+      "{attempt}/review-materials/text/0001.md",
+      "{attempt}/review-materials/text/0002.md",
+      "{attempt}/review-materials/text/0003.diff",
+      "{attempt}/review-materials/text/0004.diff",
+      "{attempt}/review-materials/text/0005.diff",
+      "{attempt}/review-materials/text/0006.diff",
+      "{attempt}/review-materials/text/0007.diff",
+      "{attempt}/review-materials/text/0008.diff",
+      "{attempt}/review-materials/text/0009.diff",
+      "{attempt}/review-materials/text/0010.txt",
+      "{attempt}/review-materials/text/0011.diff",
+      "{attempt}/review-materials/text/0012.diff",
+      "{attempt}/review-materials/text/0013.diff",
+      "{attempt}/review-materials/text/0014.diff",
+      "{attempt}/review-materials/text/0015.md",
+      "{attempt}/review-materials/text/0016.txt"
+    ],
+    "agent": {
+      "name": "atlas-factory-{attempt_sha256_12}",
+      "mode": "primary",
+      "description": "Atlas read-only factory proposal agent"
+    },
+    "policies": [
+      {
+        "action": "tool.use",
+        "resource": "shell:*",
+        "effect": "deny"
+      },
+      {
+        "action": "tool.use",
+        "resource": "execute:*",
+        "effect": "deny"
+      },
+      {
+        "action": "plugin.use",
+        "resource": "*",
+        "effect": "deny"
+      },
+      {
+        "action": "mcp.use",
+        "resource": "*",
+        "effect": "deny"
+      },
+      {
+        "action": "skill.use",
+        "resource": "*",
+        "effect": "deny"
+      }
+    ],
+    "materials_manifest_digest": "5e0bc6f9ad0376f50b9e01bf2be0d4c655764f980f053cc5f8af814e69e21d6f",
+    "config_digest": "6867650df2ee780eb27ae62cf76a74afffb2130d6e4179bd01e835addea96d18"
+  },
+  "original_timeout": 600,
+  "authorized_timeout": 1800,
+  "effective_timeout": 1799.7918245829642,
+  "start_remaining_seconds": 4636.290885925293,
+  "start_slack_at_least_2700": true,
+  "result_present": false,
+  "report_present": false,
+  "host_only_eligible": false,
+  "host_only_reason": "reservation failed and no result/report; only a valid delivered result qualifies",
+  "requested_model": "opencode-go/deepseek-v4.1-flash",
+  "observed_model": null,
+  "nine_program_hashes": {
+    "acceptance/common.py": "7f0d7d28d8336bdde3da267795e24d13e430f05e53063ee01ed5611236325d37",
+    "acceptance/p0_library.py": "5923bdd1d15e7d98bcf2c3b91123b36d986c0c69cbc6a1a7fdab80ce4c437d6e",
+    "acceptance/p0_organize.py": "93ae82c74946811fac3b1dd213cc077cf89acc6ecfb45e64ec2830e3482b7f60",
+    "acceptance/p0_find_open.py": "342e38d2298cf48e22fb97d76e080ce4a67c3c10a942502c5ef205954878d667",
+    "acceptance/p0_recovery.py": "372c75aa2944a10cc5146859dc0bacd0e03111defe7c8aa75ece2d28ec45aff3",
+    "acceptance/p1_maturity.py": "d44e17c87314db18084b3b88bd2c700a75bfe583d108e9b518040fb8378601a3",
+    "acceptance/requirements.txt": "f1fc18b605a1eea93892d319d09122d91033a48dfd4b913f8f262a4dc8633deb",
+    "acceptance/README.md": "9e73ee6233e5b991a9682bb0bcaa235783bd4c7a6d399d5be38c100face9db6e",
+    "acceptance/runner.json": "3e71774a5bb0fb2b29cbb334983127264d5f377cc9e3a680b12f11da9268e201"
+  },
+  "all_nine_unchanged": true,
+  "historical_ledger_preserved": true,
+  "checkpoint_set_preserved": true,
+  "checkpoint_count": 0,
+  "nonexistent_reference_repair_call_count": 0,
+  "cli_attempt_directory_count": 2,
+  "template_author_calls_this_round": 0,
+  "source_authorization": {
+    "source_ref": "docs/template-factory/g1-frozen-review-recovery-2026-10-20/authorization/ATLAS_G1_FROZEN_REVIEW_RECOVERY_CODEX_INSTRUCTIONS.txt",
+    "source_digest": "65976f3c72613dfc7208d86cea7ce4c9ec0688ef04c881efba8abacf7f642101"
+  },
+  "checked_source_gate": {
+    "source_commit": "c5090772b364d9c3f75ce837f70cd2578d414a75",
+    "source_tree_digest": "6d4ecacc74fbf419d175249ff949096b985144c75d31639a7484b71364dcfdb1",
+    "ci_evidence": [
+      {
+        "path": "docs/template-factory/g1-frozen-review-recovery-2026-10-20/ci-source.json",
+        "sha256": "8e47295b4ecb2f10d644d3e42d0cb4772094741a55d9e02ecc0976fee159f251",
+        "run_id": 39404477135,
+        "head_sha": "c5090772b364d9c3f75ce837f70cd2578d414a75",
+        "required_checks": [
+          "check",
+          "docker-integration"
+        ]
+      }
+    ]
+  },
+  "proposal_digest": "9b9cee840ee335a9fe5ab4b37adbdbc86a014a45d048cab437a476b1ce9b0a45",
+  "case_basis_digest": "a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589",
+  "source_inventory_count": 27,
+  "review_rules_version": "atlas.current-required-contract.v1",
+  "old_protocol_grant": [
+    {
+      "id": "pgrant_f3595368c14d4b23b6ab536f6d198007",
+      "job_id": "job_7742b1c124be4c9ab3a0096da5cdd772",
+      "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+      "product_id": "product-c42848f63251507bd9d911a5",
+      "idempotency_key": "atlas-g1-phase-protocol-once-2026-10-19-v1",
+      "request_digest": "61b9d6dc393e0a5ffb82de9eb58a123cd68d550813be02f7eadb0072a866d260",
+      "status": "consumed",
+      "consumed_reservation_id": "bud_9a81a7a4adc14f49b46239ec68ee2fdb",
+      "created_at": 1792432170.1529229
+    }
+  ],
+  "old_phase_evidence_grant": [
+    {
+      "id": "egrant_dd03245306034022bbc046e3b9428955",
+      "job_id": "job_3a658ba085e8417ea6faad5cb0cdd493",
+      "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+      "product_id": "product-c42848f63251507bd9d911a5",
+      "request_key": "atlas-g1-r7-evidence-recovery-2026-10-20-once",
+      "proposal_digest": "1f4ab61f12ee07ae9eeb3bc7116f5858b491cd60fd567831409a347f7d1a686d",
+      "status": "consumed",
+      "queued_job_id": "job_3a658ba085e8417ea6faad5cb0cdd493",
+      "consumed_reservation_id": "bud_9ad8e95b29224f249f9d48a654d22b9f",
+      "call_attempt": 2,
+      "created_at": 1792483738.414801
+    }
+  ],
+  "historical_cognitive_review_retry_rows": [
+    {
+      "id": "bud_0e5ba3eec4fc407e9908ace311a0f745",
+      "campaign_id": "atlas-v1-first-production-2026-10-19",
+      "identity": "product-c42848f63251507bd9d911a5",
+      "phase": "G1",
+      "kind": "review",
+      "status": "failed",
+      "created": 1792395577.8500428,
+      "started": 1792395578.083055,
+      "finished": 1792395746.169887,
+      "job_id": "job_8c13691fd4ac4591a83308c02cd4e267",
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "requested_effort": null,
+      "stage": "cognitive-review:85f6308386aca162",
+      "retry": 1,
+      "observed_model": null,
+      "observed_effort": null,
+      "outcome": "cli_failed",
+      "group_kind": "production",
+      "retry_scope": null,
+      "worker_token": null
+    },
+    {
+      "id": "bud_bc07c48bd2494a93a5183e31d3ca7d1d",
+      "campaign_id": "atlas-v1-first-production-2026-10-19",
+      "identity": "product-c42848f63251507bd9d911a5",
+      "phase": "G1",
+      "kind": "review",
+      "status": "completed",
+      "created": 1792395770.859334,
+      "started": 1792395770.9693272,
+      "finished": 1792396029.111187,
+      "job_id": "job_8c13691fd4ac4591a83308c02cd4e267",
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "requested_effort": null,
+      "stage": "cognitive-review:85f6308386aca162",
+      "retry": 2,
+      "observed_model": null,
+      "observed_effort": null,
+      "outcome": null,
+      "group_kind": "production",
+      "retry_scope": null,
+      "worker_token": null
+    }
+  ],
+  "historical_cognitive_review_retries_used": 2
+}

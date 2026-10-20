@@ -1,0 +1,2914 @@
+--- baseline/acceptance/p0_organize.py
++++ candidate/acceptance/p0_organize.py
+@@ -10,9 +10,11 @@
+ from __future__ import annotations
+ 
+ import os
++import re
+ import sys
+ import uuid
+-from urllib.parse import quote
++from html.parser import HTMLParser
++from urllib.parse import parse_qsl, quote, urlsplit
+ 
+ _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+ if _THIS_DIR not in sys.path:
+@@ -21,6 +23,416 @@
+ import common
+ 
+ _SUCCESS_STATUSES = (200, 204)
++_NUMBER_RE = re.compile('[0-9]+')
++_VOID_TAGS = frozenset({
++    'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
++    'link', 'meta', 'param', 'source', 'track', 'wbr',
++})
++_OMIT = object()
++
++
++def _normalize_space(value):
++    return ' '.join(str(value or '').split())
++
++
++class _Field:
++    def __init__(self, attrs):
++        self.attrs = attrs
++        self.name = attrs.get('name')
++        self.value = attrs.get('value', '')
++        self.type = (attrs.get('type') or 'text').lower()
++        self.checked = 'checked' in attrs
++
++
++class _Option:
++    def __init__(self, attrs):
++        self.attrs = attrs
++        self.value = attrs.get('value')
++        self.text = ''
++        self.selected = 'selected' in attrs
++
++    def resolved_value(self):
++        if self.value is not None:
++            return self.value
++        return self.text.strip()
++
++
++class _Select:
++    def __init__(self, attrs):
++        self.attrs = attrs
++        self.name = attrs.get('name')
++        self.options = []
++
++    def selected_value(self):
++        for option in self.options:
++            if option.selected:
++                return option.resolved_value()
++        if self.options:
++            return self.options[0].resolved_value()
++        return ''
++
++
++class _Textarea:
++    def __init__(self, attrs):
++        self.attrs = attrs
++        self.name = attrs.get('name')
++        self.text = ''
++
++
++class _Form:
++    def __init__(self, attrs):
++        self.attrs = attrs
++        self.action = (attrs.get('action') or '').strip()
++        self.method = (attrs.get('method') or 'get').strip().lower()
++        self.testid = attrs.get('data-testid') or ''
++        self.fields = []
++        self.selects = []
++        self.textareas = []
++
++    def has_name(self, name):
++        if any(field.name == name for field in self.fields):
++            return True
++        if any(select.name == name for select in self.selects):
++            return True
++        return any(textarea.name == name for textarea in self.textareas)
++
++    def value(self, name):
++        for field in reversed(self.fields):
++            if field.name == name:
++                return field.value
++        for select in reversed(self.selects):
++            if select.name == name:
++                return select.selected_value()
++        for textarea in reversed(self.textareas):
++            if textarea.name == name:
++                return textarea.text
++        return None
++
++
++class _Anchor:
++    def __init__(self, attrs):
++        self.attrs = attrs
++        self.href = attrs.get('href') or ''
++        self.testid = attrs.get('data-testid') or ''
++        self.text = ''
++
++
++class _Row:
++    def __init__(self, attrs):
++        self.attrs = attrs
++        self.record_id = attrs.get('data-record-id') or ''
++        self.anchors = []
++        self.text = ''
++
++
++def _action_path(action):
++    text = (action or '').strip()
++    if not text:
++        return ''
++    try:
++        path = urlsplit(text).path
++    except ValueError:
++        return text
++    if not path:
++        return ''
++    if not path.startswith('/'):
++        path = '/' + path
++    return path.rstrip('/') or '/'
++
++
++def _path_of(href):
++    try:
++        path = urlsplit(href).path
++    except ValueError:
++        return ''
++    if not path:
++        return ''
++    if not path.startswith('/'):
++        path = '/' + path
++    return path.rstrip('/') or '/'
++
++
++def _form_path(form, default):
++    action = (form.action or '').strip()
++    return action if action else default
++
++
++class _Document:
++    def __init__(self):
++        self.forms = []
++        self.anchors = []
++        self.rows = []
++        self.testids = []
++        self.start_tags = []
++        self.text = ''
++
++    def save_form(self):
++        for form in self.forms:
++            if form.method == 'post' and _action_path(form.action) == '/bookmarks/new':
++                return form
++        for form in self.forms:
++            if form.method == 'post' and form.has_name('url'):
++                return form
++        return None
++
++
++class _HtmlReader(HTMLParser):
++    def __init__(self):
++        super().__init__(convert_charrefs=True)
++        self.doc = _Document()
++        self._form = None
++        self._select = None
++        self._option = None
++        self._textarea = None
++        self._anchor = None
++        self._row = None
++        self._testid_stack = []
++
++    def handle_starttag(self, tag, attrs):
++        tag = tag.lower()
++        attributes = {
++            str(key).lower(): ('' if value is None else value)
++            for key, value in attrs
++        }
++        self.doc.start_tags.append((tag, attributes))
++        testid = attributes.get('data-testid') or ''
++        if testid:
++            entry = {'tag': tag, 'attrs': attributes, 'text': ''}
++            self.doc.testids.append(entry)
++            if tag not in _VOID_TAGS:
++                self._testid_stack.append((tag, entry))
++        if tag == 'form':
++            self._finish_form()
++            self._form = _Form(attributes)
++        elif tag == 'input':
++            if self._form is not None:
++                self._form.fields.append(_Field(attributes))
++        elif tag == 'select':
++            self._finish_select()
++            if self._form is not None:
++                self._select = _Select(attributes)
++        elif tag == 'option':
++            self._finish_option()
++            if self._select is not None:
++                self._option = _Option(attributes)
++        elif tag == 'textarea':
++            self._finish_textarea()
++            if self._form is not None:
++                self._textarea = _Textarea(attributes)
++        elif tag == 'a':
++            self._finish_anchor()
++            self._anchor = _Anchor(attributes)
++        elif tag == 'tr' and testid == 'record-row':
++            self._finish_row()
++            self._row = _Row(attributes)
++
++    def handle_data(self, data):
++        if not data:
++            return
++        self.doc.text += data
++        if self._row is not None:
++            self._row.text += data
++        if self._anchor is not None:
++            self._anchor.text += data
++        if self._option is not None:
++            self._option.text += data
++        if self._textarea is not None:
++            self._textarea.text += data
++        for _, entry in self._testid_stack:
++            entry['text'] += data
++
++    def handle_endtag(self, tag):
++        tag = tag.lower()
++        if tag == 'a':
++            self._finish_anchor()
++        elif tag == 'option':
++            self._finish_option()
++        elif tag == 'select':
++            self._finish_select()
++        elif tag == 'textarea':
++            self._finish_textarea()
++        elif tag == 'form':
++            self._finish_form()
++        elif tag == 'tr':
++            self._finish_row()
++        if tag in _VOID_TAGS:
++            return
++        if self._testid_stack and self._testid_stack[-1][0] == tag:
++            self._testid_stack.pop()
++
++    def _finish_option(self):
++        if self._option is None:
++            return
++        option = self._option
++        self._option = None
++        if self._select is not None:
++            self._select.options.append(option)
++
++    def _finish_select(self):
++        self._finish_option()
++        if self._select is None:
++            return
++        select = self._select
++        self._select = None
++        if self._form is not None:
++            self._form.selects.append(select)
++
++    def _finish_textarea(self):
++        if self._textarea is None:
++            return
++        textarea = self._textarea
++        self._textarea = None
++        if self._form is not None:
++            self._form.textareas.append(textarea)
++
++    def _finish_anchor(self):
++        if self._anchor is None:
++            return
++        anchor = self._anchor
++        self._anchor = None
++        self.doc.anchors.append(anchor)
++        if self._row is not None:
++            self._row.anchors.append(anchor)
++
++    def _finish_row(self):
++        if self._row is None:
++            return
++        row = self._row
++        self._row = None
++        self.doc.rows.append(row)
++
++    def _finish_form(self):
++        self._finish_select()
++        self._finish_textarea()
++        if self._form is None:
++            return
++        form = self._form
++        self._form = None
++        self.doc.forms.append(form)
++
++    def finalize(self):
++        self._finish_anchor()
++        self._finish_row()
++        self._finish_form()
++
++
++def _parse_html(text):
++    reader = _HtmlReader()
++    reader.feed(text or '')
++    reader.close()
++    reader.finalize()
++    return reader.doc
++
++
++def _form_fields(form, overrides=None, omit=()):
++    fields = {}
++    for field in form.fields:
++        name = field.name
++        if not name:
++            continue
++        if field.type in ('submit', 'button', 'reset', 'file', 'image'):
++            continue
++        if field.type in ('checkbox', 'radio') and not field.checked:
++            continue
++        fields[name] = field.value
++    for select in form.selects:
++        if select.name:
++            fields[select.name] = select.selected_value()
++    for textarea in form.textareas:
++        if textarea.name:
++            fields[textarea.name] = textarea.text
++    if overrides:
++        for key, value in overrides.items():
++            name = str(key)
++            if value is None:
++                fields.pop(name, None)
++            else:
++                fields[name] = str(value)
++    for name in omit:
++        fields.pop(name, None)
++    return fields
++
++
++def _first_form(doc, testid):
++    for form in doc.forms:
++        if form.testid == testid:
++            return form
++    return None
++
++
++def _form_for_category(doc, testid, category_id):
++    forms = [
++        form for form in doc.forms
++        if form.testid == testid and form.has_name('category_id')
++    ]
++    for form in forms:
++        if form.value('category_id') == category_id:
++            return form
++    if len(forms) == 1:
++        return forms[0]
++    return None
++
++
++def _find_record_form(doc, testid, record_id):
++    for form in doc.forms:
++        if form.testid == testid and form.value('record_id') == record_id:
++            return form
++    return None
++
++
++def _find_anchor(doc, testid):
++    for anchor in doc.anchors:
++        if anchor.testid == testid:
++            return anchor
++    return None
++
++
++def _form_error_text(doc):
++    parts = []
++    for entry in doc.testids:
++        testid = (entry['attrs'].get('data-testid') or '').lower()
++        if testid == 'form-error' or 'form-error' in testid:
++            text = _normalize_space(entry['text'])
++            if text:
++                parts.append(text)
++    return ' '.join(parts)
++
++
++def _category_count_values(doc):
++    result = {}
++    for entry in doc.testids:
++        if entry['attrs'].get('data-testid') != 'category-count':
++            continue
++        category_id = entry['attrs'].get('data-category-id')
++        if not category_id:
++            continue
++        numbers = _NUMBER_RE.findall(entry['text'])
++        value = int(numbers[-1]) if numbers else None
++        result.setdefault(category_id, []).append(value)
++    return result
++
++
++def _row_ids(doc):
++    return {row.record_id for row in doc.rows if row.record_id}
++
++
++def _row_for_url(doc, url):
++    for row in doc.rows:
++        for anchor in row.anchors:
++            if anchor.testid == 'record-open-link' and anchor.href == url:
++                return row
++    for row in doc.rows:
++        for anchor in row.anchors:
++            if anchor.href == url:
++                return row
++    return None
++
++
++def _select_values(form, name):
++    for select in form.selects:
++        if select.name == name:
++            return [option.resolved_value() for option in select.options]
++    return []
+ 
+ 
+ def _unique_url(tag):
+@@ -41,7 +453,7 @@
+ 
+ def _extract_record(payload):
+     if isinstance(payload, dict):
+-        for key in ('category', 'bookmark', 'record', 'data', 'item'):
++        for key in ('bookmark', 'record', 'data', 'item'):
+             value = payload.get(key)
+             if isinstance(value, dict):
+                 return value
+@@ -49,21 +461,120 @@
+     return None
+ 
+ 
++def _extract_category(payload):
++    if isinstance(payload, dict):
++        value = payload.get('category')
++        if isinstance(value, dict):
++            return value
++        return payload
++    return None
++
++
++def _extract_list(payload, keys):
++    if isinstance(payload, list):
++        return payload
++    if isinstance(payload, dict):
++        for key in keys:
++            value = payload.get(key)
++            if isinstance(value, list):
++                return value
++    return None
++
++
+ def _record_id(record):
+     if isinstance(record, dict) and record.get('id') is not None:
+         return str(record['id'])
+     return None
+ 
+ 
+-def _record_category_name(record):
++def _record_url(record):
++    if isinstance(record, dict) and record.get('url') is not None:
++        return str(record['url'])
++    return None
++
++
++def _record_title(record):
++    if isinstance(record, dict) and record.get('title') is not None:
++        return str(record['title'])
++    return None
++
++
++def _record_description(record):
+     if isinstance(record, dict):
+-        for key in ('category', 'category_name'):
+-            value = record.get(key)
+-            if isinstance(value, str) and value:
++        for key in ('description', 'desc'):
++            if record.get(key) is not None:
++                return str(record[key])
++    return None
++
++
++def _record_category_name(record, categories):
++    if not isinstance(record, dict):
++        return None
++    by_id = {}
++    names = set()
++    for item in categories or []:
++        if isinstance(item, dict) and item.get('id') is not None:
++            if item.get('name') is not None:
++                by_id[str(item['id'])] = str(item['name'])
++                names.add(str(item['name']))
++    for key in ('category', 'category_name', 'categoryName'):
++        value = record.get(key)
++        if isinstance(value, str):
++            if value in names:
+                 return value
+-            if isinstance(value, dict) and value.get('name'):
+-                return str(value['name'])
++            if value in by_id:
++                return by_id[value]
++            return value
++        if isinstance(value, dict) and value.get('name') is not None:
++            return str(value['name'])
++    for key in ('category_id', 'categoryId'):
++        value = record.get(key)
++        if value is not None and str(value) in by_id:
++            return by_id[str(value)]
+     return None
++
++
++def _category_names(categories):
++    return {
++        str(item['name']) for item in categories
++        if isinstance(item, dict) and item.get('name') is not None
++    }
++
++
++def _category_ids(categories):
++    return {
++        str(item['id']) for item in categories
++        if isinstance(item, dict) and item.get('id') is not None
++    }
++
++
++def _find_category_by_name(categories, name):
++    if name is None:
++        return None
++    target = str(name).casefold()
++    for item in categories:
++        if isinstance(item, dict) and item.get('name') is not None:
++            if str(item['name']).casefold() == target:
++                return item
++    return None
++
++
++def _find_category_by_id(categories, category_id):
++    if category_id is None:
++        return None
++    target = str(category_id)
++    for item in categories:
++        if isinstance(item, dict) and item.get('id') is not None:
++            if str(item['id']) == target:
++                return item
++    return None
++
++
++def _default_category(categories):
++    for item in categories:
++        if isinstance(item, dict) and item.get('is_default'):
++            return item
++    return _find_category_by_name(categories, common.DEFAULT_CATEGORY)
+ 
+ 
+ def _error_code(response):
+@@ -78,17 +589,6 @@
+     return None
+ 
+ 
+-def _extract_list(payload, keys):
+-    if isinstance(payload, list):
+-        return payload
+-    if isinstance(payload, dict):
+-        for key in keys:
+-            value = payload.get(key)
+-            if isinstance(value, list):
+-                return value
+-    return None
+-
+-
+ def _bookmark_path(bookmark_id):
+     return '/api/bookmarks/' + quote(str(bookmark_id), safe='')
+ 
+@@ -101,13 +601,20 @@
+     return '/api/categories/' + quote(str(category_id), safe='')
+ 
+ 
++def _record_ids(records):
++    return {
++        record_id for record_id in (_record_id(record) for record in records)
++        if record_id
++    }
++
++
+ def _fetch_bookmarks(client, recorder, aid, params=None):
+     response = client.get('/api/bookmarks', params=params)
+-    recorder.expect_status(response, 200, aid=f'{aid}-list-status')
++    recorder.expect_status(response, 200, aid=f'{aid}-status')
+     payload = _safe_json(response)
+     records = _extract_list(payload, ('bookmarks', 'items', 'data', 'records'))
+     recorder.check(
+-        f'{aid}-list-shape',
++        f'{aid}-shape',
+         isinstance(records, list),
+         f'GET /api/bookmarks 必须返回 JSON 数组，实际 {type(payload).__name__}',
+     )
+@@ -116,66 +623,224 @@
+ 
+ def _fetch_categories(client, recorder, aid):
+     response = client.get('/api/categories')
+-    recorder.expect_status(response, 200, aid=f'{aid}-categories-status')
++    recorder.expect_status(response, 200, aid=f'{aid}-status')
+     payload = _safe_json(response)
+     categories = _extract_list(payload, ('categories', 'items', 'data'))
+     recorder.check(
+-        f'{aid}-categories-shape',
++        f'{aid}-shape',
+         isinstance(categories, list),
+         f'GET /api/categories 必须返回 JSON 数组，实际 {type(payload).__name__}',
+     )
+     return categories if isinstance(categories, list) else []
+ 
+ 
+-def _category_names(categories):
+-    names = set()
+-    for item in categories:
+-        if isinstance(item, dict) and item.get('name') is not None:
+-            names.add(str(item['name']))
+-    return names
+-
+-
+-def _category_ids(categories):
+-    ids = set()
+-    for item in categories:
+-        item_id = _record_id(item)
+-        if item_id:
+-            ids.add(item_id)
+-    return ids
+-
+-
+-def _find_category(categories, name):
+-    target = str(name).casefold()
+-    for item in categories:
+-        if isinstance(item, dict) and item.get('name') is not None:
+-            if str(item['name']).casefold() == target:
+-                return item
+-    return None
+-
+-
+-def _default_category(categories):
+-    for item in categories:
+-        if isinstance(item, dict) and item.get('is_default'):
+-            return item
+-    return _find_category(categories, common.DEFAULT_CATEGORY)
+-
+-
+-def _record_ids(records):
+-    return {item_id for item_id in (_record_id(record) for record in records) if item_id}
+-
+-
+-def _create_record(client, recorder, aid, category=None, title=None):
++def _create_category_json(client, recorder, aid, name):
++    response = client.post_json('/api/categories', {'name': name})
++    recorder.expect_status(response, 201, aid=f'{aid}-status')
++    category_id = _record_id(_extract_category(_safe_json(response)))
++    recorder.check(
++        f'{aid}-id',
++        bool(category_id),
++        f'POST /api/categories name={name!r} 返回 id={category_id!r}',
++    )
++    return category_id
++
++
++def _create_record_json(client, recorder, aid, category=None, title=None, description=None):
+     url = _unique_url(aid)
+     payload = {'url': url}
+     if category is not None:
+         payload['category'] = category
+     if title is not None:
+         payload['title'] = title
++    if description is not None:
++        payload['description'] = description
+     response = client.post_json('/api/bookmarks', payload)
+-    recorder.expect_status(response, 201, aid=f'{aid}-save-status')
++    recorder.expect_status(response, 201, aid=f'{aid}-status')
+     record_id = _record_id(_extract_record(_safe_json(response)))
+-    recorder.check(f'{aid}-save-id', bool(record_id), f'保存 {url} 返回 id={record_id!r}')
+-    return record_id
++    recorder.check(
++        f'{aid}-id',
++        bool(record_id),
++        f'POST /api/bookmarks url={url!r} 返回 id={record_id!r}',
++    )
++    return record_id, url
++
++
++def _get_record_json(client, recorder, aid, record_id):
++    response = client.get(_bookmark_path(record_id))
++    recorder.expect_status(response, 200, aid=f'{aid}-status')
++    payload = _safe_json(response)
++    record = _extract_record(payload)
++    recorder.check(
++        f'{aid}-shape',
++        isinstance(record, dict),
++        f'GET /api/bookmarks/{record_id} 返回 JSON 对象，实际 {type(payload).__name__}',
++    )
++    return record if isinstance(record, dict) else None
++
++
++def _category_signature(categories):
++    items = []
++    for item in categories:
++        if not isinstance(item, dict):
++            continue
++        items.append((
++            str(item.get('id')),
++            str(item.get('name')),
++            bool(item.get('is_default')),
++            item.get('count'),
++        ))
++    return tuple(sorted(items, key=lambda entry: (entry[0], entry[1])))
++
++
++def _record_map(records, categories):
++    result = {}
++    for record in records:
++        record_id = _record_id(record)
++        if record_id:
++            result[record_id] = _record_category_name(record, categories)
++    return result
++
++
++def _snapshot(client, recorder, aid):
++    categories = _fetch_categories(client, recorder, f'{aid}-categories')
++    records = _fetch_bookmarks(
++        client, recorder, f'{aid}-records', params={'include_trashed': 1}
++    )
++    return (_category_signature(categories), _record_map(records, categories))
++
++
++def _check_unchanged(recorder, aid, before, after, label):
++    recorder.check(
++        f'{aid}-categories-unchanged',
++        before[0] == after[0],
++        f'{label} 后分类集合（含计数）不变：{len(before[0])} -> {len(after[0])}',
++    )
++    recorder.check(
++        f'{aid}-records-unchanged',
++        before[1] == after[1],
++        f'{label} 后记录集合与归类归属不变：{len(before[1])} -> {len(after[1])}',
++    )
++
++
++def _follow_303(client, recorder, response, aid, expected_path=None, expected_query=None):
++    recorder.expect_status(response, 303, aid=f'{aid}-status')
++    location = response.location
++    if not recorder.check(
++        f'{aid}-location',
++        bool(location),
++        f'303 响应必须带 Location，实际 {location!r}',
++    ):
++        return None, None
++    parts = urlsplit(location)
++    if expected_path is not None:
++        actual_path = parts.path.rstrip('/') or '/'
++        wanted_path = expected_path.rstrip('/') or '/'
++        recorder.check(
++            f'{aid}-path',
++            actual_path == wanted_path,
++            f'303 Location={location!r} 的路径={actual_path!r}（期望 {wanted_path!r}）',
++        )
++    if expected_query:
++        actual_query = dict(parse_qsl(parts.query, keep_blank_values=True))
++        for key, value in expected_query.items():
++            actual_value = actual_query.get(key)
++            recorder.check(
++                f'{aid}-query-{key}',
++                actual_value == value,
++                f'303 Location={location!r} 的 {key}={actual_value!r}（期望 {value!r}）',
++            )
++    page = client.get(location, accept='text/html')
++    recorder.expect_status(page, 200, aid=f'{aid}-follow-status')
++    return page, location
++
++
++def _home_page(client, recorder, aid, params=None):
++    response = client.get('/', params=params, accept='text/html')
++    recorder.expect_status(response, 200, aid=f'{aid}-status')
++    recorder.check(
++        f'{aid}-content-type',
++        'text/html' in response.content_type.lower(),
++        f'GET / Content-Type={response.content_type!r}',
++    )
++    return _parse_html(response.text)
++
++
++def _categories_page(client, recorder, aid):
++    response = client.get('/categories', accept='text/html')
++    recorder.expect_status(response, 200, aid=f'{aid}-status')
++    recorder.check(
++        f'{aid}-content-type',
++        'text/html' in response.content_type.lower(),
++        f'GET /categories Content-Type={response.content_type!r}',
++    )
++    return _parse_html(response.text)
++
++
++def _expect_html_error(recorder, response, aid, label, expected_status):
++    recorder.check(
++        f'{aid}-no-5xx',
++        response.status < 500,
++        f'{label} -> HTTP {response.status}（校验类错误不得产生 5xx）',
++    )
++    recorder.expect_status(
++        response,
++        expected_status,
++        aid=f'{aid}-status',
++        detail=f'{label} -> HTTP {response.status}（期望 {expected_status}）',
++    )
++    doc = _parse_html(response.text)
++    error_text = _form_error_text(doc)
++    recorder.check(
++        f'{aid}-form-error',
++        bool(error_text),
++        f'{label} 显示可读 form-error，实际 {error_text!r}',
++    )
++    return doc
++
++
++def _run_html_move_negative(client, recorder, aid, move_form, move_action, anchor_id, label, value, default_category):
++    before = _snapshot(client, recorder, f'{aid}-before')
++    if value is _OMIT:
++        fields = _form_fields(move_form, omit=('category_id',))
++    else:
++        fields = _form_fields(move_form, {'category_id': value})
++    response = client.post_form(
++        move_action, fields, follow_redirects=False, accept='text/html'
++    )
++    error_doc = _expect_html_error(recorder, response, aid, f'HTML move {label}', 400)
++    error_form = _find_record_form(error_doc, 'record-move-form', anchor_id)
++    recorder.check(
++        f'{aid}-form',
++        error_form is not None,
++        f'HTML move {label} 错误页保留目标记录 move 表单',
++    )
++    if error_form is not None:
++        retained_record = error_form.value('record_id')
++        recorder.check(
++            f'{aid}-record-retained',
++            retained_record == anchor_id,
++            f'HTML move {label} 错误页 record_id={retained_record!r}（期望 {anchor_id!r}）',
++        )
++        if value is not _OMIT:
++            retained_category = error_form.value('category_id')
++            recorder.check(
++                f'{aid}-category-retained',
++                retained_category == value,
++                f'HTML move {label} 错误页 category_id={retained_category!r}（期望 {value!r}）',
++            )
++    after = _snapshot(client, recorder, f'{aid}-after')
++    _check_unchanged(recorder, aid, before, after, f'HTML move {label}')
++    categories = _fetch_categories(client, recorder, f'{aid}-categories')
++    record = _get_record_json(client, recorder, f'{aid}-anchor', anchor_id)
++    if record is not None:
++        actual = _record_category_name(record, categories)
++        recorder.check(
++            f'{aid}-anchor-category',
++            actual == default_category,
++            f'HTML move {label} 后锚点 category={actual!r}（期望 {default_category!r}）',
++        )
++    return record
+ 
+ 
+ def _case_a04(args, recorder):
+@@ -183,116 +848,791 @@
+     try:
+         health = client.get('/api/health')
+         recorder.expect_status(health, 200, aid='a04-health-status')
+-
+-        name = _unique_category('a04')
+-        created = client.post_json('/api/categories', {'name': name})
+-        recorder.expect_status(created, 201, aid='a04-create-status')
+-        category_id = _record_id(_extract_record(_safe_json(created)))
+-        recorder.check('a04-create-id', bool(category_id), f'POST /api/categories 返回 id={category_id!r}')
+-
+-        listed = _fetch_categories(client, recorder, 'a04-listed')
+-        recorder.check(
+-            'a04-created-visible',
+-            name in _category_names(listed),
+-            f'GET /api/categories 含新建归类 {name!r}',
+-        )
+-
+-        duplicate = client.post_json('/api/categories', {'name': name})
+-        recorder.expect_status(duplicate, 409, aid='a04-duplicate-status')
+-        recorder.check(
+-            'a04-duplicate-code',
+-            _error_code(duplicate) == 'duplicate_category',
+-            f'同名再建错误码={_error_code(duplicate)!r}（期望 duplicate_category）',
+-        )
+-
+-        variant = client.post_json('/api/categories', {'name': str(name).upper()})
+-        recorder.expect_status(variant, 409, aid='a04-duplicate-case-status')
+-        recorder.check(
+-            'a04-duplicate-case-code',
+-            _error_code(variant) == 'duplicate_category',
+-            f'大小写变体再建错误码={_error_code(variant)!r}（期望 duplicate_category）',
+-        )
+-
+-        if not category_id:
+-            return
+-
+-        record_id = _create_record(client, recorder, 'a04', category=name)
+-        if record_id:
+-            in_new = _fetch_bookmarks(client, recorder, 'a04-in-new', params={'category': name})
+-            recorder.check(
+-                'a04-record-in-new-category',
+-                record_id in _record_ids(in_new),
+-                f'记录 {record_id!r} 可在归类 {name!r} 中查到',
+-            )
+-
+-        renamed_name = _unique_category('a04renamed')
+-        renamed = client.patch_json(_category_path(category_id), {'name': renamed_name})
+-        recorder.expect_status(renamed, _SUCCESS_STATUSES, aid='a04-rename-status')
+-        after_rename = _fetch_categories(client, recorder, 'a04-after-rename')
+-        names_after = _category_names(after_rename)
+-        recorder.check(
+-            'a04-rename-applied',
+-            renamed_name in names_after,
+-            f'重命名后新名 {renamed_name!r} 可见：{sorted(names_after)}',
+-        )
+-        recorder.check('a04-rename-old-absent', name not in names_after, f'重命名后旧名 {name!r} 不再出现')
+-        if record_id:
+-            by_renamed = _fetch_bookmarks(client, recorder, 'a04-by-renamed', params={'category': renamed_name})
+-            recorder.check(
+-                'a04-record-follows-rename',
+-                record_id in _record_ids(by_renamed),
+-                f'重命名后记录 {record_id!r} 仍属于该归类',
+-            )
+-            stale = _fetch_bookmarks(client, recorder, 'a04-stale-name', params={'category': name})
+-            recorder.check(
+-                'a04-unknown-category-empty',
+-                record_id not in _record_ids(stale),
+-                f'旧归类名 {name!r} 过滤不再返回该记录',
+-            )
+-
+-        deleted = client.request('DELETE', _category_path(category_id))
+-        recorder.expect_status(deleted, _SUCCESS_STATUSES, aid='a04-delete-status')
+-        after_delete = _fetch_categories(client, recorder, 'a04-after-delete')
+-        remaining = _category_names(after_delete)
+-        recorder.check(
+-            'a04-delete-applied',
+-            renamed_name not in remaining,
+-            f'删除后 {renamed_name!r} 不再出现：{sorted(remaining)}',
+-        )
+-        if record_id:
+-            inbox = _fetch_bookmarks(client, recorder, 'a04-inbox', params={'category': common.DEFAULT_CATEGORY})
+-            recorder.check(
+-                'a04-record-back-to-default',
+-                record_id in _record_ids(inbox),
+-                f'删除归类后记录 {record_id!r} 回到「{common.DEFAULT_CATEGORY}」',
+-            )
+-            fetched = client.get(_bookmark_path(record_id))
+-            recorder.expect_status(fetched, 200, aid='a04-record-fetch-status')
+-            category_name = _record_category_name(_extract_record(_safe_json(fetched)))
+-            if category_name is not None:
++        recorder.check(
++            'a04-health-json',
++            isinstance(_safe_json(health), dict),
++            '/api/health 返回 JSON 对象',
++        )
++
++        home = client.get('/', accept='text/html')
++        recorder.expect_status(home, 200, aid='a04-home-status')
++        home_doc = _parse_html(home.text)
++        manager = _find_anchor(home_doc, 'category-manager')
++        manager_href = manager.href if manager is not None else ''
++        recorder.check(
++            'a04-manager-link',
++            manager is not None,
++            '首页含 a[data-testid=category-manager]',
++        )
++        recorder.check(
++            'a04-manager-path',
++            _path_of(manager_href) == '/categories',
++            f'category-manager href={manager_href!r}（期望路径 /categories）',
++        )
++        if manager is None or _path_of(manager_href) != '/categories':
++            return
++        categories_path = manager_href
++
++        cat_page = client.get(categories_path, accept='text/html')
++        recorder.expect_status(cat_page, 200, aid='a04-categories-status')
++        recorder.check(
++            'a04-categories-content-type',
++            'text/html' in cat_page.content_type.lower(),
++            f'GET /categories Content-Type={cat_page.content_type!r}',
++        )
++        cat_doc = _parse_html(cat_page.text)
++        create_form = _first_form(cat_doc, 'category-create-form')
++        if not recorder.check(
++            'a04-create-form',
++            create_form is not None,
++            'GET /categories 含 category-create-form',
++        ):
++            return
++        if not recorder.check(
++            'a04-create-name-field',
++            create_form.has_name('name'),
++            'category-create-form 含 name 输入',
++        ):
++            return
++        create_action = _form_path(create_form, '/categories')
++
++        name_a = _unique_category('a04a')
++        variant = name_a.upper()
++        if variant == name_a:
++            variant = name_a + 'X'
++
++        response = client.post_form(
++            create_action,
++            _form_fields(create_form, {'name': name_a}),
++            follow_redirects=False,
++            accept='text/html',
++        )
++        page, location = _follow_303(
++            client, recorder, response, 'a04-create-a', expected_path='/categories'
++        )
++        if page is None:
++            return
++        page_doc = _parse_html(page.text)
++        categories = _fetch_categories(client, recorder, 'a04-create-a')
++        cat_a = _find_category_by_name(categories, name_a)
++        id_a = _record_id(cat_a)
++        recorder.check(
++            'a04-create-a-visible',
++            cat_a is not None and name_a in page_doc.text,
++            f'新建归类 {name_a!r} 在 /categories 可见',
++        )
++        if not recorder.check(
++            'a04-create-a-id', bool(id_a), f'新建归类 id={id_a!r}'
++        ):
++            return
++        values = _category_count_values(page_doc).get(id_a, [])
++        recorder.check(
++            'a04-create-a-count',
++            bool(values) and all(value == 0 for value in values),
++            f'新建归类 {name_a!r} HTML 计数={values!r}（期望 0）',
++        )
++
++        before = _snapshot(client, recorder, 'a04-dup-create-exact-before')
++        duplicate = client.post_form(
++            create_action,
++            _form_fields(create_form, {'name': name_a}),
++            follow_redirects=False,
++            accept='text/html',
++        )
++        error_doc = _expect_html_error(
++            recorder, duplicate, 'a04-dup-create-exact', '重复名称 create', 409
++        )
++        error_form = _first_form(error_doc, 'category-create-form')
++        recorder.check(
++            'a04-dup-create-exact-form',
++            error_form is not None,
++            '重复 create 错误页保留 category-create-form',
++        )
++        if error_form is not None:
++            retained = error_form.value('name')
++            recorder.check(
++                'a04-dup-create-exact-retained',
++                retained == name_a,
++                f'重复 create 错误页 name={retained!r}（期望 {name_a!r}）',
++            )
++        after = _snapshot(client, recorder, 'a04-dup-create-exact-after')
++        _check_unchanged(recorder, 'a04-dup-create-exact', before, after, '重复 create')
++
++        before = _snapshot(client, recorder, 'a04-dup-create-case-before')
++        duplicate_case = client.post_form(
++            create_action,
++            _form_fields(create_form, {'name': variant}),
++            follow_redirects=False,
++            accept='text/html',
++        )
++        error_doc = _expect_html_error(
++            recorder, duplicate_case, 'a04-dup-create-case', '大小写变体 create', 409
++        )
++        error_form = _first_form(error_doc, 'category-create-form')
++        recorder.check(
++            'a04-dup-create-case-form',
++            error_form is not None,
++            '大小写变体 create 错误页保留 category-create-form',
++        )
++        if error_form is not None:
++            retained = error_form.value('name')
++            recorder.check(
++                'a04-dup-create-case-retained',
++                retained == variant,
++                f'大小写变体 create 错误页 name={retained!r}（期望 {variant!r}）',
++            )
++        after = _snapshot(client, recorder, 'a04-dup-create-case-after')
++        _check_unchanged(recorder, 'a04-dup-create-case', before, after, '大小写变体 create')
++
++        for label, duplicate_name in (('exact', name_a), ('case', variant)):
++            before = _snapshot(client, recorder, f'a04-json-dup-create-{label}-before')
++            response = client.post_json('/api/categories', {'name': duplicate_name})
++            recorder.expect_status(
++                response, 409, aid=f'a04-json-dup-create-{label}-status'
++            )
++            code = _error_code(response)
++            recorder.check(
++                f'a04-json-dup-create-{label}-code',
++                code == 'duplicate_category',
++                f'JSON create 重复名称 {duplicate_name!r} 错误码={code!r}（期望 duplicate_category）',
++            )
++            after = _snapshot(client, recorder, f'a04-json-dup-create-{label}-after')
++            _check_unchanged(
++                recorder, f'a04-json-dup-create-{label}', before, after, 'JSON 重复 create'
++            )
++
++        name_b = _unique_category('a04b')
++        response = client.post_form(
++            create_action,
++            _form_fields(create_form, {'name': name_b}),
++            follow_redirects=False,
++            accept='text/html',
++        )
++        page, location = _follow_303(
++            client, recorder, response, 'a04-create-b', expected_path='/categories'
++        )
++        if page is None:
++            return
++        categories = _fetch_categories(client, recorder, 'a04-create-b')
++        cat_b = _find_category_by_name(categories, name_b)
++        id_b = _record_id(cat_b)
++        if not recorder.check(
++            'a04-create-b-id', bool(id_b), f'新建归类 {name_b!r} id={id_b!r}'
++        ):
++            return
++
++        cat_doc = _categories_page(client, recorder, 'a04-forms')
++        create_form = _first_form(cat_doc, 'category-create-form')
++        rename_form = _form_for_category(cat_doc, 'category-rename-form', id_b)
++        if not recorder.check(
++            'a04-forms-refresh',
++            create_form is not None,
++            '刷新后仍含 category-create-form',
++        ):
++            return
++        if not recorder.check(
++            'a04-rename-form',
++            rename_form is not None
++            and rename_form.has_name('category_id')
++            and rename_form.has_name('name'),
++            f'找到目标归类 {name_b!r} 的 category-rename-form（含 category_id 与 name）',
++        ):
++            return
++        create_action = _form_path(create_form, '/categories')
++        rename_action = _form_path(rename_form, '/categories')
++
++        invalid_values = (
++            ('omitted', _OMIT),
++            ('empty', ''),
++            ('whitespace', '   '),
++            ('overlong', 'x' * 121),
++        )
++        for label, value in invalid_values:
++            before = _snapshot(client, recorder, f'a04-invalid-create-{label}-before')
++            if value is _OMIT:
++                fields = _form_fields(create_form, omit=('name',))
++            else:
++                fields = _form_fields(create_form, {'name': value})
++            response = client.post_form(
++                create_action, fields, follow_redirects=False, accept='text/html'
++            )
++            error_doc = _expect_html_error(
++                recorder, response, f'a04-invalid-create-{label}', f'create name {label}', 400
++            )
++            error_form = _first_form(error_doc, 'category-create-form')
++            recorder.check(
++                f'a04-invalid-create-{label}-form',
++                error_form is not None,
++                f'非法 create name {label} 错误页保留 category-create-form',
++            )
++            if error_form is not None:
++                retained = error_form.value('name')
++                if value is _OMIT:
++                    recorder.check(
++                        f'a04-invalid-create-{label}-retained',
++                        retained is None or retained == '',
++                        f'省略 name 的错误页 name={retained!r}（期望未提交或空）',
++                    )
++                else:
++                    recorder.check(
++                        f'a04-invalid-create-{label}-retained',
++                        retained == value,
++                        f'非法 create name={retained!r}（期望保留 {value!r}）',
++                    )
++            after = _snapshot(client, recorder, f'a04-invalid-create-{label}-after')
++            _check_unchanged(
++                recorder, f'a04-invalid-create-{label}', before, after,
++                f'非法 create name {label}',
++            )
++
++        for label, value in invalid_values:
++            before = _snapshot(client, recorder, f'a04-invalid-rename-{label}-before')
++            if value is _OMIT:
++                fields = _form_fields(rename_form, {'category_id': id_b}, omit=('name',))
++            else:
++                fields = _form_fields(
++                    rename_form, {'category_id': id_b, 'name': value}
++                )
++            response = client.post_form(
++                rename_action, fields, follow_redirects=False, accept='text/html'
++            )
++            error_doc = _expect_html_error(
++                recorder, response, f'a04-invalid-rename-{label}', f'rename name {label}', 400
++            )
++            error_form = _form_for_category(error_doc, 'category-rename-form', id_b)
++            recorder.check(
++                f'a04-invalid-rename-{label}-form',
++                error_form is not None,
++                f'非法 rename name {label} 错误页保留目标 category_id={id_b!r} 的表单',
++            )
++            if error_form is not None:
++                retained_category = error_form.value('category_id')
++                retained_name = error_form.value('name')
+                 recorder.check(
+-                    'a04-record-category-default',
+-                    category_name == common.DEFAULT_CATEGORY,
+-                    f'记录 category={category_name!r}（期望 {common.DEFAULT_CATEGORY!r}）',
++                    f'a04-invalid-rename-{label}-category-retained',
++                    retained_category == id_b,
++                    f'非法 rename 错误页 category_id={retained_category!r}（期望 {id_b!r}）',
+                 )
+-
+-        default_item = _default_category(after_delete)
++                if value is _OMIT:
++                    recorder.check(
++                        f'a04-invalid-rename-{label}-retained',
++                        retained_name is None or retained_name == '',
++                        f'省略 name 的错误页 name={retained_name!r}（期望未提交或空）',
++                    )
++                else:
++                    recorder.check(
++                        f'a04-invalid-rename-{label}-retained',
++                        retained_name == value,
++                        f'非法 rename name={retained_name!r}（期望保留 {value!r}）',
++                    )
++            after = _snapshot(client, recorder, f'a04-invalid-rename-{label}-after')
++            _check_unchanged(
++                recorder, f'a04-invalid-rename-{label}', before, after,
++                f'非法 rename name {label}',
++            )
++
++        json_values = (
++            ('omitted', _OMIT),
++            ('empty', ''),
++            ('whitespace', '   '),
++            ('overlong', 'x' * 121),
++            ('null', None),
++        )
++        for label, value in json_values:
++            before = _snapshot(client, recorder, f'a04-json-invalid-create-{label}-before')
++            payload = {} if value is _OMIT else {'name': value}
++            response = client.post_json('/api/categories', payload)
++            recorder.expect_status(
++                response, 400, aid=f'a04-json-invalid-create-{label}-status'
++            )
++            code = _error_code(response)
++            recorder.check(
++                f'a04-json-invalid-create-{label}-code',
++                code == 'invalid_name',
++                f'JSON create name {label} 错误码={code!r}（期望 invalid_name）',
++            )
++            after = _snapshot(client, recorder, f'a04-json-invalid-create-{label}-after')
++            _check_unchanged(
++                recorder, f'a04-json-invalid-create-{label}', before, after,
++                f'JSON 非法 create name {label}',
++            )
++
++            before = _snapshot(client, recorder, f'a04-json-invalid-rename-{label}-before')
++            payload = {} if value is _OMIT else {'name': value}
++            response = client.patch_json(_category_path(id_b), payload)
++            recorder.expect_status(
++                response, 400, aid=f'a04-json-invalid-rename-{label}-status'
++            )
++            code = _error_code(response)
++            recorder.check(
++                f'a04-json-invalid-rename-{label}-code',
++                code == 'invalid_name',
++                f'JSON rename name {label} 错误码={code!r}（期望 invalid_name）',
++            )
++            after = _snapshot(client, recorder, f'a04-json-invalid-rename-{label}-after')
++            _check_unchanged(
++                recorder, f'a04-json-invalid-rename-{label}', before, after,
++                f'JSON 非法 rename name {label}',
++            )
++
++        for label, duplicate_name in (('exact', name_a), ('case', variant)):
++            before = _snapshot(client, recorder, f'a04-dup-rename-{label}-before')
++            response = client.post_form(
++                rename_action,
++                _form_fields(
++                    rename_form, {'category_id': id_b, 'name': duplicate_name}
++                ),
++                follow_redirects=False,
++                accept='text/html',
++            )
++            error_doc = _expect_html_error(
++                recorder, response, f'a04-dup-rename-{label}',
++                f'重复名称 rename {label}', 409,
++            )
++            error_form = _form_for_category(error_doc, 'category-rename-form', id_b)
++            recorder.check(
++                f'a04-dup-rename-{label}-form',
++                error_form is not None,
++                f'重复 rename 错误页保留目标 category_id={id_b!r} 的表单',
++            )
++            if error_form is not None:
++                retained_name = error_form.value('name')
++                recorder.check(
++                    f'a04-dup-rename-{label}-retained',
++                    retained_name == duplicate_name,
++                    f'重复 rename 错误页 name={retained_name!r}（期望 {duplicate_name!r}）',
++                )
++            after = _snapshot(client, recorder, f'a04-dup-rename-{label}-after')
++            _check_unchanged(
++                recorder, f'a04-dup-rename-{label}', before, after,
++                f'重复 rename {label}',
++            )
++
++            before = _snapshot(client, recorder, f'a04-json-dup-rename-{label}-before')
++            response = client.patch_json(
++                _category_path(id_b), {'name': duplicate_name}
++            )
++            recorder.expect_status(
++                response, 409, aid=f'a04-json-dup-rename-{label}-status'
++            )
++            code = _error_code(response)
++            recorder.check(
++                f'a04-json-dup-rename-{label}-code',
++                code == 'duplicate_category',
++                f'JSON rename 重复名称 {duplicate_name!r} 错误码={code!r}（期望 duplicate_category）',
++            )
++            after = _snapshot(client, recorder, f'a04-json-dup-rename-{label}-after')
++            _check_unchanged(
++                recorder, f'a04-json-dup-rename-{label}', before, after,
++                'JSON 重复 rename',
++            )
++
++        record_b, record_b_url = _create_record_json(
++            client, recorder, 'a04-record-b', category=name_b,
++            title=f'A04 记录 {uuid.uuid4().hex[:8]}',
++            description=f'A04 描述 {uuid.uuid4().hex[:8]}',
++        )
++        if not recorder.check(
++            'a04-record-b-id',
++            bool(record_b),
++            f'在归类 {name_b!r} 中创建记录 id={record_b!r}',
++        ):
++            return
++        categories = _fetch_categories(client, recorder, 'a04-record-b-count')
++        cat_b = _find_category_by_id(categories, id_b)
++        count_b = cat_b.get('count') if isinstance(cat_b, dict) else None
++        recorder.check(
++            'a04-record-b-count',
++            count_b == 1,
++            f'归类 {name_b!r} API count={count_b!r}（期望 1）',
++        )
++        page_doc = _categories_page(client, recorder, 'a04-record-b-html')
++        values = _category_count_values(page_doc).get(id_b, [])
++        recorder.check(
++            'a04-record-b-html-count',
++            bool(values) and all(value == 1 for value in values),
++            f'归类 {name_b!r} HTML 计数={values!r}（期望 1）',
++        )
++
++        renamed_name = _unique_category('a04b-renamed')
++        cat_doc = _categories_page(client, recorder, 'a04-rename-success-forms')
++        rename_form = _form_for_category(cat_doc, 'category-rename-form', id_b)
++        if not recorder.check(
++            'a04-rename-success-form',
++            rename_form is not None,
++            '找到目标归类的 rename 表单',
++        ):
++            return
++        rename_action = _form_path(rename_form, '/categories')
++        response = client.post_form(
++            rename_action,
++            _form_fields(rename_form, {'category_id': id_b, 'name': renamed_name}),
++            follow_redirects=False,
++            accept='text/html',
++        )
++        page, location = _follow_303(
++            client, recorder, response, 'a04-rename-success',
++            expected_path='/categories',
++        )
++        if page is None:
++            return
++        page_doc = _parse_html(page.text)
++        categories = _fetch_categories(client, recorder, 'a04-rename-success')
++        renamed_item = _find_category_by_id(categories, id_b)
++        recorder.check(
++            'a04-rename-success-new-name',
++            isinstance(renamed_item, dict) and renamed_item.get('name') == renamed_name,
++            f'重命名后 id={id_b!r} 的 name={renamed_name!r}',
++        )
++        recorder.check(
++            'a04-rename-success-old-name',
++            _find_category_by_name(categories, name_b) is None,
++            f'重命名后旧名 {name_b!r} 不再出现',
++        )
++        values = _category_count_values(page_doc).get(id_b, [])
++        recorder.check(
++            'a04-rename-success-count',
++            bool(values) and all(value == 1 for value in values),
++            f'重命名后 HTML 计数={values!r}（期望 1）',
++        )
++        new_list = _fetch_bookmarks(
++            client, recorder, 'a04-rename-success-list',
++            params={'category': renamed_name},
++        )
++        recorder.check(
++            'a04-rename-success-record',
++            record_b in _record_ids(new_list),
++            f'重命名后记录 {record_b!r} 仍属于该归类',
++        )
++        old_list = _fetch_bookmarks(
++            client, recorder, 'a04-rename-success-old-list',
++            params={'category': name_b},
++        )
++        recorder.check(
++            'a04-rename-success-old-empty',
++            record_b not in _record_ids(old_list),
++            f'旧归类名 {name_b!r} 过滤不再返回记录 {record_b!r}',
++        )
++        record = _get_record_json(
++            client, recorder, 'a04-rename-success-record-json', record_b
++        )
++        if record is not None:
++            actual = _record_category_name(record, categories)
++            recorder.check(
++                'a04-rename-success-record-category',
++                actual == renamed_name,
++                f'记录 category={actual!r}（期望 {renamed_name!r}）',
++            )
++
++        name_c = _unique_category('a04c')
++        cat_doc = _categories_page(client, recorder, 'a04-create-c-forms')
++        create_form = _first_form(cat_doc, 'category-create-form')
++        if not recorder.check(
++            'a04-create-c-form',
++            create_form is not None,
++            '找到 category-create-form',
++        ):
++            return
++        create_action = _form_path(create_form, '/categories')
++        response = client.post_form(
++            create_action,
++            _form_fields(create_form, {'name': name_c}),
++            follow_redirects=False,
++            accept='text/html',
++        )
++        page, location = _follow_303(
++            client, recorder, response, 'a04-create-c', expected_path='/categories'
++        )
++        if page is None:
++            return
++        categories = _fetch_categories(client, recorder, 'a04-create-c')
++        cat_c = _find_category_by_name(categories, name_c)
++        id_c = _record_id(cat_c)
++        if not recorder.check(
++            'a04-create-c-id', bool(id_c), f'新建归类 {name_c!r} id={id_c!r}'
++        ):
++            return
++        active_c, _ = _create_record_json(
++            client, recorder, 'a04-active-c', category=name_c
++        )
++        trashed_c, _ = _create_record_json(
++            client, recorder, 'a04-trashed-c', category=name_c
++        )
++        if not recorder.check(
++            'a04-c-records',
++            bool(active_c) and bool(trashed_c),
++            f'创建活动记录 {active_c!r} 与待软删记录 {trashed_c!r}',
++        ):
++            return
++
++        home_doc = _home_page(
++            client, recorder, 'a04-category-c-before-trash',
++            params={'category': name_c},
++        )
++        delete_form = _find_record_form(home_doc, 'record-delete-form', trashed_c)
++        if not recorder.check(
++            'a04-trash-form',
++            delete_form is not None,
++            f'归类 {name_c!r} 的记录行含 record-delete-form',
++        ):
++            return
++        response = client.post_form(
++            _form_path(delete_form, '/'),
++            _form_fields(delete_form),
++            follow_redirects=False,
++            accept='text/html',
++        )
++        page, location = _follow_303(
++            client, recorder, response, 'a04-trash',
++            expected_path='/', expected_query={'trash': '1'},
++        )
++        if page is None:
++            return
++        trash_doc = _parse_html(page.text)
++        recorder.check(
++            'a04-trash-restore-form-before-delete',
++            _find_record_form(trash_doc, 'record-restore-form', trashed_c) is not None,
++            f'删除归类前 /?trash=1 显示记录 {trashed_c!r} 的 restore 表单',
++        )
++
++        cat_doc = _categories_page(client, recorder, 'a04-delete-c-forms')
++        delete_cat_form = _form_for_category(cat_doc, 'category-delete-form', id_c)
++        if not recorder.check(
++            'a04-delete-c-form',
++            delete_cat_form is not None,
++            f'找到归类 {name_c!r} 的 delete 表单',
++        ):
++            return
++        response = client.post_form(
++            _form_path(delete_cat_form, '/categories'),
++            _form_fields(delete_cat_form, {'category_id': id_c}),
++            follow_redirects=False,
++            accept='text/html',
++        )
++        page, location = _follow_303(
++            client, recorder, response, 'a04-delete-c', expected_path='/categories'
++        )
++        if page is None:
++            return
++        categories = _fetch_categories(client, recorder, 'a04-delete-c-after')
++        recorder.check(
++            'a04-delete-c-gone',
++            _find_category_by_id(categories, id_c) is None
++            and _find_category_by_name(categories, name_c) is None,
++            f'删除后归类 {name_c!r} 不再存在',
++        )
++        default_item = _default_category(categories)
+         default_id = _record_id(default_item)
+-        if default_id:
+-            delete_default = client.request('DELETE', _category_path(default_id))
+-            recorder.expect_status(delete_default, 400, aid='a04-default-delete-status')
+-            recorder.check(
+-                'a04-default-delete-code',
+-                _error_code(delete_default) == 'protected_category',
+-                f'删除默认归类错误码={_error_code(delete_default)!r}（期望 protected_category）',
+-            )
+-            rename_default = client.patch_json(_category_path(default_id), {'name': _unique_category('a04default')})
+-            recorder.expect_status(rename_default, 400, aid='a04-default-rename-status')
+-            recorder.check(
+-                'a04-default-rename-code',
+-                _error_code(rename_default) == 'protected_category',
+-                f'重命名默认归类错误码={_error_code(rename_default)!r}（期望 protected_category）',
+-            )
++        if not recorder.check(
++            'a04-default-id', bool(default_id), f'默认归类 id={default_id!r}'
++        ):
++            return
++
++        default_active = _fetch_bookmarks(
++            client, recorder, 'a04-default-active',
++            params={'category': common.DEFAULT_CATEGORY},
++        )
++        active_ids = _record_ids(default_active)
++        recorder.check(
++            'a04-delete-c-active-migrated',
++            active_c in active_ids,
++            f'删除归类后活动记录 {active_c!r} 出现在「{common.DEFAULT_CATEGORY}」',
++        )
++        recorder.check(
++            'a04-delete-c-trashed-hidden',
++            trashed_c not in active_ids,
++            f'删除归类后软删记录 {trashed_c!r} 不出现在默认活动列表',
++        )
++        default_all = _fetch_bookmarks(
++            client, recorder, 'a04-default-all',
++            params={
++                'category': common.DEFAULT_CATEGORY,
++                'include_trashed': 1,
++            },
++        )
++        all_categories = _record_map(default_all, categories)
++        recorder.check(
++            'a04-delete-c-trashed-migrated',
++            all_categories.get(active_c) == common.DEFAULT_CATEGORY
++            and all_categories.get(trashed_c) == common.DEFAULT_CATEGORY,
++            f'活动/软删记录均迁回「{common.DEFAULT_CATEGORY}」：{all_categories.get(active_c)!r}, {all_categories.get(trashed_c)!r}',
++        )
++        active_record = _get_record_json(
++            client, recorder, 'a04-active-c-after', active_c
++        )
++        if active_record is not None:
++            actual = _record_category_name(active_record, categories)
++            recorder.check(
++                'a04-active-c-category',
++                actual == common.DEFAULT_CATEGORY,
++                f'活动记录 category={actual!r}（期望 {common.DEFAULT_CATEGORY!r}）',
++            )
++
++        trash_doc = _home_page(
++            client, recorder, 'a04-trash-page-after-delete', params={'trash': 1}
++        )
++        restore_form = _find_record_form(trash_doc, 'record-restore-form', trashed_c)
++        if not recorder.check(
++            'a04-delete-c-trashed-restorable',
++            restore_form is not None,
++            f'删除归类后软删记录 {trashed_c!r} 仍在 /?trash=1 可恢复',
++        ):
++            return
++        response = client.post_form(
++            _form_path(restore_form, '/'),
++            _form_fields(restore_form),
++            follow_redirects=False,
++            accept='text/html',
++        )
++        page, location = _follow_303(
++            client, recorder, response, 'a04-restore-c', expected_path='/'
++        )
++        if page is None:
++            return
++        after_restore = _fetch_bookmarks(
++            client, recorder, 'a04-restore-c-list',
++            params={'category': common.DEFAULT_CATEGORY},
++        )
++        recorder.check(
++            'a04-restore-c-visible',
++            trashed_c in _record_ids(after_restore),
++            f'恢复后记录 {trashed_c!r} 回到「{common.DEFAULT_CATEGORY}」活动列表',
++        )
++        restored = _get_record_json(
++            client, recorder, 'a04-restore-c-record', trashed_c
++        )
++        if restored is not None:
++            actual = _record_category_name(restored, categories)
++            recorder.check(
++                'a04-restore-c-category',
++                actual == common.DEFAULT_CATEGORY,
++                f'恢复后记录 category={actual!r}（期望 {common.DEFAULT_CATEGORY!r}）',
++            )
++
++        categories = _fetch_categories(client, recorder, 'a04-default-protection')
++        default_item = _default_category(categories)
++        default_id = _record_id(default_item)
++        if not recorder.check(
++            'a04-default-protection-id',
++            bool(default_id),
++            f'默认归类 id={default_id!r}',
++        ):
++            return
++        cat_doc = _categories_page(client, recorder, 'a04-default-forms')
++        delete_default_form = _form_for_category(
++            cat_doc, 'category-delete-form', default_id
++        )
++        if not recorder.check(
++            'a04-default-delete-form',
++            delete_default_form is not None,
++            '找到默认归类的 category-delete-form',
++        ):
++            return
++        before = _snapshot(client, recorder, 'a04-default-delete-before')
++        response = client.post_form(
++            _form_path(delete_default_form, '/categories'),
++            _form_fields(delete_default_form, {'category_id': default_id}),
++            follow_redirects=False,
++            accept='text/html',
++        )
++        error_doc = _expect_html_error(
++            recorder, response, 'a04-default-delete', '删除默认归类', 400
++        )
++        error_form = _form_for_category(
++            error_doc, 'category-delete-form', default_id
++        )
++        recorder.check(
++            'a04-default-delete-retained',
++            error_form is not None
++            and error_form.value('category_id') == default_id,
++            f'删除默认归类错误页保留 category_id={default_id!r}',
++        )
++        after = _snapshot(client, recorder, 'a04-default-delete-after')
++        _check_unchanged(
++            recorder, 'a04-default-delete', before, after, '删除默认归类'
++        )
++
++        rename_default_form = _form_for_category(
++            cat_doc, 'category-rename-form', default_id
++        )
++        if not recorder.check(
++            'a04-default-rename-form',
++            rename_default_form is not None,
++            '找到默认归类的 category-rename-form',
++        ):
++            return
++        before = _snapshot(client, recorder, 'a04-default-rename-before')
++        response = client.post_form(
++            _form_path(rename_default_form, '/categories'),
++            _form_fields(rename_default_form, {
++                'category_id': default_id,
++                'name': _unique_category('a04default'),
++            }),
++            follow_redirects=False,
++            accept='text/html',
++        )
++        _expect_html_error(
++            recorder, response, 'a04-default-rename', '重命名默认归类', 400
++        )
++        after = _snapshot(client, recorder, 'a04-default-rename-after')
++        _check_unchanged(
++            recorder, 'a04-default-rename', before, after, '重命名默认归类'
++        )
++
++        before = _snapshot(client, recorder, 'a04-json-default-delete-before')
++        response = client.request('DELETE', _category_path(default_id))
++        recorder.expect_status(
++            response, 400, aid='a04-json-default-delete-status'
++        )
++        code = _error_code(response)
++        recorder.check(
++            'a04-json-default-delete-code',
++            code == 'protected_category',
++            f'JSON 删除默认归类错误码={code!r}（期望 protected_category）',
++        )
++        after = _snapshot(client, recorder, 'a04-json-default-delete-after')
++        _check_unchanged(
++            recorder, 'a04-json-default-delete', before, after,
++            'JSON 删除默认归类',
++        )
++
++        before = _snapshot(client, recorder, 'a04-json-default-rename-before')
++        response = client.patch_json(
++            _category_path(default_id),
++            {'name': _unique_category('a04default2')},
++        )
++        recorder.expect_status(
++            response, 400, aid='a04-json-default-rename-status'
++        )
++        code = _error_code(response)
++        recorder.check(
++            'a04-json-default-rename-code',
++            code == 'protected_category',
++            f'JSON 重命名默认归类错误码={code!r}（期望 protected_category）',
++        )
++        after = _snapshot(client, recorder, 'a04-json-default-rename-after')
++        _check_unchanged(
++            recorder, 'a04-json-default-rename', before, after,
++            'JSON 重命名默认归类',
++        )
++
++        final_categories = _fetch_categories(client, recorder, 'a04-final')
++        recorder.check(
++            'a04-final-a',
++            _find_category_by_name(final_categories, name_a) is not None,
++            f'最终仍存在归类 {name_a!r}',
++        )
++        final_b = _find_category_by_id(final_categories, id_b)
++        recorder.check(
++            'a04-final-b',
++            isinstance(final_b, dict) and final_b.get('name') == renamed_name,
++            f'最终归类 id={id_b!r} 名为 {renamed_name!r}',
++        )
++        recorder.check(
++            'a04-final-c',
++            _find_category_by_name(final_categories, name_c) is None,
++            f'最终不存在已删除归类 {name_c!r}',
++        )
+     finally:
+         client.close()
+ 
+@@ -302,35 +1642,112 @@
+     try:
+         health = client.get('/api/health')
+         recorder.expect_status(health, 200, aid='a05-health-status')
+-
+-        category_name = _unique_category('a05live')
+-        record_id = _create_record(client, recorder, 'a05live')
+-        if not record_id:
+-            return
+-
+-        moved = client.post_json(_move_path(record_id), {'category': category_name})
+-        recorder.expect_status(moved, _SUCCESS_STATUSES, aid='a05-live-move-status')
+-        in_category = _fetch_bookmarks(client, recorder, 'a05-live-in', params={'category': category_name})
+-        recorder.check(
+-            'a05-live-move-visible',
+-            record_id in _record_ids(in_category),
+-            f'移动后 {record_id!r} 可在 {category_name!r} 中查到',
+-        )
+-        inbox = _fetch_bookmarks(client, recorder, 'a05-live-inbox', params={'category': common.DEFAULT_CATEGORY})
+-        recorder.check(
+-            'a05-live-left-default',
+-            record_id not in _record_ids(inbox),
+-            f'移动后 {record_id!r} 不再属于「{common.DEFAULT_CATEGORY}」',
+-        )
+-        fetched = client.get(_bookmark_path(record_id))
+-        recorder.expect_status(fetched, 200, aid='a05-live-fetch-status')
+-        stored_category = _record_category_name(_extract_record(_safe_json(fetched)))
+-        if stored_category is not None:
+-            recorder.check(
+-                'a05-live-record-category',
+-                stored_category == category_name,
+-                f'记录 category={stored_category!r}（期望 {category_name!r}）',
+-            )
++        target_name = _unique_category('a05target')
++        target_id = _create_category_json(
++            client, recorder, 'a05-target-category', target_name
++        )
++        record_id, record_url = _create_record_json(
++            client, recorder, 'a05-record',
++            title=f'A05 记录 {uuid.uuid4().hex[:8]}',
++            description=f'A05 描述 {uuid.uuid4().hex[:8]}',
++        )
++        if not recorder.check(
++            'a05-prerequisites',
++            bool(target_id) and bool(record_id),
++            f'目标归类 id={target_id!r}，记录 id={record_id!r}',
++        ):
++            return
++        doc = _home_page(
++            client, recorder, 'a05-home',
++            params={'category': common.DEFAULT_CATEGORY},
++        )
++        move_form = _find_record_form(doc, 'record-move-form', record_id)
++        if not recorder.check(
++            'a05-move-form',
++            move_form is not None,
++            f'记录行含 record-move-form（record_id={record_id!r}）',
++        ):
++            return
++        options = _select_values(move_form, 'category_id')
++        recorder.check(
++            'a05-move-options',
++            target_id in options,
++            f'record-move-form 的 category_id 选项包含目标 id={target_id!r}；实际 {options!r}',
++        )
++        form_record_id = move_form.value('record_id')
++        recorder.check(
++            'a05-move-record-id',
++            form_record_id == record_id,
++            f'record_id 字段={form_record_id!r}（期望 {record_id!r}）',
++        )
++        response = client.post_form(
++            _form_path(move_form, '/'),
++            _form_fields(move_form, {'category_id': target_id}),
++            follow_redirects=False,
++            accept='text/html',
++        )
++        page, location = _follow_303(
++            client, recorder, response, 'a05-move', expected_path='/'
++        )
++        if page is None:
++            return
++        actual_query = {}
++        if location:
++            actual_query = dict(
++                parse_qsl(urlsplit(location).query, keep_blank_values=True)
++            )
++        location_category = actual_query.get('category')
++        recorder.check(
++            'a05-move-location-category',
++            location_category == target_name,
++            f'移动 303 Location 的 category={location_category!r}（期望 {target_name!r}）',
++        )
++        old_list = _fetch_bookmarks(
++            client, recorder, 'a05-old-list',
++            params={'category': common.DEFAULT_CATEGORY},
++        )
++        recorder.check(
++            'a05-left-default',
++            record_id not in _record_ids(old_list),
++            f'移动后记录 {record_id!r} 不再属于「{common.DEFAULT_CATEGORY}」',
++        )
++        new_list = _fetch_bookmarks(
++            client, recorder, 'a05-new-list',
++            params={'category': target_name},
++        )
++        recorder.check(
++            'a05-in-target',
++            record_id in _record_ids(new_list),
++            f'移动后记录 {record_id!r} 出现在归类 {target_name!r}',
++        )
++        categories = _fetch_categories(client, recorder, 'a05-categories')
++        fetched = _get_record_json(
++            client, recorder, 'a05-record-json', record_id
++        )
++        if fetched is not None:
++            actual = _record_category_name(fetched, categories)
++            recorder.check(
++                'a05-record-category',
++                actual == target_name,
++                f'JSON 读回归类={actual!r}（期望 {target_name!r}）',
++            )
++        new_doc = _home_page(
++            client, recorder, 'a05-html-new', params={'category': target_name}
++        )
++        recorder.check(
++            'a05-html-new-row',
++            record_id in _row_ids(new_doc),
++            f'归类 {target_name!r} 的 HTML 列表包含记录 {record_id!r}',
++        )
++        old_doc = _home_page(
++            client, recorder, 'a05-html-old',
++            params={'category': common.DEFAULT_CATEGORY},
++        )
++        recorder.check(
++            'a05-html-old-absent',
++            record_id not in _row_ids(old_doc),
++            f'「{common.DEFAULT_CATEGORY}」的 HTML 列表不再包含记录 {record_id!r}',
++        )
+     finally:
+         client.close()
+ 
+@@ -338,61 +1755,110 @@
+ def _a05_across_restart(args, recorder):
+     first = common.launch_app(args.app_root, args.data_dir, 0)
+     instance_dir = first.instance_dir
+-    category_name = _unique_category('a05restart')
++    target_name = _unique_category('a05restart')
++    target_id = None
+     record_id = None
+     try:
+         client = common.HttpClient(first.base_url)
+         try:
+             health = client.get('/api/health')
+             recorder.expect_status(health, 200, aid='a05-restart-health-status')
+-            record_id = _create_record(client, recorder, 'a05restart')
+-            if record_id:
+-                moved = client.post_json(_move_path(record_id), {'category': category_name})
+-                recorder.expect_status(moved, _SUCCESS_STATUSES, aid='a05-restart-move-status')
+-                in_category = _fetch_bookmarks(
+-                    client, recorder, 'a05-restart-in', params={'category': category_name}
++            target_id = _create_category_json(
++                client, recorder, 'a05-restart-target', target_name
++            )
++            record_id, _ = _create_record_json(
++                client, recorder, 'a05-restart-record',
++                title=f'A05 重启记录 {uuid.uuid4().hex[:8]}',
++                description=f'A05 重启描述 {uuid.uuid4().hex[:8]}',
++            )
++            if target_id and record_id:
++                doc = _home_page(
++                    client, recorder, 'a05-restart-home',
++                    params={'category': common.DEFAULT_CATEGORY},
+                 )
+-                recorder.check(
+-                    'a05-restart-move-visible',
+-                    record_id in _record_ids(in_category),
+-                    f'隔离实例移动后 {record_id!r} 可在 {category_name!r} 中查到',
++                move_form = _find_record_form(
++                    doc, 'record-move-form', record_id
+                 )
++                if recorder.check(
++                    'a05-restart-move-form',
++                    move_form is not None,
++                    f'隔离实例记录行含 record-move-form（record_id={record_id!r}）',
++                ):
++                    response = client.post_form(
++                        _form_path(move_form, '/'),
++                        _form_fields(move_form, {'category_id': target_id}),
++                        follow_redirects=False,
++                        accept='text/html',
++                    )
++                    page, location = _follow_303(
++                        client, recorder, response,
++                        'a05-restart-move', expected_path='/',
++                    )
++                    if page is not None:
++                        before_stop = _fetch_bookmarks(
++                            client, recorder, 'a05-restart-before-stop',
++                            params={'category': target_name},
++                        )
++                        recorder.check(
++                            'a05-restart-before-stop-visible',
++                            record_id in _record_ids(before_stop),
++                            f'停止前记录 {record_id!r} 已在归类 {target_name!r}',
++                        )
+         finally:
+             client.close()
+     finally:
+         common.stop_app(first)
+ 
+-    if not record_id:
+-        recorder.check('a05-restart-persist', False, '隔离实例未返回可用 id，无法验证归属跨重启')
++    if not recorder.check(
++        'a05-restart-prerequisite',
++        bool(target_id) and bool(record_id),
++        f'隔离实例未提供目标归类或记录（target_id={target_id!r}, record_id={record_id!r}）',
++    ):
+         return
+ 
+-    second = common.launch_app(args.app_root, args.data_dir, 0, instance_dir=instance_dir)
++    second = common.launch_app(
++        args.app_root, args.data_dir, 0, instance_dir=instance_dir
++    )
+     try:
+         client = common.HttpClient(second.base_url)
+         try:
+-            after = _fetch_bookmarks(client, recorder, 'a05-restart-after', params={'category': category_name})
+-            recorder.check(
+-                'a05-restart-persist-visible',
+-                record_id in _record_ids(after),
+-                f'重启后 {record_id!r} 仍可在 {category_name!r} 中查到',
+-            )
+-            inbox = _fetch_bookmarks(
+-                client, recorder, 'a05-restart-inbox', params={'category': common.DEFAULT_CATEGORY}
+-            )
+-            recorder.check(
+-                'a05-restart-persist-not-default',
+-                record_id not in _record_ids(inbox),
+-                f'重启后 {record_id!r} 不回到「{common.DEFAULT_CATEGORY}」',
+-            )
+-            fetched = client.get(_bookmark_path(record_id))
+-            recorder.expect_status(fetched, 200, aid='a05-restart-fetch-status')
+-            stored_category = _record_category_name(_extract_record(_safe_json(fetched)))
+-            if stored_category is not None:
++            categories = _fetch_categories(
++                client, recorder, 'a05-restart-categories'
++            )
++            target = _find_category_by_id(categories, target_id)
++            recorder.check(
++                'a05-restart-category-id',
++                target is not None and _record_id(target) == target_id,
++                f'重启后归类 {target_name!r} 的 id 保持 {target_id!r}',
++            )
++            fetched = _get_record_json(
++                client, recorder, 'a05-restart-record-json', record_id
++            )
++            if fetched is not None:
++                actual = _record_category_name(fetched, categories)
+                 recorder.check(
+                     'a05-restart-record-category',
+-                    stored_category == category_name,
+-                    f'重启后 category={stored_category!r}（期望 {category_name!r}）',
++                    actual == target_name,
++                    f'重启后记录 category={actual!r}（期望 {target_name!r}）',
+                 )
++            new_doc = _home_page(
++                client, recorder, 'a05-restart-html-new',
++                params={'category': target_name},
++            )
++            recorder.check(
++                'a05-restart-html-visible',
++                record_id in _row_ids(new_doc),
++                f'重启后归类 {target_name!r} 的 HTML 列表包含记录 {record_id!r}',
++            )
++            old_doc = _home_page(
++                client, recorder, 'a05-restart-html-old',
++                params={'category': common.DEFAULT_CATEGORY},
++            )
++            recorder.check(
++                'a05-restart-html-old-absent',
++                record_id not in _row_ids(old_doc),
++                f'重启后「{common.DEFAULT_CATEGORY}」不再包含记录 {record_id!r}',
++            )
+         finally:
+             client.close()
+     finally:
+@@ -402,6 +1868,66 @@
+ def _case_a05(args, recorder):
+     _a05_on_base_url(args, recorder)
+     _a05_across_restart(args, recorder)
++
++
++def _check_category_state(client, recorder, prefix, expectations):
++    categories = _fetch_categories(
++        client, recorder, f'{prefix}-api-categories'
++    )
++    for label, name, category_id, expected_ids in expectations:
++        item = _find_category_by_id(categories, category_id)
++        if not isinstance(item, dict):
++            item = _find_category_by_name(categories, name)
++        count = item.get('count') if isinstance(item, dict) else None
++        recorder.check(
++            f'{prefix}-api-count-{label}',
++            count == len(expected_ids),
++            f'归类 {name!r} API count={count!r}（期望活动记录数 {len(expected_ids)}）',
++        )
++        listed = _fetch_bookmarks(
++            client, recorder, f'{prefix}-api-list-{label}',
++            params={'category': name},
++        )
++        actual_ids = _record_ids(listed)
++        recorder.check(
++            f'{prefix}-api-list-{label}',
++            actual_ids == set(expected_ids),
++            f'归类 {name!r} API 列表={sorted(actual_ids)}（期望 {sorted(set(expected_ids))}）',
++        )
++
++    home_doc = _home_page(client, recorder, f'{prefix}-html-home')
++    home_counts = _category_count_values(home_doc)
++    for label, name, category_id, expected_ids in expectations:
++        values = home_counts.get(category_id, [])
++        recorder.check(
++            f'{prefix}-html-home-count-{label}',
++            bool(values) and all(value == len(expected_ids) for value in values),
++            f'归类 {name!r} 首页 HTML 计数={values!r}（期望 {len(expected_ids)}）',
++        )
++
++    categories_doc = _categories_page(
++        client, recorder, f'{prefix}-html-categories'
++    )
++    categories_counts = _category_count_values(categories_doc)
++    for label, name, category_id, expected_ids in expectations:
++        values = categories_counts.get(category_id, [])
++        recorder.check(
++            f'{prefix}-html-categories-count-{label}',
++            bool(values) and all(value == len(expected_ids) for value in values),
++            f'归类 {name!r} /categories HTML 计数={values!r}（期望 {len(expected_ids)}）',
++        )
++
++    for label, name, category_id, expected_ids in expectations:
++        filtered_doc = _home_page(
++            client, recorder, f'{prefix}-html-filtered-{label}',
++            params={'category': name},
++        )
++        actual_ids = _row_ids(filtered_doc)
++        recorder.check(
++            f'{prefix}-html-rows-{label}',
++            actual_ids == set(expected_ids),
++            f'归类 {name!r} HTML 记录行={sorted(actual_ids)}（期望 {sorted(set(expected_ids))}）',
++        )
+ 
+ 
+ def _case_a06(args, recorder):
+@@ -409,52 +1935,157 @@
+     try:
+         health = client.get('/api/health')
+         recorder.expect_status(health, 200, aid='a06-health-status')
+-
+-        category_a = _unique_category('a06a')
+-        category_b = _unique_category('a06b')
+-        for label, category_name in (('a', category_a), ('b', category_b)):
+-            created = client.post_json('/api/categories', {'name': category_name})
+-            recorder.expect_status(created, 201, aid=f'a06-create-{label}-status')
+-
+-        ids_a = [
+-            record_id
+-            for record_id in (
+-                _create_record(client, recorder, f'a06a-{index}', category=category_a) for index in range(1, 3)
+-            )
+-            if record_id
+-        ]
+-        ids_b = [
+-            record_id
+-            for record_id in (
+-                _create_record(client, recorder, f'a06b-{index}', category=category_b) for index in range(1, 3)
+-            )
+-            if record_id
+-        ]
+-
+-        list_a = _fetch_bookmarks(client, recorder, 'a06-list-a', params={'category': category_a})
+-        set_a = _record_ids(list_a)
+-        list_b = _fetch_bookmarks(client, recorder, 'a06-list-b', params={'category': category_b})
+-        set_b = _record_ids(list_b)
+-
+-        recorder.check(
+-            'a06-a-exact',
+-            bool(ids_a) and set_a == set(ids_a),
+-            f'按 {category_a!r} 过滤返回 {sorted(set_a)}（期望 {sorted(set(ids_a))}）',
+-        )
+-        recorder.check(
+-            'a06-b-exact',
+-            bool(ids_b) and set_b == set(ids_b),
+-            f'按 {category_b!r} 过滤返回 {sorted(set_b)}（期望 {sorted(set(ids_b))}）',
+-        )
+-        recorder.check('a06-disjoint', not (set_a & set_b), f'两类过滤结果不相交，交集={sorted(set_a & set_b)}')
+-
+-        categories = _fetch_categories(client, recorder, 'a06-categories')
+-        item_a = _find_category(categories, category_a)
+-        item_b = _find_category(categories, category_b)
+-        count_a = item_a.get('count') if isinstance(item_a, dict) else None
+-        count_b = item_b.get('count') if isinstance(item_b, dict) else None
+-        recorder.check('a06-count-a', count_a == len(ids_a), f'归类 {category_a!r} 计数={count_a!r}（期望 {len(ids_a)}）')
+-        recorder.check('a06-count-b', count_b == len(ids_b), f'归类 {category_b!r} 计数={count_b!r}（期望 {len(ids_b)}）')
++        name_a = _unique_category('a06a')
++        name_b = _unique_category('a06b')
++        id_a = _create_category_json(client, recorder, 'a06-category-a', name_a)
++        id_b = _create_category_json(client, recorder, 'a06-category-b', name_b)
++        if not recorder.check(
++            'a06-prerequisites',
++            bool(id_a) and bool(id_b),
++            f'两个归类 id：a={id_a!r}, b={id_b!r}',
++        ):
++            return
++        ids_a = []
++        for index in (1, 2):
++            record_id, _ = _create_record_json(
++                client, recorder, f'a06-a-{index}', category=name_a,
++                title=f'A06 A{index} {uuid.uuid4().hex[:8]}',
++                description=f'A06 A 描述 {index}',
++            )
++            if record_id:
++                ids_a.append(record_id)
++        ids_b = []
++        for index in (1, 2):
++            record_id, _ = _create_record_json(
++                client, recorder, f'a06-b-{index}', category=name_b,
++                title=f'A06 B{index} {uuid.uuid4().hex[:8]}',
++                description=f'A06 B 描述 {index}',
++            )
++            if record_id:
++                ids_b.append(record_id)
++        if not recorder.check(
++            'a06-record-setup',
++            len(ids_a) == 2 and len(ids_b) == 2,
++            f'两个归类各两条记录：A={ids_a!r}, B={ids_b!r}',
++        ):
++            return
++
++        expectations = (
++            ('a', name_a, id_a, ids_a),
++            ('b', name_b, id_b, ids_b),
++        )
++        _check_category_state(client, recorder, 'a06-initial', expectations)
++
++        doc = _home_page(
++            client, recorder, 'a06-move-source', params={'category': name_a}
++        )
++        move_form = _find_record_form(doc, 'record-move-form', ids_a[0])
++        if not recorder.check(
++            'a06-move-form',
++            move_form is not None,
++            f'归类 {name_a!r} 的记录行含 record-move-form',
++        ):
++            return
++        options = _select_values(move_form, 'category_id')
++        recorder.check(
++            'a06-move-options',
++            id_b in options,
++            f'record-move-form 的 category_id 选项包含目标 {id_b!r}；实际 {options!r}',
++        )
++        response = client.post_form(
++            _form_path(move_form, '/'),
++            _form_fields(move_form, {'category_id': id_b}),
++            follow_redirects=False,
++            accept='text/html',
++        )
++        page, location = _follow_303(
++            client, recorder, response, 'a06-move', expected_path='/'
++        )
++        if page is None:
++            return
++        actual_query = {}
++        if location:
++            actual_query = dict(
++                parse_qsl(urlsplit(location).query, keep_blank_values=True)
++            )
++        location_category = actual_query.get('category')
++        recorder.check(
++            'a06-move-location',
++            location_category == name_b,
++            f'移动 303 Location category={location_category!r}（期望 {name_b!r}）',
++        )
++
++        expectations = (
++            ('a', name_a, id_a, [ids_a[1]]),
++            ('b', name_b, id_b, [ids_b[0], ids_b[1], ids_a[0]]),
++        )
++        _check_category_state(client, recorder, 'a06-after-move', expectations)
++
++        doc = _home_page(
++            client, recorder, 'a06-delete-source', params={'category': name_b}
++        )
++        delete_form = _find_record_form(doc, 'record-delete-form', ids_b[0])
++        if not recorder.check(
++            'a06-delete-form',
++            delete_form is not None,
++            f'归类 {name_b!r} 的记录行含 record-delete-form',
++        ):
++            return
++        response = client.post_form(
++            _form_path(delete_form, '/'),
++            _form_fields(delete_form),
++            follow_redirects=False,
++            accept='text/html',
++        )
++        page, location = _follow_303(
++            client, recorder, response, 'a06-delete',
++            expected_path='/', expected_query={'trash': '1'},
++        )
++        if page is None:
++            return
++        expectations = (
++            ('a', name_a, id_a, [ids_a[1]]),
++            ('b', name_b, id_b, [ids_b[1], ids_a[0]]),
++        )
++        _check_category_state(client, recorder, 'a06-after-delete', expectations)
++        trashed_b = _fetch_bookmarks(
++            client, recorder, 'a06-deleted-in-trashed',
++            params={'category': name_b, 'include_trashed': 1},
++        )
++        recorder.check(
++            'a06-deleted-still-exists',
++            ids_b[0] in _record_ids(trashed_b),
++            f'软删记录 {ids_b[0]!r} 在 include_trashed=1 中仍存在',
++        )
++
++        trash_doc = _home_page(
++            client, recorder, 'a06-trash-page', params={'trash': 1}
++        )
++        restore_form = _find_record_form(
++            trash_doc, 'record-restore-form', ids_b[0]
++        )
++        if not recorder.check(
++            'a06-restore-form',
++            restore_form is not None,
++            f'/?trash=1 含记录 {ids_b[0]!r} 的 record-restore-form',
++        ):
++            return
++        response = client.post_form(
++            _form_path(restore_form, '/'),
++            _form_fields(restore_form),
++            follow_redirects=False,
++            accept='text/html',
++        )
++        page, location = _follow_303(
++            client, recorder, response, 'a06-restore', expected_path='/'
++        )
++        if page is None:
++            return
++        expectations = (
++            ('a', name_a, id_a, [ids_a[1]]),
++            ('b', name_b, id_b, [ids_b[1], ids_a[0], ids_b[0]]),
++        )
++        _check_category_state(client, recorder, 'a06-after-restore', expectations)
+     finally:
+         client.close()
+ 
+@@ -465,61 +2096,516 @@
+         health = client.get('/api/health')
+         recorder.expect_status(health, 200, aid='a12-health-status')
+ 
+-        anchor_id = _create_record(client, recorder, 'a12-anchor')
+-        if not anchor_id:
+-            return
+-
+-        before_categories = _fetch_categories(client, recorder, 'a12-before-categories')
+-        before_books = _fetch_bookmarks(client, recorder, 'a12-before-bookmarks')
+-        before_category_ids = _category_ids(before_categories)
+-        before_record_ids = _record_ids(before_books)
+-
+-        too_long = 'x' * 121
+-        attempts = [
+-            ('save-empty', 'bookmark', ''),
+-            ('save-long', 'bookmark', too_long),
+-            ('move-empty', 'move', ''),
+-            ('move-long', 'move', too_long),
+-        ]
+-        for label, kind, category_value in attempts:
+-            if kind == 'bookmark':
+-                response = client.post_json(
+-                    '/api/bookmarks', {'url': _unique_url(f'a12-{label}'), 'category': category_value}
++        home_doc = _home_page(client, recorder, 'a12-home')
++        save_form = home_doc.save_form()
++        if not recorder.check(
++            'a12-save-form',
++            save_form is not None,
++            '首页含 action=/bookmarks/new 的保存表单',
++        ):
++            return
++        if not recorder.check(
++            'a12-save-category-field',
++            save_form.has_name('category'),
++            '保存表单含 category 字段',
++        ):
++            return
++        save_action = _form_path(save_form, '/')
++
++        omitted_url = _unique_url('a12-html-omitted')
++        omitted_title = f'A12 省略归类 {uuid.uuid4().hex[:8]}'
++        omitted_description = f'A12 省略归类描述 {uuid.uuid4().hex[:8]}'
++        omitted_fields = _form_fields(
++            save_form,
++            {
++                'url': omitted_url,
++                'title': omitted_title,
++                'description': omitted_description,
++            },
++            omit=('category',),
++        )
++        response = client.post_form(
++            save_action, omitted_fields, follow_redirects=False,
++            accept='text/html',
++        )
++        page, location = _follow_303(
++            client, recorder, response, 'a12-html-omitted', expected_path='/'
++        )
++        if page is None:
++            return
++        row = _row_for_url(_parse_html(page.text), omitted_url)
++        html_inbox_id = row.record_id if row is not None else None
++        if not recorder.check(
++            'a12-html-omitted-row',
++            row is not None and bool(html_inbox_id),
++            f'省略 category 保存后出现记录行 url={omitted_url!r}',
++        ):
++            return
++        categories = _fetch_categories(
++            client, recorder, 'a12-html-omitted-categories'
++        )
++        record = _get_record_json(
++            client, recorder, 'a12-html-omitted-record', html_inbox_id
++        )
++        if record is not None:
++            actual = _record_category_name(record, categories)
++            recorder.check(
++                'a12-html-omitted-default',
++                actual == common.DEFAULT_CATEGORY,
++                f'省略 category 保存后记录归类={actual!r}（期望 {common.DEFAULT_CATEGORY!r}）',
++            )
++
++        html_invalid_values = (
++            ('empty', ''),
++            ('whitespace', '   '),
++            ('overlong', 'x' * 121),
++        )
++        for label, value in html_invalid_values:
++            before = _snapshot(
++                client, recorder, f'a12-html-save-{label}-before'
++            )
++            url = _unique_url(f'a12-html-save-{label}')
++            title = f'A12 保存 {label} {uuid.uuid4().hex[:8]}'
++            description = f'A12 保存描述 {label} {uuid.uuid4().hex[:8]}'
++            fields = _form_fields(
++                save_form,
++                {
++                    'url': url,
++                    'title': title,
++                    'description': description,
++                    'category': value,
++                },
++            )
++            response = client.post_form(
++                save_action, fields, follow_redirects=False,
++                accept='text/html',
++            )
++            error_doc = _expect_html_error(
++                recorder, response, f'a12-html-save-{label}',
++                f'HTML 保存 category={label}', 400,
++            )
++            error_form = error_doc.save_form()
++            recorder.check(
++                f'a12-html-save-{label}-form',
++                error_form is not None,
++                f'HTML 保存 category={label} 错误页保留保存表单',
++            )
++            if error_form is not None:
++                for field_name, expected in (
++                    ('url', url),
++                    ('title', title),
++                    ('description', description),
++                    ('category', value),
++                ):
++                    retained = error_form.value(field_name)
++                    recorder.check(
++                        f'a12-html-save-{label}-retained-{field_name}',
++                        retained == expected,
++                        f'HTML 保存错误页 {field_name}={retained!r}（期望保留 {expected!r}）',
++                    )
++            after = _snapshot(
++                client, recorder, f'a12-html-save-{label}-after'
++            )
++            _check_unchanged(
++                recorder, f'a12-html-save-{label}', before, after,
++                f'HTML 保存非法 category {label}',
++            )
++
++        html_new_name = _unique_category('a12-html-new')
++        new_url = _unique_url('a12-html-new')
++        new_title = f'A12 新归类 {uuid.uuid4().hex[:8]}'
++        new_description = f'A12 新归类描述 {uuid.uuid4().hex[:8]}'
++        response = client.post_form(
++            save_action,
++            _form_fields(save_form, {
++                'url': new_url,
++                'title': new_title,
++                'description': new_description,
++                'category': html_new_name,
++            }),
++            follow_redirects=False,
++            accept='text/html',
++        )
++        page, location = _follow_303(
++            client, recorder, response, 'a12-html-new-save', expected_path='/'
++        )
++        if page is None:
++            return
++        row = _row_for_url(_parse_html(page.text), new_url)
++        html_new_record_id = row.record_id if row is not None else None
++        if not recorder.check(
++            'a12-html-new-row',
++            row is not None and bool(html_new_record_id),
++            f'有效新归类 {html_new_name!r} 保存后出现记录行',
++        ):
++            return
++        categories = _fetch_categories(
++            client, recorder, 'a12-html-new-categories'
++        )
++        html_new_category = _find_category_by_name(categories, html_new_name)
++        html_new_category_id = _record_id(html_new_category)
++        recorder.check(
++            'a12-html-new-category-created',
++            html_new_category_id is not None,
++            f'有效新归类 {html_new_name!r} 被自动创建，id={html_new_category_id!r}',
++        )
++        new_record = _get_record_json(
++            client, recorder, 'a12-html-new-record', html_new_record_id
++        )
++        if new_record is not None:
++            actual = _record_category_name(new_record, categories)
++            recorder.check(
++                'a12-html-new-record-category',
++                actual == html_new_name,
++                f'新归类保存记录 category={actual!r}（期望 {html_new_name!r}）',
++            )
++
++        if html_new_category_id is None:
++            recorder.check(
++                'a12-html-move-prerequisite',
++                False,
++                '缺少有效新归类 id，无法验证 HTML move',
++            )
++        else:
++            move_doc = _home_page(
++                client, recorder, 'a12-html-move-home',
++                params={'category': common.DEFAULT_CATEGORY},
++            )
++            move_form = _find_record_form(
++                move_doc, 'record-move-form', html_inbox_id
++            )
++            if not recorder.check(
++                'a12-html-move-form',
++                move_form is not None,
++                f'记录 {html_inbox_id!r} 含 record-move-form',
++            ):
++                recorder.check(
++                    'a12-html-move-skip',
++                    False,
++                    '缺少 move 表单，HTML move 断言无法执行',
+                 )
+             else:
+-                response = client.post_json(_move_path(anchor_id), {'category': category_value})
+-            recorder.expect_status(response, 400, aid=f'a12-{label}-status')
++                options = _select_values(move_form, 'category_id')
++                recorder.check(
++                    'a12-html-move-options',
++                    html_new_category_id in options,
++                    f'record-move-form 的 category_id 选项包含 {html_new_category_id!r}；实际 {options!r}',
++                )
++                move_action = _form_path(move_form, '/')
++
++                _run_html_move_negative(
++                    client, recorder, 'a12-html-move-omitted',
++                    move_form, move_action, html_inbox_id,
++                    'omitted', _OMIT, common.DEFAULT_CATEGORY,
++                )
++                _run_html_move_negative(
++                    client, recorder, 'a12-html-move-empty',
++                    move_form, move_action, html_inbox_id,
++                    'empty', '', common.DEFAULT_CATEGORY,
++                )
++                unknown_id = f'cat-unknown-{uuid.uuid4().hex[:10]}'
++                _run_html_move_negative(
++                    client, recorder, 'a12-html-move-unknown',
++                    move_form, move_action, html_inbox_id,
++                    'unknown', unknown_id, common.DEFAULT_CATEGORY,
++                )
++                categories = _fetch_categories(
++                    client, recorder, 'a12-html-move-unknown-categories'
++                )
++                recorder.check(
++                    'a12-html-move-unknown-not-created',
++                    unknown_id not in _category_ids(categories)
++                    and unknown_id not in _category_names(categories),
++                    f'未知 ID {unknown_id!r} 未被当作新归类名称创建',
++                )
++
++                move_doc = _home_page(
++                    client, recorder, 'a12-html-move-valid-home',
++                    params={'category': common.DEFAULT_CATEGORY},
++                )
++                move_form = _find_record_form(
++                    move_doc, 'record-move-form', html_inbox_id
++                )
++                if not recorder.check(
++                    'a12-html-move-valid-form',
++                    move_form is not None,
++                    f'修正前再次找到记录 {html_inbox_id!r} 的 move 表单',
++                ):
++                    recorder.check(
++                        'a12-html-move-valid-skip',
++                        False,
++                        '缺少 move 表单，无法验证修正后恢复',
++                    )
++                else:
++                    response = client.post_form(
++                        _form_path(move_form, '/'),
++                        _form_fields(
++                            move_form, {'category_id': html_new_category_id}
++                        ),
++                        follow_redirects=False,
++                        accept='text/html',
++                    )
++                    page, location = _follow_303(
++                        client, recorder, response,
++                        'a12-html-move-valid', expected_path='/',
++                    )
++                    if page is not None:
++                        actual_query = {}
++                        if location:
++                            actual_query = dict(
++                                parse_qsl(
++                                    urlsplit(location).query,
++                                    keep_blank_values=True,
++                                )
++                            )
++                        location_category = actual_query.get('category')
++                        recorder.check(
++                            'a12-html-move-valid-location',
++                            location_category == html_new_name,
++                            f'有效 move 303 Location category={location_category!r}（期望 {html_new_name!r}）',
++                        )
++                        categories = _fetch_categories(
++                            client, recorder, 'a12-html-move-valid-categories'
++                        )
++                        moved = _get_record_json(
++                            client, recorder, 'a12-html-move-valid-record',
++                            html_inbox_id,
++                        )
++                        if moved is not None:
++                            actual = _record_category_name(moved, categories)
++                            recorder.check(
++                                'a12-html-move-valid-category',
++                                actual == html_new_name,
++                                f'修正后记录 category={actual!r}（期望 {html_new_name!r}）',
++                            )
++                        old_doc = _home_page(
++                            client, recorder, 'a12-html-move-valid-old',
++                            params={'category': common.DEFAULT_CATEGORY},
++                        )
++                        recorder.check(
++                            'a12-html-move-valid-old-absent',
++                            html_inbox_id not in _row_ids(old_doc),
++                            f'修正后「{common.DEFAULT_CATEGORY}」不再包含记录 {html_inbox_id!r}',
++                        )
++                        new_doc = _home_page(
++                            client, recorder, 'a12-html-move-valid-new',
++                            params={'category': html_new_name},
++                        )
++                        recorder.check(
++                            'a12-html-move-valid-new-present',
++                            html_inbox_id in _row_ids(new_doc),
++                            f'修正后归类 {html_new_name!r} 包含记录 {html_inbox_id!r}',
++                        )
++
++        json_inbox_ids = []
++        for label, payload in (
++            ('omitted', {'url': _unique_url('a12-json-omitted')}),
++            ('null', {
++                'url': _unique_url('a12-json-null'),
++                'category': None,
++            }),
++        ):
++            response = client.post_json('/api/bookmarks', payload)
++            recorder.expect_status(
++                response, 201, aid=f'a12-json-save-{label}-status'
++            )
++            record_id = _record_id(_extract_record(_safe_json(response)))
++            recorder.check(
++                f'a12-json-save-{label}-id',
++                bool(record_id),
++                f'JSON 保存 category {label} 返回 id={record_id!r}',
++            )
++            if record_id:
++                json_inbox_ids.append(record_id)
++                categories = _fetch_categories(
++                    client, recorder, f'a12-json-save-{label}-categories'
++                )
++                record = _get_record_json(
++                    client, recorder, f'a12-json-save-{label}-record',
++                    record_id,
++                )
++                if record is not None:
++                    actual = _record_category_name(record, categories)
++                    recorder.check(
++                        f'a12-json-save-{label}-default',
++                        actual == common.DEFAULT_CATEGORY,
++                        f'JSON 保存 category {label} 后归类={actual!r}（期望 {common.DEFAULT_CATEGORY!r}）',
++                    )
++
++        for label, value in (
++            ('empty', ''),
++            ('whitespace', '   '),
++            ('overlong', 'x' * 121),
++        ):
++            before = _snapshot(
++                client, recorder, f'a12-json-save-{label}-before'
++            )
++            response = client.post_json(
++                '/api/bookmarks',
++                {
++                    'url': _unique_url(f'a12-json-save-{label}'),
++                    'category': value,
++                },
++            )
++            recorder.expect_status(
++                response, 400, aid=f'a12-json-save-{label}-status'
++            )
+             code = _error_code(response)
+             recorder.check(
+-                f'a12-{label}-code',
++                f'a12-json-save-{label}-code',
+                 code == 'invalid_category',
+-                f'{label} category={category_value[:24]!r} 错误码={code!r}（期望 invalid_category）',
+-            )
+-
+-        after_categories = _fetch_categories(client, recorder, 'a12-after-categories')
+-        after_books = _fetch_bookmarks(client, recorder, 'a12-after-bookmarks')
+-        recorder.check(
+-            'a12-categories-unchanged',
+-            _category_ids(after_categories) == before_category_ids,
+-            f'归类集合不变：{sorted(_category_ids(after_categories))}（原 {sorted(before_category_ids)}）',
+-        )
+-        recorder.check(
+-            'a12-records-unchanged',
+-            _record_ids(after_books) == before_record_ids,
+-            f'记录集合不变：{len(before_record_ids)} -> {len(_record_ids(after_books))}',
+-        )
+-        names_after = _category_names(after_categories)
+-        recorder.check('a12-no-empty-category', '' not in names_after, '非法请求未创建空名归类')
+-        recorder.check('a12-no-long-category', too_long not in names_after, '非法请求未创建超长名归类')
+-
+-        fetched = client.get(_bookmark_path(anchor_id))
+-        recorder.expect_status(fetched, 200, aid='a12-anchor-fetch-status')
+-        stored_category = _record_category_name(_extract_record(_safe_json(fetched)))
+-        if stored_category is not None:
+-            recorder.check(
+-                'a12-anchor-unchanged-category',
+-                stored_category == common.DEFAULT_CATEGORY,
+-                f'被移动尝试的目标记录 category={stored_category!r}（期望 {common.DEFAULT_CATEGORY!r}）',
++                f'JSON 保存非法 category {label} 错误码={code!r}（期望 invalid_category）',
++            )
++            after = _snapshot(
++                client, recorder, f'a12-json-save-{label}-after'
++            )
++            _check_unchanged(
++                recorder, f'a12-json-save-{label}', before, after,
++                f'JSON 保存非法 category {label}',
++            )
++
++        json_save_name = _unique_category('a12-json-new')
++        response = client.post_json(
++            '/api/bookmarks',
++            {
++                'url': _unique_url('a12-json-new'),
++                'category': json_save_name,
++            },
++        )
++        recorder.expect_status(response, 201, aid='a12-json-new-status')
++        json_new_record_id = _record_id(
++            _extract_record(_safe_json(response))
++        )
++        recorder.check(
++            'a12-json-new-id',
++            bool(json_new_record_id),
++            f'JSON 有效新名称保存返回 id={json_new_record_id!r}',
++        )
++        categories = _fetch_categories(
++            client, recorder, 'a12-json-new-categories'
++        )
++        json_new_category = _find_category_by_name(categories, json_save_name)
++        json_new_category_id = _record_id(json_new_category)
++        recorder.check(
++            'a12-json-new-category-created',
++            json_new_category_id is not None,
++            f'JSON 有效新名称 {json_save_name!r} 自动创建归类，id={json_new_category_id!r}',
++        )
++        if json_new_record_id:
++            record = _get_record_json(
++                client, recorder, 'a12-json-new-record',
++                json_new_record_id,
++            )
++            if record is not None:
++                actual = _record_category_name(record, categories)
++                recorder.check(
++                    'a12-json-new-record-category',
++                    actual == json_save_name,
++                    f'JSON 新名称保存记录 category={actual!r}（期望 {json_save_name!r}）',
++                )
++
++        known_category_id = (
++            json_new_category_id
++            or html_new_category_id
++            or f'cat-known-{uuid.uuid4().hex[:10]}'
++        )
++        json_anchor_id = json_inbox_ids[0] if json_inbox_ids else None
++        if json_anchor_id is None:
++            recorder.check(
++                'a12-json-move-prerequisite',
++                False,
++                '缺少 JSON 保存的未整理记录，无法验证 JSON move',
++            )
++        else:
++            move_cases = (
++                ('omitted', {}),
++                ('null', {'category': None}),
++                ('empty', {'category': ''}),
++                ('whitespace', {'category': '   '}),
++                ('overlong', {'category': 'x' * 121}),
++                ('category-id-only', {'category_id': known_category_id}),
++            )
++            for label, payload in move_cases:
++                before = _snapshot(
++                    client, recorder, f'a12-json-move-{label}-before'
++                )
++                response = client.post_json(
++                    _move_path(json_anchor_id), payload
++                )
++                recorder.expect_status(
++                    response, 400, aid=f'a12-json-move-{label}-status'
++                )
++                code = _error_code(response)
++                recorder.check(
++                    f'a12-json-move-{label}-code',
++                    code == 'invalid_category',
++                    f'JSON move {label} 错误码={code!r}（期望 invalid_category）',
++                )
++                after = _snapshot(
++                    client, recorder, f'a12-json-move-{label}-after'
++                )
++                _check_unchanged(
++                    recorder, f'a12-json-move-{label}', before, after,
++                    f'JSON move {label}',
++                )
++                categories = _fetch_categories(
++                    client, recorder, f'a12-json-move-{label}-categories'
++                )
++                record = _get_record_json(
++                    client, recorder, f'a12-json-move-{label}-anchor',
++                    json_anchor_id,
++                )
++                if record is not None:
++                    actual = _record_category_name(record, categories)
++                    recorder.check(
++                        f'a12-json-move-{label}-anchor-category',
++                        actual == common.DEFAULT_CATEGORY,
++                        f'JSON move {label} 后锚点 category={actual!r}（期望 {common.DEFAULT_CATEGORY!r}）',
++                    )
++
++            json_move_name = _unique_category('a12-json-move')
++            response = client.post_json(
++                _move_path(json_anchor_id), {'category': json_move_name}
++            )
++            recorder.expect_status(
++                response, _SUCCESS_STATUSES, aid='a12-json-move-valid-status'
++            )
++            categories = _fetch_categories(
++                client, recorder, 'a12-json-move-valid-categories'
++            )
++            recorder.check(
++                'a12-json-move-valid-category-created',
++                _find_category_by_name(categories, json_move_name) is not None,
++                f'JSON move 有效新名称 {json_move_name!r} 自动创建归类',
++            )
++            moved = _get_record_json(
++                client, recorder, 'a12-json-move-valid-record',
++                json_anchor_id,
++            )
++            if moved is not None:
++                actual = _record_category_name(moved, categories)
++                recorder.check(
++                    'a12-json-move-valid-category',
++                    actual == json_move_name,
++                    f'JSON move 后记录 category={actual!r}（期望 {json_move_name!r}）',
++                )
++            old_list = _fetch_bookmarks(
++                client, recorder, 'a12-json-move-valid-old',
++                params={'category': common.DEFAULT_CATEGORY},
++            )
++            recorder.check(
++                'a12-json-move-valid-old-absent',
++                json_anchor_id not in _record_ids(old_list),
++                f'JSON move 后「{common.DEFAULT_CATEGORY}」不再包含记录 {json_anchor_id!r}',
++            )
++            new_list = _fetch_bookmarks(
++                client, recorder, 'a12-json-move-valid-new',
++                params={'category': json_move_name},
++            )
++            recorder.check(
++                'a12-json-move-valid-new-present',
++                json_anchor_id in _record_ids(new_list),
++                f'JSON move 后归类 {json_move_name!r} 包含记录 {json_anchor_id!r}',
+             )
+     finally:
+         client.close()
+@@ -549,7 +2635,11 @@
+         except common.AcceptanceError as exc:
+             recorder.check('infrastructure', False, f'验收基础设施错误：{exc}')
+         except Exception as exc:
+-            recorder.check('unexpected-error', False, f'未预期错误：{type(exc).__name__}: {exc}')
++            recorder.check(
++                'unexpected-error',
++                False,
++                f'未预期错误：{type(exc).__name__}: {exc}',
++            )
+     return recorder.finish(args.case)
+ 
+ 

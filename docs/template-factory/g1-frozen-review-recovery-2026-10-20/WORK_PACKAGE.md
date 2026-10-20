@@ -9,8 +9,8 @@
 | F03 提示及 ACL | 原 prompt 字节前缀、严格只读清单、原引用校验不放宽 | PROMPT_AND_PERMISSION_DELTA.json | 已实现，fixture通过 |
 | F04 一次性恢复 | 类型隔离、幂等、同 job 1→2、原子占用、lease/启动/消费 | test_factory_frozen_link.py、test_factory_frozen_recovery_contract.py | 已实现，fixture通过，正式执行待门禁 |
 | F05 提交与只读续交 | 原失败保留、合法交付与精确 attempt、禁止第二次模型 | test_factory_frozen_saved_result.py | 已实现，三项fixture通过 |
-| F06 代码门禁 | 必要回归、13 项检查、精确源码 CI 两项成功 | verification/、ci-source.json | 完整13组已通过，远端精确SHA CI待提交/核对 |
-| F07 真实恢复 | 最多一次 1800 秒；启动余量至少 2700 秒 | operations/、actual-attempt-2/ | 未登记、未运行 |
-| F08 下游 G1/T08 | passed 后才发布、实际标准交接及真实 P0/独立运行；宿主 G1 后 T08 | DELIVERY.md 或 STOP_RECORD.json | 条件未满足 |
+| F06 代码门禁 | 必要回归、13 项检查、精确源码 CI 两项成功 | verification/、ci-source.json | 完整13组及c509077精确CI均通过 |
+| F07 真实恢复 | 最多一次 1800 秒；启动余量至少 2700 秒 | operations/、actual-attempt-2/ | 已登记并实际启动一次；provider quota429，资格已消费 |
+| F08 下游 G1/T08 | passed 后才发布、实际标准交接及真实 P0/独立运行；宿主 G1 后 T08 | DELIVERY.md 或 STOP_RECORD.json | G1 blocked；后续均未运行 |
 
 绝对截止为北京时间 2026-10-20 19:21:52.855422，最迟真实启动时间为 18:36:52.855422。时间不足时不登记/入队/启动，保留未启动证据；不增加窗口或业务修复。Fixture 与真实证据分别报告。

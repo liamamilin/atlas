@@ -1,0 +1,272 @@
+{
+ "authored_field_paths": [
+  [
+   "acceptance",
+   "A02",
+   "goal"
+  ],
+  [
+   "acceptance",
+   "A04",
+   "goal"
+  ],
+  [
+   "acceptance",
+   "A06",
+   "goal"
+  ],
+  [
+   "acceptance",
+   "A07",
+   "goal"
+  ],
+  [
+   "acceptance",
+   "A09",
+   "goal"
+  ],
+  [
+   "acceptance",
+   "A10",
+   "goal"
+  ],
+  [
+   "acceptance",
+   "A12",
+   "features"
+  ],
+  [
+   "acceptance",
+   "A12",
+   "goal"
+  ],
+  [
+   "architecture_markdown"
+  ],
+  [
+   "contract_coverage",
+   "error_contract"
+  ],
+  [
+   "contract_coverage",
+   "features"
+  ],
+  [
+   "contract_coverage",
+   "review_rules_version"
+  ],
+  [
+   "contract_coverage",
+   "schema"
+  ],
+  [
+   "decisions",
+   "D03",
+   "impact"
+  ],
+  [
+   "decisions",
+   "D04",
+   "impact"
+  ],
+  [
+   "decisions",
+   "D07",
+   "impact"
+  ],
+  [
+   "decisions",
+   "D08",
+   "impact"
+  ],
+  [
+   "features",
+   "F01",
+   "acceptance"
+  ],
+  [
+   "features",
+   "F01",
+   "reason"
+  ],
+  [
+   "features",
+   "F01",
+   "sources"
+  ],
+  [
+   "features",
+   "F02",
+   "reason"
+  ],
+  [
+   "features",
+   "F03",
+   "reason"
+  ],
+  [
+   "features",
+   "F07",
+   "reason"
+  ],
+  [
+   "features",
+   "F07",
+   "sources"
+  ],
+  [
+   "features",
+   "F08",
+   "reason"
+  ],
+  [
+   "features",
+   "F08",
+   "sources"
+  ],
+  [
+   "features",
+   "F09",
+   "reason"
+  ],
+  [
+   "features",
+   "F10",
+   "reason"
+  ],
+  [
+   "features",
+   "F10",
+   "sources"
+  ],
+  [
+   "features",
+   "F11",
+   "reason"
+  ],
+  [
+   "features",
+   "F11",
+   "sources"
+  ],
+  [
+   "features",
+   "F12",
+   "reason"
+  ],
+  [
+   "features",
+   "F12",
+   "sources"
+  ],
+  [
+   "features",
+   "F13",
+   "reason"
+  ],
+  [
+   "features",
+   "F14",
+   "reason"
+  ],
+  [
+   "features",
+   "F17",
+   "reason"
+  ],
+  [
+   "features",
+   "F24",
+   "reason"
+  ],
+  [
+   "features",
+   "F24",
+   "sources"
+  ]
+ ],
+ "authorized_assertion_changes": [
+  {
+   "acceptance_id": "A02",
+   "change": "single_label_hostname_negative_to_positive",
+   "rationale": "The explicit target policy accepts any absolute parseable HTTP(S) URL with a valid nonempty hostname, without requiring DNS or a dot. This is the sole authorized semantic replacement of an existing assertion; malformed scheme, non-HTTP(S), empty/invalid hostname and no-write-on-failure negatives remain."
+  }
+ ],
+ "baseline": {
+  "artifact_id": "tpl_7f4c17e834c342e7b462e6bb8b6379e4",
+  "case_basis_digest": "a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589",
+  "expected_digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+  "immutable_case_facts": 29
+ },
+ "edit_paths": [
+  "acceptance/README.md",
+  "acceptance/p0_find_open.py",
+  "acceptance/p0_library.py",
+  "acceptance/p0_organize.py",
+  "acceptance/p0_recovery.py",
+  "acceptance/runner.json"
+ ],
+ "known_blockers": [
+  {
+   "acceptance_id": "A04",
+   "basis": "Category management needs actual HTML create/rename/delete journeys, protection, validation and reassignment of active and soft-deleted records.",
+   "decision_id": "D03",
+   "feature_id": "F03"
+  },
+  {
+   "acceptance_id": "A05",
+   "basis": "The existing move capability needs browser form coverage and visible result/feedback while preserving persistence checks.",
+   "decision_id": "D03",
+   "feature_id": "F04"
+  },
+  {
+   "acceptance_id": "A06",
+   "basis": "P0 category browsing requires visible counts that include active records only and agree with API/list results after state changes.",
+   "decision_id": "D07",
+   "feature_id": "F05"
+  },
+  {
+   "acceptance_id": "A07",
+   "basis": "Category-scoped search must submit category and q together and show selected category, retained query, and matching/empty results.",
+   "decision_id": "D07",
+   "feature_id": "F06"
+  },
+  {
+   "acceptance_id": "A01",
+   "basis": "The source IndexedDB/Dexie implementation is not the target Python/SQLite persistence implementation; correct target rationale while preserving restart assertion.",
+   "decision_id": "D08",
+   "feature_id": "F08"
+  },
+  {
+   "acceptance_id": "A09",
+   "basis": "HTML soft-delete/restore recovery must be exercised; category deletion also needs trashed records to remain recoverable.",
+   "decision_id": "D04",
+   "feature_id": "F09"
+  },
+  {
+   "acceptance_id": "A10",
+   "basis": "Malformed requests and form validation need explicit non-mutating feedback/recovery; retain JSON bad_request and existing API behavior.",
+   "decision_id": null,
+   "feature_id": "F10"
+  },
+  {
+   "acceptance_id": "A02",
+   "basis": "Correct the URL boundary from dotted-host rejection to absolute parseable HTTP(S) with a valid nonempty hostname.",
+   "decision_id": null,
+   "feature_id": "F10"
+  },
+  {
+   "acceptance_id": "A12",
+   "basis": "Invalid category input must retain failure/no-mutation semantics with usable HTML feedback.",
+   "decision_id": "D03",
+   "feature_id": "F10"
+  },
+  {
+   "acceptance_id": "A11",
+   "basis": "The target shell is Python server-rendered HTML, not the source SPA mount; preserve the empty-library readiness contract.",
+   "decision_id": "D08",
+   "feature_id": "F11"
+  }
+ ],
+ "version": "atlas.aggregate-repair-scope.v2"
+}
