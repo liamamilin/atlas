@@ -1,0 +1,23 @@
+test_api_prepare_route_and_cli_prepare_never_start_worker (test_factory_evidence_recovery.EvidenceRecoveryTests) ... ok
+test_prepare_is_pure_and_binds_materials_and_source_authorization (test_factory_evidence_recovery.EvidenceRecoveryTests) ... ok
+test_recover_budget_drift_rolls_back_grant_activation_and_job_queue (test_factory_evidence_recovery.EvidenceRecoveryTests) ... ok
+test_recover_queues_same_job_once_and_preserves_prior_checkpoint_history (test_factory_evidence_recovery.EvidenceRecoveryTests) ... ok
+test_source_gate_checks_exact_head_and_successful_raw_ci (test_factory_evidence_recovery.EvidenceRecoveryTests) ... ok
+test_stale_prepared_proposal_is_rejected_at_registration (test_factory_evidence_recovery.EvidenceRecoveryTests) ... ok
+test_unknown_request_fields_and_wrong_authorization_reject (test_factory_evidence_recovery.EvidenceRecoveryTests) ... ok
+test_binding_mismatch_lower_limit_and_transaction_fault_do_not_spend_grant (test_factory_evidence_grants.EvidenceGrantTests) ... ok
+test_exact_registration_replay_survives_recovery_and_expiry (test_factory_evidence_grants.EvidenceGrantTests) ... ok
+test_idempotence_conflict_and_single_grant_per_job (test_factory_evidence_grants.EvidenceGrantTests) ... ok
+test_only_proven_pre_spawn_release_reopens_same_grant (test_factory_evidence_grants.EvidenceGrantTests) ... ok
+test_r7_phase_cannot_be_recast_as_retry_none_or_new_stage (test_factory_evidence_grants.EvidenceGrantTests) ... ok
+test_reservation_is_atomic_and_mismatch_does_not_consume (test_factory_evidence_grants.EvidenceGrantTests) ... ok
+test_blocked_uncertain_and_malformed_phase_outputs_cannot_advance_or_get_a_second_call (test_factory_evidence_link.EvidenceRecoveryPipelineLinkTests) ... ok
+test_invalid_prepared_evidence_reference_is_rejected_without_second_call (test_factory_evidence_link.EvidenceRecoveryPipelineLinkTests) ... ok
+test_prepare_register_recover_claim_and_append_one_phase_before_aggregate (test_factory_evidence_link.EvidenceRecoveryPipelineLinkTests) ... ok
+test_saved_phase_result_resumes_host_only_without_another_phase_call (test_factory_evidence_link.EvidenceRecoveryPipelineLinkTests) ... ok
+test_r7_uses_four_prepared_replacements_five_reuses_six_fresh_reviews_and_reaches_aggregate (test_factory_r7_link.R7PositivePipelineLinkTests) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 9.205s
+
+OK

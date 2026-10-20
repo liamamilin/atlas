@@ -25,6 +25,27 @@ def dispatch_v1(method, route, query, body, store):
         from .protocol_recovery import ProtocolRecoveryService
         # Recovery leaves the parent paused for explicit operator verification.
         return ProtocolRecoveryService(store).recover(match[1], body), 202
+    match = re.fullmatch(r"jobs/(job_[a-f0-9]{32})/prepare-evidence", route)
+    if method == "POST" and match:
+        from .evidence_recovery import EvidenceRecoveryService
+        return EvidenceRecoveryService(store).prepare(match[1], body), 200
+    match = re.fullmatch(r"jobs/(job_[a-f0-9]{32})/recover-evidence", route)
+    if method == "POST" and match:
+        from .evidence_recovery import EvidenceRecoveryService
+        return EvidenceRecoveryService(store).recover(match[1], body), 202
+    match = re.fullmatch(r"jobs/(job_[a-f0-9]{32})/resume-evidence-result", route)
+    if method == "POST" and match:
+        from .evidence_recovery import EvidenceRecoveryService
+        return EvidenceRecoveryService(store).resume_saved_result(match[1], body), 202
+    if method == "POST" and route == "budget/evidence-grants":
+        from .evidence_recovery import EvidenceRecoveryService
+        if not isinstance(body, dict) or set(body) != {"prepared_proposal", "request"}:
+            raise FactoryError("grant registration requires prepared_proposal and request", "evidence_recovery_schema", 400)
+        return EvidenceRecoveryService(store).register(body["prepared_proposal"], body["request"]), 201
+    match = re.fullmatch(r"budget/evidence-grants/([A-Za-z0-9_-]+)", route)
+    if method == "GET" and match:
+        from .evidence_grants import EvidenceGrantService
+        return EvidenceGrantService(store).get(match[1]), 200
     if route == "budget/protocol-grants":
         from .protocol_grants import ProtocolRetryGrantService
         if method == "POST":

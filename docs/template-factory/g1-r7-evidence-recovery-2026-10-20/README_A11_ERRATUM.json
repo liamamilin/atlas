@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.readonly-template-erratum.v1",
+  "observed_epoch": 1792481925.262275,
+  "status": "known_not_fixed_no_formal_blocker_invented",
+  "path": "acceptance/README.md",
+  "section": "4.1 args table A11",
+  "sha256": "9e73ee6233e5b991a9682bb0bcaa235783bd4c7a6d399d5be38c100face9db6e",
+  "before": "| A11 | `p0_library.py` | `[\"--case\",\"A11\",\"--base-url\",\"{base_url}\"]` |",
+  "proposed_after": "| A11 | `p0_library.py` | `[\"--case\",\"A11\",\"--base-url\",\"{base_url}\",\"--app-root\",\"{app_root}\",\"--data-dir\",\"{data_dir}\"]` |",
+  "unapplied_proposed_sha256": "572a888b3dadacdea3679d8f62c727aa3f3163e0f519e85520d355ea734f0633",
+  "runner_sha256": "3e71774a5bb0fb2b29cbb334983127264d5f377cc9e3a680b12f11da9268e201",
+  "actual_runner_A11": {
+    "args": [
+      "--case",
+      "{case_id}",
+      "--base-url",
+      "{base_url}",
+      "--app-root",
+      "{app_root}",
+      "--data-dir",
+      "{data_dir}"
+    ]
+  },
+  "impact": "照该表手动调用缺--app-root/--data-dir；参数说明、4.2示例、真实runner和实现要求这些参数。",
+  "not_claimed": [
+    "未修改正式九文件或23补证包",
+    "不是717ebf8修复内容",
+    "未宣布必定可忽略或已触发正式blocker",
+    "不要求独立审阅忽略此问题"
+  ],
+  "future_version_handling": "若正式独立审阅要求改文档，需明确的内容修订授权和正式版本处理；目前无第八轮。"
+}

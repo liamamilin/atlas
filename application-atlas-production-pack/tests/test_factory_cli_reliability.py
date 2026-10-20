@@ -15,6 +15,69 @@ from template_factory.store import FactoryError
 
 
 class FactoryCLIReliabilityTests(unittest.TestCase):
+    def test_evidence_grant_stays_occupied_when_spawn_or_start_record_is_uncertain(self):
+        for failure_mode in ("popen_interrupt", "start_record_failure"):
+            with self.subTest(failure_mode=failure_mode), tempfile.TemporaryDirectory() as root:
+                exe, work = self.fake(root, 'import time\ntime.sleep(20)\n')
+                events, processes = [], []
+
+                class Ledger:
+                    def reserve(self, *args, **kwargs):
+                        return {"id": "evidence-reservation", "timeout": 3,
+                                "evidence_recovery_id": "egrant-fixture"}
+
+                    def mark_spawn_intent(self, reservation_id, *, directory=None):
+                        events.append("spawn_intent")
+
+                    def mark_started(self, reservation_id):
+                        events.append("mark_started")
+                        if failure_mode == "start_record_failure":
+                            raise FactoryError("start write failed", "fixture_start_failed", 409)
+
+                    def finish(self, reservation_id, status, **kwargs):
+                        events.append(("finish", status))
+
+                    def release_not_started(self, reservation_id):
+                        events.append("release")
+
+                original = subprocess.Popen
+
+                def spawn(*args, **kwargs):
+                    child = original(*args, **kwargs)
+                    # Setup probes may also use Popen. The model process is
+                    # the explicit `opencode run` command.
+                    argv = args[0] if args else kwargs.get("args", [])
+                    if len(argv) > 1 and argv[1] == "run":
+                        processes.append(child)
+                        if failure_mode == "popen_interrupt":
+                            raise KeyboardInterrupt()
+                    return child
+
+                with patch("template_factory.cli._detect_major", return_value=2), \
+                     patch("template_factory.cli.subprocess.Popen", side_effect=spawn), \
+                     patch("template_factory.evidence_views.readonly_cli_config_identity",
+                           return_value={"schema": "fixture"}):
+                    with self.assertRaises(KeyboardInterrupt if failure_mode == "popen_interrupt" else FactoryError) as caught:
+                        self.run_cli(
+                            exe, work,
+                            budget={"ledger": Ledger(), "identity": "p", "phase": "G1",
+                                    "evidence_recovery_id": "egrant-fixture"},
+                        )
+                self.assertIn("spawn_intent", events)
+                self.assertNotIn("release", events)
+                self.assertIn(("finish", "uncertain"), events)
+                summary = self.summary(work)
+                if failure_mode == "popen_interrupt":
+                    self.assertEqual(summary["cli_status"], "uncertain")
+                    self.assertIsNone(summary["stdout_sha256"])
+                    self.assertIsNone(summary["stderr_sha256"])
+                    self.assertFalse(summary["output_observed"])
+                self.assertTrue(processes)
+                for child in processes:
+                    if child.poll() is None:
+                        child.kill()
+                    child.wait(timeout=3)
+
     def test_budget_rejection_never_announces_or_spawns_cli(self):
         class DeniedLedger:
             def reserve(self, *args, **kwargs):

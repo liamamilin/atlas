@@ -154,7 +154,8 @@ class Pipeline:
         def stage(name, message):
             self.store.update(jid, token, name, message)
 
-        def agent(name, prompt, payload, source=None, *, budget_stage=None, budget_scope=None):
+        def agent(name, prompt, payload, source=None, *, budget_stage=None, budget_scope=None,
+                  evidence_recovery_id=None):
             directory = attempt / name
             directory.mkdir()
             # JSON escapes a multiline document into one long line. OpenCode's
@@ -182,23 +183,35 @@ class Pipeline:
                     scope_history = _budget_scope_history(
                         con, identity["campaign_id"], identity["product_id"], retry_scope, jid
                     )
-                retry = _budget_next_retry(
+                retry = (1 if evidence_recovery_id else _budget_next_retry(
                     prior_calls,
                     ledger.limits["transient_retries"],
                     forced_transient=_is_forced_transient_retry(name),
                     scope_retries=scope_history["retries"],
-                )
+                ))
+                full_payload_digest = digest(payload)
+                budget_input_digest = digest({key: value for key, value in payload.items() if key != "language"})
+                input_sha256 = hashlib.sha256((directory / "input.json").read_bytes()).hexdigest()
+                prompt_sha256 = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+                source_digest = digest(tree_manifest(directory / "source")) if source else None
                 budget_options = {"budget_required": True, "budget": {
                     "ledger": ledger,
                     "identity": identity["product_id"], "phase": identity["segment"],
                     "plan_id": identity.get("plan_id"),
                     "stage": operation, "retry_scope": budget_scope or retry_scope, "job_id": jid,
+                    "job_token": token,
+                    "evidence_recovery_id": evidence_recovery_id,
                     "protocol_context": {
-                        "input_digest": digest({key: value for key, value in payload.items() if key != "language"}),
-                        "input_sha256": hashlib.sha256((directory / "input.json").read_bytes()).hexdigest(),
-                        "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
-                        "source_tree_digest": digest(tree_manifest(directory / "source")) if source else None,
+                        "input_digest": budget_input_digest,
+                        "input_sha256": input_sha256,
+                        "full_payload_digest": full_payload_digest,
+                        "budget_input_digest": budget_input_digest,
+                        "prompt_sha256": prompt_sha256,
+                        "source_tree_digest": source_digest,
                         "projection_digest": payload.get("projection_digest"),
+                        "stage_name": name,
+                        "logical_retry_scope": budget_scope or retry_scope,
+                        "operation": operation,
                     },
                     **({"retry": retry} if retry is not None else {}),
                     "kind": "review" if "review" in name else "research" if "case-" in name else "production",

@@ -1,0 +1,331 @@
+# Atlas G1：R7 同任务补证恢复与一次性重审指令
+
+版本：1.0
+核对日期：2026-10-20（北京时间）
+目标仓库：https://github.com/liamamilin/atlas
+核对分支：codex/stabilize-atlas
+核对 HEAD：b09f971ab0d8af5cb0245d6f2a25fa2c6557dbda
+
+本文件供用户转交 Codex，并配合明确的执行授权使用。它本身不是已经登记的 grant，也不是已执行的恢复回执。收到用户对本文件的明确执行授权后，在本文件限定范围内自主完成宿主开发、验证、正式登记、真实补证重审和条件满足后的后续生产，不要再次停在“准备已完成”。
+
+## 0. 本轮目标、授权范围与硬边界
+
+目标：为当前同一 R7 job 增加一次 phase_acceptance 的正式证据补充重审机会，解决已确认的宿主送审/结果组合缺口，保留历史失败，并继续按真实门禁推进 G1。
+
+允许：
+- 修复宿主的补证投影、严格引用汇总、追加审阅记录、有效检查点选择、同任务恢复、幂等与预算计账。
+- 建立并使用一个明确绑定当前 job、旧失败、原 proposal、新证据投影的“一次性证据补充重审”资格。
+- 本次额外 phase_acceptance CLI 会话最多 1 次；是补证后的重新审阅，不是首次审阅，不是旧 R5 协议 grant，不是第八轮业务修订。
+- 在证据身份确实不变时复用其他五项 passed；新 phase 和新的六项组合通过后，继续 R7 原已授权的程序消费、聚合、冻结后审阅、发布、标准交接、首次真实 P0 和独立运行。
+- G1 正式 passed 后，继续原 T08 三个固定样本，遵守已有范围与预算。
+
+保持：
+- 业务修复 7/7，不增加第八轮；旧 grant 1/1 已消费，不复活或改绑。
+- CLI 总上限 500；本轮起点 77，active 0；所有新真实调用继续入原账。
+- 原 campaign、plan、product、scenario、case revision、事实范围、规格 proposal、九份 R7 prepared 交付文件字节、审阅规则、下游固定验收目标不变。
+- 绝对截止 1792495312.855422，即北京时间 2026-10-20 19:21:52.855422（UTC 11:21:52.855422）。不从恢复时间重新计算，不延期。
+- 原有并发、阶段重试和其余产品额度不变；不得因为全局剩余 423 次就自动取得任何阶段额外资格。
+- 模板 author 调用为 0。首次 P0 的正常开发调用与模板 author 分开统计，按原授权执行。
+- 所有生产写操作必须走正式服务/API/CLI/队列；不得用脚本直接改业务库、删检查点、手写 passed 或重置台账。
+
+本文件不授权改 acceptance 程序、README、runner、规格、file_plan、案例依据或 A04 新行为。发现真实模板内容缺陷须记录并停在相应门禁；不能把内容改动包装成宿主补证。
+
+## 1. 固定现场与不可混淆的状态
+
+campaign：atlas-v1-first-production-2026-10-19
+plan：plan_87059846caf345d2b2fe690657cf324f
+product：product-c42848f63251507bd9d911a5
+scenario：scn_7756e0007f6a463a97316f3f49c15248，r2
+当前 R7 job：job_3a658ba085e8417ea6faad5cb0cdd493
+当前 R7 batch：bat_6b4fc8bf5b4e42d79bc6a9069277e9f0
+当前 attempt：1，job state：failed
+job snapshot digest：c4778af6053066cc90b22c1c1320928f7bed4ea9c818bed19cf62c3e986e9239
+父计划及后继 batch：paused；这是正式计划暂停，不能误写为当前 job paused_budget。
+
+最后登记 stage：blueprint-spec-review-0-ad1379367f3e742a-runtime_protocol-v1。
+真实 blocking dimension：phase_acceptance。runtime_protocol 已 passed。
+
+R7 原生产源码：e97431f323cad8a60ca5bee3ad19c37fd594d10b
+宿主补证准备源码：717ebf830cc231d25cb198795edec06741e7fb76
+最终证据 HEAD：b09f971ab0d8af5cb0245d6f2a25fa2c6557dbda
+三个精确 CI 的 check 与 docker-integration 均已核对 success：
+- https://github.com/liamamilin/atlas/actions/runs/39378796575
+- https://github.com/liamamilin/atlas/actions/runs/39382442263
+- https://github.com/liamamilin/atlas/actions/runs/39383180095
+
+旧 R7 V4 amendment：bamd_f2054b5d9a9b4e80b6a4e379ed04a42a。
+旧已消费 protocol grant：pgrant_f3595368c14d4b23b6ab536f6d198007。
+原 logical retry scope：blueprint-spec-review:phase_acceptance，历史两次普通追加和一次旧 grant 全保留。
+
+原 phase checkpoint：
+- name：blueprint-design-check-0-phase_acceptance
+- digest：dd19d90217dc6cadd7e8346ac4d2af2b1b5a73f4fee2f28aa3ea2f8190ad6d8f
+- outcome：blocked
+- proposal：e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54
+- projection：39d09af2c64eae5f81b4f83505383eb05902cf1f794e2612786a04892b7b6b4b
+- 原 input.json SHA256：ef0e7f1ab2963050b046060ac088d43513c871a60b33f1329279a4061a7a3b56
+- 原完整 payload digest（含 language）：559c03f2846706675146695d5c30cd4670a51b2039b113e57756dbe9dd9cf6a5
+- 原预算 operation 的 input_digest（按 pipeline 规则去掉 language 后 canonical）：7742082f7e399a3be58bcebbb66123d4447b7c2cd0f658b83b82ee72977f2a20
+- 原 CLI reservation：bud_fbec046b65054a33a1c132ad8ed2fd32
+- 原 reservation stage：blueprint-spec-review-0-ad1379367f3e742a-phase_acceptance:7742082f7e399a3b
+
+原 CLI 已完成并返回有效 blocked 内容；不是 cli_protocol 失败。不能把它改造成旧 recover-protocol 所需的协议失败。原 input.json 文件 SHA、完整 payload digest、预算规范化 input_digest 是不同对象，prepare 与预算绑定必须分别命名、按对应公式计算，不能把含 language 的完整摘要代入预算 protocol_context。
+
+外层六项设计汇总也已有 blocked checkpoint：
+blueprint-spec-review-0-ad1379367f3e742a-runtime-v1。
+正式 prepare 必须读取并绑定其实际 digest、内容和六项引用，不凭本文虚构 digest。
+
+当前真实产品结果：新正式模板 0、真实 P0 交付/通过 0/0、案例新增/复用 0/1、G1 blocked、T08 not_started 0/3。
+R7 六预审之后的程序交付检查点尚未实际消费；准备文件存在不等于已冻结候选。
+
+## 2. 先读证据与现有实现，保留工作区
+
+读取适用 AGENTS.md、现有项目指令和当前工作区状态。不要重置到上述 HEAD；如出现更新，只做差异核对，保留已有改动。若现场 job、proposal、预算或关键字节发生未解释变化，先只读核实并停止真实调用，不自动改写本轮绑定。
+
+必须读取目录 docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/ 下：
+- DELIVERY.md、RECOVERY.md、STOP_RECORD.json、RECOVERY_BINDING.json；
+- actual-six-new-review-proof.json；
+- actual-production-raw/ 中 phase_acceptance 原 input、result、prompt/CLI 原始记录；
+- actual-new-checkpoints.json、actual-stop-preservation.json；
+- PROGRAM_REVISION_MANIFEST.json、prepare-request.json、实际 prepared response 与授权来源；
+- HOST_EVIDENCE_FIX.md、host-evidence-preparation/READ_ONLY_PREPARATION.json；
+- independent-real-blocker-review.json、R7_REVIEW_SUGGESTIONS.json、FINDINGS_DISPOSITION.json；
+- prepared-programs/acceptance/ 中真实九份字节。
+同时读取 R7 原授权文件及原 G1/T08 运行、独立验收与采样合同。
+
+重点核对现有 cognition、pipeline 预算身份计算、BudgetLedger、同任务队列恢复、检查点存储与原 protocol_recovery 的语义。复用现有正式服务与事务，不引入独立生产平台。不得直接调用只适用于旧 R5 的恢复入口。
+
+## 3. 已确认的 A05 证据与未证明事项
+
+A05 在 p0_organize.py 的 _a05_across_restart 中已有以下静态行为：
+1. 从绑定 app_root 启动隔离实例，保留 first.instance_dir；
+2. 通过 JSON 创建唯一分类并保存 target_id；
+3. 创建书签，使用真实 HTML record-move-form 移入该分类；
+4. 停止应用，再以同一个 instance_dir 启动；
+5. 从 /api/categories 按原 target_id 查回分类实体；
+6. 检查记录归类名、目标归类 HTML 列表包含记录、默认归类列表不再含该记录。
+_case_a05 确实调用该重启流程。原 source/prepared p0_organize.py 都为：
+93ae82c74946811fac3b1dd213cc077cf89acc6ecfb45e64ec2830e3482b7f60。
+
+原 phase 输入只有六份文档，没有上述程序；旧提示还说程序尚不存在。新的补证应让审阅者看到原先未见的真实字节，而不是要求审阅者改判。
+
+不得扩大说明：
+- 分类创建在此走 JSON，HTML 用于移动；不能说已有 HTML 创建分类后跨重启的独立证据。
+- 不等于 A04 重命名后跨重启全部验证。
+- 不等于直接穷举核对分类 name/count 等全部实体字段。
+- 只是静态断言存在，不是实际 P0 运行 passed。
+
+原授权和 A05 处置作为可审查的历史数据；不是强迫审阅者 passed 的指令。审阅者若基于现有固定合同提出实质缺陷，仍如实 blocked/uncertain，不重试换意见。
+
+## 4. 冻结本轮的九份交付字节与补证材料
+
+本轮相对 R7 prepared 九份文件全部保持原字节。此前“R6→R7 四 replace、五 reuse”的历史 manifest 不重写成另一轮内容修订。
+
+| R7 prepared 文件 | 固定 SHA256 |
+| --- | --- |
+| acceptance/common.py | 7f0d7d28d8336bdde3da267795e24d13e430f05e53063ee01ed5611236325d37 |
+| acceptance/p0_library.py | 5923bdd1d15e7d98bcf2c3b91123b36d986c0c69cbc6a1a7fdab80ce4c437d6e |
+| acceptance/p0_organize.py | 93ae82c74946811fac3b1dd213cc077cf89acc6ecfb45e64ec2830e3482b7f60 |
+| acceptance/p0_find_open.py | 342e38d2298cf48e22fb97d76e080ce4a67c3c10a942502c5ef205954878d667 |
+| acceptance/p0_recovery.py | 372c75aa2944a10cc5146859dc0bacd0e03111defe7c8aa75ece2d28ec45aff3 |
+| acceptance/p1_maturity.py | d44e17c87314db18084b3b88bd2c700a75bfe583d108e9b518040fb8378601a3 |
+| acceptance/requirements.txt | f1fc18b605a1eea93892d319d09122d91033a48dfd4b913f8f262a4dc8633deb |
+| acceptance/README.md | 9e73ee6233e5b991a9682bb0bcaa235783bd4c7a6d399d5be38c100face9db6e |
+| acceptance/runner.json | 3e71774a5bb0fb2b29cbb334983127264d5f377cc9e3a680b12f11da9268e201 |
+
+补证准备已存在：
+- prepared_request_digest：1f45eb5b2d7808d9e7e166f7563bdaa20769bb1cb4949c772b37ee5bfd374648
+- evidence_digest：703fa772f6aa0a6c0571d55738994ee991d178b2687fde0b58295e5810dacd4a
+- PROGRAM_EVIDENCE.json 文件 SHA256：a22b2aa353b9e4dc256385f0e77aa4dabe4f8e5172c7495d74f655eb3c7a58e0
+- A05_FINDING_DISPOSITION.json SHA256：5ff02a1ad9485f2af95466719b7c1de3bb5d16b9a530233ab9d148b6e2c24401
+
+共 23 份已绑定材料：source/prepared 九项各一份、原授权/approved revision/patch/A05 处置四份，以及程序证据 manifest 一份。
+从当前 store.pack 所属仓库根经正式只读准备服务重新校验，不能混用另一 checkout 或任意本地文件。
+原 case r1、20 条场景事实、14 个来源不扩充；程序证据不是新的上游案例事实。
+
+evidence_digest 不等于新的 projection_digest。当前 READ_ONLY_PREPARATION 的 provider_calls 为 0、new_review_outcome 为 null、状态为 prepared_only_not_consumed_by_review。不能拿它充当新审阅。
+
+## 5. 真实调用前必须补齐的宿主衔接
+
+### 5.1 单项引用与六项汇总引用一致
+
+当前 cognition.py 只将 program-evidence/ 写入 phase 的 design_context；六维合并 validate_review 却读取共享 context 的 tree_manifest。
+因此新 phase 若合法引用 program-evidence/prepared/acceptance/p0_organize.py，单项能通过，汇总仍可能报 review cites nonexistent source file。
+
+最小修复：把同一个已严格校验的 23 文件包，以相同路径和相同字节供六维合并校验使用。可将其镜像至共享 context/program-evidence/；如现有结构更适合逐维固定 inventory 合并，也必须保持同样严格性。
+- 每一维仍必须先按自己实际见到的 inventory 校验。
+- 其他五维的模型可见投影不加入补证文件、不改变提示。
+- 合并时保留合法的原引用；禁止删引用、替成 DRAFT.md 或放宽“文件存在/身份”校验。
+- 不允许某维引用它没有见过的材料。
+- 不把补证历史授权当成当前调用的系统指令。
+
+### 5.2 同时处理内层 phase 与外层旧 blocked 缓存
+
+普通同任务重试会先命中外层六维旧汇总，甚至不会进入单维重审；仅允许新 phase projection 不够。
+
+建立受正式授权约束的追加记录机制：
+- 原 phase blocked、原五项 passed、原六维 blocked 总览及其原始报告/输入永不覆盖。
+- 新 phase 结果保存为一份追加记录，绑定旧 CP、原 proposal、新 projection、grant、CLI reservation 和恢复 attempt。
+- 新六维组合记录引用五份核验一致的旧 passed 与这份新的 phase 结果，保留各自来源，不重写旧总览。
+- 新 phase 与新组合的 scope 元数据应准确说明“静态规格及补充的既有程序证据审阅，未执行程序、未验证实际 P0”；不继续声称审阅未见任何程序。其他五维与原历史报告的 scope 不改写。
+- 建立显式、可审计的有效审阅选择/替代关系；只能由合法补证资格产生。
+- R7 后续程序消费必须使用该有效六维组合；不得沿用旧 blocked 总览，也不得仅看新 phase 而绕过其他维度。
+- 没有授权、身份不匹配或普通恢复调用，仍执行原 checkpoint_changed/旧结果逻辑；不得全局放宽检查点不可变规则。
+- 存储可增加带 recovery id 的追加键，但预算逻辑仍归原 phase scope，不能把新存储键解释成免费首次调用。
+
+## 6. 只读恢复 prepare、一次性资格与原子恢复
+
+在现有服务中增加最小的正式“补证恢复 prepare / 登记 / 同任务恢复”路径及对应 CLI/API。具体命名由当前项目结构决定，使用明确新版本并拒绝未知版本。本文没有声称现有 recover-protocol 或普通 retry 已支持本动作。
+
+### 6.1 只读 prepare，零模型调用
+
+生成一份完整、可审查且可重复计算的恢复提案，至少包含：
+- campaign/plan/product/job/batch/attempt/snapshot 原身份；
+- 原 phase 与原外层总览 CP 名称/digest/完整历史绑定；
+- proposal、原 input/projection、原已完成 reservation；
+- 23 文件包和九 prepared 文件实际摘要；
+- 重建的新 phase tree_manifest、projection_digest、prompt_hash、完整规范化输入摘要、审阅规则与配置；
+- 其他五维原/新投影、输入和提示身份的比较结果；
+- 原预算、旧 grant、历史 retry scope、原绝对截止；
+- 精确宿主源码 commit/tree 摘要及 CI 绑定；
+- request_key、提案自身 digest 和本次用户授权原文/文件的 SHA256。
+
+新的摘要必须从实际构造材料计算，不拿 evidence_digest 代填 projection，不手写假摘要。
+prepare、grant 与 reservation 分别保存原始输入文件 SHA、完整 payload 摘要和预算规范化输入摘要，并按各自实际用途校验，禁止混用三者。
+
+### 6.2 五维复用以实际身份为准
+
+原 passed 的固定记录：
+
+| checkpoint | digest | projection digest |
+| --- | --- | --- |
+| blueprint-design-check-0-architecture_contract-ad1379367f3e742a | 29f22fbaeabf413b594d286e6a1dd3e75d93239814eebad9e6852eeddc275132 | 294ac39bebaaed1dfdc12d02278a5081753863cea047fc91a50e01f46ad31919 |
+| blueprint-design-check-0-decisions_defaults | 38f2d5809bdd654411e6140d1444b726d9723645f5e0b5b48a19ef82956c1323 | 77977c6734b92f6e472d3079090bde729534560e3a751f0ea4e5bc0c93e5ad2a |
+| blueprint-design-check-0-product_completeness | 0b54d495af79c6c7c22a871a6281e68eba4f74f67376dae63e44d797eae40e58 | b0255218220f34c9e580b55f20cdbd7e102695113711e838f9d2d51791b2c253 |
+| blueprint-design-check-0-runtime_protocol | b97302d6a41d00e7ccfc20cf73683c283dddb8869651fc65e3df2683a8be56fb | 353b6d2d5c16c26b040997fc53f4526ea3a3a38d2dd2f45cd8a74c42a0aafc06 |
+| blueprint-design-check-0-scenario_scope | d9131dafeef00ecee093b68f7815d09b32d00a97ef80dcef20e207bde2da2473 | 35b5375d5af54080f290e7ce9d9745042bf1f573631b2b6a25321bfed2114c27 |
+
+不仅比较此表：还要比较 actual-six-new-review-proof 内 input_sha256、模型可见完整规范化 payload、提示正文、规则版本和适用配置。
+仅按已有缓存规范明确排除的传输/attempt 路径元数据可以正常化，不能临时忽略业务字段来制造相同。
+五项任一实质输入改变，本次只授权 phase 的范围不足，应在真实调用前停下并列出差异；不得自动补跑五维。
+
+### 6.3 一次性资格与逻辑重试身份
+
+登记独立于旧 R5 protocol grant 的、仅适用当前 R7 phase 的证据补充重审资格。
+必须绑定本文件的实际用户授权、prepare digest、原失败 CP、原 proposal、新 phase projection/input/prompt、旧历史及绝对截止。
+额外容量恰好 1 次 CLI 会话。不得新增业务 repair 行、提高产品 repair limit 或修改旧 grant。
+
+当前 pipeline 按 payload 摘要形成 budget operation identity。补证必然改变 payload，默认可能被识别成 retry=None 的首次调用；正式实现必须显式保留原→新输入 lineage，并将本次记为同 logical scope 下的受授权补证追加调用。用新 digest、stage 后缀或新 attempt 获得免费首次资格属于错误实现。
+
+原 phase CLI 已完成；不得为了复用协议入口而篡改原 failure class、outcome 或 reservation。
+
+### 6.4 原子恢复与幂等
+
+通过正式事务在加锁后再次核验当前 job failed/attempt1、父与后继 paused、active0、77 次基线、7/7、旧 grant1/1、proposal/CP/字节/期限和一次性资格。
+登记/激活恢复关系与同 job 的恢复就绪状态必须事务一致；失败不得留下半激活资格或可无授权启动的任务。
+保持同一 job，正式推进下一 attempt，原 attempt1 的历史与失败事件保留。不得创建替代 job/product/campaign 绕过当前历史。
+父计划保持 paused 直到恢复回执、状态和资格读回验证完成，再通过正式 action resume；禁止用通用 batch retry 误启旧 R5/R6 失败任务。
+同 request_key 的重放返回同一恢复/回执，不再增加 attempt、不再登记额度、不改变截止；不同 request_key 也不能为同一已绑定补证重复铸造资格。
+
+实际 CLI 启动需同时受唯一 reservation、token/lease 与授权消费状态约束：在 Popen 或任何 provider 启动之前，以同一写事务原子校验并占用唯一补证资格与预算 reservation，确认启动后记录 started 与真实调用。队列登记本身不能伪报已调用；Popen 后启动标记写入失败也不得自动释放资格或重新启动，应保留占用/uncertain 并核对原进程证据。
+如果能证明未启动，可复用同一未消费资格；一旦已经启动或无法排除已启动，不得通过崩溃恢复再自动发第二次调用。
+网络/外部进程无法靠数据库事务保证绝对 exactly-once：结果丢失或启动状态不确定时，应保留 uncertain 状态和原始证据，不能盲重发。
+模型已返回 blocked/uncertain、协议失败或超时，都不产生第二次自动补证调用资格。
+
+在登记、恢复及每次新调用启动前按既有机制检查绝对截止。到期不得新增生产调用，不通过延长 CLI timeout、排队时间或暂停来重开窗口。
+
+## 7. 必须完成的有意义验证
+
+在临时数据库和假 CLI 中验证正式服务，测试不得污染生产账。至少覆盖：
+
+1. 完整正向恢复：旧 phase blocked +旧六维 blocked 都存在；只执行一个新的 phase 调用；五维真实缓存复用；新的六项有效组合成立；能继续九份 prepared 字节消费；模板 author0。
+2. phase 返回对真实 program-evidence/prepared/acceptance/p0_organize.py 的引用，单项与六维汇总均通过、引用保留；不存在或越权的路径仍拒绝。
+3. 新 phase/新组合追加后，原 phase、原组合、其他旧 CP、原报告和原台账内容仍可逐条比对。
+4. 改 request、旧 CP、proposal、准备字节、manifest、授权 SHA、新 projection、prompt 或输入身份，均在调用前拒绝。
+5. 任一非 phase 维度输入改变时，零额外调用且不自动重跑。
+6. 同 key 重放、不同 key 重复申请、两请求并发、事务异常回滚：只产生一个合法恢复关系和最多一个新 CLI 启动。
+7. 未授权、错误 job/attempt、旧 R5 grant、已消费资格、通用 retry/新 stage/新 payload 冒充首次：不能启动额外重审。
+8. 启动前失败、启动后中断、结果已落盘但后处理未完成的恢复：按可证实状态复用已有结果，不出现第二次模型调用。
+9. 新 phase 返回 blocked/uncertain/坏 JSON/超时：不强制通过、不隐式新增资格；预算与暂停记录正确。
+10. 截止已过时不能启动，恢复重放不修改 deadline；业务 repair始终7/7，旧grant1/1保留。
+11. 旧 V1/V2/R5/R6/R7 普通路径、原协议恢复、原不可变检查点语义不被新分支改变。
+12. 已完成新 phase 的结果若在后续宿主纯组合环节遇到可修复错误，宿主修复后只可重用该已保存结果；不得再向模型补调，也不得改变被审阅输入。
+
+本次有生产恢复/预算/检查点修改，执行仓库既定完整 13 组检查与必要定向回归。按实际数量报告，不固定要求仍为668；严格 Docker 路径按原规定执行并报告真实 skip。
+先完成必要开发和本地验证，再提交/推送已授权改动，检查对应精确源码 SHA 的 check 与 docker-integration。旧三个成功 CI 不能替代新增宿主源码的 CI。
+不要在开发中反复跑全套无关检查；修复完毕后完成所需门禁即可。
+
+## 8. 已知文档问题必须登记，不能混入宿主修复
+
+当前 R7 prepared README 的 SHA 为 9e73ee6233e5b991a9682bb0bcaa235783bd4c7a6d399d5be38c100face9db6e。
+§4.1 “与 runner.json 一致的 args” 中，A11 行只有：
+["--case","A11","--base-url","{base_url}"]
+
+但同文件参数说明、§4.2调用示例、真实 runner 和 A11 实现都要求：
+--app-root {app_root} --data-dir {data_dir}
+
+这是未修正文档不一致，人工照该表调用会缺参数。它不属于“程序证据没送到审阅者”，不能写成已由717ebf8修复。
+新增只读发现记录，保留精确 before 内容、正确 runner 身份和影响；不改变 README、PROGRAM_REVISION_MANIFEST 或原23份包来冒充纯补证。
+
+可以准备一份尚未应用的精确勘误 diff 供将来审查，但本文件不授权将其应用到正式九份交付物。后续正式独立审阅仍应看完整真实文件，并按原合同判断影响；不得提前宣布该问题必定可忽略，也不得编造已经触发正式 blocker。
+若独立审阅要求修改文档，应如实停止，提交这份具体 diff、受影响摘要与需要失效重审的范围。改变交付字节需要明确的文档修订授权与正式版本处理，不能自动占用不存在的第八轮。
+
+## 9. 实际执行顺序
+
+1. 在原生产 root 只读核对现场，归档基线。
+2. 完成上述最小宿主修复、正式受限恢复入口及回归；提交并取得精确源码 CI。
+3. 使用正式只读 prepare 构造新 phase 投影，核对五维身份不变和全部绑定。
+4. 根据用户本次明确授权，通过正式机制登记恰好一次补证重审资格并恢复同 job；读回回执、预算、状态和原证据保全。
+5. 在原绝对截止有效时，通过正式计划服务 resume；执行唯一一次 phase_acceptance 补证审阅。
+6. 保存模型完整输入、提示、输出、CLI 原始日志与 reservation，严格校验，不预设结论。
+7. 新 phase passed 且六项有效组合均通过，才继续九 prepared 文件的正式消费、候选构造、聚合、新候选冻结、冻结后独立审阅和发布。
+8. 按原标准交接导出创建真正 application-development 作业；证明该作业实际消费了对应标准包；取得第一次真实 P0 交付。
+9. 对精确绑定应用运行冻结套件与独立浏览器核心旅程，包含同容器重启、错误零写入、并发持久化等原固定要求；保留实际 app_root、交付摘要、runtime binding、receipt与phase proof。
+10. 通过 BatchService.assess_g1 正式重新评估；G1 passed 后才执行原 T08 书签、月度预算、多项目会议笔记，不换失败样本，不扩成新批次。
+
+phase补证本身最多1次；后续原已授权新阶段的正常首次调用仍计入总500，并遵循各阶段已有规则，不能因旧grant耗尽而一概禁止它们，也不能把本次补证grant借给后续阶段。
+首次P0仍可开发，但业务修复7/7已满；若真实应用需要业务修复，保存失败与精确修复建议后正式暂停，不新建初始开发任务绕过额度。
+
+## 10. 停止条件与报告
+
+下列情形立即停止新增生产动作，完成可安全完成的证据归档，并通过正式服务保持/恢复暂停：
+- 缺用户本次明确授权或正式绑定不匹配；
+- 新投影/五维比较证明 scope 超出本文件；
+- 需要修改业务规格、九份交付字节、来源范围，或追加第八轮；
+- 唯一补证调用已消费而仍需再调用，或启动是否发生无法证实；
+- phase或后续独立审阅 blocked/uncertain，且没有现有合法继续路径；
+- 精确源码 CI 未满足现有门禁；
+- 原绝对截止到期，或其他正式预算上限触发；
+- 真实P0失败且需要新的产品业务修复。
+
+不得把准备 fixture、静态反证、单项预审、CI、README勘误计划或宿主修复当成模板发布/P0/G1成功。
+
+交付至少包含：
+- 宿主代码提交、精确CI、测试结果及未执行项；
+- 新正式接口/schema/CLI的可执行用法（实现后再给真实命令，不伪造现成API）；
+- 恢复prepare与六维身份比较；
+- 新授权登记/激活/实际消费回执及77起点后的原账增量；
+- 原phase/外层总览及新phase/新组合的追加关系和保全证明；
+- 23补证材料实际被审阅消费的证据；
+- 九文件SHA、规格/案例/事实/旧grant/修复限额/截止不变证明；
+- 已知README A11未修问题与未应用精确diff；
+- 实际聚合、冻结、发布、标准交接、P0、独立运行和G1/T08状态；
+- 精确停止阶段、job/attempt、最后stage与真正blocker区分。
+
+最终报告分清：原R7生产、717ebf8准备、此次宿主修复、此次真实补审及后续真实生产。只要G1未passed，就明确“模板生产主链仍未走通”。
+
+## 11. 核查来源
+
+以下均固定到核对 HEAD，不以可移动分支代替证据身份：
+- https://github.com/liamamilin/atlas/blob/b09f971ab0d8af5cb0245d6f2a25fa2c6557dbda/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/DELIVERY.md
+- https://github.com/liamamilin/atlas/blob/b09f971ab0d8af5cb0245d6f2a25fa2c6557dbda/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/RECOVERY.md
+- https://github.com/liamamilin/atlas/blob/b09f971ab0d8af5cb0245d6f2a25fa2c6557dbda/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/RECOVERY_BINDING.json
+- https://github.com/liamamilin/atlas/blob/b09f971ab0d8af5cb0245d6f2a25fa2c6557dbda/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/HOST_EVIDENCE_FIX.md
+- https://github.com/liamamilin/atlas/blob/b09f971ab0d8af5cb0245d6f2a25fa2c6557dbda/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/actual-six-new-review-proof.json
+- https://github.com/liamamilin/atlas/blob/b09f971ab0d8af5cb0245d6f2a25fa2c6557dbda/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/host-evidence-preparation/READ_ONLY_PREPARATION.json
+- https://github.com/liamamilin/atlas/blob/b09f971ab0d8af5cb0245d6f2a25fa2c6557dbda/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/p0_organize.py
+- https://github.com/liamamilin/atlas/blob/b09f971ab0d8af5cb0245d6f2a25fa2c6557dbda/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/README.md
+- https://github.com/liamamilin/atlas/blob/b09f971ab0d8af5cb0245d6f2a25fa2c6557dbda/application-atlas-production-pack/template_factory/cognition.py
+
+本轮只读审查和本指令不会自动更改生产授权、预算、任务状态或远端仓库。实际授权与执行以上述正式路径为准。
+

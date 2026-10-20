@@ -1,0 +1,28 @@
+{
+  "schema": "atlas.independent-evidence-recovery-review.v1",
+  "reviewer": "Sol /root/protocol_review",
+  "mode": "read_only",
+  "code_conclusion": "no_remaining_supported_actionable_findings",
+  "resolved_in_code": [
+    "uncertain_spawn_cannot_release_grant",
+    "changed_payload_cannot_bypass_evidence_grant",
+    "registration_replay_precedes_dynamic_baseline_checks",
+    "stage_and_operation_contract_aligned",
+    "saved_result_uses_actual_call_attempt",
+    "host_only_resume_binds_new_source_gate_and_unchanged_review_materials",
+    "unbudgeted_cli_preserves_original_failure_summary"
+  ],
+  "evidence_reviewed": {
+    "targeted_tests": "18 passed",
+    "legacy_compatibility_tests": "6 passed",
+    "cross_attempt_chain": "attempt2 not_started -> attempt3 sole phase call -> changed source tree -> attempt4 saved-result reuse",
+    "prepared_programs": "all nine hashes unchanged"
+  },
+  "remaining_verification_at_review": [
+    "CLI regression after final summary-condition fix",
+    "complete final 13 gates",
+    "check and docker-integration for exact final source commit"
+  ],
+  "production_or_model_actions_by_reviewer": false,
+  "limitations": "Fixtures and static review do not establish production recovery or G1 success."
+}

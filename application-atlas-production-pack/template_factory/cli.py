@@ -137,7 +137,9 @@ class CLI:
         budget=None, budget_required=False
     ):
         run_started = time.monotonic()
-        state = {"started": False}
+        state = {"started": False, "start_recorded": False,
+                 "spawn_attempted": False, "spawn_uncertain": False,
+                 "spawn_failed_proven": False}
         reservation = None
         ledger = None
         if budget is not None:
@@ -153,6 +155,8 @@ class CLI:
                 retry_scope=budget.get("retry_scope"),
                 plan_id=budget.get("plan_id"),
                 protocol_context=budget.get("protocol_context"),
+                evidence_recovery_id=budget.get("evidence_recovery_id"),
+                job_token=budget.get("job_token"),
             )
             timeout = reservation["timeout"]
         elif budget_required:
@@ -161,24 +165,29 @@ class CLI:
             return self._run(directory, prompt, model, timeout, cancelled, progress,
                              reasoning_effort=reasoning_effort, _state=state,
                              _budget_ledger=ledger,
-                             _budget_reservation=reservation["id"] if reservation else None)
+                             _budget_reservation=reservation["id"] if reservation else None,
+                             _evidence_recovery=bool(reservation and reservation.get("evidence_recovery_id")))
         except BaseException as error:
             if ledger is not None and reservation is not None:
-                if not state["started"]:
+                proven_not_started = (not state["spawn_attempted"] or state["spawn_failed_proven"])
+                if not state["started"] and proven_not_started:
                     try:
                         ledger.release_not_started(reservation["id"])
                     except FactoryError:
                         pass
                 else:
                     try:
-                        ledger.finish(reservation["id"], "failed", outcome=getattr(error, "code", "cli_failed"))
+                        finish_status = "failed" if state.get("start_recorded") else "uncertain"
+                        ledger.finish(reservation["id"], finish_status,
+                                      outcome=getattr(error, "code", "cli_failed"))
                     except FactoryError:
                         pass
-            if not state["started"]:
+            if not state["started"] or (ledger is not None and reservation is not None and not state["start_recorded"]):
                 target = Path(directory)
+                proven_not_started = (not state["spawn_attempted"] or state["spawn_failed_proven"])
                 try:
                     target.mkdir(parents=True, exist_ok=True)
-                    atomic_json(target / "cli-summary.json", redact_value({
+                    summary = {
                         "model": model, "actual_model": None, "requested_model": model,
                         "observed_model": None,
                         "reasoning_effort": reasoning_effort,
@@ -188,11 +197,14 @@ class CLI:
                         "usage_events": [], "usage_event_limit": MAX_USAGE_EVENTS,
                         "usage_events_truncated": False,
                         "duration_seconds": round(time.monotonic() - run_started, 2),
-                        "cli_status": "not_started", "delivery_status": "failed",
+                        "cli_status": "not_started" if proven_not_started else "uncertain",
+                        "delivery_status": "failed",
                         "failure_code": getattr(error, "code", "cli_start_failed"),
-                        "stdout_sha256": hashlib.sha256(b"").hexdigest(),
-                        "stderr_sha256": hashlib.sha256(b"").hexdigest(),
-                    }))
+                        "stdout_sha256": hashlib.sha256(b"").hexdigest() if proven_not_started else None,
+                        "stderr_sha256": hashlib.sha256(b"").hexdigest() if proven_not_started else None,
+                        "output_observed": False,
+                    }
+                    atomic_json(target / "cli-summary.json", redact_value(summary))
                 except Exception:
                     pass
             raise
@@ -210,6 +222,7 @@ class CLI:
         _state=None,
         _budget_ledger=None,
         _budget_reservation=None,
+        _evidence_recovery=False,
     ):
         call_started = time.monotonic()
         if not self.executable:
@@ -385,7 +398,12 @@ class CLI:
         if timeout <= 0:
             raise FactoryError("CLI setup exhausted the call deadline", "budget_deadline", 409)
         started = time.monotonic()
-        process = subprocess.Popen(
+        if _budget_ledger is not None and _budget_reservation is not None and _evidence_recovery:
+            _budget_ledger.mark_spawn_intent(_budget_reservation, directory=directory)
+        if _state is not None:
+            _state["spawn_attempted"] = True
+        try:
+            process = subprocess.Popen(
                 argv,
                 cwd=directory,
                 env=environment,
@@ -394,8 +412,35 @@ class CLI:
                 stdin=subprocess.DEVNULL,
                 start_new_session=True,
             )
+        except OSError:
+            # Popen's OS launch failures report that exec could not begin.
+            # This is the only exception class treated as proven not-started.
+            if _state is not None:
+                _state["spawn_failed_proven"] = True
+            raise
+        except BaseException:
+            # Interruptions and unexpected failures inside Popen can occur
+            # after the child was created. Keep the reservation occupied.
+            if _state is not None:
+                _state["spawn_uncertain"] = True
+            raise
         if _state is not None:
             _state["started"] = True
+        if _budget_ledger is not None and _budget_reservation is not None:
+            try:
+                _budget_ledger.mark_started(_budget_reservation)
+                if _state is not None:
+                    _state["start_recorded"] = True
+            except BaseException:
+                # Popen returned a live process. Stop it when possible, but keep
+                # the grant occupied as uncertain if the durable start write
+                # failed; never report this as a proven pre-start failure.
+                try:
+                    process.terminate()
+                    process.wait(timeout=2)
+                except (OSError, subprocess.TimeoutExpired):
+                    pass
+                raise
         exit_code = None
         failure = None
         delivery_status = "pending"
@@ -455,8 +500,6 @@ class CLI:
             if event_type in {"tool_use", "tool", "step_start", "step_finish", "error"}:
                 progress("OpenCode: " + event_type)
         try:
-            if _budget_ledger is not None:
-                _budget_ledger.mark_started(_budget_reservation)
             selector = selectors.DefaultSelector()
             selector.register(process.stdout, selectors.EVENT_READ, "stdout")
             selector.register(process.stderr, selectors.EVENT_READ, "stderr")

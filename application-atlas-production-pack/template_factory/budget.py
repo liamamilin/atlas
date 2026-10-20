@@ -62,6 +62,9 @@ G1_R7_FAILED_ATTEMPT = 1
 G1_R7_FAILED_STAGE = "aggregate-semantic-review"
 G1_R7_OLD_DEADLINE = 1792495312.855422
 G1_R7_IDEMPOTENCY_KEY = "atlas-g1-r7-acceptance-alignment-2026-10-20-v1"
+G1_R7_EVIDENCE_JOB = "job_3a658ba085e8417ea6faad5cb0cdd493"
+G1_R7_EVIDENCE_SCOPE = "blueprint-spec-review:phase_acceptance"
+G1_R7_EVIDENCE_STAGE_PREFIX = "blueprint-spec-review-0-ad1379367f3e742a-phase_acceptance"
 
 
 def build_r7_authorization_request(store, prepared_request, *, summary, reason,
@@ -198,6 +201,9 @@ class BudgetLedger:
             "CREATE TABLE IF NOT EXISTS tf_protocol_retry_grant (id TEXT PRIMARY KEY, campaign_id TEXT NOT NULL, plan_id TEXT NOT NULL, product_id TEXT NOT NULL, job_id TEXT NOT NULL, source_ref TEXT NOT NULL, source_digest TEXT NOT NULL, request_json TEXT NOT NULL, request_digest TEXT NOT NULL, idempotency_key TEXT NOT NULL, status TEXT NOT NULL, consumed_reservation_id TEXT, created_at REAL NOT NULL, UNIQUE(campaign_id,idempotency_key))",
             "CREATE TABLE IF NOT EXISTS tf_protocol_retry_grant_use (grant_id TEXT NOT NULL, reservation_id TEXT NOT NULL UNIQUE, status TEXT NOT NULL, created_at REAL NOT NULL, released_at REAL, PRIMARY KEY(grant_id,reservation_id))",
             "CREATE UNIQUE INDEX IF NOT EXISTS tf_protocol_retry_grant_one_live_use ON tf_protocol_retry_grant_use(grant_id) WHERE status IN ('reserved','started','uncertain','consumed')",
+            "CREATE TABLE IF NOT EXISTS tf_evidence_recovery_grant (id TEXT PRIMARY KEY,campaign_id TEXT NOT NULL,product_id TEXT NOT NULL,plan_id TEXT NOT NULL,job_id TEXT NOT NULL,request_key TEXT NOT NULL,proposal_digest TEXT NOT NULL,request_json TEXT NOT NULL,status TEXT NOT NULL,queued_job_id TEXT,consumed_reservation_id TEXT,call_attempt INTEGER,created_at REAL NOT NULL,UNIQUE(campaign_id,request_key),UNIQUE(campaign_id,job_id))",
+            "CREATE TABLE IF NOT EXISTS tf_evidence_recovery_grant_use (grant_id TEXT NOT NULL,reservation_id TEXT NOT NULL UNIQUE,status TEXT NOT NULL,created_at REAL NOT NULL,released_at REAL,call_attempt INTEGER,PRIMARY KEY(grant_id,reservation_id))",
+            "CREATE UNIQUE INDEX IF NOT EXISTS tf_evidence_recovery_grant_one_live_use ON tf_evidence_recovery_grant_use(grant_id) WHERE status IN ('reserved','spawn_intent','started','uncertain','consumed')",
         )
         with store.connect(True) as con:
             for statement in statements:
@@ -205,6 +211,14 @@ class BudgetLedger:
             reservation_columns = {row[1] for row in con.execute("PRAGMA table_info(tf_budget_reservation)")}
             if "retry_scope" not in reservation_columns:
                 con.execute("ALTER TABLE tf_budget_reservation ADD COLUMN retry_scope TEXT")
+            if "worker_token" not in reservation_columns:
+                con.execute("ALTER TABLE tf_budget_reservation ADD COLUMN worker_token TEXT")
+            grant_columns = {row[1] for row in con.execute("PRAGMA table_info(tf_evidence_recovery_grant)")}
+            if "call_attempt" not in grant_columns:
+                con.execute("ALTER TABLE tf_evidence_recovery_grant ADD COLUMN call_attempt INTEGER")
+            use_columns = {row[1] for row in con.execute("PRAGMA table_info(tf_evidence_recovery_grant_use)")}
+            if "call_attempt" not in use_columns:
+                con.execute("ALTER TABLE tf_evidence_recovery_grant_use ADD COLUMN call_attempt INTEGER")
             row = con.execute("SELECT limits_json FROM tf_budget_campaign WHERE campaign_id=?", (self.campaign_id,)).fetchone()
             if row:
                 recorded = {**DEFAULT_LIMITS, **json.loads(row[0])}
@@ -259,7 +273,8 @@ class BudgetLedger:
 
     def reserve(self, identity, phase, kind="production", timeout=None, *, job_id=None,
                 requested_model=None, requested_effort=None, stage=None, retry=None,
-                retry_scope=None, plan_id=None, protocol_context=None):
+                retry_scope=None, plan_id=None, protocol_context=None,
+                evidence_recovery_id=None, job_token=None):
         if not identity or not phase:
             raise FactoryError("budget identity and phase are required", "budget_identity_required", 400)
         if kind not in {"production", "runtime", "review", "research", "transient_retry"}:
@@ -283,6 +298,11 @@ class BudgetLedger:
             remaining = deadline - now
             if remaining <= 0:
                 raise FactoryError("phase deadline exhausted", "budget_deadline", 409)
+            if evidence_recovery_id:
+                owner = con.execute("SELECT state,token,lease FROM job WHERE id=?", (job_id,)).fetchone()
+                if (not job_token or owner is None or owner["state"] != "running"
+                        or owner["token"] != job_token or owner["lease"] is None or owner["lease"] <= now):
+                    raise FactoryError("evidence review job token or lease is not current", "lease_lost", 409)
             charged = con.execute(
                 "SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status!='not_started'",
                 (self.campaign_id,),
@@ -297,12 +317,44 @@ class BudgetLedger:
             ).fetchone()[0]
             if same_group >= active_limit:
                 raise FactoryError("global model-call concurrency limit reached", "budget_concurrency", 409)
+            r7_evidence_scope = (
+                self.campaign_id == G1_AMENDMENT_CAMPAIGN
+                and str(identity) == G1_AMENDMENT_PRODUCT
+                and plan_id == G1_AMENDMENT_PLAN
+                and job_id == G1_R7_EVIDENCE_JOB
+                and str(phase) == "G1"
+                and (str(retry_scope or "") == G1_R7_EVIDENCE_SCOPE
+                     or _legacy_retry_scope(stage) == G1_R7_EVIDENCE_SCOPE
+                     or str(stage or "").startswith(G1_R7_EVIDENCE_STAGE_PREFIX))
+            )
+            if r7_evidence_scope:
+                if evidence_recovery_id and (
+                    str(retry_scope or "") != G1_R7_EVIDENCE_SCOPE
+                    or not str(stage or "").startswith(G1_R7_EVIDENCE_STAGE_PREFIX + ":")
+                    or retry != 1
+                ):
+                    raise FactoryError("R7 evidence grant requires the exact phase stage and retry scope", "evidence_grant_binding", 409)
+                # The original R7 phase call is already durably recorded. A
+                # changed payload/stage cannot turn its authorized successor
+                # into retry=None or another apparent first call.
+                prior_phase = con.execute(
+                    "SELECT retry_scope,stage FROM tf_budget_reservation WHERE campaign_id=? AND identity=? AND job_id=? AND status!='not_started'",
+                    (self.campaign_id, str(identity), job_id),
+                ).fetchall()
+                has_prior_phase = any(
+                    (row[0] == G1_R7_EVIDENCE_SCOPE if row[0] is not None
+                     else _legacy_retry_scope(row[1]) == G1_R7_EVIDENCE_SCOPE)
+                    for row in prior_phase
+                )
+                if has_prior_phase and not evidence_recovery_id:
+                    raise FactoryError("R7 phase successor requires its exact evidence recovery grant", "budget_retry_limit", 409)
             protocol_grant = None
+            evidence_grant = None
             if retry is not None:
                 if (isinstance(retry, bool) or not isinstance(retry, int) or retry < 1
-                        or retry > self.limits["transient_retries"]):
+                        or (retry > self.limits["transient_retries"] and not evidence_recovery_id)):
                     raise FactoryError("retry must be a positive integer", "budget_retry_invalid", 400)
-                scope = str(retry_scope or stage or phase)
+                scope = G1_R7_EVIDENCE_SCOPE if r7_evidence_scope else str(retry_scope or stage or phase)
                 rows = con.execute(
                     "SELECT retry_scope,stage FROM tf_budget_reservation WHERE campaign_id=? AND identity=? AND retry IS NOT NULL AND status!='not_started'",
                     (self.campaign_id, str(identity)),
@@ -311,7 +363,18 @@ class BudgetLedger:
                     1 for row in rows
                     if (row[0] == scope if row[0] is not None else _legacy_retry_scope(row[1]) == scope)
                 )
-                if count >= self.limits["transient_retries"]:
+                if evidence_recovery_id:
+                    if self.limits["transient_retries"] < 2:
+                        raise FactoryError("configured retry limit is stricter than the evidence grant", "budget_retry_limit", 409)
+                    from .evidence_grants import EvidenceGrantService
+                    evidence_grant = EvidenceGrantService.occupy_locked(
+                        con, evidence_recovery_id, protocol_context, reservation_id, now,
+                        campaign_id=self.campaign_id, identity=str(identity), plan_id=plan_id,
+                        job_id=job_id, phase=str(phase), stage=stage, retry=retry,
+                        retry_scope=scope, requested_model=requested_model, kind=kind,
+                        deadline=deadline,
+                    )
+                elif count >= self.limits["transient_retries"]:
                     if self.limits["transient_retries"] >= 2:
                         from .protocol_grants import ProtocolRetryGrantService
                         grant_service = ProtocolRetryGrantService(self.store, clock=self.clock, initialize=False)
@@ -331,20 +394,24 @@ class BudgetLedger:
                 if duplicate:
                     raise FactoryError("repeated fixed-input call must consume retry budget", "budget_retry_limit", 409)
             con.execute(
-                "INSERT INTO tf_budget_reservation(id,campaign_id,identity,phase,kind,status,created,job_id,requested_model,requested_effort,stage,retry,group_kind,retry_scope) VALUES(?,?,?,?,?,'reserved',?,?,?,?,?,?,?,?)",
+                "INSERT INTO tf_budget_reservation(id,campaign_id,identity,phase,kind,status,created,job_id,requested_model,requested_effort,stage,retry,group_kind,retry_scope,worker_token) VALUES(?,?,?,?,?,'reserved',?,?,?,?,?,?,?,?,?)",
                 (reservation_id, self.campaign_id, str(identity), str(phase), kind, now, job_id,
                  requested_model, requested_effort, stage, retry,
                  "runtime" if kind == "runtime" else "production",
-                 str(retry_scope) if retry_scope else None),
+                 str(retry_scope) if retry_scope else None, job_token),
             )
             if retry is not None and protocol_grant is not None:
                 con.execute("INSERT INTO tf_protocol_retry_grant_use(grant_id,reservation_id,status,created_at) VALUES(?,?,?,?)",
                             (protocol_grant["id"], reservation_id, "reserved", now))
                 con.execute("UPDATE tf_protocol_retry_grant SET status='reserved',consumed_reservation_id=? WHERE id=?",
                             (reservation_id, protocol_grant["id"]))
+            if evidence_grant is not None:
+                con.execute("INSERT INTO tf_evidence_recovery_grant_use(grant_id,reservation_id,status,created_at,call_attempt) VALUES(?,?,?,?,?)",
+                            (evidence_grant["id"], reservation_id, "reserved", now, evidence_grant["call_attempt"]))
         cap = min(float(timeout), remaining) if timeout is not None else remaining
         return {"id": reservation_id, "timeout": max(0.0, cap), "deadline": deadline,
-                "protocol_grant_id": protocol_grant["id"] if retry is not None and protocol_grant is not None else None}
+                "protocol_grant_id": protocol_grant["id"] if retry is not None and protocol_grant is not None else None,
+                "evidence_recovery_id": evidence_grant["id"] if evidence_grant else None}
 
     def record_repair(self, identity, operation_key, *, con=None, plan_id=None):
         """Count a business repair once, independent of job IDs or CLI calls."""
@@ -423,6 +490,44 @@ class BudgetLedger:
                             (float(self.clock()), reservation_id))
                 con.execute("UPDATE tf_protocol_retry_grant_use SET status='started' WHERE reservation_id=? AND status='reserved'", (reservation_id,))
                 con.execute("UPDATE tf_protocol_retry_grant SET status='consumed' WHERE consumed_reservation_id=? AND status='reserved'", (reservation_id,))
+            evidence = con.execute("SELECT grant_id FROM tf_evidence_recovery_grant_use WHERE reservation_id=? AND status IN ('reserved','spawn_intent')", (reservation_id,)).fetchone()
+            if evidence:
+                con.execute("UPDATE tf_evidence_recovery_grant_use SET status='started' WHERE reservation_id=?", (reservation_id,))
+                con.execute("UPDATE tf_evidence_recovery_grant SET status='started' WHERE id=? AND consumed_reservation_id=?", (evidence[0], reservation_id))
+
+    def mark_spawn_intent(self, reservation_id, *, directory=None):
+        """Durably record imminent process creation before calling Popen."""
+        with self.store.connect(True) as con:
+            row = con.execute("SELECT status,job_id,worker_token FROM tf_budget_reservation WHERE id=? AND campaign_id=?", (reservation_id, self.campaign_id)).fetchone()
+            if row is None or row[0] != "reserved":
+                raise FactoryError("reservation is not ready to spawn", "budget_spawn_state", 409)
+            grant = con.execute("SELECT grant_id FROM tf_evidence_recovery_grant_use WHERE reservation_id=? AND status='reserved'", (reservation_id,)).fetchone()
+            if grant:
+                if directory is None:
+                    raise FactoryError("evidence call CLI configuration path is required", "evidence_grant_binding", 409)
+                try:
+                    config = json.loads((__import__("pathlib").Path(directory) / "opencode.json").read_text(encoding="utf-8"))
+                    from .evidence_views import readonly_cli_config_identity
+                    actual_identity = readonly_cli_config_identity(config, directory)
+                    proposal_row = con.execute("SELECT request_json FROM tf_evidence_recovery_grant WHERE id=?", (grant[0],)).fetchone()
+                    expected_identity = json.loads(proposal_row[0])["materials"]["new_phase"]["cli_config_identity"]
+                except (OSError, ValueError, KeyError, ImportError) as exc:
+                    raise FactoryError("evidence call CLI configuration cannot be verified", "evidence_grant_binding", 409) from exc
+                if actual_identity != expected_identity:
+                    raise FactoryError("evidence call CLI permissions or configuration differ", "evidence_grant_binding", 409)
+                now = float(self.clock())
+                grant_record = json.loads(proposal_row[0])
+                fixed_deadline = float(grant_record["materials"]["binding"]["deadline"])
+                if now >= fixed_deadline:
+                    raise FactoryError("evidence recovery authorization deadline has passed", "budget_deadline", 409)
+                owner = con.execute("SELECT state,token,lease FROM job WHERE id=?", (row[1],)).fetchone()
+                if (owner is None or owner["state"] != "running" or owner["token"] != row[2]
+                        or owner["lease"] is None or owner["lease"] <= now):
+                    raise FactoryError("evidence review job token or lease is no longer current", "lease_lost", 409)
+                changed = con.execute("UPDATE tf_evidence_recovery_grant SET status='spawn_intent' WHERE id=? AND consumed_reservation_id=? AND status='reserved'", (grant[0], reservation_id)).rowcount
+                if changed != 1:
+                    raise FactoryError("evidence grant cannot enter spawn intent", "evidence_grant_used", 409)
+                con.execute("UPDATE tf_evidence_recovery_grant_use SET status='spawn_intent' WHERE reservation_id=?", (reservation_id,))
 
     def finish(self, reservation_id, status="completed", *, observed_model=None,
                observed_effort=None, outcome=None):
@@ -441,6 +546,10 @@ class BudgetLedger:
                         ("consumed" if final in {"completed", "failed"} else "uncertain", reservation_id))
             con.execute("UPDATE tf_protocol_retry_grant SET status=? WHERE consumed_reservation_id=? AND status IN ('reserved','consumed')",
                         ("consumed" if final in {"completed", "failed"} else "uncertain", reservation_id))
+            con.execute("UPDATE tf_evidence_recovery_grant_use SET status=? WHERE reservation_id=? AND status IN ('reserved','spawn_intent','started','uncertain')",
+                        ("consumed" if final in {"completed", "failed"} else "uncertain", reservation_id))
+            con.execute("UPDATE tf_evidence_recovery_grant SET status=? WHERE consumed_reservation_id=? AND status IN ('reserved','spawn_intent','started','uncertain')",
+                        ("consumed" if final in {"completed", "failed"} else "uncertain", reservation_id))
 
     def release_not_started(self, reservation_id):
         """Release only when caller has direct evidence subprocess creation failed."""
@@ -453,6 +562,10 @@ class BudgetLedger:
                         (float(self.clock()), reservation_id))
             con.execute("UPDATE tf_protocol_retry_grant SET status='available',consumed_reservation_id=NULL WHERE consumed_reservation_id=? AND status='reserved'",
                         (reservation_id,))
+            evidence = con.execute("SELECT grant_id FROM tf_evidence_recovery_grant_use WHERE reservation_id=? AND status IN ('reserved','spawn_intent')", (reservation_id,)).fetchone()
+            if evidence:
+                con.execute("UPDATE tf_evidence_recovery_grant_use SET status='not_started',released_at=? WHERE reservation_id=?", (float(self.clock()), reservation_id))
+                con.execute("UPDATE tf_evidence_recovery_grant SET status='queued',consumed_reservation_id=NULL,call_attempt=NULL WHERE id=? AND consumed_reservation_id=? AND status IN ('reserved','spawn_intent')", (evidence[0], reservation_id))
 
     def phase_remaining(self, identity, phase=None, *, plan_id=None):
         # ``identity`` is retained for older callers; segment deadlines are
@@ -507,6 +620,12 @@ class BudgetLedger:
             protocol_grant_uses = [dict(r) for r in con.execute(
                 "SELECT grant_id,reservation_id,status,created_at,released_at FROM tf_protocol_retry_grant_use WHERE grant_id IN (SELECT id FROM tf_protocol_retry_grant WHERE campaign_id=?) ORDER BY created_at,reservation_id",
                 (self.campaign_id,))]
+            evidence_grants = [dict(r) for r in con.execute(
+                "SELECT id,job_id,plan_id,product_id,request_key,proposal_digest,status,queued_job_id,consumed_reservation_id,call_attempt,created_at FROM tf_evidence_recovery_grant WHERE campaign_id=? ORDER BY created_at,id",
+                (self.campaign_id,))]
+            evidence_grant_uses = [dict(r) for r in con.execute(
+                "SELECT grant_id,reservation_id,status,created_at,released_at FROM tf_evidence_recovery_grant_use WHERE grant_id IN (SELECT id FROM tf_evidence_recovery_grant WHERE campaign_id=?) ORDER BY created_at,reservation_id",
+                (self.campaign_id,))]
         now = float(self.clock())
         for segment in segments:
             segment["remaining_seconds"] = max(0.0, segment["deadline"] - now)
@@ -519,6 +638,8 @@ class BudgetLedger:
                 "repairs": repairs, "amendments": amendments,
                 "protocol_retry_grants": protocol_grants,
                 "protocol_retry_grant_uses": protocol_grant_uses,
+                "evidence_recovery_grants": evidence_grants,
+                "evidence_recovery_grant_uses": evidence_grant_uses,
                 "provider_requests": None, "cost": None}
 
     status = snapshot

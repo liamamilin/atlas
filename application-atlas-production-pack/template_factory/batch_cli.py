@@ -43,6 +43,17 @@ def main(argv=None):
     protocol_recovery = commands.add_parser("recover-protocol", help="Resume the fixed paused protocol failure on the same job")
     protocol_recovery.add_argument("job_id")
     protocol_recovery.add_argument("--request", type=Path, required=True)
+    evidence_prepare = commands.add_parser("evidence-prepare", help="Read-only prepare for the fixed R7 evidence review")
+    evidence_prepare.add_argument("job_id")
+    evidence_prepare.add_argument("--request", type=Path, required=True)
+    evidence_register = commands.add_parser("evidence-grant-register", help="Register one prepared evidence review grant")
+    evidence_register.add_argument("--request", type=Path, required=True)
+    evidence_recovery = commands.add_parser("recover-evidence", help="Queue attempt 2 of the same fixed R7 job")
+    evidence_recovery.add_argument("job_id")
+    evidence_recovery.add_argument("--request", type=Path, required=True)
+    evidence_saved = commands.add_parser("resume-evidence-result", help="Queue a checked host-only continuation with the saved result; no CLI retry")
+    evidence_saved.add_argument("job_id")
+    evidence_saved.add_argument("--request", type=Path, required=True)
     args = parser.parse_args(argv)
     store = FactoryStore(args.root, args.pack)
     service = BatchService(store)
@@ -60,6 +71,21 @@ def main(argv=None):
         elif args.command == "recover-protocol":
             from .protocol_recovery import ProtocolRecoveryService
             result = ProtocolRecoveryService(store).recover(args.job_id, json.loads(args.request.read_text()))
+        elif args.command == "evidence-prepare":
+            from .evidence_recovery import EvidenceRecoveryService
+            result = EvidenceRecoveryService(store).prepare(args.job_id, json.loads(args.request.read_text()))
+        elif args.command == "evidence-grant-register":
+            from .evidence_recovery import EvidenceRecoveryService
+            request = json.loads(args.request.read_text())
+            if not isinstance(request, dict) or set(request) != {"prepared_proposal", "request"}:
+                raise FactoryError("grant registration requires prepared_proposal and request", "evidence_recovery_schema", 400)
+            result = EvidenceRecoveryService(store).register(request["prepared_proposal"], request["request"])
+        elif args.command == "recover-evidence":
+            from .evidence_recovery import EvidenceRecoveryService
+            result = EvidenceRecoveryService(store).recover(args.job_id, json.loads(args.request.read_text()))
+        elif args.command == "resume-evidence-result":
+            from .evidence_recovery import EvidenceRecoveryService
+            result = EvidenceRecoveryService(store).resume_saved_result(args.job_id, json.loads(args.request.read_text()))
         elif args.command == "prepare-revision":
             from .plan_revision import PreparedRevisionService
             result = PreparedRevisionService(store).prepare(args.job_id, json.loads(args.request.read_text()))

@@ -1461,6 +1461,223 @@ def apply_review_reference_repair(result, response, source):
     return repaired
 
 
+def _write_design_projection(design_context, dimension, snapshot, plan, research, context,
+                             source_manifest, source_citation_matrix, policy, prepared_r7_review_evidence):
+    """One byte-stable projection builder shared by production and recovery prepare."""
+    file_plan = plan["file_plan"]
+    projection = {
+        "confirmed_scenario": snapshot["scenario"],
+    }
+    for key in DESIGN_FIELDS[dimension]:
+        projection[key] = (
+            file_plan if key == "file_plan" else plan["spec"].get(key)
+        )
+    if source_manifest is not None:
+        projection["source_manifest_digest"] = digest(source_manifest)
+        projection["source_citation_matrix"] = source_citation_matrix
+    if dimension == "phase_acceptance":
+        projection["file_plan"] = file_plan
+        if prepared_r7_review_evidence is not None:
+            projection["prepared_program_evidence_digest"] = prepared_r7_review_evidence["digest"]
+            for relative_path, raw in prepared_r7_review_evidence["files"].items():
+                target = design_context / relative_path
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(raw)
+    if dimension == "runtime_protocol":
+        (design_context / "RUNTIME_CONTRACT.md").write_text(
+            RUNTIME_CONTRACT
+        )
+    if source_manifest is not None:
+        _atomic_context_json(
+            design_context / "SOURCE_MANIFEST.json", source_manifest
+        )
+        _atomic_context_json(
+            design_context / "SOURCE_CITATION_MATRIX.json",
+            source_citation_matrix,
+        )
+    prose = json.dumps(
+        projection, ensure_ascii=False, indent=2, sort_keys=True
+    )
+    (design_context / "DRAFT.md").write_text(
+        "\n".join(
+            textwrap.fill(line, width=120)
+            for line in prose.splitlines()
+        )
+    )
+    (design_context / "ARCHITECTURE.md").write_text(
+        plan["spec"]["architecture_markdown"]
+    )
+    summary = json.dumps(
+        {"summary": research["summary"], "gaps": research["gaps"]},
+        ensure_ascii=False,
+        indent=2,
+        sort_keys=True,
+    )
+    (design_context / "RESEARCH.md").write_text(
+        "\n".join(
+            textwrap.fill(line, width=120)
+            for line in summary.splitlines()
+        )
+    )
+    if dimension == "architecture_contract" and policy:
+        write_architecture_review_material(
+            design_context, snapshot.get("case_design", []), policy
+        )
+    for filename in ("GUIDANCE.md", "REVISION.md"):
+        if (context / filename).exists():
+            (design_context / filename).write_text(
+                (context / filename).read_text()
+            )
+    return digest(tree_manifest(design_context))
+
+
+def _design_review_payload(snapshot, plan, dimension, design_context, prepared_r7_review_evidence):
+    config = snapshot["config"]
+    return {
+        "language": config.get("language", "zh"),
+        "guidance_file": "source/GUIDANCE.md" if config.get("cognition_guidance", "") else None,
+        "revision_file": "source/REVISION.md" if snapshot.get("cognitive_repair") else None,
+        "proposal_digest": digest(plan),
+        "review_rules_version": REVIEW_RULES_VERSION,
+        "projection_digest": digest(tree_manifest(design_context)),
+        "review_dimensions": [dimension],
+        "focus": DESIGN_FOCUS[dimension],
+        "projection_fields": list(DESIGN_FIELDS[dimension]),
+        "file_plan_included": dimension in ("phase_acceptance", "runtime_protocol"),
+        "source_inventory": sorted(tree_manifest(design_context)),
+        **({"prepared_program_evidence_digest": prepared_r7_review_evidence["digest"]}
+           if dimension == "phase_acceptance" and prepared_r7_review_evidence is not None else {}),
+    }
+
+
+def _r7_evidence_design_review(pipeline, job, attempt, context, plan, research,
+                               source_manifest, matrix, policy, evidence, agent, checkpoint):
+    """Select an authorized appended review; never replace either original blocked CP."""
+    from .evidence_views import (JOB_ID, build_evidence_review_materials)
+    if job["id"] != JOB_ID:
+        return None
+    from .evidence_recovery import EvidenceRecoveryService
+    recovery = EvidenceRecoveryService(pipeline.store).active_for_job(job["id"])
+    if recovery is None:
+        return None
+    from .evidence_grants import EvidenceGrantService
+    grant_service = EvidenceGrantService(pipeline.store)
+    grant_id = recovery["grant_id"]
+    proposal = recovery["proposal"]
+    materials = build_evidence_review_materials(pipeline.store, job["id"])
+    if digest(materials) != digest(proposal["materials"]) or digest(plan) != materials["proposal_digest"]:
+        raise FactoryError("evidence recovery input changed", "checkpoint_changed", 409)
+    from .v1_batches import _g1_source_digest
+    effective_gate = recovery.get("source_gate", proposal["source_gate"])
+    if _g1_source_digest(pipeline.store.pack.parent) != effective_gate["source_tree_digest"]:
+        raise FactoryError("evidence recovery source tree changed", "checkpoint_changed", 409)
+    new = materials["new_phase"]
+    phase_context = attempt / "design-context-0-phase_acceptance"
+    phase_context.mkdir(exist_ok=True)
+    actual_projection = _write_design_projection(
+        phase_context, "phase_acceptance", job["snapshot"], plan, research, context,
+        source_manifest, matrix, policy, evidence,
+    )
+    actual_payload = _design_review_payload(job["snapshot"], plan, "phase_acceptance", phase_context, evidence)
+    if (actual_projection != new["projection_digest"] or actual_payload != new["payload"]
+            or _r7_phase_acceptance_prompt(evidence) != new["prompt"]):
+        raise FactoryError("rebuilt supplementary phase input differs from grant", "checkpoint_changed", 409)
+    # Ensure all five old passes still cite only their own unchanged projection.
+    reused = {}
+    for dimension, identity in materials["reuse_checks"].items():
+        own = attempt / ("design-context-0-" + dimension)
+        own.mkdir(exist_ok=True)
+        view = _write_design_projection(own, dimension, job["snapshot"], plan, research, context,
+                                        source_manifest, matrix, policy, None)
+        saved = pipeline.store.checkpoint(job["id"], identity["checkpoint_name"])
+        if (not saved or saved != identity["record"] or view != identity["projection_digest"]
+                or _design_review_payload(job["snapshot"], plan, dimension, own, None)
+                   != json.loads((pipeline.store.root / "jobs" / job["id"] / "attempt-1" /
+                                   saved["result"]["stage"] / "input.json").read_text())):
+            raise FactoryError("a reused review input changed", "checkpoint_changed", 409)
+        validate_review(saved["result"], own, (dimension,))
+        reused[dimension] = saved["result"]
+
+    phase_key = materials["old_phase"]["checkpoint_name"] + "-evidence-" + grant_id
+    outer_key = materials["old_aggregate"]["checkpoint_name"] + "-evidence-" + grant_id
+    atomic_write(attempt / "evidence-review-prompt.txt", new["prompt"])
+    atomic_json(attempt / "evidence-review-binding.json", {
+        "grant_id": grant_id, "recovery_id": recovery["recovery_id"],
+        "proposal_digest": recovery["proposal_digest"], "materials_digest": digest(materials),
+        "old_phase_checkpoint": materials["old_phase"]["checkpoint_name"],
+        "old_aggregate_checkpoint": materials["old_aggregate"]["checkpoint_name"],
+        "new_phase_checkpoint": phase_key, "new_aggregate_checkpoint": outer_key,
+        "new_input_sha256": new["input_sha256"], "new_full_payload_digest": new["full_payload_digest"],
+        "new_budget_input_digest": new["budget_input_digest"], "new_projection_digest": new["projection_digest"],
+        "prompt_sha256": new["prompt_sha256"], "reused_dimensions": sorted(reused),
+    })
+
+    def append_phase():
+        grant = grant_service.get(grant_id)
+        # A prior result from this same qualification may survive a host-only
+        # combination error. Its exact bytes and original charge are reusable;
+        # absence of proof of non-start never creates a second CLI opportunity.
+        if grant.get("status") == "consumed":
+            from .evidence_recovery import saved_phase_result
+            raw, result_path = saved_phase_result(pipeline.store, grant, materials)
+            if (recovery.get("host_only") and
+                    hashlib.sha256(result_path.read_bytes()).hexdigest() != recovery["saved_result_sha256"]):
+                raise FactoryError("host-only saved result changed", "checkpoint_changed", 409)
+        else:
+            if recovery.get("host_only") or grant.get("status") not in {"queued"}:
+                raise FactoryError("supplementary call already started or is uncertain; no blind retry", "evidence_call_unavailable", 409)
+            raw = agent(new["stage_name"], new["prompt"], new["payload"], phase_context,
+                        evidence_recovery_id=grant_id)
+        part = validate_review(raw, phase_context, ("phase_acceptance",))
+        grant = grant_service.get(grant_id)
+        if not grant.get("consumed_reservation_id"):
+            raise FactoryError("supplementary result lacks its one-use reservation", "evidence_result_unproved", 409)
+        part.update({"scope": "Independent static specification and supplementary existing acceptance-program evidence review; no program execution, actual P0 verification or publication.",
+                     "review_rules_version": REVIEW_RULES_VERSION, "proposal_digest": digest(plan),
+                     "projection_digest": new["projection_digest"], "stage": new["stage_name"],
+                     "evidence_grant_id": grant_id, "evidence_recovery_id": recovery["recovery_id"],
+                     "reservation_id": grant["consumed_reservation_id"], "recovery_attempt": grant.get("call_attempt"),
+                     "supersedes_checkpoint": {"name": materials["old_phase"]["checkpoint_name"],
+                                               "digest": materials["old_phase"]["checkpoint_digest"]}})
+        destination = attempt / new["stage_name"]
+        destination.mkdir(exist_ok=True)
+        atomic_json(destination / "report.json", part)
+        return part
+
+    phase = checkpoint(phase_key, append_phase)
+    _validate_design_review_projection_checkpoint(phase, plan, new["projection_digest"])
+    if phase.get("evidence_grant_id") != grant_id:
+        raise FactoryError("appended phase has the wrong grant", "checkpoint_changed", 409)
+    validate_review(phase, phase_context, ("phase_acceptance",))
+
+    def append_combination():
+        parts = [phase if dimension == "phase_acceptance" else reused[dimension]
+                 for dimension in (*DESIGN_DIMENSIONS, "runtime_protocol")]
+        report = validate_review({"summary": "; ".join(c["dimension"] + ": " + c["outcome"]
+                                                      for part in parts for c in part["checks"]),
+                                  "checks": [c for part in parts for c in part["checks"]],
+                                  "suggestions": list(dict.fromkeys(s for part in parts for s in part["suggestions"]))},
+                                 context, (*DESIGN_DIMENSIONS, "runtime_protocol"))
+        report.update({"scope": "Independent static six-dimension specification review with one supplementary existing-program evidence review; five identical-input original passes reused. No program execution, actual P0 verification or publication.",
+                       "proposal_digest": digest(plan), "case_adaptation_review_digest": _case_adaptation_review_digest(job["snapshot"].get("case_design", []), policy),
+                       "subreviews": parts,
+                       "effective_review_selection": {"grant_id": grant_id, "recovery_id": recovery["recovery_id"],
+                          "old_overview": {"name": materials["old_aggregate"]["checkpoint_name"], "digest": materials["old_aggregate"]["checkpoint_digest"]},
+                          "phase": {"name": phase_key, "digest": digest(phase)},
+                          "reused": {d:{"name":i["checkpoint_name"],"digest":i["checkpoint_digest"]} for d,i in materials["reuse_checks"].items()}}})
+        atomic_json(attempt / "effective-six-review.json", report)
+        return report
+
+    report = checkpoint(outer_key, append_combination)
+    if (report.get("effective_review_selection", {}).get("grant_id") != grant_id
+            or report.get("effective_review_selection", {}).get("phase", {}).get("digest") != digest(phase)):
+        raise FactoryError("effective supplementary review selection changed", "checkpoint_changed", 409)
+    if report["outcome"] != "passed":
+        raise FactoryError("supplementary design review did not pass; no additional qualification available",
+                           "evidence_review_not_passed", 409)
+    return report
+
+
 def produce(pipeline, job, attempt, agent, stage, checkpoint):
     snapshot, config = job["snapshot"], job["snapshot"]["config"]
     repair = snapshot.get("cognitive_repair")
@@ -1622,6 +1839,10 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             repair.get("prepared_revision_request"),
             prepared_program_contents,
         )
+        for relative_path, raw in prepared_r7_review_evidence["files"].items():
+            target = context / relative_path
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(raw)
     if prepared_program_contents is not None:
         prepared = repair["prepared_revision"]
         r7 = prepared.get("schema") == "atlas.failed-plan-revision.v3"
@@ -2145,69 +2366,10 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                         "design-context-" + str(index) + "-" + dimension
                     )
                     design_context.mkdir(exist_ok=True)
-                    projection = {
-                        "confirmed_scenario": snapshot["scenario"],
-                    }
-                    for key in DESIGN_FIELDS[dimension]:
-                        projection[key] = (
-                            file_plan if key == "file_plan" else plan["spec"].get(key)
-                        )
-                    if source_manifest is not None:
-                        projection["source_manifest_digest"] = digest(source_manifest)
-                        projection["source_citation_matrix"] = source_citation_matrix
-                    if dimension == "phase_acceptance":
-                        projection["file_plan"] = file_plan
-                        if prepared_r7_review_evidence is not None:
-                            projection["prepared_program_evidence_digest"] = prepared_r7_review_evidence["digest"]
-                            for relative_path, raw in prepared_r7_review_evidence["files"].items():
-                                target = design_context / relative_path
-                                target.parent.mkdir(parents=True, exist_ok=True)
-                                target.write_bytes(raw)
-                    if dimension == "runtime_protocol":
-                        (design_context / "RUNTIME_CONTRACT.md").write_text(
-                            RUNTIME_CONTRACT
-                        )
-                    if source_manifest is not None:
-                        _atomic_context_json(
-                            design_context / "SOURCE_MANIFEST.json", source_manifest
-                        )
-                        _atomic_context_json(
-                            design_context / "SOURCE_CITATION_MATRIX.json",
-                            source_citation_matrix,
-                        )
-                    prose = json.dumps(
-                        projection, ensure_ascii=False, indent=2, sort_keys=True
+                    _write_design_projection(
+                        design_context, dimension, snapshot, plan, research, context,
+                        source_manifest, source_citation_matrix, policy, prepared_r7_review_evidence,
                     )
-                    (design_context / "DRAFT.md").write_text(
-                        "\n".join(
-                            textwrap.fill(line, width=120)
-                            for line in prose.splitlines()
-                        )
-                    )
-                    (design_context / "ARCHITECTURE.md").write_text(
-                        plan["spec"]["architecture_markdown"]
-                    )
-                    summary = json.dumps(
-                        {"summary": research["summary"], "gaps": research["gaps"]},
-                        ensure_ascii=False,
-                        indent=2,
-                        sort_keys=True,
-                    )
-                    (design_context / "RESEARCH.md").write_text(
-                        "\n".join(
-                            textwrap.fill(line, width=120)
-                            for line in summary.splitlines()
-                        )
-                    )
-                    if dimension == "architecture_contract" and policy:
-                        write_architecture_review_material(
-                            design_context, snapshot.get("case_design", []), policy
-                        )
-                    for filename in ("GUIDANCE.md", "REVISION.md"):
-                        if (context / filename).exists():
-                            (design_context / filename).write_text(
-                                (context / filename).read_text()
-                            )
                     view_digest = digest(tree_manifest(design_context))
 
                     def review_one(
@@ -2223,29 +2385,9 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                         raw = agent(
                             name,
                             review_prompt,
-                            {
-                                "language": config.get("language", "zh"),
-                                "guidance_file": "source/GUIDANCE.md"
-                                if guidance
-                                else None,
-                                "revision_file": "source/REVISION.md"
-                                if repair
-                                else None,
-                                "proposal_digest": digest(plan),
-                                "review_rules_version": REVIEW_RULES_VERSION,
-                                "projection_digest": view_digest,
-                                "review_dimensions": [dimension],
-                                "focus": DESIGN_FOCUS[dimension],
-                                "projection_fields": list(DESIGN_FIELDS[dimension]),
-                                "file_plan_included": dimension
-                                in ("phase_acceptance", "runtime_protocol"),
-                                "source_inventory": sorted(
-                                    tree_manifest(design_context)
-                                ),
-                                **({
-                                    "prepared_program_evidence_digest": prepared_r7_review_evidence["digest"]
-                                } if dimension == "phase_acceptance" and prepared_r7_review_evidence is not None else {}),
-                            },
+                            _design_review_payload(
+                                snapshot, plan, dimension, design_context, prepared_r7_review_evidence
+                            ),
                             design_context,
                         )
                         part = validate_review(raw, design_context, (dimension,))
@@ -2299,7 +2441,12 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                 atomic_json(attempt / design_name / "report.json", report)
                 return report
 
-            design_report = checkpoint(design_checkpoint_name, review_design)
+            design_report = _r7_evidence_design_review(
+                pipeline, job, attempt, context, plan, research, source_manifest,
+                source_citation_matrix, policy, prepared_r7_review_evidence, agent, checkpoint,
+            ) if prepared_r7_review_evidence is not None else None
+            if design_report is None:
+                design_report = checkpoint(design_checkpoint_name, review_design)
             _validate_design_review_checkpoint(
                 design_report, plan, snapshot.get("case_design", []), policy
             )

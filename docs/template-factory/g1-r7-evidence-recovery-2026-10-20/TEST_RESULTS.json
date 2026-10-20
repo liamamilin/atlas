@@ -1,0 +1,85 @@
+{
+  "schema": "atlas.evidence-recovery-tests.v1",
+  "fixture_only": true,
+  "source_tree_sha256": "61ce9eac8ce3c903831c20885a772f8862ecbe9394fbcda692bfa123530c03e0",
+  "full_13_passed": true,
+  "source_changed": false,
+  "counts": {
+    "python_audit": {
+      "tests_run": null,
+      "skipped": 0,
+      "status": "passed"
+    },
+    "ruff": {
+      "tests_run": null,
+      "skipped": 0,
+      "status": "passed"
+    },
+    "backend_tests": {
+      "tests_run": 687,
+      "skipped": 8,
+      "status": "passed"
+    },
+    "atlas_export": {
+      "tests_run": null,
+      "skipped": 0,
+      "status": "passed"
+    },
+    "web_gen": {
+      "tests_run": null,
+      "skipped": 0,
+      "status": "passed"
+    },
+    "web_verify_data": {
+      "tests_run": null,
+      "skipped": 0,
+      "status": "passed"
+    },
+    "npm_audit": {
+      "tests_run": null,
+      "skipped": 0,
+      "status": "passed"
+    },
+    "web_typecheck": {
+      "tests_run": null,
+      "skipped": 0,
+      "status": "passed"
+    },
+    "web_unit": {
+      "tests_run": 9,
+      "skipped": 0,
+      "status": "passed"
+    },
+    "web_build": {
+      "tests_run": null,
+      "skipped": 0,
+      "status": "passed"
+    },
+    "default_e2e": {
+      "tests_run": 17,
+      "skipped": 0,
+      "status": "passed"
+    },
+    "factory_e2e": {
+      "tests_run": 27,
+      "skipped": 0,
+      "status": "passed"
+    },
+    "docker_integration": {
+      "tests_run": 20,
+      "skipped": 0,
+      "status": "passed"
+    }
+  },
+  "targeted_evidence_tests": 18,
+  "legacy_compatibility_tests": 6,
+  "cli_reliability_pytest": {
+    "passed": 15,
+    "subtests": 14,
+    "also_in_backend": true
+  },
+  "negative_probes": "verification/targeted/external-negative-probe.txt",
+  "prior_failed_check": "verification/full-pre-cli-fix/checks.json",
+  "real_production_calls_during_development": 0,
+  "production_baseline_cli": 77
+}
