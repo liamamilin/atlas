@@ -30,6 +30,7 @@ MAX_EXTRA_CALLS = 1
 FROZEN_REVIEW_SCHEMA = "atlas.frozen-review-recovery-proposal.v1"
 FROZEN_REVIEW_JOB = "job_b01427592b164863aab5bedf7b3863bb"
 FROZEN_REVIEW_DEADLINE = 1792495312.855422
+FROZEN_REVIEW_ADDITIONAL_KEY = "atlas-g1-r7-frozen-review-additional-2026-10-20-attempt3"
 
 
 def get_call_binding(proposal):
@@ -75,17 +76,46 @@ class EvidenceGrantService:
 
     @staticmethod
     def initialize_locked(con):
+        con.execute("CREATE TABLE IF NOT EXISTS tf_frozen_review_schema_migration(version INTEGER PRIMARY KEY,applied_at REAL NOT NULL,migration_digest TEXT NOT NULL)")
         con.execute(
             "CREATE TABLE IF NOT EXISTS tf_evidence_recovery_grant ("
             "id TEXT PRIMARY KEY,campaign_id TEXT NOT NULL,product_id TEXT NOT NULL,"
             "plan_id TEXT NOT NULL,job_id TEXT NOT NULL,request_key TEXT NOT NULL,"
             "proposal_digest TEXT NOT NULL,request_json TEXT NOT NULL,status TEXT NOT NULL,"
             "queued_job_id TEXT,consumed_reservation_id TEXT,call_attempt INTEGER,created_at REAL NOT NULL,"
-            "UNIQUE(campaign_id,request_key),UNIQUE(campaign_id,job_id))"
+            "UNIQUE(campaign_id,request_key))"
         )
         columns = {row[1] for row in con.execute("PRAGMA table_info(tf_evidence_recovery_grant)")}
         if "call_attempt" not in columns:
             con.execute("ALTER TABLE tf_evidence_recovery_grant ADD COLUMN call_attempt INTEGER")
+        unique_job = False
+        for index in con.execute("PRAGMA index_list(tf_evidence_recovery_grant)").fetchall():
+            if not index[2]:
+                continue
+            cols = [col[2] for col in con.execute(f"PRAGMA index_info('{index[1]}')").fetchall()]
+            if cols == ["campaign_id", "job_id"]:
+                unique_job = True
+                break
+        if unique_job:
+            custom_indexes = [row[0] for row in con.execute("SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name='tf_evidence_recovery_grant' AND sql IS NOT NULL")]
+            con.execute("ALTER TABLE tf_evidence_recovery_grant RENAME TO tf_evidence_recovery_grant_legacy")
+            con.execute("""CREATE TABLE tf_evidence_recovery_grant (
+                id TEXT PRIMARY KEY,campaign_id TEXT NOT NULL,product_id TEXT NOT NULL,
+                plan_id TEXT NOT NULL,job_id TEXT NOT NULL,request_key TEXT NOT NULL,
+                proposal_digest TEXT NOT NULL,request_json TEXT NOT NULL,status TEXT NOT NULL,
+                queued_job_id TEXT,consumed_reservation_id TEXT,call_attempt INTEGER,created_at REAL NOT NULL,
+                UNIQUE(campaign_id,request_key))""")
+            con.execute("""INSERT INTO tf_evidence_recovery_grant
+                (id,campaign_id,product_id,plan_id,job_id,request_key,proposal_digest,request_json,status,
+                 queued_job_id,consumed_reservation_id,call_attempt,created_at)
+                SELECT id,campaign_id,product_id,plan_id,job_id,request_key,proposal_digest,request_json,status,
+                       queued_job_id,consumed_reservation_id,call_attempt,created_at
+                FROM tf_evidence_recovery_grant_legacy""")
+            con.execute("DROP TABLE tf_evidence_recovery_grant_legacy")
+            for statement in custom_indexes:
+                con.execute(statement)
+        con.execute("INSERT OR IGNORE INTO tf_frozen_review_schema_migration VALUES(1,?,?)",
+                    (time.time(), "grant-job-unique-to-sequential-v1"))
 
     def _verify_authorization(self, proposal):
         authorization = proposal.get("source_authorization")
@@ -144,6 +174,47 @@ class EvidenceGrantService:
                 or grant["consumed_reservation_id"] != G1_R6_PROTOCOL_RESERVATION_ID
                 or len(uses) != 1 or uses[0]["status"] != "consumed"):
             raise FactoryError("G1 budget, pause, old-grant, repair or deadline baseline changed", "evidence_grant_baseline", 409)
+
+    @staticmethod
+    def _verify_frozen_additional_baseline_locked(con, store):
+        from .frozen_review_additional import (
+            PREDECESSOR_GRANT, PREDECESSOR_RESERVATION, PREDECESSOR_ACCEPTANCE,
+            PREDECESSOR_ACCEPTED_AT, DIAGNOSTIC_PATH, DIAGNOSTIC_SHA256,
+        )
+        calls = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status!='not_started'", (CAMPAIGN_ID,)).fetchone()[0]
+        active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','started','uncertain')", (CAMPAIGN_ID,)).fetchone()[0]
+        repairs = con.execute("SELECT COUNT(*) FROM tf_budget_repair WHERE campaign_id=? AND product_id=?", (CAMPAIGN_ID, PRODUCT_ID)).fetchone()[0]
+        prior = con.execute("SELECT status,consumed_reservation_id,call_attempt FROM tf_evidence_recovery_grant WHERE id=?", (PREDECESSOR_GRANT,)).fetchone()
+        reservation = con.execute("SELECT status,job_id,stage,finished,outcome FROM tf_budget_reservation WHERE id=?", (PREDECESSOR_RESERVATION,)).fetchone()
+        acceptance = con.execute("SELECT job_id,body,created_at FROM acceptance WHERE id=?", (PREDECESSOR_ACCEPTANCE,)).fetchone()
+        batches = [con.execute("SELECT state FROM batch WHERE id=?", (batch_id,)).fetchone()
+                   for batch_id in ("bat_6b4fc8bf5b4e42d79bc6a9069277e9f0", "bat_d13dc5920a574140be85da0ea6f5395b")]
+        try:
+            import hashlib
+            import json
+            path = store.pack.parent / DIAGNOSTIC_PATH
+            raw = path.read_bytes()
+            diagnostic = json.loads(raw)
+            diag_ok = (hashlib.sha256(raw).hexdigest() == DIAGNOSTIC_SHA256
+                       and diagnostic.get("cli_invocations") == 1 and diagnostic.get("result") == "passed"
+                       and diagnostic.get("provider_model") == "opencode-go/deepseek-v4.1-flash"
+                       and diagnostic.get("g1_resumed") is False and diagnostic.get("g1_ledger_baseline") == 81
+                       and diagnostic.get("exit_code") == 0 and diagnostic.get("tool_events") == 0
+                       and diagnostic.get("timeout_seconds") == 60)
+        except (OSError, ValueError, TypeError):
+            diag_ok = False
+        body = json.loads(acceptance["body"]) if acceptance else {}
+        if (calls != 81 or active != 0 or repairs != 7 or not prior or prior["status"] != "consumed"
+                or prior["consumed_reservation_id"] != PREDECESSOR_RESERVATION or prior["call_attempt"] != 2
+                or not reservation or reservation["status"] != "failed" or reservation["job_id"] != FROZEN_REVIEW_JOB
+                or reservation["finished"] is None or abs(float(reservation["finished"]) - 1792490680.240822) > 1e-6
+                or reservation["outcome"] != "cli_failed" or reservation["stage"] != "cognitive-review:572da86649b4face"
+                or not acceptance or acceptance["job_id"] != FROZEN_REVIEW_JOB
+                or acceptance["created_at"] != PREDECESSOR_ACCEPTED_AT
+                or body.get("job_attempt") != 2 or body.get("outcome") != "unavailable"
+                or body.get("code") != "cli_failed" or any(not b or b["state"] != "paused" for b in batches)
+                or not diag_ok):
+            raise FactoryError("additional frozen-review predecessor, ledger or diagnostic baseline changed", "evidence_grant_baseline", 409)
 
     @staticmethod
     def _proposal_digest(proposal):
@@ -225,32 +296,59 @@ class EvidenceGrantService:
         return request_key, binding, phase
 
     def _validate_frozen_proposal(self, proposal, request):
+        if not isinstance(request, dict):
+            raise FactoryError("frozen-review registration request must be an object", "evidence_grant_binding", 400)
         if proposal.get("proposal_digest") != self._proposal_digest(proposal):
             raise FactoryError("frozen-review proposal digest does not match", "evidence_grant_binding", 409)
         request_key = proposal.get("request_key")
         supplied = request.get("request_key") if isinstance(request, dict) else None
         if not isinstance(request_key, str) or supplied != request_key:
             raise FactoryError("frozen-review request key differs", "evidence_grant_binding", 403)
-        if (request.get("schema") != "atlas.frozen-review-prepare.v1"
+        additional = proposal.get("request_key") == FROZEN_REVIEW_ADDITIONAL_KEY
+        request_fields = {"schema", "request_key", "source_authorization", "source_gate", "timing_override_authorization"} if additional else {"schema", "request_key", "source_authorization", "source_gate"}
+        if (set(request) != request_fields or request.get("schema") != "atlas.frozen-review-prepare.v1"
                 or request.get("source_authorization") != proposal.get("source_authorization")
+                or (additional and request.get("timing_override_authorization") != proposal.get("timing_override_authorization"))
                 or request.get("source_gate") != proposal.get("source_gate")):
             raise FactoryError("frozen-review registration request differs from proposal", "evidence_grant_binding", 409)
+        from .frozen_review_additional import (
+            REQUEST_KEY as ADDITIONAL_KEY, AUTH_REF as ADDITIONAL_AUTH_REF,
+            AUTH_SHA256 as ADDITIONAL_AUTH_SHA256, TIMING_AUTH_REF,
+            TIMING_AUTH_SHA256, PREDECESSOR_AUTH_REF, PREDECESSOR_AUTH_SHA256,
+        )
+        additional = proposal.get("request_key") == ADDITIONAL_KEY
         authorization = proposal.get("source_authorization")
-        auth_ref = "docs/template-factory/g1-frozen-review-recovery-2026-10-20/authorization/ATLAS_G1_FROZEN_REVIEW_RECOVERY_CODEX_INSTRUCTIONS.txt"
-        auth_digest = "65976f3c72613dfc7208d86cea7ce4c9ec0688ef04c881efba8abacf7f642101"
-        if authorization != {"source_ref": auth_ref, "source_digest": auth_digest}:
-            raise FactoryError("frozen-review authorization differs", "evidence_grant_binding", 403)
-        try:
-            actual = hashlib.sha256((self.store.pack.parent / auth_ref).read_bytes()).hexdigest()
-        except OSError as exc:
-            raise FactoryError("frozen-review authorization source is unavailable", "evidence_grant_source", 409) from exc
-        if actual != auth_digest:
-            raise FactoryError("frozen-review authorization bytes differ", "evidence_grant_source", 409)
+        if additional:
+            if (authorization != {"source_ref": ADDITIONAL_AUTH_REF, "source_digest": ADDITIONAL_AUTH_SHA256}
+                    or proposal.get("timing_override_authorization") != {"source_ref": TIMING_AUTH_REF, "source_digest": TIMING_AUTH_SHA256}
+                    or proposal.get("predecessor_source_authorization") != {"source_ref": PREDECESSOR_AUTH_REF, "source_digest": PREDECESSOR_AUTH_SHA256}
+                or request.get("timing_override_authorization") != proposal["timing_override_authorization"]):
+                raise FactoryError("additional frozen-review authorizations differ", "evidence_grant_binding", 403)
+            for ref, sha in ((ADDITIONAL_AUTH_REF, ADDITIONAL_AUTH_SHA256),
+                             (TIMING_AUTH_REF, TIMING_AUTH_SHA256),
+                             (PREDECESSOR_AUTH_REF, PREDECESSOR_AUTH_SHA256)):
+                try:
+                    actual = hashlib.sha256((self.store.pack.parent / ref).read_bytes()).hexdigest()
+                except OSError as exc:
+                    raise FactoryError("additional frozen-review authorization is unavailable", "evidence_grant_source", 409) from exc
+                if actual != sha:
+                    raise FactoryError("additional frozen-review authorization bytes differ", "evidence_grant_source", 409)
+        else:
+            auth_ref = "docs/template-factory/g1-frozen-review-recovery-2026-10-20/authorization/ATLAS_G1_FROZEN_REVIEW_RECOVERY_CODEX_INSTRUCTIONS.txt"
+            auth_digest = "65976f3c72613dfc7208d86cea7ce4c9ec0688ef04c881efba8abacf7f642101"
+            if authorization != {"source_ref": auth_ref, "source_digest": auth_digest}:
+                raise FactoryError("frozen-review authorization differs", "evidence_grant_binding", 403)
+            try:
+                actual = hashlib.sha256((self.store.pack.parent / auth_ref).read_bytes()).hexdigest()
+            except OSError as exc:
+                raise FactoryError("frozen-review authorization source is unavailable", "evidence_grant_source", 409) from exc
+            if actual != auth_digest:
+                raise FactoryError("frozen-review authorization bytes differ", "evidence_grant_source", 409)
         materials = proposal.get("materials")
         binding = materials.get("binding") if isinstance(materials, dict) else None
         call = materials.get("frozen_review_call") if isinstance(materials, dict) else None
         fixed = {"campaign_id": CAMPAIGN_ID, "plan_id": PLAN_ID, "product_id": PRODUCT_ID,
-                 "job_id": "job_b01427592b164863aab5bedf7b3863bb", "attempt": 1,
+                 "job_id": "job_b01427592b164863aab5bedf7b3863bb", "attempt": 2 if additional else 1,
                  "snapshot_digest": "db51b4ca834dd031135025d761b46407f02b2850ad993c950f55407a0f95fcf6",
                  "batch_id": "bat_6b4fc8bf5b4e42d79bc6a9069277e9f0", "deadline": 1792495312.855422,
                  "artifact_id": "tpl_f7ecff8d8fef4deba828aa2a8ef82918",
@@ -289,8 +387,28 @@ class EvidenceGrantService:
                 or old.get("prompt_sha256") != "9cdd40b5ee69c3b14675fa60569b9f9fb948949dd7be493fe6ff7436a1c9ce09"
                 or old.get("summary_sha256") != "d5c9b3ae369bd3c0f079de9ceb1c661accdb2d24435c3a54872ce9adccba8f72"):
             raise FactoryError("original frozen review call differs", "evidence_grant_binding", 409)
+        if additional:
+            from .frozen_review_additional import (
+                REMAINING_SECONDS, PREDECESSOR_GRANT, PREDECESSOR_RESERVATION,
+                PREDECESSOR_ACCEPTANCE, PREDECESSOR_AUTH_REF, PREDECESSOR_AUTH_SHA256,
+                DIAGNOSTIC_PATH, DIAGNOSTIC_SHA256,
+            )
+            timing = proposal.get("timing_policy")
+            if (proposal.get("predecessor_source_authorization") != {"source_ref": PREDECESSOR_AUTH_REF, "source_digest": PREDECESSOR_AUTH_SHA256}
+                    or timing != {"remaining_seconds": REMAINING_SECONDS, "external_cli_sessions": 1,
+                                  "previous_deadline": 1792495312.855422, "paused_at": 1792490680.244128}
+                    or binding.get("predecessor_grant_id") != PREDECESSOR_GRANT
+                    or binding.get("predecessor_reservation_id") != PREDECESSOR_RESERVATION
+                    or binding.get("predecessor_acceptance_id") != PREDECESSOR_ACCEPTANCE
+                    or binding.get("diagnostic_source_ref") != DIAGNOSTIC_PATH
+                    or binding.get("diagnostic_source_digest") != DIAGNOSTIC_SHA256
+                    or binding.get("attempt") != 2
+                    or not isinstance(binding.get("predecessor_summary_sha256"), str)
+                    or len(binding["predecessor_summary_sha256"]) != 64
+                    or any(ch not in "0123456789abcdef" for ch in binding["predecessor_summary_sha256"])):
+                raise FactoryError("additional frozen-review predecessor or restored timing differs", "evidence_grant_binding", 409)
         self._verify_source_gate(proposal)
-        if float(self.clock()) >= 1792495312.855422:
+        if not additional and float(self.clock()) >= 1792495312.855422:
             raise FactoryError("frozen-review deadline has passed", "budget_deadline", 409)
         return request_key, binding, call
 
@@ -345,14 +463,24 @@ class EvidenceGrantService:
                         or record["proposal"] != prepared_proposal):
                     raise FactoryError("request key was already used for a different proposal", "evidence_grant_conflict", 409)
                 return record
-            prior = con.execute(
-                "SELECT 1 FROM tf_evidence_recovery_grant WHERE campaign_id=? AND job_id=?",
+            existing_for_job = con.execute(
+                "SELECT id,status,consumed_reservation_id,request_key FROM tf_evidence_recovery_grant WHERE campaign_id=? AND job_id=?",
                 (CAMPAIGN_ID, binding.get("job_id", JOB_ID)),
-            ).fetchone()
-            if prior:
-                raise FactoryError("this failed job already has an evidence recovery grant", "evidence_grant_conflict", 409)
+            ).fetchall()
+            additional = request_key == FROZEN_REVIEW_ADDITIONAL_KEY
+            if existing_for_job:
+                from .frozen_review_additional import PREDECESSOR_GRANT, PREDECESSOR_RESERVATION
+                if (not additional or len(existing_for_job) != 1
+                        or existing_for_job[0]["id"] != PREDECESSOR_GRANT
+                        or existing_for_job[0]["status"] != "consumed"
+                        or existing_for_job[0]["consumed_reservation_id"] != PREDECESSOR_RESERVATION):
+                    raise FactoryError("this frozen job already has an unrelated recovery grant", "evidence_grant_conflict", 409)
+            elif additional:
+                raise FactoryError("additional frozen-review recovery requires its consumed predecessor grant", "evidence_grant_conflict", 409)
             if prepared_proposal.get("schema") == SCHEMA:
                 self._verify_budget_baseline_locked(con)
+            elif additional:
+                self._verify_frozen_additional_baseline_locked(con, self.store)
             else:
                 from .frozen_review_recovery import FrozenReviewRecoveryService
                 FrozenReviewRecoveryService(self.store, clock=self.clock)._verify_baseline_locked(con)
@@ -410,8 +538,17 @@ class EvidenceGrantService:
         expected_phase = get_call_binding(proposal)
         owner = con.execute("SELECT state,attempt FROM job WHERE id=?", (job_id,)).fetchone()
         frozen = proposal.get("schema") == FROZEN_REVIEW_SCHEMA
+        additional = proposal.get("request_key") == FROZEN_REVIEW_ADDITIONAL_KEY
         expected_job = FROZEN_REVIEW_JOB if frozen else JOB_ID
         expected_deadline = FROZEN_REVIEW_DEADLINE if frozen else OLD_DEADLINE
+        effective_deadline = expected_deadline
+        if additional:
+            from .frozen_review_additional import get_time_resume_locked
+            resume = get_time_resume_locked(con, campaign_id=campaign_id, product_id=identity,
+                                            plan_id=plan_id, grant_id=grant_id)
+            if resume is None:
+                raise FactoryError("additional frozen-review timing window is not activated", "budget_deadline", 409)
+            effective_deadline = float(resume["effective_deadline"])
         expected_scope = expected_phase.get("logical_retry_scope")
         expected_model = expected_phase.get("requested_model")
         if (campaign_id != CAMPAIGN_ID or identity != PRODUCT_ID or plan_id != PLAN_ID
@@ -421,8 +558,9 @@ class EvidenceGrantService:
                 or requested_model != expected_model
                 or owner is None or owner["state"] != "running" or owner["attempt"] < 2
                 or binding.get("deadline") != expected_deadline
-                or float(deadline) != expected_deadline or float(now) >= expected_deadline
-                or (frozen and owner["attempt"] not in {2, 3, 4})):
+                or float(deadline) != effective_deadline or float(now) >= effective_deadline
+                or (frozen and not additional and owner["attempt"] not in {2, 3, 4})
+                or (additional and owner["attempt"] != 3)):
             raise FactoryError("call identity does not match the evidence grant", "evidence_grant_binding", 409)
         if not isinstance(context, dict):
             raise FactoryError("evidence call context is required", "evidence_grant_binding", 409)

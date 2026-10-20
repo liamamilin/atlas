@@ -67,14 +67,14 @@ class FrozenReviewRecoveryService:
         if _g1_source_digest(self.store.pack.parent) != gate["source_tree_digest"]:
             raise FactoryError("frozen-review host source changed after source authorization", "evidence_source_gate", 409)
 
-    def _original(self):
+    def _original(self, failed_attempt=1):
         from .agent_inputs import build_agent_input
         from .artifacts import tree_manifest
         from .cognition import REVIEW_PROMPT, frozen_review_payload, verify_frozen
         from .api import controlled_path
         job = self.store.job(JOB_ID)
         snapshot = job["snapshot"]
-        if (job["state"] != "needs_review" or job["attempt"] != 1 or job["batch_id"] != BATCH_ID
+        if (job["state"] != "needs_review" or job["attempt"] != failed_attempt or job["batch_id"] != BATCH_ID
                 or digest(snapshot) != SNAPSHOT_DIGEST or snapshot.get("artifact_id") != ARTIFACT_ID
                 or snapshot.get("artifact_digest") != ARTIFACT_DIGEST):
             raise FactoryError("frozen review job no longer matches its original snapshot", "frozen_recovery_baseline", 409)
@@ -118,7 +118,7 @@ class FrozenReviewRecoveryService:
             raise FactoryError("original frozen review CLI summary changed", "frozen_recovery_baseline", 409)
         return job, snapshot, bundle, source, attempt, raw, leaf_raw, effective, REVIEW_PROMPT, tree_manifest(source)
 
-    def _verify_baseline_locked(self, con):
+    def _verify_baseline_locked(self, con, additional=False):
         sessions = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status!='not_started'", (CAMPAIGN_ID,)).fetchone()[0]
         active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','started','uncertain')", (CAMPAIGN_ID,)).fetchone()[0]
         repairs = con.execute("SELECT COUNT(*) FROM tf_budget_repair WHERE campaign_id=? AND product_id=?", (CAMPAIGN_ID, PRODUCT_ID)).fetchone()[0]
@@ -131,35 +131,65 @@ class FrozenReviewRecoveryService:
         from .budget import _legacy_retry_scope
         prior_scope_retries = sum(1 for r in retry_rows if (r[0] or _legacy_retry_scope(r[1])) == "cognitive-review" and r[2] is not None)
         old_use = con.execute("SELECT status FROM tf_evidence_recovery_grant_use WHERE grant_id='egrant_dd03245306034022bbc046e3b9428955'").fetchall()
-        if (sessions != 80 or active != 0 or repairs != 7 or not amendment
+        if (sessions != (81 if additional else 80) or active != 0 or repairs != 7 or not amendment
                 or amendment["id"] != "bamd_f2054b5d9a9b4e80b6a4e379ed04a42a"
                 or amendment["activated_at"] is None or float(amendment["new_deadline"]) != DEADLINE
-                or float(self.clock()) >= DEADLINE or not old or old["status"] != "consumed"
+                or (not additional and float(self.clock()) >= DEADLINE) or not old or old["status"] != "consumed"
                 or old["consumed_reservation_id"] != "bud_9a81a7a4adc14f49b46239ec68ee2fdb"
                 or not prior or prior["status"] != "consumed"
                 or len(old_use) != 1 or old_use[0]["status"] != "consumed"
                 or not batch or batch["state"] != "paused" or not parent_batch or parent_batch["state"] != "paused"
-                or prior_scope_retries != 2):
+                or prior_scope_retries != (3 if additional else 2)):
             raise FactoryError("frozen review budget, old grants or absolute deadline changed", "frozen_recovery_baseline", 409)
+        if additional:
+            from .frozen_review_additional import PREDECESSOR_GRANT, PREDECESSOR_RESERVATION, PREDECESSOR_ACCEPTANCE, PREDECESSOR_ACCEPTED_AT
+            predecessor = con.execute("SELECT * FROM tf_evidence_recovery_grant WHERE id=?", (PREDECESSOR_GRANT,)).fetchone()
+            uses = con.execute("SELECT * FROM tf_evidence_recovery_grant_use WHERE grant_id=?", (PREDECESSOR_GRANT,)).fetchall()
+            failed = con.execute("SELECT * FROM tf_budget_reservation WHERE id=?", (PREDECESSOR_RESERVATION,)).fetchone()
+            unavailable = con.execute("SELECT * FROM acceptance WHERE id=?", (PREDECESSOR_ACCEPTANCE,)).fetchone()
+            if (not predecessor or predecessor["status"] != "consumed" or predecessor["call_attempt"] != 2
+                    or predecessor["consumed_reservation_id"] != PREDECESSOR_RESERVATION
+                    or len(uses) != 1 or uses[0]["status"] != "consumed" or uses[0]["reservation_id"] != PREDECESSOR_RESERVATION
+                    or not failed or failed["job_id"] != JOB_ID or failed["status"] != "failed" or failed["outcome"] != "cli_failed"
+                    or failed["requested_model"] != "opencode-go/deepseek-v4.1-flash"
+                    or not unavailable or unavailable["job_id"] != JOB_ID or unavailable["created_at"] != PREDECESSOR_ACCEPTED_AT):
+                raise FactoryError("additional frozen review predecessor evidence changed", "frozen_recovery_baseline", 409)
+            body = json.loads(unavailable["body"])
+            if body.get("outcome") != "unavailable" or body.get("job_attempt") != 2 or "Go usage limit exceeded" not in body.get("error", ""):
+                raise FactoryError("additional frozen review is not the fixed provider quota failure", "frozen_recovery_baseline", 409)
 
     def prepare(self, job_id, request):
         from .cognition import DIMENSIONS
         from .frozen_review_materials import append_review_prompt, extend_readonly_config
-        if job_id != JOB_ID or not isinstance(request, dict) or set(request) != {"schema", "request_key", "source_authorization", "source_gate"}:
+        from . import frozen_review_additional as extra
+        additional = isinstance(request, dict) and request.get("request_key") == extra.REQUEST_KEY
+        fields = {"schema", "request_key", "source_authorization", "source_gate"}
+        if additional:
+            fields.add("timing_override_authorization")
+        if job_id != JOB_ID or not isinstance(request, dict) or set(request) != fields:
             raise FactoryError("invalid frozen-review prepare scope", "frozen_recovery_schema", 400)
-        if request.get("schema") != "atlas.frozen-review-prepare.v1" or request.get("request_key") != REQUEST_KEY:
+        if request.get("schema") != "atlas.frozen-review-prepare.v1" or request.get("request_key") != (extra.REQUEST_KEY if additional else REQUEST_KEY):
             raise FactoryError("unsupported frozen-review prepare request", "frozen_recovery_schema", 400)
-        if request.get("source_authorization") != {"source_ref": AUTH_REF, "source_digest": AUTH_SHA256}:
+        auth_ref, auth_sha = (extra.AUTH_REF, extra.AUTH_SHA256) if additional else (AUTH_REF, AUTH_SHA256)
+        if request.get("source_authorization") != {"source_ref": auth_ref, "source_digest": auth_sha}:
             raise FactoryError("frozen-review source authorization differs", "frozen_recovery_authorization", 403)
         try:
-            if _sha((self.store.pack.parent / AUTH_REF).read_bytes()) != AUTH_SHA256:
-                raise ValueError("authorization bytes changed")
-        except OSError as exc:
+            checks = [(auth_ref, auth_sha)]
+            if additional:
+                if request["timing_override_authorization"] != {"source_ref": extra.TIMING_AUTH_REF, "source_digest": extra.TIMING_AUTH_SHA256}:
+                    raise ValueError("timing authorization differs")
+                checks.extend([(extra.TIMING_AUTH_REF, extra.TIMING_AUTH_SHA256), (AUTH_REF, AUTH_SHA256), (extra.DIAGNOSTIC_PATH, extra.DIAGNOSTIC_SHA256)])
+            for ref, sha in checks:
+                path = self.store.pack.parent / ref
+                if path.is_symlink() or _sha(path.read_bytes()) != sha:
+                    raise ValueError("authorization or diagnostic bytes changed")
+        except (OSError, ValueError) as exc:
             raise FactoryError("frozen-review authorization is unavailable", "frozen_recovery_authorization", 409) from exc
         from .evidence_recovery import validate_source_gate
         gate = (self.source_gate_validator(self.store, request["source_gate"])
                 if self.source_gate_validator else validate_source_gate(self.store, request["source_gate"]))
-        job, snapshot, bundle, source, old_dir, raw, leaf_raw, payload, original_prompt, source_manifest = self._original()
+        failed_attempt = 2 if additional else 1
+        job, snapshot, bundle, source, old_dir, raw, leaf_raw, payload, original_prompt, source_manifest = self._original(failed_attempt)
         source_copy = old_dir / "source"
         materials = self._materials(raw, leaf_raw, source_copy)
         prompt, prompt_identity = append_review_prompt(original_prompt)
@@ -170,7 +200,7 @@ class FrozenReviewRecoveryService:
         operation, _ = _budget_operation_identity("cognitive-review", call_payload)
         if operation != "cognitive-review:572da86649b4face":
             raise FactoryError("frozen-review operation identity changed", "frozen_recovery_baseline", 409)
-        target_attempt = self.store.root / "jobs" / JOB_ID / "attempt-2" / "cognitive-review"
+        target_attempt = self.store.root / "jobs" / JOB_ID / f"attempt-{failed_attempt + 1}" / "cognitive-review"
         old_config = json.loads((old_dir / "opencode.json").read_bytes())
         derived_config, config_identity = extend_readonly_config(old_config, old_dir, target_attempt, materials["manifest"])
         call = {"payload": call_payload, "input_json": raw.decode("utf-8"), "prompt": prompt, "input_sha256": input_hash,
@@ -185,7 +215,7 @@ class FrozenReviewRecoveryService:
                 "prompt_append_identity": prompt_identity, "materials_scan": materials["scan"],
                 "source_manifest": source_manifest, "cli_config": derived_config}
         with self.store.connect() as con:
-            self._verify_baseline_locked(con)
+            self._verify_baseline_locked(con, additional)
             acceptance = con.execute("SELECT body FROM acceptance WHERE id=?", (OLD_ACCEPTANCE_ID,)).fetchone()
             if not acceptance or json.loads(acceptance["body"]).get("outcome") != "unavailable":
                 raise FactoryError("original unavailable acceptance changed", "frozen_recovery_baseline", 409)
@@ -195,12 +225,12 @@ class FrozenReviewRecoveryService:
             events = [dict(row) for row in con.execute("SELECT seq,attempt,at,stage,message FROM event WHERE job_id=? ORDER BY seq", (JOB_ID,))]
             checkpoints = [dict(row) for row in con.execute("SELECT name,body FROM checkpoint WHERE job_id=? ORDER BY name", (JOB_ID,))]
         binding = {"campaign_id": CAMPAIGN_ID, "plan_id": PLAN_ID, "product_id": PRODUCT_ID,
-                   "job_id": JOB_ID, "batch_id": BATCH_ID, "attempt": 1, "snapshot_digest": SNAPSHOT_DIGEST,
+                   "job_id": JOB_ID, "batch_id": BATCH_ID, "attempt": failed_attempt, "snapshot_digest": SNAPSHOT_DIGEST,
                    "deadline": DEADLINE, "artifact_id": ARTIFACT_ID, "artifact_digest": ARTIFACT_DIGEST,
                    "old_acceptance_id": OLD_ACCEPTANCE_ID, "old_acceptance_digest": _sha(acceptance["body"].encode()),
                    "original_reservation_id": ORIGINAL_RESERVATION, "original_events_digest": digest(events),
                    "original_checkpoints_digest": digest(checkpoints), "source_manifest_digest": digest(source_manifest)}
-        proposal = {"schema": SCHEMA, "request_key": REQUEST_KEY, "source_authorization": request["source_authorization"],
+        proposal = {"schema": SCHEMA, "request_key": request["request_key"], "source_authorization": request["source_authorization"],
                     "source_gate": gate, "source_gate_passed": True,
                     "materials": {"binding": binding, "old_phase": {"reservation_id": ORIGINAL_RESERVATION,
                     "input_sha256": OLD_RAW_SHA, "full_payload_digest": OLD_PAYLOAD_DIGEST,
@@ -208,6 +238,27 @@ class FrozenReviewRecoveryService:
                     "summary_sha256": OLD_SUMMARY_SHA, "source_tree_digest": digest(source_manifest)},
                     "frozen_review_call": call, "review_dimensions": list(DIMENSIONS),
                     "material_files": {path: _sha(content) for path, content in materials["files"].items()}}}
+        if additional:
+            predecessor_dir = self.store.root / "jobs" / JOB_ID / "attempt-2" / "cognitive-review"
+            if ((predecessor_dir / "input.json").read_bytes() != raw
+                    or (predecessor_dir / "leaf.md").read_bytes() != leaf_raw
+                    or (predecessor_dir / "prompt.txt").read_text() != prompt):
+                raise FactoryError("additional frozen review predecessor bytes differ", "frozen_recovery_baseline", 409)
+            from .artifacts import tree_manifest
+            if tree_manifest(predecessor_dir / "source") != source_manifest:
+                raise FactoryError("additional frozen review predecessor source differs", "frozen_recovery_baseline", 409)
+            predecessor_summary = (predecessor_dir / "cli-summary.json").read_bytes()
+            if _sha(predecessor_summary) != "b4e6d90b6c4fb0df91d70254fd241930f9c7fd73165831cd47577b6c2e48d8e1":
+                raise FactoryError("additional frozen review predecessor summary differs", "frozen_recovery_baseline", 409)
+            binding.update(predecessor_grant_id=extra.PREDECESSOR_GRANT,
+                           predecessor_reservation_id=extra.PREDECESSOR_RESERVATION,
+                           predecessor_acceptance_id=extra.PREDECESSOR_ACCEPTANCE,
+                           predecessor_summary_sha256=_sha(predecessor_summary),
+                           diagnostic_source_ref=extra.DIAGNOSTIC_PATH, diagnostic_source_digest=extra.DIAGNOSTIC_SHA256)
+            proposal.update(timing_override_authorization=request["timing_override_authorization"],
+                            predecessor_source_authorization={"source_ref": AUTH_REF, "source_digest": AUTH_SHA256},
+                            timing_policy={"remaining_seconds": extra.REMAINING_SECONDS, "external_cli_sessions": 1,
+                                           "previous_deadline": DEADLINE, "paused_at": 1792490680.244128})
         proposal["proposal_digest"] = digest(proposal)
         return proposal
 
@@ -225,8 +276,11 @@ class FrozenReviewRecoveryService:
             prior = None
         if prior:
             stored = json.loads(prior["request_json"])
-            req_matches = (request == {"schema": "atlas.frozen-review-prepare.v1", "request_key": stored.get("request_key"),
-                           "source_authorization": stored.get("source_authorization"), "source_gate": stored.get("source_gate")})
+            stored_request = {"schema": "atlas.frozen-review-prepare.v1", "request_key": stored.get("request_key"),
+                              "source_authorization": stored.get("source_authorization"), "source_gate": stored.get("source_gate")}
+            if "timing_override_authorization" in stored:
+                stored_request["timing_override_authorization"] = stored["timing_override_authorization"]
+            req_matches = request == stored_request
             if (not req_matches or stored != prepared_proposal
                     or prepared_proposal.get("proposal_digest") != digest({k: v for k, v in prepared_proposal.items() if k != "proposal_digest"})):
                 raise FactoryError("frozen-review key is already bound to another proposal", "evidence_grant_conflict", 409)
@@ -243,19 +297,22 @@ class FrozenReviewRecoveryService:
                 or request.get("schema") != "atlas.frozen-review-recovery.v1"):
             raise FactoryError("invalid frozen-review recovery request", "frozen_recovery_schema", 400)
         request_digest = digest(request)
+        from . import frozen_review_additional as extra
+        additional = request["request_key"] == extra.REQUEST_KEY
+        failed_attempt = 2 if additional else 1
         with self.store.connect(True) as con:
             EvidenceRecoveryService = __import__("template_factory.evidence_recovery", fromlist=["EvidenceRecoveryService"]).EvidenceRecoveryService
             EvidenceRecoveryService._initialize_locked(con)
-            prior = con.execute("SELECT * FROM tf_evidence_recovery WHERE job_id=?", (job_id,)).fetchone()
+            prior = con.execute("SELECT * FROM tf_evidence_recovery WHERE job_id=? AND grant_id=?", (job_id, request["grant_id"])).fetchone()
             if prior:
                 if prior["grant_id"] != request["grant_id"] or prior["request_key"] != request["request_key"] or prior["request_digest"] != request_digest:
                     raise FactoryError("frozen review was already recovered with another request", "idempotency_conflict", 409)
                 return {"recovery_id": prior["recovery_id"], "grant_id": prior["grant_id"], "job_id": job_id,
                         "attempt": prior["old_attempt"] + 1, "replayed": True, "worker_started": False}
             job = con.execute("SELECT * FROM job WHERE id=?", (job_id,)).fetchone()
-            if not job or job["state"] != "needs_review" or job["attempt"] != 1 or digest(json.loads(job["snapshot"])) != SNAPSHOT_DIGEST:
-                raise FactoryError("frozen review is not the fixed needs-review attempt 1", "frozen_recovery_state", 409)
-            self._verify_baseline_locked(con)
+            if not job or job["state"] != "needs_review" or job["attempt"] != failed_attempt or digest(json.loads(job["snapshot"])) != SNAPSHOT_DIGEST:
+                raise FactoryError("frozen review is not the authorized needs-review attempt", "frozen_recovery_state", 409)
+            self._verify_baseline_locked(con, additional)
             grant_row = con.execute("SELECT * FROM tf_evidence_recovery_grant WHERE id=?", (request["grant_id"],)).fetchone()
             if not grant_row:
                 raise FactoryError("frozen review grant not found", "evidence_grant_missing", 404)
@@ -268,8 +325,11 @@ class FrozenReviewRecoveryService:
             if gate != proposal["source_gate"]:
                 raise FactoryError("frozen-review source gate changed", "evidence_source_gate", 409)
             EvidenceGrantService.validate_locked(con, request["grant_id"], proposal, request["request_key"], job_id)
-            current = self.prepare(JOB_ID, {"schema": "atlas.frozen-review-prepare.v1", "request_key": REQUEST_KEY,
-                      "source_authorization": proposal["source_authorization"], "source_gate": proposal["source_gate"]})
+            prepare_request = {"schema": "atlas.frozen-review-prepare.v1", "request_key": proposal["request_key"],
+                               "source_authorization": proposal["source_authorization"], "source_gate": proposal["source_gate"]}
+            if additional:
+                prepare_request["timing_override_authorization"] = proposal["timing_override_authorization"]
+            current = self.prepare(JOB_ID, prepare_request)
             if current != proposal:
                 raise FactoryError("frozen-review evidence changed before recovery", "checkpoint_changed", 409)
             EvidenceGrantService.queue_locked(con, request["grant_id"], proposal, request["request_key"], job_id)
@@ -279,15 +339,22 @@ class FrozenReviewRecoveryService:
             rid = "frec_" + uuid.uuid4().hex
             con.execute("INSERT INTO tf_evidence_recovery VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                         (rid, job_id, request["grant_id"], request["request_key"], request_digest,
-                         proposal["proposal_digest"], job["state"], job["error"], job["stage"], 1,
+                         proposal["proposal_digest"], job["state"], job["error"], job["stage"], failed_attempt,
                          SNAPSHOT_DIGEST, digest(checkpoints), canonical([x["name"] for x in checkpoints]), canonical(events), at))
-            changed = con.execute("UPDATE job SET state='queued',attempt=2,token=NULL,lease=NULL,error=NULL,updated_at=? WHERE id=? AND attempt=1 AND state='needs_review'", (at, job_id)).rowcount
+            if additional:
+                extra.ensure_table(con)
+                activated_at = float(self.clock())
+                con.execute("INSERT INTO tf_frozen_review_time_resume VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+                            (request["grant_id"], job_id, CAMPAIGN_ID, PLAN_ID, PRODUCT_ID, DEADLINE,
+                             1792490680.244128, extra.REMAINING_SECONDS, activated_at,
+                             activated_at + extra.REMAINING_SECONDS, extra.AUTH_SHA256, 1))
+            changed = con.execute("UPDATE job SET state='queued',attempt=?,token=NULL,lease=NULL,error=NULL,updated_at=? WHERE id=? AND attempt=? AND state='needs_review'", (failed_attempt + 1, at, job_id, failed_attempt)).rowcount
             if changed != 1:
                 raise FactoryError("frozen review changed during recovery", "frozen_recovery_race", 409)
             con.execute("INSERT INTO event(job_id,attempt,at,stage,message) VALUES(?,?,?,?,?)",
-                        (job_id, 2, at, job["stage"], "Authorized same-job frozen review recovery queued; no provider started"))
+                        (job_id, failed_attempt + 1, at, job["stage"], "Authorized same-job frozen review recovery queued; no provider started"))
             return {"recovery_id": rid, "grant_id": request["grant_id"], "job_id": job_id,
-                    "attempt": 2, "replayed": False, "worker_started": False}
+                    "attempt": failed_attempt + 1, "replayed": False, "worker_started": False}
 
     def prepare_call(self, job, directory, prompt, payload, context):
         """Rebuild derived readable material and fail closed on any call drift."""
@@ -334,7 +401,7 @@ class FrozenReviewRecoveryService:
             return None
         with self.store.connect() as con:
             try:
-                row = con.execute("SELECT r.*,g.request_json,g.status grant_status,g.call_attempt,g.consumed_reservation_id FROM tf_evidence_recovery r JOIN tf_evidence_recovery_grant g ON g.id=r.grant_id WHERE r.job_id=? AND json_extract(g.request_json,'$.schema')=?", (job_id, SCHEMA)).fetchone()
+                row = con.execute("SELECT r.*,g.request_json,g.status grant_status,g.call_attempt,g.consumed_reservation_id FROM tf_evidence_recovery r JOIN tf_evidence_recovery_grant g ON g.id=r.grant_id WHERE r.job_id=? AND json_extract(g.request_json,'$.schema')=? ORDER BY r.old_attempt DESC LIMIT 1", (job_id, SCHEMA)).fetchone()
             except Exception as exc:
                 if "no such table" in str(exc):
                     return None
@@ -354,7 +421,7 @@ class FrozenReviewRecoveryService:
                     raise
                 saved = None
         current = self.store.job(job_id)
-        if saved and current["attempt"] == saved["next_attempt"]:
+        if saved and saved["grant_id"] == result["grant_id"] and current["attempt"] == saved["next_attempt"]:
             result.update({"attempt": saved["next_attempt"], "host_only": True, "cli_allowed": False,
                            "saved_resume_id": saved["id"], "saved_result_sha256": saved["result_sha256"],
                            "source_gate": json.loads(saved["source_gate_json"])})
@@ -392,6 +459,7 @@ class FrozenReviewRecoveryService:
             before_job = read.execute("SELECT * FROM job WHERE id=?", (job_id,)).fetchone()
             before_recovery = read.execute("SELECT * FROM tf_evidence_recovery WHERE job_id=? AND grant_id=?", (job_id, request["grant_id"])).fetchone()
             before_grant = read.execute("SELECT * FROM tf_evidence_recovery_grant WHERE id=?", (request["grant_id"],)).fetchone()
+            latest_recovery = read.execute("SELECT grant_id FROM tf_evidence_recovery WHERE job_id=? ORDER BY old_attempt DESC LIMIT 1", (job_id,)).fetchone()
             latest_acceptance = read.execute("SELECT body FROM acceptance WHERE job_id=? ORDER BY created_at DESC,id DESC LIMIT 1", (job_id,)).fetchone()
         state_ok = before_job and before_job["state"] in {"failed", "interrupted", "needs_review"}
         if before_job and before_job["state"] == "needs_review":
@@ -399,7 +467,8 @@ class FrozenReviewRecoveryService:
             state_ok = (acceptance_body.get("job_attempt") == before_job["attempt"]
                         and acceptance_body.get("outcome") == "unavailable")
         if (not state_ok or before_job["attempt"] < 2
-                or not before_recovery or not before_grant or before_grant["status"] != "consumed"):
+                or not before_recovery or not before_grant or before_grant["status"] != "consumed"
+                or not latest_recovery or latest_recovery["grant_id"] != request["grant_id"]):
             raise FactoryError("frozen-review host-only continuation is not eligible", "evidence_saved_state", 409)
         gate = (self.source_gate_validator(self.store, request["source_gate"])
                 if self.source_gate_validator else __import__("template_factory.evidence_recovery", fromlist=["validate_source_gate"]).validate_source_gate(self.store, request["source_gate"]))
@@ -427,13 +496,15 @@ class FrozenReviewRecoveryService:
             job_row = con.execute("SELECT * FROM job WHERE id=?", (job_id,)).fetchone()
             recovery = con.execute("SELECT * FROM tf_evidence_recovery WHERE job_id=? AND grant_id=?", (job_id, request["grant_id"])).fetchone()
             grant_row = con.execute("SELECT * FROM tf_evidence_recovery_grant WHERE id=?", (request["grant_id"],)).fetchone()
+            latest_recovery = con.execute("SELECT grant_id FROM tf_evidence_recovery WHERE job_id=? ORDER BY old_attempt DESC LIMIT 1", (job_id,)).fetchone()
             latest = con.execute("SELECT body FROM acceptance WHERE job_id=? ORDER BY created_at DESC,id DESC LIMIT 1", (job_id,)).fetchone()
             can_resume = job_row and job_row["state"] in {"failed", "interrupted"}
             if job_row and job_row["state"] == "needs_review":
                 body = json.loads(latest["body"]) if latest else {}
                 can_resume = body.get("job_attempt") == job_row["attempt"] and body.get("outcome") == "unavailable"
             if (not can_resume or job_row["attempt"] < 2
-                    or not recovery or not grant_row or grant_row["status"] != "consumed"):
+                    or not recovery or not grant_row or grant_row["status"] != "consumed"
+                    or not latest_recovery or latest_recovery["grant_id"] != request["grant_id"]):
                 raise FactoryError("frozen-review host-only continuation is not eligible", "evidence_saved_state", 409)
             if grant_row["call_attempt"] != before_grant["call_attempt"] or recovery["recovery_id"] != before_recovery["recovery_id"]:
                 raise FactoryError("frozen-review saved result binding changed", "evidence_saved_state", 409)
@@ -534,12 +605,18 @@ class FrozenReviewRecoveryService:
             raise FactoryError("frozen review acceptance is attached to another attempt or artifact", "evidence_acceptance_binding", 409)
         recovery = con.execute("SELECT * FROM tf_evidence_recovery WHERE recovery_id=? AND job_id=? AND grant_id=?",
                                (report.get("recovery_id"), JOB_ID, report.get("grant_id"))).fetchone()
-        if not recovery or recovery["old_attempt"] != 1 or recovery["snapshot_digest"] != SNAPSHOT_DIGEST:
+        if not recovery or recovery["old_attempt"] not in {1, 2} or recovery["snapshot_digest"] != SNAPSHOT_DIGEST:
             raise FactoryError("frozen review recovery receipt differs", "evidence_acceptance_binding", 409)
         grant_row = con.execute("SELECT * FROM tf_evidence_recovery_grant WHERE id=?", (report.get("grant_id"),)).fetchone()
         if not grant_row or grant_row["status"] != "consumed" or grant_row["consumed_reservation_id"] != report.get("reservation_id") or grant_row["call_attempt"] != report.get("call_attempt"):
             raise FactoryError("frozen review acceptance is not bound to its completed grant", "evidence_acceptance_binding", 409)
         proposal = json.loads(grant_row["request_json"])
+        from .frozen_review_additional import REQUEST_KEY as ADDITIONAL_KEY
+        expected_failed_attempt = 2 if proposal.get("request_key") == ADDITIONAL_KEY else 1
+        if (recovery["old_attempt"] != expected_failed_attempt
+                or proposal.get("materials", {}).get("binding", {}).get("attempt") != expected_failed_attempt
+                or grant_row["call_attempt"] != expected_failed_attempt + 1):
+            raise FactoryError("frozen review acceptance does not bind its authorized attempt", "evidence_acceptance_binding", 409)
         from .evidence_grants import get_call_binding
         call = get_call_binding(proposal)
         if any(report.get(field) != call.get(field) for field in ("input_sha256", "prompt_sha256", "source_tree_digest", "materials_manifest_digest", "materials_tree_digest")):

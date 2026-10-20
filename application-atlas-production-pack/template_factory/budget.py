@@ -251,6 +251,13 @@ class BudgetLedger:
             (self.campaign_id, str(identity)),
         ).fetchone()
 
+    def _time_resume_locked(self, con, identity, phase="G1", plan_id=None):
+        if str(phase) != "G1":
+            return None
+        from .frozen_review_additional import get_time_resume_locked
+        return get_time_resume_locked(con, campaign_id=self.campaign_id,
+                                      product_id=str(identity), plan_id=plan_id)
+
     def begin_segment(self, phase, *, con=None):
         """Start the campaign-wide segment clock once at official queue start."""
         if not phase:
@@ -292,6 +299,9 @@ class BudgetLedger:
             amendment = self._amendment_locked(con, identity, phase, plan_id)
             if amendment:
                 deadline = amendment["new_deadline"]
+            time_resume = self._time_resume_locked(con, identity, phase, plan_id)
+            if time_resume:
+                deadline = time_resume["effective_deadline"]
             # Sample the clock after obtaining BEGIN IMMEDIATE. A reservation
             # that waited behind another writer must not receive a timeout
             # based on stale time from before the lock.
@@ -299,7 +309,7 @@ class BudgetLedger:
             remaining = deadline - now
             if remaining <= 0:
                 raise FactoryError("phase deadline exhausted", "budget_deadline", 409)
-            if job_id == FROZEN_REVIEW_JOB and remaining < 2700:
+            if job_id == FROZEN_REVIEW_JOB and not time_resume and remaining < 2700:
                 raise FactoryError("frozen-review call lacks its required deadline reserve", "budget_deadline", 409)
             if evidence_recovery_id:
                 owner = con.execute("SELECT state,token,lease FROM job WHERE id=?", (job_id,)).fetchone()
@@ -310,7 +320,9 @@ class BudgetLedger:
                 "SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status!='not_started'",
                 (self.campaign_id,),
             ).fetchone()[0]
-            if charged >= self.limits["cli_sessions"]:
+            campaign_time_resume = time_resume or self._time_resume_locked(con, G1_AMENDMENT_PRODUCT, "G1", G1_AMENDMENT_PLAN)
+            external_sessions = campaign_time_resume["external_cli_sessions"] if campaign_time_resume else 0
+            if charged + external_sessions >= self.limits["cli_sessions"]:
                 raise FactoryError("campaign CLI session budget exhausted", "budget_exhausted", 409)
             active_limit = self.limits["runtime_concurrency"] if kind == "runtime" else self.limits["production_concurrency"]
             group = "runtime" if kind == "runtime" else "production"
@@ -572,7 +584,12 @@ class BudgetLedger:
                 grant_record = json.loads(proposal_row[0])
                 fixed_deadline = float(grant_record["materials"]["binding"]["deadline"])
                 frozen = grant_record.get("schema") == "atlas.frozen-review-recovery-proposal.v1"
-                minimum_slack = 2700 if frozen else 0
+                resumed = self._time_resume_locked(con, G1_AMENDMENT_PRODUCT, "G1", G1_AMENDMENT_PLAN) if frozen else None
+                if resumed and resumed["grant_id"] == grant[0]:
+                    fixed_deadline = resumed["effective_deadline"]
+                else:
+                    resumed = None
+                minimum_slack = 2700 if frozen and not resumed else 0
                 if now >= fixed_deadline or fixed_deadline - now < minimum_slack:
                     raise FactoryError("evidence recovery authorization deadline has passed", "budget_deadline", 409)
                 owner = con.execute("SELECT state,token,lease FROM job WHERE id=?", (row[1],)).fetchone()
@@ -635,7 +652,10 @@ class BudgetLedger:
             row = con.execute("SELECT deadline FROM tf_budget_phase WHERE campaign_id=? AND identity=? AND phase=?",
                               (self.campaign_id, "__campaign_segment__", str(phase))).fetchone()
             amendment = self._amendment_locked(con, identity, phase, plan_id)
+            resumed = self._time_resume_locked(con, identity, phase, plan_id)
         deadline = amendment["new_deadline"] if amendment else (row[0] if row else None)
+        if resumed:
+            deadline = resumed["effective_deadline"]
         return None if deadline is None else max(0.0, deadline - float(self.clock()))
 
     def effective_deadline(self, identity, phase="G1", *, plan_id=None):
@@ -643,24 +663,29 @@ class BudgetLedger:
             row = con.execute("SELECT deadline FROM tf_budget_phase WHERE campaign_id=? AND identity=? AND phase=?",
                               (self.campaign_id, "__campaign_segment__", str(phase))).fetchone()
             amendment = self._amendment_locked(con, identity, phase, plan_id)
-        return amendment["new_deadline"] if amendment else (row[0] if row else None)
+            resumed = self._time_resume_locked(con, identity, phase, plan_id)
+        return resumed["effective_deadline"] if resumed else (amendment["new_deadline"] if amendment else (row[0] if row else None))
 
     def effective_deadline_snapshot(self, identity, phase="G1", *, plan_id=None, job_id=None):
         with self.store.connect() as con:
             row = con.execute("SELECT started,deadline FROM tf_budget_phase WHERE campaign_id=? AND identity=? AND phase=?",
                               (self.campaign_id, "__campaign_segment__", str(phase))).fetchone()
             amendment = self._amendment_locked(con, identity, phase, plan_id)
+            resumed = self._time_resume_locked(con, identity, phase, plan_id)
         base_deadline = row["deadline"] if row else None
         deadline = amendment["new_deadline"] if amendment else base_deadline
+        if resumed:
+            deadline = resumed["effective_deadline"]
         return {"schema": "atlas.g1-effective-budget.v1", "binding": {
                     "campaign_id": self.campaign_id, "plan_id": plan_id,
                     "product_id": str(identity), "segment": str(phase), "job_id": job_id},
                 "base_started_at": row["started"] if row else None,
                 "base_deadline": base_deadline, "effective_deadline": deadline,
-                "deadline_source": "amendment" if amendment else "base",
+                "deadline_source": "authorized_external_pause_resume" if resumed else ("amendment" if amendment else "base"),
+                "time_resume": dict(resumed) if resumed else None,
                 "amendment_id": amendment["id"] if amendment else None,
-                "activated_at": amendment["activated_at"] if amendment else None,
-                "new_deadline": amendment["new_deadline"] if amendment else None,
+                "activated_at": resumed["activated_at"] if resumed else (amendment["activated_at"] if amendment else None),
+                "new_deadline": resumed["effective_deadline"] if resumed else (amendment["new_deadline"] if amendment else None),
                 "generated_at": float(self.clock())}
 
     def snapshot(self):
@@ -686,10 +711,14 @@ class BudgetLedger:
             evidence_grant_uses = [dict(r) for r in con.execute(
                 "SELECT grant_id,reservation_id,status,created_at,released_at FROM tf_evidence_recovery_grant_use WHERE grant_id IN (SELECT id FROM tf_evidence_recovery_grant WHERE campaign_id=?) ORDER BY created_at,reservation_id",
                 (self.campaign_id,))]
+            resumed = self._time_resume_locked(con, G1_AMENDMENT_PRODUCT, "G1", G1_AMENDMENT_PLAN)
+            external_sessions = resumed["external_cli_sessions"] if resumed else 0
         now = float(self.clock())
         for segment in segments:
             segment["remaining_seconds"] = max(0.0, segment["deadline"] - now)
-        return {"campaign_id": self.campaign_id, "cli_sessions_used": charged,
+        return {"campaign_id": self.campaign_id, "cli_sessions_used": charged + external_sessions,
+                "factory_cli_sessions_used": charged, "external_cli_sessions_used": external_sessions,
+                "time_resumes": [dict(resumed)] if resumed else [],
                 "cli_sessions_limit": self.limits["cli_sessions"], "active": active,
                 "limits": dict(self.limits), "segments": segments,
                 "paused": bool(control[0]) if control else False,

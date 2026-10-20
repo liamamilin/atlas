@@ -1,0 +1,79 @@
+{
+  "schema": "atlas.g1-check-run.v1",
+  "source_tree_sha256": "653df2ef90ce3d6dbcb32d9478f67490880949f72ed902d17bc4a11bcbe226ae",
+  "checks": {
+    "python_audit": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "pip-audit",
+        "-r",
+        "requirements.txt"
+      ],
+      "cwd": ".",
+      "env": {},
+      "started_epoch": 1792495464.6213708,
+      "duration_seconds": 8.989,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-frozen-review-recovery-2026-10-20/additional-call-authorization/verification/final/python_audit.txt",
+      "log_sha256": "15950a68a7ed99c59779717acefdceb3f69cfd31bde67d2c954f2a3cea4d7955"
+    },
+    "ruff": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "ruff",
+        "check",
+        "application-atlas-production-pack/privacy.py",
+        "application-atlas-production-pack/drafts_api.py",
+        "application-atlas-production-pack/drafts_engines/__init__.py",
+        "application-atlas-production-pack/mcp_atlas.py",
+        "application-atlas-production-pack/execution_service.py",
+        "application-atlas-production-pack/execution_state.py",
+        "application-atlas-production-pack/execution_workspace.py",
+        "application-atlas-production-pack/opencode_client.py",
+        "application-atlas-production-pack/opencode_cli_adapter.py",
+        "application-atlas-production-pack/opencode_permissions.py",
+        "application-atlas-production-pack/opencode_runtime.py",
+        "application-atlas-production-pack/project_export.py",
+        "application-atlas-production-pack/project_generation.py",
+        "application-atlas-production-pack/project_store.py",
+        "application-atlas-production-pack/project_backup.py",
+        "application-atlas-production-pack/runtime_recovery.py",
+        "application-atlas-production-pack/template_factory",
+        "atlas-web/scripts/gen-data.py",
+        "atlas-web/scripts/verify-web-data.py"
+      ],
+      "cwd": ".",
+      "env": {},
+      "started_epoch": 1792495473.611126,
+      "duration_seconds": 0.012,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-frozen-review-recovery-2026-10-20/additional-call-authorization/verification/final/ruff.txt",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "backend_tests": {
+      "status": "failed",
+      "exit_code": 1,
+      "argv": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "application-atlas-production-pack/tests",
+        "-v"
+      ],
+      "cwd": ".",
+      "env": {},
+      "started_epoch": 1792495473.623025,
+      "duration_seconds": 114.314,
+      "tests_run": 729,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-frozen-review-recovery-2026-10-20/additional-call-authorization/verification/final/backend_tests.txt",
+      "log_sha256": "6dcfb06aab58436cc402e1610358a672d79a477def17d850314e33d3740dad60"
+    }
+  }
+}

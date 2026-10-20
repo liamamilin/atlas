@@ -59,7 +59,28 @@ class FrozenReviewFixtureCLI:
         self.calls.append(directory)
         budget = kwargs["budget"]
         ledger = budget["ledger"]
+        # Keep the linked fake CLI on the same fixed in-window clock as the fixture's recovery service.
+        # One test below explicitly substitutes its own clock to exercise the deadline edge.
+        if self.fault == "past_old_deadline":
+            from template_factory.budget import BudgetLedger
+            ledger = BudgetLedger(self.store, campaign_id=budget["ledger"].campaign_id,
+                                  clock=lambda: 1792497820.0)
+        elif self.fault == "expired_resume":
+            from template_factory.budget import BudgetLedger
+            with self.store.connect() as con:
+                deadline = con.execute("SELECT effective_deadline FROM tf_frozen_review_time_resume WHERE grant_id=?",
+                                        (budget["evidence_recovery_id"],)).fetchone()[0]
+            ledger = BudgetLedger(self.store, campaign_id=budget["ledger"].campaign_id,
+                                  clock=lambda: deadline + 1)
+        elif self.fault != "deadline_2699":
+            ledger.clock = lambda: 1792489000
         context = dict(budget["protocol_context"])
+        if self.fault == "past_old_deadline":
+            from template_factory.frozen_review_additional import get_time_resume_locked
+            with self.store.connect() as con:
+                assert get_time_resume_locked(con, campaign_id=budget["ledger"].campaign_id,
+                                              product_id=budget["identity"], plan_id=budget["plan_id"],
+                                              grant_id=budget["evidence_recovery_id"]) is not None
         reserve = {
             "identity": budget["identity"], "phase": budget["phase"],
             "kind": budget["kind"], "timeout": timeout,

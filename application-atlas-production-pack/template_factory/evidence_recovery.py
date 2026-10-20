@@ -120,12 +120,43 @@ class EvidenceRecoveryService:
         self._source_gate_validator = source_gate_validator
     @staticmethod
     def _initialize_locked(con):
+        con.execute("CREATE TABLE IF NOT EXISTS tf_frozen_review_schema_migration(version INTEGER PRIMARY KEY,applied_at REAL NOT NULL,migration_digest TEXT NOT NULL)")
         con.execute("""CREATE TABLE IF NOT EXISTS tf_evidence_recovery (
-                recovery_id TEXT PRIMARY KEY, job_id TEXT NOT NULL UNIQUE, grant_id TEXT NOT NULL UNIQUE,
+                recovery_id TEXT PRIMARY KEY, job_id TEXT NOT NULL, grant_id TEXT NOT NULL UNIQUE,
                 request_key TEXT NOT NULL UNIQUE, request_digest TEXT NOT NULL, proposal_digest TEXT NOT NULL,
                 old_state TEXT NOT NULL, old_error TEXT, old_stage TEXT NOT NULL, old_attempt INTEGER NOT NULL,
                 snapshot_digest TEXT NOT NULL, checkpoint_digest TEXT NOT NULL, checkpoint_names TEXT NOT NULL,
                 old_events_json TEXT NOT NULL, created_at TEXT NOT NULL)""")
+        # A job may have sequential, separately authorized recoveries. Preserve
+        # all historical receipts while removing only the obsolete job UNIQUE.
+        unique_job = False
+        for index in con.execute("PRAGMA index_list(tf_evidence_recovery)").fetchall():
+            if not index[2]:
+                continue
+            columns = [col[2] for col in con.execute(f"PRAGMA index_info('{index[1]}')").fetchall()]
+            if columns == ["job_id"]:
+                unique_job = True
+                break
+        if unique_job:
+            custom_indexes = [row[0] for row in con.execute("SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name='tf_evidence_recovery' AND sql IS NOT NULL")]
+            con.execute("ALTER TABLE tf_evidence_recovery RENAME TO tf_evidence_recovery_legacy")
+            con.execute("""CREATE TABLE tf_evidence_recovery (
+                recovery_id TEXT PRIMARY KEY, job_id TEXT NOT NULL, grant_id TEXT NOT NULL UNIQUE,
+                request_key TEXT NOT NULL UNIQUE, request_digest TEXT NOT NULL, proposal_digest TEXT NOT NULL,
+                old_state TEXT NOT NULL, old_error TEXT, old_stage TEXT NOT NULL, old_attempt INTEGER NOT NULL,
+                snapshot_digest TEXT NOT NULL, checkpoint_digest TEXT NOT NULL, checkpoint_names TEXT NOT NULL,
+                old_events_json TEXT NOT NULL, created_at TEXT NOT NULL)""")
+            con.execute("""INSERT INTO tf_evidence_recovery
+                (recovery_id,job_id,grant_id,request_key,request_digest,proposal_digest,old_state,old_error,
+                 old_stage,old_attempt,snapshot_digest,checkpoint_digest,checkpoint_names,old_events_json,created_at)
+                SELECT recovery_id,job_id,grant_id,request_key,request_digest,proposal_digest,old_state,old_error,
+                       old_stage,old_attempt,snapshot_digest,checkpoint_digest,checkpoint_names,old_events_json,created_at
+                FROM tf_evidence_recovery_legacy""")
+            con.execute("DROP TABLE tf_evidence_recovery_legacy")
+            for statement in custom_indexes:
+                con.execute(statement)
+        con.execute("INSERT OR IGNORE INTO tf_frozen_review_schema_migration VALUES(2,?,?)",
+                    (time.time(), "recovery-job-unique-to-sequential-v1"))
 
     def _materials(self, job_id):
         if self._evidence_builder is not None:

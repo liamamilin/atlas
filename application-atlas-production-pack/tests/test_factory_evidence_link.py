@@ -48,6 +48,9 @@ class EvidencePipelineFixture:
         self.phase_payload = payload
         budget = kwargs["budget"]
         ledger = budget["ledger"]
+        # The archived authorization has a fixed date; this fixture must use
+        # the same in-window clock as its recovery service, not today's date.
+        ledger.clock = lambda: 1792490000
         reserved = ledger.reserve(
             budget["identity"], budget["phase"], budget["kind"], timeout,
             job_id=budget["job_id"], requested_model=model, stage=budget["stage"],
@@ -90,6 +93,7 @@ class PrestartFailureFixtureCLI(EvidencePipelineFixture):
     def run(self, directory, prompt, model, timeout, cancelled, on_progress, **kwargs):
         budget = kwargs["budget"]
         ledger = budget["ledger"]
+        ledger.clock = lambda: 1792490000
         reservation = ledger.reserve(
             budget["identity"], budget["phase"], budget["kind"], timeout,
             job_id=budget["job_id"], requested_model=model, stage=budget["stage"],

@@ -3,6 +3,7 @@ import argparse
 import base64
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 from pathlib import PurePosixPath
@@ -29,6 +30,10 @@ if sys_path_root not in os.sys.path:
 from template_factory.store import digest as atlas_digest
 from template_factory.artifacts import tree_manifest
 from template_factory.delivery import prepare_application
+from template_factory.frozen_review_additional import (
+    AUTH_SHA256 as FROZEN_CALL_AUTH_SHA256,
+    REMAINING_SECONDS as FROZEN_RESUME_SECONDS,
+)
 
 
 class DockerCommandTimeout(subprocess.TimeoutExpired):
@@ -719,16 +724,61 @@ def read_pinned_budget_context(path, expected_sha256, expected_binding):
         raise ValueError("effective-budget context binding does not match the selected runtime job")
     deadline = payload.get("effective_deadline")
     generated = payload.get("generated_at")
-    if not isinstance(deadline, (int, float)) or isinstance(deadline, bool):
+    if not isinstance(deadline, (int, float)) or isinstance(deadline, bool) or not math.isfinite(deadline):
         raise ValueError("effective-budget context has no numeric effective_deadline")
-    if not isinstance(generated, (int, float)) or isinstance(generated, bool):
+    if not isinstance(generated, (int, float)) or isinstance(generated, bool) or not math.isfinite(generated):
         raise ValueError("effective-budget context has no numeric generated_at")
-    if payload.get("deadline_source") not in ("base", "amendment"):
+    deadline_source = payload.get("deadline_source")
+    if deadline_source not in ("base", "amendment", "authorized_external_pause_resume"):
         raise ValueError("effective-budget context has an unknown deadline source")
-    if binding.get("segment") == "T08" and payload.get("deadline_source") != "base":
-        raise ValueError("T08 cannot use the G1 amendment deadline")
-    if payload.get("deadline_source") == "amendment" and (not payload.get("amendment_id") or not payload.get("activated_at")):
+    if binding.get("segment") == "T08" and deadline_source != "base":
+        raise ValueError("T08 cannot use a non-base deadline")
+    if deadline_source == "amendment" and (not payload.get("amendment_id") or not payload.get("activated_at")):
         raise ValueError("amended effective deadline lacks its official amendment and activation references")
+    if deadline_source == "authorized_external_pause_resume":
+        resume = payload.get("time_resume")
+        if binding.get("segment") != "G1":
+            raise ValueError("authorized external pause-resume deadline is only valid for G1")
+        if not isinstance(resume, dict):
+            raise ValueError("authorized external pause-resume deadline lacks its official timing record")
+        expected_resume_keys = {
+            "grant_id", "job_id", "campaign_id", "plan_id", "product_id", "previous_deadline",
+            "paused_at", "remaining_seconds", "activated_at", "effective_deadline",
+            "authorization_digest", "external_cli_sessions",
+        }
+        if set(resume) != expected_resume_keys:
+            raise ValueError("authorized external pause-resume timing record has unknown or missing fields")
+        expected_scope = {
+            "campaign_id": "atlas-v1-first-production-2026-10-19",
+            "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+            "product_id": "product-c42848f63251507bd9d911a5",
+            "job_id": "job_b01427592b164863aab5bedf7b3863bb",
+            "authorization_digest": FROZEN_CALL_AUTH_SHA256,
+            "external_cli_sessions": 1,
+        }
+        if any(resume.get(key) != value for key, value in expected_scope.items()):
+            raise ValueError("authorized external pause-resume timing record has a different authorization or scope")
+        if any(binding.get(key) != resume[key] for key in ("campaign_id", "plan_id", "product_id")):
+            raise ValueError("runtime binding is outside the authorized external pause-resume scope")
+        if isinstance(resume.get("external_cli_sessions"), bool) or not isinstance(resume.get("external_cli_sessions"), int):
+            raise ValueError("authorized external pause-resume session count must be an integer")
+        grant_id = resume.get("grant_id")
+        if not isinstance(grant_id, str) or not re.fullmatch(r"egrant_[0-9a-f]{32}", grant_id):
+            raise ValueError("authorized external pause-resume timing record has no valid grant id")
+        numeric = ("remaining_seconds", "paused_at", "previous_deadline", "activated_at", "effective_deadline")
+        if any(not isinstance(resume.get(key), (int, float)) or isinstance(resume.get(key), bool)
+               or not math.isfinite(resume[key]) for key in numeric):
+            raise ValueError("authorized external pause-resume timing values must be finite numbers")
+        if (resume["remaining_seconds"] != FROZEN_RESUME_SECONDS
+                or resume["paused_at"] != 1792490680.244128
+                or resume["previous_deadline"] != 1792495312.855422
+                or resume["activated_at"] < resume["paused_at"]
+                or resume["effective_deadline"] != resume["activated_at"] + FROZEN_RESUME_SECONDS
+                or deadline != resume["effective_deadline"]
+                or payload.get("new_deadline") != resume["effective_deadline"]
+                or payload.get("activated_at") != resume["activated_at"]
+                or generated < resume["activated_at"]):
+            raise ValueError("authorized external pause-resume deadline does not match its activated timing record")
     if generated > time.time() + 5:
         raise ValueError("effective-budget context timestamp is in the future")
     if deadline <= time.time():

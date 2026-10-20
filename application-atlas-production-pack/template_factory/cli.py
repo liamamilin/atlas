@@ -171,6 +171,7 @@ class CLI:
                              reasoning_effort=reasoning_effort, _state=state,
                              _budget_ledger=ledger,
                              _budget_reservation=reservation["id"] if reservation else None,
+                             _budget_deadline=reservation.get("deadline") if reservation else None,
                              _evidence_recovery=bool(reservation and reservation.get("evidence_recovery_id")),
                              _frozen_review_recovery=frozen_recovery)
         except BaseException as error:
@@ -228,10 +229,15 @@ class CLI:
         _state=None,
         _budget_ledger=None,
         _budget_reservation=None,
+        _budget_deadline=None,
         _evidence_recovery=False,
         _frozen_review_recovery=False,
     ):
         call_started = time.monotonic()
+        if _budget_ledger is not None and _budget_deadline is not None:
+            timeout = min(timeout, _budget_deadline - float(_budget_ledger.clock()))
+            if timeout <= 0:
+                raise FactoryError("call deadline elapsed before CLI setup", "budget_deadline", 409)
         if not self.executable:
             raise FactoryError("OpenCode CLI is not installed", "cli_unavailable", 503)
         directory = Path(directory)
@@ -417,6 +423,10 @@ class CLI:
         started = time.monotonic()
         if _budget_ledger is not None and _budget_reservation is not None and _evidence_recovery:
             _budget_ledger.mark_spawn_intent(_budget_reservation, directory=directory)
+        if _budget_ledger is not None and _budget_deadline is not None:
+            timeout = min(timeout, _budget_deadline - float(_budget_ledger.clock()))
+            if timeout <= 0:
+                raise FactoryError("call deadline elapsed before provider spawn", "budget_deadline", 409)
         if _state is not None:
             _state["spawn_attempted"] = True
         try:
@@ -532,6 +542,8 @@ class CLI:
                     raise FactoryError(
                         "task cancelled or ownership lost", "cancelled", 409
                     )
+                if _budget_ledger is not None and _budget_deadline is not None and float(_budget_ledger.clock()) >= _budget_deadline:
+                    raise FactoryError("effective production deadline exhausted", "budget_deadline", 409)
                 if time.monotonic() - started > timeout:
                     raise FactoryError(
                         "OpenCode stage timed out; inspect evidence or increase stage timeout",

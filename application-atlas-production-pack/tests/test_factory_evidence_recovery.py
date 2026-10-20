@@ -75,7 +75,8 @@ class EvidenceRecoveryTests(unittest.TestCase):
         self.request = {"schema": PREPARE_SCHEMA, "request_key": "evidence-test-once",
                         "source_authorization": {"source_ref": SOURCE_REF, "source_digest": SOURCE_DIGEST},
                         "source_gate": {"source_commit": "test-commit", "source_tree_digest": "test-tree", "ci_evidence": []}}
-        self.service = EvidenceRecoveryService(self.store, evidence_builder=lambda _store, _job: _materials(),
+        self.service = EvidenceRecoveryService(self.store, clock=lambda: 1792481200.0,
+                                               evidence_builder=lambda _store, _job: _materials(),
                                                source_gate_validator=lambda _store, gate: dict(gate))
 
     def tearDown(self):

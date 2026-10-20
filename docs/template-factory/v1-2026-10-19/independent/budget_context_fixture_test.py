@@ -40,6 +40,31 @@ class EffectiveBudgetContextFixtureTest(unittest.TestCase):
             self.path, sha or self.sha, binding or self.binding,
         )
 
+    def _authorized_external_resume(self):
+        from template_factory.frozen_review_additional import AUTH_SHA256, REMAINING_SECONDS
+        activated = time.time() - 20
+        resume = {
+            "grant_id": "egrant_" + "a" * 32,
+            "job_id": "job_b01427592b164863aab5bedf7b3863bb",
+            "campaign_id": "atlas-v1-first-production-2026-10-19",
+            "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+            "product_id": "product-c42848f63251507bd9d911a5",
+            "previous_deadline": 1792495312.855422,
+            "paused_at": 1792490680.244128,
+            "remaining_seconds": REMAINING_SECONDS,
+            "activated_at": activated,
+            "effective_deadline": activated + REMAINING_SECONDS,
+            "authorization_digest": AUTH_SHA256,
+            "external_cli_sessions": 1,
+        }
+        self.payload.update(deadline_source="authorized_external_pause_resume",
+                            time_resume=resume, activated_at=activated,
+                            effective_deadline=resume["effective_deadline"],
+                            new_deadline=resume["effective_deadline"], generated_at=activated + 1)
+        self.binding.update({key: resume[key] for key in ("campaign_id", "plan_id", "product_id")})
+        self._write()
+        return resume
+
     def test_uses_official_amended_deadline_even_when_base_deadline_expired(self):
         self.assertEqual(self._read()["effective_deadline"], self.payload["effective_deadline"])
 
@@ -78,6 +103,47 @@ class EffectiveBudgetContextFixtureTest(unittest.TestCase):
         self._write()
         with self.assertRaisesRegex(ValueError, "T08"):
             self._read()
+
+    def test_accepts_only_pinned_authorized_external_g1_resume(self):
+        resume = self._authorized_external_resume()
+        self.assertEqual(self._read()["time_resume"], resume)
+
+    def test_external_resume_rejects_wrong_scope_authorization_and_arithmetic(self):
+        for field, value in (("campaign_id", "other-campaign"),
+                             ("job_id", self.binding["job_id"]),
+                             ("authorization_digest", "0" * 64),
+                             ("remaining_seconds", 4632.611293),
+                             ("external_cli_sessions", True),
+                             ("paused_at", True),
+                             ("effective_deadline", time.time() + 500)):
+            with self.subTest(field=field):
+                resume = self._authorized_external_resume()
+                resume[field] = value
+                self._write()
+                with self.assertRaises(ValueError):
+                    self._read()
+
+    def test_external_resume_is_g1_only_and_generated_after_activation(self):
+        self._authorized_external_resume()
+        self.binding["segment"] = "T08"
+        self._write()
+        with self.assertRaisesRegex(ValueError, "T08"):
+            self._read()
+        self.binding["segment"] = "G1"
+        resume = self._authorized_external_resume()
+        self.payload["generated_at"] = resume["activated_at"] - 1
+        self._write()
+        with self.assertRaisesRegex(ValueError, "does not match"):
+            self._read()
+
+    def test_external_resume_cannot_extend_another_runtime_product_or_plan(self):
+        for field in ("campaign_id", "plan_id", "product_id"):
+            with self.subTest(field=field):
+                self._authorized_external_resume()
+                self.binding[field] = "other-scope"
+                self._write()
+                with self.assertRaisesRegex(ValueError, "outside"):
+                    self._read(binding=dict(self.binding))
 
 
 if __name__ == "__main__":
