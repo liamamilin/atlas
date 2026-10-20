@@ -1,0 +1,36 @@
+{
+ "outcome": "passed",
+ "summary": "P0 先行覆盖确认的核心旅程：保存、默认归类/新建归类、移动、归类浏览/计数、关键字检索、打开原页、软删除恢复、输入错误合同、首启空库，并交付跨重启持久化；P1 仅保留元数据增强、导入导出与重复检测。A05 的真实生命周期与独立实例重启读回、A11 的 fresh 首启证明及 runner 参数绑定均与当前阶段计划一致。A04 重命名跨重启仍是明确未验证的 scope limitation，不应声称已完成；另需修正 README 4.1 中 A11 的 args 行。",
+ "checks": [
+  {
+   "dimension": "phase_acceptance",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md",
+    "program-evidence/prepared/acceptance/p0_organize.py",
+    "program-evidence/prepared/acceptance/runner.json",
+    "program-evidence/prepared/acceptance/README.md",
+    "program-evidence/authorization/A05_FINDING_DISPOSITION.json"
+   ],
+   "reason": "P0 的 A01–A12/F01–F11 先覆盖确认场景的全部核心动作与跨会话持久化，A13–A15/F12–F14 留在 P1，没有把核心工作流推迟到后续阶段。A05 的静态实现先在 base_url 经 record-move-form 完成移动，再以同一 app_root/data_dir 启动隔离实例、停止后用同一 instance_dir 重启，按归类 ID、记录归属与 HTML 列表读回验证持久化，且没有把 base_url 重启冒充为已验证。A11 明确要求 app_root/data_dir，使用 fresh=True 独立证明首启空库、四预置 count=0 与无记录行，并在 runner 中绑定对应 flags；A12 的 F01/F04/F10 映射、F02 的仅首次初始化预置归类、F11 的 base_url/fresh 观察边界均与 R7 授权补丁一致。A04 重命名跨重启按 disposition 未新增、未声称，属于非阻断的覆盖范围限制；README 4.1 的 A11 args 行仍漏 --app-root/--data-dir，与 runner.json、README 4.2 及程序必需参数不一致，需在冻结前修正，但不破坏本阶段核心旅程。"
+  }
+ ],
+ "suggestions": [
+  "修正 program-evidence/prepared/acceptance/README.md 4.1 的 A11 args，加入 --app-root {app_root} 与 --data-dir {data_dir}，使其与 runner.json、README 4.2 及 p0_library.py 的必需参数完全一致。",
+  "A04 重命名跨重启继续保持为已记录的未验证 scope limitation，不新增本轮要求，也不得在验收结果中声称该路径已经验证。"
+ ],
+ "scope": "Independent static specification and supplementary existing acceptance-program evidence review; no program execution, actual P0 verification or publication.",
+ "review_rules_version": "atlas.current-required-contract.v1",
+ "proposal_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+ "projection_digest": "19e22abbcfab0481855d2fa3fe1c6672748afb36023338af75c5d333a140b751",
+ "stage": "blueprint-spec-review-0-ad1379367f3e742a-phase_acceptance",
+ "evidence_grant_id": "egrant_dd03245306034022bbc046e3b9428955",
+ "evidence_recovery_id": "erec_ff26b9f89975447bbef7cc6869ad16ca",
+ "reservation_id": "bud_9ad8e95b29224f249f9d48a654d22b9f",
+ "recovery_attempt": 2,
+ "supersedes_checkpoint": {
+  "name": "blueprint-design-check-0-phase_acceptance",
+  "digest": "dd19d90217dc6cadd7e8346ac4d2af2b1b5a73f4fee2f28aa3ea2f8190ad6d8f"
+ }
+}

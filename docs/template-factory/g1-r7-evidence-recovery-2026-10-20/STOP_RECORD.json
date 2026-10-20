@@ -1,0 +1,60 @@
+{
+  "schema": "atlas.g1-formal-stop.v1",
+  "observed_epoch": 1792485349.920202,
+  "status": "paused_retry_qualification_exhausted",
+  "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+  "producer_job_id": "job_3a658ba085e8417ea6faad5cb0cdd493",
+  "producer_attempt": 2,
+  "producer_state": "completed",
+  "blocking_job_id": "job_b01427592b164863aab5bedf7b3863bb",
+  "blocking_attempt": 1,
+  "blocking_queue_stage": "acceptance",
+  "blocking_cli_stage": "cognitive-review",
+  "blocking_job_state": "needs_review",
+  "failure_code": "cli_timeout",
+  "duration_seconds": 600.48,
+  "no_valid_review_result": true,
+  "business_repairs": {
+    "used": 7,
+    "limit": 7
+  },
+  "cli": {
+    "used": 80,
+    "limit": 500,
+    "active": 0
+  },
+  "old_protocol_grant": {
+    "used": 1,
+    "limit": 1
+  },
+  "evidence_grant": {
+    "id": "egrant_dd03245306034022bbc046e3b9428955",
+    "used": 1,
+    "limit": 1,
+    "result": "passed",
+    "reservation_id": "bud_9ad8e95b29224f249f9d48a654d22b9f"
+  },
+  "deadline": 1792495312.855422,
+  "deadline_expired_at_stop": false,
+  "G1": "blocked",
+  "T08": "not_started",
+  "published_templates": 0,
+  "new_frozen_candidates": 1,
+  "campaign_frozen_versions": 2,
+  "real_P0_deliveries": 0,
+  "real_independent_P0_runs": 0,
+  "case_increment": 0,
+  "cases_reused": 1,
+  "formal_pause_receipt": "operations/pause.stdout.json",
+  "host_assessment": "G1_ASSESSMENT.json",
+  "quota_proof": "RETRY_SCOPE_STOP_PROOF.json",
+  "not_executed": [
+    "formal publication",
+    "standard development handoff and application-development",
+    "first real P0 delivery",
+    "frozen acceptance suite against real P0",
+    "independent browser core journey and exact phase proof",
+    "T08 three fixed scenes"
+  ],
+  "recovery_boundary": "No authorized request can restart this cognitive-review under the consumed grants. A separately bounded authorization and formal mechanism for this exact frozen-review job/input would be required; do not reuse the phase evidence grant, raise timeout, reset counters or create replacement samples."
+}

@@ -1,0 +1,180 @@
+{
+ "$schema": "https://opencode.ai/config.json",
+ "permissions": [
+  {
+   "action": "*",
+   "resource": "*",
+   "effect": "deny"
+  },
+  {
+   "action": "read",
+   "resource": "input.json",
+   "effect": "allow"
+  },
+  {
+   "action": "read",
+   "resource": "leaf.md",
+   "effect": "allow"
+  },
+  {
+   "action": "read",
+   "resource": "source",
+   "effect": "allow"
+  },
+  {
+   "action": "read",
+   "resource": "source/**",
+   "effect": "allow"
+  },
+  {
+   "action": "read",
+   "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_3a658ba085e8417ea6faad5cb0cdd493/attempt-2/aggregate-semantic-review/input.json",
+   "effect": "allow"
+  },
+  {
+   "action": "read",
+   "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_3a658ba085e8417ea6faad5cb0cdd493/attempt-2/aggregate-semantic-review/leaf.md",
+   "effect": "allow"
+  },
+  {
+   "action": "read",
+   "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_3a658ba085e8417ea6faad5cb0cdd493/attempt-2/aggregate-semantic-review/source",
+   "effect": "allow"
+  },
+  {
+   "action": "read",
+   "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_3a658ba085e8417ea6faad5cb0cdd493/attempt-2/aggregate-semantic-review/source/**",
+   "effect": "allow"
+  },
+  {
+   "action": "websearch",
+   "resource": "*",
+   "effect": "allow"
+  },
+  {
+   "action": "webfetch",
+   "resource": "https://github.com/*",
+   "effect": "allow"
+  },
+  {
+   "action": "webfetch",
+   "resource": "https://raw.githubusercontent.com/*",
+   "effect": "allow"
+  },
+  {
+   "action": "webfetch",
+   "resource": "https://docs.python.org/*",
+   "effect": "allow"
+  },
+  {
+   "action": "webfetch",
+   "resource": "https://docs.npmjs.com/*",
+   "effect": "allow"
+  }
+ ],
+ "agents": {
+  "atlas-factory-1d8eab076824": {
+   "mode": "primary",
+   "description": "Atlas read-only factory proposal agent",
+   "permissions": [
+    {
+     "action": "*",
+     "resource": "*",
+     "effect": "deny"
+    },
+    {
+     "action": "read",
+     "resource": "input.json",
+     "effect": "allow"
+    },
+    {
+     "action": "read",
+     "resource": "leaf.md",
+     "effect": "allow"
+    },
+    {
+     "action": "read",
+     "resource": "source",
+     "effect": "allow"
+    },
+    {
+     "action": "read",
+     "resource": "source/**",
+     "effect": "allow"
+    },
+    {
+     "action": "read",
+     "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_3a658ba085e8417ea6faad5cb0cdd493/attempt-2/aggregate-semantic-review/input.json",
+     "effect": "allow"
+    },
+    {
+     "action": "read",
+     "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_3a658ba085e8417ea6faad5cb0cdd493/attempt-2/aggregate-semantic-review/leaf.md",
+     "effect": "allow"
+    },
+    {
+     "action": "read",
+     "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_3a658ba085e8417ea6faad5cb0cdd493/attempt-2/aggregate-semantic-review/source",
+     "effect": "allow"
+    },
+    {
+     "action": "read",
+     "resource": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/jobs/job_3a658ba085e8417ea6faad5cb0cdd493/attempt-2/aggregate-semantic-review/source/**",
+     "effect": "allow"
+    },
+    {
+     "action": "websearch",
+     "resource": "*",
+     "effect": "allow"
+    },
+    {
+     "action": "webfetch",
+     "resource": "https://github.com/*",
+     "effect": "allow"
+    },
+    {
+     "action": "webfetch",
+     "resource": "https://raw.githubusercontent.com/*",
+     "effect": "allow"
+    },
+    {
+     "action": "webfetch",
+     "resource": "https://docs.python.org/*",
+     "effect": "allow"
+    },
+    {
+     "action": "webfetch",
+     "resource": "https://docs.npmjs.com/*",
+     "effect": "allow"
+    }
+   ]
+  }
+ },
+ "policies": [
+  {
+   "action": "tool.use",
+   "resource": "shell:*",
+   "effect": "deny"
+  },
+  {
+   "action": "tool.use",
+   "resource": "execute:*",
+   "effect": "deny"
+  },
+  {
+   "action": "plugin.use",
+   "resource": "*",
+   "effect": "deny"
+  },
+  {
+   "action": "mcp.use",
+   "resource": "*",
+   "effect": "deny"
+  },
+  {
+   "action": "skill.use",
+   "resource": "*",
+   "effect": "deny"
+  }
+ ]
+}

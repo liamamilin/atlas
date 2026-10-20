@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.retry-scope-stop-proof.v1",
+  "read_only": true,
+  "job_id": "job_b01427592b164863aab5bedf7b3863bb",
+  "scope": "cognitive-review",
+  "operation": "cognitive-review:572da86649b4face",
+  "prior_same_operation_calls": 1,
+  "configured_transient_retries": 2,
+  "used_stage_additional_retries": 2,
+  "remaining_additional_retries": 0,
+  "historical_and_current_rows": [
+    {
+      "id": "bud_bc07c48bd2494a93a5183e31d3ca7d1d",
+      "stage": "cognitive-review:85f6308386aca162",
+      "retry": 2,
+      "retry_scope": null,
+      "job_id": "job_8c13691fd4ac4591a83308c02cd4e267",
+      "status": "completed"
+    },
+    {
+      "id": "bud_06f2be2ec5dc40cba5e2b89706ad2f37",
+      "stage": "cognitive-review:85f6308386aca162",
+      "retry": null,
+      "retry_scope": null,
+      "job_id": "job_8c13691fd4ac4591a83308c02cd4e267",
+      "status": "failed"
+    },
+    {
+      "id": "bud_0e5ba3eec4fc407e9908ace311a0f745",
+      "stage": "cognitive-review:85f6308386aca162",
+      "retry": 1,
+      "retry_scope": null,
+      "job_id": "job_8c13691fd4ac4591a83308c02cd4e267",
+      "status": "failed"
+    },
+    {
+      "id": "bud_0be070e3a2624ce3989d7eaec26da107",
+      "stage": "cognitive-review:572da86649b4face",
+      "retry": null,
+      "retry_scope": "cognitive-review",
+      "job_id": "job_b01427592b164863aab5bedf7b3863bb",
+      "status": "failed"
+    }
+  ],
+  "existing_protocol_grants": [
+    {
+      "id": "pgrant_f3595368c14d4b23b6ab536f6d198007",
+      "job_id": "job_7742b1c124be4c9ab3a0096da5cdd772",
+      "status": "consumed"
+    }
+  ],
+  "new_evidence_grant_only_scope": "blueprint-spec-review:phase_acceptance",
+  "new_evidence_grant_consumed": true,
+  "formal_guard": "BudgetLedger.reserve refuses retry when matching retry rows >= transient_retries and no matching unused protocol grant; no new reservation or CLI attempted for this proof."
+}

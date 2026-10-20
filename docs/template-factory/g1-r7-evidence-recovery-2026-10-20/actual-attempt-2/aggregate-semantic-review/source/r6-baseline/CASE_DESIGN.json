@@ -1,0 +1,93 @@
+[
+ {
+  "capability": "F08: a single-user personal library persisted in SQLite that survives browser sessions and server restarts, with records queried from the database for every request rather than held in a browser store.",
+  "disposition": "adjusted",
+  "evidence_ids": [
+   "ev_ba200adf6e2c_35e41aab676021eb",
+   "ev_ba200adf6e2c_86ed2327f33a3ca8",
+   "ev_ba200adf6e2c_922f1dbc84912d99",
+   "ev_ba200adf6e2c_e7dd8d32c05c39f9"
+  ],
+  "reason": "The evidence shows Dexie writes on save/delete and a one-time db.bookmarks.toArray() hydration into an in-memory RippleMap, scoped to one browser profile with no sync. The target adopts local, single-user, cross-session retention but replaces IndexedDB/Dexie and in-memory hydration with SQLite on the Python server; it does not claim browser-profile persistence, multi-device sync, or the source map as target design."
+ },
+ {
+  "capability": "F11: the library is delivered as server-rendered HTML pages and forms with POST/redirect/GET for add, edit and organize actions, including a ready empty-library view.",
+  "disposition": "adjusted",
+  "evidence_ids": [
+   "ev_ba200adf6e2c_06c81a165e03c96a",
+   "ev_ba200adf6e2c_86ed2327f33a3ca8",
+   "ev_ba200adf6e2c_e7dd8d32c05c39f9"
+  ],
+  "reason": "The evidence describes a client-mounted SPA: Edit is an in-page dialog populated from item fields, and component creation loads Dexie rows into a client RippleMap. The target renders lists, forms and empty state as Python 3.12 HTML responses, so the SPA mount, client-side dialog state and Dexie hydration are not carried over; only the save-now/find-later user loop is retained."
+ },
+ {
+  "capability": "A deliberate save creates a URL-anchored record with a stable id, derived hostname, createdAt and initial state, and later edits preserve the record identity and creation/visit fields.",
+  "disposition": "adopted",
+  "evidence_ids": [
+   "ev_ba200adf6e2c_05babdea64ba9858"
+  ],
+  "reason": "Evidence defines bm-prefixed UUID identity, hostname derivation, createdAt and default state, and preserves id/createdAt/visit fields on edit. The target adopts this record lifecycle as a user-facing capability, with SQLite providing durability; the source's free-text tag constraints are treated separately in the category decision, not silently imported as target rules."
+ },
+ {
+  "capability": "URL validation accepts only absolute, parseable HTTP(S) URLs with a nonempty valid hostname, allows single-label hosts such as http://localhost, preserves the original URL text, and rejects malformed, non-HTTP(S) or empty-host input without writing; no DNS or online-reachability check is performed.",
+  "disposition": "adjusted",
+  "evidence_ids": [
+   "ev_ba200adf6e2c_1596da4a90687ca5"
+  ],
+  "reason": "The upstream Valibot rule is a dotted-host regex that requires a dot-separated domain and an alphabetic top-level suffix, so it rejects localhost. That regex is retained as a source fact and mapped as adjusted, not reused as the target rule: the target parses the URL, checks the http/https scheme, absolute form and hostname presence, permits single-label hosts, and stores the entered string unchanged."
+ },
+ {
+  "capability": "Create, rename and delete named categories with validation and with protection or reassignment when a category still contains records, assign one at save time, move records between categories, and default uncategorized saves into an Inbox category.",
+  "disposition": "new_design",
+  "evidence_ids": [
+   "ev_ba200adf6e2c_3168bcd465b6a043",
+   "ev_ba200adf6e2c_6bbd7a588896fe31"
+  ],
+  "reason": "Evidence shows the source has no category entity: classification is only up to five free-text tags, there is no collection CRUD or separate move, and the form rejects saves with zero tags. The target therefore designs first-class categories, an inbox default for unclassified capture and an explicit move action; these are new target concepts, not source-derived tag behavior."
+ },
+ {
+  "capability": "Browse one category and see only its active records, with a category count that agrees with the listed records after adds, moves and restores.",
+  "disposition": "adjusted",
+  "evidence_ids": [
+   "ev_ba200adf6e2c_c4ad7e52e5713628",
+   "ev_ba200adf6e2c_9ab6b0e51811a16d"
+  ],
+  "reason": "Source facts derive tag counts by scanning all in-memory bookmarks and filter records by requiring every selected tag. The target computes category counts and category-scoped lists in SQL over active, non-deleted rows so the count and the list stay consistent; the source tag-sidebar algorithm is not the target implementation."
+ },
+ {
+  "capability": "Search the selected category by keyword across title, hostname and description using case-insensitive substring matching, retaining category and query and rendering matching or explicit empty results.",
+  "disposition": "adjusted",
+  "evidence_ids": [
+   "ev_ba200adf6e2c_9ab6b0e51811a16d",
+   "ev_ba200adf6e2c_e62ae7e0a2c68ba1"
+  ],
+  "reason": "Source search lowercases and compares only bookmark.title; the fixed target F06/A07 contract adjusts it to title, derived hostname and description, combined with the selected category. Raw URL text, category names and tags are not additional keyword fields. This clarifies target design only; accepted observations, evidence IDs, source revision and disposition remain unchanged."
+ },
+ {
+  "capability": "Open a saved record as a navigation to its stored original URL, preserving the URL text and never fetching, proxying or prefetching the destination during save, listing or open preparation.",
+  "disposition": "adjusted",
+  "evidence_ids": [
+   "ev_ba200adf6e2c_93ff254508846f11"
+  ],
+  "reason": "Source opens the URL with window.open(url, '_blank', 'noopener,noreferrer') after updating visit state. The target renders the record URL as an ordinary HTTP(S) link or server redirect with the same new-tab/no-referrer intent; opening is a user navigation distinct from saving, and the Python server does not request the target page."
+ },
+ {
+  "capability": "Do not enrich saved records with third-party metadata or favicon services and do not prefetch saved target pages; stored title, description and URL come from the user or local derivation.",
+  "disposition": "not_adopted",
+  "evidence_ids": [
+   "ev_ba200adf6e2c_7d47d725a2e9b759",
+   "ev_ba200adf6e2c_8e11efc61a4650ba",
+   "ev_ba200adf6e2c_ec303a2fd1afa287"
+  ],
+  "reason": "The source calls api.microlink.io and images.weserv.nl/Google s2 favicons on save and treats failures as silent. The target P0 deliberately omits these outbound calls because saving and opening must remain distinct from fetching; no target-page response, metadata or icon is retrieved, and no source enrichment behavior is presented as target design."
+ },
+ {
+  "capability": "Soft-delete an active record into a recoverable trash and restore it later, instead of allowing deletion only on archived items with a transient toast undo.",
+  "disposition": "adjusted",
+  "evidence_ids": [
+   "ev_ba200adf6e2c_4c56ef30a1785be1",
+   "ev_ba200adf6e2c_93ef917a193a45ab"
+  ],
+  "reason": "Source facts limit Delete to archived items and provide recovery only through an Undo action on the toast, with no trash view and no deletion path for active records. The target uses an explicit soft-delete/restore lifecycle exposed in HTML so records remain recoverable; this changes the source's archived-only and transient-recovery model."
+ }
+]

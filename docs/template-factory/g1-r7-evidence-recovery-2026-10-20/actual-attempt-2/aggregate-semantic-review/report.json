@@ -1,0 +1,39 @@
+{
+ "identity": {
+  "scope_digest": "a2ca780e54267acf42a8209de54eeadea5df1c8b1b9242fa026621a6009b3e31",
+  "case_policy_digest": "fdf6b892771ee2a6068f197564413afca67a0a4d6a82e057e6eaf7cde5aae643",
+  "diff_digest": "ec8d62722942d084a7887ab63e5a46597761efe7540549b7ef9b02a32e7e056c",
+  "baseline_digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+  "candidate_authored_digest": "fdd76f122aba9922419be44f94a6cf4d884985e71b2d36574b0dc72a0cd7cae4",
+  "baseline_program_digest": "8a3399bf52eb8185ac57fd19133beeefc93acaac4d2f707ff4346be6d8f87274",
+  "candidate_program_digest": "c90c68281d4ec027236f45465d6d7109af9db8bf58b67bb2e9a0a55a6d35f321",
+  "r7_authorization_material_digest": "6bab6cf15f0c238fa8a7b7bc5a192caf704ef84b33055ad95543db41edcf00ae"
+ },
+ "outcome": "passed",
+ "summary": "The cumulative historical-baseline-to-candidate review and the R6-to-R7 incremental review preserve the prior assertion intent. The only semantic replacement is the explicitly authorized A02 single-label-hostname negative-to-positive change; malformed scheme, non-HTTP(S), empty/invalid hostname and no-write negatives remain. A07 adds direct HTML search plus URL-path/query/category-name exclusion and positive controls; A11 adds an independently launched fresh instance while retaining the base_url observations; A04/A05/A06/A09/A10/A12 add real HTML journeys without weakening their JSON obligations; A08 and the P1 programs retain their prior intent. Authored feature identities, phases and current-required status, case-design evidence/dispositions, and the scenario policy are preserved. The generated plan matches the authored cases. One non-blocking README parameter-table inconsistency remains.",
+ "checks": [
+  {
+   "id": "assertion_intent_preserved",
+   "outcome": "passed",
+   "reason": "Baseline A01-A12 and P1 assertions remain covered or are strengthened with direct UI adaptations. A02's dotless-host rejection was replaced only by the authorized single-label positive, with missing-scheme, javascript/ftp, empty-host, space/invalid-host and no-write checks retained; A07 retains title/hostname/description, case-insensitive, category+q and empty-result checks while adding HTML and excluded-field checks; A11 retains health/home/form/list checks and independently proves fresh first-init/empty state; A04/A05/A06/A09/A10/A12 add HTML create/rename/delete, move, counts, soft-delete/restore, migration and error-recovery coverage while retaining prior JSON assertions where applicable; A08 retains /go 302, unknown-id and unchanged-URL checks. No unauthorized assertion was weakened or removed."
+  },
+  {
+   "id": "scope_fidelity",
+   "outcome": "passed",
+   "reason": "All authored, case-design and program changes fall within the supplied R7 allowlist and the cumulative edit paths. The exact diff resolves to four replaced programs and five byte-identical reused programs, and the reported before/after hashes match the prepared manifest. Feature IDs/names, phases, current-required applicability, acceptance IDs/goals outside the authorized edits, evidence IDs, dispositions and decision identities are preserved. Generated acceptance/plan.json was reviewed separately as host metadata and matches the candidate authored cases."
+  },
+  {
+   "id": "case_adaptation",
+   "outcome": "passed",
+   "reason": "The candidate case design matches the bound scenario identity and the exact CP-1 scenario policy: A04 category create/rename validation uses name and category_id semantics correctly; A12 preserves the save/move category-name versus HTML category_id contracts, default/null behavior, no-write failures and automatic creation rules; A07 applies the title/hostname/description search contract and excludes URL path/query and category names; A02 follows the authorized single-label-hostname adaptation. The F11 and record-lifecycle choice revisions match the authorized target-adaptation text, with evidence IDs and dispositions unchanged."
+  }
+ ],
+ "findings": [
+  {
+   "severity": "suggestion",
+   "basis": "acceptance/README.md §4.1, the table titled '与 runner.json 一致的 args', still lists A11 as ['--case','A11','--base-url','{base_url}'] without --app-root/--data-dir. This contradicts acceptance/runner.json, the same README's A11 example and behavior row, and the A11 program's required-flag check. The runner and program are correct; this is a documentation-only inconsistency and does not weaken any assertion."
+  }
+ ],
+ "reviewer_response_digest": "10f3fc3064a2dde1fd4b11dc49e544b828ad6b5b2fff6c52540fe8c10bea8c89",
+ "review_scope": "Independent semantic review of exact pre-freeze authored and acceptance-program diffs; no execution."
+}

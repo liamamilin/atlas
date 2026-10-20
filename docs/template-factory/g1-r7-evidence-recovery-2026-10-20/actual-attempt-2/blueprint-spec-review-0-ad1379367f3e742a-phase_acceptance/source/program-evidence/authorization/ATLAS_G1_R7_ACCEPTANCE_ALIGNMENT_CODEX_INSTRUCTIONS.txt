@@ -1,0 +1,521 @@
+# Atlas G1 R7：验收程序、合同映射与真实生产执行指令
+
+版本：2026-10-20
+建议文件名：ATLAS_G1_R7_ACCEPTANCE_ALIGNMENT_CODEX_INSTRUCTIONS.txt
+仓库：https://github.com/liamamilin/atlas
+工作分支：codex/stabilize-atlas
+核对基线：2807362d804ba95dc7671b4ab250b8b6fa420456
+
+## 0. 执行目标与本轮明确授权
+
+当用户将本文件交给 Codex 并要求“按附件执行”时，本文件就是本轮完整实施范围及有限额度授权。先阅读仓库实际指令与正式记录，完成必要准备、开发和验证，再实际通过正式服务继续生产；不要停在“准备完成”“请再确认是否执行”。
+
+本轮目标：
+1. 关闭 A02 JSON 保存单标签 hostname 正向断言缺失。
+2. 关闭 A07 搜索额外命中原始 URL 路径/查询串、分类名的覆盖缺口。
+3. 使 A11 自己证明同一交付源码的新实例首启/真实空库，不用 A01 的结果冒充 A11。
+4. 一次处理本文件列明的 A12 映射、F02 首启、F11/记录生命周期适配说明及 README 不准确描述。
+5. 新候选通过真实聚合审阅、冻结后独立审阅、发布、标准交接实际消费、首次真实 P0、冻结套件及独立浏览器运行，由宿主正式评估 G1。
+6. 只有 G1 正式 passed 后，才继续原 T08 书签、月度预算、多项目会议笔记三个固定样本。未满足条件不得启动或换样本。
+
+本轮授权边界：
+- 书签产品业务修复上限从 6 提高到 7，仅增加一次 R7 业务修订；第七轮只在正式激活与唯一后继入队事务中消费。
+- 原 campaign CLI 总额 500 不变，历史 71 次继续累计；现有可控会话统计不等于 provider 内部请求或费用。
+- 旧协议 grant 保持 1/1 已消费；历史普通追加 2 次及 grant 对应一次，共 3 条非空 retry 记录全部保留。本文件不新增协议 grant，不重置阶段追加重试。
+- 现有 R6 窗口不变：北京时间 2026-10-20 19:21:52.855422 截止，epoch 1792495312.855422；对应 UTC 2026-10-20 11:21:52.855422。
+- 不重新开八小时窗口，不延长、不冻结暂停时间，不用新 job/新产品/新 campaign 取得新时间或额度。
+- 原窗口、历次授权、失败、检查点、审阅结果、预算记录保留；旧失败报告不改成通过。
+- 模板候选交付清单只允许修改四项：acceptance/p0_library.py、acceptance/p0_find_open.py、acceptance/README.md、acceptance/runner.json；其余五项从 R6 实际交付逐字节复用。具体规格/适配说明变更仅限第 5 节。
+- 允许实现本轮必要的宿主准备、正式预算授权、原子后继入队、部分程序替换及证据绑定，并完成相应回归。复用现有服务，不建设独立 R7 平台。
+- 原生产/静态审阅并发 2、运行并发 1，及所有已存在的隔离、清理、正式门禁继续有效。
+- 本轮可以推进首次 P0；如果首次 P0 需要业务修复，第 7/7 轮已经用完，不能自动修到通过。按第 10 节保存真实失败并暂停，不另起 initial P0 绕过计数。
+
+本文件是范围授权，不是事实通过证明。是否完成仍以新任务的实际文件、审阅、运行与正式宿主评估为准。
+
+## 1. 当前正式基线：先现场核实，不重置
+
+Git 基线：
+- 最终交付 HEAD：2807362d804ba95dc7671b4ab250b8b6fa420456。
+- R6 实际生产源码：2b40dff20bc2761be649bc3ce43b825094bf075c。
+- 已完成但尚未用于真实复产的宿主元数据补修：7eb137cac6e2b21bbe3bb3dcf3493632a5e436cc。
+- 对应已知 CI：39363405866、39366847618、39367528697。新实现仍须绑定新的精确源码与规定 CI。
+
+生产身份：
+- campaign_id：atlas-v1-first-production-2026-10-19
+- plan_id：plan_87059846caf345d2b2fe690657cf324f
+- product_id：product-c42848f63251507bd9d911a5
+- scenario_id：scn_7756e0007f6a463a97316f3f49c15248，revision 2
+- R6 当前失败任务：job_f3e32b56036b4ec7bea0c00d6a2a8dc4，attempt 1，failed
+- R6 停止阶段：aggregate-semantic-review
+- 父计划：paused
+- 更早失败任务：job_7742b1c124be4c9ab3a0096da5cdd772，attempt 4，继续保留
+- 当前台账：CLI 71/500，active 0，书签业务修复 6/6
+- 旧 grant：pgrant_f3595368c14d4b23b6ab536f6d198007，1/1
+- 前任已激活 V3 amendment：bamd_100a302fe8424d9493dafe62d6e43db9
+- R6 窗口激活：1792466512.855422；截止：1792495312.855422
+- 更早截止：1792437223.754534，保留在历史中，不覆盖
+
+固定材料：
+- R6 effective proposal：6f806d9416cd1c5a724e980dece7330dac651c8a838d469db409d940a493f158
+- R6 聚合审阅 digest：78150ff8071af6e1e4a35365d965b8644140d2157ad27356e91ccad644981672
+- R6 实际 candidate template.json 文件 SHA256：3259239fd8a87fc3f4bf6c6ccd442f507a572db54e8e70b9dc9889c68f3855d3
+- 当前候选：rendered_not_frozen；不得冒充 frozen 或 published
+- 共享 case：case:product-c42848f63251507bd9d911a5:faa52e6b1414，revision 1
+- 上游：lakhindarpal/bookmark-manager@539881bc67099d491e8ab6f85de0f443fa7de623
+- case_basis_digest：a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589
+- case facts view digest：241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b
+- 案例层 29 条观察；当前场景固定 20 条事实（13 代码、7 推断）；14 个原编号来源。
+- 来源集合：S01、S02、S03、S04、S06、S07、S12、S13、S14、S15、S16、S19、S20、S21。
+- 历史冻结候选 A：tpl_7f4c17e834c342e7b462e6bb8b6379e4
+- A digest：8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9
+
+执行要求：
+1. 在实际工作区读 AGENTS.md/项目开发约定，确认仓库、分支、未提交改动；不 reset 用户改动，不覆盖并行工作。
+2. 查正式 API/服务确认数据库根、worker 根、队列、上述身份、账本和截止。临时测试库不能当生产库。
+3. Git 若已有后续提交，先核对其与基线关系及本轮操作是否已执行；同一 R7 请求重入应幂等恢复，不重复登记或新建后继。不要回滚新提交。
+4. 若正式事实与基线实质不符，完成可做的只读核对和补丁准备，报告差异；不能猜测新 ID 或强行把状态改回基线。
+5. 当前时间若已过绝对截止，仍可完成代码、补丁和可审查报告，但不能启动真实生产或隐式延期。
+6. 将本 instruction 原始 UTF-8 字节保存为本轮授权来源，计算实际 SHA256；请求引用该原件。机器补充字段另存，不改授权原件生成自我循环摘要。
+
+## 2. 必读材料与实际入口
+
+上一轮目录：
+docs/template-factory/g1-r6-source-alignment-2026-10-20/
+
+至少读取：
+- DELIVERY.md、STOP_RECORD.json、RECOVERY.md、OPERATIONS.md
+- actual-aggregate-review.json、independent-real-blocker-review.json
+- actual-six-new-review-proof.json（必须读 suggestions，不只读 outcome）
+- actual-nine-program-byte-proof.json、actual-rendered-candidate-proof.json
+- actual-fixed-input-and-program-inheritance.json
+- effective-plan-preview.json、实际 blueprint-plan 检查点
+- candidate-attempt-1-not-frozen/ 全部规范字段、case-design、case-basis、程序、runner 与旧聚合输入
+- HOST_METADATA_FIX.md、independent-metadata-fix-review.json
+- 原 v1 G1 独立执行计划、冻结 machineplan、T08 固定抽验与正式操作合同
+
+实现前读当前实际源码，定位既有接口：
+application-atlas-production-pack/template_factory/ 下的
+plan_revision.py、product_recovery.py、budget.py、cognition.py、contract_scope.py、
+source_references.py、development_jobs.py、blueprint_runtime.py、v1_batches.py、v1_api.py，
+以及相关 CLI、tests 和独立执行器。
+
+现有 failed-plan-revision.v2/product-resume.v2 实际绑定 R6 旧任务、64/5 和九程序全复用。不要把它们当成已支持本轮的通用接口，也不要改写旧版本语义。
+新增明确的版本分支，沿用已有服务和事务结构；建议名称见第 7 节。不存在的 API/CLI 不得假装已经可调用，先实现与验证必要支持。
+
+## 3. 本轮四项程序修改及五项固定复用
+
+R6 原始九项 SHA256（必须与实际交付和检查点相互核对）：
+
+acceptance/common.py
+7f0d7d28d8336bdde3da267795e24d13e430f05e53063ee01ed5611236325d37
+模式：reuse
+
+acceptance/p0_library.py
+8a5ce953288f2b09b9cc0256d869fc7dca2a3dcd3ff255dc5dd5dfa2fa51fb67
+模式：replace，仅 A02/A11 与文件内必要 helper/参数检查
+
+acceptance/p0_organize.py
+93ae82c74946811fac3b1dd213cc077cf89acc6ecfb45e64ec2830e3482b7f60
+模式：reuse，A04/A05/A06/A12 实际程序不改
+
+acceptance/p0_find_open.py
+4ba2fa6d2a6d3b306d6be5f82ef63604b836cf3d84bd0fc5efddf4d64683a6da
+模式：replace，仅 A07 与文件内必要 helper，A08 原断言保留
+
+acceptance/p0_recovery.py
+372c75aa2944a10cc5146859dc0bacd0e03111defe7c8aa75ece2d28ec45aff3
+模式：reuse
+
+acceptance/p1_maturity.py
+d44e17c87314db18084b3b88bd2c700a75bfe583d108e9b518040fb8378601a3
+模式：reuse
+
+acceptance/requirements.txt
+f1fc18b605a1eea93892d319d09122d91033a48dfd4b913f8f262a4dc8633deb
+模式：reuse
+
+acceptance/README.md
+01cf57941aeed3e0bfa431349b832429f4518addebd00528e8bc1a33ff189459
+模式：replace，仅准确覆盖说明及 A11 参数/证据边界
+
+acceptance/runner.json
+f9448d370749dcca44fb2024b1b4b6d761d127edaf98a523063a590db5c69375
+模式：replace，仅 cases.A11.args
+
+这里“四项修改”不等于四个应用。它们是模板交付的验收材料。其余五项必须从 R6 job attempt 1 的实际交付字节继承，不能回退读取历史冻结 A 的 previous/source。
+
+准备阶段在新目录复制原始材料并制作精确补丁，不直接改 R6 归档/原任务目录。新 replace 字节由正式 prepared revision 按绑定补丁消费；不必调用真实 author 模型重写已准备好的程序，也不得把替换标成零字节复用。
+
+### 3.1 A02：补 JSON 正向，保留双入口负向
+
+在 acceptance/p0_library.py 的 _case_a02 中：
+- 保留 HTML 单标签 URL 正向及现有原始 URL/href/读回断言。
+- 新增独立唯一的 JSON POST /api/bookmarks 单标签 hostname 合法 URL，不能复用已经存在的 HTML 样本。
+- 断言 201、新非空记录 ID、独立 GET/列表读回同一 ID 和原始 URL 字符串；不得通过 HTML 保存后 JSON GET 冒充 JSON POST 正向。
+- 如验证 hostname，按既有解析合同验证，不引入 DNS/在线可达性；不能访问保存的外链。
+- 保留现有缺 scheme、javascript、ftp、空 hostname、空格/非法 hostname 等 HTML 与 JSON 负向，400 invalid_url、HTML 可读错误与输入保留、零写入不减。
+- 非法输入 before 快照在所有合法创建后取得，避免把新合法记录误判成非法新增。
+- 断言新增，不能把目标缩成“只有 HTML 接受单标签主机”，不能删原 JSON 边界意图。
+
+### 3.2 A07：允许字段与排除字段分别证明
+
+在 acceptance/p0_find_open.py 的 _case_a07 中：
+- 保留 title/hostname/description 正向、大小写、category+q、HTML 表单状态保留、空结果与 A08 全部断言。
+- 构造只存在于 URL path 的唯一 token、只存在于 URL query 的另一 token，以及仅存在于分类名的 token；确认它们不出现在该记录的 title/hostname/description。
+- 分别经 JSON 查询与真实 HTML category-search-form 查询这些 token，验证不命中该目标记录；同分类条件下也不能因分类名本身而命中。
+- 比较记录 ID/行集合，不以整页是否出现查询词判定（页面会回显 q、分类名）。
+- 保留能够命中的正向控制，避免“全部返回空”实现通过。可增加允许字段中包含同一 token 的对照记录，但要明确预期 ID 集合并避免污染其他负例。
+- hostname 本来允许检索，不能把 hostname token 当成 URL 排除负例。
+- 不新增标签字段、搜索端点或产品功能；P0 无标签模型，不为测试标签排除而添加标签能力。
+- 保持精确 origin、无外链访问、现有 HTTP/HTML 真实交互约束。
+
+### 3.3 A11：由 A11 独立输出真实首启/空库证据
+
+采用唯一方案：A11 使用同一冻结 app_root 的全新隔离实例；不借用 A01 的结果、不重排验收顺序、不清空 base_url 数据。
+
+实现：
+1. common.py 已接受 --app-root/--data-dir，且 launch_app 支持 fresh=True。保持 common.py 原字节。
+2. 在 _case_a11 内明确校验 app_root/data_dir 必需；缺失、无法启动、缺启动脚本等必须产生 A11 的失败/未验证结果并非零退出，不 skip、不 fallback 为较弱检查。
+3. 保留对原 --base-url 的现有健康、首页表单、分类入口、列表容器及未知分类空状态检查；这些只证明该部署的当前入口。
+4. 调用现有 common.launch_app(args.app_root, args.data_dir, 0, fresh=True)，创建新的 instances/<uuid>，不传旧 instance_dir，不删除任何旧实例/目标数据。
+5. 在该 fresh 实例完成正常启动初始化后、任何验收发起的业务写入之前验证以下条件；允许应用按原合同创建数据库 schema 和四个预置分类：
+   a. 健康检查就绪。
+   b. 全库记录集合为空，包含软删除视图也为空；不能用未知 category 或不匹配 q 伪造空库。
+   c. 首次初始化四个预置分类可见，分类 ID 合法且各 count 为 0。
+   d. 未过滤首页的保存表单、URL 字段、分类入口、列表容器、明确空状态存在，且无记录行。
+6. 用 a11-base-* 与 a11-fresh-* 等清晰断言身份区分两组观察。输出仍为现有 schema、case_id=A11；不复制 A01 receipt、不手写 runtime passed。
+7. fresh 实例必须来自本次正式绑定的冻结应用源码/实际 app_root；fixture 程序只能用于准备回归，不能充当真实 G1 应用。
+8. finally 关闭 client 并 common.stop_app；校验子进程已经结束，清理异常不得报 passed。只处理本次拥有的进程及草稿资源。
+9. 原 A01/A03 行为与断言保持；A11 首启预置证明补充 A03 相关前提，不新增 A03 参数或独立开发流程。
+10. 不把这个源码新实例的首启证明说成原 base_url 部署被清空或重启过；G1 独立浏览器/同容器重启仍按原冻结计划执行。
+
+### 3.4 runner 只改 A11 绑定
+
+cases.A11.args 精确改为：
+["--case","{case_id}","--base-url","{base_url}","--app-root","{app_root}","--data-dir","{data_dir}"]
+
+保持 runner schema、result_schema、所有 case ID、其他十四项 args 与顺序不变。
+验收 ID/phase/goal/implementation 不删除、不改名、不降级；不通过重排 case 制造隐含首启前提。
+新 runner 字节、声明、参数实际接受能力、运行器传入的 app_root/data_dir 必须一起验证。
+
+## 4. 已知审阅意见逐项归档，不只读 passed
+
+建立一份精简 FINDINGS_DISPOSITION.json（名称可按仓库风格调整），读取 R6 六项预审和聚合审阅全文。每项记录原出处、现行合同、代码证据、处置、对应精确补丁或不处理理由。
+
+至少逐项处理：
+- A02：本轮修复。
+- A07：本轮修复。
+- A11 真空库/首启：按第 3.3 节修复。
+- A12 保存/移动映射：按第 5.1 节修复。
+- F02 首启/后续持久化：按第 5.2 节澄清。
+- F11 与 lifecycle 适配说明：按第 5.3 节澄清。
+- A04 README “JSON 同等断言”说法：按第 5.4 节修正事实描述。
+- A01 同一记录跨重启：现有隔离实例保存、同 id 读回、同目录重启已覆盖，附具体代码证明关闭，不新增实现。
+- A05 新建分类跨重启：现有唯一分类 id/名称/归属跨重启检查已覆盖，附代码证明关闭。
+- A04 “重命名跨重启”单独建议：它不等于 A05 已证明的“新建分类”；本轮不新增该测试，也不声称已验证。保留为非阻断建议及实际理由。
+- 应用 /state/app-data 与测试 data_dir：README 已有区分，附原文关闭；本轮补充 A11 用法。
+- 其余建议如分类 name/id 冲突优先级、额外错误追踪字段、F09 支撑性能力措辞：核对当前合同后明确处置，不默认为已解决，不自行扩成新功能或新行为默认。
+
+若某建议有现行程序证据已满足，直接证明；若发现本文件未授权的真实硬合同矛盾，保留具体差分需求并在真实生产前报告，不删建议、不缩目标、不开新修复轮。不要新增一套模型审阅平台或不断扩大“理想完整性”的检查表。
+
+## 5. 精确规格、适配说明及配套材料范围
+
+所有匹配按稳定 ID/条目身份执行，不能只按容易漂移的数组下标。准备 old/new 精确差分，使用现有字段结构，不任意新增 schema 字段。
+
+除下列允许项，标题、角色、功能 ID/name/applicability/phase、阶段成员/顺序、acceptance ID/goal/type/phase/implementation、decisions、limits、来源数组、case_basis/facts/观察保持不变。
+
+### 5.1 A12 归属联动修正
+
+只修映射，不改任何错误行为：
+- features[F01].acceptance 增加 A12。
+- acceptance[A12].features 增加 F01，保留 F04、F10。
+- contract_coverage.features[F01].acceptance_ids 增加 A12。
+- contract_coverage.features[feature_id=F01].error_branch_ids 接收以下六条 save 分支：
+  html.bookmark_save.category.empty
+  html.bookmark_save.category.whitespace
+  html.bookmark_save.category.overlong_121
+  json.bookmark_save.category.empty
+  json.bookmark_save.category.whitespace
+  json.bookmark_save.category.overlong_121
+- contract_coverage.features[F04].error_branch_ids 移除上述六条，保留原八条 move 分支。
+- error_contract 中上述六条分支的 feature_ids 从 F04/F10 改为 F01/F10。
+- F10 仍覆盖保存与移动；其他分支归属不改。
+- 原 32 条 A04/A12 分支的 ID、code、status、field、value_kind、response、write_effect、acceptance_ids、implementation 和集合保持。
+- p0_organize.py 不改；其 file_plan.error_branch_ids 保留原集合。
+- 其他派生展示/材料从这份新规范重生成，不能只改前端展示而源规范仍错。
+
+### 5.2 F02 只澄清首启与持久化边界
+
+只允许 contract_coverage.features[F02].recovery 与 success_state 的必要精确文字修订：
+- 首次初始化数据库创建四个预置分类。
+- 后续启动保留已持久化的分类变更，不重新创建用户已删除或重命名的非默认分类。
+- 默认“未整理”继续遵守既有保护与初始化合同。
+- “四分类都可见”明确指首次初始化状态；之后显示真实持久化的用户状态。
+
+不改变默认分类名、错误码或分类管理功能，不新增数据库修复策略。保持 A03/A04/A05 自身处理逻辑及既有断言不变；p0_organize.py 整文件逐字复用；p0_library.py 只允许第 3 节规定的 A02/A11 及必要 helper、参数检查变更。
+
+### 5.3 两条 target case-design 的限定说明修订
+
+这里改的是目标适配说明，不改共享案例观察、case revision 或场景链接。只改下面两项的 capability/reason；每项原 evidence_ids、disposition，以及其余八个 choices 完全保留。
+
+F11 capability 替换为：
+F11: the library is delivered as Python server-rendered HTML pages and forms using POST/redirect/GET for saving records, managing categories, moving records between categories, and soft-delete/restore, including a ready empty-library view. P0 has no standalone record-editing page; record URL updates retain only the existing PATCH /api/bookmarks/{id} contract.
+
+F11 reason 替换为：
+The evidence describes a client-mounted SPA: Edit is an in-page dialog populated from item fields, and component creation loads Dexie rows into a client RippleMap. The target implements the already-declared P0 save, category-management, move and soft-delete/restore journeys as Python 3.12 HTML responses. Source SPA mounting, client-side dialog state and Dexie hydration are not carried over. The source Edit dialog does not imply a target record-editing UI; the existing PATCH API retains URL updates and recomputes hostname when the URL changes. The save-now/find-later loop and ready empty state remain the target intent.
+
+record lifecycle capability 替换为：
+A deliberate save creates a URL-anchored record with a stable id, a locally derived hostname, creation time and initial active state. Later changes preserve the record id and creation time; updating the URL recomputes hostname from the new URL. The adopted capability is this identity and creation lifecycle; visitCount and visitedAt are not target fields or P0 obligations.
+
+record lifecycle reason 替换为：
+The accepted observation records the source's bm-prefixed UUID identity, hostname derivation, createdAt, initial flags and visit fields, and preservation of identity and creation/visit fields on edit. These remain source observations. The target adopts stable record identity and creation time, represented by its existing id/created_at model and made durable by SQLite; it does not import the source's visitCount/visitedAt fields, which F24 excludes. URL updates follow the existing PATCH contract and derive hostname again. The source's tag constraints and other state fields are not silently imported into the category or target data model.
+
+原 lifecycle disposition=adopted 表示采用身份/创建时间这个子能力；不把源项目所有字段静默带入目标。F24、编辑 UI 的既有 P0 范围不变。
+
+必须通过正式新 prepared target adaptation 产生新内容摘要/检查点/输入身份，不直接覆盖旧 CASE_DESIGN.json 或旧 snapshot。
+actual policy 本身保持；case_policy_digest 按实际 policy 文件计算，内容未变就应保持。case_design/adaptation review 组合摘要因 choices 改变而重新计算。
+旧 R6 case-design 和审阅保持原样；新准备、预审、聚合、冻结、交接使用一致的新 choices。
+
+### 5.4 README、file_plan 与架构只作必要同步
+
+README：
+- A02 如实描述 HTML 与 JSON 两个正向和原有负向。
+- A07 描述允许字段正向及 URL path/query/分类名排除。
+- A11 所有参数表、运行示例、行为说明增加 app_root/data_dir，区分 base_url 当前入口与同源码 fresh 实例首启。
+- A04 删除笼统“JSON 同等断言”说法，准确写 HTML 成功分类管理、JSON 已有非法值/重复/默认保护覆盖；不宣称 JSON 成功 rename/delete 已覆盖，也不新增这套程序。
+- 保留运行/退出码/网络/真实浏览器与文本 HTML 区别、未运行声明等现有约束。
+
+file_plan：
+- 保持九个 path、case IDs 与实现归属、依赖、导入/导出合同。
+- p0_library.purpose 增补 A02 JSON 正向与 A11 fresh/必需参数。
+- p0_find_open.purpose 增补 A07 排除字段与正负控制，A08 不变。
+- README/runner purpose 同步上述内容。
+- p0_organize.purpose 仅修正同一处“JSON 同等断言”的不准确描述，不改其实际程序、错误分支或覆盖要求。
+- reuse/mode 字段按第 3 节正式 manifest 一致设置，不能因为旧 file_plan 有 reuse=false 就重新生成五份旧程序；准备好的 replace 文件由绑定补丁供给。
+
+architecture_markdown：
+- 仅更新“验收适配器合同”中的参数说明：A01/A05/A09 用 app_root/data_dir 做既有重启检查；A11 另用二者验证同一源码的全新实例首启/空库；A14 仍仅 data_dir。
+- 同处明确 A11 的 base_url 与 fresh 实例观察边界，不把 A11 称为同容器重启。
+- 不改现有 API、HTML 入口、URL 策略、search_contract、32 类别错误合同、P0/P1 能力或运行隔离设计。
+
+contract_coverage.features[F11].success_state：
+- 仅补充空库/首启由绑定同一冻结 app_root 的 fresh 实例独立证明，base_url 观察只表示当前部署入口；两组都在 A11 输出中区分。
+- 不修改 A11 原 goal，不降低“空库”的含义。
+
+上述 authored 字段与 case_design 变更均列入精确补丁 allowlist；派生文档、template.json、acceptance/plan.json 由正式渲染生成，不手改旧归档。
+
+## 6. 一份规范、两套差分基线
+
+本轮输入必须从 R6 实际失败候选/检查点建立，不从旧 A 或 f190... 的 R5 proposal 重建。
+
+两套差分：
+A. R6 → R7 增量：
+   只包含第 3/5 节四交付文件、限定映射/文字/适配说明；其余五文件 SHA 不变，事实/来源不变。
+B. 历史冻结 A → R7 累计：
+   包含之前合法的 R5/R6 改动加本轮增量，供独立聚合审阅确认原断言意图保留。
+
+不能用较宽的累计 edit_paths 允许本轮越界，也不能把此前合法变化误判成新越权。
+本轮 runner.json 改动必须同时进入准确的累计授权 edit_paths；旧累计范围没有它，不能放任 validate_repair_diff 正确拒绝后再绕过。
+
+来源 gate：
+- 继续使用共享严格来源校验，必须在新设计预审及 author 前执行。
+- 新视图仍为固定 20 条事实和 14 原编号来源，不补 S08/S09/S10/S11/S17/S18。
+- 归档本次实际 SOURCE_REFERENCE_REPORT/MANIFEST/CITATION_MATRIX（使用已有真实名称）。
+- 不以恢复 legacy_all_accepted、重编号、删除功能或编造来源解决问题。
+
+宿主元数据 gate：
+- 新源码必须包含 7eb137c 的修复。
+- 聚合输入的程序清单精确为正式九项；四 replace、五 reuse 均提供真实文件与哈希。
+- acceptance/plan.json 作为 generated metadata 单列，给出前后实际文件、哈希和 diff，摘要纳入聚合身份。
+- 文档/元数据不混称程序；也不能把元数据变化隐藏。
+- 旧 R6 scope_fidelity=uncertain/blocked 保持，只有新材料的新真实审阅能给出新结论。
+
+## 7. 正式准备、预算与后继机制
+
+在已有服务中做有限、版本化扩展。建议：
+- atlas.failed-plan-revision.v3：受限规格/target adaptation 补丁及程序部分替换。
+- atlas.prepared-program-revision.v1：完整九项 reuse/replace 清单。
+- atlas.g1-bounded-revision-authorization.v1：本次授权、差分、预算和截止绑定。
+- 预算 amendment 内部 version 4：仅 6→7，继承现有绝对截止。
+- atlas.product-resume.v3：R6 失败任务的唯一正式后继。
+
+如仓库已有相同版本，先核对实际合同再选一致名称；名称是实现建议，不是声明现有接口。所有版本显式分支，未知版本拒绝；旧 V1/V2/V3 与旧准备/恢复版本语义保持。
+
+### 7.1 准备请求与 manifest
+
+请求绑定：
+- 第 1 节所有正式身份、当前 failed attempt 与报告。
+- 实际 snapshot、plan/checkpoint、候选、四个替换前字节、完整九项来源交付的摘要。
+- 新 instruction 原件 SHA、限定字段 allowlist、old/new 规格/choices、四项补丁与新字节、五项复用证明。
+- 原 R6 提案、旧 A 累计基线、71/6/active0、前任 amendment、旧 grant 消费、绝对截止。
+- 新规格/新程序/新材料摘要由真实内容计算，不预填未知 hash。
+
+每个 manifest entry 至少标识 path、source_job/attempt、checkpoint 名称/摘要、before SHA、mode、after SHA、patch/diff 摘要及授权条款。
+reuse 必须 before=after；replace 必须从绑定原字节应用精确补丁得到同一 after。
+读取路径受控，拒绝 missing file、路径逃逸、重复 path、未知文件、篡改 checksum、基线变化与过宽字段补丁。
+
+以正式 prepared byte patch/checkpoint 交付替换结果；不得伪造模型 author receipt、直接修改原 artifact 或绕过最终 validate_blueprint/repair_diff。
+新增 target adaptation 通过相同正式请求绑定，不伪造研究或改写案例库。
+
+### 7.2 注册及激活
+
+准备与登记 pending amendment：
+- 不消费业务轮次、不启动模型、不改父计划暂停状态。
+- 不改现有有效 deadline，不调用旧 R6 “now+8h” 激活逻辑。
+- 请求和授权原件先准备具体可审查差分，不等待生产失败后再补授权范围。
+
+首次正式入队必须同一事务：
+1. 获取写锁后再次读取当前时间、台账、原失败状态和材料身份。
+2. 确认前任 V3 已激活、deadline=1792495312.855422，且当前时间仍在窗口内。
+3. 激活 V4，书签修复上限 6→7。
+4. V4 有效截止直接继承上述绝对值；禁止 now+28800、max(old,now+window) 等延期。
+5. 用同一个业务操作键记录唯一第七轮；外层激活和内层 queue_repair 不得重复计数。
+6. 创建当前 R6 failed job 的唯一正式业务后继；不是原任务协议 attempt 2，也不是重跑相同输入。
+7. 新模板后继 config.repair_attempts=0，防止语义失败自动尝试第八轮并掩盖真正原因。
+8. 原子保存 supersession、预算/授权关联、完整 receipt。
+9. 原 R6 job、attempt、error、snapshot、报告/检查点保持；父计划仍 paused。
+
+相同 key/请求重放返回同一后继与截止，不能再记 repair 或开新窗口；相同 key 不同内容显式冲突。
+事务失败完整回滚，不留下半激活授权、孤立 job 或错误计数。
+
+入队后正式查询应看到：
+- CLI 仍 71（尚无生产模型调用时）、修复 7/7、active 0。
+- 同一唯一 queued 后继，父计划仍 paused。
+- 旧 grant 1/1、旧 retry/历史时间行保留。
+- 相同绝对截止。
+确认后用已有正式接口 resume 原计划。此步骤已经在本文件执行授权内，不再要求重复确认。
+
+### 7.3 六项新设计审阅与程序审阅
+
+这次有规格映射、file_plan、runner说明和 target choices 变更，直接取得六项新设计预审。
+- 新 proposal/projection/adaptation 身份按实际内容计算。
+- 不复制 R6 passed，不将旧 digest 换成新 digest。
+- 不为省六次正常调用再建设跨 job 审阅继承系统。
+- 真正没有变化的程序字节按 manifest 复用；四份 replace 文件均由正式 prepared patch 消费，本轮模板 author 模型调用必须为 0。若现有宿主不支持，在本轮已授权的宿主开发范围内实现并验证，不改走模型重写路径。后续首次 P0 的正常开发模型调用另计入同一 campaign 台账，不受这条模板 author=0 约束。
+- 新聚合审阅必须读新程序、双基线、授权、实际新元数据与新适配说明；出具真实新报告。
+- 聚合通过后才冻结，再取得冻结候选的独立审阅。二者不能互相替代。
+- 若审阅拒绝，先核对真实原因；不原样 retry 寻找更宽松结论，不删除/降低目标或将 blocker 改 suggestion。
+
+## 8. 必要验证：证明能识别错误，避免无效测试堆积
+
+先用临时库、假 CLI、受控 fixture 验证宿主机制；与真实生产记录严格区分。不要为了测试改生产数据库。
+
+至少覆盖以下具体风险：
+1. 原 R5 错误引用输入，在任何设计/author 模型调用前失败；R7 合法输入通过同一来源检查。
+2. R6 真实九项材料 → R7 四项替换/五项复用；错误来源 job、篡改旧字节、缺文件、额外 path、越界规格字段均拒绝；不会从旧 A 恢复程序。
+3. A02 正确 fixture 通过；仅 JSON 拒绝合法单标签 hostname 的变体被新断言拒绝；HTML/JSON 原负向继续有效。
+4. A07 正确三字段搜索通过；额外搜索 URL path/query、额外搜索分类名的变体分别失败；永远空结果也被原正向拒绝。覆盖 JSON 与 HTML，检查的是记录而非页面回显。
+5. A11 fresh 实例真正为空且预置齐全时通过；初始偷偷带记录、缺预置、首页缺空态等对应变体失败；缺 flags/启动失败/清理失败不能 passed。runner 传入真实现有占位符，case_id=A11 不冒充其他 case。
+6. 原有 A01/A03、A08 与其他固定程序不会因共享 helper/参数改变回退；可复用已有必要回归，不重写不相关套件。
+7. A12 六 save/八 move 映射正确，原 32 分支其他合同及 p0_organize 字节不变；F02/两 choices 仅允许文字差分，其余事实/来源/选择不变。
+8. 使用真实 71/6/grant1/前任 V3/已暂停且失败的 R6 状态构建恢复回归：
+   登记不激活；唯一入队到 71/7；重放不重复；旧请求拒绝新权限；未知 schema 拒绝；过期时连首次入队也拒绝；有效截止不会延长；事务回滚完整。
+9. 有效期测试使用注入时钟/临时库，不修改真实系统时钟或生产 deadline。
+10. 新聚合材料精确九程序 + 单列生成 plan 元数据，新摘要与实际文件一致；双基线允许历史合法变化，同时拒绝本轮越界。
+11. 新 choices 在准备、设计、聚合、候选和交接一致，没有中途回到 R6。实际宿主运行源码含 7eb137c 修复。
+
+进行仓库原有完整 13 组门禁及确实受影响的独立执行器合同验证；复用已有有效流程，不新增形式化门禁数量作为交付成果。
+- 记录执行数、skip 原因、严格 Docker 路径与 fixture 的区别。
+- 记录检查前后源码摘要；新源码 push 后等待精确提交的规定远端 CI 通过。
+- 源码发生修改使检查失效时，重跑必要受影响验证及规定完整 gate；纯报告更新不伪称又完成一次真实生产。
+- CI 未通过、仍排队、环境受限或窗口到期时如实记录；本地通过不能冒充远端通过。
+- 独立审阅者应看真实补丁与行为负控，不能只看测试数量。
+
+上述测试属于生产前验证；它们不是 P0、不是 G1 passed。
+
+## 9. 正式执行顺序：完成可达的真实主线
+
+必要源码、补丁、精确请求、规定检查与精确 CI 齐备后，在有效窗口内：
+1. 再读原计划/预算/任务/根目录，确认与准备绑定一致。
+2. 正式 prepare/登记本轮授权，按第 7 节原子激活并入队唯一后继，检查 receipt 与实际状态。
+3. 正式 resume 原计划，观察真实事件、模型调用及检查点。
+4. 六项新预审 → 新程序材料消费 → 候选构造 → 独立聚合语义审阅 → 冻结 → 冻结后独立审阅。
+5. 只有精确版本符合正式目录条件才发布。保留发布摘要/目录资格/独立审阅证明。
+6. 通过标准 application-development 流程导出并真正消费该模板 P0 交接包；归档 export hash、消费检查点、开发任务与实际交付 root。
+7. 执行冻结验收套件，对实际绑定的 P0 应用运行；A11 的 fresh app_root 必须是同一份实际交付源码，不能指向 fixture 或另一个应用。
+8. 按原独立机器计划完成真实浏览器核心旅程、实际目标绑定、必要同容器重启、非法输入零写入、并发写入持久化、清理与 phase proof。准备回归和合成探针不能替代。
+9. 重新由正式宿主 assess_g1 读取真实材料，保存机器结果与全部剩余原因。
+10. G1 只有正式 passed 才启动原 T08 三个固定场景。T08 继续原 campaign 的500总额、既有各产品额度/并发/首次启动窗口规则和固定抽验，不因本轮把全部产品额度提升到7；失败不能换样本。
+
+不要为了报告漂亮而停在“程序已补”“CI通过”或“候选已发布”；也不要承诺尚未执行的下游一定通过。
+运行期间保持简短进度：当前阶段、新取得证据、真实阻断、预算与剩余窗口。非阻断步骤已有授权时继续执行。
+
+## 10. 停止、额度与后续应用修复边界
+
+本轮第七轮由模板修订消费。首次 P0 开发在现有代码中不计一次业务修复，可以继续；对失败 P0 的后续 application-development repair 使用同一 product 的修复台账，第7/7轮后没有自动余额。
+
+以下情况正式保留现场并 pause：
+- 发现本文件外的规格、事实、程序或产品需求变更才能解决的问题。
+- 新聚合/冻结后审阅仍有真实 blocker，且需要另一业务修订。
+- 首次真实 P0 的业务失败需要改应用；不得包装为新 initial P0、改产品ID/版本名称规避记录。
+- 继续当前阶段确实需要额外重试，而对应正式追加额度已用尽，且没有已授权、未消费并适用于该阶段的 grant。旧 grant 1/1 本身不阻止新输入的正常首次调用；本文件不新增或重置任何重试额度。
+- 总 CLI/运行预算/绝对截止等正式门禁不允许继续。
+- 新授权与实际基线、工作区或生产根存在未解决冲突。
+
+停止时：
+- 记录真正业务/程序/协议/资源失败，不用后续 budget 错误覆盖原始原因。
+- 保留本次 candidate/app_root/完整输入输出/独立报告/调用及检查点/预算和时间。
+- 区分未运行、运行失败、证据不足、正式通过；只为真实发生的状态填值。
+- 先完成已授权且不需要继续生产的代码修复、报告与可审查请求准备，再说明仍需什么新的具体决策。不要擅自创建第8轮或新时间窗口。
+
+本文件不保证 G1 成功；它要求本轮完成必要工作并实际执行到正式可达结果，不能用“授权有限”提前放弃当前仍可执行的发布、首次 P0 或独立运行。
+
+## 11. 最终交付
+
+建议本轮证据目录：
+docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/
+
+最少交付内容：
+- DELIVERY.md：真实结论、完成项、当前停止点、未运行项和下一步具体边界。
+- BASELINE/授权原件/授权摘要与正式请求、准备响应、激活/队列/幂等回执。
+- FINDINGS_DISPOSITION：R6 所有审阅意见的逐项证据和处置。
+- 本轮 spec、target adaptation、file_plan 的精确 old/new patch。
+- PROGRAM_REVISION_MANIFEST：九文件路径、来源/CP身份、before/after SHA、四replace/五reuse、确定性补丁。
+- R6→R7 增量与 A→R7 累计差分及独立审阅输入。
+- A02/A07/A11 正向和故意错误 fixture 的原始验证；不可混称实际应用。
+- 13组本地检查、源码摘要、精确源码提交/远端CI对应。
+- 六项全新真实预审、实际聚合输入/报告、新候选/冻结/冻结后审阅/发布证据（未运行则注明）。
+- 若已执行，下游正式交接消费、真实 P0、套件运行、独立浏览器/phase proof及资源清理证据。
+- 最新正式 G1_ASSESSMENT、T08 三固定样本真实状态、预算和绝对deadline。
+- 失败/暂停时明确STOP_RECORD与可执行的正式恢复条件，不直接写库提供“恢复命令”。
+
+最终摘要必须列：
+G1 状态；T08 0/3或实际值；正式新模板数；真实P0交付/通过数；
+案例新增/复用（本轮没有新研究时0/1）；
+CLI累计/500与active；书签修复使用/7；旧grant1/1；
+当前绝对截止与观察时间；
+实际生产源码SHA、宿主补修SHA、最终HEAD及对应CI；
+真实job/attempt/stage、未运行项和停止原因。
+
+只统计真实发生的变化。不把模板程序文件数、fixture通过数、预审passed数写成产品数或G1成功。
+
+## 12. 可核对来源
+
+本 instruction 的基线来自精确提交 2807362d804ba95dc7671b4ab250b8b6fa420456；执行仍以现场正式服务记录及新实际材料为准。
+
+R6交付：
+https://github.com/liamamilin/atlas/blob/2807362d804ba95dc7671b4ab250b8b6fa420456/docs/template-factory/g1-r6-source-alignment-2026-10-20/DELIVERY.md
+
+R6正式停止：
+https://github.com/liamamilin/atlas/blob/2807362d804ba95dc7671b4ab250b8b6fa420456/docs/template-factory/g1-r6-source-alignment-2026-10-20/STOP_RECORD.json
+
+真实聚合审阅：
+https://github.com/liamamilin/atlas/blob/2807362d804ba95dc7671b4ab250b8b6fa420456/docs/template-factory/g1-r6-source-alignment-2026-10-20/actual-aggregate-review.json
+
+六项新设计预审：
+https://github.com/liamamilin/atlas/blob/2807362d804ba95dc7671b4ab250b8b6fa420456/docs/template-factory/g1-r6-source-alignment-2026-10-20/actual-six-new-review-proof.json
+
+实际九文件复用：
+https://github.com/liamamilin/atlas/blob/2807362d804ba95dc7671b4ab250b8b6fa420456/docs/template-factory/g1-r6-source-alignment-2026-10-20/actual-nine-program-byte-proof.json
+
+R6候选规范：
+https://github.com/liamamilin/atlas/blob/2807362d804ba95dc7671b4ab250b8b6fa420456/docs/template-factory/g1-r6-source-alignment-2026-10-20/candidate-attempt-1-not-frozen/template.json
+
+宿主元数据补修：
+https://github.com/liamamilin/atlas/commit/7eb137cac6e2b21bbe3bb3dcf3493632a5e436cc
+
+实际开发任务与修复计数：
+https://github.com/liamamilin/atlas/blob/2807362d804ba95dc7671b4ab250b8b6fa420456/application-atlas-production-pack/template_factory/development_jobs.py
+
+最终CI：
+https://github.com/liamamilin/atlas/actions/runs/39367528697
