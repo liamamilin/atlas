@@ -1,0 +1,122 @@
+{
+  "artifact_id": "tpl_f7ecff8d8fef4deba828aa2a8ef82918",
+  "checks": [
+    {
+      "dimension": "category_evidence",
+      "files": [
+        "CATEGORY.md",
+        "inputs/case-basis.json"
+      ],
+      "outcome": "passed",
+      "reason": "CATEGORY.md 以 S01-S21 区分 code_observation 与 inference，给出固定 commit、来源与 LICENSE/NOTICE 哈希，并明确列出未知项及「法律复用审查未执行」；没有把推断写成已验证的产品事实，也没有对许可范围作无依据声明。"
+    },
+    {
+      "dimension": "scenario_scope",
+      "files": [
+        "inputs/scenario.json",
+        "PRODUCT.md",
+        "ROADMAP.md"
+      ],
+      "outcome": "passed",
+      "reason": "场景的受众、目标、五步 workflow 与四条验收均映射到 P0 的 F01-F11；待购/家居改造/以后看看与默认收件区属于场景直接语境，云同步、多设备、快照、分享、阅读队列等被排除或延后，P1 的导入导出与去重没有挤占核心闭环。"
+    },
+    {
+      "dimension": "product_completeness",
+      "files": [
+        "PRODUCT.md",
+        "DECISIONS.md",
+        "ARCHITECTURE.md"
+      ],
+      "outcome": "passed",
+      "reason": "覆盖个人收藏者、服务端外壳与独立验收者三类角色，正常与失败流程、归类生命周期、软删除/恢复、导出与恢复路径均有定义；单用户本机定位下无认证、无计费、无后台管理/审计是明确且合理的范围限制，未强行套用不适用企业能力。"
+    },
+    {
+      "dimension": "architecture_contract",
+      "files": [
+        "ARCHITECTURE.md",
+        "template.json",
+        "acceptance/p0_recovery.py"
+      ],
+      "outcome": "uncertain",
+      "reason": "ARCHITECTURE.md 已给出 python-web 选型理由、SQLite 数据模型、URL 策略、JSON 错误码与 HTML 表单/重定向合同；但 GET /api/bookmarks/{id} 未说明软删记录返回 200 还是 404，而 A09 依赖 200；template.json 的 contract_coverage.error_contract 只列 invalid_name/invalid_category，F10/A02/A10 依赖的 invalid_url、bad_request、not_found 没有对应分支。"
+    },
+    {
+      "dimension": "phase_acceptance",
+      "files": [
+        "acceptance/p0_library.py",
+        "acceptance/p1_maturity.py",
+        "acceptance/p0_recovery.py",
+        "acceptance/plan.json",
+        "template.json"
+      ],
+      "outcome": "blocked",
+      "reason": "A03（acceptance/p0_library.py）在 --base-url 上无条件断言四个预置分类，未使用 fresh 实例；template.json 的 F02 recovery/success state 明确后续启动保留用户已删除或改名的非默认分类，已使用目标会被误判。A13（acceptance/p1_maturity.py）断言首页文本含 /go/{record_id}，但 ARCHITECTURE.md 与 F07/A08 要求 record-open-link 的 href 等于原始 URL，只有 GET /go/{id} 返回 302；合规页面无需在 HTML 中出现该文本。A09（acceptance/p0_recovery.py）还在软删后调用 GET /api/bookmarks/{id} 并假定 200，而架构未规定 trashed 行在按 id 读取时的行为。"
+    },
+    {
+      "dimension": "decisions_defaults",
+      "files": [
+        "DECISIONS.md"
+      ],
+      "outcome": "passed",
+      "reason": "D01-D13 均有明确默认值与 when_to_ask：单选归类、默认未整理、自动创建归类、软删除恢复、本地优先、无认证但仅限本机/隔离网络、P1 去重等关键选择可逆且有触发问题；D11/D12 延后、D13 保持 open，没有把 proposed 当成用户已确认。"
+    },
+    {
+      "dimension": "agent_handoff",
+      "files": [
+        "AGENT.md",
+        "README.md",
+        "ROADMAP.md"
+      ],
+      "outcome": "passed",
+      "reason": "AGENT.md 要求先核对 PRODUCT/ROADMAP 与既有决定，按需读取 ARCHITECTURE/DECISIONS，首阶段完成已确认场景的核心闭环，验收前运行对应程序并如实记录失败；README.md 为缺少 HANDOFF.md/CURRENT_PHASE.json 的直接阅读场景提供了 PRODUCT/ROADMAP 回退路径，未擅自覆盖用户决定。"
+    },
+    {
+      "dimension": "evidence_honesty",
+      "files": [
+        "README.md",
+        "VALIDATION.md",
+        "acceptance/README.md",
+        "acceptance/plan.json"
+      ],
+      "outcome": "passed",
+      "reason": "README.md 与 VALIDATION.md 明确「尚未执行包内程序」，acceptance/README.md 声明套件未执行且不得声称通过，plan.json 全部用例 status 为 not_run；来源调研日期与当前访问日期被区分，没有把静态观察或未运行程序写成已通过结果。"
+    }
+  ],
+  "created_at": "2026-10-20T11:53:46.919655+00:00",
+  "digest": "ec3f2fc668c20d24b78c22f15eed40779ed38b835c10b7b452aaba725dbb7105",
+  "frozen_review_recovery": {
+    "artifact_digest": "ec3f2fc668c20d24b78c22f15eed40779ed38b835c10b7b452aaba725dbb7105",
+    "artifact_id": "tpl_f7ecff8d8fef4deba828aa2a8ef82918",
+    "attempt": 3,
+    "call_attempt": 3,
+    "grant_id": "egrant_5168847ee98d4b7f980779bb9199f44f",
+    "input_sha256": "394209fae774d75bcf1fa06c4eb091f26c727438836476cb86471c3adbc1d242",
+    "job_id": "job_b01427592b164863aab5bedf7b3863bb",
+    "materials_manifest_digest": "ad76380a71a55b277dabb663bb039c5df8e29ed738ffeb7f4b290ad75f5b5460",
+    "materials_tree_digest": "20abaed83c7348e1857e25b3c02bd9252d7d1f6a105fc8c1762df99e4118681a",
+    "prompt_sha256": "e944a32a1986c44ab71af7a1dfdbbf439335264b252387c9baae371876dae47f",
+    "recovery_id": "frec_60a38757ec0c4363a193b922155df22a",
+    "reservation_id": "bud_2b188bf21f09446c843877b9025c1841",
+    "result_digest": "8e60bc52f431d794d4380222209da0782ee5eca826f30591653da5ff84af4078",
+    "schema": "atlas.frozen-review-recovery-proposal.v1",
+    "source_tree_digest": "c56d550a62c929f0429006c6252058f0e588067f2107a1afb0b2d8026dc4c636",
+    "timeout_seconds": 1800
+  },
+  "id": "acc_90be1c382dae42e4b3c2eba0344eeacf",
+  "job_attempt": 3,
+  "job_id": "job_b01427592b164863aab5bedf7b3863bb",
+  "method": "cognitive-review",
+  "outcome": "blocked",
+  "scope": "Independent static cognition and acceptance-program review only; no program execution, source re-fetch, downstream runtime or publication.",
+  "suggestions": [
+    "A03 改用 --app-root/--data-dir 的 fresh 实例断言四个预置分类；--base-url 只验证当前持久化分类状态，与 F02 的后续启动语义一致。",
+    "A13 删除对 /go/{record_id} 页面文本的断言，改为定位 tr[data-record-id] 与 a[data-testid=record-open-link]，校验 href、target、rel，并单独保留 /go 302 断言。",
+    "明确 GET /api/bookmarks/{id} 对软删记录返回 200 还是 404；若 A09 需要读取 trashed 行，改用 include_trashed=1 列表，或把该行为补入架构合同。",
+    "在 contract_coverage.error_contract 增补 invalid_url、bad_request、not_found 等 F10 分支，或说明该 schema 只覆盖归类错误分支。",
+    "修正 acceptance/README.md 4.1 的 A11 行，补上 --app-root 与 --data-dir，使其与 runner.json 及 4.2 示例一致。",
+    "明确 HTML 归类搜索中空 category 是「全部」还是非法；当前 A07 的无 scope 负例假定空值可用于全库搜索。",
+    "A13 若要证明外部网络不可用场景，需关闭外网并记录前提，或将此项标为 unverified；当前只检查页面不引用外部资源，未真正制造断网条件。",
+    "清理 ARCHITECTURE.md 开头重复的「# 架构与契约」标题，避免契约入口出现重复章节。"
+  ],
+  "summary": "静态审阅冻结蓝图：P0 的保存—归类—检索—打开—软删除恢复主线、数据模型、决策与阶段划分总体自洽，来源与未执行状态也如实披露。但验收语义有两处会把合规实现判错：A03 在任意 --base-url 上无条件要求四个预置归类，与 F02 关于后续启动保留用户删除或改名分类的承诺冲突；A13 要求列表 HTML 出现 /go/{record_id}，而 F07 与 ARCHITECTURE 要求打开链接 href 为原始 URL、/go 只作 302 端点。另有软删记录按 id 读取语义未定义、error_contract 未覆盖 invalid_url/bad_request 等分支、A11 参数表与 runner 不一致等缺口。未执行任何程序，结论仅来自静态文件审阅。"
+}
