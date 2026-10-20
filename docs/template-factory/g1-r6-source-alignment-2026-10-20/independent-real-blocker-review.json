@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.r6-independent-static-blocker-review.v1",
+  "reviewer": "Sol /root/protocol_review",
+  "scope": "Independent static verification of the actual aggregate report and fixed candidate programs; no application runtime or production calls.",
+  "job_id": "job_f3e32b56036b4ec7bea0c00d6a2a8dc4",
+  "business_blockers_confirmed": [
+    {
+      "id": "A02",
+      "file": "acceptance/p0_library.py",
+      "lines": [835, 888, 893, 923],
+      "reason": "Single-label positive uses post_form only. The get_record at 883 is a GET read, not JSON save. The only post_json at 923 is inside the invalid-URL loop. Baseline lines 206-220 exercised the dotless boundary via JSON."
+    },
+    {
+      "id": "A07",
+      "file": "acceptance/p0_find_open.py",
+      "lines": [505, 528, 533, 581, 616, 653],
+      "reason": "Category and path tokens are constructed, but queries test title/hostname/description/shared/absent only. No query matching only URL path/query or category name excludes extra search fields."
+    }
+  ],
+  "classification": "Acceptance-program coverage defects, not observed downstream application failures.",
+  "authorization_boundary": "Fixing either changes fixed nine-program bytes and exceeds R6. Metadata host correction cannot remove these blockers. Keep formal pause; do not retry unchanged input to seek another semantic conclusion."
+}

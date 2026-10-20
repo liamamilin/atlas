@@ -1,0 +1,19 @@
+{
+ "summary": "阶段设计通过：按照核心旅程先行的顺序，P0 先覆盖 confirmed_scenario 的保存、默认归类、移动、浏览/检索、打开原页与跨重启持久化；P1 仅保留可选成熟增强。核心 workflow 未被推迟，验收程序与 ARCHITECTURE 的接口及 runner 绑定相容。下列问题属于可修正的覆盖或 fixture 身份缺口，不构成核心旅程阻塞。",
+ "checks": [
+  {
+   "dimension": "phase_acceptance",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "P0 的 A01/A02/A03 覆盖保存与默认「未整理」，A05 覆盖归类移动，A06/A07 覆盖归类浏览与关键字检索，A08 覆盖原始 URL 打开，A09–A12 覆盖软删除恢复、错误零写入与分类保护；A01/A05/A09 通过 app_root/data_dir 在同一实例目录重启，A14 通过 data_dir，其余 base_url，和 ARCHITECTURE 的验收适配器合同及 runner.json 的绑定一致。P1 的 A13–A15 对应 F12–F14，属元数据、导入导出与去重等后续增强，未把 confirmed_scenario 的必需步骤移出 P0。"
+  }
+ ],
+ "suggestions": [
+  "A11 的「空库」和 A03 的「首启」目前只用 base_url 与不存在的归类过滤验证；建议在隔离的新实例（app_root/data_dir）上执行，或把目标明确收窄为「无匹配归类的空状态」，避免非空目标被误判为空库。",
+  "A02 的目标同时声明 HTML 与 JSON 接受单标签主机 URL，但文件计划只明确用保存表单做正向提交；建议补充 JSON 保存单标签主机的正向断言，或把该正向目标限定为表单路径。",
+  "A01 的 base_url 流程与隔离实例流程各自保存记录；若「该记录」要求同一条记录跨进程稳定，建议在隔离实例内先读回再重启并断言同一 id，或明确拆成两个独立断言。"
+ ]
+}

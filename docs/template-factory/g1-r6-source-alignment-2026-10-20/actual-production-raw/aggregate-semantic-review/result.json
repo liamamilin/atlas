@@ -1,0 +1,52 @@
+{
+ "identity": {
+  "scope_digest": "ef1a48daae02ecad7810d450ddae286bef5dd45e4c83888c7dd141070fe01201",
+  "diff_digest": "f153e3550ceaeeb58b14248db94b66263276f20b85641476f2fedde72b8fdc81",
+  "baseline_digest": "8d9229d3895be0cd1672ad28a2926549a2e5e6920b186ceeaef09c38c37803d9",
+  "candidate_authored_digest": "60296e5322e693bf17dfc49754278304529563112af173fcb5df4f36e1ef4e39",
+  "baseline_program_digest": "8a3399bf52eb8185ac57fd19133beeefc93acaac4d2f707ff4346be6d8f87274",
+  "candidate_program_digest": "975148d1255384bcd0c3fcf2ce681cd6bb1b4f77612487fab1ab12672b708cc7",
+  "case_policy_digest": "fdf6b892771ee2a6068f197564413afca67a0a4d6a82e057e6eaf7cde5aae643"
+ },
+ "outcome": "blocked",
+ "summary": "The repair is broadly faithful and adds substantial HTML coverage, but it does not fully implement the authorized A02 single-label replacement in the JSON save path and does not test A07's exact search-field exclusions. A04/A12 invalid-value contracts are otherwise well covered; scope is also not fully confirmed because acceptance/plan.json is recorded as changed but is absent from the supplied source trees and program diff.",
+ "checks": [
+  {
+   "id": "assertion_intent_preserved",
+   "outcome": "blocked",
+   "reason": "A02's prior JSON single-label boundary is not preserved. The baseline exercised the dotless-host case through the JSON endpoint; the authorized change permits replacing that rejection with a positive, but the candidate submits the positive only through the HTML save form while JSON is exercised only with invalid URLs. The authored A02 goal requires both the save form and JSON to accept a single-label host, so an implementation accepting it in HTML but rejecting it in JSON can satisfy every current A02 assertion. Other prior assertion intents (A01, A03-A12) are preserved or strengthened."
+  },
+  {
+   "id": "scope_fidelity",
+   "outcome": "uncertain",
+   "reason": "Within the supplied source trees, changes are confined to the authorized acceptance edit paths (README.md, p0_library.py, p0_organize.py, p0_find_open.py, p0_recovery.py) and the authorized authored paths; common.py, p1_maturity.py, runner.json, and requirements.txt are unchanged. However, the top-level program hash inventory records acceptance/plan.json changing from 7a2e... to 56e5... while that file is absent from both supplied source trees and from exact_diff.program_diffs, so the full scope cannot be confirmed."
+  },
+  {
+   "id": "case_adaptation",
+   "outcome": "blocked",
+   "reason": "The A04 and A12 exact category-management and save/move contracts are substantially implemented, including HTML/JSON invalid values, default/null JSON save, HTML category_id-only move rejection, and no-write snapshots. But A02's positive single-label acceptance is not exercised through JSON, and A07 does not test the policy's exclusion of raw URL substrings (nor category names/tags) from keyword search. The adaptation therefore does not fully match the host-owned url_policy and search_contract."
+  }
+ ],
+ "findings": [
+  {
+   "severity": "blocker",
+   "basis": "source/candidate/acceptance/p0_library.py `_case_a02`: the single-label boundary `http://atlas-a02-<token>` is submitted only through `_save_form_from_home`/`post_form`; the JSON loop submits only invalid URLs and never a valid single-label URL. This leaves the authorized `single_label_hostname_negative_to_positive` replacement absent from the JSON path even though the authored A02 goal says both the save form and JSON must accept it."
+  },
+  {
+   "severity": "blocker",
+   "basis": "source/candidate/acceptance/p0_find_open.py `_case_a07`: the URL path/query tokens are never used as a query, and no query equal to a category name is tested. The host policy `search_contract` states search is over title, hostname and description and does not match tags or raw URL substrings; `CASE_DESIGN.json` F06 also states raw URL text and category names are not additional keyword fields. Current A07 assertions do not distinguish implementation that additionally searches raw URLs or category names."
+  },
+  {
+   "severity": "uncertain",
+   "basis": "input.json `program_file_hashes_before/after` records `acceptance/plan.json` changing (7a2e79... -> 56e5cc...), but plan.json is absent from source/baseline/ and source/candidate/ and is not included in exact_diff.program_diffs or edit_paths. This may be a generated plan artifact, but the supplied evidence does not permit verifying whether it is an unauthorized program change."
+  },
+  {
+   "severity": "suggestion",
+   "basis": "source/candidate/acceptance/README.md line 117 claims A04 retains equivalent JSON API assertions, but candidate A04 exercises JSON only for duplicate/protection/invalid-name; the baseline's successful JSON rename and delete assertions are replaced by HTML success paths. Correct the README claim or add the successful JSON rename/delete assertions."
+  },
+  {
+   "severity": "suggestion",
+   "basis": "source/candidate/CASE_DESIGN.json F11 says server-rendered HTML pages and forms support 'add, edit and organize' actions, while source/candidate/ARCHITECTURE.md line 48 says P0 has no isolated record edit UI and only retains the PATCH API contract. Clarify whether edit is API-only or an HTML journey so the case design and architecture do not assert different target capabilities."
+  }
+ ]
+}

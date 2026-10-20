@@ -1,0 +1,15 @@
+{
+ "summary": "decisions_defaults 维度通过：D01-D13 均以问题、默认值、影响、状态和 when_to_ask 明确记录；D01-D10 是当前采用且可逆的默认（单选归类、默认收件区、自动建类、软删除、离线优先、P1 去重、检索字段、python-web/SQLite、无认证），D11-D12 延后、D13 保持开放；与 ARCHITECTURE.md 的默认归类、事务化软删除与迁移、P0 不做去重、无认证隔离验收等约定一致，未发现会破坏核心旅程或造成数据/安全矛盾的默认。",
+ "checks": [
+  {
+   "dimension": "decisions_defaults",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "DRAFT.md 的 decisions 逐项给出 default 与 when_to_ask：D01 单选 category_id；D02 缺省归入「未整理」；D03 新名称大小写不敏感自动创建并复用；D04 软删除且可恢复；D05 离线优先、第三方增强失败静默降级；D06 仅 P1 默认返回 409 duplicate_url，allow_duplicate 可覆盖；D07 仅检索标题、hostname、描述；D08 python-web + SQLite；D09 无认证但限定本机或隔离验收网络；D11/D12 明确延后；D13 保持开放。这些是可逆的文档化默认，触发条件具体可验证，未冒充用户已确认需求。ARCHITECTURE.md 的 categories/bookmarks 模型、默认「未整理」预置、软删除与归类删除迁移、P1 去重，以及仅隔离验收使用 0.0.0.0 的约定均与上述默认一致；D02 的「保存始终成功」仅适用于归类省略场景，显式非法 URL 或归类仍按 400 零写入处理，不构成矛盾。"
+  }
+ ],
+ "suggestions": []
+}

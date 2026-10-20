@@ -1,0 +1,17 @@
+{
+ "summary": "runtime_protocol 设计审查通过：交付 profile 为合法的 python-web；计划和架构明确所有 Web 用例使用 --base-url，导入基于程序文件位置自举 sys.path，app_root 只读，data_dir 仅作测试者草稿根且实例数据库位于其下独立目录；A01/A05/A09 的跨重启断言具备从 app_root 启动同一应用独立进程、真实操作、停止后同目录重启并读回的适配器合同。本次仅完成设计审查，不代表验收程序已运行或通过。",
+ "checks": [
+  {
+   "dimension": "runtime_protocol",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "DRAFT 的交付 profile 为 python-web；ARCHITECTURE.md 明确全部程序使用 --base-url，A01/A05/A09 另用 --app-root（只读应用源）与 --data-dir（测试者草稿根），每实例数据库位于 data_dir/instances/<uuid>；跨重启通过 common.launch_app 启动 app/serve.py 的独立进程，执行真实表单写入、SIGTERM，并在同一实例目录重启后读回。file_plan 中 common.py 通过 os.path.dirname(os.path.abspath(__file__)) 自举 sys.path，不依赖 cwd；runner.json 的 flags 与各程序一致。README 计划将 start argv 声明为字面量，不使用 {port}/{data_dir} 参数插值。未发现只读外部目标的错误重启声明或缺损的进程适配器。"
+  }
+ ],
+ "suggestions": [
+  "在 acceptance/README.md 的 delivery.json 示例旁明确：/state/app-data 属于应用运行卷，不是测试者 --data-dir 根；测试者隔离实例仍使用 data_dir/instances/<uuid>，且 A14 的 --data-dir 仅用于测试草稿文件，不读取或替代应用数据库。"
+ ]
+}

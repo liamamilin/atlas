@@ -1,0 +1,73 @@
+{
+  "schema": "atlas.reused-case-preservation.v1",
+  "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+  "revision": 1,
+  "record_digest": "f9e73c6bac7544ea70fc1b08dd0150752954fcb0a15382ae20cc3e61b773d9f0",
+  "basis_digest": "a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589",
+  "observations": 29,
+  "shared_scenario_links": [
+    {
+      "adopted_scope": [
+        "Bookmark record model and Dexie/IndexedDB persistence layer (source/src/includes/store.ts:3-16, source/src/includes/store.ts:41-47).",
+        "Add/edit dialog with Valibot validation and generated ids (source/src/App.tsrx:101-129, source/src/App.tsrx:699-717).",
+        "Library list, tabs, tag sidebar, search, sort, and per-card actions (source/src/App.tsrx:58-88, source/src/App.tsrx:178-498).",
+        "URL validation, hostname extraction, blob-URL favicon handling, and date formatting (source/src/includes/utils.ts:1-26).",
+        "Application mount and static HTML shell (source/src/index.ts:1-9, source/index.html:14-19)."
+      ],
+      "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+      "case_revision": 1,
+      "evidence_ids": [
+        "ev_ba200adf6e2c_1596da4a90687ca5",
+        "ev_ba200adf6e2c_05babdea64ba9858",
+        "ev_ba200adf6e2c_35e41aab676021eb",
+        "ev_ba200adf6e2c_86ed2327f33a3ca8",
+        "ev_ba200adf6e2c_9ab6b0e51811a16d",
+        "ev_ba200adf6e2c_c4ad7e52e5713628",
+        "ev_ba200adf6e2c_93ff254508846f11",
+        "ev_ba200adf6e2c_7150b0ac7a5678db",
+        "ev_ba200adf6e2c_06c81a165e03c96a",
+        "ev_ba200adf6e2c_b1ca64cf2ad02998",
+        "ev_ba200adf6e2c_4c56ef30a1785be1",
+        "ev_ba200adf6e2c_ec303a2fd1afa287",
+        "ev_ba200adf6e2c_8e11efc61a4650ba",
+        "ev_ba200adf6e2c_e7dd8d32c05c39f9",
+        "ev_ba200adf6e2c_3168bcd465b6a043",
+        "ev_ba200adf6e2c_6bbd7a588896fe31",
+        "ev_ba200adf6e2c_e62ae7e0a2c68ba1",
+        "ev_ba200adf6e2c_922f1dbc84912d99",
+        "ev_ba200adf6e2c_93ef917a193a45ab",
+        "ev_ba200adf6e2c_7d47d725a2e9b759"
+      ],
+      "exclusions": [
+        "No collections/folders or nested organization: organization is a flat string[] tags field only (source/src/includes/store.ts:3-16).",
+        "No unsorted/default category: the schema requires at least one tag (source/src/App.tsrx:121-128).",
+        "Search is title-only; URL, description, and tags are not searched (source/src/App.tsrx:63-88).",
+        "No import/export of browser bookmark HTML or other services' libraries; absent from the manifest.",
+        "No cloud sync or multi-device sharing; data is local IndexedDB (source/README.md:13-14).",
+        "No preserved page copies or snapshots; only a favicon Blob is stored (source/src/includes/store.ts:8).",
+        "No duplicate detection or URL uniqueness constraint; 'url' is not indexed uniquely (source/src/includes/store.ts:45-47).",
+        "No broken-link detection or library hygiene features.",
+        "No public sharing or collaboration.",
+        "No browser extension/bookmarklet; capture is via the in-page add form.",
+        "No trash view; Delete exists only for archived records and relies on a transient Undo toast (source/src/App.tsrx:436-453)."
+      ],
+      "reason": "The repository implements the scenario's core loop of deliberately saving a URL as a durable record, organizing it, retrieving it later, and returning to the original page. However, the scenario's 'category' (归类) concept maps only onto a mandatory flat tag list rather than creatable/movable collections, there is no default/unsorted category because at least one tag is required, and search covers only the title. Persistence is single-browser IndexedDB with no sync, so the multi-device aspect of the scenario is not supported.",
+      "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+      "scenario_revision": 2,
+      "workflow_support": [
+        "Save a seen link: Add Bookmark dialog captures URL with Valibot validation (source/src/App.tsrx:101-129, source/src/App.tsrx:658-717).",
+        "Choose a simple category: up to five free-text tags are entered in the dialog (source/src/App.tsrx:608-657).",
+        "Browse or search the personal library: Home/Archived tabs, tag checkbox filters with counts, and a title-search field (source/src/App.tsrx:49-56, source/src/App.tsrx:58-88, source/src/App.tsrx:241-250).",
+        "Move/manage organization after saving: Edit reopens the record and rewrites tags via saveBookmark (source/src/App.tsrx:392-412, source/src/App.tsrx:699-714).",
+        "Open a record to return to the original page: Visit updates visitedAt/visitCount and calls window.open(item.url, '_blank', 'noopener,noreferrer') (source/src/App.tsrx:339-354).",
+        "Persistence across sessions: records are written to Dexie table 'bookmarks' and re-read with db.bookmarks.toArray() on mount (source/src/includes/store.ts:41-47, source/src/App.tsrx:23-32)."
+      ]
+    }
+  ],
+  "admissible_after_template_failure": true,
+  "research_reusable": true,
+  "new_cases": 0,
+  "reused_cases": 1,
+  "upstream_run": "not_observed",
+  "note": "Formal CaseLibrary read; template failure did not remove or rewrite the canonical shared research record."
+}

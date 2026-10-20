@@ -1,0 +1,250 @@
+{
+  "job_id": "job_f3e32b56036b4ec7bea0c00d6a2a8dc4",
+  "candidate_path": "jobs/job_f3e32b56036b4ec7bea0c00d6a2a8dc4/attempt-1/candidate-0",
+  "status": "rendered_not_frozen",
+  "template_json_sha256": "3259239fd8a87fc3f4bf6c6ccd442f507a572db54e8e70b9dc9889c68f3855d3",
+  "authored_fields_exactly_match_prepared_spec": {
+    "title": true,
+    "roles": true,
+    "features": true,
+    "decisions": true,
+    "phases": true,
+    "acceptance": true,
+    "architecture_markdown": true,
+    "limits": true,
+    "contract_coverage": true
+  },
+  "all_nine_rendered_program_bytes_equal": {
+    "acceptance/common.py": true,
+    "acceptance/p0_library.py": true,
+    "acceptance/p0_organize.py": true,
+    "acceptance/p0_find_open.py": true,
+    "acceptance/p0_recovery.py": true,
+    "acceptance/p1_maturity.py": true,
+    "acceptance/requirements.txt": true,
+    "acceptance/README.md": true,
+    "acceptance/runner.json": true
+  },
+  "template_case_facts_view": {
+    "schema": "atlas.accepted-case-facts.v1",
+    "policy": "accepted-linked-observations-only-v1",
+    "status": "accepted",
+    "basis_digest": "a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589",
+    "source_research_digest": "9053da8cb157b5bec6ce698e163e208b5a500a3c121d12a6b1b8855aadba0238",
+    "accepted_evidence_ids": [
+      "ev_ba200adf6e2c_05babdea64ba9858",
+      "ev_ba200adf6e2c_06c81a165e03c96a",
+      "ev_ba200adf6e2c_1596da4a90687ca5",
+      "ev_ba200adf6e2c_3168bcd465b6a043",
+      "ev_ba200adf6e2c_35e41aab676021eb",
+      "ev_ba200adf6e2c_4c56ef30a1785be1",
+      "ev_ba200adf6e2c_6bbd7a588896fe31",
+      "ev_ba200adf6e2c_7150b0ac7a5678db",
+      "ev_ba200adf6e2c_7d47d725a2e9b759",
+      "ev_ba200adf6e2c_86ed2327f33a3ca8",
+      "ev_ba200adf6e2c_8e11efc61a4650ba",
+      "ev_ba200adf6e2c_922f1dbc84912d99",
+      "ev_ba200adf6e2c_93ef917a193a45ab",
+      "ev_ba200adf6e2c_93ff254508846f11",
+      "ev_ba200adf6e2c_9ab6b0e51811a16d",
+      "ev_ba200adf6e2c_b1ca64cf2ad02998",
+      "ev_ba200adf6e2c_c4ad7e52e5713628",
+      "ev_ba200adf6e2c_e62ae7e0a2c68ba1",
+      "ev_ba200adf6e2c_e7dd8d32c05c39f9",
+      "ev_ba200adf6e2c_ec303a2fd1afa287"
+    ],
+    "facts": [
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_05babdea64ba9858",
+        "kind": "code_observation",
+        "statement": "New records are built with id `bm-${crypto.randomUUID()}`, hostname from getHostname(url), and defaults visitCount=0, visitedAt=null, isPinned=false, isArchived=false, createdAt=Date.now(); edits preserve the previous id, isPinned, isArchived, visitCount, createdAt, and visitedAt."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_06c81a165e03c96a",
+        "kind": "code_observation",
+        "statement": "Pin/Unpin and Edit actions are rendered only when the item is not archived, and Edit loads the item's url/title/description/tags/favicon into the dialog."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_1596da4a90687ca5",
+        "kind": "code_observation",
+        "statement": "The Valibot BookmarkFormSchema requires a non-empty URL matching /^https?:\\/\\/(?:[\\w-]+\\.)+[a-zA-Z]{2,}(?:\\/\\S*)?$/ and v.url, a non-empty title up to 100 chars, a non-empty description up to 280 chars, and 1-5 tags each up to 30 chars."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_3168bcd465b6a043",
+        "kind": "inference",
+        "statement": "The scenario's user-controlled 'category' (归类) is realized only as up to five free-text tags on each record; there are no creatable, renameable, or nestable collections, and no separate move operation beyond editing tags."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_35e41aab676021eb",
+        "kind": "code_observation",
+        "statement": "saveBookmark sets the record in the in-memory map then awaits db.bookmarks.put(bm); deleteBookmark removes from the map then awaits db.bookmarks.delete(id)."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_4c56ef30a1785be1",
+        "kind": "code_observation",
+        "statement": "A Delete action is rendered only for archived items; it calls deleteBookmark and shows an error-type toast with an Undo action that calls saveBookmark(item) to restore the record."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_6bbd7a588896fe31",
+        "kind": "inference",
+        "statement": "The scenario step of letting unclassified links land in a default category is not supported, because the form schema rejects saves with zero tags."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_7150b0ac7a5678db",
+        "kind": "code_observation",
+        "statement": "A Copy URL action writes item.url to the clipboard and shows a success toast."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_7d47d725a2e9b759",
+        "kind": "inference",
+        "statement": "Metadata and favicon enrichment is best-effort and dependent on third-party HTTP services; failures degrade silently to console errors while the bookmark still saves with whatever fields the user entered or omitted defaults for."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_86ed2327f33a3ca8",
+        "kind": "code_observation",
+        "statement": "An effect on component creation calls db.bookmarks.toArray() and inserts each returned bookmark into an in-memory RippleMap keyed by bookmark id."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_8e11efc61a4650ba",
+        "kind": "code_observation",
+        "statement": "On submit, if no favicon exists and a hostname is derivable, the code fetches a Google s2 favicon proxied through images.weserv.nl inside a try/catch that only logs failure."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_922f1dbc84912d99",
+        "kind": "inference",
+        "statement": "Persistence is local to one browser profile/device via IndexedDB with no sync layer, so the scenario's cross-session growth holds only on the same browser, and the leaf's multi-device context is unmet."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_93ef917a193a45ab",
+        "kind": "inference",
+        "statement": "Deletion is limited to archived records and recovery is only the transient Undo action on the toast; there is no trash view, and non-archived records cannot be deleted at all through the UI."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_93ff254508846f11",
+        "kind": "code_observation",
+        "statement": "The Visit action builds an updated bookmark with visitedAt=Date.now() and visitCount+1, calls saveBookmark(updated), then opens the URL with window.open(item.url, '_blank', 'noopener,noreferrer')."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_9ab6b0e51811a16d",
+        "kind": "code_observation",
+        "statement": "The displayed list filters by isArchived matching the active tab, requires every selected tag to be present in bookmark.tags, matches search only against bookmark.title.toLowerCase(), and sorts pinned-first then by the chosen sort mode with createdAt descending as fallback."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_b1ca64cf2ad02998",
+        "kind": "code_observation",
+        "statement": "The Archive/Unarchive action toggles isArchived and, when archiving, forces isPinned=false before saving."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_c4ad7e52e5713628",
+        "kind": "code_observation",
+        "statement": "Tag counts are derived by iterating all in-memory bookmarks and counting each tag occurrence, then sorted alphabetically for the sidebar."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_e62ae7e0a2c68ba1",
+        "kind": "inference",
+        "statement": "Retrieval by keyword covers only bookmark titles, not URLs, descriptions, or tag names, so the scenario's 'find by a remembered word' workflow is partially supported."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_e7dd8d32c05c39f9",
+        "kind": "inference",
+        "statement": "The app supports the scenario's save-now/find-later loop: a deliberate add dialog writes a URL-anchored record into durable IndexedDB, and the record can later be browsed, tag-filtered, title-searched, and opened back to the live URL."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_id": "ev_ba200adf6e2c_ec303a2fd1afa287",
+        "kind": "code_observation",
+        "statement": "fetchMeta calls https://api.microlink.io/?url=... and, on success with result.data, sets title/description and fetches the logo through https://images.weserv.nl/; errors are only console.error'd and the finally block resets loading."
+      }
+    ],
+    "unknowns": [
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "statement": "Behavior of Ripple TS reactivity primitives (track/effect/bindGroup/bindValue) at this pinned version was not validated."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "statement": "Host excluded unsupported evidence inf-no-tests: Depends on a quarantined, unlocated observation"
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "statement": "Host excluded unsupported evidence obs-no-test-files: observation cites an unknown source path: source/src"
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "statement": "No automated tests exist in the manifest, so none of the described behaviors are test-confirmed."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "statement": "Runtime behavior was not observed; all claims are static reading of source files."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "statement": "The full commit tree was inferred from the supplied source_manifest and the on-disk source/ directory; files outside it were not inspected."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "statement": "The paired Research Notes referenced by leaf.md were not supplied, so product-level evidence beyond the pinned repository is unavailable."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "statement": "Whether Dexie/IndexedDB persistence behaves correctly in real browsers at this commit is unverified."
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "statement": "Whether the third-party metadata/favicon endpoints (api.microlink.io, images.weserv.nl, Google s2 favicons) are reachable, rate-limited, or CORS-permitted at runtime is unverified."
+      }
+    ],
+    "view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b"
+  },
+  "aggregate_review": "in_progress",
+  "publication": "not_done",
+  "P0_runtime": "not_run"
+}

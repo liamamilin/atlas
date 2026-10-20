@@ -1,0 +1,21 @@
+{
+ "summary": "仅审查 architecture_contract：默认归类、SQLite 数据/软删除模型、A04/A12 的 API 与 HTML 错误分支、URL 策略及本地无认证边界总体相互一致，P0 主旅程可落地；未发现需要阻断验收的架构矛盾。输入未提供 file_plan，故未对 app/serve.py 等计划文件接口作断言。",
+ "checks": [
+  {
+   "dimension": "architecture_contract",
+   "outcome": "passed",
+   "files": [
+    "ARCHITECTURE.md",
+    "DRAFT.md"
+   ],
+   "reason": "ARCHITECTURE.md 以 categories.name NOCASE 唯一键、bookmarks.category_id 非空外键和 trashed_at 软删除支撑 D01/D02/D04；首启预置「未整理」并使保存省略/null 归类落入默认，与 F01/F02、A03/A12 一致；分类创建/重命名/删除、书签保存/移动/恢复的 invalid_name、invalid_category、duplicate_category、protected_category、not_found 及 400/409、form-error 保留输入、303 重定向、事务零写入，与 A04/A12 的 CASE_ADAPTATION_POLICY 分支一致；搜索限定 title/hostname/description、未知 category 过滤返回空，与 D07 及 policy 一致；无认证、日常 127.0.0.1、仅隔离验收使用 0.0.0.0 与 D09/limits 一致。CASE_DESIGN 的服务端化、分类、搜索、打开、软删除和 P0 无第三方增强均已体现；F11 的 edit 表述与访问统计字段和当前 P0 无编辑界面/F24 排除存在文档张力，已列为建议而非阻断。"
+  }
+ ],
+ "suggestions": [
+  "统一 ARCHITECTURE.md 第 31/34 行与第 78–81 行的分类校验：把纯空白明确写进 POST/PATCH 分类及书签保存/移动的 API 摘要，避免被理解为纯空白可自动创建新名称。",
+  "明确 GET /api/bookmarks?category=<name|id> 在归类名称与 ID 冲突时的解析优先级（建议 ID 优先），并让 HTML 归类链接使用同一约定。",
+  "把 F02 的“应用启动时补齐预置归类”收敛为仅修复缺失的默认归类，不复活用户已删除的“待购/家居改造/以后看看”，以与 ARCHITECTURE.md 的首启预置和 F03 的删除持久化一致。",
+  "在 error_contract 或 F10 的 error_branch_ids 中补充 invalid_url 与 bad_request（畸形 JSON）分支，使 A02/A10 的计划覆盖与 ARCHITECTURE.md 的错误合同一致。",
+  "对齐 CASE_DESIGN 中 F11 的“edit”和记录生命周期的 visit fields 与 ARCHITECTURE.md 第 48 行/F24 的既定 P0 范围；若坚持无记录编辑界面且不保留访问统计，请把该限制写成明确的阶段说明，避免 API PATCH 被读作浏览器 UI 能力。"
+ ]
+}

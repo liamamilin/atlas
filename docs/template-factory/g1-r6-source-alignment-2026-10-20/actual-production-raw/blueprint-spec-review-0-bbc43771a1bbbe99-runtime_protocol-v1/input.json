@@ -1,0 +1,34 @@
+{
+ "language": "zh",
+ "guidance_file": null,
+ "revision_file": "source/REVISION.md",
+ "proposal_digest": "6f806d9416cd1c5a724e980dece7330dac651c8a838d469db409d940a493f158",
+ "review_rules_version": "atlas.current-required-contract.v1",
+ "projection_digest": "2bb92f64e47cf292f2e5629820883dbdc42e00f1404c3263611ae1e146049cec",
+ "review_dimensions": [
+  "runtime_protocol"
+ ],
+ "focus": "Review the complete proposed architecture, features, phases, acceptance cases, and file plan against source/RUNTIME_CONTRACT.md. Block if any promise conflicts with the isolated tester contract: the tester runs in a separate Python or Node image; Python files run directly as python /suite/acceptance/x.py and cwd is not guaranteed to be /suite, so imports must be explicitly correct; app_root is read-only application source; data_dir is only the tester's mutable scratch at /state and is never the application's database; the only shared connection is network. Delivery profiles are exactly python-web, node-web, static-web, or cli. Web cases must exercise the supplied base_url. Start argv values are literal and placeholders such as {port} or {data_dir} are not expanded inside arguments. A restart claim requires an explicit adapter contract that starts the same frozen application from app_root as a dedicated tester-owned process with isolated per-instance scratch, performs the real actions, stops it, starts it again, and observes persisted behavior; a fresh HTTP client or tester-created database does not prove application restart or persistence. If a read-only external target cannot be restarted, require explicit separate external verification and mark that behavior unverified rather than claiming it passed. Check these facts in acceptance and README/file_plan contracts before any programs are authored.",
+ "projection_fields": [
+  "title",
+  "roles",
+  "features",
+  "decisions",
+  "phases",
+  "acceptance",
+  "architecture_markdown",
+  "limits",
+  "contract_coverage",
+  "file_plan"
+ ],
+ "file_plan_included": true,
+ "source_inventory": [
+  "ARCHITECTURE.md",
+  "DRAFT.md",
+  "RESEARCH.md",
+  "REVISION.md",
+  "RUNTIME_CONTRACT.md",
+  "SOURCE_CITATION_MATRIX.json",
+  "SOURCE_MANIFEST.json"
+ ]
+}

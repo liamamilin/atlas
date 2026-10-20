@@ -1,0 +1,23 @@
+{
+ "outcome": "passed",
+ "summary": "针对 scenario_scope 维度的审查结论：DRAFT 的 P0 完整覆盖确认场景的五步流程与四条验收，P1 只保留可选增强，未把不可或缺的保存、归类、移动、浏览与检索、打开回跳和跨会话持久化推迟到后期；范围总体收敛。P0 另含删除/撤销与归类重命名/删除等确认场景之外的支撑性能力，属低风险且为既有阶段承诺，不阻断核心旅程。",
+ "checks": [
+  {
+   "dimension": "scenario_scope",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "确认场景的五步流程与四条验收均可逐一落到 P0：F01 保存 URL、F02 默认“未整理”及预置归类、F04 归类间移动、F05 归类浏览与计数、F06 关键字检索、F07 打开原始网页、F08 多会话/重启持久化；F03 的“新建归类”覆盖验收第 3 条。P0 阶段目标明确把这些能力作为首期闭环，ARCHITECTURE 同时给出对应 HTML 入口（保存表单、移动/删除/恢复表单、类别管理表单、归类+关键字搜索表单及原始 URL 打开链接），不是仅有 API。F12-F14 的元数据、导入导出、重复检测留在 P1，F15/F16/F20-F24 明确排除，F17-F19 标为待决，未见核心步骤被推迟或把无关企业能力纳入本期。"
+  }
+ ],
+ "suggestions": [
+  "F09 的理由写“场景要求可恢复的失败”、R01 写“清理误存条目”，但确认场景未包含删除或清理步骤；建议保留既有 P0 能力不动，只把措辞标注为支撑性数据清理，避免把新增范围表述为场景验收要求。"
+ ],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "review_rules_version": "atlas.current-required-contract.v1",
+ "proposal_digest": "6f806d9416cd1c5a724e980dece7330dac651c8a838d469db409d940a493f158",
+ "projection_digest": "9667552320fb0a00c49dbe242892f74b7df34e33c3cc4dba11031bddd5acd5a7",
+ "stage": "blueprint-spec-review-0-bbc43771a1bbbe99-scenario_scope"
+}
