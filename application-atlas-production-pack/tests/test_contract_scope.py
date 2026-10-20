@@ -4,6 +4,7 @@ import unittest
 from template_factory.contract_scope import (
     REVIEW_RULES_VERSION,
     REPAIR_SCOPE_VERSION,
+    REPAIR_SCOPE_VERSION_R7,
     aggregate_semantic_diff_digest,
     validate_contract_coverage,
     validate_repair_diff,
@@ -56,6 +57,14 @@ class ContractScopeTests(unittest.TestCase):
         ):
             with self.subTest(scope=scope), self.assertRaises(FactoryError):
                 validate_repair_scope(scope, {**self.spec, "contract_coverage": self.coverage}, self.scope["edit_paths"])
+
+    def test_r7_scope_version_adds_only_runner_manifest(self):
+        r7 = {**self.scope, "version": REPAIR_SCOPE_VERSION_R7,
+              "edit_paths": ["acceptance/p0_organize.py", "acceptance/runner.json"]}
+        validate_repair_scope(r7, {**self.spec, "contract_coverage": self.coverage}, r7["edit_paths"])
+        bad = {**r7, "edit_paths": [*r7["edit_paths"], "acceptance/p1_maturity.py"]}
+        with self.assertRaises(FactoryError):
+            validate_repair_scope(bad, {**self.spec, "contract_coverage": self.coverage}, bad["edit_paths"])
 
     def test_diff_allows_scoped_reason_but_rejects_feature_phase_or_outside_program(self):
         before = {**self.spec, "contract_coverage": self.coverage}

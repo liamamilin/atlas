@@ -94,6 +94,100 @@ def _reuse_prepared_case_adaptation(prepared_revision, scenario, policy, checkpo
     return name, adaptation_input, result
 
 
+def _validate_r7_program_revision(prepared, contents, effective_plan):
+    """Require the authorized R7 four-replace/five-reuse inventory verbatim."""
+    manifest = prepared.get("prepared_program_revision")
+    entries = manifest.get("entries") if isinstance(manifest, dict) else None
+    required = {
+        "acceptance/common.py", "acceptance/p0_library.py", "acceptance/p0_organize.py",
+        "acceptance/p0_find_open.py", "acceptance/p0_recovery.py",
+        "acceptance/p1_maturity.py", "acceptance/requirements.txt",
+        "acceptance/README.md", "acceptance/runner.json",
+    }
+    replacements = {
+        "acceptance/p0_library.py", "acceptance/p0_find_open.py",
+        "acceptance/README.md", "acceptance/runner.json",
+    }
+    if not isinstance(entries, list) or len(entries) != 9:
+        raise FactoryError("R7 program revision must bind exactly nine files", "patch_conflict", 409)
+    by_path = {row.get("path"): row for row in entries if isinstance(row, dict)}
+    if len(by_path) != len(entries) or set(by_path) != required:
+        raise FactoryError("R7 program revision paths differ from the authorized nine", "patch_conflict", 409)
+    if set(contents) != required:
+        raise FactoryError("R7 program content does not cover the authorized nine", "patch_conflict", 409)
+    if {path for path, row in by_path.items() if row.get("mode") == "replace"} != replacements:
+        raise FactoryError("R7 program revision must contain exactly four authorized replacements", "patch_conflict", 409)
+    if any(row.get("mode") not in {"replace", "reuse"} for row in entries):
+        raise FactoryError("R7 program revision contains an unknown mode", "patch_conflict", 409)
+    plan_paths = [row.get("path") for row in effective_plan.get("file_plan", []) if isinstance(row, dict)]
+    if len(plan_paths) != len(effective_plan.get("file_plan", [])) or set(plan_paths) != required or len(set(plan_paths)) != 9:
+        raise FactoryError("R7 effective file plan differs from the nine-file revision", "patch_conflict", 409)
+    for path, row in by_path.items():
+        after_sha = row.get("after_sha256", row.get("sha256"))
+        before_sha = row.get("before_sha256", row.get("source_sha256"))
+        if not isinstance(after_sha, str) or hashlib.sha256(contents[path].encode("utf-8")).hexdigest() != after_sha:
+            raise FactoryError("R7 prepared program bytes differ from manifest: " + path, "patch_conflict", 409)
+        if not isinstance(before_sha, str) or len(before_sha) != 64:
+            raise FactoryError("R7 manifest is missing its source program digest: " + path, "patch_conflict", 409)
+        if (row["mode"] == "reuse") != (before_sha == after_sha):
+            raise FactoryError("R7 reuse/replace mode does not match source and candidate bytes: " + path, "patch_conflict", 409)
+    return by_path
+
+
+def _read_r7_review_authorization(store, prepared_request):
+    """Load only the fixed, digest-bound R7 authorization materials for review."""
+    from .plan_revision import (
+        R7_AUTHORIZATION_REF, R7_AUTHORIZATION_SHA256, R7_APPROVED_REVISION_REF,
+        R7_PATCH_REF,
+    )
+
+    authorization = prepared_request.get("source_authorization")
+    if (not isinstance(authorization, dict)
+            or authorization.get("source_ref") != R7_AUTHORIZATION_REF
+            or authorization.get("source_digest") != R7_AUTHORIZATION_SHA256
+            or authorization.get("revision_ref") != R7_APPROVED_REVISION_REF):
+        raise FactoryError("R7 aggregate authorization binding is incomplete", "patch_conflict", 409)
+    root = store.pack.resolve().parent
+
+    def read_bound(relative_path):
+        path = root / relative_path
+        resolved = path.resolve()
+        if not resolved.is_relative_to(root) or any(part.is_symlink() for part in (path, *path.parents)):
+            raise FactoryError("R7 review authorization path is unsafe", "patch_conflict", 409)
+        try:
+            return path.read_bytes()
+        except OSError as error:
+            raise FactoryError("R7 review authorization material is missing", "patch_conflict", 409) from error
+
+    source = read_bound(R7_AUTHORIZATION_REF)
+    record_bytes = read_bound(R7_APPROVED_REVISION_REF)
+    patch_bytes = read_bound(R7_PATCH_REF)
+    if hashlib.sha256(source).hexdigest() != R7_AUTHORIZATION_SHA256:
+        raise FactoryError("R7 authorization source bytes changed before aggregate review", "checkpoint_changed", 409)
+    try:
+        record, patch = json.loads(record_bytes), json.loads(patch_bytes)
+    except (ValueError, UnicodeDecodeError) as error:
+        raise FactoryError("R7 review authorization materials are malformed", "patch_conflict", 409) from error
+    if (digest(record) != authorization.get("revision_digest")
+            or patch != prepared_request.get("patch")
+            or record.get("patch_digest") != digest(patch)):
+        raise FactoryError("R7 aggregate patch or authorization record changed", "checkpoint_changed", 409)
+    return {
+        "source_ref": R7_AUTHORIZATION_REF,
+        "source_sha256": hashlib.sha256(source).hexdigest(),
+        "revision_ref": R7_APPROVED_REVISION_REF,
+        "revision_digest": digest(record),
+        "patch_ref": R7_PATCH_REF,
+        "patch_digest": digest(patch),
+        "program_manifest_digest": digest(prepared_request.get("prepared_program_revision")),
+        "files": {
+            "authorization/ATLAS_G1_R7_ACCEPTANCE_ALIGNMENT_CODEX_INSTRUCTIONS.txt": source,
+            "authorization/approved-revision.json": record_bytes,
+            "authorization/patch.json": patch_bytes,
+        },
+    }
+
+
 def _case_adaptation_review_digest(case_design, policy):
     """Bind design-review cache identity to prepared choices and scenario policy."""
     if policy is None:
@@ -1225,7 +1319,7 @@ def apply_review_reference_repair(result, response, source):
 def produce(pipeline, job, attempt, agent, stage, checkpoint):
     snapshot, config = job["snapshot"], job["snapshot"]["config"]
     repair = snapshot.get("cognitive_repair")
-    prepared_program_reuse_contents = None
+    prepared_program_contents = None
     if repair and isinstance(repair.get("prepared_revision"), dict):
         prepared = repair["prepared_revision"]
         if prepared.get("schema") == "atlas.failed-plan-revision.v2":
@@ -1233,13 +1327,33 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                 raise FactoryError("prepared revision changed", "patch_conflict", 409)
             from .plan_revision import program_reuse_contents
 
-            prepared_program_reuse_contents = program_reuse_contents(
+            prepared_program_contents = program_reuse_contents(
                 pipeline.store, prepared.get("prepared_program_reuse")
             )
-            if set(prepared_program_reuse_contents) != set(
+            if set(prepared_program_contents) != set(
                 row.get("path") for row in prepared["effective_plan"].get("file_plan", [])
             ):
                 raise FactoryError("prepared program reuse does not cover the complete effective file plan", "patch_conflict", 409)
+        elif prepared.get("schema") == "atlas.failed-plan-revision.v3":
+            if digest(prepared.get("effective_plan")) != prepared.get("effective_plan_digest"):
+                raise FactoryError("prepared R7 revision changed", "patch_conflict", 409)
+            manifest = prepared.get("prepared_program_revision")
+            if not isinstance(manifest, dict):
+                raise FactoryError("prepared R7 program revision manifest is missing", "patch_conflict", 409)
+            from .plan_revision import program_revision_contents
+
+            prepared_program_contents = program_revision_contents(
+                pipeline.store, manifest
+            )
+            expected_paths = {
+                row.get("path") for row in prepared["effective_plan"].get("file_plan", [])
+                if isinstance(row, dict) and isinstance(row.get("path"), str)
+            }
+            if not expected_paths or len(expected_paths) != len(prepared["effective_plan"].get("file_plan", [])):
+                raise FactoryError("prepared R7 file plan inventory is invalid", "patch_conflict", 409)
+            if set(prepared_program_contents) != expected_paths:
+                raise FactoryError("prepared R7 program revision does not cover the complete effective file plan", "patch_conflict", 409)
+            _validate_r7_program_revision(prepared, prepared_program_contents, prepared["effective_plan"])
     if snapshot.get("v1"):
         from .cases import CaseLibrary
         library = CaseLibrary(pipeline.store)
@@ -1347,13 +1461,14 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             snapshot["case_facts_view"] = facts_view
     context = attempt / "context"
     context.mkdir()
-    if prepared_program_reuse_contents is not None:
+    if prepared_program_contents is not None:
         prepared = repair["prepared_revision"]
-        _atomic_context_json(context / "PREPARED_PROGRAM_REUSE.json", {
-            "schema": "atlas.prepared-program-reuse-receipt.v1",
+        r7 = prepared.get("schema") == "atlas.failed-plan-revision.v3"
+        _atomic_context_json(context / ("PREPARED_PROGRAM_REVISION.json" if r7 else "PREPARED_PROGRAM_REUSE.json"), {
+            "schema": "atlas.prepared-program-revision-receipt.v1" if r7 else "atlas.prepared-program-reuse-receipt.v1",
             "prepared_plan_digest": prepared["effective_plan_digest"],
-            "manifest": prepared["prepared_program_reuse"],
-            "reused_paths": sorted(prepared_program_reuse_contents),
+            "manifest": prepared.get("prepared_program_revision") if r7 else prepared["prepared_program_reuse"],
+            "program_paths": sorted(prepared_program_contents),
             "all_program_bytes_bound_before_authoring": True,
         })
     policy = scenario_policy_for(
@@ -2057,14 +2172,14 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                 prior = previous / "source" if previous else None
                 if prior:
                     verify_frozen(previous, repair["digest"])
-                if prepared_program_reuse_contents is not None:
-                    content = prepared_program_reuse_contents.get(file["path"])
+                if prepared_program_contents is not None:
+                    content = prepared_program_contents.get(file["path"])
                     if content is None:
-                        raise FactoryError("prepared program reuse is missing " + file["path"], "patch_conflict", 409)
+                        raise FactoryError("prepared program revision is missing " + file["path"], "patch_conflict", 409)
                     return {
                         "path": file["path"],
                         "content": content,
-                        "reused_sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+                        "prepared_sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
                     }
                 if file.get("reuse"):
                     if not prior or not (prior / file["path"]).is_file():
@@ -2259,6 +2374,9 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             "rendered_tree_diff_digest": digest({"before": before_files, "after": after_files}),
         }
         r6_incremental_diff = None
+        r7_incremental_diff = None
+        r7_source_program_contents = None
+        r7_authorization_material = None
         baseline_program_hashes = aggregate_diff["program_file_hashes_before"]
         candidate_program_hashes = aggregate_diff["program_file_hashes_after"]
         if isinstance(prepared_for_diff, dict) and prepared_for_diff.get("schema") == "atlas.failed-plan-revision.v2":
@@ -2289,6 +2407,77 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                 "program_reuse_manifest_digest": digest(manifest),
             }
             aggregate_diff["r6_incremental_diff"] = r6_incremental_diff
+        elif isinstance(prepared_for_diff, dict) and prepared_for_diff.get("schema") == "atlas.failed-plan-revision.v3":
+            from .plan_revision import R7_PROGRAM_PATHS
+
+            manifest = prepared_for_diff["prepared_program_revision"]
+            entries = manifest["entries"]
+            entry_by_path = {entry["path"]: entry for entry in entries}
+            prepared_hashes = {
+                path: entry.get("after_sha256", entry.get("sha256"))
+                for path, entry in entry_by_path.items()
+            }
+            if prepared_hashes != candidate_program_hashes:
+                raise FactoryError("R7 candidate program bytes differ from the prepared nine-file revision", "patch_conflict", 409)
+            before_hashes = {
+                path: entry.get("before_sha256", entry.get("source_sha256"))
+                for path, entry in entry_by_path.items()
+            }
+            if any(not isinstance(value, str) or len(value) != 64 for value in before_hashes.values()):
+                raise FactoryError("R7 program manifest is missing a source-byte baseline", "patch_conflict", 409)
+            replaced = sorted(path for path, entry in entry_by_path.items() if entry.get("mode") == "replace")
+            reused = sorted(path for path, entry in entry_by_path.items() if entry.get("mode") == "reuse")
+            if len(replaced) != 4 or len(reused) != 5:
+                raise FactoryError("R7 program revision must retain four replacements and five reuse entries", "patch_conflict", 409)
+            if any(before_hashes[path] == prepared_hashes[path] for path in replaced) or any(
+                before_hashes[path] != prepared_hashes[path] for path in reused
+            ):
+                raise FactoryError("R7 incremental program hashes do not match four replacements and five exact reuses", "patch_conflict", 409)
+            source_job_id = manifest.get("source_job_id")
+            source_attempt = manifest.get("source_attempt")
+            if not isinstance(source_job_id, str) or source_attempt != 1:
+                raise FactoryError("R7 manifest is not bound to the actual R6 attempt-1 source", "patch_conflict", 409)
+            incremental_program_diffs = {}
+            r7_source_program_contents = {}
+            for path in R7_PROGRAM_PATHS:
+                source_path = pipeline.store.root / "jobs" / source_job_id / "attempt-1" / "context" / "generated-0" / path
+                try:
+                    original_raw = source_path.read_bytes()
+                    original_text = original_raw.decode("utf-8")
+                except (OSError, UnicodeDecodeError) as error:
+                    raise FactoryError("R7 incremental source or candidate is missing: " + path, "patch_conflict", 409) from error
+                if hashlib.sha256(original_raw).hexdigest() != before_hashes[path]:
+                    raise FactoryError("R7 incremental source bytes changed: " + path, "checkpoint_changed", 409)
+                r7_source_program_contents[path] = original_raw
+                if path not in replaced:
+                    continue
+                try:
+                    revised_text = (candidate / path).read_text(encoding="utf-8")
+                except (OSError, UnicodeDecodeError) as error:
+                    raise FactoryError("R7 revised source or candidate is missing: " + path, "patch_conflict", 409) from error
+                incremental_program_diffs[path] = "".join(difflib.unified_diff(
+                    original_text.splitlines(keepends=True), revised_text.splitlines(keepends=True),
+                    fromfile="R6-attempt-1/" + path, tofile="R7/" + path,
+                ))
+            r7_authorization_material = _read_r7_review_authorization(
+                pipeline.store, repair.get("prepared_revision_request", repair.get("prepared_revision", {}))
+            )
+            r7_incremental_diff = {
+                "schema": "atlas.r7-incremental-diff.v1",
+                "source_binding": prepared_for_diff.get("binding"),
+                "prepared_effective_plan_digest": prepared_for_diff["effective_plan_digest"],
+                "case_design_digest": prepared_for_diff.get("case_design_digest"),
+                "prepared_incremental_diff": prepared_for_diff.get("incremental_diff"),
+                "program_file_hashes_before": before_hashes,
+                "program_file_hashes_after": candidate_program_hashes,
+                "replaced_paths": replaced,
+                "reused_paths": reused,
+                "program_diffs": incremental_program_diffs,
+                "program_byte_change_count": len(replaced),
+                "program_revision_manifest_digest": digest(manifest),
+                "authorization_material_digest": digest({key: value for key, value in r7_authorization_material.items() if key != "files"}),
+            }
+            aggregate_diff["r7_incremental_diff"] = r7_incremental_diff
         baseline_authored = {key: before_spec.get(key) for key in (AUTHORED_FIELDS | OPTIONAL_AUTHORED_FIELDS) if key in before_spec}
         candidate_authored = {key: after_spec.get(key) for key in (AUTHORED_FIELDS | OPTIONAL_AUTHORED_FIELDS) if key in after_spec}
         cumulative_diff_digest = aggregate_semantic_diff_digest(
@@ -2303,15 +2492,22 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             case_adaptation_revision=aggregate_diff["case_adaptation_revision"],
             case_adaptation_input=aggregate_diff["case_adaptation_input"],
         )
-        aggregate_diff["diff_digest"] = digest({
+        aggregate_digest_payload = {
             "cumulative_diff_digest": cumulative_diff_digest,
             "r6_incremental_diff": r6_incremental_diff,
             "generated_metadata_digest": digest(generated_metadata),
-        })
+        }
+        # Keep the pre-R7 digest shape stable so existing v1/v2 review
+        # checkpoints continue to match after an upgrade.
+        if r7_incremental_diff is not None:
+            aggregate_digest_payload["r7_incremental_diff"] = r7_incremental_diff
+        aggregate_diff["diff_digest"] = digest(aggregate_digest_payload)
         atomic_json(candidate / "inputs/repair-scope.json", repair_scope)
         atomic_json(candidate / "inputs/aggregate-repair-diff.json", aggregate_diff)
         if r6_incremental_diff is not None:
             atomic_json(candidate / "inputs/r6-incremental-diff.json", r6_incremental_diff)
+        if r7_incremental_diff is not None:
+            atomic_json(candidate / "inputs/r7-incremental-diff.json", r7_incremental_diff)
         template_json = json.loads((candidate / "template.json").read_text(encoding="utf-8"))
         evidence_rows = [
             {"path": "inputs/repair-scope.json", "scope": "Host-authorized authored field and program paths for this aggregate revision."},
@@ -2319,6 +2515,8 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
         ]
         if r6_incremental_diff is not None:
             evidence_rows.append({"path": "inputs/r6-incremental-diff.json", "scope": "Exact source-alignment spec delta from the failed R6 proposal and proof that all nine program hashes were reused unchanged."})
+        if r7_incremental_diff is not None:
+            evidence_rows.append({"path": "inputs/r7-incremental-diff.json", "scope": "Exact R7 incremental source-to-candidate program and authored deltas, authorization digests, four replacement diffs, and five source-byte reuse proofs."})
         template_json.setdefault("evidence", []).extend(evidence_rows)
         atomic_json(candidate / "template.json", template_json)
         atomic_json(candidate / "integrity.json", {
@@ -2328,6 +2526,8 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
         _atomic_context_json(context / "AGGREGATE_REPAIR_DIFF.json", aggregate_diff)
         if r6_incremental_diff is not None:
             _atomic_context_json(context / "R6_INCREMENTAL_DIFF.json", r6_incremental_diff)
+        if r7_incremental_diff is not None:
+            _atomic_context_json(context / "R7_INCREMENTAL_DIFF.json", r7_incremental_diff)
         review_identity = {
             "scope_digest": digest(repair_scope),
             "case_policy_digest": digest(policy) if policy else None,
@@ -2337,6 +2537,10 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             "baseline_program_digest": digest(baseline_program_hashes),
             "candidate_program_digest": digest(candidate_program_hashes),
         }
+        if r7_authorization_material:
+            review_identity["r7_authorization_material_digest"] = digest(
+                {key: value for key, value in r7_authorization_material.items() if key != "files"}
+            )
         review_source = attempt / "aggregate-semantic-review-source"
         review_source.mkdir(parents=True, exist_ok=True)
         for rel in program_paths:
@@ -2356,6 +2560,30 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                 target = review_source / "candidate/generated-metadata" / rel
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_bytes(after_path.read_bytes())
+        if r7_source_program_contents is not None:
+            for rel, raw in r7_source_program_contents.items():
+                target = review_source / "r6-baseline" / rel
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(raw)
+            binding = prepared_for_diff["binding"]
+            source_plan_record = pipeline.store.checkpoint(binding["job_id"], binding["plan_checkpoint_name"])
+            source_design_record = pipeline.store.checkpoint(binding["job_id"], binding["case_design_checkpoint_name"])
+            if (not source_plan_record or source_plan_record.get("digest") != binding["plan_checkpoint_digest"]
+                    or digest(source_plan_record.get("result")) != binding["plan_checkpoint_digest"]
+                    or not source_design_record or source_design_record.get("digest") != binding["case_design_checkpoint_digest"]
+                    or digest(source_design_record.get("result")) != binding["case_design_checkpoint_digest"]):
+                raise FactoryError("R7 review source checkpoints changed", "checkpoint_changed", 409)
+            r6_spec = source_plan_record["result"]["spec"]
+            r6_authored = {key: r6_spec.get(key) for key in (AUTHORED_FIELDS | OPTIONAL_AUTHORED_FIELDS) if key in r6_spec}
+            atomic_json(review_source / "r6-baseline/AUTHORED_FIELDS.json", r6_authored)
+            atomic_json(review_source / "r6-baseline/CASE_DESIGN.json", source_design_record["result"].get("choices", []))
+            for rel, raw in r7_authorization_material["files"].items():
+                target = review_source / rel
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(raw)
+            atomic_json(review_source / "authorization/PROGRAM_REVISION_MANIFEST.json", prepared_for_diff["prepared_program_revision"])
+            atomic_json(review_source / "authorization/SOURCE_AUTHORIZATION.json", prepared_for_diff.get("source_authorization", repair["prepared_revision"].get("source_authorization")))
+            atomic_json(review_source / "candidate/inputs/r7-incremental-diff.json", r7_incremental_diff)
         atomic_json(review_source / "baseline/AUTHORED_FIELDS.json", baseline_authored)
         atomic_json(review_source / "candidate/AUTHORED_FIELDS.json", candidate_authored)
         if policy:
@@ -2370,9 +2598,17 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                 )
 
         def semantic_review():
+            aggregate_prompt = AGGREGATE_SEMANTIC_REVIEW_PROMPT
+            if r7_authorization_material is not None:
+                aggregate_prompt += (
+                    " For this R7 review, copy every key from input.identity exactly, including "
+                    "r7_authorization_material_digest. Read source/authorization/, source/r6-baseline/, "
+                    "and both exact_diff and r7-incremental-diff.json; assess the cumulative and "
+                    "R6-to-R7 incremental baselines together."
+                )
             raw = agent(
                 "aggregate-semantic-review",
-                AGGREGATE_SEMANTIC_REVIEW_PROMPT,
+                aggregate_prompt,
                 {
                     "identity": review_identity,
                     "scope": repair_scope,
@@ -2654,20 +2890,28 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
     spec_edit_paths = value.get("spec_edit_paths")
     reuse_spec = value.get("reuse_spec", False)
     prepared = None
+    prepared_request = None
     r6_prepared = False
+    r7_prepared = False
     if value.get("prepared_revision") is not None:
         from .plan_revision import PreparedRevisionService
         request = value["prepared_revision"]
+        prepared_request = request
         if not isinstance(request, dict) or not isinstance(request.get("binding"), dict):
             raise FactoryError("prepared revision requires its exact request and job binding", "patch_conflict", 409)
         prepared = PreparedRevisionService(store).prepare(request["binding"].get("job_id"), request)
         r6_prepared = prepared.get("schema") == "atlas.failed-plan-revision.v2"
+        r7_prepared = prepared.get("schema") == "atlas.failed-plan-revision.v3"
         failed = store.job(prepared["binding"]["job_id"])["snapshot"]
         failed_repair = failed.get("cognitive_repair", {})
+        expected_program_scope = (
+            prepared.get("cumulative_repair_scope", {}).get("edit_paths")
+            if r7_prepared else failed_repair.get("edit_paths")
+        )
         if (reuse_spec or spec_edit_paths is not None or not repair_scope
                 or failed_repair.get("id") != artifact["id"]
                 or failed_repair.get("digest") != artifact["digest"]
-                or failed_repair.get("edit_paths") != edit_paths
+                or expected_program_scope != edit_paths
                 or failed.get("case_basis") != spec.get("case_basis")):
             raise FactoryError("prepared revision differs from its frozen repair baseline", "patch_conflict", 409)
         if r6_prepared:
@@ -2679,6 +2923,16 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
             expected_scope = prepared.get("cumulative_repair_scope")
             if not isinstance(expected_scope, dict):
                 raise FactoryError("R6 preparation is missing its cumulative repair scope", "patch_conflict", 409)
+        elif r7_prepared:
+            if (digest(prepared.get("effective_plan")) != prepared.get("effective_plan_digest")
+                    or not isinstance(prepared.get("prepared_program_revision"), dict)
+                    or not isinstance(prepared.get("source_reference_report"), dict)
+                    or not prepared["source_reference_report"].get("valid")
+                    or not isinstance(prepared.get("case_adaptation_input"), dict)):
+                raise FactoryError("R7 prepared plan, program revision, source report, or case adaptation is incomplete", "patch_conflict", 409)
+            expected_scope = prepared.get("cumulative_repair_scope")
+            if not isinstance(expected_scope, dict):
+                raise FactoryError("R7 preparation is missing its cumulative repair scope", "patch_conflict", 409)
         else:
             expected_scope = json.loads(json.dumps(failed_repair["repair_scope"]))
             expected_scope["authored_field_paths"].append(["contract_coverage", "error_contract"])
@@ -2722,11 +2976,11 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
             if not exists or key in allowed_spec_paths:
                 raise FactoryError("spec_edit_paths must name unique existing architecture or decision text fields")
             allowed_spec_paths.add(key)
-    r6_source_config = None
-    if r6_prepared:
-        r6_source_config = store.job(prepared["binding"]["job_id"])["snapshot"]["config"]
+    prepared_source_config = None
+    if r6_prepared or r7_prepared:
+        prepared_source_config = store.job(prepared["binding"]["job_id"])["snapshot"]["config"]
     model = text(
-        value.get("model", r6_source_config["model"] if r6_source_config else artifact["provenance"].get("model")),
+        value.get("model", prepared_source_config["model"] if prepared_source_config else artifact["provenance"].get("model")),
         "provider/model", 200
     )
     import re
@@ -2737,14 +2991,14 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
         or model.startswith("-")
     ):
         raise FactoryError("model must use provider/model format")
-    language = value.get("language", r6_source_config.get("language", "zh") if r6_source_config else "zh")
+    language = value.get("language", prepared_source_config.get("language", "zh") if prepared_source_config else "zh")
     if language not in ("zh", "en"):
         raise FactoryError("language must be zh or en")
-    timeout = value.get("timeout", r6_source_config.get("timeout", 600) if r6_source_config else 900)
-    if r6_source_config and (model != r6_source_config.get("model")
-                            or language != r6_source_config.get("language")
-                            or timeout != r6_source_config.get("timeout")):
-        raise FactoryError("R6 must preserve the failed job model, language and timeout", "patch_conflict", 409)
+    timeout = value.get("timeout", prepared_source_config.get("timeout", 600) if prepared_source_config else 900)
+    if prepared_source_config and (model != prepared_source_config.get("model")
+                            or language != prepared_source_config.get("language")
+                            or timeout != prepared_source_config.get("timeout")):
+        raise FactoryError("prepared revision must preserve its failed job model, language and timeout", "patch_conflict", 409)
     config = {
         "kind": "blueprint-production",
         "name": "Cognitive revision: " + artifact["manifest"]["name"],
@@ -2798,6 +3052,7 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
         snapshot.update({key: original[key] for key in ("v1", "case_basis", "admission") if key in original})
     if prepared:
         snapshot["cognitive_repair"]["prepared_revision"] = prepared
+        snapshot["cognitive_repair"]["prepared_revision_request"] = prepared_request
     request_identity = {
         "artifact_id": artifact["id"],
         "artifact_digest": artifact["digest"],
@@ -2895,6 +3150,20 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
             if report != prepared["source_reference_report"]:
                 raise FactoryError("R6 source-reference report changed before queue", "checkpoint_changed", 409)
             program_reuse_contents(store, prepared["prepared_program_reuse"])
+        elif r7_prepared:
+            # Re-run the complete v3 binding verifier under the caller's write
+            # transaction so source state, authorization, patches and bytes
+            # cannot change between preparation and queue insertion.
+            from .plan_revision import PreparedRevisionService, program_revision_contents
+
+            fresh = PreparedRevisionService(store).prepare(
+                prepared["binding"]["job_id"], prepared_request
+            )
+            if digest(fresh) != digest(prepared):
+                raise FactoryError("R7 prepared revision changed before queue", "checkpoint_changed", 409)
+            program_revision_contents(
+                store, prepared["prepared_program_revision"]
+            )
         parent_state = parent_state_override or "running"
         if original.get("v1", {}).get("plan_id"):
             parent = con.execute("SELECT b.state FROM v1_execution e JOIN batch b ON b.id=e.batch_id WHERE e.plan_id=?", (original["v1"]["plan_id"],)).fetchone()

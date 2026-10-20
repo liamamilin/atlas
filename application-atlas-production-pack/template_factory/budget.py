@@ -53,6 +53,54 @@ G1_R6_PROTOCOL_RESERVATION_ID = "bud_9a81a7a4adc14f49b46239ec68ee2fdb"
 G1_R6_OLD_DEADLINE = G1_R5_DEADLINE
 G1_R6_WINDOW_SECONDS = 8 * 60 * 60
 G1_R6_IDEMPOTENCY_KEY = "atlas-g1-r6-source-alignment-2026-10-20-v1"
+G1_R7_AUTHORIZATION_SCHEMA = "atlas.g1-bounded-revision-authorization.v1"
+G1_R7_AUTHORIZATION_SOURCE_REF = "docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/authorization/ATLAS_G1_R7_ACCEPTANCE_ALIGNMENT_CODEX_INSTRUCTIONS.txt"
+G1_R7_AUTHORIZATION_SOURCE_DIGEST = "5fb0792b769739f070f68af6ea196473671c791cd895989026ebf9520e282562"
+G1_R7_PREDECESSOR_ID = "bamd_100a302fe8424d9493dafe62d6e43db9"
+G1_R7_FAILED_JOB = "job_f3e32b56036b4ec7bea0c00d6a2a8dc4"
+G1_R7_FAILED_ATTEMPT = 1
+G1_R7_FAILED_STAGE = "aggregate-semantic-review"
+G1_R7_OLD_DEADLINE = 1792495312.855422
+G1_R7_IDEMPOTENCY_KEY = "atlas-g1-r7-acceptance-alignment-2026-10-20-v1"
+
+
+def build_r7_authorization_request(store, prepared_request, *, summary, reason,
+                                  idempotency_key=G1_R7_IDEMPOTENCY_KEY):
+    """Build the fixed R7 authorization from current R6 failure and prepared bytes."""
+    from .plan_revision import PreparedRevisionService
+
+    prepared = PreparedRevisionService(store).prepare(G1_R7_FAILED_JOB, prepared_request)
+    job = store.job(G1_R7_FAILED_JOB)
+    source_path = store.pack.parent / G1_R7_AUTHORIZATION_SOURCE_REF
+    source_digest = hashlib.sha256(source_path.read_bytes()).hexdigest()
+    return {
+        "schema": G1_R7_AUTHORIZATION_SCHEMA,
+        "campaign_id": G1_AMENDMENT_CAMPAIGN,
+        "product_id": G1_AMENDMENT_PRODUCT,
+        "plan_id": G1_AMENDMENT_PLAN,
+        "source_ref": G1_R7_AUTHORIZATION_SOURCE_REF,
+        "source_digest": source_digest,
+        "summary": summary,
+        "reason": reason,
+        "idempotency_key": idempotency_key,
+        "predecessor_amendment_id": G1_R7_PREDECESSOR_ID,
+        "old_job_id": G1_R7_FAILED_JOB,
+        "old_job_attempt": G1_R7_FAILED_ATTEMPT,
+        "old_job_snapshot_digest": digest(job["snapshot"]),
+        "old_job_error": job["error"],
+        "old_job_stage": G1_R7_FAILED_STAGE,
+        "prepared_revision": prepared_request,
+        "prepared_revision_digest": prepared.get("request_digest"),
+        "effective_plan_digest": prepared.get("effective_plan_digest"),
+        "case_design_digest": prepared.get("case_design_digest"),
+        "program_revision_digest": digest(prepared.get("prepared_program_revision")),
+        "baseline_cli_sessions": 71,
+        "baseline_repair_count": 6,
+        "baseline_scope_retry_rows": 3,
+        "baseline_protocol_grant_uses": 1,
+        "baseline_active": 0,
+        "old_deadline": G1_R7_OLD_DEADLINE,
+    }
 
 
 def build_r6_authorization_request(store, prepared_request, *, summary, reason,
@@ -492,6 +540,10 @@ class BudgetAmendmentService:
             return self.register_r5(request)
         if isinstance(request, dict) and request.get("schema") == G1_R6_AUTHORIZATION_SCHEMA:
             return self.register_r6(request)
+        if isinstance(request, dict) and request.get("schema") == G1_R7_AUTHORIZATION_SCHEMA:
+            return self.register_r7(request)
+        if isinstance(request, dict) and "schema" in request:
+            raise FactoryError("unsupported budget amendment schema", "budget_amendment_invalid", 400)
         required = ("product_id", "plan_id", "source_ref", "source_digest", "summary", "reason", "idempotency_key")
         if not isinstance(request, dict) or any(not isinstance(request.get(k), str) or not request[k].strip() for k in required):
             raise FactoryError("all amendment source, scope and idempotency fields are required", "budget_amendment_invalid", 400)
@@ -785,12 +837,131 @@ class BudgetAmendmentService:
                         (amendment_id, encoded, request_digest))
             return dict(con.execute("SELECT * FROM tf_budget_amendment WHERE id=?", (amendment_id,)).fetchone())
 
+    def _validate_r7_request(self, request):
+        required = {
+            "schema", "campaign_id", "product_id", "plan_id", "source_ref", "source_digest",
+            "summary", "reason", "idempotency_key", "predecessor_amendment_id", "old_job_id",
+            "old_job_attempt", "old_job_snapshot_digest", "old_job_error", "old_job_stage",
+            "prepared_revision", "prepared_revision_digest", "effective_plan_digest", "case_design_digest",
+            "program_revision_digest", "baseline_cli_sessions", "baseline_repair_count",
+            "baseline_scope_retry_rows", "baseline_protocol_grant_uses", "baseline_active", "old_deadline",
+        }
+        if not isinstance(request, dict) or set(request) != required:
+            raise FactoryError("R7 authorization request has missing or unknown fields", "budget_amendment_invalid", 400)
+        fixed = {
+            "schema": G1_R7_AUTHORIZATION_SCHEMA, "campaign_id": G1_AMENDMENT_CAMPAIGN,
+            "product_id": G1_AMENDMENT_PRODUCT, "plan_id": G1_AMENDMENT_PLAN,
+            "source_ref": G1_R7_AUTHORIZATION_SOURCE_REF, "source_digest": G1_R7_AUTHORIZATION_SOURCE_DIGEST,
+            "idempotency_key": G1_R7_IDEMPOTENCY_KEY, "predecessor_amendment_id": G1_R7_PREDECESSOR_ID,
+            "old_job_id": G1_R7_FAILED_JOB, "old_job_attempt": G1_R7_FAILED_ATTEMPT,
+            "old_job_stage": G1_R7_FAILED_STAGE, "baseline_cli_sessions": 71,
+            "baseline_repair_count": 6, "baseline_scope_retry_rows": 3,
+            "baseline_protocol_grant_uses": 1, "baseline_active": 0, "old_deadline": G1_R7_OLD_DEADLINE,
+        }
+        if any(request.get(key) != value for key, value in fixed.items()):
+            raise FactoryError("R7 authorization is outside its fixed campaign, job or budget binding", "budget_amendment_scope", 403)
+        if any(not isinstance(request.get(k), str) or not request[k].strip() for k in (
+                "summary", "reason", "old_job_snapshot_digest", "old_job_error",
+                "prepared_revision_digest", "effective_plan_digest", "case_design_digest", "program_revision_digest")):
+            raise FactoryError("R7 authorization digests and reason are required", "budget_amendment_invalid", 400)
+        if not isinstance(request.get("prepared_revision"), dict) or request["prepared_revision"].get("schema") != "atlas.failed-plan-revision.v3":
+            raise FactoryError("R7 authorization requires the v3 prepared revision", "budget_amendment_invalid", 400)
+        if len(request["summary"]) > 2000 or len(request["reason"]) > 1000:
+            raise FactoryError("R7 authorization text exceeds limits", "budget_amendment_invalid", 400)
+        source_path = self.store.pack.parent / G1_R7_AUTHORIZATION_SOURCE_REF
+        try:
+            actual_source_digest = hashlib.sha256(source_path.read_bytes()).hexdigest()
+        except OSError as exc:
+            raise FactoryError("R7 authorization source is unavailable", "budget_amendment_source", 409) from exc
+        if actual_source_digest != G1_R7_AUTHORIZATION_SOURCE_DIGEST:
+            raise FactoryError("R7 authorization source bytes changed", "budget_amendment_source", 409)
+        if digest(request["prepared_revision"]) != request["prepared_revision_digest"]:
+            raise FactoryError("R7 prepared revision request digest changed", "budget_amendment_basis", 409)
+        from .plan_revision import PreparedRevisionService
+        try:
+            prepared = PreparedRevisionService(self.store).prepare(G1_R7_FAILED_JOB, request["prepared_revision"])
+        except FactoryError as exc:
+            raise FactoryError("fixed R7 prepared revision no longer validates", "budget_amendment_basis", 409) from exc
+        if (prepared.get("request_digest") != request["prepared_revision_digest"]
+                or prepared.get("effective_plan_digest") != request["effective_plan_digest"]
+                or prepared.get("case_design_digest") != request["case_design_digest"]
+                or digest(prepared.get("prepared_program_revision")) != request["program_revision_digest"]):
+            raise FactoryError("R7 prepared plan, case design or program manifest differs from authorization", "budget_amendment_basis", 409)
+        return digest(request)
+
+    def register_r7(self, request):
+        if self.campaign_id != G1_AMENDMENT_CAMPAIGN:
+            raise FactoryError("R7 authorization is limited to its fixed campaign", "budget_amendment_scope", 403)
+        request_digest = digest(request)
+        encoded = json.dumps(request, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        with self.store.connect(True) as con:
+            prior = con.execute(
+                "SELECT a.*,b.request_json,b.request_digest FROM tf_budget_amendment a "
+                "LEFT JOIN tf_budget_amendment_binding b ON b.amendment_id=a.id "
+                "WHERE a.campaign_id=? AND a.product_id=? AND a.idempotency_key=?",
+                (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT, request.get("idempotency_key")),
+            ).fetchone()
+            if prior:
+                if prior["request_digest"] != request_digest or prior["request_json"] != encoded:
+                    raise FactoryError("R7 idempotency key is already bound to another request", "idempotency_conflict", 409)
+                return {key: prior[key] for key in prior.keys() if key not in {"request_json", "request_digest"}}
+            self._validate_r7_request(request)
+            prior_v4 = con.execute("SELECT id FROM tf_budget_amendment WHERE campaign_id=? AND product_id=? AND version=4",
+                                   (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchone()
+            if prior_v4:
+                raise FactoryError("the single R7 bounded-revision amendment is already registered", "budget_amendment_exhausted", 409)
+            predecessor = con.execute("SELECT * FROM tf_budget_amendment WHERE id=? AND campaign_id=? AND product_id=?",
+                                      (G1_R7_PREDECESSOR_ID, G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchone()
+            base = con.execute("SELECT started,deadline FROM tf_budget_phase WHERE campaign_id=? AND identity='__campaign_segment__' AND phase='G1'",
+                               (G1_AMENDMENT_CAMPAIGN,)).fetchone()
+            calls = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status!='not_started'",
+                                (G1_AMENDMENT_CAMPAIGN,)).fetchone()[0]
+            repairs = con.execute("SELECT COUNT(*) FROM tf_budget_repair WHERE campaign_id=? AND product_id=?",
+                                  (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchone()[0]
+            active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','started','uncertain')",
+                                 (G1_AMENDMENT_CAMPAIGN,)).fetchone()[0]
+            retry_rows = con.execute("SELECT retry_scope,stage FROM tf_budget_reservation WHERE campaign_id=? AND identity=? AND retry IS NOT NULL AND status!='not_started'",
+                                     (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchall()
+            retry_count = sum(1 for item in retry_rows if (item["retry_scope"] == "blueprint-spec-review:phase_acceptance"
+                                if item["retry_scope"] is not None else
+                                _legacy_retry_scope(item["stage"]) == "blueprint-spec-review:phase_acceptance"))
+            grant = con.execute("SELECT status,consumed_reservation_id FROM tf_protocol_retry_grant WHERE id=? AND campaign_id=?",
+                                (G1_R6_PROTOCOL_GRANT_ID, G1_AMENDMENT_CAMPAIGN)).fetchone()
+            grant_use = con.execute("SELECT status FROM tf_protocol_retry_grant_use WHERE grant_id=? AND reservation_id=?",
+                                    (G1_R6_PROTOCOL_GRANT_ID, G1_R6_PROTOCOL_RESERVATION_ID)).fetchone()
+            job = con.execute("SELECT state,attempt,stage,error,snapshot FROM job WHERE id=?", (G1_R7_FAILED_JOB,)).fetchone()
+            execution = con.execute("SELECT batch_id FROM v1_execution WHERE plan_id=?", (G1_AMENDMENT_PLAN,)).fetchone()
+            parent = con.execute("SELECT state FROM batch WHERE id=?", (execution[0],)).fetchone() if execution else None
+            if (not predecessor or predecessor["version"] != 3 or predecessor["activated_at"] is None
+                    or predecessor["new_repair_limit"] != 6 or predecessor["new_deadline"] != G1_R7_OLD_DEADLINE
+                    or not base or base["deadline"] != G1_R5_BASE_DEADLINE
+                    or calls != 71 or repairs != 6 or active != 0 or retry_count != 3
+                    or not grant or grant["status"] != "consumed"
+                    or grant["consumed_reservation_id"] != G1_R6_PROTOCOL_RESERVATION_ID
+                    or not grant_use or grant_use["status"] != "consumed"
+                    or not job or job["state"] != "failed" or job["attempt"] != 1
+                    or job["stage"] != G1_R7_FAILED_STAGE or job["error"] != request["old_job_error"]
+                    or digest(json.loads(job["snapshot"])) != request["old_job_snapshot_digest"]
+                    or not parent or parent["state"] != "paused"):
+                raise FactoryError("current R6 job or 71/6/0 budget baseline differs from R7 authorization", "budget_amendment_basis", 409)
+            amendment_id = "bamd_" + uuid.uuid4().hex
+            at = float(self.clock())
+            con.execute("INSERT INTO tf_budget_amendment VALUES(?,?,?,?,?,?,?,?,?,4,6,7,?,?,?,?,?,NULL,NULL)",
+                        (amendment_id, G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT, G1_AMENDMENT_PLAN,
+                         G1_R7_AUTHORIZATION_SOURCE_REF, G1_R7_AUTHORIZATION_SOURCE_DIGEST,
+                         request["summary"], request["reason"], request["idempotency_key"],
+                         repairs, calls, G1_R7_OLD_DEADLINE, 0, at))
+            con.execute("INSERT INTO tf_budget_amendment_binding VALUES(?,?,?)", (amendment_id, encoded, request_digest))
+            return dict(con.execute("SELECT * FROM tf_budget_amendment WHERE id=?", (amendment_id,)).fetchone())
+
     def activate_locked(self, con, amendment_id):
         row = con.execute("SELECT * FROM tf_budget_amendment WHERE id=? AND campaign_id=?", (amendment_id, self.campaign_id)).fetchone()
         if not row:
             raise FactoryError("budget amendment not found", "not_found", 404)
-        if row["version"] not in {1, 2, 3}:
+        if row["version"] not in {1, 2, 3, 4}:
             raise FactoryError("unknown budget amendment version", "budget_amendment_version", 409)
+        if row["version"] == 4:
+            raise FactoryError("R7 amendment can activate only with its atomic successor queue", "budget_amendment_activation_denied", 409)
         if row["version"] == 3:
             raise FactoryError("R6 amendment can activate only with its atomic source-alignment successor queue", "budget_amendment_activation_denied", 409)
         if row["activated_at"] is not None:
@@ -862,6 +1033,61 @@ class BudgetAmendmentService:
         deadline = at + G1_R6_WINDOW_SECONDS
         con.execute("UPDATE tf_budget_amendment SET activated_at=?,new_deadline=? WHERE id=? AND version=3 AND activated_at IS NULL",
                     (at, deadline, amendment_id))
+        return dict(con.execute("SELECT * FROM tf_budget_amendment WHERE id=?", (amendment_id,)).fetchone())
+
+    def activate_r7_locked(self, con, amendment_id):
+        """Activate v4 only inside the transaction that queues its one successor."""
+        if not getattr(con, "in_transaction", False):
+            raise FactoryError("R7 activation requires the atomic successor transaction", "budget_amendment_activation_denied", 409)
+        row = con.execute("SELECT * FROM tf_budget_amendment WHERE id=? AND campaign_id=?",
+                          (amendment_id, self.campaign_id)).fetchone()
+        if not row:
+            raise FactoryError("R7 amendment not found", "not_found", 404)
+        if row["version"] != 4 or self.campaign_id != G1_AMENDMENT_CAMPAIGN:
+            raise FactoryError("bounded-revision activation requires the exact version 4 amendment", "budget_amendment_version", 409)
+        if row["activated_at"] is not None or row["new_deadline"] is not None:
+            raise FactoryError("R7 amendment was activated without its queue receipt", "budget_amendment_activation_conflict", 409)
+        predecessor = con.execute("SELECT version,activated_at,new_repair_limit,new_deadline FROM tf_budget_amendment WHERE id=? AND campaign_id=? AND product_id=?",
+                                  (G1_R7_PREDECESSOR_ID, G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchone()
+        calls = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status!='not_started'",
+                            (G1_AMENDMENT_CAMPAIGN,)).fetchone()[0]
+        repairs = con.execute("SELECT COUNT(*) FROM tf_budget_repair WHERE campaign_id=? AND product_id=?",
+                              (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchone()[0]
+        active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','started','uncertain')",
+                             (G1_AMENDMENT_CAMPAIGN,)).fetchone()[0]
+        retry_rows = con.execute("SELECT retry_scope,stage FROM tf_budget_reservation WHERE campaign_id=? AND identity=? AND retry IS NOT NULL AND status!='not_started'",
+                                 (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchall()
+        retries = sum(1 for item in retry_rows if (item["retry_scope"] == "blueprint-spec-review:phase_acceptance"
+                        if item["retry_scope"] is not None else
+                        _legacy_retry_scope(item["stage"]) == "blueprint-spec-review:phase_acceptance"))
+        grant = con.execute("SELECT status,consumed_reservation_id FROM tf_protocol_retry_grant WHERE id=? AND campaign_id=?",
+                            (G1_R6_PROTOCOL_GRANT_ID, G1_AMENDMENT_CAMPAIGN)).fetchone()
+        grant_use = con.execute("SELECT status FROM tf_protocol_retry_grant_use WHERE grant_id=? AND reservation_id=?",
+                                (G1_R6_PROTOCOL_GRANT_ID, G1_R6_PROTOCOL_RESERVATION_ID)).fetchone()
+        if (not predecessor or predecessor["version"] != 3 or predecessor["activated_at"] is None
+                or predecessor["new_repair_limit"] != 6 or predecessor["new_deadline"] != G1_R7_OLD_DEADLINE
+                or row["old_repair_limit"] != 6 or row["new_repair_limit"] != 7
+                or row["baseline_repair_count"] != 6 or row["baseline_cli_sessions"] != 71
+                or row["old_deadline"] != G1_R7_OLD_DEADLINE or row["window_seconds"] != 0
+                or calls != 71 or repairs != 6 or active != 0 or retries != 3
+                or not grant or grant["status"] != "consumed"
+                or grant["consumed_reservation_id"] != G1_R6_PROTOCOL_RESERVATION_ID
+                or not grant_use or grant_use["status"] != "consumed"):
+            raise FactoryError("R7 activation baseline or inherited deadline changed", "budget_amendment_basis", 409)
+        binding = con.execute("SELECT request_json,request_digest FROM tf_budget_amendment_binding WHERE amendment_id=?",
+                              (amendment_id,)).fetchone()
+        if not binding:
+            raise FactoryError("R7 authorization binding is missing", "budget_amendment_basis", 409)
+        request = json.loads(binding["request_json"])
+        if digest(request) != binding["request_digest"] or request.get("schema") != G1_R7_AUTHORIZATION_SCHEMA:
+            raise FactoryError("R7 authorization binding is corrupt", "budget_amendment_basis", 409)
+        if self._validate_r7_request(request) != binding["request_digest"]:
+            raise FactoryError("R7 authorization no longer validates against its source and prepared material", "budget_amendment_basis", 409)
+        at = float(self.clock())
+        if at >= G1_R7_OLD_DEADLINE:
+            raise FactoryError("inherited R6 deadline has expired", "budget_deadline", 409)
+        con.execute("UPDATE tf_budget_amendment SET activated_at=?,new_deadline=? WHERE id=? AND version=4 AND activated_at IS NULL",
+                    (at, G1_R7_OLD_DEADLINE, amendment_id))
         return dict(con.execute("SELECT * FROM tf_budget_amendment WHERE id=?", (amendment_id,)).fetchone())
 
     def activate(self, amendment_id):

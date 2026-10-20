@@ -1,0 +1,43 @@
+[a01-health-status] PASS GET http://127.0.0.1:55970/api/health -> HTTP 200（期望 200）
+[a01-health-json] PASS /api/health 返回 JSON 对象
+[a01-home-status] PASS GET http://127.0.0.1:55970/ -> HTTP 200（期望 200）
+[a01-save-form] PASS 首页含 action=/bookmarks/new 且 method=post 的保存表单
+[a01-save-status] PASS POST http://127.0.0.1:55970/bookmarks/new -> HTTP 303（期望 303）
+[a01-save-location] PASS 303 响应必须带 Location，实际 '/?category=%E6%9C%AA%E6%95%B4%E7%90%86'
+[a01-save-follow-status] PASS GET http://127.0.0.1:55970/?category=%E6%9C%AA%E6%95%B4%E7%90%86 -> HTTP 200（期望 200）
+[a01-row-present] PASS 保存后 HTML 列表出现原始 URL='https://a01-live-09ba0695c7bf.atlas-acceptance.example/a01-live-09ba0695c7bf' 的记录行
+[a01-row-id] PASS 记录行 data-record-id='e6338b4b2a884a15a4569cc22a0a060b'
+[a01-row-title] PASS 记录行文本包含标题 'A01 保存标题 d5008d5e'
+[a01-row-description] PASS 记录行文本包含描述 'A01 保存描述 0eb3cd38'
+[a01-row-href] PASS 行内打开链接 href='https://a01-live-09ba0695c7bf.atlas-acceptance.example/a01-live-09ba0695c7bf'（期望 'https://a01-live-09ba0695c7bf.atlas-acceptance.example/a01-live-09ba0695c7bf'）
+[a01-record-status] PASS GET http://127.0.0.1:55970/api/bookmarks/e6338b4b2a884a15a4569cc22a0a060b -> HTTP 200（期望 200）
+[a01-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a01-json-id] PASS JSON id='e6338b4b2a884a15a4569cc22a0a060b'（期望 'e6338b4b2a884a15a4569cc22a0a060b'）
+[a01-json-url] PASS JSON url='https://a01-live-09ba0695c7bf.atlas-acceptance.example/a01-live-09ba0695c7bf'（期望 'https://a01-live-09ba0695c7bf.atlas-acceptance.example/a01-live-09ba0695c7bf'）
+[a01-json-title] PASS JSON title='A01 保存标题 d5008d5e'（期望 'A01 保存标题 d5008d5e'）
+[a01-json-description] PASS JSON description='A01 保存描述 0eb3cd38'（期望 'A01 保存描述 0eb3cd38'）
+[a01-instance-home-status] PASS GET http://127.0.0.1:55978/ -> HTTP 200（期望 200）
+[a01-instance-save-form] PASS 首页含 action=/bookmarks/new 且 method=post 的保存表单
+[a01-instance-status] PASS POST http://127.0.0.1:55978/bookmarks/new -> HTTP 303（期望 303）
+[a01-instance-location] PASS 303 响应必须带 Location，实际 '/?category=%E6%9C%AA%E6%95%B4%E7%90%86'
+[a01-instance-follow-status] PASS GET http://127.0.0.1:55978/?category=%E6%9C%AA%E6%95%B4%E7%90%86 -> HTTP 200（期望 200）
+[a01-instance-row] PASS 隔离实例保存后 HTML 列表出现 URL='https://a01-restart-6e5aaef98ccf.atlas-acceptance.example/a01-restart-6e5aaef98ccf' 的记录行
+[a01-instance-row-id] PASS 隔离实例记录 data-record-id='8564203c8b7041e9bcab54cf1c416530'
+[a01-instance-row-title] PASS 隔离实例记录行包含标题 'A01 重启标题 7bebb49f'
+[a01-instance-row-description] PASS 隔离实例记录行包含描述 'A01 重启描述 4397170b'
+[a01-instance-row-href] PASS 隔离实例行内 href='https://a01-restart-6e5aaef98ccf.atlas-acceptance.example/a01-restart-6e5aaef98ccf'（期望 'https://a01-restart-6e5aaef98ccf.atlas-acceptance.example/a01-restart-6e5aaef98ccf'）
+[a01-instance-record-status] PASS GET http://127.0.0.1:55978/api/bookmarks/8564203c8b7041e9bcab54cf1c416530 -> HTTP 200（期望 200）
+[a01-instance-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a01-instance-json-url] PASS 隔离实例 JSON url='https://a01-restart-6e5aaef98ccf.atlas-acceptance.example/a01-restart-6e5aaef98ccf'（期望 'https://a01-restart-6e5aaef98ccf.atlas-acceptance.example/a01-restart-6e5aaef98ccf'）
+[a01-restart-home-status] PASS GET http://127.0.0.1:55985/ -> HTTP 200（期望 200）
+[a01-restart-row] PASS 重启后 HTML 列表包含 id='8564203c8b7041e9bcab54cf1c416530' 的记录行
+[a01-restart-href] PASS 重启后行内 href='https://a01-restart-6e5aaef98ccf.atlas-acceptance.example/a01-restart-6e5aaef98ccf'（期望 'https://a01-restart-6e5aaef98ccf.atlas-acceptance.example/a01-restart-6e5aaef98ccf'）
+[a01-restart-title] PASS 重启后记录行包含标题 'A01 重启标题 7bebb49f'
+[a01-restart-description] PASS 重启后记录行包含描述 'A01 重启描述 4397170b'
+[a01-restart-record-status] PASS GET http://127.0.0.1:55985/api/bookmarks/8564203c8b7041e9bcab54cf1c416530 -> HTTP 200（期望 200）
+[a01-restart-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a01-restart-id] PASS 重启后 JSON id='8564203c8b7041e9bcab54cf1c416530'（期望 '8564203c8b7041e9bcab54cf1c416530'）
+[a01-restart-url] PASS 重启后 JSON url='https://a01-restart-6e5aaef98ccf.atlas-acceptance.example/a01-restart-6e5aaef98ccf'（期望 'https://a01-restart-6e5aaef98ccf.atlas-acceptance.example/a01-restart-6e5aaef98ccf'）
+[a01-restart-title-json] PASS 重启后 JSON title='A01 重启标题 7bebb49f'（期望 'A01 重启标题 7bebb49f'）
+[a01-restart-description-json] PASS 重启后 JSON description='A01 重启描述 4397170b'（期望 'A01 重启描述 4397170b'）
+[atlas] A01: passed; 断言 42 条

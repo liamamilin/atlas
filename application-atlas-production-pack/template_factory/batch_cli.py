@@ -76,7 +76,7 @@ def main(argv=None):
             from .product_recovery import ProductRecoveryService
             request = json.loads(args.request.read_text())
             result = ProductRecoveryService(store).resume_product(args.plan_id, request)
-            if request.get("schema") != "atlas.product-resume.v2":
+            if request.get("schema") not in {"atlas.product-resume.v2", "atlas.product-resume.v3"}:
                 ensure_worker(store)
         elif args.command in {"status", "report"}:
             result = service.report(args.plan_id)

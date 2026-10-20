@@ -6,6 +6,7 @@ from .store import FactoryError, digest
 
 REVIEW_RULES_VERSION = "atlas.current-required-contract.v1"
 REPAIR_SCOPE_VERSION = "atlas.aggregate-repair-scope.v1"
+REPAIR_SCOPE_VERSION_R7 = "atlas.aggregate-repair-scope.v2"
 COVERAGE_SCHEMA = "atlas.contract-coverage.v1"
 
 
@@ -60,7 +61,8 @@ def validate_contract_coverage(spec, *, required=False):
 
 
 def validate_repair_scope(scope, spec, edit_paths):
-    if not isinstance(scope, dict) or scope.get("version") != REPAIR_SCOPE_VERSION:
+    scope_version = scope.get("version") if isinstance(scope, dict) else None
+    if not isinstance(scope, dict) or scope_version not in {REPAIR_SCOPE_VERSION, REPAIR_SCOPE_VERSION_R7}:
         _fail("versioned aggregate repair scope is required")
     paths = scope.get("edit_paths")
     fields = scope.get("authored_field_paths")
@@ -99,6 +101,11 @@ def validate_repair_scope(scope, spec, edit_paths):
         "acceptance/p0_find_open.py", "acceptance/p0_recovery.py",
         "acceptance/README.md",
     }
+    if scope_version == REPAIR_SCOPE_VERSION_R7:
+        # R7's explicit runner argument binding is the sole newly authorized
+        # program path. PreparedRevisionService must still match this complete
+        # scope to its fixed request before queueing.
+        allowed_programs.add("acceptance/runner.json")
     if set(paths) - allowed_programs:
         _fail("repair scope includes an unauthorized program path")
     for path in fields:

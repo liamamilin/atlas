@@ -1,0 +1,305 @@
+...................................................................................EEEEEEEEEEEEEEEE.
+======================================================================
+ERROR: test_a01_a03_a08_preserved_and_behave (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms) (case='A01')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 154, in test_a01_a03_a08_preserved_and_behave
+    self.assert_outcome(case)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a01_a03_a08_preserved_and_behave (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms) (case='A03')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 154, in test_a01_a03_a08_preserved_and_behave
+    self.assert_outcome(case)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a01_a03_a08_preserved_and_behave (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms) (case='A08')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 154, in test_a01_a03_a08_preserved_and_behave
+    self.assert_outcome(case)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a02_json_reject_single_label_mutant (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 78, in test_a02_json_reject_single_label_mutant
+    self.assert_outcome('A02', 'reject-json-single-label', passed=False)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a02_positive_and_existing_negatives (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 71, in test_a02_positive_and_existing_negatives
+    value = self.assert_outcome('A02')
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a07_correct_three_fields (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 81, in test_a07_correct_three_fields
+    self.assert_outcome('A07')
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a07_reject_always_empty (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 99, in test_a07_reject_always_empty
+    self.assert_outcome('A07', 'always-empty', passed=False)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a07_reject_category_search_mutant (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 94, in test_a07_reject_category_search_mutant
+    value = self.assert_outcome('A07', 'category-name', passed=False)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a07_reject_url_path_search_mutant (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 84, in test_a07_reject_url_path_search_mutant
+    value = self.assert_outcome('A07', 'url-path', passed=False)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a07_reject_url_query_search_mutant (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 89, in test_a07_reject_url_query_search_mutant
+    value = self.assert_outcome('A07', 'url-query', passed=False)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a11_cleanup_failure_cannot_pass (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 134, in test_a11_cleanup_failure_cannot_pass
+    proc = self.common.launch_app(str(APP), self.temp.name + '/cleanup-base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a11_fresh_empty_and_presets (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 102, in test_a11_fresh_empty_and_presets
+    value = self.assert_outcome('A11')
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a11_missing_empty_ui_fails (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 115, in test_a11_missing_empty_ui_fails
+    self.assert_outcome('A11', 'missing-empty-ui', passed=False)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a11_missing_flags_emits_own_failure (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 118, in test_a11_missing_flags_emits_own_failure
+    self.assert_outcome('A11', passed=False, missing_flags=True)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a11_missing_preset_fails (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 112, in test_a11_missing_preset_fails
+    self.assert_outcome('A11', 'missing-preset', passed=False)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a11_missing_script_fails (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 121, in test_a11_missing_script_fails
+    self.assert_outcome('A11', passed=False, app_root=Path(self.temp.name))
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a11_nonexistent_app_root_emits_own_failure (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 124, in test_a11_nonexistent_app_root_emits_own_failure
+    self.assert_outcome('A11', passed=False, app_root=Path(self.temp.name) / 'nonexistent')
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a11_seeded_record_fails (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 109, in test_a11_seeded_record_fails
+    self.assert_outcome('A11', 'seeded-record', passed=False)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_a11_start_failure_emits_own_failure (tests.test_factory_r7_acceptance_programs.R7AcceptancePrograms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 130, in test_a11_start_failure_emits_own_failure
+    self.assert_outcome('A11', passed=False, app_root=bad.parent)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 65, in assert_outcome
+    result, value = self.run_case(case, mutant, **kwargs)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_r7_acceptance_programs.py", line 39, in run_case
+    proc = self.common.launch_app(str(APP), self.temp.name + '/base', 0, fresh=True)
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 646, in launch_app
+    numeric_port = free_port()
+  File "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance/common.py", line 632, in free_port
+    sock.bind(('127.0.0.1', 0))
+PermissionError: [Errno 1] Operation not permitted
+
+----------------------------------------------------------------------
+Ran 101 tests in 13.328s
+
+FAILED (errors=19)

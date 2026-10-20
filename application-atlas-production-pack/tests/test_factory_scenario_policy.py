@@ -24,7 +24,7 @@ from template_factory.scenario_policy import (
     policy_prompt,
     write_architecture_review_material,
 )
-from template_factory.error_contracts import required_branches
+from template_factory.error_contracts import ERROR_SCHEMA, ERROR_SCHEMA_R7, required_branches
 from template_factory.store import digest
 from template_factory.store import FactoryError
 
@@ -103,6 +103,24 @@ class ScenarioPolicyTests(unittest.TestCase):
         self.assertEqual(actual_a12, expected_a12)
         self.assertEqual(policy["category_contract"]["bookmark_save"]["invalid_values"], ["empty", "whitespace_only", "121_characters"])
         self.assertEqual(policy["category_contract"]["bookmark_move"]["invalid_json_values"], ["omitted", "JSON null", "empty", "whitespace_only", "121_characters"])
+
+    def test_r7_a12_save_mapping_is_versioned_and_move_mapping_is_unchanged(self):
+        old = required_branches(ERROR_SCHEMA)
+        new = required_branches(ERROR_SCHEMA_R7)
+        old_a12 = [row for row in old if row["acceptance_ids"] == ["A12"]]
+        new_a12 = [row for row in new if row["acceptance_ids"] == ["A12"]]
+        self.assertEqual(len(old_a12), 14)
+        self.assertEqual(len(new_a12), 14)
+        for row in old_a12:
+            self.assertEqual(row["feature_ids"], ["F04", "F10"])
+        self.assertEqual({row["feature_ids"][0] for row in new_a12 if row["operation"] == "bookmark_save"}, {"F01"})
+        self.assertEqual({tuple(row["feature_ids"]) for row in new_a12 if row["operation"] == "bookmark_move"}, {("F04", "F10")})
+        self.assertEqual(
+            {(row["id"], row["code"], row["status"], row["field"], row["value_kind"], row["response"], row["write_effect"], tuple(row["acceptance_ids"]), row["implementation"])
+             for row in old},
+            {(row["id"], row["code"], row["status"], row["field"], row["value_kind"], row["response"], row["write_effect"], tuple(row["acceptance_ids"]), row["implementation"])
+             for row in new},
+        )
 
     def test_prepared_adaptation_reuses_choices_and_bound_policy_without_agent_call(self):
         choices = [{

@@ -1,0 +1,40 @@
+[a03-categories-status] PASS GET http://127.0.0.1:55992/api/categories -> HTTP 200（期望 200）
+[a03-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-api-preset-1] PASS /api/categories 包含预置归类 '未整理'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-api-preset-2] PASS /api/categories 包含预置归类 '待购'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-api-preset-3] PASS /api/categories 包含预置归类 '家居改造'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-api-preset-4] PASS /api/categories 包含预置归类 '以后看看'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-home-status] PASS GET http://127.0.0.1:55992/ -> HTTP 200（期望 200）
+[a03-save-form] PASS 首页含 action=/bookmarks/new 且 method=post 的保存表单
+[a03-html-preset-1] PASS 首页 HTML 归类链接/选项包含 '未整理'；实际 ['以后看看', '全部', '家居改造', '待购', '未整理']
+[a03-html-preset-2] PASS 首页 HTML 归类链接/选项包含 '待购'；实际 ['以后看看', '全部', '家居改造', '待购', '未整理']
+[a03-html-preset-3] PASS 首页 HTML 归类链接/选项包含 '家居改造'；实际 ['以后看看', '全部', '家居改造', '待购', '未整理']
+[a03-html-preset-4] PASS 首页 HTML 归类链接/选项包含 '以后看看'；实际 ['以后看看', '全部', '家居改造', '待购', '未整理']
+[a03-category-omitted] PASS 真实保存表单省略 category 字段后提交
+[a03-default-status] PASS POST http://127.0.0.1:55992/bookmarks/new -> HTTP 303（期望 303）
+[a03-default-location] PASS 303 响应必须带 Location，实际 '/?category=%E6%9C%AA%E6%95%B4%E7%90%86'
+[a03-default-follow-status] PASS GET http://127.0.0.1:55992/?category=%E6%9C%AA%E6%95%B4%E7%90%86 -> HTTP 200（期望 200）
+[a03-default-row] PASS 省略归类保存后 HTML 列表出现 URL='https://a03-default-3f4ac16bc0f8.atlas-acceptance.example/a03-default-3f4ac16bc0f8' 的记录行
+[a03-default-id] PASS 默认归类记录 id='8e8f53cf3a594c28bfff4ed96ffe7b45'
+[a03-default-record-status] PASS GET http://127.0.0.1:55992/api/bookmarks/8e8f53cf3a594c28bfff4ed96ffe7b45 -> HTTP 200（期望 200）
+[a03-default-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a03-default-category] PASS 省略 category 后 JSON 归类='未整理'（期望 '未整理'）
+[a03-inbox-status] PASS GET http://127.0.0.1:55992/?category=%E6%9C%AA%E6%95%B4%E7%90%86 -> HTTP 200（期望 200）
+[a03-inbox-row] PASS 「未整理」过滤列表包含 id='8e8f53cf3a594c28bfff4ed96ffe7b45'
+[a03-newcat-status] PASS POST http://127.0.0.1:55992/bookmarks/new -> HTTP 303（期望 303）
+[a03-newcat-location] PASS 303 响应必须带 Location，实际 '/?category=%E8%87%AA%E5%8A%A8%E5%BD%92%E7%B1%BB-13f42191'
+[a03-newcat-follow-status] PASS GET http://127.0.0.1:55992/?category=%E8%87%AA%E5%8A%A8%E5%BD%92%E7%B1%BB-13f42191 -> HTTP 200（期望 200）
+[a03-newcat-row] PASS 新归类保存后 HTML 列表出现 URL='https://a03-newcat-30f74eda92e0.atlas-acceptance.example/a03-newcat-30f74eda92e0' 的记录行
+[a03-newcat-id] PASS 新归类记录 id='e90ffa09463a495ab8e4aac4c62d16d2'
+[a03-refreshed-categories-status] PASS GET http://127.0.0.1:55992/api/categories -> HTTP 200（期望 200）
+[a03-refreshed-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-newcat-created] PASS 保存新归类名 '自动归类-13f42191' 后 /api/categories 自动创建；实际 ['以后看看', '家居改造', '待购', '未整理', '自动归类-13f42191']
+[a03-newcat-record-status] PASS GET http://127.0.0.1:55992/api/bookmarks/e90ffa09463a495ab8e4aac4c62d16d2 -> HTTP 200（期望 200）
+[a03-newcat-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a03-newcat-json-category] PASS 新归类记录 JSON 归类='自动归类-13f42191'（期望 '自动归类-13f42191'）
+[a03-newcat-filter-status] PASS GET http://127.0.0.1:55992/?category=%E8%87%AA%E5%8A%A8%E5%BD%92%E7%B1%BB-13f42191 -> HTTP 200（期望 200）
+[a03-newcat-filter] PASS HTML 归类过滤 '自动归类-13f42191' 包含 id='e90ffa09463a495ab8e4aac4c62d16d2'
+[a03-newcat-api-list-status] PASS GET http://127.0.0.1:55992/api/bookmarks?category=%E8%87%AA%E5%8A%A8%E5%BD%92%E7%B1%BB-13f42191 -> HTTP 200（期望 200）
+[a03-newcat-api-list-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a03-newcat-api-filter] PASS API 归类过滤 '自动归类-13f42191' 包含 id='e90ffa09463a495ab8e4aac4c62d16d2'
+[atlas] A03: passed; 断言 39 条

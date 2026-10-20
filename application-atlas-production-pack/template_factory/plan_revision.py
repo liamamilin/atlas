@@ -49,6 +49,26 @@ R6_PROGRAM_PATHS = (
     "acceptance/requirements.txt", "acceptance/README.md", "acceptance/runner.json",
 )
 
+# R7 is a separate, explicitly authorized continuation of the failed R6
+# candidate. It does not alter the R1/R6 preparation contracts above.
+R7_PREPARATION_SCHEMA = "atlas.failed-plan-revision.v3"
+R7_PROGRAM_REVISION_SCHEMA = "atlas.prepared-program-revision.v1"
+R7_SOURCE_JOB = "job_f3e32b56036b4ec7bea0c00d6a2a8dc4"
+R7_SOURCE_ATTEMPT = 1
+R7_SOURCE_PROPOSAL_DIGEST = "6f806d9416cd1c5a724e980dece7330dac651c8a838d469db409d940a493f158"
+R7_SOURCE_CANDIDATE_SHA256 = "3259239fd8a87fc3f4bf6c6ccd442f507a572db54e8e70b9dc9889c68f3855d3"
+R7_AGGREGATE_DIGEST = "78150ff8071af6e1e4a35365d965b8644140d2157ad27356e91ccad644981672"
+R7_CASE_BASIS_DIGEST = R6_CASE_BASIS_DIGEST
+R7_FACTS_VIEW_DIGEST = R6_FACTS_VIEW_DIGEST
+R7_AUTHORIZATION_REF = "docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/authorization/ATLAS_G1_R7_ACCEPTANCE_ALIGNMENT_CODEX_INSTRUCTIONS.txt"
+R7_AUTHORIZATION_SHA256 = "5fb0792b769739f070f68af6ea196473671c791cd895989026ebf9520e282562"
+R7_APPROVED_REVISION_REF = "docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/authorization/approved-revision.json"
+R7_PATCH_REF = "docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/patch.json"
+R7_PROGRAMS_REF = "docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/prepared-programs/acceptance"
+R7_PROGRAM_PATHS = R6_PROGRAM_PATHS
+R7_REPLACE_PATHS = {"acceptance/p0_library.py", "acceptance/p0_find_open.py",
+                    "acceptance/README.md", "acceptance/runner.json"}
+
 
 def _fail(message):
     raise FactoryError(message, "plan_revision_conflict", 409)
@@ -379,11 +399,303 @@ def program_reuse_contents(store, manifest):
     return contents
 
 
+R7_SPEC_PATHS = {
+    ("features", "F01", "acceptance"), ("acceptance", "A12", "features"),
+    ("contract_coverage", "error_contract", "branches", "html.bookmark_save.category.empty", "feature_ids"),
+    ("contract_coverage", "error_contract", "branches", "html.bookmark_save.category.whitespace", "feature_ids"),
+    ("contract_coverage", "error_contract", "branches", "html.bookmark_save.category.overlong_121", "feature_ids"),
+    ("contract_coverage", "error_contract", "branches", "json.bookmark_save.category.empty", "feature_ids"),
+    ("contract_coverage", "error_contract", "branches", "json.bookmark_save.category.whitespace", "feature_ids"),
+    ("contract_coverage", "error_contract", "branches", "json.bookmark_save.category.overlong_121", "feature_ids"),
+    ("contract_coverage", "error_contract", "schema"),
+    ("contract_coverage", "features", "F01", "acceptance_ids"),
+    ("contract_coverage", "features", "F01", "error_branch_ids"),
+    ("contract_coverage", "features", "F02", "recovery"),
+    ("contract_coverage", "features", "F02", "success_state"),
+    ("contract_coverage", "features", "F04", "error_branch_ids"),
+    ("contract_coverage", "features", "F11", "success_state"),
+    ("architecture_markdown",),
+}
+R7_FILE_PLAN_PATHS = {"acceptance/p0_library.py", "acceptance/p0_organize.py",
+                      "acceptance/p0_find_open.py", "acceptance/p0_recovery.py",
+                      "acceptance/README.md", "acceptance/runner.json"}
+R7_CASE_FIELDS = {("capability",), ("reason",)}
+R7_EXPECTED_JOB_ERROR = "aggregate repair semantic review did not pass; candidate was not frozen"
+R7_AGGREGATE_CHECKPOINT = "aggregate-semantic-review-f153e3550ceaeeb5"
+
+
+def _at_path(root, path):
+    """Resolve only identity-addressed list rows and ordinary object keys."""
+    current = root
+    index = 0
+    while index < len(path):
+        part = path[index]
+        if isinstance(current, list):
+            identity = part
+            matches = [row for row in current if isinstance(row, dict)
+                       and (row.get("id") == identity or row.get("feature_id") == identity)]
+            if len(matches) != 1:
+                _fail(f"R7 patch identity is missing or ambiguous: {identity}")
+            current = matches[0]
+            index += 1
+            continue
+        if isinstance(current, dict) and part not in current and index == len(path) - 1:
+            return None
+        if not isinstance(current, dict) or part not in current:
+            _fail(f"R7 patch field is missing: {part}")
+        current = current[part]
+        index += 1
+    return current
+
+
+def _set_path(root, path, value):
+    parent = root
+    index = 0
+    while index < len(path) - 1:
+        part = path[index]
+        if isinstance(parent, list):
+            identity = part
+            matches = [row for row in parent if isinstance(row, dict)
+                       and (row.get("id") == identity or row.get("feature_id") == identity)]
+            if len(matches) != 1:
+                _fail(f"R7 patch identity is missing or ambiguous: {identity}")
+            parent = matches[0]
+            index += 1
+            continue
+        parent = parent[part]
+        index += 1
+    last = path[-1]
+    if isinstance(parent, list):
+        _fail("R7 patch path cannot end at a list")
+    parent[last] = deepcopy(value)
+
+
+def _apply_r7_patch(plan, choices, patch):
+    if (not isinstance(patch, dict)
+            or set(patch) != {"spec_changes", "file_plan_changes", "case_design_changes", "program_changes"}):
+        _fail("R7 requires exact spec, file-plan, case-design and program deltas")
+    spec_changes = patch["spec_changes"]
+    if (not isinstance(spec_changes, list) or len(spec_changes) != len(R7_SPEC_PATHS)
+            or any(not isinstance(row, dict) or not isinstance(row.get("path"), list)
+                   or not all(isinstance(part, str) for part in row["path"]) for row in spec_changes)
+            or {tuple(row["path"]) for row in spec_changes} != R7_SPEC_PATHS):
+        _fail("R7 specification patch must contain the exact approved field allowlist")
+    effective = deepcopy(plan)
+    seen = set()
+    for change in spec_changes:
+        if (not isinstance(change, dict) or set(change) != {"path", "old", "new"}
+                or not isinstance(change["path"], list)
+                or not all(isinstance(part, str) for part in change["path"])):
+            _fail("R7 spec changes require exact old/new values")
+        path = change["path"]
+        key = tuple(path)
+        if key in seen or key not in R7_SPEC_PATHS:
+            _fail("R7 spec path is duplicated or unauthorized")
+        seen.add(key)
+        target_path = ["spec", *path]
+        if _at_path(effective, target_path) != change["old"]:
+            _fail(f"R7 spec baseline changed at {path}")
+        _set_path(effective, target_path, change["new"])
+
+    rows = patch["file_plan_changes"]
+    if (not isinstance(rows, list) or len(rows) != len(R7_FILE_PLAN_PATHS)
+            or any(not isinstance(row, dict) or not isinstance(row.get("path"), str) for row in rows)
+            or {row["path"] for row in rows} != R7_FILE_PLAN_PATHS):
+        _fail("R7 file-plan patch must bind exactly the four changed and two reuse rows")
+    by_path = {row.get("path"): row for row in effective.get("file_plan", []) if isinstance(row, dict)}
+    if len(by_path) != len(effective.get("file_plan", [])):
+        _fail("R7 base file-plan has duplicate paths")
+    for change in rows:
+        if not isinstance(change, dict) or set(change) != {"path", "old", "new"}:
+            _fail("R7 file-plan changes require whole old/new rows")
+        path = change["path"]
+        old, new = change["old"], change["new"]
+        if (not isinstance(old, dict) or not isinstance(new, dict)
+                or path not in R7_FILE_PLAN_PATHS or by_path.get(path) != old or new.get("path") != path
+                or set(old) != set(new) or any(old.get(k) != new.get(k) for k in set(old) - {"purpose", "reuse"})
+                or not isinstance(new.get("purpose"), str) or not new["purpose"].strip()
+                or type(new.get("reuse")) is not bool):
+            _fail(f"R7 file-plan change exceeds purpose/reuse fields: {path}")
+        by_path[path].update({"purpose": new["purpose"], "reuse": new["reuse"]})
+    expected_modes = {path: path not in R7_REPLACE_PATHS for path in R7_FILE_PLAN_PATHS}
+    # Every pinned source file remains present; only the exact four replacements change mode.
+    for row in effective["file_plan"]:
+        path = row["path"]
+        if path in R7_PROGRAM_PATHS and row.get("reuse") != expected_modes.get(path, True):
+            _fail(f"R7 file-plan reuse mode does not match the authorized program set: {path}")
+
+    updates = patch["case_design_changes"]
+    if not isinstance(updates, list) or len(updates) != 4:
+        _fail("R7 case-design patch must contain exactly two capability/reason pairs")
+    design = deepcopy(choices)
+    original_by_capability = {row.get("capability"): row for row in design if isinstance(row, dict)}
+    seen_case = set()
+    for change in updates:
+        if (not isinstance(change, dict) or set(change) != {"choice_id", "path", "old", "new"}
+                or not isinstance(change["choice_id"], str)
+                or change["path"] not in (["capability"], ["reason"])):
+            _fail("R7 case-design changes may edit only capability or reason by old capability identity")
+        identity = change["choice_id"]
+        token = (identity, tuple(change["path"]))
+        if token in seen_case:
+            _fail("R7 case-design patch repeats a field")
+        seen_case.add(token)
+        target = original_by_capability.get(identity)
+        if target is None or target.get(change["path"][0]) != change["old"] or not isinstance(change["new"], str) or not change["new"].strip():
+            _fail("R7 case-design baseline or replacement is invalid")
+        target[change["path"][0]] = change["new"]
+    if len({identity for identity, _ in seen_case}) != 2 or {field[0] for _, field in seen_case} != {"capability", "reason"}:
+        _fail("R7 must revise exactly two target capability/reason pairs")
+    return effective, design
+
+
+def _r7_repo_root(store):
+    return store.pack.resolve().parent
+
+
+def build_program_revision_manifest(store, patch=None, repo_root=None):
+    """Derive the nine-file R7 revision from the pinned failed delivery and host patches."""
+    repo_root = Path(repo_root) if repo_root is not None else _r7_repo_root(store)
+    if patch is None:
+        patch = _read_bound_json(repo_root, R7_PATCH_REF)
+    changes = patch.get("program_changes") if isinstance(patch, dict) else None
+    if (not isinstance(changes, list) or len(changes) != len(R7_REPLACE_PATHS)
+            or any(not isinstance(row, dict) or not isinstance(row.get("path"), str) for row in changes)
+            or {row["path"] for row in changes} != R7_REPLACE_PATHS):
+        _fail("R7 program patch must replace exactly the four authorized files")
+    changes_by_path = {row["path"]: row for row in changes}
+    plan_record = _checkpoint_result(store, R7_SOURCE_JOB, "blueprint-plan-0", R7_SOURCE_PROPOSAL_DIGEST)
+    if plan_record["digest"] != R7_SOURCE_PROPOSAL_DIGEST:
+        _fail("R7 source plan checkpoint changed")
+    aggregate = _checkpoint_result(store, R7_SOURCE_JOB, R7_AGGREGATE_CHECKPOINT, R7_AGGREGATE_DIGEST)
+    prepared_root = R7_PROGRAMS_REF
+    plan_rows = {row.get("path"): row for row in plan_record["result"].get("file_plan", []) if isinstance(row, dict)}
+    if len(plan_rows) != 9 or set(plan_rows) != set(R7_PROGRAM_PATHS):
+        _fail("R7 source file plan does not contain the exact nine programs")
+    candidate_rel = f"jobs/{R7_SOURCE_JOB}/attempt-1/candidate-0/template.json"
+    candidate_path = _resolve_bound_file(store.root, candidate_rel)
+    if _sha256(candidate_path.read_bytes()) != R7_SOURCE_CANDIDATE_SHA256:
+        _fail("R7 source candidate bytes changed")
+    entries = []
+    for index, path in enumerate(R7_PROGRAM_PATHS):
+        cp_name = f"blueprint-code-0-{index}"
+        cp = _checkpoint_result(store, R7_SOURCE_JOB, cp_name)
+        result = cp["result"]
+        if result.get("path") != path or not isinstance(result.get("content"), str):
+            _fail(f"R7 program checkpoint path/content mismatch: {cp_name}")
+        before = result["content"].encode("utf-8")
+        if result.get("reused_sha256") is not None and result["reused_sha256"] != _sha256(before):
+            _fail(f"R7 source reused digest mismatch: {path}")
+        source_ref = f"jobs/{R7_SOURCE_JOB}/attempt-1/context/generated-0/{path}"
+        actual_source = _resolve_bound_file(store.root, source_ref).read_bytes()
+        if actual_source != before:
+            _fail(f"R7 source checkpoint differs from actual delivery: {path}")
+        mode = "replace" if path in R7_REPLACE_PATHS else "reuse"
+        spans = []
+        after = before
+        if mode == "replace":
+            change = changes_by_path[path]
+            if not isinstance(change, dict) or set(change) != {"path", "mode", "patch"} or change["mode"] != "replace" or not isinstance(change["patch"], list) or not change["patch"]:
+                _fail(f"R7 replacement patch is malformed: {path}")
+            try:
+                text_value = before.decode("utf-8")
+            except UnicodeDecodeError:
+                _fail(f"R7 source program is not UTF-8: {path}")
+            for span in change["patch"]:
+                if not isinstance(span, dict) or set(span) != {"old", "new"} or not isinstance(span["old"], str) or not span["old"] or not isinstance(span["new"], str):
+                    _fail(f"R7 exact replacement span is malformed: {path}")
+                if text_value.count(span["old"]) != 1:
+                    _fail(f"R7 replacement span must match exactly once: {path}")
+                text_value = text_value.replace(span["old"], span["new"], 1)
+                spans.append(deepcopy(span))
+            after = text_value.encode("utf-8")
+        elif path in changes_by_path:
+            _fail(f"R7 reuse program has a supplied patch: {path}")
+        prepared_ref = f"{prepared_root}/{Path(path).name}"
+        prepared_path = _resolve_bound_file(repo_root, prepared_ref)
+        prepared = prepared_path.read_bytes()
+        if prepared != after:
+            _fail(f"R7 prepared program bytes differ from applying the exact patch: {path}")
+        clauses = {
+            "acceptance/p0_library.py": "R7 §3.1 A02 and §3.3 A11 only",
+            "acceptance/p0_find_open.py": "R7 §3.2 A07 only",
+            "acceptance/README.md": "R7 §5.4 README factual correction only",
+            "acceptance/runner.json": "R7 §3.4 A11 argument binding only",
+        }
+        authorization_clause = clauses.get(path, "R7 §3.0 exact byte-for-byte reuse")
+        entries.append({"path": path, "source_job_id": R7_SOURCE_JOB, "source_attempt": 1,
+                        "checkpoint_name": cp_name, "checkpoint_digest": cp["digest"],
+                        "before_sha256": _sha256(before), "mode": mode,
+                        "after_sha256": _sha256(after), "patch": spans,
+                        "patch_digest": digest(spans), "prepared_ref": prepared_ref,
+                        "authorization_clause": authorization_clause})
+    return {"schema": R7_PROGRAM_REVISION_SCHEMA, "source_job_id": R7_SOURCE_JOB,
+            "source_attempt": 1, "source_proposal_digest": R7_SOURCE_PROPOSAL_DIGEST,
+            "source_candidate_sha256": R7_SOURCE_CANDIDATE_SHA256,
+            "source_plan_checkpoint_name": "blueprint-plan-0",
+            "source_plan_checkpoint_digest": plan_record["digest"],
+            "source_aggregate_checkpoint_name": R7_AGGREGATE_CHECKPOINT,
+            "source_aggregate_checkpoint_digest": aggregate["digest"], "entries": entries}
+
+
+def program_revision_contents(store, manifest):
+    """Revalidate original checkpoints, patch spans and prepared bytes, then return strings."""
+    if not isinstance(manifest, dict) or manifest.get("schema") != R7_PROGRAM_REVISION_SCHEMA:
+        _fail("unsupported prepared program revision manifest")
+    root = _r7_repo_root(store)
+    patch = _read_bound_json(root, R7_PATCH_REF)
+    expected = build_program_revision_manifest(store, patch, root)
+    if manifest != expected:
+        _fail("prepared program revision no longer matches pinned source and approved bytes")
+    contents = {}
+    for entry in expected["entries"]:
+        raw = _resolve_bound_file(root, entry["prepared_ref"]).read_bytes()
+        if _sha256(raw) != entry["after_sha256"]:
+            _fail(f"R7 prepared program hash changed: {entry['path']}")
+        try:
+            contents[entry["path"]] = raw.decode("utf-8")
+        except UnicodeDecodeError:
+            _fail(f"R7 prepared program is not UTF-8: {entry['path']}")
+    return contents
+
+
+def _validate_approved_r7(root, source_authorization, patch, manifest, binding=None):
+    expected_auth = {"source_ref": R7_AUTHORIZATION_REF,
+                     "source_digest": R7_AUTHORIZATION_SHA256,
+                     "revision_ref": R7_APPROVED_REVISION_REF}
+    if (not isinstance(source_authorization, dict)
+            or set(source_authorization) != set(expected_auth) | {"revision_digest"}
+            or any(source_authorization.get(k) != v for k, v in expected_auth.items())):
+        _fail("R7 request does not bind the fixed authorization record")
+    if _sha256(_resolve_bound_file(root, R7_AUTHORIZATION_REF).read_bytes()) != R7_AUTHORIZATION_SHA256:
+        _fail("R7 authorization source bytes changed")
+    record = _read_bound_json(root, R7_APPROVED_REVISION_REF)
+    if digest(record) != source_authorization["revision_digest"]:
+        _fail("R7 approved-revision record digest changed")
+    if (record.get("schema") != "atlas.g1-bounded-revision-authorization.v1"
+            or record.get("source_ref") != R7_AUTHORIZATION_REF
+            or record.get("source_digest") != R7_AUTHORIZATION_SHA256
+            or record.get("base_proposal_digest") != R7_SOURCE_PROPOSAL_DIGEST
+            or record.get("candidate_sha256") != R7_SOURCE_CANDIDATE_SHA256
+            or record.get("aggregate_checkpoint_digest") != R7_AGGREGATE_DIGEST
+            or record.get("patch_ref") != R7_PATCH_REF
+            or record.get("patch_digest") != digest(patch)
+            or record.get("program_revision_digest") != digest(manifest)
+            or record.get("program_ref") != R7_PROGRAMS_REF
+            or record.get("binding_digest") != digest(binding)):
+        _fail("R7 approved-revision record does not bind this exact patch and program revision")
+    if _read_bound_json(root, R7_PATCH_REF) != patch:
+        _fail("R7 request patch differs from the fixed host patch file")
+    return record
+
+
 class PreparedRevisionService:
     def __init__(self, store):
         self.store = store
 
     def prepare(self, job_id, request):
+        if isinstance(request, dict) and request.get("schema") == R7_PREPARATION_SCHEMA:
+            return self._prepare_r7(job_id, request)
         if isinstance(request, dict) and request.get("schema") == R6_PREPARATION_SCHEMA:
             return self._prepare_r6(job_id, request)
         if not isinstance(request, dict) or set(request) != {"schema", "binding", "patch"} or request.get("schema") != PREPARATION_SCHEMA:
@@ -559,3 +871,165 @@ class PreparedRevisionService:
                 "incremental_diff": incremental_diff,
                 "cumulative_repair_scope": cumulative_scope,
                 "evidence_scope": "Host preparation only; source references and all nine attempt-4 program bytes are bound. No queue, model calls, budget, repair limit or window changed."}
+
+    def _prepare_r7(self, job_id, request):
+        required_top = {"schema", "binding", "patch", "source_authorization", "prepared_program_revision"}
+        if set(request) != required_top or job_id != R7_SOURCE_JOB:
+            _fail("R7 preparation requires the exact fixed failed job and request shape")
+        root = _r7_repo_root(self.store)
+        patch = request["patch"]
+        manifest = request["prepared_program_revision"]
+        _validate_approved_r7(root, request["source_authorization"], patch, manifest, request.get("binding"))
+        job = self.store.job(job_id)
+        snapshot = job["snapshot"]
+        if (job["kind"] != "blueprint-production" or job["state"] != "failed"
+                or job["attempt"] != R7_SOURCE_ATTEMPT or job["stage"] != "aggregate-semantic-review"
+                or job.get("error") != R7_EXPECTED_JOB_ERROR or not bookmark_bound(snapshot)):
+            _fail("R7 requires the pinned failed aggregate-review attempt")
+        binding = request["binding"]
+        keys = {"job_id", "attempt", "snapshot_digest", "stage", "job_error_digest",
+                "plan_checkpoint_name", "plan_checkpoint_digest", "proposal_digest",
+                "candidate_path", "candidate_sha256", "aggregate_checkpoint_name",
+                "aggregate_checkpoint_digest", "campaign_id", "plan_id", "plan_digest",
+                "product_id", "scenario_id", "scenario_revision", "case_basis_digest",
+                "facts_view_checkpoint_name", "facts_view_checkpoint_digest", "facts_view_digest",
+                "case_design_checkpoint_name", "case_design_checkpoint_digest", "cli_total",
+                "business_repairs_used", "active_jobs", "old_grant_id", "old_grant_used",
+                "previous_amendment_id", "absolute_deadline"}
+        if not isinstance(binding, dict) or set(binding) != keys:
+            _fail("R7 request must bind the complete failed job, accepted inputs and preserved ledger")
+        v1, scenario = snapshot["v1"], snapshot["scenario"]
+        expected = {"job_id": R7_SOURCE_JOB, "attempt": 1,
+                    "snapshot_digest": digest(snapshot), "stage": "aggregate-semantic-review",
+                    "job_error_digest": digest(job["error"]),
+                    "plan_checkpoint_name": "blueprint-plan-0",
+                    "plan_checkpoint_digest": R7_SOURCE_PROPOSAL_DIGEST,
+                    "proposal_digest": R7_SOURCE_PROPOSAL_DIGEST,
+                    "candidate_path": f"jobs/{R7_SOURCE_JOB}/attempt-1/candidate-0/template.json",
+                    "candidate_sha256": R7_SOURCE_CANDIDATE_SHA256,
+                    "aggregate_checkpoint_name": R7_AGGREGATE_CHECKPOINT,
+                    "aggregate_checkpoint_digest": R7_AGGREGATE_DIGEST,
+                    "campaign_id": v1["campaign_id"], "plan_id": v1["plan_id"],
+                    "plan_digest": v1["plan_digest"],
+                    "product_id": v1["product_id"], "scenario_id": scenario["id"],
+                    "scenario_revision": scenario["revision"],
+                    "case_basis_digest": R7_CASE_BASIS_DIGEST,
+                    "facts_view_checkpoint_name": "blueprint-accepted-facts-view",
+                    "facts_view_digest": R7_FACTS_VIEW_DIGEST,
+                    "case_design_checkpoint_name": "case-adaptation-prepared-aaf080ba52611126",
+                    "cli_total": 71, "business_repairs_used": 6, "active_jobs": 0,
+                    "old_grant_id": "pgrant_f3595368c14d4b23b6ab536f6d198007",
+                    "old_grant_used": 1,
+                    "previous_amendment_id": "bamd_100a302fe8424d9493dafe62d6e43db9",
+                    "absolute_deadline": 1792495312.855422}
+        if any(binding.get(key) != value for key, value in expected.items()):
+            _fail("R7 request identity differs from the pinned failed product or authorization baseline")
+        with self.store.connect() as con:
+            row = con.execute("SELECT body FROM v1_plan WHERE id=?", (v1["plan_id"],)).fetchone()
+        if not row:
+            _fail("fixed R7 batch plan is missing")
+        fixed_plan = json.loads(row[0])
+        if (fixed_plan.get("digest") != binding["plan_digest"]
+                or digest({k: v for k, v in fixed_plan.items() if k != "digest"}) != fixed_plan.get("digest")
+                or fixed_plan.get("campaign_id") != v1["campaign_id"]):
+            _fail("R7 fixed plan digest or campaign changed")
+        if fixed_plan.get("campaign_id") != "atlas-v1-first-production-2026-10-19":
+            _fail("R7 campaign identity changed")
+        seeds = [seed for seed in fixed_plan.get("seeds", []) if seed.get("product_id") == v1["product_id"]]
+        if (len(seeds) != 1 or seeds[0].get("scenario") != scenario
+                or (seeds[0].get("case_basis") is not None
+                    and seeds[0].get("case_basis") != snapshot.get("case_basis"))):
+            _fail("R7 failed product no longer agrees with its fixed plan seed")
+        plan_cp = _checkpoint_result(self.store, job_id, binding["plan_checkpoint_name"], binding["plan_checkpoint_digest"])
+        aggregate_cp = _checkpoint_result(self.store, job_id, binding["aggregate_checkpoint_name"], binding["aggregate_checkpoint_digest"])
+        if aggregate_cp["digest"] != R7_AGGREGATE_DIGEST:
+            _fail("R7 aggregate review checkpoint changed")
+        candidate = _resolve_bound_file(self.store.root, binding["candidate_path"])
+        if _sha256(candidate.read_bytes()) != binding["candidate_sha256"]:
+            _fail("R7 failed candidate bytes changed")
+
+        facts_cp = _checkpoint_result(self.store, job_id, binding["facts_view_checkpoint_name"], binding["facts_view_checkpoint_digest"])
+        facts_view = facts_cp["result"]
+        if facts_view.get("view_digest") != binding["facts_view_digest"] or facts_view.get("basis_digest") != R7_CASE_BASIS_DIGEST:
+            _fail("R7 accepted facts view is stale or has changed")
+        from .cases import CaseLibrary
+        cases = CaseLibrary(self.store, initialize=False)
+        cases.require_admissible(snapshot["case_basis"])
+        cases.validate_facts_view(facts_view, snapshot["case_basis"])
+        design_cp = _checkpoint_result(self.store, job_id, binding["case_design_checkpoint_name"], binding["case_design_checkpoint_digest"])
+        _validate_pinned_case_design(snapshot, binding["case_design_checkpoint_name"], design_cp)
+        cases.require_design_evidence(snapshot["case_basis"], design_cp["result"]["choices"])
+        research_cp = _checkpoint_result(self.store, job_id, "blueprint-research")
+        _validate_research_view_binding(facts_view, research_cp)
+
+        effective, choices = _apply_r7_patch(plan_cp["result"], design_cp["result"]["choices"], patch)
+        eligible = set(facts_view.get("accepted_evidence_ids", []))
+        research_sources = research_cp["result"].get("sources")
+        if not isinstance(research_sources, list):
+            _fail("R7 current research sources are malformed")
+        current_sources = [source for source in research_sources if isinstance(source, dict) and source.get("name") in eligible]
+        current_sources.append({"id": "S01"})
+        from .source_references import validate_feature_source_references
+        source_report = validate_feature_source_references(effective["spec"], current_sources,
+                                                           binding={"job_id": job_id, "attempt": 1,
+                                                                    "facts_view_digest": binding["facts_view_digest"],
+                                                                    "case_basis_digest": binding["case_basis_digest"]})
+        if not source_report.get("valid"):
+            _fail("R7 current source-reference policy validation did not pass")
+        cases.require_design_evidence(snapshot["case_basis"], choices)
+        from .cognition import validate_file_plan
+        from .contract_scope import validate_contract_coverage
+        validate_file_plan(effective, allow_reuse=True, require_runtime=True)
+        validate_contract_coverage(effective["spec"], required=True)
+        actual_manifest = build_program_revision_manifest(self.store, patch, root)
+        if manifest != actual_manifest:
+            _fail("R7 program revision manifest differs from source checkpoints and prepared bytes")
+        program_revision_contents(self.store, actual_manifest)
+
+        changed_spec = []
+        for change in patch["spec_changes"]:
+            changed_spec.append(deepcopy(change))
+        actual_case_changes = deepcopy(patch["case_design_changes"])
+        old_repair = snapshot.get("cognitive_repair", {})
+        old_scope = old_repair.get("repair_scope")
+        if not isinstance(old_scope, dict):
+            _fail("R7 cumulative repair scope is missing from the failed snapshot")
+        cumulative_scope = deepcopy(old_scope)
+        cumulative_scope["version"] = "atlas.aggregate-repair-scope.v2"
+        field_paths = [list(path) for path in cumulative_scope.get("authored_field_paths", [])]
+        for change in changed_spec:
+            path = change["path"]
+            # Contract-coverage nested rows are authored through their existing top-level field.
+            if path[0] == "contract_coverage":
+                path = ["contract_coverage", path[1]]
+            if path not in field_paths:
+                field_paths.append(path)
+        cumulative_scope["authored_field_paths"] = field_paths
+        edit_paths = list(cumulative_scope.get("edit_paths", []))
+        for path in sorted(R7_REPLACE_PATHS):
+            if path not in edit_paths:
+                edit_paths.append(path)
+        cumulative_scope["edit_paths"] = edit_paths
+        cumulative_scope["edit_paths"].sort()
+        cumulative_scope["authored_field_paths"] = sorted(field_paths)
+        incremental_diff = {"base_proposal_digest": plan_cp["digest"],
+                            "effective_plan_digest": digest(effective),
+                            "spec_changes": changed_spec,
+                            "case_design_changes": actual_case_changes,
+                            "program_changes": [{"path": row["path"], "before_sha256": row["before_sha256"],
+                                                 "after_sha256": row["after_sha256"], "patch_digest": row["patch_digest"]}
+                                                for row in actual_manifest["entries"] if row["mode"] == "replace"],
+                            "reuse_paths": [row["path"] for row in actual_manifest["entries"] if row["mode"] == "reuse"],
+                            "program_revision_digest": digest(actual_manifest)}
+        return {"schema": R7_PREPARATION_SCHEMA, "state": "prepared_not_queued",
+                "binding": deepcopy(binding), "request_digest": digest(request),
+                "base_proposal_digest": plan_cp["digest"], "effective_plan": effective,
+                "effective_plan_digest": digest(effective), "case_design": choices,
+                "case_design_digest": digest(choices), "source_reference_report": source_report,
+                "case_adaptation_input": {"mode": "host-exact-r7-target-adaptation",
+                                          "prior_checkpoint_digest": design_cp["digest"],
+                                          "case_basis_digest": binding["case_basis_digest"]},
+                "prepared_program_revision": deepcopy(actual_manifest),
+                "incremental_diff": incremental_diff,
+                "cumulative_repair_scope": cumulative_scope,
+                "evidence_scope": "Read-only host preparation. R7 proposal, current case evidence, source view, four exact program replacements and five reused source bytes are bound; no production state, queue, budget, worker, call or window was changed."}

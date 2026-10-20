@@ -1,0 +1,43 @@
+--- R6/acceptance/p0_find_open.py
++++ R7/acceptance/p0_find_open.py
+@@ -509,7 +509,9 @@
+         desc_token = f'descr{uuid.uuid4().hex[:12]}'
+         unmatched = f'absent{uuid.uuid4().hex[:12]}'
+ 
+-        url_a = f'https://{host_token}.atlas-acceptance.example/notes/{uuid.uuid4().hex[:10]}'
++        path_only = f'pathonly{uuid.uuid4().hex[:12]}'
++        query_only = f'queryonly{uuid.uuid4().hex[:12]}'
++        url_a = f'https://{host_token}.atlas-acceptance.example/{path_only}?q={query_only}'
+         title_a = f'{shared} 收藏甲'
+         desc_a = f'备注 {desc_token}'
+         created_a = client.post_json(
+@@ -639,6 +641,29 @@
+             f'归类 {cat_b!r} 的搜索结果排除记录甲：{sorted(ids_b)}',
+         )
+ 
++        # Tokens occur only in excluded fields of this target, never in allowed ones.
++        for label, token_value in (('url-path', path_only), ('url-query', query_only), ('category-name', cat_a)):
++            allowed_text = ' '.join((title_a, host_token + '.atlas-acceptance.example', desc_a)).lower()
++            recorder.check(f'a07-{label}-isolated-token', token_value.lower() not in allowed_text,
++                           '负例 token 不在目标记录 title/hostname/description')
++            for scoped in (False, True):
++                aid = f'a07-excludes-{label}-' + ('category' if scoped else 'all')
++                params = {'q': token_value}
++                if scoped:
++                    params['category'] = cat_a
++                results = _search(client, recorder, aid + '-json', params)
++                recorder.check(aid + '-json-target-absent', id_a not in _record_ids(results),
++                               'JSON 不因 URL path/query 或分类名而命中目标记录')
++                html = _html_search(client, recorder, aid + '-html', search_form,
++                                    cat_a if scoped else '', token_value)
++                recorder.check(aid + '-html-target-absent', id_a not in _row_ids(html),
++                               '实际搜索表单的记录行不因排除字段命中；不检查页面回显')
++        # These positive controls also prove both entry points do not return always-empty.
++        for label, positive_token in (('title', shared), ('hostname', host_token), ('description', desc_token)):
++            positive_doc = _html_search(client, recorder, f'a07-html-positive-{label}',
++                                        search_form, cat_a, positive_token.upper())
++            recorder.check(f'a07-html-positive-{label}-hit', id_a in _row_ids(positive_doc),
++                           '允许字段经真实 HTML 搜索表单仍命中同一记录')
+         doc_empty = _html_search(client, recorder, 'a07-html-empty', search_form, cat_a, unmatched)
+         empty_ids = _row_ids(doc_empty)
+         recorder.check(

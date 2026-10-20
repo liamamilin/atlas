@@ -1,0 +1,46 @@
+[a11-fresh-required-flags] PASS A11 必须绑定实际冻结 app_root 与测试者 data_dir
+[a11-base-health-status] PASS GET http://127.0.0.1:56313/api/health -> HTTP 200（期望 200）
+[a11-base-health-json] PASS /api/health 返回非空 JSON 对象，实际 dict
+[a11-base-home-status] PASS GET http://127.0.0.1:56313/ -> HTTP 200（期望 200）
+[a11-base-home-content-type] PASS 首页 Content-Type='text/html; charset=utf-8'
+[a11-base-entry-form] PASS 首页含 action=/bookmarks/new 且 method=post 的录入表单
+[a11-base-entry-action] PASS 录入表单 action='/bookmarks/new'
+[a11-base-url-field] PASS 录入表单含 name=url 输入字段
+[a11-base-category-manager] PASS 首页 category-manager 链接 href='/categories'（期望指向 /categories）
+[a11-base-list-container] PASS 首页含记录列表容器
+[a11-base-unknown-status] PASS GET http://127.0.0.1:56313/?category=%E4%B8%8D%E5%AD%98%E5%9C%A8%E5%BD%92%E7%B1%BB-0ab8f13889 -> HTTP 200（期望 200）
+[a11-base-unknown-filter-empty] PASS 不存在归类 '不存在归类-0ab8f13889' 过滤后记录行数=0（期望 0）
+[a11-base-unknown-empty-state] PASS 不存在归类过滤显示明确空状态，标记='暂无记录'
+[a11-fresh-owned-source] PASS fresh 实例来自同一冻结交付源码
+[a11-fresh-health-status] PASS GET http://127.0.0.1:56323/api/health -> HTTP 200（期望 200）
+[a11-fresh-health-json] PASS fresh 健康检查返回 JSON 对象
+[a11-fresh-active-list-status] PASS GET http://127.0.0.1:56323/api/bookmarks -> HTTP 200（期望 200）
+[a11-fresh-active-list-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a11-fresh-active-empty] FAIL 未过滤全库 active 记录数=1，首次初始化必须为0
+[a11-fresh-including-trash-list-status] PASS GET http://127.0.0.1:56323/api/bookmarks?include_trashed=1 -> HTTP 200（期望 200）
+[a11-fresh-including-trash-list-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a11-fresh-including-trash-empty] FAIL 未过滤全库 including-trash 记录数=1，首次初始化必须为0
+[a11-fresh-categories-status] PASS GET http://127.0.0.1:56323/api/categories -> HTTP 200（期望 200）
+[a11-fresh-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a11-fresh-preset-1] PASS 首次初始化准确存在预置分类 '未整理'
+[a11-fresh-preset-1-id] PASS 分类 ID='e5b1917eb7c641bfbb87b2c2eada8cf9'
+[a11-fresh-preset-1-count] PASS 预置分类活动记录 count=0
+[a11-fresh-preset-2] PASS 首次初始化准确存在预置分类 '待购'
+[a11-fresh-preset-2-id] PASS 分类 ID='ea8331e7d52b45af87062ca95f1c1c9c'
+[a11-fresh-preset-2-count] PASS 预置分类活动记录 count=0
+[a11-fresh-preset-3] PASS 首次初始化准确存在预置分类 '家居改造'
+[a11-fresh-preset-3-id] PASS 分类 ID='6949edd5d2464f4c865ed49e59bdffad'
+[a11-fresh-preset-3-count] PASS 预置分类活动记录 count=0
+[a11-fresh-preset-4] PASS 首次初始化准确存在预置分类 '以后看看'
+[a11-fresh-preset-4-id] PASS 分类 ID='3cdda425b45b45e18725f40103d6d06d'
+[a11-fresh-preset-4-count] FAIL 预置分类活动记录 count=1
+[a11-fresh-preset-unique-ids] PASS 四个预置分类 ID 各自唯一
+[a11-fresh-home-status] PASS GET http://127.0.0.1:56323/ -> HTTP 200（期望 200）
+[a11-fresh-home-content-type] PASS 未过滤首页是 HTML
+[a11-fresh-save-form] PASS 未过滤首页具备保存表单与 URL 字段
+[a11-fresh-category-entry] PASS 未过滤首页有分类管理入口
+[a11-fresh-list-container] PASS 未过滤首页有列表容器
+[a11-fresh-no-record-rows] FAIL 首次初始化未过滤首页没有记录行
+[a11-fresh-explicit-empty-state] FAIL 首次初始化未过滤首页有明确空状态
+[a11-fresh-process-stopped] PASS 本用例拥有的 fresh 子进程已结束
+[atlas] A11: failed; 失败断言: a11-fresh-active-empty, a11-fresh-including-trash-empty, a11-fresh-preset-4-count, a11-fresh-no-record-rows, a11-fresh-explicit-empty-state

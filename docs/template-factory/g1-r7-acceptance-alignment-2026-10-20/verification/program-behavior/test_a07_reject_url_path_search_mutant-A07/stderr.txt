@@ -1,0 +1,164 @@
+[a07-health-status] PASS GET http://127.0.0.1:56173/api/health -> HTTP 200（期望 200）
+[a07-create-a-status] PASS POST http://127.0.0.1:56173/api/bookmarks -> HTTP 201（期望 201）
+[a07-create-a-id] PASS 创建记录甲返回 id='3994df7176964c23bf886338b87d9202'
+[a07-create-b-status] PASS POST http://127.0.0.1:56173/api/bookmarks -> HTTP 201（期望 201）
+[a07-create-b-id] PASS 创建记录乙返回 id='5df1f24d2b6e4e2081a129ffc7f1a123'
+[a07-title-status] PASS GET http://127.0.0.1:56173/api/bookmarks?q=sharedf5b7e4ce2df7 -> HTTP 200（期望 200）
+[a07-title-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a07-title-hit-a] PASS 标题片段 'sharedf5b7e4ce2df7' 命中记录甲：['3994df7176964c23bf886338b87d9202', '5df1f24d2b6e4e2081a129ffc7f1a123']
+[a07-title-hit-b] PASS 标题片段 'sharedf5b7e4ce2df7' 命中记录乙：['3994df7176964c23bf886338b87d9202', '5df1f24d2b6e4e2081a129ffc7f1a123']
+[a07-title-case-status] PASS GET http://127.0.0.1:56173/api/bookmarks?q=SHAREDF5B7E4CE2DF7 -> HTTP 200（期望 200）
+[a07-title-case-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a07-title-case-insensitive] PASS 大写标题片段 'SHAREDF5B7E4CE2DF7' 命中记录甲（大小写不敏感）
+[a07-domain-status] PASS GET http://127.0.0.1:56173/api/bookmarks?q=host9fc23c12f708 -> HTTP 200（期望 200）
+[a07-domain-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a07-domain-hit] PASS 域名片段 'host9fc23c12f708' 命中记录甲：['3994df7176964c23bf886338b87d9202']
+[a07-domain-excludes-b] PASS 域名检索不命中域名不同的记录乙
+[a07-domain-case-status] PASS GET http://127.0.0.1:56173/api/bookmarks?q=HOST9FC23C12F708 -> HTTP 200（期望 200）
+[a07-domain-case-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a07-domain-case-insensitive] PASS 大写域名片段 'HOST9FC23C12F708' 命中记录甲（大小写不敏感）
+[a07-description-status] PASS GET http://127.0.0.1:56173/api/bookmarks?q=descra88eb3dfca4b -> HTTP 200（期望 200）
+[a07-description-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a07-description-hit] PASS 描述片段 'descra88eb3dfca4b' 命中记录甲：['3994df7176964c23bf886338b87d9202']
+[a07-description-excludes-b] PASS 描述检索不命中无该描述的记录乙
+[a07-description-case-status] PASS GET http://127.0.0.1:56173/api/bookmarks?q=DESCRA88EB3DFCA4B -> HTTP 200（期望 200）
+[a07-description-case-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a07-description-case-insensitive] PASS 大写描述片段 'DESCRA88EB3DFCA4B' 命中记录甲（大小写不敏感）
+[a07-combined-a-status] PASS GET http://127.0.0.1:56173/api/bookmarks?category=atlas-a07a-f774abc1ba&q=sharedf5b7e4ce2df7 -> HTTP 200（期望 200）
+[a07-combined-a-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a07-combined-a-includes] PASS category='atlas-a07a-f774abc1ba' 与 q='sharedf5b7e4ce2df7' 叠加命中记录甲
+[a07-combined-a-excludes-b] PASS category='atlas-a07a-f774abc1ba' 叠加过滤排除属于 'atlas-a07b-dd1de8bb35' 的记录乙
+[a07-combined-b-status] PASS GET http://127.0.0.1:56173/api/bookmarks?category=atlas-a07b-dd1de8bb35&q=sharedf5b7e4ce2df7 -> HTTP 200（期望 200）
+[a07-combined-b-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a07-combined-b-includes] PASS category='atlas-a07b-dd1de8bb35' 与 q='sharedf5b7e4ce2df7' 叠加命中记录乙
+[a07-combined-b-excludes-a] PASS category='atlas-a07b-dd1de8bb35' 叠加过滤排除属于 'atlas-a07a-f774abc1ba' 的记录甲
+[a07-no-match-status] PASS GET http://127.0.0.1:56173/api/bookmarks?q=absent50d331e1cd03 -> HTTP 200（期望 200）
+[a07-no-match-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a07-no-match-empty] PASS 无匹配关键字 'absent50d331e1cd03' 返回 200 空数组，实际 0 条
+[a07-home-status] PASS GET http://127.0.0.1:56173/ -> HTTP 200（期望 200）
+[a07-home-content-type] PASS GET / Content-Type='text/html; charset=utf-8'
+[a07-search-form] PASS 首页含 form[data-testid=category-search-form]（category 与 q）
+[a07-search-fields] PASS category-search-form 同时含 category 与 q 字段
+[a07-search-method] PASS category-search-form method='get'（期望 get）
+[a07-search-action] PASS category-search-form action='/'（期望 GET /）
+[a07-html-a-status] PASS GET http://127.0.0.1:56173/?q=sharedf5b7e4ce2df7&category=atlas-a07a-f774abc1ba -> HTTP 200（期望 200）
+[a07-html-a-content-type] PASS GET 搜索页 Content-Type='text/html; charset=utf-8'
+[a07-html-a-form] PASS 搜索页保留 category-search-form
+[a07-html-a-category-retained] PASS 搜索表单 category='atlas-a07a-f774abc1ba'（期望 'atlas-a07a-f774abc1ba'）
+[a07-html-a-query-retained] PASS 搜索表单 q='sharedf5b7e4ce2df7'（期望 'sharedf5b7e4ce2df7'）
+[a07-html-a-category-visible] PASS 结果页显示所选归类 'atlas-a07a-f774abc1ba'（表单保留值 'atlas-a07a-f774abc1ba'）
+[a07-html-a-query-visible] PASS 结果页显示查询 'sharedf5b7e4ce2df7'（表单保留值 'sharedf5b7e4ce2df7'）
+[a07-html-a-hit] PASS 归类 'atlas-a07a-f774abc1ba' 中 q='sharedf5b7e4ce2df7' 命中记录甲：['3994df7176964c23bf886338b87d9202']
+[a07-html-a-excludes-b] PASS 归类 'atlas-a07a-f774abc1ba' 的搜索结果排除记录乙：['3994df7176964c23bf886338b87d9202']
+[a07-html-b-status] PASS GET http://127.0.0.1:56173/?q=sharedf5b7e4ce2df7&category=atlas-a07b-dd1de8bb35 -> HTTP 200（期望 200）
+[a07-html-b-content-type] PASS GET 搜索页 Content-Type='text/html; charset=utf-8'
+[a07-html-b-form] PASS 搜索页保留 category-search-form
+[a07-html-b-category-retained] PASS 搜索表单 category='atlas-a07b-dd1de8bb35'（期望 'atlas-a07b-dd1de8bb35'）
+[a07-html-b-query-retained] PASS 搜索表单 q='sharedf5b7e4ce2df7'（期望 'sharedf5b7e4ce2df7'）
+[a07-html-b-category-visible] PASS 结果页显示所选归类 'atlas-a07b-dd1de8bb35'（表单保留值 'atlas-a07b-dd1de8bb35'）
+[a07-html-b-query-visible] PASS 结果页显示查询 'sharedf5b7e4ce2df7'（表单保留值 'sharedf5b7e4ce2df7'）
+[a07-html-b-hit] PASS 归类 'atlas-a07b-dd1de8bb35' 中 q='sharedf5b7e4ce2df7' 命中记录乙：['5df1f24d2b6e4e2081a129ffc7f1a123']
+[a07-html-b-excludes-a] PASS 归类 'atlas-a07b-dd1de8bb35' 的搜索结果排除记录甲：['5df1f24d2b6e4e2081a129ffc7f1a123']
+[a07-url-path-isolated-token] PASS 负例 token 不在目标记录 title/hostname/description
+[a07-excludes-url-path-all-json-status] PASS GET http://127.0.0.1:56173/api/bookmarks?q=pathonlyd8374416ba15 -> HTTP 200（期望 200）
+[a07-excludes-url-path-all-json-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a07-excludes-url-path-all-json-target-absent] FAIL JSON 不因 URL path/query 或分类名而命中目标记录
+[a07-excludes-url-path-all-html-status] PASS GET http://127.0.0.1:56173/?q=pathonlyd8374416ba15&category= -> HTTP 200（期望 200）
+[a07-excludes-url-path-all-html-content-type] PASS GET 搜索页 Content-Type='text/html; charset=utf-8'
+[a07-excludes-url-path-all-html-form] PASS 搜索页保留 category-search-form
+[a07-excludes-url-path-all-html-category-retained] PASS 搜索表单 category=''（期望 ''）
+[a07-excludes-url-path-all-html-query-retained] PASS 搜索表单 q='pathonlyd8374416ba15'（期望 'pathonlyd8374416ba15'）
+[a07-excludes-url-path-all-html-category-visible] PASS 结果页显示所选归类 ''（表单保留值 ''）
+[a07-excludes-url-path-all-html-query-visible] PASS 结果页显示查询 'pathonlyd8374416ba15'（表单保留值 'pathonlyd8374416ba15'）
+[a07-excludes-url-path-all-html-target-absent] FAIL 实际搜索表单的记录行不因排除字段命中；不检查页面回显
+[a07-excludes-url-path-category-json-status] PASS GET http://127.0.0.1:56173/api/bookmarks?q=pathonlyd8374416ba15&category=atlas-a07a-f774abc1ba -> HTTP 200（期望 200）
+[a07-excludes-url-path-category-json-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a07-excludes-url-path-category-json-target-absent] FAIL JSON 不因 URL path/query 或分类名而命中目标记录
+[a07-excludes-url-path-category-html-status] PASS GET http://127.0.0.1:56173/?q=pathonlyd8374416ba15&category=atlas-a07a-f774abc1ba -> HTTP 200（期望 200）
+[a07-excludes-url-path-category-html-content-type] PASS GET 搜索页 Content-Type='text/html; charset=utf-8'
+[a07-excludes-url-path-category-html-form] PASS 搜索页保留 category-search-form
+[a07-excludes-url-path-category-html-category-retained] PASS 搜索表单 category='atlas-a07a-f774abc1ba'（期望 'atlas-a07a-f774abc1ba'）
+[a07-excludes-url-path-category-html-query-retained] PASS 搜索表单 q='pathonlyd8374416ba15'（期望 'pathonlyd8374416ba15'）
+[a07-excludes-url-path-category-html-category-visible] PASS 结果页显示所选归类 'atlas-a07a-f774abc1ba'（表单保留值 'atlas-a07a-f774abc1ba'）
+[a07-excludes-url-path-category-html-query-visible] PASS 结果页显示查询 'pathonlyd8374416ba15'（表单保留值 'pathonlyd8374416ba15'）
+[a07-excludes-url-path-category-html-target-absent] FAIL 实际搜索表单的记录行不因排除字段命中；不检查页面回显
+[a07-url-query-isolated-token] PASS 负例 token 不在目标记录 title/hostname/description
+[a07-excludes-url-query-all-json-status] PASS GET http://127.0.0.1:56173/api/bookmarks?q=queryonly118570b2faf6 -> HTTP 200（期望 200）
+[a07-excludes-url-query-all-json-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a07-excludes-url-query-all-json-target-absent] PASS JSON 不因 URL path/query 或分类名而命中目标记录
+[a07-excludes-url-query-all-html-status] PASS GET http://127.0.0.1:56173/?q=queryonly118570b2faf6&category= -> HTTP 200（期望 200）
+[a07-excludes-url-query-all-html-content-type] PASS GET 搜索页 Content-Type='text/html; charset=utf-8'
+[a07-excludes-url-query-all-html-form] PASS 搜索页保留 category-search-form
+[a07-excludes-url-query-all-html-category-retained] PASS 搜索表单 category=''（期望 ''）
+[a07-excludes-url-query-all-html-query-retained] PASS 搜索表单 q='queryonly118570b2faf6'（期望 'queryonly118570b2faf6'）
+[a07-excludes-url-query-all-html-category-visible] PASS 结果页显示所选归类 ''（表单保留值 ''）
+[a07-excludes-url-query-all-html-query-visible] PASS 结果页显示查询 'queryonly118570b2faf6'（表单保留值 'queryonly118570b2faf6'）
+[a07-excludes-url-query-all-html-target-absent] PASS 实际搜索表单的记录行不因排除字段命中；不检查页面回显
+[a07-excludes-url-query-category-json-status] PASS GET http://127.0.0.1:56173/api/bookmarks?q=queryonly118570b2faf6&category=atlas-a07a-f774abc1ba -> HTTP 200（期望 200）
+[a07-excludes-url-query-category-json-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a07-excludes-url-query-category-json-target-absent] PASS JSON 不因 URL path/query 或分类名而命中目标记录
+[a07-excludes-url-query-category-html-status] PASS GET http://127.0.0.1:56173/?q=queryonly118570b2faf6&category=atlas-a07a-f774abc1ba -> HTTP 200（期望 200）
+[a07-excludes-url-query-category-html-content-type] PASS GET 搜索页 Content-Type='text/html; charset=utf-8'
+[a07-excludes-url-query-category-html-form] PASS 搜索页保留 category-search-form
+[a07-excludes-url-query-category-html-category-retained] PASS 搜索表单 category='atlas-a07a-f774abc1ba'（期望 'atlas-a07a-f774abc1ba'）
+[a07-excludes-url-query-category-html-query-retained] PASS 搜索表单 q='queryonly118570b2faf6'（期望 'queryonly118570b2faf6'）
+[a07-excludes-url-query-category-html-category-visible] PASS 结果页显示所选归类 'atlas-a07a-f774abc1ba'（表单保留值 'atlas-a07a-f774abc1ba'）
+[a07-excludes-url-query-category-html-query-visible] PASS 结果页显示查询 'queryonly118570b2faf6'（表单保留值 'queryonly118570b2faf6'）
+[a07-excludes-url-query-category-html-target-absent] PASS 实际搜索表单的记录行不因排除字段命中；不检查页面回显
+[a07-category-name-isolated-token] PASS 负例 token 不在目标记录 title/hostname/description
+[a07-excludes-category-name-all-json-status] PASS GET http://127.0.0.1:56173/api/bookmarks?q=atlas-a07a-f774abc1ba -> HTTP 200（期望 200）
+[a07-excludes-category-name-all-json-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a07-excludes-category-name-all-json-target-absent] PASS JSON 不因 URL path/query 或分类名而命中目标记录
+[a07-excludes-category-name-all-html-status] PASS GET http://127.0.0.1:56173/?q=atlas-a07a-f774abc1ba&category= -> HTTP 200（期望 200）
+[a07-excludes-category-name-all-html-content-type] PASS GET 搜索页 Content-Type='text/html; charset=utf-8'
+[a07-excludes-category-name-all-html-form] PASS 搜索页保留 category-search-form
+[a07-excludes-category-name-all-html-category-retained] PASS 搜索表单 category=''（期望 ''）
+[a07-excludes-category-name-all-html-query-retained] PASS 搜索表单 q='atlas-a07a-f774abc1ba'（期望 'atlas-a07a-f774abc1ba'）
+[a07-excludes-category-name-all-html-category-visible] PASS 结果页显示所选归类 ''（表单保留值 ''）
+[a07-excludes-category-name-all-html-query-visible] PASS 结果页显示查询 'atlas-a07a-f774abc1ba'（表单保留值 'atlas-a07a-f774abc1ba'）
+[a07-excludes-category-name-all-html-target-absent] PASS 实际搜索表单的记录行不因排除字段命中；不检查页面回显
+[a07-excludes-category-name-category-json-status] PASS GET http://127.0.0.1:56173/api/bookmarks?q=atlas-a07a-f774abc1ba&category=atlas-a07a-f774abc1ba -> HTTP 200（期望 200）
+[a07-excludes-category-name-category-json-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a07-excludes-category-name-category-json-target-absent] PASS JSON 不因 URL path/query 或分类名而命中目标记录
+[a07-excludes-category-name-category-html-status] PASS GET http://127.0.0.1:56173/?q=atlas-a07a-f774abc1ba&category=atlas-a07a-f774abc1ba -> HTTP 200（期望 200）
+[a07-excludes-category-name-category-html-content-type] PASS GET 搜索页 Content-Type='text/html; charset=utf-8'
+[a07-excludes-category-name-category-html-form] PASS 搜索页保留 category-search-form
+[a07-excludes-category-name-category-html-category-retained] PASS 搜索表单 category='atlas-a07a-f774abc1ba'（期望 'atlas-a07a-f774abc1ba'）
+[a07-excludes-category-name-category-html-query-retained] PASS 搜索表单 q='atlas-a07a-f774abc1ba'（期望 'atlas-a07a-f774abc1ba'）
+[a07-excludes-category-name-category-html-category-visible] PASS 结果页显示所选归类 'atlas-a07a-f774abc1ba'（表单保留值 'atlas-a07a-f774abc1ba'）
+[a07-excludes-category-name-category-html-query-visible] PASS 结果页显示查询 'atlas-a07a-f774abc1ba'（表单保留值 'atlas-a07a-f774abc1ba'）
+[a07-excludes-category-name-category-html-target-absent] PASS 实际搜索表单的记录行不因排除字段命中；不检查页面回显
+[a07-html-positive-title-status] PASS GET http://127.0.0.1:56173/?q=SHAREDF5B7E4CE2DF7&category=atlas-a07a-f774abc1ba -> HTTP 200（期望 200）
+[a07-html-positive-title-content-type] PASS GET 搜索页 Content-Type='text/html; charset=utf-8'
+[a07-html-positive-title-form] PASS 搜索页保留 category-search-form
+[a07-html-positive-title-category-retained] PASS 搜索表单 category='atlas-a07a-f774abc1ba'（期望 'atlas-a07a-f774abc1ba'）
+[a07-html-positive-title-query-retained] PASS 搜索表单 q='SHAREDF5B7E4CE2DF7'（期望 'SHAREDF5B7E4CE2DF7'）
+[a07-html-positive-title-category-visible] PASS 结果页显示所选归类 'atlas-a07a-f774abc1ba'（表单保留值 'atlas-a07a-f774abc1ba'）
+[a07-html-positive-title-query-visible] PASS 结果页显示查询 'SHAREDF5B7E4CE2DF7'（表单保留值 'SHAREDF5B7E4CE2DF7'）
+[a07-html-positive-title-hit] PASS 允许字段经真实 HTML 搜索表单仍命中同一记录
+[a07-html-positive-hostname-status] PASS GET http://127.0.0.1:56173/?q=HOST9FC23C12F708&category=atlas-a07a-f774abc1ba -> HTTP 200（期望 200）
+[a07-html-positive-hostname-content-type] PASS GET 搜索页 Content-Type='text/html; charset=utf-8'
+[a07-html-positive-hostname-form] PASS 搜索页保留 category-search-form
+[a07-html-positive-hostname-category-retained] PASS 搜索表单 category='atlas-a07a-f774abc1ba'（期望 'atlas-a07a-f774abc1ba'）
+[a07-html-positive-hostname-query-retained] PASS 搜索表单 q='HOST9FC23C12F708'（期望 'HOST9FC23C12F708'）
+[a07-html-positive-hostname-category-visible] PASS 结果页显示所选归类 'atlas-a07a-f774abc1ba'（表单保留值 'atlas-a07a-f774abc1ba'）
+[a07-html-positive-hostname-query-visible] PASS 结果页显示查询 'HOST9FC23C12F708'（表单保留值 'HOST9FC23C12F708'）
+[a07-html-positive-hostname-hit] PASS 允许字段经真实 HTML 搜索表单仍命中同一记录
+[a07-html-positive-description-status] PASS GET http://127.0.0.1:56173/?q=DESCRA88EB3DFCA4B&category=atlas-a07a-f774abc1ba -> HTTP 200（期望 200）
+[a07-html-positive-description-content-type] PASS GET 搜索页 Content-Type='text/html; charset=utf-8'
+[a07-html-positive-description-form] PASS 搜索页保留 category-search-form
+[a07-html-positive-description-category-retained] PASS 搜索表单 category='atlas-a07a-f774abc1ba'（期望 'atlas-a07a-f774abc1ba'）
+[a07-html-positive-description-query-retained] PASS 搜索表单 q='DESCRA88EB3DFCA4B'（期望 'DESCRA88EB3DFCA4B'）
+[a07-html-positive-description-category-visible] PASS 结果页显示所选归类 'atlas-a07a-f774abc1ba'（表单保留值 'atlas-a07a-f774abc1ba'）
+[a07-html-positive-description-query-visible] PASS 结果页显示查询 'DESCRA88EB3DFCA4B'（表单保留值 'DESCRA88EB3DFCA4B'）
+[a07-html-positive-description-hit] PASS 允许字段经真实 HTML 搜索表单仍命中同一记录
+[a07-html-empty-status] PASS GET http://127.0.0.1:56173/?q=absent50d331e1cd03&category=atlas-a07a-f774abc1ba -> HTTP 200（期望 200）
+[a07-html-empty-content-type] PASS GET 搜索页 Content-Type='text/html; charset=utf-8'
+[a07-html-empty-form] PASS 搜索页保留 category-search-form
+[a07-html-empty-category-retained] PASS 搜索表单 category='atlas-a07a-f774abc1ba'（期望 'atlas-a07a-f774abc1ba'）
+[a07-html-empty-query-retained] PASS 搜索表单 q='absent50d331e1cd03'（期望 'absent50d331e1cd03'）
+[a07-html-empty-category-visible] PASS 结果页显示所选归类 'atlas-a07a-f774abc1ba'（表单保留值 'atlas-a07a-f774abc1ba'）
+[a07-html-empty-query-visible] PASS 结果页显示查询 'absent50d331e1cd03'（表单保留值 'absent50d331e1cd03'）
+[a07-html-empty-no-rows] PASS 归类 'atlas-a07a-f774abc1ba' 中 q='absent50d331e1cd03' 无记录行，实际 []
+[a07-html-empty-marker] PASS 无匹配时显示明确空结果，实际 '暂无记录'
+[atlas] A07: failed; 失败断言: a07-excludes-url-path-all-json-target-absent, a07-excludes-url-path-all-html-target-absent, a07-excludes-url-path-category-json-target-absent, a07-excludes-url-path-category-html-target-absent

@@ -1,0 +1,16 @@
+--- R6/acceptance/runner.json
++++ R7/acceptance/runner.json
+@@ -33,7 +33,12 @@
+       "args": ["--case", "{case_id}", "--base-url", "{base_url}"]
+     },
+     "A11": {
+-      "args": ["--case", "{case_id}", "--base-url", "{base_url}"]
++      "args": ["--case", "{case_id}", "--base-url", "{base_url}",
++        "--app-root",
++        "{app_root}",
++        "--data-dir",
++        "{data_dir}"
++      ]
+     },
+     "A12": {
+       "args": ["--case", "{case_id}", "--base-url", "{base_url}"]

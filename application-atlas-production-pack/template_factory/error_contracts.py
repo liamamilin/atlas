@@ -4,6 +4,7 @@ from .store import FactoryError
 BOOKMARK_PRODUCT = "product-c42848f63251507bd9d911a5"
 BOOKMARK_SCENARIO = "scn_7756e0007f6a463a97316f3f49c15248"
 ERROR_SCHEMA = "atlas.bookmark-error-contract.v1"
+ERROR_SCHEMA_R7 = "atlas.bookmark-error-contract.v2"
 
 
 def bookmark_bound(snapshot):
@@ -11,7 +12,7 @@ def bookmark_bound(snapshot):
             and snapshot.get("scenario", {}).get("id") == BOOKMARK_SCENARIO)
 
 
-def required_branches():
+def required_branches(schema=ERROR_SCHEMA):
     rows = []
 
     def add(transport, operation, field, value_kind, code, case, features):
@@ -37,7 +38,13 @@ def required_branches():
             if operation == "bookmark_move" and transport == "json":
                 kinds += ("omitted", "null")
             for kind in kinds:
-                add(transport, operation, field, kind, "invalid_category", "A12", ["F04", "F10"])
+                # R6's frozen contract attributed all A12 branches to F04/F10.
+                # R7 is a separate, explicit mapping revision: saves belong to
+                # F01/F10 while moves remain F04/F10. Keep the historical schema
+                # intact so old candidates and checkpoints continue to validate.
+                features = (["F01", "F10"] if schema == ERROR_SCHEMA_R7 and operation == "bookmark_save"
+                            else ["F04", "F10"])
+                add(transport, operation, field, kind, "invalid_category", "A12", features)
     return rows
 
 
@@ -50,10 +57,12 @@ def validate_error_contract(spec, file_plan=None, *, required=False):
     def fail(message):
         raise FactoryError(message, "error_contract_invalid", 409)
 
-    expected = required_branches()
-    if not isinstance(contract, dict) or set(contract) != {"schema", "branches"} or contract.get("schema") != ERROR_SCHEMA:
+    schema = contract.get("schema") if isinstance(contract, dict) else None
+    if (not isinstance(contract, dict) or set(contract) != {"schema", "branches"}
+            or schema not in {ERROR_SCHEMA, ERROR_SCHEMA_R7}):
         fail("bound negative error contract is missing or unsupported")
     rows = contract.get("branches")
+    expected = required_branches(schema)
     if not isinstance(rows, list) or rows != expected:
         fail("negative branches are missing, duplicated, reordered or use a mixed error code/field/transport")
     features = {r["id"]: r for r in spec.get("features", [])}

@@ -1,0 +1,164 @@
+{
+  "schema": "atlas.r7-findings-disposition.v1",
+  "items": [
+    {
+      "source": "docs/template-factory/g1-r6-source-alignment-2026-10-20/actual-six-new-review-proof.json",
+      "checkpoint": "blueprint-design-check-0-architecture_contract-bbc43771a1bbbe99",
+      "suggestion_index": 0,
+      "text": "统一 ARCHITECTURE.md 第 31/34 行与第 78–81 行的分类校验：把纯空白明确写进 POST/PATCH 分类及书签保存/移动的 API 摘要，避免被理解为纯空白可自动创建新名称。",
+      "disposition": "existing_contract_covers",
+      "reason": "ARCHITECTURE API摘要之外同一文档末节A04/A12明确纯空白400；32分支与p0_organize逐项验证，不改API摘要超出授权。",
+      "evidence": "r6-plan.json:spec.architecture_markdown末节A04/A12；prepared-programs/acceptance/p0_organize.py"
+    },
+    {
+      "source": "docs/template-factory/g1-r6-source-alignment-2026-10-20/actual-six-new-review-proof.json",
+      "checkpoint": "blueprint-design-check-0-architecture_contract-bbc43771a1bbbe99",
+      "suggestion_index": 1,
+      "text": "明确 GET /api/bookmarks?category=<name|id> 在归类名称与 ID 冲突时的解析优先级（建议 ID 优先），并让 HTML 归类链接使用同一约定。",
+      "disposition": "deferred_nonblocking",
+      "reason": "当前合同只要求已有名称或ID过滤，未规定名称与ID碰撞优先级；本轮不新增行为默认。此建议不是现有必需分支缺失。",
+      "evidence": "r6-plan.json:architecture GET /api/bookmarks；CASE_DESIGN search choice"
+    },
+    {
+      "source": "docs/template-factory/g1-r6-source-alignment-2026-10-20/actual-six-new-review-proof.json",
+      "checkpoint": "blueprint-design-check-0-architecture_contract-bbc43771a1bbbe99",
+      "suggestion_index": 2,
+      "text": "把 F02 的“应用启动时补齐预置归类”收敛为仅修复缺失的默认归类，不复活用户已删除的“待购/家居改造/以后看看”，以与 ARCHITECTURE.md 的首启预置和 F03 的删除持久化一致。",
+      "disposition": "fixed_R7",
+      "reason": "F02 recovery/success_state限首启四预置，后续保留持久化状态不复活非默认。",
+      "evidence": "patch.json:contract_coverage.features.F02"
+    },
+    {
+      "source": "docs/template-factory/g1-r6-source-alignment-2026-10-20/actual-six-new-review-proof.json",
+      "checkpoint": "blueprint-design-check-0-architecture_contract-bbc43771a1bbbe99",
+      "suggestion_index": 3,
+      "text": "在 error_contract 或 F10 的 error_branch_ids 中补充 invalid_url 与 bad_request（畸形 JSON）分支，使 A02/A10 的计划覆盖与 ARCHITECTURE.md 的错误合同一致。",
+      "disposition": "existing_programs_cover_deferred_trace",
+      "reason": "32类别分支合同明确限定A04/A12；A02验证invalid_url双入口，A10已验证畸形JSON bad_request及零写入。本轮不扩32分支或新错误追踪字段。",
+      "evidence": "prepared-programs/acceptance/p0_library.py:_case_a02；p0_recovery.py:_case_a10"
+    },
+    {
+      "source": "docs/template-factory/g1-r6-source-alignment-2026-10-20/actual-six-new-review-proof.json",
+      "checkpoint": "blueprint-design-check-0-architecture_contract-bbc43771a1bbbe99",
+      "suggestion_index": 4,
+      "text": "对齐 CASE_DESIGN 中 F11 的“edit”和记录生命周期的 visit fields 与 ARCHITECTURE.md 第 48 行/F24 的既定 P0 范围；若坚持无记录编辑界面且不保留访问统计，请把该限制写成明确的阶段说明，避免 API PATCH 被读作浏览器 UI 能力。",
+      "disposition": "fixed_R7",
+      "reason": "仅两choices capability/reason精确澄清，证据ID/disposition/其余8条不变；不引入编辑UI或访问字段。",
+      "evidence": "patch.json:case_design_changes"
+    },
+    {
+      "source": "docs/template-factory/g1-r6-source-alignment-2026-10-20/actual-six-new-review-proof.json",
+      "checkpoint": "blueprint-design-check-0-phase_acceptance",
+      "suggestion_index": 0,
+      "text": "A11 的「空库」和 A03 的「首启」目前只用 base_url 与不存在的归类过滤验证；建议在隔离的新实例（app_root/data_dir）上执行，或把目标明确收窄为「无匹配归类的空状态」，避免非空目标被误判为空库。",
+      "disposition": "fixed_R7",
+      "reason": "A11自身同冻结app_root的fresh实例，未过滤全库含trash、四预置、HTML空态，base/fresh分组断言与清理；A03程序原字节。",
+      "evidence": "p0_library.py.diff；runner.json.diff；verification/program-fixtures.txt"
+    },
+    {
+      "source": "docs/template-factory/g1-r6-source-alignment-2026-10-20/actual-six-new-review-proof.json",
+      "checkpoint": "blueprint-design-check-0-phase_acceptance",
+      "suggestion_index": 1,
+      "text": "A02 的目标同时声明 HTML 与 JSON 接受单标签主机 URL，但文件计划只明确用保存表单做正向提交；建议补充 JSON 保存单标签主机的正向断言，或把该正向目标限定为表单路径。",
+      "disposition": "fixed_R7",
+      "reason": "独立JSON POST合法单标签hostname；201/新ID/GET与列表精确读回；保留双入口负例。",
+      "evidence": "p0_library.py.diff；verification/program-fixtures.txt"
+    },
+    {
+      "source": "docs/template-factory/g1-r6-source-alignment-2026-10-20/actual-six-new-review-proof.json",
+      "checkpoint": "blueprint-design-check-0-phase_acceptance",
+      "suggestion_index": 2,
+      "text": "A01 的 base_url 流程与隔离实例流程各自保存记录；若「该记录」要求同一条记录跨进程稳定，建议在隔离实例内先读回再重启并断言同一 id，或明确拆成两个独立断言。",
+      "disposition": "closed_existing_code",
+      "reason": "隔离实例先保存并取restart_id，_get_record first_client读回同ID/原URL；stop后使用同instance_dir启动second并按restart_id查行和GET。没有借用base实例记录。",
+      "evidence": "prepared-programs/acceptance/p0_library.py:_case_a01 a01-instance-json-url/a01-restart-id"
+    },
+    {
+      "source": "docs/template-factory/g1-r6-source-alignment-2026-10-20/actual-six-new-review-proof.json",
+      "checkpoint": "blueprint-design-check-0-product_completeness",
+      "suggestion_index": 0,
+      "text": "把 A12 的 bookmark_save.category.* 从 F04 改归 F01，并把 A12 加入 F01 的 acceptance_ids/error_branch_ids；F04 仅保留 bookmark_move 分支，使保存表单的 invalid_category 失败、form-error 和重试路径与入口一致。",
+      "disposition": "fixed_R7",
+      "reason": "6save归F01/F10，8move保持F04/F10，F01与A12双向引用；32其他字段不变。schema v2仅区分此映射和历史v1。",
+      "evidence": "patch.json；template_factory/error_contracts.py"
+    },
+    {
+      "source": "docs/template-factory/g1-r6-source-alignment-2026-10-20/actual-six-new-review-proof.json",
+      "checkpoint": "blueprint-design-check-0-product_completeness",
+      "suggestion_index": 1,
+      "text": "在 A04 或 A05 中显式增加“用户新建或重命名归类后重启仍可见”的断言，并使用独立创建的对象，不假定它与移动用例共享同一归类。",
+      "disposition": "partly_closed_partly_deferred",
+      "reason": "A05隔离实例创建唯一分类、保存/移动后以同实例目录重启，按分类ID/名称/记录归属验证，已覆盖新建分类持久化。A04重命名跨重启是另一个建议，本轮未新增、未声称通过。",
+      "evidence": "prepared-programs/acceptance/p0_organize.py:_a05_across_restart a05-restart-target / a05-restart-category-id / a05-restart-record-category / a05-restart-html-visible"
+    },
+    {
+      "source": "docs/template-factory/g1-r6-source-alignment-2026-10-20/actual-six-new-review-proof.json",
+      "checkpoint": "blueprint-design-check-0-runtime_protocol",
+      "suggestion_index": 0,
+      "text": "在 acceptance/README.md 的 delivery.json 示例旁明确：/state/app-data 属于应用运行卷，不是测试者 --data-dir 根；测试者隔离实例仍使用 data_dir/instances/<uuid>，且 A14 的 --data-dir 仅用于测试草稿文件，不读取或替代应用数据库。",
+      "disposition": "closed_existing_docs_plus_R7",
+      "reason": "README第9节已明确应用持久化/state/app-data不同于测试草稿data_dir；R7补A11fresh参数/边界。",
+      "evidence": "prepared-programs/acceptance/README.md:第1.2/9节"
+    },
+    {
+      "source": "docs/template-factory/g1-r6-source-alignment-2026-10-20/actual-six-new-review-proof.json",
+      "checkpoint": "blueprint-design-check-0-scenario_scope",
+      "suggestion_index": 0,
+      "text": "F09 的理由写“场景要求可恢复的失败”、R01 写“清理误存条目”，但确认场景未包含删除或清理步骤；建议保留既有 P0 能力不动，只把措辞标注为支撑性数据清理，避免把新增范围表述为场景验收要求。",
+      "disposition": "deferred_nonblocking",
+      "reason": "保留既有P0数据清理/恢复支撑能力及原理由字节；确认场景未要求删除流程，建议措辞不构成必需新功能。本轮授权不含F09理由改写。",
+      "evidence": "r6-plan.json:features.F09；scenario固定workflow/acceptance"
+    },
+    {
+      "source": "../g1-r6-source-alignment-2026-10-20/actual-aggregate-review.json",
+      "finding_index": 0,
+      "original": {
+        "basis": "source/candidate/acceptance/p0_library.py `_case_a02`: the single-label boundary `http://atlas-a02-<token>` is submitted only through `_save_form_from_home`/`post_form`; the JSON loop submits only invalid URLs and never a valid single-label URL. This leaves the authorized `single_label_hostname_negative_to_positive` replacement absent from the JSON path even though the authored A02 goal says both the save form and JSON must accept it.",
+        "severity": "blocker"
+      },
+      "disposition": "fixed_R7_or_retained_host_fix",
+      "patch_or_evidence": "A02 independent JSON positive"
+    },
+    {
+      "source": "../g1-r6-source-alignment-2026-10-20/actual-aggregate-review.json",
+      "finding_index": 1,
+      "original": {
+        "basis": "source/candidate/acceptance/p0_find_open.py `_case_a07`: the URL path/query tokens are never used as a query, and no query equal to a category name is tested. The host policy `search_contract` states search is over title, hostname and description and does not match tags or raw URL substrings; `CASE_DESIGN.json` F06 also states raw URL text and category names are not additional keyword fields. Current A07 assertions do not distinguish implementation that additionally searches raw URLs or category names.",
+        "severity": "blocker"
+      },
+      "disposition": "fixed_R7_or_retained_host_fix",
+      "patch_or_evidence": "A07 excluded-field controls"
+    },
+    {
+      "source": "../g1-r6-source-alignment-2026-10-20/actual-aggregate-review.json",
+      "finding_index": 2,
+      "original": {
+        "basis": "input.json `program_file_hashes_before/after` records `acceptance/plan.json` changing (7a2e79... -> 56e5cc...), but plan.json is absent from source/baseline/ and source/candidate/ and is not included in exact_diff.program_diffs or edit_paths. This may be a generated plan artifact, but the supplied evidence does not permit verifying whether it is an unauthorized program change.",
+        "severity": "uncertain"
+      },
+      "disposition": "fixed_R7_or_retained_host_fix",
+      "patch_or_evidence": "7eb host metadata inventory fix retained"
+    },
+    {
+      "source": "../g1-r6-source-alignment-2026-10-20/actual-aggregate-review.json",
+      "finding_index": 3,
+      "original": {
+        "basis": "source/candidate/acceptance/README.md line 117 claims A04 retains equivalent JSON API assertions, but candidate A04 exercises JSON only for duplicate/protection/invalid-name; the baseline's successful JSON rename and delete assertions are replaced by HTML success paths. Correct the README claim or add the successful JSON rename/delete assertions.",
+        "severity": "suggestion"
+      },
+      "disposition": "fixed_R7_or_retained_host_fix",
+      "patch_or_evidence": "README A04 factual correction"
+    },
+    {
+      "source": "../g1-r6-source-alignment-2026-10-20/actual-aggregate-review.json",
+      "finding_index": 4,
+      "original": {
+        "basis": "source/candidate/CASE_DESIGN.json F11 says server-rendered HTML pages and forms support 'add, edit and organize' actions, while source/candidate/ARCHITECTURE.md line 48 says P0 has no isolated record edit UI and only retains the PATCH API contract. Clarify whether edit is API-only or an HTML journey so the case design and architecture do not assert different target capabilities.",
+        "severity": "suggestion"
+      },
+      "disposition": "fixed_R7_or_retained_host_fix",
+      "patch_or_evidence": "two exact target adaptation choices"
+    }
+  ],
+  "claim_boundary": "Static program verification only; R7 real reviews/runtime/G1 are separate required evidence."
+}

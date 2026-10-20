@@ -29,9 +29,10 @@ from template_factory.cognition import (
     validate_file_plan,
     validate_research,
     validate_review,
+    _validate_r7_program_revision,
 )
 from template_factory.budget import BudgetLedger
-from template_factory.contract_scope import aggregate_semantic_budget_stage, validate_repair_diff
+from template_factory.contract_scope import aggregate_semantic_budget_stage, aggregate_semantic_diff_digest, validate_repair_diff
 from template_factory.pipeline import Pipeline
 from template_factory.store import FactoryError, canonical, digest
 
@@ -40,6 +41,7 @@ class FakeCognitionCLI:
     def __init__(self, source):
         self.source = source
         self.calls = []
+        self.call_directories = []
         self.fail_generation = False
         self.bad_structure_once = False
         self.review_outcome = "passed"
@@ -70,6 +72,7 @@ class FakeCognitionCLI:
     def run(self, directory, prompt, model, timeout, cancelled, progress):
         stage = directory.name
         self.calls.append(stage)
+        self.call_directories.append(Path(directory))
         fixture = json.loads((self.source / "template.json").read_text())
         if stage == "blueprint-research":
             sources = deepcopy(fixture["sources"][1:])
@@ -364,6 +367,35 @@ class FakeCognitionCLI:
 class CognitionTests(unittest.TestCase):
     setUp = blueprint_fixtures.BlueprintTests.setUp
 
+    def test_r7_program_revision_requires_exact_four_replacements_and_five_reuses(self):
+        paths = (
+            "acceptance/common.py", "acceptance/p0_library.py", "acceptance/p0_organize.py",
+            "acceptance/p0_find_open.py", "acceptance/p0_recovery.py",
+            "acceptance/p1_maturity.py", "acceptance/requirements.txt",
+            "acceptance/README.md", "acceptance/runner.json",
+        )
+        replace = {"acceptance/p0_library.py", "acceptance/p0_find_open.py",
+                   "acceptance/README.md", "acceptance/runner.json"}
+        contents, entries = {}, []
+        for path in paths:
+            text = "prepared:" + path
+            after = hashlib.sha256(text.encode()).hexdigest()
+            mode = "replace" if path in replace else "reuse"
+            before = hashlib.sha256(("source:" + path).encode()).hexdigest() if mode == "replace" else after
+            contents[path] = text
+            entries.append({"path": path, "mode": mode, "before_sha256": before, "after_sha256": after})
+        prepared = {"prepared_program_revision": {"entries": entries}}
+        plan = {"file_plan": [{"path": path} for path in paths]}
+        _validate_r7_program_revision(prepared, contents, plan)
+        bad = deepcopy(prepared)
+        bad["prepared_program_revision"]["entries"][0]["mode"] = "replace"
+        with self.assertRaises(FactoryError):
+            _validate_r7_program_revision(bad, contents, plan)
+        missing = deepcopy(plan)
+        missing["file_plan"].pop()
+        with self.assertRaises(FactoryError):
+            _validate_r7_program_revision(prepared, contents, missing)
+
     def test_missing_or_reserved_spec_fields_rejected_before_program_authoring(self):
         fixture = json.loads((self.source / "template.json").read_text())
         keys = (
@@ -424,6 +456,72 @@ class CognitionTests(unittest.TestCase):
             self.assertEqual(validate_aggregate_semantic_review(nonpassing, identity), nonpassing)
             with self.assertRaises(FactoryError):
                 require_aggregate_semantic_review_pass(nonpassing)
+
+    def test_legacy_aggregate_checkpoint_keeps_pre_r7_digest_and_identity(self):
+        _, _, artifact = self.produce()
+        baseline_spec = json.loads((self.store.root / artifact["bundle_path"] / "source/template.json").read_text())
+        scope = {
+            "version": "atlas.aggregate-repair-scope.v1",
+            "known_blockers": [{
+                "feature_id": "F03", "acceptance_id": "A04", "decision_id": "D03",
+                "basis": "Retain the accepted category workflow while validating checkpoint recovery.",
+            }],
+            "authorized_assertion_changes": [{
+                "acceptance_id": "A02",
+                "change": "single_label_hostname_negative_to_positive",
+                "rationale": "This legacy checkpoint fixture makes no authored changes.",
+            }],
+            "authored_field_paths": [["architecture_markdown"]],
+            "edit_paths": ["acceptance/README.md"],
+        }
+        queued = self.store.create_repair(artifact["id"], {
+            "expected_digest": artifact["digest"],
+            "note": "Keep the accepted template intact while verifying recovery.",
+            "model": "fake/flash",
+            "repair_scope": scope,
+            "edit_paths": scope["edit_paths"],
+        })
+        pipeline = self.pipeline()
+        self.cli.scope_repair_baseline = baseline_spec
+        job = self.store.claim("legacy aggregate checkpoint", "production")
+        self.assertEqual(job["id"], queued["jobs"][0]["id"])
+
+        # Stop immediately after a passed aggregate review is persisted, then
+        # independently reconstruct the exact pre-R7 checkpoint key formula.
+        with patch("template_factory.cognition.freeze_blueprint", side_effect=FactoryError("stop after review")):
+            with self.assertRaisesRegex(FactoryError, "stop after review"):
+                pipeline.run(job)
+        aggregate_calls = [name for name in self.cli.calls if name == "aggregate-semantic-review"]
+        self.assertEqual(len(aggregate_calls), 1, self.cli.calls)
+        review_directory = self.cli.call_directories[-1]
+        review_input = json.loads((review_directory / "input.json").read_text())
+        repair_diff = json.loads((review_directory.parent / "context/AGGREGATE_REPAIR_DIFF.json").read_text())
+        repair_snapshot = self.store.job(job["id"])["snapshot"]["cognitive_repair"]
+        cumulative_digest = aggregate_semantic_diff_digest(
+            scope=repair_snapshot["repair_scope"],
+            baseline_digest=repair_diff["baseline_artifact_digest"],
+            before_spec=repair_diff["authored_fields_before"],
+            after_spec=repair_diff["authored_fields_after"],
+            before_program_hashes=repair_diff["program_file_hashes_before"],
+            after_program_hashes=repair_diff["program_file_hashes_after"],
+            case_design_before=repair_diff["case_design_before"],
+            case_design_after=repair_diff["case_design_after"],
+            case_adaptation_revision=repair_diff["case_adaptation_revision"],
+            case_adaptation_input=repair_diff["case_adaptation_input"],
+        )
+        legacy_diff_digest = digest({
+            "cumulative_diff_digest": cumulative_digest,
+            "r6_incremental_diff": None,
+            "generated_metadata_digest": digest(repair_diff["generated_metadata"]),
+        })
+        self.assertEqual(repair_diff["diff_digest"], legacy_diff_digest)
+        self.assertEqual(review_input["identity"]["diff_digest"], legacy_diff_digest)
+        self.assertNotIn("r7_authorization_material_digest", review_input["identity"])
+        checkpoint_name = "aggregate-semantic-review-" + legacy_diff_digest[:16]
+        saved = self.store.checkpoint(job["id"], checkpoint_name)
+        self.assertIsNotNone(saved, "legacy key must resolve to the already-passed aggregate checkpoint")
+        self.assertEqual(saved["result"]["outcome"], "passed")
+        self.assertEqual(self.cli.calls.count("aggregate-semantic-review"), 1, "checkpoint creation must use one CLI call")
 
     def test_new_aggregate_revision_has_a_first_call_stage_under_same_retry_scope(self):
         ledger = BudgetLedger(self.store, campaign_id="aggregate-semantic-stage-test")
