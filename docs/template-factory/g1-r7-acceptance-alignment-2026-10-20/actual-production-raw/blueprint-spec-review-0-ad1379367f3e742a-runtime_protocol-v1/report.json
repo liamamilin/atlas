@@ -1,0 +1,22 @@
+{
+ "outcome": "passed",
+ "summary": "按 runtime_protocol 复核完整架构、验收契约与 file_plan：交付 profile 为 python-web；验收程序基于 __file__ 自举导入；app_root 只读、data_dir 仅作测试草稿并以 data_dir/instances/<uuid> 隔离；web 用例均走 --base-url；A01/A05/A09 具备同冻结应用的真实进程重启适配器（真实表单动作→SIGTERM→同目录重启→读回），A11 明确为 fresh 首启而非重启；start argv 为字面量，未发现占位符插值、绕过 base_url 或虚假重启/持久化承诺。未发现与 RUNTIME_CONTRACT.md 的具体不兼容。",
+ "checks": [
+  {
+   "dimension": "runtime_protocol",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md",
+    "RUNTIME_CONTRACT.md"
+   ],
+   "reason": "ARCHITECTURE.md“验收适配器合同”与 DRAFT.md 的 acceptance/file_plan 规定：common.py 通过 os.path.dirname(os.path.abspath(__file__)) 自举 sys.path 并 import common；--base-url 精确 origin；--app-root 只读；--data-dir 仅测试者草稿根，每实例数据库位于 data_dir/instances/<uuid>；A01/A05/A09 用 common.launch_app 启动 app/serve.py、真实写入、SIGTERM、同一目录重启并读回，A11 使用同一冻结源码的 fresh 实例且明确不宣称同容器重启；runner 为 A01/A05/A09/A11 绑定 app_root/data_dir，A14 绑定 data_dir，其余绑定 base_url；delivery profile 为 python-web，README 要求字面 start argv。未发现 {port}/{data_dir} 插值、测试者自建库冒充持久化或仅更换 HTTP 客户端即宣称重启的承诺。"
+  }
+ ],
+ "suggestions": [],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "review_rules_version": "atlas.current-required-contract.v1",
+ "proposal_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+ "projection_digest": "353b6d2d5c16c26b040997fc53f4526ea3a3a38d2dd2f45cd8a74c42a0aafc06",
+ "stage": "blueprint-spec-review-0-ad1379367f3e742a-runtime_protocol-v1"
+}

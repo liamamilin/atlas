@@ -1,0 +1,260 @@
+{
+  "schema": "atlas.r7-fresh-review-proof.v1",
+  "old_job_id": "job_f3e32b56036b4ec7bea0c00d6a2a8dc4",
+  "new_job_id": "job_3a658ba085e8417ea6faad5cb0cdd493",
+  "old_six_preserved": [
+    {
+      "name": "blueprint-design-check-0-architecture_contract-bbc43771a1bbbe99",
+      "digest": "cefb0bbefc4f94c2169046f89db1f14c64d8fb713688416097ccead73b636881",
+      "unchanged": true
+    },
+    {
+      "name": "blueprint-design-check-0-decisions_defaults",
+      "digest": "407c94b5e4bc2ce7443c53aff9a82929562d4223fc2a8947b6dff588d457caf1",
+      "unchanged": true
+    },
+    {
+      "name": "blueprint-design-check-0-phase_acceptance",
+      "digest": "c78120e580454bd510c96a5e1acc692bd156f5bb1fa13bb05ee13f19182ab301",
+      "unchanged": true
+    },
+    {
+      "name": "blueprint-design-check-0-product_completeness",
+      "digest": "ec1e10e2d99843015539a88cd1af1870479798b1aacb0f6ba039884fe245c498",
+      "unchanged": true
+    },
+    {
+      "name": "blueprint-design-check-0-runtime_protocol",
+      "digest": "161a4e680303519a756999bb8030b8336fbfbbff9b60e2a1e3fff6dff866d845",
+      "unchanged": true
+    },
+    {
+      "name": "blueprint-design-check-0-scenario_scope",
+      "digest": "c9dfe2a9bac013d9945c4ac43d1915f373954bbb13c556af37c4f7e3c5f7f8f5",
+      "unchanged": true
+    }
+  ],
+  "new_review_count": 6,
+  "all_six_complete": true,
+  "new_reviews": [
+    {
+      "name": "blueprint-design-check-0-architecture_contract-ad1379367f3e742a",
+      "checkpoint_digest": "29f22fbaeabf413b594d286e6a1dd3e75d93239814eebad9e6852eeddc275132",
+      "proposal_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+      "projection_digest": "294ac39bebaaed1dfdc12d02278a5081753863cea047fc91a50e01f46ad31919",
+      "outcome": "passed",
+      "input_sha256": "e9c835290ce052e620935b55d0a3f8df4f9d40b3b2cd10596973f930ce79f77d",
+      "raw_stage": "jobs/job_3a658ba085e8417ea6faad5cb0cdd493/attempt-1/blueprint-spec-review-0-ad1379367f3e742a-architecture_contract",
+      "old_proposal_digest": null,
+      "old_projection_digest": null,
+      "fresh_new_review": true,
+      "result": {
+        "checks": [
+          {
+            "dimension": "architecture_contract",
+            "files": [
+              "DRAFT.md",
+              "ARCHITECTURE.md",
+              "REVISION.md",
+              "CASE_DESIGN.json",
+              "CASE_ADAPTATION_POLICY.json"
+            ],
+            "outcome": "passed",
+            "reason": "ARCHITECTURE.md 的 SQLite 模型（categories/bookmarks、trashed_at、url 不设唯一索引）与 DRAFT.md 的 F01–F11、limits、decisions 对齐；A04 仅对归类 name 返回 invalid_name（含空白与 121 字符），A12 对书签保存/移动分别使用 category/category_id 并返回 invalid_category，未知 GET 归类返回空结果，均与 CASE_ADAPTATION_POLICY.json 一致；归类删除事务迁移活动与软删记录、恢复清空 trashed_at、校验零写入、默认归类保护及 400/409/404 与 303 导航无相互冲突。"
+          }
+        ],
+        "outcome": "passed",
+        "projection_digest": "294ac39bebaaed1dfdc12d02278a5081753863cea047fc91a50e01f46ad31919",
+        "proposal_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+        "review_rules_version": "atlas.current-required-contract.v1",
+        "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+        "stage": "blueprint-spec-review-0-ad1379367f3e742a-architecture_contract",
+        "suggestions": [
+          "在打开链接契约中补充 rel=noreferrer（或明确说明仅保留 noopener），以完全落实 CASE_DESIGN 的 no-referrer 意图。",
+          "为 /categories 的 create/rename/delete 以及记录 move/delete/restore 表单补充明确的 method=post 与 action 路由，避免独立验收依赖实现自选路径。",
+          "明确 F12/D05 的第三方元数据与图标增强仅为 P1 路线图，P0 保持 CASE_DESIGN 的 not_adopted，避免与当前承诺混淆。"
+        ],
+        "summary": "architecture_contract 维度通过：A04/A12 的归类名称与 category_id 语义、默认「未整理」、软删除迁移、错误码以及搜索/URL 策略相互一致，P0 核心旅程的 UI/API/持久化入口完整；未发现需要阻断的契约矛盾或数据完整性/安全缺口。"
+      }
+    },
+    {
+      "name": "blueprint-design-check-0-decisions_defaults",
+      "checkpoint_digest": "38f2d5809bdd654411e6140d1444b726d9723645f5e0b5b48a19ef82956c1323",
+      "proposal_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+      "projection_digest": "77977c6734b92f6e472d3079090bde729534560e3a751f0ea4e5bc0c93e5ad2a",
+      "outcome": "passed",
+      "input_sha256": "796976808c92d79992e9a32737b7b05a93bf717ee0bc0b43a8b681ff5f115e00",
+      "raw_stage": "jobs/job_3a658ba085e8417ea6faad5cb0cdd493/attempt-1/blueprint-spec-review-0-ad1379367f3e742a-decisions_defaults",
+      "old_proposal_digest": "6f806d9416cd1c5a724e980dece7330dac651c8a838d469db409d940a493f158",
+      "old_projection_digest": "15dcdf3526f590b2c32b0790ccb2dc2ff8b885ae06796f9977bdf7dd4a511341",
+      "fresh_new_review": true,
+      "result": {
+        "checks": [
+          {
+            "dimension": "decisions_defaults",
+            "files": [
+              "DRAFT.md",
+              "ARCHITECTURE.md"
+            ],
+            "outcome": "passed",
+            "reason": "D01 单选归类、D02 缺省落入“未整理”、D03 保存/移动时按名称大小写不敏感创建或复用、D04 软删除与恢复、D05 本地优先及外部增强静默降级、D06 P1 去重与 allow_duplicate、D07 检索字段范围、D08 python-web + SQLite、D09 无认证及本机/隔离网络边界、D10 Netscape 导入导出，均有明确默认和可执行的 when_to_ask；D11/D12 标为 deferred，D13 标为 open 且明确“本期不做”，与 F16/F19/F17/F18 的范围一致。ARCHITECTURE 的默认归类、NOCASE 唯一名、归类删除迁移软删记录、P0 不启用重复拒绝、软删除不参与重复判定等实现承诺与这些决策一致。"
+          }
+        ],
+        "outcome": "passed",
+        "projection_digest": "77977c6734b92f6e472d3079090bde729534560e3a751f0ea4e5bc0c93e5ad2a",
+        "proposal_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+        "review_rules_version": "atlas.current-required-contract.v1",
+        "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+        "stage": "blueprint-spec-review-0-ad1379367f3e742a-decisions_defaults",
+        "suggestions": [
+          "将 D13 拆成“网页副本留存”和“失效链接检测”两个独立决策；当前一个 open 决策绑定两个不同能力，用户只要求其中一项时无法给出无歧义答复。",
+          "在 D03 中明确区分路径：显式 POST /api/categories 的重名返回 409 duplicate_category，只有保存/移动时输入的新名称才自动创建并复用；避免“重名则复用”被误读为分类管理表单也复用。",
+          "将 D04 问题中的“短时撤销”改为“可恢复回收站（无自动清理期限）”，或在默认中写明保留期；当前架构没有 purge 或到期清理，短时表述可能诱发未定义的过期验收。",
+          "D05 的“图标由域名派生本地路由”在架构中没有对应的路由或字段契约；请在 P1 前补充本地 favicon 路由，或明确 P0 仅显示 hostname，避免把图标可达性写成隐含承诺。"
+        ],
+        "summary": "decisions_defaults 维度通过：D01–D13 均明确给出问题、可逆默认、影响和 when_to_ask；P0 适用决策均已定为 decided，deferred/open 项也保留可逆默认与真实触发条件。未发现与当前架构承诺冲突的默认值、无触发条件的悬空决策，或会把未确认偏好写成已确认事实的问题。"
+      }
+    },
+    {
+      "name": "blueprint-design-check-0-phase_acceptance",
+      "checkpoint_digest": "dd19d90217dc6cadd7e8346ac4d2af2b1b5a73f4fee2f28aa3ea2f8190ad6d8f",
+      "proposal_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+      "projection_digest": "39d09af2c64eae5f81b4f83505383eb05902cf1f794e2612786a04892b7b6b4b",
+      "outcome": "blocked",
+      "input_sha256": "ef0e7f1ab2963050b046060ac088d43513c871a60b33f1329279a4061a7a3b56",
+      "raw_stage": "jobs/job_3a658ba085e8417ea6faad5cb0cdd493/attempt-1/blueprint-spec-review-0-ad1379367f3e742a-phase_acceptance",
+      "old_proposal_digest": "6f806d9416cd1c5a724e980dece7330dac651c8a838d469db409d940a493f158",
+      "old_projection_digest": "ef2275727c737e349262d4b5005c4597cd4d0adde8f355426b7729953664ee16",
+      "fresh_new_review": true,
+      "result": {
+        "checks": [
+          {
+            "dimension": "phase_acceptance",
+            "files": [
+              "DRAFT.md",
+              "ARCHITECTURE.md",
+              "REVISION.md"
+            ],
+            "outcome": "blocked",
+            "reason": "A04 的 goal 与 file_plan 只在 --base-url 上验证归类的新建、重命名和删除，runner 对 A04 也只绑定 --case/--base-url；F08 的跨重启证据仅列 A01/A05/A09，其中 A05 只读回书签的归类归属，A09 只读回书签删除与回收站状态，均未在隔离实例中证明新建或改名后的分类实体在重启后仍然存在。这与 F03 reason 中「持久化」的表述及 P0 goal 的「全部数据跨会话与重启保留」不符，也使确认场景第 3 条「新建归类，操作结果在重新打开后仍然有效」无法由计划证明。"
+          }
+        ],
+        "outcome": "blocked",
+        "projection_digest": "39d09af2c64eae5f81b4f83505383eb05902cf1f794e2612786a04892b7b6b4b",
+        "proposal_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+        "review_rules_version": "atlas.current-required-contract.v1",
+        "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+        "stage": "blueprint-spec-review-0-ad1379367f3e742a-phase_acceptance",
+        "suggestions": [
+          "在 P0 增加归类实体的跨重启断言：让 A04 使用 --app-root/--data-dir，或扩展现有 A05/A09 的隔离实例；先经真实归类表单新建或重命名分类，停止后以同一实例目录重启，再断言分类名、计数及书签归属保留，并同步更新 file_plan 与 runner 的 A04 绑定。"
+        ],
+        "summary": "P0 已先覆盖保存、归类、移动、浏览/检索、打开，以及书签与回收站的跨重启持久化；P1 只保留可选增强。但是，新建或重命名归类后跨重启仍然有效这一点没有对应验收用例，因此当前计划仍不能完整证明确认的核心旅程。"
+      }
+    },
+    {
+      "name": "blueprint-design-check-0-product_completeness",
+      "checkpoint_digest": "0b54d495af79c6c7c22a871a6281e68eba4f74f67376dae63e44d797eae40e58",
+      "proposal_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+      "projection_digest": "b0255218220f34c9e580b55f20cdbd7e102695113711e838f9d2d51791b2c253",
+      "outcome": "passed",
+      "input_sha256": "0adc04f25137c746bcb89010cea334fd2894165932aee86d78e56db424a2a660",
+      "raw_stage": "jobs/job_3a658ba085e8417ea6faad5cb0cdd493/attempt-1/blueprint-spec-review-0-ad1379367f3e742a-product_completeness",
+      "old_proposal_digest": "6f806d9416cd1c5a724e980dece7330dac651c8a838d469db409d940a493f158",
+      "old_projection_digest": "9173a788f3ed2104d905058e16f81cf6019bd8fec51c18cda1e19d138f8c0043",
+      "fresh_new_review": true,
+      "result": {
+        "checks": [
+          {
+            "dimension": "product_completeness",
+            "files": [
+              "DRAFT.md",
+              "ARCHITECTURE.md"
+            ],
+            "outcome": "passed",
+            "reason": "逐项追踪 contract_coverage：F01/F02 由 GET / 的 form[action=/bookmarks/new] 经 303 到 /?category=...，并声明 SQLite 持久化与 /api/bookmarks/{id} 可读；F03 由 /categories 的 create/rename/delete 表单经 303 返回，删除时活动与软删记录同迁默认归类；F04 由每行 record-move-form 提交 category_id，HTML 适配器翻译为归类名后 303 到目标归类；F05/F06 由 category-search-form（category+q）与 /?category=... 页面读取活动记录和计数、保留查询并给出明确空结果；F07 由 record-open-link 与 GET /go/{id} 302 到原始 URL；F09 由 record-delete-form、/?trash=1 的 restore 表单及 303 完成软删与恢复；F08 由 A01/A05/A09 的同实例重启读取覆盖；F10/A02/A10/A12 的错误分支均声明 400/404/409、form-error 或结构化错误、零写入，并保留可重试表单；F11 由 GET / 与 /api/health 覆盖。失败路径均保留可重新提交的控件或回收站恢复入口，未发现仅靠标题或 API 冒充的 P0 浏览器能力。"
+          }
+        ],
+        "outcome": "passed",
+        "projection_digest": "b0255218220f34c9e580b55f20cdbd7e102695113711e838f9d2d51791b2c253",
+        "proposal_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+        "review_rules_version": "atlas.current-required-contract.v1",
+        "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+        "stage": "blueprint-spec-review-0-ad1379367f3e742a-product_completeness",
+        "suggestions": [
+          "建议在首页外壳合同中补充指向 /?trash=1 的可见回收站入口；当前只有删除成功后的 303 页面能到达恢复表单，离开该页面后普通用户不便再次发现恢复路径。",
+          "F07 的恢复说明提到用 PATCH API 修正 URL，而 P0 明确不提供记录编辑界面；建议注明这是既有的 API-only 合同、不是浏览器用户的 P0 旅程，或补充相应 UI 入口。"
+        ],
+        "summary": "在 product_completeness（产品完整性）范围内，P0 的 F01–F11/A01–A12 都已围绕真实服务端页面与表单形成完整闭环，涵盖保存（默认归类或新归类）、归类管理、记录移动、归类浏览与计数、类别加关键字检索、打开原始 URL、软删除与回收站恢复、错误重试以及跨重启持久化，并且每一环都有入口、成功后写入数据并跳转、用户可见的失败提示和恢复路径。未发现会阻断核心旅程，或造成数据完整性、安全矛盾的缺口；P1 的元数据、导入导出与去重明确留在后续阶段，不阻塞当前核心旅程。"
+      }
+    },
+    {
+      "name": "blueprint-design-check-0-runtime_protocol",
+      "checkpoint_digest": "b97302d6a41d00e7ccfc20cf73683c283dddb8869651fc65e3df2683a8be56fb",
+      "proposal_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+      "projection_digest": "353b6d2d5c16c26b040997fc53f4526ea3a3a38d2dd2f45cd8a74c42a0aafc06",
+      "outcome": "passed",
+      "input_sha256": "eaf2ea9b0a1d526962d1cdab27f62658b3f1966023084e3de0848f7c6c4dc51f",
+      "raw_stage": "jobs/job_3a658ba085e8417ea6faad5cb0cdd493/attempt-1/blueprint-spec-review-0-ad1379367f3e742a-runtime_protocol-v1",
+      "old_proposal_digest": "6f806d9416cd1c5a724e980dece7330dac651c8a838d469db409d940a493f158",
+      "old_projection_digest": "2bb92f64e47cf292f2e5629820883dbdc42e00f1404c3263611ae1e146049cec",
+      "fresh_new_review": true,
+      "result": {
+        "checks": [
+          {
+            "dimension": "runtime_protocol",
+            "files": [
+              "DRAFT.md",
+              "ARCHITECTURE.md",
+              "RUNTIME_CONTRACT.md"
+            ],
+            "outcome": "passed",
+            "reason": "ARCHITECTURE.md“验收适配器合同”与 DRAFT.md 的 acceptance/file_plan 规定：common.py 通过 os.path.dirname(os.path.abspath(__file__)) 自举 sys.path 并 import common；--base-url 精确 origin；--app-root 只读；--data-dir 仅测试者草稿根，每实例数据库位于 data_dir/instances/<uuid>；A01/A05/A09 用 common.launch_app 启动 app/serve.py、真实写入、SIGTERM、同一目录重启并读回，A11 使用同一冻结源码的 fresh 实例且明确不宣称同容器重启；runner 为 A01/A05/A09/A11 绑定 app_root/data_dir，A14 绑定 data_dir，其余绑定 base_url；delivery profile 为 python-web，README 要求字面 start argv。未发现 {port}/{data_dir} 插值、测试者自建库冒充持久化或仅更换 HTTP 客户端即宣称重启的承诺。"
+          }
+        ],
+        "outcome": "passed",
+        "projection_digest": "353b6d2d5c16c26b040997fc53f4526ea3a3a38d2dd2f45cd8a74c42a0aafc06",
+        "proposal_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+        "review_rules_version": "atlas.current-required-contract.v1",
+        "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+        "stage": "blueprint-spec-review-0-ad1379367f3e742a-runtime_protocol-v1",
+        "suggestions": [],
+        "summary": "按 runtime_protocol 复核完整架构、验收契约与 file_plan：交付 profile 为 python-web；验收程序基于 __file__ 自举导入；app_root 只读、data_dir 仅作测试草稿并以 data_dir/instances/<uuid> 隔离；web 用例均走 --base-url；A01/A05/A09 具备同冻结应用的真实进程重启适配器（真实表单动作→SIGTERM→同目录重启→读回），A11 明确为 fresh 首启而非重启；start argv 为字面量，未发现占位符插值、绕过 base_url 或虚假重启/持久化承诺。未发现与 RUNTIME_CONTRACT.md 的具体不兼容。"
+      }
+    },
+    {
+      "name": "blueprint-design-check-0-scenario_scope",
+      "checkpoint_digest": "d9131dafeef00ecee093b68f7815d09b32d00a97ef80dcef20e207bde2da2473",
+      "proposal_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+      "projection_digest": "35b5375d5af54080f290e7ce9d9745042bf1f573631b2b6a25321bfed2114c27",
+      "outcome": "passed",
+      "input_sha256": "d4e0b473d22b5ba84037afa688185a5a4f02069451714a79e056a9a4f44eb03a",
+      "raw_stage": "jobs/job_3a658ba085e8417ea6faad5cb0cdd493/attempt-1/blueprint-spec-review-0-ad1379367f3e742a-scenario_scope",
+      "old_proposal_digest": "6f806d9416cd1c5a724e980dece7330dac651c8a838d469db409d940a493f158",
+      "old_projection_digest": "9667552320fb0a00c49dbe242892f74b7df34e33c3cc4dba11031bddd5acd5a7",
+      "fresh_new_review": true,
+      "result": {
+        "checks": [
+          {
+            "dimension": "scenario_scope",
+            "files": [
+              "DRAFT.md",
+              "ARCHITECTURE.md"
+            ],
+            "outcome": "passed",
+            "reason": "DRAFT.md 的 P0 由 F01 保存、F02 默认“未整理”与预置归类、F03 新建归类、F04 归类间移动、F05 归类浏览与计数、F06 关键字检索、F07 打开原 URL、F08 跨会话持久化组成，P0 目标与 A01–A12 覆盖确认场景全部五个流程步骤及四条验收；F10、F11 补齐校验和浏览器外壳，ARCHITECTURE.md 的保存、归类管理、移动、搜索与打开表单/链接为当前用户提供了对应 UI 入口。F12–F14 明确留在 P1，属于可选成熟能力；F15、F16、F20–F24 的排除与个人单机收藏不冲突。F03 的重命名/删除及 F09 的删除/撤销是辅助管理与恢复能力，未挤占或推迟核心旅程。唯一需澄清的是 limits 将 F17、F18、F19 写成绝对“不做/不支持”，而 features 将其标为 decision needed。"
+          }
+        ],
+        "outcome": "passed",
+        "projection_digest": "35b5375d5af54080f290e7ce9d9745042bf1f573631b2b6a25321bfed2114c27",
+        "proposal_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+        "review_rules_version": "atlas.current-required-contract.v1",
+        "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+        "stage": "blueprint-spec-review-0-ad1379367f3e742a-scenario_scope",
+        "suggestions": [
+          "将 limits 中 F17、F18、F19 的“不保存/不做/不支持”改为“本期/P0 不实现，后续按 decision 评估”，与 applicability=decision needed 保持一致；无需改变当前 P0/P1 范围。"
+        ],
+        "summary": "确认场景的“保存—归类—移动—浏览/检索—打开—跨会话持久化”闭环已完整落在 P0：F01–F08 覆盖保存、默认归类与预置归类、新建归类、移动、归类浏览与计数、关键字检索、打开原 URL 和跨会话持久化；F10、F11 提供校验与 HTML 外壳。P1 仅保留 F12–F14 可选增强，F15、F16、F20–F24 等排除项与单用户本地收藏定位一致。未发现必需步骤被推迟，也未发现与确认场景冲突的扩展；仅需澄清 limits 对 F17、F18、F19 的绝对排除措辞。"
+      }
+    }
+  ]
+}

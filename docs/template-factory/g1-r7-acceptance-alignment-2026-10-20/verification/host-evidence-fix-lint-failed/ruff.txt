@@ -1,0 +1,14 @@
+F841 Local variable `root` is assigned to but never used
+   --> application-atlas-production-pack/template_factory/cognition.py:220:5
+    |
+218 |             or {row.get("path") for row in entries if isinstance(row, dict)} != set(R7_PROGRAM_PATHS)):
+219 |         changed("R7 review manifest does not bind the exact nine program paths")
+220 |     root = store.pack.resolve().parent
+    |     ^^^^
+221 |     evidence_root = store.root.resolve()
+222 |     files = {}
+    |
+help: Remove assignment to unused variable `root`
+
+Found 1 error.
+No fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).

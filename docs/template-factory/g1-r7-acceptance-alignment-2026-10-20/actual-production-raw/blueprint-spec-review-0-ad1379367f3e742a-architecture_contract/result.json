@@ -1,0 +1,22 @@
+{
+ "summary": "architecture_contract 维度通过：A04/A12 的归类名称与 category_id 语义、默认「未整理」、软删除迁移、错误码以及搜索/URL 策略相互一致，P0 核心旅程的 UI/API/持久化入口完整；未发现需要阻断的契约矛盾或数据完整性/安全缺口。",
+ "checks": [
+  {
+   "dimension": "architecture_contract",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md",
+    "REVISION.md",
+    "CASE_DESIGN.json",
+    "CASE_ADAPTATION_POLICY.json"
+   ],
+   "reason": "ARCHITECTURE.md 的 SQLite 模型（categories/bookmarks、trashed_at、url 不设唯一索引）与 DRAFT.md 的 F01–F11、limits、decisions 对齐；A04 仅对归类 name 返回 invalid_name（含空白与 121 字符），A12 对书签保存/移动分别使用 category/category_id 并返回 invalid_category，未知 GET 归类返回空结果，均与 CASE_ADAPTATION_POLICY.json 一致；归类删除事务迁移活动与软删记录、恢复清空 trashed_at、校验零写入、默认归类保护及 400/409/404 与 303 导航无相互冲突。"
+  }
+ ],
+ "suggestions": [
+  "在打开链接契约中补充 rel=noreferrer（或明确说明仅保留 noopener），以完全落实 CASE_DESIGN 的 no-referrer 意图。",
+  "为 /categories 的 create/rename/delete 以及记录 move/delete/restore 表单补充明确的 method=post 与 action 路由，避免独立验收依赖实现自选路径。",
+  "明确 F12/D05 的第三方元数据与图标增强仅为 P1 路线图，P0 保持 CASE_DESIGN 的 not_adopted，避免与当前承诺混淆。"
+ ]
+}

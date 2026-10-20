@@ -1,0 +1,24 @@
+{
+ "outcome": "blocked",
+ "summary": "P0 已先覆盖保存、归类、移动、浏览/检索、打开，以及书签与回收站的跨重启持久化；P1 只保留可选增强。但是，新建或重命名归类后跨重启仍然有效这一点没有对应验收用例，因此当前计划仍不能完整证明确认的核心旅程。",
+ "checks": [
+  {
+   "dimension": "phase_acceptance",
+   "outcome": "blocked",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md",
+    "REVISION.md"
+   ],
+   "reason": "A04 的 goal 与 file_plan 只在 --base-url 上验证归类的新建、重命名和删除，runner 对 A04 也只绑定 --case/--base-url；F08 的跨重启证据仅列 A01/A05/A09，其中 A05 只读回书签的归类归属，A09 只读回书签删除与回收站状态，均未在隔离实例中证明新建或改名后的分类实体在重启后仍然存在。这与 F03 reason 中「持久化」的表述及 P0 goal 的「全部数据跨会话与重启保留」不符，也使确认场景第 3 条「新建归类，操作结果在重新打开后仍然有效」无法由计划证明。"
+  }
+ ],
+ "suggestions": [
+  "在 P0 增加归类实体的跨重启断言：让 A04 使用 --app-root/--data-dir，或扩展现有 A05/A09 的隔离实例；先经真实归类表单新建或重命名分类，停止后以同一实例目录重启，再断言分类名、计数及书签归属保留，并同步更新 file_plan 与 runner 的 A04 绑定。"
+ ],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "review_rules_version": "atlas.current-required-contract.v1",
+ "proposal_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+ "projection_digest": "39d09af2c64eae5f81b4f83505383eb05902cf1f794e2612786a04892b7b6b4b",
+ "stage": "blueprint-spec-review-0-ad1379367f3e742a-phase_acceptance"
+}

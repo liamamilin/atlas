@@ -1,0 +1,50 @@
+{
+  "schema": "atlas.r7-t08-status.v1",
+  "observed_epoch": 1792478417.006407,
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "status": "not_started_G1_blocked",
+  "fixed_request_path": "docs/template-factory/v1-2026-10-19/t08-request.json",
+  "fixed_request_sha256": "774436e5f3d47829c5d3510677cd7da10223150834ab95c2e9e18fa4523e5520",
+  "fixed_sampling_plan": {
+    "schema": "atlas.v1.prespecified-sampling.v1",
+    "scope": "首批上限10产品，本轮优先3个不同场景、3个叶子；G1书签包括在首批内。抽验在查看本轮结果前固定，失败不替换。",
+    "profile": "python-web",
+    "scenarios": [
+      {
+        "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+        "revision": 2,
+        "name": "生活待购与灵感收藏夹",
+        "risk": "持久化、分类/搜索/真实链接、非法输入、并发保存"
+      },
+      {
+        "scenario_id": "scn_6fb4896d9eb0428aa1c080df0a137813",
+        "revision": 1,
+        "name": "个人极简月度预算：先查剩余再消费",
+        "risk": "金额/剩余额度口径、月度边界、错误恢复与持久化"
+      },
+      {
+        "scenario_id": "scn_805c99ffe8da4532817592bb466a505e",
+        "revision": 1,
+        "name": "多项目会议结论的归档与回查",
+        "risk": "按项目归档、历史检索、内容保留与重新读取"
+      }
+    ],
+    "admission": "书签人工ready；其余在T08启动前核对当前审阅与明确 reviewed-draft-v1 批次准入，不改写草案为人工确认。",
+    "required": "每个固定场景的冻结套件与独立核心旅程证据全部通过；实际源码/模板/套件/场景/案例/环境绑定",
+    "failure_policy": "保留失败，不换样本，不降低要求，不自动提高预算或扩大下一批"
+  },
+  "completed": 0,
+  "required_runtime_samples": 3,
+  "new_templates": 0,
+  "real_P0_deliveries": 0,
+  "runtime_passes": 0,
+  "new_case_revisions": 0,
+  "model_calls": 0,
+  "no_sample_replacement": true,
+  "production_concurrency": 2,
+  "runtime_concurrency": 1,
+  "max_template_products": 10,
+  "other_product_business_repair_limit": 2,
+  "window": "T08正式首次启动规则未激活；不借R7给其他产品7轮。",
+  "next_batch": "保持原书签、月度预算、多项目会议笔记三样本；只有宿主正式G1通过后可进入，当前不启动。"
+}

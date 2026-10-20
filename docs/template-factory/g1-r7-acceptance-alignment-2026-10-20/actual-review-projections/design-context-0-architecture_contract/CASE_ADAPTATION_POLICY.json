@@ -1,0 +1,97 @@
+{
+  "adaptation": "The source IndexedDB/Dexie and SPA are source facts. Adapt persistence and rendering to the declared target profile; do not turn source facts into target requirements. Preserve the exact A04 category-management and A12 bookmark save/move contracts above, plus the title/hostname/description search contract.",
+  "authorized_assertion_adaptation": "A02 may replace only its single-label-hostname rejection example with a positive example; missing scheme, unsupported scheme, empty hostname, and invalid hostname must remain rejected without writing.",
+  "category_contract": {
+    "bookmark_move": {
+      "acceptance_id": "A12",
+      "html_failure": "Show form-error, retain submitted values, and make no writes.",
+      "html_field": "category_id",
+      "html_semantics": "Resolve the submitted ID to an existing category name.",
+      "invalid_html_values": [
+        "omitted",
+        "empty",
+        "unknown_id"
+      ],
+      "invalid_json_values": [
+        "omitted",
+        "JSON null",
+        "empty",
+        "whitespace_only",
+        "121_characters"
+      ],
+      "invalid_result": {
+        "code": "invalid_category",
+        "status": 400
+      },
+      "json_field": "category",
+      "json_semantics": "Category NAME, never category ID.",
+      "never_create_from_html_id": true,
+      "valid_new_json_name": "Automatically create and use the named category."
+    },
+    "bookmark_save": {
+      "acceptance_id": "A12",
+      "field_semantics": "Category NAME, never category ID.",
+      "html_failure": "Show form-error, retain submitted values, and make no writes.",
+      "html_field": "category",
+      "html_null": "HTML forms have no native null value.",
+      "invalid_result": {
+        "code": "invalid_category",
+        "status": 400
+      },
+      "invalid_values": [
+        "empty",
+        "whitespace_only",
+        "121_characters"
+      ],
+      "json_field": "category",
+      "omitted_or_null_json": "Use the default category.",
+      "valid_new_name": "Automatically create and use the named category."
+    },
+    "management": {
+      "acceptance_id": "A04",
+      "existing_category_identity_field": "category_id",
+      "html_failure": "Show form-error, retain submitted values, and make no writes.",
+      "html_invalid_values": [
+        "omitted",
+        "empty",
+        "whitespace_only",
+        "121_characters"
+      ],
+      "input_field": "name",
+      "invalid_result": {
+        "code": "invalid_name",
+        "status": 400
+      },
+      "json_failure": "Return invalid_name and make no writes.",
+      "json_invalid_values": [
+        "omitted",
+        "empty",
+        "whitespace_only",
+        "121_characters",
+        "null"
+      ],
+      "operations": [
+        "category_create",
+        "category_rename"
+      ]
+    },
+    "unknown_get_filter": "Return an empty result; do not treat an unknown category filter as an error."
+  },
+  "product_id": "product-c42848f63251507bd9d911a5",
+  "revision": "CP-1",
+  "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+  "schema": "atlas.scenario-policy.bookmarks.v1",
+  "search_contract": "Search is a case-insensitive substring over title, hostname, and description, with optional category filtering applied together. Search does not match tags or raw URL substrings.",
+  "url_policy": {
+    "absolute": true,
+    "dns_required": false,
+    "nonempty_valid_hostname": true,
+    "p0_fetch": false,
+    "preserve_original_text": true,
+    "schemes": [
+      "http",
+      "https"
+    ],
+    "single_label_hosts": true
+  }
+}

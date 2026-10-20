@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.r7-commit-and-ci-evidence.v1",
+  "observed_epoch": 1792479276.435776,
+  "baseline_sha": "2807362d804ba95dc7671b4ab250b8b6fa420456",
+  "actual_production": {
+    "sha": "e97431f323cad8a60ca5bee3ad19c37fd594d10b",
+    "source_tree_sha256": "2181f5768db76d5fa54589a21e15af8a027d5a203d1ddd6b3b4b494a43bb8e2e",
+    "ci_run": 39378796575,
+    "ci_status": "completed/success",
+    "check": "success",
+    "docker_integration": "success"
+  },
+  "host_evidence_preparation_only": {
+    "sha": "717ebf830cc231d25cb198795edec06741e7fb76",
+    "source_tree_sha256": "65ac7a04eebb78589fe5134524615f78240c0fd114456005a8bc932cbc5b5cf7",
+    "ci_run": 39382442263,
+    "ci_status": "completed/success",
+    "check": "success",
+    "docker_integration": "success",
+    "production_or_review_restarted": false
+  },
+  "final_evidence_delivery": {
+    "branch": "codex/stabilize-atlas",
+    "head_resolution": "The commit containing this file (git rev-parse HEAD after evidence delivery). Exact final HEAD and its CI are reported in the final response; an in-file self-referential commit SHA is deliberately not fabricated.",
+    "local_full_checks_repeated_for_docs_only": false
+  },
+  "live_services": {
+    "api": "http://127.0.0.1:5199",
+    "frontend": "http://127.0.0.1:5188/factory",
+    "source_sha": "717ebf830cc231d25cb198795edec06741e7fb76",
+    "original_factory_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory",
+    "G1_plan_state": "paused",
+    "no_production_resume_after_evidence_fix": true
+  }
+}

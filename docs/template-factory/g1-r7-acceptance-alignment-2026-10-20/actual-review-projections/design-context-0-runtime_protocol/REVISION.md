@@ -1,0 +1,1 @@
+Apply the exact R7 bounded acceptance-alignment patch and its prepared four-file replacement manifest.

@@ -1,0 +1,21 @@
+{
+ "summary": "decisions_defaults 维度通过：D01–D13 均明确给出问题、可逆默认、影响和 when_to_ask；P0 适用决策均已定为 decided，deferred/open 项也保留可逆默认与真实触发条件。未发现与当前架构承诺冲突的默认值、无触发条件的悬空决策，或会把未确认偏好写成已确认事实的问题。",
+ "checks": [
+  {
+   "dimension": "decisions_defaults",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "D01 单选归类、D02 缺省落入“未整理”、D03 保存/移动时按名称大小写不敏感创建或复用、D04 软删除与恢复、D05 本地优先及外部增强静默降级、D06 P1 去重与 allow_duplicate、D07 检索字段范围、D08 python-web + SQLite、D09 无认证及本机/隔离网络边界、D10 Netscape 导入导出，均有明确默认和可执行的 when_to_ask；D11/D12 标为 deferred，D13 标为 open 且明确“本期不做”，与 F16/F19/F17/F18 的范围一致。ARCHITECTURE 的默认归类、NOCASE 唯一名、归类删除迁移软删记录、P0 不启用重复拒绝、软删除不参与重复判定等实现承诺与这些决策一致。",
+   "notes": "未把 deferred/open 项误列为 P0 必需能力，也未将可选增强写成 P0 可用性依赖。"
+  }
+ ],
+ "suggestions": [
+  "将 D13 拆成“网页副本留存”和“失效链接检测”两个独立决策；当前一个 open 决策绑定两个不同能力，用户只要求其中一项时无法给出无歧义答复。",
+  "在 D03 中明确区分路径：显式 POST /api/categories 的重名返回 409 duplicate_category，只有保存/移动时输入的新名称才自动创建并复用；避免“重名则复用”被误读为分类管理表单也复用。",
+  "将 D04 问题中的“短时撤销”改为“可恢复回收站（无自动清理期限）”，或在默认中写明保留期；当前架构没有 purge 或到期清理，短时表述可能诱发未定义的过期验收。",
+  "D05 的“图标由域名派生本地路由”在架构中没有对应的路由或字段契约；请在 P1 前补充本地 favicon 路由，或明确 P0 仅显示 hostname，避免把图标可达性写成隐含承诺。"
+ ]
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "atlas.g1-check-run.v1",
+  "source_tree_sha256": "42b162c7201cdb835d2450f9031e45a532730eb19efdfda39a76c004f16822b7",
+  "checks": {
+    "python_audit": {
+      "status": "passed",
+      "exit_code": 0,
+      "argv": [
+        "pip-audit",
+        "-r",
+        "requirements.txt"
+      ],
+      "cwd": ".",
+      "env": {},
+      "started_epoch": 1792478496.0027242,
+      "duration_seconds": 30.896,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/verification/host-evidence-fix-full/python_audit.txt",
+      "log_sha256": "15950a68a7ed99c59779717acefdceb3f69cfd31bde67d2c954f2a3cea4d7955"
+    },
+    "ruff": {
+      "status": "failed",
+      "exit_code": 1,
+      "argv": [
+        "ruff",
+        "check",
+        "application-atlas-production-pack/privacy.py",
+        "application-atlas-production-pack/drafts_api.py",
+        "application-atlas-production-pack/drafts_engines/__init__.py",
+        "application-atlas-production-pack/mcp_atlas.py",
+        "application-atlas-production-pack/execution_service.py",
+        "application-atlas-production-pack/execution_state.py",
+        "application-atlas-production-pack/execution_workspace.py",
+        "application-atlas-production-pack/opencode_client.py",
+        "application-atlas-production-pack/opencode_cli_adapter.py",
+        "application-atlas-production-pack/opencode_permissions.py",
+        "application-atlas-production-pack/opencode_runtime.py",
+        "application-atlas-production-pack/project_export.py",
+        "application-atlas-production-pack/project_generation.py",
+        "application-atlas-production-pack/project_store.py",
+        "application-atlas-production-pack/project_backup.py",
+        "application-atlas-production-pack/runtime_recovery.py",
+        "application-atlas-production-pack/template_factory",
+        "atlas-web/scripts/gen-data.py",
+        "atlas-web/scripts/verify-web-data.py"
+      ],
+      "cwd": ".",
+      "env": {},
+      "started_epoch": 1792478526.899074,
+      "duration_seconds": 0.048,
+      "tests_run": null,
+      "skipped": 0,
+      "log_path": "docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/verification/host-evidence-fix-full/ruff.txt",
+      "log_sha256": "f23fcb25addcbbbf2a70b35b1a86bcaa2979314cb9a7ff7ea94127ecea064188"
+    }
+  }
+}

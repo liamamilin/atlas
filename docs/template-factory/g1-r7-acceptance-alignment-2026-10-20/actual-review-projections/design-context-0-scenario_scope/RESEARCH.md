@@ -1,0 +1,69 @@
+{
+  "gaps": [
+    "Unverified case limitation (case:product-c42848f63251507bd9d911a5:faa52e6b1414 r1); not accepted evidence:",
+    "Behavior of Ripple TS reactivity primitives (track/effect/bindGroup/bindValue) at this pinned version was not
+validated.",
+    "Unverified case limitation (case:product-c42848f63251507bd9d911a5:faa52e6b1414 r1); not accepted evidence:",
+    "Host excluded unsupported evidence inf-no-tests: Depends on a quarantined, unlocated observation",
+    "Unverified case limitation (case:product-c42848f63251507bd9d911a5:faa52e6b1414 r1); not accepted evidence:",
+    "Host excluded unsupported evidence obs-no-test-files: observation cites an unknown source path: source/src",
+    "Unverified case limitation (case:product-c42848f63251507bd9d911a5:faa52e6b1414 r1); not accepted evidence:",
+    "No automated tests exist in the manifest, so none of the described behaviors are test-confirmed.",
+    "Unverified case limitation (case:product-c42848f63251507bd9d911a5:faa52e6b1414 r1); not accepted evidence:",
+    "Runtime behavior was not observed; all claims are static reading of source files.",
+    "Unverified case limitation (case:product-c42848f63251507bd9d911a5:faa52e6b1414 r1); not accepted evidence:",
+    "The full commit tree was inferred from the supplied source_manifest and the on-disk source/ directory; files
+outside it were not inspected.",
+    "Unverified case limitation (case:product-c42848f63251507bd9d911a5:faa52e6b1414 r1); not accepted evidence:",
+    "The paired Research Notes referenced by leaf.md were not supplied, so product-level evidence beyond the pinned
+repository is unavailable.",
+    "Unverified case limitation (case:product-c42848f63251507bd9d911a5:faa52e6b1414 r1); not accepted evidence:",
+    "Whether Dexie/IndexedDB persistence behaves correctly in real browsers at this commit is unverified.",
+    "Unverified case limitation (case:product-c42848f63251507bd9d911a5:faa52e6b1414 r1); not accepted evidence:",
+    "Whether the third-party metadata/favicon endpoints (api.microlink.io, images.weserv.nl, Google s2 favicons) are
+reachable, rate-limited, or CORS-permitted at runtime is unverified."
+  ],
+  "summary": "ev_ba200adf6e2c_05babdea64ba9858 [code_observation]: New records are built with id
+`bm-${crypto.randomUUID()}`, hostname from getHostname(url), and defaults visitCount=0, visitedAt=null, isPinned=false,
+isArchived=false, createdAt=Date.now(); edits preserve the previous id, isPinned, isArchived, visitCount, createdAt, and
+visitedAt.\n\nev_ba200adf6e2c_06c81a165e03c96a [code_observation]: Pin/Unpin and Edit actions are rendered only when the
+item is not archived, and Edit loads the item's url/title/description/tags/favicon into the
+dialog.\n\nev_ba200adf6e2c_1596da4a90687ca5 [code_observation]: The Valibot BookmarkFormSchema requires a non-empty URL
+matching /^https?:\\/\\/(?:[\\w-]+\\.)+[a-zA-Z]{2,}(?:\\/\\S*)?$/ and v.url, a non-empty title up to 100 chars, a non-
+empty description up to 280 chars, and 1-5 tags each up to 30 chars.\n\nev_ba200adf6e2c_3168bcd465b6a043 [inference]:
+The scenario's user-controlled 'category' (归类) is realized only as up to five free-text tags on each record; there are
+no creatable, renameable, or nestable collections, and no separate move operation beyond editing
+tags.\n\nev_ba200adf6e2c_35e41aab676021eb [code_observation]: saveBookmark sets the record in the in-memory map then
+awaits db.bookmarks.put(bm); deleteBookmark removes from the map then awaits
+db.bookmarks.delete(id).\n\nev_ba200adf6e2c_4c56ef30a1785be1 [code_observation]: A Delete action is rendered only for
+archived items; it calls deleteBookmark and shows an error-type toast with an Undo action that calls saveBookmark(item)
+to restore the record.\n\nev_ba200adf6e2c_6bbd7a588896fe31 [inference]: The scenario step of letting unclassified links
+land in a default category is not supported, because the form schema rejects saves with zero
+tags.\n\nev_ba200adf6e2c_7150b0ac7a5678db [code_observation]: A Copy URL action writes item.url to the clipboard and
+shows a success toast.\n\nev_ba200adf6e2c_7d47d725a2e9b759 [inference]: Metadata and favicon enrichment is best-effort
+and dependent on third-party HTTP services; failures degrade silently to console errors while the bookmark still saves
+with whatever fields the user entered or omitted defaults for.\n\nev_ba200adf6e2c_86ed2327f33a3ca8 [code_observation]:
+An effect on component creation calls db.bookmarks.toArray() and inserts each returned bookmark into an in-memory
+RippleMap keyed by bookmark id.\n\nev_ba200adf6e2c_8e11efc61a4650ba [code_observation]: On submit, if no favicon exists
+and a hostname is derivable, the code fetches a Google s2 favicon proxied through images.weserv.nl inside a try/catch
+that only logs failure.\n\nev_ba200adf6e2c_922f1dbc84912d99 [inference]: Persistence is local to one browser
+profile/device via IndexedDB with no sync layer, so the scenario's cross-session growth holds only on the same browser,
+and the leaf's multi-device context is unmet.\n\nev_ba200adf6e2c_93ef917a193a45ab [inference]: Deletion is limited to
+archived records and recovery is only the transient Undo action on the toast; there is no trash view, and non-archived
+records cannot be deleted at all through the UI.\n\nev_ba200adf6e2c_93ff254508846f11 [code_observation]: The Visit
+action builds an updated bookmark with visitedAt=Date.now() and visitCount+1, calls saveBookmark(updated), then opens
+the URL with window.open(item.url, '_blank', 'noopener,noreferrer').\n\nev_ba200adf6e2c_9ab6b0e51811a16d
+[code_observation]: The displayed list filters by isArchived matching the active tab, requires every selected tag to be
+present in bookmark.tags, matches search only against bookmark.title.toLowerCase(), and sorts pinned-first then by the
+chosen sort mode with createdAt descending as fallback.\n\nev_ba200adf6e2c_b1ca64cf2ad02998 [code_observation]: The
+Archive/Unarchive action toggles isArchived and, when archiving, forces isPinned=false before
+saving.\n\nev_ba200adf6e2c_c4ad7e52e5713628 [code_observation]: Tag counts are derived by iterating all in-memory
+bookmarks and counting each tag occurrence, then sorted alphabetically for the
+sidebar.\n\nev_ba200adf6e2c_e62ae7e0a2c68ba1 [inference]: Retrieval by keyword covers only bookmark titles, not URLs,
+descriptions, or tag names, so the scenario's 'find by a remembered word' workflow is partially
+supported.\n\nev_ba200adf6e2c_e7dd8d32c05c39f9 [inference]: The app supports the scenario's save-now/find-later loop: a
+deliberate add dialog writes a URL-anchored record into durable IndexedDB, and the record can later be browsed, tag-
+filtered, title-searched, and opened back to the live URL.\n\nev_ba200adf6e2c_ec303a2fd1afa287 [code_observation]:
+fetchMeta calls https://api.microlink.io/?url=... and, on success with result.data, sets title/description and fetches
+the logo through https://images.weserv.nl/; errors are only console.error'd and the finally block resets loading."
+}

@@ -1,0 +1,24 @@
+{
+ "outcome": "passed",
+ "summary": "在 product_completeness（产品完整性）范围内，P0 的 F01–F11/A01–A12 都已围绕真实服务端页面与表单形成完整闭环，涵盖保存（默认归类或新归类）、归类管理、记录移动、归类浏览与计数、类别加关键字检索、打开原始 URL、软删除与回收站恢复、错误重试以及跨重启持久化，并且每一环都有入口、成功后写入数据并跳转、用户可见的失败提示和恢复路径。未发现会阻断核心旅程，或造成数据完整性、安全矛盾的缺口；P1 的元数据、导入导出与去重明确留在后续阶段，不阻塞当前核心旅程。",
+ "checks": [
+  {
+   "dimension": "product_completeness",
+   "outcome": "passed",
+   "files": [
+    "DRAFT.md",
+    "ARCHITECTURE.md"
+   ],
+   "reason": "逐项追踪 contract_coverage：F01/F02 由 GET / 的 form[action=/bookmarks/new] 经 303 到 /?category=...，并声明 SQLite 持久化与 /api/bookmarks/{id} 可读；F03 由 /categories 的 create/rename/delete 表单经 303 返回，删除时活动与软删记录同迁默认归类；F04 由每行 record-move-form 提交 category_id，HTML 适配器翻译为归类名后 303 到目标归类；F05/F06 由 category-search-form（category+q）与 /?category=... 页面读取活动记录和计数、保留查询并给出明确空结果；F07 由 record-open-link 与 GET /go/{id} 302 到原始 URL；F09 由 record-delete-form、/?trash=1 的 restore 表单及 303 完成软删与恢复；F08 由 A01/A05/A09 的同实例重启读取覆盖；F10/A02/A10/A12 的错误分支均声明 400/404/409、form-error 或结构化错误、零写入，并保留可重试表单；F11 由 GET / 与 /api/health 覆盖。失败路径均保留可重新提交的控件或回收站恢复入口，未发现仅靠标题或 API 冒充的 P0 浏览器能力。"
+  }
+ ],
+ "suggestions": [
+  "建议在首页外壳合同中补充指向 /?trash=1 的可见回收站入口；当前只有删除成功后的 303 页面能到达恢复表单，离开该页面后普通用户不便再次发现恢复路径。",
+  "F07 的恢复说明提到用 PATCH API 修正 URL，而 P0 明确不提供记录编辑界面；建议注明这是既有的 API-only 合同、不是浏览器用户的 P0 旅程，或补充相应 UI 入口。"
+ ],
+ "scope": "Independent static design review of the declared proposal projection only; no program review, execution or publication.",
+ "review_rules_version": "atlas.current-required-contract.v1",
+ "proposal_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+ "projection_digest": "b0255218220f34c9e580b55f20cdbd7e102695113711e838f9d2d51791b2c253",
+ "stage": "blueprint-spec-review-0-ad1379367f3e742a-product_completeness"
+}
