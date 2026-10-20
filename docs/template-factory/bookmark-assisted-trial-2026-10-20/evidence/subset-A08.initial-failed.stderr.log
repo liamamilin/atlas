@@ -1,0 +1,25 @@
+[a08-health-status] PASS GET http://127.0.0.1:64548/api/health -> HTTP 200（期望 200）
+[a08-home-status] PASS GET http://127.0.0.1:64548/ -> HTTP 200（期望 200）
+[a08-home-content-type] PASS GET / Content-Type='text/html; charset=utf-8'
+[a08-save-form] PASS 首页含真实保存表单 form[action=/bookmarks/new]
+[a08-save-url-field] PASS 保存表单含 name=url
+[a08-save-method] PASS 保存表单 method='post'（期望 post）
+[a08-save-action] PASS 保存表单 action='/bookmarks/new'（期望 POST /bookmarks/new）
+[a08-create-status] PASS POST http://127.0.0.1:64548/bookmarks/new -> HTTP 303（期望 303）
+[a08-create-location] PASS 保存成功 303 必须带 Location，实际 '/?category=%E6%9C%AA%E6%95%B4%E7%90%86&notice=saved'
+[a08-create-follow-status] PASS GET http://127.0.0.1:64548/?category=%E6%9C%AA%E6%95%B4%E7%90%86&notice=saved -> HTTP 200（期望 200）
+[a08-record-row] PASS 保存后列表含 tr[data-record-id] 且打开链接 href='https://open11335a0b76c2.atlas-acceptance.example/page/97fec03ac3bb?src=atlas&n=7%27
+[a08-create-id] PASS tr[data-record-id] 的 data-record-id='fbdd4cd26edf47dc952cbc285e3a214d'
+[a08-open-link] PASS 记录行内含 a[data-testid=record-open-link]
+[a08-link-href] PASS 打开链接 href='https://open11335a0b76c2.atlas-acceptance.example/page/97fec03ac3bb?src=atlas&n=7%27%EF%BC%88%E6%9C%9F%E6%9C%9B%E5%8E%9F%E5%A7%8B URL 'https://open11335a0b76c2.atlas-acceptance.example/page/97fec03ac3bb?src=atlas&n=7%27%EF%BC%89
+[a08-link-target] PASS 打开链接 target='_blank'（期望 _blank）
+[a08-link-rel] PASS 打开链接 rel='noopener noreferrer' 含 noopener
+[a08-link-resolved-target] PASS urljoin 解析 href 得到 'https://open11335a0b76c2.atlas-acceptance.example/page/97fec03ac3bb?src=atlas&n=7%27%EF%BC%88%E6%9C%9F%E6%9C%9B 'https://open11335a0b76c2.atlas-acceptance.example/page/97fec03ac3bb?src=atlas&n=7%27%EF%BC%89
+[a08-open-status] PASS GET http://127.0.0.1:64548/go/fbdd4cd26edf47dc952cbc285e3a214d -> HTTP 302（期望 302）
+[a08-open-location-present] PASS 302 响应携带 Location 头：'https://open11335a0b76c2.atlas-acceptance.example/page/97fec03ac3bb?src=atlas&n=7%27
+[a08-open-location] PASS GET /go/{id} Location='https://open11335a0b76c2.atlas-acceptance.example/page/97fec03ac3bb?src=atlas&n=7%27%EF%BC%88%E6%9C%9F%E6%9C%9B%E4%BF%9D%E5%AD%98%E6%97%B6 URL 'https://open11335a0b76c2.atlas-acceptance.example/page/97fec03ac3bb?src=atlas&n=7%27%EF%BC%89
+[a08-unknown-status] PASS GET http://127.0.0.1:64548/go/no-such-f1537275a2b5 -> HTTP 404（期望 404）
+[a08-unknown-code] FAIL 未知 id 打开错误码=None（期望 not_found）
+[a08-readback-status] PASS GET http://127.0.0.1:64548/api/bookmarks/fbdd4cd26edf47dc952cbc285e3a214d -> HTTP 200（期望 200）
+[a08-url-unchanged] PASS 打开动作后记录 url='https://open11335a0b76c2.atlas-acceptance.example/page/97fec03ac3bb?src=atlas&n=7%27%EF%BC%88%E6%9C%AA%E8%A2%AB%E6%94%B9%E5%86%99%EF%BC%8C%E6%9C%9F%E6%9C%9B 'https://open11335a0b76c2.atlas-acceptance.example/page/97fec03ac3bb?src=atlas&n=7%27%EF%BC%89
+[atlas] A08: failed; 失败断言: a08-unknown-code

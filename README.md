@@ -11,6 +11,8 @@
 
 ## 模板工厂
 
+可先试用 [留存 · 个人收藏夹](examples/bookmark-trial/README.md)：在仓库根目录运行 `python3 examples/bookmark-trial/app/serve.py --port 5273 --demo`，打开 http://127.0.0.1:5273/ 。这是从 R8 准备模板导出标准开发包后，由 Codex 直接实现的辅助试用应用；不代表严格 G1/T08 通过。来源包与七条真实浏览器旅程见 [试用报告](docs/template-factory/bookmark-assisted-trial-2026-10-20/TRIAL_REPORT.md)。
+
 叶子类型与应用场景构成生产目录；OpenCode CLI 批量生产冻结候选，Harness 审阅及运行验收独立排队，已发布模板可确定性创建应用包。
 
 - [模板工厂 V1 本轮交付与未通过项](docs/template-factory/v1-2026-10-19/DELIVERY.md)：代码门禁与真实 G1 分开；书签真实生产触及业务修复上限，G1 未通过、首批未启动。

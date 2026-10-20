@@ -1,0 +1,113 @@
+Browser tab: 2, Title: "留存 · 个人收藏夹", URL: "http://127.0.0.1:5273/".
+1 AXWebArea 留存 · 个人收藏夹, URL: 127.0.0.1:5273/
+	2 container
+		3 link Description: 留存 / 个人收藏夹, Value: 127.0.0.1:5273/
+		4 text 本机保存 · 辅助试用版
+	5 container
+		6 text A LITTLE SPACE FOR GOOD FINDS
+		7 heading 把好东西，留给下次。, Value: 1
+			8 text 把好东西，留给下次。
+		9 text 商品、教程、灵感。先存下来，需要时再找到它。
+		10 container 收藏分类
+			11 link Description: 全部收藏 4, Value: 127.0.0.1:5273/
+			12 link Description: 未整理 3, Value: 127.0.0.1:5273/?category=%E6%9C%AA%E6%95%B4%E7%90%86
+			13 link Description: 待购 0, Value: 127.0.0.1:5273/?category=%E5%BE%85%E8%B4%AD
+			14 link Description: 家居改造 0, Value: 127.0.0.1:5273/?category=%E5%AE%B6%E5%B1%85%E6%94%B9%E9%80%A0
+			15 link Description: 以后看看 1, Value: 127.0.0.1:5273/?category=%E4%BB%A5%E5%90%8E%E7%9C%8B%E7%9C%8B
+			16 link Description: 管理分类 ↗, Value: 127.0.0.1:5273/categories
+			17 link Description: 回收站, Value: 127.0.0.1:5273/?trash=1
+		18 container
+			19 text 搜索收藏
+			20 text field (settable) 搜索收藏, ID: q
+			21 text 筛选分类
+			22 pop up button (collapsed, settable) 筛选分类, Value: 全部分类, ID: filter, Secondary Actions: Expand
+				23 menu
+					24 (selected) 全部分类
+					25 未整理
+					26 待购
+					27 家居改造
+					28 以后看看
+			29 button 搜索
+		30 text 全部收藏 4 条收藏
+		31 table 收藏列表
+			32 row
+				33 cell
+					34 text example.com
+					35 link Description: 周末木工教程 · 核心旅程 ↗, Value: example.com/Atlas/Guide?ref=Trial&mode=Read#Start
+					36 text 书架改造参考，描述检索词：OakShelf
+					37 text https://example.com/Atlas/Guide?ref=Trial&mode=Read#Start
+					38 text 未整理
+					39 container
+						40 pop up button (collapsed, settable) Description: 移动到分类, Value: 未整理, Secondary Actions: Expand
+							41 menu
+								42 (selected) 未整理
+								43 待购
+								44 家居改造
+								45 以后看看
+						46 button 移动
+					47 button 移入回收站, Help: 可以从回收站恢复
+			48 row
+				49 cell
+					50 text 127.0.0.1
+					51 link Description: 阅读角台灯 · 核心旅程 ↗, Value: 127.0.0.1:5273/demo-page?item=Lamp&color=warm%20white#details
+					52 text 暖光灯灵感，描述检索词：AmberDesk
+					53 text http://127.0.0.1:5273/demo-page?item=Lamp&color=warm%20white#details
+					54 text 未整理
+					55 container
+						56 pop up button (collapsed, settable) Description: 移动到分类, Value: 未整理, Secondary Actions: Expand
+							57 menu
+								58 (selected) 未整理
+								59 待购
+								60 家居改造
+								61 以后看看
+						62 button 移动
+					63 button 移入回收站, Help: 可以从回收站恢复
+			64 row
+				65 cell
+					66 text example.com
+					67 link Description: [演示] 留给下次的灵感 ↗, Value: example.com/?idea=reading
+					68 text 试试搜索“灵感”，或移动到自己的分类。
+					69 text https://example.com/?idea=reading
+					70 text 未整理
+					71 container
+						72 pop up button (collapsed, settable) Description: 移动到分类, Value: 未整理, Secondary Actions: Expand
+							73 menu
+								74 (selected) 未整理
+								75 待购
+								76 家居改造
+								77 以后看看
+						78 button 移动
+					79 button 移入回收站, Help: 可以从回收站恢复
+			80 row
+				81 cell
+					82 text www.python.org
+					83 link Description: [演示] Python 官方网站 ↗, Value: python.org/
+					84 text 这是一条演示书签，可以移入回收站。
+					85 text https://www.python.org/
+					86 text 以后看看
+					87 container
+						88 pop up button (collapsed, settable) Description: 移动到分类, Value: 以后看看, Secondary Actions: Expand
+							89 menu
+								90 未整理
+								91 待购
+								92 家居改造
+								93 (selected) 以后看看
+						94 button 移动
+					95 button 移入回收站, Help: 可以从回收站恢复
+		96 heading ＋ 保存一个链接, Value: 2
+			97 text ＋ 保存一个链接
+		98 text 无需整理完美，先留住它。
+		99 container
+			100 text 网页链接 *
+			101 text field (settable) 网页链接 *, ID: url
+			102 text 标题（可选）
+			103 text field (settable) 标题（可选）, ID: title
+			104 text 描述（可选）
+			105 text entry area (settable) 描述（可选）, ID: description
+			106 text 保存到分类
+			107 combo box (settable) 保存到分类, Value: 未整理, ID: category
+			108 text 可选已有分类，也可输入新名称。
+			109 button 保存收藏
+		110 text 源自 Atlas「生活待购与灵感收藏夹」 · 数据保存在本机 SQLite · 不抓取网页，不同步云端
+
+The focused UI element is 1 AXWebArea 留存 · 个人收藏夹, URL: 127.0.0.1:5273/

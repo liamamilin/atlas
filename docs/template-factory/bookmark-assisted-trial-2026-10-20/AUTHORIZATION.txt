@@ -1,0 +1,215 @@
+Atlas：可用优先的辅助试产指令
+目标：先交付一个我能打开、能保存和找回链接的书签应用。
+依据：2026-10-20，GitHub HEAD f0e58096b2abfe539eb6c49ce8413fb0bd4df42c。
+仓库：https://github.com/liamamilin/atlas
+分支：codex/stabilize-atlas
+
+一、本轮目标调整
+
+我接受首版只有“70分”，先验证它有没有实际使用价值。请将本轮完成标准调整为：
+从当前 R8 已准备的场景、案例与模板内容，导出带来源的标准开发包，由 Codex 直接做出一个真实可运行的书签应用，并完成下文七条核心用户旅程。
+
+这份指令在本轮辅助试产范围内，替代上一份指令中“完整严格 G1 是试用前置”“固定四文件白名单”“模板 author 必须 0”“每次小修都重复完整13组检查”等限制。
+
+本轮先不推进严格 G1 的剩余模型预审、聚合和冻结独审，也不开发新的 trial 模式平台、授权 registry、评分系统或第九轮专属恢复机制。直接利用已经完成的内容交付应用。
+
+首个交付就是一份可试用书签应用及其来源模板包。先把地址、启动方法和可操作结果交到我手上。月度预算、会议笔记保留为紧接着的两个试产样本，不是这一个书签试用版的交付前置。
+
+二、当前真实状态，读一遍即可
+
+R8 已完成前三项有效预审：
+scenario_scope、product_completeness、architecture_contract。
+
+第四项 phase_acceptance 因模型 JSON 缺闭合括号而无有效检查点；不是超时，也没有形成新的有效业务否决。历史重试额度用完导致暂停。
+不必为这份可选审阅再加 grant，也不把无效输出修写成正式 passed。
+
+当前：
+- R8 job：job_dcb163d70a8e400fb07bc606570e2313，attempt 1，failed；原计划 paused。
+- 原 campaign：atlas-v1-first-production-2026-10-19。
+- 原 G1 plan：plan_87059846caf345d2b2fe690657cf324f。
+- 书签 product：product-c42848f63251507bd9d911a5。
+- 场景：scn_7756e0007f6a463a97316f3f49c15248 r2。
+- factory 86 + external 1 = 87/500，活动0；正式G1修复8/8。
+- 严格G1 blocked、正式T08 not_started；正式发布和真实严格P0均为0。
+- 原G1有效截止为北京时间2026-10-21 22:29:11.151877。
+
+以上正式记录保留原值。本轮叫“基于 R8 准备包的辅助试用版”，不是原 G1 的第九轮修复，也不自动变成正式发布模板或正式 application-development 作业消费。辅助应用迭代和实际结果另外如实列出。
+
+三、最短实施路线：准备包 → 应用 → 真实试用
+
+优先由当前 Codex 会话直接编码、运行、修复，不再调用 OpenCode 逐层审查这份模板。已有模型审查结论可以参考，试用交付由真实操作决定。
+
+1. 复用 R8 已准备内容，不重新研究案例、不重新生成整份模板。
+2. 使用现有 render/freeze/export 函数组装一个独立的本地试用模板快照和标准开发包。
+3. 读取导出包，直接在独立应用目录实现书签应用。
+4. 启动实际应用，使用真实浏览器完成七条核心旅程；遇到核心失败继续修到能用。
+5. 给我可点击的本地地址、完整源码包、一条清晰的启动命令、简短使用说明和已知缺口。
+
+不要先去改正式队列的 review_status 门槛。现有正式 queue_development 在两处要求 passed，还会继承原计划 paused；本轮直接辅助开发不需要为此重构工厂。
+
+也不要先做一个“选择严格/宽松”的管理页面。试用标记和一份简短说明已经足够。
+
+四、如何复用当前 R8 内容（供实现时定位）
+
+现有目录：
+docs/template-factory/g1-r8-contract-convergence-2026-10-20/
+
+主要输入：
+- prepared-response.json：effective_plan.spec、effective_plan_digest、case_design、prepared_program_revision.entries。
+- PRODUCER_CHECKPOINTS.json：job.snapshot，以及 blueprint-research、blueprint-accepted-facts-view、case-adaptation 的结果。
+- prepared-programs/acceptance/：四份实际修订后的程序文件。
+- program-manifest.json：九份程序的来源和摘要。
+- DELIVERY.md、PROGRAM_CONSISTENCY.md：已经完成的修正和实际停止点。
+
+本轮使用的有效 plan digest：
+8bf361dbaae383b02cb3fd48020cfa6d9a229edc2f08a00e5f92029fb8c3e3a4
+
+其余五份原字节文件可从 manifest 指向的历史冻结 source 读取：
+docs/template-factory/g1-r7-evidence-recovery-2026-10-20/actual-frozen-review/job_b01427592b164863aab5bedf7b3863bb/source/
+
+可以写一个小的本地导出脚本，复用：
+- template_factory.cognition.research_from_accepted_facts
+- template_factory.cognition.render_candidate(result, research, snapshot, candidate, job_id)
+- template_factory.blueprints.freeze_blueprint(source, target, provenance)
+- template_factory.blueprints.export_development(bundle, digest, destination, project_name, phase)
+
+实施要点：
+- 从正式已保存输入复制 snapshot 到本地对象，补齐实际 case_facts_view 和 case_design；不要改数据库快照。
+- raw research 通过现有 accepted-facts 投影函数处理，不把案例层其他事实加进当前场景。
+- result 使用 effective_plan.spec 和真实九文件内容，先核对输入摘要。
+- render_candidate 生成 template.json、架构和验收派生文件；freeze/export 保留结构和来源校验。
+- freeze 的 provenance 必须包含与规格一致的 case_facts_view，否则现有 verify_frozen 会拒绝；同时写明 origin=assisted-trial、来源叶子/场景/案例、原job和prepared-plan摘要。
+- 使用独立 local trial 标识和新目录，不能把本地快照伪装成已经登记的正式 tpl/job。
+- 不调用 import_blueprint、add_artifact、publish 去制造正式目录记录，不写 review_status=passed。
+- freeze 在这里仅表示本地输入快照固定，不代表模型独审或运行验收通过。
+
+这条路线不需要恢复原失败任务、不需要新模型审阅，也不需要修改业务数据库。
+若接口细节与实际代码不同，按现有函数签名和结构校验适配本地导出脚本；不要为了一个导出动作扩大为工厂重构。
+
+标准包中的完整严格合同原样保留，另附本次 TRIAL_SCOPE.md：
+- 本次实现和实际验证的核心范围。
+- 尚未实现或未验证的严格功能。
+- 本指令对辅助试用开发优先级的调整。
+不要删掉旧断言来伪造全套通过。
+
+五、实现范围：小而真实
+
+使用当前模板约定的 Python Web + SQLite 路线，优先已有依赖。建议应用放在仓库独立 examples/bookmark-trial/ 目录；根据仓库已有结构选择等价目录也可以。
+
+首版至少有：
+- 清楚的中文首页、保存表单、链接列表。
+- 输入URL和可选标题/描述。
+- 简单分类创建、归类/移动、分类筛选。
+- 关键词搜索、无结果状态。
+- 打开保存的原始链接。
+- 可读的错误提示。
+- SQLite持久化；刷新和重启后数据仍在。
+
+页面需要能顺畅操作，按钮和表单有实际作用；不要求复杂视觉设计、多端适配、账户体系或上线公网。
+提供少量明显标记的演示数据。演示数据库属于本次应用，不改 Atlas 原业务库，不把测试数据写成真实案例新增。
+
+允许 Codex 修改实现核心可用所需的应用代码、说明、局部模板工作副本和针对性测试，不受上一轮“四份替换、五份复用”约束。保留版本差分即可。
+尽量直接利用 R8 已修正的初始化、原URL链接、软删读取、搜索和错误语义，避免重新发明互相冲突的合同。
+
+如果完整P0中部分非核心功能尚未做完，明确延期，并隐藏或清楚标识其入口；不要显示一个点击后会报错、误删或损坏数据的“完成”按钮。
+不要为追求所谓70分，故意删除已经容易保留且正常工作的功能。
+
+六、七条真实核心用户旅程
+
+以下是进入试用的最低条件，不是“10项随便过7项就算70分”。每条都要在实际应用执行，失败就修。
+
+1. 启动并打开
+按照交付的启动方式启动应用，用真实浏览器打开首页，看见可操作的保存入口和列表；不需要用户先手工修改源码。
+
+2. 保存并读回
+通过页面保存两条不同的HTTP(S)链接，包含标题或描述。刷新后仍存在，内容对应正确。不能只用mock、内存假列表或API fixture代替页面操作。
+
+3. 分类整理
+通过页面创建一个分类，把其中一条记录归到该分类或移动过去。刷新后分类归属不变，分类筛选能找到它。
+
+4. 搜索找回
+按标题/hostname/描述中的可控关键词找到对应记录；分类筛选与关键词组合能找到目标；不匹配词呈现清楚的空结果。
+不要求本轮穷尽全部边界组合，但不能搜错主要记录。
+
+5. 打开原始链接
+目标记录的打开动作精确指向保存的原始URL，路径、查询串等不能被错误改写。
+可以使用受控本地目标页验证真实点击/新标签行为，或捕获浏览器导航目标；无需访问任意外网网站。
+
+6. 错误输入与恢复
+至少验证明显非法URL和非HTTP(S)协议被拒绝：页面给出可理解提示，不新增坏记录。改为合法输入后可成功保存。
+
+7. 真实重启持久化
+停止再启动同一实际应用，使用同一数据目录；先前记录、分类归属、搜索和打开仍正常。普通顺序使用不能丢数据。
+现有Docker容易复用就复用；不把严格的同容器ID、复杂phase proof或多套重复重启检查新增为试用前置。
+
+用一份简短结果记录这些动作、实际目标地址/版本和结果，并保留能解释失败或成功的截图/日志。先用真实操作验证，截图数量和报告篇幅不作为考核。
+
+七、明确可以后置的事项
+
+本轮不作为交付前置：
+- 六项模型预审、聚合、八维冻结独审全部通过。
+- 为可选模型审查的JSON格式错误反复申请额外资格。
+- 全32个分类错误分支、所有状态码/输入类型/HTML与JSON组合。
+- 分类删除、软删与分类迁移的全部交叉恢复矩阵。
+- 重复fresh实例和每条API/HTML等价性的全面穷举。
+- 并发写入专项、压力与长期稳定性测试。
+- P1离线证明、导入导出、去重、图标/外部元数据等增强能力。
+- 完整严格P0套件和独立执行器全部认证。
+- 每次应用局部小改后重新跑工厂全部13组本地门禁。
+- 先改造完整工厂平台，再允许生成首个应用。
+
+可以运行已有严格套件中方便复用的部分，记录其真实结果；非核心失败进已知问题，不阻止七条核心旅程已经通过的辅助试用交付。
+保留仓库正常CI，不篡改已有CI结果。对改动做相关检查、应用启动/构建和上述实际旅程；停止无具体风险的重复全量验证。
+
+八、仍要保留的基本要求
+
+- 保存、找回、分类、打开和重启持久化真实可用。
+- 真实来源能追溯到现有叶子、场景、案例与本次模板包；没有运行过上游项目就继续标明。
+- 未实现、未测、审阅协议失败分别如实记录，不能写成通过。
+- 不修改历史冻结字节、旧报告、预算历史或正式G1结论。
+- 给我实际能启动和使用的结果，不能只交付“接口已实现”“CI通过”或一份截图。
+- 对本次应用的迭代可以直接继续，不为每个UI/保存/搜索bug再请求一次业务修复授权。
+- 本轮无需额外设置一个会反复过期的辅助开发窗口；原严格G1的时间记录不变。若使用其受控模型调用服务，仍按正式有效预算/时间约束计账。
+
+九、预算和工作记录
+
+优先让 Codex 直接实现，不新增 OpenCode 前置审阅。
+当前500上限不增加，也不通过换campaign、换provider或账外脚本隐去额外调用。
+
+- 如果本轮没有新增受控OpenCode调用，保留原87/500，报告“工厂/外部OpenCode新增0”；不能报告“开发成本0”。
+- 如确有额外OpenCode需要，沿同一campaign的正式预算入口记录，计入500；不恢复旧失败review operation，不伪造未消费grant。
+- 若现有入口不适合该可选调用，继续Codex直接开发，不为可选模型工具再造授权机制。
+- 正式G1修复仍按旧记录8/8保留；辅助工作副本的实际迭代、改动和检查另列，不伪称没有发生改动，也不冒充获批的原G1第九轮。
+
+十、本轮交付完成标准
+
+完成书签应用后，请先在最终回复最前面给：
+1. 可以打开的本地地址，或一条可直接运行的启动命令。
+2. 源码目录和可下载的完整应用包。
+3. 三五句话说明如何保存、分类、搜索和打开链接。
+4. 七条核心旅程实际结果。
+5. 简短已知缺口列表。
+
+同时附来源模板包和精简TRIAL_REPORT，记录：
+- 来源叶子/场景/案例、R8 prepared plan和开发包摘要。
+- 实际应用源码/归档摘要及启动环境。
+- 这是Codex辅助开发，未冒充正式application-development队列消费。
+- 是否真实可试用；严格G1/T08仍按原事实。
+- 新增受控模型调用、辅助迭代和对应提交。
+不要求再写几十份重复的授权、恢复、停止和汇总文档。
+
+提交并推送本轮代码和必要证据，保留用户已有修改。不要把日志中的CI绿色放在真实可用成果之前作为主要交付。
+
+本轮核心成功条件：
+已有场景与共享案例 → R8试用模板快照 → 标准开发包 → Codex实际应用 → 我能亲自试用。
+
+这证明模板能够支持产出可用应用；它还不等于全自动批量工厂或原严格G1通过。
+第一份可试用交付完成后，再按这条已经实际走过的路径推进预算、会议笔记，并据真实结果决定哪些自动化和严格门禁值得接回。
+不要在第一份真实应用出现之前，又把主要工作转回恢复框架建设。
+
+核查来源：
+https://github.com/liamamilin/atlas/blob/f0e58096b2abfe539eb6c49ce8413fb0bd4df42c/docs/template-factory/g1-r8-contract-convergence-2026-10-20/DELIVERY.md
+https://github.com/liamamilin/atlas/blob/f0e58096b2abfe539eb6c49ce8413fb0bd4df42c/application-atlas-production-pack/template_factory/cognition.py
+https://github.com/liamamilin/atlas/blob/f0e58096b2abfe539eb6c49ce8413fb0bd4df42c/application-atlas-production-pack/template_factory/blueprints.py
+https://github.com/liamamilin/atlas/blob/f0e58096b2abfe539eb6c49ce8413fb0bd4df42c/application-atlas-production-pack/template_factory/development_jobs.py
+

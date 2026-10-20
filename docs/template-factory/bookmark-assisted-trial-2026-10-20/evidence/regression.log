@@ -1,0 +1,16 @@
+test_category_errors_leave_records_unchanged (test_app.TrialTests) ... ok
+test_http_errors_origin_and_html_escaping (test_app.TrialTests) ... 127.0.0.1 - - [20/Oct/2026 23:36:21] "POST /api/bookmarks HTTP/1.1" 400 -
+127.0.0.1 - - [20/Oct/2026 23:36:21] "POST /api/categories HTTP/1.1" 403 -
+127.0.0.1 - - [20/Oct/2026 23:36:21] "GET /go/missing-record HTTP/1.1" 404 -
+127.0.0.1 - - [20/Oct/2026 23:36:21] "POST /api/bookmarks HTTP/1.1" 201 -
+127.0.0.1 - - [20/Oct/2026 23:36:21] "GET / HTTP/1.1" 200 -
+ok
+test_initialization_does_not_resurrect_renamed_presets (test_app.TrialTests) ... ok
+test_invalid_input_is_atomic_and_recoverable (test_app.TrialTests) ... ok
+test_move_trash_category_deletion_and_restore (test_app.TrialTests) ... ok
+test_original_url_unicode_search_and_persistence (test_app.TrialTests) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.541s
+
+OK

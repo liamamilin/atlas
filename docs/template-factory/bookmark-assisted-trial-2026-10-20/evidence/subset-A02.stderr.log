@@ -1,0 +1,69 @@
+[a02-home-status] PASS GET http://127.0.0.1:64548/ -> HTTP 200（期望 200）
+[a02-save-form] PASS 首页含 action=/bookmarks/new 且 method=post 的保存表单
+[a02-boundary-status] PASS POST http://127.0.0.1:64548/bookmarks/new -> HTTP 303（期望 303）
+[a02-boundary-location] PASS 303 响应必须带 Location，实际 '/?category=%E6%9C%AA%E6%95%B4%E7%90%86&notice=saved'
+[a02-boundary-follow-status] PASS GET http://127.0.0.1:64548/?category=%E6%9C%AA%E6%95%B4%E7%90%86&notice=saved -> HTTP 200（期望 200）
+[a02-boundary-row] PASS 单标签主机 URL='http://atlas-a02-aaee4af1ddc3' 出现在 HTML 列表
+[a02-boundary-id] PASS 单标签主机记录 data-record-id='3a7b7c20ade149ed812c7e6947c7cfe6'
+[a02-boundary-href] PASS 行内 href='http://atlas-a02-aaee4af1ddc3'（期望精确等于 'http://atlas-a02-aaee4af1ddc3'）
+[a02-boundary-record-status] PASS GET http://127.0.0.1:64548/api/bookmarks/3a7b7c20ade149ed812c7e6947c7cfe6 -> HTTP 200（期望 200）
+[a02-boundary-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a02-boundary-json-url] PASS JSON url='http://atlas-a02-aaee4af1ddc3'（期望原始字符串 'http://atlas-a02-aaee4af1ddc3'）
+[a02-json-before-create-list-status] PASS GET http://127.0.0.1:64548/api/bookmarks -> HTTP 200（期望 200）
+[a02-json-before-create-list-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a02-json-boundary-create-status] PASS POST http://127.0.0.1:64548/api/bookmarks -> HTTP 201（期望 201）
+[a02-json-boundary-new-id] PASS 独立 JSON POST 返回新的非空 id='1bcefa85e8b641d59f67394b3c6f3538'
+[a02-json-boundary-record-status] PASS GET http://127.0.0.1:64548/api/bookmarks/1bcefa85e8b641d59f67394b3c6f3538 -> HTTP 200（期望 200）
+[a02-json-boundary-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a02-json-boundary-readback] PASS 独立 GET 读回同一 id 与精确原始 URL
+[a02-json-positive-list-status] PASS GET http://127.0.0.1:64548/api/bookmarks -> HTTP 200（期望 200）
+[a02-json-positive-list-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a02-json-boundary-listed] PASS 列表包含同一 JSON 创建记录与原始 URL
+[a02-before-list-status] PASS GET http://127.0.0.1:64548/api/bookmarks -> HTTP 200（期望 200）
+[a02-before-list-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a02-html-missing-scheme-status] PASS POST http://127.0.0.1:64548/bookmarks/new -> HTTP 400（期望 400）
+[a02-html-missing-scheme-form-error] PASS HTML 非法 URL 显示可读 form-error，实际 '请输入完整的 http:// 或 https:// 网页链接（域名不能包含空格）。 (invalid_url)'
+[a02-html-missing-scheme-form-present] PASS HTML 错误页保留可重新提交的保存表单
+[a02-html-missing-scheme-retained] PASS HTML 错误页保留 url='aaee4af1ddc3.example.com/no-scheme'（期望 'aaee4af1ddc3.example.com/no-scheme'）
+[a02-json-missing-scheme-status] PASS POST http://127.0.0.1:64548/api/bookmarks -> HTTP 400（期望 400）
+[a02-json-missing-scheme-code] PASS JSON 非法 URL 错误码='invalid_url'（期望 invalid_url）
+[a02-html-javascript-scheme-status] PASS POST http://127.0.0.1:64548/bookmarks/new -> HTTP 400（期望 400）
+[a02-html-javascript-scheme-form-error] PASS HTML 非法 URL 显示可读 form-error，实际 '请输入完整的 http:// 或 https:// 网页链接（域名不能包含空格）。 (invalid_url)'
+[a02-html-javascript-scheme-form-present] PASS HTML 错误页保留可重新提交的保存表单
+[a02-html-javascript-scheme-retained] PASS HTML 错误页保留 url='javascript:void(aaee4af1ddc3)'（期望 'javascript:void(aaee4af1ddc3)'）
+[a02-json-javascript-scheme-status] PASS POST http://127.0.0.1:64548/api/bookmarks -> HTTP 400（期望 400）
+[a02-json-javascript-scheme-code] PASS JSON 非法 URL 错误码='invalid_url'（期望 invalid_url）
+[a02-html-ftp-scheme-status] PASS POST http://127.0.0.1:64548/bookmarks/new -> HTTP 400（期望 400）
+[a02-html-ftp-scheme-form-error] PASS HTML 非法 URL 显示可读 form-error，实际 '请输入完整的 http:// 或 https:// 网页链接（域名不能包含空格）。 (invalid_url)'
+[a02-html-ftp-scheme-form-present] PASS HTML 错误页保留可重新提交的保存表单
+[a02-html-ftp-scheme-retained] PASS HTML 错误页保留 url='ftp://aaee4af1ddc3.example.com/manual'（期望 'ftp://aaee4af1ddc3.example.com/manual'）
+[a02-json-ftp-scheme-status] PASS POST http://127.0.0.1:64548/api/bookmarks -> HTTP 400（期望 400）
+[a02-json-ftp-scheme-code] PASS JSON 非法 URL 错误码='invalid_url'（期望 invalid_url）
+[a02-html-empty-host-status] PASS POST http://127.0.0.1:64548/bookmarks/new -> HTTP 400（期望 400）
+[a02-html-empty-host-form-error] PASS HTML 非法 URL 显示可读 form-error，实际 '请输入完整的 http:// 或 https:// 网页链接（域名不能包含空格）。 (invalid_url)'
+[a02-html-empty-host-form-present] PASS HTML 错误页保留可重新提交的保存表单
+[a02-html-empty-host-retained] PASS HTML 错误页保留 url='http://'（期望 'http://'）
+[a02-json-empty-host-status] PASS POST http://127.0.0.1:64548/api/bookmarks -> HTTP 400（期望 400）
+[a02-json-empty-host-code] PASS JSON 非法 URL 错误码='invalid_url'（期望 invalid_url）
+[a02-html-space-in-hostname-status] PASS POST http://127.0.0.1:64548/bookmarks/new -> HTTP 400（期望 400）
+[a02-html-space-in-hostname-form-error] PASS HTML 非法 URL 显示可读 form-error，实际 '请输入完整的 http:// 或 https:// 网页链接（域名不能包含空格）。 (invalid_url)'
+[a02-html-space-in-hostname-form-present] PASS HTML 错误页保留可重新提交的保存表单
+[a02-html-space-in-hostname-retained] PASS HTML 错误页保留 url='http://aaee4af1ddc3.exa mple.com/path'（期望 'http://aaee4af1ddc3.exa mple.com/path'）
+[a02-json-space-in-hostname-status] PASS POST http://127.0.0.1:64548/api/bookmarks -> HTTP 400（期望 400）
+[a02-json-space-in-hostname-code] PASS JSON 非法 URL 错误码='invalid_url'（期望 invalid_url）
+[a02-html-illegal-hostname-status] PASS POST http://127.0.0.1:64548/bookmarks/new -> HTTP 400（期望 400）
+[a02-html-illegal-hostname-form-error] PASS HTML 非法 URL 显示可读 form-error，实际 '请输入完整的 http:// 或 https:// 网页链接（域名不能包含空格）。 (invalid_url)'
+[a02-html-illegal-hostname-form-present] PASS HTML 错误页保留可重新提交的保存表单
+[a02-html-illegal-hostname-retained] PASS HTML 错误页保留 url='http://aaee4af1ddc3.example.com|invalid/'（期望 'http://aaee4af1ddc3.example.com|invalid/'）
+[a02-json-illegal-hostname-status] PASS POST http://127.0.0.1:64548/api/bookmarks -> HTTP 400（期望 400）
+[a02-json-illegal-hostname-code] PASS JSON 非法 URL 错误码='invalid_url'（期望 invalid_url）
+[a02-after-list-status] PASS GET http://127.0.0.1:64548/api/bookmarks -> HTTP 200（期望 200）
+[a02-after-list-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a02-relative-count] PASS 非法提交前后记录数 3->3，标记记录数 2->2（不得新增）
+[a02-missing-scheme-absent] PASS 被拒绝的 url='aaee4af1ddc3.example.com/no-scheme' 不出现在列表
+[a02-javascript-scheme-absent] PASS 被拒绝的 url='javascript:void(aaee4af1ddc3)' 不出现在列表
+[a02-ftp-scheme-absent] PASS 被拒绝的 url='ftp://aaee4af1ddc3.example.com/manual' 不出现在列表
+[a02-empty-host-absent] PASS 被拒绝的 url='http://' 不出现在列表
+[a02-space-in-hostname-absent] PASS 被拒绝的 url='http://aaee4af1ddc3.exa mple.com/path' 不出现在列表
+[a02-illegal-hostname-absent] PASS 被拒绝的 url='http://aaee4af1ddc3.example.com|invalid/' 不出现在列表
+[atlas] A02: passed; 断言 68 条
