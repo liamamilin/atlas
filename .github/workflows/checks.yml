@@ -43,6 +43,8 @@ jobs:
         run: python -m unittest discover -s examples/bookmark-trial/tests -v
       - name: Verify assisted budget trial regressions
         run: python -m unittest discover -s examples/budget-trial/tests -v
+      - name: Verify assisted meetings trial regressions
+        run: python -m unittest discover -s examples/meetings-trial/tests -v
       - uses: actions/setup-node@v4
         with:
           node-version: '22'

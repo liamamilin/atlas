@@ -18,7 +18,7 @@
 
 ## 真实案例和模板
 
-共享case `case:assisted-budget-actual r1`，digest `36729c5ed3f35e8732580af41fa69c27e16eacaaa067f38b9e73bfc0eaff12f0`。固定[Actual Budget](https://github.com/actualbudget/actual/tree/8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc)；MIT许可证随upstream-evidence.zip保存。源码定位月/分类SUM、整数cents CLI、重算；无结转/收入/极简模型标为目标推断。CaseLibrary.commit_research正式服务保存，原应用实证API读取同一记录，模板inputs/shared-case-record.json逐字引用，证据独立审阅pending，上游运行not_run。
+共享case `case:assisted-budget-actual r1`，digest `36729c5ed3f35e8732580af41fa69c27e16eacaaa067f38b9e73bfc0eaff12f0`。固定[Actual Budget](https://github.com/actualbudget/actual/tree/8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc)；MIT许可证随upstream-evidence.zip保存。源码定位月/分类SUM、整数cents CLI、重算；无结转/收入/极简模型标为目标推断。CaseLibrary.commit_research正式服务保存，原应用实证API读取同一记录，模板inputs/shared-case-record.json保留完整同一记录对象（宿主JSON缩进不同，非逐字字节相同），证据独立审阅pending，上游运行not_run。
 
 正式场景 `scn_6fb4896d9eb0428aa1c080df0a137813 r1`原记录仍draft；用户明确授权此固定场景辅助开发，本地副本注明确认来源，不修改正式场景或通过状态。
 

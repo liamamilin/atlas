@@ -1,0 +1,137 @@
+{
+  "case_id": "case:assisted-meetings-joplin",
+  "app_name": "Joplin",
+  "source_snapshots": [
+    {
+      "repository": "https://github.com/laurent22/joplin",
+      "commit_sha": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+      "strategy_version": "assisted-core-source-v1",
+      "collected_at": "2026-10-20T16:12:04.995605+00:00",
+      "local_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/sources/assisted-trials/joplin-cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+      "files": {
+        "LICENSE": "f6b29267fe2c4251ed95cf9c846b47774a970c5960be9eb8a409f21ffd98425e",
+        "packages/lib/models/Note.ts": "38ab2fd9ca041ba56f089fa399762e680fe18806a9fc2d731522bd83cf274d23",
+        "packages/lib/models/Folder.ts": "ca2054cb4ffb1c0fc91d6c821bb46059cbe263bd7cd8499a5c63ab7b5fcbd48c",
+        "readme/api/references/rest_api.md": "9506a39c77b454f95b74f297ff4a8c5178815ad6d835c71955256172609a4202"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license": {
+        "status": "located",
+        "notice_hashes": {
+          "LICENSE": "f6b29267fe2c4251ed95cf9c846b47774a970c5960be9eb8a409f21ffd98425e"
+        },
+        "spdx": "AGPL-3.0-or-later (root LICENSE; listed exceptions not exhaustively audited)"
+      },
+      "license_uncertainties": [
+        "File-level exceptions not exhaustively audited; reference study only, no upstream code copied into application"
+      ],
+      "excluded_paths": [
+        "All unselected files; no build or upstream runtime"
+      ]
+    }
+  ],
+  "research": {
+    "summary": "固定Joplin笔记/笔记本/搜索与API文档；目标仅借鉴容器、正文持久化与回查，场景置顶/归档为独立设计，不复制上游代码。",
+    "scope": "多项目会议结论的单一归属、正文保存、回查及可恢复生命周期",
+    "unknowns": [
+      "上游未运行",
+      "证据独立审阅pending",
+      "未穷尽文件级许可证例外；不复制上游实现"
+    ],
+    "input_digest": "3c58979e9f9fd1add4a9908f03a0d58821e1327df56c1431ba56fb5e7732a629",
+    "task_id": "assisted-trial-meetings-2026-10-21"
+  },
+  "observations": [
+    {
+      "evidence_id": "ev_assisted_notes_container",
+      "kind": "code_observation",
+      "statement": "Folder.notes查询按单一parent_id读取笔记；非includeDeleted时增加deleted_time=0条件，表明容器归属和软删除过滤是分开处理的。",
+      "location": {
+        "commit_sha": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+        "path": "packages/lib/models/Folder.ts",
+        "file_digest": "ca2054cb4ffb1c0fc91d6c821bb46059cbe263bd7cd8499a5c63ab7b5fcbd48c",
+        "line_start": 70,
+        "line_end": 85
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_notes_move",
+      "kind": "code_observation",
+      "statement": "Note.move相关实现将目标parentId赋给output.parent_id后保存；归属是单一笔记本标识。",
+      "location": {
+        "commit_sha": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+        "path": "packages/lib/models/Note.ts",
+        "file_digest": "38ab2fd9ca041ba56f089fa399762e680fe18806a9fc2d731522bd83cf274d23",
+        "line_start": 300,
+        "line_end": 331
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_notes_search",
+      "kind": "code_observation",
+      "statement": "Note搜索路径分别处理deleted_time、parent_id条件，并在titlePattern路径使用(title LIKE ? OR body LIKE ?)；这是静态源码观察，不等同于所有全库搜索实现。",
+      "location": {
+        "commit_sha": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+        "path": "packages/lib/models/Note.ts",
+        "file_digest": "38ab2fd9ca041ba56f089fa399762e680fe18806a9fc2d731522bd83cf274d23",
+        "line_start": 452,
+        "line_end": 490
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_notes_docs",
+      "kind": "documentation",
+      "statement": "REST API参考定义title、body和笔记本parent_id；说明改变parent_id可移动笔记，并提供search入口。",
+      "location": {
+        "url": "https://github.com/laurent22/joplin/blob/cf57e5932584c0fbd894d8510f1a31a4d41f2251/readme/api/references/rest_api.md",
+        "material_version": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+        "content_digest": "9506a39c77b454f95b74f297ff4a8c5178815ad6d835c71955256172609a4202"
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_notes_design",
+      "kind": "inference",
+      "statement": "本场景采用扁平项目/收件箱、独立pinned/archived标记、保留项目的回收站与包含归档的全库正文搜索；这些目标取舍不宣称为Joplin原生置顶/归档能力。",
+      "depends_on": [
+        "ev_assisted_notes_container",
+        "ev_assisted_notes_move",
+        "ev_assisted_notes_search",
+        "ev_assisted_notes_docs"
+      ],
+      "reasoning": "沿用单一容器和正文可回查的思想，为多项目会议结论补充场景明确要求的置顶与归档状态；用全新Python/SQLite实现。",
+      "assumptions": [
+        "单用户本机",
+        "只保存纯文本/Markdown原文，不执行HTML",
+        "无上游运行",
+        "无永久删除或到期自动清理"
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "scenario_id": "scn_805c99ffe8da4532817592bb466a505e",
+      "scenario_revision": 1,
+      "reason": "同一固定会议笔记场景的项目归属、正文编辑及历史检索依据",
+      "evidence_ids": [
+        "ev_assisted_notes_container",
+        "ev_assisted_notes_move",
+        "ev_assisted_notes_search",
+        "ev_assisted_notes_docs",
+        "ev_assisted_notes_design"
+      ],
+      "adopted_scope": [
+        "单一项目笔记本",
+        "正文原文",
+        "查询与软删除过滤"
+      ],
+      "exclusions": [
+        "同步/协作",
+        "Joplin插件",
+        "上游运行认证",
+        "原生置顶/归档的无依据声明"
+      ]
+    }
+  ]
+}

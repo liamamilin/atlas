@@ -1,0 +1,281 @@
+{
+  "scenario_record": {
+    "acceptance": [
+      "笔记移入某项目笔记本后出现在该笔记本列表中，且同一时刻只归属一个容器",
+      "被置顶的笔记在所属容器列表的固定位置保持可见，不随按日期或标题排序而移动",
+      "删除笔记后它进入可恢复的回收状态，在保留期内可被恢复并回到库中原有位置",
+      "归档后的笔记不再出现在默认活跃列表，但通过全库搜索仍能找到并打开"
+    ],
+    "audience": "同时跟进多个项目、以桌面端为主的职场人士",
+    "id": "scn_805c99ffe8da4532817592bb466a505e",
+    "leaf": "note-taking-application",
+    "leaf_name": "笔记应用",
+    "name": "多项目会议结论的归档与回查",
+    "objective": "把会议结论和项目细节持续记入个人笔记库，按项目归档并管理活跃与过期笔记，使任一历史记录都能被可靠取回",
+    "revision": 1,
+    "status": "draft",
+    "updated_at": "2026-10-17T01:05:44.788641+00:00",
+    "workflow": [
+      "会议中用快速捕获窗口记录要点，先不决定归属",
+      "会后在桌面端把该笔记移入对应项目笔记本，并补充表格形式的决策与行动项",
+      "把当前重点推进的笔记置顶，使其在列表中始终可见",
+      "按阶段把已结束的笔记归档，清理活跃视图",
+      "把确实不需要的笔记删除，必要时在保留期内恢复",
+      "需要回顾时按容器浏览项目笔记本，找不到时改用全库搜索"
+    ]
+  },
+  "case_ref": {
+    "case_id": "case:assisted-meetings-joplin",
+    "revision": 2,
+    "digest": "010aea528378355df4fbe4cb895a261c3ceb72e1d1e64655c685343630faf4be"
+  },
+  "research": {
+    "summary": "同一共享case r2的静态源码/文档观察与目标推断；无独立证据审阅通过、无上游运行。\nev_assisted_notes_container [code_observation]: Folder.notes查询按单一parent_id读取笔记；非includeDeleted时增加deleted_time=0条件，表明容器归属和软删除过滤是分开处理的。\nev_assisted_notes_design [inference]: 本场景采用扁平项目/收件箱、独立pinned/archived标记、保留项目的回收站与包含归档的全库正文搜索；这些目标取舍不宣称为Joplin原生置顶/归档能力。\nev_assisted_notes_docs [documentation]: REST API参考定义title、body和笔记本parent_id；说明改变parent_id可移动笔记，并提供search入口。\nev_assisted_notes_move [code_observation]: Note.new(parentId)将parentId写入新笔记的output.parent_id，确认新笔记的单一容器标识；该段不是移动实现，移动语义依据单独REST文档。\nev_assisted_notes_search [code_observation]: Note搜索路径分别处理deleted_time、parent_id条件，并在anywherePattern路径使用(title LIKE ? OR body LIKE ?)；只作该分支静态观察，不泛指全部搜索实现。",
+    "sources": [
+      {
+        "id": "S02",
+        "name": "ev_assisted_notes_container",
+        "url": "https://github.com/laurent22/joplin/blob/cf57e5932584c0fbd894d8510f1a31a4d41f2251/packages/lib/models/Folder.ts",
+        "version": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+        "facts": "code_observation: Folder.notes查询按单一parent_id读取笔记；非includeDeleted时增加deleted_time=0条件，表明容器归属和软删除过滤是分开处理的。",
+        "license": "根LICENSE声明AGPL-3.0-or-later，子目录可例外；未穷尽文件级审计，不复制上游实现。",
+        "license_url": "https://github.com/laurent22/joplin/blob/cf57e5932584c0fbd894d8510f1a31a4d41f2251/LICENSE",
+        "reuse": "仅设计研究；Python应用全新实现；证据审阅pending、上游运行not_run"
+      },
+      {
+        "id": "S03",
+        "name": "ev_assisted_notes_design",
+        "url": "https://github.com/laurent22/joplin/blob/cf57e5932584c0fbd894d8510f1a31a4d41f2251/LICENSE",
+        "version": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+        "facts": "inference: 本场景采用扁平项目/收件箱、独立pinned/archived标记、保留项目的回收站与包含归档的全库正文搜索；这些目标取舍不宣称为Joplin原生置顶/归档能力。",
+        "license": "根LICENSE声明AGPL-3.0-or-later，子目录可例外；未穷尽文件级审计，不复制上游实现。",
+        "license_url": "https://github.com/laurent22/joplin/blob/cf57e5932584c0fbd894d8510f1a31a4d41f2251/LICENSE",
+        "reuse": "仅设计研究；Python应用全新实现；证据审阅pending、上游运行not_run"
+      },
+      {
+        "id": "S04",
+        "name": "ev_assisted_notes_docs",
+        "url": "https://github.com/laurent22/joplin/blob/cf57e5932584c0fbd894d8510f1a31a4d41f2251/readme/api/references/rest_api.md",
+        "version": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+        "facts": "documentation: REST API参考定义title、body和笔记本parent_id；说明改变parent_id可移动笔记，并提供search入口。",
+        "license": "根LICENSE声明AGPL-3.0-or-later，子目录可例外；未穷尽文件级审计，不复制上游实现。",
+        "license_url": "https://github.com/laurent22/joplin/blob/cf57e5932584c0fbd894d8510f1a31a4d41f2251/LICENSE",
+        "reuse": "仅设计研究；Python应用全新实现；证据审阅pending、上游运行not_run"
+      },
+      {
+        "id": "S05",
+        "name": "ev_assisted_notes_move",
+        "url": "https://github.com/laurent22/joplin/blob/cf57e5932584c0fbd894d8510f1a31a4d41f2251/packages/lib/models/Note.ts",
+        "version": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+        "facts": "code_observation: Note.new(parentId)将parentId写入新笔记的output.parent_id，确认新笔记的单一容器标识；该段不是移动实现，移动语义依据单独REST文档。",
+        "license": "根LICENSE声明AGPL-3.0-or-later，子目录可例外；未穷尽文件级审计，不复制上游实现。",
+        "license_url": "https://github.com/laurent22/joplin/blob/cf57e5932584c0fbd894d8510f1a31a4d41f2251/LICENSE",
+        "reuse": "仅设计研究；Python应用全新实现；证据审阅pending、上游运行not_run"
+      },
+      {
+        "id": "S06",
+        "name": "ev_assisted_notes_search",
+        "url": "https://github.com/laurent22/joplin/blob/cf57e5932584c0fbd894d8510f1a31a4d41f2251/packages/lib/models/Note.ts",
+        "version": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+        "facts": "code_observation: Note搜索路径分别处理deleted_time、parent_id条件，并在anywherePattern路径使用(title LIKE ? OR body LIKE ?)；只作该分支静态观察，不泛指全部搜索实现。",
+        "license": "根LICENSE声明AGPL-3.0-or-later，子目录可例外；未穷尽文件级审计，不复制上游实现。",
+        "license_url": "https://github.com/laurent22/joplin/blob/cf57e5932584c0fbd894d8510f1a31a4d41f2251/LICENSE",
+        "reuse": "仅设计研究；Python应用全新实现；证据审阅pending、上游运行not_run"
+      }
+    ],
+    "gaps": [
+      "上游未运行，独立证据审阅pending",
+      "置顶/归档是本场景设计，不宣称Joplin原生能力",
+      "只参考设计，不复制实现；根LICENSE AGPL-3.0-or-later与例外说明保留，文件级例外未穷尽审计"
+    ]
+  },
+  "spec": {
+    "title": "会后 · 项目会议笔记",
+    "roles": [
+      {
+        "id": "R01",
+        "name": "项目参与者",
+        "responsibility": "捕获会议结论、按项目归档、编辑更正并回查历史。"
+      }
+    ],
+    "features": [
+      {
+        "id": "F01",
+        "name": "项目归属与快速捕获",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "创建多个项目；会议正文可先存收件箱，再移动到单一项目，不能同时出现在另一项目。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06"
+        ],
+        "acceptance": [
+          "N01"
+        ]
+      },
+      {
+        "id": "F02",
+        "name": "正文保存、编辑与回查",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "UTF-8多行正文/Markdown表格原文保存，编辑后读回一致；标题/正文检索，空结果明确；空正文/旧版本更新不得覆盖数据。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06"
+        ],
+        "acceptance": [
+          "N02"
+        ]
+      },
+      {
+        "id": "F03",
+        "name": "置顶、归档与可恢复清理",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "置顶稳定先于标题/日期排序；归档退出活跃列表但全库检索可找回；回收站可恢复原项目、正文及原状态，不永久删除。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06"
+        ],
+        "acceptance": [
+          "N03"
+        ]
+      },
+      {
+        "id": "F04",
+        "name": "真实重启持久化",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "真实停止和同一SQLite目录启动同一代码，项目、正文、编辑、归档、置顶与搜索仍保留。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06"
+        ],
+        "acceptance": [
+          "N04"
+        ]
+      },
+      {
+        "id": "F05",
+        "name": "附件/富文本/导出/多人协作",
+        "phase": null,
+        "applicability": "later",
+        "reason": "核心是可靠保存和找回文本，附件和协作按实际需求扩展。",
+        "sources": [
+          "S01"
+        ],
+        "acceptance": []
+      }
+    ],
+    "decisions": [
+      {
+        "id": "D01",
+        "question": "正文存储与渲染？",
+        "default": "UTF-8纯文本/Markdown原文，HTML转义显示；不执行正文HTML。",
+        "when_to_ask": "需要富文本或附件时再增加独立设计。",
+        "impact": "准确保存多行内容并避免脚本执行。",
+        "status": "local trial default"
+      },
+      {
+        "id": "D02",
+        "question": "归档与删除有什么区别？",
+        "default": "归档仍在全库搜索；回收站可恢复、不自动过期、无永久删除。",
+        "when_to_ask": "用户要求保留期或永久清除时再明确确认。",
+        "impact": "找回历史与避免意外丢失。",
+        "status": "local trial default"
+      },
+      {
+        "id": "D03",
+        "question": "快速记录是否自动保存？",
+        "default": "点击保存才写入，先进入收件箱；编辑用revision检测陈旧覆盖。",
+        "when_to_ask": "确需实时自动保存/多人协作时再评估。",
+        "impact": "可解释写入边界与冲突反馈。",
+        "status": "local trial default"
+      }
+    ],
+    "phases": [
+      {
+        "id": "P0",
+        "title": "多项目笔记核心旅程",
+        "goal": "捕获会议正文，按项目归属与编辑，稳定置顶/归档/回收恢复，全库搜索找回并跨重启保留。",
+        "features": [
+          "F01",
+          "F02",
+          "F03",
+          "F04"
+        ],
+        "acceptance": [
+          "N01",
+          "N02",
+          "N03",
+          "N04"
+        ]
+      }
+    ],
+    "acceptance": [
+      {
+        "id": "N01",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "创建多个项目；会议正文可先存收件箱，再移动到单一项目，不能同时出现在另一项目。",
+        "features": [
+          "F01"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "N02",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "UTF-8多行正文/Markdown表格原文保存，编辑后读回一致；标题/正文检索，空结果明确；空正文/旧版本更新不得覆盖数据。",
+        "features": [
+          "F02"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "N03",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "置顶稳定先于标题/日期排序；归档退出活跃列表但全库检索可找回；回收站可恢复原项目、正文及原状态，不永久删除。",
+        "features": [
+          "F03"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "N04",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "真实停止和同一SQLite目录启动同一代码，项目、正文、编辑、归档、置顶与搜索仍保留。",
+        "features": [
+          "F04"
+        ],
+        "implementation": "acceptance/probe.py"
+      }
+    ],
+    "architecture_markdown": "## 默认实现\nPython标准库http.server＋SQLite，服务端HTML表单；本机单人127.0.0.1，无账户、同步、外部服务或第三方依赖。全新实现，只参考Joplin固定代码，不复制实现/图标。\n\n## 数据与生命周期\nprojects(id,name UNIQUE,created_at,is_default)，初建“收件箱”默认项目。notes(id,title,body,project_id REFERENCES projects,pinned,archived,trashed_at,revision,created_at,updated_at)。单一项目外键；正文必需非空、最多100000字符，标题可省略取首行，最长120字；保存UTF-8原文不改换行/表格，HTML输出转义而非执行。project创建名称1–80字符，重复409。\n移动只改project_id；置顶与归档独立标记，回收保持原项目/正文/标记，不自动过期、不提供永久删除。默认活跃列表排除archived和trash；q非空的全库搜索包含归档但排除回收站；项目筛选可叠加。view=archive只归档，view=trash仅回收。查询仅标题/正文casefold子串，不提供索引全文或模糊语义。排序先pinned DESC，后选择标题或更新时间，再以id稳定打破平局。\n每次成功编辑revision+1，POST编辑必须带当前revision，旧版本409保持原内容；HTML保留草稿并显示冲突说明，加载最新版本号，再次保存前用户须核对。动作事务化；GET无写入。\n\n## API\nGET /api/health；GET /api/state?project=<id>&q=<text>&view=active|archive|trash&sort=updated|title 返回projects与过滤notes；GET /api/notes/{id}返回完整原文状态（含trash，不恢复）。POST /api/projects {name}→201；POST /api/notes {title,body,project_id?}→201（省略项目到收件箱）；POST /api/notes/update {id,revision,title,body,project_id}→200；POST /api/notes/move {id,project_id}→200；POST /api/notes/pin|archive|trash|restore {id}→200。pin/archive切换对应标记；trash可恢复，已在回收站的笔记禁止其他编辑/移动。\n400 invalid_body/invalid_title/invalid_project/invalid_name/bad_request，404 not_found，409 revision_conflict/already_exists；{error:{code,message}}。不以UI假状态代替数据库。\n\n## 浏览器入口与恢复\nGET / 首页项目侧栏、创建项目、快速记录、标题/正文搜索、排序和活跃/归档/回收视图。GET /note/{id}打开全文，提供项目移动、置顶、归档、回收及恢复动作；GET /note/{id}/edit回填标题/正文/项目并保留revision；保存成功303到全文，其他动作回全文或回收视图；失败400/409可读role=alert，原输入保留并可修正提交。快速捕获可不先选择项目；正文表单明确“点击保存才写入本机”。编辑非自动保存，不能宣称离开页面前未保存草稿已持久化。归档记录仍可从搜索打开，并可取消归档。项目仅创建不支持删除/整体归档。\n\n## 范围\n支持多行纯文本/Markdown表格原文，不渲染富文本、不自动提取行动项、不录音转写；项目可浏览，生命周期与全文回查构成完整核心。权限/计费/云端协作不适用本机首版。真实浏览器、真实重启另记录，HTTP程序不能冒充浏览器。",
+    "limits": [
+      "辅助本机单用户；不声称G1/T08通过。",
+      "无附件/语音/团队/云同步/计费。",
+      "独立证据审阅pending，上游运行not_run。"
+    ]
+  },
+  "trial_scope": "# 会议笔记辅助试用范围\n\n固定scn_805c99ffe8da4532817592bb466a505e r1；用户本轮明确授权，本地确认用于开发，原正式draft状态保留。\n\n范围：项目单一归属、收件箱快速记录、正文/编辑/检索、置顶、归档后回查、回收恢复与重启持久化。纯文本/Markdown原文，无附件/转写/富文本/协作。\n\n先共享case r2与独立模板、标准包，再Codex读取实现；不冒充正式开发队列、独审认证或严格G1/T08。"
+}

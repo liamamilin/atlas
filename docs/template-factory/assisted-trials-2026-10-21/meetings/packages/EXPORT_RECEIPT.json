@@ -1,0 +1,62 @@
+{
+ "origin": "assisted-trial",
+ "template_digest": "3a1dc2c414023091d3189cab0b5fe51cff318442b38a515d8fc2c3e0143a4c5a",
+ "export": {
+  "phase": "P0",
+  "project_name": "meetings-trial",
+  "template_digest": "3a1dc2c414023091d3189cab0b5fe51cff318442b38a515d8fc2c3e0143a4c5a",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1"
+ },
+ "provenance": {
+  "origin": "assisted-trial",
+  "scenario": {
+   "acceptance": [
+    "笔记移入某项目笔记本后出现在该笔记本列表中，且同一时刻只归属一个容器",
+    "被置顶的笔记在所属容器列表的固定位置保持可见，不随按日期或标题排序而移动",
+    "删除笔记后它进入可恢复的回收状态，在保留期内可被恢复并回到库中原有位置",
+    "归档后的笔记不再出现在默认活跃列表，但通过全库搜索仍能找到并打开"
+   ],
+   "audience": "同时跟进多个项目、以桌面端为主的职场人士",
+   "id": "scn_805c99ffe8da4532817592bb466a505e",
+   "leaf": "note-taking-application",
+   "leaf_name": "笔记应用",
+   "name": "多项目会议结论的归档与回查",
+   "objective": "把会议结论和项目细节持续记入个人笔记库，按项目归档并管理活跃与过期笔记，使任一历史记录都能被可靠取回",
+   "revision": 1,
+   "status": "draft",
+   "updated_at": "2026-10-17T01:05:44.788641+00:00",
+   "workflow": [
+    "会议中用快速捕获窗口记录要点，先不决定归属",
+    "会后在桌面端把该笔记移入对应项目笔记本，并补充表格形式的决策与行动项",
+    "把当前重点推进的笔记置顶，使其在列表中始终可见",
+    "按阶段把已结束的笔记归档，清理活跃视图",
+    "把确实不需要的笔记删除，必要时在保留期内恢复",
+    "需要回顾时按容器浏览项目笔记本，找不到时改用全库搜索"
+   ]
+  },
+  "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+  "case_ref": {
+   "case_id": "case:assisted-meetings-joplin",
+   "revision": 2,
+   "digest": "010aea528378355df4fbe4cb895a261c3ceb72e1d1e64655c685343630faf4be"
+  },
+  "case_record_sha256": "e8ab4a9646ec6a3f4dcab37482348cef307bfd88363117041490b4af5d9af8b0",
+  "definition_digest": "f79d06f6e58b6b43fcd6914ce05e09e797ff69dbde028a2a313c8b72e925d266",
+  "official_publication": false,
+  "upstream_runtime": "not_run",
+  "independent_evidence_review": "pending",
+  "note": "Static Codex source study; no model review or formal queue consumption. Local freeze fixes inputs only."
+ },
+ "controlled_opencode_calls_added": 0,
+ "official_queue_consumed": false,
+ "archives": {
+  "template-snapshot.zip": "90231160af1043ec48481c96edd93d2584a7fd75b1ad07fd8b860775685369cb",
+  "development-package.zip": "42d624b768797aa9d265f0725726613b67d739c7dc4ba213c91d5d40dd48c433"
+ }
+}
