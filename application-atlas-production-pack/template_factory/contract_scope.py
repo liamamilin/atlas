@@ -7,6 +7,7 @@ from .store import FactoryError, digest
 REVIEW_RULES_VERSION = "atlas.current-required-contract.v1"
 REPAIR_SCOPE_VERSION = "atlas.aggregate-repair-scope.v1"
 REPAIR_SCOPE_VERSION_R7 = "atlas.aggregate-repair-scope.v2"
+REPAIR_SCOPE_VERSION_FROZEN = "atlas.aggregate-repair-scope.v3"
 COVERAGE_SCHEMA = "atlas.contract-coverage.v1"
 
 
@@ -62,7 +63,7 @@ def validate_contract_coverage(spec, *, required=False):
 
 def validate_repair_scope(scope, spec, edit_paths):
     scope_version = scope.get("version") if isinstance(scope, dict) else None
-    if not isinstance(scope, dict) or scope_version not in {REPAIR_SCOPE_VERSION, REPAIR_SCOPE_VERSION_R7}:
+    if not isinstance(scope, dict) or scope_version not in {REPAIR_SCOPE_VERSION, REPAIR_SCOPE_VERSION_R7, REPAIR_SCOPE_VERSION_FROZEN}:
         _fail("versioned aggregate repair scope is required")
     paths = scope.get("edit_paths")
     fields = scope.get("authored_field_paths")
@@ -89,6 +90,16 @@ def validate_repair_scope(scope, spec, edit_paths):
                 or not isinstance(blocker.get("basis"), str) or not blocker["basis"].strip()):
             _fail("repair blocker must reference an existing feature, acceptance, and optional decision")
     authorized = scope.get("authorized_assertion_changes")
+    if scope_version == REPAIR_SCOPE_VERSION_FROZEN:
+        expected_changes = {("A03", "split_initialization_and_used_target"), ("A13", "target_row_exact_original_url")}
+        if (not isinstance(authorized, list) or len(authorized) != 2
+                or any(not isinstance(row, dict) or not isinstance(row.get("rationale"), str)
+                       or not row["rationale"].strip() for row in authorized)
+                or {(row.get("acceptance_id"), row.get("change")) for row in authorized} != expected_changes
+                or set(paths) != {"acceptance/p0_library.py", "acceptance/p1_maturity.py", "acceptance/README.md", "acceptance/runner.json"}
+                or {tuple(path) for path in fields} != {("architecture_markdown",), ("acceptance", "A03", "goal")}):
+            _fail("frozen contract convergence scope differs from its two semantic changes and exact field/file boundary")
+        return scope
     if not isinstance(authorized, list) or len(authorized) != 1:
         _fail("repair scope must explicitly bind its sole assertion semantic replacement")
     change = authorized[0]

@@ -113,12 +113,13 @@ class EvidenceRecoveryTests(unittest.TestCase):
         (pack / "tests").mkdir()
         (pack / "template_factory/source_marker.py").write_text("# source fixture\n")
         (pack / "tests/source_marker.py").write_text("# test fixture\n")
-        rel_dir = Path("docs/template-factory/g1-r7-evidence-recovery-2026-10-20")
-        data = repo / rel_dir
-        data.mkdir(parents=True)
         evidence = []
         run_ids = (39378796575, 39382442263, 39383180095)
-        for run_id in run_ids:
+        archives = ("g1-r7-evidence-recovery-2026-10-20", "g1-frozen-review-recovery-2026-10-20",
+                    "g1-r8-contract-convergence-2026-10-20")
+        for run_id, archive in zip(run_ids, archives):
+            data = repo / "docs/template-factory" / archive
+            data.mkdir(parents=True)
             path = data / f"ci-{run_id}.json"
             raw = {"runs": [{"run": {"id": run_id, "head_sha": "pending", "status": "completed", "conclusion": "success"},
                              "jobs": {"jobs": [{"name": "check", "status": "completed", "conclusion": "success"},
@@ -141,6 +142,10 @@ class EvidenceRecoveryTests(unittest.TestCase):
         gate = {"source_commit": head, "source_tree_digest": tree, "ci_evidence": evidence}
         service = EvidenceRecoveryService(FactoryStore(self.root / "gate-state", pack))
         self.assertEqual(validate_source_gate(service.store, gate)["source_commit"], head)
+        for path in ("docs/other/ci.json", "docs/template-factory/../ci.json",
+                     "docs/template-factory//ci.json", "docs/template-factory/ci.txt"):
+            with self.subTest(path=path), self.assertRaises(FactoryError):
+                validate_source_gate(service.store, dict(gate, ci_evidence=[dict(item, path=path) for item in evidence]))
         bad = json.loads((repo / evidence[0]["path"]).read_text())
         bad["runs"][0]["jobs"]["jobs"][0]["conclusion"] = "failure"
         bad_path = repo / evidence[0]["path"]

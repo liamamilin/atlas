@@ -73,10 +73,9 @@ def validate_source_gate(store, gate):
             raise FactoryError("CI evidence run identity is duplicated or invalid", "evidence_source_gate", 409)
         observed.add(run_id)
         rel = item["path"]
-        if not isinstance(rel, str) or not rel.startswith((
-                "docs/template-factory/g1-r7-evidence-recovery-2026-10-20/",
-                "docs/template-factory/g1-frozen-review-recovery-2026-10-20/")) or ".." in rel.split("/"):
-            raise FactoryError("CI evidence path is outside the fixed evidence archive", "evidence_source_gate", 409)
+        if (not isinstance(rel, str) or not rel.startswith("docs/template-factory/")
+                or not rel.endswith(".json") or any(part in {"", ".", ".."} for part in rel.split("/"))):
+            raise FactoryError("CI evidence path is outside the template factory evidence archive", "evidence_source_gate", 409)
         path = repo_root / rel
         if path.is_symlink() or any(parent.is_symlink() for parent in (path.parent, *path.parent.parents) if parent != repo_root.parent):
             raise FactoryError("CI evidence must be a regular file without symlinked parents", "evidence_source_gate", 409)

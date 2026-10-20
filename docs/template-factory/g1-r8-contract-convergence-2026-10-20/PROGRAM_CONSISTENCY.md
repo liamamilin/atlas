@@ -1,0 +1,32 @@
+# R8 finite program consistency review
+
+Scope: actual frozen R7 source under `docs/template-factory/g1-r7-evidence-recovery-2026-10-20/actual-frozen-review/job_b01427592b164863aab5bedf7b3863bb/source` and the four files prepared in `prepared-programs/acceptance/`. This is a targeted review of the eight reported recommendations and six linked contracts. It does not certify a generated application, production template, isolated browser run, or offline network environment.
+
+## Eight recommendations
+
+| # | Finding and disposition | Actual locations and evidence boundary |
+| --- | --- | --- |
+| 1. Initialization | A03 checks a used `base_url` against persisted user state and the four presets on a separate first-boot instance from the same `app_root`. A11 keeps its own first-boot behavior. Runner/README add both required paths for A03; the other five acceptance files are byte-reuse files. | Prepared `p0_library.py::_case_a03`, `_case_a11`; prepared `runner.json` A03; README §§1, 4.1, 5. Synthetic fixture only; no production app was run. |
+| 2. Opening | A13 locates the created record row and its open anchor, requiring decoded href to equal the original URL, `_blank`, and `noopener`. The independent `/go/{id}` 302/Location and unknown-ID 404 checks remain in A08. | Prepared `p1_maturity.py::_A13TargetLinkParser`, `_a13_target_link`, `_case_a13`; reused `p0_find_open.py::_case_a08`. A13's old `/go` text assertion was not a 302 test. No external URL was opened. |
+| 3. Soft delete | The selected contract is 200 for existing active and soft-deleted rows, 404 only for absent IDs; GET is read-only. A09's `a09-migrate-record-after-category-delete` calls `_get_record_json` while the migrated record remains trashed, requiring 200 and the default category. A09 also keeps list/count exclusion, recycle-bin, restore, and restart checks. | Reused `p0_recovery.py::_case_a09`, `_get_record_json` (around lines 770–780; migration read around 1200–1216). This is source inspection only; A09 did not run in this work. |
+| 4. Error contract | Preserve v2's 32 category-management/input branches and explain that the machine enumeration is not a product-wide error inventory. Keep actual assertion mapping for URL, malformed JSON, unknown IDs and other branches. | `ASSERTION_MAP.md`; reused `p0_organize.py`, `p0_find_open.py`, `p0_recovery.py`; prepared A02 semantics unchanged. No contract coverage executed here. |
+| 5. A11 parameters | Correct A11's README argv row with `--app-root` and `--data-dir`; its runner row and parser-required behavior remain unchanged. | Prepared README §4.1 and call example; original/reused `runner.json` A11; `common.py::parse_case_args`. JSON comparison verifies only A03's runner entry changed. |
+| 6. Empty-category search | The contract distinguishes GET missing/empty category (all records), unknown nonempty category (empty result), and explicit empty write category (`invalid_category`). A07 submits `category=""` in unscoped negative searches, but does not assert that all records are returned. | Reused `p0_find_open.py::_case_a07`, `_html_search` and `p0_organize.py::_case_a12`; no code change. Static inspection only; full empty-category read semantics are not established by these checks. |
+| 7. A13 offline evidence | A13's no-external-resource assertion covers only that HTML behavior. A complete offline claim requires egress disabled in the existing runtime and evidence bound to app source, application/execution container and receipt. | Prepared README §§5, 8 and `p1_maturity.py::_external_resources`/`_case_a13`. Synthetic unit tests are not network-isolation evidence; no real app or offline receipt exists here. |
+| 8. Repeated architecture heading | The authorized deterministic spec patch removes the initial authored `# 架构与契约` heading; the unchanged exporter supplies the single top-level heading. The frozen predecessor is untouched. | `patch.json` architecture old/new values and `SPEC_AND_PLAN.diff`; `blueprints.render_candidate` supplies the heading. Read-only preparation accepts the patched spec; a real produced artifact still needs runtime pipeline evidence. |
+
+
+## Six linked relationships
+
+| Relationship | Contract and code alignment | Result boundary |
+| --- | --- | --- |
+| Initialization | F02's stated first-initialization/persist-user-state rule is reflected in prepared A03's split checks; A11 retains separate existing fresh behavior. | Program-level agreement checked; no application execution. |
+| Opening | Page anchor retains original URL semantics; A13 checks anchor attributes; A08 separately checks `/go` redirect semantics. | Unit tests exercise prepared A13 parser negatives/positive; no real target run. |
+| Soft delete | Default exclusion, recycle-bin visibility, migration and recovery stay in reused A09; `a09-migrate-record-after-category-delete` reads the still-trashed migrated record by ID and expects 200. The selected contract further says any existing trashed ID returns 200 and GET does not restore it. | Static source review only; no A09 execution. |
+| Search | A07 submits an empty GET category for some HTML searches but does not prove that this returns all records; A12 directly checks explicit empty write rejection. The read/write distinction is explicit, and the complete read semantic remains outside these unchanged tests. | Static source review only; no A07/A12 execution. |
+| Errors | Existing 32 category branches stay scoped to category errors; other branches are listed with actual assertion locations in `ASSERTION_MAP.md`. | Static source/map only; no full suite execution. |
+| Parameters/evidence | A03 gets app/data argv; A11's existing runner row is retained. Program checks cannot establish disabled network egress; evidence must come from the actual bound runtime. | Runner JSON and README inspected; only focused synthetic tests run. |
+
+## Executed checks and limits
+
+The focused Python unit suite exercises synthetic A03 behavior where a used instance has only the default preset but a fresh instance exposes all four, missing fresh presets, missing arguments, startup failure, source mismatch, cleanup failure, and A13 target-row parsing (including entity decoding, misleading `/go`, wrong row/URL/target/rel, and duplicate/missing links). These fixtures do not run or emulate an actual P0 application. No A01–A15 target acceptance, offline isolation, Docker run, design review, or production flow was executed as part of this assigned scope.

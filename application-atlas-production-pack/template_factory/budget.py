@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+from pathlib import Path
 import re
 import time
 import uuid
@@ -258,6 +259,63 @@ class BudgetLedger:
         return get_time_resume_locked(con, campaign_id=self.campaign_id,
                                       product_id=str(identity), plan_id=plan_id)
 
+    def _effective_timing_locked(self, con, identity, phase="G1", plan_id=None):
+        """Resolve one authoritative deadline and its provenance.
+
+        A registered amendment is inert until activation.  An activated
+        version 5 may supersede the timing source it explicitly bound; older
+        pause/resume rows remain available for accounting and audit.
+        """
+        phase_row = con.execute(
+            "SELECT started,deadline FROM tf_budget_phase WHERE campaign_id=? AND identity=? AND phase=?",
+            (self.campaign_id, "__campaign_segment__", str(phase)),
+        ).fetchone()
+        base_started = phase_row["started"] if phase_row else None
+        base_deadline = phase_row["deadline"] if phase_row else None
+        amendment = self._amendment_locked(con, identity, phase, plan_id)
+        resume = self._time_resume_locked(con, identity, phase, plan_id)
+
+        if amendment and amendment["version"] == 5:
+            binding = con.execute(
+                "SELECT request_json,request_digest FROM tf_budget_amendment_binding WHERE amendment_id=?",
+                (amendment["id"],),
+            ).fetchone()
+            if not binding:
+                raise FactoryError("version 5 timing authorization binding is missing", "budget_amendment_basis", 409)
+            request = json.loads(binding["request_json"])
+            expected = request.get("timing", {}).get("supersedes") if isinstance(request, dict) else None
+            if (digest(request) != binding["request_digest"] or not isinstance(expected, dict)
+                    or not resume or expected != self._timing_source_snapshot(resume)
+                    or amendment["activated_at"] is None
+                    or amendment["new_deadline"] != amendment["activated_at"] + amendment["window_seconds"]
+                    or request.get("timing", {}).get("window_seconds") != amendment["window_seconds"]):
+                raise FactoryError("active amendment no longer supersedes its exact timing source", "budget_amendment_basis", 409)
+            return {
+                "base_started_at": base_started, "base_deadline": base_deadline,
+                "deadline": amendment["new_deadline"],
+                "deadline_source": "amendment_superseding_timing",
+                "time_resume": dict(resume), "amendment": dict(amendment),
+                "supersedes": expected,
+            }
+        if resume:
+            return {"base_started_at": base_started, "base_deadline": base_deadline,
+                    "deadline": resume["effective_deadline"],
+                    "deadline_source": "authorized_external_pause_resume",
+                    "time_resume": dict(resume), "amendment": amendment,
+                    "supersedes": None}
+        return {"base_started_at": base_started, "base_deadline": base_deadline,
+                "deadline": amendment["new_deadline"] if amendment else base_deadline,
+                "deadline_source": "amendment" if amendment else "base",
+                "time_resume": None, "amendment": dict(amendment) if amendment else None,
+                "supersedes": None}
+
+    @staticmethod
+    def _timing_source_snapshot(resume):
+        return {"deadline_source": "authorized_external_pause_resume",
+                "source_id": resume["grant_id"], "activated_at": resume["activated_at"],
+                "effective_deadline": resume["effective_deadline"],
+                "authorization_digest": resume["authorization_digest"]}
+
     def begin_segment(self, phase, *, con=None):
         """Start the campaign-wide segment clock once at official queue start."""
         if not phase:
@@ -295,13 +353,10 @@ class BudgetLedger:
             control = con.execute("SELECT paused FROM tf_budget_control WHERE campaign_id=?", (self.campaign_id,)).fetchone()
             if control and control[0]:
                 raise FactoryError("campaign budget is paused", "budget_paused", 409)
-            deadline = self.begin_segment(phase, con=con)
-            amendment = self._amendment_locked(con, identity, phase, plan_id)
-            if amendment:
-                deadline = amendment["new_deadline"]
-            time_resume = self._time_resume_locked(con, identity, phase, plan_id)
-            if time_resume:
-                deadline = time_resume["effective_deadline"]
+            self.begin_segment(phase, con=con)
+            timing = self._effective_timing_locked(con, identity, phase, plan_id)
+            deadline = timing["deadline"]
+            time_resume = timing["time_resume"]
             # Sample the clock after obtaining BEGIN IMMEDIATE. A reservation
             # that waited behind another writer must not receive a timeout
             # based on stale time from before the lock.
@@ -320,14 +375,17 @@ class BudgetLedger:
                 "SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status!='not_started'",
                 (self.campaign_id,),
             ).fetchone()[0]
-            campaign_time_resume = time_resume or self._time_resume_locked(con, G1_AMENDMENT_PRODUCT, "G1", G1_AMENDMENT_PLAN)
+            # External diagnostics are historical campaign consumption. Keep
+            # reading that evidence even after a later amendment supersedes
+            # its deadline source.
+            campaign_time_resume = self._time_resume_locked(con, G1_AMENDMENT_PRODUCT, "G1", G1_AMENDMENT_PLAN)
             external_sessions = campaign_time_resume["external_cli_sessions"] if campaign_time_resume else 0
             if charged + external_sessions >= self.limits["cli_sessions"]:
                 raise FactoryError("campaign CLI session budget exhausted", "budget_exhausted", 409)
             active_limit = self.limits["runtime_concurrency"] if kind == "runtime" else self.limits["production_concurrency"]
             group = "runtime" if kind == "runtime" else "production"
             same_group = con.execute(
-                "SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND group_kind=? AND status IN ('reserved','started','uncertain')",
+                "SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND group_kind=? AND status IN ('reserved','spawn_intent','started','uncertain')",
                 (self.campaign_id, group),
             ).fetchone()[0]
             if same_group >= active_limit:
@@ -505,7 +563,7 @@ class BudgetLedger:
         placeholders = ",".join("?" for _ in ids)
         with self.store.connect(True) as con:
             cur = con.execute(
-                f"UPDATE tf_budget_reservation SET status='failed',finished=?,outcome='recovered_after_owned_processes_stopped' WHERE campaign_id=? AND job_id IN ({placeholders}) AND status IN ('reserved','started','uncertain')",
+                f"UPDATE tf_budget_reservation SET status='failed',finished=?,outcome='recovered_after_owned_processes_stopped' WHERE campaign_id=? AND job_id IN ({placeholders}) AND status IN ('reserved','spawn_intent','started','uncertain')",
                 (float(self.clock()), self.campaign_id, *ids),
             )
         return cur.rowcount
@@ -649,43 +707,39 @@ class BudgetLedger:
         # intentionally campaign-wide rather than product-scoped.
         phase = phase or identity
         with self.store.connect() as con:
-            row = con.execute("SELECT deadline FROM tf_budget_phase WHERE campaign_id=? AND identity=? AND phase=?",
-                              (self.campaign_id, "__campaign_segment__", str(phase))).fetchone()
-            amendment = self._amendment_locked(con, identity, phase, plan_id)
-            resumed = self._time_resume_locked(con, identity, phase, plan_id)
-        deadline = amendment["new_deadline"] if amendment else (row[0] if row else None)
-        if resumed:
-            deadline = resumed["effective_deadline"]
+            deadline = self._effective_timing_locked(con, identity, phase, plan_id)["deadline"]
         return None if deadline is None else max(0.0, deadline - float(self.clock()))
 
     def effective_deadline(self, identity, phase="G1", *, plan_id=None):
         with self.store.connect() as con:
-            row = con.execute("SELECT deadline FROM tf_budget_phase WHERE campaign_id=? AND identity=? AND phase=?",
-                              (self.campaign_id, "__campaign_segment__", str(phase))).fetchone()
-            amendment = self._amendment_locked(con, identity, phase, plan_id)
-            resumed = self._time_resume_locked(con, identity, phase, plan_id)
-        return resumed["effective_deadline"] if resumed else (amendment["new_deadline"] if amendment else (row[0] if row else None))
+            return self._effective_timing_locked(con, identity, phase, plan_id)["deadline"]
 
     def effective_deadline_snapshot(self, identity, phase="G1", *, plan_id=None, job_id=None):
         with self.store.connect() as con:
-            row = con.execute("SELECT started,deadline FROM tf_budget_phase WHERE campaign_id=? AND identity=? AND phase=?",
-                              (self.campaign_id, "__campaign_segment__", str(phase))).fetchone()
-            amendment = self._amendment_locked(con, identity, phase, plan_id)
-            resumed = self._time_resume_locked(con, identity, phase, plan_id)
-        base_deadline = row["deadline"] if row else None
-        deadline = amendment["new_deadline"] if amendment else base_deadline
-        if resumed:
-            deadline = resumed["effective_deadline"]
+            timing = self._effective_timing_locked(con, identity, phase, plan_id)
+        amendment = timing["amendment"]
+        resumed = timing["time_resume"]
+        deadline = timing["deadline"]
+        source_authorization = None
+        if amendment and amendment["version"] == 5:
+            with self.store.connect() as con:
+                binding = con.execute("SELECT request_json FROM tf_budget_amendment_binding WHERE amendment_id=?",
+                                      (amendment["id"],)).fetchone()
+            request = json.loads(binding[0]) if binding else {}
+            source_authorization = {"source_ref": request.get("source_ref"),
+                                    "source_digest": request.get("source_digest")}
         return {"schema": "atlas.g1-effective-budget.v1", "binding": {
                     "campaign_id": self.campaign_id, "plan_id": plan_id,
                     "product_id": str(identity), "segment": str(phase), "job_id": job_id},
-                "base_started_at": row["started"] if row else None,
-                "base_deadline": base_deadline, "effective_deadline": deadline,
-                "deadline_source": "authorized_external_pause_resume" if resumed else ("amendment" if amendment else "base"),
+                "base_started_at": timing["base_started_at"],
+                "base_deadline": timing["base_deadline"], "effective_deadline": deadline,
+                "deadline_source": timing["deadline_source"],
                 "time_resume": dict(resumed) if resumed else None,
                 "amendment_id": amendment["id"] if amendment else None,
-                "activated_at": resumed["activated_at"] if resumed else (amendment["activated_at"] if amendment else None),
-                "new_deadline": resumed["effective_deadline"] if resumed else (amendment["new_deadline"] if amendment else None),
+                "activated_at": amendment["activated_at"] if amendment and amendment["version"] == 5 else (resumed["activated_at"] if resumed else (amendment["activated_at"] if amendment else None)),
+                "new_deadline": amendment["new_deadline"] if amendment and amendment["version"] == 5 else (resumed["effective_deadline"] if resumed else (amendment["new_deadline"] if amendment else None)),
+                "supersedes": timing["supersedes"],
+                "source_authorization": source_authorization,
                 "generated_at": float(self.clock())}
 
     def snapshot(self):
@@ -693,7 +747,7 @@ class BudgetLedger:
             self._refresh_limits_locked(con)
             charged = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status!='not_started'",
                                   (self.campaign_id,)).fetchone()[0]
-            active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','started','uncertain')",
+            active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','spawn_intent','started','uncertain')",
                                  (self.campaign_id,)).fetchone()[0]
             segments = [dict(r) for r in con.execute("SELECT phase,started,deadline FROM tf_budget_phase WHERE campaign_id=?", (self.campaign_id,))]
             control = con.execute("SELECT paused,paused_at,pause_reason FROM tf_budget_control WHERE campaign_id=?", (self.campaign_id,)).fetchone()
@@ -713,12 +767,29 @@ class BudgetLedger:
                 (self.campaign_id,))]
             resumed = self._time_resume_locked(con, G1_AMENDMENT_PRODUCT, "G1", G1_AMENDMENT_PLAN)
             external_sessions = resumed["external_cli_sessions"] if resumed else 0
+            effective_timings = []
+            seen = set()
+            for amendment in amendments:
+                identity = (amendment["product_id"], amendment["plan_id"])
+                if identity in seen:
+                    continue
+                seen.add(identity)
+                timing = self._effective_timing_locked(con, amendment["product_id"], "G1", amendment["plan_id"])
+                effective_timings.append({
+                    "plan_id": amendment["plan_id"], "product_id": amendment["product_id"],
+                    "segment": "G1", "effective_deadline": timing["deadline"],
+                    "deadline_source": timing["deadline_source"],
+                    "amendment_id": timing["amendment"]["id"] if timing["amendment"] else None,
+                    "activated_at": timing["amendment"]["activated_at"] if timing["amendment"] and timing["amendment"]["version"] == 5 else (timing["time_resume"]["activated_at"] if timing["time_resume"] else (timing["amendment"]["activated_at"] if timing["amendment"] else None)),
+                    "supersedes": timing["supersedes"],
+                })
         now = float(self.clock())
         for segment in segments:
             segment["remaining_seconds"] = max(0.0, segment["deadline"] - now)
         return {"campaign_id": self.campaign_id, "cli_sessions_used": charged + external_sessions,
                 "factory_cli_sessions_used": charged, "external_cli_sessions_used": external_sessions,
                 "time_resumes": [dict(resumed)] if resumed else [],
+                "effective_timings": effective_timings,
                 "cli_sessions_limit": self.limits["cli_sessions"], "active": active,
                 "limits": dict(self.limits), "segments": segments,
                 "paused": bool(control[0]) if control else False,
@@ -752,6 +823,8 @@ class BudgetAmendmentService:
             return self.register_r6(request)
         if isinstance(request, dict) and request.get("schema") == G1_R7_AUTHORIZATION_SCHEMA:
             return self.register_r7(request)
+        if isinstance(request, dict) and request.get("schema") == "atlas.budget-amendment.v3":
+            return self.register_frozen_revision(request)
         if isinstance(request, dict) and "schema" in request:
             raise FactoryError("unsupported budget amendment schema", "budget_amendment_invalid", 400)
         required = ("product_id", "plan_id", "source_ref", "source_digest", "summary", "reason", "idempotency_key")
@@ -881,7 +954,7 @@ class BudgetAmendmentService:
                                        (self.campaign_id,)).fetchone()
             cli_sessions = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status!='not_started'",
                                        (self.campaign_id,)).fetchone()[0]
-            active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','started','uncertain')",
+            active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','spawn_intent','started','uncertain')",
                                  (self.campaign_id,)).fetchone()[0]
             if (not old_deadline or old_deadline[0] != G1_R5_BASE_STARTED or old_deadline[1] != G1_R5_BASE_DEADLINE
                     or repairs != 4 or cli_sessions != 52 or active != 0):
@@ -1009,7 +1082,7 @@ class BudgetAmendmentService:
                                 (G1_AMENDMENT_CAMPAIGN,)).fetchone()[0]
             repairs = con.execute("SELECT COUNT(*) FROM tf_budget_repair WHERE campaign_id=? AND product_id=?",
                                   (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchone()[0]
-            active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','started','uncertain')",
+            active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','spawn_intent','started','uncertain')",
                                  (G1_AMENDMENT_CAMPAIGN,)).fetchone()[0]
             retry_rows = con.execute("SELECT retry_scope,stage FROM tf_budget_reservation WHERE campaign_id=? AND identity=? AND retry IS NOT NULL AND status!='not_started'",
                                      (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchall()
@@ -1128,7 +1201,7 @@ class BudgetAmendmentService:
                                 (G1_AMENDMENT_CAMPAIGN,)).fetchone()[0]
             repairs = con.execute("SELECT COUNT(*) FROM tf_budget_repair WHERE campaign_id=? AND product_id=?",
                                   (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchone()[0]
-            active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','started','uncertain')",
+            active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','spawn_intent','started','uncertain')",
                                  (G1_AMENDMENT_CAMPAIGN,)).fetchone()[0]
             retry_rows = con.execute("SELECT retry_scope,stage FROM tf_budget_reservation WHERE campaign_id=? AND identity=? AND retry IS NOT NULL AND status!='not_started'",
                                      (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchall()
@@ -1169,7 +1242,7 @@ class BudgetAmendmentService:
         if not row:
             raise FactoryError("budget amendment not found", "not_found", 404)
         if row["version"] not in {1, 2, 3, 4}:
-            raise FactoryError("unknown budget amendment version", "budget_amendment_version", 409)
+            raise FactoryError("unknown or queue-only budget amendment version", "budget_amendment_version", 409)
         if row["version"] == 4:
             raise FactoryError("R7 amendment can activate only with its atomic successor queue", "budget_amendment_activation_denied", 409)
         if row["version"] == 3:
@@ -1200,6 +1273,205 @@ class BudgetAmendmentService:
         con.execute("UPDATE tf_budget_amendment SET activated_at=?,new_deadline=? WHERE id=? AND activated_at IS NULL", (at, deadline, amendment_id))
         return dict(con.execute("SELECT * FROM tf_budget_amendment WHERE id=?", (amendment_id,)).fetchone())
 
+    def activate_frozen_locked(self, con, amendment_id, *, expected_prepared_digest):
+        """Activate version 5 only in the caller's successor queue transaction."""
+        if not getattr(con, "in_transaction", False):
+            raise FactoryError("version 5 activation requires the atomic successor transaction",
+                               "budget_amendment_activation_denied", 409)
+        row = con.execute("SELECT * FROM tf_budget_amendment WHERE id=? AND campaign_id=?",
+                          (amendment_id, self.campaign_id)).fetchone()
+        if not row:
+            raise FactoryError("budget amendment not found", "not_found", 404)
+        if row["version"] != 5:
+            raise FactoryError("frozen revision activation requires version 5", "budget_amendment_version", 409)
+        if row["activated_at"] is not None or row["new_deadline"] is not None:
+            raise FactoryError("version 5 amendment was activated without its atomic queue receipt",
+                               "budget_amendment_activation_conflict", 409)
+        binding = con.execute("SELECT request_json,request_digest FROM tf_budget_amendment_binding WHERE amendment_id=?",
+                              (amendment_id,)).fetchone()
+        if not binding:
+            raise FactoryError("version 5 prepared digest does not match its registered binding",
+                               "budget_amendment_basis", 409)
+        request = json.loads(binding["request_json"])
+        self._validate_frozen_revision_request(request)
+        if (digest(request) != binding["request_digest"]
+                or request.get("prepared_revision_digest") != expected_prepared_digest
+                or row["source_ref"] != request["source_ref"]
+                or row["source_digest"] != request["source_digest"]
+                or row["window_seconds"] != request["timing"].get("window_seconds")
+                or row["new_repair_limit"] != request["limits"].get("repair_limit")):
+            raise FactoryError("version 5 registered authorization changed", "budget_amendment_basis", 409)
+        predecessor = con.execute(
+            "SELECT * FROM tf_budget_amendment WHERE campaign_id=? AND product_id=? "
+            "AND version<5 AND activated_at IS NOT NULL ORDER BY version DESC LIMIT 1",
+            (row["campaign_id"], row["product_id"]),
+        ).fetchone()
+        timing = self.ledger._effective_timing_locked(con, row["product_id"], "G1", row["plan_id"])
+        if (not predecessor or predecessor["activated_at"] is None
+                or predecessor["new_repair_limit"] != request["limits"].get("expected_repairs")
+                or timing["deadline_source"] != request["timing"].get("supersedes", {}).get("deadline_source")
+                or not timing["time_resume"]
+                or request["timing"].get("supersedes") != self.ledger._timing_source_snapshot(timing["time_resume"])):
+            raise FactoryError("current predecessor or timing source differs from version 5 authorization",
+                               "budget_amendment_basis", 409)
+        calls = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status!='not_started'",
+                            (row["campaign_id"],)).fetchone()[0]
+        external = int(timing["time_resume"].get("external_cli_sessions", 0))
+        repairs = con.execute("SELECT COUNT(*) FROM tf_budget_repair WHERE campaign_id=? AND product_id=?",
+                              (row["campaign_id"], row["product_id"])).fetchone()[0]
+        active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','spawn_intent','started','uncertain')",
+                             (row["campaign_id"],)).fetchone()[0]
+        limits = request["limits"]
+        if (calls + external != limits.get("expected_cli_total")
+                or repairs != limits.get("expected_repairs") or active != 0):
+            raise FactoryError("live budget changed before atomic version 5 activation", "budget_amendment_basis", 409)
+        activated_at = float(self.clock())
+        deadline = activated_at + int(row["window_seconds"])
+        con.execute("UPDATE tf_budget_amendment SET activated_at=?,new_deadline=? WHERE id=? AND version=5 AND activated_at IS NULL",
+                    (activated_at, deadline, amendment_id))
+        return dict(con.execute("SELECT * FROM tf_budget_amendment WHERE id=?", (amendment_id,)).fetchone())
+
+    def _validate_frozen_revision_request(self, request):
+        required = {
+            "schema", "campaign_id", "product_id", "plan_id", "source_ref", "source_digest",
+            "summary", "reason", "idempotency_key", "source_gate", "limits", "timing",
+            "prepared_revision", "prepared_revision_digest", "effective_plan_digest",
+            "case_design_digest", "program_revision_digest",
+        }
+        if not isinstance(request, dict) or set(request) != required:
+            raise FactoryError("version 5 authorization has missing or unknown fields", "budget_amendment_invalid", 400)
+        for key in ("campaign_id", "product_id", "plan_id", "source_ref", "source_digest",
+                    "summary", "reason", "idempotency_key", "prepared_revision_digest",
+                    "effective_plan_digest", "case_design_digest", "program_revision_digest"):
+            if not isinstance(request.get(key), str) or not request[key].strip():
+                raise FactoryError("version 5 authorization fields must be non-empty strings", "budget_amendment_invalid", 400)
+        if request["schema"] != "atlas.budget-amendment.v3":
+            raise FactoryError("unsupported budget amendment schema", "budget_amendment_invalid", 400)
+        if len(request["summary"]) > 2000 or len(request["reason"]) > 1000 or len(request["idempotency_key"]) > 200:
+            raise FactoryError("amendment text exceeds limits", "budget_amendment_invalid", 400)
+        if (self.campaign_id != request["campaign_id"] or not isinstance(request["limits"], dict)
+                or not isinstance(request["timing"], dict) or not isinstance(request["source_gate"], dict)
+                or not isinstance(request["prepared_revision"], dict)):
+            raise FactoryError("version 5 authorization scope or objects are invalid", "budget_amendment_invalid", 400)
+        if (set(request["limits"]) != {"cli_sessions", "expected_repairs", "repair_limit", "expected_cli_total"}
+                or any(isinstance(value, bool) or not isinstance(value, int) or value < 0
+                       for value in request["limits"].values())
+                or request["limits"]["repair_limit"] <= request["limits"]["expected_repairs"]
+                or set(request["timing"]) != {"window_seconds", "supersedes"}
+                or isinstance(request["timing"].get("window_seconds"), bool)
+                or not isinstance(request["timing"].get("window_seconds"), int)
+                or request["timing"]["window_seconds"] <= 0
+                or not isinstance(request["timing"].get("supersedes"), dict)
+                or set(request["timing"]["supersedes"]) != {"deadline_source", "source_id", "activated_at",
+                                                                "effective_deadline", "authorization_digest"}):
+            raise FactoryError("version 5 limits or superseded timing source are malformed", "budget_amendment_invalid", 400)
+        source_root = self.store.pack.resolve().parent
+        source_relative = Path(request["source_ref"])
+        if source_relative.is_absolute() or ".." in source_relative.parts:
+            raise FactoryError("authorization source path is outside the repository", "budget_amendment_source", 400)
+        source_path = source_root / source_relative
+        cursor = source_root
+        unsafe = False
+        for part in source_relative.parts:
+            cursor = cursor / part
+            unsafe = unsafe or cursor.is_symlink()
+        if unsafe or not source_path.is_file() or not source_path.resolve().is_relative_to(source_root):
+            raise FactoryError("authorization source is unavailable or unsafe", "budget_amendment_source", 409)
+        try:
+            actual_source_digest = hashlib.sha256(source_path.read_bytes()).hexdigest()
+        except OSError as exc:
+            raise FactoryError("authorization source is unavailable", "budget_amendment_source", 409) from exc
+        if actual_source_digest != request["source_digest"]:
+            raise FactoryError("authorization source bytes changed", "budget_amendment_source", 409)
+        if digest(request["prepared_revision"]) != request["prepared_revision_digest"]:
+            raise FactoryError("prepared revision request digest changed", "budget_amendment_basis", 409)
+        from .plan_revision import PreparedRevisionService
+        prepared_binding = request["prepared_revision"].get("binding", {})
+        job_id = prepared_binding.get("job_id")
+        if not isinstance(job_id, str) or not job_id:
+            raise FactoryError("prepared revision does not identify its source job", "budget_amendment_basis", 409)
+        prepared = PreparedRevisionService(self.store).prepare(job_id, request["prepared_revision"])
+        if (prepared.get("request_digest") != request["prepared_revision_digest"]
+                or prepared.get("effective_plan_digest") != request["effective_plan_digest"]
+                or digest(prepared.get("case_design")) != request["case_design_digest"]
+                or digest(prepared.get("prepared_program_revision")) != request["program_revision_digest"]):
+            raise FactoryError("prepared revision differs from its authorization digests", "budget_amendment_basis", 409)
+        binding = prepared.get("binding", {})
+        if (binding.get("campaign_id") != request["campaign_id"]
+                or binding.get("plan_id") != request["plan_id"]
+                or binding.get("product_id") != request["product_id"]):
+            raise FactoryError("prepared revision identity is outside the authorized scope", "budget_amendment_scope", 403)
+        from .evidence_recovery import validate_source_gate
+        validate_source_gate(self.store, request["source_gate"])
+        if (prepared.get("authorization_limits") != request["limits"]
+                or prepared.get("authorization_timing") != request["timing"]):
+            raise FactoryError("prepared authorization policy differs from budget request", "budget_amendment_basis", 409)
+        source_auth = prepared.get("source_authorization") or request["prepared_revision"].get("source_authorization")
+        if (not isinstance(source_auth, dict)
+                or source_auth.get("source_ref") != request["source_ref"]
+                or source_auth.get("source_digest") != request["source_digest"]):
+            raise FactoryError("prepared revision is bound to a different authorization source", "budget_amendment_source", 409)
+        return prepared
+
+    def register_frozen_revision(self, request):
+        request_digest = digest(request)
+        encoded = json.dumps(request, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        with self.store.connect(True) as con:
+            prior = con.execute(
+                "SELECT a.*,b.request_json,b.request_digest FROM tf_budget_amendment a "
+                "LEFT JOIN tf_budget_amendment_binding b ON b.amendment_id=a.id "
+                "WHERE a.campaign_id=? AND a.product_id=? AND a.idempotency_key=?",
+                (request.get("campaign_id"), request.get("product_id"), request.get("idempotency_key")),
+            ).fetchone()
+            if prior:
+                if prior["request_digest"] != request_digest or prior["request_json"] != encoded:
+                    raise FactoryError("idempotency key is already bound to another request", "idempotency_conflict", 409)
+                return {key: prior[key] for key in prior.keys() if key not in {"request_json", "request_digest"}}
+            self._validate_frozen_revision_request(request)
+            prior_v5 = con.execute("SELECT id FROM tf_budget_amendment WHERE campaign_id=? AND product_id=? AND version=5",
+                                   (request["campaign_id"], request["product_id"])).fetchone()
+            if prior_v5:
+                raise FactoryError("the single version 5 amendment is already registered", "budget_amendment_exhausted", 409)
+            predecessor = con.execute(
+                "SELECT * FROM tf_budget_amendment WHERE campaign_id=? AND product_id=? "
+                "AND version<5 AND activated_at IS NOT NULL ORDER BY version DESC LIMIT 1",
+                (request["campaign_id"], request["product_id"]),
+            ).fetchone()
+            if (not predecessor or predecessor["activated_at"] is None
+                    or predecessor["new_repair_limit"] != request["limits"].get("expected_repairs")):
+                raise FactoryError("version 5 predecessor or repair baseline differs", "budget_amendment_basis", 409)
+            timing = self.ledger._effective_timing_locked(con, request["product_id"], "G1", request["plan_id"])
+            if timing["deadline_source"] != request["timing"].get("supersedes", {}).get("deadline_source"):
+                raise FactoryError("current effective timing source differs from authorization", "budget_amendment_basis", 409)
+            if request["timing"]["supersedes"] != self.ledger._timing_source_snapshot(timing["time_resume"]):
+                raise FactoryError("superseded timing snapshot differs from current effective deadline", "budget_amendment_basis", 409)
+            calls = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status!='not_started'",
+                                (request["campaign_id"],)).fetchone()[0]
+            external = int((timing["time_resume"] or {}).get("external_cli_sessions", 0))
+            repairs = con.execute("SELECT COUNT(*) FROM tf_budget_repair WHERE campaign_id=? AND product_id=?",
+                                  (request["campaign_id"], request["product_id"])).fetchone()[0]
+            active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','spawn_intent','started','uncertain')",
+                                 (request["campaign_id"],)).fetchone()[0]
+            limits = request["limits"]
+            if (calls + external != limits.get("expected_cli_total")
+                    or calls != limits.get("expected_cli_total") - external
+                    or repairs != limits.get("expected_repairs") or active != 0
+                    or limits.get("cli_sessions") != self.ledger.limits["cli_sessions"]):
+                raise FactoryError("live budget baseline differs from version 5 authorization", "budget_amendment_basis", 409)
+            old_deadline = timing["deadline"]
+            at = float(self.clock())
+            amendment_id = "bamd_" + uuid.uuid4().hex
+            con.execute(
+                "INSERT INTO tf_budget_amendment VALUES(?,?,?,?,?,?,?,?,?,5,?,?,?,?,?,?,?,NULL,NULL)",
+                (amendment_id, request["campaign_id"], request["product_id"], request["plan_id"],
+                 request["source_ref"], request["source_digest"], request["summary"], request["reason"],
+                 request["idempotency_key"], limits["expected_repairs"], limits["repair_limit"],
+                 repairs, calls, old_deadline, request["timing"]["window_seconds"], at),
+            )
+            con.execute("INSERT INTO tf_budget_amendment_binding VALUES(?,?,?)",
+                        (amendment_id, encoded, request_digest))
+            return dict(con.execute("SELECT * FROM tf_budget_amendment WHERE id=?", (amendment_id,)).fetchone())
+
     def activate_r6_locked(self, con, amendment_id):
         """Activate v3 only from ProductRecoveryService's successor queue transaction."""
         if not getattr(con, "in_transaction", False):
@@ -1222,7 +1494,7 @@ class BudgetAmendmentService:
                             (G1_AMENDMENT_CAMPAIGN,)).fetchone()[0]
         repairs = con.execute("SELECT COUNT(*) FROM tf_budget_repair WHERE campaign_id=? AND product_id=?",
                               (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchone()[0]
-        active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','started','uncertain')",
+        active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','spawn_intent','started','uncertain')",
                              (G1_AMENDMENT_CAMPAIGN,)).fetchone()[0]
         if (not predecessor or predecessor["version"] != 2 or predecessor["activated_at"] is None
                 or predecessor["new_repair_limit"] != 5 or predecessor["new_deadline"] != G1_R6_OLD_DEADLINE
@@ -1263,7 +1535,7 @@ class BudgetAmendmentService:
                             (G1_AMENDMENT_CAMPAIGN,)).fetchone()[0]
         repairs = con.execute("SELECT COUNT(*) FROM tf_budget_repair WHERE campaign_id=? AND product_id=?",
                               (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchone()[0]
-        active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','started','uncertain')",
+        active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status IN ('reserved','spawn_intent','started','uncertain')",
                              (G1_AMENDMENT_CAMPAIGN,)).fetchone()[0]
         retry_rows = con.execute("SELECT retry_scope,stage FROM tf_budget_reservation WHERE campaign_id=? AND identity=? AND retry IS NOT NULL AND status!='not_started'",
                                  (G1_AMENDMENT_CAMPAIGN, G1_AMENDMENT_PRODUCT)).fetchall()

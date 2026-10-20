@@ -1,0 +1,22 @@
+test_prepare_register_recover_and_real_pipeline_use_exactly_one_model_call (tests.test_factory_frozen_link.FrozenReviewPipelineLinkTests) ... ERROR
+
+======================================================================
+ERROR: test_prepare_register_recover_and_real_pipeline_use_exactly_one_model_call (tests.test_factory_frozen_link.FrozenReviewPipelineLinkTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/tests/test_factory_frozen_link.py", line 329, in test_prepare_register_recover_and_real_pipeline_use_exactly_one_model_call
+    Pipeline(self.store, cli=cli).run(claimed)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/template_factory/pipeline.py", line 284, in run
+    review(self, job, attempt, agent)
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/template_factory/cognition.py", line 3155, in review
+    result = agent("cognitive-review", call["prompt"], json.loads(call["input_json"]), source,
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/template_factory/pipeline.py", line 173, in agent
+    FrozenReviewRecoveryService(self.store).prepare_call(
+  File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/template_factory/frozen_review_recovery.py", line 388, in prepare_call
+    raise FactoryError("frozen review material or digest differs from the registered call", "evidence_grant_binding", 409)
+template_factory.store.FactoryError: frozen review material or digest differs from the registered call
+
+----------------------------------------------------------------------
+Ran 1 test in 0.654s
+
+FAILED (errors=1)

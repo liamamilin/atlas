@@ -729,12 +729,44 @@ def read_pinned_budget_context(path, expected_sha256, expected_binding):
     if not isinstance(generated, (int, float)) or isinstance(generated, bool) or not math.isfinite(generated):
         raise ValueError("effective-budget context has no numeric generated_at")
     deadline_source = payload.get("deadline_source")
-    if deadline_source not in ("base", "amendment", "authorized_external_pause_resume"):
+    if deadline_source not in ("base", "amendment", "authorized_external_pause_resume",
+                               "amendment_superseding_timing"):
         raise ValueError("effective-budget context has an unknown deadline source")
     if binding.get("segment") == "T08" and deadline_source != "base":
         raise ValueError("T08 cannot use a non-base deadline")
     if deadline_source == "amendment" and (not payload.get("amendment_id") or not payload.get("activated_at")):
         raise ValueError("amended effective deadline lacks its official amendment and activation references")
+    if deadline_source == "amendment_superseding_timing":
+        amendment_id = payload.get("amendment_id")
+        activated = payload.get("activated_at")
+        supersedes = payload.get("supersedes")
+        source_authorization = payload.get("source_authorization")
+        if (not isinstance(amendment_id, str) or not re.fullmatch(r"bamd_[0-9a-f]{32}", amendment_id)
+                or not isinstance(activated, (int, float)) or isinstance(activated, bool)
+                or not math.isfinite(activated)
+                or not isinstance(supersedes, dict)
+                or set(supersedes) != {"deadline_source", "source_id", "activated_at",
+                                       "effective_deadline", "authorization_digest"}
+                or supersedes.get("deadline_source") != "authorized_external_pause_resume"
+                or not isinstance(supersedes.get("source_id"), str)
+                or not re.fullmatch(r"egrant_[0-9a-f]{32}", supersedes["source_id"])
+                or any(not isinstance(supersedes.get(key), (int, float))
+                       or isinstance(supersedes.get(key), bool)
+                       or not math.isfinite(supersedes[key])
+                       for key in ("activated_at", "effective_deadline"))
+                or not isinstance(supersedes.get("authorization_digest"), str)
+                or not re.fullmatch(r"[0-9a-f]{64}", supersedes["authorization_digest"])
+                or not isinstance(source_authorization, dict)
+                or set(source_authorization) != {"source_ref", "source_digest"}
+                or not isinstance(source_authorization.get("source_ref"), str)
+                or not source_authorization["source_ref"]
+                or not isinstance(source_authorization.get("source_digest"), str)
+                or not re.fullmatch(r"[0-9a-f]{64}", source_authorization["source_digest"])):
+            raise ValueError("superseding effective deadline lacks its official amendment, source, or authorization binding")
+        if (payload.get("new_deadline") != activated + 86400
+                or deadline != payload.get("new_deadline")
+                or generated < activated):
+            raise ValueError("superseding effective deadline does not summarize its activated 24-hour window")
     if deadline_source == "authorized_external_pause_resume":
         resume = payload.get("time_resume")
         if binding.get("segment") != "G1":

@@ -315,6 +315,8 @@ def _case_adaptation_review_digest(case_design, policy):
 def _r7_phase_acceptance_prompt(evidence):
     if evidence is None:
         return DESIGN_REVIEW_PROMPT
+    if evidence.get("manifest", {}).get("schema") == "atlas.prepared-phase-review-program-evidence.v1":
+        return _frozen_revision_design_prompt(evidence)
     prompt = DESIGN_REVIEW_PROMPT.replace(
         "Historical programs are deliberately excluded; do not seek them or infer defects in their bodies.",
         "For this prepared R7 phase review, inspect only the host-verified source and prepared program evidence explicitly listed in source/program-evidence/; do not seek any other historical programs.",
@@ -329,6 +331,24 @@ def _r7_phase_acceptance_prompt(evidence):
         "Use the actual acceptance/p0_organize.py A05 lifecycle as static implementation "
         "context. Cite only paths listed in input.source_inventory. This remains a static "
         "design review: do not execute programs or claim runtime success."
+    )
+
+
+def _frozen_revision_design_prompt(evidence):
+    if evidence is None:
+        return DESIGN_REVIEW_PROMPT
+    return DESIGN_REVIEW_PROMPT.replace(
+        "Historical programs are deliberately excluded; do not seek them or infer defects in their bodies.",
+        "This prepared revision includes exact frozen-baseline and prepared program bytes in source/program-evidence/. Inspect these listed static files against the current specification and authorization; do not seek other historical programs.",
+    ).replace(
+        "Programs do not exist yet: do not block merely for no code or no runtime evidence and never claim they passed.",
+        "The prepared programs exist as static bytes; this is not runtime evidence and they must not be executed.",
+    ) + (
+        " Read source/program-evidence/PROGRAM_EVIDENCE.json, relevant source/ and prepared/ programs, "
+        "and authorization materials, including the exact revision, prior review findings and assertion map. "
+        "Check fresh versus used-target initialization, target-row exact original URL semantics, "
+        "existing soft-deleted ID read semantics, GET filter/write-validation separation and the stated offline evidence boundary. "
+        "Evaluate only input.review_dimensions; retain negative conclusions when justified. Cite only input.source_inventory."
     )
 
 
@@ -1475,14 +1495,18 @@ def _write_design_projection(design_context, dimension, snapshot, plan, research
     if source_manifest is not None:
         projection["source_manifest_digest"] = digest(source_manifest)
         projection["source_citation_matrix"] = source_citation_matrix
+    prepared_dimensions = {"phase_acceptance"}
+    if (prepared_r7_review_evidence is not None
+            and prepared_r7_review_evidence.get("manifest", {}).get("schema") == "atlas.prepared-phase-review-program-evidence.v1"):
+        prepared_dimensions |= {"architecture_contract", "runtime_protocol"}
     if dimension == "phase_acceptance":
         projection["file_plan"] = file_plan
-        if prepared_r7_review_evidence is not None:
-            projection["prepared_program_evidence_digest"] = prepared_r7_review_evidence["digest"]
-            for relative_path, raw in prepared_r7_review_evidence["files"].items():
-                target = design_context / relative_path
-                target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_bytes(raw)
+    if dimension in prepared_dimensions and prepared_r7_review_evidence is not None:
+        projection["prepared_program_evidence_digest"] = prepared_r7_review_evidence["digest"]
+        for relative_path, raw in prepared_r7_review_evidence["files"].items():
+            target = design_context / relative_path
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(raw)
     if dimension == "runtime_protocol":
         (design_context / "RUNTIME_CONTRACT.md").write_text(
             RUNTIME_CONTRACT
@@ -1546,7 +1570,9 @@ def _design_review_payload(snapshot, plan, dimension, design_context, prepared_r
         "file_plan_included": dimension in ("phase_acceptance", "runtime_protocol"),
         "source_inventory": sorted(tree_manifest(design_context)),
         **({"prepared_program_evidence_digest": prepared_r7_review_evidence["digest"]}
-           if dimension == "phase_acceptance" and prepared_r7_review_evidence is not None else {}),
+           if prepared_r7_review_evidence is not None and (dimension == "phase_acceptance" or
+               (dimension in {"architecture_contract", "runtime_protocol"} and
+                prepared_r7_review_evidence.get("manifest", {}).get("schema") == "atlas.prepared-phase-review-program-evidence.v1")) else {}),
     }
 
 
@@ -1685,7 +1711,12 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
     prepared_r7_review_evidence = None
     if repair and isinstance(repair.get("prepared_revision"), dict):
         prepared = repair["prepared_revision"]
-        if prepared.get("schema") == "atlas.failed-plan-revision.v2":
+        if prepared.get("schema") == "atlas.frozen-plan-revision.v1":
+            from .frozen_revision import program_contents
+            if digest(prepared.get("effective_plan")) != prepared.get("effective_plan_digest"):
+                raise FactoryError("prepared frozen revision changed", "checkpoint_changed", 409)
+            prepared_program_contents = program_contents(pipeline.store, prepared["prepared_program_revision"])
+        elif prepared.get("schema") == "atlas.failed-plan-revision.v2":
             if digest(prepared.get("effective_plan")) != prepared.get("effective_plan_digest"):
                 raise FactoryError("prepared revision changed", "patch_conflict", 409)
             from .plan_revision import program_reuse_contents
@@ -1843,9 +1874,18 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             target = context / relative_path
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(raw)
+    elif (repair and isinstance(repair.get("prepared_revision"), dict)
+            and repair["prepared_revision"].get("schema") == "atlas.frozen-plan-revision.v1"):
+        from .frozen_revision import review_evidence
+        prepared_r7_review_evidence = review_evidence(pipeline.store, repair["prepared_revision"],
+                                                   repair["prepared_revision_request"], prepared_program_contents)
+        for relative_path, raw in prepared_r7_review_evidence["files"].items():
+            target = context / relative_path
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(raw)
     if prepared_program_contents is not None:
         prepared = repair["prepared_revision"]
-        r7 = prepared.get("schema") == "atlas.failed-plan-revision.v3"
+        r7 = prepared.get("schema") in {"atlas.failed-plan-revision.v3", "atlas.frozen-plan-revision.v1"}
         _atomic_context_json(context / ("PREPARED_PROGRAM_REVISION.json" if r7 else "PREPARED_PROGRAM_REUSE.json"), {
             "schema": "atlas.prepared-program-revision-receipt.v1" if r7 else "atlas.prepared-program-reuse-receipt.v1",
             "prepared_plan_digest": prepared["effective_plan_digest"],
@@ -2382,6 +2422,10 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                             prepared_r7_review_evidence
                             if dimension == "phase_acceptance" else None
                         )
+                        if (dimension in {"architecture_contract", "runtime_protocol"}
+                                and prepared_r7_review_evidence is not None
+                                and prepared_r7_review_evidence["manifest"]["schema"] == "atlas.prepared-phase-review-program-evidence.v1"):
+                            review_prompt = _frozen_revision_design_prompt(prepared_r7_review_evidence)
                         raw = agent(
                             name,
                             review_prompt,
@@ -2690,6 +2734,7 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
         r7_incremental_diff = None
         r7_source_program_contents = None
         r7_authorization_material = None
+        frozen_revision_diff = None
         baseline_program_hashes = aggregate_diff["program_file_hashes_before"]
         candidate_program_hashes = aggregate_diff["program_file_hashes_after"]
         if isinstance(prepared_for_diff, dict) and prepared_for_diff.get("schema") == "atlas.failed-plan-revision.v2":
@@ -2791,6 +2836,25 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
                 "authorization_material_digest": digest({key: value for key, value in r7_authorization_material.items() if key != "files"}),
             }
             aggregate_diff["r7_incremental_diff"] = r7_incremental_diff
+        if isinstance(prepared_for_diff, dict) and prepared_for_diff.get("schema") == "atlas.frozen-plan-revision.v1":
+            from .frozen_revision import program_diff
+            frozen_revision_diff = program_diff(pipeline.store, prepared_for_diff, candidate)
+            aggregate_diff["frozen_revision_diff"] = frozen_revision_diff
+            # These are host-derived evidence files, not acceptance programs.
+            # Keep long deltas readable without touching the frozen predecessor.
+            evidence_dir = candidate / "inputs/frozen-revision"
+            evidence_dir.mkdir(parents=True, exist_ok=True)
+            atomic_json(evidence_dir / "diff.json", frozen_revision_diff)
+            (evidence_dir / "baseline-architecture.md").write_text(before_spec["architecture_markdown"])
+            for rel, value in frozen_revision_diff["program_diffs"].items():
+                target = evidence_dir / "diffs" / (Path(rel).name + ".diff")
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(value)
+            for rel, raw in prepared_r7_review_evidence["files"].items():
+                if "/authorization/" in rel:
+                    target = evidence_dir / "authorization" / Path(rel).name
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    target.write_bytes(raw)
         baseline_authored = {key: before_spec.get(key) for key in (AUTHORED_FIELDS | OPTIONAL_AUTHORED_FIELDS) if key in before_spec}
         candidate_authored = {key: after_spec.get(key) for key in (AUTHORED_FIELDS | OPTIONAL_AUTHORED_FIELDS) if key in after_spec}
         cumulative_diff_digest = aggregate_semantic_diff_digest(
@@ -2814,6 +2878,8 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
         # checkpoints continue to match after an upgrade.
         if r7_incremental_diff is not None:
             aggregate_digest_payload["r7_incremental_diff"] = r7_incremental_diff
+        if frozen_revision_diff is not None:
+            aggregate_digest_payload["frozen_revision_diff"] = frozen_revision_diff
         aggregate_diff["diff_digest"] = digest(aggregate_digest_payload)
         atomic_json(candidate / "inputs/repair-scope.json", repair_scope)
         atomic_json(candidate / "inputs/aggregate-repair-diff.json", aggregate_diff)
@@ -2830,6 +2896,8 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             evidence_rows.append({"path": "inputs/r6-incremental-diff.json", "scope": "Exact source-alignment spec delta from the failed R6 proposal and proof that all nine program hashes were reused unchanged."})
         if r7_incremental_diff is not None:
             evidence_rows.append({"path": "inputs/r7-incremental-diff.json", "scope": "Exact R7 incremental source-to-candidate program and authored deltas, authorization digests, four replacement diffs, and five source-byte reuse proofs."})
+        if frozen_revision_diff is not None:
+            evidence_rows.append({"path": "inputs/frozen-revision/diff.json", "scope": "Exact authorized revision of the latest blocked frozen baseline, with four changed and five reused program bytes; readable diffs and source authorization are alongside this file. Static evidence only."})
         template_json.setdefault("evidence", []).extend(evidence_rows)
         atomic_json(candidate / "template.json", template_json)
         atomic_json(candidate / "integrity.json", {
@@ -2856,6 +2924,16 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
             )
         review_source = attempt / "aggregate-semantic-review-source"
         review_source.mkdir(parents=True, exist_ok=True)
+        if frozen_revision_diff is not None:
+            for rel, raw in prepared_r7_review_evidence["files"].items():
+                target = review_source / rel
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(raw)
+            atomic_json(review_source / "FROZEN_REVISION_DIFF.json", frozen_revision_diff)
+            for rel, value in frozen_revision_diff["program_diffs"].items():
+                target = review_source / "program-diffs" / (Path(rel).name + ".diff")
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(value)
         for rel in program_paths:
             baseline_target = review_source / "baseline" / rel
             candidate_target = review_source / "candidate" / rel
@@ -2912,6 +2990,15 @@ def produce(pipeline, job, attempt, agent, stage, checkpoint):
 
         def semantic_review():
             aggregate_prompt = AGGREGATE_SEMANTIC_REVIEW_PROMPT
+            if frozen_revision_diff is not None:
+                aggregate_prompt += (
+                    " This is an authorized content revision of a previously blocked frozen candidate, "
+                    "not a retry of that same input. Read source/FROZEN_REVISION_DIFF.json, "
+                    "source/program-diffs/, source/program-evidence/authorization/ and actual baseline/candidate "
+                    "programs. The v3 scope permits only A03 first-initialization/used-target separation "
+                    "and A13 exact target-row URL semantics plus the listed contract explanations. "
+                    "Unchanged P0 and P1 obligations remain. No execution or runtime pass may be claimed."
+                )
             if r7_authorization_material is not None:
                 aggregate_prompt += (
                     " For this R7 review, copy every key from input.identity exactly, including "
@@ -3070,7 +3157,19 @@ def review(pipeline, job, attempt, agent):
                            evidence_recovery_id=recovery_context["grant_id"],
                            frozen_review_context=recovery_context)
     else:
-        result = agent("cognitive-review", REVIEW_PROMPT, payload, source)
+        prompt = REVIEW_PROMPT
+        if (payload.get("aggregate_repair_diff") or {}).get("frozen_revision_diff") is not None:
+            prompt += (
+                " For this authorized frozen content revision, read source/inputs/frozen-revision/diff.json, "
+                "the four plain-text diffs in source/inputs/frozen-revision/diffs/, and all supplied "
+                "source/inputs/frozen-revision/authorization/ files including the original blocked report "
+                "and the finite consistency/assertion maps. Read ARCHITECTURE.md and relevant acceptance "
+                "programs to the end using line pagination; do not rely on truncated JSON strings. "
+                "The scope authorizes only the listed A03/A13 assertion changes and contract explanations. "
+                "Keep all other commitments, distinguish static evidence from execution, and judge "
+                "the revised input independently without treating the old verdict as the new verdict."
+            )
+        result = agent("cognitive-review", prompt, payload, source)
     try:
         report = validate_review(result, source)
     except FactoryError as error:
@@ -3229,6 +3328,7 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
     prepared_request = None
     r6_prepared = False
     r7_prepared = False
+    frozen_prepared = False
     if value.get("prepared_revision") is not None:
         from .plan_revision import PreparedRevisionService
         request = value["prepared_revision"]
@@ -3238,15 +3338,20 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
         prepared = PreparedRevisionService(store).prepare(request["binding"].get("job_id"), request)
         r6_prepared = prepared.get("schema") == "atlas.failed-plan-revision.v2"
         r7_prepared = prepared.get("schema") == "atlas.failed-plan-revision.v3"
+        frozen_prepared = prepared.get("schema") == "atlas.frozen-plan-revision.v1"
+        if frozen_prepared and con is None:
+            raise FactoryError("frozen revisions require atomic resume-product with budget activation", "resume_transaction_required", 409)
         failed = store.job(prepared["binding"]["job_id"])["snapshot"]
         failed_repair = failed.get("cognitive_repair", {})
         expected_program_scope = (
             prepared.get("cumulative_repair_scope", {}).get("edit_paths")
-            if r7_prepared else failed_repair.get("edit_paths")
+            if r7_prepared or frozen_prepared else failed_repair.get("edit_paths")
         )
         if (reuse_spec or spec_edit_paths is not None or not repair_scope
-                or failed_repair.get("id") != artifact["id"]
-                or failed_repair.get("digest") != artifact["digest"]
+                or (not frozen_prepared and failed_repair.get("id") != artifact["id"])
+                or (not frozen_prepared and failed_repair.get("digest") != artifact["digest"])
+                or (frozen_prepared and (prepared["binding"]["artifact_id"] != artifact["id"]
+                                        or prepared["binding"]["artifact_digest"] != artifact["digest"]))
                 or expected_program_scope != edit_paths
                 or failed.get("case_basis") != spec.get("case_basis")):
             raise FactoryError("prepared revision differs from its frozen repair baseline", "patch_conflict", 409)
@@ -3259,7 +3364,7 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
             expected_scope = prepared.get("cumulative_repair_scope")
             if not isinstance(expected_scope, dict):
                 raise FactoryError("R6 preparation is missing its cumulative repair scope", "patch_conflict", 409)
-        elif r7_prepared:
+        elif r7_prepared or frozen_prepared:
             if (digest(prepared.get("effective_plan")) != prepared.get("effective_plan_digest")
                     or not isinstance(prepared.get("prepared_program_revision"), dict)
                     or not isinstance(prepared.get("source_reference_report"), dict)
@@ -3315,6 +3420,8 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
     prepared_source_config = None
     if r6_prepared or r7_prepared:
         prepared_source_config = store.job(prepared["binding"]["job_id"])["snapshot"]["config"]
+    elif frozen_prepared:
+        prepared_source_config = prepared["review_config"]
     model = text(
         value.get("model", prepared_source_config["model"] if prepared_source_config else artifact["provenance"].get("model")),
         "provider/model", 200
@@ -3486,7 +3593,7 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
             if report != prepared["source_reference_report"]:
                 raise FactoryError("R6 source-reference report changed before queue", "checkpoint_changed", 409)
             program_reuse_contents(store, prepared["prepared_program_reuse"])
-        elif r7_prepared:
+        elif r7_prepared or frozen_prepared:
             # Re-run the complete v3 binding verifier under the caller's write
             # transaction so source state, authorization, patches and bytes
             # cannot change between preparation and queue insertion.
@@ -3497,9 +3604,11 @@ def queue_repair(store, artifact, value, *, con=None, parent_state_override=None
             )
             if digest(fresh) != digest(prepared):
                 raise FactoryError("R7 prepared revision changed before queue", "checkpoint_changed", 409)
-            program_revision_contents(
-                store, prepared["prepared_program_revision"]
-            )
+            if frozen_prepared:
+                from .frozen_revision import program_contents
+                program_contents(store, prepared["prepared_program_revision"])
+            else:
+                program_revision_contents(store, prepared["prepared_program_revision"])
         parent_state = parent_state_override or "running"
         if original.get("v1", {}).get("plan_id"):
             parent = con.execute("SELECT b.state FROM v1_execution e JOIN batch b ON b.id=e.batch_id WHERE e.plan_id=?", (original["v1"]["plan_id"],)).fetchone()

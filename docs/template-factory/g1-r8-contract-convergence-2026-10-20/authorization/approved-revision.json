@@ -1,0 +1,134 @@
+{
+  "schema": "atlas.frozen-revision-authorization.v1",
+  "source_authorization": {
+    "source_ref": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/authorization/ATLAS_G1_R8_CONTRACT_CONVERGENCE_CODEX_INSTRUCTIONS.txt",
+    "source_digest": "f7569e2f8954fda07b6645924e93973114044343a31ebd7ef4ee5cee6dbcbc46"
+  },
+  "binding": {
+    "job_id": "job_b01427592b164863aab5bedf7b3863bb",
+    "attempt": 3,
+    "snapshot_digest": "db51b4ca834dd031135025d761b46407f02b2850ad993c950f55407a0f95fcf6",
+    "artifact_id": "tpl_f7ecff8d8fef4deba828aa2a8ef82918",
+    "artifact_digest": "ec3f2fc668c20d24b78c22f15eed40779ed38b835c10b7b452aaba725dbb7105",
+    "archive_sha256": "20d602d7a4eba259a88126366780b571aefae6821b32c123f2d1d9614cc83bee",
+    "acceptance_id": "acc_90be1c382dae42e4b3c2eba0344eeacf",
+    "acceptance_digest": "25f028e91343208570191d49092e95a9344c27e03746cd1c48080ef9258a6632",
+    "producer_job_id": "job_3a658ba085e8417ea6faad5cb0cdd493",
+    "campaign_id": "atlas-v1-first-production-2026-10-19",
+    "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+    "plan_digest": "1f7701fbf5f52dde011dee76196b2cb01697e10190c6ad17c1273f4b5dcc3d30",
+    "product_id": "product-c42848f63251507bd9d911a5",
+    "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+    "scenario_revision": 2,
+    "case_basis_digest": "a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589",
+    "facts_view_digest": "241bf3d99ff497c30be8349cbc70529e08df6146736cb749b55268271889aa4b",
+    "plan_checkpoint_name": "blueprint-plan-0",
+    "plan_checkpoint_digest": "e7b9e82beb121a4d73852e556eac0eeefd2406af2cd4a3f8fc6489eea4944f54",
+    "facts_view_checkpoint_digest": "8598295bca5580dec40dc1fa56b9b421d775d668a498b3ea3115fbae29141d4f",
+    "case_design_checkpoint_name": "case-adaptation-prepared-0b627399d035068e",
+    "case_design_checkpoint_digest": "9b67a9576cc5825f449e3175211ded44b0497f43d372622e5ea928fe12235fc9",
+    "research_checkpoint_digest": "9053da8cb157b5bec6ce698e163e208b5a500a3c121d12a6b1b8855aadba0238"
+  },
+  "patch_digest": "aa8316562fb13c741423e453a088c248ee1ae919c112d8c125d2d1afe4a11022",
+  "program_revision_digest": "7450075f4f66b466ddd445078e8a242d381b7a336f324ba89507bd66659d97cc",
+  "review_config": {
+    "model": "opencode-go/deepseek-v4.1-flash",
+    "language": "zh",
+    "timeout": 1800,
+    "repair_attempts": 0
+  },
+  "prepared_root": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/prepared-programs/acceptance",
+  "repair_scope": {
+    "version": "atlas.aggregate-repair-scope.v3",
+    "edit_paths": [
+      "acceptance/README.md",
+      "acceptance/p0_library.py",
+      "acceptance/p1_maturity.py",
+      "acceptance/runner.json"
+    ],
+    "authored_field_paths": [
+      [
+        "acceptance",
+        "A03",
+        "goal"
+      ],
+      [
+        "architecture_markdown"
+      ]
+    ],
+    "known_blockers": [
+      {
+        "feature_id": "F02",
+        "acceptance_id": "A03",
+        "decision_id": null,
+        "basis": "最新冻结独审指出首启四分类与已用目标状态混淆；独立fresh首启与已有目标分别验证。"
+      },
+      {
+        "feature_id": "F12",
+        "acceptance_id": "A13",
+        "decision_id": null,
+        "basis": "最新冻结独审指出/go页面字符串与原始URL行内链接合同冲突；断网证据边界必须分开。"
+      },
+      {
+        "feature_id": "F08",
+        "acceptance_id": "A09",
+        "decision_id": null,
+        "basis": "明确仍存在的软删行按ID200且只读，不改既有迁移/恢复程序。"
+      }
+    ],
+    "authorized_assertion_changes": [
+      {
+        "acceptance_id": "A03",
+        "change": "split_initialization_and_used_target",
+        "rationale": "保留首启API/HTML四分类与现有保存/创建断言，移到各自正确目标；不清空已用目标。"
+      },
+      {
+        "acceptance_id": "A13",
+        "change": "target_row_exact_original_url",
+        "rationale": "目标行内原始URL属性精确匹配替代错误/go文本；保留A08重定向及P1其他行为。"
+      }
+    ]
+  },
+  "limits": {
+    "cli_sessions": 500,
+    "expected_repairs": 7,
+    "repair_limit": 8,
+    "expected_cli_total": 83
+  },
+  "timing": {
+    "window_seconds": 86400,
+    "supersedes": {
+      "deadline_source": "authorized_external_pause_resume",
+      "source_id": "egrant_5168847ee98d4b7f980779bb9199f44f",
+      "activated_at": 1792496531.354074,
+      "effective_deadline": 1792501163.965368,
+      "authorization_digest": "4384d1c263c8c553c73b85b2fe6e11533325b64f95c9343fe63a49f4fd97767e"
+    }
+  },
+  "review_materials": [
+    {
+      "path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/ASSERTION_MAP.md",
+      "sha256": "0197e1bf5ea912312c9716bfb3bee0badb604e40d33ebaffb4f8d3bbe0c41f14"
+    },
+    {
+      "path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/PROGRAM_CONSISTENCY.md",
+      "sha256": "12ce3414dab1eb851afc26b1904abfd707a517b1317d54057e366842f06aa699"
+    },
+    {
+      "path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/patch.json",
+      "sha256": "1da109d67eadc2644d3fe33adb453cfa192b9e0952ee358617c88951f95b2169"
+    },
+    {
+      "path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/SPEC_AND_PLAN.diff",
+      "sha256": "fd808ffb651c5224875fc2206fcadd85810f04cf4e5708ea3433b1faf8dc8238"
+    },
+    {
+      "path": "docs/template-factory/g1-frozen-review-recovery-2026-10-20/additional-call-authorization/actual-attempt-3/report.json",
+      "sha256": "98a0c3be46fa95bf9007eb1798332a4e33752b4f1efcfa0bd7ec9f295222c7b9"
+    },
+    {
+      "path": "docs/template-factory/g1-frozen-review-recovery-2026-10-20/additional-call-authorization/actual-attempt-3/acceptance.json",
+      "sha256": "0322e9e7a83bffb60399e4efe2ff598d6208f047233b1b6c7e8270d21ca39fbe"
+    }
+  ]
+}

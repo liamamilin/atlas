@@ -1,0 +1,497 @@
+Atlas G1 R8：冻结候选合同收敛、正式内容修订与真实主链验收
+交给 Codex 的完整执行指令
+编制依据：2026-10-20；已核查 GitHub HEAD 257bbdb061e7d63a41fa03378cca1bd70a85f17a
+仓库：https://github.com/liamamilin/atlas
+工作分支：codex/stabilize-atlas
+
+一、任务目标和本次授权
+
+请执行本指令，完成准备、必要宿主修复、正式内容修订、真实独立审阅，并继续推进标准交接、真实 P0 和 G1。G1 通过后，再执行原先固定的 T08 三场景小批生产。不要只提交准备代码就结束，也不要只重跑上一份已经得到 blocked 结论的冻结候选。
+
+本指令成为执行授权的前提是用户将其作为新任务交给你。授权不等于已经登记或已经消费；所有生产额度、时间和作业变更仍须经过正式服务生效。
+
+授权的具体范围如下：
+
+1. 对原书签产品进行一次有边界的业务内容修订，业务修复上限由 7 提高到 8；历史已用 7 次保留。这个新增额度仅用于本文明确的 A03、A13、A09 及同族说明修订，不允许第九轮业务修复，不允许重新设计产品。
+2. 四份程序包文件替换，五份原字节复用；规格只允许本文列出的两个 authored 字段变更。通过确定性补丁和已准备字节完成，模板 author 模型调用为 0。下游真实应用开发的首次正常模型调用不属于“模板 author”，可按已有开发授权执行。
+3. 保留同一个 campaign、G1 plan、product、scenario revision、共享案例及固定事实视图。生成新的模板版本和摘要，正式关联其前驱；不改写旧冻结候选、旧独审结论或历史失败。
+4. 全局 CLI 上限保持 500；从 factory 82 + 外部诊断 1 = 合计 83 的实际基线继续累计。生产/静态审阅并发上限 2、运行并发上限 1 不变。
+5. 用户已经明确允许新指令覆盖旧时间限制。本指令将 G1 书签产品的有效生产窗口改为：准备与代码门禁完成、实际生产源码远端 CI 通过后，在首次正式激活 R8 的事务中记录 activated_at，deadline = activated_at + 86400 秒（24 小时）。它明确替代此前 03:13、19:21 及最新 20:59:23.965368 等适用于该产品的旧有效截止，保留全部历史记录。准备和 CI 等待不启动新窗口；激活后的暂停、重启、重放和恢复不重新计时。取消对本次新修订套用旧冻结任务的“至少剩余 2700 秒才可启动”特别门槛。
+6. T08 仍只使用原先固定的三个场景及其原有预算、修复和抽验规则。它在 G1 正式通过后首次实际启动时启用原有 8 小时阶段窗口；尚未启动的 T08 不继承已过期 G1 截止，也不因为启动 G1 R8 而提前计时。不扩为 10 个产品，不添加或替换样本。若正式记录显示 T08 已经启动或样本已改变，应先核对新事实；不得伪称首次启动。
+7. 新版本所需独立模型审阅继续使用 OpenCode Go；以目前可调用并已成功使用的请求模型 opencode-go/deepseek-v4.1-flash 为基准，单次审阅 timeout 明确为 1800 秒，并受剩余有效窗口约束。记录请求模型；无法观测实际 provider 模型时保持 unknown。不得静默换模型，也不得从旧 producer 配置继承回 600 秒。
+8. 这不是旧冻结任务第四次同内容重试授权。只有真实改变、在本授权范围内的新版本输入可执行合法首次审阅；旧阶段历史追加重试 2/2 和所有已消费 grant 原样保留。相同输入重试、协议修复、reference repair 等追加模型调用仍服从原历史额度，不因换版本或 job ID 清零。新版本不得为了取得“首次调用”而改时间戳、语言或无关文字。
+9. 对上述已授权事项，请持续执行，不需要因旧日期、旧任务状态或上一轮已消费 grant 再要求用户重复授权。确实出现本指令之外的新业务改动、需要第九次修复、耗尽既有协议重试、全局 500 次或新窗口到期时，正式暂停并一次性给出准确阻断和最小下一步。
+10. 宿主实现、针对性回归、准备文件、提交和推送属于本任务必要工作；不要新增与本轮问题无关的平台、审查制度或轮次专属恢复子系统。
+
+二、先核实当前真实状态
+
+以正式数据库、队列和归档为准复核以下基线；若已被用户其他操作推进，只读确认最新状态并防止重复生产，不重置到本报告的旧状态。
+
+基线：
+- HEAD：257bbdb061e7d63a41fa03378cca1bd70a85f17a。
+- 实际宿主源码：da15a23a4007fa60158a87ee5a24e3d7b86852a7。
+- campaign：atlas-v1-first-production-2026-10-19。
+- G1 plan：plan_87059846caf345d2b2fe690657cf324f。
+- product：product-c42848f63251507bd9d911a5。
+- scenario：scn_7756e0007f6a463a97316f3f49c15248，r2。
+- 当前冻结候选：tpl_f7ecff8d8fef4deba828aa2a8ef82918。
+- 当前冻结 digest：ec3f2fc668c20d24b78c22f15eed40779ed38b835c10b7b452aaba725dbb7105。
+- 当前归档 SHA256：20d602d7a4eba259a88126366780b571aefae6821b32c123f2d1d9614cc83bee。
+- 固定 case basis digest：a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589。
+- 最新冻结独审 job：job_b01427592b164863aab5bedf7b3863bb，attempt 3，needs_review。
+- 最新有效 acceptance：acc_90be1c382dae42e4b3c2eba0344eeacf。
+- 实际结论：6 passed、architecture_contract uncertain、phase_acceptance blocked。
+- 最近独审 exit 0，676.68 秒，1 次调用；不是尚无结论的超时。
+- factory 82、外部诊断 1、合计 83/500；书签修复 7/7；活动调用 0。
+- 当前正式新模板 0、标准交接被真实开发消费 0、真实 P0 交付/通过 0/0。
+- 本轮案例新增 0、复用原依据 1；T08 not_started，0/3。
+- 最新已经生效过的旧时间截止：北京时间 2026-10-20 20:59:23.965368。它在本指令编制时已过期，本指令第一节明确覆盖它。
+
+必须先读：
+A. docs/template-factory/g1-frozen-review-recovery-2026-10-20/additional-call-authorization/RESUMED_DELIVERY.md
+B. 同目录 RESUMED_OPERATIONS.md、RESUMED_STOP_RECORD.json、actual-attempt-3/report.json、acceptance.json、result.json、原始输出及预算回执。
+C. docs/template-factory/g1-r7-evidence-recovery-2026-10-20/actual-frozen-review/job_b01427592b164863aab5bedf7b3863bb/source/
+D. 原 G1 manifest、固定三场景 SAMPLING_PLAN、T08 请求、独立执行器 plan 和操作说明。
+E. 仓库现有 AGENTS.md、接口和交付合同；用户新授权覆盖与其冲突的旧时间和本次修复上限，不覆盖来源真实性或验收要求。
+
+保留已有用户/provider 改动；不要 reset、清库、重建 campaign、复制产品来规避预算。生产前保存正式状态和预算快照，核对活动调用确为 0，按现有机制保留可恢复备份。
+
+本轮证据目录建议：
+docs/template-factory/g1-r8-contract-convergence-2026-10-20/
+
+归档本指令和用户转发授权，记录实际 SHA256，不填虚构的预定新摘要。所有将改变生产状态的请求都绑定当前真实 revision、digest、acceptance 和完整授权摘要。
+
+三、已核实的三个核心问题与明确裁决
+
+3.1 A03：首次初始化与已用实例的目标混淆
+
+现状：
+acceptance/p0_library.py 的 _case_a03 对传入 base_url 无条件要求 API 和 HTML 同时出现四个预置分类。
+但 F02 已规定：四类仅在新数据库首次初始化建立，后续必须保留用户删除、重命名非默认分类的持久状态。
+
+本轮选择：
+- 对给定 base_url，保留真实表单省略 category 保存进入“未整理”、有效新分类名自动创建、读回、分类筛选及 HTML/JSON 一致等已有断言。
+- 不再强求已用实例恢复“待购”“家居改造”“以后看看”这些可能合法删除或重命名的预置名称。
+- 使用同一 app_root 和测试者控制的 data_dir 创建独立 fresh 实例，在第一次业务写入之前验证四个预置分类在 API 和 HTML 均可见。
+- 保留 F02→A03 映射和“首启四分类”的验收意图，不能删除断言后仅声称 A11 已覆盖。现有 A11 的 fresh 检查不包含 A03 全部 HTML 分类断言。
+- 复用 common.launch_app(..., fresh=True) 和同文件 A11 的来源绑定、启动和清理模式；新增代码优先放在 p0_library.py 内，不改 common.py。
+- fresh 目录必须与既有目标数据分离，只清理本次测试创建并持有的临时资源；不得清空用户目录，不得对 base_url 重置数据。
+- A03 缺少 app_root/data_dir、fresh 启动失败、来源不匹配或清理失败，均返回明确失败，不跳过首启部分，也不回落为只验现有 base_url。
+- 不把 fresh 实例冒充“同数据目录跨重启”。无需仅为了 fresh 把 A03 放入 common.RESTART_CASES。
+- runner 中 A03 增加 --app-root {app_root} 与 --data-dir {data_dir}；README、架构适配器和实际参数错误处理同步。
+
+3.2 A13：原始 URL 页面链接被错验成 /go 页面字符串
+
+现状：
+acceptance/p1_maturity.py 的 A13 仅用“HTML 中含 /go/{record_id}”判断记录可打开。
+F07、架构和 A08 实际约定：页面链接 href 是原始 URL；/go/{id} 另有 302 重定向接口。
+
+本轮选择：
+- 仅替换 A13 这组错误页面断言和必要的局部解析代码。
+- 定位本次保存得到的 record_id 对应 tr[data-testid=record-row][data-record-id=...]。
+- 在这一行内定位 a[data-testid=record-open-link]。
+- 用 HTML 属性解析后的 href 精确比较提交的原始 URL，包括大小写、路径、查询串和片段；正确处理 &amp; 等 HTML 实体，不进行 URL 规范化后比较。
+- target 必须为 _blank；rel 按 token 校验包含 noopener。
+- 页面完全没有 /go 字符串，但目标行链接正确，应可通过链接检查。
+- 注释、其他记录、隐藏无关文本中出现 /go 或原 URL，不得让目标行错误通过。
+- 保留 A13 已有的仅 URL 保存、hostname 派生、标题降级、favicon 本地性、API 读回和页面不引用外部资源等检查。
+- A14/A15 不变。
+- 原字节复用 p0_find_open.py，保留 A08 既有的独立 /go 302、原始 Location 和未知 ID 404 检查。A13 目前没有自己的 /go 302 断言，不要在报告中虚称“保留 A13 原有 302 断言”。
+- 测试和独立浏览器检查均不访问保存的外部网站，不跟随 /go 到外网。
+
+3.3 A09：软删除后按 ID 读取合同未定义
+
+现状：
+架构只写 GET /api/bookmarks/{id} 返回 200 或 404；A09 在记录软删、分类删除后按 ID 读取并要求 200，以验证软删记录也迁入默认分类。
+
+本轮选择如下，不能同时兼容互斥答案：
+- 数据库中仍存在的活动记录、软删除记录，GET /api/bookmarks/{id} 均返回 200 和该记录的持久状态。
+- 仅不存在的 ID 返回 404 not_found。
+- GET 为只读，不清空 trashed_at、不自动恢复。
+- 默认列表和默认计数仍排除软删；include_trashed=1、回收站、分类删除迁移活动及软删记录、真实恢复与跨重启合同保持原样。
+- 将此明确写进 architecture_markdown。p0_recovery.py 保持原字节。
+- 不改成“200 或 404 都接受”；不删除真实 HTML 软删、回收站、恢复、分类迁移或重启断言。
+
+四、同一次修订完成其余五项一致性说明
+
+4.1 错误合同范围
+
+保留 contract_coverage.error_contract 的 atlas.bookmark-error-contract.v2、32 条分支、顺序和现有双向映射，全部不改。
+
+现有 validate_error_contract 要求对象键恰好 schema/branches，并要求分支等于宿主固定集合；不要新增 scope 字段，不往 v2 塞 invalid_url/bad_request/not_found，不为本轮升级 schema。
+
+在 architecture_markdown 中说明：
+这 32 条机器分支专门枚举分类管理及书签保存/移动的分类输入错误，覆盖 invalid_name 和 invalid_category，不宣称穷尽产品所有错误。URL 校验、畸形 JSON、未知 ID 等仍受架构完整错误合同约束，由其既有验收程序检查；未执行不称已运行通过。
+
+准备一张精确的既有断言映射：
+- invalid_url：核对 A02 及 A10 HTML 恢复路径。
+- bad_request：核对 A10。
+- not_found：核对 A08/A10 的已有范围。
+- invalid_name/invalid_category：保留 v2 对 A04/A12 的 32 条分支。
+- 其他已存在错误按真实代码列出，不虚称已有覆盖。
+每行写到实际函数/断言位置和执行前提，不新发明不存在的测试。
+
+4.2 README A11 参数
+
+修正 acceptance/README.md §4.1 中 A11 行遗漏的 --app-root / --data-dir。
+它已有 runner 及其他示例正确，统一为实际接口。与 A03 的所有参数表、示例、适配器说明一次对齐，不改 A11 程序语义。
+
+4.3 搜索 category 空值
+
+明确 GET 搜索合同：
+- category 缺省或空字符串表示全库。
+- 非空且未知的分类表示空结果。
+- q 仍只匹配 title、hostname、description，不扩为原始 URL 或分类名。
+- 与写入操作区分：保存/移动的显式空 category 继续遵守原 400 invalid_category；省略分类默认保存及 null 的既有合同不变。
+保留 A07 程序字节，它已有无 scope HTML 搜索提交 category='' 的行为。
+
+4.4 A13 离线证据边界
+
+A13 的原 goal 和 P1 身份不变。
+“页面没有外部资源引用”只能证明该子项，不能单独证明应用在禁用外网时仍能保存。
+
+在架构、README 及 file_plan 的相应说明中写明：
+- 真正宣称 A13 离线通过时，运行者必须用现有执行环境禁用应用外网，保留与同一 app_root、应用/执行容器、实际运行 receipt 绑定的网络配置和运行证据。
+- 缺少环境断网证据时，离线结论保持未证明；程序行为子项通过不能被宿主汇总成完整离线通过。
+- 不新增用户手填 offline=true 即可通过的自证开关。
+- 如果现有状态 enum 没有 unverified，不自行塞不支持的值；使用现有未证明/未满足证据状态，并写清缺项。
+- 本轮 G1 仍是 P0 验收。修复 P1 程序静态冲突，不把真实 P1 开发或全 P1 运行新增为 G1 前置。
+- 本轮若没有运行 A13，就诚实保留 not_run，不伪造隔离证据。必要的文档说明可以在独审阶段评价其合同完整性。
+- 不为此创建新的通用运行平台。
+
+4.5 重复架构标题
+
+修正 specification 内重复顶级标题，使正式生成的 ARCHITECTURE.md 只有一个该标题。通过新版本源规格或现有确定性导出完成，不手改旧冻结输出。
+
+五、严格且足够的编辑范围
+
+5.1 Author-owned spec 字段
+
+必须可改：
+- spec.architecture_markdown，仅第三、四节列明的语义和说明。
+
+允许等价消歧：
+- spec.acceptance[id=A03].goal。
+
+建议 A03 goal 表述：
+“在给定 base_url 验证省略归类保存进入‘未整理’、有效新归类名自动创建；使用同一应用源码的独立 fresh 实例验证首次初始化四个预置归类。既有目标按持久化后的用户分类状态验收，不要求恢复已删除或重命名的非默认预置分类。”
+
+其 features=["F01","F02"]、implementation、phase=P0、type、status 均不改。实际 acceptance 条目没有 command 字段，不添加；命令权威在 runner.json。
+
+其余 authored 字段全部保持：
+features、decisions、roles、phases、acceptance ID/映射/阶段及其他 goal、sources、case_basis、case_facts_view、scenario revision、runtime profile、原运行证据要求、contract_coverage 全部内容。
+
+特别是 F02 的 recovery/success_state 已正确写明“首次初始化、之后保留用户状态”，本轮保持，不再扩大修改面。
+
+5.2 九份程序包文件
+
+只替换以下四份：
+- acceptance/p0_library.py：A03 分离目标、必要参数校验、fresh 资源生命周期；不改 A01/A02/A11 的既有语义。
+- acceptance/p1_maturity.py：A13 行内原始 URL 链接断言和局部必要解析；A14/A15 不变。
+- acceptance/README.md：本轮合同、参数、A11 表格和 A13 离线证据说明。
+- acceptance/runner.json：只改 A03 argv，加入 app-root/data-dir；其他用例定义不变。
+
+原字节复用以下五份：
+- acceptance/common.py
+- acceptance/p0_organize.py
+- acceptance/p0_find_open.py
+- acceptance/p0_recovery.py
+- acceptance/requirements.txt
+
+固定基线 SHA256：
+acceptance/common.py
+7f0d7d28d8336bdde3da267795e24d13e430f05e53063ee01ed5611236325d37
+acceptance/p0_library.py
+5923bdd1d15e7d98bcf2c3b91123b36d986c0c69cbc6a1a7fdab80ce4c437d6e
+acceptance/p0_organize.py
+93ae82c74946811fac3b1dd213cc077cf89acc6ecfb45e64ec2830e3482b7f60
+acceptance/p0_find_open.py
+342e38d2298cf48e22fb97d76e080ce4a67c3c10a942502c5ef205954878d667
+acceptance/p0_recovery.py
+372c75aa2944a10cc5146859dc0bacd0e03111defe7c8aa75ece2d28ec45aff3
+acceptance/p1_maturity.py
+d44e17c87314db18084b3b88bd2c700a75bfe583d108e9b518040fb8378601a3
+acceptance/requirements.txt
+f1fc18b605a1eea93892d319d09122d91033a48dfd4b913f8f262a4dc8633deb
+acceptance/README.md
+9e73ee6233e5b991a9682bb0bcaa235783bd4c7a6d399d5be38c100face9db6e
+acceptance/runner.json
+3e71774a5bb0fb2b29cbb334983127264d5f377cc9e3a680b12f11da9268e201
+
+先实际计算并核对基线，再制作四份替换文件，记录真实 after SHA；不得根据此清单伪造核对结果。
+file_plan 的九项本轮 replace/reuse 标志及对应准备引用，允许按“四替换、五复用”确定性同步；上一轮替换、本轮复用的文件也必须正确改为本轮 reuse。purpose 的语义修改仅限四份 replace 项，其他路径、验收映射、错误分支引用等不变，五份 reuse 文件正文和字节不变。p1_maturity.py 当前 purpose 中“保持固定字节不变”的旧声明必须更新，明确 A13 改动、离线证据前提和 A14/A15 不变。
+
+template.json、ARCHITECTURE.md、acceptance/plan.json、manifest、版本、摘要、状态和来源绑定是正式生成的派生输出，可以随有效修订变化，但不手工写冻结目录，不将派生更新伪装为扩大 authored 白名单。
+
+六、正式修订入口：最小扩展现有机制
+
+请先读：
+application-atlas-production-pack/template_factory/plan_revision.py
+contract_scope.py、cognition.py、budget.py、product_recovery.py、api.py、v1_api.py
+以及它们的现有回归。
+
+目前旧 schema 不能直接承载本次修订：
+- atlas.failed-plan-revision.v3 绑定旧 R6 failed producer、旧调用数及 R7 的替换文件集，没有 p1_maturity.py。
+- aggregate repair_scope v1/v2 仍限定旧 A02 single_label_hostname_negative_to_positive。
+- spec_edit_paths 与 edit_paths 当前互斥，不能拼两个互斥参数假装支持联合补丁。
+- 旧 prepared revision 还会强制继承旧 producer 的 model/language/timeout。
+
+本次允许在现有服务中增加一个适用于“冻结候选收到有效 blocked/uncertain 结论后的受限内容修订”的 schema/version。复用 PreparedRevisionService、BudgetAmendmentService、ProductRecoveryService、queue_repair、程序清单及原子后继关系。不另造 R8 恢复平台，不在核心业务代码继续堆 R8_JOB/R8_CLI_COUNT 这样的轮次专用常量。
+
+建议沿用现有正式路由并扩展其受验证请求，而不是直接写数据库：
+- POST /api/factory/v1/jobs/{job_id}/prepare-revision
+- POST /api/factory/v1/budget/amendments
+- POST /api/factory/artifacts/{artifact_id}/repair
+- POST /api/factory/v1/plans/{plan_id}/resume-product
+
+以上是现有入口清单，不表示旧请求 schema 已支持新能力。实现后在 CONTRACTS.md 给出真实可用的完整 JSON 请求、顺序、幂等键与响应；不得提交一个未实现的示例接口让操作者猜。
+
+新准备对象至少验证并绑定：
+1. campaign/plan/product/scenario revision。
+2. 基线 artifact ID、digest、归档完整性。
+3. 最新有效 acceptance ID/摘要及其 review job/attempt，拒绝旧审阅或其他候选结果。
+4. 本轮授权文档及摘要、明确的 spec 和程序白名单。
+5. 确定性补丁、四份新字节、五份旧字节、file_plan 及其 before/after digest。
+6. 固定案例、事实视图、所有未授权 authored 内容不变。
+7. 真实送审材料必须包含修改后的程序源码、规格及对应断言，不只提供 file_plan 描述。
+8. 审阅模型、语言、1800 秒 timeout、repair_attempts=0。
+9. 一次修复/唯一后继的绑定；新版本与旧候选、旧 review 的 supersedes 关系。
+10. 预算和时间授权的确切来源、当前生效时间来源及被替代来源。
+
+准备动作对生产状态只读：可写准备文件和摘要，不增加修复、不消费调用、不激活时间、不入生产队列。
+正式登记/激活复用服务，在事务内完成最终基线复核、预算修订激活、记一次业务修复、唯一后继入队和回执持久化。不存在“只扣额度没有作业”或“一份授权生成两个后继”。
+
+同请求重放返回同一个回执；同幂等键不同内容返回 409；并发重复不会双扣。失败应按事务语义回滚，已经可能发出的模型调用不能抹掉。
+
+旧 job_b014... 的 needs_review 和 blocked acceptance 原样保留。用现有 tf_job_supersession / 正式后继关系表示被新修订替代，查询和 G1 当前阻断解析使用有效后继；不要 UPDATE 旧结论为 passed、清掉旧失败或把未解决的旧失败误列成新版本永远不能完成的活动阻断。
+
+七、时间覆盖和累计费用必须一起验证
+
+7.1 修复已核实的优先级问题
+
+当前 BudgetLedger.reserve、phase_remaining、effective_deadline、effective_deadline_snapshot 会先选 amendment，再用旧 frozen-review time_resume 无条件覆盖。仅增加一个 24 小时 amendment 仍可能落回已经过期的 20:59 截止。
+
+在现有预算模块统一解析有效时间：
+- 本次新授权明确引用并替代当前有效时间依据，按已激活的授权继承关系选择。
+- 不能简单取所有 deadline 的最大值；那会让历史超长授权永久生效。
+- 新授权未激活时仍按旧状态，不能提前生产。
+- 首次正式激活后选择新窗口；reserve、phase_remaining、effective-budget API、队列、宿主、独立执行器看到同一个 activated_at/deadline 和来源。
+- 保留旧 base/amendment/time_resume 行、原始截止和审计摘要，不删除/倒改。
+- 重放同一激活、普通 resume、进程重启和暂停恢复不延长。
+- 新窗口只作用于本指令授权的 G1 产品。其他产品按各自原范围；T08 按第一节的首次启动阶段规则，不借 G1 amendment 擅自扩大其他额度。
+- 旧 frozen job 的 2700 秒专用启动余量不应套在新 successor。正常调用仍应受真实剩余窗口和明确 timeout 限制。
+
+7.2 外部诊断 1 次不可丢失
+
+当前 external_cli_sessions=1 存在旧 time_resume 来源中。
+切换时间来源时，将“已发生外部消费”的读取与“当前有效时间来源”分离，继续使用正式历史证据计账；不得因新 amendment 生效就回到 82/500，也不得再造一条 factory reservation 双重收费。
+
+应观察：
+- 准备结束：factory82 + external1 =83，repairs7，active0。
+- 唯一后继成功入队、尚未调用模型：合计仍83，repairs8。
+- 新增一次实际工厂模型调用后：factory83 + external1 =84。
+- 后续按实际调用递增，上限500不变。
+不把 provider 内部 HTTP 请求、未知搜索数或未知实际费用混写成可观测 CLI 会话数。
+
+7.3 重试和正常首次调用
+
+基于有效内容与操作身份区分：
+- 真正新的受限修订内容，可正常首次调用。
+- 完全相同输入的已通过检查，只有摘要、规则版本与来源均符合既有复用规则时才能复用，并记录复用绑定。
+- 不凭“上一轮通过”跳过受这次 spec/程序变化影响的审阅。
+- 不换 job_id 或材料排版来取得同内容免费重试。
+- 历史阶段追加重试 2/2 和旧 protocol/evidence/frozen grants 消费记录保持。
+- 新版本首次调用如果协议无效、超时或需额外 reference repair，按正式预算机制判断；不得偷偷把追加调用标为首次，也不得自动创建新 grant。
+- 现有完整合法输出的确定性解析、导入或崩溃恢复，若没有新模型调用且正式机制允许，应继续恢复，不为单纯本地恢复虚设新模型额度。
+
+八、入队前的有限交叉核对与必要回归
+
+不要为本轮新增通用“审计所有产品一切问题”的门禁。入队前只把已知报告中的八项建议全部裁决并核对六条关系：
+
+1. 初始化：spec/F02、架构、A03程序、A11已有行为、runner/README 对 fresh 和已用实例的分工一致。
+2. 打开：页面原始 URL、行内 anchor 属性与 A08 独立 /go 302 一致。
+3. 软删：默认排除、回收站可见、按 ID 200、未知 ID404、迁移/恢复/重启一致。
+4. 搜索：GET 空 category 全部、未知非空为空、字段匹配范围不变；不混淆写入空值校验。
+5. 错误：32 条分类分支范围与其他既有错误断言映射一致。
+6. 参数/证据：A03/A11 argv 与 parser 一致；A13 行为子项和断网环境证据区分。
+
+每项给合同、代码位置、执行前提和结果边界。使用准备后的最终实际字节，不根据“计划会修改”写通过。
+
+针对性验证应覆盖真实风险：
+
+A03：
+- 已用目标合法删除/重命名非默认预置分类，不应仅因此失败，测试也不能补回它们。
+- fresh API 或 HTML 缺任一预置，必须失败。
+- 永远不创建预置的 fixture 不能借“当前目标部分通过”蒙混整个 A03。
+- 默认归类错误、新分类未创建、假成功不落盘等原负控仍失败。
+- 缺参/启动失败/来源不符/清理失败不能跳过；确认不删既有数据目录。
+
+A13：
+- 目标行只含正确原始 URL，整页无 /go 文本，链接检查通过。
+- /go 只在注释或其他记录出现、目标行缺链接，必须失败。
+- 其他行含正确 URL、目标行 href 错误，必须失败。
+- href 改写、target 错误、缺 noopener 分别失败；正确 HTML 实体编码可通过。
+- 原保存、派生、本地资源检查保留；A14/A15行为不变。
+- fixture 通过仅是程序回归，不能写成真实断网应用通过。
+
+A09/文件范围：
+- 对照明确后的合同核查软删 GET200、默认排除、分类删除迁移和恢复；未知ID404保留。
+- p0_recovery.py 与另外四份 reuse 文件摘要逐一相同。
+- 未授权字段/文件/案例/功能映射改动必须被拒绝。
+
+宿主：
+- 联合 spec/四文件准备被接受，旧 R7 schema仍兼容且不能冒名承载R8。
+- 真实新源码和架构进入相关预审、聚合及冻结独审材料，manifest绑定准确，无截断。
+- 并发重复/冲突重放、基线竞态、事务失败不会重复扣修复或双入队。
+- 旧时间过期不阻断本次已授权激活；未激活不生产；激活后统一24小时截止，重放不延长。
+- T08仍未启动时不提前计时；其他产品时间/修复额度不被更改。
+- 总账83含external1，额度500保留，外部消费不丢不重。
+- 合法新输入正常首次调用，同输入换job不能绕重试；旧blocked不被改写。
+- 检查所选模型与1800秒timeout实际进入新作业和子进程配置。
+
+完成这些有意义的回归后，运行仓库既有完整13组规定检查及严格Docker专项；使用既有可选skip规则，不人为设定必须等于某个旧测试总数。准备fixture、Docker技术探针和真实生成应用结果分开报告。
+
+提交必要宿主源码和准备材料，推送同一分支；核实实际生产源码对应远端 CI 成功再激活生产。等待 CI 不消耗新24小时窗口。保留旧失败检查，不拿历史CI代替新生产源码CI。不因只追加证据的提交就无差别重复全部昂贵检查；按仓库规则核验其影响和提交绑定。
+
+九、实际生产：必须推进到真实结果
+
+9.1 正式激活与唯一修订
+
+- 从正式状态重新核对基线，生成并持久化明确授权记录、准备对象、diff、四replace/五reuse manifest及预算请求。
+- 正式登记并原子激活业务上限7→8、G1新24小时窗口和唯一successor。
+- 本轮模板修订 author调用0，repair_attempts=0，不允许流水线在背后再自行改业务内容。
+- 获取正式回执，验证队列、修复使用次数、时间来源和总账符合预期，之后用正式worker继续。
+- 不重复恢复旧冻结独审job进行第四次同内容审阅。
+
+9.2 新版本设计预审与聚合
+
+- 用实际新规格和新程序完成现有六项设计预审及聚合。
+- 合法复用必须以真实输入摘要和规则为依据；不能全盘照搬旧六passed。
+- 送审材料应包括三处核心裁决、五项配套说明、旧报告、精确diff、相关源码与未变保护范围。
+- 不写“必须给passed”的诱导提示；请独立审查所选合同是否一致，保留原始输出。
+- 对明确blocked或uncertain应按现有门禁处理，不能只重试相同内容求另一个意见。
+- 若宿主遗漏已经存在的证据而产生无效判断，修复材料组装属于宿主工作；保留原判。是否能再次调用模型仍由正式历史重试额度决定，不把内容修复额度或旧grant当新重审额度。
+
+9.3 新候选冻结与真实独审
+
+- 预审和聚合合格后，正式生成并冻结新候选、新digest、新归档、完整九文件程序清单。
+- 核对五份reuse摘要未变，四份replace摘要与批准准备一致；新review材料绑定新digest。
+- 对新候选执行一次合法首次OpenCode Go冻结独审，timeout1800，保留原始事件、exit、耗时、请求/观测模型、结果和budget reservation。
+- 这次不得复用旧候选被审摘要，不把仅提示词变更当新内容。
+- 独审达到正式发布门槛后，通过正式目录服务发布。冻结数量和正式发布数量分开。
+- 到此仍不宣称G1通过；必须继续下游。
+
+9.4 标准交接、真实P0和精确运行
+
+- 正式导出新发布模板的标准P0开发包。
+- 创建并实际执行 application-development 作业，使其消费这份标准包；记录下载/包摘要、作业输入、交付检查点、实际app_root和归档摘要。
+- 仅在页面点下载或本地检查包不算真实开发消费。
+- 真实开发应实现既定全部P0功能；不能删UI、删错误分支或以API替代已承诺浏览器入口。
+- 使用该应用真实运行冻结P0验收套件（A01–A12）和既定独立浏览器核心旅程，运行证据绑定同一模板digest、程序摘要、交付包、app_root、容器/运行身份。
+- A03新增fresh实例使用相同实际应用源码，保留它与当前部署的目标区别和资源清理证据。
+- 独立执行器按原机读计划、submission/receipt和网络/端口/loopback约束运行；浏览器不追随真实外网地址。验精确URL可通过DOM及阻止导航/捕获目标，不打开外部网站。
+- 保留保存、分类管理/移动、搜索、精确原URL、非法URL无写入、同容器重启持久化、并发写入不丢失、失败恢复等原核心旅程。
+- fixture或合成Docker探针不替代真实P0；静态独审不替代运行；服务GET200不替代浏览器核心旅程。
+- 不扩大为P1真实开发。A13静态合同修好，P1运行仍按未运行状态诚实呈现。
+- 通过正式宿主 assess_g1 重新读取有效模板、发布、标准交接实际消费、真实交付和精确运行证据，产出新的G1机器结论。不得手写passed。
+
+若真实应用首轮不通过，保留真实失败证据并区分模板合同缺陷、实现缺陷、执行器问题和环境/协议问题。执行器或宿主的局部修复可在既定合同内继续；不能冒用为免计数的产品修复。需要超过8次的业务修复时，本授权不覆盖第九次，应停止并给出可审查差分及下一步最小额度。
+
+9.5 G1通过后，按已有范围执行T08三场景
+
+只有正式G1机器结论passed后，才能preview/run T08。不要在仅新候选通过设计预审时提前生产其他样本。
+
+固定样本：
+- 书签：scn_7756e0007f6a463a97316f3f49c15248 r2；G1合格结果符合精确复用条件时复用，累计/增量分别报告。
+- 月度预算：scn_6fb4896d9eb0428aa1c080df0a137813 r1。
+- 多项目会议笔记：scn_805c99ffe8da4532817592bb466a505e r1。
+
+从原已固定请求/抽验清单读取完整seed和事实，不凭本文件的名称重新造场景。
+不替换失败样本、不挑简单样本补数、不扩展10产品、不提前开始叶子全量自动生产。
+月度预算和会议笔记沿用原每产品2轮业务修复上限；不要把书签的特殊8次继承给它们。历史追加重试也按各自原规则。
+T08与G1共享500总调用；T08首次实际启动启用原8小时段，无重复启动重置。
+按原三场景抽验要求记录正式模板、共享案例新增/复用、标准交接、真实P0及独立运行结果；3/3未满足就如实报告。
+
+十、停止条件与无需停止的事项
+
+真正需要正式暂停：
+- 有效独立审阅仍blocked/uncertain且需要超出本文白名单的新业务变化。
+- 需要第九次书签业务修复、额外同输入协议重试/grant，或其他产品越过其既定额度。
+- 新24小时G1窗口或T08实际8小时窗口耗尽、全局500调用耗尽。
+- 正式基线被并发改变，无法安全绑定当前授权；真实结果/来源/程序摘要不能证明一致。
+- 已批准运行环境或CI出现实际阻断且无法在授权范围内解决。
+
+以下不应成为再次要求用户批准的理由：
+- 旧时间已经到期：本指令已明确授权新窗口，按正式机制实现并激活即可。
+- 旧grant已用完：本次是新内容修订的合法首次审阅，不恢复旧grant；真正追加调用才另受历史限制。
+- 当前候选被blocked：它正是本次获准修订的基线，不要求先把它改成eligible才能修复。
+- 需要四份程序字节变化：本文已明确授权四replace/五reuse。
+- 准备需要对现有修订服务做本文范围内的最小扩展。
+- 合格模板发布后需要标准交接、真实P0及独立运行：本任务已经要求继续。
+- G1通过后开始原三个T08样本：在本文与原固定范围内已明确要求。
+- 日志整理、证据归档、补齐正式报表或无新调用的合法崩溃恢复。
+
+不要把建议写成新的前置门禁。对同族已知问题做一次有限交叉核对，完成即前进；新发现必须说明为何阻碍既有合同，不能凭“还可以更完善”无限加需求。
+
+十一、交付内容与最终报告
+
+在证据目录保留足够复现的文件；复用已有报告结构，不为凑文档数量复制同一内容：
+
+1. DELIVERY.md：实际达成、G1/T08结论、准确停止点或成功路径。
+2. AUTHORIZATION/请求与回执：用户原文、本指令摘要、有效范围、预算与时间前后、原子唯一后继。
+3. 精确spec diff、四份prepared replacement、九文件before/after清单、五份reuse证明。
+4. 八项独审建议的逐项处置，以及六条有限交叉一致性核对。
+5. 正式接口CONTRACTS与可复现OPERATIONS：真实已实现路由和完整请求；不留下要求操作者自行猜测的占位参数。
+6. 本地和远端检查、实际生产源码SHA、最终HEAD、工作区状态、提交绑定。
+7. 新预审、聚合、冻结独审原始输入材料manifest、原始输出、正式结果和budget reservations。
+8. 如果执行到下游：发布记录、标准包被真实开发消费、P0交付、实际app_root/容器身份、冻结套件/独立浏览器运行及正式G1评估。
+9. 如执行T08：原三样本逐项状态、阶段开始/截止、案例新增/复用、模板/P0增量和累计。
+10. 如暂停：错误码、job/attempt、当前有效时间来源、账目、缺失证据、下一步最小差分；不要只写“需要授权继续”。
+
+最终回复先给一张真实结果表：
+- G1：passed/blocked；T08：x/3及是否started。
+- 新冻结候选/正式发布模板。
+- 真实P0交付数/通过数；标准包真实消费数。
+- 案例新增/复用。
+- factory CLI / external CLI / 合计 / 500，活动调用。
+- 书签业务修复使用/上限，其他两个产品各自使用/上限。
+- 旧历史追加重试和grant是否保持。
+- 新有效activated_at/deadline，旧截止保留情况。
+- 四replace/五reuse是否实际达成，模板author真实调用数。
+- 生产源码SHA、最终HEAD、远端CI和工作区状态。
+
+只写实际完成的结果。不能把“开发了生产链路代码”“全部仓库测试通过”“候选冻结”“独审通过”中的任何一个单独写成“模板生产主链已走通”。
+
+本轮最低成功目标是取得至少一条：
+固定场景和共享案例 → 合格新模板 → 正式发布 → 标准包实际消费 → 真实P0交付 → 同目标独立运行 → 宿主G1通过。
+随后继续原三个场景的小批验证，才能据此判断批量可重复性。
+
+十二、核查来源
+
+固定HEAD：
+https://github.com/liamamilin/atlas/commit/257bbdb061e7d63a41fa03378cca1bd70a85f17a
+
+真实交付：
+https://github.com/liamamilin/atlas/blob/257bbdb061e7d63a41fa03378cca1bd70a85f17a/docs/template-factory/g1-frozen-review-recovery-2026-10-20/additional-call-authorization/RESUMED_DELIVERY.md
+
+真实八维报告与八项建议：
+https://github.com/liamamilin/atlas/blob/257bbdb061e7d63a41fa03378cca1bd70a85f17a/docs/template-factory/g1-frozen-review-recovery-2026-10-20/additional-call-authorization/actual-attempt-3/report.json
+
+冻结源码：
+https://github.com/liamamilin/atlas/tree/257bbdb061e7d63a41fa03378cca1bd70a85f17a/docs/template-factory/g1-r7-evidence-recovery-2026-10-20/actual-frozen-review/job_b01427592b164863aab5bedf7b3863bb/source
+
+预算实现：
+https://github.com/liamamilin/atlas/blob/257bbdb061e7d63a41fa03378cca1bd70a85f17a/application-atlas-production-pack/template_factory/budget.py
+
+旧修订范围及错误合同校验：
+https://github.com/liamamilin/atlas/blob/257bbdb061e7d63a41fa03378cca1bd70a85f17a/application-atlas-production-pack/template_factory/plan_revision.py
+https://github.com/liamamilin/atlas/blob/257bbdb061e7d63a41fa03378cca1bd70a85f17a/application-atlas-production-pack/template_factory/contract_scope.py
+https://github.com/liamamilin/atlas/blob/257bbdb061e7d63a41fa03378cca1bd70a85f17a/application-atlas-production-pack/template_factory/error_contracts.py
+
+当前HEAD的CI：
+https://github.com/liamamilin/atlas/actions/runs/39418631174
+实际宿主源码的CI：
+https://github.com/liamamilin/atlas/actions/runs/39415837779
+
+说明：本指令是根据上述固定源码和真实报告编制的下一步执行任务；编制方没有替用户登记新额度、启动R8或操作本地生产数据库。实际执行状态须由Codex按正式回执报告。
+

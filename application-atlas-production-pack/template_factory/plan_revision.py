@@ -694,6 +694,9 @@ class PreparedRevisionService:
         self.store = store
 
     def prepare(self, job_id, request):
+        if isinstance(request, dict) and request.get("schema") == "atlas.frozen-plan-revision.v1":
+            from .frozen_revision import prepare
+            return prepare(self.store, job_id, request)
         if isinstance(request, dict) and request.get("schema") == R7_PREPARATION_SCHEMA:
             return self._prepare_r7(job_id, request)
         if isinstance(request, dict) and request.get("schema") == R6_PREPARATION_SCHEMA:

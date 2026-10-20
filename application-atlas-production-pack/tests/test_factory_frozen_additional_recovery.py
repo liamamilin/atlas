@@ -249,7 +249,10 @@ class AdditionalFrozenReviewTests(unittest.TestCase):
         with self.fixture.store.connect() as con:
             deadline = con.execute("SELECT effective_deadline FROM tf_frozen_review_time_resume WHERE grant_id=?", (grant["id"],)).fetchone()[0]
         with self.fixture.store.connect(True) as con:
-            con.execute("UPDATE job SET lease=? WHERE id=?", (deadline + 3600, JOB_ID))
+            # The real Pipeline checks wall-clock ownership before the fake CLI
+            # switches the budget clock to the archived deadline. Keep that
+            # independent lease live even after the historical date has passed.
+            con.execute("UPDATE job SET lease=? WHERE id=?", (max(time.time(), deadline) + 3600, JOB_ID))
         cli = FrozenReviewFixtureCLI(self.fixture.store, fault="expired_resume")
         with self.assertRaises(FactoryError) as caught:
             Pipeline(self.fixture.store, cli=cli).run(claimed)
@@ -275,7 +278,7 @@ class AdditionalFrozenReviewTests(unittest.TestCase):
         BatchService(self.fixture.store).action(self.fixture.store.job(JOB_ID)["snapshot"]["v1"]["plan_id"], "resume")
         claimed = self.fixture.store.claim("cap-resume-fixture")
         with self.fixture.store.connect(True) as con:
-            con.execute("UPDATE job SET lease=? WHERE id=?", (1792497820.0 + 3600, JOB_ID))
+            con.execute("UPDATE job SET lease=? WHERE id=?", (max(time.time(), 1792497820.0) + 3600, JOB_ID))
         cli = FrozenReviewFixtureCLI(self.fixture.store, fault="past_old_deadline")
         with self.assertRaises(FactoryError) as caught:
             Pipeline(self.fixture.store, cli=cli).run(claimed)

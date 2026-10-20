@@ -60,6 +60,8 @@ class ProductRecoveryService:
             con.execute("CREATE TABLE IF NOT EXISTS tf_product_resume(plan_id TEXT NOT NULL, old_job_id TEXT NOT NULL, idempotency_key TEXT NOT NULL, request_digest TEXT NOT NULL, amendment_id TEXT NOT NULL, successor_batch_id TEXT NOT NULL, successor_job_id TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY(plan_id,old_job_id), UNIQUE(idempotency_key))")
 
     def resume_product(self, plan_id, request):
+        if isinstance(request, dict) and request.get("schema") == "atlas.product-resume.v4":
+            return self.resume_frozen_revision(plan_id, request)
         if isinstance(request, dict) and request.get("schema") == "atlas.product-resume.v3":
             return self.resume_product_r7(plan_id, request)
         if isinstance(request, dict) and request.get("schema") == "atlas.product-resume.v2":
@@ -481,6 +483,98 @@ class ProductRecoveryService:
         return {**result, "schema": "atlas.product-resume-result.v3",
                 "activated_at": activated["activated_at"], "effective_deadline": activated["new_deadline"],
                 "parent_remains_paused": True, "old_job_remains_failed": True}
+
+    def resume_frozen_revision(self, plan_id, request):
+        """Activate one authorized window and queue one frozen-content successor."""
+        from .cognition import queue_repair
+        from .frozen_revision import SCHEMA, prepare
+        required = {"schema", "old_job_id", "artifact_id", "expected_digest", "amendment_id", "idempotency_key", "repair"}
+        if (not isinstance(request, dict) or set(request) != required
+                or any(not isinstance(request.get(k), str) or not request[k].strip() for k in required - {"repair"})
+                or not isinstance(request["repair"], dict)):
+            raise FactoryError("frozen product resume has missing or invalid fields", "resume_request_invalid", 400)
+        repair = request["repair"]
+        prepared_request = repair.get("prepared_revision")
+        if not isinstance(prepared_request, dict) or prepared_request.get("schema") != SCHEMA:
+            raise FactoryError("frozen product resume requires a valid prepared frozen revision", "resume_request_invalid", 409)
+        request_digest = digest({k: v for k, v in request.items() if k != "idempotency_key"})
+        binding = prepared_request.get("binding", {})
+        campaign, product = binding.get("campaign_id"), binding.get("product_id")
+        if (binding.get("plan_id") != plan_id or binding.get("job_id") != request["old_job_id"]
+                or binding.get("artifact_id") != request["artifact_id"]
+                or binding.get("artifact_digest") != request["expected_digest"]):
+            raise FactoryError("resume differs from the approved frozen candidate identity", "resume_candidate_mismatch", 409)
+        amendment_service = BudgetAmendmentService(self.store, campaign_id=campaign, clock=self.clock)
+        ledger = BudgetLedger(self.store, campaign_id=campaign, clock=self.clock)
+        with self.store.connect(True) as con:
+            prior = con.execute("SELECT * FROM tf_product_resume WHERE plan_id=? AND old_job_id=?", (plan_id, request["old_job_id"])).fetchone()
+            if prior:
+                if prior["request_digest"] != request_digest or prior["idempotency_key"] != request["idempotency_key"]:
+                    raise FactoryError("frozen candidate already has a different successor", "idempotency_conflict", 409)
+                amended = con.execute("SELECT activated_at,new_deadline FROM tf_budget_amendment WHERE id=? AND version=5", (prior["amendment_id"],)).fetchone()
+                successor = con.execute("SELECT snapshot FROM job WHERE id=?", (prior["successor_job_id"],)).fetchone()
+                if (not amended or amended["activated_at"] is None or not successor
+                        or json.loads(successor["snapshot"]).get("cognitive_repair", {}).get("prepared_revision", {}).get("request_digest") != digest(prepared_request)):
+                    raise FactoryError("frozen revision receipt is detached from its activation or successor", "resume_successor_invalid", 409)
+                return {**self._result(prior, replay=True), "schema": "atlas.product-resume-result.v4",
+                        "activated_at": amended["activated_at"], "effective_deadline": amended["new_deadline"],
+                        "parent_remains_paused": True, "old_review_preserved": True}
+            if con.execute("SELECT 1 FROM tf_product_resume WHERE idempotency_key=?", (request["idempotency_key"],)).fetchone():
+                raise FactoryError("resume idempotency key belongs to another operation", "idempotency_conflict", 409)
+            prepared = prepare(self.store, request["old_job_id"], prepared_request)
+            if (repair.get("expected_digest") != request["expected_digest"]
+                    or repair.get("reuse_spec") is not False or repair.get("spec_edit_paths") is not None
+                    or repair.get("edit_paths") != prepared["cumulative_repair_scope"]["edit_paths"]
+                    or repair.get("repair_scope") != prepared["cumulative_repair_scope"]
+                    or any(repair.get(key) != value for key, value in prepared["review_config"].items() if key != "repair_attempts")):
+                raise FactoryError("repair differs from its approved exact scope or review configuration", "resume_request_invalid", 409)
+            amended = con.execute("SELECT * FROM tf_budget_amendment WHERE id=? AND campaign_id=? AND product_id=? AND plan_id=? AND version=5",
+                                  (request["amendment_id"], campaign, product, plan_id)).fetchone()
+            registered = con.execute("SELECT request_json,request_digest FROM tf_budget_amendment_binding WHERE amendment_id=?", (request["amendment_id"],)).fetchone()
+            authorization = json.loads(registered["request_json"]) if registered else None
+            if (not amended or not authorization or amended["activated_at"] is not None
+                    or amended["new_deadline"] is not None or digest(authorization) != registered["request_digest"]
+                    or authorization.get("prepared_revision") != prepared_request
+                    or authorization.get("prepared_revision_digest") != prepared["request_digest"]):
+                raise FactoryError("registered budget/window does not bind this sole prepared successor", "budget_amendment_basis", 409)
+            execution = con.execute("SELECT batch_id FROM v1_execution WHERE plan_id=?", (plan_id,)).fetchone()
+            parent = con.execute("SELECT state FROM batch WHERE id=?", (execution[0],)).fetchone() if execution else None
+            if not parent or parent[0] != "paused":
+                raise FactoryError("parent plan must remain paused until the atomic successor is checked", "resume_parent_invalid", 409)
+            old = con.execute("SELECT * FROM job WHERE id=?", (request["old_job_id"],)).fetchone()
+            old_values = dict(old)
+            before_calls = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status!='not_started'", (campaign,)).fetchone()[0]
+            artifact = next(a for a in self.store.artifacts() if a["id"] == request["artifact_id"])
+            activated = amendment_service.activate_frozen_locked(con, request["amendment_id"], expected_prepared_digest=prepared["request_digest"])
+            queued = queue_repair(self.store, artifact, repair, con=con, parent_state_override="paused", ledger=ledger)
+            if not queued.get("created"):
+                raise FactoryError("prepared revision already has an unreceipted queue entry", "resume_successor_invalid", 409)
+            successor = con.execute("SELECT state,snapshot FROM job WHERE id=?", (queued["job_id"],)).fetchone()
+            successor_snapshot = json.loads(successor["snapshot"])
+            config = successor_snapshot["config"]
+            limits = prepared["authorization_limits"]
+            repairs = con.execute("SELECT COUNT(*) FROM tf_budget_repair WHERE campaign_id=? AND product_id=?", (campaign, product)).fetchone()[0]
+            after_calls = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND status!='not_started'", (campaign,)).fetchone()[0]
+            old_after = con.execute("SELECT * FROM job WHERE id=?", (request["old_job_id"],)).fetchone()
+            child = con.execute("SELECT state FROM batch WHERE id=?", (queued["batch_id"],)).fetchone()
+            if (dict(old_after) != old_values or config.get("repair_attempts") != 0
+                    or any(config.get(k) != value for k, value in prepared["review_config"].items())
+                    or successor["state"] != "queued" or child[0] != "paused"
+                    or repairs != limits["expected_repairs"] + 1 or repairs != limits["repair_limit"]
+                    or before_calls != after_calls):
+                raise FactoryError("atomic frozen revision did not preserve its history and exact single repair", "resume_successor_invalid", 409)
+            at = now()
+            reason = "Authorized frozen contract revision successor " + queued["job_id"]
+            con.execute("INSERT INTO tf_job_supersession VALUES(?,?,?,?,?,?,?,?,?,?)",
+                        (old["id"], queued["job_id"], plan_id, reason, old["state"], old["error"], old["stage"], old["attempt"], old["updated_at"], at))
+            con.execute("INSERT INTO event(job_id,attempt,at,stage,message) VALUES(?,?,?,?,?)",
+                        (old["id"], old["attempt"], at, "bounded_revision_successor", reason))
+            con.execute("INSERT INTO tf_product_resume VALUES(?,?,?,?,?,?,?,?)",
+                        (plan_id, old["id"], request["idempotency_key"], request_digest, request["amendment_id"], queued["batch_id"], queued["job_id"], at))
+            receipt = con.execute("SELECT * FROM tf_product_resume WHERE plan_id=? AND old_job_id=?", (plan_id, old["id"])).fetchone()
+            return {**self._result(receipt, replay=False), "schema": "atlas.product-resume-result.v4",
+                    "activated_at": activated["activated_at"], "effective_deadline": activated["new_deadline"],
+                    "parent_remains_paused": True, "old_review_preserved": True}
 
     @staticmethod
     def _result(row, *, replay):

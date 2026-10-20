@@ -1,0 +1,337 @@
+test_a03_cli_without_required_runner_arguments_exits_nonzero (tests.test_factory_contract_convergence_programs.A03SeparationTests) ... [a03-fresh-required-flags] FAIL A03 必须绑定同一应用源码 --app-root 与测试者 --data-dir
+{"schema":"atlas.acceptance-result.v1","case_id":"A03","status":"failed","assertions":[{"id":"a03-fresh-required-flags","passed":false,"detail":"A03 必须绑定同一应用源码 --app-root 与测试者 --data-dir"}]}
+[atlas] A03: failed; 失败断言: a03-fresh-required-flags
+ok
+test_existing_instance_may_have_removed_presets_but_fresh_checks_all_four (tests.test_factory_contract_convergence_programs.A03SeparationTests) ... [a03-fresh-required-flags] PASS A03 必须绑定同一应用源码 --app-root 与测试者 --data-dir
+[a03-fresh-owned-source] PASS fresh 实例来自与 base_url 相同的冻结应用源码根
+[a03-fresh-health-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-fresh-api-preset-1] PASS fresh 首次初始化 API 包含预置归类 '未整理'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-2] PASS fresh 首次初始化 API 包含预置归类 '待购'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-3] PASS fresh 首次初始化 API 包含预置归类 '家居改造'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-4] PASS fresh 首次初始化 API 包含预置归类 '以后看看'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-home-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-html-preset-1] PASS fresh 首次初始化 HTML 包含预置归类 '未整理'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-html-preset-2] PASS fresh 首次初始化 HTML 包含预置归类 '待购'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-html-preset-3] PASS fresh 首次初始化 HTML 包含预置归类 '家居改造'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-html-preset-4] PASS fresh 首次初始化 HTML 包含预置归类 '以后看看'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-process-stopped] PASS 本用例拥有的 fresh 子进程已结束
+[a03-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-home-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-save-form] PASS 首页含 action=/bookmarks/new 且 method=post 的保存表单
+[a03-category-omitted] PASS 真实保存表单省略 category 字段后提交
+[a03-default-status] PASS ? ? -> HTTP 303（期望 303）
+[a03-default-location] PASS 303 响应必须带 Location，实际 '/?category=%E6%9C%AA%E6%95%B4%E7%90%86'
+[a03-default-follow-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-default-row] PASS 省略归类保存后 HTML 列表出现 URL='https://a03-default-cc33dd0c6f20.atlas-acceptance.example/a03-default-cc33dd0c6f20' 的记录行
+[a03-default-id] PASS 默认归类记录 id='r1'
+[a03-default-record-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-default-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a03-default-category] PASS 省略 category 后 JSON 归类='未整理'（期望 '未整理'）
+[a03-inbox-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-inbox-row] PASS 「未整理」过滤列表包含 id='r1'
+[a03-newcat-status] PASS ? ? -> HTTP 303（期望 303）
+[a03-newcat-location] PASS 303 响应必须带 Location，实际 '/?category=%E8%87%AA%E5%8A%A8%E5%BD%92%E7%B1%BB-4f188677'
+[a03-newcat-follow-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-row] PASS 新归类保存后 HTML 列表出现 URL='https://a03-newcat-0b617607077f.atlas-acceptance.example/a03-newcat-0b617607077f' 的记录行
+[a03-newcat-id] PASS 新归类记录 id='r2'
+[a03-refreshed-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-refreshed-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-newcat-created] PASS 保存新归类名 '自动归类-4f188677' 后 /api/categories 自动创建；实际 ['未整理', '自动归类-4f188677']
+[a03-newcat-record-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a03-newcat-json-category] PASS 新归类记录 JSON 归类='自动归类-4f188677'（期望 '自动归类-4f188677'）
+[a03-newcat-filter-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-filter] PASS HTML 归类过滤 '自动归类-4f188677' 包含 id='r2'
+[a03-newcat-api-list-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-api-list-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a03-newcat-api-filter] PASS API 归类过滤 '自动归类-4f188677' 包含 id='r2'
+ok
+test_fresh_missing_preset_and_start_source_cleanup_errors_fail (tests.test_factory_contract_convergence_programs.A03SeparationTests) ... [a03-fresh-required-flags] PASS A03 必须绑定同一应用源码 --app-root 与测试者 --data-dir
+[a03-fresh-owned-source] PASS fresh 实例来自与 base_url 相同的冻结应用源码根
+[a03-fresh-health-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-fresh-api-preset-1] PASS fresh 首次初始化 API 包含预置归类 '未整理'；实际 ['家居改造', '待购', '未整理']
+[a03-fresh-api-preset-2] PASS fresh 首次初始化 API 包含预置归类 '待购'；实际 ['家居改造', '待购', '未整理']
+[a03-fresh-api-preset-3] PASS fresh 首次初始化 API 包含预置归类 '家居改造'；实际 ['家居改造', '待购', '未整理']
+[a03-fresh-api-preset-4] FAIL fresh 首次初始化 API 包含预置归类 '以后看看'；实际 ['家居改造', '待购', '未整理']
+[a03-fresh-home-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-html-preset-1] PASS fresh 首次初始化 HTML 包含预置归类 '未整理'；实际 ['家居改造', '待购', '未整理']
+[a03-fresh-html-preset-2] PASS fresh 首次初始化 HTML 包含预置归类 '待购'；实际 ['家居改造', '待购', '未整理']
+[a03-fresh-html-preset-3] PASS fresh 首次初始化 HTML 包含预置归类 '家居改造'；实际 ['家居改造', '待购', '未整理']
+[a03-fresh-html-preset-4] FAIL fresh 首次初始化 HTML 包含预置归类 '以后看看'；实际 ['家居改造', '待购', '未整理']
+[a03-fresh-process-stopped] PASS 本用例拥有的 fresh 子进程已结束
+[a03-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-home-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-save-form] PASS 首页含 action=/bookmarks/new 且 method=post 的保存表单
+[a03-category-omitted] PASS 真实保存表单省略 category 字段后提交
+[a03-default-status] PASS ? ? -> HTTP 303（期望 303）
+[a03-default-location] PASS 303 响应必须带 Location，实际 '/?category=%E6%9C%AA%E6%95%B4%E7%90%86'
+[a03-default-follow-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-default-row] PASS 省略归类保存后 HTML 列表出现 URL='https://a03-default-bc2e856478d2.atlas-acceptance.example/a03-default-bc2e856478d2' 的记录行
+[a03-default-id] PASS 默认归类记录 id='r1'
+[a03-default-record-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-default-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a03-default-category] PASS 省略 category 后 JSON 归类='未整理'（期望 '未整理'）
+[a03-inbox-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-inbox-row] PASS 「未整理」过滤列表包含 id='r1'
+[a03-newcat-status] PASS ? ? -> HTTP 303（期望 303）
+[a03-newcat-location] PASS 303 响应必须带 Location，实际 '/?category=%E8%87%AA%E5%8A%A8%E5%BD%92%E7%B1%BB-149b37a0'
+[a03-newcat-follow-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-row] PASS 新归类保存后 HTML 列表出现 URL='https://a03-newcat-858001b222a3.atlas-acceptance.example/a03-newcat-858001b222a3' 的记录行
+[a03-newcat-id] PASS 新归类记录 id='r2'
+[a03-refreshed-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-refreshed-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-newcat-created] PASS 保存新归类名 '自动归类-149b37a0' 后 /api/categories 自动创建；实际 ['未整理', '自动归类-149b37a0']
+[a03-newcat-record-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a03-newcat-json-category] PASS 新归类记录 JSON 归类='自动归类-149b37a0'（期望 '自动归类-149b37a0'）
+[a03-newcat-filter-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-filter] PASS HTML 归类过滤 '自动归类-149b37a0' 包含 id='r2'
+[a03-newcat-api-list-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-api-list-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a03-newcat-api-filter] PASS API 归类过滤 '自动归类-149b37a0' 包含 id='r2'
+[a03-fresh-required-flags] PASS A03 必须绑定同一应用源码 --app-root 与测试者 --data-dir
+[a03-fresh-owned-source] PASS fresh 实例来自与 base_url 相同的冻结应用源码根
+[a03-fresh-health-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-fresh-api-preset-1] PASS fresh 首次初始化 API 包含预置归类 '未整理'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-2] PASS fresh 首次初始化 API 包含预置归类 '待购'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-3] PASS fresh 首次初始化 API 包含预置归类 '家居改造'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-4] PASS fresh 首次初始化 API 包含预置归类 '以后看看'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-home-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-html-preset-1] PASS fresh 首次初始化 HTML 包含预置归类 '未整理'；实际 ['家居改造', '待购', '未整理']
+[a03-fresh-html-preset-2] PASS fresh 首次初始化 HTML 包含预置归类 '待购'；实际 ['家居改造', '待购', '未整理']
+[a03-fresh-html-preset-3] PASS fresh 首次初始化 HTML 包含预置归类 '家居改造'；实际 ['家居改造', '待购', '未整理']
+[a03-fresh-html-preset-4] FAIL fresh 首次初始化 HTML 包含预置归类 '以后看看'；实际 ['家居改造', '待购', '未整理']
+[a03-fresh-process-stopped] PASS 本用例拥有的 fresh 子进程已结束
+[a03-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-home-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-save-form] PASS 首页含 action=/bookmarks/new 且 method=post 的保存表单
+[a03-category-omitted] PASS 真实保存表单省略 category 字段后提交
+[a03-default-status] PASS ? ? -> HTTP 303（期望 303）
+[a03-default-location] PASS 303 响应必须带 Location，实际 '/?category=%E6%9C%AA%E6%95%B4%E7%90%86'
+[a03-default-follow-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-default-row] PASS 省略归类保存后 HTML 列表出现 URL='https://a03-default-05d50d93d7b9.atlas-acceptance.example/a03-default-05d50d93d7b9' 的记录行
+[a03-default-id] PASS 默认归类记录 id='r1'
+[a03-default-record-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-default-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a03-default-category] PASS 省略 category 后 JSON 归类='未整理'（期望 '未整理'）
+[a03-inbox-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-inbox-row] PASS 「未整理」过滤列表包含 id='r1'
+[a03-newcat-status] PASS ? ? -> HTTP 303（期望 303）
+[a03-newcat-location] PASS 303 响应必须带 Location，实际 '/?category=%E8%87%AA%E5%8A%A8%E5%BD%92%E7%B1%BB-d8b24022'
+[a03-newcat-follow-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-row] PASS 新归类保存后 HTML 列表出现 URL='https://a03-newcat-fd3824212b41.atlas-acceptance.example/a03-newcat-fd3824212b41' 的记录行
+[a03-newcat-id] PASS 新归类记录 id='r2'
+[a03-refreshed-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-refreshed-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-newcat-created] PASS 保存新归类名 '自动归类-d8b24022' 后 /api/categories 自动创建；实际 ['未整理', '自动归类-d8b24022']
+[a03-newcat-record-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a03-newcat-json-category] PASS 新归类记录 JSON 归类='自动归类-d8b24022'（期望 '自动归类-d8b24022'）
+[a03-newcat-filter-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-filter] PASS HTML 归类过滤 '自动归类-d8b24022' 包含 id='r2'
+[a03-newcat-api-list-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-api-list-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a03-newcat-api-filter] PASS API 归类过滤 '自动归类-d8b24022' 包含 id='r2'
+[a03-fresh-required-flags] PASS A03 必须绑定同一应用源码 --app-root 与测试者 --data-dir
+[a03-fresh-owned-source] PASS fresh 实例来自与 base_url 相同的冻结应用源码根
+[a03-fresh-health-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-fresh-api-preset-1] PASS fresh 首次初始化 API 包含预置归类 '未整理'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-2] PASS fresh 首次初始化 API 包含预置归类 '待购'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-3] PASS fresh 首次初始化 API 包含预置归类 '家居改造'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-4] PASS fresh 首次初始化 API 包含预置归类 '以后看看'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-home-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-html-preset-1] PASS fresh 首次初始化 HTML 包含预置归类 '未整理'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-html-preset-2] PASS fresh 首次初始化 HTML 包含预置归类 '待购'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-html-preset-3] PASS fresh 首次初始化 HTML 包含预置归类 '家居改造'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-html-preset-4] PASS fresh 首次初始化 HTML 包含预置归类 '以后看看'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-process-stopped] PASS 本用例拥有的 fresh 子进程已结束
+[a03-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-home-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-save-form] PASS 首页含 action=/bookmarks/new 且 method=post 的保存表单
+[a03-category-omitted] PASS 真实保存表单省略 category 字段后提交
+[a03-default-status] PASS ? ? -> HTTP 303（期望 303）
+[a03-default-location] PASS 303 响应必须带 Location，实际 '/?category=%E9%94%99%E8%AF%AF%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB'
+[a03-default-follow-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-default-row] PASS 省略归类保存后 HTML 列表出现 URL='https://a03-default-1f9e7f1cee5d.atlas-acceptance.example/a03-default-1f9e7f1cee5d' 的记录行
+[a03-default-id] PASS 默认归类记录 id='r1'
+[a03-default-record-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-default-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a03-default-category] FAIL 省略 category 后 JSON 归类='错误默认分类'（期望 '未整理'）
+[a03-inbox-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-inbox-row] FAIL 「未整理」过滤列表包含 id='r1'
+[a03-newcat-status] PASS ? ? -> HTTP 303（期望 303）
+[a03-newcat-location] PASS 303 响应必须带 Location，实际 '/?category=%E8%87%AA%E5%8A%A8%E5%BD%92%E7%B1%BB-12a63ce3'
+[a03-newcat-follow-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-row] PASS 新归类保存后 HTML 列表出现 URL='https://a03-newcat-fee4db6897e0.atlas-acceptance.example/a03-newcat-fee4db6897e0' 的记录行
+[a03-newcat-id] PASS 新归类记录 id='r2'
+[a03-refreshed-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-refreshed-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-newcat-created] FAIL 保存新归类名 '自动归类-12a63ce3' 后 /api/categories 自动创建；实际 ['未整理', '错误默认分类']
+[a03-newcat-record-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a03-newcat-json-category] PASS 新归类记录 JSON 归类='自动归类-12a63ce3'（期望 '自动归类-12a63ce3'）
+[a03-newcat-filter-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-filter] PASS HTML 归类过滤 '自动归类-12a63ce3' 包含 id='r2'
+[a03-newcat-api-list-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-api-list-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a03-newcat-api-filter] PASS API 归类过滤 '自动归类-12a63ce3' 包含 id='r2'
+[a03-fresh-required-flags] PASS A03 必须绑定同一应用源码 --app-root 与测试者 --data-dir
+[a03-fresh-owned-source] PASS fresh 实例来自与 base_url 相同的冻结应用源码根
+[a03-fresh-health-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-fresh-api-preset-1] PASS fresh 首次初始化 API 包含预置归类 '未整理'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-2] PASS fresh 首次初始化 API 包含预置归类 '待购'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-3] PASS fresh 首次初始化 API 包含预置归类 '家居改造'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-4] PASS fresh 首次初始化 API 包含预置归类 '以后看看'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-home-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-html-preset-1] PASS fresh 首次初始化 HTML 包含预置归类 '未整理'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-html-preset-2] PASS fresh 首次初始化 HTML 包含预置归类 '待购'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-html-preset-3] PASS fresh 首次初始化 HTML 包含预置归类 '家居改造'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-html-preset-4] PASS fresh 首次初始化 HTML 包含预置归类 '以后看看'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-process-stopped] PASS 本用例拥有的 fresh 子进程已结束
+[a03-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-home-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-save-form] PASS 首页含 action=/bookmarks/new 且 method=post 的保存表单
+[a03-category-omitted] PASS 真实保存表单省略 category 字段后提交
+[a03-default-status] PASS ? ? -> HTTP 303（期望 303）
+[a03-default-location] PASS 303 响应必须带 Location，实际 '/?category=%E6%9C%AA%E6%95%B4%E7%90%86'
+[a03-default-follow-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-default-row] PASS 省略归类保存后 HTML 列表出现 URL='https://a03-default-6835ae5b2a62.atlas-acceptance.example/a03-default-6835ae5b2a62' 的记录行
+[a03-default-id] PASS 默认归类记录 id='r1'
+[a03-default-record-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-default-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a03-default-category] PASS 省略 category 后 JSON 归类='未整理'（期望 '未整理'）
+[a03-inbox-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-inbox-row] PASS 「未整理」过滤列表包含 id='r1'
+[a03-newcat-status] PASS ? ? -> HTTP 303（期望 303）
+[a03-newcat-location] PASS 303 响应必须带 Location，实际 '/?category=%E8%87%AA%E5%8A%A8%E5%BD%92%E7%B1%BB-87fc9cb0'
+[a03-newcat-follow-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-row] FAIL 新归类保存后 HTML 列表出现 URL='https://a03-newcat-2fc318d910f8.atlas-acceptance.example/a03-newcat-2fc318d910f8' 的记录行
+[a03-fresh-required-flags] PASS A03 必须绑定同一应用源码 --app-root 与测试者 --data-dir
+[a03-fresh-start] FAIL 无法启动独立 fresh 实例：RuntimeError: no start
+[a03-fresh-required-flags] PASS A03 必须绑定同一应用源码 --app-root 与测试者 --data-dir
+[a03-fresh-owned-source] FAIL fresh 实例来自与 base_url 相同的冻结应用源码根
+[a03-fresh-health-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-fresh-api-preset-1] PASS fresh 首次初始化 API 包含预置归类 '未整理'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-2] PASS fresh 首次初始化 API 包含预置归类 '待购'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-3] PASS fresh 首次初始化 API 包含预置归类 '家居改造'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-4] PASS fresh 首次初始化 API 包含预置归类 '以后看看'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-home-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-html-preset-1] PASS fresh 首次初始化 HTML 包含预置归类 '未整理'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-html-preset-2] PASS fresh 首次初始化 HTML 包含预置归类 '待购'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-html-preset-3] PASS fresh 首次初始化 HTML 包含预置归类 '家居改造'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-html-preset-4] PASS fresh 首次初始化 HTML 包含预置归类 '以后看看'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-process-stopped] PASS 本用例拥有的 fresh 子进程已结束
+[a03-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-home-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-save-form] PASS 首页含 action=/bookmarks/new 且 method=post 的保存表单
+[a03-category-omitted] PASS 真实保存表单省略 category 字段后提交
+[a03-default-status] PASS ? ? -> HTTP 303（期望 303）
+[a03-default-location] PASS 303 响应必须带 Location，实际 '/?category=%E6%9C%AA%E6%95%B4%E7%90%86'
+[a03-default-follow-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-default-row] PASS 省略归类保存后 HTML 列表出现 URL='https://a03-default-864e633c5201.atlas-acceptance.example/a03-default-864e633c5201' 的记录行
+[a03-default-id] PASS 默认归类记录 id='r1'
+[a03-default-record-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-default-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a03-default-category] PASS 省略 category 后 JSON 归类='未整理'（期望 '未整理'）
+[a03-inbox-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-inbox-row] PASS 「未整理」过滤列表包含 id='r1'
+[a03-newcat-status] PASS ? ? -> HTTP 303（期望 303）
+[a03-newcat-location] PASS 303 响应必须带 Location，实际 '/?category=%E8%87%AA%E5%8A%A8%E5%BD%92%E7%B1%BB-96c44408'
+[a03-newcat-follow-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-row] PASS 新归类保存后 HTML 列表出现 URL='https://a03-newcat-47e79f7ce16f.atlas-acceptance.example/a03-newcat-47e79f7ce16f' 的记录行
+[a03-newcat-id] PASS 新归类记录 id='r2'
+[a03-refreshed-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-refreshed-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-newcat-created] PASS 保存新归类名 '自动归类-96c44408' 后 /api/categories 自动创建；实际 ['未整理', '自动归类-96c44408']
+[a03-newcat-record-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a03-newcat-json-category] PASS 新归类记录 JSON 归类='自动归类-96c44408'（期望 '自动归类-96c44408'）
+[a03-newcat-filter-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-filter] PASS HTML 归类过滤 '自动归类-96c44408' 包含 id='r2'
+[a03-newcat-api-list-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-api-list-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a03-newcat-api-filter] PASS API 归类过滤 '自动归类-96c44408' 包含 id='r2'
+[a03-fresh-required-flags] PASS A03 必须绑定同一应用源码 --app-root 与测试者 --data-dir
+[a03-fresh-owned-source] PASS fresh 实例来自与 base_url 相同的冻结应用源码根
+[a03-fresh-health-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-fresh-api-preset-1] PASS fresh 首次初始化 API 包含预置归类 '未整理'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-2] PASS fresh 首次初始化 API 包含预置归类 '待购'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-3] PASS fresh 首次初始化 API 包含预置归类 '家居改造'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-api-preset-4] PASS fresh 首次初始化 API 包含预置归类 '以后看看'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-home-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-fresh-html-preset-1] PASS fresh 首次初始化 HTML 包含预置归类 '未整理'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-html-preset-2] PASS fresh 首次初始化 HTML 包含预置归类 '待购'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-html-preset-3] PASS fresh 首次初始化 HTML 包含预置归类 '家居改造'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-html-preset-4] PASS fresh 首次初始化 HTML 包含预置归类 '以后看看'；实际 ['以后看看', '家居改造', '待购', '未整理']
+[a03-fresh-cleanup] FAIL 清理异常：cannot stop
+[a03-fresh-process-stopped] FAIL 本用例拥有的 fresh 子进程已结束
+[a03-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-home-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-save-form] PASS 首页含 action=/bookmarks/new 且 method=post 的保存表单
+[a03-category-omitted] PASS 真实保存表单省略 category 字段后提交
+[a03-default-status] PASS ? ? -> HTTP 303（期望 303）
+[a03-default-location] PASS 303 响应必须带 Location，实际 '/?category=%E6%9C%AA%E6%95%B4%E7%90%86'
+[a03-default-follow-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-default-row] PASS 省略归类保存后 HTML 列表出现 URL='https://a03-default-c27d89591c94.atlas-acceptance.example/a03-default-c27d89591c94' 的记录行
+[a03-default-id] PASS 默认归类记录 id='r1'
+[a03-default-record-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-default-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a03-default-category] PASS 省略 category 后 JSON 归类='未整理'（期望 '未整理'）
+[a03-inbox-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-inbox-row] PASS 「未整理」过滤列表包含 id='r1'
+[a03-newcat-status] PASS ? ? -> HTTP 303（期望 303）
+[a03-newcat-location] PASS 303 响应必须带 Location，实际 '/?category=%E8%87%AA%E5%8A%A8%E5%BD%92%E7%B1%BB-8f7555cd'
+[a03-newcat-follow-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-row] PASS 新归类保存后 HTML 列表出现 URL='https://a03-newcat-7e098cab1dbb.atlas-acceptance.example/a03-newcat-7e098cab1dbb' 的记录行
+[a03-newcat-id] PASS 新归类记录 id='r2'
+[a03-refreshed-categories-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-refreshed-categories-shape] PASS GET /api/categories 必须返回 JSON 数组，实际 list
+[a03-newcat-created] PASS 保存新归类名 '自动归类-8f7555cd' 后 /api/categories 自动创建；实际 ['未整理', '自动归类-8f7555cd']
+[a03-newcat-record-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-record-shape] PASS GET /api/bookmarks/{id} 必须返回 JSON 对象，实际 dict
+[a03-newcat-json-category] PASS 新归类记录 JSON 归类='自动归类-8f7555cd'（期望 '自动归类-8f7555cd'）
+[a03-newcat-filter-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-filter] PASS HTML 归类过滤 '自动归类-8f7555cd' 包含 id='r2'
+[a03-newcat-api-list-status] PASS ? ? -> HTTP 200（期望 200）
+[a03-newcat-api-list-shape] PASS GET /api/bookmarks 必须返回 JSON 数组，实际 list
+[a03-newcat-api-filter] PASS API 归类过滤 '自动归类-8f7555cd' 包含 id='r2'
+ok
+test_missing_arguments_fail_before_any_target_or_fresh_launch (tests.test_factory_contract_convergence_programs.A03SeparationTests) ... [a03-fresh-required-flags] FAIL A03 必须绑定同一应用源码 --app-root 与测试者 --data-dir
+ok
+test_different_nested_record_row_cannot_supply_target_anchor (tests.test_factory_contract_convergence_programs.A13LinkTests) ... ok
+test_go_elsewhere_does_not_substitute_for_target_link (tests.test_factory_contract_convergence_programs.A13LinkTests) ... ok
+test_implicitly_closed_target_row_cannot_adopt_next_rows_anchor (tests.test_factory_contract_convergence_programs.A13LinkTests) ... ok
+test_original_url_and_decoded_html_entity_pass_without_go (tests.test_factory_contract_convergence_programs.A13LinkTests) ... ok
+test_other_row_url_and_duplicate_or_missing_target_links_fail (tests.test_factory_contract_convergence_programs.A13LinkTests) ... ok
+test_program_loader_never_writes_into_source_evidence (tests.test_factory_contract_convergence_programs.A13LinkTests) ... ok
+test_target_record_row_inside_nested_layout_table_is_valid (tests.test_factory_contract_convergence_programs.A13LinkTests) ... ok
+test_wrong_target_href_and_rel_each_fail (tests.test_factory_contract_convergence_programs.A13LinkTests) ... ok
+test_four_prepared_files_only_and_five_reuse_digests_match_baseline (tests.test_factory_contract_convergence_programs.R8ScopeTests) ... ok
+test_untouched_case_implementations_match_frozen_source (tests.test_factory_contract_convergence_programs.R8ScopeTests) ... ok
+test_prepare_register_recover_and_real_pipeline_use_exactly_one_model_call (tests.test_factory_frozen_link.FrozenReviewPipelineLinkTests) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 1.391s
+
+OK
