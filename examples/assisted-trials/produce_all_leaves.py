@@ -36,6 +36,7 @@ from template_factory.store import FactoryStore, FactoryError, digest
 from template_factory.full_auxiliary import FullAuxiliaryService, MODEL
 from template_factory.auxiliary_workflow import WorkflowService, STEPS
 from template_factory.cases import CaseLibrary
+from template_factory.sources import github_repo, request_bytes
 from atlas_runtime import atomic_json
 import full_leaf_profiles as profiles
 
@@ -69,6 +70,97 @@ def load(path):
 
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def materialize_case_snapshot(snapshot, folder, store, *, namespace):
+    """Recreate bytes for a canonical CaseLibrary pin without resolving HEAD.
+
+    CaseLibrary snapshots intentionally contain provenance and hashes, not a
+    machine-specific local_root. Reuse its exact commit and manifest to fill
+    the normal source cache; never replace a mismatching cached file.
+    """
+    repository = snapshot.get("repository")
+    commit = snapshot.get("commit_sha")
+    files = snapshot.get("files")
+    if (
+        not isinstance(files, dict)
+        or not files
+        or not isinstance(commit, str)
+        or len(commit) != 40
+        or any(ch not in "0123456789abcdef" for ch in commit)
+    ):
+        raise ValueError("reused case snapshot lacks a fixed commit/file manifest")
+    license_info = snapshot.get("license") or {}
+    license_spdx = license_info.get("spdx_id")
+    license_files = snapshot.get("license_files")
+    if (
+        not isinstance(license_spdx, str)
+        or not license_spdx.strip()
+        or license_spdx.upper() in {"NOASSERTION", "NONE"}
+        or not isinstance(license_files, list)
+        or not license_files
+        or any(name not in files for name in license_files)
+    ):
+        raise ValueError("source license unclear; stop before generation")
+    repo = github_repo(repository)
+    source_root = Path(store.root) / "sources" / namespace
+    local = source_root / folder.parent.name / folder.name
+    local.mkdir(parents=True, exist_ok=True)
+    local = local.resolve(strict=True)
+    for name, expected in files.items():
+        relative = Path(name)
+        if (not name or relative.is_absolute() or "\\" in name
+                or any(part in {"", ".", ".."} for part in name.split("/"))):
+            raise ValueError("reused source manifest contains an unsafe path")
+        if (
+            not isinstance(expected, str)
+            or len(expected) != 64
+            or any(ch not in "0123456789abcdef" for ch in expected)
+        ):
+            raise ValueError("reused source manifest contains an invalid SHA-256")
+        target = local / relative
+        current = local
+        for part in relative.parts[:-1]:
+            current = current / part
+            if current.is_symlink():
+                raise ValueError("reused source path contains a symlink")
+            current.mkdir(exist_ok=True)
+        if target.is_symlink():
+            raise ValueError("reused source path contains a symlink")
+        try:
+            target.resolve(strict=False).relative_to(local)
+        except ValueError as error:
+            raise ValueError("reused source path escapes its snapshot root") from error
+        if target.exists():
+            if target.is_symlink() or not target.is_file() or sha(target) != expected:
+                raise ValueError("cached reused source bytes differ from fixed case digest")
+            continue
+        data = request_bytes(
+            f"https://raw.githubusercontent.com/{repo}/{commit}/{name}", 180_000
+        )
+        data.decode("utf-8")
+        if hashlib.sha256(data).hexdigest() != expected:
+            raise ValueError("downloaded fixed-commit bytes differ from case digest")
+        target.write_bytes(data)
+    if manifest_files(local) != files:
+        raise ValueError("materialized reused source inventory differs")
+    result = {
+        key: value
+        for key, value in snapshot.items()
+        if key not in {"snapshot_id", "file_manifest_digest", "local_root", "_validated_root"}
+    }
+    result["local_root"] = str(local.resolve())
+    pin = {
+        "repository": repository,
+        "commit_sha": commit,
+        "paths": list(files),
+        "collected_at": snapshot.get("collected_at"),
+        "repository_id": snapshot.get("repo_id"),
+        "license_spdx": license_spdx,
+    }
+    fixed_json(folder / "SOURCE_PIN.json", pin)
+    fixed_json(folder / "source-snapshot.json", result)
+    return result
 
 
 def shared_provider_fault(error):
@@ -1339,15 +1431,8 @@ def execute_leaf(root, service, item, api, repair=False):
                     if reused
                     else None
                 )
-                if snap and Path(snap["local_root"]).is_dir():
-                    fixed_json(
-                        work / "source-snapshot.json",
-                        {
-                            k: v
-                            for k, v in snap.items()
-                            if k not in {"snapshot_id", "file_manifest_digest"}
-                        },
-                    )
+                if snap:
+                    materialize_case_snapshot(snap, work, service.store, namespace=PLAN_ID)
                     fixed_json(
                         work / "RESEARCH_REUSE.json",
                         {
@@ -1356,6 +1441,8 @@ def execute_leaf(root, service, item, api, repair=False):
                             "digest": reused["digest"],
                         },
                     )
+                elif reused:
+                    raise ValueError("reuse case has no matching fixed source snapshot")
                 else:
                     pin_sources(research, work, service.store, namespace=PLAN_ID)
             snapshot = load(work / "source-snapshot.json")

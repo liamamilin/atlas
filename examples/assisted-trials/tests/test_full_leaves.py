@@ -262,6 +262,102 @@ class FullLeafTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "pinned source"):
             profiles.validate_author(bad, snapshot, inputs)
 
+    def test_canonical_case_snapshot_replays_from_exact_cached_bytes_without_network(self):
+        source = self.pack / "state/sources/p/leaf-0/attempt-1"
+        source.mkdir(parents=True)
+        (source / "README.md").write_text("fixed readme\n")
+        (source / "LICENSE").write_text("fixed license\n")
+        canonical = {
+            "snapshot_id": "src_fixture",
+            "repository": "https://github.com/example/reference",
+            "commit_sha": "a" * 40,
+            "strategy_version": "assisted-core-source-v1",
+            "collected_at": "2026-10-21T00:00:00+00:00",
+            "files": {n: runner.sha(source / n) for n in ("README.md", "LICENSE")},
+            "license_files": ["LICENSE"],
+            "license": {"status": "located", "spdx_id": "MIT", "notice_hashes": {"LICENSE": runner.sha(source / "LICENSE")}},
+            "license_uncertainties": ["fixed case evidence"],
+            "archive_sha256": None,
+            "excluded_paths": ["unselected files"],
+            "repo_id": None,
+            "file_manifest_digest": "derived-and-not-carried-forward",
+        }
+        folder = self.root / "items/leaf-0/attempt-1"
+        folder.mkdir(parents=True)
+        with patch.object(runner, "request_bytes", side_effect=AssertionError("replay used network")):
+            result = runner.materialize_case_snapshot(canonical, folder, self.store, namespace="p")
+        self.assertEqual(result["commit_sha"], canonical["commit_sha"])
+        self.assertEqual(result["files"], canonical["files"])
+        self.assertNotIn("snapshot_id", result)
+        self.assertNotIn("file_manifest_digest", result)
+        self.assertTrue(Path(result["local_root"]).is_dir())
+        self.assertEqual(json.loads((folder / "SOURCE_PIN.json").read_text())["commit_sha"], canonical["commit_sha"])
+
+    def test_canonical_case_snapshot_download_is_exact_commit_and_digest_checked(self):
+        canonical = {
+            "repository": "https://github.com/example/reference",
+            "commit_sha": "b" * 40,
+            "strategy_version": "assisted-core-source-v1",
+            "collected_at": "2026-10-21T00:00:00+00:00",
+            "files": {"src/main.py": hashlib.sha256(b"pinned\n").hexdigest()},
+            "license_files": ["src/main.py"],
+            "license": {"status": "located", "spdx_id": "MIT"},
+        }
+        folder = self.root / "items/leaf-0/attempt-1"
+        folder.mkdir(parents=True)
+        with patch.object(runner, "request_bytes", return_value=b"pinned\n") as fetch:
+            result = runner.materialize_case_snapshot(canonical, folder, self.store, namespace="p")
+        fetch.assert_called_once_with(
+            "https://raw.githubusercontent.com/example/reference/" + "b" * 40 + "/src/main.py",
+            180_000,
+        )
+        self.assertEqual(runner.sha(Path(result["local_root"]) / "src/main.py"), canonical["files"]["src/main.py"])
+
+        missing_folder = self.root / "items/leaf-1/attempt-1"
+        missing_folder.mkdir(parents=True)
+        with patch.object(runner, "request_bytes", return_value=b"changed\n"):
+            with self.assertRaisesRegex(ValueError, "digest"):
+                runner.materialize_case_snapshot(canonical, missing_folder, self.store, namespace="p")
+
+    def test_canonical_case_snapshot_refuses_mismatched_cached_bytes(self):
+        canonical = {
+            "repository": "https://github.com/example/reference",
+            "commit_sha": "c" * 40,
+            "strategy_version": "assisted-core-source-v1",
+            "collected_at": "2026-10-21T00:00:00+00:00",
+            "files": {"README.md": hashlib.sha256(b"expected\n").hexdigest()},
+            "license_files": ["README.md"],
+            "license": {"status": "located", "spdx_id": "MIT"},
+        }
+        folder = self.root / "items/leaf-0/attempt-1"
+        folder.mkdir(parents=True)
+        cached = self.pack / "state/sources/p/leaf-0/attempt-1/README.md"
+        cached.parent.mkdir(parents=True)
+        cached.write_text("wrong\n")
+        with patch.object(runner, "request_bytes", side_effect=AssertionError("must not overwrite pin")):
+            with self.assertRaisesRegex(ValueError, "cached reused source bytes differ"):
+                runner.materialize_case_snapshot(canonical, folder, self.store, namespace="p")
+
+    def test_canonical_case_snapshot_requires_fixed_commit_and_license_before_fetch(self):
+        valid = {
+            "repository": "https://github.com/example/reference",
+            "commit_sha": "d" * 40,
+            "strategy_version": "assisted-core-source-v1",
+            "collected_at": "2026-10-21T00:00:00+00:00",
+            "files": {"LICENSE": hashlib.sha256(b"MIT\n").hexdigest()},
+            "license_files": ["LICENSE"],
+            "license": {"status": "located", "spdx_id": "MIT"},
+        }
+        folder = self.root / "items/leaf-0/attempt-1"
+        folder.mkdir(parents=True)
+        for snapshot, message in (
+            ({**valid, "commit_sha": "HEAD"}, "fixed commit"),
+            ({**valid, "license": {"status": "located"}}, "source license unclear"),
+        ):
+            with patch.object(runner, "request_bytes", side_effect=AssertionError("invalid pin must not fetch")):
+                with self.assertRaisesRegex(ValueError, message):
+                    runner.materialize_case_snapshot(snapshot, folder, self.store, namespace="p")
+
     def test_invalid_protocol_preserves_bytes_and_one_paid_successor(self):
         root = self.root / "plan"
         work = root / "items/leaf-0/attempt-1"
