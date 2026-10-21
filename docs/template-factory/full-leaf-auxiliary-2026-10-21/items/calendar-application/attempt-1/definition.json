@@ -1,0 +1,555 @@
+{
+  "scenario_record": {
+    "acceptance": [
+      "A01 - The month view shows exactly 7 weekday columns and 4-6 week rows, and the header's next/previous controls move exactly one month (with correct year rollover) and re-render the grid, including navigation back into a past month.",
+      "A02 - An appointment 2026-10-05 10:00-11:00 (+08:00) with title, location and notes renders on the October 2026 grid and reads back identically in the editor; a save whose end is not strictly after its start (or whose title is blank) is refused with a message, nothing is written, and no record carries a recurrence, all-day, attendee, alert or time-zone field.",
+      "A03 - An appointment 2026-10-31 22:00 to 2026-11-01 02:00 is visible in both the October 2026 and November 2026 grids and touches no other day; two overlapping appointments in the same day cell are both displayed and the second save is accepted.",
+      "A04 - After an edit or reschedule the previous slot is empty and the new slot shows the updated title and time; deleting a probe-created appointment removes it from the grid and from the persistent store while leaving other records untouched, and deleting an unknown id changes nothing.",
+      "A05 - After restarting the app every created appointment is still present with identical field values, the store file is not rewritten on load, and a past month can be re-navigated to and still shows its appointments."
+    ],
+    "audience": "A single local user on one machine who manages only their own appointments. No accounts, no sharing, no sync, no second calendar for anyone else.",
+    "id": "scn_02914f6fcd344568a566187c9724dfba",
+    "leaf": "calendar-application",
+    "leaf_name": "日历应用",
+    "name": "Personal Month-Grid Calendar (single-user desktop)",
+    "objective": "Create, read, edit, reschedule and delete your own titled appointments with a start and an end date-time in a fixed UTC+08:00 offset and optional location and notes, shown on a real seven-column month grid whose schedule is persisted locally across restarts and navigable back into past months.",
+    "revision": 1,
+    "status": "draft",
+    "updated_at": "2026-10-21T13:54:35.733795+00:00",
+    "workflow": [
+      "Open the app: a month frame renders 7 weekday columns by 4-6 week rows for the current month, with a header showing the month and previous/next controls.",
+      "Double-click an empty day cell (or use the new-appointment action), type a title, set start and end date-time, optionally location and notes, then save.",
+      "The appointment appears as a block on the grid in every month its [start,end) span touches; overlapping appointments are all shown, never rejected.",
+      "Open the block, change title, time, location or notes, or reschedule it to another day and time; save and see the block move.",
+      "Use the header arrows to step to the next or previous month and again to return to a past month; the frame re-renders with that month's events.",
+      "Delete the appointment from the editor (probe-created records only) and confirm it disappears from the grid and the store.",
+      "Close and reopen the app: the appointments are still listed and navigating back to a past month still shows them."
+    ]
+  },
+  "case_ref": {
+    "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+    "revision": 2,
+    "digest": "4981f844eb6c28caaa9c655af6beeba3fe310603d99aa45124e89660243a4925"
+  },
+  "research": {
+    "summary": "同一共享案例记录的静态研究与明确的设计推断；完整定位见inputs/shared-case-record.json。",
+    "sources": [
+      {
+        "id": "S02",
+        "name": "ev_assisted_attempt_1_1",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/src/Grid/Grid.vala",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "code_observation: The month surface is a Gtk.Grid built with insert_column (7) and homogeneous columns and rows, so the frame is seven columns wide by construction.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S03",
+        "name": "ev_assisted_attempt_1_10",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/src/Grid/GridDay.vala",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "code_observation: Keyboard handling inside a day cell: Return emits on_event_add for the cell date, Page_Up calls change_month (1) and Page_Down calls change_month (-1).",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S04",
+        "name": "ev_assisted_attempt_1_11",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/src/Grid/GridDay.vala",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "code_observation: Dropping an event on another day shifts DTSTART and DTEND by the day difference and writes the component back with calmodel.update_event (src, comp, ECal.ObjModType.ALL), i.e. rescheduling to another day.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S05",
+        "name": "ev_assisted_attempt_1_12",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/src/Grid/Header.vala",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "code_observation: The weekday header is itself a seven-column Gtk.Grid with a single row.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S06",
+        "name": "ev_assisted_attempt_1_13",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/src/Grid/Header.vala",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "code_observation: update_columns fills exactly seven labels formatted with %a, starting from the configured first day of the week.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S07",
+        "name": "ev_assisted_attempt_1_14",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/src/Grid/Header.vala",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "code_observation: The header exposes a 'Show Week Numbers' action in a context menu, i.e. the upstream week-number column is an optional toggle rather than a core part of the frame.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S08",
+        "name": "ev_assisted_attempt_1_15",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/src/Grid/EventButton.vala",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "code_observation: An event block displays only the component summary, as an ellipsized label.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S09",
+        "name": "ev_assisted_attempt_1_16",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/src/Grid/EventButton.vala",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "code_observation: update() replaces the component and refreshes the label with the new summary, so an edited event's block re-labels itself.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S10",
+        "name": "ev_assisted_attempt_1_17",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/README.md",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "documentation: The upstream build depends on libecal, libedataserverui, libical, libfolks and GTK/Granite, i.e. its store is an Evolution Data Server / iCalendar source stack rather than a local single-file store.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S11",
+        "name": "ev_assisted_attempt_1_18",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/README.md",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "documentation: Upstream is configured with meson and built with ninja, then installed as a desktop binary launched with io.elementary.calendar.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S12",
+        "name": "ev_assisted_attempt_1_19",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "documentation: The upstream project ships the GNU General Public License version 3 text (29 June 2007).",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S13",
+        "name": "ev_assisted_attempt_1_2",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/src/Grid/Grid.vala",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "code_observation: Before the day widgets are rebuilt the code asserts new_dates.size % 7 == 0, so the displayed date range is always a whole number of seven-day weeks.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S14",
+        "name": "ev_assisted_attempt_1_3",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/src/Grid/Grid.vala",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "code_observation: Day cells are laid out with the column counter wrapping modulo 7 and the row counter incremented on the wrap, so a month frame is seven columns by N week rows.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S15",
+        "name": "ev_assisted_attempt_1_4",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/src/Grid/Grid.vala",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "code_observation: add_event walks every day cell and attaches the component to each cell for which Calendar.Util.ecalcomponent_is_on_day (event, grid_day.date) holds, so one event can be attached to several day cells at once.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S16",
+        "name": "ev_assisted_attempt_1_5",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/src/Grid/Grid.vala",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "code_observation: update_event adds the component to the cells it now belongs to and removes it from every other cell, so an edited or moved event leaves the cells it no longer touches.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S17",
+        "name": "ev_assisted_attempt_1_6",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/src/Grid/Grid.vala",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "code_observation: The focused day is written into Maya.Application.saved_state as 'selected-day' and the store's displayed month is switched when the focused day lies in another month.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S18",
+        "name": "ev_assisted_attempt_1_7",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/src/Grid/GridDay.vala",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "code_observation: Each day cell keeps its event buttons in a hash table keyed by the event UID, replacing any earlier button with the same UID, so distinct events - including two that overlap in time - coexist in one cell.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S19",
+        "name": "ev_assisted_attempt_1_8",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/src/Grid/GridDay.vala",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "code_observation: remove_event drops an event from the cell by looking up its UID in that same per-cell table.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S20",
+        "name": "ev_assisted_attempt_1_9",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/src/Grid/GridDay.vala",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "code_observation: A double click on a day cell (n_press == 2) emits on_event_add with that cell's date, which is the entry point for creating an event on the grid.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S21",
+        "name": "ev_assisted_attempt_1_design",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/LICENSE",
+        "version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "license": "GPL-3.0",
+        "license_url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING",
+        "facts": "inference: Target proposal: implement the leaf as a single-user desktop GUI application in Python 3 using only the standard library - Tkinter for the seven-column month frame, the day cells, the event blocks and the appointment editor - with one local JSON document as the persistent store, a fixed UTC+08:00 offset and no accounts, sync, recurrence, all-day mode or notifications; the upstream elementary/calendar project (GPL-3.0) is used only as a structural reference for the grid and event model and no upstream code is copied.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      }
+    ],
+    "gaps": [
+      "辅助静态独审通过，不代表运行通过",
+      "上游not_run",
+      "Only the month frame is implemented; there is no day, week, agenda or year view, and the upstream week-number toggle is deliberately not reproduced.",
+      "Rescheduling is done through the editor's date-time fields rather than by dragging a block to another day, so the upstream drag-and-drop reschedule is not reproduced.",
+      "The upstream Evolution Data Server / iCalendar source layer, calendar colours, calendars sidebar, context menus and libical interop are out of scope; the store is one local JSON document.",
+      "All instants use a fixed UTC+08:00 offset with no daylight-saving handling and no time-zone switch, so appointments do not follow a machine zone change.",
+      "There is no undo/redo, no search, no import/export, no recurring event, no all-day mode, no reminders, no attendee or invitation data.",
+      "The widget-tree half of the acceptance probe is reported as NOT_RUN on a machine without a graphical display; the model/store half still runs there.",
+      "The target code is not present in this workspace, so the probe is expected to fail loudly rather than pass until the implementation is written.",
+      "No upstream code was copied; the GPL-3.0 upstream project was read as a structural reference only."
+    ]
+  },
+  "spec": {
+    "title": "Personal Month-Grid Calendar (single-user desktop)",
+    "roles": [
+      {
+        "id": "R01",
+        "name": "A single local user on one machine who manages only their own appointments. No accounts, no sharing, no sync, no second calendar for anyone else.",
+        "responsibility": "Create, read, edit, reschedule and delete your own titled appointments with a start and an end date-time in a fixed UTC+08:00 offset and optional location and notes, shown on a real seven-column month grid whose schedule is persisted locally across restarts and navigable back into past months."
+      }
+    ],
+    "features": [
+      {
+        "id": "F01",
+        "name": "month-grid-frame: a single-window month frame of exactly 7 weekday columns by 4-6 week rows for the visible month, with a header that names the month and offers previous/next controls that move exactly one month (with year rollover) and re-render, including backwards into past months.",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "The month view shows exactly 7 weekday columns and 4-6 week rows, and the header's next/previous controls move exactly one month and re-render the grid, including navigation back into a past month.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19",
+          "S20",
+          "S21"
+        ],
+        "acceptance": [
+          "A01"
+        ]
+      },
+      {
+        "id": "F02",
+        "name": "appointment-editor: an editor for one appointment carrying title, start date-time, end date-time and optional location and notes, which refuses a save whose end is not strictly after its start, or whose title is blank, and writes nothing on refusal.",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "An appointment 2026-10-05 10:00-11:00 (+08:00) with title, location and notes renders on the October 2026 grid and is readable in the editor, while a save whose end is not strictly after its start is refused with a message and no record is written and no recurrence/all-day/attendee field exists.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19",
+          "S20",
+          "S21"
+        ],
+        "acceptance": [
+          "A02"
+        ]
+      },
+      {
+        "id": "F03",
+        "name": "span-and-overlap-rendering: each appointment is rendered as a block on every day its half-open [start,end) span touches, including across a month boundary, while overlapping appointments are shown side by side and never rejected.",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "An appointment 2026-10-31 22:00 to 2026-11-01 02:00 is visible in both the October 2026 and November 2026 grids, and two overlapping appointments in the same day cell are both displayed with the second save accepted.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19",
+          "S20",
+          "S21"
+        ],
+        "acceptance": [
+          "A03"
+        ]
+      },
+      {
+        "id": "F04",
+        "name": "edit-reschedule-delete: opening an existing block and changing its title, times, location or notes moves the block to the new slot, and deleting a record removes it from the grid and from the store while leaving other records untouched.",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "After an edit or reschedule the previous slot is empty and the new slot shows the updated title and time, and deleting a probe-created appointment removes it from the grid and from the persistent store while leaving other records untouched.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19",
+          "S20",
+          "S21"
+        ],
+        "acceptance": [
+          "A04"
+        ]
+      },
+      {
+        "id": "F05",
+        "name": "local-persistent-store: a single local JSON document per user holds the schedule, is written atomically, survives application restart, and is read back on launch without being rewritten.",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "After restarting the app every created appointment is still present and a past month can be re-navigated to.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19",
+          "S20",
+          "S21"
+        ],
+        "acceptance": [
+          "A05"
+        ]
+      }
+    ],
+    "acceptance": [
+      {
+        "id": "A01",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "The month view shows exactly 7 weekday columns and 4-6 week rows, and the header's next/previous controls move exactly one month and re-render the grid, including navigation back into a past month.",
+        "features": [
+          "F01"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A02",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "An appointment 2026-10-05 10:00-11:00 (+08:00) with title, location and notes renders on the October 2026 grid and is readable in the editor, while a save whose end is not strictly after its start is refused with a message and no record is written and no recurrence/all-day/attendee field exists.",
+        "features": [
+          "F02"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A03",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "An appointment 2026-10-31 22:00 to 2026-11-01 02:00 is visible in both the October 2026 and November 2026 grids, and two overlapping appointments in the same day cell are both displayed with the second save accepted.",
+        "features": [
+          "F03"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A04",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "After an edit or reschedule the previous slot is empty and the new slot shows the updated title and time, and deleting a probe-created appointment removes it from the grid and from the persistent store while leaving other records untouched.",
+        "features": [
+          "F04"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A05",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "After restarting the app every created appointment is still present and a past month can be re-navigated to.",
+        "features": [
+          "F05"
+        ],
+        "implementation": "acceptance/probe.py"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "D01",
+        "question": "首版运行与数据边界？",
+        "default": "A single Python 3.9+ process on the user's own machine, standard library only, Tkinter for the desktop window. No server, no listening socket, no network access, no account. The entire mutable state is one JSON document at <data_dir>/appointments.json (default per-user directory, overridable with --data-dir); the probe overrides it with a fresh disposable temporary directory so no user record is ever read or deleted.",
+        "when_to_ask": "确需公网托管或多人数据时先确认，不自行扩展。",
+        "impact": "保护本地数据，避免默认外发。",
+        "status": "assisted default"
+      },
+      {
+        "id": "D02",
+        "question": "是否复刻上游？",
+        "default": "Target proposal: implement the leaf as a single-user desktop GUI application in Python 3 using only the standard library - Tkinter for the seven-column month frame, the day cells, the event blocks and the appointment editor - with one local JSON document as the persistent store, a fixed UTC+08:00 offset and no accounts, sync, recurrence, all-day mode or notifications; the upstream elementary/calendar project (GPL-3.0) is used only as a structural reference for the grid and event model and no upstream code is copied.",
+        "when_to_ask": "目标变化、破坏已有数据或需要引入上游实现/依赖时先确认。",
+        "impact": "不混淆来源事实与目标设计。",
+        "status": "assisted default"
+      }
+    ],
+    "phases": [
+      {
+        "id": "P0",
+        "title": "核心可用",
+        "goal": "Create, read, edit, reschedule and delete your own titled appointments with a start and an end date-time in a fixed UTC+08:00 offset and optional location and notes, shown on a real seven-column month grid whose schedule is persisted locally across restarts and navigable back into past months.",
+        "features": [
+          "F01",
+          "F02",
+          "F03",
+          "F04",
+          "F05"
+        ],
+        "acceptance": [
+          "A01",
+          "A02",
+          "A03",
+          "A04",
+          "A05"
+        ]
+      }
+    ],
+    "architecture_markdown": "# Architecture - Personal Month-Grid Calendar (desktop target)\n\n## 1. Scope\nOne local user on one machine. The product owns exactly two structures:\n\n- **Appointment** - title (required), start date-time, end date-time (both required), optional location, optional notes. Nothing else.\n- **Schedule** - the accumulated appointments, persisted locally and shown on a seven-column month frame that can be walked one month backwards or forwards.\n\nOut of scope for this leaf: recurrence, all-day events, invitations/RSVP, accounts, sharing, sync, notifications, alerts, time-zone switching, tasks, resource booking, day/week/agenda frames, search, week numbers, undo.\n\n## 2. Target stack (explicit proposal)\n- Runtime: Python 3.9+, standard library only - no third-party packages, nothing to install.\n- UI: Tkinter (Tk). A real desktop window on Linux, macOS and Windows.\n- Storage: one JSON document file written atomically. No database server, no HTTP service, no listening socket, no network access at all.\n- This is an independent implementation. The upstream project (elementary/calendar, GPL-3.0) is a structural reference only; no upstream source code is copied.\n\n## 3. Module map\n\n    calendar_app/\n      __init__.py    create_app(data_dir=None, headless=True) -> App\n      timeutil.py    UTC8 offset, parsing/formatting, month arithmetic, month frames\n      model.py       Appointment dataclass, validation rules, SaveResult\n      store.py       AppointmentStore - JSON file, atomic replace, CRUD\n      gridmodel.py   MonthGrid, DayCell, EventBlock - the month frame model\n      controller.py  CalendarController - navigation, CRUD, validation\n      app.py         App - binds a controller to an optional window\n      ui_tk.py       CalendarWindow (tk.Tk), EditorDialog (tk.Toplevel)\n      __main__.py    python3 -m calendar_app [--data-dir PATH]\n\nLayering rule: timeutil, model, store and gridmodel never import tkinter, so the whole schedule can be exercised without a display. Only ui_tk touches Tk.\n\n## 4. Time semantics\n- One fixed offset: UTC+08:00, i.e. datetime.timezone(timedelta(hours=8)). No DST, no zone table, no zone switch. The machine local zone is never used for storage.\n- Stored instants are always written as YYYY-MM-DDTHH:MM:SS+08:00.\n- The editor edits wall-clock text YYYY-MM-DD HH:MM in the fixed offset.\n- An appointment covers the half-open interval [start, end). The days it touches are start.date() .. (end - 1 microsecond).date(); an appointment ending exactly at 2026-10-31 00:00 touches 2026-10-29 and 2026-10-30 but not 2026-10-31.\n- end must be strictly greater than start. There is no zero-length and no all-day form.\n- The OS clock is read only to mark today in the frame; it never moves an appointment.\n\n## 5. Record contract\n\n    {\n      'uid':        '32 lowercase hex characters, generated once, stable across edits',\n      'title':      'trimmed, 1..200 characters, never blank',\n      'start':      '2026-10-05T10:00:00+08:00',\n      'end':        '2026-10-05T11:00:00+08:00',\n      'location':   '0..200 characters, optional',\n      'notes':      '0..2000 characters, optional',\n      'created_at': '2026-10-21T09:12:00+08:00',\n      'updated_at': '2026-10-21T09:12:00+08:00'\n    }\n\nThere is deliberately no rrule, all_day, attendees, alerts, calendar, timezone or tzid key. Every appointment has a time-of-day range.\n\nValidation (every failure is reported as a field error, none is fatal):\n\n| Field | Rule | Message |\n| title | non-blank after trimming, at most 200 chars | 'Title is required' / 'Title is limited to 200 characters' |\n| start | parses as YYYY-MM-DD HH:MM | 'Start must be a local date-time (YYYY-MM-DD HH:MM)' |\n| end | parses, and end > start | 'End must be after start' |\n| location | at most 200 chars | 'Location is limited to 200 characters' |\n| notes | at most 2000 chars | 'Notes are limited to 2000 characters' |\n\nA validation failure returns SaveResult(ok=False, appointment=None, errors={field: message}) and writes nothing.\n\n## 6. Store contract\nFile: <data_dir>/appointments.json\n\n    {\n      'schema_version': 1,\n      'appointments': [ <record>, ... ]\n    }\n\n- AppointmentStore(path); path is a pathlib.Path.\n- The store is the single source of truth: the controller re-reads the file for every read, so two application instances over the same directory agree.\n- Writes are atomic: the document is written to appointments.json.tmp in the same directory, flushed and fsync-ed, then moved onto the target with os.replace. A crash leaves either the previous or the next file, never a truncated one.\n- Reading never writes; launching the application does not rewrite the file.\n- A missing file means an empty schedule; the directory is created on demand.\n- A malformed file is a hard error at launch and the file is left untouched.\n- A delete removes exactly one uid; other records are never rewritten.\n\n## 7. Month frame contract\n- The week starts on Monday; the header shows seven labels, Mon .. Sun.\n- The frame for month M contains every day of M, padded to whole weeks with filler cells from the adjacent months, so the frame always has 7 columns and 4, 5 or 6 week rows.\n- Filler cells are rendered dimmed and never carry an event block, so 'visible in the October grid' and 'visible in the November grid' are unambiguous.\n- DayCell: date, in_current_month, blocks.\n- EventBlock: uid, title, start, end, location, notes, day, continues_before, continues_after.\n- MonthGrid: year, month, weeks (list of 7-cell rows), weekday_labels, header_label ('October 2026'), blocks_on(date) -> list of EventBlock.\n- Navigation moves exactly one month: next_month() and previous_month() roll the year over at the boundaries (2026-12 -> 2027-01, 2026-01 -> 2025-12) and rebuild the frame. Navigation backwards is unbounded.\n\n## 8. Controller contract (the app public API)\n\n    CalendarController(data_dir)\n      .store                    -> AppointmentStore\n      .year, .month             -> int (visible month)\n      .grid                     -> MonthGrid, rebuilt on every change\n      .open_month(year, month)\n      .next_month() / .previous_month()\n      .all_appointments()       -> list of Appointment\n      .find(uid)                -> Appointment or None\n      .save_new(title, start_text, end_text, location='', notes='') -> SaveResult\n      .save_existing(uid, title, start_text, end_text, location='', notes='') -> SaveResult\n      .delete(uid)              -> bool\n      .add_listener(callback)   -> called after every successful change\n\n    SaveResult(ok, appointment, errors)\n\nstart_text and end_text are editor strings (YYYY-MM-DD HH:MM); an unparsable value is returned as a field error and never raised. save_existing on an unknown uid returns ok=False and writes nothing.\n\n## 9. UI surfaces (Tk)\n- CalendarWindow(tk.Tk): header with header_label (a tk.Label naming the month), prev_button, next_button, new_button and seven weekday labels exposed by header_weekday_labels() -> list of str.\n- grid_frame holds the day-cell frames, attached with grid() at columns 0..6 of each row. grid_geometry() -> (columns, rows) is computed from the live widget tree, not from a stored number.\n- Each cell frame carries the attribute cell_date (a datetime.date) and holds a date label plus a nested blocks frame whose children are one tk.Label per event block, in chronological order. A cell with many blocks uses a scrollable list so every block stays reachable.\n- header_label_text() -> str.\n- open_editor(date=None, uid=None) -> EditorDialog.\n- The window registers itself as a controller listener, so any successful change rebuilds the frame.\n- EditorDialog(tk.Toplevel): title_var, start_var, end_var, location_var, notes_var, error_var (all tk.StringVar), a Save button, a Delete button in edit mode only, and a Cancel button. save() -> bool returns False and fills error_var when the controller refuses. delete() -> bool.\n- Double-clicking a day cell, or pressing Return in it, opens the editor for that date with 09:00-10:00 pre-filled.\n- The header previous/next buttons call controller.previous_month() / next_month() and re-render.\n\n## 10. Lifecycle and transaction semantics\n- Every mutation is validate -> persist -> rebuild. If validation fails, neither the file nor the visible frame changes.\n- Create inserts a new uid; edit replaces the record that keeps its uid and bumps updated_at; delete removes exactly one uid.\n- The frame is derived state, rebuilt from the store after every change; the UI keeps no second copy of the schedule.\n- Restart means launch, read the file, rebuild the frame. The file is not rewritten.\n\n## 11. Edge cases\n\n| Case | Behaviour |\n| end equals start | refused, 'End must be after start', nothing written |\n| end precedes start | refused, same message |\n| blank or whitespace title | refused, 'Title is required' |\n| unparsable date-time text | refused with a field error, never an exception |\n| title longer than 200 chars | refused, length message |\n| event ends exactly at midnight | that day is not touched (half-open [start,end)) |\n| event crosses midnight | both days are touched |\n| event crosses a month boundary | touched in both months |\n| event crosses a year boundary | touched in December and January |\n| two or three events in one cell | all are stored and all are rendered |\n| 28-day month starting on Monday | 4 week rows |\n| 31-day month starting on Sunday | 6 week rows |\n| delete of an unknown uid | no-op, returns False, store unchanged |\n| store file missing at launch | empty schedule, file created on the first save |\n| store file malformed | launch fails with a clear error, file not overwritten |\n| edit of an unknown uid | refused, returns ok=False, store unchanged |\n\n## 12. Verification strategy\nThree layers, reported separately:\n1. Model and store layer (always executed): the probe drives the real controller, model, store and month-frame model through the public API in section 8 and asserts the on-disk document.\n2. Widget-tree layer (executed only when a display is available): the probe drives the real Tk tree - header buttons, day-cell frames, event-block labels, editor variables and the error message.\n3. Manual layer (operator): the visible journey on a real desktop.\nA check that cannot be executed is reported as NOT_RUN and never as PASS. The probe writes nothing outside a fresh temporary directory and deletes only the records it created inside it.\n\n## 13. Operating commands\n- Install: nothing to install; standard library only.\n- Launch: python3 -m calendar_app --data-dir <dir>\n- Default data directory: $XDG_DATA_HOME/personal-calendar/appointments.json, else ~/Library/Application Support/PersonalCalendar/appointments.json on macOS, else ~/.local/share/personal-calendar/appointments.json.\n- Verify: python3 probe.py (options --app-path DIR to point at the package, --keep to retain the temporary probe data).\n\n## 14. Human decisions and defaults\n- Week starts on Monday (upstream makes it configurable; the target fixes it so the frame is deterministic).\n- Only the month frame exists; there is no day, week, agenda or year frame.\n- Adjacent-month filler cells are dimmed and never carry blocks.\n- New appointments opened from a day cell default to 09:00-10:00 in the fixed offset.\n- Title is trimmed; blank titles are refused rather than defaulted.\n- uid is a random 32-hex string generated once and never reused.\n- Editing an appointment keeps its uid and its created_at; only updated_at changes.\n- Delete is available only from the editor of one existing record; there is no bulk delete and no undo.\n- Two instances writing the same file at the same time are out of scope; last writer wins.\n\n## 15. Known limits\n- The upstream project was never installed, built or executed while writing this blueprint; every upstream statement here is a read-only observation.\n- The target implementation does not exist in this workspace yet, so the probe is written against the contract pinned above and fails loudly until the code lands.\n- On a headless machine the widget-tree assertions are NOT_RUN.\n- No certification, conformance or performance claim is made.",
+    "limits": [
+      "辅助试产，非严格G1/T08。",
+      "Only the month frame is implemented; there is no day, week, agenda or year view, and the upstream week-number toggle is deliberately not reproduced.",
+      "Rescheduling is done through the editor's date-time fields rather than by dragging a block to another day, so the upstream drag-and-drop reschedule is not reproduced.",
+      "The upstream Evolution Data Server / iCalendar source layer, calendar colours, calendars sidebar, context menus and libical interop are out of scope; the store is one local JSON document.",
+      "All instants use a fixed UTC+08:00 offset with no daylight-saving handling and no time-zone switch, so appointments do not follow a machine zone change.",
+      "There is no undo/redo, no search, no import/export, no recurring event, no all-day mode, no reminders, no attendee or invitation data.",
+      "The widget-tree half of the acceptance probe is reported as NOT_RUN on a machine without a graphical display; the model/store half still runs there.",
+      "The target code is not present in this workspace, so the probe is expected to fail loudly rather than pass until the implementation is written.",
+      "No upstream code was copied; the GPL-3.0 upstream project was read as a structural reference only."
+    ]
+  },
+  "trial_scope": "# 辅助试用范围\n\nCreate, read, edit, reschedule and delete your own titled appointments with a start and an end date-time in a fixed UTC+08:00 offset and optional location and notes, shown on a real seven-column month grid whose schedule is persisted locally across restarts and navigable back into past months.\n\n- Only the month frame is implemented; there is no day, week, agenda or year view, and the upstream week-number toggle is deliberately not reproduced.\n- Rescheduling is done through the editor's date-time fields rather than by dragging a block to another day, so the upstream drag-and-drop reschedule is not reproduced.\n- The upstream Evolution Data Server / iCalendar source layer, calendar colours, calendars sidebar, context menus and libical interop are out of scope; the store is one local JSON document.\n- All instants use a fixed UTC+08:00 offset with no daylight-saving handling and no time-zone switch, so appointments do not follow a machine zone change.\n- There is no undo/redo, no search, no import/export, no recurring event, no all-day mode, no reminders, no attendee or invitation data.\n- The widget-tree half of the acceptance probe is reported as NOT_RUN on a machine without a graphical display; the model/store half still runs there.\n- The target code is not present in this workspace, so the probe is expected to fail loudly rather than pass until the implementation is written.\n- No upstream code was copied; the GPL-3.0 upstream project was read as a structural reference only.\n\nOpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。模板先于应用；仅代表场景后续开发应用。严格G1/T08不因本包通过。",
+  "production": {
+    "schema": "atlas.auxiliary-model-production.v1",
+    "mode": "opencode-cli-go",
+    "model": "opencode-go/minimax-m3.1-flash-free",
+    "campaign_id": "atlas-v1-first-production-2026-10-19",
+    "phase": "auxiliary-full-full-leaf-auxiliary-2026-10-21",
+    "full_plan_id": "full-leaf-auxiliary-2026-10-21",
+    "profile": "full-leaf-v1",
+    "prompt_digest": "81297f85377bd12d9fa00400effbb8a5d308ded0019309cdc56772e5a1545ab5",
+    "review_status": "passed",
+    "review_input_digest": "25adf1f3431fc66dd3347e6b2896aad3f8f2b1eb6b36e50088f8cd3a79eac13b",
+    "review_result_digest": "b13100f4189c33c009ce6f167ab1c6d9af37feb0e843ac157f978f31ff048b02",
+    "source_snapshot_digest": "56ce2cfe1e475192ad54076cca39f7e753f74fff779022aab7ea0d7de4aa5203",
+    "sessions": {
+      "discovery": "ses_ea15335ceffeL1iOAEN8YC0BAe",
+      "blueprint-generate-aux": "ses_ea14fa2f1ffeWhEu4mA0s4e6G1",
+      "blueprint-spec-review-aux": "ses_ea14831acffem4IV0xiG3MuTxV"
+    },
+    "research_reuse": null,
+    "upstream_runtime": "not_run",
+    "application_runtime": "not_run",
+    "strict_acceptance": false
+  }
+}

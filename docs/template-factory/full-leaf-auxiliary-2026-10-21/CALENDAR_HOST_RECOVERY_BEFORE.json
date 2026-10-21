@@ -1,0 +1,33 @@
+{
+ "leaf": "calendar-application",
+ "key": "calendar-application",
+ "leaf_sha256": "b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d",
+ "classification_path": [
+  {
+   "id": "03",
+   "name": "Productivity, Collaboration & Work Management"
+  },
+  {
+   "id": "03.08",
+   "name": "Calendar"
+  }
+ ],
+ "directory_section": "03.08",
+ "display_name": "Calendar Application",
+ "covered": [],
+ "fixed_scenario": "个人预约日历：本机单用户，在可切换上月/下月的真实七列月历时间网格中创建、读取、编辑、改期和删除自己新建的有标题、开始/结束日期时间、可选地点/备注的日程。采用固定UTC+08:00无夏令时，结束必须晚于开始，时间区间为[start,end)，跨日/跨月日程在相交月份可见，重叠预约允许并显示而非拒绝。重开保留并可导航回历史月份。P0不做重复规则、全天模式、邀请、账号、同步、通知、时区切换、任务或预约资源平台；验收删除仅针对probe自己创建的可丢弃记录。",
+ "prior_failure": {
+  "path": "docs/template-factory/go-minimax-batch-2026-10-21/personal-calendar/FAILURE.json",
+  "sha256": "6b9cebfb7e44a61502f63f57d3946fbbf29f766a5ed7de8c7ff9e0c312e7ebc6"
+ },
+ "current_attempt": "attempt-1",
+ "first_pass_done": true,
+ "workdir": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/calendar-application/attempt-1",
+ "failure_stage": "freeze_import_export",
+ "failure_code": "content_or_host_validation",
+ "error": "'controlled_opencode_calls_added'",
+ "repair_pending": false,
+ "host_recovery_request_digest": "35a8285fdb81e25e059714b66dac47e90ef7b502030af3aeac18091808521613",
+ "host_recovery": "same static-passed candidate; filename-only host correction; no new author/review",
+ "state": "failed"
+}

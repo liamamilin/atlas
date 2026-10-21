@@ -1,0 +1,132 @@
+{
+ "scenario": {
+  "name": "日常支出记录与月度分类汇总",
+  "audience": "记录个人人民币支出的本机用户",
+  "objective": "个人日常支出与月度分类复盘：本机单用户，创建/重命名支出分类，记录日期、正数人民币金额、分类和简短用途，修改已记支出的金额/日期/分类后立即重算选定自然月的总额及完整分类汇总，切换相邻月份并回查明细，重开保留。金额以整数分存储，UI严格两位小数，不使用浮点累计。P0只做支出记录、可管理分类、月份汇总及修正，不做预算目标、收入、账户余额、报销、多币种、银行同步或金融建议。",
+  "workflow": [
+   "管理支出分类",
+   "记录及编辑支出",
+   "按月查看金额与分类汇总",
+   "重新打开保留记录"
+  ],
+  "acceptance": [
+   "完整执行固定日常支出场景及金额重算、月份隔离、持久化"
+  ]
+ },
+ "fixed_scope": "个人日常支出与月度分类复盘：本机单用户，创建/重命名支出分类，记录日期、正数人民币金额、分类和简短用途，修改已记支出的金额/日期/分类后立即重算选定自然月的总额及完整分类汇总，切换相邻月份并回查明细，重开保留。金额以整数分存储，UI严格两位小数，不使用浮点累计。P0只做支出记录、可管理分类、月份汇总及修正，不做预算目标、收入、账户余额、报销、多币种、银行同步或金融建议。",
+ "delivery_profile": "web",
+ "source": {
+  "repository": "https://github.com/Tanq16/ExpenseOwl",
+  "commit_sha": "4795569c754f77313ba3237aac5fddd7dc05d0c4",
+  "strategy_version": "go-auxiliary-selected-files-v1",
+  "collected_at": "2026-10-21T11:09:54.654058+00:00",
+  "files": {
+   "LICENSE": "4c084baadaec64b48337ef6e3a813358dcdb6c02c64d24c688c7a687695d2730",
+   "README.md": "82be809c754bdaccc52868ed282e94d4d0a27d525d80126940cfe3099b602701",
+   "internal/api/handlers.go": "f11c6a0af38de1ab3642f0e35b9f091b2a9e0d9b283208de2020fa6ac7c8e4c4",
+   "internal/storage/jsonStore.go": "eb3b6cc8b09ccf74fa2a8b5b15bb38493c98b61ec3e2fe002b7330306a2aaf00",
+   "internal/storage/storage.go": "4b0a1c7dee7795bc3fc20adfd4f692f05b9160b8be9b13440fc53ae667a1fcc7",
+   "internal/web/templates/index.html": "5f834d7558715ff27cfe96e99cee4d6531bd3f173635c9265fa333d6b390156c",
+   "internal/web/templates/settings.html": "609a3b1fa4875b73ad00975be5f3a1322f114baa88af2d38d06c71a27c83d8db",
+   "internal/web/templates/table.html": "bdcde02f98bf4f920cfbbb9bed59d52fb7a8705b74ff53a25e67c21604e546f2"
+  },
+  "license_files": [
+   "LICENSE"
+  ],
+  "license": {
+   "status": "located",
+   "spdx_id": "MIT",
+   "notice_hashes": {
+    "LICENSE": "4c084baadaec64b48337ef6e3a813358dcdb6c02c64d24c688c7a687695d2730"
+   }
+  },
+  "license_uncertainties": [
+   "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+  ],
+  "excluded_paths": [
+   "Unselected files; upstream not installed or run"
+  ]
+ },
+ "source_ids": {
+  "requirements": {
+   "atlas:605b7584bc62e5b360d0bd380032c6be07e51bb67748553d5a05b49044295a07": "leaf.md",
+   "scenario:47cdcf86ec8bde16ee22dd188af4053e4c5a4e2d1c36dd72858220463628856d": "fixed scenario"
+  },
+  "upstream": {
+   "upstream:5783a022feb42e21af97141959ab067e280656ff1a15c80d4dd58d0dfcbdd6b7": {
+    "path": "LICENSE",
+    "repository": "https://github.com/Tanq16/ExpenseOwl",
+    "commit_sha": "4795569c754f77313ba3237aac5fddd7dc05d0c4"
+   },
+   "upstream:eac0d7bf5231bb4dfb9d5aea00f168f587b79b91b28a2988585dbce3cd157945": {
+    "path": "README.md",
+    "repository": "https://github.com/Tanq16/ExpenseOwl",
+    "commit_sha": "4795569c754f77313ba3237aac5fddd7dc05d0c4"
+   },
+   "upstream:cb69c53abdeca946c93b7577f690e480cd8e4dc8e1d9ca63a34cb169671df752": {
+    "path": "internal/api/handlers.go",
+    "repository": "https://github.com/Tanq16/ExpenseOwl",
+    "commit_sha": "4795569c754f77313ba3237aac5fddd7dc05d0c4"
+   },
+   "upstream:8d0f1615dd63a7bd0e8e25b55869c3f4d9a671197759e907de65e11c589903ba": {
+    "path": "internal/storage/jsonStore.go",
+    "repository": "https://github.com/Tanq16/ExpenseOwl",
+    "commit_sha": "4795569c754f77313ba3237aac5fddd7dc05d0c4"
+   },
+   "upstream:40e3254da0bc2922a5d39e8cb481537dd5dae13c8a8212bff59852a8bb48f5dd": {
+    "path": "internal/storage/storage.go",
+    "repository": "https://github.com/Tanq16/ExpenseOwl",
+    "commit_sha": "4795569c754f77313ba3237aac5fddd7dc05d0c4"
+   },
+   "upstream:0e529170d7faec436a21a630951b9f82e8ad9ee8cec550507936cc8eef9a8676": {
+    "path": "internal/web/templates/index.html",
+    "repository": "https://github.com/Tanq16/ExpenseOwl",
+    "commit_sha": "4795569c754f77313ba3237aac5fddd7dc05d0c4"
+   },
+   "upstream:2cbd3c413a569c33c9c92d6753b372ba6a16c3f6223a83136526986ac434e1ab": {
+    "path": "internal/web/templates/settings.html",
+    "repository": "https://github.com/Tanq16/ExpenseOwl",
+    "commit_sha": "4795569c754f77313ba3237aac5fddd7dc05d0c4"
+   },
+   "upstream:e273d40afe2c7513131af1f046a6d476fab47c769d764d22968b2671ec134310": {
+    "path": "internal/web/templates/table.html",
+    "repository": "https://github.com/Tanq16/ExpenseOwl",
+    "commit_sha": "4795569c754f77313ba3237aac5fddd7dc05d0c4"
+   }
+  }
+ },
+ "inventory": [
+  {
+   "path": "LICENSE",
+   "lines": 21
+  },
+  {
+   "path": "README.md",
+   "lines": 227
+  },
+  {
+   "path": "internal/api/handlers.go",
+   "lines": 396
+  },
+  {
+   "path": "internal/storage/jsonStore.go",
+   "lines": 472
+  },
+  {
+   "path": "internal/storage/storage.go",
+   "lines": 281
+  },
+  {
+   "path": "internal/web/templates/index.html",
+   "lines": 537
+  },
+  {
+   "path": "internal/web/templates/settings.html",
+   "lines": 888
+  },
+  {
+   "path": "internal/web/templates/table.html",
+   "lines": 463
+  }
+ ]
+}

@@ -1,0 +1,27 @@
+{
+  "acceptance": [
+    "A01 - The month view shows exactly 7 weekday columns and 4-6 week rows, and the header's next/previous controls move exactly one month (with correct year rollover) and re-render the grid, including navigation back into a past month.",
+    "A02 - An appointment 2026-10-05 10:00-11:00 (+08:00) with title, location and notes renders on the October 2026 grid and reads back identically in the editor; a save whose end is not strictly after its start (or whose title is blank) is refused with a message, nothing is written, and no record carries a recurrence, all-day, attendee, alert or time-zone field.",
+    "A03 - An appointment 2026-10-31 22:00 to 2026-11-01 02:00 is visible in both the October 2026 and November 2026 grids and touches no other day; two overlapping appointments in the same day cell are both displayed and the second save is accepted.",
+    "A04 - After an edit or reschedule the previous slot is empty and the new slot shows the updated title and time; deleting a probe-created appointment removes it from the grid and from the persistent store while leaving other records untouched, and deleting an unknown id changes nothing.",
+    "A05 - After restarting the app every created appointment is still present with identical field values, the store file is not rewritten on load, and a past month can be re-navigated to and still shows its appointments."
+  ],
+  "audience": "A single local user on one machine who manages only their own appointments. No accounts, no sharing, no sync, no second calendar for anyone else.",
+  "id": "scn_02914f6fcd344568a566187c9724dfba",
+  "leaf": "calendar-application",
+  "leaf_name": "日历应用",
+  "name": "Personal Month-Grid Calendar (single-user desktop)",
+  "objective": "Create, read, edit, reschedule and delete your own titled appointments with a start and an end date-time in a fixed UTC+08:00 offset and optional location and notes, shown on a real seven-column month grid whose schedule is persisted locally across restarts and navigable back into past months.",
+  "revision": 1,
+  "status": "draft",
+  "updated_at": "2026-10-21T13:54:35.733795+00:00",
+  "workflow": [
+    "Open the app: a month frame renders 7 weekday columns by 4-6 week rows for the current month, with a header showing the month and previous/next controls.",
+    "Double-click an empty day cell (or use the new-appointment action), type a title, set start and end date-time, optionally location and notes, then save.",
+    "The appointment appears as a block on the grid in every month its [start,end) span touches; overlapping appointments are all shown, never rejected.",
+    "Open the block, change title, time, location or notes, or reschedule it to another day and time; save and see the block move.",
+    "Use the header arrows to step to the next or previous month and again to return to a past month; the frame re-renders with that month's events.",
+    "Delete the appointment from the editor (probe-created records only) and confirm it disappears from the grid and the store.",
+    "Close and reopen the app: the appointments are still listed and navigating back to a past month still shows them."
+  ]
+}

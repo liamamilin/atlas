@@ -1,0 +1,215 @@
+{
+ "name": "日常支出记录与月度分类汇总",
+ "audience": "记录个人人民币支出的本机用户",
+ "objective": "个人日常支出与月度分类复盘：本机单用户，创建/重命名支出分类，记录日期、正数人民币金额、分类和简短用途，修改已记支出的金额/日期/分类后立即重算选定自然月的总额及完整分类汇总，切换相邻月份并回查明细，重开保留。金额以整数分存储，UI严格两位小数，不使用浮点累计。P0只做支出记录、可管理分类、月份汇总及修正，不做预算目标、收入、账户余额、报销、多币种、银行同步或金融建议。",
+ "workflow": [
+  "管理支出分类",
+  "记录及编辑支出",
+  "按月查看金额与分类汇总",
+  "重新打开保留记录"
+ ],
+ "acceptance": [
+  "A01 分类管理：POST /api/categories 创建分类返回 201 且分类列表按创建顺序包含新分类；重复名称返回 409，空名称/纯空白名称/超过 20 字符的名称返回 400；PATCH /api/categories/{旧名} 重命名返回 200，旧名从列表消失、新名出现，未知旧名返回 404，重命名目标名已被占用返回 409；DELETE /api/categories/{名} 返回 405（P0 不支持删除分类）；所有被拒调用不得产生部分写入，分类列表内容与长度保持不变。",
+  "A02 记录支出：POST /api/expenses 接受 date(YYYY-MM-DD 真实日历日)、amount_cents(正整数分)、category(必须是已存在分类)、note(可选，去空白后不超过 60 字符)，返回 201 与含 id/date/amount_cents/category/note 的记录且逐字段回显；amount_cents 为 0、负数、浮点 12.5、字符串 2350、缺失，date 为 2026-13-01/2026-02-30/2026-10-5，category 不存在，note 超过 60 字符时一律返回 400 且不落库；负例执行后当月记录笔数与总额与负例前完全一致。",
+  "A03 修正并立即重算：PATCH /api/expenses/{id} 修改 amount_cents/category/date 后，选定自然月的 total_cents 与 by_category 立即按修改后的数据重算，修改 date 会把记录移出原月并计入目标月；PATCH /api/categories/{名} 重命名分类后，引用旧名的历史支出立即改归新名且受影响月份的分类汇总与总额同步变化；未知 id 返回 404，非法金额/日期/未知分类/空请求体返回 400，且被拒请求不改变任何已有金额或汇总。",
+  "A04 月份切换与明细回查：GET /api/expenses?month=YYYY-MM 只返回该自然月的记录，total_cents 为该月 amount_cents 的整数和，total_display 严格两位小数，by_category 覆盖该月出现过的全部分类且不截断不输出零值行；相邻月份各自只显示自己的明细与汇总；无记录的月份返回 total_cents=0、total_display=0.00、by_category=[]、expenses=[]；month 为 2026-13/2026-1/abc/缺失时返回 400；连续累加 10+20+30 分得到 total_cents=60、total_display=0.60，1005+2010 分得到 3015 分，验证整数分累加无浮点误差。",
+  "A05 重开保留：目标进程在一次性数据目录上停止并重新启动后，分类列表、每个自然月的 total_cents/total_display/by_category 与每条支出（id/date/amount_cents/category/note）逐字段保持不变；落盘 store.json 中每条支出的 amount_cents 必须是 JSON 整数（无小数点、无浮点金额字段），按月求和等于该月 API 返回的 total_cents。"
+ ],
+ "observations": [
+  [
+   "code_observation",
+   "internal/storage/storage.go",
+   85,
+   94,
+   "上游持久化模型 Expense 把金额定义为 float64 Amount 字段，另有 time.Time Date、string Name/Category/Tags，金额在数据模型层就是浮点数。"
+  ],
+  [
+   "code_observation",
+   "internal/storage/storage.go",
+   170,
+   198,
+   "上游 Expense.Validate 拒绝空 name、空 category 与金额为 0，但接受负金额，也没有把金额约束到固定小数位。"
+  ],
+  [
+   "code_observation",
+   "internal/storage/jsonStore.go",
+   358,
+   377,
+   "上游 AddExpense 在 ID 为空时补 uuid，日期为零值时补 time.Now()，把记录追加进切片后整体重写 expenses.json 文件。"
+  ],
+  [
+   "code_observation",
+   "internal/storage/jsonStore.go",
+   447,
+   472,
+   "上游 UpdateExpense 用匹配到的 ID 替换整条记录并重新赋 ID，找不到记录时返回错误。"
+  ],
+  [
+   "code_observation",
+   "internal/api/handlers.go",
+   169,
+   192,
+   "上游新增支出的接口是 PUT 处理函数：解码为 storage.Expense，调用 Validate，非法时回 400 并附带校验信息，成功时回 200 与落库后的记录。"
+  ],
+  [
+   "code_observation",
+   "internal/api/handlers.go",
+   208,
+   233,
+   "上游编辑支出从查询串取 id，缺少 id 回 400，存储更新失败时回 500 并记录 Failed to edit expense，而不是 404。"
+  ],
+  [
+   "code_observation",
+   "internal/web/templates/index.html",
+   160,
+   177,
+   "上游仪表盘在浏览器端用浮点金额计算分类汇总：对负金额取绝对值按分类累加，并用浮点总额推导百分比。"
+  ],
+  [
+   "code_observation",
+   "internal/web/templates/index.html",
+   479,
+   492,
+   "上游录入表单用 parseFloat 解析金额，未勾选 Report Gain 时取负，再把日期经 getISODateWithLocalTime 转换后提交到 PUT /expense。"
+  ],
+  [
+   "code_observation",
+   "internal/web/templates/index.html",
+   454,
+   464,
+   "上游月份切换由两个前端按钮修改一个 JavaScript Date 后重绘，所选月份不是服务端概念。"
+  ],
+  [
+   "code_observation",
+   "internal/web/templates/settings.html",
+   352,
+   365,
+   "上游 addCategory 对输入做去空白、去除尖括号、拒绝重复与空名，但只修改页面内的数组，需再点击 Save Categories 才写回后端。"
+  ],
+  [
+   "documentation",
+   "README.md",
+   148,
+   153,
+   "上游约定支出以负值归类、收入为正值，日期以 UTC RFC3339 字符串存储但对用户隐藏时间，未来与经常性支出立即写入后端。"
+  ],
+  [
+   "documentation",
+   "README.md",
+   166,
+   168,
+   "上游设置提供可配置的开始日，把月度窗口从 5 日偏移到次月 4 日，因此其月份不是自然月。"
+  ],
+  [
+   "documentation",
+   "README.md",
+   141,
+   142,
+   "上游应用不包含认证，文档声明仅用于 homelab 部署并建议放在反向代理之后。"
+  ],
+  [
+   "documentation",
+   "README.md",
+   179,
+   192,
+   "上游支持 JSON 与 Postgres 两种后端，由 STORAGE_TYPE 选择，并用 STORAGE_URL/STORAGE_SSL/STORAGE_USER/STORAGE_PASS 配置。"
+  ],
+  [
+   "documentation",
+   "LICENSE",
+   1,
+   3,
+   "上游以 MIT License 分发，Copyright (c) 2024 Tanishq Rupaal，因此在本目标中只作形态参考、不复制代码。"
+  ]
+ ],
+ "inference": "目标技术选型：本机单进程 Web 应用（delivery_profile=web），Go 1.22 仅标准库 net/http + html/template + encoding/json，产出单二进制 expense-tracker，数据落在一个本地 JSON 文件 <DATA_DIR>/store.json，浏览器为唯一客户端，不引入数据库、容器编排、前端框架、构建链与外网依赖。选型理由来自上游事实：上游 ExpenseOwl 即为 Go 后端 + html/template 页面 + JSON 文件存储（internal/storage/jsonStore.go 写 config.json/expenses.json，internal/api/handlers.go 暴露 JSON HTTP 接口，internal/web/templates 提供 index/table/settings 三个页面），该形态对个人日常支出这种小数据量单用户场景足够且部署简单。相对上游的显式设计偏离有四点且都写成目标约束：金额从 float64 改为整数分 amount_cents（上游 storage.go 的 Expense.Amount 为 float64，index.html 在浏览器端用浮点求和），聚合从浏览器移到服务端按自然月计算（上游 index.html 用前端 Date 切月、README 记录了可配置 startDate 的偏移窗口），分类语义改为创建 + 重命名并即时迁移历史归类（上游 settings.html 只是整体替换分类列表，删除分类在 P0 以 405 拒绝），以及删除上游的收入/经常性交易/多币种/导入导出等 P0 外能力。",
+ "features": [
+  "支出分类管理：创建新分类、重命名分类，重命名在同一原子写入中即时迁移引用旧名的历史支出归类",
+  "支出记录：录入日期、正数人民币金额（整数分）、所属分类与简短用途，字段逐项校验后落库",
+  "支出修正：修改已记支出的金额/日期/分类，选定自然月的总额与完整分类汇总立即重算，跨月修改即在月份之间迁移",
+  "月度复盘：在相邻自然月之间切换，查看该月总额、覆盖全部出现分类的汇总以及该月明细回查",
+  "本机持久化：重开进程后分类、支出明细与各月汇总完整保留，落盘金额恒为整数分"
+ ],
+ "goals": [
+  "A01 目标：创建与重命名分类按契约返回并刷新分类列表；重复名 409、空名与超长名 400、未知旧名 404、重名目标 409、删除 405，且被拒调用不产生部分写入。",
+  "A02 目标：合法支出以 201 落库并逐字段回显；金额必须为正整数分、日期必须为真实日历日、分类必须已存在、用途不超过 60 字符，任一违规以 400 拒绝且当月笔数与总额不变。",
+  "A03 目标：金额/分类/日期修改后目标自然月总额与完整分类汇总立即按新数据重算，跨月修改的记录从原月移出并计入目标月；分类重命名即时迁移历史归类；未知 id 404、非法字段 400 且不改变任何汇总。",
+  "A04 目标：任一自然月查询只返回该月记录与该月汇总，分类汇总覆盖当月全部出现过的分类且不截断，空月返回零与空数组，非法月份参数 400，金额以整数分累加并严格两位小数呈现。",
+  "A05 目标：进程重启后分类、支出明细与各月汇总逐字段不变，落盘金额为 JSON 整数分，按月求和与 API 汇总一致。"
+ ],
+ "arch": "# 目标架构：日常支出记录与月度分类汇总（本机单用户 Web 应用）\n\n## 1. 固定场景与 P0 边界\n\n固定场景（原样保留）：记录个人人民币支出的本机用户，创建/重命名支出分类，记录日期、正数人民币金额、分类和简短用途；修改已记支出的金额/日期/分类后立即重算选定自然月的总额及完整分类汇总；切换相邻月份并回查明细；重开保留。金额以整数分存储，UI 严格两位小数，不使用浮点累计。\n\nP0 能力（5 项）：分类管理、支出记录、支出修正与即时重算、月度复盘与明细回查、本机持久化。\nP0 明确不做：预算与目标、收入与收益、账户余额与转账、报销、多币种与汇率、银行同步、收据附件、标签、导入导出、主题与 PWA、认证与多用户、删除支出、删除分类。\n\n## 2. 技术选型与理由\n\n- 形态：本机单进程 Web 应用（delivery_profile=web）；浏览器是唯一客户端，服务与数据都在本机。\n- 运行时：Go 1.22，仅标准库（net/http + html/template + encoding/json），产出单个二进制 `expense-tracker`，`go build` 即可，无第三方依赖。\n- 持久化：单个本地 JSON 文件 `<DATA_DIR>/store.json`；原子写（写临时文件 + fsync + rename），进程内互斥锁加跨进程 advisory 文件锁。\n- 前端：服务端 `html/template` 渲染页面骨架，页面内少量原生 JS 调用 `/api/*`；不引入框架、不引入构建链、不请求外网资源。\n- 理由：个人日常支出数据量小、单用户单进程，文件存储与单二进制足以覆盖全部 P0 能力；沿用上游 ExpenseOwl 的 Go/模板/JSON 文件形态作为结构参考，但把金额表示改为整数分、把聚合移到服务端按自然月计算。\n- 不照搬上游：float64 金额、浏览器端浮点求和、startDate 偏移月份、收入与经常性交易、多币种、CSV 导入导出、PWA、主题。\n\n## 3. 组件与数据流\n\n```\n浏览器 /            浏览器 /settings\n  | 录入/修正/切月        | 分类创建/重命名\n  v                      v\n+--------------------------------------------------+\n| HTTP 处理器层（JSON 编解码、字段校验、状态码映射） |\n+--------------------------------------------------+\n| 领域层（整数分聚合、自然月归属、分类归类迁移）     |\n+--------------------------------------------------+\n| 存储层（读 store.json -> 内存状态 -> 原子写回）   |\n+--------------------------------------------------+\n```\n\n所有写操作走同一条路径：加锁 -> 读入当前状态 -> 校验 -> 在内存副本上变更 -> 序列化 -> 写临时文件 -> fsync -> rename -> 解锁。任何校验失败都在写盘之前中止，因此不产生部分写入。\n\n## 4. 数据模型与落盘格式\n\n`<DATA_DIR>/store.json`：\n\n```json\n{\n  \"version\": 1,\n  \"categories\": [\"餐饮\", \"交通\", \"购物\", \"居住\", \"医疗\", \"其他\"],\n  \"expenses\": [\n    {\n      \"id\": \"exp_9f2c1d0a7b3e4568\",\n      \"date\": \"2026-10-05\",\n      \"amount_cents\": 2350,\n      \"category\": \"餐饮\",\n      \"note\": \"午餐\",\n      \"created_at\": \"2026-10-21T09:12:33Z\"\n    }\n  ]\n}\n```\n\n- `amount_cents` 恒为整数分（int64），是唯一的金额真相来源；文件中不存在浮点金额字段。\n- `date` 是无时区的日历日字符串 `YYYY-MM-DD`；月份归属直接取前 7 位，不做时区换算。\n- `category` 是分类名的引用，重命名时在同一次原子写入里同步改写引用它的支出。\n- `id` 形如 `exp_` + 16 位十六进制（crypto/rand），全局唯一且稳定。\n- `note` 存简短用途（去首尾空白，最多 60 个 Unicode 码点），可为空串。\n\n## 5. 金额与显示规则\n\n- 存储与计算：全部用 int64 整数分；总额 = 目标月内各笔 `amount_cents` 的整数求和，禁止 float 参与。\n- 显示：服务端在响应里直接给出 `total_display`（如 `24.00`、`0.60`）；前端用整数除/模格式化：`Math.floor(cents/100) + '.' + String(cents % 100).padStart(2, '0')`，UI 呈现为 `¥24.00`，严格两位小数，金额路径不使用 parseFloat/toFixed。\n- 金额只允许正数（支出方向）；0 与负数一律 400 拒绝，P0 不含收入方向。\n- 金额上限 999999999 分（9,999,999.99 元），超出按非法金额 400 拒绝。\n\n## 6. HTTP API 契约\n\n所有接口以 `/api` 为前缀，请求与响应均为 `application/json`；错误体固定为 `{\"error\": \"<可读信息>\", \"code\": \"<机器码>\"}`。\n\n| 方法与路径 | 请求 | 成功 | 失败 |\n| --- | --- | --- | --- |\n| GET /api/health | 无 | 200 status=ok | - |\n| GET /api/categories | 无 | 200 categories 数组 | - |\n| POST /api/categories | name | 201 新分类与全量列表 | 400 非法名；409 重名 |\n| PATCH /api/categories/{旧名} | name | 200 新名与全量列表 | 400 非法名；404 旧名不存在；409 新名被占用 |\n| POST /api/expenses | date/amount_cents/category/note | 201 expense 对象 | 400 字段非法 |\n| PATCH /api/expenses/{id} | 上述字段的任意非空子集 | 200 expense 对象 | 400 字段非法；404 id 不存在 |\n| GET /api/expenses?month=YYYY-MM | 无 | 200 月汇总对象（见下） | 400 月份非法或缺失 |\n| GET /api/expenses | 无 | 200 全部记录数组 | - |\n| GET / 与 GET /settings | 无 | 200 HTML | - |\n\n月汇总对象字段：`month`、`total_cents`（整数）、`total_display`（严格两位小数字符串）、`by_category`（数组，每项含 category/total_cents/total_display/count）、`expenses`（该月明细数组）。\n\n约定：`by_category` 覆盖该月出现过的全部分类，不做 top-N 截断、不输出零值行，按 total_cents 降序、同额按分类名升序；`expenses` 按 date 升序、同日按 created_at 升序；`month` 必须匹配 `^\\d{4}-(0[1-9]|1[0-2])$`；`PATCH /api/categories/{旧名}` 在同一次原子写入中把引用旧名的支出改归新名；`DELETE` 分类在 P0 不支持，返回 405。\n\n## 7. UI 契约与操作步骤\n\n- `/`（记录与月度复盘）：月份切换条（`#prev-month`、`#next-month`、`#month-label`）、本月合计（`#month-total`）、分类汇总容器（`#category-breakdown`）、本月明细列表（`#expense-list`）、录入与编辑表单（`#expense-form`，含金额、日期、分类、用途字段）、新增按钮（`#add-expense`）。\n- `/settings`（分类管理）：分类列表（`#category-list`）、新建分类输入（`#new-category-name`）与表单（`#category-form`），每行提供重命名输入与保存按钮。\n- 操作步骤：1) 打开 `/`，选分类、填金额与用途，日期默认今天，提交后本月合计与分类汇总立即刷新；2) 点击上月/下月在相邻自然月之间切换并回查该月明细；3) 在明细行点编辑改金额/日期/分类，保存后当前月汇总立即重算，跨月修改的记录从本月移除并计入目标月；4) 打开 `/settings` 新建或重命名分类，重命名后历史支出归类随之变化；5) 停止并重启进程，刷新页面确认数据保留。\n- 页面骨架由服务端渲染，交互数据来自 `/api/*`，不引用任何外网资源。\n\n## 8. 聚合规则\n\n- 月份 = 自然月（每月 1 日至月末最后一日），按支出自身 date 归月，与运行时的当前日期无关，也不受任何可配置起始日影响。\n- 某月总额 = 该月所有支出的 amount_cents 整数和；分类汇总 = 该月按 category 分组的整数和并附该分类笔数。\n- 汇总只包含有支出的分类；某月无支出时返回 total_cents=0、total_display=`0.00`、空 by_category、空 expenses。\n- 每次新增或修改后重新计算，不缓存历史快照，因此修正立即体现在当月与受影响月份的汇总上。\n\n## 9. 事务与生命周期\n\n- 写路径：取锁 -> 读 store.json（不存在则用默认配置新建）-> 校验 -> 在内存副本上变更 -> 序列化 -> 写 store.json.tmp -> fsync -> rename 覆盖 -> 解锁。\n- 分类重命名是单次原子写：同一次写入内既改分类列表也改写引用旧名的支出，不会出现分类已改、记录未改的中间态。\n- 启动时若 store.json 缺失则创建并播种默认分类；已存在则原样加载，绝不覆盖用户数据。\n- 进程退出无未落盘状态；数据只存在于 `<DATA_DIR>/store.json`，删除该目录即删除全部数据（只应针对一次性目录操作）。\n\n## 10. 校验与错误契约\n\n| 场景 | 状态码 | 错误码 |\n| --- | --- | --- |\n| 金额为 0、负数、非整数、字符串、缺失或超上限 | 400 | invalid_amount |\n| 日期不是 YYYY-MM-DD、不是真实日历日、缺失 | 400 | invalid_date |\n| 分类名为空、纯空白、超过 20 字符、含控制字符 | 400 | invalid_category |\n| 用途超过 60 字符 | 400 | invalid_note |\n| 支出引用不存在的分类 | 400 | unknown_category |\n| 分类重名 / 重命名目标名已被占用 | 409 | category_conflict |\n| 目标 id 不存在 | 404 | not_found |\n| 方法不被支持（如删除分类） | 405 | method_not_allowed |\n| 月份参数缺失或非法 | 400 | invalid_month |\n\n## 11. 验收映射\n\n| 编号 | 能力 | 自动化验证点 |\n| --- | --- | --- |\n| A01 | 分类管理 | 创建 201 且列表含新分类；重复 409；空/超长 400；重命名 200 且旧名消失；未知旧名 404；占用名 409；删除 405；被拒调用不改变列表 |\n| A02 | 支出记录 | 合法支出 201 且字段逐一回显；金额 0/负数/浮点/字符串/缺失、非法日期、未知分类、超长用途一律 400；负例后当月总额与笔数不变 |\n| A03 | 修正并重算 | 改金额/分类后当月总额与分类汇总立即变化；改日期使记录跨月移动且两月汇总同步；分类重命名即时迁移历史归类；未知 id 404、非法字段 400 且不改变汇总 |\n| A04 | 月度复盘 | 各月只返回自己的明细与汇总；分类汇总完整不截断；空月为零与空数组；非法月份 400；10+20+30 分 = 60 分显示 0.60，1005+2010 分 = 3015 分，验证无浮点误差 |\n| A05 | 重开保留 | 进程重启后分类与各月汇总、明细逐字段不变；落盘 amount_cents 为 JSON 整数、无小数点、无浮点金额字段；落盘按月求和等于 API 汇总 |\n\n## 12. 人工决策与默认值\n\n- 首次运行播种默认分类：餐饮、交通、购物、居住、医疗、其他（可在 `/settings` 重命名）；金额符号固定为 `¥`，不提供多币种设置。\n- 单用户本机部署，不做认证；建议只监听回环地址。\n- 重命名分类即迁移历史归类（不做别名或合并），迁移不可撤销，操作前由用户在 `/settings` 确认。\n- 分类删除在 P0 不支持（405）；支出删除在 P0 不支持，修正仅指编辑。\n- 分类汇总只列当月有记录的分类，不输出零值行、不做 top-N。\n- 金额上限与字段长度上限见第 10 节，由实现者按该表固化。\n\n## 13. 已知限制与 not_run 边界\n\n- 无认证与授权：本机任何进程都能读写 store.json，仅适合单用户本机部署。\n- 无删除能力、无撤销、无操作审计；分类重命名没有历史留痕。\n- 金额粒度为分，不支持亚分；不含收入、预算、账户、报销、多币种、银行同步等 P0 外能力。\n- 月份只支持自然月，不支持上游那种可配置起始日的偏移窗口。\n- 同一数据目录只允许单进程写入（进程内互斥 + advisory 文件锁），多进程并发写不支持。\n- `probe.py` 不驱动浏览器：UI 的点击流转、`¥` 前缀与两位小数的实际渲染属于人工步骤；性能、并发与长期数据量不在自动验收范围内。",
+ "gaps": [
+  "无认证与授权：本机任何进程都能读取和改写 store.json，只适合单用户本机部署。",
+  "P0 不提供删除支出与删除分类的能力（分类删除返回 405），也没有撤销或操作审计，分类重命名不留历史痕迹。",
+  "金额粒度固定为分，不支持亚分金额；P0 只支持支出方向，无收入、预算、账户余额、报销、多币种与银行同步。",
+  "月份只支持自然月，不提供上游那种可配置起始日的偏移窗口，也不提供跨月对比或趋势视图。",
+  "同一数据目录只允许单进程写入，进程内互斥加 advisory 文件锁不支持多进程并发写，也不提供备份/恢复/导入导出。",
+  "自动验收不驱动浏览器：UI 的月份切换交互、¥ 前缀与两位小数的实际渲染是人工步骤；性能、并发与长期数据量增长未纳入验证。"
+ ],
+ "delivery_profile": "web",
+ "execution_default": "Go 1.22 单二进制 `expense-tracker`（仅标准库 net/http + html/template + encoding/json）在本机监听 127.0.0.1:8099，浏览器为唯一客户端；全部状态收敛在一个本地 JSON 文件 `<DATA_DIR>/store.json`（默认 `./data`，可用 `--data-dir` 或 `DATA_DIR` 覆盖），写操作以进程内互斥锁加 advisory 文件锁串行化并原子落盘；不连数据库、不连外网、不做认证（单用户本机边界）。验收默认由 `probe.py` 自建一次性临时数据目录、拉起目标进程、执行 A01-A04、停止并用同一目录重启进程完成 A05，退出前删除该临时目录，绝不触碰用户已有数据。",
+ "source_refs": {
+  "requirements": [
+   "atlas:605b7584bc62e5b360d0bd380032c6be07e51bb67748553d5a05b49044295a07",
+   "scenario:47cdcf86ec8bde16ee22dd188af4053e4c5a4e2d1c36dd72858220463628856d"
+  ],
+  "case_files": [
+   "upstream:5783a022feb42e21af97141959ab067e280656ff1a15c80d4dd58d0dfcbdd6b7",
+   "upstream:eac0d7bf5231bb4dfb9d5aea00f168f587b79b91b28a2988585dbce3cd157945",
+   "upstream:cb69c53abdeca946c93b7577f690e480cd8e4dc8e1d9ca63a34cb169671df752",
+   "upstream:8d0f1615dd63a7bd0e8e25b55869c3f4d9a671197759e907de65e11c589903ba",
+   "upstream:40e3254da0bc2922a5d39e8cb481537dd5dae13c8a8212bff59852a8bb48f5dd",
+   "upstream:0e529170d7faec436a21a630951b9f82e8ad9ee8cec550507936cc8eef9a8676",
+   "upstream:2cbd3c413a569c33c9c92d6753b372ba6a16c3f6223a83136526986ac434e1ab",
+   "upstream:e273d40afe2c7513131af1f046a6d476fab47c769d764d22968b2671ec134310"
+  ],
+  "design_inferences": [
+   {
+    "text": "目标形态选为本机单进程 Web 应用（Go 1.22 + 标准库 net/http + html/template + 单个本地 JSON 文件），沿用上游 Go 后端 + 服务端模板 + JSON 文件后端的结构，但把金额表示从 float64 改为整数分。",
+    "depends_on": [
+     "upstream:40e3254da0bc2922a5d39e8cb481537dd5dae13c8a8212bff59852a8bb48f5dd",
+     "upstream:cb69c53abdeca946c93b7577f690e480cd8e4dc8e1d9ca63a34cb169671df752",
+     "upstream:8d0f1615dd63a7bd0e8e25b55869c3f4d9a671197759e907de65e11c589903ba"
+    ]
+   },
+   {
+    "text": "金额模型改为整数分 amount_cents 并禁止浮点累加，UI 的两位小数由服务端下发的 total_display 字符串与前端整数除/模格式化保证，取代上游的 float64 金额与浏览器端浮点求和。",
+    "depends_on": [
+     "upstream:40e3254da0bc2922a5d39e8cb481537dd5dae13c8a8212bff59852a8bb48f5dd",
+     "upstream:0e529170d7faec436a21a630951b9f82e8ad9ee8cec550507936cc8eef9a8676"
+    ]
+   },
+   {
+    "text": "API 采用上游风格的 JSON HTTP 接口（列表查询 + 按 id 的增改），但统一放到 /api 前缀并给出显式 404/409/405 语义，不再用 500 掩盖未找到或不支持的操作。",
+    "depends_on": [
+     "upstream:cb69c53abdeca946c93b7577f690e480cd8e4dc8e1d9ca63a34cb169671df752",
+     "upstream:8d0f1615dd63a7bd0e8e25b55869c3f4d9a671197759e907de65e11c589903ba"
+    ]
+   },
+   {
+    "text": "月汇总与分类汇总改由服务端按自然月以整数分计算并返回完整分类汇总与该月明细，取代上游在前端按 Date 切月并以 startDate 偏移窗口的做法。",
+    "depends_on": [
+     "upstream:0e529170d7faec436a21a630951b9f82e8ad9ee8cec550507936cc8eef9a8676",
+     "upstream:eac0d7bf5231bb4dfb9d5aea00f168f587b79b91b28a2988585dbce3cd157945"
+    ]
+   },
+   {
+    "text": "分类在 P0 只支持创建与重命名，重命名时即时迁移引用旧名的历史支出，删除分类以 405 明确拒绝，取代上游只整体替换分类列表而让历史记录悬挂旧分类名的做法。",
+    "depends_on": [
+     "upstream:2cbd3c413a569c33c9c92d6753b372ba6a16c3f6223a83136526986ac434e1ab",
+     "upstream:e273d40afe2c7513131af1f046a6d476fab47c769d764d22968b2671ec134310"
+    ]
+   },
+   {
+    "text": "保持单用户本机部署、不做认证、不联外网，与上游的自托管说明一致；验收数据一律写入一次性临时数据目录，绝不删除或覆盖用户既有记录。",
+    "depends_on": [
+     "upstream:eac0d7bf5231bb4dfb9d5aea00f168f587b79b91b28a2988585dbce3cd157945",
+     "upstream:5783a022feb42e21af97141959ab067e280656ff1a15c80d4dd58d0dfcbdd6b7"
+    ]
+   }
+  ]
+ },
+ "repo_name": "Tanq16/ExpenseOwl",
+ "license": "MIT",
+ "license_path": "LICENSE"
+}

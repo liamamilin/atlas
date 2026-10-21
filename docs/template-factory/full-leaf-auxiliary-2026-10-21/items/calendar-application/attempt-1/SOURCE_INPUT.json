@@ -1,0 +1,123 @@
+{
+ "scenario": {
+  "name": "Personal appointment calendar on a seven-column month grid",
+  "audience": "A single local user on one machine, managing only their own appointments (no accounts, no sharing, no sync)",
+  "objective": "Create, read, edit, reschedule and delete your own titled appointments with start/end date-time (fixed UTC+08:00) and optional location/notes on a real seven-column month grid, with the schedule persisted locally across restarts and navigable back into past months.",
+  "workflow": [
+   "Open the app: a month grid renders 7 weekday columns by 4-6 week rows for the current month, with a header showing the month and previous/next controls.",
+   "Click an empty day cell (or the new-appointment action), type a title, set start and end date-time, optionally location and notes, then save.",
+   "The appointment appears as a block on the grid in every month its [start,end) span touches; overlapping appointments are all shown, never rejected.",
+   "Open the block, change title, time, location or notes, or reschedule it to another day and time; save and see the block move.",
+   "Use the header arrows to step to the next or previous month and again to return to a past month; the grid re-renders with that month's events.",
+   "Delete the appointment from the editor (probe-created records only) and confirm it disappears from the grid and the store.",
+   "Close and reopen the app: the appointments are still listed and navigating back to a past month still shows them."
+  ],
+  "acceptance": [
+   "The month view shows exactly 7 weekday columns and 4-6 week rows, and the header's next/previous controls move exactly one month and re-render the grid.",
+   "An appointment 2026-10-05 10:00-11:00 (+08:00) with title, location and notes renders on the October 2026 grid and is readable in the editor.",
+   "Saving an event whose end is not strictly after its start is refused with a message and no record is written.",
+   "An appointment 2026-10-31 22:00 to 2026-11-01 02:00 is visible in both the October 2026 and November 2026 grids.",
+   "Two overlapping appointments in the same day cell are both displayed; the second save is not rejected.",
+   "After an edit or reschedule the previous slot is empty and the new slot shows the updated title and time.",
+   "After restarting the app every created appointment is still present and a past month can be re-navigated to.",
+   "Deleting a probe-created appointment removes it from the grid and from the persistent store, leaving other records untouched.",
+   "No recurrence rule, all-day mode, invitation, account, sync, notification, timezone switch, task list or resource booking exists; every appointment has a time-of-day range."
+  ]
+ },
+ "fixed_scope": "个人预约日历：本机单用户，在可切换上月/下月的真实七列月历时间网格中创建、读取、编辑、改期和删除自己新建的有标题、开始/结束日期时间、可选地点/备注的日程。采用固定UTC+08:00无夏令时，结束必须晚于开始，时间区间为[start,end)，跨日/跨月日程在相交月份可见，重叠预约允许并显示而非拒绝。重开保留并可导航回历史月份。P0不做重复规则、全天模式、邀请、账号、同步、通知、时区切换、任务或预约资源平台；验收删除仅针对probe自己创建的可丢弃记录。",
+ "delivery_profile": "desktop",
+ "source": {
+  "repository": "https://github.com/elementary/calendar",
+  "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+  "strategy_version": "full-leaf-selected-v2-cf60cfe188fcda2d",
+  "collected_at": "2026-10-21T13:39:29.362323+00:00",
+  "files": {
+   "COPYING": "0ae0485a5bd37a63e63603596417e4eb0e653334fa6c7f932ca3a0e85d4af227",
+   "README.md": "94dcbe6bbe73592938439f0362b7537b40bff9c50265091fd1bfbd87f6d43918",
+   "src/Grid/EventButton.vala": "e484f56ac1ed05a16f760edb8b6bcace76a9888ed186e532c8af4892be417eda",
+   "src/Grid/Grid.vala": "7865b6d05ae3e8f4e8e1ba551a1f4865269be421d2eddb7755991f8660526735",
+   "src/Grid/GridDay.vala": "62a413a504dc10505b795f655aaab507c2051a2507946d679d4880ba45984d98",
+   "src/Grid/Header.vala": "b90085667ab410f61dbfa8acc7cd0b66db7234e63f4f8dc74193ceaa0836e30f"
+  },
+  "license_files": [
+   "COPYING"
+  ],
+  "license": {
+   "status": "located",
+   "spdx_id": "GPL-3.0",
+   "notice_hashes": {
+    "COPYING": "0ae0485a5bd37a63e63603596417e4eb0e653334fa6c7f932ca3a0e85d4af227"
+   }
+  },
+  "license_uncertainties": [
+   "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+  ],
+  "excluded_paths": [
+   "Unselected files; upstream not installed or run"
+  ]
+ },
+ "source_ids": {
+  "requirements": {
+   "atlas:b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d": "leaf.md",
+   "scenario:37b1ca5c1459a5a17efdfa0c3f48c26e32db3da88f53a06fd8b04d9380931171": "fixed scenario"
+  },
+  "upstream": {
+   "upstream:ac5aa2a0af2c04c585e1c88b275a9807efaf8562f65f543eefa5347502ed7ca9": {
+    "path": "COPYING",
+    "repository": "https://github.com/elementary/calendar",
+    "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a"
+   },
+   "upstream:872e166d9623789859dcadb88ddcfd7773a64263b39754929aa89a654b65844b": {
+    "path": "README.md",
+    "repository": "https://github.com/elementary/calendar",
+    "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a"
+   },
+   "upstream:28437a2d2ce5952a3caac0e3dfbcb96b4607bb05fe3254506b6d5188e7fd163c": {
+    "path": "src/Grid/EventButton.vala",
+    "repository": "https://github.com/elementary/calendar",
+    "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a"
+   },
+   "upstream:9c5a3929d751bcbb277496000eb9165f4ca6776cb9f458f03159d5fbb01effac": {
+    "path": "src/Grid/Grid.vala",
+    "repository": "https://github.com/elementary/calendar",
+    "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a"
+   },
+   "upstream:85f57c67afe6e9fc7739118422cdf6aebb77222351f9c1d197356da2bf665677": {
+    "path": "src/Grid/GridDay.vala",
+    "repository": "https://github.com/elementary/calendar",
+    "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a"
+   },
+   "upstream:120cad0593de96796615eeb51649f568997a3fcdb7b0855d6f825e6774b10e8e": {
+    "path": "src/Grid/Header.vala",
+    "repository": "https://github.com/elementary/calendar",
+    "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a"
+   }
+  }
+ },
+ "inventory": [
+  {
+   "path": "COPYING",
+   "lines": 675
+  },
+  {
+   "path": "README.md",
+   "lines": 36
+  },
+  {
+   "path": "src/Grid/EventButton.vala",
+   "lines": 182
+  },
+  {
+   "path": "src/Grid/Grid.vala",
+   "lines": 258
+  },
+  {
+   "path": "src/Grid/GridDay.vala",
+   "lines": 186
+  },
+  {
+   "path": "src/Grid/Header.vala",
+   "lines": 122
+  }
+ ]
+}

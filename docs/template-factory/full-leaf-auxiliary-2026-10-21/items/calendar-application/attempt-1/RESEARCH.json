@@ -1,0 +1,39 @@
+{
+ "repository": "https://github.com/elementary/calendar",
+ "files": [
+  "COPYING",
+  "README.md",
+  "src/Grid/Grid.vala",
+  "src/Grid/GridDay.vala",
+  "src/Grid/EventButton.vala",
+  "src/Grid/Header.vala"
+ ],
+ "rationale": "elementary/calendar is a real licensed GTK/Vala desktop calendar app: COPYING holds the GNU GPL v3 text, README.md documents the build. Read as text, src/Grid/Grid.vala builds the month grid with insert_column(7) and a %7 column/row walk over a per-month DateRange, places an event into every day cell it falls on, and updates or removes it on edit - the leaf's defining core (time-anchored events on a navigable month grid). Upstream was never built or run; the target app is our own design from the pinned scenario.",
+ "reuse_case_id": null,
+ "delivery_profile": "desktop",
+ "scenario": {
+  "name": "Personal appointment calendar on a seven-column month grid",
+  "audience": "A single local user on one machine, managing only their own appointments (no accounts, no sharing, no sync)",
+  "objective": "Create, read, edit, reschedule and delete your own titled appointments with start/end date-time (fixed UTC+08:00) and optional location/notes on a real seven-column month grid, with the schedule persisted locally across restarts and navigable back into past months.",
+  "workflow": [
+   "Open the app: a month grid renders 7 weekday columns by 4-6 week rows for the current month, with a header showing the month and previous/next controls.",
+   "Click an empty day cell (or the new-appointment action), type a title, set start and end date-time, optionally location and notes, then save.",
+   "The appointment appears as a block on the grid in every month its [start,end) span touches; overlapping appointments are all shown, never rejected.",
+   "Open the block, change title, time, location or notes, or reschedule it to another day and time; save and see the block move.",
+   "Use the header arrows to step to the next or previous month and again to return to a past month; the grid re-renders with that month's events.",
+   "Delete the appointment from the editor (probe-created records only) and confirm it disappears from the grid and the store.",
+   "Close and reopen the app: the appointments are still listed and navigating back to a past month still shows them."
+  ],
+  "acceptance": [
+   "The month view shows exactly 7 weekday columns and 4-6 week rows, and the header's next/previous controls move exactly one month and re-render the grid.",
+   "An appointment 2026-10-05 10:00-11:00 (+08:00) with title, location and notes renders on the October 2026 grid and is readable in the editor.",
+   "Saving an event whose end is not strictly after its start is refused with a message and no record is written.",
+   "An appointment 2026-10-31 22:00 to 2026-11-01 02:00 is visible in both the October 2026 and November 2026 grids.",
+   "Two overlapping appointments in the same day cell are both displayed; the second save is not rejected.",
+   "After an edit or reschedule the previous slot is empty and the new slot shows the updated title and time.",
+   "After restarting the app every created appointment is still present and a past month can be re-navigated to.",
+   "Deleting a probe-created appointment removes it from the grid and from the persistent store, leaving other records untouched.",
+   "No recurrence rule, all-day mode, invitation, account, sync, notification, timezone switch, task list or resource booking exists; every appointment has a time-of-day range."
+  ]
+ }
+}

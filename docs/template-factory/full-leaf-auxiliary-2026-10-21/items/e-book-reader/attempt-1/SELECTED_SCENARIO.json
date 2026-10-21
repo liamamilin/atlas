@@ -1,0 +1,17 @@
+{
+ "name": "Resume a book exactly where reading stopped",
+ "audience": "A person reading one long-form EPUB over several sittings on a Linux desktop",
+ "objective": "Reopen the same book days later and land on the exact passage where reading stopped, even after the typography changed",
+ "workflow": [
+  "Open one EPUB from the file chooser; it renders as a paginated reading surface with a progress slider and table of contents",
+  "Turn pages or scroll to read; each relocation updates that book's own JSON file with progress and the CFI of the current position",
+  "Close the application, then reopen the same file",
+  "Change font size or margins; the book re-paginates but the saved position still points at the same text"
+ ],
+ "acceptance": [
+  "Reopening the same EPUB restores the same passage (CFI), not merely a similar percentage",
+  "Each book keeps its own position: a second book opens at its own last position, unaffected by the first",
+  "The stored position is a text anchor, so it survives a font-size change that alters the page count",
+  "Page turns and the progress slider visibly change the position value stored in that book's JSON file"
+ ]
+}

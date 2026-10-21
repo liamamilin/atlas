@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "<stdin>", line 9, in <module>
+  File "/Users/milin/2026/软件开发/application-atlas/examples/assisted-trials/produce_batch.py", line 314, in produce
+    receipt = export_trial(p, p / "packages", item["key"] + "-trial", reuse=True)
+  File "/Users/milin/2026/软件开发/application-atlas/examples/assisted-trials/export_trial.py", line 71, in export_trial
+    receipt = json.loads((destination / "EXPORT_RECEIPT.json").read_text())
+  File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/pathlib.py", line 1134, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+  File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/pathlib.py", line 1119, in open
+    return self._accessor.open(self, mode, buffering, encoding, errors,
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/milin/2026/软件开发/application-atlas/docs/template-factory/full-leaf-auxiliary-2026-10-21/items/calendar-application/attempt-1/packages/EXPORT_RECEIPT.json'

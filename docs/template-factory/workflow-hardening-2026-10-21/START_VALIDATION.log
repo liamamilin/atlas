@@ -1,0 +1,40 @@
+{
+  "id": "full-leaf-auxiliary-2026-10-21",
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "phase": "auxiliary-full-full-leaf-auxiliary-2026-10-21",
+  "request_digest": "e8f0a3b11676bac6c9d7ec35b1aa108733e0d5bc161d8b9c192b8f1bd1135cda",
+  "baseline": 99,
+  "max_calls": 7200,
+  "window_seconds": 2592000,
+  "model": "opencode-go/minimax-m3.1-flash-free",
+  "created": 1792589722.814663,
+  "status": "running",
+  "reason": "operator",
+  "started": 1792589744.123177,
+  "deadline": 1795181744.123177,
+  "counts": {
+    "paused": 1,
+    "ready_not_run": 1,
+    "failed": 1,
+    "pending": 1784,
+    "reused": 18
+  },
+  "total": 1805,
+  "handled": 20,
+  "attempted": 3,
+  "new_calls": 9,
+  "remaining_calls": 7191,
+  "active_calls": 0,
+  "provider_requests": null,
+  "observed_model": null,
+  "cost": null
+}
+{
+  "supervisor": "launchd",
+  "label": "com.atlas.full-leaf-auxiliary-20261021",
+  "target": "gui/501/com.atlas.full-leaf-auxiliary-20261021",
+  "plist_sha256": "f6ce4da0161b8cb818be6212b12f8de33401cc727d9c52dad1fcdbdd4122190e",
+  "observed_at": 1792596564.3556092,
+  "actual": "gui/501/com.atlas.full-leaf-auxiliary-20261021 = {\n\tactive count = 1\n\tpath = /Users/milin/2026/软件开发/application-atlas/docs/template-factory/full-leaf-auxiliary-2026-10-21/coordinator.plist\n\ttype = LaunchAgent\n\tstate = running\n\n\tprogram = /Users/milin/.pyenv/versions/3.10.13/bin/python3\n\targuments = {\n\t\t/Users/milin/.pyenv/versions/3.10.13/bin/python3\n\t\t/Users/milin/2026/软件开发/application-atlas/examples/assisted-trials/produce_all_leaves.py\n\t\trun\n\t\t--root\n\t\t/Users/milin/2026/软件开发/application-atlas/docs/template-factory/full-leaf-auxiliary-2026-10-21\n\t\t--api\n\t\thttp://127.0.0.1:5199\n\t}\n\n\tworking directory = /Users/milin/2026/软件开发/application-atlas\n\n\tstdout path = /Users/milin/2026/软件开发/application-atlas/docs/template-factory/full-leaf-auxiliary-2026-10-21/runner.log\n\tstderr path = /Users/milin/2026/软件开发/application-atlas/docs/template-factory/full-leaf-auxiliary-2026-10-21/runner.stderr.log\n\tinherited environment = {\n\t\tSSH_AUTH_SOCK => /var/run/com.apple.launchd.bMIeH0p0uE/Listeners\n\t}\n\n\tdefault environment = {\n\t\tPATH => /usr/bin:/bin:/usr/sbin:/sbin\n\t}\n\n\tenvironment = {\n\t\tOSLogRateLimit => 64\n\t\tPYTHONUNBUFFERED => 1\n\t\tPATH => /Users/milin/.opencode/bin:/usr/local/bin:/usr/bin:/bin\n\t\tXPC_SERVICE_NAME => com.atlas.full-leaf-auxiliary-20261021\n\t}\n\n\tdomain = gui/501 [100020]\n\tasid = 100020\n\tminimum runtime = 30\n\texit timeout = 5\n\truns = 4\n\tpid = 30673\n\timmediate reason = non-ipc demand\n\tforks = 0\n\texecs = 1\n\tinitialized = 1\n\ttrampolined = 1\n\tstarted suspended = 0\n\tproxy started suspended = 0\n\tchecked allocations = 0 (queried = 1)\n\tchecked allocations reason = no host\n\tchecked allocations flags = 0x0\n\tlast exit code = 0\n\n\tsemaphores = {\n\t\tsuccessful exit => 0\n\t}\n\n\tresource coalition = {\n\t\tID = 850009\n\t\ttype = resource\n\t\tstate = active\n\t\tactive count = 1\n\t\tname = com.atlas.full-leaf-auxiliary-20261021\n\t}\n\n\tjetsam coalition = {\n\t\tID = 850010\n\t\ttype = jetsam\n\t\tstate = active\n\t\tactive count = 1\n\t\tname = com.atlas.full-leaf-auxiliary-20261021\n\t}\n\n\tspawn type = daemon (3)\n\tjetsam priority = 40\n\tjetsam memory limit (active) = (unlimited)\n\tjetsam memory limit (inactive) = (unlimited)\n\tjetsamproperties category = daemon\n\tjetsam thread limit = 32\n\tcpumon = default\n\n\tproperties = runatload | inferred program\n}\n",
+  "note": "Launchd survives this chat and terminal. Machine sleep/offline stops progress; reboot/login may require start again. Checkpoints and original 30-day clock persist."
+}

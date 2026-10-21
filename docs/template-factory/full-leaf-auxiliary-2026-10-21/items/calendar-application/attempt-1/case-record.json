@@ -1,0 +1,721 @@
+{
+  "app_id": "app:repo:a3c224f4e8853132841e9ddd",
+  "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+  "created_at": "2026-10-21T14:19:25.243755+00:00",
+  "created_task_id": "full-leaf-auxiliary-2026-10-21-calendar-application-attempt-1",
+  "digest": "4981f844eb6c28caaa9c655af6beeba3fe310603d99aa45124e89660243a4925",
+  "evidence_digest": "afd98097e50ddd213e82a8aaee95d8e5c893f5ce11e502cdee6e3a9329a59918",
+  "research": {
+    "input_digest": "0d1697aa1556c59f7784546df8660366a30cf094adbedb570a2a900fbd6b0596",
+    "scope": "Create, read, edit, reschedule and delete your own titled appointments with a start and an end date-time in a fixed UTC+08:00 offset and optional location and notes, shown on a real seven-column month grid whose schedule is persisted locally across restarts and navigable back into past months.",
+    "summary": "OpenCode Go静态研究与独立会话审阅；Target proposal: implement the leaf as a single-user desktop GUI application in Python 3 using only the standard library - Tkinter for the seven-column month frame, the day cells, the event blocks and the appointment editor - with one local JSON document as the persistent store, a fixed UTC+08:00 offset and no accounts, sync, recurrence, all-day mode or notifications; the upstream elementary/calendar project (GPL-3.0) is used only as a structural reference for the grid and event model and no upstream code is copied.",
+    "task_id": "full-leaf-auxiliary-2026-10-21-calendar-application-attempt-1",
+    "unknowns": [
+      "upstream not_run",
+      "auxiliary independent static review passed; runtime not_run",
+      "Only the month frame is implemented; there is no day, week, agenda or year view, and the upstream week-number toggle is deliberately not reproduced.",
+      "Rescheduling is done through the editor's date-time fields rather than by dragging a block to another day, so the upstream drag-and-drop reschedule is not reproduced.",
+      "The upstream Evolution Data Server / iCalendar source layer, calendar colours, calendars sidebar, context menus and libical interop are out of scope; the store is one local JSON document.",
+      "All instants use a fixed UTC+08:00 offset with no daylight-saving handling and no time-zone switch, so appointments do not follow a machine zone change.",
+      "There is no undo/redo, no search, no import/export, no recurring event, no all-day mode, no reminders, no attendee or invitation data.",
+      "The widget-tree half of the acceptance probe is reported as NOT_RUN on a machine without a graphical display; the model/store half still runs there.",
+      "The target code is not present in this workspace, so the probe is expected to fail loudly rather than pass until the implementation is written.",
+      "No upstream code was copied; the GPL-3.0 upstream project was read as a structural reference only."
+    ]
+  },
+  "research_input_digest": "0d1697aa1556c59f7784546df8660366a30cf094adbedb570a2a900fbd6b0596",
+  "revision": 2,
+  "snapshot_ids": [
+    "src_bfad578fc4b6c73747c75a95"
+  ],
+  "observations": [
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "bd17d3c626b823d5cf1e50b68d0625e4a156b190973c360cd4cf5bf962ba28ca",
+      "evidence_id": "ev_assisted_attempt_1_1",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "file_digest": "7865b6d05ae3e8f4e8e1ba551a1f4865269be421d2eddb7755991f8660526735",
+        "line_end": 49,
+        "line_start": 44,
+        "path": "src/Grid/Grid.vala"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The month surface is a Gtk.Grid built with insert_column (7) and homogeneous columns and rows, so the frame is seven columns wide by construction.",
+      "reviews": [
+        {
+          "review_id": "rev_64fdda19d9b5d3875d2e03c0502b07c3",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "bd17d3c626b823d5cf1e50b68d0625e4a156b190973c360cd4cf5bf962ba28ca",
+          "created_at": "2026-10-21T14:19:25.249423+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "2768e7b83080134d156f4f2a0371c05ea09b5b213e4eb0d40d7968533ee483a3",
+      "evidence_id": "ev_assisted_attempt_1_10",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "file_digest": "62a413a504dc10505b795f655aaab507c2051a2507946d679d4880ba45984d98",
+        "line_end": 184,
+        "line_start": 171,
+        "path": "src/Grid/GridDay.vala"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Keyboard handling inside a day cell: Return emits on_event_add for the cell date, Page_Up calls change_month (1) and Page_Down calls change_month (-1).",
+      "reviews": [
+        {
+          "review_id": "rev_1947cde2b9b90a2ba95ab235071fd323",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "2768e7b83080134d156f4f2a0371c05ea09b5b213e4eb0d40d7968533ee483a3",
+          "created_at": "2026-10-21T14:19:25.251362+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "372d3b914acd4f0bee713c342112fa416d8629a9c72c5566f7b67869a74edc7c",
+      "evidence_id": "ev_assisted_attempt_1_11",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "file_digest": "62a413a504dc10505b795f655aaab507c2051a2507946d679d4880ba45984d98",
+        "line_end": 110,
+        "line_start": 93,
+        "path": "src/Grid/GridDay.vala"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Dropping an event on another day shifts DTSTART and DTEND by the day difference and writes the component back with calmodel.update_event (src, comp, ECal.ObjModType.ALL), i.e. rescheduling to another day.",
+      "reviews": [
+        {
+          "review_id": "rev_714b686488ab56608d3418ecb8026eba",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "372d3b914acd4f0bee713c342112fa416d8629a9c72c5566f7b67869a74edc7c",
+          "created_at": "2026-10-21T14:19:25.253045+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "09a318cf260d911158040835a70567be25f64c2312f892a33043efa4297dd219",
+      "evidence_id": "ev_assisted_attempt_1_12",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "file_digest": "b90085667ab410f61dbfa8acc7cd0b66db7234e63f4f8dc74193ceaa0836e30f",
+        "line_end": 49,
+        "line_start": 44,
+        "path": "src/Grid/Header.vala"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The weekday header is itself a seven-column Gtk.Grid with a single row.",
+      "reviews": [
+        {
+          "review_id": "rev_5da75d8c8fe545b23c48154c42d850d1",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "09a318cf260d911158040835a70567be25f64c2312f892a33043efa4297dd219",
+          "created_at": "2026-10-21T14:19:25.254646+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "bd3e415b0c481483dced92d872df06adfa2065f1f41fb11668b9b23cd3ce8bd4",
+      "evidence_id": "ev_assisted_attempt_1_13",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "file_digest": "b90085667ab410f61dbfa8acc7cd0b66db7234e63f4f8dc74193ceaa0836e30f",
+        "line_end": 119,
+        "line_start": 112,
+        "path": "src/Grid/Header.vala"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "update_columns fills exactly seven labels formatted with %a, starting from the configured first day of the week.",
+      "reviews": [
+        {
+          "review_id": "rev_dad098539f0e573a18d93aca717a48de",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "bd3e415b0c481483dced92d872df06adfa2065f1f41fb11668b9b23cd3ce8bd4",
+          "created_at": "2026-10-21T14:19:25.256267+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "0165e8a60697cacc39aaeb0d95020e727adc67cc5aee3958b4ce44fdc242643f",
+      "evidence_id": "ev_assisted_attempt_1_14",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "file_digest": "b90085667ab410f61dbfa8acc7cd0b66db7234e63f4f8dc74193ceaa0836e30f",
+        "line_end": 77,
+        "line_start": 69,
+        "path": "src/Grid/Header.vala"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The header exposes a 'Show Week Numbers' action in a context menu, i.e. the upstream week-number column is an optional toggle rather than a core part of the frame.",
+      "reviews": [
+        {
+          "review_id": "rev_764fd1e624ebe0e4258077ebdd04837a",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "0165e8a60697cacc39aaeb0d95020e727adc67cc5aee3958b4ce44fdc242643f",
+          "created_at": "2026-10-21T14:19:25.257874+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "d1c0fa13d472dcb9d81cbe8b893feec1b5ec69b0e0e8c037c9a74d4ac26ca120",
+      "evidence_id": "ev_assisted_attempt_1_15",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "file_digest": "e484f56ac1ed05a16f760edb8b6bcace76a9888ed186e532c8af4892be417eda",
+        "line_end": 33,
+        "line_start": 29,
+        "path": "src/Grid/EventButton.vala"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "An event block displays only the component summary, as an ellipsized label.",
+      "reviews": [
+        {
+          "review_id": "rev_f619bb26c8e562ca347a4b48eedfe9b5",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "d1c0fa13d472dcb9d81cbe8b893feec1b5ec69b0e0e8c037c9a74d4ac26ca120",
+          "created_at": "2026-10-21T14:19:25.259370+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "9c83f91cfaeccb6cff798d30c07f09390d1f12b730b0b4d36dd4469f1f1eca25",
+      "evidence_id": "ev_assisted_attempt_1_16",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "file_digest": "e484f56ac1ed05a16f760edb8b6bcace76a9888ed186e532c8af4892be417eda",
+        "line_end": 135,
+        "line_start": 132,
+        "path": "src/Grid/EventButton.vala"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "update() replaces the component and refreshes the label with the new summary, so an edited event's block re-labels itself.",
+      "reviews": [
+        {
+          "review_id": "rev_2fcc1e0624caa48388d1fdd2fd408751",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "9c83f91cfaeccb6cff798d30c07f09390d1f12b730b0b4d36dd4469f1f1eca25",
+          "created_at": "2026-10-21T14:19:25.260985+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "1c1cf998878413b18a9260dd697fbf13a4ad0a8cd23451ffd940144dcd88533d",
+      "evidence_id": "ev_assisted_attempt_1_17",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "94dcbe6bbe73592938439f0362b7537b40bff9c50265091fd1bfbd87f6d43918",
+        "material_version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/README.md"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The upstream build depends on libecal, libedataserverui, libical, libfolks and GTK/Granite, i.e. its store is an Evolution Data Server / iCalendar source stack rather than a local single-file store.",
+      "reviews": [
+        {
+          "review_id": "rev_8d1d8777a07409356594a80b09050ce5",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "1c1cf998878413b18a9260dd697fbf13a4ad0a8cd23451ffd940144dcd88533d",
+          "created_at": "2026-10-21T14:19:25.262611+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "2da7064e489de3de11f26ef63518d739045dff265241f6821d30ce01dc12a6eb",
+      "evidence_id": "ev_assisted_attempt_1_18",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "94dcbe6bbe73592938439f0362b7537b40bff9c50265091fd1bfbd87f6d43918",
+        "material_version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/README.md"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream is configured with meson and built with ninja, then installed as a desktop binary launched with io.elementary.calendar.",
+      "reviews": [
+        {
+          "review_id": "rev_2ffd05c435b2bbe4a14e6da576f8463b",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "2da7064e489de3de11f26ef63518d739045dff265241f6821d30ce01dc12a6eb",
+          "created_at": "2026-10-21T14:19:25.264333+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "055728f81968fcc78083b2afe86bede6edd3d18f31e5a70e3a505ed733907e2d",
+      "evidence_id": "ev_assisted_attempt_1_19",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "0ae0485a5bd37a63e63603596417e4eb0e653334fa6c7f932ca3a0e85d4af227",
+        "material_version": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "url": "https://github.com/elementary/calendar/blob/14ee18015422bf195cd0df1cbab7170525166f9a/COPYING"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The upstream project ships the GNU General Public License version 3 text (29 June 2007).",
+      "reviews": [
+        {
+          "review_id": "rev_a60d9cf34a0c102fc6512afb00444005",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "055728f81968fcc78083b2afe86bede6edd3d18f31e5a70e3a505ed733907e2d",
+          "created_at": "2026-10-21T14:19:25.266104+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "2085a5eb0bfc0257c65e147bbe65819cef96b6d2e5dfb0b5728aaa93aa33e01f",
+      "evidence_id": "ev_assisted_attempt_1_2",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "file_digest": "7865b6d05ae3e8f4e8e1ba551a1f4865269be421d2eddb7755991f8660526735",
+        "line_end": 143,
+        "line_start": 142,
+        "path": "src/Grid/Grid.vala"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Before the day widgets are rebuilt the code asserts new_dates.size % 7 == 0, so the displayed date range is always a whole number of seven-day weeks.",
+      "reviews": [
+        {
+          "review_id": "rev_ffcd732b8a6369860bdedfd488cd6a4a",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "2085a5eb0bfc0257c65e147bbe65819cef96b6d2e5dfb0b5728aaa93aa33e01f",
+          "created_at": "2026-10-21T14:19:25.267904+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "9abb461feb5982f6e01c8386b5975411d682d25e00b98f71627b1194cb037840",
+      "evidence_id": "ev_assisted_attempt_1_3",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "file_digest": "7865b6d05ae3e8f4e8e1ba551a1f4865269be421d2eddb7755991f8660526735",
+        "line_end": 180,
+        "line_start": 147,
+        "path": "src/Grid/Grid.vala"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Day cells are laid out with the column counter wrapping modulo 7 and the row counter incremented on the wrap, so a month frame is seven columns by N week rows.",
+      "reviews": [
+        {
+          "review_id": "rev_9f2301468611f61c7dc1477b60685446",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "9abb461feb5982f6e01c8386b5975411d682d25e00b98f71627b1194cb037840",
+          "created_at": "2026-10-21T14:19:25.269597+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "ac544563d100012663e1308179e06626f134657246d67dc135cdb7eaa3dedde7",
+      "evidence_id": "ev_assisted_attempt_1_4",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "file_digest": "7865b6d05ae3e8f4e8e1ba551a1f4865269be421d2eddb7755991f8660526735",
+        "line_end": 222,
+        "line_start": 216,
+        "path": "src/Grid/Grid.vala"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "add_event walks every day cell and attaches the component to each cell for which Calendar.Util.ecalcomponent_is_on_day (event, grid_day.date) holds, so one event can be attached to several day cells at once.",
+      "reviews": [
+        {
+          "review_id": "rev_b1d06100bb0e10fc842d070debce86fa",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "ac544563d100012663e1308179e06626f134657246d67dc135cdb7eaa3dedde7",
+          "created_at": "2026-10-21T14:19:25.271377+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "1357b9730a2d012af5b1517f063c09b989212ad53d4f40a757f9a2a0d3a980a9",
+      "evidence_id": "ev_assisted_attempt_1_5",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "file_digest": "7865b6d05ae3e8f4e8e1ba551a1f4865269be421d2eddb7755991f8660526735",
+        "line_end": 247,
+        "line_start": 237,
+        "path": "src/Grid/Grid.vala"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "update_event adds the component to the cells it now belongs to and removes it from every other cell, so an edited or moved event leaves the cells it no longer touches.",
+      "reviews": [
+        {
+          "review_id": "rev_b7d205797a9fe54fc83bffaf3272aad4",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "1357b9730a2d012af5b1517f063c09b989212ad53d4f40a757f9a2a0d3a980a9",
+          "created_at": "2026-10-21T14:19:25.273120+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "4bdfa77fd8dd46c4dc6f8445a74294f4e8f58d8a0319fe0f9f3278a6e27dfbec",
+      "evidence_id": "ev_assisted_attempt_1_6",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "file_digest": "7865b6d05ae3e8f4e8e1ba551a1f4865269be421d2eddb7755991f8660526735",
+        "line_end": 111,
+        "line_start": 103,
+        "path": "src/Grid/Grid.vala"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The focused day is written into Maya.Application.saved_state as 'selected-day' and the store's displayed month is switched when the focused day lies in another month.",
+      "reviews": [
+        {
+          "review_id": "rev_3d2d3516e154fd263e1fbcd909e8eefa",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "4bdfa77fd8dd46c4dc6f8445a74294f4e8f58d8a0319fe0f9f3278a6e27dfbec",
+          "created_at": "2026-10-21T14:19:25.274859+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "6143379f6f6778b3ac688306f51cc55bdcee4a26d2f30446199de0e810610ee7",
+      "evidence_id": "ev_assisted_attempt_1_7",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "file_digest": "62a413a504dc10505b795f655aaab507c2051a2507946d679d4880ba45984d98",
+        "line_end": 127,
+        "line_start": 112,
+        "path": "src/Grid/GridDay.vala"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Each day cell keeps its event buttons in a hash table keyed by the event UID, replacing any earlier button with the same UID, so distinct events - including two that overlap in time - coexist in one cell.",
+      "reviews": [
+        {
+          "review_id": "rev_327cf85c61acb8572e5b37e019961801",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "6143379f6f6778b3ac688306f51cc55bdcee4a26d2f30446199de0e810610ee7",
+          "created_at": "2026-10-21T14:19:25.276612+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "b001506cfd4f3af3024abc534f0eb8f9b56e637d80df1603c54230ee0ab7865c",
+      "evidence_id": "ev_assisted_attempt_1_8",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "file_digest": "62a413a504dc10505b795f655aaab507c2051a2507946d679d4880ba45984d98",
+        "line_end": 149,
+        "line_start": 143,
+        "path": "src/Grid/GridDay.vala"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "remove_event drops an event from the cell by looking up its UID in that same per-cell table.",
+      "reviews": [
+        {
+          "review_id": "rev_1caec4e9fa29c44a6796cb9cc9d14308",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "b001506cfd4f3af3024abc534f0eb8f9b56e637d80df1603c54230ee0ab7865c",
+          "created_at": "2026-10-21T14:19:25.278394+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "7bf025c95828d44d6fe1ff77e7fff1ff5851bfd898a0d7e1aeefd4de29e7621b",
+      "evidence_id": "ev_assisted_attempt_1_9",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+        "file_digest": "62a413a504dc10505b795f655aaab507c2051a2507946d679d4880ba45984d98",
+        "line_end": 169,
+        "line_start": 163,
+        "path": "src/Grid/GridDay.vala"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "A double click on a day cell (n_press == 2) emits on_event_add with that cell's date, which is the entry point for creating an event on the grid.",
+      "reviews": [
+        {
+          "review_id": "rev_7473899f7edb27e422318bc4b1eba1dc",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "7bf025c95828d44d6fe1ff77e7fff1ff5851bfd898a0d7e1aeefd4de29e7621b",
+          "created_at": "2026-10-21T14:19:25.280299+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "digest": "592a390e70deff100f078cbdc7e005a68dfd23e400719c293bb2f0e497cc02c9",
+      "evidence_id": "ev_assisted_attempt_1_design",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "上游未运行",
+          "辅助静态独审通过，运行未验证",
+          "Only the month frame is implemented; there is no day, week, agenda or year view, and the upstream week-number toggle is deliberately not reproduced.",
+          "Rescheduling is done through the editor's date-time fields rather than by dragging a block to another day, so the upstream drag-and-drop reschedule is not reproduced.",
+          "The upstream Evolution Data Server / iCalendar source layer, calendar colours, calendars sidebar, context menus and libical interop are out of scope; the store is one local JSON document.",
+          "All instants use a fixed UTC+08:00 offset with no daylight-saving handling and no time-zone switch, so appointments do not follow a machine zone change.",
+          "There is no undo/redo, no search, no import/export, no recurring event, no all-day mode, no reminders, no attendee or invitation data.",
+          "The widget-tree half of the acceptance probe is reported as NOT_RUN on a machine without a graphical display; the model/store half still runs there.",
+          "The target code is not present in this workspace, so the probe is expected to fail loudly rather than pass until the implementation is written.",
+          "No upstream code was copied; the GPL-3.0 upstream project was read as a structural reference only."
+        ],
+        "depends_on": [
+          "ev_assisted_attempt_1_1",
+          "ev_assisted_attempt_1_2",
+          "ev_assisted_attempt_1_3",
+          "ev_assisted_attempt_1_4",
+          "ev_assisted_attempt_1_5",
+          "ev_assisted_attempt_1_6",
+          "ev_assisted_attempt_1_7",
+          "ev_assisted_attempt_1_8",
+          "ev_assisted_attempt_1_9",
+          "ev_assisted_attempt_1_10",
+          "ev_assisted_attempt_1_11",
+          "ev_assisted_attempt_1_12",
+          "ev_assisted_attempt_1_13",
+          "ev_assisted_attempt_1_14",
+          "ev_assisted_attempt_1_15",
+          "ev_assisted_attempt_1_16",
+          "ev_assisted_attempt_1_17",
+          "ev_assisted_attempt_1_18",
+          "ev_assisted_attempt_1_19"
+        ],
+        "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Target proposal: implement the leaf as a single-user desktop GUI application in Python 3 using only the standard library - Tkinter for the seven-column month frame, the day cells, the event blocks and the appointment editor - with one local JSON document as the persistent store, a fixed UTC+08:00 offset and no accounts, sync, recurrence, all-day mode or notifications; the upstream elementary/calendar project (GPL-3.0) is used only as a structural reference for the grid and event model and no upstream code is copied.",
+      "reviews": [
+        {
+          "review_id": "rev_9c663b56c37d8cd2d9c3016ef3c66a79",
+          "outcome": "accepted",
+          "reviewer": "ses_ea14831acffem4IV0xiG3MuTxV",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "592a390e70deff100f078cbdc7e005a68dfd23e400719c293bb2f0e497cc02c9",
+          "created_at": "2026-10-21T14:19:25.282242+00:00"
+        }
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "adopted_scope": [
+        "month-grid-frame: a single-window month frame of exactly 7 weekday columns by 4-6 week rows for the visible month, with a header that names the month and offers previous/next controls that move exactly one month (with year rollover) and re-render, including backwards into past months.",
+        "appointment-editor: an editor for one appointment carrying title, start date-time, end date-time and optional location and notes, which refuses a save whose end is not strictly after its start, or whose title is blank, and writes nothing on refusal.",
+        "span-and-overlap-rendering: each appointment is rendered as a block on every day its half-open [start,end) span touches, including across a month boundary, while overlapping appointments are shown side by side and never rejected.",
+        "edit-reschedule-delete: opening an existing block and changing its title, times, location or notes moves the block to the new slot, and deleting a record removes it from the grid and from the store while leaving other records untouched.",
+        "local-persistent-store: a single local JSON document per user holds the schedule, is written atomically, survives application restart, and is read back on launch without being rewritten."
+      ],
+      "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+      "case_revision": 2,
+      "evidence_ids": [
+        "ev_assisted_attempt_1_1",
+        "ev_assisted_attempt_1_2",
+        "ev_assisted_attempt_1_3",
+        "ev_assisted_attempt_1_4",
+        "ev_assisted_attempt_1_5",
+        "ev_assisted_attempt_1_6",
+        "ev_assisted_attempt_1_7",
+        "ev_assisted_attempt_1_8",
+        "ev_assisted_attempt_1_9",
+        "ev_assisted_attempt_1_10",
+        "ev_assisted_attempt_1_11",
+        "ev_assisted_attempt_1_12",
+        "ev_assisted_attempt_1_13",
+        "ev_assisted_attempt_1_14",
+        "ev_assisted_attempt_1_15",
+        "ev_assisted_attempt_1_16",
+        "ev_assisted_attempt_1_17",
+        "ev_assisted_attempt_1_18",
+        "ev_assisted_attempt_1_19",
+        "ev_assisted_attempt_1_design"
+      ],
+      "exclusions": [
+        "Only the month frame is implemented; there is no day, week, agenda or year view, and the upstream week-number toggle is deliberately not reproduced.",
+        "Rescheduling is done through the editor's date-time fields rather than by dragging a block to another day, so the upstream drag-and-drop reschedule is not reproduced.",
+        "The upstream Evolution Data Server / iCalendar source layer, calendar colours, calendars sidebar, context menus and libical interop are out of scope; the store is one local JSON document.",
+        "All instants use a fixed UTC+08:00 offset with no daylight-saving handling and no time-zone switch, so appointments do not follow a machine zone change.",
+        "There is no undo/redo, no search, no import/export, no recurring event, no all-day mode, no reminders, no attendee or invitation data.",
+        "The widget-tree half of the acceptance probe is reported as NOT_RUN on a machine without a graphical display; the model/store half still runs there.",
+        "The target code is not present in this workspace, so the probe is expected to fail loudly rather than pass until the implementation is written.",
+        "No upstream code was copied; the GPL-3.0 upstream project was read as a structural reference only."
+      ],
+      "reason": "Create, read, edit, reschedule and delete your own titled appointments with a start and an end date-time in a fixed UTC+08:00 offset and optional location and notes, shown on a real seven-column month grid whose schedule is persisted locally across restarts and navigable back into past months.",
+      "scenario_id": "scn_02914f6fcd344568a566187c9724dfba",
+      "scenario_revision": 1,
+      "workflow_support": []
+    }
+  ],
+  "source_snapshots": [
+    {
+      "archive_sha256": null,
+      "collected_at": "2026-10-21T13:39:29.362323+00:00",
+      "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ],
+      "file_manifest_digest": "d60dc14a4da740ab1c567e28cd1fc1db78aebe14a0c1ce88cea30424969f9629",
+      "files": {
+        "COPYING": "0ae0485a5bd37a63e63603596417e4eb0e653334fa6c7f932ca3a0e85d4af227",
+        "README.md": "94dcbe6bbe73592938439f0362b7537b40bff9c50265091fd1bfbd87f6d43918",
+        "src/Grid/EventButton.vala": "e484f56ac1ed05a16f760edb8b6bcace76a9888ed186e532c8af4892be417eda",
+        "src/Grid/Grid.vala": "7865b6d05ae3e8f4e8e1ba551a1f4865269be421d2eddb7755991f8660526735",
+        "src/Grid/GridDay.vala": "62a413a504dc10505b795f655aaab507c2051a2507946d679d4880ba45984d98",
+        "src/Grid/Header.vala": "b90085667ab410f61dbfa8acc7cd0b66db7234e63f4f8dc74193ceaa0836e30f"
+      },
+      "license": {
+        "notice_hashes": {
+          "COPYING": "0ae0485a5bd37a63e63603596417e4eb0e653334fa6c7f932ca3a0e85d4af227"
+        },
+        "spdx_id": "GPL-3.0",
+        "status": "located"
+      },
+      "license_files": [
+        "COPYING"
+      ],
+      "license_uncertainties": [
+        "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+      ],
+      "repo_id": null,
+      "repository": "https://github.com/elementary/calendar",
+      "snapshot_id": "src_bfad578fc4b6c73747c75a95",
+      "strategy_version": "full-leaf-selected-v2-cf60cfe188fcda2d"
+    }
+  ]
+}

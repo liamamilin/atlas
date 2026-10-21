@@ -1,0 +1,70 @@
+{
+  "observed_at": "2026-10-21T13:48:13.338514+00:00",
+  "progress": {
+    "id": "full-leaf-auxiliary-2026-10-21",
+    "campaign_id": "atlas-v1-first-production-2026-10-19",
+    "phase": "auxiliary-full-full-leaf-auxiliary-2026-10-21",
+    "request_digest": "e8f0a3b11676bac6c9d7ec35b1aa108733e0d5bc161d8b9c192b8f1bd1135cda",
+    "baseline": 99,
+    "max_calls": 7200,
+    "window_seconds": 2592000,
+    "model": "opencode-go/minimax-m3.1-flash-free",
+    "created": 1792589722.814663,
+    "status": "running",
+    "reason": "coordinator active",
+    "started": 1792589744.123177,
+    "deadline": 1795181744.123177,
+    "counts": {
+      "running": 2,
+      "pending": 1785,
+      "reused": 18
+    },
+    "total": 1805,
+    "handled": 18,
+    "attempted": 2,
+    "new_calls": 5,
+    "remaining_calls": 7195,
+    "active_calls": 2,
+    "provider_requests": null,
+    "observed_model": null,
+    "cost": null
+  },
+  "actual_total_cli_sessions": 104,
+  "old_case_identities": 18,
+  "new_case_identities": 0,
+  "new_case_versions": 0,
+  "delivered_stages": [
+    {
+      "path": "items/calendar-application/attempt-1/calls/discovery/cli-summary.json",
+      "requested_model": "opencode-go/minimax-m3.1-flash-free",
+      "observed_model": null,
+      "session_id": "ses_ea15335ceffeL1iOAEN8YC0BAe",
+      "reservation_id": "bud_01dd0a03c0744cbc9139a7d8001dd896",
+      "delivery_status": "delivered",
+      "failure_code": null,
+      "duration_seconds": 222.04
+    },
+    {
+      "path": "items/calendar-application/attempt-1/calls/blueprint-spec-review-aux/cli-summary.json",
+      "requested_model": "opencode-go/minimax-m3.1-flash-free",
+      "observed_model": null,
+      "session_id": "ses_ea14ac7e3ffe4Hppxestk27H3P",
+      "reservation_id": "bud_880b535a71db45a7a3be741ce16d392b",
+      "delivery_status": "failed",
+      "failure_code": "cli_protocol",
+      "duration_seconds": 169.54
+    },
+    {
+      "path": "items/calendar-application/attempt-1/calls/blueprint-generate-aux/cli-summary.json",
+      "requested_model": "opencode-go/minimax-m3.1-flash-free",
+      "observed_model": null,
+      "session_id": "ses_ea14fa2f1ffeWhEu4mA0s4e6G1",
+      "reservation_id": "bud_c32a0199a7954d0a9bb224ccca7b44c7",
+      "delivery_status": "delivered",
+      "failure_code": null,
+      "duration_seconds": 317.83
+    }
+  ],
+  "applications_run": 0,
+  "strict_g1_t08_resumed": false
+}

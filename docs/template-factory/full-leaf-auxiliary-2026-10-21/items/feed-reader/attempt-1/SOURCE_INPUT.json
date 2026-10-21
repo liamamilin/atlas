@@ -1,0 +1,135 @@
+{
+ "scenario": {
+  "name": "Morning triage of a self-hosted subscription list",
+  "audience": "One individual reader running Miniflux on their own server, following about twenty blogs and news feeds",
+  "objective": "Keep a personal list of feeds, let new items arrive on their own, and clear the unread backlog each morning while keeping the list portable",
+  "workflow": [
+   "Add sources: submit a site or feed URL, or import an OPML file, placing each feed in a category; the user's list is the only selector of what may appear.",
+   "Intake: the background scheduler refreshes each subscribed feed on its own interval (default polling 1h, honoring feed TTL and ETag/Last-Modified), parses RSS, Atom or JSON Feed, and stores newly published items attributed to their feed with status unread.",
+   "Triage: open the Unread view to see what arrived, with per-feed and total unread counts, then open an item to read it in the reader view with previous/next navigation through already-read items.",
+   "Record state: mark entries read (one by one, per feed or category, or mark all as read) and star the keepers, since starred is a separate flag from unread/read.",
+   "Maintain: export the subscription list as OPML to carry it to another reader, and re-import that file to restore the same feeds."
+  ],
+  "acceptance": [
+   "A newly published item shows up in the Unread view after a scheduled refresh, carries its feed's title and canonical link, and is listed only once because the item identifier is already known.",
+   "Marking an item read removes it from the Unread view and lowers the shown unread count, while an item that was starred keeps its starred flag after being read and still appears in the starred list.",
+   "Exporting the subscription list yields one OPML outline per subscribed feed with its xmlUrl inside its category outline, and importing that file back recreates the same subscriptions without duplicates."
+  ]
+ },
+ "fixed_scope": null,
+ "delivery_profile": "service",
+ "source": {
+  "repository": "https://github.com/miniflux/v2",
+  "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+  "strategy_version": "full-leaf-selected-v2-88a755a184064577",
+  "collected_at": "2026-10-21T15:31:18.647547+00:00",
+  "files": {
+   "LICENSE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+   "README.md": "2a18e492d96193f6bb1122bd493944e07987920a06005a48651c304e310a4a48",
+   "internal/model/entry.go": "3b64600f275b86eff3f1b9ac35d27e0d9af284aa3f475b4c420c640be77b4ca3",
+   "internal/model/feed.go": "2e5c1759aea79a8c37be8b1fa8d7265ebb7ac178e411df7b9af43628e31b78dd",
+   "internal/reader/handler/handler.go": "f99ab981dcacd062d87362e330acc9ffa52153964cff95d7efbda32450a41927",
+   "internal/reader/opml/opml.go": "ff7806e6c7417db352a797a13485d0220c89b6eb07a79701723421598289157b",
+   "internal/ui/entry_read.go": "b9afe9f9eda4a902e43812920ce13e7d87b6235433b065bff6b0596884cc874a",
+   "internal/ui/entry_toggle_starred.go": "4d4310b71f6672c9ed36326774a520f03890e3e2939fc135713f51f6f66721e1"
+  },
+  "license_files": [
+   "LICENSE"
+  ],
+  "license": {
+   "status": "located",
+   "spdx_id": "Apache-2.0",
+   "notice_hashes": {
+    "LICENSE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+   }
+  },
+  "license_uncertainties": [
+   "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+  ],
+  "excluded_paths": [
+   "Unselected files; upstream not installed or run"
+  ]
+ },
+ "source_ids": {
+  "requirements": {
+   "atlas:b91e3b12c150b30bf7f6c5ae36b7e8086249a75b211c14347f67c6fd308df2a8": "leaf.md",
+   "scenario:9bb999639e8a90cfd3f95ec4972423b9a5ae2b718a346937f19cc231c3414ec3": "fixed scenario"
+  },
+  "upstream": {
+   "upstream:2e18fd4131f0c86c2979749be54014bd0d5b9280d1a919ccdc70e02a57b11af9": {
+    "path": "LICENSE",
+    "repository": "https://github.com/miniflux/v2",
+    "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da"
+   },
+   "upstream:66347612d4a33b59f695d199a3e1f82a4baa3cfe2ae4233a9607e5e9b9288b28": {
+    "path": "README.md",
+    "repository": "https://github.com/miniflux/v2",
+    "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da"
+   },
+   "upstream:b9b1045380d26694afcdbb677e2c3233d48763182a1982819ba6b67b6726e2ee": {
+    "path": "internal/model/entry.go",
+    "repository": "https://github.com/miniflux/v2",
+    "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da"
+   },
+   "upstream:b8dd589c8a201156c0e3d3ea38d3a39d714198c60d2daff773bc4a3109c27cb4": {
+    "path": "internal/model/feed.go",
+    "repository": "https://github.com/miniflux/v2",
+    "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da"
+   },
+   "upstream:7bb311aa259d91018897c821b5a517a9f9a174f57b62df38daaa6bf3c028672c": {
+    "path": "internal/reader/handler/handler.go",
+    "repository": "https://github.com/miniflux/v2",
+    "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da"
+   },
+   "upstream:501d5a3441bd7295da00a0e0d00a55b54cb7e11eeb81975cfbfe62e0039bc66f": {
+    "path": "internal/reader/opml/opml.go",
+    "repository": "https://github.com/miniflux/v2",
+    "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da"
+   },
+   "upstream:e9ffb5d218b7750c8e43d34ce409d08324c0f17ca8a9e8e3dd455675c4e0478d": {
+    "path": "internal/ui/entry_read.go",
+    "repository": "https://github.com/miniflux/v2",
+    "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da"
+   },
+   "upstream:914bb74c617eba76135d109f911590c3c5a99305564e75dc86b7811b0a82f13b": {
+    "path": "internal/ui/entry_toggle_starred.go",
+    "repository": "https://github.com/miniflux/v2",
+    "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da"
+   }
+  }
+ },
+ "inventory": [
+  {
+   "path": "LICENSE",
+   "lines": 177
+  },
+  {
+   "path": "README.md",
+   "lines": 148
+  },
+  {
+   "path": "internal/model/entry.go",
+   "lines": 101
+  },
+  {
+   "path": "internal/model/feed.go",
+   "lines": 325
+  },
+  {
+   "path": "internal/reader/handler/handler.go",
+   "lines": 381
+  },
+  {
+   "path": "internal/reader/opml/opml.go",
+   "lines": 181
+  },
+  {
+   "path": "internal/ui/entry_read.go",
+   "lines": 74
+  },
+  {
+   "path": "internal/ui/entry_toggle_starred.go",
+   "lines": 21
+  }
+ ]
+}

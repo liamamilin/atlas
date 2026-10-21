@@ -1,0 +1,31 @@
+{
+ "repository": "https://github.com/johnfactotum/foliate",
+ "files": [
+  "COPYING",
+  "README.md",
+  "src/data.js",
+  "src/utils.js",
+  "src/book-viewer.js",
+  "src/reader/reader.js"
+ ],
+ "rationale": "Foliate (GPL-3.0, COPYING) is an open file-based desktop e-book reader built with GJS/GTK4 that matches the leaf's defining core: one opened book, a paginated or scrolled reading surface (src/reader/reader.js sets flow to 'paginated' or 'scrolled'), in-book movement (prev/next/goLeft/goRight/scrollUp/scrollDown), and a per-book position persisted outside the session: src/data.js keys each book to its own JSON file through src/utils.js JSONStorage, while src/book-viewer.js writes 'progress' and 'lastLocation' (an EPUB CFI, i.e. a text anchor) on every relocation and restores it when the book is opened again. Small source surface, no store, no accounts.",
+ "reuse_case_id": null,
+ "delivery_profile": "desktop",
+ "scenario": {
+  "name": "Resume a book exactly where reading stopped",
+  "audience": "A person reading one long-form EPUB over several sittings on a Linux desktop",
+  "objective": "Reopen the same book days later and land on the exact passage where reading stopped, even after the typography changed",
+  "workflow": [
+   "Open one EPUB from the file chooser; it renders as a paginated reading surface with a progress slider and table of contents",
+   "Turn pages or scroll to read; each relocation updates that book's own JSON file with progress and the CFI of the current position",
+   "Close the application, then reopen the same file",
+   "Change font size or margins; the book re-paginates but the saved position still points at the same text"
+  ],
+  "acceptance": [
+   "Reopening the same EPUB restores the same passage (CFI), not merely a similar percentage",
+   "Each book keeps its own position: a second book opens at its own last position, unaffected by the first",
+   "The stored position is a text anchor, so it survives a font-size change that alters the page count",
+   "Page turns and the progress slider visibly change the position value stored in that book's JSON file"
+  ]
+ }
+}

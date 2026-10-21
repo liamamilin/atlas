@@ -1,0 +1,87 @@
+{
+ "observed_at": 1792596665.482649,
+ "stage": "real_validation_started",
+ "source_ci": {
+  "sha": "71ef44aee955aec6de8eb340bd7f456beda77361",
+  "run_id": 39624858703,
+  "url": "https://github.com/liamamilin/atlas/actions/runs/39624858703",
+  "status": "completed",
+  "conclusion": "success",
+  "updated_at": "2026-10-21T15:28:16Z"
+ },
+ "plan": {
+  "id": "full-leaf-auxiliary-2026-10-21",
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "phase": "auxiliary-full-full-leaf-auxiliary-2026-10-21",
+  "request_digest": "e8f0a3b11676bac6c9d7ec35b1aa108733e0d5bc161d8b9c192b8f1bd1135cda",
+  "baseline": 99,
+  "max_calls": 7200,
+  "window_seconds": 2592000,
+  "model": "opencode-go/minimax-m3.1-flash-free",
+  "created": 1792589722.814663,
+  "status": "running",
+  "reason": "coordinator active",
+  "started": 1792589744.123177,
+  "deadline": 1795181744.123177,
+  "counts": {
+   "failed": 2,
+   "ready_not_run": 1,
+   "pending": 1782,
+   "running": 2,
+   "reused": 18
+  },
+  "total": 1805,
+  "handled": 21,
+  "attempted": 5,
+  "new_calls": 11,
+  "remaining_calls": 7189,
+  "active_calls": 2,
+  "provider_requests": null,
+  "observed_model": null,
+  "cost": null
+ },
+ "gate": {
+  "created_at": 1792596563.4084532,
+  "initial_states": {
+   "calendar-application": "ready_not_run",
+   "dictionary-application": "pending",
+   "e-book-reader": "pending",
+   "expense-tracking-application": "paused",
+   "feed-reader": "pending"
+  },
+  "leaves": [
+   "calendar-application",
+   "expense-tracking-application",
+   "dictionary-application",
+   "feed-reader",
+   "e-book-reader"
+  ],
+  "mode": "validation",
+  "status": "ready"
+ },
+ "calendar_replay": {
+  "results": [
+   {
+    "leaf": "calendar-application",
+    "artifact_id": "tpl_bbc868df7d214cd4844df7f8fc42554d",
+    "model_calls_added": 0,
+    "historical_adoption": true
+   }
+  ],
+  "new_calls": 0
+ },
+ "initial_failed_leaf_isolation": {
+  "expense_state": "failed",
+  "continued_running_leaves": [
+   "dictionary-application",
+   "feed-reader"
+  ]
+ },
+ "process": {
+  "pid": 30673,
+  "started": 1792596564.52251,
+  "cwd": "/Users/milin/2026/软件开发/application-atlas",
+  "plan_id": "full-leaf-auxiliary-2026-10-21",
+  "source_commit": "71ef44aee955aec6de8eb340bd7f456beda77361"
+ }
+}

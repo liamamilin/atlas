@@ -34,3 +34,11 @@ cat docs/template-factory/full-leaf-auxiliary-2026-10-21/PROGRESS.json
 SOURCE/CASE/模板绑定与标准包由正式服务完成。已有18份及六应用不重建。实际状态由PROGRESS、RESULTS和CALL_LEDGER分别给出已尝试、已处理、可用、失败、未开始、在途与暂停。handled包括明确的失败终态，覆盖率仅按不同叶子的reused/ready_not_run算。
 
 历史严格G1/T08仍blocked/未启动；全量任务不改变其grant/修复/期限。新增模板只代表辅助独立静态审阅，不代表上游运行、目标应用运行或正式严格发布。
+
+## 最新 workflow 门禁
+
+用户要求先在少量叶子上验证自动执行、恢复、自动接续，当前全量派发保持暂停。新宿主源码通过精确CI并追加 host revision 后，先用 `workflow-validation --leaf ...` 登记固定验证清单，`workflow-replay --leaf calendar-application` 校验已有完成项不新增调用，再 resume/start。验证模式在预算预留事务中限制范围，不仅过滤内存列表；缺门禁不能启动。
+
+具体清单及最新状态见 `../workflow-hardening-2026-10-21/WORK_PACKAGE.md` 和该目录真实回执。验证清单完成后协调者自动暂停。仅当真实新产物的八步、摘要与下载均通过，恢复/失败隔离证据完整时，使用 `workflow-open-full --evidence <真实验证报告JSON>` 正式开放全量；不能把旧模板接纳或fixture当新产物通过。开放门禁本身不启动模型，仍需原计划resume/start。原30天窗口、账本和失败保持。
+
+只读进度：`http://127.0.0.1:5188/factory?view=workflow`；接口 `/api/factory/auxiliary-workflows` 及 `/<plan_id>?offset=0&limit=20&state=&q=`。步骤产物下载仅允许正式记录中摘要吻合的文件，不能传任意路径。

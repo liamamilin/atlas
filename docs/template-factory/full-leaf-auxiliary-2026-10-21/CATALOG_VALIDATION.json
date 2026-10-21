@@ -1,0 +1,113 @@
+{
+ "observed_at": 1792593868.1866932,
+ "catalog_counts": {
+  "total": 20,
+  "core_verified": 6,
+  "not_run": 14,
+  "usable": 19,
+  "needs_revision": 1
+ },
+ "old_usable_downloads_unchanged": [
+  "tpl_320ad3f159624ee18ff7fa3ebb0ff59b",
+  "tpl_ae75820e56d148ca98ecab408a68ad92",
+  "tpl_d02ead780fca4ec584f924b159ccea09",
+  "tpl_ac5ce1eedef94a539fe2047e60754416",
+  "tpl_47afbb4ac70d4dc1be628047b75e89ca",
+  "tpl_b21313b1dac44e3db298d0370cfbb75b",
+  "tpl_e1761c3db0a941348f9a97fb47c279b3",
+  "tpl_d4404c1ab4c8429db472a572e412d04b",
+  "tpl_cfeddf44187a403ba0148e3264c5627d",
+  "tpl_31f54a064df949379ae9450a27c2858a",
+  "tpl_de2df547557e4539a91c4d7e93542ff3",
+  "tpl_26a70025f25141cb971a629d978fe42c",
+  "tpl_b91f50c7d8c741aa8d04715852f8effa",
+  "tpl_a7f570f681834f778db88dfe41d1b631",
+  "tpl_737c65d52051433ab3510b8f148494ee",
+  "tpl_6949040b690c40b3ad7415eec367242c",
+  "tpl_c4f9d29ee90e4ddebd300f34d66666cb",
+  "tpl_d3c38917d0404fa98b984955adde3e11"
+ ],
+ "new_calendar": {
+  "artifact_id": "tpl_bbc868df7d214cd4844df7f8fc42554d",
+  "digest": "fb29d55db827392a683aacc0c3c49e24f7ae2b60181caa4868127e9756da2c5f",
+  "key": "calendar-application-attempt-1",
+  "production": {
+   "mode": "opencode-cli-go",
+   "model": "opencode-go/minimax-m3.1-flash-free",
+   "review_status": "passed",
+   "review_input_digest": "25adf1f3431fc66dd3347e6b2896aad3f8f2b1eb6b36e50088f8cd3a79eac13b"
+  },
+  "title": "Personal Month-Grid Calendar (single-user desktop)",
+  "leaf": "calendar-application",
+  "scenario": {
+   "id": "scn_02914f6fcd344568a566187c9724dfba",
+   "revision": 1,
+   "name": "Personal Month-Grid Calendar (single-user desktop)",
+   "audience": "A single local user on one machine who manages only their own appointments. No accounts, no sharing, no sync, no second calendar for anyone else.",
+   "objective": "Create, read, edit, reschedule and delete your own titled appointments with a start and an end date-time in a fixed UTC+08:00 offset and optional location and notes, shown on a real seven-column month grid whose schedule is persisted locally across restarts and navigable back into past months.",
+   "workflow": [
+    "Open the app: a month frame renders 7 weekday columns by 4-6 week rows for the current month, with a header showing the month and previous/next controls.",
+    "Double-click an empty day cell (or use the new-appointment action), type a title, set start and end date-time, optionally location and notes, then save.",
+    "The appointment appears as a block on the grid in every month its [start,end) span touches; overlapping appointments are all shown, never rejected.",
+    "Open the block, change title, time, location or notes, or reschedule it to another day and time; save and see the block move.",
+    "Use the header arrows to step to the next or previous month and again to return to a past month; the frame re-renders with that month's events.",
+    "Delete the appointment from the editor (probe-created records only) and confirm it disappears from the grid and the store.",
+    "Close and reopen the app: the appointments are still listed and navigating back to a past month still shows them."
+   ]
+  },
+  "capabilities": [
+   "month-grid-frame: a single-window month frame of exactly 7 weekday columns by 4-6 week rows for the visible month, with a header that names the month and offers previous/next controls that move exactly one month (with year rollover) and re-render, including backwards into past months.",
+   "appointment-editor: an editor for one appointment carrying title, start date-time, end date-time and optional location and notes, which refuses a save whose end is not strictly after its start, or whose title is blank, and writes nothing on refusal.",
+   "span-and-overlap-rendering: each appointment is rendered as a block on every day its half-open [start,end) span touches, including across a month boundary, while overlapping appointments are shown side by side and never rejected.",
+   "edit-reschedule-delete: opening an existing block and changing its title, times, location or notes moves the block to the new slot, and deleting a record removes it from the grid and from the store while leaving other records untouched.",
+   "local-persistent-store: a single local JSON document per user holds the schedule, is written atomically, survives application restart, and is read back on launch without being rewritten."
+  ],
+  "limits": [
+   "辅助试产，非严格G1/T08。",
+   "Only the month frame is implemented; there is no day, week, agenda or year view, and the upstream week-number toggle is deliberately not reproduced.",
+   "Rescheduling is done through the editor's date-time fields rather than by dragging a block to another day, so the upstream drag-and-drop reschedule is not reproduced.",
+   "The upstream Evolution Data Server / iCalendar source layer, calendar colours, calendars sidebar, context menus and libical interop are out of scope; the store is one local JSON document.",
+   "All instants use a fixed UTC+08:00 offset with no daylight-saving handling and no time-zone switch, so appointments do not follow a machine zone change.",
+   "There is no undo/redo, no search, no import/export, no recurring event, no all-day mode, no reminders, no attendee or invitation data.",
+   "The widget-tree half of the acceptance probe is reported as NOT_RUN on a machine without a graphical display; the model/store half still runs there.",
+   "The target code is not present in this workspace, so the probe is expected to fail loudly rather than pass until the implementation is written.",
+   "No upstream code was copied; the GPL-3.0 upstream project was read as a structural reference only."
+  ],
+  "cases": [
+   {
+    "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+    "revision": 2,
+    "digest": "4981f844eb6c28caaa9c655af6beeba3fe310603d99aa45124e89660243a4925",
+    "app_id": "app:repo:a3c224f4e8853132841e9ddd",
+    "sources": [
+     {
+      "repository": "https://github.com/elementary/calendar",
+      "commit_sha": "14ee18015422bf195cd0df1cbab7170525166f9a",
+      "license_files": [
+       "COPYING"
+      ]
+     }
+    ]
+   }
+  ],
+  "runtime": {
+   "status": "not_run",
+   "scope": "OpenCode Go 研究与生成、独立会话静态审阅；应用尚未开发或运行。",
+   "kind": "辅助模型生产，非严格工厂验收",
+   "online_status": "not_checked",
+   "strict_acceptance": false
+  },
+  "files": {
+   "development": {
+    "available": true,
+    "sha256": "c83dc947d26e6f82a93f7d67dde270b4fcddc6378edf1723e958a247153611e4",
+    "url": "/api/factory/assisted-templates/tpl_bbc868df7d214cd4844df7f8fc42554d/files/development"
+   }
+  },
+  "strict_status": {
+   "publication": "draft",
+   "acceptances": []
+  }
+ },
+ "withdrawn_candidate_download_status": 409
+}

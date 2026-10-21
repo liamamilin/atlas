@@ -1,0 +1,158 @@
+{
+ "observed_at": "2026-10-21T14:45:21.335535+00:00",
+ "state": {
+  "id": "full-leaf-auxiliary-2026-10-21",
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "phase": "auxiliary-full-full-leaf-auxiliary-2026-10-21",
+  "request_digest": "e8f0a3b11676bac6c9d7ec35b1aa108733e0d5bc161d8b9c192b8f1bd1135cda",
+  "baseline": 99,
+  "max_calls": 7200,
+  "window_seconds": 2592000,
+  "model": "opencode-go/minimax-m3.1-flash-free",
+  "created": 1792589722.814663,
+  "status": "running",
+  "reason": "coordinator active",
+  "started": 1792589744.123177,
+  "deadline": 1795181744.123177,
+  "counts": {
+   "running": 2,
+   "ready_not_run": 1,
+   "pending": 1784,
+   "reused": 18
+  },
+  "total": 1805,
+  "handled": 19,
+  "attempted": 3,
+  "new_calls": 9,
+  "remaining_calls": 7191,
+  "active_calls": 2,
+  "provider_requests": null,
+  "observed_model": null,
+  "cost": null
+ },
+ "catalog_counts": {
+  "total": 20,
+  "core_verified": 6,
+  "not_run": 14,
+  "usable": 19,
+  "needs_revision": 1
+ },
+ "new_case_identities": [
+  "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a"
+ ],
+ "new_case_versions": 2,
+ "cases_reused_from_before": [
+  "expense-tracking-application"
+ ],
+ "calendar_delivery": {
+  "observed_at": 1792593820.615394,
+  "artifact_id": "tpl_bbc868df7d214cd4844df7f8fc42554d",
+  "url": "http://127.0.0.1:5188/factory?view=artifacts&artifact_id=tpl_bbc868df7d214cd4844df7f8fc42554d",
+  "download_url": "/api/factory/development-downloads/9dd920a53a2c4cad962198c9b392dd5e",
+  "sha256": "c83dc947d26e6f82a93f7d67dde270b4fcddc6378edf1723e958a247153611e4",
+  "case_ref": {
+   "case_id": "case:repo:a3c224f4e8853132841e9ddd:14ee18015422bf195cd0df1cbab7170525166f9a",
+   "revision": 2,
+   "digest": "4981f844eb6c28caaa9c655af6beeba3fe310603d99aa45124e89660243a4925"
+  },
+  "handoff_files_missing": [],
+  "replay_same_artifact": true,
+  "replay_new_calls": 0,
+  "replay_case_versions_added": 0,
+  "calendar_actual_charged_calls": 4,
+  "application_runtime": "not_run",
+  "upstream_runtime": "not_run",
+  "strict_g1_t08_resumed": false,
+  "manifest_entries_verified": {
+   "README.md": "ad77c0bf604cef318f0932d704865516d964196380ec8cf1e27c53cbf795ce54",
+   "AGENT.md": "932f6dd2e007b24377d89196001d9b18564996cda1e189c32edb135ad2a1d6bf",
+   "HANDOFF.md": "023a35e73fd691039f68f84f81583c3410d6153b10ae9d7da36036bafa982fae",
+   "KNOWLEDGE.md": "975b826cdd4255d5452358dcabea6a9bd925bced22df11e5d22f346665f64712",
+   "CURRENT_PHASE.json": "ac0af3140267f0e2bfda1f5f59450fd1a014d5c2b71219acc4051352aae428c6",
+   "PROJECT_DECISIONS.json": "5b38a81c3c5e90279586a5ea94976bfd1c49a8d1b983223a35231429e0a7b2b8",
+   "ACCEPTANCE_CONTRACT.json": "bb396335d07e9fe8cf0660757fa46069242962828704d30e859ede06d54e5bb4",
+   "APP_DELIVERY.md": "64d70b915df319baa6e585ec866a9d15c8597856ea9be9778f3c459a9a31cf93"
+  },
+  "blueprint_files_verified": 20,
+  "note": "Verified actual versioned handoff contract from template_factory/handoff.py. Initial inspection expected obsolete filenames; original inspection retained, no package modification needed."
+ },
+ "process": {
+  "pid": 8077,
+  "started": 1792593662.938768,
+  "cwd": "/Users/milin/2026/软件开发/application-atlas",
+  "plan_id": "full-leaf-auxiliary-2026-10-21",
+  "source_commit": "cfeb8705db6596825927c8af48b09aa002551a36"
+ },
+ "source_ci": {
+  "sha": "cfeb8705db6596825927c8af48b09aa002551a36",
+  "run_id": 39617893359,
+  "url": "https://github.com/liamamilin/atlas/actions/runs/39617893359",
+  "status": "completed",
+  "conclusion": "success",
+  "updated_at": "2026-10-21T14:40:11Z"
+ },
+ "host_revisions": [
+  {
+   "full_plan_id": "full-leaf-auxiliary-2026-10-21",
+   "request_digest": "35a8285fdb81e25e059714b66dac47e90ef7b502030af3aeac18091808521613",
+   "code_sha": "cb10e49a44a0b9fb3ce2a9c46e22077c19fb3885",
+   "previous_host_sha256": {
+    "examples/assisted-trials/produce_all_leaves.py": "33399f1c0b9923d017dfd08cb2b5a4df8c471ba5a91b16f2b7e8f485fc31ecbd",
+    "examples/assisted-trials/full_leaf_profiles.py": "0430e5966a2323d1200b884f86a66a5349bb9d2ca56f085daf335debe24a67a3",
+    "application-atlas-production-pack/template_factory/full_auxiliary.py": "c70b41bb716835b8f0fc7259c58ce9b0acdf7dd725990e4faea6a77a8e956d56",
+    "application-atlas-production-pack/template_factory/budget.py": "3447ab5b608729617cc794007cb41f22d81ae9e33e9ff92bcc5d6f55194a80b9",
+    "examples/assisted-trials/produce_batch.py": "99c17cea63ad133049baee400e7b5d8312813f2c5b57ba70bac6dcf9f7222fb2",
+    "examples/assisted-trials/produce_with_opencode.py": "a6b662e4f1fd53e535c8a523b977fc10dfff665d3df892cac711cfa272deaa71",
+    "examples/assisted-trials/export_trial.py": "8260c24fded4e2bb717517664e67acddb5a171dfe4c4e75f0302d84cd0f44a67"
+   },
+   "new_host_sha256": {
+    "examples/assisted-trials/produce_all_leaves.py": "2773f6541f7e805e7fce71f2c5e1ea13f5de9e7b3425bafb9d4c0c5a69bc36e2",
+    "examples/assisted-trials/full_leaf_profiles.py": "0430e5966a2323d1200b884f86a66a5349bb9d2ca56f085daf335debe24a67a3",
+    "application-atlas-production-pack/template_factory/full_auxiliary.py": "49928212e73858238927ca89c147e9aa6d46467aaac822b33cf355d59a49cee8",
+    "application-atlas-production-pack/template_factory/budget.py": "3447ab5b608729617cc794007cb41f22d81ae9e33e9ff92bcc5d6f55194a80b9",
+    "examples/assisted-trials/produce_batch.py": "34cbcc19ec817c756307a35ca256f4b4b920d0b8ac5cf744aecd618a4b4ddf37",
+    "examples/assisted-trials/produce_with_opencode.py": "a6b662e4f1fd53e535c8a523b977fc10dfff665d3df892cac711cfa272deaa71",
+    "examples/assisted-trials/export_trial.py": "8260c24fded4e2bb717517664e67acddb5a171dfe4c4e75f0302d84cd0f44a67"
+   },
+   "baseline": 99,
+   "max_calls": 7200,
+   "started": 1792589744.123177,
+   "deadline": 1795181744.123177,
+   "registered_at": 1792592359.016638
+  },
+  {
+   "full_plan_id": "full-leaf-auxiliary-2026-10-21",
+   "request_digest": "c1086de6d0bcfe0f42c4c0f7b2fb7ad728f7470507d42badf92e73a0aea72529",
+   "code_sha": "cfeb8705db6596825927c8af48b09aa002551a36",
+   "previous_host_sha256": {
+    "examples/assisted-trials/produce_all_leaves.py": "2773f6541f7e805e7fce71f2c5e1ea13f5de9e7b3425bafb9d4c0c5a69bc36e2",
+    "examples/assisted-trials/full_leaf_profiles.py": "0430e5966a2323d1200b884f86a66a5349bb9d2ca56f085daf335debe24a67a3",
+    "application-atlas-production-pack/template_factory/full_auxiliary.py": "49928212e73858238927ca89c147e9aa6d46467aaac822b33cf355d59a49cee8",
+    "application-atlas-production-pack/template_factory/budget.py": "3447ab5b608729617cc794007cb41f22d81ae9e33e9ff92bcc5d6f55194a80b9",
+    "examples/assisted-trials/produce_batch.py": "34cbcc19ec817c756307a35ca256f4b4b920d0b8ac5cf744aecd618a4b4ddf37",
+    "examples/assisted-trials/produce_with_opencode.py": "a6b662e4f1fd53e535c8a523b977fc10dfff665d3df892cac711cfa272deaa71",
+    "examples/assisted-trials/export_trial.py": "8260c24fded4e2bb717517664e67acddb5a171dfe4c4e75f0302d84cd0f44a67"
+   },
+   "new_host_sha256": {
+    "examples/assisted-trials/produce_all_leaves.py": "f499016a32b01e0b9f4b064a345f1b7700d75e8f11ef2b0979607ec221ecce33",
+    "examples/assisted-trials/full_leaf_profiles.py": "0430e5966a2323d1200b884f86a66a5349bb9d2ca56f085daf335debe24a67a3",
+    "application-atlas-production-pack/template_factory/full_auxiliary.py": "c2d18c4a0610784e33946dab32810cb5eb98c2863bd9453f8d06c6afdecb40fa",
+    "application-atlas-production-pack/template_factory/budget.py": "3447ab5b608729617cc794007cb41f22d81ae9e33e9ff92bcc5d6f55194a80b9",
+    "examples/assisted-trials/produce_batch.py": "34cbcc19ec817c756307a35ca256f4b4b920d0b8ac5cf744aecd618a4b4ddf37",
+    "examples/assisted-trials/produce_with_opencode.py": "a6b662e4f1fd53e535c8a523b977fc10dfff665d3df892cac711cfa272deaa71",
+    "examples/assisted-trials/export_trial.py": "aff84160f3b0826b0c3479f4cc6ec2656fe01adba59e1345d87ee9a8db4b8d28"
+   },
+   "baseline": 99,
+   "max_calls": 7200,
+   "started": 1792589744.123177,
+   "deadline": 1795181744.123177,
+   "registered_at": 1792593662.388387
+  }
+ ],
+ "background_followup": {
+  "id": "atlas",
+  "kind": "heartbeat",
+  "interval": "hourly",
+  "purpose": "Check actual persistent state, remain quiet if unchanged; continue in-scope maintenance and aggregate evidence commits."
+ }
+}
