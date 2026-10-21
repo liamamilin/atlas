@@ -47,6 +47,11 @@ def archive(source, path):
 def export_trial(inputs, destination, name, reuse=False):
     definition = json.loads((inputs / "definition.json").read_text())
     case = json.loads((inputs / "case-record.json").read_text())
+    if definition.get("production", {}).get("full_plan_id"):
+        from produce_all_leaves import verify_full_production
+        verify_full_production(inputs, definition["production"],
+            json.loads((inputs/"AUTHOR_INPUT.json").read_text()),
+            json.loads((inputs/"source-snapshot.json").read_text()))
     if definition.get("production", {}).get("revision_request_digest"):
         from revise_with_opencode import verify_revision
         verify_revision(inputs, definition["production"],
@@ -125,6 +130,9 @@ def export_trial(inputs, destination, name, reuse=False):
     atomic_json(candidate / "inputs/shared-case-record.json", case)
     if definition.get("production"):
         atomic_json(candidate / "inputs/model-production.json", definition["production"])
+    if definition.get("production", {}).get("full_plan_id"):
+        atomic_json(candidate/"inputs/authored-cognition.json", json.loads((inputs/"AUTHOR_INPUT.json").read_text()))
+        atomic_json(candidate/"inputs/source-partitions.json", json.loads((inputs/"SOURCE_INPUT.json").read_text()))
     atomic_json(candidate / "inputs/original-scenario-record.json", original)
     (candidate / "TRIAL_SCOPE.md").write_text(definition["trial_scope"])
     atomic_json(

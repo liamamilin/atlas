@@ -211,6 +211,8 @@ class BudgetLedger:
         with store.connect(True) as con:
             for statement in statements:
                 con.execute(statement)
+            from .full_auxiliary import ensure_schema
+            ensure_schema(con)
             reservation_columns = {row[1] for row in con.execute("PRAGMA table_info(tf_budget_reservation)")}
             if "retry_scope" not in reservation_columns:
                 con.execute("ALTER TABLE tf_budget_reservation ADD COLUMN retry_scope TEXT")
@@ -389,7 +391,10 @@ class BudgetLedger:
         now = float(self.clock())
         auxiliary = con.execute("SELECT window_seconds FROM tf_budget_auxiliary_segment WHERE campaign_id=? AND phase=?",
                                 (self.campaign_id, str(phase))).fetchone()
-        deadline = now + float(auxiliary[0] if auxiliary else self.limits["phase_seconds"])
+        full = con.execute("SELECT window_seconds,deadline FROM auxiliary_full_plan WHERE campaign_id=? AND phase=?", (self.campaign_id, str(phase))).fetchone()
+        if full and full[1] is None:
+            raise FactoryError("full window starts only with controlled reservation", "full_plan_binding",409)
+        deadline = float(full[1]) if full else now + float(auxiliary[0] if auxiliary else self.limits["phase_seconds"])
         con.execute("INSERT INTO tf_budget_phase VALUES(?,?,?,?,?)",
                     (self.campaign_id, phase_key, str(phase), now, deadline))
         return deadline
@@ -410,6 +415,9 @@ class BudgetLedger:
             control = con.execute("SELECT paused FROM tf_budget_control WHERE campaign_id=?", (self.campaign_id,)).fetchone()
             if control and control[0]:
                 raise FactoryError("campaign budget is paused", "budget_paused", 409)
+            from .full_auxiliary import full_reservation_locked
+            full = full_reservation_locked(con, self.campaign_id, str(identity), str(phase), plan_id,
+                                           requested_model, stage, float(self.clock()), kind=kind)
             auxiliary = con.execute("SELECT * FROM tf_budget_auxiliary_segment WHERE campaign_id=? AND phase=?",
                                     (self.campaign_id, str(phase))).fetchone()
             if str(phase).startswith(("auxiliary-revision-", "auxiliary-batch-")) and not auxiliary:
@@ -448,7 +456,10 @@ class BudgetLedger:
             # its deadline source.
             campaign_time_resume = self._time_resume_locked(con, G1_AMENDMENT_PRODUCT, "G1", G1_AMENDMENT_PLAN)
             external_sessions = campaign_time_resume["external_cli_sessions"] if campaign_time_resume else 0
-            if charged + external_sessions >= self.limits["cli_sessions"]:
+            # The new allowance is exclusive to this frozen auxiliary plan.
+            # Old grants/limits remain unchanged and cannot borrow its quota.
+            ceiling = full["baseline"] + full["max_calls"] if full else self.limits["cli_sessions"]
+            if charged + external_sessions >= ceiling:
                 raise FactoryError("campaign CLI session budget exhausted", "budget_exhausted", 409)
             active_limit = self.limits["runtime_concurrency"] if kind == "runtime" else self.limits["production_concurrency"]
             group = "runtime" if kind == "runtime" else "production"

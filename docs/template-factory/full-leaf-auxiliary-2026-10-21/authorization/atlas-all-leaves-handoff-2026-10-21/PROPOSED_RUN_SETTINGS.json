@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.full-leaf-auxiliary-handoff-settings.draft.v1",
+  "status": "proposed_requires_user_instruction_and_formal_registration",
+  "is_running": false,
+  "repository": "liamamilin/atlas",
+  "branch": "codex/stabilize-atlas",
+  "reference_commit": "178d8e2d468d515170c1934804aac436b4b67b62",
+  "scope": "One core scenario auxiliary template for each currently uncovered valid directory leaf",
+  "scope_reconciliation_required": true,
+  "known_baseline": {
+    "valid_leaves": 1805,
+    "covered_distinct_leaves": 18,
+    "remaining_leaves": 1787,
+    "historical_cli_sessions": 99,
+    "historical_global_limit": 500
+  },
+  "requested_model": "opencode-go/minimax-m3.1-flash-free",
+  "model_fallback_authorized": false,
+  "new_cli_session_limit": 7200,
+  "baseline_99_resulting_max_cumulative": 7299,
+  "original_unused_401_is_not_additive": true,
+  "authorization_scope": "Only the formally registered frozen full_plan_id; historical strict G1/T08 not resumed or expanded",
+  "basic_call_estimate": {
+    "new_leaf_calls": 3,
+    "leaf_count": 1787,
+    "estimated_base_calls": 5361,
+    "remaining_recovery_repair_allowance": 1839,
+    "estimate_is_not_success_or_cost_guarantee": true
+  },
+  "max_new_cli_sessions_per_leaf": 6,
+  "max_protocol_recoveries_per_leaf_across_all_stages": 1,
+  "max_content_repair_rounds_per_leaf": 1,
+  "content_repair_requires_fresh_independent_review": true,
+  "reserve_first_pass_before_repair": true,
+  "max_model_concurrency": 2,
+  "batch_size": 20,
+  "estimated_batches_before_local_reconciliation": 90,
+  "auto_continue_between_batches": true,
+  "window_policy": {
+    "inherit_old_pilot_window": false,
+    "if_window_required_days": 30,
+    "anchor": "first_real_cli_call_of_this_full_plan",
+    "resume_resets_anchor": false
+  },
+  "application_development_authorized_by_this_file": false,
+  "new_template_runtime_status": "not_run",
+  "strict_g1_t08_resume": false,
+  "completion_counts_handled_and_usable_separately": true,
+  "old_data_and_evidence_must_be_preserved": true,
+  "canonical_instruction": "CODEX_INSTRUCTION.txt"
+}

@@ -128,7 +128,7 @@ def checkpoint(directory, payload, prompt, cli, budget, source=None, leaf=None, 
     return result
 
 
-def pin_sources(proposal, folder, store):
+def pin_sources(proposal, folder, store, *, namespace=None):
     """Resolve once before download; never let the model assign commit/digests."""
     repository = proposal["repository"]
     repo = github_repo(repository)
@@ -150,7 +150,10 @@ def pin_sources(proposal, folder, store):
                "license_spdx": spdx, "repository_id": metadata["id"],
                "collected_at": datetime.now(timezone.utc).isoformat()}
         fixed_json(pin_path, pin)
-    local = store.root / "sources" / folder.parent.name / folder.name
+    source_root = store.root / "sources"
+    if namespace:
+        source_root = source_root / safe_file(namespace)
+    local = source_root / folder.parent.name / folder.name
     local.mkdir(parents=True, exist_ok=True)
     for name in paths:
         target = local / name
@@ -166,7 +169,7 @@ def pin_sources(proposal, folder, store):
     if not licenses:
         raise ValueError("license text must be among pinned files")
     snapshot = {"repository": repository, "commit_sha": pin["commit_sha"],
-                "strategy_version": "go-auxiliary-selected-files-v1", "collected_at": pin["collected_at"],
+                "strategy_version": ("full-leaf-selected-v2-" + digest(paths)[:16] if namespace else "go-auxiliary-selected-files-v1"), "collected_at": pin["collected_at"],
                 "local_root": str(local.resolve()), "files": files, "license_files": licenses,
                 "license": {"status": "located", "spdx_id": pin["license_spdx"],
                             "notice_hashes": {p: files[p] for p in licenses}},
@@ -176,7 +179,7 @@ def pin_sources(proposal, folder, store):
     return snapshot
 
 
-def validate_generation(value, snapshot):
+def validate_generation(value, snapshot, *, full=False):
     authored, files = value["authored"], value["acceptance_files"]
     for key in ("name", "audience", "objective", "inference", "arch"):
         if not isinstance(authored.get(key), str) or not authored[key].strip():
@@ -184,7 +187,7 @@ def validate_generation(value, snapshot):
     for key in ("workflow", "acceptance", "features", "goals", "gaps"):
         if not isinstance(authored.get(key), list) or not authored[key] or not all(isinstance(x, str) and x.strip() for x in authored[key]):
             raise ValueError("invalid authored " + key)
-    if not 3 <= len(authored["features"]) == len(authored["goals"]) <= 5:
+    if not (1 if full else 3) <= len(authored["features"]) == len(authored["goals"]) <= 5:
         raise ValueError("require 3–5 features, each with an acceptance goal")
     if not isinstance(files, dict) or "probe.py" not in files or len(files) > 5:
         raise ValueError("require acceptance/probe.py and at most five files")
@@ -288,6 +291,9 @@ def has_long_line_truncation(directory):
 
 def verify_production(folder, production, authored, snapshot, *, allow_incomplete_review=False):
     """Recheck real receipts before any case/scene/import write, including reruns."""
+    if production.get("full_plan_id"):
+        from produce_all_leaves import verify_full_production
+        return verify_full_production(folder, production, authored, snapshot)
     if production.get("revision_request_digest"):
         from revise_with_opencode import verify_revision
         return verify_revision(folder, production, authored, snapshot)

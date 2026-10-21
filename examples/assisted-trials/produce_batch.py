@@ -121,7 +121,7 @@ def authored_definition(item, authored, scene, case, snap):
                 {
                     "id": "D01",
                     "question": "首版运行与数据边界？",
-                    "default": "单用户本机、独立SQLite；显式保存，无账户、云端和协作。",
+                    "default": authored.get("execution_default", "单用户本机、独立SQLite；显式保存，无账户、云端和协作。"),
                     "when_to_ask": "确需公网托管或多人数据时先确认，不自行扩展。",
                     "impact": "保护本地数据，避免默认外发。",
                     "status": "assisted default",
@@ -243,7 +243,7 @@ def produce(folder, item, store, base, batch_id):
     payload = {
         "case_id": existing_case["case_id"]
         if existing_case
-        else "case:" + batch_id + ":" + item["key"],
+        else item.get("shared_case_id", "case:" + batch_id + ":" + item["key"]),
         "app_name": authored["repo_name"],
         "source_snapshots": [snap],
         "research": {
