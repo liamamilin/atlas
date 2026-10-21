@@ -127,7 +127,12 @@ class WorkflowRunnerHostTests(unittest.TestCase):
                     "observations": [],
                 }
             write_json(target / "RESULT.json", value)
-            write_json(target / "cli-summary.json", {"session_id": "session-" + stage})
+            write_json(target / "BINDING.json", {"model": MODEL})
+            write_json(target / "cli-summary.json", {
+                "session_id": "session-" + stage,
+                "requested_model": MODEL,
+                "delivery_status": "delivered",
+            })
             service.ledger.finish(reservation["id"], "completed")
             return value
 

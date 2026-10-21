@@ -34,7 +34,7 @@ def request(base, route, body=None):
 
 def authored_definition(item, authored, scene, case, snap):
     model_production = item.get("production_mode") == "opencode-cli-go"
-    origin_note = ("OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+    origin_note = ("OpenCode CLI 研究与编写（渠道与模型见调用记录）；独立会话静态审阅通过，上游和下游应用均未运行。"
                    if model_production else "Codex研究与编写；静态案例未独审、上游未运行。")
     sources = []
     for i, observation in enumerate(case["observations"], 2):
@@ -248,7 +248,7 @@ def produce(folder, item, store, base, batch_id):
         "app_name": authored["repo_name"],
         "source_snapshots": [snap],
         "research": {
-            "summary": ("OpenCode Go静态研究与独立会话审阅；" if production else "Codex静态研究；") + authored["inference"],
+            "summary": ("OpenCode CLI静态研究与独立会话审阅；" if production else "Codex静态研究；") + authored["inference"],
             "scope": authored["objective"],
             "unknowns": [
                 "upstream not_run",
@@ -366,7 +366,7 @@ def produce(folder, item, store, base, batch_id):
         "exported_zip_sha256": hashlib.sha256(
             (p / "atlas-development-package.zip").read_bytes()
         ).hexdigest(),
-        "source": "OpenCode CLI + Go authored and independently reviewed; host persistence/freeze/export/import" if production else "Codex authored; service persistence and existing freeze/export/import",
+        "source": "OpenCode CLI authored and independently reviewed; provider/model preserved in stage records; host persistence/freeze/export/import" if production else "Codex authored; service persistence and existing freeze/export/import",
         "application_runtime": "not_run",
     }
     save(p / "IMPORT_RECEIPT.json", imported)

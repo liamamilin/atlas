@@ -7,6 +7,8 @@ import time
 from .store import FactoryError, digest
 
 MODEL = "opencode-go/minimax-m3.1-flash-free"
+REVISED_MODEL = "open-design/deepseek-v4.1-flash"
+MODEL_SWITCH_AUTHORIZATION = "docs/template-factory/open-design-switch-2026-10-22/authorization/USER_MODEL_SWITCH.txt"
 
 
 def ensure_schema(con):
@@ -236,6 +238,104 @@ class FullAuxiliaryService:
                 "host revision record changed", "full_plan_integrity", 409
             )
         return value["request"]
+
+    @staticmethod
+    def _model_revisions(con, plan_id, row, root=None):
+        """Read and verify the append-only model amendment chain."""
+        events = con.execute(
+            "SELECT body FROM auxiliary_full_event WHERE plan_id=? AND kind='model_revision' ORDER BY id",
+            (plan_id,),
+        ).fetchall()
+        model = MODEL
+        revisions = []
+        original = json.loads(row["request_json"])
+        if digest(original) != row["request_digest"]:
+            raise FactoryError("stored full authorization changed", "full_plan_integrity", 409)
+        if original.get("model") != MODEL:
+            raise FactoryError("initial model binding changed", "full_plan_integrity", 409)
+        for event in events:
+            value = json.loads(event[0])
+            request = value.get("request", {})
+            if digest(request) != value.get("request_digest"):
+                raise FactoryError("model revision record changed", "full_plan_integrity", 409)
+            if revisions or request.get("previous_model") != model or request.get("new_model") != REVISED_MODEL:
+                raise FactoryError("model revision lineage changed", "full_plan_integrity", 409)
+            authorization = request.get("authorization", {})
+            if (authorization.get("path") != MODEL_SWITCH_AUTHORIZATION
+                or not authorization.get("sha256")):
+                raise FactoryError("model revision authorization missing", "full_plan_integrity", 409)
+            if root is not None:
+                auth_path = (root / authorization["path"]).resolve()
+                if (not auth_path.is_relative_to(root.resolve()) or not auth_path.is_file()
+                    or hashlib.sha256(auth_path.read_bytes()).hexdigest() != authorization["sha256"]):
+                    raise FactoryError("model revision authorization changed", "full_plan_integrity", 409)
+            model = request["new_model"]
+            revisions.append(request)
+        if row["model"] != model:
+            raise FactoryError("effective model binding changed", "full_plan_integrity", 409)
+        return model, revisions
+
+    def effective_model(self, plan_id):
+        with self.store.connect() as con:
+            row = con.execute("SELECT * FROM auxiliary_full_plan WHERE id=? AND campaign_id=?", (plan_id, self.campaign_id)).fetchone()
+            if not row:
+                raise FactoryError("full plan not registered", "not_found", 404)
+            return self._model_revisions(con, plan_id, row, self.store.pack.parent)[0]
+
+    def allowed_models(self, plan_id):
+        with self.store.connect() as con:
+            row = con.execute("SELECT * FROM auxiliary_full_plan WHERE id=? AND campaign_id=?", (plan_id, self.campaign_id)).fetchone()
+            if not row:
+                raise FactoryError("full plan not registered", "not_found", 404)
+            _, revisions = self._model_revisions(con, plan_id, row, self.store.pack.parent)
+            return [MODEL] + [x["new_model"] for x in revisions]
+
+    def register_model_revision(self, request):
+        if request.get("schema") != "atlas.full-leaf-model-revision.v1" or not request.get("reason"):
+            raise FactoryError("invalid model revision", "full_plan_binding", 409)
+        plan_id = request.get("full_plan_id")
+        with self.store.connect(True) as con:
+            row = con.execute("SELECT * FROM auxiliary_full_plan WHERE id=? AND campaign_id=?", (plan_id, self.campaign_id)).fetchone()
+            if not row:
+                raise FactoryError("unknown plan", "not_found", 404)
+            root = self.store.pack.parent.resolve()
+            model, revisions = self._model_revisions(con, plan_id, row, root)
+            for value in revisions:
+                if value == request:
+                    receipt = con.execute("SELECT body FROM auxiliary_full_event WHERE plan_id=? AND kind='model_revision' ORDER BY id", (plan_id,)).fetchall()[revisions.index(value)]
+                    return json.loads(receipt[0])["receipt"]
+            if model != MODEL or request.get("previous_model") != model or request.get("new_model") != REVISED_MODEL:
+                raise FactoryError("model revision lineage differs", "full_plan_binding", 409)
+            grant = json.loads(row["request_json"])
+            auth = grant["authorization"]
+            auth_path = (root / auth["path"]).resolve()
+            if (not auth_path.is_relative_to(root) or hashlib.sha256(auth_path.read_bytes()).hexdigest() != auth["sha256"]
+                or request.get("authorization_sha256") != auth["sha256"]):
+                raise FactoryError("original authorization changed", "full_plan_integrity", 409)
+            user_auth = request.get("authorization", {})
+            if user_auth.get("path") != MODEL_SWITCH_AUTHORIZATION:
+                raise FactoryError("model revision authorization path differs", "full_plan_binding", 409)
+            user_auth_path = (root / user_auth.get("path", "")).resolve()
+            if (not user_auth.get("sha256") or not user_auth_path.is_relative_to(root)
+                or not user_auth_path.is_file()
+                or hashlib.sha256(user_auth_path.read_bytes()).hexdigest() != user_auth["sha256"]):
+                raise FactoryError("model revision authorization changed", "full_plan_integrity", 409)
+            scope = grant["scope"]
+            scope_path = (root / scope["path"]).resolve()
+            if (not scope_path.is_relative_to(root) or hashlib.sha256(scope_path.read_bytes()).hexdigest() != scope["sha256"]):
+                raise FactoryError("original scope changed", "full_plan_integrity", 409)
+            active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND phase=? AND status IN ('reserved','spawn_intent','started','uncertain')", (self.campaign_id, row["phase"])).fetchone()[0]
+            if row["status"] != "paused" or active:
+                raise FactoryError("drain and pause before model activation", "full_plan_paused", 409)
+            receipt = {"full_plan_id": plan_id, "request_digest": digest(request), "previous_model": model,
+                       "new_model": REVISED_MODEL, "authorization_sha256": auth["sha256"],
+                       "user_authorization_sha256": user_auth["sha256"],
+                       "baseline": row["baseline"], "max_calls": row["max_calls"],
+                       "started": row["started"], "deadline": row["deadline"], "registered_at": self.clock()}
+            con.execute("INSERT INTO auxiliary_full_event(plan_id,kind,body,created) VALUES(?,'model_revision',?,?)",
+                        (plan_id, json.dumps({"request": request, "request_digest": digest(request), "receipt": receipt}), self.clock()))
+            con.execute("UPDATE auxiliary_full_plan SET model=? WHERE id=?", (REVISED_MODEL, plan_id))
+            return receipt
 
     def prove_unlaunched(self, plan_id, leaf, work_name, stage, directory):
         """A required reservation never existed; retain intent and record host proof."""
@@ -592,9 +692,10 @@ def full_reservation_locked(
         raise FactoryError(
             "stored full authorization changed", "full_plan_integrity", 409
         )
+    effective_model, _ = FullAuxiliaryService._model_revisions(con, plan_id, row)
     if (
         plan_id != row["id"]
-        or model != row["model"]
+        or model != effective_model
         or not identity.startswith(plan_id + ":")
     ):
         raise FactoryError(

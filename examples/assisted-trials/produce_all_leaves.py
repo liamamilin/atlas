@@ -578,8 +578,16 @@ def verify_full_production(folder, production, authored, snapshot):
         raise ValueError("full production lineage differs")
     paths = load(folder / "STAGE_PATHS.json")
     summaries = {}
+    stage_models = {}
+    _, model_service = host()
+    allowed_models = set(model_service.allowed_models(PLAN_ID))
     for stage, path in paths.items():
-        summaries[stage] = _verify_call(folder / path, request["leaf_sha256"], MODEL)
+        binding = load(folder / path / "BINDING.json")
+        actual_model = binding.get("model")
+        if actual_model not in allowed_models:
+            raise ValueError("full-stage model is not authorized for this plan")
+        summaries[stage] = _verify_call(folder / path, request["leaf_sha256"], actual_model)
+        stage_models[stage] = actual_model
     author = folder / paths["blueprint-generate-aux"]
     reviewer = folder / paths["blueprint-spec-review-aux"]
     inputs = load(author / "input.json")
@@ -616,6 +624,11 @@ def verify_full_production(folder, production, authored, snapshot):
         raise ValueError("full review/source digest differs")
     if production["sessions"] != {k: v["session_id"] for k, v in summaries.items()}:
         raise ValueError("full stage sessions differ")
+    recorded_models = production.get("stage_models")
+    if recorded_models is not None and recorded_models != stage_models:
+        raise ValueError("full stage models differ")
+    if production.get("model") != summaries["blueprint-generate-aux"]["requested_model"]:
+        raise ValueError("production author model differs")
     validate_read_coverage(reviewer, authored)
     validate_review(
         review,
@@ -704,6 +717,16 @@ def stage_call(
     if "-protocol-1" in relative:
         budget["stage"] = "protocol/" + stage + "/" + work.name
 
+    effective_model = service.effective_model(PLAN_ID)
+    # Existing reservations/checkpoints remain bound to the model that actually
+    # owned that attempt. A protocol successor gets the current authorized model.
+    if (path / "BINDING.json").exists():
+        call_model = load(path / "BINDING.json")["model"]
+        if call_model not in service.allowed_models(PLAN_ID):
+            raise ValueError("checkpoint model is not authorized for this plan")
+    else:
+        call_model = effective_model
+
     def deliver(target, selected_budget):
         try:
             result = checkpoint(
@@ -714,7 +737,7 @@ def stage_call(
                 selected_budget,
                 source,
                 leaf,
-                model=MODEL,
+                model=call_model,
             )
         except FactoryError as error:
             if shared_provider_fault(error):
@@ -835,6 +858,7 @@ def stage_call(
             paths[stage] = successor
             atomic_json(pathsfile, paths)
             budget["stage"] = "protocol/" + stage + "/" + work.name
+            call_model = effective_model
             return deliver(work / successor, budget)
         raise
 
@@ -1048,6 +1072,15 @@ def get_workflow_gate(service):
     return gate
 
 
+def selected_first_pass_complete(items, selected_leaves):
+    selected = [item for item in items if item["leaf"] in set(selected_leaves)]
+    return bool(selected) and not any(
+        not item.get("first_pass_done")
+        and item["state"] not in {"ready_not_run", "reused"}
+        for item in selected
+    )
+
+
 def replay_completed_workflow(root, service, item, api):
     """Adopt only fully verified historical delivery; no model invocation."""
     work = ROOT / item["workdir"]
@@ -1158,16 +1191,28 @@ def execute_leaf(root, service, item, api, repair=False):
         try:
             verify_plan(root)
             selected_scenario(work)
-            fixed_json(
-                work / "REQUEST.json",
-                {
-                    "leaf": item["leaf"],
-                    "leaf_sha256": item["leaf_sha256"],
-                    "full_plan_id": PLAN_ID,
-                    "profile": profiles.VERSION,
-                    "model": MODEL,
-                },
-            )
+            request_path = work / "REQUEST.json"
+            if not request_path.exists():
+                fixed_json(
+                    request_path,
+                    {
+                        "leaf": item["leaf"],
+                        "leaf_sha256": item["leaf_sha256"],
+                        "full_plan_id": PLAN_ID,
+                        "profile": profiles.VERSION,
+                        "model": service.effective_model(PLAN_ID),
+                    },
+                )
+            else:
+                saved_request = load(request_path)
+                if (
+                    saved_request.get("leaf") != item["leaf"]
+                    or saved_request.get("leaf_sha256") != item["leaf_sha256"]
+                    or saved_request.get("full_plan_id") != PLAN_ID
+                    or saved_request.get("profile") != profiles.VERSION
+                    or saved_request.get("model") not in service.allowed_models(PLAN_ID)
+                ):
+                    raise ValueError("existing REQUEST.json binding is invalid")
             if wf.begin(
                 PLAN_ID,
                 item["leaf"],
@@ -1672,7 +1717,11 @@ def execute_leaf(root, service, item, api, repair=False):
             production = {
                 "schema": "atlas.auxiliary-model-production.v1",
                 "mode": "opencode-cli-go",
-                "model": MODEL,
+                "model": summaries["blueprint-generate-aux"]["requested_model"],
+                "stage_models": {
+                    k: load(work / v / "BINDING.json")["model"]
+                    for k, v in paths.items()
+                },
                 "campaign_id": CAMPAIGN,
                 "phase": "auxiliary-full-" + PLAN_ID,
                 "full_plan_id": PLAN_ID,
@@ -1885,12 +1934,17 @@ def progress(root, service):
     return state
 
 
-def run(root, api):
+def run(root, api, selected_leaves=None):
     root.mkdir(parents=True, exist_ok=True)
     with (root / ".coordinator.lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         request, scope = verify_plan(root)
         store, service = host()
+        selected_leaves = set(selected_leaves or [])
+        if selected_leaves:
+            known = {item["leaf"] for item in scope["items"]}
+            if not selected_leaves <= known:
+                raise ValueError("selected leaf is outside the frozen plan scope")
         if service.status(PLAN_ID)["status"] not in {"running", "registered"}:
             return progress(root, service)
         service.control(PLAN_ID, "resume", "coordinator active")
@@ -1913,7 +1967,7 @@ def run(root, api):
             ),
         )
         try:
-            for repair in (False, True):
+            for repair in ((False,) if selected_leaves else (False, True)):
                 while service.status(PLAN_ID)["status"] == "running":
                     verify_plan(root)
                     if shutil.disk_usage(root).free < 5 * 1024**3:
@@ -1930,6 +1984,8 @@ def run(root, api):
                             and not x.get("first_pass_done")
                         )
                     ]
+                    if selected_leaves:
+                        pending = [x for x in pending if x["leaf"] in selected_leaves]
                     if not pending:
                         break
                     gate = get_workflow_gate(service)
@@ -1984,6 +2040,10 @@ def run(root, api):
                             progress(root, service)
                     progress(root, service)
             state = progress(root, service)
+            if selected_leaves and state["status"] == "running":
+                if selected_first_pass_complete(state["items"], selected_leaves):
+                    service.control(PLAN_ID, "pause", "selected leaf run complete")
+                    state = progress(root, service)
             gate = get_workflow_gate(service)
             if state["status"] == "running" and gate and gate["mode"] == "validation":
                 service.control(
@@ -1992,7 +2052,7 @@ def run(root, api):
                     "workflow_validation_complete: evaluate actual results before opening full dispatch",
                 )
                 state = progress(root, service)
-            if state["status"] == "running" and not any(
+            if not selected_leaves and state["status"] == "running" and not any(
                 x["state"] in {"pending", "running", "paused"}
                 or x.get("repair_pending")
                 for x in state["items"]
@@ -2019,12 +2079,18 @@ def run(root, api):
             progress(root, service)
 
 
-def start_daemon(root, api):
+def start_daemon(root, api, selected_leaves=None):
     """launchd owns the coordinator after the chat/terminal exits; no cron loop."""
     _, service = host()
     if service.control_state(PLAN_ID) not in {"registered", "running"}:
         raise ValueError("resume the formally paused plan before starting")
     verify_plan(root)
+    selected_leaves = list(dict.fromkeys(selected_leaves or []))
+    scope = load(root / "FROZEN_SCOPE.json")
+    known = {item["leaf"] for item in scope["items"]}
+    if selected_leaves:
+        if not set(selected_leaves) <= known:
+            raise ValueError("selected leaf is outside the frozen plan scope")
     label = "com.atlas.full-leaf-auxiliary-20261021"
     target = "gui/" + str(os.getuid()) + "/" + label
     plist = root / "coordinator.plist"
@@ -2053,16 +2119,50 @@ def start_daemon(root, api):
             "PYTHONUNBUFFERED": "1",
         },
     }
+    for leaf in selected_leaves or []:
+        config["ProgramArguments"].extend(["--leaf", leaf])
     encoded = plistlib.dumps(config)
-    if plist.exists() and plist.read_bytes() != encoded:
-        raise ValueError(
-            "supervisor definition changed; inspect existing launchd service"
-        )
-    plist.write_bytes(encoded)
+    old_bytes = plist.read_bytes() if plist.exists() else None
     found = subprocess.run(
         ["launchctl", "print", target], capture_output=True, text=True
     )
-    if found.returncode:
+    booted_out = False
+    if old_bytes is not None and old_bytes != encoded:
+        old_config = plistlib.loads(old_bytes)
+        new_config = plistlib.loads(encoded)
+        old_args = old_config.get("ProgramArguments", [])
+        new_args = new_config.get("ProgramArguments", [])
+        old_leaf_args = daemon_leaf_args(old_args)
+        if (
+            old_config.get("Label") != label
+            or {k: v for k, v in old_config.items() if k != "ProgramArguments"}
+            != {k: v for k, v in new_config.items() if k != "ProgramArguments"}
+            or strip_leaf_args(old_args) != strip_leaf_args(new_args)
+        ):
+            raise ValueError("supervisor definition changed beyond selected leaf arguments")
+        if not set(old_leaf_args) <= known:
+            raise ValueError("existing supervisor selects a leaf outside the frozen plan scope")
+        live = bool(found.returncode == 0 and __import__("re").search(r"(?m)^\s*pid = [1-9]\d*\s*$", found.stdout))
+        state = service.status(PLAN_ID)
+        if live or state.get("active_calls", 0) != 0:
+            raise ValueError("cannot change selected leaves while coordinator/model calls are active")
+        archived_hash = hashlib.sha256(old_bytes).hexdigest()
+        archive = root / ("coordinator.previous-" + archived_hash + ".plist")
+        if archive.exists() and archive.read_bytes() != old_bytes:
+            raise ValueError("existing archived supervisor bytes differ")
+        if not archive.exists():
+            archive.write_bytes(old_bytes)
+        atomic_json(
+            root / ("coordinator.previous-" + archived_hash + ".json"),
+            {"path": archive.name, "sha256": archived_hash, "label": label},
+        )
+        if found.returncode == 0:
+            subprocess.run(["launchctl", "bootout", target], check=True)
+            booted_out = True
+        plist.write_bytes(encoded)
+    elif old_bytes is None:
+        plist.write_bytes(encoded)
+    if found.returncode or booted_out:
         subprocess.run(
             ["launchctl", "bootstrap", "gui/" + str(os.getuid()), str(plist)],
             check=True,
@@ -2085,9 +2185,25 @@ def start_daemon(root, api):
     return receipt
 
 
-def supervised_run(root, api):
+def strip_leaf_args(arguments):
+    """Normalize only trailing repeatable leaf selectors; every other arg stays bound."""
+    return arguments[: len(arguments) - len(daemon_leaf_args(arguments) * 2)]
+
+
+def daemon_leaf_args(arguments):
+    try:
+        index = arguments.index("--leaf")
+    except ValueError:
+        return []
+    suffix = arguments[index:]
+    if len(suffix) % 2 or any(suffix[n] != "--leaf" for n in range(0, len(suffix), 2)):
+        raise ValueError("selected leaf arguments must be trailing --leaf/value pairs")
+    return suffix[1::2]
+
+
+def supervised_run(root, api, selected_leaves=None):
     while True:
-        run(root, api)
+        run(root, api, selected_leaves)
         _, service = host()
         state = service.status(PLAN_ID)
         if (
@@ -2184,9 +2300,9 @@ def main():
         result = workflow.open_full(PLAN_ID)
         atomic_json(root / "WORKFLOW_FULL_GATE_RECEIPT.json", result)
     elif args.command == "run":
-        return supervised_run(root, args.api)
+        return supervised_run(root, args.api, args.leaf)
     elif args.command == "start":
-        result = start_daemon(root, args.api)
+        result = start_daemon(root, args.api, args.leaf)
     elif args.command in {"pause", "resume", "stop"}:
         result = service.control(PLAN_ID, args.command)
     else:

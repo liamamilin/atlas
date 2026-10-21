@@ -25,7 +25,7 @@ from template_factory.store import FactoryStore, digest
 from atlas_runtime import atomic_json
 
 MODEL = "opencode-go/deepseek-v4.1-flash"
-MODELS = {MODEL, "opencode-go/minimax-m3.1-flash-free"}
+MODELS = {MODEL, "opencode-go/minimax-m3.1-flash-free", "open-design/deepseek-v4.1-flash"}
 CAMPAIGN = "atlas-v1-first-production-2026-10-19"
 CHECKS = ("leaf_scope", "source_fidelity", "design_distinction", "core_journey",
           "architecture", "acceptance", "limits_and_safety")
@@ -356,7 +356,7 @@ def register_catalog(item, folder):
     receipt = json.loads((folder / "IMPORT_RECEIPT.json").read_text())
     package = folder / "atlas-development-package.zip"
     row = {"key": item["key"], "artifact_id": receipt["artifact_id"], "artifact_digest": receipt["digest"],
-           "runtime": {"status": "not_run", "scope": "OpenCode Go 研究与生成、独立会话静态审阅；应用尚未开发或运行。",
+           "runtime": {"status": "not_run", "scope": "OpenCode CLI 研究与生成、独立会话静态审阅；渠道与模型见调用记录，应用尚未开发或运行。",
                        "kind": "辅助模型生产，非严格工厂验收", "online_status": "not_checked", "strict_acceptance": False},
            "files": {"development": {"path": package.relative_to(ROOT).as_posix(),
                                        "sha256": hashlib.sha256(package.read_bytes()).hexdigest()}}}

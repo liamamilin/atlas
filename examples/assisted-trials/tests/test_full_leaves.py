@@ -19,6 +19,9 @@ from template_factory.full_auxiliary import FullAuxiliaryService, MODEL
 
 class FullLeafTests(unittest.TestCase):
     def setUp(self):
+        plan_id = patch.object(runner, "PLAN_ID", "p")
+        plan_id.start()
+        self.addCleanup(plan_id.stop)
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
@@ -359,6 +362,7 @@ class FullLeafTests(unittest.TestCase):
                     runner.materialize_case_snapshot(snapshot, folder, self.store, namespace="p")
 
     def test_invalid_protocol_preserves_bytes_and_one_paid_successor(self):
+        self.register()
         root = self.root / "plan"
         work = root / "items/leaf-0/attempt-1"
         work.mkdir(parents=True)
@@ -429,6 +433,7 @@ class FullLeafTests(unittest.TestCase):
     def test_old_shared_marker_cannot_turn_leaf_protocol_failure_into_global_pause(
         self,
     ):
+        self.register()
         root = self.root / "plan"
         work = root / "items/leaf-0/attempt-1"
         path = work / "calls/blueprint-spec-review-aux"
@@ -494,6 +499,7 @@ class FullLeafTests(unittest.TestCase):
         )
 
     def test_unknown_launch_is_not_retried_and_stopped_plan_cannot_resume(self):
+        self.register()
         work = self.root / "items/leaf-0/attempt-1"
         work.mkdir(parents=True)
         (self.pack / "applications").mkdir()
@@ -527,6 +533,7 @@ class FullLeafTests(unittest.TestCase):
                 self.service.control("p", action)
 
     def test_proven_not_started_keeps_original_intent_and_gets_no_free_paid_retry(self):
+        self.register()
         work = self.root / "items/leaf-0/attempt-1"
         path = work / "calls/blueprint-generate-aux"
         path.mkdir(parents=True)
