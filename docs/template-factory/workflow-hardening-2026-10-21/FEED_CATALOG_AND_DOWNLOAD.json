@@ -1,0 +1,96 @@
+{
+ "observed_at": 1792604303.057985,
+ "counts": {
+  "total": 21,
+  "core_verified": 6,
+  "not_run": 15,
+  "usable": 20,
+  "needs_revision": 1
+ },
+ "entry": {
+  "artifact_id": "tpl_a33b05ab19b948c490ed351cb4f7c112",
+  "digest": "efc9ac53b2cbcc85a45140f8f9fd17b5480c65d2815e25185ecacb47dc5a853c",
+  "key": "feed-reader-attempt-2",
+  "production": {
+   "mode": "opencode-cli-go",
+   "model": "opencode-go/minimax-m3.1-flash-free",
+   "review_status": "passed",
+   "review_input_digest": "8de8dd31ddf045137d78890a3f053e97630bd04e4c4d6da9e451c55f60a0dd21"
+  },
+  "title": "Feed Reader",
+  "leaf": "feed-reader",
+  "scenario": {
+   "id": "scn_8e3395b7131b4d699b2ec0fb167b0c4b",
+   "revision": 1,
+   "name": "Feed Reader",
+   "audience": "One individual reader running a self-hosted feed reader service on their own server, following about twenty blogs and news feeds.",
+   "objective": "Keep a personal list of feeds, let new items arrive on their own, and clear the unread backlog each morning while keeping the list portable",
+   "workflow": [
+    "Add sources: submit a site or feed URL, or import an OPML file, placing each feed in a category; the user's list is the only selector of what may appear.",
+    "Intake: the background scheduler refreshes each subscribed feed on its own interval (default polling 1h, honoring feed TTL and ETag/Last-Modified), parses RSS, Atom or JSON Feed, and stores newly published items attributed to their feed with status unread.",
+    "Triage: open the Unread view to see what arrived, with per-feed and total unread counts, then open an item to read it in the reader view with previous/next navigation through already-read items.",
+    "Record state: mark entries read (one by one, per feed or category, or mark all as read) and star the keepers, since starred is a separate flag from unread/read.",
+    "Maintain: export the subscription list as OPML to carry it to another reader, and re-import that file to restore the same feeds."
+   ]
+  },
+  "capabilities": [
+   "Standing intake of the user's own list: a background scheduler refreshes each subscribed feed on its own interval (default 1h, raised by feed TTL, Cache-Control and Expires, never lowered below the configured interval), honours ETag/Last-Modified, parses RSS, Atom or JSON Feed and stores each newly published item once, attributed to its feed and unread.",
+   "Personal subscription list management: the operator's own list of sources grouped into categories, filled by a feed URL, by a site URL that advertises a feed, or by an OPML import, and the only selector of what may appear on the reading surface.",
+   "Triage surface with per feed and total unread counts, an unread view over the selected scope and a reader view that opens one item with previous/next navigation through already-read items.",
+   "Reading state recording: mark entries read one by one, per feed, per category or for the whole account, and star the keepers with a flag that stays independent of unread and read.",
+   "List portability: export the subscription list as OPML with one outline per feed inside its category outline, and re-import that file to restore the same subscriptions without duplicates."
+  ],
+  "limits": [
+   "辅助试产，非严格G1/T08。",
+   "The upstream reference was read as source only and was never built, installed or run; no upstream runtime behaviour is claimed and no certification of the upstream product is made.",
+   "The probe drives the JSON API of the target; the operator-facing HTML surface described in the architecture is verified by hand and is not asserted by an acceptance case.",
+   "Only RSS 2.0 fixtures are exercised by the probe; Atom 0.3/1.0 and JSON Feed 1.0/1.1 parsing is specified in the contract but not covered by an acceptance case.",
+   "The scheduled intake check of A01 is reported as not_run when the service does not report polling_interval_seconds on GET /api/v1/config, or when the configured polling interval is longer than the probe intake timeout; the remaining A01 sub-checks then run on the explicit refresh endpoint instead of the scheduler path.",
+   "The probe requires a disposable instance because read-all is account wide: it refuses to run against an instance that already holds subscriptions outside its own probe- categories, and it deletes only feeds in those categories and categories whose title starts with probe-.",
+   "The site URL discovery reads only the link rel=alternate tags of the page; it does not crawl the page body and does not guess a feed path.",
+   "Full text extraction, rewrite and filter rules, share codes, webhooks, third party integrations and the Fever or Google Reader compatible APIs are outside this leaf and are not implemented.",
+   "Podcast and video enclosures, playback position and per feed crawler mode are not part of the target scope.",
+   "The reader view renders the stored item content only; the target never re-fetches the article page, so an item whose source page changes is not updated in place.",
+   "Multi user accounts, per user API tokens and password or passkey login flows are reduced to a single seeded operator in this scope.",
+   "OPML import reuses an existing category by name, so two categories with the same title inside one file are merged into the first match."
+  ],
+  "cases": [
+   {
+    "case_id": "case:repo:05c41fcc9bc53550b85db43e:bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+    "revision": 3,
+    "digest": "46b681ea19a643dd289ea501df09f179c01b6b9682dba391aca92c4b049f2b90",
+    "app_id": "app:repo:05c41fcc9bc53550b85db43e",
+    "sources": [
+     {
+      "repository": "https://github.com/miniflux/v2",
+      "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+      "license_files": [
+       "LICENSE"
+      ]
+     }
+    ]
+   }
+  ],
+  "runtime": {
+   "status": "not_run",
+   "scope": "OpenCode Go 研究与生成、独立会话静态审阅；应用尚未开发或运行。",
+   "kind": "辅助模型生产，非严格工厂验收",
+   "online_status": "not_checked",
+   "strict_acceptance": false
+  },
+  "files": {
+   "development": {
+    "available": true,
+    "sha256": "799de98161dc16fbd29e9849f9f33b2192378fef3e1364df5a1439940d3fbc8a",
+    "url": "/api/factory/assisted-templates/tpl_a33b05ab19b948c490ed351cb4f7c112/files/development"
+   }
+  },
+  "strict_status": {
+   "publication": "draft",
+   "acceptances": []
+  }
+ },
+ "download_sha256": "799de98161dc16fbd29e9849f9f33b2192378fef3e1364df5a1439940d3fbc8a",
+ "application_runtime": "not_run",
+ "case_fixed_commit_verified": true
+}

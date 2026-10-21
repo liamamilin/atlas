@@ -1,0 +1,15 @@
+{
+ "artifact_id": "tpl_a33b05ab19b948c490ed351cb4f7c112",
+ "review_result": "pass",
+ "application_runtime": "not_run",
+ "reviewer_nonblocking_notes": [
+  "Frozen acceptance/README.md example says acceptance_files/probe.py; actual archive program is blueprint/acceptance/probe.py. Follow HANDOFF.md and ACCEPTANCE_CONTRACT.json pointers.",
+  "One README sentence about reported results is awkward. No upstream or application was run; explicit not_run records remain authoritative."
+ ],
+ "core_limitations": [
+  "Probe and application not executed in this auxiliary production",
+  "RSS fixture scope; HTML needs later application/browser verification",
+  "Scheduler check can report not_run when configured interval exceeds test timeout"
+ ],
+ "no_frozen_bytes_changed": true
+}

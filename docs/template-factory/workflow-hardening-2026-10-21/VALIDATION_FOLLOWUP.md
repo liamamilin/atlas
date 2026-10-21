@@ -1,3 +1,13 @@
+# 验证已通过，全量已实际恢复
+
+本说明下方保留原验证操作。当前正式状态已经是 full / passed；不要重复登记验证、开放门禁或回到 validation。
+
+精确源码 `74a678b9861b2833397e36e6e48f7b72425a6f16` 的 CI `39648165191` 全部通过，已追加正式 host revision。完整门禁依据为 WORKFLOW_VALIDATION.json；FULL_GATE_RECEIPT.json 和 FULL_DISPATCH_STARTED.json 记录真实开放与下一批启动。原协调者已启动20项清单，最初两项真实研究会话 started，进程PID90002。该PID和23次新增/2在途仅是启动快照，后续以正式状态和launchctl为准。
+
+保留所有已绑定引用文件原字节，后续使用新检查点。不重新调用已通过的叶子。继续原计划的批次自动接续、限额、来源校验、独审和下载，严格G1/T08和应用开发保持未启动。源代码修复只有真实缺陷需要时才做，并经过精确CI及正式宿主更新。
+
+---
+
 # 有限验证的持久接续
 
 最新宿主 `b5704bc0e883c6124b909aee85399c5ea0c03d88` 的 CI `39632490333` 已通过并经正式 host revision 激活。API 已用原生产根目录重启；18 个旧可用开发包摘要相同，真实 workflow JSON 字节和 Content-Type 正确。见 SOURCE_CI_FINAL、HOST_FINAL_REVISION_RECEIPT、ACTUAL_WORKFLOW_EVIDENCE_READ。

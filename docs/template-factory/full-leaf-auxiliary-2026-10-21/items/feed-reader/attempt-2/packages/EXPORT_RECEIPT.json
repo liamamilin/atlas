@@ -1,0 +1,88 @@
+{
+ "origin": "assisted-trial",
+ "template_digest": "b0173d0d988ed64716353caa43d092fa9f1aef14adddc875e24453539592aca6",
+ "export": {
+  "phase": "P0",
+  "project_name": "attempt-2-trial",
+  "template_digest": "b0173d0d988ed64716353caa43d092fa9f1aef14adddc875e24453539592aca6",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1"
+ },
+ "provenance": {
+  "origin": "assisted-trial",
+  "scenario": {
+   "acceptance": [
+    "A01: A newly published item shows up in the Unread view after a scheduled refresh, carries its feed's title and canonical link, and is listed only once because the item identifier is already known.",
+    "A02: Marking an item read removes it from the Unread view and lowers the shown unread count, the same happens when a whole feed, a whole category or the whole account is marked read, and an item that was starred keeps its starred flag after being read and still appears in the starred list.",
+    "A03: Exporting the subscription list yields one OPML outline per subscribed feed with its xmlUrl inside its category outline, and importing that file back recreates the same subscriptions without duplicates.",
+    "A04: A feed URL and a site URL are subscribed into a category and listed there with the feed title, while a duplicate feed URL, an unknown category, a malformed URL and a URL that is not a feed are all rejected without creating a subscription.",
+    "A05: Opening an item in the reader view returns its content, its feed title and its canonical link with previous/next entries drawn from the already-read items, and an unknown item id is reported as not found."
+   ],
+   "audience": "One individual reader running a self-hosted feed reader service on their own server, following about twenty blogs and news feeds.",
+   "id": "scn_8e3395b7131b4d699b2ec0fb167b0c4b",
+   "leaf": "feed-reader",
+   "leaf_name": "阅读器",
+   "name": "Feed Reader",
+   "objective": "Keep a personal list of feeds, let new items arrive on their own, and clear the unread backlog each morning while keeping the list portable",
+   "revision": 1,
+   "status": "draft",
+   "updated_at": "2026-10-21T16:39:46.514394+00:00",
+   "workflow": [
+    "Add sources: submit a site or feed URL, or import an OPML file, placing each feed in a category; the user's list is the only selector of what may appear.",
+    "Intake: the background scheduler refreshes each subscribed feed on its own interval (default polling 1h, honoring feed TTL and ETag/Last-Modified), parses RSS, Atom or JSON Feed, and stores newly published items attributed to their feed with status unread.",
+    "Triage: open the Unread view to see what arrived, with per-feed and total unread counts, then open an item to read it in the reader view with previous/next navigation through already-read items.",
+    "Record state: mark entries read (one by one, per feed or category, or mark all as read) and star the keepers, since starred is a separate flag from unread/read.",
+    "Maintain: export the subscription list as OPML to carry it to another reader, and re-import that file to restore the same feeds."
+   ]
+  },
+  "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+  "case_ref": {
+   "case_id": "case:repo:05c41fcc9bc53550b85db43e:bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+   "revision": 3,
+   "digest": "46b681ea19a643dd289ea501df09f179c01b6b9682dba391aca92c4b049f2b90"
+  },
+  "case_record_sha256": "6c8a9eab5b000549557a2a824a1511af5062e4042151f26fb80fd5e29428b2fd",
+  "definition_digest": "7fd75c620a976ea5ffd4def68c7369d26cdf11665a578171f5a6c039da6a0a0e",
+  "acceptance_inputs": {
+   "README.md": "65e4ce18d5fd17874729eed8b9dc968e9afb7791d133c5964c56015e6f182b2d",
+   "probe.py": "5f33f443528ea52f81c83679e2ccaedca48d38a0a1a30b1c5e1b66b3e98c0759"
+  },
+  "official_publication": false,
+  "upstream_runtime": "not_run",
+  "independent_evidence_review": "passed_auxiliary_static",
+  "note": "OpenCode CLI + Go source study and separate-session review. No upstream/downstream runtime or strict certification.",
+  "model_production": {
+   "schema": "atlas.auxiliary-model-production.v1",
+   "mode": "opencode-cli-go",
+   "model": "opencode-go/minimax-m3.1-flash-free",
+   "campaign_id": "atlas-v1-first-production-2026-10-19",
+   "phase": "auxiliary-full-full-leaf-auxiliary-2026-10-21",
+   "full_plan_id": "full-leaf-auxiliary-2026-10-21",
+   "profile": "full-leaf-v1",
+   "prompt_digest": "81297f85377bd12d9fa00400effbb8a5d308ded0019309cdc56772e5a1545ab5",
+   "review_status": "passed",
+   "review_input_digest": "8de8dd31ddf045137d78890a3f053e97630bd04e4c4d6da9e451c55f60a0dd21",
+   "review_result_digest": "ee63ff8224b7a406994d37526185af162281ebb85e408cac4f483190011a4db0",
+   "source_snapshot_digest": "fe95d322ce83e553cf45716c450770d6eb90a3cc9fe165d0952104c14be81a99",
+   "sessions": {
+    "blueprint-generate-aux": "ses_ea0bc516affevxm86YxBs19nO0",
+    "blueprint-spec-review-aux": "ses_ea0ae9a04ffexjxHLJRLax3gmP"
+   },
+   "research_reuse": null,
+   "upstream_runtime": "not_run",
+   "application_runtime": "not_run",
+   "strict_acceptance": false
+  }
+ },
+ "controlled_opencode_calls_added": 2,
+ "official_queue_consumed": false,
+ "archives": {
+  "template-snapshot.zip": "284653f2a88067f3401bed64a34f9fc433a205a7744445c13b8359d3b549b7cd",
+  "development-package.zip": "0396f3fe17a627bae1507cdd13d1be4ac02e7fba9d946028a0fea5adfa20bc39"
+ }
+}

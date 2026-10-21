@@ -1,0 +1,101 @@
+{
+ "observed_at": 1792604362.879937,
+ "status": "passed_core_validation_pending_ui_refresh_fix",
+ "full_dispatch_open": false,
+ "gate": {
+  "created_at": 1792596563.4084532,
+  "initial_states": {
+   "calendar-application": "ready_not_run",
+   "dictionary-application": "pending",
+   "e-book-reader": "pending",
+   "expense-tracking-application": "paused",
+   "feed-reader": "pending"
+  },
+  "leaves": [
+   "calendar-application",
+   "expense-tracking-application",
+   "dictionary-application",
+   "feed-reader",
+   "e-book-reader"
+  ],
+  "mode": "validation",
+  "status": "ready"
+ },
+ "validation_leaves": [
+  {
+   "leaf": "expense-tracking-application",
+   "state": "failed",
+   "current_attempt": "attempt-1",
+   "artifact_id": null,
+   "failure_stage": "independent_review",
+   "failure_code": "budget_retry_limit",
+   "error": "one protocol recovery already used; original failed output retained",
+   "repair_pending": false
+  },
+  {
+   "leaf": "calendar-application",
+   "state": "ready_not_run",
+   "current_attempt": "attempt-1",
+   "artifact_id": "tpl_bbc868df7d214cd4844df7f8fc42554d",
+   "failure_stage": null,
+   "failure_code": null,
+   "error": null,
+   "repair_pending": false
+  },
+  {
+   "leaf": "dictionary-application",
+   "state": "failed",
+   "current_attempt": "attempt-1",
+   "artifact_id": null,
+   "failure_stage": "generation",
+   "failure_code": "cli_protocol",
+   "error": "incomplete cognitive JSON; no fields recovered",
+   "repair_pending": false
+  },
+  {
+   "leaf": "feed-reader",
+   "state": "ready_not_run",
+   "current_attempt": "attempt-2",
+   "artifact_id": "tpl_a33b05ab19b948c490ed351cb4f7c112",
+   "failure_stage": null,
+   "failure_code": null,
+   "error": null,
+   "repair_pending": false
+  },
+  {
+   "leaf": "e-book-reader",
+   "state": "failed",
+   "current_attempt": "attempt-1",
+   "artifact_id": null,
+   "failure_stage": "generation",
+   "failure_code": "cli_failed",
+   "error": "OpenCode CLI failed: {'type': 'provider.invalid-output', 'message': 'OpenAI Chat stream ended without finish_reason', 'status': 200}",
+   "repair_pending": false
+  }
+ ],
+ "new_calls": 21,
+ "cumulative_cli": 120,
+ "calls_per_started_leaf": {
+  "calendar-application": 4,
+  "dictionary-application": 3,
+  "e-book-reader": 3,
+  "expense-tracking-application": 3,
+  "feed-reader": 6,
+  "instant-messaging-application": 2
+ },
+ "automatic_failure_isolation": {
+  "dictionary_failure_finished": 1792597577.575764,
+  "ebook_research_started": 1792597577.9183528,
+  "seconds_to_continue": 0.3425889015197754
+ },
+ "fresh_leaf_count": 3,
+ "fresh_ready_count": 1,
+ "fresh_failed_count": 2,
+ "first_generation_protocol_failures": 3,
+ "candidate_review_after_revision": "pass",
+ "case_versions": 24,
+ "raw_old_failures_preserved": true,
+ "not_a_statistical_quality_claim": true,
+ "applications_run_added": 0,
+ "strict_g1_t08_resumed": false
+}

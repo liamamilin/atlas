@@ -1,0 +1,345 @@
+{
+  "case_id": "case:repo:05c41fcc9bc53550b85db43e:bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+  "app_name": "miniflux/v2",
+  "source_snapshots": [
+    {
+      "repository": "https://github.com/miniflux/v2",
+      "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+      "strategy_version": "full-leaf-selected-v2-88a755a184064577",
+      "collected_at": "2026-10-21T15:31:18.647547+00:00",
+      "local_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/sources/full-leaf-auxiliary-2026-10-21/feed-reader/attempt-1",
+      "files": {
+        "LICENSE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "README.md": "2a18e492d96193f6bb1122bd493944e07987920a06005a48651c304e310a4a48",
+        "internal/model/entry.go": "3b64600f275b86eff3f1b9ac35d27e0d9af284aa3f475b4c420c640be77b4ca3",
+        "internal/model/feed.go": "2e5c1759aea79a8c37be8b1fa8d7265ebb7ac178e411df7b9af43628e31b78dd",
+        "internal/reader/handler/handler.go": "f99ab981dcacd062d87362e330acc9ffa52153964cff95d7efbda32450a41927",
+        "internal/reader/opml/opml.go": "ff7806e6c7417db352a797a13485d0220c89b6eb07a79701723421598289157b",
+        "internal/ui/entry_read.go": "b9afe9f9eda4a902e43812920ce13e7d87b6235433b065bff6b0596884cc874a",
+        "internal/ui/entry_toggle_starred.go": "4d4310b71f6672c9ed36326774a520f03890e3e2939fc135713f51f6f66721e1"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license": {
+        "status": "located",
+        "spdx_id": "Apache-2.0",
+        "notice_hashes": {
+          "LICENSE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+        }
+      },
+      "license_uncertainties": [
+        "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+      ],
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ]
+    }
+  ],
+  "research": {
+    "summary": "OpenCode Go静态研究与独立会话审阅；Target inference: the leaf makes the user's own subscription list the only selector and adds standing automated intake plus a per-item reading state, and the fixed scenario is one operator on their own server, so the target is a self-hosted single-user service rather than a hosted multi-tenant platform or a desktop app. The concrete choices are: one Go binary (net/http plus html/template) over PostgreSQL; a scheduler goroutine that refreshes each feed on its own next_check_at, where the configured polling interval is used verbatim with no lower floor (so a short interval stays legal and the standing intake is observable in seconds) while a publisher delay may only push the next check further out; conditional GET with ETag and Last-Modified; a per feed hash of the item identifier as the duplicate suppression key; a two valued read status with an independent starred flag; subscribe time ingestion, so a new subscription is readable at once and its first items are stored unread; entries listed newest first with an id tie break and the reader view navigating over the read entries by changed_at; a site URL resolved through the feed its page advertises; category nesting in the OPML export and an idempotent import keyed on the resolved feed URL. These are target proposals derived from the observations above; they are not claims about how the upstream product behaves, and the upstream was read as source only and never built or run.",
+    "scope": "Keep a personal list of feeds, let new items arrive on their own, and clear the unread backlog each morning while keeping the list portable",
+    "unknowns": [
+      "upstream not_run",
+      "auxiliary independent static review passed; runtime not_run",
+      "The upstream reference was read as source only and was never built, installed or run; no upstream runtime behaviour is claimed and no certification of the upstream product is made.",
+      "The probe drives the JSON API of the target; the operator-facing HTML surface described in the architecture is verified by hand and is not asserted by an acceptance case.",
+      "Only RSS 2.0 fixtures are exercised by the probe; Atom 0.3/1.0 and JSON Feed 1.0/1.1 parsing is specified in the contract but not covered by an acceptance case.",
+      "The scheduled intake check of A01 is reported as not_run when the service does not report polling_interval_seconds on GET /api/v1/config, or when the configured polling interval is longer than the probe intake timeout; the remaining A01 sub-checks then run on the explicit refresh endpoint instead of the scheduler path.",
+      "The probe requires a disposable instance because read-all is account wide: it refuses to run against an instance that already holds subscriptions outside its own probe- categories, and it deletes only feeds in those categories and categories whose title starts with probe-.",
+      "The site URL discovery reads only the link rel=alternate tags of the page; it does not crawl the page body and does not guess a feed path.",
+      "Full text extraction, rewrite and filter rules, share codes, webhooks, third party integrations and the Fever or Google Reader compatible APIs are outside this leaf and are not implemented.",
+      "Podcast and video enclosures, playback position and per feed crawler mode are not part of the target scope.",
+      "The reader view renders the stored item content only; the target never re-fetches the article page, so an item whose source page changes is not updated in place.",
+      "Multi user accounts, per user API tokens and password or passkey login flows are reduced to a single seeded operator in this scope.",
+      "OPML import reuses an existing category by name, so two categories with the same title inside one file are merged into the first match."
+    ],
+    "input_digest": "2a44bd43b8be3de3afd329647f5d7f7a7824f9f76c249eb8af0c35b41ed90cb2",
+    "task_id": "full-leaf-auxiliary-2026-10-21-feed-reader-attempt-2"
+  },
+  "observations": [
+    {
+      "evidence_id": "ev_assisted_attempt_2_1",
+      "kind": "code_observation",
+      "statement": "Entry status is a two valued string field, EntryStatusUnread = 'unread' and EntryStatusRead = 'read', with published_at ascending as the default listing order.",
+      "location": {
+        "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "path": "internal/model/entry.go",
+        "file_digest": "3b64600f275b86eff3f1b9ac35d27e0d9af284aa3f475b4c420c640be77b4ca3",
+        "line_start": 11,
+        "line_end": 16
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_2",
+      "kind": "code_observation",
+      "statement": "The Entry record carries FeedID, Status, Hash, Title, URL and an independent boolean Starred field alongside Status, plus an optional nested Feed pointer, so the read state and the starred state are separate attributes of the same row.",
+      "location": {
+        "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "path": "internal/model/entry.go",
+        "file_digest": "3b64600f275b86eff3f1b9ac35d27e0d9af284aa3f475b4c420c640be77b4ca3",
+        "line_start": 27,
+        "line_end": 48
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_3",
+      "kind": "code_observation",
+      "statement": "A feed row stores its own fetch bookkeeping: CheckedAt, NextCheckAt, EtagHeader, LastModifiedHeader, plus ParsingErrorMsg and ParsingErrorCount for feeds that stopped parsing.",
+      "location": {
+        "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "path": "internal/model/feed.go",
+        "file_digest": "2e5c1759aea79a8c37be8b1fa8d7265ebb7ac178e411df7b9af43628e31b78dd",
+        "line_start": 32,
+        "line_end": 37
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_4",
+      "kind": "code_observation",
+      "statement": "ScheduleNextCheck derives the next check delay from the configured scheduler interval, never lets a publisher supplied delay shorten it (max(interval, refreshDelay)) and clamps it to the scheduler maximum before writing NextCheckAt.",
+      "location": {
+        "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "path": "internal/model/feed.go",
+        "file_digest": "2e5c1759aea79a8c37be8b1fa8d7265ebb7ac178e411df7b9af43628e31b78dd",
+        "line_start": 122,
+        "line_end": 150
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_5",
+      "kind": "code_observation",
+      "statement": "A refresh attaches the stored ETag and Last-Modified values as conditional request headers unless the feed ignores the HTTP cache or the refresh is forced.",
+      "location": {
+        "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "path": "internal/reader/handler/handler.go",
+        "file_digest": "f99ab981dcacd062d87362e330acc9ffa52153964cff95d7efbda32450a41927",
+        "line_start": 244,
+        "line_end": 249
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_6",
+      "kind": "code_observation",
+      "statement": "After a modified response the refresh delay is the maximum of the feed TTL, the Cache-Control max-age and the Expires header, and the parsed entries are handed to the store together with a flag that says whether existing entries may be updated.",
+      "location": {
+        "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "path": "internal/reader/handler/handler.go",
+        "file_digest": "f99ab981dcacd062d87362e330acc9ffa52153964cff95d7efbda32450a41927",
+        "line_start": 304,
+        "line_end": 333
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_7",
+      "kind": "code_observation",
+      "statement": "Subscription creation refuses a feed URL the user already has (ErrDuplicatedFeed) and reports a parse failure when the fetched body is not a feed, so a failed subscription writes nothing.",
+      "location": {
+        "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "path": "internal/reader/handler/handler.go",
+        "file_digest": "f99ab981dcacd062d87362e330acc9ffa52153964cff95d7efbda32450a41927",
+        "line_start": 149,
+        "line_end": 157
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_8",
+      "kind": "code_observation",
+      "statement": "The subscription path hands the parsed entries to the entry processor (ProcessFeedEntries) before the feed row is created, so processing the first batch of items belongs to the subscription call itself and not to a later refresh.",
+      "location": {
+        "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "path": "internal/reader/handler/handler.go",
+        "file_digest": "f99ab981dcacd062d87362e330acc9ffa52153964cff95d7efbda32450a41927",
+        "line_start": 186,
+        "line_end": 190
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_9",
+      "kind": "code_observation",
+      "statement": "An OPML outline carries title, text, xmlUrl, htmlUrl and description attributes and nests child outlines, so one category outline can hold one feed outline per subscription.",
+      "location": {
+        "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "path": "internal/reader/opml/opml.go",
+        "file_digest": "ff7806e6c7417db352a797a13485d0220c89b6eb07a79701723421598289157b",
+        "line_start": 30,
+        "line_end": 36
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_10",
+      "kind": "code_observation",
+      "statement": "The OPML encoder writes the type attribute as 'rss' for an outline that carries a feed URL and leaves it out for a folder, so an exported feed outline is distinguishable from a category outline.",
+      "location": {
+        "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "path": "internal/reader/opml/opml.go",
+        "file_digest": "ff7806e6c7417db352a797a13485d0220c89b6eb07a79701723421598289157b",
+        "line_start": 58,
+        "line_end": 73
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_11",
+      "kind": "code_observation",
+      "statement": "A parsed outline counts as a subscription only when its xmlUrl attribute is not blank, so outlines without xmlUrl are folders rather than feeds.",
+      "location": {
+        "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "path": "internal/reader/opml/opml.go",
+        "file_digest": "ff7806e6c7417db352a797a13485d0220c89b6eb07a79701723421598289157b",
+        "line_start": 94,
+        "line_end": 96
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_12",
+      "kind": "code_observation",
+      "statement": "The reader view resolves the previous and next entries with a pagination builder restricted to entries whose status is read and ordered by changed_at descending.",
+      "location": {
+        "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "path": "internal/ui/entry_read.go",
+        "file_digest": "b9afe9f9eda4a902e43812920ce13e7d87b6235433b065bff6b0596884cc874a",
+        "line_start": 42,
+        "line_end": 58
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_13",
+      "kind": "code_observation",
+      "statement": "Starring is a separate toggle endpoint that returns OK without looking at the entry status, so the starred flag is independent of the unread and read state.",
+      "location": {
+        "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "path": "internal/ui/entry_toggle_starred.go",
+        "file_digest": "4d4310b71f6672c9ed36326774a520f03890e3e2939fc135713f51f6f66721e1",
+        "line_start": 13,
+        "line_end": 21
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_14",
+      "kind": "documentation",
+      "statement": "The product documentation lists Atom 0.3/1.0, RSS 1.0/2.0 and JSON Feed 1.0/1.1 as supported formats, states that OPML import/export and URL import are available, and that articles are organized with categories and bookmarks.",
+      "location": {
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/README.md",
+        "material_version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "content_digest": "2a18e492d96193f6bb1122bd493944e07987920a06005a48651c304e310a4a48"
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_15",
+      "kind": "documentation",
+      "statement": "The documentation states that feeds are updated in the background by an internal scheduler or a cron job, that Last-Modified, If-Modified-Since, If-None-Match, Cache-Control, Expires and ETag are respected, and that the default polling interval is one hour.",
+      "location": {
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/README.md",
+        "material_version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "content_digest": "2a18e492d96193f6bb1122bd493944e07987920a06005a48651c304e310a4a48"
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_16",
+      "kind": "documentation",
+      "statement": "The reference implementation is written in Go, shipped as a single static binary and works only with PostgreSQL.",
+      "location": {
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/README.md",
+        "material_version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "content_digest": "2a18e492d96193f6bb1122bd493944e07987920a06005a48651c304e310a4a48"
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_17",
+      "kind": "documentation",
+      "statement": "The upstream project is distributed under the Apache License, Version 2.0, so the reference material is usable as a design reference only.",
+      "location": {
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "material_version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "content_digest": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_design",
+      "kind": "inference",
+      "statement": "Target inference: the leaf makes the user's own subscription list the only selector and adds standing automated intake plus a per-item reading state, and the fixed scenario is one operator on their own server, so the target is a self-hosted single-user service rather than a hosted multi-tenant platform or a desktop app. The concrete choices are: one Go binary (net/http plus html/template) over PostgreSQL; a scheduler goroutine that refreshes each feed on its own next_check_at, where the configured polling interval is used verbatim with no lower floor (so a short interval stays legal and the standing intake is observable in seconds) while a publisher delay may only push the next check further out; conditional GET with ETag and Last-Modified; a per feed hash of the item identifier as the duplicate suppression key; a two valued read status with an independent starred flag; subscribe time ingestion, so a new subscription is readable at once and its first items are stored unread; entries listed newest first with an id tie break and the reader view navigating over the read entries by changed_at; a site URL resolved through the feed its page advertises; category nesting in the OPML export and an idempotent import keyed on the resolved feed URL. These are target proposals derived from the observations above; they are not claims about how the upstream product behaves, and the upstream was read as source only and never built or run.",
+      "depends_on": [
+        "ev_assisted_attempt_2_1",
+        "ev_assisted_attempt_2_2",
+        "ev_assisted_attempt_2_3",
+        "ev_assisted_attempt_2_4",
+        "ev_assisted_attempt_2_5",
+        "ev_assisted_attempt_2_6",
+        "ev_assisted_attempt_2_7",
+        "ev_assisted_attempt_2_8",
+        "ev_assisted_attempt_2_9",
+        "ev_assisted_attempt_2_10",
+        "ev_assisted_attempt_2_11",
+        "ev_assisted_attempt_2_12",
+        "ev_assisted_attempt_2_13",
+        "ev_assisted_attempt_2_14",
+        "ev_assisted_attempt_2_15",
+        "ev_assisted_attempt_2_16",
+        "ev_assisted_attempt_2_17"
+      ],
+      "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。",
+      "assumptions": [
+        "上游未运行",
+        "辅助静态独审通过，运行未验证",
+        "The upstream reference was read as source only and was never built, installed or run; no upstream runtime behaviour is claimed and no certification of the upstream product is made.",
+        "The probe drives the JSON API of the target; the operator-facing HTML surface described in the architecture is verified by hand and is not asserted by an acceptance case.",
+        "Only RSS 2.0 fixtures are exercised by the probe; Atom 0.3/1.0 and JSON Feed 1.0/1.1 parsing is specified in the contract but not covered by an acceptance case.",
+        "The scheduled intake check of A01 is reported as not_run when the service does not report polling_interval_seconds on GET /api/v1/config, or when the configured polling interval is longer than the probe intake timeout; the remaining A01 sub-checks then run on the explicit refresh endpoint instead of the scheduler path.",
+        "The probe requires a disposable instance because read-all is account wide: it refuses to run against an instance that already holds subscriptions outside its own probe- categories, and it deletes only feeds in those categories and categories whose title starts with probe-.",
+        "The site URL discovery reads only the link rel=alternate tags of the page; it does not crawl the page body and does not guess a feed path.",
+        "Full text extraction, rewrite and filter rules, share codes, webhooks, third party integrations and the Fever or Google Reader compatible APIs are outside this leaf and are not implemented.",
+        "Podcast and video enclosures, playback position and per feed crawler mode are not part of the target scope.",
+        "The reader view renders the stored item content only; the target never re-fetches the article page, so an item whose source page changes is not updated in place.",
+        "Multi user accounts, per user API tokens and password or passkey login flows are reduced to a single seeded operator in this scope.",
+        "OPML import reuses an existing category by name, so two categories with the same title inside one file are merged into the first match."
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "scenario_id": "scn_8e3395b7131b4d699b2ec0fb167b0c4b",
+      "scenario_revision": 1,
+      "reason": "Keep a personal list of feeds, let new items arrive on their own, and clear the unread backlog each morning while keeping the list portable",
+      "evidence_ids": [
+        "ev_assisted_attempt_2_1",
+        "ev_assisted_attempt_2_2",
+        "ev_assisted_attempt_2_3",
+        "ev_assisted_attempt_2_4",
+        "ev_assisted_attempt_2_5",
+        "ev_assisted_attempt_2_6",
+        "ev_assisted_attempt_2_7",
+        "ev_assisted_attempt_2_8",
+        "ev_assisted_attempt_2_9",
+        "ev_assisted_attempt_2_10",
+        "ev_assisted_attempt_2_11",
+        "ev_assisted_attempt_2_12",
+        "ev_assisted_attempt_2_13",
+        "ev_assisted_attempt_2_14",
+        "ev_assisted_attempt_2_15",
+        "ev_assisted_attempt_2_16",
+        "ev_assisted_attempt_2_17",
+        "ev_assisted_attempt_2_design"
+      ],
+      "adopted_scope": [
+        "Standing intake of the user's own list: a background scheduler refreshes each subscribed feed on its own interval (default 1h, raised by feed TTL, Cache-Control and Expires, never lowered below the configured interval), honours ETag/Last-Modified, parses RSS, Atom or JSON Feed and stores each newly published item once, attributed to its feed and unread.",
+        "Personal subscription list management: the operator's own list of sources grouped into categories, filled by a feed URL, by a site URL that advertises a feed, or by an OPML import, and the only selector of what may appear on the reading surface.",
+        "Triage surface with per feed and total unread counts, an unread view over the selected scope and a reader view that opens one item with previous/next navigation through already-read items.",
+        "Reading state recording: mark entries read one by one, per feed, per category or for the whole account, and star the keepers with a flag that stays independent of unread and read.",
+        "List portability: export the subscription list as OPML with one outline per feed inside its category outline, and re-import that file to restore the same subscriptions without duplicates."
+      ],
+      "exclusions": [
+        "The upstream reference was read as source only and was never built, installed or run; no upstream runtime behaviour is claimed and no certification of the upstream product is made.",
+        "The probe drives the JSON API of the target; the operator-facing HTML surface described in the architecture is verified by hand and is not asserted by an acceptance case.",
+        "Only RSS 2.0 fixtures are exercised by the probe; Atom 0.3/1.0 and JSON Feed 1.0/1.1 parsing is specified in the contract but not covered by an acceptance case.",
+        "The scheduled intake check of A01 is reported as not_run when the service does not report polling_interval_seconds on GET /api/v1/config, or when the configured polling interval is longer than the probe intake timeout; the remaining A01 sub-checks then run on the explicit refresh endpoint instead of the scheduler path.",
+        "The probe requires a disposable instance because read-all is account wide: it refuses to run against an instance that already holds subscriptions outside its own probe- categories, and it deletes only feeds in those categories and categories whose title starts with probe-.",
+        "The site URL discovery reads only the link rel=alternate tags of the page; it does not crawl the page body and does not guess a feed path.",
+        "Full text extraction, rewrite and filter rules, share codes, webhooks, third party integrations and the Fever or Google Reader compatible APIs are outside this leaf and are not implemented.",
+        "Podcast and video enclosures, playback position and per feed crawler mode are not part of the target scope.",
+        "The reader view renders the stored item content only; the target never re-fetches the article page, so an item whose source page changes is not updated in place.",
+        "Multi user accounts, per user API tokens and password or passkey login flows are reduced to a single seeded operator in this scope.",
+        "OPML import reuses an existing category by name, so two categories with the same title inside one file are merged into the first match."
+      ]
+    }
+  ]
+}

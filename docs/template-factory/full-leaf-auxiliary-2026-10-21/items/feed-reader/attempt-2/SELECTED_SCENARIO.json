@@ -1,0 +1,17 @@
+{
+ "name": "Morning triage of a self-hosted subscription list",
+ "audience": "One individual reader running Miniflux on their own server, following about twenty blogs and news feeds",
+ "objective": "Keep a personal list of feeds, let new items arrive on their own, and clear the unread backlog each morning while keeping the list portable",
+ "workflow": [
+  "Add sources: submit a site or feed URL, or import an OPML file, placing each feed in a category; the user's list is the only selector of what may appear.",
+  "Intake: the background scheduler refreshes each subscribed feed on its own interval (default polling 1h, honoring feed TTL and ETag/Last-Modified), parses RSS, Atom or JSON Feed, and stores newly published items attributed to their feed with status unread.",
+  "Triage: open the Unread view to see what arrived, with per-feed and total unread counts, then open an item to read it in the reader view with previous/next navigation through already-read items.",
+  "Record state: mark entries read (one by one, per feed or category, or mark all as read) and star the keepers, since starred is a separate flag from unread/read.",
+  "Maintain: export the subscription list as OPML to carry it to another reader, and re-import that file to restore the same feeds."
+ ],
+ "acceptance": [
+  "A newly published item shows up in the Unread view after a scheduled refresh, carries its feed's title and canonical link, and is listed only once because the item identifier is already known.",
+  "Marking an item read removes it from the Unread view and lowers the shown unread count, while an item that was starred keeps its starred flag after being read and still appears in the starred list.",
+  "Exporting the subscription list yields one OPML outline per subscribed feed with its xmlUrl inside its category outline, and importing that file back recreates the same subscriptions without duplicates."
+ ]
+}

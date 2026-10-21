@@ -1,0 +1,25 @@
+{
+  "acceptance": [
+    "A01: A newly published item shows up in the Unread view after a scheduled refresh, carries its feed's title and canonical link, and is listed only once because the item identifier is already known.",
+    "A02: Marking an item read removes it from the Unread view and lowers the shown unread count, the same happens when a whole feed, a whole category or the whole account is marked read, and an item that was starred keeps its starred flag after being read and still appears in the starred list.",
+    "A03: Exporting the subscription list yields one OPML outline per subscribed feed with its xmlUrl inside its category outline, and importing that file back recreates the same subscriptions without duplicates.",
+    "A04: A feed URL and a site URL are subscribed into a category and listed there with the feed title, while a duplicate feed URL, an unknown category, a malformed URL and a URL that is not a feed are all rejected without creating a subscription.",
+    "A05: Opening an item in the reader view returns its content, its feed title and its canonical link with previous/next entries drawn from the already-read items, and an unknown item id is reported as not found."
+  ],
+  "audience": "One individual reader running a self-hosted feed reader service on their own server, following about twenty blogs and news feeds.",
+  "id": "scn_8e3395b7131b4d699b2ec0fb167b0c4b",
+  "leaf": "feed-reader",
+  "leaf_name": "阅读器",
+  "name": "Feed Reader",
+  "objective": "Keep a personal list of feeds, let new items arrive on their own, and clear the unread backlog each morning while keeping the list portable",
+  "revision": 1,
+  "status": "draft",
+  "updated_at": "2026-10-21T16:39:46.514394+00:00",
+  "workflow": [
+    "Add sources: submit a site or feed URL, or import an OPML file, placing each feed in a category; the user's list is the only selector of what may appear.",
+    "Intake: the background scheduler refreshes each subscribed feed on its own interval (default polling 1h, honoring feed TTL and ETag/Last-Modified), parses RSS, Atom or JSON Feed, and stores newly published items attributed to their feed with status unread.",
+    "Triage: open the Unread view to see what arrived, with per-feed and total unread counts, then open an item to read it in the reader view with previous/next navigation through already-read items.",
+    "Record state: mark entries read (one by one, per feed or category, or mark all as read) and star the keepers, since starred is a separate flag from unread/read.",
+    "Maintain: export the subscription list as OPML to carry it to another reader, and re-import that file to restore the same feeds."
+  ]
+}

@@ -1,0 +1,528 @@
+{
+  "scenario_record": {
+    "acceptance": [
+      "A01: A newly published item shows up in the Unread view after a scheduled refresh, carries its feed's title and canonical link, and is listed only once because the item identifier is already known.",
+      "A02: Marking an item read removes it from the Unread view and lowers the shown unread count, the same happens when a whole feed, a whole category or the whole account is marked read, and an item that was starred keeps its starred flag after being read and still appears in the starred list.",
+      "A03: Exporting the subscription list yields one OPML outline per subscribed feed with its xmlUrl inside its category outline, and importing that file back recreates the same subscriptions without duplicates.",
+      "A04: A feed URL and a site URL are subscribed into a category and listed there with the feed title, while a duplicate feed URL, an unknown category, a malformed URL and a URL that is not a feed are all rejected without creating a subscription.",
+      "A05: Opening an item in the reader view returns its content, its feed title and its canonical link with previous/next entries drawn from the already-read items, and an unknown item id is reported as not found."
+    ],
+    "audience": "One individual reader running a self-hosted feed reader service on their own server, following about twenty blogs and news feeds.",
+    "id": "scn_8e3395b7131b4d699b2ec0fb167b0c4b",
+    "leaf": "feed-reader",
+    "leaf_name": "阅读器",
+    "name": "Feed Reader",
+    "objective": "Keep a personal list of feeds, let new items arrive on their own, and clear the unread backlog each morning while keeping the list portable",
+    "revision": 1,
+    "status": "draft",
+    "updated_at": "2026-10-21T16:39:46.514394+00:00",
+    "workflow": [
+      "Add sources: submit a site or feed URL, or import an OPML file, placing each feed in a category; the user's list is the only selector of what may appear.",
+      "Intake: the background scheduler refreshes each subscribed feed on its own interval (default polling 1h, honoring feed TTL and ETag/Last-Modified), parses RSS, Atom or JSON Feed, and stores newly published items attributed to their feed with status unread.",
+      "Triage: open the Unread view to see what arrived, with per-feed and total unread counts, then open an item to read it in the reader view with previous/next navigation through already-read items.",
+      "Record state: mark entries read (one by one, per feed or category, or mark all as read) and star the keepers, since starred is a separate flag from unread/read.",
+      "Maintain: export the subscription list as OPML to carry it to another reader, and re-import that file to restore the same feeds."
+    ]
+  },
+  "case_ref": {
+    "case_id": "case:repo:05c41fcc9bc53550b85db43e:bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+    "revision": 3,
+    "digest": "46b681ea19a643dd289ea501df09f179c01b6b9682dba391aca92c4b049f2b90"
+  },
+  "research": {
+    "summary": "同一共享案例记录的静态研究与明确的设计推断；完整定位见inputs/shared-case-record.json。",
+    "sources": [
+      {
+        "id": "S02",
+        "name": "ev_assisted_attempt_2_1",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/internal/model/entry.go",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "code_observation: Entry status is a two valued string field, EntryStatusUnread = 'unread' and EntryStatusRead = 'read', with published_at ascending as the default listing order.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S03",
+        "name": "ev_assisted_attempt_2_10",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/internal/reader/opml/opml.go",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "code_observation: The OPML encoder writes the type attribute as 'rss' for an outline that carries a feed URL and leaves it out for a folder, so an exported feed outline is distinguishable from a category outline.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S04",
+        "name": "ev_assisted_attempt_2_11",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/internal/reader/opml/opml.go",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "code_observation: A parsed outline counts as a subscription only when its xmlUrl attribute is not blank, so outlines without xmlUrl are folders rather than feeds.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S05",
+        "name": "ev_assisted_attempt_2_12",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/internal/ui/entry_read.go",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "code_observation: The reader view resolves the previous and next entries with a pagination builder restricted to entries whose status is read and ordered by changed_at descending.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S06",
+        "name": "ev_assisted_attempt_2_13",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/internal/ui/entry_toggle_starred.go",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "code_observation: Starring is a separate toggle endpoint that returns OK without looking at the entry status, so the starred flag is independent of the unread and read state.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S07",
+        "name": "ev_assisted_attempt_2_14",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/README.md",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "documentation: The product documentation lists Atom 0.3/1.0, RSS 1.0/2.0 and JSON Feed 1.0/1.1 as supported formats, states that OPML import/export and URL import are available, and that articles are organized with categories and bookmarks.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S08",
+        "name": "ev_assisted_attempt_2_15",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/README.md",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "documentation: The documentation states that feeds are updated in the background by an internal scheduler or a cron job, that Last-Modified, If-Modified-Since, If-None-Match, Cache-Control, Expires and ETag are respected, and that the default polling interval is one hour.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S09",
+        "name": "ev_assisted_attempt_2_16",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/README.md",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "documentation: The reference implementation is written in Go, shipped as a single static binary and works only with PostgreSQL.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S10",
+        "name": "ev_assisted_attempt_2_17",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "documentation: The upstream project is distributed under the Apache License, Version 2.0, so the reference material is usable as a design reference only.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S11",
+        "name": "ev_assisted_attempt_2_2",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/internal/model/entry.go",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "code_observation: The Entry record carries FeedID, Status, Hash, Title, URL and an independent boolean Starred field alongside Status, plus an optional nested Feed pointer, so the read state and the starred state are separate attributes of the same row.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S12",
+        "name": "ev_assisted_attempt_2_3",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/internal/model/feed.go",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "code_observation: A feed row stores its own fetch bookkeeping: CheckedAt, NextCheckAt, EtagHeader, LastModifiedHeader, plus ParsingErrorMsg and ParsingErrorCount for feeds that stopped parsing.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S13",
+        "name": "ev_assisted_attempt_2_4",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/internal/model/feed.go",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "code_observation: ScheduleNextCheck derives the next check delay from the configured scheduler interval, never lets a publisher supplied delay shorten it (max(interval, refreshDelay)) and clamps it to the scheduler maximum before writing NextCheckAt.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S14",
+        "name": "ev_assisted_attempt_2_5",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/internal/reader/handler/handler.go",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "code_observation: A refresh attaches the stored ETag and Last-Modified values as conditional request headers unless the feed ignores the HTTP cache or the refresh is forced.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S15",
+        "name": "ev_assisted_attempt_2_6",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/internal/reader/handler/handler.go",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "code_observation: After a modified response the refresh delay is the maximum of the feed TTL, the Cache-Control max-age and the Expires header, and the parsed entries are handed to the store together with a flag that says whether existing entries may be updated.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S16",
+        "name": "ev_assisted_attempt_2_7",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/internal/reader/handler/handler.go",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "code_observation: Subscription creation refuses a feed URL the user already has (ErrDuplicatedFeed) and reports a parse failure when the fetched body is not a feed, so a failed subscription writes nothing.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S17",
+        "name": "ev_assisted_attempt_2_8",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/internal/reader/handler/handler.go",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "code_observation: The subscription path hands the parsed entries to the entry processor (ProcessFeedEntries) before the feed row is created, so processing the first batch of items belongs to the subscription call itself and not to a later refresh.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S18",
+        "name": "ev_assisted_attempt_2_9",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/internal/reader/opml/opml.go",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "code_observation: An OPML outline carries title, text, xmlUrl, htmlUrl and description attributes and nests child outlines, so one category outline can hold one feed outline per subscription.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S19",
+        "name": "ev_assisted_attempt_2_design",
+        "url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "version": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/miniflux/v2/blob/bdd8087d9cf7a20ca7e800948389e8a7e86445da/LICENSE",
+        "facts": "inference: Target inference: the leaf makes the user's own subscription list the only selector and adds standing automated intake plus a per-item reading state, and the fixed scenario is one operator on their own server, so the target is a self-hosted single-user service rather than a hosted multi-tenant platform or a desktop app. The concrete choices are: one Go binary (net/http plus html/template) over PostgreSQL; a scheduler goroutine that refreshes each feed on its own next_check_at, where the configured polling interval is used verbatim with no lower floor (so a short interval stays legal and the standing intake is observable in seconds) while a publisher delay may only push the next check further out; conditional GET with ETag and Last-Modified; a per feed hash of the item identifier as the duplicate suppression key; a two valued read status with an independent starred flag; subscribe time ingestion, so a new subscription is readable at once and its first items are stored unread; entries listed newest first with an id tie break and the reader view navigating over the read entries by changed_at; a site URL resolved through the feed its page advertises; category nesting in the OPML export and an idempotent import keyed on the resolved feed URL. These are target proposals derived from the observations above; they are not claims about how the upstream product behaves, and the upstream was read as source only and never built or run.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      }
+    ],
+    "gaps": [
+      "辅助静态独审通过，不代表运行通过",
+      "上游not_run",
+      "The upstream reference was read as source only and was never built, installed or run; no upstream runtime behaviour is claimed and no certification of the upstream product is made.",
+      "The probe drives the JSON API of the target; the operator-facing HTML surface described in the architecture is verified by hand and is not asserted by an acceptance case.",
+      "Only RSS 2.0 fixtures are exercised by the probe; Atom 0.3/1.0 and JSON Feed 1.0/1.1 parsing is specified in the contract but not covered by an acceptance case.",
+      "The scheduled intake check of A01 is reported as not_run when the service does not report polling_interval_seconds on GET /api/v1/config, or when the configured polling interval is longer than the probe intake timeout; the remaining A01 sub-checks then run on the explicit refresh endpoint instead of the scheduler path.",
+      "The probe requires a disposable instance because read-all is account wide: it refuses to run against an instance that already holds subscriptions outside its own probe- categories, and it deletes only feeds in those categories and categories whose title starts with probe-.",
+      "The site URL discovery reads only the link rel=alternate tags of the page; it does not crawl the page body and does not guess a feed path.",
+      "Full text extraction, rewrite and filter rules, share codes, webhooks, third party integrations and the Fever or Google Reader compatible APIs are outside this leaf and are not implemented.",
+      "Podcast and video enclosures, playback position and per feed crawler mode are not part of the target scope.",
+      "The reader view renders the stored item content only; the target never re-fetches the article page, so an item whose source page changes is not updated in place.",
+      "Multi user accounts, per user API tokens and password or passkey login flows are reduced to a single seeded operator in this scope.",
+      "OPML import reuses an existing category by name, so two categories with the same title inside one file are merged into the first match."
+    ]
+  },
+  "spec": {
+    "title": "Feed Reader",
+    "roles": [
+      {
+        "id": "R01",
+        "name": "One individual reader running a self-hosted feed reader service on their own server, following about twenty blogs and news feeds.",
+        "responsibility": "Keep a personal list of feeds, let new items arrive on their own, and clear the unread backlog each morning while keeping the list portable"
+      }
+    ],
+    "features": [
+      {
+        "id": "F01",
+        "name": "Standing intake of the user's own list: a background scheduler refreshes each subscribed feed on its own interval (default 1h, raised by feed TTL, Cache-Control and Expires, never lowered below the configured interval), honours ETag/Last-Modified, parses RSS, Atom or JSON Feed and stores each newly published item once, attributed to its feed and unread.",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "A01: A newly published item shows up in the Unread view after a scheduled refresh, carries its feed's title and canonical link, and is listed only once because the item identifier is already known.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19"
+        ],
+        "acceptance": [
+          "A01"
+        ]
+      },
+      {
+        "id": "F02",
+        "name": "Personal subscription list management: the operator's own list of sources grouped into categories, filled by a feed URL, by a site URL that advertises a feed, or by an OPML import, and the only selector of what may appear on the reading surface.",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "A02: Marking an item read removes it from the Unread view and lowers the shown unread count, the same happens when a whole feed, a whole category or the whole account is marked read, and an item that was starred keeps its starred flag after being read and still appears in the starred list.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19"
+        ],
+        "acceptance": [
+          "A02"
+        ]
+      },
+      {
+        "id": "F03",
+        "name": "Triage surface with per feed and total unread counts, an unread view over the selected scope and a reader view that opens one item with previous/next navigation through already-read items.",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "A03: Exporting the subscription list yields one OPML outline per subscribed feed with its xmlUrl inside its category outline, and importing that file back recreates the same subscriptions without duplicates.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19"
+        ],
+        "acceptance": [
+          "A03"
+        ]
+      },
+      {
+        "id": "F04",
+        "name": "Reading state recording: mark entries read one by one, per feed, per category or for the whole account, and star the keepers with a flag that stays independent of unread and read.",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "A04: A feed URL and a site URL are subscribed into a category and listed there with the feed title, while a duplicate feed URL, an unknown category, a malformed URL and a URL that is not a feed are all rejected without creating a subscription.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19"
+        ],
+        "acceptance": [
+          "A04"
+        ]
+      },
+      {
+        "id": "F05",
+        "name": "List portability: export the subscription list as OPML with one outline per feed inside its category outline, and re-import that file to restore the same subscriptions without duplicates.",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "A05: Opening an item in the reader view returns its content, its feed title and its canonical link with previous/next entries drawn from the already-read items, and an unknown item id is reported as not found.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19"
+        ],
+        "acceptance": [
+          "A05"
+        ]
+      }
+    ],
+    "acceptance": [
+      {
+        "id": "A01",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "A01: A newly published item shows up in the Unread view after a scheduled refresh, carries its feed's title and canonical link, and is listed only once because the item identifier is already known.",
+        "features": [
+          "F01"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A02",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "A02: Marking an item read removes it from the Unread view and lowers the shown unread count, the same happens when a whole feed, a whole category or the whole account is marked read, and an item that was starred keeps its starred flag after being read and still appears in the starred list.",
+        "features": [
+          "F02"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A03",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "A03: Exporting the subscription list yields one OPML outline per subscribed feed with its xmlUrl inside its category outline, and importing that file back recreates the same subscriptions without duplicates.",
+        "features": [
+          "F03"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A04",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "A04: A feed URL and a site URL are subscribed into a category and listed there with the feed title, while a duplicate feed URL, an unknown category, a malformed URL and a URL that is not a feed are all rejected without creating a subscription.",
+        "features": [
+          "F04"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A05",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "A05: Opening an item in the reader view returns its content, its feed title and its canonical link with previous/next entries drawn from the already-read items, and an unknown item id is reported as not found.",
+        "features": [
+          "F05"
+        ],
+        "implementation": "acceptance/probe.py"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "D01",
+        "question": "首版运行与数据边界？",
+        "default": "Go 1.22+ service compiled as one static binary, PostgreSQL 14+ in a disposable database (schema feedreader) holding one seeded operator account, HTTP server plus scheduler goroutine in the same process; the acceptance probe runs on the same host with Python 3.9+ standard library only, driving the JSON API at http://127.0.0.1:8080 and a loopback RSS fixture server that it starts and stops itself; every probe record is prefixed probe-/Probe and is deleted by the probe at teardown, and because mark-all-read is account wide the probe refuses to run against an instance that already holds subscriptions it did not create.",
+        "when_to_ask": "确需公网托管或多人数据时先确认，不自行扩展。",
+        "impact": "保护本地数据，避免默认外发。",
+        "status": "assisted default"
+      },
+      {
+        "id": "D02",
+        "question": "是否复刻上游？",
+        "default": "Target inference: the leaf makes the user's own subscription list the only selector and adds standing automated intake plus a per-item reading state, and the fixed scenario is one operator on their own server, so the target is a self-hosted single-user service rather than a hosted multi-tenant platform or a desktop app. The concrete choices are: one Go binary (net/http plus html/template) over PostgreSQL; a scheduler goroutine that refreshes each feed on its own next_check_at, where the configured polling interval is used verbatim with no lower floor (so a short interval stays legal and the standing intake is observable in seconds) while a publisher delay may only push the next check further out; conditional GET with ETag and Last-Modified; a per feed hash of the item identifier as the duplicate suppression key; a two valued read status with an independent starred flag; subscribe time ingestion, so a new subscription is readable at once and its first items are stored unread; entries listed newest first with an id tie break and the reader view navigating over the read entries by changed_at; a site URL resolved through the feed its page advertises; category nesting in the OPML export and an idempotent import keyed on the resolved feed URL. These are target proposals derived from the observations above; they are not claims about how the upstream product behaves, and the upstream was read as source only and never built or run.",
+        "when_to_ask": "目标变化、破坏已有数据或需要引入上游实现/依赖时先确认。",
+        "impact": "不混淆来源事实与目标设计。",
+        "status": "assisted default"
+      }
+    ],
+    "phases": [
+      {
+        "id": "P0",
+        "title": "核心可用",
+        "goal": "Keep a personal list of feeds, let new items arrive on their own, and clear the unread backlog each morning while keeping the list portable",
+        "features": [
+          "F01",
+          "F02",
+          "F03",
+          "F04",
+          "F05"
+        ],
+        "acceptance": [
+          "A01",
+          "A02",
+          "A03",
+          "A04",
+          "A05"
+        ]
+      }
+    ],
+    "architecture_markdown": "# feedreader - architecture for the morning triage service\n\n## 1. Target and rationale\n`feedreader` is a self-hosted, single-user feed reader **service**. One process serves a small HTML reading surface and a JSON API, holds the operator's subscription list, the items it delivers and their reading state in PostgreSQL, and refreshes every subscribed feed in the background.\n\nThe delivery profile is `service`, so the list and the state live on the operator's own server, not in a hosted multi-tenant platform and not on a desktop. The stack follows the upstream reference that was read for this leaf (Go, one static binary, PostgreSQL only, an internal scheduler, conditional GET, a one hour default polling interval) and keeps only the scenario core: the subscription list, standing intake, unread triage, reading state and OPML portability. Filters, sharing, integrations, enclosures, full-text extraction and multi-user accounts are out of scope.\n\nThe fixed scenario is preserved: one individual reader on their own server, following about twenty blogs and news feeds, clearing the unread backlog each morning and keeping the list portable.\n\n## 2. Runtime, deployment and configuration\n- Language: Go 1.22+, `net/http` for the server, `html/template` for the web surface, `embed` for static assets, plain SQL, no ORM and no framework.\n- Process: one static binary. `feedreader migrate` applies the embedded SQL migrations; `feedreader serve` runs the HTTP server and the scheduler goroutine in the same process.\n- Storage: PostgreSQL 14+ (`FEEDREADER_DATABASE_URL`), one schema `feedreader`, migrations embedded in the binary.\n- Configuration comes from environment variables only. The only arguments are the subcommands `migrate` and `serve`; there are no configuration flags, so the commands in section 8 and the acceptance environment in the acceptance README are the same commands.\n\n| Variable | Default | Meaning |\n| --- | --- | --- |\n| `FEEDREADER_LISTEN_ADDR` | `:8080` | HTTP listen address |\n| `FEEDREADER_DATABASE_URL` | required | PostgreSQL DSN |\n| `FEEDREADER_API_KEY` | required for the API | value of the `X-Api-Key` header |\n| `FEEDREADER_USERNAME`, `FEEDREADER_PASSWORD` | required once | bootstrap of the single operator account |\n| `FEEDREADER_POLLING_INTERVAL` | `1h` | base polling interval, Go duration, at least `1s`; **no lower floor is applied** |\n| `FEEDREADER_MAX_POLLING_INTERVAL` | `24h` | the only clamp applied to a computed delay |\n| `FEEDREADER_SCHEDULER_ENABLED` | `true` | whether the background scheduler runs |\n| `FEEDREADER_SCHEDULER_TICK` | `1s` | scheduler tick period |\n| `FEEDREADER_DEFAULT_CATEGORY` | `Uncategorized` | category of a feed created without one |\n| `FEEDREADER_HTTP_TIMEOUT` | `20s` | timeout when fetching a feed |\n| `FEEDREADER_MAX_BODY_SIZE` | `5MiB` | maximum feed body size |\n\n### 2.1 Polling interval semantics\nThe configured `FEEDREADER_POLLING_INTERVAL` is used verbatim as the base interval. **It is not clamped to any floor**, so `5s` is a legal configuration and the acceptance environment uses it so the standing intake is observable in seconds. Only two rules shape a delay:\n1. a publisher supplied delay (feed TTL, `Cache-Control: max-age`, `Expires`, `Retry-After`) may only *increase* the delay: `delay = max(polling_interval, refresh_delay)`;\n2. the delay is clamped from above by `FEEDREADER_MAX_POLLING_INTERVAL` (default `24h`).\n\nThere is no lower clamp other than the configured interval itself. The effective base interval is reported by `GET /api/v1/config` so a verifier can size its wait.\n\n## 3. Data model\nSchema `feedreader`:\n- `users(id, username unique, password_hash, created_at)` - exactly one operator row.\n- `categories(id, user_id, title)` with a unique index on `(user_id, lower(title))`; the categories are the folders of the list.\n- `feeds(id, user_id, category_id, feed_url, site_url, title, description, etag, last_modified, checked_at, next_check_at, parsing_error_message, parsing_error_count, disabled)` with a unique index on `(user_id, feed_url)`.\n- `entries(id, user_id, feed_id, hash, title, url, content, author, published_at, status, starred, created_at, changed_at)` with a unique index on `(feed_id, hash)`.\n  - `status` is `unread` or `read`; `starred` is a boolean independent of `status`.\n  - `hash` is the duplicate suppression key: sha256 of the item's stable identifier - `guid` when present, else `id`, else `url`; when the item carries none, sha256 of `title` and `published_at`.\n  - Indexes on `(user_id, status, published_at desc, id desc)`, `(feed_id, status)` and `(user_id, starred)`.\n\nLifecycle: deleting a feed deletes its entries. Deleting a category that still holds feeds is refused. Unread counts are always computed from `entries` where `status = 'unread'`; no counter column is kept, so a count can never drift from the list.\n\n## 4. HTTP contract\nEvery API path is under `/api/v1`. The API requires the header `X-Api-Key: <FEEDREADER_API_KEY>`; the web surface uses the same single operator account with a session cookie. An error body is `{\"error\":{\"code\":\"...\",\"message\":\"...\"}}` where `code` is one of the codes named below.\n\n### 4.1 Configuration\n`GET /api/v1/config` -> 200 with the fields `polling_interval_seconds` (integer, the effective base interval in seconds), `max_polling_interval_seconds` (integer), `scheduler_enabled` (boolean) and `version` (string).\n\n### 4.2 Categories\n| Request | Result |\n| --- | --- |\n| `GET /api/v1/categories` | 200 `{\"categories\":[{\"id\":1,\"title\":\"Uncategorized\"}]}` |\n| `POST /api/v1/categories` with `{\"title\":\"...\"}` | 201 `{\"id\":N,\"title\":\"...\"}`; 400 `invalid_category` when the title is blank; 409 `duplicate_category` when the account already has that title (case insensitive) |\n| `DELETE /api/v1/categories/{id}` | 204; 404 `unknown_category`; 409 `category_not_empty` when it still holds feeds |\n\n### 4.3 Feeds\n| Request | Result |\n| --- | --- |\n| `GET /api/v1/feeds?category_id=` | 200 `{\"feeds\":[{\"id\":N,\"category_id\":N,\"feed_url\":\"...\",\"site_url\":\"...\",\"title\":\"...\",\"unread_count\":N,\"checked_at\":\"...\",\"next_check_at\":\"...\",\"parsing_error_message\":\"\"}],\"total\":N}`, ordered by title asc then id asc |\n| `POST /api/v1/feeds` with `{\"feed_url\":\"...\",\"category_id\":N}` | 201 `{\"id\":N,\"category_id\":N,\"feed_url\":\"...\",\"site_url\":\"...\",\"title\":\"...\",\"unread_count\":N,\"checked_at\":\"...\",\"next_check_at\":\"...\"}` |\n| `DELETE /api/v1/feeds/{id}` | 204; the entries of that feed go with it |\n| `PUT /api/v1/feeds/{id}/refresh` | 204 after one synchronous fetch, parse and store cycle; 404 `unknown_feed` |\n\n`POST /api/v1/feeds` errors: `400 invalid_url` (not an absolute http or https URL), `400 not_a_feed` (the fetch failed, or the body is neither a feed nor a page that advertises one), `404 unknown_category`, `409 duplicate_feed_url` (the resolved feed URL is already subscribed). **In every error case no feed row and no entry is written.**\n\n### 4.4 Entries\n| Request | Result |\n| --- | --- |\n| `GET /api/v1/entries?status=&feed_id=&category_id=&starred=true&limit=&offset=` | 200 `{\"entries\":[...],\"total\":N,\"unread_count\":N}` where `total` is the size of the filtered scope and `unread_count` is the account wide unread total |\n| `GET /api/v1/entries/{id}` | 200 the entry with its `feed` object and `prev_entry_id` / `next_entry_id`; 404 `unknown_entry` |\n| `PUT /api/v1/entries/{id}` with `{\"status\":\"read\"}` | 200 the updated entry; 400 `invalid_status` for a value outside `unread` and `read` |\n| `PUT /api/v1/entries/{id}` with `{\"starred\":true}` | 200 the updated entry; the status is not touched |\n| `PUT /api/v1/entries` with `{\"entry_ids\":[1,2],\"status\":\"read\"}` | 200 `{\"updated\":2}` |\n| `PUT /api/v1/feeds/{id}/entries` with `{\"status\":\"read\"}` | 200 `{\"updated\":N}` - every entry of one feed |\n| `PUT /api/v1/categories/{id}/entries` with `{\"status\":\"read\"}` | 200 `{\"updated\":N}` - every entry of one category |\n| `PUT /api/v1/entries/read-all` with `{\"status\":\"read\"}` | 200 `{\"updated\":N}` - every unread entry of the account |\n\nThe entry object is `{\"id\":N,\"feed_id\":N,\"status\":\"unread\",\"starred\":false,\"title\":\"...\",\"url\":\"...\",\"content\":\"...\",\"author\":\"...\",\"published_at\":\"...\",\"created_at\":\"...\",\"changed_at\":\"...\",\"feed\":{\"id\":N,\"title\":\"...\",\"feed_url\":\"...\"}}`.\n\n**Ordering is pinned.** `GET /api/v1/entries` returns the entries of the scope ordered by `published_at DESC, id DESC` (newest first) unless `order` and `direction` are given. A client therefore must not assume a creation order; the acceptance probe selects an entry by id and compares the reader view against that entry.\n\n**Navigation is pinned.** `prev_entry_id` and `next_entry_id` are computed over the entries of the account whose status is `read`, excluding the entry itself, ordered by `changed_at DESC, id DESC`:\n- `next_entry_id` is the first read entry whose `(changed_at, id)` is strictly smaller than the current entry's;\n- `prev_entry_id` is the last read entry whose `(changed_at, id)` is strictly greater than the current entry's;\n- both are `null` when there is no such entry.\n\n### 4.5 Unread counts\n`GET /api/v1/unread_count` -> 200 `{\"total\":N,\"by_feed\":[{\"feed_id\":N,\"unread_count\":N}]}`. `total` is the account total; `by_feed` lists every feed that holds unread entries.\n\n### 4.6 OPML\n| Request | Result |\n| --- | --- |\n| `GET /api/v1/export` | 200, `text/x-opml` |\n| `POST /api/v1/import` with the OPML document as the body and `Content-Type: text/x-opml` | 200 `{\"created\":N,\"existing\":M,\"categories_created\":K,\"errors\":[\"...\"]}` |\n\nExport shape:\n\n    <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n    <opml version=\"2.0\">\n      <head><title>feedreader subscriptions</title><dateCreated>2026-10-22T06:00:00Z</dateCreated></head>\n      <body>\n        <outline text=\"News\" title=\"News\">\n          <outline type=\"rss\" text=\"Probe Alpha\" title=\"Probe Alpha\" xmlUrl=\"http://127.0.0.1:8080/feeds/alpha.xml\" htmlUrl=\"http://probe.invalid/alpha\"/>\n        </outline>\n      </body>\n    </opml>\n\nExport rules: exactly one category outline per category that holds at least one feed, ordered by title asc; inside it exactly one feed outline per feed of that category, ordered by title asc; each feed outline carries `xmlUrl` (the subscribed feed URL), `htmlUrl` (the site URL), `title` and `text` (the feed title) and `type=\"rss\"`. A feed without a category is exported under `FEEDREADER_DEFAULT_CATEGORY`.\n\nImport rules: an outline whose `xmlUrl` is blank is a folder and its `text` or `title` is the category name - a category with that name is reused, otherwise it is created and counted in `categories_created`. An outline with a non blank `xmlUrl` is a subscription and is resolved exactly like `POST /api/v1/feeds` (a feed URL or a site URL, see 5.2); the resolved feed URL is the identity of the subscription. A subscription whose resolved feed URL is already subscribed is skipped and counted in `existing`; it is never created twice and its entries are never ingested again. A subscription that cannot be resolved is recorded in `errors` and the import continues with the remaining outlines. The import is idempotent: importing the same file twice leaves the subscription list unchanged.\n\n## 5. Intake rules\n### 5.1 Scheduler\nOne goroutine ticks every `FEEDREADER_SCHEDULER_TICK` (default `1s`). On each tick it selects the feeds whose `next_check_at <= now()` and that are not disabled, ordered by `next_check_at asc, id asc`, and refreshes them one at a time; there are no parallel fetches. A scheduled refresh runs exactly the same code path as `PUT /api/v1/feeds/{id}/refresh`.\n\nAfter every fetch, modified or not, the next check is computed:\n\n    refresh_delay = max(feed TTL, Cache-Control max-age, Expires - Date, Retry-After)\n    delay         = max(polling_interval, refresh_delay)\n    delay         = min(delay, max_polling_interval)\n    next_check_at = now + delay\n\nA publisher can therefore make the reader wait longer, never less, and the operator's configured interval is never overridden from below.\n\n### 5.2 Resolving a subscription URL: a feed URL or a site URL\n`POST /api/v1/feeds` and the OPML import both accept **a feed URL or a site URL**:\n1. the URL must be an absolute http or https URL, otherwise `400 invalid_url`;\n2. the body is fetched with the timeout and size limit of section 2;\n3. if the body parses as RSS, Atom or JSON Feed, that is the feed;\n4. otherwise, if the body is HTML, the page is scanned for `<link rel=\"alternate\" type=\"application/rss+xml|application/atom+xml|application/feed+json\" href=\"...\">`; the first candidate is resolved against the page URL, fetched and parsed; if it parses as a feed, that is the feed and the subscribed `feed_url` is the **candidate** URL, not the page URL;\n5. otherwise `400 not_a_feed`.\n\nThe page URL is kept as the `site_url` of the feed.\n\n### 5.3 Subscribe time ingestion\nA successful subscription is not an empty row. The fetch that resolves the feed also parses its items, and those items are stored immediately:\n- every parsed item becomes an entry of the new feed with `status = 'unread'`, `starred = false`, and its title, link, content and published date;\n- the feed row and those first entries are written in one transaction; if the entry insert fails, the feed row is rolled back and no partial subscription survives;\n- the `unread_count` of the response is the number of items stored this way, and is `0` for a feed that published nothing;\n- `checked_at = now` and `next_check_at = now + delay` (computed with 5.1) are set on the feed.\n\nSo a subscription is readable at once and the standing scheduler takes over from the next tick. Later refreshes insert only the items whose hash is unknown.\n\n### 5.4 Fetching, conditional requests and duplicates\n- Each fetch sends a `User-Agent` and, when the feed has stored validators, `If-None-Match: <etag>` and `If-Modified-Since: <last-modified>`.\n- `304 Not Modified` inserts nothing; only `checked_at`, `next_check_at` and the stored validators are updated.\n- `200` with a parseable body: the items are parsed; an item whose `hash` already exists for that feed is **not inserted again** - the existing row keeps its id and its stored fields may be refreshed in place; a new item is inserted with `status = 'unread'`.\n- A fetch or parse failure increments `parsing_error_count`, stores the message in `parsing_error_message` and leaves the stored entries untouched.\n\n## 6. Reading state\n- `status` is `unread` or `read`; there is no third value and no keep-unread toggle in this scope.\n- `starred` is a separate boolean. `PUT /api/v1/entries/{id}` with `{\"status\":\"read\"}` never clears `starred`, and `{\"starred\":false}` never changes the status.\n- The bulk endpoints of 4.4 change the status only, for one entry, one feed, one category or the whole account; `read-all` is account wide by design and the operator accepts that.\n- `changed_at` is updated on every state change and is the ordering key of the reader navigation.\n- Unread counts are derived from the entries, so a count and a list can never disagree.\n\n## 7. Web surface and operator steps\nThe service renders a small HTML surface with `html/template`:\n- `/` - the unread view: the entries of the selected scope (unread, one feed, one category), newest first, each row with the feed title, the title, the date and an unread marker;\n- `/feeds` - the subscription list with the per feed unread count, an add form and a delete action;\n- `/entries/{id}` - the reader view: the stored content, the feed title, a link to the source, the star toggle, the mark read toggle and the previous and next links;\n- `/categories` - the categories.\n\nHuman decisions left to the operator: which category a new feed goes into, whether a feed that stopped parsing is deleted, and what to keep (star) versus what to read. The acceptance probe drives the JSON API only; the operator checks the HTML surface by hand, and the acceptance README lists those steps.\n\n## 8. Operating commands\n    export FEEDREADER_DATABASE_URL='postgres://feedreader:feedreader@127.0.0.1:5432/feedreader?sslmode=disable'\n    export FEEDREADER_API_KEY='choose-a-long-random-value'\n    export FEEDREADER_USERNAME='reader'\n    export FEEDREADER_PASSWORD='choose-a-password'\n    export FEEDREADER_LISTEN_ADDR='127.0.0.1:8080'\n    export FEEDREADER_POLLING_INTERVAL='1h'\n    feedreader migrate\n    feedreader serve\n\n`feedreader serve` runs the HTTP server and the scheduler in one process. The service reads only environment variables, so the acceptance environment uses the same two commands with a disposable database and `FEEDREADER_POLLING_INTERVAL=5s` (see the acceptance README).\n\n## 9. Acceptance mapping\n| Case | What it pins | Endpoints |\n| --- | --- | --- |\n| A01 | standing intake: a new item arrives through the scheduler, carries the feed title and its canonical link, and is listed once | `POST /api/v1/feeds`, `GET /api/v1/entries`, `PUT /api/v1/feeds/{id}/refresh`, `GET /api/v1/config` |\n| A02 | reading state: mark read one by one, per feed, per category and for the account, with the unread counts falling and the starred flag independent | `PUT /api/v1/entries/{id}`, `PUT /api/v1/feeds/{id}/entries`, `PUT /api/v1/categories/{id}/entries`, `PUT /api/v1/entries/read-all`, `GET /api/v1/unread_count` |\n| A03 | portability: the export holds one outline per feed inside its category outline and the import recreates the list without duplicates | `GET /api/v1/export`, `POST /api/v1/import`, `DELETE /api/v1/feeds/{id}` |\n| A04 | the subscription list: a feed URL and a site URL are accepted, and a duplicate URL, an unknown category, a malformed URL and a body that is not a feed are refused without writing a row | `POST /api/v1/feeds`, `GET /api/v1/feeds` |\n| A05 | the reader view: content, feed title and canonical link of the selected entry, previous and next over the read entries, and a not found for an unknown id | `GET /api/v1/entries/{id}`, `GET /api/v1/entries` |\n\nThe probe compares the reader view with the entry it selected from the list, so it never depends on the order the service returns; the pinned order of 4.4 exists for the operator's own view and for the navigation rule.\n\n## 10. Known limitations\n- The upstream reference was read as source only and was never built, installed or run; no upstream runtime behaviour is claimed.\n- The probe drives the JSON API. The HTML surface of section 7 is checked by hand, not asserted.\n- The probe exercises RSS 2.0 fixtures only; Atom 0.3 and 1.0 and JSON Feed 1.0 and 1.1 parsing is specified in 5.2 but not covered by an acceptance case.\n- The scheduled intake check of A01 is reported as `not_run` when the service does not report `polling_interval_seconds`, or when the configured interval is longer than the probe intake timeout.\n- The probe needs a disposable instance, because `read-all` is account wide; it refuses to run against an instance that holds subscriptions outside its own `probe-` categories and deletes only records it created.\n- The site URL discovery of 5.2 reads the `link rel=\"alternate\"` tags of the page only; it does not crawl the page body.\n- Full text extraction, rewrite and filter rules, share codes, webhooks, third party integrations and the Fever or Google Reader compatible APIs are outside this leaf.\n- Podcast and video enclosures, playback position and the per feed crawler mode are outside this leaf.\n- The reader view renders the stored content only; the target never re-fetches the article page.\n- Multi user accounts, per user API tokens and passkey or OAuth logins are reduced to a single seeded operator.\n- An OPML import reuses an existing category by name, so two categories with the same title inside one file are merged into the first match.",
+    "limits": [
+      "辅助试产，非严格G1/T08。",
+      "The upstream reference was read as source only and was never built, installed or run; no upstream runtime behaviour is claimed and no certification of the upstream product is made.",
+      "The probe drives the JSON API of the target; the operator-facing HTML surface described in the architecture is verified by hand and is not asserted by an acceptance case.",
+      "Only RSS 2.0 fixtures are exercised by the probe; Atom 0.3/1.0 and JSON Feed 1.0/1.1 parsing is specified in the contract but not covered by an acceptance case.",
+      "The scheduled intake check of A01 is reported as not_run when the service does not report polling_interval_seconds on GET /api/v1/config, or when the configured polling interval is longer than the probe intake timeout; the remaining A01 sub-checks then run on the explicit refresh endpoint instead of the scheduler path.",
+      "The probe requires a disposable instance because read-all is account wide: it refuses to run against an instance that already holds subscriptions outside its own probe- categories, and it deletes only feeds in those categories and categories whose title starts with probe-.",
+      "The site URL discovery reads only the link rel=alternate tags of the page; it does not crawl the page body and does not guess a feed path.",
+      "Full text extraction, rewrite and filter rules, share codes, webhooks, third party integrations and the Fever or Google Reader compatible APIs are outside this leaf and are not implemented.",
+      "Podcast and video enclosures, playback position and per feed crawler mode are not part of the target scope.",
+      "The reader view renders the stored item content only; the target never re-fetches the article page, so an item whose source page changes is not updated in place.",
+      "Multi user accounts, per user API tokens and password or passkey login flows are reduced to a single seeded operator in this scope.",
+      "OPML import reuses an existing category by name, so two categories with the same title inside one file are merged into the first match."
+    ]
+  },
+  "trial_scope": "# 辅助试用范围\n\nKeep a personal list of feeds, let new items arrive on their own, and clear the unread backlog each morning while keeping the list portable\n\n- The upstream reference was read as source only and was never built, installed or run; no upstream runtime behaviour is claimed and no certification of the upstream product is made.\n- The probe drives the JSON API of the target; the operator-facing HTML surface described in the architecture is verified by hand and is not asserted by an acceptance case.\n- Only RSS 2.0 fixtures are exercised by the probe; Atom 0.3/1.0 and JSON Feed 1.0/1.1 parsing is specified in the contract but not covered by an acceptance case.\n- The scheduled intake check of A01 is reported as not_run when the service does not report polling_interval_seconds on GET /api/v1/config, or when the configured polling interval is longer than the probe intake timeout; the remaining A01 sub-checks then run on the explicit refresh endpoint instead of the scheduler path.\n- The probe requires a disposable instance because read-all is account wide: it refuses to run against an instance that already holds subscriptions outside its own probe- categories, and it deletes only feeds in those categories and categories whose title starts with probe-.\n- The site URL discovery reads only the link rel=alternate tags of the page; it does not crawl the page body and does not guess a feed path.\n- Full text extraction, rewrite and filter rules, share codes, webhooks, third party integrations and the Fever or Google Reader compatible APIs are outside this leaf and are not implemented.\n- Podcast and video enclosures, playback position and per feed crawler mode are not part of the target scope.\n- The reader view renders the stored item content only; the target never re-fetches the article page, so an item whose source page changes is not updated in place.\n- Multi user accounts, per user API tokens and password or passkey login flows are reduced to a single seeded operator in this scope.\n- OPML import reuses an existing category by name, so two categories with the same title inside one file are merged into the first match.\n\nOpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。模板先于应用；仅代表场景后续开发应用。严格G1/T08不因本包通过。",
+  "production": {
+    "schema": "atlas.auxiliary-model-production.v1",
+    "mode": "opencode-cli-go",
+    "model": "opencode-go/minimax-m3.1-flash-free",
+    "campaign_id": "atlas-v1-first-production-2026-10-19",
+    "phase": "auxiliary-full-full-leaf-auxiliary-2026-10-21",
+    "full_plan_id": "full-leaf-auxiliary-2026-10-21",
+    "profile": "full-leaf-v1",
+    "prompt_digest": "81297f85377bd12d9fa00400effbb8a5d308ded0019309cdc56772e5a1545ab5",
+    "review_status": "passed",
+    "review_input_digest": "8de8dd31ddf045137d78890a3f053e97630bd04e4c4d6da9e451c55f60a0dd21",
+    "review_result_digest": "ee63ff8224b7a406994d37526185af162281ebb85e408cac4f483190011a4db0",
+    "source_snapshot_digest": "fe95d322ce83e553cf45716c450770d6eb90a3cc9fe165d0952104c14be81a99",
+    "sessions": {
+      "blueprint-generate-aux": "ses_ea0bc516affevxm86YxBs19nO0",
+      "blueprint-spec-review-aux": "ses_ea0ae9a04ffexjxHLJRLax3gmP"
+    },
+    "research_reuse": null,
+    "upstream_runtime": "not_run",
+    "application_runtime": "not_run",
+    "strict_acceptance": false
+  }
+}

@@ -1,0 +1,255 @@
+{
+ "scenario": {
+  "name": "Morning triage of a self-hosted subscription list",
+  "audience": "One individual reader running Miniflux on their own server, following about twenty blogs and news feeds",
+  "objective": "Keep a personal list of feeds, let new items arrive on their own, and clear the unread backlog each morning while keeping the list portable",
+  "workflow": [
+   "Add sources: submit a site or feed URL, or import an OPML file, placing each feed in a category; the user's list is the only selector of what may appear.",
+   "Intake: the background scheduler refreshes each subscribed feed on its own interval (default polling 1h, honoring feed TTL and ETag/Last-Modified), parses RSS, Atom or JSON Feed, and stores newly published items attributed to their feed with status unread.",
+   "Triage: open the Unread view to see what arrived, with per-feed and total unread counts, then open an item to read it in the reader view with previous/next navigation through already-read items.",
+   "Record state: mark entries read (one by one, per feed or category, or mark all as read) and star the keepers, since starred is a separate flag from unread/read.",
+   "Maintain: export the subscription list as OPML to carry it to another reader, and re-import that file to restore the same feeds."
+  ],
+  "acceptance": [
+   "A newly published item shows up in the Unread view after a scheduled refresh, carries its feed's title and canonical link, and is listed only once because the item identifier is already known.",
+   "Marking an item read removes it from the Unread view and lowers the shown unread count, while an item that was starred keeps its starred flag after being read and still appears in the starred list.",
+   "Exporting the subscription list yields one OPML outline per subscribed feed with its xmlUrl inside its category outline, and importing that file back recreates the same subscriptions without duplicates."
+  ]
+ },
+ "fixed_scope": null,
+ "delivery_profile": "service",
+ "source": {
+  "repository": "https://github.com/miniflux/v2",
+  "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da",
+  "strategy_version": "full-leaf-selected-v2-88a755a184064577",
+  "collected_at": "2026-10-21T15:31:18.647547+00:00",
+  "files": {
+   "LICENSE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+   "README.md": "2a18e492d96193f6bb1122bd493944e07987920a06005a48651c304e310a4a48",
+   "internal/model/entry.go": "3b64600f275b86eff3f1b9ac35d27e0d9af284aa3f475b4c420c640be77b4ca3",
+   "internal/model/feed.go": "2e5c1759aea79a8c37be8b1fa8d7265ebb7ac178e411df7b9af43628e31b78dd",
+   "internal/reader/handler/handler.go": "f99ab981dcacd062d87362e330acc9ffa52153964cff95d7efbda32450a41927",
+   "internal/reader/opml/opml.go": "ff7806e6c7417db352a797a13485d0220c89b6eb07a79701723421598289157b",
+   "internal/ui/entry_read.go": "b9afe9f9eda4a902e43812920ce13e7d87b6235433b065bff6b0596884cc874a",
+   "internal/ui/entry_toggle_starred.go": "4d4310b71f6672c9ed36326774a520f03890e3e2939fc135713f51f6f66721e1"
+  },
+  "license_files": [
+   "LICENSE"
+  ],
+  "license": {
+   "status": "located",
+   "spdx_id": "Apache-2.0",
+   "notice_hashes": {
+    "LICENSE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+   }
+  },
+  "license_uncertainties": [
+   "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+  ],
+  "excluded_paths": [
+   "Unselected files; upstream not installed or run"
+  ]
+ },
+ "source_ids": {
+  "requirements": {
+   "atlas:b91e3b12c150b30bf7f6c5ae36b7e8086249a75b211c14347f67c6fd308df2a8": "leaf.md",
+   "scenario:9bb999639e8a90cfd3f95ec4972423b9a5ae2b718a346937f19cc231c3414ec3": "fixed scenario"
+  },
+  "upstream": {
+   "upstream:2e18fd4131f0c86c2979749be54014bd0d5b9280d1a919ccdc70e02a57b11af9": {
+    "path": "LICENSE",
+    "repository": "https://github.com/miniflux/v2",
+    "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da"
+   },
+   "upstream:66347612d4a33b59f695d199a3e1f82a4baa3cfe2ae4233a9607e5e9b9288b28": {
+    "path": "README.md",
+    "repository": "https://github.com/miniflux/v2",
+    "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da"
+   },
+   "upstream:b9b1045380d26694afcdbb677e2c3233d48763182a1982819ba6b67b6726e2ee": {
+    "path": "internal/model/entry.go",
+    "repository": "https://github.com/miniflux/v2",
+    "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da"
+   },
+   "upstream:b8dd589c8a201156c0e3d3ea38d3a39d714198c60d2daff773bc4a3109c27cb4": {
+    "path": "internal/model/feed.go",
+    "repository": "https://github.com/miniflux/v2",
+    "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da"
+   },
+   "upstream:7bb311aa259d91018897c821b5a517a9f9a174f57b62df38daaa6bf3c028672c": {
+    "path": "internal/reader/handler/handler.go",
+    "repository": "https://github.com/miniflux/v2",
+    "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da"
+   },
+   "upstream:501d5a3441bd7295da00a0e0d00a55b54cb7e11eeb81975cfbfe62e0039bc66f": {
+    "path": "internal/reader/opml/opml.go",
+    "repository": "https://github.com/miniflux/v2",
+    "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da"
+   },
+   "upstream:e9ffb5d218b7750c8e43d34ce409d08324c0f17ca8a9e8e3dd455675c4e0478d": {
+    "path": "internal/ui/entry_read.go",
+    "repository": "https://github.com/miniflux/v2",
+    "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da"
+   },
+   "upstream:914bb74c617eba76135d109f911590c3c5a99305564e75dc86b7811b0a82f13b": {
+    "path": "internal/ui/entry_toggle_starred.go",
+    "repository": "https://github.com/miniflux/v2",
+    "commit_sha": "bdd8087d9cf7a20ca7e800948389e8a7e86445da"
+   }
+  }
+ },
+ "inventory": [
+  {
+   "path": "LICENSE",
+   "lines": 177
+  },
+  {
+   "path": "README.md",
+   "lines": 148
+  },
+  {
+   "path": "internal/model/entry.go",
+   "lines": 101
+  },
+  {
+   "path": "internal/model/feed.go",
+   "lines": 325
+  },
+  {
+   "path": "internal/reader/handler/handler.go",
+   "lines": 381
+  },
+  {
+   "path": "internal/reader/opml/opml.go",
+   "lines": 181
+  },
+  {
+   "path": "internal/ui/entry_read.go",
+   "lines": 74
+  },
+  {
+   "path": "internal/ui/entry_toggle_starred.go",
+   "lines": 21
+  }
+ ],
+ "revision": {
+  "parent_failure_sha256": "c3bfd53c0e6b1a81081daabd0a8101c4e24e6203db2878680890efe57b39b213",
+  "feedback": {
+   "leaf": "feed-reader",
+   "stage": "independent_review",
+   "code": "auxiliary_content",
+   "error": "independent review did not pass; retain candidate and findings",
+   "at": 1792598266.255618,
+   "attempt": "attempt-1",
+   "stage_summaries": {
+    "calls/discovery/cli-summary.json": "0f728166d12906362d9eb3baf9dc486379f06c20dd4e9c5907d9c1476334f105",
+    "calls/blueprint-generate-aux-protocol-1/cli-summary.json": "f43aa2104bb23e98ac00abf0c82f6bc27bd90511b8adde4c1327afbc6f4619d1",
+    "calls/blueprint-spec-review-aux/cli-summary.json": "c9dfd76117d6f128320abf3e3e625020df3b41f31b8107c55b42d2c922ce83bc",
+    "calls/blueprint-generate-aux/cli-summary.json": "70dd688ae76b127b39b5fe67162df8140833bef475b090dd8a3b09b30b430e3a"
+   },
+   "raw_outputs": {
+    "calls/discovery/original-response.json": "8ea32d29da227aaf39c736538e4427f3db6be450d2a5ed134d79b67c4569be82",
+    "calls/blueprint-generate-aux-protocol-1/original-response.json": "f0022a52ff018592a979d3e144bce2c3761a84b069bf84269407e1ec304cc931",
+    "calls/blueprint-spec-review-aux/original-response.json": "01f8a19c9899dce4a1d01608533068c90200d7dfa79cfcb4c48415eb8c3ca647",
+    "calls/blueprint-generate-aux/original-response.json": "5d9b38381fb3c4c1973197c34548c782f9e5f2e3436e6e5ff97da618a5435649"
+   },
+   "review": {
+    "input_digest": "e3641af7679f04d5ae120e9e0ae2ff7815d0d9cf6c3b277d8bb7866304e60963",
+    "verdict": "needs_changes",
+    "checks": {
+     "leaf_scope": true,
+     "source_fidelity": true,
+     "design_distinction": true,
+     "core_journey": true,
+     "architecture": false,
+     "acceptance": false,
+     "limits_and_safety": true
+    },
+    "observations": [
+     {
+      "index": 0,
+      "verdict": "accepted",
+      "reason": "internal/model/entry.go:11-16 defines EntryStatusUnread='unread' (12), EntryStatusRead='read' (13), DefaultSortingOrder='published_at' (14) and DefaultSortingDirection='asc' (15); the two-valued status and the ascending default listing order quoted by the observation are exactly what the pinned bytes contain."
+     },
+     {
+      "index": 1,
+      "verdict": "accepted",
+      "reason": "internal/model/entry.go:27-48 is the Entry struct and does carry FeedID (30), Status (31), Hash (32), Title (33), URL (34), the boolean Starred (43) and the optional nested Feed *Feed pointer (46), so read state and starred state are separate attributes of the same row as claimed."
+     },
+     {
+      "index": 2,
+      "verdict": "accepted",
+      "reason": "internal/model/feed.go:32-37 lists CheckedAt (32), NextCheckAt (33), EtagHeader (34), LastModifiedHeader (35), ParsingErrorMsg (36) and ParsingErrorCount (37); the cited range and the described fetch bookkeeping plus error counters match the file."
+     },
+     {
+      "index": 3,
+      "verdict": "accepted",
+      "reason": "internal/model/feed.go:122-150 is ScheduleNextCheck: interval starts from the configured scheduler value (125), interval = max(interval, refreshDelay) (138) prevents a publisher delay from shortening it, the scheduler maximum is applied with min() (141-146) and NextCheckAt is written at 148, exactly the cited behaviour."
+     },
+     {
+      "index": 4,
+      "verdict": "accepted",
+      "reason": "internal/reader/handler/handler.go:244-249 computes ignoreHTTPCache = originalFeed.IgnoreHTTPCache || forceRefresh and only inside the negated branch attaches WithETag(originalFeed.EtagHeader) and WithLastModified(originalFeed.LastModifiedHeader); the conditional-request claim holds for the cited lines."
+     },
+     {
+      "index": 5,
+      "verdict": "accepted",
+      "reason": "internal/reader/handler/handler.go:304-333 contains refreshDelay := max(feedTTLValue, cacheControlMaxAgeValue, expiresValue) (309) and store.RefreshFeedEntries(..., updateExistingEntries) (333) with updateExistingEntries computed at 332, so both the max-of-TTL/Cache-Control/Expires delay and the store hand-off with an update-permission flag are inside the cited range."
+     },
+     {
+      "index": 6,
+      "verdict": "accepted",
+      "reason": "internal/reader/handler/handler.go:149-151 returns ErrDuplicatedFeed when store.FeedURLExists(userID, responseHandler.EffectiveURL()) and 153-156 returns the parser error when the fetched body is not a feed; store.CreateFeed is only reached at 188, so a refused subscription writes nothing as the observation states."
+     },
+     {
+      "index": 7,
+      "verdict": "accepted",
+      "reason": "internal/reader/opml/opml.go:30-36 declares the outline attributes title (31), text (32), xmlUrl (33), htmlUrl (34), description (35) and the nested Outlines collection (36), which is precisely the attribute list and nesting the observation claims."
+     },
+     {
+      "index": 8,
+      "verdict": "accepted",
+      "reason": "internal/reader/opml/opml.go:94-96 defines IsSubscription() as strings.TrimSpace(o.FeedURL) != '', i.e. only a non-blank xmlUrl makes an outline a subscription; outlines without xmlUrl are folders, exactly as observed."
+     },
+     {
+      "index": 9,
+      "verdict": "accepted",
+      "reason": "internal/ui/entry_read.go:42-44 builds NewEntryPaginationBuilder(user.ID, entry.ID, 'changed_at', 'desc').WithStatus(model.EntryStatusRead) and 50-58 assembles the prev/next routes from that result, so navigation is read-restricted and changed_at descending as described."
+     },
+     {
+      "index": 10,
+      "verdict": "accepted",
+      "reason": "internal/ui/entry_toggle_starred.go:13-21 is the whole toggleStarred handler: it calls store.ToggleStarred and returns 'OK' (20) without reading or writing the entry status, so the starred flag is independent of unread/read as the observation states."
+     },
+     {
+      "index": 11,
+      "verdict": "accepted",
+      "reason": "README.md:14 lists 'Atom 0.3/1.0, RSS 1.0/2.0, and JSON Feed 1.0/1.1', 15 states OPML file import/export and URL import and 18 states 'Organizes articles using categories and bookmarks'; the cited range supports every clause of the observation."
+     },
+     {
+      "index": 12,
+      "verdict": "accepted",
+      "reason": "README.md:101 documents 'Updates feeds in the background using an internal scheduler or a traditional cron job' and README.md:110 documents 'Respects/sends Last-Modified, If-Modified-Since, If-None-Match, Cache-Control, Expires and ETags headers, and has a default polling interval of 1h'; both cited lines are inside 101-110."
+     },
+     {
+      "index": 13,
+      "verdict": "accepted",
+      "reason": "README.md:91 'Written in Go (Golang)', 92 'Single binary compiled statically without dependency' and 93 'Works only with PostgreSQL' back the observation verbatim within the cited range 91-94."
+     },
+     {
+      "index": 14,
+      "verdict": "accepted",
+      "reason": "LICENSE:2-4 reads 'Apache License' / 'Version 2.0, January 2004' / 'http://www.apache.org/licenses/', which matches the cited range and the Apache-2.0 spdx_id and LICENSE notice hash recorded in input.json."
+     }
+    ],
+    "issues": [
+     "VIEW_ARCH.md:118 states 'Polling interval defaults to one hour and is clamped to [5m, 24h]' and VIEW_ARCH.md:65 computes next_check_at = now + clamp(max(polling_interval, refresh_delay), min_interval, max_interval), but VIEW_ARCH.md:111 sets FEEDREADER_POLLING_INTERVAL=5s in the acceptance environment with the comment 'short interval so the scheduled intake is observable in seconds', and acceptance/README.md:18 and acceptance/README.md:23 repeat that promise. Under the blueprint's own floor the 5s value becomes at least 5m, so the core standing-intake property cannot be observed in seconds: probe.py:391 reads polling_interval_seconds from /api/v1/config, and a reported 300s exceeds the 60s INTAKE_TIMEOUT so A01.6 (probe.py:465-472) is downgraded to not_run; if the raw 5s is reported while the effective cadence is 5m, A01.6 instead fails with 'no new item within 60s'. The documented acceptance setup therefore either silently skips or falsely fails the single case that verifies standing automated intake. Fix: exempt the configured polling interval from the [5m, 24h] floor (or make min_interval configurable / below 5m for the acceptance environment), or change VIEW_ARCH.md:111, acceptance/README.md:18 and :23 and probe.py so the documented setup really makes the scheduler path observable.",
+     "probe.py:532 selects target = alpha_entries[0] taken from list_entries(status='unread', feed_id=alpha_id) at probe.py:524, and probe.py:719-723 then asserts that the reader view of that entry has url == https://probe.invalid/alpha/1. That expectation only holds if the API returns the oldest alpha item first, but VIEW_ARCH.md:85 specifies the unread scope as 'newest first' and VIEW_ARCH.md:76 orders navigation by (changed_at DESC, id DESC), while VIEW_ARCH.md:45-46 specifies no ordering for GET /api/v1/entries at all. All three alpha fixture items share one pubDate (probe.py:180 default 'Mon, 05 Oct 2026 09:00:00 +0000'), so a conforming newest-first service returns alpha item 3 first and A05.2 fails even though the reader view is correct. Fix: derive the expected link from the selected entry (compare the view url against target['url']) or pin the API list order in VIEW_ARCH.md:45 and align the probe with it.",
+     "The probe asserts a subscribe-time ingestion rule that the contract section never states: A01.3/A01.5 (probe.py:446-462) require exactly one unread entry and an unread total of 1 immediately after POST /api/v1/feeds returns 201, and the gamma path of A04.7/A05.4 (probe.py:696-706 and probe.py:735-741) depends on the same behaviour, yet VIEW_ARCH.md:40-41 states the subscribe contract only as '201 feed | 400 invalid url / unknown category / not a feed | 409 duplicate feed url' and VIEW_ARCH.md:66-67 describes entry insertion solely as part of a refresh ('The refresh returns the number of rows actually inserted'). acceptance/README.md:52 already claims 'subscribing a feed URL stores its first item as unread', so the rule lives only in the verifier's documentation, not in the contract. An implementation that validates the URL by fetching and parsing but leaves ingestion to the first scheduled refresh satisfies the written contract while failing A01.3/A01.5 and emptying the A05.4 branch. Fix: state the subscribe-time ingestion rule and the initial next_check_at behaviour explicitly in VIEW_ARCH.md sections 4 or 5, or make the probe wait for or force a refresh before asserting."
+    ],
+    "summary": "All 15 author observations were re-verified against the pinned upstream bytes and every one holds with the exact cited line ranges, so the requirement/upstream/design partition is sound and the blueprint makes no upstream execution or certification claim. The blueprint covers the leaf's defining core (user-managed list as the only selector, standing automated intake, per-item read state plus an independent starred flag) and the fixed morning-triage scenario end to end (add sources, scheduler intake, unread triage with counts and reader navigation, one-by-one/per-feed/per-category/all mark-read, star, OPML round trip), and it keeps the reader/aggregator seam clean by excluding filter, ranking and sharing machinery. Limits are honest: the not-run states, the RSS-only fixture coverage and the never-executed probe are stated in VIEW_ARCH.md:127-131, gaps and acceptance/README.md:62-67, and the probe refuses to run against a non-disposable instance. Three concrete defects block a pass. (1) VIEW_ARCH.md:118's [5m, 24h] polling-interval floor contradicts the 5s acceptance environment of VIEW_ARCH.md:111 and acceptance/README.md:18/23, which silently makes the core scheduled-intake case A01.6 either not_run or falsely failing; (2) probe.py:719-723 hard-codes an item link that depends on an entry ordering the contract leaves unspecified and elsewhere contradicts ('newest first'), so A05.2 fails against a conforming implementation; (3) the subscribe-time ingestion asserted by A01.3/A01.5 and the gamma path exists only in acceptance/README.md:52, not in the architecture's contract section, so the verifier depends on an unwritten rule. Non-blocking notes: the design narrows the scenario's 'submit a site or feed URL' to a URL that must itself parse as a feed (VIEW_ARCH.md:94), which is consistent with upstream but is a deviation from the fixed workflow wording; VIEW_ARCH.md section 2 configures by environment variables while section 10's commands pass -database-url and -listen-addr flags; and no wire format is given for the timestamp fields the probe parses. Fixing the three blocking items by stating the entry list order, the subscribe-time ingestion rule and a polling-interval floor that honours the documented acceptance setup is sufficient; no new core features are required."
+   }
+  },
+  "scope": "Fix existing core violations only; preserve fixed scenario, sources and delivery profile."
+ }
+}
