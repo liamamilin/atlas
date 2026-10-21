@@ -43,7 +43,7 @@ The browser test saves and deletes this local file.
 writeFileSync(path.join(runtime, "drafts", "e2e-draft.md"), draftFixture);
 writeFileSync(path.join(runtime, "e2e-draft.fixture.md"), draftFixture);
 
-const child = spawn(process.env.PYTHON || "python3", ["drafts_api.py", "--port", "5199"], {
+const child = spawn(process.env.PYTHON || "python3", ["drafts_api.py", "--port", process.env.ATLAS_E2E_API_PORT || "5199"], {
   cwd: packRoot,
   env: {
     ...process.env,

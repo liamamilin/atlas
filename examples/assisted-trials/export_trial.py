@@ -28,6 +28,14 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def acceptance_inputs(directory):
+    return {
+        p.relative_to(directory).as_posix(): sha(p)
+        for p in sorted(directory.rglob("*"))
+        if p.is_file() and "__pycache__" not in p.parts
+    }
+
+
 def archive(source, path):
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as out:
         for item in sorted(source.rglob("*")):
@@ -39,6 +47,7 @@ def archive(source, path):
 def export_trial(inputs, destination, name, reuse=False):
     definition = json.loads((inputs / "definition.json").read_text())
     case = json.loads((inputs / "case-record.json").read_text())
+    acceptance = acceptance_inputs(inputs / "acceptance")
     if reuse and destination.exists():
         receipt = json.loads((destination / "EXPORT_RECEIPT.json").read_text())
         provenance = receipt["provenance"]
@@ -56,6 +65,18 @@ def export_trial(inputs, destination, name, reuse=False):
                 (destination / "template-snapshot.zip").read_bytes(), temporary
             )
             verify_frozen(temporary, receipt["template_digest"])
+            # Older receipts predate this input manifest. Compare with the
+            # original verified bytes instead of rewriting historical freezes.
+            expected = provenance.get("acceptance_inputs")
+            if expected is None:
+                expected = acceptance_inputs(Path(temporary) / "source/acceptance")
+                # render_candidate always adds this host-owned plan. It was
+                # not an authored acceptance input in legacy trial exports.
+                expected.pop("plan.json", None)
+            if acceptance != expected:
+                raise ValueError(
+                    "acceptance files changed; choose a new version/output"
+                )
         return {**receipt, "reused": True}
     original = definition["scenario_record"]
     # User explicitly chose this fixed draft revision for auxiliary development.
@@ -112,6 +133,7 @@ def export_trial(inputs, destination, name, reuse=False):
         },
         "case_record_sha256": sha(inputs / "case-record.json"),
         "definition_digest": digest(definition),
+        "acceptance_inputs": acceptance,
         "official_publication": False,
         "upstream_runtime": "not_run",
         "independent_evidence_review": "pending",

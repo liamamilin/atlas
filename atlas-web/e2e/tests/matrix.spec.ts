@@ -7,7 +7,7 @@ const e2eRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../.
 const runtimeRoot = path.join(e2eRoot, ".e2e-runtime");
 const draftPath = path.join(runtimeRoot, "drafts", "e2e-draft.md");
 const draftFixture = path.join(runtimeRoot, "e2e-draft.fixture.md");
-const apiBase = "http://127.0.0.1:5199";
+const apiBase = `http://127.0.0.1:${process.env.ATLAS_E2E_API_PORT || "5199"}`;
 
 function resetDraftFixture() {
   mkdirSync(path.dirname(draftPath), { recursive: true });

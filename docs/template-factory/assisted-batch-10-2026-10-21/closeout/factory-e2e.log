@@ -1,0 +1,115 @@
+
+> test:e2e:factory
+> playwright test --config playwright.factory.config.ts --reporter=line
+
+[WebServer] (node:99884) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 27 tests using 1 worker
+
+(node:99886) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/27] e2e/factory-tests/blueprint-runtime.spec.ts:23:1 › blueprint runtime submission requires adapter, source ZIP and execution consent, without a model field
+[2/27] e2e/factory-tests/blueprint-runtime.spec.ts:45:1 › runtime deep link exposes startup diagnostics, case evidence and cleanup errors
+[3/27] e2e/factory-tests/blueprint-runtime.spec.ts:65:1 › blueprint with no frozen runner adapter explains runtime acceptance is unavailable
+[4/27] e2e/factory-tests/factory.spec.ts:7:1 › factory catalog saves, confirms, pins and cancels a batch without a provider call
+[WebServer] ----------------------------------------
+
+[WebServer] Exception occurred during processing of request from ('127.0.0.1', 61851)
+[WebServer] ----------------------------------------
+[WebServer] Exception occurred during processing of request from ('127.0.0.1', 61850)
+
+[WebServer] Traceback (most recent call last):
+[WebServer]   File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py", line 683, in process_request_thread
+[WebServer]     self.finish_request(request, client_address)
+[WebServer]   File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py", line 360, in finish_request
+[WebServer]     self.RequestHandlerClass(request, client_address, self)
+
+[WebServer] Traceback (most recent call last):
+[WebServer]   File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py", line 747, in __init__
+[WebServer]     self.handle()
+[WebServer]   File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/http/server.py", line 433, in handle
+[WebServer]     self.handle_one_request()
+[WebServer]   File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/http/server.py", line 421, in handle_one_request
+[WebServer]     method()
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/drafts_api.py", line 1563, in do_GET
+[WebServer]     return self._factory("GET", parsed)
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/drafts_api.py", line 1401, in _factory
+[WebServer]     result = factory_api.dispatch(method, unquote(parsed.path), parsed.query,
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/template_factory/api.py", line 68, in dispatch
+[WebServer]     store = store or get_store()
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/template_factory/api.py", line 36, in get_store
+[WebServer]     return _initialized_store(
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/template_factory/api.py", line 32, in _initialized_store
+[WebServer]     return FactoryStore(root, pack)
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/template_factory/store.py", line 77, in __init__
+[WebServer]     con.execute("PRAGMA journal_mode=WAL")
+[WebServer]   File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py", line 683, in process_request_thread
+[WebServer]     self.finish_request(request, client_address)
+[WebServer] sqlite3.OperationalError: database is locked
+
+[WebServer] ----------------------------------------
+[WebServer]   File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py", line 360, in finish_request
+[WebServer]     self.RequestHandlerClass(request, client_address, self)
+[WebServer]   File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/socketserver.py", line 747, in __init__
+[WebServer]     self.handle()
+[WebServer]   File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/http/server.py", line 433, in handle
+[WebServer]     self.handle_one_request()
+[WebServer]   File "/Users/milin/.pyenv/versions/3.10.13/lib/python3.10/http/server.py", line 421, in handle_one_request
+[WebServer]     method()
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/drafts_api.py", line 1563, in do_GET
+[WebServer]     return self._factory("GET", parsed)
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/drafts_api.py", line 1401, in _factory
+[WebServer]     result = factory_api.dispatch(method, unquote(parsed.path), parsed.query,
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/template_factory/api.py", line 68, in dispatch
+[WebServer]     store = store or get_store()
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/template_factory/api.py", line 36, in get_store
+[WebServer]     return _initialized_store(
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/template_factory/api.py", line 32, in _initialized_store
+[WebServer]     return FactoryStore(root, pack)
+[WebServer]   File "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/template_factory/store.py", line 77, in __init__
+[WebServer]     con.execute("PRAGMA journal_mode=WAL")
+[WebServer] sqlite3.OperationalError: database is locked
+[WebServer] ----------------------------------------
+
+[WebServer] 1:21:54 PM [vite] http proxy error: /api/factory/batches
+[WebServer] Error: socket hang up
+[WebServer]     at Socket.socketOnEnd (node:_http_client:598:25)
+[WebServer]     at Socket.emit (node:events:531:35)
+[WebServer]     at endReadableNT (node:internal/streams/readable:1698:12)
+[WebServer]     at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+
+[WebServer] 1:21:54 PM [vite] http proxy error: /api/factory/artifacts
+[WebServer] Error: socket hang up
+[WebServer]     at Socket.socketOnEnd (node:_http_client:598:25)
+[WebServer]     at Socket.emit (node:events:531:35)
+[WebServer]     at endReadableNT (node:internal/streams/readable:1698:12)
+[WebServer]     at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+
+[5/27] e2e/factory-tests/factory.spec.ts:34:1 › catalog groups scenarios by type and preserves cross-group selection through collapse, search and refresh
+[6/27] e2e/factory-tests/factory.spec.ts:88:1 › visible generation entry filters covered leaves, marks zero additions and blocks active generation
+[7/27] e2e/factory-tests/factory.spec.ts:156:1 › leaf exposes confirmed scenarios and links to factory
+[8/27] e2e/factory-tests/factory.spec.ts:165:1 › draft scenarios can queue an independent pinned review without confirmation or provider calls
+[9/27] e2e/factory-tests/factory.spec.ts:187:1 › review actions distinguish first, repeat and retry; passed drafts still need human confirmation
+[10/27] e2e/factory-tests/factory.spec.ts:243:1 › scenario review displays reasons, revisions, failed attempts and bilingual stale evidence
+[11/27] e2e/factory-tests/factory.spec.ts:266:1 › covered types can complete without new drafts and explain their pinned output language
+[12/27] e2e/factory-tests/factory.spec.ts:281:1 › factory supports mobile, English, empty artifacts and recoverable errors
+[13/27] e2e/factory-tests/factory.spec.ts:297:1 › artifact distinguishes source review from runtime acceptance and can instantiate L0
+[14/27] e2e/factory-tests/factory.spec.ts:333:1 › leaf published template creates an application and explains review scope
+[15/27] e2e/factory-tests/factory.spec.ts:347:1 › cognitive sample imports once, reads definitions and exports a phased development handoff without provider calls
+[16/27] e2e/factory-tests/factory.spec.ts:396:1 › invalid cognitive ZIP shows an error and keeps imported candidates
+[17/27] e2e/factory-tests/factory.spec.ts:408:1 › cognitive document reader does not load remote images or execute embedded HTML
+[18/27] e2e/factory-tests/factory.spec.ts:430:1 › confirmed scenarios queue pinned cognition production separately from code templates
+[19/27] e2e/factory-tests/factory.spec.ts:446:1 › cognitive review queues independently, can retry after cancellation and produces a new pinned revision
+[20/27] e2e/factory-tests/factory.spec.ts:478:1 › 规范预审阻断可见，意见可带回生产补充要求
+[21/27] e2e/factory-tests/leaf-blueprint.spec.ts:32:1 › published product blueprint links to phase export and does not offer runnable instantiate
+[22/27] e2e/factory-tests/leaf-blueprint.spec.ts:40:1 › published runnable starter keeps its application archive flow
+[23/27] e2e/factory-tests/v1.spec.ts:18:1 › shared cases show fixed source, evidence, unknowns and keep legacy cards when the dynamic API is unavailable
+[24/27] e2e/factory-tests/v1.spec.ts:28:1 › case revisions expose observed evidence separately from unknown runtime and link into factory
+[25/27] e2e/factory-tests/v1.spec.ts:43:1 › V1 plan survives run, pause, resume and reload with a stable idempotency key
+[26/27] e2e/factory-tests/v1.spec.ts:98:1 › V1 catalog shows each blueprint runtime result per run and target, with no aggregate fallback
+[27/27] e2e/factory-tests/v1.spec.ts:126:1 › fresh deep link restores a running plan, polls its report, pauses by plan ID, then stops at terminal state
+  27 passed (55.3s)

@@ -3,6 +3,8 @@ import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+const apiBase = `http://127.0.0.1:${process.env.ATLAS_E2E_API_PORT || "5199"}`;
+
 const e2eRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const runtimeRoot = path.join(e2eRoot, ".e2e-runtime");
 const draftPath = path.join(runtimeRoot, "drafts", "e2e-draft.md");
@@ -184,7 +186,7 @@ test("project detail state follows the selected project", async ({ page, request
   const created: string[] = [];
   try {
     for (const name of ["Project switch A", "Project switch B"]) {
-      const response = await request.post("http://127.0.0.1:5199/api/projects", {
+      const response = await request.post(`${apiBase}/api/projects`, {
         headers: { "Content-Type": "application/json" },
         data: { name, objective: "Verify project identity", mode: "new" },
       });
@@ -199,7 +201,7 @@ test("project detail state follows the selected project", async ({ page, request
     await expect(page.locator("main h1")).toHaveText("Project switch B");
   } finally {
     for (const id of created) {
-      await request.delete(`http://127.0.0.1:5199/api/projects/${id}`);
+      await request.delete(`${apiBase}/api/projects/${id}`);
     }
   }
 });
@@ -212,14 +214,14 @@ test("English tutorial does not fall back to the long Chinese source", async ({ 
 });
 
 test("local API initializes recovery, backup download, and controlled restore", async ({ page, request }, testInfo) => {
-  const health = await request.get("http://127.0.0.1:5199/api/health");
+  const health = await request.get(`${apiBase}/api/health`);
   expect(health.ok()).toBeTruthy();
   expect((await health.json()).recovery.status).toBe("completed");
-  const readiness = await request.get("http://127.0.0.1:5199/api/ready");
+  const readiness = await request.get(`${apiBase}/api/ready`);
   expect(readiness.status()).toBe(200);
   expect((await readiness.json()).ready).toBe(true);
 
-  const response = await request.post("http://127.0.0.1:5199/api/projects", {
+  const response = await request.post(`${apiBase}/api/projects`, {
     headers: {
       "Content-Type": "application/json",
       "Origin": "https://attacker.example",
@@ -232,7 +234,7 @@ test("local API initializes recovery, backup download, and controlled restore", 
   const fixtureName = `Backup fixture ${testInfo.repeatEachIndex}-${Date.now()}`;
   let projectId: string | undefined;
   try {
-    const created = await request.post("http://127.0.0.1:5199/api/projects", {
+    const created = await request.post(`${apiBase}/api/projects`, {
       headers: { "Content-Type": "application/json" },
       data: { name: fixtureName, objective: "Verify backup download", mode: "new" },
     });
@@ -240,13 +242,13 @@ test("local API initializes recovery, backup download, and controlled restore", 
     const project = await created.json();
     projectId = project.id;
     const backup = await request.post(
-      `http://127.0.0.1:5199/api/projects/${project.id}/backup`,
+      `${apiBase}/api/projects/${project.id}/backup`,
       { headers: { "Content-Type": "application/json" }, data: {} },
     );
     expect(backup.status()).toBe(201);
     const backupResult = await backup.json();
     const download = await request.get(
-      `http://127.0.0.1:5199${backupResult.download_url}`,
+      `${apiBase}${backupResult.download_url}`,
     );
     expect(download.status()).toBe(200);
     expect(download.headers()["content-disposition"]).toContain("attachment");
@@ -281,7 +283,7 @@ test("local API initializes recovery, backup download, and controlled restore", 
      await expect(backupPanel.getByRole("button", { name: "删除归档", exact: true })).toHaveCount(1);
   } finally {
     if (projectId) {
-      await request.delete(`http://127.0.0.1:5199/api/projects/${projectId}`, {
+      await request.delete(`${apiBase}/api/projects/${projectId}`, {
         headers: { "Content-Type": "application/json" },
         data: { confirm: projectId },
       });
