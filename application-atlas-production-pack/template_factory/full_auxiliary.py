@@ -234,6 +234,99 @@ class FullAuxiliaryService:
             )
         return value["request"]
 
+    def prove_unlaunched(self, plan_id, leaf, work_name, stage, directory):
+        """A required reservation never existed; retain intent and record host proof."""
+        from atlas_runtime import atomic_json
+        from pathlib import Path
+
+        path = Path(directory).resolve()
+        with self.store.connect(True) as con:
+            plan = con.execute(
+                "SELECT * FROM auxiliary_full_plan WHERE id=? AND campaign_id=?",
+                (plan_id, self.campaign_id),
+            ).fetchone()
+            member = con.execute(
+                "SELECT body FROM auxiliary_full_leaf WHERE plan_id=? AND slug=?",
+                (plan_id, leaf),
+            ).fetchone()
+            if not plan or not member:
+                raise FactoryError("unknown recovery scope", "full_plan_binding", 409)
+            grant = json.loads(plan["request_json"])
+            root = (self.store.pack.parent / grant["scope"]["path"]).parent.resolve()
+            expected = root / "items" / leaf / work_name / "calls"
+            if path.parent != expected or not (path / "LAUNCH_INTENT.json").exists():
+                raise FactoryError("recovery path differs", "full_plan_binding", 409)
+            row = json.loads(member["body"])
+            binding = json.loads((path / "BINDING.json").read_text())
+            if (
+                binding["model"] != plan["model"]
+                or binding["leaf_sha256"] != row["leaf_sha256"]
+                or json.loads((path / "LAUNCH_INTENT.json").read_text())[
+                    "binding_digest"
+                ]
+                != digest(binding)
+            ):
+                raise FactoryError(
+                    "recovery binding differs", "full_plan_integrity", 409
+                )
+            jobs = con.execute(
+                "SELECT status FROM tf_budget_reservation WHERE campaign_id=? AND phase=? AND identity=? AND job_id=? AND stage=?",
+                (
+                    self.campaign_id,
+                    plan["phase"],
+                    plan_id + ":" + leaf,
+                    plan_id + ":" + leaf + ":" + work_name,
+                    stage,
+                ),
+            ).fetchall()
+            if any(x[0] != "not_started" for x in jobs) or any(
+                (path / n).exists()
+                for n in [
+                    "process.json",
+                    "events.jsonl",
+                    "stdout.log",
+                    "original-response.json",
+                    "DELIVERED.json",
+                ]
+            ):
+                raise FactoryError(
+                    "call may have started; cannot prove free recovery",
+                    "full_uncertain",
+                    409,
+                )
+            proof = {
+                "plan_id": plan_id,
+                "leaf": leaf,
+                "stage": stage,
+                "directory": str(path.relative_to(self.store.pack.parent)),
+                "intent_sha256": hashlib.sha256(
+                    (path / "LAUNCH_INTENT.json").read_bytes()
+                ).hexdigest(),
+                "charged_reservations": 0,
+                "process_or_output_artifacts": False,
+                "kind": "host_proven_not_started",
+                "observed_at": self.clock(),
+            }
+            con.execute(
+                "INSERT INTO auxiliary_full_event(plan_id,slug,kind,body,created) VALUES(?,?,'proved_not_started',?,?)",
+                (plan_id, leaf, json.dumps(proof), self.clock()),
+            )
+        atomic_json(path / "NOT_STARTED_PROOF.json", proof)
+        atomic_json(
+            path / "cli-summary.json",
+            {
+                "requested_model": plan["model"],
+                "session_id": None,
+                "cli_status": "not_started",
+                "delivery_status": "failed",
+                "output_observed": False,
+                "failure_code": "host_proven_not_started",
+                "reservation_id": None,
+                "host_proof_digest": digest(proof),
+            },
+        )
+        return proof
+
     def register_host_revision(self, request):
         """Append tested host-code correction; never rewrite scope, quota or clock."""
         if request.get(

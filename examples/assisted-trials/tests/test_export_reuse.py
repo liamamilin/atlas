@@ -95,21 +95,84 @@ class ExportReuseTests(unittest.TestCase):
 
     def test_model_provenance_travels_with_package_without_runtime_certification(self):
         definition = json.loads((self.inputs / "definition.json").read_text())
-        production = {"schema": "atlas.auxiliary-model-production.v1", "mode": "opencode-cli-go",
-                      "model": "opencode-go/deepseek-v4.1-flash", "review_status": "passed",
-                      "controlled_opencode_calls_added": 3, "application_runtime": "not_run",
-                      "upstream_runtime": "not_run", "strict_acceptance": False}
+        production = {
+            "schema": "atlas.auxiliary-model-production.v1",
+            "mode": "opencode-cli-go",
+            "model": "opencode-go/deepseek-v4.1-flash",
+            "review_status": "passed",
+            "controlled_opencode_calls_added": 3,
+            "application_runtime": "not_run",
+            "upstream_runtime": "not_run",
+            "strict_acceptance": False,
+        }
         definition["production"] = production
         (self.inputs / "definition.json").write_text(json.dumps(definition))
         receipt = export_trial(self.inputs, self.output, "model-test")
         self.assertEqual(receipt["controlled_opencode_calls_added"], 3)
         self.assertFalse(receipt["provenance"]["official_publication"])
-        self.assertEqual(receipt["provenance"]["independent_evidence_review"], "passed_auxiliary_static")
+        self.assertEqual(
+            receipt["provenance"]["independent_evidence_review"],
+            "passed_auxiliary_static",
+        )
         import zipfile
+
         with zipfile.ZipFile(self.output / "template-snapshot.zip") as archive:
-            self.assertEqual(json.loads(archive.read("source/inputs/model-production.json")), production)
+            self.assertEqual(
+                json.loads(archive.read("source/inputs/model-production.json")),
+                production,
+            )
         again = export_trial(self.inputs, self.output, "model-test", reuse=True)
         self.assertTrue(again["reused"])
+
+    def test_full_leaf_partial_export_recovers_and_derives_real_reservation_count(self):
+        from unittest.mock import patch
+
+        definition = json.loads((self.inputs / "definition.json").read_text())
+        definition["production"] = {
+            "schema": "atlas.auxiliary-model-production.v1",
+            "mode": "opencode-cli-go",
+            "model": "opencode-go/minimax-m3.1-flash-free",
+            "full_plan_id": "fixture",
+            "review_status": "passed",
+        }
+        (self.inputs / "definition.json").write_text(json.dumps(definition))
+        for name in ["AUTHOR_INPUT.json", "source-snapshot.json", "SOURCE_INPUT.json"]:
+            (self.inputs / name).write_text("{}")
+        for n in range(4):
+            p = self.inputs / "calls" / str(n)
+            p.mkdir(parents=True)
+            (p / "cli-summary.json").write_text(
+                json.dumps(
+                    {"reservation_id": "charged-" + str(n), "cli_status": "completed"}
+                )
+            )
+        p = self.inputs / "calls/not-started"
+        p.mkdir()
+        (p / "cli-summary.json").write_text(
+            json.dumps({"reservation_id": None, "cli_status": "not_started"})
+        )
+        self.output = self.inputs / "packages"
+        self.output.mkdir()
+        (self.output / "old-partial.txt").write_text("retain original partial output")
+        # This fixture isolates export/recovery. Real production invokes the
+        # full verifier; existing producer tests cover source/review identity.
+        with patch("produce_all_leaves.verify_full_production"):
+            receipt = export_trial(self.inputs, self.output, "full-fixture", reuse=True)
+            self.assertEqual(receipt["controlled_opencode_calls_added"], 4)
+            self.assertEqual(
+                (self.inputs / "packages.incomplete-1/old-partial.txt").read_text(),
+                "retain original partial output",
+            )
+            before = self.archives()
+            self.assertTrue(
+                export_trial(self.inputs, self.output, "full-fixture", reuse=True)[
+                    "reused"
+                ]
+            )
+            self.assertEqual(before, self.archives())
+            (self.inputs / "acceptance/probe.py").write_text("# changed verifier")
+            with self.assertRaisesRegex(ValueError, "acceptance files changed"):
+                export_trial(self.inputs, self.output, "full-fixture", reuse=True)
 
 
 if __name__ == "__main__":

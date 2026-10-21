@@ -481,6 +481,49 @@ class FullLeafTests(unittest.TestCase):
         with self.assertRaisesRegex(FactoryError, "frozen authorization"):
             self.service.register_host_revision(bad)
 
+    def test_missing_summary_recovery_requires_zero_charged_reservations_and_no_output(
+        self,
+    ):
+        leaf_sha = hashlib.sha256(b"leaf").hexdigest()
+        self.scope["items"][0]["leaf_sha256"] = leaf_sha
+        (self.root / "scope.json").write_text(json.dumps(self.scope))
+        self.request["scope"]["sha256"] = runner.sha(self.root / "scope.json")
+        self.register()
+        work = self.root / "items/leaf-0/attempt-1"
+        call = work / "calls/blueprint-generate-aux"
+        call.mkdir(parents=True)
+
+        class NeverStarted:
+            def run(inner, *a, **k):
+                raise FactoryError("paused before reservation", "full_plan_paused", 409)
+
+        with self.assertRaises(FactoryError):
+            runner.checkpoint(
+                call, {}, "prompt", NeverStarted(), {}, leaf=b"leaf", model=MODEL
+            )
+        original = (call / "LAUNCH_INTENT.json").read_bytes()
+        proof = self.service.prove_unlaunched(
+            "p", "leaf-0", "attempt-1", "first/blueprint-generate-aux/attempt-1", call
+        )
+        self.assertEqual(proof["charged_reservations"], 0)
+        self.assertEqual((call / "LAUNCH_INTENT.json").read_bytes(), original)
+        self.assertEqual(
+            json.loads((call / "cli-summary.json").read_text())["cli_status"],
+            "not_started",
+        )
+        self.assertEqual(self.service.status("p")["new_calls"], 0)
+        self.reserve(
+            stage="first/blueprint-generate-aux/attempt-1", job_id="p:leaf-0:attempt-1"
+        )
+        with self.assertRaisesRegex(FactoryError, "may have started"):
+            self.service.prove_unlaunched(
+                "p",
+                "leaf-0",
+                "attempt-1",
+                "first/blueprint-generate-aux/attempt-1",
+                call,
+            )
+
     def test_coordinator_auto_continues_20_20_1_and_isolates_failed_leaf(self):
         import signal
         import time

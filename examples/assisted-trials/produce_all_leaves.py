@@ -560,6 +560,19 @@ def stage_call(
     if (
         (path / "LAUNCH_INTENT.json").exists()
         and not (path / "DELIVERED.json").exists()
+        and not (path / "cli-summary.json").exists()
+    ):
+        proof_stage = (
+            ("protocol" if "-protocol-1" in relative else lane)
+            + "/"
+            + stage
+            + "/"
+            + work.name
+        )
+        service.prove_unlaunched(PLAN_ID, item["leaf"], work.name, proof_stage, path)
+    if (
+        (path / "LAUNCH_INTENT.json").exists()
+        and not (path / "DELIVERED.json").exists()
         and (path / "cli-summary.json").exists()
     ):
         old_summary = load(path / "cli-summary.json")

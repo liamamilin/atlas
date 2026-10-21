@@ -36,6 +36,24 @@ def acceptance_inputs(directory):
     }
 
 
+def production_call_count(inputs, production):
+    if not production:
+        return 0
+    if "controlled_opencode_calls_added" in production:
+        return production["controlled_opencode_calls_added"]
+    if not production.get("full_plan_id"):
+        raise ValueError("production call accounting missing")
+    # Full-leaf v1 kept each reservation receipt, but omitted the aggregate.
+    reservations = set()
+    for path in (inputs / "calls").glob("*/cli-summary.json"):
+        summary = json.loads(path.read_text())
+        if summary.get("reservation_id") and summary.get("cli_status") != "not_started":
+            reservations.add(summary["reservation_id"])
+    if not reservations:
+        raise ValueError("full-leaf production has no charged call receipts")
+    return len(reservations)
+
+
 def archive(source, path):
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as out:
         for item in sorted(source.rglob("*")):
@@ -49,24 +67,78 @@ def export_trial(inputs, destination, name, reuse=False):
     case = json.loads((inputs / "case-record.json").read_text())
     if definition.get("production", {}).get("full_plan_id"):
         from produce_all_leaves import verify_full_production
-        verify_full_production(inputs, definition["production"],
-            json.loads((inputs/"AUTHOR_INPUT.json").read_text()),
-            json.loads((inputs/"source-snapshot.json").read_text()))
+
+        verify_full_production(
+            inputs,
+            definition["production"],
+            json.loads((inputs / "AUTHOR_INPUT.json").read_text()),
+            json.loads((inputs / "source-snapshot.json").read_text()),
+        )
     if definition.get("production", {}).get("revision_request_digest"):
         from revise_with_opencode import verify_revision
-        verify_revision(inputs, definition["production"],
-                        json.loads((inputs / "AUTHOR_INPUT.json").read_text()),
-                        json.loads((inputs / "source-snapshot.json").read_text()))
-        if definition["case_ref"] != {k: case[k] for k in ("case_id", "revision", "digest")}:
+
+        verify_revision(
+            inputs,
+            definition["production"],
+            json.loads((inputs / "AUTHOR_INPUT.json").read_text()),
+            json.loads((inputs / "source-snapshot.json").read_text()),
+        )
+        if definition["case_ref"] != {
+            k: case[k] for k in ("case_id", "revision", "digest")
+        }:
             raise ValueError("revision case reference differs")
         from produce_batch import authored_definition
-        expected = authored_definition({"production_mode": "opencode-cli-go"},
-            json.loads((inputs / "AUTHOR_INPUT.json").read_text()), definition["scenario_record"], case,
-            json.loads((inputs / "source-snapshot.json").read_text()))
+
+        expected = authored_definition(
+            {"production_mode": "opencode-cli-go"},
+            json.loads((inputs / "AUTHOR_INPUT.json").read_text()),
+            definition["scenario_record"],
+            case,
+            json.loads((inputs / "source-snapshot.json").read_text()),
+        )
         expected["production"] = definition["production"]
         if expected != definition:
             raise ValueError("revision definition differs from reviewed model content")
     acceptance = acceptance_inputs(inputs / "acceptance")
+    if (
+        reuse
+        and destination.exists()
+        and not (destination / "EXPORT_RECEIPT.json").exists()
+        and definition.get("production", {}).get("full_plan_id")
+    ):
+        # Retain interrupted output instead of treating an absent receipt as a
+        # successful freeze. This is only the verified full-plan owned folder.
+        if (
+            destination.resolve().parent != inputs.resolve()
+            or destination.name != "packages"
+        ):
+            raise ValueError("incomplete full-leaf output outside owned directory")
+        manifest = {
+            p.relative_to(destination).as_posix(): sha(p)
+            for p in destination.rglob("*")
+            if p.is_file()
+        }
+        number = 1
+        preserved = destination.with_name(
+            destination.name + ".incomplete-" + str(number)
+        )
+        while preserved.exists():
+            number += 1
+            preserved = destination.with_name(
+                destination.name + ".incomplete-" + str(number)
+            )
+        destination.rename(preserved)
+        atomic_json(
+            inputs / ("EXPORT_RECOVERY_" + str(number) + ".json"),
+            {
+                "preserved_output": preserved.name,
+                "preserved_files": manifest,
+                "definition_digest": digest(definition),
+                "acceptance_inputs": acceptance,
+                "case_record_sha256": sha(inputs / "case-record.json"),
+                "model_calls_added": 0,
+            },
+        )
     if reuse and destination.exists():
         receipt = json.loads((destination / "EXPORT_RECEIPT.json").read_text())
         provenance = receipt["provenance"]
@@ -129,10 +201,18 @@ def export_trial(inputs, destination, name, reuse=False):
     )
     atomic_json(candidate / "inputs/shared-case-record.json", case)
     if definition.get("production"):
-        atomic_json(candidate / "inputs/model-production.json", definition["production"])
+        atomic_json(
+            candidate / "inputs/model-production.json", definition["production"]
+        )
     if definition.get("production", {}).get("full_plan_id"):
-        atomic_json(candidate/"inputs/authored-cognition.json", json.loads((inputs/"AUTHOR_INPUT.json").read_text()))
-        atomic_json(candidate/"inputs/source-partitions.json", json.loads((inputs/"SOURCE_INPUT.json").read_text()))
+        atomic_json(
+            candidate / "inputs/authored-cognition.json",
+            json.loads((inputs / "AUTHOR_INPUT.json").read_text()),
+        )
+        atomic_json(
+            candidate / "inputs/source-partitions.json",
+            json.loads((inputs / "SOURCE_INPUT.json").read_text()),
+        )
     atomic_json(candidate / "inputs/original-scenario-record.json", original)
     (candidate / "TRIAL_SCOPE.md").write_text(definition["trial_scope"])
     atomic_json(
@@ -167,9 +247,11 @@ def export_trial(inputs, destination, name, reuse=False):
     if production:
         # New auxiliary packages carry model provenance; old frozen bytes and
         # default receipt structure remain unchanged.
-        provenance.update(model_production=production,
-                          independent_evidence_review="passed_auxiliary_static",
-                          note="OpenCode CLI + Go source study and separate-session review. No upstream/downstream runtime or strict certification.")
+        provenance.update(
+            model_production=production,
+            independent_evidence_review="passed_auxiliary_static",
+            note="OpenCode CLI + Go source study and separate-session review. No upstream/downstream runtime or strict certification.",
+        )
     frozen = freeze_blueprint(candidate, destination / "template-snapshot", provenance)
     verify_frozen(destination / "template-snapshot", frozen["digest"])
     exported = export_development(
@@ -187,7 +269,7 @@ def export_trial(inputs, destination, name, reuse=False):
         "template_digest": frozen["digest"],
         "export": exported,
         "provenance": provenance,
-        "controlled_opencode_calls_added": production["controlled_opencode_calls_added"] if production else 0,
+        "controlled_opencode_calls_added": production_call_count(inputs, production),
         "official_queue_consumed": False,
         "archives": {
             n + ".zip": archive(destination / n, destination / (n + ".zip"))
