@@ -1,0 +1,1 @@
+Create the home and its equipment, define every-N-day care plans anchored to them, see the exact sets of tasks that are overdue, due, or upcoming as of a date, record a completion with a note, advance the next due date to max(old due_on, latest completion + interval_days) so it never regresses, and retrieve care history by home or equipment.

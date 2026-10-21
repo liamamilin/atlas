@@ -1,0 +1,30 @@
+{
+ "model": "opencode-go/deepseek-v4.1-flash",
+ "input_digest": "0db9c65f37a9f954c1cd9f1df6f4fa3e9a1acff5d026a605ccf9c985194d62bd",
+ "prompt": "You are a NEW independent reviewer, not the author. Read leaf.md, all supplied\nsource/upstream files and source/candidate files. Do not use an author transcript or\nassume its claims true. Input binds the COMPLETE author result digest; echo it exactly\nas input_digest. Check code/doc line citations against the actual fixed source, target\ninferences separate, home+recurring care+history leaf scope, end-to-end scenario,\nexplicit architecture/API/error/date rules, probe correctness and meaningful negative\nassertions, no upstream execution/certification claims, and clear limits.\nReturn JSON {input_digest,verdict:'pass'|'needs_changes',checks:{leaf_scope:boolean,\nsource_fidelity:boolean,design_distinction:boolean,core_journey:boolean,\narchitecture:boolean,acceptance:boolean,limits_and_safety:boolean},\nobservations:[{index:0-based author observation index,verdict:'accepted'|'rejected'|'uncertain',\nreason:'specific cited explanation'}],issues:[blocking concrete findings],summary}.\nPassing requires all checks true, every observation accepted, no issues. Do NOT waive\nreal mismatches to get pass. No search needed; source bytes are authoritative. Read only.\nFIRST read source/candidate/READING_GUIDE.md and READ_VIEWS.json.\nRead source/candidate/VIEW_ARCH.md from line 1 through EOF (paginate when necessary).\nIt is the exact decoded original arch string; never rely on the truncated JSON line.\nOther long string views are listed in READ_VIEWS.json. Read each completely. The host\nchecks line coverage of actual tool outputs, not just your declaration. Use the supplied\ninventory, not guessed filenames. Original JSON, acceptance code and source bytes have\nNOT changed. The prior review verdict/transcript is not provided; form your own findings.\n\nReview ALL existing core contracts, five corrections and interactions. Do not waive core defects; non-core feature/style wishes are follow-up only.",
+ "source": {
+  "candidate/AUTHOR_INPUT.json": "e99684e5dc31dcf364672122624dffbf1725daff22c2e1916bf07f18f758e4d1",
+  "candidate/READING_GUIDE.md": "fa2b824dba6a3073b3fea23035f8fc88378afa9e534093e4a4555efd7cae54e3",
+  "candidate/READ_VIEWS.json": "d11c28f1b6d7ab06e0c977b23cf9272e9f8b4d31175579b91493db72a7d7d795",
+  "candidate/REVIEW_SCOPE.md": "92ff838faff8ed89b85b7331176cbea5f95df5b50e4be45f40d83e5a0858a5b0",
+  "candidate/VIEW_ARCH.md": "9afaee3f43c3cad9762177dc9251dc6df5dd6a7bf841d3bf3c851534a7bf5098",
+  "candidate/VIEW_AUDIENCE.md": "da3042b0e768cad7cb08de50a5c02a66eb4e92aa055fa2f637a2eaf477a05314",
+  "candidate/VIEW_INFERENCE.md": "2feb54dcd47aacec495ff6db2dba92d143dd4b223c6e11b0408a31290f0d179d",
+  "candidate/VIEW_LICENSE.md": "2af71558e438db0b73a20beab92dc278a94e1bbe974c00c1a33e3ab62d53a608",
+  "candidate/VIEW_LICENSE_PATH.md": "c693279643b8cd5d248172d9c22cb7cf4ed163a3c98c8a3f69c2717edd3eacb7",
+  "candidate/VIEW_NAME.md": "03e5d2520c4667ace0d8a7b280f04f28d49c2ade96e45679d79ddd18f49c6e24",
+  "candidate/VIEW_OBJECTIVE.md": "57f36bf4fffe85f4b5f0a7178e4987a01fa41f1bd21296679106bf24815ab4dd",
+  "candidate/VIEW_REPO_NAME.md": "cfeddd00aba8b89a343df14268e71fecd2950ea61996b72cc79a868db1014d7b",
+  "candidate/acceptance/README.md": "3da2d8f23a643449ac6187e60a65024376975dcb91c46236e08d37eac89c41b5",
+  "candidate/acceptance/probe.py": "4661e379e75c2f0575e693d464a92c4ed0f4cd0f7d5bf00db8b1bdb24997159e",
+  "upstream/LICENSE": "837f9e6758e4d3313dc19beaa4638522f22c781c9a27d32ff56b473e7094eccc",
+  "upstream/README.md": "40b5d4f8df78510ec9b05454df1d307ca5eb44ee055328229faa07d0f6e1c348",
+  "upstream/internal/data/dashboard.go": "d03ed7b8243f97c6f906a52ba7aad63645a468586092c4584f20437972ffd656",
+  "upstream/internal/data/models.go": "5cd2a997f2efa9fd7d2916446d8173571fba7ee40dfb9703083d266bb6cab000",
+  "upstream/internal/data/store_house.go": "e79c86687cc434803229f62571c4b5737eac983a8d1e7d6ef1e32bf15c0bf205",
+  "upstream/internal/data/store_maintenance.go": "d150cb4ee2bc410a9844768b63a4447c81a8122555c9bcc465b1c54c3a9d2b37",
+  "upstream/internal/data/store_servicelog.go": "0cc864c8ff483237fbd128d417f6d2bf2a9ff66fdcbf2719c97cb239c6a65f4a",
+  "upstream/internal/data/validation.go": "6bb00aeae3903900ef4182e87fb10bbb640980bcde6739e5e252d29b45d8fef4"
+ },
+ "leaf_sha256": "cdff70bb68e06a7602222f7ea6e7f4167e9ff1f0311ed7db6441b31eb9f4ea33"
+}

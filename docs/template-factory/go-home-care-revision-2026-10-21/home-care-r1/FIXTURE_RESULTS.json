@@ -1,0 +1,167 @@
+{
+  "kind": "isolated_fixture_not_application_runtime",
+  "status": "passed",
+  "probe_sha256": "4661e379e75c2f0575e693d464a92c4ed0f4cd0f7d5bf00db8b1bdb24997159e",
+  "checks": [
+    {
+      "check": "A01",
+      "expected": "pass",
+      "result": "pass"
+    },
+    {
+      "check": "A02",
+      "expected": "pass",
+      "result": "pass"
+    },
+    {
+      "check": "A03",
+      "expected": "pass",
+      "result": "pass"
+    },
+    {
+      "check": "A04",
+      "expected": "pass",
+      "result": "pass"
+    },
+    {
+      "check": "A05",
+      "expected": "pass",
+      "result": "pass"
+    },
+    {
+      "check": "two_initial_backfill_branches",
+      "expected": "pass",
+      "result": "pass",
+      "explicit": [
+        {
+          "before": {
+            "id": "pl_00000000000000000000000000000007",
+            "home_id": "home",
+            "equipment_id": null,
+            "name": "Probe plan A03B 20261021102152483323-1",
+            "interval_days": 30,
+            "last_completed_on": null,
+            "due_on": "2026-03-01",
+            "notes": "",
+            "created_at": "2026-10-21T00:00:000040Z",
+            "updated_at": "2026-10-21T00:00:000041Z"
+          },
+          "completion": {
+            "id": "cm_00000000000000000000000000000007",
+            "plan_id": "pl_00000000000000000000000000000007",
+            "completed_on": "2025-01-01",
+            "note": "Initial backfill",
+            "created_at": "2026-10-21T00:00:000042Z"
+          },
+          "new_due_on": "2026-03-01",
+          "latest": "2025-01-01"
+        }
+      ],
+      "creation_day": [
+        {
+          "before": {
+            "id": "pl_00000000000000000000000000000008",
+            "home_id": "home",
+            "equipment_id": null,
+            "name": "Probe plan A03D 20261021102152483323-1",
+            "interval_days": 30,
+            "last_completed_on": null,
+            "due_on": "2026-10-21",
+            "notes": "",
+            "created_at": "2026-10-21T00:00:000044Z",
+            "updated_at": "2026-10-21T00:00:000045Z"
+          },
+          "completion": {
+            "id": "cm_00000000000000000000000000000008",
+            "plan_id": "pl_00000000000000000000000000000008",
+            "completed_on": "2025-01-01",
+            "note": "No anchor backfill",
+            "created_at": "2026-10-21T00:00:000046Z"
+          },
+          "new_due_on": "2026-10-21",
+          "latest": "2025-01-01"
+        }
+      ]
+    },
+    {
+      "check": "empty_patch_write",
+      "expected": "detected",
+      "result": "detected",
+      "message": "empty patch must not mutate the patched home object"
+    },
+    {
+      "check": "invalid_category_write",
+      "expected": "detected",
+      "result": "detected",
+      "message": "invalid equipment category must write nothing"
+    },
+    {
+      "check": "missing_due_floor",
+      "expected": "detected",
+      "result": "detected",
+      "message": "initial backfill must keep the existing due date"
+    },
+    {
+      "check": "due_extra",
+      "expected": "detected",
+      "result": "detected",
+      "message": "horizon zero before far due: expected 1 tasks, got 2: ['pl_00000000000000000000000000000001', 'unexpected']"
+    },
+    {
+      "check": "due_duplicate",
+      "expected": "detected",
+      "result": "detected",
+      "message": "horizon zero before far due: expected 1 tasks, got 2: ['pl_00000000000000000000000000000001', 'pl_00000000000000000000000000000001']"
+    },
+    {
+      "check": "due_missing",
+      "expected": "detected",
+      "result": "detected",
+      "message": "horizon zero before far due: expected 1 tasks, got 0: []"
+    },
+    {
+      "check": "html_label",
+      "expected": "detected",
+      "result": "detected",
+      "message": "input home-name must have a matching label for"
+    },
+    {
+      "check": "html_fieldset",
+      "expected": "detected",
+      "result": "detected",
+      "message": "every fieldset must contain a legend"
+    },
+    {
+      "check": "html_caption",
+      "expected": "detected",
+      "result": "detected",
+      "message": "UI must have a due table with a caption"
+    },
+    {
+      "check": "html_scope",
+      "expected": "detected",
+      "result": "detected",
+      "message": "every due table th must use scope=col"
+    },
+    {
+      "check": "html_status",
+      "expected": "detected",
+      "result": "detected",
+      "message": "UI must include a state feedback region"
+    },
+    {
+      "check": "html_lang",
+      "expected": "detected",
+      "result": "detected",
+      "message": "html lang must be en"
+    },
+    {
+      "check": "html_live",
+      "expected": "detected",
+      "result": "detected",
+      "message": "state feedback region must use aria-live=polite"
+    }
+  ],
+  "application_runtime": "not_run",
+  "upstream_runtime": "not_run"
+}

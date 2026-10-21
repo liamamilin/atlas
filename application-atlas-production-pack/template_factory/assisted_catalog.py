@@ -82,6 +82,8 @@ def _entry(store, row, artifacts):
     production = ({"mode": model_production["mode"], "model": model_production["model"],
                    "review_status": model_production["review_status"],
                    "review_input_digest": model_production["review_input_digest"]} if model_production else None)
+    if production and model_production.get("revision_request_digest"):
+        production.update(parent=model_production["parent"], revision_id=model_production["revision_id"])
     supplement = row.get("production_review")
     if production and supplement:
         production["review_status"] = "incomplete_materials"
@@ -141,7 +143,9 @@ def catalog(store, filters=None):
         items.append(item)
     return {"items": items, "unavailable": unavailable, "counts": {
         "total": len(items), "core_verified": sum(i["runtime"]["status"] == "core_verified" for i in items),
-        "not_run": sum(i["runtime"]["status"] == "not_run" for i in items)}}
+        "not_run": sum(i["runtime"]["status"] == "not_run" for i in items),
+        "usable": sum(i["files"].get("development", {}).get("available", False) for i in items),
+        "needs_revision": sum(bool(i.get("production")) and i["production"]["review_status"] != "passed" for i in items)}}
 
 
 def download(store, artifact_id, kind):

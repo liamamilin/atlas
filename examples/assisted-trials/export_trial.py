@@ -47,6 +47,20 @@ def archive(source, path):
 def export_trial(inputs, destination, name, reuse=False):
     definition = json.loads((inputs / "definition.json").read_text())
     case = json.loads((inputs / "case-record.json").read_text())
+    if definition.get("production", {}).get("revision_request_digest"):
+        from revise_with_opencode import verify_revision
+        verify_revision(inputs, definition["production"],
+                        json.loads((inputs / "AUTHOR_INPUT.json").read_text()),
+                        json.loads((inputs / "source-snapshot.json").read_text()))
+        if definition["case_ref"] != {k: case[k] for k in ("case_id", "revision", "digest")}:
+            raise ValueError("revision case reference differs")
+        from produce_batch import authored_definition
+        expected = authored_definition({"production_mode": "opencode-cli-go"},
+            json.loads((inputs / "AUTHOR_INPUT.json").read_text()), definition["scenario_record"], case,
+            json.loads((inputs / "source-snapshot.json").read_text()))
+        expected["production"] = definition["production"]
+        if expected != definition:
+            raise ValueError("revision definition differs from reviewed model content")
     acceptance = acceptance_inputs(inputs / "acceptance")
     if reuse and destination.exists():
         receipt = json.loads((destination / "EXPORT_RECEIPT.json").read_text())

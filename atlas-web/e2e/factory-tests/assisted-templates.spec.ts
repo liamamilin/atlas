@@ -102,3 +102,18 @@ test('recovered refresh clears its alert while a user action error remains visib
  const before=calls;await expect.poll(()=>calls,{timeout:10000}).toBeGreaterThan(before);
  await expect(page.getByRole('alert')).toContainText('Manual action rejected');
 });
+
+test('reviewed revision retains its withdrawn parent and separates usable entries from history',async({page})=>{
+ await setup(page,true);
+ await page.addInitScript(()=>localStorage.setItem('atlas-lang','zh'));
+ await page.route('**/api/factory/assisted-templates**',r=>r.fulfill({json:{items:[{...item,
+  production:{mode:'opencode-cli-go',model:'opencode-go/deepseek-v4.1-flash',review_status:'passed',review_input_digest:'e'.repeat(64),revision_id:'home-care-r1',parent:{artifact_id:'tpl_parent',digest:'f'.repeat(64)}},
+  runtime:{...item.runtime,status:'not_run',scope:'No app run'},files:{development:item.files.development}}],
+  unavailable:[],counts:{total:2,usable:1,needs_revision:1,core_verified:0,not_run:2}}}));
+ await page.goto('/types/'+leaf.slug);
+ await expect(page.getByText(/2 条目录记录 · 1 份可用 · 1 份待修订历史/)).toBeVisible();
+ const info=page.getByRole('region',{name:'辅助模板信息 '+item.title});
+ await expect(info.getByRole('link',{name:'回查已撤回父版本'})).toHaveAttribute('href','/factory?view=artifacts&artifact_id=tpl_parent');
+ await expect(info.getByText('应用未运行',{exact:true})).toBeVisible();
+ await expect(info.getByRole('link',{name:'下载标准开发包'})).toBeVisible();
+});

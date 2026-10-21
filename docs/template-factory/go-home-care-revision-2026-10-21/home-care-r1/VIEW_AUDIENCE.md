@@ -1,0 +1,1 @@
+A single homeowner keeping care records for their own home on a local machine, with no accounts, notifications, or multi-property operation.

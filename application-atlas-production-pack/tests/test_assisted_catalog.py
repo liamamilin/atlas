@@ -51,7 +51,7 @@ class AssistedCatalogTests(unittest.TestCase):
         before = self.store.artifacts()
         with patch("subprocess.run", side_effect=AssertionError("read must not execute anything")):
             result = self.get()
-        self.assertEqual(result["counts"], {"total": 1, "core_verified": 1, "not_run": 0})
+        self.assertEqual(result["counts"], {"total": 1, "core_verified": 1, "not_run": 0, "usable": 1, "needs_revision": 0})
         item = result["items"][0]
         self.assertEqual(item["runtime"]["online_status"], "not_checked")
         self.assertFalse(item["runtime"]["strict_acceptance"])

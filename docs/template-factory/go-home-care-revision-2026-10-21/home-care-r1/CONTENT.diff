@@ -1,0 +1,358 @@
+--- parent/authored/objective
++++ home-care-r1/authored/objective
+@@ -1 +1 @@
+-Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.
++Create the home and its equipment, define every-N-day care plans anchored to them, see the exact sets of tasks that are overdue, due, or upcoming as of a date, record a completion with a note, advance the next due date to max(old due_on, latest completion + interval_days) so it never regresses, and retrieve care history by home or equipment.
+--- parent/authored/workflow
++++ home-care-r1/authored/workflow
+@@ -2,8 +2,8 @@
+   "Start the local server against a disposable data directory; initialize the SQLite schema on first start.",
+   "Create the single home with POST /api/home, then add equipment records with POST /api/equipment anchored by home_id.",
+   "Create care plans with POST /api/plans using interval_days and an optional equipment anchor.",
+-  "Query GET /api/tasks/due with an explicit as_of and horizon_days to see overdue, due, and upcoming work.",
+-  "Record a completion and note with POST /api/plans/{id}/completions; the same transaction updates the plan next due date.",
++  "Query GET /api/tasks/due with an explicit as_of and horizon_days to see the exact overdue, due, and upcoming task sets.",
++  "Record a completion and note with POST /api/plans/{id}/completions; one transaction appends the actual completion and note, stores the true latest completion date, and sets due_on to max(old due_on, latest + interval_days).",
+   "Read GET /api/plans/{id}/completions or GET /api/history filtered by home_id and equipment_id.",
+   "Use GET / for the basic accessible single-page UI; all actions remain available through the documented JSON API."
+ ]
+--- parent/authored/acceptance
++++ home-care-r1/authored/acceptance
+@@ -1,7 +1,7 @@
+ [
+   "A fresh database has no home; POST /api/home creates exactly one record with id home, and a second POST returns 409 HOME_EXISTS without mutating the stored home.",
+-  "POST /api/equipment under the existing home returns 201 and round-trips through list and detail; blank names, invalid categories, and unknown homes return 422 or 404 and add no equipment row.",
+-  "POST /api/plans enforces interval_days 1..3650 and mutual exclusion of last_completed_on and first_due_on; GET /api/tasks/due returns exact overdue, due, and upcoming sets at as_of and horizon_days boundaries, while invalid requests write nothing.",
+-  "A completion with note inserts one history row and atomically sets due_on to max(previous last_completed_on, completed_on) plus interval_days; leap-day, month-end, year-end, future-date, oversize-note, and unknown-plan failures leave both plan and completions unchanged.",
+-  "GET /api/history filters by home and equipment and returns documented fields in descending completion order; invalid filters write nothing; GET / is dependency-free accessible HTML and unknown routes or methods return documented JSON errors."
++  "POST /api/equipment under the existing home returns 201 and round-trips through list and detail; blank names, invalid categories with otherwise valid fields, and unknown homes return 422 or 404 and add no equipment row.",
++  "POST /api/plans enforces interval_days 1..3650 and mutual exclusion of last_completed_on and first_due_on; GET /api/tasks/due returns exact overdue, due, and upcoming ID sets and counts at as_of and horizon_days boundaries, so duplicate, extra, or missing tasks fail, while invalid requests write nothing.",
++  "A completion with note inserts one history row and atomically sets last_completed_on to max(existing last_completed_on if present, completed_on) and due_on to max(old due_on, latest + interval_days); leap-day, month-end, year-end, initial-backfill, no-anchor, future-date, oversize-note, and unknown-plan failures leave both plan and completions unchanged.",
++  "GET /api/history filters by home and equipment and returns documented fields in descending completion order; invalid filters write nothing; GET / is dependency-free accessible HTML with html lang=en, every input labelled by for/id, fieldset/legend groups, a due-table caption with th scope=col, and a role=status aria-live=polite feedback shell; unknown routes or methods return documented JSON errors."
+ ]
+--- parent/authored/goals
++++ home-care-r1/authored/goals
+@@ -1,7 +1,7 @@
+ [
+-  "In a dedicated data directory, create the single home, add an equipment record under it, and prove duplicate-home and invalid-equipment requests return 409, 422, or 404 without changing stored records.",
+-  "Create plans with interval_days in 1..3650 and verify GET /api/tasks/due returns the exact overdue, due, and upcoming sets at the as_of and horizon_days boundaries while invalid plans write nothing.",
+-  "Record a completion and note in one atomic call and verify due_on becomes max(previous last_completed_on, completed_on) plus interval_days across leap-day, month-end, and year-end examples, with invalid completions leaving no trace.",
++  "In a dedicated data directory, create the single home, add an equipment record under it, and prove duplicate-home and invalid-name, invalid-category, and unknown-home requests return 409, 422, or 404 without changing stored records.",
++  "Create plans with interval_days in 1..3650 and verify GET /api/tasks/due returns exact overdue, due, and upcoming ID sets and counts at the as_of and horizon_days boundaries, using fresh equipment scopes, while invalid plans write nothing.",
++  "Record a completion and note in one atomic call and verify last_completed_on is the true latest date and due_on is max(old due_on, latest + interval_days) across leap-day, month-end, year-end, initial-backfill, and no-anchor creation-day examples, with invalid completions leaving no trace.",
+   "Retrieve completions filtered by home and equipment in documented descending order with plan and equipment names and notes, and reject invalid filters without writes.",
+-  "Load GET / and assert a dependency-free, labelled, keyboard-accessible HTML shell exposes home, equipment, plan, due, completion, and history workflows, while unknown routes and methods return documented JSON errors."
++  "Load GET / and assert a dependency-free HTML shell exposes home, equipment, plan, due, completion, and history workflows with structural accessibility relationships (label for/id, fieldset/legend, due caption and th scope=col, role=status, aria-live=polite, lang=en), while unknown routes and methods return documented JSON errors."
+ ]
+--- parent/authored/arch
++++ home-care-r1/authored/arch
+@@ -8,7 +8,7 @@
+ - Decision: exactly one home with fixed id `home`, because the pinned scenario is the user's own home and upstream exposes a single house profile.
+ - Decision: recurrence is every N calendar days, 1..3650, because the scenario says every N days. Upstream uses interval months; this target is not API-compatible with it.
+ - Decision: a plan created without an anchor is due on the server local creation date.
+-- Decision: a backdated completion never moves next due backwards; next due is based on the latest completion date.
++- Decision: next due after any completion is `max(old due_on, max(existing last_completed_on, completed_on) + interval_days)`; a backdated completion can never move `due_on` earlier, including a plan seeded only with `first_due_on` or no anchor.
+ - Decision: no natural-language dates and no timezone-bearing timestamps in domain dates.
+ 
+ ## Runtime, data directory, start
+@@ -74,12 +74,13 @@
+ - `last_completed_on` and `first_due_on` are mutually exclusive; supplying both is 422.
+ - `last_completed_on` may not be after `server_today`; `first_due_on` may not be before 1900-01-01 or after 2100-12-31.
+ - Completion accepts `completed_on <= server_today`.
+-- Next due after a completion is always `max(previous last_completed_on, completed_on) + interval_days`, using proleptic Gregorian ordinal addition. This makes backdated entries safe and never regresses the schedule.
++- Next due after a completion is always `max(old due_on, max(previous last_completed_on, completed_on) + interval_days)`, using proleptic Gregorian ordinal addition. `last_completed_on` is set to the true latest of its previous value and `completed_on`. This makes backdated entries safe, including a plan seeded only with `first_due_on` or no anchor, and never regresses the schedule.
+ - If a plan was seeded with `last_completed_on`, that seed is not a completion record; only completion rows appear in history.
+ - Due status at `as_of`: `overdue` when `due_on < as_of`; `due` when equal; `upcoming` when greater.
+ - Due query includes tasks with `due_on <= as_of + horizon_days`. Default `horizon_days=0`, so default shows overdue and due only. Horizon range 0..365.
+ - Sort order: due tasks by `due_on ASC, created_at ASC, id ASC`; plans by `created_at ASC, id ASC`; completions and history by `completed_on DESC, created_at DESC, id DESC`.
+ - Date edge examples: 2024-02-28 + 1 = 2024-02-29; 2024-02-29 + 1 = 2024-03-01; 2024-12-31 + 30 = 2025-01-30; 2026-01-31 + 31 = 2026-03-03.
++- Initial backfill examples: `due_on=2026-03-01` with interval 30 and `completed_on=2025-01-01` keeps `last_completed_on=2025-01-01` and `due_on=2026-03-01`; a plan with no anchor is due on its creation day and a backdated completion keeps that due date.
+ - Integer fields reject booleans, floats, and numeric strings; JSON boolean true is not an integer. Query integers use decimal digits only.
+ 
+ ## HTTP API
+@@ -148,21 +149,22 @@
+ - Validate method, content type, JSON, field presence, types, bounds, enums, dates, and referential checks before opening a write transaction.
+ - For `POST /api/home`, insert with fixed id `home`; a concurrent duplicate loses with 409 and leaves exactly one row.
+ - For `POST /api/equipment` and `POST /api/plans`, one INSERT each; foreign-key failure maps to 404 or 422, not 500.
+-- For completion, `BEGIN IMMEDIATE`; select plan; compute `last = max(previous last_completed_on, completed_on)`; INSERT completion; UPDATE plan `last_completed_on`, `due_on`, and `updated_at`; COMMIT. Any error triggers ROLLBACK, leaving zero new completions and an unchanged plan.
++- For completion, `BEGIN IMMEDIATE`; select plan; compute `latest = max(previous last_completed_on, completed_on)` (or `completed_on` when absent); INSERT completion with the actual `completed_on` and note; UPDATE plan `last_completed_on=latest`, `due_on=max(old due_on, latest + interval_days)`, and `updated_at`; COMMIT. Any error triggers ROLLBACK, leaving zero new completions and an unchanged plan.
+ - Reads never create rows. A failed request must produce no completion, no plan, no equipment, and no home mutation.
+ - SQLite constraint errors are mapped to a deterministic 422 or 409; unexpected errors return 500 `INTERNAL_ERROR` without partial commits.
+ 
+ ## Basic accessible UI
+ `GET /` returns one HTML document with `lang=en`, UTF-8, no external assets, and a small inline script that calls the JSON API.
+ - Sections, in order: Home; Equipment; Care plans; Due work; Completion history.
+-- Every input has a visible `label for` tied to an id; groups use `fieldset` and `legend`.
++- Every `input` has an `id` and a visible `label for` that references it; groups use `fieldset` and `legend`.
+ - Buttons are native `button` elements with descriptive text: Create home, Add equipment, Add plan, Record completion, Refresh.
+-- Due table has `caption`, `th scope=col`, and text status plus a non-color-only overdue label.
++- Due table has a `caption`, every `th` uses `scope=col`, and text status plus a non-color-only overdue label.
+ - Success and validation messages render in a container with `role=status` and `aria-live=polite`; errors also include the field name.
+ - Forms are keyboard operable, visible focus is retained, default browser font sizing is not disabled, and no timeout or auto-submit is used.
+ - Completing a task opens a small form for `completed_on` and `note`; the API response updates the due list and history without a full page reload.
+ - History has home and equipment filters populated from the API.
+ - The UI is a convenience surface; all behavior is available through the documented API.
++- These structural checks are a smoke test, not a certification of full accessibility conformance.
+ 
+ ## Probe contract
+-`probe.py` is a standard-library HTTP client supplied in `acceptance_files`. It accepts `--base-url` and exactly one `--case A01..A05`, creates only disposable records with a unique suffix, never deletes, and asserts exact statuses, shapes, dates, ordering, and zero-write outcomes. It does not start the server and makes no claim about an upstream run.
++`probe.py` is a standard-library HTTP client supplied in `acceptance_files`. It accepts `--base-url` and exactly one `--case A01..A05`, creates only disposable records with a unique suffix, never deletes, and asserts exact statuses, shapes, dates, ordering, exact due ID sets and counts, zero-write outcomes, and HTML structure through `html.parser.HTMLParser`. It does not start the server and makes no claim about an upstream run.
+--- parent/authored/gaps
++++ home-care-r1/authored/gaps
+@@ -7,9 +7,9 @@
+   "Every-N-days recurrence differs from upstream interval months; no compatibility with upstream databases, APIs, or schema is claimed.",
+   "No delete, undo, archive, or restore endpoints; completion history is append-only and test records remain until the disposable data directory is discarded.",
+   "Validation is strict and date-only; natural-language dates and timezone conversion are unsupported. Server local date can differ by one day from a client in another timezone.",
+-  "The UI is a minimal single-page client, not a polished product; no internationalization, offline cache, or mobile-native behavior.",
++  "The UI is a minimal single-page client, not a polished product; no internationalization, offline cache, or mobile-native behavior. Accessibility assertions are structural and do not certify full conformance.",
+   "Schema v1 has no migration path. Changing entities later needs an explicit migration or a new disposable database.",
+   "Concurrency is sized for one user; SQLite WAL and busy_timeout reduce but do not eliminate lock contention.",
+-  "User decision points: confirm one-home scope, the default due date of creation day when no anchor is provided, latest-completion rollover for backdated entries, strict date-only input, and the absence of delete and defect-tracking features.",
++  "User decision points: confirm one-home scope, creation-day due for plans without an anchor, `max(old due_on, latest completion + interval_days)` rollover that never regresses, strict date-only input, and the absence of delete and defect-tracking features.",
+   "Restart durability may be described as an operator stop and start step in README; it was not run and is not claimed as verified."
+ ]
+--- parent/acceptance/README.md
++++ home-care-r1/acceptance/README.md
+@@ -18,13 +18,16 @@
+ python3 probe.py --base-url http://127.0.0.1:8765 --case A01
+ ```
+ Cases:
+-- A01 home and equipment anchor, duplicate and invalid zero-write checks.
+-- A02 plan bounds, due statuses, and as_of and horizon edges.
+-- A03 completion, note, leap and month and year date edges, rollback checks.
++- A01 home and equipment anchor; duplicate, empty-patch, blank-name, invalid-category, and unknown-home zero-write checks. The empty-patch baseline is the successful PATCH response, including `updated_at`.
++- A02 plan bounds; exact overdue, due, and upcoming ID sets and counts at `as_of` and `horizon_days` boundaries using fresh equipment scopes.
++- A03 completion, note, leap and month and year date edges, initial backfills, no-anchor creation-day due, and rollback checks.
+ - A04 home and equipment history ordering and filters.
+-- A05 accessible HTML shell, unknown route, and method errors.
++- A05 structural HTML shell checks with `html.parser.HTMLParser`, unknown route, and method errors. These are structural assertions, not full accessibility certification.
+ 
+ Run cases one at a time or all five sequentially against the same disposable database. Each case creates unique records.
++
++## Date contract
++A completion stores `last_completed_on = max(existing last_completed_on if present, completed_on)` and sets `due_on = max(old due_on, latest + interval_days)`. The completion row and plan update are one transaction. Initial backfills and plans without an anchor keep the old due date when the computed date would be earlier.
+ 
+ ## Expected result
+ The script prints `PASS A0N` and exits 0 when every assertion passes. It prints `FAIL A0N: ...` or `ERROR A0N: ...` and exits 1 otherwise. A failure is evidence of a contract mismatch, not a reason to weaken the documented contract.
+--- parent/acceptance/probe.py
++++ home-care-r1/acceptance/probe.py
+@@ -13,6 +13,7 @@
+ import urllib.error
+ import urllib.parse
+ import urllib.request
++from html.parser import HTMLParser
+ 
+ TIMEOUT = 10
+ SUFFIX = dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d%H%M%S%f') + '-' + str(os.getpid())
+@@ -125,6 +126,13 @@
+     return api(base_url, 'GET', due_path(home_id, as_of, horizon_days, equipment_id))['tasks']
+ 
+ 
++def check_task_ids(tasks, expected_ids, context):
++    ids = [task['id'] for task in tasks]
++    check(len(ids) == len(expected_ids), f'{context}: expected {len(expected_ids)} tasks, got {len(ids)}: {ids}')
++    check(len(set(ids)) == len(ids), f'{context}: duplicate task ids in {ids}')
++    check(set(ids) == set(expected_ids), f'{context}: expected ids {sorted(expected_ids)}, got {sorted(ids)}')
++
++
+ def create_completion(base_url, plan_id, completed_on, note=''):
+     payload = {'completed_on': completed_on, 'note': note}
+     return api(base_url, 'POST', '/api/plans/' + plan_id + '/completions', payload, 201)
+@@ -161,7 +169,7 @@
+     patched = api(base_url, 'PATCH', '/api/home', {'name': before['name'], 'address': before['address']})['home']
+     check(patched['id'] == 'home' and patched['name'] == before['name'] and patched['address'] == before['address'], 'home patch round trip failed')
+     expect_error(base_url, 'PATCH', '/api/home', {}, 422, 'VALIDATION_ERROR')
+-    check(api(base_url, 'GET', '/api/home')['home'] == before, 'empty patch must not mutate home')
++    check(api(base_url, 'GET', '/api/home')['home'] == patched, 'empty patch must not mutate the patched home object')
+     equipment = create_equipment(base_url, home['id'], 'A01')
+     check(equipment['home_id'] == home['id'], 'equipment must be anchored to home')
+     check(equipment['installed_on'] == '2020-02-29', 'equipment date round trip failed')
+@@ -171,6 +179,8 @@
+     check(any(item['id'] == equipment['id'] for item in before_equipment), 'created equipment must be listed')
+     expect_error(base_url, 'POST', '/api/equipment', {'home_id': home['id'], 'name': '   ', 'category': 'heating'}, 422, 'VALIDATION_ERROR')
+     check(list_equipment(base_url, home['id']) == before_equipment, 'blank equipment name must write nothing')
++    expect_error(base_url, 'POST', '/api/equipment', {'home_id': home['id'], 'name': 'Probe bad category ' + SUFFIX, 'category': 'not-a-category'}, 422, 'VALIDATION_ERROR')
++    check(list_equipment(base_url, home['id']) == before_equipment, 'invalid equipment category must write nothing')
+     expect_error(base_url, 'POST', '/api/equipment', {'home_id': 'missing-home', 'name': 'Ghost', 'category': 'other'}, 404, 'HOME_NOT_FOUND')
+     check(list_equipment(base_url, home['id']) == before_equipment, 'unknown home must write nothing')
+     expect_error(base_url, 'GET', '/api/equipment', None, 422, 'VALIDATION_ERROR')
+@@ -181,47 +191,61 @@
+ def case_a02(base_url):
+     home = ensure_home(base_url)
+     equipment = create_equipment(base_url, home['id'], 'A02')
++    other_equipment = create_equipment(base_url, home['id'], 'A02X')
+     baseline = len(list_plans(base_url, home['id']))
+     far = create_plan(base_url, home['id'], 'A02F', 90, equipment_id=equipment['id'], first_due_on='2026-03-01')
+-    old = create_plan(base_url, home['id'], 'A02O', 30, first_due_on='2026-01-01')
++    old = create_plan(base_url, home['id'], 'A02O', 30, equipment_id=equipment['id'], first_due_on='2026-01-01')
++    decoy = create_plan(base_url, home['id'], 'A02X', 10, equipment_id=other_equipment['id'], first_due_on='2026-02-01')
+     check(far['due_on'] == '2026-03-01', 'first_due_on must be preserved')
+     check(far['equipment_id'] == equipment['id'], 'plan equipment anchor lost')
+     check(old['due_on'] == '2026-01-01', 'second plan due date wrong')
++    check(decoy['equipment_id'] == other_equipment['id'], 'decoy plan equipment anchor lost')
+     for interval in (0, 3651, -1):
+         expect_error(base_url, 'POST', '/api/plans', {'home_id': home['id'], 'name': 'Bad interval ' + SUFFIX, 'interval_days': interval}, 422, 'VALIDATION_ERROR')
+     for interval in (1.5, True, '30'):
+         expect_error(base_url, 'POST', '/api/plans', {'home_id': home['id'], 'name': 'Bad type ' + SUFFIX, 'interval_days': interval}, 422, 'VALIDATION_ERROR')
+     expect_error(base_url, 'POST', '/api/plans', {'home_id': home['id'], 'name': 'Two anchors ' + SUFFIX, 'interval_days': 10, 'last_completed_on': '2025-01-01', 'first_due_on': '2025-02-01'}, 422, 'VALIDATION_ERROR')
+     expect_error(base_url, 'POST', '/api/plans', {'home_id': home['id'], 'name': 'Bad date ' + SUFFIX, 'interval_days': 10, 'first_due_on': '2026-02-30'}, 422, 'VALIDATION_ERROR')
+-    check(len(list_plans(base_url, home['id'])) == baseline + 2, 'invalid plans must not be stored')
+-    tasks = due_tasks(base_url, home['id'], '2026-02-28')
++    check(len(list_plans(base_url, home['id'])) == baseline + 3, 'invalid plans must not be stored')
++    tasks = due_tasks(base_url, home['id'], '2026-02-28', 0, equipment['id'])
++    check_task_ids(tasks, [old['id']], 'horizon zero before far due')
+     by_id = {task['id']: task for task in tasks}
+-    check(old['id'] in by_id and by_id[old['id']]['status'] == 'overdue', 'old plan must be overdue on 2026-02-28')
++    check(by_id[old['id']]['status'] == 'overdue', 'old plan must be overdue on 2026-02-28')
+     check(far['id'] not in by_id, 'future plan must be excluded at horizon zero')
+-    tasks = due_tasks(base_url, home['id'], '2026-03-01')
++    tasks = due_tasks(base_url, home['id'], '2026-03-01', 0, equipment['id'])
++    check_task_ids(tasks, [old['id'], far['id']], 'as_of on far due date')
+     by_id = {task['id']: task for task in tasks}
+     check(by_id[old['id']]['status'] == 'overdue', 'old plan still overdue on 2026-03-01')
+     check(by_id[far['id']]['status'] == 'due' and by_id[far['id']]['days_until_due'] == 0, 'far plan must be due on its due date')
+-    tasks = due_tasks(base_url, home['id'], '2026-02-28', 1)
++    tasks = due_tasks(base_url, home['id'], '2026-02-28', 1, equipment['id'])
++    check_task_ids(tasks, [old['id'], far['id']], 'horizon one before far due')
+     by_id = {task['id']: task for task in tasks}
+     check(by_id[far['id']]['status'] == 'upcoming' and by_id[far['id']]['days_until_due'] == 1, 'horizon one must expose tomorrow as upcoming')
+-    tasks = due_tasks(base_url, home['id'], '2026-03-02')
++    check(by_id[old['id']]['status'] == 'overdue', 'horizon one must keep old plan overdue')
++    tasks = due_tasks(base_url, home['id'], '2026-03-02', 0, equipment['id'])
++    check_task_ids(tasks, [old['id'], far['id']], 'day after far due')
+     by_id = {task['id']: task for task in tasks}
+     check(by_id[far['id']]['status'] == 'overdue' and by_id[far['id']]['days_until_due'] == -1, 'next day must be overdue')
+-    ordered = due_tasks(base_url, home['id'], '2026-03-01')
++    ordered = due_tasks(base_url, home['id'], '2026-03-01', 0, equipment['id'])
++    check_task_ids(ordered, [old['id'], far['id']], 'ordered due query')
++    check([task['id'] for task in ordered] == [old['id'], far['id']], 'due tasks must sort by due_on')
+     dates = [task['due_on'] for task in ordered]
+     check(dates == sorted(dates), 'due tasks must sort by due_on')
+-    filtered = due_tasks(base_url, home['id'], '2026-03-01', 0, equipment['id'])
+-    check([task['id'] for task in filtered] == [far['id']], 'equipment filter must isolate the equipment plan')
++    filtered = due_tasks(base_url, home['id'], '2026-03-01', 0, other_equipment['id'])
++    check_task_ids(filtered, [decoy['id']], 'other equipment due filter')
++    check(filtered[0]['status'] == 'overdue', 'decoy plan must stay overdue in its own scope')
+     filtered_plans = list_plans(base_url, home['id'], equipment['id'])
+-    check([plan['id'] for plan in filtered_plans] == [far['id']], 'plan equipment filter must isolate the equipment plan')
++    check(len(filtered_plans) == 2, 'plan equipment filter must return exactly two plans')
++    check({plan['id'] for plan in filtered_plans} == {old['id'], far['id']}, 'plan equipment filter must isolate the fresh scope')
++    other_plans = list_plans(base_url, home['id'], other_equipment['id'])
++    check([plan['id'] for plan in other_plans] == [decoy['id']], 'plan equipment filter must isolate the decoy scope')
+     detail = get_plan(base_url, far['id'])
+     check(detail['due_on'] == '2026-03-01' and detail['completion_count'] == 0, 'plan detail must expose due date and count')
+     for as_of, horizon in (('2026-02-30', 0), ('2026-02-29', 0), ('2026-03-01', -1), ('2026-03-01', 366)):
+-        expect_error(base_url, 'GET', due_path(home['id'], as_of, horizon), None, 422, 'VALIDATION_ERROR')
++        expect_error(base_url, 'GET', due_path(home['id'], as_of, horizon, equipment['id']), None, 422, 'VALIDATION_ERROR')
+     expect_error(base_url, 'GET', '/api/tasks/due?as_of=2026-03-01', None, 422, 'VALIDATION_ERROR')
+-    expect_error(base_url, 'GET', due_path('missing-home', '2026-03-01'), None, 404, 'HOME_NOT_FOUND')
+-    check(len(list_plans(base_url, home['id'])) == baseline + 2, 'due query errors must not write plans')
++    expect_error(base_url, 'GET', due_path('missing-home', '2026-03-01', 0, equipment['id']), None, 404, 'HOME_NOT_FOUND')
++    check(len(list_plans(base_url, home['id'])) == baseline + 3, 'due query errors must not write plans')
+ 
+ 
+ def case_a03(base_url):
+@@ -258,6 +282,23 @@
+     note_plan = create_plan(base_url, home['id'], 'A03N', 10, first_due_on='2025-01-01')
+     note_result = create_completion(base_url, note_plan['id'], '2025-01-01', 'x' * 500)
+     check(len(note_result['completion']['note']) == 500, 'five hundred code point note must be accepted')
++    backfill = create_plan(base_url, home['id'], 'A03B', 30, first_due_on='2026-03-01')
++    check(backfill['due_on'] == '2026-03-01', 'initial backfill plan due date wrong')
++    backfilled = create_completion(base_url, backfill['id'], '2025-01-01', 'Initial backfill')
++    check(backfilled['plan']['last_completed_on'] == '2025-01-01', 'initial backfill must store the actual completion as latest')
++    check(backfilled['plan']['due_on'] == '2026-03-01', 'initial backfill must keep the existing due date')
++    backfill_logs = list_completions(base_url, backfill['id'])
++    check([entry['completed_on'] for entry in backfill_logs] == ['2025-01-01'], 'initial backfill must append the actual completion date')
++    check(backfill_logs[0]['note'] == 'Initial backfill', 'initial backfill must append the note')
++    today = dt.date.today().isoformat()
++    anchorless = create_plan(base_url, home['id'], 'A03D', 30)
++    check(anchorless['due_on'] == today, 'no-anchor plan must be due on creation day')
++    anchorless_back = create_completion(base_url, anchorless['id'], '2025-01-01', 'No anchor backfill')
++    check(anchorless_back['plan']['last_completed_on'] == '2025-01-01', 'no-anchor plan must store the actual completion as latest')
++    check(anchorless_back['plan']['due_on'] == today, 'no-anchor backfill must keep the creation-day due date')
++    anchorless_today = create_completion(base_url, anchorless['id'], today, 'No anchor today')
++    check(anchorless_today['plan']['last_completed_on'] == today, 'latest completion must win over an older completion')
++    check(anchorless_today['plan']['due_on'] == (dt.date.today() + dt.timedelta(days=30)).isoformat(), 'no-anchor completion must advance from the latest date')
+     logs = list_completions(base_url, plan['id'])
+     dates = [entry['completed_on'] for entry in logs]
+     check(dates == ['2024-12-31', '2024-02-29', '2024-01-15'], 'plan history order failed')
+@@ -303,14 +344,78 @@
+     check(len(list_plans(base_url, home['id'])) == before_count, 'history errors must not write plans')
+ 
+ 
++class UIParser(HTMLParser):
++    def __init__(self):
++        super().__init__(convert_charrefs=True)
++        self.html_lang = None
++        self.input_ids = []
++        self.label_targets = set()
++        self.fieldsets = []
++        self.closed_fieldsets = []
++        self.tables = []
++        self.closed_tables = []
++        self.status_regions = []
++
++    def handle_starttag(self, tag, attrs):
++        attrs = dict(attrs)
++        if tag == 'html' and self.html_lang is None:
++            self.html_lang = attrs.get('lang')
++        if tag == 'label' and attrs.get('for'):
++            self.label_targets.add(attrs['for'])
++        if tag == 'input':
++            self.input_ids.append(attrs.get('id'))
++        if tag == 'fieldset':
++            self.fieldsets.append({'has_legend': False})
++        if tag == 'legend' and self.fieldsets:
++            self.fieldsets[-1]['has_legend'] = True
++        if tag == 'table':
++            self.tables.append({'caption': '', 'in_caption': False, 'th_scopes': []})
++        if tag == 'caption' and self.tables:
++            self.tables[-1]['in_caption'] = True
++        if tag == 'th' and self.tables:
++            self.tables[-1]['th_scopes'].append(attrs.get('scope'))
++        if (attrs.get('role') or '').lower() == 'status':
++            self.status_regions.append({'aria_live': attrs.get('aria-live')})
++
++    def handle_endtag(self, tag):
++        if tag == 'fieldset' and self.fieldsets:
++            self.closed_fieldsets.append(self.fieldsets.pop())
++        if tag == 'caption' and self.tables:
++            self.tables[-1]['in_caption'] = False
++        if tag == 'table' and self.tables:
++            self.closed_tables.append(self.tables.pop())
++
++    def handle_data(self, data):
++        if self.tables and self.tables[-1]['in_caption']:
++            self.tables[-1]['caption'] += data
++
++
+ def case_a05(base_url):
+     status, parsed, raw, ctype = request(base_url, 'GET', '/')
+     check(status == 200, f'GET /: expected 200, got {status}')
+     check('text/html' in ctype.lower(), f'GET /: expected HTML, got {ctype!r}')
+-    text = raw.decode('utf-8').lower()
++    document = raw.decode('utf-8')
++    text = document.lower()
+     for token in ('<html lang=', '<label', '<form', '<button', 'aria-live', 'home', 'equipment', 'due', 'history', 'complete'):
+         check(token in text, 'UI missing token ' + token)
+     check('<script src=' not in text, 'UI must not load external scripts')
++    parser = UIParser()
++    parser.feed(document)
++    parser.close()
++    check((parser.html_lang or '').lower() == 'en', 'html lang must be en')
++    check(parser.input_ids, 'UI must contain form inputs')
++    for input_id in parser.input_ids:
++        check(input_id, 'every input must have an id')
++        check(input_id in parser.label_targets, 'input ' + input_id + ' must have a matching label for')
++    check(parser.closed_fieldsets, 'UI must group fields with fieldset')
++    check(all(item['has_legend'] for item in parser.closed_fieldsets), 'every fieldset must contain a legend')
++    due_tables = [table for table in parser.closed_tables if 'due' in table['caption'].lower()]
++    check(due_tables, 'UI must have a due table with a caption')
++    for table in due_tables:
++        check(table['th_scopes'], 'due table must use th cells')
++        check(all((scope or '').lower() == 'col' for scope in table['th_scopes']), 'every due table th must use scope=col')
++    check(parser.status_regions, 'UI must include a state feedback region')
++    check(any((region['aria_live'] or '').lower() == 'polite' for region in parser.status_regions), 'state feedback region must use aria-live=polite')
+     health = api(base_url, 'GET', '/health')
+     check(health.get('status') == 'ok', 'health status must be ok')
+     expect_error(base_url, 'GET', '/api/unknown', None, 404, 'NOT_FOUND')

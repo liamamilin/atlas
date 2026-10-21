@@ -1,0 +1,274 @@
+{
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "cli_sessions_used": 93,
+  "factory_cli_sessions_used": 92,
+  "external_cli_sessions_used": 1,
+  "time_resumes": [
+    {
+      "grant_id": "egrant_5168847ee98d4b7f980779bb9199f44f",
+      "job_id": "job_b01427592b164863aab5bedf7b3863bb",
+      "campaign_id": "atlas-v1-first-production-2026-10-19",
+      "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+      "product_id": "product-c42848f63251507bd9d911a5",
+      "previous_deadline": 1792495312.855422,
+      "paused_at": 1792490680.244128,
+      "remaining_seconds": 4632.611294,
+      "activated_at": 1792496531.354074,
+      "effective_deadline": 1792501163.965368,
+      "authorization_digest": "4384d1c263c8c553c73b85b2fe6e11533325b64f95c9343fe63a49f4fd97767e",
+      "external_cli_sessions": 1
+    }
+  ],
+  "effective_timings": [
+    {
+      "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+      "product_id": "product-c42848f63251507bd9d911a5",
+      "segment": "G1",
+      "effective_deadline": 1792592951.1518772,
+      "deadline_source": "amendment_superseding_timing",
+      "amendment_id": "bamd_be0c6137a6c64347855672b1ca51a5ad",
+      "activated_at": 1792506551.1518772,
+      "supersedes": {
+        "activated_at": 1792496531.354074,
+        "authorization_digest": "4384d1c263c8c553c73b85b2fe6e11533325b64f95c9343fe63a49f4fd97767e",
+        "deadline_source": "authorized_external_pause_resume",
+        "effective_deadline": 1792501163.965368,
+        "source_id": "egrant_5168847ee98d4b7f980779bb9199f44f"
+      }
+    }
+  ],
+  "cli_sessions_limit": 500,
+  "active": 0,
+  "limits": {
+    "cli_sessions": 500,
+    "production_concurrency": 2,
+    "runtime_concurrency": 1,
+    "product_repairs": 2,
+    "transient_retries": 2,
+    "phase_seconds": 28800
+  },
+  "segments": [
+    {
+      "phase": "G1",
+      "started": 1792389754.633465,
+      "deadline": 1792418554.633465,
+      "remaining_seconds": 0.0
+    },
+    {
+      "phase": "auxiliary-go-pilot-2026-10-21",
+      "started": 1792571131.744697,
+      "deadline": 1792599931.744697,
+      "remaining_seconds": 21274.543793201447
+    },
+    {
+      "phase": "auxiliary-revision-home-care-2026-10-21",
+      "started": 1792577873.3438752,
+      "deadline": 1792664273.3438752,
+      "remaining_seconds": 85616.14297127724
+    }
+  ],
+  "paused": false,
+  "paused_at": null,
+  "pause_reason": null,
+  "repairs": [
+    {
+      "product_id": "product-c42848f63251507bd9d911a5",
+      "repairs_used": 8
+    }
+  ],
+  "amendments": [
+    {
+      "id": "bamd_9378738d1e274c409f756d92ec9c2ac5",
+      "campaign_id": "atlas-v1-first-production-2026-10-19",
+      "product_id": "product-c42848f63251507bd9d911a5",
+      "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+      "source_ref": "ATLAS_G1_CONVERGENCE_CODEX_INSTRUCTIONS.txt",
+      "source_digest": "cc3df91f60afad1a2bf4e862e534be36cb8fcc1f2b8d07687995b325fa7841ae",
+      "summary": "用户将附件交付并明确指示执行：仅原书签产品累计业务修复由2调整为4，允许一次最长8小时的G1补充窗口，完成前置修复及同一新SHA远端完整CI后，在正式恢复真实生产时激活。保留原campaign/plan/product/依据及全部历史。",
+      "reason": "合并处理已承诺P0合同、目标案例适配、URL政策与真实UI验收缺口；原三点请求过窄且已paused_budget。全局500、生产并发2、运行并发1、瞬时重试2及其他产品修复2均保持。",
+      "idempotency_key": "atlas-g1-convergence-user-authorization-2026-10-19-v1",
+      "version": 1,
+      "old_repair_limit": 2,
+      "new_repair_limit": 4,
+      "baseline_repair_count": 2,
+      "baseline_cli_sessions": 42,
+      "old_deadline": 1792418554.633465,
+      "window_seconds": 28800,
+      "created_at": 1792408411.830824,
+      "activated_at": 1792408423.754534,
+      "new_deadline": 1792437223.754534
+    },
+    {
+      "id": "bamd_ad804106fd7049b1b67b914b8e494300",
+      "campaign_id": "atlas-v1-first-production-2026-10-19",
+      "product_id": "product-c42848f63251507bd9d911a5",
+      "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+      "source_ref": "docs/template-factory/g1-r5-2026-10-19/authorization/ATLAS_G1_R5_EXECUTION_CODEX_INSTRUCTIONS.txt",
+      "source_digest": "4d642929aeccdea2a5b0afb5d92157bc54f7e47871f2a3425b05a35268cc9b73",
+      "summary": "原书签产品 G1 累计业务修复上限 4→5，仅增加一轮；继承原有效绝对截止，不重开窗口。",
+      "reason": "执行已核验 plan-1 的宿主精确补丁及后续真实 G1 主链，保留全部历史及全局500上限。",
+      "idempotency_key": "atlas-g1-r5-user-authorization-2026-10-19-v1",
+      "version": 2,
+      "old_repair_limit": 4,
+      "new_repair_limit": 5,
+      "baseline_repair_count": 4,
+      "baseline_cli_sessions": 52,
+      "old_deadline": 1792437223.754534,
+      "window_seconds": 0,
+      "created_at": 1792421546.33515,
+      "activated_at": 1792421563.027058,
+      "new_deadline": 1792437223.754534
+    },
+    {
+      "id": "bamd_100a302fe8424d9493dafe62d6e43db9",
+      "campaign_id": "atlas-v1-first-production-2026-10-19",
+      "product_id": "product-c42848f63251507bd9d911a5",
+      "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+      "source_ref": "docs/template-factory/g1-r6-source-alignment-2026-10-20/authorization/ATLAS_G1_R6_SOURCE_ALIGNMENT_CODEX_INSTRUCTIONS.txt",
+      "source_digest": "7c36e8048393bf7b3fd7eecc78c3af76e3189d462310d88955ce283dd4ce0168",
+      "summary": "R6 来源引用与解释受限修订；书签修复5→6；一次新28800秒G1窗口。",
+      "reason": "附件正式授权，保持r1/20条事实/全部业务与验收/九程序字节，检查及同源码CI后原子激活入队。",
+      "idempotency_key": "atlas-g1-r6-source-alignment-2026-10-20-v1",
+      "version": 3,
+      "old_repair_limit": 5,
+      "new_repair_limit": 6,
+      "baseline_repair_count": 5,
+      "baseline_cli_sessions": 64,
+      "old_deadline": 1792437223.754534,
+      "window_seconds": 28800,
+      "created_at": 1792466501.7907991,
+      "activated_at": 1792466512.855422,
+      "new_deadline": 1792495312.855422
+    },
+    {
+      "id": "bamd_f2054b5d9a9b4e80b6a4e379ed04a42a",
+      "campaign_id": "atlas-v1-first-production-2026-10-19",
+      "product_id": "product-c42848f63251507bd9d911a5",
+      "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+      "source_ref": "docs/template-factory/g1-r7-acceptance-alignment-2026-10-20/authorization/ATLAS_G1_R7_ACCEPTANCE_ALIGNMENT_CODEX_INSTRUCTIONS.txt",
+      "source_digest": "5fb0792b769739f070f68af6ea196473671c791cd895989026ebf9520e282562",
+      "summary": "原书签产品 R7 受限验收对齐，业务修复6→7，仅一次；继承现有绝对截止，不延长窗口。",
+      "reason": "执行附件指定四程序确定补丁与五程序原字节复用、限定A12/F02/F11与案例适配说明，保留原71调用及全部历史。",
+      "idempotency_key": "atlas-g1-r7-acceptance-alignment-2026-10-20-v1",
+      "version": 4,
+      "old_repair_limit": 6,
+      "new_repair_limit": 7,
+      "baseline_repair_count": 6,
+      "baseline_cli_sessions": 71,
+      "old_deadline": 1792495312.855422,
+      "window_seconds": 0,
+      "created_at": 1792476965.092108,
+      "activated_at": 1792476987.017052,
+      "new_deadline": 1792495312.855422
+    },
+    {
+      "id": "bamd_be0c6137a6c64347855672b1ca51a5ad",
+      "campaign_id": "atlas-v1-first-production-2026-10-19",
+      "product_id": "product-c42848f63251507bd9d911a5",
+      "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+      "source_ref": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/authorization/ATLAS_G1_R8_CONTRACT_CONVERGENCE_CODEX_INSTRUCTIONS.txt",
+      "source_digest": "f7569e2f8954fda07b6645924e93973114044343a31ebd7ef4ee5cee6dbcbc46",
+      "summary": "R8受限冻结合同与验收程序修订；保留同一产品、场景及案例，四替换五复用，模板author零调用。",
+      "reason": "用户明确授权第八次业务修订与首次原子激活后的24小时G1窗口；不重试旧blocked候选。",
+      "idempotency_key": "atlas-g1-r8-frozen-contract-amendment-2026-10-20-v1",
+      "version": 5,
+      "old_repair_limit": 7,
+      "new_repair_limit": 8,
+      "baseline_repair_count": 7,
+      "baseline_cli_sessions": 82,
+      "old_deadline": 1792501163.965368,
+      "window_seconds": 86400,
+      "created_at": 1792506550.770865,
+      "activated_at": 1792506551.1518772,
+      "new_deadline": 1792592951.1518772
+    }
+  ],
+  "protocol_retry_grants": [
+    {
+      "id": "pgrant_f3595368c14d4b23b6ab536f6d198007",
+      "job_id": "job_7742b1c124be4c9ab3a0096da5cdd772",
+      "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+      "product_id": "product-c42848f63251507bd9d911a5",
+      "idempotency_key": "atlas-g1-phase-protocol-once-2026-10-19-v1",
+      "request_digest": "61b9d6dc393e0a5ffb82de9eb58a123cd68d550813be02f7eadb0072a866d260",
+      "status": "consumed",
+      "consumed_reservation_id": "bud_9a81a7a4adc14f49b46239ec68ee2fdb",
+      "created_at": 1792432170.1529229
+    }
+  ],
+  "protocol_retry_grant_uses": [
+    {
+      "grant_id": "pgrant_f3595368c14d4b23b6ab536f6d198007",
+      "reservation_id": "bud_9a81a7a4adc14f49b46239ec68ee2fdb",
+      "status": "consumed",
+      "created_at": 1792432199.389308,
+      "released_at": null
+    }
+  ],
+  "evidence_recovery_grants": [
+    {
+      "id": "egrant_dd03245306034022bbc046e3b9428955",
+      "job_id": "job_3a658ba085e8417ea6faad5cb0cdd493",
+      "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+      "product_id": "product-c42848f63251507bd9d911a5",
+      "request_key": "atlas-g1-r7-evidence-recovery-2026-10-20-once",
+      "proposal_digest": "1f4ab61f12ee07ae9eeb3bc7116f5858b491cd60fd567831409a347f7d1a686d",
+      "status": "consumed",
+      "queued_job_id": "job_3a658ba085e8417ea6faad5cb0cdd493",
+      "consumed_reservation_id": "bud_9ad8e95b29224f249f9d48a654d22b9f",
+      "call_attempt": 2,
+      "created_at": 1792483738.414801
+    },
+    {
+      "id": "egrant_c06325f363b84bd9bb1c8fa46f93f945",
+      "job_id": "job_b01427592b164863aab5bedf7b3863bb",
+      "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+      "product_id": "product-c42848f63251507bd9d911a5",
+      "request_key": "atlas-g1-r7-frozen-review-recovery-2026-10-20-once",
+      "proposal_digest": "9b9cee840ee335a9fe5ab4b37adbdbc86a014a45d048cab437a476b1ce9b0a45",
+      "status": "consumed",
+      "queued_job_id": "job_b01427592b164863aab5bedf7b3863bb",
+      "consumed_reservation_id": "bud_c06f643f77bb4ce9a7bad57f30f161e1",
+      "call_attempt": 2,
+      "created_at": 1792490651.033804
+    },
+    {
+      "id": "egrant_5168847ee98d4b7f980779bb9199f44f",
+      "job_id": "job_b01427592b164863aab5bedf7b3863bb",
+      "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+      "product_id": "product-c42848f63251507bd9d911a5",
+      "request_key": "atlas-g1-r7-frozen-review-additional-2026-10-20-attempt3",
+      "proposal_digest": "1713aee022e4a7840b762a8c17fb937eb453c99c8eaee8c256abd31886069049",
+      "status": "consumed",
+      "queued_job_id": "job_b01427592b164863aab5bedf7b3863bb",
+      "consumed_reservation_id": "bud_2b188bf21f09446c843877b9025c1841",
+      "call_attempt": 3,
+      "created_at": 1792496527.0742311
+    }
+  ],
+  "evidence_recovery_grant_uses": [
+    {
+      "grant_id": "egrant_dd03245306034022bbc046e3b9428955",
+      "reservation_id": "bud_9ad8e95b29224f249f9d48a654d22b9f",
+      "status": "consumed",
+      "created_at": 1792483774.82274,
+      "released_at": null
+    },
+    {
+      "grant_id": "egrant_c06325f363b84bd9bb1c8fa46f93f945",
+      "reservation_id": "bud_c06f643f77bb4ce9a7bad57f30f161e1",
+      "status": "consumed",
+      "created_at": 1792490676.306466,
+      "released_at": null
+    },
+    {
+      "grant_id": "egrant_5168847ee98d4b7f980779bb9199f44f",
+      "reservation_id": "bud_2b188bf21f09446c843877b9025c1841",
+      "status": "consumed",
+      "created_at": 1792496550.069236,
+      "released_at": null
+    }
+  ],
+  "provider_requests": null,
+  "cost": null
+}

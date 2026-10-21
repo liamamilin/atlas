@@ -1,0 +1,53 @@
+{
+  "sessions_added": 2,
+  "technical_recoveries": 0,
+  "second_content_rounds": 0,
+  "calls": [
+    {
+      "role": "author",
+      "stage": "blueprint-generate-aux-revision-1",
+      "session_id": "ses_ea208589fffeY8gRHkM8pRFG1I",
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "observed_model": null,
+      "delivery_status": "delivered",
+      "original_response_sha256": "f591ca1527872699ea257a3f79b65e1d18dc29522e934b1cfaaefcbe6f6cb2b5",
+      "summary_sha256": "744dee2e4d99fd2be639c8bc2c0caa5c1cf0cd041539e4619756b73c8f60d751",
+      "step_token_totals": {
+        "input": 37474,
+        "output": 921,
+        "reasoning": 65,
+        "cache_read": 21760,
+        "cache_write": 0
+      },
+      "usage_events_truncated": false,
+      "usage_event_limit": 1000
+    },
+    {
+      "role": "review",
+      "stage": "blueprint-spec-review-aux-revision-1",
+      "session_id": "ses_ea2047897ffeOOj8bA7xqsiYKj",
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "observed_model": null,
+      "delivery_status": "delivered",
+      "original_response_sha256": "d746baaa0f49248d544cd3fc2634f2b4726d41d7f1cfdfc6341de2cf39070681",
+      "summary_sha256": "ad7e129e3da64f4fdd74f36a825773b0a7ba5d60298d753895afdd57baac64a2",
+      "step_token_totals": {
+        "input": 66163,
+        "output": 2447,
+        "reasoning": 38539,
+        "cache_read": 250496,
+        "cache_write": 0
+      },
+      "usage_events_truncated": false,
+      "usage_event_limit": 1000
+    }
+  ],
+  "note": "CLI会话按真实启动计账；step_token_totals仅汇总cli-summary保留的用量事件，若truncated为true则不是完整用量。输入按step会重复，不是峰值上下文；cost无币种不等于账单。",
+  "step_token_totals": {
+    "input": 103637,
+    "output": 3368,
+    "reasoning": 38604,
+    "cache_read": 272256,
+    "cache_write": 0
+  }
+}

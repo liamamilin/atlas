@@ -1,0 +1,264 @@
+{
+  "status": "passed",
+  "catalog_counts": {
+    "total": 18,
+    "core_verified": 6,
+    "not_run": 12,
+    "usable": 17,
+    "needs_revision": 1
+  },
+  "new_artifact": {
+    "artifact_id": "tpl_d3c38917d0404fa98b984955adde3e11",
+    "digest": "6b81fb4bcbb30b6d7e86ac790cdd9a9368cf72d750f15a4d893facb5aa8b74d2",
+    "key": "home-care-r1",
+    "production": {
+      "mode": "opencode-cli-go",
+      "model": "opencode-go/deepseek-v4.1-flash",
+      "review_status": "passed",
+      "review_input_digest": "9d63418403336b739fe4f3f8dca46623af7a5ab7d8b4b9dae5923964a77b7637",
+      "parent": {
+        "artifact_id": "tpl_d610fc5e84644092b880b30fbf691c29",
+        "case_ref": {
+          "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+          "digest": "f42187b6993942a959c4ca954c82e14d45472e9c1793cd908851311b7f4b28aa",
+          "revision": 1
+        },
+        "digest": "4b466e1fe6fd062b170341287addae5a3cc8eb92d0dbfbe87ca4c6c9f45438f8",
+        "original_frozen_digest": "a869427a057907eaf0e3ab1182e8acb2279b47953ea6f399022e30a559ad0cf0"
+      },
+      "revision_id": "home-care-r1"
+    },
+    "title": "Home Care Ledger",
+    "leaf": "home-maintenance-application",
+    "scenario": {
+      "id": "scn_802f9221599a491781b3dafa4f27a033",
+      "revision": 1,
+      "name": "Home Care Ledger",
+      "audience": "A single homeowner keeping care records for their own home on a local machine, with no accounts, notifications, or multi-property operation.",
+      "objective": "Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.",
+      "workflow": [
+        "Start the local server against a disposable data directory; initialize the SQLite schema on first start.",
+        "Create the single home with POST /api/home, then add equipment records with POST /api/equipment anchored by home_id.",
+        "Create care plans with POST /api/plans using interval_days and an optional equipment anchor.",
+        "Query GET /api/tasks/due with an explicit as_of and horizon_days to see overdue, due, and upcoming work.",
+        "Record a completion and note with POST /api/plans/{id}/completions; the same transaction updates the plan next due date.",
+        "Read GET /api/plans/{id}/completions or GET /api/history filtered by home_id and equipment_id.",
+        "Use GET / for the basic accessible single-page UI; all actions remain available through the documented JSON API."
+      ]
+    },
+    "capabilities": [
+      "Home and equipment anchor",
+      "Every-N-day plan and due queue",
+      "Completion and next-due rollover",
+      "Anchored care history",
+      "Accessible localhost UI"
+    ],
+    "limits": [
+      "辅助试产，非严格G1/T08。",
+      "Upstream status: not_run. The repository was read as evidence only; no build, test, server, TUI, or database was executed, so no upstream behavior is runtime-verified.",
+      "Runtime verification is not_run for the target too. The probe and architecture are authored artifacts; no server was started and no acceptance case was executed in this task.",
+      "Single-home and single-user by design; no multi-property, accounts, authentication, sharing, or remote access.",
+      "No notifications, email, SMS, push, calendar sync, or background scheduler; due work is pull-based through the API and UI.",
+      "No costs, vendors, receipts, photos, manuals, warranties, projects, quotes, incidents, documents, or LLM features; those upstream surfaces are intentionally out of scope.",
+      "Every-N-days recurrence differs from upstream interval months; no compatibility with upstream databases, APIs, or schema is claimed.",
+      "No delete, undo, archive, or restore endpoints; completion history is append-only and test records remain until the disposable data directory is discarded.",
+      "Validation is strict and date-only; natural-language dates and timezone conversion are unsupported. Server local date can differ by one day from a client in another timezone.",
+      "The UI is a minimal single-page client, not a polished product; no internationalization, offline cache, or mobile-native behavior. Accessibility assertions are structural and do not certify full conformance.",
+      "Schema v1 has no migration path. Changing entities later needs an explicit migration or a new disposable database.",
+      "Concurrency is sized for one user; SQLite WAL and busy_timeout reduce but do not eliminate lock contention.",
+      "User decision points: confirm one-home scope, creation-day due for plans without an anchor, `max(old due_on, latest completion + interval_days)` rollover that never regresses, strict date-only input, and the absence of delete and defect-tracking features.",
+      "Restart durability may be described as an operator stop and start step in README; it was not run and is not claimed as verified."
+    ],
+    "cases": [
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "revision": 1,
+        "digest": "f42187b6993942a959c4ca954c82e14d45472e9c1793cd908851311b7f4b28aa",
+        "app_id": "app:repo:de476a278e635014bdacdeeb",
+        "sources": [
+          {
+            "repository": "https://github.com/micasa-dev/micasa",
+            "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+            "license_files": [
+              "LICENSE"
+            ]
+          }
+        ]
+      }
+    ],
+    "runtime": {
+      "status": "not_run",
+      "scope": "OpenCode Go 研究与生成、独立会话静态审阅；应用尚未开发或运行。",
+      "kind": "辅助模型生产，非严格工厂验收",
+      "online_status": "not_checked",
+      "strict_acceptance": false
+    },
+    "files": {
+      "development": {
+        "available": true,
+        "sha256": "72b029ac8476abadb6d8910674ec6d9befc500c474b247764f9b8b2dc08b2f26",
+        "url": "/api/factory/assisted-templates/tpl_d3c38917d0404fa98b984955adde3e11/files/development"
+      }
+    },
+    "strict_status": {
+      "publication": "draft",
+      "acceptances": []
+    }
+  },
+  "new_download": {
+    "sha256": "72b029ac8476abadb6d8910674ec6d9befc500c474b247764f9b8b2dc08b2f26",
+    "handoff_files": {
+      "HANDOFF.md": "023a35e73fd691039f68f84f81583c3410d6153b10ae9d7da36036bafa982fae",
+      "KNOWLEDGE.md": "6eee25a9109cd4e0276cf7e91bb0dab301c4d42c8cc28867578cbff994f72fd7",
+      "CURRENT_PHASE.json": "c318f7ed242c392fa9f029666085dd5206da8df7ec9e8e908ba8a845ad1f90c2",
+      "ACCEPTANCE_CONTRACT.json": "f3564e4e8f606fdb4006361f3f030c63462ff3979994a4a48b7ee0939428dccf",
+      "APP_DELIVERY.md": "64d70b915df319baa6e585ec866a9d15c8597856ea9be9778f3c459a9a31cf93",
+      "PROJECT_DECISIONS.json": "7bfd2086420aba9548d425f2c2ee9022efc778f2e1669ad1b9836706e6d11953"
+    },
+    "model_production_sha256": "e7f1c13c962df73eeafd7a0532b32a8d26e4ecbb3b6597507760480b910c0a73",
+    "template_digest": "6b81fb4bcbb30b6d7e86ac790cdd9a9368cf72d750f15a4d893facb5aa8b74d2"
+  },
+  "existing_16_downloads": [
+    {
+      "artifact_id": "tpl_320ad3f159624ee18ff7fa3ebb0ff59b",
+      "standard_download_sha256": "bbf42b3ebe6fe71541d0520e40d78ce2aae4ef332b9c386b0a3b61b631ab4a1e",
+      "unchanged": true
+    },
+    {
+      "artifact_id": "tpl_26a70025f25141cb971a629d978fe42c",
+      "standard_download_sha256": "34365b196c458af9ae01073f38623a4e8e98feef3f5af695205700f5e3ad294e",
+      "unchanged": true
+    },
+    {
+      "artifact_id": "tpl_d02ead780fca4ec584f924b159ccea09",
+      "standard_download_sha256": "fa796aefd28d7e6b7baec69f6bae7de611ace482f0160cc0bdd88c4435996c6e",
+      "unchanged": true
+    },
+    {
+      "artifact_id": "tpl_c4f9d29ee90e4ddebd300f34d66666cb",
+      "standard_download_sha256": "727876e37570253b3d46797972211a82bdba6e27c99c8208c133898332c4ba99",
+      "unchanged": true
+    },
+    {
+      "artifact_id": "tpl_cfeddf44187a403ba0148e3264c5627d",
+      "standard_download_sha256": "91434af8cf083eea3c41722f3d1fbbd65c1bdc7e6c8429e71891970ebe117231",
+      "unchanged": true
+    },
+    {
+      "artifact_id": "tpl_b91f50c7d8c741aa8d04715852f8effa",
+      "standard_download_sha256": "a2147212f6048676b88ed52bfe27f5a4c54571c371af0f2581938633649b7169",
+      "unchanged": true
+    },
+    {
+      "artifact_id": "tpl_6949040b690c40b3ad7415eec367242c",
+      "standard_download_sha256": "e975955a0b27d24b2eb69fa8fa3a2ea2cbd82fce2cab7505515fb699d9512b8c",
+      "unchanged": true
+    },
+    {
+      "artifact_id": "tpl_e1761c3db0a941348f9a97fb47c279b3",
+      "standard_download_sha256": "e5aa54db629f525d30d4a09065abec216feb455c7eace8507b6196eaac077437",
+      "unchanged": true
+    },
+    {
+      "artifact_id": "tpl_ae75820e56d148ca98ecab408a68ad92",
+      "standard_download_sha256": "defd51baed874f4e7a7c48ad3a8f577d5d58d848a6b65807dc3bd7bccf4fdbbf",
+      "unchanged": true
+    },
+    {
+      "artifact_id": "tpl_a7f570f681834f778db88dfe41d1b631",
+      "standard_download_sha256": "c520b46f4f1eee636b8f72a0d03c1891d4af129acc1a11ba691a2cfd55b0771c",
+      "unchanged": true
+    },
+    {
+      "artifact_id": "tpl_d4404c1ab4c8429db472a572e412d04b",
+      "standard_download_sha256": "8d0dc126a83f024f25d4d8aff8df0c055a92d4ac80cd8a8ece2bf7ba1377dd0e",
+      "unchanged": true
+    },
+    {
+      "artifact_id": "tpl_737c65d52051433ab3510b8f148494ee",
+      "standard_download_sha256": "9209219cc2ce54f6b1e74eb9169084d83272bbb2df284d2c7d102064bfddf9aa",
+      "unchanged": true
+    },
+    {
+      "artifact_id": "tpl_ac5ce1eedef94a539fe2047e60754416",
+      "standard_download_sha256": "311d0401961941072d5c243e5d3b1c9c157be24fb2281bad017ca390bc902236",
+      "unchanged": true
+    },
+    {
+      "artifact_id": "tpl_31f54a064df949379ae9450a27c2858a",
+      "standard_download_sha256": "0b635386e483273a63f0172df4f4ef4a8784ffe81a764d0fcfcc1cc5e473c393",
+      "unchanged": true
+    },
+    {
+      "artifact_id": "tpl_47afbb4ac70d4dc1be628047b75e89ca",
+      "standard_download_sha256": "82ae63ca7513bae3419ae14819f21c5a6c6674eddd2c72a01d617db37e233d8c",
+      "unchanged": true
+    },
+    {
+      "artifact_id": "tpl_de2df547557e4539a91c4d7e93542ff3",
+      "standard_download_sha256": "972ed86562432e710feb8a2820782ec08805f2d714e6c11ff0e2d4df15096faf",
+      "unchanged": true
+    }
+  ],
+  "inventory_source_download_sha256": "9a2442058b8d305b97b9e2163bcc1234008ab138345eaddda53a2686868d919b",
+  "parent_development_download_status": 409,
+  "case_ref": {
+    "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+    "revision": 1,
+    "digest": "f42187b6993942a959c4ca954c82e14d45472e9c1793cd908851311b7f4b28aa"
+  },
+  "case_added": 0,
+  "case_reused": 1,
+  "applications_run_added": 0,
+  "calls": [
+    {
+      "id": "bud_85f7323d103343438c394639394582fb",
+      "identity": "auxiliary-revision-home-care-2026-10-21:home-care",
+      "phase": "auxiliary-revision-home-care-2026-10-21",
+      "kind": "production",
+      "status": "completed",
+      "created": 1792577873.343903,
+      "started": 1792577873.467781,
+      "finished": 1792578027.3567529,
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "stage": "blueprint-generate-aux-revision-1",
+      "outcome": null
+    },
+    {
+      "id": "bud_a5232795972e4332b683a777a31c8441",
+      "identity": "auxiliary-revision-home-care-2026-10-21:home-care",
+      "phase": "auxiliary-revision-home-care-2026-10-21",
+      "kind": "review",
+      "status": "completed",
+      "created": 1792578127.2811468,
+      "started": 1792578127.4054348,
+      "finished": 1792578390.366453,
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "stage": "blueprint-spec-review-aux-revision-1",
+      "outcome": null
+    }
+  ],
+  "cli_sessions_before": 91,
+  "cli_sessions_after": 93,
+  "new_phase": {
+    "phase": "auxiliary-revision-home-care-2026-10-21",
+    "started": 1792577873.3438752,
+    "deadline": 1792664273.3438752,
+    "remaining_seconds": 85616.14297127724
+  },
+  "strict_history_fields_unchanged": [
+    "repairs",
+    "amendments",
+    "protocol_retry_grants",
+    "protocol_retry_grant_uses",
+    "evidence_recovery_grants",
+    "evidence_recovery_grant_uses",
+    "time_resumes",
+    "effective_timings",
+    "limits"
+  ],
+  "protected_files_unchanged": 112,
+  "replay_same_artifact": true,
+  "replay_new_calls": 0,
+  "strict_g1_status": "blocked (GET v1/gates, STRICT_GATES_UNCHANGED.json)"
+}

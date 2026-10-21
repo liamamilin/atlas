@@ -1,0 +1,162 @@
+{
+ "name": "Home Care Ledger",
+ "audience": "A single homeowner keeping care records for their own home on a local machine, with no accounts, notifications, or multi-property operation.",
+ "objective": "Create the home and its equipment, define every-N-day care plans anchored to them, see the exact sets of tasks that are overdue, due, or upcoming as of a date, record a completion with a note, advance the next due date to max(old due_on, latest completion + interval_days) so it never regresses, and retrieve care history by home or equipment.",
+ "workflow": [
+  "Start the local server against a disposable data directory; initialize the SQLite schema on first start.",
+  "Create the single home with POST /api/home, then add equipment records with POST /api/equipment anchored by home_id.",
+  "Create care plans with POST /api/plans using interval_days and an optional equipment anchor.",
+  "Query GET /api/tasks/due with an explicit as_of and horizon_days to see the exact overdue, due, and upcoming task sets.",
+  "Record a completion and note with POST /api/plans/{id}/completions; one transaction appends the actual completion and note, stores the true latest completion date, and sets due_on to max(old due_on, latest + interval_days).",
+  "Read GET /api/plans/{id}/completions or GET /api/history filtered by home_id and equipment_id.",
+  "Use GET / for the basic accessible single-page UI; all actions remain available through the documented JSON API."
+ ],
+ "acceptance": [
+  "A fresh database has no home; POST /api/home creates exactly one record with id home, and a second POST returns 409 HOME_EXISTS without mutating the stored home.",
+  "POST /api/equipment under the existing home returns 201 and round-trips through list and detail; blank names, invalid categories with otherwise valid fields, and unknown homes return 422 or 404 and add no equipment row.",
+  "POST /api/plans enforces interval_days 1..3650 and mutual exclusion of last_completed_on and first_due_on; GET /api/tasks/due returns exact overdue, due, and upcoming ID sets and counts at as_of and horizon_days boundaries, so duplicate, extra, or missing tasks fail, while invalid requests write nothing.",
+  "A completion with note inserts one history row and atomically sets last_completed_on to max(existing last_completed_on if present, completed_on) and due_on to max(old due_on, latest + interval_days); leap-day, month-end, year-end, initial-backfill, no-anchor, future-date, oversize-note, and unknown-plan failures leave both plan and completions unchanged.",
+  "GET /api/history filters by home and equipment and returns documented fields in descending completion order; invalid filters write nothing; GET / is dependency-free accessible HTML with html lang=en, every input labelled by for/id, fieldset/legend groups, a due-table caption with th scope=col, and a role=status aria-live=polite feedback shell; unknown routes or methods return documented JSON errors."
+ ],
+ "observations": [
+  [
+   "documentation",
+   "README.md",
+   17,
+   17,
+   "Document claim: micasa describes itself as home maintenance from the terminal, a local tool rather than a hosted multi-tenant service."
+  ],
+  [
+   "documentation",
+   "README.md",
+   25,
+   25,
+   "Document claim: the upstream advertises schedules, due dates, and full history."
+  ],
+  [
+   "code_observation",
+   "internal/data/models.go",
+   104,
+   135,
+   "Code observation: HouseProfile stores address, year built, systems, and other attributes; no explicit multi-home ownership table is observed in the selected files."
+  ],
+  [
+   "code_observation",
+   "internal/data/models.go",
+   201,
+   216,
+   "Code observation: Appliance stores make, model, serial, warranty, and location, with no home_id field observed."
+  ],
+  [
+   "code_observation",
+   "internal/data/models.go",
+   218,
+   237,
+   "Code observation: MaintenanceItem has an optional ApplianceID, category, season, interval months, last serviced date, and due date."
+  ],
+  [
+   "code_observation",
+   "internal/data/models.go",
+   261,
+   274,
+   "Code observation: ServiceLogEntry belongs to a maintenance item and stores serviced_at, optional vendor and cost, notes, and timestamps."
+  ],
+  [
+   "code_observation",
+   "internal/data/store_house.go",
+   22,
+   31,
+   "Code observation: CreateHouseProfile counts existing profiles and rejects a second row, implementing one house profile."
+  ],
+  [
+   "code_observation",
+   "internal/data/store_maintenance.go",
+   24,
+   33,
+   "Code observation: ListMaintenanceByAppliance filters maintenance items by appliance id, showing an equipment-anchored query path."
+  ],
+  [
+   "code_observation",
+   "internal/data/store_servicelog.go",
+   16,
+   30,
+   "Code observation: syncLastServiced sets LastServicedAt to the most recent non-deleted serviced_at."
+  ],
+  [
+   "code_observation",
+   "internal/data/store_servicelog.go",
+   59,
+   73,
+   "Code observation: CreateServiceLog runs in a transaction, creates the service log, then syncs the parent maintenance item."
+  ],
+  [
+   "code_observation",
+   "internal/data/validation.go",
+   168,
+   177,
+   "Code observation: ComputeNextDue returns an explicit due date when set, otherwise adds interval months to the last service date."
+  ],
+  [
+   "code_observation",
+   "internal/data/validation.go",
+   182,
+   192,
+   "Code observation: AddMonths clamps the day to the target month end, avoiding the Jan 31 plus one month overflow."
+  ],
+  [
+   "code_observation",
+   "internal/data/validation.go",
+   98,
+   153,
+   "Code observation: interval parsing accepts years and months, not days."
+  ],
+  [
+   "code_observation",
+   "internal/data/dashboard.go",
+   12,
+   25,
+   "Code observation: scheduled maintenance is defined as interval months greater than zero or an explicit due date."
+  ],
+  [
+   "documentation",
+   "README.md",
+   58,
+   58,
+   "Document claim: the upstream is pure Go using SQLite and a terminal UI; this target does not copy or run that implementation."
+  ]
+ ],
+ "inference": "Target design inference, not an upstream claim: the pinned research makes the home the subject and requires recurring work plus a durable completion record. Upstream code corroborates that abstract shape but realizes recurrence in months, keeps one house profile, links maintenance to an optional appliance, and does not show an explicit appliance-to-home foreign key in the selected files. The target therefore makes the home anchor explicit through home_id on equipment and plans, uses every-N-days recurrence from the scenario, and keeps only the home, equipment, plan, completion, and history slice. It does not copy upstream code, schema, or UI. Upstream status: not_run; no upstream build, test, server, TUI, or database was started.",
+ "features": [
+  "Home and equipment anchor",
+  "Every-N-day plan and due queue",
+  "Completion and next-due rollover",
+  "Anchored care history",
+  "Accessible localhost UI"
+ ],
+ "goals": [
+  "In a dedicated data directory, create the single home, add an equipment record under it, and prove duplicate-home and invalid-name, invalid-category, and unknown-home requests return 409, 422, or 404 without changing stored records.",
+  "Create plans with interval_days in 1..3650 and verify GET /api/tasks/due returns exact overdue, due, and upcoming ID sets and counts at the as_of and horizon_days boundaries, using fresh equipment scopes, while invalid plans write nothing.",
+  "Record a completion and note in one atomic call and verify last_completed_on is the true latest date and due_on is max(old due_on, latest + interval_days) across leap-day, month-end, year-end, initial-backfill, and no-anchor creation-day examples, with invalid completions leaving no trace.",
+  "Retrieve completions filtered by home and equipment in documented descending order with plan and equipment names and notes, and reject invalid filters without writes.",
+  "Load GET / and assert a dependency-free HTML shell exposes home, equipment, plan, due, completion, and history workflows with structural accessibility relationships (label for/id, fieldset/legend, due caption and th scope=col, role=status, aria-live=polite, lang=en), while unknown routes and methods return documented JSON errors."
+ ],
+ "arch": "# Home Care Ledger: target architecture\n\n## Scope and decisions to confirm\n- Local single-user target: one homeowner, one home, loopback only.\n- Python 3.11+ standard library only; SQLite; no third-party packages.\n- This is a cognition template, not an application and not the upstream micasa codebase.\n- Deliberately excluded: accounts and authentication, notifications, email, vendors, costs, quotes, projects, documents, manuals, photos, payments, LLM, multi-property, imports and exports, and deletion endpoints.\n- Decision: exactly one home with fixed id `home`, because the pinned scenario is the user's own home and upstream exposes a single house profile.\n- Decision: recurrence is every N calendar days, 1..3650, because the scenario says every N days. Upstream uses interval months; this target is not API-compatible with it.\n- Decision: a plan created without an anchor is due on the server local creation date.\n- Decision: next due after any completion is `max(old due_on, max(existing last_completed_on, completed_on) + interval_days)`; a backdated completion can never move `due_on` earlier, including a plan seeded only with `first_due_on` or no anchor.\n- Decision: no natural-language dates and no timezone-bearing timestamps in domain dates.\n\n## Runtime, data directory, start\n- Source file `app.py`; database `$HOMECARE_DATA_DIR/homecare.sqlite3`.\n- `HOMECARE_DATA_DIR` defaults to `./data`; the directory is created if absent.\n- Start: `python3 app.py --data-dir ./data --host 127.0.0.1 --port 8765`.\n- Equivalent environment variables: `HOMECARE_DATA_DIR`, `HOMECARE_HOST`, `HOMECARE_PORT`.\n- Bind loopback by default. There is no authentication; do not expose the port.\n- On first start create schema and indexes. Schema version 1 is created once; no migration beyond that.\n- SQLite connection setup: `PRAGMA foreign_keys=ON`, `journal_mode=WAL`, `busy_timeout=5000`.\n- Server: `ThreadingHTTPServer` is acceptable, but every write uses one explicit SQLite transaction.\n- JSON is UTF-8. Maximum request body 1,048,576 bytes. POST and PATCH must send `application/json`; otherwise 415.\n- Only GET, POST, and PATCH on documented routes. Other methods return 405 `METHOD_NOT_ALLOWED`.\n- Health: `GET /health` returns `{status: ok, database: ready}`.\n\n## Entities and exact persisted fields\n`homes`\n- `id` TEXT primary key, always the literal `home`.\n- `name` TEXT NOT NULL, trimmed, 1..80 Unicode code points.\n- `address` TEXT NOT NULL default empty string, trimmed, 0..200.\n- `created_at`, `updated_at` TEXT UTC ISO-8601 with `Z`, for example `2026-10-21T08:30:00Z`.\n\n`equipment`\n- `id` TEXT primary key, `eq_` plus 32 lowercase hex characters.\n- `home_id` TEXT NOT NULL REFERENCES `homes(id)` ON DELETE RESTRICT.\n- `name` TEXT NOT NULL, trimmed, 1..80.\n- `category` TEXT NOT NULL, one of `heating`, `cooling`, `plumbing`, `electrical`, `roof`, `exterior`, `appliance`, `safety`, `other`.\n- `location` TEXT NOT NULL default empty, 0..80.\n- `make` TEXT NOT NULL default empty, 0..80.\n- `model` TEXT NOT NULL default empty, 0..80.\n- `installed_on` TEXT NULL, strict calendar date 1900-01-01..2100-12-31.\n- `created_at`, `updated_at` UTC ISO-8601.\n\n`plans`\n- `id` TEXT primary key, `pl_` plus 32 hex.\n- `home_id` TEXT NOT NULL REFERENCES homes.\n- `equipment_id` TEXT NULL REFERENCES equipment; when present it must belong to the same `home_id`.\n- `name` TEXT NOT NULL, trimmed, 1..80.\n- `interval_days` INTEGER NOT NULL, 1..3650 inclusive.\n- `last_completed_on` TEXT NULL, strict date; latest known care date.\n- `due_on` TEXT NOT NULL, strict date.\n- `notes` TEXT NOT NULL default empty, 0..500.\n- `created_at`, `updated_at` UTC ISO-8601.\n- Index: `(home_id, equipment_id, due_on)`.\n\n`completions`\n- `id` TEXT primary key, `cm_` plus 32 hex.\n- `plan_id` TEXT NOT NULL REFERENCES plans ON DELETE RESTRICT.\n- `completed_on` TEXT NOT NULL, strict date.\n- `note` TEXT NOT NULL default empty, trimmed, 0..500.\n- `created_at` UTC ISO-8601.\n- Index: `(plan_id, completed_on DESC, created_at DESC)`.\n- There is no PATCH or DELETE for completions: the record is append-only.\n\n## Date, validation and recurrence rules\n- Domain dates are `YYYY-MM-DD` only. Reject timestamps, natural language, invalid ordinal dates, and years outside 1900..2100 with 422 `VALIDATION_ERROR`.\n- `server_today` is `datetime.date.today()` in the host local timezone. Domain dates are not converted between zones.\n- Creation response timestamps are UTC; domain decisions use `server_today` or an explicit `as_of`.\n- Plan anchor when created:\n  - `first_due_on` supplied: `due_on = first_due_on`.\n  - else `last_completed_on` supplied: `due_on = last_completed_on + interval_days`.\n  - else: `due_on = server_today`.\n- `last_completed_on` and `first_due_on` are mutually exclusive; supplying both is 422.\n- `last_completed_on` may not be after `server_today`; `first_due_on` may not be before 1900-01-01 or after 2100-12-31.\n- Completion accepts `completed_on <= server_today`.\n- Next due after a completion is always `max(old due_on, max(previous last_completed_on, completed_on) + interval_days)`, using proleptic Gregorian ordinal addition. `last_completed_on` is set to the true latest of its previous value and `completed_on`. This makes backdated entries safe, including a plan seeded only with `first_due_on` or no anchor, and never regresses the schedule.\n- If a plan was seeded with `last_completed_on`, that seed is not a completion record; only completion rows appear in history.\n- Due status at `as_of`: `overdue` when `due_on < as_of`; `due` when equal; `upcoming` when greater.\n- Due query includes tasks with `due_on <= as_of + horizon_days`. Default `horizon_days=0`, so default shows overdue and due only. Horizon range 0..365.\n- Sort order: due tasks by `due_on ASC, created_at ASC, id ASC`; plans by `created_at ASC, id ASC`; completions and history by `completed_on DESC, created_at DESC, id DESC`.\n- Date edge examples: 2024-02-28 + 1 = 2024-02-29; 2024-02-29 + 1 = 2024-03-01; 2024-12-31 + 30 = 2025-01-30; 2026-01-31 + 31 = 2026-03-03.\n- Initial backfill examples: `due_on=2026-03-01` with interval 30 and `completed_on=2025-01-01` keeps `last_completed_on=2025-01-01` and `due_on=2026-03-01`; a plan with no anchor is due on its creation day and a backdated completion keeps that due date.\n- Integer fields reject booleans, floats, and numeric strings; JSON boolean true is not an integer. Query integers use decimal digits only.\n\n## HTTP API\nBase URL in examples: `http://127.0.0.1:8765`.\n\nCommon response rules:\n- All API responses are JSON objects with `Content-Type: application/json; charset=utf-8`.\n- Error shape: `error` object with `code` string, `message` string, and `field` string or null.\n- Codes and statuses:\n  - `INVALID_JSON` 400\n  - `UNSUPPORTED_MEDIA_TYPE` 415\n  - `METHOD_NOT_ALLOWED` 405\n  - `NOT_FOUND` 404 for an unknown route\n  - `HOME_NOT_FOUND` 404\n  - `EQUIPMENT_NOT_FOUND` 404\n  - `PLAN_NOT_FOUND` 404\n  - `HOME_EXISTS` 409\n  - `VALIDATION_ERROR` 422\n  - `INTERNAL_ERROR` 500 with no leaked internals\n- Unknown request fields are rejected with 422 `VALIDATION_ERROR` and `field` naming the first unknown field.\n- Canonical plan object: `id`, `home_id`, `equipment_id`, `name`, `interval_days`, `last_completed_on`, `due_on`, `notes`, `created_at`, `updated_at`, `completion_count`, and `status`. `status` is computed against `server_today`.\n- Canonical completion object: `id`, `plan_id`, `completed_on`, `note`, and `created_at`.\n\n### Home\n`POST /api/home`\nBody: `name` required, `address` optional. Returns 201 `{home: HOME}`. If a home already exists returns 409 `HOME_EXISTS` and writes nothing.\n`GET /api/home` returns 200 `{home: HOME}` or 404 `HOME_NOT_FOUND`.\n`PATCH /api/home` Body: at least one of `name`, `address`; validates bounds. Returns 200 `{home: HOME}`. Empty patch 422. There is no DELETE.\n\n### Equipment\n`POST /api/equipment`\nBody: `home_id` required, `name` required, `category` required, optional `location`, `make`, `model`, and `installed_on`.\nReturns 201 `{equipment: EQUIPMENT}`. Unknown home 404 `HOME_NOT_FOUND`.\n`GET /api/equipment?home_id=home` returns 200 `{equipment: [EQUIPMENT...]}` sorted by `created_at ASC, id ASC`. Missing `home_id` 422; unknown home 404.\n`GET /api/equipment/{id}` returns 200 `{equipment: EQUIPMENT}` or 404 `EQUIPMENT_NOT_FOUND`.\nNo delete.\n\n### Plans\n`POST /api/plans`\nBody: `home_id` required; `name` required; `interval_days` required; optional `equipment_id`, `last_completed_on`, `first_due_on`, and `notes`.\nReturns 201 `{plan: PLAN}`. Unknown home 404. Unknown equipment 404 `EQUIPMENT_NOT_FOUND`; equipment belonging to another home 422 `VALIDATION_ERROR` with field `equipment_id` (defensive, unreachable while only one home exists).\n`GET /api/plans?home_id=home&equipment_id=eq_...` returns 200 `{plans: [PLAN...]}`. `equipment_id` is an optional filter. Missing home 422; unknown home 404; unknown equipment 404.\n`GET /api/plans/{id}` returns 200 `{plan: PLAN}` or 404 `PLAN_NOT_FOUND`.\nNo interval or schedule edit endpoint in this version; create a new plan instead. This is a deliberate scope cut.\n\n### Due work\n`GET /api/tasks/due?home_id=home&as_of=YYYY-MM-DD&horizon_days=0&equipment_id=eq_...`\n- `home_id` required; `as_of` optional, default `server_today`; `horizon_days` optional integer 0..365; `equipment_id` optional.\n- Returns 200 `{as_of, horizon_days, tasks: [TASK...]}`.\n- TASK fields: `id` (plan id), `home_id`, `home_name`, `equipment_id`, `equipment_name` or null, `name`, `interval_days`, `last_completed_on`, `due_on`, `status`, `days_until_due`, and `notes`.\n- `days_until_due = due_on - as_of` in days; negative means overdue.\n- Invalid `as_of`, out-of-range horizon, missing home, or unknown home or equipment: 422 or 404 as applicable. No writes.\n\n### Completions and history\n`POST /api/plans/{id}/completions`\nBody: `completed_on` required, `note` optional default empty.\nReturns 201 `{completion: COMPLETION, plan: PLAN}`. Unknown plan 404 `PLAN_NOT_FOUND`. Future date, bad date, or note over 500: 422. The insert and plan update happen in one transaction; on any failure neither changes.\n`GET /api/plans/{id}/completions` returns 200 `{completions: [COMPLETION...]}` or 404 `PLAN_NOT_FOUND`.\n`GET /api/history?home_id=home&equipment_id=eq_...&limit=100`\n- `home_id` required; `equipment_id` optional; `limit` 1..500 default 100.\n- Returns 200 `{history: [HISTORY...]}` sorted as defined above.\n- HISTORY fields: `id`, `plan_id`, `plan_name`, `home_id`, `home_name`, `equipment_id`, `equipment_name` or null, `completed_on`, `note`, and `created_at`.\n- Missing home 422; unknown home or equipment 404. No writes.\n\n## Atomic failure semantics\n- Validate method, content type, JSON, field presence, types, bounds, enums, dates, and referential checks before opening a write transaction.\n- For `POST /api/home`, insert with fixed id `home`; a concurrent duplicate loses with 409 and leaves exactly one row.\n- For `POST /api/equipment` and `POST /api/plans`, one INSERT each; foreign-key failure maps to 404 or 422, not 500.\n- For completion, `BEGIN IMMEDIATE`; select plan; compute `latest = max(previous last_completed_on, completed_on)` (or `completed_on` when absent); INSERT completion with the actual `completed_on` and note; UPDATE plan `last_completed_on=latest`, `due_on=max(old due_on, latest + interval_days)`, and `updated_at`; COMMIT. Any error triggers ROLLBACK, leaving zero new completions and an unchanged plan.\n- Reads never create rows. A failed request must produce no completion, no plan, no equipment, and no home mutation.\n- SQLite constraint errors are mapped to a deterministic 422 or 409; unexpected errors return 500 `INTERNAL_ERROR` without partial commits.\n\n## Basic accessible UI\n`GET /` returns one HTML document with `lang=en`, UTF-8, no external assets, and a small inline script that calls the JSON API.\n- Sections, in order: Home; Equipment; Care plans; Due work; Completion history.\n- Every `input` has an `id` and a visible `label for` that references it; groups use `fieldset` and `legend`.\n- Buttons are native `button` elements with descriptive text: Create home, Add equipment, Add plan, Record completion, Refresh.\n- Due table has a `caption`, every `th` uses `scope=col`, and text status plus a non-color-only overdue label.\n- Success and validation messages render in a container with `role=status` and `aria-live=polite`; errors also include the field name.\n- Forms are keyboard operable, visible focus is retained, default browser font sizing is not disabled, and no timeout or auto-submit is used.\n- Completing a task opens a small form for `completed_on` and `note`; the API response updates the due list and history without a full page reload.\n- History has home and equipment filters populated from the API.\n- The UI is a convenience surface; all behavior is available through the documented API.\n- These structural checks are a smoke test, not a certification of full accessibility conformance.\n\n## Probe contract\n`probe.py` is a standard-library HTTP client supplied in `acceptance_files`. It accepts `--base-url` and exactly one `--case A01..A05`, creates only disposable records with a unique suffix, never deletes, and asserts exact statuses, shapes, dates, ordering, exact due ID sets and counts, zero-write outcomes, and HTML structure through `html.parser.HTMLParser`. It does not start the server and makes no claim about an upstream run.",
+ "gaps": [
+  "Upstream status: not_run. The repository was read as evidence only; no build, test, server, TUI, or database was executed, so no upstream behavior is runtime-verified.",
+  "Runtime verification is not_run for the target too. The probe and architecture are authored artifacts; no server was started and no acceptance case was executed in this task.",
+  "Single-home and single-user by design; no multi-property, accounts, authentication, sharing, or remote access.",
+  "No notifications, email, SMS, push, calendar sync, or background scheduler; due work is pull-based through the API and UI.",
+  "No costs, vendors, receipts, photos, manuals, warranties, projects, quotes, incidents, documents, or LLM features; those upstream surfaces are intentionally out of scope.",
+  "Every-N-days recurrence differs from upstream interval months; no compatibility with upstream databases, APIs, or schema is claimed.",
+  "No delete, undo, archive, or restore endpoints; completion history is append-only and test records remain until the disposable data directory is discarded.",
+  "Validation is strict and date-only; natural-language dates and timezone conversion are unsupported. Server local date can differ by one day from a client in another timezone.",
+  "The UI is a minimal single-page client, not a polished product; no internationalization, offline cache, or mobile-native behavior. Accessibility assertions are structural and do not certify full conformance.",
+  "Schema v1 has no migration path. Changing entities later needs an explicit migration or a new disposable database.",
+  "Concurrency is sized for one user; SQLite WAL and busy_timeout reduce but do not eliminate lock contention.",
+  "User decision points: confirm one-home scope, creation-day due for plans without an anchor, `max(old due_on, latest completion + interval_days)` rollover that never regresses, strict date-only input, and the absence of delete and defect-tracking features.",
+  "Restart durability may be described as an operator stop and start step in README; it was not run and is not claimed as verified."
+ ],
+ "repo_name": "micasa-dev/micasa",
+ "license": "Apache-2.0",
+ "license_path": "LICENSE"
+}

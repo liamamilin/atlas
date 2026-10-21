@@ -1,0 +1,39 @@
+{
+  "schema": "atlas.auxiliary-revision-request.v1",
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "phase": "auxiliary-revision-home-care-2026-10-21",
+  "identity": "auxiliary-revision-home-care-2026-10-21:home-care",
+  "revision_id": "home-care-r1",
+  "model": "opencode-go/deepseek-v4.1-flash",
+  "max_cli_calls": 6,
+  "window_seconds": 86400,
+  "authorization_ref": "docs/template-factory/go-home-care-revision-2026-10-21/AUTHORIZATION.md",
+  "authorization_sha256": "e87f4a228e5f3cde2456ea0ce3fc17b0be8de2e853bde1c7a7127d05cb31eb59",
+  "parent": {
+    "artifact_id": "tpl_d610fc5e84644092b880b30fbf691c29",
+    "digest": "4b466e1fe6fd062b170341287addae5a3cc8eb92d0dbfbe87ca4c6c9f45438f8",
+    "original_frozen_digest": "a869427a057907eaf0e3ab1182e8acb2279b47953ea6f399022e30a559ad0cf0",
+    "case_ref": {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "revision": 1,
+      "digest": "f42187b6993942a959c4ca954c82e14d45472e9c1793cd908851311b7f4b28aa"
+    }
+  },
+  "parent_folder": "docs/template-factory/go-auxiliary-pilot-2026-10-21/home-care",
+  "scenario_id": "scn_802f9221599a491781b3dafa4f27a033",
+  "scenario_revision": 1,
+  "leaf": "home-maintenance-application",
+  "issues": [
+    "acceptance/probe.py:157-164 (A01): before is captured before the successful PATCH at line 161, but line 164 compares the home after the empty PATCH to before. The home object includes updated_at (VIEW_ARCH.md:32; probe.py:155); a correct PATCH that refreshes updated_at makes the final zero-write check fail even though the empty patch wrote nothing. Use the patched response from line 161 as the baseline or compare only id/name/address.",
+    "acceptance/probe.py:171-175 (A01) tests blank name and unknown home but never an invalid category; AUTHOR_INPUT.json acceptance[1] and REVIEW_SCOPE.md:35-37 explicitly require invalid categories to return 422 or 404 with no equipment row, and VIEW_ARCH.md:38 defines the enum. Add an invalid-category POST and assert 422 plus an unchanged equipment list.",
+    "VIEW_ARCH.md:11 and :77 state a backdated completion never moves next due backwards, but max(previous last_completed_on, completed_on) + interval_days has no floor when last_completed_on is NULL (a plan created with only first_due_on or no anchor). Example: first_due_on 2026-03-01, interval 30, completed_on 2025-01-01 gives due_on 2025-01-31, earlier than 2026-03-01. probe.py:230,245-247 only backdates after a prior completion. Define an anchor floor or narrow the invariant and add the missing case.",
+    "acceptance/probe.py:197-210 (A02) checks selected task IDs and statuses but never the exact set or count; AUTHOR_INPUT.json acceptance[2] and REVIEW_SCOPE.md:40-42 require exact overdue/due/upcoming sets at the boundaries. Extra tasks, for example from earlier cases in the same disposable database, would not fail the probe. Assert the full ID set or count, preferably with a fresh equipment-filtered query.",
+    "acceptance/probe.py:311-313 (A05) only checks token presence (label, form, button, aria-live, and words); VIEW_ARCH.md:158-162 also requires label for/id linkage, fieldset/legend, caption, th scope=col, role=status, and lang=en. Token presence does not verify the stated accessibility rules; add structural assertions."
+  ],
+  "date_contract": {
+    "latest": "max(existing last_completed_on if present, completed_on)",
+    "new_due_on": "max(old due_on, latest + interval_days)",
+    "atomic": "BEGIN IMMEDIATE; read old plan; append actual completion date and note; update last_completed_on=latest and new_due_on; COMMIT, rollback all on failure"
+  },
+  "no_application_runtime": true
+}

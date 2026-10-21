@@ -1,0 +1,140 @@
+Browser tab: 17, Title: "应用图谱 · Application Atlas", URL: "http://127.0.0.1:5188/factory?view=artifacts&artifact_id=tpl_d3c38917d0404fa98b984955adde3e11".
+1 AXWebArea 应用图谱 · Application Atlas, URL: 127.0.0.1:5188/factory?view=artifacts&artifact_id=tpl_d3c38917d0404fa98b984955adde3e11
+	2 container root
+		3 container
+			4 link Description: 应用图谱, Value: 127.0.0.1:5188/
+			5 container 主导航
+				6 link Description: 首页, Value: 127.0.0.1:5188/
+				7 link Description: 对话, Value: 127.0.0.1:5188/ask
+				8 link Description: 浏览类型, Value: 127.0.0.1:5188/browse
+				9 link Description: 应用实证, Value: 127.0.0.1:5188/apps
+				10 link Description: 模板工厂, Value: 127.0.0.1:5188/factory
+				11 link Description: 草稿, Value: 127.0.0.1:5188/drafts
+				12 link Description: 使用教程, Value: 127.0.0.1:5188/tutorial
+				13 link Description: 设置, Value: 127.0.0.1:5188/settings
+			14 text 1805 类型 · 数据来自 atlas 语料
+			15 button 切换到英文
+		18 container
+			19 text 模板工厂
+			20 heading 从应用场景，生产可创建应用的模板, Value: 1
+				21 text 从应用场景，生产可创建应用的模板
+			22 text 叶子 + 应用场景构成生产目录。认知模板交付产品判断、阶段计划与开发验收，可在制品页阅读并导出开发包。已确认场景可交给 OpenCode 调研并生成认知包，冻结后自动排入独立认知审阅。旧代码模板生产仍可使用。 OpenCode CLI · opencode v2.0.30 Docker · 已就绪
+			23 button 重新检查
+			24 tab group 工厂视图
+				25 tab (selectable, settable, boolean) 生产目录, Value: 0
+				26 tab (selectable, settable, boolean) 任务批次, Value: 0
+				27 tab (selected, settable, boolean) 模板制品, Value: 1
+				28 tab (selectable, settable, boolean) V1 计划与预算, Value: 0
+			29 container 认知模板入口
+				30 heading 认知模板：先把产品想清楚，再交给开发 agent, Value: 2
+					31 text 认知模板：先把产品想清楚，再交给开发 agent
+				32 text 包含品类认知、产品定义、架构决策、阶段路线图、验收程序与 Agent 指令。先查看已验证的书签样板，或导入同一协议的认知包；自动生产请在生产目录选择已确认场景。
+				33 button 载入书签认知样板
+				34 button (collapsed) 导入其他认知包, Secondary Actions: Expand
+					35 text 导入其他认知包
+			36 container
+				37 text 查找模板
+				38 text field (settable) 查找模板
+			39 container
+				40 text 按辅助运行记录筛选
+				41 pop up button (collapsed, settable) 按辅助运行记录筛选, Value: 全部制品, Secondary Actions: Expand
+					42 menu
+						43 (selected) 全部制品
+						44 辅助：已有核心运行示例
+						45 辅助：应用未运行
+			46 text 辅助目录：18 条记录 · 17 份可用 · 1 份待修订历史 · 6 份有核心运行示例 · 12 份应用未运行；不代表严格验收通过。
+			47 container
+				48 text 已按链接筛选制品 :  tpl_d3c38917d0404fa98b984955adde3e11  · 
+				49 link Description: 查看全部制品, Value: 127.0.0.1:5188/factory?view=artifacts
+			50 container 认知模板 Home Care Ledger
+				51 container
+					52 text 认知模板 · 辅助试用模板  · v assisted-trial-0.1.0
+				53 heading Home Care Ledger, Value: 2
+					54 text Home Care Ledger
+				55 container
+					56 text Home Care Ledger  · r 1
+				57 link Description: 下载冻结包, Value: 127.0.0.1:5188/api/factory/artifacts/tpl_d3c38917d0404fa98b984955adde3e11/download
+				58 text Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.
+				59 container 辅助模板信息 Home Care Ledger
+					60 text 辅助试用模板 应用未运行
+					61 container
+						62 text 生产模型 :  opencode-go/deepseek-v4.1-flash  ·  独立会话静态审阅通过；应用运行另行验证
+					63 container
+						64 text 修订版本 :  home-care-r1  · 
+						65 link Description: 回查已撤回父版本, Value: 127.0.0.1:5188/factory?view=artifacts&artifact_id=tpl_d610fc5e84644092b880b30fbf691c29
+					66 definition list
+						67 container 适用用户
+							68 text 适用用户
+						69 text A single homeowner keeping care records for their own home on a local machine, with no accounts, notifications, or multi-property operation.
+						70 container 解决的问题
+							71 text 解决的问题
+						72 text Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.
+					73 text 核心能力
+					74 content list
+						75 container
+							76 AXListMarker • 
+							77 text Home and equipment anchor
+						78 container
+							79 AXListMarker • 
+							80 text Every-N-day plan and due queue
+						81 container
+							82 AXListMarker • 
+							83 text Completion and next-due rollover
+						84 container
+							85 AXListMarker • 
+							86 text Anchored care history
+						87 container
+							88 AXListMarker • 
+							89 text Accessible localhost UI
+					90 button (collapsed) 适用范围与已知限制, Secondary Actions: Expand
+						91 text 适用范围与已知限制
+					92 text 固定案例来源
+					93 link Description: 回查共享案例 · r1, Value: 127.0.0.1:5188/apps?app_id=app%3Arepo%3Ade476a278e635014bdacdeeb&case_id=case%3Aauxiliary-go-pilot-2026-10-21%3Ahome-care&case_revision=1
+					94 container
+						95 link Description: micasa-dev/micasa @ ca69a88f998d, Value: github.com/micasa-dev/micasa/tree/ca69a88f998dec25c1e285121e428a4f7621dc68
+						96 link Description: LICENSE, Value: github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE
+					97 text OpenCode Go 研究与生成、独立会话静态审阅；应用尚未开发或运行。
+					98 text 辅助运行记录与严格工厂验收分别记录；不代表正式发布、严格 G1/T08 通过或本机服务此刻在线。
+					99 link Description: 下载标准开发包, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_d3c38917d0404fa98b984955adde3e11/files/development
+					100 button (collapsed) 让 Codex 从这里开始, Secondary Actions: Expand
+						101 text 让 Codex 从这里开始
+				102 container 辅助试用来源
+					103 text 辅助生产模板。冻结来源、包内声明、辅助运行示例与严格工厂验收分别记录；验证范围与缺口请对照上方说明及包内章节。
+					104 container
+						105 text 原冻结摘要 :  6f945f24ee2ec83162baee8b1925ab4e6dbcf4819141945f7af0baf33ac4c950
+					106 link Description: 回查共享案例: case:auxiliary-go-pilot-2026-10-21:home-care · r1, Value: 127.0.0.1:5188/apps?app_id=app%3Arepo%3Ade476a278e635014bdacdeeb&case_id=case%3Aauxiliary-go-pilot-2026-10-21%3Ahome-care&case_revision=1
+				107 text 5 项能力 · 2 个决策 · 1 个阶段 · 5 个验收用例
+				108 text 冻结检查覆盖结构、引用、阶段映射与文件摘要，本身不执行包内程序。包内报告作为来源声明保留，不等于工厂重新验收；工厂独立审阅和每个下游目标的运行结果分别记录。符合当前审阅与固定案例证据要求的模板，可在 V1 工厂中管理目录发布。
+				109 container 完整认知库
+					110 heading 1. 完整认知库, Value: 3
+						111 text 1. 完整认知库
+					112 text 查看已冻结章节，或下载包含完整 blueprint/ 来源文件的原始冻结包。
+				113 container 工厂认知审阅
+					114 container
+						115 text 独立认知审阅： 未发起
+					116 button 发起认知审阅
+					117 text 会向所选模型发送冻结认知包与对应叶子、场景，可能计费；这是静态审阅，不证明下游应用运行成功。
+					118 button (collapsed) 按冻结场景生产认知修订版, Secondary Actions: Expand
+						119 text 按冻结场景生产认知修订版
+				120 button 查看认知内容
+				121 container 创建认知开发包
+					122 heading 2. 当前阶段执行包, Value: 3
+						123 text 2. 当前阶段执行包
+					124 text 按阶段导出，从 HANDOFF.md 开始，再按需加载完整认知和契约；无需一开始预加载全部材料。旧包阶段可能未覆盖完整场景，应对照已确认场景核实范围；不能静默更改冻结承诺或视为已完成。导出不会运行验收。
+					125 container
+						126 text 开发项目名称
+						127 text field (settable) 开发项目名称, Value: my-application
+					128 container
+						129 text 本次开发阶段
+						130 pop up button (collapsed, settable) Description: 本次开发阶段, Value: P0 · 核心可用, Secondary Actions: Expand
+							131 menu
+								132 (selected) P0 · 核心可用
+					133 button 创建开发包
+				134 container 独立运行验收
+					135 heading 3. 独立验收：运行冻结用例, Value: 3
+						136 text 3. 独立验收：运行冻结用例
+					137 text 与静态认知审阅分开记录。仅在冻结包声明支持适配器时可提交；容器运行时是否可用由提交结果确认。不会调用模型。
+					138 text 先读取冻结包能力以确认是否有运行适配器。
+		17 text Application Atlas · 1805 软件应用类型 · 由语料自动生成 · v1.1 方法论
+
+The focused UI element is 1 AXWebArea 应用图谱 · Application Atlas, URL: 127.0.0.1:5188/factory?view=artifacts&artifact_id=tpl_d3c38917d0404fa98b984955adde3e11

@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/fixture.py", line 240, in <module>
+    print(json.dumps(run(args.probe), indent=2))
+                     ^^^^^^^^^^^^^^^
+  File "/fixture.py", line 214, in run
+    case('http://fixture.invalid')
+  File "/probe.py", line 400, in case_a05
+    check(token in text, 'UI missing token ' + token)
+  File "/probe.py", line 28, in check
+    raise ProbeFailure(message)
+generated_probe.ProbeFailure: UI missing token complete

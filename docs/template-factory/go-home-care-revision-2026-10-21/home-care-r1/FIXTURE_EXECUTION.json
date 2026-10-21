@@ -1,0 +1,21 @@
+{
+  "engine": "docker",
+  "image": "python:3.12-slim",
+  "network": "none",
+  "read_only": true,
+  "cap_drop": "ALL",
+  "no_new_privileges": true,
+  "user": "65534:65534",
+  "memory": "512m",
+  "pids": 128,
+  "cpus": 1,
+  "tmpfs": "/tmp:32m",
+  "generated_code_mount": "/probe.py:ro",
+  "trusted_harness_mount": "/fixture.py:ro",
+  "harness_sha256": "39965cd020180ef8193f8cc2f5e3853028254e8ffb1ad48649be39243755e564",
+  "probe_sha256": "4661e379e75c2f0575e693d464a92c4ed0f4cd0f7d5bf00db8b1bdb24997159e",
+  "exit_code": 0,
+  "checks": 19,
+  "application_runtime": "not_run",
+  "fixture_harness_corrections": "默认字段合并及既有complete状态词；保留FIXTURE_HARNESS_CORRECTION.log，不改模型交付。"
+}

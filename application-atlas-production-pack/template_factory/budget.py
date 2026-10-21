@@ -189,6 +189,7 @@ class BudgetLedger:
             if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
                 raise ValueError(f"{key} must be positive")
         statements = (
+            "CREATE TABLE IF NOT EXISTS tf_budget_auxiliary_segment (campaign_id TEXT NOT NULL, phase TEXT NOT NULL, identity TEXT NOT NULL, request_json TEXT NOT NULL, request_digest TEXT NOT NULL, max_calls INTEGER NOT NULL, window_seconds INTEGER NOT NULL, model TEXT NOT NULL, PRIMARY KEY(campaign_id,phase))",
             "CREATE TABLE IF NOT EXISTS tf_budget_phase (campaign_id TEXT NOT NULL, identity TEXT NOT NULL, phase TEXT NOT NULL, started REAL NOT NULL, deadline REAL NOT NULL, PRIMARY KEY(campaign_id, identity, phase))",
             "CREATE TABLE IF NOT EXISTS tf_budget_reservation (id TEXT PRIMARY KEY, campaign_id TEXT NOT NULL, identity TEXT NOT NULL, phase TEXT NOT NULL, kind TEXT NOT NULL, status TEXT NOT NULL, created REAL NOT NULL, started REAL, finished REAL, job_id TEXT, requested_model TEXT, requested_effort TEXT, stage TEXT, retry INTEGER, observed_model TEXT, observed_effort TEXT, outcome TEXT, group_kind TEXT NOT NULL DEFAULT 'production')",
             "CREATE INDEX IF NOT EXISTS tf_budget_campaign_status ON tf_budget_reservation(campaign_id,status)",
@@ -316,6 +317,32 @@ class BudgetLedger:
                 "effective_deadline": resume["effective_deadline"],
                 "authorization_digest": resume["authorization_digest"]}
 
+    def register_auxiliary_revision(self, phase, identity, request):
+        """Persist a bounded operator request, without activating its clock.
+
+        This local service does not amend/resume G1 or reset campaign counters.
+        Reservations atomically enforce the stable phase cap across all jobs.
+        """
+        if (not str(phase).startswith("auxiliary-revision-") or not identity
+                or request.get("schema") != "atlas.auxiliary-revision-request.v1"
+                or request.get("campaign_id") != self.campaign_id
+                or request.get("phase") != phase or request.get("identity") != identity
+                or request.get("max_cli_calls") != 6 or request.get("window_seconds") != 86400
+                or request.get("model") != "opencode-go/deepseek-v4.1-flash"
+                or not request.get("authorization_sha256") or not request.get("parent")):
+            raise FactoryError("invalid auxiliary revision request", "auxiliary_revision_binding", 409)
+        with self.store.connect(True) as con:
+            row = con.execute("SELECT request_digest FROM tf_budget_auxiliary_segment WHERE campaign_id=? AND phase=?",
+                              (self.campaign_id, phase)).fetchone()
+            if row and row[0] != digest(request):
+                raise FactoryError("auxiliary request already bound", "auxiliary_revision_binding", 409)
+            if not row:
+                if con.execute("SELECT 1 FROM tf_budget_phase WHERE campaign_id=? AND phase=?", (self.campaign_id, phase)).fetchone():
+                    raise FactoryError("cannot rebind an existing phase", "auxiliary_revision_binding", 409)
+                con.execute("INSERT INTO tf_budget_auxiliary_segment VALUES(?,?,?,?,?,?,?,?)",
+                            (self.campaign_id, phase, identity, json.dumps(request, sort_keys=True), digest(request), 6, 86400, request["model"]))
+        return {"phase": phase, "request_digest": digest(request), "max_cli_calls": 6, "window_seconds": 86400}
+
     def begin_segment(self, phase, *, con=None):
         """Start the campaign-wide segment clock once at official queue start."""
         if not phase:
@@ -332,7 +359,9 @@ class BudgetLedger:
         if row:
             return row[0]
         now = float(self.clock())
-        deadline = now + float(self.limits["phase_seconds"])
+        auxiliary = con.execute("SELECT window_seconds FROM tf_budget_auxiliary_segment WHERE campaign_id=? AND phase=?",
+                                (self.campaign_id, str(phase))).fetchone()
+        deadline = now + float(auxiliary[0] if auxiliary else self.limits["phase_seconds"])
         con.execute("INSERT INTO tf_budget_phase VALUES(?,?,?,?,?)",
                     (self.campaign_id, phase_key, str(phase), now, deadline))
         return deadline
@@ -353,6 +382,17 @@ class BudgetLedger:
             control = con.execute("SELECT paused FROM tf_budget_control WHERE campaign_id=?", (self.campaign_id,)).fetchone()
             if control and control[0]:
                 raise FactoryError("campaign budget is paused", "budget_paused", 409)
+            auxiliary = con.execute("SELECT * FROM tf_budget_auxiliary_segment WHERE campaign_id=? AND phase=?",
+                                    (self.campaign_id, str(phase))).fetchone()
+            if str(phase).startswith("auxiliary-revision-") and not auxiliary:
+                raise FactoryError("auxiliary revision must be registered first", "auxiliary_revision_binding", 409)
+            if auxiliary:
+                used = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND phase=? AND status!='not_started'",
+                                   (self.campaign_id, str(phase))).fetchone()[0]
+                if str(identity) != auxiliary["identity"] or requested_model != auxiliary["model"]:
+                    raise FactoryError("auxiliary revision call binding differs", "auxiliary_revision_binding", 409)
+                if used >= auxiliary["max_calls"]:
+                    raise FactoryError("auxiliary revision CLI limit exhausted", "budget_exhausted", 409)
             self.begin_segment(phase, con=con)
             timing = self._effective_timing_locked(con, identity, phase, plan_id)
             deadline = timing["deadline"]

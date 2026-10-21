@@ -286,6 +286,9 @@ def has_long_line_truncation(directory):
 
 def verify_production(folder, production, authored, snapshot, *, allow_incomplete_review=False):
     """Recheck real receipts before any case/scene/import write, including reruns."""
+    if production.get("revision_request_digest"):
+        from revise_with_opencode import verify_revision
+        return verify_revision(folder, production, authored, snapshot)
     calls = folder / "calls"
     if not allow_incomplete_review and (folder / "SUPPLEMENTAL_FAILURE.json").exists():
         raise ValueError("latest complete-material review failed; do not register/re-export as usable")

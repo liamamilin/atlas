@@ -1,0 +1,27 @@
+{
+ "acceptance": [
+  "A fresh database has no home; POST /api/home creates exactly one record with id home, and a second POST returns 409 HOME_EXISTS without mutating the stored home.",
+  "POST /api/equipment under the existing home returns 201 and round-trips through list and detail; blank names, invalid categories, and unknown homes return 422 or 404 and add no equipment row.",
+  "POST /api/plans enforces interval_days 1..3650 and mutual exclusion of last_completed_on and first_due_on; GET /api/tasks/due returns exact overdue, due, and upcoming sets at as_of and horizon_days boundaries, while invalid requests write nothing.",
+  "A completion with note inserts one history row and atomically sets due_on to max(previous last_completed_on, completed_on) plus interval_days; leap-day, month-end, year-end, future-date, oversize-note, and unknown-plan failures leave both plan and completions unchanged.",
+  "GET /api/history filters by home and equipment and returns documented fields in descending completion order; invalid filters write nothing; GET / is dependency-free accessible HTML and unknown routes or methods return documented JSON errors."
+ ],
+ "audience": "A single homeowner keeping care records for their own home on a local machine, with no accounts, notifications, or multi-property operation.",
+ "id": "scn_802f9221599a491781b3dafa4f27a033",
+ "leaf": "home-maintenance-application",
+ "leaf_name": "家庭维护应用",
+ "name": "Home Care Ledger",
+ "objective": "Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.",
+ "revision": 1,
+ "status": "draft",
+ "updated_at": "2026-10-21T08:38:10.458340+00:00",
+ "workflow": [
+  "Start the local server against a disposable data directory; initialize the SQLite schema on first start.",
+  "Create the single home with POST /api/home, then add equipment records with POST /api/equipment anchored by home_id.",
+  "Create care plans with POST /api/plans using interval_days and an optional equipment anchor.",
+  "Query GET /api/tasks/due with an explicit as_of and horizon_days to see overdue, due, and upcoming work.",
+  "Record a completion and note with POST /api/plans/{id}/completions; the same transaction updates the plan next due date.",
+  "Read GET /api/plans/{id}/completions or GET /api/history filtered by home_id and equipment_id.",
+  "Use GET / for the basic accessible single-page UI; all actions remain available through the documented JSON API."
+ ]
+}

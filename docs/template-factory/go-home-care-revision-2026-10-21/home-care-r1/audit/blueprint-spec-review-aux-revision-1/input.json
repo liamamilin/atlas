@@ -1,0 +1,137 @@
+{
+ "input_digest": "9d63418403336b739fe4f3f8dca46623af7a5ab7d8b4b9dae5923964a77b7637",
+ "request": {
+  "schema": "atlas.auxiliary-revision-request.v1",
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "phase": "auxiliary-revision-home-care-2026-10-21",
+  "identity": "auxiliary-revision-home-care-2026-10-21:home-care",
+  "revision_id": "home-care-r1",
+  "model": "opencode-go/deepseek-v4.1-flash",
+  "max_cli_calls": 6,
+  "window_seconds": 86400,
+  "authorization_ref": "docs/template-factory/go-home-care-revision-2026-10-21/AUTHORIZATION.md",
+  "authorization_sha256": "e87f4a228e5f3cde2456ea0ce3fc17b0be8de2e853bde1c7a7127d05cb31eb59",
+  "parent": {
+   "artifact_id": "tpl_d610fc5e84644092b880b30fbf691c29",
+   "digest": "4b466e1fe6fd062b170341287addae5a3cc8eb92d0dbfbe87ca4c6c9f45438f8",
+   "original_frozen_digest": "a869427a057907eaf0e3ab1182e8acb2279b47953ea6f399022e30a559ad0cf0",
+   "case_ref": {
+    "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+    "revision": 1,
+    "digest": "f42187b6993942a959c4ca954c82e14d45472e9c1793cd908851311b7f4b28aa"
+   }
+  },
+  "parent_folder": "docs/template-factory/go-auxiliary-pilot-2026-10-21/home-care",
+  "scenario_id": "scn_802f9221599a491781b3dafa4f27a033",
+  "scenario_revision": 1,
+  "leaf": "home-maintenance-application",
+  "issues": [
+   "acceptance/probe.py:157-164 (A01): before is captured before the successful PATCH at line 161, but line 164 compares the home after the empty PATCH to before. The home object includes updated_at (VIEW_ARCH.md:32; probe.py:155); a correct PATCH that refreshes updated_at makes the final zero-write check fail even though the empty patch wrote nothing. Use the patched response from line 161 as the baseline or compare only id/name/address.",
+   "acceptance/probe.py:171-175 (A01) tests blank name and unknown home but never an invalid category; AUTHOR_INPUT.json acceptance[1] and REVIEW_SCOPE.md:35-37 explicitly require invalid categories to return 422 or 404 with no equipment row, and VIEW_ARCH.md:38 defines the enum. Add an invalid-category POST and assert 422 plus an unchanged equipment list.",
+   "VIEW_ARCH.md:11 and :77 state a backdated completion never moves next due backwards, but max(previous last_completed_on, completed_on) + interval_days has no floor when last_completed_on is NULL (a plan created with only first_due_on or no anchor). Example: first_due_on 2026-03-01, interval 30, completed_on 2025-01-01 gives due_on 2025-01-31, earlier than 2026-03-01. probe.py:230,245-247 only backdates after a prior completion. Define an anchor floor or narrow the invariant and add the missing case.",
+   "acceptance/probe.py:197-210 (A02) checks selected task IDs and statuses but never the exact set or count; AUTHOR_INPUT.json acceptance[2] and REVIEW_SCOPE.md:40-42 require exact overdue/due/upcoming sets at the boundaries. Extra tasks, for example from earlier cases in the same disposable database, would not fail the probe. Assert the full ID set or count, preferably with a fresh equipment-filtered query.",
+   "acceptance/probe.py:311-313 (A05) only checks token presence (label, form, button, aria-live, and words); VIEW_ARCH.md:158-162 also requires label for/id linkage, fieldset/legend, caption, th scope=col, role=status, and lang=en. Token presence does not verify the stated accessibility rules; add structural assertions."
+  ],
+  "date_contract": {
+   "latest": "max(existing last_completed_on if present, completed_on)",
+   "new_due_on": "max(old due_on, latest + interval_days)",
+   "atomic": "BEGIN IMMEDIATE; read old plan; append actual completion date and note; update last_completed_on=latest and new_due_on; COMMIT, rollback all on failure"
+  },
+  "no_application_runtime": true
+ },
+ "scenario": {
+  "acceptance": [
+   "A fresh database has no home; POST /api/home creates exactly one record with id home, and a second POST returns 409 HOME_EXISTS without mutating the stored home.",
+   "POST /api/equipment under the existing home returns 201 and round-trips through list and detail; blank names, invalid categories, and unknown homes return 422 or 404 and add no equipment row.",
+   "POST /api/plans enforces interval_days 1..3650 and mutual exclusion of last_completed_on and first_due_on; GET /api/tasks/due returns exact overdue, due, and upcoming sets at as_of and horizon_days boundaries, while invalid requests write nothing.",
+   "A completion with note inserts one history row and atomically sets due_on to max(previous last_completed_on, completed_on) plus interval_days; leap-day, month-end, year-end, future-date, oversize-note, and unknown-plan failures leave both plan and completions unchanged.",
+   "GET /api/history filters by home and equipment and returns documented fields in descending completion order; invalid filters write nothing; GET / is dependency-free accessible HTML and unknown routes or methods return documented JSON errors."
+  ],
+  "audience": "A single homeowner keeping care records for their own home on a local machine, with no accounts, notifications, or multi-property operation.",
+  "id": "scn_802f9221599a491781b3dafa4f27a033",
+  "leaf": "home-maintenance-application",
+  "leaf_name": "家庭维护应用",
+  "name": "Home Care Ledger",
+  "objective": "Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.",
+  "revision": 1,
+  "status": "draft",
+  "updated_at": "2026-10-21T08:38:10.458340+00:00",
+  "workflow": [
+   "Start the local server against a disposable data directory; initialize the SQLite schema on first start.",
+   "Create the single home with POST /api/home, then add equipment records with POST /api/equipment anchored by home_id.",
+   "Create care plans with POST /api/plans using interval_days and an optional equipment anchor.",
+   "Query GET /api/tasks/due with an explicit as_of and horizon_days to see overdue, due, and upcoming work.",
+   "Record a completion and note with POST /api/plans/{id}/completions; the same transaction updates the plan next due date.",
+   "Read GET /api/plans/{id}/completions or GET /api/history filtered by home_id and equipment_id.",
+   "Use GET / for the basic accessible single-page UI; all actions remain available through the documented JSON API."
+  ]
+ },
+ "read_views": {
+  "VIEW_NAME.md": {
+   "json_pointer": "/name",
+   "sha256": "03e5d2520c4667ace0d8a7b280f04f28d49c2ade96e45679d79ddd18f49c6e24"
+  },
+  "VIEW_AUDIENCE.md": {
+   "json_pointer": "/audience",
+   "sha256": "da3042b0e768cad7cb08de50a5c02a66eb4e92aa055fa2f637a2eaf477a05314"
+  },
+  "VIEW_OBJECTIVE.md": {
+   "json_pointer": "/objective",
+   "sha256": "57f36bf4fffe85f4b5f0a7178e4987a01fa41f1bd21296679106bf24815ab4dd"
+  },
+  "VIEW_INFERENCE.md": {
+   "json_pointer": "/inference",
+   "sha256": "2feb54dcd47aacec495ff6db2dba92d143dd4b223c6e11b0408a31290f0d179d"
+  },
+  "VIEW_ARCH.md": {
+   "json_pointer": "/arch",
+   "sha256": "9afaee3f43c3cad9762177dc9251dc6df5dd6a7bf841d3bf3c851534a7bf5098"
+  },
+  "VIEW_REPO_NAME.md": {
+   "json_pointer": "/repo_name",
+   "sha256": "cfeddd00aba8b89a343df14268e71fecd2950ea61996b72cc79a868db1014d7b"
+  },
+  "VIEW_LICENSE.md": {
+   "json_pointer": "/license",
+   "sha256": "2af71558e438db0b73a20beab92dc278a94e1bbe974c00c1a33e3ab62d53a608"
+  },
+  "VIEW_LICENSE_PATH.md": {
+   "json_pointer": "/license_path",
+   "sha256": "c693279643b8cd5d248172d9c22cb7cf4ed163a3c98c8a3f69c2717edd3eacb7"
+  }
+ },
+ "inventory": {
+  "candidate/AUTHOR_INPUT.json": "e99684e5dc31dcf364672122624dffbf1725daff22c2e1916bf07f18f758e4d1",
+  "candidate/READING_GUIDE.md": "fa2b824dba6a3073b3fea23035f8fc88378afa9e534093e4a4555efd7cae54e3",
+  "candidate/READ_VIEWS.json": "d11c28f1b6d7ab06e0c977b23cf9272e9f8b4d31175579b91493db72a7d7d795",
+  "candidate/REVIEW_SCOPE.md": "92ff838faff8ed89b85b7331176cbea5f95df5b50e4be45f40d83e5a0858a5b0",
+  "candidate/VIEW_ARCH.md": "9afaee3f43c3cad9762177dc9251dc6df5dd6a7bf841d3bf3c851534a7bf5098",
+  "candidate/VIEW_AUDIENCE.md": "da3042b0e768cad7cb08de50a5c02a66eb4e92aa055fa2f637a2eaf477a05314",
+  "candidate/VIEW_INFERENCE.md": "2feb54dcd47aacec495ff6db2dba92d143dd4b223c6e11b0408a31290f0d179d",
+  "candidate/VIEW_LICENSE.md": "2af71558e438db0b73a20beab92dc278a94e1bbe974c00c1a33e3ab62d53a608",
+  "candidate/VIEW_LICENSE_PATH.md": "c693279643b8cd5d248172d9c22cb7cf4ed163a3c98c8a3f69c2717edd3eacb7",
+  "candidate/VIEW_NAME.md": "03e5d2520c4667ace0d8a7b280f04f28d49c2ade96e45679d79ddd18f49c6e24",
+  "candidate/VIEW_OBJECTIVE.md": "57f36bf4fffe85f4b5f0a7178e4987a01fa41f1bd21296679106bf24815ab4dd",
+  "candidate/VIEW_REPO_NAME.md": "cfeddd00aba8b89a343df14268e71fecd2950ea61996b72cc79a868db1014d7b",
+  "candidate/acceptance/README.md": "3da2d8f23a643449ac6187e60a65024376975dcb91c46236e08d37eac89c41b5",
+  "candidate/acceptance/probe.py": "4661e379e75c2f0575e693d464a92c4ed0f4cd0f7d5bf00db8b1bdb24997159e",
+  "upstream/LICENSE": "837f9e6758e4d3313dc19beaa4638522f22c781c9a27d32ff56b473e7094eccc",
+  "upstream/README.md": "40b5d4f8df78510ec9b05454df1d307ca5eb44ee055328229faa07d0f6e1c348",
+  "upstream/internal/data/dashboard.go": "d03ed7b8243f97c6f906a52ba7aad63645a468586092c4584f20437972ffd656",
+  "upstream/internal/data/models.go": "5cd2a997f2efa9fd7d2916446d8173571fba7ee40dfb9703083d266bb6cab000",
+  "upstream/internal/data/store_house.go": "e79c86687cc434803229f62571c4b5737eac983a8d1e7d6ef1e32bf15c0bf205",
+  "upstream/internal/data/store_maintenance.go": "d150cb4ee2bc410a9844768b63a4447c81a8122555c9bcc465b1c54c3a9d2b37",
+  "upstream/internal/data/store_servicelog.go": "0cc864c8ff483237fbd128d417f6d2bf2a9ff66fdcbf2719c97cb239c6a65f4a",
+  "upstream/internal/data/validation.go": "6bb00aeae3903900ef4182e87fb10bbb640980bcde6739e5e252d29b45d8fef4"
+ },
+ "checks": [
+  "leaf_scope",
+  "source_fidelity",
+  "design_distinction",
+  "core_journey",
+  "architecture",
+  "acceptance",
+  "limits_and_safety"
+ ],
+ "revision_round": 1
+}

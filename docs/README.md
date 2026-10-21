@@ -8,6 +8,8 @@
 
 ## 模板工厂
 
+- [家庭保养 Go 局部修订与真实复审](template-factory/go-home-care-revision-2026-10-21/REPORT.md)：新辅助修订静态通过、应用未运行；原案例复用，17可用+1待修订历史，93/500调用。
+
 - [Atlas 辅助模板工厂 V1 收口与用户入口](template-factory/assisted-v1-user-entry-2026-10-21/REPORT.md)：当前16份辅助模板的叶子/场景/案例入口、6份核心示例与10份未运行、标准包和Codex交接。下方严格V1历史受控链仍保持原状态，不因辅助交付升级。
 - [十模板辅助批次交付](template-factory/assisted-batch-10-2026-10-21/REPORT.md)：十个不同叶子、十份固定共享案例、两个新上下文开发的代表应用；真实浏览器/重启、幂等复用、CI审计修复及未运行范围分别记录。
 - [V1 交付总览与真实阻断](template-factory/v1-2026-10-19/DELIVERY.md)：G1 正式评估、固定首批未启动报告、完整测试和恢复步骤；未取得真实 P0 运行证明。
