@@ -671,6 +671,83 @@ class FullAuxiliaryService:
             )
         return self.status(plan_id)
 
+    def selected_leaves(self, plan_id):
+        with self.store.connect() as con:
+            row = con.execute(
+                "SELECT body FROM auxiliary_full_event WHERE plan_id=? AND kind='selected_dispatch' ORDER BY id DESC LIMIT 1",
+                (plan_id,),
+            ).fetchone()
+        if not row:
+            return []
+        event = json.loads(row[0])
+        receipt = event.get("receipt", {})
+        if (digest(event["leaves"]) != event.get("selection_digest")
+            or receipt.get("leaves") != event["leaves"]
+            or receipt.get("selection_digest") != event["selection_digest"]):
+            raise FactoryError("selected dispatch record changed", "full_plan_integrity", 409)
+        return event["leaves"]
+
+    def resume_selected(self, plan_id, leaves):
+        """Resume a drained plan with a durable dispatch boundary of at most three leaves."""
+        if (not isinstance(leaves, list) or not 1 <= len(leaves) <= 3
+            or any(not isinstance(x, str) or not x for x in leaves)
+            or len(set(leaves)) != len(leaves)):
+            raise FactoryError("selected dispatch requires one to three unique leaves", "full_plan_binding", 409)
+        selection = sorted(leaves)
+        selection_digest = digest(selection)
+        with self.store.connect(True) as con:
+            row = con.execute(
+                "SELECT * FROM auxiliary_full_plan WHERE id=? AND campaign_id=?",
+                (plan_id, self.campaign_id),
+            ).fetchone()
+            if not row:
+                raise FactoryError("unknown plan", "not_found", 404)
+            latest = con.execute(
+                "SELECT body FROM auxiliary_full_event WHERE plan_id=? AND kind='selected_dispatch' ORDER BY id DESC LIMIT 1",
+                (plan_id,),
+            ).fetchone()
+            if row["status"] == "running":
+                if latest:
+                    prior = json.loads(latest[0])
+                    if prior.get("selection_digest") == selection_digest and prior.get("leaves") == selection:
+                        return prior["receipt"]
+                raise FactoryError("running plan has a different selected dispatch", "full_plan_paused", 409)
+            if row["status"] != "paused":
+                raise FactoryError("selected dispatch requires a paused plan", "full_plan_paused", 409)
+            active = con.execute(
+                "SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND phase=? AND status IN ('reserved','spawn_intent','started','uncertain')",
+                (self.campaign_id, row["phase"]),
+            ).fetchone()[0]
+            if active:
+                raise FactoryError("drain active reservations before selected dispatch", "full_plan_paused", 409)
+            members = {
+                x["slug"]: x["state"]
+                for x in con.execute(
+                    "SELECT slug,state FROM auxiliary_full_leaf WHERE plan_id=?", (plan_id,)
+                )
+            }
+            if any(x not in members or members[x] not in {"pending", "running", "paused", "needs_revision"} for x in selection):
+                raise FactoryError("selected leaf outside dispatchable frozen scope", "full_plan_binding", 409)
+            receipt = {
+                "full_plan_id": plan_id,
+                "leaves": selection,
+                "selection_digest": selection_digest,
+                "baseline": row["baseline"],
+                "max_calls": row["max_calls"],
+                "started": row["started"],
+                "deadline": row["deadline"],
+                "resumed_at": self.clock(),
+            }
+            con.execute(
+                "INSERT INTO auxiliary_full_event(plan_id,kind,body,created) VALUES(?,'selected_dispatch',?,?)",
+                (plan_id, json.dumps({"leaves": selection, "selection_digest": selection_digest, "receipt": receipt}), self.clock()),
+            )
+            con.execute(
+                "UPDATE auxiliary_full_plan SET status='running',reason='selected dispatch' WHERE id=?",
+                (plan_id,),
+            )
+            return receipt
+
 
 def full_reservation_locked(
     con, campaign, identity, phase, plan_id, model, stage, now, kind="production"
@@ -706,6 +783,21 @@ def full_reservation_locked(
             "full plan cannot fund application/runtime calls", "full_plan_binding", 409
         )
     slug = identity[len(plan_id) + 1 :]
+    selected = con.execute(
+        "SELECT body FROM auxiliary_full_event WHERE plan_id=? AND kind='selected_dispatch' ORDER BY id DESC LIMIT 1",
+        (plan_id,),
+    ).fetchone()
+    if selected:
+        selection = json.loads(selected[0])
+        receipt = selection.get("receipt", {})
+        if (digest(selection.get("leaves")) != selection.get("selection_digest")
+            or receipt.get("leaves") != selection.get("leaves")
+            or receipt.get("selection_digest") != selection.get("selection_digest")):
+            raise FactoryError("selected dispatch record changed", "full_plan_integrity", 409)
+        if slug not in selection["leaves"]:
+            raise FactoryError("leaf outside selected dispatch", "full_plan_paused", 409)
+    elif effective_model == REVISED_MODEL:
+        raise FactoryError("selected dispatch required before Open Design reservations", "full_plan_paused", 409)
     gate_row = con.execute(
         "SELECT body FROM auxiliary_workflow_gate WHERE plan_id=?", (plan_id,)
     ).fetchone()

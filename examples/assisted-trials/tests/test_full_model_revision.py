@@ -1,4 +1,5 @@
 import hashlib
+import json
 from pathlib import Path
 import sys
 import tempfile
@@ -7,7 +8,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "application-atlas-production-pack"))
 from template_factory.full_auxiliary import (
-    FullAuxiliaryService, MODEL, REVISED_MODEL, ensure_schema, full_reservation_locked,
+    FullAuxiliaryService, MODEL, REVISED_MODEL, ensure_schema,
 )
 from template_factory.store import FactoryError, FactoryStore
 
@@ -28,7 +29,8 @@ class FullModelRevisionTests(unittest.TestCase):
         self.auth.write_text("authorized provider switch\n")
         self.user_auth.parent.mkdir(parents=True)
         self.user_auth.write_text("user authorizes provider switch\n")
-        self.scope.write_text('{"full_plan_id":"plan-test","items":[{"leaf":"leaf"}]}')
+        self.scope.write_text('{"full_plan_id":"plan-test","items":' + json.dumps(
+            [{"leaf": leaf} for leaf in ("leaf", "leaf-two", "leaf-three", "leaf-four")]) + '}')
         self.request = {
             "schema": "atlas.full-leaf-auxiliary-authorization.v1",
             "campaign_id": "test", "model": MODEL, "max_new_calls": 7200,
@@ -106,7 +108,8 @@ class FullModelRevisionTests(unittest.TestCase):
             self.service.effective_model(self.plan_id)
 
     def test_reservations_use_current_revision_and_original_scope(self):
-        self.service.control(self.plan_id, "resume")
+        self.pause()
+        self.service.resume_selected(self.plan_id, ["leaf"])
         self.service.update_leaf(self.plan_id, "leaf", "running", {})
         old_call = self.service.ledger.reserve(
             self.plan_id + ":leaf", self.request["phase"], requested_model=MODEL,
@@ -119,14 +122,70 @@ class FullModelRevisionTests(unittest.TestCase):
             self.assertEqual(con.execute(
                 "SELECT COUNT(*) FROM tf_budget_reservation WHERE id=?", (old_call["id"],)
             ).fetchone()[0], 1)
-        with self.store.connect(True) as con:
-            con.execute("UPDATE auxiliary_full_plan SET status='running' WHERE id=?", (self.plan_id,))
-            con.execute("UPDATE auxiliary_full_leaf SET state='running' WHERE plan_id=?", (self.plan_id,))
-            args = (con, "test", self.plan_id + ":leaf", self.request["phase"], self.plan_id)
-            with self.assertRaisesRegex(FactoryError, "identity/model"):
-                full_reservation_locked(*args, MODEL, "first/discovery/attempt-1", 1001)
-            row = full_reservation_locked(*args, REVISED_MODEL, "first/blueprint-generate-aux/attempt-1", 1001)
-            self.assertEqual(row["max_calls"], 7200)
+        self.assertEqual(self.service.selected_leaves(self.plan_id), ["leaf"])
+        receipt = self.service.resume_selected(self.plan_id, ["leaf", "leaf-two", "leaf-three"])
+        self.assertEqual(self.service.resume_selected(self.plan_id, ["leaf-three", "leaf", "leaf-two"]), receipt)
+        self.assertEqual(self.service.selected_leaves(self.plan_id), sorted(["leaf", "leaf-two", "leaf-three"]))
+        for leaf in ("leaf", "leaf-two", "leaf-three", "leaf-four"):
+            self.service.update_leaf(self.plan_id, leaf, "running", {})
+        for leaf in ("leaf", "leaf-two", "leaf-three"):
+            call = self.service.ledger.reserve(
+                self.plan_id + ":" + leaf, self.request["phase"], requested_model=REVISED_MODEL,
+                plan_id=self.plan_id, stage="first/blueprint-generate-aux/attempt-1",
+            )
+            self.service.ledger.finish(call["id"], "failed", outcome="bounded fixture")
+        with self.assertRaisesRegex(FactoryError, "outside selected dispatch"):
+            self.service.ledger.reserve(
+                self.plan_id + ":leaf-four", self.request["phase"], requested_model=REVISED_MODEL,
+                plan_id=self.plan_id, stage="first/discovery/attempt-1",
+            )
+
+    def test_unselected_model_compatibility_boundary(self):
+        self.service.control(self.plan_id, "resume")
+        self.service.update_leaf(self.plan_id, "leaf", "running", {})
+        legacy = self.service.ledger.reserve(
+            self.plan_id + ":leaf", self.request["phase"], requested_model=MODEL,
+            plan_id=self.plan_id, stage="first/discovery/attempt-1",
+        )
+        self.service.ledger.finish(legacy["id"], "failed", outcome="legacy fixture")
+
+        self.service.control(self.plan_id, "pause")
+        self.service.register_model_revision(self.amendment())
+        self.service.control(self.plan_id, "resume")
+        with self.assertRaisesRegex(FactoryError, "selected dispatch required"):
+            self.service.ledger.reserve(
+                self.plan_id + ":leaf", self.request["phase"], requested_model=REVISED_MODEL,
+                plan_id=self.plan_id, stage="first/blueprint-generate-aux/attempt-1",
+            )
+
+    def test_selected_resume_requires_paused_drained_frozen_subset(self):
+        with self.assertRaises(FactoryError):
+            self.service.resume_selected(self.plan_id, ["leaf"])
+        self.pause()
+        for bad in ([], ["leaf", "leaf", "leaf-two"], ["missing"], ["leaf", "leaf-two", "leaf-three", "leaf-four"]):
+            with self.assertRaises(FactoryError):
+                self.service.resume_selected(self.plan_id, bad)
+        self.assertEqual(self.service.status(self.plan_id)["status"], "paused")
+        receipt = self.service.resume_selected(self.plan_id, ["leaf"])
+        self.assertEqual(receipt["max_calls"], 7200)
+        self.service.update_leaf(self.plan_id, "leaf", "running", {})
+        active = self.service.ledger.reserve(
+            self.plan_id + ":leaf", self.request["phase"], requested_model=MODEL,
+            plan_id=self.plan_id, stage="first/discovery/attempt-1",
+        )
+        self.service.control(self.plan_id, "pause")
+        with self.assertRaisesRegex(FactoryError, "drain active reservations"):
+            self.service.resume_selected(self.plan_id, ["leaf", "leaf-two"])
+        self.service.ledger.finish(active["id"], "failed", outcome="fixture")
+        self.service.resume_selected(self.plan_id, ["leaf", "leaf-two"])
+        self.service.control(self.plan_id, "pause")
+        self.service.control(self.plan_id, "resume")
+        self.service.update_leaf(self.plan_id, "leaf-four", "running", {})
+        with self.assertRaisesRegex(FactoryError, "outside selected dispatch"):
+            self.service.ledger.reserve(
+                self.plan_id + ":leaf-four", self.request["phase"], requested_model=MODEL,
+                plan_id=self.plan_id, stage="first/discovery/attempt-1",
+            )
 
 
 if __name__ == "__main__":

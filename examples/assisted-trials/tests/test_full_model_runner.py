@@ -98,6 +98,8 @@ class FullModelRunnerTests(unittest.TestCase):
         service.register(request)
         service.control("plan", "resume")
         service.update_leaf("plan", "leaf", "running", {})
+        service.control("plan", "pause")
+        service.resume_selected("plan", ["leaf"])
         old = service.ledger.reserve(
             "plan:leaf", request["phase"], requested_model=FULL_MODEL,
             plan_id="plan", job_id="plan:leaf:attempt-1",
@@ -247,42 +249,83 @@ class FullModelRunnerTests(unittest.TestCase):
         rows[1]["first_pass_done"] = False
         self.assertFalse(runner.selected_first_pass_complete(rows, {"pilot-a", "pilot-b"}))
 
-    def _daemon_fixture(self, root, *, active_calls=0, print_output="state = waiting\n"):
+    def test_runner_inherits_only_the_persisted_three_leaf_dispatch(self):
+        leaves = {"e-book-library-application", "markdown-editor", "resource-calendar"}
+        self.assertEqual(runner.effective_dispatch_selection([], leaves, leaves), leaves)
+        self.assertEqual(runner.effective_dispatch_selection(leaves, leaves, leaves), leaves)
+        with self.assertRaisesRegex(ValueError, "differ from the active durable dispatch"):
+            runner.effective_dispatch_selection(leaves | {"outside"}, leaves, leaves | {"outside"})
+        with self.assertRaisesRegex(ValueError, "selected run must be activated"):
+            runner.effective_dispatch_selection(leaves, [], leaves)
+
+    def test_running_start_rejects_a_subset_of_active_dispatch(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "runner"
+            service, _calls, fake_run, _events, state, _timeline = self._daemon_fixture(root)
+            state["selected"] = ["e-book-library-application", "markdown-editor", "resource-calendar"]
+            with patch.object(runner, "host", return_value=(None, service)), \
+                    patch.object(runner, "verify_plan"), \
+                    patch.object(runner.subprocess, "run", side_effect=fake_run):
+                with self.assertRaisesRegex(ValueError, "exactly match the active durable dispatch"):
+                    runner.start_daemon(root, "http://fixture", ["e-book-library-application"])
+
+    def _daemon_fixture(self, root, *, active_calls=0, print_output="state = waiting\n", status="running"):
         root.mkdir(exist_ok=True)
-        (root / "FROZEN_SCOPE.json").write_text(json.dumps({"items": [{"leaf": "pilot"}]}))
+        bounded_leaves = ["e-book-library-application", "markdown-editor", "resource-calendar"]
+        (root / "FROZEN_SCOPE.json").write_text(json.dumps({"items": [{"leaf": leaf} for leaf in ["pilot", *bounded_leaves]]}))
+        state = {"active_calls": active_calls, "status": status, "selected": []}
+        events = []
+        timeline = []
 
         class Service:
             def control_state(self, plan_id):
-                return "running"
+                return state["status"]
 
             def status(self, plan_id):
-                return {"active_calls": active_calls}
+                return dict(state)
+
+            def selected_leaves(self, plan_id):
+                return list(state["selected"])
+
+            def resume_selected(self, plan_id, leaves):
+                events.append(("resume_selected", list(leaves)))
+                timeline.append(("service", "resume_selected"))
+                state["selected"] = sorted(leaves)
+                state["status"] = "running"
+
+            def control(self, plan_id, action, reason=None):
+                events.append(("control", action, reason))
+                timeline.append(("service", action))
+                state["status"] = action
+                return dict(state)
 
         service = Service()
         calls = []
 
         class Completed:
             def __init__(self, command):
-                self.returncode = 0
+                self.returncode = 1 if command[1] == "print" and not (root / "coordinator.plist").exists() else 0
                 self.stdout = print_output if command[1] == "print" else ""
                 self.stderr = ""
 
         def fake_run(command, **kwargs):
             calls.append(command)
+            timeline.append(("launchctl", command[1]))
             return Completed(command)
 
-        return service, calls, fake_run
+        return service, calls, fake_run, events, state, timeline
 
     def test_same_label_daemon_reconfigures_only_selected_leaf_arguments(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / "runner"
-            service, calls, fake_run = self._daemon_fixture(root)
+            service, calls, fake_run, events, state, timeline = self._daemon_fixture(root)
             with patch.object(runner, "host", return_value=(None, service)), \
                     patch.object(runner, "verify_plan"), \
                     patch.object(runner.subprocess, "run", side_effect=fake_run):
                 runner.start_daemon(root, "http://fixture")
                 before = (root / "coordinator.plist").read_bytes()
-                runner.start_daemon(root, "http://fixture", ["pilot"])
+                state["status"] = "paused"
+                runner.start_daemon(root, "http://fixture", ["e-book-library-application", "markdown-editor", "resource-calendar"])
                 pilot_bytes = (root / "coordinator.plist").read_bytes()
                 runner.start_daemon(root, "http://fixture", [])
             current = plistlib.loads((root / "coordinator.plist").read_bytes())
@@ -297,25 +340,32 @@ class FullModelRunnerTests(unittest.TestCase):
             for index, operation in enumerate(operations):
                 if operation == "bootout":
                     self.assertEqual(operations[index + 1], "bootstrap")
+            self.assertEqual(events, [("resume_selected", ["e-book-library-application", "markdown-editor", "resource-calendar"])])
+            resume_index = timeline.index(("service", "resume_selected"))
+            self.assertGreater(resume_index, timeline.index(("launchctl", "bootout")))
+            self.assertEqual(timeline[resume_index + 1], ("launchctl", "bootstrap"))
+            self.assertNotIn(("service", "resume"), timeline)
 
     def test_daemon_refuses_live_or_active_and_unrelated_definition_changes(self):
         for output, active_calls in (("pid = 4321\n", 0), ("state = waiting\n", 1)):
             with self.subTest(output=output, active_calls=active_calls), tempfile.TemporaryDirectory() as tmp:
                 root = Path(tmp) / "runner"
-                service, _, fake_run = self._daemon_fixture(root, active_calls=active_calls)
+                service, _, fake_run, _events, state, _timeline = self._daemon_fixture(root, active_calls=0)
                 with patch.object(runner, "host", return_value=(None, service)), \
                         patch.object(runner, "verify_plan"), \
                         patch.object(runner.subprocess, "run", side_effect=fake_run):
                     runner.start_daemon(root, "http://fixture")
                     old = (root / "coordinator.plist").read_bytes()
+                    state["status"] = "paused"
+                    state["active_calls"] = active_calls
                     with patch.object(runner.subprocess, "run", side_effect=lambda command, **kwargs: type("R", (), {"returncode": 0, "stdout": output, "stderr": ""})()):
-                        with self.assertRaisesRegex(ValueError, "while coordinator/model calls are active"):
+                        with self.assertRaisesRegex(ValueError, "while (coordinator|model) calls are active|coordinator is live"):
                             runner.start_daemon(root, "http://fixture", ["pilot"])
                     self.assertEqual((root / "coordinator.plist").read_bytes(), old)
 
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / "runner"
-            service, _, fake_run = self._daemon_fixture(root)
+            service, _, fake_run, _events, state, _timeline = self._daemon_fixture(root)
             with patch.object(runner, "host", return_value=(None, service)), \
                     patch.object(runner, "verify_plan"), \
                     patch.object(runner.subprocess, "run", side_effect=fake_run):
@@ -324,8 +374,78 @@ class FullModelRunnerTests(unittest.TestCase):
                 config = plistlib.loads(plist.read_bytes())
                 config["ProgramArguments"][0] = "/unexpected/python"
                 plist.write_bytes(plistlib.dumps(config))
+                state["status"] = "paused"
                 with self.assertRaisesRegex(ValueError, "beyond selected leaf arguments"):
                     runner.start_daemon(root, "http://fixture", ["pilot"])
+
+    def test_paused_selected_bootstrap_failure_repauses_and_keeps_selection(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "runner"
+            service, _calls, fake_run, events, state, timeline = self._daemon_fixture(root, status="paused")
+
+            def fail_bootstrap(command, **kwargs):
+                timeline.append(("launchctl", command[1]))
+                if command[1] == "bootstrap":
+                    raise runner.subprocess.CalledProcessError(5, command)
+                return type("Result", (), {"returncode": 1, "stdout": "", "stderr": ""})()
+
+            with patch.object(runner, "host", return_value=(None, service)), \
+                    patch.object(runner, "verify_plan"), \
+                    patch.object(runner.subprocess, "run", side_effect=fail_bootstrap):
+                with self.assertRaises(runner.subprocess.CalledProcessError):
+                    runner.start_daemon(root, "http://fixture", ["pilot"])
+            self.assertEqual(events[0], ("resume_selected", ["pilot"]))
+            self.assertEqual(state["selected"], ["pilot"])
+            self.assertEqual(state["status"], "pause")
+            self.assertEqual(timeline, [
+                ("launchctl", "print"),
+                ("service", "resume_selected"),
+                ("launchctl", "bootstrap"),
+                ("service", "pause"),
+            ])
+
+    def test_final_launchd_verification_failure_repauses_and_keeps_selection(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "runner"
+            service, _calls, _fake_run, events, state, timeline = self._daemon_fixture(root, status="paused")
+            print_calls = 0
+
+            def fail_final_print(command, **kwargs):
+                nonlocal print_calls
+                timeline.append(("launchctl", command[1]))
+                if command[1] == "print":
+                    print_calls += 1
+                    if print_calls == 1:
+                        return type("Result", (), {"returncode": 1, "stdout": "", "stderr": ""})()
+                    raise runner.subprocess.CalledProcessError(5, command)
+                return type("Result", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+            with patch.object(runner, "host", return_value=(None, service)), \
+                    patch.object(runner, "verify_plan"), \
+                    patch.object(runner.subprocess, "run", side_effect=fail_final_print):
+                with self.assertRaises(runner.subprocess.CalledProcessError):
+                    runner.start_daemon(root, "http://fixture", ["pilot"])
+            self.assertEqual(events[0], ("resume_selected", ["pilot"]))
+            self.assertEqual(state["selected"], ["pilot"])
+            self.assertEqual(state["status"], "pause")
+            self.assertEqual(timeline, [
+                ("launchctl", "print"),
+                ("service", "resume_selected"),
+                ("launchctl", "bootstrap"),
+                ("launchctl", "print"),
+                ("service", "pause"),
+            ])
+
+    def test_paused_plan_rejects_unbounded_start(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "runner"
+            service, _calls, fake_run, events, _state, _timeline = self._daemon_fixture(root, status="paused")
+            with patch.object(runner, "host", return_value=(None, service)), \
+                    patch.object(runner, "verify_plan"), \
+                    patch.object(runner.subprocess, "run", side_effect=fake_run):
+                with self.assertRaisesRegex(ValueError, "only with selected leaves"):
+                    runner.start_daemon(root, "http://fixture")
+            self.assertEqual(events, [])
 
 
 if __name__ == "__main__":

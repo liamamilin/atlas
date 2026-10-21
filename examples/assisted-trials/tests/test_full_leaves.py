@@ -763,6 +763,9 @@ class FullLeafTests(unittest.TestCase):
             def control_state(inner, *args):
                 return inner.state
 
+            def selected_leaves(inner, *args):
+                return []
+
             def control(inner, plan, action, reason=None):
                 inner.state = {
                     "resume": "running",
@@ -799,7 +802,11 @@ class FullLeafTests(unittest.TestCase):
         previous = signal.getsignal(signal.SIGTERM)
         self.addCleanup(signal.signal, signal.SIGTERM, previous)
         with (
-            patch.object(runner, "verify_plan", return_value=({}, {})),
+            patch.object(
+                runner,
+                "verify_plan",
+                return_value=({}, {"items": [{"leaf": "q-" + str(n)} for n in range(41)]}),
+            ),
             patch.object(runner, "host", return_value=(None, service)),
             patch.object(runner, "execute_leaf", leaf),
             patch.object(runner, "get_workflow_gate", return_value=None),

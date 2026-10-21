@@ -1081,6 +1081,21 @@ def selected_first_pass_complete(items, selected_leaves):
     )
 
 
+def effective_dispatch_selection(requested_leaves, persisted_leaves, known_leaves):
+    requested = set(requested_leaves or [])
+    persisted = set(persisted_leaves or [])
+    known = set(known_leaves)
+    if not requested <= known:
+        raise ValueError("selected leaf is outside the frozen plan scope")
+    if persisted:
+        if requested and requested != persisted:
+            raise ValueError("CLI selected leaves differ from the active durable dispatch")
+        return persisted
+    if requested:
+        raise ValueError("selected run must be activated through selected start")
+    return set()
+
+
 def replay_completed_workflow(root, service, item, api):
     """Adopt only fully verified historical delivery; no model invocation."""
     work = ROOT / item["workdir"]
@@ -1940,14 +1955,16 @@ def run(root, api, selected_leaves=None):
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         request, scope = verify_plan(root)
         store, service = host()
-        selected_leaves = set(selected_leaves or [])
-        if selected_leaves:
-            known = {item["leaf"] for item in scope["items"]}
-            if not selected_leaves <= known:
-                raise ValueError("selected leaf is outside the frozen plan scope")
-        if service.status(PLAN_ID)["status"] not in {"running", "registered"}:
+        selected_leaves = effective_dispatch_selection(
+            selected_leaves,
+            service.selected_leaves(PLAN_ID),
+            {item["leaf"] for item in scope["items"]},
+        )
+        state = service.status(PLAN_ID)
+        if state["status"] not in {"running", "registered"}:
             return progress(root, service)
-        service.control(PLAN_ID, "resume", "coordinator active")
+        if state["status"] == "registered":
+            service.control(PLAN_ID, "resume", "coordinator active")
         atomic_json(
             root / "PROCESS.json",
             {
@@ -2082,15 +2099,33 @@ def run(root, api, selected_leaves=None):
 def start_daemon(root, api, selected_leaves=None):
     """launchd owns the coordinator after the chat/terminal exits; no cron loop."""
     _, service = host()
-    if service.control_state(PLAN_ID) not in {"registered", "running"}:
-        raise ValueError("resume the formally paused plan before starting")
+    plan_state = service.status(PLAN_ID)
+    resuming_selected = plan_state["status"] == "paused"
+    if resuming_selected and not selected_leaves:
+        raise ValueError("a paused plan can start only with selected leaves")
+    if plan_state["status"] not in {"registered", "running", "paused"}:
+        raise ValueError("plan is not startable")
     verify_plan(root)
-    selected_leaves = list(dict.fromkeys(selected_leaves or []))
+    selected_leaves = list(selected_leaves or [])
+    if selected_leaves and (
+        len(selected_leaves) > 3
+        or len(set(selected_leaves)) != len(selected_leaves)
+        or any(not isinstance(leaf, str) or not leaf for leaf in selected_leaves)
+    ):
+        raise ValueError("selected dispatch requires one to three unique leaf names")
     scope = load(root / "FROZEN_SCOPE.json")
     known = {item["leaf"] for item in scope["items"]}
     if selected_leaves:
         if not set(selected_leaves) <= known:
             raise ValueError("selected leaf is outside the frozen plan scope")
+        if not resuming_selected:
+            active_selection = set(service.selected_leaves(PLAN_ID))
+            if not active_selection:
+                raise ValueError("selected leaves must be durably activated while the plan is paused")
+            if set(selected_leaves) != active_selection:
+                raise ValueError("selected leaves must exactly match the active durable dispatch")
+    if resuming_selected and plan_state.get("active_calls", 0) != 0:
+        raise ValueError("cannot resume selected dispatch while model calls are active")
     label = "com.atlas.full-leaf-auxiliary-20261021"
     target = "gui/" + str(os.getuid()) + "/" + label
     plist = root / "coordinator.plist"
@@ -2127,6 +2162,11 @@ def start_daemon(root, api, selected_leaves=None):
         ["launchctl", "print", target], capture_output=True, text=True
     )
     booted_out = False
+    live = bool(found.returncode == 0 and __import__("re").search(r"(?m)^\s*pid = [1-9]\d*\s*$", found.stdout))
+    if resuming_selected and live:
+        raise ValueError("cannot resume selected dispatch while coordinator is live")
+    if resuming_selected and found.returncode == 0 and old_bytes is None:
+        raise ValueError("loaded supervisor has no local plist to verify")
     if old_bytes is not None and old_bytes != encoded:
         old_config = plistlib.loads(old_bytes)
         new_config = plistlib.loads(encoded)
@@ -2142,7 +2182,6 @@ def start_daemon(root, api, selected_leaves=None):
             raise ValueError("supervisor definition changed beyond selected leaf arguments")
         if not set(old_leaf_args) <= known:
             raise ValueError("existing supervisor selects a leaf outside the frozen plan scope")
-        live = bool(found.returncode == 0 and __import__("re").search(r"(?m)^\s*pid = [1-9]\d*\s*$", found.stdout))
         state = service.status(PLAN_ID)
         if live or state.get("active_calls", 0) != 0:
             raise ValueError("cannot change selected leaves while coordinator/model calls are active")
@@ -2162,16 +2201,26 @@ def start_daemon(root, api, selected_leaves=None):
         plist.write_bytes(encoded)
     elif old_bytes is None:
         plist.write_bytes(encoded)
-    if found.returncode or booted_out:
-        subprocess.run(
-            ["launchctl", "bootstrap", "gui/" + str(os.getuid()), str(plist)],
-            check=True,
+    if resuming_selected and found.returncode == 0 and not booted_out:
+        subprocess.run(["launchctl", "bootout", target], check=True)
+        booted_out = True
+    if resuming_selected:
+        service.resume_selected(PLAN_ID, selected_leaves)
+    try:
+        if found.returncode or booted_out:
+            subprocess.run(
+                ["launchctl", "bootstrap", "gui/" + str(os.getuid()), str(plist)],
+                check=True,
+            )
+        elif "pid = " not in found.stdout:
+            subprocess.run(["launchctl", "kickstart", target], check=True)
+        actual = subprocess.run(
+            ["launchctl", "print", target], check=True, capture_output=True, text=True
         )
-    elif "pid = " not in found.stdout:
-        subprocess.run(["launchctl", "kickstart", target], check=True)
-    actual = subprocess.run(
-        ["launchctl", "print", target], check=True, capture_output=True, text=True
-    )
+    except BaseException:
+        if resuming_selected and service.control_state(PLAN_ID) == "running":
+            service.control(PLAN_ID, "pause", "selected supervisor activation failed")
+        raise
     receipt = {
         "supervisor": "launchd",
         "label": label,
