@@ -68,6 +68,13 @@ def dispatch(method, path, query="", body=None, store=None):
     store = store or get_store()
     body = body or {}
     route = path.removeprefix("/api/factory").strip("/")
+    if method == "GET" and route == "assisted-templates":
+        from .assisted_catalog import catalog
+        return catalog(store, {k: v[0] for k, v in parse_qs(query).items()}), 200
+    assisted_match = re.fullmatch(r"assisted-templates/(tpl_[a-f0-9]{32})/files/([a-z]+)", route)
+    if method == "GET" and assisted_match:
+        from .assisted_catalog import download
+        return download(store, assisted_match[1], assisted_match[2])
     if route.startswith("v1/"):
         from .v1_api import dispatch_v1
         return dispatch_v1(method, route[3:], query, body, store)
@@ -168,6 +175,14 @@ def dispatch(method, path, query="", body=None, store=None):
     if method == "GET" and route == "artifacts":
         filters = parse_qs(query)
         values = store.artifacts()
+        # Navigation identity comes from the host-owned job snapshot, not a
+        # title match. This projection does not rewrite any frozen artifact.
+        with store.connect() as con:
+            scene_ids = {r["id"]: (json.loads(r["snapshot"]).get("scenario") or {}).get("id")
+                         for r in con.execute("SELECT id,snapshot FROM job")}
+        values = [{**a, "scenario_id": scene_ids.get(a["job_id"])} for a in values]
+        if filters.get("scenario_id"):
+            values = [a for a in values if a["scenario_id"] == filters["scenario_id"][0]]
         if filters.get("leaf"):
             values = [a for a in values if a["leaf"] == filters["leaf"][0]]
         if filters.get("type"):

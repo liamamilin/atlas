@@ -1,3 +1,4 @@
+import { AssistedTemplateSummary, type AssistedTemplate } from "@/components/assisted-templates";
 import {Link} from "react-router-dom";
 import {useState} from "react";
 import ReactMarkdown from "react-markdown";
@@ -49,7 +50,7 @@ export function BlueprintImportPanel({zh,busy,act}:{zh:boolean;busy:boolean;act:
   </section>;
 }
 
-export function BlueprintCard({artifact:a,zh,busy,act,model,timeout,runtimeRunId}:{artifact:FactoryArtifact;zh:boolean;busy:boolean;act:Act;model:string;timeout:number;runtimeRunId?:string|null}) {
+export function BlueprintCard({artifact:a,zh,busy,act,model,timeout,runtimeRunId,assistedInfo}:{artifact:FactoryArtifact;zh:boolean;busy:boolean;act:Act;model:string;timeout:number;runtimeRunId?:string|null;assistedInfo?:AssistedTemplate}) {
   const [details,setDetails]=useState<BlueprintDetails|null>(null);
   const [project,setProject]=useState("my-application");
   const [phase,setPhase]=useState(a.manifest.phases?.[0]?.id||"");
@@ -76,8 +77,9 @@ export function BlueprintCard({artifact:a,zh,busy,act,model,timeout,runtimeRunId
   return <article aria-label={`${zh?"认知模板":"Cognitive template"} ${a.manifest.name}`} className="rounded-xl bg-surface p-5 shadow-card">
     <div className="flex flex-wrap justify-between gap-3"><div><p className="text-xs font-medium text-primary">{zh?`认知模板 · ${publicationLabel}`:`Cognitive template · ${publicationLabel}`} · v{a.manifest.version}</p><h2 className="mt-1 font-serif text-xl font-medium">{a.manifest.name}</h2><p className="mt-1 text-xs text-muted">{a.scenario_name} · r{a.scenario_revision}</p></div><Button asChild size="sm" variant="outline"><a href={`/api/factory/artifacts/${a.id}/download`}><Download className="size-4"/>{zh?"下载冻结包":"Download frozen bundle"}</a></Button></div>
     <p className="mt-3 text-sm text-muted">{a.manifest.description}</p>
+    {assistedInfo?<AssistedTemplateSummary item={assistedInfo} zh={zh} detail/>:null}
     {assisted?<aside className="mt-3 rounded-lg border border-border p-3 text-xs leading-6" aria-label={zh?"辅助试用来源":"Assisted trial provenance"}>
-      <p>{zh?"Codex 研究与编写的辅助模板。包内验证与已知缺口见「包内验证说明」和「试用范围」；不代表严格 G1/T08、独立审阅或当前应用运行通过。":"Codex-researched and authored trial. See validation and trial scope for claims and gaps; this is not strict G1/T08 or independent acceptance."}</p>
+      <p>{zh?"Codex 研究与编写的辅助模板。冻结来源、包内声明、辅助运行示例与严格工厂验收分别记录；验证范围与缺口请对照上方说明及包内章节。":"Codex-researched and authored trial. See validation and trial scope for claims and gaps; this is not strict G1/T08 or independent acceptance."}</p>
       <p className="break-all">{zh?"原冻结摘要":"Original frozen digest"}: {a.provenance.imported_snapshot?.digest}</p>
       {a.provenance.shared_case_refs?.map(ref=><p key={`${ref.case_id}:${ref.revision}`}><Link className="text-primary underline" to={`/apps?app_id=${encodeURIComponent(ref.app_id)}&case_id=${encodeURIComponent(ref.case_id)}&case_revision=${ref.revision}`}>{zh?"回查共享案例":"Read shared case"}: {ref.case_id} · r{ref.revision}</Link></p>)}
     </aside>:null}

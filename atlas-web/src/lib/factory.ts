@@ -50,6 +50,7 @@ export interface FactoryStatus {
 export interface FactoryArtifact {
   artifact_type?: "product-blueprint" | "runnable-starter";
   id: string; job_id: string; leaf: string; scenario_name: string; scenario_revision: number;
+  scenario_id?:string;
   digest: string; level: string; state: string; created_at: string;
   manifest: { name: string; description: string; render_files?: string[]; version?: string; feature_count?: number; decision_count?: number; phase_count?: number; acceptance_count?: number; phases?: {id:string;title:string}[] };
   provenance: { repository?: string; commit?: string; license?: string; model?: string; change_summary?: string; origin?: string; package_digest?: string; note?: string; shared_case_refs?: {case_id:string;revision:number;digest:string;app_id:string}[]; imported_snapshot?: {digest:string;archive_sha256:string;provenance:Record<string,unknown>} };

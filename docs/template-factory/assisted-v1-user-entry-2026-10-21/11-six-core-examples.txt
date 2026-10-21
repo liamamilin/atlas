@@ -1,0 +1,585 @@
+Browser tab: 13, Title: "应用图谱 · Application Atlas", URL: "http://127.0.0.1:5188/factory?view=artifacts".
+0 AXWebArea 应用图谱 · Application Atlas, URL: 127.0.0.1:5188/factory?view=artifacts
+	1 container root
+		2 container
+			3 link Description: 应用图谱, Value: 127.0.0.1:5188/
+			4 container 主导航
+				5 link Description: 首页, Value: 127.0.0.1:5188/
+				6 link Description: 对话, Value: 127.0.0.1:5188/ask
+				7 link Description: 浏览类型, Value: 127.0.0.1:5188/browse
+				8 link Description: 应用实证, Value: 127.0.0.1:5188/apps
+				9 link Description: 模板工厂, Value: 127.0.0.1:5188/factory
+				10 link Description: 草稿, Value: 127.0.0.1:5188/drafts
+				11 link Description: 使用教程, Value: 127.0.0.1:5188/tutorial
+				12 link Description: 设置, Value: 127.0.0.1:5188/settings
+			13 text 1805 类型 · 数据来自 atlas 语料
+			14 button 切换到英文
+		17 container
+			18 text 模板工厂
+			19 heading 从应用场景，生产可创建应用的模板, Value: 1
+				20 text 从应用场景，生产可创建应用的模板
+			21 text 叶子 + 应用场景构成生产目录。认知模板交付产品判断、阶段计划与开发验收，可在制品页阅读并导出开发包。已确认场景可交给 OpenCode 调研并生成认知包，冻结后自动排入独立认知审阅。旧代码模板生产仍可使用。 OpenCode CLI · opencode v2.0.30 Docker · 已就绪
+			22 button 重新检查
+			40 text 刷新失败，保留最后一次结果：AtlasApiError: Factory request failed
+			41 button 重试加载
+			23 tab group 工厂视图
+				24 tab (selectable, settable, boolean) 生产目录, Value: 0
+				25 tab (selectable, settable, boolean) 任务批次, Value: 0
+				26 tab (selected, settable, boolean) 模板制品, Value: 1
+				27 tab (selectable, settable, boolean) V1 计划与预算, Value: 0
+			28 container 认知模板入口
+				29 heading 认知模板：先把产品想清楚，再交给开发 agent, Value: 2
+					30 text 认知模板：先把产品想清楚，再交给开发 agent
+				31 text 包含品类认知、产品定义、架构决策、阶段路线图、验收程序与 Agent 指令。先查看已验证的书签样板，或导入同一协议的认知包；自动生产请在生产目录选择已确认场景。
+				32 button 载入书签认知样板
+				33 button (collapsed) 导入其他认知包, Secondary Actions: Expand
+					34 text 导入其他认知包
+			35 container
+				36 text 查找模板
+				37 text field (settable) 查找模板
+			42 container
+				43 text 按辅助运行记录筛选
+				44 pop up button (collapsed, settable) 按辅助运行记录筛选, Value: 辅助：已有核心运行示例, Secondary Actions: Expand
+					45 menu
+						46 全部制品
+						47 (selected) 辅助：已有核心运行示例
+						48 辅助：应用未运行
+			49 text 辅助目录：16 份模板 · 6 份有核心运行示例 · 10 份应用未运行；不代表严格验收通过。
+			327 container 认知模板 同机聚餐地点投票
+				501 container
+					502 text 认知模板 · 辅助试用模板  · v assisted-trial-0.1.0
+				328 heading 同机聚餐地点投票, Value: 2
+					503 text 同机聚餐地点投票
+				504 container
+					505 text 同机聚餐地点投票  · r 1
+				329 link Description: 下载冻结包, Value: 127.0.0.1:5188/api/factory/artifacts/tpl_e1761c3db0a941348f9a97fb47c279b3/download
+				506 text 为聚餐问题预设地点选项，成员用代号单选并可改票，查看汇总，在结束后冻结投票，必要时重开。
+				507 container 辅助模板信息 同机聚餐地点投票
+					508 text 辅助试用模板 已有核心运行示例
+					509 definition list
+						510 container 适用用户
+							511 text 适用用户
+						512 text 在同一台设备前轮流表达偏好的小组成员
+						513 container 解决的问题
+							514 text 解决的问题
+						515 text 为聚餐问题预设地点选项，成员用代号单选并可改票，查看汇总，在结束后冻结投票，必要时重开。
+					516 text 核心能力
+					517 content list
+						518 container
+							519 AXListMarker • 
+							520 text 问题与固定地点选项、投票隔离
+						521 container
+							522 AXListMarker • 
+							523 text 单选改票与准确汇总
+						524 container
+							525 AXListMarker • 
+							526 text 结束与重开、非法输入保护
+						527 container
+							528 AXListMarker • 
+							529 text 刷新与真实重启持久化
+					530 button (collapsed) 适用范围与已知限制, Secondary Actions: Expand
+						531 text 适用范围与已知限制
+					532 text 固定案例来源
+					533 link Description: 回查共享案例 · r1, Value: 127.0.0.1:5188/apps?app_id=app%3Arepo%3A4b8e9c24aecc020c7bfbfcf6&case_id=case%3Aassisted-ten-2026-10-21%3Adinner-poll&case_revision=1
+					534 container
+						535 link Description: nextcloud/polls @ 65bf4627ee9a, Value: github.com/nextcloud/polls/tree/65bf4627ee9a76c52034e796eda75ae5112ad7c3
+						536 link Description: COPYING, Value: github.com/nextcloud/polls/blob/65bf4627ee9a76c52034e796eda75ae5112ad7c3/COPYING
+					537 container
+						538 text 创建、单选改票、准确汇总、结束禁投/重开、刷新及同目录重启。  · 验证记录日期 2026-10-21
+					539 text 辅助运行记录与严格工厂验收分别记录；不代表正式发布、严格 G1/T08 通过或本机服务此刻在线。
+					540 link Description: 下载标准开发包, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_e1761c3db0a941348f9a97fb47c279b3/files/development
+					541 link Description: 下载示例源码, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_e1761c3db0a941348f9a97fb47c279b3/files/source
+					542 link Description: 查看运行证据文件, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_e1761c3db0a941348f9a97fb47c279b3/files/evidence
+					543 button 阅读应用使用说明
+					544 button (collapsed) 让 Codex 从这里开始, Secondary Actions: Expand
+						545 text 让 Codex 从这里开始
+				546 container 辅助试用来源
+					547 text Codex 研究与编写的辅助模板。冻结来源、包内声明、辅助运行示例与严格工厂验收分别记录；验证范围与缺口请对照上方说明及包内章节。
+					548 container
+						549 text 原冻结摘要 :  72b4b2e92bc3405e57d454ab889962d10b480dddf1e1bc716f3b990efae5befc
+					550 link Description: 回查共享案例: case:assisted-ten-2026-10-21:dinner-poll · r1, Value: 127.0.0.1:5188/apps?app_id=app%3Arepo%3A4b8e9c24aecc020c7bfbfcf6&case_id=case%3Aassisted-ten-2026-10-21%3Adinner-poll&case_revision=1
+				551 text 4 项能力 · 2 个决策 · 1 个阶段 · 4 个验收用例
+				552 text 冻结检查覆盖结构、引用、阶段映射与文件摘要，本身不执行包内程序。包内报告作为来源声明保留，不等于工厂重新验收；工厂独立审阅和每个下游目标的运行结果分别记录。符合当前审阅与固定案例证据要求的模板，可在 V1 工厂中管理目录发布。
+				553 container 完整认知库
+					554 heading 1. 完整认知库, Value: 3
+						555 text 1. 完整认知库
+					556 text 查看已冻结章节，或下载包含完整 blueprint/ 来源文件的原始冻结包。
+				557 container 工厂认知审阅
+					558 container
+						559 text 独立认知审阅： 未发起
+					560 button 发起认知审阅
+					561 text 会向所选模型发送冻结认知包与对应叶子、场景，可能计费；这是静态审阅，不证明下游应用运行成功。
+					562 button (collapsed) 按冻结场景生产认知修订版, Secondary Actions: Expand
+						563 text 按冻结场景生产认知修订版
+				344 button 查看认知内容
+				564 container 创建认知开发包
+					565 heading 2. 当前阶段执行包, Value: 3
+						566 text 2. 当前阶段执行包
+					567 text 按阶段导出，从 HANDOFF.md 开始，再按需加载完整认知和契约；无需一开始预加载全部材料。旧包阶段可能未覆盖完整场景，应对照已确认场景核实范围；不能静默更改冻结承诺或视为已完成。导出不会运行验收。
+					568 container
+						569 text 开发项目名称
+						570 text field (settable) 开发项目名称, Value: my-application
+					571 container
+						572 text 本次开发阶段
+						573 pop up button (collapsed, settable) Description: 本次开发阶段, Value: P0 · 核心可用, Secondary Actions: Expand
+							574 menu
+								575 (selected) P0 · 核心可用
+					576 button 创建开发包
+				577 container 独立运行验收
+					578 heading 3. 独立验收：运行冻结用例, Value: 3
+						579 text 3. 独立验收：运行冻结用例
+					580 text 与静态认知审阅分开记录。仅在冻结包声明支持适配器时可提交；容器运行时是否可用由提交结果确认。不会调用模型。
+					581 text 先读取冻结包能力以确认是否有运行适配器。
+			354 container 认知模板 每周晚餐计划与合并采购清单
+				582 container
+					583 text 认知模板 · 辅助试用模板  · v assisted-trial-0.1.0
+				355 heading 每周晚餐计划与合并采购清单, Value: 2
+					584 text 每周晚餐计划与合并采购清单
+				585 container
+					586 text 每周晚餐计划与合并采购清单  · r 1
+				356 link Description: 下载冻结包, Value: 127.0.0.1:5188/api/factory/artifacts/tpl_6949040b690c40b3ad7415eec367242c/download
+				587 text 把菜谱安排到一周晚餐，按用餐份数自动合并同名同单位食材，修改计划后采购量立即重算。
+				588 container 辅助模板信息 每周晚餐计划与合并采购清单
+					589 text 辅助试用模板 已有核心运行示例
+					590 definition list
+						591 container 适用用户
+							592 text 适用用户
+						593 text 为自己或两人家庭提前备餐的个人用户
+						594 container 解决的问题
+							595 text 解决的问题
+						596 text 把菜谱安排到一周晚餐，按用餐份数自动合并同名同单位食材，修改计划后采购量立即重算。
+					597 text 核心能力
+					598 content list
+						599 container
+							600 AXListMarker • 
+							601 text 菜谱与日期晚餐计划
+						602 container
+							603 AXListMarker • 
+							604 text 按人数合并采购清单及修改重算
+						605 container
+							606 AXListMarker • 
+							607 text 暂停恢复、错误零写入与周范围隔离
+						608 container
+							609 AXListMarker • 
+							610 text 刷新与真实重启持久化
+					611 button (collapsed) 适用范围与已知限制, Secondary Actions: Expand
+						612 text 适用范围与已知限制
+					613 text 固定案例来源
+					614 link Description: 回查共享案例 · r1, Value: 127.0.0.1:5188/apps?app_id=app%3Arepo%3A335c710a6586f0510ec1e1ea&case_id=case%3Aassisted-ten-2026-10-21%3Ameal-plan&case_revision=1
+					615 container
+						616 link Description: mealie-recipes/mealie @ 9b66aa319d32, Value: github.com/mealie-recipes/mealie/tree/9b66aa319d32ea5dbdf112fe6bcda60015702721
+						617 link Description: LICENSE, Value: github.com/mealie-recipes/mealie/blob/9b66aa319d32ea5dbdf112fe6bcda60015702721/LICENSE
+					618 container
+						619 text 按份数汇总、修改重算、暂停恢复、周隔离、刷新及同目录重启。  · 验证记录日期 2026-10-21
+					620 text 辅助运行记录与严格工厂验收分别记录；不代表正式发布、严格 G1/T08 通过或本机服务此刻在线。
+					621 link Description: 下载标准开发包, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_6949040b690c40b3ad7415eec367242c/files/development
+					622 link Description: 下载示例源码, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_6949040b690c40b3ad7415eec367242c/files/source
+					623 link Description: 查看运行证据文件, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_6949040b690c40b3ad7415eec367242c/files/evidence
+					624 button 阅读应用使用说明
+					625 button (collapsed) 让 Codex 从这里开始, Secondary Actions: Expand
+						626 text 让 Codex 从这里开始
+				627 container 辅助试用来源
+					628 text Codex 研究与编写的辅助模板。冻结来源、包内声明、辅助运行示例与严格工厂验收分别记录；验证范围与缺口请对照上方说明及包内章节。
+					629 container
+						630 text 原冻结摘要 :  136001eb2bca0b30eaef6214275d2280d88cddbf818a7d809bb27e900f0b5410
+					631 link Description: 回查共享案例: case:assisted-ten-2026-10-21:meal-plan · r1, Value: 127.0.0.1:5188/apps?app_id=app%3Arepo%3A335c710a6586f0510ec1e1ea&case_id=case%3Aassisted-ten-2026-10-21%3Ameal-plan&case_revision=1
+				632 text 4 项能力 · 2 个决策 · 1 个阶段 · 4 个验收用例
+				633 text 冻结检查覆盖结构、引用、阶段映射与文件摘要，本身不执行包内程序。包内报告作为来源声明保留，不等于工厂重新验收；工厂独立审阅和每个下游目标的运行结果分别记录。符合当前审阅与固定案例证据要求的模板，可在 V1 工厂中管理目录发布。
+				634 container 完整认知库
+					635 heading 1. 完整认知库, Value: 3
+						636 text 1. 完整认知库
+					637 text 查看已冻结章节，或下载包含完整 blueprint/ 来源文件的原始冻结包。
+				638 container 工厂认知审阅
+					639 container
+						640 text 独立认知审阅： 未发起
+					641 button 发起认知审阅
+					642 text 会向所选模型发送冻结认知包与对应叶子、场景，可能计费；这是静态审阅，不证明下游应用运行成功。
+					643 button (collapsed) 按冻结场景生产认知修订版, Secondary Actions: Expand
+						644 text 按冻结场景生产认知修订版
+				371 button 查看认知内容
+				645 container 创建认知开发包
+					646 heading 2. 当前阶段执行包, Value: 3
+						647 text 2. 当前阶段执行包
+					648 text 按阶段导出，从 HANDOFF.md 开始，再按需加载完整认知和契约；无需一开始预加载全部材料。旧包阶段可能未覆盖完整场景，应对照已确认场景核实范围；不能静默更改冻结承诺或视为已完成。导出不会运行验收。
+					649 container
+						650 text 开发项目名称
+						651 text field (settable) 开发项目名称, Value: my-application
+					652 container
+						653 text 本次开发阶段
+						654 pop up button (collapsed, settable) Description: 本次开发阶段, Value: P0 · 核心可用, Secondary Actions: Expand
+							655 menu
+								656 (selected) P0 · 核心可用
+					657 button 创建开发包
+				658 container 独立运行验收
+					659 heading 3. 独立验收：运行冻结用例, Value: 3
+						660 text 3. 独立验收：运行冻结用例
+					661 text 与静态认知审阅分开记录。仅在冻结包声明支持适配器时可提交；容器运行时是否可用由提交结果确认。不会调用模型。
+					662 text 先读取冻结包能力以确认是否有运行适配器。
+			50 container 认知模板 搬家前家庭物品盘点
+				51 container
+					52 text 认知模板 · 辅助试用模板  · v assisted-trial-0.1.0
+				53 heading 搬家前家庭物品盘点, Value: 2
+					54 text 搬家前家庭物品盘点
+				55 container
+					56 text 搬家前家庭物品盘点  · r 1
+				57 link Description: 下载冻结包, Value: 127.0.0.1:5188/api/factory/artifacts/tpl_c4f9d29ee90e4ddebd300f34d66666cb/download
+				58 text 逐件记录自己的物品、所在房间与估值，搬动后仍能找到，并查看待搬物品数量和估值。
+				59 container 辅助模板信息 搬家前家庭物品盘点
+					60 text 辅助试用模板 已有核心运行示例
+					61 definition list
+						62 container 适用用户
+							63 text 适用用户
+						64 text 准备搬家的单人家庭成员
+						65 container 解决的问题
+							66 text 解决的问题
+						67 text 逐件记录自己的物品、所在房间与估值，搬动后仍能找到，并查看待搬物品数量和估值。
+					68 text 核心能力
+					69 content list
+						70 container
+							71 AXListMarker • 
+							72 text 逐件物品和位置登记、估值汇总
+						73 container
+							74 AXListMarker • 
+							75 text 编辑、移动与检索
+						76 container
+							77 AXListMarker • 
+							78 text 归档恢复与错误零写入
+						79 container
+							80 AXListMarker • 
+							81 text 真实重启持久化
+					82 button (collapsed) 适用范围与已知限制, Secondary Actions: Expand
+						83 text 适用范围与已知限制
+					84 text 固定案例来源
+					85 link Description: 回查共享案例 · r1, Value: 127.0.0.1:5188/apps?app_id=app%3Arepo%3Af6742ccb9e28a369cde19865&case_id=case%3Aassisted-batch-home-inventory&case_revision=1
+					86 container
+						87 link Description: sysadminsmedia/homebox @ 1fd28822634a, Value: github.com/sysadminsmedia/homebox/tree/1fd28822634a3d5935c002d569559ef46530d4a0
+						88 link Description: LICENSE, Value: github.com/sysadminsmedia/homebox/blob/1fd28822634a3d5935c002d569559ef46530d4a0/LICENSE
+					89 container
+						90 text 位置、物品、估值重算、搜索、归档恢复、刷新及同目录重启。  · 验证记录日期 2026-10-21
+					91 text 辅助运行记录与严格工厂验收分别记录；不代表正式发布、严格 G1/T08 通过或本机服务此刻在线。
+					92 link Description: 下载标准开发包, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_c4f9d29ee90e4ddebd300f34d66666cb/files/development
+					93 link Description: 下载示例源码, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_c4f9d29ee90e4ddebd300f34d66666cb/files/source
+					94 link Description: 查看运行证据文件, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_c4f9d29ee90e4ddebd300f34d66666cb/files/evidence
+					95 button 阅读应用使用说明
+					96 button (collapsed) 让 Codex 从这里开始, Secondary Actions: Expand
+						97 text 让 Codex 从这里开始
+				98 container 辅助试用来源
+					99 text Codex 研究与编写的辅助模板。冻结来源、包内声明、辅助运行示例与严格工厂验收分别记录；验证范围与缺口请对照上方说明及包内章节。
+					100 container
+						101 text 原冻结摘要 :  979f42a6cbfabcf0029a12e83b8265d967405b20edb7a54bb03fd3be0c3f3b6d
+					102 link Description: 回查共享案例: case:assisted-batch-home-inventory · r1, Value: 127.0.0.1:5188/apps?app_id=app%3Arepo%3Af6742ccb9e28a369cde19865&case_id=case%3Aassisted-batch-home-inventory&case_revision=1
+				103 text 4 项能力 · 2 个决策 · 1 个阶段 · 4 个验收用例
+				104 text 冻结检查覆盖结构、引用、阶段映射与文件摘要，本身不执行包内程序。包内报告作为来源声明保留，不等于工厂重新验收；工厂独立审阅和每个下游目标的运行结果分别记录。符合当前审阅与固定案例证据要求的模板，可在 V1 工厂中管理目录发布。
+				105 container 完整认知库
+					106 heading 1. 完整认知库, Value: 3
+						107 text 1. 完整认知库
+					108 text 查看已冻结章节，或下载包含完整 blueprint/ 来源文件的原始冻结包。
+				109 container 工厂认知审阅
+					110 container
+						111 text 独立认知审阅： 未发起
+					112 button 发起认知审阅
+					113 text 会向所选模型发送冻结认知包与对应叶子、场景，可能计费；这是静态审阅，不证明下游应用运行成功。
+					114 button (collapsed) 按冻结场景生产认知修订版, Secondary Actions: Expand
+						115 text 按冻结场景生产认知修订版
+				116 button 查看认知内容
+				117 container 创建认知开发包
+					118 heading 2. 当前阶段执行包, Value: 3
+						119 text 2. 当前阶段执行包
+					120 text 按阶段导出，从 HANDOFF.md 开始，再按需加载完整认知和契约；无需一开始预加载全部材料。旧包阶段可能未覆盖完整场景，应对照已确认场景核实范围；不能静默更改冻结承诺或视为已完成。导出不会运行验收。
+					121 container
+						122 text 开发项目名称
+						123 text field (settable) 开发项目名称, Value: my-application
+					124 container
+						125 text 本次开发阶段
+						126 pop up button (collapsed, settable) Description: 本次开发阶段, Value: P0 · 核心可用, Secondary Actions: Expand
+							127 menu
+								128 (selected) P0 · 核心可用
+					129 button 创建开发包
+				130 container 独立运行验收
+					131 heading 3. 独立验收：运行冻结用例, Value: 3
+						132 text 3. 独立验收：运行冻结用例
+					133 text 与静态认知审阅分开记录。仅在冻结包声明支持适配器时可提交；容器运行时是否可用由提交结果确认。不会调用模型。
+					134 text 先读取冻结包能力以确认是否有运行适配器。
+			429 container 认知模板 会后 · 项目会议笔记
+				663 container
+					664 text 认知模板 · 辅助试用模板  · v assisted-trial-0.1.0
+				430 heading 会后 · 项目会议笔记, Value: 2
+					665 text 会后 · 项目会议笔记
+				666 container
+					667 text 多项目会议结论的归档与回查  · r 1
+				431 link Description: 下载冻结包, Value: 127.0.0.1:5188/api/factory/artifacts/tpl_d02ead780fca4ec584f924b159ccea09/download
+				668 text 把会议结论和项目细节持续记入个人笔记库，按项目归档并管理活跃与过期笔记，使任一历史记录都能被可靠取回
+				669 container 辅助模板信息 会后 · 项目会议笔记
+					670 text 辅助试用模板 已有核心运行示例
+					671 definition list
+						672 container 适用用户
+							673 text 适用用户
+						674 text 同时跟进多个项目、以桌面端为主的职场人士
+						675 container 解决的问题
+							676 text 解决的问题
+						677 text 把会议结论和项目细节持续记入个人笔记库，按项目归档并管理活跃与过期笔记，使任一历史记录都能被可靠取回
+					678 text 核心能力
+					679 content list
+						680 container
+							681 AXListMarker • 
+							682 text 项目归属与快速捕获
+						683 container
+							684 AXListMarker • 
+							685 text 正文保存、编辑与回查
+						686 container
+							687 AXListMarker • 
+							688 text 置顶、归档与可恢复清理
+						689 container
+							690 AXListMarker • 
+							691 text 真实重启持久化
+					692 button (collapsed) 适用范围与已知限制, Secondary Actions: Expand
+						693 text 适用范围与已知限制
+					694 text 固定案例来源
+					695 link Description: 回查共享案例 · r2, Value: 127.0.0.1:5188/apps?app_id=app%3Arepo%3Abae0a5c0fe08d4edf051012d&case_id=case%3Aassisted-meetings-joplin&case_revision=2
+					696 container
+						697 link Description: laurent22/joplin @ cf57e5932584, Value: github.com/laurent22/joplin/tree/cf57e5932584c0fbd894d8510f1a31a4d41f2251
+						698 link Description: LICENSE, Value: github.com/laurent22/joplin/blob/cf57e5932584c0fbd894d8510f1a31a4d41f2251/LICENSE
+					699 container
+						700 text 项目隔离、正文保存/编辑、正文检索、归档恢复、刷新及同目录重启。  · 验证记录日期 2026-10-21
+					701 text 辅助运行记录与严格工厂验收分别记录；不代表正式发布、严格 G1/T08 通过或本机服务此刻在线。
+					702 link Description: 下载标准开发包, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_d02ead780fca4ec584f924b159ccea09/files/development
+					703 link Description: 下载示例源码, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_d02ead780fca4ec584f924b159ccea09/files/source
+					704 link Description: 查看运行证据文件, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_d02ead780fca4ec584f924b159ccea09/files/evidence
+					705 button 阅读应用使用说明
+					706 button (collapsed) 让 Codex 从这里开始, Secondary Actions: Expand
+						707 text 让 Codex 从这里开始
+				708 container 辅助试用来源
+					709 text Codex 研究与编写的辅助模板。冻结来源、包内声明、辅助运行示例与严格工厂验收分别记录；验证范围与缺口请对照上方说明及包内章节。
+					710 container
+						711 text 原冻结摘要 :  3a1dc2c414023091d3189cab0b5fe51cff318442b38a515d8fc2c3e0143a4c5a
+					712 link Description: 回查共享案例: case:assisted-meetings-joplin · r2, Value: 127.0.0.1:5188/apps?app_id=app%3Arepo%3Abae0a5c0fe08d4edf051012d&case_id=case%3Aassisted-meetings-joplin&case_revision=2
+				713 text 5 项能力 · 3 个决策 · 1 个阶段 · 4 个验收用例
+				714 text 冻结检查覆盖结构、引用、阶段映射与文件摘要，本身不执行包内程序。包内报告作为来源声明保留，不等于工厂重新验收；工厂独立审阅和每个下游目标的运行结果分别记录。符合当前审阅与固定案例证据要求的模板，可在 V1 工厂中管理目录发布。
+				715 container 完整认知库
+					716 heading 1. 完整认知库, Value: 3
+						717 text 1. 完整认知库
+					718 text 查看已冻结章节，或下载包含完整 blueprint/ 来源文件的原始冻结包。
+				719 container 工厂认知审阅
+					720 container
+						721 text 独立认知审阅： 未发起
+					722 button 发起认知审阅
+					723 text 会向所选模型发送冻结认知包与对应叶子、场景，可能计费；这是静态审阅，不证明下游应用运行成功。
+					724 button (collapsed) 按冻结场景生产认知修订版, Secondary Actions: Expand
+						725 text 按冻结场景生产认知修订版
+				446 button 查看认知内容
+				726 container 创建认知开发包
+					727 heading 2. 当前阶段执行包, Value: 3
+						728 text 2. 当前阶段执行包
+					729 text 按阶段导出，从 HANDOFF.md 开始，再按需加载完整认知和契约；无需一开始预加载全部材料。旧包阶段可能未覆盖完整场景，应对照已确认场景核实范围；不能静默更改冻结承诺或视为已完成。导出不会运行验收。
+					730 container
+						731 text 开发项目名称
+						732 text field (settable) 开发项目名称, Value: my-application
+					733 container
+						734 text 本次开发阶段
+						735 pop up button (collapsed, settable) Description: 本次开发阶段, Value: P0 · 多项目笔记核心旅程, Secondary Actions: Expand
+							736 menu
+								737 (selected) P0 · 多项目笔记核心旅程
+					738 button 创建开发包
+				739 container 独立运行验收
+					740 heading 3. 独立验收：运行冻结用例, Value: 3
+						741 text 3. 独立验收：运行冻结用例
+					742 text 与静态认知审阅分开记录。仅在冻结包声明支持适配器时可提交；容器运行时是否可用由提交结果确认。不会调用模型。
+					743 text 先读取冻结包能力以确认是否有运行适配器。
+			456 container 认知模板 月有度 · 个人极简月度预算
+				744 container
+					745 text 认知模板 · 辅助试用模板  · v assisted-trial-0.1.0
+				457 heading 月有度 · 个人极简月度预算, Value: 2
+					746 text 月有度 · 个人极简月度预算
+				747 container
+					748 text 个人极简月度预算：先查剩余再消费  · r 1
+				458 link Description: 下载冻结包, Value: 127.0.0.1:5188/api/factory/artifacts/tpl_26a70025f25141cb971a629d978fe42c/download
+				749 text 为一个月的各项用途预先设定计划金额，并在每次消费前查看该用途的剩余额度，让计划真正影响消费决策。
+				750 container 辅助模板信息 月有度 · 个人极简月度预算
+					751 text 辅助试用模板 已有核心运行示例
+					752 definition list
+						753 container 适用用户
+							754 text 适用用户
+						755 text 希望用预先承诺约束日常开支、且不连接银行账户的个人用户（如刚独立生活的年轻上班族）
+						756 container 解决的问题
+							757 text 解决的问题
+						758 text 为一个月的各项用途预先设定计划金额，并在每次消费前查看该用途的剩余额度，让计划真正影响消费决策。
+					759 text 核心能力
+					760 content list
+						761 container
+							762 AXListMarker • 
+							763 text 月度计划、收入与精确金额
+						764 container
+							765 AXListMarker • 
+							766 text 修改支出后重算
+						767 container
+							768 AXListMarker • 
+							769 text 分类转移、月份隔离和模板
+						770 container
+							771 AXListMarker • 
+							772 text 错误输入零写入
+						773 container
+							774 AXListMarker • 
+							775 text 跨进程持久化
+					776 button (collapsed) 适用范围与已知限制, Secondary Actions: Expand
+						777 text 适用范围与已知限制
+					778 text 固定案例来源
+					779 link Description: 回查共享案例 · r1, Value: 127.0.0.1:5188/apps?app_id=app%3Arepo%3A5b81e5e31f4804c82254fdf2&case_id=case%3Aassisted-budget-actual&case_revision=1
+					780 container
+						781 link Description: actualbudget/actual @ 8fba0e87cf7a, Value: github.com/actualbudget/actual/tree/8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc
+						782 link Description: LICENSE.txt, Value: github.com/actualbudget/actual/blob/8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc/LICENSE.txt
+					783 container
+						784 text 预算、支出、精确金额汇总、修改后重算、月份隔离及重启持久化。  · 验证记录日期 2026-10-21
+					785 text 辅助运行记录与严格工厂验收分别记录；不代表正式发布、严格 G1/T08 通过或本机服务此刻在线。
+					786 link Description: 下载标准开发包, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_26a70025f25141cb971a629d978fe42c/files/development
+					787 link Description: 下载示例源码, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_26a70025f25141cb971a629d978fe42c/files/source
+					788 link Description: 查看运行证据文件, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_26a70025f25141cb971a629d978fe42c/files/evidence
+					789 button 阅读应用使用说明
+					790 button (collapsed) 让 Codex 从这里开始, Secondary Actions: Expand
+						791 text 让 Codex 从这里开始
+				792 container 辅助试用来源
+					793 text Codex 研究与编写的辅助模板。冻结来源、包内声明、辅助运行示例与严格工厂验收分别记录；验证范围与缺口请对照上方说明及包内章节。
+					794 container
+						795 text 原冻结摘要 :  bb0412f604e04d6f6343c18d111d05e368be0b2268d6e852f43e78e66c5b190c
+					796 link Description: 回查共享案例: case:assisted-budget-actual · r1, Value: …
+				797 text 6 项能力 · 3 个决策 · 1 个阶段 · 5 个验收用例
+				798 text 冻结检查覆盖结构、引用、阶段映射与文件摘要，本身不执行包内程序。包内报告作为来源声明保留，不等于工厂重新验收；工厂独立审阅和每个下游目标的运行结果分别记录。符合当前审阅与固定案例证据要求的模板，可在 V1 工厂中管理目录发布。
+				799 container 完整认知库
+					800 heading 1. 完整认知库, Value: 3
+						801 text 1. 完整认知库
+					802 text 查看已冻结章节，或下载包含完整 blueprint/ 来源文件的原始冻结包。
+				803 container 工厂认知审阅
+					804 container
+						805 text 独立认知审阅： 未发起
+					806 button 发起认知审阅
+					807 text 会向所选模型发送冻结认知包与对应叶子、场景，可能计费；这是静态审阅，不证明下游应用运行成功。
+					808 button (collapsed) 按冻结场景生产认知修订版, Secondary Actions: Expand
+						809 text 按冻结场景生产认知修订版
+				473 button 查看认知内容
+				810 container 创建认知开发包
+					811 heading 2. 当前阶段执行包, Value: 3
+						812 text 2. 当前阶段执行包
+					813 text 按阶段导出，从 HANDOFF.md 开始，再按需加载完整认知和契约；无需一开始预加载全部材料。旧包阶段可能未覆盖完整场景，应对照已确认场景核实范围；不能静默更改冻结承诺或视为已完成。导出不会运行验收。
+					814 container
+						815 text 开发项目名称
+						816 text field (settable) 开发项目名称, Value: my-application
+					817 container
+						818 text 本次开发阶段
+						819 pop up button (collapsed, settable) Description: 本次开发阶段, Value: P0 · 手工月度预算核心, Secondary Actions: Expand
+							820 menu
+								821 (selected) P0 · 手工月度预算核心
+					822 button 创建开发包
+				823 container 独立运行验收
+					824 heading 3. 独立验收：运行冻结用例, Value: 3
+						825 text 3. 独立验收：运行冻结用例
+					826 text 与静态认知审阅分开记录。仅在冻结包声明支持适配器时可提交；容器运行时是否可用由提交结果确认。不会调用模型。
+					827 text 先读取冻结包能力以确认是否有运行适配器。
+			483 container 认知模板 生活待购与灵感收藏夹
+				828 container
+					829 text 认知模板 · 辅助试用模板  · v 0.1.1
+				484 heading 生活待购与灵感收藏夹, Value: 2
+					830 text 生活待购与灵感收藏夹
+				831 container
+					832 text 生活待购与灵感收藏夹  · r 2
+				485 link Description: 下载冻结包, Value: …
+				833 text 把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面
+				834 container 辅助模板信息 生活待购与灵感收藏夹
+					835 text 辅助试用模板 已有核心运行示例
+					836 definition list
+						837 container 适用用户
+							838 text 适用用户
+						839 text 习惯先把感兴趣的网页存起来、之后再回头处理的普通网络用户
+						840 container 解决的问题
+							841 text 解决的问题
+						842 text 把偶然看到但当下不处理的外部网页链接留存，日后需要时能重新找到并回到原页面
+					843 text 核心能力
+					844 content list
+						845 container
+							846 AXListMarker • 
+							847 text 保存收藏（URL 必填，标题/描述可选）
+						848 container
+							849 AXListMarker • 
+							850 text 默认“未整理”与预置归类集合
+						851 container
+							852 AXListMarker • 
+							853 text 归类管理（新建/重命名/删除）
+						854 container
+							855 AXListMarker • 
+							856 text 记录在归类间移动
+						857 container
+							858 AXListMarker • 
+							859 text 归类浏览与条目计数
+						860 container
+							861 AXListMarker • 
+							862 text 关键字检索（标题/域名/描述）
+						863 container
+							864 AXListMarker • 
+							865 text 打开原始网页（URL 锚定与回跳）
+						866 container
+							867 AXListMarker • 
+							868 text 多会话持久化（跨重启保留）
+						869 container
+							870 AXListMarker • 
+							871 text 删除与撤销恢复
+						872 container
+							873 AXListMarker • 
+							874 text 输入校验与错误合同
+						875 container
+							876 AXListMarker • 
+							877 text 本地应用外壳与首启（空库）
+					878 button (collapsed) 适用范围与已知限制, Secondary Actions: Expand
+						879 text 适用范围与已知限制
+					880 text 固定案例来源
+					881 link Description: 回查共享案例 · r1, Value: …
+					882 container
+						883 link Description: lakhindarpal/bookmark-manager @ 539881bc6709, Value: …
+						884 link Description: LICENSE, Value: …
+					885 container
+						886 text 保存、分类、移动、检索、打开链接、失败恢复、刷新与同目录重启；辅助首版，未覆盖完整严格错误矩阵。  · 验证记录日期 2026-10-20
+					887 text 辅助运行记录与严格工厂验收分别记录；不代表正式发布、严格 G1/T08 通过或本机服务此刻在线。
+					888 link Description: 下载标准开发包, Value: …
+					889 link Description: 下载示例源码, Value: …
+					890 link Description: 查看运行证据文件, Value: …
+					891 button 阅读应用使用说明
+					892 button (collapsed) 让 Codex 从这里开始, Secondary Actions: Expand
+						893 text 让 Codex 从这里开始
+				894 container 辅助试用来源
+					895 text Codex 研究与编写的辅助模板。冻结来源、包内声明、辅助运行示例与严格工厂验收分别记录；验证范围与缺口请对照上方说明及包内章节。
+					896 container
+						897 text 原冻结摘要 :  6febed5fd5526e5955dbb25005ae1b45bcc876ea13ecc704b711d70f1f40bd8c
+					898 link Description: 回查共享案例: case:product-c42848f63251507bd9d911a5:faa52e6b1414 · r1, Value: …
+				899 text 24 项能力 · 13 个决策 · 2 个阶段 · 15 个验收用例
+				900 text 冻结检查覆盖结构、引用、阶段映射与文件摘要，本身不执行包内程序。包内报告作为来源声明保留，不等于工厂重新验收；工厂独立审阅和每个下游目标的运行结果分别记录。符合当前审阅与固定案例证据要求的模板，可在 V1 工厂中管理目录发布。
+				901 container 完整认知库
+					902 heading 1. 完整认知库, Value: 3
+						903 text 1. 完整认知库
+					904 text 查看已冻结章节，或下载包含完整 blueprint/ 来源文件的原始冻结包。
+				905 container 工厂认知审阅
+					906 container
+						907 text 独立认知审阅： 未发起
+					908 button 发起认知审阅
+					909 text 会向所选模型发送冻结认知包与对应叶子、场景，可能计费；这是静态审阅，不证明下游应用运行成功。
+					910 button (collapsed) 按冻结场景生产认知修订版, Secondary Actions: Expand
+						911 text 按冻结场景生产认知修订版
+				500 button 查看认知内容
+				912 container 创建认知开发包
+					913 heading 2. 当前阶段执行包, Value: 3
+						914 text 2. 当前阶段执行包
+					915 text 按阶段导出，从 HANDOFF.md 开始，再按需加载完整认知和契约；无需一开始预加载全部材料。旧包阶段可能未覆盖完整场景，应对照已确认场景核实范围；不能静默更改冻结承诺或视为已完成。导出不会运行验收。
+					916 container
+						917 text 开发项目名称
+						918 text field (settable) 开发项目名称, Value: my-application
+					919 container
+						920 text 本次开发阶段
+						921 pop up button (collapsed, settable) Description: 本次开发阶段, Value: P0 · 个人收藏箱核心旅程, Secondary Actions: Expand
+							922 menu
+								923 (selected) P0 · 个人收藏箱核心旅程
+								924 P1 · 成熟增强：元数据、互操作与库清理
+					925 button 创建开发包
+				926 container 独立运行验收
+					927 heading 3. 独立验收：运行冻结用例, Value: 3
+						928 text 3. 独立验收：运行冻结用例
+					929 text 与静态认知审阅分开记录。仅在冻结包声明支持适配器时可提交；容器运行时是否可用由提交结果确认。不会调用模型。
+					930 text 先读取冻结包能力以确认是否有运行适配器。
+		16 text Application Atlas · 1805 软件应用类型 · 由语料自动生成 · v1.1 方法论
+
+The focused UI element is 44 pop up button (collapsed, settable) 按辅助运行记录筛选, Value: 辅助：已有核心运行示例, Secondary Actions: Expand

@@ -19,6 +19,8 @@
 
 [十模板辅助生产批次](docs/template-factory/assisted-batch-10-2026-10-21/REPORT.md)新增晚餐计划、聚餐投票、阅读、旅行、工时、训练、大纲、时间块、流程图和文件整理模板，均可在制品页查找及导出。代表应用 [一周晚餐](examples/meal-plan-trial/README.md)（5277）和 [聚餐投票](examples/dinner-poll-trial/README.md)（5278）已完成真实浏览器核心旅程及同目录重启；其余八份应用未运行。原有数据和严格 G1/T08 状态保留。
 
+[Atlas 辅助模板工厂 V1 用户入口](docs/template-factory/assisted-v1-user-entry-2026-10-21/REPORT.md)已按 Codex 辅助生产范围收口：16份模板可沿「叶子 → 场景 → 模板」或「应用实证 → 固定案例 → 模板」找到。六份有历史核心运行示例，十份应用未运行；均可下载标准开发包，有示例者还可阅读说明、下载源码和回查证据。模板内提供可复制的 Codex 开始说明。辅助记录不等于严格验收或服务当前在线，正式发布区保留原门禁。
+
 叶子类型与应用场景构成生产目录；OpenCode CLI 批量生产冻结候选，Harness 审阅及运行验收独立排队，已发布模板可确定性创建应用包。
 
 - [模板工厂 V1 本轮交付与未通过项](docs/template-factory/v1-2026-10-19/DELIVERY.md)：代码门禁与真实 G1 分开；书签真实生产触及业务修复上限，G1 未通过、首批未启动。

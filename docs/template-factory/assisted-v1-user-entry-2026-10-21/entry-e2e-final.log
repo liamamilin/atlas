@@ -1,0 +1,18 @@
+
+> test:e2e:factory
+> playwright test --config playwright.factory.config.ts assisted-templates.spec.ts
+
+[WebServer] (node:85876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:85881) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/factory-tests/assisted-templates.spec.ts:16:1 › leaf → scenario → assisted template → case and standard package, without formal publication (987ms)
+  ✓  2 e2e/factory-tests/assisted-templates.spec.ts:34:1 › not-run template has no example source, guide or runtime evidence links (583ms)
+  ✓  3 e2e/factory-tests/assisted-templates.spec.ts:43:1 › assisted catalog outage does not hide formal template or claim zero verified evidence (550ms)
+  ✓  4 e2e/factory-tests/assisted-templates.spec.ts:51:1 › scenario link retains formally published artifacts outside the assisted index (680ms)
+  ✓  5 e2e/factory-tests/assisted-templates.spec.ts:61:1 › recovered refresh clears its alert while a user action error remains visible (12.7s)
+
+  5 passed (17.3s)

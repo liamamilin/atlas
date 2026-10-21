@@ -1,0 +1,488 @@
+Browser tab: 14, Title: "应用图谱 · Application Atlas", URL: "http://127.0.0.1:5188/types/focus-timer".
+0 AXWebArea 应用图谱 · Application Atlas, URL: 127.0.0.1:5188/types/focus-timer
+	1 container root
+		2 container
+			3 link Description: 应用图谱, Value: 127.0.0.1:5188/
+			4 container 主导航
+				5 link Description: 首页, Value: 127.0.0.1:5188/
+				6 link Description: 对话, Value: 127.0.0.1:5188/ask
+				7 link Description: 浏览类型, Value: 127.0.0.1:5188/browse
+				8 link Description: 应用实证, Value: 127.0.0.1:5188/apps
+				9 link Description: 模板工厂, Value: 127.0.0.1:5188/factory
+				10 link Description: 草稿, Value: 127.0.0.1:5188/drafts
+				11 link Description: 使用教程, Value: 127.0.0.1:5188/tutorial
+				12 link Description: 设置, Value: 127.0.0.1:5188/settings
+			13 text 1805 类型 · 数据来自 atlas 语料
+			14 button 切换到英文
+		17 container
+			18 link Description: 类型树, Value: 127.0.0.1:5188/browse
+			19 text / 时间与专注
+			20 heading 专注计时器, Value: 1
+				21 text 专注计时器
+			22 text Focus Timer 番茄钟 工作计时器
+			23 heading 基于这个类型开发项目, Value: 2
+				24 text 基于这个类型开发项目
+			25 text 把完整类型正文固定为项目依据，然后进入项目工作区继续分析、生成文档和开发。
+			26 button 加入当前项目并开发
+			27 link Description: 创建新项目, Value: 127.0.0.1:5188/projects?fromType=focus-timer
+			28 heading 应用场景与模板, Value: 2
+				29 text 应用场景与模板
+			30 link Description: 打开模板工厂 →, Value: 127.0.0.1:5188/factory?leaf=focus-timer
+			31 text 场景描述谁用这类软件完成什么事情；确认后的场景可以交给工厂生产模板。
+			32 content list
+				33 container
+					34 link Description: 写作前的一轮专注与休息, Value: 127.0.0.1:5188/factory?view=artifacts&scenario_id=scn_4636cb92042a444da70ed81c0c131666
+					35 text 草案 选定写作目标，完成一轮25分钟专注，再主动进入5分钟休息，并留存真实完成记录。
+			36 text 此类型还没有已发布模板。生产完成后，可在工厂审阅并发布。
+			37 container 辅助试用模板目录
+				38 heading 辅助试用模板, Value: 3
+					39 text 辅助试用模板
+				40 text Codex 辅助生产，可阅读和导出使用；与正式发布区分开。
+				41 text 1 份模板 · 0 份有核心运行示例 · 1 份应用未运行
+				42 link Description: 查看此场景的模板: 写作前的一轮专注与休息 · r1, Value: 127.0.0.1:5188/factory?view=artifacts&scenario_id=scn_4636cb92042a444da70ed81c0c131666
+				43 container 辅助模板信息 写作前的一轮专注与休息
+					44 text 辅助试用模板 应用未运行
+					45 heading 写作前的一轮专注与休息, Value: 4
+						46 link Description: 写作前的一轮专注与休息, Value: 127.0.0.1:5188/factory?view=artifacts&artifact_id=tpl_cfeddf44187a403ba0148e3264c5627d
+					47 definition list
+						48 container 适用用户
+							49 text 适用用户
+						50 text 需要开始一段写作的个人用户
+						51 container 解决的问题
+							52 text 解决的问题
+						53 text 选定写作目标，完成一轮25分钟专注，再主动进入5分钟休息，并留存真实完成记录。
+					54 text 核心能力
+					55 content list
+						56 container
+							57 AXListMarker • 
+							58 text 目标、时长、开始与暂停恢复
+						59 container
+							60 AXListMarker • 
+							61 text 到期记录及主动休息
+						62 container
+							63 AXListMarker • 
+							64 text 取消、重复完成防重与持久化
+					65 button (collapsed) 适用范围与已知限制, Secondary Actions: Expand
+						66 text 适用范围与已知限制
+					67 text 固定案例来源
+					68 link Description: 回查共享案例 · r1, Value: 127.0.0.1:5188/apps?app_id=app%3Arepo%3Abdb9120cdd460c971a15b6e8&case_id=case%3Aassisted-batch-focus&case_revision=1
+					69 container
+						70 link Description: splode/pomotroid @ dda06e6bf412, Value: github.com/splode/pomotroid/tree/dda06e6bf412bebe5ef8668a4357c52d974dc874
+						71 link Description: LICENSE, Value: github.com/splode/pomotroid/blob/dda06e6bf412bebe5ef8668a4357c52d974dc874/LICENSE
+					72 text 尚未开发或验证该模板的应用；冻结与导出检查不等于应用运行。
+					73 text 辅助运行记录与严格工厂验收分别记录；不代表正式发布、严格 G1/T08 通过或本机服务此刻在线。
+					74 link Description: 下载标准开发包, Value: 127.0.0.1:5188/api/factory/assisted-templates/tpl_cfeddf44187a403ba0148e3264c5627d/files/development
+			75 heading 定义核心 · DEFINING CORE, Value: 2
+				76 text 定义核心 · DEFINING CORE
+			77 content list
+				78 container
+					79 AXListMarker • 
+					80 text 专注会话  — 中心对象：一个有界的时间段，致力于一个意图（“在计时器结束前一直工作于X”）。用户启动它；应用程序可见且连续地计时（一个倒计时至完成信号是经典形式）；它通过完成或放弃而结束。一个会话是一个专注工作的单位。
+				81 container
+					82 AXListMarker • 
+					83 text 注意力框架  — 会话是为了专注工作或学习而存在。这个目的将此类型与通用计时器工具区分开来：计时与工作注意力语义（会话、休息、专注）绑定，而不是与任意事件如烹饪或停车绑定。
+			84 text 如果定时会话消失，产品就是计划器或任务列表。如果注意力框架消失，它就是时钟工具。这两种移除都会破坏类型；其他不会。
+			85 button (collapsed) 英文原文, Secondary Actions: Expand
+				86 text 英文原文
+			87 heading 概览, Value: 2
+				88 text 概览
+			89 container
+				90 text 一款 专注计时器 是一种将自主工作结构化为有意识的、定时专注时段的应用程序。用户承诺在一个有限的预期专注区间内工作；应用程序以可见的方式运行该区间，标记其结束，并通常过渡到休息阶段并记录已完成的会话。
+			91 text 它解决了一个具体问题：在充满干扰的环境中开始并维持对单一工作的注意力。这种模式源自限时注意力方法——最突出的是番茄工作法，其中工作被分解为以短暂休息分隔的定时区间。
+			92 text 边界界定：专注计时器不是用于任意事件的秒表（那是时钟/计时器工具），不是花费时间的账本（时间追踪），不是未来区间的计划（时间块），也不是任务系统（待办事项列表）——尽管它触及了所有这些方面。
+			93 text 其定义核心很小：
+			94 text 专注会话 — 一个有意识的、有限的预期专注区间
+└── 由用户启动
+     └── 由应用程序可见地运行
+         └── 完成，或放弃
+
+			95 text 通常与该类型关联的其他所有内容——工作/休息循环、统计数据、任务列表、屏蔽、游戏化——在当前产品中很普遍，但可移除：存在不包含其中任何一项的产品，且起源方法的纸笔和厨房计时器实现完全没有任何这些功能。
+			96 heading 工作结构, Value: 2
+				97 text 工作结构
+			98 text 核心循环：
+			99 text 选择工作（可选地附加一个任务）
+→ 选择会话长度（预设值、由预设导出的值，或用户选择）
+→ 启动会话
+→ 应用程序可见地运行它；保持专注于工作
+→ 会话以信号结束——结果被注册为已完成
+→ 随后是休息（在循环式产品中自动进行；在其他产品中由用户发起）
+→ 重复；在一组会话之后进行更长的休息
+→ 会话累积成记录（次数、专注时间、连续记录）
+
+			100 text 两个交互层围绕此循环：
+			101 content list
+				102 container
+					103 AXListMarker • 
+					104 text 承诺。  启动会话是一个小的承诺行为，产品以不同方式放大它。宽松的产品允许用户随时停止。严格的产品为离开附加可见成本——在最强烈的形式中，在会话期间离开应用程序会摧毁其结果。群组模式使结果共享：如果一名参与者放弃，所有人的结果都会受影响。
+				105 container
+					106 AXListMarker • 
+					107 text 保护。  一些产品通过屏蔽选定的应用程序或网站直到会话结束来主动保护正在运行的会话。最简化的产品仅通过不呈现其他内容来保护它——一个干净的、单一用途的界面。
+			108 text 放弃语义在每个变体中都很重要：已完成的会话和被放弃的会话被区分，有时仅在记录中，有时伴随可见的损失。放弃时的确切行为因产品而异。
+			109 heading 重要规则, Value: 2
+				110 text 重要规则
+			111 content list
+				112 container
+					113 AXListMarker • 
+					114 text 会话是有界的且外部可见的。  应用程序，而非用户的时间感，标记边界，并给出完成信号。将时间边界外部化是该类型的定义行为。
+				115 container
+					116 AXListMarker • 
+					117 text 会话由用户发起。  在用户有意识地启动会话之前，不会测量任何东西——这与环境活动测量不同。
+				118 container
+					119 AXListMarker • 
+					120 text 在循环式产品中，休息与专注交替进行 ——通常在专注区间后自动开始，在配置的一组会话后进行更长的休息。在其他产品中，休息是一个独立的、由用户发起的界面。这两种形式在市场上都已确立。
+				121 container
+					122 AXListMarker • 
+					123 text 放弃有定义的结果。  已完成和被放弃的会话被区分；放弃的后果范围从安静的记录条目到摧毁会话结果，取决于产品的严格程度。
+				124 container
+					125 AXListMarker • 
+					126 text 记录是激励性的，而非计费级的。  历史回答“我是否专注，专注多少，专注什么”——它不是经过审计的工时表。
+			127 heading 变体谱系, Value: 2
+				128 text 变体谱系
+			129 content list
+				130 container
+					131 AXListMarker • 
+					132 text 循环主导的番茄计时器  — 经典的带有可调整传统值的工作/休息循环；通常基于浏览器，账户可选，具有简单的任务附加功能。
+				133 container
+					134 AXListMarker • 
+					135 text 承诺主导/游戏化计时器  — 会话长度由用户选择，结果以损失框架呈现；动机由视觉成长、奖励、挑战和群组专注承载（例如 Forest）。
+				136 container
+					137 AXListMarker • 
+					138 text 任务集成计时器  — 完整的任务管理模型，会话循环贯穿任务、项目和长期统计（例如 Focus To-Do）。
+				139 container
+					140 AXListMarker • 
+					141 text 灵活/自定义区间计时器  — 命名的自定义周期取代固定的番茄节奏，有时通过共同计时器与队友共享（例如 Marinara Timer）。
+				142 container
+					143 AXListMarker • 
+					144 text 屏蔽辅助计时器  — 会话内的应用程序/网站屏蔽作为一等支持能力。当会话外的计划屏蔽成为产品的中心时，产品正在偏离屏幕时间/数字健康而非此类型。
+				145 container
+					146 AXListMarker • 
+					147 text 受众调整（学生、ADHD 定位、数字排毒）和界面调整（菜单栏桌面伴侣、手表或浏览器扩展伴侣）贯穿这些形式。
+			148 heading 代表产品（语料记录）, Value: 2
+				149 text 代表产品（语料记录）
+			150 content list
+				151 container
+					152 AXListMarker • 
+					153 text Pomofocus — 极简的基于浏览器的番茄计时器，具有任务附加功能且无需强制账户
+				154 container
+					155 AXListMarker • 
+					156 text Forest — 游戏化承诺计时器，具有会话内应用程序屏蔽和群组专注
+				157 container
+					158 AXListMarker • 
+					159 text Focus To-Do — 与任务管理套件和历史统计合并的番茄计时器
+				160 container
+					161 AXListMarker • 
+					162 text Marinara Timer — 纯计时界面，具有番茄循环、自定义命名区间和可共享计时器
+			163 text 定义还针对起源方法本身（番茄工作法的纸笔和厨房计时器实现）进行了检查，以确保核心不过度拟合任何当前产品模式：屏蔽、游戏化、账户和统计在原始方法中均不存在，且如今均为可选。
+			164 heading 与相邻类型的关系, Value: 2
+				165 text 与相邻类型的关系
+			166 heading 相关, Value: 3
+				167 text 相关
+			168 link Description: 无干扰写作应用, Value: 127.0.0.1:5188/types/distraction-free-writing-application
+			169 button (collapsed) 技术信息, Secondary Actions: Expand
+				170 text 技术信息
+			171 text 可能包含一个计时器，但在这里计时器服务于写作；在专注计时器中，会话本身就是产品。
+			172 link Description: 生产力活动追踪器, Value: 127.0.0.1:5188/types/productivity-activity-tracker
+			173 button (collapsed) 技术信息, Secondary Actions: Expand
+				174 text 技术信息
+			175 text 自动且环境化地测量使用情况；专注计时器只运行用户有意启动的内容。
+			176 link Description: 时间块规划应用, Value: 127.0.0.1:5188/types/time-blocking-application
+			177 button (collapsed) 技术信息, Secondary Actions: Expand
+				178 text 技术信息
+			179 text 在计划表上规划未来的时间段；专注计时器执行当前的时间段。规划和执行是互补的阶段，而非同一类型。
+			180 link Description: 时间跟踪应用, Value: 127.0.0.1:5188/types/time-tracking-application
+			181 button (collapsed) 技术信息, Secondary Actions: Expand
+				182 text 技术信息
+			183 text 持续记录花费的时间以用于报告、分析或计费；专注计时器运行有意识的有界会话以提供动力和结构，其记录是激励性的副产品，而非账簿。
+			184 link Description: 任务管理软件, Value: 127.0.0.1:5188/types/task-management-application
+			185 button (collapsed) 技术信息, Secondary Actions: Expand
+				186 text 技术信息
+			187 text 以任务模型为中心；计时器至多是众多嵌入功能之一。移除任务——专注计时器仍然存在；移除会话循环——它就是一个任务管理器。
+			188 heading 资料来源, Value: 2
+				189 text 资料来源
+			190 text Research date: 2026-09-07
+			191 content list
+				192 container
+					193 AXListMarker • 
+					194 text Pomofocus — 
+					195 link Description: https://pomofocus.app/, Value: pomofocus.app/
+					196 text  (official product page)
+				197 container
+					198 AXListMarker • 
+					199 text Forest — 
+					200 link Description: https://www.forestapp.cc/, Value: forestapp.cc/
+					201 text  (official product page, including FAQ)
+				202 container
+					203 AXListMarker • 
+					204 text Focus To-Do — 
+					205 link Description: https://www.focustodo.cn/, Value: focustodo.cn/
+					206 text  (official product page)
+				207 container
+					208 AXListMarker • 
+					209 text Marinara Timer — 
+					210 link Description: https://marinaratimer.com/, Value: marinaratimer.com/
+					211 text  (official product page)
+				212 container
+					213 AXListMarker • 
+					214 text TickTick — 
+					215 link Description: https://ticktick.com/about/features, Value: ticktick.com/about/features
+					216 text  (official features page; used only as boundary evidence that a timer can be an embedded capability of a task-management application)
+				217 container
+					218 AXListMarker • 
+					219 text Pomodoro Technique (official site, Francesco Cirillo) — 
+					220 link Description: https://www.pomodorotechnique.com/, Value: pomodorotechnique.com/
+			221 container
+				222 text “ Sourcing limitation: no help-center or user-guide documentation was reachable for the sampled products on 2026-09-07; the official site of one additional desktop timer was also unreachable. All product-level statements above are calibrated to what the official product pages state; per-product operational details (default configurations, interruption handling, record retention) are deliberately not asserted. Detailed observations are recorded in the paired Research Notes. ”
+			223 heading 正式资料阅读器, Value: 2
+				224 text 正式资料阅读器
+			225 text 直接读取语料中的正式 Markdown；收藏时由服务端再次读取并固定来源版本。
+			226 tab (selected, settable, boolean) 类型正文, Value: 1
+			227 tab (selectable, settable, boolean) 研究笔记, Value: 0
+			228 container
+				229 text 阅读范围
+				230 pop up button (collapsed, settable) 阅读范围, Value: 完整文档, Secondary Actions: Expand
+					231 menu
+						232 (selected) 完整文档
+						233 Focus Timer
+						234 　Overview
+						235 　Users & Context
+						236 　Core Model
+						237 　　The defining core
+						238 　　What mature products add
+						239 　How It Works
+						240 　Interfaces
+						241 　Important Rules / Behaviors
+						242 　Variants
+						243 　Related Application Types
+						244 　Representative Products
+						245 　Sources
+			246 container
+				247 text 125 行  ·  11,361 字符
+				248 button (collapsed) 版本技术信息, Secondary Actions: Expand
+					249 text 版本技术信息
+			250 container source-panel-application
+				251 heading Focus Timer, Value: 1
+					252 text Focus Timer
+				253 heading Overview, Value: 2
+					254 text Overview
+				255 container
+					256 text A  Focus Timer  is an application that structures self-directed work into deliberate, timed sessions of focused attention. The user commits to a bounded interval of intended focus; the application runs the interval visibly, marks its end, and commonly transitions into a break and records the completed session.
+				257 text It addresses a specific problem: starting and sustaining attention on a single piece of work in an interruption-rich environment. The pattern descends from timeboxed attention methods — most prominently the Pomodoro Technique, in which work is broken into timed intervals separated by short breaks.
+				258 text The boundary: a focus timer is not a stopwatch for arbitrary events (that is the Clock / Timer utility), not a ledger of time spent (Time Tracking), not a plan of future intervals (Time Blocking), and not a task system (To-do List) — though it touches all of these.
+				259 text The defining core is small:
+				260 text Focus session — a deliberate, bounded interval of intended focus
+└── started by the user
+    └── run visibly by the application
+        └── completed, or given up
+
+				261 text Everything else commonly associated with the Type — the work/break cycle, statistics, task lists, blocking, gamification — is widespread in current products but removable: products exist without each of them, and the origin method's paper-and-kitchen-timer realization had none of them at all.
+				262 heading Users & Context, Value: 2
+					263 text Users & Context
+				264 text The primary user is an individual doing self-directed knowledge work or study — writing, coding, reading, exam preparation, problem sets — who wants external structure for attention: a commitment device that says "work on this now, until the timer ends."
+				265 text Typical setting: a desk or study environment with the phone or computer in reach. Sessions are short by design and repeated through a work period.
+				266 text Secondary motivations observed in the market: reclaiming attention from the phone (digital-detox positioning), structure for users who describe attention difficulties (ADHD-friendly positioning), and shared focus for study groups or teams.
+				267 heading Core Model, Value: 2
+					268 text Core Model
+				269 heading The defining core, Value: 3
+					270 text The defining core
+				271 content list
+					272 container
+						273 AXListMarker • 
+						274 text Focus session  — the central object: one bounded interval dedicated to one intention ("work on X until the timer ends"). The user starts it; the application times it visibly and continuously (a countdown toward a completion signal is the classic form); it ends by completion or by being given up. One session is one unit of focused work.
+					275 container
+						276 AXListMarker • 
+						277 text Attention framing  — the session exists for focused work or study. This purpose separates the Type from a generic timer utility: the timing is bound to work-attention semantics (sessions, breaks, focus), not to arbitrary events such as cooking or parking.
+				278 text If the timed session disappears, the product is a planner or task list. If the attention framing disappears, it is a clock utility. Both removals destroy the Type; nothing else does.
+				279 heading What mature products add, Value: 3
+					280 text What mature products add
+				281 content list
+					282 container
+						283 AXListMarker • 
+						284 text Work/break rhythm  — the dominant pattern, inherited from the Pomodoro Technique: a focus interval, then a short break, repeated, with a longer break after a set of focus intervals. The technique's traditional values (a 25-minute focus interval, a 5-minute short break, a longer break after four intervals) appear as common defaults — and are nearly always adjustable, because the fixed rhythm is a frequent criticism of the method.
+					285 container
+						286 AXListMarker • 
+						287 text Session record and statistics  — completed sessions, focused time per day/week/month, streaks; in motivation-led products a visual accumulation (a growing forest, a filled display) instead of a dashboard.
+					288 container
+						289 AXListMarker • 
+						290 text Task linkage  — attaching the session to a task from a list, so the record says what the time was spent on. Depth varies from a simple flat list to a full task-management suite.
+					291 container
+						292 AXListMarker • 
+						293 text Interval configuration  — session length, break lengths, when the long break comes, completion sounds and notifications.
+				294 heading How It Works, Value: 2
+					295 text How It Works
+				296 text The core loop:
+				297 text Pick the work (optionally attach a task)
+→ choose the session length (a preset, a preset-derived value, or user-chosen)
+→ start the session
+→ the application runs it visibly; stay with the work
+→ session ends with a signal — the outcome is registered as completed
+→ break follows (automatic in cycle-style products; user-initiated in others)
+→ repeat; a longer break comes after a set of sessions
+→ sessions accumulate into a record (count, focused time, streak)
+
+				298 text Two interaction layers surround this loop:
+				299 content list
+					300 container
+						301 AXListMarker • 
+						302 text Commitment.  Starting a session is a small act of commitment, and products amplify it differently. Lenient products let the user stop at any time. Strict products attach a visible cost to walking away — in the strongest form, leaving the application during the session destroys its outcome. Group modes make the outcome shared: if one participant gives up, everyone's does.
+					303 container
+						304 AXListMarker • 
+						305 text Protection.  Some products actively defend the running session by blocking selected apps or sites until it ends. The minimal ones defend it only by presenting nothing else — a clean, single-purpose surface.
+				306 text Give-up semantics matter in every variant: a completed session and an abandoned one are distinguished, sometimes merely in the record, sometimes with a visible loss. The exact behavior at abandonment varies by product.
+				307 heading Interfaces, Value: 2
+					308 text Interfaces
+				309 content list
+					310 container
+						311 AXListMarker • 
+						312 text Timer face  — the home surface: the running countdown, the current session type (focus or break), the attached task if any, and start/pause/skip controls. Commonly mirrored in ambient surfaces (menu bar, home-screen widget, notification).
+					313 container
+						314 AXListMarker • 
+						315 text Task list  (where present) — a lightweight list of things to focus on; selecting one binds it to the session.
+					316 container
+						317 AXListMarker • 
+						318 text Session record / statistics  — history of completed sessions and focused time by day, week, or month; visual accumulations in motivation-led products.
+					319 container
+						320 AXListMarker • 
+						321 text Settings  — interval lengths, break cadence, auto-start of the next interval, sounds, strictness options.
+					322 container
+						323 AXListMarker • 
+						324 text Blocking configuration  (where present) — which apps or sites are barred while a session runs.
+				325 heading Important Rules / Behaviors, Value: 2
+					326 text Important Rules / Behaviors
+				327 content list
+					328 container
+						329 AXListMarker • 
+						330 text The session is bounded and externally visible.  The application, not the user's sense of time, marks the boundary, and completion is signaled. Externalizing the time boundary is the Type's defining behavior.
+					331 container
+						332 AXListMarker • 
+						333 text Sessions are user-initiated.  Nothing is measured until the user deliberately starts a session — unlike ambient activity measurement.
+					334 container
+						335 AXListMarker • 
+						336 text Breaks alternate with focus in cycle-style products  — typically starting automatically after a focus interval, with a longer break after a configured set of sessions. In other products breaks are a separate, user-initiated surface. Both forms are established in the market.
+					337 container
+						338 AXListMarker • 
+						339 text Abandonment has a defined outcome.  Completed and abandoned sessions are distinguished; the consequence of abandoning ranges from a quiet record entry to the destruction of the session's result, depending on the product's strictness posture.
+					340 container
+						341 AXListMarker • 
+						342 text Records are motivational, not billing-grade.  The history answers "did I focus, how much, on what" — it is not an audited timesheet.
+				343 heading Variants, Value: 2
+					344 text Variants
+				345 content list
+					346 container
+						347 AXListMarker • 
+						348 text Cycle-led Pomodoro timers  — the classic work/break loop with adjustable traditional values; often browser-based, account-optional, with simple task attachment.
+					349 container
+						350 AXListMarker • 
+						351 text Commitment-led / gamified timers  — session length user-chosen, outcome loss-framed; motivation carried by visual growth, rewards, challenges, and group focus (e.g. Forest).
+					352 container
+						353 AXListMarker • 
+						354 text Task-integrated timers  — a full task-management model with the session loop woven through tasks, projects, and long-term statistics (e.g. Focus To-Do).
+					355 container
+						356 AXListMarker • 
+						357 text Flexible / custom-interval timers  — named custom periods replacing the fixed pomodoro rhythm, sometimes shared with teammates through a common timer (e.g. Marinara Timer).
+					358 container
+						359 AXListMarker • 
+						360 text Blocking-assisted timers  — in-session app/site blocking as a first-class support capability. When scheduled blocking outside sessions becomes the product's center, the product is drifting toward screen-time / digital wellbeing rather than this Type.
+					361 container
+						362 AXListMarker • 
+						363 text Audience tuning (students, ADHD positioning, digital detox) and surface tuning (menu-bar desktop companions, watch or browser-extension companions) cut across these forms.
+				364 heading Related Application Types, Value: 2
+					365 text Related Application Types
+				366 table
+					367 row
+						368 cell
+							369 text Application Type
+						370 cell
+							371 text Distinction
+					372 row
+						373 cell
+							374 text Clock / Timer utility
+						375 cell
+							376 text times arbitrary events; no work-attention semantics (sessions, breaks, focus framing). A generic countdown can exist as an auxiliary mode inside a focus-timer product — the attention framing, not the countdown mechanism, carries the Type.
+					377 row
+						378 cell
+							379 text To-do List / Task Management Application
+						380 cell
+							381 text centers the task model; a timer is at most one embedded capability among many. Remove the tasks — the focus timer remains; remove the session loop — it is a task manager.
+					382 row
+						383 cell
+							384 text Time Tracking Application
+						385 cell
+							386 text records time spent continuously for reporting, analysis, or billing; the focus timer runs deliberate bounded sessions for motivation and structure, and its records are a motivational byproduct rather than a ledger.
+					387 row
+						388 cell
+							389 text Time Blocking Application
+						390 cell
+							391 text plans future intervals on a schedule; the focus timer executes the current interval. Planning and execution are complementary phases, not the same Type.
+					392 row
+						393 cell
+							394 text Productivity Activity Tracker
+						395 cell
+							396 text measures usage ambiently and automatically; the focus timer runs only what the user deliberately starts.
+					397 row
+						398 cell
+							399 text Distraction-free Writing Application
+						400 cell
+							401 text may include a timer, but there the timer serves the writing; in a focus timer the session itself is the product.
+					402 row
+						403 cell
+							404 text Habit Tracker
+						405 cell
+							406 text centers a recurring-behavior loop with streaks; the timed attention session as a unit of work is absent.
+				407 heading Representative Products, Value: 2
+					408 text Representative Products
+				409 content list
+					410 container
+						411 AXListMarker • 
+						412 text Pomofocus — minimal browser-based Pomodoro timer with task attachment and no required account
+					413 container
+						414 AXListMarker • 
+						415 text Forest — gamified commitment timer with in-session app blocking and group focus
+					416 container
+						417 AXListMarker • 
+						418 text Focus To-Do — Pomodoro timer merged with a task-management suite and historical statistics
+					419 container
+						420 AXListMarker • 
+						421 text Marinara Timer — pure timing surface with pomodoro cycles, custom named intervals, and shareable timers
+				422 text The definition was also checked against the origin method itself (the Pomodoro Technique's paper-and-kitchen-timer realization) so that the core does not over-fit to any current product pattern: blocking, gamification, accounts, and statistics are all absent from the original and all optional today.
+				423 heading Sources, Value: 2
+					424 text Sources
+				425 text Research date: 2026-09-07
+				426 content list
+					427 container
+						428 AXListMarker • 
+						429 text Pomofocus — 
+						430 link Description: https://pomofocus.app/, Value: pomofocus.app/
+						431 text  (official product page)
+					432 container
+						433 AXListMarker • 
+						434 text Forest — 
+						435 link Description: https://www.forestapp.cc/, Value: forestapp.cc/
+						436 text  (official product page, including FAQ)
+					437 container
+						438 AXListMarker • 
+						439 text Focus To-Do — 
+						440 link Description: https://www.focustodo.cn/, Value: focustodo.cn/
+						441 text  (official product page)
+					442 container
+						443 AXListMarker • 
+						444 text Marinara Timer — 
+						445 link Description: https://marinaratimer.com/, Value: marinaratimer.com/
+						446 text  (official product page)
+					447 container
+						448 AXListMarker • 
+						449 text TickTick — 
+						450 link Description: https://ticktick.com/about/features, Value: ticktick.com/about/features
+						451 text  (official features page; used only as boundary evidence that a timer can be an embedded capability of a task-management application)
+					452 container
+						453 AXListMarker • 
+						454 text Pomodoro Technique (official site, Francesco Cirillo) — 
+						455 link Description: https://www.pomodorotechnique.com/, Value: pomodorotechnique.com/
+				456 container
+					457 text “ Sourcing limitation: no help-center or user-guide documentation was reachable for the sampled products on 2026-09-07; the official site of one additional desktop timer was also unreachable. All product-level statements above are calibrated to what the official product pages state; per-product operational details (default configurations, interruption handling, record retention) are deliberately not asserted. Detailed observations are recorded in the paired Research Notes. ”
+			458 container
+				459 text 借鉴点 / 项目备注（可选）
+				460 text entry area (settable) 借鉴点 / 项目备注（可选）
+			461 button 收藏当前范围
+		16 text Application Atlas · 1805 软件应用类型 · 由语料自动生成 · v1.1 方法论
+
+The focused UI element is 0 AXWebArea 应用图谱 · Application Atlas, URL: 127.0.0.1:5188/types/focus-timer

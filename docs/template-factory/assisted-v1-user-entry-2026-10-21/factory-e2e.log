@@ -1,0 +1,44 @@
+
+> test:e2e:factory
+> playwright test --config playwright.factory.config.ts
+
+[WebServer] (node:61997) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 31 tests using 1 worker
+
+(node:62000) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/factory-tests/assisted-templates.spec.ts:16:1 › leaf → scenario → assisted template → case and standard package, without formal publication (2.1s)
+  ✓   2 e2e/factory-tests/assisted-templates.spec.ts:34:1 › not-run template has no example source, guide or runtime evidence links (873ms)
+  ✓   3 e2e/factory-tests/assisted-templates.spec.ts:43:1 › assisted catalog outage does not hide formal template or claim zero verified evidence (811ms)
+  ✓   4 e2e/factory-tests/assisted-templates.spec.ts:51:1 › scenario link retains formally published artifacts outside the assisted index (962ms)
+  ✓   5 e2e/factory-tests/blueprint-runtime.spec.ts:23:1 › blueprint runtime submission requires adapter, source ZIP and execution consent, without a model field (1.7s)
+  ✓   6 e2e/factory-tests/blueprint-runtime.spec.ts:45:1 › runtime deep link exposes startup diagnostics, case evidence and cleanup errors (2.2s)
+  ✓   7 e2e/factory-tests/blueprint-runtime.spec.ts:65:1 › blueprint with no frozen runner adapter explains runtime acceptance is unavailable (1.5s)
+  ✓   8 e2e/factory-tests/factory.spec.ts:7:1 › factory catalog saves, confirms, pins and cancels a batch without a provider call (4.0s)
+  ✓   9 e2e/factory-tests/factory.spec.ts:34:1 › catalog groups scenarios by type and preserves cross-group selection through collapse, search and refresh (7.3s)
+  ✓  10 e2e/factory-tests/factory.spec.ts:88:1 › visible generation entry filters covered leaves, marks zero additions and blocks active generation (4.2s)
+  ✓  11 e2e/factory-tests/factory.spec.ts:156:1 › leaf exposes confirmed scenarios and links to factory (1.6s)
+  ✓  12 e2e/factory-tests/factory.spec.ts:165:1 › draft scenarios can queue an independent pinned review without confirmation or provider calls (2.2s)
+  ✓  13 e2e/factory-tests/factory.spec.ts:187:1 › review actions distinguish first, repeat and retry; passed drafts still need human confirmation (3.4s)
+  ✓  14 e2e/factory-tests/factory.spec.ts:243:1 › scenario review displays reasons, revisions, failed attempts and bilingual stale evidence (3.5s)
+  ✓  15 e2e/factory-tests/factory.spec.ts:266:1 › covered types can complete without new drafts and explain their pinned output language (1.3s)
+  ✓  16 e2e/factory-tests/factory.spec.ts:281:1 › factory supports mobile, English, empty artifacts and recoverable errors (2.5s)
+  ✓  17 e2e/factory-tests/factory.spec.ts:297:1 › artifact distinguishes source review from runtime acceptance and can instantiate L0 (2.2s)
+  ✓  18 e2e/factory-tests/factory.spec.ts:333:1 › leaf published template creates an application and explains review scope (1.3s)
+  ✓  19 e2e/factory-tests/factory.spec.ts:347:1 › cognitive sample imports once, reads definitions and exports a phased development handoff without provider calls (3.5s)
+  ✓  20 e2e/factory-tests/factory.spec.ts:396:1 › invalid cognitive ZIP shows an error and keeps imported candidates (1.4s)
+  ✓  21 e2e/factory-tests/factory.spec.ts:408:1 › cognitive document reader does not load remote images or execute embedded HTML (1.6s)
+  ✓  22 e2e/factory-tests/factory.spec.ts:430:1 › confirmed scenarios queue pinned cognition production separately from code templates (1.8s)
+  ✓  23 e2e/factory-tests/factory.spec.ts:446:1 › cognitive review queues independently, can retry after cancellation and produces a new pinned revision (6.0s)
+  ✓  24 e2e/factory-tests/factory.spec.ts:478:1 › 规范预审阻断可见，意见可带回生产补充要求 (2.1s)
+  ✓  25 e2e/factory-tests/leaf-blueprint.spec.ts:32:1 › published product blueprint links to phase export and does not offer runnable instantiate (748ms)
+  ✓  26 e2e/factory-tests/leaf-blueprint.spec.ts:40:1 › published runnable starter keeps its application archive flow (858ms)
+  ✓  27 e2e/factory-tests/v1.spec.ts:18:1 › shared cases show fixed source, evidence, unknowns and keep legacy cards when the dynamic API is unavailable (721ms)
+  ✓  28 e2e/factory-tests/v1.spec.ts:28:1 › case revisions expose observed evidence separately from unknown runtime and link into factory (877ms)
+  ✓  29 e2e/factory-tests/v1.spec.ts:43:1 › V1 plan survives run, pause, resume and reload with a stable idempotency key (2.2s)
+  ✓  30 e2e/factory-tests/v1.spec.ts:98:1 › V1 catalog shows each blueprint runtime result per run and target, with no aggregate fallback (769ms)
+  ✓  31 e2e/factory-tests/v1.spec.ts:126:1 › fresh deep link restores a running plan, polls its report, pauses by plan ID, then stops at terminal state (5.3s)
+
+  31 passed (1.3m)
