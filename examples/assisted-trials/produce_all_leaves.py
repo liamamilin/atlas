@@ -68,6 +68,11 @@ def sha(path):
 
 
 def shared_provider_fault(error):
+    # A completed HTTP response with malformed/incomplete model output is a
+    # per-leaf protocol failure, not evidence of shared auth/network failure.
+    # Keep the original charged receipt and apply the same one-recovery limit.
+    if "provider.invalid-output" in str(error).lower():
+        return False
     return getattr(error, "code", None) == "cli_unavailable" or (
         getattr(error, "code", None) == "cli_failed"
         and any(
@@ -82,7 +87,6 @@ def shared_provider_fault(error):
                 "429",
                 "connection",
                 "network",
-                "provider",
                 "quota",
                 "limit exceeded",
                 "usage limit",
@@ -91,6 +95,11 @@ def shared_provider_fault(error):
                 "401",
                 "402",
                 "403",
+                "502",
+                "503",
+                "504",
+                "service unavailable",
+                "overloaded",
             )
         )
     )
@@ -657,7 +666,9 @@ def stage_call(
         )
         if getattr(error, "code", None) in GLOBAL_CODES:
             raise
-        if (path / "SHARED_PROVIDER_FAILURE.json").exists() and (
+        if (path / "SHARED_PROVIDER_FAILURE.json").exists() and shared_provider_fault(
+            FactoryError(load(path / "SHARED_PROVIDER_FAILURE.json")["error"], "cli_failed", 503)
+        ) and (
             "-protocol-1" in relative or (work / "PROTOCOL_SUCCESSOR.json").exists()
         ):
             raise FactoryError(
@@ -666,32 +677,7 @@ def stage_call(
                 "full_provider_unavailable",
                 503,
             ) from error
-        if getattr(error, "code", None) == "cli_unavailable" or (
-            getattr(error, "code", None) == "cli_failed"
-            and any(
-                word in str(error).lower()
-                for word in (
-                    "unauthorized",
-                    "insufficient",
-                    "balance",
-                    "credit",
-                    "api key",
-                    "rate limit",
-                    "429",
-                    "connection",
-                    "network",
-                    "provider",
-                    "quota",
-                    "limit exceeded",
-                    "usage limit",
-                    "too many requests",
-                    "authentication",
-                    "401",
-                    "402",
-                    "403",
-                )
-            )
-        ):
+        if shared_provider_fault(error):
             raise FactoryError(
                 "shared provider unavailable: " + str(error),
                 "full_provider_unavailable",
@@ -724,6 +710,12 @@ def stage_call(
                     },
                 )
         if technical and "-protocol-1" not in relative:
+            if (work / "PROTOCOL_SUCCESSOR.json").exists():
+                raise FactoryError(
+                    "one protocol recovery already used; original failed output retained",
+                    "budget_retry_limit",
+                    409,
+                ) from error
             # One new, explicitly charged successor across all stages of a leaf.
             successor = "calls/" + stage + "-protocol-1"
             fixed_json(

@@ -312,6 +312,36 @@ class FullLeafTests(unittest.TestCase):
         )
         self.assertTrue((work / "PROTOCOL_SUCCESSOR.json").is_file())
 
+    def test_incomplete_model_stream_is_not_a_shared_outage(self):
+        invalid = FactoryError(
+            "OpenCode CLI failed: {'type': 'provider.invalid-output', "
+            "'message': 'OpenAI Chat stream ended without finish_reason', 'status': 200}",
+            "cli_failed", 409,
+        )
+        self.assertFalse(runner.shared_provider_fault(invalid))
+        for message in ("provider balance insufficient 402", "network connection failed", "rate limit 429", "service unavailable 503"):
+            self.assertTrue(runner.shared_provider_fault(FactoryError(message, "cli_failed", 503)))
+
+    def test_old_shared_marker_cannot_turn_leaf_protocol_failure_into_global_pause(self):
+        root = self.root / "plan"
+        work = root / "items/leaf-0/attempt-1"
+        path = work / "calls/blueprint-spec-review-aux"
+        path.mkdir(parents=True)
+        (self.pack / "applications").mkdir()
+        (self.pack / "applications/leaf-0.md").write_text("leaf")
+        item = {"leaf": "leaf-0", "leaf_sha256": hashlib.sha256(b"leaf").hexdigest()}
+        message = "provider.invalid-output: OpenAI Chat stream ended without finish_reason"
+        marker = {"error": message, "code": "cli_failed"}
+        (path / "SHARED_PROVIDER_FAILURE.json").write_text(json.dumps(marker))
+        (path / "cli-summary.json").write_text(json.dumps({"failure_code": "cli_failed"}))
+        (work / "PROTOCOL_SUCCESSOR.json").write_text(json.dumps({"parent_path": "calls/blueprint-generate-aux"}))
+        with patch.object(runner, "checkpoint", side_effect=FactoryError(message, "cli_failed", 409)) as call:
+            with self.assertRaises(FactoryError) as raised:
+                runner.stage_call(root, self.service, item, work, "blueprint-spec-review-aux", {}, "prompt", "review")
+        self.assertEqual(raised.exception.code, "budget_retry_limit")
+        self.assertEqual(call.call_count, 1)  # replay failure only; no successor CLI
+        self.assertEqual(json.loads((path / "SHARED_PROVIDER_FAILURE.json").read_text()), marker)
+
     def test_registration_rejects_authorization_or_scope_drift(self):
         self.register()
         changed = copy.deepcopy(self.request)
