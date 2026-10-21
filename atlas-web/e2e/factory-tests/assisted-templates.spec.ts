@@ -120,7 +120,7 @@ test('reviewed revision retains its withdrawn parent and separates usable entrie
 
 test('workflow artifact poll refreshes assisted info before opening it in the same factory page',async({page})=>{
  await page.addInitScript(()=>localStorage.setItem('atlas-lang','en'));
- let artifactReads=0,assistedReads=0,artifactVisible=false,pageLoads=0;
+ let artifactReads=0,assistedReads=0,freshCatalogResponses=0,artifactVisible=false,pageLoads=0;
  page.on('load',()=>pageLoads++);
  const artifactId='tpl_feed_reader_fixture',artifactDigest='f'.repeat(64);
  const devUrl='/api/factory/assisted-templates/'+artifactId+'/files/development';
@@ -139,9 +139,11 @@ test('workflow artifact poll refreshes assisted info before opening it in the sa
   if(url.pathname.endsWith('/auxiliary-workflows'))return r.fulfill({json:{plans:[plan]}});
   return r.fulfill({json:{plan,items:[{leaf:'feed-reader',display_name:'Feed reader',state:'ready_not_run',artifact_id:artifactId,steps:[],calls:[]}],pagination:{offset:0,limit:20,total:1}}});
  });
- await page.route('**/api/factory/assisted-templates**',r=>{
+ await page.route('**/api/factory/assisted-templates**',async r=>{
   assistedReads++;
-  return r.fulfill({json:artifactVisible?{items:[feedItem],unavailable:[],counts:{total:21,usable:20,needs_revision:1,core_verified:19,not_run:2}}:{items:[],unavailable:[],counts:{total:0,usable:0,needs_revision:0,core_verified:0,not_run:0}}});
+  const fresh=artifactVisible;
+  await r.fulfill({json:fresh?{items:[feedItem],unavailable:[],counts:{total:21,usable:20,needs_revision:1,core_verified:19,not_run:2}}:{items:[],unavailable:[],counts:{total:0,usable:0,needs_revision:0,core_verified:0,not_run:0}}});
+  if(fresh)freshCatalogResponses++;
  });
  await page.route('**/api/factory/artifacts**',r=>{
   artifactReads++;
@@ -154,15 +156,19 @@ test('workflow artifact poll refreshes assisted info before opening it in the sa
  await page.goto('/factory?view=workflow');
  await expect(page.getByRole('tab',{name:'Auxiliary production progress'})).toHaveAttribute('aria-selected','true');
  await expect.poll(()=>artifactReads,{timeout:10000}).toBeGreaterThan(1);
- await expect.poll(()=>assistedReads,{timeout:10000}).toBeGreaterThan(1);
- const readsForStableInventory=assistedReads;
- await page.waitForTimeout(4500);
- expect(assistedReads).toBe(readsForStableInventory);
+ await expect.poll(()=>freshCatalogResponses,{timeout:10000}).toBeGreaterThan(0);
+ const navigationCatalogRequest=page.waitForRequest(r=>new URL(r.url()).pathname==='/api/factory/assisted-templates');
  await page.getByRole('link',{name:'Open artifact · '+artifactId}).click();
+ const navigationCatalogResponse=await (await navigationCatalogRequest).response();
+ expect(navigationCatalogResponse).not.toBeNull();
+ await navigationCatalogResponse!.finished();
  await expect(page).toHaveURL(new RegExp('view=artifacts.*artifact_id='+artifactId));
  const info=page.getByRole('region',{name:'Assisted template information Feed reader'});
  await expect(info.getByRole('link',{name:'Download standard development package'})).toHaveAttribute('href',devUrl);
  await expect(info.getByText(/Separate-session static review passed/)).toBeVisible();
  await expect(info.getByText('Application not run',{exact:true})).toBeVisible();
+ const readsForStableInventory=assistedReads;
+ await page.waitForTimeout(4500);
+ expect(assistedReads).toBe(readsForStableInventory);
  expect(pageLoads).toBe(1);
 });

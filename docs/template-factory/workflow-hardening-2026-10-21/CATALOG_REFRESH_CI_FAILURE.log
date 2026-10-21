@@ -1,0 +1,90 @@
+2026-10-21T17:46:52.7357734Z ##[group]Run npm run test:e2e:factory -- --reporter=line
+2026-10-21T17:46:52.7358219Z npm run test:e2e:factory -- --reporter=line
+2026-10-21T17:46:52.7419330Z shell: /usr/bin/bash -e {0}
+2026-10-21T17:46:52.7419601Z env:
+2026-10-21T17:46:52.7419908Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-21T17:46:52.7420385Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-21T17:46:52.7421110Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-21T17:46:52.7421571Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-21T17:46:52.7421973Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-21T17:46:52.7422561Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-21T17:46:52.7422900Z ##[endgroup]
+2026-10-21T17:46:52.8458427Z 
+2026-10-21T17:46:52.8458921Z > test:e2e:factory
+2026-10-21T17:46:52.8459697Z > playwright test --config playwright.factory.config.ts --reporter=line
+2026-10-21T17:46:52.8460074Z 
+2026-10-21T17:46:56.8083800Z 
+2026-10-21T17:46:56.8084511Z Running 37 tests using 1 worker
+2026-10-21T17:46:56.8085142Z 
+2026-10-21T17:46:57.2924008Z [1/37] e2e/factory-tests/assisted-templates.spec.ts:16:1 › leaf → scenario → assisted template → case and standard package, without formal publication
+2026-10-21T17:46:59.4434204Z [2/37] e2e/factory-tests/assisted-templates.spec.ts:34:1 › not-run template has no example source, guide or runtime evidence links
+2026-10-21T17:47:00.2936220Z [3/37] e2e/factory-tests/assisted-templates.spec.ts:43:1 › Go model static review does not turn an unrun app into a runtime example
+2026-10-21T17:47:01.1696974Z [4/37] e2e/factory-tests/assisted-templates.spec.ts:56:1 › failed complete-material review remains inspectable and is not offered as a usable package
+2026-10-21T17:47:02.7174723Z [5/37] e2e/factory-tests/assisted-templates.spec.ts:73:1 › assisted catalog outage does not hide formal template or claim zero verified evidence
+2026-10-21T17:47:03.5283793Z [6/37] e2e/factory-tests/assisted-templates.spec.ts:81:1 › scenario link retains formally published artifacts outside the assisted index
+2026-10-21T17:47:04.5642393Z [7/37] e2e/factory-tests/assisted-templates.spec.ts:91:1 › recovered refresh clears its alert while a user action error remains visible
+2026-10-21T17:47:17.4987234Z [8/37] e2e/factory-tests/assisted-templates.spec.ts:106:1 › reviewed revision retains its withdrawn parent and separates usable entries from history
+2026-10-21T17:47:18.3503835Z [9/37] e2e/factory-tests/assisted-templates.spec.ts:121:1 › workflow artifact poll refreshes assisted info before opening it in the same factory page
+2026-10-21T17:47:23.8822593Z   1) e2e/factory-tests/assisted-templates.spec.ts:121:1 › workflow artifact poll refreshes assisted info before opening it in the same factory page 
+2026-10-21T17:47:23.8824097Z 
+2026-10-21T17:47:23.8824796Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-21T17:47:23.8825607Z 
+2026-10-21T17:47:23.8826117Z     Expected: 2
+2026-10-21T17:47:23.8826560Z     Received: 3
+2026-10-21T17:47:23.8826810Z 
+2026-10-21T17:47:23.8827167Z       158 |  const readsForStableInventory=assistedReads;
+2026-10-21T17:47:23.8827865Z       159 |  await page.waitForTimeout(4500);
+2026-10-21T17:47:23.8828635Z     > 160 |  expect(assistedReads).toBe(readsForStableInventory);
+2026-10-21T17:47:23.8829303Z           |                        ^
+2026-10-21T17:47:23.8830330Z       161 |  await page.getByRole('link',{name:'Open artifact · '+artifactId}).click();
+2026-10-21T17:47:23.8831724Z       162 |  await expect(page).toHaveURL(new RegExp('view=artifacts.*artifact_id='+artifactId));
+2026-10-21T17:47:23.8832981Z       163 |  const info=page.getByRole('region',{name:'Assisted template information Feed reader'});
+2026-10-21T17:47:23.8834318Z         at /home/runner/work/atlas/atlas/atlas-web/e2e/factory-tests/assisted-templates.spec.ts:160:24
+2026-10-21T17:47:23.8834998Z 
+2026-10-21T17:47:23.8835945Z     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+2026-10-21T17:47:23.8836767Z     test-results/assisted-templates-workflo-4419f-it-in-the-same-factory-page/test-failed-1.png
+2026-10-21T17:47:23.8837590Z     ────────────────────────────────────────────────────────────────────────────────────────────────
+2026-10-21T17:47:23.8837920Z 
+2026-10-21T17:47:23.8838359Z     Error Context: test-results/assisted-templates-workflo-4419f-it-in-the-same-factory-page/error-context.md
+2026-10-21T17:47:23.8838828Z 
+2026-10-21T17:47:23.8839239Z     attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+2026-10-21T17:47:23.8839925Z     test-results/assisted-templates-workflo-4419f-it-in-the-same-factory-page/trace.zip
+2026-10-21T17:47:23.8840395Z     Usage:
+2026-10-21T17:47:23.8840513Z 
+2026-10-21T17:47:23.8841288Z         npx playwright show-trace test-results/assisted-templates-workflo-4419f-it-in-the-same-factory-page/trace.zip
+2026-10-21T17:47:23.8841794Z 
+2026-10-21T17:47:23.8842322Z     ────────────────────────────────────────────────────────────────────────────────────────────────
+2026-10-21T17:47:23.8842906Z 
+2026-10-21T17:47:23.8842917Z 
+2026-10-21T17:47:24.3175441Z [10/37] e2e/factory-tests/auxiliary-workflow.spec.ts:3:1 › auxiliary workflow shows leaf progress, reuse, calls and filters details
+2026-10-21T17:47:25.4958968Z [11/37] e2e/factory-tests/blueprint-runtime.spec.ts:23:1 › blueprint runtime submission requires adapter, source ZIP and execution consent, without a model field
+2026-10-21T17:47:28.1617482Z [12/37] e2e/factory-tests/blueprint-runtime.spec.ts:45:1 › runtime deep link exposes startup diagnostics, case evidence and cleanup errors
+2026-10-21T17:47:31.2478562Z [13/37] e2e/factory-tests/blueprint-runtime.spec.ts:65:1 › blueprint with no frozen runner adapter explains runtime acceptance is unavailable
+2026-10-21T17:47:33.3380539Z [14/37] e2e/factory-tests/factory.spec.ts:7:1 › factory catalog saves, confirms, pins and cancels a batch without a provider call
+2026-10-21T17:47:38.3325926Z [15/37] e2e/factory-tests/factory.spec.ts:34:1 › catalog groups scenarios by type and preserves cross-group selection through collapse, search and refresh
+2026-10-21T17:47:47.6255020Z [16/37] e2e/factory-tests/factory.spec.ts:88:1 › visible generation entry filters covered leaves, marks zero additions and blocks active generation
+2026-10-21T17:47:53.4947976Z [17/37] e2e/factory-tests/factory.spec.ts:156:1 › leaf exposes confirmed scenarios and links to factory
+2026-10-21T17:47:55.2861534Z [18/37] e2e/factory-tests/factory.spec.ts:165:1 › draft scenarios can queue an independent pinned review without confirmation or provider calls
+2026-10-21T17:47:58.7365188Z [19/37] e2e/factory-tests/factory.spec.ts:187:1 › review actions distinguish first, repeat and retry; passed drafts still need human confirmation
+2026-10-21T17:48:04.1580167Z [20/37] e2e/factory-tests/factory.spec.ts:243:1 › scenario review displays reasons, revisions, failed attempts and bilingual stale evidence
+2026-10-21T17:48:08.9631552Z [21/37] e2e/factory-tests/factory.spec.ts:266:1 › covered types can complete without new drafts and explain their pinned output language
+2026-10-21T17:48:10.8954996Z [22/37] e2e/factory-tests/factory.spec.ts:281:1 › factory supports mobile, English, empty artifacts and recoverable errors
+2026-10-21T17:48:14.5333319Z [23/37] e2e/factory-tests/factory.spec.ts:297:1 › artifact distinguishes source review from runtime acceptance and can instantiate L0
+2026-10-21T17:48:17.0197078Z [24/37] e2e/factory-tests/factory.spec.ts:333:1 › leaf published template creates an application and explains review scope
+2026-10-21T17:48:18.3544353Z [25/37] e2e/factory-tests/factory.spec.ts:347:1 › cognitive sample imports once, reads definitions and exports a phased development handoff without provider calls
+2026-10-21T17:48:23.0140217Z [26/37] e2e/factory-tests/factory.spec.ts:396:1 › invalid cognitive ZIP shows an error and keeps imported candidates
+2026-10-21T17:48:25.1976533Z [27/37] e2e/factory-tests/factory.spec.ts:408:1 › cognitive document reader does not load remote images or execute embedded HTML
+2026-10-21T17:48:27.3649061Z [28/37] e2e/factory-tests/factory.spec.ts:430:1 › confirmed scenarios queue pinned cognition production separately from code templates
+2026-10-21T17:48:30.1126133Z [29/37] e2e/factory-tests/factory.spec.ts:446:1 › cognitive review queues independently, can retry after cancellation and produces a new pinned revision
+2026-10-21T17:48:37.1135696Z [30/37] e2e/factory-tests/factory.spec.ts:478:1 › 规范预审阻断可见，意见可带回生产补充要求
+2026-10-21T17:48:40.1699613Z [31/37] e2e/factory-tests/leaf-blueprint.spec.ts:32:1 › published product blueprint links to phase export and does not offer runnable instantiate
+2026-10-21T17:48:41.0730800Z [32/37] e2e/factory-tests/leaf-blueprint.spec.ts:40:1 › published runnable starter keeps its application archive flow
+2026-10-21T17:48:41.9941425Z [33/37] e2e/factory-tests/v1.spec.ts:18:1 › shared cases show fixed source, evidence, unknowns and keep legacy cards when the dynamic API is unavailable
+2026-10-21T17:48:42.8954780Z [34/37] e2e/factory-tests/v1.spec.ts:28:1 › case revisions expose observed evidence separately from unknown runtime and link into factory
+2026-10-21T17:48:43.8764436Z [35/37] e2e/factory-tests/v1.spec.ts:43:1 › V1 plan survives run, pause, resume and reload with a stable idempotency key
+2026-10-21T17:48:46.8907486Z [36/37] e2e/factory-tests/v1.spec.ts:98:1 › V1 catalog shows each blueprint runtime result per run and target, with no aggregate fallback
+2026-10-21T17:48:47.7458871Z [37/37] e2e/factory-tests/v1.spec.ts:126:1 › fresh deep link restores a running plan, polls its report, pauses by plan ID, then stops at terminal state
+2026-10-21T17:48:53.3527560Z   1 failed
+2026-10-21T17:48:53.3528702Z     e2e/factory-tests/assisted-templates.spec.ts:121:1 › workflow artifact poll refreshes assisted info before opening it in the same factory page 
+2026-10-21T17:48:53.3529621Z   36 passed (2.0m)
+2026-10-21T17:48:53.3782420Z ##[error]Process completed with exit code 1.
