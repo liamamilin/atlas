@@ -4,6 +4,7 @@ import argparse
 import concurrent.futures
 import fcntl
 import hashlib
+import io
 import json
 import os
 import plistlib
@@ -33,6 +34,7 @@ from produce_with_opencode import (
 )
 from template_factory.store import FactoryStore, FactoryError, digest
 from template_factory.full_auxiliary import FullAuxiliaryService, MODEL
+from template_factory.auxiliary_workflow import WorkflowService, STEPS
 from template_factory.cases import CaseLibrary
 from atlas_runtime import atomic_json
 import full_leaf_profiles as profiles
@@ -49,6 +51,8 @@ GLOBAL_CODES = {
     "full_plan_paused",
     "full_uncertain",
     "full_provider_unavailable",
+    "workflow_integrity",
+    "workflow_host_error",
 }
 TECH_CODES = {
     "cli_protocol",
@@ -666,10 +670,18 @@ def stage_call(
         )
         if getattr(error, "code", None) in GLOBAL_CODES:
             raise
-        if (path / "SHARED_PROVIDER_FAILURE.json").exists() and shared_provider_fault(
-            FactoryError(load(path / "SHARED_PROVIDER_FAILURE.json")["error"], "cli_failed", 503)
-        ) and (
-            "-protocol-1" in relative or (work / "PROTOCOL_SUCCESSOR.json").exists()
+        if (
+            (path / "SHARED_PROVIDER_FAILURE.json").exists()
+            and shared_provider_fault(
+                FactoryError(
+                    load(path / "SHARED_PROVIDER_FAILURE.json")["error"],
+                    "cli_failed",
+                    503,
+                )
+            )
+            and (
+                "-protocol-1" in relative or (work / "PROTOCOL_SUCCESSOR.json").exists()
+            )
         ):
             raise FactoryError(
                 "shared provider unavailable: "
@@ -855,18 +867,161 @@ def save_accepted_research(
                 "independent_agent",
             )
         case = library.get_case(case_id, committed["case"]["revision"])
-        atomic_json(
-            work / "ACCEPTED_RESEARCH_RECEIPT.json",
-            {
-                "case_id": case_id,
-                "revision": case["revision"],
-                "digest": case["digest"],
-                "review_input_digest": identity,
-                "review_session": review_session,
-                "template_passed": False,
-                "replayed": committed["replayed"],
-            },
+        receipt = {
+            "case_id": case_id,
+            "revision": case["revision"],
+            "digest": case["digest"],
+            "review_input_digest": identity,
+            "review_session": review_session,
+            "template_passed": False,
+            "replayed": committed["replayed"],
+        }
+        original = work / "ACCEPTED_RESEARCH_RECEIPT.json"
+        if original.exists():
+            previous = load(original)
+            if {k: v for k, v in previous.items() if k != "replayed"} != {
+                k: v for k, v in receipt.items() if k != "replayed"
+            }:
+                raise FactoryError(
+                    "accepted research binding changed", "workflow_integrity", 409
+                )
+            fixed_json(work / "ACCEPTED_RESEARCH_REPLAY_RECEIPT.json", receipt)
+        else:
+            fixed_json(original, receipt)
+
+
+def workflow_outputs(*paths, url=None):
+    return [
+        {
+            "path": str(Path(p).relative_to(ROOT)),
+            "sha256": sha(p),
+            **({"url": url} if url else {}),
+        }
+        for p in paths
+    ]
+
+
+def latest_failure(work):
+    return work / (
+        "LATEST_FAILURE.json"
+        if (work / "LATEST_FAILURE.json").exists()
+        else "FAILURE.json"
+    )
+
+
+def verify_download(work, api):
+    """Real HTTP download, exact manifest/case binding; never runs target code."""
+    receipt = load(work / "IMPORT_RECEIPT.json")
+    data = get_bytes(api, receipt["export"]["download_url"])
+    if hashlib.sha256(data).hexdigest() != receipt["exported_zip_sha256"]:
+        raise FactoryError("download bytes differ", "workflow_integrity", 409)
+    with zipfile.ZipFile(io.BytesIO(data)) as z:
+        manifest = json.loads(z.read("HANDOFF_MANIFEST.json"))
+        if manifest["template_digest"] != receipt["digest"]:
+            raise FactoryError("handoff template differs", "workflow_integrity", 409)
+        for name, expected in manifest["entry_sha256"].items():
+            if hashlib.sha256(z.read(name)).hexdigest() != expected:
+                raise FactoryError("handoff file differs", "workflow_integrity", 409)
+        actual = {
+            n.removeprefix("blueprint/"): hashlib.sha256(z.read(n)).hexdigest()
+            for n in z.namelist()
+            if n.startswith("blueprint/") and not n.endswith("/")
+        }
+        if actual != manifest["blueprint_sha256"]:
+            raise FactoryError("blueprint files differ", "workflow_integrity", 409)
+        case = json.loads(z.read("blueprint/inputs/shared-case-record.json"))
+        if {k: case[k] for k in ("case_id", "revision", "digest")} != receipt[
+            "case_ref"
+        ]:
+            raise FactoryError("download case differs", "workflow_integrity", 409)
+    proof = {
+        "artifact_id": receipt["artifact_id"],
+        "sha256": hashlib.sha256(data).hexdigest(),
+        "template_digest": receipt["digest"],
+        "case_ref": receipt["case_ref"],
+        "entries": manifest["entry_sha256"],
+        "blueprint_files": len(actual),
+        "application_runtime": "not_run",
+    }
+    fixed_json(work / "DOWNLOAD_VERIFIED.json", proof)
+    return proof
+
+
+def get_workflow_gate(service):
+    gate = WorkflowService(service.store, service.campaign_id).gate(PLAN_ID)
+    if gate is None:
+        raise FactoryError(
+            "workflow validation gate not registered", "workflow_gate", 409
         )
+    return gate
+
+
+def replay_completed_workflow(root, service, item, api):
+    """Adopt only fully verified historical delivery; no model invocation."""
+    work = ROOT / item["workdir"]
+    wf = WorkflowService(service.store, service.campaign_id)
+    production = load(work / "MODEL_PRODUCTION.json")
+    verify_full_production(
+        work,
+        production,
+        load(work / "AUTHOR_INPUT.json"),
+        load(work / "source-snapshot.json"),
+    )
+    verify_download(work, api)
+    output = {
+        "existing_template": work / "REQUEST.json",
+        "scenario": selected_scenario(work),
+        "case_research": work / "source-snapshot.json",
+        "generation": work / "AUTHOR_INPUT.json",
+        "deterministic_check": work / "SOURCE_INPUT.json",
+        "independent_review": work
+        / load(work / "STAGE_PATHS.json")["blueprint-spec-review-aux"]
+        / "RESULT.json",
+        "freeze_import": work / "IMPORT_RECEIPT.json",
+        "download": work / "DOWNLOAD_VERIFIED.json",
+    }
+    existing = next(
+        (
+            x
+            for x in wf.detail(PLAN_ID, q=item["leaf"], limit=100)["items"]
+            if x["leaf"] == item["leaf"]
+        ),
+        None,
+    )
+    recorded = existing["steps"] if existing else []
+    if recorded and all(x["state"] in {"completed", "reused"} for x in recorded):
+        for row in recorded:
+            wf.begin(
+                PLAN_ID, item["leaf"], row["attempt"], row["step"], row["input_digest"]
+            )
+        return {
+            "leaf": item["leaf"],
+            "artifact_id": item["artifact_id"],
+            "model_calls_added": 0,
+            "historical_adoption": False,
+        }
+    for name in STEPS:
+        wf.begin(
+            PLAN_ID,
+            item["leaf"],
+            work.name,
+            name,
+            digest({"verified_historical_production": production, "step": name}),
+        )
+        wf.complete(
+            PLAN_ID,
+            item["leaf"],
+            work.name,
+            name,
+            workflow_outputs(output[name]),
+            reused=True,
+        )
+    return {
+        "leaf": item["leaf"],
+        "artifact_id": item["artifact_id"],
+        "model_calls_added": 0,
+        "historical_adoption": True,
+    }
 
 
 def execute_leaf(root, service, item, api, repair=False):
@@ -888,8 +1043,8 @@ def execute_leaf(root, service, item, api, repair=False):
         previous = leafroot / "attempt-1"
         if repair:
             lineage["parent_failure"] = {
-                "path": str((previous / "FAILURE.json").relative_to(ROOT)),
-                "sha256": sha(previous / "FAILURE.json"),
+                "path": str(latest_failure(previous).relative_to(ROOT)),
+                "sha256": sha(latest_failure(previous)),
             }
         fixed_json(work / "LINEAGE.json", lineage)
         service.update_leaf(
@@ -900,9 +1055,14 @@ def execute_leaf(root, service, item, api, repair=False):
                 "current_attempt": work.name,
                 "first_pass_done": repair,
                 "workdir": str(work.relative_to(ROOT)),
+                "error": None,
+                "failure_stage": None,
+                "failure_code": None,
             },
         )
-        stage = "research"
+        wf = WorkflowService(service.store, service.campaign_id)
+        step = "existing_template"
+        stage = "existing_template"
         try:
             verify_plan(root)
             selected_scenario(work)
@@ -915,6 +1075,117 @@ def execute_leaf(root, service, item, api, repair=False):
                     "profile": profiles.VERSION,
                     "model": MODEL,
                 },
+            )
+            if wf.begin(
+                PLAN_ID,
+                item["leaf"],
+                work.name,
+                step,
+                digest(load(work / "REQUEST.json")),
+            ):
+                prior_catalog = json.loads(
+                    get_bytes(
+                        api, "/api/factory/assisted-templates?leaf=" + item["leaf"]
+                    )
+                )
+                existing = next(
+                    (
+                        x
+                        for x in prior_catalog["items"]
+                        if x["files"].get("development", {}).get("available")
+                        and (
+                            not x.get("production")
+                            or x["production"]["review_status"] == "passed"
+                        )
+                    ),
+                    None,
+                )
+                if existing:
+                    fixed_json(work / "EXISTING_TEMPLATE.json", existing)
+                    # The actual download guard remains authoritative, not a cached status.
+                    existing_data = get_bytes(
+                        api,
+                        "/api/factory/assisted-templates/"
+                        + existing["artifact_id"]
+                        + "/files/development",
+                    )
+                    if (
+                        hashlib.sha256(existing_data).hexdigest()
+                        != existing["files"]["development"]["sha256"]
+                    ):
+                        raise FactoryError(
+                            "existing template download differs",
+                            "workflow_integrity",
+                            409,
+                        )
+                    wf.complete(
+                        PLAN_ID,
+                        item["leaf"],
+                        work.name,
+                        step,
+                        workflow_outputs(work / "EXISTING_TEMPLATE.json"),
+                        reused=True,
+                    )
+                    service.update_leaf(
+                        PLAN_ID,
+                        item["leaf"],
+                        "reused",
+                        {
+                            "artifact_id": existing["artifact_id"],
+                            "first_pass_done": True,
+                            "repair_pending": False,
+                        },
+                    )
+                    return {"leaf": item["leaf"], "state": "reused"}
+                wf.complete(
+                    PLAN_ID,
+                    item["leaf"],
+                    work.name,
+                    step,
+                    workflow_outputs(work / "REQUEST.json"),
+                )
+            if (work / "EXISTING_TEMPLATE.json").exists():
+                row = next(
+                    x
+                    for x in wf.detail(PLAN_ID, q=item["leaf"], limit=100)["items"]
+                    if x["leaf"] == item["leaf"]
+                )
+                if row["steps"][0]["state"] == "reused":
+                    existing = load(work / "EXISTING_TEMPLATE.json")
+                    data = get_bytes(
+                        api,
+                        "/api/factory/assisted-templates/"
+                        + existing["artifact_id"]
+                        + "/files/development",
+                    )
+                    if (
+                        hashlib.sha256(data).hexdigest()
+                        != existing["files"]["development"]["sha256"]
+                    ):
+                        raise FactoryError(
+                            "existing download differs on recovery",
+                            "workflow_integrity",
+                            409,
+                        )
+                    service.update_leaf(
+                        PLAN_ID,
+                        item["leaf"],
+                        "reused",
+                        {
+                            "artifact_id": existing["artifact_id"],
+                            "first_pass_done": True,
+                            "repair_pending": False,
+                        },
+                    )
+                    return {"leaf": item["leaf"], "state": "reused"}
+            step = "scenario"
+            stage = "research"
+            wf.begin(
+                PLAN_ID,
+                item["leaf"],
+                work.name,
+                step,
+                digest(load(work / "REQUEST.json")),
             )
             known = CaseLibrary(service.store).list_cases()
             compatible = [
@@ -1035,6 +1306,16 @@ def execute_leaf(root, service, item, api, repair=False):
                 fixed_json(work / "RESEARCH.json", result)
             research = load(work / "RESEARCH.json")
             profiles.validate_research(research)
+            fixed_json(selected_scenario(work), research["scenario"])
+            wf.complete(
+                PLAN_ID,
+                item["leaf"],
+                work.name,
+                step,
+                workflow_outputs(selected_scenario(work), work / "RESEARCH.json"),
+            )
+            step = "case_research"
+            wf.begin(PLAN_ID, item["leaf"], work.name, step, digest(research))
             stage = "source_pin"
             if not (work / "source-snapshot.json").exists():
                 reused = next(
@@ -1088,6 +1369,15 @@ def execute_leaf(root, service, item, api, repair=False):
                     for name in sorted(snapshot["files"]):
                         z.write(Path(snapshot["local_root"]) / name, name)
                     z.write(work / "source-snapshot.json", "source-snapshot.json")
+            wf.complete(
+                PLAN_ID,
+                item["leaf"],
+                work.name,
+                step,
+                workflow_outputs(
+                    work / "source-snapshot.json", work / "upstream-evidence.zip"
+                ),
+            )
             scene = research["scenario"]
             fixed_json(selected_scenario(work), scene)
             inputs = {
@@ -1114,7 +1404,7 @@ def execute_leaf(root, service, item, api, repair=False):
                 raise ValueError("source inventory differs")
             prompt = profiles.AUTHOR
             if repair:
-                feedback = load(previous / "FAILURE.json")
+                feedback = load(latest_failure(previous))
                 reviewfile = (
                     previous
                     / load(previous / "STAGE_PATHS.json").get(
@@ -1134,26 +1424,72 @@ def execute_leaf(root, service, item, api, repair=False):
                 if parent_author.exists():
                     shutil.copyfile(parent_author, materials / "PARENT_CANDIDATE.json")
                 inputs["revision"] = {
-                    "parent_failure_sha256": sha(previous / "FAILURE.json"),
+                    "parent_failure_sha256": sha(latest_failure(previous)),
                     "feedback": feedback,
                     "scope": "Fix existing core violations only; preserve fixed scenario, sources and delivery profile.",
                 }
                 prompt += "\nThis is ONE content revision. Read source/PARENT_CANDIDATE.json when supplied. Fix all concrete feedback together; do not expand scope. Return the complete revised template JSON."
+            step = "generation"
             stage = "generation"
-            generated = stage_call(
-                root,
-                service,
-                item,
-                work,
-                "blueprint-generate-aux",
-                inputs,
-                prompt,
-                "production",
-                materials,
-                lane="repair" if repair else "first",
+            if wf.begin(PLAN_ID, item["leaf"], work.name, step, digest(inputs)):
+                generated = stage_call(
+                    root,
+                    service,
+                    item,
+                    work,
+                    "blueprint-generate-aux",
+                    inputs,
+                    prompt,
+                    "production",
+                    materials,
+                    lane="repair" if repair else "first",
+                )
+            else:
+                generated = load(
+                    work
+                    / load(work / "STAGE_PATHS.json")["blueprint-generate-aux"]
+                    / "RESULT.json"
+                )
+            paths = load(work / "STAGE_PATHS.json")
+            wf.complete(
+                PLAN_ID,
+                item["leaf"],
+                work.name,
+                step,
+                workflow_outputs(
+                    work / paths["blueprint-generate-aux"] / "RESULT.json"
+                ),
             )
-            authored, files = profiles.validate_author(generated, snapshot, inputs)
+            step = "deterministic_check"
+            wf.begin(
+                PLAN_ID,
+                item["leaf"],
+                work.name,
+                step,
+                digest({"generated": generated, "source": inputs}),
+            )
+            try:
+                authored, files = profiles.validate_author(generated, snapshot, inputs)
+            except (ValueError, KeyError, TypeError, SyntaxError) as invalid:
+                raise FactoryError(str(invalid), "auxiliary_content", 409) from invalid
             fixed_json(work / "SOURCE_INPUT.json", inputs)
+            fixed_json(work / "AUTHOR_INPUT.json", authored)
+            for name, content in files.items():
+                p = work / "acceptance" / name
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_text(content)
+            wf.complete(
+                PLAN_ID,
+                item["leaf"],
+                work.name,
+                step,
+                workflow_outputs(
+                    work / "SOURCE_INPUT.json",
+                    work / "AUTHOR_INPUT.json",
+                    *[work / "acceptance" / name for name in files],
+                ),
+            )
+            step = "independent_review"
             stage = "independent_review"
             rm = work / "review-materials"
             candidate = rm / "candidate"
@@ -1174,22 +1510,29 @@ def execute_leaf(root, service, item, api, repair=False):
                 "checks": list(profiles.CHECK_NAMES),
                 "read_views": readable_candidate(candidate, authored),
             }
-            review = stage_call(
-                root,
-                service,
-                item,
-                work,
-                "blueprint-spec-review-aux",
-                review_input,
-                profiles.REVIEW,
-                "review",
-                rm,
-                lane="repair" if repair else "first",
-                validator=lambda value, target: (
-                    profiles.validate_review_envelope(value, identity),
-                    validate_read_coverage(target, authored),
-                ),
-            )
+            if wf.begin(PLAN_ID, item["leaf"], work.name, step, identity):
+                review = stage_call(
+                    root,
+                    service,
+                    item,
+                    work,
+                    "blueprint-spec-review-aux",
+                    review_input,
+                    profiles.REVIEW,
+                    "review",
+                    rm,
+                    lane="repair" if repair else "first",
+                    validator=lambda value, target: (
+                        profiles.validate_review_envelope(value, identity),
+                        validate_read_coverage(target, authored),
+                    ),
+                )
+            else:
+                review = load(
+                    work
+                    / load(work / "STAGE_PATHS.json")["blueprint-spec-review-aux"]
+                    / "RESULT.json"
+                )
             paths = load(work / "STAGE_PATHS.json")
             rd = work / paths["blueprint-spec-review-aux"]
             validate_read_coverage(rd, authored)
@@ -1208,12 +1551,28 @@ def execute_leaf(root, service, item, api, repair=False):
                 author_summary["session_id"],
                 review_summary["session_id"],
             )
-            validate_review(
-                review,
-                identity,
-                author_summary["session_id"],
-                review_summary["session_id"],
-                len(authored["observations"]),
+            try:
+                validate_review(
+                    review,
+                    identity,
+                    author_summary["session_id"],
+                    review_summary["session_id"],
+                    len(authored["observations"]),
+                )
+            except ValueError as invalid:
+                if review.get("verdict") == "needs_changes":
+                    raise FactoryError(
+                        str(invalid), "auxiliary_content", 409
+                    ) from invalid
+                raise
+            wf.complete(
+                PLAN_ID,
+                item["leaf"],
+                work.name,
+                step,
+                workflow_outputs(
+                    rd / "RESULT.json", work / "ACCEPTED_RESEARCH_RECEIPT.json"
+                ),
             )
             fixed_json(work / "AUTHOR_INPUT.json", authored)
             for name, content in files.items():
@@ -1245,7 +1604,9 @@ def execute_leaf(root, service, item, api, repair=False):
                 "strict_acceptance": False,
             }
             fixed_json(work / "MODEL_PRODUCTION.json", production)
+            step = "freeze_import"
             stage = "freeze_import_export"
+            wf.begin(PLAN_ID, item["leaf"], work.name, step, digest(production))
             output_item = {
                 "key": work.name,
                 "leaf": item["leaf"],
@@ -1273,6 +1634,40 @@ def execute_leaf(root, service, item, api, repair=False):
                 register_catalog(
                     {**output_item, "key": item["leaf"] + "-" + work.name}, work
                 )
+            wf.complete(
+                PLAN_ID,
+                item["leaf"],
+                work.name,
+                step,
+                workflow_outputs(
+                    work / "IMPORT_RECEIPT.json",
+                    work / "packages/template-snapshot.zip",
+                    work / "atlas-development-package.zip",
+                    url=result.get("url"),
+                ),
+            )
+            step = "download"
+            stage = "verify_download"
+            wf.begin(
+                PLAN_ID,
+                item["leaf"],
+                work.name,
+                step,
+                digest(load(work / "IMPORT_RECEIPT.json")),
+            )
+            verify_download(work, api)
+            wf.complete(
+                PLAN_ID,
+                item["leaf"],
+                work.name,
+                step,
+                workflow_outputs(
+                    work / "DOWNLOAD_VERIFIED.json",
+                    url="/api/factory/assisted-templates/"
+                    + result["artifact_id"]
+                    + "/files/development",
+                ),
+            )
             service.update_leaf(
                 PLAN_ID,
                 item["leaf"],
@@ -1296,7 +1691,16 @@ def execute_leaf(root, service, item, api, repair=False):
                 )
             return {"leaf": item["leaf"], "state": "ready_not_run"}
         except Exception as error:
-            code = getattr(error, "code", "content_or_host_validation")
+            code = getattr(error, "code", "workflow_host_error")
+            if stage == "source_pin" and isinstance(
+                error, (ValueError, urllib.error.HTTPError)
+            ):
+                code = "source_unavailable"
+            if (
+                stage in {"freeze_import_export", "verify_download"}
+                and code not in GLOBAL_CODES
+            ):
+                code = "workflow_host_error"
             if isinstance(error, urllib.error.URLError) and (
                 not isinstance(error, urllib.error.HTTPError)
                 or error.code in {403, 429, 500, 502, 503, 504}
@@ -1320,6 +1724,17 @@ def execute_leaf(root, service, item, api, repair=False):
             }
             if not (work / "FAILURE.json").exists():
                 atomic_json(work / "FAILURE.json", failure)
+            atomic_json(work / "LATEST_FAILURE.json", failure)
+            atomic_json(work / "failures" / (str(time.time_ns()) + ".json"), failure)
+            wf.fail(
+                PLAN_ID,
+                item["leaf"],
+                work.name,
+                step,
+                code,
+                str(error),
+                paused=code in GLOBAL_CODES,
+            )
             if code in GLOBAL_CODES:
                 service.update_leaf(
                     PLAN_ID,
@@ -1335,14 +1750,7 @@ def execute_leaf(root, service, item, api, repair=False):
                 if service.control_state(PLAN_ID) != "stopped":
                     service.control(PLAN_ID, "pause", code + ": " + str(error))
                 return {"leaf": item["leaf"], "state": "paused", "code": code}
-            content = (
-                stage == "generation" and code == "content_or_host_validation"
-            ) or (
-                stage == "independent_review"
-                and code == "content_or_host_validation"
-                and "review" in locals()
-                and review.get("verdict") == "needs_changes"
-            )
+            content = code == "auxiliary_content"
             state = (
                 "needs_revision"
                 if content
@@ -1437,6 +1845,11 @@ def run(root, api):
                     ]
                     if not pending:
                         break
+                    gate = get_workflow_gate(service)
+                    if gate and gate["mode"] == "validation":
+                        pending = [x for x in pending if x["leaf"] in gate["leaves"]]
+                        if not pending:
+                            break
                     batch = pending[:20]
                     atomic_json(
                         root / "CURRENT_BATCH.json",
@@ -1484,6 +1897,14 @@ def run(root, api):
                             progress(root, service)
                     progress(root, service)
             state = progress(root, service)
+            gate = get_workflow_gate(service)
+            if state["status"] == "running" and gate and gate["mode"] == "validation":
+                service.control(
+                    PLAN_ID,
+                    "pause",
+                    "workflow_validation_complete: evaluate actual results before opening full dispatch",
+                )
+                state = progress(root, service)
             if state["status"] == "running" and not any(
                 x["state"] in {"pending", "running", "paused"}
                 or x.get("repair_pending")
@@ -1620,10 +2041,15 @@ def main():
             "pause",
             "resume",
             "stop",
+            "workflow-validation",
+            "workflow-replay",
+            "workflow-open-full",
         ],
     )
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
     parser.add_argument("--api", default="http://127.0.0.1:5199")
+    parser.add_argument("--leaf", action="append", default=[])
+    parser.add_argument("--evidence", type=Path)
     args = parser.parse_args()
     root = args.root.resolve()
     if args.command == "freeze":
@@ -1641,6 +2067,35 @@ def main():
         request, _ = verify_plan(root)
         result = service.register(request)
         atomic_json(root / "REGISTRATION.json", result)
+    elif args.command == "workflow-validation":
+        verify_plan(root)
+        result = WorkflowService(store).set_validation(PLAN_ID, args.leaf)
+        atomic_json(root / "WORKFLOW_VALIDATION_GATE.json", result)
+    elif args.command == "workflow-replay":
+        verify_plan(root)
+        selected = [
+            x for x in service.status(PLAN_ID)["items"] if x["leaf"] in args.leaf
+        ]
+        if len(selected) != len(args.leaf) or any(
+            x["state"] != "ready_not_run" for x in selected
+        ):
+            raise ValueError("replay requires exact already completed plan leaves")
+        before = service.status(PLAN_ID)["new_calls"]
+        result = {
+            "results": [
+                replay_completed_workflow(root, service, x, args.api) for x in selected
+            ]
+        }
+        result["new_calls"] = service.status(PLAN_ID)["new_calls"] - before
+        atomic_json(root / "WORKFLOW_REPLAY_RECEIPT.json", result)
+    elif args.command == "workflow-open-full":
+        verify_plan(root)
+        if not args.evidence:
+            raise ValueError("actual workflow validation evidence required")
+        workflow = WorkflowService(store)
+        workflow.set_gate_passed(PLAN_ID, load(args.evidence))
+        result = workflow.open_full(PLAN_ID)
+        atomic_json(root / "WORKFLOW_FULL_GATE_RECEIPT.json", result)
     elif args.command == "run":
         return supervised_run(root, args.api)
     elif args.command == "start":

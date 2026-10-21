@@ -19,6 +19,9 @@ def ensure_schema(con):
     con.execute(
         "CREATE TABLE IF NOT EXISTS auxiliary_full_event (id INTEGER PRIMARY KEY,plan_id TEXT NOT NULL,slug TEXT,kind TEXT NOT NULL,body TEXT NOT NULL,created REAL NOT NULL)"
     )
+    con.execute(
+        "CREATE TABLE IF NOT EXISTS auxiliary_workflow_gate(plan_id TEXT PRIMARY KEY,body TEXT NOT NULL,updated REAL NOT NULL)"
+    )
 
 
 class FullAuxiliaryService:
@@ -375,9 +378,30 @@ class FullAuxiliaryService:
                 if prior
                 else scope["host_source_sha256"]
             )
-            if request["previous_host_sha256"] != previous or set(
-                request["new_host_sha256"]
-            ) != set(previous):
+            added = set(request["new_host_sha256"]) - set(previous)
+            workflow_module = "application-atlas-production-pack/template_factory/auxiliary_workflow.py"
+            if (
+                workflow_module in request["new_host_sha256"]
+                and request.get("workflow_gate_required") is not True
+            ):
+                raise FactoryError(
+                    "workflow host activation requires validation gate",
+                    "workflow_gate",
+                    409,
+                )
+            if (
+                request["previous_host_sha256"] != previous
+                or not set(previous) <= set(request["new_host_sha256"])
+                or any(
+                    not name.startswith(
+                        (
+                            "application-atlas-production-pack/template_factory/",
+                            "examples/assisted-trials/",
+                        )
+                    )
+                    for name in added
+                )
+            ):
                 raise FactoryError(
                     "host correction lineage differs", "full_plan_binding", 409
                 )
@@ -578,6 +602,27 @@ def full_reservation_locked(
             "full plan cannot fund application/runtime calls", "full_plan_binding", 409
         )
     slug = identity[len(plan_id) + 1 :]
+    gate_row = con.execute(
+        "SELECT body FROM auxiliary_workflow_gate WHERE plan_id=?", (plan_id,)
+    ).fetchone()
+    host_revision = con.execute(
+        "SELECT body FROM auxiliary_full_event WHERE plan_id=? AND kind='host_revision' ORDER BY id DESC LIMIT 1",
+        (plan_id,),
+    ).fetchone()
+    if (
+        host_revision
+        and json.loads(host_revision[0])["request"].get("workflow_gate_required")
+        and not gate_row
+    ):
+        raise FactoryError(
+            "workflow validation gate not registered", "full_plan_paused", 409
+        )
+    if gate_row:
+        gate = json.loads(gate_row[0])
+        if gate["mode"] == "validation" and slug not in gate["leaves"]:
+            raise FactoryError(
+                "leaf outside fixed workflow validation gate", "full_plan_paused", 409
+            )
     leaf = con.execute(
         "SELECT state FROM auxiliary_full_leaf WHERE plan_id=? AND slug=?",
         (plan_id, slug),

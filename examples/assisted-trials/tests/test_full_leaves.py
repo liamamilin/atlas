@@ -316,13 +316,23 @@ class FullLeafTests(unittest.TestCase):
         invalid = FactoryError(
             "OpenCode CLI failed: {'type': 'provider.invalid-output', "
             "'message': 'OpenAI Chat stream ended without finish_reason', 'status': 200}",
-            "cli_failed", 409,
+            "cli_failed",
+            409,
         )
         self.assertFalse(runner.shared_provider_fault(invalid))
-        for message in ("provider balance insufficient 402", "network connection failed", "rate limit 429", "service unavailable 503"):
-            self.assertTrue(runner.shared_provider_fault(FactoryError(message, "cli_failed", 503)))
+        for message in (
+            "provider balance insufficient 402",
+            "network connection failed",
+            "rate limit 429",
+            "service unavailable 503",
+        ):
+            self.assertTrue(
+                runner.shared_provider_fault(FactoryError(message, "cli_failed", 503))
+            )
 
-    def test_old_shared_marker_cannot_turn_leaf_protocol_failure_into_global_pause(self):
+    def test_old_shared_marker_cannot_turn_leaf_protocol_failure_into_global_pause(
+        self,
+    ):
         root = self.root / "plan"
         work = root / "items/leaf-0/attempt-1"
         path = work / "calls/blueprint-spec-review-aux"
@@ -330,17 +340,36 @@ class FullLeafTests(unittest.TestCase):
         (self.pack / "applications").mkdir()
         (self.pack / "applications/leaf-0.md").write_text("leaf")
         item = {"leaf": "leaf-0", "leaf_sha256": hashlib.sha256(b"leaf").hexdigest()}
-        message = "provider.invalid-output: OpenAI Chat stream ended without finish_reason"
+        message = (
+            "provider.invalid-output: OpenAI Chat stream ended without finish_reason"
+        )
         marker = {"error": message, "code": "cli_failed"}
         (path / "SHARED_PROVIDER_FAILURE.json").write_text(json.dumps(marker))
-        (path / "cli-summary.json").write_text(json.dumps({"failure_code": "cli_failed"}))
-        (work / "PROTOCOL_SUCCESSOR.json").write_text(json.dumps({"parent_path": "calls/blueprint-generate-aux"}))
-        with patch.object(runner, "checkpoint", side_effect=FactoryError(message, "cli_failed", 409)) as call:
+        (path / "cli-summary.json").write_text(
+            json.dumps({"failure_code": "cli_failed"})
+        )
+        (work / "PROTOCOL_SUCCESSOR.json").write_text(
+            json.dumps({"parent_path": "calls/blueprint-generate-aux"})
+        )
+        with patch.object(
+            runner, "checkpoint", side_effect=FactoryError(message, "cli_failed", 409)
+        ) as call:
             with self.assertRaises(FactoryError) as raised:
-                runner.stage_call(root, self.service, item, work, "blueprint-spec-review-aux", {}, "prompt", "review")
+                runner.stage_call(
+                    root,
+                    self.service,
+                    item,
+                    work,
+                    "blueprint-spec-review-aux",
+                    {},
+                    "prompt",
+                    "review",
+                )
         self.assertEqual(raised.exception.code, "budget_retry_limit")
         self.assertEqual(call.call_count, 1)  # replay failure only; no successor CLI
-        self.assertEqual(json.loads((path / "SHARED_PROVIDER_FAILURE.json").read_text()), marker)
+        self.assertEqual(
+            json.loads((path / "SHARED_PROVIDER_FAILURE.json").read_text()), marker
+        )
 
     def test_registration_rejects_authorization_or_scope_drift(self):
         self.register()
@@ -511,6 +540,52 @@ class FullLeafTests(unittest.TestCase):
         with self.assertRaisesRegex(FactoryError, "frozen authorization"):
             self.service.register_host_revision(bad)
 
+    def test_activated_workflow_requires_gate_in_reservation_transaction(self):
+        from template_factory.auxiliary_workflow import WorkflowService
+
+        module = (
+            "application-atlas-production-pack/template_factory/auxiliary_workflow.py"
+        )
+        path = self.root / module
+        path.parent.mkdir(parents=True)
+        path.write_text("fixture workflow")
+        self.scope["host_source_sha256"] = {module: runner.sha(path)}
+        (self.root / "scope.json").write_text(json.dumps(self.scope))
+        self.request["scope"]["sha256"] = runner.sha(self.root / "scope.json")
+        self.register()
+        self.service.control("p", "pause")
+        ci = self.root / "ci.json"
+        ci.write_text(
+            json.dumps(
+                {"sha": "fixture", "status": "completed", "conclusion": "success"}
+            )
+        )
+        req = {
+            "schema": "atlas.full-leaf-host-revision.v1",
+            "full_plan_id": "p",
+            "reason": "fixture gated workflow",
+            "scope_sha256": self.request["scope"]["sha256"],
+            "authorization_sha256": self.request["authorization"]["sha256"],
+            "previous_host_sha256": self.scope["host_source_sha256"],
+            "new_host_sha256": self.scope["host_source_sha256"],
+            "code_sha": "fixture",
+            "ci_proof": {"path": "ci.json", "sha256": runner.sha(ci)},
+            "workflow_gate_required": True,
+        }
+        self.service.register_host_revision(req)
+        self.service.control("p", "resume")
+        with self.assertRaisesRegex(FactoryError, "gate not registered"):
+            self.reserve()
+        self.assertEqual(self.service.status("p")["new_calls"], 0)
+        self.service.control("p", "pause")
+        WorkflowService(self.store, "fixture").set_validation("p", ["leaf-0"])
+        self.service.control("p", "resume")
+        with self.assertRaisesRegex(FactoryError, "outside fixed workflow"):
+            self.reserve("leaf-1")
+        reservation = self.reserve()
+        self.service.ledger.finish(reservation["id"], "completed")
+        self.assertEqual(self.service.status("p")["new_calls"], 1)
+
     def test_missing_summary_recovery_requires_zero_charged_reservations_and_no_output(
         self,
     ):
@@ -624,6 +699,7 @@ class FullLeafTests(unittest.TestCase):
             patch.object(runner, "verify_plan", return_value=({}, {})),
             patch.object(runner, "host", return_value=(None, service)),
             patch.object(runner, "execute_leaf", leaf),
+            patch.object(runner, "get_workflow_gate", return_value=None),
             patch.object(runner, "atomic_json", write),
         ):
             runner.run(folder, "fixture://no-model")

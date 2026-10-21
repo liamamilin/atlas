@@ -68,6 +68,23 @@ def dispatch(method, path, query="", body=None, store=None):
     store = store or get_store()
     body = body or {}
     route = path.removeprefix("/api/factory").strip("/")
+    if method == "GET" and route == "auxiliary-workflows":
+        from .auxiliary_workflow import WorkflowService
+        return WorkflowService(store).list_plans(), 200
+    workflow_output = re.fullmatch(r"auxiliary-workflows/([A-Za-z0-9._-]+)/leaves/([A-Za-z0-9._-]+)/steps/([A-Za-z0-9._-]+)/([A-Za-z_]+)/outputs/(\d+)", route)
+    if method == "GET" and workflow_output:
+        from .auxiliary_workflow import WorkflowService
+        return WorkflowService(store).output_file(*workflow_output.groups()[:4], int(workflow_output[5]))
+    workflow_match = re.fullmatch(r"auxiliary-workflows/([A-Za-z0-9._-]+)", route)
+    if method == "GET" and workflow_match:
+        from .auxiliary_workflow import WorkflowService
+        params = parse_qs(query)
+        try:
+            offset = int(params.get("offset", ["0"])[0])
+            limit = int(params.get("limit", ["20"])[0])
+        except ValueError as error:
+            raise FactoryError("invalid workflow pagination") from error
+        return WorkflowService(store).detail(workflow_match[1], offset, limit, params.get("state", [""])[0], params.get("q", [""])[0]), 200
     if method == "GET" and route == "assisted-templates":
         from .assisted_catalog import catalog
         return catalog(store, {k: v[0] for k, v in parse_qs(query).items()}), 200
