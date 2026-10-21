@@ -85,18 +85,23 @@ def _entry(store, row, artifacts):
     supplement = row.get("production_review")
     if production and supplement:
         production["review_status"] = "incomplete_materials"
-        if supplement.get("status") == "passed":
+        if supplement.get("status") in {"passed", "needs_changes"}:
             try:
                 receipt = json.loads(asset_path(store, supplement["file"]).read_text())
-                if (receipt.get("schema") == "atlas.auxiliary-readable-review.v1"
+                if (receipt.get("schema") in {"atlas.auxiliary-readable-review.v1", "atlas.auxiliary-readable-review-failure.v1"}
                         and receipt.get("artifact_id") == artifact["id"]
                         and receipt.get("artifact_digest") == artifact["digest"]
                         and receipt.get("review_input_digest") == production["review_input_digest"]
-                        and receipt.get("status") == "passed"):
-                    production["review_status"] = "passed"
-                    production["review_session_id"] = receipt["session_id"]
+                        and receipt.get("status") == supplement["status"]):
+                    production["review_status"] = receipt["status"]
+                    if receipt.get("session_id"):
+                        production["review_session_id"] = receipt["session_id"]
+                    if receipt.get("issues"):
+                        production["issues"] = receipt["issues"]
             except (FactoryError, OSError, ValueError, KeyError):
                 pass  # A missing/changed receipt cannot advertise complete review.
+        if production["review_status"] != "passed":
+            files["development"] = {"available": False, "reason": "assisted_review_needs_changes"}
     return {"artifact_id": artifact["id"], "digest": artifact["digest"], "key": row["key"], "production": production,
             "title": artifact["manifest"]["name"], "leaf": artifact["leaf"],
             "scenario": {k: scenario[k] for k in ("id", "revision", "name", "audience", "objective", "workflow")},
@@ -145,7 +150,9 @@ def download(store, artifact_id, kind):
     row = next((r for r in registry(store) if r["artifact_id"] == artifact_id), None)
     if not row:
         raise FactoryError("assisted template not found", "not_found", 404)
-    _entry(store, row, {a["id"]: a for a in store.artifacts()})
+    entry = _entry(store, row, {a["id"]: a for a in store.artifacts()})
+    if kind == "development" and entry.get("production") and entry["production"]["review_status"] != "passed":
+        raise FactoryError("assisted template review requires changes", "assisted_review_needs_changes", 409)
     if kind not in row["files"]:
         raise FactoryError("no application delivery for this template", "not_found", 404)
     path = asset_path(store, row["files"][kind])

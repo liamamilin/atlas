@@ -1,0 +1,99 @@
+{
+  "sessions": [
+    {
+      "stage": "blueprint-generate-aux",
+      "session_id": "ses_ea26cd13fffee0sFO6GH0pswNK",
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "observed_model": null,
+      "reservation_id": "bud_bbb38c4a3bdb4e05bdbe7af61a0034d8",
+      "duration_seconds": 243.32,
+      "tokens_reported": {
+        "input": 17647,
+        "output": 799,
+        "reasoning": 42,
+        "cache_read": 10752,
+        "cache_write": 0
+      },
+      "cli_reported_cost": 0.0031839060000000002,
+      "cost_currency": null,
+      "completed_tools": {
+        "read": 9
+      },
+      "delivery_status": "delivered"
+    },
+    {
+      "stage": "blueprint-spec-review-aux",
+      "session_id": "ses_ea2691a44ffemHBxOiocBq67ci",
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "observed_model": null,
+      "reservation_id": "bud_fefde5a0e4b34cc1897c6e6a7c238387",
+      "duration_seconds": 357.98,
+      "tokens_reported": {
+        "input": 44944,
+        "output": 3766,
+        "reasoning": 27630,
+        "cache_read": 239872,
+        "cache_write": 0
+      },
+      "cli_reported_cost": 0.026298816,
+      "cost_currency": null,
+      "completed_tools": {
+        "read": 20
+      },
+      "delivery_status": "delivered"
+    },
+    {
+      "stage": "blueprint-spec-review-aux-readable",
+      "session_id": "ses_ea25dc067ffet66RUyN7KDZBJK",
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "observed_model": null,
+      "reservation_id": "bud_236c25f314f94d8fb85199dc3ff015ec",
+      "duration_seconds": 342.3,
+      "tokens_reported": {
+        "input": 40337,
+        "output": 2437,
+        "reasoning": 36692,
+        "cache_read": 131200,
+        "cache_write": 0
+      },
+      "cli_reported_cost": 0.029921549999999998,
+      "cost_currency": null,
+      "completed_tools": {
+        "read": 28
+      },
+      "delivery_status": "delivered"
+    },
+    {
+      "stage": "discovery",
+      "session_id": "ses_ea26f370bffeBZoOhIu3UU3u5d",
+      "requested_model": "opencode-go/deepseek-v4.1-flash",
+      "observed_model": null,
+      "reservation_id": "bud_7b6119cf47254625b4bee8ade549b533",
+      "duration_seconds": 141.8,
+      "tokens_reported": {
+        "input": 103739,
+        "output": 1622,
+        "reasoning": 2870,
+        "cache_read": 299264,
+        "cache_write": 0
+      },
+      "cli_reported_cost": 0.019153842,
+      "cost_currency": null,
+      "completed_tools": {
+        "read": 2,
+        "websearch": 9,
+        "webfetch": 13
+      },
+      "delivery_status": "delivered"
+    }
+  ],
+  "actual_cli_sessions": 4,
+  "token_sums": {
+    "input": 206667,
+    "output": 8624,
+    "reasoning": 67234,
+    "cache_read": 681088,
+    "cache_write": 0
+  },
+  "cost_note": "CLI reported cost has no currency and is not a provider bill. Input/cache are separate reported fields; sums are accumulated per model step, not peak context length."
+}

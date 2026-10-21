@@ -1,0 +1,111 @@
+{
+  "items": 17,
+  "previous_usable_templates": 16,
+  "previous_package_downloads_sha256_passed": 16,
+  "new_candidate": {
+    "artifact_id": "tpl_d610fc5e84644092b880b30fbf691c29",
+    "digest": "4b466e1fe6fd062b170341287addae5a3cc8eb92d0dbfbe87ca4c6c9f45438f8",
+    "key": "home-care",
+    "production": {
+      "mode": "opencode-cli-go",
+      "model": "opencode-go/deepseek-v4.1-flash",
+      "review_status": "needs_changes",
+      "review_input_digest": "db3971272dea6ada40ff45ca8d4871f9ca719189917eecace4561122e1b7c20a",
+      "issues": [
+        "acceptance/probe.py:157-164 (A01): before is captured before the successful PATCH at line 161, but line 164 compares the home after the empty PATCH to before. The home object includes updated_at (VIEW_ARCH.md:32; probe.py:155); a correct PATCH that refreshes updated_at makes the final zero-write check fail even though the empty patch wrote nothing. Use the patched response from line 161 as the baseline or compare only id/name/address.",
+        "acceptance/probe.py:171-175 (A01) tests blank name and unknown home but never an invalid category; AUTHOR_INPUT.json acceptance[1] and REVIEW_SCOPE.md:35-37 explicitly require invalid categories to return 422 or 404 with no equipment row, and VIEW_ARCH.md:38 defines the enum. Add an invalid-category POST and assert 422 plus an unchanged equipment list.",
+        "VIEW_ARCH.md:11 and :77 state a backdated completion never moves next due backwards, but max(previous last_completed_on, completed_on) + interval_days has no floor when last_completed_on is NULL (a plan created with only first_due_on or no anchor). Example: first_due_on 2026-03-01, interval 30, completed_on 2025-01-01 gives due_on 2025-01-31, earlier than 2026-03-01. probe.py:230,245-247 only backdates after a prior completion. Define an anchor floor or narrow the invariant and add the missing case.",
+        "acceptance/probe.py:197-210 (A02) checks selected task IDs and statuses but never the exact set or count; AUTHOR_INPUT.json acceptance[2] and REVIEW_SCOPE.md:40-42 require exact overdue/due/upcoming sets at the boundaries. Extra tasks, for example from earlier cases in the same disposable database, would not fail the probe. Assert the full ID set or count, preferably with a fresh equipment-filtered query.",
+        "acceptance/probe.py:311-313 (A05) only checks token presence (label, form, button, aria-live, and words); VIEW_ARCH.md:158-162 also requires label for/id linkage, fieldset/legend, caption, th scope=col, role=status, and lang=en. Token presence does not verify the stated accessibility rules; add structural assertions."
+      ]
+    },
+    "title": "Home Care Ledger",
+    "leaf": "home-maintenance-application",
+    "scenario": {
+      "id": "scn_802f9221599a491781b3dafa4f27a033",
+      "revision": 1,
+      "name": "Home Care Ledger",
+      "audience": "A single homeowner keeping care records for their own home on a local machine, with no accounts, notifications, or multi-property operation.",
+      "objective": "Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.",
+      "workflow": [
+        "Start the local server against a disposable data directory; initialize the SQLite schema on first start.",
+        "Create the single home with POST /api/home, then add equipment records with POST /api/equipment anchored by home_id.",
+        "Create care plans with POST /api/plans using interval_days and an optional equipment anchor.",
+        "Query GET /api/tasks/due with an explicit as_of and horizon_days to see overdue, due, and upcoming work.",
+        "Record a completion and note with POST /api/plans/{id}/completions; the same transaction updates the plan next due date.",
+        "Read GET /api/plans/{id}/completions or GET /api/history filtered by home_id and equipment_id.",
+        "Use GET / for the basic accessible single-page UI; all actions remain available through the documented JSON API."
+      ]
+    },
+    "capabilities": [
+      "Home and equipment anchor",
+      "Every-N-day plan and due queue",
+      "Completion and next-due rollover",
+      "Anchored care history",
+      "Accessible localhost UI"
+    ],
+    "limits": [
+      "辅助试产，非严格G1/T08。",
+      "Upstream status: not_run. The repository was read as evidence only; no build, test, server, TUI, or database was executed, so no upstream behavior is runtime-verified.",
+      "Runtime verification is not_run for the target too. The probe and architecture are authored artifacts; no server was started and no acceptance case was executed in this task.",
+      "Single-home and single-user by design; no multi-property, accounts, authentication, sharing, or remote access.",
+      "No notifications, email, SMS, push, calendar sync, or background scheduler; due work is pull-based through the API and UI.",
+      "No costs, vendors, receipts, photos, manuals, warranties, projects, quotes, incidents, documents, or LLM features; those upstream surfaces are intentionally out of scope.",
+      "Every-N-days recurrence differs from upstream interval months; no compatibility with upstream databases, APIs, or schema is claimed.",
+      "No delete, undo, archive, or restore endpoints; completion history is append-only and test records remain until the disposable data directory is discarded.",
+      "Validation is strict and date-only; natural-language dates and timezone conversion are unsupported. Server local date can differ by one day from a client in another timezone.",
+      "The UI is a minimal single-page client, not a polished product; no internationalization, offline cache, or mobile-native behavior.",
+      "Schema v1 has no migration path. Changing entities later needs an explicit migration or a new disposable database.",
+      "Concurrency is sized for one user; SQLite WAL and busy_timeout reduce but do not eliminate lock contention.",
+      "User decision points: confirm one-home scope, the default due date of creation day when no anchor is provided, latest-completion rollover for backdated entries, strict date-only input, and the absence of delete and defect-tracking features.",
+      "Restart durability may be described as an operator stop and start step in README; it was not run and is not claimed as verified."
+    ],
+    "cases": [
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "revision": 1,
+        "digest": "f42187b6993942a959c4ca954c82e14d45472e9c1793cd908851311b7f4b28aa",
+        "app_id": "app:repo:de476a278e635014bdacdeeb",
+        "sources": [
+          {
+            "repository": "https://github.com/micasa-dev/micasa",
+            "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+            "license_files": [
+              "LICENSE"
+            ]
+          }
+        ]
+      }
+    ],
+    "runtime": {
+      "status": "not_run",
+      "scope": "OpenCode Go 研究与生成、独立会话静态审阅；应用尚未开发或运行。",
+      "kind": "辅助模型生产，非严格工厂验收",
+      "online_status": "not_checked",
+      "strict_acceptance": false
+    },
+    "files": {
+      "development": {
+        "available": false,
+        "reason": "assisted_review_needs_changes"
+      }
+    },
+    "strict_status": {
+      "publication": "withdrawn",
+      "acceptances": []
+    }
+  },
+  "blocked_response": {
+    "error": "assisted template review requires changes",
+    "code": "assisted_review_needs_changes"
+  },
+  "shared_case_readable": true,
+  "standard_package_contract_and_case_consistent": true,
+  "withdrawn_new_development_export": {
+    "status": 409,
+    "response": {
+      "error": "withdrawn assisted template requires revision before development",
+      "code": "assisted_review_needs_changes"
+    }
+  }
+}

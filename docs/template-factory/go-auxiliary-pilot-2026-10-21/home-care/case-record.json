@@ -1,0 +1,614 @@
+{
+  "app_id": "app:repo:de476a278e635014bdacdeeb",
+  "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+  "created_at": "2026-10-21T08:38:10.461028+00:00",
+  "created_task_id": "auxiliary-go-pilot-2026-10-21-home-care",
+  "digest": "f42187b6993942a959c4ca954c82e14d45472e9c1793cd908851311b7f4b28aa",
+  "evidence_digest": "4a646f28a7be8f40356a9f3e5d85ae1b885ad64c4ea3f45f14f7f0834c275ed7",
+  "research": {
+    "input_digest": "54fc3ad43d12e43d79c075d7c44a73e00f3bcd6695f2e16177f46f70900de8fa",
+    "scope": "Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.",
+    "summary": "OpenCode Go静态研究与独立会话审阅；Target design inference, not an upstream claim: the pinned research makes the home the subject and requires recurring work plus a durable completion record. Upstream code corroborates that abstract shape but realizes recurrence in months, keeps one house profile, links maintenance to an optional appliance, and does not show an explicit appliance-to-home foreign key in the selected files. The target therefore makes the home anchor explicit through home_id on equipment and plans, uses every-N-days recurrence from the scenario, and keeps only the home, equipment, plan, completion, and history slice. It does not copy upstream code, schema, or UI. Upstream status: not_run; no upstream build, test, server, TUI, or database was started.",
+    "task_id": "auxiliary-go-pilot-2026-10-21-home-care",
+    "unknowns": [
+      "upstream not_run",
+      "auxiliary independent static review passed; runtime not_run",
+      "Upstream status: not_run. The repository was read as evidence only; no build, test, server, TUI, or database was executed, so no upstream behavior is runtime-verified.",
+      "Runtime verification is not_run for the target too. The probe and architecture are authored artifacts; no server was started and no acceptance case was executed in this task.",
+      "Single-home and single-user by design; no multi-property, accounts, authentication, sharing, or remote access.",
+      "No notifications, email, SMS, push, calendar sync, or background scheduler; due work is pull-based through the API and UI.",
+      "No costs, vendors, receipts, photos, manuals, warranties, projects, quotes, incidents, documents, or LLM features; those upstream surfaces are intentionally out of scope.",
+      "Every-N-days recurrence differs from upstream interval months; no compatibility with upstream databases, APIs, or schema is claimed.",
+      "No delete, undo, archive, or restore endpoints; completion history is append-only and test records remain until the disposable data directory is discarded.",
+      "Validation is strict and date-only; natural-language dates and timezone conversion are unsupported. Server local date can differ by one day from a client in another timezone.",
+      "The UI is a minimal single-page client, not a polished product; no internationalization, offline cache, or mobile-native behavior.",
+      "Schema v1 has no migration path. Changing entities later needs an explicit migration or a new disposable database.",
+      "Concurrency is sized for one user; SQLite WAL and busy_timeout reduce but do not eliminate lock contention.",
+      "User decision points: confirm one-home scope, the default due date of creation day when no anchor is provided, latest-completion rollover for backdated entries, strict date-only input, and the absence of delete and defect-tracking features.",
+      "Restart durability may be described as an operator stop and start step in README; it was not run and is not claimed as verified."
+    ]
+  },
+  "research_input_digest": "54fc3ad43d12e43d79c075d7c44a73e00f3bcd6695f2e16177f46f70900de8fa",
+  "revision": 1,
+  "snapshot_ids": [
+    "src_8b5775cbd27085addccfe547"
+  ],
+  "observations": [
+    {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "digest": "9809566dd5e251321437511f214b3b20a7c02c12c10d53d29c0916b565587e90",
+      "evidence_id": "ev_assisted_home_care_1",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "40b5d4f8df78510ec9b05454df1d307ca5eb44ee055328229faa07d0f6e1c348",
+        "material_version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/README.md"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Document claim: micasa describes itself as home maintenance from the terminal, a local tool rather than a hosted multi-tenant service.",
+      "reviews": [
+        {
+          "review_id": "rev_fe3eadf42b2e08ac81dedb08aaece752",
+          "outcome": "accepted",
+          "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "9809566dd5e251321437511f214b3b20a7c02c12c10d53d29c0916b565587e90",
+          "created_at": "2026-10-21T08:38:10.463501+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "digest": "f21531260721fbe381a2878ff6fef4003ecc80355d72a20c125e842ef0287439",
+      "evidence_id": "ev_assisted_home_care_10",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "file_digest": "0cc864c8ff483237fbd128d417f6d2bf2a9ff66fdcbf2719c97cb239c6a65f4a",
+        "line_end": 73,
+        "line_start": 59,
+        "path": "internal/data/store_servicelog.go"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Code observation: CreateServiceLog runs in a transaction, creates the service log, then syncs the parent maintenance item.",
+      "reviews": [
+        {
+          "review_id": "rev_c04d01fe33a05113714c3cc6a929de9d",
+          "outcome": "accepted",
+          "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "f21531260721fbe381a2878ff6fef4003ecc80355d72a20c125e842ef0287439",
+          "created_at": "2026-10-21T08:38:10.463806+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "digest": "2c760870a0714c28e210714fd44470f1b1ccd19e405d046dd4ecb14ddb54ada1",
+      "evidence_id": "ev_assisted_home_care_11",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "file_digest": "6bb00aeae3903900ef4182e87fb10bbb640980bcde6739e5e252d29b45d8fef4",
+        "line_end": 177,
+        "line_start": 168,
+        "path": "internal/data/validation.go"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Code observation: ComputeNextDue returns an explicit due date when set, otherwise adds interval months to the last service date.",
+      "reviews": [
+        {
+          "review_id": "rev_9499d7cda853c3a3c6a4267e929c1103",
+          "outcome": "accepted",
+          "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "2c760870a0714c28e210714fd44470f1b1ccd19e405d046dd4ecb14ddb54ada1",
+          "created_at": "2026-10-21T08:38:10.464100+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "digest": "661e17c1f55d773d1d7d20095acbe79508ad810c7e5c69249e238a7daed23d7a",
+      "evidence_id": "ev_assisted_home_care_12",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "file_digest": "6bb00aeae3903900ef4182e87fb10bbb640980bcde6739e5e252d29b45d8fef4",
+        "line_end": 192,
+        "line_start": 182,
+        "path": "internal/data/validation.go"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Code observation: AddMonths clamps the day to the target month end, avoiding the Jan 31 plus one month overflow.",
+      "reviews": [
+        {
+          "review_id": "rev_63c6b4c4e7356e9a2c5fea908925d8f5",
+          "outcome": "accepted",
+          "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "661e17c1f55d773d1d7d20095acbe79508ad810c7e5c69249e238a7daed23d7a",
+          "created_at": "2026-10-21T08:38:10.464402+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "digest": "eeba69689960d934cd63e7a419d33481d0ab07ac717d3b9eddf15786a0b72f84",
+      "evidence_id": "ev_assisted_home_care_13",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "file_digest": "6bb00aeae3903900ef4182e87fb10bbb640980bcde6739e5e252d29b45d8fef4",
+        "line_end": 153,
+        "line_start": 98,
+        "path": "internal/data/validation.go"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Code observation: interval parsing accepts years and months, not days.",
+      "reviews": [
+        {
+          "review_id": "rev_0557699a3946f52fb1255585c7483d28",
+          "outcome": "accepted",
+          "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "eeba69689960d934cd63e7a419d33481d0ab07ac717d3b9eddf15786a0b72f84",
+          "created_at": "2026-10-21T08:38:10.464691+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "digest": "6b28eaa4dc727eb6121b61ed5b7f197ae2999f508a91548d1feaa6b5cdc109e7",
+      "evidence_id": "ev_assisted_home_care_14",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "file_digest": "d03ed7b8243f97c6f906a52ba7aad63645a468586092c4584f20437972ffd656",
+        "line_end": 25,
+        "line_start": 12,
+        "path": "internal/data/dashboard.go"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Code observation: scheduled maintenance is defined as interval months greater than zero or an explicit due date.",
+      "reviews": [
+        {
+          "review_id": "rev_3ea172efcae19136d671c0bebe102757",
+          "outcome": "accepted",
+          "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "6b28eaa4dc727eb6121b61ed5b7f197ae2999f508a91548d1feaa6b5cdc109e7",
+          "created_at": "2026-10-21T08:38:10.464969+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "digest": "a2ed374ca1a2964be0580c4e292c775e7fa5a16fbc25e1c7cc2f8f34c6dbbe67",
+      "evidence_id": "ev_assisted_home_care_15",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "40b5d4f8df78510ec9b05454df1d307ca5eb44ee055328229faa07d0f6e1c348",
+        "material_version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/README.md"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Document claim: the upstream is pure Go using SQLite and a terminal UI; this target does not copy or run that implementation.",
+      "reviews": [
+        {
+          "review_id": "rev_514647ef23bfcc5d240ba064b6b43e67",
+          "outcome": "accepted",
+          "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "a2ed374ca1a2964be0580c4e292c775e7fa5a16fbc25e1c7cc2f8f34c6dbbe67",
+          "created_at": "2026-10-21T08:38:10.465234+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "digest": "7139e702ecc22c98f8bce6ec9be02c22ee3d2ede024a301d10e61a4f35998e31",
+      "evidence_id": "ev_assisted_home_care_2",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "40b5d4f8df78510ec9b05454df1d307ca5eb44ee055328229faa07d0f6e1c348",
+        "material_version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/README.md"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Document claim: the upstream advertises schedules, due dates, and full history.",
+      "reviews": [
+        {
+          "review_id": "rev_ba1badc5eda2c33d9a45b4b25c7abb75",
+          "outcome": "accepted",
+          "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "7139e702ecc22c98f8bce6ec9be02c22ee3d2ede024a301d10e61a4f35998e31",
+          "created_at": "2026-10-21T08:38:10.465527+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "digest": "97b3d79a9e033f12443cc7659544bb834cea78bd2a3b71a6398acdca4b252fdd",
+      "evidence_id": "ev_assisted_home_care_3",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "file_digest": "5cd2a997f2efa9fd7d2916446d8173571fba7ee40dfb9703083d266bb6cab000",
+        "line_end": 135,
+        "line_start": 104,
+        "path": "internal/data/models.go"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Code observation: HouseProfile stores address, year built, systems, and other attributes; no explicit multi-home ownership table is observed in the selected files.",
+      "reviews": [
+        {
+          "review_id": "rev_060156ba7dee73d97175bd16e4874b78",
+          "outcome": "accepted",
+          "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "97b3d79a9e033f12443cc7659544bb834cea78bd2a3b71a6398acdca4b252fdd",
+          "created_at": "2026-10-21T08:38:10.465830+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "digest": "faa242cdb098a6d29b0efa0371ec33570fe53b2a2da1cbc3e3e00924148124b9",
+      "evidence_id": "ev_assisted_home_care_4",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "file_digest": "5cd2a997f2efa9fd7d2916446d8173571fba7ee40dfb9703083d266bb6cab000",
+        "line_end": 216,
+        "line_start": 201,
+        "path": "internal/data/models.go"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Code observation: Appliance stores make, model, serial, warranty, and location, with no home_id field observed.",
+      "reviews": [
+        {
+          "review_id": "rev_ec580a82e2e53b9304cedd64d816bc4d",
+          "outcome": "accepted",
+          "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "faa242cdb098a6d29b0efa0371ec33570fe53b2a2da1cbc3e3e00924148124b9",
+          "created_at": "2026-10-21T08:38:10.466114+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "digest": "a5fb4c1dfe304e5086a4a2371d61993eab15d1e64fc8ab358ef8b3ce0eca66e8",
+      "evidence_id": "ev_assisted_home_care_5",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "file_digest": "5cd2a997f2efa9fd7d2916446d8173571fba7ee40dfb9703083d266bb6cab000",
+        "line_end": 237,
+        "line_start": 218,
+        "path": "internal/data/models.go"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Code observation: MaintenanceItem has an optional ApplianceID, category, season, interval months, last serviced date, and due date.",
+      "reviews": [
+        {
+          "review_id": "rev_4e2d36d1f1cc90477d92d24114ac0322",
+          "outcome": "accepted",
+          "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "a5fb4c1dfe304e5086a4a2371d61993eab15d1e64fc8ab358ef8b3ce0eca66e8",
+          "created_at": "2026-10-21T08:38:10.466385+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "digest": "3619cee4e50e610a0915f1ca16fd33717960d747f334c4c5b0578df8a33d926d",
+      "evidence_id": "ev_assisted_home_care_6",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "file_digest": "5cd2a997f2efa9fd7d2916446d8173571fba7ee40dfb9703083d266bb6cab000",
+        "line_end": 274,
+        "line_start": 261,
+        "path": "internal/data/models.go"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Code observation: ServiceLogEntry belongs to a maintenance item and stores serviced_at, optional vendor and cost, notes, and timestamps.",
+      "reviews": [
+        {
+          "review_id": "rev_ed31cd4ca48e6714335f5f638fde25ac",
+          "outcome": "accepted",
+          "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "3619cee4e50e610a0915f1ca16fd33717960d747f334c4c5b0578df8a33d926d",
+          "created_at": "2026-10-21T08:38:10.466662+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "digest": "20bbcd1d9aa0297c77efc8a1960dd3b89e4d36304bc8d5816d26f8029c102eeb",
+      "evidence_id": "ev_assisted_home_care_7",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "file_digest": "e79c86687cc434803229f62571c4b5737eac983a8d1e7d6ef1e32bf15c0bf205",
+        "line_end": 31,
+        "line_start": 22,
+        "path": "internal/data/store_house.go"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Code observation: CreateHouseProfile counts existing profiles and rejects a second row, implementing one house profile.",
+      "reviews": [
+        {
+          "review_id": "rev_80457b107cf5f06742a197a924a5db5a",
+          "outcome": "accepted",
+          "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "20bbcd1d9aa0297c77efc8a1960dd3b89e4d36304bc8d5816d26f8029c102eeb",
+          "created_at": "2026-10-21T08:38:10.466954+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "digest": "47ff87a0e44f8c822d03a9b7db13bdb50f4cb6faa47aa30adc4f97be992f79d7",
+      "evidence_id": "ev_assisted_home_care_8",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "file_digest": "d150cb4ee2bc410a9844768b63a4447c81a8122555c9bcc465b1c54c3a9d2b37",
+        "line_end": 33,
+        "line_start": 24,
+        "path": "internal/data/store_maintenance.go"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Code observation: ListMaintenanceByAppliance filters maintenance items by appliance id, showing an equipment-anchored query path.",
+      "reviews": [
+        {
+          "review_id": "rev_487b3f53ee20f8856a55b01a40e00ee7",
+          "outcome": "accepted",
+          "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "47ff87a0e44f8c822d03a9b7db13bdb50f4cb6faa47aa30adc4f97be992f79d7",
+          "created_at": "2026-10-21T08:38:10.467247+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "digest": "b3f3694fea0f2854b2acc2b4ae6020f01b2e0f784f4469675fe4b5d975dad116",
+      "evidence_id": "ev_assisted_home_care_9",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "file_digest": "0cc864c8ff483237fbd128d417f6d2bf2a9ff66fdcbf2719c97cb239c6a65f4a",
+        "line_end": 30,
+        "line_start": 16,
+        "path": "internal/data/store_servicelog.go"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Code observation: syncLastServiced sets LastServicedAt to the most recent non-deleted serviced_at.",
+      "reviews": [
+        {
+          "review_id": "rev_00ae1641fc4698a666bbaf1613bbabc6",
+          "outcome": "accepted",
+          "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "b3f3694fea0f2854b2acc2b4ae6020f01b2e0f784f4469675fe4b5d975dad116",
+          "created_at": "2026-10-21T08:38:10.467540+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "digest": "fc10e571de4fd29af2d7f8cc4922fe2a76a34779b30aa86d6973d9bb2943b554",
+      "evidence_id": "ev_assisted_home_care_design",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "上游未运行",
+          "辅助静态独审通过，运行未验证",
+          "Upstream status: not_run. The repository was read as evidence only; no build, test, server, TUI, or database was executed, so no upstream behavior is runtime-verified.",
+          "Runtime verification is not_run for the target too. The probe and architecture are authored artifacts; no server was started and no acceptance case was executed in this task.",
+          "Single-home and single-user by design; no multi-property, accounts, authentication, sharing, or remote access.",
+          "No notifications, email, SMS, push, calendar sync, or background scheduler; due work is pull-based through the API and UI.",
+          "No costs, vendors, receipts, photos, manuals, warranties, projects, quotes, incidents, documents, or LLM features; those upstream surfaces are intentionally out of scope.",
+          "Every-N-days recurrence differs from upstream interval months; no compatibility with upstream databases, APIs, or schema is claimed.",
+          "No delete, undo, archive, or restore endpoints; completion history is append-only and test records remain until the disposable data directory is discarded.",
+          "Validation is strict and date-only; natural-language dates and timezone conversion are unsupported. Server local date can differ by one day from a client in another timezone.",
+          "The UI is a minimal single-page client, not a polished product; no internationalization, offline cache, or mobile-native behavior.",
+          "Schema v1 has no migration path. Changing entities later needs an explicit migration or a new disposable database.",
+          "Concurrency is sized for one user; SQLite WAL and busy_timeout reduce but do not eliminate lock contention.",
+          "User decision points: confirm one-home scope, the default due date of creation day when no anchor is provided, latest-completion rollover for backdated entries, strict date-only input, and the absence of delete and defect-tracking features.",
+          "Restart durability may be described as an operator stop and start step in README; it was not run and is not claimed as verified."
+        ],
+        "depends_on": [
+          "ev_assisted_home_care_1",
+          "ev_assisted_home_care_2",
+          "ev_assisted_home_care_3",
+          "ev_assisted_home_care_4",
+          "ev_assisted_home_care_5",
+          "ev_assisted_home_care_6",
+          "ev_assisted_home_care_7",
+          "ev_assisted_home_care_8",
+          "ev_assisted_home_care_9",
+          "ev_assisted_home_care_10",
+          "ev_assisted_home_care_11",
+          "ev_assisted_home_care_12",
+          "ev_assisted_home_care_13",
+          "ev_assisted_home_care_14",
+          "ev_assisted_home_care_15"
+        ],
+        "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Target design inference, not an upstream claim: the pinned research makes the home the subject and requires recurring work plus a durable completion record. Upstream code corroborates that abstract shape but realizes recurrence in months, keeps one house profile, links maintenance to an optional appliance, and does not show an explicit appliance-to-home foreign key in the selected files. The target therefore makes the home anchor explicit through home_id on equipment and plans, uses every-N-days recurrence from the scenario, and keeps only the home, equipment, plan, completion, and history slice. It does not copy upstream code, schema, or UI. Upstream status: not_run; no upstream build, test, server, TUI, or database was started.",
+      "reviews": [
+        {
+          "review_id": "rev_a1991ccf5863462d708df8f9480d0954",
+          "outcome": "accepted",
+          "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "fc10e571de4fd29af2d7f8cc4922fe2a76a34779b30aa86d6973d9bb2943b554",
+          "created_at": "2026-10-21T08:38:10.467814+00:00"
+        }
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "adopted_scope": [
+        "Home and equipment anchor",
+        "Every-N-day plan and due queue",
+        "Completion and next-due rollover",
+        "Anchored care history",
+        "Accessible localhost UI"
+      ],
+      "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+      "case_revision": 1,
+      "evidence_ids": [
+        "ev_assisted_home_care_1",
+        "ev_assisted_home_care_2",
+        "ev_assisted_home_care_3",
+        "ev_assisted_home_care_4",
+        "ev_assisted_home_care_5",
+        "ev_assisted_home_care_6",
+        "ev_assisted_home_care_7",
+        "ev_assisted_home_care_8",
+        "ev_assisted_home_care_9",
+        "ev_assisted_home_care_10",
+        "ev_assisted_home_care_11",
+        "ev_assisted_home_care_12",
+        "ev_assisted_home_care_13",
+        "ev_assisted_home_care_14",
+        "ev_assisted_home_care_15",
+        "ev_assisted_home_care_design"
+      ],
+      "exclusions": [
+        "Upstream status: not_run. The repository was read as evidence only; no build, test, server, TUI, or database was executed, so no upstream behavior is runtime-verified.",
+        "Runtime verification is not_run for the target too. The probe and architecture are authored artifacts; no server was started and no acceptance case was executed in this task.",
+        "Single-home and single-user by design; no multi-property, accounts, authentication, sharing, or remote access.",
+        "No notifications, email, SMS, push, calendar sync, or background scheduler; due work is pull-based through the API and UI.",
+        "No costs, vendors, receipts, photos, manuals, warranties, projects, quotes, incidents, documents, or LLM features; those upstream surfaces are intentionally out of scope.",
+        "Every-N-days recurrence differs from upstream interval months; no compatibility with upstream databases, APIs, or schema is claimed.",
+        "No delete, undo, archive, or restore endpoints; completion history is append-only and test records remain until the disposable data directory is discarded.",
+        "Validation is strict and date-only; natural-language dates and timezone conversion are unsupported. Server local date can differ by one day from a client in another timezone.",
+        "The UI is a minimal single-page client, not a polished product; no internationalization, offline cache, or mobile-native behavior.",
+        "Schema v1 has no migration path. Changing entities later needs an explicit migration or a new disposable database.",
+        "Concurrency is sized for one user; SQLite WAL and busy_timeout reduce but do not eliminate lock contention.",
+        "User decision points: confirm one-home scope, the default due date of creation day when no anchor is provided, latest-completion rollover for backdated entries, strict date-only input, and the absence of delete and defect-tracking features.",
+        "Restart durability may be described as an operator stop and start step in README; it was not run and is not claimed as verified."
+      ],
+      "reason": "Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.",
+      "scenario_id": "scn_802f9221599a491781b3dafa4f27a033",
+      "scenario_revision": 1,
+      "workflow_support": []
+    }
+  ],
+  "source_snapshots": [
+    {
+      "archive_sha256": null,
+      "collected_at": "2026-10-21T08:27:57.872919+00:00",
+      "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ],
+      "file_manifest_digest": "6e6d457845ca87b3f83ebc8869427ac2e6f4e0e9a6878b61899bfd1c5f62687c",
+      "files": {
+        "LICENSE": "837f9e6758e4d3313dc19beaa4638522f22c781c9a27d32ff56b473e7094eccc",
+        "README.md": "40b5d4f8df78510ec9b05454df1d307ca5eb44ee055328229faa07d0f6e1c348",
+        "internal/data/dashboard.go": "d03ed7b8243f97c6f906a52ba7aad63645a468586092c4584f20437972ffd656",
+        "internal/data/models.go": "5cd2a997f2efa9fd7d2916446d8173571fba7ee40dfb9703083d266bb6cab000",
+        "internal/data/store_house.go": "e79c86687cc434803229f62571c4b5737eac983a8d1e7d6ef1e32bf15c0bf205",
+        "internal/data/store_maintenance.go": "d150cb4ee2bc410a9844768b63a4447c81a8122555c9bcc465b1c54c3a9d2b37",
+        "internal/data/store_servicelog.go": "0cc864c8ff483237fbd128d417f6d2bf2a9ff66fdcbf2719c97cb239c6a65f4a",
+        "internal/data/validation.go": "6bb00aeae3903900ef4182e87fb10bbb640980bcde6739e5e252d29b45d8fef4"
+      },
+      "license": {
+        "notice_hashes": {
+          "LICENSE": "837f9e6758e4d3313dc19beaa4638522f22c781c9a27d32ff56b473e7094eccc"
+        },
+        "spdx_id": "Apache-2.0",
+        "status": "located"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license_uncertainties": [
+        "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+      ],
+      "repo_id": null,
+      "repository": "https://github.com/micasa-dev/micasa",
+      "snapshot_id": "src_8b5775cbd27085addccfe547",
+      "strategy_version": "go-auxiliary-selected-files-v1"
+    }
+  ]
+}

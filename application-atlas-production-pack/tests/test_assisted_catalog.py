@@ -120,6 +120,10 @@ class AssistedCatalogTests(unittest.TestCase):
             self.assertEqual(self.get()["items"][0]["production"]["review_status"], "passed")
             self.file.write_text("changed")
             self.assertEqual(self.get()["items"][0]["production"]["review_status"], "incomplete_materials")
+            self.assertFalse(self.get()["items"][0]["files"]["development"]["available"])
+            with self.assertRaises(FactoryError) as caught:
+                dispatch("GET", f"/api/factory/assisted-templates/{value['id']}/files/development", store=self.store)
+            self.assertEqual(caught.exception.code, "assisted_review_needs_changes")
 
     def test_artifact_scene_identity_is_projected_without_rewriting_frozen_data(self):
         item = self.get()["items"][0]
@@ -149,3 +153,13 @@ class AssistedCatalogTests(unittest.TestCase):
             dispatch("GET", f"/api/factory/assisted-templates/{self.artifact['id']}/files/source", store=self.store)
         path, _, _ = dispatch("GET", f"/api/factory/assisted-templates/{self.artifact['id']}/files/development", store=self.store)
         self.assertEqual(path.read_bytes(), self.file.read_bytes())
+
+    def test_withdrawn_auxiliary_draft_cannot_export_a_new_development_package(self):
+        self.store.artifact_action(self.artifact["id"], {"action": "withdraw", "expected_digest": self.artifact["digest"],
+                                                       "review": "Complete-material review requires revision"})
+        with self.assertRaises(FactoryError) as caught:
+            dispatch("POST", f"/api/factory/artifacts/{self.artifact['id']}/development-package", body={
+                "expected_digest": self.artifact["digest"], "project_name": "blocked", "phase": "P0"}, store=self.store)
+        self.assertEqual(caught.exception.code, "assisted_review_needs_changes")
+        details, _ = dispatch("GET", f"/api/factory/artifacts/{self.artifact['id']}/blueprint", store=self.store)
+        self.assertEqual(details["artifact_id"], self.artifact["id"])

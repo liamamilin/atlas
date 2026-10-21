@@ -8,7 +8,8 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from produce_with_opencode import (CHECKS, MODEL, checkpoint, fixed_json, safe_file,
-                                  readable_candidate, validate_generation, validate_review, validate_read_coverage)
+                                  readable_candidate, validate_generation, validate_review, validate_read_coverage,
+                                  verify_production)
 from produce_batch import authored_definition
 
 
@@ -108,6 +109,11 @@ class ProducerTests(unittest.TestCase):
         for name in ("../outside", "/absolute", "a/../b", "a//b", "a\\b", ""):
             with self.assertRaises(ValueError):
                 safe_file(name)
+
+    def test_failed_latest_review_cannot_be_bypassed_by_the_legacy_batch_entry(self):
+        fixed_json(self.root / "SUPPLEMENTAL_FAILURE.json", {"status": "needs_changes"})
+        with self.assertRaisesRegex(ValueError, "do not register/re-export as usable"):
+            verify_production(self.root, {}, {}, {})
 
     def test_previous_ten_authored_definitions_remain_identical(self):
         root = Path(__file__).resolve().parents[3]

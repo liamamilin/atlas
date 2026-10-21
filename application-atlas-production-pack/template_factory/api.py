@@ -221,6 +221,8 @@ def dispatch(method, path, query="", body=None, store=None):
                     "runtime_acceptance": runtime_support(bundle / "source", spec),
                 }, 200
             if method == "POST" and match[2] == "development-package":
+                if value.get("provenance", {}).get("origin") == "assisted-trial" and value["state"] == "withdrawn":
+                    raise FactoryError("withdrawn assisted template requires revision before development", "assisted_review_needs_changes", 409)
                 if body.get("expected_digest") != value["digest"]:
                     raise FactoryError(
                         "artifact version changed", "revision_conflict", 409

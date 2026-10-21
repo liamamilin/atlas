@@ -1,0 +1,22 @@
+{
+ "schema": "atlas.auxiliary-readable-review-failure.v1",
+ "model": "opencode-go/deepseek-v4.1-flash",
+ "campaign_id": "atlas-v1-first-production-2026-10-19",
+ "phase": "auxiliary-go-pilot-2026-10-21",
+ "artifact_id": "tpl_d610fc5e84644092b880b30fbf691c29",
+ "artifact_digest": "4b466e1fe6fd062b170341287addae5a3cc8eb92d0dbfbe87ca4c6c9f45438f8",
+ "review_input_digest": "db3971272dea6ada40ff45ca8d4871f9ca719189917eecace4561122e1b7c20a",
+ "prior_review_digest": "4b1305c4def0c4c61582f6adf9da392e4f75b66fd7e4371bd9bc2a4e12cc94c4",
+ "max_additional_cli_sessions": 1,
+ "status": "needs_changes",
+ "error": "independent review did not pass; retain candidate and findings",
+ "issues": [
+  "acceptance/probe.py:157-164 (A01): before is captured before the successful PATCH at line 161, but line 164 compares the home after the empty PATCH to before. The home object includes updated_at (VIEW_ARCH.md:32; probe.py:155); a correct PATCH that refreshes updated_at makes the final zero-write check fail even though the empty patch wrote nothing. Use the patched response from line 161 as the baseline or compare only id/name/address.",
+  "acceptance/probe.py:171-175 (A01) tests blank name and unknown home but never an invalid category; AUTHOR_INPUT.json acceptance[1] and REVIEW_SCOPE.md:35-37 explicitly require invalid categories to return 422 or 404 with no equipment row, and VIEW_ARCH.md:38 defines the enum. Add an invalid-category POST and assert 422 plus an unchanged equipment list.",
+  "VIEW_ARCH.md:11 and :77 state a backdated completion never moves next due backwards, but max(previous last_completed_on, completed_on) + interval_days has no floor when last_completed_on is NULL (a plan created with only first_due_on or no anchor). Example: first_due_on 2026-03-01, interval 30, completed_on 2025-01-01 gives due_on 2025-01-31, earlier than 2026-03-01. probe.py:230,245-247 only backdates after a prior completion. Define an anchor floor or narrow the invariant and add the missing case.",
+  "acceptance/probe.py:197-210 (A02) checks selected task IDs and statuses but never the exact set or count; AUTHOR_INPUT.json acceptance[2] and REVIEW_SCOPE.md:40-42 require exact overdue/due/upcoming sets at the boundaries. Extra tasks, for example from earlier cases in the same disposable database, would not fail the probe. Assert the full ID set or count, preferably with a fresh equipment-filtered query.",
+  "acceptance/probe.py:311-313 (A05) only checks token presence (label, form, button, aria-live, and words); VIEW_ARCH.md:158-162 also requires label for/id linkage, fieldset/legend, caption, th scope=col, role=status, and lang=en. Token presence does not verify the stated accessibility rules; add structural assertions."
+ ],
+ "result_digest": "a0ea526b9711585d02cd5f529c6eef8f03c98bfd9a790979cd2815d5eebf0430",
+ "frozen_content_unchanged": true
+}

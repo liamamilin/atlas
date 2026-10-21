@@ -1,0 +1,726 @@
+Browser tab: 16, Title: "应用图谱 · Application Atlas", URL: "http://127.0.0.1:5188/types/home-maintenance-application".
+1 AXWebArea 应用图谱 · Application Atlas, URL: 127.0.0.1:5188/types/home-maintenance-application
+	2 container root
+		3 container
+			4 link Description: 应用图谱, Value: 127.0.0.1:5188/
+			5 container 主导航
+				6 link Description: 首页, Value: 127.0.0.1:5188/
+				7 link Description: 对话, Value: 127.0.0.1:5188/ask
+				8 link Description: 浏览类型, Value: 127.0.0.1:5188/browse
+				9 link Description: 应用实证, Value: 127.0.0.1:5188/apps
+				10 link Description: 模板工厂, Value: 127.0.0.1:5188/factory
+				11 link Description: 草稿, Value: 127.0.0.1:5188/drafts
+				12 link Description: 使用教程, Value: 127.0.0.1:5188/tutorial
+				13 link Description: 设置, Value: 127.0.0.1:5188/settings
+			14 text 1805 类型 · 数据来自 atlas 语料
+			15 button 切换到英文
+		18 container
+			19 link Description: 类型树, Value: 127.0.0.1:5188/browse
+			20 text / 家庭与家庭管理
+			21 heading 家庭维护应用, Value: 1
+				22 text 家庭维护应用
+			23 text Home Maintenance Application 家居维护应用 家庭保养软件
+			24 heading 基于这个类型开发项目, Value: 2
+				25 text 基于这个类型开发项目
+			26 text 把完整类型正文固定为项目依据，然后进入项目工作区继续分析、生成文档和开发。
+			27 button 加入当前项目并开发
+			28 link Description: 创建新项目, Value: 127.0.0.1:5188/projects?fromType=home-maintenance-application
+			29 heading 应用场景与模板, Value: 2
+				30 text 应用场景与模板
+			31 link Description: 打开模板工厂 →, Value: 127.0.0.1:5188/factory?leaf=home-maintenance-application
+			32 text 场景描述谁用这类软件完成什么事情；确认后的场景可以交给工厂生产模板。
+			33 content list
+				34 container
+					35 link Description: Home Care Ledger, Value: 127.0.0.1:5188/factory?view=artifacts&scenario_id=scn_802f9221599a491781b3dafa4f27a033
+					36 text 草案 Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.
+			37 text 此类型还没有已发布模板。生产完成后，可在工厂审阅并发布。
+			38 container 辅助试用模板目录
+				39 heading 辅助试用模板, Value: 3
+					40 text 辅助试用模板
+				41 text 辅助生产，可阅读和导出使用；与正式发布区分开。
+				42 text 1 份模板 · 0 份有核心运行示例 · 1 份应用未运行
+				43 link Description: 查看此场景的模板: Home Care Ledger · r1, Value: 127.0.0.1:5188/factory?view=artifacts&scenario_id=scn_802f9221599a491781b3dafa4f27a033
+				44 container 辅助模板信息 Home Care Ledger
+					45 text 辅助试用模板 应用未运行
+					46 container
+						47 text 生产模型 :  opencode-go/deepseek-v4.1-flash  ·  完整材料审阅：需要修改，暂不作为可用模板
+					48 button (collapsed) 查看待修订问题, Secondary Actions: Expand
+						49 text 查看待修订问题
+					50 heading Home Care Ledger, Value: 4
+						51 link Description: Home Care Ledger, Value: 127.0.0.1:5188/factory?view=artifacts&artifact_id=tpl_d610fc5e84644092b880b30fbf691c29
+					52 definition list
+						53 container 适用用户
+							54 text 适用用户
+						55 text A single homeowner keeping care records for their own home on a local machine, with no accounts, notifications, or multi-property operation.
+						56 container 解决的问题
+							57 text 解决的问题
+						58 text Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.
+					59 text 核心能力
+					60 content list
+						61 container
+							62 AXListMarker • 
+							63 text Home and equipment anchor
+						64 container
+							65 AXListMarker • 
+							66 text Every-N-day plan and due queue
+						67 container
+							68 AXListMarker • 
+							69 text Completion and next-due rollover
+						70 container
+							71 AXListMarker • 
+							72 text Anchored care history
+						73 container
+							74 AXListMarker • 
+							75 text Accessible localhost UI
+					76 button (collapsed) 适用范围与已知限制, Secondary Actions: Expand
+						77 text 适用范围与已知限制
+					78 text 固定案例来源
+					79 link Description: 回查共享案例 · r1, Value: 127.0.0.1:5188/apps?app_id=app%3Arepo%3Ade476a278e635014bdacdeeb&case_id=case%3Aauxiliary-go-pilot-2026-10-21%3Ahome-care&case_revision=1
+					80 container
+						81 link Description: micasa-dev/micasa @ ca69a88f998d, Value: github.com/micasa-dev/micasa/tree/ca69a88f998dec25c1e285121e428a4f7621dc68
+						82 link Description: LICENSE, Value: github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE
+					83 text OpenCode Go 研究与生成、独立会话静态审阅；应用尚未开发或运行。
+					84 text 辅助运行记录与严格工厂验收分别记录；不代表正式发布、严格 G1/T08 通过或本机服务此刻在线。
+					85 text 标准包暂不可用，请先核对审阅状态或文件版本。
+			86 heading 定义核心 · DEFINING CORE, Value: 2
+				87 text 定义核心 · DEFINING CORE
+			88 text 用户的自有住宅（结构、系统、设备）作为护理对象 └── 定期维护计划（护理项目具有节奏 → 随时间产生的待办工作） └── 维护记录（完成项累积成住宅的护理历史）
+			89 button (collapsed) 英文原文, Secondary Actions: Expand
+				90 text 英文原文
+			91 heading 概览, Value: 2
+				92 text 概览
+			93 container
+				94 text 一款 家庭维护应用程序 帮助房主掌握其自有房屋的周期性维护工作：它管理房屋的护理目标，将其转化为周期性护理工作的计划，并记录已完成的护理。
+			95 text 其核心结构较为简洁：
+			96 text 用户自有房屋（结构、系统、设备）作为护理对象
+└── 周期性维护计划（带周期的护理项目 → 随时间产生的待办工作）
+    └── 维护记录（已完成的工作累积为房屋的护理历史）
+
+			97 text 所有与这些产品常关联的其他功能——提醒通知、内置任务库、包含手册和保修信息的电器数据库、收据、专业建议、奖励——在当前产品中普遍存在，但并非定义性核心部分。钉在家庭手册上的纸质家庭维护计划，即使没有任何这些功能，也满足相同的结构。
+			98 text 当重心转移时——转向家庭的日常劳动（家务）、家庭信息总汇、财产记录或计划性改造工程——该产品便在向一种不同的应用程序类型偏移。
+			99 heading 工作结构, Value: 2
+				100 text 工作结构
+			101 heading 设置房屋及其护理目标, Value: 3
+				102 text 设置房屋及其护理目标
+			103 text 添加房屋（位置、类型、年龄）
+→ 添加其系统和设备（在合作伙伴分发的产品中，房屋
+   可能已从检查报告中预加载）
+→ 应用程序提出适用的护理项目
+→ 调整计划：添加、移除、调整周期
+
+			104 text 房屋记录是锚点：每个任务、电器和收据都属于这所房屋。
+			105 heading 随时间执行计划, Value: 3
+				106 text 随时间执行计划
+			107 text 护理项目按其周期到期
+→ 提醒浮现到期项目（以及逾期项目）
+→ 房主执行工作（自行处理，参照附带的说明进行指导）
+   或将其外包（一些产品推荐或连接专业人员）
+→ 记录完成情况：日期、笔记、照片、费用、收据、服务提供方
+→ 循环重置；计算下一个到期日期
+
+			108 text 这是该类型的交互循环：到期工作 → 已完成工作 → 已记录工作 → 下一个到期工作。多年后，该记录将成为房屋的护理历史——对于保修、转售以及决定何时替换优于维修非常有用。
+			109 heading 查询与决策, Value: 3
+				110 text 查询与决策
+			111 text 打开一个电器或系统记录
+→ 查看其手册、保修和过往服务记录
+→ 决定下一步行动（维护、修理、更换）
+
+			112 heading 核心与常见与可选, Value: 3
+				113 text 核心与常见与可选
+			114 container
+				115 text 定义性核心  —— 没有这些，就不是家庭维护应用程序：
+			116 content list
+				117 container
+					118 AXListMarker • 
+					119 text 用户自有房屋作为锚定的护理对象
+				120 container
+					121 AXListMarker • 
+					122 text 带周期的周期性维护计划
+				123 container
+					124 AXListMarker • 
+					125 text 维护记录 / 护理历史
+			126 container
+				127 text 常见的成熟结构  —— 在大多数当前产品中存在：
+			128 content list
+				129 container
+					130 AXListMarker • 
+					131 text 提醒和通知
+				132 container
+					133 AXListMarker • 
+					134 text 定制计划的家庭概况
+				135 container
+					136 AXListMarker • 
+					137 text 包含手册和保修信息的电器/设备记录
+				138 container
+					139 AXListMarker • 
+					140 text 包含收据和费用的服务历史
+				141 container
+					142 AXListMarker • 
+					143 text 指导内容、家庭共享、日历/季节视图
+			144 container
+				145 text 可选 / 变体  —— 取决于产品和细分市场：
+			146 content list
+				147 container
+					148 AXListMarker • 
+					149 text 专业建议或预约（平台服务部分）
+				150 container
+					151 AXListMarker • 
+					152 text 完成护理的奖励
+				153 container
+					154 AXListMarker • 
+					155 text 基于存储的型号/序列号的召回警报
+				156 container
+					157 AXListMarker • 
+					158 text 可持续性/碳足迹追踪
+				159 container
+					160 AXListMarker • 
+					161 text 多房产支持
+				162 container
+					163 AXListMarker • 
+					164 text 自托管/开源部署
+				165 container
+					166 AXListMarker • 
+					167 text 通过房地产专业人士分发（预装手册）
+			168 heading 重要规则, Value: 2
+				169 text 重要规则
+			170 heading 周期驱动计划, Value: 3
+				171 text 周期驱动计划
+			172 text 护理项目的重复频率（季节性、年度、每月、基于使用量）是产生到期工作的驱动因素。完成一项任务会计算其下一个到期日期；计划是自我维持的。具体的周期选项因产品而异。
+			173 heading 记录是按房屋区分且持久的, Value: 3
+				174 text 记录是按房屋区分且持久的
+			175 text 所有内容——任务、电器、完成记录、收据——都属于房屋记录，并能在多年使用后得以保存。正是这点使得该历史在转售或保修索赔时具有价值。
+			176 heading 计划是定制的，而非通用的, Value: 3
+				177 text 计划是定制的，而非通用的
+			178 text 护理项目是有条件应用的：房屋的位置、气候、年龄和设备决定了哪些任务适用以及何时适用。同一产品会为不同的房屋提出不同的计划。
+			179 heading 提醒是提示，而非强制执行, Value: 3
+				180 text 提醒是提示，而非强制执行
+			181 text 应用程序显示到期工作；完成它仍然是房主的责任。计划不会因被忽视而消失——项目会一直保持到期状态，直到被完成或更改。
+			182 heading 自行处理和雇佣工作都会记录在案, Value: 3
+				183 text 自行处理和雇佣工作都会记录在案
+			184 text 无论是房主自行完成工作还是由专业人员完成，完成情况都会记录在该房屋下。一些产品推荐专业人员；记录始终属于房主。
+			185 heading 变体谱系, Value: 2
+				186 text 变体谱系
+			187 text 该类型的常见实现方式：
+			188 content list
+				189 container
+					190 AXListMarker • 
+					191 text 套件嵌入式  —— 维护提醒和历史作为全屋信息总汇（文档、库存、项目、专业人员）的一项功能，通过房地产专业人士分发
+				192 container
+					193 AXListMarker • 
+					194 text 日志与奖励型  —— 以房屋为锚点的护理日志，包含提示、收据和完成护理的激励措施
+				195 container
+					196 AXListMarker • 
+					197 text 以电器为核心型  —— 计划基于每台设备的记录、手册和保修信息向外构建
+				198 container
+					199 AXListMarker • 
+					200 text 家庭ERP / 自托管型  —— 维护机制（设备、周期性任务、电池管理）内置于开源家庭系统中；记录了其与家务/家庭工具的边界
+				201 container
+					202 AXListMarker • 
+					203 text 专业人员连接型  —— 计划与推荐或可预约的服务专业人员相关联
+				204 container
+					205 AXListMarker • 
+					206 text 多房产型  —— 同一套维护机制应用于多个房屋；大规模使用时会向专业的物业维护系统偏移
+			207 container
+				208 text 只要定义性核心得以保持，变体就仍是 变体 。当重心转移到家庭的日常劳动、全屋信息总汇、财产记录或计划性改造工程时，该产品就属于相邻的类型。
+			209 heading 代表产品（语料记录）, Value: 2
+				210 text 代表产品（语料记录）
+			211 content list
+				212 container
+					213 AXListMarker • 
+					214 text HomeBinder —— 套件嵌入式一端；通过房屋检查员、贷款机构和经纪人分发的手册，包含维护提醒和召回警报
+				215 container
+					216 AXListMarker • 
+					217 text Dwellin —— 日志与奖励型一端；房屋概况、电器记录、维护日志、提示、奖励
+				218 container
+					219 AXListMarker • 
+					220 text Under My Roof —— 苹果生态系统套件模块；维护功能与库存、翻新、文档和保险并列
+				221 container
+					222 AXListMarker • 
+					223 text Grocy —— 家庭ERP / 自托管型一端；设备、家务和电池管理机制，记录了与家务的边界
+			224 text 在研究期间无法联系到专门的维护计划套件一端（HomeZada 类），因此此处有意未作描述。
+			225 heading 与相邻类型的关系, Value: 2
+				226 text 与相邻类型的关系
+			227 heading 相关, Value: 3
+				228 text 相关
+			229 link Description: 维护管理系统(CMMS), Value: 127.0.0.1:5188/types/cmms-maintenance-management
+			230 button (collapsed) 技术信息, Secondary Actions: Expand
+				231 text 技术信息
+			232 text 相同的抽象结构（资产 + 重复预防性任务 + 历史）但用于组织的物理资产；不同的主题、用户和规模。
+			233 link Description: 家居改善规划器, Value: 127.0.0.1:5188/types/home-improvement-planner
+			234 button (collapsed) 技术信息, Secondary Actions: Expand
+				235 text 技术信息
+			236 text 有限、可自由支配的变更工作（翻新、改造）带有预算计划，与对现有系统的重复维护相对；产品将两者捆绑，具有独立的机制。
+			237 link Description: 家庭库存应用, Value: 127.0.0.1:5188/types/home-inventory-application
+			238 button (collapsed) 技术信息, Secondary Actions: Expand
+				239 text 技术信息
+			240 text 记录是关于财产的；设备记录有重叠，但重复工作的机制是维护应用的核心。
+			241 link Description: 家庭管理应用, Value: 127.0.0.1:5188/types/home-management-application
+			242 button (collapsed) 技术信息, Secondary Actions: Expand
+				243 text 技术信息
+			244 text 整个家庭的集成中心是核心；维护机制是文档、库存和财务之外的一个功能。
+			245 link Description: 家庭服务平台, Value: 127.0.0.1:5188/types/home-services-marketplace
+			246 button (collapsed) 技术信息, Secondary Actions: Expand
+				247 text 技术信息
+			248 text 雇佣环节（寻找和预订专业人士）与房主的维护计划和记录相对；互补。
+			249 link Description: 家务管理应用, Value: 127.0.0.1:5188/types/household-chore-application
+			250 button (collapsed) 技术信息, Secondary Actions: Expand
+				251 text 技术信息
+			252 text 也有重复任务，但主题是家庭的常规生活工作（清洁、洗衣），而不是房屋的物理结构。
+			253 link Description: 物业维护管理, Value: 127.0.0.1:5188/types/property-maintenance-management
+			254 button (collapsed) 技术信息, Secondary Actions: Expand
+				255 text 技术信息
+			256 text 专业/房东操作系统（工单、供应商、租户、资产组合）；记录主题和用户不同。
+			257 link Description: 智能家居平台, Value: 127.0.0.1:5188/types/smart-home-platform
+			258 button (collapsed) 技术信息, Secondary Actions: Expand
+				259 text 技术信息
+			260 text 设备控制和自动化与维护规划相对。
+			261 heading 资料来源, Value: 2
+				262 text 资料来源
+			263 container
+				264 text Research date:  2026-09-08
+			265 content list
+				266 container
+					267 AXListMarker • 
+					268 text HomeBinder — 
+					269 link Description: https://www.homebinder.com/, Value: homebinder.com/
+				270 container
+					271 AXListMarker • 
+					272 text Dwellin — 
+					273 link Description: https://dwellin.com/, Value: dwellin.com/
+					274 text  , 
+					275 link Description: https://dwellin.com/app/how-it-works/, Value: dwellin.com/app/how-it-works/
+					276 text  , 
+					277 link Description: https://dwellin.com/app/overview/, Value: dwellin.com/app/overview/
+				278 container
+					279 AXListMarker • 
+					280 text Grocy — 
+					281 link Description: https://grocy.info/, Value: grocy.info/
+				282 container
+					283 AXListMarker • 
+					284 text Under My Roof — via the paired Home Inventory research pass of 2026-09-08 (official surfaces reachable then; direct fetch timed out this pass)
+			285 container
+				286 text “ Sourcing limitation: several prominent products in this category were unreachable from the research environment on 2026-09-08 (HomeZada, BrightNest, HomeSmarts, HomeKeepr returned blocks or empty responses; Centriq and Homebrella domains have been recycled by unrelated businesses; major home-warranty vendors returned blocks). Claims in this document are calibrated accordingly: capabilities observed across multiple sampled products are described as common; capabilities observed in a single product are described as product-specific or optional; the dedicated maintenance-plan pole is under-evidenced and is not characterized. ”
+			287 text Detailed evidence, product-by-product observations, cross-product comparison, and the historical/market-sample check are recorded in the paired Research Notes.
+			288 heading 正式资料阅读器, Value: 2
+				289 text 正式资料阅读器
+			290 text 直接读取语料中的正式 Markdown；收藏时由服务端再次读取并固定来源版本。
+			291 tab (selected, settable, boolean) 类型正文, Value: 1
+			292 tab (selectable, settable, boolean) 研究笔记, Value: 0
+			293 container
+				294 text 阅读范围
+				295 pop up button (collapsed, settable) 阅读范围, Value: 完整文档, Secondary Actions: Expand
+					296 menu
+						297 (selected) 完整文档
+						298 Home Maintenance Application
+						299 　Overview
+						300 　Users & Context
+						301 　Core Model
+						302 　　The Defining Core
+						303 　　Standard Capabilities
+						304 　　One Structure, Many Implementations
+						305 　How It Works
+						306 　　Set up the home and its care targets
+						307 　　Work the plan over time
+						308 　　Look up and decide
+						309 　　Core vs Common vs Optional
+						310 　Interfaces
+						311 　　Home overview
+						312 　　Upkeep plan / task list
+						313 　　Task detail
+						314 　　Appliance / equipment record
+						315 　　Care history / log
+						316 　　Settings / sharing
+						317 　Important Rules / Behaviors
+						318 　　Cadence drives the plan
+						319 　　The record is per-home and durable
+						320 　　The plan is tailored, not universal
+						321 　　Reminders are prompts, not enforcement
+						322 　　DIY and hired work both feed the record
+						323 　Variants
+						324 　Related Application Types
+						325 　Representative Products
+						326 　Sources
+			327 container
+				328 text 258 行  ·  14,478 字符
+				329 button (collapsed) 版本技术信息, Secondary Actions: Expand
+					330 text 版本技术信息
+			331 container source-panel-application
+				332 heading Home Maintenance Application, Value: 1
+					333 text Home Maintenance Application
+				334 heading Overview, Value: 2
+					335 text Overview
+				336 container
+					337 text A  Home Maintenance Application  helps a homeowner stay on top of the recurring upkeep of their own home: it holds the home's care targets, turns them into a schedule of recurring care work, and keeps a record of the care that was done.
+				338 text The defining structure is small:
+				339 text The user's own home (structure, systems, equipment) as the subject of care
+└── Recurring upkeep plan (care items with cadences → due work over time)
+    └── Upkeep record (completions accumulating into the home's care history)
+
+				340 text Everything else commonly associated with these products — reminder notifications, built-in task libraries, appliance databases with manuals and warranties, receipts, pro recommendations, rewards — is widespread in current products but is not part of the defining core. The paper home-maintenance schedule pinned in a house book satisfies the same structure without any of them.
+				341 text When the center of gravity shifts — to the household's routine labor (chores), to the whole-home information binder, to possession records, or to planned change-work — the product is drifting toward a different Application Type.
+				342 heading Users & Context, Value: 2
+					343 text Users & Context
+				344 text The primary user is a homeowner responsible for a residential property — a first-time buyer facing an unfamiliar list of systems to care for, or a long-time owner keeping up a known routine.
+				345 text Typical reasons to open the application:
+				346 content list
+					347 container
+						348 AXListMarker • 
+						349 text see what care is due now or coming up this season
+					350 container
+						351 AXListMarker • 
+						352 text check how to do a care task, or who did it last time and what it cost
+					353 container
+						354 AXListMarker • 
+						355 text record that a task was completed, with photos, receipts, or cost
+					356 container
+						357 AXListMarker • 
+						358 text look up an appliance's manual, warranty, or service history
+				359 text Secondary users are household members who share the care work. The context is consumer and personal: one's own home, used occasionally but over many years, mostly from a phone. Small-scale landlords who track upkeep across multiple rental properties are at the edge of this Type — at scale their needs belong to professional property-maintenance systems.
+				360 heading Core Model, Value: 2
+					361 text Core Model
+				362 heading The Defining Core, Value: 3
+					363 text The Defining Core
+				364 text The user's own home (structure, systems, equipment) as the subject of care
+└── Recurring upkeep plan (care items with cadences → due work over time)
+    └── Upkeep record (completions accumulating into the home's care history)
+
+				365 text Three properties. If any one is removed, the product is no longer recognizable as a home maintenance application:
+				366 content list
+					367 container
+						368 AXListMarker • 
+						369 text The home as the anchored subject of care.  The application holds a persistent record of the user's own home, and its care targets are the home's physical fabric — structure, systems, and equipment (roof, gutters, HVAC, water heater, detectors, appliances). Tasks hang from this record. Without it, the product is a generic to-do or reminder app, or a content site with no home of record.
+					370 container
+						371 AXListMarker • 
+						372 text The recurring upkeep plan.  Care items are held as scheduled, repeating work — seasonal, annual, monthly, or usage-based cadences that generate due work over time. Without the forward-looking plan, the product is a one-off repair log or home journal.
+					373 container
+						374 AXListMarker • 
+						375 text The upkeep record.  Completions are tracked and retained — what was done, when, and often at what cost and by whom — accumulating into the home's care history. Without it, the product is a static checklist or a reminder-only tool that never learns what has actually been done.
+				376 text The three are load-bearing together: a plan without a record is a tips checklist; a record and schedule without the home anchor is a generic recurring to-do list; a home record with history but no plan is a service log.
+				377 heading Standard Capabilities, Value: 3
+					378 text Standard Capabilities
+				379 text Mature products commonly add these. They make the upkeep practical but do not define the Type:
+				380 content list
+					381 container
+						382 AXListMarker • 
+						383 text Reminders and notifications  — due-date prompts delivered through the product's channels (text and email are observed; mobile apps also prompt in-app), so scheduled care actually happens.
+					384 container
+						385 AXListMarker • 
+						386 text Home profile  — the home's characteristics (location, age, systems, appliances) used to tailor which care items apply and when.
+					387 container
+						388 AXListMarker • 
+						389 text Appliance and equipment records  — per-device entries with make/model, manuals, and warranties, anchoring care tasks to specific equipment.
+					390 container
+						391 AXListMarker • 
+						392 text Service history with receipts  — logged completions carrying cost, provider, and documents.
+					393 container
+						394 AXListMarker • 
+						395 text Guidance content  — short how-to instructions attached to care tasks.
+					396 container
+						397 AXListMarker • 
+						398 text Household sharing  — more than one person can see and act on the plan.
+					399 container
+						400 AXListMarker • 
+						401 text Calendar or seasonal views  — the plan rendered as what's due this month or this season.
+				402 heading One Structure, Many Implementations, Value: 3
+					403 text One Structure, Many Implementations
+				404 text The Core Model is written in conceptual terms. Products realize each concept differently:
+				405 text Concept:            The home as subject of care
+Implementations:    a home profile with systems and appliances; a binder pre-loaded
+                    from an inspection report; a property record in a household hub
+
+Concept:            The recurring upkeep plan
+Implementations:    built-in task libraries filtered by home characteristics;
+                    user-defined recurring tasks; prompts generated from the profile
+
+Concept:            The upkeep record
+Implementations:    check-off with timestamps; a log of actions with receipts and
+                    costs; service records attached to appliances
+
+				406 text A reader who has only seen one implementation should still be able to recognize the others from the Core Model.
+				407 heading How It Works, Value: 2
+					408 text How It Works
+				409 heading Set up the home and its care targets, Value: 3
+					410 text Set up the home and its care targets
+				411 text Add the home (location, type, age)
+→ add its systems and equipment (in partner-distributed products the home
+   may arrive pre-loaded from an inspection report)
+→ the application proposes applicable care items
+→ adjust the plan: add, remove, re-cadence
+
+				412 text The home record is the anchor: every task, appliance, and receipt belongs to this home.
+				413 heading Work the plan over time, Value: 3
+					414 text Work the plan over time
+				415 text Care items come due on their cadences
+→ reminders surface what's due (and what's overdue)
+→ the homeowner does the work (DIY, guided by attached instructions)
+   or hires it out (some products recommend or connect to pros)
+→ completion is recorded: date, notes, photos, cost, receipt, provider
+→ the cycle resets; the next due date is computed
+
+				416 text This is the interaction loop of the Type: due work → done work → recorded work → next due work. Over years the record becomes the home's care history — useful for warranties, resale, and deciding when replacement beats repair.
+				417 heading Look up and decide, Value: 3
+					418 text Look up and decide
+				419 text Open an appliance or system record
+→ see its manual, warranty, and past service
+→ decide the next action (maintain, repair, replace)
+
+				420 heading Core vs Common vs Optional, Value: 3
+					421 text Core vs Common vs Optional
+				422 container
+					423 text Defining core  — without these, not a home maintenance application:
+				424 content list
+					425 container
+						426 AXListMarker • 
+						427 text the user's own home as the anchored subject of care
+					428 container
+						429 AXListMarker • 
+						430 text recurring upkeep plan with cadences
+					431 container
+						432 AXListMarker • 
+						433 text upkeep record / care history
+				434 container
+					435 text Common mature structure  — present in most current products:
+				436 content list
+					437 container
+						438 AXListMarker • 
+						439 text reminders and notifications
+					440 container
+						441 AXListMarker • 
+						442 text home profile tailoring the plan
+					443 container
+						444 AXListMarker • 
+						445 text appliance/equipment records with manuals and warranties
+					446 container
+						447 AXListMarker • 
+						448 text service history with receipts and costs
+					449 container
+						450 AXListMarker • 
+						451 text guidance content, household sharing, calendar/seasonal views
+				452 container
+					453 text Optional / variant  — depends on product and segment:
+				454 content list
+					455 container
+						456 AXListMarker • 
+						457 text pro recommendations or booking (marketplace leg)
+					458 container
+						459 AXListMarker • 
+						460 text rewards for completed care
+					461 container
+						462 AXListMarker • 
+						463 text recall alerts from stored make/model numbers
+					464 container
+						465 AXListMarker • 
+						466 text sustainability/carbon tracking
+					467 container
+						468 AXListMarker • 
+						469 text multi-property support
+					470 container
+						471 AXListMarker • 
+						472 text self-hosted/open-source deployment
+					473 container
+						474 AXListMarker • 
+						475 text distribution through real-estate professionals (pre-loaded binders)
+				476 heading Interfaces, Value: 2
+					477 text Interfaces
+				478 text The following surfaces are described in conceptual terms. Exact layouts and names vary by product.
+				479 heading Home overview, Value: 3
+					480 text Home overview
+				481 text The entry surface for the home as a whole.
+				482 content list
+					483 container
+						484 AXListMarker • 
+						485 text the home's profile (location, type, age), its systems and appliances at a glance
+					486 container
+						487 AXListMarker • 
+						488 text what's due now, overdue, and coming up
+					489 container
+						490 AXListMarker • 
+						491 text primary actions: open the plan, add an appliance, record a completion
+				492 heading Upkeep plan / task list, Value: 3
+					493 text Upkeep plan / task list
+				494 text The schedule surface.
+				495 content list
+					496 container
+						497 AXListMarker • 
+						498 text care items grouped by cadence, season, or system; due and overdue states
+					499 container
+						500 AXListMarker • 
+						501 text primary actions: mark done, snooze/reschedule, edit cadence, add a custom task
+				502 heading Task detail, Value: 3
+					503 text Task detail
+				504 text The surface for one care item.
+				505 content list
+					506 container
+						507 AXListMarker • 
+						508 text cadence, last done, next due, instructions, attached photos/receipts
+					509 container
+						510 AXListMarker • 
+						511 text primary actions: complete with notes/cost/receipt, view history, edit
+				512 heading Appliance / equipment record, Value: 3
+					513 text Appliance / equipment record
+				514 text The per-device surface.
+				515 content list
+					516 container
+						517 AXListMarker • 
+						518 text make/model, manual, warranty, purchase details, past service entries
+					519 container
+						520 AXListMarker • 
+						521 text primary actions: log service, attach document, link care tasks
+				522 heading Care history / log, Value: 3
+					523 text Care history / log
+				524 text The record surface.
+				525 content list
+					526 container
+						527 AXListMarker • 
+						528 text chronological completions with dates, costs, providers, documents
+					529 container
+						530 AXListMarker • 
+						531 text primary actions: filter by system or year, export or share (in some products)
+				532 heading Settings / sharing, Value: 3
+					533 text Settings / sharing
+				534 text Household members, notification preferences, and (where offered) pro connections.
+				535 heading Important Rules / Behaviors, Value: 2
+					536 text Important Rules / Behaviors
+				537 heading Cadence drives the plan, Value: 3
+					538 text Cadence drives the plan
+				539 text A care item's recurrence (seasonal, annual, monthly, usage-based) is what generates due work. Completing a task computes its next due date; the plan is self-perpetuating. Exact cadence options vary by product.
+				540 heading The record is per-home and durable, Value: 3
+					541 text The record is per-home and durable
+				542 text Everything — tasks, appliances, completions, receipts — belongs to the home record and survives years of use. This is what makes the history valuable at resale or for warranty claims.
+				543 heading The plan is tailored, not universal, Value: 3
+					544 text The plan is tailored, not universal
+				545 text Care items apply conditionally: a home's location, climate, age, and equipment determine which tasks apply and when. The same product proposes different plans for different homes.
+				546 heading Reminders are prompts, not enforcement, Value: 3
+					547 text Reminders are prompts, not enforcement
+				548 text The application surfaces due work; completing it remains the homeowner's responsibility. The plan does not disappear when ignored — items stay due until done or changed.
+				549 heading DIY and hired work both feed the record, Value: 3
+					550 text DIY and hired work both feed the record
+				551 text Whether the homeowner does the work or a pro does, the completion is recorded against the home. Some products recommend pros; the record remains the homeowner's.
+				552 heading Variants, Value: 2
+					553 text Variants
+				554 text Common realizations of the Type:
+				555 content list
+					556 container
+						557 AXListMarker • 
+						558 text suite-embedded  — maintenance reminders and histories as one capability of a whole-home binder (documents, inventory, projects, pros) distributed through real-estate professionals
+					559 container
+						560 AXListMarker • 
+						561 text log-and-rewards  — a home-anchored care log with prompts, receipts, and incentives for completed care
+					562 container
+						563 AXListMarker • 
+						564 text appliance-anchored  — the plan built outward from per-device records, manuals, and warranties
+					565 container
+						566 AXListMarker • 
+						567 text household-ERP / self-hosted  — upkeep machinery (equipment, recurring tasks, batteries) inside an open-source household system; documents the boundary toward chore/household tools
+					568 container
+						569 AXListMarker • 
+						570 text pro-connected  — the plan joined to recommended or bookable service professionals
+					571 container
+						572 AXListMarker • 
+						573 text multi-property  — the same upkeep machinery across several homes; at scale this drifts toward professional property-maintenance systems
+				574 container
+					575 text A variant remains a  Variant  while the defining core holds. When the center of gravity shifts to the household's routine labor, the whole-home binder, possession records, or planned change-work, the product belongs to the neighboring Type.
+				576 heading Related Application Types, Value: 2
+					577 text Related Application Types
+				578 table
+					579 row
+						580 cell
+							581 text Application Type
+						582 cell
+							583 text Distinction
+					584 row
+						585 cell
+							586 text Household Chore Application
+						587 cell
+							588 text recurring tasks too, but the subject is the household's routine living work (cleaning, laundry), not the home's physical fabric
+					589 row
+						590 cell
+							591 text Home Management Application
+						592 cell
+							593 text the whole-home binder/hub is the center; maintenance machinery is one capability beside documents, inventory, and finance
+					594 row
+						595 cell
+							596 text Home Inventory Application
+						597 cell
+							598 text the record is of possessions; appliance records overlap, but recurring-work machinery is the maintenance app's center
+					599 row
+						600 cell
+							601 text Home Improvement Planner
+						602 cell
+							603 text bounded, discretionary change-work (renovation, remodel) with a money plan, vs recurring preservation of existing systems; products bundle both with separate machinery
+					604 row
+						605 cell
+							606 text Property Maintenance Management
+						607 cell
+							608 text the professional/landlord operations system (work orders, vendors, tenants, portfolios); different subject of record and user
+					609 row
+						610 cell
+							611 text Home Services Marketplace
+						612 cell
+							613 text the hiring leg (finding and booking pros) vs the homeowner's upkeep plan and record; complementary
+					614 row
+						615 cell
+							616 text Home warranty / service-plan products
+						617 cell
+							618 text a service contract (coverage, claims, dispatch) vs the homeowner's own care plan; warranty apps may carry reminders as engagement features
+					619 row
+						620 cell
+							621 text CMMS / EAM
+						622 cell
+							623 text the same abstract shape (assets + recurring preventive tasks + history) but for organizations' physical assets; different subject, user, and scale
+					624 row
+						625 cell
+							626 text Smart Home Platform
+						627 cell
+							628 text device control and automation vs upkeep planning
+				629 text The most important boundary is with the Household Chore Application, because both hold recurring tasks with completion tracking. The structural difference is the task's subject: the home's fabric versus the household's routine.
+				630 heading Representative Products, Value: 2
+					631 text Representative Products
+				632 content list
+					633 container
+						634 AXListMarker • 
+						635 text HomeBinder — suite-embedded pole; binder distributed through home inspectors, lenders, and agents, with maintenance reminders and recall alerts
+					636 container
+						637 AXListMarker • 
+						638 text Dwellin — log-and-rewards pole; home profile, appliance records, maintenance logging, prompts, rewards
+					639 container
+						640 AXListMarker • 
+						641 text Under My Roof — Apple-ecosystem suite module; maintenance beside inventory, renovations, documents, and insurance
+					642 container
+						643 AXListMarker • 
+						644 text Grocy — household-ERP / self-hosted pole; equipment, chores, and batteries machinery documenting the chore boundary
+				645 text The dedicated maintenance-plan suite pole (HomeZada class) could not be reached during research and is intentionally not characterized here.
+				646 heading Sources, Value: 2
+					647 text Sources
+				648 container
+					649 text Research date:  2026-09-08
+				650 content list
+					651 container
+						652 AXListMarker • 
+						653 text HomeBinder — 
+						654 link Description: https://www.homebinder.com/, Value: homebinder.com/
+					655 container
+						656 AXListMarker • 
+						657 text Dwellin — 
+						658 link Description: https://dwellin.com/, Value: dwellin.com/
+						659 text  , 
+						660 link Description: https://dwellin.com/app/how-it-works/, Value: dwellin.com/app/how-it-works/
+						661 text  , 
+						662 link Description: https://dwellin.com/app/overview/, Value: dwellin.com/app/overview/
+					663 container
+						664 AXListMarker • 
+						665 text Grocy — 
+						666 link Description: https://grocy.info/, Value: grocy.info/
+					667 container
+						668 AXListMarker • 
+						669 text Under My Roof — via the paired Home Inventory research pass of 2026-09-08 (official surfaces reachable then; direct fetch timed out this pass)
+				670 container
+					671 text “ Sourcing limitation: several prominent products in this category were unreachable from the research environment on 2026-09-08 (HomeZada, BrightNest, HomeSmarts, HomeKeepr returned blocks or empty responses; Centriq and Homebrella domains have been recycled by unrelated businesses; major home-warranty vendors returned blocks). Claims in this document are calibrated accordingly: capabilities observed across multiple sampled products are described as common; capabilities observed in a single product are described as product-specific or optional; the dedicated maintenance-plan pole is under-evidenced and is not characterized. ”
+				672 text Detailed evidence, product-by-product observations, cross-product comparison, and the historical/market-sample check are recorded in the paired Research Notes.
+			673 container
+				674 text 借鉴点 / 项目备注（可选）
+				675 text entry area (settable) 借鉴点 / 项目备注（可选）
+			676 button 收藏当前范围
+		17 text Application Atlas · 1805 软件应用类型 · 由语料自动生成 · v1.1 方法论
+
+The focused UI element is 1 AXWebArea 应用图谱 · Application Atlas, URL: 127.0.0.1:5188/types/home-maintenance-application

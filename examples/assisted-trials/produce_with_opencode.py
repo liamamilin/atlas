@@ -18,7 +18,7 @@ import shutil
 import sys
 import textwrap
 
-from produce_batch import ROOT, produce, save
+from produce_batch import ROOT, produce, save, request
 from template_factory.budget import BudgetLedger
 from template_factory.cli import CLI
 from template_factory.sources import github_repo, request_bytes, resolve_commit
@@ -262,9 +262,11 @@ def has_long_line_truncation(directory):
     return "line truncated to 2000 chars" in (directory / "events.jsonl").read_text()
 
 
-def verify_production(folder, production, authored, snapshot):
+def verify_production(folder, production, authored, snapshot, *, allow_incomplete_review=False):
     """Recheck real receipts before any case/scene/import write, including reruns."""
     calls = folder / "calls"
+    if not allow_incomplete_review and (folder / "SUPPLEMENTAL_FAILURE.json").exists():
+        raise ValueError("latest complete-material review failed; do not register/re-export as usable")
     leaf_digest = json.loads((folder / "REQUEST.json").read_text())["leaf_sha256"]
     generation = calls / "blueprint-generate-aux"
     review = calls / "blueprint-spec-review-aux"
@@ -304,6 +306,13 @@ def verify_production(folder, production, authored, snapshot):
         raise ValueError("review result differs")
     validate_review(result, expected_digest, sessions["blueprint-generate-aux"],
                     sessions["blueprint-spec-review-aux"], len(authored["observations"]))
+    if not allow_incomplete_review:
+        if "read_views" in json.loads((review / "input.json").read_text()):
+            validate_read_coverage(review, authored)
+        elif has_long_line_truncation(review):
+            receipt_path = folder / "SUPPLEMENTAL_REVIEW.json"
+            if not receipt_path.exists() or json.loads(receipt_path.read_text()).get("review_input_digest") != expected_digest:
+                raise ValueError("complete-readable review required before registration")
 
 
 def register_catalog(item, folder):
@@ -384,7 +393,7 @@ NOT changed. The prior review verdict/transcript is not provided; form your own 
 """
 
 
-def complete_readable_review(manifest_path):
+def complete_readable_review(manifest_path, api="http://127.0.0.1:5199/api/factory/"):
     """One explicitly authorized additional read-only session; no regeneration.
 
     This is a local auxiliary operation using the same budget phase/identity,
@@ -397,14 +406,14 @@ def complete_readable_review(manifest_path):
     imported = json.loads((p / "IMPORT_RECEIPT.json").read_text())
     authored = json.loads((p / "AUTHOR_INPUT.json").read_text())
     snapshot = json.loads((p / "source-snapshot.json").read_text())
-    verify_production(p, production, authored, snapshot)
+    verify_production(p, production, authored, snapshot, allow_incomplete_review=True)
     prior = json.loads((p / "calls/blueprint-spec-review-aux/RESULT.json").read_text())
-    request = json.loads((p / "READABLE_REVIEW_AUTHORIZATION.json").read_text())
+    authorization = json.loads((p / "READABLE_REVIEW_AUTHORIZATION.json").read_text())
     expected = {"model": MODEL, "campaign_id": CAMPAIGN, "phase": manifest["batch_id"],
                 "artifact_id": imported["artifact_id"], "artifact_digest": imported["digest"],
                 "review_input_digest": production["review_input_digest"], "prior_review_digest": digest(prior),
                 "max_additional_cli_sessions": 1}
-    if any(request.get(k) != v for k, v in expected.items()) or request.get("reply") != "允许":
+    if any(authorization.get(k) != v for k, v in expected.items()) or authorization.get("reply") != "允许":
         raise ValueError("supplemental authorization binding differs")
     materials = p / "review-readable-materials"
     if not materials.exists():
@@ -424,9 +433,9 @@ def complete_readable_review(manifest_path):
         summary = json.loads((stage / "cli-summary.json").read_text())
         if summary["session_id"] == production["sessions"]["blueprint-spec-review-aux"]:
             raise ValueError("supplemental review reused the old session")
+        validate_read_coverage(stage, authored)
         validate_review(reviewed, production["review_input_digest"], production["sessions"]["blueprint-generate-aux"],
                         summary["session_id"], len(authored["observations"]))
-        validate_read_coverage(stage, authored)
         receipt = {"schema": "atlas.auxiliary-readable-review.v1", **expected,
                    "status": "passed", "session_id": summary["session_id"],
                    "result_digest": digest(reviewed), "view_hashes": views,
@@ -443,6 +452,34 @@ def complete_readable_review(manifest_path):
                 "sha256": hashlib.sha256((p / "SUPPLEMENTAL_REVIEW.json").read_bytes()).hexdigest()}}
             atomic_json(catalog_path, catalog)
         return receipt
+    except Exception as error:
+        result_path = stage / "RESULT.json"
+        result = json.loads(result_path.read_text()) if result_path.exists() else {}
+        failure = {"schema": "atlas.auxiliary-readable-review-failure.v1", **expected,
+                   "status": "needs_changes" if result.get("verdict") == "needs_changes" else "incomplete_materials",
+                   "error": str(error), "issues": result.get("issues", []),
+                   "result_digest": digest(result), "frozen_content_unchanged": True}
+        fixed_json(p / "SUPPLEMENTAL_FAILURE.json", failure)
+        item.update(state="blocked_review", error=str(error))
+        save(manifest_path, manifest)
+        catalog_path = ROOT / "examples/assisted-trials/CATALOG.json"
+        with catalog_path.with_suffix(".lock").open("a") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            catalog = json.loads(catalog_path.read_text())
+            row = next(r for r in catalog["items"] if r["artifact_id"] == imported["artifact_id"])
+            row["production_review"] = {"status": failure["status"], "file": {
+                "path": (p / "SUPPLEMENTAL_FAILURE.json").relative_to(ROOT).as_posix(),
+                "sha256": hashlib.sha256((p / "SUPPLEMENTAL_FAILURE.json").read_bytes()).hexdigest()}}
+            atomic_json(catalog_path, catalog)
+        # Only this new auxiliary candidate is withdrawn. Original source and
+        # case research survive and can be reused. No strict job/grant changes.
+        artifact = next(a for a in store.artifacts() if a["id"] == imported["artifact_id"])
+        if artifact["state"] != "withdrawn":
+            response = request(api, f"artifacts/{artifact['id']}/review", {
+                "action": "withdraw", "expected_digest": artifact["digest"],
+                "review": "Auxiliary pilot stopped: complete-material independent review needs changes. See SUPPLEMENTAL_FAILURE.json; original freeze and case evidence retained. Not G1/T08."})
+            save(p / "WITHDRAW_RECEIPT.json", response)
+        raise
     finally:
         save(manifest_path.parent / "BUDGET_AFTER.json", ledger.snapshot())
 
@@ -459,6 +496,8 @@ def run(manifest_path, api, cli=None):
         raise ValueError("item key must be one directory")
     p = folder / item["key"]
     p.mkdir(exist_ok=True)
+    if (p / "SUPPLEMENTAL_FAILURE.json").exists():
+        raise ValueError("latest complete-material review failed; retain original draft and create a reviewed revision before import")
     store = FactoryStore(ROOT / "application-atlas-production-pack/atlas/template-factory",
                          ROOT / "application-atlas-production-pack")
     ledger = BudgetLedger(store, campaign_id=CAMPAIGN)
@@ -514,11 +553,18 @@ def run(manifest_path, api, cli=None):
         review_digest = digest({"authored": authored, "acceptance_files": files, "source": source_input})
         review_payload = {**source_input, "input_digest": review_digest, "checks": list(CHECKS)}
         prompt = REVIEW
-        if manifest.get("review_format") == 2:
+        format_path = p / "REVIEW_FORMAT.json"
+        if format_path.exists():
+            review_format = json.loads(format_path.read_text())["version"]
+        else:
+            prior_input = calls / "blueprint-spec-review-aux/input.json"
+            review_format = manifest.get("review_format", (2 if "read_views" in json.loads(prior_input.read_text()) else 1) if prior_input.exists() else 2)
+            fixed_json(format_path, {"version": review_format})
+        if review_format == 2:
             review_payload["read_views"] = readable_candidate(candidate, authored)
             prompt = READABLE_REVIEW
         reviewed = call("blueprint-spec-review-aux", review_payload, prompt, "review", review_materials)
-        if manifest.get("review_format") == 2:
+        if review_format == 2:
             validate_read_coverage(calls / "blueprint-spec-review-aux", authored)
         elif has_long_line_truncation(calls / "blueprint-spec-review-aux"):
             supplement = p / "SUPPLEMENTAL_REVIEW.json"
@@ -576,5 +622,5 @@ if __name__ == "__main__":
     manifest = args.manifest.resolve()
     with (manifest.parent / ".producer.lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        result = complete_readable_review(manifest) if args.complete_readable_review else run(manifest, args.api)
+        result = complete_readable_review(manifest, args.api) if args.complete_readable_review else run(manifest, args.api)
         print(json.dumps(result, ensure_ascii=False, indent=2))

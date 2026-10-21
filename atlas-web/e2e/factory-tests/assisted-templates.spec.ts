@@ -53,6 +53,23 @@ test('Go model static review does not turn an unrun app into a runtime example',
  await expect(info.getByText('Application not run',{exact:true})).toBeVisible();
  await expect(info.getByRole('link',{name:'Download example source'})).toHaveCount(0);
 });
+test('failed complete-material review remains inspectable and is not offered as a usable package',async({page})=>{
+ await setup(page,true);
+ await page.route('**/api/factory/assisted-templates**',r=>r.fulfill({json:{items:[{...item,
+  production:{mode:'opencode-cli-go',model:'opencode-go/deepseek-v4.1-flash',review_status:'needs_changes',review_input_digest:'e'.repeat(64),issues:['Stale update baseline']},
+  runtime:{...item.runtime,status:'not_run',scope:'No app run'},files:{development:{available:false,reason:'assisted_review_needs_changes'}}}],
+  unavailable:[],counts:{total:1,core_verified:0,not_run:1}}}));
+ await page.goto('/types/'+leaf.slug);
+ const info=page.getByRole('region',{name:'Assisted template information '+item.title});
+ await expect(info.getByText(/Complete-material review: changes required/)).toBeVisible();
+ await expect(info.getByRole('link',{name:'Download standard development package'})).toHaveCount(0);
+ await info.getByText('Read revision findings',{exact:true}).click();
+ await expect(info.getByText('Stale update baseline')).toBeVisible();
+ await page.route('**/api/factory/artifacts**',r=>r.fulfill({json:[{...artifact,state:'withdrawn'}]}));
+ await page.goto('/factory?view=artifacts&artifact_id='+item.artifact_id);
+ await expect(page.getByRole('button',{name:'Create development package',exact:true})).toBeDisabled();
+ await expect(page.getByRole('link',{name:'Download frozen bundle',exact:true})).toBeVisible();
+});
 test('assisted catalog outage does not hide formal template or claim zero verified evidence',async({page})=>{
  await setup(page);await page.route('**/api/factory/assisted-templates**',r=>r.fulfill({status:503,json:{error:'unavailable'}}));
  await page.route('**/api/factory/artifacts?**',r=>r.fulfill({json:[{...artifact,id:'formal',provenance:{},state:'published'}]}));

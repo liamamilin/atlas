@@ -1,0 +1,183 @@
+{
+  "archive_path": "artifacts/tpl_d610fc5e84644092b880b30fbf691c29.zip",
+  "archive_sha256": "8fde967ba684455ed1a38c869fb45e5c2a717adfa7964e903a0a84342f16aa9c",
+  "artifact_type": "product-blueprint",
+  "bundle_path": "artifacts/tpl_d610fc5e84644092b880b30fbf691c29",
+  "created_at": "2026-10-21T08:38:10.641616+00:00",
+  "digest": "4b466e1fe6fd062b170341287addae5a3cc8eb92d0dbfbe87ca4c6c9f45438f8",
+  "formal_checks": [
+    {
+      "passed": true,
+      "scope": "Structure, references, stage/case mapping and declared hashes only; no code executed."
+    }
+  ],
+  "job_id": "job_bb48ee4c926a4b07b0d6c33a7024f2d2",
+  "leaf": "home-maintenance-application",
+  "manifest": {
+    "acceptance_count": 5,
+    "artifact_type": "product-blueprint",
+    "decision_count": 2,
+    "description": "Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.",
+    "feature_count": 5,
+    "name": "Home Care Ledger",
+    "phase_count": 1,
+    "phases": [
+      {
+        "id": "P0",
+        "title": "核心可用"
+      }
+    ],
+    "schema": "atlas.product-blueprint.v0",
+    "version": "assisted-trial-0.1.0"
+  },
+  "package_digest": "6b9fbe24a3fbff275969057ce1bb9845180d3b3dd5c1c15f5065ab4614d052bf",
+  "plan": {
+    "phases": [
+      {
+        "acceptance": [
+          "A01",
+          "A02",
+          "A03",
+          "A04",
+          "A05"
+        ],
+        "features": [
+          "F01",
+          "F02",
+          "F03",
+          "F04",
+          "F05"
+        ],
+        "goal": "Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.",
+        "id": "P0",
+        "status": "not implemented",
+        "title": "核心可用"
+      }
+    ],
+    "profile": "product-blueprint"
+  },
+  "provenance": {
+    "imported_snapshot": {
+      "archive_sha256": "e50f8dbc7fb8564a5c9a8df7da68f6023b858ea1a675e39004b3f0fe67fa7232",
+      "digest": "a869427a057907eaf0e3ab1182e8acb2279b47953ea6f399022e30a559ad0cf0",
+      "provenance": {
+        "acceptance_inputs": {
+          "README.md": "cb4e9fe0581b531ac8cd5f3fddec3edb609b8f9075d3cb5efe67123bc344566b",
+          "probe.py": "ea7863a5a765368b93675f2a2d69c3337fd5da25a9a30dd76e2398775e0d180a"
+        },
+        "case_record_sha256": "1c2129d1d0f9b9e3b4cf80c8371046cc9873c1f67caa9c5037e6964c8d4ea386",
+        "case_ref": {
+          "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+          "digest": "f42187b6993942a959c4ca954c82e14d45472e9c1793cd908851311b7f4b28aa",
+          "revision": 1
+        },
+        "definition_digest": "153fa12d8a5e024ea3cfe2c3cc1677a142858eea1bc44fbb3d40578d27886896",
+        "independent_evidence_review": "passed_auxiliary_static",
+        "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+        "model_production": {
+          "application_runtime": "not_run",
+          "campaign_id": "atlas-v1-first-production-2026-10-19",
+          "controlled_opencode_calls_added": 3,
+          "mode": "opencode-cli-go",
+          "model": "opencode-go/deepseek-v4.1-flash",
+          "phase": "auxiliary-go-pilot-2026-10-21",
+          "review_input_digest": "db3971272dea6ada40ff45ca8d4871f9ca719189917eecace4561122e1b7c20a",
+          "review_result_digest": "4b1305c4def0c4c61582f6adf9da392e4f75b66fd7e4371bd9bc2a4e12cc94c4",
+          "review_status": "passed",
+          "schema": "atlas.auxiliary-model-production.v1",
+          "sessions": {
+            "blueprint-generate-aux": "ses_ea26cd13fffee0sFO6GH0pswNK",
+            "blueprint-spec-review-aux": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "discovery": "ses_ea26f370bffeBZoOhIu3UU3u5d"
+          },
+          "source_snapshot_digest": "20e19a3e7792fef299906c1ac73461f086b873acce24247b5434a6165441b9d8",
+          "strict_acceptance": false,
+          "upstream_runtime": "not_run"
+        },
+        "note": "OpenCode CLI + Go source study and separate-session review. No upstream/downstream runtime or strict certification.",
+        "official_publication": false,
+        "origin": "assisted-trial",
+        "scenario": {
+          "acceptance": [
+            "A fresh database has no home; POST /api/home creates exactly one record with id home, and a second POST returns 409 HOME_EXISTS without mutating the stored home.",
+            "POST /api/equipment under the existing home returns 201 and round-trips through list and detail; blank names, invalid categories, and unknown homes return 422 or 404 and add no equipment row.",
+            "POST /api/plans enforces interval_days 1..3650 and mutual exclusion of last_completed_on and first_due_on; GET /api/tasks/due returns exact overdue, due, and upcoming sets at as_of and horizon_days boundaries, while invalid requests write nothing.",
+            "A completion with note inserts one history row and atomically sets due_on to max(previous last_completed_on, completed_on) plus interval_days; leap-day, month-end, year-end, future-date, oversize-note, and unknown-plan failures leave both plan and completions unchanged.",
+            "GET /api/history filters by home and equipment and returns documented fields in descending completion order; invalid filters write nothing; GET / is dependency-free accessible HTML and unknown routes or methods return documented JSON errors."
+          ],
+          "audience": "A single homeowner keeping care records for their own home on a local machine, with no accounts, notifications, or multi-property operation.",
+          "id": "scn_802f9221599a491781b3dafa4f27a033",
+          "leaf": "home-maintenance-application",
+          "leaf_name": "家庭维护应用",
+          "name": "Home Care Ledger",
+          "objective": "Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.",
+          "revision": 1,
+          "status": "draft",
+          "updated_at": "2026-10-21T08:38:10.458340+00:00",
+          "workflow": [
+            "Start the local server against a disposable data directory; initialize the SQLite schema on first start.",
+            "Create the single home with POST /api/home, then add equipment records with POST /api/equipment anchored by home_id.",
+            "Create care plans with POST /api/plans using interval_days and an optional equipment anchor.",
+            "Query GET /api/tasks/due with an explicit as_of and horizon_days to see overdue, due, and upcoming work.",
+            "Record a completion and note with POST /api/plans/{id}/completions; the same transaction updates the plan next due date.",
+            "Read GET /api/plans/{id}/completions or GET /api/history filtered by home_id and equipment_id.",
+            "Use GET / for the basic accessible single-page UI; all actions remain available through the documented JSON API."
+          ]
+        },
+        "upstream_runtime": "not_run"
+      }
+    },
+    "note": "Imported declarations and evidence are not factory acceptance; no code or model executed.",
+    "origin": "assisted-trial",
+    "package_digest": "6b9fbe24a3fbff275969057ce1bb9845180d3b3dd5c1c15f5065ab4614d052bf",
+    "scenario": {
+      "acceptance": [
+        "A fresh database has no home; POST /api/home creates exactly one record with id home, and a second POST returns 409 HOME_EXISTS without mutating the stored home.",
+        "POST /api/equipment under the existing home returns 201 and round-trips through list and detail; blank names, invalid categories, and unknown homes return 422 or 404 and add no equipment row.",
+        "POST /api/plans enforces interval_days 1..3650 and mutual exclusion of last_completed_on and first_due_on; GET /api/tasks/due returns exact overdue, due, and upcoming sets at as_of and horizon_days boundaries, while invalid requests write nothing.",
+        "A completion with note inserts one history row and atomically sets due_on to max(previous last_completed_on, completed_on) plus interval_days; leap-day, month-end, year-end, future-date, oversize-note, and unknown-plan failures leave both plan and completions unchanged.",
+        "GET /api/history filters by home and equipment and returns documented fields in descending completion order; invalid filters write nothing; GET / is dependency-free accessible HTML and unknown routes or methods return documented JSON errors."
+      ],
+      "audience": "A single homeowner keeping care records for their own home on a local machine, with no accounts, notifications, or multi-property operation.",
+      "id": "scn_802f9221599a491781b3dafa4f27a033",
+      "leaf": "home-maintenance-application",
+      "leaf_name": "家庭维护应用",
+      "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+      "name": "Home Care Ledger",
+      "objective": "Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.",
+      "revision": 1,
+      "status": "ready",
+      "updated_at": "2026-10-21T08:38:10.458340+00:00",
+      "workflow": [
+        "Start the local server against a disposable data directory; initialize the SQLite schema on first start.",
+        "Create the single home with POST /api/home, then add equipment records with POST /api/equipment anchored by home_id.",
+        "Create care plans with POST /api/plans using interval_days and an optional equipment anchor.",
+        "Query GET /api/tasks/due with an explicit as_of and horizon_days to see overdue, due, and upcoming work.",
+        "Record a completion and note with POST /api/plans/{id}/completions; the same transaction updates the plan next due date.",
+        "Read GET /api/plans/{id}/completions or GET /api/history filtered by home_id and equipment_id.",
+        "Use GET / for the basic accessible single-page UI; all actions remain available through the documented JSON API."
+      ]
+    },
+    "shared_case_refs": [
+      {
+        "app_id": "app:repo:de476a278e635014bdacdeeb",
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "digest": "f42187b6993942a959c4ca954c82e14d45472e9c1793cd908851311b7f4b28aa",
+        "revision": 1
+      }
+    ]
+  },
+  "reports": [],
+  "scenario_name": "Home Care Ledger",
+  "scenario_revision": 1,
+  "review": {
+    "note": "Auxiliary pilot stopped: complete-material independent review needs changes. See SUPPLEMENTAL_FAILURE.json; original freeze and case evidence retained. Not G1/T08.",
+    "at": "2026-10-21T08:54:15.037781+00:00",
+    "action": "withdraw",
+    "digest": "4b466e1fe6fd062b170341287addae5a3cc8eb92d0dbfbe87ca4c6c9f45438f8"
+  },
+  "id": "tpl_d610fc5e84644092b880b30fbf691c29",
+  "level": "L0",
+  "state": "withdrawn",
+  "publication_status": "withdrawn"
+}

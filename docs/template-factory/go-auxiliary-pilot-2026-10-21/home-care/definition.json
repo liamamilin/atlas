@@ -1,0 +1,502 @@
+{
+  "scenario_record": {
+    "id": "scn_802f9221599a491781b3dafa4f27a033",
+    "leaf": "home-maintenance-application",
+    "leaf_name": "家庭维护应用",
+    "name": "Home Care Ledger",
+    "audience": "A single homeowner keeping care records for their own home on a local machine, with no accounts, notifications, or multi-property operation.",
+    "objective": "Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.",
+    "workflow": [
+      "Start the local server against a disposable data directory; initialize the SQLite schema on first start.",
+      "Create the single home with POST /api/home, then add equipment records with POST /api/equipment anchored by home_id.",
+      "Create care plans with POST /api/plans using interval_days and an optional equipment anchor.",
+      "Query GET /api/tasks/due with an explicit as_of and horizon_days to see overdue, due, and upcoming work.",
+      "Record a completion and note with POST /api/plans/{id}/completions; the same transaction updates the plan next due date.",
+      "Read GET /api/plans/{id}/completions or GET /api/history filtered by home_id and equipment_id.",
+      "Use GET / for the basic accessible single-page UI; all actions remain available through the documented JSON API."
+    ],
+    "acceptance": [
+      "A fresh database has no home; POST /api/home creates exactly one record with id home, and a second POST returns 409 HOME_EXISTS without mutating the stored home.",
+      "POST /api/equipment under the existing home returns 201 and round-trips through list and detail; blank names, invalid categories, and unknown homes return 422 or 404 and add no equipment row.",
+      "POST /api/plans enforces interval_days 1..3650 and mutual exclusion of last_completed_on and first_due_on; GET /api/tasks/due returns exact overdue, due, and upcoming sets at as_of and horizon_days boundaries, while invalid requests write nothing.",
+      "A completion with note inserts one history row and atomically sets due_on to max(previous last_completed_on, completed_on) plus interval_days; leap-day, month-end, year-end, future-date, oversize-note, and unknown-plan failures leave both plan and completions unchanged.",
+      "GET /api/history filters by home and equipment and returns documented fields in descending completion order; invalid filters write nothing; GET / is dependency-free accessible HTML and unknown routes or methods return documented JSON errors."
+    ],
+    "status": "draft",
+    "updated_at": "2026-10-21T08:38:10.458340+00:00",
+    "revision": 1
+  },
+  "case_ref": {
+    "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+    "revision": 1,
+    "digest": "f42187b6993942a959c4ca954c82e14d45472e9c1793cd908851311b7f4b28aa"
+  },
+  "research": {
+    "summary": "同一共享案例记录的静态研究与明确的设计推断；完整定位见inputs/shared-case-record.json。",
+    "sources": [
+      {
+        "id": "S02",
+        "name": "ev_assisted_home_care_1",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/README.md",
+        "version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "facts": "documentation: Document claim: micasa describes itself as home maintenance from the terminal, a local tool rather than a hosted multi-tenant service.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S03",
+        "name": "ev_assisted_home_care_10",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/internal/data/store_servicelog.go",
+        "version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "facts": "code_observation: Code observation: CreateServiceLog runs in a transaction, creates the service log, then syncs the parent maintenance item.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S04",
+        "name": "ev_assisted_home_care_11",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/internal/data/validation.go",
+        "version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "facts": "code_observation: Code observation: ComputeNextDue returns an explicit due date when set, otherwise adds interval months to the last service date.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S05",
+        "name": "ev_assisted_home_care_12",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/internal/data/validation.go",
+        "version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "facts": "code_observation: Code observation: AddMonths clamps the day to the target month end, avoiding the Jan 31 plus one month overflow.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S06",
+        "name": "ev_assisted_home_care_13",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/internal/data/validation.go",
+        "version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "facts": "code_observation: Code observation: interval parsing accepts years and months, not days.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S07",
+        "name": "ev_assisted_home_care_14",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/internal/data/dashboard.go",
+        "version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "facts": "code_observation: Code observation: scheduled maintenance is defined as interval months greater than zero or an explicit due date.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S08",
+        "name": "ev_assisted_home_care_15",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/README.md",
+        "version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "facts": "documentation: Document claim: the upstream is pure Go using SQLite and a terminal UI; this target does not copy or run that implementation.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S09",
+        "name": "ev_assisted_home_care_2",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/README.md",
+        "version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "facts": "documentation: Document claim: the upstream advertises schedules, due dates, and full history.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S10",
+        "name": "ev_assisted_home_care_3",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/internal/data/models.go",
+        "version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "facts": "code_observation: Code observation: HouseProfile stores address, year built, systems, and other attributes; no explicit multi-home ownership table is observed in the selected files.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S11",
+        "name": "ev_assisted_home_care_4",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/internal/data/models.go",
+        "version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "facts": "code_observation: Code observation: Appliance stores make, model, serial, warranty, and location, with no home_id field observed.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S12",
+        "name": "ev_assisted_home_care_5",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/internal/data/models.go",
+        "version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "facts": "code_observation: Code observation: MaintenanceItem has an optional ApplianceID, category, season, interval months, last serviced date, and due date.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S13",
+        "name": "ev_assisted_home_care_6",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/internal/data/models.go",
+        "version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "facts": "code_observation: Code observation: ServiceLogEntry belongs to a maintenance item and stores serviced_at, optional vendor and cost, notes, and timestamps.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S14",
+        "name": "ev_assisted_home_care_7",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/internal/data/store_house.go",
+        "version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "facts": "code_observation: Code observation: CreateHouseProfile counts existing profiles and rejects a second row, implementing one house profile.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S15",
+        "name": "ev_assisted_home_care_8",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/internal/data/store_maintenance.go",
+        "version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "facts": "code_observation: Code observation: ListMaintenanceByAppliance filters maintenance items by appliance id, showing an equipment-anchored query path.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S16",
+        "name": "ev_assisted_home_care_9",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/internal/data/store_servicelog.go",
+        "version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "facts": "code_observation: Code observation: syncLastServiced sets LastServicedAt to the most recent non-deleted serviced_at.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S17",
+        "name": "ev_assisted_home_care_design",
+        "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "license": "Apache-2.0",
+        "license_url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/LICENSE",
+        "facts": "inference: Target design inference, not an upstream claim: the pinned research makes the home the subject and requires recurring work plus a durable completion record. Upstream code corroborates that abstract shape but realizes recurrence in months, keeps one house profile, links maintenance to an optional appliance, and does not show an explicit appliance-to-home foreign key in the selected files. The target therefore makes the home anchor explicit through home_id on equipment and plans, uses every-N-days recurrence from the scenario, and keeps only the home, equipment, plan, completion, and history slice. It does not copy upstream code, schema, or UI. Upstream status: not_run; no upstream build, test, server, TUI, or database was started.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      }
+    ],
+    "gaps": [
+      "辅助静态独审通过，不代表运行通过",
+      "上游not_run",
+      "Upstream status: not_run. The repository was read as evidence only; no build, test, server, TUI, or database was executed, so no upstream behavior is runtime-verified.",
+      "Runtime verification is not_run for the target too. The probe and architecture are authored artifacts; no server was started and no acceptance case was executed in this task.",
+      "Single-home and single-user by design; no multi-property, accounts, authentication, sharing, or remote access.",
+      "No notifications, email, SMS, push, calendar sync, or background scheduler; due work is pull-based through the API and UI.",
+      "No costs, vendors, receipts, photos, manuals, warranties, projects, quotes, incidents, documents, or LLM features; those upstream surfaces are intentionally out of scope.",
+      "Every-N-days recurrence differs from upstream interval months; no compatibility with upstream databases, APIs, or schema is claimed.",
+      "No delete, undo, archive, or restore endpoints; completion history is append-only and test records remain until the disposable data directory is discarded.",
+      "Validation is strict and date-only; natural-language dates and timezone conversion are unsupported. Server local date can differ by one day from a client in another timezone.",
+      "The UI is a minimal single-page client, not a polished product; no internationalization, offline cache, or mobile-native behavior.",
+      "Schema v1 has no migration path. Changing entities later needs an explicit migration or a new disposable database.",
+      "Concurrency is sized for one user; SQLite WAL and busy_timeout reduce but do not eliminate lock contention.",
+      "User decision points: confirm one-home scope, the default due date of creation day when no anchor is provided, latest-completion rollover for backdated entries, strict date-only input, and the absence of delete and defect-tracking features.",
+      "Restart durability may be described as an operator stop and start step in README; it was not run and is not claimed as verified."
+    ]
+  },
+  "spec": {
+    "title": "Home Care Ledger",
+    "roles": [
+      {
+        "id": "R01",
+        "name": "A single homeowner keeping care records for their own home on a local machine, with no accounts, notifications, or multi-property operation.",
+        "responsibility": "Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment."
+      }
+    ],
+    "features": [
+      {
+        "id": "F01",
+        "name": "Home and equipment anchor",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "In a dedicated data directory, create the single home, add an equipment record under it, and prove duplicate-home and invalid-equipment requests return 409, 422, or 404 without changing stored records.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17"
+        ],
+        "acceptance": [
+          "A01"
+        ]
+      },
+      {
+        "id": "F02",
+        "name": "Every-N-day plan and due queue",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "Create plans with interval_days in 1..3650 and verify GET /api/tasks/due returns the exact overdue, due, and upcoming sets at the as_of and horizon_days boundaries while invalid plans write nothing.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17"
+        ],
+        "acceptance": [
+          "A02"
+        ]
+      },
+      {
+        "id": "F03",
+        "name": "Completion and next-due rollover",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "Record a completion and note in one atomic call and verify due_on becomes max(previous last_completed_on, completed_on) plus interval_days across leap-day, month-end, and year-end examples, with invalid completions leaving no trace.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17"
+        ],
+        "acceptance": [
+          "A03"
+        ]
+      },
+      {
+        "id": "F04",
+        "name": "Anchored care history",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "Retrieve completions filtered by home and equipment in documented descending order with plan and equipment names and notes, and reject invalid filters without writes.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17"
+        ],
+        "acceptance": [
+          "A04"
+        ]
+      },
+      {
+        "id": "F05",
+        "name": "Accessible localhost UI",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "Load GET / and assert a dependency-free, labelled, keyboard-accessible HTML shell exposes home, equipment, plan, due, completion, and history workflows, while unknown routes and methods return documented JSON errors.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17"
+        ],
+        "acceptance": [
+          "A05"
+        ]
+      }
+    ],
+    "acceptance": [
+      {
+        "id": "A01",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "In a dedicated data directory, create the single home, add an equipment record under it, and prove duplicate-home and invalid-equipment requests return 409, 422, or 404 without changing stored records.",
+        "features": [
+          "F01"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A02",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "Create plans with interval_days in 1..3650 and verify GET /api/tasks/due returns the exact overdue, due, and upcoming sets at the as_of and horizon_days boundaries while invalid plans write nothing.",
+        "features": [
+          "F02"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A03",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "Record a completion and note in one atomic call and verify due_on becomes max(previous last_completed_on, completed_on) plus interval_days across leap-day, month-end, and year-end examples, with invalid completions leaving no trace.",
+        "features": [
+          "F03"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A04",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "Retrieve completions filtered by home and equipment in documented descending order with plan and equipment names and notes, and reject invalid filters without writes.",
+        "features": [
+          "F04"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A05",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "Load GET / and assert a dependency-free, labelled, keyboard-accessible HTML shell exposes home, equipment, plan, due, completion, and history workflows, while unknown routes and methods return documented JSON errors.",
+        "features": [
+          "F05"
+        ],
+        "implementation": "acceptance/probe.py"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "D01",
+        "question": "首版运行与数据边界？",
+        "default": "单用户本机、独立SQLite；显式保存，无账户、云端和协作。",
+        "when_to_ask": "确需公网托管或多人数据时先确认，不自行扩展。",
+        "impact": "保护本地数据，避免默认外发。",
+        "status": "assisted default"
+      },
+      {
+        "id": "D02",
+        "question": "是否复刻上游？",
+        "default": "Target design inference, not an upstream claim: the pinned research makes the home the subject and requires recurring work plus a durable completion record. Upstream code corroborates that abstract shape but realizes recurrence in months, keeps one house profile, links maintenance to an optional appliance, and does not show an explicit appliance-to-home foreign key in the selected files. The target therefore makes the home anchor explicit through home_id on equipment and plans, uses every-N-days recurrence from the scenario, and keeps only the home, equipment, plan, completion, and history slice. It does not copy upstream code, schema, or UI. Upstream status: not_run; no upstream build, test, server, TUI, or database was started.",
+        "when_to_ask": "目标变化、破坏已有数据或需要引入上游实现/依赖时先确认。",
+        "impact": "不混淆来源事实与目标设计。",
+        "status": "assisted default"
+      }
+    ],
+    "phases": [
+      {
+        "id": "P0",
+        "title": "核心可用",
+        "goal": "Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.",
+        "features": [
+          "F01",
+          "F02",
+          "F03",
+          "F04",
+          "F05"
+        ],
+        "acceptance": [
+          "A01",
+          "A02",
+          "A03",
+          "A04",
+          "A05"
+        ]
+      }
+    ],
+    "architecture_markdown": "# Home Care Ledger: target architecture\n\n## Scope and decisions to confirm\n- Local single-user target: one homeowner, one home, loopback only.\n- Python 3.11+ standard library only; SQLite; no third-party packages.\n- This is a cognition template, not an application and not the upstream micasa codebase.\n- Deliberately excluded: accounts and authentication, notifications, email, vendors, costs, quotes, projects, documents, manuals, photos, payments, LLM, multi-property, imports and exports, and deletion endpoints.\n- Decision: exactly one home with fixed id `home`, because the pinned scenario is the user's own home and upstream exposes a single house profile.\n- Decision: recurrence is every N calendar days, 1..3650, because the scenario says every N days. Upstream uses interval months; this target is not API-compatible with it.\n- Decision: a plan created without an anchor is due on the server local creation date.\n- Decision: a backdated completion never moves next due backwards; next due is based on the latest completion date.\n- Decision: no natural-language dates and no timezone-bearing timestamps in domain dates.\n\n## Runtime, data directory, start\n- Source file `app.py`; database `$HOMECARE_DATA_DIR/homecare.sqlite3`.\n- `HOMECARE_DATA_DIR` defaults to `./data`; the directory is created if absent.\n- Start: `python3 app.py --data-dir ./data --host 127.0.0.1 --port 8765`.\n- Equivalent environment variables: `HOMECARE_DATA_DIR`, `HOMECARE_HOST`, `HOMECARE_PORT`.\n- Bind loopback by default. There is no authentication; do not expose the port.\n- On first start create schema and indexes. Schema version 1 is created once; no migration beyond that.\n- SQLite connection setup: `PRAGMA foreign_keys=ON`, `journal_mode=WAL`, `busy_timeout=5000`.\n- Server: `ThreadingHTTPServer` is acceptable, but every write uses one explicit SQLite transaction.\n- JSON is UTF-8. Maximum request body 1,048,576 bytes. POST and PATCH must send `application/json`; otherwise 415.\n- Only GET, POST, and PATCH on documented routes. Other methods return 405 `METHOD_NOT_ALLOWED`.\n- Health: `GET /health` returns `{status: ok, database: ready}`.\n\n## Entities and exact persisted fields\n`homes`\n- `id` TEXT primary key, always the literal `home`.\n- `name` TEXT NOT NULL, trimmed, 1..80 Unicode code points.\n- `address` TEXT NOT NULL default empty string, trimmed, 0..200.\n- `created_at`, `updated_at` TEXT UTC ISO-8601 with `Z`, for example `2026-10-21T08:30:00Z`.\n\n`equipment`\n- `id` TEXT primary key, `eq_` plus 32 lowercase hex characters.\n- `home_id` TEXT NOT NULL REFERENCES `homes(id)` ON DELETE RESTRICT.\n- `name` TEXT NOT NULL, trimmed, 1..80.\n- `category` TEXT NOT NULL, one of `heating`, `cooling`, `plumbing`, `electrical`, `roof`, `exterior`, `appliance`, `safety`, `other`.\n- `location` TEXT NOT NULL default empty, 0..80.\n- `make` TEXT NOT NULL default empty, 0..80.\n- `model` TEXT NOT NULL default empty, 0..80.\n- `installed_on` TEXT NULL, strict calendar date 1900-01-01..2100-12-31.\n- `created_at`, `updated_at` UTC ISO-8601.\n\n`plans`\n- `id` TEXT primary key, `pl_` plus 32 hex.\n- `home_id` TEXT NOT NULL REFERENCES homes.\n- `equipment_id` TEXT NULL REFERENCES equipment; when present it must belong to the same `home_id`.\n- `name` TEXT NOT NULL, trimmed, 1..80.\n- `interval_days` INTEGER NOT NULL, 1..3650 inclusive.\n- `last_completed_on` TEXT NULL, strict date; latest known care date.\n- `due_on` TEXT NOT NULL, strict date.\n- `notes` TEXT NOT NULL default empty, 0..500.\n- `created_at`, `updated_at` UTC ISO-8601.\n- Index: `(home_id, equipment_id, due_on)`.\n\n`completions`\n- `id` TEXT primary key, `cm_` plus 32 hex.\n- `plan_id` TEXT NOT NULL REFERENCES plans ON DELETE RESTRICT.\n- `completed_on` TEXT NOT NULL, strict date.\n- `note` TEXT NOT NULL default empty, trimmed, 0..500.\n- `created_at` UTC ISO-8601.\n- Index: `(plan_id, completed_on DESC, created_at DESC)`.\n- There is no PATCH or DELETE for completions: the record is append-only.\n\n## Date, validation and recurrence rules\n- Domain dates are `YYYY-MM-DD` only. Reject timestamps, natural language, invalid ordinal dates, and years outside 1900..2100 with 422 `VALIDATION_ERROR`.\n- `server_today` is `datetime.date.today()` in the host local timezone. Domain dates are not converted between zones.\n- Creation response timestamps are UTC; domain decisions use `server_today` or an explicit `as_of`.\n- Plan anchor when created:\n  - `first_due_on` supplied: `due_on = first_due_on`.\n  - else `last_completed_on` supplied: `due_on = last_completed_on + interval_days`.\n  - else: `due_on = server_today`.\n- `last_completed_on` and `first_due_on` are mutually exclusive; supplying both is 422.\n- `last_completed_on` may not be after `server_today`; `first_due_on` may not be before 1900-01-01 or after 2100-12-31.\n- Completion accepts `completed_on <= server_today`.\n- Next due after a completion is always `max(previous last_completed_on, completed_on) + interval_days`, using proleptic Gregorian ordinal addition. This makes backdated entries safe and never regresses the schedule.\n- If a plan was seeded with `last_completed_on`, that seed is not a completion record; only completion rows appear in history.\n- Due status at `as_of`: `overdue` when `due_on < as_of`; `due` when equal; `upcoming` when greater.\n- Due query includes tasks with `due_on <= as_of + horizon_days`. Default `horizon_days=0`, so default shows overdue and due only. Horizon range 0..365.\n- Sort order: due tasks by `due_on ASC, created_at ASC, id ASC`; plans by `created_at ASC, id ASC`; completions and history by `completed_on DESC, created_at DESC, id DESC`.\n- Date edge examples: 2024-02-28 + 1 = 2024-02-29; 2024-02-29 + 1 = 2024-03-01; 2024-12-31 + 30 = 2025-01-30; 2026-01-31 + 31 = 2026-03-03.\n- Integer fields reject booleans, floats, and numeric strings; JSON boolean true is not an integer. Query integers use decimal digits only.\n\n## HTTP API\nBase URL in examples: `http://127.0.0.1:8765`.\n\nCommon response rules:\n- All API responses are JSON objects with `Content-Type: application/json; charset=utf-8`.\n- Error shape: `error` object with `code` string, `message` string, and `field` string or null.\n- Codes and statuses:\n  - `INVALID_JSON` 400\n  - `UNSUPPORTED_MEDIA_TYPE` 415\n  - `METHOD_NOT_ALLOWED` 405\n  - `NOT_FOUND` 404 for an unknown route\n  - `HOME_NOT_FOUND` 404\n  - `EQUIPMENT_NOT_FOUND` 404\n  - `PLAN_NOT_FOUND` 404\n  - `HOME_EXISTS` 409\n  - `VALIDATION_ERROR` 422\n  - `INTERNAL_ERROR` 500 with no leaked internals\n- Unknown request fields are rejected with 422 `VALIDATION_ERROR` and `field` naming the first unknown field.\n- Canonical plan object: `id`, `home_id`, `equipment_id`, `name`, `interval_days`, `last_completed_on`, `due_on`, `notes`, `created_at`, `updated_at`, `completion_count`, and `status`. `status` is computed against `server_today`.\n- Canonical completion object: `id`, `plan_id`, `completed_on`, `note`, and `created_at`.\n\n### Home\n`POST /api/home`\nBody: `name` required, `address` optional. Returns 201 `{home: HOME}`. If a home already exists returns 409 `HOME_EXISTS` and writes nothing.\n`GET /api/home` returns 200 `{home: HOME}` or 404 `HOME_NOT_FOUND`.\n`PATCH /api/home` Body: at least one of `name`, `address`; validates bounds. Returns 200 `{home: HOME}`. Empty patch 422. There is no DELETE.\n\n### Equipment\n`POST /api/equipment`\nBody: `home_id` required, `name` required, `category` required, optional `location`, `make`, `model`, and `installed_on`.\nReturns 201 `{equipment: EQUIPMENT}`. Unknown home 404 `HOME_NOT_FOUND`.\n`GET /api/equipment?home_id=home` returns 200 `{equipment: [EQUIPMENT...]}` sorted by `created_at ASC, id ASC`. Missing `home_id` 422; unknown home 404.\n`GET /api/equipment/{id}` returns 200 `{equipment: EQUIPMENT}` or 404 `EQUIPMENT_NOT_FOUND`.\nNo delete.\n\n### Plans\n`POST /api/plans`\nBody: `home_id` required; `name` required; `interval_days` required; optional `equipment_id`, `last_completed_on`, `first_due_on`, and `notes`.\nReturns 201 `{plan: PLAN}`. Unknown home 404. Unknown equipment 404 `EQUIPMENT_NOT_FOUND`; equipment belonging to another home 422 `VALIDATION_ERROR` with field `equipment_id` (defensive, unreachable while only one home exists).\n`GET /api/plans?home_id=home&equipment_id=eq_...` returns 200 `{plans: [PLAN...]}`. `equipment_id` is an optional filter. Missing home 422; unknown home 404; unknown equipment 404.\n`GET /api/plans/{id}` returns 200 `{plan: PLAN}` or 404 `PLAN_NOT_FOUND`.\nNo interval or schedule edit endpoint in this version; create a new plan instead. This is a deliberate scope cut.\n\n### Due work\n`GET /api/tasks/due?home_id=home&as_of=YYYY-MM-DD&horizon_days=0&equipment_id=eq_...`\n- `home_id` required; `as_of` optional, default `server_today`; `horizon_days` optional integer 0..365; `equipment_id` optional.\n- Returns 200 `{as_of, horizon_days, tasks: [TASK...]}`.\n- TASK fields: `id` (plan id), `home_id`, `home_name`, `equipment_id`, `equipment_name` or null, `name`, `interval_days`, `last_completed_on`, `due_on`, `status`, `days_until_due`, and `notes`.\n- `days_until_due = due_on - as_of` in days; negative means overdue.\n- Invalid `as_of`, out-of-range horizon, missing home, or unknown home or equipment: 422 or 404 as applicable. No writes.\n\n### Completions and history\n`POST /api/plans/{id}/completions`\nBody: `completed_on` required, `note` optional default empty.\nReturns 201 `{completion: COMPLETION, plan: PLAN}`. Unknown plan 404 `PLAN_NOT_FOUND`. Future date, bad date, or note over 500: 422. The insert and plan update happen in one transaction; on any failure neither changes.\n`GET /api/plans/{id}/completions` returns 200 `{completions: [COMPLETION...]}` or 404 `PLAN_NOT_FOUND`.\n`GET /api/history?home_id=home&equipment_id=eq_...&limit=100`\n- `home_id` required; `equipment_id` optional; `limit` 1..500 default 100.\n- Returns 200 `{history: [HISTORY...]}` sorted as defined above.\n- HISTORY fields: `id`, `plan_id`, `plan_name`, `home_id`, `home_name`, `equipment_id`, `equipment_name` or null, `completed_on`, `note`, and `created_at`.\n- Missing home 422; unknown home or equipment 404. No writes.\n\n## Atomic failure semantics\n- Validate method, content type, JSON, field presence, types, bounds, enums, dates, and referential checks before opening a write transaction.\n- For `POST /api/home`, insert with fixed id `home`; a concurrent duplicate loses with 409 and leaves exactly one row.\n- For `POST /api/equipment` and `POST /api/plans`, one INSERT each; foreign-key failure maps to 404 or 422, not 500.\n- For completion, `BEGIN IMMEDIATE`; select plan; compute `last = max(previous last_completed_on, completed_on)`; INSERT completion; UPDATE plan `last_completed_on`, `due_on`, and `updated_at`; COMMIT. Any error triggers ROLLBACK, leaving zero new completions and an unchanged plan.\n- Reads never create rows. A failed request must produce no completion, no plan, no equipment, and no home mutation.\n- SQLite constraint errors are mapped to a deterministic 422 or 409; unexpected errors return 500 `INTERNAL_ERROR` without partial commits.\n\n## Basic accessible UI\n`GET /` returns one HTML document with `lang=en`, UTF-8, no external assets, and a small inline script that calls the JSON API.\n- Sections, in order: Home; Equipment; Care plans; Due work; Completion history.\n- Every input has a visible `label for` tied to an id; groups use `fieldset` and `legend`.\n- Buttons are native `button` elements with descriptive text: Create home, Add equipment, Add plan, Record completion, Refresh.\n- Due table has `caption`, `th scope=col`, and text status plus a non-color-only overdue label.\n- Success and validation messages render in a container with `role=status` and `aria-live=polite`; errors also include the field name.\n- Forms are keyboard operable, visible focus is retained, default browser font sizing is not disabled, and no timeout or auto-submit is used.\n- Completing a task opens a small form for `completed_on` and `note`; the API response updates the due list and history without a full page reload.\n- History has home and equipment filters populated from the API.\n- The UI is a convenience surface; all behavior is available through the documented API.\n\n## Probe contract\n`probe.py` is a standard-library HTTP client supplied in `acceptance_files`. It accepts `--base-url` and exactly one `--case A01..A05`, creates only disposable records with a unique suffix, never deletes, and asserts exact statuses, shapes, dates, ordering, and zero-write outcomes. It does not start the server and makes no claim about an upstream run.",
+    "limits": [
+      "辅助试产，非严格G1/T08。",
+      "Upstream status: not_run. The repository was read as evidence only; no build, test, server, TUI, or database was executed, so no upstream behavior is runtime-verified.",
+      "Runtime verification is not_run for the target too. The probe and architecture are authored artifacts; no server was started and no acceptance case was executed in this task.",
+      "Single-home and single-user by design; no multi-property, accounts, authentication, sharing, or remote access.",
+      "No notifications, email, SMS, push, calendar sync, or background scheduler; due work is pull-based through the API and UI.",
+      "No costs, vendors, receipts, photos, manuals, warranties, projects, quotes, incidents, documents, or LLM features; those upstream surfaces are intentionally out of scope.",
+      "Every-N-days recurrence differs from upstream interval months; no compatibility with upstream databases, APIs, or schema is claimed.",
+      "No delete, undo, archive, or restore endpoints; completion history is append-only and test records remain until the disposable data directory is discarded.",
+      "Validation is strict and date-only; natural-language dates and timezone conversion are unsupported. Server local date can differ by one day from a client in another timezone.",
+      "The UI is a minimal single-page client, not a polished product; no internationalization, offline cache, or mobile-native behavior.",
+      "Schema v1 has no migration path. Changing entities later needs an explicit migration or a new disposable database.",
+      "Concurrency is sized for one user; SQLite WAL and busy_timeout reduce but do not eliminate lock contention.",
+      "User decision points: confirm one-home scope, the default due date of creation day when no anchor is provided, latest-completion rollover for backdated entries, strict date-only input, and the absence of delete and defect-tracking features.",
+      "Restart durability may be described as an operator stop and start step in README; it was not run and is not claimed as verified."
+    ]
+  },
+  "trial_scope": "# 辅助试用范围\n\nCreate the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.\n\n- Upstream status: not_run. The repository was read as evidence only; no build, test, server, TUI, or database was executed, so no upstream behavior is runtime-verified.\n- Runtime verification is not_run for the target too. The probe and architecture are authored artifacts; no server was started and no acceptance case was executed in this task.\n- Single-home and single-user by design; no multi-property, accounts, authentication, sharing, or remote access.\n- No notifications, email, SMS, push, calendar sync, or background scheduler; due work is pull-based through the API and UI.\n- No costs, vendors, receipts, photos, manuals, warranties, projects, quotes, incidents, documents, or LLM features; those upstream surfaces are intentionally out of scope.\n- Every-N-days recurrence differs from upstream interval months; no compatibility with upstream databases, APIs, or schema is claimed.\n- No delete, undo, archive, or restore endpoints; completion history is append-only and test records remain until the disposable data directory is discarded.\n- Validation is strict and date-only; natural-language dates and timezone conversion are unsupported. Server local date can differ by one day from a client in another timezone.\n- The UI is a minimal single-page client, not a polished product; no internationalization, offline cache, or mobile-native behavior.\n- Schema v1 has no migration path. Changing entities later needs an explicit migration or a new disposable database.\n- Concurrency is sized for one user; SQLite WAL and busy_timeout reduce but do not eliminate lock contention.\n- User decision points: confirm one-home scope, the default due date of creation day when no anchor is provided, latest-completion rollover for backdated entries, strict date-only input, and the absence of delete and defect-tracking features.\n- Restart durability may be described as an operator stop and start step in README; it was not run and is not claimed as verified.\n\nOpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。模板先于应用；仅代表场景后续开发应用。严格G1/T08不因本包通过。",
+  "production": {
+    "schema": "atlas.auxiliary-model-production.v1",
+    "mode": "opencode-cli-go",
+    "model": "opencode-go/deepseek-v4.1-flash",
+    "campaign_id": "atlas-v1-first-production-2026-10-19",
+    "phase": "auxiliary-go-pilot-2026-10-21",
+    "review_status": "passed",
+    "review_input_digest": "db3971272dea6ada40ff45ca8d4871f9ca719189917eecace4561122e1b7c20a",
+    "review_result_digest": "4b1305c4def0c4c61582f6adf9da392e4f75b66fd7e4371bd9bc2a4e12cc94c4",
+    "source_snapshot_digest": "20e19a3e7792fef299906c1ac73461f086b873acce24247b5434a6165441b9d8",
+    "controlled_opencode_calls_added": 3,
+    "sessions": {
+      "discovery": "ses_ea26f370bffeBZoOhIu3UU3u5d",
+      "blueprint-generate-aux": "ses_ea26cd13fffee0sFO6GH0pswNK",
+      "blueprint-spec-review-aux": "ses_ea2691a44ffemHBxOiocBq67ci"
+    },
+    "upstream_runtime": "not_run",
+    "application_runtime": "not_run",
+    "strict_acceptance": false
+  }
+}
