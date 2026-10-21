@@ -40,6 +40,19 @@ test('not-run template has no example source, guide or runtime evidence links',a
  await expect(info.getByRole('link',{name:'Read runtime evidence file'})).toHaveCount(0);
  await expect(info.getByRole('link',{name:'Download standard development package'})).toBeVisible();
 });
+test('Go model static review does not turn an unrun app into a runtime example',async({page})=>{
+ await setup(page,true);
+ await page.route('**/api/factory/assisted-templates**',r=>r.fulfill({json:{items:[{...item,
+  production:{mode:'opencode-cli-go',model:'opencode-go/deepseek-v4.1-flash',review_status:'passed',review_input_digest:'e'.repeat(64)},
+  runtime:{...item.runtime,status:'not_run',scope:'No app run'},files:{development:item.files.development}}],
+  unavailable:[],counts:{total:1,core_verified:0,not_run:1}}}));
+ await page.goto('/types/'+leaf.slug);
+ const info=page.getByRole('region',{name:'Assisted template information '+item.title});
+ await expect(info.getByText(/opencode-go\/deepseek-v4.1-flash/)).toBeVisible();
+ await expect(info.getByText(/Separate-session static review passed/)).toBeVisible();
+ await expect(info.getByText('Application not run',{exact:true})).toBeVisible();
+ await expect(info.getByRole('link',{name:'Download example source'})).toHaveCount(0);
+});
 test('assisted catalog outage does not hide formal template or claim zero verified evidence',async({page})=>{
  await setup(page);await page.route('**/api/factory/assisted-templates**',r=>r.fulfill({status:503,json:{error:'unavailable'}}));
  await page.route('**/api/factory/artifacts?**',r=>r.fulfill({json:[{...artifact,id:'formal',provenance:{},state:'published'}]}));

@@ -78,7 +78,26 @@ def _entry(store, row, artifacts):
                       "app_id": case["app_id"], "sources": [
                           {"repository": s["repository"], "commit_sha": s["commit_sha"],
                            "license_files": s.get("license_files", [])} for s in case["source_snapshots"]]})
-    return {"artifact_id": artifact["id"], "digest": artifact["digest"], "key": row["key"],
+    model_production = provenance.get("imported_snapshot", {}).get("provenance", {}).get("model_production")
+    production = ({"mode": model_production["mode"], "model": model_production["model"],
+                   "review_status": model_production["review_status"],
+                   "review_input_digest": model_production["review_input_digest"]} if model_production else None)
+    supplement = row.get("production_review")
+    if production and supplement:
+        production["review_status"] = "incomplete_materials"
+        if supplement.get("status") == "passed":
+            try:
+                receipt = json.loads(asset_path(store, supplement["file"]).read_text())
+                if (receipt.get("schema") == "atlas.auxiliary-readable-review.v1"
+                        and receipt.get("artifact_id") == artifact["id"]
+                        and receipt.get("artifact_digest") == artifact["digest"]
+                        and receipt.get("review_input_digest") == production["review_input_digest"]
+                        and receipt.get("status") == "passed"):
+                    production["review_status"] = "passed"
+                    production["review_session_id"] = receipt["session_id"]
+            except (FactoryError, OSError, ValueError, KeyError):
+                pass  # A missing/changed receipt cannot advertise complete review.
+    return {"artifact_id": artifact["id"], "digest": artifact["digest"], "key": row["key"], "production": production,
             "title": artifact["manifest"]["name"], "leaf": artifact["leaf"],
             "scenario": {k: scenario[k] for k in ("id", "revision", "name", "audience", "objective", "workflow")},
             "capabilities": [f["name"] for f in spec["features"] if f.get("phase") == "P0"],

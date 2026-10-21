@@ -93,6 +93,24 @@ class ExportReuseTests(unittest.TestCase):
             export_trial(self.inputs, self.output, "budget-trial", reuse=True)
         self.assertEqual(hashes, self.archives())
 
+    def test_model_provenance_travels_with_package_without_runtime_certification(self):
+        definition = json.loads((self.inputs / "definition.json").read_text())
+        production = {"schema": "atlas.auxiliary-model-production.v1", "mode": "opencode-cli-go",
+                      "model": "opencode-go/deepseek-v4.1-flash", "review_status": "passed",
+                      "controlled_opencode_calls_added": 3, "application_runtime": "not_run",
+                      "upstream_runtime": "not_run", "strict_acceptance": False}
+        definition["production"] = production
+        (self.inputs / "definition.json").write_text(json.dumps(definition))
+        receipt = export_trial(self.inputs, self.output, "model-test")
+        self.assertEqual(receipt["controlled_opencode_calls_added"], 3)
+        self.assertFalse(receipt["provenance"]["official_publication"])
+        self.assertEqual(receipt["provenance"]["independent_evidence_review"], "passed_auxiliary_static")
+        import zipfile
+        with zipfile.ZipFile(self.output / "template-snapshot.zip") as archive:
+            self.assertEqual(json.loads(archive.read("source/inputs/model-production.json")), production)
+        again = export_trial(self.inputs, self.output, "model-test", reuse=True)
+        self.assertTrue(again["reused"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -109,6 +109,8 @@ def export_trial(inputs, destination, name, reuse=False):
         "local-assisted-" + name,
     )
     atomic_json(candidate / "inputs/shared-case-record.json", case)
+    if definition.get("production"):
+        atomic_json(candidate / "inputs/model-production.json", definition["production"])
     atomic_json(candidate / "inputs/original-scenario-record.json", original)
     (candidate / "TRIAL_SCOPE.md").write_text(definition["trial_scope"])
     atomic_json(
@@ -139,6 +141,13 @@ def export_trial(inputs, destination, name, reuse=False):
         "independent_evidence_review": "pending",
         "note": "Static Codex source study; no model review or formal queue consumption. Local freeze fixes inputs only.",
     }
+    production = definition.get("production")
+    if production:
+        # New auxiliary packages carry model provenance; old frozen bytes and
+        # default receipt structure remain unchanged.
+        provenance.update(model_production=production,
+                          independent_evidence_review="passed_auxiliary_static",
+                          note="OpenCode CLI + Go source study and separate-session review. No upstream/downstream runtime or strict certification.")
     frozen = freeze_blueprint(candidate, destination / "template-snapshot", provenance)
     verify_frozen(destination / "template-snapshot", frozen["digest"])
     exported = export_development(
@@ -156,7 +165,7 @@ def export_trial(inputs, destination, name, reuse=False):
         "template_digest": frozen["digest"],
         "export": exported,
         "provenance": provenance,
-        "controlled_opencode_calls_added": 0,
+        "controlled_opencode_calls_added": production["controlled_opencode_calls_added"] if production else 0,
         "official_queue_consumed": False,
         "archives": {
             n + ".zip": archive(destination / n, destination / (n + ".zip"))

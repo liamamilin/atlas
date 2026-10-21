@@ -33,6 +33,9 @@ def request(base, route, body=None):
 
 
 def authored_definition(item, authored, scene, case, snap):
+    model_production = item.get("production_mode") == "opencode-cli-go"
+    origin_note = ("OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+                   if model_production else "Codex研究与编写；静态案例未独审、上游未运行。")
     sources = []
     for i, observation in enumerate(case["observations"], 2):
         loc = observation["location"]
@@ -55,7 +58,8 @@ def authored_definition(item, authored, scene, case, snap):
                 + snap["commit_sha"]
                 + "/" + authored.get("license_path", "LICENSE"),
                 "facts": observation["kind"] + ": " + observation["statement"],
-                "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。",
+                "reuse": ("只参考设计；不复制上游代码。" + origin_note if model_production
+                          else "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"),
             }
         )
     features, cases = [], []
@@ -87,7 +91,7 @@ def authored_definition(item, authored, scene, case, snap):
         + authored["objective"]
         + "\n\n"
         + "\n".join("- " + gap for gap in authored["gaps"])
-        + "\n\nCodex研究与编写；静态案例未独审、上游未运行。模板先于应用；仅代表场景后续开发应用。严格G1/T08不因本包通过。"
+        + "\n\n" + origin_note + "模板先于应用；仅代表场景后续开发应用。严格G1/T08不因本包通过。"
     )
     return {
         "scenario_record": scene,
@@ -99,7 +103,8 @@ def authored_definition(item, authored, scene, case, snap):
         "research": {
             "summary": "同一共享案例记录的静态研究与明确的设计推断；完整定位见inputs/shared-case-record.json。",
             "sources": sources,
-            "gaps": ["证据独立审阅pending", "上游not_run", *authored["gaps"]],
+            "gaps": (["辅助静态独审通过，不代表运行通过"] if model_production else ["证据独立审阅pending"])
+                    + ["上游not_run", *authored["gaps"]],
         },
         "spec": {
             "title": authored["name"],
@@ -149,9 +154,21 @@ def authored_definition(item, authored, scene, case, snap):
 def produce(folder, item, store, base, batch_id):
     p = folder / item["key"]
     authored = json.loads((p / "AUTHOR_INPUT.json").read_text())
+    production = None
+    if item.get("production_mode") == "opencode-cli-go":
+        production = json.loads((p / "MODEL_PRODUCTION.json").read_text())
+        if (production.get("schema") != "atlas.auxiliary-model-production.v1"
+                or production.get("review_status") != "passed"
+                or not production.get("review_input_digest")):
+            raise ValueError("model production requires its bound review receipt")
     snap = json.loads((p / "source-snapshot.json").read_text())
+    if production:
+        from produce_with_opencode import verify_production
+        verify_production(p, production, authored, snap)
     leaf = store.leaf(item["leaf"])
     raw = (store.pack / "applications" / (item["leaf"] + ".md")).read_bytes()
+    if production and hashlib.sha256(raw).hexdigest() != json.loads((p / "REQUEST.json").read_text())["leaf_sha256"]:
+        raise ValueError("leaf changed after independent review")
     leaf_receipt = {
         "slug": item["leaf"],
         "sha256": hashlib.sha256(raw).hexdigest(),
@@ -215,7 +232,7 @@ def produce(folder, item, store, base, batch_id):
             "statement": authored["inference"],
             "depends_on": [o["evidence_id"] for o in observations],
             "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。",
-            "assumptions": ["上游未运行", "独立证据审阅pending", *authored["gaps"]],
+            "assumptions": ["上游未运行", "辅助静态独审通过，运行未验证" if production else "独立证据审阅pending", *authored["gaps"]],
         }
     )
     existing_case = (
@@ -230,11 +247,11 @@ def produce(folder, item, store, base, batch_id):
         "app_name": authored["repo_name"],
         "source_snapshots": [snap],
         "research": {
-            "summary": "Codex静态研究；" + authored["inference"],
+            "summary": ("OpenCode Go静态研究与独立会话审阅；" if production else "Codex静态研究；") + authored["inference"],
             "scope": authored["objective"],
             "unknowns": [
                 "upstream not_run",
-                "independent review pending",
+                "auxiliary independent static review passed; runtime not_run" if production else "independent review pending",
                 *authored["gaps"],
             ],
             "input_digest": digest(scene),
@@ -257,6 +274,13 @@ def produce(folder, item, store, base, batch_id):
         payload, batch_id + "-" + item["key"] + "-research-v1"
     )
     case = result["case"]
+    if production:
+        library = CaseLibrary(store)
+        for observation in case["observations"]:
+            library.record_evidence_review(case["case_id"], case["revision"], observation["evidence_id"],
+                                           "accepted", production["sessions"]["blueprint-spec-review-aux"],
+                                           "independent_agent")
+        case = library.get_case(case["case_id"], case["revision"])
     save(p / "case-record.json", case)
     save(
         p
@@ -274,6 +298,8 @@ def produce(folder, item, store, base, batch_id):
         },
     )
     definition = authored_definition(item, authored, scene, case, snap)
+    if production:
+        definition["production"] = production
     if (p / "definition.json").exists():
         if json.loads((p / "definition.json").read_text()) != definition:
             raise ValueError("authored specification changed; new version required")
@@ -339,7 +365,7 @@ def produce(folder, item, store, base, batch_id):
         "exported_zip_sha256": hashlib.sha256(
             (p / "atlas-development-package.zip").read_bytes()
         ).hexdigest(),
-        "source": "Codex authored; service persistence and existing freeze/export/import",
+        "source": "OpenCode CLI + Go authored and independently reviewed; host persistence/freeze/export/import" if production else "Codex authored; service persistence and existing freeze/export/import",
         "application_runtime": "not_run",
     }
     save(p / "IMPORT_RECEIPT.json", imported)

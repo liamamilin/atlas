@@ -86,6 +86,41 @@ class AssistedCatalogTests(unittest.TestCase):
         with patch.object(self.store, "artifacts", return_value=[value]):
             self.assertEqual(self.get()["items"], [])
 
+    def test_model_review_is_displayed_separately_from_runtime_and_publication(self):
+        production = {"mode": "opencode-cli-go", "model": "opencode-go/deepseek-v4.1-flash",
+                      "review_status": "passed", "review_input_digest": "e" * 64}
+        value = {**self.artifact, "provenance": {**self.artifact["provenance"],
+                 "imported_snapshot": {"provenance": {"model_production": production}}}}
+        self.row["runtime"] = {"status": "not_run", "scope": "No application run"}
+        self.save()
+        with patch.object(self.store, "artifacts", return_value=[value]):
+            item = self.get()["items"][0]
+        self.assertEqual(item["production"], production)
+        self.assertEqual(item["runtime"]["status"], "not_run")
+        self.assertFalse(item["runtime"]["strict_acceptance"])
+        self.assertEqual(item["strict_status"]["publication"], "draft")
+
+    def test_supplemental_review_needs_matching_hash_and_artifact_binding(self):
+        production = {"mode": "opencode-cli-go", "model": "opencode-go/deepseek-v4.1-flash",
+                      "review_status": "passed", "review_input_digest": "e" * 64}
+        value = {**self.artifact, "provenance": {**self.artifact["provenance"],
+                 "imported_snapshot": {"provenance": {"model_production": production}}}}
+        receipt = {"schema": "atlas.auxiliary-readable-review.v1", "artifact_id": value["id"],
+                   "artifact_digest": value["digest"], "review_input_digest": "e" * 64,
+                   "status": "passed", "session_id": "separate-full-review"}
+        self.row["production_review"] = {"status": "incomplete_materials"}
+        self.save()
+        with patch.object(self.store, "artifacts", return_value=[value]):
+            self.assertEqual(self.get()["items"][0]["production"]["review_status"], "incomplete_materials")
+            self.file.write_text(json.dumps(receipt))
+            # Bind the reviewed report independently of any runtime evidence.
+            self.row["production_review"] = {"status": "passed", "file": {
+                "path": "examples/demo.md", "sha256": hashlib.sha256(self.file.read_bytes()).hexdigest()}}
+            self.save()
+            self.assertEqual(self.get()["items"][0]["production"]["review_status"], "passed")
+            self.file.write_text("changed")
+            self.assertEqual(self.get()["items"][0]["production"]["review_status"], "incomplete_materials")
+
     def test_artifact_scene_identity_is_projected_without_rewriting_frozen_data(self):
         item = self.get()["items"][0]
         before = self.store.artifacts()
