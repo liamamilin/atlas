@@ -36,7 +36,6 @@ export function Factory() {
   const focusedRuntimeId = params.get("runtime_run_id");
   const scenarioFilterId=params.get("scenario_id");
   const requestedView=params.get("view");
-  const assisted=useAsync(()=>factoryRequest<AssistedCatalog>("assisted-templates"),[]);
   const caseFilterId = params.get("case_id");
   const caseFilterRevision = Number(params.get("case_revision")) || undefined;
   const [view,setView] = useState<"catalog"|"batches"|"artifacts"|"v1"|"workflow">(() => params.get("view") === "workflow" ? "workflow" : params.get("view") === "artifacts" ? "artifacts" : params.get("view") === "v1" || params.has("scenario") || params.has("plan") ? "v1" : "catalog");
@@ -45,6 +44,8 @@ export function Factory() {
   const [catalog,setCatalog] = useState<Scenario[]>([]);
   const [batches,setBatches] = useState<FactoryBatch[]>([]);
   const [artifacts,setArtifacts] = useState<FactoryArtifact[]>([]);
+  const artifactFingerprint=JSON.stringify(artifacts.map(a=>[a.id,a.digest,a.state]).sort(([a],[b])=>String(a).localeCompare(String(b))));
+  const assisted=useAsync(()=>factoryRequest<AssistedCatalog>("assisted-templates"),[view,focusedArtifactId,artifactFingerprint]);
   const [artifactSearch,setArtifactSearch] = useState("");
   const [runtimeFilter,setRuntimeFilter]=useState("all");
   useEffect(()=>{if(requestedView==="artifacts"){setView("artifacts");setArtifactSearch("");setRuntimeFilter("all");}else if(requestedView==="workflow")setView("workflow");else if(requestedView==="v1")setView("v1");},[requestedView,scenarioFilterId]);

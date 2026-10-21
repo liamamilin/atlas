@@ -117,3 +117,52 @@ test('reviewed revision retains its withdrawn parent and separates usable entrie
  await expect(info.getByText('应用未运行',{exact:true})).toBeVisible();
  await expect(info.getByRole('link',{name:'下载标准开发包'})).toBeVisible();
 });
+
+test('workflow artifact poll refreshes assisted info before opening it in the same factory page',async({page})=>{
+ await page.addInitScript(()=>localStorage.setItem('atlas-lang','en'));
+ let artifactReads=0,assistedReads=0,artifactVisible=false,pageLoads=0;
+ page.on('load',()=>pageLoads++);
+ const artifactId='tpl_feed_reader_fixture',artifactDigest='f'.repeat(64);
+ const devUrl='/api/factory/assisted-templates/'+artifactId+'/files/development';
+ const feedItem={...item,artifact_id:artifactId,digest:artifactDigest,key:'feed-reader',title:'Feed reader',leaf:'feed-reader',
+  scenario:{...scenario,id:'scn_feed_reader',name:'Follow an RSS feed',audience:'Reader',objective:'Track article updates'},
+  production:{mode:'opencode-cli-go',model:'opencode-go/minimax-m3.1-flash-free',review_status:'passed',review_input_digest:'e'.repeat(64)},
+  runtime:{status:'not_run',scope:'Static review only; application not run',online_status:'not_checked',strict_acceptance:false},
+  files:{development:{available:true,url:devUrl,sha256:'a'.repeat(64)}}};
+ const feedArtifact={artifact_type:'product-blueprint',id:artifactId,job_id:'job-feed',leaf:'feed-reader',scenario_name:'Follow an RSS feed',scenario_revision:1,digest:artifactDigest,level:'L0',state:'draft',
+  manifest:{name:'Feed reader',description:'Follow a feed and inspect articles.',version:'1',feature_count:4,decision_count:2,phase_count:1,acceptance_count:3,phases:[{id:'P0',title:'Read feeds'}]},
+  provenance:{origin:'assisted-trial',imported_snapshot:{digest:artifactDigest,archive_sha256:artifactDigest,provenance:{}}},
+  acceptances:[],reports:[],formal_checks:[]};
+ const plan={id:'plan-feed-reader',status:'running',reason:null,model:'opencode-go/minimax-m3.1-flash-free',baseline:0,max_calls:6,new_calls:3,active_calls:0,remaining_calls:3,total:1,handled:1,counts:{ready_not_run:1},started:1792520000,deadline:1792523600,gate:null};
+ await page.route('**/api/factory/auxiliary-workflows**',r=>{
+  const url=new URL(r.request().url());
+  if(url.pathname.endsWith('/auxiliary-workflows'))return r.fulfill({json:{plans:[plan]}});
+  return r.fulfill({json:{plan,items:[{leaf:'feed-reader',display_name:'Feed reader',state:'ready_not_run',artifact_id:artifactId,steps:[],calls:[]}],pagination:{offset:0,limit:20,total:1}}});
+ });
+ await page.route('**/api/factory/assisted-templates**',r=>{
+  assistedReads++;
+  return r.fulfill({json:artifactVisible?{items:[feedItem],unavailable:[],counts:{total:21,usable:20,needs_revision:1,core_verified:19,not_run:2}}:{items:[],unavailable:[],counts:{total:0,usable:0,needs_revision:0,core_verified:0,not_run:0}}});
+ });
+ await page.route('**/api/factory/artifacts**',r=>{
+  artifactReads++;
+  if(artifactReads>1)artifactVisible=true;
+  return r.fulfill({json:artifactVisible?[feedArtifact]:[]});
+ });
+ await page.route('**/api/factory/catalog**',r=>r.fulfill({json:[]}));
+ await page.route('**/api/factory/batches',r=>r.fulfill({json:[]}));
+ await page.route('**/api/factory/status',r=>r.fulfill({json:{cli:{available:false,models:[]},runtime:{available:false}}}));
+ await page.goto('/factory?view=workflow');
+ await expect(page.getByRole('tab',{name:'Auxiliary production progress'})).toHaveAttribute('aria-selected','true');
+ await expect.poll(()=>artifactReads,{timeout:10000}).toBeGreaterThan(1);
+ await expect.poll(()=>assistedReads,{timeout:10000}).toBeGreaterThan(1);
+ const readsForStableInventory=assistedReads;
+ await page.waitForTimeout(4500);
+ expect(assistedReads).toBe(readsForStableInventory);
+ await page.getByRole('link',{name:'Open artifact · '+artifactId}).click();
+ await expect(page).toHaveURL(new RegExp('view=artifacts.*artifact_id='+artifactId));
+ const info=page.getByRole('region',{name:'Assisted template information Feed reader'});
+ await expect(info.getByRole('link',{name:'Download standard development package'})).toHaveAttribute('href',devUrl);
+ await expect(info.getByText(/Separate-session static review passed/)).toBeVisible();
+ await expect(info.getByText('Application not run',{exact:true})).toBeVisible();
+ expect(pageLoads).toBe(1);
+});
