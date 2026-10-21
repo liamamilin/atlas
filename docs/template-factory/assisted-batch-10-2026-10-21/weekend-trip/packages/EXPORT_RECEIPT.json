@@ -1,0 +1,65 @@
+{
+ "origin": "assisted-trial",
+ "template_digest": "1ff5a2976965c33e09e9b695de6b084ce450afcab1785a676c9c6f0a5a05df70",
+ "export": {
+  "phase": "P0",
+  "project_name": "weekend-trip-trial",
+  "template_digest": "1ff5a2976965c33e09e9b695de6b084ce450afcab1785a676c9c6f0a5a05df70",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1"
+ },
+ "provenance": {
+  "origin": "assisted-trial",
+  "scenario": {
+   "id": "scn_16afaedcefee4dd9b8e8931e3a29fd65",
+   "leaf": "travel-itinerary-planner",
+   "leaf_name": "旅行行程规划器",
+   "name": "两日城市行程与顺序安排",
+   "audience": "独自安排周末两日城市游的旅行者",
+   "objective": "把地点安排进两天行程，调整参观顺序并标记已到访，离线回查地址和安排。",
+   "workflow": [
+    "创建两日行程并设置首日",
+    "为某天添加地点、地址和备注",
+    "上下移动地点调整路线顺序",
+    "标记到访并切换另一日查看",
+    "刷新重启保留顺序与状态"
+   ],
+   "acceptance": [
+    "创建2026-11-07开始的行程，day1添加博物馆和公园，day2添加咖啡馆。",
+    "将公园移动到博物馆之前后，重读顺序一致，另一日不变。",
+    "到访后可撤销；day3、越界移动、空地址拒绝且旧顺序不变。",
+    "重启保留行程日期、地点地址、日内顺序和到访状态。"
+   ],
+   "status": "draft",
+   "updated_at": "2026-10-21T05:38:18.489341+00:00",
+   "revision": 1
+  },
+  "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+  "case_ref": {
+   "case_id": "case:assisted-ten-2026-10-21:weekend-trip",
+   "revision": 1,
+   "digest": "9270b77a21c46ecf2733a5052fd4e636e4a01cf762e4ec3d685223089847abad"
+  },
+  "case_record_sha256": "344990f334bafed3917712b4a0d788808e028ce2bdb5e372857d0ace7a542043",
+  "definition_digest": "2169ba20f3b423d2705f6d3ce55a9ab7fa28bb55d8be72d1a58dfca69f13e644",
+  "acceptance_inputs": {
+   "README.md": "2418fce93dedbca68968fe5de3ecf6e2e926d2270c27ad27e4031d35fa03215f",
+   "probe.py": "944e2c2c857d458e0af33809ac41e84d3b6b85cc1f90cf432f918f8bc6c29dc1"
+  },
+  "official_publication": false,
+  "upstream_runtime": "not_run",
+  "independent_evidence_review": "pending",
+  "note": "Static Codex source study; no model review or formal queue consumption. Local freeze fixes inputs only."
+ },
+ "controlled_opencode_calls_added": 0,
+ "official_queue_consumed": false,
+ "archives": {
+  "template-snapshot.zip": "d857edf66a86a62a234ec99747f95bf9a7caee91fd4b2c92870c57ec6717ed76",
+  "development-package.zip": "c638e93d77f075224d85cffee6515daa71de2d1566415a631384f2fa7b35b8f3"
+ }
+}

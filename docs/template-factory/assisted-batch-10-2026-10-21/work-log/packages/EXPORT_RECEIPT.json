@@ -1,0 +1,65 @@
+{
+ "origin": "assisted-trial",
+ "template_digest": "1f340fe0032d5f2a431f93a879e22548ed40c93c2d0d05e1b3d464d153ec42d3",
+ "export": {
+  "phase": "P0",
+  "project_name": "work-log-trial",
+  "template_digest": "1f340fe0032d5f2a431f93a879e22548ed40c93c2d0d05e1b3d464d153ec42d3",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1"
+ },
+ "provenance": {
+  "origin": "assisted-trial",
+  "scenario": {
+   "id": "scn_a5ba5020abbe461fa5992a4e01bee420",
+   "leaf": "time-tracking-application",
+   "leaf_name": "时间跟踪应用",
+   "name": "零工项目工时与日汇总",
+   "audience": "按项目记录工作时间但不需要开票的自由职业者",
+   "objective": "按日登记项目开始结束时间和休息分钟数，自动计算净工时，修改后日汇总立即重算。",
+   "workflow": [
+    "新建工作项目",
+    "按日期录入开始结束与休息",
+    "查看日合计和项目分组",
+    "更正休息或结束时间后重新计算",
+    "切换日期并在重启后继续"
+   ],
+   "acceptance": [
+    "项目A登记09:00–11:00休息15分钟，净105分钟。",
+    "再记13:00–14:00得到总165分钟；第一条休息改30后日总150。",
+    "同日重叠、倒置时间、休息超过区间或跨午夜拒绝；另一日不混入。",
+    "重启保留项目与条目，汇总与保存前一致。"
+   ],
+   "status": "draft",
+   "updated_at": "2026-10-21T05:38:18.778966+00:00",
+   "revision": 1
+  },
+  "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+  "case_ref": {
+   "case_id": "case:assisted-ten-2026-10-21:work-log",
+   "revision": 1,
+   "digest": "6d33ddfa6cb256ef6770087a697a2b42f1363ed3b8ab22af9faccb3707baa9d1"
+  },
+  "case_record_sha256": "e2f45eae0fd7400bf818490957782260bacfeca0f61e13f6190f77aef70643ca",
+  "definition_digest": "ac6bdac1ec656996927919c8d75b60563e20d6b8a1a90673b1cc3b18f153bb39",
+  "acceptance_inputs": {
+   "README.md": "2418fce93dedbca68968fe5de3ecf6e2e926d2270c27ad27e4031d35fa03215f",
+   "probe.py": "d5958e942f6c72a485ff78ba782e58310cba5410e88ad2c0e97fcc8ac8fa5973"
+  },
+  "official_publication": false,
+  "upstream_runtime": "not_run",
+  "independent_evidence_review": "pending",
+  "note": "Static Codex source study; no model review or formal queue consumption. Local freeze fixes inputs only."
+ },
+ "controlled_opencode_calls_added": 0,
+ "official_queue_consumed": false,
+ "archives": {
+  "template-snapshot.zip": "41b010d6c680e5666c425e0d9bde55272f12f75939b9bdaa86b5dec45eeac2c6",
+  "development-package.zip": "17be5980688f2d7e37d4f06726e4f0052121855186dd40ce3273c2f81925133f"
+ }
+}

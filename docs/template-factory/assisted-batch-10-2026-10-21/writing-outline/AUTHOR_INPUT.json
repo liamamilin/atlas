@@ -1,0 +1,50 @@
+{
+  "name": "文章大纲的分支折叠与重组",
+  "audience": "用层次段落组织长文章的写作者",
+  "objective": "把文章要点整理成可折叠的树，移动整个分支后保留子项及顺序，导出结构文本。",
+  "workflow": [
+    "创建文章大纲",
+    "添加章节与子要点",
+    "折叠分支减少视图干扰",
+    "将分支移动到另一章节下并调整顺序",
+    "导出缩进文本，重启保留结构"
+  ],
+  "acceptance": [
+    "创建引言和正文，正文下添加论据，形成两层结构。",
+    "把正文移到引言下，论据随整个子树移动；折叠只隐藏不删除。",
+    "禁止移到自身或后代；导出每层两个空格，不因折叠丢子项。",
+    "重启保留父子关系、同级顺序和折叠状态。"
+  ],
+  "repo_name": "Logseq",
+  "license": "AGPL-3.0（LICENSE.md；只研究，不复制实现）",
+  "license_path": "LICENSE.md",
+  "observations": [
+    [
+      "documentation",
+      "deps/outliner/README.md",
+      1,
+      15,
+      "仓库outliner子库说明提供大纲操作，列出datascript-report与pipeline命名空间及前端/命令行使用；未据此声称目标移动规则已在上游验证。"
+    ]
+  ],
+  "inference": "目标采用邻接表树和事务内移动，而非复用Logseq的图谱/同步栈；循环检测、折叠与文本格式均为目标设计。",
+  "features": [
+    "文档与树形条目",
+    "分支移动和折叠",
+    "循环保护与结构导出",
+    "真实重启持久化"
+  ],
+  "goals": [
+    "创建引言和正文，正文下添加论据，形成两层结构。",
+    "把正文移到引言下，论据随整个子树移动；折叠只隐藏不删除。",
+    "禁止移到自身或后代；导出每层两个空格，不因折叠丢子项。",
+    "重启保留父子关系、同级顺序和折叠状态。"
+  ],
+  "arch": "## 运行边界\nPython标准库HTTP+SQLite，本机127.0.0.1；--data-dir独立目录，--demo仅新库首次初始化。GET只读，所有错误JSON为{error:{code,message}}，失败零写入，未知ID404not_found。输入类型先校验；事务保存；UI文本转义，无第三方资源。\n## 数据与规则\ndocuments(id,title)，nodes(id,document_id,parent_id nullable,text,position,collapsed)。同级连续0基；新增在末尾；移动{parent_id,position}为最终同级序列的插入位置0..剩余长度，校验同文档且不能放自己/后代。整个子树保留ID；折叠只改标志。text1..500纯单行，document title1..120。导出所有节点preorder，每层2空格和“- ”。\n## 接口\nGET /api/health；GET /api/state?document_id= -> {documents,nodes}；GET /api/export?document_id= -> {text}；POST /api/documents {title}->201；POST /api/nodes {document_id,parent_id,text}->201；POST /api/nodes/move {id,parent_id,position}->200；POST /api/nodes/collapse {id}->200切换。400 invalid_name/invalid_parent/invalid_position，循环409cycle_detected。\n## 交互\n树形缩进、展开折叠、明确的移动目标下拉与同级位置，不依赖拖拽才可操作。导出预览含隐藏分支。只保存纯文本，不执行Markdown/HTML。\n## 来源与推断\n目标采用邻接表树和事务内移动，而非复用Logseq的图谱/同步栈；循环检测、折叠与文本格式均为目标设计。\n",
+  "gaps": [
+    "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+    "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+    "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+    "无双向链接、图谱、多人编辑、附件、富文本或撤销栈。"
+  ]
+}

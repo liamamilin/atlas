@@ -1,0 +1,65 @@
+{
+  "name": "指定沙箱目录的文件整理与重命名预览",
+  "audience": "只整理自己指定练习目录的个人",
+  "objective": "浏览独立沙箱文件，先预览重命名及子目录移动，再确认执行；禁止覆盖、越界和跟随符号链接。",
+  "workflow": [
+    "启动时指定独立沙箱目录并浏览实际文件",
+    "创建整理子目录",
+    "为单个文件预览新名字和目标目录",
+    "确认预览后执行，核对真实内容不变",
+    "重启回查目录与操作记录"
+  ],
+  "acceptance": [
+    "临时沙箱有note.txt，创建“归档”子目录并预览归档/notes.txt，不立即移动。",
+    "确认token后移动成功，原文件消失、目标字节摘要一致；重复确认只返回既有结果。",
+    "../、绝对路径、符号链接、目标已存在或预览后源变化均失败且不覆盖。",
+    "同沙箱及数据目录重启，目录结构、文件内容和操作记录保留。"
+  ],
+  "repo_name": "File Browser",
+  "license": "Apache-2.0（LICENSE；只研究，不复制实现）",
+  "license_path": "LICENSE",
+  "observations": [
+    [
+      "code_observation",
+      "files/scoped.go",
+      14,
+      26,
+      "ScopedFs说明在BasePathFs之上为可访问磁盘的操作增加范围检查，防止符号链接逃逸。"
+    ],
+    [
+      "code_observation",
+      "files/scoped.go",
+      73,
+      103,
+      "guard调用within，而within对root和目标使用EvalSymlinks后校验范围。"
+    ],
+    [
+      "code_observation",
+      "files/scoped.go",
+      208,
+      216,
+      "Rename分别检查旧、新路径后再委托底层Rename；目标预览及拒绝覆盖另行设计。"
+    ]
+  ],
+  "inference": "目标不开放任意用户目录，要求显式--sandbox-root，仅新建测试沙箱；预览token绑定源字节和目录身份，操作只支持单文件且拒绝覆盖和全部符号链接。宿主共享记录不是对实现安全认证。",
+  "features": [
+    "真实沙箱目录浏览",
+    "预览后单文件重命名/移动",
+    "范围、覆盖与过期预览保护",
+    "真实重启与文件内容保留"
+  ],
+  "goals": [
+    "临时沙箱有note.txt，创建“归档”子目录并预览归档/notes.txt，不立即移动。",
+    "确认token后移动成功，原文件消失、目标字节摘要一致；重复确认只返回既有结果。",
+    "../、绝对路径、符号链接、目标已存在或预览后源变化均失败且不覆盖。",
+    "同沙箱及数据目录重启，目录结构、文件内容和操作记录保留。"
+  ],
+  "arch": "## 运行边界\nPython标准库HTTP+SQLite，本机127.0.0.1；--data-dir独立目录，--demo仅新库首次初始化。GET只读，所有错误JSON为{error:{code,message}}，失败零写入，未知ID404not_found。输入类型先校验；事务保存；UI文本转义，无第三方资源。\n## 数据与规则\n真实磁盘为真相；SQLite只存previews(token,source,target,source_sha256,source_stat,consumed,result)。启动必须传--sandbox-root，缺省则仅创建data-dir/sandbox练习目录，不枚举HOME。所有API路径只允许相对POSIX路径，不许空段、..、绝对路径或NUL；逐段lstat拒绝symlink，根目录本身也不能是链接。只移动普通文件，不批量/删文件/跟随链接。源预览后有变化=>409source_changed；目标已存在409target_exists；确认前再次验证；使用同目录临时与不覆盖原子策略，不用先删目标。token只代表本机明确确认，非认证。跨文件系统返回unsupported_move不复制删源。\n## 接口\nGET /api/health；GET /api/state?path= -> {entries:[{name,kind,size}],operations}；POST /api/folders {path}->201；POST /api/preview {source,target}->201{token,source_sha256,source,target}（不写文件）；POST /api/confirm {token}->200{source,target,sha256}幂等返回。400 invalid_path/symlink_forbidden/unsupported_move；404not_found；409target_exists/source_changed。GET /api/health。--data-dir存操作库，与--sandbox-root分离；练习套件使用data-dir/sandbox。\n## 交互\n固定根说明、面包屑列表、单文件目标输入、预览原/目标/摘要、独立确认按钮。警示只整理练习副本；不提供删除或一键全目录移动；后台限127.0.0.1并校验同源。\n## 来源与推断\n目标不开放任意用户目录，要求显式--sandbox-root，仅新建测试沙箱；预览token绑定源字节和目录身份，操作只支持单文件且拒绝覆盖和全部符号链接。宿主共享记录不是对实现安全认证。\n",
+  "gaps": [
+    "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+    "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+    "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+    "安全敏感模板尚未应用运行或专项安全审阅，不建议直接操作珍贵原文件；TOCTOU/平台文件系统差异需后续实测。",
+    "不做删除、批量规则、外盘跨FS、压缩/上传、目录树移动或权限修改。"
+  ]
+}

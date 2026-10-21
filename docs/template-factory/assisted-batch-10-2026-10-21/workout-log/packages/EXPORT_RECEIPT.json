@@ -1,0 +1,65 @@
+{
+ "origin": "assisted-trial",
+ "template_digest": "5b4a3ef749494d1ef911a53b405c3cc2a26747a083e034779542e4033dcc9ad5",
+ "export": {
+  "phase": "P0",
+  "project_name": "workout-log-trial",
+  "template_digest": "5b4a3ef749494d1ef911a53b405c3cc2a26747a083e034779542e4033dcc9ad5",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1"
+ },
+ "provenance": {
+  "origin": "assisted-trial",
+  "scenario": {
+   "id": "scn_bf0bf87b07d245dca990ea7ea1f1721a",
+   "leaf": "workout-tracking-application",
+   "leaf_name": "健身记录应用",
+   "name": "力量训练组次与训练量回查",
+   "audience": "想回查自己已完成力量训练的个人",
+   "objective": "逐组记录动作、重量和次数，按训练日回查训练量，纠正误填后重新汇总。",
+   "workflow": [
+    "创建训练日",
+    "登记动作名称和每组公斤数、次数",
+    "按动作查看重量乘次数的训练量",
+    "纠正一组的重量并重算",
+    "切换训练日、刷新重启回查"
+   ],
+   "acceptance": [
+    "登记卧推50kg×10次、50kg×8次，总训练量900kg·次。",
+    "第一组改55kg×10次后合计950kg·次，第二日隔离。",
+    "负重量、小数次数和非有限值拒绝，0kg可记自重但注明不含身体重量。",
+    "重启保留每组数据和日汇总。"
+   ],
+   "status": "draft",
+   "updated_at": "2026-10-21T05:38:19.068354+00:00",
+   "revision": 1
+  },
+  "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+  "case_ref": {
+   "case_id": "case:assisted-ten-2026-10-21:workout-log",
+   "revision": 1,
+   "digest": "fb137bad82227c14eaa1cee8fcbc0c9b0b88756f64fd74130a9f6e8ca2ce3040"
+  },
+  "case_record_sha256": "691f90fec01b2d8550b2942c29cb45196ec68e94fd4dc3ab856a92dbd9f88989",
+  "definition_digest": "65fff55fa6344f09c4a054c9f13b00b3c09826911e1079cf3b8e199c8aa86724",
+  "acceptance_inputs": {
+   "README.md": "2418fce93dedbca68968fe5de3ecf6e2e926d2270c27ad27e4031d35fa03215f",
+   "probe.py": "201a039ad06357972f6489b0eb30c0deb16841b9d1a42587bfb1c145e8b11508"
+  },
+  "official_publication": false,
+  "upstream_runtime": "not_run",
+  "independent_evidence_review": "pending",
+  "note": "Static Codex source study; no model review or formal queue consumption. Local freeze fixes inputs only."
+ },
+ "controlled_opencode_calls_added": 0,
+ "official_queue_consumed": false,
+ "archives": {
+  "template-snapshot.zip": "7cb1f1e765dff6a703565004428d83cb0413f47030b615bb167d97c98ee50973",
+  "development-package.zip": "34c54bf587ba015e5859436a2a1edc5ebd8e28e9f48b2994b45b00282f21fd95"
+ }
+}

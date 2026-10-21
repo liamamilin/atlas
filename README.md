@@ -17,6 +17,8 @@
 
 [可重复辅助小批次](docs/template-factory/assisted-batch-2026-10-21/REPORT.md)将上述三份模板接入工厂，并新增家庭库存、专注计时、出行英语模板。工厂「模板制品」支持按名称查找、阅读、回查固定共享案例与导出标准开发包；辅助来源明确标注，不代表严格发布。代表应用 [家物清单](examples/home-inventory-trial/README.md) 使用5276，另两份新模板未运行应用。
 
+[十模板辅助生产批次](docs/template-factory/assisted-batch-10-2026-10-21/REPORT.md)新增晚餐计划、聚餐投票、阅读、旅行、工时、训练、大纲、时间块、流程图和文件整理模板，均可在制品页查找及导出。代表应用 [一周晚餐](examples/meal-plan-trial/README.md)（5277）和 [聚餐投票](examples/dinner-poll-trial/README.md)（5278）已完成真实浏览器核心旅程及同目录重启；其余八份应用未运行。原有数据和严格 G1/T08 状态保留。
+
 叶子类型与应用场景构成生产目录；OpenCode CLI 批量生产冻结候选，Harness 审阅及运行验收独立排队，已发布模板可确定性创建应用包。
 
 - [模板工厂 V1 本轮交付与未通过项](docs/template-factory/v1-2026-10-19/DELIVERY.md)：代码门禁与真实 G1 分开；书签真实生产触及业务修复上限，G1 未通过、首批未启动。

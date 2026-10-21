@@ -1,0 +1,160 @@
+{
+  "sha": "fb3887b64ca5d9db81e208de1dbe20592ed18ca2",
+  "id": 39549472878,
+  "status": "completed",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "name": "docker-integration",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run pip install -r requirements.txt",
+          "conclusion": "success"
+        },
+        {
+          "name": "Pull required runtime images",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run required Docker integration gate",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "name": "check",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run pip install -r requirements.txt",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run python -m pip install pip-audit==2.10.1 ruff==0.15.17",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run pip-audit -r requirements.txt",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint critical Python paths",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run python -m unittest discover -s application-atlas-production-pack/tests -v",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify assisted bookmark trial regressions",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify assisted budget trial regressions",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify assisted meetings trial regressions",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify assisted inventory trial regressions",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify assisted export input identity",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-node@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run npm ci --registry=https://registry.npmjs.org --replace-registry-host=always",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run python application-atlas-production-pack/export_atlas.py",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run npm run gen && npm run verify-data",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run npx playwright install --with-deps chromium",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify independent executor contracts and browser negative controls",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run npm audit --registry=https://registry.npmjs.org --audit-level=high",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run npm run typecheck && npm test && npm run build && npm run test:e2e",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run template factory Playwright suite",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-node@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ]
+}

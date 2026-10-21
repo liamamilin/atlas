@@ -1,0 +1,224 @@
+{
+  "scenario_record": {
+    "acceptance": [
+      "创建09:00–10:00写作和10:00–11:00读书，相邻不重叠。",
+      "09:30–10:30冲突被拒绝；完成写作后保留时间占用及完成标志。",
+      "顺延只移动未完成读书到次日未排期区，不复制；重复顺延不重复创建；再排14:00–15:00。",
+      "重启保留当天完成项、次日安排及顺延来源。"
+    ],
+    "audience": "需要为今天工作预留时间并处理未完成项的个人",
+    "id": "scn_3b74c4ea6d2345988d877e975eb0a5fa",
+    "leaf": "time-blocking-application",
+    "leaf_name": "时间块规划应用",
+    "name": "今日工作时间块与未完事项顺延",
+    "objective": "把待办安排到一天的时间块，避免重叠，结束时把未完成块顺延到明天待安排区而保留来源。",
+    "revision": 1,
+    "status": "draft",
+    "updated_at": "2026-10-21T05:38:19.414844+00:00",
+    "workflow": [
+      "新增当天任务并安排开始结束时间",
+      "查看按时间排序的日程",
+      "完成任务或修改安排",
+      "将一天未完成任务顺延至次日待安排区",
+      "次日重新排期，刷新重启保留"
+    ]
+  },
+  "case_ref": {
+    "case_id": "case:assisted-ten-2026-10-21:day-blocks",
+    "revision": 1,
+    "digest": "3316f087c1f49c58978993251fb001cf8fc8786d81214d6e4a3f92cdcf4c98a7"
+  },
+  "research": {
+    "summary": "同一共享案例记录的静态研究与明确的设计推断；完整定位见inputs/shared-case-record.json。",
+    "sources": [
+      {
+        "id": "S02",
+        "name": "ev_assisted_day_blocks_1",
+        "url": "https://github.com/super-productivity/super-productivity/blob/0556bdb84d09faeff18d6c18abf867e28f3c1f69/README.md",
+        "version": "0556bdb84d09faeff18d6c18abf867e28f3c1f69",
+        "license": "MIT（LICENSE；只研究，不复制实现）",
+        "license_url": "https://github.com/super-productivity/super-productivity/blob/0556bdb84d09faeff18d6c18abf867e28f3c1f69/LICENSE",
+        "facts": "documentation: README声明任务分类、planner/schedule时间轴、timeboxing、time tracking及focus能力；文档声明未代替上游运行。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      },
+      {
+        "id": "S03",
+        "name": "ev_assisted_day_blocks_design",
+        "url": "https://github.com/super-productivity/super-productivity/blob/0556bdb84d09faeff18d6c18abf867e28f3c1f69/LICENSE",
+        "version": "0556bdb84d09faeff18d6c18abf867e28f3c1f69",
+        "license": "MIT（LICENSE；只研究，不复制实现）",
+        "license_url": "https://github.com/super-productivity/super-productivity/blob/0556bdb84d09faeff18d6c18abf867e28f3c1f69/LICENSE",
+        "facts": "inference: 目标把计划时间与实际工时分开，只实现当日排程、完成与未完成迁移；不从现有工时模板换名字复用。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      }
+    ],
+    "gaps": [
+      "证据独立审阅pending",
+      "上游not_run",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "不接外部日历、通知、自动番茄钟或真实工时统计；顺延日如需补录先列待办，不静默绕过封存。"
+    ]
+  },
+  "spec": {
+    "title": "今日工作时间块与未完事项顺延",
+    "roles": [
+      {
+        "id": "R01",
+        "name": "需要为今天工作预留时间并处理未完成项的个人",
+        "responsibility": "把待办安排到一天的时间块，避免重叠，结束时把未完成块顺延到明天待安排区而保留来源。"
+      }
+    ],
+    "features": [
+      {
+        "id": "F01",
+        "name": "时间块与日程排序",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "创建09:00–10:00写作和10:00–11:00读书，相邻不重叠。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03"
+        ],
+        "acceptance": [
+          "A01"
+        ]
+      },
+      {
+        "id": "F02",
+        "name": "完成状态及重叠检测",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "09:30–10:30冲突被拒绝；完成写作后保留时间占用及完成标志。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03"
+        ],
+        "acceptance": [
+          "A02"
+        ]
+      },
+      {
+        "id": "F03",
+        "name": "可幂等顺延与重新排期",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "顺延只移动未完成读书到次日未排期区，不复制；重复顺延不重复创建；再排14:00–15:00。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03"
+        ],
+        "acceptance": [
+          "A03"
+        ]
+      },
+      {
+        "id": "F04",
+        "name": "真实重启持久化",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "重启保留当天完成项、次日安排及顺延来源。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03"
+        ],
+        "acceptance": [
+          "A04"
+        ]
+      }
+    ],
+    "acceptance": [
+      {
+        "id": "A01",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "创建09:00–10:00写作和10:00–11:00读书，相邻不重叠。",
+        "features": [
+          "F01"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A02",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "09:30–10:30冲突被拒绝；完成写作后保留时间占用及完成标志。",
+        "features": [
+          "F02"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A03",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "顺延只移动未完成读书到次日未排期区，不复制；重复顺延不重复创建；再排14:00–15:00。",
+        "features": [
+          "F03"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A04",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "重启保留当天完成项、次日安排及顺延来源。",
+        "features": [
+          "F04"
+        ],
+        "implementation": "acceptance/probe.py"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "D01",
+        "question": "首版运行与数据边界？",
+        "default": "单用户本机、独立SQLite；显式保存，无账户、云端和协作。",
+        "when_to_ask": "确需公网托管或多人数据时先确认，不自行扩展。",
+        "impact": "保护本地数据，避免默认外发。",
+        "status": "assisted default"
+      },
+      {
+        "id": "D02",
+        "question": "是否复刻上游？",
+        "default": "目标把计划时间与实际工时分开，只实现当日排程、完成与未完成迁移；不从现有工时模板换名字复用。",
+        "when_to_ask": "目标变化、破坏已有数据或需要引入上游实现/依赖时先确认。",
+        "impact": "不混淆来源事实与目标设计。",
+        "status": "assisted default"
+      }
+    ],
+    "phases": [
+      {
+        "id": "P0",
+        "title": "核心可用",
+        "goal": "把待办安排到一天的时间块，避免重叠，结束时把未完成块顺延到明天待安排区而保留来源。",
+        "features": [
+          "F01",
+          "F02",
+          "F03",
+          "F04"
+        ],
+        "acceptance": [
+          "A01",
+          "A02",
+          "A03",
+          "A04"
+        ]
+      }
+    ],
+    "architecture_markdown": "## 运行边界\nPython标准库HTTP+SQLite，本机127.0.0.1；--data-dir独立目录，--demo仅新库首次初始化。GET只读，所有错误JSON为{error:{code,message}}，失败零写入，未知ID404not_found。输入类型先校验；事务保存；UI文本转义，无第三方资源。\n## 数据与规则\nblocks(id,title,date,start nullable,end nullable,done,origin_date)。未排期start/end均null；已排期HH:MM同日且end>start。日期有效ISO，title1..160；所有已排期块包括done的半开时间区间不得重叠。carry{date}把未完成块原ID迁到次日、清空start/end，首次保留origin_date；已完成不迁。事务内标记该source日已carry，第二次请求幂等，不移动后来次日新建项。次日已存在块不复制/覆盖。\n## 接口\nGET /api/health；GET /api/state?date= -> {blocks,carried:bool}；POST /api/blocks {title,date,start,end}->201；POST /api/blocks/done {id}->200切换；POST /api/blocks/schedule {id,date,start,end}->200；POST /api/carry {date}->200{moved_ids}（幂等第二次moved_ids=[]）。400 invalid_date/invalid_time/invalid_name，409overlap；顺延完成后原日期禁止新增/移入新块409day_carried，避免幂等状态歧义。\n## 交互\n时间轴+未安排区；完成项打勾保留原时间；顺延按钮先展示目标次日及未完数量，显式确认。未排期不能伪装为已完成工作小时。\n## 来源与推断\n目标把计划时间与实际工时分开，只实现当日排程、完成与未完成迁移；不从现有工时模板换名字复用。\n",
+    "limits": [
+      "辅助试产，非严格G1/T08。",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "不接外部日历、通知、自动番茄钟或真实工时统计；顺延日如需补录先列待办，不静默绕过封存。"
+    ]
+  },
+  "trial_scope": "# 辅助试用范围\n\n把待办安排到一天的时间块，避免重叠，结束时把未完成块顺延到明天待安排区而保留来源。\n\n- 辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。\n- 本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。\n- 单人本机显式保存，无账户、云同步、协作；不复制上游实现。\n- 不接外部日历、通知、自动番茄钟或真实工时统计；顺延日如需补录先列待办，不静默绕过封存。\n\nCodex研究与编写；静态案例未独审、上游未运行。模板先于应用；仅代表场景后续开发应用。严格G1/T08不因本包通过。"
+}

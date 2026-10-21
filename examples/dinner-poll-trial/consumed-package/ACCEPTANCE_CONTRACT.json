@@ -1,0 +1,69 @@
+{
+ "schema": "atlas.acceptance-contract.v1",
+ "template_digest": "232ae37740899435d7aba7c2f20952b5ac3b271f9cb4371ae4121d0dcb1e0f18",
+ "selected_phase": "P0",
+ "required_case_ids": [
+  "A01",
+  "A02",
+  "A03",
+  "A04"
+ ],
+ "cases": [
+  {
+   "id": "A01",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "创建2个不同投票，选择只属于当前投票；重复/空选项不能创建。",
+   "features": [
+    "F01"
+   ],
+   "implementation": "acceptance/probe.py",
+   "implementation_sha256": "5a906ce5e0552c4cca5e26826746eb0d8278fb80ce79ccb5924a18e1283dbaff"
+  },
+  {
+   "id": "A02",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "小林选A、小周选B得到1/1总2；小林改B得到0/2，总数不增加。",
+   "features": [
+    "F02"
+   ],
+   "implementation": "acceptance/probe.py",
+   "implementation_sha256": "5a906ce5e0552c4cca5e26826746eb0d8278fb80ce79ccb5924a18e1283dbaff"
+  },
+  {
+   "id": "A03",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "关闭后投票409poll_closed且汇总不变；重开允许小李选A变1/2总3；空代号与跨投票选项拒绝。",
+   "features": [
+    "F03"
+   ],
+   "implementation": "acceptance/probe.py",
+   "implementation_sha256": "5a906ce5e0552c4cca5e26826746eb0d8278fb80ce79ccb5924a18e1283dbaff"
+  },
+  {
+   "id": "A04",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "相同数据目录重启后列表、状态、全部选项计数与代号票保留。",
+   "features": [
+    "F04"
+   ],
+   "implementation": "acceptance/probe.py",
+   "implementation_sha256": "5a906ce5e0552c4cca5e26826746eb0d8278fb80ce79ccb5924a18e1283dbaff"
+  }
+ ],
+ "suite_sha256": {
+  "acceptance/README.md": "ef9dbca4c64fd866d0290bfb0fae22006c9f567637a00aadd9263920f3bd696c",
+  "acceptance/plan.json": "55fafc71fec56182594a33c0fc535aa5300424c07cfb7ed69342969d8228def9",
+  "acceptance/probe.py": "5a906ce5e0552c4cca5e26826746eb0d8278fb80ce79ccb5924a18e1283dbaff"
+ },
+ "suite_digest": "13142bd26712f1efb3d1e5eb7a52e1b763ca083961ccd093a641fe699f37bfe8",
+ "suite_digest_scope": "all-frozen-blueprint-source; identical to managed runtime binding",
+ "program_inventory_digest": "0b1f9700848281bf0df8a839aa4ee80964b5fcc9c38ce7964be32c9dd9c706a4",
+ "case_basis_digest": null,
+ "scenario_revision": 1,
+ "phase_required_evidence": [],
+ "status": "not_run"
+}

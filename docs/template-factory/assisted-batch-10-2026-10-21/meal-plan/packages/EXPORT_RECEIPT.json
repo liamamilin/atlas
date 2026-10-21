@@ -1,0 +1,65 @@
+{
+ "origin": "assisted-trial",
+ "template_digest": "136001eb2bca0b30eaef6214275d2280d88cddbf818a7d809bb27e900f0b5410",
+ "export": {
+  "phase": "P0",
+  "project_name": "meal-plan-trial",
+  "template_digest": "136001eb2bca0b30eaef6214275d2280d88cddbf818a7d809bb27e900f0b5410",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1"
+ },
+ "provenance": {
+  "origin": "assisted-trial",
+  "scenario": {
+   "id": "scn_860a53784e704b9687ddef39f51be5aa",
+   "leaf": "meal-planning-application",
+   "leaf_name": "膳食规划应用",
+   "name": "每周晚餐计划与合并采购清单",
+   "audience": "为自己或两人家庭提前备餐的个人用户",
+   "objective": "把菜谱安排到一周晚餐，按用餐份数自动合并同名同单位食材，修改计划后采购量立即重算。",
+   "workflow": [
+    "录入一份菜谱的基准人数和食材数量",
+    "在未来日期选择晚餐菜谱和用餐人数",
+    "查看七天内同名同单位食材合并的采购量",
+    "调整人数或暂停某天计划，立即查看重算清单",
+    "恢复计划并在刷新或重启后继续使用"
+   ],
+   "acceptance": [
+    "两人份菜谱300g番茄+2个鸡蛋，分别安排2人和4人晚餐，采购量900g及6个",
+    "4人改2人后600g及4个，暂停其中一天后300g及2个，恢复后还原",
+    "不同单位不合并；非法份数和日期失败零写入，跨周查询隔离",
+    "刷新和同目录进程重启保留菜谱、计划和暂停状态"
+   ],
+   "status": "draft",
+   "updated_at": "2026-10-21T05:32:17.993186+00:00",
+   "revision": 1
+  },
+  "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+  "case_ref": {
+   "case_id": "case:assisted-ten-2026-10-21:meal-plan",
+   "revision": 1,
+   "digest": "1e0c3fe9570b552c9a1420f9a40debf2f728ab76aa6103ba0cbb65977fed12aa"
+  },
+  "case_record_sha256": "048e5af345b360225513a4c637e74d4d3c4c5400e5d872d728d03a53cd4534d0",
+  "definition_digest": "fca2d123f75a1ff5b9ec520ec02167c5c3b9442f2427ad6862f1f5bf05914945",
+  "acceptance_inputs": {
+   "README.md": "ef9dbca4c64fd866d0290bfb0fae22006c9f567637a00aadd9263920f3bd696c",
+   "probe.py": "0c8e8ca7bbbac23465baece5c6811c1d3babba28d3a895145990d02039b244a0"
+  },
+  "official_publication": false,
+  "upstream_runtime": "not_run",
+  "independent_evidence_review": "pending",
+  "note": "Static Codex source study; no model review or formal queue consumption. Local freeze fixes inputs only."
+ },
+ "controlled_opencode_calls_added": 0,
+ "official_queue_consumed": false,
+ "archives": {
+  "template-snapshot.zip": "67d23cd5fa318a1e32e5612489a595aec8913dc986fa557781f342e6fcf5c217",
+  "development-package.zip": "e0a27cc6687cd0d6e333c97fe6fd309b13954d5edba2e4a17cdf955c85ae76b5"
+ }
+}

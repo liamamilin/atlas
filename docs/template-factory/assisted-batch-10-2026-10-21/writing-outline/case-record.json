@@ -1,0 +1,132 @@
+{
+  "app_id": "app:repo:1cde7d888362d3065bd6e629",
+  "case_id": "case:assisted-ten-2026-10-21:writing-outline",
+  "created_at": "2026-10-21T05:39:08.939292+00:00",
+  "created_task_id": "assisted-ten-2026-10-21-writing-outline",
+  "digest": "540c608f701b926b08851b2bf09129a1c16040ad508c260258a954cf89f72450",
+  "evidence_digest": "fdf182dc2178a3ebc5432e3ad2feea95da1efb01fa630e29a59425799bf9776e",
+  "research": {
+    "input_digest": "23b3d33eaf61ab541337330a56213347adc24aa4f0beed95cfa282e84afab711",
+    "scope": "把文章要点整理成可折叠的树，移动整个分支后保留子项及顺序，导出结构文本。",
+    "summary": "Codex静态研究；目标采用邻接表树和事务内移动，而非复用Logseq的图谱/同步栈；循环检测、折叠与文本格式均为目标设计。",
+    "task_id": "assisted-ten-2026-10-21-writing-outline",
+    "unknowns": [
+      "upstream not_run",
+      "independent review pending",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "无双向链接、图谱、多人编辑、附件、富文本或撤销栈。"
+    ]
+  },
+  "research_input_digest": "23b3d33eaf61ab541337330a56213347adc24aa4f0beed95cfa282e84afab711",
+  "revision": 1,
+  "snapshot_ids": [
+    "src_e36cc347e1d507ae2c5dc539"
+  ],
+  "observations": [
+    {
+      "case_id": "case:assisted-ten-2026-10-21:writing-outline",
+      "case_revision": 1,
+      "digest": "84b3154c4a407bd992ae424b0f1180210d586c0499bdce675f0535d379c3061d",
+      "evidence_id": "ev_assisted_writing_outline_1",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "ac1009987f14aa7ee4985a25242236e425377daa3cc7abdb60a64de46664c456",
+        "material_version": "e8c4c37ed43299f22ca36ef898466eae02f45416",
+        "url": "https://github.com/logseq/logseq/blob/e8c4c37ed43299f22ca36ef898466eae02f45416/deps/outliner/README.md"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "仓库outliner子库说明提供大纲操作，列出datascript-report与pipeline命名空间及前端/命令行使用；未据此声称目标移动规则已在上游验证。",
+      "reviews": []
+    },
+    {
+      "case_id": "case:assisted-ten-2026-10-21:writing-outline",
+      "case_revision": 1,
+      "digest": "090a77b7fdb18f7f98e86de3f5a39e756a1fa91aa9b2d6a5bfcbccf6ff8407cd",
+      "evidence_id": "ev_assisted_writing_outline_design",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "上游未运行",
+          "独立证据审阅pending",
+          "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+          "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+          "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+          "无双向链接、图谱、多人编辑、附件、富文本或撤销栈。"
+        ],
+        "depends_on": [
+          "ev_assisted_writing_outline_1"
+        ],
+        "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "目标采用邻接表树和事务内移动，而非复用Logseq的图谱/同步栈；循环检测、折叠与文本格式均为目标设计。",
+      "reviews": []
+    }
+  ],
+  "scenario_links": [
+    {
+      "adopted_scope": [
+        "文档与树形条目",
+        "分支移动和折叠",
+        "循环保护与结构导出",
+        "真实重启持久化"
+      ],
+      "case_id": "case:assisted-ten-2026-10-21:writing-outline",
+      "case_revision": 1,
+      "evidence_ids": [
+        "ev_assisted_writing_outline_1",
+        "ev_assisted_writing_outline_design"
+      ],
+      "exclusions": [
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "无双向链接、图谱、多人编辑、附件、富文本或撤销栈。"
+      ],
+      "reason": "把文章要点整理成可折叠的树，移动整个分支后保留子项及顺序，导出结构文本。",
+      "scenario_id": "scn_3e5d16480fde4032b759eac2dae15b44",
+      "scenario_revision": 1,
+      "workflow_support": []
+    }
+  ],
+  "source_snapshots": [
+    {
+      "archive_sha256": null,
+      "collected_at": "2026-10-21T05:26:14.092719+00:00",
+      "commit_sha": "e8c4c37ed43299f22ca36ef898466eae02f45416",
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ],
+      "file_manifest_digest": "44ff6f77f633a9ef38d84c3519765a234c282d5f5542a92597d447d012eebeda",
+      "files": {
+        "LICENSE.md": "2467b8901ba62f7708c479944468a677897472a39ecbda1d23818ecf9538620b",
+        "README.md": "597bcf7218c37fdf053524467029e22db5c29faffd8fb21007512bbbd3affe56",
+        "deps/outliner/README.md": "ac1009987f14aa7ee4985a25242236e425377daa3cc7abdb60a64de46664c456"
+      },
+      "license": {
+        "notice_hashes": {
+          "LICENSE.md": "2467b8901ba62f7708c479944468a677897472a39ecbda1d23818ecf9538620b"
+        },
+        "status": "located"
+      },
+      "license_files": [
+        "LICENSE.md"
+      ],
+      "license_uncertainties": [
+        "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+      ],
+      "repo_id": null,
+      "repository": "https://github.com/logseq/logseq",
+      "snapshot_id": "src_e36cc347e1d507ae2c5dc539",
+      "strategy_version": "assisted-core-source-v1"
+    }
+  ]
+}

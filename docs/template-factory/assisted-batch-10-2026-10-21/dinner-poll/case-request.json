@@ -1,0 +1,113 @@
+{
+  "case_id": "case:assisted-ten-2026-10-21:dinner-poll",
+  "app_name": "Nextcloud Polls",
+  "source_snapshots": [
+    {
+      "repository": "https://github.com/nextcloud/polls",
+      "commit_sha": "65bf4627ee9a76c52034e796eda75ae5112ad7c3",
+      "strategy_version": "assisted-core-source-v1",
+      "collected_at": "2026-10-21T05:26:06.139132+00:00",
+      "local_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/sources/assisted-ten-2026-10-21/dinner-poll",
+      "files": {
+        "COPYING": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6",
+        "README.md": "642b407c3daea9f4377768d5505db05f7e060247b68c7b74b00568049795d2ed",
+        "lib/Db/Vote.php": "a3ef55c4aaca50db866199e8f1599a02d9fc4c742557f6f24d9237fc16d83789",
+        "lib/Db/Poll.php": "74c337abb5d6c689e46a075006d6d1cdf9f6e68308554a43cead76a89a20ca63"
+      },
+      "license_files": [
+        "COPYING"
+      ],
+      "license": {
+        "status": "located",
+        "notice_hashes": {
+          "COPYING": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6"
+        }
+      },
+      "license_uncertainties": [
+        "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+      ],
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ]
+    }
+  ],
+  "research": {
+    "summary": "Codex静态研究；目标不嵌入Nextcloud，也不复制其身份体系。使用本机共享界面、代号casefold去重、单选替换、显式open/closed状态；代号不是身份认证，不能用于正式选举。",
+    "scope": "为聚餐问题预设地点选项，成员用代号单选并可改票，查看汇总，在结束后冻结投票，必要时重开。",
+    "unknowns": [
+      "upstream not_run",
+      "independent review pending",
+      "Codex静态研究和编写，证据独审pending；上游未安装运行",
+      "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+      "本机同屏、代号非身份认证；不做远程分享、权限隔离、防恶意刷票或正式选举用途"
+    ],
+    "input_digest": "1a88946ca1cfff58b3d6ad423897b9874d96ded108d7ad6d68606d250d2dd3fb",
+    "task_id": "assisted-ten-2026-10-21-dinner-poll"
+  },
+  "observations": [
+    {
+      "evidence_id": "ev_assisted_dinner_poll_1",
+      "kind": "code_observation",
+      "statement": "Vote实体包含pollId、userId、voteOptionId与voteAnswer，定义yes/no/maybe；目标采用单选，与上游多选偏好语义不同。",
+      "location": {
+        "commit_sha": "65bf4627ee9a76c52034e796eda75ae5112ad7c3",
+        "path": "lib/Db/Vote.php",
+        "file_digest": "a3ef55c4aaca50db866199e8f1599a02d9fc4c742557f6f24d9237fc16d83789",
+        "line_start": 34,
+        "line_end": 52
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_dinner_poll_2",
+      "kind": "code_observation",
+      "statement": "Poll声明datePoll与textPoll、private/open访问以及always/closed/never结果可见策略；目标采用文字选项与显式关闭。",
+      "location": {
+        "commit_sha": "65bf4627ee9a76c52034e796eda75ae5112ad7c3",
+        "path": "lib/Db/Poll.php",
+        "file_digest": "74c337abb5d6c689e46a075006d6d1cdf9f6e68308554a43cead76a89a20ca63",
+        "line_start": 86,
+        "line_end": 101
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_dinner_poll_design",
+      "kind": "inference",
+      "statement": "目标不嵌入Nextcloud，也不复制其身份体系。使用本机共享界面、代号casefold去重、单选替换、显式open/closed状态；代号不是身份认证，不能用于正式选举。",
+      "depends_on": [
+        "ev_assisted_dinner_poll_1",
+        "ev_assisted_dinner_poll_2"
+      ],
+      "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。",
+      "assumptions": [
+        "上游未运行",
+        "独立证据审阅pending",
+        "Codex静态研究和编写，证据独审pending；上游未安装运行",
+        "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+        "本机同屏、代号非身份认证；不做远程分享、权限隔离、防恶意刷票或正式选举用途"
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "scenario_id": "scn_0da5ffd0b2124edf8183c82506cb2c61",
+      "scenario_revision": 1,
+      "reason": "为聚餐问题预设地点选项，成员用代号单选并可改票，查看汇总，在结束后冻结投票，必要时重开。",
+      "evidence_ids": [
+        "ev_assisted_dinner_poll_1",
+        "ev_assisted_dinner_poll_2",
+        "ev_assisted_dinner_poll_design"
+      ],
+      "adopted_scope": [
+        "问题与固定地点选项、投票隔离",
+        "单选改票与准确汇总",
+        "结束与重开、非法输入保护",
+        "刷新与真实重启持久化"
+      ],
+      "exclusions": [
+        "Codex静态研究和编写，证据独审pending；上游未安装运行",
+        "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+        "本机同屏、代号非身份认证；不做远程分享、权限隔离、防恶意刷票或正式选举用途"
+      ]
+    }
+  ]
+}

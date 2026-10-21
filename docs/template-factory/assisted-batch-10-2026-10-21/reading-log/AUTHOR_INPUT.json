@@ -1,0 +1,57 @@
+{
+  "name": "个人书架与阅读进度",
+  "audience": "想整理纸书和电子书阅读计划的个人",
+  "objective": "用书架管理待读书，记录已读页数，完成后进入已读列表并能按标题或作者找回。",
+  "workflow": [
+    "新建书架并登记书名、作者和总页数",
+    "将书放进书架并开始阅读",
+    "更新已读页数并显示进度",
+    "读完归档到已读，按标题/作者检索",
+    "刷新重启继续阅读"
+  ],
+  "acceptance": [
+    "在“周末”书架登记200页书，标题作者均可检索。",
+    "更新50页显示25%，更新200页显示已读；从200改100返回在读50%。",
+    "201或负数页拒绝且不改原书；不同书架筛选隔离；0总页拒绝。",
+    "同目录重启保留书架、页数和派生状态。"
+  ],
+  "repo_name": "Calibre-Web",
+  "license": "GPL-3.0（根LICENSE；只研究，不复制实现）",
+  "license_path": "LICENSE",
+  "observations": [
+    [
+      "code_observation",
+      "cps/ub.py",
+      362,
+      387,
+      "Shelf保存名称、所属用户及书籍关系；BookShelf保存book_id、order和shelf，支撑独立书架与成员关系。"
+    ],
+    [
+      "code_observation",
+      "cps/ub.py",
+      403,
+      422,
+      "ReadBook分别定义未读、完成和进行中状态，并关联book_id与user_id；不是本模板页数算法的运行证据。"
+    ]
+  ],
+  "inference": "目标独立实现纸书/电子书元数据目录；每书只放一个书架，页数驱动状态；不搭建Calibre内容服务器或电子书阅读器。",
+  "features": [
+    "书架与书籍目录",
+    "阅读页数与完成状态",
+    "边界、筛选与更正",
+    "真实重启持久化"
+  ],
+  "goals": [
+    "在“周末”书架登记200页书，标题作者均可检索。",
+    "更新50页显示25%，更新200页显示已读；从200改100返回在读50%。",
+    "201或负数页拒绝且不改原书；不同书架筛选隔离；0总页拒绝。",
+    "同目录重启保留书架、页数和派生状态。"
+  ],
+  "arch": "## 运行边界\nPython标准库HTTP+SQLite，本机127.0.0.1；--data-dir独立目录，--demo仅新库首次初始化。GET只读，所有错误JSON为{error:{code,message}}，失败零写入，未知ID404not_found。输入类型先校验；事务保存；UI文本转义，无第三方资源。\n## 数据与规则\nshelves(id,name UNIQUE)，books(id,shelf_id,title,author,total_pages,pages_read)。总页整数1..100000；已读0..total_pages，状态由0=>unread，等于总页=>finished，其余reading，百分比只显示1位小数。更新允许回退以更正误填。名称trim1..80，书名1..200、作者0..120。搜索标题/作者casefold包含匹配，q空返回全部；不做全文电子书搜索。\n## 接口\nGET /api/health；GET /api/state?shelf_id=&q=&status= -> {shelves,books:[{id,shelf_id,title,author,total_pages,pages_read,status,progress_percent}]}；POST /api/shelves {name}->201；POST /api/books {shelf_id,title,author,total_pages}->201（pages_read=0）；POST /api/books/progress {id,pages_read}->200。400 invalid_pages/invalid_name/invalid_status，重复书架409already_exists。\n## 交互\n书架筛选、书籍卡片、页数表单、状态徽标和完成列表。空书架提示先加书，不自动获取封面/ISBN；错误保留输入，不自动删书。\n## 来源与推断\n目标独立实现纸书/电子书元数据目录；每书只放一个书架，页数驱动状态；不搭建Calibre内容服务器或电子书阅读器。\n",
+  "gaps": [
+    "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+    "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+    "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+    "不管理书籍文件/版权下载、读书社交、ISBN抓取或多书架关系。"
+  ]
+}

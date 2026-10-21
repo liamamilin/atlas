@@ -1,0 +1,57 @@
+{
+  "name": "零工项目工时与日汇总",
+  "audience": "按项目记录工作时间但不需要开票的自由职业者",
+  "objective": "按日登记项目开始结束时间和休息分钟数，自动计算净工时，修改后日汇总立即重算。",
+  "workflow": [
+    "新建工作项目",
+    "按日期录入开始结束与休息",
+    "查看日合计和项目分组",
+    "更正休息或结束时间后重新计算",
+    "切换日期并在重启后继续"
+  ],
+  "acceptance": [
+    "项目A登记09:00–11:00休息15分钟，净105分钟。",
+    "再记13:00–14:00得到总165分钟；第一条休息改30后日总150。",
+    "同日重叠、倒置时间、休息超过区间或跨午夜拒绝；另一日不混入。",
+    "重启保留项目与条目，汇总与保存前一致。"
+  ],
+  "repo_name": "Kimai",
+  "license": "AGPL-3.0（LICENSE；只研究，不复制实现）",
+  "license_path": "LICENSE",
+  "observations": [
+    [
+      "code_observation",
+      "src/Entity/Timesheet.php",
+      97,
+      166,
+      "Timesheet分别记录日期、begin/end、duration、break、user、activity、project和description。"
+    ],
+    [
+      "code_observation",
+      "src/Entity/Timesheet.php",
+      343,
+      363,
+      "getCalculatedDuration使用结束时间减开始时间再减break；running记录另有警告。"
+    ]
+  ],
+  "inference": "目标只记录已结束的同日工作，不做运行中计时器、账单费率、后台监控或跨时区时间；以分钟整数派生日总。",
+  "features": [
+    "项目与已完成工时条目",
+    "净时长与日汇总",
+    "修改、重叠保护和日期隔离",
+    "真实重启持久化"
+  ],
+  "goals": [
+    "项目A登记09:00–11:00休息15分钟，净105分钟。",
+    "再记13:00–14:00得到总165分钟；第一条休息改30后日总150。",
+    "同日重叠、倒置时间、休息超过区间或跨午夜拒绝；另一日不混入。",
+    "重启保留项目与条目，汇总与保存前一致。"
+  ],
+  "arch": "## 运行边界\nPython标准库HTTP+SQLite，本机127.0.0.1；--data-dir独立目录，--demo仅新库首次初始化。GET只读，所有错误JSON为{error:{code,message}}，失败零写入，未知ID404not_found。输入类型先校验；事务保存；UI文本转义，无第三方资源。\n## 数据与规则\nprojects(id,name UNIQUE)，entries(id,project_id,date,start,end,break_minutes,notes)。时间HH:MM按本地墙上时间，end>start且同日，break为整数0..区间；净时长可为0。所有项目同日工作半开区间[start,end)不得重叠，相邻可接；更正时排除自己。更新重新派生duration_minutes，不累计旧汇总。\n## 接口\nGET /api/health；GET /api/state?date=YYYY-MM-DD -> {projects,entries:[含duration_minutes],summary:{total_minutes,by_project}}；POST /api/projects {name}->201；POST /api/entries {project_id,date,start,end,break_minutes,notes}->201；POST /api/entries/update {id,project_id,date,start,end,break_minutes,notes}->200。400 invalid_time/invalid_break/invalid_date/invalid_name，重叠409overlap；未知项目404。\n## 交互\n日期导航、项目选择、开始结束和休息字段，明确分钟和净工时；条目编辑显式保存，错误保留输入；空日不显示上日工时。\n## 来源与推断\n目标只记录已结束的同日工作，不做运行中计时器、账单费率、后台监控或跨时区时间；以分钟整数派生日总。\n",
+  "gaps": [
+    "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+    "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+    "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+    "不做计费、发票、自动计时、跨午夜或夏令时跨度计算。"
+  ]
+}

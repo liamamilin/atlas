@@ -1,0 +1,57 @@
+{
+  "name": "力量训练组次与训练量回查",
+  "audience": "想回查自己已完成力量训练的个人",
+  "objective": "逐组记录动作、重量和次数，按训练日回查训练量，纠正误填后重新汇总。",
+  "workflow": [
+    "创建训练日",
+    "登记动作名称和每组公斤数、次数",
+    "按动作查看重量乘次数的训练量",
+    "纠正一组的重量并重算",
+    "切换训练日、刷新重启回查"
+  ],
+  "acceptance": [
+    "登记卧推50kg×10次、50kg×8次，总训练量900kg·次。",
+    "第一组改55kg×10次后合计950kg·次，第二日隔离。",
+    "负重量、小数次数和非有限值拒绝，0kg可记自重但注明不含身体重量。",
+    "重启保留每组数据和日汇总。"
+  ],
+  "repo_name": "wger",
+  "license": "AGPL-3.0（LICENSE.txt；只研究，不复制实现）",
+  "license_path": "LICENSE.txt",
+  "observations": [
+    [
+      "code_observation",
+      "wger/manager/models/log.py",
+      48,
+      71,
+      "WorkoutLog为逐动作日志，具有UUID、日期和用户关联。"
+    ],
+    [
+      "code_observation",
+      "wger/manager/models/log.py",
+      156,
+      177,
+      "weight_unit与两位小数weight分开记录，重量允许空值；目标首版固定kg并明确0kg含义。"
+    ]
+  ],
+  "inference": "目标聚焦已完成的kg重量×次数日志，不给训练或健康建议，不自动生成运动计划。",
+  "features": [
+    "训练日与逐组日志",
+    "整数精度训练量汇总",
+    "更正与非法值保护",
+    "真实重启持久化"
+  ],
+  "goals": [
+    "登记卧推50kg×10次、50kg×8次，总训练量900kg·次。",
+    "第一组改55kg×10次后合计950kg·次，第二日隔离。",
+    "负重量、小数次数和非有限值拒绝，0kg可记自重但注明不含身体重量。",
+    "重启保留每组数据和日汇总。"
+  ],
+  "arch": "## 运行边界\nPython标准库HTTP+SQLite，本机127.0.0.1；--data-dir独立目录，--demo仅新库首次初始化。GET只读，所有错误JSON为{error:{code,message}}，失败零写入，未知ID404not_found。输入类型先校验；事务保存；UI文本转义，无第三方资源。\n## 数据与规则\nsessions(id,date UNIQUE,title)，sets(id,session_id,exercise,weight_minor,reps,position)。weight十进制字符串0..9999.99两位，存百分之一kg；reps整数1..1000；训练量=weight_minor*reps求和，显示除100，绝不把不同日累加进当前日。exercise trim1..100，用casefold分组。编辑保持所属训练日不变。\n## 接口\nGET /api/health；GET /api/state?session_id= -> {sessions,sets,summary:{volume_minor,total_sets}}；POST /api/sessions {date,title}->201；POST /api/sets {session_id,exercise,weight,reps}->201；POST /api/sets/update {id,exercise,weight,reps}->200。400 invalid_weight/invalid_reps/invalid_date/invalid_name，重复日期409already_exists。\n## 交互\n训练日选择器，逐组条目，单位kg、次数、kg·次清晰；编辑显式保存；空日提示开始记录而非推荐强度。\n## 来源与推断\n目标聚焦已完成的kg重量×次数日志，不给训练或健康建议，不自动生成运动计划。\n",
+  "gaps": [
+    "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+    "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+    "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+    "不含动作视频、身体指标、营养/康复建议、lb换算或器械联动。"
+  ]
+}

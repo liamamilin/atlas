@@ -1,0 +1,236 @@
+{
+  "scenario_record": {
+    "id": "scn_860a53784e704b9687ddef39f51be5aa",
+    "leaf": "meal-planning-application",
+    "leaf_name": "膳食规划应用",
+    "name": "每周晚餐计划与合并采购清单",
+    "audience": "为自己或两人家庭提前备餐的个人用户",
+    "objective": "把菜谱安排到一周晚餐，按用餐份数自动合并同名同单位食材，修改计划后采购量立即重算。",
+    "workflow": [
+      "录入一份菜谱的基准人数和食材数量",
+      "在未来日期选择晚餐菜谱和用餐人数",
+      "查看七天内同名同单位食材合并的采购量",
+      "调整人数或暂停某天计划，立即查看重算清单",
+      "恢复计划并在刷新或重启后继续使用"
+    ],
+    "acceptance": [
+      "两人份菜谱300g番茄+2个鸡蛋，分别安排2人和4人晚餐，采购量900g及6个",
+      "4人改2人后600g及4个，暂停其中一天后300g及2个，恢复后还原",
+      "不同单位不合并；非法份数和日期失败零写入，跨周查询隔离",
+      "刷新和同目录进程重启保留菜谱、计划和暂停状态"
+    ],
+    "status": "draft",
+    "updated_at": "2026-10-21T05:32:17.993186+00:00",
+    "revision": 1
+  },
+  "case_ref": {
+    "case_id": "case:assisted-ten-2026-10-21:meal-plan",
+    "revision": 1,
+    "digest": "1e0c3fe9570b552c9a1420f9a40debf2f728ab76aa6103ba0cbb65977fed12aa"
+  },
+  "research": {
+    "summary": "同一共享案例记录的静态研究与明确的设计推断；完整定位见inputs/shared-case-record.json。",
+    "sources": [
+      {
+        "id": "S02",
+        "name": "ev_assisted_meal_plan_1",
+        "url": "https://github.com/mealie-recipes/mealie/blob/9b66aa319d32ea5dbdf112fe6bcda60015702721/mealie/db/models/household/mealplan.py",
+        "version": "9b66aa319d32ea5dbdf112fe6bcda60015702721",
+        "license": "AGPL-3.0根LICENSE；参考研究，不复制实现",
+        "license_url": "https://github.com/mealie-recipes/mealie/blob/9b66aa319d32ea5dbdf112fe6bcda60015702721/LICENSE",
+        "facts": "code_observation: GroupMealPlan定义date、entry_type、recipe_id与recipe_scale，把日期餐次与菜谱及倍率连接。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      },
+      {
+        "id": "S03",
+        "name": "ev_assisted_meal_plan_2",
+        "url": "https://github.com/mealie-recipes/mealie/blob/9b66aa319d32ea5dbdf112fe6bcda60015702721/mealie/db/models/household/shopping_list.py",
+        "version": "9b66aa319d32ea5dbdf112fe6bcda60015702721",
+        "license": "AGPL-3.0根LICENSE；参考研究，不复制实现",
+        "license_url": "https://github.com/mealie-recipes/mealie/blob/9b66aa319d32ea5dbdf112fe6bcda60015702721/LICENSE",
+        "facts": "code_observation: ShoppingListItemRecipeReference记录recipe_id、recipe_quantity、recipe_scale；这里只观察购物项的菜谱引用，不据此宣称已运行完整合并算法。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      },
+      {
+        "id": "S04",
+        "name": "ev_assisted_meal_plan_design",
+        "url": "https://github.com/mealie-recipes/mealie/blob/9b66aa319d32ea5dbdf112fe6bcda60015702721/LICENSE",
+        "version": "9b66aa319d32ea5dbdf112fe6bcda60015702721",
+        "license": "AGPL-3.0根LICENSE；参考研究，不复制实现",
+        "license_url": "https://github.com/mealie-recipes/mealie/blob/9b66aa319d32ea5dbdf112fe6bcda60015702721/LICENSE",
+        "facts": "inference: 目标缩小为晚餐、单人本机、不可变菜谱和可暂停计划；用整数百分之一数量按份数缩放后合并同名同单位，不自动换算单位/营养或调用食谱抓取。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      }
+    ],
+    "gaps": [
+      "证据独立审阅pending",
+      "上游not_run",
+      "Codex静态研究和编写，证据独审pending；上游未安装运行",
+      "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+      "仅晚餐/7天窗口；菜谱不可变，无营养建议、单位自动换算、附件、抓取、同步或采购下单"
+    ]
+  },
+  "spec": {
+    "title": "每周晚餐计划与合并采购清单",
+    "roles": [
+      {
+        "id": "R01",
+        "name": "为自己或两人家庭提前备餐的个人用户",
+        "responsibility": "把菜谱安排到一周晚餐，按用餐份数自动合并同名同单位食材，修改计划后采购量立即重算。"
+      }
+    ],
+    "features": [
+      {
+        "id": "F01",
+        "name": "菜谱与日期晚餐计划",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "登记2人菜谱：番茄300g、鸡蛋2个；安排2人和4人两天，采购900g、6个。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A01"
+        ]
+      },
+      {
+        "id": "F02",
+        "name": "按人数合并采购清单及修改重算",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "4人改2人后600g、4个；不同单位不合并；汇总由当前计划实时派生，非累加缓存。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A02"
+        ]
+      },
+      {
+        "id": "F03",
+        "name": "暂停恢复、错误零写入与周范围隔离",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "暂停一日只剩300g、2个，恢复还原；份数0、非法日期、超过7天范围、未知菜谱拒绝且不改旧数据。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A03"
+        ]
+      },
+      {
+        "id": "F04",
+        "name": "刷新与真实重启持久化",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "同一数据目录跨进程重启，全部菜谱、计划状态及清单相同。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A04"
+        ]
+      }
+    ],
+    "acceptance": [
+      {
+        "id": "A01",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "登记2人菜谱：番茄300g、鸡蛋2个；安排2人和4人两天，采购900g、6个。",
+        "features": [
+          "F01"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A02",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "4人改2人后600g、4个；不同单位不合并；汇总由当前计划实时派生，非累加缓存。",
+        "features": [
+          "F02"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A03",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "暂停一日只剩300g、2个，恢复还原；份数0、非法日期、超过7天范围、未知菜谱拒绝且不改旧数据。",
+        "features": [
+          "F03"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A04",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "同一数据目录跨进程重启，全部菜谱、计划状态及清单相同。",
+        "features": [
+          "F04"
+        ],
+        "implementation": "acceptance/probe.py"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "D01",
+        "question": "首版运行与数据边界？",
+        "default": "单用户本机、独立SQLite；显式保存，无账户、云端和协作。",
+        "when_to_ask": "确需公网托管或多人数据时先确认，不自行扩展。",
+        "impact": "保护本地数据，避免默认外发。",
+        "status": "assisted default"
+      },
+      {
+        "id": "D02",
+        "question": "是否复刻上游？",
+        "default": "目标缩小为晚餐、单人本机、不可变菜谱和可暂停计划；用整数百分之一数量按份数缩放后合并同名同单位，不自动换算单位/营养或调用食谱抓取。",
+        "when_to_ask": "目标变化、破坏已有数据或需要引入上游实现/依赖时先确认。",
+        "impact": "不混淆来源事实与目标设计。",
+        "status": "assisted default"
+      }
+    ],
+    "phases": [
+      {
+        "id": "P0",
+        "title": "核心可用",
+        "goal": "把菜谱安排到一周晚餐，按用餐份数自动合并同名同单位食材，修改计划后采购量立即重算。",
+        "features": [
+          "F01",
+          "F02",
+          "F03",
+          "F04"
+        ],
+        "acceptance": [
+          "A01",
+          "A02",
+          "A03",
+          "A04"
+        ]
+      }
+    ],
+    "architecture_markdown": "## 数据和计算\n单用户本机127.0.0.1，Python标准库HTTP+SQLite，显式HTML表单，零外部依赖。recipes(id,name,base_servings,ingredients JSON)为不可变菜谱；ingredients为[{name,unit,quantity}]，quantity为十进制正数字符串最多2位小数，单位仅g/ml/个，每名每单位在单一菜谱唯一。base_servings与计划servings为整数1–20。plans(id,date UNIQUE,recipe_id,servings,active)；每日期只有一份晚餐，重复409already_exists，即使暂停也先更新或恢复，禁止覆盖。\n食材数量按整数百分之一存储；每个有效计划贡献=原数量×servings/base_servings，Decimal ROUND_HALF_UP保留2位；按trim+casefold后的名称和精确单位分组，相同单位加总，不自动换算g/kg。显示单位与数量，说明份数估算并非营养建议。暂停不删除原计划；GET不写库。\n## 接口\nGET /api/health；GET /api/state?start=YYYY-MM-DD&end=YYYY-MM-DD -> recipes,plans（含暂停）,shopping{items:[{name,unit,quantity_minor}],plan_count}；GET /api/shopping?start=&end= -> {items,plan_count}。范围1–7天含首尾，默认本周，旧周与新周隔离。\nPOST /api/recipes {name,base_servings,ingredients:[{name,unit,quantity}]} ->201{id,...}；POST /api/plans {date,recipe_id,servings}->201{id,...}；POST /api/plans/update {id,servings}->200；POST /api/plans/toggle {id}->200切换active。400 invalid_servings/invalid_quantity/invalid_ingredient/invalid_date/invalid_range/invalid_name，404not_found，409already_exists；{error:{code,message}}，失败零写入。\n## 界面和启动\n首页选择起止日期，显示晚餐计划、人数、修改/暂停/恢复按钮、合并采购清单和菜谱登记。食材每行“名称|单位|数量”，字段label明确，错误保留原输入，HTML全部转义。显式提交，暂停可以恢复。新增日期后跳回包含所选日期的周，不能保存成功却看不到计划。--port5277 --data-dir指向独立目录；--demo仅新库首次创建。采购数量非真实购买订单，不自动下单，不读取原应用库。\n",
+    "limits": [
+      "辅助试产，非严格G1/T08。",
+      "Codex静态研究和编写，证据独审pending；上游未安装运行",
+      "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+      "仅晚餐/7天窗口；菜谱不可变，无营养建议、单位自动换算、附件、抓取、同步或采购下单"
+    ]
+  },
+  "trial_scope": "# 辅助试用范围\n\n把菜谱安排到一周晚餐，按用餐份数自动合并同名同单位食材，修改计划后采购量立即重算。\n\n- Codex静态研究和编写，证据独审pending；上游未安装运行\n- 只供本机辅助试用，非严格G1/T08；不改旧应用或数据\n- 仅晚餐/7天窗口；菜谱不可变，无营养建议、单位自动换算、附件、抓取、同步或采购下单\n\nCodex研究与编写；静态案例未独审、上游未运行。模板先于应用；仅代表场景后续开发应用。严格G1/T08不因本包通过。"
+}

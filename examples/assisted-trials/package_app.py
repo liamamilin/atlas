@@ -9,10 +9,14 @@ import zipfile
 
 
 def package(app, destination):
+    destination = destination.resolve()
+    receipt = destination.with_name("SOURCE_MANIFEST.json")
     files = [
         p
         for p in app.rglob("*")
-        if p.is_file() and not ({"data", "__pycache__"} & set(p.relative_to(app).parts))
+        if p.is_file()
+        and p.resolve() not in {destination, receipt}
+        and not ({"data", "__pycache__"} & set(p.relative_to(app).parts))
     ]
     rows = [
         {
@@ -32,7 +36,7 @@ def package(app, destination):
         "files": rows,
         "user_database_included": False,
     }
-    destination.with_name("SOURCE_MANIFEST.json").write_text(
+    receipt.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
     )
     return manifest

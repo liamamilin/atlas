@@ -1,0 +1,154 @@
+{
+ "app_id": "app:repo:4b8e9c24aecc020c7bfbfcf6",
+ "case_id": "case:assisted-ten-2026-10-21:dinner-poll",
+ "created_at": "2026-10-21T05:32:18.432373+00:00",
+ "created_task_id": "assisted-ten-2026-10-21-dinner-poll",
+ "digest": "72bcf1ef0fc6a48d824c9978ea8a39a864d70650d63c804b1553835ebd41e617",
+ "evidence_digest": "a3c7a3b6514c3ccb0c8b99b61e39342a272f87e6ebc98bf5ab0a5ea56846072e",
+ "research": {
+  "input_digest": "1a88946ca1cfff58b3d6ad423897b9874d96ded108d7ad6d68606d250d2dd3fb",
+  "scope": "为聚餐问题预设地点选项，成员用代号单选并可改票，查看汇总，在结束后冻结投票，必要时重开。",
+  "summary": "Codex静态研究；目标不嵌入Nextcloud，也不复制其身份体系。使用本机共享界面、代号casefold去重、单选替换、显式open/closed状态；代号不是身份认证，不能用于正式选举。",
+  "task_id": "assisted-ten-2026-10-21-dinner-poll",
+  "unknowns": [
+   "upstream not_run",
+   "independent review pending",
+   "Codex静态研究和编写，证据独审pending；上游未安装运行",
+   "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+   "本机同屏、代号非身份认证；不做远程分享、权限隔离、防恶意刷票或正式选举用途"
+  ]
+ },
+ "research_input_digest": "1a88946ca1cfff58b3d6ad423897b9874d96ded108d7ad6d68606d250d2dd3fb",
+ "revision": 1,
+ "snapshot_ids": [
+  "src_7f2d22d8b4525255daf122b7"
+ ],
+ "observations": [
+  {
+   "case_id": "case:assisted-ten-2026-10-21:dinner-poll",
+   "case_revision": 1,
+   "digest": "f5aa88a4af6b2d9867d2941f4e1bb28a7d1f27a7094b2c1e895cee45d2e42033",
+   "evidence_id": "ev_assisted_dinner_poll_1",
+   "kind": "code_observation",
+   "location": {
+    "commit_sha": "65bf4627ee9a76c52034e796eda75ae5112ad7c3",
+    "file_digest": "a3ef55c4aaca50db866199e8f1599a02d9fc4c742557f6f24d9237fc16d83789",
+    "line_end": 52,
+    "line_start": 34,
+    "path": "lib/Db/Vote.php"
+   },
+   "observation_status": "source_located",
+   "review": {
+    "status": "pending"
+   },
+   "statement": "Vote实体包含pollId、userId、voteOptionId与voteAnswer，定义yes/no/maybe；目标采用单选，与上游多选偏好语义不同。",
+   "reviews": []
+  },
+  {
+   "case_id": "case:assisted-ten-2026-10-21:dinner-poll",
+   "case_revision": 1,
+   "digest": "e3c4243a6cd41aacabc0de603502e2ba9cbfa0f7440c78c72794180328a7fcd8",
+   "evidence_id": "ev_assisted_dinner_poll_2",
+   "kind": "code_observation",
+   "location": {
+    "commit_sha": "65bf4627ee9a76c52034e796eda75ae5112ad7c3",
+    "file_digest": "74c337abb5d6c689e46a075006d6d1cdf9f6e68308554a43cead76a89a20ca63",
+    "line_end": 101,
+    "line_start": 86,
+    "path": "lib/Db/Poll.php"
+   },
+   "observation_status": "source_located",
+   "review": {
+    "status": "pending"
+   },
+   "statement": "Poll声明datePoll与textPoll、private/open访问以及always/closed/never结果可见策略；目标采用文字选项与显式关闭。",
+   "reviews": []
+  },
+  {
+   "case_id": "case:assisted-ten-2026-10-21:dinner-poll",
+   "case_revision": 1,
+   "digest": "84c7dd689410380f7c310d6ac6b20157ad3dfe2d9d150e2e3d7cb6edde4bef5a",
+   "evidence_id": "ev_assisted_dinner_poll_design",
+   "kind": "inference",
+   "location": {
+    "assumptions": [
+     "上游未运行",
+     "独立证据审阅pending",
+     "Codex静态研究和编写，证据独审pending；上游未安装运行",
+     "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+     "本机同屏、代号非身份认证；不做远程分享、权限隔离、防恶意刷票或正式选举用途"
+    ],
+    "depends_on": [
+     "ev_assisted_dinner_poll_1",
+     "ev_assisted_dinner_poll_2"
+    ],
+    "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+   },
+   "observation_status": "model_extracted",
+   "review": {
+    "status": "pending"
+   },
+   "statement": "目标不嵌入Nextcloud，也不复制其身份体系。使用本机共享界面、代号casefold去重、单选替换、显式open/closed状态；代号不是身份认证，不能用于正式选举。",
+   "reviews": []
+  }
+ ],
+ "scenario_links": [
+  {
+   "adopted_scope": [
+    "问题与固定地点选项、投票隔离",
+    "单选改票与准确汇总",
+    "结束与重开、非法输入保护",
+    "刷新与真实重启持久化"
+   ],
+   "case_id": "case:assisted-ten-2026-10-21:dinner-poll",
+   "case_revision": 1,
+   "evidence_ids": [
+    "ev_assisted_dinner_poll_1",
+    "ev_assisted_dinner_poll_2",
+    "ev_assisted_dinner_poll_design"
+   ],
+   "exclusions": [
+    "Codex静态研究和编写，证据独审pending；上游未安装运行",
+    "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+    "本机同屏、代号非身份认证；不做远程分享、权限隔离、防恶意刷票或正式选举用途"
+   ],
+   "reason": "为聚餐问题预设地点选项，成员用代号单选并可改票，查看汇总，在结束后冻结投票，必要时重开。",
+   "scenario_id": "scn_0da5ffd0b2124edf8183c82506cb2c61",
+   "scenario_revision": 1,
+   "workflow_support": []
+  }
+ ],
+ "source_snapshots": [
+  {
+   "archive_sha256": null,
+   "collected_at": "2026-10-21T05:26:06.139132+00:00",
+   "commit_sha": "65bf4627ee9a76c52034e796eda75ae5112ad7c3",
+   "excluded_paths": [
+    "Unselected files; upstream not installed or run"
+   ],
+   "file_manifest_digest": "e2a0b173de715d13276f1537bff43dda4d1a64e53212b0c727566dc2f3ea98df",
+   "files": {
+    "COPYING": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6",
+    "README.md": "642b407c3daea9f4377768d5505db05f7e060247b68c7b74b00568049795d2ed",
+    "lib/Db/Poll.php": "74c337abb5d6c689e46a075006d6d1cdf9f6e68308554a43cead76a89a20ca63",
+    "lib/Db/Vote.php": "a3ef55c4aaca50db866199e8f1599a02d9fc4c742557f6f24d9237fc16d83789"
+   },
+   "license": {
+    "notice_hashes": {
+     "COPYING": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6"
+    },
+    "status": "located"
+   },
+   "license_files": [
+    "COPYING"
+   ],
+   "license_uncertainties": [
+    "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+   ],
+   "repo_id": null,
+   "repository": "https://github.com/nextcloud/polls",
+   "snapshot_id": "src_7f2d22d8b4525255daf122b7",
+   "strategy_version": "assisted-core-source-v1"
+  }
+ ]
+}

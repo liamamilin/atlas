@@ -53,7 +53,7 @@ def authored_definition(item, authored, scene, case, snap):
                 "license_url": snap["repository"]
                 + "/blob/"
                 + snap["commit_sha"]
-                + "/LICENSE",
+                + "/" + authored.get("license_path", "LICENSE"),
                 "facts": observation["kind"] + ": " + observation["statement"],
                 "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。",
             }
@@ -388,6 +388,9 @@ def main():
             item.update(
                 produce(path.parent, item, store, args.api, manifest["batch_id"])
             )
+            # The failed-attempt file remains evidence; current state must not
+            # keep a stale error after a successful, same-item continuation.
+            item.pop("error", None)
             if (
                 item.get("application_runtime")
                 == "core_browser_and_same_dir_restart_passed"

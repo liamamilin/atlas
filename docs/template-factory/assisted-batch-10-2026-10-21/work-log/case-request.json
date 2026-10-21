@@ -1,0 +1,115 @@
+{
+  "case_id": "case:assisted-ten-2026-10-21:work-log",
+  "app_name": "Kimai",
+  "source_snapshots": [
+    {
+      "repository": "https://github.com/kimai/kimai",
+      "commit_sha": "acc17ef21c2f1466a0b399cf6595fd4b20b1f085",
+      "strategy_version": "assisted-core-source-v1",
+      "collected_at": "2026-10-21T05:26:10.949590+00:00",
+      "local_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/sources/assisted-ten-2026-10-21/work-log",
+      "files": {
+        "LICENSE": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+        "README.md": "c149b1087ac06e94cbdd71b5e6b75d1e473b7f32a442de73b806e7dcf1e0a2ca",
+        "src/Entity/Timesheet.php": "fecd06dd2f259bc63ea8c937d9eba019f225eb58a4368252bf8eb077acebbbc7"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license": {
+        "status": "located",
+        "notice_hashes": {
+          "LICENSE": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+        }
+      },
+      "license_uncertainties": [
+        "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+      ],
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ]
+    }
+  ],
+  "research": {
+    "summary": "Codex静态研究；目标只记录已结束的同日工作，不做运行中计时器、账单费率、后台监控或跨时区时间；以分钟整数派生日总。",
+    "scope": "按日登记项目开始结束时间和休息分钟数，自动计算净工时，修改后日汇总立即重算。",
+    "unknowns": [
+      "upstream not_run",
+      "independent review pending",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "不做计费、发票、自动计时、跨午夜或夏令时跨度计算。"
+    ],
+    "input_digest": "8e8a4418f53a7efc92c1ecbfbe8011ae9f19d10e7e62e5f267e2e08a4e2c7250",
+    "task_id": "assisted-ten-2026-10-21-work-log"
+  },
+  "observations": [
+    {
+      "evidence_id": "ev_assisted_work_log_1",
+      "kind": "code_observation",
+      "statement": "Timesheet分别记录日期、begin/end、duration、break、user、activity、project和description。",
+      "location": {
+        "commit_sha": "acc17ef21c2f1466a0b399cf6595fd4b20b1f085",
+        "path": "src/Entity/Timesheet.php",
+        "file_digest": "fecd06dd2f259bc63ea8c937d9eba019f225eb58a4368252bf8eb077acebbbc7",
+        "line_start": 97,
+        "line_end": 166
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_work_log_2",
+      "kind": "code_observation",
+      "statement": "getCalculatedDuration使用结束时间减开始时间再减break；running记录另有警告。",
+      "location": {
+        "commit_sha": "acc17ef21c2f1466a0b399cf6595fd4b20b1f085",
+        "path": "src/Entity/Timesheet.php",
+        "file_digest": "fecd06dd2f259bc63ea8c937d9eba019f225eb58a4368252bf8eb077acebbbc7",
+        "line_start": 343,
+        "line_end": 363
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_work_log_design",
+      "kind": "inference",
+      "statement": "目标只记录已结束的同日工作，不做运行中计时器、账单费率、后台监控或跨时区时间；以分钟整数派生日总。",
+      "depends_on": [
+        "ev_assisted_work_log_1",
+        "ev_assisted_work_log_2"
+      ],
+      "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。",
+      "assumptions": [
+        "上游未运行",
+        "独立证据审阅pending",
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "不做计费、发票、自动计时、跨午夜或夏令时跨度计算。"
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "scenario_id": "scn_a5ba5020abbe461fa5992a4e01bee420",
+      "scenario_revision": 1,
+      "reason": "按日登记项目开始结束时间和休息分钟数，自动计算净工时，修改后日汇总立即重算。",
+      "evidence_ids": [
+        "ev_assisted_work_log_1",
+        "ev_assisted_work_log_2",
+        "ev_assisted_work_log_design"
+      ],
+      "adopted_scope": [
+        "项目与已完成工时条目",
+        "净时长与日汇总",
+        "修改、重叠保护和日期隔离",
+        "真实重启持久化"
+      ],
+      "exclusions": [
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "不做计费、发票、自动计时、跨午夜或夏令时跨度计算。"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "case_id": "case:assisted-ten-2026-10-21:meal-plan",
+  "app_name": "Mealie",
+  "source_snapshots": [
+    {
+      "repository": "https://github.com/mealie-recipes/mealie",
+      "commit_sha": "9b66aa319d32ea5dbdf112fe6bcda60015702721",
+      "strategy_version": "assisted-core-source-v1",
+      "collected_at": "2026-10-21T05:26:06.510043+00:00",
+      "local_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/sources/assisted-ten-2026-10-21/meal-plan",
+      "files": {
+        "LICENSE": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+        "README.md": "7a87d6463aba4d2050b89eb4e069b18e5b25ba268372234edbd8d6e8b34650fc",
+        "mealie/db/models/household/mealplan.py": "fcad61134734da7c09efc67be35db1578a2525909416a5746f03782a9b64aaba",
+        "mealie/db/models/household/shopping_list.py": "759e9f2ad5d118e3031884f9222d301cd1c93f552e2be39caf60cfebeb3f25b7"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license": {
+        "status": "located",
+        "notice_hashes": {
+          "LICENSE": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+        }
+      },
+      "license_uncertainties": [
+        "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+      ],
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ]
+    }
+  ],
+  "research": {
+    "summary": "Codex静态研究；目标缩小为晚餐、单人本机、不可变菜谱和可暂停计划；用整数百分之一数量按份数缩放后合并同名同单位，不自动换算单位/营养或调用食谱抓取。",
+    "scope": "把菜谱安排到一周晚餐，按用餐份数自动合并同名同单位食材，修改计划后采购量立即重算。",
+    "unknowns": [
+      "upstream not_run",
+      "independent review pending",
+      "Codex静态研究和编写，证据独审pending；上游未安装运行",
+      "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+      "仅晚餐/7天窗口；菜谱不可变，无营养建议、单位自动换算、附件、抓取、同步或采购下单"
+    ],
+    "input_digest": "b92295936ca368bfd06e719883794c919022493b86337e75b4d03284058ab7ff",
+    "task_id": "assisted-ten-2026-10-21-meal-plan"
+  },
+  "observations": [
+    {
+      "evidence_id": "ev_assisted_meal_plan_1",
+      "kind": "code_observation",
+      "statement": "GroupMealPlan定义date、entry_type、recipe_id与recipe_scale，把日期餐次与菜谱及倍率连接。",
+      "location": {
+        "commit_sha": "9b66aa319d32ea5dbdf112fe6bcda60015702721",
+        "path": "mealie/db/models/household/mealplan.py",
+        "file_digest": "fcad61134734da7c09efc67be35db1578a2525909416a5746f03782a9b64aaba",
+        "line_start": 55,
+        "line_end": 75
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_meal_plan_2",
+      "kind": "code_observation",
+      "statement": "ShoppingListItemRecipeReference记录recipe_id、recipe_quantity、recipe_scale；这里只观察购物项的菜谱引用，不据此宣称已运行完整合并算法。",
+      "location": {
+        "commit_sha": "9b66aa319d32ea5dbdf112fe6bcda60015702721",
+        "path": "mealie/db/models/household/shopping_list.py",
+        "file_digest": "759e9f2ad5d118e3031884f9222d301cd1c93f552e2be39caf60cfebeb3f25b7",
+        "line_start": 26,
+        "line_end": 44
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_meal_plan_design",
+      "kind": "inference",
+      "statement": "目标缩小为晚餐、单人本机、不可变菜谱和可暂停计划；用整数百分之一数量按份数缩放后合并同名同单位，不自动换算单位/营养或调用食谱抓取。",
+      "depends_on": [
+        "ev_assisted_meal_plan_1",
+        "ev_assisted_meal_plan_2"
+      ],
+      "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。",
+      "assumptions": [
+        "上游未运行",
+        "独立证据审阅pending",
+        "Codex静态研究和编写，证据独审pending；上游未安装运行",
+        "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+        "仅晚餐/7天窗口；菜谱不可变，无营养建议、单位自动换算、附件、抓取、同步或采购下单"
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "scenario_id": "scn_860a53784e704b9687ddef39f51be5aa",
+      "scenario_revision": 1,
+      "reason": "把菜谱安排到一周晚餐，按用餐份数自动合并同名同单位食材，修改计划后采购量立即重算。",
+      "evidence_ids": [
+        "ev_assisted_meal_plan_1",
+        "ev_assisted_meal_plan_2",
+        "ev_assisted_meal_plan_design"
+      ],
+      "adopted_scope": [
+        "菜谱与日期晚餐计划",
+        "按人数合并采购清单及修改重算",
+        "暂停恢复、错误零写入与周范围隔离",
+        "刷新与真实重启持久化"
+      ],
+      "exclusions": [
+        "Codex静态研究和编写，证据独审pending；上游未安装运行",
+        "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+        "仅晚餐/7天窗口；菜谱不可变，无营养建议、单位自动换算、附件、抓取、同步或采购下单"
+      ]
+    }
+  ]
+}

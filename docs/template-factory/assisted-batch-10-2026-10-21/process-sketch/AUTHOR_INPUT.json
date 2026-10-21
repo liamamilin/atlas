@@ -1,0 +1,57 @@
+{
+  "name": "个人办事流程图与连接保持",
+  "audience": "需要梳理报销或办事步骤的个人",
+  "objective": "用开始、处理、判断和结束节点画出小流程，连接步骤并移动节点时保持连接，保存后回看。",
+  "workflow": [
+    "新建流程图",
+    "添加开始、处理、判断、结束节点",
+    "连接步骤并给分支标注文字",
+    "移动节点检查连接端点随之更新",
+    "保存刷新并导出结构JSON"
+  ],
+  "acceptance": [
+    "创建start、process、decision、end四节点并建立三条边，分支可标“是”。",
+    "移动process节点后，边仍指向相同节点ID，UI端点按新几何重算。",
+    "未知端点、自环、重复同端点同标签边拒绝；导出保留全部节点几何及边。",
+    "重启保留节点位置、类型、标签和连接。"
+  ],
+  "repo_name": "draw.io",
+  "license": "Apache-2.0（LICENSE；只研究，不复制实现）",
+  "license_path": "LICENSE",
+  "observations": [
+    [
+      "code_observation",
+      "src/main/webapp/mxgraph/src/model/mxGeometry.js",
+      6,
+      33,
+      "mxGeometry区分顶点x/y宽高和边的端点/控制点，并说明连接状态与移动时控制点行为。"
+    ],
+    [
+      "code_observation",
+      "src/main/webapp/mxgraph/src/model/mxGeometry.js",
+      285,
+      322,
+      "translate对顶点位置及可用的sourcePoint/targetPoint平移；目标节点ID绑定的重算方式仍为独立设计。"
+    ]
+  ],
+  "inference": "目标以SVG渲染少量流程节点，边持有节点ID，几何改变时派生中心端点；不复制mxGraph或提供完整BPMN。",
+  "features": [
+    "带类型的流程节点",
+    "连接与移动保持",
+    "非法连接及结构导出",
+    "真实重启持久化"
+  ],
+  "goals": [
+    "创建start、process、decision、end四节点并建立三条边，分支可标“是”。",
+    "移动process节点后，边仍指向相同节点ID，UI端点按新几何重算。",
+    "未知端点、自环、重复同端点同标签边拒绝；导出保留全部节点几何及边。",
+    "重启保留节点位置、类型、标签和连接。"
+  ],
+  "arch": "## 运行边界\nPython标准库HTTP+SQLite，本机127.0.0.1；--data-dir独立目录，--demo仅新库首次初始化。GET只读，所有错误JSON为{error:{code,message}}，失败零写入，未知ID404not_found。输入类型先校验；事务保存；UI文本转义，无第三方资源。\n## 数据与规则\ndiagrams(id,title)，nodes(id,diagram_id,kind start|process|decision|end,label,x,y)，edges(id,diagram_id,source_id,target_id,label)。节点默认尺寸120×60，decision绘菱形，start/end圆角；x/y整数0..1900，label1..80。边两端必须属于同图、不能自身、source+target+label唯一；允许回路但不解释为执行引擎。导出完整图结构JSON，不保存派生像素端点。\n## 接口\nGET /api/health；GET /api/state?diagram_id= -> {diagrams,nodes,edges}；GET /api/export?diagram_id= -> 同结构JSON；POST /api/diagrams {title}->201；POST /api/nodes {diagram_id,kind,label,x,y}->201；POST /api/nodes/move {id,x,y}->200；POST /api/edges {diagram_id,source_id,target_id,label}->201。400 invalid_kind/invalid_position/invalid_edge/invalid_name，409already_exists。\n## 交互\n提供类型选择、新增节点、连接起终点及标签表单；坐标编辑是必备无拖拽路径，SVG连线随移动更新。空图有示例提示，不执行图内文字或脚本。\n## 来源与推断\n目标以SVG渲染少量流程节点，边持有节点ID，几何改变时派生中心端点；不复制mxGraph或提供完整BPMN。\n",
+  "gaps": [
+    "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+    "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+    "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+    "无图形智能布局、BPMN验证、协作、图片/PDF导出或工作流执行。"
+  ]
+}

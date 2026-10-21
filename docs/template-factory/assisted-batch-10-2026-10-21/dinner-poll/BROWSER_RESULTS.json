@@ -1,0 +1,80 @@
+{
+  "schema": "atlas.auxiliary-browser-result.v1",
+  "status": "core_browser_and_same_dir_restart_passed",
+  "verified_at": "2026-10-21T05:55:00.390461+00:00",
+  "origin": "assisted-trial",
+  "journeys": [
+    "真实浏览器创建“周五聚餐·试用”，面馆/火锅2项。",
+    "小林选面馆、小周选火锅，总2人，各1票，显示并列。",
+    "“ 小林 ”改选火锅，仍2人，0/2票。",
+    "结束投票后控件禁用并说明原因；重开保留2票，再由小李投面馆，3人，1/2票。",
+    "刷新、停止原PID并同目录启动新PID，完整API状态相等，浏览器重新加载仍保留。"
+  ],
+  "restart": {
+    "before": {
+      "polls": [
+        {
+          "id": "32381bbee40841f08989c1865dfcbb60",
+          "title": "周五聚餐 · 试用",
+          "status": "open"
+        }
+      ],
+      "details": [
+        {
+          "id": "32381bbee40841f08989c1865dfcbb60",
+          "title": "周五聚餐 · 试用",
+          "status": "open",
+          "options": [
+            {
+              "id": "1b0c3702e6284ff8ad459b5546e1023f",
+              "label": "面馆",
+              "count": 1
+            },
+            {
+              "id": "0000471998e44ae1ba3acb13dee1f90c",
+              "label": "火锅",
+              "count": 2
+            }
+          ],
+          "total_votes": 3
+        }
+      ]
+    },
+    "stopped_pid": 7053,
+    "command": "/Users/milin/.pyenv/versions/3.10.13/bin/python3 examples/dinner-poll-trial/app/serve.py --port 5278 --data-dir examples/dinner-poll-trial/data",
+    "stopped_at": "2026-10-21T05:42:43.024676+00:00",
+    "after": {
+      "polls": [
+        {
+          "id": "32381bbee40841f08989c1865dfcbb60",
+          "title": "周五聚餐 · 试用",
+          "status": "open"
+        }
+      ],
+      "details": [
+        {
+          "id": "32381bbee40841f08989c1865dfcbb60",
+          "title": "周五聚餐 · 试用",
+          "status": "open",
+          "options": [
+            {
+              "id": "1b0c3702e6284ff8ad459b5546e1023f",
+              "label": "面馆",
+              "count": 1
+            },
+            {
+              "id": "0000471998e44ae1ba3acb13dee1f90c",
+              "label": "火锅",
+              "count": 2
+            }
+          ],
+          "total_votes": 3
+        }
+      ]
+    },
+    "restarted_pid": 7656,
+    "equal": true,
+    "verified_at": "2026-10-21T05:43:28.887903+00:00"
+  },
+  "scope": "人工驱动真实IAB浏览器；完整状态HTTP比对；非工厂独立runner或严格G1。"
+}

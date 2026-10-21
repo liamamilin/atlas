@@ -1,0 +1,130 @@
+{
+  "schema": "atlas.auxiliary-browser-result.v1",
+  "status": "core_browser_and_same_dir_restart_passed",
+  "verified_at": "2026-10-21T05:55:00.390461+00:00",
+  "origin": "assisted-trial",
+  "journeys": [
+    "在真实浏览器登记2人菜谱，番茄300g、鸡蛋2个。",
+    "2026-10-21排2人、10-22排4人；界面采购900g和6个。",
+    "将第二天改为2人，重算600g和4个；暂停第一天变300g和2个，恢复600g和4个。",
+    "切到下一周为空，回本周仍有2顿及600g/4个。",
+    "刷新、停止原PID并同目录启动新PID，完整API状态相等，浏览器重新加载仍保留。"
+  ],
+  "restart": {
+    "before": {
+      "recipes": [
+        {
+          "id": 1,
+          "name": "番茄炒蛋 · 试用",
+          "base_servings": 2,
+          "ingredients": [
+            {
+              "name": "番茄",
+              "unit": "g",
+              "quantity": "300"
+            },
+            {
+              "name": "鸡蛋",
+              "unit": "个",
+              "quantity": "2"
+            }
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "id": 1,
+          "date": "2026-10-21",
+          "recipe_id": 1,
+          "servings": 2,
+          "active": 1,
+          "recipe_name": "番茄炒蛋 · 试用"
+        },
+        {
+          "id": 2,
+          "date": "2026-10-22",
+          "recipe_id": 1,
+          "servings": 2,
+          "active": 1,
+          "recipe_name": "番茄炒蛋 · 试用"
+        }
+      ],
+      "shopping": {
+        "items": [
+          {
+            "name": "番茄",
+            "unit": "g",
+            "quantity_minor": 60000
+          },
+          {
+            "name": "鸡蛋",
+            "unit": "个",
+            "quantity_minor": 400
+          }
+        ],
+        "plan_count": 2
+      }
+    },
+    "stopped_pid": 7008,
+    "command": "/Users/milin/.pyenv/versions/3.10.13/bin/python3 examples/meal-plan-trial/app/serve.py --port 5277 --data-dir examples/meal-plan-trial/data",
+    "stopped_at": "2026-10-21T05:42:42.968786+00:00",
+    "after": {
+      "recipes": [
+        {
+          "id": 1,
+          "name": "番茄炒蛋 · 试用",
+          "base_servings": 2,
+          "ingredients": [
+            {
+              "name": "番茄",
+              "unit": "g",
+              "quantity": "300"
+            },
+            {
+              "name": "鸡蛋",
+              "unit": "个",
+              "quantity": "2"
+            }
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "id": 1,
+          "date": "2026-10-21",
+          "recipe_id": 1,
+          "servings": 2,
+          "active": 1,
+          "recipe_name": "番茄炒蛋 · 试用"
+        },
+        {
+          "id": 2,
+          "date": "2026-10-22",
+          "recipe_id": 1,
+          "servings": 2,
+          "active": 1,
+          "recipe_name": "番茄炒蛋 · 试用"
+        }
+      ],
+      "shopping": {
+        "items": [
+          {
+            "name": "番茄",
+            "unit": "g",
+            "quantity_minor": 60000
+          },
+          {
+            "name": "鸡蛋",
+            "unit": "个",
+            "quantity_minor": 400
+          }
+        ],
+        "plan_count": 2
+      }
+    },
+    "restarted_pid": 7613,
+    "equal": true,
+    "verified_at": "2026-10-21T05:43:28.830611+00:00"
+  },
+  "scope": "人工驱动真实IAB浏览器；完整状态HTTP比对；非工厂独立runner或严格G1。"
+}

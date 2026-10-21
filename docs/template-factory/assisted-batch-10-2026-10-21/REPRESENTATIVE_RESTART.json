@@ -1,0 +1,184 @@
+{
+  "meal-plan": {
+    "before": {
+      "recipes": [
+        {
+          "id": 1,
+          "name": "番茄炒蛋 · 试用",
+          "base_servings": 2,
+          "ingredients": [
+            {
+              "name": "番茄",
+              "unit": "g",
+              "quantity": "300"
+            },
+            {
+              "name": "鸡蛋",
+              "unit": "个",
+              "quantity": "2"
+            }
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "id": 1,
+          "date": "2026-10-21",
+          "recipe_id": 1,
+          "servings": 2,
+          "active": 1,
+          "recipe_name": "番茄炒蛋 · 试用"
+        },
+        {
+          "id": 2,
+          "date": "2026-10-22",
+          "recipe_id": 1,
+          "servings": 2,
+          "active": 1,
+          "recipe_name": "番茄炒蛋 · 试用"
+        }
+      ],
+      "shopping": {
+        "items": [
+          {
+            "name": "番茄",
+            "unit": "g",
+            "quantity_minor": 60000
+          },
+          {
+            "name": "鸡蛋",
+            "unit": "个",
+            "quantity_minor": 400
+          }
+        ],
+        "plan_count": 2
+      }
+    },
+    "stopped_pid": 7008,
+    "command": "/Users/milin/.pyenv/versions/3.10.13/bin/python3 examples/meal-plan-trial/app/serve.py --port 5277 --data-dir examples/meal-plan-trial/data",
+    "stopped_at": "2026-10-21T05:42:42.968786+00:00",
+    "after": {
+      "recipes": [
+        {
+          "id": 1,
+          "name": "番茄炒蛋 · 试用",
+          "base_servings": 2,
+          "ingredients": [
+            {
+              "name": "番茄",
+              "unit": "g",
+              "quantity": "300"
+            },
+            {
+              "name": "鸡蛋",
+              "unit": "个",
+              "quantity": "2"
+            }
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "id": 1,
+          "date": "2026-10-21",
+          "recipe_id": 1,
+          "servings": 2,
+          "active": 1,
+          "recipe_name": "番茄炒蛋 · 试用"
+        },
+        {
+          "id": 2,
+          "date": "2026-10-22",
+          "recipe_id": 1,
+          "servings": 2,
+          "active": 1,
+          "recipe_name": "番茄炒蛋 · 试用"
+        }
+      ],
+      "shopping": {
+        "items": [
+          {
+            "name": "番茄",
+            "unit": "g",
+            "quantity_minor": 60000
+          },
+          {
+            "name": "鸡蛋",
+            "unit": "个",
+            "quantity_minor": 400
+          }
+        ],
+        "plan_count": 2
+      }
+    },
+    "restarted_pid": 7613,
+    "equal": true,
+    "verified_at": "2026-10-21T05:43:28.830611+00:00"
+  },
+  "dinner-poll": {
+    "before": {
+      "polls": [
+        {
+          "id": "32381bbee40841f08989c1865dfcbb60",
+          "title": "周五聚餐 · 试用",
+          "status": "open"
+        }
+      ],
+      "details": [
+        {
+          "id": "32381bbee40841f08989c1865dfcbb60",
+          "title": "周五聚餐 · 试用",
+          "status": "open",
+          "options": [
+            {
+              "id": "1b0c3702e6284ff8ad459b5546e1023f",
+              "label": "面馆",
+              "count": 1
+            },
+            {
+              "id": "0000471998e44ae1ba3acb13dee1f90c",
+              "label": "火锅",
+              "count": 2
+            }
+          ],
+          "total_votes": 3
+        }
+      ]
+    },
+    "stopped_pid": 7053,
+    "command": "/Users/milin/.pyenv/versions/3.10.13/bin/python3 examples/dinner-poll-trial/app/serve.py --port 5278 --data-dir examples/dinner-poll-trial/data",
+    "stopped_at": "2026-10-21T05:42:43.024676+00:00",
+    "after": {
+      "polls": [
+        {
+          "id": "32381bbee40841f08989c1865dfcbb60",
+          "title": "周五聚餐 · 试用",
+          "status": "open"
+        }
+      ],
+      "details": [
+        {
+          "id": "32381bbee40841f08989c1865dfcbb60",
+          "title": "周五聚餐 · 试用",
+          "status": "open",
+          "options": [
+            {
+              "id": "1b0c3702e6284ff8ad459b5546e1023f",
+              "label": "面馆",
+              "count": 1
+            },
+            {
+              "id": "0000471998e44ae1ba3acb13dee1f90c",
+              "label": "火锅",
+              "count": 2
+            }
+          ],
+          "total_votes": 3
+        }
+      ]
+    },
+    "restarted_pid": 7656,
+    "equal": true,
+    "verified_at": "2026-10-21T05:43:28.887903+00:00"
+  }
+}

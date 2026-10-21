@@ -1,0 +1,135 @@
+Browser tab: 10, Title: "一周晚餐", URL: "http://127.0.0.1:5277/?start=2026-10-26&end=2026-11-01".
+1 AXWebArea 一周晚餐, URL: 127.0.0.1:5277/?start=2026-10-26&end=2026-11-01
+	2 container
+		3 link Description: 一周晚餐, Value: 127.0.0.1:5277/
+		4 text 本机保存 · 辅助试用版
+	5 container
+		6 heading 安排晚餐，采购刚刚好, Value: 1
+			7 text 安排晚餐，采购刚刚好
+		8 text 为自己或两个人，提前想好每天吃什么。 有效晚餐 0  顿 当前日期范围 已暂停 0  顿 随时可以恢复 合并采购项 0  项 按名称和单位计算 已保存菜谱 1  份 保存在本机
+		9 heading 查看 7 天内的晚餐, Value: 2
+			10 text 查看 7 天内的晚餐
+		11 link Description: 回到本周, Value: 127.0.0.1:5277/
+		12 container
+			13 text 开始日期
+			14 date field (settable) 开始日期, Value: 2026-10-26, ID: start
+				15 container
+					16 stepper
+					17 stepper
+					18 stepper
+				19 pop up button 显示日期选择器 显示日期选择器
+			20 text 结束日期
+			21 date field (settable) 结束日期, Value: 2026-11-01, ID: end
+				22 container
+					23 stepper
+					24 stepper
+					25 stepper
+				26 pop up button 显示日期选择器 显示日期选择器
+			27 button 查看计划
+		28 link Description: ← 前 7 天, Value: 127.0.0.1:5277/?start=2026-10-19&end=2026-10-25
+		29 text 范围包含起止日期，最多 7 天
+		30 link Description: 后 7 天 →, Value: 127.0.0.1:5277/?start=2026-11-02&end=2026-11-08
+		31 heading 晚餐日历, Value: 2
+			32 text 晚餐日历
+		33 table
+			34 row
+				35 cell
+					36 text 日期
+				37 cell
+					38 text 菜谱 / 状态
+				39 cell
+					40 text 人数
+				41 cell
+					42 text 操作
+			43 row
+				44 cell
+					45 text 2026-10-26
+					46 text 周一
+				47 cell
+					48 text 尚未安排 · 在下方选择日期和菜谱
+			49 row
+				50 cell
+					51 text 2026-10-27
+					52 text 周二
+				53 cell
+					54 text 尚未安排 · 在下方选择日期和菜谱
+			55 row
+				56 cell
+					57 text 2026-10-28
+					58 text 周三
+				59 cell
+					60 text 尚未安排 · 在下方选择日期和菜谱
+			61 row
+				62 cell
+					63 text 2026-10-29
+					64 text 周四
+				65 cell
+					66 text 尚未安排 · 在下方选择日期和菜谱
+			67 row
+				68 cell
+					69 text 2026-10-30
+					70 text 周五
+				71 cell
+					72 text 尚未安排 · 在下方选择日期和菜谱
+			73 row
+				74 cell
+					75 text 2026-10-31
+					76 text 周六
+				77 cell
+					78 text 尚未安排 · 在下方选择日期和菜谱
+			79 row
+				80 cell
+					81 text 2026-11-01
+					82 text 周日
+				83 cell
+					84 text 尚未安排 · 在下方选择日期和菜谱
+		85 heading 安排一顿晚餐, Value: 3
+			86 text 安排一顿晚餐
+		87 container
+			88 text 晚餐日期
+			89 date field (settable) 晚餐日期, Value: 2026-10-26, ID: plan-date
+				90 container
+					91 stepper
+					92 stepper
+					93 stepper
+				94 pop up button 显示日期选择器 显示日期选择器
+			95 text 选择菜谱
+			96 pop up button (collapsed, settable) 选择菜谱, Value: 请选择菜谱, ID: plan-recipe, Secondary Actions: Expand
+				97 menu
+					98 (selected) 请选择菜谱
+					99 番茄炒蛋 · 试用（基准 2 人）
+			100 text 用餐人数（1–20）
+			101 stepper (settable, integer) 用餐人数（1–20）, Value: 2, ID: plan-servings
+			102 button 保存晚餐
+			103 text 每日期一份晚餐。已存在的计划请修改人数或恢复；选择其他日期后，会显示该日期所在周。
+		104 heading 登记菜谱, Value: 2
+			105 text 登记菜谱
+		106 text 保存后菜谱不可修改。食材数量按基准人数填写。
+		107 container
+			108 text 菜谱名称
+			109 text field (settable) 菜谱名称, ID: recipe-name
+			110 text 基准人数（1–20）
+			111 stepper (settable, integer) 基准人数（1–20）, Value: 2, ID: base-servings
+			112 text 食材清单：每行 名称|单位|数量
+			113 text entry area (settable) 食材清单：每行 名称|单位|数量, ID: ingredients
+			114 text 单位只填 g、ml 或 个；数量大于 0，最多两位小数。同名同单位每份菜谱只写一行。
+			115 button 保存菜谱
+		116 heading 我的菜谱 · 1 份, Value: 2
+			117 text 我的菜谱 · 1 份
+		118 container
+			119 text 番茄炒蛋 · 试用 基准 2 人 番茄 300 g · 鸡蛋 2 个
+		120 container
+			121 heading 合并采购清单, Value: 2
+				122 text 合并采购清单
+			123 text 2026-10-26 至 2026-11-01
+			124 text 来自 0 顿有效晚餐，暂停计划不计入。 还没有采购项
+			125 text 先登记菜谱，再安排晚餐 同名同单位合并；不同单位分开列出。每顿按人数换算并保留两位小数，再合计。 这是份数估算，并非营养建议或真实购买订单。
+		126 heading 从一份菜谱开始, Value: 2
+			127 text 从一份菜谱开始
+		128 container
+			129 text ① 登记基准人数和食材
+			130 text ② 选择日期，安排晚餐人数
+			131 text ③ 查看清单，调整或暂停计划
+		132 text 源自 Atlas 场景与固定开源案例 · SQLite 本机持久化 · Codex 辅助实现
+
+The focused UI element is 1 AXWebArea 一周晚餐, URL: 127.0.0.1:5277/?start=2026-10-26&end=2026-11-01

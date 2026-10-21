@@ -1,0 +1,65 @@
+{
+ "origin": "assisted-trial",
+ "template_digest": "72b4b2e92bc3405e57d454ab889962d10b480dddf1e1bc716f3b990efae5befc",
+ "export": {
+  "phase": "P0",
+  "project_name": "dinner-poll-trial",
+  "template_digest": "72b4b2e92bc3405e57d454ab889962d10b480dddf1e1bc716f3b990efae5befc",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1"
+ },
+ "provenance": {
+  "origin": "assisted-trial",
+  "scenario": {
+   "id": "scn_0da5ffd0b2124edf8183c82506cb2c61",
+   "leaf": "polling-application",
+   "leaf_name": "投票应用",
+   "name": "同机聚餐地点投票",
+   "audience": "在同一台设备前轮流表达偏好的小组成员",
+   "objective": "为聚餐问题预设地点选项，成员用代号单选并可改票，查看汇总，在结束后冻结投票，必要时重开。",
+   "workflow": [
+    "主持人创建问题及2–8个地点选项",
+    "成员在同一设备用代号投一票",
+    "成员以相同代号改票，汇总保持一人一票",
+    "主持人结束投票，此后不能再投或改票",
+    "需要继续时重开并再次投票，刷新重启后保留结果"
+   ],
+   "acceptance": [
+    "两人分别投不同选项时总数2且各1；一人改票后仍2，变成0和2",
+    "关闭时再投返回poll_closed且结果不变；重开后允许第三人投票，总3",
+    "选项必须属于该投票，重复选项或空代号被拒绝；不同投票互不混入",
+    "刷新及同目录进程重启后状态和汇总一致，平票如实显示不擅自选赢家"
+   ],
+   "status": "draft",
+   "updated_at": "2026-10-21T05:32:18.425591+00:00",
+   "revision": 1
+  },
+  "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+  "case_ref": {
+   "case_id": "case:assisted-ten-2026-10-21:dinner-poll",
+   "revision": 1,
+   "digest": "72bcf1ef0fc6a48d824c9978ea8a39a864d70650d63c804b1553835ebd41e617"
+  },
+  "case_record_sha256": "7ed84db5a0cc622f518eb64672830583c3f478e6015a4e3e92b1f9be6b10c48a",
+  "definition_digest": "891af7246d06c0ef250427f7a43ac0a0658cca85d372200b3e2ee645c3e57c6a",
+  "acceptance_inputs": {
+   "README.md": "ef9dbca4c64fd866d0290bfb0fae22006c9f567637a00aadd9263920f3bd696c",
+   "probe.py": "5a906ce5e0552c4cca5e26826746eb0d8278fb80ce79ccb5924a18e1283dbaff"
+  },
+  "official_publication": false,
+  "upstream_runtime": "not_run",
+  "independent_evidence_review": "pending",
+  "note": "Static Codex source study; no model review or formal queue consumption. Local freeze fixes inputs only."
+ },
+ "controlled_opencode_calls_added": 0,
+ "official_queue_consumed": false,
+ "archives": {
+  "template-snapshot.zip": "8f19fab70b9043806fb3192d83206a535ca927ad738f2679108b3477b4b5d792",
+  "development-package.zip": "e55ddefb3dca86c89d7b84ea9d757592ca0599be445efb09dc0f1c7ed4cf0dec"
+ }
+}

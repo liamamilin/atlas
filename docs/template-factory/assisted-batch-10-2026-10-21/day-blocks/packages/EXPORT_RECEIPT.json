@@ -1,0 +1,65 @@
+{
+ "origin": "assisted-trial",
+ "template_digest": "d0bbea8035ba439160a6798f870344b0ca80394b90abecd742c418cd363698d8",
+ "export": {
+  "phase": "P0",
+  "project_name": "day-blocks-trial",
+  "template_digest": "d0bbea8035ba439160a6798f870344b0ca80394b90abecd742c418cd363698d8",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1"
+ },
+ "provenance": {
+  "origin": "assisted-trial",
+  "scenario": {
+   "acceptance": [
+    "创建09:00–10:00写作和10:00–11:00读书，相邻不重叠。",
+    "09:30–10:30冲突被拒绝；完成写作后保留时间占用及完成标志。",
+    "顺延只移动未完成读书到次日未排期区，不复制；重复顺延不重复创建；再排14:00–15:00。",
+    "重启保留当天完成项、次日安排及顺延来源。"
+   ],
+   "audience": "需要为今天工作预留时间并处理未完成项的个人",
+   "id": "scn_3b74c4ea6d2345988d877e975eb0a5fa",
+   "leaf": "time-blocking-application",
+   "leaf_name": "时间块规划应用",
+   "name": "今日工作时间块与未完事项顺延",
+   "objective": "把待办安排到一天的时间块，避免重叠，结束时把未完成块顺延到明天待安排区而保留来源。",
+   "revision": 1,
+   "status": "draft",
+   "updated_at": "2026-10-21T05:38:19.414844+00:00",
+   "workflow": [
+    "新增当天任务并安排开始结束时间",
+    "查看按时间排序的日程",
+    "完成任务或修改安排",
+    "将一天未完成任务顺延至次日待安排区",
+    "次日重新排期，刷新重启保留"
+   ]
+  },
+  "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+  "case_ref": {
+   "case_id": "case:assisted-ten-2026-10-21:day-blocks",
+   "revision": 1,
+   "digest": "3316f087c1f49c58978993251fb001cf8fc8786d81214d6e4a3f92cdcf4c98a7"
+  },
+  "case_record_sha256": "c5b29940e2e74913be7f1456882d236aa7c9c1752618d07d4cd238d50ccb6665",
+  "definition_digest": "401c3aed5d106879b98c9352461b05ffecb216a1e12e28a823136756e53e8bc6",
+  "acceptance_inputs": {
+   "README.md": "2418fce93dedbca68968fe5de3ecf6e2e926d2270c27ad27e4031d35fa03215f",
+   "probe.py": "02c0b0761f820d5788cdc4f5949e3263714213ac715bdc23942e7ed3c1652523"
+  },
+  "official_publication": false,
+  "upstream_runtime": "not_run",
+  "independent_evidence_review": "pending",
+  "note": "Static Codex source study; no model review or formal queue consumption. Local freeze fixes inputs only."
+ },
+ "controlled_opencode_calls_added": 0,
+ "official_queue_consumed": false,
+ "archives": {
+  "template-snapshot.zip": "3bdba7c14ba0f9564e2ad329def532144eabfd0eda004664aba93af994374a59",
+  "development-package.zip": "c9bb221deaefc89fe67b206cb1ceb0436ba335e368d549e2aef18ebee25b3cee"
+ }
+}

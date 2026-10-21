@@ -1,0 +1,21 @@
+test_api_error_shape_and_unknown_recipe (test_app.FormTests) ... 127.0.0.1 - - [21/Oct/2026 13:56:33] "POST /api/plans HTTP/1.1" 404 -
+ok
+test_create_outside_current_week_redirects_visible (test_app.FormTests) ... 127.0.0.1 - - [21/Oct/2026 13:56:33] "POST /plans HTTP/1.1" 303 -
+127.0.0.1 - - [21/Oct/2026 13:56:33] "GET /?start=2027-01-04&end=2027-01-10&saved=plan HTTP/1.1" 200 -
+127.0.0.1 - - [21/Oct/2026 13:56:33] "POST /plans HTTP/1.1" 409 -
+ok
+test_form_error_escapes_and_preserves_input (test_app.FormTests) ... 127.0.0.1 - - [21/Oct/2026 13:56:33] "POST /recipes HTTP/1.1" 400 -
+ok
+test_demo_only_initializes_new_database (test_app.StorageTests) ... ok
+test_duplicate_paused_date_zero_write (test_app.StorageTests) ... ok
+test_duplicate_recipe_ingredient_rejected_atomically (test_app.StorageTests) ... ok
+test_get_state_does_not_write (test_app.StorageTests) ... ok
+test_invalid_inputs_zero_write (test_app.StorageTests) ... ok
+test_range_edges_and_week_isolation (test_app.StorageTests) ... ok
+test_round_each_plan_half_up_before_aggregation (test_app.StorageTests) ... ok
+test_trim_casefold_grouping_and_units (test_app.StorageTests) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.550s
+
+OK

@@ -1,0 +1,115 @@
+{
+  "case_id": "case:assisted-ten-2026-10-21:weekend-trip",
+  "app_name": "TRIP",
+  "source_snapshots": [
+    {
+      "repository": "https://github.com/itskovacs/trip",
+      "commit_sha": "856b1edfe81a735fce4b544c2e16a6518cebf164",
+      "strategy_version": "assisted-core-source-v1",
+      "collected_at": "2026-10-21T05:26:09.792883+00:00",
+      "local_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/sources/assisted-ten-2026-10-21/weekend-trip",
+      "files": {
+        "license.txt": "3eae852e2dc6be228a0eb4050a7607fffa2a40929e7ae954e5f5ef41e2ffb063",
+        "README.md": "8abcad63787a47837f9907ee148d517ec47141d45de05f1cafdc491b67aa38ba",
+        "backend/trip/models/models.py": "61d50de69472d504a8038b28c55af76c9e32d0ba7e94bff6e2a295fa2673ebe0"
+      },
+      "license_files": [
+        "license.txt"
+      ],
+      "license": {
+        "status": "located",
+        "notice_hashes": {
+          "license.txt": "3eae852e2dc6be228a0eb4050a7607fffa2a40929e7ae954e5f5ef41e2ffb063"
+        }
+      },
+      "license_uncertainties": [
+        "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+      ],
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ]
+    }
+  ],
+  "research": {
+    "summary": "Codex静态研究；只借鉴行程/地点/天的关系；目标手工地址文本与日内顺序，不接地图、导航、实时交通或预订。",
+    "scope": "把地点安排进两天行程，调整参观顺序并标记已到访，离线回查地址和安排。",
+    "unknowns": [
+      "upstream not_run",
+      "independent review pending",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "无地图、路线最优解、天气、订票或远程协作，地址正确性由人确认。"
+    ],
+    "input_digest": "1f80f778b932b0813d70f30d66c532c1affa2f81bdf2626b351831772af086b3",
+    "task_id": "assisted-ten-2026-10-21-weekend-trip"
+  },
+  "observations": [
+    {
+      "evidence_id": "ev_assisted_weekend_trip_1",
+      "kind": "code_observation",
+      "statement": "TripPlaceLink连接旅行和地点；PlaceBase包含名称、坐标、描述和visited标志。",
+      "location": {
+        "commit_sha": "856b1edfe81a735fce4b544c2e16a6518cebf164",
+        "path": "backend/trip/models/models.py",
+        "file_digest": "61d50de69472d504a8038b28c55af76c9e32d0ba7e94bff6e2a295fa2673ebe0",
+        "line_start": 505,
+        "line_end": 557
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_weekend_trip_2",
+      "kind": "code_observation",
+      "statement": "Trip拥有days关系，按日期和标签排序；目标日内的手动排序属于设计推断。",
+      "location": {
+        "commit_sha": "856b1edfe81a735fce4b544c2e16a6518cebf164",
+        "path": "backend/trip/models/models.py",
+        "file_digest": "61d50de69472d504a8038b28c55af76c9e32d0ba7e94bff6e2a295fa2673ebe0",
+        "line_start": 610,
+        "line_end": 633
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_weekend_trip_design",
+      "kind": "inference",
+      "statement": "只借鉴行程/地点/天的关系；目标手工地址文本与日内顺序，不接地图、导航、实时交通或预订。",
+      "depends_on": [
+        "ev_assisted_weekend_trip_1",
+        "ev_assisted_weekend_trip_2"
+      ],
+      "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。",
+      "assumptions": [
+        "上游未运行",
+        "独立证据审阅pending",
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "无地图、路线最优解、天气、订票或远程协作，地址正确性由人确认。"
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "scenario_id": "scn_16afaedcefee4dd9b8e8931e3a29fd65",
+      "scenario_revision": 1,
+      "reason": "把地点安排进两天行程，调整参观顺序并标记已到访，离线回查地址和安排。",
+      "evidence_ids": [
+        "ev_assisted_weekend_trip_1",
+        "ev_assisted_weekend_trip_2",
+        "ev_assisted_weekend_trip_design"
+      ],
+      "adopted_scope": [
+        "两日行程与地点",
+        "日内顺序调整",
+        "到访状态与隔离",
+        "真实重启持久化"
+      ],
+      "exclusions": [
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "无地图、路线最优解、天气、订票或远程协作，地址正确性由人确认。"
+      ]
+    }
+  ]
+}

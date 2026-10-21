@@ -1,0 +1,193 @@
+{
+  "schema": "atlas.application-delivery.v1",
+  "root": ".",
+  "files": [
+    "CONSUMPTION.json",
+    "README.md",
+    "acceptance/README.md",
+    "acceptance/plan.json",
+    "acceptance/probe.py",
+    "app/serve.py",
+    "app/store.py",
+    "app/views.py",
+    "app/web_support.py",
+    "evidence/browser-01-900g-6eggs.txt",
+    "evidence/browser-02-recalculated.txt",
+    "evidence/browser-03-paused.txt",
+    "evidence/browser-04-restored.txt",
+    "evidence/browser-05-other-week.txt",
+    "evidence/browser-06-restarted.txt",
+    "evidence/browser-result.png",
+    "evidence/browser-validation.json",
+    "tests/test_app.py"
+  ],
+  "runtime": {
+    "profile": "python-web",
+    "install": [],
+    "build": [],
+    "start": [
+      "python3",
+      "app/serve.py",
+      "--port",
+      "5277",
+      "--data-dir",
+      "data"
+    ],
+    "port": 5277,
+    "readiness_path": "/api/health"
+  },
+  "application": "meal-plan-trial",
+  "phase": "P0",
+  "source_package_consumption": {
+    "path": "CONSUMPTION.json",
+    "package_sha256": "e975955a0b27d24b2eb69fa8fa3a2ea2cbd82fce2cab7505515fb699d9512b8c",
+    "consumed_at": "2026-10-21T05:33:09.985965+00:00"
+  },
+  "source_sha256": {
+    "CONSUMPTION.json": "3866b172e1d30157d41ba68e5a2ce811155d9b6944d09045d2cca57b416c9c77",
+    "README.md": "3b888ac1eca9ece1213a6039772aaf8a1e100b9e429d9a9e65972a22c17af943",
+    "acceptance/README.md": "ef9dbca4c64fd866d0290bfb0fae22006c9f567637a00aadd9263920f3bd696c",
+    "acceptance/plan.json": "9d16900f2a11157131c39ac5d5315d38c3e458c9d23569930eb1ba0ba59df536",
+    "acceptance/probe.py": "0c8e8ca7bbbac23465baece5c6811c1d3babba28d3a895145990d02039b244a0",
+    "app/serve.py": "0d9239582dcebf794aca6d60366dc9b5918188874d3ca1da284d3324eda916bb",
+    "app/store.py": "f4132b1fae18cedf1ba3df1e87bb4fc13fbd06831aa8dde6656e8206139f7177",
+    "app/views.py": "e20339c0450e662ea75d5f23011b9c0b37677ed228281e640f705398dee3703e",
+    "app/web_support.py": "a174cda28f9a667607e257e55143551380a74ca5792b998fdf00e346596990a6",
+    "evidence/browser-01-900g-6eggs.txt": "27d2efdead34f9a0608bdcd1e1e8b205d2cb8db51a13462634ea1cc5af1e8599",
+    "evidence/browser-02-recalculated.txt": "fa16e473e1eb8c635ec8980755f120812b6b3950d3d7032ca91b5618c5148b17",
+    "evidence/browser-03-paused.txt": "ccd8cb72921fe86ab92b36232a5b441c44058ed5ae3e785bc6f4d86172deaf1f",
+    "evidence/browser-04-restored.txt": "171da7083fc1f2034c6bcedd366170fdb39ab60e8a4b0eb6d42ad30e1882e51e",
+    "evidence/browser-05-other-week.txt": "85ea716484eb06731b57b635912e4e610a75c75b7fc22f7dc7ee961ceb2b1bfd",
+    "evidence/browser-06-restarted.txt": "07b032f8aab59f983fa904c0162448f0a83013e137374cab011d085beaf3a02b",
+    "evidence/browser-result.png": "ac304158db85610dcfa6ce97c96aaab2cac07bf858b45e970ac6ce939b3029ad",
+    "evidence/browser-validation.json": "16854803f26cae9634a764e450ce800d9e5393c474a76ea2df82b6ead34ae09d",
+    "tests/test_app.py": "336ccbd20fa6d26ae3a5ff1e52db18adabf31847736c4208aad349203f828a2e"
+  },
+  "test_results": [
+    {
+      "id": "A01",
+      "command": [
+        "python3",
+        "examples/meal-plan-trial/acceptance/probe.py",
+        "--case",
+        "A01",
+        "--app-root",
+        "examples/meal-plan-trial"
+      ],
+      "started_at": "2026-10-21T05:38:03.838892+00:00",
+      "finished_at": "2026-10-21T05:38:04.020529+00:00",
+      "status": "passed",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"A01\", \"status\": \"passed\", \"scope\": \"real HTTP and owned-process restart, not browser evidence\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "A02",
+      "command": [
+        "python3",
+        "examples/meal-plan-trial/acceptance/probe.py",
+        "--case",
+        "A02",
+        "--app-root",
+        "examples/meal-plan-trial"
+      ],
+      "started_at": "2026-10-21T05:38:04.020566+00:00",
+      "finished_at": "2026-10-21T05:38:04.204188+00:00",
+      "status": "passed",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"A02\", \"status\": \"passed\", \"scope\": \"real HTTP and owned-process restart, not browser evidence\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "A03",
+      "command": [
+        "python3",
+        "examples/meal-plan-trial/acceptance/probe.py",
+        "--case",
+        "A03",
+        "--app-root",
+        "examples/meal-plan-trial"
+      ],
+      "started_at": "2026-10-21T05:38:04.204224+00:00",
+      "finished_at": "2026-10-21T05:38:04.383638+00:00",
+      "status": "passed",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"A03\", \"status\": \"passed\", \"scope\": \"real HTTP and owned-process restart, not browser evidence\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "A04",
+      "command": [
+        "python3",
+        "examples/meal-plan-trial/acceptance/probe.py",
+        "--case",
+        "A04",
+        "--app-root",
+        "examples/meal-plan-trial"
+      ],
+      "started_at": "2026-10-21T05:38:04.383675+00:00",
+      "finished_at": "2026-10-21T05:38:04.564141+00:00",
+      "status": "passed",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"A04\", \"status\": \"passed\", \"scope\": \"real HTTP and owned-process restart, not browser evidence\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "additional-regressions",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "examples/meal-plan-trial/tests",
+        "-v"
+      ],
+      "started_at": "2026-10-21T05:38:04.564177+00:00",
+      "finished_at": "2026-10-21T05:38:05.165025+00:00",
+      "status": "passed",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "test_api_error_shape_and_unknown_recipe (test_app.FormTests) ... 127.0.0.1 - - [21/Oct/2026 13:38:04] \"POST /api/plans HTTP/1.1\" 404 -\nok\ntest_create_outside_current_week_redirects_visible (test_app.FormTests) ... 127.0.0.1 - - [21/Oct/2026 13:38:04] \"POST /plans HTTP/1.1\" 303 -\n127.0.0.1 - - [21/Oct/2026 13:38:04] \"GET /?start=2027-01-04&end=2027-01-10&saved=plan HTTP/1.1\" 200 -\n127.0.0.1 - - [21/Oct/2026 13:38:04] \"POST /plans HTTP/1.1\" 409 -\nok\ntest_form_error_escapes_and_preserves_input (test_app.FormTests) ... 127.0.0.1 - - [21/Oct/2026 13:38:04] \"POST /recipes HTTP/1.1\" 400 -\nok\ntest_demo_only_initializes_new_database (test_app.StorageTests) ... ok\ntest_duplicate_paused_date_zero_write (test_app.StorageTests) ... ok\ntest_duplicate_recipe_ingredient_rejected_atomically (test_app.StorageTests) ... ok\ntest_get_state_does_not_write (test_app.StorageTests) ... ok\ntest_invalid_inputs_zero_write (test_app.StorageTests) ... ok\ntest_range_edges_and_week_isolation (test_app.StorageTests) ... ok\ntest_round_each_plan_half_up_before_aggregation (test_app.StorageTests) ... ok\ntest_trim_casefold_grouping_and_units (test_app.StorageTests) ... ok\n\n----------------------------------------------------------------------\nRan 11 tests in 0.542s\n\nOK\n"
+    }
+  ],
+  "frozen_suite_modified": false,
+  "browser_validation": {
+    "status": "passed",
+    "evidence": "evidence/browser-validation.json",
+    "scope": "five real browser journeys, refresh and same-data-dir real restart; not strict G1"
+  },
+  "environment_attempts": [
+    {
+      "status": "blocked_by_sandbox",
+      "scope": "Initial unprivileged frozen and form tests could not bind localhost socket; rerun with approved escalation passed."
+    }
+  ],
+  "known_limits": [
+    "single-user localhost dinners and 1–7-day window",
+    "immutable recipes, no delete/import/export UI, automatic unit conversion or nutrition advice",
+    "No frozen runner.json; direct frozen probe execution only",
+    "Upstream app not run; independent static-source review pending; not strict G1/T08"
+  ],
+  "generated_at": "2026-10-21T05:38:05.166669+00:00",
+  "standalone_zip_check": {
+    "status": "passed",
+    "command": [
+      "python3",
+      "<temporary-unpacked-source>/acceptance/probe.py",
+      "--case",
+      "A04",
+      "--app-root",
+      "<temporary-unpacked-source>"
+    ],
+    "stdout": "{\"case\": \"A04\", \"status\": \"passed\", \"scope\": \"real HTTP and owned-process restart, not browser evidence\"}\n",
+    "stderr": "",
+    "exit_code": 0,
+    "verified_at": "2026-10-21T05:38:23.694881+00:00",
+    "assertions": [
+      "ZIP contains no database or pyc files",
+      "Unpacked source starts independently and passes frozen real-process restart journey"
+    ]
+  },
+  "packaging": "Existing package_app.py; top-level meal-plan-trial/; source ZIP excludes its previous archive, receipt, data and caches."
+}

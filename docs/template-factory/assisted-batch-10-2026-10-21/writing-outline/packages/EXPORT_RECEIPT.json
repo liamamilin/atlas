@@ -1,0 +1,65 @@
+{
+ "origin": "assisted-trial",
+ "template_digest": "b5d4d8a56eb70517a9d0e4bd1b239e3d007660fe435b978c338524728e07baa5",
+ "export": {
+  "phase": "P0",
+  "project_name": "writing-outline-trial",
+  "template_digest": "b5d4d8a56eb70517a9d0e4bd1b239e3d007660fe435b978c338524728e07baa5",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1"
+ },
+ "provenance": {
+  "origin": "assisted-trial",
+  "scenario": {
+   "acceptance": [
+    "创建引言和正文，正文下添加论据，形成两层结构。",
+    "把正文移到引言下，论据随整个子树移动；折叠只隐藏不删除。",
+    "禁止移到自身或后代；导出每层两个空格，不因折叠丢子项。",
+    "重启保留父子关系、同级顺序和折叠状态。"
+   ],
+   "audience": "用层次段落组织长文章的写作者",
+   "id": "scn_3e5d16480fde4032b759eac2dae15b44",
+   "leaf": "outliner",
+   "leaf_name": "大纲工具",
+   "name": "文章大纲的分支折叠与重组",
+   "objective": "把文章要点整理成可折叠的树，移动整个分支后保留子项及顺序，导出结构文本。",
+   "revision": 1,
+   "status": "draft",
+   "updated_at": "2026-10-21T05:38:19.395091+00:00",
+   "workflow": [
+    "创建文章大纲",
+    "添加章节与子要点",
+    "折叠分支减少视图干扰",
+    "将分支移动到另一章节下并调整顺序",
+    "导出缩进文本，重启保留结构"
+   ]
+  },
+  "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+  "case_ref": {
+   "case_id": "case:assisted-ten-2026-10-21:writing-outline",
+   "revision": 1,
+   "digest": "540c608f701b926b08851b2bf09129a1c16040ad508c260258a954cf89f72450"
+  },
+  "case_record_sha256": "722fbdd3fb1fd01bd0b599a71a573ab662d4cd31a16f51e48859a97b3efd6f96",
+  "definition_digest": "3c85d6348d53be662cee35338ea34a080d50117599add9f4313b1b0fec57aebd",
+  "acceptance_inputs": {
+   "README.md": "2418fce93dedbca68968fe5de3ecf6e2e926d2270c27ad27e4031d35fa03215f",
+   "probe.py": "76d690d3697e1c58a690fe1ad7f2194259a4bebee966fba8d4a7775c9aa1aeaa"
+  },
+  "official_publication": false,
+  "upstream_runtime": "not_run",
+  "independent_evidence_review": "pending",
+  "note": "Static Codex source study; no model review or formal queue consumption. Local freeze fixes inputs only."
+ },
+ "controlled_opencode_calls_added": 0,
+ "official_queue_consumed": false,
+ "archives": {
+  "template-snapshot.zip": "dcda16b8d56fcfa7792c6ff28b746f3e0babc1883c05e9a29c89a6e4559c8155",
+  "development-package.zip": "561f5dddc68c9682295fe919ab8f963472b67f45fe2ac393f46e94d54b946db4"
+ }
+}

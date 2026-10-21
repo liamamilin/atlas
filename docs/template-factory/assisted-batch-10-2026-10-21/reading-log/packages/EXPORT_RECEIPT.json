@@ -1,0 +1,65 @@
+{
+ "origin": "assisted-trial",
+ "template_digest": "d8995ceeaa619903d79e215c8fde87a79cfe238f6407419a8e822f21ebd54c2e",
+ "export": {
+  "phase": "P0",
+  "project_name": "reading-log-trial",
+  "template_digest": "d8995ceeaa619903d79e215c8fde87a79cfe238f6407419a8e822f21ebd54c2e",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1"
+ },
+ "provenance": {
+  "origin": "assisted-trial",
+  "scenario": {
+   "id": "scn_bb19507a62c84135bfb9d07d8c89283b",
+   "leaf": "reading-library-application",
+   "leaf_name": "图书管理应用",
+   "name": "个人书架与阅读进度",
+   "audience": "想整理纸书和电子书阅读计划的个人",
+   "objective": "用书架管理待读书，记录已读页数，完成后进入已读列表并能按标题或作者找回。",
+   "workflow": [
+    "新建书架并登记书名、作者和总页数",
+    "将书放进书架并开始阅读",
+    "更新已读页数并显示进度",
+    "读完归档到已读，按标题/作者检索",
+    "刷新重启继续阅读"
+   ],
+   "acceptance": [
+    "在“周末”书架登记200页书，标题作者均可检索。",
+    "更新50页显示25%，更新200页显示已读；从200改100返回在读50%。",
+    "201或负数页拒绝且不改原书；不同书架筛选隔离；0总页拒绝。",
+    "同目录重启保留书架、页数和派生状态。"
+   ],
+   "status": "draft",
+   "updated_at": "2026-10-21T05:38:18.203432+00:00",
+   "revision": 1
+  },
+  "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+  "case_ref": {
+   "case_id": "case:assisted-ten-2026-10-21:reading-log",
+   "revision": 1,
+   "digest": "277d8e5f2163e8cff8bcfa8cd98b9ea0dfbd01c3e5c4dc1e017a745a5f3118eb"
+  },
+  "case_record_sha256": "ecbd0014b554b37143de0b1d567e73cc3075efceef789370da5ec393d79c3eda",
+  "definition_digest": "89392d2d414422e99bfb1a0d68829ef490042da74320567ec6657447d56b7768",
+  "acceptance_inputs": {
+   "README.md": "2418fce93dedbca68968fe5de3ecf6e2e926d2270c27ad27e4031d35fa03215f",
+   "probe.py": "04ca14e5e544aacb0058ce405df7ceb968a1fe02c8db4b1f82761c7d2237a95d"
+  },
+  "official_publication": false,
+  "upstream_runtime": "not_run",
+  "independent_evidence_review": "pending",
+  "note": "Static Codex source study; no model review or formal queue consumption. Local freeze fixes inputs only."
+ },
+ "controlled_opencode_calls_added": 0,
+ "official_queue_consumed": false,
+ "archives": {
+  "template-snapshot.zip": "bcbc60a40e656ee632dfd808547ec1278da45a15e9993115617c243d0cc1751c",
+  "development-package.zip": "723dbfb5b26236404d009601eae4cc14eff8d2efeb7f1a4c9929bf16a2bce82f"
+ }
+}

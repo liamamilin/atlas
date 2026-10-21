@@ -1,0 +1,115 @@
+{
+  "case_id": "case:assisted-ten-2026-10-21:workout-log",
+  "app_name": "wger",
+  "source_snapshots": [
+    {
+      "repository": "https://github.com/wger-project/wger",
+      "commit_sha": "8eed3c6d8406f09874eda6e402fb68c52d6c8392",
+      "strategy_version": "assisted-core-source-v1",
+      "collected_at": "2026-10-21T05:26:11.352057+00:00",
+      "local_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/sources/assisted-ten-2026-10-21/workout-log",
+      "files": {
+        "LICENSE.txt": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6",
+        "README.md": "11b4826a7357eabd8756a6a5d21099f5660122e87ef6c4ec688249b351b42f05",
+        "wger/manager/models/log.py": "14a02d6eafdf3bb06b11dd3c1622d57c5f12e2043550d61391d80432a91e1904"
+      },
+      "license_files": [
+        "LICENSE.txt"
+      ],
+      "license": {
+        "status": "located",
+        "notice_hashes": {
+          "LICENSE.txt": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6"
+        }
+      },
+      "license_uncertainties": [
+        "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+      ],
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ]
+    }
+  ],
+  "research": {
+    "summary": "Codex静态研究；目标聚焦已完成的kg重量×次数日志，不给训练或健康建议，不自动生成运动计划。",
+    "scope": "逐组记录动作、重量和次数，按训练日回查训练量，纠正误填后重新汇总。",
+    "unknowns": [
+      "upstream not_run",
+      "independent review pending",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "不含动作视频、身体指标、营养/康复建议、lb换算或器械联动。"
+    ],
+    "input_digest": "81b4e9309e34c7b27bbe703024505dc5ac33b656833bb4bbb1c64d3ac3cd843a",
+    "task_id": "assisted-ten-2026-10-21-workout-log"
+  },
+  "observations": [
+    {
+      "evidence_id": "ev_assisted_workout_log_1",
+      "kind": "code_observation",
+      "statement": "WorkoutLog为逐动作日志，具有UUID、日期和用户关联。",
+      "location": {
+        "commit_sha": "8eed3c6d8406f09874eda6e402fb68c52d6c8392",
+        "path": "wger/manager/models/log.py",
+        "file_digest": "14a02d6eafdf3bb06b11dd3c1622d57c5f12e2043550d61391d80432a91e1904",
+        "line_start": 48,
+        "line_end": 71
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_workout_log_2",
+      "kind": "code_observation",
+      "statement": "weight_unit与两位小数weight分开记录，重量允许空值；目标首版固定kg并明确0kg含义。",
+      "location": {
+        "commit_sha": "8eed3c6d8406f09874eda6e402fb68c52d6c8392",
+        "path": "wger/manager/models/log.py",
+        "file_digest": "14a02d6eafdf3bb06b11dd3c1622d57c5f12e2043550d61391d80432a91e1904",
+        "line_start": 156,
+        "line_end": 177
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_workout_log_design",
+      "kind": "inference",
+      "statement": "目标聚焦已完成的kg重量×次数日志，不给训练或健康建议，不自动生成运动计划。",
+      "depends_on": [
+        "ev_assisted_workout_log_1",
+        "ev_assisted_workout_log_2"
+      ],
+      "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。",
+      "assumptions": [
+        "上游未运行",
+        "独立证据审阅pending",
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "不含动作视频、身体指标、营养/康复建议、lb换算或器械联动。"
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "scenario_id": "scn_bf0bf87b07d245dca990ea7ea1f1721a",
+      "scenario_revision": 1,
+      "reason": "逐组记录动作、重量和次数，按训练日回查训练量，纠正误填后重新汇总。",
+      "evidence_ids": [
+        "ev_assisted_workout_log_1",
+        "ev_assisted_workout_log_2",
+        "ev_assisted_workout_log_design"
+      ],
+      "adopted_scope": [
+        "训练日与逐组日志",
+        "整数精度训练量汇总",
+        "更正与非法值保护",
+        "真实重启持久化"
+      ],
+      "exclusions": [
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "不含动作视频、身体指标、营养/康复建议、lb换算或器械联动。"
+      ]
+    }
+  ]
+}

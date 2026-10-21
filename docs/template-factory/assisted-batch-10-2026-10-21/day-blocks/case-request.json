@@ -1,0 +1,98 @@
+{
+  "case_id": "case:assisted-ten-2026-10-21:day-blocks",
+  "app_name": "Super Productivity",
+  "source_snapshots": [
+    {
+      "repository": "https://github.com/super-productivity/super-productivity",
+      "commit_sha": "0556bdb84d09faeff18d6c18abf867e28f3c1f69",
+      "strategy_version": "assisted-core-source-v1",
+      "collected_at": "2026-10-21T05:26:13.491418+00:00",
+      "local_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/sources/assisted-ten-2026-10-21/day-blocks",
+      "files": {
+        "LICENSE": "2e279de19632b5694d24b0ac06fd5b837ec487bf821302d9ce195379850a5fcb",
+        "README.md": "f15b319ab8de76ca8e9ce5d1b72cc2334e0cab1cb3515da7048f0ba6e8f9ad1e"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license": {
+        "status": "located",
+        "notice_hashes": {
+          "LICENSE": "2e279de19632b5694d24b0ac06fd5b837ec487bf821302d9ce195379850a5fcb"
+        }
+      },
+      "license_uncertainties": [
+        "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+      ],
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ]
+    }
+  ],
+  "research": {
+    "summary": "Codex静态研究；目标把计划时间与实际工时分开，只实现当日排程、完成与未完成迁移；不从现有工时模板换名字复用。",
+    "scope": "把待办安排到一天的时间块，避免重叠，结束时把未完成块顺延到明天待安排区而保留来源。",
+    "unknowns": [
+      "upstream not_run",
+      "independent review pending",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "不接外部日历、通知、自动番茄钟或真实工时统计；顺延日如需补录先列待办，不静默绕过封存。"
+    ],
+    "input_digest": "ebe2bc20fdcf3edf61cc50394793a890dc82a17943708be66d37d6f3f3e4a6d3",
+    "task_id": "assisted-ten-2026-10-21-day-blocks"
+  },
+  "observations": [
+    {
+      "evidence_id": "ev_assisted_day_blocks_1",
+      "kind": "documentation",
+      "statement": "README声明任务分类、planner/schedule时间轴、timeboxing、time tracking及focus能力；文档声明未代替上游运行。",
+      "location": {
+        "url": "https://github.com/super-productivity/super-productivity/blob/0556bdb84d09faeff18d6c18abf867e28f3c1f69/README.md",
+        "material_version": "0556bdb84d09faeff18d6c18abf867e28f3c1f69",
+        "content_digest": "f15b319ab8de76ca8e9ce5d1b72cc2334e0cab1cb3515da7048f0ba6e8f9ad1e"
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_day_blocks_design",
+      "kind": "inference",
+      "statement": "目标把计划时间与实际工时分开，只实现当日排程、完成与未完成迁移；不从现有工时模板换名字复用。",
+      "depends_on": [
+        "ev_assisted_day_blocks_1"
+      ],
+      "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。",
+      "assumptions": [
+        "上游未运行",
+        "独立证据审阅pending",
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "不接外部日历、通知、自动番茄钟或真实工时统计；顺延日如需补录先列待办，不静默绕过封存。"
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "scenario_id": "scn_3b74c4ea6d2345988d877e975eb0a5fa",
+      "scenario_revision": 1,
+      "reason": "把待办安排到一天的时间块，避免重叠，结束时把未完成块顺延到明天待安排区而保留来源。",
+      "evidence_ids": [
+        "ev_assisted_day_blocks_1",
+        "ev_assisted_day_blocks_design"
+      ],
+      "adopted_scope": [
+        "时间块与日程排序",
+        "完成状态及重叠检测",
+        "可幂等顺延与重新排期",
+        "真实重启持久化"
+      ],
+      "exclusions": [
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "不接外部日历、通知、自动番茄钟或真实工时统计；顺延日如需补录先列待办，不静默绕过封存。"
+      ]
+    }
+  ]
+}

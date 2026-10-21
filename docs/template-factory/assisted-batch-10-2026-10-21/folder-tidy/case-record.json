@@ -1,0 +1,181 @@
+{
+  "app_id": "app:repo:6386c9e2356b0a6d97f84b55",
+  "case_id": "case:assisted-ten-2026-10-21:folder-tidy",
+  "created_at": "2026-10-21T05:38:19.799893+00:00",
+  "created_task_id": "assisted-ten-2026-10-21-folder-tidy",
+  "digest": "2d1c5047e6ffc986bc704c6dc1ba0ee664263d143024a56f9fb4839618ca22db",
+  "evidence_digest": "c50e6918cdbe27907a82b127ac0f3b6f2cbec48e39a2e1f7ecd5d90b020531a3",
+  "research": {
+    "input_digest": "1191e649d5db1526e635b91a0fecf7ffda4840dfd0b13bb4632f2ba6cdb3cde5",
+    "scope": "浏览独立沙箱文件，先预览重命名及子目录移动，再确认执行；禁止覆盖、越界和跟随符号链接。",
+    "summary": "Codex静态研究；目标不开放任意用户目录，要求显式--sandbox-root，仅新建测试沙箱；预览token绑定源字节和目录身份，操作只支持单文件且拒绝覆盖和全部符号链接。宿主共享记录不是对实现安全认证。",
+    "task_id": "assisted-ten-2026-10-21-folder-tidy",
+    "unknowns": [
+      "upstream not_run",
+      "independent review pending",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "安全敏感模板尚未应用运行或专项安全审阅，不建议直接操作珍贵原文件；TOCTOU/平台文件系统差异需后续实测。",
+      "不做删除、批量规则、外盘跨FS、压缩/上传、目录树移动或权限修改。"
+    ]
+  },
+  "research_input_digest": "1191e649d5db1526e635b91a0fecf7ffda4840dfd0b13bb4632f2ba6cdb3cde5",
+  "revision": 1,
+  "snapshot_ids": [
+    "src_48067b2468e423063e5a70d8"
+  ],
+  "observations": [
+    {
+      "case_id": "case:assisted-ten-2026-10-21:folder-tidy",
+      "case_revision": 1,
+      "digest": "564d1c6891670549df284bc85303944867a03eccbed39959988b4c7a6c448b88",
+      "evidence_id": "ev_assisted_folder_tidy_1",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "833d908884d5c801f30f5c098d7977177eb3a36b",
+        "file_digest": "65ff439e1c4fd2367232a7ba8a3d7cae08499525a5c33422df086422ef5294f8",
+        "line_end": 26,
+        "line_start": 14,
+        "path": "files/scoped.go"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "ScopedFs说明在BasePathFs之上为可访问磁盘的操作增加范围检查，防止符号链接逃逸。",
+      "reviews": []
+    },
+    {
+      "case_id": "case:assisted-ten-2026-10-21:folder-tidy",
+      "case_revision": 1,
+      "digest": "e369ff9897f8b45ff23c9756e86a6dc074286f46ae813e21496a8c093a5b79fe",
+      "evidence_id": "ev_assisted_folder_tidy_2",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "833d908884d5c801f30f5c098d7977177eb3a36b",
+        "file_digest": "65ff439e1c4fd2367232a7ba8a3d7cae08499525a5c33422df086422ef5294f8",
+        "line_end": 103,
+        "line_start": 73,
+        "path": "files/scoped.go"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "guard调用within，而within对root和目标使用EvalSymlinks后校验范围。",
+      "reviews": []
+    },
+    {
+      "case_id": "case:assisted-ten-2026-10-21:folder-tidy",
+      "case_revision": 1,
+      "digest": "f8e58bce4d34acedb512a253f94959ba537791d5f8f022d3443fb72505ee2c2f",
+      "evidence_id": "ev_assisted_folder_tidy_3",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "833d908884d5c801f30f5c098d7977177eb3a36b",
+        "file_digest": "65ff439e1c4fd2367232a7ba8a3d7cae08499525a5c33422df086422ef5294f8",
+        "line_end": 216,
+        "line_start": 208,
+        "path": "files/scoped.go"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Rename分别检查旧、新路径后再委托底层Rename；目标预览及拒绝覆盖另行设计。",
+      "reviews": []
+    },
+    {
+      "case_id": "case:assisted-ten-2026-10-21:folder-tidy",
+      "case_revision": 1,
+      "digest": "9c129c0de37d49ad2d092317e2e4db8d31f432aa351ccaa10f92d4432191f135",
+      "evidence_id": "ev_assisted_folder_tidy_design",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "上游未运行",
+          "独立证据审阅pending",
+          "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+          "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+          "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+          "安全敏感模板尚未应用运行或专项安全审阅，不建议直接操作珍贵原文件；TOCTOU/平台文件系统差异需后续实测。",
+          "不做删除、批量规则、外盘跨FS、压缩/上传、目录树移动或权限修改。"
+        ],
+        "depends_on": [
+          "ev_assisted_folder_tidy_1",
+          "ev_assisted_folder_tidy_2",
+          "ev_assisted_folder_tidy_3"
+        ],
+        "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "目标不开放任意用户目录，要求显式--sandbox-root，仅新建测试沙箱；预览token绑定源字节和目录身份，操作只支持单文件且拒绝覆盖和全部符号链接。宿主共享记录不是对实现安全认证。",
+      "reviews": []
+    }
+  ],
+  "scenario_links": [
+    {
+      "adopted_scope": [
+        "真实沙箱目录浏览",
+        "预览后单文件重命名/移动",
+        "范围、覆盖与过期预览保护",
+        "真实重启与文件内容保留"
+      ],
+      "case_id": "case:assisted-ten-2026-10-21:folder-tidy",
+      "case_revision": 1,
+      "evidence_ids": [
+        "ev_assisted_folder_tidy_1",
+        "ev_assisted_folder_tidy_2",
+        "ev_assisted_folder_tidy_3",
+        "ev_assisted_folder_tidy_design"
+      ],
+      "exclusions": [
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "安全敏感模板尚未应用运行或专项安全审阅，不建议直接操作珍贵原文件；TOCTOU/平台文件系统差异需后续实测。",
+        "不做删除、批量规则、外盘跨FS、压缩/上传、目录树移动或权限修改。"
+      ],
+      "reason": "浏览独立沙箱文件，先预览重命名及子目录移动，再确认执行；禁止覆盖、越界和跟随符号链接。",
+      "scenario_id": "scn_639d6d74b2914439867875295f4ab528",
+      "scenario_revision": 1,
+      "workflow_support": []
+    }
+  ],
+  "source_snapshots": [
+    {
+      "archive_sha256": null,
+      "collected_at": "2026-10-21T05:26:17.536964+00:00",
+      "commit_sha": "833d908884d5c801f30f5c098d7977177eb3a36b",
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ],
+      "file_manifest_digest": "870a8ee224fe8a852690f1d5bb0c9c4ec31a47b2efef0d6bb23cf1f17083664e",
+      "files": {
+        "LICENSE": "4a1946819f24b20b3144360151a4dc1ed1b8e407bfb11045a74884abd6816100",
+        "README.md": "6966247bf87f43e6eeda87f0f4f9539897a37e8108aec84e9c7608601afd7d59",
+        "files/scoped.go": "65ff439e1c4fd2367232a7ba8a3d7cae08499525a5c33422df086422ef5294f8"
+      },
+      "license": {
+        "notice_hashes": {
+          "LICENSE": "4a1946819f24b20b3144360151a4dc1ed1b8e407bfb11045a74884abd6816100"
+        },
+        "status": "located"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license_uncertainties": [
+        "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+      ],
+      "repo_id": null,
+      "repository": "https://github.com/filebrowser/filebrowser",
+      "snapshot_id": "src_48067b2468e423063e5a70d8",
+      "strategy_version": "assisted-core-source-v1"
+    }
+  ]
+}

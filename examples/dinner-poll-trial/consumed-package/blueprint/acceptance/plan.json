@@ -1,0 +1,70 @@
+{
+ "schema": "atlas.acceptance-plan.v0",
+ "template_id": "blueprint-local-assisted-dinner-poll-trial",
+ "phases": [
+  {
+   "id": "P0",
+   "title": "核心可用",
+   "goal": "为聚餐问题预设地点选项，成员用代号单选并可改票，查看汇总，在结束后冻结投票，必要时重开。",
+   "features": [
+    "F01",
+    "F02",
+    "F03",
+    "F04"
+   ],
+   "acceptance": [
+    "A01",
+    "A02",
+    "A03",
+    "A04"
+   ],
+   "status": "not implemented"
+  }
+ ],
+ "cases": [
+  {
+   "id": "A01",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "创建2个不同投票，选择只属于当前投票；重复/空选项不能创建。",
+   "features": [
+    "F01"
+   ],
+   "implementation": "acceptance/probe.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A02",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "小林选A、小周选B得到1/1总2；小林改B得到0/2，总数不增加。",
+   "features": [
+    "F02"
+   ],
+   "implementation": "acceptance/probe.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A03",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "关闭后投票409poll_closed且汇总不变；重开允许小李选A变1/2总3；空代号与跨投票选项拒绝。",
+   "features": [
+    "F03"
+   ],
+   "implementation": "acceptance/probe.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A04",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "相同数据目录重启后列表、状态、全部选项计数与代号票保留。",
+   "features": [
+    "F04"
+   ],
+   "implementation": "acceptance/probe.py",
+   "status": "not_run"
+  }
+ ]
+}

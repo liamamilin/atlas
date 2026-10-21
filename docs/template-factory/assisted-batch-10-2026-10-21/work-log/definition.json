@@ -1,0 +1,238 @@
+{
+  "scenario_record": {
+    "id": "scn_a5ba5020abbe461fa5992a4e01bee420",
+    "leaf": "time-tracking-application",
+    "leaf_name": "时间跟踪应用",
+    "name": "零工项目工时与日汇总",
+    "audience": "按项目记录工作时间但不需要开票的自由职业者",
+    "objective": "按日登记项目开始结束时间和休息分钟数，自动计算净工时，修改后日汇总立即重算。",
+    "workflow": [
+      "新建工作项目",
+      "按日期录入开始结束与休息",
+      "查看日合计和项目分组",
+      "更正休息或结束时间后重新计算",
+      "切换日期并在重启后继续"
+    ],
+    "acceptance": [
+      "项目A登记09:00–11:00休息15分钟，净105分钟。",
+      "再记13:00–14:00得到总165分钟；第一条休息改30后日总150。",
+      "同日重叠、倒置时间、休息超过区间或跨午夜拒绝；另一日不混入。",
+      "重启保留项目与条目，汇总与保存前一致。"
+    ],
+    "status": "draft",
+    "updated_at": "2026-10-21T05:38:18.778966+00:00",
+    "revision": 1
+  },
+  "case_ref": {
+    "case_id": "case:assisted-ten-2026-10-21:work-log",
+    "revision": 1,
+    "digest": "6d33ddfa6cb256ef6770087a697a2b42f1363ed3b8ab22af9faccb3707baa9d1"
+  },
+  "research": {
+    "summary": "同一共享案例记录的静态研究与明确的设计推断；完整定位见inputs/shared-case-record.json。",
+    "sources": [
+      {
+        "id": "S02",
+        "name": "ev_assisted_work_log_1",
+        "url": "https://github.com/kimai/kimai/blob/acc17ef21c2f1466a0b399cf6595fd4b20b1f085/src/Entity/Timesheet.php",
+        "version": "acc17ef21c2f1466a0b399cf6595fd4b20b1f085",
+        "license": "AGPL-3.0（LICENSE；只研究，不复制实现）",
+        "license_url": "https://github.com/kimai/kimai/blob/acc17ef21c2f1466a0b399cf6595fd4b20b1f085/LICENSE",
+        "facts": "code_observation: Timesheet分别记录日期、begin/end、duration、break、user、activity、project和description。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      },
+      {
+        "id": "S03",
+        "name": "ev_assisted_work_log_2",
+        "url": "https://github.com/kimai/kimai/blob/acc17ef21c2f1466a0b399cf6595fd4b20b1f085/src/Entity/Timesheet.php",
+        "version": "acc17ef21c2f1466a0b399cf6595fd4b20b1f085",
+        "license": "AGPL-3.0（LICENSE；只研究，不复制实现）",
+        "license_url": "https://github.com/kimai/kimai/blob/acc17ef21c2f1466a0b399cf6595fd4b20b1f085/LICENSE",
+        "facts": "code_observation: getCalculatedDuration使用结束时间减开始时间再减break；running记录另有警告。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      },
+      {
+        "id": "S04",
+        "name": "ev_assisted_work_log_design",
+        "url": "https://github.com/kimai/kimai/blob/acc17ef21c2f1466a0b399cf6595fd4b20b1f085/LICENSE",
+        "version": "acc17ef21c2f1466a0b399cf6595fd4b20b1f085",
+        "license": "AGPL-3.0（LICENSE；只研究，不复制实现）",
+        "license_url": "https://github.com/kimai/kimai/blob/acc17ef21c2f1466a0b399cf6595fd4b20b1f085/LICENSE",
+        "facts": "inference: 目标只记录已结束的同日工作，不做运行中计时器、账单费率、后台监控或跨时区时间；以分钟整数派生日总。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      }
+    ],
+    "gaps": [
+      "证据独立审阅pending",
+      "上游not_run",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "不做计费、发票、自动计时、跨午夜或夏令时跨度计算。"
+    ]
+  },
+  "spec": {
+    "title": "零工项目工时与日汇总",
+    "roles": [
+      {
+        "id": "R01",
+        "name": "按项目记录工作时间但不需要开票的自由职业者",
+        "responsibility": "按日登记项目开始结束时间和休息分钟数，自动计算净工时，修改后日汇总立即重算。"
+      }
+    ],
+    "features": [
+      {
+        "id": "F01",
+        "name": "项目与已完成工时条目",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "项目A登记09:00–11:00休息15分钟，净105分钟。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A01"
+        ]
+      },
+      {
+        "id": "F02",
+        "name": "净时长与日汇总",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "再记13:00–14:00得到总165分钟；第一条休息改30后日总150。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A02"
+        ]
+      },
+      {
+        "id": "F03",
+        "name": "修改、重叠保护和日期隔离",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "同日重叠、倒置时间、休息超过区间或跨午夜拒绝；另一日不混入。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A03"
+        ]
+      },
+      {
+        "id": "F04",
+        "name": "真实重启持久化",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "重启保留项目与条目，汇总与保存前一致。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A04"
+        ]
+      }
+    ],
+    "acceptance": [
+      {
+        "id": "A01",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "项目A登记09:00–11:00休息15分钟，净105分钟。",
+        "features": [
+          "F01"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A02",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "再记13:00–14:00得到总165分钟；第一条休息改30后日总150。",
+        "features": [
+          "F02"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A03",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "同日重叠、倒置时间、休息超过区间或跨午夜拒绝；另一日不混入。",
+        "features": [
+          "F03"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A04",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "重启保留项目与条目，汇总与保存前一致。",
+        "features": [
+          "F04"
+        ],
+        "implementation": "acceptance/probe.py"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "D01",
+        "question": "首版运行与数据边界？",
+        "default": "单用户本机、独立SQLite；显式保存，无账户、云端和协作。",
+        "when_to_ask": "确需公网托管或多人数据时先确认，不自行扩展。",
+        "impact": "保护本地数据，避免默认外发。",
+        "status": "assisted default"
+      },
+      {
+        "id": "D02",
+        "question": "是否复刻上游？",
+        "default": "目标只记录已结束的同日工作，不做运行中计时器、账单费率、后台监控或跨时区时间；以分钟整数派生日总。",
+        "when_to_ask": "目标变化、破坏已有数据或需要引入上游实现/依赖时先确认。",
+        "impact": "不混淆来源事实与目标设计。",
+        "status": "assisted default"
+      }
+    ],
+    "phases": [
+      {
+        "id": "P0",
+        "title": "核心可用",
+        "goal": "按日登记项目开始结束时间和休息分钟数，自动计算净工时，修改后日汇总立即重算。",
+        "features": [
+          "F01",
+          "F02",
+          "F03",
+          "F04"
+        ],
+        "acceptance": [
+          "A01",
+          "A02",
+          "A03",
+          "A04"
+        ]
+      }
+    ],
+    "architecture_markdown": "## 运行边界\nPython标准库HTTP+SQLite，本机127.0.0.1；--data-dir独立目录，--demo仅新库首次初始化。GET只读，所有错误JSON为{error:{code,message}}，失败零写入，未知ID404not_found。输入类型先校验；事务保存；UI文本转义，无第三方资源。\n## 数据与规则\nprojects(id,name UNIQUE)，entries(id,project_id,date,start,end,break_minutes,notes)。时间HH:MM按本地墙上时间，end>start且同日，break为整数0..区间；净时长可为0。所有项目同日工作半开区间[start,end)不得重叠，相邻可接；更正时排除自己。更新重新派生duration_minutes，不累计旧汇总。\n## 接口\nGET /api/health；GET /api/state?date=YYYY-MM-DD -> {projects,entries:[含duration_minutes],summary:{total_minutes,by_project}}；POST /api/projects {name}->201；POST /api/entries {project_id,date,start,end,break_minutes,notes}->201；POST /api/entries/update {id,project_id,date,start,end,break_minutes,notes}->200。400 invalid_time/invalid_break/invalid_date/invalid_name，重叠409overlap；未知项目404。\n## 交互\n日期导航、项目选择、开始结束和休息字段，明确分钟和净工时；条目编辑显式保存，错误保留输入；空日不显示上日工时。\n## 来源与推断\n目标只记录已结束的同日工作，不做运行中计时器、账单费率、后台监控或跨时区时间；以分钟整数派生日总。\n",
+    "limits": [
+      "辅助试产，非严格G1/T08。",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "不做计费、发票、自动计时、跨午夜或夏令时跨度计算。"
+    ]
+  },
+  "trial_scope": "# 辅助试用范围\n\n按日登记项目开始结束时间和休息分钟数，自动计算净工时，修改后日汇总立即重算。\n\n- 辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。\n- 本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。\n- 单人本机显式保存，无账户、云同步、协作；不复制上游实现。\n- 不做计费、发票、自动计时、跨午夜或夏令时跨度计算。\n\nCodex研究与编写；静态案例未独审、上游未运行。模板先于应用；仅代表场景后续开发应用。严格G1/T08不因本包通过。"
+}

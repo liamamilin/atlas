@@ -1,0 +1,238 @@
+{
+  "scenario_record": {
+    "id": "scn_cd663b9f8fdb475e8382fb6fadd44ac9",
+    "leaf": "diagramming-application",
+    "leaf_name": "图表应用",
+    "name": "个人办事流程图与连接保持",
+    "audience": "需要梳理报销或办事步骤的个人",
+    "objective": "用开始、处理、判断和结束节点画出小流程，连接步骤并移动节点时保持连接，保存后回看。",
+    "workflow": [
+      "新建流程图",
+      "添加开始、处理、判断、结束节点",
+      "连接步骤并给分支标注文字",
+      "移动节点检查连接端点随之更新",
+      "保存刷新并导出结构JSON"
+    ],
+    "acceptance": [
+      "创建start、process、decision、end四节点并建立三条边，分支可标“是”。",
+      "移动process节点后，边仍指向相同节点ID，UI端点按新几何重算。",
+      "未知端点、自环、重复同端点同标签边拒绝；导出保留全部节点几何及边。",
+      "重启保留节点位置、类型、标签和连接。"
+    ],
+    "status": "draft",
+    "updated_at": "2026-10-21T05:38:19.433314+00:00",
+    "revision": 1
+  },
+  "case_ref": {
+    "case_id": "case:assisted-ten-2026-10-21:process-sketch",
+    "revision": 1,
+    "digest": "92c1e5c0bc54c333ff546b951a5a544d9b77117c743489bb8c8a51cbd69ec9fe"
+  },
+  "research": {
+    "summary": "同一共享案例记录的静态研究与明确的设计推断；完整定位见inputs/shared-case-record.json。",
+    "sources": [
+      {
+        "id": "S02",
+        "name": "ev_assisted_process_sketch_1",
+        "url": "https://github.com/jgraph/drawio/blob/17b367b91dbab91804f852645788d7ffb46dcb79/src/main/webapp/mxgraph/src/model/mxGeometry.js",
+        "version": "17b367b91dbab91804f852645788d7ffb46dcb79",
+        "license": "Apache-2.0（LICENSE；只研究，不复制实现）",
+        "license_url": "https://github.com/jgraph/drawio/blob/17b367b91dbab91804f852645788d7ffb46dcb79/LICENSE",
+        "facts": "code_observation: mxGeometry区分顶点x/y宽高和边的端点/控制点，并说明连接状态与移动时控制点行为。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      },
+      {
+        "id": "S03",
+        "name": "ev_assisted_process_sketch_2",
+        "url": "https://github.com/jgraph/drawio/blob/17b367b91dbab91804f852645788d7ffb46dcb79/src/main/webapp/mxgraph/src/model/mxGeometry.js",
+        "version": "17b367b91dbab91804f852645788d7ffb46dcb79",
+        "license": "Apache-2.0（LICENSE；只研究，不复制实现）",
+        "license_url": "https://github.com/jgraph/drawio/blob/17b367b91dbab91804f852645788d7ffb46dcb79/LICENSE",
+        "facts": "code_observation: translate对顶点位置及可用的sourcePoint/targetPoint平移；目标节点ID绑定的重算方式仍为独立设计。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      },
+      {
+        "id": "S04",
+        "name": "ev_assisted_process_sketch_design",
+        "url": "https://github.com/jgraph/drawio/blob/17b367b91dbab91804f852645788d7ffb46dcb79/LICENSE",
+        "version": "17b367b91dbab91804f852645788d7ffb46dcb79",
+        "license": "Apache-2.0（LICENSE；只研究，不复制实现）",
+        "license_url": "https://github.com/jgraph/drawio/blob/17b367b91dbab91804f852645788d7ffb46dcb79/LICENSE",
+        "facts": "inference: 目标以SVG渲染少量流程节点，边持有节点ID，几何改变时派生中心端点；不复制mxGraph或提供完整BPMN。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      }
+    ],
+    "gaps": [
+      "证据独立审阅pending",
+      "上游not_run",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "无图形智能布局、BPMN验证、协作、图片/PDF导出或工作流执行。"
+    ]
+  },
+  "spec": {
+    "title": "个人办事流程图与连接保持",
+    "roles": [
+      {
+        "id": "R01",
+        "name": "需要梳理报销或办事步骤的个人",
+        "responsibility": "用开始、处理、判断和结束节点画出小流程，连接步骤并移动节点时保持连接，保存后回看。"
+      }
+    ],
+    "features": [
+      {
+        "id": "F01",
+        "name": "带类型的流程节点",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "创建start、process、decision、end四节点并建立三条边，分支可标“是”。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A01"
+        ]
+      },
+      {
+        "id": "F02",
+        "name": "连接与移动保持",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "移动process节点后，边仍指向相同节点ID，UI端点按新几何重算。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A02"
+        ]
+      },
+      {
+        "id": "F03",
+        "name": "非法连接及结构导出",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "未知端点、自环、重复同端点同标签边拒绝；导出保留全部节点几何及边。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A03"
+        ]
+      },
+      {
+        "id": "F04",
+        "name": "真实重启持久化",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "重启保留节点位置、类型、标签和连接。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A04"
+        ]
+      }
+    ],
+    "acceptance": [
+      {
+        "id": "A01",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "创建start、process、decision、end四节点并建立三条边，分支可标“是”。",
+        "features": [
+          "F01"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A02",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "移动process节点后，边仍指向相同节点ID，UI端点按新几何重算。",
+        "features": [
+          "F02"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A03",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "未知端点、自环、重复同端点同标签边拒绝；导出保留全部节点几何及边。",
+        "features": [
+          "F03"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A04",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "重启保留节点位置、类型、标签和连接。",
+        "features": [
+          "F04"
+        ],
+        "implementation": "acceptance/probe.py"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "D01",
+        "question": "首版运行与数据边界？",
+        "default": "单用户本机、独立SQLite；显式保存，无账户、云端和协作。",
+        "when_to_ask": "确需公网托管或多人数据时先确认，不自行扩展。",
+        "impact": "保护本地数据，避免默认外发。",
+        "status": "assisted default"
+      },
+      {
+        "id": "D02",
+        "question": "是否复刻上游？",
+        "default": "目标以SVG渲染少量流程节点，边持有节点ID，几何改变时派生中心端点；不复制mxGraph或提供完整BPMN。",
+        "when_to_ask": "目标变化、破坏已有数据或需要引入上游实现/依赖时先确认。",
+        "impact": "不混淆来源事实与目标设计。",
+        "status": "assisted default"
+      }
+    ],
+    "phases": [
+      {
+        "id": "P0",
+        "title": "核心可用",
+        "goal": "用开始、处理、判断和结束节点画出小流程，连接步骤并移动节点时保持连接，保存后回看。",
+        "features": [
+          "F01",
+          "F02",
+          "F03",
+          "F04"
+        ],
+        "acceptance": [
+          "A01",
+          "A02",
+          "A03",
+          "A04"
+        ]
+      }
+    ],
+    "architecture_markdown": "## 运行边界\nPython标准库HTTP+SQLite，本机127.0.0.1；--data-dir独立目录，--demo仅新库首次初始化。GET只读，所有错误JSON为{error:{code,message}}，失败零写入，未知ID404not_found。输入类型先校验；事务保存；UI文本转义，无第三方资源。\n## 数据与规则\ndiagrams(id,title)，nodes(id,diagram_id,kind start|process|decision|end,label,x,y)，edges(id,diagram_id,source_id,target_id,label)。节点默认尺寸120×60，decision绘菱形，start/end圆角；x/y整数0..1900，label1..80。边两端必须属于同图、不能自身、source+target+label唯一；允许回路但不解释为执行引擎。导出完整图结构JSON，不保存派生像素端点。\n## 接口\nGET /api/health；GET /api/state?diagram_id= -> {diagrams,nodes,edges}；GET /api/export?diagram_id= -> 同结构JSON；POST /api/diagrams {title}->201；POST /api/nodes {diagram_id,kind,label,x,y}->201；POST /api/nodes/move {id,x,y}->200；POST /api/edges {diagram_id,source_id,target_id,label}->201。400 invalid_kind/invalid_position/invalid_edge/invalid_name，409already_exists。\n## 交互\n提供类型选择、新增节点、连接起终点及标签表单；坐标编辑是必备无拖拽路径，SVG连线随移动更新。空图有示例提示，不执行图内文字或脚本。\n## 来源与推断\n目标以SVG渲染少量流程节点，边持有节点ID，几何改变时派生中心端点；不复制mxGraph或提供完整BPMN。\n",
+    "limits": [
+      "辅助试产，非严格G1/T08。",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "无图形智能布局、BPMN验证、协作、图片/PDF导出或工作流执行。"
+    ]
+  },
+  "trial_scope": "# 辅助试用范围\n\n用开始、处理、判断和结束节点画出小流程，连接步骤并移动节点时保持连接，保存后回看。\n\n- 辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。\n- 本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。\n- 单人本机显式保存，无账户、云同步、协作；不复制上游实现。\n- 无图形智能布局、BPMN验证、协作、图片/PDF导出或工作流执行。\n\nCodex研究与编写；静态案例未独审、上游未运行。模板先于应用；仅代表场景后续开发应用。严格G1/T08不因本包通过。"
+}

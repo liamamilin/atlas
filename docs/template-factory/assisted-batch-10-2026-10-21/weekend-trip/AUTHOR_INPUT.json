@@ -1,0 +1,57 @@
+{
+  "name": "两日城市行程与顺序安排",
+  "audience": "独自安排周末两日城市游的旅行者",
+  "objective": "把地点安排进两天行程，调整参观顺序并标记已到访，离线回查地址和安排。",
+  "workflow": [
+    "创建两日行程并设置首日",
+    "为某天添加地点、地址和备注",
+    "上下移动地点调整路线顺序",
+    "标记到访并切换另一日查看",
+    "刷新重启保留顺序与状态"
+  ],
+  "acceptance": [
+    "创建2026-11-07开始的行程，day1添加博物馆和公园，day2添加咖啡馆。",
+    "将公园移动到博物馆之前后，重读顺序一致，另一日不变。",
+    "到访后可撤销；day3、越界移动、空地址拒绝且旧顺序不变。",
+    "重启保留行程日期、地点地址、日内顺序和到访状态。"
+  ],
+  "repo_name": "TRIP",
+  "license": "MIT（license.txt；只研究，不复制实现）",
+  "license_path": "license.txt",
+  "observations": [
+    [
+      "code_observation",
+      "backend/trip/models/models.py",
+      505,
+      557,
+      "TripPlaceLink连接旅行和地点；PlaceBase包含名称、坐标、描述和visited标志。"
+    ],
+    [
+      "code_observation",
+      "backend/trip/models/models.py",
+      610,
+      633,
+      "Trip拥有days关系，按日期和标签排序；目标日内的手动排序属于设计推断。"
+    ]
+  ],
+  "inference": "只借鉴行程/地点/天的关系；目标手工地址文本与日内顺序，不接地图、导航、实时交通或预订。",
+  "features": [
+    "两日行程与地点",
+    "日内顺序调整",
+    "到访状态与隔离",
+    "真实重启持久化"
+  ],
+  "goals": [
+    "创建2026-11-07开始的行程，day1添加博物馆和公园，day2添加咖啡馆。",
+    "将公园移动到博物馆之前后，重读顺序一致，另一日不变。",
+    "到访后可撤销；day3、越界移动、空地址拒绝且旧顺序不变。",
+    "重启保留行程日期、地点地址、日内顺序和到访状态。"
+  ],
+  "arch": "## 运行边界\nPython标准库HTTP+SQLite，本机127.0.0.1；--data-dir独立目录，--demo仅新库首次初始化。GET只读，所有错误JSON为{error:{code,message}}，失败零写入，未知ID404not_found。输入类型先校验；事务保存；UI文本转义，无第三方资源。\n## 数据与规则\ntrips(id,title,start_date)，stops(id,trip_id,day,position,name,address,notes,visited)。day只1或2；position连续0基，插入末尾。move以新position在事务内重排该天，未知/越界拒绝。trip首日严格ISO有效日期；name/title1..120，address1..300，notes0..2000。\n## 接口\nGET /api/health；GET /api/state -> {trips,stops}；GET /api/stops?trip_id=&day= -> {stops}按position排序；POST /api/trips {title,start_date}->201；POST /api/stops {trip_id,day,name,address,notes}->201；POST /api/stops/move {id,position}->200；POST /api/stops/visit {id}->200切换visited。400 invalid_day/invalid_position/invalid_date/invalid_name。\n## 交互\n行程切换、第一天/第二天标签、地点地址及上下移按钮、已到访开关。边界按钮禁用但服务仍校验；无坐标也可完成计划。\n## 来源与推断\n只借鉴行程/地点/天的关系；目标手工地址文本与日内顺序，不接地图、导航、实时交通或预订。\n",
+  "gaps": [
+    "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+    "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+    "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+    "无地图、路线最优解、天气、订票或远程协作，地址正确性由人确认。"
+  ]
+}

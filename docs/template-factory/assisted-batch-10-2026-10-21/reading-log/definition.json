@@ -1,0 +1,238 @@
+{
+  "scenario_record": {
+    "id": "scn_bb19507a62c84135bfb9d07d8c89283b",
+    "leaf": "reading-library-application",
+    "leaf_name": "图书管理应用",
+    "name": "个人书架与阅读进度",
+    "audience": "想整理纸书和电子书阅读计划的个人",
+    "objective": "用书架管理待读书，记录已读页数，完成后进入已读列表并能按标题或作者找回。",
+    "workflow": [
+      "新建书架并登记书名、作者和总页数",
+      "将书放进书架并开始阅读",
+      "更新已读页数并显示进度",
+      "读完归档到已读，按标题/作者检索",
+      "刷新重启继续阅读"
+    ],
+    "acceptance": [
+      "在“周末”书架登记200页书，标题作者均可检索。",
+      "更新50页显示25%，更新200页显示已读；从200改100返回在读50%。",
+      "201或负数页拒绝且不改原书；不同书架筛选隔离；0总页拒绝。",
+      "同目录重启保留书架、页数和派生状态。"
+    ],
+    "status": "draft",
+    "updated_at": "2026-10-21T05:38:18.203432+00:00",
+    "revision": 1
+  },
+  "case_ref": {
+    "case_id": "case:assisted-ten-2026-10-21:reading-log",
+    "revision": 1,
+    "digest": "277d8e5f2163e8cff8bcfa8cd98b9ea0dfbd01c3e5c4dc1e017a745a5f3118eb"
+  },
+  "research": {
+    "summary": "同一共享案例记录的静态研究与明确的设计推断；完整定位见inputs/shared-case-record.json。",
+    "sources": [
+      {
+        "id": "S02",
+        "name": "ev_assisted_reading_log_1",
+        "url": "https://github.com/janeczku/calibre-web/blob/6e840acbda8d62fdd159bf3855c01872d629a914/cps/ub.py",
+        "version": "6e840acbda8d62fdd159bf3855c01872d629a914",
+        "license": "GPL-3.0（根LICENSE；只研究，不复制实现）",
+        "license_url": "https://github.com/janeczku/calibre-web/blob/6e840acbda8d62fdd159bf3855c01872d629a914/LICENSE",
+        "facts": "code_observation: Shelf保存名称、所属用户及书籍关系；BookShelf保存book_id、order和shelf，支撑独立书架与成员关系。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      },
+      {
+        "id": "S03",
+        "name": "ev_assisted_reading_log_2",
+        "url": "https://github.com/janeczku/calibre-web/blob/6e840acbda8d62fdd159bf3855c01872d629a914/cps/ub.py",
+        "version": "6e840acbda8d62fdd159bf3855c01872d629a914",
+        "license": "GPL-3.0（根LICENSE；只研究，不复制实现）",
+        "license_url": "https://github.com/janeczku/calibre-web/blob/6e840acbda8d62fdd159bf3855c01872d629a914/LICENSE",
+        "facts": "code_observation: ReadBook分别定义未读、完成和进行中状态，并关联book_id与user_id；不是本模板页数算法的运行证据。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      },
+      {
+        "id": "S04",
+        "name": "ev_assisted_reading_log_design",
+        "url": "https://github.com/janeczku/calibre-web/blob/6e840acbda8d62fdd159bf3855c01872d629a914/LICENSE",
+        "version": "6e840acbda8d62fdd159bf3855c01872d629a914",
+        "license": "GPL-3.0（根LICENSE；只研究，不复制实现）",
+        "license_url": "https://github.com/janeczku/calibre-web/blob/6e840acbda8d62fdd159bf3855c01872d629a914/LICENSE",
+        "facts": "inference: 目标独立实现纸书/电子书元数据目录；每书只放一个书架，页数驱动状态；不搭建Calibre内容服务器或电子书阅读器。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      }
+    ],
+    "gaps": [
+      "证据独立审阅pending",
+      "上游not_run",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "不管理书籍文件/版权下载、读书社交、ISBN抓取或多书架关系。"
+    ]
+  },
+  "spec": {
+    "title": "个人书架与阅读进度",
+    "roles": [
+      {
+        "id": "R01",
+        "name": "想整理纸书和电子书阅读计划的个人",
+        "responsibility": "用书架管理待读书，记录已读页数，完成后进入已读列表并能按标题或作者找回。"
+      }
+    ],
+    "features": [
+      {
+        "id": "F01",
+        "name": "书架与书籍目录",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "在“周末”书架登记200页书，标题作者均可检索。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A01"
+        ]
+      },
+      {
+        "id": "F02",
+        "name": "阅读页数与完成状态",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "更新50页显示25%，更新200页显示已读；从200改100返回在读50%。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A02"
+        ]
+      },
+      {
+        "id": "F03",
+        "name": "边界、筛选与更正",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "201或负数页拒绝且不改原书；不同书架筛选隔离；0总页拒绝。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A03"
+        ]
+      },
+      {
+        "id": "F04",
+        "name": "真实重启持久化",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "同目录重启保留书架、页数和派生状态。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A04"
+        ]
+      }
+    ],
+    "acceptance": [
+      {
+        "id": "A01",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "在“周末”书架登记200页书，标题作者均可检索。",
+        "features": [
+          "F01"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A02",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "更新50页显示25%，更新200页显示已读；从200改100返回在读50%。",
+        "features": [
+          "F02"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A03",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "201或负数页拒绝且不改原书；不同书架筛选隔离；0总页拒绝。",
+        "features": [
+          "F03"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A04",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "同目录重启保留书架、页数和派生状态。",
+        "features": [
+          "F04"
+        ],
+        "implementation": "acceptance/probe.py"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "D01",
+        "question": "首版运行与数据边界？",
+        "default": "单用户本机、独立SQLite；显式保存，无账户、云端和协作。",
+        "when_to_ask": "确需公网托管或多人数据时先确认，不自行扩展。",
+        "impact": "保护本地数据，避免默认外发。",
+        "status": "assisted default"
+      },
+      {
+        "id": "D02",
+        "question": "是否复刻上游？",
+        "default": "目标独立实现纸书/电子书元数据目录；每书只放一个书架，页数驱动状态；不搭建Calibre内容服务器或电子书阅读器。",
+        "when_to_ask": "目标变化、破坏已有数据或需要引入上游实现/依赖时先确认。",
+        "impact": "不混淆来源事实与目标设计。",
+        "status": "assisted default"
+      }
+    ],
+    "phases": [
+      {
+        "id": "P0",
+        "title": "核心可用",
+        "goal": "用书架管理待读书，记录已读页数，完成后进入已读列表并能按标题或作者找回。",
+        "features": [
+          "F01",
+          "F02",
+          "F03",
+          "F04"
+        ],
+        "acceptance": [
+          "A01",
+          "A02",
+          "A03",
+          "A04"
+        ]
+      }
+    ],
+    "architecture_markdown": "## 运行边界\nPython标准库HTTP+SQLite，本机127.0.0.1；--data-dir独立目录，--demo仅新库首次初始化。GET只读，所有错误JSON为{error:{code,message}}，失败零写入，未知ID404not_found。输入类型先校验；事务保存；UI文本转义，无第三方资源。\n## 数据与规则\nshelves(id,name UNIQUE)，books(id,shelf_id,title,author,total_pages,pages_read)。总页整数1..100000；已读0..total_pages，状态由0=>unread，等于总页=>finished，其余reading，百分比只显示1位小数。更新允许回退以更正误填。名称trim1..80，书名1..200、作者0..120。搜索标题/作者casefold包含匹配，q空返回全部；不做全文电子书搜索。\n## 接口\nGET /api/health；GET /api/state?shelf_id=&q=&status= -> {shelves,books:[{id,shelf_id,title,author,total_pages,pages_read,status,progress_percent}]}；POST /api/shelves {name}->201；POST /api/books {shelf_id,title,author,total_pages}->201（pages_read=0）；POST /api/books/progress {id,pages_read}->200。400 invalid_pages/invalid_name/invalid_status，重复书架409already_exists。\n## 交互\n书架筛选、书籍卡片、页数表单、状态徽标和完成列表。空书架提示先加书，不自动获取封面/ISBN；错误保留输入，不自动删书。\n## 来源与推断\n目标独立实现纸书/电子书元数据目录；每书只放一个书架，页数驱动状态；不搭建Calibre内容服务器或电子书阅读器。\n",
+    "limits": [
+      "辅助试产，非严格G1/T08。",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "不管理书籍文件/版权下载、读书社交、ISBN抓取或多书架关系。"
+    ]
+  },
+  "trial_scope": "# 辅助试用范围\n\n用书架管理待读书，记录已读页数，完成后进入已读列表并能按标题或作者找回。\n\n- 辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。\n- 本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。\n- 单人本机显式保存，无账户、云同步、协作；不复制上游实现。\n- 不管理书籍文件/版权下载、读书社交、ISBN抓取或多书架关系。\n\nCodex研究与编写；静态案例未独审、上游未运行。模板先于应用；仅代表场景后续开发应用。严格G1/T08不因本包通过。"
+}

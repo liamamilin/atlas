@@ -1,0 +1,29 @@
+{
+ "schema": "atlas.project-decisions.v1",
+ "project_name": "dinner-poll-trial",
+ "phase": "P0",
+ "template_digest": "232ae37740899435d7aba7c2f20952b5ac3b271f9cb4371ae4121d0dcb1e0f18",
+ "confirmed": false,
+ "choices": [
+  {
+   "id": "D01",
+   "question": "首版运行与数据边界？",
+   "default": "单用户本机、独立SQLite；显式保存，无账户、云端和协作。",
+   "when_to_ask": "确需公网托管或多人数据时先确认，不自行扩展。",
+   "impact": "保护本地数据，避免默认外发。",
+   "status": "assisted default",
+   "choice": null,
+   "confirmed": false
+  },
+  {
+   "id": "D02",
+   "question": "是否复刻上游？",
+   "default": "目标不嵌入Nextcloud，也不复制其身份体系。使用本机共享界面、代号casefold去重、单选替换、显式open/closed状态；代号不是身份认证，不能用于正式选举。",
+   "when_to_ask": "目标变化、破坏已有数据或需要引入上游实现/依赖时先确认。",
+   "impact": "不混淆来源事实与目标设计。",
+   "status": "assisted default",
+   "choice": null,
+   "confirmed": false
+  }
+ ]
+}

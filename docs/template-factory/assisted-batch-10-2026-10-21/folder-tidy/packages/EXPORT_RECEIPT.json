@@ -1,0 +1,65 @@
+{
+ "origin": "assisted-trial",
+ "template_digest": "1ad783d38dd8d8feba55884d3dc6361667a1ceb6608be484d6e50f682697f87e",
+ "export": {
+  "phase": "P0",
+  "project_name": "folder-tidy-trial",
+  "template_digest": "1ad783d38dd8d8feba55884d3dc6361667a1ceb6608be484d6e50f682697f87e",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1"
+ },
+ "provenance": {
+  "origin": "assisted-trial",
+  "scenario": {
+   "id": "scn_639d6d74b2914439867875295f4ab528",
+   "leaf": "file-manager",
+   "leaf_name": "文件管理器 (File Manager)",
+   "name": "指定沙箱目录的文件整理与重命名预览",
+   "audience": "只整理自己指定练习目录的个人",
+   "objective": "浏览独立沙箱文件，先预览重命名及子目录移动，再确认执行；禁止覆盖、越界和跟随符号链接。",
+   "workflow": [
+    "启动时指定独立沙箱目录并浏览实际文件",
+    "创建整理子目录",
+    "为单个文件预览新名字和目标目录",
+    "确认预览后执行，核对真实内容不变",
+    "重启回查目录与操作记录"
+   ],
+   "acceptance": [
+    "临时沙箱有note.txt，创建“归档”子目录并预览归档/notes.txt，不立即移动。",
+    "确认token后移动成功，原文件消失、目标字节摘要一致；重复确认只返回既有结果。",
+    "../、绝对路径、符号链接、目标已存在或预览后源变化均失败且不覆盖。",
+    "同沙箱及数据目录重启，目录结构、文件内容和操作记录保留。"
+   ],
+   "status": "draft",
+   "updated_at": "2026-10-21T05:38:19.795159+00:00",
+   "revision": 1
+  },
+  "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+  "case_ref": {
+   "case_id": "case:assisted-ten-2026-10-21:folder-tidy",
+   "revision": 1,
+   "digest": "2d1c5047e6ffc986bc704c6dc1ba0ee664263d143024a56f9fb4839618ca22db"
+  },
+  "case_record_sha256": "09d31458d03586db8efc1d4794e95317e1d4969e85ad0f0adf5e4e29014e53d8",
+  "definition_digest": "ba372b1b0a12484e21c7838ca718834513219a753006dd9e0d4039f18d0b19c8",
+  "acceptance_inputs": {
+   "README.md": "2418fce93dedbca68968fe5de3ecf6e2e926d2270c27ad27e4031d35fa03215f",
+   "probe.py": "26f2d986e535b380776a80ccd362cffe92517efefadd6249c0970f3dce0fdd79"
+  },
+  "official_publication": false,
+  "upstream_runtime": "not_run",
+  "independent_evidence_review": "pending",
+  "note": "Static Codex source study; no model review or formal queue consumption. Local freeze fixes inputs only."
+ },
+ "controlled_opencode_calls_added": 0,
+ "official_queue_consumed": false,
+ "archives": {
+  "template-snapshot.zip": "867b3ffaeb474e5d1da7ce612a45204cb6275feed60fe8577d2833dd03bfd6aa",
+  "development-package.zip": "cb850e980bb7a84f8ee54441c3f185e665083310659beb9f8c0f3be46e9de8ad"
+ }
+}

@@ -1,0 +1,156 @@
+{
+  "app_id": "app:repo:6b5ca73de5f1f8da935f36e5",
+  "case_id": "case:assisted-ten-2026-10-21:reading-log",
+  "created_at": "2026-10-21T05:38:18.219832+00:00",
+  "created_task_id": "assisted-ten-2026-10-21-reading-log",
+  "digest": "277d8e5f2163e8cff8bcfa8cd98b9ea0dfbd01c3e5c4dc1e017a745a5f3118eb",
+  "evidence_digest": "d1836d1ddd013372bd7e518f512c8a8e39b508c8a03b36f2cb444481d872a086",
+  "research": {
+    "input_digest": "2b596ba1e51a79eacf707d510a5148b5b99fae8e715144f78a64ba2d7faf1f25",
+    "scope": "用书架管理待读书，记录已读页数，完成后进入已读列表并能按标题或作者找回。",
+    "summary": "Codex静态研究；目标独立实现纸书/电子书元数据目录；每书只放一个书架，页数驱动状态；不搭建Calibre内容服务器或电子书阅读器。",
+    "task_id": "assisted-ten-2026-10-21-reading-log",
+    "unknowns": [
+      "upstream not_run",
+      "independent review pending",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "不管理书籍文件/版权下载、读书社交、ISBN抓取或多书架关系。"
+    ]
+  },
+  "research_input_digest": "2b596ba1e51a79eacf707d510a5148b5b99fae8e715144f78a64ba2d7faf1f25",
+  "revision": 1,
+  "snapshot_ids": [
+    "src_7337bab52d5ad872c3ce429b"
+  ],
+  "observations": [
+    {
+      "case_id": "case:assisted-ten-2026-10-21:reading-log",
+      "case_revision": 1,
+      "digest": "201ebe102e7e3af11747f97fb10bac3c06491d95e865d0c96e159e5bf733501d",
+      "evidence_id": "ev_assisted_reading_log_1",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "6e840acbda8d62fdd159bf3855c01872d629a914",
+        "file_digest": "e5a89cfe7eafa70cd5c8241a1dd8a615e8c4b4abaf8936e4c779dd46c94414dc",
+        "line_end": 387,
+        "line_start": 362,
+        "path": "cps/ub.py"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Shelf保存名称、所属用户及书籍关系；BookShelf保存book_id、order和shelf，支撑独立书架与成员关系。",
+      "reviews": []
+    },
+    {
+      "case_id": "case:assisted-ten-2026-10-21:reading-log",
+      "case_revision": 1,
+      "digest": "b727232c25f1ea5eb61918e4a2cc9c988665951acc38e54d2566a63527fa515d",
+      "evidence_id": "ev_assisted_reading_log_2",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "6e840acbda8d62fdd159bf3855c01872d629a914",
+        "file_digest": "e5a89cfe7eafa70cd5c8241a1dd8a615e8c4b4abaf8936e4c779dd46c94414dc",
+        "line_end": 422,
+        "line_start": 403,
+        "path": "cps/ub.py"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "ReadBook分别定义未读、完成和进行中状态，并关联book_id与user_id；不是本模板页数算法的运行证据。",
+      "reviews": []
+    },
+    {
+      "case_id": "case:assisted-ten-2026-10-21:reading-log",
+      "case_revision": 1,
+      "digest": "aa844b88c0de4a5a16de66abd1ffe0e8e418ee05572d8ce39730649dc378ec5d",
+      "evidence_id": "ev_assisted_reading_log_design",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "上游未运行",
+          "独立证据审阅pending",
+          "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+          "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+          "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+          "不管理书籍文件/版权下载、读书社交、ISBN抓取或多书架关系。"
+        ],
+        "depends_on": [
+          "ev_assisted_reading_log_1",
+          "ev_assisted_reading_log_2"
+        ],
+        "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "目标独立实现纸书/电子书元数据目录；每书只放一个书架，页数驱动状态；不搭建Calibre内容服务器或电子书阅读器。",
+      "reviews": []
+    }
+  ],
+  "scenario_links": [
+    {
+      "adopted_scope": [
+        "书架与书籍目录",
+        "阅读页数与完成状态",
+        "边界、筛选与更正",
+        "真实重启持久化"
+      ],
+      "case_id": "case:assisted-ten-2026-10-21:reading-log",
+      "case_revision": 1,
+      "evidence_ids": [
+        "ev_assisted_reading_log_1",
+        "ev_assisted_reading_log_2",
+        "ev_assisted_reading_log_design"
+      ],
+      "exclusions": [
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "不管理书籍文件/版权下载、读书社交、ISBN抓取或多书架关系。"
+      ],
+      "reason": "用书架管理待读书，记录已读页数，完成后进入已读列表并能按标题或作者找回。",
+      "scenario_id": "scn_bb19507a62c84135bfb9d07d8c89283b",
+      "scenario_revision": 1,
+      "workflow_support": []
+    }
+  ],
+  "source_snapshots": [
+    {
+      "archive_sha256": null,
+      "collected_at": "2026-10-21T05:33:17.931430+00:00",
+      "commit_sha": "6e840acbda8d62fdd159bf3855c01872d629a914",
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ],
+      "file_manifest_digest": "2701a537a14fe2dfd6d05e893cb5541fb27edcee528ae444552319c541b34b97",
+      "files": {
+        "LICENSE": "589ed823e9a84c56feb95ac58e7cf384626b9cbf4fda2a907bc36e103de1bad2",
+        "README.md": "feb9051b9a3b11b3fd9e64375704cd0a888a496fca6d11f0dfc72a0135dd8f1f",
+        "cps/ub.py": "e5a89cfe7eafa70cd5c8241a1dd8a615e8c4b4abaf8936e4c779dd46c94414dc"
+      },
+      "license": {
+        "notice_hashes": {
+          "LICENSE": "589ed823e9a84c56feb95ac58e7cf384626b9cbf4fda2a907bc36e103de1bad2"
+        },
+        "status": "located"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license_uncertainties": [
+        "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+      ],
+      "repo_id": null,
+      "repository": "https://github.com/janeczku/calibre-web",
+      "snapshot_id": "src_7337bab52d5ad872c3ce429b",
+      "strategy_version": "assisted-core-source-v1"
+    }
+  ]
+}

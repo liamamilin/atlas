@@ -47,6 +47,14 @@ jobs:
         run: python -m unittest discover -s examples/meetings-trial/tests -v
       - name: Verify assisted inventory trial regressions
         run: python -m unittest discover -s examples/home-inventory-trial/tests -v
+      - name: Verify assisted meal trial regressions
+        run: |
+          python -m unittest discover -s examples/meal-plan-trial/tests -v
+          python examples/meal-plan-trial/acceptance/probe.py --case A04 --app-root examples/meal-plan-trial
+      - name: Verify assisted polling trial regressions
+        run: |
+          python -m unittest discover -s examples/dinner-poll-trial/tests -v
+          python examples/dinner-poll-trial/consumed-package/blueprint/acceptance/probe.py --case A04 --app-root examples/dinner-poll-trial
       - name: Verify assisted export input identity
         run: python -m unittest discover -s examples/assisted-trials/tests -v
       - uses: actions/setup-node@v4

@@ -1,0 +1,131 @@
+{
+  "app_id": "app:repo:71cc94c056860080b284a16a",
+  "case_id": "case:assisted-ten-2026-10-21:day-blocks",
+  "created_at": "2026-10-21T05:39:09.562865+00:00",
+  "created_task_id": "assisted-ten-2026-10-21-day-blocks",
+  "digest": "3316f087c1f49c58978993251fb001cf8fc8786d81214d6e4a3f92cdcf4c98a7",
+  "evidence_digest": "9da17f76f79648b1486dabe1e72450ceae81c18f5ead1072fa306fc12f656c93",
+  "research": {
+    "input_digest": "ebe2bc20fdcf3edf61cc50394793a890dc82a17943708be66d37d6f3f3e4a6d3",
+    "scope": "把待办安排到一天的时间块，避免重叠，结束时把未完成块顺延到明天待安排区而保留来源。",
+    "summary": "Codex静态研究；目标把计划时间与实际工时分开，只实现当日排程、完成与未完成迁移；不从现有工时模板换名字复用。",
+    "task_id": "assisted-ten-2026-10-21-day-blocks",
+    "unknowns": [
+      "upstream not_run",
+      "independent review pending",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "不接外部日历、通知、自动番茄钟或真实工时统计；顺延日如需补录先列待办，不静默绕过封存。"
+    ]
+  },
+  "research_input_digest": "ebe2bc20fdcf3edf61cc50394793a890dc82a17943708be66d37d6f3f3e4a6d3",
+  "revision": 1,
+  "snapshot_ids": [
+    "src_bc378675f974c9549bf9bdd0"
+  ],
+  "observations": [
+    {
+      "case_id": "case:assisted-ten-2026-10-21:day-blocks",
+      "case_revision": 1,
+      "digest": "e7c034d82a2038655610f12a99dc9b61b4ccf6675cb84629b71b8629569e95ff",
+      "evidence_id": "ev_assisted_day_blocks_1",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "f15b319ab8de76ca8e9ce5d1b72cc2334e0cab1cb3515da7048f0ba6e8f9ad1e",
+        "material_version": "0556bdb84d09faeff18d6c18abf867e28f3c1f69",
+        "url": "https://github.com/super-productivity/super-productivity/blob/0556bdb84d09faeff18d6c18abf867e28f3c1f69/README.md"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "README声明任务分类、planner/schedule时间轴、timeboxing、time tracking及focus能力；文档声明未代替上游运行。",
+      "reviews": []
+    },
+    {
+      "case_id": "case:assisted-ten-2026-10-21:day-blocks",
+      "case_revision": 1,
+      "digest": "c467417e92266e5899e9ca31abcdaf4d88ed57401e873e987b5e29bd978e6ce0",
+      "evidence_id": "ev_assisted_day_blocks_design",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "上游未运行",
+          "独立证据审阅pending",
+          "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+          "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+          "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+          "不接外部日历、通知、自动番茄钟或真实工时统计；顺延日如需补录先列待办，不静默绕过封存。"
+        ],
+        "depends_on": [
+          "ev_assisted_day_blocks_1"
+        ],
+        "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "目标把计划时间与实际工时分开，只实现当日排程、完成与未完成迁移；不从现有工时模板换名字复用。",
+      "reviews": []
+    }
+  ],
+  "scenario_links": [
+    {
+      "adopted_scope": [
+        "时间块与日程排序",
+        "完成状态及重叠检测",
+        "可幂等顺延与重新排期",
+        "真实重启持久化"
+      ],
+      "case_id": "case:assisted-ten-2026-10-21:day-blocks",
+      "case_revision": 1,
+      "evidence_ids": [
+        "ev_assisted_day_blocks_1",
+        "ev_assisted_day_blocks_design"
+      ],
+      "exclusions": [
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "不接外部日历、通知、自动番茄钟或真实工时统计；顺延日如需补录先列待办，不静默绕过封存。"
+      ],
+      "reason": "把待办安排到一天的时间块，避免重叠，结束时把未完成块顺延到明天待安排区而保留来源。",
+      "scenario_id": "scn_3b74c4ea6d2345988d877e975eb0a5fa",
+      "scenario_revision": 1,
+      "workflow_support": []
+    }
+  ],
+  "source_snapshots": [
+    {
+      "archive_sha256": null,
+      "collected_at": "2026-10-21T05:26:13.491418+00:00",
+      "commit_sha": "0556bdb84d09faeff18d6c18abf867e28f3c1f69",
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ],
+      "file_manifest_digest": "4c246c64aacd7fabd34821ed85a9e029fcfd93f6478dbb17ff4aac47d77feb90",
+      "files": {
+        "LICENSE": "2e279de19632b5694d24b0ac06fd5b837ec487bf821302d9ce195379850a5fcb",
+        "README.md": "f15b319ab8de76ca8e9ce5d1b72cc2334e0cab1cb3515da7048f0ba6e8f9ad1e"
+      },
+      "license": {
+        "notice_hashes": {
+          "LICENSE": "2e279de19632b5694d24b0ac06fd5b837ec487bf821302d9ce195379850a5fcb"
+        },
+        "status": "located"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license_uncertainties": [
+        "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+      ],
+      "repo_id": null,
+      "repository": "https://github.com/super-productivity/super-productivity",
+      "snapshot_id": "src_bc378675f974c9549bf9bdd0",
+      "strategy_version": "assisted-core-source-v1"
+    }
+  ]
+}

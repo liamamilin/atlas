@@ -1,0 +1,50 @@
+{
+  "name": "今日工作时间块与未完事项顺延",
+  "audience": "需要为今天工作预留时间并处理未完成项的个人",
+  "objective": "把待办安排到一天的时间块，避免重叠，结束时把未完成块顺延到明天待安排区而保留来源。",
+  "workflow": [
+    "新增当天任务并安排开始结束时间",
+    "查看按时间排序的日程",
+    "完成任务或修改安排",
+    "将一天未完成任务顺延至次日待安排区",
+    "次日重新排期，刷新重启保留"
+  ],
+  "acceptance": [
+    "创建09:00–10:00写作和10:00–11:00读书，相邻不重叠。",
+    "09:30–10:30冲突被拒绝；完成写作后保留时间占用及完成标志。",
+    "顺延只移动未完成读书到次日未排期区，不复制；重复顺延不重复创建；再排14:00–15:00。",
+    "重启保留当天完成项、次日安排及顺延来源。"
+  ],
+  "repo_name": "Super Productivity",
+  "license": "MIT（LICENSE；只研究，不复制实现）",
+  "license_path": "LICENSE",
+  "observations": [
+    [
+      "documentation",
+      "README.md",
+      80,
+      89,
+      "README声明任务分类、planner/schedule时间轴、timeboxing、time tracking及focus能力；文档声明未代替上游运行。"
+    ]
+  ],
+  "inference": "目标把计划时间与实际工时分开，只实现当日排程、完成与未完成迁移；不从现有工时模板换名字复用。",
+  "features": [
+    "时间块与日程排序",
+    "完成状态及重叠检测",
+    "可幂等顺延与重新排期",
+    "真实重启持久化"
+  ],
+  "goals": [
+    "创建09:00–10:00写作和10:00–11:00读书，相邻不重叠。",
+    "09:30–10:30冲突被拒绝；完成写作后保留时间占用及完成标志。",
+    "顺延只移动未完成读书到次日未排期区，不复制；重复顺延不重复创建；再排14:00–15:00。",
+    "重启保留当天完成项、次日安排及顺延来源。"
+  ],
+  "arch": "## 运行边界\nPython标准库HTTP+SQLite，本机127.0.0.1；--data-dir独立目录，--demo仅新库首次初始化。GET只读，所有错误JSON为{error:{code,message}}，失败零写入，未知ID404not_found。输入类型先校验；事务保存；UI文本转义，无第三方资源。\n## 数据与规则\nblocks(id,title,date,start nullable,end nullable,done,origin_date)。未排期start/end均null；已排期HH:MM同日且end>start。日期有效ISO，title1..160；所有已排期块包括done的半开时间区间不得重叠。carry{date}把未完成块原ID迁到次日、清空start/end，首次保留origin_date；已完成不迁。事务内标记该source日已carry，第二次请求幂等，不移动后来次日新建项。次日已存在块不复制/覆盖。\n## 接口\nGET /api/health；GET /api/state?date= -> {blocks,carried:bool}；POST /api/blocks {title,date,start,end}->201；POST /api/blocks/done {id}->200切换；POST /api/blocks/schedule {id,date,start,end}->200；POST /api/carry {date}->200{moved_ids}（幂等第二次moved_ids=[]）。400 invalid_date/invalid_time/invalid_name，409overlap；顺延完成后原日期禁止新增/移入新块409day_carried，避免幂等状态歧义。\n## 交互\n时间轴+未安排区；完成项打勾保留原时间；顺延按钮先展示目标次日及未完数量，显式确认。未排期不能伪装为已完成工作小时。\n## 来源与推断\n目标把计划时间与实际工时分开，只实现当日排程、完成与未完成迁移；不从现有工时模板换名字复用。\n",
+  "gaps": [
+    "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+    "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+    "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+    "不接外部日历、通知、自动番茄钟或真实工时统计；顺延日如需补录先列待办，不静默绕过封存。"
+  ]
+}

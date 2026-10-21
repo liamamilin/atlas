@@ -1,0 +1,70 @@
+{
+ "schema": "atlas.acceptance-plan.v0",
+ "template_id": "blueprint-local-assisted-meal-plan-trial",
+ "phases": [
+  {
+   "id": "P0",
+   "title": "核心可用",
+   "goal": "把菜谱安排到一周晚餐，按用餐份数自动合并同名同单位食材，修改计划后采购量立即重算。",
+   "features": [
+    "F01",
+    "F02",
+    "F03",
+    "F04"
+   ],
+   "acceptance": [
+    "A01",
+    "A02",
+    "A03",
+    "A04"
+   ],
+   "status": "not implemented"
+  }
+ ],
+ "cases": [
+  {
+   "id": "A01",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "登记2人菜谱：番茄300g、鸡蛋2个；安排2人和4人两天，采购900g、6个。",
+   "features": [
+    "F01"
+   ],
+   "implementation": "acceptance/probe.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A02",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "4人改2人后600g、4个；不同单位不合并；汇总由当前计划实时派生，非累加缓存。",
+   "features": [
+    "F02"
+   ],
+   "implementation": "acceptance/probe.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A03",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "暂停一日只剩300g、2个，恢复还原；份数0、非法日期、超过7天范围、未知菜谱拒绝且不改旧数据。",
+   "features": [
+    "F03"
+   ],
+   "implementation": "acceptance/probe.py",
+   "status": "not_run"
+  },
+  {
+   "id": "A04",
+   "phase": "P0",
+   "type": "positive",
+   "goal": "同一数据目录跨进程重启，全部菜谱、计划状态及清单相同。",
+   "features": [
+    "F04"
+   ],
+   "implementation": "acceptance/probe.py",
+   "status": "not_run"
+  }
+ ]
+}

@@ -1,0 +1,115 @@
+{
+  "case_id": "case:assisted-ten-2026-10-21:process-sketch",
+  "app_name": "draw.io",
+  "source_snapshots": [
+    {
+      "repository": "https://github.com/jgraph/drawio",
+      "commit_sha": "17b367b91dbab91804f852645788d7ffb46dcb79",
+      "strategy_version": "assisted-core-source-v1",
+      "collected_at": "2026-10-21T05:26:15.595842+00:00",
+      "local_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/sources/assisted-ten-2026-10-21/process-sketch",
+      "files": {
+        "LICENSE": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1",
+        "README.md": "749486eaa18f4569a45add47b4d1feae09df45044291eec2ce67f0506ef41c51",
+        "src/main/webapp/mxgraph/src/model/mxGeometry.js": "a0b99a4a7e1d5abf3317b365720441ff6eb20e4e296ad5b1acbfb8480e927598"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license": {
+        "status": "located",
+        "notice_hashes": {
+          "LICENSE": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1"
+        }
+      },
+      "license_uncertainties": [
+        "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+      ],
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ]
+    }
+  ],
+  "research": {
+    "summary": "Codex静态研究；目标以SVG渲染少量流程节点，边持有节点ID，几何改变时派生中心端点；不复制mxGraph或提供完整BPMN。",
+    "scope": "用开始、处理、判断和结束节点画出小流程，连接步骤并移动节点时保持连接，保存后回看。",
+    "unknowns": [
+      "upstream not_run",
+      "independent review pending",
+      "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+      "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+      "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+      "无图形智能布局、BPMN验证、协作、图片/PDF导出或工作流执行。"
+    ],
+    "input_digest": "534a5592018783f4f06632d397ff16fae0b4f6913ed2935cf454a16f8b6418c7",
+    "task_id": "assisted-ten-2026-10-21-process-sketch"
+  },
+  "observations": [
+    {
+      "evidence_id": "ev_assisted_process_sketch_1",
+      "kind": "code_observation",
+      "statement": "mxGeometry区分顶点x/y宽高和边的端点/控制点，并说明连接状态与移动时控制点行为。",
+      "location": {
+        "commit_sha": "17b367b91dbab91804f852645788d7ffb46dcb79",
+        "path": "src/main/webapp/mxgraph/src/model/mxGeometry.js",
+        "file_digest": "a0b99a4a7e1d5abf3317b365720441ff6eb20e4e296ad5b1acbfb8480e927598",
+        "line_start": 6,
+        "line_end": 33
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_process_sketch_2",
+      "kind": "code_observation",
+      "statement": "translate对顶点位置及可用的sourcePoint/targetPoint平移；目标节点ID绑定的重算方式仍为独立设计。",
+      "location": {
+        "commit_sha": "17b367b91dbab91804f852645788d7ffb46dcb79",
+        "path": "src/main/webapp/mxgraph/src/model/mxGeometry.js",
+        "file_digest": "a0b99a4a7e1d5abf3317b365720441ff6eb20e4e296ad5b1acbfb8480e927598",
+        "line_start": 285,
+        "line_end": 322
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_process_sketch_design",
+      "kind": "inference",
+      "statement": "目标以SVG渲染少量流程节点，边持有节点ID，几何改变时派生中心端点；不复制mxGraph或提供完整BPMN。",
+      "depends_on": [
+        "ev_assisted_process_sketch_1",
+        "ev_assisted_process_sketch_2"
+      ],
+      "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。",
+      "assumptions": [
+        "上游未运行",
+        "独立证据审阅pending",
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "无图形智能布局、BPMN验证、协作、图片/PDF导出或工作流执行。"
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "scenario_id": "scn_cd663b9f8fdb475e8382fb6fadd44ac9",
+      "scenario_revision": 1,
+      "reason": "用开始、处理、判断和结束节点画出小流程，连接步骤并移动节点时保持连接，保存后回看。",
+      "evidence_ids": [
+        "ev_assisted_process_sketch_1",
+        "ev_assisted_process_sketch_2",
+        "ev_assisted_process_sketch_design"
+      ],
+      "adopted_scope": [
+        "带类型的流程节点",
+        "连接与移动保持",
+        "非法连接及结构导出",
+        "真实重启持久化"
+      ],
+      "exclusions": [
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "无图形智能布局、BPMN验证、协作、图片/PDF导出或工作流执行。"
+      ]
+    }
+  ]
+}
