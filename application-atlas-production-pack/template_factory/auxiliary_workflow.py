@@ -437,6 +437,22 @@ class WorkflowService:
                 raise FactoryError(
                     "fresh leaves outside validation gate", "workflow_gate", 409
                 )
+            for leaf in g["leaves"]:
+                member = c.execute(
+                    "SELECT state,body FROM auxiliary_full_leaf WHERE plan_id=? AND slug=?",
+                    (plan_id, leaf),
+                ).fetchone()
+                member_body = json.loads(member["body"]) if member else {}
+                if (
+                    not member
+                    or member["state"] in {"pending", "running", "paused"}
+                    or bool(member_body.get("repair_pending"))
+                ):
+                    raise FactoryError(
+                        "validation gate includes a nonterminal or repair-pending leaf",
+                        "workflow_gate",
+                        409,
+                    )
             for leaf in fresh:
                 if g.get("initial_states", {}).get(leaf) in {"ready_not_run", "reused"}:
                     raise FactoryError(
@@ -445,7 +461,7 @@ class WorkflowService:
                         409,
                     )
                 leafrow = c.execute(
-                    "SELECT state FROM auxiliary_full_leaf WHERE plan_id=? AND slug=?",
+                    "SELECT state,body FROM auxiliary_full_leaf WHERE plan_id=? AND slug=?",
                     (plan_id, leaf),
                 ).fetchone()
                 if not leafrow or leafrow[0] != "ready_not_run":
@@ -467,6 +483,13 @@ class WorkflowService:
                         409,
                     )
                 attempt = download["attempt"]
+                leaf_body = json.loads(leafrow["body"])
+                if leaf_body.get("current_attempt") != attempt:
+                    raise FactoryError(
+                        "download attempt differs from current leaf attempt",
+                        "workflow_gate",
+                        409,
+                    )
                 latest_attempt = (
                     max(rows, key=lambda item: item["updated"])["attempt"]
                     if rows

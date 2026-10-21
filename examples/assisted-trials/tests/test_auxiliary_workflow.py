@@ -195,7 +195,10 @@ class WorkflowTests(unittest.TestCase):
             self.workflow.complete("p", leaf, attempt, step, [output])
         if mark_ready:
             self.service.update_leaf(
-                "p", leaf, "ready_not_run", {"validation_fixture": True}
+                "p",
+                leaf,
+                "ready_not_run",
+                {"validation_fixture": True, "current_attempt": attempt},
             )
         return outputs
 
@@ -220,6 +223,43 @@ class WorkflowTests(unittest.TestCase):
         outputs[0].unlink()
         with self.assertRaises(FactoryError):
             self.workflow.set_gate_passed("p", evidence)
+
+    def test_gate_rejects_pending_member_outside_fresh_ready_subset(self):
+        self.service.control("p", "pause")
+        self.workflow.set_validation("p", ["leaf-0", "leaf-1"])
+        self._complete_fresh_workflow("leaf-0", attempt="fresh1")
+        evidence = {
+            "kind": "atlas.auxiliary-workflow-validation.v1",
+            "static_checks_passed": True,
+            "replay_new_calls": 0,
+            "resume_verified": True,
+            "failed_leaf_isolated": True,
+            "fresh_ready_leaves": ["leaf-0"],
+        }
+        with self.assertRaises(FactoryError):
+            self.workflow.set_gate_passed("p", evidence)
+        self.assertEqual(self.workflow.gate("p")["status"], "ready")
+
+    def test_gate_rejects_download_attempt_different_from_current_attempt(self):
+        self.service.control("p", "pause")
+        self.workflow.set_validation("p", ["leaf-0"])
+        self._complete_fresh_workflow(
+            "leaf-0", attempt="workflow-attempt", mark_ready=False
+        )
+        self.service.update_leaf(
+            "p", "leaf-0", "ready_not_run", {"current_attempt": "leaf-attempt"}
+        )
+        evidence = {
+            "kind": "atlas.auxiliary-workflow-validation.v1",
+            "static_checks_passed": True,
+            "replay_new_calls": 0,
+            "resume_verified": True,
+            "failed_leaf_isolated": True,
+            "fresh_ready_leaves": ["leaf-0"],
+        }
+        with self.assertRaises(FactoryError):
+            self.workflow.set_gate_passed("p", evidence)
+        self.assertEqual(self.workflow.gate("p")["status"], "ready")
 
     def test_preexisting_ready_replay_is_not_fresh_validation(self):
         self.service.update_leaf("p", "leaf-0", "ready_not_run", {"old": True})

@@ -1411,7 +1411,7 @@ class Handler(BaseHTTPRequestHandler):
                     self.end_headers()
                     self.wfile.write(content)
                     return
-                return self._file(result[0], result[1])
+                return self._file(result[0], result[1], result[2])
             return self._json(result[0], result[1])
         except FactoryError as error:
             return self._json({"error": str(error), "code": error.code}, error.status)
@@ -1436,12 +1436,12 @@ class Handler(BaseHTTPRequestHandler):
         except (BrokenPipeError, ConnectionResetError):
             return
 
-    def _file(self, path: Path, download_name: str):
+    def _file(self, path: Path, download_name: str, content_type: str = "application/zip"):
         path = path.resolve()
         if not path.is_file():
             return self._json({"error": "backup archive not found"}, 404)
         self.send_response(200)
-        self.send_header("Content-Type", "application/zip")
+        self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(path.stat().st_size))
         self.send_header("Content-Disposition", f'attachment; filename="{download_name}"')
         self.send_header("Cache-Control", "no-store")

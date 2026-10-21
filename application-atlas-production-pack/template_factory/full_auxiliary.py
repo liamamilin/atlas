@@ -393,11 +393,14 @@ class FullAuxiliaryService:
                 request["previous_host_sha256"] != previous
                 or not set(previous) <= set(request["new_host_sha256"])
                 or any(
-                    not name.startswith(
-                        (
-                            "application-atlas-production-pack/template_factory/",
-                            "examples/assisted-trials/",
+                    not (
+                        name.startswith(
+                            (
+                                "application-atlas-production-pack/template_factory/",
+                                "examples/assisted-trials/",
+                            )
                         )
+                        or name == "application-atlas-production-pack/drafts_api.py"
                     )
                     for name in added
                 )
