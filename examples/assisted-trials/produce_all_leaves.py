@@ -158,12 +158,49 @@ def verify_plan(root):
         raise FactoryError(
             "producer prompt version changed", "full_plan_integrity", 409
         )
-    for name, expected in scope.get("host_source_sha256", {}).items():
+    expected_hosts = scope.get("host_source_sha256", {})
+    _, service = host()
+    revision = service.host_revision(PLAN_ID)
+    if revision:
+        if revision["scope_sha256"] != request["scope"]["sha256"]:
+            raise FactoryError(
+                "host revision scope differs", "full_plan_integrity", 409
+            )
+        expected_hosts = revision["new_host_sha256"]
+    for name, expected in expected_hosts.items():
         if sha(ROOT / name) != expected:
             raise FactoryError(
                 "production host source changed: " + name, "full_plan_integrity", 409
             )
     return request, scope
+
+
+def selected_scenario(work):
+    """SCENARIO.json aliases scenario.json on macOS. Preserve the old bytes."""
+    target = work / "SELECTED_SCENARIO.json"
+    legacy = work / "SCENARIO.json"
+    if not target.exists() and legacy.exists():
+        original = legacy.read_bytes()
+        value = json.loads(original)
+        if "id" not in value:
+            if value != load(work / "RESEARCH.json")["scenario"]:
+                raise ValueError("legacy research scenario differs")
+            preserved = work / "LEGACY_RESEARCH_SCENARIO.json"
+            if preserved.exists() and preserved.read_bytes() != original:
+                raise ValueError("legacy scenario preservation differs")
+            legacy.rename(preserved)
+            target.write_bytes(original)
+            fixed_json(
+                work / "SCENARIO_CHECKPOINT_MIGRATION.json",
+                {
+                    "original_name": "SCENARIO.json",
+                    "preserved_name": preserved.name,
+                    "sha256": sha(preserved),
+                    "new_name": target.name,
+                    "content_changed": False,
+                },
+            )
+    return target
 
 
 def freeze(root, api):
@@ -443,7 +480,14 @@ def verify_full_production(folder, production, authored, snapshot):
     inputs = load(author / "input.json")
     if inputs["source"] != {
         k: v for k, v in snapshot.items() if k != "local_root"
-    } or inputs["scenario"] != load(folder / "SCENARIO.json"):
+    } or inputs["scenario"] != load(
+        folder
+        / (
+            "SELECTED_SCENARIO.json"
+            if (folder / "SELECTED_SCENARIO.json").exists()
+            else "SCENARIO.json"
+        )
+    ):
         raise ValueError("full source/scenario differs from author inputs")
     actual, files = profiles.validate_author(
         load(author / "RESULT.json"), snapshot, inputs
@@ -856,6 +900,7 @@ def execute_leaf(root, service, item, api, repair=False):
         stage = "research"
         try:
             verify_plan(root)
+            selected_scenario(work)
             fixed_json(
                 work / "REQUEST.json",
                 {
@@ -906,11 +951,12 @@ def execute_leaf(root, service, item, api, repair=False):
                 ],
             }
             if repair:
+                selected_scenario(previous)
                 for name in (
                     "SOURCE_PIN.json",
                     "source-snapshot.json",
                     "RESEARCH.json",
-                    "SCENARIO.json",
+                    "SELECTED_SCENARIO.json",
                     "RESEARCH_REUSE.json",
                 ):
                     if (previous / name).exists() and not (work / name).exists():
@@ -1038,7 +1084,7 @@ def execute_leaf(root, service, item, api, repair=False):
                         z.write(Path(snapshot["local_root"]) / name, name)
                     z.write(work / "source-snapshot.json", "source-snapshot.json")
             scene = research["scenario"]
-            fixed_json(work / "SCENARIO.json", scene)
+            fixed_json(selected_scenario(work), scene)
             inputs = {
                 "scenario": scene,
                 "fixed_scope": item.get("fixed_scenario"),

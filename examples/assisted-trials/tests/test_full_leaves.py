@@ -414,6 +414,153 @@ class FullLeafTests(unittest.TestCase):
         self.assertIn("not-started-1", called[0].name)
         self.assertEqual((path / "LAUNCH_INTENT.json").read_text(), '{"original":true}')
 
+    def test_scenario_case_alias_migration_preserves_bytes_and_formal_identity(self):
+        work = self.root / "checkpoint"
+        work.mkdir()
+        scene = {
+            "name": "calendar",
+            "audience": "person",
+            "objective": "a month",
+            "workflow": ["create"],
+            "acceptance": ["persist"],
+        }
+        (work / "RESEARCH.json").write_text(json.dumps({"scenario": scene}))
+        original = json.dumps(scene, indent=1).encode()
+        (work / "SCENARIO.json").write_bytes(original)
+        selected = runner.selected_scenario(work)
+        self.assertEqual(selected.read_bytes(), original)
+        self.assertEqual(
+            (work / "LEGACY_RESEARCH_SCENARIO.json").read_bytes(), original
+        )
+        self.assertFalse((work / "SCENARIO.json").exists())
+        (work / "scenario.json").write_text(
+            json.dumps({**scene, "id": "formal-scene", "revision": 1})
+        )
+        self.assertEqual(runner.selected_scenario(work).read_bytes(), original)
+        self.assertEqual(
+            json.loads((work / "scenario.json").read_text())["id"], "formal-scene"
+        )
+
+    def test_host_fix_registration_keeps_frozen_scope_budget_and_deadline(self):
+        source = self.root / "host.py"
+        source.write_text("before")
+        self.scope["host_source_sha256"] = {"host.py": runner.sha(source)}
+        (self.root / "scope.json").write_text(json.dumps(self.scope))
+        self.request["scope"]["sha256"] = runner.sha(self.root / "scope.json")
+        self.register()
+        reservation = self.reserve()
+        self.service.ledger.finish(reservation["id"], "completed")
+        self.service.control("p", "pause")
+        before = self.service.status("p")
+        source.write_text("after")
+        proof = self.root / "ci.json"
+        proof.write_text(
+            json.dumps(
+                {"sha": "fixture-code", "status": "completed", "conclusion": "success"}
+            )
+        )
+        request = {
+            "schema": "atlas.full-leaf-host-revision.v1",
+            "full_plan_id": "p",
+            "scope_sha256": self.request["scope"]["sha256"],
+            "authorization_sha256": self.request["authorization"]["sha256"],
+            "previous_host_sha256": self.scope["host_source_sha256"],
+            "new_host_sha256": {"host.py": runner.sha(source)},
+            "code_sha": "fixture-code",
+            "ci_proof": {"path": "ci.json", "sha256": runner.sha(proof)},
+            "reason": "case alias fixture",
+        }
+        receipt = self.service.register_host_revision(request)
+        self.assertEqual(self.service.register_host_revision(request), receipt)
+        after = self.service.status("p")
+        for key in ["baseline", "max_calls", "deadline", "started", "new_calls"]:
+            self.assertEqual(before[key], after[key])
+        self.assertEqual(self.service.host_revision("p"), request)
+        bad = copy.deepcopy(request)
+        bad["scope_sha256"] = "different"
+        with self.assertRaisesRegex(FactoryError, "frozen authorization"):
+            self.service.register_host_revision(bad)
+
+    def test_coordinator_auto_continues_20_20_1_and_isolates_failed_leaf(self):
+        import signal
+        import time
+        from atlas_runtime import atomic_json
+
+        class Service:
+            def __init__(inner):
+                inner.state = "registered"
+                inner.lock = threading.Lock()
+                inner.active = 0
+                inner.peak = 0
+                inner.visited = []
+                inner.items = [
+                    {"leaf": "q-" + str(n), "state": "pending"} for n in range(41)
+                ]
+
+            def status(inner, *args):
+                with inner.lock:
+                    return {
+                        "status": inner.state,
+                        "items": copy.deepcopy(inner.items),
+                        "calls": [],
+                        "baseline": 99,
+                        "new_calls": 0,
+                        "max_calls": 7200,
+                        "active_calls": 0,
+                    }
+
+            def control_state(inner, *args):
+                return inner.state
+
+            def control(inner, plan, action, reason=None):
+                inner.state = {
+                    "resume": "running",
+                    "pause": "paused",
+                    "complete": "completed",
+                }[action]
+                return inner.status()
+
+        service = Service()
+        batches = []
+        folder = self.root / "queue"
+        folder.mkdir()
+
+        def leaf(root, svc, item, api, repair):
+            with svc.lock:
+                svc.active += 1
+                svc.peak = max(svc.peak, svc.active)
+                svc.visited.append(item["leaf"])
+            time.sleep(0.01)
+            with svc.lock:
+                own = next(x for x in svc.items if x["leaf"] == item["leaf"])
+                own.update(
+                    state="failed" if own["leaf"] == "q-5" else "ready_not_run",
+                    first_pass_done=True,
+                )
+                svc.active -= 1
+            return own
+
+        def write(path, value):
+            if path.name == "CURRENT_BATCH.json":
+                batches.append(value["leaves"])
+            atomic_json(path, value)
+
+        previous = signal.getsignal(signal.SIGTERM)
+        self.addCleanup(signal.signal, signal.SIGTERM, previous)
+        with (
+            patch.object(runner, "verify_plan", return_value=({}, {})),
+            patch.object(runner, "host", return_value=(None, service)),
+            patch.object(runner, "execute_leaf", leaf),
+            patch.object(runner, "atomic_json", write),
+        ):
+            runner.run(folder, "fixture://no-model")
+        self.assertEqual([len(x) for x in batches], [20, 20, 1])
+        self.assertEqual(len(set(service.visited)), 41)
+        self.assertEqual(len(service.visited), 41)
+        self.assertEqual(service.peak, 2)
+        self.assertEqual(service.state, "completed")
+        self.assertEqual(sum(x["state"] == "failed" for x in service.items), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

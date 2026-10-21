@@ -219,6 +219,138 @@ class FullAuxiliaryService:
             ).fetchone()
             return row[0] if row else "unregistered"
 
+    def host_revision(self, plan_id):
+        with self.store.connect() as con:
+            row = con.execute(
+                "SELECT body FROM auxiliary_full_event WHERE plan_id=? AND kind='host_revision' ORDER BY id DESC LIMIT 1",
+                (plan_id,),
+            ).fetchone()
+        if not row:
+            return None
+        value = json.loads(row[0])
+        if digest(value["request"]) != value["request_digest"]:
+            raise FactoryError(
+                "host revision record changed", "full_plan_integrity", 409
+            )
+        return value["request"]
+
+    def register_host_revision(self, request):
+        """Append tested host-code correction; never rewrite scope, quota or clock."""
+        if request.get(
+            "schema"
+        ) != "atlas.full-leaf-host-revision.v1" or not request.get("reason"):
+            raise FactoryError("invalid host revision", "full_plan_binding", 409)
+        plan_id = request["full_plan_id"]
+        with self.store.connect(True) as con:
+            row = con.execute(
+                "SELECT * FROM auxiliary_full_plan WHERE id=? AND campaign_id=?",
+                (plan_id, self.campaign_id),
+            ).fetchone()
+            if not row:
+                raise FactoryError("unknown plan", "not_found", 404)
+            prior = con.execute(
+                "SELECT body FROM auxiliary_full_event WHERE plan_id=? AND kind='host_revision' ORDER BY id DESC LIMIT 1",
+                (plan_id,),
+            ).fetchone()
+            if prior and json.loads(prior[0])["request_digest"] == digest(request):
+                return json.loads(prior[0])["receipt"]
+            grant = json.loads(row["request_json"])
+            root = self.store.pack.parent
+            if (
+                hashlib.sha256(
+                    (root / grant["authorization"]["path"]).read_bytes()
+                ).hexdigest()
+                != grant["authorization"]["sha256"]
+            ):
+                raise FactoryError(
+                    "original authorization changed", "full_plan_integrity", 409
+                )
+            scope = json.loads((root / grant["scope"]["path"]).read_text())
+            if (
+                hashlib.sha256((root / grant["scope"]["path"]).read_bytes()).hexdigest()
+                != grant["scope"]["sha256"]
+                or request["scope_sha256"] != grant["scope"]["sha256"]
+                or request["authorization_sha256"] != grant["authorization"]["sha256"]
+            ):
+                raise FactoryError(
+                    "host correction cannot change frozen authorization/scope",
+                    "full_plan_integrity",
+                    409,
+                )
+            previous = (
+                json.loads(prior[0])["request"]["new_host_sha256"]
+                if prior
+                else scope["host_source_sha256"]
+            )
+            if request["previous_host_sha256"] != previous or set(
+                request["new_host_sha256"]
+            ) != set(previous):
+                raise FactoryError(
+                    "host correction lineage differs", "full_plan_binding", 409
+                )
+            for name, value in request["new_host_sha256"].items():
+                path = (root / name).resolve()
+                if (
+                    not path.is_relative_to(root.resolve())
+                    or hashlib.sha256(path.read_bytes()).hexdigest() != value
+                ):
+                    raise FactoryError(
+                        "tested host bytes differ", "full_plan_integrity", 409
+                    )
+            ci_path = (root / request["ci_proof"]["path"]).resolve()
+            if not ci_path.is_relative_to(root.resolve()):
+                raise FactoryError(
+                    "CI proof outside repository", "full_plan_binding", 409
+                )
+            ci = json.loads(ci_path.read_text())
+            if (
+                hashlib.sha256(
+                    (root / request["ci_proof"]["path"]).read_bytes()
+                ).hexdigest()
+                != request["ci_proof"]["sha256"]
+                or ci.get("sha") != request["code_sha"]
+                or ci.get("status") != "completed"
+                or ci.get("conclusion") != "success"
+            ):
+                raise FactoryError(
+                    "exact host CI proof missing", "full_plan_binding", 409
+                )
+            active = con.execute(
+                "SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND phase=? AND status IN ('reserved','spawn_intent','started','uncertain')",
+                (self.campaign_id, row["phase"]),
+            ).fetchone()[0]
+            if row["status"] != "paused" or active:
+                raise FactoryError(
+                    "drain and pause before host activation", "full_plan_paused", 409
+                )
+            receipt = {
+                "full_plan_id": plan_id,
+                "request_digest": digest(request),
+                "code_sha": request["code_sha"],
+                "previous_host_sha256": previous,
+                "new_host_sha256": request["new_host_sha256"],
+                "baseline": row["baseline"],
+                "max_calls": row["max_calls"],
+                "started": row["started"],
+                "deadline": row["deadline"],
+                "registered_at": self.clock(),
+            }
+            con.execute(
+                "INSERT INTO auxiliary_full_event(plan_id,kind,body,created) VALUES(?,'host_revision',?,?)",
+                (
+                    plan_id,
+                    json.dumps(
+                        {
+                            "request": request,
+                            "request_digest": digest(request),
+                            "receipt": receipt,
+                        }
+                    ),
+                    self.clock(),
+                ),
+            )
+            return receipt
+
     def schedule_provider_recovery(self, plan_id):
         """At most two shared-service backoffs, not free provider probes."""
         with self.store.connect(True) as con:

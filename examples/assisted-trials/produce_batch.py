@@ -191,7 +191,8 @@ def produce(folder, item, store, base, batch_id):
         matches = [
             s for s in store.scenarios(item["leaf"]) if s["name"] == authored["name"]
         ]
-        scene = matches[0] if matches else store.save_scenario(scene_input)
+        # Freeze canonical data, excluding live review annotations in list projections.
+        scene = store.scenario(matches[0]["id"]) if matches else store.save_scenario(scene_input)
     if any(scene[k] != v for k, v in scene_input.items()):
         raise ValueError("scenario changed; do not silently rewrite")
     save(p / "scenario.json", scene)
