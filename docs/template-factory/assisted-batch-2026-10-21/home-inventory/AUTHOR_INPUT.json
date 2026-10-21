@@ -1,0 +1,55 @@
+{
+  "name": "搬家前家庭物品盘点",
+  "audience": "准备搬家的单人家庭成员",
+  "objective": "逐件记录自己的物品、所在房间与估值，搬动后仍能找到，并查看待搬物品数量和估值。",
+  "workflow": [
+    "创建卧室、厨房等平面位置",
+    "逐件录入名称、位置、估值与备注，一行只代表一件物品",
+    "按房间浏览或按名称/备注搜索",
+    "编辑名称、估值或位置，立即重算当前列表数量和总估值",
+    "不再参与本次盘点的物品归档，必要时恢复",
+    "刷新及同目录重启后继续盘点"
+  ],
+  "acceptance": [
+    "添加两件100.00与20.00物品，总估值120.00；第一件改90.00后110.00",
+    "移动位置后只在新位置查询出现；名称和备注均可检索",
+    "归档不出现在默认活跃列表，归档视图可恢复并保留字段",
+    "刷新及停止进程同数据目录重启后物品与位置保留"
+  ],
+  "license": "AGPL-3.0（固定根LICENSE；仅研究，不复制实现）",
+  "repo_name": "Homebox",
+  "observations": [
+    [
+      "code_observation",
+      "backend/internal/data/ent/schema/entity.go",
+      37,
+      58,
+      "Entity字段含notes、quantity、archived和asset_id；说明独立物品记录与归档状态。"
+    ],
+    [
+      "code_observation",
+      "backend/internal/data/ent/schema/entity.go",
+      110,
+      119,
+      "Entity的parent和location边均Unique，代码注释说明沿父链解析位置；目标只采用单层位置，不复刻层级。"
+    ]
+  ],
+  "inference": "目标每行固定一件家庭物品、平面位置、整数分估值与筛选后汇总；与上游quantity浮点及层级实体不同，是明确的试用取舍。",
+  "features": [
+    "逐件物品和位置登记、估值汇总",
+    "编辑、移动与检索",
+    "归档恢复与错误零写入",
+    "真实重启持久化"
+  ],
+  "goals": [
+    "创建卧室/厨房；100.00+20.00=120.00；改为90.00后110.00；移动后旧位置消失、新位置出现。",
+    "名称与备注不区分大小写子串搜索，q与位置相交；空结果有明确提示，筛选汇总只统计当前列表。",
+    "归档默认不可见，可筛选并恢复；非法名称/估值/不存在位置返回错误且不写入，旧revision不能覆盖。",
+    "停止自有进程、同data-dir重启后字段、汇总及归档状态保留。"
+  ],
+  "arch": "## 数据与范围\n单人本机127.0.0.1，Python标准库HTTP+SQLite，服务端HTML表单，全新实现不复制Homebox代码。\nlocations(id,name UNIQUE)；items(id,name,location_id FK,value_minor INTEGER,notes,archived,revision)。一行一件，不引入数量/保险价值推断；值是用户估计的CNY金额，不是理赔证明。初始位置“未分类”，新建位置名称1–80；物品名1–120、备注0–2000，HTML始终转义。\n金额非负、最多两位十进制、最大999999999.99，不接受NaN/指数/负数/三位小数；按整数分聚合。重复物品名允许，ID唯一。删除需求先用归档/恢复，不永久删除。修改必须当前revision，409保留输入；事务校验失败零写入。\n## 接口\nGET /api/health；GET /api/state?q=&location=&view=active|archive|all -> locations、items、summary{count,total_minor}（仅当前筛选结果）。搜索匹配name/notes，大小写无关；位置与搜索条件相交；默认active。\nPOST /api/locations {name} ->201 {id,name}；POST /api/items {name,location_id,value,notes} ->201；POST /api/items/update {id,revision,name,location_id,value,notes}->200；POST /api/items/archive {id}->200切换归档状态。item输出value_minor、revision，输入value为元字符串。400 invalid_name/invalid_value/invalid_location/bad_request；404 not_found；409 revision_conflict/already_exists，JSON{error:{code,message}}。\n## UI与启动\n首页清楚区分位置/搜索/视图和当前筛选的数量、估值。新增、编辑的每个输入有label；值错误保留原稿；成功再跳转。提供编辑入口、归档/恢复按钮和详情原文。显式保存、无自动保存。python3 app/serve.py --port 5276 --data-dir <目录>，默认examples/home-inventory-trial/data；GET不写入，--demo仅空库首次初始化。不接触原三个应用数据库。\n",
+  "gaps": [
+    "照片/收据/附件、层级房间/箱子、保险证明、导出、家庭协作后置",
+    "估值不是理赔或市场估价；本机单人，不暴露公网"
+  ]
+}

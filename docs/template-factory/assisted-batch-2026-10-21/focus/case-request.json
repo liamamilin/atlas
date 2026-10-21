@@ -1,0 +1,109 @@
+{
+  "case_id": "case:assisted-batch-focus",
+  "app_name": "Pomotroid",
+  "source_snapshots": [
+    {
+      "repository": "https://github.com/Splode/pomotroid",
+      "commit_sha": "dda06e6bf412bebe5ef8668a4357c52d974dc874",
+      "strategy_version": "assisted-core-source-v1",
+      "collected_at": "2026-10-21T04:18:58.705638+00:00",
+      "local_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/sources/assisted-batch-2026-10-21/focus",
+      "files": {
+        "LICENSE": "26c9bfaefad8fafa79e3f2c403bf75438f099f1847da304f43fda117b5ca6658",
+        "README.md": "faa651e36f833b00d57578345589a2bddd99930ed7a929a2e56f2daabd7e23fc",
+        "src-tauri/src/timer/engine.rs": "7978a27f9127bfa278095543ea29498a08dfdd30169c39a689f6942bedebcd14",
+        "src-tauri/src/timer/sequence.rs": "c1c2801908556708abb1c6c0a64a5e77d0f0e7ad4216c1c3505e531db0fc7f0a"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license": {
+        "status": "located",
+        "notice_hashes": {
+          "LICENSE": "26c9bfaefad8fafa79e3f2c403bf75438f099f1847da304f43fda117b5ca6658"
+        }
+      },
+      "license_uncertainties": [
+        "Reference study only; no upstream implementation copied."
+      ],
+      "excluded_paths": [
+        "Unselected source files; upstream not built or run"
+      ]
+    }
+  ],
+  "research": {
+    "summary": "Codex静态研究；目标用SQLite持久化wall-clock deadline和唯一session_id跨刷新结算；自然完成与取消分开计数，休息不计入专注，属于目标设计，未证明上游相同实现。",
+    "scope": "选定写作目标，完成一轮25分钟专注，再主动进入5分钟休息，并留存真实完成记录。",
+    "unknowns": [
+      "upstream not_run",
+      "independent review pending",
+      "本批仅模板和验收程序，应用未实现/未运行",
+      "长休息周期、网站拦截、任务系统、声音/通知保证和跨设备同步后置"
+    ],
+    "input_digest": "ec94918fb8ae18bf55c9cc76432b29bbad0fe550d949cb742ca61e586b382ab3",
+    "task_id": "assisted-small-2026-10-21-focus"
+  },
+  "observations": [
+    {
+      "evidence_id": "ev_assisted_focus_1",
+      "kind": "code_observation",
+      "statement": "TimerCommand显式区分Start/Pause/Resume/Reset/Skip和Reconfigure；Complete事件含skipped布尔值。",
+      "location": {
+        "commit_sha": "dda06e6bf412bebe5ef8668a4357c52d974dc874",
+        "path": "src-tauri/src/timer/engine.rs",
+        "file_digest": "7978a27f9127bfa278095543ea29498a08dfdd30169c39a689f6942bedebcd14",
+        "line_start": 16,
+        "line_end": 42
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_focus_2",
+      "kind": "code_observation",
+      "statement": "文件注释定义work→short-break和长休息的轮次推进；目标只采用一轮专注加短休息。",
+      "location": {
+        "commit_sha": "dda06e6bf412bebe5ef8668a4357c52d974dc874",
+        "path": "src-tauri/src/timer/sequence.rs",
+        "file_digest": "c1c2801908556708abb1c6c0a64a5e77d0f0e7ad4216c1c3505e531db0fc7f0a",
+        "line_start": 1,
+        "line_end": 7
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_focus_design",
+      "kind": "inference",
+      "statement": "目标用SQLite持久化wall-clock deadline和唯一session_id跨刷新结算；自然完成与取消分开计数，休息不计入专注，属于目标设计，未证明上游相同实现。",
+      "depends_on": [
+        "ev_assisted_focus_1",
+        "ev_assisted_focus_2"
+      ],
+      "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。",
+      "assumptions": [
+        "上游未运行",
+        "独立证据审阅pending",
+        "本批仅模板和验收程序，应用未实现/未运行",
+        "长休息周期、网站拦截、任务系统、声音/通知保证和跨设备同步后置"
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "scenario_id": "scn_4636cb92042a444da70ed81c0c131666",
+      "scenario_revision": 1,
+      "reason": "选定写作目标，完成一轮25分钟专注，再主动进入5分钟休息，并留存真实完成记录。",
+      "evidence_ids": [
+        "ev_assisted_focus_1",
+        "ev_assisted_focus_2",
+        "ev_assisted_focus_design"
+      ],
+      "adopted_scope": [
+        "目标、时长、开始与暂停恢复",
+        "到期记录及主动休息",
+        "取消、重复完成防重与持久化"
+      ],
+      "exclusions": [
+        "本批仅模板和验收程序，应用未实现/未运行",
+        "长休息周期、网站拦截、任务系统、声音/通知保证和跨设备同步后置"
+      ]
+    }
+  ]
+}

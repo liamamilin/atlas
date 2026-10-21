@@ -1,0 +1,61 @@
+{
+ "origin": "assisted-trial",
+ "template_digest": "66c0c1ade8da1ea458d2988f6f15dcd31e3c275b68d0a70eab69c88c2ec1be28",
+ "export": {
+  "phase": "P0",
+  "project_name": "travel-english-trial",
+  "template_digest": "66c0c1ade8da1ea458d2988f6f15dcd31e3c275b68d0a70eab69c88c2ec1be28",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1"
+ },
+ "provenance": {
+  "origin": "assisted-trial",
+  "scenario": {
+   "id": "scn_6db4af782bc548e69e0f48072069ed72",
+   "leaf": "language-learning-application",
+   "leaf_name": "语言学习应用（Language Learning Application）",
+   "name": "出行英语三课：问路、入住、点餐",
+   "audience": "准备短期出国旅行、中文母语的初学者",
+   "objective": "按固定三课练习必要英语短句，获得即时文字反馈，保存完成进度，并优先重练错误题。",
+   "workflow": [
+    "应用提供按顺序的问路、酒店入住、餐厅点餐三课，每课三道原创文字题",
+    "进入下一未完成课，输入英文短句",
+    "立即显示是否匹配及可接受答案；错误可重试",
+    "同课三题均答对后完成本课并解锁下一课",
+    "下次打开继续未完成课或重练错误题"
+   ],
+   "acceptance": [
+    "三课有固定课程顺序和英语目标，不退化成自由闪卡",
+    "输入前后空格和大小写规范化；错误即时反馈，不能直接提升完成进度",
+    "每题首次正确只记一次；重复提交不虚增完成量",
+    "刷新和重启保留进度、错误重练队列，课程序号越界返回错误"
+   ],
+   "status": "draft",
+   "updated_at": "2026-10-21T04:24:53.189564+00:00",
+   "revision": 1
+  },
+  "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+  "case_ref": {
+   "case_id": "case:assisted-batch-travel-english",
+   "revision": 1,
+   "digest": "82e4b899ecca526c4e9656c76a3e524dd0068c9caaaba4ffa64cc3bf0e48d16f"
+  },
+  "case_record_sha256": "b3ba75dd5da3d6b7f2a6e6a097cde56d1779a1efee829e97f572b57ee1961aa4",
+  "definition_digest": "e1807a147c15ad4a42d096de1671d2f13ce87ed02d4c4d13da9cf60d58863ab9",
+  "official_publication": false,
+  "upstream_runtime": "not_run",
+  "independent_evidence_review": "pending",
+  "note": "Static Codex source study; no model review or formal queue consumption. Local freeze fixes inputs only."
+ },
+ "controlled_opencode_calls_added": 0,
+ "official_queue_consumed": false,
+ "archives": {
+  "template-snapshot.zip": "81013b540aab0fff5a52ed20266f07929315e94bc509eb48b2d154122ca41eb8",
+  "development-package.zip": "4f2b625402084cce7ec544948a822c841aa1593e7d1bd004d6c786edf44f4766"
+ }
+}

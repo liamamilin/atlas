@@ -1,0 +1,206 @@
+{
+  "scenario_record": {
+    "id": "scn_4636cb92042a444da70ed81c0c131666",
+    "leaf": "focus-timer",
+    "leaf_name": "专注计时器",
+    "name": "写作前的一轮专注与休息",
+    "audience": "需要开始一段写作的个人用户",
+    "objective": "选定写作目标，完成一轮25分钟专注，再主动进入5分钟休息，并留存真实完成记录。",
+    "workflow": [
+      "输入本轮写作目标并选择专注时长",
+      "开始倒计时，可暂停/恢复",
+      "到期显示完成，写入一次完成记录",
+      "主动开始短休息，到期提醒",
+      "回看已完成专注次数和累计时长，刷新后保留"
+    ],
+    "acceptance": [
+      "暂停期间剩余不减少；恢复后继续剩余时间",
+      "自然到期只写一次完成；重置/取消不记完成",
+      "后台刷新按保存的deadline计算；同一轮不会重复累计",
+      "重启保留记录，已到期专注只结算一次"
+    ],
+    "status": "draft",
+    "updated_at": "2026-10-21T04:24:52.780034+00:00",
+    "revision": 1
+  },
+  "case_ref": {
+    "case_id": "case:assisted-batch-focus",
+    "revision": 1,
+    "digest": "8acd72c7d1c8b224c08b2e963c2b4b3e4ce837e755901bf3efbabc164cabc864"
+  },
+  "research": {
+    "summary": "同一共享案例记录的静态研究与明确的设计推断；完整定位见inputs/shared-case-record.json。",
+    "sources": [
+      {
+        "id": "S02",
+        "name": "ev_assisted_focus_1",
+        "url": "https://github.com/Splode/pomotroid/blob/dda06e6bf412bebe5ef8668a4357c52d974dc874/src-tauri/src/timer/engine.rs",
+        "version": "dda06e6bf412bebe5ef8668a4357c52d974dc874",
+        "license": "MIT（根LICENSE）",
+        "license_url": "https://github.com/Splode/pomotroid/blob/dda06e6bf412bebe5ef8668a4357c52d974dc874/LICENSE",
+        "facts": "code_observation: TimerCommand显式区分Start/Pause/Resume/Reset/Skip和Reconfigure；Complete事件含skipped布尔值。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      },
+      {
+        "id": "S03",
+        "name": "ev_assisted_focus_2",
+        "url": "https://github.com/Splode/pomotroid/blob/dda06e6bf412bebe5ef8668a4357c52d974dc874/src-tauri/src/timer/sequence.rs",
+        "version": "dda06e6bf412bebe5ef8668a4357c52d974dc874",
+        "license": "MIT（根LICENSE）",
+        "license_url": "https://github.com/Splode/pomotroid/blob/dda06e6bf412bebe5ef8668a4357c52d974dc874/LICENSE",
+        "facts": "code_observation: 文件注释定义work→short-break和长休息的轮次推进；目标只采用一轮专注加短休息。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      },
+      {
+        "id": "S04",
+        "name": "ev_assisted_focus_design",
+        "url": "https://github.com/Splode/pomotroid/blob/dda06e6bf412bebe5ef8668a4357c52d974dc874/LICENSE",
+        "version": "dda06e6bf412bebe5ef8668a4357c52d974dc874",
+        "license": "MIT（根LICENSE）",
+        "license_url": "https://github.com/Splode/pomotroid/blob/dda06e6bf412bebe5ef8668a4357c52d974dc874/LICENSE",
+        "facts": "inference: 目标用SQLite持久化wall-clock deadline和唯一session_id跨刷新结算；自然完成与取消分开计数，休息不计入专注，属于目标设计，未证明上游相同实现。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      }
+    ],
+    "gaps": [
+      "证据独立审阅pending",
+      "上游not_run",
+      "本批仅模板和验收程序，应用未实现/未运行",
+      "长休息周期、网站拦截、任务系统、声音/通知保证和跨设备同步后置"
+    ]
+  },
+  "spec": {
+    "title": "写作前的一轮专注与休息",
+    "roles": [
+      {
+        "id": "R01",
+        "name": "需要开始一段写作的个人用户",
+        "responsibility": "选定写作目标，完成一轮25分钟专注，再主动进入5分钟休息，并留存真实完成记录。"
+      }
+    ],
+    "features": [
+      {
+        "id": "F01",
+        "name": "目标、时长、开始与暂停恢复",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "25分钟默认、1–120分钟配置；暂停不耗时，恢复剩余。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A01"
+        ]
+      },
+      {
+        "id": "F02",
+        "name": "到期记录及主动休息",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "自然到期一次计数及原专注时长；休息仅显示提醒，不计专注。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A02"
+        ]
+      },
+      {
+        "id": "F03",
+        "name": "取消、重复完成防重与持久化",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "取消不记完成，同session完成幂等；刷新和重启保留状态与记录。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A03"
+        ]
+      }
+    ],
+    "acceptance": [
+      {
+        "id": "A01",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "25分钟默认、1–120分钟配置；暂停不耗时，恢复剩余。",
+        "features": [
+          "F01"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A02",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "自然到期一次计数及原专注时长；休息仅显示提醒，不计专注。",
+        "features": [
+          "F02"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A03",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "取消不记完成，同session完成幂等；刷新和重启保留状态与记录。",
+        "features": [
+          "F03"
+        ],
+        "implementation": "acceptance/probe.py"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "D01",
+        "question": "首版运行与数据边界？",
+        "default": "单用户本机、独立SQLite；显式保存，无账户、云端和协作。",
+        "when_to_ask": "确需公网托管或多人数据时先确认，不自行扩展。",
+        "impact": "保护本地数据，避免默认外发。",
+        "status": "assisted default"
+      },
+      {
+        "id": "D02",
+        "question": "是否复刻上游？",
+        "default": "目标用SQLite持久化wall-clock deadline和唯一session_id跨刷新结算；自然完成与取消分开计数，休息不计入专注，属于目标设计，未证明上游相同实现。",
+        "when_to_ask": "目标变化、破坏已有数据或需要引入上游实现/依赖时先确认。",
+        "impact": "不混淆来源事实与目标设计。",
+        "status": "assisted default"
+      }
+    ],
+    "phases": [
+      {
+        "id": "P0",
+        "title": "核心可用",
+        "goal": "选定写作目标，完成一轮25分钟专注，再主动进入5分钟休息，并留存真实完成记录。",
+        "features": [
+          "F01",
+          "F02",
+          "F03"
+        ],
+        "acceptance": [
+          "A01",
+          "A02",
+          "A03"
+        ]
+      }
+    ],
+    "architecture_markdown": "## 数据与交互\n单用户本机Python/SQLite+浏览器少量JS倒计时。sessions(id,goal,kind,duration_seconds,state,deadline,remaining_seconds,completed_at UNIQUE id)；focus/short-break状态区分。服务端UTC秒时间权威；暂停保存remaining并清空deadline，恢复deadline=now+remaining；UI仅渲染，不自行认定完成。GET只读取，POST settle在事务内以state=running条件原子结算，过期一次写入completed，不将skip计为成功；页面可轮询POST settle并幂等。\n时长分钟1–120，goal1–160；可用10秒开发测试配置但生产UI默认不提供。自然focus完成计duration_seconds，取消不计；5分钟短休息手动启动；系统时钟大幅回拨显示状态提示，不保证跨设备时间一致。\n## 接口\nGET /api/state -> current,history,totals；POST /api/sessions {goal,minutes}；POST /api/sessions/{id}/pause|resume|cancel|settle；POST /api/break {minutes:5}。state idle/running/paused/completed/cancelled。非法转换409invalid_transition、非法时长400invalid_duration；不覆盖已完成会话。首版只能一个活动计时。提供可读大倒计时、目标、明确按钮及提醒文本，浏览器声音/通知权限拒绝不得阻断流程。\n## 验证\n用可注入时钟的真实服务专项跑pause/resume/duplicate settle，另跑缩短计时的浏览器旅程和实际重启；本批不开发此应用，以上为待实现合同，not_run。\n",
+    "limits": [
+      "辅助试产，非严格G1/T08。",
+      "本批仅模板和验收程序，应用未实现/未运行",
+      "长休息周期、网站拦截、任务系统、声音/通知保证和跨设备同步后置"
+    ]
+  },
+  "trial_scope": "# 辅助试用范围\n\n选定写作目标，完成一轮25分钟专注，再主动进入5分钟休息，并留存真实完成记录。\n\n- 本批仅模板和验收程序，应用未实现/未运行\n- 长休息周期、网站拦截、任务系统、声音/通知保证和跨设备同步后置\n\nCodex研究与编写；静态案例未独审、上游未运行。模板先于应用；仅代表场景后续开发应用。严格G1/T08不因本包通过。"
+}

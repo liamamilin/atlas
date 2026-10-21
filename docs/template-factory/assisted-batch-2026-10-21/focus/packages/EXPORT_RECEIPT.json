@@ -1,0 +1,61 @@
+{
+ "origin": "assisted-trial",
+ "template_digest": "b6265fc41b71de248938cb15cd5a801ea51f768865a871d1f7f05f6b39eb0da5",
+ "export": {
+  "phase": "P0",
+  "project_name": "focus-trial",
+  "template_digest": "b6265fc41b71de248938cb15cd5a801ea51f768865a871d1f7f05f6b39eb0da5",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1"
+ },
+ "provenance": {
+  "origin": "assisted-trial",
+  "scenario": {
+   "id": "scn_4636cb92042a444da70ed81c0c131666",
+   "leaf": "focus-timer",
+   "leaf_name": "专注计时器",
+   "name": "写作前的一轮专注与休息",
+   "audience": "需要开始一段写作的个人用户",
+   "objective": "选定写作目标，完成一轮25分钟专注，再主动进入5分钟休息，并留存真实完成记录。",
+   "workflow": [
+    "输入本轮写作目标并选择专注时长",
+    "开始倒计时，可暂停/恢复",
+    "到期显示完成，写入一次完成记录",
+    "主动开始短休息，到期提醒",
+    "回看已完成专注次数和累计时长，刷新后保留"
+   ],
+   "acceptance": [
+    "暂停期间剩余不减少；恢复后继续剩余时间",
+    "自然到期只写一次完成；重置/取消不记完成",
+    "后台刷新按保存的deadline计算；同一轮不会重复累计",
+    "重启保留记录，已到期专注只结算一次"
+   ],
+   "status": "draft",
+   "updated_at": "2026-10-21T04:24:52.780034+00:00",
+   "revision": 1
+  },
+  "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+  "case_ref": {
+   "case_id": "case:assisted-batch-focus",
+   "revision": 1,
+   "digest": "8acd72c7d1c8b224c08b2e963c2b4b3e4ce837e755901bf3efbabc164cabc864"
+  },
+  "case_record_sha256": "3fec1c17e5d417cf80d1a56f563fb107ff119f8a54af592986ced2c52ca0f3d5",
+  "definition_digest": "c5fa1b696a1110c0d76664012a863730d823c301673d0b615f7f1e7cda5a67d2",
+  "official_publication": false,
+  "upstream_runtime": "not_run",
+  "independent_evidence_review": "pending",
+  "note": "Static Codex source study; no model review or formal queue consumption. Local freeze fixes inputs only."
+ },
+ "controlled_opencode_calls_added": 0,
+ "official_queue_consumed": false,
+ "archives": {
+  "template-snapshot.zip": "da51d8adac3bca51773578898b668d0b8301497c6c1e6e8b6c40cdda0894de7d",
+  "development-package.zip": "633617f589ead87fc6bd44327c36c9db975cd03ebbcac4b0611b8301fe8378ad"
+ }
+}

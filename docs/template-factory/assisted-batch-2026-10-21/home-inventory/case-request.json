@@ -1,0 +1,109 @@
+{
+  "case_id": "case:assisted-batch-home-inventory",
+  "app_name": "Homebox",
+  "source_snapshots": [
+    {
+      "repository": "https://github.com/sysadminsmedia/homebox",
+      "commit_sha": "1fd28822634a3d5935c002d569559ef46530d4a0",
+      "strategy_version": "assisted-core-source-v1",
+      "collected_at": "2026-10-21T04:18:53.540136+00:00",
+      "local_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/sources/assisted-batch-2026-10-21/home-inventory",
+      "files": {
+        "LICENSE": "4df3c306dddaaf4baffdff5ca820cc679ac8cd6dc263c6a74517783e42fa7a3b",
+        "README.md": "eb3f4dc03dc36e3f8f08a31394db063ff5fc3c2bdeb9f18d2fdec030303e9b70",
+        "backend/internal/data/ent/schema/entity.go": "fcebc804b23cb001b812825af10d9449e4503d20f4dff336bae88ac6d683aaa5"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license": {
+        "status": "located",
+        "notice_hashes": {
+          "LICENSE": "4df3c306dddaaf4baffdff5ca820cc679ac8cd6dc263c6a74517783e42fa7a3b"
+        }
+      },
+      "license_uncertainties": [
+        "Reference study only; no upstream implementation copied."
+      ],
+      "excluded_paths": [
+        "Unselected source files; upstream not built or run"
+      ]
+    }
+  ],
+  "research": {
+    "summary": "Codex静态研究；目标每行固定一件家庭物品、平面位置、整数分估值与筛选后汇总；与上游quantity浮点及层级实体不同，是明确的试用取舍。",
+    "scope": "逐件记录自己的物品、所在房间与估值，搬动后仍能找到，并查看待搬物品数量和估值。",
+    "unknowns": [
+      "upstream not_run",
+      "independent review pending",
+      "照片/收据/附件、层级房间/箱子、保险证明、导出、家庭协作后置",
+      "估值不是理赔或市场估价；本机单人，不暴露公网"
+    ],
+    "input_digest": "c47b178f9a585b95f837224f6b92b390c1e1e45d6ac3be97a98d2a31bd65bb9f",
+    "task_id": "assisted-small-2026-10-21-home-inventory"
+  },
+  "observations": [
+    {
+      "evidence_id": "ev_assisted_home_inventory_1",
+      "kind": "code_observation",
+      "statement": "Entity字段含notes、quantity、archived和asset_id；说明独立物品记录与归档状态。",
+      "location": {
+        "commit_sha": "1fd28822634a3d5935c002d569559ef46530d4a0",
+        "path": "backend/internal/data/ent/schema/entity.go",
+        "file_digest": "fcebc804b23cb001b812825af10d9449e4503d20f4dff336bae88ac6d683aaa5",
+        "line_start": 37,
+        "line_end": 58
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_home_inventory_2",
+      "kind": "code_observation",
+      "statement": "Entity的parent和location边均Unique，代码注释说明沿父链解析位置；目标只采用单层位置，不复刻层级。",
+      "location": {
+        "commit_sha": "1fd28822634a3d5935c002d569559ef46530d4a0",
+        "path": "backend/internal/data/ent/schema/entity.go",
+        "file_digest": "fcebc804b23cb001b812825af10d9449e4503d20f4dff336bae88ac6d683aaa5",
+        "line_start": 110,
+        "line_end": 119
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_home_inventory_design",
+      "kind": "inference",
+      "statement": "目标每行固定一件家庭物品、平面位置、整数分估值与筛选后汇总；与上游quantity浮点及层级实体不同，是明确的试用取舍。",
+      "depends_on": [
+        "ev_assisted_home_inventory_1",
+        "ev_assisted_home_inventory_2"
+      ],
+      "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。",
+      "assumptions": [
+        "上游未运行",
+        "独立证据审阅pending",
+        "照片/收据/附件、层级房间/箱子、保险证明、导出、家庭协作后置",
+        "估值不是理赔或市场估价；本机单人，不暴露公网"
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "scenario_id": "scn_435d92c3222644bd906e10a62e65737a",
+      "scenario_revision": 1,
+      "reason": "逐件记录自己的物品、所在房间与估值，搬动后仍能找到，并查看待搬物品数量和估值。",
+      "evidence_ids": [
+        "ev_assisted_home_inventory_1",
+        "ev_assisted_home_inventory_2",
+        "ev_assisted_home_inventory_design"
+      ],
+      "adopted_scope": [
+        "逐件物品和位置登记、估值汇总",
+        "编辑、移动与检索",
+        "归档恢复与错误零写入",
+        "真实重启持久化"
+      ],
+      "exclusions": [
+        "照片/收据/附件、层级房间/箱子、保险证明、导出、家庭协作后置",
+        "估值不是理赔或市场估价；本机单人，不暴露公网"
+      ]
+    }
+  ]
+}

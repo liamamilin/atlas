@@ -7,6 +7,7 @@ import hashlib
 import json
 from pathlib import Path
 import sys
+import tempfile
 import zipfile
 
 REPO = Path(__file__).resolve().parents[2]
@@ -16,6 +17,7 @@ from template_factory.blueprints import (  # noqa: E402
     freeze_blueprint,
     export_development,
     verify_frozen,
+    unpack_archive,
 )
 from template_factory.artifacts import tree_manifest  # noqa: E402
 from template_factory.store import digest  # noqa: E402
@@ -34,9 +36,27 @@ def archive(source, path):
     return sha(path)
 
 
-def export_trial(inputs, destination, name):
+def export_trial(inputs, destination, name, reuse=False):
     definition = json.loads((inputs / "definition.json").read_text())
     case = json.loads((inputs / "case-record.json").read_text())
+    if reuse and destination.exists():
+        receipt = json.loads((destination / "EXPORT_RECEIPT.json").read_text())
+        provenance = receipt["provenance"]
+        if (
+            provenance["definition_digest"] != digest(definition)
+            or provenance["case_record_sha256"] != sha(inputs / "case-record.json")
+            or receipt["export"]["project_name"] != name
+        ):
+            raise ValueError("fixed trial inputs changed; choose a new version/output")
+        for filename, expected in receipt["archives"].items():
+            if sha(destination / filename) != expected:
+                raise ValueError("trial archive changed")
+        with tempfile.TemporaryDirectory() as temporary:
+            unpack_archive(
+                (destination / "template-snapshot.zip").read_bytes(), temporary
+            )
+            verify_frozen(temporary, receipt["template_digest"])
+        return {**receipt, "reused": True}
     original = definition["scenario_record"]
     # User explicitly chose this fixed draft revision for auxiliary development.
     # This is local confirmation only: never changes the formal scenario record.
@@ -130,6 +150,13 @@ if __name__ == "__main__":
     parser.add_argument("--inputs", type=Path, required=True)
     parser.add_argument("--destination", type=Path, required=True)
     parser.add_argument("--name", required=True)
+    parser.add_argument(
+        "--reuse",
+        action="store_true",
+        help="Verify and reuse fixed outputs; never overwrite",
+    )
     args = parser.parse_args()
-    receipt = export_trial(args.inputs.resolve(), args.destination.resolve(), args.name)
+    receipt = export_trial(
+        args.inputs.resolve(), args.destination.resolve(), args.name, args.reuse
+    )
     print(json.dumps(receipt, ensure_ascii=False, indent=2))

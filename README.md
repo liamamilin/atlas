@@ -15,6 +15,8 @@
 
 另有 [月有度 · 个人预算](examples/budget-trial/README.md)（5274）和 [会后有据 · 会议笔记](examples/meetings-trial/README.md)（5275）。均先固定共享案例、导出本场景模板与标准开发包，再由 Codex 实现并验证浏览器旅程；独立源码包不带试用数据库。[三场景对照与来源包](docs/template-factory/assisted-trials-2026-10-21/COMPARISON.md)记录实际结果、人工步骤与已知缺口。
 
+[可重复辅助小批次](docs/template-factory/assisted-batch-2026-10-21/REPORT.md)将上述三份模板接入工厂，并新增家庭库存、专注计时、出行英语模板。工厂「模板制品」支持按名称查找、阅读、回查固定共享案例与导出标准开发包；辅助来源明确标注，不代表严格发布。代表应用 [家物清单](examples/home-inventory-trial/README.md) 使用5276，另两份新模板未运行应用。
+
 叶子类型与应用场景构成生产目录；OpenCode CLI 批量生产冻结候选，Harness 审阅及运行验收独立排队，已发布模板可确定性创建应用包。
 
 - [模板工厂 V1 本轮交付与未通过项](docs/template-factory/v1-2026-10-19/DELIVERY.md)：代码门禁与真实 G1 分开；书签真实生产触及业务修复上限，G1 未通过、首批未启动。

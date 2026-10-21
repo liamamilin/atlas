@@ -1,0 +1,31 @@
+{
+  "archive": "home-inventory-source.zip",
+  "sha256": "9a2442058b8d305b97b9e2163bcc1234008ab138345eaddda53a2686868d919b",
+  "files": [
+    ".gitignore",
+    "README.md",
+    "SOURCE.json",
+    "CONSUMPTION.json",
+    "app/serve.py",
+    "app/web_support.py",
+    "tests/test_inventory.py",
+    "tests/run_frozen_probe.py"
+  ],
+  "runtime": {
+    "profile": "python-web",
+    "install": [],
+    "build": [],
+    "start": [
+      "python3",
+      "app/serve.py",
+      "--port",
+      "5276"
+    ],
+    "port": 5276,
+    "readiness_path": "/api/health"
+  },
+  "user_database_included": false,
+  "standard_development_package_consumed_sha256": "727876e37570253b3d46797972211a82bdba6e27c99c8208c133898332c4ba99",
+  "new_development_context": "inventory_from_handoff",
+  "controlled_opencode_calls_added": 0
+}

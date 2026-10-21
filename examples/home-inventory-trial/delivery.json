@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.application-delivery.v1",
+  "root": ".",
+  "files": [
+    ".gitignore",
+    "README.md",
+    "SOURCE.json",
+    "CONSUMPTION.json",
+    "app/serve.py",
+    "app/web_support.py",
+    "tests/test_inventory.py",
+    "tests/run_frozen_probe.py"
+  ],
+  "runtime": {
+    "profile": "python-web",
+    "install": [],
+    "build": [],
+    "start": [
+      "python3",
+      "app/serve.py",
+      "--port",
+      "5276"
+    ],
+    "port": 5276,
+    "readiness_path": "/api/health"
+  }
+}

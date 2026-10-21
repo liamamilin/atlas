@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.assisted-application-source.v1",
+  "application": "home-inventory-trial",
+  "phase": "P0",
+  "port": 5276,
+  "formal_atlas_development_package": "docs/template-factory/assisted-batch-2026-10-21/home-inventory/atlas-development-package.zip",
+  "package_sha256": "727876e37570253b3d46797972211a82bdba6e27c99c8208c133898332c4ba99",
+  "template_digest": "55c7d1dff6b9a9529022ec2b3239a8ea0d3a1b8075d9336238b1389c243bc484",
+  "sequence": "Template generated and imported before representative application development; formal Atlas phase export consumed as recorded in CONSUMPTION.json",
+  "evidence_scope": "Assisted development consumption only; not strict G1 or T08",
+  "implementation": "Independent Python standard library HTTP + SQLite implementation; no Homebox implementation copied",
+  "local_reuse": [
+    {
+      "source": "examples/assisted-trials/web_support.py",
+      "destination": "app/web_support.py",
+      "scope": "Small HTTP/HTML helpers vendored and adapted for draft-preserving storage errors"
+    }
+  ],
+  "defaults_adopted": [
+    "D01: single-user local SQLite, explicit save, no accounts/cloud",
+    "D02: one item per row, flat locations, integer minor units"
+  ],
+  "frozen_contract_modified": false,
+  "opencode_called": false,
+  "extra_models_called": false
+}

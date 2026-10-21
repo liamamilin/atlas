@@ -1,3 +1,4 @@
+import {Link} from "react-router-dom";
 import {useState} from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -41,7 +42,7 @@ export function BlueprintImportPanel({zh,busy,act}:{zh:boolean;busy:boolean;act:
     <Button className="mt-3" size="sm" variant="outline" disabled={busy} onClick={()=>act(()=>factoryRequest("blueprints/sample",{}),zh?"书签认知样板已加入制品；没有调用模型或执行包内代码。":"Bookmark cognition sample added; no model calls or package code executed.")}>{zh?"载入书签认知样板":"Load bookmark cognition sample"}</Button>
     <details className="mt-4 text-sm"><summary className="cursor-pointer text-primary">{zh?"导入其他认知包":"Import another cognitive package"}</summary>
       <label className="mt-3 block">{zh?"认知模板 ZIP":"Cognitive template ZIP"}<input type="file" accept=".zip,application/zip" className={input} disabled={busy} onChange={e=>{setFile(e.target.files?.[0]||null);setError("");}}/></label>
-      <p className="mt-2 text-xs leading-5 text-muted">{zh?"支持 atlas.product-blueprint.v0，ZIP 根目录需有 template.json 与 integrity.json。压缩包上限 1 MiB，展开上限 8 MiB；导入只检查结构、引用和摘要，不执行脚本，也不将包内报告认定为工厂验收。":"Supports atlas.product-blueprint.v0 with template.json and integrity.json at ZIP root. Limits: 1 MiB compressed, 8 MiB expanded. Import checks structure, references and hashes; scripts do not run and bundled reports are not factory acceptance."}</p>
+      <p className="mt-2 text-xs leading-5 text-muted">{zh?"支持 atlas.product-blueprint.v0，ZIP 根目录需有 template.json 与 integrity.json；也支持带 inventory.json 和 source/ 的宿主冻结快照，保留原来源与摘要。压缩包上限 1 MiB，展开上限 8 MiB；导入只检查结构、引用和摘要，不执行脚本，也不将包内报告认定为工厂验收。":"Supports atlas.product-blueprint.v0 with template.json and integrity.json at ZIP root, or a host snapshot with inventory.json and source/, preserving original provenance and digest. Limits: 1 MiB compressed, 8 MiB expanded. Import checks structure, references and hashes; scripts do not run and bundled reports are not factory acceptance."}</p>
       <Button className="mt-3" size="sm" disabled={busy||!file} onClick={()=>void importFile()}>{zh?"校验并导入":"Validate and import"}</Button>
       {error?<p role="alert" className="mt-2 text-sm text-danger">{error}</p>:null}
     </details>
@@ -68,12 +69,18 @@ export function BlueprintCard({artifact:a,zh,busy,act,model,timeout,runtimeRunId
   const reviewState=reviewJob?.state||(incomplete?"unavailable":review?.outcome);
   const dimensions:Record<string,[string,string]>={category_evidence:["品类依据","Category evidence"],scenario_scope:["场景范围","Scenario scope"],product_completeness:["产品完整性","Product completeness"],architecture_contract:["架构与契约","Architecture and contracts"],phase_acceptance:["阶段与验收","Phases and acceptance"],decisions_defaults:["决策与默认值","Decisions and defaults"],agent_handoff:["开发交接","Agent handoff"],evidence_honesty:["验证声明","Evidence claims"]};
   const [document,setDocument]=useState("PRODUCT.md");
-  const names:Record<string,[string,string]>={"README.md":["开始使用","Getting started"],"CATEGORY.md":["品类认知","Category research"],"PRODUCT.md":["产品定义","Product definition"],"ARCHITECTURE.md":["架构与契约","Architecture and contracts"],"DECISIONS.md":["默认决策","Default decisions"],"ROADMAP.md":["阶段路线图","Roadmap"],"AGENT.md":["Agent 指令","Agent instructions"],"VALIDATION.md":["包内验证说明（声明）","Bundled validation claims"]};
+  const names:Record<string,[string,string]>={"README.md":["开始使用","Getting started"],"CATEGORY.md":["品类认知","Category research"],"PRODUCT.md":["产品定义","Product definition"],"ARCHITECTURE.md":["架构与契约","Architecture and contracts"],"DECISIONS.md":["默认决策","Default decisions"],"ROADMAP.md":["阶段路线图","Roadmap"],"AGENT.md":["Agent 指令","Agent instructions"],"VALIDATION.md":["包内验证说明（声明）","Bundled validation claims"],"TRIAL_SCOPE.md":["试用范围与已知缺口","Trial scope and gaps"]};
   const validName=/^[a-z][a-z0-9-]{0,62}$/.test(project);
-  const publicationLabel=a.state==="published"?(zh?"正式目录已发布":"Published in catalog"):a.state==="withdrawn"?(zh?"已撤回目录":"Withdrawn from catalog"):(zh?"已冻结候选":"Frozen candidate");
+  const assisted=a.provenance.origin==="assisted-trial";
+  const publicationLabel=assisted?(zh?"辅助试用模板":"Assisted trial template"):a.state==="published"?(zh?"正式目录已发布":"Published in catalog"):a.state==="withdrawn"?(zh?"已撤回目录":"Withdrawn from catalog"):(zh?"已冻结候选":"Frozen candidate");
   return <article aria-label={`${zh?"认知模板":"Cognitive template"} ${a.manifest.name}`} className="rounded-xl bg-surface p-5 shadow-card">
     <div className="flex flex-wrap justify-between gap-3"><div><p className="text-xs font-medium text-primary">{zh?`认知模板 · ${publicationLabel}`:`Cognitive template · ${publicationLabel}`} · v{a.manifest.version}</p><h2 className="mt-1 font-serif text-xl font-medium">{a.manifest.name}</h2><p className="mt-1 text-xs text-muted">{a.scenario_name} · r{a.scenario_revision}</p></div><Button asChild size="sm" variant="outline"><a href={`/api/factory/artifacts/${a.id}/download`}><Download className="size-4"/>{zh?"下载冻结包":"Download frozen bundle"}</a></Button></div>
     <p className="mt-3 text-sm text-muted">{a.manifest.description}</p>
+    {assisted?<aside className="mt-3 rounded-lg border border-border p-3 text-xs leading-6" aria-label={zh?"辅助试用来源":"Assisted trial provenance"}>
+      <p>{zh?"Codex 研究与编写的辅助模板。包内验证与已知缺口见「包内验证说明」和「试用范围」；不代表严格 G1/T08、独立审阅或当前应用运行通过。":"Codex-researched and authored trial. See validation and trial scope for claims and gaps; this is not strict G1/T08 or independent acceptance."}</p>
+      <p className="break-all">{zh?"原冻结摘要":"Original frozen digest"}: {a.provenance.imported_snapshot?.digest}</p>
+      {a.provenance.shared_case_refs?.map(ref=><p key={`${ref.case_id}:${ref.revision}`}><Link className="text-primary underline" to={`/apps?app_id=${encodeURIComponent(ref.app_id)}&case_id=${encodeURIComponent(ref.case_id)}&case_revision=${ref.revision}`}>{zh?"回查共享案例":"Read shared case"}: {ref.case_id} · r{ref.revision}</Link></p>)}
+    </aside>:null}
     <p className="mt-3 text-sm">{zh?`${a.manifest.feature_count} 项能力 · ${a.manifest.decision_count} 个决策 · ${a.manifest.phase_count} 个阶段 · ${a.manifest.acceptance_count} 个验收用例`:`${a.manifest.feature_count} capabilities · ${a.manifest.decision_count} decisions · ${a.manifest.phase_count} phases · ${a.manifest.acceptance_count} acceptance cases`}</p>
     <p className="mt-3 rounded-lg bg-primary/5 p-3 text-xs leading-5 text-muted">{zh?"冻结检查覆盖结构、引用、阶段映射与文件摘要，本身不执行包内程序。包内报告作为来源声明保留，不等于工厂重新验收；工厂独立审阅和每个下游目标的运行结果分别记录。符合当前审阅与固定案例证据要求的模板，可在 V1 工厂中管理目录发布。":"Freezing checks structure, references, phase mappings and hashes without running package programs. Bundled reports remain source claims, not fresh factory acceptance; independent review and each downstream runtime target are recorded separately. Templates that meet current review and fixed case-evidence requirements can be published through the V1 factory."}</p>
     <section aria-label={zh?"完整认知库":"Full knowledge"} className="mt-4 rounded-lg border border-border p-4 text-sm">

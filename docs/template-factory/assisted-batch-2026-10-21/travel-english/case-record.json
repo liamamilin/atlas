@@ -1,0 +1,150 @@
+{
+  "app_id": "app:repo:152e715111e33ad3e17f558c",
+  "case_id": "case:assisted-batch-travel-english",
+  "created_at": "2026-10-21T04:24:53.201727+00:00",
+  "created_task_id": "assisted-small-2026-10-21-travel-english",
+  "digest": "82e4b899ecca526c4e9656c76a3e524dd0068c9caaaba4ffa64cc3bf0e48d16f",
+  "evidence_digest": "28163a7ab159ec00a2b62bccfaea911037ed235ca34ab550fad77e1998f955ba",
+  "research": {
+    "input_digest": "af7453a9b24cf875c932fd12e7bddd42067f9caa347e8164ecceb7e846d32e5f",
+    "scope": "按固定三课练习必要英语短句，获得即时文字反馈，保存完成进度，并优先重练错误题。",
+    "summary": "Codex静态研究；目标采用原创三课固定课程、文本匹配即时反馈和SQLite进度/错题记录；课程文档不证明上游运行或本目标的掌握度判断。归一化匹配不是自由语义或教学效果评估。",
+    "task_id": "assisted-small-2026-10-21-travel-english",
+    "unknowns": [
+      "upstream not_run",
+      "independent review pending",
+      "模板未开发真实应用，未经过教学人员审阅，未做学习效果或独立证据审阅",
+      "语音、听力、自由对话、真实语义评分、SRS和多用户后置",
+      "上游归档且历史仓库重定向，只参考固定版本；不作为当前推荐部署项目"
+    ]
+  },
+  "research_input_digest": "af7453a9b24cf875c932fd12e7bddd42067f9caa347e8164ecceb7e846d32e5f",
+  "revision": 1,
+  "snapshot_ids": [
+    "src_6f8d5e5b8860c37996bbfc53"
+  ],
+  "observations": [
+    {
+      "case_id": "case:assisted-batch-travel-english",
+      "case_revision": 1,
+      "digest": "088ab41f314a2348ed9bdb8dd7df3588fef0a14e4c3440d439b7829c9b492184",
+      "evidence_id": "ev_assisted_travel_english_1",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "2816927bab0f0e73cdfaafc97a315696a3913501702d8ec12c8c64916d2f5a3e",
+        "material_version": "3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee",
+        "url": "https://github.com/kantord/LibreLingo/blob/3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee/docs/courses/skill.md"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Skill文档说明课程Module下的Skill组织主题词句，并自动生成问题任务。",
+      "reviews": []
+    },
+    {
+      "case_id": "case:assisted-batch-travel-english",
+      "case_revision": 1,
+      "digest": "7a042999e5c2db7af904f9eb65b9aef09b626db88da7ee592100391a9ebe07d1",
+      "evidence_id": "ev_assisted_travel_english_2",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "2168caa17d293cf1aea2e3c072a3172a5d3e84864c442dbe73400eb541aff89e",
+        "material_version": "3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee",
+        "url": "https://github.com/kantord/LibreLingo/blob/3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee/docs/courses/challenge.md"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Challenge文档说明用户通过一系列问题任务学习，任务从Skill配置生成。",
+      "reviews": []
+    },
+    {
+      "case_id": "case:assisted-batch-travel-english",
+      "case_revision": 1,
+      "digest": "62f9c2f6ed414f3e0aaf857c1f11cbbd82e87ca0e488e5d26e0b00ae87204bd6",
+      "evidence_id": "ev_assisted_travel_english_design",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "上游未运行",
+          "独立证据审阅pending",
+          "模板未开发真实应用，未经过教学人员审阅，未做学习效果或独立证据审阅",
+          "语音、听力、自由对话、真实语义评分、SRS和多用户后置",
+          "上游归档且历史仓库重定向，只参考固定版本；不作为当前推荐部署项目"
+        ],
+        "depends_on": [
+          "ev_assisted_travel_english_1",
+          "ev_assisted_travel_english_2"
+        ],
+        "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "目标采用原创三课固定课程、文本匹配即时反馈和SQLite进度/错题记录；课程文档不证明上游运行或本目标的掌握度判断。归一化匹配不是自由语义或教学效果评估。",
+      "reviews": []
+    }
+  ],
+  "scenario_links": [
+    {
+      "adopted_scope": [
+        "英语三课的课程与顺序",
+        "文字作答反馈和防重复进度",
+        "错误重练与持久化"
+      ],
+      "case_id": "case:assisted-batch-travel-english",
+      "case_revision": 1,
+      "evidence_ids": [
+        "ev_assisted_travel_english_1",
+        "ev_assisted_travel_english_2",
+        "ev_assisted_travel_english_design"
+      ],
+      "exclusions": [
+        "模板未开发真实应用，未经过教学人员审阅，未做学习效果或独立证据审阅",
+        "语音、听力、自由对话、真实语义评分、SRS和多用户后置",
+        "上游归档且历史仓库重定向，只参考固定版本；不作为当前推荐部署项目"
+      ],
+      "reason": "按固定三课练习必要英语短句，获得即时文字反馈，保存完成进度，并优先重练错误题。",
+      "scenario_id": "scn_6db4af782bc548e69e0f48072069ed72",
+      "scenario_revision": 1,
+      "workflow_support": []
+    }
+  ],
+  "source_snapshots": [
+    {
+      "archive_sha256": null,
+      "collected_at": "2026-10-21T04:19:04.157165+00:00",
+      "commit_sha": "3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee",
+      "excluded_paths": [
+        "Unselected source files; upstream not built or run"
+      ],
+      "file_manifest_digest": "9025fd9a2889c82f8f594bccd85c9a5461caef60e76170c2ecd12deaf43f8543",
+      "files": {
+        "LICENSE": "e9df4c4e4e64b8168a71c3c67668dcffabbe8fca11d4ac4a7d5482562cd1679c",
+        "README.md": "ad27c8fe3f3c748475607278837fdc040d178eb746948f445b708daa10c3d98b",
+        "docs/courses/challenge.md": "2168caa17d293cf1aea2e3c072a3172a5d3e84864c442dbe73400eb541aff89e",
+        "docs/courses/skill.md": "2816927bab0f0e73cdfaafc97a315696a3913501702d8ec12c8c64916d2f5a3e"
+      },
+      "license": {
+        "notice_hashes": {
+          "LICENSE": "e9df4c4e4e64b8168a71c3c67668dcffabbe8fca11d4ac4a7d5482562cd1679c"
+        },
+        "status": "located"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license_uncertainties": [
+        "Reference study only; no upstream code copied.",
+        "LibreLingo archived; course/media licenses distinct, no upstream lesson text copied."
+      ],
+      "repo_id": null,
+      "repository": "https://github.com/kantord/librelingo",
+      "snapshot_id": "src_6f8d5e5b8860c37996bbfc53",
+      "strategy_version": "assisted-core-source-v1"
+    }
+  ]
+}

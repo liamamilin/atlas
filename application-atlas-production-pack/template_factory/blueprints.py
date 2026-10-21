@@ -417,16 +417,68 @@ def import_blueprint(store, data, origin="imported-blueprint"):
         source = Path(temporary) / "input"
         source.mkdir()
         unpack_archive(data, source)
+        imported_snapshot = None
+        shared_refs = []
+        if (source / "inventory.json").is_file():
+            # Frozen host ZIPs wrap a raw import package in source/. Validate
+            # the entire original freeze before adapting its layout.
+            inventory = read_json(source / "inventory.json")
+            if not isinstance(inventory, dict) or not re.fullmatch(r"[a-f0-9]{64}", str(inventory.get("digest", ""))):
+                raise FactoryError("invalid frozen snapshot digest", "invalid_blueprint_archive")
+            original_digest = inventory["digest"]
+            verify_frozen(source, original_digest)
+            declared = read_json(source / "provenance.json")
+            if not isinstance(declared, dict):
+                raise FactoryError("invalid snapshot provenance", "invalid_blueprint_archive")
+            imported_snapshot = {
+                "digest": original_digest,
+                "archive_sha256": hashlib.sha256(data).hexdigest(),
+                "provenance": declared,
+            }
+            basis = declared.get("case_basis", {})
+            if not isinstance(basis, dict):
+                raise FactoryError("invalid case basis", "invalid_blueprint_archive")
+            refs, extra = basis.get("case_refs", []), declared.get("shared_case_refs", [])
+            if not isinstance(refs, list) or not isinstance(extra, list):
+                raise FactoryError("invalid case references", "invalid_blueprint_archive")
+            refs = [*refs, *extra]
+            if declared.get("case_ref"):
+                refs = [*refs, declared["case_ref"]]
+            if not isinstance(refs, list) or any(not isinstance(ref, dict) or not {"case_id", "revision", "digest"} <= ref.keys() for ref in refs):
+                raise FactoryError("invalid shared case references", "invalid_blueprint_archive")
+            if refs:
+                from .cases import CaseLibrary
+
+                library = CaseLibrary(store)
+                for ref in refs:
+                    case = library.get_case(ref["case_id"], ref["revision"])
+                    if case["digest"] != ref["digest"]:
+                        raise FactoryError("shared case digest differs", "case_changed", 409)
+                    fixed_ref = {
+                        "case_id": case["case_id"], "revision": case["revision"],
+                        "digest": case["digest"], "app_id": case["app_id"],
+                    }
+                    if fixed_ref not in shared_refs:
+                        shared_refs.append(fixed_ref)
+            if declared.get("origin") == "assisted-trial":
+                origin = "assisted-trial"
+            source = source / "source"
         spec, manifest = validate_blueprint(source)
         leaf = store.leaf(spec["scenario"]["leaf"])
         package_digest = digest(tree_manifest(source))
         target = None
         try:
             with store.connect(True) as con:
-                previous = con.execute(
-                    "SELECT id FROM artifact WHERE json_extract(body,'$.artifact_type')=? AND json_extract(body,'$.package_digest')=?",
-                    (KIND, package_digest),
-                ).fetchone()
+                if imported_snapshot:
+                    previous = con.execute(
+                        "SELECT id FROM artifact WHERE json_extract(body,'$.artifact_type')=? AND (json_extract(body,'$.provenance.imported_snapshot.digest')=? OR digest=?)",
+                        (KIND, imported_snapshot["digest"], imported_snapshot["digest"]),
+                    ).fetchone()
+                else:
+                    previous = con.execute(
+                        "SELECT id FROM artifact WHERE json_extract(body,'$.artifact_type')=? AND json_extract(body,'$.package_digest')=? AND json_extract(body,'$.provenance.imported_snapshot') IS NULL",
+                        (KIND, package_digest),
+                    ).fetchone()
                 if previous:
                     return next(a for a in store.artifacts() if a["id"] == previous[0])
                 artifact_id, job_id, batch_id, at = (
@@ -444,6 +496,9 @@ def import_blueprint(store, data, origin="imported-blueprint"):
                     "package_digest": package_digest,
                     "note": "Imported declarations and evidence are not factory acceptance; no code or model executed.",
                 }
+                if imported_snapshot:
+                    provenance["imported_snapshot"] = imported_snapshot
+                    provenance["shared_case_refs"] = shared_refs
                 if spec.get("factory_policy") == "atlas.factory-v1.1":
                     provenance["case_basis"] = spec.get("case_basis")
                     if spec.get("case_facts_view") is not None:

@@ -199,7 +199,8 @@ def dispatch(method, path, query="", body=None, store=None):
                     "spec": spec,
                     "documents": {
                         name: (bundle / "source" / name).read_text()
-                        for name in DOCUMENTS
+                        for name in (*DOCUMENTS, "TRIAL_SCOPE.md")
+                        if (bundle / "source" / name).is_file()
                     },
                     "evidence_scope": "Package declarations only; imported reports do not become factory acceptance.",
                     "runtime_acceptance": runtime_support(bundle / "source", spec),
@@ -274,6 +275,17 @@ def dispatch(method, path, query="", body=None, store=None):
                 render_template(bundle, Path(temporary) / "check", "review-check")
             return store.artifact_action(match[1], body), 200
         if method == "GET" and match[2] == "download":
+            if is_blueprint(value) and value.get("provenance", {}).get("origin") == "assisted-trial":
+                # Preserve host provenance/identity on a download→import roundtrip.
+                # The immutable source-only archive remains untouched.
+                download_dir = store.root / "downloads"
+                download_dir.mkdir(exist_ok=True)
+                snapshot_archive = download_dir / (value["digest"] + ".zip")
+                with tempfile.TemporaryDirectory(dir=store.root) as temporary:
+                    generated = Path(temporary) / "snapshot.zip"
+                    archive_tree(bundle, generated)
+                    os.replace(generated, snapshot_archive)
+                return snapshot_archive, value["id"] + ".zip", "application/zip"
             file = controlled_path(store, value["archive_path"])
             if hashlib.sha256(file.read_bytes()).hexdigest() != value["archive_sha256"]:
                 raise FactoryError(

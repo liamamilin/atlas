@@ -1,0 +1,208 @@
+{
+  "scenario_record": {
+    "id": "scn_6db4af782bc548e69e0f48072069ed72",
+    "leaf": "language-learning-application",
+    "leaf_name": "语言学习应用（Language Learning Application）",
+    "name": "出行英语三课：问路、入住、点餐",
+    "audience": "准备短期出国旅行、中文母语的初学者",
+    "objective": "按固定三课练习必要英语短句，获得即时文字反馈，保存完成进度，并优先重练错误题。",
+    "workflow": [
+      "应用提供按顺序的问路、酒店入住、餐厅点餐三课，每课三道原创文字题",
+      "进入下一未完成课，输入英文短句",
+      "立即显示是否匹配及可接受答案；错误可重试",
+      "同课三题均答对后完成本课并解锁下一课",
+      "下次打开继续未完成课或重练错误题"
+    ],
+    "acceptance": [
+      "三课有固定课程顺序和英语目标，不退化成自由闪卡",
+      "输入前后空格和大小写规范化；错误即时反馈，不能直接提升完成进度",
+      "每题首次正确只记一次；重复提交不虚增完成量",
+      "刷新和重启保留进度、错误重练队列，课程序号越界返回错误"
+    ],
+    "status": "draft",
+    "updated_at": "2026-10-21T04:24:53.189564+00:00",
+    "revision": 1
+  },
+  "case_ref": {
+    "case_id": "case:assisted-batch-travel-english",
+    "revision": 1,
+    "digest": "82e4b899ecca526c4e9656c76a3e524dd0068c9caaaba4ffa64cc3bf0e48d16f"
+  },
+  "research": {
+    "summary": "同一共享案例记录的静态研究与明确的设计推断；完整定位见inputs/shared-case-record.json。",
+    "sources": [
+      {
+        "id": "S02",
+        "name": "ev_assisted_travel_english_1",
+        "url": "https://github.com/kantord/LibreLingo/blob/3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee/docs/courses/skill.md",
+        "version": "3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee",
+        "license": "AGPL-3.0根LICENSE；课程及媒体可能另有许可证，本模板不复制上游课程/媒体",
+        "license_url": "https://github.com/kantord/LibreLingo/blob/3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee/LICENSE",
+        "facts": "documentation: Skill文档说明课程Module下的Skill组织主题词句，并自动生成问题任务。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      },
+      {
+        "id": "S03",
+        "name": "ev_assisted_travel_english_2",
+        "url": "https://github.com/kantord/LibreLingo/blob/3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee/docs/courses/challenge.md",
+        "version": "3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee",
+        "license": "AGPL-3.0根LICENSE；课程及媒体可能另有许可证，本模板不复制上游课程/媒体",
+        "license_url": "https://github.com/kantord/LibreLingo/blob/3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee/LICENSE",
+        "facts": "documentation: Challenge文档说明用户通过一系列问题任务学习，任务从Skill配置生成。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      },
+      {
+        "id": "S04",
+        "name": "ev_assisted_travel_english_design",
+        "url": "https://github.com/kantord/LibreLingo/blob/3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee/LICENSE",
+        "version": "3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee",
+        "license": "AGPL-3.0根LICENSE；课程及媒体可能另有许可证，本模板不复制上游课程/媒体",
+        "license_url": "https://github.com/kantord/LibreLingo/blob/3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee/LICENSE",
+        "facts": "inference: 目标采用原创三课固定课程、文本匹配即时反馈和SQLite进度/错题记录；课程文档不证明上游运行或本目标的掌握度判断。归一化匹配不是自由语义或教学效果评估。",
+        "reuse": "只参考设计；不复制上游代码。独立审阅pending，上游运行not_run。"
+      }
+    ],
+    "gaps": [
+      "证据独立审阅pending",
+      "上游not_run",
+      "模板未开发真实应用，未经过教学人员审阅，未做学习效果或独立证据审阅",
+      "语音、听力、自由对话、真实语义评分、SRS和多用户后置",
+      "上游归档且历史仓库重定向，只参考固定版本；不作为当前推荐部署项目"
+    ]
+  },
+  "spec": {
+    "title": "出行英语三课：问路、入住、点餐",
+    "roles": [
+      {
+        "id": "R01",
+        "name": "准备短期出国旅行、中文母语的初学者",
+        "responsibility": "按固定三课练习必要英语短句，获得即时文字反馈，保存完成进度，并优先重练错误题。"
+      }
+    ],
+    "features": [
+      {
+        "id": "F01",
+        "name": "英语三课的课程与顺序",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "固定three lesson ids/directions,hotel,restaurant，每课三题与明确可接受答案；未完成前不得解锁下一课。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A01"
+        ]
+      },
+      {
+        "id": "F02",
+        "name": "文字作答反馈和防重复进度",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "按strip+casefold+合并空格匹配；错误显示可接受答案但不计正确，正确一题只记一次。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A02"
+        ]
+      },
+      {
+        "id": "F03",
+        "name": "错误重练与持久化",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "错题队列答对可移除；刷新重启保留课程版本、答题事件与唯一正确集合。",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04"
+        ],
+        "acceptance": [
+          "A03"
+        ]
+      }
+    ],
+    "acceptance": [
+      {
+        "id": "A01",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "固定three lesson ids/directions,hotel,restaurant，每课三题与明确可接受答案；未完成前不得解锁下一课。",
+        "features": [
+          "F01"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A02",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "按strip+casefold+合并空格匹配；错误显示可接受答案但不计正确，正确一题只记一次。",
+        "features": [
+          "F02"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A03",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "错题队列答对可移除；刷新重启保留课程版本、答题事件与唯一正确集合。",
+        "features": [
+          "F03"
+        ],
+        "implementation": "acceptance/probe.py"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "D01",
+        "question": "首版运行与数据边界？",
+        "default": "单用户本机、独立SQLite；显式保存，无账户、云端和协作。",
+        "when_to_ask": "确需公网托管或多人数据时先确认，不自行扩展。",
+        "impact": "保护本地数据，避免默认外发。",
+        "status": "assisted default"
+      },
+      {
+        "id": "D02",
+        "question": "是否复刻上游？",
+        "default": "目标采用原创三课固定课程、文本匹配即时反馈和SQLite进度/错题记录；课程文档不证明上游运行或本目标的掌握度判断。归一化匹配不是自由语义或教学效果评估。",
+        "when_to_ask": "目标变化、破坏已有数据或需要引入上游实现/依赖时先确认。",
+        "impact": "不混淆来源事实与目标设计。",
+        "status": "assisted default"
+      }
+    ],
+    "phases": [
+      {
+        "id": "P0",
+        "title": "核心可用",
+        "goal": "按固定三课练习必要英语短句，获得即时文字反馈，保存完成进度，并优先重练错误题。",
+        "features": [
+          "F01",
+          "F02",
+          "F03"
+        ],
+        "acceptance": [
+          "A01",
+          "A02",
+          "A03"
+        ]
+      }
+    ],
+    "architecture_markdown": "## 课程与边界\n单用户本机；课程内容全新编写，不复制LibreLingo课程/媒体。原创course-v1为中文提示→英文文本，三课每课三题，lesson顺序固定：directions（问路）、hotel（入住）、restaurant（点餐）。示例目标句Where is the station? / I have a reservation. / Water, please.；每题预先列出有限可接受变体。学习完整核心含应用拥有的语言课程、交互反馈、持续进度。仅文本初学练习，不宣称达到语言等级或代替教学。\n## 数据和API\ncourse_version + lessons/questions静态配置；attempts(id,lesson,question,input,correct,at)、mastered UNIQUE(course_version,question)、mistakes UNIQUE(course_version,question)。SQLite事务内写答题和正确集合；只按规范化后的有限答案匹配（strip/casefold/合并空格，不做模糊语义匹配）；空输入400invalid_answer不计错，未知题404，未解锁课409locked。\nGET /api/course -> lessons,progress,next_lesson,mistakes；GET /api/lessons/{id} -> prompts，未作答不提前暴露答案；POST /api/answers {question_id,answer,submission_id} -> correct,acceptable_answers,progress。submission_id唯一幂等，同ID不同body409。只在本课三题均正确时解锁下一课；错题被正确回答才移除。GET不写进度，旧course_version不静默覆盖或清空。\n## UI与验证\n首页显示三课顺序和进度；题页label+输入+提交；即时成功/错误、可接受答案及重试按钮。错题重练有独立入口和空状态。未保存不能假称答对；网络错误留输入。测试非法题、空输入、错误不推进、首次正确幂等、解锁、复习和真实重启。本批仅导出，不运行应用。\n\n## 原创题库与固定ID\n课程题库在acceptance/COURSE.json；qid固定，英文答案接受表仅为文字匹配，不复制上游课程。每课下一题选择尚未答对的题，错题重练不改变课程顺序。接口lesson.questions输出id,prompt；/api/course.progress为{mastered_count,completed_lessons}，mistakes为question_id列表。POST /api/answers返回correct、acceptable_answers、progress；合法首次提交返回200。\n",
+    "limits": [
+      "辅助试产，非严格G1/T08。",
+      "模板未开发真实应用，未经过教学人员审阅，未做学习效果或独立证据审阅",
+      "语音、听力、自由对话、真实语义评分、SRS和多用户后置",
+      "上游归档且历史仓库重定向，只参考固定版本；不作为当前推荐部署项目"
+    ]
+  },
+  "trial_scope": "# 辅助试用范围\n\n按固定三课练习必要英语短句，获得即时文字反馈，保存完成进度，并优先重练错误题。\n\n- 模板未开发真实应用，未经过教学人员审阅，未做学习效果或独立证据审阅\n- 语音、听力、自由对话、真实语义评分、SRS和多用户后置\n- 上游归档且历史仓库重定向，只参考固定版本；不作为当前推荐部署项目\n\nCodex研究与编写；静态案例未独审、上游未运行。模板先于应用；仅代表场景后续开发应用。严格G1/T08不因本包通过。"
+}

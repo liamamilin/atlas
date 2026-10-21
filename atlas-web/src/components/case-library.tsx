@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { AlertCircle, BookOpen, Copy, ExternalLink, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState, Loading } from "@/components/loaders";
@@ -18,10 +18,11 @@ function asList<T>(value: unknown): T[] {
 export function CaseLibrary() {
   const { lang } = useLang();
   const zh = lang === "zh";
+  const [params] = useSearchParams();
   const [apps, setApps] = useState<V1Application[]>([]);
   const [cases, setCases] = useState<V1Case[]>([]);
-  const [selectedApp, setSelectedApp] = useState("");
-  const [selectedKey, setSelectedKey] = useState("");
+  const [selectedApp, setSelectedApp] = useState(params.get("app_id")||"");
+  const [selectedKey, setSelectedKey] = useState(params.get("case_id")?`${params.get("case_id")}:r${params.get("case_revision")||1}`:"");
   const [detail, setDetail] = useState<V1Case | null>(null);
   const [appsLoading, setAppsLoading] = useState(true);
   const [casesLoading, setCasesLoading] = useState(false);

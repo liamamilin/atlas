@@ -20,6 +20,7 @@ from template_factory.api import dispatch
 from template_factory.artifacts import archive_tree, tree_manifest
 from template_factory.blueprints import (
     import_blueprint,
+    freeze_blueprint,
     unpack_archive,
     validate_blueprint,
     verify_frozen,
@@ -33,6 +34,46 @@ SAMPLE = (
 
 
 class BlueprintTests(unittest.TestCase):
+    def test_assisted_snapshot_preserves_original_identity_and_reuses_import(self):
+        shutil.copyfile(Path(__file__).resolve().parents[1] / "mvp_apps.json", self.pack / "mvp_apps.json")
+        bundle = self.root / "frozen"
+        ref = {"case_id": "case:test", "revision": 1, "digest": "a" * 64}
+        original = freeze_blueprint(self.source, bundle, {"origin": "assisted-trial", "case_ref": ref, "scope": "not a runtime pass"})
+        archive = self.root / "frozen.zip"
+        archive_tree(bundle, archive)
+        with patch("template_factory.cases.CaseLibrary.get_case", return_value={**ref, "app_id": "app:test"}):
+            first = import_blueprint(self.store, archive.read_bytes())
+            second = import_blueprint(self.store, archive.read_bytes())
+        self.assertEqual(first["id"], second["id"])
+        self.assertEqual(first["provenance"]["origin"], "assisted-trial")
+        self.assertEqual(first["provenance"]["imported_snapshot"]["digest"], original["digest"])
+        self.assertNotEqual(first["digest"], original["digest"])
+        self.assertEqual(first["provenance"]["shared_case_refs"][0]["digest"], ref["digest"])
+        self.assertEqual(first["state"], "draft")
+        self.assertEqual(len(self.store.artifacts()), 1)
+        downloaded, _, _ = dispatch("GET", f"/api/factory/artifacts/{first['id']}/download", store=self.store)
+        with patch("template_factory.cases.CaseLibrary.get_case", return_value={**ref, "app_id": "app:test"}):
+            roundtrip = import_blueprint(self.store, downloaded.read_bytes())
+        self.assertEqual(roundtrip["id"], first["id"])
+        self.assertEqual(len(self.store.artifacts()), 1)
+        detail, _ = dispatch("GET", f"/api/factory/artifacts/{first['id']}/blueprint", store=self.store)
+        self.assertEqual(detail["digest"], first["digest"])
+
+    def test_snapshot_tampering_or_missing_case_creates_no_artifact(self):
+        shutil.copyfile(Path(__file__).resolve().parents[1] / "mvp_apps.json", self.pack / "mvp_apps.json")
+        bundle = self.root / "frozen"
+        freeze_blueprint(self.source, bundle, {"origin": "assisted-trial", "case_ref": {"case_id": "case:missing", "revision": 1, "digest": "a" * 64}})
+        archive = self.root / "frozen.zip"
+        archive_tree(bundle, archive)
+        with self.assertRaises(FactoryError):
+            import_blueprint(self.store, archive.read_bytes())
+        (bundle / "source/PRODUCT.md").write_text("changed")
+        archive.unlink()
+        archive_tree(bundle, archive)
+        with self.assertRaises(FactoryError):
+            import_blueprint(self.store, archive.read_bytes())
+        self.assertEqual(len(self.store.artifacts()), 0)
+
     def test_bundled_sample_is_self_contained_without_history_or_local_zip(self):
         with patch("subprocess.run", side_effect=AssertionError("sample must not execute code or git")):
             sample, status = dispatch("POST", "/api/factory/blueprints/sample", store=self.store)

@@ -1,0 +1,22 @@
+{
+  "executed_at": "2026-10-21T04:53:28.830735+00:00",
+  "command": [
+    "/Users/milin/.pyenv/versions/3.10.13/bin/python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "examples/home-inventory-trial/tests",
+    "-v"
+  ],
+  "status": "passed",
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "test_concurrent_edits_cannot_both_commit (test_inventory.InventoryTests) ... ok\ntest_demo_is_only_on_first_initialization_and_money_is_integer (test_inventory.InventoryTests) ... ok\ntest_html_escape_and_failed_form_draft (test_inventory.InventoryTests) ... ok\ntest_invalid_writes_and_stale_archive_preserve_snapshot (test_inventory.InventoryTests) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.076s\n\nOK\n",
+  "scope": "4 regression tests; temporary local HTTP process and temporary SQLite only",
+  "source_revision_note": "After ruff format and unused-import removal; no behavior change",
+  "prior_findings_fixed": [
+    "Conflict form rendered a supplied extra value_minor string before draft value; use explicit trusted numeric default. Regression covers stale-form draft rendering."
+  ],
+  "environment_note": "HTTP checks require approved local networking in this sandbox."
+}
