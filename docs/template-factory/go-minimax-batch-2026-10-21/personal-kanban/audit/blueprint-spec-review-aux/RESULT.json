@@ -1,0 +1,147 @@
+{
+ "input_digest": "06b0f967c38db8d30472bd793873c4b0f9b07c9d1937c223614b80e9f63cf302",
+ "verdict": "pass",
+ "checks": {
+  "leaf_scope": true,
+  "source_fidelity": true,
+  "design_distinction": true,
+  "core_journey": true,
+  "architecture": true,
+  "acceptance": true,
+  "limits_and_safety": true
+ },
+ "observations": [
+  {
+   "index": 0,
+   "verdict": "accepted",
+   "reason": "source/upstream/README.md:4-14 confirms the claim verbatim: line 4 'Kanboard is project management software that focuses on the Kanban methodology', line 6 'This application is in maintenance mode', line 12 'not actively developing any new major features (only small fixes)', line 14 'Pull requests for new features and bug fixes are accepted'. Cited range matches the claim exactly."
+  },
+  {
+   "index": 1,
+   "verdict": "accepted",
+   "reason": "README.md:19-27 contains exactly the listed links: official website (19), List of features (20), Change Log (21), Forum (22), Official documentation (23) plus Requirements (24), Installation instructions (25), Upgrade (26) and Docker (27). The inference that upstream is a full server product with its own docs/deployment story is supported."
+  },
+  {
+   "index": 2,
+   "verdict": "accepted",
+   "reason": "README.md:29-34 is the Credits section: 'Main developer: Frédéric Guillot' (32), Contributors link (33), 'Distributed under MIT License' (34). All three sub-claims verified in the cited range."
+  },
+  {
+   "index": 3,
+   "verdict": "accepted",
+   "reason": "source/upstream/LICENSE:1-21 is 'The MIT License (MIT)' (1), 'Copyright (c) Frédéric Guillot' (3), the grant (5-10), the notice requirement (12-13) and the warranty disclaimer (15-21). Matches the pinned LICENSE bytes and input.source.license (MIT)."
+  },
+  {
+   "index": 4,
+   "verdict": "accepted",
+   "reason": "app/Model/ColumnModel.php:183-195 create() persists project_id, title, task_limit, hide_in_dashboard, description and 'position' => $this->getLastColumnPosition($project_id) + 1 (189), so append-at-end is accurate; task_limit as a WIP cap field is confirmed by the persisted column."
+  },
+  {
+   "index": 5,
+   "verdict": "accepted",
+   "reason": "ColumnModel.php:208-216 update() writes only title, task_limit, hide_in_dashboard and description; no 'position' key appears in the update array, so 'never touches the column position' is exactly what the cited lines show."
+  },
+  {
+   "index": 6,
+   "verdict": "accepted",
+   "reason": "ColumnModel.php:239-261 changePosition(): bound check `$position < 1 || $position > ...count()` at 241, siblings fetched with neq('id',$column_id)->asc('position') at 245 and renumbered in the loop 249-256, moved column written at 258, and `return !in_array(false, $results, true);` at 260 — 'bounded, all-or-nothing' is faithful."
+  },
+  {
+   "index": 7,
+   "verdict": "accepted",
+   "reason": "ColumnModel.php:118-121 is getAll(): `->eq('project_id', $project_id)->asc('position')->findAll()`, exactly the ascending-position ordering claimed."
+  },
+  {
+   "index": 8,
+   "verdict": "accepted",
+   "reason": "ColumnModel.php:147-156 getAllWithTaskCount() adds subquery COUNT(*) ... is_active='1' (nb_open_tasks, 151) and is_active='0' (nb_closed_tasks, 152) with ->asc('position') (154); counts are derived from the task table, as stated."
+  },
+  {
+   "index": 9,
+   "verdict": "accepted",
+   "reason": "ColumnModel.php:225-228 remove() deletes the row by id via `->eq('id',$column_id)->remove()`; the referenced docblock is at lines 218-224 ('Remove a column and all tasks associated to this column') — immediately above the cited range, so the destructive-deletion claim holds (minor note: the docblock itself sits just outside 225-228)."
+  },
+  {
+   "index": 10,
+   "verdict": "accepted",
+   "reason": "app/Model/TaskPositionModel.php:66-97 movePosition(): `if ($position < 1) return false;` (68-70), swimlane default from the task (74-76), onlyOpen/STATUS_CLOSED early return (78-80), and three mutually exclusive branches at 84-90 (swimlane change, column change, same-column position change). All four sub-claims verified."
+  },
+  {
+   "index": 11,
+   "verdict": "accepted",
+   "reason": "TaskPositionModel.php:177-215 saveTaskPositions(): listing of sibling tasks with ->eq('column_id')->neq('id',$task_id)->asc('position')->asc('id') (179-187), insertion of the moved task when `$position == $offset` (194-199), rewrite of each sibling position (202-204), and final bottom placement normalising a bad position (210-212)."
+  },
+  {
+   "index": 12,
+   "verdict": "accepted",
+   "reason": "TaskPositionModel.php:112-121 saveSwimlaneChange(): startTransaction (114), source rewrite + target rewrite + saveTaskTimestamps (115-117), closeTransaction (118), `return $r1 && $r2 && $r3;` (120) — one transaction, conjunction of the three writes."
+  },
+  {
+   "index": 13,
+   "verdict": "accepted",
+   "reason": "TaskPositionModel.php:135-144 saveColumnChange() mirrors that pattern: transaction opened at 137, source column cleared with position 0 (138), target filled at the requested position (139), timestamps at 140, and success only when all three writes succeeded (143)."
+  },
+  {
+   "index": 14,
+   "verdict": "accepted",
+   "reason": "TaskPositionModel.php:244-258 saveTaskPosition(): when the row update returns false the method calls `$this->db->cancelTransaction();` (252-255) and returns false, which is exactly the abort-mid-move behaviour described."
+  },
+  {
+   "index": 15,
+   "verdict": "accepted",
+   "reason": "TaskPositionModel.php:15-51 moveBottom(): MAX(position) subquery over the target column (25-26), `$position = $result['pos'] + 1` (30) and the update writing swimlane_id, column_id, position, date_moved, date_modification (36-42). 'Appending is a position write, not a status flag' is a sound reading."
+  },
+  {
+   "index": 16,
+   "verdict": "accepted",
+   "reason": "TaskPositionModel.php:269-313 fireEvents(): $changes carries src_column_id, dst_column_id, date_moved, recurrence_status and recurrence_trigger (271-281), and the event selection at 283-313 distinguishes swimlane change, column change and position change."
+  },
+  {
+   "index": 17,
+   "verdict": "accepted",
+   "reason": "app/Model/TaskCreationModel.php:61-93 prepare(): empty column_id -> getFirstColumnId (69-71), empty title -> t('Untitled') (77-79), date_creation/date_modification/date_moved = time() (87-89) and position = countByColumnAndSwimlaneId(...)+1 (90)."
+  },
+  {
+   "index": 18,
+   "verdict": "accepted",
+   "reason": "TaskCreationModel.php:22-53 create(): the row is persisted first (33) and movePosition() is called afterwards only when `$position > 0 && $values['position'] > 1` (36-38) — create step then position step, as claimed."
+  },
+  {
+   "index": 19,
+   "verdict": "accepted",
+   "reason": "app/Model/TaskModificationModel.php:23-41 update(): the field write is at 34 and events fire only `if ($fire_events && $result)` (36-38); prepare() (105-117) resets/does not touch column_id or position, so text edits are independent of column and position."
+  },
+  {
+   "index": 20,
+   "verdict": "accepted",
+   "reason": "TaskModificationModel.php:105-117 prepare(): dateParser->convert for date_due/date_started (107-108), removeFields 'id' (110), resetFields of date/score/category/time fields (111), convertIntegerFields of recurrence_status/trigger/factor/timeframe/basedate (112) and date_modification = time() (114)."
+  },
+  {
+   "index": 21,
+   "verdict": "accepted",
+   "reason": "app/Controller/TaskMovePositionController.php:33-52 save(): `$this->request->getJson()` (37) supplying column_id/position/swimlane_id, the projectRole->canMoveTask permission check (39-41), movePosition() called with project id, task id and the three values (43-49), and the redirect to TaskViewController::show (51)."
+  },
+  {
+   "index": 22,
+   "verdict": "accepted",
+   "reason": "app/Template/board/table_column.php:5-27: the foreach over $swimlane['columns'] (6) emits one <th> per column with data-column-id (7), the escaped title (24, 27) and the per-column dropdown span (26-28), so header order follows the column order."
+  },
+  {
+   "index": 23,
+   "verdict": "accepted",
+   "reason": "table_column.php:88-120: the score block (89-93), the visible task count via nb_tasks (105-109) and the total across swimlanes, shown with the task_limit denominator when task_limit > 0 (111-119) — 'a per-column card count next to the column title' is accurate."
+  },
+  {
+   "index": 24,
+   "verdict": "accepted",
+   "reason": "table_column.php:105-119: the count block is guarded by `if (! empty($column['nb_tasks']))` (105) and the number is preceded by `<span class=\"ui-helper-hidden-accessible\"><?= t('Task count') ?>` (107), exactly as cited."
+  },
+  {
+   "index": 25,
+   "verdict": "accepted",
+   "reason": "table_column.php:39-43: the 'Close all tasks in this column and this swimlane' modal link (41) is rendered only when `$column['nb_tasks'] > 0` and the role permits it (39-43), confirming the column-as-container bulk-close behaviour."
+  }
+ ],
+ "issues": [],
+ "summary": "Pass. I read leaf.md (213 lines) in full, VIEW_ARCH.md in full (190 lines, the complete decoded /arch string, consistent with the truncated AUTHOR_INPUT.json prefix), all other VIEW_* files (each matching its JSON pointer in AUTHOR_INPUT.json), REVIEW_SCOPE.md, AUTHOR_INPUT.json, acceptance/README.md, acceptance/probe.py (550 lines) and all eight pinned upstream files at the exact bytes of input.inventory. All 26 author observations were checked line-by-line against the fixed upstream source and every claim (line range, method name, field names, quoted strings, transaction semantics) holds; the one nuance is observation 9, whose docblock quote sits at ColumnModel.php:218-224 immediately above the cited 225-228 body, which does not change the substance. Design/inference separation is explicit and honoured: upstream observations stay upstream, the Python/SQLite target design is labelled as inference, and no upstream code, schema or runtime behaviour is asserted. Scope matches the leaf's defining core (board, columns, cards, position-as-state) and the pinned P0 scenario (local single-user, named boards, user-named ordered columns, title+short-description cards, cross-column move and in-column reorder, restart persistence, per-column lists and counts) while explicitly rejecting accounts, collaboration, a status field, WIP limits, notifications, time reports and automation at the API boundary (FORBIDDEN_FIELD), with the leaf's standard/optional layers declared out of scope. The journey is end-to-end (workflow steps 1-9 from process start to restart to probe). Architecture, API surface, validation bounds, error codes (all probe-asserted codes appear in VIEW_ARCH.md section 5), timestamp/date rules and decisions D1-D8 are explicit and mutually consistent with the probe's assertions (board/card length bounds 120/200/500, 201/204/303/400/404/409/422 codes, created_at<=updated_at/moved_at, contiguous 1..N renumbering on both columns). The probe's negative cases are meaningful: every rejection asserts an exact status plus error code, and every rejected write is accompanied by a state re-read proving no write (board_state() comparison in A02/A04, board-state before/after in A03, board-list growth in A01). No upstream execution or certification is claimed: gaps 0-3, the inference field, acceptance item 8 and README's Verification status all state not_run for both the target and upstream, and the restart check is explicitly an operator procedure. Limits are explicit and honest (12 gaps covering unverified restart, no UI/HTML assertions, no drag-and-drop, no auth/TLS, single-threaded server, destructive deletion without undo, no per-column history, licence scope). Two non-blocking prose imprecisions in the acceptance prose are worth noting for a future edit but do not affect correctness: acceptance item 4 says 'every rejected request ... is followed by a re-read ... (board_state() comparison)', whereas the probe batches the 12 A03 create rejections into one before/after comparison, uses a list-length check for A01's rejections and a card-order check for A03's two PATCH rejections, and omits a re-read after A04's unknown-card 404; and the A03 case summary counts '12 rejected writes' while two further PATCH rejections are also asserted in that case. The substantive zero-write guarantee for every rejected write still holds in each case."
+}

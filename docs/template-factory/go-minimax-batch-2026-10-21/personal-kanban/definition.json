@@ -1,0 +1,672 @@
+{
+  "scenario_record": {
+    "id": "scn_e7e1f70a65da44cb95ecf786e204d159",
+    "leaf": "kanban-task-board",
+    "leaf_name": "看板任务板",
+    "name": "Personal Project Board (个人小项目看板) - local single-user kanban board",
+    "audience": "One person running a small personal project on their own machine (the board's only user), plus the engineer who implements and probes it. The user names the board, names the columns after their own workflow, writes cards with a title and a short description, moves cards between and inside columns, and reopens the app expecting the same board, column order and card order. The implementer needs an exact, dependency-free local contract they can code and assert against.",
+    "objective": "Deliver a localhost-only, single-user, Python-stdlib web application that persists named boards, user-named ordered columns and ordered cards (title + short description) in one SQLite file, treats a card's column membership as the card's state (no separate status field), supports column add/rename/reorder and card move/reorder, shows every column's full card list with per-column counts, and reads the whole structure back unchanged after a restart. P0 explicitly excludes accounts, collaboration, a separate status field, WIP limits, notifications, time reports and automation, and those concepts are rejected at the API boundary rather than merely omitted.",
+    "workflow": [
+      "1. Operator starts the process with `python3 app.py --data-dir ./data --host 127.0.0.1 --port 8765`; the data directory and the SQLite file are created on first run and the startup banner prints the local URL.",
+      "2. The user opens `GET /` (boards home) and creates a named board, optionally seeding user-named columns (for example 待办 / 进行中 / 完成) in one step; the board is stored with zero hidden default columns.",
+      "3. The user adds further columns, renames a column in place, and reorders columns to match the real workflow; the column order is stored as a contiguous 1..N position sequence and is always rendered left to right.",
+      "4. The user creates a card with a title and a short description inside a chosen column; the card is appended at the bottom of that column unless an explicit slot is given.",
+      "5. The user edits a card's title or description; editing never changes the card's column, position or moved timestamp.",
+      "6. The user moves a card to another column (this is the state change - there is no status field) and reorders cards inside a column; the source column and target column are renumbered to contiguous 1..N in one transaction.",
+      "7. The user reads the board surface: columns left to right, each column showing its full ordered card list and its card count, with the board total equal to the sum of the column counts.",
+      "8. The user restarts the process against the same `--data-dir` and sees the same boards, the same column order and the same card order, because every write is committed to `<data-dir>/kanban.sqlite3`.",
+      "9. The acceptance probe (one disposable board per case, deleting only what it created) exercises the same journey over the JSON API and asserts the zero-write behaviour of every rejected request."
+    ],
+    "acceptance": [
+      "The probe runs against a live target with `python3 probe.py --base-url http://127.0.0.1:8765 --case A01` (or `--case all`, repeatable `--case` flags) and exits 0 only when every selected case passes; the five cases A01..A05 map one-to-one onto the five features.",
+      "A01 proves board behaviour: POST /api/boards creates exactly one board (201 with id, name, created_at, updated_at, column_count, card_count), GET /api/boards grows by exactly one entry and carries the same name and counts, GET /api/boards/{id} returns the same board with an empty column list, PATCH renames without changing the id, and DELETE removes exactly that board.",
+      "A02 proves column behaviour: seeded columns keep their names and order with positions 1..3, a new column is appended at position 4, a rename keeps the position, a reorder persists the new order with positions exactly 1..4 and names still attached to the same ids, and deleting an empty column renumbers the remaining columns to 1..N.",
+      "A03 proves card behaviour: a card is created with title, description, column and position 1, a second card gets position 2, the board's card_count and the per-column card_count equal the real number of cards, and PATCH changes only title/description (position, column and moved_at unchanged).",
+      "Every rejected request in A01..A04 is followed by a re-read that proves zero writes: the board/column/card counts, the column order, the card order, the card positions and each card's updated_at are byte-for-byte the same before and after the rejection (board_state() comparison).",
+      "Negative cases are exact: blank or over-long name, blank or over-long title, over-long description, missing column, unknown column (404 COLUMN_NOT_FOUND), a column of another board (422 COLUMN_BOARD_MISMATCH), position 0 or position beyond the last slot (422 POSITION_OUT_OF_RANGE), duplicate column name (409 DUPLICATE_COLUMN_NAME), deleting a non-empty column (409 COLUMN_NOT_EMPTY), deleting the last column (409 LAST_COLUMN), malformed JSON body (400 MALFORMED_JSON), and forbidden P0 keys such as status, assignee, due_date, recurrence_trigger, task_limit (422 FORBIDDEN_FIELD) or colour (422 UNKNOWN_FIELD).",
+      "A04 proves position-as-state: moving a card to another column renumbers the source column to 1..M-1 and the target column to 1..N, an in-column reorder swaps the two cards and their positions, the board's total card count is unchanged by every move, moved_at never precedes created_at, and a no-op move leaves the column order untouched.",
+      "A05 proves the read model and the date edges: GET /api/boards/{id} returns the columns in position order, each with its full ordered card list, a card_count equal to the length of that list, contiguous card positions starting at 1, a board card_count equal to the sum of the column counts, the expected exact set of card titles per column, an identical snapshot on a second read, and created_at <= updated_at and created_at <= moved_at for every card inside the probe's write window.",
+      "Cross-process restart durability is specified in README.md as an operator procedure (stop the process, start it again with the same --data-dir, re-read the board) because the probe cannot stop or start the server; the blueprint claims that step was not executed, and the whole runtime verification of this target is not_run.",
+      "The probe only uses records it created in its own disposable board and deletes only those records; it never deletes pre-existing user data, and it asserts only behaviour documented in this architecture - no upstream Kanboard behaviour is asserted."
+    ],
+    "status": "draft",
+    "updated_at": "2026-10-21T11:06:20.305054+00:00",
+    "revision": 1
+  },
+  "case_ref": {
+    "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+    "revision": 1,
+    "digest": "6c619352cee6c8a85ed501c8cc6b8618357a574a5489a555c0be654ac9cad222"
+  },
+  "research": {
+    "summary": "同一共享案例记录的静态研究与明确的设计推断；完整定位见inputs/shared-case-record.json。",
+    "sources": [
+      {
+        "id": "S02",
+        "name": "ev_assisted_personal_kanban_1",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/README.md",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "documentation: Upstream README describes Kanboard as project management software that focuses on the Kanban methodology and states the application is in maintenance mode: the author is not actively developing any new major features, only small fixes are made, and pull requests for new features and bug fixes are accepted.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S03",
+        "name": "ev_assisted_personal_kanban_10",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/ColumnModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream remove() deletes a column row by id and its docblock states that the column and all associated tasks are removed, so upstream column deletion is destructive rather than a move of the cards elsewhere.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S04",
+        "name": "ev_assisted_personal_kanban_11",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/TaskPositionModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream movePosition() returns false for a position below 1, resolves the swimlane when none is given, skips closed tasks when onlyOpen is set, and then dispatches to exactly one of three branches - swimlane change, column change or same-column position change - so a card's placement is the only way its location changes.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S05",
+        "name": "ev_assisted_personal_kanban_12",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/TaskPositionModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream saveTaskPositions() lists the other tasks of the same column ordered by position then id, inserts the moved task when the requested position equals the running offset, rewrites every other task's position, and finally places the task at the bottom while normalising a bad position - the whole column is renumbered around the moved card.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S06",
+        "name": "ev_assisted_personal_kanban_13",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/TaskPositionModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream saveSwimlaneChange() performs the source-column rewrite, the target-column rewrite and the timestamp update inside one database transaction and returns the conjunction of the three results, i.e. a move commits as a single all-or-nothing unit.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S07",
+        "name": "ev_assisted_personal_kanban_14",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/TaskPositionModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream saveColumnChange() applies the same transaction pattern for a move between two columns: clear the source column, fill the target column, update the timestamps, and report success only when all three writes succeeded.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S08",
+        "name": "ev_assisted_personal_kanban_15",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/TaskPositionModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream saveTaskPosition() cancels the surrounding transaction when the row update affects no rows, which is how a failed mid-move write aborts the whole move instead of leaving a half-renumbered column.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S09",
+        "name": "ev_assisted_personal_kanban_16",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/TaskPositionModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream moveBottom() computes MAX(position)+1 over the tasks of the target column and writes column_id, position, date_moved and date_modification, so appending a card to a column is a position write and not a separate status flag.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S10",
+        "name": "ev_assisted_personal_kanban_17",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/TaskPositionModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream fireEvents() emits a distinct event for a swimlane change, a column change or a position change and carries src_column_id, dst_column_id, date_moved and the task's recurrence fields; in upstream the move is the state-change event of the card.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S11",
+        "name": "ev_assisted_personal_kanban_18",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/TaskCreationModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream prepare() defaults an empty column_id to the first column of the project, defaults an empty title to 'Untitled', stamps date_creation, date_modification and date_moved with the current time and computes position as the number of tasks in the column plus one.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S12",
+        "name": "ev_assisted_personal_kanban_19",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/TaskCreationModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream create() persists the task row first and only afterwards calls movePosition() when an explicit position greater than one was requested, i.e. inserting a card at a chosen slot is a create step followed by a position step.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S13",
+        "name": "ev_assisted_personal_kanban_2",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/README.md",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "documentation: Upstream README links the official website, a feature list, the change log, a forum and the documentation pages for requirements, installation, upgrade and Docker use, i.e. upstream is a full server product with its own documentation and deployment story, not a local single-user tool.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S14",
+        "name": "ev_assisted_personal_kanban_20",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/TaskModificationModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream update() applies the changed fields to the task row and fires the modification events only when the write succeeded; the card's text fields are edited independently of its column and position.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S15",
+        "name": "ev_assisted_personal_kanban_21",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/TaskModificationModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream prepare() converts date_due and date_started through the date parser, removes the id field, resets the date, score and time fields and stamps date_modification - upstream tasks carry due/start dates and recurrence counters, which the pinned P0 scenario deliberately excludes.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S16",
+        "name": "ev_assisted_personal_kanban_22",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Controller/TaskMovePositionController.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream TaskMovePositionController::save() reads a JSON body with column_id, position and swimlane_id, checks a move permission on the project role, calls movePosition() with the project id, the task id and those three values, and then redirects back to the task view.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S17",
+        "name": "ev_assisted_personal_kanban_23",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Template/board/table_column.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: The upstream board template renders one table header cell per column carrying data-column-id, the escaped column title and a per-column dropdown, so the column order of the board surface is exactly the column position order.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S18",
+        "name": "ev_assisted_personal_kanban_24",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Template/board/table_column.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: The upstream column header renders the score, the visible task count and - when a task_limit is set - the total across swimlanes, i.e. upstream already shows a per-column card count next to the column title.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S19",
+        "name": "ev_assisted_personal_kanban_25",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Template/board/table_column.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: The upstream task count block is rendered only when the count is non-empty and is preceded by an ui-helper-hidden-accessible 'Task count' text, i.e. upstream labels the column count for assistive technology.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S20",
+        "name": "ev_assisted_personal_kanban_26",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Template/board/table_column.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: The upstream column dropdown offers 'Close all tasks in this column and this swimlane' only when the column holds tasks, showing that upstream treats the column as the container whose content can be closed in bulk - a batch operation outside the pinned P0 scenario.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S21",
+        "name": "ev_assisted_personal_kanban_3",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/README.md",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "documentation: Upstream README names Frederic Guillot as main developer, points at the contributor list and states that the project is distributed under the MIT License.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S22",
+        "name": "ev_assisted_personal_kanban_4",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "documentation: The pinned upstream LICENSE is the MIT License (MIT), copyright (c) Frederic Guillot, with the standard grant, the notice requirement and the warranty disclaimer.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S23",
+        "name": "ev_assisted_personal_kanban_5",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/ColumnModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream create() persists a new column for a project with title, task_limit (a WIP cap), description and hide_in_dashboard, and sets position to getLastColumnPosition(project_id) + 1, so a newly added column is appended at the end of the board rather than inserted at an arbitrary slot.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S24",
+        "name": "ev_assisted_personal_kanban_6",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/ColumnModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream update() rewrites the column title, task_limit, hide_in_dashboard and description in place and never touches the column position, so renaming a column is independent of the column order.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S25",
+        "name": "ev_assisted_personal_kanban_7",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/ColumnModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream changePosition() rejects a position below 1 or above the number of columns of the project, then renumbers the sibling columns ascending by their current position and finally writes the requested position on the moved column, returning false if any single update fails - reordering is a bounded, all-or-nothing rewrite of the sibling positions.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S26",
+        "name": "ev_assisted_personal_kanban_8",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/ColumnModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream getAll() returns the columns of a project ordered ascending by position, which is the mechanism behind the left-to-right column order of the board surface.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S27",
+        "name": "ev_assisted_personal_kanban_9",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/app/Model/ColumnModel.php",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "code_observation: Upstream getAllWithTaskCount() returns the columns ordered by position together with a per-column count of open tasks (is_active='1') and of closed tasks (is_active='0'), i.e. upstream derives the column card counts from the task table itself.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S28",
+        "name": "ev_assisted_personal_kanban_design",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "license": "MIT",
+        "license_url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE",
+        "facts": "inference: Evidence classes are kept separate. (1) code_observation = behaviour read directly from the pinned upstream files at the cited lines (for example upstream renumbers a column around a moved card inside one transaction, upstream bounds a column reorder by the number of columns, upstream renders a per-column task count). (2) documentation = claims read from upstream README.md and LICENSE and from leaf.md; leaf.md describes the Kanban Task Board type in general terms and explicitly separates the defining core (board, card, position-as-state) from standard and optional capabilities. (3) target design inference = every statement about the local Python/SQLite target in this blueprint, including the data model, the API surface, the validation bounds, the error codes, the UI and the probe, is my own design derived from the pinned scenario plus the leaf's defining core; it is not an upstream capability and upstream code was not copied. (4) not_run upstream status = the pinned Kanboard snapshot was read as text only; it was never installed, started or exercised, so no upstream runtime behaviour, upstream database schema or upstream performance figure is asserted anywhere here. The target's own runtime verification is likewise not_run: no server was started and no probe case was executed while writing this blueprint. Upstream-only concepts visible in the evidence (swimlanes, task_limit as a WIP cap, tags, score, priority, recurrence counters, bulk creation, project-role permissions, markdown tooltips) were read as evidence of the category's standard capabilities and are deliberately kept out of the target P0; the target rejects them at the API boundary instead of ignoring them.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。"
+      }
+    ],
+    "gaps": [
+      "辅助静态独审通过，不代表运行通过",
+      "上游not_run",
+      "Runtime verification status: not_run. No target server was started, no HTTP request was issued and no probe case was executed while producing this blueprint; the acceptance criteria state what must hold, not what was observed.",
+      "Upstream status: not_run. The pinned Kanboard snapshot was read as source text only - it was not installed, started or exercised - so no upstream runtime behaviour, upstream database schema or upstream performance characteristic is asserted here.",
+      "Only the eight pinned upstream files were read; the rest of the upstream tree (routing, migrations, templates, tests) is outside the evidence set, so claims about upstream beyond these files are not made.",
+      "Restart durability is specified but not demonstrated: the probe cannot stop or start the server, so the cross-process restart check exists only as an operator procedure in README.md and is not claimed as executed.",
+      "The probe compares API-level shapes only; it asserts nothing about the HTML surface, so the accessibility, Post/Redirect/Get and focus requirements of the UI are reviewed by hand rather than machine-checked.",
+      "Drag-and-drop is deliberately out of P0: the UI exposes movement through buttons and a select, so pointer-only drag affordances, live drag feedback and cross-column drag previews are not covered.",
+      "The target stores no due dates, recurrence rules, assignees, labels, priorities, attachments, comments, checklists, activity history or archive, so the leaf's 'card detail' and 'standard capabilities' layers are absent by design in P0.",
+      "Deletion is destructive without archive or undo, so a mistaken board deletion cannot be recovered in this P0 build (decision D5).",
+      "The HTTP server is single-threaded and the probe runs sequentially, so concurrent writers, lock contention and busy_timeout behaviour are not exercised.",
+      "No authentication, TLS, per-board permissions or multi-user isolation: the process must stay on the loopback interface.",
+      "Column rename has no per-column history and card edits record no change log, so 'the position confirmed in the card's history' from the leaf is not implemented in P0.",
+      "The upstream MIT licence covers the pinned reference files only; no upstream source was copied into the target, and a file-level licence audit of the upstream tree was not performed."
+    ]
+  },
+  "spec": {
+    "title": "Personal Project Board (个人小项目看板) - local single-user kanban board",
+    "roles": [
+      {
+        "id": "R01",
+        "name": "One person running a small personal project on their own machine (the board's only user), plus the engineer who implements and probes it. The user names the board, names the columns after their own workflow, writes cards with a title and a short description, moves cards between and inside columns, and reopens the app expecting the same board, column order and card order. The implementer needs an exact, dependency-free local contract they can code and assert against.",
+        "responsibility": "Deliver a localhost-only, single-user, Python-stdlib web application that persists named boards, user-named ordered columns and ordered cards (title + short description) in one SQLite file, treats a card's column membership as the card's state (no separate status field), supports column add/rename/reorder and card move/reorder, shows every column's full card list with per-column counts, and reads the whole structure back unchanged after a restart. P0 explicitly excludes accounts, collaboration, a separate status field, WIP limits, notifications, time reports and automation, and those concepts are rejected at the API boundary rather than merely omitted."
+      }
+    ],
+    "features": [
+      {
+        "id": "F01",
+        "name": "Named boards with durable local storage (create, list, read, rename, delete)",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "A POST /api/boards with a 1..120 character name creates exactly one board row and answers 201 with id, name, created_at, updated_at, column_count and card_count; GET /api/boards then lists that board once with the same counts, GET /api/boards/{id} returns the same board with an empty column list, and after the process is restarted with the same --data-dir the same board id, name and counts are read back unchanged.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19",
+          "S20",
+          "S21",
+          "S22",
+          "S23",
+          "S24",
+          "S25",
+          "S26",
+          "S27",
+          "S28"
+        ],
+        "acceptance": [
+          "A01"
+        ]
+      },
+      {
+        "id": "F02",
+        "name": "User-named ordered columns (add, rename, reorder, guarded delete)",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "Columns can be appended, renamed in place and reordered: after every accepted change the board's columns are exactly the contiguous permutation 1..N of their positions, GET /api/boards/{id} returns them in that order with every name still attached to the same column id, deleting an empty column renumbers the remaining columns to 1..N, and deleting a non-empty column (409 COLUMN_NOT_EMPTY) or the last column of a board (409 LAST_COLUMN) is rejected without writing.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19",
+          "S20",
+          "S21",
+          "S22",
+          "S23",
+          "S24",
+          "S25",
+          "S26",
+          "S27",
+          "S28"
+        ],
+        "acceptance": [
+          "A02"
+        ]
+      },
+      {
+        "id": "F03",
+        "name": "Cards with a title and a short description (create, read, edit)",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "A card can be created in a chosen column with a required title of 1..200 characters and an optional description of at most 500 characters, is appended at the bottom of that column unless an explicit slot is requested, and PATCH can change only the title and the description - never the column, the position or moved_at; a rejected card write (blank or over-long title, over-long description, missing or unknown column, forbidden key such as status, due_date or recurrence_trigger, unknown key such as colour) leaves the card set, the card order, the per-column counts and every card's updated_at exactly unchanged.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19",
+          "S20",
+          "S21",
+          "S22",
+          "S23",
+          "S24",
+          "S25",
+          "S26",
+          "S27",
+          "S28"
+        ],
+        "acceptance": [
+          "A03"
+        ]
+      },
+      {
+        "id": "F04",
+        "name": "Movement as state: cross-column move and in-column reorder with contiguous renumbering",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "POST /api/cards/{id}/move with (column_id, position) places the card in the 1-based slot position of the target column, renumbers the source column to 1..M-1 and the target column to 1..N inside one transaction, keeps the board's total card count unchanged and bumps moved_at, while an out-of-range position, an unknown column, a column belonging to another board and an unknown card are all rejected without any write.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19",
+          "S20",
+          "S21",
+          "S22",
+          "S23",
+          "S24",
+          "S25",
+          "S26",
+          "S27",
+          "S28"
+        ],
+        "acceptance": [
+          "A04"
+        ]
+      },
+      {
+        "id": "F05",
+        "name": "Board read model: columns in order, full per-column card lists and per-column counts",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "GET /api/boards/{id} returns the board, its columns in position order and for every column the complete ordered list of its cards plus a card_count equal to the length of that list, so that the column counts sum to the board card_count, every card list carries contiguous positions starting at 1, the expected card titles appear exactly in the expected columns, and two consecutive reads return an identical snapshot.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09",
+          "S10",
+          "S11",
+          "S12",
+          "S13",
+          "S14",
+          "S15",
+          "S16",
+          "S17",
+          "S18",
+          "S19",
+          "S20",
+          "S21",
+          "S22",
+          "S23",
+          "S24",
+          "S25",
+          "S26",
+          "S27",
+          "S28"
+        ],
+        "acceptance": [
+          "A05"
+        ]
+      }
+    ],
+    "acceptance": [
+      {
+        "id": "A01",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "A POST /api/boards with a 1..120 character name creates exactly one board row and answers 201 with id, name, created_at, updated_at, column_count and card_count; GET /api/boards then lists that board once with the same counts, GET /api/boards/{id} returns the same board with an empty column list, and after the process is restarted with the same --data-dir the same board id, name and counts are read back unchanged.",
+        "features": [
+          "F01"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A02",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "Columns can be appended, renamed in place and reordered: after every accepted change the board's columns are exactly the contiguous permutation 1..N of their positions, GET /api/boards/{id} returns them in that order with every name still attached to the same column id, deleting an empty column renumbers the remaining columns to 1..N, and deleting a non-empty column (409 COLUMN_NOT_EMPTY) or the last column of a board (409 LAST_COLUMN) is rejected without writing.",
+        "features": [
+          "F02"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A03",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "A card can be created in a chosen column with a required title of 1..200 characters and an optional description of at most 500 characters, is appended at the bottom of that column unless an explicit slot is requested, and PATCH can change only the title and the description - never the column, the position or moved_at; a rejected card write (blank or over-long title, over-long description, missing or unknown column, forbidden key such as status, due_date or recurrence_trigger, unknown key such as colour) leaves the card set, the card order, the per-column counts and every card's updated_at exactly unchanged.",
+        "features": [
+          "F03"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A04",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "POST /api/cards/{id}/move with (column_id, position) places the card in the 1-based slot position of the target column, renumbers the source column to 1..M-1 and the target column to 1..N inside one transaction, keeps the board's total card count unchanged and bumps moved_at, while an out-of-range position, an unknown column, a column belonging to another board and an unknown card are all rejected without any write.",
+        "features": [
+          "F04"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A05",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "GET /api/boards/{id} returns the board, its columns in position order and for every column the complete ordered list of its cards plus a card_count equal to the length of that list, so that the column counts sum to the board card_count, every card list carries contiguous positions starting at 1, the expected card titles appear exactly in the expected columns, and two consecutive reads return an identical snapshot.",
+        "features": [
+          "F05"
+        ],
+        "implementation": "acceptance/probe.py"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "D01",
+        "question": "首版运行与数据边界？",
+        "default": "单用户本机、独立SQLite；显式保存，无账户、云端和协作。",
+        "when_to_ask": "确需公网托管或多人数据时先确认，不自行扩展。",
+        "impact": "保护本地数据，避免默认外发。",
+        "status": "assisted default"
+      },
+      {
+        "id": "D02",
+        "question": "是否复刻上游？",
+        "default": "Evidence classes are kept separate. (1) code_observation = behaviour read directly from the pinned upstream files at the cited lines (for example upstream renumbers a column around a moved card inside one transaction, upstream bounds a column reorder by the number of columns, upstream renders a per-column task count). (2) documentation = claims read from upstream README.md and LICENSE and from leaf.md; leaf.md describes the Kanban Task Board type in general terms and explicitly separates the defining core (board, card, position-as-state) from standard and optional capabilities. (3) target design inference = every statement about the local Python/SQLite target in this blueprint, including the data model, the API surface, the validation bounds, the error codes, the UI and the probe, is my own design derived from the pinned scenario plus the leaf's defining core; it is not an upstream capability and upstream code was not copied. (4) not_run upstream status = the pinned Kanboard snapshot was read as text only; it was never installed, started or exercised, so no upstream runtime behaviour, upstream database schema or upstream performance figure is asserted anywhere here. The target's own runtime verification is likewise not_run: no server was started and no probe case was executed while writing this blueprint. Upstream-only concepts visible in the evidence (swimlanes, task_limit as a WIP cap, tags, score, priority, recurrence counters, bulk creation, project-role permissions, markdown tooltips) were read as evidence of the category's standard capabilities and are deliberately kept out of the target P0; the target rejects them at the API boundary instead of ignoring them.",
+        "when_to_ask": "目标变化、破坏已有数据或需要引入上游实现/依赖时先确认。",
+        "impact": "不混淆来源事实与目标设计。",
+        "status": "assisted default"
+      }
+    ],
+    "phases": [
+      {
+        "id": "P0",
+        "title": "核心可用",
+        "goal": "Deliver a localhost-only, single-user, Python-stdlib web application that persists named boards, user-named ordered columns and ordered cards (title + short description) in one SQLite file, treats a card's column membership as the card's state (no separate status field), supports column add/rename/reorder and card move/reorder, shows every column's full card list with per-column counts, and reads the whole structure back unchanged after a restart. P0 explicitly excludes accounts, collaboration, a separate status field, WIP limits, notifications, time reports and automation, and those concepts are rejected at the API boundary rather than merely omitted.",
+        "features": [
+          "F01",
+          "F02",
+          "F03",
+          "F04",
+          "F05"
+        ],
+        "acceptance": [
+          "A01",
+          "A02",
+          "A03",
+          "A04",
+          "A05"
+        ]
+      }
+    ],
+    "architecture_markdown": "# Architecture - Personal Project Board (个人小项目看板)\n\n## 1. Scope and non-goals\nP0 scope: one local, single-user process that stores named boards; every board holds user-named columns in a user-defined order; every column holds ordered cards; a card carries a title and a short description; a card's column membership IS its state; column order and card order are persisted and shown; the whole structure is read back unchanged after a restart.\n\nRejected at the API boundary (422 FORBIDDEN_FIELD) and absent from the schema: accounts and login, roles and permissions, multi-user collaboration, a separate status/state field, WIP limits, swimlanes, due/start dates, recurrence, notifications, time tracking and reports, automation, templates, search/filter, archive, secondary views, external integrations.\n\n## 2. Runtime, files and start instructions\n- Python 3.9+, standard library only (http.server, sqlite3, json, urllib.parse, argparse).\n- Start: `python3 app.py --host 127.0.0.1 --port 8765 --data-dir ./data`\n  - `--host` default 127.0.0.1 (loopback only), `--port` default 8765, `--data-dir` default ./data.\n  - Env override: `PERSONAL_KANBAN_DATA_DIR`.\n  - Startup order: create the data directory if missing; open `<data-dir>/kanban.sqlite3`; apply the schema with `CREATE TABLE IF NOT EXISTS` (PRAGMA user_version = 1); `PRAGMA foreign_keys=ON`, `PRAGMA journal_mode=WAL`, `PRAGMA busy_timeout=5000`; print `Personal Project Board listening on http://127.0.0.1:8765/`.\n  - Shutdown: SIGINT / Ctrl-C closes the connection and checkpoints the WAL; committed data is not lost.\n- Target file layout: `app.py`, `personal_board/db.py` (schema and connection), `personal_board/service.py` (transactional domain logic), `personal_board/api.py` (JSON endpoints), `personal_board/web.py` (HTML endpoints), `personal_board/server.py` (router), `probe.py`, `README.md`.\n- Storage: exactly one SQLite file `<data-dir>/kanban.sqlite3` (plus `-wal` / `-shm` sidecars). No other state is kept in memory across restarts.\n- No authentication and no TLS: the process binds loopback only and is single-user (decision D1).\n\n## 3. Data model (SQLite, one file, PRAGMA user_version = 1)\nboards\n  id          INTEGER PRIMARY KEY AUTOINCREMENT\n  name        TEXT    NOT NULL   -- trimmed, 1..120 chars\n  created_at  INTEGER NOT NULL   -- UTC epoch seconds\n  updated_at  INTEGER NOT NULL\n\ncolumns\n  id          INTEGER PRIMARY KEY AUTOINCREMENT\n  board_id    INTEGER NOT NULL REFERENCES boards(id) ON DELETE CASCADE\n  name        TEXT    NOT NULL   -- trimmed, 1..120 chars, unique per board (case-insensitive)\n  position    INTEGER NOT NULL   -- 1..N inside the board\n  created_at  INTEGER NOT NULL\n  updated_at  INTEGER NOT NULL\n  UNIQUE (board_id, position)\n\ncards\n  id          INTEGER PRIMARY KEY AUTOINCREMENT\n  board_id    INTEGER NOT NULL REFERENCES boards(id) ON DELETE CASCADE\n  column_id   INTEGER NOT NULL REFERENCES columns(id) ON DELETE CASCADE\n  position    INTEGER NOT NULL   -- 1..N inside the column\n  title       TEXT    NOT NULL   -- trimmed, 1..200 chars\n  description TEXT    NOT NULL DEFAULT ''   -- 0..500 chars\n  created_at  INTEGER NOT NULL\n  updated_at  INTEGER NOT NULL\n  moved_at    INTEGER NOT NULL   -- last time the card changed column or position\n  UNIQUE (column_id, position)\n\nInvariants after every committed write:\n- the columns of a board form exactly the permutation 1..N of their positions;\n- the cards of a column form exactly the permutation 1..N of their positions;\n- a card's board_id always equals the board_id of its column;\n- no status, state, priority, assignee, date or recurrence column exists anywhere.\n\n## 4. HTTP API (JSON, UTF-8, Content-Type application/json)\nError envelope for every non-2xx answer:\n  {\"error\": {\"code\": \"POSITION_OUT_OF_RANGE\", \"message\": \"position must be between 1 and 3\", \"field\": \"position\", \"details\": {\"min\": 1, \"max\": 3}}}\n\nHealth\n  GET /api/health -> 200 {\"status\": \"ok\", \"schema_version\": 1, \"data_dir\": \"/abs/path\"}\n\nBoards\n  GET /api/boards -> 200 {\"boards\": [{\"id\": 1, \"name\": \"Home\", \"created_at\": 1760000000, \"updated_at\": 1760000000, \"column_count\": 3, \"card_count\": 4}]}\n  POST /api/boards\n    request  {\"name\": \"Home\", \"columns\": [\"待办\", \"进行中\"]}   # name required, columns optional\n    response 201 {\"board\": {\"id\": 1, \"name\": \"Home\", \"created_at\": ..., \"updated_at\": ..., \"column_count\": 2, \"card_count\": 0},\n                   \"columns\": [{\"id\": 1, \"name\": \"待办\", \"position\": 1, \"card_count\": 0, \"created_at\": ..., \"updated_at\": ...}]}\n  GET /api/boards/{board_id} -> 200\n    {\"board\": {\"id\": 1, \"name\": \"Home\", \"created_at\": ..., \"updated_at\": ..., \"column_count\": 2, \"card_count\": 3},\n     \"columns\": [{\"id\": 1, \"name\": \"待办\", \"position\": 1, \"card_count\": 2,\n                  \"cards\": [{\"id\": 11, \"board_id\": 1, \"column_id\": 1, \"position\": 1, \"title\": \"...\", \"description\": \"...\",\n                             \"created_at\": ..., \"updated_at\": ..., \"moved_at\": ...}]}]}\n  PATCH /api/boards/{board_id} request {\"name\": \"...\"} -> 200 {\"board\": {...}}\n  DELETE /api/boards/{board_id} -> 204 (cascades to that board's columns and cards)\n\nColumns\n  POST /api/boards/{board_id}/columns request {\"name\": \"...\"} -> 201 {\"column\": {\"id\": 3, \"board_id\": 1, \"name\": \"...\", \"position\": 3, \"card_count\": 0, \"created_at\": ..., \"updated_at\": ...}}\n  GET /api/columns/{column_id} -> 200 {\"column\": {...}}\n  PATCH /api/columns/{column_id} request {\"name\": \"...\"} -> 200 {\"column\": {...}}\n  PUT /api/columns/{column_id}/position request {\"position\": 2} -> 200\n    {\"column\": {...}, \"columns\": [{\"id\": 1, \"name\": \"待办\", \"position\": 1}, {\"id\": 3, \"name\": \"完成\", \"position\": 2}]}\n  DELETE /api/columns/{column_id} -> 204 | 409 COLUMN_NOT_EMPTY | 409 LAST_COLUMN\n\nCards\n  POST /api/boards/{board_id}/cards\n    request  {\"title\": \"...\", \"description\": \"...\", \"column_id\": 1, \"position\": 2}\n             # title and column_id required; description optional (default \"\"); position optional (default: append at the bottom)\n    response 201 {\"card\": {\"id\": 11, \"board_id\": 1, \"column_id\": 1, \"position\": 2, \"title\": \"...\", \"description\": \"...\", \"created_at\": ..., \"updated_at\": ..., \"moved_at\": ...}}\n  GET /api/cards/{card_id} -> 200 {\"card\": {...}}\n  PATCH /api/cards/{card_id} request {\"title\": \"...\", \"description\": \"...\"} -> 200 {\"card\": {...}}\n  POST /api/cards/{card_id}/move request {\"column_id\": 2, \"position\": 1} -> 200\n    {\"card\": {...},\n     \"columns\": [{\"id\": 1, \"name\": \"待办\", \"position\": 1, \"card_count\": 1, \"card_ids\": [12]},\n                 {\"id\": 2, \"name\": \"进行中\", \"position\": 2, \"card_count\": 2, \"card_ids\": [11, 13]}]}\n  DELETE /api/cards/{card_id} -> 204\n\n## 5. Validation bounds, allowed keys and error codes\nField bounds\n  board.name          trimmed, 1..120 chars            -> 422 NAME_REQUIRED / NAME_TOO_LONG\n  column.name         trimmed, 1..120 chars            -> 422 NAME_REQUIRED / NAME_TOO_LONG\n  column.name         unique per board, case-insensitive-> 409 DUPLICATE_COLUMN_NAME\n  card.title          trimmed, 1..200 chars            -> 422 TITLE_REQUIRED / TITLE_TOO_LONG\n  card.description    0..500 chars, default \"\"        -> 422 DESCRIPTION_TOO_LONG\n  card.column_id      required on create               -> 422 COLUMN_REQUIRED\n                      must exist                       -> 404 COLUMN_NOT_FOUND\n                      must belong to the board in the path -> 422 COLUMN_BOARD_MISMATCH\n  card.position       optional on create, 1..(count+1) -> 422 POSITION_OUT_OF_RANGE\n  move.position       1..(target count after removal + 1) -> 422 POSITION_OUT_OF_RANGE\n  column.position     1..number of columns of the board-> 422 POSITION_OUT_OF_RANGE\n\nAllowed request keys (any other key is rejected)\n  POST /api/boards                 name, columns\n  PATCH /api/boards/{id}           name\n  POST /api/boards/{id}/columns    name\n  PATCH /api/columns/{id}          name\n  PUT  /api/columns/{id}/position   position\n  POST /api/boards/{id}/cards      title, description, column_id, position\n  PATCH /api/cards/{id}            title, description\n  POST /api/cards/{id}/move        column_id, position\n\nForbidden keys (P0 guard, checked before any write) -> 422 FORBIDDEN_FIELD:\n  status, state, workflow_status, is_active, closed, completed, archived,\n  assignee, owner, owner_id, member, members, priority, score, tags, tag, label, labels,\n  color, color_id, due_date, date_due, start_date, date_started, deadline, end_date,\n  recurrence, recurrence_status, recurrence_trigger, recurrence_factor, recurrence_timeframe,\n  recurrence_basedate, repeat, every, remind, reminder, notification, notifications, notify,\n  wip_limit, task_limit, limit, swimlane, swimlane_id, time_estimated, time_spent, duration,\n  estimate, checklist, checklists, comment, comments, attachment, attachments, subtask, subtasks,\n  template, templates, rule, rules, automation, external_id, external_provider, email, password,\n  username, role, roles, permission, permissions, created_at, updated_at, moved_at\n  Any other unknown key -> 422 UNKNOWN_FIELD.\n  column_id inside PATCH /api/cards/{id} -> 422 COLUMN_CHANGE_REQUIRES_MOVE.\n  position inside PATCH /api/cards/{id} -> 422 POSITION_CHANGE_REQUIRES_MOVE.\n\nHTTP status codes\n  200 OK, 201 Created, 204 No Content, 303 See Other (UI redirect),\n  400 MALFORMED_JSON (body is not valid JSON) / 400 INVALID_BODY (body is not a JSON object),\n  404 NOT_FOUND (unknown route), 404 BOARD_NOT_FOUND, 404 COLUMN_NOT_FOUND, 404 CARD_NOT_FOUND,\n  405 METHOD_NOT_ALLOWED (with an Allow header),\n  409 DUPLICATE_COLUMN_NAME, 409 COLUMN_NOT_EMPTY, 409 LAST_COLUMN,\n  422 NAME_REQUIRED, NAME_TOO_LONG, TITLE_REQUIRED, TITLE_TOO_LONG, DESCRIPTION_TOO_LONG,\n      COLUMN_REQUIRED, POSITION_OUT_OF_RANGE, FORBIDDEN_FIELD, UNKNOWN_FIELD,\n      COLUMN_CHANGE_REQUIRES_MOVE, POSITION_CHANGE_REQUIRES_MOVE, COLUMN_BOARD_MISMATCH,\n  500 INTERNAL_ERROR (transaction rolled back, nothing written)\n\n## 6. Ordering rules and atomic failure semantics\nOrdering\n- The columns of a board are ordered by position ascending; positions are a contiguous 1..N.\n- The cards of a column are ordered by position ascending; positions are a contiguous 1..N.\n- Card creation without `position` appends at the bottom of the column; with `position` the card is inserted at that slot and the column is renumbered around it.\n- Move: POST /api/cards/{id}/move with (column_id, position) puts the card in the 1-based slot `position` of the target column and removes it from the source column; the source column is renumbered to 1..(M-1) and the target column to 1..N in the same transaction. The board's total card count never changes.\n- Column reorder: PUT /api/columns/{id}/position with 1 <= position <= number of columns of the board; the other columns shift and all are renumbered to 1..N.\n- Deleting a column removes it and renumbers the remaining columns of that board to 1..N.\n\nAtomicity\n- Every mutating request runs inside exactly one SQLite transaction (BEGIN IMMEDIATE ... COMMIT); there is no multi-transaction request.\n- Validation runs before the transaction opens. A rejected request opens no transaction and writes nothing (the zero-write guarantee the probe checks).\n- Any exception during the write phase rolls the transaction back: the database is exactly as it was before the request and the client receives 500 INTERNAL_ERROR. A move that fails half way cannot leave a half-renumbered column.\n- Position rewrites are staged inside the same transaction: the affected rows first receive temporary negative positions (`-id`), then the final 1..N positions are assigned. The UNIQUE (board_id, position) and UNIQUE (column_id, position) constraints are therefore never violated mid-flight and no intermediate order is observable.\n- Deleting a board cascades to its columns and cards in the same transaction.\n- No partial success is possible: a request either commits every row it touched or none.\n\n## 7. Dates, timestamps and recurrence\n- The only dates in the target are the three server-set integers created_at, updated_at, moved_at on boards, columns and cards. Unit: UTC epoch seconds, resolution 1 second.\n- Clients never supply timestamps; created_at, updated_at and moved_at are in the forbidden key list and are rejected with 422 FORBIDDEN_FIELD.\n- updated_at is bumped on every accepted change of that record and is non-decreasing (>=) because of the 1-second resolution; updated_at >= created_at always holds. moved_at changes only when a card changes column or position, so a plain edit leaves moved_at untouched and a move sets moved_at >= created_at.\n- The target stores NO due date, start date or deadline, and NO recurrence rule (P0 excludes both). The recurrence rule of this target is therefore: none exists and none can be created - every date or recurrence key (due_date, date_due, start_date, date_started, deadline, end_date, recurrence, recurrence_status, recurrence_trigger, recurrence_factor, recurrence_timeframe, recurrence_basedate, repeat, every, remind, reminder) is rejected with 422 FORBIDDEN_FIELD before any write. Upstream Kanboard does carry recurrence fields; they are deliberately not carried over (decision D4).\n\n## 8. UI (server-rendered HTML, no JavaScript required)\n- GET / - boards home: a list of boards (name, column count, card count) and a create-board form (name plus optional one-column-per-line column names).\n- GET /board/{id} - the board surface: columns left to right; each column shows its name, its card count and its cards top to bottom (title and short description), with a card form, a rename form, reorder buttons and a delete button; each card shows an edit form, up/down buttons, a move-to-column select and a delete button.\n- All UI mutations are HTML forms POSTing to `/ui/...` handlers and answered with `303 See Other` back to the referring page (Post/Redirect/Get). The UI and the JSON API share one service layer, so both obey the same validation, ordering and transaction rules.\n- UI routes: POST /ui/boards, POST /ui/boards/{id}/rename, POST /ui/boards/{id}/delete, POST /ui/boards/{id}/columns, POST /ui/columns/{id}/rename, POST /ui/columns/{id}/position, POST /ui/columns/{id}/delete, POST /ui/boards/{id}/cards, POST /ui/cards/{id}/update, POST /ui/cards/{id}/move, POST /ui/cards/{id}/delete.\n- Accessibility: `<!DOCTYPE html>` with lang=\"zh-CN\"; one `<h1>` per page; `<header>`, `<nav>` and `<main>` landmarks; every input has a `<label for>`; `required` and `maxlength` on inputs; every action is a `<button type=\"submit\">` (no click-only controls); cards are `<ol>` items so the sequence is announced; each column is an `<h2>` section whose heading text carries the count; results and errors are announced in a `<div role=\"status\">` / `role=\"alert\">` region after the redirect; a visible focus outline is kept; state is never conveyed by colour alone (the column name carries it); every move is reachable from the keyboard via up/down buttons and a select, so there is no drag-only interaction.\n\n## 9. Acceptance mapping (probe.py --case A01..A05)\n  A01 boards            -> feature 1: create/list/read/rename/delete + 7 rejected writes, each followed by a zero-write re-read\n  A02 columns           -> feature 2: seed/add/rename/reorder, delete guards, 7 rejected writes with zero-write re-reads\n  A03 cards             -> feature 3: create/read/edit, 12 rejected writes with a full board-state comparison before and after\n  A04 movement          -> feature 4: cross-column move, in-column reorder, out-of-range/unknown/cross-board rejections, board total unchanged\n  A05 read model        -> feature 5: exact per-column card lists, counts, contiguous positions, stable second read, date edges\n  Each case creates its own disposable board and deletes only the records it created; a restart check is an operator procedure in README.md because the probe cannot stop or start the server.\n\n## 10. Decision points for the user (change before building if you disagree)\n  D1 loopback-only binding with no authentication (single-user local tool); exposing the port to a LAN would give every reachable host full write access.\n  D2 a new board starts with zero columns; optional `columns: [...]` seeds user-named columns; there are no hidden default columns and no implicit first column.\n  D3 column names are unique per board (case-insensitive); card titles may repeat.\n  D4 no dates and no recurrence at all - rejected with FORBIDDEN_FIELD rather than accepted and ignored.\n  D5 deletion is destructive and unarchived: a column must be empty, a board must keep one column, deleting a board cascades; there is no undo.\n  D6 movement is a dedicated endpoint (POST /api/cards/{id}/move); PATCH on a card can change only title and description.\n  D7 UI labels in zh-CN, API keys and error codes in English.\n  D8 no drag-and-drop JavaScript in P0; a later drag layer can reuse the same move endpoint without an API change.",
+    "limits": [
+      "辅助试产，非严格G1/T08。",
+      "Runtime verification status: not_run. No target server was started, no HTTP request was issued and no probe case was executed while producing this blueprint; the acceptance criteria state what must hold, not what was observed.",
+      "Upstream status: not_run. The pinned Kanboard snapshot was read as source text only - it was not installed, started or exercised - so no upstream runtime behaviour, upstream database schema or upstream performance characteristic is asserted here.",
+      "Only the eight pinned upstream files were read; the rest of the upstream tree (routing, migrations, templates, tests) is outside the evidence set, so claims about upstream beyond these files are not made.",
+      "Restart durability is specified but not demonstrated: the probe cannot stop or start the server, so the cross-process restart check exists only as an operator procedure in README.md and is not claimed as executed.",
+      "The probe compares API-level shapes only; it asserts nothing about the HTML surface, so the accessibility, Post/Redirect/Get and focus requirements of the UI are reviewed by hand rather than machine-checked.",
+      "Drag-and-drop is deliberately out of P0: the UI exposes movement through buttons and a select, so pointer-only drag affordances, live drag feedback and cross-column drag previews are not covered.",
+      "The target stores no due dates, recurrence rules, assignees, labels, priorities, attachments, comments, checklists, activity history or archive, so the leaf's 'card detail' and 'standard capabilities' layers are absent by design in P0.",
+      "Deletion is destructive without archive or undo, so a mistaken board deletion cannot be recovered in this P0 build (decision D5).",
+      "The HTTP server is single-threaded and the probe runs sequentially, so concurrent writers, lock contention and busy_timeout behaviour are not exercised.",
+      "No authentication, TLS, per-board permissions or multi-user isolation: the process must stay on the loopback interface.",
+      "Column rename has no per-column history and card edits record no change log, so 'the position confirmed in the card's history' from the leaf is not implemented in P0.",
+      "The upstream MIT licence covers the pinned reference files only; no upstream source was copied into the target, and a file-level licence audit of the upstream tree was not performed."
+    ]
+  },
+  "trial_scope": "# 辅助试用范围\n\nDeliver a localhost-only, single-user, Python-stdlib web application that persists named boards, user-named ordered columns and ordered cards (title + short description) in one SQLite file, treats a card's column membership as the card's state (no separate status field), supports column add/rename/reorder and card move/reorder, shows every column's full card list with per-column counts, and reads the whole structure back unchanged after a restart. P0 explicitly excludes accounts, collaboration, a separate status field, WIP limits, notifications, time reports and automation, and those concepts are rejected at the API boundary rather than merely omitted.\n\n- Runtime verification status: not_run. No target server was started, no HTTP request was issued and no probe case was executed while producing this blueprint; the acceptance criteria state what must hold, not what was observed.\n- Upstream status: not_run. The pinned Kanboard snapshot was read as source text only - it was not installed, started or exercised - so no upstream runtime behaviour, upstream database schema or upstream performance characteristic is asserted here.\n- Only the eight pinned upstream files were read; the rest of the upstream tree (routing, migrations, templates, tests) is outside the evidence set, so claims about upstream beyond these files are not made.\n- Restart durability is specified but not demonstrated: the probe cannot stop or start the server, so the cross-process restart check exists only as an operator procedure in README.md and is not claimed as executed.\n- The probe compares API-level shapes only; it asserts nothing about the HTML surface, so the accessibility, Post/Redirect/Get and focus requirements of the UI are reviewed by hand rather than machine-checked.\n- Drag-and-drop is deliberately out of P0: the UI exposes movement through buttons and a select, so pointer-only drag affordances, live drag feedback and cross-column drag previews are not covered.\n- The target stores no due dates, recurrence rules, assignees, labels, priorities, attachments, comments, checklists, activity history or archive, so the leaf's 'card detail' and 'standard capabilities' layers are absent by design in P0.\n- Deletion is destructive without archive or undo, so a mistaken board deletion cannot be recovered in this P0 build (decision D5).\n- The HTTP server is single-threaded and the probe runs sequentially, so concurrent writers, lock contention and busy_timeout behaviour are not exercised.\n- No authentication, TLS, per-board permissions or multi-user isolation: the process must stay on the loopback interface.\n- Column rename has no per-column history and card edits record no change log, so 'the position confirmed in the card's history' from the leaf is not implemented in P0.\n- The upstream MIT licence covers the pinned reference files only; no upstream source was copied into the target, and a file-level licence audit of the upstream tree was not performed.\n\nOpenCode CLI + Go 研究与编写；独立会话静态审阅通过，上游和下游应用均未运行。模板先于应用；仅代表场景后续开发应用。严格G1/T08不因本包通过。",
+  "production": {
+    "schema": "atlas.auxiliary-model-production.v1",
+    "mode": "opencode-cli-go",
+    "model": "opencode-go/minimax-m3.1-flash-free",
+    "campaign_id": "atlas-v1-first-production-2026-10-19",
+    "phase": "auxiliary-batch-minimax-2026-10-21",
+    "review_status": "passed",
+    "review_input_digest": "06b0f967c38db8d30472bd793873c4b0f9b07c9d1937c223614b80e9f63cf302",
+    "review_result_digest": "7efb42970d3b88bb8861575f8708d5cfbe7df57919652e5fd4fa96e31e77e646",
+    "source_snapshot_digest": "71e73f33515281107e646b5a5f544b234131cca944fbf9747a63d2a0fa577f8c",
+    "controlled_opencode_calls_added": 3,
+    "sessions": {
+      "discovery": "ses_ea1e5483affe5bFYOkSGxkJFkG",
+      "blueprint-generate-aux": "ses_ea1e2c06effePVRSo6GVzXd0tr",
+      "blueprint-spec-review-aux": "ses_ea1de83daffetTStmPb5FvGcdC"
+    },
+    "upstream_runtime": "not_run",
+    "application_runtime": "not_run",
+    "strict_acceptance": false
+  }
+}

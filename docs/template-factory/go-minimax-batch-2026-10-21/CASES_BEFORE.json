@@ -1,0 +1,4292 @@
+[
+  {
+    "app_id": "app:repo:bdb9120cdd460c971a15b6e8",
+    "case_id": "case:assisted-batch-focus",
+    "created_at": "2026-10-21T04:24:52.795651+00:00",
+    "created_task_id": "assisted-small-2026-10-21-focus",
+    "digest": "8acd72c7d1c8b224c08b2e963c2b4b3e4ce837e755901bf3efbabc164cabc864",
+    "evidence_digest": "69e4c8b05f58f145af86fb3011275c9cb9cf5a1a9b13ed6964933173c81fa4de",
+    "research": {
+      "input_digest": "ec94918fb8ae18bf55c9cc76432b29bbad0fe550d949cb742ca61e586b382ab3",
+      "scope": "选定写作目标，完成一轮25分钟专注，再主动进入5分钟休息，并留存真实完成记录。",
+      "summary": "Codex静态研究；目标用SQLite持久化wall-clock deadline和唯一session_id跨刷新结算；自然完成与取消分开计数，休息不计入专注，属于目标设计，未证明上游相同实现。",
+      "task_id": "assisted-small-2026-10-21-focus",
+      "unknowns": [
+        "upstream not_run",
+        "independent review pending",
+        "本批仅模板和验收程序，应用未实现/未运行",
+        "长休息周期、网站拦截、任务系统、声音/通知保证和跨设备同步后置"
+      ]
+    },
+    "research_input_digest": "ec94918fb8ae18bf55c9cc76432b29bbad0fe550d949cb742ca61e586b382ab3",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_39fa0c7c57f4a76d213e9ae7"
+    ],
+    "observations": [
+      {
+        "case_id": "case:assisted-batch-focus",
+        "case_revision": 1,
+        "digest": "39a72692ccb4e846dea306e944cca4c6da4a44b7085e1b1ca08906a0e6c61dc2",
+        "evidence_id": "ev_assisted_focus_1",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "dda06e6bf412bebe5ef8668a4357c52d974dc874",
+          "file_digest": "7978a27f9127bfa278095543ea29498a08dfdd30169c39a689f6942bedebcd14",
+          "line_end": 42,
+          "line_start": 16,
+          "path": "src-tauri/src/timer/engine.rs"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "TimerCommand显式区分Start/Pause/Resume/Reset/Skip和Reconfigure；Complete事件含skipped布尔值。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-batch-focus",
+        "case_revision": 1,
+        "digest": "9734397c95516828b348977d73882cc7a4e4044404184e482c64bf7f9e185d9a",
+        "evidence_id": "ev_assisted_focus_2",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "dda06e6bf412bebe5ef8668a4357c52d974dc874",
+          "file_digest": "c1c2801908556708abb1c6c0a64a5e77d0f0e7ad4216c1c3505e531db0fc7f0a",
+          "line_end": 7,
+          "line_start": 1,
+          "path": "src-tauri/src/timer/sequence.rs"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "文件注释定义work→short-break和长休息的轮次推进；目标只采用一轮专注加短休息。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-batch-focus",
+        "case_revision": 1,
+        "digest": "cb097219a4aa0b42baf25c9a7b648666c7633f0208b327912286930de0c9ec6e",
+        "evidence_id": "ev_assisted_focus_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "上游未运行",
+            "独立证据审阅pending",
+            "本批仅模板和验收程序，应用未实现/未运行",
+            "长休息周期、网站拦截、任务系统、声音/通知保证和跨设备同步后置"
+          ],
+          "depends_on": [
+            "ev_assisted_focus_1",
+            "ev_assisted_focus_2"
+          ],
+          "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "目标用SQLite持久化wall-clock deadline和唯一session_id跨刷新结算；自然完成与取消分开计数，休息不计入专注，属于目标设计，未证明上游相同实现。",
+        "reviews": []
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "目标、时长、开始与暂停恢复",
+          "到期记录及主动休息",
+          "取消、重复完成防重与持久化"
+        ],
+        "case_id": "case:assisted-batch-focus",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_assisted_focus_1",
+          "ev_assisted_focus_2",
+          "ev_assisted_focus_design"
+        ],
+        "exclusions": [
+          "本批仅模板和验收程序，应用未实现/未运行",
+          "长休息周期、网站拦截、任务系统、声音/通知保证和跨设备同步后置"
+        ],
+        "reason": "选定写作目标，完成一轮25分钟专注，再主动进入5分钟休息，并留存真实完成记录。",
+        "scenario_id": "scn_4636cb92042a444da70ed81c0c131666",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-21T04:18:58.705638+00:00",
+        "commit_sha": "dda06e6bf412bebe5ef8668a4357c52d974dc874",
+        "excluded_paths": [
+          "Unselected source files; upstream not built or run"
+        ],
+        "file_manifest_digest": "e7a9d6f457babdfb21e3418fb529a17dd3b252518ad3ee742d77b7780ad1727e",
+        "files": {
+          "LICENSE": "26c9bfaefad8fafa79e3f2c403bf75438f099f1847da304f43fda117b5ca6658",
+          "README.md": "faa651e36f833b00d57578345589a2bddd99930ed7a929a2e56f2daabd7e23fc",
+          "src-tauri/src/timer/engine.rs": "7978a27f9127bfa278095543ea29498a08dfdd30169c39a689f6942bedebcd14",
+          "src-tauri/src/timer/sequence.rs": "c1c2801908556708abb1c6c0a64a5e77d0f0e7ad4216c1c3505e531db0fc7f0a"
+        },
+        "license": {
+          "notice_hashes": {
+            "LICENSE": "26c9bfaefad8fafa79e3f2c403bf75438f099f1847da304f43fda117b5ca6658"
+          },
+          "status": "located"
+        },
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_uncertainties": [
+          "Reference study only; no upstream implementation copied."
+        ],
+        "repo_id": null,
+        "repository": "https://github.com/splode/pomotroid",
+        "snapshot_id": "src_39fa0c7c57f4a76d213e9ae7",
+        "strategy_version": "assisted-core-source-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:f6742ccb9e28a369cde19865",
+    "case_id": "case:assisted-batch-home-inventory",
+    "created_at": "2026-10-21T04:23:19.389204+00:00",
+    "created_task_id": "assisted-small-2026-10-21-home-inventory",
+    "digest": "01dbbdf6e9fbe33ea8538d8c4c12b1123d5d78f1131117aafaa2209b3fac5ada",
+    "evidence_digest": "053bf5dd6f8a31edec9f8d2e303272a336050f0ae3cbbe13a1a4b1750fef6623",
+    "research": {
+      "input_digest": "c47b178f9a585b95f837224f6b92b390c1e1e45d6ac3be97a98d2a31bd65bb9f",
+      "scope": "逐件记录自己的物品、所在房间与估值，搬动后仍能找到，并查看待搬物品数量和估值。",
+      "summary": "Codex静态研究；目标每行固定一件家庭物品、平面位置、整数分估值与筛选后汇总；与上游quantity浮点及层级实体不同，是明确的试用取舍。",
+      "task_id": "assisted-small-2026-10-21-home-inventory",
+      "unknowns": [
+        "upstream not_run",
+        "independent review pending",
+        "照片/收据/附件、层级房间/箱子、保险证明、导出、家庭协作后置",
+        "估值不是理赔或市场估价；本机单人，不暴露公网"
+      ]
+    },
+    "research_input_digest": "c47b178f9a585b95f837224f6b92b390c1e1e45d6ac3be97a98d2a31bd65bb9f",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_94cbba2fb5ae10d6e3767b11"
+    ],
+    "observations": [
+      {
+        "case_id": "case:assisted-batch-home-inventory",
+        "case_revision": 1,
+        "digest": "323ad475bb984d4f122e136faa62399a4579e45796db509fc6b12391f8e889fb",
+        "evidence_id": "ev_assisted_home_inventory_1",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "1fd28822634a3d5935c002d569559ef46530d4a0",
+          "file_digest": "fcebc804b23cb001b812825af10d9449e4503d20f4dff336bae88ac6d683aaa5",
+          "line_end": 58,
+          "line_start": 37,
+          "path": "backend/internal/data/ent/schema/entity.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Entity字段含notes、quantity、archived和asset_id；说明独立物品记录与归档状态。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-batch-home-inventory",
+        "case_revision": 1,
+        "digest": "0d61d1f59ad72933d4752f9d32842fd382d25a6b771fbaed7d8db79e379a4275",
+        "evidence_id": "ev_assisted_home_inventory_2",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "1fd28822634a3d5935c002d569559ef46530d4a0",
+          "file_digest": "fcebc804b23cb001b812825af10d9449e4503d20f4dff336bae88ac6d683aaa5",
+          "line_end": 119,
+          "line_start": 110,
+          "path": "backend/internal/data/ent/schema/entity.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Entity的parent和location边均Unique，代码注释说明沿父链解析位置；目标只采用单层位置，不复刻层级。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-batch-home-inventory",
+        "case_revision": 1,
+        "digest": "23c3283de15e517e743a854feb25a5f9d13311c90e5896cb1cb359a328aed542",
+        "evidence_id": "ev_assisted_home_inventory_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "上游未运行",
+            "独立证据审阅pending",
+            "照片/收据/附件、层级房间/箱子、保险证明、导出、家庭协作后置",
+            "估值不是理赔或市场估价；本机单人，不暴露公网"
+          ],
+          "depends_on": [
+            "ev_assisted_home_inventory_1",
+            "ev_assisted_home_inventory_2"
+          ],
+          "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "目标每行固定一件家庭物品、平面位置、整数分估值与筛选后汇总；与上游quantity浮点及层级实体不同，是明确的试用取舍。",
+        "reviews": []
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "逐件物品和位置登记、估值汇总",
+          "编辑、移动与检索",
+          "归档恢复与错误零写入",
+          "真实重启持久化"
+        ],
+        "case_id": "case:assisted-batch-home-inventory",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_assisted_home_inventory_1",
+          "ev_assisted_home_inventory_2",
+          "ev_assisted_home_inventory_design"
+        ],
+        "exclusions": [
+          "照片/收据/附件、层级房间/箱子、保险证明、导出、家庭协作后置",
+          "估值不是理赔或市场估价；本机单人，不暴露公网"
+        ],
+        "reason": "逐件记录自己的物品、所在房间与估值，搬动后仍能找到，并查看待搬物品数量和估值。",
+        "scenario_id": "scn_435d92c3222644bd906e10a62e65737a",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-21T04:18:53.540136+00:00",
+        "commit_sha": "1fd28822634a3d5935c002d569559ef46530d4a0",
+        "excluded_paths": [
+          "Unselected source files; upstream not built or run"
+        ],
+        "file_manifest_digest": "44664ae546f9ad8140c97163dea24ca9277bd7ff3363871a34749e59dfda8ba4",
+        "files": {
+          "LICENSE": "4df3c306dddaaf4baffdff5ca820cc679ac8cd6dc263c6a74517783e42fa7a3b",
+          "README.md": "eb3f4dc03dc36e3f8f08a31394db063ff5fc3c2bdeb9f18d2fdec030303e9b70",
+          "backend/internal/data/ent/schema/entity.go": "fcebc804b23cb001b812825af10d9449e4503d20f4dff336bae88ac6d683aaa5"
+        },
+        "license": {
+          "notice_hashes": {
+            "LICENSE": "4df3c306dddaaf4baffdff5ca820cc679ac8cd6dc263c6a74517783e42fa7a3b"
+          },
+          "status": "located"
+        },
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_uncertainties": [
+          "Reference study only; no upstream implementation copied."
+        ],
+        "repo_id": null,
+        "repository": "https://github.com/sysadminsmedia/homebox",
+        "snapshot_id": "src_94cbba2fb5ae10d6e3767b11",
+        "strategy_version": "assisted-core-source-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:152e715111e33ad3e17f558c",
+    "case_id": "case:assisted-batch-travel-english",
+    "created_at": "2026-10-21T04:24:53.201727+00:00",
+    "created_task_id": "assisted-small-2026-10-21-travel-english",
+    "digest": "82e4b899ecca526c4e9656c76a3e524dd0068c9caaaba4ffa64cc3bf0e48d16f",
+    "evidence_digest": "28163a7ab159ec00a2b62bccfaea911037ed235ca34ab550fad77e1998f955ba",
+    "research": {
+      "input_digest": "af7453a9b24cf875c932fd12e7bddd42067f9caa347e8164ecceb7e846d32e5f",
+      "scope": "按固定三课练习必要英语短句，获得即时文字反馈，保存完成进度，并优先重练错误题。",
+      "summary": "Codex静态研究；目标采用原创三课固定课程、文本匹配即时反馈和SQLite进度/错题记录；课程文档不证明上游运行或本目标的掌握度判断。归一化匹配不是自由语义或教学效果评估。",
+      "task_id": "assisted-small-2026-10-21-travel-english",
+      "unknowns": [
+        "upstream not_run",
+        "independent review pending",
+        "模板未开发真实应用，未经过教学人员审阅，未做学习效果或独立证据审阅",
+        "语音、听力、自由对话、真实语义评分、SRS和多用户后置",
+        "上游归档且历史仓库重定向，只参考固定版本；不作为当前推荐部署项目"
+      ]
+    },
+    "research_input_digest": "af7453a9b24cf875c932fd12e7bddd42067f9caa347e8164ecceb7e846d32e5f",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_6f8d5e5b8860c37996bbfc53"
+    ],
+    "observations": [
+      {
+        "case_id": "case:assisted-batch-travel-english",
+        "case_revision": 1,
+        "digest": "088ab41f314a2348ed9bdb8dd7df3588fef0a14e4c3440d439b7829c9b492184",
+        "evidence_id": "ev_assisted_travel_english_1",
+        "kind": "documentation",
+        "location": {
+          "content_digest": "2816927bab0f0e73cdfaafc97a315696a3913501702d8ec12c8c64916d2f5a3e",
+          "material_version": "3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee",
+          "url": "https://github.com/kantord/LibreLingo/blob/3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee/docs/courses/skill.md"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Skill文档说明课程Module下的Skill组织主题词句，并自动生成问题任务。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-batch-travel-english",
+        "case_revision": 1,
+        "digest": "7a042999e5c2db7af904f9eb65b9aef09b626db88da7ee592100391a9ebe07d1",
+        "evidence_id": "ev_assisted_travel_english_2",
+        "kind": "documentation",
+        "location": {
+          "content_digest": "2168caa17d293cf1aea2e3c072a3172a5d3e84864c442dbe73400eb541aff89e",
+          "material_version": "3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee",
+          "url": "https://github.com/kantord/LibreLingo/blob/3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee/docs/courses/challenge.md"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Challenge文档说明用户通过一系列问题任务学习，任务从Skill配置生成。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-batch-travel-english",
+        "case_revision": 1,
+        "digest": "62f9c2f6ed414f3e0aaf857c1f11cbbd82e87ca0e488e5d26e0b00ae87204bd6",
+        "evidence_id": "ev_assisted_travel_english_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "上游未运行",
+            "独立证据审阅pending",
+            "模板未开发真实应用，未经过教学人员审阅，未做学习效果或独立证据审阅",
+            "语音、听力、自由对话、真实语义评分、SRS和多用户后置",
+            "上游归档且历史仓库重定向，只参考固定版本；不作为当前推荐部署项目"
+          ],
+          "depends_on": [
+            "ev_assisted_travel_english_1",
+            "ev_assisted_travel_english_2"
+          ],
+          "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "目标采用原创三课固定课程、文本匹配即时反馈和SQLite进度/错题记录；课程文档不证明上游运行或本目标的掌握度判断。归一化匹配不是自由语义或教学效果评估。",
+        "reviews": []
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "英语三课的课程与顺序",
+          "文字作答反馈和防重复进度",
+          "错误重练与持久化"
+        ],
+        "case_id": "case:assisted-batch-travel-english",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_assisted_travel_english_1",
+          "ev_assisted_travel_english_2",
+          "ev_assisted_travel_english_design"
+        ],
+        "exclusions": [
+          "模板未开发真实应用，未经过教学人员审阅，未做学习效果或独立证据审阅",
+          "语音、听力、自由对话、真实语义评分、SRS和多用户后置",
+          "上游归档且历史仓库重定向，只参考固定版本；不作为当前推荐部署项目"
+        ],
+        "reason": "按固定三课练习必要英语短句，获得即时文字反馈，保存完成进度，并优先重练错误题。",
+        "scenario_id": "scn_6db4af782bc548e69e0f48072069ed72",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-21T04:19:04.157165+00:00",
+        "commit_sha": "3c4bcfb3ef999ae48ee3d361afb0c4a5fa317dee",
+        "excluded_paths": [
+          "Unselected source files; upstream not built or run"
+        ],
+        "file_manifest_digest": "9025fd9a2889c82f8f594bccd85c9a5461caef60e76170c2ecd12deaf43f8543",
+        "files": {
+          "LICENSE": "e9df4c4e4e64b8168a71c3c67668dcffabbe8fca11d4ac4a7d5482562cd1679c",
+          "README.md": "ad27c8fe3f3c748475607278837fdc040d178eb746948f445b708daa10c3d98b",
+          "docs/courses/challenge.md": "2168caa17d293cf1aea2e3c072a3172a5d3e84864c442dbe73400eb541aff89e",
+          "docs/courses/skill.md": "2816927bab0f0e73cdfaafc97a315696a3913501702d8ec12c8c64916d2f5a3e"
+        },
+        "license": {
+          "notice_hashes": {
+            "LICENSE": "e9df4c4e4e64b8168a71c3c67668dcffabbe8fca11d4ac4a7d5482562cd1679c"
+          },
+          "status": "located"
+        },
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_uncertainties": [
+          "Reference study only; no upstream code copied.",
+          "LibreLingo archived; course/media licenses distinct, no upstream lesson text copied."
+        ],
+        "repo_id": null,
+        "repository": "https://github.com/kantord/librelingo",
+        "snapshot_id": "src_6f8d5e5b8860c37996bbfc53",
+        "strategy_version": "assisted-core-source-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:5b81e5e31f4804c82254fdf2",
+    "case_id": "case:assisted-budget-actual",
+    "created_at": "2026-10-20T15:59:21.697238+00:00",
+    "created_task_id": "assisted-trial-budget-2026-10-21",
+    "digest": "36729c5ed3f35e8732580af41fa69c27e16eacaaa067f38b9e73bfc0eaff12f0",
+    "evidence_digest": "7ddd45a7e09e99ccfb2fae2a1e4d6cfec462974244988da0c00806a2ada8afe4",
+    "research": {
+      "input_digest": "7b4c280185115cff93007dc613e44a9d39093f1bd93878aee93d587fcbd35417",
+      "scope": "月度分类预算、支出汇总、改后重算；辅助试用设计参考",
+      "summary": "固定Actual Budget源码与文档，研究按月份/分类的金额聚合、整数小单位输入和重算设计；目标为极简个人预算而非复刻完整Actual。",
+      "task_id": "assisted-trial-budget-2026-10-21",
+      "unknowns": [
+        "上游未安装或运行",
+        "独立证据审阅pending",
+        "预计收入和无结转模板复制是目标设计，不宣称上游观察"
+      ]
+    },
+    "research_input_digest": "7b4c280185115cff93007dc613e44a9d39093f1bd93878aee93d587fcbd35417",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_ab535876e0819b358f422158"
+    ],
+    "observations": [
+      {
+        "case_id": "case:assisted-budget-actual",
+        "case_revision": 1,
+        "digest": "f3d1631cbfe78ed29f4d49cfcca2fad0b8f2a6dc06a5331aabc462b8e6c4525a",
+        "evidence_id": "ev_assisted_budget_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "本机单人",
+            "一种货币CNY",
+            "无银行联接",
+            "本轮不运行上游"
+          ],
+          "depends_on": [
+            "ev_assisted_budget_sum",
+            "ev_assisted_budget_minor",
+            "ev_assisted_budget_docs"
+          ],
+          "reasoning": "保留月度分类汇总与小单位金额思路，省略银行连接/账户同步，用SQLite事务支持手工记账与显式模板复制。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "本地单用户、人民币两位小数转整数分、预计收入、正数支出、无结转模板月度启动，是本场景的适配设计；不声称上游与本应用语义完全相同。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-budget-actual",
+        "case_revision": 1,
+        "digest": "ac2d7dc7f058062112c61f955ec397246a3be915a68fd170954a1048fa53ceb7",
+        "evidence_id": "ev_assisted_budget_docs",
+        "kind": "documentation",
+        "location": {
+          "content_digest": "4b9e45063e43ebd05be174b1e3e20697048bd3f364563fed667734c1cb64f3ab",
+          "material_version": "8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc",
+          "url": "https://github.com/actualbudget/actual/blob/8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc/packages/docs/docs/getting-started/starting-fresh.md"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "入门文档说明信封预算可在分类间移动可用资金，并介绍按月份分配预算及对照预算与实际支出。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-budget-actual",
+        "case_revision": 1,
+        "digest": "f1bbb51473c52af0b82e5707e911617604bbad12df83a9e5e3d69404baf1c859",
+        "evidence_id": "ev_assisted_budget_minor",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc",
+          "file_digest": "a640afc468dc8c4550c9c0ad781758b247492a76eccb49f1e0498dcbb76de919",
+          "line_end": 94,
+          "line_start": 77,
+          "path": "packages/cli/src/commands/budgets.ts"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "CLI set-amount显式要求month、category和以cents为单位的amount，通过parseIntFlag解析整数再调用setBudgetAmount。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-budget-actual",
+        "case_revision": 1,
+        "digest": "f623d075b73061d0f3e05d7f56eceb05e36bfe8f6e72b5e26e7925a4ccb7fada",
+        "evidence_id": "ev_assisted_budget_recompute",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc",
+          "file_digest": "0e55e0f309adb0cebb015ec92f56d95ebb385ce21093a8f32d3be0adc7e26f6e",
+          "line_end": 180,
+          "line_start": 157,
+          "path": "packages/loot-core/src/server/budget/base.ts"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "账户相关属性变化处理按月份枚举交易分类，并调用sheet.recompute重新计算sum-amount；这是上游重算机制的静态代码观察。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-budget-actual",
+        "case_revision": 1,
+        "digest": "74117ba0614265a463267e534fe3ca93135b4e7260ad6259a2615fde294be4bb",
+        "evidence_id": "ev_assisted_budget_sum",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc",
+          "file_digest": "0e55e0f309adb0cebb015ec92f56d95ebb385ce21093a8f32d3be0adc7e26f6e",
+          "line_end": 89,
+          "line_start": 62,
+          "path": "packages/loot-core/src/server/budget/base.ts"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "预算源码通过SQL按交易日期月份和分类GROUP BY聚合SUM(t.amount)，并以month-category键保存分类月度支出；该观察不说明本试用程序已运行。",
+        "reviews": []
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "月度/分类聚合",
+          "整数金额",
+          "修改后重算"
+        ],
+        "case_id": "case:assisted-budget-actual",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_assisted_budget_sum",
+          "ev_assisted_budget_minor",
+          "ev_assisted_budget_recompute",
+          "ev_assisted_budget_docs",
+          "ev_assisted_budget_design"
+        ],
+        "exclusions": [
+          "银行同步",
+          "多用户",
+          "上游运行认证"
+        ],
+        "reason": "支撑同一固定月度预算场景的分类/月度支出与金额设计",
+        "scenario_id": "scn_6fb4896d9eb0428aa1c080df0a137813",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-20T15:57:35.354951+00:00",
+        "commit_sha": "8fba0e87cf7a4cda6ab5ea8012477bd7051f6ebc",
+        "excluded_paths": [
+          "All unselected files; no build or upstream execution"
+        ],
+        "file_manifest_digest": "0e14adf12cc0c8a717d0484b652f467d496ea2de4bd849736b18b6cc8bbf8a3f",
+        "files": {
+          "LICENSE.txt": "71e4b3053e4622e1f5fc5d8aa5336350de32ead39247924c596d659b89b47b6f",
+          "packages/cli/src/commands/budgets.ts": "a640afc468dc8c4550c9c0ad781758b247492a76eccb49f1e0498dcbb76de919",
+          "packages/docs/docs/getting-started/starting-fresh.md": "4b9e45063e43ebd05be174b1e3e20697048bd3f364563fed667734c1cb64f3ab",
+          "packages/loot-core/src/server/budget/actions.ts": "5fa3915814c773ee998e6836e5fe7c5a562cad643b310a1ac74faad662ec3294",
+          "packages/loot-core/src/server/budget/base.ts": "0e55e0f309adb0cebb015ec92f56d95ebb385ce21093a8f32d3be0adc7e26f6e"
+        },
+        "license": {
+          "notice_hashes": {
+            "LICENSE.txt": "71e4b3053e4622e1f5fc5d8aa5336350de32ead39247924c596d659b89b47b6f"
+          },
+          "spdx": "MIT",
+          "status": "located"
+        },
+        "license_files": [
+          "LICENSE.txt"
+        ],
+        "license_uncertainties": [],
+        "repo_id": null,
+        "repository": "https://github.com/actualbudget/actual",
+        "snapshot_id": "src_ab535876e0819b358f422158",
+        "strategy_version": "assisted-core-source-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:bae0a5c0fe08d4edf051012d",
+    "case_id": "case:assisted-meetings-joplin",
+    "created_at": "2026-10-20T16:12:54.550967+00:00",
+    "created_task_id": "assisted-trial-meetings-2026-10-21",
+    "digest": "ee26f105c16c77a45ece47e7b6d111d7d6b63445b03384d19b8a042cf7453d73",
+    "evidence_digest": "29b4218414376132565353cd3ba05d9a133e6a6713c14c3baf7561c5567bc202",
+    "research": {
+      "input_digest": "3c58979e9f9fd1add4a9908f03a0d58821e1327df56c1431ba56fb5e7732a629",
+      "scope": "多项目会议结论的单一归属、正文保存、回查及可恢复生命周期",
+      "summary": "固定Joplin笔记/笔记本/搜索与API文档；目标仅借鉴容器、正文持久化与回查，场景置顶/归档为独立设计，不复制上游代码。",
+      "task_id": "assisted-trial-meetings-2026-10-21",
+      "unknowns": [
+        "上游未运行",
+        "证据独立审阅pending",
+        "未穷尽文件级许可证例外；不复制上游实现"
+      ]
+    },
+    "research_input_digest": "3c58979e9f9fd1add4a9908f03a0d58821e1327df56c1431ba56fb5e7732a629",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_c04c9a484f5374e5987dc547"
+    ],
+    "observations": [
+      {
+        "case_id": "case:assisted-meetings-joplin",
+        "case_revision": 1,
+        "digest": "c0e97ed5030b8e0a3d744a67fe83ad578008ba304516019fb0f38103572d9289",
+        "evidence_id": "ev_assisted_notes_container",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+          "file_digest": "ca2054cb4ffb1c0fc91d6c821bb46059cbe263bd7cd8499a5c63ab7b5fcbd48c",
+          "line_end": 85,
+          "line_start": 70,
+          "path": "packages/lib/models/Folder.ts"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Folder.notes查询按单一parent_id读取笔记；非includeDeleted时增加deleted_time=0条件，表明容器归属和软删除过滤是分开处理的。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-meetings-joplin",
+        "case_revision": 1,
+        "digest": "8fea65be2da6ee2b0f0ce988b2bb78859a72ae914f4f4e780200150cde1794e8",
+        "evidence_id": "ev_assisted_notes_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "单用户本机",
+            "只保存纯文本/Markdown原文，不执行HTML",
+            "无上游运行",
+            "无永久删除或到期自动清理"
+          ],
+          "depends_on": [
+            "ev_assisted_notes_container",
+            "ev_assisted_notes_move",
+            "ev_assisted_notes_search",
+            "ev_assisted_notes_docs"
+          ],
+          "reasoning": "沿用单一容器和正文可回查的思想，为多项目会议结论补充场景明确要求的置顶与归档状态；用全新Python/SQLite实现。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "本场景采用扁平项目/收件箱、独立pinned/archived标记、保留项目的回收站与包含归档的全库正文搜索；这些目标取舍不宣称为Joplin原生置顶/归档能力。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-meetings-joplin",
+        "case_revision": 1,
+        "digest": "43848803c42709483ebe6841b7fc961de9447d2cb7c8732d5cd808b1d8b9ca2f",
+        "evidence_id": "ev_assisted_notes_docs",
+        "kind": "documentation",
+        "location": {
+          "content_digest": "9506a39c77b454f95b74f297ff4a8c5178815ad6d835c71955256172609a4202",
+          "material_version": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+          "url": "https://github.com/laurent22/joplin/blob/cf57e5932584c0fbd894d8510f1a31a4d41f2251/readme/api/references/rest_api.md"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "REST API参考定义title、body和笔记本parent_id；说明改变parent_id可移动笔记，并提供search入口。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-meetings-joplin",
+        "case_revision": 1,
+        "digest": "66cdb455219d708524913665d1d9980dcfb6d7d7b77c7c5e49f1fb311534389b",
+        "evidence_id": "ev_assisted_notes_move",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+          "file_digest": "38ab2fd9ca041ba56f089fa399762e680fe18806a9fc2d731522bd83cf274d23",
+          "line_end": 331,
+          "line_start": 300,
+          "path": "packages/lib/models/Note.ts"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Note.move相关实现将目标parentId赋给output.parent_id后保存；归属是单一笔记本标识。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-meetings-joplin",
+        "case_revision": 1,
+        "digest": "f0c1219034b0baa281f3a24f9ed3146db117812086a202b047b2d84056b032b1",
+        "evidence_id": "ev_assisted_notes_search",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+          "file_digest": "38ab2fd9ca041ba56f089fa399762e680fe18806a9fc2d731522bd83cf274d23",
+          "line_end": 490,
+          "line_start": 452,
+          "path": "packages/lib/models/Note.ts"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Note搜索路径分别处理deleted_time、parent_id条件，并在titlePattern路径使用(title LIKE ? OR body LIKE ?)；这是静态源码观察，不等同于所有全库搜索实现。",
+        "reviews": []
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "单一项目笔记本",
+          "正文原文",
+          "查询与软删除过滤"
+        ],
+        "case_id": "case:assisted-meetings-joplin",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_assisted_notes_container",
+          "ev_assisted_notes_move",
+          "ev_assisted_notes_search",
+          "ev_assisted_notes_docs",
+          "ev_assisted_notes_design"
+        ],
+        "exclusions": [
+          "同步/协作",
+          "Joplin插件",
+          "上游运行认证",
+          "原生置顶/归档的无依据声明"
+        ],
+        "reason": "同一固定会议笔记场景的项目归属、正文编辑及历史检索依据",
+        "scenario_id": "scn_805c99ffe8da4532817592bb466a505e",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-20T16:12:04.995605+00:00",
+        "commit_sha": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+        "excluded_paths": [
+          "All unselected files; no build or upstream runtime"
+        ],
+        "file_manifest_digest": "fd9ff90c8274ad72559262d5574ffbe3a75fd17e35c76a78e94e7e1777b18cd9",
+        "files": {
+          "LICENSE": "f6b29267fe2c4251ed95cf9c846b47774a970c5960be9eb8a409f21ffd98425e",
+          "packages/lib/models/Folder.ts": "ca2054cb4ffb1c0fc91d6c821bb46059cbe263bd7cd8499a5c63ab7b5fcbd48c",
+          "packages/lib/models/Note.ts": "38ab2fd9ca041ba56f089fa399762e680fe18806a9fc2d731522bd83cf274d23",
+          "readme/api/references/rest_api.md": "9506a39c77b454f95b74f297ff4a8c5178815ad6d835c71955256172609a4202"
+        },
+        "license": {
+          "notice_hashes": {
+            "LICENSE": "f6b29267fe2c4251ed95cf9c846b47774a970c5960be9eb8a409f21ffd98425e"
+          },
+          "spdx": "AGPL-3.0-or-later (root LICENSE; listed exceptions not exhaustively audited)",
+          "status": "located"
+        },
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_uncertainties": [
+          "File-level exceptions not exhaustively audited; reference study only, no upstream code copied into application"
+        ],
+        "repo_id": null,
+        "repository": "https://github.com/laurent22/joplin",
+        "snapshot_id": "src_c04c9a484f5374e5987dc547",
+        "strategy_version": "assisted-core-source-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:bae0a5c0fe08d4edf051012d",
+    "case_id": "case:assisted-meetings-joplin",
+    "created_at": "2026-10-20T16:13:24.092970+00:00",
+    "created_task_id": "assisted-trial-meetings-2026-10-21-correction-r2",
+    "digest": "010aea528378355df4fbe4cb895a261c3ceb72e1d1e64655c685343630faf4be",
+    "evidence_digest": "279722d94e56e0f2e42d29c8a54d4c2e4531fdae5fa02188cabde2261190b215",
+    "research": {
+      "input_digest": "3c58979e9f9fd1add4a9908f03a0d58821e1327df56c1431ba56fb5e7732a629",
+      "scope": "多项目会议结论的单一归属、正文保存、回查及可恢复生命周期",
+      "summary": "固定Joplin笔记/笔记本/搜索与API文档；目标仅借鉴容器、正文持久化与回查，场景置顶/归档为独立设计，不复制上游代码。",
+      "task_id": "assisted-trial-meetings-2026-10-21-correction-r2",
+      "unknowns": [
+        "上游未运行",
+        "证据独立审阅pending",
+        "未穷尽文件级许可证例外；不复制上游实现",
+        "r1误把Note.new定位称为move，误将anywherePattern称titlePattern；本r2纠正描述，保留r1原记录；未开展独立审阅。"
+      ]
+    },
+    "research_input_digest": "3c58979e9f9fd1add4a9908f03a0d58821e1327df56c1431ba56fb5e7732a629",
+    "revision": 2,
+    "snapshot_ids": [
+      "src_c04c9a484f5374e5987dc547"
+    ],
+    "observations": [
+      {
+        "case_id": "case:assisted-meetings-joplin",
+        "case_revision": 2,
+        "digest": "bf100eea62cf8388c9aff36842e2dd052e235ebe831f5af74ddc7a767115a466",
+        "evidence_id": "ev_assisted_notes_container",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+          "file_digest": "ca2054cb4ffb1c0fc91d6c821bb46059cbe263bd7cd8499a5c63ab7b5fcbd48c",
+          "line_end": 85,
+          "line_start": 70,
+          "path": "packages/lib/models/Folder.ts"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Folder.notes查询按单一parent_id读取笔记；非includeDeleted时增加deleted_time=0条件，表明容器归属和软删除过滤是分开处理的。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-meetings-joplin",
+        "case_revision": 2,
+        "digest": "93845300cc18e2beb9332168a2106fff4bd8d2fa640771c7aa137c57c7dee6fc",
+        "evidence_id": "ev_assisted_notes_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "单用户本机",
+            "只保存纯文本/Markdown原文，不执行HTML",
+            "无上游运行",
+            "无永久删除或到期自动清理"
+          ],
+          "depends_on": [
+            "ev_assisted_notes_container",
+            "ev_assisted_notes_move",
+            "ev_assisted_notes_search",
+            "ev_assisted_notes_docs"
+          ],
+          "reasoning": "沿用单一容器和正文可回查的思想，为多项目会议结论补充场景明确要求的置顶与归档状态；用全新Python/SQLite实现。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "本场景采用扁平项目/收件箱、独立pinned/archived标记、保留项目的回收站与包含归档的全库正文搜索；这些目标取舍不宣称为Joplin原生置顶/归档能力。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-meetings-joplin",
+        "case_revision": 2,
+        "digest": "6291eee650742524fc399cdc6548ec99f7139e0ab315f301302390721d0ca11d",
+        "evidence_id": "ev_assisted_notes_docs",
+        "kind": "documentation",
+        "location": {
+          "content_digest": "9506a39c77b454f95b74f297ff4a8c5178815ad6d835c71955256172609a4202",
+          "material_version": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+          "url": "https://github.com/laurent22/joplin/blob/cf57e5932584c0fbd894d8510f1a31a4d41f2251/readme/api/references/rest_api.md"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "REST API参考定义title、body和笔记本parent_id；说明改变parent_id可移动笔记，并提供search入口。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-meetings-joplin",
+        "case_revision": 2,
+        "digest": "c2f6ad7b66113ffb42cf7f9058b4296c1ce4411305e42e92f702f2fce58f058f",
+        "evidence_id": "ev_assisted_notes_move",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+          "file_digest": "38ab2fd9ca041ba56f089fa399762e680fe18806a9fc2d731522bd83cf274d23",
+          "line_end": 331,
+          "line_start": 300,
+          "path": "packages/lib/models/Note.ts"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Note.new(parentId)将parentId写入新笔记的output.parent_id，确认新笔记的单一容器标识；该段不是移动实现，移动语义依据单独REST文档。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-meetings-joplin",
+        "case_revision": 2,
+        "digest": "fa10a37860e7dc5c6a9a8f275cb422f4888e6be20876306ffd95325f661fbe41",
+        "evidence_id": "ev_assisted_notes_search",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+          "file_digest": "38ab2fd9ca041ba56f089fa399762e680fe18806a9fc2d731522bd83cf274d23",
+          "line_end": 490,
+          "line_start": 452,
+          "path": "packages/lib/models/Note.ts"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Note搜索路径分别处理deleted_time、parent_id条件，并在anywherePattern路径使用(title LIKE ? OR body LIKE ?)；只作该分支静态观察，不泛指全部搜索实现。",
+        "reviews": []
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "单一项目笔记本",
+          "正文原文",
+          "查询与软删除过滤"
+        ],
+        "case_id": "case:assisted-meetings-joplin",
+        "case_revision": 2,
+        "evidence_ids": [
+          "ev_assisted_notes_container",
+          "ev_assisted_notes_move",
+          "ev_assisted_notes_search",
+          "ev_assisted_notes_docs",
+          "ev_assisted_notes_design"
+        ],
+        "exclusions": [
+          "同步/协作",
+          "Joplin插件",
+          "上游运行认证",
+          "原生置顶/归档的无依据声明"
+        ],
+        "reason": "同一固定会议笔记场景的项目归属、正文编辑及历史检索依据",
+        "scenario_id": "scn_805c99ffe8da4532817592bb466a505e",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-20T16:12:04.995605+00:00",
+        "commit_sha": "cf57e5932584c0fbd894d8510f1a31a4d41f2251",
+        "excluded_paths": [
+          "All unselected files; no build or upstream runtime"
+        ],
+        "file_manifest_digest": "fd9ff90c8274ad72559262d5574ffbe3a75fd17e35c76a78e94e7e1777b18cd9",
+        "files": {
+          "LICENSE": "f6b29267fe2c4251ed95cf9c846b47774a970c5960be9eb8a409f21ffd98425e",
+          "packages/lib/models/Folder.ts": "ca2054cb4ffb1c0fc91d6c821bb46059cbe263bd7cd8499a5c63ab7b5fcbd48c",
+          "packages/lib/models/Note.ts": "38ab2fd9ca041ba56f089fa399762e680fe18806a9fc2d731522bd83cf274d23",
+          "readme/api/references/rest_api.md": "9506a39c77b454f95b74f297ff4a8c5178815ad6d835c71955256172609a4202"
+        },
+        "license": {
+          "notice_hashes": {
+            "LICENSE": "f6b29267fe2c4251ed95cf9c846b47774a970c5960be9eb8a409f21ffd98425e"
+          },
+          "spdx": "AGPL-3.0-or-later (root LICENSE; listed exceptions not exhaustively audited)",
+          "status": "located"
+        },
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_uncertainties": [
+          "File-level exceptions not exhaustively audited; reference study only, no upstream code copied into application"
+        ],
+        "repo_id": null,
+        "repository": "https://github.com/laurent22/joplin",
+        "snapshot_id": "src_c04c9a484f5374e5987dc547",
+        "strategy_version": "assisted-core-source-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:71cc94c056860080b284a16a",
+    "case_id": "case:assisted-ten-2026-10-21:day-blocks",
+    "created_at": "2026-10-21T05:39:09.562865+00:00",
+    "created_task_id": "assisted-ten-2026-10-21-day-blocks",
+    "digest": "3316f087c1f49c58978993251fb001cf8fc8786d81214d6e4a3f92cdcf4c98a7",
+    "evidence_digest": "9da17f76f79648b1486dabe1e72450ceae81c18f5ead1072fa306fc12f656c93",
+    "research": {
+      "input_digest": "ebe2bc20fdcf3edf61cc50394793a890dc82a17943708be66d37d6f3f3e4a6d3",
+      "scope": "把待办安排到一天的时间块，避免重叠，结束时把未完成块顺延到明天待安排区而保留来源。",
+      "summary": "Codex静态研究；目标把计划时间与实际工时分开，只实现当日排程、完成与未完成迁移；不从现有工时模板换名字复用。",
+      "task_id": "assisted-ten-2026-10-21-day-blocks",
+      "unknowns": [
+        "upstream not_run",
+        "independent review pending",
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "不接外部日历、通知、自动番茄钟或真实工时统计；顺延日如需补录先列待办，不静默绕过封存。"
+      ]
+    },
+    "research_input_digest": "ebe2bc20fdcf3edf61cc50394793a890dc82a17943708be66d37d6f3f3e4a6d3",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_bc378675f974c9549bf9bdd0"
+    ],
+    "observations": [
+      {
+        "case_id": "case:assisted-ten-2026-10-21:day-blocks",
+        "case_revision": 1,
+        "digest": "e7c034d82a2038655610f12a99dc9b61b4ccf6675cb84629b71b8629569e95ff",
+        "evidence_id": "ev_assisted_day_blocks_1",
+        "kind": "documentation",
+        "location": {
+          "content_digest": "f15b319ab8de76ca8e9ce5d1b72cc2334e0cab1cb3515da7048f0ba6e8f9ad1e",
+          "material_version": "0556bdb84d09faeff18d6c18abf867e28f3c1f69",
+          "url": "https://github.com/super-productivity/super-productivity/blob/0556bdb84d09faeff18d6c18abf867e28f3c1f69/README.md"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "README声明任务分类、planner/schedule时间轴、timeboxing、time tracking及focus能力；文档声明未代替上游运行。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:day-blocks",
+        "case_revision": 1,
+        "digest": "c467417e92266e5899e9ca31abcdaf4d88ed57401e873e987b5e29bd978e6ce0",
+        "evidence_id": "ev_assisted_day_blocks_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "上游未运行",
+            "独立证据审阅pending",
+            "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+            "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+            "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+            "不接外部日历、通知、自动番茄钟或真实工时统计；顺延日如需补录先列待办，不静默绕过封存。"
+          ],
+          "depends_on": [
+            "ev_assisted_day_blocks_1"
+          ],
+          "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "目标把计划时间与实际工时分开，只实现当日排程、完成与未完成迁移；不从现有工时模板换名字复用。",
+        "reviews": []
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "时间块与日程排序",
+          "完成状态及重叠检测",
+          "可幂等顺延与重新排期",
+          "真实重启持久化"
+        ],
+        "case_id": "case:assisted-ten-2026-10-21:day-blocks",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_assisted_day_blocks_1",
+          "ev_assisted_day_blocks_design"
+        ],
+        "exclusions": [
+          "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+          "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+          "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+          "不接外部日历、通知、自动番茄钟或真实工时统计；顺延日如需补录先列待办，不静默绕过封存。"
+        ],
+        "reason": "把待办安排到一天的时间块，避免重叠，结束时把未完成块顺延到明天待安排区而保留来源。",
+        "scenario_id": "scn_3b74c4ea6d2345988d877e975eb0a5fa",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-21T05:26:13.491418+00:00",
+        "commit_sha": "0556bdb84d09faeff18d6c18abf867e28f3c1f69",
+        "excluded_paths": [
+          "Unselected files; upstream not installed or run"
+        ],
+        "file_manifest_digest": "4c246c64aacd7fabd34821ed85a9e029fcfd93f6478dbb17ff4aac47d77feb90",
+        "files": {
+          "LICENSE": "2e279de19632b5694d24b0ac06fd5b837ec487bf821302d9ce195379850a5fcb",
+          "README.md": "f15b319ab8de76ca8e9ce5d1b72cc2334e0cab1cb3515da7048f0ba6e8f9ad1e"
+        },
+        "license": {
+          "notice_hashes": {
+            "LICENSE": "2e279de19632b5694d24b0ac06fd5b837ec487bf821302d9ce195379850a5fcb"
+          },
+          "status": "located"
+        },
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_uncertainties": [
+          "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+        ],
+        "repo_id": null,
+        "repository": "https://github.com/super-productivity/super-productivity",
+        "snapshot_id": "src_bc378675f974c9549bf9bdd0",
+        "strategy_version": "assisted-core-source-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:4b8e9c24aecc020c7bfbfcf6",
+    "case_id": "case:assisted-ten-2026-10-21:dinner-poll",
+    "created_at": "2026-10-21T05:32:18.432373+00:00",
+    "created_task_id": "assisted-ten-2026-10-21-dinner-poll",
+    "digest": "72bcf1ef0fc6a48d824c9978ea8a39a864d70650d63c804b1553835ebd41e617",
+    "evidence_digest": "a3c7a3b6514c3ccb0c8b99b61e39342a272f87e6ebc98bf5ab0a5ea56846072e",
+    "research": {
+      "input_digest": "1a88946ca1cfff58b3d6ad423897b9874d96ded108d7ad6d68606d250d2dd3fb",
+      "scope": "为聚餐问题预设地点选项，成员用代号单选并可改票，查看汇总，在结束后冻结投票，必要时重开。",
+      "summary": "Codex静态研究；目标不嵌入Nextcloud，也不复制其身份体系。使用本机共享界面、代号casefold去重、单选替换、显式open/closed状态；代号不是身份认证，不能用于正式选举。",
+      "task_id": "assisted-ten-2026-10-21-dinner-poll",
+      "unknowns": [
+        "upstream not_run",
+        "independent review pending",
+        "Codex静态研究和编写，证据独审pending；上游未安装运行",
+        "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+        "本机同屏、代号非身份认证；不做远程分享、权限隔离、防恶意刷票或正式选举用途"
+      ]
+    },
+    "research_input_digest": "1a88946ca1cfff58b3d6ad423897b9874d96ded108d7ad6d68606d250d2dd3fb",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_7f2d22d8b4525255daf122b7"
+    ],
+    "observations": [
+      {
+        "case_id": "case:assisted-ten-2026-10-21:dinner-poll",
+        "case_revision": 1,
+        "digest": "f5aa88a4af6b2d9867d2941f4e1bb28a7d1f27a7094b2c1e895cee45d2e42033",
+        "evidence_id": "ev_assisted_dinner_poll_1",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "65bf4627ee9a76c52034e796eda75ae5112ad7c3",
+          "file_digest": "a3ef55c4aaca50db866199e8f1599a02d9fc4c742557f6f24d9237fc16d83789",
+          "line_end": 52,
+          "line_start": 34,
+          "path": "lib/Db/Vote.php"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Vote实体包含pollId、userId、voteOptionId与voteAnswer，定义yes/no/maybe；目标采用单选，与上游多选偏好语义不同。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:dinner-poll",
+        "case_revision": 1,
+        "digest": "e3c4243a6cd41aacabc0de603502e2ba9cbfa0f7440c78c72794180328a7fcd8",
+        "evidence_id": "ev_assisted_dinner_poll_2",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "65bf4627ee9a76c52034e796eda75ae5112ad7c3",
+          "file_digest": "74c337abb5d6c689e46a075006d6d1cdf9f6e68308554a43cead76a89a20ca63",
+          "line_end": 101,
+          "line_start": 86,
+          "path": "lib/Db/Poll.php"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Poll声明datePoll与textPoll、private/open访问以及always/closed/never结果可见策略；目标采用文字选项与显式关闭。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:dinner-poll",
+        "case_revision": 1,
+        "digest": "84c7dd689410380f7c310d6ac6b20157ad3dfe2d9d150e2e3d7cb6edde4bef5a",
+        "evidence_id": "ev_assisted_dinner_poll_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "上游未运行",
+            "独立证据审阅pending",
+            "Codex静态研究和编写，证据独审pending；上游未安装运行",
+            "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+            "本机同屏、代号非身份认证；不做远程分享、权限隔离、防恶意刷票或正式选举用途"
+          ],
+          "depends_on": [
+            "ev_assisted_dinner_poll_1",
+            "ev_assisted_dinner_poll_2"
+          ],
+          "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "目标不嵌入Nextcloud，也不复制其身份体系。使用本机共享界面、代号casefold去重、单选替换、显式open/closed状态；代号不是身份认证，不能用于正式选举。",
+        "reviews": []
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "问题与固定地点选项、投票隔离",
+          "单选改票与准确汇总",
+          "结束与重开、非法输入保护",
+          "刷新与真实重启持久化"
+        ],
+        "case_id": "case:assisted-ten-2026-10-21:dinner-poll",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_assisted_dinner_poll_1",
+          "ev_assisted_dinner_poll_2",
+          "ev_assisted_dinner_poll_design"
+        ],
+        "exclusions": [
+          "Codex静态研究和编写，证据独审pending；上游未安装运行",
+          "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+          "本机同屏、代号非身份认证；不做远程分享、权限隔离、防恶意刷票或正式选举用途"
+        ],
+        "reason": "为聚餐问题预设地点选项，成员用代号单选并可改票，查看汇总，在结束后冻结投票，必要时重开。",
+        "scenario_id": "scn_0da5ffd0b2124edf8183c82506cb2c61",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-21T05:26:06.139132+00:00",
+        "commit_sha": "65bf4627ee9a76c52034e796eda75ae5112ad7c3",
+        "excluded_paths": [
+          "Unselected files; upstream not installed or run"
+        ],
+        "file_manifest_digest": "e2a0b173de715d13276f1537bff43dda4d1a64e53212b0c727566dc2f3ea98df",
+        "files": {
+          "COPYING": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6",
+          "README.md": "642b407c3daea9f4377768d5505db05f7e060247b68c7b74b00568049795d2ed",
+          "lib/Db/Poll.php": "74c337abb5d6c689e46a075006d6d1cdf9f6e68308554a43cead76a89a20ca63",
+          "lib/Db/Vote.php": "a3ef55c4aaca50db866199e8f1599a02d9fc4c742557f6f24d9237fc16d83789"
+        },
+        "license": {
+          "notice_hashes": {
+            "COPYING": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6"
+          },
+          "status": "located"
+        },
+        "license_files": [
+          "COPYING"
+        ],
+        "license_uncertainties": [
+          "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+        ],
+        "repo_id": null,
+        "repository": "https://github.com/nextcloud/polls",
+        "snapshot_id": "src_7f2d22d8b4525255daf122b7",
+        "strategy_version": "assisted-core-source-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:6386c9e2356b0a6d97f84b55",
+    "case_id": "case:assisted-ten-2026-10-21:folder-tidy",
+    "created_at": "2026-10-21T05:38:19.799893+00:00",
+    "created_task_id": "assisted-ten-2026-10-21-folder-tidy",
+    "digest": "2d1c5047e6ffc986bc704c6dc1ba0ee664263d143024a56f9fb4839618ca22db",
+    "evidence_digest": "c50e6918cdbe27907a82b127ac0f3b6f2cbec48e39a2e1f7ecd5d90b020531a3",
+    "research": {
+      "input_digest": "1191e649d5db1526e635b91a0fecf7ffda4840dfd0b13bb4632f2ba6cdb3cde5",
+      "scope": "浏览独立沙箱文件，先预览重命名及子目录移动，再确认执行；禁止覆盖、越界和跟随符号链接。",
+      "summary": "Codex静态研究；目标不开放任意用户目录，要求显式--sandbox-root，仅新建测试沙箱；预览token绑定源字节和目录身份，操作只支持单文件且拒绝覆盖和全部符号链接。宿主共享记录不是对实现安全认证。",
+      "task_id": "assisted-ten-2026-10-21-folder-tidy",
+      "unknowns": [
+        "upstream not_run",
+        "independent review pending",
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "安全敏感模板尚未应用运行或专项安全审阅，不建议直接操作珍贵原文件；TOCTOU/平台文件系统差异需后续实测。",
+        "不做删除、批量规则、外盘跨FS、压缩/上传、目录树移动或权限修改。"
+      ]
+    },
+    "research_input_digest": "1191e649d5db1526e635b91a0fecf7ffda4840dfd0b13bb4632f2ba6cdb3cde5",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_48067b2468e423063e5a70d8"
+    ],
+    "observations": [
+      {
+        "case_id": "case:assisted-ten-2026-10-21:folder-tidy",
+        "case_revision": 1,
+        "digest": "564d1c6891670549df284bc85303944867a03eccbed39959988b4c7a6c448b88",
+        "evidence_id": "ev_assisted_folder_tidy_1",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "833d908884d5c801f30f5c098d7977177eb3a36b",
+          "file_digest": "65ff439e1c4fd2367232a7ba8a3d7cae08499525a5c33422df086422ef5294f8",
+          "line_end": 26,
+          "line_start": 14,
+          "path": "files/scoped.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "ScopedFs说明在BasePathFs之上为可访问磁盘的操作增加范围检查，防止符号链接逃逸。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:folder-tidy",
+        "case_revision": 1,
+        "digest": "e369ff9897f8b45ff23c9756e86a6dc074286f46ae813e21496a8c093a5b79fe",
+        "evidence_id": "ev_assisted_folder_tidy_2",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "833d908884d5c801f30f5c098d7977177eb3a36b",
+          "file_digest": "65ff439e1c4fd2367232a7ba8a3d7cae08499525a5c33422df086422ef5294f8",
+          "line_end": 103,
+          "line_start": 73,
+          "path": "files/scoped.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "guard调用within，而within对root和目标使用EvalSymlinks后校验范围。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:folder-tidy",
+        "case_revision": 1,
+        "digest": "f8e58bce4d34acedb512a253f94959ba537791d5f8f022d3443fb72505ee2c2f",
+        "evidence_id": "ev_assisted_folder_tidy_3",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "833d908884d5c801f30f5c098d7977177eb3a36b",
+          "file_digest": "65ff439e1c4fd2367232a7ba8a3d7cae08499525a5c33422df086422ef5294f8",
+          "line_end": 216,
+          "line_start": 208,
+          "path": "files/scoped.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Rename分别检查旧、新路径后再委托底层Rename；目标预览及拒绝覆盖另行设计。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:folder-tidy",
+        "case_revision": 1,
+        "digest": "9c129c0de37d49ad2d092317e2e4db8d31f432aa351ccaa10f92d4432191f135",
+        "evidence_id": "ev_assisted_folder_tidy_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "上游未运行",
+            "独立证据审阅pending",
+            "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+            "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+            "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+            "安全敏感模板尚未应用运行或专项安全审阅，不建议直接操作珍贵原文件；TOCTOU/平台文件系统差异需后续实测。",
+            "不做删除、批量规则、外盘跨FS、压缩/上传、目录树移动或权限修改。"
+          ],
+          "depends_on": [
+            "ev_assisted_folder_tidy_1",
+            "ev_assisted_folder_tidy_2",
+            "ev_assisted_folder_tidy_3"
+          ],
+          "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "目标不开放任意用户目录，要求显式--sandbox-root，仅新建测试沙箱；预览token绑定源字节和目录身份，操作只支持单文件且拒绝覆盖和全部符号链接。宿主共享记录不是对实现安全认证。",
+        "reviews": []
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "真实沙箱目录浏览",
+          "预览后单文件重命名/移动",
+          "范围、覆盖与过期预览保护",
+          "真实重启与文件内容保留"
+        ],
+        "case_id": "case:assisted-ten-2026-10-21:folder-tidy",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_assisted_folder_tidy_1",
+          "ev_assisted_folder_tidy_2",
+          "ev_assisted_folder_tidy_3",
+          "ev_assisted_folder_tidy_design"
+        ],
+        "exclusions": [
+          "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+          "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+          "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+          "安全敏感模板尚未应用运行或专项安全审阅，不建议直接操作珍贵原文件；TOCTOU/平台文件系统差异需后续实测。",
+          "不做删除、批量规则、外盘跨FS、压缩/上传、目录树移动或权限修改。"
+        ],
+        "reason": "浏览独立沙箱文件，先预览重命名及子目录移动，再确认执行；禁止覆盖、越界和跟随符号链接。",
+        "scenario_id": "scn_639d6d74b2914439867875295f4ab528",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-21T05:26:17.536964+00:00",
+        "commit_sha": "833d908884d5c801f30f5c098d7977177eb3a36b",
+        "excluded_paths": [
+          "Unselected files; upstream not installed or run"
+        ],
+        "file_manifest_digest": "870a8ee224fe8a852690f1d5bb0c9c4ec31a47b2efef0d6bb23cf1f17083664e",
+        "files": {
+          "LICENSE": "4a1946819f24b20b3144360151a4dc1ed1b8e407bfb11045a74884abd6816100",
+          "README.md": "6966247bf87f43e6eeda87f0f4f9539897a37e8108aec84e9c7608601afd7d59",
+          "files/scoped.go": "65ff439e1c4fd2367232a7ba8a3d7cae08499525a5c33422df086422ef5294f8"
+        },
+        "license": {
+          "notice_hashes": {
+            "LICENSE": "4a1946819f24b20b3144360151a4dc1ed1b8e407bfb11045a74884abd6816100"
+          },
+          "status": "located"
+        },
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_uncertainties": [
+          "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+        ],
+        "repo_id": null,
+        "repository": "https://github.com/filebrowser/filebrowser",
+        "snapshot_id": "src_48067b2468e423063e5a70d8",
+        "strategy_version": "assisted-core-source-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:335c710a6586f0510ec1e1ea",
+    "case_id": "case:assisted-ten-2026-10-21:meal-plan",
+    "created_at": "2026-10-21T05:32:18.002028+00:00",
+    "created_task_id": "assisted-ten-2026-10-21-meal-plan",
+    "digest": "1e0c3fe9570b552c9a1420f9a40debf2f728ab76aa6103ba0cbb65977fed12aa",
+    "evidence_digest": "3e99b715d2af5aa0ae81c923b630dc36ca775c6c2e731adef87116580fc057e3",
+    "research": {
+      "input_digest": "b92295936ca368bfd06e719883794c919022493b86337e75b4d03284058ab7ff",
+      "scope": "把菜谱安排到一周晚餐，按用餐份数自动合并同名同单位食材，修改计划后采购量立即重算。",
+      "summary": "Codex静态研究；目标缩小为晚餐、单人本机、不可变菜谱和可暂停计划；用整数百分之一数量按份数缩放后合并同名同单位，不自动换算单位/营养或调用食谱抓取。",
+      "task_id": "assisted-ten-2026-10-21-meal-plan",
+      "unknowns": [
+        "upstream not_run",
+        "independent review pending",
+        "Codex静态研究和编写，证据独审pending；上游未安装运行",
+        "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+        "仅晚餐/7天窗口；菜谱不可变，无营养建议、单位自动换算、附件、抓取、同步或采购下单"
+      ]
+    },
+    "research_input_digest": "b92295936ca368bfd06e719883794c919022493b86337e75b4d03284058ab7ff",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_e2ea88785b459386c62f3f9d"
+    ],
+    "observations": [
+      {
+        "case_id": "case:assisted-ten-2026-10-21:meal-plan",
+        "case_revision": 1,
+        "digest": "c86fafaf56a3eee012fed3fc50a9263fd660f9f44f3b990a93090f273643a028",
+        "evidence_id": "ev_assisted_meal_plan_1",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "9b66aa319d32ea5dbdf112fe6bcda60015702721",
+          "file_digest": "fcad61134734da7c09efc67be35db1578a2525909416a5746f03782a9b64aaba",
+          "line_end": 75,
+          "line_start": 55,
+          "path": "mealie/db/models/household/mealplan.py"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "GroupMealPlan定义date、entry_type、recipe_id与recipe_scale，把日期餐次与菜谱及倍率连接。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:meal-plan",
+        "case_revision": 1,
+        "digest": "f853fccd205b1f44c7632736f3bee4cd1ead797363ff6695137f99826809c20d",
+        "evidence_id": "ev_assisted_meal_plan_2",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "9b66aa319d32ea5dbdf112fe6bcda60015702721",
+          "file_digest": "759e9f2ad5d118e3031884f9222d301cd1c93f552e2be39caf60cfebeb3f25b7",
+          "line_end": 44,
+          "line_start": 26,
+          "path": "mealie/db/models/household/shopping_list.py"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "ShoppingListItemRecipeReference记录recipe_id、recipe_quantity、recipe_scale；这里只观察购物项的菜谱引用，不据此宣称已运行完整合并算法。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:meal-plan",
+        "case_revision": 1,
+        "digest": "f6e86b23f6cbf5b53f0de712561495f50248156ae49694eb0a56e9c0bb8763c5",
+        "evidence_id": "ev_assisted_meal_plan_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "上游未运行",
+            "独立证据审阅pending",
+            "Codex静态研究和编写，证据独审pending；上游未安装运行",
+            "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+            "仅晚餐/7天窗口；菜谱不可变，无营养建议、单位自动换算、附件、抓取、同步或采购下单"
+          ],
+          "depends_on": [
+            "ev_assisted_meal_plan_1",
+            "ev_assisted_meal_plan_2"
+          ],
+          "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "目标缩小为晚餐、单人本机、不可变菜谱和可暂停计划；用整数百分之一数量按份数缩放后合并同名同单位，不自动换算单位/营养或调用食谱抓取。",
+        "reviews": []
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "菜谱与日期晚餐计划",
+          "按人数合并采购清单及修改重算",
+          "暂停恢复、错误零写入与周范围隔离",
+          "刷新与真实重启持久化"
+        ],
+        "case_id": "case:assisted-ten-2026-10-21:meal-plan",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_assisted_meal_plan_1",
+          "ev_assisted_meal_plan_2",
+          "ev_assisted_meal_plan_design"
+        ],
+        "exclusions": [
+          "Codex静态研究和编写，证据独审pending；上游未安装运行",
+          "只供本机辅助试用，非严格G1/T08；不改旧应用或数据",
+          "仅晚餐/7天窗口；菜谱不可变，无营养建议、单位自动换算、附件、抓取、同步或采购下单"
+        ],
+        "reason": "把菜谱安排到一周晚餐，按用餐份数自动合并同名同单位食材，修改计划后采购量立即重算。",
+        "scenario_id": "scn_860a53784e704b9687ddef39f51be5aa",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-21T05:26:06.510043+00:00",
+        "commit_sha": "9b66aa319d32ea5dbdf112fe6bcda60015702721",
+        "excluded_paths": [
+          "Unselected files; upstream not installed or run"
+        ],
+        "file_manifest_digest": "cceabb25f0d1fecc774901842dc0bccc80b3612986f1cbdb0d6e6dbea2b659fb",
+        "files": {
+          "LICENSE": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+          "README.md": "7a87d6463aba4d2050b89eb4e069b18e5b25ba268372234edbd8d6e8b34650fc",
+          "mealie/db/models/household/mealplan.py": "fcad61134734da7c09efc67be35db1578a2525909416a5746f03782a9b64aaba",
+          "mealie/db/models/household/shopping_list.py": "759e9f2ad5d118e3031884f9222d301cd1c93f552e2be39caf60cfebeb3f25b7"
+        },
+        "license": {
+          "notice_hashes": {
+            "LICENSE": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+          },
+          "status": "located"
+        },
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_uncertainties": [
+          "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+        ],
+        "repo_id": null,
+        "repository": "https://github.com/mealie-recipes/mealie",
+        "snapshot_id": "src_e2ea88785b459386c62f3f9d",
+        "strategy_version": "assisted-core-source-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:b849c6271cda1ccfbd219ce1",
+    "case_id": "case:assisted-ten-2026-10-21:process-sketch",
+    "created_at": "2026-10-21T05:38:19.439346+00:00",
+    "created_task_id": "assisted-ten-2026-10-21-process-sketch",
+    "digest": "92c1e5c0bc54c333ff546b951a5a544d9b77117c743489bb8c8a51cbd69ec9fe",
+    "evidence_digest": "f9d91eb47442860b57117d3700808ddd8395990ff05d2b85d5368eb876202f34",
+    "research": {
+      "input_digest": "534a5592018783f4f06632d397ff16fae0b4f6913ed2935cf454a16f8b6418c7",
+      "scope": "用开始、处理、判断和结束节点画出小流程，连接步骤并移动节点时保持连接，保存后回看。",
+      "summary": "Codex静态研究；目标以SVG渲染少量流程节点，边持有节点ID，几何改变时派生中心端点；不复制mxGraph或提供完整BPMN。",
+      "task_id": "assisted-ten-2026-10-21-process-sketch",
+      "unknowns": [
+        "upstream not_run",
+        "independent review pending",
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "无图形智能布局、BPMN验证、协作、图片/PDF导出或工作流执行。"
+      ]
+    },
+    "research_input_digest": "534a5592018783f4f06632d397ff16fae0b4f6913ed2935cf454a16f8b6418c7",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_37364edca354eae4cffbff85"
+    ],
+    "observations": [
+      {
+        "case_id": "case:assisted-ten-2026-10-21:process-sketch",
+        "case_revision": 1,
+        "digest": "50a698f40f49929df2259fb113317d030e2f21bae307cc4ad5e3fb9c301eb2de",
+        "evidence_id": "ev_assisted_process_sketch_1",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "17b367b91dbab91804f852645788d7ffb46dcb79",
+          "file_digest": "a0b99a4a7e1d5abf3317b365720441ff6eb20e4e296ad5b1acbfb8480e927598",
+          "line_end": 33,
+          "line_start": 6,
+          "path": "src/main/webapp/mxgraph/src/model/mxGeometry.js"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "mxGeometry区分顶点x/y宽高和边的端点/控制点，并说明连接状态与移动时控制点行为。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:process-sketch",
+        "case_revision": 1,
+        "digest": "b8ad301ef585c86ebcba6049df3f9fdf908a3fa47e6f43288aeb854ed9f17ff1",
+        "evidence_id": "ev_assisted_process_sketch_2",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "17b367b91dbab91804f852645788d7ffb46dcb79",
+          "file_digest": "a0b99a4a7e1d5abf3317b365720441ff6eb20e4e296ad5b1acbfb8480e927598",
+          "line_end": 322,
+          "line_start": 285,
+          "path": "src/main/webapp/mxgraph/src/model/mxGeometry.js"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "translate对顶点位置及可用的sourcePoint/targetPoint平移；目标节点ID绑定的重算方式仍为独立设计。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:process-sketch",
+        "case_revision": 1,
+        "digest": "275ec85974e327afb30e462057c65cc65c0de6c741c9b3ae8e0d392a2d192861",
+        "evidence_id": "ev_assisted_process_sketch_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "上游未运行",
+            "独立证据审阅pending",
+            "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+            "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+            "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+            "无图形智能布局、BPMN验证、协作、图片/PDF导出或工作流执行。"
+          ],
+          "depends_on": [
+            "ev_assisted_process_sketch_1",
+            "ev_assisted_process_sketch_2"
+          ],
+          "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "目标以SVG渲染少量流程节点，边持有节点ID，几何改变时派生中心端点；不复制mxGraph或提供完整BPMN。",
+        "reviews": []
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "带类型的流程节点",
+          "连接与移动保持",
+          "非法连接及结构导出",
+          "真实重启持久化"
+        ],
+        "case_id": "case:assisted-ten-2026-10-21:process-sketch",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_assisted_process_sketch_1",
+          "ev_assisted_process_sketch_2",
+          "ev_assisted_process_sketch_design"
+        ],
+        "exclusions": [
+          "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+          "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+          "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+          "无图形智能布局、BPMN验证、协作、图片/PDF导出或工作流执行。"
+        ],
+        "reason": "用开始、处理、判断和结束节点画出小流程，连接步骤并移动节点时保持连接，保存后回看。",
+        "scenario_id": "scn_cd663b9f8fdb475e8382fb6fadd44ac9",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-21T05:26:15.595842+00:00",
+        "commit_sha": "17b367b91dbab91804f852645788d7ffb46dcb79",
+        "excluded_paths": [
+          "Unselected files; upstream not installed or run"
+        ],
+        "file_manifest_digest": "64b0472e8819f154b86c84a03c5a432b366db1d04755104e0f3c922652ef73db",
+        "files": {
+          "LICENSE": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1",
+          "README.md": "749486eaa18f4569a45add47b4d1feae09df45044291eec2ce67f0506ef41c51",
+          "src/main/webapp/mxgraph/src/model/mxGeometry.js": "a0b99a4a7e1d5abf3317b365720441ff6eb20e4e296ad5b1acbfb8480e927598"
+        },
+        "license": {
+          "notice_hashes": {
+            "LICENSE": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1"
+          },
+          "status": "located"
+        },
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_uncertainties": [
+          "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+        ],
+        "repo_id": null,
+        "repository": "https://github.com/jgraph/drawio",
+        "snapshot_id": "src_37364edca354eae4cffbff85",
+        "strategy_version": "assisted-core-source-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:6b5ca73de5f1f8da935f36e5",
+    "case_id": "case:assisted-ten-2026-10-21:reading-log",
+    "created_at": "2026-10-21T05:38:18.219832+00:00",
+    "created_task_id": "assisted-ten-2026-10-21-reading-log",
+    "digest": "277d8e5f2163e8cff8bcfa8cd98b9ea0dfbd01c3e5c4dc1e017a745a5f3118eb",
+    "evidence_digest": "d1836d1ddd013372bd7e518f512c8a8e39b508c8a03b36f2cb444481d872a086",
+    "research": {
+      "input_digest": "2b596ba1e51a79eacf707d510a5148b5b99fae8e715144f78a64ba2d7faf1f25",
+      "scope": "用书架管理待读书，记录已读页数，完成后进入已读列表并能按标题或作者找回。",
+      "summary": "Codex静态研究；目标独立实现纸书/电子书元数据目录；每书只放一个书架，页数驱动状态；不搭建Calibre内容服务器或电子书阅读器。",
+      "task_id": "assisted-ten-2026-10-21-reading-log",
+      "unknowns": [
+        "upstream not_run",
+        "independent review pending",
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "不管理书籍文件/版权下载、读书社交、ISBN抓取或多书架关系。"
+      ]
+    },
+    "research_input_digest": "2b596ba1e51a79eacf707d510a5148b5b99fae8e715144f78a64ba2d7faf1f25",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_7337bab52d5ad872c3ce429b"
+    ],
+    "observations": [
+      {
+        "case_id": "case:assisted-ten-2026-10-21:reading-log",
+        "case_revision": 1,
+        "digest": "201ebe102e7e3af11747f97fb10bac3c06491d95e865d0c96e159e5bf733501d",
+        "evidence_id": "ev_assisted_reading_log_1",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "6e840acbda8d62fdd159bf3855c01872d629a914",
+          "file_digest": "e5a89cfe7eafa70cd5c8241a1dd8a615e8c4b4abaf8936e4c779dd46c94414dc",
+          "line_end": 387,
+          "line_start": 362,
+          "path": "cps/ub.py"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Shelf保存名称、所属用户及书籍关系；BookShelf保存book_id、order和shelf，支撑独立书架与成员关系。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:reading-log",
+        "case_revision": 1,
+        "digest": "b727232c25f1ea5eb61918e4a2cc9c988665951acc38e54d2566a63527fa515d",
+        "evidence_id": "ev_assisted_reading_log_2",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "6e840acbda8d62fdd159bf3855c01872d629a914",
+          "file_digest": "e5a89cfe7eafa70cd5c8241a1dd8a615e8c4b4abaf8936e4c779dd46c94414dc",
+          "line_end": 422,
+          "line_start": 403,
+          "path": "cps/ub.py"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "ReadBook分别定义未读、完成和进行中状态，并关联book_id与user_id；不是本模板页数算法的运行证据。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:reading-log",
+        "case_revision": 1,
+        "digest": "aa844b88c0de4a5a16de66abd1ffe0e8e418ee05572d8ce39730649dc378ec5d",
+        "evidence_id": "ev_assisted_reading_log_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "上游未运行",
+            "独立证据审阅pending",
+            "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+            "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+            "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+            "不管理书籍文件/版权下载、读书社交、ISBN抓取或多书架关系。"
+          ],
+          "depends_on": [
+            "ev_assisted_reading_log_1",
+            "ev_assisted_reading_log_2"
+          ],
+          "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "目标独立实现纸书/电子书元数据目录；每书只放一个书架，页数驱动状态；不搭建Calibre内容服务器或电子书阅读器。",
+        "reviews": []
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "书架与书籍目录",
+          "阅读页数与完成状态",
+          "边界、筛选与更正",
+          "真实重启持久化"
+        ],
+        "case_id": "case:assisted-ten-2026-10-21:reading-log",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_assisted_reading_log_1",
+          "ev_assisted_reading_log_2",
+          "ev_assisted_reading_log_design"
+        ],
+        "exclusions": [
+          "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+          "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+          "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+          "不管理书籍文件/版权下载、读书社交、ISBN抓取或多书架关系。"
+        ],
+        "reason": "用书架管理待读书，记录已读页数，完成后进入已读列表并能按标题或作者找回。",
+        "scenario_id": "scn_bb19507a62c84135bfb9d07d8c89283b",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-21T05:33:17.931430+00:00",
+        "commit_sha": "6e840acbda8d62fdd159bf3855c01872d629a914",
+        "excluded_paths": [
+          "Unselected files; upstream not installed or run"
+        ],
+        "file_manifest_digest": "2701a537a14fe2dfd6d05e893cb5541fb27edcee528ae444552319c541b34b97",
+        "files": {
+          "LICENSE": "589ed823e9a84c56feb95ac58e7cf384626b9cbf4fda2a907bc36e103de1bad2",
+          "README.md": "feb9051b9a3b11b3fd9e64375704cd0a888a496fca6d11f0dfc72a0135dd8f1f",
+          "cps/ub.py": "e5a89cfe7eafa70cd5c8241a1dd8a615e8c4b4abaf8936e4c779dd46c94414dc"
+        },
+        "license": {
+          "notice_hashes": {
+            "LICENSE": "589ed823e9a84c56feb95ac58e7cf384626b9cbf4fda2a907bc36e103de1bad2"
+          },
+          "status": "located"
+        },
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_uncertainties": [
+          "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+        ],
+        "repo_id": null,
+        "repository": "https://github.com/janeczku/calibre-web",
+        "snapshot_id": "src_7337bab52d5ad872c3ce429b",
+        "strategy_version": "assisted-core-source-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:6646332b5320b038957bcef2",
+    "case_id": "case:assisted-ten-2026-10-21:weekend-trip",
+    "created_at": "2026-10-21T05:38:18.498677+00:00",
+    "created_task_id": "assisted-ten-2026-10-21-weekend-trip",
+    "digest": "9270b77a21c46ecf2733a5052fd4e636e4a01cf762e4ec3d685223089847abad",
+    "evidence_digest": "52233ba94461bff9fe021aeaa68e0a5c4a1ab515707cf230aad601eb8f8067e5",
+    "research": {
+      "input_digest": "1f80f778b932b0813d70f30d66c532c1affa2f81bdf2626b351831772af086b3",
+      "scope": "把地点安排进两天行程，调整参观顺序并标记已到访，离线回查地址和安排。",
+      "summary": "Codex静态研究；只借鉴行程/地点/天的关系；目标手工地址文本与日内顺序，不接地图、导航、实时交通或预订。",
+      "task_id": "assisted-ten-2026-10-21-weekend-trip",
+      "unknowns": [
+        "upstream not_run",
+        "independent review pending",
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "无地图、路线最优解、天气、订票或远程协作，地址正确性由人确认。"
+      ]
+    },
+    "research_input_digest": "1f80f778b932b0813d70f30d66c532c1affa2f81bdf2626b351831772af086b3",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_ea2e154232e280fe051a7955"
+    ],
+    "observations": [
+      {
+        "case_id": "case:assisted-ten-2026-10-21:weekend-trip",
+        "case_revision": 1,
+        "digest": "276ab7c600d2cc25100c8af446a18594ec1a5e84ffbc65963dd79c7bf5f9d6e5",
+        "evidence_id": "ev_assisted_weekend_trip_1",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "856b1edfe81a735fce4b544c2e16a6518cebf164",
+          "file_digest": "61d50de69472d504a8038b28c55af76c9e32d0ba7e94bff6e2a295fa2673ebe0",
+          "line_end": 557,
+          "line_start": 505,
+          "path": "backend/trip/models/models.py"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "TripPlaceLink连接旅行和地点；PlaceBase包含名称、坐标、描述和visited标志。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:weekend-trip",
+        "case_revision": 1,
+        "digest": "1af3224919e85bc78823914d9df4c9daaaaddea40816d278ee77acec441e721f",
+        "evidence_id": "ev_assisted_weekend_trip_2",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "856b1edfe81a735fce4b544c2e16a6518cebf164",
+          "file_digest": "61d50de69472d504a8038b28c55af76c9e32d0ba7e94bff6e2a295fa2673ebe0",
+          "line_end": 633,
+          "line_start": 610,
+          "path": "backend/trip/models/models.py"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Trip拥有days关系，按日期和标签排序；目标日内的手动排序属于设计推断。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:weekend-trip",
+        "case_revision": 1,
+        "digest": "85bcfa5b833dbda11165b0f18b9433c31bc13ce7e7b91117ba0754aa05ba1e74",
+        "evidence_id": "ev_assisted_weekend_trip_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "上游未运行",
+            "独立证据审阅pending",
+            "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+            "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+            "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+            "无地图、路线最优解、天气、订票或远程协作，地址正确性由人确认。"
+          ],
+          "depends_on": [
+            "ev_assisted_weekend_trip_1",
+            "ev_assisted_weekend_trip_2"
+          ],
+          "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "只借鉴行程/地点/天的关系；目标手工地址文本与日内顺序，不接地图、导航、实时交通或预订。",
+        "reviews": []
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "两日行程与地点",
+          "日内顺序调整",
+          "到访状态与隔离",
+          "真实重启持久化"
+        ],
+        "case_id": "case:assisted-ten-2026-10-21:weekend-trip",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_assisted_weekend_trip_1",
+          "ev_assisted_weekend_trip_2",
+          "ev_assisted_weekend_trip_design"
+        ],
+        "exclusions": [
+          "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+          "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+          "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+          "无地图、路线最优解、天气、订票或远程协作，地址正确性由人确认。"
+        ],
+        "reason": "把地点安排进两天行程，调整参观顺序并标记已到访，离线回查地址和安排。",
+        "scenario_id": "scn_16afaedcefee4dd9b8e8931e3a29fd65",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-21T05:26:09.792883+00:00",
+        "commit_sha": "856b1edfe81a735fce4b544c2e16a6518cebf164",
+        "excluded_paths": [
+          "Unselected files; upstream not installed or run"
+        ],
+        "file_manifest_digest": "242d772ea9d87270295ce54d7efc9c795ce69beae1569c22937392ed4d94f3a0",
+        "files": {
+          "README.md": "8abcad63787a47837f9907ee148d517ec47141d45de05f1cafdc491b67aa38ba",
+          "backend/trip/models/models.py": "61d50de69472d504a8038b28c55af76c9e32d0ba7e94bff6e2a295fa2673ebe0",
+          "license.txt": "3eae852e2dc6be228a0eb4050a7607fffa2a40929e7ae954e5f5ef41e2ffb063"
+        },
+        "license": {
+          "notice_hashes": {
+            "license.txt": "3eae852e2dc6be228a0eb4050a7607fffa2a40929e7ae954e5f5ef41e2ffb063"
+          },
+          "status": "located"
+        },
+        "license_files": [
+          "license.txt"
+        ],
+        "license_uncertainties": [
+          "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+        ],
+        "repo_id": null,
+        "repository": "https://github.com/itskovacs/trip",
+        "snapshot_id": "src_ea2e154232e280fe051a7955",
+        "strategy_version": "assisted-core-source-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:3f66ec177cc391d3f3a14e42",
+    "case_id": "case:assisted-ten-2026-10-21:work-log",
+    "created_at": "2026-10-21T05:38:18.783701+00:00",
+    "created_task_id": "assisted-ten-2026-10-21-work-log",
+    "digest": "6d33ddfa6cb256ef6770087a697a2b42f1363ed3b8ab22af9faccb3707baa9d1",
+    "evidence_digest": "5eaff2f3ebdf1a3c2ee4289d54d837420debd554de2dea589f896b92771a913f",
+    "research": {
+      "input_digest": "8e8a4418f53a7efc92c1ecbfbe8011ae9f19d10e7e62e5f267e2e08a4e2c7250",
+      "scope": "按日登记项目开始结束时间和休息分钟数，自动计算净工时，修改后日汇总立即重算。",
+      "summary": "Codex静态研究；目标只记录已结束的同日工作，不做运行中计时器、账单费率、后台监控或跨时区时间；以分钟整数派生日总。",
+      "task_id": "assisted-ten-2026-10-21-work-log",
+      "unknowns": [
+        "upstream not_run",
+        "independent review pending",
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "不做计费、发票、自动计时、跨午夜或夏令时跨度计算。"
+      ]
+    },
+    "research_input_digest": "8e8a4418f53a7efc92c1ecbfbe8011ae9f19d10e7e62e5f267e2e08a4e2c7250",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_6c206647c8d37b557eca9d0a"
+    ],
+    "observations": [
+      {
+        "case_id": "case:assisted-ten-2026-10-21:work-log",
+        "case_revision": 1,
+        "digest": "1054908394831dc5ebcd39bceb35a9ac25e405895f3ac55e4703fd66704bb614",
+        "evidence_id": "ev_assisted_work_log_1",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "acc17ef21c2f1466a0b399cf6595fd4b20b1f085",
+          "file_digest": "fecd06dd2f259bc63ea8c937d9eba019f225eb58a4368252bf8eb077acebbbc7",
+          "line_end": 166,
+          "line_start": 97,
+          "path": "src/Entity/Timesheet.php"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Timesheet分别记录日期、begin/end、duration、break、user、activity、project和description。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:work-log",
+        "case_revision": 1,
+        "digest": "0b72163776f36397bc5c502e9dcd33fe25941bcebc755802fa67bcb4ebe7c746",
+        "evidence_id": "ev_assisted_work_log_2",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "acc17ef21c2f1466a0b399cf6595fd4b20b1f085",
+          "file_digest": "fecd06dd2f259bc63ea8c937d9eba019f225eb58a4368252bf8eb077acebbbc7",
+          "line_end": 363,
+          "line_start": 343,
+          "path": "src/Entity/Timesheet.php"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "getCalculatedDuration使用结束时间减开始时间再减break；running记录另有警告。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:work-log",
+        "case_revision": 1,
+        "digest": "c426b2f8c24109e4ef0f59e1f497294b0b36aa088a8663fec068485a8710724c",
+        "evidence_id": "ev_assisted_work_log_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "上游未运行",
+            "独立证据审阅pending",
+            "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+            "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+            "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+            "不做计费、发票、自动计时、跨午夜或夏令时跨度计算。"
+          ],
+          "depends_on": [
+            "ev_assisted_work_log_1",
+            "ev_assisted_work_log_2"
+          ],
+          "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "目标只记录已结束的同日工作，不做运行中计时器、账单费率、后台监控或跨时区时间；以分钟整数派生日总。",
+        "reviews": []
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "项目与已完成工时条目",
+          "净时长与日汇总",
+          "修改、重叠保护和日期隔离",
+          "真实重启持久化"
+        ],
+        "case_id": "case:assisted-ten-2026-10-21:work-log",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_assisted_work_log_1",
+          "ev_assisted_work_log_2",
+          "ev_assisted_work_log_design"
+        ],
+        "exclusions": [
+          "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+          "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+          "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+          "不做计费、发票、自动计时、跨午夜或夏令时跨度计算。"
+        ],
+        "reason": "按日登记项目开始结束时间和休息分钟数，自动计算净工时，修改后日汇总立即重算。",
+        "scenario_id": "scn_a5ba5020abbe461fa5992a4e01bee420",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-21T05:26:10.949590+00:00",
+        "commit_sha": "acc17ef21c2f1466a0b399cf6595fd4b20b1f085",
+        "excluded_paths": [
+          "Unselected files; upstream not installed or run"
+        ],
+        "file_manifest_digest": "e9bb5cf4fbe413e7f2f8cbb6599169c0648fb67643f4b6f50e6fc7be8e889ce5",
+        "files": {
+          "LICENSE": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+          "README.md": "c149b1087ac06e94cbdd71b5e6b75d1e473b7f32a442de73b806e7dcf1e0a2ca",
+          "src/Entity/Timesheet.php": "fecd06dd2f259bc63ea8c937d9eba019f225eb58a4368252bf8eb077acebbbc7"
+        },
+        "license": {
+          "notice_hashes": {
+            "LICENSE": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+          },
+          "status": "located"
+        },
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_uncertainties": [
+          "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+        ],
+        "repo_id": null,
+        "repository": "https://github.com/kimai/kimai",
+        "snapshot_id": "src_6c206647c8d37b557eca9d0a",
+        "strategy_version": "assisted-core-source-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:c10a756def60d2e24415c626",
+    "case_id": "case:assisted-ten-2026-10-21:workout-log",
+    "created_at": "2026-10-21T05:38:19.073267+00:00",
+    "created_task_id": "assisted-ten-2026-10-21-workout-log",
+    "digest": "fb137bad82227c14eaa1cee8fcbc0c9b0b88756f64fd74130a9f6e8ca2ce3040",
+    "evidence_digest": "d598e5d342340b44557b4814a48ca5030d1d2bdb2da1947aa5c1801a5b41acea",
+    "research": {
+      "input_digest": "81b4e9309e34c7b27bbe703024505dc5ac33b656833bb4bbb1c64d3ac3cd843a",
+      "scope": "逐组记录动作、重量和次数，按训练日回查训练量，纠正误填后重新汇总。",
+      "summary": "Codex静态研究；目标聚焦已完成的kg重量×次数日志，不给训练或健康建议，不自动生成运动计划。",
+      "task_id": "assisted-ten-2026-10-21-workout-log",
+      "unknowns": [
+        "upstream not_run",
+        "independent review pending",
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "不含动作视频、身体指标、营养/康复建议、lb换算或器械联动。"
+      ]
+    },
+    "research_input_digest": "81b4e9309e34c7b27bbe703024505dc5ac33b656833bb4bbb1c64d3ac3cd843a",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_ce29ee2a092c739322c85125"
+    ],
+    "observations": [
+      {
+        "case_id": "case:assisted-ten-2026-10-21:workout-log",
+        "case_revision": 1,
+        "digest": "ce6d56863b74dfa010f682dac9b21677744dd3e5c15e5486a5a1d8f549acba35",
+        "evidence_id": "ev_assisted_workout_log_1",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "8eed3c6d8406f09874eda6e402fb68c52d6c8392",
+          "file_digest": "14a02d6eafdf3bb06b11dd3c1622d57c5f12e2043550d61391d80432a91e1904",
+          "line_end": 71,
+          "line_start": 48,
+          "path": "wger/manager/models/log.py"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "WorkoutLog为逐动作日志，具有UUID、日期和用户关联。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:workout-log",
+        "case_revision": 1,
+        "digest": "11e3970104f7e075e84de04bef9427f36d3098dc1655b0d69bd7ea66296a7dc6",
+        "evidence_id": "ev_assisted_workout_log_2",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "8eed3c6d8406f09874eda6e402fb68c52d6c8392",
+          "file_digest": "14a02d6eafdf3bb06b11dd3c1622d57c5f12e2043550d61391d80432a91e1904",
+          "line_end": 177,
+          "line_start": 156,
+          "path": "wger/manager/models/log.py"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "weight_unit与两位小数weight分开记录，重量允许空值；目标首版固定kg并明确0kg含义。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:workout-log",
+        "case_revision": 1,
+        "digest": "df4d83827009508cca5c14284dc5c8cc2bfa75fb7ba962615355afce900c0525",
+        "evidence_id": "ev_assisted_workout_log_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "上游未运行",
+            "独立证据审阅pending",
+            "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+            "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+            "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+            "不含动作视频、身体指标、营养/康复建议、lb换算或器械联动。"
+          ],
+          "depends_on": [
+            "ev_assisted_workout_log_1",
+            "ev_assisted_workout_log_2"
+          ],
+          "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "目标聚焦已完成的kg重量×次数日志，不给训练或健康建议，不自动生成运动计划。",
+        "reviews": []
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "训练日与逐组日志",
+          "整数精度训练量汇总",
+          "更正与非法值保护",
+          "真实重启持久化"
+        ],
+        "case_id": "case:assisted-ten-2026-10-21:workout-log",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_assisted_workout_log_1",
+          "ev_assisted_workout_log_2",
+          "ev_assisted_workout_log_design"
+        ],
+        "exclusions": [
+          "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+          "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+          "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+          "不含动作视频、身体指标、营养/康复建议、lb换算或器械联动。"
+        ],
+        "reason": "逐组记录动作、重量和次数，按训练日回查训练量，纠正误填后重新汇总。",
+        "scenario_id": "scn_bf0bf87b07d245dca990ea7ea1f1721a",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-21T05:26:11.352057+00:00",
+        "commit_sha": "8eed3c6d8406f09874eda6e402fb68c52d6c8392",
+        "excluded_paths": [
+          "Unselected files; upstream not installed or run"
+        ],
+        "file_manifest_digest": "16fb418b0c8d32fffe53d1c4bf22f4d6731a9af75787297f6f02a58666bee7a3",
+        "files": {
+          "LICENSE.txt": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6",
+          "README.md": "11b4826a7357eabd8756a6a5d21099f5660122e87ef6c4ec688249b351b42f05",
+          "wger/manager/models/log.py": "14a02d6eafdf3bb06b11dd3c1622d57c5f12e2043550d61391d80432a91e1904"
+        },
+        "license": {
+          "notice_hashes": {
+            "LICENSE.txt": "57c8ff33c9c0cfc3ef00e650a1cc910d7ee479a8bc509f6c9209a7c2a11399d6"
+          },
+          "status": "located"
+        },
+        "license_files": [
+          "LICENSE.txt"
+        ],
+        "license_uncertainties": [
+          "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+        ],
+        "repo_id": null,
+        "repository": "https://github.com/wger-project/wger",
+        "snapshot_id": "src_ce29ee2a092c739322c85125",
+        "strategy_version": "assisted-core-source-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:1cde7d888362d3065bd6e629",
+    "case_id": "case:assisted-ten-2026-10-21:writing-outline",
+    "created_at": "2026-10-21T05:39:08.939292+00:00",
+    "created_task_id": "assisted-ten-2026-10-21-writing-outline",
+    "digest": "540c608f701b926b08851b2bf09129a1c16040ad508c260258a954cf89f72450",
+    "evidence_digest": "fdf182dc2178a3ebc5432e3ad2feea95da1efb01fa630e29a59425799bf9776e",
+    "research": {
+      "input_digest": "23b3d33eaf61ab541337330a56213347adc24aa4f0beed95cfa282e84afab711",
+      "scope": "把文章要点整理成可折叠的树，移动整个分支后保留子项及顺序，导出结构文本。",
+      "summary": "Codex静态研究；目标采用邻接表树和事务内移动，而非复用Logseq的图谱/同步栈；循环检测、折叠与文本格式均为目标设计。",
+      "task_id": "assisted-ten-2026-10-21-writing-outline",
+      "unknowns": [
+        "upstream not_run",
+        "independent review pending",
+        "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+        "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+        "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+        "无双向链接、图谱、多人编辑、附件、富文本或撤销栈。"
+      ]
+    },
+    "research_input_digest": "23b3d33eaf61ab541337330a56213347adc24aa4f0beed95cfa282e84afab711",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_e36cc347e1d507ae2c5dc539"
+    ],
+    "observations": [
+      {
+        "case_id": "case:assisted-ten-2026-10-21:writing-outline",
+        "case_revision": 1,
+        "digest": "84b3154c4a407bd992ae424b0f1180210d586c0499bdce675f0535d379c3061d",
+        "evidence_id": "ev_assisted_writing_outline_1",
+        "kind": "documentation",
+        "location": {
+          "content_digest": "ac1009987f14aa7ee4985a25242236e425377daa3cc7abdb60a64de46664c456",
+          "material_version": "e8c4c37ed43299f22ca36ef898466eae02f45416",
+          "url": "https://github.com/logseq/logseq/blob/e8c4c37ed43299f22ca36ef898466eae02f45416/deps/outliner/README.md"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "仓库outliner子库说明提供大纲操作，列出datascript-report与pipeline命名空间及前端/命令行使用；未据此声称目标移动规则已在上游验证。",
+        "reviews": []
+      },
+      {
+        "case_id": "case:assisted-ten-2026-10-21:writing-outline",
+        "case_revision": 1,
+        "digest": "090a77b7fdb18f7f98e86de3f5a39e756a1fa91aa9b2d6a5bfcbccf6ff8407cd",
+        "evidence_id": "ev_assisted_writing_outline_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "上游未运行",
+            "独立证据审阅pending",
+            "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+            "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+            "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+            "无双向链接、图谱、多人编辑、附件、富文本或撤销栈。"
+          ],
+          "depends_on": [
+            "ev_assisted_writing_outline_1"
+          ],
+          "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "目标采用邻接表树和事务内移动，而非复用Logseq的图谱/同步栈；循环检测、折叠与文本格式均为目标设计。",
+        "reviews": []
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "文档与树形条目",
+          "分支移动和折叠",
+          "循环保护与结构导出",
+          "真实重启持久化"
+        ],
+        "case_id": "case:assisted-ten-2026-10-21:writing-outline",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_assisted_writing_outline_1",
+          "ev_assisted_writing_outline_design"
+        ],
+        "exclusions": [
+          "辅助试用，非严格G1/T08；Codex研究与编写，证据独审pending，上游未运行。",
+          "本模板尚未开发代表应用或取得下游运行证据；验收程序仅编译检查，不能据此声称运行通过。",
+          "单人本机显式保存，无账户、云同步、协作；不复制上游实现。",
+          "无双向链接、图谱、多人编辑、附件、富文本或撤销栈。"
+        ],
+        "reason": "把文章要点整理成可折叠的树，移动整个分支后保留子项及顺序，导出结构文本。",
+        "scenario_id": "scn_3e5d16480fde4032b759eac2dae15b44",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-21T05:26:14.092719+00:00",
+        "commit_sha": "e8c4c37ed43299f22ca36ef898466eae02f45416",
+        "excluded_paths": [
+          "Unselected files; upstream not installed or run"
+        ],
+        "file_manifest_digest": "44ff6f77f633a9ef38d84c3519765a234c282d5f5542a92597d447d012eebeda",
+        "files": {
+          "LICENSE.md": "2467b8901ba62f7708c479944468a677897472a39ecbda1d23818ecf9538620b",
+          "README.md": "597bcf7218c37fdf053524467029e22db5c29faffd8fb21007512bbbd3affe56",
+          "deps/outliner/README.md": "ac1009987f14aa7ee4985a25242236e425377daa3cc7abdb60a64de46664c456"
+        },
+        "license": {
+          "notice_hashes": {
+            "LICENSE.md": "2467b8901ba62f7708c479944468a677897472a39ecbda1d23818ecf9538620b"
+          },
+          "status": "located"
+        },
+        "license_files": [
+          "LICENSE.md"
+        ],
+        "license_uncertainties": [
+          "Reference study only; no upstream implementation/assets copied. File-level exceptions not exhaustively audited."
+        ],
+        "repo_id": null,
+        "repository": "https://github.com/logseq/logseq",
+        "snapshot_id": "src_e36cc347e1d507ae2c5dc539",
+        "strategy_version": "assisted-core-source-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:de476a278e635014bdacdeeb",
+    "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+    "created_at": "2026-10-21T08:38:10.461028+00:00",
+    "created_task_id": "auxiliary-go-pilot-2026-10-21-home-care",
+    "digest": "f42187b6993942a959c4ca954c82e14d45472e9c1793cd908851311b7f4b28aa",
+    "evidence_digest": "4a646f28a7be8f40356a9f3e5d85ae1b885ad64c4ea3f45f14f7f0834c275ed7",
+    "research": {
+      "input_digest": "54fc3ad43d12e43d79c075d7c44a73e00f3bcd6695f2e16177f46f70900de8fa",
+      "scope": "Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.",
+      "summary": "OpenCode Go静态研究与独立会话审阅；Target design inference, not an upstream claim: the pinned research makes the home the subject and requires recurring work plus a durable completion record. Upstream code corroborates that abstract shape but realizes recurrence in months, keeps one house profile, links maintenance to an optional appliance, and does not show an explicit appliance-to-home foreign key in the selected files. The target therefore makes the home anchor explicit through home_id on equipment and plans, uses every-N-days recurrence from the scenario, and keeps only the home, equipment, plan, completion, and history slice. It does not copy upstream code, schema, or UI. Upstream status: not_run; no upstream build, test, server, TUI, or database was started.",
+      "task_id": "auxiliary-go-pilot-2026-10-21-home-care",
+      "unknowns": [
+        "upstream not_run",
+        "auxiliary independent static review passed; runtime not_run",
+        "Upstream status: not_run. The repository was read as evidence only; no build, test, server, TUI, or database was executed, so no upstream behavior is runtime-verified.",
+        "Runtime verification is not_run for the target too. The probe and architecture are authored artifacts; no server was started and no acceptance case was executed in this task.",
+        "Single-home and single-user by design; no multi-property, accounts, authentication, sharing, or remote access.",
+        "No notifications, email, SMS, push, calendar sync, or background scheduler; due work is pull-based through the API and UI.",
+        "No costs, vendors, receipts, photos, manuals, warranties, projects, quotes, incidents, documents, or LLM features; those upstream surfaces are intentionally out of scope.",
+        "Every-N-days recurrence differs from upstream interval months; no compatibility with upstream databases, APIs, or schema is claimed.",
+        "No delete, undo, archive, or restore endpoints; completion history is append-only and test records remain until the disposable data directory is discarded.",
+        "Validation is strict and date-only; natural-language dates and timezone conversion are unsupported. Server local date can differ by one day from a client in another timezone.",
+        "The UI is a minimal single-page client, not a polished product; no internationalization, offline cache, or mobile-native behavior.",
+        "Schema v1 has no migration path. Changing entities later needs an explicit migration or a new disposable database.",
+        "Concurrency is sized for one user; SQLite WAL and busy_timeout reduce but do not eliminate lock contention.",
+        "User decision points: confirm one-home scope, the default due date of creation day when no anchor is provided, latest-completion rollover for backdated entries, strict date-only input, and the absence of delete and defect-tracking features.",
+        "Restart durability may be described as an operator stop and start step in README; it was not run and is not claimed as verified."
+      ]
+    },
+    "research_input_digest": "54fc3ad43d12e43d79c075d7c44a73e00f3bcd6695f2e16177f46f70900de8fa",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_8b5775cbd27085addccfe547"
+    ],
+    "observations": [
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "digest": "9809566dd5e251321437511f214b3b20a7c02c12c10d53d29c0916b565587e90",
+        "evidence_id": "ev_assisted_home_care_1",
+        "kind": "documentation",
+        "location": {
+          "content_digest": "40b5d4f8df78510ec9b05454df1d307ca5eb44ee055328229faa07d0f6e1c348",
+          "material_version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+          "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/README.md"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Document claim: micasa describes itself as home maintenance from the terminal, a local tool rather than a hosted multi-tenant service.",
+        "reviews": [
+          {
+            "review_id": "rev_fe3eadf42b2e08ac81dedb08aaece752",
+            "outcome": "accepted",
+            "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "9809566dd5e251321437511f214b3b20a7c02c12c10d53d29c0916b565587e90",
+            "created_at": "2026-10-21T08:38:10.463501+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "digest": "f21531260721fbe381a2878ff6fef4003ecc80355d72a20c125e842ef0287439",
+        "evidence_id": "ev_assisted_home_care_10",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+          "file_digest": "0cc864c8ff483237fbd128d417f6d2bf2a9ff66fdcbf2719c97cb239c6a65f4a",
+          "line_end": 73,
+          "line_start": 59,
+          "path": "internal/data/store_servicelog.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Code observation: CreateServiceLog runs in a transaction, creates the service log, then syncs the parent maintenance item.",
+        "reviews": [
+          {
+            "review_id": "rev_c04d01fe33a05113714c3cc6a929de9d",
+            "outcome": "accepted",
+            "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "f21531260721fbe381a2878ff6fef4003ecc80355d72a20c125e842ef0287439",
+            "created_at": "2026-10-21T08:38:10.463806+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "digest": "2c760870a0714c28e210714fd44470f1b1ccd19e405d046dd4ecb14ddb54ada1",
+        "evidence_id": "ev_assisted_home_care_11",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+          "file_digest": "6bb00aeae3903900ef4182e87fb10bbb640980bcde6739e5e252d29b45d8fef4",
+          "line_end": 177,
+          "line_start": 168,
+          "path": "internal/data/validation.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Code observation: ComputeNextDue returns an explicit due date when set, otherwise adds interval months to the last service date.",
+        "reviews": [
+          {
+            "review_id": "rev_9499d7cda853c3a3c6a4267e929c1103",
+            "outcome": "accepted",
+            "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "2c760870a0714c28e210714fd44470f1b1ccd19e405d046dd4ecb14ddb54ada1",
+            "created_at": "2026-10-21T08:38:10.464100+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "digest": "661e17c1f55d773d1d7d20095acbe79508ad810c7e5c69249e238a7daed23d7a",
+        "evidence_id": "ev_assisted_home_care_12",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+          "file_digest": "6bb00aeae3903900ef4182e87fb10bbb640980bcde6739e5e252d29b45d8fef4",
+          "line_end": 192,
+          "line_start": 182,
+          "path": "internal/data/validation.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Code observation: AddMonths clamps the day to the target month end, avoiding the Jan 31 plus one month overflow.",
+        "reviews": [
+          {
+            "review_id": "rev_63c6b4c4e7356e9a2c5fea908925d8f5",
+            "outcome": "accepted",
+            "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "661e17c1f55d773d1d7d20095acbe79508ad810c7e5c69249e238a7daed23d7a",
+            "created_at": "2026-10-21T08:38:10.464402+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "digest": "eeba69689960d934cd63e7a419d33481d0ab07ac717d3b9eddf15786a0b72f84",
+        "evidence_id": "ev_assisted_home_care_13",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+          "file_digest": "6bb00aeae3903900ef4182e87fb10bbb640980bcde6739e5e252d29b45d8fef4",
+          "line_end": 153,
+          "line_start": 98,
+          "path": "internal/data/validation.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Code observation: interval parsing accepts years and months, not days.",
+        "reviews": [
+          {
+            "review_id": "rev_0557699a3946f52fb1255585c7483d28",
+            "outcome": "accepted",
+            "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "eeba69689960d934cd63e7a419d33481d0ab07ac717d3b9eddf15786a0b72f84",
+            "created_at": "2026-10-21T08:38:10.464691+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "digest": "6b28eaa4dc727eb6121b61ed5b7f197ae2999f508a91548d1feaa6b5cdc109e7",
+        "evidence_id": "ev_assisted_home_care_14",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+          "file_digest": "d03ed7b8243f97c6f906a52ba7aad63645a468586092c4584f20437972ffd656",
+          "line_end": 25,
+          "line_start": 12,
+          "path": "internal/data/dashboard.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Code observation: scheduled maintenance is defined as interval months greater than zero or an explicit due date.",
+        "reviews": [
+          {
+            "review_id": "rev_3ea172efcae19136d671c0bebe102757",
+            "outcome": "accepted",
+            "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "6b28eaa4dc727eb6121b61ed5b7f197ae2999f508a91548d1feaa6b5cdc109e7",
+            "created_at": "2026-10-21T08:38:10.464969+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "digest": "a2ed374ca1a2964be0580c4e292c775e7fa5a16fbc25e1c7cc2f8f34c6dbbe67",
+        "evidence_id": "ev_assisted_home_care_15",
+        "kind": "documentation",
+        "location": {
+          "content_digest": "40b5d4f8df78510ec9b05454df1d307ca5eb44ee055328229faa07d0f6e1c348",
+          "material_version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+          "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/README.md"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Document claim: the upstream is pure Go using SQLite and a terminal UI; this target does not copy or run that implementation.",
+        "reviews": [
+          {
+            "review_id": "rev_514647ef23bfcc5d240ba064b6b43e67",
+            "outcome": "accepted",
+            "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "a2ed374ca1a2964be0580c4e292c775e7fa5a16fbc25e1c7cc2f8f34c6dbbe67",
+            "created_at": "2026-10-21T08:38:10.465234+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "digest": "7139e702ecc22c98f8bce6ec9be02c22ee3d2ede024a301d10e61a4f35998e31",
+        "evidence_id": "ev_assisted_home_care_2",
+        "kind": "documentation",
+        "location": {
+          "content_digest": "40b5d4f8df78510ec9b05454df1d307ca5eb44ee055328229faa07d0f6e1c348",
+          "material_version": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+          "url": "https://github.com/micasa-dev/micasa/blob/ca69a88f998dec25c1e285121e428a4f7621dc68/README.md"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Document claim: the upstream advertises schedules, due dates, and full history.",
+        "reviews": [
+          {
+            "review_id": "rev_ba1badc5eda2c33d9a45b4b25c7abb75",
+            "outcome": "accepted",
+            "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "7139e702ecc22c98f8bce6ec9be02c22ee3d2ede024a301d10e61a4f35998e31",
+            "created_at": "2026-10-21T08:38:10.465527+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "digest": "97b3d79a9e033f12443cc7659544bb834cea78bd2a3b71a6398acdca4b252fdd",
+        "evidence_id": "ev_assisted_home_care_3",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+          "file_digest": "5cd2a997f2efa9fd7d2916446d8173571fba7ee40dfb9703083d266bb6cab000",
+          "line_end": 135,
+          "line_start": 104,
+          "path": "internal/data/models.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Code observation: HouseProfile stores address, year built, systems, and other attributes; no explicit multi-home ownership table is observed in the selected files.",
+        "reviews": [
+          {
+            "review_id": "rev_060156ba7dee73d97175bd16e4874b78",
+            "outcome": "accepted",
+            "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "97b3d79a9e033f12443cc7659544bb834cea78bd2a3b71a6398acdca4b252fdd",
+            "created_at": "2026-10-21T08:38:10.465830+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "digest": "faa242cdb098a6d29b0efa0371ec33570fe53b2a2da1cbc3e3e00924148124b9",
+        "evidence_id": "ev_assisted_home_care_4",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+          "file_digest": "5cd2a997f2efa9fd7d2916446d8173571fba7ee40dfb9703083d266bb6cab000",
+          "line_end": 216,
+          "line_start": 201,
+          "path": "internal/data/models.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Code observation: Appliance stores make, model, serial, warranty, and location, with no home_id field observed.",
+        "reviews": [
+          {
+            "review_id": "rev_ec580a82e2e53b9304cedd64d816bc4d",
+            "outcome": "accepted",
+            "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "faa242cdb098a6d29b0efa0371ec33570fe53b2a2da1cbc3e3e00924148124b9",
+            "created_at": "2026-10-21T08:38:10.466114+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "digest": "a5fb4c1dfe304e5086a4a2371d61993eab15d1e64fc8ab358ef8b3ce0eca66e8",
+        "evidence_id": "ev_assisted_home_care_5",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+          "file_digest": "5cd2a997f2efa9fd7d2916446d8173571fba7ee40dfb9703083d266bb6cab000",
+          "line_end": 237,
+          "line_start": 218,
+          "path": "internal/data/models.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Code observation: MaintenanceItem has an optional ApplianceID, category, season, interval months, last serviced date, and due date.",
+        "reviews": [
+          {
+            "review_id": "rev_4e2d36d1f1cc90477d92d24114ac0322",
+            "outcome": "accepted",
+            "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "a5fb4c1dfe304e5086a4a2371d61993eab15d1e64fc8ab358ef8b3ce0eca66e8",
+            "created_at": "2026-10-21T08:38:10.466385+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "digest": "3619cee4e50e610a0915f1ca16fd33717960d747f334c4c5b0578df8a33d926d",
+        "evidence_id": "ev_assisted_home_care_6",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+          "file_digest": "5cd2a997f2efa9fd7d2916446d8173571fba7ee40dfb9703083d266bb6cab000",
+          "line_end": 274,
+          "line_start": 261,
+          "path": "internal/data/models.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Code observation: ServiceLogEntry belongs to a maintenance item and stores serviced_at, optional vendor and cost, notes, and timestamps.",
+        "reviews": [
+          {
+            "review_id": "rev_ed31cd4ca48e6714335f5f638fde25ac",
+            "outcome": "accepted",
+            "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "3619cee4e50e610a0915f1ca16fd33717960d747f334c4c5b0578df8a33d926d",
+            "created_at": "2026-10-21T08:38:10.466662+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "digest": "20bbcd1d9aa0297c77efc8a1960dd3b89e4d36304bc8d5816d26f8029c102eeb",
+        "evidence_id": "ev_assisted_home_care_7",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+          "file_digest": "e79c86687cc434803229f62571c4b5737eac983a8d1e7d6ef1e32bf15c0bf205",
+          "line_end": 31,
+          "line_start": 22,
+          "path": "internal/data/store_house.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Code observation: CreateHouseProfile counts existing profiles and rejects a second row, implementing one house profile.",
+        "reviews": [
+          {
+            "review_id": "rev_80457b107cf5f06742a197a924a5db5a",
+            "outcome": "accepted",
+            "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "20bbcd1d9aa0297c77efc8a1960dd3b89e4d36304bc8d5816d26f8029c102eeb",
+            "created_at": "2026-10-21T08:38:10.466954+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "digest": "47ff87a0e44f8c822d03a9b7db13bdb50f4cb6faa47aa30adc4f97be992f79d7",
+        "evidence_id": "ev_assisted_home_care_8",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+          "file_digest": "d150cb4ee2bc410a9844768b63a4447c81a8122555c9bcc465b1c54c3a9d2b37",
+          "line_end": 33,
+          "line_start": 24,
+          "path": "internal/data/store_maintenance.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Code observation: ListMaintenanceByAppliance filters maintenance items by appliance id, showing an equipment-anchored query path.",
+        "reviews": [
+          {
+            "review_id": "rev_487b3f53ee20f8856a55b01a40e00ee7",
+            "outcome": "accepted",
+            "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "47ff87a0e44f8c822d03a9b7db13bdb50f4cb6faa47aa30adc4f97be992f79d7",
+            "created_at": "2026-10-21T08:38:10.467247+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "digest": "b3f3694fea0f2854b2acc2b4ae6020f01b2e0f784f4469675fe4b5d975dad116",
+        "evidence_id": "ev_assisted_home_care_9",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+          "file_digest": "0cc864c8ff483237fbd128d417f6d2bf2a9ff66fdcbf2719c97cb239c6a65f4a",
+          "line_end": 30,
+          "line_start": 16,
+          "path": "internal/data/store_servicelog.go"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Code observation: syncLastServiced sets LastServicedAt to the most recent non-deleted serviced_at.",
+        "reviews": [
+          {
+            "review_id": "rev_00ae1641fc4698a666bbaf1613bbabc6",
+            "outcome": "accepted",
+            "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "b3f3694fea0f2854b2acc2b4ae6020f01b2e0f784f4469675fe4b5d975dad116",
+            "created_at": "2026-10-21T08:38:10.467540+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "digest": "fc10e571de4fd29af2d7f8cc4922fe2a76a34779b30aa86d6973d9bb2943b554",
+        "evidence_id": "ev_assisted_home_care_design",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "上游未运行",
+            "辅助静态独审通过，运行未验证",
+            "Upstream status: not_run. The repository was read as evidence only; no build, test, server, TUI, or database was executed, so no upstream behavior is runtime-verified.",
+            "Runtime verification is not_run for the target too. The probe and architecture are authored artifacts; no server was started and no acceptance case was executed in this task.",
+            "Single-home and single-user by design; no multi-property, accounts, authentication, sharing, or remote access.",
+            "No notifications, email, SMS, push, calendar sync, or background scheduler; due work is pull-based through the API and UI.",
+            "No costs, vendors, receipts, photos, manuals, warranties, projects, quotes, incidents, documents, or LLM features; those upstream surfaces are intentionally out of scope.",
+            "Every-N-days recurrence differs from upstream interval months; no compatibility with upstream databases, APIs, or schema is claimed.",
+            "No delete, undo, archive, or restore endpoints; completion history is append-only and test records remain until the disposable data directory is discarded.",
+            "Validation is strict and date-only; natural-language dates and timezone conversion are unsupported. Server local date can differ by one day from a client in another timezone.",
+            "The UI is a minimal single-page client, not a polished product; no internationalization, offline cache, or mobile-native behavior.",
+            "Schema v1 has no migration path. Changing entities later needs an explicit migration or a new disposable database.",
+            "Concurrency is sized for one user; SQLite WAL and busy_timeout reduce but do not eliminate lock contention.",
+            "User decision points: confirm one-home scope, the default due date of creation day when no anchor is provided, latest-completion rollover for backdated entries, strict date-only input, and the absence of delete and defect-tracking features.",
+            "Restart durability may be described as an operator stop and start step in README; it was not run and is not claimed as verified."
+          ],
+          "depends_on": [
+            "ev_assisted_home_care_1",
+            "ev_assisted_home_care_2",
+            "ev_assisted_home_care_3",
+            "ev_assisted_home_care_4",
+            "ev_assisted_home_care_5",
+            "ev_assisted_home_care_6",
+            "ev_assisted_home_care_7",
+            "ev_assisted_home_care_8",
+            "ev_assisted_home_care_9",
+            "ev_assisted_home_care_10",
+            "ev_assisted_home_care_11",
+            "ev_assisted_home_care_12",
+            "ev_assisted_home_care_13",
+            "ev_assisted_home_care_14",
+            "ev_assisted_home_care_15"
+          ],
+          "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Target design inference, not an upstream claim: the pinned research makes the home the subject and requires recurring work plus a durable completion record. Upstream code corroborates that abstract shape but realizes recurrence in months, keeps one house profile, links maintenance to an optional appliance, and does not show an explicit appliance-to-home foreign key in the selected files. The target therefore makes the home anchor explicit through home_id on equipment and plans, uses every-N-days recurrence from the scenario, and keeps only the home, equipment, plan, completion, and history slice. It does not copy upstream code, schema, or UI. Upstream status: not_run; no upstream build, test, server, TUI, or database was started.",
+        "reviews": [
+          {
+            "review_id": "rev_a1991ccf5863462d708df8f9480d0954",
+            "outcome": "accepted",
+            "reviewer": "ses_ea2691a44ffemHBxOiocBq67ci",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "fc10e571de4fd29af2d7f8cc4922fe2a76a34779b30aa86d6973d9bb2943b554",
+            "created_at": "2026-10-21T08:38:10.467814+00:00"
+          }
+        ]
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "Home and equipment anchor",
+          "Every-N-day plan and due queue",
+          "Completion and next-due rollover",
+          "Anchored care history",
+          "Accessible localhost UI"
+        ],
+        "case_id": "case:auxiliary-go-pilot-2026-10-21:home-care",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_assisted_home_care_1",
+          "ev_assisted_home_care_2",
+          "ev_assisted_home_care_3",
+          "ev_assisted_home_care_4",
+          "ev_assisted_home_care_5",
+          "ev_assisted_home_care_6",
+          "ev_assisted_home_care_7",
+          "ev_assisted_home_care_8",
+          "ev_assisted_home_care_9",
+          "ev_assisted_home_care_10",
+          "ev_assisted_home_care_11",
+          "ev_assisted_home_care_12",
+          "ev_assisted_home_care_13",
+          "ev_assisted_home_care_14",
+          "ev_assisted_home_care_15",
+          "ev_assisted_home_care_design"
+        ],
+        "exclusions": [
+          "Upstream status: not_run. The repository was read as evidence only; no build, test, server, TUI, or database was executed, so no upstream behavior is runtime-verified.",
+          "Runtime verification is not_run for the target too. The probe and architecture are authored artifacts; no server was started and no acceptance case was executed in this task.",
+          "Single-home and single-user by design; no multi-property, accounts, authentication, sharing, or remote access.",
+          "No notifications, email, SMS, push, calendar sync, or background scheduler; due work is pull-based through the API and UI.",
+          "No costs, vendors, receipts, photos, manuals, warranties, projects, quotes, incidents, documents, or LLM features; those upstream surfaces are intentionally out of scope.",
+          "Every-N-days recurrence differs from upstream interval months; no compatibility with upstream databases, APIs, or schema is claimed.",
+          "No delete, undo, archive, or restore endpoints; completion history is append-only and test records remain until the disposable data directory is discarded.",
+          "Validation is strict and date-only; natural-language dates and timezone conversion are unsupported. Server local date can differ by one day from a client in another timezone.",
+          "The UI is a minimal single-page client, not a polished product; no internationalization, offline cache, or mobile-native behavior.",
+          "Schema v1 has no migration path. Changing entities later needs an explicit migration or a new disposable database.",
+          "Concurrency is sized for one user; SQLite WAL and busy_timeout reduce but do not eliminate lock contention.",
+          "User decision points: confirm one-home scope, the default due date of creation day when no anchor is provided, latest-completion rollover for backdated entries, strict date-only input, and the absence of delete and defect-tracking features.",
+          "Restart durability may be described as an operator stop and start step in README; it was not run and is not claimed as verified."
+        ],
+        "reason": "Create the home and its equipment, define every-N-day care plans anchored to them, see exactly which tasks are due or overdue as of a date, record a completion with a note, advance the next due date from the actual completion date, and retrieve care history by home or equipment.",
+        "scenario_id": "scn_802f9221599a491781b3dafa4f27a033",
+        "scenario_revision": 1,
+        "workflow_support": []
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": null,
+        "collected_at": "2026-10-21T08:27:57.872919+00:00",
+        "commit_sha": "ca69a88f998dec25c1e285121e428a4f7621dc68",
+        "excluded_paths": [
+          "Unselected files; upstream not installed or run"
+        ],
+        "file_manifest_digest": "6e6d457845ca87b3f83ebc8869427ac2e6f4e0e9a6878b61899bfd1c5f62687c",
+        "files": {
+          "LICENSE": "837f9e6758e4d3313dc19beaa4638522f22c781c9a27d32ff56b473e7094eccc",
+          "README.md": "40b5d4f8df78510ec9b05454df1d307ca5eb44ee055328229faa07d0f6e1c348",
+          "internal/data/dashboard.go": "d03ed7b8243f97c6f906a52ba7aad63645a468586092c4584f20437972ffd656",
+          "internal/data/models.go": "5cd2a997f2efa9fd7d2916446d8173571fba7ee40dfb9703083d266bb6cab000",
+          "internal/data/store_house.go": "e79c86687cc434803229f62571c4b5737eac983a8d1e7d6ef1e32bf15c0bf205",
+          "internal/data/store_maintenance.go": "d150cb4ee2bc410a9844768b63a4447c81a8122555c9bcc465b1c54c3a9d2b37",
+          "internal/data/store_servicelog.go": "0cc864c8ff483237fbd128d417f6d2bf2a9ff66fdcbf2719c97cb239c6a65f4a",
+          "internal/data/validation.go": "6bb00aeae3903900ef4182e87fb10bbb640980bcde6739e5e252d29b45d8fef4"
+        },
+        "license": {
+          "notice_hashes": {
+            "LICENSE": "837f9e6758e4d3313dc19beaa4638522f22c781c9a27d32ff56b473e7094eccc"
+          },
+          "spdx_id": "Apache-2.0",
+          "status": "located"
+        },
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_uncertainties": [
+          "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+        ],
+        "repo_id": null,
+        "repository": "https://github.com/micasa-dev/micasa",
+        "snapshot_id": "src_8b5775cbd27085addccfe547",
+        "strategy_version": "go-auxiliary-selected-files-v1"
+      }
+    ]
+  },
+  {
+    "app_id": "app:repo:faa52e6b14140add50579594",
+    "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+    "created_at": "2026-10-19T06:19:40.565663+00:00",
+    "created_task_id": "job_d59605a1fbac430e84966ff143871068",
+    "digest": "d58ca8ae2ad37f581bbc79d1743df34657cdd651a43320db32ad3c4aeb275caf",
+    "evidence_digest": "706fa40ddf461e7cf1256f4b133979d5a019c6e7b848878c1be27bc75bd00d06",
+    "research": {
+      "input_digest": "941796f8efe0d21bbf6c268898d7d401d1e6cc2b3cfe2b0fb1a2c5e56e5d8587",
+      "scope": "Full read of the pinned source manifest under source/: README.md, package.json, index.html, vite.config.js, tsconfig.json, .gitignore, src/index.ts, src/App.tsrx (all 763 lines), src/includes/store.ts, src/includes/utils.ts, and src/includes/Icon.tsrx (first 80 lines); directory listings of source/ and source/src/. No files were executed, and no code outside the supplied manifest was inspected.",
+      "summary": "The pinned upstream tree at commit 539881b (github.com/lakhindarpal/bookmark-manager, materialized under source/) is a client-only bookmark manager built with Ripple TS, Vite, Tailwind/DaisyUI, Valibot, and Dexie/IndexedDB. A single Bookmark record type carries id, title, url, hostname, favicon Blob, description, flat tags[], isPinned, isArchived, visitCount, createdAt, visitedAt (source/src/includes/store.ts:3-16). The DB 'BookmarkDB' v1 has one table 'bookmarks' keyed by id with createdAt and visitCount indexes (source/src/includes/store.ts:41-47). The single component App.tsrx implements: an add/edit dialog with Valibot validation (URL http/https, title, description, 1-5 tags), a library grid with Home/Archived tabs, tag-filter sidebar with per-tag counts, title-only search, three sort modes with pinned-first, Visit (increments visitCount/visitedAt then window.open), Copy URL, Pin/Unpin, Edit, Archive/Unarchive, and a Delete action available only on archived items with a 5-second Undo toast. Metadata/favicons are fetched opportunistically from third-party services (api.microlink.io, images.weserv.nl, Google favicon) behind a 'sparkles' button and a fallback path, with failures only console.error'd. No test files, no import/export, no collections/folders, no sync, no preserved page copies, and no test script exist in the supplied manifest.",
+      "task_id": "job_d59605a1fbac430e84966ff143871068",
+      "unknowns": [
+        "Runtime behavior was not observed; all claims are static reading of source files.",
+        "Whether Dexie/IndexedDB persistence behaves correctly in real browsers at this commit is unverified.",
+        "Whether the third-party metadata/favicon endpoints (api.microlink.io, images.weserv.nl, Google s2 favicons) are reachable, rate-limited, or CORS-permitted at runtime is unverified.",
+        "The paired Research Notes referenced by leaf.md were not supplied, so product-level evidence beyond the pinned repository is unavailable.",
+        "No automated tests exist in the manifest, so none of the described behaviors are test-confirmed.",
+        "Behavior of Ripple TS reactivity primitives (track/effect/bindGroup/bindValue) at this pinned version was not validated.",
+        "The full commit tree was inferred from the supplied source_manifest and the on-disk source/ directory; files outside it were not inspected.",
+        "Host excluded unsupported evidence obs-no-test-files: observation cites an unknown source path: source/src",
+        "Host excluded unsupported evidence inf-no-tests: Depends on a quarantined, unlocated observation"
+      ]
+    },
+    "research_input_digest": "941796f8efe0d21bbf6c268898d7d401d1e6cc2b3cfe2b0fb1a2c5e56e5d8587",
+    "revision": 1,
+    "snapshot_ids": [
+      "src_3a8113f49b44ef3b3d7a7fca"
+    ],
+    "observations": [
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "2be642fc8f35015df2b623af261894b765c1fb9106932c90805f80a6db2449fd",
+        "evidence_id": "ev_ba200adf6e2c_05babdea64ba9858",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+          "line_end": 714,
+          "line_start": 699,
+          "path": "src/App.tsrx",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/App.tsrx"
+          },
+          "symbol": "inputData"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "New records are built with id `bm-${crypto.randomUUID()}`, hostname from getHostname(url), and defaults visitCount=0, visitedAt=null, isPinned=false, isArchived=false, createdAt=Date.now(); edits preserve the previous id, isPinned, isArchived, visitCount, createdAt, and visitedAt.",
+        "reviews": [
+          {
+            "review_id": "rev_46c0df270d9650196c868f5d06b334dc",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "2be642fc8f35015df2b623af261894b765c1fb9106932c90805f80a6db2449fd",
+            "created_at": "2026-10-19T06:21:07.828045+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "b4373de490abd2fc3e1545595bc1aef7af5f1953c48b0816e39527dd68cdd600",
+        "evidence_id": "ev_ba200adf6e2c_06c81a165e03c96a",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+          "line_end": 412,
+          "line_start": 369,
+          "path": "src/App.tsrx",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/App.tsrx"
+          },
+          "unresolved_symbol": "pin, edit"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Pin/Unpin and Edit actions are rendered only when the item is not archived, and Edit loads the item's url/title/description/tags/favicon into the dialog.",
+        "reviews": [
+          {
+            "review_id": "rev_ec8cc0127f290dac7297ffc35bf9c343",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "b4373de490abd2fc3e1545595bc1aef7af5f1953c48b0816e39527dd68cdd600",
+            "created_at": "2026-10-19T06:21:07.825636+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "9738ecfec828bc93a93274ef07cd0eb86963a8ef677eb5fb0ce111beb3d2a41c",
+        "evidence_id": "ev_ba200adf6e2c_1596da4a90687ca5",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+          "line_end": 129,
+          "line_start": 101,
+          "path": "src/App.tsrx",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/App.tsrx"
+          },
+          "symbol": "BookmarkFormSchema"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "The Valibot BookmarkFormSchema requires a non-empty URL matching /^https?:\\/\\/(?:[\\w-]+\\.)+[a-zA-Z]{2,}(?:\\/\\S*)?$/ and v.url, a non-empty title up to 100 chars, a non-empty description up to 280 chars, and 1-5 tags each up to 30 chars.",
+        "reviews": [
+          {
+            "review_id": "rev_0b37c012f62544bd4324560e45249414",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "9738ecfec828bc93a93274ef07cd0eb86963a8ef677eb5fb0ce111beb3d2a41c",
+            "created_at": "2026-10-19T06:21:07.823512+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "1ebeb1e40d63cadc38f496131bc9f48610c3139b391ac6adb08b097ff39ad2e9",
+        "evidence_id": "ev_ba200adf6e2c_2288b28e90cd8450",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+          "line_end": 61,
+          "line_start": 58,
+          "path": "src/App.tsrx",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/App.tsrx"
+          },
+          "unresolved_symbol": "tab, filters, sort, search"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Tab, tag filters, sort, and search are held in component-local tracked state initialized to 'Home', [], 'Recently Added', and '' respectively, with no persistence to Dexie.",
+        "reviews": [
+          {
+            "review_id": "rev_5ef65fbeb85bf445e193f651af322b88",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "1ebeb1e40d63cadc38f496131bc9f48610c3139b391ac6adb08b097ff39ad2e9",
+            "created_at": "2026-10-19T06:21:07.822624+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "389846b2bf6635cde3ef8161f1027bc19d99f423d7aee1c75c13bdb72936aa50",
+        "evidence_id": "ev_ba200adf6e2c_3168bcd465b6a043",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "No collection concept exists outside the Bookmark fields and App.tsrx UI."
+          ],
+          "depends_on": [
+            "ev_ba200adf6e2c_9c7f6060878383fa",
+            "ev_ba200adf6e2c_1596da4a90687ca5",
+            "ev_ba200adf6e2c_06c81a165e03c96a",
+            "ev_ba200adf6e2c_9ab6b0e51811a16d"
+          ],
+          "reasoning": "The data model exposes only tags[] for organization, the form caps tags at five, and the sidebar only renders tag checkboxes rather than a collection tree; reclassification happens by editing the tag list."
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "The scenario's user-controlled 'category' (归类) is realized only as up to five free-text tags on each record; there are no creatable, renameable, or nestable collections, and no separate move operation beyond editing tags.",
+        "reviews": [
+          {
+            "review_id": "rev_abb30c4bb1e972bffd70297fe0d90942",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "389846b2bf6635cde3ef8161f1027bc19d99f423d7aee1c75c13bdb72936aa50",
+            "created_at": "2026-10-19T06:21:07.831728+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "d6e7ebaee80c4ec90fb0e73e82b9df7b114ae35a66f5b44151c1377471ea5d3c",
+        "evidence_id": "ev_ba200adf6e2c_35e41aab676021eb",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+          "line_end": 37,
+          "line_start": 29,
+          "path": "src/App.tsrx",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/App.tsrx"
+          },
+          "unresolved_symbol": "saveBookmark, deleteBookmark"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "saveBookmark sets the record in the in-memory map then awaits db.bookmarks.put(bm); deleteBookmark removes from the map then awaits db.bookmarks.delete(id).",
+        "reviews": [
+          {
+            "review_id": "rev_6f83dce8bac2790e094d875627c67331",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "d6e7ebaee80c4ec90fb0e73e82b9df7b114ae35a66f5b44151c1377471ea5d3c",
+            "created_at": "2026-10-19T06:21:07.822125+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "c90500dc23152ef3169a31cffd3461e6658c44a59c78717de9c86347de959c9c",
+        "evidence_id": "ev_ba200adf6e2c_3b553994c375aea5",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "saveBookmark uses put with a newly generated id for every add, so identical URLs are distinct rows."
+          ],
+          "depends_on": [
+            "ev_ba200adf6e2c_515aa5d072bd2ec4",
+            "ev_ba200adf6e2c_05babdea64ba9858"
+          ],
+          "reasoning": "The schema indexes id, createdAt, and visitCount, not url, and each add generates a fresh `bm-${crypto.randomUUID()}` id."
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Duplicate records for the same URL can accumulate because the url field is neither uniquely indexed nor checked before insert; only id (a random UUID) is the key.",
+        "reviews": [
+          {
+            "review_id": "rev_e56007e9949a011802dad21a9f589e43",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "c90500dc23152ef3169a31cffd3461e6658c44a59c78717de9c86347de959c9c",
+            "created_at": "2026-10-19T06:21:07.838838+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "afc1f95277bba05677cc73f352b93faf89c2396c957e36f962dedcc2bee005f1",
+        "evidence_id": "ev_ba200adf6e2c_4c56ef30a1785be1",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+          "line_end": 453,
+          "line_start": 436,
+          "path": "src/App.tsrx",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/App.tsrx"
+          },
+          "symbol": "delete"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "A Delete action is rendered only for archived items; it calls deleteBookmark and shows an error-type toast with an Undo action that calls saveBookmark(item) to restore the record.",
+        "reviews": [
+          {
+            "review_id": "rev_1e02e15df6f3ece787b1db3fa1f58f69",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "afc1f95277bba05677cc73f352b93faf89c2396c957e36f962dedcc2bee005f1",
+            "created_at": "2026-10-19T06:21:07.826601+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "d51afa6a8eea6ab32450d028bf4ffc560b2c0007698bd9ff6bf8402b2ea79a22",
+        "evidence_id": "ev_ba200adf6e2c_5011700a24e503c7",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "d581eb982ce67b285056a74ab02d31a6a6a957423340da078e4ae89d9004189c",
+          "line_end": 26,
+          "line_start": 1,
+          "path": "src/includes/utils.ts",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/includes/utils.ts"
+          },
+          "unresolved_symbol": "getHostname, getBlobUrl, formatDate"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "getHostname returns '' unless the URL matches an http/https regex with a dotted domain, otherwise returns new URL(url).hostname; getBlobUrl caches object URLs per Blob in a WeakMap; formatDate returns 'Never' for falsy timestamps else a locale date string.",
+        "reviews": [
+          {
+            "review_id": "rev_9e485f316db5c12a87ff5f2f6c434f22",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "d51afa6a8eea6ab32450d028bf4ffc560b2c0007698bd9ff6bf8402b2ea79a22",
+            "created_at": "2026-10-19T06:21:07.828586+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "49ea8eb4be0e58f25ff563a88a802f0e376b61cf72a9e0401a85d5969c976c59",
+        "evidence_id": "ev_ba200adf6e2c_515aa5d072bd2ec4",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "b4dc58a7a48cd9929f3d35f31aef9fd5eb2b0b0606cdf735ce436a1e162b07ed",
+          "line_end": 47,
+          "line_start": 41,
+          "path": "src/includes/store.ts",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/includes/store.ts"
+          },
+          "symbol": "db"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "A Dexie database named 'BookmarkDB' version 1 declares a single 'bookmarks' EntityTable keyed by id and indexed on createdAt and visitCount.",
+        "reviews": [
+          {
+            "review_id": "rev_ff29815e7bea88b891d2ffc8e3b02cfc",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "49ea8eb4be0e58f25ff563a88a802f0e376b61cf72a9e0401a85d5969c976c59",
+            "created_at": "2026-10-19T06:21:07.820924+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "377aeaeae058465469b6fe1959717ca365afd37673ba179c231e244e255e17eb",
+        "evidence_id": "ev_ba200adf6e2c_5d51c18a989c01f8",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "6cbf0e25606a5627e6e3e6ceff394929691edf2d6417df922ecdca3321524eab",
+          "line_end": 19,
+          "line_start": 14,
+          "path": "index.html",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/index.html"
+          },
+          "symbol": "root"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "index.html defines the #root div and loads /src/index.ts as a module for the Bookmark Manager SPA.",
+        "reviews": [
+          {
+            "review_id": "rev_3268cf1b7ce2e999b1f1e479f02b7743",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "377aeaeae058465469b6fe1959717ca365afd37673ba179c231e244e255e17eb",
+            "created_at": "2026-10-19T06:21:07.830338+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "4ea50a75bb0e27a6e885708b1593f7292c686a9b8f7212a4826fdafa38c93e45",
+        "evidence_id": "ev_ba200adf6e2c_6805376f7e2ee383",
+        "kind": "documentation",
+        "location": {
+          "content_digest": "b49b8acb566472b0d377438114d662854b4fb93c90b4cbde180c7dac588e3a93",
+          "host_classification": "Fixed documentation file; no implementation or runtime claim.",
+          "material_version": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "source_path": "README.md",
+          "url": "https://github.com/lakhindarpal/bookmark-manager/blob/539881bc67099d491e8ab6f85de0f443fa7de623/README.md"
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "README describes the app as local-first with bookmarks stored in IndexedDB and featuring tagging, sorting by recently added/visited/most visited, and archiving/pinning.",
+        "reviews": [
+          {
+            "review_id": "rev_d14209dba2e7bb81732cc974407e721e",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "4ea50a75bb0e27a6e885708b1593f7292c686a9b8f7212a4826fdafa38c93e45",
+            "created_at": "2026-10-19T06:21:07.829035+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "a10fc2b280ae2e83eda3562e52f62fa390b5962f5fc8a32f5a1eba5f196d57ab",
+        "evidence_id": "ev_ba200adf6e2c_6bbd7a588896fe31",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "Users cannot bypass the schema, since submit always calls v.safeParse before saving."
+          ],
+          "depends_on": [
+            "ev_ba200adf6e2c_1596da4a90687ca5"
+          ],
+          "reasoning": "The tags schema enforces v.minLength(1), so a record cannot be stored without at least one tag, leaving no 'unsorted' inbox path."
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "The scenario step of letting unclassified links land in a default category is not supported, because the form schema rejects saves with zero tags.",
+        "reviews": [
+          {
+            "review_id": "rev_d30f354f0561c67d434dd9bce51a1f44",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "a10fc2b280ae2e83eda3562e52f62fa390b5962f5fc8a32f5a1eba5f196d57ab",
+            "created_at": "2026-10-19T06:21:07.832267+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "417f58299cbd24f45c2abf5da20809db08d1d4449513e6fce604746c740ceeb8",
+        "evidence_id": "ev_ba200adf6e2c_7150b0ac7a5678db",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+          "line_end": 367,
+          "line_start": 360,
+          "path": "src/App.tsrx",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/App.tsrx"
+          },
+          "symbol": "Copy URL"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "A Copy URL action writes item.url to the clipboard and shows a success toast.",
+        "reviews": [
+          {
+            "review_id": "rev_595e62aa4e20e727580341324a04aac1",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "417f58299cbd24f45c2abf5da20809db08d1d4449513e6fce604746c740ceeb8",
+            "created_at": "2026-10-19T06:21:07.825138+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "61df1547455c601ea568f92bc65237af3f6dc7298abc18a837f8943a283a1fed",
+        "evidence_id": "ev_ba200adf6e2c_7d47d725a2e9b759",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "The user may submit without pressing the metadata button, in which case only the submitted fields are stored."
+          ],
+          "depends_on": [
+            "ev_ba200adf6e2c_ec303a2fd1afa287",
+            "ev_ba200adf6e2c_8e11efc61a4650ba",
+            "ev_ba200adf6e2c_05babdea64ba9858"
+          ],
+          "reasoning": "Both the metadata fetch and the favicon fallback are wrapped in try/catch that only log, and submission proceeds to build the record regardless of enrichment success."
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Metadata and favicon enrichment is best-effort and dependent on third-party HTTP services; failures degrade silently to console errors while the bookmark still saves with whatever fields the user entered or omitted defaults for.",
+        "reviews": [
+          {
+            "review_id": "rev_5d12e294526ebc830272e052d567e397",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "61df1547455c601ea568f92bc65237af3f6dc7298abc18a837f8943a283a1fed",
+            "created_at": "2026-10-19T06:21:07.838414+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "aaec85f888e49f2f7bf49cbb2c85bb7ecb79bfdbefb451f54c0513ffe217015e",
+        "evidence_id": "ev_ba200adf6e2c_86ed2327f33a3ca8",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+          "line_end": 27,
+          "line_start": 23,
+          "path": "src/App.tsrx",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/App.tsrx"
+          },
+          "symbol": "App"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "An effect on component creation calls db.bookmarks.toArray() and inserts each returned bookmark into an in-memory RippleMap keyed by bookmark id.",
+        "reviews": [
+          {
+            "review_id": "rev_ad696d53ea90471bb4f92ea86978166f",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "aaec85f888e49f2f7bf49cbb2c85bb7ecb79bfdbefb451f54c0513ffe217015e",
+            "created_at": "2026-10-19T06:21:07.821532+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "5b5992d70729f93b9fbb0cb638e3f411035b63c039b315be37b48118e72576d5",
+        "evidence_id": "ev_ba200adf6e2c_8e11efc61a4650ba",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+          "line_end": 697,
+          "line_start": 684,
+          "path": "src/App.tsrx",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/App.tsrx"
+          },
+          "symbol": "finalFavicon"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "On submit, if no favicon exists and a hostname is derivable, the code fetches a Google s2 favicon proxied through images.weserv.nl inside a try/catch that only logs failure.",
+        "reviews": [
+          {
+            "review_id": "rev_82b6bbdedebb75f12f5be9526bb6e1f2",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "5b5992d70729f93b9fbb0cb638e3f411035b63c039b315be37b48118e72576d5",
+            "created_at": "2026-10-19T06:21:07.827480+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "ac91e57b3dba519d9ffb913ca79f58946e36c37beccba7fad8d776ef436e038f",
+        "evidence_id": "ev_ba200adf6e2c_922f1dbc84912d99",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "IndexedDB storage is not shared or synchronized across browsers/devices by the app."
+          ],
+          "depends_on": [
+            "ev_ba200adf6e2c_515aa5d072bd2ec4",
+            "ev_ba200adf6e2c_6805376f7e2ee383",
+            "ev_ba200adf6e2c_86ed2327f33a3ca8"
+          ],
+          "reasoning": "The only storage mechanism declared is a local Dexie/IndexedDB database and the README frames the design as local-first with no accounts or servers."
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Persistence is local to one browser profile/device via IndexedDB with no sync layer, so the scenario's cross-session growth holds only on the same browser, and the leaf's multi-device context is unmet.",
+        "reviews": [
+          {
+            "review_id": "rev_ef1e1752bf79c5445f5fe6139895e5fa",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "ac91e57b3dba519d9ffb913ca79f58946e36c37beccba7fad8d776ef436e038f",
+            "created_at": "2026-10-19T06:21:07.833594+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "5a62fabe586db5e0860e7f15b7618ca09a326564cbe846fffd5edf767dad4836",
+        "evidence_id": "ev_ba200adf6e2c_93ef917a193a45ab",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "No other delete entry point exists in the manifest."
+          ],
+          "depends_on": [
+            "ev_ba200adf6e2c_4c56ef30a1785be1",
+            "ev_ba200adf6e2c_b1ca64cf2ad02998",
+            "ev_ba200adf6e2c_2288b28e90cd8450"
+          ],
+          "reasoning": "The Delete <li> is inside the if (item.isArchived) block, and restoration is bound solely to the toast's Undo onClick, which disappears when the toast auto-expires in five seconds."
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Deletion is limited to archived records and recovery is only the transient Undo action on the toast; there is no trash view, and non-archived records cannot be deleted at all through the UI.",
+        "reviews": [
+          {
+            "review_id": "rev_aaa7715d000be680685ac193c67bf124",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "5a62fabe586db5e0860e7f15b7618ca09a326564cbe846fffd5edf767dad4836",
+            "created_at": "2026-10-19T06:21:07.837897+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "5140e0f21c0580e0819eba9058916919e81482cab61d27274a444435732adb0d",
+        "evidence_id": "ev_ba200adf6e2c_93ff254508846f11",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+          "line_end": 354,
+          "line_start": 339,
+          "path": "src/App.tsrx",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/App.tsrx"
+          },
+          "symbol": "Visit"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "The Visit action builds an updated bookmark with visitedAt=Date.now() and visitCount+1, calls saveBookmark(updated), then opens the URL with window.open(item.url, '_blank', 'noopener,noreferrer').",
+        "reviews": [
+          {
+            "review_id": "rev_e21995b48810a64485232d26f9db0e02",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "5140e0f21c0580e0819eba9058916919e81482cab61d27274a444435732adb0d",
+            "created_at": "2026-10-19T06:21:07.824562+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "75434817f5a108c7b7b39668c58497de2b976947bdaa60495a5976f1ea5595b9",
+        "evidence_id": "ev_ba200adf6e2c_9ab6b0e51811a16d",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+          "line_end": 88,
+          "line_start": 63,
+          "path": "src/App.tsrx",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/App.tsrx"
+          },
+          "symbol": "bookmarks"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "The displayed list filters by isArchived matching the active tab, requires every selected tag to be present in bookmark.tags, matches search only against bookmark.title.toLowerCase(), and sorts pinned-first then by the chosen sort mode with createdAt descending as fallback.",
+        "reviews": [
+          {
+            "review_id": "rev_c110bee260eee772e9d38175601ddb6c",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "75434817f5a108c7b7b39668c58497de2b976947bdaa60495a5976f1ea5595b9",
+            "created_at": "2026-10-19T06:21:07.823048+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "7fe14da0e40fc7a3971695a98e45db3905cd89980fbfbe01fd719bf357d14315",
+        "evidence_id": "ev_ba200adf6e2c_9c7f6060878383fa",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "b4dc58a7a48cd9929f3d35f31aef9fd5eb2b0b0606cdf735ce436a1e162b07ed",
+          "line_end": 16,
+          "line_start": 3,
+          "path": "src/includes/store.ts",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/includes/store.ts"
+          },
+          "symbol": "Bookmark"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "The Bookmark type stores id, title, url, hostname, favicon Blob, description, tags string array, isPinned, isArchived, visitCount, createdAt, and visitedAt.",
+        "reviews": [
+          {
+            "review_id": "rev_8520756153c31c1a1f6b7c4554ca2db4",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "7fe14da0e40fc7a3971695a98e45db3905cd89980fbfbe01fd719bf357d14315",
+            "created_at": "2026-10-19T06:21:07.820112+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "590e1663da363c0d40628033b036e2a9fca8adac9d36f7c06ec77c68b311c504",
+        "evidence_id": "ev_ba200adf6e2c_a2ebc864c5b6b3e7",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "8fd34f45b8e3392cfad6650602b1704af7e4b150cae22e74332555ce69406ba8",
+          "line_end": 9,
+          "line_start": 1,
+          "path": "src/index.ts",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/index.ts"
+          },
+          "symbol": "mount"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "The entry point imports index.css, mounts the App component into #root via ripple's mount, and throws if the root element is missing.",
+        "reviews": [
+          {
+            "review_id": "rev_77c1566c20a050ab41c5b755e5119f74",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "590e1663da363c0d40628033b036e2a9fca8adac9d36f7c06ec77c68b311c504",
+            "created_at": "2026-10-19T06:21:07.829888+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "eb9d0a5e4ed877eac8c088c53461ae82b096ba848c5a783cd29b30e3d16e5b25",
+        "evidence_id": "ev_ba200adf6e2c_b1ca64cf2ad02998",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+          "line_end": 435,
+          "line_start": 413,
+          "path": "src/App.tsrx",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/App.tsrx"
+          },
+          "symbol": "archive"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "The Archive/Unarchive action toggles isArchived and, when archiving, forces isPinned=false before saving.",
+        "reviews": [
+          {
+            "review_id": "rev_62aa9ba40efb4e5214a96b640e7d6340",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "eb9d0a5e4ed877eac8c088c53461ae82b096ba848c5a783cd29b30e3d16e5b25",
+            "created_at": "2026-10-19T06:21:07.826098+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "267281aac7c69c5885e3382f0d16023a79d7b47575b8fe6356b76ae4407eacbf",
+        "evidence_id": "ev_ba200adf6e2c_c4ad7e52e5713628",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+          "line_end": 56,
+          "line_start": 49,
+          "path": "src/App.tsrx",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/App.tsrx"
+          },
+          "symbol": "tagCounts"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Tag counts are derived by iterating all in-memory bookmarks and counting each tag occurrence, then sorted alphabetically for the sidebar.",
+        "reviews": [
+          {
+            "review_id": "rev_7a7c4ab13b57c2dd30ec13457404f616",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "267281aac7c69c5885e3382f0d16023a79d7b47575b8fe6356b76ae4407eacbf",
+            "created_at": "2026-10-19T06:21:07.827001+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "bedaf525785c18f436a430e24489689d9ad973b6e3be5b1896281550222371cb",
+        "evidence_id": "ev_ba200adf6e2c_e62ae7e0a2c68ba1",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "Tag names are found only via the sidebar checkbox filter, not via the text search."
+          ],
+          "depends_on": [
+            "ev_ba200adf6e2c_9ab6b0e51811a16d"
+          ],
+          "reasoning": "The filter clause applies _search exclusively to bookmark.title.toLowerCase()."
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "Retrieval by keyword covers only bookmark titles, not URLs, descriptions, or tag names, so the scenario's 'find by a remembered word' workflow is partially supported.",
+        "reviews": [
+          {
+            "review_id": "rev_334567075bfe4f50ab7301ba1a40bce8",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "bedaf525785c18f436a430e24489689d9ad973b6e3be5b1896281550222371cb",
+            "created_at": "2026-10-19T06:21:07.833137+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "134199e7260f757d7c708010991955293b629b4022be9c00b78a7de5df6e52e5",
+        "evidence_id": "ev_ba200adf6e2c_e7dd8d32c05c39f9",
+        "kind": "inference",
+        "location": {
+          "assumptions": [
+            "Dexie over IndexedDB persists between sessions in the user's browser profile.",
+            "RippleMap reactivity renders the loaded records as the grid of articles."
+          ],
+          "depends_on": [
+            "ev_ba200adf6e2c_9c7f6060878383fa",
+            "ev_ba200adf6e2c_515aa5d072bd2ec4",
+            "ev_ba200adf6e2c_86ed2327f33a3ca8",
+            "ev_ba200adf6e2c_35e41aab676021eb",
+            "ev_ba200adf6e2c_1596da4a90687ca5",
+            "ev_ba200adf6e2c_9ab6b0e51811a16d",
+            "ev_ba200adf6e2c_93ff254508846f11"
+          ],
+          "reasoning": "Records are persisted on save and re-read on mount into the reactive map that drives the filtered/sorted list; the Visit action reopens the stored URL, closing the retrieve-and-return loop."
+        },
+        "observation_status": "model_extracted",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "The app supports the scenario's save-now/find-later loop: a deliberate add dialog writes a URL-anchored record into durable IndexedDB, and the record can later be browsed, tag-filtered, title-searched, and opened back to the live URL.",
+        "reviews": [
+          {
+            "review_id": "rev_be1d5e756f55721e76640786fda6892c",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "134199e7260f757d7c708010991955293b629b4022be9c00b78a7de5df6e52e5",
+            "created_at": "2026-10-19T06:21:07.830820+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "f2e6082bf490d98e7f508b61d6a29a5f05561c99fc07f308e61dd83888728c18",
+        "evidence_id": "ev_ba200adf6e2c_ec303a2fd1afa287",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+          "line_end": 160,
+          "line_start": 133,
+          "path": "src/App.tsrx",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/src/App.tsrx"
+          },
+          "symbol": "fetchMeta"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "fetchMeta calls https://api.microlink.io/?url=... and, on success with result.data, sets title/description and fetches the logo through https://images.weserv.nl/; errors are only console.error'd and the finally block resets loading.",
+        "reviews": [
+          {
+            "review_id": "rev_87d4484969add14b26ab5f4991a0c7c2",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "f2e6082bf490d98e7f508b61d6a29a5f05561c99fc07f308e61dd83888728c18",
+            "created_at": "2026-10-19T06:21:07.824083+00:00"
+          }
+        ]
+      },
+      {
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "digest": "51c3bca2ca4c2a10017a498dd2a0f533426b51ac3aeb4bf627fec81b7ab52ada",
+        "evidence_id": "ev_ba200adf6e2c_f30eb4285ca66219",
+        "kind": "code_observation",
+        "location": {
+          "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+          "file_digest": "a0df38a4bf76cb70e4a46fed0487345b3bd89ee98ec8b69f48bfca95260c6e90",
+          "line_end": 19,
+          "line_start": 10,
+          "path": "package.json",
+          "path_normalization": {
+            "policy": "single-source-mount-prefix-v1",
+            "reported": "source/package.json"
+          },
+          "symbol": "scripts"
+        },
+        "observation_status": "source_located",
+        "review": {
+          "status": "pending"
+        },
+        "statement": "package.json scripts are start, dev, build, lint, typecheck, serve, format, and check; there is no test script and no test dependency.",
+        "reviews": [
+          {
+            "review_id": "rev_8702bbd620dd76abf479ad37bed579a2",
+            "outcome": "accepted",
+            "reviewer": "case-review:job_d59605a1fbac430e84966ff143871068",
+            "reviewer_kind": "independent_agent",
+            "evidence_digest": "51c3bca2ca4c2a10017a498dd2a0f533426b51ac3aeb4bf627fec81b7ab52ada",
+            "created_at": "2026-10-19T06:21:07.829454+00:00"
+          }
+        ]
+      }
+    ],
+    "scenario_links": [
+      {
+        "adopted_scope": [
+          "Bookmark record model and Dexie/IndexedDB persistence layer (source/src/includes/store.ts:3-16, source/src/includes/store.ts:41-47).",
+          "Add/edit dialog with Valibot validation and generated ids (source/src/App.tsrx:101-129, source/src/App.tsrx:699-717).",
+          "Library list, tabs, tag sidebar, search, sort, and per-card actions (source/src/App.tsrx:58-88, source/src/App.tsrx:178-498).",
+          "URL validation, hostname extraction, blob-URL favicon handling, and date formatting (source/src/includes/utils.ts:1-26).",
+          "Application mount and static HTML shell (source/src/index.ts:1-9, source/index.html:14-19)."
+        ],
+        "case_id": "case:product-c42848f63251507bd9d911a5:faa52e6b1414",
+        "case_revision": 1,
+        "evidence_ids": [
+          "ev_ba200adf6e2c_1596da4a90687ca5",
+          "ev_ba200adf6e2c_05babdea64ba9858",
+          "ev_ba200adf6e2c_35e41aab676021eb",
+          "ev_ba200adf6e2c_86ed2327f33a3ca8",
+          "ev_ba200adf6e2c_9ab6b0e51811a16d",
+          "ev_ba200adf6e2c_c4ad7e52e5713628",
+          "ev_ba200adf6e2c_93ff254508846f11",
+          "ev_ba200adf6e2c_7150b0ac7a5678db",
+          "ev_ba200adf6e2c_06c81a165e03c96a",
+          "ev_ba200adf6e2c_b1ca64cf2ad02998",
+          "ev_ba200adf6e2c_4c56ef30a1785be1",
+          "ev_ba200adf6e2c_ec303a2fd1afa287",
+          "ev_ba200adf6e2c_8e11efc61a4650ba",
+          "ev_ba200adf6e2c_e7dd8d32c05c39f9",
+          "ev_ba200adf6e2c_3168bcd465b6a043",
+          "ev_ba200adf6e2c_6bbd7a588896fe31",
+          "ev_ba200adf6e2c_e62ae7e0a2c68ba1",
+          "ev_ba200adf6e2c_922f1dbc84912d99",
+          "ev_ba200adf6e2c_93ef917a193a45ab",
+          "ev_ba200adf6e2c_7d47d725a2e9b759"
+        ],
+        "exclusions": [
+          "No collections/folders or nested organization: organization is a flat string[] tags field only (source/src/includes/store.ts:3-16).",
+          "No unsorted/default category: the schema requires at least one tag (source/src/App.tsrx:121-128).",
+          "Search is title-only; URL, description, and tags are not searched (source/src/App.tsrx:63-88).",
+          "No import/export of browser bookmark HTML or other services' libraries; absent from the manifest.",
+          "No cloud sync or multi-device sharing; data is local IndexedDB (source/README.md:13-14).",
+          "No preserved page copies or snapshots; only a favicon Blob is stored (source/src/includes/store.ts:8).",
+          "No duplicate detection or URL uniqueness constraint; 'url' is not indexed uniquely (source/src/includes/store.ts:45-47).",
+          "No broken-link detection or library hygiene features.",
+          "No public sharing or collaboration.",
+          "No browser extension/bookmarklet; capture is via the in-page add form.",
+          "No trash view; Delete exists only for archived records and relies on a transient Undo toast (source/src/App.tsrx:436-453)."
+        ],
+        "reason": "The repository implements the scenario's core loop of deliberately saving a URL as a durable record, organizing it, retrieving it later, and returning to the original page. However, the scenario's 'category' (归类) concept maps only onto a mandatory flat tag list rather than creatable/movable collections, there is no default/unsorted category because at least one tag is required, and search covers only the title. Persistence is single-browser IndexedDB with no sync, so the multi-device aspect of the scenario is not supported.",
+        "scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+        "scenario_revision": 2,
+        "workflow_support": [
+          "Save a seen link: Add Bookmark dialog captures URL with Valibot validation (source/src/App.tsrx:101-129, source/src/App.tsrx:658-717).",
+          "Choose a simple category: up to five free-text tags are entered in the dialog (source/src/App.tsrx:608-657).",
+          "Browse or search the personal library: Home/Archived tabs, tag checkbox filters with counts, and a title-search field (source/src/App.tsrx:49-56, source/src/App.tsrx:58-88, source/src/App.tsrx:241-250).",
+          "Move/manage organization after saving: Edit reopens the record and rewrites tags via saveBookmark (source/src/App.tsrx:392-412, source/src/App.tsrx:699-714).",
+          "Open a record to return to the original page: Visit updates visitedAt/visitCount and calls window.open(item.url, '_blank', 'noopener,noreferrer') (source/src/App.tsrx:339-354).",
+          "Persistence across sessions: records are written to Dexie table 'bookmarks' and re-read with db.bookmarks.toArray() on mount (source/src/includes/store.ts:41-47, source/src/App.tsrx:23-32)."
+        ]
+      }
+    ],
+    "source_snapshots": [
+      {
+        "archive_sha256": "8d7d5423093436727aa1dbb47ce8dc1bae715de309ac22bc65e650913f91af39",
+        "collected_at": "2026-10-19T06:03:21.864088+00:00",
+        "commit_sha": "539881bc67099d491e8ab6f85de0f443fa7de623",
+        "excluded_paths": [],
+        "file_manifest_digest": "b2af66143ffc52e3591c248ca1cdff66e6f24388ae797e9784dc9908fdf6ce4b",
+        "files": {
+          ".gitignore": "20e30f7d2feddb1cf1914aec96dc9a694c2aca0f02efbac0523d5a846dc82dc1",
+          ".prettierignore": "dc4cc2ab6231b00bb0dc801c9b7d463f8273b1557f98519b3d18570a487d03fe",
+          ".prettierrc": "d4eeddaeb3c416ceedf4c165dd4048d8d4596a6a5216fb54e54751fe2b80634b",
+          ".vscode/settings.json": "fa8d97f9abffb85cca63607cb22ba9cbf4e18d841a087e75d8edc02822d8bf1f",
+          "LICENSE": "17e5ccdd3ca04fa001985e8b3370d70d357f858d491b5691a461fd5985834a44",
+          "README.md": "b49b8acb566472b0d377438114d662854b4fb93c90b4cbde180c7dac588e3a93",
+          "bun.lock": "60d16e5afd1af76799de1e459bea78c1b66a0d022388ebc9c10daa9920023086",
+          "eslint.config.js": "21723b58d2f8d88320bcf607dde20041f6fd52a6b06864636776b76b4c2b5c0e",
+          "favicon.svg": "11ed7b3e1c389fe1b736dff5bf8df3dc700dcd9e1fdaebda6fbd9417c0e6b69e",
+          "index.html": "6cbf0e25606a5627e6e3e6ceff394929691edf2d6417df922ecdca3321524eab",
+          "package.json": "a0df38a4bf76cb70e4a46fed0487345b3bd89ee98ec8b69f48bfca95260c6e90",
+          "preview.png": "346d46f64f374faf3f7f901e53273df285f9eb2f34c4aabc712b32a0ceb945b9",
+          "src/App.tsrx": "8b57f46a0aa0553e6e240157e8fad4d171491bca881a39ea8299df71d0fc37a1",
+          "src/includes/Icon.tsrx": "b807d863fd08b06210341652a6a5a85dd063122d3fc12aef1163c45c85d7e23e",
+          "src/includes/store.ts": "b4dc58a7a48cd9929f3d35f31aef9fd5eb2b0b0606cdf735ce436a1e162b07ed",
+          "src/includes/utils.ts": "d581eb982ce67b285056a74ab02d31a6a6a957423340da078e4ae89d9004189c",
+          "src/index.css": "6c319086d7e7fa9298abab36a28618932d4f3a4a2c69f969b774ff6cf3aef3d7",
+          "src/index.ts": "8fd34f45b8e3392cfad6650602b1704af7e4b150cae22e74332555ce69406ba8",
+          "tsconfig.json": "db25efbcc189ea0e0679f48928d8491ef10358c569977399031018ce0b5f438f",
+          "vite.config.js": "ffd99be0c5dda12dbc1d6dd21ea11c94581a9df9ed9df3659c645c6a0f9c5974"
+        },
+        "license": {
+          "notice_hashes": {
+            "LICENSE": "17e5ccdd3ca04fa001985e8b3370d70d357f858d491b5691a461fd5985834a44"
+          },
+          "spdx_id_supplement": "MIT",
+          "supplement_collected_at": "2026-10-19T06:03:21.864088+00:00",
+          "supplement_source": "GitHub repository metadata for the current default branch; not evidence of the pinned commit license"
+        },
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_uncertainties": [
+          "Repository API license metadata is a current default-branch supplement; pinned-version terms are represented by fixed LICENSE/NOTICE files and their hashes."
+        ],
+        "repo_id": "1247664857",
+        "repository": "https://github.com/lakhindarpal/bookmark-manager",
+        "snapshot_id": "src_3a8113f49b44ef3b3d7a7fca",
+        "strategy_version": "github-safe-archive-v1"
+      }
+    ]
+  }
+]

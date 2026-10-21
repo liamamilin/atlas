@@ -1,0 +1,950 @@
+{
+  "app_id": "app:repo:e32c861b7120b6571db9c58a",
+  "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+  "created_at": "2026-10-21T11:06:20.311774+00:00",
+  "created_task_id": "auxiliary-batch-minimax-2026-10-21-personal-kanban",
+  "digest": "6c619352cee6c8a85ed501c8cc6b8618357a574a5489a555c0be654ac9cad222",
+  "evidence_digest": "3699e1d1c1384331ba97bea736e649dcd2ad114d0f5c43b74a5be800206bcf08",
+  "research": {
+    "input_digest": "04921b7f7b501fcfb932d9a710816d149c824c22323557c0fd59e9f872f80b4a",
+    "scope": "Deliver a localhost-only, single-user, Python-stdlib web application that persists named boards, user-named ordered columns and ordered cards (title + short description) in one SQLite file, treats a card's column membership as the card's state (no separate status field), supports column add/rename/reorder and card move/reorder, shows every column's full card list with per-column counts, and reads the whole structure back unchanged after a restart. P0 explicitly excludes accounts, collaboration, a separate status field, WIP limits, notifications, time reports and automation, and those concepts are rejected at the API boundary rather than merely omitted.",
+    "summary": "OpenCode Go静态研究与独立会话审阅；Evidence classes are kept separate. (1) code_observation = behaviour read directly from the pinned upstream files at the cited lines (for example upstream renumbers a column around a moved card inside one transaction, upstream bounds a column reorder by the number of columns, upstream renders a per-column task count). (2) documentation = claims read from upstream README.md and LICENSE and from leaf.md; leaf.md describes the Kanban Task Board type in general terms and explicitly separates the defining core (board, card, position-as-state) from standard and optional capabilities. (3) target design inference = every statement about the local Python/SQLite target in this blueprint, including the data model, the API surface, the validation bounds, the error codes, the UI and the probe, is my own design derived from the pinned scenario plus the leaf's defining core; it is not an upstream capability and upstream code was not copied. (4) not_run upstream status = the pinned Kanboard snapshot was read as text only; it was never installed, started or exercised, so no upstream runtime behaviour, upstream database schema or upstream performance figure is asserted anywhere here. The target's own runtime verification is likewise not_run: no server was started and no probe case was executed while writing this blueprint. Upstream-only concepts visible in the evidence (swimlanes, task_limit as a WIP cap, tags, score, priority, recurrence counters, bulk creation, project-role permissions, markdown tooltips) were read as evidence of the category's standard capabilities and are deliberately kept out of the target P0; the target rejects them at the API boundary instead of ignoring them.",
+    "task_id": "auxiliary-batch-minimax-2026-10-21-personal-kanban",
+    "unknowns": [
+      "upstream not_run",
+      "auxiliary independent static review passed; runtime not_run",
+      "Runtime verification status: not_run. No target server was started, no HTTP request was issued and no probe case was executed while producing this blueprint; the acceptance criteria state what must hold, not what was observed.",
+      "Upstream status: not_run. The pinned Kanboard snapshot was read as source text only - it was not installed, started or exercised - so no upstream runtime behaviour, upstream database schema or upstream performance characteristic is asserted here.",
+      "Only the eight pinned upstream files were read; the rest of the upstream tree (routing, migrations, templates, tests) is outside the evidence set, so claims about upstream beyond these files are not made.",
+      "Restart durability is specified but not demonstrated: the probe cannot stop or start the server, so the cross-process restart check exists only as an operator procedure in README.md and is not claimed as executed.",
+      "The probe compares API-level shapes only; it asserts nothing about the HTML surface, so the accessibility, Post/Redirect/Get and focus requirements of the UI are reviewed by hand rather than machine-checked.",
+      "Drag-and-drop is deliberately out of P0: the UI exposes movement through buttons and a select, so pointer-only drag affordances, live drag feedback and cross-column drag previews are not covered.",
+      "The target stores no due dates, recurrence rules, assignees, labels, priorities, attachments, comments, checklists, activity history or archive, so the leaf's 'card detail' and 'standard capabilities' layers are absent by design in P0.",
+      "Deletion is destructive without archive or undo, so a mistaken board deletion cannot be recovered in this P0 build (decision D5).",
+      "The HTTP server is single-threaded and the probe runs sequentially, so concurrent writers, lock contention and busy_timeout behaviour are not exercised.",
+      "No authentication, TLS, per-board permissions or multi-user isolation: the process must stay on the loopback interface.",
+      "Column rename has no per-column history and card edits record no change log, so 'the position confirmed in the card's history' from the leaf is not implemented in P0.",
+      "The upstream MIT licence covers the pinned reference files only; no upstream source was copied into the target, and a file-level licence audit of the upstream tree was not performed."
+    ]
+  },
+  "research_input_digest": "04921b7f7b501fcfb932d9a710816d149c824c22323557c0fd59e9f872f80b4a",
+  "revision": 1,
+  "snapshot_ids": [
+    "src_b9b0de76ae8cb791d6bf34f9"
+  ],
+  "observations": [
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "8992971d60641623da339e8b5f02506aabef50577fe83b4dbfd851d14cb88f0d",
+      "evidence_id": "ev_assisted_personal_kanban_1",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "2559998a4cf3104c3b628d4aa61e1c5ccafe2d7daf4866da2a05ed52ca5feb09",
+        "material_version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/README.md"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream README describes Kanboard as project management software that focuses on the Kanban methodology and states the application is in maintenance mode: the author is not actively developing any new major features, only small fixes are made, and pull requests for new features and bug fixes are accepted.",
+      "reviews": [
+        {
+          "review_id": "rev_5cb750b864a840ec7c8d52259fb67677",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "8992971d60641623da339e8b5f02506aabef50577fe83b4dbfd851d14cb88f0d",
+          "created_at": "2026-10-21T11:06:20.318725+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "a8abd50a684a04db2c8ccb49f80de9adebb0ab2afb6cc0759fb472ce9fb4e851",
+      "evidence_id": "ev_assisted_personal_kanban_10",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "7ef218fa883475773f11333e5e274693be33b702821fa301b36db6d7ebc425cf",
+        "line_end": 228,
+        "line_start": 225,
+        "path": "app/Model/ColumnModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream remove() deletes a column row by id and its docblock states that the column and all associated tasks are removed, so upstream column deletion is destructive rather than a move of the cards elsewhere.",
+      "reviews": [
+        {
+          "review_id": "rev_998e8d73c5f9fedf7b42ddc44203ccb1",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "a8abd50a684a04db2c8ccb49f80de9adebb0ab2afb6cc0759fb472ce9fb4e851",
+          "created_at": "2026-10-21T11:06:20.321704+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "3c3359813939f2ff7960efb6f3f48e1cfcefc08a39f5209bcbb8668505225585",
+      "evidence_id": "ev_assisted_personal_kanban_11",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "a02cdeb916a6d436f60a0dd3db5c72eeb2cce9e406e19c2cfe5807a683ac17ff",
+        "line_end": 97,
+        "line_start": 66,
+        "path": "app/Model/TaskPositionModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream movePosition() returns false for a position below 1, resolves the swimlane when none is given, skips closed tasks when onlyOpen is set, and then dispatches to exactly one of three branches - swimlane change, column change or same-column position change - so a card's placement is the only way its location changes.",
+      "reviews": [
+        {
+          "review_id": "rev_a361ce86121a07f03f6aafe6879886c6",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "3c3359813939f2ff7960efb6f3f48e1cfcefc08a39f5209bcbb8668505225585",
+          "created_at": "2026-10-21T11:06:20.324798+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "570d9d7db7bdf288c114a581024b91fcaac36380241107157dad84f516b40157",
+      "evidence_id": "ev_assisted_personal_kanban_12",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "a02cdeb916a6d436f60a0dd3db5c72eeb2cce9e406e19c2cfe5807a683ac17ff",
+        "line_end": 215,
+        "line_start": 177,
+        "path": "app/Model/TaskPositionModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream saveTaskPositions() lists the other tasks of the same column ordered by position then id, inserts the moved task when the requested position equals the running offset, rewrites every other task's position, and finally places the task at the bottom while normalising a bad position - the whole column is renumbered around the moved card.",
+      "reviews": [
+        {
+          "review_id": "rev_de20ce5f7b02ba9a8c6b32734207ebef",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "570d9d7db7bdf288c114a581024b91fcaac36380241107157dad84f516b40157",
+          "created_at": "2026-10-21T11:06:20.327285+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "655d63c83f22998c8403a1e57113e542be67f53242508b9081da8a44c7bf9e2d",
+      "evidence_id": "ev_assisted_personal_kanban_13",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "a02cdeb916a6d436f60a0dd3db5c72eeb2cce9e406e19c2cfe5807a683ac17ff",
+        "line_end": 121,
+        "line_start": 112,
+        "path": "app/Model/TaskPositionModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream saveSwimlaneChange() performs the source-column rewrite, the target-column rewrite and the timestamp update inside one database transaction and returns the conjunction of the three results, i.e. a move commits as a single all-or-nothing unit.",
+      "reviews": [
+        {
+          "review_id": "rev_9f5784b49ae0c8b93259d9ff9c1ab73b",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "655d63c83f22998c8403a1e57113e542be67f53242508b9081da8a44c7bf9e2d",
+          "created_at": "2026-10-21T11:06:20.329719+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "d28555d1235e73fedb56ac3124b531d2cc6a0225e386081569d49ad368c96658",
+      "evidence_id": "ev_assisted_personal_kanban_14",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "a02cdeb916a6d436f60a0dd3db5c72eeb2cce9e406e19c2cfe5807a683ac17ff",
+        "line_end": 144,
+        "line_start": 135,
+        "path": "app/Model/TaskPositionModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream saveColumnChange() applies the same transaction pattern for a move between two columns: clear the source column, fill the target column, update the timestamps, and report success only when all three writes succeeded.",
+      "reviews": [
+        {
+          "review_id": "rev_3c3e6e1a22ef23d540d38324c01a7f41",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "d28555d1235e73fedb56ac3124b531d2cc6a0225e386081569d49ad368c96658",
+          "created_at": "2026-10-21T11:06:20.331943+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "0b74971488301d595b13e00771092fda82d201a79e7f90ff342a0eaf41bb535d",
+      "evidence_id": "ev_assisted_personal_kanban_15",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "a02cdeb916a6d436f60a0dd3db5c72eeb2cce9e406e19c2cfe5807a683ac17ff",
+        "line_end": 258,
+        "line_start": 244,
+        "path": "app/Model/TaskPositionModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream saveTaskPosition() cancels the surrounding transaction when the row update affects no rows, which is how a failed mid-move write aborts the whole move instead of leaving a half-renumbered column.",
+      "reviews": [
+        {
+          "review_id": "rev_7ca684121fa7ab0e0a528b36739b70a4",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "0b74971488301d595b13e00771092fda82d201a79e7f90ff342a0eaf41bb535d",
+          "created_at": "2026-10-21T11:06:20.334156+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "bda001aaeb70a68ca2c24e2059c174617d36a811a6119a572c26fe99408e5aa1",
+      "evidence_id": "ev_assisted_personal_kanban_16",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "a02cdeb916a6d436f60a0dd3db5c72eeb2cce9e406e19c2cfe5807a683ac17ff",
+        "line_end": 51,
+        "line_start": 15,
+        "path": "app/Model/TaskPositionModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream moveBottom() computes MAX(position)+1 over the tasks of the target column and writes column_id, position, date_moved and date_modification, so appending a card to a column is a position write and not a separate status flag.",
+      "reviews": [
+        {
+          "review_id": "rev_0a17be95840ac430738eacb16ca6e746",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "bda001aaeb70a68ca2c24e2059c174617d36a811a6119a572c26fe99408e5aa1",
+          "created_at": "2026-10-21T11:06:20.336326+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "bd6345c9a1fb678493b6a60eda0e52e74c32e98e881687fa8140e88098db4b8b",
+      "evidence_id": "ev_assisted_personal_kanban_17",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "a02cdeb916a6d436f60a0dd3db5c72eeb2cce9e406e19c2cfe5807a683ac17ff",
+        "line_end": 313,
+        "line_start": 269,
+        "path": "app/Model/TaskPositionModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream fireEvents() emits a distinct event for a swimlane change, a column change or a position change and carries src_column_id, dst_column_id, date_moved and the task's recurrence fields; in upstream the move is the state-change event of the card.",
+      "reviews": [
+        {
+          "review_id": "rev_95bacd913f4cfd2f435394542c82b609",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "bd6345c9a1fb678493b6a60eda0e52e74c32e98e881687fa8140e88098db4b8b",
+          "created_at": "2026-10-21T11:06:20.338322+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "fda9cac8c3dce0c443b10c595f31b577d02c93a714f2b39365f3e09fc75369db",
+      "evidence_id": "ev_assisted_personal_kanban_18",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "b5cdc36a43cb0447922dc9fdee506855ac869fe106c6586c164d10b69f37bb42",
+        "line_end": 93,
+        "line_start": 61,
+        "path": "app/Model/TaskCreationModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream prepare() defaults an empty column_id to the first column of the project, defaults an empty title to 'Untitled', stamps date_creation, date_modification and date_moved with the current time and computes position as the number of tasks in the column plus one.",
+      "reviews": [
+        {
+          "review_id": "rev_cd04b1d17996ae6f2d833655f2ec7e8e",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "fda9cac8c3dce0c443b10c595f31b577d02c93a714f2b39365f3e09fc75369db",
+          "created_at": "2026-10-21T11:06:20.340441+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "134bda43eda733c51136640f44f07641de13afb62c1165987ff6247a178bbab5",
+      "evidence_id": "ev_assisted_personal_kanban_19",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "b5cdc36a43cb0447922dc9fdee506855ac869fe106c6586c164d10b69f37bb42",
+        "line_end": 53,
+        "line_start": 22,
+        "path": "app/Model/TaskCreationModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream create() persists the task row first and only afterwards calls movePosition() when an explicit position greater than one was requested, i.e. inserting a card at a chosen slot is a create step followed by a position step.",
+      "reviews": [
+        {
+          "review_id": "rev_8d2bcf296cee11a350f2834bf7be147e",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "134bda43eda733c51136640f44f07641de13afb62c1165987ff6247a178bbab5",
+          "created_at": "2026-10-21T11:06:20.342673+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "3639ddbca994d8894cb9aeed94a7c0f718c68a1ffa26c4fb96ec125c95d7661f",
+      "evidence_id": "ev_assisted_personal_kanban_2",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "2559998a4cf3104c3b628d4aa61e1c5ccafe2d7daf4866da2a05ed52ca5feb09",
+        "material_version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/README.md"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream README links the official website, a feature list, the change log, a forum and the documentation pages for requirements, installation, upgrade and Docker use, i.e. upstream is a full server product with its own documentation and deployment story, not a local single-user tool.",
+      "reviews": [
+        {
+          "review_id": "rev_8604f3d478485062c6a1df1c19a433e7",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "3639ddbca994d8894cb9aeed94a7c0f718c68a1ffa26c4fb96ec125c95d7661f",
+          "created_at": "2026-10-21T11:06:20.344546+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "3e2632c1f3b2ea863115623db4b2c3a5aaf85a5c4e43f7e08635cd46b3d081d7",
+      "evidence_id": "ev_assisted_personal_kanban_20",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "26a717b1063d7225728ac273de7231ec93f74a2f0128b496a18a02880f810750",
+        "line_end": 41,
+        "line_start": 23,
+        "path": "app/Model/TaskModificationModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream update() applies the changed fields to the task row and fires the modification events only when the write succeeded; the card's text fields are edited independently of its column and position.",
+      "reviews": [
+        {
+          "review_id": "rev_6316b1be829b91b01746188ccdd24a8b",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "3e2632c1f3b2ea863115623db4b2c3a5aaf85a5c4e43f7e08635cd46b3d081d7",
+          "created_at": "2026-10-21T11:06:20.346327+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "d4f7dd750ec56db37b1f5332d3cc9bb0414c63ce1e9301cf9d6f3d9b0019f6b0",
+      "evidence_id": "ev_assisted_personal_kanban_21",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "26a717b1063d7225728ac273de7231ec93f74a2f0128b496a18a02880f810750",
+        "line_end": 117,
+        "line_start": 105,
+        "path": "app/Model/TaskModificationModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream prepare() converts date_due and date_started through the date parser, removes the id field, resets the date, score and time fields and stamps date_modification - upstream tasks carry due/start dates and recurrence counters, which the pinned P0 scenario deliberately excludes.",
+      "reviews": [
+        {
+          "review_id": "rev_54ad468c0b617fa47ac6e6c0be4b80b3",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "d4f7dd750ec56db37b1f5332d3cc9bb0414c63ce1e9301cf9d6f3d9b0019f6b0",
+          "created_at": "2026-10-21T11:06:20.348123+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "dd002b5befe8d1d9a35a277f9f633dbced051263326cc21da99f722d6b0fce4f",
+      "evidence_id": "ev_assisted_personal_kanban_22",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "5d0925849ac7dba9e6bb1ab10b562e45b4b466c29bbaeee7edb366f781602892",
+        "line_end": 52,
+        "line_start": 33,
+        "path": "app/Controller/TaskMovePositionController.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream TaskMovePositionController::save() reads a JSON body with column_id, position and swimlane_id, checks a move permission on the project role, calls movePosition() with the project id, the task id and those three values, and then redirects back to the task view.",
+      "reviews": [
+        {
+          "review_id": "rev_a02b9a5bb3eec90390c42173a5f80ef2",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "dd002b5befe8d1d9a35a277f9f633dbced051263326cc21da99f722d6b0fce4f",
+          "created_at": "2026-10-21T11:06:20.350245+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "694339cad7ab3384ae40f9e21b090bfa13d0eaebcdc59e4aa91df86708e84c87",
+      "evidence_id": "ev_assisted_personal_kanban_23",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "4341e17757c67ab3d8cf9fa33dd32daefe0aaeb5d8760d7a16a2947e794ec90f",
+        "line_end": 27,
+        "line_start": 5,
+        "path": "app/Template/board/table_column.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The upstream board template renders one table header cell per column carrying data-column-id, the escaped column title and a per-column dropdown, so the column order of the board surface is exactly the column position order.",
+      "reviews": [
+        {
+          "review_id": "rev_9955370a27015407ba7e3a9b724a974b",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "694339cad7ab3384ae40f9e21b090bfa13d0eaebcdc59e4aa91df86708e84c87",
+          "created_at": "2026-10-21T11:06:20.352205+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "f9f4512a840e29876f59db30dbbf804e46c1cc8f6cb4a27a8976069860119767",
+      "evidence_id": "ev_assisted_personal_kanban_24",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "4341e17757c67ab3d8cf9fa33dd32daefe0aaeb5d8760d7a16a2947e794ec90f",
+        "line_end": 120,
+        "line_start": 88,
+        "path": "app/Template/board/table_column.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The upstream column header renders the score, the visible task count and - when a task_limit is set - the total across swimlanes, i.e. upstream already shows a per-column card count next to the column title.",
+      "reviews": [
+        {
+          "review_id": "rev_3448bbffe97debcd112e288cd9186d4d",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "f9f4512a840e29876f59db30dbbf804e46c1cc8f6cb4a27a8976069860119767",
+          "created_at": "2026-10-21T11:06:20.354264+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "04feefa25fe1cc367e0d07123090e4d2431792cb57fc989852fff25fa5250c44",
+      "evidence_id": "ev_assisted_personal_kanban_25",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "4341e17757c67ab3d8cf9fa33dd32daefe0aaeb5d8760d7a16a2947e794ec90f",
+        "line_end": 119,
+        "line_start": 105,
+        "path": "app/Template/board/table_column.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The upstream task count block is rendered only when the count is non-empty and is preceded by an ui-helper-hidden-accessible 'Task count' text, i.e. upstream labels the column count for assistive technology.",
+      "reviews": [
+        {
+          "review_id": "rev_5c023242a2ba80dbc7933b2ac6df3d26",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "04feefa25fe1cc367e0d07123090e4d2431792cb57fc989852fff25fa5250c44",
+          "created_at": "2026-10-21T11:06:20.356661+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "c97591f1322e9de5d8e48a8b901aee85bb83a0a444c70557cb49e0823e9ce8bd",
+      "evidence_id": "ev_assisted_personal_kanban_26",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "4341e17757c67ab3d8cf9fa33dd32daefe0aaeb5d8760d7a16a2947e794ec90f",
+        "line_end": 43,
+        "line_start": 39,
+        "path": "app/Template/board/table_column.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The upstream column dropdown offers 'Close all tasks in this column and this swimlane' only when the column holds tasks, showing that upstream treats the column as the container whose content can be closed in bulk - a batch operation outside the pinned P0 scenario.",
+      "reviews": [
+        {
+          "review_id": "rev_16f32f0b2055470188b8e001d6d66197",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "c97591f1322e9de5d8e48a8b901aee85bb83a0a444c70557cb49e0823e9ce8bd",
+          "created_at": "2026-10-21T11:06:20.359733+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "256deded9698acbc01ab532d60b400af6ed305d0fc2616f9ced3827d1463a4ac",
+      "evidence_id": "ev_assisted_personal_kanban_3",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "2559998a4cf3104c3b628d4aa61e1c5ccafe2d7daf4866da2a05ed52ca5feb09",
+        "material_version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/README.md"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream README names Frederic Guillot as main developer, points at the contributor list and states that the project is distributed under the MIT License.",
+      "reviews": [
+        {
+          "review_id": "rev_13371842d5ff8c94f38cc32fc6b66865",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "256deded9698acbc01ab532d60b400af6ed305d0fc2616f9ced3827d1463a4ac",
+          "created_at": "2026-10-21T11:06:20.362739+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "604db1a187983167510b8e7980e396ccb5af4fde96cfc3c60eba736e7570b2a2",
+      "evidence_id": "ev_assisted_personal_kanban_4",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "df88a58a28ae686f60f737fcdc27c2a7895da9e89d93da710c595e4b95c4edac",
+        "material_version": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "url": "https://github.com/kanboard/kanboard/blob/e4fb64e972b0ae255a92cf4b7b03489846ebbffc/LICENSE"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The pinned upstream LICENSE is the MIT License (MIT), copyright (c) Frederic Guillot, with the standard grant, the notice requirement and the warranty disclaimer.",
+      "reviews": [
+        {
+          "review_id": "rev_76d36591fd604b0c48fe74eef0505941",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "604db1a187983167510b8e7980e396ccb5af4fde96cfc3c60eba736e7570b2a2",
+          "created_at": "2026-10-21T11:06:20.365867+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "f1f2d36c622f34a0730d4472a3f2effb0b41e2656af47dba497d89868cdde0b8",
+      "evidence_id": "ev_assisted_personal_kanban_5",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "7ef218fa883475773f11333e5e274693be33b702821fa301b36db6d7ebc425cf",
+        "line_end": 195,
+        "line_start": 183,
+        "path": "app/Model/ColumnModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream create() persists a new column for a project with title, task_limit (a WIP cap), description and hide_in_dashboard, and sets position to getLastColumnPosition(project_id) + 1, so a newly added column is appended at the end of the board rather than inserted at an arbitrary slot.",
+      "reviews": [
+        {
+          "review_id": "rev_e0a43082fc154e1f0a14dbc5ebc51e13",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "f1f2d36c622f34a0730d4472a3f2effb0b41e2656af47dba497d89868cdde0b8",
+          "created_at": "2026-10-21T11:06:20.367893+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "7784908f926f9dc009020371d5d7f7b50b0c2bcb93d5a8b504d12242bb6c9f89",
+      "evidence_id": "ev_assisted_personal_kanban_6",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "7ef218fa883475773f11333e5e274693be33b702821fa301b36db6d7ebc425cf",
+        "line_end": 216,
+        "line_start": 208,
+        "path": "app/Model/ColumnModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream update() rewrites the column title, task_limit, hide_in_dashboard and description in place and never touches the column position, so renaming a column is independent of the column order.",
+      "reviews": [
+        {
+          "review_id": "rev_09aad868923479f06866a5feb979be49",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "7784908f926f9dc009020371d5d7f7b50b0c2bcb93d5a8b504d12242bb6c9f89",
+          "created_at": "2026-10-21T11:06:20.370950+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "4d30f2de1c99ad099c5aa92f63583abbae951d6ad287e1f25d6c26a5f6548201",
+      "evidence_id": "ev_assisted_personal_kanban_7",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "7ef218fa883475773f11333e5e274693be33b702821fa301b36db6d7ebc425cf",
+        "line_end": 261,
+        "line_start": 239,
+        "path": "app/Model/ColumnModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream changePosition() rejects a position below 1 or above the number of columns of the project, then renumbers the sibling columns ascending by their current position and finally writes the requested position on the moved column, returning false if any single update fails - reordering is a bounded, all-or-nothing rewrite of the sibling positions.",
+      "reviews": [
+        {
+          "review_id": "rev_02146dcbe68adcc233f9121687d0f15a",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "4d30f2de1c99ad099c5aa92f63583abbae951d6ad287e1f25d6c26a5f6548201",
+          "created_at": "2026-10-21T11:06:20.373821+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "15e51d1619d358dabdaf0ad195608585852c670044442d78682c84c7e48916cc",
+      "evidence_id": "ev_assisted_personal_kanban_8",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "7ef218fa883475773f11333e5e274693be33b702821fa301b36db6d7ebc425cf",
+        "line_end": 121,
+        "line_start": 118,
+        "path": "app/Model/ColumnModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream getAll() returns the columns of a project ordered ascending by position, which is the mechanism behind the left-to-right column order of the board surface.",
+      "reviews": [
+        {
+          "review_id": "rev_faef11d17aa2fb57936015e93137f83d",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "15e51d1619d358dabdaf0ad195608585852c670044442d78682c84c7e48916cc",
+          "created_at": "2026-10-21T11:06:20.376923+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "e641fb17571502dd7013aeb15b9d5b63e15c4ad6b814382cc1ca3c69d1da8487",
+      "evidence_id": "ev_assisted_personal_kanban_9",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+        "file_digest": "7ef218fa883475773f11333e5e274693be33b702821fa301b36db6d7ebc425cf",
+        "line_end": 156,
+        "line_start": 147,
+        "path": "app/Model/ColumnModel.php"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Upstream getAllWithTaskCount() returns the columns ordered by position together with a per-column count of open tasks (is_active='1') and of closed tasks (is_active='0'), i.e. upstream derives the column card counts from the task table itself.",
+      "reviews": [
+        {
+          "review_id": "rev_1f3438607b5c629be419782171daf5eb",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "e641fb17571502dd7013aeb15b9d5b63e15c4ad6b814382cc1ca3c69d1da8487",
+          "created_at": "2026-10-21T11:06:20.379912+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "digest": "58cfb1400ea9da9b36a35c6aa41f648612981b7c304d69ead624fefbf93e07e3",
+      "evidence_id": "ev_assisted_personal_kanban_design",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "上游未运行",
+          "辅助静态独审通过，运行未验证",
+          "Runtime verification status: not_run. No target server was started, no HTTP request was issued and no probe case was executed while producing this blueprint; the acceptance criteria state what must hold, not what was observed.",
+          "Upstream status: not_run. The pinned Kanboard snapshot was read as source text only - it was not installed, started or exercised - so no upstream runtime behaviour, upstream database schema or upstream performance characteristic is asserted here.",
+          "Only the eight pinned upstream files were read; the rest of the upstream tree (routing, migrations, templates, tests) is outside the evidence set, so claims about upstream beyond these files are not made.",
+          "Restart durability is specified but not demonstrated: the probe cannot stop or start the server, so the cross-process restart check exists only as an operator procedure in README.md and is not claimed as executed.",
+          "The probe compares API-level shapes only; it asserts nothing about the HTML surface, so the accessibility, Post/Redirect/Get and focus requirements of the UI are reviewed by hand rather than machine-checked.",
+          "Drag-and-drop is deliberately out of P0: the UI exposes movement through buttons and a select, so pointer-only drag affordances, live drag feedback and cross-column drag previews are not covered.",
+          "The target stores no due dates, recurrence rules, assignees, labels, priorities, attachments, comments, checklists, activity history or archive, so the leaf's 'card detail' and 'standard capabilities' layers are absent by design in P0.",
+          "Deletion is destructive without archive or undo, so a mistaken board deletion cannot be recovered in this P0 build (decision D5).",
+          "The HTTP server is single-threaded and the probe runs sequentially, so concurrent writers, lock contention and busy_timeout behaviour are not exercised.",
+          "No authentication, TLS, per-board permissions or multi-user isolation: the process must stay on the loopback interface.",
+          "Column rename has no per-column history and card edits record no change log, so 'the position confirmed in the card's history' from the leaf is not implemented in P0.",
+          "The upstream MIT licence covers the pinned reference files only; no upstream source was copied into the target, and a file-level licence audit of the upstream tree was not performed."
+        ],
+        "depends_on": [
+          "ev_assisted_personal_kanban_1",
+          "ev_assisted_personal_kanban_2",
+          "ev_assisted_personal_kanban_3",
+          "ev_assisted_personal_kanban_4",
+          "ev_assisted_personal_kanban_5",
+          "ev_assisted_personal_kanban_6",
+          "ev_assisted_personal_kanban_7",
+          "ev_assisted_personal_kanban_8",
+          "ev_assisted_personal_kanban_9",
+          "ev_assisted_personal_kanban_10",
+          "ev_assisted_personal_kanban_11",
+          "ev_assisted_personal_kanban_12",
+          "ev_assisted_personal_kanban_13",
+          "ev_assisted_personal_kanban_14",
+          "ev_assisted_personal_kanban_15",
+          "ev_assisted_personal_kanban_16",
+          "ev_assisted_personal_kanban_17",
+          "ev_assisted_personal_kanban_18",
+          "ev_assisted_personal_kanban_19",
+          "ev_assisted_personal_kanban_20",
+          "ev_assisted_personal_kanban_21",
+          "ev_assisted_personal_kanban_22",
+          "ev_assisted_personal_kanban_23",
+          "ev_assisted_personal_kanban_24",
+          "ev_assisted_personal_kanban_25",
+          "ev_assisted_personal_kanban_26"
+        ],
+        "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Evidence classes are kept separate. (1) code_observation = behaviour read directly from the pinned upstream files at the cited lines (for example upstream renumbers a column around a moved card inside one transaction, upstream bounds a column reorder by the number of columns, upstream renders a per-column task count). (2) documentation = claims read from upstream README.md and LICENSE and from leaf.md; leaf.md describes the Kanban Task Board type in general terms and explicitly separates the defining core (board, card, position-as-state) from standard and optional capabilities. (3) target design inference = every statement about the local Python/SQLite target in this blueprint, including the data model, the API surface, the validation bounds, the error codes, the UI and the probe, is my own design derived from the pinned scenario plus the leaf's defining core; it is not an upstream capability and upstream code was not copied. (4) not_run upstream status = the pinned Kanboard snapshot was read as text only; it was never installed, started or exercised, so no upstream runtime behaviour, upstream database schema or upstream performance figure is asserted anywhere here. The target's own runtime verification is likewise not_run: no server was started and no probe case was executed while writing this blueprint. Upstream-only concepts visible in the evidence (swimlanes, task_limit as a WIP cap, tags, score, priority, recurrence counters, bulk creation, project-role permissions, markdown tooltips) were read as evidence of the category's standard capabilities and are deliberately kept out of the target P0; the target rejects them at the API boundary instead of ignoring them.",
+      "reviews": [
+        {
+          "review_id": "rev_dd0d364f60742511790d54b30c650ed1",
+          "outcome": "accepted",
+          "reviewer": "ses_ea1de83daffetTStmPb5FvGcdC",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "58cfb1400ea9da9b36a35c6aa41f648612981b7c304d69ead624fefbf93e07e3",
+          "created_at": "2026-10-21T11:06:20.382939+00:00"
+        }
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "adopted_scope": [
+        "Named boards with durable local storage (create, list, read, rename, delete)",
+        "User-named ordered columns (add, rename, reorder, guarded delete)",
+        "Cards with a title and a short description (create, read, edit)",
+        "Movement as state: cross-column move and in-column reorder with contiguous renumbering",
+        "Board read model: columns in order, full per-column card lists and per-column counts"
+      ],
+      "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+      "case_revision": 1,
+      "evidence_ids": [
+        "ev_assisted_personal_kanban_1",
+        "ev_assisted_personal_kanban_2",
+        "ev_assisted_personal_kanban_3",
+        "ev_assisted_personal_kanban_4",
+        "ev_assisted_personal_kanban_5",
+        "ev_assisted_personal_kanban_6",
+        "ev_assisted_personal_kanban_7",
+        "ev_assisted_personal_kanban_8",
+        "ev_assisted_personal_kanban_9",
+        "ev_assisted_personal_kanban_10",
+        "ev_assisted_personal_kanban_11",
+        "ev_assisted_personal_kanban_12",
+        "ev_assisted_personal_kanban_13",
+        "ev_assisted_personal_kanban_14",
+        "ev_assisted_personal_kanban_15",
+        "ev_assisted_personal_kanban_16",
+        "ev_assisted_personal_kanban_17",
+        "ev_assisted_personal_kanban_18",
+        "ev_assisted_personal_kanban_19",
+        "ev_assisted_personal_kanban_20",
+        "ev_assisted_personal_kanban_21",
+        "ev_assisted_personal_kanban_22",
+        "ev_assisted_personal_kanban_23",
+        "ev_assisted_personal_kanban_24",
+        "ev_assisted_personal_kanban_25",
+        "ev_assisted_personal_kanban_26",
+        "ev_assisted_personal_kanban_design"
+      ],
+      "exclusions": [
+        "Runtime verification status: not_run. No target server was started, no HTTP request was issued and no probe case was executed while producing this blueprint; the acceptance criteria state what must hold, not what was observed.",
+        "Upstream status: not_run. The pinned Kanboard snapshot was read as source text only - it was not installed, started or exercised - so no upstream runtime behaviour, upstream database schema or upstream performance characteristic is asserted here.",
+        "Only the eight pinned upstream files were read; the rest of the upstream tree (routing, migrations, templates, tests) is outside the evidence set, so claims about upstream beyond these files are not made.",
+        "Restart durability is specified but not demonstrated: the probe cannot stop or start the server, so the cross-process restart check exists only as an operator procedure in README.md and is not claimed as executed.",
+        "The probe compares API-level shapes only; it asserts nothing about the HTML surface, so the accessibility, Post/Redirect/Get and focus requirements of the UI are reviewed by hand rather than machine-checked.",
+        "Drag-and-drop is deliberately out of P0: the UI exposes movement through buttons and a select, so pointer-only drag affordances, live drag feedback and cross-column drag previews are not covered.",
+        "The target stores no due dates, recurrence rules, assignees, labels, priorities, attachments, comments, checklists, activity history or archive, so the leaf's 'card detail' and 'standard capabilities' layers are absent by design in P0.",
+        "Deletion is destructive without archive or undo, so a mistaken board deletion cannot be recovered in this P0 build (decision D5).",
+        "The HTTP server is single-threaded and the probe runs sequentially, so concurrent writers, lock contention and busy_timeout behaviour are not exercised.",
+        "No authentication, TLS, per-board permissions or multi-user isolation: the process must stay on the loopback interface.",
+        "Column rename has no per-column history and card edits record no change log, so 'the position confirmed in the card's history' from the leaf is not implemented in P0.",
+        "The upstream MIT licence covers the pinned reference files only; no upstream source was copied into the target, and a file-level licence audit of the upstream tree was not performed."
+      ],
+      "reason": "Deliver a localhost-only, single-user, Python-stdlib web application that persists named boards, user-named ordered columns and ordered cards (title + short description) in one SQLite file, treats a card's column membership as the card's state (no separate status field), supports column add/rename/reorder and card move/reorder, shows every column's full card list with per-column counts, and reads the whole structure back unchanged after a restart. P0 explicitly excludes accounts, collaboration, a separate status field, WIP limits, notifications, time reports and automation, and those concepts are rejected at the API boundary rather than merely omitted.",
+      "scenario_id": "scn_e7e1f70a65da44cb95ecf786e204d159",
+      "scenario_revision": 1,
+      "workflow_support": []
+    }
+  ],
+  "source_snapshots": [
+    {
+      "archive_sha256": null,
+      "collected_at": "2026-10-21T10:58:45.044034+00:00",
+      "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ],
+      "file_manifest_digest": "cb263d885c812bb73c3990bf9d41ea785f65bf40719d466dc4139835dbb8058c",
+      "files": {
+        "LICENSE": "df88a58a28ae686f60f737fcdc27c2a7895da9e89d93da710c595e4b95c4edac",
+        "README.md": "2559998a4cf3104c3b628d4aa61e1c5ccafe2d7daf4866da2a05ed52ca5feb09",
+        "app/Controller/TaskMovePositionController.php": "5d0925849ac7dba9e6bb1ab10b562e45b4b466c29bbaeee7edb366f781602892",
+        "app/Model/ColumnModel.php": "7ef218fa883475773f11333e5e274693be33b702821fa301b36db6d7ebc425cf",
+        "app/Model/TaskCreationModel.php": "b5cdc36a43cb0447922dc9fdee506855ac869fe106c6586c164d10b69f37bb42",
+        "app/Model/TaskModificationModel.php": "26a717b1063d7225728ac273de7231ec93f74a2f0128b496a18a02880f810750",
+        "app/Model/TaskPositionModel.php": "a02cdeb916a6d436f60a0dd3db5c72eeb2cce9e406e19c2cfe5807a683ac17ff",
+        "app/Template/board/table_column.php": "4341e17757c67ab3d8cf9fa33dd32daefe0aaeb5d8760d7a16a2947e794ec90f"
+      },
+      "license": {
+        "notice_hashes": {
+          "LICENSE": "df88a58a28ae686f60f737fcdc27c2a7895da9e89d93da710c595e4b95c4edac"
+        },
+        "spdx_id": "MIT",
+        "status": "located"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license_uncertainties": [
+        "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+      ],
+      "repo_id": null,
+      "repository": "https://github.com/kanboard/kanboard",
+      "snapshot_id": "src_b9b0de76ae8cb791d6bf34f9",
+      "strategy_version": "go-auxiliary-selected-files-v1"
+    }
+  ]
+}

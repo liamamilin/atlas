@@ -1,0 +1,113 @@
+{
+ "scenario": "个人小项目看板：本机单用户，创建命名看板及用户命名的有序列，创建/修改带标题和简短描述的卡片，在列间移动并在列内重排，以卡片所在列直接表达状态；重新打开仍保留看板、列和卡片顺序，展示各列完整卡片及数量。P0保留列的新增/改名/重排和卡片的位置变更，不引入独立状态字段、账号、协作、WIP限额、通知、时间报表或自动化。",
+ "source": {
+  "repository": "https://github.com/kanboard/kanboard",
+  "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+  "strategy_version": "go-auxiliary-selected-files-v1",
+  "collected_at": "2026-10-21T10:58:45.044034+00:00",
+  "files": {
+   "LICENSE": "df88a58a28ae686f60f737fcdc27c2a7895da9e89d93da710c595e4b95c4edac",
+   "README.md": "2559998a4cf3104c3b628d4aa61e1c5ccafe2d7daf4866da2a05ed52ca5feb09",
+   "app/Controller/TaskMovePositionController.php": "5d0925849ac7dba9e6bb1ab10b562e45b4b466c29bbaeee7edb366f781602892",
+   "app/Model/ColumnModel.php": "7ef218fa883475773f11333e5e274693be33b702821fa301b36db6d7ebc425cf",
+   "app/Model/TaskCreationModel.php": "b5cdc36a43cb0447922dc9fdee506855ac869fe106c6586c164d10b69f37bb42",
+   "app/Model/TaskModificationModel.php": "26a717b1063d7225728ac273de7231ec93f74a2f0128b496a18a02880f810750",
+   "app/Model/TaskPositionModel.php": "a02cdeb916a6d436f60a0dd3db5c72eeb2cce9e406e19c2cfe5807a683ac17ff",
+   "app/Template/board/table_column.php": "4341e17757c67ab3d8cf9fa33dd32daefe0aaeb5d8760d7a16a2947e794ec90f"
+  },
+  "license_files": [
+   "LICENSE"
+  ],
+  "license": {
+   "status": "located",
+   "spdx_id": "MIT",
+   "notice_hashes": {
+    "LICENSE": "df88a58a28ae686f60f737fcdc27c2a7895da9e89d93da710c595e4b95c4edac"
+   }
+  },
+  "license_uncertainties": [
+   "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+  ],
+  "excluded_paths": [
+   "Unselected files; upstream not installed or run"
+  ]
+ },
+ "inventory": [
+  {
+   "path": "LICENSE",
+   "lines": 21
+  },
+  {
+   "path": "README.md",
+   "lines": 34
+  },
+  {
+   "path": "app/Controller/TaskMovePositionController.php",
+   "lines": 53
+  },
+  {
+   "path": "app/Model/ColumnModel.php",
+   "lines": 262
+  },
+  {
+   "path": "app/Model/TaskCreationModel.php",
+   "lines": 94
+  },
+  {
+   "path": "app/Model/TaskModificationModel.php",
+   "lines": 134
+  },
+  {
+   "path": "app/Model/TaskPositionModel.php",
+   "lines": 315
+  },
+  {
+   "path": "app/Template/board/table_column.php",
+   "lines": 127
+  }
+ ],
+ "input_digest": "06b0f967c38db8d30472bd793873c4b0f9b07c9d1937c223614b80e9f63cf302",
+ "checks": [
+  "leaf_scope",
+  "source_fidelity",
+  "design_distinction",
+  "core_journey",
+  "architecture",
+  "acceptance",
+  "limits_and_safety"
+ ],
+ "read_views": {
+  "VIEW_NAME.md": {
+   "json_pointer": "/name",
+   "sha256": "74928e3c457b0b7d9710cb7868e1561f4c24ac2f049ee33bc9df2f9cb4c8b8f4"
+  },
+  "VIEW_AUDIENCE.md": {
+   "json_pointer": "/audience",
+   "sha256": "d78b47c6d988fe0314c23b78984c7c5da654f47d2763baa02cfc8de2fb0ce58e"
+  },
+  "VIEW_OBJECTIVE.md": {
+   "json_pointer": "/objective",
+   "sha256": "01fd215f98d8f9e0356e8938275d7ac5967f2a04a574b533619f2ba77b61c383"
+  },
+  "VIEW_INFERENCE.md": {
+   "json_pointer": "/inference",
+   "sha256": "4f6faca7987521a7aae03bac76689b771d46d13f9b3d665f90e4d68274a25133"
+  },
+  "VIEW_ARCH.md": {
+   "json_pointer": "/arch",
+   "sha256": "56622c04d0802e2d1ba7dafc96c9c2ea486905b47f5e7d5e64e6d32f20cf9a84"
+  },
+  "VIEW_REPO_NAME.md": {
+   "json_pointer": "/repo_name",
+   "sha256": "71c2d10bfad9f5ce6f37879152d684239196b45b63873651c5fba6ae9d1da9aa"
+  },
+  "VIEW_LICENSE.md": {
+   "json_pointer": "/license",
+   "sha256": "e5dcffe836b6ec8a58e492419b550e65fb8cbdc308503979e5dacb33ac7ea3b7"
+  },
+  "VIEW_LICENSE_PATH.md": {
+   "json_pointer": "/license_path",
+   "sha256": "c693279643b8cd5d248172d9c22cb7cf4ed163a3c98c8a3f69c2717edd3eacb7"
+  }
+ }
+}

@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.auxiliary-model-batch.v1",
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "phase": "auxiliary-batch-minimax-2026-10-21",
+  "identity": "auxiliary-batch-minimax-2026-10-21:three-leaves",
+  "model": "opencode-go/minimax-m3.1-flash-free",
+  "max_cli_calls": 9,
+  "window_seconds": 28800,
+  "authorization_ref": "docs/template-factory/go-minimax-batch-2026-10-21/AUTHORIZATION.md",
+  "authorization_sha256": "52cb4e8e3c0815df6ada93416c6084ce1244fd30d2456e10b0b15591f714d635",
+  "items": [
+    {
+      "key": "personal-kanban",
+      "leaf": "kanban-task-board",
+      "scenario": "个人小项目看板：本机单用户，创建命名看板及用户命名的有序列，创建/修改带标题和简短描述的卡片，在列间移动并在列内重排，以卡片所在列直接表达状态；重新打开仍保留看板、列和卡片顺序，展示各列完整卡片及数量。P0保留列的新增/改名/重排和卡片的位置变更，不引入独立状态字段、账号、协作、WIP限额、通知、时间报表或自动化。",
+      "case_lead": "https://github.com/kanboard/kanboard 作为可核实的开源应用线索；选取实际支持列/卡片移动/排序的少量源码，不把可选能力都加入目标。",
+      "leaf_sha256": "2a173962ac3e83cadf92ac3d63a7e839d8ae7bf90619a01ca13115e7594f3a1a"
+    },
+    {
+      "key": "daily-expenses",
+      "leaf": "expense-tracking-application",
+      "scenario": "个人日常支出与月度分类复盘：本机单用户，创建/重命名支出分类，记录日期、正数人民币金额、分类和简短用途，修改已记支出的金额/日期/分类后立即重算选定自然月的总额及完整分类汇总，切换相邻月份并回查明细，重开保留。金额以整数分存储，UI严格两位小数，不使用浮点累计。P0只做支出记录、可管理分类、月份汇总及修正，不做预算目标、收入、账户余额、报销、多币种、银行同步或金融建议。",
+      "case_lead": "https://github.com/moneymanagerex/moneymanagerex 仅为真实开源项目线索，也可发现更小但确有分类与金额汇总源码的应用；不能仅引用营销说明。",
+      "leaf_sha256": "605b7584bc62e5b360d0bd380032c6be07e51bb67748553d5a05b49044295a07"
+    },
+    {
+      "key": "personal-calendar",
+      "leaf": "calendar-application",
+      "scenario": "个人预约日历：本机单用户，在可切换上月/下月的真实七列月历时间网格中创建、读取、编辑、改期和删除自己新建的有标题、开始/结束日期时间、可选地点/备注的日程。采用固定UTC+08:00无夏令时，结束必须晚于开始，时间区间为[start,end)，跨日/跨月日程在相交月份可见，重叠预约允许并显示而非拒绝。重开保留并可导航回历史月份。P0不做重复规则、全天模式、邀请、账号、同步、通知、时区切换、任务或预约资源平台；验收删除仅针对probe自己创建的可丢弃记录。",
+      "case_lead": "https://github.com/nextcloud/calendar 为可核实开源应用线索；也可选择更小的真实日历应用，需固定能支撑事件编辑与时间网格的文档/代码。不要选择只有显示组件的库冒充应用。",
+      "leaf_sha256": "b6095206944f5c379a523839189df835f8fed00a3a9c0ba8e118d7345c0ace1d"
+    }
+  ]
+}

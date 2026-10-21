@@ -15,7 +15,6 @@ import json
 from pathlib import Path, PurePosixPath
 import re
 import shutil
-import sys
 import textwrap
 
 from produce_batch import ROOT, produce, save, request
@@ -26,6 +25,7 @@ from template_factory.store import FactoryStore, digest
 from atlas_runtime import atomic_json
 
 MODEL = "opencode-go/deepseek-v4.1-flash"
+MODELS = {MODEL, "opencode-go/minimax-m3.1-flash-free"}
 CAMPAIGN = "atlas-v1-first-production-2026-10-19"
 CHECKS = ("leaf_scope", "source_fidelity", "design_distinction", "core_journey",
           "architecture", "acceptance", "limits_and_safety")
@@ -68,12 +68,14 @@ def snapshot_audit(directory):
                                        for name in names if (directory / name).is_file()})
 
 
-def checkpoint(directory, payload, prompt, cli, budget, source=None, leaf=None):
+def checkpoint(directory, payload, prompt, cli, budget, source=None, leaf=None, *, model=MODEL):
     """No duplicate call after delivery; an uncertain/failed launch needs inspection.
 
     Bind the instruction as well as all read bytes. A crashed delivered call can
     recover its existing parsed result without another model session.
     """
+    if model not in MODELS:
+        raise ValueError("unsupported auxiliary production model")
     directory.mkdir(parents=True, exist_ok=True)
     if source is not None:
         target = directory / "source"
@@ -88,7 +90,7 @@ def checkpoint(directory, payload, prompt, cli, budget, source=None, leaf=None):
             raise ValueError("checkpoint leaf changed")
         target.write_bytes(leaf)
     fixed_json(directory / "input.json", payload)
-    binding = {"model": MODEL, "input_digest": digest(payload), "prompt": prompt,
+    binding = {"model": model, "input_digest": digest(payload), "prompt": prompt,
                "source": manifest_files(directory / "source"),
                "leaf_sha256": hashlib.sha256(leaf).hexdigest() if leaf else None}
     fixed_json(directory / "BINDING.json", binding)
@@ -115,7 +117,7 @@ def checkpoint(directory, payload, prompt, cli, budget, source=None, leaf=None):
     else:
         fixed_json(started, {"binding_digest": digest(binding)})
         try:
-            result = cli.run(directory, prompt, MODEL, 1800, lambda: False,
+            result = cli.run(directory, prompt, model, 1800, lambda: False,
                              lambda message: print(directory.name + ": " + message, flush=True),
                              budget=budget, budget_required=True)
         finally:
@@ -292,6 +294,9 @@ def verify_production(folder, production, authored, snapshot, *, allow_incomplet
     calls = folder / "calls"
     if not allow_incomplete_review and (folder / "SUPPLEMENTAL_FAILURE.json").exists():
         raise ValueError("latest complete-material review failed; do not register/re-export as usable")
+    model = production.get("model")
+    if model not in MODELS:
+        raise ValueError("unsupported recorded production model")
     leaf_digest = json.loads((folder / "REQUEST.json").read_text())["leaf_sha256"]
     generation = calls / "blueprint-generate-aux"
     review = calls / "blueprint-spec-review-aux"
@@ -314,7 +319,8 @@ def verify_production(folder, production, authored, snapshot, *, allow_incomplet
         if json.loads((d / "DELIVERED.json").read_text()) != {"binding_digest": digest(binding), "result_digest": digest(result)}:
             raise ValueError("production stage checkpoint differs")
         summary = json.loads((d / "cli-summary.json").read_text())
-        if summary["delivery_status"] != "delivered" or summary["requested_model"] != MODEL:
+        if (summary["delivery_status"] != "delivered" or summary["requested_model"] != model
+                or binding["model"] != model):
             raise ValueError("production CLI evidence missing")
         raw_path = d / "original-response.json"
         if summary.get("original_response_sha256") != hashlib.sha256(raw_path.read_bytes()).hexdigest():
@@ -418,6 +424,25 @@ NOT changed. The prior review verdict/transcript is not provided; form your own 
 """
 
 
+def prompts(profile=None):
+    """Keep historical prompt bytes stable; new leaves use an explicit profile."""
+    if profile is None:
+        return DISCOVERY, AUTHOR, REVIEW, READABLE_REVIEW
+    if profile != "leaf-scenario-v1":
+        raise ValueError("unknown auxiliary prompt profile")
+    discovery = DISCOVERY.replace("preserve the defining home/recurring-plan/history core",
+                                  "preserve this leaf's defining core and the exact supplied scenario")
+    author = AUTHOR.replace(
+        "Do not attribute the target home anchor to an upstream generic chores feature unless\nactually observed.",
+        "Do not attribute target capabilities to upstream unless actually observed.")
+    author = author.replace("including explicit home/equipment anchoring, due tasks, completion history and next date.",
+                            "including all defining leaf concepts and the supplied concrete scenario's full core journey.")
+    author += "\nUse exact supplied scenario only. Keep long string view lines and acceptance source lines below 1900 characters. Preserve negative zero-write checks and exact counts/sets where promised. No fixed household-specific entities unless this leaf calls for them. If the scenario includes deletion, test deletion ONLY on records created by this probe in its disposable data directory; never delete real-user data."
+    review = REVIEW.replace("home+recurring care+history leaf scope", "the supplied leaf's defining core and fixed scenario scope")
+    readable = READABLE_REVIEW.replace("home+recurring care+history leaf scope", "the supplied leaf's defining core and fixed scenario scope")
+    return discovery, author, review, readable
+
+
 def complete_readable_review(manifest_path, api="http://127.0.0.1:5199/api/factory/"):
     """One explicitly authorized additional read-only session; no regeneration.
 
@@ -511,9 +536,11 @@ def complete_readable_review(manifest_path, api="http://127.0.0.1:5199/api/facto
 
 def run(manifest_path, api, cli=None):
     manifest = json.loads(manifest_path.read_text())
-    if (manifest["model"] != MODEL or manifest["campaign_id"] != CAMPAIGN
+    model = manifest["model"]
+    discovery_prompt, author_prompt, review_prompt, readable_prompt = prompts(manifest.get("prompt_profile"))
+    if (model not in MODELS or manifest["campaign_id"] != CAMPAIGN
             or len(manifest["items"]) != 1 or manifest.get("max_cli_calls") != 3):
-        raise ValueError("pilot requires one item and the fixed Go model/original campaign")
+        raise ValueError("item requires one fixed Go model and the original campaign")
     folder = manifest_path.parent
     item = manifest["items"][0]
     safe_file(item["key"])
@@ -530,14 +557,15 @@ def run(manifest_path, api, cli=None):
     # A stable auxiliary segment shares the original 500-call counter, but does
     # not extend/restart/resume any historical G1 or T08 window, grant or job.
     phase = manifest["batch_id"]
-    budget = {"ledger": ledger, "identity": phase + ":" + item["key"], "phase": phase}
+    budget = {"ledger": ledger, "identity": manifest.get("budget_identity", phase + ":" + item["key"]), "phase": phase,
+              "job_id": phase + ":" + item["key"]}
     baseline = ledger.snapshot()
     if not (folder / "BUDGET_BEFORE.json").exists():
         save(folder / "BUDGET_BEFORE.json", baseline)
-    leaf = (store.pack / "applications" / (item["leaf"] + ".md")).read_bytes()
     store.leaf(item["leaf"])
+    leaf = (store.pack / "applications" / (item["leaf"] + ".md")).read_bytes()
     fixed_json(p / "REQUEST.json", {"leaf": item["leaf"], "scenario": item["scenario"],
-                                   "lead": item.get("case_lead"), "model": MODEL,
+                                   "lead": item.get("case_lead"), "model": model,
                                    "leaf_sha256": hashlib.sha256(leaf).hexdigest()})
     calls = p / "calls"
     def call(stage, payload, prompt, kind, source=None):
@@ -546,9 +574,9 @@ def run(manifest_path, api, cli=None):
         if stage not in {"discovery", "blueprint-generate-aux", "blueprint-spec-review-aux"}:
             raise ValueError("unknown pilot stage")
         return checkpoint(calls / stage, payload, prompt, cli,
-                          {**budget, "stage": stage, "kind": kind}, source, leaf)
+                          {**budget, "stage": stage, "kind": kind}, source, leaf, model=model)
     try:
-        proposal = call("discovery", json.loads((p / "REQUEST.json").read_text()), DISCOVERY, "research")
+        proposal = call("discovery", json.loads((p / "REQUEST.json").read_text()), discovery_prompt, "research")
         snapshot = pin_sources(proposal, p, store)
         materials = p / "materials"
         upstream = materials / "upstream"
@@ -559,7 +587,7 @@ def run(manifest_path, api, cli=None):
         source_input = {"scenario": item["scenario"], "source": {k: v for k, v in snapshot.items() if k != "local_root"},
                         "inventory": [{"path": name, "lines": len((upstream / name).read_text().splitlines())}
                                       for name in snapshot["files"]]}
-        generated = call("blueprint-generate-aux", source_input, AUTHOR, "production", materials)
+        generated = call("blueprint-generate-aux", source_input, author_prompt, "production", materials)
         authored, files = validate_generation(generated, snapshot)
         review_materials = p / "review-materials"
         if not (review_materials / "upstream").exists():
@@ -577,7 +605,7 @@ def run(manifest_path, api, cli=None):
             target.write_text(content)
         review_digest = digest({"authored": authored, "acceptance_files": files, "source": source_input})
         review_payload = {**source_input, "input_digest": review_digest, "checks": list(CHECKS)}
-        prompt = REVIEW
+        prompt = review_prompt
         format_path = p / "REVIEW_FORMAT.json"
         if format_path.exists():
             review_format = json.loads(format_path.read_text())["version"]
@@ -587,7 +615,7 @@ def run(manifest_path, api, cli=None):
             fixed_json(format_path, {"version": review_format})
         if review_format == 2:
             review_payload["read_views"] = readable_candidate(candidate, authored)
-            prompt = READABLE_REVIEW
+            prompt = readable_prompt
         reviewed = call("blueprint-spec-review-aux", review_payload, prompt, "review", review_materials)
         if review_format == 2:
             validate_read_coverage(calls / "blueprint-spec-review-aux", authored)
@@ -607,7 +635,7 @@ def run(manifest_path, api, cli=None):
                 raise ValueError("fixed acceptance changed")
             target.write_text(content)
         production = {"schema": "atlas.auxiliary-model-production.v1", "mode": "opencode-cli-go",
-                      "model": MODEL, "campaign_id": CAMPAIGN, "phase": phase,
+                      "model": model, "campaign_id": CAMPAIGN, "phase": phase,
                       "review_status": "passed", "review_input_digest": review_digest,
                       "review_result_digest": digest(reviewed),
                       "source_snapshot_digest": digest(snapshot),

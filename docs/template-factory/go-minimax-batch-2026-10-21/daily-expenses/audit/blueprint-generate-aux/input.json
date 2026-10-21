@@ -1,0 +1,69 @@
+{
+ "scenario": "个人日常支出与月度分类复盘：本机单用户，创建/重命名支出分类，记录日期、正数人民币金额、分类和简短用途，修改已记支出的金额/日期/分类后立即重算选定自然月的总额及完整分类汇总，切换相邻月份并回查明细，重开保留。金额以整数分存储，UI严格两位小数，不使用浮点累计。P0只做支出记录、可管理分类、月份汇总及修正，不做预算目标、收入、账户余额、报销、多币种、银行同步或金融建议。",
+ "source": {
+  "repository": "https://github.com/Tanq16/ExpenseOwl",
+  "commit_sha": "4795569c754f77313ba3237aac5fddd7dc05d0c4",
+  "strategy_version": "go-auxiliary-selected-files-v1",
+  "collected_at": "2026-10-21T11:09:54.654058+00:00",
+  "files": {
+   "LICENSE": "4c084baadaec64b48337ef6e3a813358dcdb6c02c64d24c688c7a687695d2730",
+   "README.md": "82be809c754bdaccc52868ed282e94d4d0a27d525d80126940cfe3099b602701",
+   "internal/api/handlers.go": "f11c6a0af38de1ab3642f0e35b9f091b2a9e0d9b283208de2020fa6ac7c8e4c4",
+   "internal/storage/jsonStore.go": "eb3b6cc8b09ccf74fa2a8b5b15bb38493c98b61ec3e2fe002b7330306a2aaf00",
+   "internal/storage/storage.go": "4b0a1c7dee7795bc3fc20adfd4f692f05b9160b8be9b13440fc53ae667a1fcc7",
+   "internal/web/templates/index.html": "5f834d7558715ff27cfe96e99cee4d6531bd3f173635c9265fa333d6b390156c",
+   "internal/web/templates/settings.html": "609a3b1fa4875b73ad00975be5f3a1322f114baa88af2d38d06c71a27c83d8db",
+   "internal/web/templates/table.html": "bdcde02f98bf4f920cfbbb9bed59d52fb7a8705b74ff53a25e67c21604e546f2"
+  },
+  "license_files": [
+   "LICENSE"
+  ],
+  "license": {
+   "status": "located",
+   "spdx_id": "MIT",
+   "notice_hashes": {
+    "LICENSE": "4c084baadaec64b48337ef6e3a813358dcdb6c02c64d24c688c7a687695d2730"
+   }
+  },
+  "license_uncertainties": [
+   "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+  ],
+  "excluded_paths": [
+   "Unselected files; upstream not installed or run"
+  ]
+ },
+ "inventory": [
+  {
+   "path": "LICENSE",
+   "lines": 21
+  },
+  {
+   "path": "README.md",
+   "lines": 227
+  },
+  {
+   "path": "internal/api/handlers.go",
+   "lines": 396
+  },
+  {
+   "path": "internal/storage/jsonStore.go",
+   "lines": 472
+  },
+  {
+   "path": "internal/storage/storage.go",
+   "lines": 281
+  },
+  {
+   "path": "internal/web/templates/index.html",
+   "lines": 537
+  },
+  {
+   "path": "internal/web/templates/settings.html",
+   "lines": 888
+  },
+  {
+   "path": "internal/web/templates/table.html",
+   "lines": 463
+  }
+ ]
+}

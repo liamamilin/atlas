@@ -251,7 +251,7 @@ def run(request_path, *, api, until="complete", round_number=1):
         if review.get("verdict") == "needs_changes":
             fixed_json(folder / "REVIEW_FAILURE.json", review)
         validate_review(review, identity, sessions["author"], sessions["review"], len(authored["observations"]))
-        used = ledger.snapshot()["cli_sessions_used"] - load(root / "BUDGET_BEFORE.json")["cli_sessions_used"]
+        used = ledger.segment_usage(req["phase"])["cli_sessions_used"]
         production = {"schema": "atlas.auxiliary-model-production.v1", "mode": "opencode-cli-go", "model": MODEL,
                       "campaign_id": CAMPAIGN, "phase": req["phase"], "review_status": "passed", "review_input_digest": identity,
                       "review_result_digest": digest(review), "source_snapshot_digest": digest(snapshot), "sessions": sessions,

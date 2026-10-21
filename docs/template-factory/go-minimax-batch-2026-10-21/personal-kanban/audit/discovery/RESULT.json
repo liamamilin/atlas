@@ -1,0 +1,37 @@
+{
+ "repository": "https://github.com/kanboard/kanboard",
+ "files": [
+  "LICENSE",
+  "README.md",
+  "app/Model/ColumnModel.php",
+  "app/Model/TaskCreationModel.php",
+  "app/Model/TaskModificationModel.php",
+  "app/Model/TaskPositionModel.php",
+  "app/Controller/TaskMovePositionController.php",
+  "app/Template/board/table_column.php"
+ ],
+ "rationale": "Kanboard is a real, public, self-hosted kanban application under the MIT License (LICENSE verified: \"The MIT License (MIT), Copyright (c) Frederic Guillot\"; README.md states \"Distributed under MIT License\"). It implements exactly the defining core of the leaf — Board -> ordered Columns -> Cards -> position-as-state — with the state of a card expressed by the column it sits in and no separate status field to reconcile, and it is the verified source behind the supplied lead. Vocabulary mapping for the scenario: Kanboard's \"project\" is the board, its \"column\" is the user's named ordered column, and its \"task\" is the card. Selected source surface and why: (1) app/Model/ColumnModel.php is the whole column side of the P0 in one small file: create() appends a user-named column at position = last+1, update() renames it, changePosition() reorders columns by rewriting their positions, getAll()/getAllWithTaskCount()/getAllWithOpenedTaskCount() return the columns in order with per-column card counts; (2) app/Model/TaskCreationModel.php creates a card with title and description, defaults column_id to the first column, and sets position = count of cards in that column + 1, so a new card lands at the bottom of its column; (3) app/Model/TaskModificationModel.php is the edit path for a card's title/description (generic column update on the task record); (4) app/Model/TaskPositionModel.php is the heart of position-as-state: movePosition() branches into saveColumnChange() when the column differs and savePositionChange() when only the position differs inside the same column, and saveTaskPositions() rewrites the 1..n position sequence of the affected column transactionally, i.e. column membership IS the state change and card order is sequence; (5) app/Controller/TaskMovePositionController.php shows the minimal move contract (POST column_id + position + swimlane_id -> taskPositionModel->movePosition()), which is what a drag between columns or a reorder within a column reduces to; (6) app/Template/board/table_column.php renders the board surface per column: the column title, the per-column card count (nb_tasks / \"Task count\"), and the per-column card stack container. Persistence across restarts is inherent in the model layer (all writes go through the DB tables 'columns' and 'tasks' with ordered 'position' columns; config.default.php shows SQLite as the default local driver with data kept in a local DATA_DIR), so reopening the app shows the same boards, columns and card order. Deliberately not pulled into the P0 target, though present in Kanboard as optional/standard surface: the columns.task_limit WIP cap, user accounts and per-project roles/permissions (canMoveTask/canCreateTaskInColumn checks in the controller/template), notifications and e-mail, time tracking, subtasks and links, and the automation hook TaskPositionModel::fireEvents() -> taskEventJob (EVENT_MOVE_COLUMN / EVENT_MOVE_POSITION). Kanboard's swimlane axis is also optional structure: with the default single swimlane a board renders exactly the scenario's columns-of-cards layout.",
+ "alternatives": [
+  {
+   "repository": "https://github.com/plankanban/planka",
+   "status": "rejected",
+   "reason": "Closest structural match (projects / boards / lists / cards, drag-and-drop, card positions) but its README now says it is \"fair-code distributed under the Fair Use License and PLANKA Pro/Enterprise License\", i.e. source-available, not a permissive/open-source license; LICENSE.md at main was not retrievable at the expected path, and the repo also leans on accounts, real-time collaboration and 100+ notification providers."
+  },
+  {
+   "repository": "https://github.com/wekan/wekan",
+   "status": "viable_but_heavy",
+   "reason": "MIT license confirmed by reading LICENSE on master (Copyright (c) Lauri Ojansivu). Board-first with user-named columns and movable cards, but it is a Meteor/JS stack built for multi-user boards with roles, attachments, comments and boosts — a much larger surface for a single-user local board."
+  },
+  {
+   "repository": "https://github.com/wekan/tcl-tk-kanban",
+   "status": "viable_but_incomplete",
+   "reason": "MIT license confirmed by reading LICENSE on main (Copyright (c) Lauri Ojansivu); a local desktop kanban (Tcl/Tk and Go/Fyne with SQLite) storing boards, lists and cards with no accounts, which matches the \"local single-user\" framing well, but its README lists mouse drag-and-drop as a future enhancement and card reordering is done with arrow controls."
+  },
+  {
+   "repository": "https://github.com/mattermost/focalboard",
+   "status": "rejected",
+   "reason": "Its LICENSE.txt shows the source is AGPL-3.0 (MIT only for Mattermost-compiled binaries, Apache-2.0 for a few config directories), so it is copyleft rather than permissive for the source files, and the repository is archived."
+  }
+ ],
+ "search_notes": "Verified rather than assumed: the GitHub REST API (api.github.com) was blocked in this environment, so every claim was checked by reading raw files from raw.githubusercontent.com and by listing directory trees on github.com. For the lead kanboard/kanboard: LICENSE was read in full (MIT, permissive, no copyleft), README.md was read (project identity, license statement, and an explicit note that the application is in maintenance mode — stable enough to read as a reference, but a reason to prefer smaller, clearer sources for a template). Exact paths were confirmed by fetching each selected file's content from the main branch (app/Model/ColumnModel.php, app/Model/TaskCreationModel.php, app/Model/TaskModificationModel.php, app/Model/TaskPositionModel.php, app/Controller/TaskMovePositionController.php, app/Template/board/table_column.php) and by tree listings for app/Model, app/Controller and app/Template/board; one dead end was corrected along the way (app/Controller/BoardController.php and app/Helper/BoardFormatter.php do not exist — the board view is app/Controller/BoardViewController.php and the board assembler is app/Formatter/BoardFormatter.php, both left out of the selected surface to keep it small). All eight listed files are small text files well under 180KB. Licensing of the alternatives was checked the same way: planka's README and repository page were read (now fair-code, so not usable as an open-source reference), wekan's LICENSE on master and tcl-tk-kanban's LICENSE on main were read (both MIT), and focalboard's LICENSE.txt was read (AGPL-3.0 source). No commit hashes, tags or branch URLs are asserted; only the stable repository URL, and file paths as they exist on the default branch, are given so the host can resolve and pin later."
+}

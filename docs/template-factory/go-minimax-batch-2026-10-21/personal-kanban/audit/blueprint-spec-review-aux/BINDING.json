@@ -1,0 +1,30 @@
+{
+ "model": "opencode-go/minimax-m3.1-flash-free",
+ "input_digest": "8dc2860e56587205c0ca04cc82afa3233c4f8c9607b8c62a4be4c1bf18ce9547",
+ "prompt": "You are a NEW independent reviewer, not the author. Read leaf.md, all supplied\nsource/upstream files and source/candidate files. Do not use an author transcript or\nassume its claims true. Input binds the COMPLETE author result digest; echo it exactly\nas input_digest. Check code/doc line citations against the actual fixed source, target\ninferences separate, the supplied leaf's defining core and fixed scenario scope, end-to-end scenario,\nexplicit architecture/API/error/date rules, probe correctness and meaningful negative\nassertions, no upstream execution/certification claims, and clear limits.\nReturn JSON {input_digest,verdict:'pass'|'needs_changes',checks:{leaf_scope:boolean,\nsource_fidelity:boolean,design_distinction:boolean,core_journey:boolean,\narchitecture:boolean,acceptance:boolean,limits_and_safety:boolean},\nobservations:[{index:0-based author observation index,verdict:'accepted'|'rejected'|'uncertain',\nreason:'specific cited explanation'}],issues:[blocking concrete findings],summary}.\nPassing requires all checks true, every observation accepted, no issues. Do NOT waive\nreal mismatches to get pass. No search needed; source bytes are authoritative. Read only.\nFIRST read source/candidate/READING_GUIDE.md and READ_VIEWS.json.\nRead source/candidate/VIEW_ARCH.md from line 1 through EOF (paginate when necessary).\nIt is the exact decoded original arch string; never rely on the truncated JSON line.\nOther long string views are listed in READ_VIEWS.json. Read each completely. The host\nchecks line coverage of actual tool outputs, not just your declaration. Use the supplied\ninventory, not guessed filenames. Original JSON, acceptance code and source bytes have\nNOT changed. The prior review verdict/transcript is not provided; form your own findings.\n",
+ "source": {
+  "candidate/AUTHOR_INPUT.json": "b672f777f57cd01e9426c241c0fd1e6c0aec304ff817a68658d4b36732191952",
+  "candidate/READING_GUIDE.md": "fa2b824dba6a3073b3fea23035f8fc88378afa9e534093e4a4555efd7cae54e3",
+  "candidate/READ_VIEWS.json": "ec7a182d0758a43df8322c68d61886ed489849aec4cb72287d70994e7245ff32",
+  "candidate/REVIEW_SCOPE.md": "1473973e7cfcfc2c2aaecd4899af8ccddb3ffc158872203175d4e768ba4e6fc0",
+  "candidate/VIEW_ARCH.md": "56622c04d0802e2d1ba7dafc96c9c2ea486905b47f5e7d5e64e6d32f20cf9a84",
+  "candidate/VIEW_AUDIENCE.md": "d78b47c6d988fe0314c23b78984c7c5da654f47d2763baa02cfc8de2fb0ce58e",
+  "candidate/VIEW_INFERENCE.md": "4f6faca7987521a7aae03bac76689b771d46d13f9b3d665f90e4d68274a25133",
+  "candidate/VIEW_LICENSE.md": "e5dcffe836b6ec8a58e492419b550e65fb8cbdc308503979e5dacb33ac7ea3b7",
+  "candidate/VIEW_LICENSE_PATH.md": "c693279643b8cd5d248172d9c22cb7cf4ed163a3c98c8a3f69c2717edd3eacb7",
+  "candidate/VIEW_NAME.md": "74928e3c457b0b7d9710cb7868e1561f4c24ac2f049ee33bc9df2f9cb4c8b8f4",
+  "candidate/VIEW_OBJECTIVE.md": "01fd215f98d8f9e0356e8938275d7ac5967f2a04a574b533619f2ba77b61c383",
+  "candidate/VIEW_REPO_NAME.md": "71c2d10bfad9f5ce6f37879152d684239196b45b63873651c5fba6ae9d1da9aa",
+  "candidate/acceptance/README.md": "a4659869cfffcfc54e426742e5fdb9927278e17b1eb4f5e5af9eaad3423c476d",
+  "candidate/acceptance/probe.py": "8503bbd8eb15f52cfa024d329a33be521615a29d17d2151cd45d7dd9d063ae64",
+  "upstream/LICENSE": "df88a58a28ae686f60f737fcdc27c2a7895da9e89d93da710c595e4b95c4edac",
+  "upstream/README.md": "2559998a4cf3104c3b628d4aa61e1c5ccafe2d7daf4866da2a05ed52ca5feb09",
+  "upstream/app/Controller/TaskMovePositionController.php": "5d0925849ac7dba9e6bb1ab10b562e45b4b466c29bbaeee7edb366f781602892",
+  "upstream/app/Model/ColumnModel.php": "7ef218fa883475773f11333e5e274693be33b702821fa301b36db6d7ebc425cf",
+  "upstream/app/Model/TaskCreationModel.php": "b5cdc36a43cb0447922dc9fdee506855ac869fe106c6586c164d10b69f37bb42",
+  "upstream/app/Model/TaskModificationModel.php": "26a717b1063d7225728ac273de7231ec93f74a2f0128b496a18a02880f810750",
+  "upstream/app/Model/TaskPositionModel.php": "a02cdeb916a6d436f60a0dd3db5c72eeb2cce9e406e19c2cfe5807a683ac17ff",
+  "upstream/app/Template/board/table_column.php": "4341e17757c67ab3d8cf9fa33dd32daefe0aaeb5d8760d7a16a2947e794ec90f"
+ },
+ "leaf_sha256": "2a173962ac3e83cadf92ac3d63a7e839d8ae7bf90619a01ca13115e7594f3a1a"
+}

@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.auxiliary-go-item.v1",
+  "batch_id": "auxiliary-batch-minimax-2026-10-21",
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "model": "opencode-go/minimax-m3.1-flash-free",
+  "max_cli_calls": 3,
+  "budget_identity": "auxiliary-batch-minimax-2026-10-21:three-leaves",
+  "prompt_profile": "leaf-scenario-v1",
+  "review_format": 2,
+  "items": [
+    {
+      "key": "daily-expenses",
+      "leaf": "expense-tracking-application",
+      "scenario": "个人日常支出与月度分类复盘：本机单用户，创建/重命名支出分类，记录日期、正数人民币金额、分类和简短用途，修改已记支出的金额/日期/分类后立即重算选定自然月的总额及完整分类汇总，切换相邻月份并回查明细，重开保留。金额以整数分存储，UI严格两位小数，不使用浮点累计。P0只做支出记录、可管理分类、月份汇总及修正，不做预算目标、收入、账户余额、报销、多币种、银行同步或金融建议。",
+      "case_lead": "https://github.com/moneymanagerex/moneymanagerex 仅为真实开源项目线索，也可发现更小但确有分类与金额汇总源码的应用；不能仅引用营销说明。",
+      "leaf_sha256": "605b7584bc62e5b360d0bd380032c6be07e51bb67748553d5a05b49044295a07",
+      "develop_representative": false,
+      "state": "blocked",
+      "error": "observation not bound to pinned source"
+    }
+  ]
+}

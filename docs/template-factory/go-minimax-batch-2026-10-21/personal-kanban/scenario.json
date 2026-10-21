@@ -1,0 +1,34 @@
+{
+  "acceptance": [
+    "The probe runs against a live target with `python3 probe.py --base-url http://127.0.0.1:8765 --case A01` (or `--case all`, repeatable `--case` flags) and exits 0 only when every selected case passes; the five cases A01..A05 map one-to-one onto the five features.",
+    "A01 proves board behaviour: POST /api/boards creates exactly one board (201 with id, name, created_at, updated_at, column_count, card_count), GET /api/boards grows by exactly one entry and carries the same name and counts, GET /api/boards/{id} returns the same board with an empty column list, PATCH renames without changing the id, and DELETE removes exactly that board.",
+    "A02 proves column behaviour: seeded columns keep their names and order with positions 1..3, a new column is appended at position 4, a rename keeps the position, a reorder persists the new order with positions exactly 1..4 and names still attached to the same ids, and deleting an empty column renumbers the remaining columns to 1..N.",
+    "A03 proves card behaviour: a card is created with title, description, column and position 1, a second card gets position 2, the board's card_count and the per-column card_count equal the real number of cards, and PATCH changes only title/description (position, column and moved_at unchanged).",
+    "Every rejected request in A01..A04 is followed by a re-read that proves zero writes: the board/column/card counts, the column order, the card order, the card positions and each card's updated_at are byte-for-byte the same before and after the rejection (board_state() comparison).",
+    "Negative cases are exact: blank or over-long name, blank or over-long title, over-long description, missing column, unknown column (404 COLUMN_NOT_FOUND), a column of another board (422 COLUMN_BOARD_MISMATCH), position 0 or position beyond the last slot (422 POSITION_OUT_OF_RANGE), duplicate column name (409 DUPLICATE_COLUMN_NAME), deleting a non-empty column (409 COLUMN_NOT_EMPTY), deleting the last column (409 LAST_COLUMN), malformed JSON body (400 MALFORMED_JSON), and forbidden P0 keys such as status, assignee, due_date, recurrence_trigger, task_limit (422 FORBIDDEN_FIELD) or colour (422 UNKNOWN_FIELD).",
+    "A04 proves position-as-state: moving a card to another column renumbers the source column to 1..M-1 and the target column to 1..N, an in-column reorder swaps the two cards and their positions, the board's total card count is unchanged by every move, moved_at never precedes created_at, and a no-op move leaves the column order untouched.",
+    "A05 proves the read model and the date edges: GET /api/boards/{id} returns the columns in position order, each with its full ordered card list, a card_count equal to the length of that list, contiguous card positions starting at 1, a board card_count equal to the sum of the column counts, the expected exact set of card titles per column, an identical snapshot on a second read, and created_at <= updated_at and created_at <= moved_at for every card inside the probe's write window.",
+    "Cross-process restart durability is specified in README.md as an operator procedure (stop the process, start it again with the same --data-dir, re-read the board) because the probe cannot stop or start the server; the blueprint claims that step was not executed, and the whole runtime verification of this target is not_run.",
+    "The probe only uses records it created in its own disposable board and deletes only those records; it never deletes pre-existing user data, and it asserts only behaviour documented in this architecture - no upstream Kanboard behaviour is asserted."
+  ],
+  "audience": "One person running a small personal project on their own machine (the board's only user), plus the engineer who implements and probes it. The user names the board, names the columns after their own workflow, writes cards with a title and a short description, moves cards between and inside columns, and reopens the app expecting the same board, column order and card order. The implementer needs an exact, dependency-free local contract they can code and assert against.",
+  "id": "scn_e7e1f70a65da44cb95ecf786e204d159",
+  "leaf": "kanban-task-board",
+  "leaf_name": "看板任务板",
+  "name": "Personal Project Board (个人小项目看板) - local single-user kanban board",
+  "objective": "Deliver a localhost-only, single-user, Python-stdlib web application that persists named boards, user-named ordered columns and ordered cards (title + short description) in one SQLite file, treats a card's column membership as the card's state (no separate status field), supports column add/rename/reorder and card move/reorder, shows every column's full card list with per-column counts, and reads the whole structure back unchanged after a restart. P0 explicitly excludes accounts, collaboration, a separate status field, WIP limits, notifications, time reports and automation, and those concepts are rejected at the API boundary rather than merely omitted.",
+  "revision": 1,
+  "status": "draft",
+  "updated_at": "2026-10-21T11:06:20.305054+00:00",
+  "workflow": [
+    "1. Operator starts the process with `python3 app.py --data-dir ./data --host 127.0.0.1 --port 8765`; the data directory and the SQLite file are created on first run and the startup banner prints the local URL.",
+    "2. The user opens `GET /` (boards home) and creates a named board, optionally seeding user-named columns (for example 待办 / 进行中 / 完成) in one step; the board is stored with zero hidden default columns.",
+    "3. The user adds further columns, renames a column in place, and reorders columns to match the real workflow; the column order is stored as a contiguous 1..N position sequence and is always rendered left to right.",
+    "4. The user creates a card with a title and a short description inside a chosen column; the card is appended at the bottom of that column unless an explicit slot is given.",
+    "5. The user edits a card's title or description; editing never changes the card's column, position or moved timestamp.",
+    "6. The user moves a card to another column (this is the state change - there is no status field) and reorders cards inside a column; the source column and target column are renumbered to contiguous 1..N in one transaction.",
+    "7. The user reads the board surface: columns left to right, each column showing its full ordered card list and its card count, with the board total equal to the sum of the column counts.",
+    "8. The user restarts the process against the same `--data-dir` and sees the same boards, the same column order and the same card order, because every write is committed to `<data-dir>/kanban.sqlite3`.",
+    "9. The acceptance probe (one disposable board per case, deleting only what it created) exercises the same journey over the JSON API and asserts the zero-write behaviour of every rejected request."
+  ]
+}

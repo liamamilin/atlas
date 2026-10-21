@@ -317,6 +317,44 @@ class BudgetLedger:
                 "effective_deadline": resume["effective_deadline"],
                 "authorization_digest": resume["authorization_digest"]}
 
+    def register_auxiliary_batch(self, phase, identity, request):
+        """Bind one three-leaf auxiliary batch to nine calls; no retry allowance."""
+        items = request.get("items", [])
+        if (request.get("schema") != "atlas.auxiliary-model-batch.v1"
+                or not str(phase).startswith("auxiliary-batch-")
+                or request.get("campaign_id") != self.campaign_id
+                or request.get("phase") != phase or request.get("identity") != identity
+                or request.get("model") != "opencode-go/minimax-m3.1-flash-free"
+                or request.get("max_cli_calls") != 9 or request.get("window_seconds") != 28800
+                or len(items) != 3 or len({item["leaf"] for item in items}) != 3
+                or len({item["key"] for item in items}) != 3
+                or any(not item.get("leaf_sha256") or not item.get("scenario") for item in items)
+                or not request.get("authorization_sha256")):
+            raise FactoryError("invalid auxiliary batch request", "auxiliary_revision_binding", 409)
+        return self._register_auxiliary_segment(phase, identity, request, 9, 28800)
+
+    def segment_usage(self, phase):
+        """Read this stable segment's charge, independent of other campaigns' work."""
+        with self.store.connect() as con:
+            rows = [dict(row) for row in con.execute(
+                "SELECT id,identity,phase,kind,status,job_id,stage,requested_model,created,started,finished,outcome FROM tf_budget_reservation WHERE campaign_id=? AND phase=? ORDER BY created,id",
+                (self.campaign_id, str(phase)))]
+        return {"phase": phase, "cli_sessions_used": sum(row["status"] != "not_started" for row in rows),
+                "reservations": rows}
+
+    def _register_auxiliary_segment(self, phase, identity, request, max_calls, seconds):
+        with self.store.connect(True) as con:
+            row = con.execute("SELECT request_digest FROM tf_budget_auxiliary_segment WHERE campaign_id=? AND phase=?",
+                              (self.campaign_id, phase)).fetchone()
+            if row and row[0] != digest(request):
+                raise FactoryError("auxiliary request already bound", "auxiliary_revision_binding", 409)
+            if not row:
+                if con.execute("SELECT 1 FROM tf_budget_phase WHERE campaign_id=? AND phase=?", (self.campaign_id, phase)).fetchone():
+                    raise FactoryError("cannot rebind an existing phase", "auxiliary_revision_binding", 409)
+                con.execute("INSERT INTO tf_budget_auxiliary_segment VALUES(?,?,?,?,?,?,?,?)",
+                            (self.campaign_id, phase, identity, json.dumps(request, sort_keys=True), digest(request), max_calls, seconds, request["model"]))
+        return {"phase": phase, "request_digest": digest(request), "max_cli_calls": max_calls, "window_seconds": seconds}
+
     def register_auxiliary_revision(self, phase, identity, request):
         """Persist a bounded operator request, without activating its clock.
 
@@ -331,17 +369,7 @@ class BudgetLedger:
                 or request.get("model") != "opencode-go/deepseek-v4.1-flash"
                 or not request.get("authorization_sha256") or not request.get("parent")):
             raise FactoryError("invalid auxiliary revision request", "auxiliary_revision_binding", 409)
-        with self.store.connect(True) as con:
-            row = con.execute("SELECT request_digest FROM tf_budget_auxiliary_segment WHERE campaign_id=? AND phase=?",
-                              (self.campaign_id, phase)).fetchone()
-            if row and row[0] != digest(request):
-                raise FactoryError("auxiliary request already bound", "auxiliary_revision_binding", 409)
-            if not row:
-                if con.execute("SELECT 1 FROM tf_budget_phase WHERE campaign_id=? AND phase=?", (self.campaign_id, phase)).fetchone():
-                    raise FactoryError("cannot rebind an existing phase", "auxiliary_revision_binding", 409)
-                con.execute("INSERT INTO tf_budget_auxiliary_segment VALUES(?,?,?,?,?,?,?,?)",
-                            (self.campaign_id, phase, identity, json.dumps(request, sort_keys=True), digest(request), 6, 86400, request["model"]))
-        return {"phase": phase, "request_digest": digest(request), "max_cli_calls": 6, "window_seconds": 86400}
+        return self._register_auxiliary_segment(phase, identity, request, 6, 86400)
 
     def begin_segment(self, phase, *, con=None):
         """Start the campaign-wide segment clock once at official queue start."""
@@ -384,7 +412,7 @@ class BudgetLedger:
                 raise FactoryError("campaign budget is paused", "budget_paused", 409)
             auxiliary = con.execute("SELECT * FROM tf_budget_auxiliary_segment WHERE campaign_id=? AND phase=?",
                                     (self.campaign_id, str(phase))).fetchone()
-            if str(phase).startswith("auxiliary-revision-") and not auxiliary:
+            if str(phase).startswith(("auxiliary-revision-", "auxiliary-batch-")) and not auxiliary:
                 raise FactoryError("auxiliary revision must be registered first", "auxiliary_revision_binding", 409)
             if auxiliary:
                 used = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND phase=? AND status!='not_started'",

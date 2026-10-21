@@ -1,0 +1,51 @@
+{
+  "stage": "generation_source_validation",
+  "reason": "Atlas leaf citations placed in upstream-only observation namespace",
+  "invalid_observations": [
+    {
+      "index": 30,
+      "observation": [
+        "documentation",
+        "leaf.md",
+        35,
+        39,
+        "叶子文档的核心模型：支出记录=金额+日期+用途；分类由用户管理且是分析主轴；聚合视图是记录的实时投影，保存新支出立即改变当月总额与分类分布。→ 目标把“保存即重算”落在服务端同一事务与随后的即时查询。"
+      ]
+    },
+    {
+      "index": 31,
+      "observation": [
+        "documentation",
+        "leaf.md",
+        157,
+        163,
+        "叶子文档的重要规则：分类是骨干；记录可编辑/重分类/删除且修正会立即传播到所有聚合；转账不算支出；计划与实际分离；预算只提示不阻断。→ 目标实现“分类+修正+删除+立即传播”，明确不做转账/预算/计划条目。"
+      ]
+    },
+    {
+      "index": 32,
+      "observation": [
+        "documentation",
+        "leaf.md",
+        90,
+        100,
+        "叶子文档的复盘循环：打开周期视图→看总额与对比→看分类分布→下钻到某分类的记录→改错。→ 目标的“相邻月切换 + 按分类过滤明细”正是这一循环的最小实现。"
+      ]
+    }
+  ],
+  "raw_generation_result_sha256": "baddff4fbf6de6dac32625549c567817fb3e52058362243fba83442fa3ec23f9",
+  "pinned_source_files": [
+    "LICENSE",
+    "README.md",
+    "internal/api/handlers.go",
+    "internal/storage/jsonStore.go",
+    "internal/storage/storage.go",
+    "internal/web/templates/index.html",
+    "internal/web/templates/settings.html",
+    "internal/web/templates/table.html"
+  ],
+  "not_sent_to_independent_review": true,
+  "not_imported": true,
+  "automatic_repair_calls": 0,
+  "original_failure_preserved": true
+}

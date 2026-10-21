@@ -1,0 +1,289 @@
+{
+  "model": "opencode-go/minimax-m3.1-flash-free",
+  "items": [
+    {
+      "key": "personal-kanban",
+      "leaf": "kanban-task-board",
+      "state": "registered_template_only",
+      "application_runtime": "not_run",
+      "repository": "https://github.com/kanboard/kanboard",
+      "commit_sha": "e4fb64e972b0ae255a92cf4b7b03489846ebbffc",
+      "source_files": 8,
+      "review": "pass",
+      "issues": [],
+      "checks": {
+        "leaf_scope": true,
+        "source_fidelity": true,
+        "design_distinction": true,
+        "core_journey": true,
+        "architecture": true,
+        "acceptance": true,
+        "limits_and_safety": true
+      },
+      "title": "Personal Project Board (个人小项目看板) - local single-user kanban board",
+      "artifact_id": "tpl_b21313b1dac44e3db298d0370cfbb75b",
+      "artifact_digest": "ffaf9913f26d2266116ffa0746bdb85d2d2ba87b73e24884b81f4092cfe9c140",
+      "development_sha256": "9198d8aac5dd39e700478d29b21623e5c1978da7f461336b65ab3b2b65bdcfb0",
+      "url": "http://127.0.0.1:5188/factory?view=artifacts&artifact_id=tpl_b21313b1dac44e3db298d0370cfbb75b",
+      "download": "/api/factory/assisted-templates/tpl_b21313b1dac44e3db298d0370cfbb75b/files/development",
+      "case_ref": {
+        "case_id": "case:auxiliary-batch-minimax-2026-10-21:personal-kanban",
+        "revision": 1,
+        "digest": "6c619352cee6c8a85ed501c8cc6b8618357a574a5489a555c0be654ac9cad222"
+      },
+      "review_input_digest": "06b0f967c38db8d30472bd793873c4b0f9b07c9d1937c223614b80e9f63cf302",
+      "review_result_digest": "7efb42970d3b88bb8861575f8708d5cfbe7df57919652e5fd4fa96e31e77e646",
+      "source_observations": 26,
+      "start_files": [
+        "HANDOFF.md",
+        "KNOWLEDGE.md",
+        "CURRENT_PHASE.json",
+        "ACCEPTANCE_CONTRACT.json",
+        "APP_DELIVERY.md",
+        "PROJECT_DECISIONS.json"
+      ]
+    },
+    {
+      "key": "daily-expenses",
+      "leaf": "expense-tracking-application",
+      "state": "blocked",
+      "application_runtime": "not_run",
+      "repository": "https://github.com/Tanq16/ExpenseOwl",
+      "commit_sha": "4795569c754f77313ba3237aac5fddd7dc05d0c4",
+      "source_files": 8,
+      "failure": {
+        "error": "observation not bound to pinned source",
+        "code": "pilot_failed",
+        "recorded_at": "2026-10-21T11:19:49.172396+00:00"
+      }
+    },
+    {
+      "key": "personal-calendar",
+      "leaf": "calendar-application",
+      "state": "blocked",
+      "application_runtime": "not_run",
+      "failure": {
+        "error": "OpenCode did not return the required final JSON object; inspect CLI evidence",
+        "code": "cli_protocol",
+        "recorded_at": "2026-10-21T11:33:09.968355+00:00"
+      }
+    }
+  ],
+  "full_static_flow_success": 1,
+  "sample_count": 3,
+  "catalog_counts": {
+    "total": 19,
+    "core_verified": 6,
+    "not_run": 13,
+    "usable": 18,
+    "needs_revision": 1
+  },
+  "cases_added": 1,
+  "applications_run_added": 0,
+  "upstream_run_added": 0,
+  "strict_publications_added": 0,
+  "calls_before": 93,
+  "calls_after": 99,
+  "segment_usage": {
+    "phase": "auxiliary-batch-minimax-2026-10-21",
+    "cli_sessions_used": 6,
+    "reservations": [
+      {
+        "id": "bud_61a4f7f1c2654c368a1a9037ab181c50",
+        "identity": "auxiliary-batch-minimax-2026-10-21:three-leaves",
+        "phase": "auxiliary-batch-minimax-2026-10-21",
+        "kind": "research",
+        "status": "completed",
+        "job_id": "auxiliary-batch-minimax-2026-10-21:personal-kanban",
+        "stage": "discovery",
+        "requested_model": "opencode-go/minimax-m3.1-flash-free",
+        "created": 1792580171.324853,
+        "started": 1792580171.433729,
+        "finished": 1792580322.3632069,
+        "outcome": null
+      },
+      {
+        "id": "bud_92432504182442baa3d1337d4498ab84",
+        "identity": "auxiliary-batch-minimax-2026-10-21:three-leaves",
+        "phase": "auxiliary-batch-minimax-2026-10-21",
+        "kind": "production",
+        "status": "completed",
+        "job_id": "auxiliary-batch-minimax-2026-10-21:personal-kanban",
+        "stage": "blueprint-generate-aux",
+        "requested_model": "opencode-go/minimax-m3.1-flash-free",
+        "created": 1792580337.1648252,
+        "started": 1792580337.280709,
+        "finished": 1792580614.690218,
+        "outcome": null
+      },
+      {
+        "id": "bud_3f92448f22a54992ac685d03e3ec0a32",
+        "identity": "auxiliary-batch-minimax-2026-10-21:three-leaves",
+        "phase": "auxiliary-batch-minimax-2026-10-21",
+        "kind": "review",
+        "status": "completed",
+        "job_id": "auxiliary-batch-minimax-2026-10-21:personal-kanban",
+        "stage": "blueprint-spec-review-aux",
+        "requested_model": "opencode-go/minimax-m3.1-flash-free",
+        "created": 1792580614.7299771,
+        "started": 1792580614.873873,
+        "finished": 1792580780.263765,
+        "outcome": null
+      },
+      {
+        "id": "bud_0d6c29ea469449c7bcc0cebdbfcd2aee",
+        "identity": "auxiliary-batch-minimax-2026-10-21:three-leaves",
+        "phase": "auxiliary-batch-minimax-2026-10-21",
+        "kind": "research",
+        "status": "completed",
+        "job_id": "auxiliary-batch-minimax-2026-10-21:daily-expenses",
+        "stage": "discovery",
+        "requested_model": "opencode-go/minimax-m3.1-flash-free",
+        "created": 1792580780.7454998,
+        "started": 1792580780.8574772,
+        "finished": 1792580990.68111,
+        "outcome": null
+      },
+      {
+        "id": "bud_d243e092b3a64813b96138279ea7efbf",
+        "identity": "auxiliary-batch-minimax-2026-10-21:three-leaves",
+        "phase": "auxiliary-batch-minimax-2026-10-21",
+        "kind": "production",
+        "status": "completed",
+        "job_id": "auxiliary-batch-minimax-2026-10-21:daily-expenses",
+        "stage": "blueprint-generate-aux",
+        "requested_model": "opencode-go/minimax-m3.1-flash-free",
+        "created": 1792581005.841078,
+        "started": 1792581005.963441,
+        "finished": 1792581589.155138,
+        "outcome": null
+      },
+      {
+        "id": "bud_d7023babd61b42b3b9057cb04348cf52",
+        "identity": "auxiliary-batch-minimax-2026-10-21:three-leaves",
+        "phase": "auxiliary-batch-minimax-2026-10-21",
+        "kind": "research",
+        "status": "failed",
+        "job_id": "auxiliary-batch-minimax-2026-10-21:personal-calendar",
+        "stage": "discovery",
+        "requested_model": "opencode-go/minimax-m3.1-flash-free",
+        "created": 1792581589.1982322,
+        "started": 1792581589.314563,
+        "finished": 1792582389.9596229,
+        "outcome": "cli_protocol"
+      }
+    ]
+  },
+  "old_downloads": [
+    {
+      "artifact_id": "tpl_320ad3f159624ee18ff7fa3ebb0ff59b",
+      "sha256": "bbf42b3ebe6fe71541d0520e40d78ce2aae4ef332b9c386b0a3b61b631ab4a1e"
+    },
+    {
+      "artifact_id": "tpl_26a70025f25141cb971a629d978fe42c",
+      "sha256": "34365b196c458af9ae01073f38623a4e8e98feef3f5af695205700f5e3ad294e"
+    },
+    {
+      "artifact_id": "tpl_d02ead780fca4ec584f924b159ccea09",
+      "sha256": "fa796aefd28d7e6b7baec69f6bae7de611ace482f0160cc0bdd88c4435996c6e"
+    },
+    {
+      "artifact_id": "tpl_c4f9d29ee90e4ddebd300f34d66666cb",
+      "sha256": "727876e37570253b3d46797972211a82bdba6e27c99c8208c133898332c4ba99"
+    },
+    {
+      "artifact_id": "tpl_cfeddf44187a403ba0148e3264c5627d",
+      "sha256": "91434af8cf083eea3c41722f3d1fbbd65c1bdc7e6c8429e71891970ebe117231"
+    },
+    {
+      "artifact_id": "tpl_b91f50c7d8c741aa8d04715852f8effa",
+      "sha256": "a2147212f6048676b88ed52bfe27f5a4c54571c371af0f2581938633649b7169"
+    },
+    {
+      "artifact_id": "tpl_6949040b690c40b3ad7415eec367242c",
+      "sha256": "e975955a0b27d24b2eb69fa8fa3a2ea2cbd82fce2cab7505515fb699d9512b8c"
+    },
+    {
+      "artifact_id": "tpl_e1761c3db0a941348f9a97fb47c279b3",
+      "sha256": "e5aa54db629f525d30d4a09065abec216feb455c7eace8507b6196eaac077437"
+    },
+    {
+      "artifact_id": "tpl_ae75820e56d148ca98ecab408a68ad92",
+      "sha256": "defd51baed874f4e7a7c48ad3a8f577d5d58d848a6b65807dc3bd7bccf4fdbbf"
+    },
+    {
+      "artifact_id": "tpl_a7f570f681834f778db88dfe41d1b631",
+      "sha256": "c520b46f4f1eee636b8f72a0d03c1891d4af129acc1a11ba691a2cfd55b0771c"
+    },
+    {
+      "artifact_id": "tpl_d4404c1ab4c8429db472a572e412d04b",
+      "sha256": "8d0dc126a83f024f25d4d8aff8df0c055a92d4ac80cd8a8ece2bf7ba1377dd0e"
+    },
+    {
+      "artifact_id": "tpl_737c65d52051433ab3510b8f148494ee",
+      "sha256": "9209219cc2ce54f6b1e74eb9169084d83272bbb2df284d2c7d102064bfddf9aa"
+    },
+    {
+      "artifact_id": "tpl_ac5ce1eedef94a539fe2047e60754416",
+      "sha256": "311d0401961941072d5c243e5d3b1c9c157be24fb2281bad017ca390bc902236"
+    },
+    {
+      "artifact_id": "tpl_31f54a064df949379ae9450a27c2858a",
+      "sha256": "0b635386e483273a63f0172df4f4ef4a8784ffe81a764d0fcfcc1cc5e473c393"
+    },
+    {
+      "artifact_id": "tpl_47afbb4ac70d4dc1be628047b75e89ca",
+      "sha256": "82ae63ca7513bae3419ae14819f21c5a6c6674eddd2c72a01d617db37e233d8c"
+    },
+    {
+      "artifact_id": "tpl_de2df547557e4539a91c4d7e93542ff3",
+      "sha256": "972ed86562432e710feb8a2820782ec08805f2d714e6c11ff0e2d4df15096faf"
+    },
+    {
+      "artifact_id": "tpl_d3c38917d0404fa98b984955adde3e11",
+      "sha256": "72b029ac8476abadb6d8910674ec6d9befc500c474b247764f9b8b2dc08b2f26"
+    }
+  ],
+  "strict_history_unchanged": [
+    "repairs",
+    "amendments",
+    "protocol_retry_grants",
+    "protocol_retry_grant_uses",
+    "evidence_recovery_grants",
+    "evidence_recovery_grant_uses",
+    "time_resumes",
+    "effective_timings",
+    "limits"
+  ],
+  "protected_files_unchanged": 117,
+  "original_case_versions_unchanged": 18,
+  "gates": [
+    {
+      "artifact_digest": "ec3f2fc668c20d24b78c22f15eed40779ed38b835c10b7b452aaba725dbb7105",
+      "artifact_id": "tpl_f7ecff8d8fef4deba828aa2a8ef82918",
+      "assessed_at": "2026-10-20T14:51:28.950881+00:00",
+      "campaign_id": "atlas-v1-first-production-2026-10-19",
+      "case_basis_digest": "a22ff1c065d27aecb0cee21dc6b597f5607375bc8ebc297a3451e708f4da5589",
+      "development_delivery_archive_sha256": null,
+      "manifest_path": "docs/template-factory/g1-r8-contract-convergence-2026-10-20/G1_VERIFICATION_MANIFEST.json",
+      "manifest_sha256": "504a7fbd0868977a7a99ac674db1dd1d8690d63a4a52df1ef5306e30f9e8151f",
+      "passed": false,
+      "plan_digest": "1f7701fbf5f52dde011dee76196b2cb01697e10190c6ad17c1273f4b5dcc3d30",
+      "plan_id": "plan_87059846caf345d2b2fe690657cf324f",
+      "reasons": [
+        "G1_queue_not_quiescent",
+        "sample_template_not_currently_catalog_eligible",
+        "sample_template_review_not_passed",
+        "P0_development_delivery_checkpoint_missing",
+        "P0_runtime_run_missing",
+        "standard_development_export_missing"
+      ],
+      "runtime_run_id": null,
+      "sample_scenario_id": "scn_7756e0007f6a463a97316f3f49c15248",
+      "schema": "atlas.g1-assessment.v1",
+      "source_tree_sha256": "d7f89d80e154d2e66becd0d2627eba9d123806c111a61425bf7c5329283b6458",
+      "status": "blocked",
+      "target_binding_digest": null
+    }
+  ]
+}

@@ -1,0 +1,298 @@
+{
+ "authored": {
+  "name": "月度支出复盘本 (Monthly Expense Review Book — 本机单用户)",
+  "audience": "单个自然人（也可是一对共同记账的伴侣/家庭成员）——只记录自己的钱、只为自己看；不是会计、不是组织、不是替别人报销的人。使用场景是一台自己的电脑上、一个浏览器标签页、每天几秒钟记一笔、月底翻一次账。无账号、无团队、无云端。",
+  "objective": "在完全离线的本机上，用整数分精确记录每一笔日常支出（日期 / 正数人民币金额 / 分类 / 简短用途），并按选定自然月即时给出总额与完整分类汇总；支持分类的创建与重命名、支出的修改与删除、相邻月份切换回查，且重启后数据仍在。目标是让用户回答“这个月钱都花到哪儿去了”，而不做预算、收入、账户余额、报销、多币种、银行同步或任何金融建议。",
+  "workflow": [
+   "启动本机应用（指定 --data-dir），浏览器打开 http://127.0.0.1:8765/ 。",
+   "在分类管理页创建这次要用的支出分类（如“餐饮”“交通”），必要时把分类重命名成更贴切的名字。",
+   "在主页面用快速记录表单记一笔：金额（正数、两位小数）、日期（默认今天，可改）、分类、简短用途；提交后当月总额与分类汇总立刻刷新。",
+   "看当月汇总：总额、每个分类的金额与占比；再展开明细表逐笔核对。",
+   "发现记错时在明细表点“编辑”，改金额/日期/分类/用途并保存；保存后原月份与新月份的总额、分类汇总立即重算。",
+   "用“上一月 / 下一月”切换到相邻自然月，回查该月总额与分类分布，并可按分类过滤明细。",
+   "需要清理时删除个别记录；删除后该月总额与分类汇总同步下降。",
+   "停止并重新启动应用（同一个 --data-dir），打开页面确认分类、记录与月度总额都还在。"
+  ],
+  "acceptance": [
+   "创建支出：POST /api/expenses 接受 {\"amount_cents\",\"spent_on\",\"category_id\",\"note\"}，返回 201 与完整记录；amount_cents 必须是 1..10000000000 的 JSON 整数，spent_on 必须是真实 YYYY-MM-DD 日历日，category_id 必须已存在，note 清洗后 0..120 字符。",
+   "任何非法输入都返回结构化错误信封 {\"error\":{\"code\",\"message\",\"field\"}}，且对数据库零写入：请求前后支出条数不变、已有记录逐字段不变。",
+   "分类：POST /api/categories 创建、PUT /api/categories/{id} 重命名；重名 409、非法名 400、未知 id 404、删除 405；重命名后支出明细与月度汇总立即显示新分类名，金额与条数不变。",
+   "月度汇总：GET /api/months/{YYYY-MM}/summary 返回该自然月的精确总额（整数分与两位小数字符串）、支出条数与完整分类汇总；by_category 的金额之和等于总额，占比基点之和为 10000。",
+   "明细回查：GET /api/expenses?month=YYYY-MM[&category_id=N] 返回该月（或该分类）记录的精确集合，按日期与 id 升序；空月份返回 200 与零值。",
+   "修正：PATCH /api/expenses/{id} 原子更新金额/日期/分类/用途；成功后旧月与新月的总额与分类汇总立即重算，失败时记录逐字段不变（无部分写入）。",
+   "相邻月份：2026-01 的前一月为 2025-12、2026-12 的后一月为 2027-01；月份参数非法（2026-13、2026-00、2026-1、2026-10-01、0000-01）返回 400 invalid_month。",
+   "日期边界：闰日 2024-02-29、2000-02-29 有效，2026-02-29、1900-02-29、2026-04-31 无效且零写入；月末与年末各归属到唯一自然月。",
+   "金额精度：库里只有 INTEGER 分列，没有 REAL；0.10+0.20 汇总为 30 分且展示 '0.30'；UI 严格两位小数，API 不返回浮点金额。",
+   "持久化：数据全部落在 <data_dir>/expenses.sqlite3；用同一 --data-dir 重启后分类、支出、id 与月度总额全部保留（重启由操作员执行并重跑 probe A05 确认）。",
+   "可访问 UI：/ 与 /categories 提供带 label 的表单、语义表格、aria-live 状态、键盘可达的月份切换与编辑删除；所有金额与汇总一律来自服务端，前端不做累加。",
+   "范围约束：P0 不提供预算/收入/账户/转账/报销/多币种/银行同步/认证/通知；DELETE /api/categories/{id} 返回 405 method_not_allowed。"
+  ],
+  "observations": [
+   [
+    "documentation",
+    "README.md",
+    33,
+    36,
+    "上游 README 的核心功能清单：快速添加支出/收入（仅需日期、金额、分类）、面向单用户（homelab 部署）、周期交易、自定义分类/货币符号/起始日。→ 目标沿用“单用户 + 记录三要素必填”的姿态，但按场景 P0 砍掉周期交易与收入。"
+   ],
+   [
+    "documentation",
+    "README.md",
+    25,
+    27,
+    "上游自述目标是“dead simple、每月快速看一眼支出”，并明确声明“不是预算应用，只做追踪”。→ 支撑目标 P0 排除预算目标与计划层。"
+   ],
+   [
+    "documentation",
+    "README.md",
+    141,
+    142,
+    "上游 README 注明不含认证，建议自行放在前置代理之后，仅面向 homelab 使用。→ 目标同样不做平台级认证，改为只监听回环地址的单用户本地应用。"
+   ],
+   [
+    "documentation",
+    "README.md",
+    148,
+    153,
+    "上游约定：支出以负值记录、收入/报销为正值；日期以 UTC RFC3339 字符串存储但前端只让用户选日期；分类是分类标准、标签可选。→ 目标改为“正数分 + 本地日历日”，并取消标签/收入/报销概念。"
+   ],
+   [
+    "documentation",
+    "README.md",
+    166,
+    168,
+    "上游的 Start Date 设置允许把“每月”定义成 5 号到次月 4 号的自定义窗口。→ 目标 P0 只用自然月，不提供自定义周期起点（用户决策点 D2）。"
+   ],
+   [
+    "documentation",
+    "README.md",
+    49,
+    52,
+    "上游表格视图支持按月或全部查看、按时间倒序展示并可删除记录，浏览器内可搜索名称/标签。→ 目标保留按月明细回查与删除，去掉搜索与标签。"
+   ],
+   [
+    "documentation",
+    "README.md",
+    209,
+    211,
+    "上游 CSV 导入只接受 YYYY-MM-DD 顺序的日期，明确不处理 MM/DD 或 DD/MM。→ 目标沿用严格 YYYY-MM-DD 顺序，并在 API 层进一步拒绝歧义格式。"
+   ],
+   [
+    "documentation",
+    "README.md",
+    179,
+    181,
+    "上游默认 JSON 文件后端（另有 Postgres），自动在数据目录创建 .json 文件。→ 目标改用单一 SQLite 文件，持久化机制不同。"
+   ],
+   [
+    "code_observation",
+    "internal/api/handlers.go",
+    169,
+    192,
+    "AddExpense 只允许 PUT；先解码 JSON 再调用 expense.Validate()，日期为零值时补当前时间，存储失败返回 500，成功回显记录对象。→ 目标改为 POST + 日期必填，缺日期报 400 而不是静默补默认值。"
+   ],
+   [
+    "code_observation",
+    "internal/api/handlers.go",
+    208,
+    233,
+    "EditExpense 用查询参数 id 定位记录，缺 id 返回 400，校验后交给存储层更新。→ 目标用路径参数 /api/expenses/{id} + PATCH。"
+   ],
+   [
+    "code_observation",
+    "internal/api/handlers.go",
+    235,
+    251,
+    "DeleteExpense 用 ?id= 删除，缺 id 返回 400，成功返回扁平 {\"status\":\"success\"}。→ 目标用 204 No Content 表示删除成功。"
+   ],
+   [
+    "code_observation",
+    "internal/api/handlers.go",
+    73,
+    99,
+    "UpdateCategories 以 PUT 接收完整分类字符串数组，逐个经 storage.ValidateCategory 清洗，任一非法即 400。→ 上游是整表替换；目标改为逐分类的创建/重命名接口，并显式拒绝重名。"
+   ],
+   [
+    "code_observation",
+    "internal/api/handlers.go",
+    27,
+    39,
+    "上游错误响应是扁平结构 {\"error\": \"...\"}（字符串），writeJSON 统一写 application/json。→ 目标改为结构化信封 {error:{code,message,field}}，让探针能断言稳定错误码。"
+   ],
+   [
+    "code_observation",
+    "internal/storage/storage.go",
+    85,
+    94,
+    "上游 Expense 结构以 float64 存 Amount、time.Time 存 Date，并带 Currency、Tags、Name、Category 字段。→ 目标用 amount_cents INTEGER + spent_on TEXT 取代浮点金额与时间戳。"
+   ],
+   [
+    "code_observation",
+    "internal/storage/storage.go",
+    170,
+    198,
+    "上游 Expense.Validate() 要求清洗后名称非空、分类非空、金额不等于 0、日期非零；货币校验被注释掉。→ 目标要求金额严格为正整数分，缺日期/缺分类为 400。"
+   ],
+   [
+    "code_observation",
+    "internal/storage/storage.go",
+    152,
+    168,
+    "上游 SanitizeString 用正则把非法字符替换为空格并压缩空白；ValidateCategory 只拒绝清洗后为空的名字，不限长度也不拒绝重名。→ 目标增加长度上限 40、控制字符拒绝与重名 409。"
+   ],
+   [
+    "code_observation",
+    "internal/storage/storage.go",
+    42,
+    44,
+    "上游 Storage 接口里多币种换算被整段注释为“Potential Future Feature”。→ 目标 P0 固定 CNY 单币种。"
+   ],
+   [
+    "code_observation",
+    "internal/storage/storage.go",
+    237,
+    248,
+    "上游内置 10 个默认分类（含 Income），说明默认分类集是产品级决定。→ 目标不预置任何具体家庭分类，分类空起步，避免引入叶子文档未指定的固定实体（决策点 D4）。"
+   ],
+   [
+    "code_observation",
+    "internal/storage/jsonStore.go",
+    28,
+    71,
+    "上游 JSON 后端启动时创建数据目录与 config.json/expenses.json，持久化靠磁盘上的 JSON 文件。→ 目标改为 SQLite 文件，重启保留机制不同。"
+   ],
+   [
+    "code_observation",
+    "internal/storage/jsonStore.go",
+    358,
+    377,
+    "上游 AddExpense 为缺省 ID 生成 uuid、补默认货币与默认日期，然后整体重写 expenses.json。→ 目标由 SQLite 自增主键给 ID，金额只接受整数分。"
+   ],
+   [
+    "code_observation",
+    "internal/storage/jsonStore.go",
+    447,
+    472,
+    "上游 UpdateExpense 在文件内按 ID 整条替换记录并保留原 ID，找不到记录时返回“expense with ID %s not found”错误。→ 目标保留“整行替换”语义并映射为 404 expense_not_found。"
+   ],
+   [
+    "code_observation",
+    "internal/storage/jsonStore.go",
+    379,
+    402,
+    "上游 RemoveExpense 过滤掉目标 ID 后整体重写文件，未找到时返回错误。→ 目标删除为事务内单行 DELETE，未知 ID 返回 404。"
+   ],
+   [
+    "code_observation",
+    "internal/web/templates/index.html",
+    160,
+    177,
+    "上游首页用前端 JS 汇总分类：只累加 amount<0 的记录，百分比用浮点除法计算。→ 目标改为服务端按分类分组、整数分求和，比例用基点整数（share_bp）输出。"
+   ],
+   [
+    "code_observation",
+    "internal/web/templates/index.html",
+    52,
+    56,
+    "上游首页有上一月/下一月按钮与当前月份显示区。→ 目标保留相邻自然月切换，并另加 /api/months 列表供导航与回查。"
+   ],
+   [
+    "code_observation",
+    "internal/web/templates/index.html",
+    92,
+    101,
+    "上游日期输入框在加载时用本地年月日填成 YYYY-MM-DD。→ 目标沿用本地日历日作为唯一日期表达，不存时间戳。"
+   ],
+   [
+    "code_observation",
+    "internal/web/templates/index.html",
+    86,
+    89,
+    "上游金额输入是 type=number、step=0.01、min=0.01、max=9000000000000000。→ 目标上限收紧为 10000000000 分（1 亿元），并由服务端再校验一次。"
+   ],
+   [
+    "code_observation",
+    "internal/web/templates/table.html",
+    374,
+    389,
+    "上游删除走 DELETE /expense/delete?id=...，成功后重新拉取列表。→ 目标删除后由月汇总/明细端点重新计算，前端不再自行汇总。"
+   ],
+   [
+    "code_observation",
+    "internal/web/templates/table.html",
+    397,
+    451,
+    "上游表格页提交时区分新增与编辑（PUT /expense 或 PUT /expense/edit?id=），非收入时给金额加负号，并用 getISODateWithLocalTime 生成时间戳。→ 目标取消符号约定：金额恒为正数分，日期为纯日历日。"
+   ],
+   [
+    "code_observation",
+    "internal/web/templates/settings.html",
+    352,
+    393,
+    "上游分类管理在客户端去重、去掉 <> 字符、要求至少一个分类，然后整体 PUT /categories/edit 提交完整数组。→ 目标把重命名与重复名校验放到服务端，并给重名返回 409。"
+   ],
+   [
+    "code_observation",
+    "internal/web/templates/settings.html",
+    517,
+    530,
+    "上游起始日以整数提交到 /startdate/edit，界面限制 1..31。→ 目标不提供周期起点配置；若将来需要，必须新增字段而不是复用该设置。"
+   ],
+   [
+    "documentation",
+    "leaf.md",
+    35,
+    39,
+    "叶子文档的核心模型：支出记录=金额+日期+用途；分类由用户管理且是分析主轴；聚合视图是记录的实时投影，保存新支出立即改变当月总额与分类分布。→ 目标把“保存即重算”落在服务端同一事务与随后的即时查询。"
+   ],
+   [
+    "documentation",
+    "leaf.md",
+    157,
+    163,
+    "叶子文档的重要规则：分类是骨干；记录可编辑/重分类/删除且修正会立即传播到所有聚合；转账不算支出；计划与实际分离；预算只提示不阻断。→ 目标实现“分类+修正+删除+立即传播”，明确不做转账/预算/计划条目。"
+   ],
+   [
+    "documentation",
+    "leaf.md",
+    90,
+    100,
+    "叶子文档的复盘循环：打开周期视图→看总额与对比→看分类分布→下钻到某分类的记录→改错。→ 目标的“相邻月切换 + 按分类过滤明细”正是这一循环的最小实现。"
+   ]
+  ],
+  "inference": "目标设计推断：依据叶子文档的核心模型（支出记录=金额+日期+用途；用户可管理的分类；记录的实时周期聚合、修正立即传播）与上游固定快照的静态证据（单用户、仅日期/金额/分类必填、每月快速复盘、分类为分析主轴、记录可改可删、无认证），目标被推断为一个“记录优先”的本机单用户支出追踪器：SQLite 持久化 + 整数分存储 + 服务端自然月聚合 + 浏览器内单页复盘界面。相对上游存在四处有意分歧：(1) 金额由带符号的 float64 改为正数整数分，UI 严格两位小数，禁止浮点累计；(2) 周期由可配置的起始日窗口改为固定自然月，日期表达为本地日历日而非 UTC 时间戳；(3) 汇总由前端 JS 浮点百分比改为服务端整数分分组求和与基点比例；(4) 持久化由整文件 JSON 重写改为 SQLite 单事务行级写。范围上按场景把收入/报销、账户余额与转账、预算目标、周期计划、标签、收据、多币种、银行同步、认证与通知全部排除在 P0 之外。上游从未运行（not_run），所有上游陈述均为对固定快照的静态阅读，本蓝图不复制任何上游实现代码。",
+  "features": [
+   "expense_capture",
+   "expense_correction",
+   "category_management",
+   "monthly_rollup",
+   "durable_local_store"
+  ],
+  "goals": [
+   "A01（expense_capture）：POST /api/expenses 以 {amount_cents, spent_on, category_id, note} 创建记录并返回 201 与完整记录（整数分 + 两位小数字符串 + CNY + 本地日历日 + 派生月份 + 分类 + 用途 + id + 时间戳）；13 组负向创建（0 分、负分、浮点金额、字符串金额、越界、缺字段、非法日期、未知分类、超长用途、未知字段、畸形 JSON）全部返回约定 4xx，且请求前后支出条数完全不变。",
+   "A02（expense_correction）：PATCH /api/expenses/{id} 成功后旧月与新月的 total_cents / expense_count / 分类行立即重算（改日期时旧月减一、新月加一；改分类时分类行在两个月之间迁移），而未知字段、非法日期、未知分类三种失败补丁都让记录逐字段不变（含 updated_at），即无部分写入。",
+   "A03（category_management）：POST /api/categories 创建、PUT /api/categories/{id} 重命名；重名 409、非法名 400、未知 id 404、删除 405；重命名后 id / created_at / expense_count 不变，支出明细与月度汇总立即显示新分类名且金额与条数不变。",
+   "A04（monthly_rollup）：GET /api/months/{YYYY-MM}/summary 返回该自然月的精确总额（2249 分 / '22.49'）、条数与完整分类划分（sum(total_cents)==total_cents、sum(share_bp)==10000、5558+4442），GET /api/expenses?month=&category_id= 返回精确明细集合与顺序，空月返回 200 零值、非法月份 400、闰日与月末年末边界正确、0.10+0.20 汇总为 30 分显示 '0.30'。",
+   "A05（durable_local_store）：GET /api/health 报告 backend=sqlite、绝对 data_dir 与 schema_version>=1；写入后精确回读、重复读取不产生重复行、总额精确；多字段补丁中任一字段非法时整条记录逐字段不变（零落库）；跨进程重启后的保留由操作员按验收 README 第 5 节停/启后重跑 A05 人工确认（本次未运行）。"
+  ],
+  "arch": "# 目标蓝图：本机单用户「日常支出与月度分类复盘」\n\n> 本蓝图是**认知模板 / 设计契约**，不是可运行应用；它规定一个 Python 标准库 HTTP + SQLite 目标应用的行为，供实现与验收使用。\n\n## 0. 定位、范围与证据状态\n\n**类型**：Expense Tracking（记录优先）。核心三件套：支出记录（金额 + 日期 + 用途）→ 用户可管理的分类 → 记录的实时周期聚合。\n\n**用户**：单个自然人，只记自己的钱、只为自己看。本机运行，无账号、无云端、无共享。\n\n**P0 范围内**\n\n- 支出记录的创建、读取、修改、删除\n- 分类的创建与重命名\n- 选定自然月的总额 + 完整分类汇总\n- 相邻月份切换与明细回查\n- 修改后立即重算、重开后保留\n\n**P0 明确不做**：预算/目标、收入、报销、账户余额与钱包、转账、周期计划/提醒、多币种、银行同步、收据照片、标签、CSV 导入导出、认证/多用户、通知、任何财务建议或 SaaS 化。\n\n**证据状态**：上游 ExpenseOwl（commit 4795569…）仅作静态阅读，**未安装、未构建、未运行（not_run）**；本蓝图不复制上游任何实现代码，只借鉴其公开产品约定作为设计参考。\n\n---\n\n## 1. 数据模型（SQLite）\n\n文件：`<data_dir>/expenses.sqlite3`\n\n```sql\nPRAGMA foreign_keys = ON;\nPRAGMA journal_mode = WAL;\nPRAGMA synchronous = FULL;\n\nCREATE TABLE IF NOT EXISTS categories (\n  id          INTEGER PRIMARY KEY AUTOINCREMENT,\n  name        TEXT    NOT NULL UNIQUE,\n  created_at  TEXT    NOT NULL,\n  updated_at  TEXT    NOT NULL\n);\n\nCREATE TABLE IF NOT EXISTS expenses (\n  id           INTEGER PRIMARY KEY AUTOINCREMENT,\n  category_id  INTEGER NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,\n  amount_cents INTEGER NOT NULL CHECK (amount_cents > 0),\n  spent_on     TEXT    NOT NULL,\n  note         TEXT    NOT NULL DEFAULT '',\n  currency     TEXT    NOT NULL DEFAULT 'CNY' CHECK (currency = 'CNY'),\n  created_at   TEXT    NOT NULL,\n  updated_at   TEXT    NOT NULL\n);\n\nCREATE INDEX IF NOT EXISTS idx_expenses_month ON expenses (spent_on);\nCREATE INDEX IF NOT EXISTS idx_expenses_category ON expenses (category_id);\n```\n\n**字段语义**\n\n| 表.字段 | 类型 | 约束与含义 |\n| --- | --- | --- |\n| categories.id | INTEGER | 自增主键，创建后不变 |\n| categories.name | TEXT | 分类名；去首尾空白后 1..40 字符；唯一（区分大小写）；禁止控制字符 |\n| categories.created_at / updated_at | TEXT | ISO-8601 UTC 时间戳，如 `2026-10-21T11:09:54Z` |\n| expenses.id | INTEGER | 自增主键，创建后不变 |\n| expenses.amount_cents | INTEGER | **整数分**，1 ≤ v ≤ 10,000,000,000（1 亿元）。无 REAL/FLOAT/TEXT 数字列 |\n| expenses.spent_on | TEXT | 本地日历日，严格 `YYYY-MM-DD`，不含时间与时区 |\n| expenses.note | TEXT | 简短用途；去首尾空白后 0..120 字符；禁止控制字符 |\n| expenses.category_id | INTEGER | 外键 → categories.id；一笔支出恰好一个分类 |\n| expenses.currency | TEXT | 恒为 `CNY`（P0 单币种常量，不接受外部输入） |\n| expenses.created_at / updated_at | TEXT | ISO-8601 UTC 时间戳；任何一次成功写入都刷新 updated_at |\n\n**不存的东西**：没有浮点金额、没有时区时间戳、没有标签、没有账户、没有计划/实际标记、没有币种表、没有周期规则表。\n\n---\n\n## 2. API 契约\n\n**基址**：`http://127.0.0.1:<port>/api`（只监听回环地址；单用户本地）。\n\n**通用约定**\n\n- 请求体必须是 `Content-Type: application/json` 的 JSON 对象；写操作严格字段校验，出现未定义字段即拒绝。\n- 成功：`200 OK`；创建 `201 Created`；删除 `204 No Content`（无正文）。响应 `Content-Type: application/json`。\n- 错误信封（统一）：\n\n```json\n{\"error\": {\"code\": \"invalid_date\", \"message\": \"spent_on must be a real YYYY-MM-DD date\", \"field\": \"spent_on\"}}\n```\n\n`field` 仅在与具体字段相关时出现，否则省略。\n\n- 所有金额字段在 API 层一律是**整数分**；API 不返回浮点金额，只额外返回派生展示串。\n- 读端点无副作用；写端点单条记录一次事务。\n\n### 2.1 健康检查\n\n`GET /api/health` → `200`\n\n```json\n{\"status\": \"ok\", \"backend\": \"sqlite\", \"data_dir\": \"/abs/path/to/data\", \"schema_version\": 1, \"currency\": \"CNY\"}\n```\n\n### 2.2 分类\n\n`GET /api/categories` → `200`\n\n```json\n{\"categories\": [{\"id\": 1, \"name\": \"餐饮\", \"expense_count\": 12, \"created_at\": \"...\", \"updated_at\": \"...\"}]}\n```\n\n顺序按 `id` 升序；`expense_count` 为该分类下的支出条数（含所有月份）。\n\n`POST /api/categories`\n\n- 请求：`{\"name\": \"餐饮\"}`\n- → `201`：`{\"category\": {\"id\": 1, \"name\": \"餐饮\", \"expense_count\": 0, \"created_at\": \"...\", \"updated_at\": \"...\"}}`\n- 错误：`400 invalid_name`、`409 duplicate_name`\n\n`PUT /api/categories/{id}`（重命名；该分类唯一可变字段被完整替换）\n\n- 请求：`{\"name\": \"外食\"}`\n- → `200`：`{\"category\": {\"id\": 1, \"name\": \"外食\", \"expense_count\": 12, \"created_at\": \"...\", \"updated_at\": \"...\"}}`\n- 错误：`400 invalid_name`、`404 category_not_found`、`409 duplicate_name`\n- 语义：只改 `categories` 一行；`id` 与 `created_at` 不变；`updated_at` 刷新；历史支出行不被改写，支出明细与月度汇总立即显示新名。\n\n`DELETE /api/categories/{id}` → `405 method_not_allowed`（P0 不实现分类删除/合并，见 §8 决策点 D3）\n\n### 2.3 支出记录\n\n`POST /api/expenses`\n\n- 请求：`{\"amount_cents\": 1234, \"spent_on\": \"2026-10-05\", \"category_id\": 1, \"note\": \"午餐\"}`\n- → `201`\n\n```json\n{\"expense\": {\"id\": 1, \"amount_cents\": 1234, \"amount\": \"12.34\", \"currency\": \"CNY\", \"spent_on\": \"2026-10-05\", \"month\": \"2026-10\", \"note\": \"午餐\", \"category\": {\"id\": 1, \"name\": \"餐饮\"}, \"created_at\": \"...\", \"updated_at\": \"...\"}}\n```\n\n`amount` 是由 `amount_cents` 派生的两位小数字符串（整数除法/取模，不经过浮点）；`month` 由 `spent_on` 派生；`category` 是内嵌的当前分类快照（id + 现名）。\n\n`GET /api/expenses/{id}` → `200 {\"expense\": {...}}` / `404 expense_not_found`\n\n`GET /api/expenses`（列表）\n\n- 查询参数：`month`（可选，`YYYY-MM`）、`category_id`（可选整数）。都缺省时返回全部记录。\n- → `200`\n\n```json\n{\"month\": \"2026-10\", \"count\": 2, \"expenses\": [{\"id\": 1}, {\"id\": 2}]}\n```\n\n`month` 参数存在时回显该键，不存在时省略该键；`count` 恒为返回条数；排序为 `spent_on` 升序，其次 `id` 升序。\n\n`PATCH /api/expenses/{id}`（修正；请求体是四个可变字段的任意非空子集）\n\n- 请求（示例）：`{\"amount_cents\": 2500, \"spent_on\": \"2026-12-01\", \"category_id\": 2, \"note\": \"更正后的用途\"}`\n- → `200 {\"expense\": {...}}`\n- 错误：`400 missing_field`（空对象）、`400 unknown_field`、`400 invalid_amount`、`400 invalid_date`、`400 invalid_note`、`404 category_not_found`、`404 expense_not_found`\n- 语义：**整行替换**。未出现的字段保持原值；出现的字段整体校验、整体生效；任一字段非法 → 整个请求被拒，记录逐字段不变。\n\n`DELETE /api/expenses/{id}` → `204 No Content`（无正文）/ `404 expense_not_found`\n\n### 2.4 月度汇总与月份导航\n\n`GET /api/months/{YYYY-MM}/summary` → `200`\n\n```json\n{\n  \"month\": \"2026-10\",\n  \"currency\": \"CNY\",\n  \"total_cents\": 2249,\n  \"total\": \"22.49\",\n  \"expense_count\": 3,\n  \"by_category\": [\n    {\"category_id\": 1, \"name\": \"餐饮\", \"total_cents\": 1250, \"total\": \"12.50\", \"expense_count\": 2, \"share_bp\": 5558},\n    {\"category_id\": 2, \"name\": \"交通\", \"total_c\": 999, \"total\": \"9.99\", \"expense_count\": 1, \"share_bp\": 4442}\n  ]\n}\n```\n\n- `by_category` 只包含**当月有支出的分类**（分类表中的空分类不出现）；按 `total_cents` 降序，并列时按 `category_id` 升序。\n- `share_bp` 为基点整数（0..10000）：`floor(total_cents * 10000 / grand_total)`，再按小数余数从大到小把剩余份额逐个 +1，保证 `total_cents > 0` 时 `sum(share_bp) == 10000`；`total_cents == 0` 时 `by_category` 为 `[]`。\n- 恒等式：`sum(by_category.total_cents) == total_cents`（分类是支出的完整划分）。\n\n`GET /api/months`（有数据的月份列表，供相邻月导航与回查）\n\n- → `200 {\"months\": [{\"month\": \"2025-12\", \"total_cents\": 50, \"total\": \"0.50\", \"expense_count\": 1}]}`\n- 按 `month` 升序；只列出至少有一条支出的月份。\n\n### 2.5 状态码与错误码总表\n\n| HTTP | code | 触发条件 |\n| --- | --- | --- |\n| 400 | invalid_body | 请求体不是合法 JSON 或不是对象 |\n| 400 | unknown_field | 出现未定义字段 |\n| 400 | missing_field | 缺少必填字段（创建缺 amount_cents/spent_on/category_id；PATCH 空对象） |\n| 400 | invalid_amount | amount_cents 不是 JSON 整数，或不在 [1, 10000000000] |\n| 400 | invalid_date | spent_on 不匹配 `^\\d{4}-\\d{2}-\\d{2}$` 或不是真实日历日 |\n| 400 | invalid_note | note 非字符串、清洗后长度 > 120、含控制字符 |\n| 400 | invalid_name | 分类名清洗后为空、长度 > 40、含控制字符 |\n| 400 | invalid_month | month 参数不匹配 `^\\d{4}-(0[1-9]|1[0-2])$` 或年份为 0000 |\n| 404 | category_not_found | 引用的或路径上的分类 id 不存在 |\n| 404 | expense_not_found | 路径上的支出 id 不存在 |\n| 404 | not_found | 未知路径 |\n| 405 | method_not_allowed | 路径存在但方法不支持（如 DELETE /api/categories/{id}） |\n| 409 | duplicate_name | 分类名已存在（创建或重命名） |\n| 500 | internal_error | 未预期异常（已回滚，数据库无残留写入） |\n\n**校验顺序（保证错误码确定）**：invalid_body → unknown_field → missing_field → invalid_amount → invalid_date → invalid_note → category_not_found / expense_not_found → duplicate_name。\n\n---\n\n## 3. 日期与周期规则\n\n1. `spent_on` 是**本地日历日**，严格 `YYYY-MM-DD`；不存时间、不存时区、不做夏令时换算。\n2. 一笔支出恰好属于一个自然月：`month = spent_on[0:7]`。\n3. 月份键 `YYYY-MM`；月参数必须匹配 `^\\d{4}-(0[1-9]|1[0-2])$` 且年份在 0001..9999。`2026-13`、`2026-00`、`2026-1`、`2026-10-01`、`0000-01` 一律 `400 invalid_month`。\n4. **相邻月规则**：前一月 = (year, month-1)，month=1 时回绕为上一年 12 月；后一月 = (year, month+1)，month=12 时进位为下一年 1 月。`2026-01` 的前一月是 `2025-12`；`2026-12` 的后一月是 `2027-01`。\n5. **闰年规则**：`(year % 4 == 0 and year % 100 != 0) or year % 400 == 0`。`2024-02-29`、`2000-02-29` 有效；`2026-02-29`、`1900-02-29` 无效（`400 invalid_date`）。\n6. **每月天数**：1/3/5/7/8/10/12 为 31 天，4/6/9/11 为 30 天，2 月按闰年规则。`2026-04-31` 无效。\n7. **空月份合法**：没有支出的月份返回 `200`，`total_cents = 0`、`expense_count = 0`、`by_category = []`。\n8. **无周期起点偏移**：P0 的月份就是自然月，不提供“5 号到次月 4 号”式自定义窗口（与上游 Start Date 设置不同，见 §8 决策点 D2）。\n9. **无计划/实际之分**：P0 不含周期计划或未来条目，所有记录都是已发生的实际支出。\n\n---\n\n## 4. 金额规则\n\n1. 存储单位是**分**（`amount_cents`），列类型 INTEGER；库里没有 REAL/FLOAT/TEXT 数字列。\n2. 金额恒为正：`amount_cents ≥ 1`；没有“负数代表支出”的符号约定，也没有收入/报销取值。\n3. 上界 `amount_cents ≤ 10,000,000,000`（1 亿元）；越界 `400 invalid_amount`。\n4. 汇总一律用 SQL `SUM(amount_cents)` 在整数域完成，不做浮点累加：`0.10 + 0.20` 恒为 30 分，展示为 `\"0.30\"`。\n5. 展示串由整数派生：`format_cents(c) = f\"{c // 100}.{c % 100:02d}\"`（只用于非负值）。UI 侧把输入串按 `.` 切分解析为分（`\"12.34\"` → `1234`），禁止 `parseFloat`。\n\n---\n\n## 5. 原子失败语义\n\n1. **读无副作用**：`GET` 类端点不写库。\n2. **写前全量校验**：解析 JSON → 拒绝未知字段 → 检查必填 → 逐字段校验 → 引用完整性（`category_id` 必须存在）。任何一步失败都在进入事务前返回 4xx，**该次请求对数据库零写入**（不产生行、不改行、不消耗 id）。\n3. **单事务提交**：写操作在 `BEGIN IMMEDIATE` … `COMMIT` 之间完成；COMMIT 成功才返回 2xx，异常路径 ROLLBACK。\n4. **整行替换**：`PATCH /api/expenses/{id}` 先算好完整新行再 UPDATE，因此不会出现“金额改了但日期没改”的半更新；任一字段非法 → 整个请求被拒，记录与请求前逐字段相同。\n5. **引用完整性**：开启 `PRAGMA foreign_keys=ON`，外键约束 + `CHECK(amount_cents > 0)`；即使应用层校验被绕过，数据库层仍然拒绝写入。\n6. **重命名的传播**：`expenses` 存 `category_id` 而非分类名副本，重命名只改 `categories` 一行；汇总在读取时按 `category_id` 分组并附带当前名称，因此重命名立即出现在汇总与明细里，且不重写历史支出行。\n7. **并发**：单进程、单把全局锁串行化所有数据库操作（单用户场景），保证“写入—重算”不会读到中间态。\n8. **崩溃安全**：`journal_mode=WAL` + `synchronous=FULL`，进程被杀时事务要么完整提交要么完全回滚；重启后数据仍在同一 `<data_dir>/expenses.sqlite3`。\n\n---\n\n## 6. 前端（基本可访问 UI）\n\n单页应用：服务器只提供静态外壳 + JSON API；无构建步骤、无框架、无 CDN、无第三方脚本。\n\n- 路由：`GET /`（记录 / 汇总 / 明细主页面）、`GET /categories`（分类管理页），二者共用同一套 API。\n- 结构与无障碍：\n  - `<html lang=\"zh-CN\">`；首屏 `<h1>`，分节 `<h2>`；每页首个可聚焦元素是“跳到主内容”链接。\n  - 所有输入都有显式 `<label for>`；金额输入 `type=\"text\" inputmode=\"decimal\" pattern=\"^\\d{1,9}(\\.\\d{2})?$\"`，前端先用正则 + 字符串切分解析为整数分（不经过 `parseFloat`），不合规就地报错并**不发起请求**。\n  - 汇总与明细用语义化 `<table>` + `<caption>` + `<th scope=\"col\">`；分类汇总表给出“占比（%）”，由 `share_bp` 整数换算成一位小数展示，只用于展示，不参与金额计算。\n  - 状态提示放在 `aria-live=\"polite\"` 区域，错误用 `role=\"alert\"`；切换月份后播报“已切换到 2026 年 10 月”。\n  - 操作按钮有可读名称（如“编辑 12.34 元 餐饮 10 月 5 日的支出”）；焦点可见；不靠颜色单独传达状态（配文字/图标）。\n  - 键盘可达：月份切换、编辑、删除均为原生 `<button>`；删除需二次确认（“取消 / 删除”）。\n- 主页面三块：① 记录/编辑表单（金额、日期、分类下拉、用途）；② 月份导航（上一月 / 当前月 / 下一月）+ 汇总（总额 + 分类分布表）；③ 明细表（可编辑/删除，可按分类过滤）。\n- 所有汇总与明细数值都取自服务端端点；前端不做任何金额累加。\n\n---\n\n## 7. 数据目录与启动\n\n```bash\n# 启动（默认只监听回环地址）\npython3 app.py --data-dir ./data --host 127.0.0.1 --port 8765\n\n# 停止：Ctrl-C\n# 重新打开（数据保留，用同一个 --data-dir）\npython3 app.py --data-dir ./data --host 127.0.0.1 --port 8765\n```\n\n- `--data-dir`（默认 `./data`）：不存在时自动创建；数据库文件 `<data_dir>/expenses.sqlite3`。\n- `--host` 默认 `127.0.0.1`、`--port` 默认 `8765`；只接受回环地址（`127.0.0.1` / `::1` / `localhost`），传其它地址直接报错退出——本应用没有认证，不应暴露到局域网。\n- 启动时幂等建表（`CREATE TABLE IF NOT EXISTS`），并打印一行启动信息：监听地址、数据目录、数据库文件路径。\n- 依赖：仅 Python 3.8+ 标准库（`http.server` / `sqlite3` / `json` / `datetime` / `argparse` / `re` / `uuid`）。\n- 备份：停止服务后复制整个数据目录（含 `expenses.sqlite3-wal` 与 `-shm`）。\n\n---\n\n## 8. 用户决策点（需要产品方拍板）\n\n- **D1 金额上限与文本长度**：上限 1 亿元、用途 120 字、分类名 40 字是本蓝图默认值。\n- **D2 周期窗口**：P0 固定自然月。若要“5 号到次月 4 号”式周期，需新增 `period_start_day` 配置并重写月份归属规则，不能直接沿用上游的 Start Date 语义。\n- **D3 分类删除/合并**：P0 只有创建与重命名，删除返回 405；重命名不留历史别名，若要按旧名回溯需新增别名/重定向表。\n- **D4 分类默认值**：P0 不预置任何分类（空起步），以免引入叶子文档未指定的固定家庭实体；是否预置通用分类由产品方决定。\n- **D5 用途字段语义**：`note` 是否要拆成“商家/物品”两个字段。\n- **D6 金额展示**：API 返回裸数值 + `currency=CNY`，UI 加 `¥` 前缀；是否在 API 层直接返回带符号字符串。\n\n---\n\n## 9. 上游证据 → 目标决策（对照表）\n\n| 上游证据 | 目标决策 | 理由 |\n| --- | --- | --- |\n| storage.go 的 float64 Amount + 符号区分支出/收入 | 正数 `amount_cents`（INTEGER） | 场景要求正数金额、禁止浮点累计，P0 无收入 |\n| handlers.go 的扁平 `{\"error\":\"...\"}` | 结构化 `{\"error\":{\"code\",\"message\",\"field\"}}` | 探针需要稳定错误码 |\n| index.html 前端浮点百分比汇总 | 服务端整数分组 + `share_bp` | 避免浮点累加，前端不再做账 |\n| README.md 的 Start Date 自定义周期窗口 | 固定自然月 | 场景写明“选定自然月” |\n| jsonStore.go 整文件 JSON 重写 | SQLite 单事务行级写 | 需要原子失败语义与并发安全 |\n| settings.html 客户端去重 + 整表 PUT | 逐分类 POST/PUT + 409 duplicate_name | 需要真正的重命名与冲突反馈 |\n| README.md 无认证、面向 homelab | 只监听回环地址、单进程单用户 | 单机单用户前提 |\n| storage.go 内置 10 个默认分类 | 不预置分类 | 叶子未指定具体分类实体 |\n\n---\n\n## 10. 验收探针对照\n\n`python3 probe.py --base-url http://127.0.0.1:8765 --case A01..A05`（`--case all` 跑全部）：\n\n| 用例 | 对应特性 | 断言重点 |\n| --- | --- | --- |\n| A01 | expense_capture | 创建/回显/两位小数格式；13 组负向创建逐一断言**零写入**（记录条数不变） |\n| A02 | expense_correction | 改金额/日期/分类后**旧月与新月**的总额与分类行立即变化；未知字段/非法日期/未知分类 → 记录逐字段不变 |\n| A03 | category_management | 创建/重命名/重名 409/非法名 400/未知 id 404/删除 405；重命名后明细与汇总同时显示新名且 `expense_count` 保持 |\n| A04 | monthly_rollup | 精确总额与分类划分（`sum(total_cents)` 恒等、`sum(share_bp)==10000`）、按月/按分类明细集合与顺序、非法月份 400、空月 200、闰日与月末/年末边界、0.10+0.20=0.30 |\n| A05 | durable_local_store | `/api/health` 报告 sqlite 后端与绝对数据目录；写入后精确回读且不产生重复行；多字段失败补丁零部分写入 |\n\n重启持久性由操作员按验收 README 第 5 节手动停/启后重跑 A05 确认；本次生成**未运行**任何用例。\n",
+  "gaps": [
+   "运行期验证为 **not_run**：本交付物生成时未安装、未构建、未运行上游 ExpenseOwl，也未启动目标应用或运行 probe.py；所有上游结论均来自对固定快照 commit 4795569 的静态阅读，所有目标行为均来自本文档与探针断言代码，未经执行验证。",
+   "上游未安装/未运行，且未审计未选中的文件：web/functions.js 中的 getMonthExpenses / formatCurrency / getISODateWithLocalTime 实现不在固定清单内，因此上游“按月过滤与金额格式化”的实际算法无法从证据中断言，本蓝图不复制其行为。",
+   "探针 A05 不覆盖真正的进程重启：跨重启持久性需操作员按验收 README 第 5 节手动停/启后重跑 A05 确认；本次未执行。",
+   "P0 不实现分类删除/合并（DELETE /api/categories/{id} 返回 405 method_not_allowed），因此重命名不保留历史别名：旧名称不可检索，若需按旧名回溯需新增别名/重定向表（决策点 D3）。",
+   "P0 不做多币种：所有记录固定 CNY，API 不接受其它 currency 字段；若未来需要记录级币种与折算率，需要新的迁移与聚合规则。",
+   "P0 不做收入/报销/转账/预算/周期计划：所有记录都是已发生的实际支出，模型内没有计划/实际之分，也没有余额、结余或“还剩多少可花”的概念。",
+   "金额上限 1 亿元、用途 120 字、分类名 40 字为蓝图默认值，未经产品方确认（决策点 D1）；越界分别返回 400 invalid_amount / invalid_note / invalid_name。",
+   "未做并发与多用户：服务以单进程、单锁串行访问 SQLite，只支持一个操作者；多人同时操作需要并发写策略与隔离级别设计。",
+   "未做导入/导出、备份、归档与数据迁移，也没有审计日志或自检；备份依赖复制整个数据目录（含 WAL 附属文件）。",
+   "界面仅覆盖基本可访问性（显式 label、语义表格、caption/th scope、aria-live、role=alert、键盘可达、可见焦点、非纯颜色编码），未做完整 WCAG 合规审计、屏幕阅读器实测或移动端实测。",
+   "上游 MIT 许可仅作设计参考；未复制上游任何代码，许可的 file-level 例外未逐条审计（见 input.json 的 license_uncertainties）。",
+   "探针的负向用例只覆盖已列出的错误码；未穷举所有畸形输入（如超大请求体、错误 Content-Type、非法 UTF-8、并发同时写）的处理结果。"
+  ]
+ },
+ "acceptance_files": {
+  "probe.py": "#!/usr/bin/env python3\n'''Acceptance probe for the local single-user daily-expense tracker target.\n\nPython standard library only. The probe drives a running target over HTTP and\nasserts the exact documented API contract, including negative cases that must\nleave the database unchanged (zero-write checks) and calendar date edges.\n\nCases:\n  A01 expense_capture      - create/read one record; negative zero-write cases\n  A02 expense_correction   - atomic correction; immediate month/category recompute\n  A03 category_management  - create/rename categories; duplicate/invalid rejection\n  A04 monthly_rollup       - natural-month totals, exact category partition, date edges\n  A05 durable_local_store  - sqlite health, exact re-read, no partial write\n\nUsage:\n  python3 probe.py --base-url http://127.0.0.1:8765 --case A01\n  python3 probe.py --base-url http://127.0.0.1:8765 --case all\n\nSafety: the probe only deletes expense ids that it created itself in this run.\nCategory deletion is out of P0 scope, so probe categories are left behind under\nrun-scoped names (probe-<runid>-<label>).\n'''\nimport argparse\nimport json\nimport re\nimport sys\nimport uuid\nfrom urllib import error as urlerror\nfrom urllib import request as urlrequest\n\nAMOUNT_RE = re.compile(r'^\\d+\\.\\d{2}$')\nMAX_AMOUNT_CENTS = 10000000000\nNOTE_MAX = 120\nRUN_ID = uuid.uuid4().hex[:10]\n\n\nclass ProbeFailure(Exception):\n    pass\n\n\ndef check(cond, msg):\n    if not cond:\n        raise ProbeFailure(msg)\n\n\ndef expect_status(status, expected, label, parsed=None):\n    check(status == expected,\n          '%s: expected HTTP %s, got %s (body=%r)' % (label, expected, status, parsed))\n\n\ndef expect_error(status, parsed, expected_status, expected_code, label):\n    check(status == expected_status,\n          '%s: expected HTTP %s, got %s (body=%r)' % (label, expected_status, status, parsed))\n    check(isinstance(parsed, dict) and isinstance(parsed.get('error'), dict),\n          '%s: missing structured error envelope: %r' % (label, parsed))\n    err = parsed['error']\n    check(err.get('code') == expected_code,\n          '%s: expected error code %s, got %r' % (label, expected_code, err.get('code')))\n    check(isinstance(err.get('message'), str) and err.get('message') != '',\n          '%s: error message must be a non-empty string' % label)\n\n\nclass Client:\n    def __init__(self, base_url, timeout=15.0):\n        self.base = base_url.rstrip('/')\n        self.timeout = timeout\n        self.created_expense_ids = []\n        self.created_category_ids = []\n\n    def call(self, method, path, body=None, raw_body=None):\n        url = self.base + path\n        data = None\n        headers = {}\n        if raw_body is not None:\n            data = raw_body\n            headers['Content-Type'] = 'application/json'\n        elif body is not None:\n            data = json.dumps(body).encode('utf-8')\n            headers['Content-Type'] = 'application/json'\n        req = urlrequest.Request(url, data=data, method=method, headers=headers)\n        try:\n            with urlrequest.urlopen(req, timeout=self.timeout) as resp:\n                raw = resp.read()\n                status = resp.getcode()\n        except urlerror.HTTPError as exc:\n            raw = exc.read()\n            status = exc.code\n        text = raw.decode('utf-8', 'replace')\n        parsed = None\n        if text:\n            try:\n                parsed = json.loads(text)\n            except ValueError:\n                parsed = None\n        return status, parsed, text\n\n    def make_category(self, label):\n        name = 'probe-%s-%s' % (RUN_ID, label)\n        status, parsed, text = self.call('POST', '/api/categories', {'name': name})\n        expect_status(status, 201, 'create category', parsed)\n        cat = parsed['category']\n        check(cat['name'] == name, 'the category name must be echoed: %r' % (cat,))\n        self.created_category_ids.append(cat['id'])\n        return cat\n\n    def make_expense(self, category_id, amount_cents, spent_on, note):\n        body = {'amount_cents': amount_cents, 'spent_on': spent_on,\n                'category_id': category_id, 'note': note}\n        status, parsed, text = self.call('POST', '/api/expenses', body)\n        expect_status(status, 201, 'create expense', parsed)\n        exp = parsed['expense']\n        self.created_expense_ids.append(exp['id'])\n        return exp\n\n    def get_expense(self, eid):\n        status, parsed, text = self.call('GET', '/api/expenses/%d' % eid)\n        expect_status(status, 200, 'get expense %d' % eid, parsed)\n        return parsed['expense']\n\n    def list_expenses(self, month=None, category_id=None):\n        path = '/api/expenses'\n        query = []\n        if month is not None:\n            query.append('month=%s' % month)\n        if category_id is not None:\n            query.append('category_id=%d' % category_id)\n        if query:\n            path = path + '?' + '&'.join(query)\n        status, parsed, text = self.call('GET', path)\n        expect_status(status, 200, 'list expenses %s' % path, parsed)\n        return parsed['expenses']\n\n    def count_all(self):\n        return len(self.list_expenses())\n\n    def list_categories(self):\n        status, parsed, text = self.call('GET', '/api/categories')\n        expect_status(status, 200, 'list categories', parsed)\n        return parsed['categories']\n\n    def get_category(self, cid):\n        for cat in self.list_categories():\n            if cat['id'] == cid:\n                return cat\n        raise ProbeFailure('category %s is missing from the category list' % cid)\n\n    def summary(self, month):\n        status, parsed, text = self.call('GET', '/api/months/%s/summary' % month)\n        expect_status(status, 200, 'summary %s' % month, parsed)\n        return parsed\n\n    def list_months(self):\n        status, parsed, text = self.call('GET', '/api/months')\n        expect_status(status, 200, 'list months', parsed)\n        return parsed['months']\n\n    def cleanup(self):\n        for eid in list(self.created_expense_ids):\n            status, parsed, text = self.call('DELETE', '/api/expenses/%d' % eid)\n            expect_status(status, 204, 'delete probe expense %d' % eid, parsed)\n        self.created_expense_ids = []\n\n\ndef case_a01(c):\n    cat = c.make_category('capture')\n    before = c.count_all()\n    exp = c.make_expense(cat['id'], 1234, '2099-04-05', 'probe lunch')\n    check(isinstance(exp['amount_cents'], int) and not isinstance(exp['amount_cents'], bool),\n          'amount_cents must be a JSON integer: %r' % (exp,))\n    check(exp['amount_cents'] == 1234, 'amount_cents must be stored in cents: %r' % (exp,))\n    check(exp['amount'] == '12.34', 'amount must be rendered with two decimals: %r' % (exp,))\n    check(AMOUNT_RE.match(exp['amount']) is not None,\n          'amount must match the two-decimal format: %r' % (exp['amount'],))\n    check(exp['currency'] == 'CNY', 'currency must be CNY: %r' % (exp,))\n    check(exp['spent_on'] == '2099-04-05', 'spent_on must be echoed: %r' % (exp,))\n    check(exp['month'] == '2099-04', 'month must be derived from spent_on: %r' % (exp,))\n    check(exp['note'] == 'probe lunch', 'note must be echoed: %r' % (exp,))\n    check(exp['category']['id'] == cat['id'], 'the category id must be echoed: %r' % (exp,))\n    check(exp['category']['name'] == cat['name'], 'the category name must be echoed: %r' % (exp,))\n    check(isinstance(exp['id'], int) and exp['id'] > 0, 'the expense id must be a positive int: %r' % (exp,))\n    check(isinstance(exp['created_at'], str) and exp['created_at'] != '', 'created_at is required')\n    check(isinstance(exp['updated_at'], str) and exp['updated_at'] != '', 'updated_at is required')\n    check(c.count_all() == before + 1, 'exactly one record must be written')\n\n    ids = [e['id'] for e in c.list_expenses(month='2099-04')]\n    check(ids.count(exp['id']) == 1, 'the new record must appear exactly once: %r' % (ids,))\n\n    tiny = c.make_expense(cat['id'], 5, '2099-04-06', 'probe tiny')\n    check(tiny['amount'] == '0.05', 'a sub-yuan amount must render as 0.05: %r' % (tiny,))\n\n    neg = [\n        ({'amount_cents': 0, 'spent_on': '2099-04-05', 'category_id': cat['id'], 'note': 'x'}, 400, 'invalid_amount'),\n        ({'amount_cents': -100, 'spent_on': '2099-04-05', 'category_id': cat['id'], 'note': 'x'}, 400, 'invalid_amount'),\n        ({'amount_cents': 12.34, 'spent_on': '2099-04-05', 'category_id': cat['id'], 'note': 'x'}, 400, 'invalid_amount'),\n        ({'amount_cents': '1234', 'spent_on': '2099-04-05', 'category_id': cat['id'], 'note': 'x'}, 400, 'invalid_amount'),\n        ({'amount_cents': MAX_AMOUNT_CENTS + 1, 'spent_on': '2099-04-05', 'category_id': cat['id'], 'note': 'x'}, 400, 'invalid_amount'),\n        ({'spent_on': '2099-04-05', 'category_id': cat['id'], 'note': 'x'}, 400, 'missing_field'),\n        ({'amount_cents': 100, 'spent_on': '2099-02-30', 'category_id': cat['id'], 'note': 'x'}, 400, 'invalid_date'),\n        ({'amount_cents': 100, 'spent_on': '2099-04-32', 'category_id': cat['id'], 'note': 'x'}, 400, 'invalid_date'),\n        ({'amount_cents': 100, 'spent_on': '2099-13-01', 'category_id': cat['id'], 'note': 'x'}, 400, 'invalid_date'),\n        ({'amount_cents': 100, 'spent_on': '05/04/2099', 'category_id': cat['id'], 'note': 'x'}, 400, 'invalid_date'),\n        ({'amount_cents': 100, 'spent_on': '2099-04-05', 'category_id': 999999, 'note': 'x'}, 404, 'category_not_found'),\n        ({'amount_cents': 100, 'spent_on': '2099-04-05', 'category_id': cat['id'], 'note': 'n' * (NOTE_MAX + 1)}, 400, 'invalid_note'),\n        ({'amount_cents': 100, 'spent_on': '2099-04-05', 'category_id': cat['id'], 'note': 'x', 'extra': 1}, 400, 'unknown_field'),\n    ]\n    for body, code, errcode in neg:\n        n0 = c.count_all()\n        status, parsed, text = c.call('POST', '/api/expenses', body)\n        expect_error(status, parsed, code, errcode, 'negative create ' + errcode)\n        check(c.count_all() == n0, 'the negative create %s must not write a row' % errcode)\n    n0 = c.count_all()\n    status, parsed, text = c.call('POST', '/api/expenses', raw_body=b'{not-json')\n    expect_error(status, parsed, 400, 'invalid_body', 'malformed json body')\n    check(c.count_all() == n0, 'a malformed json body must not write a row')\n    c.cleanup()\n\n\ndef case_a02(c):\n    cat_a = c.make_category('corr-a')\n    cat_b = c.make_category('corr-b')\n    e1 = c.make_expense(cat_a['id'], 1000, '2099-11-10', 'probe e1')\n    e2 = c.make_expense(cat_a['id'], 500, '2099-11-10', 'probe e2')\n\n    status, parsed, text = c.call('PATCH', '/api/expenses/%d' % e1['id'],\n                                  {'amount_cents': 2500})\n    expect_status(status, 200, 'patch amount', parsed)\n    check(parsed['expense']['amount_cents'] == 2500, 'the patched amount must be returned: %r' % (parsed,))\n    check(parsed['expense']['amount'] == '25.00', 'the patched amount must keep two decimals: %r' % (parsed,))\n\n    s = c.summary('2099-11')\n    check(s['total_cents'] == 3000, 'the month total must recompute to 3000: %r' % (s,))\n    check(s['total'] == '30.00', 'the month total string must be 30.00: %r' % (s,))\n    check(s['expense_count'] == 2, 'the month count must be 2: %r' % (s,))\n    rows = s['by_category']\n    check(len(rows) == 1 and rows[0]['category_id'] == cat_a['id'],\n          'by_category must hold exactly one row: %r' % (rows,))\n    check(rows[0]['total_cents'] == 3000, 'the by_category total must be 3000: %r' % (rows,))\n\n    status, parsed, text = c.call('PATCH', '/api/expenses/%d' % e1['id'],\n                                  {'spent_on': '2099-12-01'})\n    expect_status(status, 200, 'patch date', parsed)\n    s_old = c.summary('2099-11')\n    s_new = c.summary('2099-12')\n    check(s_old['total_cents'] == 500 and s_old['expense_count'] == 1,\n          'the old month must drop the moved record: %r' % (s_old,))\n    check(s_new['total_cents'] == 2500 and s_new['expense_count'] == 1,\n          'the new month must gain the moved record: %r' % (s_new,))\n\n    status, parsed, text = c.call('PATCH', '/api/expenses/%d' % e1['id'],\n                                  {'category_id': cat_b['id']})\n    expect_status(status, 200, 'patch category', parsed)\n    rows = c.summary('2099-12')['by_category']\n    check(len(rows) == 1 and rows[0]['category_id'] == cat_b['id'] and rows[0]['total_cents'] == 2500,\n          'recategorisation must move the category row: %r' % (rows,))\n    rows = c.summary('2099-11')['by_category']\n    check(len(rows) == 1 and rows[0]['category_id'] == cat_a['id'],\n          'the other month must keep its own row: %r' % (rows,))\n\n    before = c.get_expense(e1['id'])\n    status, parsed, text = c.call('PATCH', '/api/expenses/%d' % e1['id'], {'bogus': 1})\n    expect_error(status, parsed, 400, 'unknown_field', 'patch with an unknown field')\n    check(c.get_expense(e1['id']) == before, 'a rejected patch must not change the record')\n    status, parsed, text = c.call('PATCH', '/api/expenses/%d' % e1['id'],\n                                  {'amount_cents': 9999, 'spent_on': '2099-02-30'})\n    expect_error(status, parsed, 400, 'invalid_date', 'patch with an invalid date')\n    check(c.get_expense(e1['id']) == before, 'a failed patch must not apply any field')\n    status, parsed, text = c.call('PATCH', '/api/expenses/%d' % e1['id'],\n                                  {'category_id': 999999})\n    expect_error(status, parsed, 404, 'category_not_found', 'patch with an unknown category')\n    check(c.get_expense(e1['id']) == before, 'a failed patch must not apply any field')\n    status, parsed, text = c.call('PATCH', '/api/expenses/999999999', {'amount_cents': 100})\n    expect_error(status, parsed, 404, 'expense_not_found', 'patch an unknown expense')\n    status, parsed, text = c.call('GET', '/api/expenses/999999999')\n    expect_error(status, parsed, 404, 'expense_not_found', 'get an unknown expense')\n    status, parsed, text = c.call('DELETE', '/api/expenses/999999999')\n    expect_error(status, parsed, 404, 'expense_not_found', 'delete an unknown expense')\n    c.cleanup()\n\n\ndef case_a03(c):\n    name = 'probe-%s-mgmt' % RUN_ID\n    status, parsed, text = c.call('POST', '/api/categories', {'name': name})\n    expect_status(status, 201, 'create category', parsed)\n    cat = parsed['category']\n    cid = cat['id']\n    check(cat['name'] == name, 'the created name must be echoed: %r' % (cat,))\n    check(cat['expense_count'] == 0, 'a fresh category must have 0 expenses: %r' % (cat,))\n    c.created_category_ids.append(cid)\n\n    other = c.make_category('mgmt-other')\n    n0 = len(c.list_categories())\n    status, parsed, text = c.call('POST', '/api/categories', {'name': name})\n    expect_error(status, parsed, 409, 'duplicate_name', 'a duplicate category name')\n    check(len(c.list_categories()) == n0, 'a duplicate name must not add a category')\n    for bad in ['', '   ', 'x' * 41, 'a\\x01b']:\n        status, parsed, text = c.call('POST', '/api/categories', {'name': bad})\n        expect_error(status, parsed, 400, 'invalid_name', 'an invalid category name %r' % (bad,))\n    check(len(c.list_categories()) == n0, 'an invalid name must not add a category')\n\n    exp = c.make_expense(cid, 1234, '2099-08-07', 'probe mgmt')\n    new_name = name + '-renamed'\n    status, parsed, text = c.call('PUT', '/api/categories/%d' % cid, {'name': new_name})\n    expect_status(status, 200, 'rename category', parsed)\n    renamed = parsed['category']\n    check(renamed['id'] == cid, 'a rename must keep the id: %r' % (renamed,))\n    check(renamed['name'] == new_name, 'a rename must apply the new name: %r' % (renamed,))\n    check(renamed['created_at'] == cat['created_at'], 'a rename must keep created_at: %r' % (renamed,))\n    check(renamed['expense_count'] == 1, 'a rename must keep the usage count: %r' % (renamed,))\n    got = c.get_expense(exp['id'])\n    check(got['category']['id'] == cid and got['category']['name'] == new_name,\n          'the expense must show the new category name: %r' % (got,))\n    s = c.summary('2099-08')\n    row = [x for x in s['by_category'] if x['category_id'] == cid]\n    check(len(row) == 1 and row[0]['name'] == new_name and row[0]['total_cents'] == 1234\n          and row[0]['expense_count'] == 1,\n          'the summary must show the new category name: %r' % (s,))\n\n    status, parsed, text = c.call('PUT', '/api/categories/%d' % cid, {'name': other['name']})\n    expect_error(status, parsed, 409, 'duplicate_name', 'rename onto an existing name')\n    check(c.get_category(cid)['name'] == new_name, 'a failed rename must keep the old name')\n    status, parsed, text = c.call('PUT', '/api/categories/999999999', {'name': 'probe-x'})\n    expect_error(status, parsed, 404, 'category_not_found', 'rename an unknown category')\n    status, parsed, text = c.call('PUT', '/api/categories/%d' % cid, {'name': ''})\n    expect_error(status, parsed, 400, 'invalid_name', 'rename to an empty name')\n    check(c.get_category(cid)['name'] == new_name, 'a failed rename must keep the old name')\n    status, parsed, text = c.call('DELETE', '/api/categories/%d' % cid)\n    expect_error(status, parsed, 405, 'method_not_allowed', 'category delete is out of P0 scope')\n    c.cleanup()\n\n\ndef case_a04(c):\n    cat_a = c.make_category('roll-a')\n    cat_b = c.make_category('roll-b')\n    e1 = c.make_expense(cat_a['id'], 1000, '2098-10-01', 'probe o1')\n    e2 = c.make_expense(cat_a['id'], 250, '2098-10-15', 'probe o2')\n    e3 = c.make_expense(cat_b['id'], 999, '2098-10-31', 'probe o3')\n    e4 = c.make_expense(cat_a['id'], 777, '2098-11-01', 'probe n1')\n    e5 = c.make_expense(cat_a['id'], 50, '2097-12-31', 'probe d1')\n    e6 = c.make_expense(cat_a['id'], 10, '2097-09-10', 'probe f1')\n    e7 = c.make_expense(cat_a['id'], 20, '2097-09-11', 'probe f2')\n\n    s = c.summary('2098-10')\n    check(s['total_cents'] == 2249, 'the month total must be 2249: %r' % (s,))\n    check(s['total'] == '22.49', 'the month total string must be 22.49: %r' % (s,))\n    check(s['expense_count'] == 3, 'the month count must be 3: %r' % (s,))\n    rows = s['by_category']\n    check(len(rows) == 2, 'the month must have two category rows: %r' % (rows,))\n    check(rows[0]['category_id'] == cat_a['id'] and rows[0]['total_cents'] == 1250\n          and rows[0]['expense_count'] == 2, 'the first row must be 1250 over 2 records: %r' % (rows,))\n    check(rows[1]['category_id'] == cat_b['id'] and rows[1]['total_cents'] == 999\n          and rows[1]['expense_count'] == 1, 'the second row must be 999 over 1 record: %r' % (rows,))\n    check(sum(r['total_cents'] for r in rows) == s['total_cents'],\n          'by_category must partition the month total: %r' % (rows,))\n    check(sum(r['share_bp'] for r in rows) == 10000, 'share_bp must sum to 10000: %r' % (rows,))\n    check(rows[0]['share_bp'] == 5558 and rows[1]['share_bp'] == 4442,\n          'share_bp must use floor plus largest remainder: %r' % (rows,))\n\n    s = c.summary('2097-09')\n    check(s['total_cents'] == 30 and s['total'] == '0.30',\n          '0.10 plus 0.20 must total 30 cents without float drift: %r' % (s,))\n    s = c.summary('2098-11')\n    check(s['total_cents'] == 777 and s['expense_count'] == 1,\n          'the first day of the next month must fall into the next month: %r' % (s,))\n    s = c.summary('2097-12')\n    check(s['total_cents'] == 50 and s['expense_count'] == 1,\n          'the last day of the year must fall into December: %r' % (s,))\n\n    ids = [e['id'] for e in c.list_expenses(month='2098-10')]\n    check(ids == [e1['id'], e2['id'], e3['id']],\n          'the month detail must be the exact set ordered by date then id: %r' % (ids,))\n    check([e['id'] for e in c.list_expenses(month='2098-11')] == [e4['id']],\n          'the next month detail must hold only its own record')\n    check([e['id'] for e in c.list_expenses(month='2097-12')] == [e5['id']],\n          'the previous month detail must hold only its own record')\n    filtered = c.list_expenses(month='2098-10', category_id=cat_a['id'])\n    check(len(filtered) == 2 and set(e['id'] for e in filtered) == set([e1['id'], e2['id']]),\n          'the category filter must return the exact subset: %r' % (filtered,))\n\n    months = c.list_months()\n    keys = [m['month'] for m in months]\n    for key in ('2097-09', '2097-12', '2098-10', '2098-11'):\n        check(key in keys, 'the month list must contain %s: %r' % (key, keys))\n    check(keys == sorted(keys), 'the month list must be sorted ascending: %r' % (keys,))\n\n    for bad in ('2098-13', '2098-00', '2098-1', 'abc', '2098-10-01', '0000-01'):\n        status, parsed, text = c.call('GET', '/api/months/%s/summary' % bad)\n        expect_error(status, parsed, 400, 'invalid_month', 'an invalid month %s' % bad)\n    empty = c.summary('2019-01')\n    check(empty['total_cents'] == 0 and empty['expense_count'] == 0 and empty['by_category'] == [],\n          'an empty month must return a zero summary: %r' % (empty,))\n\n    leap = c.make_expense(cat_a['id'], 100, '2096-02-29', 'probe leap')\n    s = c.summary('2096-02')\n    check(s['expense_count'] == 1 and s['total_cents'] == 100,\n          'the leap day must land in February: %r' % (s,))\n    century = c.make_expense(cat_a['id'], 100, '2000-02-29', 'probe century')\n    check(century['spent_on'] == '2000-02-29', '2000-02-29 is a valid leap day')\n    for bad_date in ('2099-02-29', '1900-02-29', '2098-04-31', '2098-00-10', '2098-10-00'):\n        n0 = c.count_all()\n        status, parsed, text = c.call('POST', '/api/expenses',\n                                      {'amount_cents': 100, 'spent_on': bad_date,\n                                       'category_id': cat_a['id'], 'note': 'x'})\n        expect_error(status, parsed, 400, 'invalid_date', 'an invalid date %s' % bad_date)\n        check(c.count_all() == n0, 'an invalid date must not write a row')\n    c.cleanup()\n\n\ndef case_a05(c):\n    status, parsed, text = c.call('GET', '/api/health')\n    expect_status(status, 200, 'health', parsed)\n    health = parsed\n    check(health.get('status') == 'ok', 'the health status must be ok: %r' % (health,))\n    check(health.get('backend') == 'sqlite', 'the backend must be sqlite: %r' % (health,))\n    data_dir = health.get('data_dir')\n    check(isinstance(data_dir, str) and data_dir.startswith('/'),\n          'data_dir must be an absolute path: %r' % (health,))\n    check(isinstance(health.get('schema_version'), int) and health.get('schema_version') >= 1,\n          'schema_version must be an integer >= 1: %r' % (health,))\n\n    cat = c.make_category('durable')\n    e1 = c.make_expense(cat['id'], 1000, '2099-06-01', 'probe d1')\n    e2 = c.make_expense(cat['id'], 2000, '2099-06-02', 'probe d2')\n    first = c.list_expenses(month='2099-06')\n    ids = [e['id'] for e in first]\n    check(sorted(ids) == sorted([e1['id'], e2['id']]), 'both records must be listed: %r' % (ids,))\n    check(len(ids) == len(set(ids)), 'a re-read must not duplicate rows: %r' % (ids,))\n    s = c.summary('2099-06')\n    check(s['total_cents'] == 3000 and s['expense_count'] == 2, 'the stored totals must be exact: %r' % (s,))\n    again = [e['id'] for e in c.list_expenses(month='2099-06')]\n    check(again == ids, 'repeated reads must return the same rows: %r' % (again,))\n\n    before = c.get_expense(e1['id'])\n    status, parsed, text = c.call('PATCH', '/api/expenses/%d' % e1['id'],\n                                  {'note': 'probe d1 updated', 'amount_cents': 0})\n    expect_error(status, parsed, 400, 'invalid_amount',\n                 'a multi-field patch where one field is invalid')\n    check(c.get_expense(e1['id']) == before,\n          'a rejected multi-field patch must not apply any field')\n    n0 = c.count_all()\n    status, parsed, text = c.call('POST', '/api/expenses',\n                                  {'amount_cents': 100, 'spent_on': '2099-06-03',\n                                   'category_id': cat['id'], 'note': 'x', 'extra': True})\n    expect_error(status, parsed, 400, 'unknown_field', 'an unknown field on create')\n    check(c.count_all() == n0, 'an unknown field must not write a row')\n    print('    note: a cross-restart durability check is an operator step, see the acceptance README')\n    c.cleanup()\n\n\nCASES = [\n    ('A01', 'expense_capture', case_a01),\n    ('A02', 'expense_correction', case_a02),\n    ('A03', 'category_management', case_a03),\n    ('A04', 'monthly_rollup', case_a04),\n    ('A05', 'durable_local_store', case_a05),\n]\n\n\ndef main(argv=None):\n    ap = argparse.ArgumentParser(\n        description='Acceptance probe for the local single-user daily-expense tracker.')\n    ap.add_argument('--base-url', required=True,\n                    help='base URL of the running target, e.g. http://127.0.0.1:8765')\n    ap.add_argument('--case', required=True,\n                    help='case id to run: A01..A05 or all')\n    ap.add_argument('--timeout', type=float, default=15.0, help='per request timeout in seconds')\n    args = ap.parse_args(argv)\n\n    selected = [item for item in CASES if args.case == 'all' or item[0] == args.case]\n    if not selected:\n        print('unknown case: %s (expected A01..A05 or all)' % args.case, file=sys.stderr)\n        return 2\n\n    failures = 0\n    for cid, name, fn in selected:\n        client = Client(args.base_url, args.timeout)\n        try:\n            fn(client)\n        except ProbeFailure as exc:\n            failures += 1\n            print('FAIL %s %s: %s' % (cid, name, exc))\n        except urlerror.URLError as exc:\n            failures += 1\n            print('ERROR %s %s: cannot reach %s (%s)' % (cid, name, args.base_url, exc))\n        else:\n            print('PASS %s %s' % (cid, name))\n    if failures:\n        print('%d case(s) failed' % failures)\n        return 1\n    print('all selected cases passed')\n    return 0\n\n\nif __name__ == '__main__':\n    sys.exit(main())\n",
+  "README.md": "# 验收说明（Acceptance README）\n\n本目录给出「本机单用户日常支出与月度分类复盘」目标的验收探针与运行方式。\n探针只使用 Python 标准库，断言蓝图 `arch` 中写明的 API 契约。\n\n## 1. 前置条件\n\n- Python 3.8 或更高（仅标准库，无第三方依赖）。\n- 目标应用已在本机启动，并监听回环地址（默认 `http://127.0.0.1:8765`）。\n- 目标应用使用一个**可丢弃的数据目录**（探针会在其中创建并删除自己的测试记录）。\n\n## 2. 启动目标应用\n\n```bash\npython3 app.py --data-dir ./data --host 127.0.0.1 --port 8765\n```\n\n- 数据库文件位于 `<data_dir>/expenses.sqlite3`；数据目录不存在时自动创建。\n- 停止：终端按 `Ctrl-C`。重新启动时使用**同一个** `--data-dir` 即可保留数据。\n- 该应用没有认证，只接受回环地址；请勿暴露到局域网。\n\n## 3. 运行探针\n\n```bash\n# 全部用例\npython3 probe.py --base-url http://127.0.0.1:8765 --case all\n\n# 单个用例\npython3 probe.py --base-url http://127.0.0.1:8765 --case A01\npython3 probe.py --base-url http://127.0.0.1:8765 --case A02\npython3 probe.py --base-url http://127.0.0.1:8765 --case A03\npython3 probe.py --base-url http://127.0.0.1:8765 --case A04\npython3 probe.py --base-url http://127.0.0.1:8765 --case A05\n```\n\n- `--base-url` 必填，指向已启动的目标；`--case` 取 `A01`..`A05` 或 `all`。\n- 退出码：全部通过 `0`；任一用例失败 `1`；用例名非法 `2`。\n- 输出格式：`PASS A01 expense_capture` / `FAIL A02 expense_correction: <断言信息>`。\n\n## 4. 用例覆盖\n\n| 用例 | 特性 | 断言重点 |\n| --- | --- | --- |\n| A01 | expense_capture | 创建后回显字段（整数分、两位小数字符串、CNY、本地日历日、派生月份、分类、用途、id、时间戳）；`/api/expenses?month=` 中恰好出现一次；13 组负向创建（0 分、负分、浮点金额、字符串金额、越界、缺字段、非法日期、未知分类、超长用途、未知字段、畸形 JSON）逐一断言**请求前后支出条数不变**（零写入）。 |\n| A02 | expense_correction | 改金额后当月总额/分类行立即变化；改日期后**旧月**总额下降、**新月**总额上升；改分类后分类行在两个月之间正确迁移；未知字段、非法日期、未知分类三种失败补丁都断言记录**逐字段不变**（含 `updated_at`），即无部分写入。 |\n| A03 | category_management | 创建分类、重复名 409、非法名（空/空白/超长/控制字符）400、未知 id 404、删除 405；重命名后 `id`/`created_at`/`expense_count` 不变，明细与月度汇总同时显示新分类名且金额不变。 |\n| A04 | monthly_rollup | 精确总额与分类完整划分（`sum(total_cents)` 等于总额、`sum(share_bp)==10000`、占比 5558/4442 符合 floor + 最大余数）；按月与按分类的明细集合与顺序精确；非法月份（2098-13 / 2098-00 / 2098-1 / abc / 2098-10-01 / 0000-01）均 400；空月返回 200 零值；闰日 2096-02-29、2000-02-29 有效，2099-02-29、1900-02-29、2098-04-31 拒绝且零写入；`0.10 + 0.20` 汇总为 30 分、显示 `0.30`。 |\n| A05 | durable_local_store | `/api/health` 报告 `sqlite` 后端与绝对数据目录、schema_version ≥ 1；写入后精确回读、重复读取不产生重复行、总额精确；多字段补丁中一个字段非法时整条记录逐字段不变；带未知字段的创建零写入。 |\n\n## 5. 重启持久化（操作员步骤，探针不代劳）\n\nA05 在**单次运行内**验证“写入后精确回读”和“失败写入零落库”。跨进程的持久性需要操作员确认：\n\n1. 先在 UI 或 API 里记一笔（或直接保留已有数据），记下分类名与当月总额；\n2. `Ctrl-C` 停止服务；\n3. 用**同一个** `--data-dir` 重新启动：`python3 app.py --data-dir ./data --host 127.0.0.1 --port 8765`；\n4. 重新运行 `python3 probe.py --base-url http://127.0.0.1:8765 --case A05`，并人工确认重启前创建的分类与支出仍然可见、总额一致。\n\n探针本身不会重启服务，也不会声称已经完成重启验证。\n\n## 6. 数据安全约定\n\n- 探针创建的分类名形如 `probe-<runid>-<label>`，用途说明以 `probe ` 开头，便于识别。\n- 探针只会删除**本次运行自己创建**的支出 id（`created_expense_ids`），不会删除任何其它记录。\n- 探针使用 2096/2097/2098/2099 等远期月份，尽量避免与既有数据重叠；但请仍然在一次性数据目录上运行。\n- 分类删除不在 P0 范围内（`DELETE /api/categories/{id}` 返回 405），所以探针用完会留下它创建的分类；它们的名称带运行 id，不会影响其它数据。\n\n## 7. 运行状态\n\n**not_run**：本交付物在生成环境中未执行——目标应用未启动、探针未运行；上游 ExpenseOwl 亦未安装、未构建、未运行。所有上游结论均来自对固定快照的静态阅读；探针只提供待执行的断言。\n"
+ }
+}
