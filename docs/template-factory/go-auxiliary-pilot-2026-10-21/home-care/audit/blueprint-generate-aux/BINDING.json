@@ -1,0 +1,16 @@
+{
+ "model": "opencode-go/deepseek-v4.1-flash",
+ "input_digest": "f83c277dc4c6e02bdf98b6425c034717277a9c3c497ef7175faa1b9b855cdd8e",
+ "prompt": "Research the COMPLETE pinned source inventory under source/upstream/ and leaf.md.\nReturn one JSON {authored:{name,audience,objective,workflow:[steps],acceptance:[criteria],\nobservations:[[kind,path,line_start,line_end,statement],...],inference,features:[3–5 names],\ngoals:[one precise acceptance goal per feature],arch:markdown,gaps:[limitations]},\nacceptance_files:{'probe.py':'full Python stdlib HTTP probe source','README.md':'how to run'}}.\nObservation kind is documentation or code_observation; path is relative to the pinned\nupstream root (not source/upstream prefix), and 1-based lines must exist. Distinguish\ncode observations, document claims, target design inference and not_run upstream status.\nDo not attribute the target home anchor to an upstream generic chores feature unless\nactually observed. No invented runtime verification or certification. Never copy upstream\nimplementation into target code. This is a cognition template, NOT an application.\nUse a small localhost single-user Python stdlib HTTP/SQLite target; no dependencies.\nArchitecture must give exact data fields, API methods/paths/request/response shapes,\nvalidation bounds/error codes, date recurrence rules and atomic failure semantics,\nbasic accessible UI, data-dir/start instructions. Cover the full confirmed scenario,\nincluding explicit home/equipment anchoring, due tasks, completion history and next date.\nProbe accepts --base-url and --case A01..A0N (N equals feature count) and verifies the\nexact documented API with real assertions, including negative zero-write cases and date\nedges. Use only disposable test records, no real-user deletes. A restart case may describe\noperator stop/restart in README; never claim it was run. List runtime verification as\nnot_run. No whole-platform authentication, notifications, payment or SaaS expansion.\nMake sensible unambiguous defaults and highlight user decision points in arch/gaps.\nReturn valid JSON only. Read input.json for the fixed scenario and source metadata.",
+ "source": {
+  "upstream/LICENSE": "837f9e6758e4d3313dc19beaa4638522f22c781c9a27d32ff56b473e7094eccc",
+  "upstream/README.md": "40b5d4f8df78510ec9b05454df1d307ca5eb44ee055328229faa07d0f6e1c348",
+  "upstream/internal/data/dashboard.go": "d03ed7b8243f97c6f906a52ba7aad63645a468586092c4584f20437972ffd656",
+  "upstream/internal/data/models.go": "5cd2a997f2efa9fd7d2916446d8173571fba7ee40dfb9703083d266bb6cab000",
+  "upstream/internal/data/store_house.go": "e79c86687cc434803229f62571c4b5737eac983a8d1e7d6ef1e32bf15c0bf205",
+  "upstream/internal/data/store_maintenance.go": "d150cb4ee2bc410a9844768b63a4447c81a8122555c9bcc465b1c54c3a9d2b37",
+  "upstream/internal/data/store_servicelog.go": "0cc864c8ff483237fbd128d417f6d2bf2a9ff66fdcbf2719c97cb239c6a65f4a",
+  "upstream/internal/data/validation.go": "6bb00aeae3903900ef4182e87fb10bbb640980bcde6739e5e252d29b45d8fef4"
+ },
+ "leaf_sha256": "cdff70bb68e06a7602222f7ea6e7f4167e9ff1f0311ed7db6441b31eb9f4ea33"
+}

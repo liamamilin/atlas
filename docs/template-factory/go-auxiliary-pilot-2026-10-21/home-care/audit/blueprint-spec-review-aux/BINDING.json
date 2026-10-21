@@ -1,0 +1,19 @@
+{
+ "model": "opencode-go/deepseek-v4.1-flash",
+ "input_digest": "bad8cef0cba122fe3838e30390e299e0bf3d3cdcfdc981fe9e4fb94353d52550",
+ "prompt": "You are a NEW independent reviewer, not the author. Read leaf.md, all supplied\nsource/upstream files and source/candidate files. Do not use an author transcript or\nassume its claims true. Input binds the COMPLETE author result digest; echo it exactly\nas input_digest. Check code/doc line citations against the actual fixed source, target\ninferences separate, home+recurring care+history leaf scope, end-to-end scenario,\nexplicit architecture/API/error/date rules, probe correctness and meaningful negative\nassertions, no upstream execution/certification claims, and clear limits.\nReturn JSON {input_digest,verdict:'pass'|'needs_changes',checks:{leaf_scope:boolean,\nsource_fidelity:boolean,design_distinction:boolean,core_journey:boolean,\narchitecture:boolean,acceptance:boolean,limits_and_safety:boolean},\nobservations:[{index:0-based author observation index,verdict:'accepted'|'rejected'|'uncertain',\nreason:'specific cited explanation'}],issues:[blocking concrete findings],summary}.\nPassing requires all checks true, every observation accepted, no issues. Do NOT waive\nreal mismatches to get pass. No search needed; source bytes are authoritative. Read only.",
+ "source": {
+  "candidate/AUTHOR_INPUT.json": "2bb585ef0e23414fd54412f3f28973d5392f189030bbb03adeb9be13100f42c2",
+  "candidate/acceptance/README.md": "cb4e9fe0581b531ac8cd5f3fddec3edb609b8f9075d3cb5efe67123bc344566b",
+  "candidate/acceptance/probe.py": "ea7863a5a765368b93675f2a2d69c3337fd5da25a9a30dd76e2398775e0d180a",
+  "upstream/LICENSE": "837f9e6758e4d3313dc19beaa4638522f22c781c9a27d32ff56b473e7094eccc",
+  "upstream/README.md": "40b5d4f8df78510ec9b05454df1d307ca5eb44ee055328229faa07d0f6e1c348",
+  "upstream/internal/data/dashboard.go": "d03ed7b8243f97c6f906a52ba7aad63645a468586092c4584f20437972ffd656",
+  "upstream/internal/data/models.go": "5cd2a997f2efa9fd7d2916446d8173571fba7ee40dfb9703083d266bb6cab000",
+  "upstream/internal/data/store_house.go": "e79c86687cc434803229f62571c4b5737eac983a8d1e7d6ef1e32bf15c0bf205",
+  "upstream/internal/data/store_maintenance.go": "d150cb4ee2bc410a9844768b63a4447c81a8122555c9bcc465b1c54c3a9d2b37",
+  "upstream/internal/data/store_servicelog.go": "0cc864c8ff483237fbd128d417f6d2bf2a9ff66fdcbf2719c97cb239c6a65f4a",
+  "upstream/internal/data/validation.go": "6bb00aeae3903900ef4182e87fb10bbb640980bcde6739e5e252d29b45d8fef4"
+ },
+ "leaf_sha256": "cdff70bb68e06a7602222f7ea6e7f4167e9ff1f0311ed7db6441b31eb9f4ea33"
+}

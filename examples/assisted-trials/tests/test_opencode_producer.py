@@ -9,7 +9,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from produce_with_opencode import (CHECKS, MODEL, checkpoint, fixed_json, safe_file,
                                   readable_candidate, validate_generation, validate_review, validate_read_coverage,
-                                  verify_production)
+                                  verify_production, snapshot_audit)
 from produce_batch import authored_definition
 
 
@@ -33,7 +33,7 @@ class ProducerTests(unittest.TestCase):
         source.mkdir()
         (source / "upstream.txt").write_text("fixed code")
         cli = FakeCLI()
-        args = (self.root / "stage", {"fixed": 1}, "prompt", cli, {}, source, b"leaf")
+        args = (self.root / "calls/stage", {"fixed": 1}, "prompt", cli, {}, source, b"leaf")
         self.assertEqual(checkpoint(*args), {"value": 42})
         self.assertEqual(checkpoint(*args), {"value": 42})
         self.assertEqual(cli.calls, 1)
@@ -45,7 +45,7 @@ class ProducerTests(unittest.TestCase):
         self.assertEqual(cli.calls, 1)
 
     def test_crash_after_delivery_recovers_raw_response_without_call(self):
-        stage, cli = self.root / "stage", FakeCLI()
+        stage, cli = self.root / "calls/stage", FakeCLI()
         checkpoint(stage, {}, "prompt", cli, {})
         (stage / "DELIVERED.json").unlink()
         (stage / "RESULT.json").unlink()
@@ -55,7 +55,7 @@ class ProducerTests(unittest.TestCase):
         self.assertEqual(cli.calls, 1)
 
     def test_uncertain_or_failed_attempt_never_blindly_relaunches(self):
-        stage, cli = self.root / "stage", FakeCLI()
+        stage, cli = self.root / "calls/stage", FakeCLI()
         checkpoint(stage, {}, "prompt", cli, {})
         (stage / "DELIVERED.json").unlink()
         for status in ("uncertain", "failed"):
@@ -65,7 +65,7 @@ class ProducerTests(unittest.TestCase):
         self.assertEqual(cli.calls, 1)
 
     def test_changed_delivered_result_rejected(self):
-        cli, stage = FakeCLI(), self.root / "stage"
+        cli, stage = FakeCLI(), self.root / "calls/stage"
         checkpoint(stage, {}, "prompt", cli, {})
         (stage / "RESULT.json").write_text('{"value":99}')
         with self.assertRaisesRegex(ValueError, "checkpoint result differs"):
@@ -115,6 +115,20 @@ class ProducerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "do not register/re-export as usable"):
             verify_production(self.root, {}, {}, {})
 
+    def test_audit_snapshot_preserves_evidence_without_embedded_git_or_source(self):
+        stage = self.root / "calls/stage"
+        (stage / ".git").mkdir(parents=True)
+        (stage / ".git/config").write_text("private workspace metadata")
+        (stage / "source").mkdir()
+        (stage / "source/example").write_text("source bytes separately archived")
+        fixed_json(stage / "RESULT.json", {"result": 1})
+        snapshot_audit(stage)
+        audit = self.root / "audit/stage"
+        self.assertEqual((audit / "RESULT.json").read_bytes(), (stage / "RESULT.json").read_bytes())
+        self.assertFalse((audit / ".git").exists())
+        self.assertFalse((audit / "source").exists())
+        self.assertEqual(set(json.loads((audit / "FILES.json").read_text())), {"RESULT.json"})
+
     def test_previous_ten_authored_definitions_remain_identical(self):
         root = Path(__file__).resolve().parents[3]
         folder = root / "docs/template-factory/assisted-batch-10-2026-10-21"
@@ -142,7 +156,7 @@ class ProducerTests(unittest.TestCase):
         self.assertEqual(original.read_bytes(), before)
 
     def test_review_must_actually_receive_all_architecture_lines(self):
-        stage = self.root / "stage"
+        stage = self.root / "calls/stage"
         candidate = stage / "source/candidate"
         candidate.mkdir(parents=True)
         arch = "\n".join("architecture line " + str(i) + " x" * 40 for i in range(30))

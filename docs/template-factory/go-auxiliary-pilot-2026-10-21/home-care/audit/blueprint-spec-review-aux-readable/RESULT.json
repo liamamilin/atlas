@@ -1,0 +1,98 @@
+{
+ "input_digest": "db3971272dea6ada40ff45ca8d4871f9ca719189917eecace4561122e1b7c20a",
+ "verdict": "needs_changes",
+ "checks": {
+  "leaf_scope": true,
+  "source_fidelity": true,
+  "design_distinction": true,
+  "core_journey": true,
+  "architecture": false,
+  "acceptance": false,
+  "limits_and_safety": true
+ },
+ "observations": [
+  {
+   "index": 0,
+   "verdict": "accepted",
+   "reason": "README.md:17 says 'Home maintenance, from the terminal.'; README.md:39-50 shows local go-install/run ('micasa # your house'), supporting the local-tool gloss. The 'rather than hosted multi-tenant' part is an absence characterization but is consistent with the selected README."
+  },
+  {
+   "index": 1,
+   "verdict": "accepted",
+   "reason": "README.md:25 says 'Schedules, due dates, full history.'; the cited line directly supports the observation."
+  },
+  {
+   "index": 2,
+   "verdict": "accepted",
+   "reason": "models.go:104-135 defines HouseProfile with address lines, YearBuilt, roof/heating/cooling/water/sewer/foundation types, and insurance/HOA fields; no multi-home ownership table appears in the selected files."
+  },
+  {
+   "index": 3,
+   "verdict": "accepted",
+   "reason": "models.go:201-216 defines Appliance with Brand, ModelNumber, SerialNumber, WarrantyExpiry, and Location; the struct has no HomeID field."
+  },
+  {
+   "index": 4,
+   "verdict": "accepted",
+   "reason": "models.go:218-237 defines MaintenanceItem with ApplianceID *string, CategoryID, Season, LastServicedAt, IntervalMonths, and DueDate; the cited range supports the observation."
+  },
+  {
+   "index": 5,
+   "verdict": "accepted",
+   "reason": "models.go:261-274 defines ServiceLogEntry with MaintenanceItemID and CASCADE, ServicedAt, VendorID *string, CostCents *int64, Notes, and CreatedAt/UpdatedAt."
+  },
+  {
+   "index": 6,
+   "verdict": "accepted",
+   "reason": "store_house.go:22-31 counts HouseProfile rows and returns 'house profile already exists' when count > 0; this implements the one-profile rule."
+  },
+  {
+   "index": 7,
+   "verdict": "accepted",
+   "reason": "store_maintenance.go:24-33 filters with Where(ColApplianceID + ' = ?', applianceID); this is an equipment-anchored query path."
+  },
+  {
+   "index": 8,
+   "verdict": "accepted",
+   "reason": "store_servicelog.go:16-30 orders by serviced_at DESC, id DESC, reads the latest entry, and updates LastServicedAt; the default GORM scope excludes soft-deleted rows."
+  },
+  {
+   "index": 9,
+   "verdict": "accepted",
+   "reason": "store_servicelog.go:59-73 wraps create and syncLastServiced in s.db.Transaction; the observation matches the code."
+  },
+  {
+   "index": 10,
+   "verdict": "accepted",
+   "reason": "validation.go:168-177 returns dueDate when non-nil and otherwise AddMonths(*last, intervalMonths); the nil/interval<=0 guards at 172-174 are a narrower branch, not a contradiction."
+  },
+  {
+   "index": 11,
+   "verdict": "accepted",
+   "reason": "validation.go:182-192 computes the target month's last day and clamps d to it before returning time.Date; this avoids the Jan 31 + 1 month overflow."
+  },
+  {
+   "index": 12,
+   "verdict": "accepted",
+   "reason": "validation.go:98-153 defines intervalRe with only year and month groups; bare integers are months and no day unit is parsed."
+  },
+  {
+   "index": 13,
+   "verdict": "accepted",
+   "reason": "dashboard.go:12-25 queries Where(interval_months > 0 OR due_date IS NOT NULL); this is the scheduled-maintenance definition."
+  },
+  {
+   "index": 14,
+   "verdict": "accepted",
+   "reason": "README.md:58 says 'Pure Go', 'SQLite', and 'TUI'; the no-copy/no-run clause is a target statement, not an upstream execution claim."
+  }
+ ],
+ "issues": [
+  "acceptance/probe.py:157-164 (A01): before is captured before the successful PATCH at line 161, but line 164 compares the home after the empty PATCH to before. The home object includes updated_at (VIEW_ARCH.md:32; probe.py:155); a correct PATCH that refreshes updated_at makes the final zero-write check fail even though the empty patch wrote nothing. Use the patched response from line 161 as the baseline or compare only id/name/address.",
+  "acceptance/probe.py:171-175 (A01) tests blank name and unknown home but never an invalid category; AUTHOR_INPUT.json acceptance[1] and REVIEW_SCOPE.md:35-37 explicitly require invalid categories to return 422 or 404 with no equipment row, and VIEW_ARCH.md:38 defines the enum. Add an invalid-category POST and assert 422 plus an unchanged equipment list.",
+  "VIEW_ARCH.md:11 and :77 state a backdated completion never moves next due backwards, but max(previous last_completed_on, completed_on) + interval_days has no floor when last_completed_on is NULL (a plan created with only first_due_on or no anchor). Example: first_due_on 2026-03-01, interval 30, completed_on 2025-01-01 gives due_on 2025-01-31, earlier than 2026-03-01. probe.py:230,245-247 only backdates after a prior completion. Define an anchor floor or narrow the invariant and add the missing case.",
+  "acceptance/probe.py:197-210 (A02) checks selected task IDs and statuses but never the exact set or count; AUTHOR_INPUT.json acceptance[2] and REVIEW_SCOPE.md:40-42 require exact overdue/due/upcoming sets at the boundaries. Extra tasks, for example from earlier cases in the same disposable database, would not fail the probe. Assert the full ID set or count, preferably with a fresh equipment-filtered query.",
+  "acceptance/probe.py:311-313 (A05) only checks token presence (label, form, button, aria-live, and words); VIEW_ARCH.md:158-162 also requires label for/id linkage, fieldset/legend, caption, th scope=col, role=status, and lang=en. Token presence does not verify the stated accessibility rules; add structural assertions."
+ ],
+ "summary": "Citations, leaf scope, inference separation, end-to-end journey, and limits are sound; all 15 cited line ranges match the fixed source. Blocking: A01 compares a post-PATCH home to a stale pre-PATCH baseline; A01 omits the acceptance-required invalid-category negative; A02 does not assert exact due sets; A05 does not verify the explicit accessibility structure; and the architecture's backdated-completion invariant conflicts with its max() formula when last_completed_on is NULL. These require correction before pass."
+}

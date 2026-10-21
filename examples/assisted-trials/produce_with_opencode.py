@@ -51,6 +51,23 @@ def manifest_files(root):
             for p in sorted(root.rglob("*")) if p.is_file() and "__pycache__" not in p.parts}
 
 
+def snapshot_audit(directory):
+    """OpenCode may init a private .git; retain ordinary evidence, not gitlinks."""
+    target = directory.parent.parent / "audit" / directory.name
+    target.mkdir(parents=True, exist_ok=True)
+    names = ("BINDING.json", "DELIVERED.json", "RESULT.json", "LAUNCH_INTENT.json", "input.json", "leaf.md",
+             "cli-summary.json", "events.jsonl", "stdout.log", "stderr.log", "original-response.json",
+             "framing-recovery.json", "opencode.json", "process.json")
+    for name in names:
+        path = directory / name
+        if path.is_symlink():
+            raise ValueError("audit input must not be a symlink")
+        if path.is_file():
+            shutil.copyfile(path, target / name)
+    atomic_json(target / "FILES.json", {name: hashlib.sha256((directory / name).read_bytes()).hexdigest()
+                                       for name in names if (directory / name).is_file()})
+
+
 def checkpoint(directory, payload, prompt, cli, budget, source=None, leaf=None):
     """No duplicate call after delivery; an uncertain/failed launch needs inspection.
 
@@ -82,6 +99,7 @@ def checkpoint(directory, payload, prompt, cli, budget, source=None, leaf=None):
         result = json.loads(result_path.read_text())
         if receipt != {"binding_digest": digest(binding), "result_digest": digest(result)}:
             raise ValueError("checkpoint result differs from delivered binding")
+        snapshot_audit(directory)
         return result
     started = directory / "LAUNCH_INTENT.json"
     if started.exists():
@@ -96,11 +114,15 @@ def checkpoint(directory, payload, prompt, cli, budget, source=None, leaf=None):
             raise ValueError("recovered raw result differs")
     else:
         fixed_json(started, {"binding_digest": digest(binding)})
-        result = cli.run(directory, prompt, MODEL, 1800, lambda: False,
-                         lambda message: print(directory.name + ": " + message, flush=True),
-                         budget=budget, budget_required=True)
+        try:
+            result = cli.run(directory, prompt, MODEL, 1800, lambda: False,
+                             lambda message: print(directory.name + ": " + message, flush=True),
+                             budget=budget, budget_required=True)
+        finally:
+            snapshot_audit(directory)
     atomic_json(result_path, result)
     atomic_json(done, {"binding_digest": digest(binding), "result_digest": digest(result)})
+    snapshot_audit(directory)
     return result
 
 

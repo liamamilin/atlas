@@ -1,0 +1,33 @@
+{
+ "repository": "https://github.com/micasa-dev/micasa",
+ "files": [
+  "LICENSE",
+  "README.md",
+  "internal/data/models.go",
+  "internal/data/store_house.go",
+  "internal/data/store_maintenance.go",
+  "internal/data/store_servicelog.go",
+  "internal/data/validation.go",
+  "internal/data/dashboard.go"
+ ],
+ "rationale": "micasa is a standalone, local-first Go TUI built around one owner-occupied house, so it preserves the defining home/recurring-plan/history core. The singleton HouseProfile is the anchored home record (CreateHouseProfile rejects a second home); Appliance records hold equipment metadata; MaintenanceItem links to an appliance through ApplianceID and stores LastServicedAt, IntervalMonths, and an optional fixed DueDate. ServiceLogEntry captures each completion with ServicedAt, Notes, CostCents, and an optional Vendor. syncLastServiced rewrites LastServicedAt to the latest non-deleted service log, and ComputeNextDue derives the next date from that actual completion plus the interval, so the due cycle is driven by real completion dates. History is queryable per maintenance item and per appliance via ListServiceLog and ListMaintenanceByAppliance. Data lives in one local SQLite file with no account, no notification delivery, and no work-order/dispatch/property-management layer. Caveat: recurrence is month-granular (for example 6m or 1y) rather than literal every-N-days; fixed due dates handle one-off schedules. Projects, quotes, vendors, and incidents exist as separate adjacent tables but are not part of the maintenance core.",
+ "alternatives": [
+  {
+   "repository": "https://github.com/prestomation/ha-home-keeper",
+   "why": "MIT-licensed and closest on cadence: floating tasks repeat every N days/weeks/months from last completion, with appliance records, completion notes/cost/photos, and history. Rejected as primary because it is a Home Assistant integration rather than a standalone local app, and its scope explicitly includes chores and medicine, drifting toward the Household Chore boundary."
+  },
+  {
+   "repository": "https://github.com/FrancisLaboratories/homelogger",
+   "why": "MIT-licensed Go/Fiber/GORM home appliance and repair tracker with local SQLite. Rejected because recurring maintenance planning/scheduling is still listed only as roadmap, so the forward-looking plan is absent."
+  },
+  {
+   "repository": "https://github.com/grocy/grocy",
+   "why": "MIT-licensed self-hosted household system with recurring chores, period-days scheduling, and execution logs, but no home profile anchoring care to the dwelling's fabric; it is chore-centric, matching the lead's warned boundary rather than the home-maintenance core."
+  },
+  {
+   "repository": "https://github.com/thiagomontozo/casaemdia",
+   "why": "MIT-licensed household maintenance system with assets, plans in days or months, completion records, and next-due advancement. Rejected as primary because its README states it is experimental and not runtime-validated, making it weaker evidence than a maintained application."
+  }
+ ],
+ "search_notes": "Read the complete 258-line leaf.md and input.json. Searched for open-source/self-hosted home-maintenance applications and checked recurring-task, appliance, and history implementations. Verified micasa through its GitHub repository page and raw.githubusercontent.com files: README.md states Apache-2.0 and home-maintenance scheduling/due dates/history; LICENSE is the Apache License 2.0 with Copyright 2026 Phillip Cloud; all eight listed paths were fetched successfully and are UTF-8 text well under 180KB. Confirmed the home anchor in store_house.go, equipment/maintenance/completion models in models.go, per-appliance plan queries in store_maintenance.go, completion-to-last-serviced synchronization in store_servicelog.go, and next-due calculation in validation.go. No commit was inferred or pinned. The GitHub API endpoint was blocked by the environment, so repository browsing and raw file fetches were used instead."
+}
