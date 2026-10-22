@@ -286,6 +286,25 @@ class WorkflowRunnerHostTests(unittest.TestCase):
         self.assertEqual(result["code"], "workflow_host_error")
         self.assertEqual(self.service.status("host-fixture")["status"], "paused")
 
+    def test_later_full_plan_paused_error_does_not_replace_primary_pause_reason(self):
+        self._patches(lambda *_args: self.fail("secondary worker must not reach production"))
+        primary = "full_plan_integrity: frozen source changed"
+        self.service.control("host-fixture", "pause", primary)
+
+        def peer_observes_pause(*_args, **_kwargs):
+            raise runner.FactoryError("plan already paused", "full_plan_paused", 409)
+
+        with patch.object(runner, "stage_call", side_effect=peer_observes_pause), patch.object(
+            self.service, "pause_if_running", wraps=self.service.pause_if_running
+        ) as pause_if_running:
+            result = self.execute()
+
+        self.assertEqual(result, {"leaf": self.leaf, "state": "paused", "code": "full_plan_paused"})
+        self.assertEqual(self.service.status("host-fixture")["reason"], primary)
+        pause_if_running.assert_called_once_with(
+            "host-fixture", "full_plan_paused: plan already paused"
+        )
+
     def test_exhausted_protocol_retry_is_leaf_failure_and_keeps_plan_running(self):
         self._patches(lambda *_args: self.fail("generation retry must remain exhausted"), real_author_stage=True)
 

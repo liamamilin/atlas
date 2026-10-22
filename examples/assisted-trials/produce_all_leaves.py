@@ -1956,8 +1956,7 @@ def execute_leaf(root, service, item, api, repair=False):
                         "workdir": str(work.relative_to(ROOT)),
                     },
                 )
-                if service.control_state(PLAN_ID) != "stopped":
-                    service.control(PLAN_ID, "pause", code + ": " + str(error))
+                service.pause_if_running(PLAN_ID, code + ": " + str(error))
                 return {"leaf": item["leaf"], "state": "paused", "code": code}
             content = code == "auxiliary_content"
             reserve_deferred = code == "budget_first_pass_reserve"
@@ -2193,12 +2192,10 @@ def run(root, api, selected_leaves=None):
                     else "all covered",
                 )
         except BaseException as error:
-            if service.control_state(PLAN_ID) != "stopped":
-                service.control(
-                    PLAN_ID,
-                    "pause",
-                    getattr(error, "code", "coordinator_error") + ": " + str(error),
-                )
+            service.pause_if_running(
+                PLAN_ID,
+                getattr(error, "code", "coordinator_error") + ": " + str(error),
+            )
             raise
         finally:
             write_round_report(root, progress(root, service))

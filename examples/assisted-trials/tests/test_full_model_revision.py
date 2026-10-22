@@ -1,7 +1,9 @@
 import hashlib
 import json
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 import sys
+import threading
 import tempfile
 import unittest
 
@@ -10,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "application-atlas-
 from template_factory.full_auxiliary import (
     FullAuxiliaryService, MODEL, REVISED_MODEL, ensure_schema,
 )
-from template_factory.store import FactoryError, FactoryStore
+from template_factory.store import FactoryError, FactoryStore, digest
 
 
 class FullModelRevisionTests(unittest.TestCase):
@@ -25,7 +27,8 @@ class FullModelRevisionTests(unittest.TestCase):
         self.plan_id = "plan-test"
         self.auth = self.root / "auth.txt"
         self.user_auth = self.root / "docs/template-factory/open-design-switch-2026-10-22/authorization/USER_MODEL_SWITCH.txt"
-        self.scope = self.root / "scope.json"
+        self.scope = self.root / "docs" / "fixture-plan" / "frozen-scope.json"
+        self.scope.parent.mkdir(parents=True, exist_ok=True)
         self.auth.write_text("authorized provider switch\n")
         self.user_auth.parent.mkdir(parents=True)
         self.user_auth.write_text("user authorizes provider switch\n")
@@ -38,7 +41,7 @@ class FullModelRevisionTests(unittest.TestCase):
             "window_seconds": 2592000, "baseline": 0, "full_plan_id": self.plan_id,
             "phase": "auxiliary-full-plan-test",
             "authorization": {"path": "auth.txt", "sha256": self.hash(self.auth)},
-            "scope": {"path": "scope.json", "sha256": self.hash(self.scope)},
+            "scope": {"path": "docs/fixture-plan/frozen-scope.json", "sha256": self.hash(self.scope)},
         }
         with self.store.connect(True) as con:
             ensure_schema(con)
@@ -58,6 +61,29 @@ class FullModelRevisionTests(unittest.TestCase):
     def pause(self):
         self.service.control(self.plan_id, "pause")
 
+    def make_unlaunched(self, work_name, *, model=MODEL, bad_intent=False, artifact=None):
+        with self.store.connect(True) as con:
+            row = con.execute("SELECT body FROM auxiliary_full_leaf WHERE plan_id=? AND slug='leaf'", (self.plan_id,)).fetchone()
+            item = json.loads(row[0])
+            item["leaf_sha256"] = "frozen-leaf-digest"
+            con.execute("UPDATE auxiliary_full_leaf SET body=? WHERE plan_id=? AND slug='leaf'",
+                        (json.dumps(item), self.plan_id))
+        directory = self.scope.parent / "items" / "leaf" / work_name / "calls" / "launch"
+        directory.mkdir(parents=True)
+        binding = {"model": model, "leaf_sha256": "frozen-leaf-digest"}
+        (directory / "BINDING.json").write_text(json.dumps(binding))
+        intent = {"binding_digest": digest(binding)}
+        if bad_intent:
+            intent["binding_digest"] = "changed"
+        (directory / "LAUNCH_INTENT.json").write_text(json.dumps(intent))
+        if artifact:
+            (directory / artifact).write_text("observed call artifact")
+        return directory
+
+    def register_switch(self):
+        self.pause()
+        self.service.register_model_revision(self.amendment())
+
     def round_request(self, mode="pilot_complete"):
         from template_factory.store import digest
         auth = self.root / "docs/template-factory/workflow-rounds-2026-10-22/authorization/USER_REQUEST.txt"
@@ -71,6 +97,53 @@ class FullModelRevisionTests(unittest.TestCase):
                 "original_request_digest": digest(self.request),
                 "leaves": ["leaf", "leaf-two", "leaf-three"] if mode == "pilot_complete" else ["leaf", "leaf-two", "leaf-three", "leaf-four"],
                 "authorization": {"path": "docs/template-factory/workflow-rounds-2026-10-22/authorization/USER_REQUEST.txt", "sha256": self.hash(auth)}}
+
+    def test_unlaunched_proof_accepts_historical_authorized_model_without_reservation(self):
+        self.register_switch()
+        directory = self.make_unlaunched("historical")
+        before = self.service.ledger.snapshot()["cli_sessions_used"]
+        proof = self.service.prove_unlaunched(
+            self.plan_id, "leaf", "historical", "first/discovery/attempt-1", directory
+        )
+        self.assertEqual(proof["charged_reservations"], 0)
+        self.assertEqual(proof["kind"], "host_proven_not_started")
+        self.assertTrue((directory / "NOT_STARTED_PROOF.json").is_file())
+        summary = json.loads((directory / "cli-summary.json").read_text())
+        self.assertEqual(summary["requested_model"], MODEL)
+        self.assertEqual(self.service.ledger.snapshot()["cli_sessions_used"], before)
+
+    def test_unlaunched_proof_rejects_unknown_model_changed_intent_and_artifacts(self):
+        self.register_switch()
+        for work_name, options, message in (
+            ("unknown", {"model": "unapproved/provider"}, "recovery binding differs"),
+            ("changed-intent", {"bad_intent": True}, "recovery binding differs"),
+            ("process", {"artifact": "process.json"}, "cannot prove free recovery"),
+            ("events", {"artifact": "events.jsonl"}, "cannot prove free recovery"),
+        ):
+            directory = self.make_unlaunched(work_name, **options)
+            with self.assertRaisesRegex(FactoryError, message):
+                self.service.prove_unlaunched(
+                    self.plan_id, "leaf", work_name, "first/discovery/attempt-1", directory
+                )
+
+    def test_unlaunched_proof_rejects_spawn_intent_without_changing_ledger(self):
+        self.register_switch()
+        self.service.resume_selected(self.plan_id, ["leaf"])
+        self.service.update_leaf(self.plan_id, "leaf", "running", {})
+        work_name = "spawned"
+        reservation = self.service.ledger.reserve(
+            self.plan_id + ":leaf", self.request["phase"], requested_model=REVISED_MODEL,
+            plan_id=self.plan_id, job_id=self.plan_id + ":leaf:" + work_name,
+            stage="first/discovery/attempt-1",
+        )
+        self.service.ledger.mark_spawn_intent(reservation["id"])
+        directory = self.make_unlaunched(work_name)
+        before = self.service.ledger.snapshot()["cli_sessions_used"]
+        with self.assertRaisesRegex(FactoryError, "cannot prove free recovery"):
+            self.service.prove_unlaunched(
+                self.plan_id, "leaf", work_name, "first/discovery/attempt-1", directory
+            )
+        self.assertEqual(self.service.ledger.snapshot()["cli_sessions_used"], before)
 
     def test_round_activation_preserves_budget_and_is_idempotent(self):
         self.pause()
@@ -250,6 +323,29 @@ class FullModelRevisionTests(unittest.TestCase):
                 self.plan_id + ":leaf-four", self.request["phase"], requested_model=MODEL,
                 plan_id=self.plan_id, stage="first/discovery/attempt-1",
             )
+
+    def test_concurrent_pause_if_running_preserves_first_reason(self):
+        self.service.control(self.plan_id, "resume")
+        barrier = threading.Barrier(2)
+
+        def pause(reason):
+            barrier.wait(timeout=5)
+            return self.service.pause_if_running(self.plan_id, reason)
+
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            futures = [pool.submit(pause, reason) for reason in ("first-pause", "second-pause")]
+            results = [future.result(timeout=10) for future in futures]
+        self.assertCountEqual(results, [True, False])
+        state = self.service.status(self.plan_id)
+        self.assertEqual(state["status"], "paused")
+        self.assertIn(state["reason"], {"first-pause", "second-pause"})
+        with self.store.connect() as con:
+            pauses = [json.loads(row[0]) for row in con.execute(
+                "SELECT body FROM auxiliary_full_event WHERE plan_id=? AND kind='control'",
+                (self.plan_id,),
+            ) if json.loads(row[0]).get("action") == "pause"]
+        self.assertEqual(len(pauses), 1)
+        self.assertEqual(pauses[0]["reason"], state["reason"])
 
 
 if __name__ == "__main__":

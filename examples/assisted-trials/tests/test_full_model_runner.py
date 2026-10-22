@@ -67,13 +67,20 @@ class FullModelRunnerTests(unittest.TestCase):
                 runner.stage_call(root, Service(), item, work, "blueprint-generate-aux", {}, "prompt", "content")
             self.assertEqual(observed["model"], "opencode-go/minimax-m3.1-flash-free")
 
-    def _amended_service(self, root, leaf_bytes):
+    def _amended_service(self, root, leaf_bytes, *, seed_old_call=True):
         pack = root / "pack"
         (pack / "applications").mkdir(parents=True)
         (pack / "applications/leaf.md").write_bytes(leaf_bytes)
-        scope_path = root / "scope.json"
+        scope_path = root / "docs/template-factory/full-leaf-auxiliary-2026-10-21/FROZEN_SCOPE.json"
+        scope_path.parent.mkdir(parents=True)
         auth_path = root / "auth.txt"
-        scope_path.write_text(json.dumps({"full_plan_id": "plan", "items": [{"leaf": "leaf"}]}))
+        scope_path.write_text(json.dumps({
+            "full_plan_id": "plan",
+            "items": [{
+                "leaf": "leaf",
+                "leaf_sha256": hashlib.sha256(leaf_bytes).hexdigest(),
+            }],
+        }))
         auth_path.write_text("original plan authorization\n")
         user_auth = root / MODEL_SWITCH_AUTHORIZATION
         user_auth.parent.mkdir(parents=True)
@@ -92,7 +99,10 @@ class FullModelRunnerTests(unittest.TestCase):
             "batch_size": 20,
             "window_seconds": 2592000,
             "model": FULL_MODEL,
-            "scope": {"path": "scope.json", "sha256": hashlib.sha256(scope_path.read_bytes()).hexdigest()},
+            "scope": {
+                "path": str(scope_path.relative_to(root)),
+                "sha256": hashlib.sha256(scope_path.read_bytes()).hexdigest(),
+            },
             "authorization": {"path": "auth.txt", "sha256": hashlib.sha256(auth_path.read_bytes()).hexdigest()},
         }
         service.register(request)
@@ -100,12 +110,15 @@ class FullModelRunnerTests(unittest.TestCase):
         service.update_leaf("plan", "leaf", "running", {})
         service.control("plan", "pause")
         service.resume_selected("plan", ["leaf"])
-        old = service.ledger.reserve(
-            "plan:leaf", request["phase"], requested_model=FULL_MODEL,
-            plan_id="plan", job_id="plan:leaf:attempt-1",
-            stage="first/blueprint-generate-aux/attempt-1", kind="production",
-        )
-        service.ledger.finish(old["id"], "failed", outcome="cli_protocol")
+        old_id = None
+        if seed_old_call:
+            old = service.ledger.reserve(
+                "plan:leaf", request["phase"], requested_model=FULL_MODEL,
+                plan_id="plan", job_id="plan:leaf:attempt-1",
+                stage="first/blueprint-generate-aux/attempt-1", kind="production",
+            )
+            service.ledger.finish(old["id"], "failed", outcome="cli_protocol")
+            old_id = old["id"]
         service.control("plan", "pause")
         amendment = {
             "schema": "atlas.full-leaf-model-revision.v1",
@@ -121,7 +134,89 @@ class FullModelRunnerTests(unittest.TestCase):
         }
         service.register_model_revision(amendment)
         service.control("plan", "resume")
-        return service, old["id"]
+        return service, old_id
+
+    def test_unstarted_minimax_intent_proves_free_then_open_design_successor_delivers_once(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            leaf = b"# Leaf\n"
+            service, old_id = self._amended_service(root, leaf, seed_old_call=False)
+            self.assertIsNone(old_id)
+            work = root / "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/leaf/attempt-1"
+            stage = work / "calls/blueprint-generate-aux"
+            stage.mkdir(parents=True)
+            (work / "STAGE_PATHS.json").write_text(json.dumps({
+                "blueprint-generate-aux": "calls/blueprint-generate-aux",
+            }))
+            (stage / "leaf.md").write_bytes(leaf)
+            payload, prompt = {"fixture": True}, "fixed prompt"
+            binding = {
+                "model": FULL_MODEL,
+                "input_digest": digest(payload),
+                "prompt": prompt,
+                "source": {},
+                "leaf_sha256": hashlib.sha256(leaf).hexdigest(),
+            }
+            binding_bytes = json.dumps(binding, sort_keys=True, separators=(",", ":")).encode()
+            intent_bytes = json.dumps(
+                {"binding_digest": digest(binding)}, sort_keys=True, separators=(",", ":")
+            ).encode()
+            (stage / "BINDING.json").write_bytes(binding_bytes)
+            (stage / "LAUNCH_INTENT.json").write_bytes(intent_bytes)
+            observed = []
+            result = {"value": "new model delivered"}
+
+            class DeliverOnceCLI:
+                def run(inner, directory, _prompt, model, _timeout, _cancelled, _progress, **kwargs):
+                    budget = kwargs["budget"]
+                    reservation = budget["ledger"].reserve(
+                        budget["identity"], budget["phase"], budget["kind"],
+                        job_id=budget["job_id"], requested_model=model,
+                        plan_id=budget["plan_id"], stage=budget["stage"],
+                    )
+                    budget["ledger"].finish(reservation["id"], "completed")
+                    observed.append((model, budget["stage"], reservation["id"]))
+                    raw = json.dumps(result, sort_keys=True)
+                    raw_path = Path(directory) / "original-response.json"
+                    raw_path.write_text(json.dumps({"text": raw}, sort_keys=True))
+                    (Path(directory) / "cli-summary.json").write_text(json.dumps({
+                        "requested_model": model,
+                        "delivery_status": "delivered",
+                        "session_id": "open-design-session",
+                        "original_response_sha256": hashlib.sha256(raw_path.read_bytes()).hexdigest(),
+                    }))
+                    return result
+
+            item = {"leaf": "leaf", "leaf_sha256": hashlib.sha256(leaf).hexdigest()}
+            with patch.object(runner, "PLAN_ID", "plan"), patch.object(
+                runner, "CoordinatedCLI", return_value=DeliverOnceCLI()
+            ):
+                first = runner.stage_call(
+                    root, service, item, work, "blueprint-generate-aux", payload, prompt, "production"
+                )
+                charged_after_first = service.status("plan")["new_calls"]
+                second = runner.stage_call(
+                    root, service, item, work, "blueprint-generate-aux", payload, prompt, "production"
+                )
+
+            successor = work / "calls/blueprint-generate-aux-not-started-1"
+            self.assertEqual(first, result)
+            self.assertEqual(second, result)
+            self.assertEqual(len(observed), 1)
+            self.assertEqual(observed[0][0], REVISED_MODEL)
+            self.assertEqual(observed[0][1], "first/blueprint-generate-aux/attempt-1")
+            self.assertEqual(service.status("plan")["new_calls"], charged_after_first)
+            self.assertEqual(charged_after_first, 1)
+            rows = service.status("plan")["calls"]
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]["requested_model"], REVISED_MODEL)
+            self.assertEqual(rows[0]["status"], "completed")
+            self.assertEqual((stage / "BINDING.json").read_bytes(), binding_bytes)
+            self.assertEqual((stage / "LAUNCH_INTENT.json").read_bytes(), intent_bytes)
+            self.assertTrue((stage / "NOT_STARTED_PROOF.json").exists())
+            self.assertEqual(load_path(stage / "cli-summary.json")["cli_status"], "not_started")
+            self.assertEqual(load_path(successor / "BINDING.json")["model"], REVISED_MODEL)
+            self.assertTrue((successor / "DELIVERED.json").exists())
 
     def test_delivered_old_model_checkpoint_replays_without_cli_and_preserves_bytes(self):
         with tempfile.TemporaryDirectory() as tmp:

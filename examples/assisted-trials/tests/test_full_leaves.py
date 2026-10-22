@@ -784,6 +784,13 @@ class FullLeafTests(unittest.TestCase):
                 inner.reason = reason
                 return inner.status()
 
+            def pause_if_running(inner, plan, reason):
+                if inner.state not in {"running", "registered"}:
+                    return False
+                inner.state = "paused"
+                inner.reason = reason
+                return True
+
         service = Service()
         invocations = []
         folder = self.root / "pilot-repair-queue"
@@ -825,6 +832,7 @@ class FullLeafTests(unittest.TestCase):
                 inner.active = 0
                 inner.peak = 0
                 inner.visited = []
+                inner.reason = None
                 inner.items = [
                     {"leaf": "q-" + str(n), "state": "pending"} for n in range(41)
                 ]
@@ -856,7 +864,15 @@ class FullLeafTests(unittest.TestCase):
                     "pause": "paused",
                     "complete": "completed",
                 }[action]
+                inner.reason = reason
                 return inner.status()
+
+            def pause_if_running(inner, plan, reason):
+                if inner.state not in {"running", "registered"}:
+                    return False
+                inner.state = "paused"
+                inner.reason = reason
+                return True
 
         service = Service()
         batches = []
