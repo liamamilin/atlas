@@ -42,3 +42,9 @@ SOURCE/CASE/模板绑定与标准包由正式服务完成。已有18份及六应
 具体清单及最新状态见 `../workflow-hardening-2026-10-21/WORK_PACKAGE.md` 和该目录真实回执。验证清单完成后协调者自动暂停。仅当真实新产物的八步、摘要与下载均通过，恢复/失败隔离证据完整时，使用 `workflow-open-full --evidence <真实验证报告JSON>` 正式开放全量；不能把旧模板接纳或fixture当新产物通过。开放门禁本身不启动模型，仍需原计划resume/start。原30天窗口、账本和失败保持。
 
 只读进度：`http://127.0.0.1:5188/factory?view=workflow`；接口 `/api/factory/auxiliary-workflows` 及 `/<plan_id>?offset=0&limit=20&state=&q=`。步骤产物下载仅允许正式记录中摘要吻合的文件，不能传任意路径。
+
+## 调研源码外置目录（2026-10-22）
+
+上游源码主缓存已按用户要求改存 `/Volumes/个人资料/2026/altlas源码`。原工厂 `sources` 入口是顶层兼容链接，历史来源 JSON、固定 commit 和摘要保持原样。模板、开发包、研究证据与应用数据仍在项目内。挂载缺失时正式暂停并显示 `source_storage_unavailable`，不能在电脑中回落重建源码缓存；挂载后核验再恢复同一任务。迁移与恢复证据见 `../source-storage-2026-10-22/`。
+
+实际模型以后续正式 model revision 与 status 为准，目前为 `open-design/deepseek-v4.1-flash`；首轮模式只处理 first lane，不自动执行第二轮修订。普通叶子失败记录后继续。
