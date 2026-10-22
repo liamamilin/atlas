@@ -1,0 +1,11 @@
+{
+  "observed_at": 1792626307.8114061,
+  "action": "standalone produce_all_leaves.py resume",
+  "decision": "rejected",
+  "reason": "resume can reopen the full paused plan and dispatch far beyond the explicitly authorized three-leaf pilot; use a bounded selected-leaf start path instead. Do not bypass indirectly.",
+  "executed": false,
+  "model_revision_registered": true,
+  "new_calls": 118,
+  "safe_followup": "Add transactional selected_dispatch restriction checked by budget reservation, and a start --leaf path which atomically enables only this bounded selection. Then exact source CI before actual start.",
+  "authorization_limits_unchanged": true
+}

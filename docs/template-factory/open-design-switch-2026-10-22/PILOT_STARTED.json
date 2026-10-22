@@ -1,0 +1,161 @@
+{
+  "observed_at": 1792627348.974541,
+  "code_sha": "9ea4379e403f4cf127ef888159547c4eab09fd93",
+  "ci_run_id": 39696185913,
+  "status": "running",
+  "model": "open-design/deepseek-v4.1-flash",
+  "selected_leaves": [
+    "e-book-library-application",
+    "markdown-editor",
+    "resource-calendar"
+  ],
+  "new_calls": 121,
+  "cumulative_calls": 220,
+  "active_calls": 2,
+  "calls_after_model_switch": [
+    {
+      "id": "bud_61cd99eb66bd44a4a7b994c00337cb28",
+      "identity": "full-leaf-auxiliary-2026-10-21:markdown-editor",
+      "stage": "first/discovery/attempt-1",
+      "status": "completed",
+      "job_id": "full-leaf-auxiliary-2026-10-21:markdown-editor:attempt-1",
+      "requested_model": "open-design/deepseek-v4.1-flash",
+      "outcome": null,
+      "created": 1792627269.984464,
+      "started": 1792627270.153292,
+      "finished": 1792627316.6895301
+    },
+    {
+      "id": "bud_df610245a7954356b35d47fa146ccbce",
+      "identity": "full-leaf-auxiliary-2026-10-21:e-book-library-application",
+      "stage": "first/discovery/attempt-1",
+      "status": "started",
+      "job_id": "full-leaf-auxiliary-2026-10-21:e-book-library-application:attempt-1",
+      "requested_model": "open-design/deepseek-v4.1-flash",
+      "outcome": null,
+      "created": 1792627269.9965818,
+      "started": 1792627270.158623,
+      "finished": null
+    },
+    {
+      "id": "bud_9b62cbb8bbe44ad0973a4c42524f5c6a",
+      "identity": "full-leaf-auxiliary-2026-10-21:markdown-editor",
+      "stage": "first/blueprint-generate-aux/attempt-1",
+      "status": "started",
+      "job_id": "full-leaf-auxiliary-2026-10-21:markdown-editor:attempt-1",
+      "requested_model": "open-design/deepseek-v4.1-flash",
+      "outcome": null,
+      "created": 1792627324.323118,
+      "started": 1792627324.43896,
+      "finished": null
+    }
+  ],
+  "historical_118_calls_unchanged": true,
+  "max_calls": 7200,
+  "deadline": 1795181744.123177,
+  "protected_files_unchanged": 123,
+  "items": [
+    {
+      "leaf": "e-book-library-application",
+      "key": "e-book-library-application",
+      "leaf_sha256": "dc136828133d497389419464364ee421677d74b554567fd73bca46d6c2faf26d",
+      "classification_path": [
+        {
+          "id": "02",
+          "name": "Content, Knowledge & Information"
+        },
+        {
+          "id": "02.09",
+          "name": "Reading"
+        }
+      ],
+      "directory_section": "02.09",
+      "display_name": "E-book Library Application",
+      "covered": [],
+      "current_attempt": "attempt-1",
+      "first_pass_done": false,
+      "workdir": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-1",
+      "error": null,
+      "failure_stage": null,
+      "failure_code": null,
+      "state": "running"
+    },
+    {
+      "leaf": "markdown-editor",
+      "key": "markdown-editor",
+      "leaf_sha256": "a14c24d234981599f180ad63ac6d79f338418a3bd37e34e93306b0835de1dd9d",
+      "classification_path": [
+        {
+          "id": "03",
+          "name": "Productivity, Collaboration & Work Management"
+        },
+        {
+          "id": "03.01",
+          "name": "Documents & Writing"
+        }
+      ],
+      "directory_section": "03.01",
+      "display_name": "Markdown Editor",
+      "covered": [],
+      "current_attempt": "attempt-1",
+      "first_pass_done": false,
+      "workdir": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-1",
+      "error": null,
+      "failure_stage": null,
+      "failure_code": null,
+      "state": "running"
+    },
+    {
+      "leaf": "resource-calendar",
+      "key": "resource-calendar",
+      "leaf_sha256": "b002c24483cc217524018776818616952a438c030c2e9e2dc717971ee95668a5",
+      "classification_path": [
+        {
+          "id": "03",
+          "name": "Productivity, Collaboration & Work Management"
+        },
+        {
+          "id": "03.08",
+          "name": "Calendar"
+        }
+      ],
+      "directory_section": "03.08",
+      "display_name": "Resource Calendar",
+      "covered": [],
+      "state": "pending"
+    }
+  ],
+  "provider_responses": [
+    {
+      "leaf": "e-book-library-application",
+      "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-1/calls/discovery/events.jsonl",
+      "types": {
+        "step_start": 11,
+        "text": 1,
+        "tool_use": 20,
+        "step_finish": 11
+      },
+      "session_ids": [
+        "ses_e9f169ca6ffevcThxqyQNS540v"
+      ],
+      "note": "Live stream snapshot, not a frozen evidence digest or completed production result."
+    },
+    {
+      "leaf": "markdown-editor",
+      "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-1/calls/discovery/events.jsonl",
+      "types": {
+        "step_start": 8,
+        "text": 2,
+        "tool_use": 12,
+        "step_finish": 7
+      },
+      "session_ids": [
+        "ses_e9f169ca6ffe52iT6REl2i5Alj"
+      ],
+      "note": "Live stream snapshot, not a frozen evidence digest or completed production result."
+    }
+  ],
+  "supervisor_start_receipt": "BOUNDED_START_RECEIPT.log",
+  "automatic_full_dispatch": false,
+  "completed_templates_in_pilot": 0
+}
