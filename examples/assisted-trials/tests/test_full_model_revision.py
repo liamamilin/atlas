@@ -58,6 +58,65 @@ class FullModelRevisionTests(unittest.TestCase):
     def pause(self):
         self.service.control(self.plan_id, "pause")
 
+    def round_request(self, mode="pilot_complete"):
+        from template_factory.store import digest
+        auth = self.root / "round.txt"
+        auth.write_text("fixture explicit full-round and bounded revision authorization")
+        with self.store.connect(True) as con:
+            con.execute("INSERT OR REPLACE INTO auxiliary_workflow_gate VALUES(?,?,?)",
+                        (self.plan_id, json.dumps({"status": "passed", "mode": "full"}), 1000))
+        return {"schema": "atlas.auxiliary-round.v1", "full_plan_id": self.plan_id,
+                "mode": mode, "reason": "fixture full round", "model": MODEL,
+                "original_request_digest": digest(self.request),
+                "leaves": ["leaf", "leaf-two", "leaf-three"] if mode == "pilot_complete" else ["leaf", "leaf-two", "leaf-three", "leaf-four"],
+                "authorization": {"path": "round.txt", "sha256": self.hash(auth)}}
+
+    def test_round_activation_preserves_budget_and_is_idempotent(self):
+        self.pause()
+        req = self.round_request()
+        receipt = self.service.resume_round(req)
+        self.assertEqual(self.service.resume_round(req), receipt)
+        self.assertEqual(self.service.dispatch_mode(self.plan_id), "pilot_complete")
+        self.assertEqual(self.service.selected_leaves(self.plan_id), sorted(req["leaves"]))
+        state = self.service.status(self.plan_id)
+        self.assertEqual((state["baseline"], state["max_calls"], state["new_calls"]), (0, 7200, 0))
+        self.assertIsNone(state["started"])
+
+    def test_full_round_requires_exact_frozen_set_and_defers_repairs(self):
+        self.pause()
+        req = self.round_request("full_first_round")
+        bad = {**req, "leaves": req["leaves"][:-1]}
+        with self.assertRaisesRegex(FactoryError, "scope differs"):
+            self.service.resume_round(bad)
+        self.service.resume_round(req)
+        self.assertEqual(self.service.selected_leaves(self.plan_id), [])
+        self.service.update_leaf(self.plan_id, "leaf-four", "running", {})
+        args = dict(requested_model=MODEL, plan_id=self.plan_id)
+        r = self.service.ledger.reserve(self.plan_id + ":leaf-four", self.request["phase"],
+                                        stage="first/discovery/attempt-1", **args)
+        self.service.ledger.finish(r["id"], "completed")
+        with self.assertRaisesRegex(FactoryError, "deferred until round analysis"):
+            self.service.ledger.reserve(self.plan_id + ":leaf-four", self.request["phase"],
+                                        stage="repair/blueprint-generate-aux/attempt-2", **args)
+        self.assertEqual(self.service.status(self.plan_id)["new_calls"], 1)
+
+    def test_round_refuses_active_calls_changed_auth_and_wrong_model(self):
+        self.pause()
+        req = self.round_request()
+        with self.assertRaises(FactoryError):
+            self.service.resume_round({**req, "model": "unknown"})
+        (self.root / "round.txt").write_text("tampered")
+        with self.assertRaisesRegex(FactoryError, "authorization/scope changed"):
+            self.service.resume_round(req)
+        req = self.round_request()
+        self.service.resume_selected(self.plan_id, ["leaf"])
+        self.service.update_leaf(self.plan_id, "leaf", "running", {})
+        self.service.ledger.reserve(self.plan_id + ":leaf", self.request["phase"],
+            stage="first/discovery/attempt-1", requested_model=MODEL, plan_id=self.plan_id)
+        self.pause()
+        with self.assertRaisesRegex(FactoryError, "drain calls"):
+            self.service.resume_round(req)
+
     def test_append_only_switch_idempotency_and_preserves_plan_limits(self):
         self.pause()
         req = self.amendment()

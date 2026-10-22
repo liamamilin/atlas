@@ -685,7 +685,91 @@ class FullAuxiliaryService:
             or receipt.get("leaves") != event["leaves"]
             or receipt.get("selection_digest") != event["selection_digest"]):
             raise FactoryError("selected dispatch record changed", "full_plan_integrity", 409)
+        if event.get("mode") == "full_first_round":
+            return []
         return event["leaves"]
+
+    def dispatch_mode(self, plan_id):
+        with self.store.connect() as con:
+            row = con.execute(
+                "SELECT body FROM auxiliary_full_event WHERE plan_id=? AND kind='selected_dispatch' ORDER BY id DESC LIMIT 1",
+                (plan_id,),
+            ).fetchone()
+        if not row:
+            return "legacy"
+        event = json.loads(row[0])
+        self.selected_leaves(plan_id)  # Verify the same durable selection binding.
+        mode = event.get("mode", "selected_first_pass")
+        if mode not in {"selected_first_pass", "pilot_complete", "full_first_round"}:
+            raise FactoryError("unknown dispatch mode", "full_plan_integrity", 409)
+        return mode
+
+    def resume_round(self, request):
+        """Append a bounded round under the original scope, budget and deadline.
+
+        pilot_complete closes the existing three-leaf revision loop. Full round
+        one attempts each remaining leaf once, then pauses for a human review;
+        it never silently enters content repair or resets previous failures.
+        """
+        mode = request.get("mode")
+        if (request.get("schema") != "atlas.auxiliary-round.v1"
+            or mode not in {"pilot_complete", "full_first_round"}
+            or not request.get("reason")):
+            raise FactoryError("invalid round request", "full_plan_binding", 409)
+        plan_id = request.get("full_plan_id")
+        with self.store.connect(True) as con:
+            row = con.execute("SELECT * FROM auxiliary_full_plan WHERE id=? AND campaign_id=?",
+                              (plan_id, self.campaign_id)).fetchone()
+            if not row:
+                raise FactoryError("unknown plan", "not_found", 404)
+            prior = con.execute("SELECT body FROM auxiliary_full_event WHERE plan_id=? AND kind='selected_dispatch' ORDER BY id DESC LIMIT 1",
+                                (plan_id,)).fetchone()
+            if prior:
+                saved = json.loads(prior[0])
+                if saved.get("round_request_digest") == digest(request):
+                    return saved["receipt"]
+            if row["status"] != "paused":
+                raise FactoryError("round activation requires paused plan", "full_plan_paused", 409)
+            active = con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND phase=? AND status IN ('reserved','spawn_intent','started','uncertain')",
+                                 (self.campaign_id, row["phase"])).fetchone()[0]
+            if active:
+                raise FactoryError("drain calls before round activation", "full_plan_paused", 409)
+            root = self.store.pack.parent.resolve()
+            grant = json.loads(row["request_json"])
+            for binding in (grant["authorization"], grant["scope"], request.get("authorization", {})):
+                path = (root / binding.get("path", "")).resolve()
+                if (not path.is_relative_to(root) or not path.is_file()
+                    or hashlib.sha256(path.read_bytes()).hexdigest() != binding.get("sha256")):
+                    raise FactoryError("round authorization/scope changed", "full_plan_integrity", 409)
+            if request.get("original_request_digest") != row["request_digest"]:
+                raise FactoryError("round changes original plan", "full_plan_binding", 409)
+            if self.clock() >= (row["deadline"] or float("inf")):
+                raise FactoryError("original deadline exhausted", "budget_deadline", 409)
+            model, _ = self._model_revisions(con, plan_id, row, root)
+            if request.get("model") != model:
+                raise FactoryError("round model differs", "full_plan_binding", 409)
+            members = {x[0] for x in con.execute("SELECT slug FROM auxiliary_full_leaf WHERE plan_id=?", (plan_id,))}
+            leaves = request.get("leaves")
+            if (not isinstance(leaves, list) or not leaves or any(not isinstance(x, str) for x in leaves)
+                or len(leaves) != len(set(leaves)) or not set(leaves) <= members
+                or (mode == "pilot_complete" and len(leaves) > 3)
+                or (mode == "full_first_round" and set(leaves) != members)):
+                raise FactoryError("round leaf scope differs", "full_plan_binding", 409)
+            gate = con.execute("SELECT body FROM auxiliary_workflow_gate WHERE plan_id=?", (plan_id,)).fetchone()
+            if not gate or json.loads(gate[0]).get("status") != "passed" or json.loads(gate[0]).get("mode") != "full":
+                raise FactoryError("actual workflow gate required", "full_plan_paused", 409)
+            selection = sorted(leaves)
+            receipt = {"full_plan_id": plan_id, "mode": mode, "leaves": selection,
+                       "selection_digest": digest(selection), "round_request_digest": digest(request),
+                       "baseline": row["baseline"], "max_calls": row["max_calls"],
+                       "started": row["started"], "deadline": row["deadline"], "resumed_at": self.clock()}
+            event = {"mode": mode, "leaves": selection, "selection_digest": digest(selection),
+                     "round_request": request, "round_request_digest": digest(request), "receipt": receipt}
+            con.execute("INSERT INTO auxiliary_full_event(plan_id,kind,body,created) VALUES(?,'selected_dispatch',?,?)",
+                        (plan_id, json.dumps(event), self.clock()))
+            con.execute("UPDATE auxiliary_full_plan SET status='running',reason=? WHERE id=?",
+                        ("round dispatch: " + mode, plan_id))
+            return receipt
 
     def resume_selected(self, plan_id, leaves):
         """Resume a drained plan with a durable dispatch boundary of at most three leaves."""
@@ -796,6 +880,14 @@ def full_reservation_locked(
             raise FactoryError("selected dispatch record changed", "full_plan_integrity", 409)
         if slug not in selection["leaves"]:
             raise FactoryError("leaf outside selected dispatch", "full_plan_paused", 409)
+        mode = selection.get("mode", "selected_first_pass")
+        if mode in {"pilot_complete", "full_first_round"}:
+            req = selection.get("round_request", {})
+            if (digest(req) != selection.get("round_request_digest")
+                or req.get("mode") != mode or sorted(req.get("leaves", [])) != selection["leaves"]):
+                raise FactoryError("round request changed", "full_plan_integrity", 409)
+            if mode == "full_first_round" and str(stage).startswith("repair/"):
+                raise FactoryError("content repair deferred until round analysis", "budget_round_boundary", 409)
     elif effective_model == REVISED_MODEL:
         raise FactoryError("selected dispatch required before Open Design reservations", "full_plan_paused", 409)
     gate_row = con.execute(

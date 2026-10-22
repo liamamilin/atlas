@@ -195,7 +195,7 @@ class WorkflowRunnerHostTests(unittest.TestCase):
         current = self.service.status("host-fixture")["items"][0]
         return runner.execute_leaf(self.root, self.service, current, "https://fixture.invalid")
 
-    def test_freeze_host_failure_pauses_and_reentry_reuses_completed_work(self):
+    def test_leaf_delivery_failure_isolated_and_reentry_reuses_completed_work(self):
         produced = []
 
         def produce_stub(*_args):
@@ -220,15 +220,15 @@ class WorkflowRunnerHostTests(unittest.TestCase):
 
         self._patches(produce_stub, verify_stub)
         first = self.execute()
-        self.assertEqual(first["state"], "paused")
+        self.assertEqual(first["state"], "failed")
         state = self.service.status("host-fixture")
-        self.assertEqual(state["status"], "paused")
-        self.assertEqual(state["items"][0]["state"], "paused", json.dumps(state, indent=2))
+        self.assertEqual(state["status"], "running")
+        self.assertEqual(state["items"][0]["state"], "failed", json.dumps(state, indent=2))
         self.assertEqual(state["new_calls"], 3, json.dumps(state, indent=2))
         progress = WorkflowService(self.store, "workflow-host-fixture").detail("host-fixture")
         self.assertEqual([x["step"] for x in progress["items"][0]["steps"]], list(STEPS))
         self.assertTrue(all(x["state"] == "completed" for x in progress["items"][0]["steps"][:6]))
-        self.assertEqual(progress["items"][0]["steps"][6]["state"], "paused")
+        self.assertEqual(progress["items"][0]["steps"][6]["state"], "failed")
         self.assertEqual(progress["items"][0]["steps"][7]["state"], "pending")
         accepted_receipt = (self.work / "ACCEPTED_RESEARCH_RECEIPT.json").read_bytes()
 
@@ -246,6 +246,15 @@ class WorkflowRunnerHostTests(unittest.TestCase):
         completed = WorkflowService(self.store, "workflow-host-fixture").detail("host-fixture")
         self.assertEqual([x["step"] for x in completed["items"][0]["steps"]], list(STEPS))
         self.assertTrue(all(x["state"] == "completed" for x in completed["items"][0]["steps"]))
+
+    def test_database_failure_still_pauses_production(self):
+        import sqlite3
+        def corrupt(*_args):
+            raise sqlite3.DatabaseError("fixture database corruption")
+        self._patches(corrupt)
+        result = self.execute()
+        self.assertEqual(result["state"], "paused")
+        self.assertEqual(self.service.status("host-fixture")["status"], "paused")
 
     def test_completed_reused_step_repairs_leaf_state_without_provider_calls(self):
         self._patches(lambda *_args: self.fail("reused leaf must not import again"))

@@ -249,6 +249,15 @@ class FullModelRunnerTests(unittest.TestCase):
         rows[1]["first_pass_done"] = False
         self.assertFalse(runner.selected_first_pass_complete(rows, {"pilot-a", "pilot-b"}))
 
+    def test_explicit_round_lanes_and_failure_isolation(self):
+        import sqlite3
+        self.assertEqual(runner.dispatch_lanes(["a"], "pilot_complete"), (False, True))
+        self.assertEqual(runner.dispatch_lanes([], "full_first_round"), (False,))
+        self.assertEqual(runner.dispatch_lanes(["a"], "selected_first_pass"), (False,))
+        self.assertNotIn(runner.leaf_failure_code(KeyError("id"), "freeze_import_export"), runner.GLOBAL_CODES)
+        self.assertNotIn(runner.leaf_failure_code(ValueError("broken candidate"), "verify_download"), runner.GLOBAL_CODES)
+        self.assertIn(runner.leaf_failure_code(sqlite3.DatabaseError("database corrupt"), "research"), runner.GLOBAL_CODES)
+
     def test_runner_inherits_only_the_persisted_three_leaf_dispatch(self):
         leaves = {"e-book-library-application", "markdown-editor", "resource-calendar"}
         self.assertEqual(runner.effective_dispatch_selection([], leaves, leaves), leaves)

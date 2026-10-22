@@ -64,6 +64,23 @@ TECH_CODES = {
 }
 
 
+def leaf_failure_code(error, stage):
+    code = getattr(error, "code", "leaf_host_error")
+    if isinstance(error, sqlite3.DatabaseError):
+        return "workflow_host_error"
+    if isinstance(error, OSError) and error.errno == __import__("errno").ENOSPC:
+        return "workflow_host_error"
+    if stage == "source_pin" and isinstance(error, (ValueError, urllib.error.HTTPError)):
+        code = "source_unavailable"
+    if stage in {"freeze_import_export", "verify_download"} and code not in GLOBAL_CODES:
+        code = "leaf_delivery_error"
+    if isinstance(error, urllib.error.URLError) and (
+        not isinstance(error, urllib.error.HTTPError) or error.code in {403, 429, 500, 502, 503, 504}
+    ):
+        code = "full_provider_unavailable"
+    return code
+
+
 def load(path):
     return json.loads(Path(path).read_text())
 
@@ -1842,21 +1859,7 @@ def execute_leaf(root, service, item, api, repair=False):
                 )
             return {"leaf": item["leaf"], "state": "ready_not_run"}
         except Exception as error:
-            code = getattr(error, "code", "workflow_host_error")
-            if stage == "source_pin" and isinstance(
-                error, (ValueError, urllib.error.HTTPError)
-            ):
-                code = "source_unavailable"
-            if (
-                stage in {"freeze_import_export", "verify_download"}
-                and code not in GLOBAL_CODES
-            ):
-                code = "workflow_host_error"
-            if isinstance(error, urllib.error.URLError) and (
-                not isinstance(error, urllib.error.HTTPError)
-                or error.code in {403, 429, 500, 502, 503, 504}
-            ):
-                code = "full_provider_unavailable"
+            code = leaf_failure_code(error, stage)
             failure = {
                 "leaf": item["leaf"],
                 "stage": stage,
@@ -1932,6 +1935,8 @@ def execute_leaf(root, service, item, api, repair=False):
 
 def progress(root, service):
     state = service.status(PLAN_ID)
+    mode = getattr(service, "dispatch_mode", lambda _: "legacy")(PLAN_ID)
+    state["dispatch_mode"] = mode
     atomic_json(
         root / "PROGRESS.json",
         {k: v for k, v in state.items() if k not in {"items", "calls"}},
@@ -1947,6 +1952,43 @@ def progress(root, service):
         },
     )
     return state
+
+
+def dispatch_lanes(selected_leaves, mode):
+    if mode == "full_first_round":
+        return (False,)
+    if mode == "pilot_complete":
+        return (False, True)
+    return (False,) if selected_leaves else (False, True)
+
+
+def write_round_report(root, state):
+    """A failure is a result, never an implied pass or a request to restart."""
+    report = {
+        "schema": "atlas.auxiliary-round-report.v1",
+        "full_plan_id": PLAN_ID,
+        "mode": state.get("dispatch_mode", "legacy"),
+        "observed_at": time.time(),
+        "status": state["status"],
+        "reason": state.get("reason"),
+        "counts": state.get("counts", {}),
+        "new_calls": state["new_calls"],
+        "historical_baseline": state["baseline"],
+        "active_calls": state.get("active_calls"),
+        "items": [
+            {key: item.get(key) for key in (
+                "leaf", "state", "current_attempt", "failure_stage", "failure_code",
+                "error", "workdir", "artifact_id", "case_id", "case_revision", "repair_pending",
+            )}
+            for item in state["items"]
+        ],
+        "application_runtime": "not_run",
+    }
+    atomic_json(root / "ROUND_REPORT.json", report)
+    if state["status"] != "running":
+        path = root / "round-reports" / (str(time.time_ns()) + ".json")
+        atomic_json(path, report)
+    return report
 
 
 def run(root, api, selected_leaves=None):
@@ -1984,7 +2026,8 @@ def run(root, api, selected_leaves=None):
             ),
         )
         try:
-            for repair in ((False,) if selected_leaves else (False, True)):
+            mode = getattr(service, "dispatch_mode", lambda _: "legacy")(PLAN_ID)
+            for repair in dispatch_lanes(selected_leaves, mode):
                 while service.status(PLAN_ID)["status"] == "running":
                     verify_plan(root)
                     if shutil.disk_usage(root).free < 5 * 1024**3:
@@ -2061,6 +2104,9 @@ def run(root, api, selected_leaves=None):
                 if selected_first_pass_complete(state["items"], selected_leaves):
                     service.control(PLAN_ID, "pause", "selected leaf run complete")
                     state = progress(root, service)
+            if mode == "full_first_round" and state["status"] == "running":
+                service.control(PLAN_ID, "pause", "round one complete; review recorded failures before round two")
+                state = progress(root, service)
             gate = get_workflow_gate(service)
             if state["status"] == "running" and gate and gate["mode"] == "validation":
                 service.control(
@@ -2093,7 +2139,7 @@ def run(root, api, selected_leaves=None):
                 )
             raise
         finally:
-            progress(root, service)
+            write_round_report(root, progress(root, service))
 
 
 def start_daemon(root, api, selected_leaves=None):
@@ -2296,6 +2342,7 @@ def main():
             "workflow-validation",
             "workflow-replay",
             "workflow-open-full",
+            "workflow-round",
         ],
     )
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
@@ -2348,6 +2395,12 @@ def main():
         workflow.set_gate_passed(PLAN_ID, load(args.evidence))
         result = workflow.open_full(PLAN_ID)
         atomic_json(root / "WORKFLOW_FULL_GATE_RECEIPT.json", result)
+    elif args.command == "workflow-round":
+        verify_plan(root)
+        if not args.evidence:
+            raise ValueError("persisted round request with authorization required")
+        result = service.resume_round(load(args.evidence))
+        atomic_json(root / "ROUND_ACTIVATION_RECEIPT.json", result)
     elif args.command == "run":
         return supervised_run(root, args.api, args.leaf)
     elif args.command == "start":

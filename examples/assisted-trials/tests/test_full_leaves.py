@@ -733,6 +733,12 @@ class FullLeafTests(unittest.TestCase):
             )
 
     def test_coordinator_auto_continues_20_20_1_and_isolates_failed_leaf(self):
+        self._assert_coordinator_batches("legacy")
+
+    def test_first_round_completes_every_batch_without_entering_repairs(self):
+        self._assert_coordinator_batches("full_first_round")
+
+    def _assert_coordinator_batches(self, mode):
         import signal
         import time
         from atlas_runtime import atomic_json
@@ -766,6 +772,9 @@ class FullLeafTests(unittest.TestCase):
             def selected_leaves(inner, *args):
                 return []
 
+            def dispatch_mode(inner, *args):
+                return mode
+
             def control(inner, plan, action, reason=None):
                 inner.state = {
                     "resume": "running",
@@ -791,6 +800,8 @@ class FullLeafTests(unittest.TestCase):
                     state="failed" if own["leaf"] == "q-5" else "ready_not_run",
                     first_pass_done=True,
                 )
+                if mode == "full_first_round" and own["leaf"] == "q-6":
+                    own.update(state="needs_revision", repair_pending=True)
                 svc.active -= 1
             return own
 
@@ -817,8 +828,11 @@ class FullLeafTests(unittest.TestCase):
         self.assertEqual(len(set(service.visited)), 41)
         self.assertEqual(len(service.visited), 41)
         self.assertEqual(service.peak, 2)
-        self.assertEqual(service.state, "completed")
+        self.assertEqual(service.state, "paused" if mode == "full_first_round" else "completed")
         self.assertEqual(sum(x["state"] == "failed" for x in service.items), 1)
+        report = json.loads((folder / "ROUND_REPORT.json").read_text())
+        self.assertEqual(len(report["items"]), 41)
+        self.assertTrue(list((folder / "round-reports").glob("*.json")))
 
 
 if __name__ == "__main__":
