@@ -420,7 +420,7 @@ class ReferencePilotInputBindingTests(unittest.TestCase):
                 "outcome": {"path": str(r2_root_rel.parent / "OUTCOME.json"),
                             "sha256": hashlib.sha256((r2_root.parent / "OUTCOME.json").read_bytes()).hexdigest()},
             }
-            r3_request = {**continuation, "revision_id": "r3", "idempotency_key": "continue-r3",
+            r3_request = {**continuation, "revision_id": "r3", "parent_revision": "r2", "idempotency_key": "continue-r3",
                           "generation_path": "docs/template-factory/product-reference-convergence-2026-10-22/bookmark-manager/r3/generation",
                           "parents": r2_parents}
             stale_r2_author = pack / "bookmark-manager/wrong-r2/generation/author/RESULT.json"
@@ -441,8 +441,82 @@ class ReferencePilotInputBindingTests(unittest.TestCase):
             r3_receipt = service.begin_revision("pilot-one", r3_request)
             self.assertEqual(r3_receipt["effective_max_calls"], 12)
             self.assertTrue(service.begin_revision("pilot-one", r3_request)["receipt_only"])
+            # Older durable r3 registrations predate the explicit parent_revision field.
+            with store.connect(True) as con:
+                event = con.execute("SELECT id,body FROM auxiliary_reference_pilot_event WHERE pilot_id='pilot-one' AND kind='revision' ORDER BY id DESC LIMIT 1").fetchone()
+                envelope = json.loads(event["body"])
+                envelope["request"].pop("parent_revision")
+                envelope["request_digest"] = digest(envelope["request"])
+                con.execute("UPDATE auxiliary_reference_pilot_event SET body=? WHERE id=?",
+                            (json.dumps(envelope, sort_keys=True), event["id"]))
             self.assertEqual(service.get_revision("pilot-one", "bookmark-manager", "r3")["request_digest"],
-                             digest(r3_request))
+                             digest({key: value for key, value in r3_request.items() if key != "parent_revision"}))
+            r3_root_rel = Path(r3_request["generation_path"])
+            r3_root = pack / r3_root_rel
+            r3_research = r3_root / "research"
+            r3_research.mkdir(parents=True)
+            for name in ("INPUT.json", "BINDING.json", "RESULT.json", "DELIVERED.json"):
+                (r3_research / name).write_bytes((r2_research / name).read_bytes())
+            r3_author = r3_root / "author"
+            r3_author.mkdir(parents=True)
+            r3_author_result = {"leaf": "bookmark-manager", "summary": "revised r3"}
+            r3_author_input = {"leaf": "bookmark-manager", "stage": "author", "revision": "r3"}
+            (r3_author / "INPUT.json").write_text(json.dumps(r3_author_input))
+            r3_author_binding = {"stage": "author", "payload_digest": digest(r3_author_input)}
+            (r3_author / "BINDING.json").write_text(json.dumps(r3_author_binding))
+            (r3_author / "RESULT.json").write_text(json.dumps(r3_author_result))
+            r3_session = "r3-author-session"
+            (r3_author / "DELIVERED.json").write_text(json.dumps({"binding_digest": digest(r3_author_binding),
+                "result_digest": digest(r3_author_result), "read_events": [{"sessionID": r3_session}]}))
+            (r3_root.parent / "OUTCOME.json").write_text(json.dumps(r2_outcome))
+            with store.connect(True) as con:
+                con.execute("INSERT INTO tf_budget_reservation(id,campaign_id,identity,phase,kind,status,created,job_id,stage,retry) VALUES(?,?,?,?,?,'completed',5,?,?,0)",
+                    ("r3-author-call", campaign, plan_id + ":bookmark-manager", phase, "production",
+                     "pilot-one:bookmark-manager:author:r3", "reference/author/pilot-one/r3"))
+            r3_official = r3_root.parent / "official-checkpoints"
+            for stage, session_id, reservation_id in (("research", "research-session", "research-call"),
+                                                      ("author", r3_session, "r3-author-call")):
+                stage_summary = r3_official / stage / "cli-summary.json"
+                stage_summary.parent.mkdir(parents=True, exist_ok=True)
+                stage_summary.write_text(json.dumps({"session_id": session_id, "exit_code": 0,
+                                                     "reservation_id": reservation_id}))
+            r3_parents = {
+                "research": {"path": str(r3_root_rel / "research/RESULT.json"),
+                              "sha256": hashlib.sha256((r3_research / "RESULT.json").read_bytes()).hexdigest()},
+                "research_receipt": {"path": str(r3_root_rel / "research/DELIVERED.json"),
+                                     "sha256": hashlib.sha256((r3_research / "DELIVERED.json").read_bytes()).hexdigest()},
+                "author": {"path": str(r3_root_rel / "author/RESULT.json"),
+                           "sha256": hashlib.sha256((r3_author / "RESULT.json").read_bytes()).hexdigest()},
+                "author_receipt": {"path": str(r3_root_rel / "author/DELIVERED.json"),
+                                   "sha256": hashlib.sha256((r3_author / "DELIVERED.json").read_bytes()).hexdigest()},
+                "outcome": {"path": str(r3_root_rel.parent / "OUTCOME.json"),
+                            "sha256": hashlib.sha256((r3_root.parent / "OUTCOME.json").read_bytes()).hexdigest()},
+            }
+            r4_request = {**r3_request, "revision_id": "r4", "parent_revision": "r3",
+                          "idempotency_key": "continue-r4",
+                          "generation_path": "docs/template-factory/product-reference-convergence-2026-10-22/bookmark-manager/r4/generation",
+                          "parents": r3_parents}
+            with store.connect(True) as con:
+                con.execute("INSERT INTO tf_budget_reservation(id,campaign_id,identity,phase,kind,status,created,job_id,stage,retry) VALUES(?,?,?,?,?,'completed',6,?,?,0)",
+                    ("exhaust-last-slot", campaign, plan_id + ":bookmark-manager", phase, "production",
+                     "last-existing-call", "reference/author/pilot-one/extra"))
+            with self.assertRaises(FactoryError):
+                service.begin_revision("pilot-one", r4_request)
+            with store.connect(True) as con:
+                con.execute("DELETE FROM tf_budget_reservation WHERE id='exhaust-last-slot'")
+            skipped_r3 = {**r4_request, "parent_revision": "r2", "idempotency_key": "skip-r3"}
+            with self.assertRaises(FactoryError):
+                service.begin_revision("pilot-one", skipped_r3)
+            r4_receipt = service.begin_revision("pilot-one", r4_request)
+            self.assertEqual(r4_receipt["effective_max_calls"], 12)
+            self.assertEqual(service.get_revision("pilot-one", "bookmark-manager", "r4")["request_digest"],
+                             digest(r4_request))
+            with store.connect() as con:
+                self.assertEqual(con.execute("SELECT max_calls FROM auxiliary_reference_pilot WHERE id='pilot-one'").fetchone()[0], 6)
+                full = con.execute("SELECT status,max_calls,deadline FROM auxiliary_full_plan WHERE id=?", (plan_id,)).fetchone()
+                self.assertEqual(tuple(full), ("paused", 7200, 1795181744.123177))
+                self.assertEqual(con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND phase=? AND status!='not_started'",
+                                             (campaign, phase)).fetchone()[0], 4)
             with store.connect(True) as con:
                 pilot = con.execute("SELECT * FROM auxiliary_reference_pilot WHERE id='pilot-one'").fetchone()
                 plan = con.execute("SELECT * FROM auxiliary_full_plan WHERE id=?", (plan_id,)).fetchone()

@@ -20,7 +20,8 @@ BASIS_KINDS = {"requirement", "upstream_observation", "design_inference", "unkno
 ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 
 
-def diagnose_reference(spec: Any, *, source_ids: set[str] | None = None) -> list[str]:
+def diagnose_reference(spec: Any, *, source_ids: set[str] | None = None,
+                       observed_source_ids: set[str] | None = None) -> list[str]:
     """Return stable, aggregated contract and graph diagnostics without repairing input.
 
     The strict validator remains authoritative. This helper gathers independent
@@ -156,6 +157,17 @@ def diagnose_reference(spec: Any, *, source_ids: set[str] | None = None) -> list
         rid = rule.get("id")
         if not any(isinstance(row.get("rule_ids"), list) and rid in row["rule_ids"] for row in assertions):
             issues.add(f"rules.{rid}: every rule must be referenced by an assertion")
+    if source_ids is not None:
+        for row in spec.get("basis", []) if isinstance(spec.get("basis"), list) else []:
+            if not isinstance(row, dict) or not isinstance(row.get("source_ids"), list):
+                continue
+            unknown = sorted(x for x in row["source_ids"] if isinstance(x, str) and x not in source_ids)
+            if unknown:
+                issues.add(f"basis.{row.get('id', '?')}.source_ids: untrusted source IDs: {', '.join(unknown)}")
+            if (row.get("kind") == "upstream_observation" and observed_source_ids is not None):
+                unobserved = sorted(x for x in row["source_ids"] if isinstance(x, str) and x in source_ids and x not in observed_source_ids)
+                if unobserved:
+                    issues.add(f"basis.{row.get('id', '?')}.source_ids: no host-pinned observation for source IDs: {', '.join(unobserved)}")
     journeys_by_id = {row.get("id"): row for row in spec.get("journeys", []) if isinstance(row, dict) and isinstance(row.get("id"), str)}
     scopes_by_id = {row.get("id"): row for row in spec.get("scope_options", []) if isinstance(row, dict) and isinstance(row.get("id"), str)}
     for scope_id, scope in scopes_by_id.items():
@@ -196,19 +208,29 @@ def diagnose_reference(spec: Any, *, source_ids: set[str] | None = None) -> list
                     and isinstance(assertion.get("journey_ids"), list)
                     and set(x for x in assertion["action_ids"] if isinstance(x, str)) <= action_ids
                     and set(x for x in assertion["journey_ids"] if isinstance(x, str)) <= journey_ids]
-        for aid in sorted(action_ids):
-            if not any(aid in assertion["action_ids"] for assertion in eligible):
-                issues.add(f"scope_options.{scope_id}: selected action {aid} lacks an independent assertion")
         selected_rules = {rid for aid in action_ids
                           for rid in (actions_by_id[aid].get("rule_ids", []) if isinstance(actions_by_id[aid].get("rule_ids"), list) else [])
                           if isinstance(rid, str)}
-        for rid in sorted(selected_rules):
-            if not any(rid in assertion.get("rule_ids", []) for assertion in eligible
-                       if isinstance(assertion.get("rule_ids"), list)):
-                issues.add(f"scope_options.{scope_id}: selected rule {rid} lacks an independent assertion")
-        for jid in sorted(journey_ids):
-            if not any(jid in assertion["journey_ids"] for assertion in eligible):
-                issues.add(f"scope_options.{scope_id}: selected journey {jid} lacks an independent assertion")
+        selected_rule_ids = selected_rules | {rid for assertion in eligible
+            for rid in (assertion.get("rule_ids", []) if isinstance(assertion.get("rule_ids"), list) else [])
+            if isinstance(rid, str)}
+        missing_actions = sorted(aid for aid in action_ids
+                                if not any(aid in assertion["action_ids"] for assertion in eligible))
+        missing_rules = sorted(rid for rid in selected_rule_ids
+                               if not any(rid in assertion.get("rule_ids", []) for assertion in eligible
+                                          if isinstance(assertion.get("rule_ids"), list)))
+        missing_journeys = sorted(jid for jid in journey_ids
+                                  if not any(jid in assertion["journey_ids"] for assertion in eligible))
+        if missing_actions or missing_rules or missing_journeys:
+            qualifying = sorted(assertion.get("id", "?") for assertion in eligible if isinstance(assertion.get("id"), str))
+            issues.add("scope_options." + scope_id + ": slice coverage "
+                       + "selected_action_ids=" + json.dumps(sorted(action_ids), separators=(",", ":"))
+                       + " selected_journey_ids=" + json.dumps(sorted(journey_ids), separators=(",", ":"))
+                       + " selected_rule_ids=" + json.dumps(sorted(selected_rule_ids), separators=(",", ":"))
+                       + " qualifying_assertion_ids=" + json.dumps(qualifying, separators=(",", ":"))
+                       + " missing_action_assertions=" + json.dumps(missing_actions, separators=(",", ":"))
+                       + " missing_rule_assertions=" + json.dumps(missing_rules, separators=(",", ":"))
+                       + " missing_journey_assertions=" + json.dumps(missing_journeys, separators=(",", ":")))
     # The strict pass adds deterministic graph and nested contract diagnostics.
     strict_ok = True
     try:

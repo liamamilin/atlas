@@ -226,7 +226,8 @@ class ReferenceCatalog:
                 files = {info.filename: archive.read(info) for info in infos}
         except (zipfile.BadZipFile, OSError, RuntimeError) as error:
             raise FactoryError("reference package is not a readable ZIP", "reference_package_invalid", 400) from error
-        if "manifest.json" not in files or "reference.json" not in files or "review.json" not in files or "review-result.json" not in files or "research.json" not in files:
+        if ("manifest.json" not in files or "reference.json" not in files or "review.json" not in files
+                or "review-result.json" not in files or "research.json" not in files or "revision.json" not in files):
             raise FactoryError("reference package is missing required files", "reference_package_invalid", 400)
         manifest = _read_json_bytes(files["manifest.json"], "manifest.json")
         profile = _profile_module(self.store.pack)
@@ -258,12 +259,15 @@ class ReferenceCatalog:
                          "research/DELIVERED.json", "research/BINDING.json"):
             _require_file(generation, relative, relative)
         inputs = _read_json_bytes(inputs_path.read_bytes(), "author/INPUT.json")
+        author_revision = inputs.get("revision")
+        revision_record = _read_json_bytes(files["revision.json"], "revision.json")
         author_raw = _read_json_bytes(author_result_path.read_bytes(), "author/RESULT.json")
         author_delivery = _read_json_bytes(author_delivery_path.read_bytes(), "author/DELIVERED.json")
         author_binding = _read_json_bytes((generation / "author/BINDING.json").read_bytes(), "author/BINDING.json")
         review_raw = _read_json_bytes(review_result_path.read_bytes(), "review/RESULT.json")
         review_delivery = _read_json_bytes(review_delivery_path.read_bytes(), "review/DELIVERED.json")
         review_input = _read_json_bytes(review_input_path.read_bytes(), "REVIEW_INPUT.json")
+        review_revision = review_input.get("revision")
         review_stage_input = _read_json_bytes(review_stage_input_path.read_bytes(), "review/INPUT.json")
         review_binding = _read_json_bytes((generation / "review/BINDING.json").read_bytes(), "review/BINDING.json")
         read_views = _read_json_bytes(read_views_path.read_bytes(), "READ_VIEWS.json")
@@ -281,12 +285,30 @@ class ReferenceCatalog:
         registered_inputs = _read_json_bytes(input_path.read_bytes(), "registered inputs")
         if inputs.get("inputs") != registered_inputs or manifest.get("input_sha256") != digest(registered_inputs):
             raise FactoryError("author and package inputs differ from registered pilot inputs", "reference_pilot_binding", 409)
-        if (author_raw.get("reference") != spec
+        try:
+            resolved_author_reference = profile.resolve_authored_reference(author_raw, inputs)
+        except (AttributeError, KeyError, TypeError, ValueError) as error:
+            raise FactoryError("delivered author result cannot be resolved against its bound revision input", "reference_import_provenance", 409) from error
+        if (resolved_author_reference != spec
                 or digest(author_raw) != author_delivery.get("result_digest")
                 or author_binding.get("stage") != "author"
                 or author_binding.get("payload_digest") != digest(inputs)
                 or author_delivery.get("binding_digest") != digest(author_binding)):
             raise FactoryError("ZIP reference does not match the delivered author result", "reference_import_provenance", 409)
+        if (not isinstance(author_revision, dict)
+                or set(author_revision) != {"revision_id", "parent_author_result", "parent_reference",
+                                            "parent_reference_digest", "parent_author_sha256", "diagnostics", "lineage"}
+                or not isinstance(review_revision, dict)
+                or revision_record != review_revision
+                or revision_record != {"parent_reference": author_revision.get("parent_reference"),
+                                       "author_result": author_raw,
+                                       "diagnostics": author_revision.get("diagnostics"),
+                                       "lineage": author_revision.get("lineage")}
+                or manifest.get("revision_lineage") != author_revision.get("lineage")
+                or author_revision.get("parent_reference_digest") != digest(author_revision.get("parent_reference"))
+                or author_revision.get("revision_id") != revision_request.get("revision_id")
+                or author_revision.get("parent_author_sha256") != revision_request.get("parents", {}).get("author", {}).get("sha256")):
+            raise FactoryError("bundled revision record differs from the bound author and review inputs", "reference_import_provenance", 409)
         identity = digest(review_input)
         if (review_stage_input.get("input_digest") != identity
                 or review_stage_input.get("review_input") != review_input

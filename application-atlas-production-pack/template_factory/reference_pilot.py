@@ -154,7 +154,8 @@ class ReferencePilotService:
             request = matches[0]["request"]
             prior = self._prior_revision(con, pilot, leaf, revision_id)
             self._verify_revision_parents(request, leaf, con=con, pilot=pilot,
-                                          original_request=json.loads(pilot["request_json"]), prior=prior)
+                                          original_request=json.loads(pilot["request_json"]), prior=prior,
+                                          historical=True)
             calls = [dict(row) for row in con.execute(
                 "SELECT identity,stage,status,job_id,created,started,finished FROM tf_budget_reservation WHERE campaign_id=? AND phase=? AND identity=? AND stage IN (?,?) ORDER BY created",
                 (self.campaign_id, pilot["phase"], pilot["plan_id"] + ":" + leaf,
@@ -311,30 +312,34 @@ class ReferencePilotService:
             leaf_revisions = [json.loads(e[0])["request"] for e in prior_events if json.loads(e[0])["request"].get("leaf") == leaf]
             if any(x.get("revision_id") == body["revision_id"] for x in leaf_revisions):
                 raise FactoryError("revision identity already used for this leaf", "reference_pilot_binding", 409)
-            if (body.get("revision_id") != "r2" and (body.get("revision_id") != "r3" or not leaf_revisions)
-                    or body.get("revision_id") == "r3" and leaf_revisions[-1].get("revision_id") != "r2"):
-                raise FactoryError("revision must continue the registered r2/r3 chain", "reference_pilot_binding", 409)
+            expected_revision = "r2" if not leaf_revisions else {
+                "r2": "r3", "r3": "r4"}.get(leaf_revisions[-1].get("revision_id"))
+            expected_parent = None if not leaf_revisions else leaf_revisions[-1].get("revision_id")
+            if (body.get("revision_id") != expected_revision
+                    or body.get("parent_revision") != expected_parent):
+                raise FactoryError("revision must continue the registered parent revision in order", "reference_pilot_binding", 409)
             prior = leaf_revisions[-1] if leaf_revisions else None
             parent_values = self._verify_revision_parents(body, leaf, con=con, pilot=pilot,
                                                           original_request=request, prior=prior)
-            if body.get("revision_id") == "r3":
-                previous_id = "reference/author/" + pilot_id + "/r2"
-                previous_review = "reference/review/" + pilot_id + "/r2"
+            if expected_parent:
+                previous_id = "reference/author/" + pilot_id + "/" + expected_parent
+                previous_review = "reference/review/" + pilot_id + "/" + expected_parent
                 author_done = any(c["identity"] == pilot["plan_id"] + ":" + leaf and c["stage"] == previous_id and c["status"] == "completed" for c in selected_calls)
                 review_rows = [c for c in selected_calls if c["identity"] == pilot["plan_id"] + ":" + leaf and c["stage"] == previous_review]
                 if not author_done:
-                    raise FactoryError("r3 requires a terminal r2 author", "reference_pilot_paused", 409)
+                    raise FactoryError("revision requires a terminal parent author", "reference_pilot_paused", 409)
                 if parent_values["outcome"].get("status") == "needs_changes":
                     if not any(c["status"] == "completed" for c in review_rows):
-                        raise FactoryError("needs_changes r2 requires a terminal independent review", "reference_pilot_paused", 409)
+                        raise FactoryError("needs_changes parent requires a terminal independent review", "reference_pilot_paused", 409)
                 elif review_rows:
-                    raise FactoryError("failed r2 must not create an unnecessary review call", "reference_pilot_paused", 409)
+                    raise FactoryError("failed parent must not create an unnecessary review call", "reference_pilot_paused", 409)
             registered_calls = con.execute("SELECT identity,stage FROM tf_budget_reservation WHERE campaign_id=? AND phase=? AND status!='not_started'",
                                            (self.campaign_id, pilot["phase"])).fetchall()
             pilot_calls = [c for c in registered_calls if c["identity"] in {pilot["plan_id"] + ':' + x['leaf'] for x in request['leaves']}]
             own_calls = [c for c in pilot_calls if c["identity"] == pilot["plan_id"] + ":" + leaf]
-            if len(pilot_calls) >= 12 or len(own_calls) >= 6:
-                raise FactoryError("continuation allowance exhausted", "budget_exhausted", 409)
+            if (len(pilot_calls) > 10 or len(own_calls) > 4
+                    or len(calls) > plan["max_calls"] - 2):
+                raise FactoryError("two author/review calls must remain inside continuation allowances", "budget_exhausted", 409)
             event = {"request": body, "request_digest": digest(body), "effective_max_calls": 12,
                      "prior_request_digest": pilot["request_digest"],
                      "research_calls": [{"identity": c["identity"], "stage": c["stage"], "status": c["status"]} for c in mine]}
@@ -348,28 +353,29 @@ class ReferencePilotService:
                     "idempotent": False, "receipt_only": False}
 
     def _prior_revision(self, con, pilot, leaf, revision_id):
-        if revision_id != "r3":
+        previous_revision = {"r3": "r2", "r4": "r3"}.get(revision_id)
+        if previous_revision is None:
             return None
         rows = con.execute("SELECT body FROM auxiliary_reference_pilot_event WHERE pilot_id=? AND kind='revision' ORDER BY id",
                            (pilot["id"],)).fetchall()
         found = [json.loads(row[0]).get("request", {}) for row in rows
                  if json.loads(row[0]).get("request", {}).get("leaf") == leaf
-                 and json.loads(row[0]).get("request", {}).get("revision_id") == "r2"]
+                 and json.loads(row[0]).get("request", {}).get("revision_id") == previous_revision]
         if len(found) != 1:
-            raise FactoryError("r3 requires one registered r2 checkpoint", "reference_pilot_integrity", 409)
+            raise FactoryError(f"{revision_id} requires one registered {previous_revision} checkpoint", "reference_pilot_integrity", 409)
         return found[0]
 
     def _verify_revision_parents(self, body, leaf, *, con=None, pilot=None,
-                                 original_request=None, prior=None):
+                                 original_request=None, prior=None, historical=False):
         parents = body.get("parents")
         required = {"research": "research/RESULT.json",
                     "research_receipt": "research/DELIVERED.json",
                     "author": "author/RESULT.json",
                     "author_receipt": "author/DELIVERED.json"}
-        if body.get("revision_id") in {"r2", "r3"}:
+        if body.get("revision_id") in {"r2", "r3", "r4"}:
             required["outcome"] = "OUTCOME.json"
         allowed_parent_sets = {frozenset(required)}
-        if body.get("revision_id") == "r3":
+        if body.get("revision_id") in {"r3", "r4"}:
             allowed_parent_sets.add(frozenset(set(required) | {"review", "review_receipt"}))
         if not isinstance(parents, dict) or frozenset(parents) not in allowed_parent_sets:
             raise FactoryError("revision parents do not match the prior generation checkpoints", "reference_pilot_integrity", 409)
@@ -426,14 +432,15 @@ class ReferencePilotService:
                         or len(records) != 1 or not records[0]["job_id"]):
                     raise FactoryError("original stage binding, delivery, session, or call-ledger lineage differs", "reference_pilot_integrity", 409)
         else:
-            if not prior or Path(prior.get("generation_path", "")) != generation_root:
-                raise FactoryError("r3 parents do not match the registered r2 generation path", "reference_pilot_integrity", 409)
+            if (not prior or prior.get("revision_id") != body.get("parent_revision", prior.get("revision_id") if historical else None)
+                    or Path(prior.get("generation_path", "")) != generation_root):
+                raise FactoryError("revision parents do not match the registered parent generation path", "reference_pilot_integrity", 409)
             for name, suffix in (("author", "author/RESULT.json"),
                                  ("author_receipt", "author/DELIVERED.json")):
                 if paths[name] != generation_root / suffix:
-                    raise FactoryError("r3 author parent is not the registered r2 author result", "reference_pilot_integrity", 409)
+                    raise FactoryError("revision author parent is not the registered parent author result", "reference_pilot_integrity", 409)
             if con is None or pilot is None:
-                raise FactoryError("r3 ledger context is unavailable", "reference_pilot_integrity", 409)
+                raise FactoryError("revision ledger context is unavailable", "reference_pilot_integrity", 409)
             research_session = self._verify_revision_stage_files(generation_root, "research", leaf, pilot, con)
             self._verify_revision_stage_files(generation_root, "author", leaf, pilot, con)
             if "review" in parents:
@@ -443,7 +450,7 @@ class ReferencePilotService:
             old_result, old_receipt = json.loads(prior_research.read_text()), json.loads(prior_receipt.read_text())
             old_session_ids = {row.get("sessionID") for row in old_receipt.get("read_events", []) if row.get("sessionID")}
             if digest(old_result) != values["research_receipt"].get("result_digest") or old_session_ids != {research_session}:
-                raise FactoryError("r3 research differs from the registered r2 research session/result", "reference_pilot_integrity", 409)
+                raise FactoryError("revision research differs from its registered parent research session/result", "reference_pilot_integrity", 409)
         expected_output = Path("docs/template-factory/product-reference-convergence-2026-10-22") / leaf / body.get("revision_id", "") / "generation"
         if Path(body.get("generation_path", "")) != expected_output:
             raise FactoryError("revision output path is outside its fixed leaf/revision generation root", "reference_pilot_integrity", 409)
@@ -456,12 +463,12 @@ class ReferencePilotService:
                 raise FactoryError("r2 must preserve the original terminal author failure", "reference_pilot_integrity", 409)
         elif (values["outcome"].get("status") == "failed"
               and values["outcome"].get("completed_stages") not in (["author"], ["research", "author"])):
-            raise FactoryError("failed r2 parent must terminate after its author stage", "reference_pilot_integrity", 409)
+            raise FactoryError("failed parent must terminate after its author stage", "reference_pilot_integrity", 409)
         elif (values["outcome"].get("status") == "needs_changes"
               and values["outcome"].get("completed_stages") not in (None, ["author", "review"], ["research", "author", "review"])):
-            raise FactoryError("needs_changes r2 parent must include its independent review stage", "reference_pilot_integrity", 409)
+            raise FactoryError("needs_changes parent must include its independent review stage", "reference_pilot_integrity", 409)
         elif values["outcome"].get("status") not in {"failed", "needs_changes"}:
-            raise FactoryError("r3 parent must preserve a terminal failed or needs_changes outcome", "reference_pilot_integrity", 409)
+            raise FactoryError("revision parent must preserve a terminal failed or needs_changes outcome", "reference_pilot_integrity", 409)
         optional = set(parents) - set(required)
         for key in optional:
             suffix = "review/RESULT.json" if key == "review" else "review/DELIVERED.json"
@@ -470,7 +477,7 @@ class ReferencePilotService:
             expected_path = generation_root / suffix
             if not str(ref["path"]).endswith(suffix) or Path(ref["path"]) != expected_path:
                 raise FactoryError("revision review parent path is outside its prior-stage lineage", "reference_pilot_integrity", 409)
-        if body.get("revision_id") == "r3":
+        if body.get("revision_id") in {"r3", "r4"}:
             has_review = "review" in parents and "review_receipt" in parents
             outcome = values["outcome"]
             if outcome.get("status") == "needs_changes" and not has_review:

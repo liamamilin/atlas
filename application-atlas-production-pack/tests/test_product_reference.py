@@ -117,8 +117,9 @@ class ProductReferenceTests(unittest.TestCase):
         spec["assertions"][0]["action_ids"] = []
         issues = diagnose_reference(spec)
         self.assertTrue(any("unsupported surface kind" in issue for issue in issues))
-        self.assertTrue(any("selected action save lacks an independent assertion" in issue for issue in issues))
-        self.assertTrue(any("selected rule valid-url lacks an independent assertion" in issue for issue in issues))
+        self.assertTrue(any('selected_action_ids=["save"]' in issue for issue in issues))
+        self.assertTrue(any('selected_rule_ids=["valid-url"]' in issue for issue in issues))
+        self.assertTrue(any('missing_action_assertions=["save"]' in issue for issue in issues))
 
     def test_fixture_validates_and_renders_deterministically(self):
         spec = make_reference()

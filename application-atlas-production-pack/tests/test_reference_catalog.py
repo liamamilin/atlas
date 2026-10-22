@@ -7,6 +7,7 @@ import sqlite3
 import sys
 import tempfile
 import unittest
+import zipfile
 from unittest.mock import patch
 
 from template_factory.api import dispatch
@@ -109,6 +110,9 @@ class ReferenceCatalogTests(unittest.TestCase):
                     result = {"findings": ["The source describes notes"],
                               "observed_upstream": copy.deepcopy(observations), "gaps": ["Runtime not checked"]}
                 elif stage == "author":
+                    if isinstance(payload.get("revision"), dict):
+                        return {"result": {"patch": [{"op": "replace", "path": "/surfaces/0/kind", "value": "cli"}]},
+                                "session_id": sessions[stage]}
                     result = {"reference": copy.deepcopy(result_spec)}
                 else:
                     result = {"input_digest": payload["input_digest"], "own_questions": ["Can the owner recover after a failed write?"],
@@ -202,6 +206,41 @@ class ReferenceCatalogTests(unittest.TestCase):
         self.assertEqual(verified_spec, spec)
         self.assertIn("PRODUCT_REFERENCE.md", rendered)
         self.assertEqual(case_refs, inputs["case_refs"])
+
+        with zipfile.ZipFile(archive) as original:
+            archive_files = {item.filename: original.read(item.filename) for item in original.infolist()}
+        revision_record = json.loads(archive_files["revision.json"])
+        revision_record["diagnostics"].append("unbound alteration")
+        altered_record = canonical(revision_record).encode() + b"\n"
+        archive_files["revision.json"] = altered_record
+        changed_manifest = json.loads(archive_files["manifest.json"])
+        changed_manifest["file_sha256"]["revision.json"] = hashlib.sha256(altered_record).hexdigest()
+        archive_files["manifest.json"] = canonical(changed_manifest).encode() + b"\n"
+        altered_archive = self.root / "altered-revision.zip"
+        with zipfile.ZipFile(altered_archive, "w", compression=zipfile.ZIP_DEFLATED) as changed:
+            for name, content in archive_files.items():
+                changed.writestr(name, content)
+        altered_args = (altered_archive, hashlib.sha256(altered_archive.read_bytes()).hexdigest(),
+                        revision_generation, pilot, revision_request, binding)
+        with patch("template_factory.reference_catalog._profile_module", return_value=profile):
+            with self.assertRaises(FactoryError) as caught:
+                self.catalog._verify_archive(*altered_args)
+        self.assertEqual(caught.exception.code, "reference_import_provenance")
+
+        del archive_files["revision.json"]
+        missing_manifest = json.loads(archive_files["manifest.json"])
+        missing_manifest["file_sha256"].pop("revision.json")
+        archive_files["manifest.json"] = canonical(missing_manifest).encode() + b"\n"
+        missing_archive = self.root / "missing-revision.zip"
+        with zipfile.ZipFile(missing_archive, "w", compression=zipfile.ZIP_DEFLATED) as changed:
+            for name, content in archive_files.items():
+                changed.writestr(name, content)
+        missing_args = (missing_archive, hashlib.sha256(missing_archive.read_bytes()).hexdigest(),
+                        revision_generation, pilot, revision_request, binding)
+        with patch("template_factory.reference_catalog._profile_module", return_value=profile):
+            with self.assertRaises(FactoryError) as caught:
+                self.catalog._verify_archive(*missing_args)
+        self.assertEqual(caught.exception.code, "reference_package_invalid")
 
 
 if __name__ == "__main__":

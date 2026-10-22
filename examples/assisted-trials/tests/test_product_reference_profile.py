@@ -120,7 +120,8 @@ class ProductReferencePipelineTests(unittest.TestCase):
             if stage == "author":
                 self.assertEqual(payload["revision"]["parent_reference"], broken)
                 self.assertTrue(any("unsupported surface kind" in x for x in payload["revision"]["diagnostics"]))
-                result = {"reference": copy.deepcopy(revised)}
+                result = {"patch": [{"op": "replace", "path": "/surfaces/0/kind",
+                                      "value": revised["surfaces"][0]["kind"]}]}
             else:
                 result = {"input_digest": payload["input_digest"], "own_questions": ["Can the owner recover after storage failure?"],
                           "checks": {x: True for x in profile.CHECKS},
@@ -137,6 +138,7 @@ class ProductReferencePipelineTests(unittest.TestCase):
         result = profile.revise(self.revision_output, self.inputs, self.snapshot, parent,
                                 "author/RESULT.json", parent_sha, "r2", revision_callback)
         self.assertEqual(result["status"], "static_review_passed")
+        self.assertEqual(result["reference"], revised)
         self.assertEqual(revision_calls, ["author", "review"])
         self.assertEqual(parent_calls, ["research", "author"])
         with zipfile.ZipFile(result["reference_zip"]) as archive:
@@ -225,6 +227,60 @@ class ProductReferencePipelineTests(unittest.TestCase):
                          {"loading", "empty", "no_results", "error", "forbidden"})
         self.assertEqual(set(surface["kind"]["enum"]),
                          {"web", "desktop", "cli", "api", "library", "other"})
+        allowed = profile._allowed_source_ids(self.inputs)
+        basis_sources = profile._contract_schema_for(self.inputs)["properties"]["basis"]["items"]["properties"]["source_ids"]["items"]["enum"]
+        self.assertEqual(basis_sources, allowed)
+        spec = fixture_reference()
+        spec["basis"][0]["source_ids"] = ["obs-01", "dc-01", "gap-01"]
+        with self.assertRaisesRegex(ValueError, "untrusted source IDs: dc-01, gap-01, obs-01"):
+            profile.validate_reference(spec, source_ids=set(allowed))
+        issues = profile.diagnose_reference(spec, source_ids=set(allowed),
+                                             observed_source_ids={"up-docs"})
+        self.assertTrue(any("dc-01, gap-01, obs-01" in issue for issue in issues))
+
+    def test_author_receives_host_owned_observation_ids(self):
+        out = self.root / "host-observations"
+        callback, _ = self.callback()
+        seen = {}
+
+        def inspect_author(stage, payload, prompt, source):
+            if stage == "author":
+                seen.update(payload)
+            return callback(stage, payload, prompt, source)
+
+        self.run_pipeline(out, inspect_author)
+        self.assertEqual(seen["allowed_source_ids"], ["req-leaf", "up-docs"])
+        self.assertEqual(seen["observation_evidence"][0]["source_id"], "up-docs")
+        self.assertEqual(seen["contract_schema"]["properties"]["basis"]["items"]["properties"]["source_ids"]["items"]["enum"],
+                         ["req-leaf", "up-docs"])
+
+    def test_revision_patch_is_minimal_immutable_and_rejects_root_escape(self):
+        parent = fixture_reference()
+        payload = {"revision": {"parent_reference": parent}}
+        patch = {"patch": [{"op": "replace", "path": "/product_shape/value",
+                            "value": "Keep and find a note collection"}]}
+        resolved = profile.resolve_authored_reference(patch, payload)
+        self.assertEqual(resolved["product_shape"]["value"], "Keep and find a note collection")
+        self.assertEqual(parent, fixture_reference())
+        self.assertEqual(resolved["actions"], parent["actions"])
+        for bad in (
+            {"patch": [{"op": "replace", "path": "/", "value": {}}]},
+            {"patch": [{"op": "replace", "path": "/schema", "value": "other"}]},
+            {"patch": [{"op": "replace", "path": "/status", "value": "passed"}]},
+            {"patch": [{"op": "replace", "path": "/product_shape/missing", "value": "x"}]},
+            {"patch": [{"op": "replace", "path": "/product_shape~2value", "value": "x"}]},
+        ):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                profile.resolve_authored_reference(bad, payload)
+
+    def test_authored_patch_parent_resolves_from_checkpoint_input(self):
+        old = fixture_reference()
+        old["product_shape"]["value"] = "parent value"
+        author_input = {"revision": {"parent_reference": fixture_reference()}}
+        author_result = {"patch": [{"op": "replace", "path": "/product_shape/value",
+                                     "value": "parent value"}]}
+        resolved = profile.resolve_authored_reference(author_result, author_input)
+        self.assertEqual(resolved, old)
 
     def test_pass_export_and_zero_callback_replay(self):
         out = self.root / "output"

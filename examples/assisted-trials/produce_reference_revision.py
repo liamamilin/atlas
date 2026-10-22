@@ -29,7 +29,7 @@ def ref(path):
     return {"path": str(path.relative_to(ROOT)), "sha256": sha(path)}
 
 
-def prepare(leaf, revision="r2", parent_revision=None):
+def prepare(leaf, revision="r2", parent_revision=None, host_revision_file=None):
     """Freeze the request; does not authorize or start a model call."""
     if leaf not in LEAVES:
         raise ValueError("only the two original samples are permitted")
@@ -38,17 +38,20 @@ def prepare(leaf, revision="r2", parent_revision=None):
     old = PARENT / leaf
     parent = DIRECTORY / leaf / parent_revision if parent_revision else old
     generation = parent / "generation"
+    host_revision_file = Path(host_revision_file) if host_revision_file else DIRECTORY / "HOST_REVISION.json"
+    latest_host = read(host_revision_file)
     request = {"schema": "atlas.reference-pilot-revision.v1", "pilot_id": PILOT,
                "plan_id": PLAN_ID, "leaf": leaf, "revision_id": revision,
                "idempotency_key": f"{PILOT}:{leaf}:{revision}",
                "generation_path": str((folder / "generation").relative_to(ROOT)),
+               **({"parent_revision": parent_revision} if parent_revision else {}),
                "original_request_digest": read(PARENT / "REGISTER_RECEIPT.json")["request_digest"],
                "inputs_digest": ReferencePilotService._inputs_digest(read(PARENT / "REGISTER_REQUEST.json")),
                "latest_user_request": ref(DIRECTORY / "USER_REQUEST.txt"),
                "profile_version": profile.VERSION, "prompt_digest": profile.PROMPT_DIGEST,
                "production_source_sha256": sha(ROOT / "examples/assisted-trials/product_reference_profile.py"),
-               "source_ci": {"code_sha": read(DIRECTORY / "HOST_REVISION.json")["code_sha"],
-                             "host_revision_digest": digest(read(DIRECTORY / "HOST_REVISION.json"))},
+               "source_ci": {"code_sha": latest_host["code_sha"],
+                             "host_revision_digest": digest(latest_host)},
                "parents": {"research": ref(generation / "research/RESULT.json"),
                            "research_receipt": ref(generation / "research/DELIVERED.json"),
                            "author": ref(generation / "author/RESULT.json"),
@@ -141,6 +144,7 @@ def main():
     parser.add_argument("--leaf", choices=LEAVES)
     parser.add_argument("--revision", default="r2")
     parser.add_argument("--parent-revision")
+    parser.add_argument("--host-revision", help="Exact saved host revision request; used only during prepare")
     args = parser.parse_args()
     if args.action == "status":
         store, full = host()
@@ -148,7 +152,7 @@ def main():
     elif not args.leaf:
         parser.error("--leaf is required")
     elif args.action == "prepare":
-        result = prepare(args.leaf, args.revision, args.parent_revision)
+        result = prepare(args.leaf, args.revision, args.parent_revision, args.host_revision)
     else:
         result = run(args.leaf, args.revision)
     print(json.dumps(result, ensure_ascii=False, indent=2))

@@ -155,7 +155,21 @@ observations and trusted evidence IDs in input.json. Cite those IDs from basis
 entries; do not reproduce observed_upstream. Output exactly
 {"reference": <ProductReference>} (the legacy {"reference": ..., "observations": [...]}
 shape is also accepted, but observations are checked against and replaced by the
-host's canonical researched set)."""
+host's canonical researched set). In a revision, prefer a minimal JSON Pointer
+patch response `{"patch":[{"op":"replace","path":"/...","value":...}]}`
+against the complete parent_reference; only add, replace, and remove are allowed.
+Do not rewrite untouched product graph fields. A complete `{"reference":...}`
+response remains accepted for compatibility. `allowed_source_ids` is the complete allowed
+vocabulary for basis.source_ids. Research finding labels, observation labels,
+design labels, and gap labels are data labels, not evidence IDs; never copy them
+into basis.source_ids. For upstream_observation basis, cite the exact source ID
+from observation_evidence; for design_inference use basis.depends_on to connect
+to known evidence, not a design label in source_ids. Review every scope option
+independently: compute its journey and action dependency closure, then verify
+each selected action, rule, and journey has a qualifying assertion. An assertion
+may have journey_ids=[] when it independently tests an action, but it must
+actually test selected action IDs. Preserve required rules and selected scope;
+add the missing assertion instead of deleting a rule or shrinking the scope."""
 
 REVIEW = """You are an independent reviewer in a new session. First construct your own
 questions from the product boundary, roles and user goals, then review the complete
@@ -175,6 +189,13 @@ booleans, observations:[{index,accepted:boolean,reason}], verdict: pass|needs_ch
 issues: concrete list}. Cover each observation index exactly once. Pass requires
 all questions and observations answered, all seven checks true, and no issues.
 needs_changes is a valid review result, not a protocol error. Do not claim application execution."""
+
+REVIEW += """
+When input.json includes revision context, inspect the parent reference, exact
+authored patch or legacy full response, diagnostics, and lineage alongside the
+complete final candidate. Confirm each finding is fixed and untouched confirmed
+capabilities and source bindings remain. A structurally valid final candidate
+alone is insufficient to pass a revision review."""
 
 PROMPT_DIGEST = digest({"version": VERSION, "research": RESEARCH,
                         "author": AUTHOR, "review": REVIEW,
@@ -215,6 +236,111 @@ def _atomic_bytes(path, data):
 
 def _json(path):
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _allowed_source_ids(inputs):
+    trusted = inputs["trusted_source_ids"]
+    requirements = trusted.get("requirements", [])
+    upstream = trusted.get("upstream", {})
+    requirement_ids = set(requirements.keys() if isinstance(requirements, dict) else requirements)
+    upstream_ids = set(upstream.keys() if isinstance(upstream, dict) else upstream)
+    return sorted(requirement_ids | upstream_ids)
+
+
+def _contract_schema_for(inputs):
+    schema = copy.deepcopy(CONTRACT_SCHEMA)
+    schema["properties"]["basis"]["items"]["properties"]["source_ids"]["items"] = {
+        "type": "string", "enum": _allowed_source_ids(inputs)}
+    return schema
+
+
+def resolve_authored_reference(result, payload):
+    """Resolve a revision patch against its bound full parent reference.
+
+    Full-reference author responses remain supported. Patch responses are
+    limited to 256 JSON Pointer operations and one MiB of canonical JSON; all
+    edits are applied to a deep copy and are subsequently subject to the same
+    strict reference validation and independent review as full responses.
+    """
+    if not isinstance(result, dict):
+        raise ValueError("author result must be an object")
+    if "reference" in result:
+        if set(result) not in ({"reference"}, {"reference", "observations"}):
+            raise ValueError("full author result has unsupported keys")
+        return copy.deepcopy(result["reference"])
+    if set(result) not in ({"patch"}, {"patch", "observations"}):
+        raise ValueError("revision author result must contain a bounded patch")
+    operations = result["patch"]
+    if not isinstance(operations, list) or len(operations) > 256:
+        raise ValueError("revision patch must contain at most 256 operations")
+    if len(_canonical(operations).encode("utf-8")) > 1024 * 1024:
+        raise ValueError("revision patch exceeds one MiB")
+    revision = payload.get("revision") if isinstance(payload, dict) else None
+    if not isinstance(revision, dict) or not isinstance(revision.get("parent_reference"), dict):
+        raise ValueError("revision patch lacks a bound parent reference")
+    candidate = copy.deepcopy(revision["parent_reference"])
+
+    def decode_pointer(path):
+        if not isinstance(path, str) or not path.startswith("/") or path == "/":
+            raise ValueError("patch path must be a non-root JSON Pointer")
+        parts = path[1:].split("/")
+        decoded = []
+        for part in parts:
+            if re.search(r"~(?![01])", part):
+                raise ValueError("patch path has an invalid JSON Pointer escape")
+            decoded.append(part.replace("~1", "/").replace("~0", "~"))
+        if decoded[0] == "schema" or "status" in decoded:
+            raise ValueError("patch cannot change schema or status paths")
+        return decoded
+
+    def list_index(segment, length, *, add=False):
+        if add and segment == "-":
+            return length
+        if not segment.isdigit() or (segment != "0" and segment.startswith("0")):
+            raise ValueError("patch list path requires a canonical numeric index")
+        index = int(segment)
+        if index > length or (not add and index == length):
+            raise ValueError("patch list index is out of range")
+        return index
+
+    for index, operation in enumerate(operations):
+        if (not isinstance(operation, dict) or not isinstance(operation.get("op"), str)
+                or operation.get("op") not in {"add", "replace", "remove"}):
+            raise ValueError(f"patch[{index}] must use add, replace, or remove")
+        op = operation["op"]
+        required = {"op", "path"} if op == "remove" else {"op", "path", "value"}
+        if set(operation) != required:
+            raise ValueError(f"patch[{index}] keys do not match {op} operation")
+        parts = decode_pointer(operation["path"])
+        parent = candidate
+        for segment in parts[:-1]:
+            if isinstance(parent, dict) and segment in parent:
+                parent = parent[segment]
+            elif isinstance(parent, list):
+                parent = parent[list_index(segment, len(parent))]
+            else:
+                raise ValueError(f"patch[{index}] parent path does not exist")
+        leaf = parts[-1]
+        value = copy.deepcopy(operation.get("value"))
+        if isinstance(parent, dict):
+            exists = leaf in parent
+            if op in {"replace", "remove"} and not exists:
+                raise ValueError(f"patch[{index}] target path does not exist")
+            if op == "remove":
+                del parent[leaf]
+            else:
+                parent[leaf] = value
+        elif isinstance(parent, list):
+            position = list_index(leaf, len(parent), add=op == "add")
+            if op == "add":
+                parent.insert(position, value)
+            elif op == "replace":
+                parent[position] = value
+            else:
+                del parent[position]
+        else:
+            raise ValueError(f"patch[{index}] parent is not a container")
+    return candidate
 
 
 def _validate_inputs(inputs, snapshot):
@@ -675,6 +801,8 @@ def _freeze(directory, inputs, snapshot, spec, reviewed, identity, provenance):
                 "research.json": (directory / "research/RESULT.json").read_text(encoding="utf-8"),
                 **{"scopes/" + sid + ".json": _canonical(value) + "\n"
                    for sid, value in scope_slices.items()}}
+    if "revision_record" in provenance:
+        contents["revision.json"] = _canonical(provenance["revision_record"]) + "\n"
     adaptation = directory / "RESEARCH_METADATA_ADAPTATION.json"
     if adaptation.is_file():
         contents["research-metadata-adaptation.json"] = adaptation.read_text(encoding="utf-8")
@@ -760,18 +888,23 @@ def _generate(directory, inputs, snapshot, call, *, revision=None):
             "reason": "Exact read-tool path prefix and named kind aliases; same manifest, byte digests and line ranges"})
         research_result = {**research_result, "observed_upstream": observations}
 
+    evidence_bindings = _observation_bindings(observations, snapshot, inputs["trusted_source_ids"], source_files)
     author_payload = {"inputs": inputs, "research": research_result,
                       "source_context": source_context, "observations": observations,
-                      "schema_contract": SCHEMA_CONTRACT, "contract_schema": CONTRACT_SCHEMA}
+                      "observation_evidence": evidence_bindings,
+                      "allowed_source_ids": _allowed_source_ids(inputs),
+                      "schema_contract": SCHEMA_CONTRACT,
+                      "contract_schema": _contract_schema_for(inputs)}
     author_prompt = AUTHOR
     if revision is not None:
         author_payload["revision"] = revision["author_context"]
-        author_prompt += "\nThis is a bounded content revision. Read the complete parent reference, parent author result, deterministic diagnostics, and revision lineage in input.json. Fix every supplied issue, preserve valid confirmed requirements and business graph content, and return a complete reference in the normal output contract. Never manufacture or alter upstream observations."
+        author_prompt += "\nThis is a bounded content revision. Read the complete parent reference, parent author result, deterministic diagnostics, and revision lineage in input.json. Fix every supplied issue and preserve all untouched valid requirements and graph fields. Prefer a minimal JSON Pointer patch result with only add/replace/remove operations; the host applies it to a copy and validates the complete reference. A complete reference result remains accepted for compatibility. Never manufacture or alter upstream observations."
     authored = _stage(directory, "author", author_payload, author_prompt, source_context, bound_call)
     authored_result = authored["result"]
-    if not isinstance(authored_result, dict) or set(authored_result) not in ({"reference"}, {"reference", "observations"}):
-        raise ValueError("author protocol requires reference and optional legacy observations")
-    spec = authored_result["reference"]
+    if not isinstance(authored_result, dict) or set(authored_result) not in (
+            {"reference"}, {"reference", "observations"}, {"patch"}, {"patch", "observations"}):
+        raise ValueError("author protocol requires a complete reference or bounded revision patch")
+    spec = resolve_authored_reference(authored_result, author_payload)
     if "observations" in authored_result:
         author_observations = _observations(authored_result["observations"], snapshot, inputs["trusted_source_ids"])
         if author_observations != observations:
@@ -791,11 +924,17 @@ def _generate(directory, inputs, snapshot, call, *, revision=None):
         raise ValueError("upstream basis entries must cite sources with specific fixed observed line ranges")
 
     review_payload = {"reference": spec, "observations": observations, "research": research_result,
-                      "observation_bindings": _observation_bindings(observations, snapshot, inputs["trusted_source_ids"], source_files),
+                      "observation_bindings": evidence_bindings,
                       "inputs": inputs, "snapshot_digest": snapshot_identity,
-                      "schema_contract": SCHEMA_CONTRACT, "contract_schema": CONTRACT_SCHEMA,
+                      "allowed_source_ids": _allowed_source_ids(inputs),
+                      "schema_contract": SCHEMA_CONTRACT, "contract_schema": _contract_schema_for(inputs),
                       "scope_slices": _scope_slices(spec, source_ids),
-                      "prompts": {"research": digest(RESEARCH), "author": digest(AUTHOR), "review": digest(REVIEW)}}
+                      "prompts": {"research": digest(RESEARCH), "author": digest(author_prompt), "review": digest(REVIEW)}}
+    if revision is not None:
+        review_payload["revision"] = {"parent_reference": revision["author_context"]["parent_reference"],
+                                       "author_result": authored_result,
+                                       "diagnostics": revision["author_context"]["diagnostics"],
+                                       "lineage": revision["lineage"]}
     review_identity = digest(review_payload)
     _fixed(directory / "REVIEW_INPUT.json", review_payload)
     views = _materialize_read_views(directory, review_payload, source_files, source_ids)
@@ -821,7 +960,12 @@ def _generate(directory, inputs, snapshot, call, *, revision=None):
                 {"sessions": {"research": research["session_id"], "author": authored["session_id"], "review": review["session_id"]},
                  "snapshot_digest": snapshot_identity,
                  "prompts": {"research": digest(RESEARCH), "author": digest(author_prompt), "review": digest(REVIEW)},
-                 **({"revision_lineage": revision["lineage"]} if revision is not None else {})})
+                 **({"revision_lineage": revision["lineage"],
+                    "revision_record": {"parent_reference": revision["author_context"]["parent_reference"],
+                                        "author_result": authored_result,
+                                        "diagnostics": revision["author_context"]["diagnostics"],
+                                        "lineage": revision["lineage"]}}
+                    if revision is not None else {})})
         status = "static_review_passed"
     else:
         status = "needs_changes"
@@ -877,15 +1021,19 @@ def _revise_unlocked(directory, inputs, snapshot, parent_directory, parent_autho
     if _sha(raw_parent) != parent_author_sha256:
         raise ValueError("parent author result SHA-256 differs")
     parent_authored = json.loads(raw_parent.decode("utf-8"))
-    if not isinstance(parent_authored, dict) or set(parent_authored) not in ({"reference"}, {"reference", "observations"}):
+    if not isinstance(parent_authored, dict) or set(parent_authored) not in (
+            {"reference"}, {"reference", "observations"}, {"patch"}, {"patch", "observations"}):
         raise ValueError("parent author result has an invalid protocol shape")
-    parent_reference = parent_authored["reference"]
     parent_author_dir = parent_directory / "author"
     parent_author_binding = _json(parent_author_dir / "BINDING.json")
     parent_author_receipt = _json(parent_author_dir / "DELIVERED.json")
+    parent_author_input = _json(parent_author_dir / "INPUT.json")
     if (parent_author_receipt.get("binding_digest") != digest(parent_author_binding)
-            or parent_author_receipt.get("result_digest") != digest(parent_authored)):
+            or parent_author_receipt.get("result_digest") != digest(parent_authored)
+            or parent_author_binding.get("stage") != "author"
+            or parent_author_binding.get("payload_digest") != digest(parent_author_input)):
         raise ValueError("parent author result is not the result bound by its completed checkpoint")
+    parent_reference = resolve_authored_reference(parent_authored, parent_author_input)
     inputs_digest = _validate_inputs(inputs, snapshot)
     trusted_ids = inputs["trusted_source_ids"]
     source_ids = set(trusted_ids.get("requirements", [])) | set(trusted_ids.get("upstream", []))
@@ -943,7 +1091,10 @@ def _revise_unlocked(directory, inputs, snapshot, parent_directory, parent_autho
             raise ValueError("parent official research raw response differs from parsed result")
         adapter_research_digest = digest({p.relative_to(adapter_research).as_posix(): _sha(p.read_bytes())
                                           for p in sorted(adapter_research.rglob("*")) if p.is_file()})
-    issues = diagnose_reference(parent_reference, source_ids=source_ids)
+    observed_source_ids = {sid for sid, record in trusted_ids["upstream"].items()
+                           if any(item[1] == record["path"] for item in observations)}
+    issues = diagnose_reference(parent_reference, source_ids=source_ids,
+                                observed_source_ids=observed_source_ids)
     review_paths = [parent_directory / "REVIEW_INPUT.json", parent_directory / "REVIEW_RESULT.json",
                     parent_directory / "review/BINDING.json", parent_directory / "review/RESULT.json",
                     parent_directory / "review/DELIVERED.json", parent_directory / "READ_VIEWS.json"]
