@@ -1,0 +1,90 @@
+{
+ "origin": "assisted-trial",
+ "template_digest": "951e0cf31acab495ec4cdb567e8303a4ac2beed4b4f5cf763fc987b49b8d55aa",
+ "export": {
+  "phase": "P0",
+  "project_name": "attempt-2-trial",
+  "template_digest": "951e0cf31acab495ec4cdb567e8303a4ac2beed4b4f5cf763fc987b49b8d55aa",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1"
+ },
+ "provenance": {
+  "origin": "assisted-trial",
+  "scenario": {
+   "acceptance": [
+    "A01 Week view: GET /api/rooms/aurora/week?weekStart=2026-10-19 returns room id aurora, name Aurora Conference Room, timezone Asia/Shanghai and exactly seven days from 2026-10-19 to 2026-10-25; a Monday is required, so a non-Monday weekStart returns 400 INVALID_WEEK_START; an accepted Thursday 09:00-10:00 claim appears exactly once as a busy block whose purpose is visible to its owner and hidden from another staff member; Thursday 14:00-16:00 is free before and after that setup claim.",
+    "A02 Claim: a zero-length Thursday 14:00-14:00 request returns 400 with INVALID_INTERVAL or INVALID_DURATION and leaves both the caller reservation list and the week busy set unchanged; a blank-purpose 14:00-16:00 request returns 400 INVALID_PURPOSE and adds no row; the 14:00-16:00 claim with purpose Training session returns 201, preserves the purpose and confirmed status, and appears exactly once in the owner week view and caller list.",
+    "A03 Conflict: a 14:30-15:30 claim returns 409 SLOT_CONFLICT with the original id and its 14:00 and 16:00 start/end values, a message naming both the requested and existing windows, and no stored or busy row; a 16:00-17:00 adjacent claim returns 201 because intervals are half-open.",
+    "A04 Cancellation: a non-owner DELETE returns 403 FORBIDDEN and leaves the 14:00-16:00 block; the owner DELETE returns 204, the row is retained as cancelled, the block leaves availability, and 14:00-16:00 reads free; a fresh claim returns 201; repeating the original DELETE returns 404 NOT_FOUND."
+   ],
+   "audience": "Department staff who need the shared Aurora conference room.",
+   "id": "scn_fe000b631b6b4b21a2ab5144d5164a72",
+   "leaf": "resource-calendar",
+   "leaf_name": "资源日历",
+   "name": "Aurora Room Calendar",
+   "objective": "Check the Aurora room calendar for a free window, claim Thursday 2026-10-22 14:00-16:00, see a clashing claim refused with the conflict named, then cancel and confirm the slot is free again.",
+   "revision": 1,
+   "status": "draft",
+   "updated_at": "2026-10-22T01:49:04.899659+00:00",
+   "workflow": [
+    "Open the Aurora room week view for 2026-10-19 through 2026-10-25 and read accepted claims as busy blocks; Thursday 14:00-16:00 is free.",
+    "Submit a Thursday 2026-10-22 14:00-16:00 claim with the purpose note Training session.",
+    "Submit an overlapping 14:30-15:30 claim and receive 409 naming the original reservation and both intervals.",
+    "Cancel the original claim, confirm 14:00-16:00 reads free, and claim it again."
+   ]
+  },
+  "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+  "case_ref": {
+   "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+   "revision": 3,
+   "digest": "7f7526699790c101817e860d9c6f5ac1d6d7aee5b9b0db63e755aa16a3e57445"
+  },
+  "case_record_sha256": "9666c13ed3332ff3437ab386caebf78a031b45ba717d9b4bc618dcbd33a3825f",
+  "definition_digest": "b76ea6052367c5ae871d4e66795d2aff6ecd8a97090c05eefa5fce88e544d634",
+  "acceptance_inputs": {
+   "README.md": "c895521e62038c0525bd923fc51403f18232f6ae191cc377c86385c53f0b4e1d",
+   "probe.py": "657dba267c3d42a99fe5a6383c7e413348b5fa243321f1bbe555545f014099fe"
+  },
+  "official_publication": false,
+  "upstream_runtime": "not_run",
+  "independent_evidence_review": "passed_auxiliary_static",
+  "note": "OpenCode CLI + Go source study and separate-session review. No upstream/downstream runtime or strict certification.",
+  "model_production": {
+   "schema": "atlas.auxiliary-model-production.v1",
+   "mode": "opencode-cli-go",
+   "model": "open-design/deepseek-v4.1-flash",
+   "stage_models": {
+    "blueprint-generate-aux": "open-design/deepseek-v4.1-flash",
+    "blueprint-spec-review-aux": "open-design/deepseek-v4.1-flash"
+   },
+   "campaign_id": "atlas-v1-first-production-2026-10-19",
+   "phase": "auxiliary-full-full-leaf-auxiliary-2026-10-21",
+   "full_plan_id": "full-leaf-auxiliary-2026-10-21",
+   "profile": "full-leaf-v1",
+   "prompt_digest": "81297f85377bd12d9fa00400effbb8a5d308ded0019309cdc56772e5a1545ab5",
+   "review_status": "passed",
+   "review_input_digest": "834a68cc7f6e3cf604529f6222e8faada8cc1c4bef80619a71accfc97f5a0b27",
+   "review_result_digest": "d4ef7aa96ff00b086cd01cf06a6c84c342cc752aca643175eb8b9aa08461c8f1",
+   "source_snapshot_digest": "5355ed89fe0d26fa55ce17c6c0bc3914fe339acbbcda911b38c24d945beeda1d",
+   "sessions": {
+    "blueprint-generate-aux": "ses_e9ebb23b8ffeXcT3ZMStLpDMS1",
+    "blueprint-spec-review-aux": "ses_e9eb747c6ffehn1hO7Ix8Ptq4m"
+   },
+   "research_reuse": null,
+   "upstream_runtime": "not_run",
+   "application_runtime": "not_run",
+   "strict_acceptance": false
+  }
+ },
+ "controlled_opencode_calls_added": 2,
+ "official_queue_consumed": false,
+ "archives": {
+  "template-snapshot.zip": "2375fc43c5d2116fea9832c69b8a9bda90afd297a3c4ac90b0ea4c7349c63277",
+  "development-package.zip": "40d3f5cae94076e58f86d0d46ac69514a14135a18f2e9a4f283758369d383fe1"
+ }
+}

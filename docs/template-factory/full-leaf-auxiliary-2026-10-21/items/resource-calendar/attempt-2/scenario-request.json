@@ -1,0 +1,19 @@
+{
+  "name": "Aurora Room Calendar",
+  "audience": "Department staff who need the shared Aurora conference room.",
+  "objective": "Check the Aurora room calendar for a free window, claim Thursday 2026-10-22 14:00-16:00, see a clashing claim refused with the conflict named, then cancel and confirm the slot is free again.",
+  "workflow": [
+    "Open the Aurora room week view for 2026-10-19 through 2026-10-25 and read accepted claims as busy blocks; Thursday 14:00-16:00 is free.",
+    "Submit a Thursday 2026-10-22 14:00-16:00 claim with the purpose note Training session.",
+    "Submit an overlapping 14:30-15:30 claim and receive 409 naming the original reservation and both intervals.",
+    "Cancel the original claim, confirm 14:00-16:00 reads free, and claim it again."
+  ],
+  "acceptance": [
+    "A01 Week view: GET /api/rooms/aurora/week?weekStart=2026-10-19 returns room id aurora, name Aurora Conference Room, timezone Asia/Shanghai and exactly seven days from 2026-10-19 to 2026-10-25; a Monday is required, so a non-Monday weekStart returns 400 INVALID_WEEK_START; an accepted Thursday 09:00-10:00 claim appears exactly once as a busy block whose purpose is visible to its owner and hidden from another staff member; Thursday 14:00-16:00 is free before and after that setup claim.",
+    "A02 Claim: a zero-length Thursday 14:00-14:00 request returns 400 with INVALID_INTERVAL or INVALID_DURATION and leaves both the caller reservation list and the week busy set unchanged; a blank-purpose 14:00-16:00 request returns 400 INVALID_PURPOSE and adds no row; the 14:00-16:00 claim with purpose Training session returns 201, preserves the purpose and confirmed status, and appears exactly once in the owner week view and caller list.",
+    "A03 Conflict: a 14:30-15:30 claim returns 409 SLOT_CONFLICT with the original id and its 14:00 and 16:00 start/end values, a message naming both the requested and existing windows, and no stored or busy row; a 16:00-17:00 adjacent claim returns 201 because intervals are half-open.",
+    "A04 Cancellation: a non-owner DELETE returns 403 FORBIDDEN and leaves the 14:00-16:00 block; the owner DELETE returns 204, the row is retained as cancelled, the block leaves availability, and 14:00-16:00 reads free; a fresh claim returns 201; repeating the original DELETE returns 404 NOT_FOUND."
+  ],
+  "leaf": "resource-calendar",
+  "status": "draft"
+}

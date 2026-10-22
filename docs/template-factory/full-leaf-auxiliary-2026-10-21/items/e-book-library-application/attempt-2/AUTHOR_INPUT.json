@@ -1,0 +1,186 @@
+{
+ "name": "Sideloaded Shelf — single-reader web e-book library template",
+ "audience": "One reader who sideloads DRM-free EPUB and MOBI files from mixed sources and keeps the collection on their own machine.",
+ "objective": "Turn a folder of stray e-book files into a durable catalog of one entry per work with covers, correctable metadata, a collection, field-qualified search, a working file handoff, and explicit catalog-only removal.",
+ "workflow": [
+  "Start the local web service with a data directory and a shelf root, then point a scan at the shelf folder from the web UI or POST /api/scans.",
+  "Review the scan report and the shelf entries; inspect the cover, derived title, and derived author that the scan produced.",
+  "Correct a badly derived title and author through the entry detail form, using revision-checked writes.",
+  "Create or reuse a collection such as To Read and assign the entry to it atomically.",
+  "Locate the entry with a field-qualified search such as author:Ada Lovelace or collection:To Read.",
+  "Restart the service, confirm the correction and collection are still present, then download the entry file and open it in a reading app.",
+  "Remove an entry from the catalog with the explicit catalog_only file policy, confirm the shelf file is untouched, then rescan and observe that the still-present file becomes a fresh entry."
+ ],
+ "acceptance": [
+  "One scan of the fixture shelf creates 3 entries with resolvable covers, reports the byte-identical copy as duplicate and the broken EPUB and escaping symlink as failed or ignored, and a second scan creates 0 entries with stable ids.",
+  "A stale PATCH returns 409 revision_conflict, a valid correction records manual provenance, collection assignment is atomic, and both survive a service restart and a rescan.",
+  "Field-qualified search on the corrected author, the title case-insensitively, and the collection returns exactly that entry; unmatched values return 0 and an unsupported field returns 422 unknown_field.",
+  "The entry file downloads byte-identically as an attachment with the EPUB content type, HEAD reports the same size, and a missing format and unknown entry return distinct 404 errors.",
+  "Catalog-only removal requires an explicit file_policy, removes the entry, its file rows, collection links and hash claim in one transaction, leaves the shelf file byte-identical, makes the entry unsearchable, and a later rescan re-creates it with a new id and no prior curation."
+ ],
+ "observations": [
+  [
+   "code_observation",
+   "src/backend/lib/library.py",
+   60,
+   72,
+   "filter_books calls scan_folder, which appends every walked file path to file_list, then keeps only paths matched by the regex .epub|.mobi|.pdf; no content hash or work-level grouping is computed in that path."
+  ],
+  [
+   "code_observation",
+   "src/backend/lib/library.py",
+   309,
+   328,
+   "compare_shelf_current reads stored Book.file_name values through Storage.book_paths_list and returns the set difference between on-disk book paths and stored paths, so re-import suppression is by path, not by file content."
+  ],
+  [
+   "code_observation",
+   "src/backend/lib/library.py",
+   114,
+   123,
+   "When an EPUB has no dc:title, extract_metadata_epub derives the title from the final path component with its extension removed, then splits titles matching the Book-prefix regex before use."
+  ],
+  [
+   "code_observation",
+   "src/backend/lib/storage.py",
+   277,
+   295,
+   "parse_advanced_query recognises the field names title, author, and tags, accepts field:value and field:quoted-value tokens, and places unmatched tokens under a keywords key; an unknown field prefix is silently discarded rather than reported."
+  ],
+  [
+   "code_observation",
+   "src/backend/lib/storage.py",
+   297,
+   332,
+   "fuzzy_search_books applies case-insensitive substring tests to title, author, and tags, then scores keyword queries with rapidfuzz WRatio and keeps only books whose score is greater than 50."
+  ],
+  [
+   "code_observation",
+   "src/backend/lib/storage.py",
+   68,
+   111,
+   "insert_book opens one Session per book, takes cover bytes from book[2].data or book[2], commits, and logs and returns False when any step raises."
+  ],
+  [
+   "code_observation",
+   "src/backend/lib/models.py",
+   19,
+   42,
+   "The Book table stores a single file_name string per row with title, optional author, cover bytes, optional tags and categories, and a relationship to BookCollection rows; there is no status or deleted marker column."
+  ],
+  [
+   "documentation",
+   "README.md",
+   57,
+   65,
+   "The Coming Soon checklist marks Manual Collections, Books Removal, Access Restrictions, and Metadata Manipulation as unchecked, while the feature list at lines 21-36 documents recursive scanning, covers, fuzzy search with specifiers, download, and folder-derived collections."
+  ]
+ ],
+ "inference": "Because the delivery profile is web, the target is a self-hosted Node.js 20 plus TypeScript web service with a server-rendered shelf and a JSON API, using SQLite for the catalog under ATLAS_DATA_DIR and read-only references to files under ATLAS_LIBRARY_ROOT. Work-level identity, per-file scan transactions, manual-metadata provenance, field-qualified search, a contained download path, and catalog-only removal are explicit target proposals derived from the scenario and upstream evidence; no upstream code or storage design is copied. Removal is added because the leaf lists it as defining core, while the upstream README lists Books Removal as unimplemented, so the target never deletes shelf files and makes the file policy explicit on every delete.",
+ "features": [
+  "Recursive shelf scan that ingests EPUB and MOBI files into one catalog entry per work with a resolved cover, reports per-file outcomes, and is idempotent on rescan.",
+  "Revision-checked correction of title and author plus atomic collection assignment, both durable in the catalog database and never reverted by a later scan.",
+  "Field-qualified search over title, author, and collection with quoted values, and explicit rejection of unsupported fields.",
+  "Download handoff of an entry's EPUB or MOBI file from within the shelf root, with stable content type and explicit not-found responses.",
+  "Catalog-only removal behind an explicit file_policy token that removes the entry, file rows, collection links and hash claim in one transaction while leaving the reader's file untouched."
+ ],
+ "goals": [
+  "A01: scanning the fixture shelf creates 3 entries (The Dispossessed with embedded metadata, Kindred, and the filename-derived mystery draft), each with a resolvable cover and recorded cover_source, reports the byte-identical copy as duplicate and the broken EPUB plus escaping symlink as failed or ignored, keeps the catalog at 3, and a second scan reports created=0 with unchanged entry ids.",
+  "A02: a PATCH with a stale revision returns 409 revision_conflict; an unsupported PATCH field returns 422 unknown_field; a valid PATCH sets title The Analytical Engine and author Ada Lovelace, records manual provenance and increments revision by one; PUT assigns To Read atomically and an unknown collection is rejected without changing the assignment; after a service restart and a rescan, corrected fields, revision and collection are still returned.",
+  "A03: author:Ada Lovelace returns exactly the corrected entry; title:DISpossessed matches case-insensitively; collection:To Read returns the corrected entry; author:Nobody Known and collection:No Such Shelf return 0; isbn:... returns 422 unknown_field; two field terms are ANDed to one result.",
+  "A04: GET on the entry file returns the exact fixture bytes with application/epub+zip and an attachment disposition, HEAD reports the same Content-Length with an empty body, a missing mobi format returns 404 format_not_found, an unknown entry returns 404 book_not_found, and a path-like format token returns 400/404/422 without leaking files.",
+  "A05: DELETE without a policy or with file_policy=delete returns 422 invalid_file_policy and keeps the entry; DELETE with file_policy=catalog_only returns 204, the entry becomes 404 and unsearchable, and every shelf file hash is unchanged; a repeated or unknown DELETE returns 404; a rescan re-creates the file as a new id with derived metadata and no collections, and a further scan is idempotent."
+ ],
+ "arch": "# Sideloaded Shelf — web template architecture\n\n## 1. Fit and scope\n\nA self-hosted web library for exactly one reader who sideloads DRM-free EPUB and MOBI files from mixed sources. The unit is a book entry, not a file: a scan of a local shelf folder creates one entry per work, resolves a cover, keeps metadata editable, organizes entries into collections, makes them searchable, hands a file to a reading app, and removes a catalog entry without ever deleting the reader's file. Those five capabilities are the whole fixed scenario; nothing else is added.\n\nATLAS_LIBRARY_ROOT holds the reader's files and is opened read-only. ATLAS_DATA_DIR holds the catalog and derived covers and is the only writable area. No accounts, store, built-in reader, device transfer, conversion, tags, series, reading progress, or OPDS. Upstream pyShelf (Python, SQLAlchemy, GPL-3.0) is design evidence only; no code is copied.\n\n## 2. Runtime and topology\n\n- Node.js 20 LTS, TypeScript compiled to dist/, started with `npm start`.\n- Fastify HTTP server with server-rendered shelf pages and a JSON API used by the pages and by the verifier.\n- SQLite through better-sqlite3 in WAL mode with PRAGMA foreign_keys=ON, one process and one writer, at `$ATLAS_DATA_DIR/catalog.sqlite3`.\n- Cover cache at `$ATLAS_DATA_DIR/covers/<sha256>.<png|jpg>`, content-addressed.\n- One scan at a time: a concurrent POST /api/scans returns 409 scan_in_progress.\n- Bind 127.0.0.1; no authentication, because the trust boundary is the single local reader.\n\n## 3. Configuration\n\n| Variable | Meaning | Default |\n|---|---|---|\n| ATLAS_DATA_DIR | writable catalog, migrations and cover cache | required |\n| ATLAS_LIBRARY_ROOT | absolute shelf root scans may read | required |\n| HOST | bind address | 127.0.0.1 |\n| PORT | HTTP port | 8787 |\n| SCAN_FILE_LIMIT | maximum book candidates per scan | 10000 |\n\nStartup validates required variables, creates ATLAS_DATA_DIR, applies pending migrations in one transaction, and serves the existing catalog. It never scans automatically and never opens anything under ATLAS_LIBRARY_ROOT for writing.\n\n## 4. Modules\n\n- `src/server.ts`, `src/config.ts` — process wiring, env validation, /healthz.\n- `src/db/schema.ts`, `migrations.ts`, `repo.ts` — DDL, migrations and every SQL statement.\n- `src/scan/walker.ts`, `extract.ts`, `ingest.ts` — containment-checked walk, EPUB/MOBI parsing, per-file transactions, report assembly.\n- `src/catalog/books.ts`, `collections.ts`, `search.ts` — detail, revision-checked patch, collection assignment, query parsing.\n- `src/handoff/file.ts`, `cover.ts` — contained streaming, content types, disposition, cover serving.\n- `src/removal.ts` — catalog-only delete transaction and post-commit cache cleanup.\n- `src/web/pages.ts`, `forms.ts` — server-rendered shelf, detail form, collection and search controls.\n- `test/` — unit tests for query parsing, work keys and path containment.\n\n## 5. Data model\n\nSix tables; timestamps are ISO-8601 UTC TEXT.\n\n- works(id TEXT PK, work_key TEXT NOT NULL UNIQUE, title TEXT NOT NULL, author TEXT, description TEXT, cover_path TEXT, cover_source TEXT NOT NULL CHECK IN ('embedded','sidecar','placeholder'), metadata_source TEXT NOT NULL CHECK IN ('embedded','filename','manual'), manual_fields TEXT NOT NULL DEFAULT '[]' holding a JSON array, revision INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)\n- work_files(id INTEGER PK, work_id TEXT NOT NULL REFERENCES works(id) ON DELETE CASCADE, format TEXT NOT NULL CHECK IN ('epub','mobi'), path TEXT NOT NULL, sha256 TEXT NOT NULL UNIQUE, size INTEGER NOT NULL, added_at TEXT NOT NULL, UNIQUE(work_id, format))\n- collections(id INTEGER PK, name TEXT NOT NULL UNIQUE COLLATE NOCASE)\n- work_collections(work_id TEXT NOT NULL REFERENCES works(id) ON DELETE CASCADE, collection_id INTEGER NOT NULL REFERENCES collections(id) ON DELETE CASCADE, PRIMARY KEY(work_id, collection_id))\n- scans(id TEXT PK, root TEXT NOT NULL, started_at TEXT NOT NULL, finished_at TEXT, counts TEXT NOT NULL)\n- scan_items(id INTEGER PK, scan_id TEXT NOT NULL REFERENCES scans(id) ON DELETE CASCADE, path TEXT NOT NULL, status TEXT NOT NULL, reason TEXT, work_id TEXT)\n\nInvariants:\n\n- One work per work_key; at most one file per (work, format) in this slice.\n- sha256 is globally unique: a byte-identical file never creates or attaches twice.\n- manual_fields names the fields the reader edited; scans never update a known work, so they can never overwrite a correction.\n- revision starts at 1 and increments by exactly one per accepted PATCH.\n- Deleting a work cascades to work_files and work_collections; its hash and identity claims disappear with the rows.\n\n## 6. HTTP contract\n\n| Method and path | Result |\n|---|---|\n| GET /healthz | 200 with `status: ok` |\n| POST /api/scans `{root}` | 200 report; 422 root_outside_library; 422 scan_limit_exceeded; 409 scan_in_progress |\n| GET /api/books?q=&limit=&offset= | 200 `{total, items}` |\n| GET /api/books/:id | 200 entry, 404 book_not_found |\n| PATCH /api/books/:id `{revision, title?, author?, description?}` | 200 entry; 409 revision_conflict; 422 unknown_field; 422 no_fields; 422 invalid_field |\n| POST /api/collections `{name}` | 201 collection; 409 collection_exists; 422 invalid_field |\n| PUT /api/books/:id/collections `{names}` | 200 entry; 422 unknown_collection; atomic replace |\n| GET, HEAD /api/books/:id/file?format= | bytes; 404 book_not_found; 404 format_not_found; 422 format_required; 409 file_missing; 409 file_changed; 409 file_outside_root |\n| GET /api/books/:id/cover | image bytes |\n| DELETE /api/books/:id?file_policy=catalog_only | 204 no body; 404 book_not_found; 422 invalid_file_policy |\n\nEntry representation: id, title, author, description, revision, metadata_source, manual_fields (sorted array), collections (sorted names), files (array of format, size, sha256), cover_url (root-relative path), cover_source, created_at, updated_at. Errors are JSON `{error, message}` with a stable error code.\n\nScan report: scan_id, root, counts with created, attached, unchanged, duplicates, failed, ignored, and items with path, status, reason, work_id. Item statuses are created, attached, unchanged, duplicate, duplicate_format, failed, ignored; counts.duplicates covers duplicate and duplicate_format. Every walked book candidate appears exactly once.\n\n## 7. Scan and ingest\n\n1. Resolve the requested root realpath; it must equal or be inside ATLAS_LIBRARY_ROOT realpath, else 422 root_outside_library.\n2. Walk recursively without following directory symlinks; consider regular files and file symlinks. More than SCAN_FILE_LIMIT candidates fails the scan with 422 scan_limit_exceeded before any ingest.\n3. Non-book extensions are ignored. `.epub` and `.mobi` match case-insensitively.\n4. Each candidate realpath must stay inside the shelf root; an escaping link is failed with path_outside_root. A directory or FIFO is failed with not_a_regular_file.\n5. Hash the bytes with SHA-256 before parsing. A known hash is duplicate, or duplicate_format when that work already holds the format, and is not parsed again.\n6. Extract metadata and compute the work key, then insert work, file row, cover and scan item in one BEGIN IMMEDIATE transaction. Any exception rolls back only that file, records failed with a reason, and the scan continues.\n7. A known work key with a free format slot attaches the file (attached) without touching metadata or collections; a known work key holding that format is unchanged.\n8. Persist scans and scan_items and return the report.\n\nFailure isolation is per file: one broken EPUB never hides other ingestions. A second scan of an unchanged shelf reports created=0 and leaves ids, metadata and collections untouched.\n\n## 8. Metadata, provenance and curation\n\nEPUB: read META-INF/container.xml, the OPF package, dc:title, dc:creator, dc:identifier and dc:description; take the cover from the manifest item named by the OPF cover meta element, else the first manifest image. MOBI: read title, author and EXTH fields; missing fields stay null.\n\nTitle fallback when dc:title is absent: the file basename without extension, underscores replaced by spaces, whitespace collapsed, original case kept. Author stays null rather than being invented.\n\nwork_key: the normalized dc:identifier (trimmed, lowercased, internal whitespace removed) when present, otherwise lowercased title plus author with non-alphanumerics collapsed. The work key is stored, never recomputed from corrected metadata.\n\nCover order: embedded image, sidecar image at `<basename>.cover.png|jpg` beside the book, deterministic placeholder PNG generated locally. cover_source records the choice. No network lookup.\n\nPATCH requires the current revision. Stale → 409 revision_conflict with no write. Any other body key → 422 unknown_field. Blank title after trim → 422 invalid_field. Empty patch → 422 no_fields. Success merges provided names into manual_fields, sets metadata_source to manual, increments revision by one and updates updated_at. Scans never touch a known work, so corrections survive rescans.\n\nCollections: names trimmed, 1-80 characters, unique case-insensitively. PUT replaces the whole assignment set in one transaction; any unknown name → 422 unknown_collection with no change.\n\n## 9. Search\n\nGET /api/books?q=. Grammar: `field:\"quoted value\"`, `field:value`, a bare word, or a quoted bare phrase. Supported fields: title, author, collection. Bare terms match case-insensitive substrings across title and author. Field terms use case-insensitive substring for title and author, and case-insensitive exact equality for collection. All terms are ANDed. Empty q returns the catalog. Any other prefix → 422 unknown_field; tokens are never silently dropped. limit defaults to 100 and is capped at 200; offset defaults to 0; total counts matches before pagination.\n\n## 10. File handoff\n\nGET or HEAD /api/books/:id/file?format=epub|mobi. With exactly one file and no format, that file is used; with several files and no format → 422 format_required; an unknown token → 404 format_not_found. The stored path is realpath-checked against ATLAS_LIBRARY_ROOT (409 file_outside_root). Missing file → 409 file_missing; size different from the scanned size → 409 file_changed, repaired by a rescan. Success returns the exact stored bytes with Content-Type application/epub+zip or application/x-mobipocket-ebook, Content-Length, Content-Disposition attachment with a sanitized basename, and no transform. HEAD has the same headers and an empty body. Range requests are not supported.\n\nGET /api/books/:id/cover returns the cached image with its recorded image type, or the placeholder.\n\n## 11. Removal lifecycle\n\nDELETE /api/books/:id?file_policy=catalog_only is the only removal the template performs. The policy parameter is mandatory so removal is never a single accidental click without a stated file decision; missing or any other value such as delete, trash or empty → 422 invalid_file_policy. Unknown id → 404 book_not_found, resolved before policy validation.\n\nIn one BEGIN IMMEDIATE transaction the service deletes the works row; ON DELETE CASCADE removes its work_files rows and work_collections links, so the sha256 and identity claims disappear with them. The response is 204 with no body after commit. The entry is then absent from list, detail, search, collection matching, cover and file routes. Its cover cache file is unlinked only when no other work references it.\n\nThe service never writes to, renames or deletes anything under ATLAS_LIBRARY_ROOT, so catalog-only removal leaves the reader's file byte-identical. Consequence stated to the reader: removal is not a blocklist. Because the hash and identity claim are gone while the file remains, the next scan re-creates it as a fresh entry with a new id, revision 1, derived metadata, no collections and a re-resolved cover. To keep a file out, move it outside the shelf. There is no undo: removing and rescanning loses manual corrections.\n\nA repeated DELETE of the same id returns 404, not 204. Deleting the underlying file is an operating-system action outside this application.\n\n## 12. Persistence and restart\n\nWAL with synchronous=NORMAL; schema version in PRAGMA user_version; pending migrations run in one startup transaction. Restart preserves corrected title and author, manual_fields, revision, collection links and scan history. No in-memory catalog cache outlives a request. A crash mid-scan leaves earlier per-file commits and no half-written work, because each file is one transaction.\n\n## 13. Safety and trust\n\n- Every path derived from a URL or scan root passes realpath containment against its configured root; symlink escapes are rejected.\n- ATLAS_LIBRARY_ROOT has no write, rename or delete code path.\n- JSON bodies are capped at 64 KiB; titles, authors and collection names are length-limited.\n- Server-rendered HTML escapes every catalog value; no user HTML is stored or echoed.\n- No outbound network calls, no shell execution, no telemetry.\n- Removal only affects ATLAS_DATA_DIR and requires the explicit policy token.\n\n## 14. Operating commands\n\n```bash\nexport ATLAS_DATA_DIR=\"$HOME/.local/share/sideloaded-shelf\"\nexport ATLAS_LIBRARY_ROOT=\"$HOME/Books/sideloaded\"\nnpm ci && npm run build && npm start\ncurl -s http://127.0.0.1:8787/healthz\nprintf '{\"root\":\"%s\"}' \"$ATLAS_LIBRARY_ROOT\" > \"$ATLAS_DATA_DIR/scan-request.json\"\ncurl -s -X POST http://127.0.0.1:8787/api/scans -H 'content-type: application/json' --data @\"$ATLAS_DATA_DIR/scan-request.json\"\npython3 acceptance/probe.py --start npm start\n```\n\nHuman decisions and defaults: the reader chooses and confirms the shelf root; bind is loopback with no auth by default; the only file is used when an entry has one; list limit is 100; SCAN_FILE_LIMIT is 10000. Deleting an underlying file, exposing the service beyond loopback, and backing up ATLAS_DATA_DIR are operator decisions outside the service.\n\n## 15. Deliberate limits\n\n- MOBI parsing exists but the verifier builds EPUB fixtures only; a real DRM-free MOBI must be supplied by the operator.\n- DRM or encrypted files are failed with unsupported_drm; no rights-management integration.\n- Search is deterministic substring matching, not rapidfuzz scoring; order is created_at ascending.\n- No built-in reader, conversion, device transfer, progress, tags, series, merge or OPDS.\n- The UI is server-rendered and only its HTTP contract is automated; layout and the external reading app are manual.\n- Removal is catalog-only with no undo and no blocklist; file deletion is out of scope.\n- Multi-format attach exists in the contract but the fixture exercises one format per work.\n- Range or resumable downloads and mid-scan crash recovery are untested.",
+ "gaps": [
+  "Catalog-only removal deliberately never deletes files; a rescan re-adds a removed entry as a fresh row with a new id, so removal cannot be used to keep a file out of the shelf.",
+  "Removal has no undo and no trash: corrections and collection assignments are lost if the entry is removed and re-added.",
+  "MOBI ingest is not exercised unless the operator supplies a real DRM-free .mobi fixture via ATLAS_MOBI_FIXTURE; the probe synthesises EPUB fixtures only.",
+  "Encrypted or DRM-protected files are reported failed with unsupported_drm and never parsed; there is no rights-management integration.",
+  "Merging works, format conversion, device transfer, built-in reading, progress tracking, tags, series and OPDS are absent from this slice.",
+  "The browser UI is server-rendered and only its HTTP contract is verified; layout, drag-and-drop and actual opening in an external reading app are not automated.",
+  "Search is deterministic substring matching with no fuzzy ranking; upstream rapidfuzz-style tolerance is intentionally not reproduced.",
+  "Range requests, resumable downloads and very large file streaming are not implemented or tested.",
+  "Scan concurrency is guarded by contract (single-flight 409) but the probe does not race two scans; crash recovery mid-scan is also untested.",
+  "A placeholder cover is a derived image, so cover presence does not imply that every source file carries embedded artwork.",
+  "Multi-format attachment to an existing work is specified but not exercised by the acceptance fixtures."
+ ],
+ "delivery_profile": "web",
+ "execution_default": "Node.js 20 LTS plus TypeScript Fastify web service started with npm start, SQLite catalog and cover cache under ATLAS_DATA_DIR, read-only file references under ATLAS_LIBRARY_ROOT, server-rendered UI plus JSON API, and HTTP-driven acceptance probing from a Python stdlib probe.",
+ "source_refs": {
+  "requirements": [
+   "atlas:dc136828133d497389419464364ee421677d74b554567fd73bca46d6c2faf26d",
+   "scenario:e3081b003a1292e98ae2eb955aa8bb8b8a2f4f1ff964dc99081a9a1e29415956"
+  ],
+  "case_files": [
+   "upstream:1dc49d84bbbe9f6d22c4f448ee7b103b74f5910dc61771187e58708af1e14a02",
+   "upstream:e1c9bf725cb160f1050737e57018b99591f65e23460b1e02e5d4d7620ace7863",
+   "upstream:106b11fcee13570b8479bce77ccd339a898146a85d4a8c14b5cca83014bfcad7",
+   "upstream:417a07dd8f440e0d8e51ba207e3f740b98ecb513b1d17705e2e737dd06d8634c",
+   "upstream:eab7f7f3447d39f5a2d77289762b1f185b51686d3062237b54fc0221ade0bd6a"
+  ],
+  "design_inferences": [
+   {
+    "text": "Deliver the leaf as a Node.js 20 plus TypeScript Fastify web service with server-rendered shelf pages and a JSON API, storing the catalog in SQLite under ATLAS_DATA_DIR.",
+    "depends_on": [
+     "scenario:e3081b003a1292e98ae2eb955aa8bb8b8a2f4f1ff964dc99081a9a1e29415956",
+     "upstream:417a07dd8f440e0d8e51ba207e3f740b98ecb513b1d17705e2e737dd06d8634c"
+    ]
+   },
+   {
+    "text": "Key entries by a normalised embedded identifier with a lowercased title-plus-author fallback, and suppress repeated ingest by SHA-256 of the file bytes so rescans are idempotent beyond path equality.",
+    "depends_on": [
+     "upstream:106b11fcee13570b8479bce77ccd339a898146a85d4a8c14b5cca83014bfcad7",
+     "upstream:417a07dd8f440e0d8e51ba207e3f740b98ecb513b1d17705e2e737dd06d8634c",
+     "atlas:dc136828133d497389419464364ee421677d74b554567fd73bca46d6c2faf26d"
+    ]
+   },
+   {
+    "text": "Track manual_fields and a revision counter so a reader correction is durable, a stale write is rejected with 409, and a later scan cannot overwrite corrected title or author.",
+    "depends_on": [
+     "atlas:dc136828133d497389419464364ee421677d74b554567fd73bca46d6c2faf26d",
+     "scenario:e3081b003a1292e98ae2eb955aa8bb8b8a2f4f1ff964dc99081a9a1e29415956"
+    ]
+   },
+   {
+    "text": "Expose field-qualified search for title, author, and collection with quoted values, reject unknown field prefixes with 422 unknown_field, and use deterministic substring matching instead of fuzzy scoring.",
+    "depends_on": [
+     "upstream:eab7f7f3447d39f5a2d77289762b1f185b51686d3062237b54fc0221ade0bd6a",
+     "scenario:e3081b003a1292e98ae2eb955aa8bb8b8a2f4f1ff964dc99081a9a1e29415956"
+    ]
+   },
+   {
+    "text": "Serve entry files only from realpaths contained in ATLAS_LIBRARY_ROOT, with attachment disposition, format selection, and explicit 404 format_not_found plus 409 file_missing and file_changed responses.",
+    "depends_on": [
+     "upstream:106b11fcee13570b8479bce77ccd339a898146a85d4a8c14b5cca83014bfcad7",
+     "scenario:e3081b003a1292e98ae2eb955aa8bb8b8a2f4f1ff964dc99081a9a1e29415956"
+    ]
+   },
+   {
+    "text": "Resolve covers in the order embedded, sidecar, deterministic placeholder, and record cover_source so cover presence is honest about its origin.",
+    "depends_on": [
+     "upstream:106b11fcee13570b8479bce77ccd339a898146a85d4a8c14b5cca83014bfcad7",
+     "atlas:dc136828133d497389419464364ee421677d74b554567fd73bca46d6c2faf26d"
+    ]
+   },
+   {
+    "text": "Use one transaction per scanned file so an unreadable or escaping file is reported failed without rolling back other ingestions in the same scan.",
+    "depends_on": [
+     "upstream:eab7f7f3447d39f5a2d77289762b1f185b51686d3062237b54fc0221ade0bd6a",
+     "upstream:106b11fcee13570b8479bce77ccd339a898146a85d4a8c14b5cca83014bfcad7"
+    ]
+   },
+   {
+    "text": "Implement removal as an explicit catalog-only delete: DELETE requires file_policy=catalog_only, cascades work_files and work_collections in one transaction, never writes to ATLAS_LIBRARY_ROOT, and drops the hash claim so a rescan re-creates a fresh entry.",
+    "depends_on": [
+     "atlas:dc136828133d497389419464364ee421677d74b554567fd73bca46d6c2faf26d",
+     "scenario:e3081b003a1292e98ae2eb955aa8bb8b8a2f4f1ff964dc99081a9a1e29415956",
+     "upstream:e1c9bf725cb160f1050737e57018b99591f65e23460b1e02e5d4d7620ace7863"
+    ]
+   }
+  ]
+ },
+ "repo_name": "th3r00t/pyShelf",
+ "license": "GPL-3.0",
+ "license_path": "LICENSE"
+}

@@ -1,0 +1,188 @@
+{
+ "scenario": {
+  "name": "Afternoon claim on the shared conference room",
+  "audience": "A staff member who needs the department conference room",
+  "objective": "Check the room's calendar for a free window, claim it, and see a clashing claim refused while a cancellation reopens the time.",
+  "workflow": [
+   "Open the room's week view and read its existing reservation blocks as busy time",
+   "Submit a 14:00-16:00 claim for Thursday with a purpose note",
+   "Submit a second overlapping claim and receive a refusal naming the conflict",
+   "Cancel the original claim and confirm the slot shows free again"
+  ],
+  "acceptance": [
+   "The week view shows each accepted claim against the named room",
+   "An overlapping claim for the same room is refused and no block is added",
+   "Cancelling removes the block so the 14:00-16:00 window reads free"
+  ]
+ },
+ "fixed_scope": null,
+ "delivery_profile": "web",
+ "source": {
+  "repository": "https://github.com/technekey/booking-tool",
+  "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a",
+  "strategy_version": "full-leaf-selected-v2-3df14bb40ce0abdc",
+  "collected_at": "2026-10-22T00:09:26.756240+00:00",
+  "files": {
+   "LICENSE": "96de8966ed1c8c6208e854bd367a3ab26bdf72a5e5637369034dcefbc5f1bebf",
+   "README.md": "69985c6e335751c9039835e9cb33d8772504b2c50b0db39614a92bbd9c6c3771",
+   "booking-tool.py": "1966e2913cbd57ed93b5a201e50038af1b12cd2fc5b0f43eab0545059a78b7ef",
+   "config.json": "bdb4da7527124d17aa46bb9cd631723dd4f1141bd5bbb393a791ddaed7e18106",
+   "requirements.txt": "9ce07e03fcb9f0fb1f216e4ee008db738d3d8f7a69cdd4e9afe67f2cdc64bb05",
+   "templates/index.html": "4eaa5d3a8fdcbf42a8ec32e5cb4ff6df53c896049c89694b7610221481e3011b"
+  },
+  "license_files": [
+   "LICENSE"
+  ],
+  "license": {
+   "status": "located",
+   "spdx_id": "MIT",
+   "notice_hashes": {
+    "LICENSE": "96de8966ed1c8c6208e854bd367a3ab26bdf72a5e5637369034dcefbc5f1bebf"
+   }
+  },
+  "license_uncertainties": [
+   "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+  ],
+  "excluded_paths": [
+   "Unselected files; upstream not installed or run"
+  ]
+ },
+ "source_ids": {
+  "requirements": {
+   "atlas:b002c24483cc217524018776818616952a438c030c2e9e2dc717971ee95668a5": "leaf.md",
+   "scenario:2a94ef7bcbfba4258956fd8dbdcc0ed8e9d529ec9dc9d0ef7ef3409166277008": "fixed scenario"
+  },
+  "upstream": {
+   "upstream:c4db56b4155fdcbca24014e5d26623a884e66b0e164a9e7ffb98b26eed597ba5": {
+    "path": "LICENSE",
+    "repository": "https://github.com/technekey/booking-tool",
+    "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a"
+   },
+   "upstream:05d74f4d316fb2af5331f6cdf60b3326bcd00bee796ddbf872e159ab46479749": {
+    "path": "README.md",
+    "repository": "https://github.com/technekey/booking-tool",
+    "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a"
+   },
+   "upstream:d54a19e970ad5e4f572060ce601f93dc04826921b6ef790ed029559a1ab10c47": {
+    "path": "booking-tool.py",
+    "repository": "https://github.com/technekey/booking-tool",
+    "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a"
+   },
+   "upstream:921195ba7d95ef948db1b004a87463ce13fa12aac5f9031dfdd0ccc0afdf189f": {
+    "path": "config.json",
+    "repository": "https://github.com/technekey/booking-tool",
+    "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a"
+   },
+   "upstream:4e0aa27d993005e916c9b71b70c99a1be5993cc19e89d3b5d2b0039cd94cccb3": {
+    "path": "requirements.txt",
+    "repository": "https://github.com/technekey/booking-tool",
+    "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a"
+   },
+   "upstream:834d7b2eaf6f48eca4e796f8a64bccd7861e784637bc90e40328cf22049e41dd": {
+    "path": "templates/index.html",
+    "repository": "https://github.com/technekey/booking-tool",
+    "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a"
+   }
+  }
+ },
+ "inventory": [
+  {
+   "path": "LICENSE",
+   "lines": 21
+  },
+  {
+   "path": "README.md",
+   "lines": 63
+  },
+  {
+   "path": "booking-tool.py",
+   "lines": 469
+  },
+  {
+   "path": "config.json",
+   "lines": 22
+  },
+  {
+   "path": "requirements.txt",
+   "lines": 4
+  },
+  {
+   "path": "templates/index.html",
+   "lines": 238
+  }
+ ],
+ "revision": {
+  "parent_failure_sha256": "b8a42b9eec02529a8c885ada3d9a1f668442f080ac2790f1cbfb530495a73666",
+  "feedback": {
+   "leaf": "resource-calendar",
+   "stage": "independent_review",
+   "code": "auxiliary_content",
+   "error": "independent review did not pass; retain candidate and findings",
+   "at": 1792628145.349031,
+   "attempt": "attempt-1",
+   "stage_summaries": {
+    "calls/discovery/cli-summary.json": "c68167aa74f07a4cedda2ebb6785bb7b71f38339ce69328e497ab652cf14afdd",
+    "calls/blueprint-spec-review-aux/cli-summary.json": "6c114e4b0af783dfb7037a7568754e84606be3a2fb79017091d5dfb58f5856b8",
+    "calls/blueprint-generate-aux/cli-summary.json": "09f4d8c5735cb488a487dc3f182d9191894d437e68b7e7cbd6a3fda2cf22734f"
+   },
+   "raw_outputs": {
+    "calls/discovery/original-response.json": "c17ccc9702ef0c63ed19d5c4228b897983b718c1a6244f71ad5bd044b859e3ae",
+    "calls/blueprint-spec-review-aux/original-response.json": "4773919284e664150736bb455ca45dcab0675a02aef82a86335c550744b82c06",
+    "calls/blueprint-generate-aux/original-response.json": "dead9f91917dcd19427c545925e8887eacebd8e4f7259158f7687d87af5f6165"
+   },
+   "review": {
+    "input_digest": "9d38cfb1223e18a02ebc3ee72df78189bfeeaf6b5fa5985eb5a775a27a7a8fdd",
+    "verdict": "needs_changes",
+    "checks": {
+     "leaf_scope": true,
+     "source_fidelity": true,
+     "design_distinction": true,
+     "core_journey": true,
+     "architecture": true,
+     "acceptance": false,
+     "limits_and_safety": false
+    },
+    "observations": [
+     {
+      "index": 0,
+      "verdict": "accepted",
+      "reason": "booking-tool.py:106-117 defines overlaps() using datetime.strptime('%Y-%m-%d %H:%M') and returns True only when start1 < end2 and start2 < end1; equal endpoints fail, so directly touching intervals are not overlapping. The observation matches the source."
+     },
+     {
+      "index": 1,
+      "verdict": "accepted",
+      "reason": "booking-tool.py:377-382 loops every stored booking, runs p.search(booking['description']) at line 378, and returns HTTP 400 at line 382 when the parsed lab name equals the request lab and overlaps(...) is true. Accurate."
+     },
+     {
+      "index": 2,
+      "verdict": "accepted",
+      "reason": "booking-tool.py:271-326 gates delete() on an authenticated session (273-279), validates id/start/end/description (281-291), permits admins while checking ownership for others (274-275, 313-316), extracts previous_user from the stored description (312-316), and rewrites new_data to the JSON file (319-321). Accurate."
+     },
+     {
+      "index": 3,
+      "verdict": "accepted",
+      "reason": "templates/index.html:45-60 contains the fullCalendar init: header right includes month,agendaWeek,agendaDay (46-50), defaultView is 'month' (51), editable is true (56), and events is '/bookings' (57). Accurate."
+     },
+     {
+      "index": 4,
+      "verdict": "accepted",
+      "reason": "README.md:51-53 says the tool is a test tool not intended for serious use without evaluation/modification, calls file read/write instead of a database a big disadvantage, and says it may not suit real use cases. Accurate."
+     },
+     {
+      "index": 5,
+      "verdict": "accepted",
+      "reason": "README.md:5-17 documents RESOURCE_INFO (names and colors), DB_FILE, USER_DB, LOG_FILE, ADMIN_INFO, HOST, PORT, TZ, REGISTRATION_ALLOWED, ALLOWED_DOMAINS, TITLE, FOOTER_MESSAGE, and RESOURCE_NAME. Accurate."
+     }
+    ],
+    "issues": [
+     "acceptance/probe.py:156-172 (A02) never verifies that the rejected zero-length claim added no row. After the 400 response it calls only touching() (lines 91-92), whose strict overlap test cannot see a 14:00-14:00 ghost against 14:00-16:00, and the later exactly-once check counts only the new id. A server that returns 400 but also inserts the zero-length row still passes, contrary to AUTHOR_INPUT.json:13 ('adds nothing') and the A02 goal 'creates no block'.",
+     "acceptance/probe.py:157 requires the zero-length rejection to be exactly INVALID_INTERVAL, but VIEW_ARCH.md:86 lists both INVALID_INTERVAL and INVALID_DURATION and VIEW_ARCH.md:92 only states a duration of 30-240 minutes. A spec-following implementation can reasonably return 400 INVALID_DURATION, while AUTHOR_INPUT.json:13 requires only 400; the probe is stricter than the pinned contract.",
+     "acceptance/probe.py:185-188 checks only that error.conflicts contains the original id and that error.message contains that id. It never verifies conflicting start/end values. VIEW_ARCH.md:88 requires error.conflicts objects with id/start/end and a message naming both intervals, and AUTHOR_INPUT.json:14 requires naming the 14:00-16:00 reservation and its times; an implementation returning only the id passes A03.",
+     "acceptance/README.md:21,40 and VIEW_ARCH.md:114 claim the probe checks both fixed windows before writing and exits 2 with status not_run when setup is unsafe. The probe instead checks 09:00-10:00 inside A01 and creates it (probe.py:134-135), then checks 14:00-16:00 only later in A02 (probe.py:158-160). If 14:00 is occupied, the 09:00 probe claim may already have been written, and occupied windows become failed cases with exit 1, not not_run; exit 2 is used only for the initial GET failure (probe.py:101-107)."
+    ],
+    "summary": "The leaf scope, source citations, and design distinction are sound, and the Thursday claim/conflict/cancel journey is covered end to end. The acceptance layer has blocking contract gaps: A02 does not verify that the zero-length refusal leaves no row, A02 hardcodes an error code the architecture does not pin, A03 does not verify the conflict times required by the API, and the documented not_run/refuse-to-proceed safety behavior is not implemented because the probe can write the 09:00 claim before discovering that 14:00 is occupied."
+   }
+  },
+  "scope": "Fix existing core violations only; preserve fixed scenario, sources and delivery profile."
+ }
+}

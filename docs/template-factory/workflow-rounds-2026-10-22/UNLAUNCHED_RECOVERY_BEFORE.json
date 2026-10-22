@@ -1,0 +1,81 @@
+{
+  "observed_at": 1792634559.7235682,
+  "status": {
+    "id": "full-leaf-auxiliary-2026-10-21",
+    "campaign_id": "atlas-v1-first-production-2026-10-19",
+    "phase": "auxiliary-full-full-leaf-auxiliary-2026-10-21",
+    "request_digest": "e8f0a3b11676bac6c9d7ec35b1aa108733e0d5bc161d8b9c192b8f1bd1135cda",
+    "baseline": 99,
+    "max_calls": 7200,
+    "window_seconds": 2592000,
+    "model": "open-design/deepseek-v4.1-flash",
+    "created": 1792589722.814663,
+    "status": "paused",
+    "reason": "full_plan_paused: full plan/leaf cannot dispatch",
+    "started": 1792589744.123177,
+    "deadline": 1795181744.123177,
+    "counts": {
+      "failed": 16,
+      "ready_not_run": 5,
+      "source_unavailable": 9,
+      "needs_revision": 15,
+      "paused": 2,
+      "pending": 1740,
+      "reused": 18
+    },
+    "total": 1805,
+    "handled": 63,
+    "attempted": 46,
+    "new_calls": 133,
+    "remaining_calls": 7067,
+    "active_calls": 0,
+    "provider_requests": null,
+    "observed_model": null,
+    "cost": null
+  },
+  "original_calls_unchanged": 127,
+  "protected_files_unchanged": 123,
+  "unlaunched_stage_reservations": [],
+  "leaf_historical_calls": [
+    {
+      "id": "bud_2fc49a2a38d94dca81757b25bdbbad4d",
+      "identity": "full-leaf-auxiliary-2026-10-21:matchmaking-platform",
+      "stage": "first/discovery/attempt-1",
+      "status": "completed",
+      "job_id": "full-leaf-auxiliary-2026-10-21:matchmaking-platform:attempt-1",
+      "requested_model": "opencode-go/minimax-m3.1-flash-free",
+      "outcome": null,
+      "created": 1792624103.343317,
+      "started": 1792624103.463485,
+      "finished": 1792624260.4043179
+    },
+    {
+      "id": "bud_35f983c57a0c4085af1ac0cfe4bd3262",
+      "identity": "full-leaf-auxiliary-2026-10-21:matchmaking-platform",
+      "stage": "first/blueprint-generate-aux/attempt-1",
+      "status": "failed",
+      "job_id": "full-leaf-auxiliary-2026-10-21:matchmaking-platform:attempt-1",
+      "requested_model": "opencode-go/minimax-m3.1-flash-free",
+      "outcome": "cli_protocol",
+      "created": 1792624269.26424,
+      "started": 1792624269.390264,
+      "finished": 1792624881.1765618
+    }
+  ],
+  "full_scope_count": 1805,
+  "raw_binding_sha256": "a24da6a236559885f223155d0555106a655123c3db23c3737b37db77a107c424",
+  "raw_launch_intent_sha256": "dd0cb78e43ae0a32da12836f806c0af0ccacc2be26da364ae36683f5928f28e9",
+  "expected_unlaunched_stage": "protocol/blueprint-generate-aux/attempt-1",
+  "all_leaf_reservations": [
+    {
+      "id": "bud_2fc49a2a38d94dca81757b25bdbbad4d",
+      "stage": "first/discovery/attempt-1",
+      "status": "completed"
+    },
+    {
+      "id": "bud_35f983c57a0c4085af1ac0cfe4bd3262",
+      "stage": "first/blueprint-generate-aux/attempt-1",
+      "status": "failed"
+    }
+  ]
+}

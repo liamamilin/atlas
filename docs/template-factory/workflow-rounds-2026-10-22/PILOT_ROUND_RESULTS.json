@@ -1,0 +1,783 @@
+{
+ "observed_at": 1792633806.051009,
+ "full_plan_id": "full-leaf-auxiliary-2026-10-21",
+ "mode": "pilot_complete",
+ "status": "paused",
+ "reason": "selected leaf run complete",
+ "source_code_sha": "894d8a830113a6e094ebbc3334285390abbc4b0b",
+ "model": "open-design/deepseek-v4.1-flash",
+ "new_calls_before": 127,
+ "calls_added": 6,
+ "research_calls_added": 0,
+ "cumulative_calls": 232,
+ "plan_new_calls": 133,
+ "active_calls": 0,
+ "max_calls": 7200,
+ "deadline": 1795181744.123177,
+ "new_usable_templates": 2,
+ "needs_revision": 1,
+ "applications_run": 0,
+ "old_call_records_unchanged": 127,
+ "protected_files_unchanged": 123,
+ "old_case_versions_unchanged": 19,
+ "items": [
+  {
+   "leaf": "e-book-library-application",
+   "state": "needs_revision",
+   "workdir": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-2",
+   "first_pass_done": true,
+   "repair_pending": false,
+   "review": {
+    "input_digest": "e0857dc029e3f706820eae2beb15ce89810adb80eb3ae2e9aecdf85969817909",
+    "verdict": "needs_changes",
+    "checks": {
+     "leaf_scope": true,
+     "source_fidelity": true,
+     "design_distinction": true,
+     "core_journey": true,
+     "architecture": false,
+     "acceptance": false,
+     "limits_and_safety": false
+    },
+    "observations": [
+     {
+      "index": 0,
+      "verdict": "accepted",
+      "reason": "library.py:60-72 supports this: filter_books calls scan_folder at line 66 (the called scan_folder, lines 38-58, appends every walked file path to self.file_list) and then filters with the regex .epub|.mobi|.pdf at line 67; no content hash or work-level grouping occurs in that path."
+     },
+     {
+      "index": 1,
+      "verdict": "accepted",
+      "reason": "library.py:309-328: compare_shelf_current reads stored Book.file_name values through Storage.book_paths_list (storage.py:113-123) and returns set.difference(on_disk, in_storage); re-import suppression is by path, not content."
+     },
+     {
+      "index": 2,
+      "verdict": "accepted",
+      "reason": "library.py:114-123: when dc:title is None, title becomes book['path'].split('/')[-1].rsplit('.', 1)[0]; lines 118-122 then apply the title_sanitization_regx split. The fallback and Book-prefix handling are accurately described."
+     },
+     {
+      "index": 3,
+      "verdict": "accepted",
+      "reason": "storage.py:277-295: fields are ['title', 'author', 'tags']; the token regex accepts field:value, field:quoted-value and quoted/bare tokens; an unknown field prefix is silently discarded because it is neither appended to a known field nor to keywords. Accurate."
+     },
+     {
+      "index": 4,
+      "verdict": "accepted",
+      "reason": "storage.py:297-332: match_field lowercases and uses substring containment for title, author and tags; keyword queries use rapidfuzz process.extract with fuzz.WRatio and keep only scores greater than 50. Accurate."
+     },
+     {
+      "index": 5,
+      "verdict": "accepted",
+      "reason": "storage.py:68-111: insert_book opens one Session per book, tries book[2].data and falls back to book[2], constructs and commits the Book, logs any exception and returns False. Accurate."
+     },
+     {
+      "index": 6,
+      "verdict": "accepted",
+      "reason": "models.py:19-42: Book has id, title, optional author, categories, cover bytes, pages, progress, file_name, description, tags, identifier and publisher, plus the BookCollection relationship; there is no status or deleted-marker column. Accurate."
+     },
+     {
+      "index": 7,
+      "verdict": "accepted",
+      "reason": "README.md:57-65 shows Manual Collections, Books Removal, Access Restrictions and Metadata Manipulation unchecked; README.md:21-36 lists recursive scanning, cover aggregation, fuzzy search with specifiers, download and folder-derived collections. Accurate."
+     }
+    ],
+    "issues": [
+     {
+      "title": "Scan duplicate status is contradictory: the arch implies duplicate_format, the probe requires duplicate",
+      "detail": "VIEW_ARCH.md:85 says a known hash is duplicate, or duplicate_format when that work already holds the format. A byte-identical copy of an existing work necessarily has a known hash and its work already holds that format, so the literal rule yields duplicate_format and makes duplicate unreachable. Probe A01 (probe.py:279) requires dispossessed-copy.epub to be duplicate, and acceptance/README.md:7 calls it the byte-identical duplicate. VIEW_ARCH.md:87 adds a third overlapping outcome (unchanged) for known work key plus held format. A target following the arch fails A01; a target passing A01 contradicts the arch.",
+      "impact": "Core scan-report state machine is ambiguous and the primary scan acceptance is inconsistent with the architecture."
+     },
+     {
+      "title": "A01 pins duplicate status to a specific path despite an unspecified walk order",
+      "detail": "VIEW_ARCH.md:82 only requires a recursive walk and never defines traversal order. Probe A01 (probe.py:278-279) asserts The Dispossessed.epub is created and copies/dispossessed-copy.epub is duplicate. If the walker visits copies/ first, which the contract permits and filesystem readdir order does not preclude, the copy is created and the root file is duplicate or duplicate_format; counts, covers, ids and A04 still pass, but these two A01 assertions fail.",
+      "impact": "A valid implementation can fail A01; the acceptance is order-dependent and over-specified."
+     },
+     {
+      "title": "metadata_source for mixed embedded/filename provenance is undefined but asserted",
+      "detail": "VIEW_ARCH.md:45 defines the metadata_source values and VIEW_ARCH.md:94-102 defines the filename title fallback and author-null rule, but never states which source wins when a work has an embedded dc:identifier and a filename-derived title. Probe A01 (probe.py:106 and 292) asserts metadata_source == filename for the mystery draft, whose fixture includes an embedded identifier but no embedded title or author. A conforming target could reasonably record embedded for the identifier/description or filename for the title.",
+      "impact": "The probe asserts an unstated rule and can fail a conforming target."
+     },
+     {
+      "title": "A02 and A05 omit revision assertions required by their own goals and the architecture",
+      "detail": "AUTHOR_INPUT goals[1] / REVIEW_SCOPE.md:130-134 explicitly requires revision to survive restart and rescan; VIEW_ARCH.md:57 says revision starts at 1, VIEW_ARCH.md:128 says restart preserves it, and VIEW_ARCH.md:122 says a re-created entry has revision 1. Probe A02 (probe.py:315 and 340-345) reads entry['revision'] without asserting it is 1 and checks only title, author and collections after restart/rescan; probe A05 (probe.py:415-418) checks new id and no collections but not revision 1. A target starting at another value, resetting revision on restart, or re-adding at revision 2 passes the probe but violates the goal and architecture.",
+      "impact": "Missing meaningful state-transition acceptance for the optimistic-concurrency revision."
+     },
+     {
+      "title": "A05 accepts loose statuses for a missing DELETE policy instead of the required 422 invalid_file_policy",
+      "detail": "VIEW_ARCH.md:118 requires missing or any other file_policy value to return 422 invalid_file_policy; the A05 goal (REVIEW_SCOPE.md:148-152 and AUTHOR_INPUT goals[4]) says DELETE without a policy returns 422 invalid_file_policy. Probe A05 (probe.py:394-396) only asserts bare.status in (400, 409, 422) and never checks the error code. A target returning 400 or 409 for a missing policy passes the probe but violates the contract.",
+      "impact": "An explicit error rule is not enforced, allowing a false pass."
+     },
+     {
+      "title": "The claimed ATLAS_MOBI_FIXTURE MOBI path does not exist",
+      "detail": "REVIEW_SCOPE.md:164-166 / AUTHOR_INPUT gaps[2] says MOBI ingest is not exercised unless the operator supplies a real DRM-free .mobi fixture via ATLAS_MOBI_FIXTURE. probe.py never reads ATLAS_MOBI_FIXTURE; its environment setup (probe.py:438-443) sets only ATLAS_DATA_DIR, ATLAS_LIBRARY_ROOT and HOST, and build_fixture (probe.py:92-123) creates only EPUBs. VIEW_ARCH.md:20-26 does not list ATLAS_MOBI_FIXTURE. The scenario names MOBI, but the only stated mechanism for exercising it is false.",
+      "impact": "The unrun MOBI state is described inaccurately and remains unverifiable through the claimed path."
+     },
+     {
+      "title": "The documented --keep example is swallowed by --start REMAINDER",
+      "detail": "acceptance/README.md:37-41 shows python3 probe.py --start python3 -m my_service --keep. probe.py:426-427 declares --start with nargs=argparse.REMAINDER, so every token after --start, including --keep, becomes part of the target command. args.keep stays False, the temp directory is deleted, and the target receives --keep, which will usually fail startup. acceptance/README.md:42 itself says everything after --start is the target command, contradicting the example. --keep only works before --start.",
+      "impact": "The documented acceptance command is wrong and the advertised keep-for-inspection workflow cannot work as shown."
+     },
+     {
+      "title": "Run and operating commands are not executable as written",
+      "detail": "acceptance/README.md:37-40 says cd acceptance then python3 probe.py --start npm start. probe.py:199-200 starts the target with the inherited working directory and offers no cwd option, while the target checkout and package.json are at the repository root per VIEW_ARCH.md:141-148; npm start from acceptance/ therefore looks in the wrong directory. Separately, VIEW_ARCH.md:141-148 places blocking npm start before the healthz and scan curls and the final probe command in one shell, so those commands never execute, and the final probe would also start a second server while the first is still running.",
+      "impact": "The documented run path fails or hangs, so the acceptance is not reproducible as written."
+     }
+    ],
+    "summary": "The upstream observations and source partition are accurate, the target is a genuine web redesign rather than an upstream copy, and the leaf's core journey (scan to work-level entries, cover, correction, collection, field-qualified search, handoff, catalog-only removal) is represented. The artifact still needs changes: the scan duplicate status contract contradicts A01, A01 assumes an undefined walk order, the probe asserts an undefined metadata_source rule, A02/A05 omit goal-required revision and 422-policy assertions, and the run instructions plus the claimed ATLAS_MOBI_FIXTURE path are inaccurate. No certification or upstream execution claim is being made; these are concrete contract and acceptance defects, not a request for new non-core features."
+   },
+   "sessions": [
+    "ses_e9ec37acbffe9p6NPM9EkIvZ5J",
+    "ses_e9ec02610ffe6IB2KWX7C2TwVW"
+   ],
+   "calls_for_leaf": 5,
+   "case_ref": null,
+   "artifact_id": null,
+   "application_runtime": "not_run",
+   "steps": [
+    {
+     "step": "existing_template",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "53d92a37f467e8c1b6b84d73dd6fb44b4b6e01330cb90f5e19e965ecceffbc4e",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-2/REQUEST.json",
+       "sha256": "08823559c32ea6e7aac67e9af71626219316f34bb9e43e585f96008f5c72afd5",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-2/existing_template/outputs/0"
+      }
+     ],
+     "started": 1792632717.8986602,
+     "finished": 1792632718.031283
+    },
+    {
+     "step": "scenario",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "53d92a37f467e8c1b6b84d73dd6fb44b4b6e01330cb90f5e19e965ecceffbc4e",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-2/SELECTED_SCENARIO.json",
+       "sha256": "8b90ad425b05cfa72251d0ef2a4a8d66783af36a4272697fc272530e68c63569",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-2/scenario/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-2/RESEARCH.json",
+       "sha256": "dc9eb7fdc2f4f44cea08c8ceff38466c21e8ecd428cff98f7cccbad6787d5658",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-2/scenario/outputs/1"
+      }
+     ],
+     "started": 1792632718.0362828,
+     "finished": 1792632718.078584
+    },
+    {
+     "step": "case_research",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "3166515cc9b0bacc3a65335036aa0510201c28ed5e4a2cacbd3d8cd13e42f6d9",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-2/source-snapshot.json",
+       "sha256": "0ae0a62f3f8177c9e30654f2095519336093857ace7df10d2b4c7e30d219ca60",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-2/case_research/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-2/upstream-evidence.zip",
+       "sha256": "f5f364b303a3641268bbde9261779316f5c44b2e9cbac571b9aaa4caa4be1b22",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-2/case_research/outputs/1"
+      }
+     ],
+     "started": 1792632718.080215,
+     "finished": 1792632718.087053
+    },
+    {
+     "step": "generation",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "dafee4d143c1dc875358dee3a17cca79d0e7d41fbf8db9a5631b2699b1b4ff05",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-2/calls/blueprint-generate-aux/RESULT.json",
+       "sha256": "d1101187caf1e5c94be790f265a0a35add5ecb70fecc84209c3072af9cc96d39",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-2/generation/outputs/0"
+      }
+     ],
+     "started": 1792632718.097014,
+     "finished": 1792632936.304269
+    },
+    {
+     "step": "deterministic_check",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "ce7a9b65a63bac98ebd1ccf93199d1d7b6665f8d26e1abf71ce69c857bb98afd",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-2/SOURCE_INPUT.json",
+       "sha256": "9d7615f304df365f6c02786e0db6b012524296860ba805cb13601dfcfb0103cd",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-2/deterministic_check/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-2/AUTHOR_INPUT.json",
+       "sha256": "bb36fae037694d2557677dd14b51c263270ea7673a5f488857703ddc12a913cd",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-2/deterministic_check/outputs/1"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-2/acceptance/probe.py",
+       "sha256": "2a6ffa78d71c26a3f028a23badb94b2ffe940550fb54b6303ab1d572edb74703",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-2/deterministic_check/outputs/2"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-2/acceptance/README.md",
+       "sha256": "398f19bd9af62c81aef8d60ce531aa6157b6143084e5bbca5ebfee1e5f067db0",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-2/deterministic_check/outputs/3"
+      }
+     ],
+     "started": 1792632936.3083572,
+     "finished": 1792632936.320265
+    },
+    {
+     "step": "independent_review",
+     "attempt": "attempt-2",
+     "state": "failed",
+     "input_digest": "e0857dc029e3f706820eae2beb15ce89810adb80eb3ae2e9aecdf85969817909",
+     "outputs": [],
+     "code": "auxiliary_content",
+     "error": "independent review did not pass; retain candidate and findings",
+     "started": 1792632936.3294358,
+     "finished": 1792633359.0072262
+    },
+    {
+     "step": "freeze_import",
+     "attempt": "attempt-2",
+     "state": "pending",
+     "input_digest": null,
+     "outputs": []
+    },
+    {
+     "step": "download",
+     "attempt": "attempt-2",
+     "state": "pending",
+     "input_digest": null,
+     "outputs": []
+    }
+   ]
+  },
+  {
+   "leaf": "markdown-editor",
+   "state": "ready_not_run",
+   "workdir": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2",
+   "first_pass_done": true,
+   "repair_pending": false,
+   "review": {
+    "input_digest": "a94c78f60d8e2cd6f8c9690017e8c7cdb01cb98362082bcc66cbc3181d85946e",
+    "verdict": "pass",
+    "checks": {
+     "leaf_scope": true,
+     "source_fidelity": true,
+     "design_distinction": true,
+     "core_journey": true,
+     "architecture": true,
+     "acceptance": true,
+     "limits_and_safety": true
+    },
+    "observations": [
+     {
+      "index": 0,
+      "verdict": "accepted",
+      "reason": "index.js 252-268: the apply switch sets bold's prefix and suffix to '**' and h1's prefix to '# ' with an empty suffix; italic and strike in the same cited range also use fixed prefix/suffix strings."
+     },
+     {
+      "index": 1,
+      "verdict": "accepted",
+      "reason": "index.js 323-333: the modern-browser branch rebuilds the value from before-start, prefix, selected text, suffix, and after-end, then sets both selection ends to the original offsets plus the prefix length."
+     },
+     {
+      "index": 2,
+      "verdict": "accepted",
+      "reason": "index.js 197-211: download reads #getm.value, replaces every LF with CRLF, creates a text/plain Blob, and clicks an anchor with download='marcdown.md'."
+     },
+     {
+      "index": 3,
+      "verdict": "accepted",
+      "reason": "index.js 68-84: counts read innerText from the viewer/buffer selected by display state, compute words after trim/replace/split and chars after whitespace removal, and the empty-text branch writes 0/0 and disables #save."
+     },
+     {
+      "index": 4,
+      "verdict": "accepted",
+      "reason": "index.js 40-47: SwapBuffers swaps the preview and buffer references, sets the old preview element to display none, and sets the old buffer element to display flex."
+     },
+     {
+      "index": 5,
+      "verdict": "accepted",
+      "reason": "index.html 173-179: #viewer has inline display:none, sibling #buffer has no inline display style, and #getm is in the preceding #editor div."
+     },
+     {
+      "index": 6,
+      "verdict": "accepted",
+      "reason": "README.md 63-69: the demo section says paste/type markdown on the left, view the preview on the right, and save the Markdown file."
+     }
+    ],
+    "issues": [],
+    "summary": "The upstream citations match the pinned files, the target architecture cleanly separates the static ES-module app from upstream CDN/PWA behavior, and the fixed README journey (open or paste, Bold/H1 insertion, derived preview, save/reopen with counts) is covered. probe.py exercises A01-A04 through a Node adapter with coded errors and meaningful negative cases, while browser-only behavior and non-execution of upstream are explicit limits. No blocking findings."
+   },
+   "sessions": [
+    "ses_e9ec37ac9ffe7Rov1aN3iNcrKO",
+    "ses_e9ebf49e5ffeUClLsOIPCptQlM"
+   ],
+   "calls_for_leaf": 5,
+   "case_ref": {
+    "case_id": "case:repo:d2480efdae2725bb0cf42249:f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+    "revision": 2,
+    "digest": "4d6177aa3939a79ead28efdaa3148ec70138f65accaf32907875e77f2aad1f84"
+   },
+   "artifact_id": "tpl_082f2b3dc06847beb29654649ba43591",
+   "application_runtime": "not_run",
+   "replay": {
+    "leaf": "markdown-editor",
+    "artifact_id": "tpl_082f2b3dc06847beb29654649ba43591",
+    "model_calls_added": 0,
+    "historical_adoption": false
+   },
+   "download": {
+    "artifact_id": "tpl_082f2b3dc06847beb29654649ba43591",
+    "sha256": "0513529059a71e4d975f30bd38ee3431ed25f22068ac1b3f93b15fea1a4eecab",
+    "template_digest": "9595c312912639b7d12606dd7d5cedc799b6cec02a45d53c2a331a5e15f66f14",
+    "case_ref": {
+     "case_id": "case:repo:d2480efdae2725bb0cf42249:f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+     "revision": 2,
+     "digest": "4d6177aa3939a79ead28efdaa3148ec70138f65accaf32907875e77f2aad1f84"
+    },
+    "entries": {
+     "README.md": "5efcc0514267eb4ea4f4bcdcc9932982a0476083a31c806526f62b51d2f96e14",
+     "AGENT.md": "932f6dd2e007b24377d89196001d9b18564996cda1e189c32edb135ad2a1d6bf",
+     "HANDOFF.md": "023a35e73fd691039f68f84f81583c3410d6153b10ae9d7da36036bafa982fae",
+     "KNOWLEDGE.md": "f52c9135039980f0aff4b870a310f6ed05b7b5764b88a33c6fdab0b7dfd82d46",
+     "CURRENT_PHASE.json": "2be1562fdcb951427aa3f0cfad9d852cb177dfc5da25fe2f542184daf4ecb015",
+     "PROJECT_DECISIONS.json": "87fb24401de74e80d2a7808a91f25d34722bfb467bb48240e5ad12a4d75a7499",
+     "ACCEPTANCE_CONTRACT.json": "ac090cf955a6af37e7dc90db2dbad376f0cfd8bc6c420d367dff568bc3d0e0e4",
+     "APP_DELIVERY.md": "64d70b915df319baa6e585ec866a9d15c8597856ea9be9778f3c459a9a31cf93"
+    },
+    "blueprint_files": 20,
+    "application_runtime": "not_run"
+   },
+   "case_versions_added_by_replay": 0,
+   "artifact_url": "http://127.0.0.1:5188/factory?view=artifacts&artifact_id=tpl_082f2b3dc06847beb29654649ba43591",
+   "steps": [
+    {
+     "step": "existing_template",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "fe8168abc35758bbf39e64b4a0d5dca38c3069f838254f1696878a2758d04a43",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2/REQUEST.json",
+       "sha256": "523079e782ce293d915dae7c71d902797a6f9e5ecea97bc390685e746991e972",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-2/existing_template/outputs/0"
+      }
+     ],
+     "started": 1792632717.910721,
+     "finished": 1792632718.046113
+    },
+    {
+     "step": "scenario",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "fe8168abc35758bbf39e64b4a0d5dca38c3069f838254f1696878a2758d04a43",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2/SELECTED_SCENARIO.json",
+       "sha256": "2ef89781bc205dc66f88ef93a01e8df2adc41c8321da17c094e446ce523dbf53",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-2/scenario/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2/RESEARCH.json",
+       "sha256": "5119eb40814ec6d456e3dec558d52121b4a6bbaccca094bc52eacb7eccd48dfa",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-2/scenario/outputs/1"
+      }
+     ],
+     "started": 1792632718.0478132,
+     "finished": 1792632718.102041
+    },
+    {
+     "step": "case_research",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "9b88b873de2c37afee50628934cb4655b04c7be5dc57deb050dadeb65da6a932",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2/source-snapshot.json",
+       "sha256": "179263f13ceb8e4994c1e2e77805f1c80000fff0fc9e94a0b702dbdfd872f4f4",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-2/case_research/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2/upstream-evidence.zip",
+       "sha256": "3344e72348cd617e47a65f1c84c0c1e3106930c0990f4006f1b65ced143441c0",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-2/case_research/outputs/1"
+      }
+     ],
+     "started": 1792632718.105876,
+     "finished": 1792632718.120086
+    },
+    {
+     "step": "generation",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "8f37c5aa75e926978d76c71b731cc49b40ace14afb7b2ae12871a5791592e887",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2/calls/blueprint-generate-aux/RESULT.json",
+       "sha256": "b58ee7a14db66a243d6d70c586b1d935ef35863a79f37d3d614a6b834ec4ce4e",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-2/generation/outputs/0"
+      }
+     ],
+     "started": 1792632718.1252658,
+     "finished": 1792632992.278135
+    },
+    {
+     "step": "deterministic_check",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "69f2b045bcda0eb4365785d4562c5ae84196d042a6e135bba3c1ec2a2c4d898f",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2/SOURCE_INPUT.json",
+       "sha256": "d10c6cc473ce5beb722f59578e8fd05fd21eb015329a96f46c1e183869b1517d",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-2/deterministic_check/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2/AUTHOR_INPUT.json",
+       "sha256": "e416e5daadfddb612678b72d378d5f0f839d8ade02360b99782b2de5cbf1ff27",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-2/deterministic_check/outputs/1"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2/acceptance/probe.py",
+       "sha256": "167911cdda1c9a8a13b36fa84694becf457925bed84a875c8c7e3aa84a628fa6",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-2/deterministic_check/outputs/2"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2/acceptance/README.md",
+       "sha256": "c19afd77a677c1f8133818a9e4bf2d090e3d3a0c28e28d5462d0fb8802c46b9f",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-2/deterministic_check/outputs/3"
+      }
+     ],
+     "started": 1792632992.278877,
+     "finished": 1792632992.2853818
+    },
+    {
+     "step": "independent_review",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "a94c78f60d8e2cd6f8c9690017e8c7cdb01cb98362082bcc66cbc3181d85946e",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2/calls/blueprint-spec-review-aux/RESULT.json",
+       "sha256": "757b9e9e115789961031ffcce0d07e48026aa79d3452a1f72aa26ceb3e16b402",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-2/independent_review/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2/ACCEPTED_RESEARCH_RECEIPT.json",
+       "sha256": "3c33a4130f7e484de22dd2817399bfd08fd7386a19d3ac6bafef67aff734a137",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-2/independent_review/outputs/1"
+      }
+     ],
+     "started": 1792632992.291481,
+     "finished": 1792633263.871973
+    },
+    {
+     "step": "freeze_import",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "131a3008a9cd839c651945ae61ff21728e0eb5ed85e0eaedc63073f653ab1fb0",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2/IMPORT_RECEIPT.json",
+       "sha256": "304c7bb74f8017d01e8b0a43081460bac12536e275573ceca928c8fc1559f71b",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-2/freeze_import/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2/packages/template-snapshot.zip",
+       "sha256": "a4cee4aa537580d41e1243711b09356509a6c83bc2721613c370262edde90554",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-2/freeze_import/outputs/1"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2/atlas-development-package.zip",
+       "sha256": "0513529059a71e4d975f30bd38ee3431ed25f22068ac1b3f93b15fea1a4eecab",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-2/freeze_import/outputs/2"
+      }
+     ],
+     "started": 1792633263.875103,
+     "finished": 1792633264.4940522
+    },
+    {
+     "step": "download",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "e2e15f98bda787c18ff43cccc96e84567d0cb85bf6a3529b7117b3c44cf09318",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-2/DOWNLOAD_VERIFIED.json",
+       "sha256": "c8424cbc9c89e67cde195bb95ede7ec500873b27bec42a2b9b961c15af9bbfbc",
+       "url": "/api/factory/assisted-templates/tpl_082f2b3dc06847beb29654649ba43591/files/development"
+      }
+     ],
+     "started": 1792633264.508474,
+     "finished": 1792633264.527545
+    }
+   ]
+  },
+  {
+   "leaf": "resource-calendar",
+   "state": "ready_not_run",
+   "workdir": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2",
+   "first_pass_done": true,
+   "repair_pending": false,
+   "review": {
+    "input_digest": "834a68cc7f6e3cf604529f6222e8faada8cc1c4bef80619a71accfc97f5a0b27",
+    "verdict": "pass",
+    "checks": {
+     "leaf_scope": true,
+     "source_fidelity": true,
+     "design_distinction": true,
+     "core_journey": true,
+     "architecture": true,
+     "acceptance": true,
+     "limits_and_safety": true
+    },
+    "observations": [
+     {
+      "index": 0,
+      "verdict": "accepted",
+      "reason": "booking-tool.py lines 106-117 define overlaps() with '%Y-%m-%d %H:%M' parsing and the strict condition start1 < end2 and start2 < end1, so directly touching intervals return False."
+     },
+     {
+      "index": 1,
+      "verdict": "accepted",
+      "reason": "booking-tool.py lines 377-382 loop over stored bookings, derive the lab name from each description using the regex used at lines 366/378, and return HTTP 400 when the lab matches and overlaps(start, end, booking['start'], booking['end']) is true."
+     },
+     {
+      "index": 2,
+      "verdict": "accepted",
+      "reason": "booking-tool.py lines 271-326 show the authenticated-session gate, admin bypass, non-admin comparison against the booked-by name parsed from the stored description, and the rewritten booking list written back to the JSON file at lines 319-321."
+     },
+     {
+      "index": 3,
+      "verdict": "accepted",
+      "reason": "templates/index.html lines 45-60 initialize FullCalendar with events:'/bookings', defaultView:'month', editable:true, and header right 'month,agendaWeek,agendaDay'."
+     },
+     {
+      "index": 4,
+      "verdict": "accepted",
+      "reason": "README.md lines 51-53 call the project a test tool not intended for serious use without evaluation and modification, identify file read/write instead of a database as a major disadvantage, and say it may not suit real use cases."
+     }
+    ],
+    "issues": [],
+    "summary": "No blocking issues. The candidate is a coherent core resource-calendar target: one room-owned schedule, a seven-day free/busy week read model, a transactional half-open claim command, a 409 refusal naming the existing reservation and both intervals, and an owner-or-admin soft cancellation that reopens the window. The probe matches the stated API and fixed 2026-10-19/2026-10-22 dates, checks meaningful negative cases and state preservation, preflights all fixed windows before any write, and cleans up only its own generated claims. Upstream observations verify against the fixed source, design choices are separated as inferences, and known UI, security, isolation, and unrun limitations are explicit without upstream execution or certification claims."
+   },
+   "sessions": [
+    "ses_e9ebb23b8ffeXcT3ZMStLpDMS1",
+    "ses_e9eb747c6ffehn1hO7Ix8Ptq4m"
+   ],
+   "calls_for_leaf": 5,
+   "case_ref": {
+    "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+    "revision": 3,
+    "digest": "7f7526699790c101817e860d9c6f5ac1d6d7aee5b9b0db63e755aa16a3e57445"
+   },
+   "artifact_id": "tpl_e69bb928d000493a81a21ea19c4fa147",
+   "application_runtime": "not_run",
+   "replay": {
+    "leaf": "resource-calendar",
+    "artifact_id": "tpl_e69bb928d000493a81a21ea19c4fa147",
+    "model_calls_added": 0,
+    "historical_adoption": false
+   },
+   "download": {
+    "artifact_id": "tpl_e69bb928d000493a81a21ea19c4fa147",
+    "sha256": "3b8acc698e862c508a1b0cbe4cf5999e5dcd5c576add4c08d668f564cd3950d3",
+    "template_digest": "08ccf786b4430bb0e6a41e8da650601b0d260db8b8356ade4c14359ef9540ec2",
+    "case_ref": {
+     "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+     "revision": 3,
+     "digest": "7f7526699790c101817e860d9c6f5ac1d6d7aee5b9b0db63e755aa16a3e57445"
+    },
+    "entries": {
+     "README.md": "5efcc0514267eb4ea4f4bcdcc9932982a0476083a31c806526f62b51d2f96e14",
+     "AGENT.md": "932f6dd2e007b24377d89196001d9b18564996cda1e189c32edb135ad2a1d6bf",
+     "HANDOFF.md": "023a35e73fd691039f68f84f81583c3410d6153b10ae9d7da36036bafa982fae",
+     "KNOWLEDGE.md": "f52c9135039980f0aff4b870a310f6ed05b7b5764b88a33c6fdab0b7dfd82d46",
+     "CURRENT_PHASE.json": "4d27792d42092b3d3df1224c14dc2e5c885beb28ca432e44453692fd57deb371",
+     "PROJECT_DECISIONS.json": "e2368946582e5705a70665443249b78d03b3394126aa77cb1e7e76d5c0e3be04",
+     "ACCEPTANCE_CONTRACT.json": "bb1fb958d1ff099a5a5e57144c0a9957a75fdea799a4fb3d09f9859adacb9801",
+     "APP_DELIVERY.md": "64d70b915df319baa6e585ec866a9d15c8597856ea9be9778f3c459a9a31cf93"
+    },
+    "blueprint_files": 20,
+    "application_runtime": "not_run"
+   },
+   "case_versions_added_by_replay": 0,
+   "artifact_url": "http://127.0.0.1:5188/factory?view=artifacts&artifact_id=tpl_e69bb928d000493a81a21ea19c4fa147",
+   "steps": [
+    {
+     "step": "existing_template",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "aa8c5cec4cf1892957c366ecd952219ed4911fec80b3a12e5ffd87842f03e7e8",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2/REQUEST.json",
+       "sha256": "6be1dbeca4907114f305a47c116748a46a317790f36e5c7afdeb9f74828edc63",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-2/existing_template/outputs/0"
+      }
+     ],
+     "started": 1792633264.62463,
+     "finished": 1792633264.71736
+    },
+    {
+     "step": "scenario",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "aa8c5cec4cf1892957c366ecd952219ed4911fec80b3a12e5ffd87842f03e7e8",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2/SELECTED_SCENARIO.json",
+       "sha256": "022cb4151c182ff4dfb054c2f8a9482a09c50854ef6d7164b7f4c0b38227c174",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-2/scenario/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2/RESEARCH.json",
+       "sha256": "03243ad568188b217a27b2a90f7b148757672703a648847f29c6d65b3e024316",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-2/scenario/outputs/1"
+      }
+     ],
+     "started": 1792633264.722346,
+     "finished": 1792633264.763086
+    },
+    {
+     "step": "case_research",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "537a8ca174684f9581d9bd17a159e93125d0ff7dcb4ede0b0ced9319cb39b3fb",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2/source-snapshot.json",
+       "sha256": "81fdba8b7db9a0397ef0510d8ed606b7349324e41285b26894eac87b966d34a1",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-2/case_research/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2/upstream-evidence.zip",
+       "sha256": "677eaafcb7b0dd04393ba9c636df20e740088caa5d0cba9451d953571866c6a9",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-2/case_research/outputs/1"
+      }
+     ],
+     "started": 1792633264.768128,
+     "finished": 1792633264.77363
+    },
+    {
+     "step": "generation",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "d3820da29ea41e17a30b7c87a04084e7986477dad5e33f332820a8a9e8bbf6f0",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2/calls/blueprint-generate-aux/RESULT.json",
+       "sha256": "b973e5be3f0b39e61d1678f2906827192a035725f1fa96d875985c093a60afc7",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-2/generation/outputs/0"
+      }
+     ],
+     "started": 1792633264.77983,
+     "finished": 1792633517.601773
+    },
+    {
+     "step": "deterministic_check",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "62c7447d42bf5fd732dc80a85c23c6ff9c597395e9dc73d052bd21e17da93777",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2/SOURCE_INPUT.json",
+       "sha256": "8b04bab85afa0128498220b28ce08c4010d7161bd5c1df2877f6267315ad36c6",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-2/deterministic_check/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2/AUTHOR_INPUT.json",
+       "sha256": "2b1443d3ea9bc1062c2d30f9d50249f4b8c09509a9bea37b9470245333044e6d",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-2/deterministic_check/outputs/1"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2/acceptance/probe.py",
+       "sha256": "657dba267c3d42a99fe5a6383c7e413348b5fa243321f1bbe555545f014099fe",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-2/deterministic_check/outputs/2"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2/acceptance/README.md",
+       "sha256": "c895521e62038c0525bd923fc51403f18232f6ae191cc377c86385c53f0b4e1d",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-2/deterministic_check/outputs/3"
+      }
+     ],
+     "started": 1792633517.605218,
+     "finished": 1792633517.616199
+    },
+    {
+     "step": "independent_review",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "834a68cc7f6e3cf604529f6222e8faada8cc1c4bef80619a71accfc97f5a0b27",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2/calls/blueprint-spec-review-aux/RESULT.json",
+       "sha256": "af93d204608818aac4fc172bfa086a09fadc2c39841200c7609b7b9271bf6ab0",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-2/independent_review/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2/ACCEPTED_RESEARCH_RECEIPT.json",
+       "sha256": "e147ccd367cc149a5070734b99276cc40d95564d0619ebab3e5b272418623fbf",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-2/independent_review/outputs/1"
+      }
+     ],
+     "started": 1792633517.63053,
+     "finished": 1792633744.931905
+    },
+    {
+     "step": "freeze_import",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "a5b8a33d6adc32b49818f9b87a508cdcebea773ef3323a53c77229b5dd5d7273",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2/IMPORT_RECEIPT.json",
+       "sha256": "36e297bab4df240585eec2d582516f6fead35aba641c3e6767c2e3abcedf2cfd",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-2/freeze_import/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2/packages/template-snapshot.zip",
+       "sha256": "2375fc43c5d2116fea9832c69b8a9bda90afd297a3c4ac90b0ea4c7349c63277",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-2/freeze_import/outputs/1"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2/atlas-development-package.zip",
+       "sha256": "3b8acc698e862c508a1b0cbe4cf5999e5dcd5c576add4c08d668f564cd3950d3",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-2/freeze_import/outputs/2"
+      }
+     ],
+     "started": 1792633744.936587,
+     "finished": 1792633745.5290911
+    },
+    {
+     "step": "download",
+     "attempt": "attempt-2",
+     "state": "completed",
+     "input_digest": "b994d20b97771425cd3bbd83718ebc89e0cf9935b657046c3b2cc0b7dd96ddbd",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-2/DOWNLOAD_VERIFIED.json",
+       "sha256": "624f718f5b47cba9cf2f41a30a9d3c3cfbe3bdd53c94964ce65a1a0a6527c2e4",
+       "url": "/api/factory/assisted-templates/tpl_e69bb928d000493a81a21ea19c4fa147/files/development"
+      }
+     ],
+     "started": 1792633745.545664,
+     "finished": 1792633745.5621781
+    }
+   ]
+  }
+ ],
+ "full_first_round_ready": true,
+ "second_round_not_started": true
+}

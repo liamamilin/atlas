@@ -1,0 +1,69 @@
+{
+  "observed_at": 1792634338.602017,
+  "status": {
+    "id": "full-leaf-auxiliary-2026-10-21",
+    "campaign_id": "atlas-v1-first-production-2026-10-19",
+    "phase": "auxiliary-full-full-leaf-auxiliary-2026-10-21",
+    "request_digest": "e8f0a3b11676bac6c9d7ec35b1aa108733e0d5bc161d8b9c192b8f1bd1135cda",
+    "baseline": 99,
+    "max_calls": 7200,
+    "window_seconds": 2592000,
+    "model": "open-design/deepseek-v4.1-flash",
+    "created": 1792589722.814663,
+    "status": "paused",
+    "reason": "full_plan_paused: full plan/leaf cannot dispatch",
+    "started": 1792589744.123177,
+    "deadline": 1795181744.123177,
+    "counts": {
+      "failed": 16,
+      "ready_not_run": 5,
+      "source_unavailable": 9,
+      "needs_revision": 15,
+      "paused": 2,
+      "pending": 1740,
+      "reused": 18
+    },
+    "total": 1805,
+    "handled": 63,
+    "attempted": 46,
+    "new_calls": 133,
+    "remaining_calls": 7067,
+    "active_calls": 0,
+    "provider_requests": null,
+    "observed_model": null,
+    "cost": null
+  },
+  "primary_leaf": "matchmaking-platform",
+  "primary_failure": "full_plan_integrity: recovery binding differs",
+  "peer_leaf": "relationship-discovery-application",
+  "peer_failure": "full_plan_paused",
+  "binding": {
+    "model": "opencode-go/minimax-m3.1-flash-free",
+    "input_digest": "e24914744908c0b2863512e45a27a8f58c4e8f81efddf04c0805d7b6b7f7daf2",
+    "prompt": "Read input.json, ALL leaf.md and source/upstream/ fixed files. Produce\na cognition TEMPLATE, not an application. Preserve the fixed concrete scenario.\nChoose target technology appropriate to input.delivery_profile; no blanket HTTP,\nSQLite, browser or Python-target requirement. A small complete core journey is\nenough, not a mature SaaS platform. 1-5 meaningful capabilities with matching goals.\nSOURCE PARTITIONS ARE MANDATORY:\n  requirements: ONLY the Atlas and scenario source IDs in input.source_ids;\n  case_files: ONLY upstream IDs in input.source_ids;\n  design_inferences: explicit target proposals, depending on known IDs.\nobservations contains ONLY tuples [documentation|code_observation, upstream path,\n1-based start,end, statement]; NEVER leaf.md or an Atlas source path. Statements\ndescribe actual upstream facts, not target requirements. Repository, commit and\nfile hashes are host-owned; don't invent source identities or runtime evidence.\nReturn valid JSON ONLY:\n{\"authored\":{\"name\":\"...\",\"audience\":\"...\",\"objective\":\"...\",\"workflow\":[\"...\"],\"acceptance\":[\"...\"],\"observations\":[[\"code_observation\",\"actual/path\",1,2,\"observed fact\"]],\"inference\":\"explicit target inference\",\"features\":[\"...\"],\"goals\":[\"precise corresponding acceptance\"],\"arch\":\"full architecture markdown\",\"gaps\":[\"known limitation\"],\"delivery_profile\":\"same as input\",\"execution_default\":\"appropriate runtime and data boundary\",\"source_refs\":{\"requirements\":[\"actual Atlas ID\",\"actual scenario ID\"],\"case_files\":[\"actual upstream ID\"],\"design_inferences\":[{\"text\":\"target choice\",\"depends_on\":[\"actual ID\"]}]}},\"acceptance_files\":{\"probe.py\":\"full stdlib acceptance orchestrator\",\"README.md\":\"how to run core verification\"}}\nProvide at least 2 genuine observations including code. Keep 1-5 acceptance cases\nA01..A0N, exactly matching capabilities. probe.py is a portable verifier, NOT a\nrequirement to implement the target in Python; it may verify a CLI, library,\ndesktop integration, service or Web app. Document appropriate adapter/target and\noperator steps when a UI is needed. It must assert observable core results and\nmeaningful negative cases, not just lint/count files or declare success. Do not\ninstall/run code here. For mutable data, use isolated disposable records/directories;\nnever delete user records. Define precise data/contracts/edge cases appropriate\nto THIS leaf, transaction/lifecycle semantics where relevant, operating commands,\nhuman decisions/defaults and honest not_run limits. No unused platform expansion.\nAll source IDs must exist in input. Keep source/code/view lines <1800 characters.\nEscape every JSON string properly; keep prose focused. No invented pass/certification.\n",
+    "source": {
+      "upstream/LICENSE": "1d45cc26443ad33f2379ce18c6ad6c40401dd55888b0a0b922b5e34540caa3aa",
+      "upstream/README.md": "ecd6b7d31f822fb1f65f8edc3ab7d2444a4ae2db90634bb1e0bb738d38e90b24",
+      "upstream/speed_friending_matcher/application.py": "1d78074de8525b9887535c01755ce0a7a500dc95b6888afc665c457d1114e5a7",
+      "upstream/speed_friending_matcher/core/person.py": "6548c961f93ce60dff8fe012236a5996e4fc096fbd92ad89960076d9689d5269",
+      "upstream/speed_friending_matcher/core/simple_clique.py": "542fafd3020745a851b3c38121727584028d83f88e567d5f65c1c236fac760d6"
+    },
+    "leaf_sha256": "2fa202f39e78a082b3b52ae4b6f8b1c4effdfa21ba445f5fb4d33a8073352612"
+  },
+  "preserved_files": {
+    "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/matchmaking-platform/attempt-1/calls/blueprint-generate-aux-protocol-1/BINDING.json": "a24da6a236559885f223155d0555106a655123c3db23c3737b37db77a107c424",
+    "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/matchmaking-platform/attempt-1/calls/blueprint-generate-aux-protocol-1/LAUNCH_INTENT.json": "dd0cb78e43ae0a32da12836f806c0af0ccacc2be26da364ae36683f5928f28e9",
+    "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/matchmaking-platform/attempt-1/calls/blueprint-generate-aux-protocol-1/input.json": "77124c473c82d67e9dd550ae581293567022062a5a67e0589ccb26b696a82387"
+  },
+  "launch_artifacts": {
+    "process.json": false,
+    "events.jsonl": false,
+    "stdout.log": false,
+    "original-response.json": false,
+    "DELIVERED.json": false,
+    "cli-summary.json": false
+  },
+  "calls_added_by_failed_full_start": 0,
+  "classification": "host compatibility defect; not a template content failure",
+  "next_action": "verify historical model amendment chain and prove no launch; new current-model successor only after new exact-source CI and formal host revision"
+}

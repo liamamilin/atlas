@@ -1,0 +1,172 @@
+{
+ "scenario": {
+  "name": "Draft and save a README with selection-based markup",
+  "audience": "a developer writing repository documentation",
+  "objective": "Turn a plain draft into a saved README.md whose formatting exists only as markup characters, verifying the derived preview before saving",
+  "workflow": [
+   "Paste or open a plain-text draft of the README into the source editor",
+   "Select a phrase and use the Bold button, then select a line and use the H1 button, so markup is inserted around the selection",
+   "Glance at the live preview pane to confirm the heading and emphasis render as intended",
+   "Save, downloading the .md file, and reopen it to confirm the stored text is the markup itself"
+  ],
+  "acceptance": [
+   "The downloaded .md file contains the literal markup characters and no styling data",
+   "The preview is recomputed from the saved text and shows the same heading and bold phrase",
+   "Word and character counts update to reflect the rendered source"
+  ]
+ },
+ "fixed_scope": null,
+ "delivery_profile": "web",
+ "source": {
+  "repository": "https://github.com/liyasthomas/marcdown",
+  "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+  "strategy_version": "full-leaf-selected-v2-032a5e151f64c6b3",
+  "collected_at": "2026-10-22T00:01:59.522656+00:00",
+  "files": {
+   "LICENSE": "d35fe88a672fac041639dba12e9c9c85df1334b0e4706c7f663fd60a6fd12ece",
+   "README.md": "98e59cd19fc2e5c5bec60203c3101eb4556286ff6d9d79725ddd8dd6c3001a76",
+   "index.html": "c871d574ec3937ebc2e307245f142737d2632973eedfefe46c20fae4681507ea",
+   "index.js": "66ffd4e13a3391af0a9cab210d8c95e4db70487275111be3c57f737b18a18d37"
+  },
+  "license_files": [
+   "LICENSE"
+  ],
+  "license": {
+   "status": "located",
+   "spdx_id": "MIT",
+   "notice_hashes": {
+    "LICENSE": "d35fe88a672fac041639dba12e9c9c85df1334b0e4706c7f663fd60a6fd12ece"
+   }
+  },
+  "license_uncertainties": [
+   "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+  ],
+  "excluded_paths": [
+   "Unselected files; upstream not installed or run"
+  ]
+ },
+ "source_ids": {
+  "requirements": {
+   "atlas:a14c24d234981599f180ad63ac6d79f338418a3bd37e34e93306b0835de1dd9d": "leaf.md",
+   "scenario:ae4c81615d7e8554611e724d27f4a1084e33c487ebb06b530d523e46ca955145": "fixed scenario"
+  },
+  "upstream": {
+   "upstream:7e24855bbc4b5fd08ae1a9e3d014252725229619b82a30730a90d895a19bbea4": {
+    "path": "LICENSE",
+    "repository": "https://github.com/liyasthomas/marcdown",
+    "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b"
+   },
+   "upstream:2118fe0c33091eb5cb22ce59c75b07642edc5c3e5279f87dfd9ebe1adb6a98fd": {
+    "path": "README.md",
+    "repository": "https://github.com/liyasthomas/marcdown",
+    "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b"
+   },
+   "upstream:262f7b513f8339a6c2714b23d436298c7801312569cbf56022dbe35645815f4f": {
+    "path": "index.html",
+    "repository": "https://github.com/liyasthomas/marcdown",
+    "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b"
+   },
+   "upstream:9c0da2a27482cf26fdcfb3d2d0f52c80ddd3c0e6418faf2c033c6701a3864ae7": {
+    "path": "index.js",
+    "repository": "https://github.com/liyasthomas/marcdown",
+    "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b"
+   }
+  }
+ },
+ "inventory": [
+  {
+   "path": "LICENSE",
+   "lines": 21
+  },
+  {
+   "path": "README.md",
+   "lines": 238
+  },
+  {
+   "path": "index.html",
+   "lines": 224
+  },
+  {
+   "path": "index.js",
+   "lines": 409
+  }
+ ],
+ "revision": {
+  "parent_failure_sha256": "f4f3fb94d6852a90689dedb092bc6cf9b555de92347e34b51d757f0ce1992645",
+  "feedback": {
+   "leaf": "markdown-editor",
+   "stage": "independent_review",
+   "code": "auxiliary_content",
+   "error": "independent review did not pass; retain candidate and findings",
+   "at": 1792627705.9784288,
+   "attempt": "attempt-1",
+   "stage_summaries": {
+    "calls/discovery/cli-summary.json": "a770bbc606cd79264f8cd71235c22c43c8a815998497b46c699be2513905d9a5",
+    "calls/blueprint-spec-review-aux/cli-summary.json": "d68f00f2f6cc52e2a0ed78c659a81eca0f26d4b8ecc227ea0f176d36970c0b8c",
+    "calls/blueprint-generate-aux/cli-summary.json": "b29fd31e60a3ceef016fbb82dbe96003cee408f1c8d44beeb6ec605feee4d1dc"
+   },
+   "raw_outputs": {
+    "calls/discovery/original-response.json": "161c77df74c77bcbd119ec068286051b86c9e1df8b9d1a9db4c2bac2faa3f295",
+    "calls/blueprint-spec-review-aux/original-response.json": "4cfe96fa62c6dbd9afebfc2f7cb5660a98f0d533d2fae330c5eb3e7d0cf0cf14",
+    "calls/blueprint-generate-aux/original-response.json": "32be98196b1b5433c15692601315e7bea989e90b5d1410aa6655f7a6bf2a41ac"
+   },
+   "review": {
+    "input_digest": "71c2050768d1b2e73933d4e9e46e4d84225af5ec4fe1ef4954988fe93b65176b",
+    "verdict": "needs_changes",
+    "checks": {
+     "leaf_scope": true,
+     "source_fidelity": false,
+     "design_distinction": true,
+     "core_journey": true,
+     "architecture": true,
+     "acceptance": false,
+     "limits_and_safety": true
+    },
+    "observations": [
+     {
+      "index": 0,
+      "verdict": "accepted",
+      "reason": "index.js 253-268 shows the switch cases: bold maps to '**'/'**' and h1 maps to '# '/''; the fixed prefix/suffix claim is accurate."
+     },
+     {
+      "index": 1,
+      "verdict": "accepted",
+      "reason": "index.js 319-336 rebuilds the textarea value from the pre-selection text, the selected substring wrapped by the prefix/suffix, and the post-selection text, then sets the selection by adding the prefix length; accurate."
+     },
+     {
+      "index": 2,
+      "verdict": "accepted",
+      "reason": "index.js 197-211 reads #getm.value, replaces every LF with CRLF, creates a Blob of type text/plain, and downloads it as marcdown.md; accurate."
+     },
+     {
+      "index": 3,
+      "verdict": "accepted",
+      "reason": "index.js 73-84 reads viewer.innerText, removes whitespace with /\\s+/gi for the character count, and sets both counts to zero and save.disabled=true when the text is empty; accurate."
+     },
+     {
+      "index": 4,
+      "verdict": "accepted",
+      "reason": "index.js 87-96 takes the buffer HTML, runs marked.parse, highlights code blocks, and swaps buffer and viewer so the visible pane contains the parsed result; accurate."
+     },
+     {
+      "index": 5,
+      "verdict": "rejected",
+      "reason": "index.html 162-179 does not show a hidden #buffer: line 177 places style='display: none;' on #viewer, while the #buffer div at line 179 has no hidden style; index.js 40-47 swaps visibility at runtime. The specific 'hidden #buffer' claim is inaccurate."
+     },
+     {
+      "index": 6,
+      "verdict": "accepted",
+      "reason": "README.md 63-69 contains the demo link and the steps to paste/type markdown on the left, view the preview on the right, and save the markdown file; accurate."
+     }
+    ],
+    "issues": [
+     "Blocking: acceptance/probe.py A01 'empty selections and blank lines' (lines 99-100) requires applyMarkup({text:'',start:0,end:0},'h1') to return '# ', but VIEW_ARCH.md section 4 (lines 33-34; also section 9 line 81) says blank lines are untouched and that if no non-blank line intersects, text and selection are returned unchanged. An empty document has no non-blank line. A core conforming to the architecture returns '' and fails A01; a core passing A01 violates the architecture. The probe and the architecture must be reconciled.",
+     "Blocking: the probe's negative assertions only call throws() (probe.py lines 54-58, used at 109-111 and 166-169), so any exception satisfies them. They never assert the explicit error codes INVALID_SELECTION, UNKNOWN_ACTION, EMPTY_DOCUMENT, INVALID_FILENAME, FILE_TOO_LARGE, or INVALID_CONTENT defined in VIEW_ARCH.md lines 35 and 55-58. A core throwing generic Errors would pass. A03 also covers only LF (probe.py 161-162), and no test covers non-string openText, so section 7's INVALID_CONTENT and CRLF-preservation rules are unverified.",
+     "Blocking source-fidelity finding: observation 5 cites index.html 162-179 but the hidden element in that range is #viewer (line 177), not #buffer (line 179); the buffer/viewer visibility is swapped by index.js 40-47. The observation overstates the fixed hidden state of #buffer."
+    ],
+    "summary": "The leaf scope, target architecture, design distinction from the upstream CDN/MathJax app, scenario journey, and explicit limits are otherwise coherent. The delivery is not ready: A01 contains a direct empty-document H1 contradiction with the architecture, the probe does not verify the explicit error-code contract, and observation 5 misidentifies the hidden upstream element. Verdict: needs_changes."
+   }
+  },
+  "scope": "Fix existing core violations only; preserve fixed scenario, sources and delivery profile."
+ }
+}

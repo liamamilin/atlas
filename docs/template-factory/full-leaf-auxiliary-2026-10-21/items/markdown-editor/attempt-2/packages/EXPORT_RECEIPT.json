@@ -1,0 +1,89 @@
+{
+ "origin": "assisted-trial",
+ "template_digest": "a5db1e2a1f4794c264160bbd1a60e1ae48a11843bb73397d2e046d3458b9ad8e",
+ "export": {
+  "phase": "P0",
+  "project_name": "attempt-2-trial",
+  "template_digest": "a5db1e2a1f4794c264160bbd1a60e1ae48a11843bb73397d2e046d3458b9ad8e",
+  "views": {
+   "knowledge": "KNOWLEDGE.md",
+   "execution": "HANDOFF.md",
+   "acceptance": "ACCEPTANCE_CONTRACT.json"
+  },
+  "acceptance_contract_path": "ACCEPTANCE_CONTRACT.json",
+  "acceptance_contract_schema": "atlas.acceptance-contract.v1"
+ },
+ "provenance": {
+  "origin": "assisted-trial",
+  "scenario": {
+   "acceptance": [
+    "The downloaded .md file contains the literal markup characters and no styling data",
+    "The preview is recomputed from the saved text and shows the same heading and bold phrase",
+    "Word and character counts update to reflect the rendered source"
+   ],
+   "audience": "a developer writing repository documentation",
+   "id": "scn_6ab05f5a50764c4f8f2eb9f74a9dfda8",
+   "leaf": "markdown-editor",
+   "leaf_name": "Markdown编辑器",
+   "name": "README Markup Editor",
+   "objective": "Turn a plain draft into a saved README.md whose formatting exists only as markup characters, verifying the derived preview before saving",
+   "revision": 1,
+   "status": "draft",
+   "updated_at": "2026-10-22T01:41:03.844144+00:00",
+   "workflow": [
+    "Paste or open a plain-text draft of the README into the source editor",
+    "Select a phrase and use the Bold button, then select a line and use the H1 button, so markup is inserted around the selection",
+    "Glance at the live preview pane to confirm the heading and emphasis render as intended",
+    "Save, downloading the .md file, and reopen it to confirm the stored text is the markup itself"
+   ]
+  },
+  "local_confirmation": "User authorized this exact id/revision for assisted trial; formal draft unchanged.",
+  "case_ref": {
+   "case_id": "case:repo:d2480efdae2725bb0cf42249:f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+   "revision": 2,
+   "digest": "4d6177aa3939a79ead28efdaa3148ec70138f65accaf32907875e77f2aad1f84"
+  },
+  "case_record_sha256": "0e54c8b544afe586521bfed803ba7a13c1aa0aa635b62cd039610c9e05f220ae",
+  "definition_digest": "f59b7c032bd542a11cf287d52ebf85230610380d6056d5aee8ced9efa79ba150",
+  "acceptance_inputs": {
+   "README.md": "c19afd77a677c1f8133818a9e4bf2d090e3d3a0c28e28d5462d0fb8802c46b9f",
+   "probe.py": "167911cdda1c9a8a13b36fa84694becf457925bed84a875c8c7e3aa84a628fa6"
+  },
+  "official_publication": false,
+  "upstream_runtime": "not_run",
+  "independent_evidence_review": "passed_auxiliary_static",
+  "note": "OpenCode CLI + Go source study and separate-session review. No upstream/downstream runtime or strict certification.",
+  "model_production": {
+   "schema": "atlas.auxiliary-model-production.v1",
+   "mode": "opencode-cli-go",
+   "model": "open-design/deepseek-v4.1-flash",
+   "stage_models": {
+    "blueprint-generate-aux": "open-design/deepseek-v4.1-flash",
+    "blueprint-spec-review-aux": "open-design/deepseek-v4.1-flash"
+   },
+   "campaign_id": "atlas-v1-first-production-2026-10-19",
+   "phase": "auxiliary-full-full-leaf-auxiliary-2026-10-21",
+   "full_plan_id": "full-leaf-auxiliary-2026-10-21",
+   "profile": "full-leaf-v1",
+   "prompt_digest": "81297f85377bd12d9fa00400effbb8a5d308ded0019309cdc56772e5a1545ab5",
+   "review_status": "passed",
+   "review_input_digest": "a94c78f60d8e2cd6f8c9690017e8c7cdb01cb98362082bcc66cbc3181d85946e",
+   "review_result_digest": "8d69221818b4b84e1c3e412067c16ed4c0ea02219f0254dc67b6a05f9b289e33",
+   "source_snapshot_digest": "09048d1be05e62f33c7a760af661941ca535387067ea2f734bb35eedb62e86bc",
+   "sessions": {
+    "blueprint-generate-aux": "ses_e9ec37ac9ffe7Rov1aN3iNcrKO",
+    "blueprint-spec-review-aux": "ses_e9ebf49e5ffeUClLsOIPCptQlM"
+   },
+   "research_reuse": null,
+   "upstream_runtime": "not_run",
+   "application_runtime": "not_run",
+   "strict_acceptance": false
+  }
+ },
+ "controlled_opencode_calls_added": 2,
+ "official_queue_consumed": false,
+ "archives": {
+  "template-snapshot.zip": "a4cee4aa537580d41e1243711b09356509a6c83bc2721613c370262edde90554",
+  "development-package.zip": "fdded7e6276b76b9522d6114954890655d8a263cb7711f9024c7b98eb8ce3ce0"
+ }
+}

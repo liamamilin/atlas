@@ -1,0 +1,342 @@
+{
+  "scenario_record": {
+    "acceptance": [
+      "The downloaded .md file contains the literal markup characters and no styling data",
+      "The preview is recomputed from the saved text and shows the same heading and bold phrase",
+      "Word and character counts update to reflect the rendered source"
+    ],
+    "audience": "a developer writing repository documentation",
+    "id": "scn_6ab05f5a50764c4f8f2eb9f74a9dfda8",
+    "leaf": "markdown-editor",
+    "leaf_name": "Markdown编辑器",
+    "name": "README Markup Editor",
+    "objective": "Turn a plain draft into a saved README.md whose formatting exists only as markup characters, verifying the derived preview before saving",
+    "revision": 1,
+    "status": "draft",
+    "updated_at": "2026-10-22T01:41:03.844144+00:00",
+    "workflow": [
+      "Paste or open a plain-text draft of the README into the source editor",
+      "Select a phrase and use the Bold button, then select a line and use the H1 button, so markup is inserted around the selection",
+      "Glance at the live preview pane to confirm the heading and emphasis render as intended",
+      "Save, downloading the .md file, and reopen it to confirm the stored text is the markup itself"
+    ]
+  },
+  "case_ref": {
+    "case_id": "case:repo:d2480efdae2725bb0cf42249:f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+    "revision": 2,
+    "digest": "4d6177aa3939a79ead28efdaa3148ec70138f65accaf32907875e77f2aad1f84"
+  },
+  "research": {
+    "summary": "同一共享案例记录的静态研究与明确的设计推断；完整定位见inputs/shared-case-record.json。",
+    "sources": [
+      {
+        "id": "S02",
+        "name": "ev_assisted_attempt_2_1",
+        "url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/index.js",
+        "version": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "license": "MIT",
+        "license_url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/LICENSE",
+        "facts": "code_observation: In the apply action switch, bold uses the prefix and suffix **, h1 uses the prefix '# ' and an empty suffix, and the other actions likewise receive fixed prefix and suffix strings.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI 研究与编写（渠道与模型见调用记录）；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S03",
+        "name": "ev_assisted_attempt_2_2",
+        "url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/index.js",
+        "version": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "license": "MIT",
+        "license_url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/LICENSE",
+        "facts": "code_observation: The modern-browser branch rebuilds the textarea value from the text before startPos, the prefix, the selected substring, the suffix, and the text after endPos, then sets selectionStart and selectionEnd to startPos and endPos plus the prefix length.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI 研究与编写（渠道与模型见调用记录）；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S04",
+        "name": "ev_assisted_attempt_2_3",
+        "url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/index.js",
+        "version": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "license": "MIT",
+        "license_url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/LICENSE",
+        "facts": "code_observation: download() reads the #getm textarea value, replaces every LF with CRLF, creates a Blob of type text/plain, and clicks an anchor whose download name is fixed as marcdown.md.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI 研究与编写（渠道与模型见调用记录）；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S05",
+        "name": "ev_assisted_attempt_2_4",
+        "url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/index.js",
+        "version": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "license": "MIT",
+        "license_url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/LICENSE",
+        "facts": "code_observation: Counts use innerText from whichever viewer or buffer element is currently visible; the character count removes whitespace runs, and an empty text value writes 0 words, 0 chars, and disables #save.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI 研究与编写（渠道与模型见调用记录）；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S06",
+        "name": "ev_assisted_attempt_2_5",
+        "url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/index.js",
+        "version": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "license": "MIT",
+        "license_url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/LICENSE",
+        "facts": "code_observation: SwapBuffers exchanges the preview and buffer references, hides the element that was preview, and sets the element that was buffer to display flex.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI 研究与编写（渠道与模型见调用记录）；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S07",
+        "name": "ev_assisted_attempt_2_6",
+        "url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/index.html",
+        "version": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "license": "MIT",
+        "license_url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/LICENSE",
+        "facts": "code_observation: The output section defines #viewer with inline display:none and a sibling #buffer with no inline display style; the #getm textarea is in the editor div immediately before both.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI 研究与编写（渠道与模型见调用记录）；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S08",
+        "name": "ev_assisted_attempt_2_7",
+        "url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/README.md",
+        "version": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "license": "MIT",
+        "license_url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/LICENSE",
+        "facts": "documentation: The documented demo loop is to paste or type markdown on the left, view the preview on the right, then save the markdown file.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI 研究与编写（渠道与模型见调用记录）；独立会话静态审阅通过，上游和下游应用均未运行。"
+      },
+      {
+        "id": "S09",
+        "name": "ev_assisted_attempt_2_design",
+        "url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/LICENSE",
+        "version": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "license": "MIT",
+        "license_url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/LICENSE",
+        "facts": "inference: Build a dependency-free static ES-module web app for the same fixed journey: a textarea source of record, Bold and H1 insertion at the current selection, a preview recomputed only from that text, and Save producing README.md unchanged. The upstream CDN renderer, MathJax, highlight.js, syncscroll, service worker and theme persistence are not replicated; a small deterministic escaped renderer covers only the scenario's headings, emphasis and inline code.",
+        "reuse": "只参考设计；不复制上游代码。OpenCode CLI 研究与编写（渠道与模型见调用记录）；独立会话静态审阅通过，上游和下游应用均未运行。"
+      }
+    ],
+    "gaps": [
+      "辅助静态独审通过，不代表运行通过",
+      "上游not_run",
+      "No persistence or autosave: reloading the page loses the draft; only the downloaded file survives.",
+      "Programmatic textarea value replacement may reset the browser undo stack, so undo after Bold or H1 is not guaranteed.",
+      "The renderer covers headings, paragraphs, strong, emphasis and inline code only; unmatched markers stay literal and lists, links, images, tables, fenced blocks, math and raw HTML are not rendered.",
+      "Counts are UTF-16 code units and whitespace-split words: astral characters count as two and unspaced CJK prose counts as one word. Source-looking HTML counts as visible characters.",
+      "H1 only inserts prefixes; existing H1 to H6 lines are preserved, so it is not a heading-level toggle and cannot remove markup.",
+      "No scroll sync, outline, multi-document workspace, syntax highlighting or drag-and-drop.",
+      "Browser download naming and placement, the file chooser, visual layout and undo behavior are manual checks; probe.py verifies the core through Node and does not run a browser.",
+      "openText preserves a leading BOM and line endings exactly; the UI decodes UTF-8 with BOM preservation, but other tools may treat a BOM differently.",
+      "Non-UTF-8 input is decoded as UTF-8 with replacement characters; there is no encoding picker."
+    ]
+  },
+  "spec": {
+    "title": "README Markup Editor",
+    "roles": [
+      {
+        "id": "R01",
+        "name": "a developer writing repository documentation",
+        "responsibility": "Turn a plain draft into a saved README.md whose formatting exists only as markup characters, verifying the derived preview before saving"
+      }
+    ],
+    "features": [
+      {
+        "id": "F01",
+        "name": "Selection-based markup insertion: Bold wraps the selected phrase in ** and keeps that phrase selected; H1 adds one '# ' prefix to each selected non-blank line that is not already an ATX heading.",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "Bold on 'A plain phrase.' with offsets 2..7 returns 'A **plain** phrase.' with offsets 4..9 and leaves the input untouched; H1 on a two-line Title/Body document with offsets 0..5 returns a single '# ' prefix, offsets 2..7, and is idempotent; empty and blank documents return unchanged; bad ranges raise INVALID_SELECTION and unsupported actions raise UNKNOWN_ACTION.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09"
+        ],
+        "acceptance": [
+          "A01"
+        ]
+      },
+      {
+        "id": "F02",
+        "name": "Derived preview: rendered synchronously from source text only, with escaped HTML, ATX headings, strong, emphasis and inline code, and with CRLF, LF and CR treated as equivalent line breaks.",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "Rendering a Title heading followed by a blank line and 'A **bold** phrase.' produces <h1>Title</h1> and <strong>bold</strong> with no literal **; inline code is escaped; a script tag is escaped as visible text; CRLF and LF render identically; unmatched ** does not create strong.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09"
+        ],
+        "acceptance": [
+          "A02"
+        ]
+      },
+      {
+        "id": "F03",
+        "name": "Markup-only save and reopen: README.md by default, text/markdown, body identical to the source including line endings and BOM; openText is an identity transform under a 1 MiB UTF-8 cap.",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "The default payload is README.md with mime text/markdown and a body identical to the source, including CRLF and a leading BOM; reopening returns the same text and preview; blank documents raise EMPTY_DOCUMENT; unsafe names raise INVALID_FILENAME; non-string or null input raises INVALID_CONTENT; more than 1,048,576 UTF-8 bytes raises FILE_TOO_LARGE.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09"
+        ],
+        "acceptance": [
+          "A03"
+        ]
+      },
+      {
+        "id": "F04",
+        "name": "Rendered counts: words and UTF-16 characters from preview-visible text, excluding markup, neutral under bolding, and zero for empty text.",
+        "phase": "P0",
+        "applicability": "current required",
+        "reason": "For the fixed heading-plus-bold example, counts are 4 words and 17 characters; bolding a plain phrase changes neither; empty and blank text are 0/0; markup markers are excluded while inline-code content is counted; the returned keys are words then chars.",
+        "sources": [
+          "S01",
+          "S02",
+          "S03",
+          "S04",
+          "S05",
+          "S06",
+          "S07",
+          "S08",
+          "S09"
+        ],
+        "acceptance": [
+          "A04"
+        ]
+      }
+    ],
+    "acceptance": [
+      {
+        "id": "A01",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "Bold on 'A plain phrase.' with offsets 2..7 returns 'A **plain** phrase.' with offsets 4..9 and leaves the input untouched; H1 on a two-line Title/Body document with offsets 0..5 returns a single '# ' prefix, offsets 2..7, and is idempotent; empty and blank documents return unchanged; bad ranges raise INVALID_SELECTION and unsupported actions raise UNKNOWN_ACTION.",
+        "features": [
+          "F01"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A02",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "Rendering a Title heading followed by a blank line and 'A **bold** phrase.' produces <h1>Title</h1> and <strong>bold</strong> with no literal **; inline code is escaped; a script tag is escaped as visible text; CRLF and LF render identically; unmatched ** does not create strong.",
+        "features": [
+          "F02"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A03",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "The default payload is README.md with mime text/markdown and a body identical to the source, including CRLF and a leading BOM; reopening returns the same text and preview; blank documents raise EMPTY_DOCUMENT; unsafe names raise INVALID_FILENAME; non-string or null input raises INVALID_CONTENT; more than 1,048,576 UTF-8 bytes raises FILE_TOO_LARGE.",
+        "features": [
+          "F03"
+        ],
+        "implementation": "acceptance/probe.py"
+      },
+      {
+        "id": "A04",
+        "phase": "P0",
+        "type": "positive",
+        "goal": "For the fixed heading-plus-bold example, counts are 4 words and 17 characters; bolding a plain phrase changes neither; empty and blank text are 0/0; markup markers are excluded while inline-code content is counted; the returned keys are words then chars.",
+        "features": [
+          "F04"
+        ],
+        "implementation": "acceptance/probe.py"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "D01",
+        "question": "首版运行与数据边界？",
+        "default": "Serve app/ with a static server (`python3 -m http.server 4173 --directory app`) and use it in a browser; the document lives only in page memory and is written solely through the Save download. Data boundary: no server, database, storage API or network. Node.js >=18 is needed only for acceptance_files/probe.py.",
+        "when_to_ask": "确需公网托管或多人数据时先确认，不自行扩展。",
+        "impact": "保护本地数据，避免默认外发。",
+        "status": "assisted default"
+      },
+      {
+        "id": "D02",
+        "question": "是否复刻上游？",
+        "default": "Build a dependency-free static ES-module web app for the same fixed journey: a textarea source of record, Bold and H1 insertion at the current selection, a preview recomputed only from that text, and Save producing README.md unchanged. The upstream CDN renderer, MathJax, highlight.js, syncscroll, service worker and theme persistence are not replicated; a small deterministic escaped renderer covers only the scenario's headings, emphasis and inline code.",
+        "when_to_ask": "目标变化、破坏已有数据或需要引入上游实现/依赖时先确认。",
+        "impact": "不混淆来源事实与目标设计。",
+        "status": "assisted default"
+      }
+    ],
+    "phases": [
+      {
+        "id": "P0",
+        "title": "核心可用",
+        "goal": "Turn a plain draft into a saved README.md whose formatting exists only as markup characters, verifying the derived preview before saving",
+        "features": [
+          "F01",
+          "F02",
+          "F03",
+          "F04"
+        ],
+        "acceptance": [
+          "A01",
+          "A02",
+          "A03",
+          "A04"
+        ]
+      }
+    ],
+    "architecture_markdown": "# README Markup Editor - target architecture\n\n## 1. Stack, boundary and delivery\n- Target: static web app made of HTML, CSS and ES2020 modules under `app/`, with no build step, no third-party runtime dependency and no network request while editing.\n- Delivery profile: `web`. Serve `app/` read-only from any static file server.\n- One in-memory document per page. No server, database, account, localStorage, sessionStorage or cookie. Reload discards the draft; the downloaded file is the only persistent artifact.\n- Source of record is the textarea string. Preview HTML, counts and Save-enabled state are derived and never written back into the document.\n- Node.js >=18 is used only by the acceptance adapter to import `src/core.js`; the app itself does not need Node.\n- Data flow:\n```text\nsource text + selection -> applyMarkup -> new source text\nsource text -> renderMarkdown -> preview DOM\nsource text -> countText -> rendered counts\nsource text -> createSavePayload -> UTF-8 Blob download\nfile bytes -> UTF-8 decode preserving BOM -> openText -> source text\n```\n\n## 2. File layout\n```text\napp/\n  index.html          toolbar, textarea #source, preview #preview, #status, counts\n  styles.css          fixed shell and preview element styling only\n  package.json        {'type': 'module'}\n  src/core.js         pure contracts: applyMarkup, renderMarkdown, countText, createSavePayload, openText\n  src/app.js          DOM wiring, file reading, Blob download\nacceptance_files/\n  probe.py            stdlib Node-backed verifier for the core contracts\n  README.md           run steps, manual UI check, limits\n```\n- `core.js` imports nothing from the DOM, network or Node built-ins. It may use the global `TextEncoder`.\n- `app.js` owns only textarea, file, download and status DOM behavior; decisions come from core functions.\n\n## 3. Document model\n`{ text: string, start: int, end: int }`\n- `text` is the exact UTF-16 string.\n- `start` and `end` are code-unit offsets with `0 <= start <= end <= text.length`.\n- No other authoritative state. Save is enabled iff `text.trim() !== ''`.\n- Opened bytes are decoded as UTF-8 with the BOM preserved by using `TextDecoder('utf-8', {'ignoreBOM': true})` in the UI. Line endings (LF, CRLF, CR) and a leading U+FEFF are data; open and save preserve them.\n- Open does not normalize the selection: it returns `start = 0`, `end = 0`.\n\n## 4. Selection insertion: applyMarkup(doc, action)\nSignature: `applyMarkup(doc, action) -> {text, start, end}`. It is pure, never mutates `doc`, and always returns a new object.\n\nValidation order:\n1. `doc` must be an object with a string `text`, integer `start` and `end`, and a valid range. Otherwise throw an `Error` with `code = 'INVALID_SELECTION'`.\n2. `action` must be exactly `'bold'` or `'h1'`. Otherwise throw `code = 'UNKNOWN_ACTION'`.\n\n### bold\n- Insert `**` at `start` and `**` at `end` around the selected text.\n- Return selection `[start + 2, end + 2]`, so the selected phrase stays selected without either marker pair.\n- An empty selection is allowed: it inserts `****` and puts the caret between the two pairs.\n\n### h1\n- Lines are split after CRLF, LF or CR. A line starts at the first character after its separator. A final empty line exists when the text ends with a separator.\n- Lines considered are all lines intersecting the half-open range `[start, end)` for a non-empty selection, or the line containing the caret for an empty selection. A line that starts exactly at `end` is not considered when `start < end`. A caret at `text.length` after a trailing separator belongs to the final empty line.\n- A line that contains only whitespace is untouched.\n- A line already beginning with 1 to 6 `#` characters followed by a space, a tab or end of line is untouched. This makes repeated H1 calls idempotent and leaves an H2 as an H2.\n- Every other considered line receives exactly one `# ` inserted at its start.\n- If no line receives a prefix, return `{text: doc.text, start: doc.start, end: doc.end}` unchanged.\n- Otherwise the new selection keeps the same original characters selected: `newStart = start + 2 * (number of insertions at positions <= start)`; `newEnd = end + 2 * (number of insertions at positions < end)`. For a caret, both ends are `newStart`. This includes prefixes inserted at interior line starts and excludes a prefix inserted exactly at the selection start.\n- Consequences: an empty document, a whitespace-only document, a caret on a blank line, or a set of lines that are all existing headings returns unchanged text and selection. H1 with a caret on a plain line inserts `# ` and moves the caret after it. There is no toggle or marker removal.\n\nPinned examples:\n- `A plain phrase.` with selection 2..7 and `bold` becomes `A **plain** phrase.` with selection 4..9.\n- The text `One`, blank line, `Body`, trailing newline, with selection 0..9 and `h1` becomes `# One`, blank line, `# Body`, trailing newline, with selection 2..13.\n\n## 5. Derived preview: renderMarkdown(text)\n- A non-string input throws `INVALID_CONTENT`.\n- Escape `&`, `<`, `>`, double quote and single quote before adding any tags, so source HTML is always visible text rather than markup.\n- Split on CRLF, LF or CR. A line of 1 to 6 `#` characters followed by a space, a tab or end of line becomes `<h1>` to `<h6>`; inline formatting applies inside the heading text.\n- A blank line closes an open paragraph. Consecutive non-blank, non-heading lines become one `<p>`; line breaks inside that paragraph are retained as newline text.\n- Inline subset, in this order: matched backtick code spans first (escaped content, no nested formatting), then `**text**` to `<strong>`, then `*text*` to `<em>`. Unmatched delimiters stay literal.\n- Blocks are joined with one newline. Empty or blank-only input returns an empty string. The result depends only on the input.\n- Out of scope: links, images, lists, blockquotes, tables, fenced code blocks, raw HTML pass-through, math and footnotes. CSS may style preview elements, but no CSS or styling data is stored in the document.\n\n## 6. Counts, save and open\n### countText(text)\n- A non-string input throws `INVALID_CONTENT`.\n- Render with `renderMarkdown`, strip only the generated block and inline tags, then decode `&lt;`, `&gt;`, `&quot;`, `&#39;` and finally `&amp;` to recover visible text.\n- `words`: 0 for empty or whitespace-only visible text, otherwise the count of whitespace-separated tokens. `chars`: the visible text with all whitespace removed, measured in UTF-16 code units.\n- Return `{words, chars}` in that key order. Markup markers, heading prefixes and emphasis delimiters are excluded; inline-code content is included; source-looking HTML is visible and counted.\n\n### createSavePayload(doc, filename = 'README.md')\n- `doc` must be an object with a string `text`, otherwise `INVALID_CONTENT`.\n- If the UTF-8 encoding of `text` exceeds 1,048,576 bytes, throw `FILE_TOO_LARGE`; the boundary is allowed.\n- If `text.trim() === ''`, throw `EMPTY_DOCUMENT`.\n- `filename` must be a string of 4 to 120 characters, start with an ASCII letter or digit, contain only ASCII letters, digits, dot, underscore or hyphen, and end with `.md` case-insensitively. No directory separators, spaces, control characters or leading dot. Otherwise throw `INVALID_FILENAME`.\n- Return `{filename, mime: 'text/markdown', body: doc.text}`. `body` is exactly the source string: no line-ending normalization, no BOM insertion or removal, no added trailing newline, no HTML or style metadata.\n- The app has no overwrite operation. The browser owns the download location and may rename on collision; the app never deletes or rewrites an existing local file.\n\n### openText(raw)\n- A non-string input throws `INVALID_CONTENT`.\n- If the UTF-8 encoding of `raw` exceeds 1,048,576 bytes, throw `FILE_TOO_LARGE`; exactly 1,048,576 bytes is accepted.\n- Return `{text: raw, start: 0, end: 0}`. Do not trim, strip a BOM or normalize line endings. An empty string is a valid open, although Save then refuses it.\n- Therefore `openText(payload.body).text === payload.body`, and its preview equals the preview before save.\n\n### Error contract\nErrors are `Error` objects with a stable `.code` among `INVALID_SELECTION`, `UNKNOWN_ACTION`, `EMPTY_DOCUMENT`, `INVALID_FILENAME`, `FILE_TOO_LARGE` and `INVALID_CONTENT`; messages are human-readable. The UI catches them, shows code and message in `#status`, and leaves the document unchanged.\n\n## 7. UI and lifecycle\n- Layout: a header toolbar with B, H1, Open and Save; a `#source` textarea; a `#preview` pane; a `#status` live region; word and character counts.\n- On load the document is blank, preview is empty, counts are 0/0, and Save is disabled.\n- Text input, selection changes, clicks and key events update the cached `start` and `end` without mutating text.\n- Bold or H1 click: read the textarea value and cached selection, call `applyMarkup`, then atomically write the returned text, set the returned selection and recompute preview and counts. If the call throws, keep the old text and selection and show the code.\n- Open accepts `.md`, `.markdown` and `.txt`. Read the file bytes, decode UTF-8 with BOM preserved, and call `openText`; replace the current document only after that call succeeds. A failed open shows the code and keeps the old document. No upload or server call occurs.\n- Preview and counts recompute synchronously after every edit, insertion or successful open; there is no debounce timer.\n- Save calls `createSavePayload` with the default README.md, builds a Blob from `payload.body` with type `text/markdown;charset=utf-8`, triggers a download named `payload.filename`, then revokes the object URL. Save is disabled for blank text and the core still rejects it.\n- Page reload starts blank. There is no autosave, undo integration, theme persistence, drag-and-drop, PWA, syntax highlighting, scroll sync or multi-document tab. Those are explicit non-goals.\n\nLifecycle: blank -> type or open -> derived preview/counts -> insert markup -> derived preview/counts -> save download -> optionally open the saved file as a new document. A failure never partially mutates the document.\n\n## 8. Acceptance mapping\n- A01 verifies pure selection insertion: Bold text and selection, H1 prefix/selection/idempotence, blank and empty no-ops, UTF-16 offsets, and coded errors.\n- A02 verifies the derived preview: heading and strong output, escaped HTML, inline code and emphasis, paragraph boundaries, CRLF equivalence, determinism and unmatched delimiters.\n- A03 verifies save and reopen: default name and MIME, body identity for CRLF and BOM, reopen identity and preview equality, blank, unsafe, non-string and oversized errors.\n- A04 verifies visible-text counts: 4 words/17 characters for the pinned example, bolding neutrality, zero for empty text, markup exclusion, inline-code inclusion and key order.\n- `probe.py` runs these through a Node ES-module adapter. The browser shell, layout, file chooser and download placement are manual checks; no pixel or download-path claim is made.\n\n## 9. Decisions and limits\n- The default filename is README.md to match the fixed journey; custom names are a core contract, not a UI feature.\n- H1 inserts prefixes and never removes them. Existing H1 to H6 lines are preserved, so the action is idempotent but not a heading-level switch.\n- The renderer is deliberately small. Unmatched markers stay literal; non-supported markup appears as escaped or plain text.\n- Counts use UTF-16 units and whitespace tokenization: astral characters count as two and unspaced CJK prose counts as one word. HTML-looking source text counts as visible characters.\n- No persistence, collaboration, sync, version control or publishing integration exists.\n- The 1 MiB UTF-8 cap is a safety boundary applied on both open and save; larger drafts cannot be saved through this core.\n- Source observations describe the upstream files at the pinned commit as static evidence; upstream was not installed or run. Browser behavior for downloads and the file picker is host-owned and only manually checked.",
+    "limits": [
+      "辅助试产，非严格G1/T08。",
+      "No persistence or autosave: reloading the page loses the draft; only the downloaded file survives.",
+      "Programmatic textarea value replacement may reset the browser undo stack, so undo after Bold or H1 is not guaranteed.",
+      "The renderer covers headings, paragraphs, strong, emphasis and inline code only; unmatched markers stay literal and lists, links, images, tables, fenced blocks, math and raw HTML are not rendered.",
+      "Counts are UTF-16 code units and whitespace-split words: astral characters count as two and unspaced CJK prose counts as one word. Source-looking HTML counts as visible characters.",
+      "H1 only inserts prefixes; existing H1 to H6 lines are preserved, so it is not a heading-level toggle and cannot remove markup.",
+      "No scroll sync, outline, multi-document workspace, syntax highlighting or drag-and-drop.",
+      "Browser download naming and placement, the file chooser, visual layout and undo behavior are manual checks; probe.py verifies the core through Node and does not run a browser.",
+      "openText preserves a leading BOM and line endings exactly; the UI decodes UTF-8 with BOM preservation, but other tools may treat a BOM differently.",
+      "Non-UTF-8 input is decoded as UTF-8 with replacement characters; there is no encoding picker."
+    ]
+  },
+  "trial_scope": "# 辅助试用范围\n\nTurn a plain draft into a saved README.md whose formatting exists only as markup characters, verifying the derived preview before saving\n\n- No persistence or autosave: reloading the page loses the draft; only the downloaded file survives.\n- Programmatic textarea value replacement may reset the browser undo stack, so undo after Bold or H1 is not guaranteed.\n- The renderer covers headings, paragraphs, strong, emphasis and inline code only; unmatched markers stay literal and lists, links, images, tables, fenced blocks, math and raw HTML are not rendered.\n- Counts are UTF-16 code units and whitespace-split words: astral characters count as two and unspaced CJK prose counts as one word. Source-looking HTML counts as visible characters.\n- H1 only inserts prefixes; existing H1 to H6 lines are preserved, so it is not a heading-level toggle and cannot remove markup.\n- No scroll sync, outline, multi-document workspace, syntax highlighting or drag-and-drop.\n- Browser download naming and placement, the file chooser, visual layout and undo behavior are manual checks; probe.py verifies the core through Node and does not run a browser.\n- openText preserves a leading BOM and line endings exactly; the UI decodes UTF-8 with BOM preservation, but other tools may treat a BOM differently.\n- Non-UTF-8 input is decoded as UTF-8 with replacement characters; there is no encoding picker.\n\nOpenCode CLI 研究与编写（渠道与模型见调用记录）；独立会话静态审阅通过，上游和下游应用均未运行。模板先于应用；仅代表场景后续开发应用。严格G1/T08不因本包通过。",
+  "production": {
+    "schema": "atlas.auxiliary-model-production.v1",
+    "mode": "opencode-cli-go",
+    "model": "open-design/deepseek-v4.1-flash",
+    "stage_models": {
+      "blueprint-generate-aux": "open-design/deepseek-v4.1-flash",
+      "blueprint-spec-review-aux": "open-design/deepseek-v4.1-flash"
+    },
+    "campaign_id": "atlas-v1-first-production-2026-10-19",
+    "phase": "auxiliary-full-full-leaf-auxiliary-2026-10-21",
+    "full_plan_id": "full-leaf-auxiliary-2026-10-21",
+    "profile": "full-leaf-v1",
+    "prompt_digest": "81297f85377bd12d9fa00400effbb8a5d308ded0019309cdc56772e5a1545ab5",
+    "review_status": "passed",
+    "review_input_digest": "a94c78f60d8e2cd6f8c9690017e8c7cdb01cb98362082bcc66cbc3181d85946e",
+    "review_result_digest": "8d69221818b4b84e1c3e412067c16ed4c0ea02219f0254dc67b6a05f9b289e33",
+    "source_snapshot_digest": "09048d1be05e62f33c7a760af661941ca535387067ea2f734bb35eedb62e86bc",
+    "sessions": {
+      "blueprint-generate-aux": "ses_e9ec37ac9ffe7Rov1aN3iNcrKO",
+      "blueprint-spec-review-aux": "ses_e9ebf49e5ffeUClLsOIPCptQlM"
+    },
+    "research_reuse": null,
+    "upstream_runtime": "not_run",
+    "application_runtime": "not_run",
+    "strict_acceptance": false
+  }
+}

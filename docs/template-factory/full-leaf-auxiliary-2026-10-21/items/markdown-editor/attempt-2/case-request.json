@@ -1,0 +1,200 @@
+{
+  "case_id": "case:repo:d2480efdae2725bb0cf42249:f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+  "app_name": "liyasthomas/marcdown",
+  "source_snapshots": [
+    {
+      "repository": "https://github.com/liyasthomas/marcdown",
+      "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+      "strategy_version": "full-leaf-selected-v2-032a5e151f64c6b3",
+      "collected_at": "2026-10-22T00:01:59.522656+00:00",
+      "local_root": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/template-factory/sources/full-leaf-auxiliary-2026-10-21/markdown-editor/attempt-1",
+      "files": {
+        "LICENSE": "d35fe88a672fac041639dba12e9c9c85df1334b0e4706c7f663fd60a6fd12ece",
+        "README.md": "98e59cd19fc2e5c5bec60203c3101eb4556286ff6d9d79725ddd8dd6c3001a76",
+        "index.html": "c871d574ec3937ebc2e307245f142737d2632973eedfefe46c20fae4681507ea",
+        "index.js": "66ffd4e13a3391af0a9cab210d8c95e4db70487275111be3c57f737b18a18d37"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license": {
+        "status": "located",
+        "spdx_id": "MIT",
+        "notice_hashes": {
+          "LICENSE": "d35fe88a672fac041639dba12e9c9c85df1334b0e4706c7f663fd60a6fd12ece"
+        }
+      },
+      "license_uncertainties": [
+        "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+      ],
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ]
+    }
+  ],
+  "research": {
+    "summary": "OpenCode CLI静态研究与独立会话审阅；Build a dependency-free static ES-module web app for the same fixed journey: a textarea source of record, Bold and H1 insertion at the current selection, a preview recomputed only from that text, and Save producing README.md unchanged. The upstream CDN renderer, MathJax, highlight.js, syncscroll, service worker and theme persistence are not replicated; a small deterministic escaped renderer covers only the scenario's headings, emphasis and inline code.",
+    "scope": "Turn a plain draft into a saved README.md whose formatting exists only as markup characters, verifying the derived preview before saving",
+    "unknowns": [
+      "upstream not_run",
+      "auxiliary independent static review passed; runtime not_run",
+      "No persistence or autosave: reloading the page loses the draft; only the downloaded file survives.",
+      "Programmatic textarea value replacement may reset the browser undo stack, so undo after Bold or H1 is not guaranteed.",
+      "The renderer covers headings, paragraphs, strong, emphasis and inline code only; unmatched markers stay literal and lists, links, images, tables, fenced blocks, math and raw HTML are not rendered.",
+      "Counts are UTF-16 code units and whitespace-split words: astral characters count as two and unspaced CJK prose counts as one word. Source-looking HTML counts as visible characters.",
+      "H1 only inserts prefixes; existing H1 to H6 lines are preserved, so it is not a heading-level toggle and cannot remove markup.",
+      "No scroll sync, outline, multi-document workspace, syntax highlighting or drag-and-drop.",
+      "Browser download naming and placement, the file chooser, visual layout and undo behavior are manual checks; probe.py verifies the core through Node and does not run a browser.",
+      "openText preserves a leading BOM and line endings exactly; the UI decodes UTF-8 with BOM preservation, but other tools may treat a BOM differently.",
+      "Non-UTF-8 input is decoded as UTF-8 with replacement characters; there is no encoding picker."
+    ],
+    "input_digest": "176ce0e51b448d472ff6d18ac2dfbeab4e378b2b43ed63b784a1c55dbee59ee8",
+    "task_id": "full-leaf-auxiliary-2026-10-21-markdown-editor-attempt-2"
+  },
+  "observations": [
+    {
+      "evidence_id": "ev_assisted_attempt_2_1",
+      "kind": "code_observation",
+      "statement": "In the apply action switch, bold uses the prefix and suffix **, h1 uses the prefix '# ' and an empty suffix, and the other actions likewise receive fixed prefix and suffix strings.",
+      "location": {
+        "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "path": "index.js",
+        "file_digest": "66ffd4e13a3391af0a9cab210d8c95e4db70487275111be3c57f737b18a18d37",
+        "line_start": 252,
+        "line_end": 268
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_2",
+      "kind": "code_observation",
+      "statement": "The modern-browser branch rebuilds the textarea value from the text before startPos, the prefix, the selected substring, the suffix, and the text after endPos, then sets selectionStart and selectionEnd to startPos and endPos plus the prefix length.",
+      "location": {
+        "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "path": "index.js",
+        "file_digest": "66ffd4e13a3391af0a9cab210d8c95e4db70487275111be3c57f737b18a18d37",
+        "line_start": 323,
+        "line_end": 333
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_3",
+      "kind": "code_observation",
+      "statement": "download() reads the #getm textarea value, replaces every LF with CRLF, creates a Blob of type text/plain, and clicks an anchor whose download name is fixed as marcdown.md.",
+      "location": {
+        "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "path": "index.js",
+        "file_digest": "66ffd4e13a3391af0a9cab210d8c95e4db70487275111be3c57f737b18a18d37",
+        "line_start": 197,
+        "line_end": 211
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_4",
+      "kind": "code_observation",
+      "statement": "Counts use innerText from whichever viewer or buffer element is currently visible; the character count removes whitespace runs, and an empty text value writes 0 words, 0 chars, and disables #save.",
+      "location": {
+        "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "path": "index.js",
+        "file_digest": "66ffd4e13a3391af0a9cab210d8c95e4db70487275111be3c57f737b18a18d37",
+        "line_start": 68,
+        "line_end": 84
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_5",
+      "kind": "code_observation",
+      "statement": "SwapBuffers exchanges the preview and buffer references, hides the element that was preview, and sets the element that was buffer to display flex.",
+      "location": {
+        "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "path": "index.js",
+        "file_digest": "66ffd4e13a3391af0a9cab210d8c95e4db70487275111be3c57f737b18a18d37",
+        "line_start": 40,
+        "line_end": 47
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_6",
+      "kind": "code_observation",
+      "statement": "The output section defines #viewer with inline display:none and a sibling #buffer with no inline display style; the #getm textarea is in the editor div immediately before both.",
+      "location": {
+        "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "path": "index.html",
+        "file_digest": "c871d574ec3937ebc2e307245f142737d2632973eedfefe46c20fae4681507ea",
+        "line_start": 173,
+        "line_end": 179
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_7",
+      "kind": "documentation",
+      "statement": "The documented demo loop is to paste or type markdown on the left, view the preview on the right, then save the markdown file.",
+      "location": {
+        "url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/README.md",
+        "material_version": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "content_digest": "98e59cd19fc2e5c5bec60203c3101eb4556286ff6d9d79725ddd8dd6c3001a76"
+      }
+    },
+    {
+      "evidence_id": "ev_assisted_attempt_2_design",
+      "kind": "inference",
+      "statement": "Build a dependency-free static ES-module web app for the same fixed journey: a textarea source of record, Bold and H1 insertion at the current selection, a preview recomputed only from that text, and Save producing README.md unchanged. The upstream CDN renderer, MathJax, highlight.js, syncscroll, service worker and theme persistence are not replicated; a small deterministic escaped renderer covers only the scenario's headings, emphasis and inline code.",
+      "depends_on": [
+        "ev_assisted_attempt_2_1",
+        "ev_assisted_attempt_2_2",
+        "ev_assisted_attempt_2_3",
+        "ev_assisted_attempt_2_4",
+        "ev_assisted_attempt_2_5",
+        "ev_assisted_attempt_2_6",
+        "ev_assisted_attempt_2_7"
+      ],
+      "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。",
+      "assumptions": [
+        "上游未运行",
+        "辅助静态独审通过，运行未验证",
+        "No persistence or autosave: reloading the page loses the draft; only the downloaded file survives.",
+        "Programmatic textarea value replacement may reset the browser undo stack, so undo after Bold or H1 is not guaranteed.",
+        "The renderer covers headings, paragraphs, strong, emphasis and inline code only; unmatched markers stay literal and lists, links, images, tables, fenced blocks, math and raw HTML are not rendered.",
+        "Counts are UTF-16 code units and whitespace-split words: astral characters count as two and unspaced CJK prose counts as one word. Source-looking HTML counts as visible characters.",
+        "H1 only inserts prefixes; existing H1 to H6 lines are preserved, so it is not a heading-level toggle and cannot remove markup.",
+        "No scroll sync, outline, multi-document workspace, syntax highlighting or drag-and-drop.",
+        "Browser download naming and placement, the file chooser, visual layout and undo behavior are manual checks; probe.py verifies the core through Node and does not run a browser.",
+        "openText preserves a leading BOM and line endings exactly; the UI decodes UTF-8 with BOM preservation, but other tools may treat a BOM differently.",
+        "Non-UTF-8 input is decoded as UTF-8 with replacement characters; there is no encoding picker."
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "scenario_id": "scn_6ab05f5a50764c4f8f2eb9f74a9dfda8",
+      "scenario_revision": 1,
+      "reason": "Turn a plain draft into a saved README.md whose formatting exists only as markup characters, verifying the derived preview before saving",
+      "evidence_ids": [
+        "ev_assisted_attempt_2_1",
+        "ev_assisted_attempt_2_2",
+        "ev_assisted_attempt_2_3",
+        "ev_assisted_attempt_2_4",
+        "ev_assisted_attempt_2_5",
+        "ev_assisted_attempt_2_6",
+        "ev_assisted_attempt_2_7",
+        "ev_assisted_attempt_2_design"
+      ],
+      "adopted_scope": [
+        "Selection-based markup insertion: Bold wraps the selected phrase in ** and keeps that phrase selected; H1 adds one '# ' prefix to each selected non-blank line that is not already an ATX heading.",
+        "Derived preview: rendered synchronously from source text only, with escaped HTML, ATX headings, strong, emphasis and inline code, and with CRLF, LF and CR treated as equivalent line breaks.",
+        "Markup-only save and reopen: README.md by default, text/markdown, body identical to the source including line endings and BOM; openText is an identity transform under a 1 MiB UTF-8 cap.",
+        "Rendered counts: words and UTF-16 characters from preview-visible text, excluding markup, neutral under bolding, and zero for empty text."
+      ],
+      "exclusions": [
+        "No persistence or autosave: reloading the page loses the draft; only the downloaded file survives.",
+        "Programmatic textarea value replacement may reset the browser undo stack, so undo after Bold or H1 is not guaranteed.",
+        "The renderer covers headings, paragraphs, strong, emphasis and inline code only; unmatched markers stay literal and lists, links, images, tables, fenced blocks, math and raw HTML are not rendered.",
+        "Counts are UTF-16 code units and whitespace-split words: astral characters count as two and unspaced CJK prose counts as one word. Source-looking HTML counts as visible characters.",
+        "H1 only inserts prefixes; existing H1 to H6 lines are preserved, so it is not a heading-level toggle and cannot remove markup.",
+        "No scroll sync, outline, multi-document workspace, syntax highlighting or drag-and-drop.",
+        "Browser download naming and placement, the file chooser, visual layout and undo behavior are manual checks; probe.py verifies the core through Node and does not run a browser.",
+        "openText preserves a leading BOM and line endings exactly; the UI decodes UTF-8 with BOM preservation, but other tools may treat a BOM differently.",
+        "Non-UTF-8 input is decoded as UTF-8 with replacement characters; there is no encoding picker."
+      ]
+    }
+  ]
+}

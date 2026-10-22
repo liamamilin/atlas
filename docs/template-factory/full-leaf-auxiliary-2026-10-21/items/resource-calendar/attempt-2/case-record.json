@@ -1,0 +1,287 @@
+{
+  "app_id": "app:repo:5bee85f7de6cd04f8a44ac42",
+  "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+  "created_at": "2026-10-22T01:49:05.044301+00:00",
+  "created_task_id": "full-leaf-auxiliary-2026-10-21-resource-calendar-attempt-2",
+  "digest": "7f7526699790c101817e860d9c6f5ac1d6d7aee5b9b0db63e755aa16a3e57445",
+  "evidence_digest": "0b273ff7e332ff151a966da57094ea6e2f23cae4833cb63fbf7a7ab85f9ae48c",
+  "research": {
+    "input_digest": "410d834f9b165b5ed7b262026dfc7bb8bd416942bfbad6f84503dac5f2a4c80c",
+    "scope": "Check the Aurora room calendar for a free window, claim Thursday 2026-10-22 14:00-16:00, see a clashing claim refused with the conflict named, then cancel and confirm the slot is free again.",
+    "summary": "OpenCode CLI静态研究与独立会话审阅；Explicit target proposal, not an upstream fact: build a small Node.js 22, Fastify 5, SQLite, and server-rendered web application in which the Aurora room schedule is the authority. The core is a public busy/free week read model, a transactional half-open-interval claim command, a 409 conflict refusal naming the existing claim and both times, and an owner-or-admin soft cancellation that reopens the window. This is inferred from the web delivery profile and the leaf model of a resource-owned schedule; suite synchronization, approvals, recurrence, and resource administration are deliberately omitted.",
+    "task_id": "full-leaf-auxiliary-2026-10-21-resource-calendar-attempt-2",
+    "unknowns": [
+      "upstream not_run",
+      "auxiliary independent static review passed; runtime not_run",
+      "The template models one fixed room and one fixed policy; there is no administration console, resource inventory, recurring-series editor, approval flow, delegate routing, notification delivery, or no-show check-in.",
+      "Staff identity is delegated to a trusted ingress proxy. The application does not implement SSO, password authentication, CSRF protection for a cookie-based UI, or rate limiting, so it must not be exposed directly to an untrusted network.",
+      "The probe verifies the JSON contract and core journey only. It does not install or start the target, render the UI, measure accessibility or performance, or certify security.",
+      "The acceptance run requires an isolated disposable SQLite database with the fixed Thursday windows free. The probe exits as not_run with code 2 before any write when setup is unsafe, but it cannot prove that the database is disposable.",
+      "Soft-cancelled reservations are retained with no restore, retention, purge, or reporting surface. Changing the room timezone requires a full data review because stored instants are rendered in the configured room zone.",
+      "There is no idempotency key. If a 201 response is lost after commit, a retry can be refused as a conflict even though the first claim exists; the operator must inspect the week view.",
+      "SQLite is a single-writer authority; the template does not scale horizontally or coordinate multiple writers."
+    ]
+  },
+  "research_input_digest": "410d834f9b165b5ed7b262026dfc7bb8bd416942bfbad6f84503dac5f2a4c80c",
+  "revision": 3,
+  "snapshot_ids": [
+    "src_825e7830c987c26fd0317746"
+  ],
+  "observations": [
+    {
+      "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+      "case_revision": 3,
+      "digest": "f415ee9a6dd759597cd281906a92cf9261ecfd2a79b1567b670f1c38648228bc",
+      "evidence_id": "ev_assisted_attempt_2_1",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a",
+        "file_digest": "1966e2913cbd57ed93b5a201e50038af1b12cd2fc5b0f43eab0545059a78b7ef",
+        "line_end": 117,
+        "line_start": 106,
+        "path": "booking-tool.py"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "overlaps() parses '%Y-%m-%d %H:%M' strings and returns True only when start1 < end2 and start2 < end1, so directly touching intervals are not considered overlapping.",
+      "reviews": [
+        {
+          "review_id": "rev_9b9b6d5fbf75adf3b539996c93cbc28f",
+          "outcome": "accepted",
+          "reviewer": "ses_e9eb747c6ffehn1hO7Ix8Ptq4m",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "f415ee9a6dd759597cd281906a92cf9261ecfd2a79b1567b670f1c38648228bc",
+          "created_at": "2026-10-22T01:49:05.050500+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+      "case_revision": 3,
+      "digest": "ced3d80acd9c7a7906b2526d4db06a6a2d21253a3e0a5f022eb13c713ec52461",
+      "evidence_id": "ev_assisted_attempt_2_2",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a",
+        "file_digest": "1966e2913cbd57ed93b5a201e50038af1b12cd2fc5b0f43eab0545059a78b7ef",
+        "line_end": 382,
+        "line_start": 377,
+        "path": "booking-tool.py"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The /bookings POST handler loops over all stored bookings, derives the lab name from each stored description with a regex, and returns HTTP 400 when the lab matches and overlaps(start, end, booking['start'], booking['end']) is true.",
+      "reviews": [
+        {
+          "review_id": "rev_43a66a0f8247a231fabc34a0dcecaa0e",
+          "outcome": "accepted",
+          "reviewer": "ses_e9eb747c6ffehn1hO7Ix8Ptq4m",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "ced3d80acd9c7a7906b2526d4db06a6a2d21253a3e0a5f022eb13c713ec52461",
+          "created_at": "2026-10-22T01:49:05.053753+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+      "case_revision": 3,
+      "digest": "9c9cf51e9d1c0235cc66773e6c710b65760394b918c071fa762b402b74759e37",
+      "evidence_id": "ev_assisted_attempt_2_3",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a",
+        "file_digest": "1966e2913cbd57ed93b5a201e50038af1b12cd2fc5b0f43eab0545059a78b7ef",
+        "line_end": 326,
+        "line_start": 271,
+        "path": "booking-tool.py"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "delete_event requires an authenticated session, allows admins, otherwise compares the session username with a 'booked by' name parsed from the stored description, and rewrites the rebuilt booking list back to the JSON file.",
+      "reviews": [
+        {
+          "review_id": "rev_0a60906c16d27c7732516b7aea8786d5",
+          "outcome": "accepted",
+          "reviewer": "ses_e9eb747c6ffehn1hO7Ix8Ptq4m",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "9c9cf51e9d1c0235cc66773e6c710b65760394b918c071fa762b402b74759e37",
+          "created_at": "2026-10-22T01:49:05.057195+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+      "case_revision": 3,
+      "digest": "38330cf886239dffbea83c4c21707773bf399b3bcc4b3271b1afeda54502c9bb",
+      "evidence_id": "ev_assisted_attempt_2_4",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a",
+        "file_digest": "4eaa5d3a8fdcbf42a8ec32e5cb4ff6df53c896049c89694b7610221481e3011b",
+        "line_end": 60,
+        "line_start": 45,
+        "path": "templates/index.html"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The embedded FullCalendar initialization uses events:'/bookings', defaults to the month view, sets editable:true, and includes month, agendaWeek, and agendaDay in the header right controls.",
+      "reviews": [
+        {
+          "review_id": "rev_4ba37d857aaf11b4d91e4aca6d79d48a",
+          "outcome": "accepted",
+          "reviewer": "ses_e9eb747c6ffehn1hO7Ix8Ptq4m",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "38330cf886239dffbea83c4c21707773bf399b3bcc4b3271b1afeda54502c9bb",
+          "created_at": "2026-10-22T01:49:05.060356+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+      "case_revision": 3,
+      "digest": "19b45a7fa64008fefa84e55c4e5bbcaca6520370f8d04f2ed47f15f061c7cb35",
+      "evidence_id": "ev_assisted_attempt_2_5",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "69985c6e335751c9039835e9cb33d8772504b2c50b0db39614a92bbd9c6c3771",
+        "material_version": "de05ec6cf49886f2f6194f42c16254ec1183920a",
+        "url": "https://github.com/technekey/booking-tool/blob/de05ec6cf49886f2f6194f42c16254ec1183920a/README.md"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The README says the tool is a test tool not intended for serious use without evaluation and modification, identifies file read/write instead of a database as a big disadvantage, and says it may not suit real use cases.",
+      "reviews": [
+        {
+          "review_id": "rev_2dd4ff3c01e9d1cbc1b3b8ed4e242a0a",
+          "outcome": "accepted",
+          "reviewer": "ses_e9eb747c6ffehn1hO7Ix8Ptq4m",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "19b45a7fa64008fefa84e55c4e5bbcaca6520370f8d04f2ed47f15f061c7cb35",
+          "created_at": "2026-10-22T01:49:05.063412+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+      "case_revision": 3,
+      "digest": "a00b0467995946847938ae12a02892d78f61fe88c8e807facdcdebbcff7b01a4",
+      "evidence_id": "ev_assisted_attempt_2_design",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "上游未运行",
+          "辅助静态独审通过，运行未验证",
+          "The template models one fixed room and one fixed policy; there is no administration console, resource inventory, recurring-series editor, approval flow, delegate routing, notification delivery, or no-show check-in.",
+          "Staff identity is delegated to a trusted ingress proxy. The application does not implement SSO, password authentication, CSRF protection for a cookie-based UI, or rate limiting, so it must not be exposed directly to an untrusted network.",
+          "The probe verifies the JSON contract and core journey only. It does not install or start the target, render the UI, measure accessibility or performance, or certify security.",
+          "The acceptance run requires an isolated disposable SQLite database with the fixed Thursday windows free. The probe exits as not_run with code 2 before any write when setup is unsafe, but it cannot prove that the database is disposable.",
+          "Soft-cancelled reservations are retained with no restore, retention, purge, or reporting surface. Changing the room timezone requires a full data review because stored instants are rendered in the configured room zone.",
+          "There is no idempotency key. If a 201 response is lost after commit, a retry can be refused as a conflict even though the first claim exists; the operator must inspect the week view.",
+          "SQLite is a single-writer authority; the template does not scale horizontally or coordinate multiple writers."
+        ],
+        "depends_on": [
+          "ev_assisted_attempt_2_1",
+          "ev_assisted_attempt_2_2",
+          "ev_assisted_attempt_2_3",
+          "ev_assisted_attempt_2_4",
+          "ev_assisted_attempt_2_5"
+        ],
+        "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Explicit target proposal, not an upstream fact: build a small Node.js 22, Fastify 5, SQLite, and server-rendered web application in which the Aurora room schedule is the authority. The core is a public busy/free week read model, a transactional half-open-interval claim command, a 409 conflict refusal naming the existing claim and both times, and an owner-or-admin soft cancellation that reopens the window. This is inferred from the web delivery profile and the leaf model of a resource-owned schedule; suite synchronization, approvals, recurrence, and resource administration are deliberately omitted.",
+      "reviews": [
+        {
+          "review_id": "rev_9be0d8d137d3d769e322743cd2854461",
+          "outcome": "accepted",
+          "reviewer": "ses_e9eb747c6ffehn1hO7Ix8Ptq4m",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "a00b0467995946847938ae12a02892d78f61fe88c8e807facdcdebbcff7b01a4",
+          "created_at": "2026-10-22T01:49:05.066698+00:00"
+        }
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "adopted_scope": [
+        "Week availability read model: GET /api/rooms/aurora/week?weekStart=2026-10-19 returns the Aurora identity, seven local days, confirmed claims as busy blocks, owner-scoped purpose, and 400 INVALID_WEEK_START for a non-Monday week.",
+        "Claim submission: POST /api/rooms/aurora/reservations accepts a same-day, 30-minute-aligned, 30-240 minute window inside Mon-Fri 08:00-18:00 Asia/Shanghai with a trimmed 1-200 character purpose, stores a confirmed claim, and returns 201.",
+        "Conflict refusal: a strict half-open overlap returns 409 SLOT_CONFLICT with the conflicting id plus start/end and a message naming both windows, inserts no row, and leaves touching intervals claimable.",
+        "Cancellation and reopening: DELETE /api/rooms/aurora/reservations/:id is owner-or-admin, returns 403 for a non-owner, 204 for a soft cancellation, removes the block from availability, allows a fresh claim, and returns 404 on repeat."
+      ],
+      "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+      "case_revision": 3,
+      "evidence_ids": [
+        "ev_assisted_attempt_2_1",
+        "ev_assisted_attempt_2_2",
+        "ev_assisted_attempt_2_3",
+        "ev_assisted_attempt_2_4",
+        "ev_assisted_attempt_2_5",
+        "ev_assisted_attempt_2_design"
+      ],
+      "exclusions": [
+        "The template models one fixed room and one fixed policy; there is no administration console, resource inventory, recurring-series editor, approval flow, delegate routing, notification delivery, or no-show check-in.",
+        "Staff identity is delegated to a trusted ingress proxy. The application does not implement SSO, password authentication, CSRF protection for a cookie-based UI, or rate limiting, so it must not be exposed directly to an untrusted network.",
+        "The probe verifies the JSON contract and core journey only. It does not install or start the target, render the UI, measure accessibility or performance, or certify security.",
+        "The acceptance run requires an isolated disposable SQLite database with the fixed Thursday windows free. The probe exits as not_run with code 2 before any write when setup is unsafe, but it cannot prove that the database is disposable.",
+        "Soft-cancelled reservations are retained with no restore, retention, purge, or reporting surface. Changing the room timezone requires a full data review because stored instants are rendered in the configured room zone.",
+        "There is no idempotency key. If a 201 response is lost after commit, a retry can be refused as a conflict even though the first claim exists; the operator must inspect the week view.",
+        "SQLite is a single-writer authority; the template does not scale horizontally or coordinate multiple writers."
+      ],
+      "reason": "Check the Aurora room calendar for a free window, claim Thursday 2026-10-22 14:00-16:00, see a clashing claim refused with the conflict named, then cancel and confirm the slot is free again.",
+      "scenario_id": "scn_fe000b631b6b4b21a2ab5144d5164a72",
+      "scenario_revision": 1,
+      "workflow_support": []
+    }
+  ],
+  "source_snapshots": [
+    {
+      "archive_sha256": null,
+      "collected_at": "2026-10-22T00:09:26.756240+00:00",
+      "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a",
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ],
+      "file_manifest_digest": "0c2a149a08fbb76916ecaad6cb49cbd02d05e694b4608a2c08a5efd3a685ce08",
+      "files": {
+        "LICENSE": "96de8966ed1c8c6208e854bd367a3ab26bdf72a5e5637369034dcefbc5f1bebf",
+        "README.md": "69985c6e335751c9039835e9cb33d8772504b2c50b0db39614a92bbd9c6c3771",
+        "booking-tool.py": "1966e2913cbd57ed93b5a201e50038af1b12cd2fc5b0f43eab0545059a78b7ef",
+        "config.json": "bdb4da7527124d17aa46bb9cd631723dd4f1141bd5bbb393a791ddaed7e18106",
+        "requirements.txt": "9ce07e03fcb9f0fb1f216e4ee008db738d3d8f7a69cdd4e9afe67f2cdc64bb05",
+        "templates/index.html": "4eaa5d3a8fdcbf42a8ec32e5cb4ff6df53c896049c89694b7610221481e3011b"
+      },
+      "license": {
+        "notice_hashes": {
+          "LICENSE": "96de8966ed1c8c6208e854bd367a3ab26bdf72a5e5637369034dcefbc5f1bebf"
+        },
+        "spdx_id": "MIT",
+        "status": "located"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license_uncertainties": [
+        "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+      ],
+      "repo_id": null,
+      "repository": "https://github.com/technekey/booking-tool",
+      "snapshot_id": "src_825e7830c987c26fd0317746",
+      "strategy_version": "full-leaf-selected-v2-3df14bb40ce0abdc"
+    }
+  ]
+}

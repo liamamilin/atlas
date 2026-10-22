@@ -1,0 +1,353 @@
+{
+  "app_id": "app:repo:d2480efdae2725bb0cf42249",
+  "case_id": "case:repo:d2480efdae2725bb0cf42249:f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+  "created_at": "2026-10-22T01:41:03.928029+00:00",
+  "created_task_id": "full-leaf-auxiliary-2026-10-21-markdown-editor-attempt-2",
+  "digest": "4d6177aa3939a79ead28efdaa3148ec70138f65accaf32907875e77f2aad1f84",
+  "evidence_digest": "0da0aff76b09137388135775899c1b3f6ba6de1aaaf6bf3026a0a55f3284e87c",
+  "research": {
+    "input_digest": "176ce0e51b448d472ff6d18ac2dfbeab4e378b2b43ed63b784a1c55dbee59ee8",
+    "scope": "Turn a plain draft into a saved README.md whose formatting exists only as markup characters, verifying the derived preview before saving",
+    "summary": "OpenCode CLI静态研究与独立会话审阅；Build a dependency-free static ES-module web app for the same fixed journey: a textarea source of record, Bold and H1 insertion at the current selection, a preview recomputed only from that text, and Save producing README.md unchanged. The upstream CDN renderer, MathJax, highlight.js, syncscroll, service worker and theme persistence are not replicated; a small deterministic escaped renderer covers only the scenario's headings, emphasis and inline code.",
+    "task_id": "full-leaf-auxiliary-2026-10-21-markdown-editor-attempt-2",
+    "unknowns": [
+      "upstream not_run",
+      "auxiliary independent static review passed; runtime not_run",
+      "No persistence or autosave: reloading the page loses the draft; only the downloaded file survives.",
+      "Programmatic textarea value replacement may reset the browser undo stack, so undo after Bold or H1 is not guaranteed.",
+      "The renderer covers headings, paragraphs, strong, emphasis and inline code only; unmatched markers stay literal and lists, links, images, tables, fenced blocks, math and raw HTML are not rendered.",
+      "Counts are UTF-16 code units and whitespace-split words: astral characters count as two and unspaced CJK prose counts as one word. Source-looking HTML counts as visible characters.",
+      "H1 only inserts prefixes; existing H1 to H6 lines are preserved, so it is not a heading-level toggle and cannot remove markup.",
+      "No scroll sync, outline, multi-document workspace, syntax highlighting or drag-and-drop.",
+      "Browser download naming and placement, the file chooser, visual layout and undo behavior are manual checks; probe.py verifies the core through Node and does not run a browser.",
+      "openText preserves a leading BOM and line endings exactly; the UI decodes UTF-8 with BOM preservation, but other tools may treat a BOM differently.",
+      "Non-UTF-8 input is decoded as UTF-8 with replacement characters; there is no encoding picker."
+    ]
+  },
+  "research_input_digest": "176ce0e51b448d472ff6d18ac2dfbeab4e378b2b43ed63b784a1c55dbee59ee8",
+  "revision": 2,
+  "snapshot_ids": [
+    "src_830b79e1590e6d11823402c5"
+  ],
+  "observations": [
+    {
+      "case_id": "case:repo:d2480efdae2725bb0cf42249:f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+      "case_revision": 2,
+      "digest": "8c22a1651af80e650463500cac379ccabaa213107ae2aaeb371f93b42363e0d4",
+      "evidence_id": "ev_assisted_attempt_2_1",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "file_digest": "66ffd4e13a3391af0a9cab210d8c95e4db70487275111be3c57f737b18a18d37",
+        "line_end": 268,
+        "line_start": 252,
+        "path": "index.js"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "In the apply action switch, bold uses the prefix and suffix **, h1 uses the prefix '# ' and an empty suffix, and the other actions likewise receive fixed prefix and suffix strings.",
+      "reviews": [
+        {
+          "review_id": "rev_32fb259be6b0e9452e198771c1378bac",
+          "outcome": "accepted",
+          "reviewer": "ses_e9ebf49e5ffeUClLsOIPCptQlM",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "8c22a1651af80e650463500cac379ccabaa213107ae2aaeb371f93b42363e0d4",
+          "created_at": "2026-10-22T01:41:03.934277+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:d2480efdae2725bb0cf42249:f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+      "case_revision": 2,
+      "digest": "a30f6917bccd16ca000717e6cae649ca9ae420d2fb0743dcdd389db39b0c3bb8",
+      "evidence_id": "ev_assisted_attempt_2_2",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "file_digest": "66ffd4e13a3391af0a9cab210d8c95e4db70487275111be3c57f737b18a18d37",
+        "line_end": 333,
+        "line_start": 323,
+        "path": "index.js"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The modern-browser branch rebuilds the textarea value from the text before startPos, the prefix, the selected substring, the suffix, and the text after endPos, then sets selectionStart and selectionEnd to startPos and endPos plus the prefix length.",
+      "reviews": [
+        {
+          "review_id": "rev_ddffdf9032c2ae8f7c3782d21aebfc97",
+          "outcome": "accepted",
+          "reviewer": "ses_e9ebf49e5ffeUClLsOIPCptQlM",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "a30f6917bccd16ca000717e6cae649ca9ae420d2fb0743dcdd389db39b0c3bb8",
+          "created_at": "2026-10-22T01:41:03.936925+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:d2480efdae2725bb0cf42249:f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+      "case_revision": 2,
+      "digest": "98cf7f747931154c1b4164ac3b31fc3aac03f2ff523f250062b4a768d38e2ad3",
+      "evidence_id": "ev_assisted_attempt_2_3",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "file_digest": "66ffd4e13a3391af0a9cab210d8c95e4db70487275111be3c57f737b18a18d37",
+        "line_end": 211,
+        "line_start": 197,
+        "path": "index.js"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "download() reads the #getm textarea value, replaces every LF with CRLF, creates a Blob of type text/plain, and clicks an anchor whose download name is fixed as marcdown.md.",
+      "reviews": [
+        {
+          "review_id": "rev_963d07be084611bdad0e2d75c98299f3",
+          "outcome": "accepted",
+          "reviewer": "ses_e9ebf49e5ffeUClLsOIPCptQlM",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "98cf7f747931154c1b4164ac3b31fc3aac03f2ff523f250062b4a768d38e2ad3",
+          "created_at": "2026-10-22T01:41:03.939191+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:d2480efdae2725bb0cf42249:f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+      "case_revision": 2,
+      "digest": "74f4abcc6b41286a83957d5d5d774418d58c3c240f1b3216c18adc7c48849f2c",
+      "evidence_id": "ev_assisted_attempt_2_4",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "file_digest": "66ffd4e13a3391af0a9cab210d8c95e4db70487275111be3c57f737b18a18d37",
+        "line_end": 84,
+        "line_start": 68,
+        "path": "index.js"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Counts use innerText from whichever viewer or buffer element is currently visible; the character count removes whitespace runs, and an empty text value writes 0 words, 0 chars, and disables #save.",
+      "reviews": [
+        {
+          "review_id": "rev_4591303e65271d2fc3caee7162e6b3ed",
+          "outcome": "accepted",
+          "reviewer": "ses_e9ebf49e5ffeUClLsOIPCptQlM",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "74f4abcc6b41286a83957d5d5d774418d58c3c240f1b3216c18adc7c48849f2c",
+          "created_at": "2026-10-22T01:41:03.941287+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:d2480efdae2725bb0cf42249:f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+      "case_revision": 2,
+      "digest": "8db5adcfe1bcb417369ca864426136f6257aa37e68dbad6130eaffe326257918",
+      "evidence_id": "ev_assisted_attempt_2_5",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "file_digest": "66ffd4e13a3391af0a9cab210d8c95e4db70487275111be3c57f737b18a18d37",
+        "line_end": 47,
+        "line_start": 40,
+        "path": "index.js"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "SwapBuffers exchanges the preview and buffer references, hides the element that was preview, and sets the element that was buffer to display flex.",
+      "reviews": [
+        {
+          "review_id": "rev_e4860b7812b2f442bef6330281ec9632",
+          "outcome": "accepted",
+          "reviewer": "ses_e9ebf49e5ffeUClLsOIPCptQlM",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "8db5adcfe1bcb417369ca864426136f6257aa37e68dbad6130eaffe326257918",
+          "created_at": "2026-10-22T01:41:03.943581+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:d2480efdae2725bb0cf42249:f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+      "case_revision": 2,
+      "digest": "19f4a11caebdf94ba623007fb386b24f7a610c6c3969ec0ee1fee8423392692a",
+      "evidence_id": "ev_assisted_attempt_2_6",
+      "kind": "code_observation",
+      "location": {
+        "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "file_digest": "c871d574ec3937ebc2e307245f142737d2632973eedfefe46c20fae4681507ea",
+        "line_end": 179,
+        "line_start": 173,
+        "path": "index.html"
+      },
+      "observation_status": "source_located",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The output section defines #viewer with inline display:none and a sibling #buffer with no inline display style; the #getm textarea is in the editor div immediately before both.",
+      "reviews": [
+        {
+          "review_id": "rev_f5d47c06b7cfa5f5c20642c88bc1783a",
+          "outcome": "accepted",
+          "reviewer": "ses_e9ebf49e5ffeUClLsOIPCptQlM",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "19f4a11caebdf94ba623007fb386b24f7a610c6c3969ec0ee1fee8423392692a",
+          "created_at": "2026-10-22T01:41:03.946298+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:d2480efdae2725bb0cf42249:f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+      "case_revision": 2,
+      "digest": "19270509dc075f6c3f4580e8590d152795175a98729818d1d72e974f32c57046",
+      "evidence_id": "ev_assisted_attempt_2_7",
+      "kind": "documentation",
+      "location": {
+        "content_digest": "98e59cd19fc2e5c5bec60203c3101eb4556286ff6d9d79725ddd8dd6c3001a76",
+        "material_version": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+        "url": "https://github.com/liyasthomas/marcdown/blob/f61f79f7d92f4a76a4d1a8bd446201fd2844159b/README.md"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "The documented demo loop is to paste or type markdown on the left, view the preview on the right, then save the markdown file.",
+      "reviews": [
+        {
+          "review_id": "rev_9c8b0dfbd86c3b32eb31cd3a6d50756f",
+          "outcome": "accepted",
+          "reviewer": "ses_e9ebf49e5ffeUClLsOIPCptQlM",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "19270509dc075f6c3f4580e8590d152795175a98729818d1d72e974f32c57046",
+          "created_at": "2026-10-22T01:41:03.948927+00:00"
+        }
+      ]
+    },
+    {
+      "case_id": "case:repo:d2480efdae2725bb0cf42249:f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+      "case_revision": 2,
+      "digest": "889d3e0235add81224798df06b0b937b5323b6f1bb478fb374072891a2b3ddc9",
+      "evidence_id": "ev_assisted_attempt_2_design",
+      "kind": "inference",
+      "location": {
+        "assumptions": [
+          "上游未运行",
+          "辅助静态独审通过，运行未验证",
+          "No persistence or autosave: reloading the page loses the draft; only the downloaded file survives.",
+          "Programmatic textarea value replacement may reset the browser undo stack, so undo after Bold or H1 is not guaranteed.",
+          "The renderer covers headings, paragraphs, strong, emphasis and inline code only; unmatched markers stay literal and lists, links, images, tables, fenced blocks, math and raw HTML are not rendered.",
+          "Counts are UTF-16 code units and whitespace-split words: astral characters count as two and unspaced CJK prose counts as one word. Source-looking HTML counts as visible characters.",
+          "H1 only inserts prefixes; existing H1 to H6 lines are preserved, so it is not a heading-level toggle and cannot remove markup.",
+          "No scroll sync, outline, multi-document workspace, syntax highlighting or drag-and-drop.",
+          "Browser download naming and placement, the file chooser, visual layout and undo behavior are manual checks; probe.py verifies the core through Node and does not run a browser.",
+          "openText preserves a leading BOM and line endings exactly; the UI decodes UTF-8 with BOM preservation, but other tools may treat a BOM differently.",
+          "Non-UTF-8 input is decoded as UTF-8 with replacement characters; there is no encoding picker."
+        ],
+        "depends_on": [
+          "ev_assisted_attempt_2_1",
+          "ev_assisted_attempt_2_2",
+          "ev_assisted_attempt_2_3",
+          "ev_assisted_attempt_2_4",
+          "ev_assisted_attempt_2_5",
+          "ev_assisted_attempt_2_6",
+          "ev_assisted_attempt_2_7"
+        ],
+        "reasoning": "按当前叶子和具体用户旅程收敛为本机单人核心；不是对上游完整复刻。"
+      },
+      "observation_status": "model_extracted",
+      "review": {
+        "status": "pending"
+      },
+      "statement": "Build a dependency-free static ES-module web app for the same fixed journey: a textarea source of record, Bold and H1 insertion at the current selection, a preview recomputed only from that text, and Save producing README.md unchanged. The upstream CDN renderer, MathJax, highlight.js, syncscroll, service worker and theme persistence are not replicated; a small deterministic escaped renderer covers only the scenario's headings, emphasis and inline code.",
+      "reviews": [
+        {
+          "review_id": "rev_b159a854cc0df5e31c34d2fa2b471144",
+          "outcome": "accepted",
+          "reviewer": "ses_e9ebf49e5ffeUClLsOIPCptQlM",
+          "reviewer_kind": "independent_agent",
+          "evidence_digest": "889d3e0235add81224798df06b0b937b5323b6f1bb478fb374072891a2b3ddc9",
+          "created_at": "2026-10-22T01:41:03.951703+00:00"
+        }
+      ]
+    }
+  ],
+  "scenario_links": [
+    {
+      "adopted_scope": [
+        "Selection-based markup insertion: Bold wraps the selected phrase in ** and keeps that phrase selected; H1 adds one '# ' prefix to each selected non-blank line that is not already an ATX heading.",
+        "Derived preview: rendered synchronously from source text only, with escaped HTML, ATX headings, strong, emphasis and inline code, and with CRLF, LF and CR treated as equivalent line breaks.",
+        "Markup-only save and reopen: README.md by default, text/markdown, body identical to the source including line endings and BOM; openText is an identity transform under a 1 MiB UTF-8 cap.",
+        "Rendered counts: words and UTF-16 characters from preview-visible text, excluding markup, neutral under bolding, and zero for empty text."
+      ],
+      "case_id": "case:repo:d2480efdae2725bb0cf42249:f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+      "case_revision": 2,
+      "evidence_ids": [
+        "ev_assisted_attempt_2_1",
+        "ev_assisted_attempt_2_2",
+        "ev_assisted_attempt_2_3",
+        "ev_assisted_attempt_2_4",
+        "ev_assisted_attempt_2_5",
+        "ev_assisted_attempt_2_6",
+        "ev_assisted_attempt_2_7",
+        "ev_assisted_attempt_2_design"
+      ],
+      "exclusions": [
+        "No persistence or autosave: reloading the page loses the draft; only the downloaded file survives.",
+        "Programmatic textarea value replacement may reset the browser undo stack, so undo after Bold or H1 is not guaranteed.",
+        "The renderer covers headings, paragraphs, strong, emphasis and inline code only; unmatched markers stay literal and lists, links, images, tables, fenced blocks, math and raw HTML are not rendered.",
+        "Counts are UTF-16 code units and whitespace-split words: astral characters count as two and unspaced CJK prose counts as one word. Source-looking HTML counts as visible characters.",
+        "H1 only inserts prefixes; existing H1 to H6 lines are preserved, so it is not a heading-level toggle and cannot remove markup.",
+        "No scroll sync, outline, multi-document workspace, syntax highlighting or drag-and-drop.",
+        "Browser download naming and placement, the file chooser, visual layout and undo behavior are manual checks; probe.py verifies the core through Node and does not run a browser.",
+        "openText preserves a leading BOM and line endings exactly; the UI decodes UTF-8 with BOM preservation, but other tools may treat a BOM differently.",
+        "Non-UTF-8 input is decoded as UTF-8 with replacement characters; there is no encoding picker."
+      ],
+      "reason": "Turn a plain draft into a saved README.md whose formatting exists only as markup characters, verifying the derived preview before saving",
+      "scenario_id": "scn_6ab05f5a50764c4f8f2eb9f74a9dfda8",
+      "scenario_revision": 1,
+      "workflow_support": []
+    }
+  ],
+  "source_snapshots": [
+    {
+      "archive_sha256": null,
+      "collected_at": "2026-10-22T00:01:59.522656+00:00",
+      "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+      "excluded_paths": [
+        "Unselected files; upstream not installed or run"
+      ],
+      "file_manifest_digest": "1be3ec391f88f0ffa98c38c125692427a522b1eb5bf072dfc57688be336445a4",
+      "files": {
+        "LICENSE": "d35fe88a672fac041639dba12e9c9c85df1334b0e4706c7f663fd60a6fd12ece",
+        "README.md": "98e59cd19fc2e5c5bec60203c3101eb4556286ff6d9d79725ddd8dd6c3001a76",
+        "index.html": "c871d574ec3937ebc2e307245f142737d2632973eedfefe46c20fae4681507ea",
+        "index.js": "66ffd4e13a3391af0a9cab210d8c95e4db70487275111be3c57f737b18a18d37"
+      },
+      "license": {
+        "notice_hashes": {
+          "LICENSE": "d35fe88a672fac041639dba12e9c9c85df1334b0e4706c7f663fd60a6fd12ece"
+        },
+        "spdx_id": "MIT",
+        "status": "located"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "license_uncertainties": [
+        "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+      ],
+      "repo_id": null,
+      "repository": "https://github.com/liyasthomas/marcdown",
+      "snapshot_id": "src_830b79e1590e6d11823402c5",
+      "strategy_version": "full-leaf-selected-v2-032a5e151f64c6b3"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+ "name": "Scan a sideloaded shelf and make one book readable",
+ "audience": "one reader who sideloads DRM-free EPUB and MOBI files from mixed sources",
+ "objective": "Turn a folder of stray e-book files into a persistent, searchable shelf and open one book in a reading app.",
+ "workflow": [
+  "Point the library at a local folder of e-book files and start a scan",
+  "Review the created entries and correct a title or author that was derived badly",
+  "Put the entry in a collection and locate it again with a field-qualified search",
+  "Use the entry's file through the download/handoff path to read it"
+ ],
+ "acceptance": [
+  "One scan produces one book entry per work with its cover, and a second scan adds no duplicate entries",
+  "The corrected metadata and collection assignment survive a restart of the library",
+  "A search on the corrected author or title returns that entry",
+  "The entry's file opens through the read/download path"
+ ]
+}

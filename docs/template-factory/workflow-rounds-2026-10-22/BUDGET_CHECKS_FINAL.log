@@ -1,0 +1,52 @@
+test_actual_design_binding_stage_shares_explicit_review_retry_scope (test_factory_budget_r5.FactoryBudgetR5Tests) ... ok
+test_concurrent_same_idempotency_key_returns_one_v2 (test_factory_budget_r5.FactoryBudgetR5Tests) ... ok
+test_design_binding_suffix_does_not_split_legacy_review_dimension (test_factory_budget_r5.FactoryBudgetR5Tests) ... ok
+test_idempotent_replay_precedes_consumed_baseline_and_preserves_full_binding (test_factory_budget_r5.FactoryBudgetR5Tests) ... ok
+test_registration_rejects_any_active_reservation_at_fixed_baseline (test_factory_budget_r5.FactoryBudgetR5Tests) ... ok
+test_registration_requires_unmodified_first_baseline_and_failure_rolls_back (test_factory_budget_r5.FactoryBudgetR5Tests) ... ok
+test_rejects_wrong_binding_or_second_key_and_deadline_expiry (test_factory_budget_r5.FactoryBudgetR5Tests) ... ok
+test_v2_does_not_change_other_products_or_non_g1_plan_deadlines (test_factory_budget_r5.FactoryBudgetR5Tests) ... ok
+test_v2_pending_activation_and_inherited_deadline (test_factory_budget_r5.FactoryBudgetR5Tests) ... ok
+test_r6_activation_is_atomic_only_and_uses_new_deadline_once (test_factory_budget_r6.FactoryBudgetR6Tests) ... ok
+test_register_is_pending_and_replay_keeps_full_request (test_factory_budget_r6.FactoryBudgetR6Tests) ... ok
+test_registration_rejects_changed_baseline_and_different_key (test_factory_budget_r6.FactoryBudgetR6Tests) ... ok
+test_baseline_race_and_transaction_failure_do_not_activate_or_double_count (test_factory_budget_r8.FrozenRevisionBudgetTests) ... ok
+test_external_cli_history_remains_separate_and_other_scopes_stay_unchanged (test_factory_budget_r8.FrozenRevisionBudgetTests) ... ok
+test_global_cli_budget_exhaustion_counts_external_session_once (test_factory_budget_r8.FrozenRevisionBudgetTests) ... ok
+test_pending_is_inert_then_activation_supersedes_expired_resume_once (test_factory_budget_r8.FrozenRevisionBudgetTests) ... ok
+test_prepared_policy_summary_must_match_budget_request (test_factory_budget_r8.FrozenRevisionBudgetTests) ... ok
+test_prepared_timing_policy_cannot_rebind_a_different_current_snapshot (test_factory_budget_r8.FrozenRevisionBudgetTests) ... ok
+test_public_activation_cannot_bypass_successor_transaction (test_factory_budget_r8.FrozenRevisionBudgetTests) ... ok
+test_queue_failure_rolls_back_activation_deadline (test_factory_budget_r8.FrozenRevisionBudgetTests) ... ok
+test_spawn_intent_is_not_missed_by_registration_or_activation_active_checks (test_factory_budget_r8.FrozenRevisionBudgetTests) ... ok
+test_business_repairs_are_idempotent_and_cumulative_across_new_jobs (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_changed_operation_stays_initial_but_explicit_protocol_repair_uses_scope_retry (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_cli_records_only_model_and_effort_explicitly_observed_in_execution_event (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_cli_requires_budget_when_marked_v1_and_observed_model_requires_event (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_concurrent_duplicate_initial_calls_cannot_both_bypass_retry_scope (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_concurrent_reservations_are_atomic_and_reservation_counts_against_limit (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_dependency_manifest_repairs_consume_real_code_scope_retry_allowance (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_first_amendment_registration_migrates_legacy_budget_schema (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_fixed_input_identity_ignores_language_but_retains_legacy_hash_aliases (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_g1_amendment_is_scoped_append_only_and_activates_once (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_g1_amendment_rejects_other_campaign_and_mismatched_idempotent_request (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_g1_index_one_repair_is_idempotent_across_ledger_restart (test_factory_budget_v1.FactoryBudgetV1Tests)
+The authorized repair key survives restart without charging twice. ... ok
+test_indexed_legacy_cognitive_stages_normalize_without_merging_review_dimensions (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_indexed_legacy_review_retries_are_counted_only_for_the_same_dimension (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_legacy_initial_and_two_retries_remain_visible_after_language_changes (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_legacy_p0_digest_retries_count_toward_stable_delivery_scope (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_old_ledger_reloads_lower_limits_and_new_instance_cannot_raise_them (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_pause_or_restart_does_not_reset_expired_deadline (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_recovery_frees_concurrency_only_after_host_proves_owned_process_stopped (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_repeating_legitimate_stage_calls_does_not_infer_transient_retries (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_restart_and_new_job_do_not_reset_segment_deadline_or_call_count (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_retry_budget_is_cumulative_by_product_and_stage_not_job (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_segment_deadline_begins_at_official_start_and_pause_does_not_reset_it (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_stable_scope_counts_legacy_cognitive_review_retries_across_new_artifacts (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+test_uncertain_reservation_survives_restart_and_cannot_be_refunded (test_factory_budget_v1.FactoryBudgetV1Tests) ... ok
+
+----------------------------------------------------------------------
+Ran 46 tests in 3.501s
+
+OK
