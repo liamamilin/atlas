@@ -591,4 +591,4 @@ class ReferenceCatalog:
         path = self.root / (body["package_sha256"] + ".zip")
         if path.is_symlink() or not path.is_file() or _sha(path.read_bytes()) != body["package_sha256"]:
             raise FactoryError("catalog package is unavailable or changed", "reference_catalog_integrity", 409)
-        return path, body["name"].replace("/", "-") + ".product-reference.zip", "application/zip"
+        return path, f"{reference_id}.product-reference.zip", "application/zip"

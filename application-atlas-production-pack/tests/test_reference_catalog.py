@@ -37,7 +37,7 @@ class ReferenceCatalogTests(unittest.TestCase):
         ref_id = "ref_" + package_sha[:32]
         archive = self.catalog.root / (package_sha + ".zip")
         archive.write_bytes(data)
-        body = {"id": ref_id, "name": "Personal Shelf", "schema": "atlas.product-reference.v1",
+        body = {"id": ref_id, "name": "Bookmark Manager — Personal Link Library", "schema": "atlas.product-reference.v1",
                 "package_sha256": package_sha, "reference_digest": "b" * 64, "pilot_id": "pilot-example",
                 "leaf": "bookmark-manager", "revision_id": "r2", "status": "static_review_passed",
                 "application_status": "application_not_run", "publication_status": "not_published",
@@ -59,7 +59,7 @@ class ReferenceCatalogTests(unittest.TestCase):
         self.assertEqual(detail["document"], "# Personal Shelf")
         package, name, mime = dispatch("GET", f"/api/factory/product-references/{body['id']}/download", store=self.store)
         self.assertEqual(package.read_bytes(), data)
-        self.assertEqual(name, "Personal Shelf.product-reference.zip")
+        self.assertEqual(name, f"{body['id']}.product-reference.zip")
         self.assertEqual(mime, "application/zip")
 
     def test_import_requires_a_registered_local_revision_and_rejects_traversal(self):
