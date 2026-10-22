@@ -1,0 +1,171 @@
+{
+ "name": "Sideloaded Shelf — single-reader web e-book library template",
+ "audience": "One reader who sideloads DRM-free EPUB and MOBI files from mixed sources and wants one persistent, searchable shelf on their own machine.",
+ "objective": "Turn a folder of stray e-book files into a durable catalog of one entry per work with covers, correctable metadata, a collection, field-qualified search, and a working file handoff to a reading app.",
+ "workflow": [
+  "Start the local web service with a data directory and a shelf root, then point a scan at the shelf folder from the web UI or POST /api/scans.",
+  "Review the scan report and the shelf entries; inspect the cover, derived title, and derived author that the scan produced.",
+  "Correct a badly derived title and author through the entry detail form, using revision-checked writes.",
+  "Create or reuse a collection such as To Read and assign the entry to it.",
+  "Locate the entry with a field-qualified search such as author:Ada Lovelace or collection:To Read.",
+  "Restart the service, confirm the correction and collection are still present, then download the entry file and open it in a reading app."
+ ],
+ "acceptance": [
+  "One scan produces one book entry per work with a cover; duplicate byte-identical copies are reported and skipped, and a second scan adds no entries.",
+  "Corrected metadata and the collection assignment survive a service restart and are not reverted by a later rescan.",
+  "A field-qualified search on the corrected author, the title, or the collection returns that entry; an unmatched author returns nothing and an unsupported field is rejected.",
+  "The entry file is downloadable through the library with a correct content type and explicit not-found responses for missing formats and unknown entries."
+ ],
+ "observations": [
+  [
+   "code_observation",
+   "src/backend/lib/library.py",
+   60,
+   72,
+   "filter_books calls scan_folder, which appends every walked file path to file_list, then keeps only paths matched by the regex .epub|.mobi|.pdf; no content hash or work-level grouping is computed."
+  ],
+  [
+   "code_observation",
+   "src/backend/lib/library.py",
+   309,
+   328,
+   "compare_shelf_current reads stored Book.file_name values through Storage.book_paths_list and returns the set difference between on-disk book paths and stored paths, so re-import suppression is by path, not by file content."
+  ],
+  [
+   "code_observation",
+   "src/backend/lib/library.py",
+   114,
+   123,
+   "When an EPUB has no dc:title, extract_metadata_epub derives the title from the final path component with its extension removed; titles matching the Book-plus-number regex are split before use."
+  ],
+  [
+   "code_observation",
+   "src/backend/lib/storage.py",
+   277,
+   295,
+   "parse_advanced_query recognises the field names title, author, and tags, accepts field:value and field:quoted-value tokens, and places unmatched tokens under the keywords key."
+  ],
+  [
+   "code_observation",
+   "src/backend/lib/storage.py",
+   297,
+   332,
+   "fuzzy_search_books applies case-insensitive substring tests to each requested field, then scores keyword queries with rapidfuzz WRatio and keeps only books whose score is greater than 50."
+  ],
+  [
+   "code_observation",
+   "src/backend/lib/storage.py",
+   68,
+   111,
+   "insert_book opens one Session per book, takes cover bytes from book[2].data or book[2] directly, commits, and returns False after logging when any step raises."
+  ],
+  [
+   "code_observation",
+   "src/backend/lib/models.py",
+   19,
+   42,
+   "The Book table stores a single file_name string per row together with title, optional author, cover bytes, optional tags and categories, and a relationship to BookCollection rows."
+  ],
+  [
+   "documentation",
+   "README.md",
+   21,
+   36,
+   "The project feature list claims recursive scanning, cover image aggregation, fuzzy search with tag, author, and title specifiers, a download system, folder-derived collections, and support for epub and mobi."
+  ]
+ ],
+ "inference": "Because the delivery profile is web, the target is a self-hosted Node.js 20 plus TypeScript web service with a server-rendered shelf and a JSON API, using SQLite for the catalog under ATLAS_DATA_DIR and read-only references to files under ATLAS_LIBRARY_ROOT. Identity, per-file scan transactions, manual-metadata provenance, field-qualified search, and a contained download path are explicit target proposals derived from the scenario and upstream evidence; no upstream code or storage design is copied.",
+ "features": [
+  "Recursive shelf scan that ingests EPUB and MOBI files into one catalog entry per work with a resolved cover, reports per-file outcomes, and is idempotent on rescan.",
+  "Revision-checked correction of title and author plus collection assignment, both durable in the catalog database and never reverted by a later scan.",
+  "Field-qualified search over title, author, and collection with quoted values, and explicit rejection of unsupported fields.",
+  "Download handoff of an entry's EPUB or MOBI file from within the shelf root, with stable content type and explicit not-found responses."
+ ],
+ "goals": [
+  "A01: scanning the fixture shelf creates 3 entries (The Dispossessed, Kindred, and the filename-derived mystery draft), reports the byte-identical copy as duplicate, reports the broken EPUB and the escaping symlink as failed, serves a cover for each entry, and a second scan creates 0 entries while the catalog stays at 3.",
+  "A02: a PATCH with a stale revision returns 409 revision_conflict; a valid PATCH sets title The Analytical Engine and author Ada Lovelace; PUT assigns collection To Read; after a service restart both fields and the collection are returned, and a rescan leaves them unchanged.",
+  "A03: author:Ada Lovelace returns exactly the corrected entry, title:dispossessed matches case-insensitively, collection:To Read returns the corrected entry, author:Nobody Known returns 0, and isbn:... returns 422 unknown_field.",
+  "A04: GET on the entry file returns the exact fixture bytes with application/epub+zip and an attachment disposition, HEAD reports the same size, and both a missing mobi format and an unknown entry id return 404."
+ ],
+ "arch": "# Sideloaded Shelf — web template architecture\n\n## 1. Fit and scope\n\nA web library for exactly one reader. The unit is a book entry, not a file: a scan of a local shelf folder creates one entry per work, resolves a cover, and keeps metadata editable. The four capabilities in this slice are scan/ingest, metadata plus collection curation, field-qualified search, and file handoff. Files are never copied, renamed, or deleted; the catalog is a layer over files the reader already owns. The fixed scenario is the sole use case; no multi-user, store, device-sync, or reading-progress surface is added.\n\n## 2. Runtime choice\n\n- Node.js 20 LTS with TypeScript, compiled to dist/ and started by npm start.\n- Fastify HTTP server, server-rendered HTML pages plus a JSON API used by the pages and by the acceptance probe.\n- SQLite through better-sqlite3 in WAL mode at $ATLAS_DATA_DIR/catalog.sqlite3; one process, one writer, synchronous scans.\n- Derived cover cache at $ATLAS_DATA_DIR/covers/<sha256>.<png|jpg>.\n- Bind 127.0.0.1 by default; no accounts. This is a personal machine service.\n- The upstream pyShelf (Python, SQLAlchemy, terminal server) is design evidence only. No GPL-3.0 code is copied.\n\n## 3. Configuration\n\n| Variable | Meaning | Default |\n|---|---|---|\n| ATLAS_DATA_DIR | writable catalog and cover cache directory | required |\n| ATLAS_LIBRARY_ROOT | absolute shelf root that scans may read | required |\n| HOST | bind address | 127.0.0.1 |\n| PORT | HTTP port | 8787 |\n| SCAN_FILE_LIMIT | max files per scan | 10000 |\n\nStartup creates the data directory, runs pending migrations, and serves the existing catalog. It never scans automatically and never writes into ATLAS_LIBRARY_ROOT.\n\n## 4. Modules\n\n- src/server.ts and src/config.ts — process wiring, env validation, health route.\n- src/db/schema.ts, migrations.ts, repository.ts — DDL, migrations, and all SQL.\n- src/scan/scanner.ts — walk, per-file transactions, scan report assembly.\n- src/scan/epub.ts — ZIP and OPF reading for EPUB.\n- src/scan/mobi.ts — PalmDB, MOBI header, and EXTH reading for MOBI; encryption flag check.\n- src/scan/identity.ts — identifier normalisation, work_key, filename fallback.\n- src/scan/covers.ts — embedded, sidecar, and placeholder cover resolution.\n- src/search/query.ts — query grammar parser and matcher.\n- src/http/routes/{health,scan,books,collections,files}.ts — HTTP contract.\n- src/web/{layout,shelf,detail,scan}.ts — server-rendered pages.\n\n## 5. Data model\n\n```sql\nCREATE TABLE book (\n  id INTEGER PRIMARY KEY,\n  work_key TEXT NOT NULL UNIQUE,\n  title TEXT NOT NULL,\n  author TEXT NOT NULL DEFAULT 'Unknown',\n  description TEXT,\n  identifier TEXT,\n  cover_sha TEXT,\n  cover_source TEXT NOT NULL CHECK (cover_source IN ('embedded','sidecar','placeholder')),\n  metadata_source TEXT NOT NULL CHECK (metadata_source IN ('derived','manual','mixed')),\n  manual_fields TEXT NOT NULL DEFAULT '[]',\n  revision INTEGER NOT NULL DEFAULT 1,\n  created_at TEXT NOT NULL,\n  updated_at TEXT NOT NULL\n);\nCREATE TABLE book_file (\n  id INTEGER PRIMARY KEY,\n  book_id INTEGER NOT NULL REFERENCES book(id) ON DELETE CASCADE,\n  format TEXT NOT NULL CHECK (format IN ('epub','mobi')),\n  rel_path TEXT NOT NULL UNIQUE,\n  sha256 TEXT NOT NULL,\n  size_bytes INTEGER NOT NULL,\n  added_at TEXT NOT NULL,\n  UNIQUE (book_id, format)\n);\nCREATE INDEX book_file_sha ON book_file(sha256);\nCREATE TABLE collection (id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE);\nCREATE TABLE book_collection (\n  book_id INTEGER NOT NULL REFERENCES book(id) ON DELETE CASCADE,\n  collection_id INTEGER NOT NULL REFERENCES collection(id) ON DELETE CASCADE,\n  PRIMARY KEY (book_id, collection_id)\n);\nCREATE TABLE scan (\n  id INTEGER PRIMARY KEY,\n  root TEXT NOT NULL,\n  started_at TEXT NOT NULL,\n  finished_at TEXT,\n  state TEXT NOT NULL,\n  counts_json TEXT NOT NULL DEFAULT '{}'\n);\n```\n\nrel_path is relative to ATLAS_LIBRARY_ROOT and is resolved and re-validated on every read. revision starts at 1 and increments on each metadata patch.\n\n## 6. Identity, ingest, covers\n\n- Walk with lstat, depth limit 32, regular files only. A symlink whose realpath escapes the shelf root is reported failed with reason outside_root and is not read. Non-book extensions are reported ignored.\n- Read each candidate once, compute SHA-256 and size. Format comes from the lowercased extension.\n- EPUB: read META-INF/container.xml, follow the OPF rootfile, take dc:title, dc:creator, dc:identifier, dc:description, dc:language, and dc:subject; cover is the manifest item with properties cover-image or the item referenced by meta name cover. Missing OPF or an unreadable ZIP is failed with unreadable_archive or missing_opf.\n- MOBI: parse PalmDB record offsets, the MOBI header full-name fields, and EXTH records 503 (updated title), 100 (author), 104 (identifier), 103 (description), 105 (subject), and cover offset 201. A non-zero encryption flag yields failed with unsupported_drm.\n- Fallback: title is the filename stem with underscores replaced by spaces and whitespace collapsed, case preserved; author is Unknown. Identifier is optional.\n- Normalise identifiers by stripping a leading urn:isbn: or urn:uuid:, removing spaces and hyphens for ISBN, and uppercasing. work_key is id:<normalised> when an identifier exists, otherwise ta:<lower title>|<lower author>. work_key is computed once at ingest and never rekeyed by manual edits.\n- Cover resolution order: embedded bytes, then a sidecar file with the same basename and .jpg, .jpeg, or .png, then a deterministic generated placeholder PNG. The chosen source is recorded as cover_source. Embedded covers are stored and served byte-for-byte.\n- Dedupe: a SHA-256 already attached to any book is reported duplicate with reason duplicate_content. A second file for an occupied book plus format slot is reported duplicate with reason duplicate_slot; this slice never replaces files automatically.\n- On create only, the first path segment relative to the shelf root becomes a collection (Unsorted for root-level files). Later scans do not re-add a folder collection the reader removed from an entry.\n\n## 7. Scan lifecycle\n\nPOST /api/scans with root validates that the realpath of root exists and is inside ATLAS_LIBRARY_ROOT, else 400 root_not_found or root_outside_library. A process-wide lock makes a concurrent scan return 409 scan_in_progress. A scan row is inserted as running; each candidate file is handled in its own BEGIN IMMEDIATE transaction: resolve identity, insert the book when absent, insert the file row, link the folder collection, commit. A file failure rolls back only that file and is recorded, so one bad archive cannot discard other ingests. The scan row is finalised with counts. Source files are opened read-only. The response is synchronous and contains scan_id, root, counts {created, unchanged, duplicates, failed, ignored}, and items [{path, status, book_id, reason}]. Status values are created, unchanged, duplicate, failed, ignored. The same shelf scanned again yields created 0 and unchanged equal to the catalog size.\n\n## 8. HTTP contract\n\nAll errors use {\"error\":\"code\",\"message\":\"...\"} with optional details.\n\n| Method and path | Behaviour |\n|---|---|\n| GET /healthz | 200 {status: ok} when the database is open |\n| POST /api/scans | scan as in section 7; 200 report, 400 root errors, 409 scan_in_progress |\n| GET /api/books | {total, items}; optional q and collection filters; limit default 100, max 500 |\n| GET /api/books/:id | full entry with files, collections, revision, metadata_source; 404 not_found |\n| PATCH /api/books/:id | body revision plus title, author, description; 200 entry, 409 revision_conflict, 422 unknown_field or invalid_field, 404 |\n| POST /api/collections | body name; 201 {id,name}; 409 collection_exists; 422 invalid_field on blank or over-long names |\n| PUT /api/books/:id/collections | body names array; replaces the set atomically; 200 entry, 422 unknown_collection with nothing applied |\n| GET /api/collections | {items:[{id,name}]} |\n| GET /api/books/:id/cover | stored cover bytes with image/png or image/jpeg |\n| GET /api/books/:id/file?format= | file bytes; 404 not_found, 409 file_missing, 404 format_not_found |\n| HEAD /api/books/:id/file?format= | same headers as GET, empty body |\n\nEntry shape: {id, title, author, description, identifier, cover_url, cover_source, metadata_source, revision, collections:[{id,name}], files:[{format, size_bytes, sha256, download_url}]}.\n\nPATCH semantics: revision must equal the stored revision; all listed fields are written in one transaction, added to manual_fields, revision incremented, and metadata_source recomputed as derived when manual_fields is empty, manual when every non-null field among title, author, and description is manual, otherwise mixed. A later scan updates only fields not in manual_fields.\n\n## 9. Search grammar\n\nTokens are field:value, field:quoted value, or bare words. Supported fields are title, author, and collection. An unsupported field prefix returns 422 unknown_field. All clauses are ANDed; each clause is a case-insensitive substring test; a repeated field must satisfy every value. collection matches when any assigned collection name contains the value. Bare terms are ANDed substring tests across title, author, and description. Results are ordered by title then id. There is no fuzzy scoring, unlike the upstream rapidfuzz path, so acceptance results are deterministic.\n\n## 10. File handoff safety\n\nGET and HEAD resolve the book, choose the requested format or the sole available format, join rel_path to ATLAS_LIBRARY_ROOT, then require the realpath to stay under the root and to be a regular file; otherwise 409 file_missing. A missing book or format is 404. Responses set Content-Type application/epub+zip or application/x-mobipocket-ebook, Content-Length, Accept-Ranges: none, and Content-Disposition attachment with an RFC 5987 encoded filename derived from the basename. No path from the request is used directly. Range requests are not implemented in this slice.\n\n## 11. UI surfaces\n\n- / — cover grid with title and author, a search box accepting field qualifiers, a collection filter, and a Scan link.\n- /scan — root path field prefilled with ATLAS_LIBRARY_ROOT, submit, and a report table of path, status, and reason.\n- /books/:id — cover, metadata form (title, author, description), collection checkboxes, file list with a Download action, and a link back to the shelf.\n- Pages use progressive enhancement only; every action has a JSON endpoint, so the probe does not need a browser.\n\n## 12. Failure handling and lifecycle\n\n- Unreadable EPUB, missing OPF, escaping symlink, and DRM-flagged MOBI become per-file failures with stable reason codes; the scan still completes.\n- A stale file after the catalog was built is reported at download time as 409 file_missing; the catalog row is kept.\n- SQLite WAL with a busy timeout of 5s; migrations are additive and run at startup. Restart loses no catalog state and triggers no rescan.\n- Logs go to stdout, one line per scan item at info level.\n\n## 13. Operating commands\n\n```bash\nexport ATLAS_DATA_DIR=$PWD/.data ATLAS_LIBRARY_ROOT=$HOME/Shelf PORT=8787\nnpm ci && npm run build\nnpm start\ncurl -s -X POST http://127.0.0.1:8787/api/scans -H 'Content-Type: application/json' -d '{\"root\":\"'$HOME'/Shelf\"}'\n```\n\nVerification is driven by probe.py; see acceptance_files README.md. The probe starts the service itself with the same environment variables and a disposable data directory.\n\n## 14. Acceptance mapping\n\n- A01 exercises POST /api/scans twice, GET /api/books, GET cover, and failure reporting for a broken ZIP and an escaping symlink.\n- A02 exercises GET detail, PATCH revision conflict and success, POST and PUT collection endpoints, a service restart, and a rescan.\n- A03 exercises GET /api/books?q= with supported and unsupported fields.\n- A04 exercises GET and HEAD file, plus missing format and unknown id.\n\n## 15. Out of scope for this slice\n\nEntry removal, merging duplicate works, format conversion, built-in reader, device transfer, OPDS, reading progress, tags, series, full-text search, backup and export, authentication, and multi-user state. These are deliberate omissions, not hidden features.",
+ "gaps": [
+  "MOBI ingest is not exercised unless the operator supplies a real DRM-free .mobi fixture via ATLAS_MOBI_FIXTURE; the probe synthesises EPUB fixtures only.",
+  "Encrypted or DRM-protected files are reported unsupported_drm and never parsed; there is no rights-management integration.",
+  "Entry removal, merging works, format conversion, device transfer, built-in reading, progress tracking, tags, series, and OPDS are absent from this slice even though the leaf treats removal as defining core.",
+  "The browser UI is server-rendered and only its HTTP contract is verified; layout, drag-and-drop, and actual opening in an external reading app are not automated.",
+  "Search is deterministic substring matching with no fuzzy ranking; upstream rapidfuzz-style tolerance is intentionally not reproduced.",
+  "Range requests, resumable downloads, and very large file streaming are not implemented or tested.",
+  "Scan concurrency is guarded by contract (single-flight 409) but the probe does not race two scans; crash recovery mid-scan is also untested.",
+  "A placeholder cover is a derived image, so cover presence does not imply that every source file carries embedded artwork."
+ ],
+ "delivery_profile": "web",
+ "execution_default": "Node.js 20 plus TypeScript Fastify web service with SQLite catalog data under ATLAS_DATA_DIR, read-only file references under ATLAS_LIBRARY_ROOT, server-rendered UI plus JSON API, and HTTP-driven acceptance probing.",
+ "source_refs": {
+  "requirements": [
+   "atlas:dc136828133d497389419464364ee421677d74b554567fd73bca46d6c2faf26d",
+   "scenario:e3081b003a1292e98ae2eb955aa8bb8b8a2f4f1ff964dc99081a9a1e29415956"
+  ],
+  "case_files": [
+   "upstream:1dc49d84bbbe9f6d22c4f448ee7b103b74f5910dc61771187e58708af1e14a02",
+   "upstream:e1c9bf725cb160f1050737e57018b99591f65e23460b1e02e5d4d7620ace7863",
+   "upstream:106b11fcee13570b8479bce77ccd339a898146a85d4a8c14b5cca83014bfcad7",
+   "upstream:417a07dd8f440e0d8e51ba207e3f740b98ecb513b1d17705e2e737dd06d8634c",
+   "upstream:eab7f7f3447d39f5a2d77289762b1f185b51686d3062237b54fc0221ade0bd6a"
+  ],
+  "design_inferences": [
+   {
+    "text": "Deliver the leaf as a Node.js 20 plus TypeScript Fastify web service with server-rendered shelf pages and a JSON API, storing the catalog in SQLite under ATLAS_DATA_DIR.",
+    "depends_on": [
+     "scenario:e3081b003a1292e98ae2eb955aa8bb8b8a2f4f1ff964dc99081a9a1e29415956",
+     "upstream:417a07dd8f440e0d8e51ba207e3f740b98ecb513b1d17705e2e737dd06d8634c"
+    ]
+   },
+   {
+    "text": "Key entries by a normalised embedded identifier with a lowercased title-plus-author fallback, and suppress repeated ingest by SHA-256 of the file bytes so rescans are idempotent beyond path equality.",
+    "depends_on": [
+     "upstream:106b11fcee13570b8479bce77ccd339a898146a85d4a8c14b5cca83014bfcad7",
+     "upstream:417a07dd8f440e0d8e51ba207e3f740b98ecb513b1d17705e2e737dd06d8634c",
+     "atlas:dc136828133d497389419464364ee421677d74b554567fd73bca46d6c2faf26d"
+    ]
+   },
+   {
+    "text": "Track manual_fields and a revision counter so a reader correction is durable, a stale write is rejected with 409, and a later scan cannot overwrite corrected title or author.",
+    "depends_on": [
+     "atlas:dc136828133d497389419464364ee421677d74b554567fd73bca46d6c2faf26d",
+     "scenario:e3081b003a1292e98ae2eb955aa8bb8b8a2f4f1ff964dc99081a9a1e29415956"
+    ]
+   },
+   {
+    "text": "Expose field-qualified search for title, author, and collection with quoted values, reject unknown field prefixes with 422 unknown_field, and use deterministic substring matching instead of fuzzy scoring.",
+    "depends_on": [
+     "upstream:eab7f7f3447d39f5a2d77289762b1f185b51686d3062237b54fc0221ade0bd6a",
+     "scenario:e3081b003a1292e98ae2eb955aa8bb8b8a2f4f1ff964dc99081a9a1e29415956"
+    ]
+   },
+   {
+    "text": "Serve entry files only from realpaths contained in ATLAS_LIBRARY_ROOT, with attachment disposition, format selection, and explicit 404 format_not_found and 409 file_missing responses.",
+    "depends_on": [
+     "upstream:106b11fcee13570b8479bce77ccd339a898146a85d4a8c14b5cca83014bfcad7",
+     "scenario:e3081b003a1292e98ae2eb955aa8bb8b8a2f4f1ff964dc99081a9a1e29415956"
+    ]
+   },
+   {
+    "text": "Resolve covers in the order embedded, sidecar, deterministic placeholder, and record cover_source so cover presence is honest about its origin.",
+    "depends_on": [
+     "upstream:106b11fcee13570b8479bce77ccd339a898146a85d4a8c14b5cca83014bfcad7",
+     "atlas:dc136828133d497389419464364ee421677d74b554567fd73bca46d6c2faf26d"
+    ]
+   },
+   {
+    "text": "Use one transaction per scanned file so an unreadable or escaping file is reported failed without rolling back other ingestions in the same scan.",
+    "depends_on": [
+     "upstream:eab7f7f3447d39f5a2d77289762b1f185b51686d3062237b54fc0221ade0bd6a",
+     "upstream:106b11fcee13570b8479bce77ccd339a898146a85d4a8c14b5cca83014bfcad7"
+    ]
+   }
+  ]
+ },
+ "repo_name": "th3r00t/pyShelf",
+ "license": "GPL-3.0",
+ "license_path": "LICENSE"
+}

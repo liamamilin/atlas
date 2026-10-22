@@ -1,0 +1,144 @@
+{
+ "name": "README Markup Editor",
+ "audience": "a developer writing repository documentation",
+ "objective": "Turn a plain draft into a saved README.md whose formatting exists only as markup characters, verifying the derived preview before saving",
+ "workflow": [
+  "Paste or open a plain-text draft of the README into the source editor",
+  "Select a phrase and use the Bold button, then select a line and use the H1 button, so markup is inserted around the selection",
+  "Glance at the live preview pane to confirm the heading and emphasis render as intended",
+  "Save, downloading the .md file, and reopen it to confirm the stored text is the markup itself"
+ ],
+ "acceptance": [
+  "The downloaded .md file contains the literal markup characters and no styling data",
+  "The preview is recomputed from the saved text and shows the same heading and bold phrase",
+  "Word and character counts update to reflect the rendered source"
+ ],
+ "observations": [
+  [
+   "code_observation",
+   "index.js",
+   253,
+   268,
+   "The bold action maps to a ** prefix and suffix while the h1 action maps to a # -with-space prefix and an empty suffix; each toolbar action is a fixed pair of strings selected in a switch."
+  ],
+  [
+   "code_observation",
+   "index.js",
+   319,
+   336,
+   "apply() rebuilds the textarea value from substring(startPos, endPos) surrounded by the action prefix and suffix, then moves the selection to start plus prefix length and end plus prefix length."
+  ],
+  [
+   "code_observation",
+   "index.js",
+   197,
+   211,
+   "download() reads the textarea value, converts every LF to CRLF, wraps the result in a Blob of type text/plain, and downloads it under the fixed name marcdown.md."
+  ],
+  [
+   "code_observation",
+   "index.js",
+   73,
+   84,
+   "Word and character counts are read from the rendered viewer innerText; the character count removes whitespace runs, and empty text resets both counts to zero and disables the save button."
+  ],
+  [
+   "code_observation",
+   "index.js",
+   87,
+   96,
+   "PreviewDone parses the buffer content with marked.parse, highlights code blocks, and swaps buffer and viewer, so the visible pane is the latest derived rendering of the text."
+  ],
+  [
+   "code_observation",
+   "index.html",
+   162,
+   179,
+   "The source textarea #getm sits beside #viewer and a hidden #buffer used for render swapping; rendered HTML is written into the div elements rather than the textarea."
+  ],
+  [
+   "documentation",
+   "README.md",
+   63,
+   69,
+   "The documented demo loop is to paste or type markdown on the left, view the preview on the right, and then save the markdown file."
+  ]
+ ],
+ "inference": "Build a dependency-free static ES-module web app for the same fixed journey: a textarea source of record, Bold and H1 buttons that insert literal markup at the current selection, a preview recomputed only from that text, and a Save that downloads README.md unchanged. The existing CDN renderer, MathJax pipeline and PWA layer are not replicated; a small deterministic HTML-escaped renderer covers the scenario's heading and emphasis.",
+ "features": [
+  "Selection-based markup insertion: Bold wraps the selected phrase in **; H1 gives each selected non-blank line exactly one #  prefix, idempotently.",
+  "Derived preview: the right pane is recomputed from the source text only, rendering ATX headings and **bold**/ *italic* while escaping all HTML input.",
+  "Markup-only save and reopen: Save downloads README.md whose body is exactly the source text (UTF-8, no presentation data); reopening it reproduces the same text and preview.",
+  "Rendered word and character counts: counts derive from preview-visible text, exclude markup, and stay unchanged when a word is bolded."
+ ],
+ "goals": [
+  "Selecting a phrase and clicking Bold produces **phrase** with the phrase still selected; selecting the README title line and clicking H1 produces a single #  prefix, and clicking H1 again changes nothing.",
+  "With the source # Title and A **bold** phrase, the preview contains <h1>Title</h1> and <strong>bold</strong>, contains no literal ** markers, and renders HTML-like input as escaped visible text.",
+  "Saving yields README.md with mime text/markdown and a body byte-identical to the source; reopening that body gives the same text and identical preview, while blank documents and unsafe filenames are refused.",
+  "For # Title / A **bold** phrase. the counts are 4 words and 17 non-whitespace characters, empty text counts 0/0, and inserting ** around a word leaves both counts unchanged."
+ ],
+ "arch": "# README Markup Editor — target architecture\n\n## 1. Stack and boundary\n- Target: static web app (HTML + CSS + ES2020 modules), no build step, no third-party runtime dependencies, no network calls during use.\n- Served from `app/` by any static server; this keeps the `web` delivery profile and needs no backend.\n- Document boundary: exactly one in-memory document per page. No server, database, localStorage, session storage, cookie, or account.\n- Source of record: the textarea string. Save downloads `README.md`; Open reads a user-chosen `.md`, `.markdown`, or `.txt` file. Preview DOM and counts are recomputed derivatives and are never written back into the document.\n- Node.js (>=18) is used only by the acceptance driver to import the same ES modules; the app itself runs without Node.\n\n## 2. File layout\n```text\napp/\n  index.html          two-pane shell, toolbar (B, H1), counts, Open, Save\n  styles.css          fixed layout only; no generated document styling\n  src/core.js         pure contracts: applyMarkup, renderMarkdown, countText, createSavePayload, openText\n  src/app.js          DOM wiring, event handlers, Blob download\n  package.json        { \"type\": \"module\" } only; no dependencies\nacceptance_files/\n  probe.py            Node-backed verifier for the core contracts\n  README.md           operator steps for core and manual UI verification\n```\n\n## 3. Document model\n`{ text: string, start: int, end: int }`\n- `text` is the exact UTF-16 string held by the textarea.\n- `start`/`end` are code-unit offsets, `0 <= start <= end <= text.length`.\n- No other state is authoritative. Save-enabled is derived, not stored: enabled iff `text.trim() !== ''`.\n- Line endings and a leading BOM on opened files are data, not renderer or save state.\n\n## 4. Selection-based insertion (`applyMarkup`)\nSignature `applyMarkup(doc, action) -> {text, start, end}`; never mutates `doc`.\n- `bold`: insert `**` at `start` and `**` at `end`; result selection `[start+2, end+2]`. An empty selection yields `****` with the caret at `start+2`.\n- `h1`: for every non-blank line intersecting `[start, end)` (a caret intersects its own line), strip an existing `#{1,6} ` prefix and insert `# `. Blank lines are untouched.\n- `h1` result selection spans from the start of the first transformed line to the end of the last transformed line, excluding its line break. If no non-blank line intersects, text and selection are returned unchanged.\n- Errors: `INVALID_SELECTION` for non-integer, reversed, or out-of-range offsets; `UNKNOWN_ACTION` for actions other than bold and h1.\n- Mapping uses UTF-16 offsets throughout, matching `selectionStart`/`selectionEnd`.\n\n## 5. Preview rendering (`renderMarkdown`)\nInput source string, output deterministic HTML string; no DOM access.\n- Split lines on CRLF, CR, or LF.\n- ATX heading: 1-6 hashes, then one space, then non-empty text -> `<h1>`..`<h6>`; trailing spaces trimmed. `#NoSpace` is a paragraph.\n- A blank line ends a paragraph; consecutive non-blank non-heading lines join with one space inside one `<p>`.\n- Inline, applied after escaping: backtick span -> `<code>`, double asterisks -> `<strong>`, single asterisks -> `<em>`. Unmatched or nested markers stay literal; no nesting guarantee.\n- Escape `<`, `>`, `&`, double quote and apostrophe before inline parsing. Emitted elements carry no attributes, and raw HTML is never passed through. Links, images, tables, math, task lists, and code highlighting are out of scope.\n\n## 6. Counts (`countText`)\n`countText(text) -> {words, chars}`, keys in that order.\n- Derive visible text with the same block and inline parsing: block text joined with single spaces, markup characters removed, HTML tags absent by construction.\n- `words` = whitespace-separated non-empty tokens; `chars` = non-whitespace UTF-16 code units.\n- Empty or whitespace-only input returns `{words: 0, chars: 0}`.\n- Recompute after every input event and after each toolbar insertion; markup must not change the counts of rendered prose.\n\n## 7. Save and reopen\n- `createSavePayload(doc, filename = 'README.md') -> {filename, mime, body}`; `body` is `doc.text` unchanged (LF preserved, no BOM added), `mime` is `text/markdown;charset=utf-8`.\n- Throws `EMPTY_DOCUMENT` when `text.trim() === ''`.\n- Throws `INVALID_FILENAME` unless the basename matches a leading alphanumeric followed by `[A-Za-z0-9._-]*\\.md`; path separators and leading dots are refused.\n- Download: `Blob([body], {type: mime})` plus an object URL and a temporary `<a download>`; revoke the URL after the click. No server round trip.\n- `openText(raw) -> {text, start: 0, end: 0}`: rejects non-strings with `INVALID_CONTENT`, rejects `raw.length > 1048576` with `FILE_TOO_LARGE`, strips exactly one leading U+FEFF, otherwise preserves every character including CRLF.\n- Open assigns the value, resets selection, then recomputes preview and counts from the new text; the previous preview is never reused.\n\n## 8. UI composition and state\n- Header: B and H1 buttons, Open file input (accept .md,.markdown,.txt), Save button.\n- Body: left textarea `#source` with visible markup, right `#preview` region for derived HTML.\n- Footer: `N words`, `M chars`, and caret line/column.\n- States: empty -> Save disabled, empty preview placeholder, 0/0 counts; draft -> Save enabled; reopened -> behaves exactly like draft with the loaded text.\n- Toolbar click handlers call `preventDefault()` on `mousedown` so the textarea selection survives; on click they apply the pure function, assign `value`, call `setSelectionRange(result.start, result.end)`, then refresh preview and counts.\n- Input path uses the same renderer and counter, coalesced with one `requestAnimationFrame`; the 1 MiB cap bounds work.\n- The Save button's disabled state mirrors the core rule (`text.trim() === ''`), so whitespace-only text cannot be saved.\n\n## 9. Errors and edge cases\n| Condition | Behaviour |\n|---|---|\n| Unknown toolbar action | not reachable: toolbar is fixed to bold and h1; core still rejects |\n| Selection outside text | core throws `INVALID_SELECTION`; app never sends stale offsets |\n| Empty save | core throws `EMPTY_DOCUMENT`; button disabled |\n| Unsafe filename | core throws `INVALID_FILENAME`; UI always uses README.md |\n| File > 1 MiB | `FILE_TOO_LARGE` shown inline; editor keeps its current text |\n| File read failure | `READ_FILE_FAILED` shown inline; current draft untouched |\n| BOM | discarded once on open; saved body never gains one |\n| CRLF input | preserved on save; renderer treats it as a line break |\n| Blank line under H1 | untouched, selection unchanged |\n| Already a heading | prefix normalised to one `# `, no duplication |\n\n## 10. Invariants\n- Preview and counts are functions of `text` only; no operation writes rendered HTML or counts into the document.\n- `createSavePayload(doc).body === doc.text` for every accepted document; save never rewrites line endings or adds a BOM.\n- Repeated H1 on a heading line is text-idempotent and never doubles the prefix.\n- Every HTML string emitted is escaped source text using only the allowed tags.\n\n## 11. Verification seams and commands\n- `src/core.js` has no DOM imports, so the acceptance driver imports it under Node and asserts A01-A04 against the same contract `app.js` calls.\n- Run the app: `python3 -m http.server 4173 --directory app`, open `http://localhost:4173`.\n- Run core verification: `python3 acceptance_files/probe.py app`; exit 0 pass, 1 fail, 2 not_run.\n- Manual UI script: paste a draft, select the phrase and click B, select the title line and click H1, inspect preview, click Save, open README.md in a text editor, reopen it with Open, compare text, preview and counts.\n\n## 12. Out of scope\nMulti-document library, persistence, sync, collaboration, HTML/PDF export, images, tables, math, code highlighting, outline, themes, and native undo across programmatic insertions.",
+ "gaps": [
+  "No persistence: reloading the page loses the draft; the only artifact is the downloaded file.",
+  "Programmatic textarea updates may reset the browser undo stack, so Ctrl+Z after a toolbar insertion is not guaranteed.",
+  "The renderer subset covers headings, paragraphs, bold, italic and inline code only; tables, links, images, math and fenced code are not rendered.",
+  "Word counting splits on whitespace, so unspaced CJK prose counts as one word; character counts are UTF-16 units, so astral characters count as two.",
+  "No scroll sync or outline; the preview updates immediately without position tracking.",
+  "Headless browser interaction, drag-and-drop, and per-browser download naming are verified manually, not by probe.py."
+ ],
+ "delivery_profile": "web",
+ "execution_default": "Serve app/ with a static server (`python3 -m http.server 4173 --directory app`) and use it in a browser; the document lives only in page memory and is written solely to the downloaded README.md file. Node.js is needed only to run the acceptance driver against src/core.js.",
+ "source_refs": {
+  "requirements": [
+   "atlas:a14c24d234981599f180ad63ac6d79f338418a3bd37e34e93306b0835de1dd9d",
+   "scenario:ae4c81615d7e8554611e724d27f4a1084e33c487ebb06b530d523e46ca955145"
+  ],
+  "case_files": [
+   "upstream:7e24855bbc4b5fd08ae1a9e3d014252725229619b82a30730a90d895a19bbea4",
+   "upstream:2118fe0c33091eb5cb22ce59c75b07642edc5c3e5279f87dfd9ebe1adb6a98fd",
+   "upstream:262f7b513f8339a6c2714b23d436298c7801312569cbf56022dbe35645815f4f",
+   "upstream:9c0da2a27482cf26fdcfb3d2d0f52c80ddd3c0e6418faf2c033c6701a3864ae7"
+  ],
+  "design_inferences": [
+   {
+    "text": "A dependency-free static ES-module web app served by a local static file server, instead of CDN scripts, a build step or a service backend",
+    "depends_on": [
+     "atlas:a14c24d234981599f180ad63ac6d79f338418a3bd37e34e93306b0835de1dd9d",
+     "upstream:262f7b513f8339a6c2714b23d436298c7801312569cbf56022dbe35645815f4f",
+     "upstream:9c0da2a27482cf26fdcfb3d2d0f52c80ddd3c0e6418faf2c033c6701a3864ae7"
+    ]
+   },
+   {
+    "text": "Selection insertion math is a pure function over {text,start,end} shared by the textarea wiring and the acceptance driver",
+    "depends_on": [
+     "scenario:ae4c81615d7e8554611e724d27f4a1084e33c487ebb06b530d523e46ca955145",
+     "upstream:9c0da2a27482cf26fdcfb3d2d0f52c80ddd3c0e6418faf2c033c6701a3864ae7"
+    ]
+   },
+   {
+    "text": "A small deterministic HTML-escaped renderer for headings, paragraphs, bold, italic and inline code replaces marked, MathJax and highlight.js for this scope",
+    "depends_on": [
+     "atlas:a14c24d234981599f180ad63ac6d79f338418a3bd37e34e93306b0835de1dd9d",
+     "upstream:9c0da2a27482cf26fdcfb3d2d0f52c80ddd3c0e6418faf2c033c6701a3864ae7"
+    ]
+   },
+   {
+    "text": "Save emits README.md as text/markdown with the source string unchanged, preserving line endings and refusing blank documents, rather than rewriting LF to CRLF",
+    "depends_on": [
+     "scenario:ae4c81615d7e8554611e724d27f4a1084e33c487ebb06b530d523e46ca955145",
+     "upstream:9c0da2a27482cf26fdcfb3d2d0f52c80ddd3c0e6418faf2c033c6701a3864ae7"
+    ]
+   },
+   {
+    "text": "Word and character counts are computed from preview-visible text by a pure counter, with characters excluding whitespace",
+    "depends_on": [
+     "scenario:ae4c81615d7e8554611e724d27f4a1084e33c487ebb06b530d523e46ca955145",
+     "upstream:9c0da2a27482cf26fdcfb3d2d0f52c80ddd3c0e6418faf2c033c6701a3864ae7"
+    ]
+   }
+  ]
+ },
+ "repo_name": "liyasthomas/marcdown",
+ "license": "MIT",
+ "license_path": "LICENSE"
+}

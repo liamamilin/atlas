@@ -1,0 +1,94 @@
+{
+ "scenario": {
+  "name": "Draft and save a README with selection-based markup",
+  "audience": "a developer writing repository documentation",
+  "objective": "Turn a plain draft into a saved README.md whose formatting exists only as markup characters, verifying the derived preview before saving",
+  "workflow": [
+   "Paste or open a plain-text draft of the README into the source editor",
+   "Select a phrase and use the Bold button, then select a line and use the H1 button, so markup is inserted around the selection",
+   "Glance at the live preview pane to confirm the heading and emphasis render as intended",
+   "Save, downloading the .md file, and reopen it to confirm the stored text is the markup itself"
+  ],
+  "acceptance": [
+   "The downloaded .md file contains the literal markup characters and no styling data",
+   "The preview is recomputed from the saved text and shows the same heading and bold phrase",
+   "Word and character counts update to reflect the rendered source"
+  ]
+ },
+ "fixed_scope": null,
+ "delivery_profile": "web",
+ "source": {
+  "repository": "https://github.com/liyasthomas/marcdown",
+  "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+  "strategy_version": "full-leaf-selected-v2-032a5e151f64c6b3",
+  "collected_at": "2026-10-22T00:01:59.522656+00:00",
+  "files": {
+   "LICENSE": "d35fe88a672fac041639dba12e9c9c85df1334b0e4706c7f663fd60a6fd12ece",
+   "README.md": "98e59cd19fc2e5c5bec60203c3101eb4556286ff6d9d79725ddd8dd6c3001a76",
+   "index.html": "c871d574ec3937ebc2e307245f142737d2632973eedfefe46c20fae4681507ea",
+   "index.js": "66ffd4e13a3391af0a9cab210d8c95e4db70487275111be3c57f737b18a18d37"
+  },
+  "license_files": [
+   "LICENSE"
+  ],
+  "license": {
+   "status": "located",
+   "spdx_id": "MIT",
+   "notice_hashes": {
+    "LICENSE": "d35fe88a672fac041639dba12e9c9c85df1334b0e4706c7f663fd60a6fd12ece"
+   }
+  },
+  "license_uncertainties": [
+   "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+  ],
+  "excluded_paths": [
+   "Unselected files; upstream not installed or run"
+  ]
+ },
+ "source_ids": {
+  "requirements": {
+   "atlas:a14c24d234981599f180ad63ac6d79f338418a3bd37e34e93306b0835de1dd9d": "leaf.md",
+   "scenario:ae4c81615d7e8554611e724d27f4a1084e33c487ebb06b530d523e46ca955145": "fixed scenario"
+  },
+  "upstream": {
+   "upstream:7e24855bbc4b5fd08ae1a9e3d014252725229619b82a30730a90d895a19bbea4": {
+    "path": "LICENSE",
+    "repository": "https://github.com/liyasthomas/marcdown",
+    "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b"
+   },
+   "upstream:2118fe0c33091eb5cb22ce59c75b07642edc5c3e5279f87dfd9ebe1adb6a98fd": {
+    "path": "README.md",
+    "repository": "https://github.com/liyasthomas/marcdown",
+    "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b"
+   },
+   "upstream:262f7b513f8339a6c2714b23d436298c7801312569cbf56022dbe35645815f4f": {
+    "path": "index.html",
+    "repository": "https://github.com/liyasthomas/marcdown",
+    "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b"
+   },
+   "upstream:9c0da2a27482cf26fdcfb3d2d0f52c80ddd3c0e6418faf2c033c6701a3864ae7": {
+    "path": "index.js",
+    "repository": "https://github.com/liyasthomas/marcdown",
+    "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b"
+   }
+  }
+ },
+ "inventory": [
+  {
+   "path": "LICENSE",
+   "lines": 21
+  },
+  {
+   "path": "README.md",
+   "lines": 238
+  },
+  {
+   "path": "index.html",
+   "lines": 224
+  },
+  {
+   "path": "index.js",
+   "lines": 409
+  }
+ ]
+}

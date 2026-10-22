@@ -1,0 +1,796 @@
+{
+ "observed_at": 1792631326.658682,
+ "full_plan_id": "full-leaf-auxiliary-2026-10-21",
+ "status": "paused",
+ "reason": "selected leaf run complete",
+ "source_code_sha": "9ea4379e403f4cf127ef888159547c4eab09fd93",
+ "effective_model": "open-design/deepseek-v4.1-flash",
+ "selected_leaves": [
+  "e-book-library-application",
+  "markdown-editor",
+  "resource-calendar"
+ ],
+ "calls_before_pilot": 118,
+ "pilot_calls": 9,
+ "pilot_calls_completed": 9,
+ "pilot_protocol_failures": 0,
+ "pilot_content_retries": 0,
+ "pilot_templates_usable": 0,
+ "pilot_needs_revision": 3,
+ "pilot_case_identities_added": 2,
+ "pilot_case_versions_added": 2,
+ "pilot_cases_reused": 0,
+ "pilot_research_not_accepted": 1,
+ "pilot_applications_run": 0,
+ "new_calls": 127,
+ "cumulative_calls": 226,
+ "max_new_calls": 7200,
+ "remaining_new_calls": 7073,
+ "active_calls": 0,
+ "deadline": 1795181744.123177,
+ "counts": {
+  "failed": 16,
+  "ready_not_run": 3,
+  "source_unavailable": 9,
+  "needs_revision": 17,
+  "paused": 1,
+  "pending": 1741,
+  "reused": 18
+ },
+ "frozen_scope_total": 1805,
+ "original_reused": 18,
+ "attempted_new_leaves": 46,
+ "new_processed_first_pass": 45,
+ "original_118_call_records_unchanged": true,
+ "protected_files_unchanged": 123,
+ "original_case_versions_unchanged": 19,
+ "total_case_versions": 36,
+ "total_case_identities": 31,
+ "strict_G1_T08_unchanged": true,
+ "items": [
+  {
+   "leaf": "e-book-library-application",
+   "state": "needs_revision",
+   "workdir": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-1",
+   "first_pass_done": true,
+   "calls": [
+    {
+     "stage": "discovery",
+     "session_id": "ses_e9f169ca6ffevcThxqyQNS540v",
+     "delivery_status": "delivered",
+     "requested_model": "open-design/deepseek-v4.1-flash",
+     "observed_model": null,
+     "result_sha256": "dc9eb7fdc2f4f44cea08c8ceff38466c21e8ecd428cff98f7cccbad6787d5658",
+     "raw_sha256": "306c33afdce8c87783ef80b96fd330d198034ab7af943aa74132f87b769aa80e",
+     "summary_sha256": "866188f6ca1c5cb57f3345832e4c7b0d033bff22b7018b46076c23e7b0b18f17"
+    },
+    {
+     "stage": "blueprint-generate-aux",
+     "session_id": "ses_e9f14fc1effeAmnChU1fNE1AHB",
+     "delivery_status": "delivered",
+     "requested_model": "open-design/deepseek-v4.1-flash",
+     "observed_model": null,
+     "result_sha256": "93f5eee034625fac0dffb89b7f891cb9669869507f0302a875f074b76abcbe1b",
+     "raw_sha256": "cc927ecd8374c3de6a00139f71fc7ae835ae7cc780cf1b5d698592bebb419321",
+     "summary_sha256": "8ef94f199177fc715a753c37a8ddea330a9d43b9e91c7991a6188061cf5c5e4e"
+    },
+    {
+     "stage": "blueprint-spec-review-aux",
+     "session_id": "ses_e9f0fc076ffekvciUAd4t3Fa2p",
+     "delivery_status": "delivered",
+     "requested_model": "open-design/deepseek-v4.1-flash",
+     "observed_model": null,
+     "result_sha256": "ce66cf369c66871d2fdc3752afada698c5928aa9601485ab34789177761a38a5",
+     "raw_sha256": "39ffa61a0413216c47535a15cb1bebe0db2a11c5074e747d8234046f506a45f1",
+     "summary_sha256": "dc7e95ab1d08a39cb4ea4023f07e94229a5a9ddb56d8a0788c6ebb873f76be9b"
+    }
+   ],
+   "source_pin": {
+    "repository": "https://github.com/th3r00t/pyShelf",
+    "commit_sha": "a723611eb351de0e96a043cbcb17f8851fc51ccc",
+    "paths": [
+     "LICENSE",
+     "README.md",
+     "src/backend/lib/library.py",
+     "src/backend/lib/models.py",
+     "src/backend/lib/storage.py"
+    ],
+    "license_spdx": "GPL-3.0",
+    "repository_id": 210694209,
+    "collected_at": "2026-10-22T00:02:50.334848+00:00"
+   },
+   "accepted_research": {
+    "case_id": "case:repo:da200001f89d952e79cfbfc9:a723611eb351de0e96a043cbcb17f8851fc51ccc",
+    "revision": 1,
+    "digest": "55df7a408e21b359dc3838ff6c349bbe8967dac0ec131ac69008ff3df9ab6c31",
+    "review_input_digest": "5c16985f603362cb09c2d2818cbb21b4e92786780f17b29276a7fb41d67cd6f1",
+    "review_session": "ses_e9f0fc076ffekvciUAd4t3Fa2p",
+    "template_passed": false,
+    "replayed": false
+   },
+   "review": {
+    "input_digest": "5c16985f603362cb09c2d2818cbb21b4e92786780f17b29276a7fb41d67cd6f1",
+    "verdict": "needs_changes",
+    "checks": {
+     "leaf_scope": false,
+     "source_fidelity": true,
+     "design_distinction": true,
+     "core_journey": true,
+     "architecture": true,
+     "acceptance": true,
+     "limits_and_safety": true
+    },
+    "observations": [
+     {
+      "index": 0,
+      "verdict": "accepted",
+      "reason": "library.py:60-72 confirms filter_books calls scan_folder, populates file_list with walked paths, then filters with the unescaped regex \\.epub|\\.mobi|\\.pdf; no content hash or work-level key is computed in that path."
+     },
+     {
+      "index": 1,
+      "verdict": "accepted",
+      "reason": "library.py:309-328 confirms compare_shelf_current obtains stored Book.file_name values via Storage.book_paths_list and returns the set difference between on-disk and stored paths, so the upstream suppression is path-based rather than content-based."
+     },
+     {
+      "index": 2,
+      "verdict": "accepted",
+      "reason": "library.py:114-123 confirms the no-dc:title fallback takes the final path component and removes the extension, then applies the Book-prefix regex split before use."
+     },
+     {
+      "index": 3,
+      "verdict": "accepted",
+      "reason": "storage.py:277-295 confirms fields title, author, and tags, field:value and field:quoted-value parsing, and a keywords bucket for non-field bare/quoted tokens; unknown field prefixes are silently discarded upstream, which the target design deliberately replaces with 422 unknown_field."
+     },
+     {
+      "index": 4,
+      "verdict": "accepted",
+      "reason": "storage.py:297-332 confirms case-insensitive substring matching for requested fields via match_field, then rapidfuzz process.extract with fuzz.WRatio and a score > 50 filter for keyword queries."
+     },
+     {
+      "index": 5,
+      "verdict": "accepted",
+      "reason": "storage.py:68-111 confirms insert_book uses one SQLAlchemy Session per book, reads cover bytes from book[2].data or book[2], commits, and logs and returns False when an exception occurs."
+     },
+     {
+      "index": 6,
+      "verdict": "accepted",
+      "reason": "models.py:19-42 confirms the Book model stores one file_name string plus title, optional author, cover bytes, tags, categories, and a book_collections relationship to BookCollection."
+     },
+     {
+      "index": 7,
+      "verdict": "accepted",
+      "reason": "README.md:21-36 confirms the documented feature list: recursive scanning, cover aggregation, fuzzy search with tag/author/title specifiers, download, folder-derived collections, and epub/mobi support."
+     }
+    ],
+    "issues": [
+     "Entry removal is omitted even though the leaf lists it as defining core: leaf.md:163-169 explicitly includes 'removal of entries' under 'Defining core — without these, not an e-book library', while the architecture §15 (VIEW_ARCH.md:166-168) and the authored gap (REVIEW_SCOPE.md:136-139, AUTHOR_INPUT.json:94) deliberately exclude removal. The fixed scan/correct/collection/search/download scenario does not exercise removal, but the template is presented as a core-usable e-book library and its own gap acknowledges the conflict. Explicit disclosure does not satisfy the leaf core. Add a minimal removal contract and acceptance (at least catalog-only removal, or entry-plus-file removal with a documented file policy), or explicitly narrow the template to a scenario slice and stop claiming the full leaf core."
+    ],
+    "summary": "The scenario specification and probe are strong: A01-A04 cover scan, covers, duplicate suppression, failure isolation, revision conflict, correction, collection assignment, restart durability, field-qualified search with negative and unsupported-field cases, and exact-byte file handoff. All eight upstream observations match the fixed source bytes, and the Node/Fastify/SQLite design is clearly separated from the GPL pyShelf evidence with no execution or certification claims. One blocking scope defect remains: the template omits entry removal, which leaf.md lists as defining core, and only records that omission as a gap. The template is not core-usable as claimed until a minimal removal path and acceptance are added, or its scope is explicitly narrowed."
+   },
+   "review_input_digest": "5c16985f603362cb09c2d2818cbb21b4e92786780f17b29276a7fb41d67cd6f1",
+   "read_coverage_verified": true,
+   "archive_verified": true,
+   "workflow_steps": [
+    {
+     "step": "existing_template",
+     "attempt": "attempt-1",
+     "state": "completed",
+     "input_digest": "53d92a37f467e8c1b6b84d73dd6fb44b4b6e01330cb90f5e19e965ecceffbc4e",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-1/REQUEST.json",
+       "sha256": "08823559c32ea6e7aac67e9af71626219316f34bb9e43e585f96008f5c72afd5",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-1/existing_template/outputs/0"
+      }
+     ],
+     "started": 1792627269.785575,
+     "finished": 1792627269.9196
+    },
+    {
+     "step": "scenario",
+     "attempt": "attempt-1",
+     "state": "completed",
+     "input_digest": "53d92a37f467e8c1b6b84d73dd6fb44b4b6e01330cb90f5e19e965ecceffbc4e",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-1/SELECTED_SCENARIO.json",
+       "sha256": "8b90ad425b05cfa72251d0ef2a4a8d66783af36a4272697fc272530e68c63569",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-1/scenario/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-1/RESEARCH.json",
+       "sha256": "dc9eb7fdc2f4f44cea08c8ceff38466c21e8ecd428cff98f7cccbad6787d5658",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-1/scenario/outputs/1"
+      }
+     ],
+     "started": 1792627269.921535,
+     "finished": 1792627367.467408
+    },
+    {
+     "step": "case_research",
+     "attempt": "attempt-1",
+     "state": "completed",
+     "input_digest": "3166515cc9b0bacc3a65335036aa0510201c28ed5e4a2cacbd3d8cd13e42f6d9",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-1/source-snapshot.json",
+       "sha256": "0ae0a62f3f8177c9e30654f2095519336093857ace7df10d2b4c7e30d219ca60",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-1/case_research/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-1/upstream-evidence.zip",
+       "sha256": "1f7609cfa1d331d6d6891c8273627db072066f0067ce85106a4fafa7f930234e",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-1/case_research/outputs/1"
+      }
+     ],
+     "started": 1792627367.472417,
+     "finished": 1792627376.5250702
+    },
+    {
+     "step": "generation",
+     "attempt": "attempt-1",
+     "state": "completed",
+     "input_digest": "c9d4d664059db3f8a4279ba9ae675c07769511b550fef985cf8edf2408ece08c",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-1/calls/blueprint-generate-aux/RESULT.json",
+       "sha256": "93f5eee034625fac0dffb89b7f891cb9669869507f0302a875f074b76abcbe1b",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-1/generation/outputs/0"
+      }
+     ],
+     "started": 1792627376.540292,
+     "finished": 1792627719.646697
+    },
+    {
+     "step": "deterministic_check",
+     "attempt": "attempt-1",
+     "state": "completed",
+     "input_digest": "c1d9da23d5270f3221f2f1f2a22d7e363222f2ec65f235cc575fbb3a6a72dc8e",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-1/SOURCE_INPUT.json",
+       "sha256": "b8fff0a80a3e5da095788d299e6d5ab767e6cef5d2fa9e321c4eb587550ac23a",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-1/deterministic_check/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-1/AUTHOR_INPUT.json",
+       "sha256": "ce2c64c186e838ee658c0ea36ea7e9b8e20e929953eaec118600db0b9807559c",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-1/deterministic_check/outputs/1"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-1/acceptance/probe.py",
+       "sha256": "c46870fd51337c74e206a80523a98fbc0aedd3502730861db1f334f4c9fe6914",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-1/deterministic_check/outputs/2"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/e-book-library-application/attempt-1/acceptance/README.md",
+       "sha256": "c0d2b7ced26618583e7632a0de26e208f4e9d7146d48720be5c3dfdd1660cdad",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/e-book-library-application/steps/attempt-1/deterministic_check/outputs/3"
+      }
+     ],
+     "started": 1792627719.650195,
+     "finished": 1792627719.6591702
+    },
+    {
+     "step": "independent_review",
+     "attempt": "attempt-1",
+     "state": "failed",
+     "input_digest": "5c16985f603362cb09c2d2818cbb21b4e92786780f17b29276a7fb41d67cd6f1",
+     "outputs": [],
+     "code": "auxiliary_content",
+     "error": "independent review did not pass; retain candidate and findings",
+     "started": 1792627719.666833,
+     "finished": 1792628024.668972
+    },
+    {
+     "step": "freeze_import",
+     "attempt": "attempt-1",
+     "state": "pending",
+     "input_digest": null,
+     "outputs": []
+    },
+    {
+     "step": "download",
+     "attempt": "attempt-1",
+     "state": "pending",
+     "input_digest": null,
+     "outputs": []
+    }
+   ],
+   "template_frozen": false,
+   "template_imported": false,
+   "development_download": "not_run: independent review needs_changes",
+   "application_runtime": "not_run"
+  },
+  {
+   "leaf": "markdown-editor",
+   "state": "needs_revision",
+   "workdir": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-1",
+   "first_pass_done": true,
+   "calls": [
+    {
+     "stage": "discovery",
+     "session_id": "ses_e9f169ca6ffe52iT6REl2i5Alj",
+     "delivery_status": "delivered",
+     "requested_model": "open-design/deepseek-v4.1-flash",
+     "observed_model": null,
+     "result_sha256": "5119eb40814ec6d456e3dec558d52121b4a6bbaccca094bc52eacb7eccd48dfa",
+     "raw_sha256": "161c77df74c77bcbd119ec068286051b86c9e1df8b9d1a9db4c2bac2faa3f295",
+     "summary_sha256": "a770bbc606cd79264f8cd71235c22c43c8a815998497b46c699be2513905d9a5"
+    },
+    {
+     "stage": "blueprint-generate-aux",
+     "session_id": "ses_e9f15c8f1ffe3fIKh3uEtQwbRs",
+     "delivery_status": "delivered",
+     "requested_model": "open-design/deepseek-v4.1-flash",
+     "observed_model": null,
+     "result_sha256": "739ce88036586e9c7fde14ded5b320b2a359c7c0fa2901d864babf3b3959b713",
+     "raw_sha256": "32be98196b1b5433c15692601315e7bea989e90b5d1410aa6655f7a6bf2a41ac",
+     "summary_sha256": "b29fd31e60a3ceef016fbb82dbe96003cee408f1c8d44beeb6ec605feee4d1dc"
+    },
+    {
+     "stage": "blueprint-spec-review-aux",
+     "session_id": "ses_e9f138a65ffePMDeB7rG6xjYAw",
+     "delivery_status": "delivered",
+     "requested_model": "open-design/deepseek-v4.1-flash",
+     "observed_model": null,
+     "result_sha256": "025321d6441e14f1be1feeebc0ef0cf8428906c7f7420bb2fd09c3b5c01a5644",
+     "raw_sha256": "4cfe96fa62c6dbd9afebfc2f7cb5660a98f0d533d2fae330c5eb3e7d0cf0cf14",
+     "summary_sha256": "d68f00f2f6cc52e2a0ed78c659a81eca0f26d4b8ecc227ea0f176d36970c0b8c"
+    }
+   ],
+   "source_pin": {
+    "repository": "https://github.com/liyasthomas/marcdown",
+    "commit_sha": "f61f79f7d92f4a76a4d1a8bd446201fd2844159b",
+    "paths": [
+     "LICENSE",
+     "README.md",
+     "index.html",
+     "index.js"
+    ],
+    "license_spdx": "MIT",
+    "repository_id": 181738425,
+    "collected_at": "2026-10-22T00:01:59.522656+00:00"
+   },
+   "accepted_research": null,
+   "review": {
+    "input_digest": "71c2050768d1b2e73933d4e9e46e4d84225af5ec4fe1ef4954988fe93b65176b",
+    "verdict": "needs_changes",
+    "checks": {
+     "leaf_scope": true,
+     "source_fidelity": false,
+     "design_distinction": true,
+     "core_journey": true,
+     "architecture": true,
+     "acceptance": false,
+     "limits_and_safety": true
+    },
+    "observations": [
+     {
+      "index": 0,
+      "verdict": "accepted",
+      "reason": "index.js 253-268 shows the switch cases: bold maps to '**'/'**' and h1 maps to '# '/''; the fixed prefix/suffix claim is accurate."
+     },
+     {
+      "index": 1,
+      "verdict": "accepted",
+      "reason": "index.js 319-336 rebuilds the textarea value from the pre-selection text, the selected substring wrapped by the prefix/suffix, and the post-selection text, then sets the selection by adding the prefix length; accurate."
+     },
+     {
+      "index": 2,
+      "verdict": "accepted",
+      "reason": "index.js 197-211 reads #getm.value, replaces every LF with CRLF, creates a Blob of type text/plain, and downloads it as marcdown.md; accurate."
+     },
+     {
+      "index": 3,
+      "verdict": "accepted",
+      "reason": "index.js 73-84 reads viewer.innerText, removes whitespace with /\\s+/gi for the character count, and sets both counts to zero and save.disabled=true when the text is empty; accurate."
+     },
+     {
+      "index": 4,
+      "verdict": "accepted",
+      "reason": "index.js 87-96 takes the buffer HTML, runs marked.parse, highlights code blocks, and swaps buffer and viewer so the visible pane contains the parsed result; accurate."
+     },
+     {
+      "index": 5,
+      "verdict": "rejected",
+      "reason": "index.html 162-179 does not show a hidden #buffer: line 177 places style='display: none;' on #viewer, while the #buffer div at line 179 has no hidden style; index.js 40-47 swaps visibility at runtime. The specific 'hidden #buffer' claim is inaccurate."
+     },
+     {
+      "index": 6,
+      "verdict": "accepted",
+      "reason": "README.md 63-69 contains the demo link and the steps to paste/type markdown on the left, view the preview on the right, and save the markdown file; accurate."
+     }
+    ],
+    "issues": [
+     "Blocking: acceptance/probe.py A01 'empty selections and blank lines' (lines 99-100) requires applyMarkup({text:'',start:0,end:0},'h1') to return '# ', but VIEW_ARCH.md section 4 (lines 33-34; also section 9 line 81) says blank lines are untouched and that if no non-blank line intersects, text and selection are returned unchanged. An empty document has no non-blank line. A core conforming to the architecture returns '' and fails A01; a core passing A01 violates the architecture. The probe and the architecture must be reconciled.",
+     "Blocking: the probe's negative assertions only call throws() (probe.py lines 54-58, used at 109-111 and 166-169), so any exception satisfies them. They never assert the explicit error codes INVALID_SELECTION, UNKNOWN_ACTION, EMPTY_DOCUMENT, INVALID_FILENAME, FILE_TOO_LARGE, or INVALID_CONTENT defined in VIEW_ARCH.md lines 35 and 55-58. A core throwing generic Errors would pass. A03 also covers only LF (probe.py 161-162), and no test covers non-string openText, so section 7's INVALID_CONTENT and CRLF-preservation rules are unverified.",
+     "Blocking source-fidelity finding: observation 5 cites index.html 162-179 but the hidden element in that range is #viewer (line 177), not #buffer (line 179); the buffer/viewer visibility is swapped by index.js 40-47. The observation overstates the fixed hidden state of #buffer."
+    ],
+    "summary": "The leaf scope, target architecture, design distinction from the upstream CDN/MathJax app, scenario journey, and explicit limits are otherwise coherent. The delivery is not ready: A01 contains a direct empty-document H1 contradiction with the architecture, the probe does not verify the explicit error-code contract, and observation 5 misidentifies the hidden upstream element. Verdict: needs_changes."
+   },
+   "review_input_digest": "71c2050768d1b2e73933d4e9e46e4d84225af5ec4fe1ef4954988fe93b65176b",
+   "read_coverage_verified": true,
+   "archive_verified": true,
+   "workflow_steps": [
+    {
+     "step": "existing_template",
+     "attempt": "attempt-1",
+     "state": "completed",
+     "input_digest": "fe8168abc35758bbf39e64b4a0d5dca38c3069f838254f1696878a2758d04a43",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-1/REQUEST.json",
+       "sha256": "523079e782ce293d915dae7c71d902797a6f9e5ecea97bc390685e746991e972",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-1/existing_template/outputs/0"
+      }
+     ],
+     "started": 1792627269.796407,
+     "finished": 1792627269.926262
+    },
+    {
+     "step": "scenario",
+     "attempt": "attempt-1",
+     "state": "completed",
+     "input_digest": "fe8168abc35758bbf39e64b4a0d5dca38c3069f838254f1696878a2758d04a43",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-1/SELECTED_SCENARIO.json",
+       "sha256": "2ef89781bc205dc66f88ef93a01e8df2adc41c8321da17c094e446ce523dbf53",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-1/scenario/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-1/RESEARCH.json",
+       "sha256": "5119eb40814ec6d456e3dec558d52121b4a6bbaccca094bc52eacb7eccd48dfa",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-1/scenario/outputs/1"
+      }
+     ],
+     "started": 1792627269.929172,
+     "finished": 1792627316.704919
+    },
+    {
+     "step": "case_research",
+     "attempt": "attempt-1",
+     "state": "completed",
+     "input_digest": "9b88b873de2c37afee50628934cb4655b04c7be5dc57deb050dadeb65da6a932",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-1/source-snapshot.json",
+       "sha256": "179263f13ceb8e4994c1e2e77805f1c80000fff0fc9e94a0b702dbdfd872f4f4",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-1/case_research/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-1/upstream-evidence.zip",
+       "sha256": "72ab8f2611b1257e4a770f2db51b4d2c17d83c5b9abb9a22badd0d641253e49d",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-1/case_research/outputs/1"
+      }
+     ],
+     "started": 1792627316.70925,
+     "finished": 1792627324.268524
+    },
+    {
+     "step": "generation",
+     "attempt": "attempt-1",
+     "state": "completed",
+     "input_digest": "c88a198b28503e721d507f2ffc8365290053f6a7a8851bb1546984f2a39083d0",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-1/calls/blueprint-generate-aux/RESULT.json",
+       "sha256": "739ce88036586e9c7fde14ded5b320b2a359c7c0fa2901d864babf3b3959b713",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-1/generation/outputs/0"
+      }
+     ],
+     "started": 1792627324.284641,
+     "finished": 1792627471.1274712
+    },
+    {
+     "step": "deterministic_check",
+     "attempt": "attempt-1",
+     "state": "completed",
+     "input_digest": "5fb57fe8d5d9d743dd4f308ad78f9fed8b3d0bb02bb2b81a6ec929903d282af5",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-1/SOURCE_INPUT.json",
+       "sha256": "9c82ea8ac1a5ba89f3c579e1919d3b41460383424825e651a8dd926846b926d3",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-1/deterministic_check/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-1/AUTHOR_INPUT.json",
+       "sha256": "8b0dd3aeb3bdaea84401cad38ea958d41cc5e058d8c288fadea7b8060374ffad",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-1/deterministic_check/outputs/1"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-1/acceptance/probe.py",
+       "sha256": "04435c9a8f5c8fb9a68a5a09867de597f241230f84958cefb9464f439875f851",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-1/deterministic_check/outputs/2"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/markdown-editor/attempt-1/acceptance/README.md",
+       "sha256": "5f83945c4a2fd5c1bc4174d39e10739f40fb8654183dab0d7750132e55fcb708",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/markdown-editor/steps/attempt-1/deterministic_check/outputs/3"
+      }
+     ],
+     "started": 1792627471.130552,
+     "finished": 1792627471.138486
+    },
+    {
+     "step": "independent_review",
+     "attempt": "attempt-1",
+     "state": "failed",
+     "input_digest": "71c2050768d1b2e73933d4e9e46e4d84225af5ec4fe1ef4954988fe93b65176b",
+     "outputs": [],
+     "code": "auxiliary_content",
+     "error": "independent review did not pass; retain candidate and findings",
+     "started": 1792627471.146116,
+     "finished": 1792627705.980714
+    },
+    {
+     "step": "freeze_import",
+     "attempt": "attempt-1",
+     "state": "pending",
+     "input_digest": null,
+     "outputs": []
+    },
+    {
+     "step": "download",
+     "attempt": "attempt-1",
+     "state": "pending",
+     "input_digest": null,
+     "outputs": []
+    }
+   ],
+   "template_frozen": false,
+   "template_imported": false,
+   "development_download": "not_run: independent review needs_changes",
+   "application_runtime": "not_run"
+  },
+  {
+   "leaf": "resource-calendar",
+   "state": "needs_revision",
+   "workdir": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-1",
+   "first_pass_done": true,
+   "calls": [
+    {
+     "stage": "discovery",
+     "session_id": "ses_e9f0ff4e7ffehxOzXFYBYqLBqd",
+     "delivery_status": "delivered",
+     "requested_model": "open-design/deepseek-v4.1-flash",
+     "observed_model": null,
+     "result_sha256": "03243ad568188b217a27b2a90f7b148757672703a648847f29c6d65b3e024316",
+     "raw_sha256": "c17ccc9702ef0c63ed19d5c4228b897983b718c1a6244f71ad5bd044b859e3ae",
+     "summary_sha256": "c68167aa74f07a4cedda2ebb6785bb7b71f38339ce69328e497ab652cf14afdd"
+    },
+    {
+     "stage": "blueprint-generate-aux",
+     "session_id": "ses_e9f0eee98ffeyxKbQHmwhnC96A",
+     "delivery_status": "delivered",
+     "requested_model": "open-design/deepseek-v4.1-flash",
+     "observed_model": null,
+     "result_sha256": "c0cbf48a52d19523ba4a85a7ecd1df452d624fef70d44a00cc760fb61eb8a2fb",
+     "raw_sha256": "dead9f91917dcd19427c545925e8887eacebd8e4f7259158f7687d87af5f6165",
+     "summary_sha256": "09f4d8c5735cb488a487dc3f182d9191894d437e68b7e7cbd6a3fda2cf22734f"
+    },
+    {
+     "stage": "blueprint-spec-review-aux",
+     "session_id": "ses_e9f0c7d9fffef03nWe8EwReWEe",
+     "delivery_status": "delivered",
+     "requested_model": "open-design/deepseek-v4.1-flash",
+     "observed_model": null,
+     "result_sha256": "3de9f0c70635cd1253bd3fc2983423e5a3906af7955b111d42015a4153cd0fe8",
+     "raw_sha256": "4773919284e664150736bb455ca45dcab0675a02aef82a86335c550744b82c06",
+     "summary_sha256": "6c114e4b0af783dfb7037a7568754e84606be3a2fb79017091d5dfb58f5856b8"
+    }
+   ],
+   "source_pin": {
+    "repository": "https://github.com/technekey/booking-tool",
+    "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a",
+    "paths": [
+     "LICENSE",
+     "README.md",
+     "booking-tool.py",
+     "config.json",
+     "templates/index.html",
+     "requirements.txt"
+    ],
+    "license_spdx": "MIT",
+    "repository_id": 620121415,
+    "collected_at": "2026-10-22T00:09:26.756240+00:00"
+   },
+   "accepted_research": {
+    "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+    "revision": 1,
+    "digest": "3db5684cd4fe91f9013425c7db7f2098f31006e7de38bcdb5d0d0e1809cd203d",
+    "review_input_digest": "9d38cfb1223e18a02ebc3ee72df78189bfeeaf6b5fa5985eb5a775a27a7a8fdd",
+    "review_session": "ses_e9f0c7d9fffef03nWe8EwReWEe",
+    "template_passed": false,
+    "replayed": false
+   },
+   "review": {
+    "input_digest": "9d38cfb1223e18a02ebc3ee72df78189bfeeaf6b5fa5985eb5a775a27a7a8fdd",
+    "verdict": "needs_changes",
+    "checks": {
+     "leaf_scope": true,
+     "source_fidelity": true,
+     "design_distinction": true,
+     "core_journey": true,
+     "architecture": true,
+     "acceptance": false,
+     "limits_and_safety": false
+    },
+    "observations": [
+     {
+      "index": 0,
+      "verdict": "accepted",
+      "reason": "booking-tool.py:106-117 defines overlaps() using datetime.strptime('%Y-%m-%d %H:%M') and returns True only when start1 < end2 and start2 < end1; equal endpoints fail, so directly touching intervals are not overlapping. The observation matches the source."
+     },
+     {
+      "index": 1,
+      "verdict": "accepted",
+      "reason": "booking-tool.py:377-382 loops every stored booking, runs p.search(booking['description']) at line 378, and returns HTTP 400 at line 382 when the parsed lab name equals the request lab and overlaps(...) is true. Accurate."
+     },
+     {
+      "index": 2,
+      "verdict": "accepted",
+      "reason": "booking-tool.py:271-326 gates delete() on an authenticated session (273-279), validates id/start/end/description (281-291), permits admins while checking ownership for others (274-275, 313-316), extracts previous_user from the stored description (312-316), and rewrites new_data to the JSON file (319-321). Accurate."
+     },
+     {
+      "index": 3,
+      "verdict": "accepted",
+      "reason": "templates/index.html:45-60 contains the fullCalendar init: header right includes month,agendaWeek,agendaDay (46-50), defaultView is 'month' (51), editable is true (56), and events is '/bookings' (57). Accurate."
+     },
+     {
+      "index": 4,
+      "verdict": "accepted",
+      "reason": "README.md:51-53 says the tool is a test tool not intended for serious use without evaluation/modification, calls file read/write instead of a database a big disadvantage, and says it may not suit real use cases. Accurate."
+     },
+     {
+      "index": 5,
+      "verdict": "accepted",
+      "reason": "README.md:5-17 documents RESOURCE_INFO (names and colors), DB_FILE, USER_DB, LOG_FILE, ADMIN_INFO, HOST, PORT, TZ, REGISTRATION_ALLOWED, ALLOWED_DOMAINS, TITLE, FOOTER_MESSAGE, and RESOURCE_NAME. Accurate."
+     }
+    ],
+    "issues": [
+     "acceptance/probe.py:156-172 (A02) never verifies that the rejected zero-length claim added no row. After the 400 response it calls only touching() (lines 91-92), whose strict overlap test cannot see a 14:00-14:00 ghost against 14:00-16:00, and the later exactly-once check counts only the new id. A server that returns 400 but also inserts the zero-length row still passes, contrary to AUTHOR_INPUT.json:13 ('adds nothing') and the A02 goal 'creates no block'.",
+     "acceptance/probe.py:157 requires the zero-length rejection to be exactly INVALID_INTERVAL, but VIEW_ARCH.md:86 lists both INVALID_INTERVAL and INVALID_DURATION and VIEW_ARCH.md:92 only states a duration of 30-240 minutes. A spec-following implementation can reasonably return 400 INVALID_DURATION, while AUTHOR_INPUT.json:13 requires only 400; the probe is stricter than the pinned contract.",
+     "acceptance/probe.py:185-188 checks only that error.conflicts contains the original id and that error.message contains that id. It never verifies conflicting start/end values. VIEW_ARCH.md:88 requires error.conflicts objects with id/start/end and a message naming both intervals, and AUTHOR_INPUT.json:14 requires naming the 14:00-16:00 reservation and its times; an implementation returning only the id passes A03.",
+     "acceptance/README.md:21,40 and VIEW_ARCH.md:114 claim the probe checks both fixed windows before writing and exits 2 with status not_run when setup is unsafe. The probe instead checks 09:00-10:00 inside A01 and creates it (probe.py:134-135), then checks 14:00-16:00 only later in A02 (probe.py:158-160). If 14:00 is occupied, the 09:00 probe claim may already have been written, and occupied windows become failed cases with exit 1, not not_run; exit 2 is used only for the initial GET failure (probe.py:101-107)."
+    ],
+    "summary": "The leaf scope, source citations, and design distinction are sound, and the Thursday claim/conflict/cancel journey is covered end to end. The acceptance layer has blocking contract gaps: A02 does not verify that the zero-length refusal leaves no row, A02 hardcodes an error code the architecture does not pin, A03 does not verify the conflict times required by the API, and the documented not_run/refuse-to-proceed safety behavior is not implemented because the probe can write the 09:00 claim before discovering that 14:00 is occupied."
+   },
+   "review_input_digest": "9d38cfb1223e18a02ebc3ee72df78189bfeeaf6b5fa5985eb5a775a27a7a8fdd",
+   "read_coverage_verified": true,
+   "archive_verified": true,
+   "workflow_steps": [
+    {
+     "step": "existing_template",
+     "attempt": "attempt-1",
+     "state": "completed",
+     "input_digest": "aa8c5cec4cf1892957c366ecd952219ed4911fec80b3a12e5ffd87842f03e7e8",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-1/REQUEST.json",
+       "sha256": "6be1dbeca4907114f305a47c116748a46a317790f36e5c7afdeb9f74828edc63",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-1/existing_template/outputs/0"
+      }
+     ],
+     "started": 1792627706.06419,
+     "finished": 1792627706.193061
+    },
+    {
+     "step": "scenario",
+     "attempt": "attempt-1",
+     "state": "completed",
+     "input_digest": "aa8c5cec4cf1892957c366ecd952219ed4911fec80b3a12e5ffd87842f03e7e8",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-1/SELECTED_SCENARIO.json",
+       "sha256": "022cb4151c182ff4dfb054c2f8a9482a09c50854ef6d7164b7f4c0b38227c174",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-1/scenario/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-1/RESEARCH.json",
+       "sha256": "03243ad568188b217a27b2a90f7b148757672703a648847f29c6d65b3e024316",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-1/scenario/outputs/1"
+      }
+     ],
+     "started": 1792627706.1979399,
+     "finished": 1792627764.031122
+    },
+    {
+     "step": "case_research",
+     "attempt": "attempt-1",
+     "state": "completed",
+     "input_digest": "537a8ca174684f9581d9bd17a159e93125d0ff7dcb4ede0b0ced9319cb39b3fb",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-1/source-snapshot.json",
+       "sha256": "81fdba8b7db9a0397ef0510d8ed606b7349324e41285b26894eac87b966d34a1",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-1/case_research/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-1/upstream-evidence.zip",
+       "sha256": "fa3cefe0e82ab4e2b7ac414238ddc6108dab21566e850cdc317e94c9f813dea1",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-1/case_research/outputs/1"
+      }
+     ],
+     "started": 1792627764.034304,
+     "finished": 1792627773.3538098
+    },
+    {
+     "step": "generation",
+     "attempt": "attempt-1",
+     "state": "completed",
+     "input_digest": "7e3fc7044815daf6fca7cc2a36901834b77d7a8dce0e3400762164a0cdebb7fb",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-1/calls/blueprint-generate-aux/RESULT.json",
+       "sha256": "c0cbf48a52d19523ba4a85a7ecd1df452d624fef70d44a00cc760fb61eb8a2fb",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-1/generation/outputs/0"
+      }
+     ],
+     "started": 1792627773.362258,
+     "finished": 1792627933.300151
+    },
+    {
+     "step": "deterministic_check",
+     "attempt": "attempt-1",
+     "state": "completed",
+     "input_digest": "e0808b85cbcbcda24b0a50b8881fd6584454378c0ec31ba50dd57cc42d4eda5c",
+     "outputs": [
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-1/SOURCE_INPUT.json",
+       "sha256": "f2aea2c805628f1dedfaede230e7351485eb72a0c4b76366e08231bc0741db61",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-1/deterministic_check/outputs/0"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-1/AUTHOR_INPUT.json",
+       "sha256": "26fccd42c411a43c3b92d704a4b3634d895993f4df18b6cff5b79232570720f3",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-1/deterministic_check/outputs/1"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-1/acceptance/probe.py",
+       "sha256": "e7912440ceef93c462daa4bef414ce9dcf28d692c30eced26fca5cd8ad811253",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-1/deterministic_check/outputs/2"
+      },
+      {
+       "path": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/resource-calendar/attempt-1/acceptance/README.md",
+       "sha256": "bb75c728597fe86e61f32f007d6b0901ed43fcc5cf3a3d9f99a2feb02ec60cf5",
+       "url": "/api/factory/auxiliary-workflows/full-leaf-auxiliary-2026-10-21/leaves/resource-calendar/steps/attempt-1/deterministic_check/outputs/3"
+      }
+     ],
+     "started": 1792627933.3046138,
+     "finished": 1792627933.3117251
+    },
+    {
+     "step": "independent_review",
+     "attempt": "attempt-1",
+     "state": "failed",
+     "input_digest": "9d38cfb1223e18a02ebc3ee72df78189bfeeaf6b5fa5985eb5a775a27a7a8fdd",
+     "outputs": [],
+     "code": "auxiliary_content",
+     "error": "independent review did not pass; retain candidate and findings",
+     "started": 1792627933.319377,
+     "finished": 1792628145.3631449
+    },
+    {
+     "step": "freeze_import",
+     "attempt": "attempt-1",
+     "state": "pending",
+     "input_digest": null,
+     "outputs": []
+    },
+    {
+     "step": "download",
+     "attempt": "attempt-1",
+     "state": "pending",
+     "input_digest": null,
+     "outputs": []
+    }
+   ],
+   "template_frozen": false,
+   "template_imported": false,
+   "development_download": "not_run: independent review needs_changes",
+   "application_runtime": "not_run"
+  }
+ ]
+}

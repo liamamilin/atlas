@@ -1,0 +1,105 @@
+{
+ "scenario": {
+  "name": "Scan a sideloaded shelf and make one book readable",
+  "audience": "one reader who sideloads DRM-free EPUB and MOBI files from mixed sources",
+  "objective": "Turn a folder of stray e-book files into a persistent, searchable shelf and open one book in a reading app.",
+  "workflow": [
+   "Point the library at a local folder of e-book files and start a scan",
+   "Review the created entries and correct a title or author that was derived badly",
+   "Put the entry in a collection and locate it again with a field-qualified search",
+   "Use the entry's file through the download/handoff path to read it"
+  ],
+  "acceptance": [
+   "One scan produces one book entry per work with its cover, and a second scan adds no duplicate entries",
+   "The corrected metadata and collection assignment survive a restart of the library",
+   "A search on the corrected author or title returns that entry",
+   "The entry's file opens through the read/download path"
+  ]
+ },
+ "fixed_scope": null,
+ "delivery_profile": "web",
+ "source": {
+  "repository": "https://github.com/th3r00t/pyShelf",
+  "commit_sha": "a723611eb351de0e96a043cbcb17f8851fc51ccc",
+  "strategy_version": "full-leaf-selected-v2-c44cad6f170f7558",
+  "collected_at": "2026-10-22T00:02:50.334848+00:00",
+  "files": {
+   "LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+   "README.md": "6e7b8882b523c53478fdc65aaeae62657deba315fc7cd8f288658fc3ac6fcd21",
+   "src/backend/lib/library.py": "4e8cf4bcda1ba0c0f07c4289ba954202e03f3a235cd0ed6ad7e6697795458e53",
+   "src/backend/lib/models.py": "8f74231955769c923669cc89316aa2ee4858691a7bce03a3408dcfa3b6ac636d",
+   "src/backend/lib/storage.py": "7f0eb1cca05ee4173b9e9abbcad4b547cb5835731293654d32098a326939593b"
+  },
+  "license_files": [
+   "LICENSE"
+  ],
+  "license": {
+   "status": "located",
+   "spdx_id": "GPL-3.0",
+   "notice_hashes": {
+    "LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+   }
+  },
+  "license_uncertainties": [
+   "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+  ],
+  "excluded_paths": [
+   "Unselected files; upstream not installed or run"
+  ]
+ },
+ "source_ids": {
+  "requirements": {
+   "atlas:dc136828133d497389419464364ee421677d74b554567fd73bca46d6c2faf26d": "leaf.md",
+   "scenario:e3081b003a1292e98ae2eb955aa8bb8b8a2f4f1ff964dc99081a9a1e29415956": "fixed scenario"
+  },
+  "upstream": {
+   "upstream:1dc49d84bbbe9f6d22c4f448ee7b103b74f5910dc61771187e58708af1e14a02": {
+    "path": "LICENSE",
+    "repository": "https://github.com/th3r00t/pyShelf",
+    "commit_sha": "a723611eb351de0e96a043cbcb17f8851fc51ccc"
+   },
+   "upstream:e1c9bf725cb160f1050737e57018b99591f65e23460b1e02e5d4d7620ace7863": {
+    "path": "README.md",
+    "repository": "https://github.com/th3r00t/pyShelf",
+    "commit_sha": "a723611eb351de0e96a043cbcb17f8851fc51ccc"
+   },
+   "upstream:106b11fcee13570b8479bce77ccd339a898146a85d4a8c14b5cca83014bfcad7": {
+    "path": "src/backend/lib/library.py",
+    "repository": "https://github.com/th3r00t/pyShelf",
+    "commit_sha": "a723611eb351de0e96a043cbcb17f8851fc51ccc"
+   },
+   "upstream:417a07dd8f440e0d8e51ba207e3f740b98ecb513b1d17705e2e737dd06d8634c": {
+    "path": "src/backend/lib/models.py",
+    "repository": "https://github.com/th3r00t/pyShelf",
+    "commit_sha": "a723611eb351de0e96a043cbcb17f8851fc51ccc"
+   },
+   "upstream:eab7f7f3447d39f5a2d77289762b1f185b51686d3062237b54fc0221ade0bd6a": {
+    "path": "src/backend/lib/storage.py",
+    "repository": "https://github.com/th3r00t/pyShelf",
+    "commit_sha": "a723611eb351de0e96a043cbcb17f8851fc51ccc"
+   }
+  }
+ },
+ "inventory": [
+  {
+   "path": "LICENSE",
+   "lines": 674
+  },
+  {
+   "path": "README.md",
+   "lines": 78
+  },
+  {
+   "path": "src/backend/lib/library.py",
+   "lines": 350
+  },
+  {
+   "path": "src/backend/lib/models.py",
+   "lines": 89
+  },
+  {
+   "path": "src/backend/lib/storage.py",
+   "lines": 333
+  }
+ ]
+}

@@ -1,0 +1,571 @@
+[
+ {
+  "app_id": "app:repo:de7ec282a6dc3f8503c7aa79",
+  "case_id": "case:repo:da200001f89d952e79cfbfc9:a723611eb351de0e96a043cbcb17f8851fc51ccc",
+  "created_at": "2026-10-22T00:13:44.646469+00:00",
+  "created_task_id": "full-leaf-auxiliary-2026-10-21:e-book-library-application:attempt-1",
+  "digest": "55df7a408e21b359dc3838ff6c349bbe8967dac0ec131ac69008ff3df9ab6c31",
+  "evidence_digest": "85509c9bc4d8f86ce4e449f96aa77a295a67b34eac692b3b8bb9ae8333cae7fc",
+  "research": {
+   "input_digest": "5c16985f603362cb09c2d2818cbb21b4e92786780f17b29276a7fb41d67cd6f1",
+   "scope": "Turn a folder of stray e-book files into a durable catalog of one entry per work with covers, correctable metadata, a collection, field-qualified search, and a working file handoff to a reading app.",
+   "summary": "Independently accepted fixed source observations; template status is separate.",
+   "task_id": "full-leaf-auxiliary-2026-10-21:e-book-library-application:attempt-1",
+   "unknowns": [
+    "Upstream not run; target not run; template may still require revision."
+   ]
+  },
+  "research_input_digest": "5c16985f603362cb09c2d2818cbb21b4e92786780f17b29276a7fb41d67cd6f1",
+  "revision": 1,
+  "snapshot_ids": [
+   "src_4d103deb128ced70b99e213f"
+  ],
+  "observations": [
+   {
+    "case_id": "case:repo:da200001f89d952e79cfbfc9:a723611eb351de0e96a043cbcb17f8851fc51ccc",
+    "case_revision": 1,
+    "digest": "64ec744574a0f897db7db3118229c93b7a77334a8fd063890c3ce2ce6911decc",
+    "evidence_id": "ev_full_0",
+    "kind": "code_observation",
+    "location": {
+     "commit_sha": "a723611eb351de0e96a043cbcb17f8851fc51ccc",
+     "file_digest": "4e8cf4bcda1ba0c0f07c4289ba954202e03f3a235cd0ed6ad7e6697795458e53",
+     "line_end": 72,
+     "line_start": 60,
+     "path": "src/backend/lib/library.py"
+    },
+    "observation_status": "source_located",
+    "review": {
+     "status": "pending"
+    },
+    "statement": "filter_books calls scan_folder, which appends every walked file path to file_list, then keeps only paths matched by the regex .epub|.mobi|.pdf; no content hash or work-level grouping is computed.",
+    "reviews": [
+     {
+      "review_id": "rev_7eb68d7e646f3a1c5478dde9dcde044a",
+      "outcome": "accepted",
+      "reviewer": "ses_e9f0fc076ffekvciUAd4t3Fa2p",
+      "reviewer_kind": "independent_agent",
+      "evidence_digest": "64ec744574a0f897db7db3118229c93b7a77334a8fd063890c3ce2ce6911decc",
+      "created_at": "2026-10-22T00:13:44.650948+00:00"
+     }
+    ]
+   },
+   {
+    "case_id": "case:repo:da200001f89d952e79cfbfc9:a723611eb351de0e96a043cbcb17f8851fc51ccc",
+    "case_revision": 1,
+    "digest": "791a73ea7e7b4fff216b091fe7d9be7f394225f1979ce366cc7c9dc857d45f59",
+    "evidence_id": "ev_full_1",
+    "kind": "code_observation",
+    "location": {
+     "commit_sha": "a723611eb351de0e96a043cbcb17f8851fc51ccc",
+     "file_digest": "4e8cf4bcda1ba0c0f07c4289ba954202e03f3a235cd0ed6ad7e6697795458e53",
+     "line_end": 328,
+     "line_start": 309,
+     "path": "src/backend/lib/library.py"
+    },
+    "observation_status": "source_located",
+    "review": {
+     "status": "pending"
+    },
+    "statement": "compare_shelf_current reads stored Book.file_name values through Storage.book_paths_list and returns the set difference between on-disk book paths and stored paths, so re-import suppression is by path, not by file content.",
+    "reviews": [
+     {
+      "review_id": "rev_bce2455fbf5af1995cd71683c25dddc9",
+      "outcome": "accepted",
+      "reviewer": "ses_e9f0fc076ffekvciUAd4t3Fa2p",
+      "reviewer_kind": "independent_agent",
+      "evidence_digest": "791a73ea7e7b4fff216b091fe7d9be7f394225f1979ce366cc7c9dc857d45f59",
+      "created_at": "2026-10-22T00:13:44.653267+00:00"
+     }
+    ]
+   },
+   {
+    "case_id": "case:repo:da200001f89d952e79cfbfc9:a723611eb351de0e96a043cbcb17f8851fc51ccc",
+    "case_revision": 1,
+    "digest": "6c57e63c0227fc759bd89e35807fccf3aa181406aa49ab82abf706d54f6e3032",
+    "evidence_id": "ev_full_2",
+    "kind": "code_observation",
+    "location": {
+     "commit_sha": "a723611eb351de0e96a043cbcb17f8851fc51ccc",
+     "file_digest": "4e8cf4bcda1ba0c0f07c4289ba954202e03f3a235cd0ed6ad7e6697795458e53",
+     "line_end": 123,
+     "line_start": 114,
+     "path": "src/backend/lib/library.py"
+    },
+    "observation_status": "source_located",
+    "review": {
+     "status": "pending"
+    },
+    "statement": "When an EPUB has no dc:title, extract_metadata_epub derives the title from the final path component with its extension removed; titles matching the Book-plus-number regex are split before use.",
+    "reviews": [
+     {
+      "review_id": "rev_ff91d569fb512ea087d71808b203e393",
+      "outcome": "accepted",
+      "reviewer": "ses_e9f0fc076ffekvciUAd4t3Fa2p",
+      "reviewer_kind": "independent_agent",
+      "evidence_digest": "6c57e63c0227fc759bd89e35807fccf3aa181406aa49ab82abf706d54f6e3032",
+      "created_at": "2026-10-22T00:13:44.655144+00:00"
+     }
+    ]
+   },
+   {
+    "case_id": "case:repo:da200001f89d952e79cfbfc9:a723611eb351de0e96a043cbcb17f8851fc51ccc",
+    "case_revision": 1,
+    "digest": "cb3f5368f96ce9c2566c1550afbfb1e8b5538fbc9a8e3808c5bf9c933b716e71",
+    "evidence_id": "ev_full_3",
+    "kind": "code_observation",
+    "location": {
+     "commit_sha": "a723611eb351de0e96a043cbcb17f8851fc51ccc",
+     "file_digest": "7f0eb1cca05ee4173b9e9abbcad4b547cb5835731293654d32098a326939593b",
+     "line_end": 295,
+     "line_start": 277,
+     "path": "src/backend/lib/storage.py"
+    },
+    "observation_status": "source_located",
+    "review": {
+     "status": "pending"
+    },
+    "statement": "parse_advanced_query recognises the field names title, author, and tags, accepts field:value and field:quoted-value tokens, and places unmatched tokens under the keywords key.",
+    "reviews": [
+     {
+      "review_id": "rev_3aa97c7de0e8989025bb694e09278daa",
+      "outcome": "accepted",
+      "reviewer": "ses_e9f0fc076ffekvciUAd4t3Fa2p",
+      "reviewer_kind": "independent_agent",
+      "evidence_digest": "cb3f5368f96ce9c2566c1550afbfb1e8b5538fbc9a8e3808c5bf9c933b716e71",
+      "created_at": "2026-10-22T00:13:44.657042+00:00"
+     }
+    ]
+   },
+   {
+    "case_id": "case:repo:da200001f89d952e79cfbfc9:a723611eb351de0e96a043cbcb17f8851fc51ccc",
+    "case_revision": 1,
+    "digest": "0887f0b63123dc0a83a4339019c32ff3db217151afce4aad3b86ab71a2900403",
+    "evidence_id": "ev_full_4",
+    "kind": "code_observation",
+    "location": {
+     "commit_sha": "a723611eb351de0e96a043cbcb17f8851fc51ccc",
+     "file_digest": "7f0eb1cca05ee4173b9e9abbcad4b547cb5835731293654d32098a326939593b",
+     "line_end": 332,
+     "line_start": 297,
+     "path": "src/backend/lib/storage.py"
+    },
+    "observation_status": "source_located",
+    "review": {
+     "status": "pending"
+    },
+    "statement": "fuzzy_search_books applies case-insensitive substring tests to each requested field, then scores keyword queries with rapidfuzz WRatio and keeps only books whose score is greater than 50.",
+    "reviews": [
+     {
+      "review_id": "rev_8cf21cd0bf848d1f4e609fdb9dcf4604",
+      "outcome": "accepted",
+      "reviewer": "ses_e9f0fc076ffekvciUAd4t3Fa2p",
+      "reviewer_kind": "independent_agent",
+      "evidence_digest": "0887f0b63123dc0a83a4339019c32ff3db217151afce4aad3b86ab71a2900403",
+      "created_at": "2026-10-22T00:13:44.659156+00:00"
+     }
+    ]
+   },
+   {
+    "case_id": "case:repo:da200001f89d952e79cfbfc9:a723611eb351de0e96a043cbcb17f8851fc51ccc",
+    "case_revision": 1,
+    "digest": "e6dc7b1d3deeb1276e3920812bbcdf6057d39249ff841c185a25613afd93b038",
+    "evidence_id": "ev_full_5",
+    "kind": "code_observation",
+    "location": {
+     "commit_sha": "a723611eb351de0e96a043cbcb17f8851fc51ccc",
+     "file_digest": "7f0eb1cca05ee4173b9e9abbcad4b547cb5835731293654d32098a326939593b",
+     "line_end": 111,
+     "line_start": 68,
+     "path": "src/backend/lib/storage.py"
+    },
+    "observation_status": "source_located",
+    "review": {
+     "status": "pending"
+    },
+    "statement": "insert_book opens one Session per book, takes cover bytes from book[2].data or book[2] directly, commits, and returns False after logging when any step raises.",
+    "reviews": [
+     {
+      "review_id": "rev_8762cf2f0a52512fcdb52a1d29e63761",
+      "outcome": "accepted",
+      "reviewer": "ses_e9f0fc076ffekvciUAd4t3Fa2p",
+      "reviewer_kind": "independent_agent",
+      "evidence_digest": "e6dc7b1d3deeb1276e3920812bbcdf6057d39249ff841c185a25613afd93b038",
+      "created_at": "2026-10-22T00:13:44.661033+00:00"
+     }
+    ]
+   },
+   {
+    "case_id": "case:repo:da200001f89d952e79cfbfc9:a723611eb351de0e96a043cbcb17f8851fc51ccc",
+    "case_revision": 1,
+    "digest": "eb17350b9505f66a8041799c3980695f9f94890f24f3df2dcfdaab3a026d93b5",
+    "evidence_id": "ev_full_6",
+    "kind": "code_observation",
+    "location": {
+     "commit_sha": "a723611eb351de0e96a043cbcb17f8851fc51ccc",
+     "file_digest": "8f74231955769c923669cc89316aa2ee4858691a7bce03a3408dcfa3b6ac636d",
+     "line_end": 42,
+     "line_start": 19,
+     "path": "src/backend/lib/models.py"
+    },
+    "observation_status": "source_located",
+    "review": {
+     "status": "pending"
+    },
+    "statement": "The Book table stores a single file_name string per row together with title, optional author, cover bytes, optional tags and categories, and a relationship to BookCollection rows.",
+    "reviews": [
+     {
+      "review_id": "rev_773fcb18d8b36c75257e9dd59ca5c21f",
+      "outcome": "accepted",
+      "reviewer": "ses_e9f0fc076ffekvciUAd4t3Fa2p",
+      "reviewer_kind": "independent_agent",
+      "evidence_digest": "eb17350b9505f66a8041799c3980695f9f94890f24f3df2dcfdaab3a026d93b5",
+      "created_at": "2026-10-22T00:13:44.662743+00:00"
+     }
+    ]
+   },
+   {
+    "case_id": "case:repo:da200001f89d952e79cfbfc9:a723611eb351de0e96a043cbcb17f8851fc51ccc",
+    "case_revision": 1,
+    "digest": "b70ad51f8f65ccbc2efdd1e01a394fc5dfbcf986ee8d2d002fa810733350f6e1",
+    "evidence_id": "ev_full_7",
+    "kind": "documentation",
+    "location": {
+     "content_digest": "6e7b8882b523c53478fdc65aaeae62657deba315fc7cd8f288658fc3ac6fcd21",
+     "material_version": "a723611eb351de0e96a043cbcb17f8851fc51ccc",
+     "url": "https://github.com/th3r00t/pyShelf/blob/a723611eb351de0e96a043cbcb17f8851fc51ccc/README.md"
+    },
+    "observation_status": "model_extracted",
+    "review": {
+     "status": "pending"
+    },
+    "statement": "The project feature list claims recursive scanning, cover image aggregation, fuzzy search with tag, author, and title specifiers, a download system, folder-derived collections, and support for epub and mobi.",
+    "reviews": [
+     {
+      "review_id": "rev_961927c97f016397073a599283f308ba",
+      "outcome": "accepted",
+      "reviewer": "ses_e9f0fc076ffekvciUAd4t3Fa2p",
+      "reviewer_kind": "independent_agent",
+      "evidence_digest": "b70ad51f8f65ccbc2efdd1e01a394fc5dfbcf986ee8d2d002fa810733350f6e1",
+      "created_at": "2026-10-22T00:13:44.664393+00:00"
+     }
+    ]
+   }
+  ],
+  "scenario_links": [
+   {
+    "adopted_scope": [
+     "static source reference"
+    ],
+    "case_id": "case:repo:da200001f89d952e79cfbfc9:a723611eb351de0e96a043cbcb17f8851fc51ccc",
+    "case_revision": 1,
+    "evidence_ids": [
+     "ev_full_0",
+     "ev_full_1",
+     "ev_full_2",
+     "ev_full_3",
+     "ev_full_4",
+     "ev_full_5",
+     "ev_full_6",
+     "ev_full_7"
+    ],
+    "exclusions": [
+     "upstream and target execution not run"
+    ],
+    "reason": "Fixed source observations for this scenario; not a template acceptance.",
+    "scenario_id": "scn_2911a663ce8c4f15af5e9fb88c2fa7c4",
+    "scenario_revision": 1,
+    "workflow_support": []
+   }
+  ],
+  "source_snapshots": [
+   {
+    "archive_sha256": null,
+    "collected_at": "2026-10-22T00:02:50.334848+00:00",
+    "commit_sha": "a723611eb351de0e96a043cbcb17f8851fc51ccc",
+    "excluded_paths": [
+     "Unselected files; upstream not installed or run"
+    ],
+    "file_manifest_digest": "df1c7d77e3bcc9e7ea6a9925078ee3fbc507134321f0abf122078262c357f84d",
+    "files": {
+     "LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+     "README.md": "6e7b8882b523c53478fdc65aaeae62657deba315fc7cd8f288658fc3ac6fcd21",
+     "src/backend/lib/library.py": "4e8cf4bcda1ba0c0f07c4289ba954202e03f3a235cd0ed6ad7e6697795458e53",
+     "src/backend/lib/models.py": "8f74231955769c923669cc89316aa2ee4858691a7bce03a3408dcfa3b6ac636d",
+     "src/backend/lib/storage.py": "7f0eb1cca05ee4173b9e9abbcad4b547cb5835731293654d32098a326939593b"
+    },
+    "license": {
+     "notice_hashes": {
+      "LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+     },
+     "spdx_id": "GPL-3.0",
+     "status": "located"
+    },
+    "license_files": [
+     "LICENSE"
+    ],
+    "license_uncertainties": [
+     "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+    ],
+    "repo_id": null,
+    "repository": "https://github.com/th3r00t/pyshelf",
+    "snapshot_id": "src_4d103deb128ced70b99e213f",
+    "strategy_version": "full-leaf-selected-v2-c44cad6f170f7558"
+   }
+  ]
+ },
+ {
+  "app_id": "app:repo:5bee85f7de6cd04f8a44ac42",
+  "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+  "created_at": "2026-10-22T00:15:45.318795+00:00",
+  "created_task_id": "full-leaf-auxiliary-2026-10-21:resource-calendar:attempt-1",
+  "digest": "3db5684cd4fe91f9013425c7db7f2098f31006e7de38bcdb5d0d0e1809cd203d",
+  "evidence_digest": "4a52dd8707f2f6a7ba40f9e328376fd386dcb445a825309aca12941e2544a609",
+  "research": {
+   "input_digest": "9d38cfb1223e18a02ebc3ee72df78189bfeeaf6b5fa5985eb5a775a27a7a8fdd",
+   "scope": "Check the room calendar for a free window, claim Thursday 14:00-16:00, see a clashing claim refused with the conflict named, then cancel and confirm the slot is free again.",
+   "summary": "Independently accepted fixed source observations; template status is separate.",
+   "task_id": "full-leaf-auxiliary-2026-10-21:resource-calendar:attempt-1",
+   "unknowns": [
+    "Upstream not run; target not run; template may still require revision."
+   ]
+  },
+  "research_input_digest": "9d38cfb1223e18a02ebc3ee72df78189bfeeaf6b5fa5985eb5a775a27a7a8fdd",
+  "revision": 1,
+  "snapshot_ids": [
+   "src_825e7830c987c26fd0317746"
+  ],
+  "observations": [
+   {
+    "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+    "case_revision": 1,
+    "digest": "0e4bfe7eab6a11a3e99abb116d53ea919f693a1cf8e28981a84b8d58ae9e09cc",
+    "evidence_id": "ev_full_0",
+    "kind": "code_observation",
+    "location": {
+     "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a",
+     "file_digest": "1966e2913cbd57ed93b5a201e50038af1b12cd2fc5b0f43eab0545059a78b7ef",
+     "line_end": 117,
+     "line_start": 106,
+     "path": "booking-tool.py"
+    },
+    "observation_status": "source_located",
+    "review": {
+     "status": "pending"
+    },
+    "statement": "overlaps() parses '%Y-%m-%d %H:%M' strings and returns true only when start1 < end2 and start2 < end1, so directly touching intervals are not considered overlapping.",
+    "reviews": [
+     {
+      "review_id": "rev_b5e93a4c721f8a9f926c202a38dccf56",
+      "outcome": "accepted",
+      "reviewer": "ses_e9f0c7d9fffef03nWe8EwReWEe",
+      "reviewer_kind": "independent_agent",
+      "evidence_digest": "0e4bfe7eab6a11a3e99abb116d53ea919f693a1cf8e28981a84b8d58ae9e09cc",
+      "created_at": "2026-10-22T00:15:45.325119+00:00"
+     }
+    ]
+   },
+   {
+    "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+    "case_revision": 1,
+    "digest": "8ed870cbeebb66ce039d4dd356ebc4c4128583672c5d91491578a89dd4df097b",
+    "evidence_id": "ev_full_1",
+    "kind": "code_observation",
+    "location": {
+     "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a",
+     "file_digest": "1966e2913cbd57ed93b5a201e50038af1b12cd2fc5b0f43eab0545059a78b7ef",
+     "line_end": 382,
+     "line_start": 377,
+     "path": "booking-tool.py"
+    },
+    "observation_status": "source_located",
+    "review": {
+     "status": "pending"
+    },
+    "statement": "The /bookings POST handler loops over all stored bookings, derives the lab name from the stored description, and returns HTTP 400 when the lab matches and overlaps(start, end, booking['start'], booking['end']) is true.",
+    "reviews": [
+     {
+      "review_id": "rev_960ac0c27a05b0cff558bddde7c5b822",
+      "outcome": "accepted",
+      "reviewer": "ses_e9f0c7d9fffef03nWe8EwReWEe",
+      "reviewer_kind": "independent_agent",
+      "evidence_digest": "8ed870cbeebb66ce039d4dd356ebc4c4128583672c5d91491578a89dd4df097b",
+      "created_at": "2026-10-22T00:15:45.332205+00:00"
+     }
+    ]
+   },
+   {
+    "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+    "case_revision": 1,
+    "digest": "1fe6309b6cd49b7373cf8a61f71693358e8f465dae287f07593a1c50620034d6",
+    "evidence_id": "ev_full_2",
+    "kind": "code_observation",
+    "location": {
+     "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a",
+     "file_digest": "1966e2913cbd57ed93b5a201e50038af1b12cd2fc5b0f43eab0545059a78b7ef",
+     "line_end": 326,
+     "line_start": 271,
+     "path": "booking-tool.py"
+    },
+    "observation_status": "source_located",
+    "review": {
+     "status": "pending"
+    },
+    "statement": "delete_event requires an authenticated session, validates id/start/end/description form fields, permits admins, extracts a previous booker from the stored description for non-admin deletion checks, and writes the rebuilt list back to the JSON file.",
+    "reviews": [
+     {
+      "review_id": "rev_e2282c3edd36a9e6e4a5278aafbea478",
+      "outcome": "accepted",
+      "reviewer": "ses_e9f0c7d9fffef03nWe8EwReWEe",
+      "reviewer_kind": "independent_agent",
+      "evidence_digest": "1fe6309b6cd49b7373cf8a61f71693358e8f465dae287f07593a1c50620034d6",
+      "created_at": "2026-10-22T00:15:45.335037+00:00"
+     }
+    ]
+   },
+   {
+    "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+    "case_revision": 1,
+    "digest": "ac415b1e168f55df5cdec39e59e804ba573f69607bdf9f9e28509f54fcfaec1d",
+    "evidence_id": "ev_full_3",
+    "kind": "code_observation",
+    "location": {
+     "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a",
+     "file_digest": "4eaa5d3a8fdcbf42a8ec32e5cb4ff6df53c896049c89694b7610221481e3011b",
+     "line_end": 60,
+     "line_start": 45,
+     "path": "templates/index.html"
+    },
+    "observation_status": "source_located",
+    "review": {
+     "status": "pending"
+    },
+    "statement": "The embedded FullCalendar initialization uses events:'/bookings', defaults to the month view, sets editable:true, and includes agendaWeek among the selectable header views.",
+    "reviews": [
+     {
+      "review_id": "rev_73cab7652bde1273ed53cb026041b7d2",
+      "outcome": "accepted",
+      "reviewer": "ses_e9f0c7d9fffef03nWe8EwReWEe",
+      "reviewer_kind": "independent_agent",
+      "evidence_digest": "ac415b1e168f55df5cdec39e59e804ba573f69607bdf9f9e28509f54fcfaec1d",
+      "created_at": "2026-10-22T00:15:45.338195+00:00"
+     }
+    ]
+   },
+   {
+    "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+    "case_revision": 1,
+    "digest": "f50aecbb7ed14bd00fbd1ac1eae600f89c9054c472d2cfaa519c3cfe04144288",
+    "evidence_id": "ev_full_4",
+    "kind": "documentation",
+    "location": {
+     "content_digest": "69985c6e335751c9039835e9cb33d8772504b2c50b0db39614a92bbd9c6c3771",
+     "material_version": "de05ec6cf49886f2f6194f42c16254ec1183920a",
+     "url": "https://github.com/technekey/booking-tool/blob/de05ec6cf49886f2f6194f42c16254ec1183920a/README.md"
+    },
+    "observation_status": "model_extracted",
+    "review": {
+     "status": "pending"
+    },
+    "statement": "The README says the tool is a test tool not intended for serious use without evaluation and modification, identifies file read/write instead of a database as a disadvantage, and says it may not suit real use cases.",
+    "reviews": [
+     {
+      "review_id": "rev_f56e32580a216be4a0034795107b3539",
+      "outcome": "accepted",
+      "reviewer": "ses_e9f0c7d9fffef03nWe8EwReWEe",
+      "reviewer_kind": "independent_agent",
+      "evidence_digest": "f50aecbb7ed14bd00fbd1ac1eae600f89c9054c472d2cfaa519c3cfe04144288",
+      "created_at": "2026-10-22T00:15:45.341074+00:00"
+     }
+    ]
+   },
+   {
+    "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+    "case_revision": 1,
+    "digest": "5e4a62f5dc2e331f07cdef5450adea720bcd4b3cb98d18cb9ab5141c10353dd0",
+    "evidence_id": "ev_full_5",
+    "kind": "documentation",
+    "location": {
+     "content_digest": "69985c6e335751c9039835e9cb33d8772504b2c50b0db39614a92bbd9c6c3771",
+     "material_version": "de05ec6cf49886f2f6194f42c16254ec1183920a",
+     "url": "https://github.com/technekey/booking-tool/blob/de05ec6cf49886f2f6194f42c16254ec1183920a/README.md"
+    },
+    "observation_status": "model_extracted",
+    "review": {
+     "status": "pending"
+    },
+    "statement": "The README documents configuration keys for resource names and colors, booking and user file paths, logs, admin credentials, host, port, timezone, registration, allowed domains, title, footer, and resource type.",
+    "reviews": [
+     {
+      "review_id": "rev_e8910c834f3d7b446945bf33609b65ec",
+      "outcome": "accepted",
+      "reviewer": "ses_e9f0c7d9fffef03nWe8EwReWEe",
+      "reviewer_kind": "independent_agent",
+      "evidence_digest": "5e4a62f5dc2e331f07cdef5450adea720bcd4b3cb98d18cb9ab5141c10353dd0",
+      "created_at": "2026-10-22T00:15:45.343385+00:00"
+     }
+    ]
+   }
+  ],
+  "scenario_links": [
+   {
+    "adopted_scope": [
+     "static source reference"
+    ],
+    "case_id": "case:repo:5bee85f7de6cd04f8a44ac42:de05ec6cf49886f2f6194f42c16254ec1183920a",
+    "case_revision": 1,
+    "evidence_ids": [
+     "ev_full_0",
+     "ev_full_1",
+     "ev_full_2",
+     "ev_full_3",
+     "ev_full_4",
+     "ev_full_5"
+    ],
+    "exclusions": [
+     "upstream and target execution not run"
+    ],
+    "reason": "Fixed source observations for this scenario; not a template acceptance.",
+    "scenario_id": "scn_b838c960693849f9ad6f22422d54fede",
+    "scenario_revision": 1,
+    "workflow_support": []
+   }
+  ],
+  "source_snapshots": [
+   {
+    "archive_sha256": null,
+    "collected_at": "2026-10-22T00:09:26.756240+00:00",
+    "commit_sha": "de05ec6cf49886f2f6194f42c16254ec1183920a",
+    "excluded_paths": [
+     "Unselected files; upstream not installed or run"
+    ],
+    "file_manifest_digest": "0c2a149a08fbb76916ecaad6cb49cbd02d05e694b4608a2c08a5efd3a685ce08",
+    "files": {
+     "LICENSE": "96de8966ed1c8c6208e854bd367a3ab26bdf72a5e5637369034dcefbc5f1bebf",
+     "README.md": "69985c6e335751c9039835e9cb33d8772504b2c50b0db39614a92bbd9c6c3771",
+     "booking-tool.py": "1966e2913cbd57ed93b5a201e50038af1b12cd2fc5b0f43eab0545059a78b7ef",
+     "config.json": "bdb4da7527124d17aa46bb9cd631723dd4f1141bd5bbb393a791ddaed7e18106",
+     "requirements.txt": "9ce07e03fcb9f0fb1f216e4ee008db738d3d8f7a69cdd4e9afe67f2cdc64bb05",
+     "templates/index.html": "4eaa5d3a8fdcbf42a8ec32e5cb4ff6df53c896049c89694b7610221481e3011b"
+    },
+    "license": {
+     "notice_hashes": {
+      "LICENSE": "96de8966ed1c8c6208e854bd367a3ab26bdf72a5e5637369034dcefbc5f1bebf"
+     },
+     "spdx_id": "MIT",
+     "status": "located"
+    },
+    "license_files": [
+     "LICENSE"
+    ],
+    "license_uncertainties": [
+     "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+    ],
+    "repo_id": null,
+    "repository": "https://github.com/technekey/booking-tool",
+    "snapshot_id": "src_825e7830c987c26fd0317746",
+    "strategy_version": "full-leaf-selected-v2-3df14bb40ce0abdc"
+   }
+  ]
+ }
+]

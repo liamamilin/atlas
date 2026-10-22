@@ -1,0 +1,125 @@
+{
+ "name": "Aurora Room Calendar",
+ "audience": "Department staff who book the shared Aurora conference room",
+ "objective": "Check the room calendar for a free window, claim Thursday 14:00-16:00, see a clashing claim refused with the conflict named, then cancel and confirm the slot is free again.",
+ "workflow": [
+  "Open the Aurora conference room week view for 2026-10-19..2026-10-25 and read accepted claims as busy blocks",
+  "Submit a Thursday 2026-10-22 14:00-16:00 claim with the purpose note Training session",
+  "Submit a second claim at 14:30-15:30 and receive a 409 refusal naming the original reservation and its times",
+  "Cancel the original claim and confirm the 14:00-16:00 window reads free and can be claimed again"
+ ],
+ "acceptance": [
+  "A01 Week view: GET /api/rooms/aurora/week?weekStart=2026-10-19 returns the Aurora room identity, seven days, and a newly accepted 09:00-10:00 claim as a busy block while 14:00-16:00 Thursday is free.",
+  "A02 Claim: POST 14:00-16:00 Thursday with purpose Training session returns 201, preserves the purpose, and appears once in the owner's week view; a zero-length interval returns 400 and adds nothing.",
+  "A03 Conflict: an overlapping 14:30-15:30 claim returns 409 naming the 14:00-16:00 reservation and its times, with no additional block; an adjacent 16:00-17:00 claim is accepted.",
+  "A04 Cancellation: a non-owner cancellation returns 403 and leaves the block; the owner cancels with 204, the block disappears and 14:00-16:00 reads free, a fresh claim returns 201, and a repeat cancellation returns 404."
+ ],
+ "observations": [
+  [
+   "code_observation",
+   "booking-tool.py",
+   106,
+   117,
+   "overlaps() parses '%Y-%m-%d %H:%M' strings and returns true only when start1 < end2 and start2 < end1, so directly touching intervals are not considered overlapping."
+  ],
+  [
+   "code_observation",
+   "booking-tool.py",
+   377,
+   382,
+   "The /bookings POST handler loops over all stored bookings, derives the lab name from the stored description, and returns HTTP 400 when the lab matches and overlaps(start, end, booking['start'], booking['end']) is true."
+  ],
+  [
+   "code_observation",
+   "booking-tool.py",
+   271,
+   326,
+   "delete_event requires an authenticated session, validates id/start/end/description form fields, permits admins, extracts a previous booker from the stored description for non-admin deletion checks, and writes the rebuilt list back to the JSON file."
+  ],
+  [
+   "code_observation",
+   "templates/index.html",
+   45,
+   60,
+   "The embedded FullCalendar initialization uses events:'/bookings', defaults to the month view, sets editable:true, and includes agendaWeek among the selectable header views."
+  ],
+  [
+   "documentation",
+   "README.md",
+   51,
+   53,
+   "The README says the tool is a test tool not intended for serious use without evaluation and modification, identifies file read/write instead of a database as a disadvantage, and says it may not suit real use cases."
+  ],
+  [
+   "documentation",
+   "README.md",
+   5,
+   17,
+   "The README documents configuration keys for resource names and colors, booking and user file paths, logs, admin credentials, host, port, timezone, registration, allowed domains, title, footer, and resource type."
+  ]
+ ],
+ "inference": "Build a small Node 22, Fastify, and SQLite web application in which the Aurora room schedule is the authority: a public busy/free week read model, a transactional half-open-interval claim command, conflict refusal naming the existing claim, and owner-only soft cancellation. This target is inferred from the fixed web delivery profile and the leaf model of a resource-owned schedule; it deliberately omits suite synchronization, approvals, and recurring-series management.",
+ "features": [
+  "Week availability read model: GET /api/rooms/aurora/week?weekStart=2026-10-19 returns the room identity, seven local days, and confirmed reservations as busy blocks, with the owner's purpose note visible only to that owner or an admin.",
+  "Claim submission: POST /api/rooms/aurora/reservations accepts a same-day, 30-minute-aligned, 30-minute-to-4-hour window within 08:00-18:00, stores the purpose, and returns the confirmed reservation.",
+  "Conflict refusal: a strict overlap on the same room is rejected with 409 SLOT_CONFLICT, the conflicting reservation id and times are returned, no row is inserted, and a directly adjacent claim remains valid.",
+  "Cancellation and reopening: DELETE /api/rooms/aurora/reservations/:id soft-cancels for the booker or an admin, removes the block from availability, and permits a fresh claim of the freed window."
+ ],
+ "goals": [
+  "A01: The week view identifies the Aurora room, exposes seven days, shows an accepted 09:00-10:00 claim as a busy block, and reports Thursday 14:00-16:00 as free.",
+  "A02: The 14:00-16:00 Thursday claim returns 201 with its purpose preserved and appears exactly once in the owner's week view; a zero-length request returns 400 and creates no block.",
+  "A03: The 14:30-15:30 overlap returns 409 with the original reservation id and times, the week block count is unchanged, and a 16:00-17:00 adjacent claim returns 201.",
+  "A04: A non-owner cancellation returns 403 and leaves the block; the owner cancellation returns 204, the block is gone, 14:00-16:00 is free, a new claim returns 201, and re-cancelling the original returns 404."
+ ],
+ "arch": "# Aurora Resource Calendar - target architecture\n\n## 1. Scope and invariants\n\nOne shared bookable resource: room `aurora`, named **Aurora Conference Room**, timezone `Asia/Shanghai`. The fixed journey uses the department room, the week of 2026-10-19, and Thursday 2026-10-22 at 14:00-16:00. Availability is a public busy/free record; the purpose note is booking detail and is hidden from other staff.\n\nA reservation is a claim by a named staff member over a half-open interval `[start,end)`. Confirmed claims are the only entries that make the room busy. Cancelled claims remain as audit rows but do not block time. The SQLite database is the single authority for this schedule; there is no external calendar sync in the core.\n\n## 2. Runtime and boundaries\n\n- Node.js 22 LTS, TypeScript, Fastify 5, better-sqlite3, EJS, Luxon for IANA timezone conversion, and a small vanilla JavaScript enhancement for the week page.\n- One web process serves HTML and JSON from the same origin. A SQLite file at `DATABASE_PATH` (default `./data/resource-calendar.sqlite`) is the only persistent store. Enable WAL, foreign keys, a 5000 ms busy timeout, and `synchronous=NORMAL`.\n- No queue, cache, external identity provider, message service, or calendar connector is required for the core journey. SQLite means one writable authority; horizontal scaling is a non-goal.\n- Identity: a trusted ingress proxy authenticates staff, strips any inbound `X-Actor`, and injects the stable staff id as `X-Actor`; it may inject `X-Role: admin`. The application never accepts an actor from a JSON body. For local demo only, `NODE_ENV=development` with `DEV_ACTOR=alex` supplies the actor when the trusted header is absent; production must refuse that fallback.\n- Room policy is fixed for this template: Monday-Friday, 08:00-18:00 room-local time, 30-minute grid, minimum 30 minutes, maximum 4 hours, exclusive claims. Policy editing is out of scope.\n\n## 3. Components and layout\n\n```text\nBrowser week grid  ->  Fastify HTTP layer  ->  reservation domain  ->  SQLite\n                          |                        |\n                          +-> EJS week view        +-> overlap query and transaction\n```\n\n```text\nsrc/server.ts                 process setup, plugins, health, static files\nsrc/db.ts                     connection PRAGMAs and schema bootstrap\nsrc/domain/reservations.ts    parsing, policy validation, claim transaction, cancellation\nsrc/routes/rooms.ts           week and reservation HTTP handlers\nsrc/views/week.ejs            initial seven-day grid and claim form\nsrc/public/week.js            fetch submission, conflict banner, cancel action\ndb/schema.sql                 tables and indexes\nscripts/seed.ts               idempotent room seed; never seeds reservations\ntests/domain.test.ts          pure overlap and validation cases\n```\n\n`db/schema.sql` is applied once at boot inside a transaction and guarded by `PRAGMA user_version`. The seed inserts room `aurora` only when absent; it is idempotent and does not create claims.\n\n## 4. Data model\n\n```sql\nCREATE TABLE rooms (\n  id TEXT PRIMARY KEY,\n  name TEXT NOT NULL,\n  timezone TEXT NOT NULL,\n  opens_minute INTEGER NOT NULL,\n  closes_minute INTEGER NOT NULL,\n  slot_minutes INTEGER NOT NULL\n);\n\nCREATE TABLE reservations (\n  id TEXT PRIMARY KEY,\n  room_id TEXT NOT NULL REFERENCES rooms(id),\n  booker TEXT NOT NULL,\n  purpose TEXT NOT NULL CHECK(length(purpose) BETWEEN 1 AND 200),\n  starts_at INTEGER NOT NULL,\n  ends_at INTEGER NOT NULL,\n  status TEXT NOT NULL CHECK(status IN ('confirmed','cancelled')),\n  created_at TEXT NOT NULL,\n  cancelled_at TEXT,\n  cancelled_by TEXT,\n  CHECK(ends_at > starts_at)\n);\n\nCREATE INDEX reservations_room_window\n  ON reservations(room_id, status, starts_at, ends_at);\n```\n\n`starts_at` and `ends_at` are UTC epoch milliseconds. `booker` and `cancelled_by` are stable staff ids. `purpose` is trimmed plain text, maximum 200 characters; attachments are not modeled. Cancellation is a status transition, never a hard delete.\n\n## 5. Time and canonical representation\n\nAll request times must be RFC3339 timestamps with an explicit offset. The server normalizes them to the room IANA zone and returns canonical room-local strings such as `2026-10-22T14:00:00+08:00`. A week is Monday 00:00 through the following Monday 00:00 in room-local time. `weekStart` is required, must be a Monday, and the response includes seven dated days. Naive timestamps and intervals spanning local midnights are rejected for this template.\n\n## 6. HTTP contract\n\n| Method and path | Behavior |\n|---|---|\n| `GET /healthz` | 200 with `status:ok` when the process and schema are ready. |\n| `GET /api/rooms/:roomId/week?weekStart=YYYY-MM-DD` | 200 week read model. 400 `INVALID_WEEK_START`; 404 `ROOM_NOT_FOUND`. |\n| `POST /api/rooms/:roomId/reservations` | 201 `reservation`; 400 validation error; 401 `ACTOR_REQUIRED`; 404 `ROOM_NOT_FOUND`; 409 `SLOT_CONFLICT`; 503 `STORE_BUSY`. |\n| `DELETE /api/rooms/:roomId/reservations/:id` | 204 on owner or admin cancellation; 403 `FORBIDDEN_ACTOR`; 404 `RESERVATION_NOT_FOUND`; 503 `STORE_BUSY`. |\n\nWeek response fields: `room` with `id`, `name`, `timezone`, `opensAt`, `closesAt`, `slotMinutes`; `weekStart`; `weekEnd`; `days` as seven `date` and `weekday` objects; and a time-sorted `reservations` array. Each block has `id`, `start`, `end`, `status`, and `mine`. For the booker or an admin, the block also has `purpose`; for every other actor `purpose` is omitted. Cancelled rows never appear.\n\nPOST body fields are `start`, `end`, and `purpose`. The 201 body is `reservation` with `id`, `roomId`, `start`, `end`, `purpose`, `booker`, `status`, and `createdAt`. Validation codes are `INVALID_JSON`, `INVALID_ACTOR`, `INVALID_INTERVAL`, `INVALID_ALIGNMENT`, `OUTSIDE_HOURS`, `INVALID_DURATION`, and `INVALID_PURPOSE`.\n\nConflict responses use HTTP 409 with `error.code: SLOT_CONFLICT`, a human-readable `error.message` that names the existing reservation id and both intervals, and `error.conflicts`, an array of objects containing `id`, `start`, and `end`. DELETE requires `X-Actor`; the booker or `X-Role: admin` may cancel. Repeated cancellation of the same id returns 404.\n\n## 7. Claim transaction and conflict rule\n\n1. Require `X-Actor`, parse JSON, trim and validate `purpose`, parse both timestamps, normalize to `Asia/Shanghai`, and require the same local date, a 30-minute boundary, a duration from 30 to 240 minutes, and containment within the room's 08:00-18:00 hours.\n2. Start `BEGIN IMMEDIATE` so the write lock is held before checking availability.\n3. Select confirmed rows where `room_id` matches, `starts_at < newEnd`, and `ends_at > newStart`. This is strict overlap on half-open intervals; touching endpoints do not conflict.\n4. If any row matches, roll back and return 409 with the matching ids and times. Do not insert.\n5. Insert one confirmed row and commit. Return 201. If the lock cannot be acquired within the busy timeout, roll back and return 503 `STORE_BUSY`; never report success without a committed row.\n\nSQLite cannot express an overlap exclusion constraint, so this single `BEGIN IMMEDIATE` path is the authority. All writes go through it; there is no separate bulk import that bypasses the check.\n\n## 8. Cancellation lifecycle\n\n`DELETE` runs in a write transaction, loads the reservation, returns 404 when absent or already cancelled, and returns 403 when the actor is neither the booker nor an admin. It sets `status='cancelled'`, `cancelled_at`, and `cancelled_by`, commits, and returns 204. The row is retained for audit and is excluded from all availability reads. A cancelled window is immediately claimable; a new reservation receives a new id and does not resurrect the old one. There is no restore or hard-delete endpoint.\n\n## 9. Week page\n\nThe route `/rooms/aurora?week=2026-10-19` renders the initial grid: seven day columns, 08:00-18:00 rows at 30-minute intervals, confirmed blocks positioned by start and end, the current local time marker, and a claim form for start, end, and purpose. Blocks owned by the current actor show the purpose and a Cancel action; other blocks show Busy. The conflict banner displays the conflicting reservation id and its local times. `week.js` submits JSON and refreshes the grid from the API. The page uses semantic headings, labelled inputs, visible focus, and text status in addition to color.\n\n## 10. Operations and observability\n\nCommands are documented in README.md: install, seed an isolated database, start on port 8080, and run the external probe. Structured request logs include request id, route, status, reservation id, and conflict id; they never log purpose text. `/healthz` checks the database connection and schema version. Backup is a SQLite copy after a WAL checkpoint. Deployment is a single trusted process behind the identity proxy.\n\n## 11. Verification boundary\n\nThe acceptance probe is an external HTTP client. It does not import application code, inspect SQLite, or use test-only hooks. It runs against an isolated database and refuses to proceed if the fixed 09:00-10:00 or 14:00-16:00 windows already contain another actor's blocks. It creates only uniquely identified probe reservations and cancels only ids it created. A01-A04 map one-to-one to the four capabilities.\n\n## 12. Non-goals and honest limits\n\nNo real SSO implementation, password login, room inventory administration, booking policies UI, recurring series, approvals or delegates, notifications, check-in, no-show release, utilization reports, suite-calendar synchronization, payments, attachments, or multi-room search. Actor trust depends on the proxy boundary. The database is single-node. The probe is functional HTTP verification, not browser visual, accessibility, load, or security certification.",
+ "gaps": [
+  "The template models one fixed room and one fixed room policy; there is no administration console, resource inventory, recurring-series editor, approval flow, delegate routing, notification delivery, or no-show check-in.",
+  "Staff identity is delegated to a trusted ingress proxy; the application does not implement SSO, password authentication, CSRF protection for a cookie-based UI, or rate limiting, so it must not be exposed directly to an untrusted network.",
+  "The probe verifies the HTTP contract and core journey only; it does not start the target, install packages, render the UI, measure accessibility or performance, or certify security.",
+  "The acceptance run requires an isolated SQLite database with the fixed windows free. The probe refuses to delete or overwrite pre-existing blocks and exits as not_run when setup is unsafe.",
+  "Soft-cancelled reservations are retained but there is no restore operation, retention policy, or reporting surface; changing the room timezone requires a full data review because stored instants are rendered in the configured room zone."
+ ],
+ "delivery_profile": "web",
+ "execution_default": "One Node.js 22 TypeScript/Fastify web process serving a server-rendered week page and JSON API; SQLite at DATABASE_PATH is the only authority; identity arrives as X-Actor from the trusted ingress proxy, with no external calendar or database service.",
+ "source_refs": {
+  "requirements": [
+   "atlas:b002c24483cc217524018776818616952a438c030c2e9e2dc717971ee95668a5",
+   "scenario:2a94ef7bcbfba4258956fd8dbdcc0ed8e9d529ec9dc9d0ef7ef3409166277008"
+  ],
+  "case_files": [
+   "upstream:c4db56b4155fdcbca24014e5d26623a884e66b0e164a9e7ffb98b26eed597ba5",
+   "upstream:05d74f4d316fb2af5331f6cdf60b3326bcd00bee796ddbf872e159ab46479749",
+   "upstream:d54a19e970ad5e4f572060ce601f93dc04826921b6ef790ed029559a1ab10c47",
+   "upstream:921195ba7d95ef948db1b004a87463ce13fa12aac5f9031dfdd0ccc0afdf189f",
+   "upstream:4e0aa27d993005e916c9b71b70c99a1be5993cc19e89d3b5d2b0039cd94cccb3",
+   "upstream:834d7b2eaf6f48eca4e796f8a64bccd7861e784637bc90e40328cf22049e41dd"
+  ],
+  "design_inferences": [
+   {
+    "text": "Use Node.js 22, Fastify, SQLite, and a server-rendered week grid with the same-origin JSON API, because the delivery profile is web and the fixed journey requires a browser availability view plus deterministic command checks.",
+    "depends_on": [
+     "atlas:b002c24483cc217524018776818616952a438c030c2e9e2dc717971ee95668a5",
+     "scenario:2a94ef7bcbfba4258956fd8dbdcc0ed8e9d529ec9dc9d0ef7ef3409166277008"
+    ]
+   },
+   {
+    "text": "Treat claims as half-open intervals and refuse only strict overlaps, so the 14:00-16:00 claim conflicts with 14:30-15:30 but remains compatible with 16:00-17:00.",
+    "depends_on": [
+     "atlas:b002c24483cc217524018776818616952a438c030c2e9e2dc717971ee95668a5",
+     "scenario:2a94ef7bcbfba4258956fd8dbdcc0ed8e9d529ec9dc9d0ef7ef3409166277008",
+     "upstream:d54a19e970ad5e4f572060ce601f93dc04826921b6ef790ed029559a1ab10c47"
+    ]
+   },
+   {
+    "text": "Store the purpose note with the claim but omit it from another staff member's availability view, and implement cancellation as an owner-or-admin soft transition rather than a file rewrite or hard delete.",
+    "depends_on": [
+     "atlas:b002c24483cc217524018776818616952a438c030c2e9e2dc717971ee95668a5",
+     "upstream:834d7b2eaf6f48eca4e796f8a64bccd7861e784637bc90e40328cf22049e41dd"
+    ]
+   }
+  ]
+ },
+ "repo_name": "technekey/booking-tool",
+ "license": "MIT",
+ "license_path": "LICENSE"
+}

@@ -1,0 +1,16 @@
+{
+ "name": "Afternoon claim on the shared conference room",
+ "audience": "A staff member who needs the department conference room",
+ "objective": "Check the room's calendar for a free window, claim it, and see a clashing claim refused while a cancellation reopens the time.",
+ "workflow": [
+  "Open the room's week view and read its existing reservation blocks as busy time",
+  "Submit a 14:00-16:00 claim for Thursday with a purpose note",
+  "Submit a second overlapping claim and receive a refusal naming the conflict",
+  "Cancel the original claim and confirm the slot shows free again"
+ ],
+ "acceptance": [
+  "The week view shows each accepted claim against the named room",
+  "An overlapping claim for the same room is refused and no block is added",
+  "Cancelling removes the block so the 14:00-16:00 window reads free"
+ ]
+}

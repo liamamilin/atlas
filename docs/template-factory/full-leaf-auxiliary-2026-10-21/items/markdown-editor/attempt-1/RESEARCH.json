@@ -1,0 +1,28 @@
+{
+ "repository": "https://github.com/liyasthomas/marcdown",
+ "files": [
+  "LICENSE",
+  "README.md",
+  "index.html",
+  "index.js"
+ ],
+ "rationale": "Marcdown is a small MIT-licensed vanilla-JS markdown viewer/editor. Its index.js implements the leaf's three-part core directly: a textarea holding the plain-text source of record, a toolbar whose apply() wraps selections in markup before re-rendering, and a preview recomputed from the text via marked (with word/char counts and a Save that downloads the raw .md). That is a precise, compact reference for the authoring loop rather than a generic CRUD app.",
+ "reuse_case_id": null,
+ "delivery_profile": "web",
+ "scenario": {
+  "name": "Draft and save a README with selection-based markup",
+  "audience": "a developer writing repository documentation",
+  "objective": "Turn a plain draft into a saved README.md whose formatting exists only as markup characters, verifying the derived preview before saving",
+  "workflow": [
+   "Paste or open a plain-text draft of the README into the source editor",
+   "Select a phrase and use the Bold button, then select a line and use the H1 button, so markup is inserted around the selection",
+   "Glance at the live preview pane to confirm the heading and emphasis render as intended",
+   "Save, downloading the .md file, and reopen it to confirm the stored text is the markup itself"
+  ],
+  "acceptance": [
+   "The downloaded .md file contains the literal markup characters and no styling data",
+   "The preview is recomputed from the saved text and shows the same heading and bold phrase",
+   "Word and character counts update to reflect the rendered source"
+  ]
+ }
+}

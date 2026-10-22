@@ -1,0 +1,30 @@
+{
+ "repository": "https://github.com/th3r00t/pyShelf",
+ "files": [
+  "LICENSE",
+  "README.md",
+  "src/backend/lib/library.py",
+  "src/backend/lib/models.py",
+  "src/backend/lib/storage.py"
+ ],
+ "rationale": "Pinned pyShelf (GPL-3.0) is a small Python e-book server: Catalogue.scan_folder walks a filesystem folder, process_by_filetype extracts EPUB OPF, MOBI and PDF metadata plus cover bytes, and Storage persists Book and Collection rows, derives collections from folders, and runs field-qualified fuzzy search over metadata. README confirms recursive scanning, cover aggregation, tag:/author:/title: search and a download system. Compact verified surface used as reference only, with a small browser shelf of our own.",
+ "reuse_case_id": null,
+ "delivery_profile": "web",
+ "scenario": {
+  "name": "Scan a sideloaded shelf and make one book readable",
+  "audience": "one reader who sideloads DRM-free EPUB and MOBI files from mixed sources",
+  "objective": "Turn a folder of stray e-book files into a persistent, searchable shelf and open one book in a reading app.",
+  "workflow": [
+   "Point the library at a local folder of e-book files and start a scan",
+   "Review the created entries and correct a title or author that was derived badly",
+   "Put the entry in a collection and locate it again with a field-qualified search",
+   "Use the entry's file through the download/handoff path to read it"
+  ],
+  "acceptance": [
+   "One scan produces one book entry per work with its cover, and a second scan adds no duplicate entries",
+   "The corrected metadata and collection assignment survive a restart of the library",
+   "A search on the corrected author or title returns that entry",
+   "The entry's file opens through the read/download path"
+  ]
+ }
+}
