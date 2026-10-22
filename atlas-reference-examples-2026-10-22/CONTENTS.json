@@ -1,0 +1,128 @@
+{
+  "package_format_version": "1.0",
+  "created_date": "2026-10-22",
+  "title": "Atlas 产品参考模板样稿",
+  "purpose": "product_reference_design_examples_for_generator_calibration",
+  "artifact_kind": "design_example",
+  "content_basis": "target_product_design",
+  "atlas_production_record": false,
+  "atlas_formal_review_status": "not_run",
+  "application_runtime_status": "not_run",
+  "application_development_default": false,
+  "entrypoint": "README.md",
+  "generator_guide": "GENERATOR_GUIDE.md",
+  "templates": [
+    {
+      "directory": "01-personal-bookmarks",
+      "name": "个人收藏夹",
+      "roles": [
+        "所有者",
+        "系统行为"
+      ],
+      "source_basis": "目标设计；提供未在本包逐文件核查的 bookmark-manager 固定版本指针",
+      "counts": {
+        "pages": 8,
+        "journeys": 8,
+        "rules": 10,
+        "acceptance_assertions": 10
+      },
+      "files": [
+        "01-personal-bookmarks/PRODUCT_REFERENCE.md",
+        "01-personal-bookmarks/HANDOFF.md"
+      ],
+      "application_runtime_status": "not_run",
+      "atlas_formal_review_status": "not_run"
+    },
+    {
+      "directory": "02-team-project-board",
+      "name": "团队项目看板",
+      "roles": [
+        "项目成员",
+        "项目负责人",
+        "组织管理员"
+      ],
+      "source_basis": "目标设计；Kanboard 仅为后续研究线索",
+      "counts": {
+        "pages": 9,
+        "journeys": 8,
+        "rules": 12,
+        "acceptance_assertions": 16
+      },
+      "files": [
+        "02-team-project-board/PRODUCT_REFERENCE.md",
+        "02-team-project-board/HANDOFF.md"
+      ],
+      "application_runtime_status": "not_run",
+      "atlas_formal_review_status": "not_run"
+    },
+    {
+      "directory": "03-team-event-registration",
+      "name": "团队活动报名",
+      "roles": [
+        "成员",
+        "活动运营",
+        "组织管理员"
+      ],
+      "source_basis": "目标设计；未声明已核验的上游来源",
+      "counts": {
+        "pages": 10,
+        "journeys": 6,
+        "rules": 10,
+        "acceptance_assertions": 11
+      },
+      "files": [
+        "03-team-event-registration/PRODUCT_REFERENCE.md",
+        "03-team-event-registration/HANDOFF.md"
+      ],
+      "application_runtime_status": "not_run",
+      "atlas_formal_review_status": "not_run"
+    }
+  ],
+  "documents": [
+    {
+      "path": "01-personal-bookmarks/HANDOFF.md",
+      "size_bytes": 4294,
+      "sha256": "a2735d3f7480dc50bedcad57f71715535c9d6e72ef9f65850da30416e9002298"
+    },
+    {
+      "path": "01-personal-bookmarks/PRODUCT_REFERENCE.md",
+      "size_bytes": 28679,
+      "sha256": "e4b9e4d7b7632ca6c672a5a13f33f8e6b39b356d7d0b35a3fa559142872e8a54"
+    },
+    {
+      "path": "02-team-project-board/HANDOFF.md",
+      "size_bytes": 3797,
+      "sha256": "9d630a4b7bcd642962163bedb514d08810ddd139d870574d4cf9d375753056cb"
+    },
+    {
+      "path": "02-team-project-board/PRODUCT_REFERENCE.md",
+      "size_bytes": 20633,
+      "sha256": "a71afee111dafbaaa936deb45c2fc37efd180e79546b6c7c04f5a6242c2717ef"
+    },
+    {
+      "path": "03-team-event-registration/HANDOFF.md",
+      "size_bytes": 5334,
+      "sha256": "216a3a0efecf31d548222798b92d74847746207b2713ab928631b98403baf9aa"
+    },
+    {
+      "path": "03-team-event-registration/PRODUCT_REFERENCE.md",
+      "size_bytes": 18747,
+      "sha256": "09e2ceaf8f3c7bd8996028996ea10c7eca8d33d434eac2eaef4bdcb1a21e833a"
+    },
+    {
+      "path": "GENERATOR_GUIDE.md",
+      "size_bytes": 6761,
+      "sha256": "d205105d6d1a285f24beb494b192b7260f69fb560f00f923cd82bdfd10b1c715"
+    },
+    {
+      "path": "README.md",
+      "size_bytes": 4560,
+      "sha256": "f7aac1b28d386ed5f26adf33b8540c9df79e3792052d8d40c1e54c85a7d99cb3"
+    }
+  ],
+  "package_validation": {
+    "local_page_journey_rule_assertion_references": "checked",
+    "scope": "文档关系和打包完整性检查；不表示应用运行或 Atlas 正式审阅通过"
+  },
+  "integrity_file": "CHECKSUMS.sha256"
+}

@@ -68,6 +68,12 @@ def dispatch(method, path, query="", body=None, store=None):
     store = store or get_store()
     body = body or {}
     route = path.removeprefix("/api/factory").strip("/")
+    if method == "GET" and route == "product-reference-examples":
+        from .reference_preview import examples
+        return examples(store, parse_qs(query).get("key", [None])[0]), 200
+    if method == "POST" and route in {"product-references/preview", "product-references/export-preview"}:
+        from .reference_preview import export_preview, preview
+        return (export_preview(body) if route.endswith("export-preview") else preview(body)), 200
     if method == "GET" and route == "auxiliary-workflows":
         from .auxiliary_workflow import WorkflowService
         return WorkflowService(store).list_plans(), 200

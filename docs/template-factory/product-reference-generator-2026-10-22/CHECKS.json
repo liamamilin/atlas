@@ -1,0 +1,85 @@
+{
+  "schema": "atlas.generator-local-checks.v1",
+  "production_activated": false,
+  "real_model_calls": 0,
+  "checks": [
+    {
+      "name": "ProductReference contract, preview API and existing source-reference checks",
+      "command": "PYTHONPATH=application-atlas-production-pack python3 -m unittest discover -s application-atlas-production-pack/tests -p 'test*reference*.py' -v",
+      "tests": 16,
+      "result": "passed",
+      "log": "REFERENCE_FINAL_TESTS.log"
+    },
+    {
+      "name": "ProductReference profile including official checkpoint bridge fixture and lock",
+      "command": "python3 -m unittest discover -s examples/assisted-trials/tests -p test_product_reference_profile.py -v",
+      "tests": 15,
+      "result": "passed",
+      "evidence_kind": "fixture_only_no_real_provider"
+    },
+    {
+      "name": "Assisted regressions",
+      "tests": 142,
+      "result": "passed",
+      "log": "ASSISTED_FINAL_TESTS.log"
+    },
+    {
+      "name": "Full backend",
+      "tests": 792,
+      "skipped": 8,
+      "result": "environment_port_errors_then_targeted_rerun_passed",
+      "error_cases": 19,
+      "log": "BACKEND_TESTS.log",
+      "reason": "Old R7 fixture attempted 127.0.0.1 port binding in sandbox and received PermissionError; no assertion failure."
+    },
+    {
+      "name": "Affected old R7 fixture with local-port permission",
+      "tests": 18,
+      "result": "passed",
+      "log": "R7_PORT_RERUN.log",
+      "strict_G1_executed": false
+    },
+    {
+      "name": "Frontend typecheck",
+      "result": "passed"
+    },
+    {
+      "name": "Frontend unit tests",
+      "tests": 9,
+      "result": "passed"
+    },
+    {
+      "name": "Frontend production build",
+      "result": "passed"
+    },
+    {
+      "name": "Factory Playwright suite",
+      "tests": 38,
+      "result": "passed",
+      "evidence_kind": "isolated_api_and_browser_fixtures"
+    },
+    {
+      "name": "Final new reader browser check after remote-image isolation",
+      "tests": 1,
+      "result": "passed"
+    },
+    {
+      "name": "Ruff",
+      "result": "passed"
+    }
+  ],
+  "independent_host_code_review": {
+    "result": "no_remaining_actionable_findings",
+    "mode": "read_only",
+    "template_semantic_review": "not_run"
+  },
+  "not_run": [
+    "Real product-reference model production",
+    "Formal new-profile dispatch activation",
+    "CaseLibrary/production catalog registration for a new reference",
+    "Reference-to-technical-development-package conversion",
+    "Application development/runtime",
+    "Strict G1/T08"
+  ],
+  "production_pause": "preserved"
+}
