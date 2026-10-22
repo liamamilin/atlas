@@ -25,6 +25,15 @@ def ensure_schema(con):
     con.execute(
         "CREATE TABLE IF NOT EXISTS auxiliary_workflow_gate(plan_id TEXT PRIMARY KEY,body TEXT NOT NULL,updated REAL NOT NULL)"
     )
+    con.execute(
+        "CREATE TABLE IF NOT EXISTS auxiliary_reference_pilot(id TEXT PRIMARY KEY,plan_id TEXT NOT NULL,campaign_id TEXT NOT NULL,phase TEXT NOT NULL UNIQUE,request_json TEXT NOT NULL,request_digest TEXT NOT NULL,max_calls INTEGER NOT NULL,status TEXT NOT NULL,created REAL NOT NULL,updated REAL NOT NULL,pause_anchor INTEGER NOT NULL DEFAULT 0)"
+    )
+    pilot_columns = {row[1] for row in con.execute("PRAGMA table_info(auxiliary_reference_pilot)")}
+    if "pause_anchor" not in pilot_columns:
+        con.execute("ALTER TABLE auxiliary_reference_pilot ADD COLUMN pause_anchor INTEGER NOT NULL DEFAULT 0")
+    con.execute(
+        "CREATE TABLE IF NOT EXISTS auxiliary_reference_pilot_event(id INTEGER PRIMARY KEY,pilot_id TEXT NOT NULL,kind TEXT NOT NULL,body TEXT NOT NULL,created REAL NOT NULL)"
+    )
 
 
 class FullAuxiliaryService:
@@ -505,7 +514,10 @@ class FullAuxiliaryService:
                                 "examples/assisted-trials/",
                             )
                         )
-                        or name == "application-atlas-production-pack/drafts_api.py"
+                        or name in {
+                            "application-atlas-production-pack/drafts_api.py",
+                            "application-atlas-production-pack/tests/test_reference_pilot.py",
+                        }
                     )
                     for name in added
                 )
@@ -946,7 +958,7 @@ class FullAuxiliaryService:
 
 
 def full_reservation_locked(
-    con, campaign, identity, phase, plan_id, model, stage, now, kind="production"
+    con, campaign, identity, phase, plan_id, model, stage, now, kind="production", store=None
 ):
     row = con.execute(
         "SELECT * FROM auxiliary_full_plan WHERE phase=? AND campaign_id=?",
@@ -973,6 +985,16 @@ def full_reservation_locked(
     ):
         raise FactoryError(
             "full plan call identity/model differs", "full_plan_binding", 409
+        )
+    pilot = con.execute(
+        "SELECT * FROM auxiliary_reference_pilot WHERE phase=? AND campaign_id=?",
+        (str(phase), campaign),
+    ).fetchone()
+    if str(stage or "").startswith("reference/"):
+        if not pilot:
+            raise FactoryError("reference pilot not registered", "full_plan_binding", 409)
+        return _reference_pilot_reservation_locked(
+            con, campaign, identity, phase, plan_id, model, stage, now, kind, pilot, row, store
         )
     if kind not in {"research", "production", "review"}:
         raise FactoryError(
@@ -1108,3 +1130,73 @@ def full_reservation_locked(
             (now, now + row["window_seconds"], plan_id),
         )
     return row
+
+
+def _reference_pilot_reservation_locked(con, campaign, identity, phase, plan_id,
+                                        model, stage, now, kind, pilot, original=None, store=None):
+    request = json.loads(pilot["request_json"])
+    if digest(request) != pilot["request_digest"]:
+        raise FactoryError("stored reference pilot changed", "full_plan_integrity", 409)
+    if original is None:
+        original = con.execute(
+            "SELECT * FROM auxiliary_full_plan WHERE id=? AND campaign_id=?",
+            (pilot["plan_id"], campaign),
+        ).fetchone()
+    if (not original or plan_id != original["id"] or model != original["model"]
+            or not identity.startswith(original["id"] + ":")):
+        raise FactoryError("reference pilot call binding differs", "full_plan_binding", 409)
+    if store is not None:
+        from .reference_pilot import ReferencePilotService
+        service = object.__new__(ReferencePilotService)
+        service.store, service.campaign_id = store, campaign
+        service.verify_call(con, pilot, request, original)
+    if original["status"] != "paused" or pilot["status"] != "active":
+        raise FactoryError("reference pilot/full plan is paused", "full_plan_paused", 409)
+    later_controls = con.execute(
+        "SELECT body FROM auxiliary_full_event WHERE plan_id=? AND kind='control' AND id>? ORDER BY id",
+        (original["id"], pilot["pause_anchor"]),
+    ).fetchall()
+    if any(json.loads(event[0]).get("action") == "pause" for event in later_controls):
+        raise FactoryError("full-plan pause after pilot registration revoked pilot calls", "full_plan_paused", 409)
+    if kind not in {"research", "production", "review"}:
+        raise FactoryError("reference pilot cannot fund this call", "full_plan_binding", 409)
+    slug = identity[len(original["id"]) + 1:]
+    members = {x["leaf"]: x for x in request["leaves"]}
+    if slug not in members:
+        raise FactoryError("leaf outside registered reference pilot", "full_plan_binding", 409)
+    frozen = con.execute(
+        "SELECT state,body FROM auxiliary_full_leaf WHERE plan_id=? AND slug=?",
+        (original["id"], slug),
+    ).fetchone()
+    if not frozen or frozen["state"] != "reused":
+        raise FactoryError("reference pilot leaf is not a frozen reused leaf", "full_plan_paused", 409)
+    stage_parts = str(stage or "").split("/")
+    stage_to_kind = {"research": "research", "author": "production", "review": "review"}
+    if (len(stage_parts) != 3 or stage_parts[0] != "reference"
+            or stage_parts[1] not in stage_to_kind or stage_parts[2] != pilot["id"]
+            or stage_to_kind[stage_parts[1]] != kind):
+        raise FactoryError("reference pilot only permits its three first-pass stages", "full_plan_binding", 409)
+    calls = con.execute(
+        "SELECT identity,stage,status FROM tf_budget_reservation WHERE campaign_id=? AND phase=? AND status!='not_started'",
+        (campaign, original["phase"]),
+    ).fetchall()
+    own = [c for c in calls if c["identity"] == identity]
+    pilot_calls = [c for c in calls if c["stage"] and c["stage"].startswith("reference/")
+                   and c["stage"].endswith("/" + pilot["id"])]
+    if any(c["stage"] == stage for c in own):
+        raise FactoryError("reference stage already charged; reuse checkpoint", "full_uncertain", 409)
+    if len(own) >= 6 or len(pilot_calls) >= pilot["max_calls"] or len(calls) >= original["max_calls"]:
+        raise FactoryError("reference pilot allowance exhausted", "budget_exhausted", 409)
+    pending_remaining = 0
+    for pending in con.execute(
+        "SELECT slug FROM auxiliary_full_leaf WHERE plan_id=? AND state IN ('pending','running','paused')",
+        (original["id"],),
+    ):
+        first = sum(c["identity"] == original["id"] + ":" + pending["slug"]
+                    and str(c["stage"]).startswith("first/") for c in calls)
+        pending_remaining += max(0, 3 - first)
+    if original["max_calls"] - len(calls) - 1 < pending_remaining:
+        raise FactoryError("preserve pending full-plan first-pass allowance", "budget_first_pass_reserve", 409)
+    if original["deadline"] is not None and now >= original["deadline"]:
+        raise FactoryError("original full-plan deadline exhausted", "budget_deadline", 409)
+    return original

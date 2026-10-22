@@ -42,6 +42,24 @@ lowercase letters/digits/underscore/hyphen. Every action is asserted and has an
 entry surface/object; every surface/action relation is symmetric. Only fixed trusted
 IDs may appear in basis source_ids. Unknown core gaps block a complete reference."""
 
+SCHEMA_CONTRACT += """
+Types: every scalar name/goal/meaning/statement/condition/response/recovery and
+assertion given/when/then/negative is a NONBLANK STRING (negative describes the
+negative expectation; it is not a boolean). product_shape audience/value/
+delivery_profile/boundary are strings. surfaces states and query values are
+nonblank explanatory strings, including an explicit reason when not applicable.
+All *_ids, depends_on, states, sections, navigation, preconditions, effects,
+excluded, from_states are lists of strings. gaps.core is the only boolean in the
+reference schema. All IDs are globally unique across collections. Action failures,
+preconditions and effects must be nonempty. A design_inference basis must depend_on
+at least one known basis ID. Scope options select entire journeys plus dependency
+closure, and need assertions whose action_ids and journey_ids are entirely within
+that option; these assertions must cover all selected actions, rules and journeys.
+Do not attach every unrelated journey to one assertion: reference the specific
+journeys that the given/when/then actually tests. This is schema guidance, not an
+instruction to limit product capability or weaken the confirmed scenario.
+"""
+
 RESEARCH = """Research this fixed leaf/scenario using only the supplied fixed case_refs and
 trusted source inventory. Do not discover or substitute sources. Separate user
 requirements, observations of the upstream product, design choices, and unknowns.

@@ -417,7 +417,8 @@ class BudgetLedger:
                 raise FactoryError("campaign budget is paused", "budget_paused", 409)
             from .full_auxiliary import full_reservation_locked
             full = full_reservation_locked(con, self.campaign_id, str(identity), str(phase), plan_id,
-                                           requested_model, stage, float(self.clock()), kind=kind)
+                                           requested_model, stage, float(self.clock()), kind=kind,
+                                           store=self.store)
             auxiliary = con.execute("SELECT * FROM tf_budget_auxiliary_segment WHERE campaign_id=? AND phase=?",
                                     (self.campaign_id, str(phase))).fetchone()
             if str(phase).startswith(("auxiliary-revision-", "auxiliary-batch-")) and not auxiliary:
