@@ -1,0 +1,39 @@
+{
+ "analysis_kind": "host_read_only_diagnosis_not_factory_review",
+ "raw_author_sha256": "0c6f803da0103baa33974a6eb349426ed89dde303edf283fd9eb368991874695",
+ "research_count": 32,
+ "author_count": 28,
+ "all_retained_tuples_match_research": true,
+ "missing_observations": [
+  [
+   "code_observation",
+   "lib/Db/Poll.php",
+   313,
+   314,
+   "'maxVotesPerOption' => $this->getOptionLimit(),\n\t\t\t'maxVotesPerUser' => $this->getVoteLimit(),"
+  ],
+  [
+   "code_observation",
+   "lib/Db/Poll.php",
+   462,
+   466,
+   "public function setAnonymousSafe(bool|int $value): void {\n\t\t// if anonymous is locked, do not allow changes\n\t\tif ($this->getAnonymous() < 0) {\n\t\t\treturn;\n\t\t}"
+  ],
+  [
+   "code_observation",
+   "lib/Db/Poll.php",
+   230,
+   255,
+   "public function createClone(string $newOwner): self {\n\t\t$clone = new self();\n\t\t$clone->setType($this->getType());\n\t\t$clone->setVotingVariant($this->getVotingVariant());\n\t\t$clone->setTitle('Clone of ' . $this->getTitle());\n\t\t$clone->setDescription($this->getDescription());\n\t\t$clone->setOwner($newOwner);\n\t\t$clone->setCreated(time());\n\t\t$clone->setLastInteraction(0);\n\t\t$clone->setExpire($this->getExpire());\n\t\t$clone->setDeleted(0);\n\t\t$clone->setAccess(self::ACCESS_PRIVATE);\n\t\t$clone->setAnonymous(0);"
+  ],
+  [
+   "code_observation",
+   "lib/Db/Vote.php",
+   110,
+   122,
+   "/** @return PollsVote */\n\tpublic function jsonSerialize(): array {\n\t\treturn [\n\t\t\t'id' => $this->getId(),\n\t\t\t'pollId' => $this->getPollId(),\n\t\t\t'optionText' => $this->getVoteOptionText(),\n\t\t\t'answer' => $this->getVoteAnswer(),\n\t\t\t'deleted' => $this->getDeleted(),\n\t\t\t'optionId' => $this->getOptionId(),\n\t\t\t'user' => $this->getUser()->jsonSerialize(),\n\t\t\t'answerSymbol' => $this->getAnswerSymbol(),\n\t\t];\n\t}"
+  ]
+ ],
+ "added_or_changed_observations": [],
+ "order_matches_retained_research": false
+}

@@ -1,0 +1,2129 @@
+{
+ "candidate_status": "failed_deterministic_check",
+ "application_runtime_status": "not_run",
+ "author_result_sha256": "0c6f803da0103baa33974a6eb349426ed89dde303edf283fd9eb368991874695",
+ "author_result": {
+  "observations": [
+   [
+    "documentation",
+    "README.md",
+    5,
+    5,
+    "# Polls - an app, similar to doodle or DuD-Poll, for Nextcloud written in PHP and JS/Vue."
+   ],
+   [
+    "documentation",
+    "README.md",
+    20,
+    20,
+    "# Free meeting schedule tool"
+   ],
+   [
+    "documentation",
+    "README.md",
+    23,
+    23,
+    "    - :envelope: Make your poll confidential by hiding the results until you want them to be discovered"
+   ],
+   [
+    "documentation",
+    "README.md",
+    24,
+    24,
+    "    - :dark_sunglasses: Obfuscate participants' names from other participants or set strong anonymous mode"
+   ],
+   [
+    "documentation",
+    "README.md",
+    25,
+    25,
+    "    - :timer_clock: Set an automatic expiry date"
+   ],
+   [
+    "documentation",
+    "README.md",
+    26,
+    26,
+    "    - :heavy_plus_sign: Allow participants to add more options"
+   ],
+   [
+    "documentation",
+    "README.md",
+    27,
+    27,
+    "    - :white_check_mark: Limit votes per option or user"
+   ],
+   [
+    "documentation",
+    "README.md",
+    30,
+    30,
+    "- :rocket: Export your poll to different spreadsheet formats or HTML"
+   ],
+   [
+    "documentation",
+    "README.md",
+    33,
+    33,
+    "- :ballot_box_with_check: Confirm options after poll closing"
+   ],
+   [
+    "documentation",
+    "README.md",
+    36,
+    36,
+    "- :toolbox: Usable via REST-API"
+   ],
+   [
+    "documentation",
+    "README.md",
+    51,
+    51,
+    "For clarification: Polls is not maintained by Nextcloud, although it resides unter the Nextcloud organisation here on Github."
+   ],
+   [
+    "documentation",
+    "README.md",
+    64,
+    64,
+    "Manage your polls and create new ones | Many configuration options | Share your poll with other people | Vote on mobile"
+   ],
+   [
+    "code_observation",
+    "lib/Db/Poll.php",
+    87,
+    90,
+    "public const TABLE = 'polls_polls';\n\tpublic const TYPE_DATE = 'datePoll';\n\tpublic const TYPE_TEXT = 'textPoll';\n\tpublic const VARIANT_SIMPLE = 'simple';"
+   ],
+   [
+    "code_observation",
+    "lib/Db/Poll.php",
+    91,
+    95,
+    "public const ACCESS_PRIVATE = 'private';\n\tpublic const ACCESS_OPEN = 'open';\n\tpublic const SHOW_RESULTS_ALWAYS = 'always';\n\tpublic const SHOW_RESULTS_CLOSED = 'closed';\n\tpublic const SHOW_RESULTS_NEVER = 'never';"
+   ],
+   [
+    "code_observation",
+    "lib/Db/Poll.php",
+    96,
+    98,
+    "public const PROPOSAL_DISALLOW = 'disallow';\n\tpublic const PROPOSAL_ALLOW = 'allow';\n\tpublic const PROPOSAL_REVIEW = 'review';"
+   ],
+   [
+    "code_observation",
+    "lib/Db/Poll.php",
+    106,
+    115,
+    "public const ROLE_USER = Share::TYPE_USER;\n\tpublic const ROLE_ADMIN = Share::TYPE_ADMIN;\n\tpublic const ROLE_EMAIL = Share::TYPE_EMAIL;\n\tpublic const ROLE_CONTACT = Share::TYPE_CONTACT;\n\tpublic const ROLE_EXTERNAL = Share::TYPE_EXTERNAL;\n\tpublic const ROLE_OWNER = 'owner';\n\tpublic const ROLE_NONE = 'none';"
+   ],
+   [
+    "code_observation",
+    "lib/Db/Poll.php",
+    148,
+    159,
+    "protected ?string $owner = '';\n\tprotected int $created = 0;\n\tprotected int $expire = 0;\n\tprotected int $deleted = 0;\n\tprotected string $access = '';\n\tprotected int $anonymous = 0;\n\tprotected int $allowMaybe = 0;\n\tprotected string $allowProposals = '';\n\tprotected int $voteLimit = 0;\n\tprotected int $optionLimit = 0;\n\tprotected string $showResults = '';"
+   ],
+   [
+    "code_observation",
+    "lib/Db/Poll.php",
+    285,
+    293,
+    "'isArchived' => boolval($this->getDeleted()),\n\t\t\t'isExpired' => $this->getIsExpired(),\n\t\t\t'isRealAnonymous' => $this->getAnonymous() < 0,"
+   ],
+   [
+    "code_observation",
+    "lib/Db/Poll.php",
+    396,
+    404,
+    "public function getIsExpired(): bool {\n\t\t$compareTime = time();\n\t\t$expiry = $this->getExpire();\n\n\t\treturn (\n\t\t\t$expiry > 0\n\t\t\t&& $expiry < $compareTime\n\t\t);\n\t}"
+   ],
+   [
+    "code_observation",
+    "lib/Db/Poll.php",
+    594,
+    597,
+    "public function getPollShowResults() {\n\t\t// avoiding migration, expired has been renamed to closed\n\t\treturn $this->showResults === 'expired' ? Poll::SHOW_RESULTS_CLOSED : $this->showResults;\n\t}"
+   ],
+   [
+    "code_observation",
+    "lib/Db/Poll.php",
+    861,
+    894,
+    "private function getAllowAddOptions(): bool {\n\t\t// Edit right includes adding new options\n\t\tif ($this->getAllowEditPoll()) {\n\t\t\treturn true;\n\t\t}\n\n\t\t// deny, if user has no access right to this poll\n\t\tif (!$this->getAllowAccessPoll()) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// deny, if user is not allowed to vote\n\t\tif (!$this->getAllowVote()) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// public shares are not allowed to add options\n\t\tif ($this->userSession->getShare()->getType() === Share::TYPE_PUBLIC) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// Request for option proposals is expired, deny\n\t\tif ($this->getProposalPeriodIsExpired()) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// Locked Users are not allowed to add options\n\t\tif (boolval($this->getIsCurrentUserLocked())) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// Allow, if poll requests proposals\n\t\treturn $this->getAllowProposals() === Poll::PROPOSAL_ALLOW;\n\t}"
+   ],
+   [
+    "code_observation",
+    "lib/Db/Poll.php",
+    970,
+    985,
+    "private function getAllowChangeForeignVotes(): bool {\n\t\treturn $this->getAnonymous() > -1 && $this->getAllowEditPoll() && $this->getUser()->getIsUnrestrictedPollOwner();\n\t}\n\n\t/**\n\t * Checks, if poll owner is allowed to deanonymize votes\n\t **/\n\tprivate function getAllowDeanonymize(): bool {\n\t\treturn $this->getAnonymous() > -1\n\t\t\t&& $this->getAllowEditPoll()\n\t\t\t&& $this->getUser()->getIsUnrestrictedPollOwner();\n\t}"
+   ],
+   [
+    "code_observation",
+    "lib/Db/Poll.php",
+    990,
+    1009,
+    "private function getAllowVote(): bool {\n\t\t// user has no access right to this poll\n\t\tif (!$this->getAllowAccessPoll()) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// Only external, user or admin shares are allowed to vote\n\t\t// All other external types have to register first\n\t\tif (!in_array($this->userSession->getCurrentUser()->getType(), [UserBase::TYPE_EXTERNAL, UserBase::TYPE_USER, UserBase::TYPE_ADMIN])) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// Locked users are not allowed to vote\n\t\tif (boolval($this->getIsCurrentUserLocked())) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// deny votes, if poll is expired\n\t\treturn !$this->getIsExpired();\n\t}"
+   ],
+   [
+    "code_observation",
+    "lib/Db/Poll.php",
+    1026,
+    1043,
+    "private function getAllowShowResults(): bool {\n\t\t// edit rights include access to results\n\t\tif ($this->getAllowEditPoll()) {\n\t\t\treturn true;\n\t\t}\n\n\t\t// no access to poll, deny\n\t\tif (!$this->getAllowAccessPoll()) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// show results, when poll is closed\n\t\tif ($this->getShowResults() === Poll::SHOW_RESULTS_CLOSED && $this->getIsExpired()) {\n\t\t\treturn true;\n\t\t}\n\t\t// return poll settings\n\t\treturn $this->getShowResults() === Poll::SHOW_RESULTS_ALWAYS;\n\t}"
+   ],
+   [
+    "code_observation",
+    "lib/Db/Vote.php",
+    37,
+    51,
+    "class Vote extends EntityWithUser implements JsonSerializable {\n\tpublic const TABLE = 'polls_votes';\n\tpublic const VOTE_YES = 'yes';\n\tpublic const VOTE_NO = 'no';\n\tpublic const VOTE_EVENTUALLY = 'maybe';\n\n\t// schema columns\n\tpublic $id = null;\n\tprotected int $pollId = 0;\n\tprotected string $userId = '';\n\tprotected int $voteOptionId = 0;\n\tprotected string $voteOptionText = '';\n\tprotected string $voteOptionHash = '';\n\tprotected string $voteAnswer = '';\n\tprotected int $deleted = 0;"
+   ],
+   [
+    "code_observation",
+    "lib/Db/Vote.php",
+    77,
+    103,
+    "/**\n\t * Get the hash for the vote option. This is generated from the option text\n\t * and poll id.\n\t *\n\t * @return string\n\t *\n\t * @psalm-suppress PossiblyUnusedMethod\n\t */\n\tpublic function getVoteOptionHash(): string {\n\t\treturn Hash::getOptionHash(\n\t\t\t$this->getPollId(),\n\t\t\t$this->getVoteOptionText(),\n\t\t);\n\t}\n\n\t/**\n\t * Get the hash for the vote option as stored in the database. This is used\n\t * to identify incorrect hashes stored in the db, because getVoteOptionHash()\n\t * which is generated from the option text and poll id.\n\t *\n\t * @psalm-suppress PossiblyUnusedMethod\n\t */\n\tpublic function getVoteOptionHashInDb(): string {\n\t\treturn $this->voteOptionHash;\n\t}"
+   ],
+   [
+    "code_observation",
+    "lib/Db/Vote.php",
+    4,
+    7,
+    "/**\n * SPDX-FileCopyrightText: 2017 Nextcloud contributors\n * SPDX-License-Identifier: AGPL-3.0-or-later\n */"
+   ],
+   [
+    "documentation",
+    "COPYING",
+    1,
+    2,
+    "                    GNU AFFERO GENERAL PUBLIC LICENSE\n                       Version 3, 19 November 2007"
+   ]
+  ],
+  "reference": {
+   "actions": [
+    {
+     "basis_ids": [
+      "b_req_poll_setup",
+      "b_design_option_ids",
+      "b_design_surfaces"
+     ],
+     "depends_on": [],
+     "effects": [
+      "A poll row is stored with status open and created_at set.",
+      "One option row per accepted label is stored with a stable poll-scoped id and display position.",
+      "A created event is appended and the poll becomes the active voting target."
+     ],
+     "failures": [
+      {
+       "condition": "Fewer than 2 or more than 8 options are submitted.",
+       "recovery": "Adjust the list to at least 2 and at most 8 labels and resubmit.",
+       "response": "Creation is rejected with an option-count message and nothing is stored."
+      },
+      {
+       "condition": "An option label is blank or duplicates another label after trimming and case folding.",
+       "recovery": "Rename or remove the duplicate or blank entry, then resubmit.",
+       "response": "Creation is rejected naming the offending label; no poll and no partial option set are stored."
+      },
+      {
+       "condition": "The question text is blank.",
+       "recovery": "Enter the dinner question and resubmit.",
+       "response": "Creation is rejected with a question-required message."
+      }
+     ],
+     "id": "create_poll",
+     "name": "Create dinner poll",
+     "object_ids": [
+      "poll",
+      "option"
+     ],
+     "preconditions": [
+      "The host has supplied a nonblank question and between 2 and 8 candidate place labels.",
+      "No other creation is mid-write on this device."
+     ],
+     "role_ids": [
+      "host"
+     ],
+     "rule_ids": [
+      "r_option_set",
+      "r_option_identity",
+      "r_role_separation"
+     ],
+     "surface_ids": [
+      "surf_setup"
+     ],
+     "transitions": [
+      {
+       "from_states": [
+        "absent"
+       ],
+       "object_id": "poll",
+       "to_state": "open"
+      },
+      {
+       "from_states": [
+        "absent"
+       ],
+       "object_id": "tally",
+       "to_state": "provisional"
+      }
+     ]
+    },
+    {
+     "basis_ids": [
+      "b_req_member_ballot",
+      "b_design_ballot",
+      "b_design_option_ids"
+     ],
+     "depends_on": [
+      "create_poll"
+     ],
+     "effects": [
+      "A ballot row is stored for the poll, code, and option with cast_at and revision 1.",
+      "The tally is recomputed and returned to the voting surface.",
+      "Total ballots increases by exactly one."
+     ],
+     "failures": [
+      {
+       "condition": "The poll is closed.",
+       "recovery": "Ask the host to reopen the poll, then submit again.",
+       "response": "The write is rejected with response poll_closed and no ballot row is created or changed."
+      },
+      {
+       "condition": "The option id is unknown or belongs to a different poll.",
+       "recovery": "Choose one of the options displayed for this poll.",
+       "response": "The write is rejected with option_not_in_poll and the tally is unchanged."
+      },
+      {
+       "condition": "The voter code is empty or whitespace only.",
+       "recovery": "Enter a nonblank personal code and submit again.",
+       "response": "The write is rejected with code_required and nothing is stored."
+      },
+      {
+       "condition": "A ballot already exists for this code on this poll.",
+       "recovery": "Use the change-vote action to move the existing ballot, or choose a different code.",
+       "response": "The submission is refused as duplicate_code and the existing ballot is left untouched."
+      }
+     ],
+     "id": "cast_vote",
+     "name": "Cast a ballot",
+     "object_ids": [
+      "ballot",
+      "poll",
+      "option"
+     ],
+     "preconditions": [
+      "The poll status is open.",
+      "The submitted voter code is nonblank after trimming.",
+      "The submitted option id belongs to this poll.",
+      "No ballot yet exists for this (poll id, voter code)."
+     ],
+     "role_ids": [
+      "member"
+     ],
+     "rule_ids": [
+      "r_one_ballot_per_code",
+      "r_option_membership",
+      "r_poll_isolation",
+      "r_closed_freeze",
+      "r_code_privacy"
+     ],
+     "surface_ids": [
+      "surf_vote"
+     ],
+     "transitions": [
+      {
+       "from_states": [
+        "absent"
+       ],
+       "object_id": "ballot",
+       "to_state": "cast"
+      }
+     ]
+    },
+    {
+     "basis_ids": [
+      "b_req_member_ballot",
+      "b_design_ballot",
+      "b_design_tie"
+     ],
+     "depends_on": [
+      "cast_vote"
+     ],
+     "effects": [
+      "The existing ballot's option is replaced in place and revision increments.",
+      "updated_at is refreshed while cast_at is retained.",
+      "The tally is recomputed and total ballots stays the same."
+     ],
+     "failures": [
+      {
+       "condition": "The poll is closed.",
+       "recovery": "Wait for the host to reopen the poll before changing the ballot.",
+       "response": "The change is rejected with response poll_closed and the ballot keeps its previous option."
+      },
+      {
+       "condition": "No ballot exists for the submitted code on this poll.",
+       "recovery": "Use the cast-vote action to create the first ballot for that code.",
+       "response": "The change is rejected as no_ballot_for_code and no row is written."
+      },
+      {
+       "condition": "The new option belongs to a different poll or no longer exists.",
+       "recovery": "Select an option shown for the current poll.",
+       "response": "The change is rejected with option_not_in_poll and the ballot is unchanged."
+      }
+     ],
+     "id": "change_vote",
+     "name": "Change own ballot",
+     "object_ids": [
+      "ballot",
+      "poll",
+      "option"
+     ],
+     "preconditions": [
+      "The poll status is open.",
+      "A ballot exists for the submitted voter code on this poll.",
+      "The newly submitted option id belongs to this poll."
+     ],
+     "role_ids": [
+      "member"
+     ],
+     "rule_ids": [
+      "r_one_ballot_per_code",
+      "r_option_membership",
+      "r_poll_isolation",
+      "r_closed_freeze",
+      "r_code_privacy"
+     ],
+     "surface_ids": [
+      "surf_vote"
+     ],
+     "transitions": [
+      {
+       "from_states": [
+        "cast"
+       ],
+       "object_id": "ballot",
+       "to_state": "cast"
+      }
+     ]
+    },
+    {
+     "basis_ids": [
+      "b_req_close",
+      "b_design_close",
+      "b_up_expiry"
+     ],
+     "depends_on": [
+      "create_poll"
+     ],
+     "effects": [
+      "Poll status becomes closed and closed_at is set.",
+      "A closed event is appended.",
+      "The tally becomes final and its current counts are preserved."
+     ],
+     "failures": [
+      {
+       "condition": "The poll is already closed.",
+       "recovery": "Reopen the poll first if voting must continue.",
+       "response": "The close is rejected as already_closed and no duplicate event is written."
+      },
+      {
+       "condition": "The caller is a member rather than the host.",
+       "recovery": "Ask the host to perform the close.",
+       "response": "The close is rejected as not_host and the poll stays open."
+      }
+     ],
+     "id": "close_poll",
+     "name": "Close the poll",
+     "object_ids": [
+      "poll",
+      "poll_event",
+      "tally"
+     ],
+     "preconditions": [
+      "The caller is the host for this poll.",
+      "The poll status is open."
+     ],
+     "role_ids": [
+      "host"
+     ],
+     "rule_ids": [
+      "r_closed_freeze",
+      "r_role_separation",
+      "r_tally_derived"
+     ],
+     "surface_ids": [
+      "surf_host_console"
+     ],
+     "transitions": [
+      {
+       "from_states": [
+        "open"
+       ],
+       "object_id": "poll",
+       "to_state": "closed"
+      },
+      {
+       "from_states": [
+        "provisional"
+       ],
+       "object_id": "tally",
+       "to_state": "final"
+      }
+     ]
+    },
+    {
+     "basis_ids": [
+      "b_req_close",
+      "b_design_close",
+      "b_unknown_reopen"
+     ],
+     "depends_on": [
+      "close_poll"
+     ],
+     "effects": [
+      "Poll status becomes open again, closed_at is cleared, and reopen_count increments.",
+      "A reopened event is appended.",
+      "All existing ballots remain untouched and the tally returns to provisional with the same counts."
+     ],
+     "failures": [
+      {
+       "condition": "The poll is already open.",
+       "recovery": "Proceed with voting; no reopen is needed.",
+       "response": "The reopen is rejected as already_open and nothing changes."
+      },
+      {
+       "condition": "The caller is a member rather than the host.",
+       "recovery": "Ask the host to reopen the poll.",
+       "response": "The reopen is rejected as not_host and the poll stays closed."
+      }
+     ],
+     "id": "reopen_poll",
+     "name": "Reopen the poll",
+     "object_ids": [
+      "poll",
+      "poll_event",
+      "ballot",
+      "tally"
+     ],
+     "preconditions": [
+      "The caller is the host for this poll.",
+      "The poll status is closed."
+     ],
+     "role_ids": [
+      "host"
+     ],
+     "rule_ids": [
+      "r_reopen_preserves",
+      "r_role_separation",
+      "r_closed_freeze"
+     ],
+     "surface_ids": [
+      "surf_host_console"
+     ],
+     "transitions": [
+      {
+       "from_states": [
+        "closed"
+       ],
+       "object_id": "poll",
+       "to_state": "open"
+      },
+      {
+       "from_states": [
+        "final"
+       ],
+       "object_id": "tally",
+       "to_state": "provisional"
+      }
+     ]
+    },
+    {
+     "basis_ids": [
+      "b_req_tally",
+      "b_req_durable_tie",
+      "b_design_tie",
+      "b_design_store"
+     ],
+     "depends_on": [
+      "create_poll"
+     ],
+     "effects": [
+      "Per-option counts are recomputed from stored ballots, including zero-count options.",
+      "total_ballots is reported alongside the counts and the tie set is computed from the highest count.",
+      "No code-to-choice mapping is exposed to members."
+     ],
+     "failures": [
+      {
+       "condition": "The poll id does not exist in the local store.",
+       "recovery": "Return to the setup surface or choose an existing poll.",
+       "response": "The read returns poll_not_found and no counts are shown."
+      },
+      {
+       "condition": "The store cannot be read or parsed.",
+       "recovery": "Inspect the local store file, restore from the last intact state, or recreate the poll; the application must not overwrite the unreadable file silently.",
+       "response": "The read returns store_unreadable and the surface shows an error state without inventing counts."
+      }
+     ],
+     "id": "view_tally",
+     "name": "Read the aggregate",
+     "object_ids": [
+      "tally",
+      "ballot",
+      "poll",
+      "option"
+     ],
+     "preconditions": [
+      "The poll exists and its store is readable.",
+      "The caller is the host or a member of this poll."
+     ],
+     "role_ids": [
+      "host",
+      "member"
+     ],
+     "rule_ids": [
+      "r_tally_derived",
+      "r_poll_isolation",
+      "r_code_privacy",
+      "r_durable_store"
+     ],
+     "surface_ids": [
+      "surf_vote",
+      "surf_host_console",
+      "surf_results"
+     ],
+     "transitions": []
+    }
+   ],
+   "assertions": [
+    {
+     "action_ids": [
+      "cast_vote",
+      "view_tally"
+     ],
+     "given": "A poll in open status has options A and B and no ballots.",
+     "id": "a_two_voters",
+     "journey_ids": [
+      "j_vote"
+     ],
+     "negative": "If the second submission reused ana as the code it must not add a ballot; the total would remain 1 with A=1 and B=0, never 2.",
+     "rule_ids": [
+      "r_one_ballot_per_code",
+      "r_tally_derived"
+     ],
+     "then": "The tally reports A=1, B=1, total=2, and each code appears in exactly one stored ballot.",
+     "when": "Member ana submits a ballot for A and member bo submits a ballot for B on the same device."
+    },
+    {
+     "action_ids": [
+      "change_vote",
+      "view_tally"
+     ],
+     "given": "The poll has ballots ana to A and bo to B with total 2.",
+     "id": "a_change_keeps_total",
+     "journey_ids": [
+      "j_vote"
+     ],
+     "negative": "If a replacement appended a second row the total would read 3 or A would still show 1; both are wrong.",
+     "rule_ids": [
+      "r_one_ballot_per_code",
+      "r_tally_derived"
+     ],
+     "then": "Exactly one ana ballot remains, now on B, and the tally reads A=0, B=2, total=2.",
+     "when": "Member ana re-submits with the same code ana, choosing B."
+    },
+    {
+     "action_ids": [
+      "close_poll",
+      "cast_vote",
+      "change_vote",
+      "view_tally"
+     ],
+     "given": "A poll with total 2 is in open status.",
+     "id": "a_closed_rejects",
+     "journey_ids": [
+      "j_close_reopen"
+     ],
+     "negative": "A closed poll that stored the write, dropped a prior ballot, or altered the aggregate would break the freeze.",
+     "rule_ids": [
+      "r_closed_freeze",
+      "r_tally_derived"
+     ],
+     "then": "Each write is rejected with response poll_closed and the tally remains total 2 with identical per-option counts.",
+     "when": "The host closes it and a member then submits a new ballot or changes an existing one."
+    },
+    {
+     "action_ids": [
+      "reopen_poll",
+      "cast_vote",
+      "view_tally"
+     ],
+     "given": "A closed poll holds ballots A=1 and B=1, total 2.",
+     "id": "a_reopen_admits_third",
+     "journey_ids": [
+      "j_close_reopen"
+     ],
+     "negative": "If reopening cleared ballots or added a second ballot for an existing code the total would not be 3 with those per-option counts.",
+     "rule_ids": [
+      "r_reopen_preserves",
+      "r_one_ballot_per_code"
+     ],
+     "then": "Status is open, both prior ballots are intact, and the tally reads A=2, B=1, total=3.",
+     "when": "The host reopens the poll and member cy votes for A."
+    },
+    {
+     "action_ids": [
+      "cast_vote",
+      "view_tally"
+     ],
+     "given": "Poll P1 has options A and B and poll P2 has options C and D.",
+     "id": "a_option_belongs_to_poll",
+     "journey_ids": [
+      "j_vote"
+     ],
+     "negative": "Accepting the foreign option would create a phantom row in P1 or leak P2's totals into P1.",
+     "rule_ids": [
+      "r_option_membership",
+      "r_poll_isolation"
+     ],
+     "then": "The P1 submission is rejected as option_not_in_poll, P1's tally is unchanged, and P2's ballot counts only in P2.",
+     "when": "A ballot for P1 is submitted using P2's option C, and separately a ballot for P2 uses D."
+    },
+    {
+     "action_ids": [
+      "create_poll"
+     ],
+     "given": "The host is on the setup surface with a nonblank question.",
+     "id": "a_duplicate_and_blank_options",
+     "journey_ids": [
+      "j_create"
+     ],
+     "negative": "A stored set with an empty or indistinguishable label would make later ballots and counts ambiguous.",
+     "rule_ids": [
+      "r_option_identity"
+     ],
+     "then": "Creation is rejected, the offending label is identified, and no poll or option row is stored.",
+     "when": "The host submits labels that include a blank entry or two labels equal after trimming and case folding, such as Pizza and pizza."
+    },
+    {
+     "action_ids": [
+      "create_poll"
+     ],
+     "given": "The host is on the setup surface with a nonblank question.",
+     "id": "a_option_bounds",
+     "journey_ids": [
+      "j_create"
+     ],
+     "negative": "Accepting 1 option leaves nothing to choose between and accepting 9 exceeds the stated instrument size; neither may be stored.",
+     "rule_ids": [
+      "r_option_set"
+     ],
+     "then": "The 1-option and 9-option submissions are rejected with an option-count message, while the 3-label submission creates an open poll.",
+     "when": "The host submits 1 option, then 9 options, then a set of 3 distinct labels."
+    },
+    {
+     "action_ids": [
+      "cast_vote"
+     ],
+     "given": "The poll is open and no ballot exists for the entered code.",
+     "id": "a_blank_code_rejected",
+     "journey_ids": [
+      "j_vote"
+     ],
+     "negative": "Accepting blank codes would collapse different members into one anonymous ballot and undercount the group.",
+     "rule_ids": [
+      "r_one_ballot_per_code"
+     ],
+     "then": "The write is rejected as code_required, no ballot is stored, and the tally is unchanged.",
+     "when": "A member submits a choice with an empty or whitespace-only code."
+    },
+    {
+     "action_ids": [
+      "view_tally"
+     ],
+     "given": "A poll has options and several ballots and the tally has been read once.",
+     "id": "a_persistence",
+     "journey_ids": [
+      "j_durable_tie"
+     ],
+     "negative": "If the store were re-initialized, partially written, or a ballot replayed on start, counts would change or double.",
+     "rule_ids": [
+      "r_durable_store",
+      "r_tally_derived"
+     ],
+     "then": "The poll reloads with the same status, the same option set, the same per-option counts and total, and no duplicated or replayed ballot.",
+     "when": "The page is refreshed and the process is stopped and started again in the same application directory."
+    },
+    {
+     "action_ids": [
+      "view_tally"
+     ],
+     "given": "A poll holds an equal split such as A=2 and B=2, or any shared highest count.",
+     "id": "a_tie_displayed",
+     "journey_ids": [
+      "j_durable_tie"
+     ],
+     "negative": "Naming the first or last option as winner, or hiding one tied option, misreports the group's answer.",
+     "rule_ids": [
+      "r_tally_derived"
+     ],
+     "then": "Both options show the equal count and the view states that the result is a tie, listing every tied option and naming no winner.",
+     "when": "The tally is displayed."
+    },
+    {
+     "action_ids": [
+      "view_tally"
+     ],
+     "given": "Any stored ballot set exists for a poll with zero-count options.",
+     "id": "a_tally_arithmetic",
+     "journey_ids": [
+      "j_vote"
+     ],
+     "negative": "A total larger than the number of distinct codes, or a tally that omits zero-count options or borrows another poll's options, is invalid.",
+     "rule_ids": [
+      "r_tally_derived",
+      "r_poll_isolation"
+     ],
+     "then": "The sum of per-option counts equals the number of distinct stored codes, every row corresponds to an option of this poll, and zero-count options are shown as 0.",
+     "when": "The aggregate is read."
+    },
+    {
+     "action_ids": [
+      "change_vote",
+      "close_poll"
+     ],
+     "given": "A closed poll holds a ballot for code ana on option A.",
+     "id": "a_closed_change_rejected",
+     "journey_ids": [
+      "j_close_reopen"
+     ],
+     "negative": "Letting an existing voter move a vote after close would change a result the host declared final.",
+     "rule_ids": [
+      "r_closed_freeze",
+      "r_one_ballot_per_code"
+     ],
+     "then": "The change is rejected with poll_closed, ana's ballot keeps A, and the aggregate is unchanged.",
+     "when": "Ana re-submits with the same code choosing B."
+    },
+    {
+     "action_ids": [
+      "close_poll",
+      "reopen_poll"
+     ],
+     "given": "A poll is closed with two ballots and a member is using the console surface.",
+     "id": "a_host_only_lifecycle",
+     "journey_ids": [
+      "j_close_reopen"
+     ],
+     "negative": "If a member could reopen, or if reopening dropped ballots, control and aggregate integrity would both fail.",
+     "rule_ids": [
+      "r_role_separation",
+      "r_reopen_preserves"
+     ],
+     "then": "The member's attempts are rejected as not_host, while the host's reopen appends a reopened event, keeps both ballots, and returns status open.",
+     "when": "The member attempts to close and then reopen the poll, after which the host reopens it."
+    },
+    {
+     "action_ids": [
+      "view_tally"
+     ],
+     "given": "Member ana has voted and opens the voting surface again.",
+     "id": "a_member_sees_aggregate_only",
+     "journey_ids": [
+      "j_vote"
+     ],
+     "negative": "Showing other codes next to their choices would expose individual ballots that the aggregate does not require.",
+     "rule_ids": [
+      "r_code_privacy",
+      "r_tally_derived"
+     ],
+     "then": "Per-option counts and the total are visible, while no other member's code is paired with a choice anywhere on the surface.",
+     "when": "The tally is rendered for ana."
+    }
+   ],
+   "basis": [
+    {
+     "depends_on": [],
+     "id": "b_req_poll_setup",
+     "kind": "requirement",
+     "source_ids": [
+      "scenario",
+      "flow-1",
+      "leaf-definition"
+     ],
+     "statement": "The host creates one dinner question with a fixed set of 2-8 place options before voting starts."
+    },
+    {
+     "depends_on": [],
+     "id": "b_req_member_ballot",
+     "kind": "requirement",
+     "source_ids": [
+      "scenario",
+      "flow-2",
+      "flow-3",
+      "leaf-definition"
+     ],
+     "statement": "Members vote on the same device under a self-chosen code, one option per person, and re-submitting with the same code replaces the earlier choice so the person still holds exactly one vote."
+    },
+    {
+     "depends_on": [],
+     "id": "b_req_tally",
+     "kind": "requirement",
+     "source_ids": [
+      "scenario"
+     ],
+     "statement": "A per-option tally is the visible deliverable, with a total that stays at 2 when two members choose different options and 2 again after one changes vote."
+    },
+    {
+     "depends_on": [],
+     "id": "b_req_close",
+     "kind": "requirement",
+     "source_ids": [
+      "scenario",
+      "flow-4"
+     ],
+     "statement": "The host can close the poll, after which further votes return poll_closed and the stored result is unchanged, and can reopen it so a third member can vote for a total of 3."
+    },
+    {
+     "depends_on": [],
+     "id": "b_req_option_integrity",
+     "kind": "requirement",
+     "source_ids": [
+      "scenario"
+     ],
+     "statement": "A vote option must belong to the poll being voted on, duplicate and empty option labels and empty codes must be rejected, and votes from different polls must never merge."
+    },
+    {
+     "depends_on": [],
+     "id": "b_req_durable_tie",
+     "kind": "requirement",
+     "source_ids": [
+      "scenario",
+      "flow-5"
+     ],
+     "statement": "Poll state and aggregate survive a page refresh and a process restart in the same directory, and a tie is displayed as a tie rather than resolved by an arbitrary winner."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_nextcloud_app",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-2"
+     ],
+     "statement": "The upstream product is a Nextcloud server application in PHP and JS/Vue, positioned as a free meeting-schedule tool similar to Doodle rather than a standalone same-device poll page."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_poll_types",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-3"
+     ],
+     "statement": "The poll entity declares only datePoll and textPoll types plus a simple voting variant, oriented to date or text option scheduling rather than a generic single-choice question."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_vote_answers",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-3",
+      "source-4"
+     ],
+     "statement": "A vote is stored per option as yes, no, or maybe, and the poll carries allowMaybe, useNo, and result-visibility settings that govern those answer modes."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_vote_binding",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-3",
+      "source-4"
+     ],
+     "statement": "Vote rows are soft-deleted records carrying poll id, user id, option id, an option text snapshot, an option hash, and an answer, so a vote is bound to a poll and an option record rather than to free text."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_hash",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-4"
+     ],
+     "statement": "Option identity in the vote is cryptographically derived from the poll id plus the option text, and a separate accessor exposes the stored hash so text and hash mismatches can be detected."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_expiry",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-3"
+     ],
+     "statement": "Poll lifecycle is driven by an integer expiry timestamp: a poll is expired when expire is greater than zero and less than now, and voting is denied while expired; no explicit open or closed boolean or reopen field appears."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_archive",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-3"
+     ],
+     "statement": "Archival is separate from closing: a deleted timestamp marks the poll archived, and the status payload distinguishes archived from expired."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_results_visibility",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-3"
+     ],
+     "statement": "Result visibility is a three-way setting of always, closed, or never; editors always see results, participants see them per the setting, and the legacy value expired is mapped to closed."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_identity",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-3",
+      "source-4"
+     ],
+     "statement": "Participation identity is a Nextcloud user identity: polls store an owner id, votes store a user id, and voting is restricted to external, user, or admin user types."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_anonymity",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-3"
+     ],
+     "statement": "Anonymity is a poll setting with a lockable state: a negative anonymous value means real anonymous and cannot be changed back."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_roles_permissions",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-3"
+     ],
+     "statement": "Access is private or open, roles include owner, admin, user, email, contact, external, and none, and more than twenty named permissions cover edit, vote, results, usernames, options, comments, sharing, download, deanonymization, and changing foreign votes."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_foreign_votes",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-3"
+     ],
+     "statement": "Changing another participant's votes and deanonymizing are separately gated privileges tied to edit rights, an unrestricted poll owner, and an unlocked anonymity setting."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_proposals",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-3"
+     ],
+     "statement": "Participant option creation is a proposal mode of disallow, allow, or review with an optional proposal expiry, and public shares are barred from adding options."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_vote_limits",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-2",
+      "source-3"
+     ],
+     "statement": "Vote volume controls exist as maxVotesPerUser and maxVotesPerOption, limits on votes rather than on the number of poll options."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_clone_delete",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-3"
+     ],
+     "statement": "Cloning produces a private, deanonymized copy titled Clone of ... with settings carried over and no votes, and deletion supports an auto-delete offset in days."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_readme_caps",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-2"
+     ],
+     "statement": "Documented capabilities include hiding results, obfuscating names, automatic expiry, participant-added options, per-option and per-user vote limits, invitations, spreadsheet or HTML export, reminders, comments, confirming options after closing, notifications, calendar conflict hints, and a REST API."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_not_maintained",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-2"
+     ],
+     "statement": "The README states the app is not maintained by Nextcloud despite living in the Nextcloud GitHub organisation, and its screenshots describe managing and creating polls, many configuration options, sharing a poll, and voting on mobile."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_license",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-1",
+      "source-3",
+      "source-4"
+     ],
+     "statement": "Licensing is GNU AGPL version 3 in COPYING with AGPL-3.0-or-later SPDX headers in the PHP files, recorded as fixed_notice_located_spdx_not_independently_verified."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_not_run",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-1",
+      "source-2",
+      "source-3",
+      "source-4"
+     ],
+     "statement": "Upstream was not executed: the snapshot records upstream_status not_run, so all upstream statements are static readings of four pinned files rather than observed behavior."
+    },
+    {
+     "depends_on": [],
+     "id": "b_up_inventory",
+     "kind": "upstream_observation",
+     "source_ids": [
+      "source-1",
+      "source-2",
+      "source-3",
+      "source-4"
+     ],
+     "statement": "The supplied upstream inventory is only COPYING, README.md, lib/Db/Poll.php, and lib/Db/Vote.php; routing, controllers, services, mappers, migrations, and frontend are absent."
+    },
+    {
+     "depends_on": [
+      "b_req_close",
+      "b_up_expiry"
+     ],
+     "id": "b_design_close",
+     "kind": "design_inference",
+     "source_ids": [
+      "scenario",
+      "flow-4"
+     ],
+     "statement": "Model closing and reopening as explicit host-owned poll status transitions with recorded events, instead of reusing an expiry timestamp as the only way to stop voting, so a closed poll rejects writes with poll_closed and a reopened poll accepts new voters."
+    },
+    {
+     "depends_on": [
+      "b_req_member_ballot",
+      "b_up_vote_answers"
+     ],
+     "id": "b_design_ballot",
+     "kind": "design_inference",
+     "source_ids": [
+      "scenario",
+      "flow-2",
+      "flow-3"
+     ],
+     "statement": "Represent a ballot as poll id plus pseudonym code plus one option id with uniqueness on poll id and code, so re-voting replaces the ballot and the aggregate is recomputed from ballots."
+    },
+    {
+     "depends_on": [
+      "b_req_option_integrity",
+      "b_up_hash"
+     ],
+     "id": "b_design_option_ids",
+     "kind": "design_inference",
+     "source_ids": [
+      "scenario"
+     ],
+     "statement": "Give options stable poll-scoped ids, validate that a ballot's option belongs to the same poll, and reject duplicate or empty option labels at creation."
+    },
+    {
+     "depends_on": [
+      "b_req_durable_tie"
+     ],
+     "id": "b_design_store",
+     "kind": "design_inference",
+     "source_ids": [
+      "scenario",
+      "flow-5"
+     ],
+     "statement": "Use one durable local store in the application directory with atomic writes and derive totals from stored ballots on load, so refresh and same-directory restart reproduce identical state."
+    },
+    {
+     "depends_on": [
+      "b_req_durable_tie"
+     ],
+     "id": "b_design_tie",
+     "kind": "design_inference",
+     "source_ids": [
+      "scenario"
+     ],
+     "statement": "Display ties as equal counts with every tied option listed, no winner designation, and no synthesized tiebreaker."
+    },
+    {
+     "depends_on": [
+      "b_req_poll_setup",
+      "b_req_member_ballot"
+     ],
+     "id": "b_design_surfaces",
+     "kind": "design_inference",
+     "source_ids": [
+      "scenario",
+      "leaf-definition"
+     ],
+     "statement": "Separate a host setup and control surface from a member voting and result surface, both usable sequentially on one device without per-member accounts."
+    },
+    {
+     "depends_on": [
+      "b_up_readme_caps",
+      "b_up_roles_permissions",
+      "b_up_not_maintained"
+     ],
+     "id": "b_design_scope",
+     "kind": "design_inference",
+     "source_ids": [
+      "scenario"
+     ],
+     "statement": "Borrow upstream configurability only where it maps to this scenario, such as result visibility and one-vote-per-person enforcement, and leave out accounts, shares, groups, REST API, reminders, comments, calendar integration, anonymity machinery, and option proposals."
+    },
+    {
+     "depends_on": [],
+     "id": "b_unknown_tally",
+     "kind": "unknown",
+     "source_ids": [
+      "source-3",
+      "source-4"
+     ],
+     "statement": "How the upstream aggregate is computed and displayed, including counts, percentages, charts, total participants, and tie presentation, cannot be determined because no tally, mapper, controller, or frontend file is in the supplied inventory."
+    },
+    {
+     "depends_on": [],
+     "id": "b_unknown_reopen",
+     "kind": "unknown",
+     "source_ids": [
+      "source-3"
+     ],
+     "statement": "Upstream reopen-after-close behavior is unknown; the supplied entity exposes only expire and deleted, and no reopen action was read."
+    },
+    {
+     "depends_on": [],
+     "id": "b_unknown_same_device",
+     "kind": "unknown",
+     "source_ids": [
+      "source-3"
+     ],
+     "statement": "Whether upstream supports same-device sequential voting under self-declared pseudonyms without accounts is unknown and is contradicted by the user-type gate on voting."
+    },
+    {
+     "depends_on": [],
+     "id": "b_unknown_validation",
+     "kind": "unknown",
+     "source_ids": [
+      "source-3",
+      "source-4"
+     ],
+     "statement": "Upstream rejection of duplicate option labels, empty option labels, or empty participant identifiers is not evidenced in the supplied files."
+    },
+    {
+     "depends_on": [],
+     "id": "b_unknown_option_limit",
+     "kind": "unknown",
+     "source_ids": [
+      "source-2",
+      "source-3"
+     ],
+     "statement": "No upstream rule limiting a poll to 2-8 options was found; the discovered limits apply to votes per user and votes per option."
+    },
+    {
+     "depends_on": [],
+     "id": "b_unknown_runtime",
+     "kind": "unknown",
+     "source_ids": [
+      "source-1",
+      "source-2",
+      "source-3",
+      "source-4"
+     ],
+     "statement": "Runtime behavior, persistence across restarts, and any error code such as poll_closed were neither executed nor observed upstream because upstream_status is not_run."
+    }
+   ],
+   "gaps": [
+    {
+     "action_ids": [
+      "view_tally"
+     ],
+     "core": false,
+     "id": "g_upstream_tally",
+     "resolution": "Not blocking: this reference defines the aggregate as per-option counts plus total recomputed from ballots. Upstream tally behavior remains unverified and is not claimed.",
+     "statement": "No upstream aggregation, tally, results view, percentage, chart, or total-participant implementation was supplied, so upstream display behavior is unknown."
+    },
+    {
+     "action_ids": [
+      "close_poll",
+      "reopen_poll"
+     ],
+     "core": false,
+     "id": "g_upstream_reopen",
+     "resolution": "Resolved by design inference b_design_close: this product uses explicit close and reopen status transitions with recorded events. Upstream reopen remains unknown.",
+     "statement": "Upstream stopping votes depends on an expiry timestamp and no explicit closed flag or reopen operation was read."
+    },
+    {
+     "action_ids": [
+      "cast_vote",
+      "change_vote"
+     ],
+     "core": false,
+     "id": "g_upstream_same_device",
+     "resolution": "Resolved for this product by design inference b_design_ballot and rule r_one_ballot_per_code. This is a deliberate departure from upstream, not an upstream observation.",
+     "statement": "No upstream evidence supports accountless same-device sequential pseudonymous voting, and the voting gate requires an external, user, or admin identity."
+    },
+    {
+     "action_ids": [
+      "create_poll",
+      "cast_vote"
+     ],
+     "core": false,
+     "id": "g_upstream_validation",
+     "resolution": "Resolved for this product by rules r_option_identity, r_option_membership, and r_one_ballot_per_code; upstream behavior stays unknown.",
+     "statement": "Upstream validation of duplicate labels, empty labels, empty voter identifiers, and option-to-poll membership at write time is not present in the supplied entity files."
+    },
+    {
+     "action_ids": [
+      "create_poll"
+     ],
+     "core": false,
+     "id": "g_upstream_option_ceiling",
+     "resolution": "The 2-8 ceiling is a product requirement from the scenario, not an upstream fact; it is stated in rule r_option_set.",
+     "statement": "No upstream 2-8 option-count constraint was found; only vote limits per user and per option are evidenced."
+    },
+    {
+     "action_ids": [
+      "view_tally"
+     ],
+     "core": false,
+     "id": "g_runtime_persistence",
+     "resolution": "Specified by rule r_durable_store and design inference b_design_store; acceptance of the built application must verify it. No runtime result is claimed here.",
+     "statement": "Durability across refresh or process restart was neither tested nor evidenced for upstream, and no execution of this product occurred at authoring time."
+    },
+    {
+     "action_ids": [],
+     "core": false,
+     "id": "g_upstream_license",
+     "resolution": "Recorded as an evidence limitation; it does not affect product behavior in this reference.",
+     "statement": "License status is fixed_notice_located_spdx_not_independently_verified; COPYING matches AGPL-3.0 and file headers declare AGPL-3.0-or-later, but no independent SPDX verification or packaging check was performed."
+    },
+    {
+     "action_ids": [
+      "create_poll",
+      "cast_vote"
+     ],
+     "core": false,
+     "id": "g_option_editing",
+     "resolution": "This reference fixes the option set at creation and treats any later mutation as out of scope; a future slice would need explicit rules for ballots pointing at changed or removed options.",
+     "statement": "Whether the host may edit, reorder, or delete options after voting has started is not specified by the scenario, and upstream option mutation code was not supplied."
+    },
+    {
+     "action_ids": [
+      "cast_vote",
+      "change_vote"
+     ],
+     "core": false,
+     "id": "g_code_collision",
+     "resolution": "Resolved by treating the code as the ballot identity key: submission with an existing code is a replacement, never a second ballot. Optional scope option s_code_confirmation makes the collision visible; no silent merge of two people's intents is modeled.",
+     "statement": "The scenario does not say what happens when two different members choose the same pseudonym code on the shared device."
+    },
+    {
+     "action_ids": [
+      "view_tally"
+     ],
+     "core": false,
+     "id": "g_visibility_default",
+     "resolution": "This reference shows the aggregate to both roles at all times; optional scope option s_hide_results_until_close adds a host visibility setting if a later revision needs one.",
+     "statement": "The scenario does not state whether members may see the running tally before the poll closes, although the member workflow includes reading the summary."
+    },
+    {
+     "action_ids": [],
+     "core": false,
+     "id": "g_no_upstream_execution",
+     "resolution": "All runtime claims in this reference are design requirements to be verified during development, not observations. Status remains not_run.",
+     "statement": "Upstream was not executed and no application runtime was executed; every upstream statement is a static reading of four pinned files."
+    }
+   ],
+   "journeys": [
+    {
+     "completion": "The poll exists in open status and every option has a stable id usable by ballots.",
+     "goal": "Produce an open poll with a question and a valid fixed option set ready for the first voter.",
+     "id": "j_create",
+     "name": "Host sets up the dinner poll",
+     "recovery": "On a validation failure the host corrects the option count or labels and resubmits; because creation is atomic, no partial poll or option set remains.",
+     "role_ids": [
+      "host"
+     ],
+     "steps": [
+      {
+       "action_id": "create_poll",
+       "role_id": "host",
+       "success": "The poll is stored as open with 2-8 distinct options and a created event, and the voting surface becomes available.",
+       "surface_id": "surf_setup"
+      }
+     ]
+    },
+    {
+     "completion": "Two distinct codes hold two ballots, the changed ballot replaced rather than added, and the total remains 2.",
+     "goal": "Collect one ballot per member on a shared device and keep the total stable when a member changes their choice.",
+     "id": "j_vote",
+     "name": "Two members vote and one changes their mind",
+     "recovery": "If a member forgets their code they would create a new ballot under a new code; the surface keeps the last entered code visible to reduce that mistake and re-submission with the same code always replaces.",
+     "role_ids": [
+      "member"
+     ],
+     "steps": [
+      {
+       "action_id": "cast_vote",
+       "role_id": "member",
+       "success": "Member ana's ballot for option A is stored and the tally shows total 1.",
+       "surface_id": "surf_vote"
+      },
+      {
+       "action_id": "cast_vote",
+       "role_id": "member",
+       "success": "Member bo's ballot for option B is stored and the tally shows A=1, B=1, total 2.",
+       "surface_id": "surf_vote"
+      },
+      {
+       "action_id": "view_tally",
+       "role_id": "member",
+       "success": "The aggregate is visible as A=1, B=1, total 2.",
+       "surface_id": "surf_vote"
+      },
+      {
+       "action_id": "change_vote",
+       "role_id": "member",
+       "success": "Ana re-submits with code ana for B and the tally becomes A=0, B=2, total 2.",
+       "surface_id": "surf_vote"
+      }
+     ]
+    },
+    {
+     "completion": "The close genuinely freezes writes, the reopen restores voting without clearing history, and the final total is 3.",
+     "goal": "Stop all writes at close, prove the aggregate is frozen, then admit a further voter after an explicit reopen.",
+     "id": "j_close_reopen",
+     "name": "Host freezes the result and later reopens",
+     "recovery": "A member whose write hit poll_closed waits for the host to reopen and submits again with the same code, so no duplicate ballot is created.",
+     "role_ids": [
+      "host",
+      "member"
+     ],
+     "steps": [
+      {
+       "action_id": "close_poll",
+       "role_id": "host",
+       "success": "Status becomes closed, a closed event is recorded, and the tally is final at total 2.",
+       "surface_id": "surf_host_console"
+      },
+      {
+       "action_id": "cast_vote",
+       "role_id": "member",
+       "success": "The attempt is rejected with poll_closed and the tally still shows total 2 with unchanged per-option counts.",
+       "surface_id": "surf_vote"
+      },
+      {
+       "action_id": "reopen_poll",
+       "role_id": "host",
+       "success": "Status returns to open, a reopened event is recorded, and both existing ballots remain.",
+       "surface_id": "surf_host_console"
+      },
+      {
+       "action_id": "cast_vote",
+       "role_id": "member",
+       "success": "A third member cy votes for A and the tally becomes total 3.",
+       "surface_id": "surf_vote"
+      },
+      {
+       "action_id": "view_tally",
+       "role_id": "host",
+       "success": "The result view shows the three-ballot aggregate with the prior ballots preserved.",
+       "surface_id": "surf_results"
+      }
+     ]
+    },
+    {
+     "completion": "State, options, ballots, and counts are identical across refresh and restart, and a tie is displayed as a tie.",
+     "goal": "Confirm the aggregate is derived from durable ballots and that an equal split is reported as a tie without a winner.",
+     "id": "j_durable_tie",
+     "name": "Aggregate survives refresh and restart, tie shown honestly",
+     "recovery": "If the store read fails the view states store_unreadable and does not fall back to zero counts or a fabricated winner; the host restores an intact store copy.",
+     "role_ids": [
+      "host",
+      "member"
+     ],
+     "steps": [
+      {
+       "action_id": "view_tally",
+       "role_id": "host",
+       "success": "Before reload the tally reports the recorded counts and total for the poll.",
+       "surface_id": "surf_results"
+      },
+      {
+       "action_id": "view_tally",
+       "role_id": "host",
+       "success": "After a page refresh and a same-directory process restart the same counts and total reappear with no duplicate ballots.",
+       "surface_id": "surf_results"
+      },
+      {
+       "action_id": "view_tally",
+       "role_id": "member",
+       "success": "When two options share the highest count the view lists both and states that the result is a tie, naming no winner.",
+       "surface_id": "surf_results"
+      }
+     ]
+    }
+   ],
+   "objects": [
+    {
+     "fields": [
+      {
+       "meaning": "Opaque identifier that scopes every option, ballot, event, and tally read for this question.",
+       "name": "id"
+      },
+      {
+       "meaning": "The single dinner question text shown to host and members.",
+       "name": "question"
+      },
+      {
+       "meaning": "Voting state: open accepts ballot writes, closed rejects them.",
+       "name": "status"
+      },
+      {
+       "meaning": "Number of predefined options, constrained to 2 through 8 at creation.",
+       "name": "option_count"
+      },
+      {
+       "meaning": "Timestamp when the host created the poll.",
+       "name": "created_at"
+      },
+      {
+       "meaning": "Timestamp of the most recent close, empty while the poll is open.",
+       "name": "closed_at"
+      },
+      {
+       "meaning": "How many times the host has reopened this poll, supporting the event history.",
+       "name": "reopen_count"
+      }
+     ],
+     "id": "poll",
+     "name": "Poll",
+     "relations": [
+      {
+       "meaning": "A poll owns its 2-8 options and no option exists without a poll.",
+       "object_id": "option"
+      },
+      {
+       "meaning": "A poll owns all ballots cast on it; ballots are readable only through their poll id.",
+       "object_id": "ballot"
+      },
+      {
+       "meaning": "A poll owns the created, closed, and reopened events that record its lifecycle.",
+       "object_id": "poll_event"
+      },
+      {
+       "meaning": "A poll has one derived aggregate recomputed from its ballots and options.",
+       "object_id": "tally"
+      }
+     ],
+     "states": [
+      "open",
+      "closed"
+     ]
+    },
+    {
+     "fields": [
+      {
+       "meaning": "Stable identifier unique within its poll, used by ballots instead of free text.",
+       "name": "id"
+      },
+      {
+       "meaning": "The poll that owns this option and bounds its use.",
+       "name": "poll_id"
+      },
+      {
+       "meaning": "The place name as the host entered it.",
+       "name": "label"
+      },
+      {
+       "meaning": "Trimmed, case-folded form used only for duplicate detection.",
+       "name": "normalized_label"
+      },
+      {
+       "meaning": "Display order in the option list and in the tally.",
+       "name": "position"
+      }
+     ],
+     "id": "option",
+     "name": "Place Option",
+     "relations": [
+      {
+       "meaning": "Each option belongs to exactly one poll.",
+       "object_id": "poll"
+      },
+      {
+       "meaning": "A ballot references one option of the same poll.",
+       "object_id": "ballot"
+      }
+     ],
+     "states": [
+      "listed"
+     ]
+    },
+    {
+     "fields": [
+      {
+       "meaning": "Storage identifier for the ballot row.",
+       "name": "id"
+      },
+      {
+       "meaning": "The poll this ballot counts toward.",
+       "name": "poll_id"
+      },
+      {
+       "meaning": "Self-chosen pseudonym entered on the shared device; nonblank and unique within the poll.",
+       "name": "voter_code"
+      },
+      {
+       "meaning": "The single option this member currently chooses.",
+       "name": "option_id"
+      },
+      {
+       "meaning": "When the ballot was first recorded for this code.",
+       "name": "cast_at"
+      },
+      {
+       "meaning": "When the ballot was last replaced.",
+       "name": "updated_at"
+      },
+      {
+       "meaning": "Counter incremented on each replacement so an overwrite is distinguishable from a fresh ballot.",
+       "name": "revision"
+      }
+     ],
+     "id": "ballot",
+     "name": "Ballot",
+     "relations": [
+      {
+       "meaning": "A ballot exists only inside one poll and is never shared across polls.",
+       "object_id": "poll"
+      },
+      {
+       "meaning": "The chosen option must belong to the same poll as the ballot.",
+       "object_id": "option"
+      }
+     ],
+     "states": [
+      "cast"
+     ]
+    },
+    {
+     "fields": [
+      {
+       "meaning": "Event identifier.",
+       "name": "id"
+      },
+      {
+       "meaning": "The poll whose lifecycle changed.",
+       "name": "poll_id"
+      },
+      {
+       "meaning": "One of created, closed, or reopened.",
+       "name": "type"
+      },
+      {
+       "meaning": "Timestamp of the transition.",
+       "name": "at"
+      },
+      {
+       "meaning": "The role that caused the transition, always host in this product.",
+       "name": "actor_role"
+      }
+     ],
+     "id": "poll_event",
+     "name": "Poll Lifecycle Event",
+     "relations": [
+      {
+       "meaning": "Events are append-only history for one poll and never outlive it.",
+       "object_id": "poll"
+      }
+     ],
+     "states": [
+      "recorded"
+     ]
+    },
+    {
+     "fields": [
+      {
+       "meaning": "The poll this aggregate describes.",
+       "name": "poll_id"
+      },
+      {
+       "meaning": "One non-negative count per option of the poll, including options with zero ballots.",
+       "name": "counts"
+      },
+      {
+       "meaning": "Number of distinct (poll, voter_code) ballots currently stored.",
+       "name": "total_ballots"
+      },
+      {
+       "meaning": "All options sharing the highest count when that highest count is shared, empty when there is a single leader.",
+       "name": "tied_option_ids"
+      },
+      {
+       "meaning": "Provisional while the poll is open, final while it is closed.",
+       "name": "status"
+      },
+      {
+       "meaning": "Timestamp of the read that produced this aggregate.",
+       "name": "computed_at"
+      }
+     ],
+     "id": "tally",
+     "name": "Vote Aggregate",
+     "relations": [
+      {
+       "meaning": "Exactly one aggregate belongs to each poll.",
+       "object_id": "poll"
+      },
+      {
+       "meaning": "Counts are derived from ballots and never edited independently.",
+       "object_id": "ballot"
+      },
+      {
+       "meaning": "Every row of the aggregate corresponds to an option of the same poll.",
+       "object_id": "option"
+      }
+     ],
+     "states": [
+      "provisional",
+      "final"
+     ]
+    }
+   ],
+   "product_shape": {
+    "audience": "A small group standing around one shared device deciding where to eat, plus one host who sets up and controls the poll; no accounts, invitations, or remote participants.",
+    "boundary": "One directory hosts one or more polls. Each poll is a question with a fixed set of 2-8 predefined place options, identified by a poll id that scopes its options, ballots, and aggregate. Members identify themselves only by a self-chosen pseudonym code at the moment of voting, hold exactly one ballot per poll, and may replace that ballot by re-submitting the same code. The host creates the poll, controls a single open/closed transition (with reopen), and reads the same aggregate as members. The tally is always computed from stored ballots, survives refresh and a same-directory process restart, and reports ties as ties.",
+    "delivery_profile": "Single-device browser application served from one application directory with a local durable store; host and member surfaces are used sequentially on the same screen; no server accounts, network distribution, or background services.",
+    "excluded": [
+     "Per-member accounts, login, passwords, email verification, or any remote identity provider",
+     "Share links, QR codes, embeds, chat or meeting-platform distribution, and multi-device concurrent access",
+     "Multiple questions per poll, survey batteries, and per-response processing workflows",
+     "Multiple-choice, rating, ranking, dot-voting, yes/no/maybe per option, and weighted vote semantics",
+     "Participant-added options, option editing or deletion after voting starts, and option proposal review",
+     "Comments, discussion threads, reminders, notifications, calendar conflict hints, and exports",
+     "Anonymity modes, obfuscated participant names, deanonymization, and who-voted-what listings",
+     "Per-user or per-option vote caps, automatic expiry dates, archival, cloning, and deletion workflows",
+     "REST API, admin dashboards across a workspace, and Nextcloud group or contact integration",
+     "Bot detection, CAPTCHA, address- or cookie-based duplicate voting, and vote tokens"
+    ],
+    "name": "Same-Device Dinner Poll",
+    "value": "The group gets one trustworthy per-option tally of a single dinner question, with one ballot per self-chosen code, a frozen result while closed, and a preserved aggregate across refresh and process restart."
+   },
+   "roles": [
+    {
+     "data_scope": "All poll configuration, the option set, aggregate counts and totals, poll status, and the close/reopen event log; no listing that maps other members' codes to their choices.",
+     "goal": "Pose one dinner question with a fixed option set, keep the poll open while the group votes, close it to freeze the result, and reopen it only when the group needs to continue.",
+     "id": "host",
+     "name": "Host"
+    },
+    {
+     "data_scope": "The question, the option set, the aggregate counts and total, and the state of their own ballot after entering their own code; other members' code-to-choice mappings are not exposed.",
+     "goal": "Express one place preference under a personal code, change that preference without gaining a second vote, and read the current aggregate.",
+     "id": "member",
+     "name": "Member"
+    }
+   ],
+   "rules": [
+    {
+     "basis_ids": [
+      "b_req_poll_setup",
+      "b_unknown_option_limit"
+     ],
+     "id": "r_option_set",
+     "object_ids": [
+      "poll",
+      "option"
+     ],
+     "statement": "A poll carries exactly one question and between 2 and 8 predefined options; a creation with fewer than 2 or more than 8 options fails and stores nothing."
+    },
+    {
+     "basis_ids": [
+      "b_req_option_integrity",
+      "b_design_option_ids"
+     ],
+     "id": "r_option_identity",
+     "object_ids": [
+      "option",
+      "poll"
+     ],
+     "statement": "Each option has a stable id scoped to its poll; labels are trimmed and case-folded for duplicate detection, and blank or duplicate labels are rejected before anything is stored."
+    },
+    {
+     "basis_ids": [
+      "b_req_member_ballot",
+      "b_design_ballot"
+     ],
+     "id": "r_one_ballot_per_code",
+     "object_ids": [
+      "ballot",
+      "poll"
+     ],
+     "statement": "A ballot is uniquely identified by poll id plus voter code; the code must be nonblank, and submitting again with the same code replaces that ballot instead of adding a second one."
+    },
+    {
+     "basis_ids": [
+      "b_req_option_integrity",
+      "b_design_option_ids"
+     ],
+     "id": "r_option_membership",
+     "object_ids": [
+      "ballot",
+      "option",
+      "poll"
+     ],
+     "statement": "A ballot's option must belong to the same poll as the ballot; an unknown option or an option from another poll is rejected and never recorded."
+    },
+    {
+     "basis_ids": [
+      "b_req_option_integrity",
+      "b_design_option_ids"
+     ],
+     "id": "r_poll_isolation",
+     "object_ids": [
+      "poll",
+      "option",
+      "ballot",
+      "tally"
+     ],
+     "statement": "All reads and writes are scoped by poll id, so options, ballots, and counts from different polls never mix and a foreign option cannot enter another poll's aggregate."
+    },
+    {
+     "basis_ids": [
+      "b_req_close",
+      "b_design_close"
+     ],
+     "id": "r_closed_freeze",
+     "object_ids": [
+      "poll",
+      "ballot",
+      "tally"
+     ],
+     "statement": "While a poll is closed, every ballot write, new or changed, is rejected with response poll_closed and the stored ballots and aggregate remain unchanged."
+    },
+    {
+     "basis_ids": [
+      "b_req_close",
+      "b_design_close"
+     ],
+     "id": "r_reopen_preserves",
+     "object_ids": [
+      "poll",
+      "poll_event",
+      "ballot",
+      "tally"
+     ],
+     "statement": "Reopening sets the poll back to open, appends a reopened event, keeps every existing ballot, and admits new codes and replacements under the same open-poll rules."
+    },
+    {
+     "basis_ids": [
+      "b_req_tally",
+      "b_req_durable_tie",
+      "b_design_tie"
+     ],
+     "id": "r_tally_derived",
+     "object_ids": [
+      "tally",
+      "ballot",
+      "option"
+     ],
+     "statement": "The aggregate is recomputed from stored ballots on every read: one count per option including zeros, a total equal to the number of distinct codes, and all options sharing the highest count reported as tied with no winner field."
+    },
+    {
+     "basis_ids": [
+      "b_req_durable_tie",
+      "b_design_store"
+     ],
+     "id": "r_durable_store",
+     "object_ids": [
+      "poll",
+      "option",
+      "ballot",
+      "poll_event",
+      "tally"
+     ],
+     "statement": "Poll state, options, ballots, and lifecycle events live in one local store inside the application directory, written atomically and reloaded at start, so refresh and same-directory process restart reproduce the same status and aggregate."
+    },
+    {
+     "basis_ids": [
+      "b_req_poll_setup",
+      "b_req_close",
+      "b_design_surfaces"
+     ],
+     "id": "r_role_separation",
+     "object_ids": [
+      "poll",
+      "ballot"
+     ],
+     "statement": "Only the host may create a poll, close it, and reopen it; members may only cast or change their own ballot under their code and read the aggregate."
+    },
+    {
+     "basis_ids": [
+      "b_design_ballot",
+      "b_design_surfaces"
+     ],
+     "id": "r_code_privacy",
+     "object_ids": [
+      "ballot",
+      "tally"
+     ],
+     "statement": "A member's code is used only to locate their own ballot; the aggregate surfaces no code-to-choice mapping, so no member can read another member's individual choice."
+    }
+   ],
+   "schema": "atlas.product-reference.v1",
+   "scope_options": [
+    {
+     "depends_on": [],
+     "extra_action_ids": [],
+     "id": "s_core_single_choice",
+     "journey_ids": [
+      "j_create",
+      "j_vote"
+     ],
+     "name": "Core single-choice poll on one device",
+     "rationale": "The minimum recognizable product: one question, 2-8 fixed options, one ballot per nonblank code, replacement by the same code, and a derived per-option tally read on the same screen."
+    },
+    {
+     "depends_on": [
+      "s_core_single_choice"
+     ],
+     "extra_action_ids": [
+      "close_poll",
+      "reopen_poll"
+     ],
+     "id": "s_close_reopen",
+     "journey_ids": [
+      "j_close_reopen"
+     ],
+     "name": "Explicit host close and reopen",
+     "rationale": "The scenario requires a manual freeze and a later reopen with preserved ballots, which the upstream expiry timestamp cannot express; this slice adds the two host transitions and their events."
+    },
+    {
+     "depends_on": [
+      "s_core_single_choice"
+     ],
+     "extra_action_ids": [],
+     "id": "s_durable_store",
+     "journey_ids": [
+      "j_durable_tie"
+     ],
+     "name": "Durable local store across restart",
+     "rationale": "Acceptance requires identical state after refresh and a same-directory process restart; this slice supplies one atomic file-backed store and load-time recomputation instead of in-memory state."
+    },
+    {
+     "depends_on": [
+      "s_core_single_choice",
+      "s_durable_store"
+     ],
+     "extra_action_ids": [],
+     "extra_note": "Selection of a poll is a navigation concern, not a new business action.",
+     "id": "s_multi_poll_directory",
+     "journey_ids": [
+      "j_create",
+      "j_vote"
+     ],
+     "name": "Several polls coexisting in one directory",
+     "rationale": "The acceptance rule that different polls never mix implies more than one poll can exist; this slice adds poll selection or ids while keeping every option, ballot, and count scoped to its poll."
+    },
+    {
+     "depends_on": [
+      "s_core_single_choice",
+      "s_close_reopen"
+     ],
+     "extra_action_ids": [
+      "view_tally"
+     ],
+     "id": "s_hide_results_until_close",
+     "journey_ids": [
+      "j_vote"
+     ],
+     "name": "Optional result visibility setting",
+     "rationale": "Maps upstream's always/closed/never result visibility onto this product as an optional host setting; without it members see the live tally, which is the scenario default."
+    },
+    {
+     "depends_on": [
+      "s_core_single_choice"
+     ],
+     "extra_action_ids": [
+      "cast_vote"
+     ],
+     "id": "s_code_confirmation",
+     "journey_ids": [
+      "j_vote"
+     ],
+     "name": "Voter code confirmation to reduce collisions",
+     "rationale": "Because a code is the ballot key, two members choosing the same code would overwrite each other; an optional confirmation or code-list check makes that collision visible without changing the one-ballot rule."
+    }
+   ],
+   "surfaces": [
+    {
+     "action_ids": [
+      "create_poll"
+     ],
+     "id": "surf_setup",
+     "kind": "host form",
+     "name": "Poll setup form",
+     "navigation": [
+      "Entered from the application start view; on success it hands off to the voting surface for this poll"
+     ],
+     "purpose": "Let the host pose the dinner question and enter the fixed option set before any vote is cast.",
+     "query": {
+      "bulk": "Not applicable: creation is a single atomic submit, not a bulk operation over records.",
+      "export": "Not applicable: setup data is not exported; export is outside the product boundary.",
+      "filter": "Not applicable: there is no list of polls on this surface to filter.",
+      "pagination": "Not applicable: at most 8 option rows are shown, so all fit without paging.",
+      "search": "Not applicable: the form edits a single poll in place, so no search is provided.",
+      "sort": "Not applicable: option order is the order the host enters, not a sort control."
+     },
+     "role_ids": [
+      "host"
+     ],
+     "sections": [
+      "Question field",
+      "Option list editor with 2-8 label rows",
+      "Create poll submit control",
+      "Inline validation messages for option count, blanks, and duplicates"
+     ],
+     "states": {
+      "empty": "With no poll yet in the directory, the setup form is the entry point and shows two empty option rows.",
+      "error": "A rejected submission keeps all entered text and shows the validation reason next to the offending field.",
+      "forbidden": "The form is only offered to the host role; a member-facing entry shows a not_host notice and a link back to voting.",
+      "loading": "The form appears with one empty question and two empty option rows while no store read is pending.",
+      "no_results": "Not applicable: the form creates data rather than listing it, so there is no result set to be empty."
+     }
+    },
+    {
+     "action_ids": [
+      "cast_vote",
+      "change_vote",
+      "view_tally"
+     ],
+     "id": "surf_vote",
+     "kind": "participant page",
+     "name": "Member voting surface",
+     "navigation": [
+      "Entered after the host creates or reopens the poll; after a ballot is stored the same surface shows the refreshed tally and the code stays available for a change"
+     ],
+     "purpose": "Show the question and options, accept one pseudonymous choice, permit a replacement by the same code, and show the current aggregate.",
+     "query": {
+      "bulk": "Not applicable: a member submits exactly one ballot per action.",
+      "export": "Not applicable: this surface does not export; results may be read on screen only.",
+      "filter": "Not applicable: all options of the poll are always shown, including zero-count ones.",
+      "pagination": "Not applicable: the bounded option set fits on one screen.",
+      "search": "Not applicable: the option set is at most 8 entries and fully visible, so no search is offered.",
+      "sort": "Options are shown in the host-defined position order; no member sort control exists."
+     },
+     "role_ids": [
+      "member"
+     ],
+     "sections": [
+      "Question text",
+      "Option list with one selectable choice",
+      "Voter code field",
+      "Submit control",
+      "Current per-option tally with total",
+      "Tie notice when the top count is shared"
+     ],
+     "states": {
+      "empty": "A poll with no ballots yet lists every option with count 0 and total 0.",
+      "error": "A rejected write shows its reason (poll_closed, option_not_in_poll, code_required, duplicate_code) while keeping the selected option and code for correction.",
+      "forbidden": "A closed poll shows a closed notice in place of the submit control and offers no write action until the host reopens.",
+      "loading": "The option list and tally show a loading indicator while the local store is read.",
+      "no_results": "Not applicable: options always exist for an open poll, so the tally has at least zero-count rows to show."
+     }
+    },
+    {
+     "action_ids": [
+      "close_poll",
+      "reopen_poll",
+      "view_tally"
+     ],
+     "id": "surf_host_console",
+     "kind": "owner control panel",
+     "name": "Host console",
+     "navigation": [
+      "Reached from the poll after creation and from the voting surface via the host role; stays on the same poll across close and reopen"
+     ],
+     "purpose": "Show poll status and aggregate, and expose the close and reopen transitions with their recorded events.",
+     "query": {
+      "bulk": "Not applicable: close and reopen are single targeted transitions.",
+      "export": "Not applicable: exporting the aggregate is outside this product's boundary.",
+      "filter": "Not applicable: there is no event or ballot list to filter; the event log is short and complete.",
+      "pagination": "Not applicable: the event log is bounded by close/reopen activity on one poll.",
+      "search": "Not applicable: the console controls one poll rather than browsing many.",
+      "sort": "Events are shown newest last in recorded order; no sort control is provided."
+     },
+     "role_ids": [
+      "host"
+     ],
+     "sections": [
+      "Question and option list",
+      "Status indicator with closed_at or open state",
+      "Per-option counts and total",
+      "Close poll control while open",
+      "Reopen poll control while closed",
+      "Lifecycle event log with timestamps"
+     ],
+     "states": {
+      "empty": "A newly created poll shows no ballots, all counts 0, and only a created event.",
+      "error": "A rejected transition (already_closed, already_open) is shown inline and the displayed status is re-read from the store.",
+      "forbidden": "A member opening this surface sees a not_host notice and cannot invoke close or reopen.",
+      "loading": "Status, counts, and event log are marked loading while the store is read.",
+      "no_results": "Not applicable: the console always shows the poll's status and counts, never an empty result set."
+     }
+    },
+    {
+     "action_ids": [
+      "view_tally"
+     ],
+     "id": "surf_results",
+     "kind": "aggregate page",
+     "name": "Result view",
+     "navigation": [
+      "Reachable from the voting surface and the host console; a refresh re-reads the same stored state"
+     ],
+     "purpose": "Present the per-option tally and total as the poll's deliverable, including an explicit tie statement.",
+     "query": {
+      "bulk": "Not applicable: the view is read-only.",
+      "export": "Not applicable: results are shared by reading the screen, not by export.",
+      "filter": "Not applicable: zero-count options are intentionally retained rather than filtered out.",
+      "pagination": "Not applicable: the option count is capped at 8.",
+      "search": "Not applicable: one poll's options are all shown.",
+      "sort": "Rows follow the host-defined option position order; no result sorting is offered."
+     },
+     "role_ids": [
+      "host",
+      "member"
+     ],
+     "sections": [
+      "Question text",
+      "Per-option counts including zero-count options",
+      "Total ballots",
+      "Tie statement listing all tied options when applicable",
+      "Poll status and freshness of the aggregate"
+     ],
+     "states": {
+      "empty": "With no ballots the view lists every option at 0 and total 0 without declaring a winner.",
+      "error": "An unreadable store produces an explicit error state rather than a blank or partial tally.",
+      "forbidden": "Not applicable: both roles may read the aggregate; no role is denied this view in this product.",
+      "loading": "Counts are marked loading until ballots are read and recomputed.",
+      "no_results": "Not applicable: options always exist, so the aggregate always has rows even at zero."
+     }
+    }
+   ]
+  }
+ }
+}
