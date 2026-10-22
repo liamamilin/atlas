@@ -20,6 +20,211 @@ BASIS_KINDS = {"requirement", "upstream_observation", "design_inference", "unkno
 ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 
 
+def diagnose_reference(spec: Any, *, source_ids: set[str] | None = None) -> list[str]:
+    """Return stable, aggregated contract and graph diagnostics without repairing input.
+
+    The strict validator remains authoritative. This helper gathers independent
+    row/type/enum issues first, then reports any remaining cross-reference or
+    graph invariant failure from the strict validator.
+    """
+    issues: set[str] = set()
+    if not isinstance(spec, dict):
+        return ["reference: must be an object"]
+    for key in sorted(ROOT_KEYS - spec.keys()):
+        issues.add(f"reference: missing key {key}")
+    for key in sorted(spec.keys() - ROOT_KEYS):
+        issues.add(f"reference: unsupported key {key}")
+    if spec.get("schema") != SCHEMA:
+        issues.add(f"schema: must equal {SCHEMA}")
+    shape = spec.get("product_shape")
+    if isinstance(shape, dict):
+        expected = {"name", "audience", "value", "delivery_profile", "boundary", "excluded"}
+        for key in sorted(expected - shape.keys()):
+            issues.add(f"product_shape: missing key {key}")
+        for key in sorted(shape.keys() - expected):
+            issues.add(f"product_shape: unsupported key {key}")
+        for key in sorted(expected - {"excluded"}):
+            if key in shape and (not isinstance(shape[key], str) or not shape[key].strip()):
+                issues.add(f"product_shape.{key}: must be a nonblank string")
+        if "excluded" in shape and (not isinstance(shape["excluded"], list) or any(not isinstance(x, str) or not x.strip() for x in shape["excluded"])):
+            issues.add("product_shape.excluded: must be a list of nonblank strings")
+    row_keys = {
+        "roles": {"id", "name", "goal", "data_scope"}, "objects": {"id", "name", "fields", "states", "relations"},
+        "actions": {"id", "name", "role_ids", "object_ids", "surface_ids", "rule_ids", "preconditions", "effects", "failures", "basis_ids", "depends_on", "transitions"},
+        "surfaces": {"id", "name", "kind", "purpose", "role_ids", "action_ids", "sections", "navigation", "states", "query"},
+        "journeys": {"id", "name", "goal", "role_ids", "steps", "completion", "recovery"}, "rules": {"id", "statement", "object_ids", "basis_ids"},
+        "assertions": {"id", "given", "when", "then", "negative", "action_ids", "rule_ids", "journey_ids"},
+        "scope_options": {"id", "name", "journey_ids", "extra_action_ids", "depends_on", "rationale"},
+        "basis": {"id", "kind", "statement", "source_ids", "depends_on"}, "gaps": {"id", "statement", "core", "action_ids", "resolution"},
+    }
+    for collection, expected in row_keys.items():
+        rows = spec.get(collection)
+        if not isinstance(rows, list):
+            issues.add(f"{collection}: must be a list")
+            continue
+        for index, row in enumerate(rows):
+            path = f"{collection}[{index}]"
+            if not isinstance(row, dict):
+                issues.add(f"{path}: must be an object")
+                continue
+            for key in sorted(expected - row.keys()):
+                issues.add(f"{path}: missing key {key}")
+            for key in sorted(row.keys() - expected):
+                issues.add(f"{path}: unsupported key {key}")
+            if "id" in row and (not isinstance(row["id"], str) or not ID_PATTERN.fullmatch(row["id"])):
+                issues.add(f"{path}.id: must use lowercase letters, digits, underscores, or hyphens")
+            if collection == "surfaces" and "kind" in row and (not isinstance(row["kind"], str) or row["kind"] not in KINDS):
+                issues.add(f"{path}.kind: unsupported surface kind (expected one of {', '.join(sorted(KINDS))})")
+            if collection == "basis" and "kind" in row and (not isinstance(row["kind"], str) or row["kind"] not in BASIS_KINDS):
+                issues.add(f"{path}.kind: unsupported basis kind (expected one of {', '.join(sorted(BASIS_KINDS))})")
+            for key, value in row.items():
+                if key == "id" or key in {"kind", "core"}:
+                    continue
+                if isinstance(value, str) and not value.strip():
+                    issues.add(f"{path}.{key}: must be a nonblank string")
+                elif (key.endswith("_ids") or key in {"depends_on", "sections", "navigation", "preconditions", "effects", "excluded", "from_states", "source_ids"}
+                      or (key == "states" and collection == "objects")):
+                    if not isinstance(value, list) or any(not isinstance(x, str) or not x.strip() for x in value):
+                        issues.add(f"{path}.{key}: must be a list of nonblank strings")
+    # Collect independent reference/symmetry/state/scope failures even when the
+    # strict validator would stop at the first graph error.
+    target_for = {"role_ids": "roles", "object_ids": "objects", "action_ids": "actions",
+                  "surface_ids": "surfaces", "rule_ids": "rules", "basis_ids": "basis",
+                  "journey_ids": "journeys", "extra_action_ids": "actions",
+                  "depends_on": None, "navigation": "surfaces"}
+    ids = {name: {row.get("id") for row in spec.get(name, [])
+                  if isinstance(row, dict) and isinstance(row.get("id"), str)}
+           for name in row_keys if isinstance(spec.get(name), list)}
+    for name, rows in ((k, spec.get(k)) for k in row_keys):
+        if not isinstance(rows, list):
+            continue
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            path = f"{name}.{row.get('id', '?')}"
+            for key, target in target_for.items():
+                if key not in row or not isinstance(row[key], list):
+                    continue
+                if target is None:
+                    target = {"actions": "actions", "scope_options": "scope_options", "basis": "basis"}.get(name)
+                if target and target in ids:
+                    for ref in row[key]:
+                        if isinstance(ref, str) and ref not in ids[target]:
+                            issues.add(f"{path}.{key}: unknown {target} ID {ref}")
+            if name == "actions":
+                for surface_id in row.get("surface_ids", []) if isinstance(row.get("surface_ids"), list) else []:
+                    surface = next((x for x in spec.get("surfaces", []) if isinstance(x, dict) and x.get("id") == surface_id), None)
+                    if surface and row.get("id") not in surface.get("action_ids", []):
+                        issues.add(f"{path}.surface_ids: missing symmetric link from surface {surface_id}")
+                for transition in row.get("transitions", []) if isinstance(row.get("transitions"), list) else []:
+                    if not isinstance(transition, dict):
+                        continue
+                    obj = next((x for x in spec.get("objects", []) if isinstance(x, dict) and x.get("id") == transition.get("object_id")), None)
+                    if obj and isinstance(obj.get("states"), list) and all(isinstance(state, str) for state in obj["states"]):
+                        states = set(obj["states"])
+                        if transition.get("object_id") not in row.get("object_ids", []) or transition.get("to_state") not in states or any(s not in states for s in transition.get("from_states", []) if isinstance(s, str)):
+                            issues.add(f"{path}.transitions: transition claims an undeclared or unreferenced object state")
+            if name == "scope_options" and not row.get("journey_ids") and not row.get("extra_action_ids"):
+                issues.add(f"{path}: must select a journey or extra action")
+    actions_by_id = {row.get("id"): row for row in spec.get("actions", []) if isinstance(row, dict) and isinstance(row.get("id"), str)}
+    surfaces_by_id = {row.get("id"): row for row in spec.get("surfaces", []) if isinstance(row, dict) and isinstance(row.get("id"), str)}
+    assertions = [row for row in spec.get("assertions", []) if isinstance(row, dict)]
+    rules = [row for row in spec.get("rules", []) if isinstance(row, dict)]
+    for action_id, action in actions_by_id.items():
+        if not any(action_id in row.get("action_ids", []) for row in assertions if isinstance(row.get("action_ids"), list)):
+            issues.add(f"actions.{action_id}: every action must be asserted")
+        for sid in action.get("surface_ids", []) if isinstance(action.get("surface_ids"), list) else []:
+            surface = surfaces_by_id.get(sid) if isinstance(sid, str) else None
+            if surface:
+                if action_id not in surface.get("action_ids", []):
+                    issues.add(f"actions.{action_id}.surface_ids: missing symmetric link from surface {sid}")
+                if not set(action.get("role_ids", []) if isinstance(action.get("role_ids"), list) else []).intersection(surface.get("role_ids", []) if isinstance(surface.get("role_ids"), list) else []):
+                    issues.add(f"actions.{action_id}: no action role can use surface {sid}")
+    for sid, surface in surfaces_by_id.items():
+        for aid in surface.get("action_ids", []) if isinstance(surface.get("action_ids"), list) else []:
+            action = actions_by_id.get(aid) if isinstance(aid, str) else None
+            if action and sid not in action.get("surface_ids", []):
+                issues.add(f"surfaces.{sid}.action_ids: missing symmetric link from action {aid}")
+    for assertion in assertions:
+        aid_list = assertion.get("action_ids", [])
+        if not isinstance(aid_list, list):
+            continue
+        for rid in assertion.get("rule_ids", []) if isinstance(assertion.get("rule_ids"), list) else []:
+            if not any(rid in actions_by_id.get(aid, {}).get("rule_ids", []) for aid in aid_list):
+                issues.add(f"assertions.{assertion.get('id', '?')}.rule_ids: rule {rid} is not used by its asserted actions")
+    for rule in rules:
+        rid = rule.get("id")
+        if not any(isinstance(row.get("rule_ids"), list) and rid in row["rule_ids"] for row in assertions):
+            issues.add(f"rules.{rid}: every rule must be referenced by an assertion")
+    journeys_by_id = {row.get("id"): row for row in spec.get("journeys", []) if isinstance(row, dict) and isinstance(row.get("id"), str)}
+    scopes_by_id = {row.get("id"): row for row in spec.get("scope_options", []) if isinstance(row, dict) and isinstance(row.get("id"), str)}
+    for scope_id, scope in scopes_by_id.items():
+        selected_scopes: set[str] = set()
+        pending_scopes = [scope_id]
+        while pending_scopes:
+            current = pending_scopes.pop()
+            if current in selected_scopes or current not in scopes_by_id:
+                continue
+            selected_scopes.add(current)
+            dependencies = scopes_by_id[current].get("depends_on", [])
+            if isinstance(dependencies, list):
+                pending_scopes.extend(x for x in dependencies if isinstance(x, str))
+        journey_ids = {jid for sid in selected_scopes
+                       for jid in (scopes_by_id[sid].get("journey_ids", []) if isinstance(scopes_by_id[sid].get("journey_ids"), list) else [])
+                       if isinstance(jid, str) and jid in journeys_by_id}
+        action_ids = {aid for sid in selected_scopes
+                      for aid in (scopes_by_id[sid].get("extra_action_ids", []) if isinstance(scopes_by_id[sid].get("extra_action_ids"), list) else [])
+                      if isinstance(aid, str) and aid in actions_by_id}
+        for jid in journey_ids:
+            steps = journeys_by_id[jid].get("steps", [])
+            if isinstance(steps, list):
+                action_ids.update(step["action_id"] for step in steps
+                                  if isinstance(step, dict) and isinstance(step.get("action_id"), str)
+                                  and step["action_id"] in actions_by_id)
+        pending_actions = list(action_ids)
+        while pending_actions:
+            action = actions_by_id[pending_actions.pop()]
+            dependencies = action.get("depends_on", [])
+            if isinstance(dependencies, list):
+                for dependency in dependencies:
+                    if isinstance(dependency, str) and dependency in actions_by_id and dependency not in action_ids:
+                        action_ids.add(dependency)
+                        pending_actions.append(dependency)
+        eligible = [assertion for assertion in assertions
+                    if isinstance(assertion.get("action_ids"), list)
+                    and bool(assertion["action_ids"])
+                    and isinstance(assertion.get("journey_ids"), list)
+                    and set(x for x in assertion["action_ids"] if isinstance(x, str)) <= action_ids
+                    and set(x for x in assertion["journey_ids"] if isinstance(x, str)) <= journey_ids]
+        for aid in sorted(action_ids):
+            if not any(aid in assertion["action_ids"] for assertion in eligible):
+                issues.add(f"scope_options.{scope_id}: selected action {aid} lacks an independent assertion")
+        selected_rules = {rid for aid in action_ids
+                          for rid in (actions_by_id[aid].get("rule_ids", []) if isinstance(actions_by_id[aid].get("rule_ids"), list) else [])
+                          if isinstance(rid, str)}
+        for rid in sorted(selected_rules):
+            if not any(rid in assertion.get("rule_ids", []) for assertion in eligible
+                       if isinstance(assertion.get("rule_ids"), list)):
+                issues.add(f"scope_options.{scope_id}: selected rule {rid} lacks an independent assertion")
+        for jid in sorted(journey_ids):
+            if not any(jid in assertion["journey_ids"] for assertion in eligible):
+                issues.add(f"scope_options.{scope_id}: selected journey {jid} lacks an independent assertion")
+    # The strict pass adds deterministic graph and nested contract diagnostics.
+    strict_ok = True
+    try:
+        validate_reference(spec, source_ids=source_ids)
+    except ValueError as error:
+        strict_ok = False
+        issues.add(str(error))
+    if strict_ok:
+        for row in spec["scope_options"]:
+            try:
+                select_scope(spec, row["id"], source_ids=source_ids)
+            except (ValueError, KeyError, TypeError) as error:
+                issues.add(f"scope_options.{row.get('id', '?')}: {error}")
+    return sorted(issues)
+
+
 def _fail(path: str, message: str) -> None:
     raise ValueError(f"{path}: {message}")
 

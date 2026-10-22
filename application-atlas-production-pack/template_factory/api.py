@@ -71,6 +71,17 @@ def dispatch(method, path, query="", body=None, store=None):
     if method == "GET" and route == "product-reference-examples":
         from .reference_preview import examples
         return examples(store, parse_qs(query).get("key", [None])[0]), 200
+    if method == "GET" and route == "product-references":
+        from .reference_catalog import ReferenceCatalog
+        return ReferenceCatalog(store).list_references(), 200
+    reference_download = re.fullmatch(r"product-references/(ref_[a-f0-9]{32})/download", route)
+    if method == "GET" and reference_download:
+        from .reference_catalog import ReferenceCatalog
+        return ReferenceCatalog(store).download(reference_download[1])
+    reference_detail = re.fullmatch(r"product-references/(ref_[a-f0-9]{32})", route)
+    if method == "GET" and reference_detail:
+        from .reference_catalog import ReferenceCatalog
+        return ReferenceCatalog(store).get_reference(reference_detail[1]), 200
     if method == "POST" and route in {"product-references/preview", "product-references/export-preview"}:
         from .reference_preview import export_preview, preview
         return (export_preview(body) if route.endswith("export-preview") else preview(body)), 200

@@ -1172,9 +1172,25 @@ def _reference_pilot_reservation_locked(con, campaign, identity, phase, plan_id,
         raise FactoryError("reference pilot leaf is not a frozen reused leaf", "full_plan_paused", 409)
     stage_parts = str(stage or "").split("/")
     stage_to_kind = {"research": "research", "author": "production", "review": "review"}
-    if (len(stage_parts) != 3 or stage_parts[0] != "reference"
-            or stage_parts[1] not in stage_to_kind or stage_parts[2] != pilot["id"]
-            or stage_to_kind[stage_parts[1]] != kind):
+    revision_id = None
+    if len(stage_parts) == 4 and stage_parts[0] == "reference" and stage_parts[1] in {"author", "review"}:
+        revision_id = stage_parts[3]
+        revision = con.execute("SELECT body FROM auxiliary_reference_pilot_event WHERE pilot_id=? AND kind='revision' ORDER BY id DESC",
+                               (pilot["id"],)).fetchall()
+        registered = False
+        for event in revision:
+            envelope = json.loads(event[0])
+            body = envelope.get("request", {})
+            if digest(body) != envelope.get("request_digest"):
+                raise FactoryError("reference continuation record changed", "full_plan_integrity", 409)
+            if body.get("revision_id") == revision_id and body.get("leaf") == slug:
+                registered = True
+        if not registered:
+            raise FactoryError("reference continuation stage is not registered", "full_plan_binding", 409)
+    if (not ((len(stage_parts) == 3 and stage_parts[0] == "reference"
+              and stage_parts[1] in stage_to_kind and stage_parts[2] == pilot["id"])
+             or (revision_id is not None and stage_parts[2] == pilot["id"]))
+            or stage_to_kind.get(stage_parts[1]) != kind):
         raise FactoryError("reference pilot only permits its three first-pass stages", "full_plan_binding", 409)
     calls = con.execute(
         "SELECT identity,stage,status FROM tf_budget_reservation WHERE campaign_id=? AND phase=? AND status!='not_started'",
@@ -1182,10 +1198,14 @@ def _reference_pilot_reservation_locked(con, campaign, identity, phase, plan_id,
     ).fetchall()
     own = [c for c in calls if c["identity"] == identity]
     pilot_calls = [c for c in calls if c["stage"] and c["stage"].startswith("reference/")
-                   and c["stage"].endswith("/" + pilot["id"])]
+                   and (c["stage"].endswith("/" + pilot["id"]) or ("/" + pilot["id"] + "/") in c["stage"])]
     if any(c["stage"] == stage for c in own):
         raise FactoryError("reference stage already charged; reuse checkpoint", "full_uncertain", 409)
-    if len(own) >= 6 or len(pilot_calls) >= pilot["max_calls"] or len(calls) >= original["max_calls"]:
+    has_events = con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='auxiliary_reference_pilot_event'").fetchone()
+    continuation = con.execute("SELECT body FROM auxiliary_reference_pilot_event WHERE pilot_id=? AND kind='revision' ORDER BY id DESC LIMIT 1",
+                               (pilot["id"],)).fetchone() if has_events else None
+    effective_limit = json.loads(continuation[0]).get("effective_max_calls", pilot["max_calls"]) if continuation else pilot["max_calls"]
+    if len(own) >= 6 or len(pilot_calls) >= effective_limit or len(calls) >= original["max_calls"]:
         raise FactoryError("reference pilot allowance exhausted", "budget_exhausted", 409)
     pending_remaining = 0
     for pending in con.execute(

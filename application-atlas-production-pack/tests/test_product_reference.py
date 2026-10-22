@@ -3,6 +3,7 @@ from copy import deepcopy
 import unittest
 
 from template_factory.product_reference import (
+    diagnose_reference,
     render_reference,
     select_scope,
     validate_reference,
@@ -77,6 +78,48 @@ def make_reference():
 
 
 class ProductReferenceTests(unittest.TestCase):
+    def test_diagnostic_collector_is_empty_for_valid_contract(self):
+        self.assertEqual(diagnose_reference(make_reference()), [])
+
+    def test_diagnostics_aggregate_contract_errors_without_repairing_graph(self):
+        spec = make_reference()
+        spec["surfaces"][0]["kind"] = "phone"
+        spec["surfaces"][0]["navigation"] = ["missing-surface"]
+        spec["objects"][0]["states"] = ["active"]
+        spec["actions"][0]["transitions"][0]["to_state"] = "deleted"
+        spec["actions"][0]["surface_ids"] = ["missing-surface"]
+        spec["actions"][0]["rule_ids"] = ["missing-rule"]
+        spec["scope_options"][0]["depends_on"] = ["missing-scope"]
+        spec["basis"][0]["kind"] = "guess"
+        original = deepcopy(spec)
+        issues = diagnose_reference(spec)
+        self.assertGreaterEqual(len(issues), 6)
+        self.assertTrue(any("unsupported surface kind" in issue for issue in issues))
+        self.assertTrue(any("unsupported basis kind" in issue for issue in issues))
+        self.assertTrue(any("unknown surfaces ID" in issue for issue in issues))
+        self.assertTrue(any("unknown rules ID" in issue for issue in issues))
+        self.assertTrue(any("unknown scope_options ID" in issue for issue in issues))
+        self.assertTrue(any("transition claims" in issue for issue in issues))
+        self.assertTrue(any("missing symmetric link" in issue for issue in issues))
+        self.assertTrue(any("is not used by its asserted actions" in issue for issue in issues))
+        self.assertEqual(spec, original)
+
+    def test_diagnostics_normalize_unhashable_malformed_ids_and_states(self):
+        spec = make_reference()
+        spec["roles"][0]["id"] = ["invalid"]
+        spec["objects"][0]["states"] = [["invalid"]]
+        spec["surfaces"][0]["kind"] = []
+        self.assertTrue(diagnose_reference(spec))
+
+    def test_slice_diagnostics_survive_an_unrelated_invalid_surface_kind(self):
+        spec = make_reference()
+        spec["surfaces"][0]["kind"] = "terminal-window"
+        spec["assertions"][0]["action_ids"] = []
+        issues = diagnose_reference(spec)
+        self.assertTrue(any("unsupported surface kind" in issue for issue in issues))
+        self.assertTrue(any("selected action save lacks an independent assertion" in issue for issue in issues))
+        self.assertTrue(any("selected rule valid-url lacks an independent assertion" in issue for issue in issues))
+
     def test_fixture_validates_and_renders_deterministically(self):
         spec = make_reference()
         self.assertIs(validate_reference(spec), spec)

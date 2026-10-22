@@ -19,7 +19,7 @@ from urllib.parse import urlsplit
 import zipfile
 
 from template_factory.store import digest
-from template_factory.product_reference import validate_reference, render_reference, select_scope
+from template_factory.product_reference import validate_reference, render_reference, select_scope, diagnose_reference
 
 VERSION = "product-reference-v1"
 CHECKS = ("scope", "journeys", "permissions_states", "source_fidelity",
@@ -48,8 +48,9 @@ assertion given/when/then/negative is a NONBLANK STRING (negative describes the
 negative expectation; it is not a boolean). product_shape audience/value/
 delivery_profile/boundary are strings. surfaces states and query values are
 nonblank explanatory strings, including an explicit reason when not applicable.
-All *_ids, depends_on, states, sections, navigation, preconditions, effects,
-excluded, from_states are lists of strings. gaps.core is the only boolean in the
+All *_ids, depends_on, sections, navigation, preconditions, effects, excluded,
+from_states, object states, and source_ids are lists of strings. surface.states
+and surface.query are exact-key maps of explanatory strings. gaps.core is the only boolean in the
 reference schema. All IDs are globally unique across collections. Action failures,
 preconditions and effects must be nonempty. A design_inference basis must depend_on
 at least one known basis ID. Scope options select entire journeys plus dependency
@@ -58,7 +59,74 @@ that option; these assertions must cover all selected actions, rules and journey
 Do not attach every unrelated journey to one assertion: reference the specific
 journeys that the given/when/then actually tests. This is schema guidance, not an
 instruction to limit product capability or weaken the confirmed scenario.
+For UI products, separate preparation/input actions from submit/commit actions
+when they have different effects or recovery. Model entry and navigation as
+surfaces where appropriate. Keep assertions independently testable and avoid
+duplicating unrelated journeys in one assertion or scope slice.
+Enums are exact: surfaces.kind is web/desktop/cli/api/library/other; basis.kind is
+requirement/upstream_observation/design_inference/unknown. Every object relation
+must name an existing object. Every action has nonempty role_ids, object_ids,
+surface_ids, basis_ids, preconditions, effects, and failures; action surface links
+are symmetric and each action has an assertion. Transitions must name an action
+object and states declared by that object. Every surface action link is symmetric,
+all navigation IDs name surfaces, and at least one role can use each action surface.
+Journey steps must agree with the journey, action, and surface role sets. Every
+assertion rule must be used by one asserted action; every rule has an assertion.
+Basis dependencies and action/scope dependencies are acyclic. Upstream basis
+source_ids must be trusted and must have host-pinned observation evidence. Core
+gaps block completion. Diagnostics are additive: fix each reported issue while
+preserving all confirmed business behavior and all other valid graph content.
 """
+
+
+def _contract_object(properties, required=None):
+    return {"type": "object", "properties": properties,
+            "required": sorted(required if required is not None else properties),
+            "additionalProperties": False}
+
+
+_STRING = {"type": "string", "minLength": 1, "pattern": r".*\S.*"}
+_ID = {"type": "string", "pattern": r"^[a-z0-9][a-z0-9_-]*$"}
+_TEXTS = {"type": "array", "items": _STRING}
+_IDS = {"type": "array", "items": _ID, "uniqueItems": True}
+_FAILURE = _contract_object({k: _STRING for k in ("condition", "response", "recovery")})
+_TRANSITION = _contract_object({"object_id": _ID, "from_states": _TEXTS, "to_state": _STRING})
+_STEP = _contract_object({"surface_id": _ID, "action_id": _ID, "role_id": _ID, "success": _STRING})
+_FIELD = _contract_object({"name": _STRING, "meaning": _STRING})
+_RELATION = _contract_object({"object_id": _ID, "meaning": _STRING})
+_SCHEMA_ROWS = {
+    "roles": _contract_object({"id": _ID, "name": _STRING, "goal": _STRING, "data_scope": _STRING}),
+    "objects": _contract_object({"id": _ID, "name": _STRING, "fields": {"type": "array", "items": _FIELD}, "states": _TEXTS, "relations": {"type": "array", "items": _RELATION}}),
+    "actions": _contract_object({"id": _ID, "name": _STRING, "role_ids": {**_IDS, "minItems": 1}, "object_ids": {**_IDS, "minItems": 1}, "surface_ids": {**_IDS, "minItems": 1}, "rule_ids": _IDS, "preconditions": {**_TEXTS, "minItems": 1}, "effects": {**_TEXTS, "minItems": 1}, "failures": {"type": "array", "minItems": 1, "items": _FAILURE}, "basis_ids": {**_IDS, "minItems": 1}, "depends_on": _IDS, "transitions": {"type": "array", "items": _TRANSITION}}),
+    "surfaces": _contract_object({"id": _ID, "name": _STRING, "kind": {"type": "string", "enum": sorted({"web", "desktop", "cli", "api", "library", "other"})}, "purpose": _STRING, "role_ids": {**_IDS, "minItems": 1}, "action_ids": {**_IDS, "minItems": 1}, "sections": _TEXTS, "navigation": _IDS, "states": _contract_object({k: _STRING for k in ("loading", "empty", "no_results", "error", "forbidden")}), "query": _contract_object({k: _STRING for k in ("search", "filter", "sort", "pagination", "bulk", "export")})}),
+    "journeys": _contract_object({"id": _ID, "name": _STRING, "goal": _STRING, "role_ids": {**_IDS, "minItems": 1}, "steps": {"type": "array", "minItems": 1, "items": _STEP}, "completion": _STRING, "recovery": _STRING}),
+    "rules": _contract_object({"id": _ID, "statement": _STRING, "object_ids": _IDS, "basis_ids": _IDS}),
+    "assertions": _contract_object({"id": _ID, "given": _STRING, "when": _STRING, "then": _STRING, "negative": _STRING, "action_ids": {**_IDS, "minItems": 1}, "rule_ids": _IDS, "journey_ids": _IDS}),
+    "scope_options": _contract_object({"id": _ID, "name": _STRING, "journey_ids": _IDS, "extra_action_ids": _IDS, "depends_on": _IDS, "rationale": _STRING}),
+    "basis": _contract_object({"id": _ID, "kind": {"type": "string", "enum": ["requirement", "upstream_observation", "design_inference", "unknown"]}, "statement": _STRING, "source_ids": _IDS, "depends_on": _IDS}),
+    "gaps": _contract_object({"id": _ID, "statement": _STRING, "core": {"type": "boolean"}, "action_ids": _IDS, "resolution": _STRING}),
+}
+CONTRACT_SCHEMA = {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    **_contract_object({"schema": {"const": "atlas.product-reference.v1"},
+        "product_shape": _contract_object({k: _STRING for k in ("name", "audience", "value", "delivery_profile", "boundary")} | {"excluded": _TEXTS}),
+        **{name: {"type": "array", "minItems": 1 if name in {"roles", "objects", "actions", "surfaces", "journeys", "assertions"} else 0, "items": row_schema}
+           for name, row_schema in _SCHEMA_ROWS.items()}},
+        {"schema", "product_shape", *_SCHEMA_ROWS}),
+    "x-atlas-invariants": [
+        "IDs are globally unique across all collections.",
+        "Every reference points to an existing row of the target collection; object relations point to objects.",
+        "Every action role/object/surface/basis list is nonempty; every action is asserted.",
+        "Action and surface action links are symmetric; each action role intersects every linked surface role set.",
+        "Transitions name action objects and only states declared by those objects.",
+        "Journey step roles must belong to the journey, action, and surface; action surface links must include the step surface.",
+        "Assertion rules must be used by an asserted action; every rule is referenced by an assertion.",
+        "Scope options select at least one journey or extra action; selected slices include dependency closure and independent assertions for selected actions, rules, and journeys.",
+        "Action, basis, and scope dependency graphs are acyclic.",
+        "Upstream observation basis source IDs are trusted and have host-pinned observation bindings; design inference depends on known basis.",
+        "Core gaps block a complete reference.",
+    ],
+}
 
 RESEARCH = """Research this fixed leaf/scenario using only the supplied fixed case_refs and
 trusted source inventory. Do not discover or substitute sources. Separate user
@@ -82,8 +150,12 @@ claim upstream execution; unknown and not_run remain explicit. Follow the exact
 schema_contract supplied in input. Assertions are
 declarative product-reference requirements only: do not fabricate probe.py or an
 empty development/probe bundle. Read input.json, leaf.md, source/snapshot.json, and
-every file below source/upstream/. Output exactly {"reference": <ProductReference>,
-"observations": [[kind,path,start,end,text], ...]}."""
+every file below source/upstream/. The host supplies canonical researched
+observations and trusted evidence IDs in input.json. Cite those IDs from basis
+entries; do not reproduce observed_upstream. Output exactly
+{"reference": <ProductReference>} (the legacy {"reference": ..., "observations": [...]}
+shape is also accepted, but observations are checked against and replaced by the
+host's canonical researched set)."""
 
 REVIEW = """You are an independent reviewer in a new session. First construct your own
 questions from the product boundary, roles and user goals, then review the complete
@@ -106,7 +178,7 @@ needs_changes is a valid review result, not a protocol error. Do not claim appli
 
 PROMPT_DIGEST = digest({"version": VERSION, "research": RESEARCH,
                         "author": AUTHOR, "review": REVIEW,
-                        "schema_contract": SCHEMA_CONTRACT})
+                        "schema_contract": SCHEMA_CONTRACT, "contract_schema": CONTRACT_SCHEMA})
 
 
 def _canonical(value):
@@ -595,6 +667,8 @@ def _freeze(directory, inputs, snapshot, spec, reviewed, identity, provenance):
                       "sessions": provenance["sessions"], "prompts": provenance["prompts"],
                       "snapshot_digest": provenance["snapshot_digest"], "source_ids": inputs["trusted_source_ids"],
                       "read_view_manifest_digest": digest(_json(directory / "READ_VIEWS.json"))}
+    if "revision_lineage" in provenance:
+        review_receipt["revision_lineage"] = provenance["revision_lineage"]
     contents = {"reference.json": _canonical(spec) + "\n", **rendered,
                 "review.json": _canonical(review_receipt) + "\n",
                 "review-result.json": _canonical(reviewed) + "\n",
@@ -609,6 +683,7 @@ def _freeze(directory, inputs, snapshot, spec, reviewed, identity, provenance):
                 "case_refs": inputs["case_refs"], "scope_options": spec["scope_options"],
                 "scope_slice_digests": {sid: digest(value) for sid, value in scope_slices.items()},
                 "review_input_digest": identity, "snapshot_sha256": digest(snapshot),
+                **({"revision_lineage": provenance["revision_lineage"]} if "revision_lineage" in provenance else {}),
                 "review_receipt_sha256": digest(review_receipt), "prompt_digest": PROMPT_DIGEST,
                 "upstream_status": "not_run", "application_runtime_status": "not_run",
                 "publication_status": "not_published",
@@ -637,7 +712,7 @@ def _freeze(directory, inputs, snapshot, spec, reviewed, identity, provenance):
         temporary.unlink(missing_ok=True)
 
 
-def _generate(directory, inputs, snapshot, call):
+def _generate(directory, inputs, snapshot, call, *, revision=None):
     """Run/reuse the opt-in research, author, independent review, and export stages.
 
     ``call(stage, payload, prompt, source)`` is the sole model seam. It must be a
@@ -658,11 +733,16 @@ def _generate(directory, inputs, snapshot, call):
         return response
     root_binding = {"profile_version": VERSION, "prompt_digest": PROMPT_DIGEST,
                     "inputs_digest": inputs_digest, "snapshot_digest": snapshot_identity}
+    if revision is not None:
+        root_binding["revision_lineage_digest"] = digest(revision["lineage"])
     directory.mkdir(parents=True, exist_ok=True)
     _fixed(directory / "BINDING.json", root_binding)
 
     research_payload = {"inputs": inputs, "snapshot_digest": snapshot_identity}
-    research = _stage(directory, "research", research_payload, RESEARCH, source_context, bound_call)
+    if revision is None:
+        research = _stage(directory, "research", research_payload, RESEARCH, source_context, bound_call)
+    else:
+        research = revision["research"]
     research_result = research["result"]
     if (not isinstance(research_result, dict) or set(research_result) != {"findings", "observed_upstream", "gaps"}
             or not isinstance(research_result["findings"], list) or not isinstance(research_result["gaps"], list)):
@@ -682,15 +762,20 @@ def _generate(directory, inputs, snapshot, call):
 
     author_payload = {"inputs": inputs, "research": research_result,
                       "source_context": source_context, "observations": observations,
-                      "schema_contract": SCHEMA_CONTRACT}
-    authored = _stage(directory, "author", author_payload, AUTHOR, source_context, bound_call)
+                      "schema_contract": SCHEMA_CONTRACT, "contract_schema": CONTRACT_SCHEMA}
+    author_prompt = AUTHOR
+    if revision is not None:
+        author_payload["revision"] = revision["author_context"]
+        author_prompt += "\nThis is a bounded content revision. Read the complete parent reference, parent author result, deterministic diagnostics, and revision lineage in input.json. Fix every supplied issue, preserve valid confirmed requirements and business graph content, and return a complete reference in the normal output contract. Never manufacture or alter upstream observations."
+    authored = _stage(directory, "author", author_payload, author_prompt, source_context, bound_call)
     authored_result = authored["result"]
-    if not isinstance(authored_result, dict) or set(authored_result) != {"reference", "observations"}:
-        raise ValueError("author protocol requires exactly reference and observations")
+    if not isinstance(authored_result, dict) or set(authored_result) not in ({"reference"}, {"reference", "observations"}):
+        raise ValueError("author protocol requires reference and optional legacy observations")
     spec = authored_result["reference"]
-    author_observations = _observations(authored_result["observations"], snapshot, inputs["trusted_source_ids"])
-    if author_observations != observations:
-        raise ValueError("author observations must retain the researched pinned source tuples")
+    if "observations" in authored_result:
+        author_observations = _observations(authored_result["observations"], snapshot, inputs["trusted_source_ids"])
+        if author_observations != observations:
+            raise ValueError("author observations must retain the researched pinned source tuples")
     trusted = inputs["trusted_source_ids"]
     source_ids = set(trusted.get("requirements", [])) | set(trusted.get("upstream", []))
     if isinstance(trusted.get("requirements"), dict):
@@ -708,7 +793,7 @@ def _generate(directory, inputs, snapshot, call):
     review_payload = {"reference": spec, "observations": observations, "research": research_result,
                       "observation_bindings": _observation_bindings(observations, snapshot, inputs["trusted_source_ids"], source_files),
                       "inputs": inputs, "snapshot_digest": snapshot_identity,
-                      "schema_contract": SCHEMA_CONTRACT,
+                      "schema_contract": SCHEMA_CONTRACT, "contract_schema": CONTRACT_SCHEMA,
                       "scope_slices": _scope_slices(spec, source_ids),
                       "prompts": {"research": digest(RESEARCH), "author": digest(AUTHOR), "review": digest(REVIEW)}}
     review_identity = digest(review_payload)
@@ -735,7 +820,8 @@ def _generate(directory, inputs, snapshot, call):
         _freeze(directory, inputs, snapshot, spec, reviewed, review_identity,
                 {"sessions": {"research": research["session_id"], "author": authored["session_id"], "review": review["session_id"]},
                  "snapshot_digest": snapshot_identity,
-                 "prompts": {"research": digest(RESEARCH), "author": digest(AUTHOR), "review": digest(REVIEW)}})
+                 "prompts": {"research": digest(RESEARCH), "author": digest(author_prompt), "review": digest(REVIEW)},
+                 **({"revision_lineage": revision["lineage"]} if revision is not None else {})})
         status = "static_review_passed"
     else:
         status = "needs_changes"
@@ -760,5 +846,200 @@ def generate(directory, inputs, snapshot, call):
             raise RuntimeError("product-reference generation already active for this directory") from error
         try:
             return _generate(directory, inputs, snapshot, call)
+        finally:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+
+
+def _revise_unlocked(directory, inputs, snapshot, parent_directory, parent_author_result,
+           parent_author_sha256, revision_id, call):
+    """Create a separately bound content revision, reusing fixed research only.
+
+    ``parent_author_result`` is the path to the parent's author/RESULT.json;
+    its raw bytes must match ``parent_author_sha256``. The destination must be a
+    new directory. This operation never invokes research and never changes the
+    parent directory or its review receipt.
+    """
+    directory, parent_directory = Path(directory), Path(parent_directory)
+    if not isinstance(revision_id, str) or not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9._-]{0,63}", revision_id):
+        raise ValueError("revision_id must be a safe nonblank directory identifier")
+    existing_destination = directory.exists() and any(p.name != ".product-reference.lock" for p in directory.iterdir())
+    if existing_destination and not (directory / "research/DELIVERED.json").is_file():
+        raise ValueError("revision destination must be new or a complete revision replay")
+    if not isinstance(parent_author_sha256, str) or not re.fullmatch(r"[0-9a-f]{64}", parent_author_sha256):
+        raise ValueError("parent author SHA-256 is required")
+    parent_result_path = Path(parent_author_result)
+    if not parent_result_path.is_absolute():
+        parent_result_path = parent_directory / parent_result_path
+    parent_result_path = parent_result_path.resolve(strict=True)
+    if not parent_result_path.is_relative_to(parent_directory.resolve(strict=True)):
+        raise ValueError("parent author result must be inside parent_directory")
+    raw_parent = parent_result_path.read_bytes()
+    if _sha(raw_parent) != parent_author_sha256:
+        raise ValueError("parent author result SHA-256 differs")
+    parent_authored = json.loads(raw_parent.decode("utf-8"))
+    if not isinstance(parent_authored, dict) or set(parent_authored) not in ({"reference"}, {"reference", "observations"}):
+        raise ValueError("parent author result has an invalid protocol shape")
+    parent_reference = parent_authored["reference"]
+    parent_author_dir = parent_directory / "author"
+    parent_author_binding = _json(parent_author_dir / "BINDING.json")
+    parent_author_receipt = _json(parent_author_dir / "DELIVERED.json")
+    if (parent_author_receipt.get("binding_digest") != digest(parent_author_binding)
+            or parent_author_receipt.get("result_digest") != digest(parent_authored)):
+        raise ValueError("parent author result is not the result bound by its completed checkpoint")
+    inputs_digest = _validate_inputs(inputs, snapshot)
+    trusted_ids = inputs["trusted_source_ids"]
+    source_ids = set(trusted_ids.get("requirements", [])) | set(trusted_ids.get("upstream", []))
+    if isinstance(trusted_ids.get("requirements"), dict):
+        source_ids |= set(trusted_ids["requirements"])
+    if isinstance(trusted_ids.get("upstream"), dict):
+        source_ids |= set(trusted_ids["upstream"])
+    source_files = _read_sources(snapshot)
+    snapshot_identity = digest({"snapshot": snapshot, "files": {p: _sha(t.encode()) for p, t in source_files.items()}})
+    parent_binding = _json(parent_directory / "BINDING.json")
+    if parent_binding.get("inputs_digest") != inputs_digest or parent_binding.get("snapshot_digest") != snapshot_identity:
+        raise ValueError("parent inputs or pinned snapshot differ from revision inputs")
+    research_dir = parent_directory / "research"
+    research_binding = _json(research_dir / "BINDING.json")
+    research_result = _json(research_dir / "RESULT.json")
+    research_receipt = _json(research_dir / "DELIVERED.json")
+    if (research_binding.get("stage") != "research"
+            or research_binding.get("payload_digest") != digest({"inputs": inputs, "snapshot_digest": snapshot_identity})
+            or research_receipt.get("binding_digest") != digest(research_binding)
+            or research_receipt.get("result_digest") != digest(research_result)):
+        raise ValueError("parent research checkpoint is incomplete or bound to different inputs")
+    if not isinstance(research_result, dict) or set(research_result) != {"findings", "observed_upstream", "gaps"}:
+        raise ValueError("parent research result has an invalid protocol shape")
+    if not isinstance(research_receipt.get("session_id"), str) or not research_receipt["session_id"].strip():
+        raise ValueError("parent research checkpoint lacks its actual session ID")
+    observations = _observations(research_result["observed_upstream"], snapshot, inputs["trusted_source_ids"])
+    adapter_research = parent_directory.parent / "official-checkpoints/research"
+    adapter_research_digest = None
+    if adapter_research.exists():
+        required_adapter_files = ("BINDING.json", "DELIVERED.json", "RESULT.json", "cli-summary.json",
+                                  "original-response.json", "input.json", "events.jsonl")
+        if not adapter_research.is_dir() or any(not (adapter_research / name).is_file() for name in required_adapter_files):
+            raise ValueError("parent official research checkpoint is incomplete")
+        adapter_binding = _json(adapter_research / "BINDING.json")
+        adapter_receipt = _json(adapter_research / "DELIVERED.json")
+        adapter_result = _json(adapter_research / "RESULT.json")
+        adapter_summary = _json(adapter_research / "cli-summary.json")
+        adapter_input = _json(adapter_research / "input.json")
+        adapter_payload = adapter_input.get("profile_payload")
+        if (adapter_result != research_result
+                or adapter_receipt != {"binding_digest": digest(adapter_binding), "result_digest": digest(adapter_result)}
+                or adapter_payload != {"inputs": inputs, "snapshot_digest": snapshot_identity}
+                or adapter_summary.get("delivery_status") != "delivered"
+                or adapter_summary.get("session_id") != research_receipt["session_id"]
+                or not isinstance(adapter_summary.get("requested_model"), str)
+                or adapter_binding.get("model") != adapter_summary.get("requested_model")
+                or adapter_binding.get("input_digest") != digest(adapter_input)):
+            raise ValueError("parent official research checkpoint result/session/input binding differs")
+        original_response = adapter_research / "original-response.json"
+        if adapter_summary.get("original_response_sha256") != _sha(original_response.read_bytes()):
+            raise ValueError("parent official research raw response digest differs")
+        from template_factory.cli import parse_result
+        parsed = parse_result(json.loads(original_response.read_text(encoding="utf-8"))["text"])
+        if parsed != adapter_result:
+            raise ValueError("parent official research raw response differs from parsed result")
+        adapter_research_digest = digest({p.relative_to(adapter_research).as_posix(): _sha(p.read_bytes())
+                                          for p in sorted(adapter_research.rglob("*")) if p.is_file()})
+    issues = diagnose_reference(parent_reference, source_ids=source_ids)
+    review_paths = [parent_directory / "REVIEW_INPUT.json", parent_directory / "REVIEW_RESULT.json",
+                    parent_directory / "review/BINDING.json", parent_directory / "review/RESULT.json",
+                    parent_directory / "review/DELIVERED.json", parent_directory / "READ_VIEWS.json"]
+    review_present = any(path.exists() for path in review_paths)
+    review_issues = []
+    if review_present:
+        if not all(path.is_file() for path in review_paths):
+            raise ValueError("parent review checkpoint is incomplete")
+        parent_review_input = _json(parent_directory / "REVIEW_INPUT.json")
+        if (parent_review_input.get("reference") != parent_reference
+                or parent_review_input.get("inputs") != inputs
+                or parent_review_input.get("snapshot_digest") != snapshot_identity
+                or parent_review_input.get("observations") != observations):
+            raise ValueError("parent review result is not bound: review input differs from parent reference, inputs, snapshot or research")
+        parent_review_identity = digest(parent_review_input)
+        parent_review_binding = _json(parent_directory / "review/BINDING.json")
+        parent_review_result = _json(parent_directory / "review/RESULT.json")
+        parent_review_receipt = _json(parent_directory / "review/DELIVERED.json")
+        parent_review_record = _json(parent_directory / "REVIEW_RESULT.json")
+        if (parent_review_binding.get("stage") != "review"
+                or parent_review_binding.get("payload_digest") != digest({
+                    "input_digest": parent_review_identity,
+                    "checks": list(CHECKS),
+                    "material_manifest": _json(parent_directory / "READ_VIEWS.json"),
+                    "review_input": parent_review_input})
+                or parent_review_receipt.get("binding_digest") != digest(parent_review_binding)
+                or parent_review_receipt.get("result_digest") != digest(parent_review_result)
+                or parent_review_result != parent_review_record):
+            raise ValueError("parent review result is not bound to its exact completed review input")
+        parent_author_session = parent_author_receipt.get("session_id")
+        parent_review_session = parent_review_receipt.get("session_id")
+        _verify_read_events(parent_review_receipt.get("read_events", []), parent_directory,
+                            _json(parent_directory / "READ_VIEWS.json"))
+        checked_parent_review = validate_review(parent_review_result, parent_review_identity,
+                                                parent_author_session, parent_review_session,
+                                                len(observations))
+        if checked_parent_review["verdict"] == "pass":
+            raise ValueError("parent review passed; a prior pass cannot authorize a content revision")
+        review_issues = checked_parent_review["issues"]
+    elif not issues:
+        raise ValueError("parent has no concrete deterministic diagnostics or completed needs_changes review")
+    revision_issues = sorted(set(issues) | {
+        "parent review: " + (item if isinstance(item, str) else _canonical(item))
+        for item in review_issues})
+    destination = directory
+    destination.mkdir(parents=True, exist_ok=True)
+    if not existing_destination:
+        shutil.copytree(research_dir, destination / "research")
+        if adapter_research_digest is not None:
+            target_adapter_research = destination.parent / "official-checkpoints/research"
+            target_adapter_research.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copytree(adapter_research, target_adapter_research)
+    else:
+        replay_result = _json(destination / "research/RESULT.json")
+        replay_receipt = _json(destination / "research/DELIVERED.json")
+        if (digest(replay_result) != digest(research_result)
+                or replay_receipt.get("result_digest") != digest(replay_result)
+                or replay_receipt.get("session_id") != research_receipt.get("session_id")):
+            raise ValueError("revision research replay differs from its fixed parent checkpoint")
+        copied_adapter_research = destination.parent / "official-checkpoints/research"
+        copied_digest = (digest({p.relative_to(copied_adapter_research).as_posix(): _sha(p.read_bytes())
+                                 for p in sorted(copied_adapter_research.rglob("*")) if p.is_file()})
+                         if copied_adapter_research.is_dir() else None)
+        if copied_digest != adapter_research_digest:
+            raise ValueError("revision adapter research checkpoint differs from its fixed parent checkpoint")
+    lineage = {"revision_id": revision_id, "parent_directory": parent_directory.name,
+               "parent_author_sha256": parent_author_sha256, "parent_author_result": str(parent_result_path),
+               "parent_reference_digest": digest(parent_reference), "parent_review_result_sha256": _sha((parent_directory / "REVIEW_RESULT.json").read_bytes()) if (parent_directory / "REVIEW_RESULT.json").is_file() else None,
+               "research_result_sha256": _sha((research_dir / "RESULT.json").read_bytes()),
+               "adapter_research_checkpoint_digest": adapter_research_digest,
+               "inputs_digest": inputs_digest, "snapshot_digest": snapshot_identity}
+    revision_context = {"revision_id": revision_id, "parent_author_result": parent_authored,
+                        "parent_reference": parent_reference, "parent_reference_digest": digest(parent_reference),
+                        "parent_author_sha256": parent_author_sha256,
+                        "diagnostics": revision_issues, "lineage": lineage}
+    return _generate(destination, inputs, snapshot, call,
+                     revision={"research": {"result": research_result,
+                                             "session_id": research_receipt["session_id"],
+                                             "read_events": research_receipt.get("read_events", [])},
+                               "author_context": revision_context, "lineage": lineage})
+
+
+def revise(directory, inputs, snapshot, parent_directory, parent_author_result,
+           parent_author_sha256, revision_id, call):
+    """Serialize revision runs in the destination directory."""
+    directory = Path(directory)
+    directory.mkdir(parents=True, exist_ok=True)
+    lock_path = directory / ".product-reference.lock"
+    with lock_path.open("a+") as lock:
+        try:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as error:
+            raise RuntimeError("product-reference generation already active for this directory") from error
+        try:
+            return _revise_unlocked(directory, inputs, snapshot, parent_directory,
+                                    parent_author_result, parent_author_sha256,
+                                    revision_id, call)
         finally:
             fcntl.flock(lock.fileno(), fcntl.LOCK_UN)

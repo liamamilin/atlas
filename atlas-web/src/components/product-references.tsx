@@ -7,9 +7,12 @@ import { factoryRequest } from "@/lib/factory";
 
 type Example = {key:string;name:string;counts:{pages:number;journeys:number;rules:number;acceptance_assertions:number}};
 type Preview = {reference_digest:string;documents:Record<string,string>;scope_options:{id:string;name:string}[];selection:null|{action_ids:string[];deferred_action_ids:string[];journey_ids:string[]}};
+type CatalogReference = {id:string;name:string;schema:string;package_sha256:string;reference_digest:string;pilot_id:string;leaf:string;revision_id:string;status:"static_review_passed";application_status:"application_not_run";publication_status:string;case_refs:{case_id:string;revision:number;digest:string;url:string}[]};
+type CatalogDetail = CatalogReference & {document:string};
 
 export function ProductReferences({zh}:{zh:boolean}) {
   const examples=useAsync(()=>factoryRequest<{items:Example[]}>("product-reference-examples"),[]);
+  const catalog=useAsync(()=>factoryRequest<CatalogReference[]>("product-references"),[]);
   const [document,setDocument]=useState("");
   const [title,setTitle]=useState("");
   const [error,setError]=useState("");
@@ -21,6 +24,11 @@ export function ProductReferences({zh}:{zh:boolean}) {
   async function readExample(item:Example) {
     setBusy(true);setError("");setNotice("");
     try {const value=await factoryRequest<{markdown:string}>(`product-reference-examples?key=${encodeURIComponent(item.key)}`);setTitle(item.name);setDocument(value.markdown);setPreview(null);setBody(null);setScope("");}
+    catch(e){setError(String(e));}finally{setBusy(false);}
+  }
+  async function readCatalogReference(item:CatalogReference) {
+    setBusy(true);setError("");setNotice("");
+    try {const value=await factoryRequest<CatalogDetail>(`product-references/${encodeURIComponent(item.id)}`);setTitle(value.name);setDocument(value.document);setPreview(null);setBody(null);setScope("");}
     catch(e){setError(String(e));}finally{setBusy(false);}
   }
   async function inspect(value:{reference:unknown;source_ids?:string[]},scopeId="") {
@@ -63,8 +71,9 @@ export function ProductReferences({zh}:{zh:boolean}) {
     <div className="rounded-xl bg-surface p-5 shadow-card">
       <h2 className="font-serif text-xl">{zh?"先看完整产品，再选择开发范围":"Understand the product, then choose a development slice"}</h2>
       <p className="mt-3 text-sm leading-6 text-muted">{zh?"完整参考规格描述角色、对象、入口、操作、旅程和共同规则。开发范围按旅程与依赖选择；同页的后期能力不会自动进入 P0。旧核心场景模板仍在模板制品页。":"References connect roles, objects, surfaces, actions, journeys and rules. Slices follow journeys and dependencies; sharing a page does not put later features into P0. Existing core templates remain in Artifacts."}</p>
-      <p role="status" className="mt-3 text-sm text-primary">{zh?"当前为设计样稿与草案结构预览；未启动生产，未登记独立审阅或应用运行通过。":"Design examples and structural draft previews only. No production, independent review or application runtime has been registered."}</p>
+      <p role="status" className="mt-3 text-sm text-primary">{catalog.loading? (zh?"正在确认正式参考目录状态…":"Checking the reviewed reference catalog…") : catalog.data?.length? (zh?"目录中的正式参考已完成独立静态审阅；应用运行仍未执行。下方样稿和草案预览仍不代表通过。":"Catalog references have passed independent static review; application runtime remains unrun. Examples and draft previews below are not passed references.") : (zh?"当前目录没有正式参考；下方为设计样稿与草案结构预览。":"No formal references are currently in the catalog; examples and structural draft previews follow.")}</p>
     </div>
+    {catalog.loading?<p role="status">{zh?"读取正式参考目录…":"Loading reviewed reference catalog…"}</p>:catalog.error?<p role="alert">{zh?"正式参考目录暂不可读。":"Reviewed reference catalog is unavailable."}</p>:catalog.data?.length?<div className="space-y-3" aria-label={zh?"已审阅产品参考":"Reviewed product references"}><h3 className="font-medium">{zh?"已审阅产品参考":"Reviewed product references"}</h3><div className="grid gap-3 md:grid-cols-2">{catalog.data.map(item=><article key={item.id} className="rounded-xl border border-primary/30 bg-surface p-4"><h4 className="font-medium">{item.name}</h4><p className="mt-2 text-xs text-muted">{item.leaf} · {item.revision_id} · {zh?"独立静态审阅通过":"Independent static review passed"}</p><p className="mt-1 text-xs">{zh?"应用未运行 · 未发布":"Application not run · not published"}</p>{item.case_refs.length?<div className="mt-2 flex flex-wrap gap-2 text-xs">{item.case_refs.map(ref=><a key={`${ref.case_id}:${ref.revision}`} className="underline" href={ref.url}>{zh?`案例 ${ref.case_id} r${ref.revision}`:`Case ${ref.case_id} r${ref.revision}`}</a>)}</div>:null}<div className="mt-3 flex gap-2"><Button size="sm" variant="outline" disabled={busy} onClick={()=>void readCatalogReference(item)}>{zh?"阅读参考":"Read reference"}</Button><a className="inline-flex items-center rounded-md border border-border px-3 text-sm" href={`/api/factory/product-references/${encodeURIComponent(item.id)}/download`}>{zh?"下载 ZIP":"Download ZIP"}</a></div></article>)}</div></div>:null}
     <div className="grid gap-3 md:grid-cols-3">{examples.loading?<p>{zh?"读取参考样稿…":"Loading examples…"}</p>:examples.error?<p role="alert">{zh?"样稿暂不可读，请刷新重试。":"Examples unavailable; refresh to retry."}</p>:examples.data?.items.map(item=><article key={item.key} className="rounded-xl border border-border bg-surface p-4"><h3 className="font-medium">{item.name}</h3><p className="mt-2 text-xs text-muted">{zh?`${item.counts.pages} 个页面 · ${item.counts.journeys} 条旅程 · ${item.counts.rules} 条规则`:`${item.counts.pages} pages · ${item.counts.journeys} journeys · ${item.counts.rules} rules`}</p><p className="mt-2 text-xs">{zh?"设计参考样稿 · 未审阅 · 应用未运行":"Design example · not reviewed · app not run"}</p><Button className="mt-3" size="sm" variant="outline" disabled={busy} onClick={()=>void readExample(item)}>{zh?`阅读${item.name}`:`Read ${item.name}`}</Button></article>)}</div>
     <div className="rounded-xl border border-border bg-surface p-5">
       <label className="block text-sm font-medium">{zh?"预览产品参考 JSON 草案":"Preview a product reference JSON draft"}<input className="mt-3 block w-full text-sm" type="file" accept=".json,application/json" disabled={busy} onChange={e=>{void upload(e.target.files?.[0]);e.target.value="";}}/></label>

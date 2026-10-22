@@ -7,6 +7,8 @@ import sys
 import shutil
 import tempfile
 import threading
+import os
+import subprocess
 import unittest
 import zipfile
 from unittest.mock import patch
@@ -15,6 +17,16 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / ".." / "application-atlas-production-pack"))
 import product_reference_profile as profile
 from template_factory.store import digest
+
+
+class ContractStabilityTests(unittest.TestCase):
+    def test_prompt_and_contract_identity_are_stable_across_python_hash_seeds(self):
+        script = "import product_reference_profile as p; import json; print(p.PROMPT_DIGEST); print(json.dumps(p.CONTRACT_SCHEMA,sort_keys=True))"
+        path = str(Path(__file__).resolve().parents[1]) + os.pathsep + str(Path(__file__).resolve().parents[3] / "application-atlas-production-pack")
+        outputs = [subprocess.check_output([sys.executable, "-c", script], env={**os.environ, "PYTHONPATH": path,
+                   "PYTHONHASHSEED": str(seed)}, text=True) for seed in (1, 2, 100)]
+        self.assertEqual(outputs[0], outputs[1])
+        self.assertEqual(outputs[0], outputs[2])
 
 
 def fixture_reference():
@@ -81,6 +93,138 @@ class ProductReferencePipelineTests(unittest.TestCase):
     def run_pipeline(self, directory, call):
         self.output = Path(directory)
         return profile.generate(directory, self.inputs, self.snapshot, call)
+
+    def test_revision_reuses_research_and_requires_fresh_review_and_parent_binding(self):
+        parent = self.root / "parent"
+        callback, parent_calls = self.callback()
+        broken = fixture_reference()
+        broken["surfaces"][0]["kind"] = "mobile"
+
+        def broken_parent(stage, payload, prompt, source):
+            if stage == "author":
+                parent_calls.append(stage)
+                return {"result": {"reference": copy.deepcopy(broken),
+                                    "observations": [["documentation", "docs.md", 1, 2, "The supplied fixture documentation describes text notes."]]},
+                        "session_id": "fixture-author"}
+            return callback(stage, payload, prompt, source)
+
+        with self.assertRaisesRegex(ValueError, "unsupported surface kind"):
+            self.run_pipeline(parent, broken_parent)
+        parent_result = parent / "author/RESULT.json"
+        parent_sha = hashlib.sha256(parent_result.read_bytes()).hexdigest()
+        revised = copy.deepcopy(fixture_reference())
+        revision_calls = []
+
+        def revision_callback(stage, payload, prompt, source):
+            revision_calls.append(stage)
+            if stage == "author":
+                self.assertEqual(payload["revision"]["parent_reference"], broken)
+                self.assertTrue(any("unsupported surface kind" in x for x in payload["revision"]["diagnostics"]))
+                result = {"reference": copy.deepcopy(revised)}
+            else:
+                result = {"input_digest": payload["input_digest"], "own_questions": ["Can the owner recover after storage failure?"],
+                          "checks": {x: True for x in profile.CHECKS},
+                          "observations": [{"index": 0, "accepted": True, "reason": "The cited lines describe text notes only."}],
+                          "verdict": "pass", "issues": []}
+            events = []
+            if stage == "review":
+                for name in payload["material_manifest"]:
+                    events.append({"tool": "read", "status": "completed", "path": name,
+                                   "content": (Path(self.revision_output) / name).read_text(encoding="utf-8")})
+            return {"result": result, "session_id": "revision-" + stage, "read_events": events}
+
+        self.revision_output = self.root / "revision-r2"
+        result = profile.revise(self.revision_output, self.inputs, self.snapshot, parent,
+                                "author/RESULT.json", parent_sha, "r2", revision_callback)
+        self.assertEqual(result["status"], "static_review_passed")
+        self.assertEqual(revision_calls, ["author", "review"])
+        self.assertEqual(parent_calls, ["research", "author"])
+        with zipfile.ZipFile(result["reference_zip"]) as archive:
+            manifest = json.loads(archive.read("manifest.json"))
+            self.assertEqual(manifest["artifact_kind"], "atlas.product-reference")
+            self.assertEqual(manifest["revision_lineage"]["revision_id"], "r2")
+        replay_calls = []
+        replay = profile.revise(self.revision_output, self.inputs, self.snapshot, parent,
+                                "author/RESULT.json", parent_sha, "r2",
+                                lambda *args: replay_calls.append(args[0]))
+        self.assertEqual(replay["status"], "static_review_passed")
+        self.assertEqual(replay_calls, [])
+        with self.assertRaisesRegex(ValueError, "SHA-256 differs"):
+            profile.revise(self.root / "bad-parent", self.inputs, self.snapshot, parent,
+                           "author/RESULT.json", "0" * 64, "r4", revision_callback)
+        changed_inputs = copy.deepcopy(self.inputs)
+        changed_inputs["scenario"]["name"] = "a different scenario"
+        changed_inputs["digest"] = digest({k: value for k, value in changed_inputs.items() if k != "digest"})
+        with self.assertRaisesRegex(ValueError, "parent inputs or pinned snapshot differ"):
+            profile.revise(self.root / "bad-input", changed_inputs, self.snapshot, parent,
+                           "author/RESULT.json", parent_sha, "r5", revision_callback)
+
+    def test_revision_uses_bound_needs_changes_findings_for_valid_parent(self):
+        parent = self.root / "needs-changes-parent"
+        base_call, _ = self.callback()
+        parent_calls = []
+
+        def needs_changes_call(stage, payload, prompt, source):
+            parent_calls.append(stage)
+            response = base_call(stage, payload, prompt, source)
+            if stage == "review":
+                response["result"].update(verdict="needs_changes", issues=["Clarify recovery after a failed save.",
+                    {"location": "journey", "issue": "Missing recovery"}])
+                response["result"]["checks"]["journeys"] = False
+            return response
+
+        self.run_pipeline(parent, needs_changes_call)
+        parent_result = parent / "author/RESULT.json"
+        parent_sha = hashlib.sha256(parent_result.read_bytes()).hexdigest()
+        revision_output = self.root / "needs-changes-revision"
+        revision_calls = []
+
+        def revised_call(stage, payload, prompt, source):
+            revision_calls.append(stage)
+            if stage == "author":
+                self.assertIn("parent review: Clarify recovery after a failed save.",
+                              payload["revision"]["diagnostics"])
+                self.assertIn('parent review: {"issue":"Missing recovery","location":"journey"}',
+                              payload["revision"]["diagnostics"])
+            response = base_call(stage, payload, prompt, source)
+            if stage == "review":
+                response["read_events"] = [
+                    {"tool": "read", "status": "completed", "path": name,
+                     "content": (revision_output / name).read_text(encoding="utf-8")}
+                    for name in payload["material_manifest"]
+                ]
+            return response
+
+        result = profile.revise(revision_output, self.inputs, self.snapshot, parent,
+                                "author/RESULT.json", parent_sha, "r3", revised_call)
+        self.assertEqual(result["status"], "static_review_passed")
+        self.assertEqual(parent_calls, ["research", "author", "review"])
+        self.assertEqual(revision_calls, ["author", "review"])
+
+        stale_parent = self.root / "stale-needs-changes-parent"
+        self.run_pipeline(stale_parent, needs_changes_call)
+        stale_input = stale_parent / "REVIEW_INPUT.json"
+        altered = json.loads(stale_input.read_text(encoding="utf-8"))
+        altered["reference"]["product_shape"]["value"] = "stale modified input"
+        stale_input.write_text(json.dumps(altered), encoding="utf-8")
+        stale_author = stale_parent / "author/RESULT.json"
+        stale_sha = hashlib.sha256(stale_author.read_bytes()).hexdigest()
+        with self.assertRaisesRegex(ValueError, "parent review result is not bound"):
+            profile.revise(self.root / "stale-review-revision", self.inputs, self.snapshot,
+                           stale_parent, "author/RESULT.json", stale_sha, "r3", revised_call)
+
+    def test_machine_schema_matches_exact_root_and_enums(self):
+        schema = profile.CONTRACT_SCHEMA
+        self.assertEqual(set(schema["properties"]), {
+            "schema", "product_shape", "roles", "objects", "actions", "surfaces",
+            "journeys", "rules", "assertions", "scope_options", "basis", "gaps",
+        })
+        self.assertEqual(set(schema["required"]), set(schema["properties"]))
+        surface = schema["properties"]["surfaces"]["items"]["properties"]
+        self.assertEqual(set(surface["states"]["properties"]),
+                         {"loading", "empty", "no_results", "error", "forbidden"})
+        self.assertEqual(set(surface["kind"]["enum"]),
+                         {"web", "desktop", "cli", "api", "library", "other"})
 
     def test_pass_export_and_zero_callback_replay(self):
         out = self.root / "output"

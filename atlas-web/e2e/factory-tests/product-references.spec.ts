@@ -34,3 +34,27 @@ test('product references distinguish design examples and unreviewed scoped draft
   await expect(page.getByRole('button',{name:'下载未审阅参考包'})).toHaveCount(0);
   expect(writes.every(p=>p==='/api/factory/product-references/preview')).toBe(true);
 });
+
+test('reviewed references are catalog entries with explicit non-runtime status and shared case links',async({page})=>{
+  await page.addInitScript(()=>localStorage.setItem('atlas-lang','en'));
+  const item={id:'ref_'+'a'.repeat(32),name:'个人收藏夹',schema:'atlas.product-reference.v1',package_sha256:'b'.repeat(64),reference_digest:'c'.repeat(64),pilot_id:'pilot-fixture',leaf:'bookmark-manager',revision_id:'r2',status:'static_review_passed',application_status:'application_not_run',publication_status:'not_published',case_refs:[{case_id:'case:bookmark',revision:2,digest:'d'.repeat(64),url:'/api/factory/v1/cases/case:bookmark/revisions/2'}]};
+  await page.route('**/api/**',async route=>{
+    const url=new URL(route.request().url());
+    if(url.pathname.endsWith('/product-references/'+item.id+'/download'))return route.fulfill({status:200,body:'fixture zip'});
+    if(url.pathname.endsWith('/product-references/'+item.id))return route.fulfill({json:{...item,document:'# 个人收藏夹\n\nReviewed reference.'}});
+    if(url.pathname.endsWith('/product-references'))return route.fulfill({json:[item]});
+    if(url.pathname.endsWith('/product-reference-examples'))return route.fulfill({json:{items:[]}});
+    if(url.pathname.endsWith('/status'))return route.fulfill({json:{cli:{available:true,version:'fixture',models:[]},runtime:{available:false}}});
+    if(url.pathname.endsWith('/assisted-templates'))return route.fulfill({json:{items:[],counts:{total:0,core_verified:0,not_run:0}}});
+    if(['/catalog','/batches','/artifacts'].some(p=>url.pathname.endsWith(p)))return route.fulfill({json:[]});
+    return route.fulfill({json:{}});
+  });
+  await page.goto('/factory?view=references');
+  await expect(page.getByRole('status').filter({hasText:'Catalog references have passed independent static review'})).toBeVisible();
+  const card=page.getByRole('article').filter({hasText:'r2'});
+  await expect(card).toContainText('Application not run');
+  await expect(card.getByRole('link',{name:'Case case:bookmark r2'})).toHaveAttribute('href',item.case_refs[0].url);
+  await card.getByRole('button',{name:'Read reference'}).click();
+  await expect(page.getByRole('article',{name:'个人收藏夹'})).toContainText('Reviewed reference.');
+  expect(page.locator('input[type=file]')).toHaveCount(1);
+});
