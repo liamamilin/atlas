@@ -254,9 +254,36 @@ class FullModelRunnerTests(unittest.TestCase):
         self.assertEqual(runner.dispatch_lanes(["a"], "pilot_complete"), (False, True))
         self.assertEqual(runner.dispatch_lanes([], "full_first_round"), (False,))
         self.assertEqual(runner.dispatch_lanes(["a"], "selected_first_pass"), (False,))
-        self.assertNotIn(runner.leaf_failure_code(KeyError("id"), "freeze_import_export"), runner.GLOBAL_CODES)
-        self.assertNotIn(runner.leaf_failure_code(ValueError("broken candidate"), "verify_download"), runner.GLOBAL_CODES)
+        self.assertIn(runner.leaf_failure_code(KeyError("id"), "freeze_import_export"), runner.GLOBAL_CODES)
+        self.assertIn(runner.leaf_failure_code(ValueError("broken candidate"), "verify_download"), runner.GLOBAL_CODES)
+        self.assertEqual(
+            runner.leaf_failure_code(
+                runner.FactoryError("bad candidate", "auxiliary_content", 409), "generation"
+            ),
+            "auxiliary_content",
+        )
+        self.assertEqual(
+            runner.leaf_failure_code(
+                runner.FactoryError("known item delivery failure", "leaf_delivery_error", 409),
+                "verify_download",
+            ),
+            "leaf_delivery_error",
+        )
+        for local_code in {
+            *runner.TECH_CODES,
+            "budget_retry_limit",
+            "budget_leaf_exhausted",
+            "budget_first_pass_reserve",
+        }:
+            self.assertEqual(
+                runner.leaf_failure_code(
+                    runner.FactoryError("known one-leaf terminal result", local_code, 409),
+                    "generation",
+                ),
+                local_code,
+            )
         self.assertIn(runner.leaf_failure_code(sqlite3.DatabaseError("database corrupt"), "research"), runner.GLOBAL_CODES)
+        self.assertIn("budget_round_boundary", runner.GLOBAL_CODES)
 
     def test_runner_inherits_only_the_persisted_three_leaf_dispatch(self):
         leaves = {"e-book-library-application", "markdown-editor", "resource-calendar"}

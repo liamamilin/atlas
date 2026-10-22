@@ -9,6 +9,7 @@ from .store import FactoryError, digest
 MODEL = "opencode-go/minimax-m3.1-flash-free"
 REVISED_MODEL = "open-design/deepseek-v4.1-flash"
 MODEL_SWITCH_AUTHORIZATION = "docs/template-factory/open-design-switch-2026-10-22/authorization/USER_MODEL_SWITCH.txt"
+ROUND_AUTHORIZATION = "docs/template-factory/workflow-rounds-2026-10-22/authorization/USER_REQUEST.txt"
 
 
 def ensure_schema(con):
@@ -724,6 +725,16 @@ class FullAuxiliaryService:
                 raise FactoryError("unknown plan", "not_found", 404)
             prior = con.execute("SELECT body FROM auxiliary_full_event WHERE plan_id=? AND kind='selected_dispatch' ORDER BY id DESC LIMIT 1",
                                 (plan_id,)).fetchone()
+            root = self.store.pack.parent.resolve()
+            grant = json.loads(row["request_json"])
+            round_auth = request.get("authorization", {})
+            if round_auth.get("path") != ROUND_AUTHORIZATION:
+                raise FactoryError("round authorization path differs", "full_plan_binding", 409)
+            for binding in (grant["authorization"], grant["scope"], round_auth):
+                path = (root / binding.get("path", "")).resolve()
+                if (not path.is_relative_to(root) or not path.is_file()
+                    or hashlib.sha256(path.read_bytes()).hexdigest() != binding.get("sha256")):
+                    raise FactoryError("round authorization/scope changed", "full_plan_integrity", 409)
             if prior:
                 saved = json.loads(prior[0])
                 if saved.get("round_request_digest") == digest(request):
@@ -734,13 +745,6 @@ class FullAuxiliaryService:
                                  (self.campaign_id, row["phase"])).fetchone()[0]
             if active:
                 raise FactoryError("drain calls before round activation", "full_plan_paused", 409)
-            root = self.store.pack.parent.resolve()
-            grant = json.loads(row["request_json"])
-            for binding in (grant["authorization"], grant["scope"], request.get("authorization", {})):
-                path = (root / binding.get("path", "")).resolve()
-                if (not path.is_relative_to(root) or not path.is_file()
-                    or hashlib.sha256(path.read_bytes()).hexdigest() != binding.get("sha256")):
-                    raise FactoryError("round authorization/scope changed", "full_plan_integrity", 409)
             if request.get("original_request_digest") != row["request_digest"]:
                 raise FactoryError("round changes original plan", "full_plan_binding", 409)
             if self.clock() >= (row["deadline"] or float("inf")):

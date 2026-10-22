@@ -47,6 +47,7 @@ GLOBAL_CODES = {
     "full_plan_integrity",
     "full_plan_binding",
     "budget_deadline",
+    "budget_round_boundary",
     "budget_exhausted",
     "budget_paused",
     "full_plan_paused",
@@ -62,23 +63,46 @@ TECH_CODES = {
     "cli_no_result",
     "cli_output_truncated",
 }
+LOCAL_CODES = {
+    "auxiliary_content",
+    "source_unavailable",
+    "leaf_delivery_error",
+    *TECH_CODES,
+    "budget_retry_limit",
+    "budget_leaf_exhausted",
+    "budget_first_pass_reserve",
+}
 
 
 def leaf_failure_code(error, stage):
-    code = getattr(error, "code", "leaf_host_error")
+    # Unknown exceptions are host failures.  A leaf may continue only when a
+    # known, explicitly classified content or per-item delivery failure occurs.
+    code = getattr(error, "code", None)
     if isinstance(error, sqlite3.DatabaseError):
         return "workflow_host_error"
     if isinstance(error, OSError) and error.errno == __import__("errno").ENOSPC:
         return "workflow_host_error"
-    if stage == "source_pin" and isinstance(error, (ValueError, urllib.error.HTTPError)):
-        code = "source_unavailable"
-    if stage in {"freeze_import_export", "verify_download"} and code not in GLOBAL_CODES:
-        code = "leaf_delivery_error"
-    if isinstance(error, urllib.error.URLError) and (
-        not isinstance(error, urllib.error.HTTPError) or error.code in {403, 429, 500, 502, 503, 504}
-    ):
+    if code in GLOBAL_CODES:
+        return code
+    if code in LOCAL_CODES:
+        return code
+    if isinstance(error, urllib.error.HTTPError) and error.code in {403, 429, 500, 502, 503, 504}:
         code = "full_provider_unavailable"
-    return code
+    elif stage == "source_pin" and isinstance(error, urllib.error.HTTPError) and error.code in {404, 410}:
+        code = "source_unavailable"
+    elif (
+        stage == "freeze_import_export"
+        and isinstance(error, urllib.error.HTTPError)
+        and error.code == 422
+    ) or (
+        stage == "verify_download"
+        and isinstance(error, urllib.error.HTTPError)
+        and error.code in {404, 410, 422}
+    ):
+        code = "leaf_delivery_error"
+    elif isinstance(error, urllib.error.URLError):
+        code = "full_provider_unavailable"
+    return code if code in GLOBAL_CODES or code in LOCAL_CODES else "workflow_host_error"
 
 
 def load(path):
@@ -118,7 +142,7 @@ def materialize_case_snapshot(snapshot, folder, store, *, namespace):
         or not license_files
         or any(name not in files for name in license_files)
     ):
-        raise ValueError("source license unclear; stop before generation")
+        raise FactoryError("source license unclear; stop before generation", "source_unavailable", 409)
     repo = github_repo(repository)
     source_root = Path(store.root) / "sources" / namespace
     local = source_root / folder.parent.name / folder.name
@@ -740,22 +764,38 @@ def stage_call(
     if (path / "BINDING.json").exists():
         call_model = load(path / "BINDING.json")["model"]
         if call_model not in service.allowed_models(PLAN_ID):
-            raise ValueError("checkpoint model is not authorized for this plan")
+            raise FactoryError(
+                "checkpoint model is not authorized for this plan",
+                "full_plan_integrity",
+                409,
+            )
     else:
         call_model = effective_model
 
     def deliver(target, selected_budget):
         try:
-            result = checkpoint(
-                target,
-                payload,
-                prompt,
-                CoordinatedCLI(root, service),
-                selected_budget,
-                source,
-                leaf,
-                model=call_model,
-            )
+            try:
+                result = checkpoint(
+                    target,
+                    payload,
+                    prompt,
+                    CoordinatedCLI(root, service),
+                    selected_budget,
+                    source,
+                    leaf,
+                    model=call_model,
+                )
+            except ValueError as error:
+                if str(error) in {
+                    "checkpoint read-source changed",
+                    "checkpoint leaf changed",
+                    "fixed input changed: input.json; use a new output/version",
+                    "fixed input changed: BINDING.json; use a new output/version",
+                    "checkpoint result differs from delivered binding",
+                    "recovered raw result differs",
+                }:
+                    raise FactoryError(str(error), "workflow_integrity", 409) from error
+                raise
         except FactoryError as error:
             if shared_provider_fault(error):
                 fixed_json(
@@ -1244,7 +1284,11 @@ def execute_leaf(root, service, item, api, repair=False):
                     or saved_request.get("profile") != profiles.VERSION
                     or saved_request.get("model") not in service.allowed_models(PLAN_ID)
                 ):
-                    raise ValueError("existing REQUEST.json binding is invalid")
+                    raise FactoryError(
+                        "existing REQUEST.json binding is invalid",
+                        "full_plan_integrity",
+                        409,
+                    )
             if wf.begin(
                 PLAN_ID,
                 item["leaf"],
@@ -1432,7 +1476,9 @@ def execute_leaf(root, service, item, api, repair=False):
                 snapshot = load(old / "source-snapshot.json")
                 for path, value in snapshot["files"].items():
                     if sha(Path(snapshot["local_root"]) / path) != value:
-                        raise ValueError("prior source bytes changed")
+                        raise FactoryError(
+                            "prior source bytes changed", "workflow_integrity", 409
+                        )
                 fixed_json(work / "source-snapshot.json", snapshot)
                 fixed_json(work / "RESEARCH_REUSE.json", ref)
                 # Scenario is supplied, not model-authored here; author must preserve it.
@@ -1519,13 +1565,22 @@ def execute_leaf(root, service, item, api, repair=False):
                         },
                     )
                 elif reused:
-                    raise ValueError("reuse case has no matching fixed source snapshot")
+                    raise FactoryError(
+                        "reuse case has no matching fixed source snapshot",
+                        "workflow_integrity",
+                        409,
+                    )
                 else:
-                    pin_sources(research, work, service.store, namespace=PLAN_ID)
+                    try:
+                        pin_sources(research, work, service.store, namespace=PLAN_ID)
+                    except ValueError as error:
+                        if str(error) == "source license unclear; stop before generation":
+                            raise FactoryError(str(error), "source_unavailable", 409) from error
+                        raise
             snapshot = load(work / "source-snapshot.json")
             for name, expected in snapshot["files"].items():
                 if sha(Path(snapshot["local_root"]) / name) != expected:
-                    raise ValueError("source bytes differ")
+                    raise FactoryError("source bytes differ", "workflow_integrity", 409)
             if not (work / "upstream-evidence.zip").exists():
                 with zipfile.ZipFile(
                     work / "upstream-evidence.zip", "w", zipfile.ZIP_DEFLATED
@@ -1565,7 +1620,7 @@ def execute_leaf(root, service, item, api, repair=False):
             if not (materials / "upstream").exists():
                 shutil.copytree(snapshot["local_root"], materials / "upstream")
             if manifest_files(materials / "upstream") != snapshot["files"]:
-                raise ValueError("source inventory differs")
+                raise FactoryError("source inventory differs", "workflow_integrity", 409)
             prompt = profiles.AUTHOR
             if repair:
                 feedback = load(latest_failure(previous))
@@ -1905,11 +1960,13 @@ def execute_leaf(root, service, item, api, repair=False):
                     service.control(PLAN_ID, "pause", code + ": " + str(error))
                 return {"leaf": item["leaf"], "state": "paused", "code": code}
             content = code == "auxiliary_content"
-            state = (
-                "needs_revision"
-                if content
-                else ("source_unavailable" if stage == "source_pin" else "failed")
-            )
+            reserve_deferred = code == "budget_first_pass_reserve"
+            if reserve_deferred:
+                state = "needs_revision" if repair else "paused"
+            elif content:
+                state = "needs_revision"
+            else:
+                state = "source_unavailable" if stage == "source_pin" else "failed"
             service.update_leaf(
                 PLAN_ID,
                 item["leaf"],
@@ -1920,6 +1977,11 @@ def execute_leaf(root, service, item, api, repair=False):
                     "error": str(error),
                     "first_pass_done": True,
                     "repair_pending": content and not repair,
+                    **(
+                        {"deferred_reason": "preserve pending first-pass allowance"}
+                        if reserve_deferred
+                        else {}
+                    ),
                     "workdir": str(work.relative_to(ROOT)),
                 },
             )

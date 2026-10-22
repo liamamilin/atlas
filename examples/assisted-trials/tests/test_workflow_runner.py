@@ -71,7 +71,15 @@ class WorkflowRunnerHostTests(unittest.TestCase):
         self.work = self.root / "items" / self.leaf / "attempt-1"
         self.provider_calls = []
 
-    def _patches(self, produce_stub, verify_stub=None):
+    def _patches(
+        self,
+        produce_stub,
+        verify_stub=None,
+        *,
+        real_author_stage=False,
+        stage_error=None,
+    ):
+        real_stage_call = runner.stage_call
         snapshot_root = self.root / "pinned-source"
         source_file = snapshot_root / "README.md"
         source_file.parent.mkdir(parents=True, exist_ok=True)
@@ -90,6 +98,16 @@ class WorkflowRunnerHostTests(unittest.TestCase):
             write_json(paths_file, paths)
             target = work / relative
             target.mkdir(parents=True, exist_ok=True)
+            if stage_error is not None and stage == "blueprint-generate-aux":
+                raise stage_error()
+            if real_author_stage and stage == "blueprint-generate-aux":
+                write_json(work / "PROTOCOL_SUCCESSOR.json", {
+                    "parent_path": "calls/blueprint-spec-review-aux",
+                    "reason": "one protocol recovery already used",
+                })
+                return real_stage_call(
+                    _root, service, item, work, stage, *_args, lane=lane, **_kwargs
+                )
             if (target / "RESULT.json").exists():
                 return json.loads((target / "RESULT.json").read_text())
             self.provider_calls.append(stage)
@@ -201,7 +219,9 @@ class WorkflowRunnerHostTests(unittest.TestCase):
         def produce_stub(*_args):
             produced.append(1)
             if len(produced) == 1:
-                raise RuntimeError("temporary freeze host failure")
+                raise runner.FactoryError(
+                    "item generation delivery was rejected", "leaf_delivery_error", 409
+                )
             write_json(self.work / "IMPORT_RECEIPT.json", {
                 "artifact_id": "artifact-fixture", "case_id": "case-fixture", "case_revision": 1,
                 "case_ref": {"case_id": "case-fixture", "revision": 1, "digest": "d" * 64},
@@ -255,6 +275,180 @@ class WorkflowRunnerHostTests(unittest.TestCase):
         result = self.execute()
         self.assertEqual(result["state"], "paused")
         self.assertEqual(self.service.status("host-fixture")["status"], "paused")
+
+    def test_unknown_generation_host_error_pauses_instead_of_isolating_leaf(self):
+        def unknown_host_failure(*_args):
+            raise RuntimeError("unexpected host defect")
+
+        self._patches(unknown_host_failure)
+        result = self.execute()
+        self.assertEqual(result["state"], "paused")
+        self.assertEqual(result["code"], "workflow_host_error")
+        self.assertEqual(self.service.status("host-fixture")["status"], "paused")
+
+    def test_exhausted_protocol_retry_is_leaf_failure_and_keeps_plan_running(self):
+        self._patches(lambda *_args: self.fail("generation retry must remain exhausted"), real_author_stage=True)
+
+        class FailedProtocolCLI:
+            def run(inner, directory, _prompt, model, _timeout, _cancelled, _progress, **kwargs):
+                budget = kwargs["budget"]
+                reservation = budget["ledger"].reserve(
+                    budget["identity"], budget["phase"], budget["kind"],
+                    job_id=budget["job_id"], requested_model=model,
+                    plan_id=budget["plan_id"], stage=budget["stage"],
+                )
+                budget["ledger"].finish(reservation["id"], "failed", outcome="cli_protocol")
+                write_json(Path(directory) / "cli-summary.json", {
+                    "requested_model": model,
+                    "delivery_status": "failed",
+                    "failure_code": "cli_protocol",
+                    "output_observed": True,
+                })
+                write_json(Path(directory) / "original-response.json", {"text": "not-json"})
+                raise runner.FactoryError("mock protocol failure", "cli_protocol", 409)
+
+        with patch.object(runner, "CoordinatedCLI", return_value=FailedProtocolCLI()):
+            result = self.execute()
+
+        self.assertEqual(result["state"], "failed")
+        self.assertEqual(result["code"], "budget_retry_limit")
+        status = self.service.status("host-fixture")
+        self.assertEqual(status["status"], "running")
+        self.assertEqual(status["items"][0]["state"], "failed")
+        self.assertEqual(status["new_calls"], 2)
+        retry_summary = self.work / "calls/blueprint-generate-aux/cli-summary.json"
+        self.assertEqual(json.loads(retry_summary.read_text())["failure_code"], "cli_protocol")
+
+    def test_first_pass_protocol_reserve_deferral_marks_leaf_done_without_pausing_plan(self):
+        self._patches(
+            lambda *_args: self.fail("budget deferral must precede the provider"),
+            stage_error=lambda: runner.FactoryError(
+                "preserve pending first-pass allowance", "budget_first_pass_reserve", 409
+            ),
+        )
+        result = self.execute()
+        self.assertEqual(result["state"], "paused")
+        status = self.service.status("host-fixture")
+        self.assertEqual(status["status"], "running")
+        self.assertEqual(status["items"][0]["first_pass_done"], True)
+        self.assertEqual(
+            status["items"][0]["deferred_reason"],
+            "preserve pending first-pass allowance",
+        )
+        self.assertEqual(status["new_calls"], 1)
+
+    def test_repair_budget_reserve_deferral_retains_needs_revision_without_retry(self):
+        self._patches(
+            lambda *_args: self.fail("budget deferral must precede the provider"),
+            stage_error=lambda: runner.FactoryError(
+                "preserve pending first-pass allowance", "budget_first_pass_reserve", 409
+            ),
+        )
+        previous = self.root / "items" / self.leaf / "attempt-1"
+        previous.mkdir(parents=True)
+        scenario = {
+            "name": "Fixture scenario",
+            "audience": "Fixture user",
+            "objective": "Complete the fixture workflow",
+            "workflow": ["Start", "Complete"],
+            "acceptance": ["Completion is visible"],
+        }
+        write_json(previous / "SELECTED_SCENARIO.json", scenario)
+        write_json(previous / "RESEARCH.json", {
+            "repository": "https://example.invalid/fixture",
+            "files": ["README.md"],
+            "rationale": "fixed research",
+            "reuse_case_id": None,
+            "delivery_profile": "web",
+            "scenario": scenario,
+        })
+        source_root = self.root / "pinned-source"
+        source_file = source_root / "README.md"
+        source_file.parent.mkdir(parents=True, exist_ok=True)
+        source_file.write_text("pinned fixture source\n")
+        write_json(previous / "source-snapshot.json", {
+            "repository": "https://example.invalid/fixture",
+            "commit_sha": "a" * 40,
+            "files": {"README.md": runner.sha(source_file)},
+            "local_root": str(source_root),
+        })
+        write_json(previous / "LATEST_FAILURE.json", {"error": "prior review"})
+        write_json(previous / "STAGE_PATHS.json", {
+            "blueprint-spec-review-aux": "calls/blueprint-spec-review-aux",
+        })
+        self.service.update_leaf("host-fixture", self.leaf, "needs_revision", {
+            "first_pass_done": True,
+            "repair_pending": True,
+            "current_attempt": "attempt-1",
+            "workdir": str(previous.relative_to(self.root)),
+        })
+        current = self.service.status("host-fixture")["items"][0]
+        result = runner.execute_leaf(self.root, self.service, current, "https://fixture.invalid", repair=True)
+
+        self.assertEqual(
+            result["state"],
+            "needs_revision",
+            json.dumps({"result": result, "failure": json.loads((self.work.parent / "attempt-2" / "LATEST_FAILURE.json").read_text())}),
+        )
+        status = self.service.status("host-fixture")
+        self.assertEqual(status["status"], "running")
+        self.assertEqual(status["items"][0]["state"], "needs_revision")
+        self.assertFalse(status["items"][0]["repair_pending"])
+        self.assertEqual(status["items"][0]["deferred_reason"], "preserve pending first-pass allowance")
+        self.assertTrue(status["items"][0]["first_pass_done"])
+
+    def test_tampered_request_binding_pauses_before_any_provider_call(self):
+        self._patches(lambda *_args: self.fail("tampered request must stop before generation"))
+        write_json(self.work / "REQUEST.json", {
+            "leaf": self.leaf,
+            "leaf_sha256": "0" * 64,
+            "full_plan_id": "host-fixture",
+            "profile": runner.profiles.VERSION,
+            "model": MODEL,
+        })
+        result = self.execute()
+        self.assertEqual(result["state"], "paused")
+        self.assertEqual(result["code"], "full_plan_integrity")
+        self.assertEqual(self.provider_calls, [])
+        self.assertEqual(self.service.status("host-fixture")["status"], "paused")
+
+    def test_source_inventory_mismatch_pauses_workflow(self):
+        self._patches(lambda *_args: self.fail("source inventory mismatch must stop before generation"))
+        original_manifest = runner.manifest_files
+
+        def mismatched_manifest(path):
+            if Path(path).name == "upstream":
+                return {"unexpected.txt": "0" * 64}
+            return original_manifest(path)
+
+        with patch.object(runner, "manifest_files", side_effect=mismatched_manifest):
+            result = self.execute()
+        self.assertEqual(result["state"], "paused")
+        self.assertEqual(result["code"], "workflow_integrity")
+        self.assertEqual(self.service.status("host-fixture")["status"], "paused")
+
+    def test_known_item_download_failure_is_isolated(self):
+        def produce_stub(*_args):
+            write_json(self.work / "IMPORT_RECEIPT.json", {
+                "artifact_id": "artifact", "case_id": "case", "case_revision": 1,
+                "digest": "d" * 64, "exported_zip_sha256": "e" * 64,
+                "export": {"download_url": "/download"},
+            })
+            for path in (self.work / "packages/template-snapshot.zip", self.work / "atlas-development-package.zip"):
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"fixture package")
+            return {"artifact_id": "artifact", "case_id": "case", "case_revision": 1, "url": "/api/factory/artifacts/artifact"}
+
+        def missing_item_download(_work, _api):
+            raise runner.urllib.error.HTTPError(
+                "https://fixture.invalid/download", 404, "missing item", {}, None
+            )
+
+        self._patches(produce_stub, missing_item_download)
+        result = self.execute()
+        self.assertEqual(result["state"], "failed")
+        self.assertEqual(result["code"], "leaf_delivery_error")
+        self.assertEqual(self.service.status("host-fixture")["status"], "running")
 
     def test_completed_reused_step_repairs_leaf_state_without_provider_calls(self):
         self._patches(lambda *_args: self.fail("reused leaf must not import again"))

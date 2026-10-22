@@ -738,6 +738,81 @@ class FullLeafTests(unittest.TestCase):
     def test_first_round_completes_every_batch_without_entering_repairs(self):
         self._assert_coordinator_batches("full_first_round")
 
+    def test_pilot_complete_repairs_only_prior_needs_revision_items_then_pauses(self):
+        import signal
+        from atlas_runtime import atomic_json
+
+        selected = ["e-book-library-application", "markdown-editor", "resource-calendar"]
+
+        class Service:
+            def __init__(inner):
+                inner.state = "registered"
+                inner.items = [
+                    {
+                        "leaf": leaf,
+                        "state": "needs_revision",
+                        "first_pass_done": True,
+                        "repair_pending": True,
+                    }
+                    for leaf in selected
+                ]
+                inner.calls = []
+                inner.reason = None
+
+            def status(inner, *args):
+                return {
+                    "status": inner.state,
+                    "items": copy.deepcopy(inner.items),
+                    "calls": [],
+                    "baseline": 0,
+                    "new_calls": 0,
+                    "max_calls": 7200,
+                    "active_calls": 0,
+                }
+
+            def control_state(inner, *args):
+                return inner.state
+
+            def selected_leaves(inner, *args):
+                return selected
+
+            def dispatch_mode(inner, *args):
+                return "pilot_complete"
+
+            def control(inner, plan, action, reason=None):
+                inner.state = {"resume": "running", "pause": "paused", "complete": "completed"}[action]
+                inner.reason = reason
+                return inner.status()
+
+        service = Service()
+        invocations = []
+        folder = self.root / "pilot-repair-queue"
+        folder.mkdir()
+
+        def execute(_root, _service, item, _api, repair):
+            invocations.append((item["leaf"], repair))
+            own = next(x for x in service.items if x["leaf"] == item["leaf"])
+            own.update(state="ready_not_run", repair_pending=False, first_pass_done=True)
+            return own
+
+        previous = signal.getsignal(signal.SIGTERM)
+        self.addCleanup(signal.signal, signal.SIGTERM, previous)
+        with (
+            patch.object(runner, "verify_plan", return_value=({}, {"items": [{"leaf": leaf} for leaf in selected]})),
+            patch.object(runner, "host", return_value=(None, service)),
+            patch.object(runner, "execute_leaf", execute),
+            patch.object(runner, "get_workflow_gate", return_value=None),
+            patch.object(runner, "atomic_json", side_effect=atomic_json),
+        ):
+            runner.run(folder, "fixture://no-model")
+
+        self.assertEqual(invocations, [(leaf, True) for leaf in selected])
+        self.assertEqual(service.state, "paused")
+        self.assertEqual(service.reason, "selected leaf run complete")
+        report = json.loads((folder / "ROUND_REPORT.json").read_text())
+        self.assertEqual(report["status"], "paused")
+        self.assertEqual(report["mode"], "pilot_complete")
+
     def _assert_coordinator_batches(self, mode):
         import signal
         import time
@@ -799,6 +874,7 @@ class FullLeafTests(unittest.TestCase):
                 own.update(
                     state="failed" if own["leaf"] == "q-5" else "ready_not_run",
                     first_pass_done=True,
+                    failure_code="budget_retry_limit" if own["leaf"] == "q-5" else None,
                 )
                 if mode == "full_first_round" and own["leaf"] == "q-6":
                     own.update(state="needs_revision", repair_pending=True)
@@ -827,9 +903,12 @@ class FullLeafTests(unittest.TestCase):
         self.assertEqual([len(x) for x in batches], [20, 20, 1])
         self.assertEqual(len(set(service.visited)), 41)
         self.assertEqual(len(service.visited), 41)
+        self.assertIn("q-40", service.visited)
         self.assertEqual(service.peak, 2)
         self.assertEqual(service.state, "paused" if mode == "full_first_round" else "completed")
         self.assertEqual(sum(x["state"] == "failed" for x in service.items), 1)
+        failed = next(x for x in service.items if x["leaf"] == "q-5")
+        self.assertEqual(failed["failure_code"], "budget_retry_limit")
         report = json.loads((folder / "ROUND_REPORT.json").read_text())
         self.assertEqual(len(report["items"]), 41)
         self.assertTrue(list((folder / "round-reports").glob("*.json")))

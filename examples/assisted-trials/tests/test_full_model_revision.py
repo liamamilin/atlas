@@ -60,7 +60,8 @@ class FullModelRevisionTests(unittest.TestCase):
 
     def round_request(self, mode="pilot_complete"):
         from template_factory.store import digest
-        auth = self.root / "round.txt"
+        auth = self.root / "docs/template-factory/workflow-rounds-2026-10-22/authorization/USER_REQUEST.txt"
+        auth.parent.mkdir(parents=True, exist_ok=True)
         auth.write_text("fixture explicit full-round and bounded revision authorization")
         with self.store.connect(True) as con:
             con.execute("INSERT OR REPLACE INTO auxiliary_workflow_gate VALUES(?,?,?)",
@@ -69,7 +70,7 @@ class FullModelRevisionTests(unittest.TestCase):
                 "mode": mode, "reason": "fixture full round", "model": MODEL,
                 "original_request_digest": digest(self.request),
                 "leaves": ["leaf", "leaf-two", "leaf-three"] if mode == "pilot_complete" else ["leaf", "leaf-two", "leaf-three", "leaf-four"],
-                "authorization": {"path": "round.txt", "sha256": self.hash(auth)}}
+                "authorization": {"path": "docs/template-factory/workflow-rounds-2026-10-22/authorization/USER_REQUEST.txt", "sha256": self.hash(auth)}}
 
     def test_round_activation_preserves_budget_and_is_idempotent(self):
         self.pause()
@@ -105,7 +106,11 @@ class FullModelRevisionTests(unittest.TestCase):
         req = self.round_request()
         with self.assertRaises(FactoryError):
             self.service.resume_round({**req, "model": "unknown"})
-        (self.root / "round.txt").write_text("tampered")
+        with self.assertRaisesRegex(FactoryError, "authorization path differs"):
+            self.service.resume_round({**req, "authorization": {**req["authorization"], "path": "round.txt"}})
+        with self.assertRaisesRegex(FactoryError, "authorization/scope changed"):
+            self.service.resume_round({**req, "authorization": {**req["authorization"], "sha256": "wrong"}})
+        (self.root / req["authorization"]["path"]).write_text("tampered")
         with self.assertRaisesRegex(FactoryError, "authorization/scope changed"):
             self.service.resume_round(req)
         req = self.round_request()
