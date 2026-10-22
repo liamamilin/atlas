@@ -1,0 +1,70 @@
+{
+ "pilot": {
+  "pilot_id": "reference-two-shapes-2026-10-22",
+  "plan_id": "full-leaf-auxiliary-2026-10-21",
+  "phase": "auxiliary-full-full-leaf-auxiliary-2026-10-21",
+  "status": "completed",
+  "request_digest": "bcdaa9c84e3308a719529bb8670d6c71d674895055195a37f4d1edbc1463c384",
+  "leaves": [
+   "bookmark-manager",
+   "polling-application"
+  ],
+  "max_calls": 6,
+  "created": 1792668493.194456,
+  "calls": [
+   {
+    "identity": "full-leaf-auxiliary-2026-10-21:bookmark-manager",
+    "stage": "reference/research/reference-two-shapes-2026-10-22",
+    "status": "completed",
+    "job_id": "reference-two-shapes-2026-10-22:bookmark-manager:research",
+    "created": 1792668514.0671291,
+    "started": 1792668514.259465,
+    "finished": 1792668598.0196428
+   },
+   {
+    "identity": "full-leaf-auxiliary-2026-10-21:polling-application",
+    "stage": "reference/research/reference-two-shapes-2026-10-22",
+    "status": "completed",
+    "job_id": "reference-two-shapes-2026-10-22:polling-application:research",
+    "created": 1792668598.464632,
+    "started": 1792668598.5780559,
+    "finished": 1792668722.381375
+   }
+  ],
+  "remaining_calls": 4
+ },
+ "outcomes": [
+  {
+   "status": "failed",
+   "error_type": "ValueError",
+   "code": null,
+   "reason": "observation is not bound to a trusted upstream source",
+   "completed_stages": [
+    "research"
+   ],
+   "leaf": "bookmark-manager",
+   "recorded_at": 1792668598.034812,
+   "application_runtime_status": "not_run",
+   "publication_status": "not_published"
+  },
+  {
+   "status": "failed",
+   "error_type": "ValueError",
+   "code": null,
+   "reason": "observation is not bound to a trusted upstream source",
+   "completed_stages": [
+    "research"
+   ],
+   "leaf": "polling-application",
+   "recorded_at": 1792668722.397938,
+   "application_runtime_status": "not_run",
+   "publication_status": "not_published"
+  }
+ ],
+ "full_plan": {
+  "status": "paused",
+  "new_calls": 176,
+  "active_calls": 0,
+  "deadline": 1795181744.123177
+ }
+}

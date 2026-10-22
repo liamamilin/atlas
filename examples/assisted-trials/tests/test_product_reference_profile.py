@@ -108,6 +108,33 @@ class ProductReferencePipelineTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.run_pipeline(out, callback)
 
+    def test_read_metadata_aliases_preserve_raw_research_and_zero_call_replay(self):
+        out = self.root / "metadata"
+        original, calls = self.callback()
+        def alias_call(stage, payload, prompt, source):
+            response = original(stage, payload, prompt, source)
+            if stage == "research":
+                response["result"]["observed_upstream"][0][:2] = ["doc", "source/upstream/docs.md"]
+            return response
+        result = self.run_pipeline(out, alias_call)
+        self.assertEqual(result["status"], "static_review_passed")
+        raw = json.loads((out / "research/RESULT.json").read_text())
+        self.assertEqual(raw["observed_upstream"][0][:2], ["doc", "source/upstream/docs.md"])
+        proof = json.loads((out / "RESEARCH_METADATA_ADAPTATION.json").read_text())
+        self.assertEqual(proof["raw_result_digest"], digest(raw))
+        self.assertFalse(proof["statement_content_changed"])
+        self.assertEqual(proof["canonical_observations"][0][:2], ["documentation", "docs.md"])
+        with zipfile.ZipFile(out / "reference.zip") as archive:
+            self.assertEqual(hashlib.sha256(archive.read("research.json")).hexdigest(), proof["raw_result_sha256"])
+            self.assertEqual(json.loads(archive.read("research-metadata-adaptation.json")), proof)
+        self.run_pipeline(out, alias_call)
+        self.assertEqual(calls, ["research", "author", "review"])
+        for bad in (["doc", "source/upstream/../docs.md", 1, 2, "Same claim"],
+                    ["executed", "docs.md", 1, 2, "Same claim"],
+                    ["doc", "docs.md", 1, 999, "Same claim"]):
+            with self.assertRaises(ValueError):
+                profile._observations([bad], self.snapshot, self.inputs["trusted_source_ids"])
+
     def test_export_interruption_resumes_after_review_without_new_calls(self):
         out = self.root / "output"
         callback, calls = self.callback()

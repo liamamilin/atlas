@@ -1,0 +1,421 @@
+{
+ "schema": "atlas.reference-pilot-research-adaptation.v1",
+ "kind_aliases": {
+  "readme": "documentation",
+  "doc": "documentation",
+  "license": "documentation",
+  "source": "code_observation"
+ },
+ "path_prefix": "source/upstream/",
+ "leaves": [
+  {
+   "leaf": "bookmark-manager",
+   "raw_result_path": "docs/template-factory/product-reference-pilot-2026-10-22/bookmark-manager/generation/research/RESULT.json",
+   "raw_result_sha256": "39c52295aac81b8da440553ce222939c4a7347c55888e2a11192bb5cc9dd3cd0",
+   "canonical_observations": [
+    [
+     "documentation",
+     "README.md",
+     3,
+     3,
+     "A fast, modern, and privacy-focused bookmark manager built for the web. Organize, tag, and manage your links with a clean and responsive interface. All data is stored locally in your browser using IndexedDB, ensuring complete privacy and offline access."
+    ],
+    [
+     "documentation",
+     "README.md",
+     13,
+     14,
+     "- **Local-First Storage**\n  All bookmarks are stored securely in your browser using IndexedDB. No accounts, servers, or tracking."
+    ],
+    [
+     "documentation",
+     "README.md",
+     16,
+     23,
+     "- **Tagging System**\n  Organize bookmarks with custom tags for quick filtering and discovery.\n\n- **Smart Sorting**\n  Sort bookmarks by recently added, recently visited, or most visited.\n\n- **Archiving & Pinning**\n  Archive old bookmarks to reduce clutter or pin important links to the top."
+    ],
+    [
+     "code_observation",
+     "src/includes/store.ts",
+     3,
+     16,
+     "export type Bookmark = {\n  id: string;\n  title: string;\n  url: string;\n  hostname: string;\n  favicon: Blob | null;\n  description: string;\n  tags: string[];\n  isPinned: boolean;\n  isArchived: boolean;\n  visitCount: number;\n  createdAt: number;\n  visitedAt: number | null;\n};"
+    ],
+    [
+     "code_observation",
+     "src/includes/store.ts",
+     35,
+     39,
+     "export const tabOptions = [\"Home\", \"Archived\"] as const;\nexport type TabOption = (typeof tabOptions)[number];\n\nexport const sortOptions = [\"Recently Added\", \"Recently Visited\", \"Most Visited\"] as const;\nexport type SortOption = (typeof sortOptions)[number];"
+    ],
+    [
+     "code_observation",
+     "src/includes/store.ts",
+     41,
+     46,
+     "export const db = new Dexie(\"BookmarkDB\") as Dexie & {\n  bookmarks: EntityTable<Bookmark, \"id\">;\n};\n\ndb.version(1).stores({\n  bookmarks: \"id, createdAt, visitCount\",\n});"
+    ],
+    [
+     "code_observation",
+     "src/App.tsrx",
+     49,
+     56,
+     "  let &[tagCounts] = track(() => {\n    const counts: Record<string, number> = {};\n    [...data.values()].forEach((bookmark) => {\n      bookmark.tags.forEach((tag) => (counts[tag] = (counts[tag] ?? 0) + 1));\n    });\n\n    return Object.fromEntries(Object.entries(counts).sort(([a], [b]) => a.localeCompare(b)));\n  });"
+    ],
+    [
+     "code_observation",
+     "src/App.tsrx",
+     69,
+     73,
+     "    return [...data.values()].filter((bookmark) => {\n      if (bookmark.isArchived !== (_tab === \"Archived\")) return false;\n      if (_tags.length > 0 && !_tags.every((t) => bookmark.tags.includes(t))) return false;\n      if (_search && !bookmark.title.toLowerCase().includes(_search)) return false;\n      return true;"
+    ],
+    [
+     "code_observation",
+     "src/App.tsrx",
+     74,
+     87,
+     "    }).sort((a, b) => {\n      if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;\n\n      if (_sort === \"Recently Visited\") {\n        const diff = (b.visitedAt ?? 0) - (a.visitedAt ?? 0);\n        if (diff !== 0) return diff;\n      } else if (_sort === \"Most Visited\") {\n        const diff = b.visitCount - a.visitCount;\n        if (diff !== 0) return diff;\n      }\n\n      // Fallback: recently added\n      return b.createdAt - a.createdAt;\n    });"
+    ],
+    [
+     "code_observation",
+     "src/App.tsrx",
+     101,
+     129,
+     "  const BookmarkFormSchema = v.object({\n    url: v.pipe(\n      v.string(),\n      v.nonEmpty(\"URL is required.\"),\n      v.regex(\n        /^https?:\\/\\/(?:[\\w-]+\\.)+[a-zA-Z]{2,}(?:\\/\\S*)?$/,\n        \"Enter a valid URL starting with http or https.\",\n      ),\n      v.url(\"Please enter a valid URL.\"),\n    ),\n    title: v.pipe(\n      v.string(),\n      v.nonEmpty(\"Title is required.\"),\n      v.maxLength(100, \"Title cannot exceed 100 characters.\"),\n    ),\n    description: v.pipe(\n      v.string(),\n      v.nonEmpty(\"Description is required.\"),\n      v.maxLength(280, \"Description cannot exceed 280 characters.\"),\n    ),\n    tags: v.pipe(\n      v.array(\n        v.pipe(v.string(), v.maxLength(30, \"A tag cannot exceed 30 characters.\")),\n        \"Tags must be an array.\",\n      ),\n      v.minLength(1, \"At least one tag is required.\"),\n      v.maxLength(5, \"At max five tags can be added.\"),\n    ),\n  });"
+    ],
+    [
+     "code_observation",
+     "src/App.tsrx",
+     136,
+     139,
+     "    loading = true;\n    try {\n      const response = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(url)}`);\n      const result = await response.json();"
+    ],
+    [
+     "code_observation",
+     "src/App.tsrx",
+     209,
+     221,
+     "          <menu class=\"menu menu-sm w-full overflow-y-auto flex-1 px-2\">\n            for (const [tag, count] of Object.entries(tagCounts); key tag) {\n              <li>\n                <label class=\"flex items-center gap-2 cursor-pointer\">\n                  <input\n                    type=\"checkbox\"\n                    value={tag}\n                    {ref bindGroup(filtersRef)}\n                    checked={filters.includes(tag)}\n                    class=\"checkbox checkbox-sm checkbox-primary rounded\"\n                  />\n                  <span class=\"flex-1\">{tag}</span>"
+    ],
+    [
+     "code_observation",
+     "src/App.tsrx",
+     244,
+     250,
+     "              <input\n                type=\"search\"\n                {ref bindValue(searchRef)}\n                class=\"grow\"\n                placeholder=\"Search by title...\"\n              />"
+    ],
+    [
+     "code_observation",
+     "src/App.tsrx",
+     309,
+     322,
+     "            for (const item of bookmarks; key item.id) {\n              <article\n                class=\"card bg-base-100 border border-base-200 rounded-2xl hover:shadow-md transition-shadow duration-200 animate-fade-in-up\"\n              >\n                <div class=\"card-body p-5 gap-3\">\n                  <header class=\"flex gap-3 items-start\">\n                    <figure class=\"border border-base-200 rounded-xl p-2.5 shrink-0\">\n                      <img src={getBlobUrl(item.favicon)} class=\"w-7 h-7 object-contain\" />\n                    </figure>\n                    <div class=\"min-w-0 flex-1\">\n                      <h3 class=\"font-semibold text-base truncate\">{item.title}</h3>\n                      <p class=\"text-xs opacity-70 truncate\">\n                        {item.hostname}\n                      </p>"
+    ],
+    [
+     "code_observation",
+     "src/App.tsrx",
+     342,
+     350,
+     "                            onClick={() => {\n                              const updated = {\n                                ...item,\n                                visitedAt: Date.now(),\n                                visitCount: item.visitCount + 1,\n                              };\n                              saveBookmark(updated);\n                              window.open(item.url, \"_blank\", \"noopener,noreferrer\");\n                            }}"
+    ],
+    [
+     "code_observation",
+     "src/App.tsrx",
+     356,
+     362,
+     "                        <li>\n                          <button\n                            popovertarget={\"popover-actions-\" + item.id}\n                            popovertargetaction=\"hide\"\n                            onClick={async () => {\n                              await navigator.clipboard.writeText(item.url);\n                              showToast(\"URL copied to clipboard\", \"success\");\n                            }}"
+    ],
+    [
+     "code_observation",
+     "src/App.tsrx",
+     413,
+     420,
+     "                        <li>\n                          <button\n                            popovertarget={\"popover-actions-\" + item.id}\n                            popovertargetaction=\"hide\"\n                            onClick={() => {\n                              const updated = { ...item, isArchived: !item.isArchived };\n                              if (updated.isArchived) updated.isPinned = false;\n                              saveBookmark(updated);"
+    ],
+    [
+     "code_observation",
+     "src/App.tsrx",
+     436,
+     453,
+     "                        if (item.isArchived) {\n                          <li>\n                            <button\n                              popovertarget={\"popover-actions-\" + item.id}\n                              popovertargetaction=\"hide\"\n                              onClick={() => {\n                                deleteBookmark(item.id);\n                                showToast(\"Bookmark deleted\", \"error\", {\n                                  label: \"Undo\",\n                                  onClick: () => saveBookmark(item),\n                                });\n                              }}\n                            >\n                              <Icon name=\"trash\" class=\"inline\" size={20} />\n                              <span>\"Delete\"</span>\n                            </button>\n                          </li>\n                        }"
+    ],
+    [
+     "code_observation",
+     "src/App.tsrx",
+     507,
+     514,
+     "          <h3 class=\"text-lg font-bold tracking-tight\">\n            {editItem ? \"Edit bookmark\" : \"Add a bookmark\"}\n          </h3>\n          <h4 class=\"text-sm\">\n            {editItem\n              ? \"Update the information for this bookmark.\"\n              : \"Save a link with details to keep your collection organized.\"}\n          </h4>"
+    ],
+    [
+     "code_observation",
+     "src/App.tsrx",
+     531,
+     541,
+     "            <input\n              type=\"url\"\n              {ref bindValue(urlRef)}\n              placeholder=\"https://website.url\"\n              class={[\n                \"input input-bordered w-full\",\n                errors.url && \"input-error\",\n              ]}\n              maxLength={100}\n              disabled={loading}\n            />"
+    ],
+    [
+     "code_observation",
+     "src/App.tsrx",
+     699,
+     715,
+     "          const isEdit = !!editItem;\n          const inputData: Bookmark = {\n            id: editItem?.id || `bm-${crypto.randomUUID()}`,\n            title: title,\n            url: url,\n            hostname: getHostname(url),\n            favicon: finalFavicon,\n            description: desc,\n            tags: draftTags,\n            isPinned: editItem?.isPinned || false,\n            isArchived: editItem?.isArchived || false,\n            visitCount: editItem?.visitCount || 0,\n            createdAt: editItem?.createdAt || Date.now(),\n            visitedAt: editItem?.visitedAt || null,\n          };\n          saveBookmark(inputData);\n          showToast(isEdit ? \"Bookmark updated\" : \"Bookmark added\", \"success\");"
+    ],
+    [
+     "code_observation",
+     "src/includes/utils.ts",
+     1,
+     8,
+     "export function getHostname(url: string): string {\n  try {\n    if (!/^https?:\\/\\/(?:[\\w-]+\\.)+[a-zA-Z]{2,}(?:\\/\\S*)?$/.test(url)) return \"\";\n    return new URL(url).hostname;\n  } catch {\n    return \"\";\n  }\n}"
+    ],
+    [
+     "code_observation",
+     "src/includes/utils.ts",
+     20,
+     26,
+     "export function formatDate(timestamp?: string | number | Date | null): string {\n  if (!timestamp) return \"Never\";\n  return new Date(timestamp).toLocaleString(\"en-IN\", {\n    day: \"numeric\",\n    month: \"short\",\n  });\n}"
+    ],
+    [
+     "documentation",
+     "LICENSE",
+     1,
+     3,
+     "MIT License\n\nCopyright (c) 2026 Lakhindar Pal"
+    ]
+   ],
+   "canonical_result_digest": "9a9fe5beea449a135c403f142f60d567ba82a7b045252cd45df2443ce91b54e9"
+  },
+  {
+   "leaf": "polling-application",
+   "raw_result_path": "docs/template-factory/product-reference-pilot-2026-10-22/polling-application/generation/research/RESULT.json",
+   "raw_result_sha256": "4ba31c372910c34f9ba8ca19fc86fee0dea15fc91f7011c57027add511c4ae91",
+   "canonical_observations": [
+    [
+     "documentation",
+     "README.md",
+     5,
+     5,
+     "# Polls - an app, similar to doodle or DuD-Poll, for Nextcloud written in PHP and JS/Vue."
+    ],
+    [
+     "documentation",
+     "README.md",
+     20,
+     20,
+     "# Free meeting schedule tool"
+    ],
+    [
+     "documentation",
+     "README.md",
+     23,
+     23,
+     "    - :envelope: Make your poll confidential by hiding the results until you want them to be discovered"
+    ],
+    [
+     "documentation",
+     "README.md",
+     24,
+     24,
+     "    - :dark_sunglasses: Obfuscate participants' names from other participants or set strong anonymous mode"
+    ],
+    [
+     "documentation",
+     "README.md",
+     25,
+     25,
+     "    - :timer_clock: Set an automatic expiry date"
+    ],
+    [
+     "documentation",
+     "README.md",
+     26,
+     26,
+     "    - :heavy_plus_sign: Allow participants to add more options"
+    ],
+    [
+     "documentation",
+     "README.md",
+     27,
+     27,
+     "    - :white_check_mark: Limit votes per option or user"
+    ],
+    [
+     "documentation",
+     "README.md",
+     30,
+     30,
+     "- :rocket: Export your poll to different spreadsheet formats or HTML"
+    ],
+    [
+     "documentation",
+     "README.md",
+     33,
+     33,
+     "- :ballot_box_with_check: Confirm options after poll closing"
+    ],
+    [
+     "documentation",
+     "README.md",
+     36,
+     36,
+     "- :toolbox: Usable via REST-API"
+    ],
+    [
+     "documentation",
+     "README.md",
+     51,
+     51,
+     "For clarification: Polls is not maintained by Nextcloud, although it resides unter the Nextcloud organisation here on Github."
+    ],
+    [
+     "documentation",
+     "README.md",
+     64,
+     64,
+     "Manage your polls and create new ones | Many configuration options | Share your poll with other people | Vote on mobile"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Poll.php",
+     87,
+     90,
+     "public const TABLE = 'polls_polls';\n\tpublic const TYPE_DATE = 'datePoll';\n\tpublic const TYPE_TEXT = 'textPoll';\n\tpublic const VARIANT_SIMPLE = 'simple';"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Poll.php",
+     91,
+     95,
+     "public const ACCESS_PRIVATE = 'private';\n\tpublic const ACCESS_OPEN = 'open';\n\tpublic const SHOW_RESULTS_ALWAYS = 'always';\n\tpublic const SHOW_RESULTS_CLOSED = 'closed';\n\tpublic const SHOW_RESULTS_NEVER = 'never';"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Poll.php",
+     96,
+     98,
+     "public const PROPOSAL_DISALLOW = 'disallow';\n\tpublic const PROPOSAL_ALLOW = 'allow';\n\tpublic const PROPOSAL_REVIEW = 'review';"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Poll.php",
+     106,
+     115,
+     "public const ROLE_USER = Share::TYPE_USER;\n\tpublic const ROLE_ADMIN = Share::TYPE_ADMIN;\n\tpublic const ROLE_EMAIL = Share::TYPE_EMAIL;\n\tpublic const ROLE_CONTACT = Share::TYPE_CONTACT;\n\tpublic const ROLE_EXTERNAL = Share::TYPE_EXTERNAL;\n\tpublic const ROLE_OWNER = 'owner';\n\tpublic const ROLE_NONE = 'none';"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Poll.php",
+     148,
+     159,
+     "protected ?string $owner = '';\n\tprotected int $created = 0;\n\tprotected int $expire = 0;\n\tprotected int $deleted = 0;\n\tprotected string $access = '';\n\tprotected int $anonymous = 0;\n\tprotected int $allowMaybe = 0;\n\tprotected string $allowProposals = '';\n\tprotected int $voteLimit = 0;\n\tprotected int $optionLimit = 0;\n\tprotected string $showResults = '';"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Poll.php",
+     285,
+     293,
+     "'isArchived' => boolval($this->getDeleted()),\n\t\t\t'isExpired' => $this->getIsExpired(),\n\t\t\t'isRealAnonymous' => $this->getAnonymous() < 0,"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Poll.php",
+     313,
+     314,
+     "'maxVotesPerOption' => $this->getOptionLimit(),\n\t\t\t'maxVotesPerUser' => $this->getVoteLimit(),"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Poll.php",
+     396,
+     404,
+     "public function getIsExpired(): bool {\n\t\t$compareTime = time();\n\t\t$expiry = $this->getExpire();\n\n\t\treturn (\n\t\t\t$expiry > 0\n\t\t\t&& $expiry < $compareTime\n\t\t);\n\t}"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Poll.php",
+     462,
+     466,
+     "public function setAnonymousSafe(bool|int $value): void {\n\t\t// if anonymous is locked, do not allow changes\n\t\tif ($this->getAnonymous() < 0) {\n\t\t\treturn;\n\t\t}"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Poll.php",
+     594,
+     597,
+     "public function getPollShowResults() {\n\t\t// avoiding migration, expired has been renamed to closed\n\t\treturn $this->showResults === 'expired' ? Poll::SHOW_RESULTS_CLOSED : $this->showResults;\n\t}"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Poll.php",
+     970,
+     985,
+     "private function getAllowChangeForeignVotes(): bool {\n\t\treturn $this->getAnonymous() > -1 && $this->getAllowEditPoll() && $this->getUser()->getIsUnrestrictedPollOwner();\n\t}\n\n\t/**\n\t * Checks, if poll owner is allowed to deanonymize votes\n\t **/\n\tprivate function getAllowDeanonymize(): bool {\n\t\treturn $this->getAnonymous() > -1\n\t\t\t&& $this->getAllowEditPoll()\n\t\t\t&& $this->getUser()->getIsUnrestrictedPollOwner();\n\t}"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Poll.php",
+     990,
+     1009,
+     "private function getAllowVote(): bool {\n\t\t// user has no access right to this poll\n\t\tif (!$this->getAllowAccessPoll()) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// Only external, user or admin shares are allowed to vote\n\t\t// All other external types have to register first\n\t\tif (!in_array($this->userSession->getCurrentUser()->getType(), [UserBase::TYPE_EXTERNAL, UserBase::TYPE_USER, UserBase::TYPE_ADMIN])) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// Locked users are not allowed to vote\n\t\tif (boolval($this->getIsCurrentUserLocked())) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// deny votes, if poll is expired\n\t\treturn !$this->getIsExpired();\n\t}"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Poll.php",
+     1026,
+     1043,
+     "private function getAllowShowResults(): bool {\n\t\t// edit rights include access to results\n\t\tif ($this->getAllowEditPoll()) {\n\t\t\treturn true;\n\t\t}\n\n\t\t// no access to poll, deny\n\t\tif (!$this->getAllowAccessPoll()) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// show results, when poll is closed\n\t\tif ($this->getShowResults() === Poll::SHOW_RESULTS_CLOSED && $this->getIsExpired()) {\n\t\t\treturn true;\n\t\t}\n\t\t// return poll settings\n\t\treturn $this->getShowResults() === Poll::SHOW_RESULTS_ALWAYS;\n\t}"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Poll.php",
+     861,
+     894,
+     "private function getAllowAddOptions(): bool {\n\t\t// Edit right includes adding new options\n\t\tif ($this->getAllowEditPoll()) {\n\t\t\treturn true;\n\t\t}\n\n\t\t// deny, if user has no access right to this poll\n\t\tif (!$this->getAllowAccessPoll()) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// deny, if user is not allowed to vote\n\t\tif (!$this->getAllowVote()) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// public shares are not allowed to add options\n\t\tif ($this->userSession->getShare()->getType() === Share::TYPE_PUBLIC) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// Request for option proposals is expired, deny\n\t\tif ($this->getProposalPeriodIsExpired()) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// Locked Users are not allowed to add options\n\t\tif (boolval($this->getIsCurrentUserLocked())) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// Allow, if poll requests proposals\n\t\treturn $this->getAllowProposals() === Poll::PROPOSAL_ALLOW;\n\t}"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Poll.php",
+     230,
+     255,
+     "public function createClone(string $newOwner): self {\n\t\t$clone = new self();\n\t\t$clone->setType($this->getType());\n\t\t$clone->setVotingVariant($this->getVotingVariant());\n\t\t$clone->setTitle('Clone of ' . $this->getTitle());\n\t\t$clone->setDescription($this->getDescription());\n\t\t$clone->setOwner($newOwner);\n\t\t$clone->setCreated(time());\n\t\t$clone->setLastInteraction(0);\n\t\t$clone->setExpire($this->getExpire());\n\t\t$clone->setDeleted(0);\n\t\t$clone->setAccess(self::ACCESS_PRIVATE);\n\t\t$clone->setAnonymous(0);"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Vote.php",
+     37,
+     51,
+     "class Vote extends EntityWithUser implements JsonSerializable {\n\tpublic const TABLE = 'polls_votes';\n\tpublic const VOTE_YES = 'yes';\n\tpublic const VOTE_NO = 'no';\n\tpublic const VOTE_EVENTUALLY = 'maybe';\n\n\t// schema columns\n\tpublic $id = null;\n\tprotected int $pollId = 0;\n\tprotected string $userId = '';\n\tprotected int $voteOptionId = 0;\n\tprotected string $voteOptionText = '';\n\tprotected string $voteOptionHash = '';\n\tprotected string $voteAnswer = '';\n\tprotected int $deleted = 0;"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Vote.php",
+     77,
+     103,
+     "/**\n\t * Get the hash for the vote option. This is generated from the option text\n\t * and poll id.\n\t *\n\t * @return string\n\t *\n\t * @psalm-suppress PossiblyUnusedMethod\n\t */\n\tpublic function getVoteOptionHash(): string {\n\t\treturn Hash::getOptionHash(\n\t\t\t$this->getPollId(),\n\t\t\t$this->getVoteOptionText(),\n\t\t);\n\t}\n\n\t/**\n\t * Get the hash for the vote option as stored in the database. This is used\n\t * to identify incorrect hashes stored in the db, because getVoteOptionHash()\n\t * which is generated from the option text and poll id.\n\t *\n\t * @psalm-suppress PossiblyUnusedMethod\n\t */\n\tpublic function getVoteOptionHashInDb(): string {\n\t\treturn $this->voteOptionHash;\n\t}"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Vote.php",
+     110,
+     122,
+     "/** @return PollsVote */\n\tpublic function jsonSerialize(): array {\n\t\treturn [\n\t\t\t'id' => $this->getId(),\n\t\t\t'pollId' => $this->getPollId(),\n\t\t\t'optionText' => $this->getVoteOptionText(),\n\t\t\t'answer' => $this->getVoteAnswer(),\n\t\t\t'deleted' => $this->getDeleted(),\n\t\t\t'optionId' => $this->getOptionId(),\n\t\t\t'user' => $this->getUser()->jsonSerialize(),\n\t\t\t'answerSymbol' => $this->getAnswerSymbol(),\n\t\t];\n\t}"
+    ],
+    [
+     "code_observation",
+     "lib/Db/Vote.php",
+     4,
+     7,
+     "/**\n * SPDX-FileCopyrightText: 2017 Nextcloud contributors\n * SPDX-License-Identifier: AGPL-3.0-or-later\n */"
+    ],
+    [
+     "documentation",
+     "COPYING",
+     1,
+     2,
+     "                    GNU AFFERO GENERAL PUBLIC LICENSE\n                       Version 3, 19 November 2007"
+    ]
+   ],
+   "canonical_result_digest": "19398272555a918a43ce000369ef8b53e74eaafe79a1cd63d10a0c1e813198d5"
+  }
+ ],
+ "pilot_id": "reference-two-shapes-2026-10-22"
+}

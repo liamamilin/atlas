@@ -180,6 +180,8 @@ class ReferencePilotInputBindingTests(unittest.TestCase):
             inputs["digest"] = digest(inputs)
             snapshot = {"repository": "https://github.com/owner/repo", "commit_sha": "f" * 40, "local_root": str(root / "external-cache"),
                         "files": {"README.md": hashlib.sha256(upstream).hexdigest()}}
+            (root / "external-cache").mkdir()
+            (root / "external-cache" / "README.md").write_bytes(upstream)
             (pack / "input.json").write_text(json.dumps(inputs))
             (pack / "snapshot.json").write_text(json.dumps(snapshot))
             profile_sha = hashlib.sha256(source_file.read_bytes()).hexdigest()
@@ -214,6 +216,68 @@ class ReferencePilotInputBindingTests(unittest.TestCase):
             with store.connect() as con:
                 pilot = con.execute("SELECT * FROM auxiliary_reference_pilot WHERE id='pilot-one'").fetchone()
                 plan = con.execute("SELECT * FROM auxiliary_full_plan WHERE id=?", (plan_id,)).fetchone()
+                service.verify_call(con, pilot, request, plan)
+            # Prepare a synthetic, terminal research-only host-protocol failure and its
+            # byte-bound canonical derivation, then exercise the full durable alignment path.
+            raw_result = {"findings": [], "observed_upstream": [["doc", "source/upstream/README.md", 1, 1, "pinned requirements"]], "gaps": []}
+            raw_path = pack / "raw-result.json"
+            raw_path.write_text(json.dumps(raw_result))
+            outcome_path = pack / "OUTCOME.initial-protocol.json"
+            outcome_path.write_text(json.dumps({"leaf": "bookmark-manager", "status": "failed",
+                "completed_stages": ["research"], "error_type": "ValueError",
+                "reason": "observation is not bound to a trusted upstream source",
+                "publication_status": "not_published", "application_runtime_status": "not_run"}))
+            canonical = {**raw_result, "observed_upstream": [["documentation", "README.md", 1, 1, "pinned requirements"]]}
+            adaptation = {"schema": "atlas.reference-pilot-research-adaptation.v1", "pilot_id": "pilot-one",
+                "kind_aliases": {"readme": "documentation", "doc": "documentation", "license": "documentation", "source": "code_observation"},
+                "path_prefix": "source/upstream/", "leaves": [{"leaf": "bookmark-manager",
+                    "raw_result_path": "raw-result.json", "raw_result_sha256": hashlib.sha256(raw_path.read_bytes()).hexdigest(),
+                    "canonical_observations": canonical["observed_upstream"], "canonical_result_digest": digest(canonical)}]}
+            adaptation_path = pack / "PROTOCOL_ADAPTATION.json"
+            adaptation_path.write_text(json.dumps(adaptation))
+            outcome_ref = {"leaf": "bookmark-manager", "path": "OUTCOME.initial-protocol.json",
+                           "sha256": hashlib.sha256(outcome_path.read_bytes()).hexdigest()}
+            adaptation_ref = {"path": "PROTOCOL_ADAPTATION.json", "sha256": hashlib.sha256(adaptation_path.read_bytes()).hexdigest()}
+            with store.connect(True) as con:
+                con.execute("INSERT INTO tf_budget_reservation(id,campaign_id,identity,phase,kind,status,created,stage,retry) VALUES(?,?,?,?,?,'completed',1,?,0)",
+                    ("research-call", campaign, plan_id + ":bookmark-manager", phase, "research", "reference/research/pilot-one"))
+            source_file.write_bytes(source_file.read_bytes() + b"\n# host-only alignment fixture\n")
+            new_profile_sha = hashlib.sha256(source_file.read_bytes()).hexdigest()
+            new_ci_path = pack / "alignment-ci.json"
+            new_code_sha = "c" * 40
+            new_ci_path.write_text(json.dumps({"sha": new_code_sha, "status": "completed", "conclusion": "success"}))
+            new_host = {"code_sha": new_code_sha, "new_host_sha256": {PROFILE_SOURCE: new_profile_sha},
+                        "ci_proof": {"path": "alignment-ci.json", "sha256": hashlib.sha256(new_ci_path.read_bytes()).hexdigest()}}
+            with store.connect(True) as con:
+                con.execute("INSERT INTO auxiliary_full_event(plan_id,kind,body,created) VALUES(?,'host_revision',?,2)",
+                            (plan_id, json.dumps({"request": new_host, "request_digest": digest(new_host)})))
+            alignment_request = {"schema": "atlas.reference-pilot-host-alignment.v1", "pilot_id": "pilot-one",
+                "idempotency_key": "align-one", "prior_request_digest": receipt["request_digest"],
+                "profile_version": request["profile_version"], "prompt_digest": request["prompt_digest"],
+                "previous_profile_source_sha256": profile_sha, "new_profile_source_sha256": new_profile_sha,
+                "host_revision_digest": digest(new_host), "code_sha": new_code_sha,
+                "inputs_digest": service._inputs_digest(request), "adaptation": adaptation_ref,
+                "outcomes": [outcome_ref]}
+            wrong_adaptation = json.loads(adaptation_path.read_text())
+            wrong_adaptation["leaves"][0]["canonical_observations"][0][4] = "changed statement"
+            wrong_adaptation["leaves"][0]["canonical_result_digest"] = digest(
+                {**raw_result, "observed_upstream": wrong_adaptation["leaves"][0]["canonical_observations"]})
+            adaptation_path.write_text(json.dumps(wrong_adaptation))
+            bad_request = {**alignment_request, "adaptation": {"path": "PROTOCOL_ADAPTATION.json",
+                "sha256": hashlib.sha256(adaptation_path.read_bytes()).hexdigest()},
+                "idempotency_key": "align-wrong-statement"}
+            with self.assertRaises(FactoryError):
+                service.align_host("pilot-one", bad_request)
+            adaptation_path.write_text(json.dumps(adaptation))
+            aligned = service.align_host("pilot-one", alignment_request)
+            self.assertEqual(aligned["status"], "active")
+            self.assertEqual(service.align_host("pilot-one", alignment_request), aligned)
+            with store.connect(True) as con:
+                pilot = con.execute("SELECT * FROM auxiliary_reference_pilot WHERE id='pilot-one'").fetchone()
+                plan = con.execute("SELECT * FROM auxiliary_full_plan WHERE id=?", (plan_id,)).fetchone()
+                service.verify_call(con, pilot, request, plan)
+                con.execute("INSERT INTO tf_budget_reservation(id,campaign_id,identity,phase,kind,status,created,stage,retry) VALUES(?,?,?,?,?,'completed',3,?,0)",
+                    ("author-call", campaign, plan_id + ":bookmark-manager", phase, "author", "reference/author/pilot-one"))
                 service.verify_call(con, pilot, request, plan)
                 con.execute("UPDATE case_revision SET digest=? WHERE case_id='case-1'", ("b" * 64,))
                 with self.assertRaises(FactoryError):

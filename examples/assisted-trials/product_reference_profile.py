@@ -220,10 +220,18 @@ def _observations(observations, snapshot, trusted_ids):
             if isinstance(item, dict) and isinstance(item.get("path"), str):
                 id_by_path[item["path"]] = sid
     files = _read_sources(snapshot)
+    canonical = []
     for item in observations:
         if not isinstance(item, (list, tuple)) or len(item) != 5:
             raise ValueError("observation must be [kind,path,start,end,text]")
         kind, path, start, end, statement = item
+        # These are unambiguous read-tool metadata aliases, not new evidence.
+        # Validate the resulting path/range against the same pinned manifest;
+        # never search for a replacement file or reinterpret source statements.
+        kind = {"readme": "documentation", "doc": "documentation", "license": "documentation",
+                "source": "code_observation"}.get(kind, kind)
+        if isinstance(path, str) and path.startswith("source/upstream/"):
+            path = path[len("source/upstream/"):]
         if kind not in {"documentation", "code_observation"} or path not in files or (id_by_path and path not in id_by_path):
             raise ValueError("observation is not bound to a trusted upstream source")
         sid = id_by_path.get(path)
@@ -233,7 +241,8 @@ def _observations(observations, snapshot, trusted_ids):
         lines = files[path].splitlines()
         if type(start) is not int or type(end) is not int or start < 1 or end < start or end > len(lines) or not isinstance(statement, str) or not statement.strip():
             raise ValueError("observation line range or statement is invalid")
-    return observations
+        canonical.append([kind, path, start, end, statement])
+    return canonical
 
 
 def _observation_bindings(observations, snapshot, trusted_ids, source_files):
@@ -589,8 +598,12 @@ def _freeze(directory, inputs, snapshot, spec, reviewed, identity, provenance):
     contents = {"reference.json": _canonical(spec) + "\n", **rendered,
                 "review.json": _canonical(review_receipt) + "\n",
                 "review-result.json": _canonical(reviewed) + "\n",
+                "research.json": (directory / "research/RESULT.json").read_text(encoding="utf-8"),
                 **{"scopes/" + sid + ".json": _canonical(value) + "\n"
                    for sid, value in scope_slices.items()}}
+    adaptation = directory / "RESEARCH_METADATA_ADAPTATION.json"
+    if adaptation.is_file():
+        contents["research-metadata-adaptation.json"] = adaptation.read_text(encoding="utf-8")
     manifest = {"artifact_kind": "atlas.product-reference", "artifact_type": "atlas.product-reference.v1", "profile_version": VERSION,
                 "spec_sha256": digest(spec), "input_sha256": digest(inputs),
                 "case_refs": inputs["case_refs"], "scope_options": spec["scope_options"],
@@ -655,6 +668,17 @@ def _generate(directory, inputs, snapshot, call):
             or not isinstance(research_result["findings"], list) or not isinstance(research_result["gaps"], list)):
         raise ValueError("research protocol requires findings, observed_upstream, and gaps")
     observations = _observations(research_result.get("observed_upstream", []), snapshot, inputs["trusted_source_ids"])
+    if observations != research_result["observed_upstream"]:
+        _fixed(directory / "RESEARCH_METADATA_ADAPTATION.json", {
+            "schema": "atlas.reference-research-metadata-adaptation.v1",
+            "raw_result_digest": digest(research_result),
+            "raw_result_sha256": _sha((directory / "research/RESULT.json").read_bytes()),
+            "original_observations": research_result["observed_upstream"],
+            "canonical_observations": observations,
+            "pinned_snapshot_digest": snapshot_identity,
+            "statement_content_changed": False,
+            "reason": "Exact read-tool path prefix and named kind aliases; same manifest, byte digests and line ranges"})
+        research_result = {**research_result, "observed_upstream": observations}
 
     author_payload = {"inputs": inputs, "research": research_result,
                       "source_context": source_context, "observations": observations,

@@ -1,0 +1,46 @@
+{
+ "schema": "atlas.full-leaf-host-revision.v1",
+ "full_plan_id": "full-leaf-auxiliary-2026-10-21",
+ "scope_sha256": "79718d2331cfe0171e1dcef25e566c19aa2cbbe44cf58e518fc1fbe12c13136d",
+ "authorization_sha256": "330606e89f5e0c69e10e629dd0dee597027d40a5e3c984b19d8adbe3de71313d",
+ "previous_host_sha256": {
+  "application-atlas-production-pack/drafts_api.py": "09ec7367de1be09bc3575ac1043c0ed22ce033e02ceea48ce2e5270b544e8c56",
+  "application-atlas-production-pack/template_factory/api.py": "ec677e28848565b1a46364f453b0e14bcd49b36d6530b5a3884337fb4725f079",
+  "application-atlas-production-pack/template_factory/auxiliary_workflow.py": "473a6bae10a499b61d2578081a8e41dd6ef8347ac1c8e5bd00e1cddd692fd808",
+  "application-atlas-production-pack/template_factory/budget.py": "3447ab5b608729617cc794007cb41f22d81ae9e33e9ff92bcc5d6f55194a80b9",
+  "application-atlas-production-pack/template_factory/cases.py": "abc1280f61c82c65f571b08207524d425c981426ef784a5827e9a822849785ab",
+  "application-atlas-production-pack/template_factory/full_auxiliary.py": "65414a0f0468876672c1a2b975723e7bb291ab5e6732e98459205e135e659563",
+  "application-atlas-production-pack/template_factory/sources.py": "f262e7bcd7b9b5256509daf5ab9444ee37ea00cb5dfe50c376a9d39aeb72ca8a",
+  "examples/assisted-trials/export_trial.py": "aff84160f3b0826b0c3479f4cc6ec2656fe01adba59e1345d87ee9a8db4b8d28",
+  "examples/assisted-trials/full_leaf_profiles.py": "0430e5966a2323d1200b884f86a66a5349bb9d2ca56f085daf335debe24a67a3",
+  "examples/assisted-trials/produce_all_leaves.py": "46cdf8a01aae4c17e6ccd7f238babc93146e2614e4b1602657726ef8198b5da4",
+  "examples/assisted-trials/produce_batch.py": "d6e283284fd8276ea43f6ea96c2925a9789e4d62454c561493968de7beaa387f",
+  "examples/assisted-trials/produce_with_opencode.py": "fb587573f5e0b57e6e6b74e0ef91c7603b3b374a41121b6f73eb23bbbced5f27"
+ },
+ "new_host_sha256": {
+  "application-atlas-production-pack/drafts_api.py": "09ec7367de1be09bc3575ac1043c0ed22ce033e02ceea48ce2e5270b544e8c56",
+  "application-atlas-production-pack/template_factory/api.py": "2a6a3f06b54585afd6ff49bfb3dba0d29974f057fb587a2d765f2e409e1bde7b",
+  "application-atlas-production-pack/template_factory/auxiliary_workflow.py": "473a6bae10a499b61d2578081a8e41dd6ef8347ac1c8e5bd00e1cddd692fd808",
+  "application-atlas-production-pack/template_factory/budget.py": "ec2ecf02abf22f7fc7bbf891a4e291644fb350156d4b1c625290c413b54a84e2",
+  "application-atlas-production-pack/template_factory/cases.py": "abc1280f61c82c65f571b08207524d425c981426ef784a5827e9a822849785ab",
+  "application-atlas-production-pack/template_factory/full_auxiliary.py": "d307f8f122b30eea8ffe0a5571f98c4b3d0be57e11f6b0c792b569584bf77607",
+  "application-atlas-production-pack/template_factory/product_reference.py": "e0bff97eaf1713f92c7e5b17504ae756e0126340916aaed28a038b23f4c0abfc",
+  "application-atlas-production-pack/template_factory/reference_pilot.py": "865b8de1f6e59d5c6073f628b48b376ef3d0052cf66cf5e20f9ea725ebe2ab99",
+  "application-atlas-production-pack/template_factory/sources.py": "f262e7bcd7b9b5256509daf5ab9444ee37ea00cb5dfe50c376a9d39aeb72ca8a",
+  "application-atlas-production-pack/tests/test_reference_pilot.py": "c4c8a8b32073c9cd7be4db79d31cc75ea5f539fff4d8e8e83a871991dff9132b",
+  "examples/assisted-trials/export_trial.py": "aff84160f3b0826b0c3479f4cc6ec2656fe01adba59e1345d87ee9a8db4b8d28",
+  "examples/assisted-trials/full_leaf_profiles.py": "0430e5966a2323d1200b884f86a66a5349bb9d2ca56f085daf335debe24a67a3",
+  "examples/assisted-trials/produce_all_leaves.py": "46cdf8a01aae4c17e6ccd7f238babc93146e2614e4b1602657726ef8198b5da4",
+  "examples/assisted-trials/produce_batch.py": "d6e283284fd8276ea43f6ea96c2925a9789e4d62454c561493968de7beaa387f",
+  "examples/assisted-trials/produce_reference_pilot.py": "7b10ef2ea91a1bd195bfbf103f3dba4f0b0f3e49327807822420cca6604294e4",
+  "examples/assisted-trials/produce_with_opencode.py": "fb587573f5e0b57e6e6b74e0ef91c7603b3b374a41121b6f73eb23bbbced5f27",
+  "examples/assisted-trials/product_reference_profile.py": "81078735b23e96ed499bca0f3446ed228975d74d3846a184ad41dc8c11e3340a"
+ },
+ "code_sha": "331f5427c18868f17c7befd0dceb77995cda3a57",
+ "workflow_gate_required": true,
+ "reason": "Bound exactly two reused leaves to a real product-reference pilot on the original paused full-plan ledger; preserve all limits, source/case identity, frozen workflow qualification and future normal dispatch.",
+ "ci_proof": {
+  "path": "docs/template-factory/product-reference-pilot-2026-10-22/CI_SUCCESS.json",
+  "sha256": "64583c9750c928523c3fbc0b439678d568e635daa4f49a268a5ab4620df49094"
+ }
+}
