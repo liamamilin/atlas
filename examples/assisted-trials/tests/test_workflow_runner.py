@@ -78,18 +78,26 @@ class WorkflowRunnerHostTests(unittest.TestCase):
         *,
         real_author_stage=False,
         stage_error=None,
+        research_result=None,
+        compatible_cases=None,
     ):
         real_stage_call = runner.stage_call
         snapshot_root = self.root / "pinned-source"
         source_file = snapshot_root / "README.md"
         source_file.parent.mkdir(parents=True, exist_ok=True)
         source_file.write_text("pinned fixture source\n")
+        license_file = snapshot_root / "LICENSE"
+        license_file.write_text("fixture license\n")
         snapshot = {
-            "repository": "https://example.invalid/fixture",
+            "repository": "https://github.com/fixture/example",
             "commit_sha": "a" * 40,
-            "files": {"README.md": runner.sha(source_file)},
+            "files": {
+                "README.md": runner.sha(source_file),
+                "LICENSE": runner.sha(license_file),
+            },
             "local_root": str(snapshot_root),
         }
+        self.pin_calls = []
 
         def fake_stage(_root, service, item, work, stage, *_args, lane="first", **_kwargs):
             paths_file = work / "STAGE_PATHS.json"
@@ -121,9 +129,9 @@ class WorkflowRunnerHostTests(unittest.TestCase):
                 kind="review" if "review" in stage else ("research" if stage == "discovery" else "production"),
             )
             if stage == "discovery":
-                value = {
+                value = research_result or {
                     "repository": snapshot["repository"],
-                    "files": ["README.md"],
+                    "files": ["README.md", "LICENSE"],
                     "rationale": "fixture research",
                     "reuse_case_id": None,
                     "delivery_profile": "web",
@@ -160,6 +168,7 @@ class WorkflowRunnerHostTests(unittest.TestCase):
                 write_json(receipt, {"fixture": "accepted research preserved"})
 
         def save_snapshot(research, work, _store, **_kwargs):
+            self.pin_calls.append(research)
             write_json(work / "source-snapshot.json", snapshot)
             return snapshot
 
@@ -169,7 +178,7 @@ class WorkflowRunnerHostTests(unittest.TestCase):
 
             @staticmethod
             def list_cases():
-                return []
+                return compatible_cases or []
 
         stack = [
             patch.object(runner, "ROOT", self.root),
@@ -374,8 +383,8 @@ class WorkflowRunnerHostTests(unittest.TestCase):
         }
         write_json(previous / "SELECTED_SCENARIO.json", scenario)
         write_json(previous / "RESEARCH.json", {
-            "repository": "https://example.invalid/fixture",
-            "files": ["README.md"],
+            "repository": "https://github.com/fixture/example",
+            "files": ["README.md", "LICENSE"],
             "rationale": "fixed research",
             "reuse_case_id": None,
             "delivery_profile": "web",
@@ -385,10 +394,15 @@ class WorkflowRunnerHostTests(unittest.TestCase):
         source_file = source_root / "README.md"
         source_file.parent.mkdir(parents=True, exist_ok=True)
         source_file.write_text("pinned fixture source\n")
+        license_file = source_root / "LICENSE"
+        license_file.write_text("fixture license\n")
         write_json(previous / "source-snapshot.json", {
-            "repository": "https://example.invalid/fixture",
+            "repository": "https://github.com/fixture/example",
             "commit_sha": "a" * 40,
-            "files": {"README.md": runner.sha(source_file)},
+            "files": {
+                "README.md": runner.sha(source_file),
+                "LICENSE": runner.sha(license_file),
+            },
             "local_root": str(source_root),
         })
         write_json(previous / "LATEST_FAILURE.json", {"error": "prior review"})
@@ -445,6 +459,150 @@ class WorkflowRunnerHostTests(unittest.TestCase):
         self.assertEqual(result["state"], "paused")
         self.assertEqual(result["code"], "workflow_integrity")
         self.assertEqual(self.service.status("host-fixture")["status"], "paused")
+
+    def _reuse_inputs(self, *, repo="https://github.com/TokTok/c-toxcore", files=None,
+                     snapshot_repo="https://github.com/toktok/c-toxcore", snapshot_files=None):
+        files = files or ["README.md", "LICENSE"]
+        snapshot_files = snapshot_files or files
+        selected = {
+            "repository": repo,
+            "files": files,
+            "rationale": "reuse fixture",
+            "reuse_case_id": "case-reuse",
+            "delivery_profile": "web",
+            "scenario": {
+                "name": "Fixture scenario", "audience": "Fixture user",
+                "objective": "Complete the fixture workflow",
+                "workflow": ["Start", "Complete"],
+                "acceptance": ["Completion is visible"],
+            },
+        }
+        content = {"README.md": b"fixed source\n", "LICENSE": b"MIT license\n"}
+        snapshot = {
+            "repository": snapshot_repo, "commit_sha": "a" * 40,
+            "files": {name: hashlib.sha256(content[name]).hexdigest() for name in snapshot_files},
+            "license": {"spdx_id": "MIT"}, "license_files": ["LICENSE"],
+        }
+        case = {
+            "case_id": "case-reuse", "revision": 3, "digest": "b" * 64,
+            "research": {"summary": "fixture case"},
+            "scenario_links": [{"leaf": self.leaf}], "source_snapshots": [snapshot],
+        }
+        cache = self.store.root / "sources" / "host-fixture" / self.leaf / "attempt-1"
+        cache.mkdir(parents=True, exist_ok=True)
+        for name in snapshot_files:
+            (cache / name).write_bytes(content[name])
+        return selected, case, cache
+
+    def test_reuse_accepts_casefolded_github_host_identity_and_keeps_fixed_commit(self):
+        selected, case, cache = self._reuse_inputs()
+        self._patches(
+            lambda *_args: self.fail("content stage is intentionally stopped"),
+            stage_error=lambda: runner.FactoryError("fixture stop", "auxiliary_content", 409),
+            research_result=selected, compatible_cases=[case],
+        )
+        result = self.execute()
+        self.assertEqual(result["state"], "needs_revision")
+        self.assertEqual(self.pin_calls, [])
+        self.assertEqual(json.loads((self.work / "RESEARCH.json").read_text()), selected)
+        snapshot = json.loads((self.work / "source-snapshot.json").read_text())
+        self.assertEqual(snapshot["repository"], case["source_snapshots"][0]["repository"])
+        self.assertEqual(snapshot["commit_sha"], "a" * 40)
+        self.assertEqual(snapshot["files"], case["source_snapshots"][0]["files"])
+        self.assertTrue((cache / "README.md").exists())
+
+    def test_wrong_reuse_files_fail_locally_without_pin_or_global_pause(self):
+        selected, case, _cache = self._reuse_inputs(
+            files=["README.md", "COPYING"], snapshot_files=["README.md", "LICENSE"]
+        )
+        self._patches(
+            lambda *_args: self.fail("invalid source selection must stop before authoring"),
+            research_result=selected, compatible_cases=[case],
+        )
+        result = self.execute()
+        self.assertEqual(result["state"], "failed")
+        self.assertEqual(result["code"], "source_selection_invalid")
+        status = self.service.status("host-fixture")
+        self.assertEqual(status["status"], "running")
+        self.assertTrue(status["items"][0]["first_pass_done"])
+        self.assertFalse(status["items"][0]["repair_pending"])
+        self.assertEqual(self.pin_calls, [])
+
+    def test_missing_reuse_case_fails_locally_without_pin(self):
+        selected, case, _cache = self._reuse_inputs()
+        selected["reuse_case_id"] = "missing-case"
+        self._patches(lambda *_args: self.fail("invalid case must stop before authoring"),
+                      research_result=selected, compatible_cases=[case])
+        result = self.execute()
+        self.assertEqual(result["state"], "failed")
+        self.assertEqual(result["code"], "source_selection_invalid")
+        self.assertEqual(self.service.status("host-fixture")["status"], "running")
+        self.assertEqual(self.pin_calls, [])
+
+    def test_wrong_reuse_repository_fails_locally_without_pin(self):
+        selected, case, _cache = self._reuse_inputs(
+            repo="https://github.com/other/project",
+            snapshot_repo="https://github.com/toktok/c-toxcore",
+        )
+        self._patches(lambda *_args: self.fail("invalid repository must stop before authoring"),
+                      research_result=selected, compatible_cases=[case])
+        result = self.execute()
+        self.assertEqual(result["state"], "failed")
+        self.assertEqual(result["code"], "source_selection_invalid")
+        self.assertEqual(self.service.status("host-fixture")["status"], "running")
+        self.assertEqual(self.pin_calls, [])
+
+    def test_malformed_model_source_selection_is_a_local_failure(self):
+        selected = {"repository": "https://[broken", "files": ["README.md", "LICENSE"],
+                    "rationale": "fixture", "reuse_case_id": None, "delivery_profile": "web",
+                    "scenario": {"name": "Fixture", "audience": "Fixture", "objective": "Complete",
+                                 "workflow": ["Start"], "acceptance": ["Visible"]}}
+        self._patches(lambda *_args: self.fail("invalid source selection must stop before authoring"),
+                      research_result=selected)
+        result = self.execute()
+        self.assertEqual(result["state"], "failed")
+        self.assertEqual(result["code"], "source_selection_invalid")
+        self.assertEqual(self.service.status("host-fixture")["status"], "running")
+        self.assertEqual(self.pin_calls, [])
+
+    def test_source_selection_validator_rejects_malformed_inputs_precisely(self):
+        for repository, files in [
+            (None, ["README.md", "LICENSE"]),
+            (17, ["README.md", "LICENSE"]),
+            ("https://[broken", ["README.md", "LICENSE"]),
+            ("https://github.com/valid/repo", []),
+            ("https://github.com/valid/repo", ["README.md", "src/../escape", "LICENSE"]),
+            ("https://github.com/valid/repo", ["README.md", "src/main.py"]),
+        ]:
+            with self.subTest(repository=repository, files=files), self.assertRaises(runner.FactoryError) as caught:
+                runner.validate_research_source_selection({"repository": repository, "files": files})
+            self.assertEqual(caught.exception.code, "source_selection_invalid")
+
+    def test_corrupted_reused_source_bytes_pause_as_workflow_integrity(self):
+        selected, case, cache = self._reuse_inputs()
+        (cache / "README.md").write_bytes(b"corrupted\n")
+        self._patches(lambda *_args: self.fail("integrity failure must stop before authoring"),
+                      research_result=selected, compatible_cases=[case])
+        result = self.execute()
+        self.assertEqual(result["state"], "paused")
+        self.assertEqual(result["code"], "workflow_integrity")
+        self.assertEqual(self.service.status("host-fixture")["status"], "paused")
+
+    def test_oversized_new_source_response_is_a_local_selection_failure(self):
+        self._patches(lambda *_args: self.fail("oversized source must stop before authoring"))
+        runner.pin_sources.side_effect = runner.FactoryError("source response exceeds download limit")
+        result = self.execute()
+        self.assertEqual(result["state"], "failed")
+        self.assertEqual(result["code"], "source_selection_invalid")
+        self.assertEqual(self.service.status("host-fixture")["status"], "running")
+
+    def test_non_utf8_new_source_is_a_local_selection_failure(self):
+        self._patches(lambda *_args: self.fail("binary source must stop before authoring"))
+        runner.pin_sources.side_effect = UnicodeDecodeError("utf-8", b"\xff", 0, 1, "invalid start byte")
+        result = self.execute()
+        self.assertEqual(result["state"], "failed")
+        self.assertEqual(result["code"], "source_selection_invalid")
+        self.assertEqual(self.service.status("host-fixture")["status"], "running")
 
     def test_known_item_download_failure_is_isolated(self):
         def produce_stub(*_args):

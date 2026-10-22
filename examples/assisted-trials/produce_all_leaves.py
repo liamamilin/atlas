@@ -29,6 +29,7 @@ from produce_with_opencode import (
     pin_sources,
     readable_candidate,
     register_catalog,
+    safe_file,
     validate_read_coverage,
     validate_review,
 )
@@ -66,6 +67,7 @@ TECH_CODES = {
 LOCAL_CODES = {
     "auxiliary_content",
     "source_unavailable",
+    "source_selection_invalid",
     "leaf_delivery_error",
     *TECH_CODES,
     "budget_retry_limit",
@@ -88,6 +90,19 @@ def leaf_failure_code(error, stage):
         return code
     if isinstance(error, urllib.error.HTTPError) and error.code in {403, 429, 500, 502, 503, 504}:
         code = "full_provider_unavailable"
+    elif (
+        isinstance(error, FactoryError)
+        and code == "source_download_failed"
+        and isinstance(error.__cause__, urllib.error.HTTPError)
+        and error.__cause__.code in {404, 410}
+    ):
+        code = "source_unavailable"
+    elif (
+        isinstance(error, FactoryError)
+        and code == "source_download_failed"
+        and isinstance(error.__cause__, urllib.error.URLError)
+    ):
+        code = "full_provider_unavailable"
     elif stage == "source_pin" and isinstance(error, urllib.error.HTTPError) and error.code in {404, 410}:
         code = "source_unavailable"
     elif (
@@ -107,6 +122,37 @@ def leaf_failure_code(error, stage):
 
 def load(path):
     return json.loads(Path(path).read_text())
+
+
+def canonical_github_repo(value):
+    """Validate a GitHub repository URL before case-insensitive identity matching."""
+    try:
+        return github_repo(value).casefold()
+    except (FactoryError, ValueError) as error:
+        raise FactoryError(
+            "selected source is not a valid GitHub repository URL",
+            "source_selection_invalid",
+            409,
+        ) from error
+
+
+def validate_research_source_selection(research):
+    """Reject malformed model source choices as local selection failures."""
+    canonical_github_repo(research.get("repository"))
+    files = research.get("files")
+    try:
+        if not isinstance(files, list) or not 2 <= len(files) <= 8:
+            raise ValueError("select 2–8 distinct small source files")
+        normalized = [safe_file(name) for name in files]
+        if normalized != files or len(set(normalized)) != len(normalized):
+            raise ValueError("source selection contains duplicate or non-canonical paths")
+        if not any(
+            Path(name).name.lower().startswith(("license", "copying", "notice"))
+            for name in normalized
+        ):
+            raise ValueError("license text must be among pinned files")
+    except ValueError as error:
+        raise FactoryError(str(error), "source_selection_invalid", 409) from error
 
 
 def sha(path):
@@ -143,7 +189,14 @@ def materialize_case_snapshot(snapshot, folder, store, *, namespace):
         or any(name not in files for name in license_files)
     ):
         raise FactoryError("source license unclear; stop before generation", "source_unavailable", 409)
-    repo = github_repo(repository)
+    try:
+        repo = github_repo(repository)
+    except (FactoryError, ValueError, TypeError) as error:
+        raise FactoryError(
+            "trusted case snapshot has an invalid repository identity",
+            "workflow_integrity",
+            409,
+        ) from error
     source_root = Path(store.root) / "sources" / namespace
     local = source_root / folder.parent.name / folder.name
     local.mkdir(parents=True, exist_ok=True)
@@ -174,17 +227,29 @@ def materialize_case_snapshot(snapshot, folder, store, *, namespace):
             raise ValueError("reused source path escapes its snapshot root") from error
         if target.exists():
             if target.is_symlink() or not target.is_file() or sha(target) != expected:
-                raise ValueError("cached reused source bytes differ from fixed case digest")
+                raise FactoryError(
+                    "cached reused source bytes differ from fixed case digest",
+                    "workflow_integrity",
+                    409,
+                )
             continue
         data = request_bytes(
             f"https://raw.githubusercontent.com/{repo}/{commit}/{name}", 180_000
         )
         data.decode("utf-8")
         if hashlib.sha256(data).hexdigest() != expected:
-            raise ValueError("downloaded fixed-commit bytes differ from case digest")
+            raise FactoryError(
+                "downloaded fixed-commit bytes differ from case digest",
+                "workflow_integrity",
+                409,
+            )
         target.write_bytes(data)
     if manifest_files(local) != files:
-        raise ValueError("materialized reused source inventory differs")
+        raise FactoryError(
+            "materialized reused source inventory differs",
+            "workflow_integrity",
+            409,
+        )
     result = {
         key: value
         for key, value in snapshot.items()
@@ -1521,6 +1586,7 @@ def execute_leaf(root, service, item, api, repair=False):
                 fixed_json(work / "RESEARCH.json", result)
             research = load(work / "RESEARCH.json")
             profiles.validate_research(research)
+            validate_research_source_selection(research)
             fixed_json(selected_scenario(work), research["scenario"])
             wf.complete(
                 PLAN_ID,
@@ -1533,28 +1599,42 @@ def execute_leaf(root, service, item, api, repair=False):
             wf.begin(PLAN_ID, item["leaf"], work.name, step, digest(research))
             stage = "source_pin"
             if not (work / "source-snapshot.json").exists():
-                reused = next(
-                    (
-                        c
-                        for c in compatible
-                        if c["case_id"] == research.get("reuse_case_id")
-                    ),
-                    None,
-                )
-                snap = (
-                    next(
-                        (
-                            s
-                            for s in reused["source_snapshots"]
-                            if s["repository"] == research["repository"]
-                            and set(s["files"]) == set(research["files"])
-                        ),
+                reuse_case_id = research.get("reuse_case_id")
+                reused = None
+                snap = None
+                if reuse_case_id is not None:
+                    reused = next(
+                        (c for c in compatible if c["case_id"] == reuse_case_id),
                         None,
                     )
-                    if reused
-                    else None
-                )
-                if snap:
+                    if reused is None:
+                        raise FactoryError(
+                            "selected reuse case is outside the supplied compatible cases",
+                            "source_selection_invalid",
+                            409,
+                        )
+                    selected_repo = canonical_github_repo(research["repository"])
+                    snap = None
+                    for candidate in reused["source_snapshots"]:
+                        try:
+                            candidate_repo = github_repo(candidate.get("repository"))
+                        except (FactoryError, ValueError, TypeError) as error:
+                            raise FactoryError(
+                                "trusted case snapshot has an invalid repository identity",
+                                "workflow_integrity",
+                                409,
+                            ) from error
+                        if (candidate_repo.casefold() == selected_repo
+                                and set(candidate.get("files", {})) == set(research["files"])):
+                            snap = candidate
+                            break
+                    if snap is None:
+                        raise FactoryError(
+                            "selected reuse case does not contain the exact repository and files",
+                            "source_selection_invalid",
+                            409,
+                        )
+                if reused and snap:
                     materialize_case_snapshot(snap, work, service.store, namespace=PLAN_ID)
                     fixed_json(
                         work / "RESEARCH_REUSE.json",
@@ -1564,18 +1644,24 @@ def execute_leaf(root, service, item, api, repair=False):
                             "digest": reused["digest"],
                         },
                     )
-                elif reused:
-                    raise FactoryError(
-                        "reuse case has no matching fixed source snapshot",
-                        "workflow_integrity",
-                        409,
-                    )
                 else:
                     try:
                         pin_sources(research, work, service.store, namespace=PLAN_ID)
-                    except ValueError as error:
+                    except FactoryError as error:
+                        if str(error) == "source response exceeds download limit":
+                            raise FactoryError(str(error), "source_selection_invalid", 409) from error
                         if str(error) == "source license unclear; stop before generation":
                             raise FactoryError(str(error), "source_unavailable", 409) from error
+                        raise
+                    except ValueError as error:
+                        if str(error) in {
+                            "source license unclear; stop before generation",
+                            "source response exceeds download limit",
+                        }:
+                            code = "source_unavailable" if "license" in str(error) else "source_selection_invalid"
+                            raise FactoryError(str(error), code, 409) from error
+                        if isinstance(error, UnicodeDecodeError):
+                            raise FactoryError(str(error), "source_selection_invalid", 409) from error
                         raise
             snapshot = load(work / "source-snapshot.json")
             for name, expected in snapshot["files"].items():
@@ -1965,7 +2051,7 @@ def execute_leaf(root, service, item, api, repair=False):
             elif content:
                 state = "needs_revision"
             else:
-                state = "source_unavailable" if stage == "source_pin" else "failed"
+                state = "source_unavailable" if code == "source_unavailable" else "failed"
             service.update_leaf(
                 PLAN_ID,
                 item["leaf"],

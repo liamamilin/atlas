@@ -890,7 +890,7 @@ class FullLeafTests(unittest.TestCase):
                 own.update(
                     state="failed" if own["leaf"] == "q-5" else "ready_not_run",
                     first_pass_done=True,
-                    failure_code="budget_retry_limit" if own["leaf"] == "q-5" else None,
+                    failure_code="source_selection_invalid" if own["leaf"] == "q-5" else None,
                 )
                 if mode == "full_first_round" and own["leaf"] == "q-6":
                     own.update(state="needs_revision", repair_pending=True)
@@ -924,7 +924,7 @@ class FullLeafTests(unittest.TestCase):
         self.assertEqual(service.state, "paused" if mode == "full_first_round" else "completed")
         self.assertEqual(sum(x["state"] == "failed" for x in service.items), 1)
         failed = next(x for x in service.items if x["leaf"] == "q-5")
-        self.assertEqual(failed["failure_code"], "budget_retry_limit")
+        self.assertEqual(failed["failure_code"], "source_selection_invalid")
         report = json.loads((folder / "ROUND_REPORT.json").read_text())
         self.assertEqual(len(report["items"]), 41)
         self.assertTrue(list((folder / "round-reports").glob("*.json")))
