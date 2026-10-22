@@ -1,0 +1,184 @@
+{
+ "observed_at": 1792649041.0620182,
+ "status": {
+  "id": "full-leaf-auxiliary-2026-10-21",
+  "campaign_id": "atlas-v1-first-production-2026-10-19",
+  "phase": "auxiliary-full-full-leaf-auxiliary-2026-10-21",
+  "request_digest": "e8f0a3b11676bac6c9d7ec35b1aa108733e0d5bc161d8b9c192b8f1bd1135cda",
+  "baseline": 99,
+  "max_calls": 7200,
+  "window_seconds": 2592000,
+  "model": "open-design/deepseek-v4.1-flash",
+  "created": 1792589722.814663,
+  "status": "paused",
+  "reason": "workflow_integrity: reuse case has no matching fixed source snapshot",
+  "started": 1792589744.123177,
+  "deadline": 1795181744.123177,
+  "counts": {
+   "failed": 16,
+   "ready_not_run": 5,
+   "source_unavailable": 10,
+   "needs_revision": 17,
+   "paused": 2,
+   "pending": 1737,
+   "reused": 18
+  },
+  "total": 1805,
+  "handled": 66,
+  "attempted": 50,
+  "new_calls": 142,
+  "remaining_calls": 7058,
+  "active_calls": 0,
+  "provider_requests": null,
+  "observed_model": null,
+  "cost": null
+ },
+ "failed_items": [
+  {
+   "leaf": "dating-community-platform",
+   "key": "dating-community-platform",
+   "leaf_sha256": "5ba6be0f8e39a69fc41d819b9f046fe342f74329217e65ac8caf391e0611994c",
+   "classification_path": [
+    {
+     "id": "01",
+     "name": "Communication & Social"
+    },
+    {
+     "id": "01.07",
+     "name": "Dating & Relationship Discovery"
+    }
+   ],
+   "directory_section": "01.07",
+   "display_name": "Dating Community Platform",
+   "covered": [],
+   "current_attempt": "attempt-1",
+   "first_pass_done": false,
+   "workdir": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/dating-community-platform/attempt-1",
+   "error": "full plan/leaf cannot dispatch",
+   "failure_stage": "independent_review",
+   "failure_code": "full_plan_paused",
+   "state": "paused"
+  },
+  {
+   "leaf": "live-video-chat-application",
+   "key": "live-video-chat-application",
+   "leaf_sha256": "1bb28880254d8c865de4d9bcf3074d233baeed7ef00ba444b14851b5cc38f62a",
+   "classification_path": [
+    {
+     "id": "01",
+     "name": "Communication & Social"
+    },
+    {
+     "id": "01.08",
+     "name": "Live Social"
+    }
+   ],
+   "directory_section": "01.08",
+   "display_name": "Live Video Chat Application",
+   "covered": [],
+   "current_attempt": "attempt-1",
+   "first_pass_done": false,
+   "workdir": "docs/template-factory/full-leaf-auxiliary-2026-10-21/items/live-video-chat-application/attempt-1",
+   "error": "reuse case has no matching fixed source snapshot",
+   "failure_stage": "source_pin",
+   "failure_code": "workflow_integrity",
+   "state": "paused"
+  }
+ ],
+ "failure": {
+  "leaf": "live-video-chat-application",
+  "stage": "source_pin",
+  "code": "workflow_integrity",
+  "error": "reuse case has no matching fixed source snapshot",
+  "at": 1792635759.280031,
+  "attempt": "attempt-1",
+  "stage_summaries": {
+   "calls/discovery/cli-summary.json": "3b7998277cfb27572b4977781c3c48dd592cd536d00184a56d368906c0916eb7"
+  },
+  "raw_outputs": {
+   "calls/discovery/original-response.json": "b8343742b8426830692bec6ff322f991e7b8a8a2ea34faddf46dd0e0eeff07e6"
+  }
+ },
+ "proposal": {
+  "repository": "https://github.com/TokTok/c-toxcore",
+  "files": [
+   "LICENSE",
+   "README.md",
+   "toxav/toxav.h",
+   "toxav/toxav.c",
+   "toxav/audio.c",
+   "toxcore/Messenger.h"
+  ],
+  "rationale": "Reuses the pinned c-toxcore case: toxav places a call to a chosen friend_number, answers it, reports a call-state bitmask (sending/accepting audio and video, FINISHED) and exposes mute, hide-video and cancel controls, while Messenger.h holds the friend list, names and online status. Those map onto the leaf's selected-counterpart live call plus persistent social context. Target is a small browser app with WebRTC media and a tiny signaling/persistence service; the GPL C library is a structural reference only and no code is copied.",
+  "reuse_case_id": "case:repo:b7df8a52d1ed856bfc163998:2f9a763de29d8fab4e6bd1fafd8476fb22e1322c",
+  "delivery_profile": "web",
+  "scenario": {
+   "name": "Evening call with a chosen friend, logged so it can be redialed",
+   "audience": "An individual using the app in personal leisure time",
+   "objective": "Place a live two-way video call to a friend chosen from the contact list, toggle one's own camera and microphone, end the call, then redial from the resulting history entry.",
+   "workflow": [
+    "Sign in as Mara; the conversation list shows her profile, friend Deniz with online presence, and one earlier call entry.",
+    "Select Deniz and place a video call; the stage shows a ringing state until Deniz answers.",
+    "Deniz answers; both stages show the other person's live video and their own self-view, each with personal camera and microphone toggles.",
+    "Mara turns her camera off, sees her own tile paused, and Deniz sees her video paused; she turns it back on.",
+    "Deniz ends the call; the stage closes and a history entry with counterpart, start time, duration and outcome appears for both.",
+    "Mara reopens that history entry and redials Deniz from it."
+   ],
+   "acceptance": [
+    "After the call is answered, each participant sees live remote video plus their own self-view, and no recording or replay is produced.",
+    "A camera or microphone toggle changes only that participant's outbound media and is visibly reflected on the other participant's stage.",
+    "Ending the call writes exactly one history entry per participant containing counterpart, start time, duration and outcome, and that entry can start a new call."
+   ]
+  }
+ },
+ "case_ref": {
+  "case_id": "case:repo:b7df8a52d1ed856bfc163998:2f9a763de29d8fab4e6bd1fafd8476fb22e1322c",
+  "revision": 1,
+  "digest": "539fab2f8ac20dfd4c19be0827950eddc31686014abd1a5cec4bb0f7241cf13c"
+ },
+ "fixed_snapshots": [
+  {
+   "archive_sha256": null,
+   "collected_at": "2026-10-21T19:13:49.127312+00:00",
+   "commit_sha": "2f9a763de29d8fab4e6bd1fafd8476fb22e1322c",
+   "excluded_paths": [
+    "Unselected files; upstream not installed or run"
+   ],
+   "file_manifest_digest": "9623b29a15d5ecace8d722810c0ee5137c0bf429c164f05493b1ded5a7069c5d",
+   "files": {
+    "LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+    "README.md": "c9b999b3a3866921ebf4ba5ad1afba1c7ff5481c6a05e2f3048979cb6a7f06f2",
+    "toxav/audio.c": "1084fad342d7ac5f2065f57d4588d110dbb8292a809012f086efa1c0de859542",
+    "toxav/toxav.c": "1e5f0f02a64f4acd1bc9d94505a451e4ab1f794f435e87969a975a8c195a903f",
+    "toxav/toxav.h": "ca14174d6ea38a6aa0973f7afcf4fb29ec6d06fc1e0e652c8e7511d401593961",
+    "toxcore/Messenger.h": "8f5344537bf844a62e694936294fc9421dbbcab5e4c0dc73cadad7c7fa8cc859"
+   },
+   "license": {
+    "notice_hashes": {
+     "LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "spdx_id": "GPL-3.0",
+    "status": "located"
+   },
+   "license_files": [
+    "LICENSE"
+   ],
+   "license_uncertainties": [
+    "Design reference only; no source code copied; file-level exceptions not exhaustively audited."
+   ],
+   "repo_id": null,
+   "repository": "https://github.com/toktok/c-toxcore",
+   "snapshot_id": "src_827a7231cfe210083a2a12c0",
+   "strategy_version": "full-leaf-selected-v2-3ec89af516a00dbd"
+  }
+ ],
+ "preserved_files": {
+  "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/full-leaf-auxiliary-2026-10-21/items/live-video-chat-application/attempt-1/RESEARCH.json": "377eb101fa533e786ca410291db74510d73ad148eb64a00626a4604d8ec7e682",
+  "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/full-leaf-auxiliary-2026-10-21/items/live-video-chat-application/attempt-1/calls/discovery/original-response.json": "b8343742b8426830692bec6ff322f991e7b8a8a2ea34faddf46dd0e0eeff07e6",
+  "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/full-leaf-auxiliary-2026-10-21/items/live-video-chat-application/attempt-1/calls/discovery/BINDING.json": "b4bfee14966ceab3d699da91aee52aab6903c55248cb58b2ccfac0817100fd04",
+  "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/full-leaf-auxiliary-2026-10-21/items/live-video-chat-application/attempt-1/calls/discovery/DELIVERED.json": "f59e646a0fb8977dcb3a29c5dae886cf188b561b93868ef33b17f2707338fa10",
+  "/Users/milin/2026/软件开发/application-atlas/docs/template-factory/full-leaf-auxiliary-2026-10-21/items/live-video-chat-application/attempt-1/calls/discovery/input.json": "01cbc35a7a65e9598d7cf52699b81855323f930c36bdb39f082566da8f9d0742"
+ },
+ "root_cause": "GitHub owner casing mismatched by literal comparison; per-leaf selection failure was incorrectly marked global workflow_integrity",
+ "plan_changed": false
+}
