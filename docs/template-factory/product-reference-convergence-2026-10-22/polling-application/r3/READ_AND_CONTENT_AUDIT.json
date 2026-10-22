@@ -1,0 +1,79 @@
+{
+ "status": "unqualified_needs_changes",
+ "original_failure": {
+  "path": "docs/template-factory/product-reference-convergence-2026-10-22/polling-application/r3/OUTCOME.json",
+  "sha256": "1449dd2ba4edaba8864895a24065f5f66772aa15a29fc1572b8af260c50c2a8a"
+ },
+ "review_result": {
+  "path": "docs/template-factory/product-reference-convergence-2026-10-22/polling-application/r3/generation/review/RESULT.json",
+  "sha256": "dc210bf75e670f050fe5e30fbfced52655b20570886e650b71f9b26fa4dd0308"
+ },
+ "checks": {
+  "assertions": false,
+  "journeys": true,
+  "limits": true,
+  "permissions_states": false,
+  "scope": true,
+  "scope_slicing": false,
+  "source_fidelity": true
+ },
+ "issues": [
+  "Assertions and scope slicing: a_option_belongs_to_poll declares action_ids [cast_vote, view_tally], but its when says '... separately a ballot for P2 uses D after selecting P2.' select_poll is the action that makes P2 active, so the assertion under-declares its action set. That lets it count as r_option_membership and r_poll_isolation coverage in s_core_poll and s_code_status_check, both of which list select_poll in deferred_action_ids; the cross-poll setup is not reachable or declared in those slices. This repeats the parent defect fixed for a_closed_poll_write_rejected. Add select_poll to the assertion action_ids (and keep it out of slices that defer it), or remove the selection setup and make the assertion operable in the selected slice.",
+  "Scope slicing: s_core_poll and s_multi_poll_directory defer check_code_status, but j_vote.recovery says 'the code-status check and the retained code field make an accidental second ballot visible' and surf_vote.sections includes 'Voter code field with code-status check'. Its navigation also points to surf_poll_index, which neither slice includes. The selected journey and surface therefore reference a deferred action and surface, so the core and multi-poll slices are not operable exactly as described. Either keep the recovery and section to the retained code field when the check is absent, or include check_code_status and the poll index in those slices.",
+  "Permissions and states: surf_vote.sections promises a 'Replacement notice naming the code's current option before resubmission', but r_code_privacy says a code locates only the member's own ballot and 'no member can read another member's individual choice'; check_code_status explicitly returns no option, label, timestamp, or revision for an in-use code; and a_member_sees_aggregate_only says 'no other member's code is paired with a choice anywhere on the surface.' On a shared device with no member authentication, anyone entering a code would see that code's current option and could replace it, contradicting those guarantees. Remove the option name from the replacement notice and report only that the code already voted and will be replaced, or drop the notice.",
+  "Assertions: unlock_host_mode declares host_auth_failed for a wrong passphrase and passphrase_invalid for a fresh blank or short passphrase, and j_create.recovery claims 'A rejected passphrase leaves member voting available and the host retries the passphrase.' No assertion covers either failure, the failed_attempts counter, or the claimed member voting and tally availability after a rejected unlock; a_host_mode_gate tests only member attempts against a locked session and a successful host unlock. Add an independently testable rejected-passphrase assertion.",
+  "Permissions, states, and gaps: g_host_passphrase_recovery says losing the passphrase leaves the existing poll readable 'but without host transitions until a new poll is created.' create_poll requires an unlocked host session under r_host_gate and its own preconditions, and the reference stores only a verifier with no bypass or reset, so a new poll in the same directory cannot be created after the passphrase is lost. The resolution describes an impossible recovery path; state that the directory is host-read-only until a fresh directory and passphrase are used, or add an explicit recovery action.",
+  "Assertions: create_poll declares a question_required failure for a blank question, but no assertion tests it; a_option_bounds and a_duplicate_and_blank_options cover option count and labels only, and j_create.recovery mentions correcting option count or labels. Add a blank-question assertion that rejects the submission and stores nothing.",
+  "Assertions, minor: a_host_mode_gate has action_ids [unlock_host_mode, create_poll, close_poll, reopen_poll] but journey_ids only [j_create], although its when and then also exercise close and reopen, which are j_close_reopen steps. The assertion under-declares the journey it tests; add j_close_reopen or split the gate assertion so action and journey traceability match."
+ ],
+ "observation_count": 32,
+ "accepted_observations": 32,
+ "source_coverage": {
+  "readable/source/upstream/COPYING": {
+   "total_lines": 661,
+   "read_lines": 0,
+   "missing_line_ranges": [
+    [
+     1,
+     661
+    ]
+   ]
+  },
+  "readable/source/upstream/README.md": {
+   "total_lines": 71,
+   "read_lines": 71,
+   "missing_line_ranges": []
+  },
+  "readable/source/upstream/lib/Db/Poll.php": {
+   "total_lines": 1045,
+   "read_lines": 640,
+   "missing_line_ranges": [
+    [
+     521,
+     579
+    ],
+    [
+     700,
+     1045
+    ]
+   ]
+  },
+  "readable/source/upstream/lib/Db/Vote.php": {
+   "total_lines": 123,
+   "read_lines": 0,
+   "missing_line_ranges": [
+    [
+     1,
+     123
+    ]
+   ]
+  }
+ },
+ "qualified_review_result_exists": false,
+ "package_exists": false,
+ "catalog_imported": false,
+ "eligible_for_pass_recovery": false,
+ "stop_reason": "per_leaf_six_calls_exhausted; substantive_contract_findings_and_incomplete_source_reads",
+ "model_calls_added_by_audit": 0,
+ "application_runtime": "not_run"
+}

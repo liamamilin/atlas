@@ -1,0 +1,124 @@
+{
+ "full": {
+  "status": "paused",
+  "new_calls": 179,
+  "baseline": 99,
+  "active_calls": 1,
+  "deadline": 1795181744.123177
+ },
+ "pilot": {
+  "pilot_id": "reference-two-shapes-2026-10-22",
+  "plan_id": "full-leaf-auxiliary-2026-10-21",
+  "phase": "auxiliary-full-full-leaf-auxiliary-2026-10-21",
+  "status": "active",
+  "request_digest": "bcdaa9c84e3308a719529bb8670d6c71d674895055195a37f4d1edbc1463c384",
+  "leaves": [
+   "bookmark-manager",
+   "polling-application"
+  ],
+  "max_calls": 6,
+  "created": 1792668493.194456,
+  "calls": [
+   {
+    "identity": "full-leaf-auxiliary-2026-10-21:bookmark-manager",
+    "stage": "reference/research/reference-two-shapes-2026-10-22",
+    "status": "completed",
+    "job_id": "reference-two-shapes-2026-10-22:bookmark-manager:research",
+    "created": 1792668514.0671291,
+    "started": 1792668514.259465,
+    "finished": 1792668598.0196428
+   },
+   {
+    "identity": "full-leaf-auxiliary-2026-10-21:polling-application",
+    "stage": "reference/research/reference-two-shapes-2026-10-22",
+    "status": "completed",
+    "job_id": "reference-two-shapes-2026-10-22:polling-application:research",
+    "created": 1792668598.464632,
+    "started": 1792668598.5780559,
+    "finished": 1792668722.381375
+   },
+   {
+    "identity": "full-leaf-auxiliary-2026-10-21:bookmark-manager",
+    "stage": "reference/author/reference-two-shapes-2026-10-22",
+    "status": "completed",
+    "job_id": "reference-two-shapes-2026-10-22:bookmark-manager:author",
+    "created": 1792669933.192516,
+    "started": 1792669933.3054981,
+    "finished": 1792670091.070094
+   },
+   {
+    "identity": "full-leaf-auxiliary-2026-10-21:polling-application",
+    "stage": "reference/author/reference-two-shapes-2026-10-22",
+    "status": "completed",
+    "job_id": "reference-two-shapes-2026-10-22:polling-application:author",
+    "created": 1792670091.178772,
+    "started": 1792670091.286533,
+    "finished": 1792670253.753495
+   },
+   {
+    "identity": "full-leaf-auxiliary-2026-10-21:bookmark-manager",
+    "stage": "reference/author/reference-two-shapes-2026-10-22/r2",
+    "status": "started",
+    "job_id": "reference-two-shapes-2026-10-22:bookmark-manager:r2:author",
+    "created": 1792672893.4832041,
+    "started": 1792672893.603159,
+    "finished": null
+   }
+  ],
+  "revisions": [
+   {
+    "request": {
+     "generation_path": "docs/template-factory/product-reference-convergence-2026-10-22/bookmark-manager/r2/generation",
+     "idempotency_key": "reference-two-shapes-2026-10-22:bookmark-manager:r2",
+     "inputs_digest": "67bddcfab8659449c1bc8d01a8d3b335a77b83ea374a4aa57bd4a1c61b769e9f",
+     "latest_user_request": {
+      "path": "docs/template-factory/product-reference-convergence-2026-10-22/USER_REQUEST.txt",
+      "sha256": "980c40ad54039b3339d79c5e389933ceca76b6a7c805000ac7b50b7f86efd186"
+     },
+     "leaf": "bookmark-manager",
+     "original_request_digest": "bcdaa9c84e3308a719529bb8670d6c71d674895055195a37f4d1edbc1463c384",
+     "parents": {
+      "author": {
+       "path": "docs/template-factory/product-reference-pilot-2026-10-22/bookmark-manager/generation/author/RESULT.json",
+       "sha256": "690e57c16efdaab37841a33fce798825021a6ef2471ad8b927aceeabcf811563"
+      },
+      "author_receipt": {
+       "path": "docs/template-factory/product-reference-pilot-2026-10-22/bookmark-manager/generation/author/DELIVERED.json",
+       "sha256": "7d2725be1fcefff219891c27dd749579ac04a8475733b68146e17aed29bf386b"
+      },
+      "outcome": {
+       "path": "docs/template-factory/product-reference-pilot-2026-10-22/bookmark-manager/OUTCOME.json",
+       "sha256": "2b43910154dccfb083c7e42a587b5f7d25993dbae896bcfb4868d73f6c575b9c"
+      },
+      "research": {
+       "path": "docs/template-factory/product-reference-pilot-2026-10-22/bookmark-manager/generation/research/RESULT.json",
+       "sha256": "39c52295aac81b8da440553ce222939c4a7347c55888e2a11192bb5cc9dd3cd0"
+      },
+      "research_receipt": {
+       "path": "docs/template-factory/product-reference-pilot-2026-10-22/bookmark-manager/generation/research/DELIVERED.json",
+       "sha256": "b0a4553719ae770abbe6d4031dd9822cdccccf25af6b455362e6b0706d0fe931"
+      }
+     },
+     "pilot_id": "reference-two-shapes-2026-10-22",
+     "plan_id": "full-leaf-auxiliary-2026-10-21",
+     "production_source_sha256": "958bde756bcbeb796d01de6ed5536be9ce271df076bdb53f1ca17178dd1a5e4b",
+     "profile_version": "product-reference-v1",
+     "prompt_digest": "e09ca4b82661fe97305cfbd490d0ad35eb20a11ca0d658c49389024a501be379",
+     "revision_id": "r2",
+     "schema": "atlas.reference-pilot-revision.v1",
+     "source_ci": {
+      "code_sha": "c915bf462947dc0261c8aa49740c34756db210ae",
+      "host_revision_digest": "560258a72dc8288e50d73471bafc7725979fc130f675caae3834ad258225ed04"
+     }
+    },
+    "request_digest": "8fcee4aff8c40184a129da24774a82d7d6dff8f63356c9a87fec1e51f8d9c24a",
+    "effective_max_calls": 12
+   }
+  ],
+  "effective_max_calls": 12,
+  "original_max_calls": 6,
+  "remaining_calls": 7,
+  "host_alignment_digest": "e2a4486b10cfafc9bf7497320e083b0a17dd2f7aa4e4b277866337d1f52bea80",
+  "effective_profile_source_sha256": "958bde756bcbeb796d01de6ed5536be9ce271df076bdb53f1ca17178dd1a5e4b"
+ }
+}

@@ -1,0 +1,237 @@
+{
+ "checkpoint": "after polling r2, before authorized r3",
+ "full_status": "paused",
+ "new_calls": 184,
+ "baseline": 99,
+ "cumulative": 283,
+ "active_calls": 0,
+ "records": [
+  {
+   "leaf": "bookmark-manager",
+   "revision": "r2",
+   "original_outcome": {
+    "status": "failed",
+    "error_type": "ValueError",
+    "code": null,
+    "reason": "scope core_personal_library is incomplete: selected rule r_private_single_owner has no selected assertion; add an assertion covering this rule",
+    "completed_stages": [
+     "research",
+     "author"
+    ],
+    "leaf": "bookmark-manager",
+    "revision_id": "r2",
+    "recorded_at": 1792673003.858578,
+    "application_runtime_status": "not_run",
+    "publication_status": "not_published"
+   }
+  },
+  {
+   "leaf": "bookmark-manager",
+   "revision": "r3",
+   "original_outcome": {
+    "status": "failed",
+    "error_type": "ValueError",
+    "code": null,
+    "reason": "basis.b_up_local.source_ids: untrusted source IDs: obs-01",
+    "completed_stages": [
+     "research",
+     "author"
+    ],
+    "leaf": "bookmark-manager",
+    "revision_id": "r3",
+    "recorded_at": 1792673189.11039,
+    "application_runtime_status": "not_run",
+    "publication_status": "not_published"
+   }
+  },
+  {
+   "leaf": "bookmark-manager",
+   "revision": "r4",
+   "original_outcome": {
+    "status": "failed",
+    "error_type": "ValueError",
+    "code": null,
+    "reason": "review lacks actual completed full-content read coverage for readable/REVIEW_STRUCTURE.json",
+    "completed_stages": [
+     "research",
+     "author",
+     "review"
+    ],
+    "leaf": "bookmark-manager",
+    "revision_id": "r4",
+    "recorded_at": 1792674834.981874,
+    "application_runtime_status": "not_run",
+    "publication_status": "not_published"
+   },
+   "RECOVERY_OUTCOME.json": {
+    "schema": "atlas.reference-read-proof-recovery.v1",
+    "leaf": "bookmark-manager",
+    "revision_id": "r4",
+    "status": "static_review_passed",
+    "original_failure": {
+     "path": "docs/template-factory/product-reference-convergence-2026-10-22/bookmark-manager/r4/OUTCOME.json",
+     "sha256": "b9b695dcb8b0aa977b03769e4750bd8efb30165a201d5f6542166ea822556d1d"
+    },
+    "request_digest": "186fdf047868b0149f6272bb2efb941e016a43800bdbda49c95834a5e16ab38b",
+    "host_revision_digest": "231b587b8505075b9f1f2fe06280cdc522c9d67c04d7c0ee5ecc3d931c6dd6ef",
+    "model_calls_added": 0,
+    "ledger_before": {
+     "new_calls": 182,
+     "active_calls": 0,
+     "pilot_calls_digest": "8d3d9ac31f455501072bd02b06f5876baf0e0e1261c3a7ed8a080e85ce37eb83"
+    },
+    "ledger_after": {
+     "new_calls": 182,
+     "active_calls": 0,
+     "pilot_calls_digest": "8d3d9ac31f455501072bd02b06f5876baf0e0e1261c3a7ed8a080e85ce37eb83"
+    },
+    "read_proof": {
+     "path": "docs/template-factory/product-reference-convergence-2026-10-22/bookmark-manager/r4/generation/READ_COVERAGE_PROOF.json",
+     "sha256": "684990a75a785f39921edef51b1df209a7aa37f3ff1d98098c5ec533e0221f40"
+    },
+    "reference_zip": {
+     "path": "docs/template-factory/product-reference-convergence-2026-10-22/bookmark-manager/r4/generation/reference.zip",
+     "sha256": "de73f071e76cebb0768dd1870aad886edbfbadb6983959d2581c4418f6ee8209"
+    },
+    "catalog_id": "ref_de73f071e76cebb0768dd1870aad886e",
+    "application_runtime_status": "not_run",
+    "publication_status": "not_published"
+   }
+  },
+  {
+   "leaf": "polling-application",
+   "revision": "r2",
+   "original_outcome": {
+    "status": "failed",
+    "error_type": "ValueError",
+    "code": null,
+    "reason": "review lacks actual completed full-content read coverage for readable/fields/5bece732973c5228-0001.txt",
+    "completed_stages": [
+     "research",
+     "author",
+     "review"
+    ],
+    "leaf": "polling-application",
+    "revision_id": "r2",
+    "recorded_at": 1792677647.8147829,
+    "application_runtime_status": "not_run",
+    "publication_status": "not_published"
+   },
+   "READ_AND_CONTENT_AUDIT.json": {
+    "status": "unqualified_needs_changes",
+    "review_result": {
+     "path": "docs/template-factory/product-reference-convergence-2026-10-22/polling-application/r2/generation/review/RESULT.json",
+     "sha256": "ffbe0292a90616a7f819c2ec6d01b3320fe8a1bfc9c0c6e199eaf16c3a7f8dc0"
+    },
+    "original_failure": {
+     "path": "docs/template-factory/product-reference-convergence-2026-10-22/polling-application/r2/OUTCOME.json",
+     "sha256": "6f9119905e858571e7f36459a576c9633924ee5353161ef319dc27207c01f8b6"
+    },
+    "issues": [
+     "Source fidelity: b_up_readme_caps claims invitations, reminders, comments, notifications, and calendar conflict hints, but the host-pinned README observations cover only lines 5, 20, 23-27, 30, 33, 36, 51, and 64. README lines 29 (Invite everyone you want), 31 (automatic reminders), 32 (Comments), 34 (notifications), and 35 (calendar hints) are in the file but have no observation binding, so the statement is not traceable to quoted pinned lines.",
+     "Source fidelity: b_up_roles_permissions claims more than twenty named permissions covering edit, vote, results, usernames, options, comments, sharing, download, deanonymization, and foreign-vote changes. The only pinned Poll.php range is 106-115, whose quoted statement is the seven ROLE_* constants; the PERMISSION_* block at lines 116-136 (editPoll, seePollResults, vote, seeUserNames, addOptions, addComment, shareCreate, downloadPoll, deanonymize, changeForeignVotes) is unpinned. The access/role part is supported; the permission enumeration is not.",
+     "Source fidelity: b_up_vote_answers says the poll carries allowMaybe, useNo, and result-visibility settings that govern yes/no/maybe answer modes. Pinned Poll.php:148-159 quotes allowMaybe and showResults but not useNo (line 163), and showResults governs result visibility rather than the answer modes. The useNo part is untraceable and the causal wording is wrong.",
+     "Source fidelity: b_up_clone_delete claims deletion supports an auto-delete offset in days. The pinned Poll.php:230-255 range quotes createClone only; getDeletionDate and the auto-delete offset at lines 635-640 are not in any observation binding. Clone copying is supported; the deletion claim is not.",
+     "Source fidelity (minor): b_up_license says AGPL-3.0-or-later SPDX headers in the PHP files, but only Vote.php:4-7 is pinned; Poll.php:4-7 is in the file but not in the observation bindings. The COPYING and Vote header parts are supported.",
+     "Permissions/states: cast_vote's duplicate_code failure refuses a submission when a ballot already exists for (poll, code) and leaves it untouched, while r_one_ballot_per_code says resubmitting the same code replaces the ballot and change_vote implements that replacement. surf_vote exposes cast_vote, change_vote, and view_tally through one Submit control with no mode switch, so the same user action has two contradictory outcomes; the cast_vote recovery 'use the change-vote action' has no distinct control. a_two_voters' negative reinforces the duplicate_code outcome (A=1, B=0) instead of the replacement outcome (A=0, B=1).",
+     "Permissions/states: r_role_separation and the not_host failures in create_poll, close_poll, reopen_poll, a_member_cannot_create_poll, and a_host_only_lifecycle require a caller role, but the reference has no accounts, session, role field, or host-mode action; surf_host_console's forbidden state assumes a member can be recognized, and its navigation only says 'via the host role'. The host/member boundary is asserted but not grounded.",
+     "Permissions/states: create_poll effects and j_create say a created event is appended, but create_poll object_ids are poll/option/tally and omit poll_event; poll_event has only the recorded state with no creation transition, while close_poll and reopen_poll do list poll_event. The created-event lifecycle is asymmetric and incomplete.",
+     "Assertions: no assertion covers create_poll's created event or close_poll's closed event although the effects and j_create/j_close_reopen successes claim them; a_host_only_lifecycle only checks the reopened event. No assertion covers view_tally's store_unreadable failure although j_durable_tie's recovery names it; a_persistence tests only successful reload.",
+     "Assertions: a_closed_poll_write_rejected assumes in its given that the host has moved the poll to closed status but omits close_poll from action_ids. This lets it count as r_closed_freeze coverage in s_core_single_choice, which defers close_poll and reopen_poll; the covered state is unreachable in that slice.",
+     "Scope slicing: s_multi_poll_directory's rationale claims poll selection or ids, but there is no selection action or surface; surf_setup says there is no poll list, surf_host_console says it controls one poll rather than browsing many, and view_tally's recovery says to choose an existing poll although no such control exists. j_create and j_vote contain no selection step, so the multi-poll slice cannot be operated.",
+     "Scope slicing: s_hide_results_until_close claims an optional host result-visibility setting, but its only extra action is view_tally (already in the core), and no field, rule, action, or surface state implements hiding results; surf_results' forbidden state says both roles may read the aggregate, and j_vote has no close step, so 'until close' is untestable. g_visibility_default defers the setting to a later revision, contradicting the scope option's rationale.",
+     "Scope slicing: s_code_confirmation claims a confirmation or code-list check, but its only extra action is cast_vote (already in the core) and surf_vote has no confirmation section, action, or rule; the only related behavior is cast_vote's duplicate_code refusal, which conflicts with replacement. The slice changes no declared behavior.",
+     "Scope slicing: s_core_single_choice defers close_poll and reopen_poll yet selects r_closed_freeze and a_closed_poll_write_rejected, whose given requires a closed poll; the state cannot be produced inside the slice. The patch restored slice coverage by adding an assertion that assumes the deferred action rather than by including the transition. Conversely, r_durable_store is pulled into the core by cast_vote/view_tally and a_ballot_survives_reload, so the durable-store capability is already required before the dependent s_durable_store slice is selected."
+    ],
+    "checks": {
+     "assertions": false,
+     "journeys": true,
+     "limits": true,
+     "permissions_states": false,
+     "scope": true,
+     "scope_slicing": false,
+     "source_fidelity": false
+    },
+    "observation_count": 32,
+    "independent_host_audit": {
+     "canonical_input_lines": 7060,
+     "exact_lines": 7059,
+     "one_truncated_schema_line_fully_paged": true,
+     "duplicate_unread_field_pages": {
+      "pointers": [
+       "/observations/25/4",
+       "/research/observed_upstream/25/4"
+      ],
+      "same_string_bytes": 842,
+      "also_fully_read_at": "/observation_bindings/25/statement",
+      "canonical_lines": [
+       2313,
+       2955,
+       3258
+      ]
+     },
+     "source_coverage": {
+      "COPYING": {
+       "read": 5,
+       "total": 661,
+       "missing": [
+        [
+         6,
+         661
+        ]
+       ]
+      },
+      "lib/Db/Poll.php": {
+       "read": 560,
+       "total": 1045,
+       "missing": [
+        [
+         320,
+         379
+        ],
+        [
+         410,
+         439
+        ],
+        [
+         485,
+         627
+        ],
+        [
+         648,
+         857
+        ],
+        [
+         898,
+         939
+        ]
+       ]
+      },
+      "README.md": {
+       "read": 71,
+       "total": 71
+      },
+      "lib/Db/Vote.php": {
+       "read": 123,
+       "total": 123
+      }
+     }
+    },
+    "eligible_for_pass_recovery": false,
+    "feedback_may_authorize_pass": false,
+    "fresh_complete_independent_review_required": true,
+    "model_calls_added": 0,
+    "application_runtime_status": "not_run"
+   }
+  }
+ ],
+ "book_usable": true,
+ "poll_usable": false,
+ "poll_remaining_calls": 2,
+ "latest_source_ci_pending": {
+  "sha": "adcdc1b10633cb3802d800ef2314611ae63e42f6",
+  "run_id": 39794533893
+ },
+ "applications_added": 0,
+ "cases_added": 0
+}
