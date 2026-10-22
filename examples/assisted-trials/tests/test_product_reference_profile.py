@@ -471,7 +471,8 @@ class ProductReferencePipelineTests(unittest.TestCase):
         response = adapter("research", {"a": 1}, prompt, source)
         self.assertEqual(response, {"result": {"findings": []},
                                     "session_id": "real-checkpoint-session",
-                                    "read_events": [{"actual": "event"}]})
+                                    "read_events": [{"actual": "event"}],
+                                    "checkpoint_dir": str((self.root / "adapter" / "official-checkpoints" / "research"))})
         self.assertIs(observed["cli"], cli)
         self.assertIs(observed["budget"], budgets["research"])
         self.assertEqual(observed["model"], "test/model")
@@ -520,6 +521,138 @@ class ProductReferencePipelineTests(unittest.TestCase):
         self.assertEqual(result["status"], "static_review_passed")
         self.run_pipeline(output, adapter)
         self.assertEqual(calls, ["research", "author", "review"])
+        proof = json.loads((output / "READ_COVERAGE_PROOF.json").read_text())
+        self.assertEqual(proof["mode"], "exact")
+        with zipfile.ZipFile(output / "reference.zip") as archive:
+            self.assertNotIn("read-coverage-proof.json", archive.namelist())
+
+    def test_canonical_equivalence_requires_complete_official_input_lines(self):
+        # A missing structural read is accepted only by the separate, bound proof
+        # path. Exact official checkpoint construction is covered by focused tests
+        # in the production-pilot suite; this guards against silently falling back.
+        structure = profile._review_structure_text({})
+        target = self.root / "readable/REVIEW_STRUCTURE.json"
+        target.parent.mkdir(parents=True)
+        target.write_text(structure, encoding="utf-8")
+        manifest = {"readable/REVIEW_STRUCTURE.json": {
+            "sha256": hashlib.sha256(structure.encode()).hexdigest(),
+            "content_sha256": "1" * 64, "required_read": True}}
+        (self.root / "READ_VIEWS.json").write_text(json.dumps(manifest), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "official review checkpoint"):
+            profile._verify_read_events([], self.root, manifest, official_context={
+                "checkpoint_dir": self.root / "absent", "review_request": {"review_input": {}}})
+
+    def _canonical_proof_fixture(self, *, tamper=None):
+        generation = self.root / ("canonical-proof-" + (tamper or "valid")) / "generation"
+        checkpoint = generation.parent / "official-checkpoints/review"
+        generation.mkdir(parents=True)
+        review_input = {"schema_contract": "Contract clause. " * 180,
+                        "reference": fixture_reference(), "observations": [],
+                        "inputs": {"case_refs": []}, "snapshot_digest": "fixture-snapshot"}
+        profile._fixed(generation / "REVIEW_INPUT.json", review_input)
+        manifest = profile._materialize_read_views(generation, review_input, {}, {"req-leaf"})
+        review_request = {"input_digest": digest(review_input), "checks": list(profile.CHECKS),
+                          "material_manifest": manifest, "review_input": review_input}
+        review_materials = {name: (generation / name).read_text(encoding="utf-8") for name in manifest}
+        review_materials.update({"READING_GUIDE.md": (generation / "READING_GUIDE.md").read_text(encoding="utf-8"),
+                                 "READ_VIEWS.json": (generation / "READ_VIEWS.json").read_text(encoding="utf-8")})
+        source = {"snapshot": {"repository": "https://example.invalid/repo", "commit_sha": "a" * 40,
+                               "files": {}, "status": "not_run", "local_root": str(self.root)},
+                  "files": {}, "upstream_status": "not_run", "application_runtime_status": "not_run",
+                  "review_materials": review_materials}
+        source_root = checkpoint / "source"
+        source_root.mkdir(parents=True)
+        snapshot_bytes = (profile._canonical({k: v for k, v in source["snapshot"].items()
+                                              if k != "local_root"}) + "\n").encode()
+        (source_root / "snapshot.json").write_bytes(snapshot_bytes)
+        source_hashes = {"snapshot.json": profile._sha(snapshot_bytes)}
+        for name, text in review_materials.items():
+            path = source_root / "review" / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            data = text.encode("utf-8")
+            path.write_bytes(data)
+            source_hashes["review/" + name] = profile._sha(data)
+        leaf = b"fixture leaf\n"
+        (checkpoint / "leaf.md").write_bytes(leaf)
+        model, session_id = "fixture/model", "fixture-review-session"
+        result = {"verdict": "pass", "input_digest": "fixture-review-input"}
+        raw = {"text": json.dumps(result, ensure_ascii=False)}
+        (checkpoint / "original-response.json").write_text(profile._canonical(raw) + "\n", encoding="utf-8")
+        raw_bytes = (checkpoint / "original-response.json").read_bytes()
+        (checkpoint / "RESULT.json").write_text(profile._canonical(result) + "\n", encoding="utf-8")
+        binding = {"model": model, "input_digest": "pending", "prompt": profile.REVIEW,
+                   "source": source_hashes, "leaf_sha256": profile._sha(leaf)}
+        official_input = {"profile_payload": review_request,
+                          "adapter": {"stage": "review", "model": model,
+                                      "prompt_sha256": profile._sha(profile.REVIEW.encode()),
+                                      "source_tree_sha256": digest(source_hashes),
+                                      "leaf_sha256": profile._sha(leaf)}}
+        official_input_bytes = (json.dumps(official_input, ensure_ascii=False, indent=1) + "\n").encode()
+        (checkpoint / "input.json").write_bytes(official_input_bytes)
+        binding["input_digest"] = digest(official_input)
+        (checkpoint / "BINDING.json").write_text(profile._canonical(binding) + "\n", encoding="utf-8")
+        delivered = {"binding_digest": digest(binding), "result_digest": digest(result)}
+        (checkpoint / "DELIVERED.json").write_text(profile._canonical(delivered) + "\n", encoding="utf-8")
+        (checkpoint / "cli-summary.json").write_text(profile._canonical({
+            "delivery_status": "delivered", "session_id": session_id, "requested_model": model,
+            "original_response_sha256": profile._sha(raw_bytes)}) + "\n", encoding="utf-8")
+
+        events = []
+        for name, row in manifest.items():
+            if name == "readable/REVIEW_STRUCTURE.json" or (tamper == "omit_page" and name.endswith("-0001.txt")):
+                continue
+            target = source_root / "review" / name
+            lines = target.read_text(encoding="utf-8").splitlines()
+            content = "\n".join(f"{i}: {line}" for i, line in enumerate(lines, 1))
+            events.append({"sessionID": session_id, "part": {"tool": "read", "sessionID": session_id,
+                            "state": {"status": "completed", "input": {"path": str(target)},
+                                      "output": content}}})
+        input_lines = official_input_bytes.decode("utf-8").splitlines()
+        long_line = next(i for i, line in enumerate(input_lines) if '"schema_contract"' in line)
+        input_body = []
+        for i, line in enumerate(input_lines, 1):
+            if i == long_line + 1:
+                clipped = line[:2000] + "... (line truncated to 2000 chars)"
+                if tamper == "bad_prefix":
+                    clipped = "X" + clipped[1:]
+                line = clipped
+            if tamper == "missing_input_line" and i == 3:
+                continue
+            input_body.append(f"{i}: {line}")
+        if tamper == "wrong_session":
+            session_for_input = "other-session"
+        else:
+            session_for_input = session_id
+        input_output = (f"Read file {checkpoint / 'input.json'}, lines 1-{len(input_lines)}\n"
+                        + "\n".join(input_body))
+        events.append({"sessionID": session_for_input,
+                       "part": {"tool": "read", "sessionID": session_for_input,
+                                "state": {"status": "completed", "input": {"path": str(checkpoint / "input.json")},
+                                          "output": input_output}}})
+        (checkpoint / "events.jsonl").write_text("\n".join(json.dumps(event) for event in events) + "\n", encoding="utf-8")
+        if tamper == "bad_binding":
+            damaged = dict(binding, input_digest="f" * 64)
+            (checkpoint / "BINDING.json").write_text(profile._canonical(damaged) + "\n", encoding="utf-8")
+        context = {"checkpoint_dir": checkpoint, "review_request": review_request,
+                   "session_id": session_id, "result": result, "source": source}
+        return generation, manifest, events, context
+
+    def test_official_canonical_equivalence_proof_and_tamper_matrix(self):
+        generation, manifest, events, context = self._canonical_proof_fixture()
+        proof = profile._verify_read_events(events, generation, manifest, official_context=context)
+        self.assertEqual(proof["mode"], "canonical_equivalent")
+        self.assertEqual(proof["canonical_input"]["official_input_line_count"],
+                         len(proof["canonical_input"]["official_input_lines_covered"]))
+        self.assertEqual(len(proof["canonical_input"]["truncated_long_fields"]), 1)
+        for tamper, expected in (("missing_input_line", "body does not cover"),
+                                 ("bad_prefix", "differs at line"),
+                                 ("wrong_session", "different session"),
+                                 ("bad_binding", "input, result, session, or delivered binding"),
+                                 ("omit_page", "full-content read coverage")):
+            with self.subTest(tamper=tamper):
+                generation, manifest, events, context = self._canonical_proof_fixture(tamper=tamper)
+                with self.assertRaisesRegex(ValueError, expected):
+                    profile._verify_read_events(events, generation, manifest, official_context=context)
 
     def test_same_directory_concurrent_generation_fails_fast(self):
         out = self.root / "output"

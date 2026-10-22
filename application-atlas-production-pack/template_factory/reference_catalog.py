@@ -83,6 +83,50 @@ def _tree_digest(root: Path) -> str:
     return digest(values)
 
 
+def _official_review_context(generation, review_request, review_result, session_id):
+    checkpoint = generation.parent / "official-checkpoints/review"
+    source_root = _require_directory(checkpoint, "source", "official review source")
+    snapshot_path = _require_file(source_root, "snapshot.json", "official review snapshot")
+
+    def source_files(directory):
+        values = {}
+        for path in sorted(directory.rglob("*")):
+            if path.is_symlink():
+                raise FactoryError("official review source contains a symlink", "reference_import_provenance", 409)
+            if path.is_file():
+                values[path.relative_to(directory).as_posix()] = path.read_text(encoding="utf-8")
+        return values
+
+    snapshot = _read_json_bytes(snapshot_path.read_bytes(), "official review snapshot")
+    upstream_root = source_root / "upstream"
+    review_root = source_root / "review"
+    if not upstream_root.is_dir() or not review_root.is_dir():
+        raise FactoryError("official review source tree is incomplete", "reference_import_provenance", 409)
+    return {"checkpoint_dir": checkpoint, "review_request": review_request,
+            "result": review_result, "session_id": session_id,
+            "source": {"snapshot": snapshot, "files": source_files(upstream_root),
+                       "review_materials": source_files(review_root)}}
+
+
+def _require_directory(root: Path, relative: str, field: str) -> Path:
+    rel = _safe_rel(relative, field)
+    root = root.resolve(strict=True)
+    path = root.joinpath(*rel.parts)
+    current = root
+    for part in rel.parts:
+        current = current / part
+        if current.is_symlink():
+            raise FactoryError(f"{field} path contains a symlink", "reference_import_provenance", 409)
+    try:
+        resolved = path.resolve(strict=True)
+        resolved.relative_to(root)
+    except (OSError, ValueError) as error:
+        raise FactoryError(f"{field} path is missing or escapes its root", "reference_import_provenance", 409) from error
+    if not resolved.is_dir():
+        raise FactoryError(f"{field} must be a directory", "reference_import_provenance", 409)
+    return resolved
+
+
 def _profile_module(pack):
     path = Path(pack).resolve().parent / "examples/assisted-trials/product_reference_profile.py"
     if not path.is_file() or path.is_symlink():
@@ -277,6 +321,23 @@ class ReferenceCatalog:
             _require_file(generation, name, "review read material")
         review_receipt = _read_json_bytes(files["review.json"], "review.json")
         reviewed = _read_json_bytes(files["review-result.json"], "review-result.json")
+        coverage_path = _require_file(generation, "READ_COVERAGE_PROOF.json", "read coverage proof")
+        coverage_proof = _read_json_bytes(coverage_path.read_bytes(), "READ_COVERAGE_PROOF.json")
+        if (not isinstance(coverage_proof, dict)
+                or coverage_proof.get("schema") != "atlas.product-reference-read-coverage.v1"
+                or coverage_proof.get("mode") not in {"exact", "canonical_equivalent"}
+                or coverage_proof.get("review_input_digest") != digest(review_input)
+                or coverage_proof.get("material_manifest_digest") != digest(read_views)
+                or coverage_proof.get("read_events_digest") != digest(review_delivery.get("read_events", []))):
+            raise FactoryError("read coverage proof does not bind the delivered review evidence", "reference_import_review", 409)
+        if coverage_proof.get("mode") == "canonical_equivalent":
+            bundled_coverage = files.get("read-coverage-proof.json")
+            if (bundled_coverage is None
+                    or _read_json_bytes(bundled_coverage, "read-coverage-proof.json") != coverage_proof
+                    or review_receipt.get("read_coverage_proof_sha256") != digest(coverage_proof)):
+                raise FactoryError("canonical-equivalent read proof is not bound by the frozen package and review receipt", "reference_import_review", 409)
+        elif "read-coverage-proof.json" in files and _read_json_bytes(files["read-coverage-proof.json"], "read-coverage-proof.json") != coverage_proof:
+            raise FactoryError("bundled exact read proof differs from its generation receipt", "reference_import_review", 409)
         repo_root = Path(self.store.pack).resolve().parent
         input_rel = _safe_rel(input_binding.get("input_path"), "registered input path")
         input_path = _require_file(repo_root, input_rel.as_posix(), "registered input")
@@ -416,7 +477,14 @@ class ReferenceCatalog:
             raise FactoryError("official research checkpoint does not match bundled research session", "reference_import_provenance", 409)
         self._ledger_check(pilot, revision_request["leaf"], revision_request["revision_id"], summaries)
         try:
-            profile._verify_read_events(review_delivery.get("read_events", []), generation, read_views)
+            official_context = None
+            if coverage_proof["mode"] == "canonical_equivalent":
+                official_context = _official_review_context(generation, review_stage_input, review_raw,
+                                                            review_session)
+            verified_coverage = profile._verify_read_events(review_delivery.get("read_events", []), generation,
+                                                            read_views, official_context=official_context)
+            if verified_coverage != coverage_proof:
+                raise ValueError("persisted read coverage proof differs from recomputed official read evidence")
             source_ids = set(source_ids)
             profile.validate_review(reviewed, identity, author_session, review_session,
                                     len(review_input.get("observations", [])))

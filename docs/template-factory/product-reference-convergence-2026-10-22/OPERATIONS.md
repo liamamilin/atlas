@@ -13,4 +13,14 @@ PYTHONPATH=application-atlas-production-pack:examples/assisted-trials python3 ex
 
 只有r2真实内容问题且原每叶限额仍有余量时，用 --revision r3 --parent-revision r2 准备集中后继。不得删除LAUNCH_INTENT重新调用，不得用新job绕过已经计账的阶段。来源/状态不明则停止本试跑并核查。模型 needs_changes不是协议错误。单样本失败留记录，另一固定样本继续。
 
+### 已交付审阅的零调用读取证明恢复
+
+只适用于三项真实交付已保存、独立审阅已经通过、宿主仅因读取覆盖证明失败的同一候选。先使证明修复的精确源码CI通过并追加正式host revision，再运行：
+
+```sh
+PYTHONPATH=application-atlas-production-pack:examples/assisted-trials python3 examples/assisted-trials/produce_reference_revision.py recover-read-proof --leaf bookmark-manager --revision r4
+```
+
+入口核验原注册请求、固定输入、当前正式源码、暂停和账本，并提供禁止模型调用的回调。原 `OUTCOME.json` 不变，新结果写入 `RECOVERY_OUTCOME.json`。标准结构副本未完全读取时，只有原始事件证明完整读取等价的权威JSON、长字段全部分页和所有源码材料，且与原绑定、独审会话和返回完全一致，才生成明确标识 `canonical_equivalent` 的证明。冻结包绑定该证明，正式入库重新计算而不信任单独声明。不能把这种恢复用于内容拒绝、缺交付、错误输入或真正缺失的读取；恢复不增加任何调用资格。
+
 目录入口 /factory?view=references；GET /api/factory/product-references，GET /<ref_id> 和 /<ref_id>/download。该类是完整产品认知参考包，不是含执行代码/验收程序的旧标准开发包，应用仍未运行；正式发布区与严格G1/T08不改。入库幂等复用，同输入恢复不重复模型或案例。

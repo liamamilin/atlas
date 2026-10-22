@@ -15,6 +15,69 @@ import produce_reference_revision as runner  # noqa: E402
 
 
 class RevisionRunnerTests(unittest.TestCase):
+    def test_read_proof_recovery_is_zero_call_and_preserves_original_failure(self):
+        from unittest.mock import Mock
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            old, new = root / "old", root / "new"
+            sample, folder = old / "bookmark-manager", new / "bookmark-manager/r4"
+            sample.mkdir(parents=True)
+            folder.mkdir(parents=True)
+            for filename in ("INPUTS.json", "SNAPSHOT.json"):
+                (sample / filename).write_text("{}")
+            binding = {"leaf": "bookmark-manager", "input_path": "old/bookmark-manager/INPUTS.json",
+                       "snapshot_path": "old/bookmark-manager/SNAPSHOT.json",
+                       "input_sha256": runner.sha(sample / "INPUTS.json"),
+                       "snapshot_sha256": runner.sha(sample / "SNAPSHOT.json")}
+            (old / "REGISTER_REQUEST.json").write_text(json.dumps({"leaves": [binding]}))
+            request = {"parents": {"author": {"path": "new/bookmark-manager/r3/generation/author/RESULT.json",
+                                               "sha256": "a" * 64}}}
+            (folder / "REQUEST.json").write_text(json.dumps(request))
+            failure = {"status": "failed", "error_type": "ValueError",
+                       "reason": "review lacks actual completed full-content read coverage for readable/REVIEW_STRUCTURE.json"}
+            (folder / "OUTCOME.json").write_text(json.dumps(failure))
+            original_failure = (folder / "OUTCOME.json").read_bytes()
+            for stage in ("research", "author", "review"):
+                stage_dir = folder / "generation" / stage
+                stage_dir.mkdir(parents=True)
+                for filename in ("BINDING.json", "DELIVERED.json", "RESULT.json"):
+                    (stage_dir / filename).write_text(json.dumps({"verdict": "pass"}))
+            package = folder / "generation/reference.zip"
+            package.write_bytes(b"fixture archive")
+            (folder / "generation/READ_COVERAGE_PROOF.json").write_text("{}")
+            state = {"status": "paused", "active_calls": 0, "new_calls": 182}
+            full = SimpleNamespace(status=lambda _: state,
+                                   host_revision=lambda _: {"new_host_sha256": {"old/bookmark-manager/INPUTS.json": binding["input_sha256"]}})
+            pilot = Mock()
+            pilot.get_revision.return_value = {"request": request}
+            pilot.get.return_value = {"calls": [{"id": "fixed-call", "status": "completed"}]}
+            catalog = Mock()
+            catalog.import_reference.return_value = {"id": "ref_fixture"}
+
+            def replay(*args):
+                with self.assertRaisesRegex(RuntimeError, "cannot launch"):
+                    args[-1]("review", {}, "", {})
+                return {"status": "static_review_passed", "reference_zip": str(package)}
+
+            with patch.object(runner, "ROOT", root), patch.object(runner, "PARENT", old), patch.object(runner, "DIRECTORY", new), \
+                    patch.object(runner, "host", return_value=(object(), full)), \
+                    patch.object(runner, "ReferencePilotService", return_value=pilot), \
+                    patch.object(runner.profile, "revise", side_effect=replay) as revise, \
+                    patch("template_factory.reference_catalog.ReferenceCatalog", return_value=catalog):
+                first = runner.recover_read_proof("bookmark-manager", "r4")
+                self.assertEqual(first, runner.recover_read_proof("bookmark-manager", "r4"))
+                self.assertEqual(first["model_calls_added"], 0)
+                self.assertEqual(first["ledger_before"], first["ledger_after"])
+                self.assertEqual((folder / "OUTCOME.json").read_bytes(), original_failure)
+                (folder / "generation/review/RESULT.json").write_text('{"verdict":"needs_changes"}')
+                with self.assertRaisesRegex(ValueError, "content rejection"):
+                    runner.recover_read_proof("bookmark-manager", "r4")
+                self.assertEqual(revise.call_count, 2)
+                (folder / "generation/review/DELIVERED.json").unlink()
+                with self.assertRaisesRegex(ValueError, "all three durable"):
+                    runner.recover_read_proof("bookmark-manager", "r4")
+                self.assertEqual(catalog.import_reference.call_count, 2)
+
     def test_same_run_replays_registration_and_recovers_import(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

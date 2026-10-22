@@ -467,6 +467,23 @@ def _scope_slices(spec, source_ids):
     return slices
 
 
+def _paged_strings(value, pointer=""):
+    if isinstance(value, str) and (len(value.encode("utf-8")) > 900
+            or len(json.dumps(value, ensure_ascii=False).encode("utf-8")) > 900):
+        return {"$string_pointer": pointer or "/", "$sha256": _sha(value.encode()),
+                "$utf8_bytes": len(value.encode())}
+    if isinstance(value, dict):
+        return {key: _paged_strings(item, pointer + "/" + str(key).replace("~", "~0").replace("/", "~1"))
+                for key, item in value.items()}
+    if isinstance(value, list):
+        return [_paged_strings(item, pointer + "/" + str(index)) for index, item in enumerate(value)]
+    return value
+
+
+def _review_structure_text(review_payload):
+    return json.dumps(_paged_strings(review_payload), ensure_ascii=False, sort_keys=True, indent=2) + "\n"
+
+
 def _materialize_read_views(directory, review_payload, source_files, source_ids):
     """Keep canonical payload and create exact, paginatable decoded-string views."""
     view_dir = directory / "readable"
@@ -483,16 +500,6 @@ def _materialize_read_views(directory, review_payload, source_files, source_ids)
                          "content_sha256": digest(spec), "required_read": False}
     field_index = ["# Exact long-string pages for the complete independent-review input", ""]
     long_strings = {}
-    def paged_strings(value, pointer=""):
-        if isinstance(value, str) and (len(value.encode("utf-8")) > 900 or len(json.dumps(value, ensure_ascii=False).encode("utf-8")) > 900):
-            return {"$string_pointer": pointer or "/", "$sha256": _sha(value.encode()),
-                    "$utf8_bytes": len(value.encode())}
-        if isinstance(value, dict):
-            return {key: paged_strings(item, pointer + "/" + str(key).replace("~", "~0").replace("/", "~1"))
-                    for key, item in value.items()}
-        if isinstance(value, list):
-            return [paged_strings(item, pointer + "/" + str(index)) for index, item in enumerate(value)]
-        return value
     def find_long(value, pointer=""):
         if isinstance(value, str) and (len(value.encode("utf-8")) > 900 or len(json.dumps(value, ensure_ascii=False).encode("utf-8")) > 900):
             long_strings[pointer or "/"] = value
@@ -534,8 +541,7 @@ def _materialize_read_views(directory, review_payload, source_files, source_ids)
         manifest[rel] = {"json_pointer": "/sources/upstream/" + name,
                          "sha256": _sha(content.encode()), "content_sha256": _sha(content.encode()),
                          "required_read": True}
-    structure = paged_strings(review_payload)
-    structural_json = json.dumps(structure, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
+    structural_json = _review_structure_text(review_payload)
     _write_fixed(view_dir / "REVIEW_STRUCTURE.json", structural_json)
     manifest["readable/REVIEW_STRUCTURE.json"] = {"json_pointer": "", "sha256": _sha(structural_json.encode()),
                                                    "content_sha256": digest(review_payload), "required_read": True}
@@ -564,13 +570,232 @@ def _write_fixed(path, text):
         _atomic_bytes(path, data)
 
 
-def _verify_read_events(events, directory, manifest):
+def _event_read(event):
+    if not isinstance(event, dict):
+        return None, None
+    path, content = event.get("path"), event.get("content")
+    part = event.get("part", {})
+    if path is None and isinstance(part, dict) and part.get("tool") == "read":
+        state = part.get("state", {})
+        if not isinstance(state, dict) or state.get("status") != "completed":
+            return None, None
+        path = state.get("input", {}).get("path")
+        content = state.get("output")
+    return path, content
+
+
+def _long_string_values(value, pointer=""):
+    found = {}
+    if isinstance(value, str) and (len(value.encode("utf-8")) > 900
+            or len(json.dumps(value, ensure_ascii=False).encode("utf-8")) > 900):
+        found[pointer or "/"] = value
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            found.update(_long_string_values(item, pointer + "/" + str(key).replace("~", "~0").replace("/", "~1")))
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            found.update(_long_string_values(item, pointer + "/" + str(index)))
+    return found
+
+
+def _official_read_checkpoint(context, events, directory, manifest, seen):
+    try:
+        checkpoint = Path(context["checkpoint_dir"]).resolve(strict=True)
+    except OSError as exc:
+        raise ValueError("official review checkpoint is missing") from exc
+    expected_checkpoint = (Path(directory).parent / "official-checkpoints/review").resolve()
+    if checkpoint != expected_checkpoint:
+        raise ValueError("official review checkpoint path differs from the bound generation sibling")
+    input_path = checkpoint / "input.json"
+    binding_path = checkpoint / "BINDING.json"
+    receipt_path = checkpoint / "DELIVERED.json"
+    result_path = checkpoint / "RESULT.json"
+    summary_path = checkpoint / "cli-summary.json"
+    raw_path = checkpoint / "original-response.json"
+    events_path = checkpoint / "events.jsonl"
+    source_root = checkpoint / "source"
+    required = (input_path, binding_path, receipt_path, result_path, summary_path,
+                raw_path, events_path, source_root, checkpoint / "leaf.md")
+    if any(not path.exists() for path in required):
+        raise ValueError("official review checkpoint lacks bound input, source, result, or read events")
+    official_input_bytes = input_path.read_bytes()
+    official_input = _json(input_path)
+    binding, receipt = _json(binding_path), _json(receipt_path)
+    result, summary = _json(result_path), _json(summary_path)
+    review_request = context["review_request"]
+    if (official_input.get("profile_payload") != review_request
+            or official_input.get("profile_payload", {}).get("review_input") != _json(Path(directory) / "REVIEW_INPUT.json")
+            or official_input.get("profile_payload", {}).get("material_manifest") != manifest
+            or official_input.get("profile_payload", {}).get("input_digest") != manifest.get("readable/REVIEW_STRUCTURE.json", {}).get("content_sha256")
+            or binding.get("input_digest") != digest(official_input)
+            or receipt != {"binding_digest": digest(binding), "result_digest": digest(result)}
+            or result != context["result"]
+            or summary.get("delivery_status") != "delivered"
+            or summary.get("session_id") != context["session_id"]
+            or summary.get("requested_model") != binding.get("model")):
+        raise ValueError("official review input, result, session, or delivered binding differs")
+    if official_input_bytes != (json.dumps(official_input, ensure_ascii=False, indent=1) + "\n").encode("utf-8"):
+        raise ValueError("official review input bytes are not canonical checkpoint JSON")
+    adapter = official_input.get("adapter", {})
+    if (adapter.get("stage") != "review" or adapter.get("model") != binding.get("model")
+            or adapter.get("prompt_sha256") != _sha(REVIEW.encode("utf-8"))
+            or adapter.get("source_tree_sha256") != digest(binding.get("source"))):
+        raise ValueError("official review adapter metadata differs from its bound stage")
+    current_source = {p.relative_to(source_root).as_posix(): _sha(p.read_bytes())
+                      for p in sorted(source_root.rglob("*")) if p.is_file()}
+    if binding.get("source") != current_source:
+        raise ValueError("official review source bytes differ from their checkpoint binding")
+    expected_source = {"snapshot.json": _canonical({k: v for k, v in context["source"]["snapshot"].items()
+                                                     if k != "local_root"}) + "\n"}
+    expected_source.update({"upstream/" + name: value for name, value in context["source"]["files"].items()})
+    expected_source.update({"review/" + name: value for name, value in context["source"].get("review_materials", {}).items()})
+    if set(expected_source) != set(current_source):
+        raise ValueError("official review source inventory differs from host-pinned materials")
+    for name, value in expected_source.items():
+        expected_bytes = value.encode("utf-8")
+        if (source_root / name).read_bytes() != expected_bytes:
+            raise ValueError(f"official review source material differs from host binding: {name}")
+    if summary.get("original_response_sha256") != _sha(raw_path.read_bytes()):
+        raise ValueError("official review raw response digest differs")
+    from template_factory.cli import parse_result
+    parsed = parse_result(json.loads(raw_path.read_text(encoding="utf-8"))["text"])
+    if parsed != result:
+        raise ValueError("official review raw response differs from delivered result")
+    official_events = [json.loads(line) for line in events_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    if official_events != events:
+        raise ValueError("review read events differ from official completed event log")
+    for event in official_events:
+        if not isinstance(event, dict):
+            continue
+        part = event.get("part", {})
+        state = part.get("state", {}) if isinstance(part, dict) else {}
+        if (isinstance(part, dict) and part.get("tool") == "read"
+                and isinstance(state, dict) and state.get("status") == "completed"
+                and (event.get("sessionID") != context["session_id"]
+                     or part.get("sessionID") != context["session_id"])):
+            raise ValueError("official completed review read belongs to a different session")
+    leaf_sha = _sha((checkpoint / "leaf.md").read_bytes())
+    if binding.get("leaf_sha256") != leaf_sha:
+        raise ValueError("official review leaf digest differs from stage binding")
+
+    input_lines = official_input_bytes.decode("utf-8").splitlines()
+    long_values = _long_string_values(official_input)
+    page_records = {}
+    review_prefix = "/profile_payload/review_input"
+    for pointer, value in long_values.items():
+        if not pointer.startswith(review_prefix + "/"):
+            continue
+        review_pointer = pointer[len(review_prefix):]
+        token = json.dumps(value, ensure_ascii=False)
+        matching = [index for index, line in enumerate(input_lines, 1) if token in line]
+        if len(matching) != 1:
+            continue
+        line_number = matching[0]
+        page_entries = {name: item for name, item in manifest.items()
+                        if item.get("json_pointer") == review_pointer and item.get("required_read")}
+        if not page_entries:
+            continue
+        expected_sha = _sha(value.encode("utf-8"))
+        ordered_pages = sorted(page_entries.items(), key=lambda pair: pair[1].get("page", -1))
+        page_count = len(ordered_pages)
+        if ([item.get("page") for _, item in ordered_pages] != list(range(1, page_count + 1))
+                or any(item.get("pages") != page_count or item.get("string_sha256") != expected_sha
+                       for _, item in ordered_pages)):
+            raise ValueError(f"official review long field SHA differs from its page binding: {review_pointer}")
+        try:
+            reconstructed = b"".join((Path(directory) / name).read_bytes() for name, _ in ordered_pages)
+        except OSError as exc:
+            raise ValueError(f"official review long field page is missing: {review_pointer}") from exc
+        if reconstructed != value.encode("utf-8") or _sha(reconstructed) != expected_sha:
+            raise ValueError(f"official review long field pages do not reconstruct the bound value: {review_pointer}")
+        page_records[line_number] = {"pointer": review_pointer, "sha256": expected_sha,
+                                     "pages": [name for name, _ in ordered_pages]}
+
+    input_seen: set[int] = set()
+    truncated = {}
+    input_resolved = input_path.resolve()
+    for event in official_events:
+        path, content = _event_read(event)
+        if not isinstance(path, str) or not isinstance(content, str):
+            continue
+        raw_path_value = Path(path)
+        if not raw_path_value.is_absolute():
+            raw_path_value = checkpoint / raw_path_value
+        try:
+            if raw_path_value.resolve() != input_resolved:
+                continue
+        except OSError:
+            continue
+        part = event.get("part", {}) if isinstance(event, dict) else {}
+        state = part.get("state", {}) if isinstance(part, dict) else {}
+        if (not isinstance(part, dict) or part.get("tool") != "read"
+                or not isinstance(state, dict) or state.get("status") != "completed"
+                or event.get("sessionID") != context["session_id"]
+                or part.get("sessionID") != context["session_id"]):
+            raise ValueError("official canonical input read is not a completed read in the bound session")
+        output_lines = content.splitlines()
+        if not output_lines:
+            raise ValueError("official canonical input read output is empty")
+        header = re.fullmatch(r"Read file (.+), lines (\d+)-(\d+)", output_lines[0])
+        if not header or Path(header.group(1)).resolve() != input_resolved:
+            raise ValueError("official canonical input read header differs from bound file")
+        range_start, range_end = int(header.group(2)), int(header.group(3))
+        if not 1 <= range_start <= range_end <= len(input_lines):
+            raise ValueError("official canonical input read header range is invalid")
+        body = output_lines[1:]
+        if body and re.fullmatch(r"\[Output truncated\. Continue reading with offset: (\d+)\]", body[-1]):
+            footer = re.fullmatch(r"\[Output truncated\. Continue reading with offset: (\d+)\]", body.pop())
+            if int(footer.group(1)) != range_end + 1:
+                raise ValueError("official canonical input read truncation offset differs from header")
+        actual_line_numbers = []
+        for line in body:
+            match = re.match(r"^\s*(\d+):(.*)$", line)
+            if not match:
+                if line.strip():
+                    raise ValueError("official canonical input read output contains unbound text")
+                continue
+            number, supplied = int(match.group(1)), match.group(2)
+            if supplied.startswith(" "):
+                supplied = supplied[1:]
+            if not 1 <= number <= len(input_lines):
+                raise ValueError("official canonical input read has an out-of-range line")
+            if not range_start <= number <= range_end:
+                raise ValueError("official canonical input line falls outside its reported range")
+            actual_line_numbers.append(number)
+            expected = input_lines[number - 1]
+            if supplied == expected:
+                input_seen.add(number)
+            elif (number in page_records and len(supplied) == 2000
+                  and len(supplied) < len(expected) and expected.startswith(supplied)):
+                input_seen.add(number)
+                truncated[number] = page_records[number]
+            elif (number in page_records and supplied.endswith("... (line truncated to 2000 chars)")
+                  and supplied[:-len("... (line truncated to 2000 chars)")].startswith(expected[:2000])
+                  and len(supplied[:-len("... (line truncated to 2000 chars)")] ) == 2000
+                  and expected.startswith(supplied[:-len("... (line truncated to 2000 chars)")])):
+                input_seen.add(number)
+                truncated[number] = page_records[number]
+            else:
+                raise ValueError(f"official canonical input read differs at line {number}")
+        if (not actual_line_numbers or actual_line_numbers != list(range(range_start, range_end + 1))):
+            raise ValueError("official canonical input read body does not cover its reported line range")
+    missing = set(range(1, len(input_lines) + 1)) - input_seen
+    if missing:
+        raise ValueError("official canonical input read lacks full line coverage")
+    return {"official_input_sha256": _sha(official_input_bytes),
+            "official_input_line_count": len(input_lines),
+            "official_input_lines_covered": sorted(input_seen),
+            "truncated_long_fields": [{"line": line, **truncated[line]} for line in sorted(truncated)]}
+
+
+def _verify_read_events(events, directory, manifest, *, official_context=None):
     if not isinstance(events, list):
         raise ValueError("review callback must provide actual read_events")
     if _json(directory / "READ_VIEWS.json") != manifest:
         raise ValueError("trusted read-view SHA/JSON-pointer manifest changed")
     required = {name: (directory / name, value["sha256"]) for name, value in manifest.items()
                 if value.get("required_read")}
+    structure_name = "readable/REVIEW_STRUCTURE.json"
     for name, (target, expected_hash) in required.items():
         if _sha(target.read_bytes()) != expected_hash:
             raise ValueError(f"bound review material changed before review: {name}")
@@ -616,13 +841,43 @@ def _verify_read_events(events, directory, manifest):
                 if not 1 <= number <= len(expected_lines) or supplied != expected_lines[number - 1]:
                     raise ValueError(f"review read event content differs from bound line {number} in {path}")
                 seen[path].add(number)
+    missing_required = []
     for name, (target, _) in required.items():
         if _sha(target.read_bytes()) != manifest[name]["sha256"]:
             raise ValueError(f"bound review material changed during review: {name}")
         if not set(range(1, len(target.read_text(encoding="utf-8").splitlines()) + 1)) <= seen[name]:
-            raise ValueError(f"review lacks actual completed full-content read coverage for {name}")
+            if name == structure_name:
+                missing_required.append(name)
+            else:
+                raise ValueError(f"review lacks actual completed full-content read coverage for {name}")
     if _json(directory / "READ_VIEWS.json") != manifest:
         raise ValueError("trusted read-view SHA/JSON-pointer manifest changed during review")
+    review_input_digest = manifest[structure_name].get("content_sha256")
+    if missing_required:
+        if official_context is None:
+            raise ValueError("review lacks actual completed full-content read coverage for readable/REVIEW_STRUCTURE.json")
+        expected_structure = _review_structure_text(official_context["review_request"]["review_input"])
+        structure_path = required[structure_name][0]
+        if structure_path.read_bytes() != expected_structure.encode("utf-8"):
+            raise ValueError("bound review structure differs from canonical review payload reconstruction")
+        input_proof = _official_read_checkpoint(official_context, events, directory, manifest, seen)
+        proof = {"schema": "atlas.product-reference-read-coverage.v1",
+                 "mode": "canonical_equivalent", "review_input_digest": review_input_digest,
+                 "material_manifest_digest": digest(manifest), "read_events_digest": digest(events),
+                 "files": {name: {"sha256": manifest[name]["sha256"],
+                                  "covered_lines": sorted(seen[name])}
+                           for name in sorted(required)},
+                 "canonical_structure": {"path": structure_name,
+                                         "sha256": manifest[structure_name]["sha256"],
+                                         "covered_lines": list(range(1, len(structure_path.read_text(encoding="utf-8").splitlines()) + 1)),
+                                         "equivalent_to_review_input": True},
+                 "canonical_input": input_proof}
+        return proof
+    return {"schema": "atlas.product-reference-read-coverage.v1", "mode": "exact",
+            "review_input_digest": review_input_digest,
+            "material_manifest_digest": digest(manifest), "read_events_digest": digest(events),
+            "files": {name: {"sha256": manifest[name]["sha256"], "covered_lines": sorted(seen[name])}
+                      for name in sorted(required)}}
 
 
 def _call(call, stage, payload, prompt, source):
@@ -715,7 +970,8 @@ class OfficialCheckpointAdapter:
         if not events_path.is_file():
             raise ValueError(f"{stage} checkpoint lacks raw events.jsonl")
         events = [json.loads(line) for line in events_path.read_text(encoding="utf-8").splitlines() if line.strip()]
-        return {"result": result, "session_id": summary["session_id"], "read_events": events}
+        return {"result": result, "session_id": summary["session_id"], "read_events": events,
+                "checkpoint_dir": str(checkpoint_dir)}
 
 
 def _stage(directory, name, payload, prompt, source, call):
@@ -730,7 +986,9 @@ def _stage(directory, name, payload, prompt, source, call):
         result, receipt = _json(result_path), _json(receipt_path)
         if receipt.get("binding_digest") != digest(binding) or receipt.get("result_digest") != digest(result):
             raise ValueError(f"{name} durable checkpoint binding/result differs")
-        return {"result": result, "session_id": receipt["session_id"], "read_events": receipt.get("read_events", [])}
+        return {"result": result, "session_id": receipt["session_id"],
+                "read_events": receipt.get("read_events", []),
+                **({"checkpoint_dir": receipt["checkpoint_dir"]} if "checkpoint_dir" in receipt else {})}
     if (folder / "LAUNCH_INTENT.json").exists():
         raise ValueError(f"{name} has an uncertain prior invocation; refusing duplicate callback")
     _fixed(folder / "INPUT.json", payload)
@@ -742,10 +1000,14 @@ def _stage(directory, name, payload, prompt, source, call):
     _fixed(result_path, result)
     _fixed(receipt_path, {"binding_digest": digest(binding), "result_digest": digest(result),
                           "session_id": response["session_id"],
-                          "read_events": response.get("read_events", [])})
+                          "read_events": response.get("read_events", []),
+                          **({"checkpoint_dir": response["checkpoint_dir"]}
+                             if isinstance(response.get("checkpoint_dir"), str) else {})})
     # Downstream first-run behavior must match replay after canonical JSON load.
     return {"result": _json(result_path), "session_id": response["session_id"],
-            "read_events": response.get("read_events", [])}
+            "read_events": response.get("read_events", []),
+            **({"checkpoint_dir": response["checkpoint_dir"]}
+               if isinstance(response.get("checkpoint_dir"), str) else {})}
 
 
 def validate_review(value, expected_digest, author_session, review_session, observation_count):
@@ -793,6 +1055,10 @@ def _freeze(directory, inputs, snapshot, spec, reviewed, identity, provenance):
                       "sessions": provenance["sessions"], "prompts": provenance["prompts"],
                       "snapshot_digest": provenance["snapshot_digest"], "source_ids": inputs["trusted_source_ids"],
                       "read_view_manifest_digest": digest(_json(directory / "READ_VIEWS.json"))}
+    read_proof_path = directory / "READ_COVERAGE_PROOF.json"
+    read_proof = _json(read_proof_path) if read_proof_path.is_file() else None
+    if read_proof is not None and read_proof.get("mode") == "canonical_equivalent":
+        review_receipt["read_coverage_proof_sha256"] = digest(read_proof)
     if "revision_lineage" in provenance:
         review_receipt["revision_lineage"] = provenance["revision_lineage"]
     contents = {"reference.json": _canonical(spec) + "\n", **rendered,
@@ -803,6 +1069,8 @@ def _freeze(directory, inputs, snapshot, spec, reviewed, identity, provenance):
                    for sid, value in scope_slices.items()}}
     if "revision_record" in provenance:
         contents["revision.json"] = _canonical(provenance["revision_record"]) + "\n"
+    if read_proof is not None and read_proof.get("mode") == "canonical_equivalent":
+        contents["read-coverage-proof.json"] = _canonical(read_proof) + "\n"
     adaptation = directory / "RESEARCH_METADATA_ADAPTATION.json"
     if adaptation.is_file():
         contents["research-metadata-adaptation.json"] = adaptation.read_text(encoding="utf-8")
@@ -952,7 +1220,13 @@ def _generate(directory, inputs, snapshot, call, *, revision=None):
         raise ValueError("canonical independent-review payload changed during review")
     if review["session_id"] == authored["session_id"]:
         raise ValueError("author and reviewer must be distinct actual sessions")
-    _verify_read_events(review.get("read_events", []), directory, views)
+    official_checkpoint = review.get("checkpoint_dir") or (directory.parent / "official-checkpoints/review")
+    read_proof = _verify_read_events(
+        review.get("read_events", []), directory, views,
+        official_context={"checkpoint_dir": official_checkpoint, "review_request": review_request,
+                          "session_id": review["session_id"], "result": review["result"],
+                          "source": review_context})
+    _write_fixed(directory / "READ_COVERAGE_PROOF.json", _canonical(read_proof) + "\n")
     reviewed = validate_review(review["result"], review_identity, authored["session_id"], review["session_id"], len(observations))
     _fixed(directory / "REVIEW_RESULT.json", reviewed)
     if reviewed["verdict"] == "pass":

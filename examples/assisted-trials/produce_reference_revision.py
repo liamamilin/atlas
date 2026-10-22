@@ -138,9 +138,86 @@ def run(leaf, revision="r2"):
         return run_one(leaf, revision)
 
 
+def recover_read_proof(leaf, revision):
+    """Re-evaluate delivered reads and freeze/import without any model seam.
+
+    The original failure stays immutable. This is not a protocol retry or a
+    content revision: missing deliveries or changed inputs still block recovery.
+    """
+    if leaf not in LEAVES:
+        raise ValueError("only the two original samples are permitted")
+    with (DIRECTORY / ".runner.lock").open("a+") as lock:
+        fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        store, full = host()
+        state = full.status(PLAN_ID)
+        if state["status"] != "paused" or state["active_calls"]:
+            raise ValueError("full plan must remain paused and drained")
+        active_host = full.host_revision(PLAN_ID)
+        if not active_host or any(sha(ROOT / path) != expected
+                                  for path, expected in active_host["new_host_sha256"].items()):
+            raise ValueError("recovery source must match the formally activated CI-checked host")
+        folder = DIRECTORY / leaf / revision
+        request = read(folder / "REQUEST.json")
+        pilot = ReferencePilotService(store)
+        registered = pilot.get_revision(PILOT, leaf, revision)
+        if registered["request"] != request:
+            raise ValueError("recovery request differs from the registered revision")
+        original_outcome = folder / "OUTCOME.json"
+        outcome = read(original_outcome)
+        failure_sha = sha(original_outcome)
+        if (outcome.get("status") != "failed" or outcome.get("error_type") != "ValueError"
+                or not outcome.get("reason", "").startswith("review lacks actual completed full-content read coverage for ")):
+            raise ValueError("only a delivered review read-coverage failure can use zero-call recovery")
+        for stage in ("research", "author", "review"):
+            for name in ("BINDING.json", "DELIVERED.json", "RESULT.json"):
+                if not (folder / "generation" / stage / name).is_file():
+                    raise ValueError("recovery requires all three durable model deliveries")
+        if read(folder / "generation/review/RESULT.json").get("verdict") != "pass":
+            raise ValueError("read-proof recovery cannot turn a content rejection into a pass")
+        pilot_before = pilot.get(PILOT)
+        before = {"new_calls": state["new_calls"], "active_calls": state["active_calls"],
+                  "pilot_calls_digest": digest(pilot_before["calls"])}
+        original = read(PARENT / "REGISTER_REQUEST.json")
+        binding = next(x for x in original["leaves"] if x["leaf"] == leaf)
+        inputs_path, snapshot_path = ROOT / binding["input_path"], ROOT / binding["snapshot_path"]
+        if (sha(inputs_path) != binding["input_sha256"] or sha(snapshot_path) != binding["snapshot_sha256"]):
+            raise ValueError("original fixed input or snapshot changed")
+        parent_path = ROOT / request["parents"]["author"]["path"]
+
+        def forbid_model(*_args, **_kwargs):
+            raise RuntimeError("zero-call recovery cannot launch a model")
+
+        result = profile.revise(folder / "generation", read(inputs_path), read(snapshot_path),
+                                parent_path.parent.parent, parent_path,
+                                request["parents"]["author"]["sha256"], revision, forbid_model)
+        if result.get("status") != "static_review_passed" or not result.get("reference_zip"):
+            raise ValueError("recovery did not produce a fully reviewed frozen package")
+        after_state = full.status(PLAN_ID)
+        after = {"new_calls": after_state["new_calls"], "active_calls": after_state["active_calls"],
+                 "pilot_calls_digest": digest(pilot.get(PILOT)["calls"])}
+        if before != after or after_state["status"] != "paused" or sha(original_outcome) != failure_sha:
+            raise ValueError("recovery changed ledger, pause state or original failure")
+        from template_factory.reference_catalog import ReferenceCatalog
+        imported = ReferenceCatalog(store).import_reference({
+            "pilot_id": PILOT, "leaf": leaf, "revision_id": revision,
+            "generation_path": str((folder / "generation").relative_to(ROOT)),
+            "package_sha256": sha(Path(result["reference_zip"]))})
+        fixed_json(folder / "IMPORT_RECEIPT.json", imported)
+        recovery = {"schema": "atlas.reference-read-proof-recovery.v1", "leaf": leaf,
+                    "revision_id": revision, "status": result["status"],
+                    "original_failure": ref(original_outcome), "request_digest": digest(request),
+                    "host_revision_digest": digest(active_host), "model_calls_added": 0,
+                    "ledger_before": before, "ledger_after": after,
+                    "read_proof": ref(folder / "generation/READ_COVERAGE_PROOF.json"),
+                    "reference_zip": ref(Path(result["reference_zip"])), "catalog_id": imported["id"],
+                    "application_runtime_status": "not_run", "publication_status": "not_published"}
+        fixed_json(folder / "RECOVERY_OUTCOME.json", recovery)
+        return recovery
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("prepare", "run", "status"))
+    parser.add_argument("action", choices=("prepare", "run", "status", "recover-read-proof"))
     parser.add_argument("--leaf", choices=LEAVES)
     parser.add_argument("--revision", default="r2")
     parser.add_argument("--parent-revision")
@@ -153,6 +230,8 @@ def main():
         parser.error("--leaf is required")
     elif args.action == "prepare":
         result = prepare(args.leaf, args.revision, args.parent_revision, args.host_revision)
+    elif args.action == "recover-read-proof":
+        result = recover_read_proof(args.leaf, args.revision)
     else:
         result = run(args.leaf, args.revision)
     print(json.dumps(result, ensure_ascii=False, indent=2))
