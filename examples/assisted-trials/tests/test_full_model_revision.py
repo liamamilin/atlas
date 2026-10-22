@@ -195,6 +195,110 @@ class FullModelRevisionTests(unittest.TestCase):
         with self.assertRaisesRegex(FactoryError, "drain calls"):
             self.service.resume_round(req)
 
+    def test_source_outcomes_count_distinct_leaves_and_success_resets(self):
+        self.service.control(self.plan_id, "resume")
+        before = self.service.status(self.plan_id)["new_calls"]
+        first = self.service.record_source_outcome(self.plan_id, "leaf", "leaf-fail-1", "exhausted")
+        self.assertFalse(first["paused"])
+        same_leaf = self.service.record_source_outcome(self.plan_id, "leaf", "leaf-fail-2", "exhausted")
+        self.assertEqual(same_leaf["distinct_failures"], ["leaf"])
+        self.assertFalse(same_leaf["paused"])
+        self.service.record_source_outcome(self.plan_id, "leaf-two", "leaf-fail-3", "exhausted")
+        reset = self.service.record_source_outcome(self.plan_id, "leaf-three", "real-get-success", "success")
+        self.assertEqual(reset["distinct_failures"], [])
+        one = self.service.record_source_outcome(self.plan_id, "leaf", "leaf-fail-4", "exhausted")
+        two = self.service.record_source_outcome(self.plan_id, "leaf-two", "leaf-fail-5", "exhausted")
+        self.assertFalse(one["paused"])
+        self.assertFalse(two["paused"])
+        restarted = FullAuxiliaryService(self.store, campaign_id="test", clock=lambda: 1000)
+        three = restarted.record_source_outcome(self.plan_id, "leaf-three", "leaf-fail-6", "exhausted")
+        self.assertTrue(three["paused"])
+        self.assertEqual(three["distinct_failures"], ["leaf", "leaf-three", "leaf-two"])
+        self.assertEqual(restarted.status(self.plan_id)["reason"].split(":", 1)[0], "full_source_unavailable")
+        after = restarted.status(self.plan_id)["new_calls"]
+        self.assertEqual(after, before)
+        self.assertFalse(restarted.record_source_outcome(self.plan_id, "leaf", "after-pause-success", "success")["paused"])
+        self.assertEqual(restarted.status(self.plan_id)["status"], "paused")
+
+    def test_source_outcome_idempotency_payload_conflict_and_concurrent_writes(self):
+        self.service.control(self.plan_id, "resume")
+        barrier = threading.Barrier(2)
+
+        def record():
+            barrier.wait(timeout=5)
+            return self.service.record_source_outcome(self.plan_id, "leaf", "same-event", "exhausted", {"http": 503})
+
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results = [future.result(timeout=10) for future in [pool.submit(record), pool.submit(record)]]
+        self.assertEqual(results[0], results[1])
+        with self.store.connect() as con:
+            count = con.execute("SELECT COUNT(*) FROM auxiliary_full_event WHERE plan_id=? AND kind='source_health'", (self.plan_id,)).fetchone()[0]
+        self.assertEqual(count, 1)
+        with self.assertRaisesRegex(FactoryError, "event key reused"):
+            self.service.record_source_outcome(self.plan_id, "leaf", "same-event", "exhausted", {"http": 504})
+        with self.assertRaises(FactoryError):
+            self.service.record_source_outcome(self.plan_id, "outside", "bad-leaf", "exhausted")
+
+    def test_source_health_is_partitioned_by_allowed_host(self):
+        self.service.control(self.plan_id, "resume")
+        raw = "raw.githubusercontent.com"
+        api = "api.github.com"
+        first = self.service.record_source_outcome(
+            self.plan_id, "leaf", "raw-1", "exhausted", {"host": raw, "status": 503}
+        )
+        self.assertEqual(first["host"], raw)
+        self.service.record_source_outcome(
+            self.plan_id, "leaf-two", "api-ok", "success", {"host": api, "status": 200}
+        )
+        after_api_success = self.service.record_source_outcome(
+            self.plan_id, "leaf-two", "raw-2", "exhausted", {"host": raw, "status": 503}
+        )
+        self.assertEqual(after_api_success["distinct_failures"], ["leaf", "leaf-two"])
+        self.assertFalse(after_api_success["paused"])
+        reset = self.service.record_source_outcome(
+            self.plan_id, "leaf-three", "raw-ok", "success", {"host": raw, "status": 200}
+        )
+        self.assertEqual(reset["distinct_failures"], [])
+        self.assertEqual(reset["host"], raw)
+        self.service.record_source_outcome(
+            self.plan_id, "leaf-three", "raw-3", "exhausted", {"host": raw}
+        )
+        self.service.record_source_outcome(
+            self.plan_id, "leaf", "raw-4", "exhausted", {"host": raw}
+        )
+        threshold = self.service.record_source_outcome(
+            self.plan_id, "leaf-two", "raw-5", "exhausted", {"host": raw}
+        )
+        self.assertTrue(threshold["paused"])
+        with self.assertRaisesRegex(FactoryError, "unsupported source host"):
+            self.service.record_source_outcome(
+                self.plan_id, "leaf-four", "atlas-api", "exhausted", {"host": "atlas.internal"}
+            )
+
+    def test_three_distinct_exhaustions_pause_once_without_provider_or_budget_changes(self):
+        self.service.control(self.plan_id, "resume")
+        provider_before = self.service.schedule_provider_recovery(self.plan_id)
+        with self.store.connect() as con:
+            backoffs_before = con.execute("SELECT COUNT(*) FROM auxiliary_full_event WHERE plan_id=? AND kind='provider_backoff'", (self.plan_id,)).fetchone()[0]
+        budget_before = self.service.ledger.snapshot()["cli_sessions_used"]
+        barrier = threading.Barrier(3)
+
+        def fail(leaf):
+            barrier.wait(timeout=5)
+            return self.service.record_source_outcome(self.plan_id, leaf, "failure-" + leaf, "exhausted")
+
+        with ThreadPoolExecutor(max_workers=3) as pool:
+            results = [f.result(timeout=10) for f in [pool.submit(fail, leaf) for leaf in ("leaf", "leaf-two", "leaf-three")]]
+        paused_results = [x for x in results if x["paused"]]
+        self.assertEqual(len(paused_results), 1)
+        self.assertCountEqual(paused_results[0]["distinct_failures"], ["leaf", "leaf-two", "leaf-three"])
+        self.assertEqual(provider_before["number"], backoffs_before)
+        with self.store.connect() as con:
+            backoffs_after = con.execute("SELECT COUNT(*) FROM auxiliary_full_event WHERE plan_id=? AND kind='provider_backoff'", (self.plan_id,)).fetchone()[0]
+        self.assertEqual(backoffs_after, backoffs_before)
+        self.assertEqual(self.service.ledger.snapshot()["cli_sessions_used"], budget_before)
+        self.assertEqual(self.service.status(self.plan_id)["reason"].split(":", 1)[0], "full_source_unavailable")
+
     def test_append_only_switch_idempotency_and_preserves_plan_limits(self):
         self.pause()
         req = self.amendment()

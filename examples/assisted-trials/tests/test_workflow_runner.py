@@ -604,6 +604,179 @@ class WorkflowRunnerHostTests(unittest.TestCase):
         self.assertEqual(result["code"], "source_selection_invalid")
         self.assertEqual(self.service.status("host-fixture")["status"], "running")
 
+    def _install_real_pin_sources(self, actual_pin_sources, fetcher):
+        def pin(research, work, store, *, namespace, fetch):
+            return actual_pin_sources(research, work, store, namespace=namespace, fetch=fetch)
+        runner.pin_sources.side_effect = pin
+        return fetcher
+
+    def test_source_timeout_retries_are_durable_and_defer_leaf_without_model_recovery(self):
+        actual_pin_sources = runner.pin_sources
+        self._patches(
+            lambda *_args: self.fail("source failure must precede authoring"),
+            research_result={
+                "repository": "https://github.com/fixture/example",
+                "files": ["README.md", "LICENSE"], "rationale": "fixture",
+                "reuse_case_id": None, "delivery_profile": "web",
+                "scenario": {"name": "Fixture", "audience": "Fixture", "objective": "Complete",
+                             "workflow": ["Start"], "acceptance": ["Visible"]},
+            },
+        )
+        calls = []
+
+        def timeout_fetch(url, limit=2_000_000):
+            calls.append(url)
+            raise runner.FactoryError("network request failed", "source_download_failed", 502) from runner.urllib.error.URLError("timeout")
+
+        self._install_real_pin_sources(actual_pin_sources, timeout_fetch)
+        with patch.object(runner, "request_bytes", side_effect=timeout_fetch), patch.object(
+            runner, "_source_wait", side_effect=lambda _service, _seconds: None
+        ) as waits:
+            result = self.execute()
+        self.assertEqual(result["state"], "paused")
+        self.assertEqual(result["code"], "source_network_deferred")
+        status = self.service.status("host-fixture")
+        self.assertEqual(status["status"], "running")
+        self.assertEqual(status["items"][0]["failure_code"], "source_network_deferred")
+        self.assertTrue(status["items"][0]["first_pass_done"])
+        self.assertFalse(status["items"][0]["repair_pending"])
+        self.assertEqual(len(calls), 3)
+        self.assertEqual(waits.call_args_list[0].args[1], 2)
+        self.assertEqual(waits.call_args_list[1].args[1], 8)
+        self.assertEqual(status["new_calls"], 1)
+        journal = json.loads((self.work / "SOURCE_GET_JOURNAL.json").read_text())
+        self.assertIn("timeout", next(iter(journal["requests"].values()))["attempts"][-1]["cause"])
+
+        # A restarted attempt observes the durable three-attempt journal and cannot fetch again.
+        with patch.object(runner, "request_bytes", side_effect=AssertionError("retry budget reset")):
+            again = self.execute()
+        self.assertEqual(again["code"], "source_network_deferred")
+        self.assertEqual(len(calls), 3)
+
+    def test_temporary_source_failure_then_success_uses_injected_get_and_no_model_budget(self):
+        actual_pin_sources = runner.pin_sources
+        self._patches(
+            lambda *_args: self.fail("fixture stops after source pin"),
+            stage_error=lambda: runner.FactoryError("fixture stop", "auxiliary_content", 409),
+            research_result={
+                "repository": "https://github.com/fixture/example",
+                "files": ["README.md", "LICENSE"], "rationale": "fixture",
+                "reuse_case_id": None, "delivery_profile": "web",
+                "scenario": {"name": "Fixture", "audience": "Fixture", "objective": "Complete",
+                             "workflow": ["Start"], "acceptance": ["Visible"]},
+            },
+        )
+        commit = "a" * 40
+        content = {"README.md": b"fixed readme\n", "LICENSE": b"MIT license\n"}
+        counts = {}
+
+        def fetch(url, limit=2_000_000):
+            counts[url] = counts.get(url, 0) + 1
+            if url.endswith("/repos/fixture/example") and counts[url] == 1:
+                raise runner.FactoryError("temporary timeout", "source_download_failed", 502) from runner.urllib.error.URLError("timeout")
+            if url.endswith("/repos/fixture/example"):
+                return json.dumps({"license": {"spdx_id": "MIT"}, "id": 77}).encode()
+            if url.endswith("/commits/HEAD"):
+                return json.dumps({"sha": commit}).encode()
+            name = url.rsplit("/", 1)[-1]
+            return content[name]
+
+        self._install_real_pin_sources(actual_pin_sources, fetch)
+        with patch.object(runner, "request_bytes", side_effect=fetch), patch.object(
+            runner, "_source_wait", side_effect=lambda _service, _seconds: None
+        ):
+            result = self.execute()
+        self.assertEqual(result["state"], "needs_revision")
+        self.assertEqual(counts["https://api.github.com/repos/fixture/example"], 2)
+        self.assertEqual(counts["https://api.github.com/repos/fixture/example/commits/HEAD"], 1)
+        self.assertEqual(counts[f"https://raw.githubusercontent.com/fixture/example/{commit}/README.md"], 1)
+        self.assertEqual(counts[f"https://raw.githubusercontent.com/fixture/example/{commit}/LICENSE"], 1)
+        self.assertEqual(self.service.status("host-fixture")["new_calls"], 1)
+
+    def test_source_http_429_is_global_source_outage_not_model_provider_fault(self):
+        actual_pin_sources = runner.pin_sources
+        self._patches(lambda *_args: self.fail("rate limited source must stop before authoring"), research_result={
+            "repository": "https://github.com/fixture/example", "files": ["README.md", "LICENSE"],
+            "rationale": "fixture", "reuse_case_id": None, "delivery_profile": "web",
+            "scenario": {"name": "Fixture", "audience": "Fixture", "objective": "Complete",
+                         "workflow": ["Start"], "acceptance": ["Visible"]},
+        })
+
+        def fetch(url, limit=2_000_000):
+            raise runner.FactoryError("source request failed", "source_download_failed", 502) from runner.urllib.error.HTTPError(
+                url, 429, "rate limited", {"Retry-After": "120"}, None
+            )
+
+        self._install_real_pin_sources(actual_pin_sources, fetch)
+        with patch.object(runner, "request_bytes", side_effect=fetch):
+            result = self.execute()
+        self.assertEqual(result["state"], "paused")
+        self.assertEqual(result["code"], "full_source_unavailable")
+        self.assertTrue(self.service.status("host-fixture")["reason"].startswith("full_source_unavailable:"))
+        journal = json.loads((self.work / "SOURCE_GET_JOURNAL.json").read_text())
+        entry = next(iter(journal["requests"].values()))
+        self.assertGreaterEqual(entry["retry_after_until"] - runner.time.time(), 119)
+        self.assertLessEqual(entry["retry_after_until"] - runner.time.time(), 120)
+
+    def test_source_workers_keep_separate_journals_and_api_network_errors_are_not_model_faults(self):
+        worker_a = self.work
+        worker_b = self.root / "items" / self.leaf / "attempt-2"
+        worker_b.mkdir(parents=True)
+        endpoint = "https://api.github.com/repos/fixture/example"
+        def fetch(_url, _limit=2_000_000):
+            return b"{}"
+        with patch.object(runner, "PLAN_ID", "host-fixture"):
+            runner.durable_source_fetch(self.root, self.service, self.item, worker_a, fetch)(endpoint)
+            runner.durable_source_fetch(self.root, self.service, self.item, worker_b, fetch)(endpoint)
+        self.assertTrue((worker_a / "SOURCE_GET_JOURNAL.json").exists())
+        self.assertTrue((worker_b / "SOURCE_GET_JOURNAL.json").exists())
+        error = runner.urllib.error.URLError("fixture API timeout")
+        self.assertEqual(runner.leaf_failure_code(error, "existing_template"), "full_api_unavailable")
+        self.assertEqual(
+            runner.leaf_failure_code(runner.FactoryError("CLI provider unavailable", "full_provider_unavailable"), "blueprint-generate-aux"),
+            "full_provider_unavailable",
+        )
+
+    def test_network_success_record_survives_cache_write_crash_without_cache_health_event(self):
+        self.work.mkdir(parents=True, exist_ok=True)
+        endpoint = "https://api.github.com/repos/fixture/example"
+        original = self.service.record_source_outcome
+        raised = {"done": False}
+
+        def record_then_crash(*args, **kwargs):
+            result = original(*args, **kwargs)
+            if args[3] == "success" and not raised["done"]:
+                raised["done"] = True
+                raise RuntimeError("crash after durable health event")
+            return result
+
+        fetch_calls = []
+        def fetch(url, limit=2_000_000):
+            fetch_calls.append(url)
+            return b"metadata"
+
+        with patch.object(runner, "PLAN_ID", "host-fixture"), patch.object(
+            self.service, "record_source_outcome", side_effect=record_then_crash
+        ):
+            durable_fetch = runner.durable_source_fetch(
+                self.root, self.service, self.item, self.work, fetch
+            )
+            with self.assertRaisesRegex(RuntimeError, "crash after durable"):
+                durable_fetch(endpoint)
+            self.service.record_source_outcome = original
+            self.assertEqual(durable_fetch(endpoint), b"metadata")
+            self.assertEqual(durable_fetch(endpoint), b"metadata")
+        self.assertEqual(len(fetch_calls), 2)
+        with self.store.connect() as con:
+            events = con.execute(
+                "SELECT body FROM auxiliary_full_event WHERE plan_id=? AND kind='source_health' ORDER BY id",
+                ("host-fixture",),
+            ).fetchall()
+        self.assertEqual(len(events), 2)
+        first_key = json.loads(events[0][0])["request"]["event_key"]
+        second_key = json.loads(events[1][0])["request"]["event_key"]
+        self.assertNotEqual(first_key, second_key)
+
     def test_known_item_download_failure_is_isolated(self):
         def produce_stub(*_args):
             write_json(self.work / "IMPORT_RECEIPT.json", {

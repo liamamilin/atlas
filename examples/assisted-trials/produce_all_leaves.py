@@ -1,9 +1,13 @@
 """Durable, single-coordinator full-leaf auxiliary production. No application runs."""
 
 import argparse
+import base64
 import concurrent.futures
 import fcntl
 import hashlib
+import http.client
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 import io
 import json
 import os
@@ -11,12 +15,14 @@ import plistlib
 from pathlib import Path
 import shutil
 import signal
+import socket
 import sqlite3
 import subprocess
 import threading
 import time
 import urllib.request
 import urllib.error
+from urllib.parse import urlsplit
 import zipfile
 
 from produce_batch import ROOT, produce
@@ -54,6 +60,8 @@ GLOBAL_CODES = {
     "full_plan_paused",
     "full_uncertain",
     "full_provider_unavailable",
+    "full_source_unavailable",
+    "full_api_unavailable",
     "workflow_integrity",
     "workflow_host_error",
 }
@@ -68,6 +76,7 @@ LOCAL_CODES = {
     "auxiliary_content",
     "source_unavailable",
     "source_selection_invalid",
+    "source_network_deferred",
     "leaf_delivery_error",
     *TECH_CODES,
     "budget_retry_limit",
@@ -88,8 +97,8 @@ def leaf_failure_code(error, stage):
         return code
     if code in LOCAL_CODES:
         return code
-    if isinstance(error, urllib.error.HTTPError) and error.code in {403, 429, 500, 502, 503, 504}:
-        code = "full_provider_unavailable"
+    if isinstance(error, urllib.error.HTTPError) and error.code in {403, 408, 429, 500, 502, 503, 504}:
+        code = "full_api_unavailable"
     elif (
         isinstance(error, FactoryError)
         and code == "source_download_failed"
@@ -102,7 +111,7 @@ def leaf_failure_code(error, stage):
         and code == "source_download_failed"
         and isinstance(error.__cause__, urllib.error.URLError)
     ):
-        code = "full_provider_unavailable"
+        code = "full_source_unavailable"
     elif stage == "source_pin" and isinstance(error, urllib.error.HTTPError) and error.code in {404, 410}:
         code = "source_unavailable"
     elif (
@@ -116,7 +125,7 @@ def leaf_failure_code(error, stage):
     ):
         code = "leaf_delivery_error"
     elif isinstance(error, urllib.error.URLError):
-        code = "full_provider_unavailable"
+        code = "full_api_unavailable"
     return code if code in GLOBAL_CODES or code in LOCAL_CODES else "workflow_host_error"
 
 
@@ -155,11 +164,193 @@ def validate_research_source_selection(research):
         raise FactoryError(str(error), "source_selection_invalid", 409) from error
 
 
+def _source_now(service):
+    clock = getattr(service, "clock", None)
+    return float(clock()) if callable(clock) else time.time()
+
+
+def _source_pause_check(service):
+    state = service.status(PLAN_ID)
+    if state.get("status") not in {"running", "registered"}:
+        raise FactoryError("full plan paused during source retry wait", "full_plan_paused", 409)
+    deadline = state.get("deadline")
+    if deadline is not None and _source_now(service) >= deadline:
+        raise FactoryError("full plan deadline exhausted during source retry wait", "budget_deadline", 409)
+
+
+def _source_wait(service, seconds):
+    until = time.monotonic() + max(0.0, seconds)
+    while True:
+        _source_pause_check(service)
+        remaining = until - time.monotonic()
+        if remaining <= 0:
+            return
+        time.sleep(min(1.0, remaining))
+
+
+def durable_source_fetch(root, service, item, work, fetch=None):
+    """Bound and persist public GitHub GET attempts independently of model calls."""
+    get = fetch or request_bytes
+    journal_path = work / "SOURCE_GET_JOURNAL.json"
+    leaf = item["leaf"]
+
+    def read_journal():
+        if not journal_path.exists():
+            return {"schema": "atlas.full-source-get-journal.v1", "requests": {}}
+        saved = load(journal_path)
+        if saved.get("schema") != "atlas.full-source-get-journal.v1" or not isinstance(saved.get("requests"), dict):
+            raise FactoryError("source GET journal is malformed", "workflow_integrity", 409)
+        return saved
+
+    def write_journal(value):
+        atomic_json(journal_path, value)
+
+    def request(url, limit=2_000_000):
+        # Only the fixed public GitHub endpoints selected by this pipeline are journaled.
+        try:
+            parsed_url = urlsplit(url)
+            port = parsed_url.port
+        except ValueError as error:
+            raise FactoryError("invalid public source URL", "source_selection_invalid", 409) from error
+        host = parsed_url.hostname
+        if (parsed_url.scheme != "https" or parsed_url.query or parsed_url.fragment
+                or parsed_url.username or parsed_url.password or port is not None
+                or host not in {"api.github.com", "raw.githubusercontent.com"}
+                or any(ord(char) > 127 or char.isspace() for char in url)):
+            raise FactoryError("source GET URL is outside public GitHub", "source_selection_invalid", 409)
+        if url.startswith("https://api.github.com/repos/"):
+            api_path = url.removeprefix("https://api.github.com/repos/").split("/")
+            if len(api_path) not in {2, 4} or (len(api_path) == 4 and api_path[2:] != ["commits", "HEAD"]):
+                raise FactoryError("invalid public GitHub metadata URL", "source_selection_invalid", 409)
+            canonical_github_repo("https://github.com/" + "/".join(api_path[:2]))
+        elif url.startswith("https://raw.githubusercontent.com/"):
+            tail = url.removeprefix("https://raw.githubusercontent.com/")
+            parts = tail.split("/")
+            if (len(parts) < 4 or len(parts[2]) != 40
+                    or any(ch not in "0123456789abcdef" for ch in parts[2])):
+                raise FactoryError("invalid fixed source GET URL", "source_selection_invalid", 409)
+            canonical_github_repo("https://github.com/" + "/".join(parts[:2]))
+            try:
+                safe_file("/".join(parts[3:]))
+            except ValueError as error:
+                raise FactoryError("invalid fixed source file path", "source_selection_invalid", 409) from error
+        else:
+            raise FactoryError("source GET URL is outside public GitHub", "source_selection_invalid", 409)
+        key = hashlib.sha256(json.dumps({"url": url, "limit": limit}, sort_keys=True).encode()).hexdigest()
+        work_scope = hashlib.sha256(str(work.relative_to(root)).encode()).hexdigest()
+        event_base = "source-get:" + leaf + ":" + work_scope + ":" + key
+        journal = read_journal()
+        entry = journal["requests"].setdefault(key, {"url": url, "limit": limit, "attempts": []})
+        if entry.get("url") != url or entry.get("limit") != limit:
+            raise FactoryError("source GET journal binding changed", "workflow_integrity", 409)
+        success = entry.get("success")
+        if success:
+            try:
+                body = base64.b64decode(success["body_b64"], validate=True)
+            except (KeyError, ValueError) as error:
+                raise FactoryError("source GET cache is malformed", "workflow_integrity", 409) from error
+            if hashlib.sha256(body).hexdigest() != success.get("sha256"):
+                raise FactoryError("source GET cache digest changed", "workflow_integrity", 409)
+            return body
+        retry_until = entry.get("retry_after_until")
+        if retry_until and time.time() < retry_until:
+            raise FactoryError("public source Retry-After is still active", "full_source_unavailable", 503)
+        if entry["attempts"]:
+            next_at = entry["attempts"][-1].get("next_attempt_at")
+            if next_at is not None and _source_now(service) < next_at:
+                _source_wait(service, next_at - _source_now(service))
+
+        while len(entry["attempts"]) < 3:
+            _source_pause_check(service)
+            number = len(entry["attempts"]) + 1
+            attempt = {"number": number, "started_at": _source_now(service), "outcome": "started"}
+            entry["attempts"].append(attempt)
+            write_journal(journal)
+            try:
+                body = get(url, limit)
+            except Exception as error:
+                cause = error.__cause__ or error
+                status = cause.code if isinstance(cause, urllib.error.HTTPError) else None
+                retry_after = None
+                if isinstance(cause, urllib.error.HTTPError):
+                    raw_retry = cause.headers.get("Retry-After") if cause.headers else None
+                    if raw_retry:
+                        try:
+                            retry_after = max(0.0, float(raw_retry))
+                        except ValueError:
+                            try:
+                                retry_time = parsedate_to_datetime(raw_retry)
+                                if retry_time.tzinfo is None:
+                                    retry_time = retry_time.replace(tzinfo=timezone.utc)
+                                retry_after = max(0.0, (retry_time - datetime.now(timezone.utc)).total_seconds())
+                            except (TypeError, ValueError, OverflowError):
+                                retry_after = None
+                attempt.update({
+                    "finished_at": _source_now(service), "outcome": "failed",
+                    "exception_type": type(error).__name__,
+                    "cause_type": type(cause).__name__, "cause": str(cause)[:2000],
+                    "http_status": status,
+                    "retry_after_seconds": retry_after, "error": str(error),
+                })
+                write_journal(journal)
+                if status in {403, 429}:
+                    if retry_after is not None:
+                        entry["retry_after_until"] = time.time() + retry_after
+                        attempt["retry_after_until"] = entry["retry_after_until"]
+                        write_journal(journal)
+                    raise FactoryError("public source access limited or denied", "full_source_unavailable", 503) from error
+                if status in {404, 410}:
+                    raise FactoryError("selected public source file was not found", "source_unavailable", 404) from error
+                if isinstance(cause, http.client.InvalidURL):
+                    raise FactoryError("selected public source URL is invalid", "source_selection_invalid", 409) from error
+                transient = status == 408 or (status is not None and 500 <= status <= 599)
+                if status is None:
+                    transient = isinstance(
+                        cause,
+                        (urllib.error.URLError, TimeoutError, socket.timeout, ConnectionError),
+                    )
+                if transient:
+                    if number < 3:
+                        attempt["next_attempt_at"] = _source_now(service) + (2 if number == 1 else 8)
+                        write_journal(journal)
+                        _source_wait(service, 2 if number == 1 else 8)
+                        continue
+                    service.record_source_outcome(
+                        PLAN_ID, leaf, event_base + ":exhausted", "exhausted",
+                        {"host": host, "url_sha256": key, "attempts": len(entry["attempts"]),
+                         "last_exception": type(cause).__name__, "http_status": status},
+                    )
+                    raise FactoryError("source network retries exhausted; defer this leaf", "source_network_deferred", 503) from error
+                if status is not None and 400 <= status <= 499:
+                    raise FactoryError("selected public source request was rejected", "source_selection_invalid", status) from error
+                if isinstance(error, FactoryError) and error.code == "source_download_failed" and cause is error:
+                    raise FactoryError("public source redirect or download rejected", "source_selection_invalid", 409) from error
+                raise
+            body_sha = hashlib.sha256(body).hexdigest()
+            service.record_source_outcome(
+                PLAN_ID, leaf, event_base + ":attempt:" + str(number) + ":success:" + body_sha, "success",
+                {"host": host, "url_sha256": key, "body_sha256": body_sha},
+            )
+            entry["success"] = {"sha256": body_sha, "body_b64": base64.b64encode(body).decode("ascii")}
+            attempt.update({"finished_at": _source_now(service), "outcome": "success", "body_sha256": body_sha})
+            write_journal(journal)
+            return body
+        service.record_source_outcome(
+            PLAN_ID, leaf, event_base + ":exhausted", "exhausted",
+            {"host": host, "url_sha256": key, "attempts": len(entry["attempts"]),
+             "last_exception": entry["attempts"][-1].get("cause_type"),
+             "http_status": entry["attempts"][-1].get("http_status")},
+        )
+        raise FactoryError("source network retries exhausted; defer this leaf", "source_network_deferred", 503)
+
+    return request
+
+
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def materialize_case_snapshot(snapshot, folder, store, *, namespace):
+def materialize_case_snapshot(snapshot, folder, store, *, namespace, fetch=None):
     """Recreate bytes for a canonical CaseLibrary pin without resolving HEAD.
 
     CaseLibrary snapshots intentionally contain provenance and hashes, not a
@@ -233,7 +424,7 @@ def materialize_case_snapshot(snapshot, folder, store, *, namespace):
                     409,
                 )
             continue
-        data = request_bytes(
+        data = (fetch or request_bytes)(
             f"https://raw.githubusercontent.com/{repo}/{commit}/{name}", 180_000
         )
         data.decode("utf-8")
@@ -1598,6 +1789,7 @@ def execute_leaf(root, service, item, api, repair=False):
             step = "case_research"
             wf.begin(PLAN_ID, item["leaf"], work.name, step, digest(research))
             stage = "source_pin"
+            source_fetch = durable_source_fetch(root, service, item, work)
             if not (work / "source-snapshot.json").exists():
                 reuse_case_id = research.get("reuse_case_id")
                 reused = None
@@ -1635,7 +1827,9 @@ def execute_leaf(root, service, item, api, repair=False):
                             409,
                         )
                 if reused and snap:
-                    materialize_case_snapshot(snap, work, service.store, namespace=PLAN_ID)
+                    materialize_case_snapshot(
+                        snap, work, service.store, namespace=PLAN_ID, fetch=source_fetch
+                    )
                     fixed_json(
                         work / "RESEARCH_REUSE.json",
                         {
@@ -1646,7 +1840,9 @@ def execute_leaf(root, service, item, api, repair=False):
                     )
                 else:
                     try:
-                        pin_sources(research, work, service.store, namespace=PLAN_ID)
+                        pin_sources(
+                            research, work, service.store, namespace=PLAN_ID, fetch=source_fetch
+                        )
                     except FactoryError as error:
                         if str(error) == "source response exceeds download limit":
                             raise FactoryError(str(error), "source_selection_invalid", 409) from error
@@ -2046,7 +2242,10 @@ def execute_leaf(root, service, item, api, repair=False):
                 return {"leaf": item["leaf"], "state": "paused", "code": code}
             content = code == "auxiliary_content"
             reserve_deferred = code == "budget_first_pass_reserve"
-            if reserve_deferred:
+            source_deferred = code == "source_network_deferred"
+            if source_deferred:
+                state = "paused"
+            elif reserve_deferred:
                 state = "needs_revision" if repair else "paused"
             elif content:
                 state = "needs_revision"
@@ -2065,6 +2264,8 @@ def execute_leaf(root, service, item, api, repair=False):
                     **(
                         {"deferred_reason": "preserve pending first-pass allowance"}
                         if reserve_deferred
+                        else {"deferred_reason": str(error)}
+                        if source_deferred
                         else {}
                     ),
                     "workdir": str(work.relative_to(ROOT)),
@@ -2125,7 +2326,7 @@ def write_round_report(root, state):
         "items": [
             {key: item.get(key) for key in (
                 "leaf", "state", "current_attempt", "failure_stage", "failure_code",
-                "error", "workdir", "artifact_id", "case_id", "case_revision", "repair_pending",
+                "error", "deferred_reason", "workdir", "artifact_id", "case_id", "case_revision", "repair_pending",
             )}
             for item in state["items"]
         ],
@@ -2263,20 +2464,29 @@ def run(root, api, selected_leaves=None):
                 )
                 state = progress(root, service)
             if not selected_leaves and state["status"] == "running" and not any(
-                x["state"] in {"pending", "running", "paused"}
+                x["state"] in {"pending", "running"}
+                or (x["state"] == "paused" and not x.get("first_pass_done"))
                 or x.get("repair_pending")
                 for x in state["items"]
             ):
-                service.control(
-                    PLAN_ID,
-                    "complete",
-                    "completed_with_failures"
-                    if any(
-                        x["state"] not in {"ready_not_run", "reused"}
-                        for x in state["items"]
+                deferred = [x for x in state["items"] if x.get("failure_code") == "source_network_deferred"]
+                if deferred:
+                    service.control(
+                        PLAN_ID,
+                        "pause",
+                        "source_network_deferred: " + str(len(deferred)) + " leaf source downloads exhausted",
                     )
-                    else "all covered",
-                )
+                else:
+                    service.control(
+                        PLAN_ID,
+                        "complete",
+                        "completed_with_failures"
+                        if any(
+                            x["state"] not in {"ready_not_run", "reused"}
+                            for x in state["items"]
+                        )
+                        else "all covered",
+                    )
         except BaseException as error:
             service.pause_if_running(
                 PLAN_ID,

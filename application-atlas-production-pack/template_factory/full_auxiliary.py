@@ -697,6 +697,89 @@ class FullAuxiliaryService:
             )
             return True
 
+    def record_source_outcome(self, plan_id, leaf, event_key, outcome, detail=None):
+        """Persist real source-network outcomes and pause after three distinct leaf failures.
+
+        Callers must report ``success`` only after a real network GET succeeds and
+        ``exhausted`` only after that leaf's bounded HTTP retry policy is spent.
+        """
+        if (not isinstance(leaf, str) or not leaf or not isinstance(event_key, str)
+            or not event_key.strip() or not isinstance(outcome, str)
+            or outcome not in {"success", "exhausted"}):
+            raise FactoryError("invalid source outcome", "full_plan_binding", 409)
+        if detail is None:
+            detail = {}
+        if not isinstance(detail, dict):
+            raise FactoryError("source outcome detail must be an object", "full_plan_binding", 409)
+        host = detail.get("host", "public-source")
+        if host not in {"public-source", "api.github.com", "raw.githubusercontent.com"}:
+            raise FactoryError("unsupported source host", "full_plan_binding", 409)
+        payload = {"plan_id": plan_id, "leaf": leaf, "event_key": event_key,
+                   "outcome": outcome, "host": host, "detail": detail}
+        payload_digest = digest(payload)
+        with self.store.connect(True) as con:
+            plan = con.execute(
+                "SELECT * FROM auxiliary_full_plan WHERE id=? AND campaign_id=?",
+                (plan_id, self.campaign_id),
+            ).fetchone()
+            if not plan:
+                raise FactoryError("unknown full plan", "not_found", 404)
+            member = con.execute(
+                "SELECT 1 FROM auxiliary_full_leaf WHERE plan_id=? AND slug=?",
+                (plan_id, leaf),
+            ).fetchone()
+            if not member:
+                raise FactoryError("leaf outside frozen scope", "full_plan_binding", 409)
+            events = con.execute(
+                "SELECT body FROM auxiliary_full_event WHERE plan_id=? AND kind='source_health' ORDER BY id",
+                (plan_id,),
+            ).fetchall()
+            failures = set()
+            for event in events:
+                saved = json.loads(event[0])
+                prior = saved.get("request", {})
+                prior_digest = saved.get("request_digest")
+                if digest(prior) != prior_digest:
+                    raise FactoryError("source outcome record changed", "full_plan_integrity", 409)
+                if prior.get("outcome") not in {"success", "exhausted"}:
+                    raise FactoryError("source outcome record has invalid outcome", "full_plan_integrity", 409)
+                if prior.get("event_key") == event_key:
+                    if prior_digest != payload_digest:
+                        raise FactoryError("source event key reused with different payload", "full_plan_binding", 409)
+                    return saved["result"]
+                if prior.get("host", "public-source") == host:
+                    if prior.get("outcome") == "success":
+                        failures.clear()
+                    elif prior.get("outcome") == "exhausted":
+                        failures.add(prior["leaf"])
+                else:
+                    continue
+            if outcome == "success":
+                failures.clear()
+            else:
+                failures.add(leaf)
+            distinct = sorted(failures)
+            should_pause = len(distinct) >= 3 and plan["status"] in {"running", "registered"}
+            result = {"plan_id": plan_id, "event_key": event_key, "outcome": outcome, "host": host,
+                      "paused": bool(should_pause), "distinct_failures": distinct,
+                      "threshold": 3}
+            con.execute(
+                "INSERT INTO auxiliary_full_event(plan_id,slug,kind,body,created) VALUES(?,?,'source_health',?,?)",
+                (plan_id, leaf, json.dumps({"request": payload, "request_digest": payload_digest,
+                                            "result": result}), self.clock()),
+            )
+            if should_pause:
+                reason = "full_source_unavailable: three distinct leaves exhausted source retries"
+                con.execute(
+                    "UPDATE auxiliary_full_plan SET status='paused',reason=? WHERE id=? AND campaign_id=? AND status IN ('running','registered')",
+                    (reason, plan_id, self.campaign_id),
+                )
+                con.execute(
+                    "INSERT INTO auxiliary_full_event(plan_id,kind,body,created) VALUES(?,'control',?,?)",
+                    (plan_id, json.dumps({"action": "pause", "reason": reason}), self.clock()),
+                )
+            return result
+
     def selected_leaves(self, plan_id):
         with self.store.connect() as con:
             row = con.execute(

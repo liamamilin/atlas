@@ -128,8 +128,9 @@ def checkpoint(directory, payload, prompt, cli, budget, source=None, leaf=None, 
     return result
 
 
-def pin_sources(proposal, folder, store, *, namespace=None):
+def pin_sources(proposal, folder, store, *, namespace=None, fetch=None):
     """Resolve once before download; never let the model assign commit/digests."""
+    get = fetch or request_bytes
     repository = proposal["repository"]
     repo = github_repo(repository)
     paths = [safe_file(p) for p in proposal["files"]]
@@ -141,11 +142,11 @@ def pin_sources(proposal, folder, store, *, namespace=None):
         if pin["repository"] != repository or pin["paths"] != paths:
             raise ValueError("source selection changed")
     else:
-        metadata = json.loads(request_bytes("https://api.github.com/repos/" + repo))
+        metadata = json.loads(get("https://api.github.com/repos/" + repo))
         spdx = (metadata.get("license") or {}).get("spdx_id")
         if not spdx or spdx in {"NOASSERTION", "NONE"}:
             raise ValueError("source license unclear; stop before generation")
-        commit = resolve_commit(repository)
+        commit = resolve_commit(repository, fetch=get)
         pin = {"repository": repository, "commit_sha": commit, "paths": paths,
                "license_spdx": spdx, "repository_id": metadata["id"],
                "collected_at": datetime.now(timezone.utc).isoformat()}
@@ -158,7 +159,7 @@ def pin_sources(proposal, folder, store, *, namespace=None):
     for name in paths:
         target = local / name
         if not target.exists():
-            data = request_bytes(f"https://raw.githubusercontent.com/{repo}/{pin['commit_sha']}/{name}", 180_000)
+            data = get(f"https://raw.githubusercontent.com/{repo}/{pin['commit_sha']}/{name}", 180_000)
             data.decode("utf-8")
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(data)
