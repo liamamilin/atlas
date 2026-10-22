@@ -8,7 +8,8 @@ import sys
 import tempfile
 import threading
 import unittest
-from unittest.mock import patch
+from types import SimpleNamespace
+from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import full_leaf_profiles as profiles
@@ -321,6 +322,52 @@ class FullLeafTests(unittest.TestCase):
         with patch.object(runner, "request_bytes", return_value=b"changed\n"):
             with self.assertRaisesRegex(ValueError, "digest"):
                 runner.materialize_case_snapshot(canonical, missing_folder, self.store, namespace="p")
+
+    def test_canonical_case_snapshot_materializes_through_alias_to_external_root(self):
+        external = self.root / "external-sources"
+        external.mkdir()
+        (self.store.root / "sources").symlink_to(external, target_is_directory=True)
+        data = b"fixed through storage alias\n"
+        canonical = {
+            "repository": "https://github.com/example/reference", "commit_sha": "e" * 40,
+            "files": {"README.md": hashlib.sha256(data).hexdigest()},
+            "license_files": ["README.md"], "license": {"spdx_id": "MIT"},
+        }
+        folder = self.root / "items/leaf-0/attempt-1"
+        folder.mkdir(parents=True)
+        result = runner.materialize_case_snapshot(
+            canonical, folder, self.store, namespace="p", fetch=lambda *_args: data
+        )
+        physical = external / "p/leaf-0/attempt-1/README.md"
+        self.assertEqual(physical.read_bytes(), data)
+        self.assertEqual(result["local_root"], str((self.store.root / "sources/p/leaf-0/attempt-1").absolute()))
+
+    def test_verify_plan_fails_before_calls_when_source_storage_alias_is_broken(self):
+        plan = self.root / "plan"
+        plan.mkdir()
+        scope = {"profile": profiles.VERSION, "prompt_digest": profiles.PROMPT_DIGEST,
+                 "host_source_sha256": {}}
+        scope_path = plan / "FROZEN_SCOPE.json"
+        scope_path.write_text(json.dumps(scope))
+        auth_path = plan / "authorization.txt"
+        auth_path.write_text("fixed auth")
+        request = {
+            "scope": {"path": "FROZEN_SCOPE.json", "sha256": runner.sha(scope_path)},
+            "authorization": {"path": "authorization.txt", "sha256": runner.sha(auth_path)},
+        }
+        (plan / "AUTHORIZATION_REQUEST.json").write_text(json.dumps(request))
+        (self.store.root / "sources").symlink_to(self.root / "missing-source-target", target_is_directory=True)
+        pause_if_running = Mock(return_value=True)
+        fake_service = SimpleNamespace(store=self.store, host_revision=lambda _plan: None,
+                                       pause_if_running=pause_if_running)
+        with patch.object(runner, "ROOT", plan), patch.object(runner, "host", return_value=(None, fake_service)):
+            with self.assertRaises(FactoryError) as caught:
+                runner.verify_plan(plan)
+        self.assertEqual(caught.exception.code, "source_storage_unavailable")
+        pause_if_running.assert_called_once_with(
+            "p", "source_storage_unavailable: source storage alias is unavailable"
+        )
+        self.assertTrue((self.store.root / "sources").is_symlink())
 
     def test_canonical_case_snapshot_refuses_mismatched_cached_bytes(self):
         canonical = {

@@ -43,7 +43,7 @@ def _safe_relative(value):
     return path
 
 
-def _validate_snapshot(raw):
+def _validate_snapshot(raw, store_root):
     if not isinstance(raw, dict):
         raise FactoryError("source snapshot must be an object")
     repository = _required(raw.get("repository"), "repository", 1000)
@@ -71,14 +71,48 @@ def _validate_snapshot(raw):
     root_raw = raw.get("local_root")
     if not isinstance(root_raw, str) or not root_raw:
         raise FactoryError("source snapshot requires a host local_root for validation")
-    root = Path(root_raw)
-    if not root.is_dir() or root.is_symlink():
+    root_candidate = Path(root_raw)
+    if not root_candidate.is_dir() or root_candidate.is_symlink():
         raise FactoryError("snapshot root must be an existing non-symlink directory")
-    root = root.resolve(strict=True)
+    root = root_candidate.resolve(strict=True)
+    store_root = Path(store_root).resolve(strict=True)
+    root_lexical = root_candidate.absolute()
+    if ".." in root_lexical.parts:
+        raise FactoryError("snapshot root must be inside the factory store root")
     try:
-        root.relative_to(Path(raw.get("_store_root", root_raw)).resolve(strict=True))
-    except (OSError, ValueError) as exc:
-        raise FactoryError("snapshot root must be inside the factory store root") from exc
+        root.relative_to(store_root)
+        lexical_relative = root_lexical.relative_to(store_root)
+        inside_store = True
+    except ValueError:
+        inside_store = False
+    if inside_store:
+        current = store_root
+        for part in lexical_relative.parts:
+            current = current / part
+            if current.is_symlink():
+                raise FactoryError("snapshot root path contains a symlink")
+    else:
+        # The only permitted external root is a child of the host-owned
+        # store.root/sources symlink. This keeps historical local_root bytes
+        # valid after the source cache is moved without allowing arbitrary
+        # host paths or alternate symlink routes.
+        alias = store_root / "sources"
+        if not alias.is_symlink():
+            raise FactoryError("snapshot root must be inside the factory store root")
+        try:
+            alias_target = alias.resolve(strict=True)
+            alias_relative = root_lexical.relative_to(alias)
+            resolved_relative = root.relative_to(alias_target)
+        except (OSError, ValueError) as exc:
+            raise FactoryError("snapshot root must be inside the factory store root") from exc
+        if (not alias_target.is_dir() or not alias_relative.parts or ".." in alias_relative.parts
+            or not resolved_relative.parts):
+            raise FactoryError("snapshot root must be a child of the sources alias")
+        current = alias
+        for part in alias_relative.parts:
+            current = current / part
+            if current.is_symlink():
+                raise FactoryError("snapshot root path contains a symlink")
     normalized_files = {}
     for name, expected in files.items():
         relative = _safe_relative(name)
@@ -221,7 +255,7 @@ class CaseLibrary:
                 raise FactoryError("at least one fixed source snapshot is required")
             if any(not isinstance(item, dict) for item in raw_snapshots):
                 raise FactoryError("each source snapshot must be an object")
-            snapshots = [_validate_snapshot({**item, "_store_root": str(self.store.root)}) for item in raw_snapshots]
+            snapshots = [_validate_snapshot(item, self.store.root) for item in raw_snapshots]
             requested_app = payload.get("app_id")
             if requested_app:
                 app_row = con.execute("SELECT app_id FROM case_app WHERE app_id=? OR legacy_slug=?", (requested_app, requested_app)).fetchone()

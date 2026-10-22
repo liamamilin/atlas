@@ -5,12 +5,15 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from produce_with_opencode import (CHECKS, MODEL, checkpoint, fixed_json, safe_file,
                                   readable_candidate, validate_generation, validate_review, validate_read_coverage,
                                   verify_production, snapshot_audit)
 from produce_batch import authored_definition
+from template_factory.store import FactoryError, digest
+from produce_with_opencode import pin_sources
 
 
 class FakeCLI:
@@ -109,6 +112,108 @@ class ProducerTests(unittest.TestCase):
         for name in ("../outside", "/absolute", "a/../b", "a//b", "a\\b", ""):
             with self.assertRaises(ValueError):
                 safe_file(name)
+
+    def test_pin_sources_preserves_existing_snapshot_bytes_through_storage_alias_without_fetch(self):
+        import hashlib
+        store_root = self.root / "state"
+        store_root.mkdir()
+        external = self.root / "external-sources"
+        external.mkdir()
+        alias = store_root / "sources"
+        alias.symlink_to(external, target_is_directory=True)
+        folder = self.root / "items/leaf-0/attempt-1"
+        folder.mkdir(parents=True)
+        local = external / "p/leaf-0/attempt-1"
+        local.mkdir(parents=True)
+        for name, content in {"README.md": b"readme\n", "LICENSE": b"MIT\n"}.items():
+            (local / name).write_bytes(content)
+        proposal = {"repository": "https://github.com/example/repo", "files": ["README.md", "LICENSE"]}
+        pin = {"repository": proposal["repository"], "paths": proposal["files"],
+               "commit_sha": "a" * 40, "license_spdx": "MIT", "repository_id": 7,
+               "collected_at": "2026-10-21T00:00:00+00:00"}
+        fixed_json(folder / "SOURCE_PIN.json", pin)
+        files = {name: hashlib.sha256((local / name).read_bytes()).hexdigest()
+                 for name in proposal["files"]}
+        snapshot = {
+            "repository": proposal["repository"], "commit_sha": "a" * 40,
+            "local_root": str(alias / "p/leaf-0/attempt-1"),
+            "strategy_version": "full-leaf-selected-v2-" + digest(proposal["files"])[:16],
+            "collected_at": pin["collected_at"], "files": files,
+            "license_files": ["LICENSE"],
+            "license": {"status": "located", "spdx_id": "MIT",
+                        "notice_hashes": {"LICENSE": files["LICENSE"]}},
+            "license_uncertainties": ["Design reference only; no source code copied; file-level exceptions not exhaustively audited."],
+            "excluded_paths": ["Unselected files; upstream not installed or run"],
+        }
+        fixed_json(folder / "source-snapshot.json", snapshot)
+        original_snapshot = (folder / "source-snapshot.json").read_bytes()
+        result = pin_sources(
+            proposal, folder, SimpleNamespace(root=store_root), namespace="p",
+            fetch=lambda *_args: self.fail("an existing snapshot must not fetch"),
+        )
+        self.assertEqual(result, snapshot)
+        self.assertEqual((folder / "source-snapshot.json").read_bytes(), original_snapshot)
+
+    def test_pin_sources_rejects_tampered_existing_snapshot_metadata_and_path(self):
+        import hashlib
+        mutations = (
+            ("license", lambda value: value["license"].update(spdx_id="Apache-2.0")),
+            ("strategy_version", lambda value: value.update(strategy_version="changed")),
+            ("collected_at", lambda value: value.update(collected_at="changed")),
+            ("license_files", lambda value: value.update(license_files=[])),
+            ("notice_hashes", lambda value: value["license"]["notice_hashes"].update(LICENSE="0" * 64)),
+            ("local_root", lambda value: value.update(local_root="/missing/fixed-source")),
+        )
+        for label, mutate in mutations:
+            with self.subTest(field=label), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp)
+                state, external = root / "state", root / "external"
+                state.mkdir()
+                external.mkdir()
+                (state / "sources").symlink_to(external, target_is_directory=True)
+                folder = root / "items/leaf-0/attempt-1"
+                folder.mkdir(parents=True)
+                local = external / "p/leaf-0/attempt-1"
+                local.mkdir(parents=True)
+                (local / "README.md").write_bytes(b"readme\n")
+                (local / "LICENSE").write_bytes(b"MIT\n")
+                proposal = {"repository": "https://github.com/example/repo", "files": ["README.md", "LICENSE"]}
+                pin = {"repository": proposal["repository"], "paths": proposal["files"],
+                       "commit_sha": "a" * 40, "license_spdx": "MIT", "repository_id": 7,
+                       "collected_at": "2026-10-21T00:00:00+00:00"}
+                fixed_json(folder / "SOURCE_PIN.json", pin)
+                files = {name: hashlib.sha256((local / name).read_bytes()).hexdigest()
+                         for name in proposal["files"]}
+                snapshot = {
+                    "repository": proposal["repository"], "commit_sha": pin["commit_sha"],
+                    "strategy_version": "full-leaf-selected-v2-" + digest(proposal["files"])[:16],
+                    "collected_at": pin["collected_at"], "local_root": str(state / "sources/p/leaf-0/attempt-1"),
+                    "files": files, "license_files": ["LICENSE"],
+                    "license": {"status": "located", "spdx_id": "MIT", "notice_hashes": {"LICENSE": files["LICENSE"]}},
+                    "license_uncertainties": ["Design reference only; no source code copied; file-level exceptions not exhaustively audited."],
+                    "excluded_paths": ["Unselected files; upstream not installed or run"],
+                }
+                mutate(snapshot)
+                fixed_json(folder / "source-snapshot.json", snapshot)
+                with self.assertRaises(FactoryError) as caught:
+                    pin_sources(proposal, folder, SimpleNamespace(root=state), namespace="p",
+                                fetch=lambda *_args: self.fail("snapshot validation must not fetch"))
+                self.assertEqual(caught.exception.code, "workflow_integrity")
+
+    def test_pin_sources_refuses_broken_storage_alias_without_local_fallback(self):
+        store_root = self.root / "state"
+        store_root.mkdir()
+        (store_root / "sources").symlink_to(self.root / "missing-external", target_is_directory=True)
+        folder = self.root / "items/leaf-0/attempt-1"
+        folder.mkdir(parents=True)
+        with self.assertRaises(FactoryError) as caught:
+            pin_sources(
+                {"repository": "https://github.com/example/repo", "files": ["README.md", "LICENSE"]},
+                folder, SimpleNamespace(root=store_root), namespace="p",
+                fetch=lambda *_args: self.fail("broken storage must stop before network"),
+            )
+        self.assertEqual(caught.exception.code, "source_storage_unavailable")
+        self.assertTrue((store_root / "sources").is_symlink())
 
     def test_failed_latest_review_cannot_be_bypassed_by_the_legacy_batch_entry(self):
         fixed_json(self.root / "SUPPLEMENTAL_FAILURE.json", {"status": "needs_changes"})

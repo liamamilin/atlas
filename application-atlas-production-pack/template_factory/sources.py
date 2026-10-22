@@ -15,6 +15,35 @@ from .artifacts import IGNORED, MAX_FILES, MAX_TOTAL, relative
 from .store import FactoryError
 
 
+def source_storage_root(store_root):
+    """Return the stable logical ``sources`` entry after validating any alias.
+
+    A linked entry is deliberately returned by its original path so snapshots
+    continue to record the same local_root string after storage is moved. Its
+    target must already exist; a broken link must never fall back to a local
+    directory with the same name.
+    """
+    entry = Path(store_root) / "sources"
+    if entry.is_symlink():
+        try:
+            target = entry.resolve(strict=True)
+        except OSError as error:
+            raise FactoryError(
+                "source storage alias is unavailable", "source_storage_unavailable", 503
+            ) from error
+        if not target.is_dir():
+            raise FactoryError(
+                "source storage alias target is not a directory",
+                "source_storage_unavailable",
+                503,
+            )
+    elif entry.exists() and not entry.is_dir():
+        raise FactoryError(
+            "source storage entry is not a directory", "source_storage_unavailable", 503
+        )
+    return entry
+
+
 class FixedRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         raise FactoryError("unexpected source redirect", "source_download_failed", 502)

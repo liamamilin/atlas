@@ -43,7 +43,7 @@ from template_factory.store import FactoryStore, FactoryError, digest
 from template_factory.full_auxiliary import FullAuxiliaryService, MODEL
 from template_factory.auxiliary_workflow import WorkflowService, STEPS
 from template_factory.cases import CaseLibrary
-from template_factory.sources import github_repo, request_bytes
+from template_factory.sources import github_repo, request_bytes, source_storage_root
 from atlas_runtime import atomic_json
 import full_leaf_profiles as profiles
 
@@ -63,6 +63,7 @@ GLOBAL_CODES = {
     "full_source_unavailable",
     "full_api_unavailable",
     "workflow_integrity",
+    "source_storage_unavailable",
     "workflow_host_error",
 }
 TECH_CODES = {
@@ -388,10 +389,10 @@ def materialize_case_snapshot(snapshot, folder, store, *, namespace, fetch=None)
             "workflow_integrity",
             409,
         ) from error
-    source_root = Path(store.root) / "sources" / namespace
-    local = source_root / folder.parent.name / folder.name
-    local.mkdir(parents=True, exist_ok=True)
-    local = local.resolve(strict=True)
+    source_root = source_storage_root(store.root) / safe_file(namespace)
+    local_entry = source_root / folder.parent.name / folder.name
+    local_entry.mkdir(parents=True, exist_ok=True)
+    local = local_entry.resolve(strict=True)
     for name, expected in files.items():
         relative = Path(name)
         if (not name or relative.is_absolute() or "\\" in name
@@ -446,7 +447,7 @@ def materialize_case_snapshot(snapshot, folder, store, *, namespace, fetch=None)
         for key, value in snapshot.items()
         if key not in {"snapshot_id", "file_manifest_digest", "local_root", "_validated_root"}
     }
-    result["local_root"] = str(local.resolve())
+    result["local_root"] = str(local_entry.absolute())
     pin = {
         "repository": repository,
         "commit_sha": commit,
@@ -562,6 +563,14 @@ def verify_plan(root):
         )
     expected_hosts = scope.get("host_source_sha256", {})
     _, service = host()
+    try:
+        source_storage_root(service.store.root)
+    except FactoryError as error:
+        if error.code == "source_storage_unavailable":
+            service.pause_if_running(
+                PLAN_ID, "source_storage_unavailable: " + str(error)
+            )
+        raise
     revision = service.host_revision(PLAN_ID)
     if revision:
         if revision["scope_sha256"] != request["scope"]["sha256"]:

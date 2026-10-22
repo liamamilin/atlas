@@ -20,8 +20,8 @@ import textwrap
 from produce_batch import ROOT, produce, save, request
 from template_factory.budget import BudgetLedger
 from template_factory.cli import CLI
-from template_factory.sources import github_repo, request_bytes, resolve_commit
-from template_factory.store import FactoryStore, digest
+from template_factory.sources import github_repo, request_bytes, resolve_commit, source_storage_root
+from template_factory.store import FactoryStore, FactoryError, digest
 from atlas_runtime import atomic_json
 
 MODEL = "opencode-go/deepseek-v4.1-flash"
@@ -136,11 +136,22 @@ def pin_sources(proposal, folder, store, *, namespace=None, fetch=None):
     paths = [safe_file(p) for p in proposal["files"]]
     if not 2 <= len(paths) <= 8 or len(paths) != len(set(paths)):
         raise ValueError("select 2–8 distinct small source files")
+    source_root = source_storage_root(store.root)
+    if namespace:
+        source_root = source_root / safe_file(namespace)
+    local = source_root / folder.parent.name / folder.name
     pin_path = folder / "SOURCE_PIN.json"
+    snapshot_path = folder / "source-snapshot.json"
+    if snapshot_path.exists() and not pin_path.exists():
+        raise FactoryError("fixed source snapshot has no matching source pin", "workflow_integrity", 409)
     if pin_path.exists():
         pin = json.loads(pin_path.read_text())
-        if pin["repository"] != repository or pin["paths"] != paths:
-            raise ValueError("source selection changed")
+        if (pin.get("repository") != repository or pin.get("paths") != paths
+                or not isinstance(pin.get("commit_sha"), str)
+                or not isinstance(pin.get("license_spdx"), str)
+                or not isinstance(pin.get("repository_id"), int)
+                or not isinstance(pin.get("collected_at"), str)):
+            raise FactoryError("fixed source pin binding or metadata changed", "workflow_integrity", 409)
     else:
         metadata = json.loads(get("https://api.github.com/repos/" + repo))
         spdx = (metadata.get("license") or {}).get("spdx_id")
@@ -151,11 +162,40 @@ def pin_sources(proposal, folder, store, *, namespace=None, fetch=None):
                "license_spdx": spdx, "repository_id": metadata["id"],
                "collected_at": datetime.now(timezone.utc).isoformat()}
         fixed_json(pin_path, pin)
-    source_root = store.root / "sources"
-    if namespace:
-        source_root = source_root / safe_file(namespace)
-    local = source_root / folder.parent.name / folder.name
     local.mkdir(parents=True, exist_ok=True)
+    if snapshot_path.exists():
+        snapshot_bytes = snapshot_path.read_bytes()
+        snapshot = json.loads(snapshot_bytes)
+        local_real = local.resolve(strict=True)
+        try:
+            saved_local = Path(snapshot["local_root"]).resolve(strict=True)
+        except (KeyError, OSError, RuntimeError, TypeError) as error:
+            raise FactoryError("fixed source snapshot path is unavailable", "workflow_integrity", 409) from error
+        files = manifest_files(local_real)
+        if set(files) != set(paths):
+            raise FactoryError("fixed source snapshot inventory changed", "workflow_integrity", 409)
+        licenses = [p for p in paths if Path(p).name.lower().startswith(("license", "copying", "notice"))]
+        if not licenses:
+            raise FactoryError("fixed source snapshot has no license selection", "workflow_integrity", 409)
+        expected_snapshot = {
+            "repository": repository,
+            "commit_sha": pin["commit_sha"],
+            "strategy_version": ("full-leaf-selected-v2-" + digest(paths)[:16] if namespace else "go-auxiliary-selected-files-v1"),
+            "collected_at": pin["collected_at"],
+            "local_root": snapshot.get("local_root"),
+            "files": files,
+            "license_files": licenses,
+            "license": {
+                "status": "located",
+                "spdx_id": pin["license_spdx"],
+                "notice_hashes": {p: files[p] for p in licenses},
+            },
+            "license_uncertainties": ["Design reference only; no source code copied; file-level exceptions not exhaustively audited."],
+            "excluded_paths": ["Unselected files; upstream not installed or run"],
+        }
+        if saved_local != local_real or snapshot != expected_snapshot:
+            raise FactoryError("fixed source snapshot bytes changed", "workflow_integrity", 409)
+        return snapshot
     for name in paths:
         target = local / name
         if not target.exists():
@@ -171,7 +211,7 @@ def pin_sources(proposal, folder, store, *, namespace=None, fetch=None):
         raise ValueError("license text must be among pinned files")
     snapshot = {"repository": repository, "commit_sha": pin["commit_sha"],
                 "strategy_version": ("full-leaf-selected-v2-" + digest(paths)[:16] if namespace else "go-auxiliary-selected-files-v1"), "collected_at": pin["collected_at"],
-                "local_root": str(local.resolve()), "files": files, "license_files": licenses,
+                "local_root": str(local.absolute()), "files": files, "license_files": licenses,
                 "license": {"status": "located", "spdx_id": pin["license_spdx"],
                             "notice_hashes": {p: files[p] for p in licenses}},
                 "license_uncertainties": ["Design reference only; no source code copied; file-level exceptions not exhaustively audited."],

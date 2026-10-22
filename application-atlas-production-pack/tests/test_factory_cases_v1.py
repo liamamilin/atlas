@@ -63,6 +63,18 @@ class CaseLibraryV1Tests(unittest.TestCase):
             "license": {"spdx_id_supplement": "MIT", "supplement_source": "current GitHub metadata", "supplement_collected_at": "2026-10-19T10:00:00Z", "notice_hashes": {"LICENSE": files["LICENSE"]}},
         }
 
+    def _move_snapshot_to_sources_alias(self, payload):
+        snapshot = payload["source_snapshots"][0]
+        original = Path(snapshot["local_root"])
+        target = self.root / "external-source-cache"
+        target.mkdir(parents=True, exist_ok=True)
+        moved = target / original.name
+        shutil.move(str(original), str(moved))
+        alias = self.store.root / "sources"
+        alias.symlink_to(target, target_is_directory=True)
+        snapshot["local_root"] = str(alias / moved.name)
+        return snapshot, alias, target, moved
+
     def _payload(self, *, case_id="case:demo", scenario=None, snapshot=None, evidence_id="ev-main"):
         snapshot = snapshot or self._snapshot()
         scenario = scenario or self.scenario_a["id"]
@@ -208,6 +220,61 @@ class CaseLibraryV1Tests(unittest.TestCase):
         runtime["observations"] = [{"evidence_id": "ev-runtime", "kind": "runtime_verification", "statement": "The case passed.", "verification_run_id": "fake-run", "assertion_id": "assertion-1"}]
         with self.assertRaisesRegex(FactoryError, "persisted run"):
             self.library.commit_research(runtime, "fake-runtime")
+
+    def test_source_snapshot_accepts_host_owned_external_sources_alias(self):
+        payload = self._payload()
+        snapshot, alias, target, moved = self._move_snapshot_to_sources_alias(payload)
+        payload["research"]["input_digest"] = "external-alias"
+        case = self.library.commit_research(payload, "external-source-alias")["case"]
+        self.assertEqual(Path(snapshot["local_root"]), alias / moved.name)
+        self.assertTrue((target / moved.name / "src/main.py").is_file())
+        self.assertEqual(case["source_snapshots"][0]["files"]["src/main.py"], snapshot["files"]["src/main.py"])
+
+    def test_source_snapshot_rejects_other_external_roots_and_store_root_injection(self):
+        payload = self._payload()
+        snapshot = payload["source_snapshots"][0]
+        original = Path(snapshot["local_root"])
+        rogue = self.root / "rogue-cache" / "repo"
+        rogue.parent.mkdir()
+        shutil.move(str(original), str(rogue))
+        approved = self.root / "approved-cache"
+        approved.mkdir()
+        (self.store.root / "sources").symlink_to(approved, target_is_directory=True)
+        snapshot["local_root"] = str(rogue)
+        snapshot["_store_root"] = str(rogue)
+        with self.assertRaisesRegex(FactoryError, "inside the factory store root"):
+            self.library.commit_research(payload, "other-external-root")
+
+    def test_source_snapshot_alias_rejects_snapshot_and_file_symlinks(self):
+        payload = self._payload()
+        snapshot, alias, _, moved = self._move_snapshot_to_sources_alias(payload)
+        alias_link = alias / "repo-link"
+        alias_link.symlink_to(moved, target_is_directory=True)
+        snapshot["local_root"] = str(alias_link)
+        with self.assertRaisesRegex(FactoryError, "non-symlink directory"):
+            self.library.commit_research(payload, "aliased-snapshot-leaf")
+
+        snapshot["local_root"] = str(alias / moved.name)
+        target = moved / "src/main.py"
+        content = target.read_text(encoding="utf-8")
+        target.unlink()
+        external_file = self.root / "external-main.py"
+        external_file.write_text(content, encoding="utf-8")
+        target.symlink_to(external_file)
+        with self.assertRaisesRegex(FactoryError, "source path contains a symlink"):
+            self.library.commit_research(payload, "aliased-file-symlink")
+
+    def test_source_snapshot_missing_or_broken_sources_alias_does_not_fallback(self):
+        for case_id, broken in (("missing-sources-alias", False), ("broken-sources-alias", True)):
+            with self.subTest(case_id=case_id):
+                payload = self._payload(case_id="case:" + case_id,
+                                        snapshot=self._snapshot(commit=("c" if broken else "d") * 40))
+                _, alias, target, _ = self._move_snapshot_to_sources_alias(payload)
+                alias.unlink()
+                if broken:
+                    alias.symlink_to(target / "missing", target_is_directory=True)
+                with self.assertRaisesRegex(FactoryError, "existing non-symlink directory"):
+                    self.library.commit_research(payload, case_id)
 
     def test_scenario_revision_and_source_location_are_host_validated(self):
         unknown_scenario = self._payload(scenario="unknown-scenario")
