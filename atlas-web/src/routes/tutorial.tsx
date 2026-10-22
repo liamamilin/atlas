@@ -52,6 +52,19 @@ export function Tutorial() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
       <h1 className="font-serif text-3xl font-medium">{t("tutorial", lang)}</h1>
+      <section aria-labelledby="template-start" className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-card">
+        <p className="text-xs font-medium text-primary">{lang === "zh" ? "使用现有模板" : "Use an existing template"}</p>
+        <h2 id="template-start" className="mt-2 font-serif text-2xl font-medium">{lang === "zh" ? "从场景到开发包" : "From a scenario to a development package"}</h2>
+        <ol className="mt-4 list-decimal space-y-3 pl-5 text-sm leading-6 text-muted">
+          <li>{lang === "zh" ? "在「浏览类型」打开对应叶子，查看具体场景与辅助模板；也可直接在「模板制品」中查找。" : "Open a leaf in Browse types to find its scenarios and assisted templates, or search Artifacts directly."}</li>
+          <li>{lang === "zh" ? "阅读适用用户、核心能力和限制，回查固定案例。静态审阅通过与应用运行验证是两种状态；已有运行证据也不表示示例服务此刻在线。" : "Read the audience, capabilities and limits, and inspect pinned cases. Static review and application runtime verification are separate; recorded evidence does not mean an example service is currently online."}</li>
+          <li>{lang === "zh" ? "下载标准开发包，将详情页的「Codex 开始说明」与开发包一起交给新开发上下文。从 HANDOFF 开始阅读，按当前阶段实现与自检。" : "Download the standard development package and give it, together with the template's Codex start instructions, to a fresh development context. Start with HANDOFF, then implement and verify the current phase."}</li>
+        </ol>
+        <div className="mt-5 flex flex-wrap gap-4 text-sm">
+          <Link to="/factory?view=artifacts" className="inline-flex items-center gap-1 font-medium text-primary hover:underline">{lang === "zh" ? "查找辅助模板" : "Find assisted templates"}<ArrowRight className="size-4" /></Link>
+          <Link to="/browse" className="inline-flex items-center gap-1 text-primary hover:underline">{lang === "zh" ? "从叶子类型开始" : "Start from a type"}<ArrowRight className="size-4" /></Link>
+        </div>
+      </section>
       <section className="mt-6 rounded-2xl bg-primary/[0.06] p-6 ring-1 ring-primary/15">
         <p className="text-xs font-medium tracking-wide text-primary">{lang === "zh" ? "第一次使用" : "First run"}</p>
         <h2 className="mt-2 font-serif text-2xl font-medium">{lang === "zh" ? "用一条完整路径理解 Atlas" : "Understand Atlas through one complete path"}</h2>

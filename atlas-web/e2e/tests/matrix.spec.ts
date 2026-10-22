@@ -42,6 +42,8 @@ function routesForProject(projectId: string) {
     "/projects",
     `/projects/${projectId}`,
     "/tutorial",
+    "/ask",
+    "/settings",
   ];
 }
 

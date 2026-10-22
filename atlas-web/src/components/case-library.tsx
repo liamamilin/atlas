@@ -19,11 +19,15 @@ function asList<T>(value: unknown): T[] {
 export function CaseLibrary() {
   const { lang } = useLang();
   const zh = lang === "zh";
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
+  const requestedApp = params.get("app_id") || "";
+  const requestedCase = params.get("case_id")
+    ? `${params.get("case_id")}:r${params.get("case_revision") || 1}`
+    : "";
   const [apps, setApps] = useState<V1Application[]>([]);
   const [cases, setCases] = useState<V1Case[]>([]);
-  const [selectedApp, setSelectedApp] = useState(params.get("app_id")||"");
-  const [selectedKey, setSelectedKey] = useState(params.get("case_id")?`${params.get("case_id")}:r${params.get("case_revision")||1}`:"");
+  const selectedApp = requestedApp || apps[0]?.app_id || "";
+  const selectedKey = requestedCase || (cases[0] ? `${cases[0].case_id}:r${cases[0].revision}` : "");
   const [detail, setDetail] = useState<V1Case | null>(null);
   const [appsLoading, setAppsLoading] = useState(true);
   const [casesLoading, setCasesLoading] = useState(false);
@@ -36,8 +40,8 @@ export function CaseLibrary() {
     try {
       const value = await factoryV1Request<unknown>("applications", undefined, signal);
       const list = asList<V1Application>(value);
+      if (signal?.aborted) return;
       setApps(list);
-      setSelectedApp(current => current || list[0]?.app_id || "");
       setError("");
     } catch (cause) {
       if (!signal?.aborted) setError(String(cause));
@@ -56,12 +60,11 @@ export function CaseLibrary() {
     if (!selectedApp) { setCases([]); setDetail(null); return; }
     const controller = new AbortController();
     setCasesLoading(true);
+    setCases([]);
     factoryV1Request<unknown>(`cases?app_id=${encodeURIComponent(selectedApp)}`, undefined, controller.signal)
       .then(value => {
-        const list = asList<V1Case>(value);
-        setCases(list);
-        setSelectedKey(current => list.some(item => `${item.case_id}:r${item.revision}` === current)
-          ? current : list[0] ? `${list[0].case_id}:r${list[0].revision}` : "");
+        if (controller.signal.aborted) return;
+        setCases(asList<V1Case>(value));
       })
       .catch(cause => { if (!controller.signal.aborted) setError(String(cause)); })
       .finally(() => { if (!controller.signal.aborted) setCasesLoading(false); });
@@ -73,7 +76,7 @@ export function CaseLibrary() {
     const controller = new AbortController();
     setDetail(null);
     factoryV1Request<V1Case>(`cases/${encodeURIComponent(selected.case_id)}/revisions/${selected.revision}`, undefined, controller.signal)
-      .then(setDetail).catch(cause => { if (!controller.signal.aborted) setError(String(cause)); });
+      .then(value => { if (!controller.signal.aborted) setDetail(value); }).catch(cause => { if (!controller.signal.aborted) setError(String(cause)); });
     return () => controller.abort();
   }, [selected?.case_id, selected?.revision]);
 
@@ -100,11 +103,11 @@ export function CaseLibrary() {
     {error ? <p role="status" className="mt-4 flex items-start gap-2 rounded-lg bg-warn/10 p-3 text-xs text-warn"><AlertCircle className="mt-0.5 size-4 shrink-0"/>{zh ? "动态案例库加载失败；旧应用目录仍可用。" : "The dynamic case library could not load; the legacy catalog remains available."} <span className="break-all">{error}</span></p> : null}
     {appsLoading ? <Loading/> : !apps.length ? <EmptyState className="mt-5" title={zh ? "还没有已保存的应用实证" : "No saved application evidence yet"}>{zh ? "通过模板工厂研究并提交固定源码版本后，记录会出现在这里。" : "Applications appear here after fixed-source research is committed through the template factory."}</EmptyState> : <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(14rem,0.75fr)_minmax(0,1.5fr)]">
       <div className="min-w-0">
-        <label className="block text-sm">{zh ? "应用" : "Application"}<select aria-label={zh ? "共享案例应用" : "Shared case application"} className="mt-1.5 w-full rounded-md border border-border bg-bg-elevated px-3 py-2 text-sm" value={selectedApp} onChange={event => { setSelectedApp(event.target.value); setSelectedKey(""); }}>
+        <label className="block text-sm">{zh ? "应用" : "Application"}<select aria-label={zh ? "共享案例应用" : "Shared case application"} className="mt-1.5 w-full rounded-md border border-border bg-bg-elevated px-3 py-2 text-sm" value={selectedApp} onChange={event => { const next = new URLSearchParams(params); next.set("app_id", event.target.value); next.delete("case_id"); next.delete("case_revision"); setParams(next); }}>
           {apps.map(app => <option key={app.app_id} value={app.app_id}>{appName(app)} · {app.catalog_status || app.status || (zh ? "已收录" : "Catalogued")}</option>)}
         </select></label>
         <div className="mt-3 space-y-2">
-          {casesLoading ? <Loading/> : cases.map(item => <button key={`${item.case_id}:r${item.revision}`} type="button" onClick={() => setSelectedKey(`${item.case_id}:r${item.revision}`)} aria-pressed={selectedKey === `${item.case_id}:r${item.revision}`} className={`w-full rounded-lg border p-3 text-left ${selectedKey === `${item.case_id}:r${item.revision}` ? "border-primary bg-primary/5" : "border-border hover:bg-bg-elevated"}`}>
+          {casesLoading ? <Loading/> : cases.map(item => <button key={`${item.case_id}:r${item.revision}`} type="button" onClick={() => { const next = new URLSearchParams(params); next.set("app_id", selectedApp); next.set("case_id", item.case_id); next.set("case_revision", String(item.revision)); setParams(next); }} aria-pressed={selectedKey === `${item.case_id}:r${item.revision}`} className={`w-full rounded-lg border p-3 text-left ${selectedKey === `${item.case_id}:r${item.revision}` ? "border-primary bg-primary/5" : "border-border hover:bg-bg-elevated"}`}>
             <span className="block break-all text-sm font-medium">{item.case_id} · r{item.revision}</span>
             <span className="mt-1 block line-clamp-2 text-xs text-muted">{item.research?.summary || (zh ? "研究摘要未知" : "Research summary unknown")}</span>
             <span className="mt-2 block text-[11px] text-subtle">{zh ? "证据摘要" : "Evidence digest"}: <code>{item.evidence_digest?.slice(0, 12) || displayUnknown(null, zh)}</code></span>

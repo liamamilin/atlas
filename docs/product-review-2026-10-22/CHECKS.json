@@ -1,0 +1,71 @@
+{
+  "baseline_sha": "115d42cff486063f7ddd949ba4baa4b70f75a58e",
+  "scope": "baseline HEAD plus this task only; concurrent discovery/navigation work excluded",
+  "checks": [
+    {
+      "name": "backend unittest",
+      "log": "BACKEND_REGRESSION.log",
+      "total": 809,
+      "passed": 801,
+      "skipped": 8,
+      "failed": 0,
+      "log_sha256": "52f9fb17d4d849167e77e2692115debb38d41cf8d748a26c25f374f23361c4c1"
+    },
+    {
+      "name": "TypeScript",
+      "log": "TYPECHECK_ISOLATED.log",
+      "passed": true,
+      "log_sha256": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+    },
+    {
+      "name": "unit",
+      "log": "UNIT_ISOLATED.log",
+      "passed": 9,
+      "failed": 0,
+      "log_sha256": "73de699042e6e7f3ca703b000fce9b0a0cbe957b8229fde8f56a71be43b17aed"
+    },
+    {
+      "name": "production build",
+      "log": "BUILD_ISOLATED.log",
+      "passed": true,
+      "log_sha256": "1a56422a72190a6389090fa9b351f65fc1d5c9c4b4c6e3d63984b0891b412356"
+    },
+    {
+      "name": "generated data",
+      "log": "DATA_CHECK.log",
+      "passed": true,
+      "leaves": 1805,
+      "sections": 270,
+      "apps": 33,
+      "log_sha256": "22094869da48cb7d339d98117b76165cc372f560687f5145f94403c08f67b300"
+    },
+    {
+      "name": "core Playwright",
+      "log": "E2E_CORE_STABLE_SNAPSHOT.log",
+      "passed": 22,
+      "failed": 0,
+      "log_sha256": "c5e8e08f613d905ffdb2ef7cfc482f15319bb45bb6b961cd26a44266ba0d8e1b"
+    },
+    {
+      "name": "factory Playwright",
+      "log": "E2E_FACTORY_STABLE_SNAPSHOT.log",
+      "passed": 43,
+      "failed": 0,
+      "log_sha256": "48cdfb8d56989250c9e28bb1944e2b8e4f5eadcc15b4354517bffdde670297fe"
+    }
+  ],
+  "product_source_sha256": {
+    "atlas-web/src/routes/ask.tsx": "3b7db427cfb03744f3e1c865308609119a6aafceb336632133a29739d1fc75a6",
+    "atlas-web/src/routes/factory.tsx": "66e9324f914d05cadf9f9916af29418e4235ba10a8d60db2af67a1cb9e1821b5",
+    "atlas-web/src/routes/settings.tsx": "b962b74ad0a58b70cfe4d0d703d42963bcb3bd71cd38dae6b113c3e48964236f",
+    "atlas-web/src/routes/tutorial.tsx": "9229f9014c321b13e71d782f07d0ed4af06957058f5774d1e036db314982011c",
+    "atlas-web/src/components/case-library.tsx": "48148207f98a3a26a0d669a70fb30a33bdc766dbcccfb68758981f149ddb549a",
+    "atlas-web/e2e/tests/matrix.spec.ts": "b3f51d7f0597d7ce197efa12a5d1d3b8101182f0cb285757bb20ecc262acb558",
+    "atlas-web/e2e/tests/product-polish-ask.spec.ts": "85f9aee4abe7bd854d1c810eaeaf15cc5eb13c4395776fb36b0ddfab162053f3",
+    "atlas-web/e2e/tests/product-polish-settings.spec.ts": "e46b008bc998808fa05af10ed29a06d86113066f3703c5c4d304c3f0f5b31575",
+    "atlas-web/e2e/factory-tests/product-polish-factory.spec.ts": "b5ff0acacb022af32dc89f2943f04638c44996de03116fb6f4fbccbcaec267e5"
+  },
+  "model_calls_added": 0,
+  "applications_run_added": 0,
+  "concurrent_work_included": false
+}

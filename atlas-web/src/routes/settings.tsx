@@ -265,6 +265,7 @@ export function Settings() {
             </select>
           </label>
           <ModelPicker
+            key={defaultDraft.provider}
             lang={lang}
             providerId={defaultDraft.provider}
             value={defaultDraft.model}
@@ -362,7 +363,7 @@ export function Settings() {
             {unconsumedPresets.map(([id, preset]) => (
               <button
                 key={id} type="button" onClick={() => startPreset(id)}
-                className="flex items-center justify-between gap-3 rounded-lg bg-surface px-4 py-3 text-left text-sm shadow-card transition-shadow hover:shadow-card-hover"
+                className="flex min-w-0 items-center justify-between gap-3 rounded-lg bg-surface px-4 py-3 text-left text-sm shadow-card transition-shadow hover:shadow-card-hover"
               >
                 <span className="min-w-0">
                   <span className="block truncate font-medium">{preset.name}</span>
@@ -439,6 +440,7 @@ function ModelPicker({
   const zh = lang === "zh";
   const [listed, setListed] = useState<string[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [listError, setListError] = useState("");
   const item = providers.find((p) => p.id === providerId);
   const options = listed ?? item?.models ?? [];
 
@@ -451,28 +453,30 @@ function ModelPicker({
     );
   }
   return (
-    <label className="block text-sm">
+    <div className="block text-sm">
       <span className="flex items-center justify-between gap-2 text-muted">
-        <span>{zh ? "默认模型" : "Default model"}</span>
+        <label htmlFor={`default-model-${providerId}`}>{zh ? "默认模型" : "Default model"}</label>
         <button type="button" className="text-[11px] text-primary hover:underline"
           disabled={loading}
           onClick={() => {
             setLoading(true);
+            setListError("");
             listProviderModels(providerId)
               .then((r) => setListed(r.models))
-              .catch(() => setListed([]))
+              .catch((cause) => setListError(actionError(cause, lang)))
               .finally(() => setLoading(false));
           }}>
           {loading ? (zh ? "读取中…" : "Loading…") : (zh ? "查看全部模型" : "Load all models")}
         </button>
       </span>
-      <input className={inputClass} list={`models-${providerId}`} value={value}
+      <input id={`default-model-${providerId}`} className={inputClass} list={`models-${providerId}`} value={value}
         placeholder={zh ? "输入或选择一个模型" : "Type or pick a model"}
         onChange={(e) => onChange(e.target.value)} />
       <datalist id={`models-${providerId}`}>
         {options.map((m) => <option key={m} value={m} />)}
       </datalist>
-    </label>
+      {listError ? <p role="alert" className="mt-2 text-xs text-danger">{listError}</p> : null}
+    </div>
   );
 }
 

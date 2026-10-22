@@ -1,0 +1,182 @@
+
+> test:e2e
+> playwright test
+
+[WebServer] (node:67684) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 22 tests using 1 worker
+
+(node:67686) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/tests/core.spec.ts:26:1 › browse opens a generated type leaf without browser errors (965ms)
+  ✓   2 e2e/tests/core.spec.ts:47:1 › type page uses a stable source fallback without canonical API files (627ms)
+  ✓   3 e2e/tests/core.spec.ts:57:1 › draft editor exposes dirty state and saves before deletion (2.2s)
+  ✓   4 e2e/tests/core.spec.ts:92:1 › draft generation completion hydrates the editor (1.5s)
+  ✓   5 e2e/tests/core.spec.ts:101:1 › draft polling exposes a stale state and retry affordance (4.9s)
+  ✓   6 e2e/tests/core.spec.ts:126:1 › search matches type and application aliases (1.1s)
+  ✓   7 e2e/tests/core.spec.ts:137:1 › unknown routes render a real not-found page (251ms)
+  ✘   8 e2e/tests/core.spec.ts:146:1 › apps hash links focus the target and invalid hashes explain recovery (9.3s)
+(node:67747) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   9 e2e/tests/core.spec.ts:155:1 › mobile pages avoid horizontal overflow and name the draft editor (1.4s)
+  ✘  10 e2e/tests/core.spec.ts:169:1 › public catalog exposes bilingual labels and navigable canonical links (8.0s)
+(node:67793) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  11 e2e/tests/core.spec.ts:185:1 › project detail state follows the selected project (988ms)
+  ✓  12 e2e/tests/core.spec.ts:209:1 › English tutorial does not fall back to the long Chinese source (424ms)
+  ✓  13 e2e/tests/core.spec.ts:216:1 › local API initializes recovery, backup download, and controlled restore (862ms)
+  ✘  14 e2e/tests/matrix.spec.ts:73:1 › normal route matrix passes at 375px and 768px (3.6s)
+(node:67814) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  15 e2e/tests/matrix.spec.ts:89:1 › language and accessible names hold across the route matrix (9.4s)
+(node:67839) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  16 e2e/tests/matrix.spec.ts:123:1 › route error matrix exposes a recoverable alert (5.7s)
+  ✓  17 e2e/tests/matrix.spec.ts:158:1 › representative empty states remain explicit and navigable (3.8s)
+  ✓  18 e2e/tests/product-polish-ask.spec.ts:3:1 › a late history response cannot replace the conversation selected later (771ms)
+  ✓  19 e2e/tests/product-polish-ask.spec.ts:62:3 › running conversation keeps polling after reopen (2.5s)
+  ✓  20 e2e/tests/product-polish-ask.spec.ts:62:3 › running conversation keeps polling after failed-new (2.4s)
+  ✓  21 e2e/tests/product-polish-settings.spec.ts:19:1 › model suggestions follow the provider even when the previous list returns late (689ms)
+  ✓  22 e2e/tests/product-polish-settings.spec.ts:47:1 › failed model lookup shows an error and retains configured suggestions (703ms)
+
+
+  1) e2e/tests/core.spec.ts:146:1 › apps hash links focus the target and invalid hashes explain recovery 
+
+    Error: expect(locator).toBeFocused() failed
+
+    Locator: locator('#todoist')
+    Expected: focused
+    Timeout: 7500ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeFocused" locator('#todoist') with timeout 7500ms
+      - waiting for locator('#todoist')
+        - waiting for navigation to finish...
+        - navigated to "http://127.0.0.1:5218/apps#todoist"
+
+
+      148 |   const target = page.locator("#todoist");
+      149 |   await expect(target).toBeVisible();
+    > 150 |   await expect(target).toBeFocused();
+          |                        ^
+      151 |   await page.goto("/apps#missing-app");
+      152 |   await expect(page.getByText("链接的应用不存在，请返回应用目录重新选择。", { exact: true })).toBeVisible();
+      153 | });
+        at /private/tmp/atlas-product-review-115d42c/atlas-web/e2e/tests/core.spec.ts:150:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/core-apps-hash-links-focus-4c04f-lid-hashes-explain-recovery/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/core-apps-hash-links-focus-4c04f-lid-hashes-explain-recovery/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/core-apps-hash-links-focus-4c04f-lid-hashes-explain-recovery/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/core-apps-hash-links-focus-4c04f-lid-hashes-explain-recovery/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) e2e/tests/core.spec.ts:169:1 › public catalog exposes bilingual labels and navigable canonical links 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('Todoist is cataloged for Tasks, Projects and Calendar.', { exact: true })
+    Expected: visible
+    Timeout: 7500ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText('Todoist is cataloged for Tasks, Projects and Calendar.', { exact: true }) with timeout 7500ms
+      - waiting for getByText('Todoist is cataloged for Tasks, Projects and Calendar.', { exact: true })
+        - waiting for "http://127.0.0.1:5218/apps" navigation to finish...
+        - navigated to "http://127.0.0.1:5218/apps"
+
+
+      172 |   await expect(page.getByText("Task Management Application", { exact: true }).first()).toBeVisible();
+      173 |   await expect(page.getByText("View classification evidence", { exact: true }).first()).toBeVisible();
+    > 174 |   await expect(page.getByText("Todoist is cataloged for Tasks, Projects and Calendar.", { exact: true })).toBeVisible();
+          |                                                                                                           ^
+      175 |
+      176 |   await page.goto("/types/human-resource-information-system-hris");
+      177 |   const canonicalLink = page.locator('a[href="/types/human-capital-management-hcm"]').first();
+        at /private/tmp/atlas-product-review-115d42c/atlas-web/e2e/tests/core.spec.ts:174:107
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/core-public-catalog-expose-a397d-d-navigable-canonical-links/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/core-public-catalog-expose-a397d-d-navigable-canonical-links/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/core-public-catalog-expose-a397d-d-navigable-canonical-links/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/core-public-catalog-expose-a397d-d-navigable-canonical-links/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) e2e/tests/matrix.spec.ts:73:1 › normal route matrix passes at 375px and 768px ─────────────────
+
+    Error: page.evaluate: Execution context was destroyed, most likely because of a navigation
+
+      51 |   await page.goto(route);
+      52 |   await expect(page.locator("main h1").first()).toBeVisible();
+    > 53 |   const width = await page.evaluate(() => ({
+         |                            ^
+      54 |     body: document.body.scrollWidth,
+      55 |     viewport: window.innerWidth,
+      56 |     offenders: [...document.querySelectorAll<HTMLElement>("body *")]
+        at assertNormalPage (/private/tmp/atlas-product-review-115d42c/atlas-web/e2e/tests/matrix.spec.ts:53:28)
+        at /private/tmp/atlas-product-review-115d42c/atlas-web/e2e/tests/matrix.spec.ts:80:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/matrix-normal-route-matrix-passes-at-375px-and-768px/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/matrix-normal-route-matrix-passes-at-375px-and-768px/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/matrix-normal-route-matrix-passes-at-375px-and-768px/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/matrix-normal-route-matrix-passes-at-375px-and-768px/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) e2e/tests/matrix.spec.ts:89:1 › language and accessible names hold across the route matrix ────
+
+    Error: locator.evaluateAll: Execution context was destroyed, most likely because of a navigation
+
+       99 |       await expect(page.locator("html")).toHaveAttribute("lang", "en");
+      100 |       await expect(page.locator("main h1").first()).toBeVisible();
+    > 101 |       const unnamedButtons = await page.locator("button").evaluateAll((buttons) => buttons.filter((button) => {
+          |                                                           ^
+      102 |         const element = button as HTMLButtonElement;
+      103 |         return !element.getAttribute("aria-label")
+      104 |           && !element.getAttribute("aria-labelledby")
+        at /private/tmp/atlas-product-review-115d42c/atlas-web/e2e/tests/matrix.spec.ts:101:59
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/matrix-language-and-access-821a7-old-across-the-route-matrix/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/matrix-language-and-access-821a7-old-across-the-route-matrix/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/matrix-language-and-access-821a7-old-across-the-route-matrix/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/matrix-language-and-access-821a7-old-across-the-route-matrix/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4 failed
+    e2e/tests/core.spec.ts:146:1 › apps hash links focus the target and invalid hashes explain recovery 
+    e2e/tests/core.spec.ts:169:1 › public catalog exposes bilingual labels and navigable canonical links 
+    e2e/tests/matrix.spec.ts:73:1 › normal route matrix passes at 375px and 768px ──────────────────
+    e2e/tests/matrix.spec.ts:89:1 › language and accessible names hold across the route matrix ─────
+  18 passed (1.1m)

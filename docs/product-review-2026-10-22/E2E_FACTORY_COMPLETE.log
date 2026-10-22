@@ -1,0 +1,108 @@
+
+> test:e2e:factory
+> playwright test --config playwright.factory.config.ts
+
+[WebServer] (node:65889) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 43 tests using 1 worker
+
+(node:65892) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/factory-tests/assisted-templates.spec.ts:16:1 › leaf → scenario → assisted template → case and standard package, without formal publication (895ms)
+  ✓   2 e2e/factory-tests/assisted-templates.spec.ts:34:1 › not-run template has no example source, guide or runtime evidence links (559ms)
+  ✓   3 e2e/factory-tests/assisted-templates.spec.ts:43:1 › Go model static review does not turn an unrun app into a runtime example (562ms)
+  ✓   4 e2e/factory-tests/assisted-templates.spec.ts:56:1 › failed complete-material review remains inspectable and is not offered as a usable package (1.0s)
+  ✓   5 e2e/factory-tests/assisted-templates.spec.ts:73:1 › assisted catalog outage does not hide formal template or claim zero verified evidence (539ms)
+  ✓   6 e2e/factory-tests/assisted-templates.spec.ts:81:1 › scenario link retains formally published artifacts outside the assisted index (644ms)
+  ✓   7 e2e/factory-tests/assisted-templates.spec.ts:91:1 › recovered refresh clears its alert while a user action error remains visible (12.6s)
+  ✓   8 e2e/factory-tests/assisted-templates.spec.ts:106:1 › reviewed revision retains its withdrawn parent and separates usable entries from history (564ms)
+  ✓   9 e2e/factory-tests/assisted-templates.spec.ts:121:1 › workflow artifact poll refreshes assisted info before opening it in the same factory page (5.1s)
+  ✓  10 e2e/factory-tests/auxiliary-workflow.spec.ts:3:1 › auxiliary workflow shows leaf progress, reuse, calls and filters details (611ms)
+  ✓  11 e2e/factory-tests/blueprint-runtime.spec.ts:23:1 › blueprint runtime submission requires adapter, source ZIP and execution consent, without a model field (1.0s)
+  ✓  12 e2e/factory-tests/blueprint-runtime.spec.ts:45:1 › runtime deep link exposes startup diagnostics, case evidence and cleanup errors (1.3s)
+  ✓  13 e2e/factory-tests/blueprint-runtime.spec.ts:65:1 › blueprint with no frozen runner adapter explains runtime acceptance is unavailable (779ms)
+  ✓  14 e2e/factory-tests/factory.spec.ts:7:1 › factory catalog saves, confirms, pins and cancels a batch without a provider call (1.9s)
+  ✓  15 e2e/factory-tests/factory.spec.ts:34:1 › catalog groups scenarios by type and preserves cross-group selection through collapse, search and refresh (5.9s)
+  ✓  16 e2e/factory-tests/factory.spec.ts:88:1 › visible generation entry filters covered leaves, marks zero additions and blocks active generation (2.1s)
+  ✓  17 e2e/factory-tests/factory.spec.ts:156:1 › leaf exposes confirmed scenarios and links to factory (1.2s)
+  ✓  18 e2e/factory-tests/factory.spec.ts:165:1 › draft scenarios can queue an independent pinned review without confirmation or provider calls (1.9s)
+  ✓  19 e2e/factory-tests/factory.spec.ts:187:1 › review actions distinguish first, repeat and retry; passed drafts still need human confirmation (2.4s)
+  ✓  20 e2e/factory-tests/factory.spec.ts:243:1 › scenario review displays reasons, revisions, failed attempts and bilingual stale evidence (3.1s)
+  ✓  21 e2e/factory-tests/factory.spec.ts:266:1 › covered types can complete without new drafts and explain their pinned output language (969ms)
+  ✓  22 e2e/factory-tests/factory.spec.ts:281:1 › factory supports mobile, English, empty artifacts and recoverable errors (1.4s)
+  ✓  23 e2e/factory-tests/factory.spec.ts:297:1 › artifact distinguishes source review from runtime acceptance and can instantiate L0 (1.2s)
+  ✓  24 e2e/factory-tests/factory.spec.ts:333:1 › leaf published template creates an application and explains review scope (1.2s)
+  ✓  25 e2e/factory-tests/factory.spec.ts:347:1 › cognitive sample imports once, reads definitions and exports a phased development handoff without provider calls (1.8s)
+  ✓  26 e2e/factory-tests/factory.spec.ts:396:1 › invalid cognitive ZIP shows an error and keeps imported candidates (1.0s)
+  ✓  27 e2e/factory-tests/factory.spec.ts:408:1 › cognitive document reader does not load remote images or execute embedded HTML (1.0s)
+  ✓  28 e2e/factory-tests/factory.spec.ts:430:1 › confirmed scenarios queue pinned cognition production separately from code templates (1.6s)
+  ✓  29 e2e/factory-tests/factory.spec.ts:446:1 › cognitive review queues independently, can retry after cancellation and produces a new pinned revision (5.4s)
+  ✓  30 e2e/factory-tests/factory.spec.ts:478:1 › 规范预审阻断可见，意见可带回生产补充要求 (1.4s)
+  ✓  31 e2e/factory-tests/leaf-blueprint.spec.ts:32:1 › published product blueprint links to phase export and does not offer runnable instantiate (540ms)
+  ✓  32 e2e/factory-tests/leaf-blueprint.spec.ts:40:1 › published runnable starter keeps its application archive flow (654ms)
+  ✓  33 e2e/factory-tests/product-polish-factory.spec.ts:28:1 › shared case panel follows case deep links and browser history (640ms)
+  ✓  34 e2e/factory-tests/product-polish-factory.spec.ts:45:1 › case history restores defaults when URL parameters are removed (715ms)
+  ✓  35 e2e/factory-tests/product-polish-factory.spec.ts:60:1 › factory opens the requested batches view and tab changes preserve browser history (591ms)
+  ✓  36 e2e/factory-tests/product-polish-factory.spec.ts:80:1 › completed batches retain evidence without offering queue controls (553ms)
+  ✓  37 e2e/factory-tests/product-references.spec.ts:3:1 › product references distinguish design examples and unreviewed scoped drafts (727ms)
+  ✓  38 e2e/factory-tests/product-references.spec.ts:38:1 › reviewed references are catalog entries with explicit non-runtime status and shared case links (689ms)
+  ✓  39 e2e/factory-tests/v1.spec.ts:18:1 › shared cases show fixed source, evidence, unknowns and keep legacy cards when the dynamic API is unavailable (532ms)
+  ✓  40 e2e/factory-tests/v1.spec.ts:28:1 › case revisions expose observed evidence separately from unknown runtime and link into factory (575ms)
+  ✓  41 e2e/factory-tests/v1.spec.ts:43:1 › V1 plan survives run, pause, resume and reload with a stable idempotency key (1.7s)
+  ✓  42 e2e/factory-tests/v1.spec.ts:98:1 › V1 catalog shows each blueprint runtime result per run and target, with no aggregate fallback (559ms)
+[WebServer] 12:08:26 AM [vite] Internal server error: Failed to resolve import "@/routes/history" from "src/app.tsx". Does the file exist?
+[WebServer]   Plugin: vite:import-analysis
+[WebServer]   File: /Users/milin/2026/软件开发/application-atlas/atlas-web/src/app.tsx:21:34
+[WebServer]   34 |  const Discover = lazy(_c25 = () => import("@/routes/discover").then(({ Discover: page }) => ({ default: page })));
+[WebServer]   35 |  _c26 = Discover;
+[WebServer]   36 |  const History = lazy(_c27 = () => import("@/routes/history").then(({ History: page }) => ({ default: page })));
+[WebServer]      |                                           ^
+[WebServer]   37 |  _c28 = History;
+[WebServer]   38 |  export function NotFoundPage() {
+[WebServer]       at TransformPluginContext._formatLog (file:///Users/milin/2026/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91/application-atlas/atlas-web/node_modules/vite/dist/node/chunks/config.js:29250:43)
+[WebServer]       at TransformPluginContext.error (file:///Users/milin/2026/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91/application-atlas/atlas-web/node_modules/vite/dist/node/chunks/config.js:29247:14)
+[WebServer]       at normalizeUrl (file:///Users/milin/2026/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91/application-atlas/atlas-web/node_modules/vite/dist/node/chunks/config.js:27370:18)
+[WebServer]       at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+[WebServer]       at async file:///Users/milin/2026/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91/application-atlas/atlas-web/node_modules/vite/dist/node/chunks/config.js:27428:32
+[WebServer]       at async Promise.all (index 20)
+[WebServer]       at async TransformPluginContext.transform (file:///Users/milin/2026/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91/application-atlas/atlas-web/node_modules/vite/dist/node/chunks/config.js:27396:4)
+[WebServer]       at async EnvironmentPluginContainer.transform (file:///Users/milin/2026/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91/application-atlas/atlas-web/node_modules/vite/dist/node/chunks/config.js:29048:14)
+[WebServer]       at async loadAndTransform (file:///Users/milin/2026/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91/application-atlas/atlas-web/node_modules/vite/dist/node/chunks/config.js:22914:26)
+[WebServer]       at async viteTransformMiddleware (file:///Users/milin/2026/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91/application-atlas/atlas-web/node_modules/vite/dist/node/chunks/config.js:24790:20)
+  ✘  43 e2e/factory-tests/v1.spec.ts:126:1 › fresh deep link restores a running plan, polls its report, pauses by plan ID, then stops at terminal state (5.1s)
+
+
+  1) e2e/factory-tests/v1.spec.ts:126:1 › fresh deep link restores a running plan, polls its report, pauses by plan ID, then stops at terminal state 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 3
+    Received: 5
+
+      179 |   const terminalReportCount = reportRequests;
+      180 |   await page.waitForTimeout(4300);
+    > 181 |   expect(reportRequests).toBe(terminalReportCount);
+          |                          ^
+      182 |   expect(planRequests).toBeGreaterThan(0);
+      183 | });
+      184 |
+        at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/factory-tests/v1.spec.ts:181:26
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/v1-fresh-deep-link-restore-5289e-hen-stops-at-terminal-state/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/v1-fresh-deep-link-restore-5289e-hen-stops-at-terminal-state/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/v1-fresh-deep-link-restore-5289e-hen-stops-at-terminal-state/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/v1-fresh-deep-link-restore-5289e-hen-stops-at-terminal-state/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/factory-tests/v1.spec.ts:126:1 › fresh deep link restores a running plan, polls its report, pauses by plan ID, then stops at terminal state 
+  42 passed (1.3m)

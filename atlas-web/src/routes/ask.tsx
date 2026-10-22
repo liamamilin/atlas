@@ -53,6 +53,7 @@ export function Ask() {
   const [showList, setShowList] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const threadIdRef = useRef<string>("");
+  const threadRequestRef = useRef(0);
 
   const loadThreads = useCallback(async () => {
     try {
@@ -63,12 +64,15 @@ export function Ask() {
   }, []);
 
   const openThread = useCallback(async (id: string) => {
-    threadIdRef.current = id;
+    const requestId = ++threadRequestRef.current;
     try {
-      setThread(await getAskThread(id));
+      const next = await getAskThread(id);
+      if (requestId !== threadRequestRef.current) return;
+      threadIdRef.current = id;
+      setThread(next);
       setError("");
     } catch (cause) {
-      setError(errorText(cause, lang));
+      if (requestId === threadRequestRef.current) setError(errorText(cause, lang));
     }
   }, [lang]);
 
@@ -79,34 +83,37 @@ export function Ask() {
   useEffect(() => {
     if (!thread?.running) return;
     let alive = true;
+    const id = thread.id;
     const timer = window.setInterval(() => {
-      const id = threadIdRef.current;
-      if (!id) return;
+      if (threadIdRef.current !== id) return;
+      const requestId = threadRequestRef.current;
       getAskThread(id)
         .then((next) => {
-          if (!alive) return;
+          if (!alive || requestId !== threadRequestRef.current || threadIdRef.current !== id) return;
           setThread(next);
           if (!next.running) void loadThreads();
         })
         .catch(() => { /* keep the last good state; the next tick retries */ });
     }, POLL_MS);
     return () => { alive = false; window.clearInterval(timer); };
-  }, [thread?.running, loadThreads]);
+  }, [thread?.id, thread?.running, loadThreads]);
 
   useEffect(() => {
     if (thread?.running) bottomRef.current?.scrollIntoView({ block: "end" });
   }, [thread?.messages.length, thread?.running]);
 
   const startNew = async () => {
+    const requestId = ++threadRequestRef.current;
     setBusy(true); setError("");
     try {
       const created = await createAskThread();
+      if (requestId !== threadRequestRef.current) return;
       setThread(created);
       threadIdRef.current = created.id;
       setShowList(false);
       await loadThreads();
     } catch (cause) {
-      setError(errorText(cause, lang));
+      if (requestId === threadRequestRef.current) setError(errorText(cause, lang));
     } finally {
       setBusy(false);
     }
@@ -117,6 +124,7 @@ export function Ask() {
     const text = question.trim();
     if (!text || busy || thread?.running) return;
     void (async () => {
+      const requestId = ++threadRequestRef.current;
       setBusy(true); setError("");
       try {
         let id = threadIdRef.current;
@@ -126,13 +134,16 @@ export function Ask() {
           threadIdRef.current = id;
         }
         await askQuestion(id, text);
+        if (requestId !== threadRequestRef.current) return;
         setQuestion("");
-        setThread(await getAskThread(id));
+        const next = await getAskThread(id);
+        if (requestId !== threadRequestRef.current) return;
+        setThread(next);
         await loadThreads();
       } catch (cause) {
-        setError(errorText(cause, lang));
+        if (requestId === threadRequestRef.current) setError(errorText(cause, lang));
       } finally {
-        setBusy(false);
+        if (requestId === threadRequestRef.current) setBusy(false);
       }
     })();
   };
@@ -143,6 +154,7 @@ export function Ask() {
       try {
         await deleteAskThread(id);
         if (threadIdRef.current === id) {
+          ++threadRequestRef.current;
           setThread(null);
           threadIdRef.current = "";
         }
@@ -189,6 +201,7 @@ export function Ask() {
                 <li key={item.id} className="flex items-center gap-2">
                   <button
                     type="button"
+                    disabled={busy}
                     onClick={() => { void openThread(item.id); setShowList(false); }}
                     className={`min-w-0 flex-1 rounded-lg px-3 py-2 text-left text-sm hover:bg-chip ${threadIdRef.current === item.id ? "bg-chip" : ""}`}
                   >
@@ -205,6 +218,7 @@ export function Ask() {
                   <button
                     type="button"
                     aria-label={zh ? "删除对话" : "Delete conversation"}
+                    disabled={busy}
                     onClick={() => onDelete(item.id)}
                     className="rounded-md p-2 text-subtle hover:bg-danger/10 hover:text-danger"
                   >
@@ -257,6 +271,7 @@ export function Ask() {
       <form onSubmit={submit} className="sticky bottom-0 mt-6 bg-bg/95 pt-3 backdrop-blur">
         <div className="flex items-end gap-2">
           <textarea
+            aria-label={zh ? "你的问题" : "Your question"}
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
             onKeyDown={(event) => {
