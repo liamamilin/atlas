@@ -94,6 +94,117 @@ class ProductReferencePipelineTests(unittest.TestCase):
         self.output = Path(directory)
         return profile.generate(directory, self.inputs, self.snapshot, call)
 
+    def make_unqualified_review_parent(self, name, *, verdict="needs_changes", corrupt_review=None):
+        """Create a genuinely read-failed parent with a bound official delivery."""
+        from template_factory.store import digest as stable_digest
+        parent_root = self.root / name
+        parent = parent_root / "generation"
+        base_call, _ = self.callback()
+
+        def failed_review_call(stage, payload, prompt, source):
+            response = base_call(stage, payload, prompt, source)
+            if stage == "review":
+                response["result"]["verdict"] = verdict
+                response["result"]["issues"] = [] if verdict == "pass" else ["Clarify recovery after storage failure"]
+                if verdict == "needs_changes":
+                    response["result"]["checks"]["journeys"] = False
+                events = []
+                omitted = next((key for key in payload["material_manifest"] if key.startswith("readable/fields/")), None)
+                for event in response["read_events"]:
+                    if event["path"] != omitted:
+                        events.append(event)
+                response["read_events"] = events
+            return response
+
+        with self.assertRaisesRegex(ValueError, "full-content read coverage for readable/fields/"):
+            self.run_pipeline(parent, failed_review_call)
+        outcome = {"status": "failed", "error_type": "ValueError",
+                   "reason": "review lacks actual completed full-content read coverage for readable/fields/fixture.txt",
+                   "completed_stages": ["research", "author", "review"],
+                   "leaf": "personal-notes", "revision_id": name}
+        profile._fixed(parent_root / "OUTCOME.json", outcome)
+
+        review_request = json.loads((parent / "review/INPUT.json").read_text(encoding="utf-8"))
+        review_result = json.loads((parent / "review/RESULT.json").read_text(encoding="utf-8"))
+        if corrupt_review == "invalid":
+            review_result["checks"].pop("scope")
+            (parent / "review/RESULT.json").write_text(profile._canonical(review_result) + "\n", encoding="utf-8")
+        if corrupt_review == "mismatch":
+            changed = json.loads((parent / "REVIEW_INPUT.json").read_text(encoding="utf-8"))
+            changed["reference"]["product_shape"]["value"] = "stale changed candidate"
+            (parent / "REVIEW_INPUT.json").write_text(profile._canonical(changed) + "\n", encoding="utf-8")
+
+        stage_receipt_path = parent / "review/DELIVERED.json"
+        stage_receipt = json.loads(stage_receipt_path.read_text(encoding="utf-8"))
+        if corrupt_review == "invalid":
+            stage_receipt["result_digest"] = stable_digest(review_result)
+            stage_receipt_path.write_text(profile._canonical(stage_receipt) + "\n", encoding="utf-8")
+        checkpoint = parent_root / "official-checkpoints/review"
+        checkpoint.mkdir(parents=True)
+        source_files = profile._read_sources(self.snapshot)
+        material_manifest = json.loads((parent / "READ_VIEWS.json").read_text(encoding="utf-8"))
+        review_materials = {path: (parent / path).read_text(encoding="utf-8") for path in material_manifest}
+        review_materials.update({"READING_GUIDE.md": (parent / "READING_GUIDE.md").read_text(encoding="utf-8"),
+                                 "READ_VIEWS.json": (parent / "READ_VIEWS.json").read_text(encoding="utf-8")})
+        snapshot_for_source = {key: value for key, value in self.snapshot.items() if key != "local_root"}
+        source_root = checkpoint / "source"
+        source_root.mkdir()
+        source_data = {"snapshot.json": (profile._canonical(snapshot_for_source) + "\n").encode()}
+        source_data.update({"upstream/" + path: text.encode() for path, text in source_files.items()})
+        source_data.update({"review/" + path: text.encode() for path, text in review_materials.items()})
+        source_hashes = {}
+        for path, data in source_data.items():
+            target = source_root / path
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(data)
+            source_hashes[path] = profile._sha(data)
+        leaf = b"fixture leaf\n"
+        (parent_root / "leaf.md").write_bytes(leaf)
+        (checkpoint / "leaf.md").write_bytes(leaf)
+        result = review_result
+        raw_result = {"text": json.dumps(result, ensure_ascii=False)}
+        raw_result_bytes = (profile._canonical(raw_result) + "\n").encode()
+        (checkpoint / "original-response.json").write_bytes(raw_result_bytes)
+        profile._fixed(checkpoint / "RESULT.json", result)
+        model = "fixture/reviewer"
+        official_input = {"profile_payload": review_request,
+                          "adapter": {"stage": "review", "model": model,
+                                      "prompt_sha256": profile._sha(profile.REVIEW.encode()),
+                                      "source_tree_sha256": stable_digest(source_hashes),
+                                      "leaf_sha256": profile._sha(leaf)}}
+        input_bytes = (json.dumps(official_input, ensure_ascii=False, indent=1) + "\n").encode()
+        (checkpoint / "input.json").write_bytes(input_bytes)
+        official_binding = {"model": model, "input_digest": stable_digest(official_input),
+                            "prompt": profile.REVIEW, "source": source_hashes,
+                            "leaf_sha256": profile._sha(leaf)}
+        profile._fixed(checkpoint / "BINDING.json", official_binding)
+        profile._fixed(checkpoint / "DELIVERED.json", {
+            "binding_digest": stable_digest(official_binding), "result_digest": stable_digest(result)})
+        profile._fixed(checkpoint / "cli-summary.json", {
+            "delivery_status": "delivered", "session_id": stage_receipt["session_id"],
+            "requested_model": model, "original_response_sha256": profile._sha(raw_result_bytes)})
+        # Convert fixture read receipts to completed raw events in the actual
+        # reviewer session. Preserve the deliberately omitted page.
+        events = []
+        for event in stage_receipt["read_events"]:
+            filename = event["path"]
+            target = source_root / "review" / filename
+            events.append({"sessionID": stage_receipt["session_id"], "part": {
+                "tool": "read", "sessionID": stage_receipt["session_id"],
+                "state": {"status": "completed", "input": {"path": str(target)},
+                          "output": event["content"]}}})
+        stage_receipt["read_events"] = events
+        stage_receipt_path.write_text(profile._canonical(stage_receipt) + "\n", encoding="utf-8")
+        (checkpoint / "events.jsonl").write_text("\n".join(json.dumps(event) for event in events) + "\n", encoding="utf-8")
+        if corrupt_review == "invalid":
+            # Keep all digest links consistent so the protocol validator, not a
+            # stale delivery hash, rejects the malformed reviewer result.
+            official_binding["input_digest"] = stable_digest(official_input)
+            profile._fixed(checkpoint / "BINDING.json", official_binding)
+            profile._fixed(checkpoint / "DELIVERED.json", {
+                "binding_digest": stable_digest(official_binding), "result_digest": stable_digest(result)})
+        return parent_root, parent, stage_receipt
+
     def test_revision_reuses_research_and_requires_fresh_review_and_parent_binding(self):
         parent = self.root / "parent"
         callback, parent_calls = self.callback()
@@ -214,6 +325,63 @@ class ProductReferencePipelineTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "parent review result is not bound"):
             profile.revise(self.root / "stale-review-revision", self.inputs, self.snapshot,
                            stale_parent, "author/RESULT.json", stale_sha, "r3", revised_call)
+
+    def test_read_failed_needs_changes_feedback_is_unqualified_and_requires_fresh_review(self):
+        parent_root, parent, _ = self.make_unqualified_review_parent("unqualified-parent")
+        self.assertFalse((parent / "REVIEW_RESULT.json").exists())
+        author_result = parent / "author/RESULT.json"
+        author_sha = profile._sha(author_result.read_bytes())
+        output = self.root / "unqualified-feedback-revision"
+        base_call, _ = self.callback()
+        calls = []
+
+        def revision_call(stage, payload, prompt, source):
+            calls.append(stage)
+            if stage == "author":
+                feedback = payload["revision"]["lineage"]["unqualified_parent_review_feedback"]
+                self.assertFalse(feedback["qualified"])
+                self.assertEqual(feedback["verdict"], "needs_changes")
+                self.assertEqual(feedback["outcome_sha256"], profile._sha((parent_root / "OUTCOME.json").read_bytes()))
+                self.assertTrue(any("unqualified needs_changes feedback" in item
+                                    for item in payload["revision"]["diagnostics"]))
+                return base_call(stage, payload, prompt, source)
+            revision_context = payload["review_input"]["revision"]
+            self.assertEqual(set(revision_context), {"parent_reference", "author_result", "diagnostics", "lineage"})
+            requirements = payload["review_input"]["read_coverage_requirements"]
+            self.assertTrue(requirements["prior_review_was_unqualified"])
+            self.assertTrue(requirements["read_every_source_file_in_full"])
+            self.assertTrue(requirements["read_every_long_field_page_in_full"])
+            self.output = output
+            return base_call(stage, payload, prompt, source)
+
+        self.output = output
+        result = profile.revise(output, self.inputs, self.snapshot, parent,
+                                "author/RESULT.json", author_sha, "r3-unqualified", revision_call)
+        self.assertEqual(result["status"], "static_review_passed")
+        self.assertEqual(calls, ["author", "review"])
+        self.assertFalse((parent / "REVIEW_RESULT.json").exists())
+        self.assertTrue((parent_root / "OUTCOME.json").is_file())
+        with zipfile.ZipFile(result["reference_zip"]) as archive:
+            manifest = json.loads(archive.read("manifest.json"))
+            self.assertIn("unqualified_parent_review_feedback",
+                          manifest["revision_lineage"])
+            self.assertFalse(manifest["revision_lineage"]["unqualified_parent_review_feedback"]["qualified"])
+            self.assertEqual(json.loads(archive.read("revision.json")),
+                             json.loads((output / "REVIEW_INPUT.json").read_text())["revision"])
+
+    def test_unqualified_feedback_rejects_pass_invalid_protocol_and_mismatched_candidate(self):
+        for name, verdict, corrupt, expected in (
+                ("unqualified-pass", "pass", None, "parent review passed"),
+                ("unqualified-invalid", "needs_changes", "invalid", "seven boolean core checks"),
+                ("unqualified-mismatch", "needs_changes", "mismatch", "review input differs")):
+            with self.subTest(name=name):
+                _, parent, _ = self.make_unqualified_review_parent(name, verdict=verdict,
+                                                                    corrupt_review=corrupt)
+                author_result = parent / "author/RESULT.json"
+                with self.assertRaisesRegex(ValueError, expected):
+                    profile.revise(self.root / (name + "-revision"), self.inputs, self.snapshot,
+                                   parent, "author/RESULT.json", profile._sha(author_result.read_bytes()),
+                                   "r3-rejected", lambda *_: self.fail("author must not be called"))
 
     def test_machine_schema_matches_exact_root_and_enums(self):
         schema = profile.CONTRACT_SCHEMA

@@ -331,6 +331,9 @@ class ReferencePilotService:
                 if parent_values["outcome"].get("status") == "needs_changes":
                     if not any(c["status"] == "completed" for c in review_rows):
                         raise FactoryError("needs_changes parent requires a terminal independent review", "reference_pilot_paused", 409)
+                elif parent_values.get("unqualified_parent_review_feedback"):
+                    if len(review_rows) != 1 or review_rows[0]["status"] != "completed":
+                        raise FactoryError("read-limited feedback requires its unique completed review call", "reference_pilot_paused", 409)
                 elif review_rows:
                     raise FactoryError("failed parent must not create an unnecessary review call", "reference_pilot_paused", 409)
             registered_calls = con.execute("SELECT identity,stage FROM tf_budget_reservation WHERE campaign_id=? AND phase=? AND status!='not_started'",
@@ -343,6 +346,8 @@ class ReferencePilotService:
             event = {"request": body, "request_digest": digest(body), "effective_max_calls": 12,
                      "prior_request_digest": pilot["request_digest"],
                      "research_calls": [{"identity": c["identity"], "stage": c["stage"], "status": c["status"]} for c in mine]}
+            if parent_values.get("unqualified_parent_review_feedback"):
+                event["parent_feedback_classification"] = "unqualified_read_coverage_feedback"
             con.execute("INSERT INTO auxiliary_reference_pilot_event(pilot_id,kind,body,created) VALUES(?,'revision',?,?)",
                         (pilot_id, json.dumps(event, ensure_ascii=False, sort_keys=True), self.clock()))
             if pilot["status"] == "completed":
@@ -442,9 +447,12 @@ class ReferencePilotService:
             if con is None or pilot is None:
                 raise FactoryError("revision ledger context is unavailable", "reference_pilot_integrity", 409)
             research_session = self._verify_revision_stage_files(generation_root, "research", leaf, pilot, con)
-            self._verify_revision_stage_files(generation_root, "author", leaf, pilot, con)
+            author_session = self._verify_revision_stage_files(generation_root, "author", leaf, pilot, con)
+            review_session = None
             if "review" in parents:
-                self._verify_revision_stage_files(generation_root, "review", leaf, pilot, con)
+                review_session = self._verify_revision_stage_files(generation_root, "review", leaf, pilot, con)
+                if review_session == author_session:
+                    raise FactoryError("independent review must use a distinct author session", "reference_pilot_integrity", 409)
             prior_research = self._evidence_path(prior["parents"]["research"], "r2 research result")
             prior_receipt = self._evidence_path(prior["parents"]["research_receipt"], "r2 research delivery")
             old_result, old_receipt = json.loads(prior_research.read_text()), json.loads(prior_receipt.read_text())
@@ -462,8 +470,8 @@ class ReferencePilotService:
                     or values["outcome"].get("completed_stages") != ["research", "author"]):
                 raise FactoryError("r2 must preserve the original terminal author failure", "reference_pilot_integrity", 409)
         elif (values["outcome"].get("status") == "failed"
-              and values["outcome"].get("completed_stages") not in (["author"], ["research", "author"])):
-            raise FactoryError("failed parent must terminate after its author stage", "reference_pilot_integrity", 409)
+              and values["outcome"].get("completed_stages") not in (["author"], ["research", "author"], ["research", "author", "review"])):
+            raise FactoryError("failed parent must terminate after its author or read-limited review stage", "reference_pilot_integrity", 409)
         elif (values["outcome"].get("status") == "needs_changes"
               and values["outcome"].get("completed_stages") not in (None, ["author", "review"], ["research", "author", "review"])):
             raise FactoryError("needs_changes parent must include its independent review stage", "reference_pilot_integrity", 409)
@@ -477,14 +485,95 @@ class ReferencePilotService:
             expected_path = generation_root / suffix
             if not str(ref["path"]).endswith(suffix) or Path(ref["path"]) != expected_path:
                 raise FactoryError("revision review parent path is outside its prior-stage lineage", "reference_pilot_integrity", 409)
+            try:
+                values[key] = json.loads(path.read_text())
+            except ValueError as error:
+                raise FactoryError("revision review parent checkpoint is not JSON", "reference_pilot_integrity", 409) from error
         if body.get("revision_id") in {"r3", "r4"}:
             has_review = "review" in parents and "review_receipt" in parents
             outcome = values["outcome"]
             if outcome.get("status") == "needs_changes" and not has_review:
                 raise FactoryError("needs_changes r2 requires its independent review checkpoint", "reference_pilot_integrity", 409)
-            if outcome.get("status") == "failed" and has_review:
-                raise FactoryError("deterministic failed r2 does not require a review call", "reference_pilot_integrity", 409)
+            if outcome.get("status") == "failed":
+                read_limited_review = (outcome.get("completed_stages") == ["research", "author", "review"]
+                                       and outcome.get("error_type") == "ValueError"
+                                       and isinstance(outcome.get("reason"), str)
+                                       and outcome["reason"].startswith(
+                                           "review lacks actual completed full-content read coverage for readable/"))
+                if has_review != read_limited_review:
+                    raise FactoryError("failed review parent is usable only as bound read-coverage feedback", "reference_pilot_integrity", 409)
+                if read_limited_review:
+                    reason_path = outcome["reason"].split(" for ", 1)[1]
+                    if "\\" in reason_path or ".." in Path(reason_path).parts or Path(reason_path).is_absolute():
+                        raise FactoryError("read-coverage failure outcome has an unsafe material path", "reference_pilot_integrity", 409)
+                    values["unqualified_parent_review_feedback"] = self._verify_unqualified_read_feedback(
+                        generation_root, values, pilot, leaf, author_session, review_session, original_request)
         return values
+
+    def _verify_unqualified_read_feedback(self, generation_root, values, pilot, leaf,
+                                          author_session, review_session, original_request):
+        """Authenticate read-limited review feedback without qualifying its read coverage."""
+        root = self.store.pack.parent.resolve()
+        review_dir = root / generation_root / "review"
+        paths = {name: review_dir / name for name in ("INPUT.json", "RESULT.json", "DELIVERED.json")}
+        if any(path.is_symlink() or not path.is_file() or not path.resolve().is_relative_to(root)
+               for path in paths.values()):
+            raise FactoryError("read-limited review checkpoints are missing or unsafe", "reference_pilot_integrity", 409)
+        review_input = json.loads(paths["INPUT.json"].read_text())
+        result = json.loads(paths["RESULT.json"].read_text())
+        delivery = json.loads(paths["DELIVERED.json"].read_text())
+        if (result != values.get("review") or delivery != values.get("review_receipt")
+                or result.get("verdict") != "needs_changes"):
+            raise FactoryError("read-limited parent lacks an exact delivered needs_changes result", "reference_pilot_integrity", 409)
+        profile = self._profile_module()
+        try:
+            review_payload = review_input.get("review_input")
+            author_input_path = root / generation_root / "author/INPUT.json"
+            research_result_path = root / generation_root / "research/RESULT.json"
+            generation_binding_path = root / generation_root / "BINDING.json"
+            for path in (author_input_path, research_result_path, generation_binding_path):
+                if path.is_symlink() or not path.is_file() or not path.resolve().is_relative_to(root):
+                    raise ValueError("parent author/research binding is missing or unsafe")
+            author_input = json.loads(author_input_path.read_text())
+            research_result = json.loads(research_result_path.read_text())
+            generation_binding = json.loads(generation_binding_path.read_text())
+            item = next((x for x in (original_request or {}).get("leaves", []) if x.get("leaf") == leaf), None)
+            if not item:
+                raise ValueError("registered original input/snapshot unavailable")
+            input_path = self._evidence_path({"path": item["input_path"], "sha256": item["input_sha256"]}, "original inputs")
+            snapshot_path = self._evidence_path({"path": item["snapshot_path"], "sha256": item["snapshot_sha256"]}, "original snapshot")
+            registered_inputs = json.loads(input_path.read_text())
+            snapshot = json.loads(snapshot_path.read_text())
+            source_files = profile._read_sources(snapshot)
+            snapshot_identity = digest({
+                "snapshot": snapshot,
+                "files": {path: hashlib.sha256(text.encode()).hexdigest()
+                          for path, text in source_files.items()},
+            })
+            parent_reference = profile.resolve_authored_reference(values["author"], author_input)
+            expected_observations = profile._observations(research_result["observed_upstream"], snapshot,
+                                                           registered_inputs["trusted_source_ids"])
+            if (author_input.get("inputs") != registered_inputs
+                    or review_payload.get("reference") != parent_reference
+                    or review_payload.get("inputs") != registered_inputs
+                    or review_payload.get("snapshot_digest") != generation_binding.get("snapshot_digest")
+                    or review_payload.get("snapshot_digest") != snapshot_identity
+                    or review_payload.get("observations") != expected_observations
+                    or review_input.get("input_digest") != digest(review_payload)):
+                raise ValueError("parent review input differs from its registered inputs, parent author, research, or snapshot")
+            profile.validate_review(result, review_input.get("input_digest"), author_session,
+                                    review_session, len(expected_observations))
+            if not hasattr(profile, "_validate_unqualified_review_delivery"):
+                raise ValueError("profile lacks the unqualified feedback provenance verifier")
+            delivery_proof = profile._validate_unqualified_review_delivery(
+                root / generation_root, review_input, result, delivery, source_files, snapshot,
+                registered_inputs)
+        except (ValueError, KeyError, TypeError) as error:
+            raise FactoryError(f"read-limited parent review provenance failed: {error}", "reference_pilot_integrity", 409) from error
+        return {"qualified": False, "verdict": "needs_changes", "session_id": review_session,
+                "review_result_sha256": hashlib.sha256(paths["RESULT.json"].read_bytes()).hexdigest(),
+                "outcome_sha256": hashlib.sha256((root / generation_root.parent / "OUTCOME.json").read_bytes()).hexdigest(),
+                "official_delivery_digest": delivery_proof.get("official_checkpoint_digest")}
 
     def _verify_revision_stage_files(self, generation_root, stage, leaf, pilot, con):
         root = self.store.pack.parent.resolve()

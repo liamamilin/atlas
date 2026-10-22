@@ -69,14 +69,42 @@ class RevisionRunnerTests(unittest.TestCase):
                 self.assertEqual(first["model_calls_added"], 0)
                 self.assertEqual(first["ledger_before"], first["ledger_after"])
                 self.assertEqual((folder / "OUTCOME.json").read_bytes(), original_failure)
+                recovery_path = folder / "RECOVERY_OUTCOME.json"
+                original_recovery_bytes = recovery_path.read_bytes()
+                self.assertEqual(first["ledger_before"]["new_calls"], 182)
+                self.assertEqual(list(folder.glob("RECOVERY_REPLAY.*.json")), [])
+                # Same ledger snapshot remains a replay of the original receipt.
+                self.assertEqual(runner.recover_read_proof("bookmark-manager", "r4"), first)
+                self.assertEqual(recovery_path.read_bytes(), original_recovery_bytes)
+                self.assertEqual(list(folder.glob("RECOVERY_REPLAY.*.json")), [])
+                # A legitimate call for another leaf advances the shared ledger.
+                # It must not rewrite the earlier replay's evidence or make its
+                # idempotent retry compare against a stale global ledger snapshot.
+                state["new_calls"] += 2
+                pilot.get.return_value = {"calls": [
+                    {"id": "fixed-call", "status": "completed"},
+                    {"id": "other-leaf-call", "status": "completed"}]}
+                replayed = runner.recover_read_proof("bookmark-manager", "r4")
+                self.assertEqual(recovery_path.read_bytes(), original_recovery_bytes)
+                replay_files = list(folder.glob("RECOVERY_REPLAY.*.json"))
+                self.assertEqual(len(replay_files), 1)
+                replay_evidence_path = replay_files[0]
+                replay_evidence = json.loads(replay_evidence_path.read_text())
+                self.assertEqual(replayed, replay_evidence)
+                self.assertEqual(replay_evidence["ledger_before"], replay_evidence["ledger_after"])
+                self.assertEqual(replay_evidence["ledger_before"]["new_calls"], 184)
+                self.assertEqual(json.loads(original_recovery_bytes)["ledger_before"]["new_calls"], 182)
+                self.assertEqual(replay_evidence["replay_of"], {
+                    "path": str(recovery_path.relative_to(root)),
+                    "sha256": runner.sha(recovery_path)})
                 (folder / "generation/review/RESULT.json").write_text('{"verdict":"needs_changes"}')
                 with self.assertRaisesRegex(ValueError, "content rejection"):
                     runner.recover_read_proof("bookmark-manager", "r4")
-                self.assertEqual(revise.call_count, 2)
+                self.assertEqual(revise.call_count, 4)
                 (folder / "generation/review/DELIVERED.json").unlink()
                 with self.assertRaisesRegex(ValueError, "all three durable"):
                     runner.recover_read_proof("bookmark-manager", "r4")
-                self.assertEqual(catalog.import_reference.call_count, 2)
+                self.assertEqual(catalog.import_reference.call_count, 4)
 
     def test_same_run_replays_registration_and_recovers_import(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -145,6 +173,22 @@ class RevisionRunnerTests(unittest.TestCase):
                 first = runner.prepare("bookmark-manager")
                 self.assertEqual(first, runner.prepare("bookmark-manager"))
                 self.assertEqual(first["parents"]["author"]["path"], "old/bookmark-manager/generation/author/RESULT.json")
+                prior = new / "bookmark-manager/r2"
+                for stage in ("research", "author", "review"):
+                    stage_dir = prior / "generation" / stage
+                    stage_dir.mkdir(parents=True)
+                    (stage_dir / "RESULT.json").write_text(json.dumps({"verdict": "needs_changes"}))
+                    (stage_dir / "DELIVERED.json").write_text(json.dumps({"session_id": stage}))
+                failure = {"status": "failed", "error_type": "ValueError",
+                           "reason": "review lacks actual completed full-content read coverage for readable/source/upstream/docs.md",
+                           "completed_stages": ["research", "author", "review"]}
+                failure_bytes = json.dumps(failure).encode()
+                (prior / "OUTCOME.json").write_bytes(failure_bytes)
+                continuation = runner.prepare("bookmark-manager", "r3", "r2")
+                self.assertEqual(continuation["parents"]["review"]["sha256"],
+                                 runner.sha(prior / "generation/review/RESULT.json"))
+                self.assertIn("review_receipt", continuation["parents"])
+                self.assertEqual((prior / "OUTCOME.json").read_bytes(), failure_bytes)
                 (new / "USER_REQUEST.txt").write_text("different request")
                 with self.assertRaises(ValueError):
                     runner.prepare("bookmark-manager")

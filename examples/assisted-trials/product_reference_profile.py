@@ -1167,6 +1167,10 @@ def _generate(directory, inputs, snapshot, call, *, revision=None):
     if revision is not None:
         author_payload["revision"] = revision["author_context"]
         author_prompt += "\nThis is a bounded content revision. Read the complete parent reference, parent author result, deterministic diagnostics, and revision lineage in input.json. Fix every supplied issue and preserve all untouched valid requirements and graph fields. Prefer a minimal JSON Pointer patch result with only add/replace/remove operations; the host applies it to a copy and validates the complete reference. A complete reference result remains accepted for compatibility. Never manufacture or alter upstream observations."
+        if revision["lineage"].get("unqualified_parent_review_feedback") is not None:
+            author_prompt += (" Prior reviewer issues in revision lineage are unqualified needs_changes feedback from a delivered review whose "
+                              "read-coverage check failed. They are revision context, not a prior pass or a read-proof; "
+                              "do not repeat unsupported claims as host findings. The revised candidate will receive a new full review.")
     authored = _stage(directory, "author", author_payload, author_prompt, source_context, bound_call)
     authored_result = authored["result"]
     if not isinstance(authored_result, dict) or set(authored_result) not in (
@@ -1191,6 +1195,7 @@ def _generate(directory, inputs, snapshot, call, *, revision=None):
            for basis in spec["basis"]):
         raise ValueError("upstream basis entries must cite sources with specific fixed observed line ranges")
 
+    review_revision_record = None
     review_payload = {"reference": spec, "observations": observations, "research": research_result,
                       "observation_bindings": evidence_bindings,
                       "inputs": inputs, "snapshot_digest": snapshot_identity,
@@ -1199,10 +1204,20 @@ def _generate(directory, inputs, snapshot, call, *, revision=None):
                       "scope_slices": _scope_slices(spec, source_ids),
                       "prompts": {"research": digest(RESEARCH), "author": digest(author_prompt), "review": digest(REVIEW)}}
     if revision is not None:
-        review_payload["revision"] = {"parent_reference": revision["author_context"]["parent_reference"],
-                                       "author_result": authored_result,
-                                       "diagnostics": revision["author_context"]["diagnostics"],
-                                       "lineage": revision["lineage"]}
+        review_revision_record = {"parent_reference": revision["author_context"]["parent_reference"],
+                                  "author_result": authored_result,
+                                  "diagnostics": revision["author_context"]["diagnostics"],
+                                  "lineage": revision["lineage"]}
+        if revision["lineage"].get("unqualified_parent_review_feedback") is not None:
+            review_payload["read_coverage_requirements"] = {
+                "prior_review_was_unqualified": True,
+                "read_every_required_material_in_full": True,
+                "read_every_source_file_in_full": sorted(source_files),
+                "read_every_long_field_page_in_full": True,
+                "read_each_page_path_independently_including_duplicate_content_pages": True,
+                "do_not_limit_reads_to_cited_ranges": True,
+                "all_revision_issues_must_be_checked_even_if_other_issues_remain": True}
+        review_payload["revision"] = review_revision_record
     review_identity = digest(review_payload)
     _fixed(directory / "REVIEW_INPUT.json", review_payload)
     views = _materialize_read_views(directory, review_payload, source_files, source_ids)
@@ -1235,10 +1250,7 @@ def _generate(directory, inputs, snapshot, call, *, revision=None):
                  "snapshot_digest": snapshot_identity,
                  "prompts": {"research": digest(RESEARCH), "author": digest(author_prompt), "review": digest(REVIEW)},
                  **({"revision_lineage": revision["lineage"],
-                    "revision_record": {"parent_reference": revision["author_context"]["parent_reference"],
-                                        "author_result": authored_result,
-                                        "diagnostics": revision["author_context"]["diagnostics"],
-                                        "lineage": revision["lineage"]}}
+                    "revision_record": review_revision_record}
                     if revision is not None else {})})
         status = "static_review_passed"
     else:
@@ -1266,6 +1278,93 @@ def generate(directory, inputs, snapshot, call):
             return _generate(directory, inputs, snapshot, call)
         finally:
             fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+
+
+def _validate_unqualified_review_delivery(parent_directory, review_request, review_result,
+                                          review_receipt, source_files, snapshot, inputs=None):
+    """Authenticate a delivered needs_changes result without qualifying its reads.
+
+    This deliberately does not produce or validate a read-coverage proof. It is
+    only a provenance check for feedback after a recorded read-coverage failure.
+    """
+    parent_directory = Path(parent_directory)
+    checkpoint = parent_directory.parent / "official-checkpoints/review"
+    required = ("input.json", "BINDING.json", "DELIVERED.json", "RESULT.json",
+                "cli-summary.json", "original-response.json", "events.jsonl", "leaf.md")
+    if not checkpoint.is_dir() or any(not (checkpoint / name).is_file() for name in required):
+        raise ValueError("unqualified parent review lacks a complete official delivery checkpoint")
+    official_input = _json(checkpoint / "input.json")
+    official_binding = _json(checkpoint / "BINDING.json")
+    official_receipt = _json(checkpoint / "DELIVERED.json")
+    official_result = _json(checkpoint / "RESULT.json")
+    summary = _json(checkpoint / "cli-summary.json")
+    raw_response = _json(checkpoint / "original-response.json")
+    raw_events = [json.loads(line) for line in (checkpoint / "events.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+    if (official_input.get("profile_payload") != review_request
+            or official_result != review_result
+            or official_receipt != {"binding_digest": digest(official_binding),
+                                    "result_digest": digest(official_result)}
+            or official_binding.get("input_digest") != digest(official_input)
+            or official_binding.get("prompt") != REVIEW
+            or summary.get("delivery_status") != "delivered"
+            or summary.get("session_id") != review_receipt.get("session_id")
+            or summary.get("requested_model") != official_binding.get("model")
+            or official_binding.get("input_digest") != digest(official_input)):
+        raise ValueError("unqualified parent review official input/result/session/delivery binding differs")
+    if (checkpoint / "input.json").read_bytes() != (json.dumps(official_input, ensure_ascii=False, indent=1) + "\n").encode():
+        raise ValueError("unqualified parent review input is not canonical checkpoint JSON")
+    adapter = official_input.get("adapter", {})
+    if (adapter.get("stage") != "review" or adapter.get("model") != official_binding.get("model")
+            or adapter.get("prompt_sha256") != _sha(REVIEW.encode("utf-8"))
+            or adapter.get("source_tree_sha256") != digest(official_binding.get("source"))):
+        raise ValueError("unqualified parent review adapter metadata differs")
+    source_root = checkpoint / "source"
+    current_source = {p.relative_to(source_root).as_posix(): _sha(p.read_bytes())
+                      for p in sorted(source_root.rglob("*")) if p.is_file()}
+    review_manifest = _json(parent_directory / "READ_VIEWS.json")
+    expected_source = {"snapshot.json": _canonical({k: v for k, v in snapshot.items()
+                                                      if k != "local_root"}) + "\n"}
+    expected_source.update({"upstream/" + name: text for name, text in source_files.items()})
+    expected_source.update({"review/" + name: (parent_directory / name).read_text(encoding="utf-8")
+                            for name in review_manifest})
+    expected_source["review/READING_GUIDE.md"] = (parent_directory / "READING_GUIDE.md").read_text(encoding="utf-8")
+    expected_source["review/READ_VIEWS.json"] = (parent_directory / "READ_VIEWS.json").read_text(encoding="utf-8")
+    expected_hashes = {name: _sha(value.encode("utf-8")) for name, value in expected_source.items()}
+    if (official_binding.get("source") != expected_hashes or current_source != expected_hashes
+            or set(expected_source) != set(current_source)):
+        raise ValueError("unqualified parent review source tree differs from host-pinned review materials")
+    for name, text in expected_source.items():
+        if (source_root / name).read_bytes() != text.encode("utf-8"):
+            raise ValueError(f"unqualified parent review source material differs: {name}")
+    raw_path = checkpoint / "original-response.json"
+    if summary.get("original_response_sha256") != _sha(raw_path.read_bytes()):
+        raise ValueError("unqualified parent review raw response digest differs")
+    from template_factory.cli import parse_result
+    if parse_result(raw_response["text"]) != review_result:
+        raise ValueError("unqualified parent review raw response differs from delivered result")
+    if raw_events != review_receipt.get("read_events", []):
+        raise ValueError("unqualified parent review read events differ from official event log")
+    for event in raw_events:
+        if not isinstance(event, dict):
+            continue
+        part = event.get("part", {})
+        state = part.get("state", {}) if isinstance(part, dict) else {}
+        if (isinstance(part, dict) and part.get("tool") == "read"
+                and isinstance(state, dict) and state.get("status") == "completed"
+                and (event.get("sessionID") != summary.get("session_id")
+                     or part.get("sessionID") != summary.get("session_id"))):
+            raise ValueError("unqualified parent review read event belongs to a different session")
+    leaf = checkpoint / "leaf.md"
+    leaf_sha = _sha(leaf.read_bytes())
+    trusted_leaf = (inputs or {}).get("leaf") if isinstance(inputs, dict) else None
+    expected_leaf_sha = trusted_leaf.get("content_sha256") if isinstance(trusted_leaf, dict) else None
+    if (official_binding.get("leaf_sha256") != leaf_sha or adapter.get("leaf_sha256") != leaf_sha
+            or (isinstance(expected_leaf_sha, str) and expected_leaf_sha != leaf_sha)):
+        raise ValueError("unqualified parent review leaf binding differs")
+    return {"official_checkpoint_digest": digest({p.relative_to(checkpoint).as_posix(): _sha(p.read_bytes())
+                                                    for p in sorted(checkpoint.rglob("*"))
+                                                    if p.is_file() and ".git" not in p.parts}),
+            "session_id": summary["session_id"]}
 
 
 def _revise_unlocked(directory, inputs, snapshot, parent_directory, parent_author_result,
@@ -1369,11 +1468,12 @@ def _revise_unlocked(directory, inputs, snapshot, parent_directory, parent_autho
                            if any(item[1] == record["path"] for item in observations)}
     issues = diagnose_reference(parent_reference, source_ids=source_ids,
                                 observed_source_ids=observed_source_ids)
-    review_paths = [parent_directory / "REVIEW_INPUT.json", parent_directory / "REVIEW_RESULT.json",
+    review_paths = [parent_directory / "REVIEW_INPUT.json",
                     parent_directory / "review/BINDING.json", parent_directory / "review/RESULT.json",
                     parent_directory / "review/DELIVERED.json", parent_directory / "READ_VIEWS.json"]
     review_present = any(path.exists() for path in review_paths)
     review_issues = []
+    unqualified_feedback = None
     if review_present:
         if not all(path.is_file() for path in review_paths):
             raise ValueError("parent review checkpoint is incomplete")
@@ -1387,7 +1487,6 @@ def _revise_unlocked(directory, inputs, snapshot, parent_directory, parent_autho
         parent_review_binding = _json(parent_directory / "review/BINDING.json")
         parent_review_result = _json(parent_directory / "review/RESULT.json")
         parent_review_receipt = _json(parent_directory / "review/DELIVERED.json")
-        parent_review_record = _json(parent_directory / "REVIEW_RESULT.json")
         if (parent_review_binding.get("stage") != "review"
                 or parent_review_binding.get("payload_digest") != digest({
                     "input_digest": parent_review_identity,
@@ -1395,23 +1494,57 @@ def _revise_unlocked(directory, inputs, snapshot, parent_directory, parent_autho
                     "material_manifest": _json(parent_directory / "READ_VIEWS.json"),
                     "review_input": parent_review_input})
                 or parent_review_receipt.get("binding_digest") != digest(parent_review_binding)
-                or parent_review_receipt.get("result_digest") != digest(parent_review_result)
-                or parent_review_result != parent_review_record):
+                or parent_review_receipt.get("result_digest") != digest(parent_review_result)):
             raise ValueError("parent review result is not bound to its exact completed review input")
         parent_author_session = parent_author_receipt.get("session_id")
         parent_review_session = parent_review_receipt.get("session_id")
-        _verify_read_events(parent_review_receipt.get("read_events", []), parent_directory,
-                            _json(parent_directory / "READ_VIEWS.json"))
         checked_parent_review = validate_review(parent_review_result, parent_review_identity,
                                                 parent_author_session, parent_review_session,
                                                 len(observations))
         if checked_parent_review["verdict"] == "pass":
             raise ValueError("parent review passed; a prior pass cannot authorize a content revision")
+        parent_review_record_path = parent_directory / "REVIEW_RESULT.json"
+        if parent_review_record_path.is_file():
+            parent_review_record = _json(parent_review_record_path)
+            if parent_review_result != parent_review_record:
+                raise ValueError("parent review result is not bound to its exact completed review input")
+            _verify_read_events(parent_review_receipt.get("read_events", []), parent_directory,
+                                _json(parent_directory / "READ_VIEWS.json"))
+        else:
+            outcome_path = parent_directory.parent / "OUTCOME.json"
+            if not outcome_path.is_file():
+                raise ValueError("parent review is missing its validated result record")
+            parent_outcome = _json(outcome_path)
+            required_failure = "review lacks actual completed full-content read coverage for "
+            if (parent_outcome.get("status") != "failed"
+                    or parent_outcome.get("error_type") != "ValueError"
+                    or not isinstance(parent_outcome.get("reason"), str)
+                    or not parent_outcome["reason"].startswith(required_failure)
+                    or parent_outcome.get("completed_stages") != ["research", "author", "review"]
+                    or parent_outcome.get("revision_id") != parent_directory.parent.name
+                    or parent_outcome.get("leaf") != (inputs.get("leaf", {}).get("id")
+                                                       if isinstance(inputs.get("leaf"), dict)
+                                                       else inputs.get("leaf"))):
+                raise ValueError("unqualified parent review requires a completed read-coverage failure outcome")
+            if checked_parent_review["verdict"] != "needs_changes":
+                raise ValueError("unqualified parent feedback must be a valid needs_changes review")
+            delivery = _validate_unqualified_review_delivery(
+                parent_directory, _json(parent_directory / "review/INPUT.json"), parent_review_result,
+                parent_review_receipt, source_files, snapshot, inputs)
+            unqualified_feedback = {
+                "qualified": False, "verdict": "needs_changes",
+                "issues": checked_parent_review["issues"],
+                "review_result_sha256": _sha((parent_directory / "review/RESULT.json").read_bytes()),
+                "outcome_sha256": _sha(outcome_path.read_bytes()),
+                "official_delivery_digest": delivery["official_checkpoint_digest"],
+                "session_id": delivery["session_id"]}
         review_issues = checked_parent_review["issues"]
     elif not issues:
         raise ValueError("parent has no concrete deterministic diagnostics or completed needs_changes review")
+    feedback_label = ("parent review (unqualified needs_changes feedback; not a pass or read-coverage attestation): "
+                      if unqualified_feedback is not None else "parent review: ")
     revision_issues = sorted(set(issues) | {
-        "parent review: " + (item if isinstance(item, str) else _canonical(item))
+        feedback_label + (item if isinstance(item, str) else _canonical(item))
         for item in review_issues})
     destination = directory
     destination.mkdir(parents=True, exist_ok=True)
@@ -1440,6 +1573,8 @@ def _revise_unlocked(directory, inputs, snapshot, parent_directory, parent_autho
                "research_result_sha256": _sha((research_dir / "RESULT.json").read_bytes()),
                "adapter_research_checkpoint_digest": adapter_research_digest,
                "inputs_digest": inputs_digest, "snapshot_digest": snapshot_identity}
+    if unqualified_feedback is not None:
+        lineage["unqualified_parent_review_feedback"] = unqualified_feedback
     revision_context = {"revision_id": revision_id, "parent_author_result": parent_authored,
                         "parent_reference": parent_reference, "parent_reference_digest": digest(parent_reference),
                         "parent_author_sha256": parent_author_sha256,

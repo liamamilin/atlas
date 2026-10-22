@@ -1,4 +1,5 @@
 """Budget guard tests for the scoped product-reference pilot."""
+import hashlib
 import json
 from pathlib import Path
 import sqlite3
@@ -157,7 +158,6 @@ class ReferencePilotInputBindingTests(unittest.TestCase):
                 service._verify_leaf_input(binding, "bookmark-manager")
 
     def test_register_is_idempotent_and_rejects_conflicting_scope(self):
-        import hashlib
         from template_factory.budget import BudgetLedger
         from template_factory.reference_pilot import ReferencePilotService, PROFILE_SOURCE
         from template_factory.store import FactoryStore
@@ -459,8 +459,10 @@ class ReferencePilotInputBindingTests(unittest.TestCase):
                 (r3_research / name).write_bytes((r2_research / name).read_bytes())
             r3_author = r3_root / "author"
             r3_author.mkdir(parents=True)
-            r3_author_result = {"leaf": "bookmark-manager", "summary": "revised r3"}
-            r3_author_input = {"leaf": "bookmark-manager", "stage": "author", "revision": "r3"}
+            parent_reference = {"schema": "atlas.product-reference.v1", "product_shape": {"name": "Parent fixture"}}
+            r3_author_result = {"reference": parent_reference}
+            r3_author_input = {"leaf": "bookmark-manager", "stage": "author", "inputs": inputs,
+                               "revision": {"parent_reference": parent_reference}}
             (r3_author / "INPUT.json").write_text(json.dumps(r3_author_input))
             r3_author_binding = {"stage": "author", "payload_digest": digest(r3_author_input)}
             (r3_author / "BINDING.json").write_text(json.dumps(r3_author_binding))
@@ -468,7 +470,85 @@ class ReferencePilotInputBindingTests(unittest.TestCase):
             r3_session = "r3-author-session"
             (r3_author / "DELIVERED.json").write_text(json.dumps({"binding_digest": digest(r3_author_binding),
                 "result_digest": digest(r3_author_result), "read_events": [{"sessionID": r3_session}]}))
-            (r3_root.parent / "OUTCOME.json").write_text(json.dumps(r2_outcome))
+            profile = service._profile_module()
+            r3_review = r3_root / "review"
+            r3_review.mkdir(parents=True)
+            snapshot_path = pack / request["leaves"][0]["snapshot_path"]
+            snapshot = json.loads(snapshot_path.read_text())
+            source_files = profile._read_sources(snapshot)
+            expected_observations = profile._observations(
+                json.loads((r3_research / "RESULT.json").read_text())["observed_upstream"], snapshot,
+                inputs["trusted_source_ids"])
+            snapshot_identity = digest({"snapshot": snapshot,
+                                        "files": {name: hashlib.sha256(content.encode()).hexdigest()
+                                                  for name, content in source_files.items()}})
+            (r3_root / "BINDING.json").write_text(json.dumps({"snapshot_digest": snapshot_identity}))
+            review_payload = {"reference": parent_reference, "inputs": inputs,
+                              "snapshot_digest": snapshot_identity, "observations": expected_observations}
+            review_stage_input = {"input_digest": digest(review_payload), "checks": list(profile.CHECKS),
+                                  "material_manifest": {}, "review_input": review_payload}
+            review_result = {"input_digest": digest(review_payload), "own_questions": ["Is the review complete?"],
+                             "checks": {name: False for name in profile.CHECKS},
+                             "observations": [{"index": index, "accepted": False, "reason": "Coverage was incomplete."}
+                                              for index in range(len(expected_observations))],
+                             "verdict": "needs_changes", "issues": ["The review did not complete its read-coverage check."]}
+            review_session = "r3-review-session"
+            review_binding = {"stage": "review", "payload_digest": digest(review_stage_input)}
+            (r3_review / "INPUT.json").write_text(json.dumps(review_stage_input))
+            (r3_review / "BINDING.json").write_text(json.dumps(review_binding))
+            (r3_review / "RESULT.json").write_text(json.dumps(review_result))
+            review_events = [{"sessionID": review_session}]
+            review_delivery = {"binding_digest": digest(review_binding), "result_digest": digest(review_result),
+                               "session_id": review_session, "read_events": review_events}
+            (r3_review / "DELIVERED.json").write_text(json.dumps(review_delivery))
+            (r3_root / "READ_VIEWS.json").write_text("{}")
+            (r3_root / "READING_GUIDE.md").write_text("Fixture review guide\n")
+            r3_outcome = {"leaf": "bookmark-manager", "status": "failed", "error_type": "ValueError",
+                          "reason": "review lacks actual completed full-content read coverage for readable/fields/5bece732973c5228-0001.txt",
+                          "completed_stages": ["research", "author", "review"]}
+            (r3_root.parent / "OUTCOME.json").write_text(json.dumps(r3_outcome))
+            (r3_root.parent / "leaf.md").write_text("fixture leaf\n")
+            r3_official = r3_root.parent / "official-checkpoints"
+            official_review = r3_official / "review"
+            (official_review / "source/upstream").mkdir(parents=True)
+            (official_review / "source/review").mkdir(parents=True)
+            (official_review / "leaf.md").write_text((r3_root.parent / "leaf.md").read_text())
+            (official_review / "source/snapshot.json").write_text(
+                profile._canonical({key: value for key, value in snapshot.items() if key != "local_root"}) + "\n")
+            for name, content in source_files.items():
+                source_path = official_review / "source/upstream" / name
+                source_path.parent.mkdir(parents=True, exist_ok=True)
+                source_path.write_text(content)
+            for name, content in (("READ_VIEWS.json", "{}"), ("READING_GUIDE.md", "Fixture review guide\n")):
+                (official_review / "source/review" / name).write_text(content)
+            source_hashes = {path.relative_to(official_review / "source").as_posix():
+                             hashlib.sha256(path.read_bytes()).hexdigest()
+                             for path in sorted((official_review / "source").rglob("*")) if path.is_file()}
+            official_input = {"profile_payload": review_stage_input,
+                              "adapter": {"stage": "review", "model": "fixture-model",
+                                          "prompt_sha256": hashlib.sha256(profile.REVIEW.encode()).hexdigest(),
+                                          "source_tree_sha256": digest(source_hashes),
+                                          "leaf_sha256": hashlib.sha256((r3_root.parent / "leaf.md").read_bytes()).hexdigest()}}
+            official_input_path = official_review / "input.json"
+            official_input_path.write_text(json.dumps(official_input, ensure_ascii=False, indent=1) + "\n")
+            official_binding = {"model": "fixture-model", "input_digest": digest(official_input),
+                                "prompt": profile.REVIEW, "source": source_hashes,
+                                "leaf_sha256": hashlib.sha256((r3_root.parent / "leaf.md").read_bytes()).hexdigest()}
+            (official_review / "BINDING.json").write_text(json.dumps(official_binding))
+            (official_review / "RESULT.json").write_text(json.dumps(review_result))
+            (official_review / "DELIVERED.json").write_text(json.dumps({"binding_digest": digest(official_binding),
+                "result_digest": digest(review_result)}))
+            raw_response = json.dumps({"text": json.dumps(review_result)})
+            (official_review / "original-response.json").write_text(raw_response)
+            raw_response_sha = hashlib.sha256(raw_response.encode()).hexdigest()
+            (official_review / "cli-summary.json").write_text(json.dumps({"session_id": review_session,
+                "exit_code": 0, "delivery_status": "delivered", "requested_model": "fixture-model",
+                "reservation_id": "r3-review-call", "original_response_sha256": raw_response_sha}))
+            (official_review / "events.jsonl").write_text(json.dumps(review_events[0]) + "\n")
+            with store.connect(True) as con:
+                con.execute("INSERT INTO tf_budget_reservation(id,campaign_id,identity,phase,kind,status,created,job_id,stage,retry) VALUES(?,?,?,?,?,'completed',5,?,?,0)",
+                    ("r3-review-call", campaign, plan_id + ":bookmark-manager", phase, "review",
+                     "pilot-one:bookmark-manager:review:r3", "reference/review/pilot-one/r3"))
             with store.connect(True) as con:
                 con.execute("INSERT INTO tf_budget_reservation(id,campaign_id,identity,phase,kind,status,created,job_id,stage,retry) VALUES(?,?,?,?,?,'completed',5,?,?,0)",
                     ("r3-author-call", campaign, plan_id + ":bookmark-manager", phase, "production",
@@ -491,6 +571,10 @@ class ReferencePilotInputBindingTests(unittest.TestCase):
                                    "sha256": hashlib.sha256((r3_author / "DELIVERED.json").read_bytes()).hexdigest()},
                 "outcome": {"path": str(r3_root_rel.parent / "OUTCOME.json"),
                             "sha256": hashlib.sha256((r3_root.parent / "OUTCOME.json").read_bytes()).hexdigest()},
+                "review": {"path": str(r3_root_rel / "review/RESULT.json"),
+                           "sha256": hashlib.sha256((r3_review / "RESULT.json").read_bytes()).hexdigest()},
+                "review_receipt": {"path": str(r3_root_rel / "review/DELIVERED.json"),
+                                   "sha256": hashlib.sha256((r3_review / "DELIVERED.json").read_bytes()).hexdigest()},
             }
             r4_request = {**r3_request, "revision_id": "r4", "parent_revision": "r3",
                           "idempotency_key": "continue-r4",
@@ -507,16 +591,22 @@ class ReferencePilotInputBindingTests(unittest.TestCase):
             skipped_r3 = {**r4_request, "parent_revision": "r2", "idempotency_key": "skip-r3"}
             with self.assertRaises(FactoryError):
                 service.begin_revision("pilot-one", skipped_r3)
-            r4_receipt = service.begin_revision("pilot-one", r4_request)
-            self.assertEqual(r4_receipt["effective_max_calls"], 12)
-            self.assertEqual(service.get_revision("pilot-one", "bookmark-manager", "r4")["request_digest"],
-                             digest(r4_request))
+            with store.connect() as con:
+                parent_values = service._verify_revision_parents(r4_request, "bookmark-manager", con=con,
+                    pilot=con.execute("SELECT * FROM auxiliary_reference_pilot WHERE id='pilot-one'").fetchone(),
+                    original_request=request, prior=r3_request)
+            self.assertFalse(parent_values["unqualified_parent_review_feedback"]["qualified"])
+            with self.assertRaises(FactoryError) as exhausted:
+                service.begin_revision("pilot-one", r4_request)
+            self.assertEqual(exhausted.exception.code, "budget_exhausted")
+            with self.assertRaises(FactoryError):
+                service.get_revision("pilot-one", "bookmark-manager", "r4")
             with store.connect() as con:
                 self.assertEqual(con.execute("SELECT max_calls FROM auxiliary_reference_pilot WHERE id='pilot-one'").fetchone()[0], 6)
                 full = con.execute("SELECT status,max_calls,deadline FROM auxiliary_full_plan WHERE id=?", (plan_id,)).fetchone()
                 self.assertEqual(tuple(full), ("paused", 7200, 1795181744.123177))
                 self.assertEqual(con.execute("SELECT COUNT(*) FROM tf_budget_reservation WHERE campaign_id=? AND phase=? AND status!='not_started'",
-                                             (campaign, phase)).fetchone()[0], 4)
+                                             (campaign, phase)).fetchone()[0], 5)
             with store.connect(True) as con:
                 pilot = con.execute("SELECT * FROM auxiliary_reference_pilot WHERE id='pilot-one'").fetchone()
                 plan = con.execute("SELECT * FROM auxiliary_full_plan WHERE id=?", (plan_id,)).fetchone()

@@ -57,9 +57,19 @@ def prepare(leaf, revision="r2", parent_revision=None, host_revision_file=None):
                            "author": ref(generation / "author/RESULT.json"),
                            "author_receipt": ref(generation / "author/DELIVERED.json"),
                            "outcome": ref(parent / "OUTCOME.json")}}
-    if parent_revision and read(parent / "OUTCOME.json").get("status") == "needs_changes":
-        request["parents"]["review"] = ref(generation / "review/RESULT.json")
-        request["parents"]["review_receipt"] = ref(generation / "review/DELIVERED.json")
+    if parent_revision:
+        outcome = read(parent / "OUTCOME.json")
+        incomplete_rejection = (
+            outcome.get("status") == "failed" and outcome.get("error_type") == "ValueError"
+            and outcome.get("reason", "").startswith("review lacks actual completed full-content read coverage for ")
+            and outcome.get("completed_stages") == ["research", "author", "review"]
+            and (generation / "review/RESULT.json").is_file()
+            and read(generation / "review/RESULT.json").get("verdict") == "needs_changes")
+        if outcome.get("status") == "needs_changes" or incomplete_rejection:
+            # A read-incomplete rejection supplies bound repair hints only. The
+            # host and profile verify authenticity; a new full review is required.
+            request["parents"]["review"] = ref(generation / "review/RESULT.json")
+            request["parents"]["review_receipt"] = ref(generation / "review/DELIVERED.json")
     fixed_json(folder / "REQUEST.json", request)
     return request
 
@@ -211,7 +221,20 @@ def recover_read_proof(leaf, revision):
                     "read_proof": ref(folder / "generation/READ_COVERAGE_PROOF.json"),
                     "reference_zip": ref(Path(result["reference_zip"])), "catalog_id": imported["id"],
                     "application_runtime_status": "not_run", "publication_status": "not_published"}
-        fixed_json(folder / "RECOVERY_OUTCOME.json", recovery)
+        target = folder / "RECOVERY_OUTCOME.json"
+        if target.exists():
+            prior = read(target)
+            changing = {"ledger_before", "ledger_after", "host_revision_digest"}
+            if {k: v for k, v in prior.items() if k not in changing} != {
+                    k: v for k, v in recovery.items() if k not in changing}:
+                raise ValueError("recovery candidate identity differs from the preserved first receipt")
+            if prior == recovery:
+                return prior
+            # Other leaves can legitimately advance the shared ledger. Preserve
+            # first-run evidence, and bind this fresh zero-call state check to it.
+            recovery["replay_of"] = ref(target)
+            target = folder / ("RECOVERY_REPLAY." + digest(recovery) + ".json")
+        fixed_json(target, recovery)
         return recovery
 
 
