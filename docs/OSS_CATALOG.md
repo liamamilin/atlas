@@ -47,7 +47,7 @@ python3 application-atlas-production-pack/oss_batch.py resume --job batch_<id>
 
 - 首页使用轻量覆盖概览，只展示已有项目的类型；“我的收藏”可从主导航直接进入。新版使用指南位于 `/guide`，包含资料说明与本地服务排查。
 - [项目库](http://127.0.0.1:5188/discover)：选择任意现有叶子；展开“批量采集”可加入多个叶子、启动任务并观察进度。
-- 项目每页最多 24 个，可按名称或最近核验排序；页码、关键词及筛选保存在地址中，刷新与浏览器前进后退可恢复。清除筛选会保留当前类型。场景数量按全部筛选结果统计，不受分页影响。
+- 项目每页最多 24 个，默认“推荐”排序（搜索时名称命中优先，其余按收录时 GitHub Stars，已归档靠后），也可按名称或最近核验排序；卡片只显示要点，完整功能、场景适用依据、许可证核验与来源在项目详情页 `/repos/<仓库 ID>`，详情页附同场景的其他项目；页码、关键词及筛选保存在地址中，刷新与浏览器前进后退可恢复。清除筛选会保留当前类型。场景数量按全部筛选结果统计，不受分页影响。
 - 批量面板提供“仅处理已有候选”选项，进程中断和模型暂停时显示原因及继续按钮；查询参数保留搜索及筛选。
 - 单叶子“更新项目资料”仍执行一次更新；持续处理使用批量入口。
 - [设置](http://127.0.0.1:5188/settings)：保存、测试或清除 GitHub Token；留空保留，保存后立即使用，接口不回传明文，本机文件权限 0600。
@@ -64,6 +64,7 @@ python3 application-atlas-production-pack/oss_batch.py resume --job batch_<id>
 | `GET /api/oss/batches` | 最近批量任务 |
 | `GET /api/oss/batches/<id>` | 持久进度；发现进程已退出时标记中断 |
 | `POST /api/oss/batches/<id>/resume` | `{}`，继续未完成目标 |
+| `GET /api/oss/projects/<id>` | 单个项目卡片及其所属类型、场景 |
 | `POST /api/oss/projects/<id>/favorite` | `{favorite:boolean}` |
 | `GET/POST /api/settings/github` | 查看凭据状态、保存或清除 |
 | `POST /api/settings/github/test` | 测试连接并返回公开额度 |
@@ -71,7 +72,7 @@ python3 application-atlas-production-pack/oss_batch.py resume --job batch_<id>
 
 写接口沿用本机 Host、Origin 和 JSON 请求边界。叶子需存在于 Atlas 分类中；路径穿越、虚构仓库 ID、私有资料及凭据外传不属于放宽范围。
 
-浏览接口可传 `limit=1..100`、`offset=0..` 与 `sort=name|recent`；`pagination.total` 是分页前的匹配项目数。未传 `limit` 保留原来的完整读取行为，供导出与已有脚本使用。`view=overview` 只返回覆盖统计、场景及已有项目的类型，不返回项目正文或候选队列，供首页使用。
+浏览接口可传 `limit=1..100`、`offset=0..` 与 `sort=name|recent|recommended`；筛选与计数使用进程内索引（数据库有提交时自动重建，批量任务运行期间最多每 30 秒重建一次），只为当前页读取完整卡片；未选类型的分页请求只返回当前页用到的场景，不返回候选队列明细。`pagination.total` 是分页前的匹配项目数。未传 `limit` 保留原来的完整读取行为，供导出与已有脚本使用。`view=overview` 只返回覆盖统计、场景及已有项目的类型，不返回项目正文或候选队列，供首页使用。
 
 前端兼容尚未重启的旧 API，以本地分页保持可用；响应体缩减需新 API 生效。已有采集任务运行期间不要为了界面更新中断任务，待任务结束后再重启 API。
 

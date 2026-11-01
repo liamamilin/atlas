@@ -168,8 +168,9 @@ export function RepositoryCatalog({ leaf = "", showHeading = true }: { leaf?: st
         : data && <div aria-busy={catalog.loading} className={catalog.loading ? "opacity-60 transition-opacity" : ""}>
           {projects.length ? <div className="mt-4 grid gap-4 md:grid-cols-2">{projects.map(project => <RepositoryCard key={project.repository_id} project={project} scenarios={data.scenarios} onFavorite={() => setRevision(v => v + 1)} />)}</div>
             : <div className="mt-4 rounded-xl border border-dashed border-border bg-surface p-6 text-sm text-muted">
-              <p>{hasFilters ? (zh ? "没有符合当前筛选的项目。可以调整关键词、场景或许可状态。" : "No projects match these filters.") : page > 1 ? (zh ? "这一页没有项目。" : "No projects on this page.") : (zh ? "这个类型还没有已整理的项目。" : "No curated projects for this leaf yet.")}</p>
-              {hasFilters && <Button variant="outline" className="mt-4" onClick={clearFilters}>{zh ? "重置筛选" : "Reset filters"}</Button>}
+              <p>{favorites && !q && !scenario && !license ? (zh ? "还没有收藏项目。在项目卡片或详情页点书签图标即可收藏，收藏保存在本机。" : "No favorites yet. Use the bookmark icon on a card or detail page; favorites stay on this device.") : hasFilters ? (zh ? "没有符合当前筛选的项目。可以调整关键词、场景或许可状态。" : "No projects match these filters.") : page > 1 ? (zh ? "这一页没有项目。" : "No projects on this page.") : (zh ? "这个类型还没有已整理的项目。" : "No curated projects for this leaf yet.")}</p>
+              {favorites && !q && !scenario && !license ? <Link className="mt-4 inline-block text-primary underline" to="/discover">{zh ? "去发现项目" : "Discover projects"}</Link>
+                : hasFilters && <Button variant="outline" className="mt-4" onClick={clearFilters}>{zh ? "重置筛选" : "Reset filters"}</Button>}
               {page > 1 && <Button variant="outline" className="mt-4" onClick={() => filter("page", "1")}>{zh ? "返回第一页" : "First page"}</Button>}
               {leaf && leaf !== PKM_LEAF && <Link className="mt-3 block text-primary underline" to={`/types/${PKM_LEAF}`}>{zh ? "查看个人知识管理应用试点" : "Explore the personal knowledge pilot"}</Link>}
             </div>}
@@ -178,7 +179,7 @@ export function RepositoryCatalog({ leaf = "", showHeading = true }: { leaf?: st
             <div className="flex gap-2"><Button size="sm" variant="outline" disabled={page <= 1 || catalog.loading} onClick={() => filter("page", String(page - 1))}>{zh ? "上一页" : "Previous"}</Button><Button size="sm" variant="outline" disabled={page * PAGE_SIZE >= total || catalog.loading} onClick={() => filter("page", String(page + 1))}>{zh ? "下一页" : "Next"}</Button></div>
           </nav>}
         </div>}
-    {data && <div id="collection-tools" className="mt-12 border-t border-border pt-6">
+    {data && !favorites && <div id="collection-tools" className="mt-12 border-t border-border pt-6">
       <h2 className="font-serif text-xl font-medium">{zh ? "资料更新与采集" : "Collection and updates"}</h2>
       <p className="mt-2 text-xs leading-6 text-muted">{zh ? "需要补充更多项目时，可以在这里更新当前类型，或选择类型启动批量任务。自动发现：场景来自现有分类，项目来自真实搜索；资料不全先收录，合理推断标注待核实。" : "Refresh this type or start a batch when you want more projects. Scenarios come from the taxonomy and projects from live search; partial information is saved and inferences are labeled."}</p>
       {canRefresh && <Button className="mt-3" variant="outline" onClick={() => void refresh()} disabled={starting || !!activeId}>
@@ -240,7 +241,7 @@ export function RepositoryFacts({ project }: { project: RepositoryProject }) {
     <span className={`rounded-md px-2 py-1 ${license.status === "open_source" ? "bg-primary/10 text-primary" : "bg-warn/10 text-warn"}`} title={licenseLabels[license.status][zh ? 0 : 1]}>{license.spdx || (license.status === "source_available" ? (zh ? "源码可见" : "Source available") : (zh ? "许可待核验" : "Unverified license"))}</span>
     {project.project_type && <span className="py-1 text-subtle">{(projectTypeLabels[project.project_type] || projectTypeLabels.unknown)[zh ? 0 : 1]}</span>}
     {project.languages[0] && <span className="py-1 text-subtle">{project.languages[0]}</span>}
-    {project.completeness === "partial" && <span className="rounded bg-warn/10 px-2 py-1 text-warn">{zh ? "资料待补充" : "Partial information"}</span>}
+    {project.completeness === "partial" && <span className="py-1 text-subtle" title={zh ? "部分资料缺失，详情页列出待补项" : "Some facts are missing; see details"}>{zh ? "资料待补充" : "Partial information"}</span>}
     {project.archived && <span className="py-1 text-warn">{zh ? "仓库已归档" : "Archived repository"}</span>}
   </div>;
 }

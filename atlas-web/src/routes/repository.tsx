@@ -1,9 +1,9 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, Star } from "lucide-react";
 import { Loading, useAsync } from "@/components/loaders";
 import { Button } from "@/components/ui/button";
-import { FavoriteButton, RepositoryDetails, RepositoryFacts, useFavorite, useLeafNames } from "@/components/repository-catalog";
-import { getRepositoryProject, type RepositoryDetail } from "@/lib/oss-catalog";
+import { FavoriteButton, formatStars, RepositoryDetails, RepositoryFacts, useFavorite, useLeafNames } from "@/components/repository-catalog";
+import { getRepositoryCatalog, getRepositoryProject, type RepositoryDetail } from "@/lib/oss-catalog";
 import { useLang } from "@/lib/lang";
 
 export function Repository() {
@@ -60,5 +60,35 @@ function RepositoryPage({ detail }: { detail: RepositoryDetail }) {
       </div>
     </header>
     <div className="mt-10 border-t border-border pt-8"><RepositoryDetails project={project} scenarios={detail.scenarios} /></div>
+    <Related detail={detail} />
   </>;
+}
+
+/** Other projects for the same use: the strongest scenario fit, else the first type. */
+function Related({ detail }: { detail: RepositoryDetail }) {
+  const { lang } = useLang(); const zh = lang === "zh";
+  const leafName = useLeafNames();
+  const { project } = detail;
+  const match = project.matches.find(m => m.applicability === "direct") || project.matches[0];
+  const scenario = match && detail.scenarios.find(s => s.id === match.scenario_id);
+  const leaf = scenario?.leaf || detail.leaves[0]?.slug || "";
+  const related = useAsync(() => leaf
+    ? getRepositoryCatalog({ leaf, scenario: scenario?.id || "", limit: "7", sort: "recommended" })
+    : Promise.resolve(null), [project.repository_id, leaf, scenario?.id]);
+  const others = (related.data?.projects || []).filter(p => p.repository_id !== project.repository_id).slice(0, 6);
+  if (!leaf || (!related.loading && !others.length)) return null;
+  const more = scenario ? `/types/${leaf}?scenario=${encodeURIComponent(scenario.id)}` : `/types/${leaf}`;
+  return <section aria-labelledby="repo-related" className="mt-12 border-t border-border pt-8">
+    <div className="flex flex-wrap items-baseline justify-between gap-3">
+      <h2 id="repo-related" className="font-serif text-xl font-medium">{scenario ? (zh ? `同样适用于「${scenario.name}」` : `Also for “${scenario.name}”`) : (zh ? `同类型：${leafName(leaf)}` : `More ${leafName(leaf)}`)}</h2>
+      <Link to={more} className="text-sm text-primary hover:underline">{zh ? "查看全部" : "View all"} →</Link>
+    </div>
+    {related.loading ? <p role="status" className="mt-4 text-sm text-muted">{zh ? "读取相关项目…" : "Loading related projects…"}</p>
+      : <ul className="mt-4 grid gap-3 sm:grid-cols-2">{others.map(item => <li key={item.repository_id}>
+        <Link to={`/repos/${item.repository_id}`} className="interactive-card block h-full rounded-xl border border-border bg-surface p-4">
+          <span className="flex items-baseline justify-between gap-3"><span className="font-medium">{item.name}</span>{typeof item.stars === "number" && <span className="inline-flex shrink-0 items-center gap-1 text-xs tabular-nums text-muted"><Star className="size-3" aria-hidden="true" />{formatStars(item.stars)}</span>}</span>
+          <span className="mt-1 line-clamp-2 block text-xs leading-5 text-muted">{item.positioning || item.summary}</span>
+        </Link>
+      </li>)}</ul>}
+  </section>;
 }
