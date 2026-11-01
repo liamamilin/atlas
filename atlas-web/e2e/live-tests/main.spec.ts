@@ -63,7 +63,8 @@ test("real repository pagination stays bounded and survives reload", async ({ pa
   await page.goto("/discover");
   await expect(page.getByRole("article")).toHaveCount(24);
   await screenshot(page, info, "discover");
-  await page.getByRole("combobox", { name: "软件类型", exact: true }).selectOption("feed-reader");
+  await page.getByRole("combobox", { name: "软件类型", exact: true }).fill("feed-reader");
+  await page.getByRole("listbox", { name: "软件类型", exact: true }).getByRole("option").first().click();
   await expect(page.getByRole("article").first()).toHaveAccessibleName(first.projects[0].name);
   await page.getByRole("button", { name: "下一页", exact: true }).click();
   await expect(page).toHaveURL(/page=2/);
@@ -90,7 +91,8 @@ test("real type, scenario and license filters match API counts", async ({ page, 
   const leaf = "feed-reader";
   const data = await (await request.get(`/api/oss/catalog?leaf=${leaf}&limit=24`)).json();
   await page.goto("/discover");
-  await page.getByRole("combobox", { name: "软件类型", exact: true }).selectOption(leaf);
+  await page.getByRole("combobox", { name: "软件类型", exact: true }).fill(leaf);
+  await page.getByRole("listbox", { name: "软件类型", exact: true }).getByRole("option").first().click();
   await expect(page.getByRole("article")).toHaveCount(Math.min(24, data.pagination.total));
   const scenario = data.scenarios[0];
   await page.getByRole("button", { name: `${scenario.name} · ${scenario.project_count}`, exact: true }).click();

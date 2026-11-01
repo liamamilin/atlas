@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useLang } from "@/lib/lang";
 import { getMeta } from "@/lib/atlas";
 import { RepositoryBatch } from "@/components/repository-batch";
+import { TypePicker } from "@/components/type-picker";
 import {
   favoriteRepository, getCatalogRun, getRepositoryCatalog, PKM_LEAF, refreshRepositoryCatalog,
   type CatalogRun, type CatalogScenario, type Evidence, type LicenseStatus, type RepositoryProject,
@@ -117,7 +118,8 @@ export function RepositoryCatalog({ leaf = "", showHeading = true }: { leaf?: st
   const data = catalog.data;
   const total = data?.pagination?.total ?? data?.projects.length ?? 0;
   const projects = data?.pagination ? data.projects : data?.projects.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) || [];
-  const scenarios = data?.scenarios || [];
+  // While a new type loads, the previous response's scenarios belong to another type.
+  const scenarios = data && data.leaf === activeLeaf ? data.scenarios : [];
   const visibleScenarios = showAllScenarios ? scenarios : scenarios.filter((item, i) => i < 6 || item.id === scenario);
   const hasFilters = !!(q || scenario || favorites || license);
   const typeOptions = useMemo(() => (data?.supported_leaves || [])
@@ -138,7 +140,7 @@ export function RepositoryCatalog({ leaf = "", showHeading = true }: { leaf?: st
     </div>}
     {activeId && run && <p role="status" className="mt-4 flex items-center gap-2 text-xs text-muted"><RefreshCw className="size-3.5 animate-spin" />{zh ? `正在更新项目资料：${run.processed}/${run.total || "…"}` : `Updating repositories: ${run.processed}/${run.total || "…"}`}</p>}
     <form role="search" className="mt-6 flex flex-wrap items-end gap-3" onSubmit={event => { event.preventDefault(); filter("q", query.trim()); }}>
-      {!leaf && <label className="min-w-0 w-full text-xs text-muted sm:w-auto sm:max-w-64">{zh ? "软件类型" : "Type"}<select value={selectedLeaf} onChange={e => { setSelectedLeaf(e.target.value); filter("leaf", e.target.value); }} className="mt-1 block h-11 w-full max-w-full rounded-lg border border-border bg-surface px-3 text-sm text-fg"><option value="">{zh ? "全部类型" : "All types"}</option>{typeOptions.map(item => <option key={item.slug} value={item.slug}>{item.name} · {item.count}</option>)}</select></label>}
+      {!leaf && <div className="min-w-0 w-full text-xs text-muted sm:w-64"><span aria-hidden="true">{zh ? "软件类型" : "Type"}</span><TypePicker options={typeOptions} value={selectedLeaf} onChange={slug => { setSelectedLeaf(slug); filter("leaf", slug); }} /></div>}
       <label className="min-w-0 basis-48 flex-1 text-xs text-muted">{zh ? "搜索项目、功能或场景" : "Search projects, features or scenarios"}
         <input className="mt-1 block h-11 w-full rounded-lg border border-border bg-surface px-3 text-sm text-fg" value={query} onChange={e => setQuery(e.target.value)} placeholder={zh ? "例如：双向链接、Markdown、Foam" : "e.g. Markdown, Foam"} />
       </label>

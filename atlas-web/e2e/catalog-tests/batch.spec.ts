@@ -43,7 +43,8 @@ for (const leaf of leaves) {
 
 test("leaf selection, repository search and restricted licenses persist in URL", async ({ page }) => {
   await page.goto("/discover");
-  await page.getByRole("combobox", { name: "软件类型", exact: true }).selectOption("feed-reader");
+  await page.getByRole("combobox", { name: "软件类型", exact: true }).fill("feed-reader");
+  await page.getByRole("listbox", { name: "软件类型", exact: true }).getByRole("option").first().click();
   await expect(page).toHaveURL(/leaf=feed-reader/);
   await expect(page.locator("article[aria-label]")).toHaveCount(Math.min(24, savedProjects("feed-reader").length));
   await page.getByRole("textbox", { name: "搜索项目、功能或场景", exact: true }).fill("miniflux/v2");
