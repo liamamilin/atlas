@@ -17,7 +17,7 @@ export function Search() {
   const [revision, setRevision] = useState(0);
   useEffect(() => setQuery(q), [q]);
   const meta = useAsync(getMeta, [revision]);
-  const catalog = useAsync(() => q ? getRepositoryCatalog({ q, limit: "12" }) : Promise.resolve(null), [q, revision]);
+  const catalog = useAsync(() => q ? getRepositoryCatalog({ q, limit: "12", sort: "recommended" }) : Promise.resolve(null), [q, revision]);
   function submitSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const next = query.trim();

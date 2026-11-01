@@ -24,13 +24,17 @@ test("scenario filters, evidence, license and upstream links are usable", async 
   await page.reload();
   await expect(page.locator('article[aria-label]')).toHaveCount(3);
   const foam = page.getByRole("article", { name: "Foam", exact: true });
-  await foam.getByText("查看功能、适用范围与来源", { exact: true }).click();
-  await expect(foam.getByRole("link", { name: "许可证原文", exact: true })).toHaveAttribute("href", /^https:\/\/github.com\/foambubble\/foam\//);
-  await expect(foam.getByRole("link", { name: "查看 GitHub 项目", exact: true })).toHaveAttribute("href", "https://github.com/foambubble/foam");
-  await expect(foam.getByText("已核验开源许可证", { exact: true })).toBeVisible();
-  await foam.getByText("展开介绍与关联的原文依据", { exact: true }).click();
-  await expect(foam.locator("blockquote").first()).toBeVisible();
-  await expect(foam.locator('blockquote a').first()).toHaveAttribute("href", /^https:\/\/api.github.com\/repos\/foambubble\/foam\/git\/blobs\//);
+  await expect(foam.getByRole("link", { name: "GitHub", exact: true })).toHaveAttribute("href", "https://github.com/foambubble/foam");
+  await expect(foam.getByTitle("已核验开源许可证")).toBeVisible();
+  await foam.getByRole("link", { name: "查看详情", exact: true }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Foam" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "许可证原文", exact: true })).toHaveAttribute("href", /^https:\/\/github.com\/foambubble\/foam\//);
+  await expect(page.getByRole("link", { name: "在 GitHub 查看", exact: true })).toHaveAttribute("href", "https://github.com/foambubble/foam");
+  await page.getByText("展开介绍与关联的原文依据", { exact: true }).click();
+  await expect(page.locator("blockquote").first()).toBeVisible();
+  await expect(page.locator('blockquote a').first()).toHaveAttribute("href", /^https:\/\/api.github.com\/repos\/foambubble\/foam\/git\/blobs\//);
+  await page.goBack();
+  await expect(page.locator('article[aria-label]')).toHaveCount(3);
 });
 
 test("search includes repository facts and favorites survive reload", async ({ page }) => {

@@ -74,7 +74,7 @@ export function AppShell() {
   const links = [
     { to: "/", label: t("home", lang), icon: House, active: location.pathname === "/" },
     { to: "/browse", label: t("browse", lang), icon: Layers3, active: location.pathname === "/browse" || location.pathname.startsWith("/types/") },
-    { to: "/discover", label: zh ? "发现项目" : "Discover", icon: Compass, active: location.pathname === "/discover" && !favorites },
+    { to: "/discover", label: zh ? "发现项目" : "Discover", icon: Compass, active: (location.pathname === "/discover" && !favorites) || location.pathname.startsWith("/repos/") },
     { to: "/discover?favorites=1", label: zh ? "我的收藏" : "Favorites", icon: Bookmark, active: favorites },
     { to: "/search", label: zh ? "搜索" : "Search", icon: Search, active: location.pathname === "/search" },
   ];

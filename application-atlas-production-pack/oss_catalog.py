@@ -587,7 +587,7 @@ class CatalogStore:
             raise CatalogError("许可证筛选无效")
         if (limit is not None and (type(limit) is not int or not 1 <= limit <= 100)) or type(offset) is not int or offset < 0:
             raise CatalogError("分页参数无效")
-        if sort not in {"name", "recent"}:
+        if sort not in {"name", "recent", "recommended"}:
             raise CatalogError("排序参数无效")
         index = _CatalogIndex.get(self)
         with self.connect() as con:
@@ -626,6 +626,10 @@ class CatalogStore:
                  "favorites": sum(entry.repository_id in favorite_ids for entry, _ in selected)}
         if sort == "recent":
             selected.sort(key=lambda pair: (pair[0].checked_at, pair[0].full_name.casefold(), pair[0].repository_id), reverse=True)
+        elif sort == "recommended":
+            # Name hits first when searching, then active repositories by the
+            # star count recorded at collection time. Stable for equal keys.
+            selected.sort(key=lambda pair: (not (needle and needle in pair[0].title), pair[0].archived, -pair[0].stars))
         page = [] if overview else selected[offset:offset + limit if limit is not None else None]
         projects = self._cards(page, allowed, favorite_ids)
         if overview:
@@ -669,6 +673,7 @@ class CatalogStore:
                 continue
             card["favorite"] = entry.repository_id in favorite_ids
             card["leaves"] = list(entry.leaves)
+            card["stars"] = entry.stars if entry.stars >= 0 else None
             card["matches"] = matches.get(entry.repository_id, [])
             projects.append(card)
         return projects
@@ -684,6 +689,26 @@ class CatalogStore:
         return {"total": sum(counts.values()),
                 "counts": {state: counts.get(state, 0) for state in ("pending", "accepted", "partial", "rejected", "needs_evidence", "failed")},
                 "items": items}
+
+    def project(self, repo_id):
+        """One card with all its type memberships and scenario associations."""
+        index = _CatalogIndex.get(self)
+        entry = next((item for item in index.entries if item.repository_id == repo_id), None)
+        if entry is None:
+            raise CatalogError("项目不存在", 404)
+        with self.connect() as con:
+            favorite_ids = {row[0] for row in con.execute("SELECT repository_id FROM oss_project WHERE favorite=1 AND repository_id=?", (repo_id,))}
+        scenario_ids = set(entry.matches)
+        cards = self._cards([(entry, list(entry.matches))], scenario_ids, favorite_ids)
+        if not cards:
+            raise CatalogError("项目不存在", 404)
+        names = {PILOT_LEAF: "个人知识管理应用", **available_leaves()}
+        scenarios = [dict(item) for item in index.scenarios if item["id"] in scenario_ids]
+        for item in scenarios:
+            item["leaf_name"] = names.get(item["leaf"], item["leaf"])
+        slugs = list(dict.fromkeys([*entry.leaves, *(item["leaf"] for item in scenarios)]))
+        return {"project": cards[0], "scenarios": scenarios,
+                "leaves": [{"slug": slug, "name": names.get(slug, slug)} for slug in slugs]}
 
     def favorite(self, repo_id, value):
         if not isinstance(value, bool):
@@ -805,15 +830,19 @@ def _file_key(path):
 
 
 class _Entry:
-    __slots__ = ("repository_id", "full_name", "checked_at", "license", "leaves", "matches", "text")
+    __slots__ = ("repository_id", "full_name", "checked_at", "license", "leaves", "matches", "text",
+                 "title", "archived", "stars")
 
-    def __init__(self, card, leaves, matches):
+    def __init__(self, card, leaves, matches, stars):
         self.repository_id = card["repository_id"]
         self.full_name = card["full_name"]
         self.checked_at = card["checked_at"]
         self.license = card["license"]["status"]
         self.leaves = tuple(leaves)
         self.matches = matches
+        self.title = (card["name"] + " " + card["full_name"]).casefold()
+        self.archived = bool(card.get("archived"))
+        self.stars = stars if isinstance(stars, int) else -1
         self.text = " ".join([card["name"], card["full_name"], card["positioning"], card["summary"], card["scope"],
                               *card["languages"], card["license"].get("spdx") or "",
                               *(f["text"] for f in card["features"])]).casefold()
@@ -880,7 +909,10 @@ class _CatalogIndex:
             leaves = {}
             for slug, rid in con.execute("SELECT leaf,repository_id FROM oss_leaf_project"):
                 leaves.setdefault(rid, []).append(slug)
-            self.entries = [_Entry(json.loads(row[1]), leaves.get(row[0], []), matches.get(row[0], {}))
+            # Star counts come from the search metadata saved with candidates.
+            stars = dict(con.execute("""SELECT repository_id,MAX(json_extract(data,'$.meta.stargazers_count'))
+                FROM oss_candidate GROUP BY repository_id"""))
+            self.entries = [_Entry(json.loads(row[1]), leaves.get(row[0], []), matches.get(row[0], {}), stars.get(row[0]))
                             for row in con.execute("SELECT repository_id,data FROM oss_project ORDER BY full_name")]
         self.scenario_text = {s["id"]: (s["name"] + " " + s["description"]).casefold() for s in self.scenarios}
         self.version = version
@@ -903,6 +935,9 @@ def dispatch(method, path, query, body=None):
     if path.startswith("/api/oss/batches"):
         from oss_batch import dispatch_batch
         return dispatch_batch(store, method, path, body)
+    match = re.fullmatch(r"/api/oss/projects/(\d{1,12})", path)
+    if method == "GET" and match:
+        return store.project(int(match[1])), 200
     if method == "GET" and re.fullmatch(r"/api/oss/runs/oss_[0-9a-f]{32}", path):
         return store.run(path.rsplit("/", 1)[1]), 200
     if method == "POST":

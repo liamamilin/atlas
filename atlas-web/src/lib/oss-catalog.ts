@@ -16,7 +16,11 @@ export type RepositoryProject = {
   sources: RepositorySource[]; checked_at: string; favorite: boolean; editorial_method: string;
   quality_review?: { reason: string; reviewed_at: string };
   completeness?: "complete" | "partial"; missing_fields?: string[]; collection_notes?: string[]; project_type?: string;
+  /** GitHub star count recorded when the repository was collected. */
+  stars?: number | null;
 };
+export type CatalogScenario = { id: string; name: string; description: string; project_count?: number; leaf?: string; leaf_name?: string };
+export type RepositoryDetail = { project: RepositoryProject; scenarios: CatalogScenario[]; leaves: { slug: string; name: string }[] };
 export type CatalogRun = {
   id: string; status: "running" | "completed" | "partial" | "failed" | "interrupted" | "paused_model";
   leaf?: string;
@@ -46,6 +50,7 @@ async function request<T>(path: string, body?: unknown): Promise<T> {
 export function getRepositoryCatalog(filters: Record<string, string> = {}) {
   return request<RepositoryCatalogData>(`catalog?${new URLSearchParams(filters)}`);
 }
+export const getRepositoryProject = (id: string) => request<RepositoryDetail>(`projects/${encodeURIComponent(id)}`);
 export const refreshRepositoryCatalog = (leaf = PKM_LEAF) => request<CatalogRun>("refresh", { leaf });
 export const getCatalogRun = (id: string) => request<CatalogRun>(`runs/${encodeURIComponent(id)}`);
 export const favoriteRepository = (id: number, favorite: boolean) => request(`projects/${id}/favorite`, { favorite });

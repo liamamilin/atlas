@@ -55,8 +55,8 @@ test("taxonomy filters and opens a real type with a readable canonical source", 
 
 test("real repository pagination stays bounded and survives reload", async ({ page, request }, info) => {
   // A completed type provides stable page membership while other types collect.
-  const first = await (await request.get("/api/oss/catalog?leaf=feed-reader&limit=24&offset=0")).json();
-  const second = await (await request.get("/api/oss/catalog?leaf=feed-reader&limit=24&offset=24")).json();
+  const first = await (await request.get("/api/oss/catalog?leaf=feed-reader&limit=24&offset=0&sort=recommended")).json();
+  const second = await (await request.get("/api/oss/catalog?leaf=feed-reader&limit=24&offset=24&sort=recommended")).json();
   expect(first.pagination.total).toBeGreaterThan(24);
   expect(second.projects).toHaveLength(24);
   expect(first.projects.some((p: { repository_id: number }) => second.projects.some((q: { repository_id: number }) => p.repository_id === q.repository_id))).toBe(false);
@@ -73,14 +73,16 @@ test("real repository pagination stays bounded and survives reload", async ({ pa
 });
 
 test("real project evidence, license and GitHub links expand correctly", async ({ page }, info) => {
-  await page.goto("/discover?q=Foam");
+  // The real catalog mentions Foam in many cards; the repository name is unique.
+  await page.goto("/discover?q=foambubble%2Ffoam");
   const card = page.getByRole("article", { name: "Foam", exact: true });
-  await expect(page.getByRole("article")).toHaveCount(1);
-  await card.getByText("查看功能、适用范围与来源", { exact: true }).click();
-  await expect(card.getByRole("link", { name: "许可证原文", exact: true })).toHaveAttribute("href", /^https:\/\/github.com\/foambubble\/foam\//);
-  await expect(card.getByRole("link", { name: "查看 GitHub 项目", exact: true })).toHaveAttribute("href", "https://github.com/foambubble/foam");
-  await card.getByText("展开介绍与关联的原文依据", { exact: true }).click();
-  await expect(card.locator("blockquote").first()).toBeVisible();
+  await expect(page.getByRole("article").first()).toHaveAccessibleName("Foam");
+  await expect(card.getByRole("link", { name: "GitHub", exact: true })).toHaveAttribute("href", "https://github.com/foambubble/foam");
+  await card.getByRole("link", { name: "查看详情", exact: true }).click();
+  await expect(page.getByRole("link", { name: "许可证原文", exact: true })).toHaveAttribute("href", /^https:\/\/github.com\/foambubble\/foam\//);
+  await expect(page.getByRole("link", { name: "在 GitHub 查看", exact: true })).toHaveAttribute("href", "https://github.com/foambubble/foam");
+  await page.getByText("展开介绍与关联的原文依据", { exact: true }).click();
+  await expect(page.locator("blockquote").first()).toBeVisible();
   await screenshot(page, info, "project-evidence");
 });
 

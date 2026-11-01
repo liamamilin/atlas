@@ -17,6 +17,7 @@ const Tutorial = lazy(() => import("@/routes/tutorial").then(({ Tutorial: page }
 const Settings = lazy(() => import("@/routes/settings").then(({ Settings: page }) => ({ default: page })));
 const Ask = lazy(() => import("@/routes/ask").then(({ Ask: page }) => ({ default: page })));
 const Factory = lazy(() => import("@/routes/factory").then(({ Factory: page }) => ({ default: page })));
+const Repository = lazy(() => import("@/routes/repository").then(({ Repository: page }) => ({ default: page })));
 const Discover = lazy(() => import("@/routes/discover").then(({ Discover: page }) => ({ default: page })));
 const History = lazy(() => import("@/routes/history").then(({ History: page }) => ({ default: page })));
 const Guide = lazy(() => import("@/routes/guide").then(({ Guide: page }) => ({ default: page })));
@@ -66,6 +67,7 @@ export default function App() {
         <Route path="/types/:slug" element={<Page><Leaf /></Page>} />
         <Route path="/search" element={<Page><Search /></Page>} />
         <Route path="/discover" element={<Page><Discover /></Page>} />
+        <Route path="/repos/:id" element={<Page><Repository /></Page>} />
         <Route path="/history" element={<Page><History /></Page>} />
         <Route path="/history/types/:slug" element={<Page><HistoricalLeaf /></Page>} />
         <Route path="/apps" element={<Page><Apps /></Page>} />

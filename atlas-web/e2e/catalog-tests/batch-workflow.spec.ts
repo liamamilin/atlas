@@ -32,20 +32,25 @@ test("choose existing non-pilot leaves, start a batch and resume saved progress"
 });
 
 test("partial projects remain browsable without scenario links or quotes", async ({ page }) => {
+  let sparse: Record<string, unknown> = {};
+  await page.route("**/api/oss/projects/*", route => route.fulfill({ json: { project: sparse, scenarios: [], leaves: [{ slug: "feed-reader", name: "Feed Reader" }] } }));
   await page.route("**/api/oss/catalog?**", async route => {
     const response = await route.fetch(); const data = await response.json();
     const proof = { source_url: "https://api.github.com/repos/test/sparse", immutable_url: "", source_sha256: "a".repeat(64), excerpt: "", verification: "source_based" };
     data.projects = [{ ...data.projects[0], name: "Sparse project", full_name: "test/sparse", positioning: "候选项目 · 定位待补充", summary: "来自仓库元数据的初步介绍", scope: "适用范围待补充", matches: [], features: [], completeness: "partial", missing_fields: ["features", "scenario_associations", "license_verification"], summary_evidence: proof, scope_evidence: proof, positioning_evidence: proof, generation_method: "live_search_coverage_first", license: { status: "pending", spdx: null, note: "许可证未核验", source: null }, collection_notes: ["README 暂不可读"] }];
+    sparse = data.projects[0];
     return route.fulfill({ json: data });
   });
   await page.goto("/discover?leaf=feed-reader");
   const card = page.getByRole("article", { name: "Sparse project", exact: true });
-  await expect(card.getByText("已收录 · 资料待补充", { exact: true })).toBeVisible();
-  await card.getByText("查看功能、适用范围与来源", { exact: true }).click();
-  await expect(card.getByText("功能说明待补充", { exact: true })).toBeVisible();
-  await expect(card.getByText("README 暂不可读", { exact: true })).toBeVisible();
-  await card.getByText("展开介绍与关联的原文依据", { exact: true }).click();
-  await expect(card.getByText("依据下方资料概述，未附逐字引文。", { exact: true }).first()).toBeVisible();
+  await expect(card.getByText("资料待补充", { exact: true })).toBeVisible();
+  await card.getByRole("link", { name: "查看详情", exact: true }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Sparse project" })).toBeVisible();
+  await expect(page.getByText("尚未建立场景关联；仍可按类型浏览。", { exact: true })).toBeVisible();
+  await expect(page.getByText("功能说明待补充", { exact: true })).toBeVisible();
+  await expect(page.getByText("README 暂不可读", { exact: true })).toBeVisible();
+  await page.getByText("展开介绍与关联的原文依据", { exact: true }).click();
+  await expect(page.getByText("依据下方资料概述，未附逐字引文。", { exact: true }).first()).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });

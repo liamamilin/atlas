@@ -15,8 +15,8 @@ test("overview returns coverage without full project cards and home stays bounde
 });
 
 test("pagination keeps every project reachable, survives reload and resets on filters", async ({ page, request }) => {
-  const first = await (await request.get("/api/oss/catalog?leaf=feed-reader&limit=24")).json();
-  const second = await (await request.get("/api/oss/catalog?leaf=feed-reader&limit=24&offset=24")).json();
+  const first = await (await request.get("/api/oss/catalog?leaf=feed-reader&limit=24&sort=recommended")).json();
+  const second = await (await request.get("/api/oss/catalog?leaf=feed-reader&limit=24&offset=24&sort=recommended")).json();
   expect(first.pagination.total).toBeGreaterThan(24);
   expect(second.scenarios).toEqual(first.scenarios);
   expect(first.projects.some((p: { repository_id: number }) => second.projects.some((s: { repository_id: number }) => s.repository_id === p.repository_id))).toBe(false);
