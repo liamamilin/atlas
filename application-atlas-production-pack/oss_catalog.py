@@ -379,6 +379,15 @@ class CatalogStore:
     def __init__(self, path=None, bootstrap=True):
         self.path = Path(path or os.environ.get("ATLAS_OSS_STORE", PACK / "atlas/oss-catalog.sqlite"))
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        # The API builds a store per request; schema checks, association backfill
+        # and snapshot bootstrap only need to run once per database file.
+        ready = (_file_key(self.path), bool(bootstrap and os.environ.get("ATLAS_OSS_BOOTSTRAP") != "0"))
+        if ready[0] and ready in _READY:
+            return
+        self._initialize(bootstrap)
+        _READY.add((_file_key(self.path), ready[1]))
+
+    def _initialize(self, bootstrap):
         with self.connect() as con:
             con.execute("PRAGMA journal_mode=WAL")
             con.executescript("""
@@ -414,6 +423,7 @@ class CatalogStore:
                   selected_count INTEGER NOT NULL, candidate_total INTEGER NOT NULL,
                   deferred_count INTEGER NOT NULL, state TEXT NOT NULL, data TEXT NOT NULL,
                   PRIMARY KEY(job_id,leaf));
+                CREATE INDEX IF NOT EXISTS oss_project_favorite ON oss_project(favorite);
             """)
             con.execute("INSERT OR IGNORE INTO oss_leaf_project SELECT DISTINCT s.leaf,m.repository_id FROM oss_match m JOIN oss_scenario s ON s.id=m.scenario_id")
         if bootstrap and os.environ.get("ATLAS_OSS_BOOTSTRAP") != "0" and (DATA / "pilot.snapshot.json").exists():
@@ -579,84 +589,110 @@ class CatalogStore:
             raise CatalogError("分页参数无效")
         if sort not in {"name", "recent"}:
             raise CatalogError("排序参数无效")
+        index = _CatalogIndex.get(self)
         with self.connect() as con:
-            con.execute("BEGIN")
-            scenarios = [{**json.loads(row["data"]), "leaf": row["leaf"]} for row in con.execute(
-                "SELECT leaf,data FROM oss_scenario WHERE (?='' OR leaf=?) ORDER BY position,id", (leaf, leaf))]
-            allowed = {s["id"] for s in scenarios}
-            rows = con.execute("SELECT data,favorite FROM oss_project ORDER BY full_name").fetchall()
-            all_matches = [dict(row) for row in con.execute("SELECT * FROM oss_match")]
-            memberships = [(row[0], row[1]) for row in con.execute("SELECT leaf,repository_id FROM oss_leaf_project")]
+            favorite_ids = {row[0] for row in con.execute("SELECT repository_id FROM oss_project WHERE favorite=1")}
             latest = con.execute("SELECT data FROM oss_run WHERE (?='' OR leaf=?) ORDER BY rowid DESC LIMIT 1", (leaf, leaf)).fetchone()
-        # Build associations once rather than rescanning every association for
-        # every card. Counts and filtering always precede pagination.
-        matches_by_repo = {}
-        for match in all_matches:
-            if match["scenario_id"] in allowed:
-                matches_by_repo.setdefault(match["repository_id"], []).append(json.loads(match["data"]))
-        leaves_by_repo = {}
-        for slug, rid in memberships:
-            leaves_by_repo.setdefault(rid, []).append(slug)
-        scenario_text = {s["id"]: s["name"] + " " + s["description"] for s in scenarios}
-        projects = []
-        for row in rows:
-            card = json.loads(row["data"])
-            card["favorite"] = bool(row["favorite"])
-            card["leaves"] = leaves_by_repo.get(card["repository_id"], [])
-            card["matches"] = matches_by_repo.get(card["repository_id"], [])
-            if (leaf and leaf not in card["leaves"] and not card["matches"]) or (not leaf and not card["leaves"] and not card["matches"]) or (scenario and not any(m["scenario_id"] == scenario for m in card["matches"])):
+        scenarios = [dict(item) for item in index.scenarios if not leaf or item["leaf"] == leaf]
+        allowed = {item["id"] for item in scenarios}
+        needle = q.casefold()
+        scenario_hits = {item["id"] for item in scenarios if needle and needle in index.scenario_text[item["id"]]}
+        # Filtering, counts and sorting use the in-memory index; full cards are
+        # read only for the returned page.
+        selected = []
+        for entry in index.entries:
+            matched = [sid for sid in entry.matches if sid in allowed]
+            if (leaf and leaf not in entry.leaves and not matched) or (not leaf and not entry.leaves and not matched) or (scenario and scenario not in matched):
                 continue
-            if license_status and card["license"]["status"] != license_status:
+            if license_status and entry.license != license_status:
                 continue
-            if favorites and not card["favorite"]:
+            if favorites and entry.repository_id not in favorite_ids:
                 continue
-            searchable = " ".join([card["name"], card["full_name"], card["positioning"], card["summary"], card["scope"],
-                                   *card["languages"], card["license"].get("spdx") or "",
-                                   *(f["text"] for f in card["features"]), *(m["reason"] for m in card["matches"]),
-                                   *(condition for m in card["matches"] for condition in m.get("conditions", [])),
-                                   *(scenario_text[m["scenario_id"]] for m in card["matches"])]) if q else ""
-            if q and q.casefold() not in searchable.casefold():
+            if needle and needle not in entry.text and not any(needle in entry.matches[sid] or sid in scenario_hits for sid in matched):
                 continue
-            projects.append(card)
-        scenario_leaf = {s["id"]: s["leaf"] for s in scenarios}
+            selected.append((entry, matched))
+        scenario_leaf = {item["id"]: item["leaf"] for item in scenarios}
         scenario_counts = {}
         leaf_counts = {}
-        for card in projects:
-            for match in card["matches"]:
-                scenario_counts[match["scenario_id"]] = scenario_counts.get(match["scenario_id"], 0) + 1
-            for slug in set(card["leaves"]) | {scenario_leaf[m["scenario_id"]] for m in card["matches"]}:
+        for entry, matched in selected:
+            for sid in matched:
+                scenario_counts[sid] = scenario_counts.get(sid, 0) + 1
+            for slug in set(entry.leaves) | {scenario_leaf[sid] for sid in matched}:
                 leaf_counts[slug] = leaf_counts.get(slug, 0) + 1
         for item in scenarios:
             item["project_count"] = scenario_counts.get(item["id"], 0)
-        total = len(projects)
+        total = len(selected)
         stats = {"projects": total, "scenarios": len(scenarios), "leaves": len(leaf_counts),
-                 "favorites": sum(p["favorite"] for p in projects)}
+                 "favorites": sum(entry.repository_id in favorite_ids for entry, _ in selected)}
         if sort == "recent":
-            projects.sort(key=lambda p: (p["checked_at"], p["full_name"].casefold(), p["repository_id"]), reverse=True)
-        projects = [] if overview else projects[offset:offset + limit if limit is not None else None]
-        # Candidate payloads include saved source material; the landing page
-        # needs only coverage counts and never reads this queue.
-        candidates = [] if overview else self.candidates(leaf)
+            selected.sort(key=lambda pair: (pair[0].checked_at, pair[0].full_name.casefold(), pair[0].repository_id), reverse=True)
+        page = [] if overview else selected[offset:offset + limit if limit is not None else None]
+        projects = self._cards(page, allowed, favorite_ids)
+        if overview:
+            # The landing page needs coverage counts and the pilot scenarios only.
+            scenarios = [item for item in scenarios if item["leaf"] == PILOT_LEAF]
+        elif not leaf and limit is not None:
+            # A paged listing without a type filter returns only scenarios the
+            # page can show; full reads (exports) keep every scenario.
+            shown = {match["scenario_id"] for card in projects for match in card["matches"]} | {scenario}
+            scenarios = [item for item in scenarios if item["id"] in shown]
         return {"leaf": leaf, "scenarios": scenarios, "projects": projects,
                 "stats": stats,
                 "pagination": {"total": total, "offset": offset, "limit": limit,
                                "has_more": not overview and offset + len(projects) < total},
-                "discovery": {"total": len(candidates), "counts": {state: sum(c["status"] == state for c in candidates)
-                               for state in ("pending", "accepted", "partial", "rejected", "needs_evidence", "failed")},
-                              "items": [{"repository_id": c["repository_id"], "leaf": c["leaf"], "full_name": c["data"]["meta"]["full_name"],
-                                         "github_url": c["data"]["meta"]["html_url"], "status": c["status"], "reason": c["reason"]} for c in candidates]},
+                "discovery": {"total": 0, "counts": {}, "items": []} if overview else self._discovery(leaf),
                 "latest_run": json.loads(latest[0]) if latest else None, "pilot_leaf": PILOT_LEAF,
                 "supported_leaves": [{"slug": slug, "name": name, "mode": "curated" if slug == PILOT_LEAF else "automatic",
                                       "project_count": leaf_counts.get(slug, 0)}
                                      for slug, name in {PILOT_LEAF: "个人知识管理应用", **available_leaves()}.items()
                                      if not overview or slug in leaf_counts]}
 
+    def _cards(self, page, allowed, favorite_ids):
+        if not page:
+            return []
+        ids = [entry.repository_id for entry, _ in page]
+        cards = {}
+        matches = {}
+        with self.connect() as con:
+            for start in range(0, len(ids), 500):
+                chunk = ids[start:start + 500]
+                marks = ",".join("?" * len(chunk))
+                for row in con.execute(f"SELECT repository_id,data FROM oss_project WHERE repository_id IN ({marks})", chunk):
+                    cards[row[0]] = json.loads(row[1])
+                for row in con.execute(f"SELECT repository_id,scenario_id,data FROM oss_match WHERE repository_id IN ({marks}) ORDER BY rowid", chunk):
+                    if row[1] in allowed:
+                        matches.setdefault(row[0], []).append(json.loads(row[2]))
+        projects = []
+        for entry, _ in page:
+            card = cards.get(entry.repository_id)
+            if card is None:
+                continue
+            card["favorite"] = entry.repository_id in favorite_ids
+            card["leaves"] = list(entry.leaves)
+            card["matches"] = matches.get(entry.repository_id, [])
+            projects.append(card)
+        return projects
+
+    def _discovery(self, leaf):
+        # Candidate rows carry saved source material; never load it for a listing.
+        with self.connect() as con:
+            counts = dict(con.execute("SELECT status,COUNT(*) FROM oss_candidate WHERE (?='' OR leaf=?) GROUP BY status", (leaf, leaf)))
+            items = [] if not leaf else [
+                {"repository_id": row[0], "leaf": row[1], "full_name": row[2], "github_url": row[3], "status": row[4], "reason": row[5]}
+                for row in con.execute("""SELECT repository_id,leaf,json_extract(data,'$.meta.full_name'),
+                    json_extract(data,'$.meta.html_url'),status,reason FROM oss_candidate WHERE leaf=? ORDER BY repository_id""", (leaf,))]
+        return {"total": sum(counts.values()),
+                "counts": {state: counts.get(state, 0) for state in ("pending", "accepted", "partial", "rejected", "needs_evidence", "failed")},
+                "items": items}
+
     def favorite(self, repo_id, value):
         if not isinstance(value, bool):
             raise CatalogError("favorite 必须是布尔值")
-        with self.connect() as con:
-            if not con.execute("UPDATE oss_project SET favorite=? WHERE repository_id=?", (int(value), repo_id)).rowcount:
-                raise CatalogError("项目不存在", 404)
+        def write():
+            with self.connect() as con:
+                return con.execute("UPDATE oss_project SET favorite=? WHERE repository_id=?", (int(value), repo_id)).rowcount
+        if not _CatalogIndex.absorb_own_write(self, write):
+            raise CatalogError("项目不存在", 404)
         return {"repository_id": repo_id, "favorite": value}
 
     def _lock(self):
@@ -755,6 +791,101 @@ class CatalogStore:
         projects = [{k: v for k, v in card.items() if k != "favorite"} for card in data["projects"]]
         atomic_json(path, {"schema": "atlas.oss-catalog.v1", "exported_at": now(),
                            "scenarios": manifest()["scenarios"], "projects": projects})
+
+
+
+_READY = set()
+
+
+def _file_key(path):
+    try:
+        return str(Path(path).resolve()), os.stat(path).st_ino
+    except OSError:
+        return None
+
+
+class _Entry:
+    __slots__ = ("repository_id", "full_name", "checked_at", "license", "leaves", "matches", "text")
+
+    def __init__(self, card, leaves, matches):
+        self.repository_id = card["repository_id"]
+        self.full_name = card["full_name"]
+        self.checked_at = card["checked_at"]
+        self.license = card["license"]["status"]
+        self.leaves = tuple(leaves)
+        self.matches = matches
+        self.text = " ".join([card["name"], card["full_name"], card["positioning"], card["summary"], card["scope"],
+                              *card["languages"], card["license"].get("spdx") or "",
+                              *(f["text"] for f in card["features"])]).casefold()
+
+
+class _CatalogIndex:
+    """Lightweight searchable view of the catalog, rebuilt when the file changes.
+
+    PRAGMA data_version on a dedicated connection reports commits made by any
+    other connection, including batch workers. Large catalogs take seconds to
+    index, so only while a batch job is active the view refreshes at most every
+    30s; otherwise every committed change is visible on the next read.
+    """
+
+    _lock = threading.Lock()
+    _items = {}
+
+    def __init__(self, store):
+        self.key = _file_key(store.path)
+        self.watch = sqlite3.connect(store.path, timeout=10, check_same_thread=False)
+        self.version = None
+        self.built_at = 0.0
+        self.duration = 0.0
+
+    @classmethod
+    def get(cls, store):
+        key = _file_key(store.path)
+        with cls._lock:
+            index = cls._items.get(key[0] if key else None)
+            if index is None or index.key != key:
+                if index is not None:
+                    index.watch.close()
+                index = cls._items[key[0]] = cls(store)
+            version = index.watch.execute("PRAGMA data_version").fetchone()[0]
+            stale = version != index.version
+            throttled = (index.duration > 1 and time.monotonic() - index.built_at < 30
+                         and index.watch.execute("SELECT 1 FROM oss_batch_job WHERE status IN ('running','retry_wait') LIMIT 1").fetchone())
+            if stale and not (index.version is not None and throttled):
+                index.build(store, version)
+            return index
+
+    @classmethod
+    def absorb_own_write(cls, store, write):
+        """Run a write that cannot change indexed fields without forcing a rebuild."""
+        key = _file_key(store.path)
+        with cls._lock:
+            index = cls._items.get(key[0] if key else None)
+            before = index.watch.execute("PRAGMA data_version").fetchone()[0] if index else None
+            result = write()
+            if index is not None and index.version == before:
+                index.version = index.watch.execute("PRAGMA data_version").fetchone()[0]
+            return result
+
+    def build(self, store, version):
+        started = time.monotonic()
+        with store.connect() as con:
+            con.execute("BEGIN")
+            self.scenarios = [{**json.loads(row["data"]), "leaf": row["leaf"]} for row in con.execute(
+                "SELECT leaf,data FROM oss_scenario ORDER BY position,id")]
+            matches = {}
+            for rid, sid, data in con.execute("SELECT repository_id,scenario_id,data FROM oss_match ORDER BY rowid"):
+                match = json.loads(data)
+                matches.setdefault(rid, {})[sid] = " ".join([match.get("reason", ""), *match.get("conditions", [])]).casefold()
+            leaves = {}
+            for slug, rid in con.execute("SELECT leaf,repository_id FROM oss_leaf_project"):
+                leaves.setdefault(rid, []).append(slug)
+            self.entries = [_Entry(json.loads(row[1]), leaves.get(row[0], []), matches.get(row[0], {}))
+                            for row in con.execute("SELECT repository_id,data FROM oss_project ORDER BY full_name")]
+        self.scenario_text = {s["id"]: (s["name"] + " " + s["description"]).casefold() for s in self.scenarios}
+        self.version = version
+        self.built_at = time.monotonic()
+        self.duration = self.built_at - started
 
 
 def dispatch(method, path, query, body=None):

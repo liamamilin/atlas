@@ -131,6 +131,27 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(self.store.catalog(sort="recent", limit=1)["projects"][0]["repository_id"], chosen["repository_id"])
         self.assertEqual(self.store.catalog(q="Foam", limit=1)["pagination"]["total"], 1)
 
+    def test_index_sees_writes_from_other_connections_and_favorites_do_not_rebuild(self):
+        from oss_catalog import _CatalogIndex
+        self.store.refresh(self.client)
+        self.assertEqual(self.store.catalog(q="Foam", limit=5)["pagination"]["total"], 1)
+        with self.store.connect() as con:
+            con.execute("DELETE FROM oss_match WHERE repository_id IN (SELECT repository_id FROM oss_project WHERE full_name LIKE '%foam%')")
+            con.execute("DELETE FROM oss_leaf_project WHERE repository_id IN (SELECT repository_id FROM oss_project WHERE full_name LIKE '%foam%')")
+        self.assertEqual(self.store.catalog(q="Foam", limit=5)["pagination"]["total"], 0)
+        chosen = self.store.catalog(limit=1)["projects"][0]
+        with patch.object(_CatalogIndex, "build", side_effect=AssertionError("favorite must not rebuild")):
+            self.store.favorite(chosen["repository_id"], True)
+            data = self.store.catalog(favorites=True, limit=5)
+        self.assertEqual([p["repository_id"] for p in data["projects"]], [chosen["repository_id"]])
+
+    def test_paged_listing_without_type_reads_no_candidate_material(self):
+        self.store.refresh(self.client)
+        data = self.store.catalog(limit=3)
+        self.assertEqual(data["discovery"]["items"], [])
+        shown = {m["scenario_id"] for p in data["projects"] for m in p["matches"]}
+        self.assertEqual({s["id"] for s in data["scenarios"]}, shown)
+
     def test_invalid_pagination_and_sort_fail_with_a_client_error(self):
         from oss_catalog import dispatch
         for kwargs in ({"limit": 0}, {"limit": 101}, {"limit": True}, {"offset": -1}, {"sort": "unknown"}):
