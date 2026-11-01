@@ -208,7 +208,7 @@ test("representative empty states remain explicit and navigable", async ({ page,
   await page.unroute("**/api/projects", projectsHandler);
 
   await page.goto("/search?q=matrix-no-match-zzzz");
-  await expect(page.getByText("没有匹配的类型或应用", { exact: true })).toBeVisible();
+  await expect(page.getByText("没有匹配的类型、场景或项目。试试更短的关键词，或浏览已有分类。", { exact: true })).toBeVisible();
 
   const leaf = {
     slug: "empty-matrix-leaf",

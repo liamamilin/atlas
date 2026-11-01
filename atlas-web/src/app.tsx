@@ -17,6 +17,10 @@ const Tutorial = lazy(() => import("@/routes/tutorial").then(({ Tutorial: page }
 const Settings = lazy(() => import("@/routes/settings").then(({ Settings: page }) => ({ default: page })));
 const Ask = lazy(() => import("@/routes/ask").then(({ Ask: page }) => ({ default: page })));
 const Factory = lazy(() => import("@/routes/factory").then(({ Factory: page }) => ({ default: page })));
+const Discover = lazy(() => import("@/routes/discover").then(({ Discover: page }) => ({ default: page })));
+const History = lazy(() => import("@/routes/history").then(({ History: page }) => ({ default: page })));
+const Guide = lazy(() => import("@/routes/guide").then(({ Guide: page }) => ({ default: page })));
+const HistoricalLeaf = lazy(() => import("@/routes/history").then(({ HistoricalLeaf: page }) => ({ default: page })));
 
 export function NotFoundPage() {
   const { lang } = useLang();
@@ -61,6 +65,9 @@ export default function App() {
         <Route path="/browse" element={<Page><Browse /></Page>} />
         <Route path="/types/:slug" element={<Page><Leaf /></Page>} />
         <Route path="/search" element={<Page><Search /></Page>} />
+        <Route path="/discover" element={<Page><Discover /></Page>} />
+        <Route path="/history" element={<Page><History /></Page>} />
+        <Route path="/history/types/:slug" element={<Page><HistoricalLeaf /></Page>} />
         <Route path="/apps" element={<Page><Apps /></Page>} />
         <Route path="/drafts" element={<Page><Drafts /></Page>} />
         <Route path="/drafts/:slug" element={<DraftDetailRoute />} />
@@ -68,6 +75,7 @@ export default function App() {
         <Route path="/projects/:projectId" element={<Page><ProjectDetail /></Page>} />
         <Route path="/tutorial" element={<Page><Tutorial /></Page>} />
         <Route path="/settings" element={<Page><Settings /></Page>} />
+        <Route path="/guide" element={<Page><Guide /></Page>} />
         <Route path="/ask" element={<Page><Ask /></Page>} />
         <Route path="/factory" element={<Page><Factory /></Page>} />
         <Route path="*" element={<Page><NotFoundPage /></Page>} />

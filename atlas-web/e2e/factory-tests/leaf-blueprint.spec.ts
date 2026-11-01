@@ -26,7 +26,7 @@ async function openLeaf(page: import("@playwright/test").Page, artifacts: unknow
   await page.route(`**/data/leaves/${leaf.slug}.json`, route => route.fulfill({ json: leaf }));
   await page.route(`**/api/factory/catalog?leaf=${leaf.slug}`, route => route.fulfill({ json: [scenario] }));
   await page.route(`**/api/factory/artifacts?leaf=${leaf.slug}&published=1`, route => route.fulfill({ json: artifacts }));
-  await page.goto(`/types/${leaf.slug}`);
+  await page.goto(`/history/types/${leaf.slug}`);
 }
 
 test("published product blueprint links to phase export and does not offer runnable instantiate", async ({ page }) => {

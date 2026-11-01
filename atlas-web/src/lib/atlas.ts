@@ -1706,6 +1706,7 @@ export interface ResolvedModel {
 export interface ModelSettings {
   providers: ModelProvider[];
   default: { provider: string | null; model: string | null };
+  fallback?: { enabled: boolean; from_provider: string; provider: string; model: string; active: boolean; activated_at?: string | null; reason?: string | null };
   embedding: { provider: string; base_url: string; model: string };
   presets: Record<string, ModelPreset>;
   resolved: ResolvedModel;
@@ -1734,6 +1735,12 @@ export interface ProviderInput {
 
 export async function getModelSettings() {
   return fetchJson<ModelSettings>("/api/settings/model");
+}
+
+export async function retryPrimaryModel() {
+  return requestJson("/api/settings/model/fallback", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ reset: true }),
+  }).then(result => { invalidateAtlasCache(); return result; });
 }
 
 export async function saveModelProvider(input: ProviderInput) {

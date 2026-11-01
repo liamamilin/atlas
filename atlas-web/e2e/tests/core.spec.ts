@@ -67,7 +67,7 @@ test("draft editor exposes dirty state and saves before deletion", async ({ page
     expect(dialog.message()).toContain("未保存");
     await dialog.dismiss();
   });
-  await page.getByRole("link", { name: "草稿", exact: true }).click();
+  await page.getByRole("link", { name: "浏览类型", exact: true }).click();
   await expect(page).toHaveURL(/\/drafts\/e2e-draft$/);
 
   const unsaved = page.getByText("未保存", { exact: true });
@@ -123,13 +123,13 @@ test("draft polling exposes a stale state and retry affordance", async ({ page }
   }
 });
 
-test("search matches type and application aliases", async ({ page }) => {
+test("search matches repository facts and type aliases", async ({ page }) => {
   await page.goto("/search");
-  const search = page.getByRole("textbox", { name: "搜索类型或应用" });
-  await search.fill("TickTick");
+  const search = page.getByRole("textbox", { name: "搜索类型、场景或项目" });
+  await search.fill("Foam");
   await page.getByRole("button", { name: "开始搜索", exact: true }).click();
-  await expect(page).toHaveURL(/q=TickTick/);
-  await expect(page.locator('a[href="/types/to-do-list-application"]')).toBeVisible();
+  await expect(page).toHaveURL(/q=Foam/);
+  await expect(page.getByRole("article", { name: "Foam", exact: true })).toBeVisible();
   await page.goto("/search?q=待办事项软件");
   await expect(page.locator('a[href="/types/task-management-application"]')).toBeVisible();
 });

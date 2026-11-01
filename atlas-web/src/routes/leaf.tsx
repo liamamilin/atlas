@@ -1,16 +1,12 @@
-import { useState } from "react";
-import { ArrowRight, FolderKanban, Plus } from "lucide-react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { getLeaf, saveProjectReference, type LeafDetail } from "@/lib/atlas";
+import { Link, useParams } from "react-router-dom";
+import { getLeaf, type LeafDetail } from "@/lib/atlas";
 import { useAsync, Loading, ErrorBox } from "@/components/loaders";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { relationKindLabel } from "@/lib/atlas";
 import { Prose } from "@/components/prose";
 import { SourceReader } from "@/components/source-reader";
 import { useLang, pick, t, type Lang } from "@/lib/lang";
-import { useCurrentProjectId } from "@/lib/project-selection";
-import { LeafScenarios } from "@/components/leaf-scenarios";
+import { RepositoryCatalog } from "@/components/repository-catalog";
 
 export function Leaf() {
   const { slug } = useParams<{ slug: string }>();
@@ -22,7 +18,7 @@ export function Leaf() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
-      <nav className="text-xs text-muted">
+      <nav aria-label={lang === "zh" ? "类型位置" : "Type breadcrumb"} className="text-xs text-muted">
         <Link to="/browse" className="hover:text-fg">{t("typeTree", lang)}</Link>
         <span className="mx-1.5">/</span>
         <span>{pick(lang, data.section_name_zh, data.section_name)}</span>
@@ -41,11 +37,13 @@ export function Leaf() {
         </div>
       ) : null}
 
-      <TypeProjectActions leaf={data} />
-      <LeafScenarios leaf={data.slug} />
+      <nav aria-label={lang === "zh" ? "本页内容" : "On this page"} className="mt-6 flex flex-wrap gap-2 border-y border-border py-3 text-xs text-muted">
+        {[["repositories", lang === "zh" ? "场景与项目" : "Scenarios and projects"], ["definition", lang === "zh" ? "类型介绍" : "About this type"], ...(data.relations.length ? [["neighbors", lang === "zh" ? "相邻类型" : "Related types"]] : []), ["source-material", lang === "zh" ? "原始资料" : "Source material"]].map(([id, label]) => <a className="rounded-lg px-3 py-2 hover:bg-chip hover:text-primary" key={id} href={`#${id}`}>{label}</a>)}
+      </nav>
+      <div id="repositories"><RepositoryCatalog key={data.slug} leaf={data.slug} /></div>
 
       {data.dc ? (
-        <section className="mt-8 rounded-xl bg-primary/[0.06] p-5 ring-1 ring-primary/15">
+        <section id="definition" className="mt-8 rounded-xl bg-primary/[0.06] p-5 ring-1 ring-primary/15">
           <h2 className="text-xs font-medium uppercase tracking-widest text-primary">{t("definingCore", lang)}</h2>
           <Prose md={pick(lang, data.dc_zh, data.dc)} className="mt-3" resolveTypeLinks />
           {lang === "zh" && data.dc && data.dc.trim() !== (data.dc_zh || "").trim() ? (
@@ -112,81 +110,16 @@ export function Leaf() {
           <Prose md={data.sources} className="mt-3 text-sm" resolveTypeLinks />
         </section>
       ) : null}
-      <SourceReader slug={data.slug} fallbackMarkdown={data.full_md} />
+      <div id="source-material"><SourceReader slug={data.slug} fallbackMarkdown={data.full_md} /></div>
+      <Link className="mt-8 inline-block text-xs text-muted underline" to={`/history/types/${data.slug}`}>{lang === "zh" ? "查看此类型的历史模板" : "View historical templates for this type"}</Link>
     </main>
-  );
-}
-
-function TypeProjectActions({ leaf }: { leaf: LeafDetail }) {
-  const { lang } = useLang();
-  const [projectId] = useCurrentProjectId();
-  const navigate = useNavigate();
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const projectLink = `/projects?fromType=${encodeURIComponent(leaf.slug)}`;
-
-  const addToCurrentProject = async () => {
-    if (!projectId) return;
-    setSaving(true);
-    setError("");
-    try {
-      await saveProjectReference(projectId, {
-        kind: "application",
-        slug: leaf.slug,
-        note: lang === "zh" ? "从类型详情页加入，作为项目开发起点。" : "Added from the type page as a project starting point.",
-        read_status: "read",
-      });
-      navigate(`/projects/${projectId}`);
-    } catch (cause) {
-      if (String(cause).includes("already saved")) navigate(`/projects/${projectId}`);
-      else setError(String(cause));
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <section className="mt-8 rounded-xl bg-primary/[0.06] p-5 ring-1 ring-primary/15">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="max-w-2xl">
-          <h2 className="flex items-center gap-2 font-serif text-xl font-medium">
-            <FolderKanban className="size-5 text-primary" />
-            {lang === "zh" ? "基于这个类型开发项目" : "Build a project from this type"}
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-muted">
-            {lang === "zh"
-              ? "把完整类型正文固定为项目依据，然后进入项目工作区继续分析、生成文档和开发。"
-              : "Pin the complete type document as project evidence, then continue analysis, documentation, and development in the workspace."}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {projectId ? (
-            <Button onClick={addToCurrentProject} disabled={saving}>
-              <ArrowRight className="size-4" />
-              {saving
-                ? (lang === "zh" ? "加入中…" : "Adding…")
-                : (lang === "zh" ? "加入当前项目并开发" : "Add to current project")}
-            </Button>
-          ) : null}
-          <Button asChild variant={projectId ? "outline" : "default"}>
-            <Link to={projectLink}>
-              <Plus className="size-4" />
-              {projectId
-                ? (lang === "zh" ? "创建新项目" : "Create a new project")
-                : (lang === "zh" ? "基于此类型创建项目" : "Create a project from this type")}
-            </Link>
-          </Button>
-        </div>
-      </div>
-      {error ? <p className="mt-3 text-sm text-danger">{error}</p> : null}
-    </section>
   );
 }
 
 function relKindsBlock(rels: LeafDetail["relations"], kinds: string[], lang: Lang) {
   if (!rels.length) return null;
   return (
-    <section className="mt-8">
+    <section id="neighbors" className="mt-8">
       <h2 className="font-serif text-xl font-medium">{t("neighbors", lang)}</h2>
       <div className="mt-3 space-y-4">
         {kinds.map((k) => (

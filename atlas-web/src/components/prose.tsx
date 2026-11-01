@@ -21,10 +21,11 @@ export function resolveTypeMarkdownUrl(url: string) {
   return `/types/${slug}${query ? `?${query}` : ""}${hash ? `#${hash}` : ""}`;
 }
 
-export function Prose({ md, className, resolveTypeLinks = false }: {
+export function Prose({ md, className, resolveTypeLinks = false, embeddedHeadings = false }: {
   md: string;
   className?: string;
   resolveTypeLinks?: boolean;
+  embeddedHeadings?: boolean;
 }) {
   const urlTransform = resolveTypeLinks
     ? (url: string) => defaultUrlTransform(resolveTypeMarkdownUrl(url))
@@ -46,7 +47,12 @@ export function Prose({ md, className, resolveTypeLinks = false }: {
         className,
       )}
     >
-      <ReactMarkdown remarkPlugins={[remarkGfm]} urlTransform={urlTransform}>{md}</ReactMarkdown>
+      <ReactMarkdown remarkPlugins={[remarkGfm]} urlTransform={urlTransform} components={embeddedHeadings ? {
+        h1: ({ children }) => <h3>{children}</h3>,
+        h2: ({ children }) => <h4>{children}</h4>,
+        h3: ({ children }) => <h5>{children}</h5>,
+        h4: ({ children }) => <h6>{children}</h6>,
+      } : undefined}>{md}</ReactMarkdown>
     </div>
   );
 }

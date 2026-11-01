@@ -8,12 +8,13 @@ const LangCtx = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({
 });
 
 export function LangProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(() =>
-    (localStorage.getItem("atlas-lang") as Lang) || "zh",
-  );
+  const [lang, setLangState] = useState<Lang>(() => {
+    try { return localStorage.getItem("atlas-lang") === "en" ? "en" : "zh"; }
+    catch { return "zh"; }
+  });
   const setLang = (l: Lang) => {
     setLangState(l);
-    localStorage.setItem("atlas-lang", l);
+    try { localStorage.setItem("atlas-lang", l); } catch { /* Session preference still works. */ }
   };
   useEffect(() => {
     document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
@@ -57,10 +58,10 @@ export const T = {
   projectsEmpty: { zh: "还没有项目。创建后会保存在本地项目库。", en: "No projects yet. New projects are kept in the local project store." },
   browseTitle: { zh: "浏览类型树", en: "Browse the Type Tree" },
   searchPlaceholder: {
-    zh: "搜索软件类型或产品，例如：任务管理、看板、Notion、SIEM",
-    en: "Search a software type or product, e.g. task management, kanban, Notion, SIEM",
+    zh: "搜索软件类型、场景或项目，例如：知识管理、双向链接、Foam",
+    en: "Search a type, scenario or project, e.g. knowledge management, Markdown, Foam",
   },
-  searchLabel: { zh: "搜索类型或应用", en: "Search types or applications" },
+  searchLabel: { zh: "搜索类型、场景或项目", en: "Search types, scenarios or projects" },
   searchBtn: { zh: "开始搜索", en: "Start searching" },
   browseAll: { zh: "浏览全部 29 个领域", en: "Browse all 29 domains" },
   heroLead: {
@@ -121,8 +122,8 @@ export const T = {
   classified: { zh: "atlas 归类", en: "atlas classification" },
   unclassified: { zh: "未归类", en: "Unclassified" },
   footer: {
-    zh: "Application Atlas · {n} 软件应用类型 · 由语料自动生成 · v1.1 方法论",
-    en: "Application Atlas · {n} software application types · generated from the corpus · v1.1 methodology",
+    zh: "Application Atlas · {n} 软件应用类型 · 以场景发现真实项目",
+    en: "Application Atlas · {n} software types · discover real projects by scenario",
   },
   headerNote: { zh: "{n} 类型 · 数据来自 atlas 语料", en: "{n} types · data from the atlas corpus" },
   aliasesLabel: { zh: "别名", en: "Aliases" },

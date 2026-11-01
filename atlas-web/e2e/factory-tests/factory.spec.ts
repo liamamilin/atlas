@@ -155,7 +155,7 @@ test('visible generation entry filters covered leaves, marks zero additions and 
 
 test('leaf exposes confirmed scenarios and links to factory',async({page,request})=>{
   await request.post('/api/factory/scenarios',{data:{leaf:type,name:'叶子场景验收',audience:'个人',objective:'管理任务',workflow:['添加任务'],acceptance:['看到任务'],status:'ready'}});
-  await mockStatus(page);await page.goto(`/types/${type}`);
+  await mockStatus(page);await page.goto(`/history/types/${type}`);
   const section=page.locator('section').filter({has:page.getByRole('heading',{name:'应用场景与模板',exact:true})});
   await expect(section.getByText('叶子场景验收',{exact:true})).toBeVisible();
   await section.getByRole('link',{name:'打开模板工厂'}).click();
@@ -334,7 +334,7 @@ test('leaf published template creates an application and explains review scope',
   const id='tpl_'+'f'.repeat(32);
   await page.route('**/api/factory/artifacts?*',r=>r.fulfill({json:[{id,leaf:type,scenario_name:'每日待办',level:'L1',manifest:{name:'发布待办',description:'example'},acceptances:[{method:'harness-review',outcome:'passed'}]}]}));
   await page.route('**/api/factory/artifacts/*/instantiate',r=>r.fulfill({status:201,json:{download_url:'/api/factory/downloads/'+'c'.repeat(32)}}));
-  await page.goto(`/types/${type}`);
+  await page.goto(`/history/types/${type}`);
   const section=page.locator('section').filter({has:page.getByRole('heading',{name:'应用场景与模板',exact:true})});
   await expect(section.getByText('已通过 Harness 源码审阅，尚未通过运行验收。',{exact:true})).toBeVisible();
   await section.getByLabel('发布待办 应用名称',{exact:true}).fill('my-task-board');

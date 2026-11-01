@@ -2,14 +2,21 @@ import { useEffect, useState } from "react";
 
 const CURRENT_PROJECT = "atlas-current-project";
 const CHANGE_EVENT = "atlas-current-project-change";
+let sessionProjectId: string | null = null;
 
 export function getCurrentProjectId() {
-  return localStorage.getItem(CURRENT_PROJECT) || "";
+  if (sessionProjectId !== null) return sessionProjectId;
+  try { return localStorage.getItem(CURRENT_PROJECT) || ""; }
+  catch { return ""; }
 }
 
 export function setCurrentProjectId(projectId: string) {
-  if (projectId) localStorage.setItem(CURRENT_PROJECT, projectId);
-  else localStorage.removeItem(CURRENT_PROJECT);
+  sessionProjectId = projectId;
+  try {
+    if (projectId) localStorage.setItem(CURRENT_PROJECT, projectId);
+    else localStorage.removeItem(CURRENT_PROJECT);
+    sessionProjectId = null;
+  } catch { /* Keep project selection usable for this session. */ }
   window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: projectId }));
 }
 

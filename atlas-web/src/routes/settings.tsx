@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import {
   AlertTriangle, Check, CheckCircle2, Cpu, Database, Loader2, Plus, RefreshCw,
   Star, Trash2, X,
@@ -9,6 +9,7 @@ import {
   getModelSettings,
   importOpencodeCredentials,
   listProviderModels,
+  retryPrimaryModel,
   saveModelProvider,
   setDefaultModel,
   setEmbeddingEndpoint,
@@ -21,6 +22,7 @@ import { ErrorBox, Loading } from "@/components/loaders";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLang, type Lang } from "@/lib/lang";
+import { GitHubSettings } from "@/components/github-settings";
 
 const inputClass =
   "mt-1 h-10 w-full rounded-lg border border-border bg-bg-elevated px-3 text-sm outline-none focus:ring-2 focus:ring-primary/35";
@@ -124,8 +126,8 @@ export function Settings() {
     }
   };
 
-  if (loading) return <Loading />;
-  if (loadError || !settings) return <ErrorBox message={loadError ?? ""} />;
+  if (loading) return <SettingsLayout><Loading /></SettingsLayout>;
+  if (loadError || !settings) return <SettingsLayout><ErrorBox message={loadError ?? ""} onRetry={() => { setLoading(true); void refresh(); }} /></SettingsLayout>;
 
   const providers = settings.providers;
   const presets = Object.entries(settings.presets);
@@ -156,6 +158,11 @@ export function Settings() {
         api_key: draft.api_key.trim() ? draft.api_key.trim() : undefined,
         models: draft.models.split(/[,\n]/).map((s) => s.trim()).filter(Boolean),
       });
+      setTesting((current) => {
+        const next = { ...current };
+        delete next[draft.id];
+        return next;
+      });
       setEditing(null);
       setNotice(labels.saved);
       await refresh();
@@ -175,14 +182,20 @@ export function Settings() {
       })));
   };
 
+  const editingExisting = Boolean(editing && providers.some((p) => p.id === editing.id));
+  const providerForm = editing ? (
+    <ProviderForm
+      key={editing.id || "new-provider"}
+      lang={lang} draft={editing} presets={settings.presets} existing={editingExisting}
+      busy={busy === "save"} onChange={setEditing}
+      onCancel={() => setEditing(null)}
+      onSubmit={(event) => submitProvider(event, editing)}
+      labels={labels} saveError={error}
+    />
+  ) : null;
+
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10">
-      <h1 className="font-serif text-3xl font-medium">{zh ? "设置" : "Settings"}</h1>
-      <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
-        {zh
-          ? "配置 Atlas 使用的模型服务。凭据只保存在本机，接口不会回传明文。"
-          : "Configure the model providers Atlas uses. Credentials stay on this machine and are never returned in plain text."}
-      </p>
+    <SettingsLayout>
 
       {error ? (
         <div role="alert" className="mt-5 flex items-start gap-2 rounded-lg bg-danger/10 p-3 text-sm text-danger">
@@ -197,7 +210,7 @@ export function Settings() {
       ) : null}
 
       {/* ---- currently effective ---- */}
-      <section className="mt-8 rounded-xl bg-surface p-5 shadow-card">
+      <section id="model-providers" className="mt-8 scroll-mt-36 rounded-xl bg-surface p-5 shadow-card">
         <div className="flex items-start gap-3">
           <Cpu className="mt-0.5 size-5 shrink-0 text-primary" />
           <div className="min-w-0 flex-1">
@@ -211,6 +224,20 @@ export function Settings() {
                   <Badge tone="primary">{sourceLabel(settings.resolved.source, zh)}</Badge>
                   <span className="font-mono text-[11px] text-subtle">{settings.resolved.base_url}</span>
                 </div>
+                {settings.fallback?.enabled && <div className="mt-3 rounded-lg bg-primary/5 p-3 text-xs leading-6" aria-label={zh ? "额度耗尽备用服务" : "Quota fallback"}>
+                  <p>{zh ? "额度耗尽时自动切换：" : "On quota exhaustion: "}
+                    {providers.find(p => p.id === settings.fallback?.from_provider)?.name || settings.fallback.from_provider}
+                    {" → "}{providers.find(p => p.id === settings.fallback?.provider)?.name || settings.fallback.provider}
+                    {" · "}<code>{settings.fallback.model}</code>
+                  </p>
+                  {settings.fallback.active && <>
+                    <p>{zh ? "当前正在使用备用服务。充值后可重试主服务。" : "The fallback is active. Retry the primary after replenishing its quota."}</p>
+                    <Button size="sm" variant="outline" className="mt-2" disabled={busy === "retry-primary"}
+                      onClick={() => void run("retry-primary", async () => { await retryPrimaryModel(); await refresh(); })}>
+                      {zh ? "重试主服务" : "Retry primary"}
+                    </Button>
+                  </>}
+                </div>}
               </>
             ) : (
               <EmptyConfigured lang={lang} reason={settings.resolved.reason} />
@@ -298,15 +325,7 @@ export function Settings() {
           </Button>
         </div>
 
-        {editing ? (
-          <ProviderForm
-            lang={lang} draft={editing} presets={settings.presets}
-            busy={busy === "save"} onChange={setEditing}
-            onCancel={() => setEditing(null)}
-            onSubmit={(event) => submitProvider(event, editing)}
-            labels={labels} saveError={error}
-          />
-        ) : null}
+        {!editingExisting ? providerForm : null}
 
         {providers.length === 0 && !editing ? (
           <p className="mt-4 rounded-xl border border-dashed border-border bg-surface p-5 text-sm leading-6 text-muted">
@@ -318,8 +337,9 @@ export function Settings() {
 
         <div className="mt-4 grid gap-3">
           {providers.map((provider) => (
+            <div key={provider.id}>
             <ProviderRow
-              key={provider.id} lang={lang} provider={provider}
+              lang={lang} provider={provider} editing={editing?.id === provider.id}
               isDefault={settings.default.provider === provider.id}
               result={testing[provider.id]} busy={busy}
               labels={labels}
@@ -348,6 +368,8 @@ export function Settings() {
                 await refresh();
               })}
             />
+            {editing?.id === provider.id ? providerForm : null}
+            </div>
           ))}
         </div>
       </section>
@@ -377,7 +399,7 @@ export function Settings() {
       ) : null}
 
       {/* ---- embedding ---- */}
-      <section className="mt-8 rounded-xl bg-surface p-5 shadow-card">
+      <section id="embedding" className="mt-8 scroll-mt-36 rounded-xl bg-surface p-5 shadow-card">
         <div className="flex items-start gap-3">
           <Database className="mt-0.5 size-5 shrink-0 text-primary" />
           <div className="min-w-0 flex-1">
@@ -411,11 +433,23 @@ export function Settings() {
       </section>
 
       <p className="mt-6 text-xs leading-5 text-subtle">{labels.keyHint}</p>
-    </main>
+    </SettingsLayout>
   );
 }
 
+function SettingsLayout({ children }: { children: ReactNode }) {
+  const { lang } = useLang(); const zh = lang === "zh";
+  return <main className="mx-auto max-w-5xl px-4 py-10">
+    <h1 className="font-serif text-3xl font-medium">{zh ? "设置" : "Settings"}</h1>
+    <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">{zh ? "管理 GitHub 采集与模型服务。浏览已有资料无需配置模型，凭据只保存在本机。" : "Manage GitHub collection and model providers. Browsing saved data needs no model. Credentials stay on this machine."}</p>
+    <nav aria-label={zh ? "设置分区" : "Settings sections"} className="mt-5 flex flex-wrap gap-2 text-xs text-primary">{[["github", "GitHub Token"], ["model-providers", zh ? "模型服务" : "Model providers"], ["embedding", zh ? "向量检索" : "Embedding"]].map(([id, label]) => <a key={id} className="rounded-lg border border-border bg-surface px-3 py-2 hover:bg-chip" href={`#${id}`}>{label}</a>)}</nav>
+    <GitHubSettings />
+    {children}
+  </main>;
+}
+
 function sourceLabel(source: string | undefined, zh: boolean) {
+  if (source === "fallback") return zh ? "额度耗尽，已自动切换" : "Automatic quota fallback";
   if (source === "environment") return zh ? "来自环境变量" : "From environment";
   if (source === "opencode") return zh ? "来自 OpenCode 凭据" : "From OpenCode credentials";
   return zh ? "来自设置" : "From settings";
@@ -481,15 +515,15 @@ function ModelPicker({
 }
 
 function ProviderRow({
-  lang, provider, isDefault, result, busy, labels, onTest, onEdit, onDelete, onSetDefault,
+  lang, provider, isDefault, editing, result, busy, labels, onTest, onEdit, onDelete, onSetDefault,
 }: {
-  lang: Lang; provider: ModelProvider; isDefault: boolean;
+  lang: Lang; provider: ModelProvider; isDefault: boolean; editing: boolean;
   result?: ProviderTestResult | "running"; busy: string; labels: Record<string, string>;
   onTest: () => void; onEdit: () => void; onDelete: () => void; onSetDefault: () => void;
 }) {
   const zh = lang === "zh";
   return (
-    <article className="rounded-xl bg-surface p-4 shadow-card">
+    <article aria-label={provider.name} className="rounded-xl bg-surface p-4 shadow-card">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
@@ -517,7 +551,8 @@ function ProviderRow({
               <Star className="size-3.5" />{labels.setDefault}
             </Button>
           ) : null}
-          <Button size="sm" variant="ghost" onClick={onEdit}>{zh ? "编辑" : "Edit"}</Button>
+          <Button size="sm" variant="ghost" onClick={onEdit} aria-expanded={editing}
+            aria-controls={editing ? `provider-form-${provider.id}` : undefined}>{zh ? "编辑" : "Edit"}</Button>
           <Button size="sm" variant="ghost" onClick={onDelete}
             disabled={busy === `delete:${provider.id}`}
             className="text-danger hover:bg-danger/10">
@@ -542,18 +577,26 @@ function ProviderRow({
 }
 
 function ProviderForm({
-  lang, draft, presets, busy, onChange, onCancel, onSubmit, labels, saveError,
+  lang, draft, presets, existing, busy, onChange, onCancel, onSubmit, labels, saveError,
 }: {
-  lang: Lang; draft: Draft; presets: ModelSettings["presets"]; busy: boolean;
+  lang: Lang; draft: Draft; presets: ModelSettings["presets"]; existing: boolean; busy: boolean;
   onChange: (draft: Draft) => void; onCancel: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   labels: Record<string, string>; saveError?: string;
 }) {
   const zh = lang === "zh";
   const set = (patch: Partial<Draft>) => onChange({ ...draft, ...patch });
+  const formRef = useRef<HTMLFormElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    formRef.current?.scrollIntoView({ block: "start" });
+    nameRef.current?.focus({ preventScroll: true });
+  }, []);
+  const title = existing ? `${labels.editProvider} · ${draft.name}` : labels.addProvider;
   return (
-    <form onSubmit={onSubmit} className="mt-4 rounded-xl bg-surface p-5 shadow-card">
-      <h3 className="font-medium">{draft.id ? labels.editProvider : labels.addProvider}</h3>
+    <form ref={formRef} id={`provider-form-${draft.id || "new"}`} aria-label={title}
+      onSubmit={onSubmit} className="mt-4 scroll-mt-24 rounded-xl bg-surface p-5 shadow-card">
+      <h3 className="font-medium">{title}</h3>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <label className="block text-sm">
           <span className="text-muted">{zh ? "常用服务" : "Provider"}</span>
@@ -562,7 +605,7 @@ function ProviderForm({
               const preset = presets[e.target.value];
               set({
                 preset: e.target.value,
-                id: e.target.value || draft.id,
+                id: existing ? draft.id : (e.target.value || draft.id),
                 name: preset?.name || draft.name,
                 base_url: preset?.base_url || "",
                 models: (preset?.models || []).join(", "),
@@ -576,7 +619,7 @@ function ProviderForm({
         </label>
         <label className="block text-sm">
           <span className="text-muted">{zh ? "显示名称" : "Display name"}</span>
-          <input className={inputClass} value={draft.name} required
+          <input ref={nameRef} className={inputClass} value={draft.name} required
             onChange={(e) => set({ name: e.target.value })} />
         </label>
         <label className="block text-sm sm:col-span-2">

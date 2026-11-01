@@ -151,7 +151,7 @@ export function SourceReader({ slug, fallbackMarkdown }: { slug: string; fallbac
       {contentState.loading ? <Loading>{lang === "zh" ? "读取正式资料中…" : "Reading source…"}</Loading> :
         contentState.error ? <ErrorBox message={contentState.error} /> : contentState.data ? (
           <div id={`source-panel-${kind}`} role="tabpanel" className="mt-5 max-h-[42rem] overflow-y-auto rounded-lg border border-border bg-bg-elevated p-5">
-            <Prose md={contentState.data.content} resolveTypeLinks />
+            <Prose md={contentState.data.content} resolveTypeLinks embeddedHeadings />
           </div>
         ) : null}
 
@@ -204,7 +204,7 @@ function StaticSource({ markdown, lang }: { markdown: string; lang: "zh" | "en" 
         {lang === "zh" ? "本地 API 不可用，以下为构建时生成的正式正文快照。" : "The local API is unavailable; this is the canonical snapshot generated at build time."}
       </p>
       <div className="mt-5 max-h-[42rem] overflow-y-auto rounded-lg border border-border bg-bg-elevated p-5">
-        <Prose md={markdown} resolveTypeLinks />
+        <Prose md={markdown} resolveTypeLinks embeddedHeadings />
       </div>
     </section>
   );

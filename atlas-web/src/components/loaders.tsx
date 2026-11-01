@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { useLang, t } from "@/lib/lang";
+import { LoaderCircle } from "lucide-react";
 
 export function useAsync<T>(fn: () => Promise<T>, deps: unknown[]): { data: T | null; error: string | null; loading: boolean } {
   const [state, setState] = useState<{ data: T | null; error: string | null; loading: boolean }>({
@@ -11,7 +12,7 @@ export function useAsync<T>(fn: () => Promise<T>, deps: unknown[]): { data: T | 
   useEffect(() => {
     let alive = true;
     setState((s) => ({ data: s.data, error: null, loading: true }));
-    fn().then(
+    Promise.resolve().then(fn).then(
       (data) => alive && setState({ data, error: null, loading: false }),
       (e) => alive && setState({ data: null, error: String(e), loading: false }),
     );
@@ -25,7 +26,7 @@ export function useAsync<T>(fn: () => Promise<T>, deps: unknown[]): { data: T | 
 
 export function Loading({ children }: { children?: ReactNode }) {
   const { lang } = useLang();
-  return <div role="status" aria-live="polite" className="py-16 text-center text-sm text-subtle">{children ?? t("loading", lang)}</div>;
+  return <div role="status" aria-live="polite" className="flex items-center justify-center gap-2 py-16 text-center text-sm text-muted"><LoaderCircle aria-hidden="true" className="size-4 animate-spin" />{children ?? t("loading", lang)}</div>;
 }
 
 export function EmptyState({ title, children, className = "" }: {
@@ -41,7 +42,7 @@ export function EmptyState({ title, children, className = "" }: {
   );
 }
 
-export function ErrorBox({ message }: { message: string }) {
+export function ErrorBox({ message, onRetry }: { message: string; onRetry?: () => void }) {
   const { lang } = useLang();
   return (
     <div role="alert" className="mx-auto mt-12 max-w-xl rounded-xl bg-surface p-6 text-center shadow-card">
@@ -53,7 +54,7 @@ export function ErrorBox({ message }: { message: string }) {
         </details>
       ) : null}
       <p className="mt-3 text-xs leading-5 text-subtle">{t("retryHint", lang)}</p>
-      <button type="button" className="mt-4 rounded-md bg-primary px-3 py-2 text-xs font-medium text-white hover:opacity-90" onClick={() => window.location.reload()}>
+      <button type="button" className="mt-4 rounded-md bg-primary px-4 py-3 text-xs font-medium text-white hover:opacity-90" onClick={onRetry || (() => window.location.reload())}>
         {t("retry", lang)}
       </button>
     </div>

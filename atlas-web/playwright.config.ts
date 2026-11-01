@@ -5,6 +5,7 @@ const webPort = process.env.ATLAS_E2E_WEB_PORT || "5188";
 
 export default defineConfig({
   testDir: "./e2e/tests",
+  outputDir: "./test-results-core",
   fullyParallel: false,
   workers: 1,
   timeout: 30_000,

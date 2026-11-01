@@ -14,7 +14,7 @@ async function setup(page:Page,notRun=false){
  await page.route('**/api/factory/artifacts**',r=>r.fulfill({json:r.request().url().includes('published=1')?[]:[artifact]}));
 }
 test('leaf → scenario → assisted template → case and standard package, without formal publication',async({page})=>{
- await setup(page);await page.goto('/types/'+leaf.slug);
+ await setup(page);await page.goto('/history/types/'+leaf.slug);
  await expect(page.getByText('Core example verified',{exact:true})).toBeVisible();
  await expect(page.getByText('No published templates for this type yet.',{exact:false})).toBeVisible();
  await page.getByRole('link',{name:scenario.name,exact:true}).click();
@@ -32,7 +32,7 @@ test('leaf → scenario → assisted template → case and standard package, wit
  await expect(info.getByText(/currently running local service/)).toBeVisible();
 });
 test('not-run template has no example source, guide or runtime evidence links',async({page})=>{
- await setup(page,true);await page.goto('/types/'+leaf.slug);
+ await setup(page,true);await page.goto('/history/types/'+leaf.slug);
  const info=page.getByRole('region',{name:'Assisted template information '+item.title});
  await expect(info.getByText('Application not run',{exact:true})).toBeVisible();
  await expect(info.getByRole('link',{name:'Download example source'})).toHaveCount(0);
@@ -46,7 +46,7 @@ test('Go model static review does not turn an unrun app into a runtime example',
   production:{mode:'opencode-cli-go',model:'opencode-go/deepseek-v4.1-flash',review_status:'passed',review_input_digest:'e'.repeat(64)},
   runtime:{...item.runtime,status:'not_run',scope:'No app run'},files:{development:item.files.development}}],
   unavailable:[],counts:{total:1,core_verified:0,not_run:1}}}));
- await page.goto('/types/'+leaf.slug);
+ await page.goto('/history/types/'+leaf.slug);
  const info=page.getByRole('region',{name:'Assisted template information '+item.title});
  await expect(info.getByText(/opencode-go\/deepseek-v4.1-flash/)).toBeVisible();
  await expect(info.getByText(/Separate-session static review passed/)).toBeVisible();
@@ -59,7 +59,7 @@ test('failed complete-material review remains inspectable and is not offered as 
   production:{mode:'opencode-cli-go',model:'opencode-go/deepseek-v4.1-flash',review_status:'needs_changes',review_input_digest:'e'.repeat(64),issues:['Stale update baseline']},
   runtime:{...item.runtime,status:'not_run',scope:'No app run'},files:{development:{available:false,reason:'assisted_review_needs_changes'}}}],
   unavailable:[],counts:{total:1,core_verified:0,not_run:1}}}));
- await page.goto('/types/'+leaf.slug);
+ await page.goto('/history/types/'+leaf.slug);
  const info=page.getByRole('region',{name:'Assisted template information '+item.title});
  await expect(info.getByText(/Complete-material review: changes required/)).toBeVisible();
  await expect(info.getByRole('link',{name:'Download standard development package'})).toHaveCount(0);
@@ -73,7 +73,7 @@ test('failed complete-material review remains inspectable and is not offered as 
 test('assisted catalog outage does not hide formal template or claim zero verified evidence',async({page})=>{
  await setup(page);await page.route('**/api/factory/assisted-templates**',r=>r.fulfill({status:503,json:{error:'unavailable'}}));
  await page.route('**/api/factory/artifacts?**',r=>r.fulfill({json:[{...artifact,id:'formal',provenance:{},state:'published'}]}));
- await page.goto('/types/'+leaf.slug);
+ await page.goto('/history/types/'+leaf.slug);
  await expect(page.getByRole('heading',{name:item.title})).toBeVisible();
  await expect(page.getByText('Assisted catalog unavailable; formal publication is unaffected.')).toBeVisible();
 });
@@ -82,7 +82,7 @@ test('scenario link retains formally published artifacts outside the assisted in
  await setup(page);
  await page.route('**/api/factory/assisted-templates**',r=>r.fulfill({json:{items:[],unavailable:[],counts:{total:0,core_verified:0,not_run:0}}}));
  await page.route('**/api/factory/artifacts**',r=>r.fulfill({json:[{...artifact,scenario_id:scenario.id,provenance:{},state:'published'}]}));
- await page.goto('/types/'+leaf.slug);
+ await page.goto('/history/types/'+leaf.slug);
  await page.getByRole('link',{name:scenario.name,exact:true}).click();
  await expect(page.getByRole('heading',{name:item.title})).toBeVisible();
  await expect(page.getByText('Cognitive template · Published in catalog',{exact:false})).toBeVisible();
@@ -110,7 +110,7 @@ test('reviewed revision retains its withdrawn parent and separates usable entrie
   production:{mode:'opencode-cli-go',model:'opencode-go/deepseek-v4.1-flash',review_status:'passed',review_input_digest:'e'.repeat(64),revision_id:'home-care-r1',parent:{artifact_id:'tpl_parent',digest:'f'.repeat(64)}},
   runtime:{...item.runtime,status:'not_run',scope:'No app run'},files:{development:item.files.development}}],
   unavailable:[],counts:{total:2,usable:1,needs_revision:1,core_verified:0,not_run:2}}}));
- await page.goto('/types/'+leaf.slug);
+ await page.goto('/history/types/'+leaf.slug);
  await expect(page.getByText(/2 条目录记录 · 1 份可用 · 1 份待修订历史/)).toBeVisible();
  const info=page.getByRole('region',{name:'辅助模板信息 '+item.title});
  await expect(info.getByRole('link',{name:'回查已撤回父版本'})).toHaveAttribute('href','/factory?view=artifacts&artifact_id=tpl_parent');
