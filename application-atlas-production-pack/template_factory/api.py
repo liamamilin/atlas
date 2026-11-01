@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import re
 import tempfile
+import threading
 from functools import lru_cache
 from urllib.parse import parse_qs
 
@@ -26,6 +27,8 @@ from .runtime import DockerVerifier
 from .store import FactoryError, FactoryStore, digest
 from .worker import ensure_worker
 
+_STORE_INIT_LOCK = threading.Lock()
+
 
 @lru_cache(maxsize=8)
 def _initialized_store(root, pack):
@@ -33,9 +36,12 @@ def _initialized_store(root, pack):
 
 
 def get_store():
-    return _initialized_store(
-        os.environ.get("ATLAS_FACTORY_ROOT", str(PACK / "atlas/template-factory")), str(PACK)
-    )
+    # lru_cache may compute the same miss concurrently. Historical leaf panels
+    # request several endpoints at once; serialize the initial schema/WAL setup.
+    with _STORE_INIT_LOCK:
+        return _initialized_store(
+            os.environ.get("ATLAS_FACTORY_ROOT", str(PACK / "atlas/template-factory")), str(PACK)
+        )
 
 
 def artifact(store, artifact_id):

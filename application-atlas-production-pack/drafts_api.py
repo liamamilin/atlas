@@ -92,6 +92,7 @@ import re
 import shutil
 import socket
 import ssl
+import sqlite3
 import sys
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -133,6 +134,7 @@ from project_baseline import (
 from opencode_cli_adapter import HarnessCompatibilityError, preflight as opencode_preflight
 import atlas_model
 import atlas_ask
+import oss_catalog
 from template_factory import api as factory_api
 from template_factory.store import FactoryError
 from execution_service import (
@@ -1396,6 +1398,40 @@ def _public_backup_result(result: dict, project_id: str) -> dict:
 
 
 class Handler(BaseHTTPRequestHandler):
+    def _settings_github(self, method, path):
+        import github_settings
+        try:
+            if method == "GET" and path == "/api/settings/github":
+                return self._json(github_settings.public_view())
+            if method == "POST" and path == "/api/settings/github":
+                return self._json(github_settings.save(self._body()))
+            if method == "POST" and path == "/api/settings/github/test":
+                self._body()
+                return self._json(github_settings.test_connection())
+            return self._json({"error": "no route"}, 404)
+        except RequestBoundaryError as error:
+            return self._boundary_error(error)
+        except oss_catalog.CatalogError as error:
+            return self._json({"error": str(error)}, error.status)
+        except ValueError:
+            return self._json({"error": "GitHub 设置无效，请检查输入或重新保存凭据"}, 400)
+        except OSError:
+            return self._json({"error": "GitHub 凭据无法保存，请检查本地目录权限"}, 503)
+
+    def _oss(self, method, parsed):
+        try:
+            result, status = oss_catalog.dispatch(method, unquote(parsed.path), parsed.query,
+                                                  self._body() if method == "POST" else None)
+            return self._json(result, status)
+        except oss_catalog.CatalogError as error:
+            return self._json({"error": str(error)}, error.status)
+        except RequestBoundaryError as error:
+            return self._boundary_error(error)
+        except (ValueError, json.JSONDecodeError):
+            return self._json({"error": "请求数据无效"}, 400)
+        except (OSError, sqlite3.Error):
+            return self._json({"error": "项目库暂时不可用，请重试"}, 503)
+
     def _factory(self, method, parsed):
         try:
             result = factory_api.dispatch(method, unquote(parsed.path), parsed.query,
@@ -1417,7 +1453,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"error": str(error), "code": error.code}, error.status)
         except RequestBoundaryError as error:
             return self._boundary_error(error)
-        except (ValueError, OSError) as error:
+        except (ValueError, OSError, sqlite3.Error) as error:
             return self._json(_api_error(error, "factory_unavailable", True), 503)
 
     def log_message(self, fmt, *args):
@@ -1520,6 +1556,8 @@ class Handler(BaseHTTPRequestHandler):
                 body = self._body()
                 return self._json(atlas_model.set_default(
                     body.get("provider"), body.get("model")))
+            if path == "/api/settings/model/fallback":
+                return self._json(atlas_model.set_fallback(self._body()))
             if path == "/api/settings/model/embedding":
                 return self._json(atlas_model.set_embedding(self._body()))
             if path == "/api/settings/model/import":
@@ -1559,6 +1597,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._boundary_error(error)
         parsed = urlparse(self.path)
         path = unquote(parsed.path)
+        if path.startswith("/api/oss/"):
+            return self._oss("GET", parsed)
         if path.startswith("/api/factory/"):
             return self._factory("GET", parsed)
         if path == "/api/health":
@@ -1581,6 +1621,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(atlas_model.public_view())
             except Exception as error:
                 return self._json(_api_error(error, "service_unavailable", True), 500)
+        if path.startswith("/api/settings/github"):
+            return self._settings_github("GET", path)
         if path == "/api/ask/threads":
             try:
                 return self._json(atlas_ask.list_threads())
@@ -1805,10 +1847,14 @@ class Handler(BaseHTTPRequestHandler):
         except RequestBoundaryError as error:
             return self._boundary_error(error)
         path = unquote(urlparse(self.path).path)
+        if path.startswith("/api/oss/"):
+            return self._oss("POST", urlparse(self.path))
         if path.startswith("/api/factory/"):
             return self._factory("POST", urlparse(self.path))
         if path.startswith("/api/settings/model"):
             return self._settings_model_post(path)
+        if path.startswith("/api/settings/github"):
+            return self._settings_github("POST", path)
         if path.startswith("/api/ask/"):
             return self._ask_post(path)
         m = re.match(
@@ -2497,4 +2543,11 @@ if __name__ == "__main__":
                 recovery["applications_requiring_review"]),
         }, sort_keys=True))
     print(f"drafts API on :{args.port}  (drafts dir: {DRAFTS})")
-    ThreadingHTTPServer(("127.0.0.1", args.port), Handler).serve_forever()
+    server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
+    from oss_batch import BatchRecoveryService
+    batch_recovery = BatchRecoveryService().start()
+    try:
+        server.serve_forever()
+    finally:
+        batch_recovery.stop.set()
+        server.server_close()

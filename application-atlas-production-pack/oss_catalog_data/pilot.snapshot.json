@@ -1,0 +1,880 @@
+{
+ "schema": "atlas.oss-catalog.v1",
+ "exported_at": "2026-10-22T16:23:30.848366+00:00",
+ "scenarios": [
+  {
+   "id": "pkm-network",
+   "name": "把零散笔记连接成知识网络",
+   "description": "写作、阅读或研究时，把笔记相互引用，并沿链接或关系视图重新发现已有知识。"
+  },
+  {
+   "id": "pkm-plaintext",
+   "name": "在文本文件与编辑器中积累知识",
+   "description": "围绕自己掌控的文本笔记，在 Markdown 工作区、Emacs 或浏览器编辑器里持续组织和连接知识。"
+  },
+  {
+   "id": "pkm-wiki",
+   "name": "搭建自己掌控的个人 Wiki",
+   "description": "以自托管服务或独立文件维护个人知识库，通过相互链接的页面长期保存和浏览知识。"
+  }
+ ],
+ "projects": [
+  {
+   "archived": false,
+   "checked_at": "2026-10-22T16:22:52.211225+00:00",
+   "curation_digest": "904bf8452141c82ecc7393439df59fd0d6c1240701385da8c34081c9e07435ca",
+   "default_branch": "main",
+   "editorial_method": "试点编辑整理；逐项依据官方仓库资料核验，未做部署实测",
+   "features": [
+    {
+     "evidence": {
+      "excerpt": "(./assets/screenshots/feature-show-graph.gif) ### Link Autocompletion Foam helps you create the connections between your notes, and your placeholders as well. ",
+      "immutable_url": "https://api.github.com/repos/foambubble/foam/git/blobs/a504233dcefb32f2623d5d0dd1aff85f5cfc0020",
+      "source_sha256": "7b772c7ef6d4c251bdcb73c19cb6d20bbf39a915c7fc6ec48560ce31d43ec635",
+      "source_url": "https://github.com/foambubble/foam/blob/main/readme.md"
+     },
+     "text": "链接自动补全"
+    },
+    {
+     "evidence": {
+      "excerpt": "](./assets/screenshots/feature-templates.gif) ### Backlinks Panel Quickly check which notes are referencing the currently active note. See for each occurre",
+      "immutable_url": "https://api.github.com/repos/foambubble/foam/git/blobs/a504233dcefb32f2623d5d0dd1aff85f5cfc0020",
+      "source_sha256": "7b772c7ef6d4c251bdcb73c19cb6d20bbf39a915c7fc6ec48560ce31d43ec635",
+      "source_url": "https://github.com/foambubble/foam/blob/main/readme.md"
+     },
+     "text": "反向链接面板"
+    },
+    {
+     "evidence": {
+      "excerpt": "etting started]] guide. 2. Write your thoughts in markdown documents (I like to call them **Bubbles**, but that might be more than a little twee). These docum",
+      "immutable_url": "https://api.github.com/repos/foambubble/foam/git/blobs/a504233dcefb32f2623d5d0dd1aff85f5cfc0020",
+      "source_sha256": "7b772c7ef6d4c251bdcb73c19cb6d20bbf39a915c7fc6ec48560ce31d43ec635",
+      "source_url": "https://github.com/foambubble/foam/blob/main/readme.md"
+     },
+     "text": "Markdown 文档与 Wiki 链接"
+    },
+    {
+     "evidence": {
+      "excerpt": "n overview of your **Foam** workspace using the [[Graph Visualisation]], and discover relationships between your thoughts with the use of [[Backlinking]]. You ",
+      "immutable_url": "https://api.github.com/repos/foambubble/foam/git/blobs/a504233dcefb32f2623d5d0dd1aff85f5cfc0020",
+      "source_sha256": "7b772c7ef6d4c251bdcb73c19cb6d20bbf39a915c7fc6ec48560ce31d43ec635",
+      "source_url": "https://github.com/foambubble/foam/blob/main/readme.md"
+     },
+     "text": "关系图谱"
+    }
+   ],
+   "full_name": "foambubble/foam",
+   "github_url": "https://github.com/foambubble/foam",
+   "languages": [
+    "TypeScript",
+    "Markdown",
+    "JavaScript",
+    "HTML"
+   ],
+   "license": {
+    "detected_spdx": "NOASSERTION",
+    "note": "已核对仓库许可证原文；以文件摘要绑定本次核验。 GitHub 返回 NOASSERTION，按原文识别。",
+    "reviewed_at": "2026-10-22T16:05:40.657216+00:00",
+    "source": {
+     "blob_sha": "a21ccb15ed6a005e61a7097b055e5b4bee51fbf8",
+     "immutable_url": "https://api.github.com/repos/foambubble/foam/git/blobs/a21ccb15ed6a005e61a7097b055e5b4bee51fbf8",
+     "kind": "license",
+     "path": "LICENSE",
+     "retrieved_at": "2026-10-22T16:09:28.593011+00:00",
+     "sha256": "e28e102dc3be06f2b27436d5c9dff9dd4471a646478fe18bf41621d0452bd706",
+     "url": "https://github.com/foambubble/foam/blob/main/LICENSE"
+    },
+    "spdx": "MIT",
+    "status": "open_source"
+   },
+   "matches": [
+    {
+     "evidence": {
+      "excerpt": "](./assets/screenshots/feature-templates.gif) ### Backlinks Panel Quickly check which notes are referencing the currently active note. See for each occurre",
+      "immutable_url": "https://api.github.com/repos/foambubble/foam/git/blobs/a504233dcefb32f2623d5d0dd1aff85f5cfc0020",
+      "source_sha256": "7b772c7ef6d4c251bdcb73c19cb6d20bbf39a915c7fc6ec48560ce31d43ec635",
+      "source_url": "https://github.com/foambubble/foam/blob/main/readme.md"
+     },
+     "reason": "反向链接面板和图谱帮助用户发现笔记之间的关系。",
+     "scenario_id": "pkm-network"
+    },
+    {
+     "evidence": {
+      "excerpt": "etting started]] guide. 2. Write your thoughts in markdown documents (I like to call them **Bubbles**, but that might be more than a little twee). These docum",
+      "immutable_url": "https://api.github.com/repos/foambubble/foam/git/blobs/a504233dcefb32f2623d5d0dd1aff85f5cfc0020",
+      "source_sha256": "7b772c7ef6d4c251bdcb73c19cb6d20bbf39a915c7fc6ec48560ce31d43ec635",
+      "source_url": "https://github.com/foambubble/foam/blob/main/readme.md"
+     },
+     "reason": "直接在 VS Code 工作区里编写 Markdown 文档，以 Wiki 链接连接笔记。",
+     "scenario_id": "pkm-plaintext"
+    }
+   ],
+   "name": "Foam",
+   "positioning": "基于 VS Code 的个人知识管理",
+   "pushed_at": "2026-10-22T10:10:44Z",
+   "repository_id": 273546408,
+   "scope": "适合希望在 VS Code 工作区中，用 Markdown、反向链接和图谱积累个人知识的用户。",
+   "scope_evidence": {
+    "excerpt": "etting started]] guide. 2. Write your thoughts in markdown documents (I like to call them **Bubbles**, but that might be more than a little twee). These docum",
+    "immutable_url": "https://api.github.com/repos/foambubble/foam/git/blobs/a504233dcefb32f2623d5d0dd1aff85f5cfc0020",
+    "source_sha256": "7b772c7ef6d4c251bdcb73c19cb6d20bbf39a915c7fc6ec48560ce31d43ec635",
+    "source_url": "https://github.com/foambubble/foam/blob/main/readme.md"
+   },
+   "sources": [
+    {
+     "blob_sha": "a504233dcefb32f2623d5d0dd1aff85f5cfc0020",
+     "immutable_url": "https://api.github.com/repos/foambubble/foam/git/blobs/a504233dcefb32f2623d5d0dd1aff85f5cfc0020",
+     "kind": "readme",
+     "path": "readme.md",
+     "retrieved_at": "2026-10-22T16:09:28.592788+00:00",
+     "sha256": "7b772c7ef6d4c251bdcb73c19cb6d20bbf39a915c7fc6ec48560ce31d43ec635",
+     "url": "https://github.com/foambubble/foam/blob/main/readme.md"
+    },
+    {
+     "kind": "repository",
+     "retrieved_at": "2026-10-22T16:09:28.593089+00:00",
+     "url": "https://api.github.com/repos/foambubble/foam"
+    },
+    {
+     "kind": "languages",
+     "retrieved_at": "2026-10-22T16:09:28.593091+00:00",
+     "url": "https://api.github.com/repos/foambubble/foam/languages"
+    }
+   ],
+   "summary": "建立在 Visual Studio Code 和 GitHub 上的个人知识管理与分享系统，用 Markdown 文档和 Wiki 链接组织想法。",
+   "summary_evidence": {
+    "excerpt": "tps://deepwiki.com/foambubble/foam) **Foam** is a personal knowledge management and sharing system built on [Visual Studio Code](https://code.visualstudio.com/) and [GitHub](https://github",
+    "immutable_url": "https://api.github.com/repos/foambubble/foam/git/blobs/a504233dcefb32f2623d5d0dd1aff85f5cfc0020",
+    "source_sha256": "7b772c7ef6d4c251bdcb73c19cb6d20bbf39a915c7fc6ec48560ce31d43ec635",
+    "source_url": "https://github.com/foambubble/foam/blob/main/readme.md"
+   }
+  },
+  {
+   "archived": false,
+   "checked_at": "2026-10-22T16:22:45.870780+00:00",
+   "curation_digest": "cd1cff7dda4e44a06d5af4fb83a66cf11408d1ddf9ca3c1dcf4839becd1588ff",
+   "default_branch": "master",
+   "editorial_method": "试点编辑整理；逐项依据官方仓库资料核验，未做部署实测",
+   "features": [
+    {
+     "evidence": {
+      "excerpt": "t**, **collaboration**, **PDF annotation**, and **task management** with support for multiple file formats, including **Markdown** and **Org-mode**, and **",
+      "immutable_url": "https://api.github.com/repos/logseq/logseq/git/blobs/662bad17d543ea6865cd8d146c91478858436dc2",
+      "source_sha256": "597bcf7218c37fdf053524467029e22db5c29faffd8fb21007512bbbd3affe56",
+      "source_url": "https://github.com/logseq/logseq/blob/master/README.md"
+     },
+     "text": "知识管理与任务管理"
+    },
+    {
+     "evidence": {
+      "excerpt": "or **knowledge management**, **collaboration**, **PDF annotation**, and **task management** with support for multiple file formats, including **Markdown**",
+      "immutable_url": "https://api.github.com/repos/logseq/logseq/git/blobs/662bad17d543ea6865cd8d146c91478858436dc2",
+      "source_sha256": "597bcf7218c37fdf053524467029e22db5c29faffd8fb21007512bbbd3affe56",
+      "source_url": "https://github.com/logseq/logseq/blob/master/README.md"
+     },
+     "text": "PDF 批注"
+    },
+    {
+     "evidence": {
+      "excerpt": "atabase version (DB version) of Logseq introduces DB graphs. [See this page](https://github.com/logseq/docs/blob/master/db-version.md) to get an over",
+      "immutable_url": "https://api.github.com/repos/logseq/logseq/git/blobs/662bad17d543ea6865cd8d146c91478858436dc2",
+      "source_sha256": "597bcf7218c37fdf053524467029e22db5c29faffd8fb21007512bbbd3affe56",
+      "source_url": "https://github.com/logseq/logseq/blob/master/README.md"
+     },
+     "text": "数据库知识图谱"
+    }
+   ],
+   "full_name": "logseq/logseq",
+   "github_url": "https://github.com/logseq/logseq",
+   "languages": [
+    "Clojure",
+    "OCaml",
+    "JavaScript",
+    "CSS",
+    "Swift"
+   ],
+   "license": {
+    "detected_spdx": "AGPL-3.0",
+    "note": "已核对仓库许可证原文；以文件摘要绑定本次核验。",
+    "reviewed_at": "2026-10-22T16:05:40.655079+00:00",
+    "source": {
+     "blob_sha": "0394f2b6e73d87eff0394dc454f3b189d5fce14f",
+     "immutable_url": "https://api.github.com/repos/logseq/logseq/git/blobs/0394f2b6e73d87eff0394dc454f3b189d5fce14f",
+     "kind": "license",
+     "path": "LICENSE.md",
+     "retrieved_at": "2026-10-22T16:09:28.579465+00:00",
+     "sha256": "2467b8901ba62f7708c479944468a677897472a39ecbda1d23818ecf9538620b",
+     "url": "https://github.com/logseq/logseq/blob/master/LICENSE.md"
+    },
+    "spdx": "AGPL-3.0",
+    "status": "open_source"
+   },
+   "matches": [
+    {
+     "evidence": {
+      "excerpt": "atabase version (DB version) of Logseq introduces DB graphs. [See this page](https://github.com/logseq/docs/blob/master/db-version.md) to get an over",
+      "immutable_url": "https://api.github.com/repos/logseq/logseq/git/blobs/662bad17d543ea6865cd8d146c91478858436dc2",
+      "source_sha256": "597bcf7218c37fdf053524467029e22db5c29faffd8fb21007512bbbd3affe56",
+      "source_url": "https://github.com/logseq/logseq/blob/master/README.md"
+     },
+     "reason": "以图谱组织个人知识，适合把持续积累的笔记放入关联网络。",
+     "scenario_id": "pkm-network"
+    }
+   ],
+   "name": "Logseq",
+   "positioning": "隐私优先的个人知识管理平台",
+   "pushed_at": "2026-10-22T15:45:18Z",
+   "repository_id": 266231149,
+   "scope": "适合希望围绕知识图谱持续整理个人资料的人。数据库版本处于 beta，README 建议使用测试图谱并备份。",
+   "scope_evidence": {
+    "excerpt": "s form](https://forms.gle/YSyF4WfKPSDuwyjH6). The DB version is in beta status while the new mobile app and RTC is in alpha. This means that **data loss is possi",
+    "immutable_url": "https://api.github.com/repos/logseq/logseq/git/blobs/662bad17d543ea6865cd8d146c91478858436dc2",
+    "source_sha256": "597bcf7218c37fdf053524467029e22db5c29faffd8fb21007512bbbd3affe56",
+    "source_url": "https://github.com/logseq/logseq/blob/master/README.md"
+   },
+   "sources": [
+    {
+     "blob_sha": "662bad17d543ea6865cd8d146c91478858436dc2",
+     "immutable_url": "https://api.github.com/repos/logseq/logseq/git/blobs/662bad17d543ea6865cd8d146c91478858436dc2",
+     "kind": "readme",
+     "path": "README.md",
+     "retrieved_at": "2026-10-22T16:09:28.579185+00:00",
+     "sha256": "597bcf7218c37fdf053524467029e22db5c29faffd8fb21007512bbbd3affe56",
+     "url": "https://github.com/logseq/logseq/blob/master/README.md"
+    },
+    {
+     "kind": "repository",
+     "retrieved_at": "2026-10-22T16:09:28.579547+00:00",
+     "url": "https://api.github.com/repos/logseq/logseq"
+    },
+    {
+     "kind": "languages",
+     "retrieved_at": "2026-10-22T16:09:28.579549+00:00",
+     "url": "https://api.github.com/repos/logseq/logseq/languages"
+    }
+   ],
+   "summary": "提供个人知识管理、PDF 批注和任务管理；当前仓库同时说明数据库图谱版本的状态。",
+   "summary_evidence": {
+    "excerpt": "or **knowledge management**, **collaboration**, **PDF annotation**, and **task management** with support for multiple file formats, including **Markdown**",
+    "immutable_url": "https://api.github.com/repos/logseq/logseq/git/blobs/662bad17d543ea6865cd8d146c91478858436dc2",
+    "source_sha256": "597bcf7218c37fdf053524467029e22db5c29faffd8fb21007512bbbd3affe56",
+    "source_url": "https://github.com/logseq/logseq/blob/master/README.md"
+   }
+  },
+  {
+   "archived": false,
+   "checked_at": "2026-10-22T16:22:54.272202+00:00",
+   "curation_digest": "82a645e855a80bfffa297a58d2a1f23470790b37866955ab1252525ced392411",
+   "default_branch": "main",
+   "editorial_method": "试点编辑整理；逐项依据官方仓库资料核验，未做部署实测",
+   "features": [
+    {
+     "evidence": {
+      "excerpt": "![License GPL 3][gpl3-badge]][gpl3] Org-roam is a plain-text knowledge management system. It brings some of [Roam's][roamresearch] more powerful features into the [Org-mode][org]",
+      "immutable_url": "https://api.github.com/repos/org-roam/org-roam/git/blobs/dc96a1c8f586f7fa7ff8e5987104608095124d30",
+      "source_sha256": "d68f5ae59b14d4f34225fb9573f11f1f64e5e38fdcee31e00608e90f4457de38",
+      "source_url": "https://github.com/org-roam/org-roam/blob/main/README.md"
+     },
+     "text": "纯文本知识管理"
+    },
+    {
+     "evidence": {
+      "excerpt": "nnect notes and thoughts together with ease using backlinks. Discover surprising and previously unseen connections in your notes with the built-in gr",
+      "immutable_url": "https://api.github.com/repos/org-roam/org-roam/git/blobs/dc96a1c8f586f7fa7ff8e5987104608095124d30",
+      "source_sha256": "d68f5ae59b14d4f34225fb9573f11f1f64e5e38fdcee31e00608e90f4457de38",
+      "source_url": "https://github.com/org-roam/org-roam/blob/main/README.md"
+     },
+     "text": "反向链接"
+    },
+    {
+     "evidence": {
+      "excerpt": "- **Private and Secure**: Edit your personal wiki completely offline, entirely in your control. Encrypt your notes with GPG. Take lasting notes in plain-text.",
+      "immutable_url": "https://api.github.com/repos/org-roam/org-roam/git/blobs/dc96a1c8f586f7fa7ff8e5987104608095124d30",
+      "source_sha256": "d68f5ae59b14d4f34225fb9573f11f1f64e5e38fdcee31e00608e90f4457de38",
+      "source_url": "https://github.com/org-roam/org-roam/blob/main/README.md"
+     },
+     "text": "离线个人 Wiki"
+    },
+    {
+     "evidence": {
+      "excerpt": " fantastic text-editing interface, and the mature Emacs and Org-mode ecosystem of packages. - **Free and Open Source**: Org-roam is licensed under the GNU Gen",
+      "immutable_url": "https://api.github.com/repos/org-roam/org-roam/git/blobs/dc96a1c8f586f7fa7ff8e5987104608095124d30",
+      "source_sha256": "d68f5ae59b14d4f34225fb9573f11f1f64e5e38fdcee31e00608e90f4457de38",
+      "source_url": "https://github.com/org-roam/org-roam/blob/main/README.md"
+     },
+     "text": "Emacs 与 Org-mode 集成"
+    }
+   ],
+   "full_name": "org-roam/org-roam",
+   "github_url": "https://github.com/org-roam/org-roam",
+   "languages": [
+    "Emacs Lisp",
+    "Makefile"
+   ],
+   "license": {
+    "detected_spdx": "GPL-3.0",
+    "note": "已核对仓库许可证原文；以文件摘要绑定本次核验。",
+    "reviewed_at": "2026-10-22T16:05:40.657594+00:00",
+    "source": {
+     "blob_sha": "f288702d2fa16d3cdf0035b15a9fcbc552cd88e7",
+     "immutable_url": "https://api.github.com/repos/org-roam/org-roam/git/blobs/f288702d2fa16d3cdf0035b15a9fcbc552cd88e7",
+     "kind": "license",
+     "path": "LICENSE",
+     "retrieved_at": "2026-10-22T16:09:28.594179+00:00",
+     "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+     "url": "https://github.com/org-roam/org-roam/blob/main/LICENSE"
+    },
+    "spdx": "GPL-3.0",
+    "status": "open_source"
+   },
+   "matches": [
+    {
+     "evidence": {
+      "excerpt": "nnect notes and thoughts together with ease using backlinks. Discover surprising and previously unseen connections in your notes with the built-in gr",
+      "immutable_url": "https://api.github.com/repos/org-roam/org-roam/git/blobs/dc96a1c8f586f7fa7ff8e5987104608095124d30",
+      "source_sha256": "d68f5ae59b14d4f34225fb9573f11f1f64e5e38fdcee31e00608e90f4457de38",
+      "source_url": "https://github.com/org-roam/org-roam/blob/main/README.md"
+     },
+     "reason": "以反向链接发现笔记之间此前未注意到的联系。",
+     "scenario_id": "pkm-network"
+    },
+    {
+     "evidence": {
+      "excerpt": "- **Private and Secure**: Edit your personal wiki completely offline, entirely in your control. Encrypt your notes with GPG. Take lasting notes in plain-text.",
+      "immutable_url": "https://api.github.com/repos/org-roam/org-roam/git/blobs/dc96a1c8f586f7fa7ff8e5987104608095124d30",
+      "source_sha256": "d68f5ae59b14d4f34225fb9573f11f1f64e5e38fdcee31e00608e90f4457de38",
+      "source_url": "https://github.com/org-roam/org-roam/blob/main/README.md"
+     },
+     "reason": "用 Emacs 和 Org-mode 编辑离线、纯文本的个人 Wiki。",
+     "scenario_id": "pkm-plaintext"
+    }
+   ],
+   "name": "Org-roam",
+   "positioning": "Emacs 与 Org-mode 中的纯文本知识网络",
+   "pushed_at": "2026-04-27T03:16:28Z",
+   "repository_id": 231891986,
+   "scope": "适合已经使用 Emacs / Org-mode，希望离线维护个人 Wiki 的用户。",
+   "scope_evidence": {
+    "excerpt": "- **Private and Secure**: Edit your personal wiki completely offline, entirely in your control. Encrypt your notes with GPG. Take lasting notes in plain-text.",
+    "immutable_url": "https://api.github.com/repos/org-roam/org-roam/git/blobs/dc96a1c8f586f7fa7ff8e5987104608095124d30",
+    "source_sha256": "d68f5ae59b14d4f34225fb9573f11f1f64e5e38fdcee31e00608e90f4457de38",
+    "source_url": "https://github.com/org-roam/org-roam/blob/main/README.md"
+   },
+   "sources": [
+    {
+     "blob_sha": "dc96a1c8f586f7fa7ff8e5987104608095124d30",
+     "immutable_url": "https://api.github.com/repos/org-roam/org-roam/git/blobs/dc96a1c8f586f7fa7ff8e5987104608095124d30",
+     "kind": "readme",
+     "path": "README.md",
+     "retrieved_at": "2026-10-22T16:09:28.593972+00:00",
+     "sha256": "d68f5ae59b14d4f34225fb9573f11f1f64e5e38fdcee31e00608e90f4457de38",
+     "url": "https://github.com/org-roam/org-roam/blob/main/README.md"
+    },
+    {
+     "kind": "repository",
+     "retrieved_at": "2026-10-22T16:09:28.594252+00:00",
+     "url": "https://api.github.com/repos/org-roam/org-roam"
+    },
+    {
+     "kind": "languages",
+     "retrieved_at": "2026-10-22T16:09:28.594254+00:00",
+     "url": "https://api.github.com/repos/org-roam/org-roam/languages"
+    }
+   ],
+   "summary": "纯文本知识管理系统，为 Org-mode 用户提供非层级笔记和反向链接。",
+   "summary_evidence": {
+    "excerpt": "![License GPL 3][gpl3-badge]][gpl3] Org-roam is a plain-text knowledge management system. It brings some of [Roam's][roamresearch] more powerful features into the [Org-mode][org]",
+    "immutable_url": "https://api.github.com/repos/org-roam/org-roam/git/blobs/dc96a1c8f586f7fa7ff8e5987104608095124d30",
+    "source_sha256": "d68f5ae59b14d4f34225fb9573f11f1f64e5e38fdcee31e00608e90f4457de38",
+    "source_url": "https://github.com/org-roam/org-roam/blob/main/README.md"
+   }
+  },
+  {
+   "archived": false,
+   "checked_at": "2026-10-22T16:22:49.770424+00:00",
+   "curation_digest": "196febe192e6729c30e2840b23ff8be3c97cb71d0f34f0295a70b89b8b81dfad",
+   "default_branch": "main",
+   "editorial_method": "试点编辑整理；逐项依据官方仓库资料核验，未做部署实测",
+   "features": [
+    {
+     "evidence": {
+      "excerpt": "h you. In SilverBullet you keep your content as a collection of Markdown Pages (called a Space). You navigate your space using the Page Picker like a traditional notes ",
+      "immutable_url": "https://api.github.com/repos/silverbulletmd/silverbullet/git/blobs/76a28177cec9b202daf80e51d46635d235f2aa49",
+      "source_sha256": "29806b792de1b6a449f794869a342f542e4599de358046b5b7172ecd404dffdb",
+      "source_url": "https://github.com/silverbulletmd/silverbullet/blob/main/README.md"
+     },
+     "text": "Markdown 页面知识空间"
+    },
+    {
+     "evidence": {
+      "excerpt": "pp, or through Links like a wiki (except they are bi-directional). If you are the **writer** type, you’ll appreciate SilverBullet as a clean Markdown edit",
+      "immutable_url": "https://api.github.com/repos/silverbulletmd/silverbullet/git/blobs/76a28177cec9b202daf80e51d46635d235f2aa49",
+      "source_sha256": "29806b792de1b6a449f794869a342f542e4599de358046b5b7172ecd404dffdb",
+      "source_url": "https://github.com/silverbulletmd/silverbullet/blob/main/README.md"
+     },
+     "text": "双向 Wiki 导航"
+    },
+    {
+     "evidence": {
+      "excerpt": "tabase and query language, and a fully integrated Space Lua scripting environment, turning your notes into a programmable system that grows with you.",
+      "immutable_url": "https://api.github.com/repos/silverbulletmd/silverbullet/git/blobs/76a28177cec9b202daf80e51d46635d235f2aa49",
+      "source_sha256": "29806b792de1b6a449f794869a342f542e4599de358046b5b7172ecd404dffdb",
+      "source_url": "https://github.com/silverbulletmd/silverbullet/blob/main/README.md"
+     },
+     "text": "Lua 脚本与查询"
+    }
+   ],
+   "full_name": "silverbulletmd/silverbullet",
+   "github_url": "https://github.com/silverbulletmd/silverbullet",
+   "languages": [
+    "TypeScript",
+    "Rust",
+    "Lua",
+    "SCSS",
+    "HTML"
+   ],
+   "license": {
+    "detected_spdx": "MIT",
+    "note": "已核对仓库许可证原文；以文件摘要绑定本次核验。",
+    "reviewed_at": "2026-10-22T16:05:40.656572+00:00",
+    "source": {
+     "blob_sha": "bc1ccb41adfe59f32908a6652ef9f3abedeaec98",
+     "immutable_url": "https://api.github.com/repos/silverbulletmd/silverbullet/git/blobs/bc1ccb41adfe59f32908a6652ef9f3abedeaec98",
+     "kind": "license",
+     "path": "LICENSE.md",
+     "retrieved_at": "2026-10-22T16:09:28.584936+00:00",
+     "sha256": "ccf525a3b5c9ac8d843e118932036e6517d4d603f9ff3e474522b632c3996c65",
+     "url": "https://github.com/silverbulletmd/silverbullet/blob/main/LICENSE.md"
+    },
+    "spdx": "MIT",
+    "status": "open_source"
+   },
+   "matches": [
+    {
+     "evidence": {
+      "excerpt": "h you. In SilverBullet you keep your content as a collection of Markdown Pages (called a Space). You navigate your space using the Page Picker like a traditional notes ",
+      "immutable_url": "https://api.github.com/repos/silverbulletmd/silverbullet/git/blobs/76a28177cec9b202daf80e51d46635d235f2aa49",
+      "source_sha256": "29806b792de1b6a449f794869a342f542e4599de358046b5b7172ecd404dffdb",
+      "source_url": "https://github.com/silverbulletmd/silverbullet/blob/main/README.md"
+     },
+     "reason": "知识内容保存为 Markdown 页面，并在浏览器编辑器中编写与连接。",
+     "scenario_id": "pkm-plaintext"
+    },
+    {
+     "evidence": {
+      "excerpt": "rogrammable, Private, Browser-based, Open Source, Self Hosted, Personal Knowledge Database — a fancy term for a \"notes app on steroids\". _Yowza!_ That ",
+      "immutable_url": "https://api.github.com/repos/silverbulletmd/silverbullet/git/blobs/76a28177cec9b202daf80e51d46635d235f2aa49",
+      "source_sha256": "29806b792de1b6a449f794869a342f542e4599de358046b5b7172ecd404dffdb",
+      "source_url": "https://github.com/silverbulletmd/silverbullet/blob/main/README.md"
+     },
+     "reason": "项目明确面向自托管的个人知识数据库，提供 Wiki 式页面链接。",
+     "scenario_id": "pkm-wiki"
+    }
+   ],
+   "name": "SilverBullet",
+   "positioning": "可编程的自托管 Markdown 知识库",
+   "pushed_at": "2026-10-22T13:47:42Z",
+   "repository_id": 459944886,
+   "scope": "适合愿意自托管、并希望通过查询或脚本定制个人知识工作方式的用户。",
+   "scope_evidence": {
+    "excerpt": "rogrammable, Private, Browser-based, Open Source, Self Hosted, Personal Knowledge Database — a fancy term for a \"notes app on steroids\". _Yowza!_ That ",
+    "immutable_url": "https://api.github.com/repos/silverbulletmd/silverbullet/git/blobs/76a28177cec9b202daf80e51d46635d235f2aa49",
+    "source_sha256": "29806b792de1b6a449f794869a342f542e4599de358046b5b7172ecd404dffdb",
+    "source_url": "https://github.com/silverbulletmd/silverbullet/blob/main/README.md"
+   },
+   "sources": [
+    {
+     "blob_sha": "76a28177cec9b202daf80e51d46635d235f2aa49",
+     "immutable_url": "https://api.github.com/repos/silverbulletmd/silverbullet/git/blobs/76a28177cec9b202daf80e51d46635d235f2aa49",
+     "kind": "readme",
+     "path": "README.md",
+     "retrieved_at": "2026-10-22T16:09:28.584833+00:00",
+     "sha256": "29806b792de1b6a449f794869a342f542e4599de358046b5b7172ecd404dffdb",
+     "url": "https://github.com/silverbulletmd/silverbullet/blob/main/README.md"
+    },
+    {
+     "kind": "repository",
+     "retrieved_at": "2026-10-22T16:09:28.585013+00:00",
+     "url": "https://api.github.com/repos/silverbulletmd/silverbullet"
+    },
+    {
+     "kind": "languages",
+     "retrieved_at": "2026-10-22T16:09:28.585015+00:00",
+     "url": "https://api.github.com/repos/silverbulletmd/silverbullet/languages"
+    }
+   ],
+   "summary": "以 Markdown 页面组成知识空间，提供双向 Wiki 链接、查询和 Lua 脚本能力。",
+   "summary_evidence": {
+    "excerpt": "rBullet combines a clean live-preview editor with wiki-style linking, a built-in database and query language, and a fully integrated Space Lua scripting envir",
+    "immutable_url": "https://api.github.com/repos/silverbulletmd/silverbullet/git/blobs/76a28177cec9b202daf80e51d46635d235f2aa49",
+    "source_sha256": "29806b792de1b6a449f794869a342f542e4599de358046b5b7172ecd404dffdb",
+    "source_url": "https://github.com/silverbulletmd/silverbullet/blob/main/README.md"
+   }
+  },
+  {
+   "archived": false,
+   "checked_at": "2026-10-22T16:22:47.159921+00:00",
+   "curation_digest": "f122cf7c65c761b55d9371bd64a43d517ade24db521520fcee44071dc9465f24",
+   "default_branch": "master",
+   "editorial_method": "试点编辑整理；逐项依据官方仓库资料核验，未做部署实测",
+   "features": [
+    {
+     "evidence": {
+      "excerpt": " free, even for commercial use. - Content block - Block-level reference and two-way links - Custom attributes - SQL query embed - Protocol `siyuan://` - Editor - Block-style - Mar",
+      "immutable_url": "https://api.github.com/repos/siyuan-note/siyuan/git/blobs/755d207f0dba924be21d2e2378f3b6f7fbab0e4d",
+      "source_sha256": "2e8149ff44c748a100517401455618b6569858eec3d8c6a24ffe96f5da2721cd",
+      "source_url": "https://github.com/siyuan-note/siyuan/blob/master/README.md"
+     },
+     "text": "块级引用和双向链接"
+    },
+    {
+     "evidence": {
+      "excerpt": "supporting fine-grained block-level reference and Markdown WYSIWYG. ![feature0.png](screenshots/feature0.png) ![feature5-1.png](screenshots/feature5-1.png) ",
+      "immutable_url": "https://api.github.com/repos/siyuan-note/siyuan/git/blobs/755d207f0dba924be21d2e2378f3b6f7fbab0e4d",
+      "source_sha256": "2e8149ff44c748a100517401455618b6569858eec3d8c6a24ffe96f5da2721cd",
+      "source_url": "https://github.com/siyuan-note/siyuan/blob/master/README.md"
+     },
+     "text": "Markdown 所见即所得"
+    },
+    {
+     "evidence": {
+      "excerpt": "n://` - Editor - Block-style - Markdown WYSIWYG - List outline - Block zoom-in - Million-word large document editing - Mathematical formulas, charts, fl",
+      "immutable_url": "https://api.github.com/repos/siyuan-note/siyuan/git/blobs/755d207f0dba924be21d2e2378f3b6f7fbab0e4d",
+      "source_sha256": "2e8149ff44c748a100517401455618b6569858eec3d8c6a24ffe96f5da2721cd",
+      "source_url": "https://github.com/siyuan-note/siyuan/blob/master/README.md"
+     },
+     "text": "大纲列表"
+    }
+   ],
+   "full_name": "siyuan-note/siyuan",
+   "github_url": "https://github.com/siyuan-note/siyuan",
+   "languages": [
+    "TypeScript",
+    "Go",
+    "JavaScript",
+    "SCSS",
+    "Python"
+   ],
+   "license": {
+    "detected_spdx": "AGPL-3.0",
+    "note": "已核对仓库许可证原文；以文件摘要绑定本次核验。",
+    "reviewed_at": "2026-10-22T16:05:40.655753+00:00",
+    "source": {
+     "blob_sha": "bae94e189e62df1b8d5bd11435d954b25bee9d7b",
+     "immutable_url": "https://api.github.com/repos/siyuan-note/siyuan/git/blobs/bae94e189e62df1b8d5bd11435d954b25bee9d7b",
+     "kind": "license",
+     "path": "LICENSE",
+     "retrieved_at": "2026-10-22T16:09:55.596199+00:00",
+     "sha256": "4df3c306dddaaf4baffdff5ca820cc679ac8cd6dc263c6a74517783e42fa7a3b",
+     "url": "https://github.com/siyuan-note/siyuan/blob/master/LICENSE"
+    },
+    "spdx": "AGPL-3.0",
+    "status": "open_source"
+   },
+   "matches": [
+    {
+     "evidence": {
+      "excerpt": " free, even for commercial use. - Content block - Block-level reference and two-way links - Custom attributes - SQL query embed - Protocol `siyuan://` - Editor - Block-style - Mar",
+      "immutable_url": "https://api.github.com/repos/siyuan-note/siyuan/git/blobs/755d207f0dba924be21d2e2378f3b6f7fbab0e4d",
+      "source_sha256": "2e8149ff44c748a100517401455618b6569858eec3d8c6a24ffe96f5da2721cd",
+      "source_url": "https://github.com/siyuan-note/siyuan/blob/master/README.md"
+     },
+     "reason": "块级引用和双向链接让笔记内容能形成可导航的关联网络。",
+     "scenario_id": "pkm-network"
+    },
+    {
+     "evidence": {
+      "excerpt": " Helm rollback does not undo data migrations. The Docker hosting limitations also apply: browser use only, no desktop or mobile application connections, no PDF/HTML/W",
+      "immutable_url": "https://api.github.com/repos/siyuan-note/siyuan/git/blobs/755d207f0dba924be21d2e2378f3b6f7fbab0e4d",
+      "source_sha256": "2e8149ff44c748a100517401455618b6569858eec3d8c6a24ffe96f5da2721cd",
+      "source_url": "https://github.com/siyuan-note/siyuan/blob/master/README.md"
+     },
+     "reason": "官方 README 提供 Docker 自托管说明；应同时查看其部署功能限制。",
+     "scenario_id": "pkm-wiki"
+    }
+   ],
+   "name": "思源 SiYuan",
+   "positioning": "块级引用与双向链接的个人知识系统",
+   "pushed_at": "2026-10-22T16:05:22Z",
+   "repository_id": 291438522,
+   "scope": "适合需要块级引用的个人知识积累；也提供 Docker 部署，但浏览器部署存在 README 列明的功能限制。",
+   "scope_evidence": {
+    "excerpt": " Helm rollback does not undo data migrations. The Docker hosting limitations also apply: browser use only, no desktop or mobile application connections, no PDF/HTML/W",
+    "immutable_url": "https://api.github.com/repos/siyuan-note/siyuan/git/blobs/755d207f0dba924be21d2e2378f3b6f7fbab0e4d",
+    "source_sha256": "2e8149ff44c748a100517401455618b6569858eec3d8c6a24ffe96f5da2721cd",
+    "source_url": "https://github.com/siyuan-note/siyuan/blob/master/README.md"
+   },
+   "sources": [
+    {
+     "blob_sha": "755d207f0dba924be21d2e2378f3b6f7fbab0e4d",
+     "immutable_url": "https://api.github.com/repos/siyuan-note/siyuan/git/blobs/755d207f0dba924be21d2e2378f3b6f7fbab0e4d",
+     "kind": "readme",
+     "path": "README.md",
+     "retrieved_at": "2026-10-22T16:09:55.595741+00:00",
+     "sha256": "2e8149ff44c748a100517401455618b6569858eec3d8c6a24ffe96f5da2721cd",
+     "url": "https://github.com/siyuan-note/siyuan/blob/master/README.md"
+    },
+    {
+     "kind": "repository",
+     "retrieved_at": "2026-10-22T16:09:55.596302+00:00",
+     "url": "https://api.github.com/repos/siyuan-note/siyuan"
+    },
+    {
+     "kind": "languages",
+     "retrieved_at": "2026-10-22T16:09:55.596304+00:00",
+     "url": "https://api.github.com/repos/siyuan-note/siyuan/languages"
+    }
+   ],
+   "summary": "隐私优先的个人知识管理系统，支持细粒度块级引用、双向链接和 Markdown 编辑。",
+   "summary_evidence": {
+    "excerpt": " personal knowledge management system, supporting fine-grained block-level reference and Markdown WYSIWYG. ![feature0.png](screenshots/feature0.png) ![feature5-1.png](screens",
+    "immutable_url": "https://api.github.com/repos/siyuan-note/siyuan/git/blobs/755d207f0dba924be21d2e2378f3b6f7fbab0e4d",
+    "source_sha256": "2e8149ff44c748a100517401455618b6569858eec3d8c6a24ffe96f5da2721cd",
+    "source_url": "https://github.com/siyuan-note/siyuan/blob/master/README.md"
+   }
+  },
+  {
+   "archived": false,
+   "checked_at": "2026-10-22T16:22:50.957616+00:00",
+   "curation_digest": "ae875fe331f8a39ffb18996bcf77f4fe52a5d2bc4b238cfcfec60bab74386c08",
+   "default_branch": "master",
+   "editorial_method": "试点编辑整理；逐项依据官方仓库资料核验，未做部署实测",
+   "features": [
+    {
+     "evidence": {
+      "excerpt": "Welcome Welcome to TiddlyWiki , a non-linear personal web notebook that anyone can use and keep forever, independently of any corporation. TiddlyWiki is a c",
+      "immutable_url": "https://api.github.com/repos/TiddlyWiki/TiddlyWiki5/git/blobs/d3d6d101192b92547b8a36fcc292dd8d8e200f6f",
+      "source_sha256": "8869b9fced808b454b5b2f3375ec424dc21252ce8a905f6e7c73ac369118499d",
+      "source_url": "https://github.com/TiddlyWiki/TiddlyWiki5/blob/master/readme.md"
+     },
+     "text": "非线性个人网页笔记"
+    },
+    {
+     "evidence": {
+      "excerpt": "teractive wiki in JavaScript. It can be used as a single HTML file in the browser or as a powerful Node.js application. It is highly customisable: the entir",
+      "immutable_url": "https://api.github.com/repos/TiddlyWiki/TiddlyWiki5/git/blobs/d3d6d101192b92547b8a36fcc292dd8d8e200f6f",
+      "source_sha256": "8869b9fced808b454b5b2f3375ec424dc21252ce8a905f6e7c73ac369118499d",
+      "source_url": "https://github.com/TiddlyWiki/TiddlyWiki5/blob/master/readme.md"
+     },
+     "text": "单个 HTML 文件运行"
+    },
+    {
+     "evidence": {
+      "excerpt": " single HTML file in the browser or as a powerful Node.js application. It is highly customisable: the entire user interface is itself implemented in hackable W",
+      "immutable_url": "https://api.github.com/repos/TiddlyWiki/TiddlyWiki5/git/blobs/d3d6d101192b92547b8a36fcc292dd8d8e200f6f",
+      "source_sha256": "8869b9fced808b454b5b2f3375ec424dc21252ce8a905f6e7c73ac369118499d",
+      "source_url": "https://github.com/TiddlyWiki/TiddlyWiki5/blob/master/readme.md"
+     },
+     "text": "Node.js 应用形态"
+    }
+   ],
+   "full_name": "TiddlyWiki/TiddlyWiki5",
+   "github_url": "https://github.com/TiddlyWiki/TiddlyWiki5",
+   "languages": [
+    "JavaScript",
+    "TeX",
+    "Shell",
+    "CSS",
+    "Batchfile"
+   ],
+   "license": {
+    "detected_spdx": "NOASSERTION",
+    "note": "已核对仓库许可证原文；以文件摘要绑定本次核验。 GitHub 返回 NOASSERTION，按原文识别。",
+    "reviewed_at": "2026-10-22T16:05:40.656868+00:00",
+    "source": {
+     "blob_sha": "ea8133e69dfe81f4ad464ef4ed2c784aa8e08033",
+     "immutable_url": "https://api.github.com/repos/TiddlyWiki/TiddlyWiki5/git/blobs/ea8133e69dfe81f4ad464ef4ed2c784aa8e08033",
+     "kind": "license",
+     "path": "license",
+     "retrieved_at": "2026-10-22T16:09:28.586805+00:00",
+     "sha256": "563955ffb71c1ff7090634d68164a68b8c76f1f9048a98fc6a0526124f447513",
+     "url": "https://github.com/TiddlyWiki/TiddlyWiki5/blob/master/license"
+    },
+    "spdx": "BSD-3-Clause",
+    "status": "open_source"
+   },
+   "matches": [
+    {
+     "evidence": {
+      "excerpt": "teractive wiki in JavaScript. It can be used as a single HTML file in the browser or as a powerful Node.js application. It is highly customisable: the entir",
+      "immutable_url": "https://api.github.com/repos/TiddlyWiki/TiddlyWiki5/git/blobs/d3d6d101192b92547b8a36fcc292dd8d8e200f6f",
+      "source_sha256": "8869b9fced808b454b5b2f3375ec424dc21252ce8a905f6e7c73ac369118499d",
+      "source_url": "https://github.com/TiddlyWiki/TiddlyWiki5/blob/master/readme.md"
+     },
+     "reason": "可把个人 Wiki 保存在单个 HTML 文件，也可作为 Node.js 应用运行。",
+     "scenario_id": "pkm-wiki"
+    }
+   ],
+   "name": "TiddlyWiki",
+   "positioning": "单文件或 Node.js 运行的个人 Wiki",
+   "pushed_at": "2026-10-18T10:26:15Z",
+   "repository_id": 2828239,
+   "scope": "适合希望用独立文件掌控个人 Wiki，或通过 Node.js 运行个人知识站点的用户。",
+   "scope_evidence": {
+    "excerpt": "teractive wiki in JavaScript. It can be used as a single HTML file in the browser or as a powerful Node.js application. It is highly customisable: the entir",
+    "immutable_url": "https://api.github.com/repos/TiddlyWiki/TiddlyWiki5/git/blobs/d3d6d101192b92547b8a36fcc292dd8d8e200f6f",
+    "source_sha256": "8869b9fced808b454b5b2f3375ec424dc21252ce8a905f6e7c73ac369118499d",
+    "source_url": "https://github.com/TiddlyWiki/TiddlyWiki5/blob/master/readme.md"
+   },
+   "sources": [
+    {
+     "blob_sha": "d3d6d101192b92547b8a36fcc292dd8d8e200f6f",
+     "immutable_url": "https://api.github.com/repos/TiddlyWiki/TiddlyWiki5/git/blobs/d3d6d101192b92547b8a36fcc292dd8d8e200f6f",
+     "kind": "readme",
+     "path": "readme.md",
+     "retrieved_at": "2026-10-22T16:09:28.586771+00:00",
+     "sha256": "8869b9fced808b454b5b2f3375ec424dc21252ce8a905f6e7c73ac369118499d",
+     "url": "https://github.com/TiddlyWiki/TiddlyWiki5/blob/master/readme.md"
+    },
+    {
+     "kind": "repository",
+     "retrieved_at": "2026-10-22T16:09:28.586873+00:00",
+     "url": "https://api.github.com/repos/TiddlyWiki/TiddlyWiki5"
+    },
+    {
+     "kind": "languages",
+     "retrieved_at": "2026-10-22T16:09:28.586875+00:00",
+     "url": "https://api.github.com/repos/TiddlyWiki/TiddlyWiki5/languages"
+    }
+   ],
+   "summary": "可长期保留的非线性个人网页笔记本，支持独立 HTML 文件或 Node.js 应用形态。",
+   "summary_evidence": {
+    "excerpt": "Welcome Welcome to TiddlyWiki , a non-linear personal web notebook that anyone can use and keep forever, independently of any corporation. TiddlyWiki is a c",
+    "immutable_url": "https://api.github.com/repos/TiddlyWiki/TiddlyWiki5/git/blobs/d3d6d101192b92547b8a36fcc292dd8d8e200f6f",
+    "source_sha256": "8869b9fced808b454b5b2f3375ec424dc21252ce8a905f6e7c73ac369118499d",
+    "source_url": "https://github.com/TiddlyWiki/TiddlyWiki5/blob/master/readme.md"
+   }
+  },
+  {
+   "archived": false,
+   "checked_at": "2026-10-22T16:22:48.416066+00:00",
+   "curation_digest": "7941cde2d7a021e5a48f5cdf9d4f7b8922955b4de4cf67ef6bed8da3c6f674db",
+   "default_branch": "main",
+   "editorial_method": "试点编辑整理；逐项依据官方仓库资料核验，未做部署实测",
+   "features": [
+    {
+     "evidence": {
+      "excerpt": "ledge) ## 🎁 Features * Notes can be arranged into arbitrarily deep tree. Single note can be placed into multiple places in the tree (see [cloning](https://docs.t",
+      "immutable_url": "https://api.github.com/repos/TriliumNext/Trilium/git/blobs/e686e04e62c5659dd7e5c19120ee9e5fc1aed87d",
+      "source_sha256": "087906667d44cbca6a47a4e198713c7b068c1766c8fe9a80daa9b4e7480eae95",
+      "source_url": "https://github.com/TriliumNext/Trilium/blob/main/README.md"
+     },
+     "text": "多层级笔记树与克隆"
+    },
+    {
+     "evidence": {
+      "excerpt": "es.org/user-guide/concepts/notes/cloning)) * Rich WYSIWYG note editor including e.g. tables, images and [math](https://docs.triliumnotes.org/user-g",
+      "immutable_url": "https://api.github.com/repos/TriliumNext/Trilium/git/blobs/e686e04e62c5659dd7e5c19120ee9e5fc1aed87d",
+      "source_sha256": "087906667d44cbca6a47a4e198713c7b068c1766c8fe9a80daa9b4e7480eae95",
+      "source_url": "https://github.com/TriliumNext/Trilium/blob/main/README.md"
+     },
+     "text": "所见即所得编辑"
+    },
+    {
+     "evidence": {
+      "excerpt": "otes.org/user-guide/note-types/relation-map) and [note/link maps](https://docs.triliumnotes.org/user-guide/note-types/note-map) for visualizing notes and ",
+      "immutable_url": "https://api.github.com/repos/TriliumNext/Trilium/git/blobs/e686e04e62c5659dd7e5c19120ee9e5fc1aed87d",
+      "source_sha256": "087906667d44cbca6a47a4e198713c7b068c1766c8fe9a80daa9b4e7480eae95",
+      "source_url": "https://github.com/TriliumNext/Trilium/blob/main/README.md"
+     },
+     "text": "关系图与笔记链接图"
+    },
+    {
+     "evidence": {
+      "excerpt": "mnotes.org/user-guide/setup/synchronization) with self-hosted sync server * there are [3rd party services for hosting synchronisation server](https://docs.triliumn",
+      "immutable_url": "https://api.github.com/repos/TriliumNext/Trilium/git/blobs/e686e04e62c5659dd7e5c19120ee9e5fc1aed87d",
+      "source_sha256": "087906667d44cbca6a47a4e198713c7b068c1766c8fe9a80daa9b4e7480eae95",
+      "source_url": "https://github.com/TriliumNext/Trilium/blob/main/README.md"
+     },
+     "text": "自托管同步服务"
+    }
+   ],
+   "full_name": "TriliumNext/Trilium",
+   "github_url": "https://github.com/TriliumNext/Trilium",
+   "languages": [
+    "TypeScript",
+    "Fluent",
+    "CSS",
+    "HTML",
+    "JavaScript"
+   ],
+   "license": {
+    "detected_spdx": "AGPL-3.0",
+    "note": "已核对仓库许可证原文；以文件摘要绑定本次核验。",
+    "reviewed_at": "2026-10-22T16:05:40.656228+00:00",
+    "source": {
+     "blob_sha": "dbbe3558157f5861bff35dcb37b328b679b0ccfd",
+     "immutable_url": "https://api.github.com/repos/TriliumNext/Trilium/git/blobs/dbbe3558157f5861bff35dcb37b328b679b0ccfd",
+     "kind": "license",
+     "path": "LICENSE",
+     "retrieved_at": "2026-10-22T16:09:28.584136+00:00",
+     "sha256": "76a97c878c9c7a8321bb395c2b44d3fe2f8d81314d219b20138ed0e2dddd5182",
+     "url": "https://github.com/TriliumNext/Trilium/blob/main/LICENSE"
+    },
+    "spdx": "AGPL-3.0",
+    "status": "open_source"
+   },
+   "matches": [
+    {
+     "evidence": {
+      "excerpt": "otes.org/user-guide/note-types/relation-map) and [note/link maps](https://docs.triliumnotes.org/user-guide/note-types/note-map) for visualizing notes and ",
+      "immutable_url": "https://api.github.com/repos/TriliumNext/Trilium/git/blobs/e686e04e62c5659dd7e5c19120ee9e5fc1aed87d",
+      "source_sha256": "087906667d44cbca6a47a4e198713c7b068c1766c8fe9a80daa9b4e7480eae95",
+      "source_url": "https://github.com/TriliumNext/Trilium/blob/main/README.md"
+     },
+     "reason": "关系图和笔记链接图让层级中的知识关系可被查看与探索。",
+     "scenario_id": "pkm-network"
+    },
+    {
+     "evidence": {
+      "excerpt": "mnotes.org/user-guide/setup/synchronization) with self-hosted sync server * there are [3rd party services for hosting synchronisation server](https://docs.triliumn",
+      "immutable_url": "https://api.github.com/repos/TriliumNext/Trilium/git/blobs/e686e04e62c5659dd7e5c19120ee9e5fc1aed87d",
+      "source_sha256": "087906667d44cbca6a47a4e198713c7b068c1766c8fe9a80daa9b4e7480eae95",
+      "source_url": "https://github.com/TriliumNext/Trilium/blob/main/README.md"
+     },
+     "reason": "可用自托管同步服务和浏览器界面访问自己的知识库。",
+     "scenario_id": "pkm-wiki"
+    }
+   ],
+   "name": "Trilium Notes",
+   "positioning": "面向大型个人知识库的分层笔记",
+   "pushed_at": "2026-10-22T14:33:09Z",
+   "repository_id": 92111509,
+   "scope": "适合需要层级组织、关系图和自托管同步的个人知识库。",
+   "scope_evidence": {
+    "excerpt": "mnotes.org/user-guide/setup/synchronization) with self-hosted sync server * there are [3rd party services for hosting synchronisation server](https://docs.triliumn",
+    "immutable_url": "https://api.github.com/repos/TriliumNext/Trilium/git/blobs/e686e04e62c5659dd7e5c19120ee9e5fc1aed87d",
+    "source_sha256": "087906667d44cbca6a47a4e198713c7b068c1766c8fe9a80daa9b4e7480eae95",
+    "source_url": "https://github.com/TriliumNext/Trilium/blob/main/README.md"
+   },
+   "sources": [
+    {
+     "blob_sha": "e686e04e62c5659dd7e5c19120ee9e5fc1aed87d",
+     "immutable_url": "https://api.github.com/repos/TriliumNext/Trilium/git/blobs/e686e04e62c5659dd7e5c19120ee9e5fc1aed87d",
+     "kind": "readme",
+     "path": "README.md",
+     "retrieved_at": "2026-10-22T16:09:28.583821+00:00",
+     "sha256": "087906667d44cbca6a47a4e198713c7b068c1766c8fe9a80daa9b4e7480eae95",
+     "url": "https://github.com/TriliumNext/Trilium/blob/main/README.md"
+    },
+    {
+     "kind": "repository",
+     "retrieved_at": "2026-10-22T16:09:28.584196+00:00",
+     "url": "https://api.github.com/repos/TriliumNext/Trilium"
+    },
+    {
+     "kind": "languages",
+     "retrieved_at": "2026-10-22T16:09:28.584197+00:00",
+     "url": "https://api.github.com/repos/TriliumNext/Trilium/languages"
+    }
+   ],
+   "summary": "跨平台的分层笔记应用，围绕大型个人知识库提供丰富编辑和关系可视化。",
+   "summary_evidence": {
+    "excerpt": "ierarchical note taking application with focus on building large personal knowledge bases. Looking for \"Trillium Notes\"? The project's canonical spelling is \"Trilium Notes\", with ",
+    "immutable_url": "https://api.github.com/repos/TriliumNext/Trilium/git/blobs/e686e04e62c5659dd7e5c19120ee9e5fc1aed87d",
+    "source_sha256": "087906667d44cbca6a47a4e198713c7b068c1766c8fe9a80daa9b4e7480eae95",
+    "source_url": "https://github.com/TriliumNext/Trilium/blob/main/README.md"
+   }
+  }
+ ]
+}

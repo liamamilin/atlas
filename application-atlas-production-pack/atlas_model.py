@@ -21,12 +21,16 @@ case while still allowing a native provider later.
 from __future__ import annotations
 
 import json
+import http.client
 import os
 import re
+import ssl
 import sqlite3
 import time
 import urllib.error
 import urllib.request
+import uuid
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -54,8 +58,8 @@ PRESETS: dict[str, dict] = {
     },
     "opencode-go": {
         "name": "OpenCode Go", "style": "openai",
-        "base_url": "https://opencode.ai/zen/go/v1",
-        "models": ["qwen3.8-flash", "mimo-v2.5", "deepseek-v4-flash"],
+        "base_url": "https://opencode.ai/inference/go/openai/v1",
+        "models": ["deepseek-v4.1-flash", "mimo-v2.5", "step-5-preview"],
     },
     "opencode": {
         "name": "OpenCode Zen", "style": "openai",
@@ -68,7 +72,7 @@ PRESETS: dict[str, dict] = {
     "openai": {
         "name": "OpenAI", "style": "openai",
         "base_url": "https://api.openai.com/v1",
-        "models": ["gpt-5.6-sol", "gpt-5.6-luna"],
+        "models": ["gpt-6-luna", "gpt-5.6-sol", "gpt-5.6-luna"],
     },
     "anthropic": {
         "name": "Anthropic", "style": "anthropic",
@@ -171,10 +175,15 @@ DELETE_CONFIRMATION = "delete_model_provider"
 class ModelConfigError(RuntimeError):
     """A provider configuration or provider call failed."""
 
-    def __init__(self, message: str, code: str = "invalid_request", status: int = 400):
+    def __init__(self, message: str, code: str = "invalid_request", status: int = 400,
+                 *, upstream_status: int | None = None, retryable: bool = False,
+                 retry_after: float | None = None):
         super().__init__(message)
         self.code = code
         self.status = status
+        self.upstream_status = upstream_status
+        self.retryable = retryable
+        self.retry_after = retry_after
 
 
 def _empty_config() -> dict:
@@ -182,6 +191,7 @@ def _empty_config() -> dict:
         "version": 1,
         "providers": {},
         "default": {"provider": None, "model": None},
+        "fallback": {"enabled": False, "from_provider": "", "provider": "", "model": ""},
         "roles": {},
         "embedding": dict(DEFAULT_EMBEDDING),
     }
@@ -217,6 +227,8 @@ def load_config() -> dict:
                     "models": _models(value.get("models")),
                     "updated_at": str(value.get("updated_at") or ""),
                 }
+                if key == "opencode-go" and config["providers"][key]["base_url"].rstrip("/") == "https://opencode.ai/zen/go/v1":
+                    config["providers"][key]["base_url"] = PRESETS["opencode-go"]["base_url"]
     default = raw.get("default")
     if isinstance(default, dict):
         provider = default.get("provider")
@@ -239,6 +251,10 @@ def load_config() -> dict:
             for role in ROLES
             if isinstance(roles.get(role), str) and roles[role].strip()
         }
+    fallback = raw.get("fallback")
+    if isinstance(fallback, dict):
+        config["fallback"] = {"enabled": fallback.get("enabled") is True,
+                              **{k: str(fallback.get(k) or "") for k in ("from_provider", "provider", "model")}}
     return config
 
 
@@ -249,6 +265,65 @@ def save_config(config: dict) -> None:
         os.chmod(path, 0o600)
     except OSError:
         pass
+
+
+def _fallback_state_path() -> Path:
+    return config_path().with_name(config_path().stem + ".fallback-state.json")
+
+
+def fallback_view(config: dict | None = None) -> dict:
+    config = config or load_config()
+    policy = dict(config["fallback"])
+    signature = {**policy, "primary_model": config["default"].get("model")}
+    try:
+        state = json.loads(_fallback_state_path().read_text())
+    except (OSError, ValueError):
+        state = {}
+    if not isinstance(state, dict):
+        state = {}
+    active = bool(policy["enabled"] and config["default"]["provider"] == policy["from_provider"]
+                  and state.get("policy") == signature)
+    return {**policy, "active": active, "activated_at": state.get("activated_at") if active else None,
+            "reason": state.get("reason") if active else None}
+
+
+def set_fallback(payload: dict) -> dict:
+    if not isinstance(payload, dict):
+        raise ModelConfigError("fallback payload must be an object")
+    config = load_config()
+    if payload.get("reset") is not True:
+        if type(payload.get("enabled")) is not bool:
+            raise ModelConfigError("fallback enabled must be a boolean")
+        policy = {"enabled": payload["enabled"],
+                  **{k: str(payload.get(k) or config["fallback"].get(k) or "").strip()
+                     for k in ("from_provider", "provider", "model")}}
+        if policy["enabled"]:
+            if policy["from_provider"] == policy["provider"] or not policy["model"]:
+                raise ModelConfigError("fallback requires a different provider and a model")
+            for key in ("from_provider", "provider"):
+                if policy[key] not in config["providers"]:
+                    raise ModelConfigError("fallback provider is not configured")
+            resolve(provider=policy["provider"], model=policy["model"])
+        config["fallback"] = policy
+        save_config(config)
+    _fallback_state_path().unlink(missing_ok=True)
+    return fallback_view(config)
+
+
+def _activate_fallback(resolved: dict) -> dict | None:
+    config = load_config()
+    policy = config["fallback"]
+    if not policy["enabled"] or policy["from_provider"] != resolved["provider"]:
+        return None
+    target = resolve(provider=policy["provider"], model=policy["model"])
+    state = {"policy": {**policy, "primary_model": config["default"].get("model")},
+             "activated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "reason": "quota_exhausted"}
+    atomic_write(_fallback_state_path(), json.dumps(state, ensure_ascii=False) + "\n")
+    os.chmod(_fallback_state_path(), 0o600)
+    target["source"] = "fallback"
+    target["fallback"] = {"from_provider": resolved["provider"], "reason": state["reason"],
+                          "activated_at": state["activated_at"]}
+    return target
 
 
 def _style(value) -> str:
@@ -311,6 +386,7 @@ def public_view() -> dict:
     return {
         "providers": providers,
         "default": dict(config["default"]),
+        "fallback": fallback_view(config),
         "embedding": dict(config["embedding"]),
         "presets": {
             key: {
@@ -421,6 +497,7 @@ def set_default(provider: str, model: str | None) -> dict:
     if not provider:
         config["default"] = {"provider": None, "model": None}
         save_config(config)
+        _fallback_state_path().unlink(missing_ok=True)
         return dict(config["default"])
     if provider not in config["providers"]:
         raise ModelConfigError("provider not found", code="not_found", status=404)
@@ -431,6 +508,7 @@ def set_default(provider: str, model: str | None) -> dict:
             [model] + list(config["providers"][provider].get("models") or []))
     config["default"] = {"provider": provider, "model": model or None}
     save_config(config)
+    _fallback_state_path().unlink(missing_ok=True)
     return dict(config["default"])
 
 
@@ -568,6 +646,10 @@ def resolve(provider: str | None = None, model: str | None = None,
     config = load_config()
     providers = config["providers"]
     source = "config"
+    fallback = fallback_view(config)
+    if not provider and fallback["active"]:
+        provider, model, role = fallback["provider"], fallback["model"], None
+        source = "fallback"
     provider_id = str(provider or "").strip()
     if not provider_id:
         provider_id = str(config["default"].get("provider") or "").strip()
@@ -648,7 +730,7 @@ def resolve(provider: str | None = None, model: str | None = None,
             f"provider {provider_id!r} has no model selected",
             code="no_model", status=400)
 
-    return {
+    result = {
         "provider": provider_id,
         "provider_name": item.get("name") or provider_id,
         "model": chosen_model,
@@ -657,6 +739,9 @@ def resolve(provider: str | None = None, model: str | None = None,
         "style": item.get("style") or "openai",
         "source": source,
     }
+    if source == "fallback":
+        result["fallback"] = {k: fallback[k] for k in ("from_provider", "reason", "activated_at")}
+    return result
 
 
 def _headers(resolved: dict) -> dict:
@@ -683,47 +768,76 @@ def _get_json(url: str, headers: dict, timeout: int) -> dict:
         return json.load(response)
 
 
-def _provider_error(error: BaseException) -> ModelConfigError:
+def _retry_after(headers) -> float | None:
+    value = headers.get("Retry-After") if headers else None
+    if not value:
+        return None
+    try:
+        return max(0, float(value))
+    except (TypeError, ValueError):
+        try:
+            return max(0, parsedate_to_datetime(value).timestamp() - time.time())
+        except (TypeError, ValueError, OverflowError):
+            return None
+
+
+def _provider_error(error: BaseException, credential: str = "") -> ModelConfigError:
     """Turn a transport error into a safe, actionable message."""
+    def safe(value):
+        # Redact the exact credential before truncation, including custom key formats.
+        return redact_text(str(value).replace(credential, "[REDACTED]") if credential else str(value))[:400]
+
     if isinstance(error, urllib.error.HTTPError):
         try:
-            detail = error.read(4096).decode("utf-8", "replace")[:400]
+            detail = safe(error.read(4096).decode("utf-8", "replace"))
         except Exception:
             detail = ""
-        detail = redact_text(detail)
         lowered = detail.lower()
+        def failure(message, code, status, retryable=False):
+            return ModelConfigError(message, code=code, status=status, upstream_status=error.code,
+                                    retryable=retryable, retry_after=_retry_after(error.headers))
+        quota = re.search(
+            r"insufficient[_ -]?(?:balance|quota|credits?|funds)|(?:quota|credits?|balance|budget)[^\n]{0,60}(?:exhausted|depleted|exceeded|insufficient|run out)|"
+            r"(?:余额|额度)(?:不足|耗尽|用完|已用尽)|欠费|请充值", lowered)
+        if quota or (error.code == 402 and not any(term in lowered for term in ("unavailable", "upstream", "endpoint", "server_error"))):
+            return failure("provider quota or balance is exhausted", "quota_exhausted", 402)
         if error.code in {401, 403}:
-            return ModelConfigError(
+            return failure(
                 f"provider rejected the credential (HTTP {error.code})",
                 code="unauthorized", status=400)
         if error.code == 404:
-            return ModelConfigError(
+            return failure(
                 "provider endpoint not found (HTTP 404); check the base URL",
                 code="bad_endpoint", status=400)
         if error.code == 429:
-            return ModelConfigError(
-                "provider rate limit reached (HTTP 429)", code="rate_limited",
-                status=429)
+            return failure(
+                f"provider rate limit reached (HTTP 429): {detail}", code="rate_limited",
+                status=429, retryable=True)
         # A named model that the provider does not serve is a configuration
         # problem, not a transient one, so it must not be retried.
-        if "model" in lowered and "unavailable" in lowered:
-            return ModelConfigError(
+        if error.code in {400, 422} and "model" in lowered and "unavailable" in lowered:
+            return failure(
                 "the selected model is unavailable on this provider",
                 code="model_unavailable", status=400)
-        return ModelConfigError(
+        return failure(
             f"provider returned HTTP {error.code}: {detail}",
-            code="provider_error", status=502)
+            code="provider_error", status=502,
+            # Gateways also emit 520–529 and vendor-specific server errors.
+            # Treat the whole server-error family uniformly; retries stay bounded.
+            retryable=error.code in {408, 425} or 500 <= error.code < 600)
     if isinstance(error, urllib.error.URLError):
         return ModelConfigError(
-            f"could not reach the provider: {redact_text(str(error.reason))}",
-            code="unreachable", status=502)
+            f"could not reach the provider: {safe(error.reason)}",
+            code="unreachable", status=502, retryable=not isinstance(error.reason, ssl.SSLCertVerificationError))
     if isinstance(error, TimeoutError):
-        return ModelConfigError("provider timed out", code="timeout", status=504)
+        return ModelConfigError("provider timed out", code="timeout", status=504, retryable=True)
+    if isinstance(error, (ConnectionError, http.client.BadStatusLine, http.client.IncompleteRead, ssl.SSLEOFError)):
+        return ModelConfigError(safe(error), code="provider_error", status=502, retryable=True)
     if isinstance(error, (KeyError, IndexError, TypeError, ValueError)):
         return ModelConfigError(
-            f"provider response shape is invalid: {redact_text(str(error))}",
+            f"provider response shape is invalid: {safe(error)}",
             code="invalid_response", status=502)
-    return ModelConfigError(redact_text(str(error)), code="provider_error", status=502)
+    return ModelConfigError(safe(error), code="provider_error", status=502)
 
 
 def list_models(provider_id: str) -> list[str]:
@@ -744,9 +858,12 @@ def list_models(provider_id: str) -> list[str]:
         raise ModelConfigError("provider has no credential", code="no_credential")
     resolved = {"api_key": api_key, "style": _style(item.get("style"))}
     try:
-        body = _get_json(f"{base_url}/models", _headers(resolved), PROBE_TIMEOUT)
+        if provider_id == "opencode-go" and base_url == PRESETS["opencode-go"]["base_url"]:
+            body = _get_json("https://opencode.ai/inference/go/v1/models", {"User-Agent": "atlas-model/1.0"}, PROBE_TIMEOUT)
+        else:
+            body = _get_json(f"{base_url}/models", _headers(resolved), PROBE_TIMEOUT)
     except BaseException as error:
-        raise _provider_error(error) from error
+        raise _provider_error(error, api_key) from error
     data = body.get("data") if isinstance(body, dict) else None
     ids: list[str] = []
     for entry in data or []:
@@ -756,12 +873,20 @@ def list_models(provider_id: str) -> list[str]:
 
 
 def test_provider(provider_id: str) -> dict:
-    """Probe a provider without spending a completion: list its models."""
+    """List models; Go also needs a small completion to verify its credential."""
     started = time.monotonic()
     result = {"id": provider_id, "ok": False, "models": [], "model_count": 0,
               "error": None, "code": None, "latency_ms": 0}
     try:
         models = list_models(provider_id)
+        if provider_id == "opencode-go":
+            policy = load_config()["fallback"]
+            selected = policy["model"] if policy["provider"] == provider_id else "deepseek-v4.1-flash"
+            response = complete([{"role": "user", "content": "Reply with exactly OK."}], provider=provider_id,
+                                model=selected, max_tokens=128, thinking=False, timeout=PROBE_TIMEOUT)
+            if not response["text"]:
+                raise ModelConfigError("provider returned an empty completion", code="invalid_response", status=502)
+            result.update(credential_verified=True, tested_model=selected)
     except ModelConfigError as error:
         result["error"] = str(error)
         result["code"] = error.code
@@ -787,7 +912,8 @@ def chat(messages: list[dict], *, model: str | None = None,
          provider: str | None = None, role: str | None = None,
          tools: list[dict] | None = None,
          temperature: float | None = None, max_tokens: int | None = None,
-         system: str | None = None, timeout: int = DEFAULT_TIMEOUT) -> dict:
+         system: str | None = None, timeout: int = DEFAULT_TIMEOUT,
+         thinking: bool | None = None, session_id: str | None = None) -> dict:
     """Send a chat completion and normalize the response.
 
     Returns ``{"content", "tool_calls", "usage", "raw"}``. ``usage`` values are
@@ -797,30 +923,57 @@ def chat(messages: list[dict], *, model: str | None = None,
     "translate", "identity") when one is configured for the default provider.
     """
     resolved = resolve(provider=provider, model=model, role=role)
-    if resolved["style"] == "anthropic":
-        return _chat_anthropic(
-            resolved, messages, tools, temperature, max_tokens, system, timeout)
-    return _chat_openai(
-        resolved, messages, tools, temperature, max_tokens, system, timeout)
+    session_id = session_id or "atlas-" + uuid.uuid4().hex
+
+    def send(target):
+        target = {**target, "session_id": session_id}
+        if target["style"] == "anthropic":
+            response = _chat_anthropic(target, messages, tools, temperature, max_tokens, system, timeout)
+        else:
+            response = _chat_openai(target, messages, tools, temperature, max_tokens, system, timeout, thinking)
+        if target.get("fallback"):
+            response["fallback"] = target["fallback"]
+        return response
+
+    try:
+        return send(resolved)
+    except ModelConfigError as error:
+        if provider or error.code != "quota_exhausted":
+            raise
+        target = _activate_fallback(resolved)
+        if target is None:
+            raise
+        return send(target)
 
 
 def _chat_openai(resolved, messages, tools, temperature, max_tokens, system,
-                 timeout) -> dict:
+                 timeout, thinking=None) -> dict:
     body: dict = {"model": resolved["model"], "messages": list(messages)}
+    # Luna uses OpenAI reasoning parameters, not the gateway's `thinking`
+    # extension. Chat Completions tool calls require reasoning_effort=none.
+    luna = (resolved["model"] == "gpt-6-luna"
+            and urlparse(resolved["base_url"]).hostname == "api.openai.com")
+    if luna:
+        body["reasoning_effort"] = "none" if tools or thinking is False else "medium"
     if system:
         body["messages"] = [{"role": "system", "content": system}] + body["messages"]
     if tools:
         body["tools"] = tools
         body["tool_choice"] = "auto"
-    if temperature is not None:
+    if temperature is not None and (not luna or body["reasoning_effort"] == "none"):
         body["temperature"] = temperature
     if max_tokens is not None:
-        body["max_tokens"] = max_tokens
+        body["max_completion_tokens" if luna else "max_tokens"] = max_tokens
+    if thinking is not None and not luna:
+        body["thinking"] = {"type": "enabled" if thinking else "disabled"}
     url = f"{resolved['base_url']}/chat/completions"
+    headers = _headers(resolved)
+    if resolved["provider"] == "opencode-go":
+        headers["x-opencode-session"] = resolved["session_id"]
     try:
-        raw = _post_json(url, body, _headers(resolved), timeout)
+        raw = _post_json(url, body, headers, timeout)
     except BaseException as error:
-        raise _provider_error(error) from error
+        raise _provider_error(error, resolved["api_key"]) from error
     choice = (raw.get("choices") or [{}])[0]
     message = choice.get("message") or {}
     usage = raw.get("usage") or {}
@@ -863,7 +1016,7 @@ def _chat_anthropic(resolved, messages, tools, temperature, max_tokens, system,
     try:
         raw = _post_json(url, body, _headers(resolved), timeout)
     except BaseException as error:
-        raise _provider_error(error) from error
+        raise _provider_error(error, resolved["api_key"]) from error
     content = ""
     tool_calls = []
     for block in raw.get("content") or []:
@@ -902,7 +1055,8 @@ def complete(messages: list[dict], *, role: str | None = None,
              temperature: float | None = None,
              max_tokens: int | None = None,
              timeout: int = DEFAULT_TIMEOUT,
-             strip_fence: bool = False) -> dict:
+             strip_fence: bool = False, thinking: bool | None = None,
+             session_id: str | None = None) -> dict:
     """Chat and return the text body plus the model that actually served it.
 
     Every Atlas caller previously repeated "use content, else fall back to
@@ -911,7 +1065,7 @@ def complete(messages: list[dict], *, role: str | None = None,
     fallback is load-bearing rather than cosmetic.
     """
     result = chat(messages, role=role, model=model, provider=provider,
-                  temperature=temperature, max_tokens=max_tokens, timeout=timeout)
+                  temperature=temperature, max_tokens=max_tokens, timeout=timeout, thinking=thinking, session_id=session_id)
     text = (result.get("content") or "").strip()
     if not text:
         raw = result.get("raw") or {}
@@ -923,7 +1077,8 @@ def complete(messages: list[dict], *, role: str | None = None,
         text = re.sub(r"\s*```\s*$", "", text)
     return {"text": text, "model": result.get("model") or "",
             "provider": result.get("provider") or "",
-            "usage": result.get("usage") or {}}
+            "usage": result.get("usage") or {},
+            **({"fallback": result["fallback"]} if "fallback" in result else {})}
 
 
 def complete_text(messages: list[dict], **kwargs) -> str:
@@ -950,7 +1105,7 @@ def embed(texts: list[str], *, model: str | None = None,
     try:
         raw = _post_json(f"{base_url}/embeddings", body, headers, timeout)
     except BaseException as error:
-        raise _provider_error(error) from error
+        raise _provider_error(error, api_key) from error
     data = raw.get("data") or []
     data = sorted(data, key=lambda entry: entry.get("index", 0))
     return [list(entry.get("embedding") or []) for entry in data]

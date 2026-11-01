@@ -1,0 +1,93 @@
+{
+  "jaywcjlove/quick-rss": {
+    "readme_sha256": "0c31bfdc49028e42edfe5ff16315054f5d047f15336de6345b0af30d1b0f89b1",
+    "reviewed_at": "2026-10-23T02:15:55.619244+00:00",
+    "exclude": true,
+    "reason": "未发现应用源码与许可证；该仓库当前主要发布产品说明、订阅源及文档，不作为开源应用收录。",
+    "sources": [
+      "https://github.com/jaywcjlove/quick-rss"
+    ]
+  },
+  "lwindolf/liferea": {
+    "readme_sha256": "3dd56e69d43251d1a2c354d3d1f4633d37f67e81463e755c2b56a8ed89505821",
+    "reviewed_at": "2026-10-23T02:15:55.619679+00:00",
+    "reason": "学术用途可基于已证实的订阅能力条件适用，需明确期刊提供兼容订阅源及所需内容；不标为直接证实。",
+    "sources": [
+      "https://github.com/lwindolf/liferea/blob/main/README.md"
+    ],
+    "require_conditional_scenarios": {
+      "auto-feed-reader-31e9b7a46c": "README 仅说明泛化订阅源浏览，未给出期刊目录或摘要/原文操作依据，暂不建立专门学术场景关联。"
+    }
+  },
+  "jgraph/drawio": {
+    "readme_sha256": "749486eaa18f4569a45add47b4d1feae09df45044291eec2ce67f0506ef41c51",
+    "reviewed_at": "2026-10-23T02:18:36.471691+00:00",
+    "reason": "同时复核 README 的资源许可与仓库 LICENSE，保留混合许可范围。",
+    "sources": [
+      "https://github.com/jgraph/drawio/blob/dev/README.md",
+      "https://github.com/jgraph/drawio/blob/dev/LICENSE"
+    ],
+    "license": {
+      "license_sha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1",
+      "spdx": "Apache-2.0（代码）+ 资源附加限制",
+      "status": "source_available",
+      "note": "代码声明 Apache-2.0；README 对图标、模具库及其衍生品在 Atlassian 产品和生态中的使用附加书面许可要求，成图输出除外。按含受限资源的项目展示，不将整个仓库概括为标准开源。当前仓库自称供评估的测试版本。"
+    }
+  },
+  "bitwarden/android": {
+    "readme_sha256": "106538975d3d405850fab1e6586bc83f6e454e50b794210710fa30d5ea03dc49",
+    "reviewed_at": "2026-10-23T02:19:37.514264+00:00",
+    "reason": "自动填充与认证的引文来自开发依赖的用途说明，不能据此确认应用实现与场景操作；需补充官方功能文档后重审。",
+    "sources": [
+      "https://github.com/bitwarden/android/blob/main/README.md"
+    ],
+    "exclude_unless_documented": true
+  },
+  "kunzisoft/keepassdx": {
+    "readme_sha256": "e2efa09fe0c07ff1d86fc6c84cdaa779a7ecb06f7ac4e62086eb98ece23bad6b",
+    "reviewed_at": "2026-10-23T02:19:37.514758+00:00",
+    "fact_overrides": {
+      "scope": "以单个 KeePass 格式文件保存和编辑加密数据。"
+    },
+    "reason": "适用范围删除当前所附引文未支持的文件扩展名与版本号；保留原始引文。",
+    "sources": [
+      "https://github.com/Kunzisoft/KeePassDX/blob/master/README.md"
+    ]
+  },
+  "mermaid-js/mermaid-live-editor": {
+    "readme_sha256": "1b0564f81cf5bf4b90cba6f85dbfa8bc04ae647ee30d1d9464b08715ff8c358a",
+    "reviewed_at": "2026-10-23T03:15:35.094189+00:00",
+    "excluded_scenarios": {
+      "auto-diagramming-application-859a3c7ec8": "该场景明确要求拖动形状并保持连线；现有 Mermaid 资料只证实文本编辑与预览。",
+      "auto-diagramming-application-9e3a6cc5ae": "该场景明确要求从设备图库拖放；现有资料未证实该交互与图库。"
+    },
+    "require_conditional_scenarios": {
+      "auto-diagramming-application-1c4dd188db": "原文只证实流程图，不足以直接证明原生泳道；需条件关联。"
+    },
+    "reason": "已证实文本图表编辑与实时预览；未核验拖放图库和移动形状保持连线，已撤下对应关联。通用结构图用途保留条件适用。",
+    "sources": [
+      "https://github.com/mermaid-js/mermaid-live-editor/blob/develop/README.md"
+    ]
+  },
+  "rssnext/folo": {
+    "readme_sha256": "5ce09e5def25d160041a495f34179a6747e960205d193562ae38dca4eaa51406",
+    "reviewed_at": "2026-10-23T03:17:51.300689+00:00",
+    "fact_overrides": {
+      "positioning": "AI RSS 阅读器，将用户关注的内容汇聚到一条时间线。"
+    },
+    "reason": "定位删除整体开源称谓，避免掩盖 LICENSE 的图标不可再分发限制；功能按 README，许可按完整 LICENSE。",
+    "sources": [
+      "https://github.com/RSSNext/Folo/blob/dev/README.md",
+      "https://github.com/RSSNext/Folo/blob/dev/LICENSE"
+    ]
+  },
+  "330205812/nexusrag": {
+    "readme_sha256": "f50d56d0957ec8d97768ad8734d4a00924587b9cd9b9c0990798a02e831300e2",
+    "reviewed_at": "2026-10-24T22:02:20.668995+00:00",
+    "reason": "人工验收：README 的 Components 表将 Neo4j 和 MinerU 标为 Pending merge，介绍须保留该限制。",
+    "fact_overrides": {
+      "summary": "NexusRAG 提供知识库管理、文档处理与全文、语义和混合检索；README 列出的 Neo4j 知识图谱与 MinerU 解析器集成尚待合并。",
+      "scope": "面向知识检索与 GenAI 应用，依赖 Milvus、Elasticsearch 等组件；Neo4j 与 MinerU 在官方组件表中标为 Pending merge，不能视为已经合入的可用集成。"
+    }
+  }
+}

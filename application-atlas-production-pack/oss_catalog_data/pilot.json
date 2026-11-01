@@ -1,0 +1,270 @@
+{
+  "schema": "atlas.oss-pilot.v1",
+  "leaf": "personal-knowledge-management-application",
+  "scenarios": [
+    {
+      "id": "pkm-network",
+      "name": "把零散笔记连接成知识网络",
+      "description": "写作、阅读或研究时，把笔记相互引用，并沿链接或关系视图重新发现已有知识。"
+    },
+    {
+      "id": "pkm-plaintext",
+      "name": "在文本文件与编辑器中积累知识",
+      "description": "围绕自己掌控的文本笔记，在 Markdown 工作区、Emacs 或浏览器编辑器里持续组织和连接知识。"
+    },
+    {
+      "id": "pkm-wiki",
+      "name": "搭建自己掌控的个人 Wiki",
+      "description": "以自托管服务或独立文件维护个人知识库，通过相互链接的页面长期保存和浏览知识。"
+    }
+  ],
+  "projects": [
+    {
+      "repo": "logseq/logseq",
+      "name": "Logseq",
+      "positioning": "隐私优先的个人知识管理平台",
+      "summary": "提供个人知识管理、PDF 批注和任务管理；当前仓库同时说明数据库图谱版本的状态。",
+      "summary_anchor": "PDF annotation",
+      "scope": "适合希望围绕知识图谱持续整理个人资料的人。数据库版本处于 beta，README 建议使用测试图谱并备份。",
+      "scope_anchor": "DB version is in beta",
+      "features": [
+        {
+          "text": "知识管理与任务管理",
+          "anchor": "task management"
+        },
+        {
+          "text": "PDF 批注",
+          "anchor": "PDF annotation"
+        },
+        {
+          "text": "数据库知识图谱",
+          "anchor": "DB graphs"
+        }
+      ],
+      "matches": [
+        {
+          "scenario_id": "pkm-network",
+          "reason": "以图谱组织个人知识，适合把持续积累的笔记放入关联网络。",
+          "anchor": "DB graphs"
+        }
+      ]
+    },
+    {
+      "repo": "siyuan-note/siyuan",
+      "name": "思源 SiYuan",
+      "positioning": "块级引用与双向链接的个人知识系统",
+      "summary": "隐私优先的个人知识管理系统，支持细粒度块级引用、双向链接和 Markdown 编辑。",
+      "summary_anchor": "fine-grained block-level reference",
+      "scope": "适合需要块级引用的个人知识积累；也提供 Docker 部署，但浏览器部署存在 README 列明的功能限制。",
+      "scope_anchor": "Docker hosting limitations",
+      "features": [
+        {
+          "text": "块级引用和双向链接",
+          "anchor": "Block-level reference and two-way links"
+        },
+        {
+          "text": "Markdown 所见即所得",
+          "anchor": "Markdown WYSIWYG"
+        },
+        {
+          "text": "大纲列表",
+          "anchor": "List outline"
+        }
+      ],
+      "matches": [
+        {
+          "scenario_id": "pkm-network",
+          "reason": "块级引用和双向链接让笔记内容能形成可导航的关联网络。",
+          "anchor": "Block-level reference and two-way links"
+        },
+        {
+          "scenario_id": "pkm-wiki",
+          "reason": "官方 README 提供 Docker 自托管说明；应同时查看其部署功能限制。",
+          "anchor": "Docker hosting limitations"
+        }
+      ]
+    },
+    {
+      "repo": "TriliumNext/Trilium",
+      "name": "Trilium Notes",
+      "positioning": "面向大型个人知识库的分层笔记",
+      "summary": "跨平台的分层笔记应用，围绕大型个人知识库提供丰富编辑和关系可视化。",
+      "summary_anchor": "building large personal knowledge bases",
+      "scope": "适合需要层级组织、关系图和自托管同步的个人知识库。",
+      "scope_anchor": "self-hosted sync server",
+      "features": [
+        {
+          "text": "多层级笔记树与克隆",
+          "anchor": "arbitrarily deep tree"
+        },
+        {
+          "text": "所见即所得编辑",
+          "anchor": "WYSIWYG"
+        },
+        {
+          "text": "关系图与笔记链接图",
+          "anchor": "note/link maps"
+        },
+        {
+          "text": "自托管同步服务",
+          "anchor": "self-hosted sync server"
+        }
+      ],
+      "matches": [
+        {
+          "scenario_id": "pkm-network",
+          "reason": "关系图和笔记链接图让层级中的知识关系可被查看与探索。",
+          "anchor": "note/link maps"
+        },
+        {
+          "scenario_id": "pkm-wiki",
+          "reason": "可用自托管同步服务和浏览器界面访问自己的知识库。",
+          "anchor": "self-hosted sync server"
+        }
+      ]
+    },
+    {
+      "repo": "silverbulletmd/silverbullet",
+      "name": "SilverBullet",
+      "positioning": "可编程的自托管 Markdown 知识库",
+      "summary": "以 Markdown 页面组成知识空间，提供双向 Wiki 链接、查询和 Lua 脚本能力。",
+      "summary_anchor": "wiki-style linking",
+      "scope": "适合愿意自托管、并希望通过查询或脚本定制个人知识工作方式的用户。",
+      "scope_anchor": "Self Hosted",
+      "features": [
+        {
+          "text": "Markdown 页面知识空间",
+          "anchor": "collection of Markdown Pages"
+        },
+        {
+          "text": "双向 Wiki 导航",
+          "anchor": "bi-directional"
+        },
+        {
+          "text": "Lua 脚本与查询",
+          "anchor": "Space Lua"
+        }
+      ],
+      "matches": [
+        {
+          "scenario_id": "pkm-plaintext",
+          "reason": "知识内容保存为 Markdown 页面，并在浏览器编辑器中编写与连接。",
+          "anchor": "collection of Markdown Pages"
+        },
+        {
+          "scenario_id": "pkm-wiki",
+          "reason": "项目明确面向自托管的个人知识数据库，提供 Wiki 式页面链接。",
+          "anchor": "Self Hosted"
+        }
+      ]
+    },
+    {
+      "repo": "TiddlyWiki/TiddlyWiki5",
+      "name": "TiddlyWiki",
+      "positioning": "单文件或 Node.js 运行的个人 Wiki",
+      "summary": "可长期保留的非线性个人网页笔记本，支持独立 HTML 文件或 Node.js 应用形态。",
+      "summary_anchor": "non-linear personal web notebook",
+      "scope": "适合希望用独立文件掌控个人 Wiki，或通过 Node.js 运行个人知识站点的用户。",
+      "scope_anchor": "single HTML file",
+      "features": [
+        {
+          "text": "非线性个人网页笔记",
+          "anchor": "non-linear personal web notebook"
+        },
+        {
+          "text": "单个 HTML 文件运行",
+          "anchor": "single HTML file"
+        },
+        {
+          "text": "Node.js 应用形态",
+          "anchor": "Node.js application"
+        }
+      ],
+      "matches": [
+        {
+          "scenario_id": "pkm-wiki",
+          "reason": "可把个人 Wiki 保存在单个 HTML 文件，也可作为 Node.js 应用运行。",
+          "anchor": "single HTML file"
+        }
+      ]
+    },
+    {
+      "repo": "foambubble/foam",
+      "name": "Foam",
+      "positioning": "基于 VS Code 的个人知识管理",
+      "summary": "建立在 Visual Studio Code 和 GitHub 上的个人知识管理与分享系统，用 Markdown 文档和 Wiki 链接组织想法。",
+      "summary_anchor": "personal knowledge management and sharing system",
+      "scope": "适合希望在 VS Code 工作区中，用 Markdown、反向链接和图谱积累个人知识的用户。",
+      "scope_anchor": "markdown documents",
+      "features": [
+        {
+          "text": "链接自动补全",
+          "anchor": "Link Autocompletion"
+        },
+        {
+          "text": "反向链接面板",
+          "anchor": "Backlinks Panel"
+        },
+        {
+          "text": "Markdown 文档与 Wiki 链接",
+          "anchor": "markdown documents"
+        },
+        {
+          "text": "关系图谱",
+          "anchor": "Graph Visualisation"
+        }
+      ],
+      "matches": [
+        {
+          "scenario_id": "pkm-network",
+          "reason": "反向链接面板和图谱帮助用户发现笔记之间的关系。",
+          "anchor": "Backlinks Panel"
+        },
+        {
+          "scenario_id": "pkm-plaintext",
+          "reason": "直接在 VS Code 工作区里编写 Markdown 文档，以 Wiki 链接连接笔记。",
+          "anchor": "markdown documents"
+        }
+      ]
+    },
+    {
+      "repo": "org-roam/org-roam",
+      "name": "Org-roam",
+      "positioning": "Emacs 与 Org-mode 中的纯文本知识网络",
+      "summary": "纯文本知识管理系统，为 Org-mode 用户提供非层级笔记和反向链接。",
+      "summary_anchor": "plain-text knowledge management system",
+      "scope": "适合已经使用 Emacs / Org-mode，希望离线维护个人 Wiki 的用户。",
+      "scope_anchor": "completely offline",
+      "features": [
+        {
+          "text": "纯文本知识管理",
+          "anchor": "plain-text knowledge management system"
+        },
+        {
+          "text": "反向链接",
+          "anchor": "backlinks"
+        },
+        {
+          "text": "离线个人 Wiki",
+          "anchor": "completely offline"
+        },
+        {
+          "text": "Emacs 与 Org-mode 集成",
+          "anchor": "Emacs and Org-mode"
+        }
+      ],
+      "matches": [
+        {
+          "scenario_id": "pkm-network",
+          "reason": "以反向链接发现笔记之间此前未注意到的联系。",
+          "anchor": "backlinks"
+        },
+        {
+          "scenario_id": "pkm-plaintext",
+          "reason": "用 Emacs 和 Org-mode 编辑离线、纯文本的个人 Wiki。",
+          "anchor": "completely offline"
+        }
+      ]
+    }
+  ]
+}
