@@ -1,0 +1,87 @@
+{
+ "repository_id": 1054238945,
+ "domain": "03",
+ "input_sha256": "bce45083644c2bdb89a6af163f0c7546e445d4f8440bfb3690a418ac87c2712f",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:00.409098+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-d90fbd992745-12f4ac",
+ "usage": {
+  "prompt_tokens": 5137,
+  "completion_tokens": 469,
+  "total_tokens": 5606,
+  "prompt_tokens_details": {
+   "cached_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00105195,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00105195,
+   "tokens": {
+    "input": 5137,
+    "output": 469,
+    "reasoning": 0,
+    "cache_read": 0,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1054238945,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体与 README 和元数据一致：定位为作品集演示应用，功能、演示数据限制和许可待定均如实标注；场景匹配均标为 unverified 并说明缺项，未把演示能力当作生产可用。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"文档上传、照片库与通知\",\"source_id\":\"s0\",\"quote\":\"Demo Mode simulates external email, push delivery, cloud persistence, and collaboration\",\"reason\":\"README 明确公开部署默认 Demo Mode 下不进行真实云端上传与 Firebase 推送，仅模拟；卡片功能条目未注明该限制，易被读作已实现真实上传与通知。\",\"suggested_correction\":\"在该功能条目中补充“演示模式下为模拟/预览，不进行真实云端上传与推送”。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-project-portfolio-management-application-c3212b161e\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"可展示项目进度与人员信息，但无组合级预算汇总与决策记录，且为演示数据。\",\"source_id\":\"s0\",\"quote\":\"Dashboard Overview with project metrics and progress tracking\",\"reason\":\"README 仅提及项目指标与进度跟踪，未明确支持预算汇总；卡片已如实说明缺项并标 unverified，但“可展示项目进度与人员信息”的表述略超出 README 对预算维度的证据。\",\"suggested_correction\":\"保留 unverified 与缺项说明，措辞改为“可展示项目进度与人员分配，未见组合级预算汇总与决策记录”。\"}],\"limitations\":[\"仅提供 README 与 GitHub 元数据，未审阅源码、SQL 脚本或部署配置，无法验证功能实现程度。\",\"许可状态为 pending，未做许可证全文比对，不能据此判定开源授权。\",\"场景匹配均为 unverified，未在真实数据或生产环境中验证。\"]}",
+ "review": {
+  "repository_id": 1054238945,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体与 README 和元数据一致：定位为作品集演示应用，功能、演示数据限制和许可待定均如实标注；场景匹配均标为 unverified 并说明缺项，未把演示能力当作生产可用。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "文档上传、照片库与通知",
+    "source_id": "s0",
+    "quote": "Demo Mode simulates external email, push delivery, cloud persistence, and collaboration",
+    "reason": "README 明确公开部署默认 Demo Mode 下不进行真实云端上传与 Firebase 推送，仅模拟；卡片功能条目未注明该限制，易被读作已实现真实上传与通知。",
+    "suggested_correction": "在该功能条目中补充“演示模式下为模拟/预览，不进行真实云端上传与推送”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-project-portfolio-management-application-c3212b161e",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "可展示项目进度与人员信息，但无组合级预算汇总与决策记录，且为演示数据。",
+    "source_id": "s0",
+    "quote": "Dashboard Overview with project metrics and progress tracking",
+    "reason": "README 仅提及项目指标与进度跟踪，未明确支持预算汇总；卡片已如实说明缺项并标 unverified，但“可展示项目进度与人员信息”的表述略超出 README 对预算维度的证据。",
+    "suggested_correction": "保留 unverified 与缺项说明，措辞改为“可展示项目进度与人员分配，未见组合级预算汇总与决策记录”。"
+   }
+  ],
+  "limitations": [
+   "仅提供 README 与 GitHub 元数据，未审阅源码、SQL 脚本或部署配置，无法验证功能实现程度。",
+   "许可状态为 pending，未做许可证全文比对，不能据此判定开源授权。",
+   "场景匹配均为 unverified，未在真实数据或生产环境中验证。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 1,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T05:11:09.028274+00:00",
+ "elapsed_seconds": 8.618
+}

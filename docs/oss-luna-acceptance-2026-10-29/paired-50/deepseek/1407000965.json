@@ -1,0 +1,59 @@
+{
+ "repository_id": 1407000965,
+ "domain": "08",
+ "input_sha256": "21731f7d1a12990cdfe419ab6e82371ca2acdff5bc7e22ef0ba81ae8890621cd",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:23.511578+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-df05291f03c0-ae5c2",
+ "usage": {
+  "prompt_tokens": 3397,
+  "completion_tokens": 196,
+  "total_tokens": 3593,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00055189,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00055189,
+   "tokens": {
+    "input": 2885,
+    "output": 196,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1407000965,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片与 README 基本一致：项目定位为意大利中小企业供应商发票审批平台核心，处于早期开发阶段，明确为预筛选层、不登记发票、不承担税务责任；许可状态为 pending，与 README 的“保留所有权利”一致。场景匹配为 conditional，条件合理。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"仅提供 README 与 GitHub 元数据，未审阅源码、迁移或测试，无法核实功能实现程度。\",\"许可状态为 pending，未做许可全文比对；README 明确保留所有权利，不应视为开源授权。\",\"场景匹配为 conditional，依赖 Fatture in Cloud 账户与 API 凭据，且项目处于早期开发阶段。\"]}",
+ "review": {
+  "repository_id": 1407000965,
+  "verdict": "pass_with_limits",
+  "summary": "卡片与 README 基本一致：项目定位为意大利中小企业供应商发票审批平台核心，处于早期开发阶段，明确为预筛选层、不登记发票、不承担税务责任；许可状态为 pending，与 README 的“保留所有权利”一致。场景匹配为 conditional，条件合理。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "仅提供 README 与 GitHub 元数据，未审阅源码、迁移或测试，无法核实功能实现程度。",
+   "许可状态为 pending，未做许可全文比对；README 明确保留所有权利，不应视为开源授权。",
+   "场景匹配为 conditional，依赖 Fatture in Cloud 账户与 API 凭据，且项目处于早期开发阶段。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:11:28.100104+00:00",
+ "elapsed_seconds": 4.588
+}

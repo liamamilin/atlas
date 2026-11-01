@@ -1,0 +1,154 @@
+{
+ "card": {
+  "repository_id": 1096079955,
+  "full_name": "ecmr/class-meeting",
+  "github_url": "https://github.com/ecmr/class-meeting",
+  "name": "class-meeting",
+  "summary": "在线课堂聊天应用：Angular + TypeScript 前端负责界面与摄像头/麦克风采集，WebRTC 用于浏览器端音视频采集与点对点或经信令服务器的连接，SignalR 作为前后端信令通道，数据库使用 Oracle Cloud Free Tier。资料未说明会议预约、链接邀请、屏幕共享等具体实现程度。",
+  "positioning": "面向在线课堂的聊天/会议应用，前端 Angular，后端 ASP.NET Core 8，使用 WebRTC 与 SignalR",
+  "scope": "适用于在线课堂等小规模实时音视频沟通；部署依赖 Oracle Cloud 免费层数据库与信令服务配置。",
+  "features": [
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/ecmr/class-meeting/git/blobs/c07fcec5fb950bcdf788df3892df442f2657924e",
+     "source_kind": "readme",
+     "source_sha256": "1f11b34debe076152a7ba5dec9eb5747336be8f3fa23686731c8baf5765a9424",
+     "source_url": "https://github.com/ecmr/class-meeting/blob/main/README.md",
+     "verification": "source_based"
+    },
+    "text": "浏览器端摄像头与麦克风采集"
+   },
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/ecmr/class-meeting/git/blobs/c07fcec5fb950bcdf788df3892df442f2657924e",
+     "source_kind": "readme",
+     "source_sha256": "1f11b34debe076152a7ba5dec9eb5747336be8f3fa23686731c8baf5765a9424",
+     "source_url": "https://github.com/ecmr/class-meeting/blob/main/README.md",
+     "verification": "source_based"
+    },
+    "text": "基于 WebRTC 的点对点或经信令服务器连接"
+   },
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/ecmr/class-meeting/git/blobs/c07fcec5fb950bcdf788df3892df442f2657924e",
+     "source_kind": "readme",
+     "source_sha256": "1f11b34debe076152a7ba5dec9eb5747336be8f3fa23686731c8baf5765a9424",
+     "source_url": "https://github.com/ecmr/class-meeting/blob/main/README.md",
+     "verification": "source_based"
+    },
+    "text": "SignalR 作为前后端信令通道"
+   }
+  ],
+  "project_type": "application",
+  "license": {
+   "detected_spdx": null,
+   "note": "未发现许可证文件；公开仓库不等于开源授权",
+   "source": null,
+   "spdx": null,
+   "status": "pending"
+  },
+  "missing_fields": [
+   "license_verification"
+  ],
+  "collection_notes": [],
+  "completeness": "partial",
+  "summary_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/ecmr/class-meeting/git/blobs/c07fcec5fb950bcdf788df3892df442f2657924e",
+   "source_kind": "readme",
+   "source_sha256": "1f11b34debe076152a7ba5dec9eb5747336be8f3fa23686731c8baf5765a9424",
+   "source_url": "https://github.com/ecmr/class-meeting/blob/main/README.md",
+   "verification": "source_based"
+  },
+  "scope_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/ecmr/class-meeting/git/blobs/c07fcec5fb950bcdf788df3892df442f2657924e",
+   "source_kind": "readme",
+   "source_sha256": "1f11b34debe076152a7ba5dec9eb5747336be8f3fa23686731c8baf5765a9424",
+   "source_url": "https://github.com/ecmr/class-meeting/blob/main/README.md",
+   "verification": "source_based"
+  },
+  "positioning_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/ecmr/class-meeting/git/blobs/c07fcec5fb950bcdf788df3892df442f2657924e",
+   "source_kind": "readme",
+   "source_sha256": "1f11b34debe076152a7ba5dec9eb5747336be8f3fa23686731c8baf5765a9424",
+   "source_url": "https://github.com/ecmr/class-meeting/blob/main/README.md",
+   "verification": "source_based"
+  }
+ },
+ "scenario_matches": [
+  {
+   "applicability": "unverified",
+   "conditions": [
+    "屏幕共享、聊天与点名功能未在资料中说明",
+    "需自行部署前后端与信令服务"
+   ],
+   "evidence": {
+    "excerpt": "",
+    "immutable_url": "https://api.github.com/repos/ecmr/class-meeting/git/blobs/c07fcec5fb950bcdf788df3892df442f2657924e",
+    "source_kind": "readme",
+    "source_sha256": "1f11b34debe076152a7ba5dec9eb5747336be8f3fa23686731c8baf5765a9424",
+    "source_url": "https://github.com/ecmr/class-meeting/blob/main/README.md",
+    "verification": "source_based"
+   },
+   "reason": "面向在线课堂，具备音视频采集与 WebRTC 连接基础",
+   "scenario_id": "auto-video-conferencing-application-a42b044a62",
+   "leaf": "video-conferencing-application",
+   "leaf_name": "Video Conferencing Application",
+   "scenario_name": "线上课堂互动",
+   "scenario_description": "教师创建课程会议，学生凭链接进入，教师共享讲义并点名发言，学生在聊天中提问。"
+  },
+  {
+   "applicability": "unverified",
+   "conditions": [
+    "需核实是否支持预约课堂与链接邀请学生加入",
+    "需核实是否支持课件共享与举手提问",
+    "需自行部署后端、信令服务与 Oracle Cloud 数据库"
+   ],
+   "evidence": {
+    "excerpt": "",
+    "immutable_url": "https://api.github.com/repos/ecmr/class-meeting/git/blobs/c07fcec5fb950bcdf788df3892df442f2657924e",
+    "source_kind": "readme",
+    "source_sha256": "1f11b34debe076152a7ba5dec9eb5747336be8f3fa23686731c8baf5765a9424",
+    "source_url": "https://github.com/ecmr/class-meeting/blob/main/README.md",
+    "verification": "source_based"
+   },
+   "reason": "定位为在线课堂聊天应用，具备浏览器音视频采集与实时连接能力",
+   "scenario_id": "auto-virtual-meeting-platform-a642c7077b",
+   "leaf": "virtual-meeting-platform",
+   "leaf_name": "Virtual Meeting Platform",
+   "scenario_name": "线上课程授课",
+   "scenario_description": "教师预约在线课堂，学生凭链接进入，教师共享课件讲解，学生举手提问并参与讨论。"
+  }
+ ],
+ "sources": [
+  {
+   "kind": "readme",
+   "immutable_url": "https://api.github.com/repos/ecmr/class-meeting/git/blobs/c07fcec5fb950bcdf788df3892df442f2657924e",
+   "sha256": "1f11b34debe076152a7ba5dec9eb5747336be8f3fa23686731c8baf5765a9424",
+   "text": "# class-meeting\nChat para aulas online\n\nBackend: ASP.NET Core 8 \"C#\"\n\nFrontend: Angular + TypeScript — para interface, captura de câmera/microfone, integração com WebRTC\n\nWebRTC: para capturar vídeo + áudio no browser e estabelecer conexões peer-to-peer ou via servidor de sinalização\n\nSignalR como canal de sinalização entre front e back\n\nBanco de dados gratuito na nuvem: Oracle Cloud Free Tier\n",
+   "id": "s0",
+   "original_chars": 397,
+   "truncated": false
+  },
+  {
+   "id": "s1",
+   "kind": "github_metadata",
+   "sha256": "1b5e8f1bd2bd25dcf94ffe9fe6515a8deabe117800a1eddb395e415314eb743e",
+   "text": "{\"archived\":false,\"description\":\"Chat para aulas online\",\"full_name\":\"ecmr/class-meeting\",\"html_url\":\"https://github.com/ecmr/class-meeting\",\"id\":1096079955,\"language\":null,\"license\":null,\"topics\":[]}\nChat para aulas online",
+   "truncated": false
+  }
+ ],
+ "coverage": {
+  "total_campaign_matches": 2,
+  "matches_included": 2,
+  "files_available": 1,
+  "files_included": 1,
+  "omitted_files": 0,
+  "truncated_files": 0
+ }
+}

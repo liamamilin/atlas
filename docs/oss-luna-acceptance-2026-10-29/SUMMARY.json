@@ -1,0 +1,49 @@
+{
+ "checked_at": "2026-10-29T04:40:46.342273+00:00",
+ "job_id": "batch_4812ef3db57543c3acc1871b8ea5ba6e",
+ "sample_count": 100,
+ "population_count": 55651,
+ "status_counts": {
+  "reviewed": 100
+ },
+ "model_verdicts": {
+  "pass_with_limits": 94,
+  "pass": 1,
+  "needs_review": 5
+ },
+ "tokens": {
+  "prompt_tokens": 428036,
+  "completion_tokens": 32416,
+  "total_tokens": 460452
+ },
+ "sample_estimated_standard_usd": 0.0590116,
+ "billing_unknown_requests": 0,
+ "invalid_citation_results": 11,
+ "elapsed_wall_seconds": 154.115,
+ "domain_weighted_full_projection": {
+  "prompt_tokens": 236589669.08333337,
+  "completion_tokens": 17935524.08333333,
+  "standard_usd": 32.626728949999986
+ },
+ "projection_with_25_percent_allowance_usd": 40.78341118749998,
+ "production_sample_and_job_unchanged": true,
+ "automatic_production_writes": false,
+ "full_run_started": false,
+ "pricing": {
+  "usd_per_million_tokens": {
+   "input": 0.1,
+   "cached_input": 0.01,
+   "output": 0.5
+  },
+  "source": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+  "verified_date": "2026-10-29",
+  "tier": "standard short context",
+  "discounts_assumed": false
+ },
+ "limits": [
+  "Model judgments await human triage; this is not final semantic acceptance.",
+  "100 samples cover domains, not every leaf; weighted extrapolation is an estimate, not a bill or confidence interval.",
+  "Projection covers the same bounded evidence/match policy; omitted long sources or many scenario associations need additional review and cost.",
+  "Transport failures without usage may be billed; actual account billing can differ due to caching, cache writes, taxes, credits or tier."
+ ]
+}

@@ -1,0 +1,180 @@
+{
+  "job_id": "batch_4812ef3db57543c3acc1871b8ea5ba6e",
+  "accepted_at": "2026-10-28T18:53:46.036898+00:00",
+  "final_acceptance_passed": true,
+  "first_round_completed": true,
+  "scope": "1598 frozen existing leaves; at most 60 selected candidates per leaf; no automatic additional scope",
+  "structural_passed": true,
+  "semantic_review_passed": true,
+  "browser_review_passed": true,
+  "manifest_exact": true,
+  "completed_leaves": 1598,
+  "finished_at": "2026-10-28T18:26:57.458016+00:00",
+  "production_job_status": "partial",
+  "totals": {
+    "leaves": 1598,
+    "selected_processed": 85231,
+    "target_statuses": {
+      "accepted": 4387,
+      "partial": 55019,
+      "rejected": 25825
+    },
+    "deferred_pending": 181486,
+    "candidates": 266717,
+    "evidence_references_checked": 512555,
+    "projects_checked": 55563,
+    "quotes_checked": 38128,
+    "verified_license_rechecks": 11555,
+    "unreadable_archived_responses": 167,
+    "licenses": {
+      "pending": 44008,
+      "open_source": 11555
+    },
+    "completeness": {
+      "partial": 51303,
+      "complete": 4260
+    },
+    "project_types": {
+      "application": 34371,
+      "library": 2378,
+      "unknown": 10660,
+      "resource": 6920,
+      "collection": 1234
+    },
+    "discovery_provenance": {
+      "candidates": 266717,
+      "with_real_search_hits": 266717,
+      "private": 0
+    },
+    "model_receipts": {
+      "opencode-go / deepseek-v4.1-flash": 22718,
+      "open-design / deepseek-flash": 625
+    },
+    "model_workers": 4,
+    "source_model_overlapping_groups": 4205,
+    "runs": 7432
+  },
+  "incremental": {
+    "passed": true,
+    "production_database_modified": false,
+    "real_cards_replayed": 1572,
+    "distinct_repositories": 1526,
+    "leaves_with_no_published_card": 26,
+    "outcomes": {
+      "unchanged": 1572
+    },
+    "before": {
+      "project_keys": "736e7855ba58b9a0018149217180bfc507d5652acc2fa3624020787a9bcf1d4a",
+      "memberships": "3fc8f0f123a21e245ce762d052755ba3a0a54feb897914165309e5710abdf21f",
+      "matches": "70e039792063cb626e684149a400808c40b75ce5294257bb63fe40825edf2623",
+      "favorites": "5eb53a2a0b7f9ba8eff26e3adcbfc10d30686b0ed42d3219c26a7089597cf295"
+    },
+    "after": {
+      "project_keys": "736e7855ba58b9a0018149217180bfc507d5652acc2fa3624020787a9bcf1d4a",
+      "memberships": "3fc8f0f123a21e245ce762d052755ba3a0a54feb897914165309e5710abdf21f",
+      "matches": "70e039792063cb626e684149a400808c40b75ce5294257bb63fe40825edf2623",
+      "favorites": "5eb53a2a0b7f9ba8eff26e3adcbfc10d30686b0ed42d3219c26a7089597cf295"
+    }
+  },
+  "pre_campaign_preservation": {
+    "repository_ids": {
+      "before_count": 24807,
+      "missing_after": 0,
+      "passed": true
+    },
+    "memberships": {
+      "before_count": 26290,
+      "missing_after": 0,
+      "passed": true
+    },
+    "favorites": {
+      "before_count": 0,
+      "missing_after": 0,
+      "passed": true
+    },
+    "matches": {
+      "before_count": 36187,
+      "missing_after": 0,
+      "passed": true
+    }
+  },
+  "semantic_sample": {
+    "projects": 33,
+    "top_level_domains": 29
+  },
+  "ordinary_errors_retained": [
+    {
+      "error": "GitHub 资源超过采集大小限制",
+      "leaf": "log-management",
+      "query": "request id log search"
+    },
+    {
+      "error": "场景搜索必须使用通用任务关键词，不能指定仓库或作者",
+      "leaf": "distributed-control-system-dcs"
+    },
+    {
+      "error": "模型返回的 场景名称 长度或类型无效",
+      "leaf": "it-operations-management-itom"
+    },
+    {
+      "error": "模型未返回有效 JSON；本次结果未入库",
+      "leaf": "portfolio-management-system"
+    }
+  ],
+  "leaves_without_published_card": 26,
+  "refined_repositories": 63,
+  "candidate_deletions": 0,
+  "healthy_api_restarted": false,
+  "worker_finished": true,
+  "proofs": [
+    {
+      "path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-first-round-2026-10-26/MANIFEST.json",
+      "sha256": "ecbe923adfe0a3773c2862e44758ae12a2dfc62f98fcc500f8dddac4e1ee370f"
+    },
+    {
+      "path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-first-round-2026-10-26/FINAL_STRUCTURAL.json",
+      "sha256": "e3567c6a8a3522fc1399a2eb981ef7b2590a860c706bd4c18dad974be27d05f0"
+    },
+    {
+      "path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-first-round-2026-10-26/FINAL_SOURCE_CHECKS.json",
+      "sha256": "5eaed9225979b5f96be3b051e4ab4c6c35006ad67e60e99ec116773b166b5307"
+    },
+    {
+      "path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-first-round-2026-10-26/FINAL_SEMANTIC_REVIEW.json",
+      "sha256": "a879a4f2be1e1736b1116389ef1855debda12f0d1b3ec58bf3eaa8a70e6b47f9"
+    },
+    {
+      "path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-first-round-2026-10-26/FINAL_REFINEMENTS.json",
+      "sha256": "3ab3b9147abdbe263fba235acf47a6ca199ea2b0d08140099c5dd54efca8a23b"
+    },
+    {
+      "path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-first-round-2026-10-26/FINAL_COVERAGE_LIMITS.json",
+      "sha256": "1db4bd5ad043f4fdce1adb3bfbaebfeec1f0b5f29462af6496bd2e217365faf7"
+    },
+    {
+      "path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-first-round-2026-10-26/FINAL_RUNTIME.json",
+      "sha256": "eabb8ebbc4c65fc55a66a2b1cd55df408a89cc435cfd2e4f0c96d82a6e890428"
+    },
+    {
+      "path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-first-round-2026-10-26/FINAL_BROWSER.json",
+      "sha256": "f44689d64790a5dfb591dba30b0fffa95a9388f3e625a831f433b1fdcacdc067"
+    },
+    {
+      "path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-first-round-2026-10-26/FINAL_AUTOMATION_DELETE.json",
+      "sha256": "aba5b3a8d59812bf4837a5a1224330455db6dc6ec5607a5f367669cf33ea0aa9"
+    }
+  ],
+  "limits": [
+    "First-round completion is distinct from processing the entire candidate pool. All 181486 unselected leaf-candidate records remain pending.",
+    "55563 distinct campaign project records include applications, libraries, resources, collections and 10660 type-unknown records; they are not all verified open-source applications.",
+    "44008 project licenses remain pending; 26 leaves have no published project, including 10 with no candidates. These explicit limitations do not invalidate the bounded first round.",
+    "33 semantic reviews across 29 domains are a sample, not exhaustive manual review."
+  ],
+  "automation": {
+    "id": "atlas-2",
+    "action": "delete_after_acceptance",
+    "deletion_confirmed": true,
+    "deleted_at": "2026-10-28T18:54:21.550989+00:00",
+    "receipt_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-first-round-2026-10-26/FINAL_AUTOMATION_DELETE.json"
+  }
+}

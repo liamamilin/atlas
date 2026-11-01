@@ -1,0 +1,103 @@
+{
+  "backend_catalog_and_github": {
+    "passed": 35,
+    "log": "backend-tests.log",
+    "commands": [
+      "python3 -m unittest discover -s application-atlas-production-pack/tests -p 'test_oss*.py' -v",
+      "python3 -m unittest discover -s application-atlas-production-pack/tests -p test_github_settings.py -v"
+    ]
+  },
+  "backend_request_boundary_and_model_settings": {
+    "passed": 23,
+    "log": "settings-regression.log",
+    "command": "PYTHONPATH=application-atlas-production-pack/tests python3 -m unittest test_reliability.ApiRequestBoundaryTests test_reliability.ModelSettingsTests -v"
+  },
+  "catalog_browser": {
+    "passed": 12,
+    "log": "browser-tests.log",
+    "command": "npm run test:e2e:catalog"
+  },
+  "frontend_unit": {
+    "passed": 9,
+    "log": "frontend-tests.log",
+    "command": "npm test"
+  },
+  "typecheck": {
+    "status": "passed",
+    "log": "typecheck.log",
+    "command": "npm run typecheck"
+  },
+  "build": {
+    "status": "passed",
+    "log": "build.log",
+    "command": "npm run build"
+  },
+  "ruff": {
+    "status": "passed",
+    "log": "ruff.log",
+    "scope": [
+      "oss_catalog.py",
+      "oss_discovery.py",
+      "oss_sources.py",
+      "github_settings.py",
+      "tests/test_oss_catalog.py",
+      "tests/test_oss_discovery.py",
+      "tests/test_github_settings.py"
+    ]
+  },
+  "live_browser": {
+    "baseURL": "http://127.0.0.1:5188",
+    "leaves": {
+      "feed-reader": {
+        "projects": 11,
+        "scenarios": 6,
+        "candidates": 63,
+        "pending": 55
+      },
+      "diagramming-application": {
+        "projects": 3,
+        "scenarios": 6,
+        "candidates": 61,
+        "pending": 53
+      },
+      "password-manager": {
+        "projects": 7,
+        "scenarios": 6,
+        "candidates": 31,
+        "pending": 23
+      }
+    },
+    "checks": {
+      "github_write_only": true,
+      "github_connection": true,
+      "candidate_queue": true,
+      "conditions_visible": true,
+      "search_persists": true,
+      "restricted_license_and_immutable_source": true,
+      "mobile_no_overflow": true,
+      "history_reachable": true
+    },
+    "page_errors": [],
+    "status": "passed"
+  },
+  "source_integrity": {
+    "projects": 21,
+    "quotes": 204,
+    "status": "passed",
+    "file": "SOURCE_INTEGRITY.json"
+  },
+  "incremental_same_batch": {
+    "selected": 24,
+    "created": 0,
+    "updated": 0,
+    "unchanged_accepted": 16,
+    "failed_reads": 1,
+    "new_model_calls": 0,
+    "real_search_requests": 15,
+    "evidence": "incremental-final/"
+  },
+  "diff_whitespace": {
+    "status": "passed",
+    "command": "git diff --check"
+  }
+}

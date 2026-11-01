@@ -1,0 +1,93 @@
+{
+ "repository_id": 1296271039,
+ "domain": "08",
+ "input_sha256": "de8fb3ffe55d889a61c08dc4b8d8ff3f196ada037912f5df4f0f1223b63e7afc",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:23.160549+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-d90fbd992745-12fb84",
+ "usage": {
+  "prompt_tokens": 7120,
+  "completion_tokens": 630,
+  "total_tokens": 7750,
+  "prompt_tokens_details": {
+   "cached_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.001446,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.001446,
+   "tokens": {
+    "input": 7120,
+    "output": 630,
+    "reasoning": 0,
+    "cache_read": 0,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1296271039,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片将仓库定位为 PokePay 充值指南类文章/资源，与 README 内容一致；功能、费用争议、网络限制均有来源支持，许可保持 pending 属保守处理。主要问题是场景匹配把虚拟卡充值类比为交易所托管充值，仅条件适用。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-cryptocurrency-exchange-238a882c8f\",\"severity\":\"minor\",\"kind\":\"irrelevant_scenario\",\"claim\":\"涉及向平台充值地址转入加密资产并选择网络，但对象是虚拟卡充值而非交易所托管账户\",\"source_id\":\"s0\",\"quote\":\"PokePay is a Hong Kong-issued Visa prepaid card platform built for people who hold crypto and want to spend it without manually converting to fiat first.\",\"reason\":\"场景描述明确为交易所生成充值地址并计入托管账户余额，而来源是虚拟卡平台充值，二者业务对象不同；卡片已标 conditional 并说明差异，但 relevance 仍偏弱。\",\"suggested_correction\":\"保留 conditional，并进一步注明该指南不覆盖交易所充值地址、备注标签（memo/tag）与托管账户余额核对流程。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"介绍 USDT/USDC/BTC/ETH 充值及网络选择建议\",\"source_id\":\"s0\",\"quote\":\"PokePay does not publish a clear list of which chains are supported for top-up on its public-facing pages.\",\"reason\":\"来源明确说明支持网络未公开、错误网络可能丢币，功能描述未体现这一前提限制。\",\"suggested_correction\":\"在功能描述中补充“支持网络需以应用内提示/客服确认为准，错误网络可能不可恢复”。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"列出卡片产品线与费用对比\",\"source_id\":\"s0\",\"quote\":\"The most detailed third-party review (ucardcrypto's 2026 evaluation) lists a **1% recharge fee** on all crypto top-ups. Another detailed third-party fee breakdown claims **PokePay charges no platform fee on deposits — gas only**.\",\"reason\":\"费用数据来自第三方且互相矛盾，官方未公开充值费率；卡片未标注该不确定性。\",\"suggested_correction\":\"注明费用对比基于第三方资料且存在冲突，实际费率需以应用内为准。\"}],\"limitations\":[\"仅审阅 README 与 GitHub 元数据各一份，未核验仓库其他文件或外部官方页面。\",\"许可状态为 pending，未做许可证全文比对，不能据此判定开源授权。\",\"场景匹配为条件适用，未验证交易所充值地址/备注标签相关流程。\"]}",
+ "review": {
+  "repository_id": 1296271039,
+  "verdict": "pass_with_limits",
+  "summary": "卡片将仓库定位为 PokePay 充值指南类文章/资源，与 README 内容一致；功能、费用争议、网络限制均有来源支持，许可保持 pending 属保守处理。主要问题是场景匹配把虚拟卡充值类比为交易所托管充值，仅条件适用。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-cryptocurrency-exchange-238a882c8f",
+    "severity": "minor",
+    "kind": "irrelevant_scenario",
+    "claim": "涉及向平台充值地址转入加密资产并选择网络，但对象是虚拟卡充值而非交易所托管账户",
+    "source_id": "s0",
+    "quote": "PokePay is a Hong Kong-issued Visa prepaid card platform built for people who hold crypto and want to spend it without manually converting to fiat first.",
+    "reason": "场景描述明确为交易所生成充值地址并计入托管账户余额，而来源是虚拟卡平台充值，二者业务对象不同；卡片已标 conditional 并说明差异，但 relevance 仍偏弱。",
+    "suggested_correction": "保留 conditional，并进一步注明该指南不覆盖交易所充值地址、备注标签（memo/tag）与托管账户余额核对流程。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "介绍 USDT/USDC/BTC/ETH 充值及网络选择建议",
+    "source_id": "s0",
+    "quote": "PokePay does not publish a clear list of which chains are supported for top-up on its public-facing pages.",
+    "reason": "来源明确说明支持网络未公开、错误网络可能丢币，功能描述未体现这一前提限制。",
+    "suggested_correction": "在功能描述中补充“支持网络需以应用内提示/客服确认为准，错误网络可能不可恢复”。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "列出卡片产品线与费用对比",
+    "source_id": "s0",
+    "quote": "The most detailed third-party review (ucardcrypto's 2026 evaluation) lists a **1% recharge fee** on all crypto top-ups. Another detailed third-party fee breakdown claims **PokePay charges no platform fee on deposits — gas only**.",
+    "reason": "费用数据来自第三方且互相矛盾，官方未公开充值费率；卡片未标注该不确定性。",
+    "suggested_correction": "注明费用对比基于第三方资料且存在冲突，实际费率需以应用内为准。"
+   }
+  ],
+  "limitations": [
+   "仅审阅 README 与 GitHub 元数据各一份，未核验仓库其他文件或外部官方页面。",
+   "许可状态为 pending，未做许可证全文比对，不能据此判定开源授权。",
+   "场景匹配为条件适用，未验证交易所充值地址/备注标签相关流程。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:11:33.113713+00:00",
+ "elapsed_seconds": 9.953
+}

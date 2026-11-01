@@ -1,0 +1,145 @@
+{
+  "prepared_at": "2026-10-29T04:14:40.531365+00:00",
+  "user_approved_reload": true,
+  "old_pid": 80295,
+  "port": 5199,
+  "command": "/Users/milin/.pyenv/versions/3.10.13/bin/python3 -u /Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/drafts_api.py --port 5199",
+  "cwd": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack",
+  "source_sha256": {
+    "drafts_api.py": "6e6916657c07f39c50e0ced7efa17767c6d590ed7a5cfc5f733e3c6959ea2c08",
+    "oss_catalog.py": "a85a41cd9489b0c5d00fb9d0004155b0ea80490c8e73b6b14a731f7fb58f84c4",
+    "oss_discovery.py": "778864aae11653214510934f1f23ac6e85288c1fb871fa1a040f43bc1d7234e3",
+    "oss_workflow.py": "09d90c2626199b1460e9dec74d2727f7efa0205146dbc902184ec8b10c3705dd",
+    "oss_batch.py": "17d7385538cccb25bcf96f92c9e8294b564092bcff635d7cfb37969678364c58",
+    "atlas_model.py": "413736b6cfda19c24e76c05887da54e220197c8c41615198b2d8619d44a55b9e"
+  },
+  "model_config_sha256": "cd438feb36e7bbff2884181078e984d696a335a6c1cdf0a1ef78c64c283493f5",
+  "fallback_state_sha256": "d49a7089064cc9fff5e5c2b51e9e2ef3308e9e458009896884b1368f3dfececd",
+  "model_route_before": {
+    "default": {
+      "provider": "open-design",
+      "model": "deepseek-v4.1-flash"
+    },
+    "fallback": {
+      "enabled": true,
+      "from_provider": "open-design",
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "active": true,
+      "activated_at": "2026-10-29T03:46:34Z",
+      "reason": "quota_exhausted"
+    },
+    "resolved": {
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "source": "fallback",
+      "ready": null
+    }
+  },
+  "health_before": {
+    "ok": true,
+    "generating": [],
+    "promoting": [],
+    "recovery": {
+      "status": "completed",
+      "executions_interrupted": 0,
+      "generations_interrupted": 0,
+      "applications_requiring_review": 0,
+      "errors": 0
+    }
+  },
+  "catalog_before": {
+    "tables": {
+      "oss_scenario": {
+        "count": 5427,
+        "sha256": "f79f86488450b7f383a27794a75c4c183690d84ca3e6bb2f2b8779a44f8b44ae"
+      },
+      "oss_project": {
+        "count": 79175,
+        "sha256": "ea61c2a6a776c8f9142aaf40476b1f90864a05c13bbcdd48fea595e3dbc24df6"
+      },
+      "oss_match": {
+        "count": 115966,
+        "sha256": "596428144916c4c9f048e6f18f7c8267201bdfce02e14897c536d96cb4ccdf56"
+      },
+      "oss_run": {
+        "count": 10583,
+        "sha256": "dad2a6a3946cc5cd26a27d96d905cf73b6018936cc933415d2d3730d6c438767"
+      },
+      "oss_meta": {
+        "count": 3,
+        "sha256": "760578eaefd3ebaa3a2b19a011db62dea4271f3915f3f80e669c016771925cae"
+      },
+      "oss_candidate": {
+        "count": 307798,
+        "sha256": "2740eb40ae18aa920dd854fc1d5fb8f0183c58244b71b719ac9fc8c26d46f0ef"
+      },
+      "oss_leaf_project": {
+        "count": 85785,
+        "sha256": "8523648e92e8070b07f67e37d2cbfeb716118bcb9b2eca9f3d519f98e4225fce"
+      },
+      "oss_batch_job": {
+        "count": 6,
+        "sha256": "f52ff42e3d0673076f370f9d7d3609193b58c3f270fc7b9e733a0d5c6e990dbf"
+      },
+      "oss_batch_target": {
+        "count": 85351,
+        "sha256": "dc19b89c253830a484b87f9383560949eefaa8a693d1395b1744b6ba0ecea6b7"
+      },
+      "oss_batch_leaf": {
+        "count": 1598,
+        "sha256": "3a1aac5ce33280605c837392df42d44f34ce39c6cc74301ee36f51df57b532c5"
+      }
+    },
+    "jobs": [
+      {
+        "id": "batch_4812ef3db57543c3acc1871b8ea5ba6e",
+        "status": "completed",
+        "sha256": "b3a8cd79b7683d27df554a72e33896cdde2a9e3d477af35d881229661742d7d3"
+      },
+      {
+        "id": "batch_49f702648577408691d5ec4dfceec6d9",
+        "status": "completed",
+        "sha256": "0424230c64c04a631f9e01bb4ce2a5da072198bcc5559cd55a9c1d0cc7925942"
+      },
+      {
+        "id": "batch_97770f4fc86e41ad97e0bed0a5f9b4b7",
+        "status": "completed",
+        "sha256": "90e2b2d4067d2f6b10da8b907326988844c2d1ba9e267537c2b4954b57c52013"
+      },
+      {
+        "id": "batch_9ab8ea47e4ef450cbb4afe5b295594e3",
+        "status": "completed",
+        "sha256": "5b49e6857ca699e16452c9a2c506aa108d637cf8e841b50af05b2e1a71a07875"
+      },
+      {
+        "id": "batch_c97980ce91f8485cbe1fd826ed436eaa",
+        "status": "partial",
+        "sha256": "604839b810dcf2edfb165f7a6098a53f645ad56a5cd78c379c54281ff5f569f9"
+      },
+      {
+        "id": "batch_cd8f7a777e3c4e6885de1cf3162e004c",
+        "status": "partial",
+        "sha256": "e7f9c46cc33696c1a3722ebe9425442adfdd0e53c4e7269bbfce19ba7c618ded"
+      }
+    ],
+    "job": {
+      "status": "completed",
+      "completed_leaves": 1598,
+      "unresolved_errors": 0,
+      "leaf_errors": 0
+    },
+    "leaf_states": {
+      "first_round_done": 1598
+    },
+    "target_statuses": {
+      "accepted": 4401,
+      "partial": 55094,
+      "rejected": 25856
+    },
+    "favorites": 0
+  },
+  "factory_worker_disabled": true,
+  "oss_model_concurrency": 4,
+  "update_lock_free_before": true
+}

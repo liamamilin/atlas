@@ -1,0 +1,62 @@
+{
+ "repository_id": 820847687,
+ "domain": "02",
+ "input_sha256": "0d95d473677775a230adc4ef6605f33fd7c65cde7a7ac383ef9d5f9ba8c36c60",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:38:19.218659+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCC50AY5vJ9LbOl6q5WaRQ2lCUv3",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 4620,
+  "completion_tokens": 370,
+  "total_tokens": 4990,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 4617,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.000647,
+ "response_text": "{\"repository_id\":820847687,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片对项目类型、主要功能及外部 API 前提的描述与 README 相符；许可证保守标为 pending 是恰当的。第二条场景涉及阅读行为驱动的逐步个性化，卡片已注明未见此能力，但仍将其列为条件匹配，相关性有限。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-personalized-news-feed-cd26b1703d\",\"severity\":\"minor\",\"kind\":\"irrelevant_scenario\",\"claim\":\"reason: 引导流程中选分类后信息流按偏好展示\",\"source_id\":\"s0\",\"quote\":\"- **Personalized Feed** - Select your favorite categories and get a curated news feed\",\"reason\":\"场景描述要求用户阅读和关注话题后，信息流逐渐调整；来源只支持选择分类后生成信息流。卡片的 conditions 已明确指出未见阅读行为自适应，因此该场景只能算有限相关，不能据此暗示满足逐步调整需求。\",\"suggested_correction\":\"将该匹配标为低相关或不匹配；如保留，明确仅覆盖初始分类选择，不覆盖基于阅读行为的持续调整。\"}],\"limitations\":[\"仅依据提供的 README 与 GitHub 元数据审查；README 未截断，但未独立核验仓库实现。\",\"许可证状态 pending 与卡片所述未发现许可证文件一致；README 的 MIT 声明和徽章不足以在本次审查中提升为已核验许可。\"]}",
+ "review": {
+  "repository_id": 820847687,
+  "verdict": "pass_with_limits",
+  "summary": "卡片对项目类型、主要功能及外部 API 前提的描述与 README 相符；许可证保守标为 pending 是恰当的。第二条场景涉及阅读行为驱动的逐步个性化，卡片已注明未见此能力，但仍将其列为条件匹配，相关性有限。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-personalized-news-feed-cd26b1703d",
+    "severity": "minor",
+    "kind": "irrelevant_scenario",
+    "claim": "reason: 引导流程中选分类后信息流按偏好展示",
+    "source_id": "s0",
+    "quote": "- **Personalized Feed** - Select your favorite categories and get a curated news feed",
+    "reason": "场景描述要求用户阅读和关注话题后，信息流逐渐调整；来源只支持选择分类后生成信息流。卡片的 conditions 已明确指出未见阅读行为自适应，因此该场景只能算有限相关，不能据此暗示满足逐步调整需求。",
+    "suggested_correction": "将该匹配标为低相关或不匹配；如保留，明确仅覆盖初始分类选择，不覆盖基于阅读行为的持续调整。"
+   }
+  ],
+  "limitations": [
+   "仅依据提供的 README 与 GitHub 元数据审查；README 未截断，但未独立核验仓库实现。",
+   "许可证状态 pending 与卡片所述未发现许可证文件一致；README 的 MIT 声明和徽章不足以在本次审查中提升为已核验许可。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:38:26.920814+00:00",
+ "elapsed_seconds": 7.702
+}

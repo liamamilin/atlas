@@ -1,0 +1,80 @@
+{
+  "injection": "first HTTP 503 only; following response is real",
+  "response": {
+    "status": "ok",
+    "sum": 5
+  },
+  "repeat_response": {
+    "status": "ok",
+    "sum": 5
+  },
+  "calls": [
+    {
+      "injected": true,
+      "provider": "open-design"
+    },
+    {
+      "injected": false,
+      "provider": "open-design"
+    }
+  ],
+  "elapsed_s": 4.46,
+  "model_calls": 2,
+  "model_cache_hits": 1,
+  "retry_policy": {
+    "max_attempts": 3,
+    "initial_backoff_seconds": 2,
+    "max_wait_seconds": 60
+  },
+  "retry_state": {
+    "stage": "recovery_check",
+    "input_sha256": "916963cd481f4bc421b68e816d247f3ade671d821e01ec5b62988f2294156e60",
+    "created_at": "2026-10-23T09:34:25.307848+00:00",
+    "provider": "open-design",
+    "model": "deepseek-v4.1-flash",
+    "code": "provider_error",
+    "status": 502,
+    "upstream_status": 503,
+    "message": "provider returned HTTP 503: {\"error\":\"injected transient upstream failure\"}",
+    "retryable": true,
+    "attempt": 2,
+    "max_attempts": 3,
+    "retry_after": null,
+    "will_retry": true,
+    "state": "recovered",
+    "retry_at": null,
+    "recovered_at": "2026-10-23T09:34:29.766053+00:00"
+  },
+  "errors": [
+    {
+      "stage": "recovery_check",
+      "input_sha256": "916963cd481f4bc421b68e816d247f3ade671d821e01ec5b62988f2294156e60",
+      "created_at": "2026-10-23T09:34:25.307848+00:00",
+      "provider": "open-design",
+      "model": "deepseek-v4.1-flash",
+      "code": "provider_error",
+      "status": 502,
+      "upstream_status": 503,
+      "message": "provider returned HTTP 503: {\"error\":\"injected transient upstream failure\"}",
+      "retryable": true,
+      "attempt": 1,
+      "max_attempts": 3,
+      "retry_after": null,
+      "will_retry": true
+    }
+  ],
+  "receipt": {
+    "stage": "recovery_check",
+    "input_sha256": "916963cd481f4bc421b68e816d247f3ade671d821e01ec5b62988f2294156e60",
+    "cached": true,
+    "model": "deepseek-flash",
+    "provider": "open-design",
+    "usage": {
+      "prompt_tokens": 95,
+      "completion_tokens": 46,
+      "total_tokens": 141,
+      "cost": null
+    },
+    "created_at": "2026-10-23T09:34:29.766167+00:00"
+  }
+}

@@ -1,0 +1,115 @@
+{
+ "repository_id": 1170058014,
+ "domain": "24",
+ "input_sha256": "253fc91905d678be6423ff738142dc5870fdbfecd875e7e8f3cd7bf75016a721",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:12:24.024845+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-d90fbd992745-130d1c",
+ "usage": {
+  "prompt_tokens": 15672,
+  "completion_tokens": 1064,
+  "total_tokens": 16736,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00291394,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00291394,
+   "tokens": {
+    "input": 15160,
+    "output": 1064,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1170058014,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体与README及文档一致：定位为内部EHS PWA，功能、外部依赖、无应用数据库、AI特性开关均有来源；许可证保守标为pending，与专有LICENSE文本相符。主要问题是场景匹配全部标为unverified但理由已说明不相关，属保守处理；另有一条功能表述把文档中“计划/后续接线”的Blob签名存储与Notion列扩展混入已实现范围的风险，需收紧。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"roadmap_as_fact\",\"claim\":\"离线优先，记录本地存储并同步Notion\",\"source_id\":\"s3\",\"quote\":\"**My follow-up code changes** (once the schema exists):\",\"reason\":\"README称记录同步Notion已实现，但设置文档明确部分Notion列（邮箱、日期、计数）与签名/照片上传Vercel Blob属“后续代码改动”，尚未接线。卡片该条未区分已同步的结构化字段与待接线的媒体/扩展列，易被读为全部同步能力已实现。\",\"suggested_correction\":\"在功能描述中注明：记录JSON同步Notion已实现；签名/照片云存储及部分扩展列属文档标注的后续接线项。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-permit-management-0ed0fc971f\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"含设备预检与检查记录，但非按已签发许可的现场检查与复检关闭流程\",\"source_id\":\"s0\",\"quote\":\"**Work Permits** | Height, hot work, and confined space permits with safety checklists, atmospheric monitoring fields, and timed validity with live countdown\",\"reason\":\"许可含安全检查清单与有效期，但来源未描述“按已签发许可的现场检查—缺陷—复检—关闭”流程，标unverified合理；理由中“设备预检”与许可后检查的关联略牵强，属证据不足而非明确否定。\",\"suggested_correction\":\"保留unverified，理由改为“来源仅描述许可表单与清单，未见许可后现场检查与复检关闭流程”。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-permit-management-d86861a3b4\",\"severity\":\"minor\",\"kind\":\"irrelevant_scenario\",\"claim\":\"含工作许可表单，但面向内部EHS作业许可，非业主/承包商住宅加建申请与图纸审查\",\"source_id\":\"s0\",\"quote\":\"An internal EHS platform. Replaces paper-based pre-task plans, permits, job hazard analyses\",\"reason\":\"住宅加建许可申请与内部EHS作业许可在对象、流程上明显不同，标unverified偏保守；conditions列出的Notion与AI配置与该场景无关，属条件错配。\",\"suggested_correction\":\"可标not_applicable并移除无关conditions；若保留unverified，应说明仅因领域不同而非证据缺失。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-permit-management-f788c5c523\",\"severity\":\"minor\",\"kind\":\"irrelevant_scenario\",\"claim\":\"提供EHS经理审查提交，但无多部门并行图纸审查与补正流程\",\"source_id\":\"s0\",\"quote\":\"**EHS Review Workflow** | Submit any record for EHS manager review; notifications delivered via email (Resend), Notion, and/or Slack\",\"reason\":\"来源仅有单一EHS经理审查，无多部门并行图纸审查；场景明显不相关，标unverified而非not_applicable偏保守，但理由本身有来源支持。\",\"suggested_correction\":\"建议标not_applicable，理由保留“仅单一EHS经理审查，无多部门并行图纸审查”。\"},{\"field\":\"scope\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"组织内部EHS作业安全与工作许可管理，非政府机构对外许可申请、审查与签发系统\",\"source_id\":\"s0\",\"quote\":\"An internal EHS platform.\",\"reason\":\"“内部EHS平台”有来源支持，但“非政府机构对外许可系统”是对未描述领域的推断性排除，来源未直接声明；作为范围界定可接受但属推断。\",\"suggested_correction\":\"改为“来源描述为组织内部EHS平台，未涉及政府对外许可签发”，避免断言未描述内容。\"}],\"limitations\":[\"s2文档被截断（含[ARCHIVE TEXT OMITTED]），未覆盖全文，不能据此声称全部文档已验证。\",\"许可证仅按语义与pending状态核对，未做官方模板全文比对；不提升为已核验开源。\",\"场景匹配均基于README与文档文字，未执行代码，无法验证运行时行为。\"]}",
+ "review": {
+  "repository_id": 1170058014,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体与README及文档一致：定位为内部EHS PWA，功能、外部依赖、无应用数据库、AI特性开关均有来源；许可证保守标为pending，与专有LICENSE文本相符。主要问题是场景匹配全部标为unverified但理由已说明不相关，属保守处理；另有一条功能表述把文档中“计划/后续接线”的Blob签名存储与Notion列扩展混入已实现范围的风险，需收紧。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "roadmap_as_fact",
+    "claim": "离线优先，记录本地存储并同步Notion",
+    "source_id": "s3",
+    "quote": "**My follow-up code changes** (once the schema exists):",
+    "reason": "README称记录同步Notion已实现，但设置文档明确部分Notion列（邮箱、日期、计数）与签名/照片上传Vercel Blob属“后续代码改动”，尚未接线。卡片该条未区分已同步的结构化字段与待接线的媒体/扩展列，易被读为全部同步能力已实现。",
+    "suggested_correction": "在功能描述中注明：记录JSON同步Notion已实现；签名/照片云存储及部分扩展列属文档标注的后续接线项。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-permit-management-0ed0fc971f",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "含设备预检与检查记录，但非按已签发许可的现场检查与复检关闭流程",
+    "source_id": "s0",
+    "quote": "**Work Permits** | Height, hot work, and confined space permits with safety checklists, atmospheric monitoring fields, and timed validity with live countdown",
+    "reason": "许可含安全检查清单与有效期，但来源未描述“按已签发许可的现场检查—缺陷—复检—关闭”流程，标unverified合理；理由中“设备预检”与许可后检查的关联略牵强，属证据不足而非明确否定。",
+    "suggested_correction": "保留unverified，理由改为“来源仅描述许可表单与清单，未见许可后现场检查与复检关闭流程”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-permit-management-d86861a3b4",
+    "severity": "minor",
+    "kind": "irrelevant_scenario",
+    "claim": "含工作许可表单，但面向内部EHS作业许可，非业主/承包商住宅加建申请与图纸审查",
+    "source_id": "s0",
+    "quote": "An internal EHS platform. Replaces paper-based pre-task plans, permits, job hazard analyses",
+    "reason": "住宅加建许可申请与内部EHS作业许可在对象、流程上明显不同，标unverified偏保守；conditions列出的Notion与AI配置与该场景无关，属条件错配。",
+    "suggested_correction": "可标not_applicable并移除无关conditions；若保留unverified，应说明仅因领域不同而非证据缺失。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-permit-management-f788c5c523",
+    "severity": "minor",
+    "kind": "irrelevant_scenario",
+    "claim": "提供EHS经理审查提交，但无多部门并行图纸审查与补正流程",
+    "source_id": "s0",
+    "quote": "**EHS Review Workflow** | Submit any record for EHS manager review; notifications delivered via email (Resend), Notion, and/or Slack",
+    "reason": "来源仅有单一EHS经理审查，无多部门并行图纸审查；场景明显不相关，标unverified而非not_applicable偏保守，但理由本身有来源支持。",
+    "suggested_correction": "建议标not_applicable，理由保留“仅单一EHS经理审查，无多部门并行图纸审查”。"
+   },
+   {
+    "field": "scope",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "组织内部EHS作业安全与工作许可管理，非政府机构对外许可申请、审查与签发系统",
+    "source_id": "s0",
+    "quote": "An internal EHS platform.",
+    "reason": "“内部EHS平台”有来源支持，但“非政府机构对外许可系统”是对未描述领域的推断性排除，来源未直接声明；作为范围界定可接受但属推断。",
+    "suggested_correction": "改为“来源描述为组织内部EHS平台，未涉及政府对外许可签发”，避免断言未描述内容。"
+   }
+  ],
+  "limitations": [
+   "s2文档被截断（含[ARCHIVE TEXT OMITTED]），未覆盖全文，不能据此声称全部文档已验证。",
+   "许可证仅按语义与pending状态核对，未做官方模板全文比对；不提升为已核验开源。",
+   "场景匹配均基于README与文档文字，未执行代码，无法验证运行时行为。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:12:43.068603+00:00",
+ "elapsed_seconds": 19.043
+}

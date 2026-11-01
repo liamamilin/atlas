@@ -1,0 +1,104 @@
+{
+ "repository_id": 311664034,
+ "domain": "09",
+ "input_sha256": "f5c0e34d3e063910917cd2469ef951884860175bf0614c0d22e80ad3a6f92489",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:26.693138+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-d90fbd992745-12fcbe",
+ "usage": {
+  "prompt_tokens": 2492,
+  "completion_tokens": 726,
+  "total_tokens": 3218,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00073414,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00073414,
+   "tokens": {
+    "input": 1980,
+    "output": 726,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":311664034,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体保守：定位与功能仅依据仓库描述，README 仅含 Angular CLI 模板命令，许可标为 pending，两个场景均标 unverified 并列出待核实条件，未把模板命令当作业务功能，也未把公开仓库当作已授权开源。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"limited\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"project_type\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"project_type: application\",\"source_id\":\"s0\",\"quote\":\"This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.1.7.\",\"reason\":\"README 仅为 Angular CLI 生成模板，未展示任何业务页面或流程；仅凭仓库描述称其为 Web 应用可接受，但“完整应用”类型缺乏实现证据，属证据不足而非反证。\",\"suggested_correction\":\"保留 application 但注明类型依据仅为仓库描述与 Angular 脚手架，业务实现未核实。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"员工相互提交绩效评审反馈（据仓库描述）\",\"source_id\":\"s1\",\"quote\":\"A web application that allows employees to submit feedback toward each others performance review.\",\"reason\":\"该功能仅来自仓库描述，README 未提供任何实现细节；卡片已标注“据仓库描述”，但 features 列表仍可能被读作已实现功能。\",\"suggested_correction\":\"在 features 中明确标注“仅仓库描述，未在源码/README 中核实实现”。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-performance-management-platform-1b222664e9\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"涉及员工间互评反馈，可能对应同事评估环节，但自评、提名审批与结果确认未见说明。\",\"source_id\":\"s1\",\"quote\":\"A web application that allows employees to submit feedback toward each others performance review.\",\"reason\":\"场景要求自评、提名审批与结果确认，仓库描述仅提及互评反馈，卡片已标 unverified 并列条件，处理恰当；仅提示条件覆盖不足。\",\"suggested_correction\":\"维持 unverified，条件中可补充“互评反馈是否构成正式评估流程”待核实。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-performance-management-platform-f4cac9b422\",\"severity\":\"minor\",\"kind\":\"irrelevant_scenario\",\"claim\":\"经理撰写下属评估的能力未在资料中体现。\",\"source_id\":\"s1\",\"quote\":\"A web application that allows employees to submit feedback toward each others performance review.\",\"reason\":\"仓库描述为同级互评，未涉及经理对下属的结构化评估与校准，场景相关性弱；卡片已标 unverified，未误标 direct。\",\"suggested_correction\":\"可考虑将该场景标为不相关或进一步降低相关性，而非仅 unverified。\"}],\"limitations\":[\"仅有 README 与 GitHub 元数据两份材料，无源码文件，无法核实任何业务功能实现。\",\"README 为 Angular CLI 模板，未包含项目特定说明。\",\"许可状态为 pending，未做许可全文比对，不能判定开源授权。\"]}",
+ "review": {
+  "repository_id": 311664034,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体保守：定位与功能仅依据仓库描述，README 仅含 Angular CLI 模板命令，许可标为 pending，两个场景均标 unverified 并列出待核实条件，未把模板命令当作业务功能，也未把公开仓库当作已授权开源。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "limited",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "project_type",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "project_type: application",
+    "source_id": "s0",
+    "quote": "This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.1.7.",
+    "reason": "README 仅为 Angular CLI 生成模板，未展示任何业务页面或流程；仅凭仓库描述称其为 Web 应用可接受，但“完整应用”类型缺乏实现证据，属证据不足而非反证。",
+    "suggested_correction": "保留 application 但注明类型依据仅为仓库描述与 Angular 脚手架，业务实现未核实。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "员工相互提交绩效评审反馈（据仓库描述）",
+    "source_id": "s1",
+    "quote": "A web application that allows employees to submit feedback toward each others performance review.",
+    "reason": "该功能仅来自仓库描述，README 未提供任何实现细节；卡片已标注“据仓库描述”，但 features 列表仍可能被读作已实现功能。",
+    "suggested_correction": "在 features 中明确标注“仅仓库描述，未在源码/README 中核实实现”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-performance-management-platform-1b222664e9",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "涉及员工间互评反馈，可能对应同事评估环节，但自评、提名审批与结果确认未见说明。",
+    "source_id": "s1",
+    "quote": "A web application that allows employees to submit feedback toward each others performance review.",
+    "reason": "场景要求自评、提名审批与结果确认，仓库描述仅提及互评反馈，卡片已标 unverified 并列条件，处理恰当；仅提示条件覆盖不足。",
+    "suggested_correction": "维持 unverified，条件中可补充“互评反馈是否构成正式评估流程”待核实。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-performance-management-platform-f4cac9b422",
+    "severity": "minor",
+    "kind": "irrelevant_scenario",
+    "claim": "经理撰写下属评估的能力未在资料中体现。",
+    "source_id": "s1",
+    "quote": "A web application that allows employees to submit feedback toward each others performance review.",
+    "reason": "仓库描述为同级互评，未涉及经理对下属的结构化评估与校准，场景相关性弱；卡片已标 unverified，未误标 direct。",
+    "suggested_correction": "可考虑将该场景标为不相关或进一步降低相关性，而非仅 unverified。"
+   }
+  ],
+  "limitations": [
+   "仅有 README 与 GitHub 元数据两份材料，无源码文件，无法核实任何业务功能实现。",
+   "README 为 Angular CLI 模板，未包含项目特定说明。",
+   "许可状态为 pending，未做许可全文比对，不能判定开源授权。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:11:36.980953+00:00",
+ "elapsed_seconds": 10.288
+}

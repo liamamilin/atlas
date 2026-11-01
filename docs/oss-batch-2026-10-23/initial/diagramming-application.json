@@ -1,0 +1,88 @@
+{
+ "id": "oss_972b2adfdef341d6b1443d7314eed5ee",
+ "leaf": "diagramming-application",
+ "status": "failed",
+ "started_at": "2026-10-23T02:03:03.199730+00:00",
+ "created": 0,
+ "updated": 0,
+ "unchanged": 0,
+ "failed": 1,
+ "processed": 1,
+ "errors": [
+  {
+   "repo": "gantFDT/icraft",
+   "error": "核心功能数量无效"
+  }
+ ],
+ "mode": "automatic",
+ "phase": "extract",
+ "model_calls": 3,
+ "model_cache_hits": 0,
+ "rejected": 0,
+ "total": 1,
+ "model_receipts": [
+  {
+   "stage": "scenarios",
+   "input_sha256": "1f25d74d8370a6d6a96d0e09f7b83585aa91dbba9c4d6a0bba6e5ec219b335d8",
+   "cached": false,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 3146,
+    "completion_tokens": 761,
+    "total_tokens": 3907,
+    "cost": null
+   },
+   "created_at": "2026-10-23T02:03:11.047069+00:00"
+  },
+  {
+   "stage": "screen",
+   "input_sha256": "1179efa8aff20bf5b2ffdb373fb6e59ca64814fe919a0a788e39d83e450174a9",
+   "cached": false,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 14493,
+    "completion_tokens": 240,
+    "total_tokens": 14733,
+    "cost": null
+   },
+   "created_at": "2026-10-23T02:03:20.571673+00:00"
+  },
+  {
+   "stage": "extract",
+   "input_sha256": "8011c9d29f14bbbdb8f7f924825ea1cd4b6bed000cd310bd1791cd6a2af17534",
+   "cached": false,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 4003,
+    "completion_tokens": 3415,
+    "total_tokens": 7418,
+    "cost": null
+   },
+   "created_at": "2026-10-23T02:03:44.891246+00:00"
+  }
+ ],
+ "discovered": 2,
+ "accepted": 0,
+ "gaps": [
+  {
+   "scenario": "系统架构说明图绘制",
+   "projects": 0,
+   "target": 3
+  },
+  {
+   "scenario": "跨部门业务流程建模",
+   "projects": 0,
+   "target": 3
+  },
+  {
+   "scenario": "组织汇报关系图搭建",
+   "projects": 0,
+   "target": 3
+  }
+ ],
+ "audit_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/runs/oss_972b2adfdef341d6b1443d7314eed5ee.json",
+ "finished_at": "2026-10-23T02:03:44.899292+00:00"
+}

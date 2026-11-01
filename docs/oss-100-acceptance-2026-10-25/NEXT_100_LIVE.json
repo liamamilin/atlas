@@ -1,0 +1,115 @@
+{
+  "id": "batch_9ab8ea47e4ef450cbb4afe5b295594e3",
+  "status": "running",
+  "created_at": "2026-10-24T22:05:41.819586+00:00",
+  "updated_at": "2026-10-24T22:07:20.993709+00:00",
+  "processed": 32,
+  "total": 391,
+  "current_leaf": "community-chat-platform",
+  "current_run": "oss_6d5553e62009449c8ba4338e33a722aa",
+  "prepared": [
+    "community-chat-platform"
+  ],
+  "batch_size": 16,
+  "search_pages": 1,
+  "auto_recovery": true,
+  "checked_at": "2026-10-24T22:07:45.849903+00:00",
+  "completed_four_worker_runs": [
+    {
+      "id": "oss_2e5c29c6194a454da0d164eeef025880",
+      "status": "completed",
+      "processed": 16,
+      "total": 16,
+      "concurrency": {
+        "configured_model_workers": 4,
+        "model_workers": 4,
+        "source_workers": 4
+      },
+      "model_calls": 4,
+      "finished_at": "2026-10-24T22:06:45.612171+00:00"
+    },
+    {
+      "id": "oss_50f6dd6d593041eca1991bb57fefebe9",
+      "status": "completed",
+      "processed": 16,
+      "total": 16,
+      "concurrency": {
+        "configured_model_workers": 4,
+        "model_workers": 4,
+        "source_workers": 4
+      },
+      "model_calls": 4,
+      "finished_at": "2026-10-24T22:07:20.984538+00:00"
+    }
+  ],
+  "model_receipts": [
+    {
+      "provider": "opencode-go",
+      "model": "deepseek-v4.1-flash",
+      "created_at": "2026-10-24T22:06:40.603332+00:00",
+      "cached": false
+    },
+    {
+      "provider": "opencode-go",
+      "model": "deepseek-v4.1-flash",
+      "created_at": "2026-10-24T22:06:40.966501+00:00",
+      "cached": false
+    },
+    {
+      "provider": "opencode-go",
+      "model": "deepseek-v4.1-flash",
+      "created_at": "2026-10-24T22:06:41.801858+00:00",
+      "cached": false
+    },
+    {
+      "provider": "opencode-go",
+      "model": "deepseek-v4.1-flash",
+      "created_at": "2026-10-24T22:06:45.105206+00:00",
+      "cached": false
+    },
+    {
+      "provider": "opencode-go",
+      "model": "deepseek-v4.1-flash",
+      "created_at": "2026-10-24T22:07:17.091619+00:00",
+      "cached": false
+    },
+    {
+      "provider": "opencode-go",
+      "model": "deepseek-v4.1-flash",
+      "created_at": "2026-10-24T22:07:19.468334+00:00",
+      "cached": false
+    },
+    {
+      "provider": "opencode-go",
+      "model": "deepseek-v4.1-flash",
+      "created_at": "2026-10-24T22:07:19.695706+00:00",
+      "cached": false
+    },
+    {
+      "provider": "opencode-go",
+      "model": "deepseek-v4.1-flash",
+      "created_at": "2026-10-24T22:07:20.486096+00:00",
+      "cached": false
+    }
+  ],
+  "api": {
+    "health": {
+      "http": 200,
+      "ok": true
+    },
+    "ready": {
+      "http": 200,
+      "ready": true
+    }
+  },
+  "supervisor": {
+    "checked_at": "2026-10-24T22:07:36.561179+00:00",
+    "pid": 63353,
+    "started": [],
+    "errors": [],
+    "last_started": {
+      "job_id": "batch_cd8f7a777e3c4e6885de1cf3162e004c",
+      "at": "2026-10-24T03:23:34.678813+00:00"
+    }
+  }
+}

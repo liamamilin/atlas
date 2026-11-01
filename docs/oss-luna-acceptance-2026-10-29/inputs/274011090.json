@@ -1,0 +1,133 @@
+{
+ "card": {
+  "repository_id": 274011090,
+  "full_name": "qvissak/small-business-tax-calculator",
+  "github_url": "https://github.com/qvissak/small-business-tax-calculator",
+  "name": "small-business-tax-calculator",
+  "summary": "读取员工 CSV 与薪资输入 CSV，按 2020 年 W-4 计算并保存员工薪资扣缴；通过命令行或交互提示运行，可打包为可执行文件。",
+  "positioning": "面向俄克拉何马州小企业的 Python 薪资扣缴计算脚本。",
+  "scope": "适用于俄克拉何马州小企业按 2020 年 W-4 做扣缴计算；仅支持“名 姓”格式姓名，未见发放、工资单留存或审批流程。",
+  "features": [
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/qvissak/small-business-tax-calculator/git/blobs/612a26d8609999699e3087a80c0979b3a193b1f8",
+     "source_kind": "readme",
+     "source_sha256": "7901cb4bbe7c753ec66a2ab2a65084a12d4fe776b55786d85c4bcfcbe60582c2",
+     "source_url": "https://github.com/qvissak/small-business-tax-calculator/blob/master/README.md",
+     "verification": "source_based"
+    },
+    "text": "按 2020 年 W-4 计算员工薪资扣缴并保存结果"
+   },
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/qvissak/small-business-tax-calculator/git/blobs/612a26d8609999699e3087a80c0979b3a193b1f8",
+     "source_kind": "readme",
+     "source_sha256": "7901cb4bbe7c753ec66a2ab2a65084a12d4fe776b55786d85c4bcfcbe60582c2",
+     "source_url": "https://github.com/qvissak/small-business-tax-calculator/blob/master/README.md",
+     "verification": "source_based"
+    },
+    "text": "从 CSV 读取员工信息与薪资输入"
+   },
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/qvissak/small-business-tax-calculator/git/blobs/612a26d8609999699e3087a80c0979b3a193b1f8",
+     "source_kind": "readme",
+     "source_sha256": "7901cb4bbe7c753ec66a2ab2a65084a12d4fe776b55786d85c4bcfcbe60582c2",
+     "source_url": "https://github.com/qvissak/small-business-tax-calculator/blob/master/README.md",
+     "verification": "source_based"
+    },
+    "text": "支持命令行参数或交互输入运行，并可打包为可执行文件"
+   }
+  ],
+  "project_type": "application",
+  "license": {
+   "detected_spdx": null,
+   "note": "未发现许可证文件；公开仓库不等于开源授权",
+   "source": null,
+   "spdx": null,
+   "status": "pending"
+  },
+  "missing_fields": [
+   "license_verification"
+  ],
+  "collection_notes": [],
+  "completeness": "partial",
+  "summary_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/qvissak/small-business-tax-calculator/git/blobs/612a26d8609999699e3087a80c0979b3a193b1f8",
+   "source_kind": "readme",
+   "source_sha256": "7901cb4bbe7c753ec66a2ab2a65084a12d4fe776b55786d85c4bcfcbe60582c2",
+   "source_url": "https://github.com/qvissak/small-business-tax-calculator/blob/master/README.md",
+   "verification": "source_based"
+  },
+  "scope_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/qvissak/small-business-tax-calculator/git/blobs/612a26d8609999699e3087a80c0979b3a193b1f8",
+   "source_kind": "readme",
+   "source_sha256": "7901cb4bbe7c753ec66a2ab2a65084a12d4fe776b55786d85c4bcfcbe60582c2",
+   "source_url": "https://github.com/qvissak/small-business-tax-calculator/blob/master/README.md",
+   "verification": "source_based"
+  },
+  "positioning_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/qvissak/small-business-tax-calculator/git/blobs/612a26d8609999699e3087a80c0979b3a193b1f8",
+   "source_kind": "readme",
+   "source_sha256": "7901cb4bbe7c753ec66a2ab2a65084a12d4fe776b55786d85c4bcfcbe60582c2",
+   "source_url": "https://github.com/qvissak/small-business-tax-calculator/blob/master/README.md",
+   "verification": "source_based"
+  }
+ },
+ "scenario_matches": [
+  {
+   "applicability": "conditional",
+   "conditions": [
+    "仅适用于俄克拉何马州与 2020 年 W-4 规则",
+    "需自行准备 CSV 输入",
+    "无发放与审批功能"
+   ],
+   "evidence": {
+    "excerpt": "",
+    "immutable_url": "https://api.github.com/repos/qvissak/small-business-tax-calculator/git/blobs/612a26d8609999699e3087a80c0979b3a193b1f8",
+    "source_kind": "readme",
+    "source_sha256": "7901cb4bbe7c753ec66a2ab2a65084a12d4fe776b55786d85c4bcfcbe60582c2",
+    "source_url": "https://github.com/qvissak/small-business-tax-calculator/blob/master/README.md",
+    "verification": "source_based"
+   },
+   "reason": "可计算小企业员工扣缴，但未覆盖薪资周期运行、净薪发放与工资单留存。",
+   "scenario_id": "auto-payroll-system-b3b6eaf00c",
+   "leaf": "payroll-system",
+   "leaf_name": "Payroll System",
+   "scenario_name": "小企业主按月发薪",
+   "scenario_description": "小企业主为员工维护薪资记录，按月度薪资周期启动薪资运行，录入工资与扣款，核对净发金额后确认发放并留存工资单。"
+  }
+ ],
+ "sources": [
+  {
+   "kind": "readme",
+   "immutable_url": "https://api.github.com/repos/qvissak/small-business-tax-calculator/git/blobs/612a26d8609999699e3087a80c0979b3a193b1f8",
+   "sha256": "7901cb4bbe7c753ec66a2ab2a65084a12d4fe776b55786d85c4bcfcbe60582c2",
+   "text": "# Oklahoma Payroll Calculator\n\nPython script to calculate and save the payroll deductions for employees of a small business in Oklahoma.\n\n## Set Up\n\nInstall Python3.\n\n```bash\npython3 -m venv env\nsource ./env/bin/activate\npython3 -m pip install requests\n```\n\n## Run\n\nRun the script without command line arguments. The program will prompt you for input.\n\n```bash\npython3 oklahoma-payroll.py\n```\n\n```bash\nPayroll date (MM/DD/YYYY): 06/22/2020\nIntuit filename: sample_input.csv\nSuccessfully proccessed payroll for Peter Stone!\nSuccessfully proccessed payroll for Mike Brown!\n...\n```\n\nAlternatively, run the script with command line arguments.\n\n```bash\npython3 oklahoma-payroll.py 06/22/2020 sample_input.csv\n```\n\n```bash\nSuccessfully proccessed payroll for Peter Stone!\nSuccessfully proccessed payroll for Mike Brown!\n...\n```\n\n### Add an Employee\n\nWhen onboarding a new employee, after they fill out their 2020 W-4, add their information to [this CSV](./employees.csv).\n\n> __NOTE__: The program only supports the format \"FirstName LastName\" for the `name` field. This will not work for individuals with two first names or two last names (non-hyphenated).\n\n## Bundle\n\nTo create an executable, run:\n\n```bash\npip3 install pyinstaller\npyinstaller --onefile oklahoma-payroll.py\n```\n\nTo run:\n\n```bash\n./dist/oklahoma-payroll\n```\n\nOr:\n\n```bash\n./dist/oklahoma-payroll 06/22/2020 sample_input.csv\n```\n",
+   "id": "s0",
+   "original_chars": 1389,
+   "truncated": false
+  },
+  {
+   "id": "s1",
+   "kind": "github_metadata",
+   "sha256": "348b740361d20f6f7ff1050638d12607545f33b86b3f28bebc49065a9e2c311d",
+   "text": "{\"archived\":false,\"description\":\"Calculate taxes for employees with a 2020 W-4 without using a payroll software\",\"full_name\":\"qvissak/small-business-tax-calculator\",\"html_url\":\"https://github.com/qvissak/small-business-tax-calculator\",\"id\":274011090,\"language\":\"Python\",\"license\":null,\"topics\":[]}\nCalculate taxes for employees with a 2020 W-4 without using a payroll software",
+   "truncated": false
+  }
+ ],
+ "coverage": {
+  "total_campaign_matches": 1,
+  "matches_included": 1,
+  "files_available": 1,
+  "files_included": 1,
+  "omitted_files": 0,
+  "truncated_files": 0
+ }
+}

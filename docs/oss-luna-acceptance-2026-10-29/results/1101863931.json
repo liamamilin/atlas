@@ -1,0 +1,51 @@
+{
+ "repository_id": 1101863931,
+ "domain": "29",
+ "input_sha256": "23a53015279bf0173ceec48ef5cc3ea5064555959f43855684ea30e64a1d9a31",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:31.304143+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCEEYhP5tnaQSvnDdnntnQ5KFlEL",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 2461,
+  "completion_tokens": 175,
+  "total_tokens": 2636,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 2458,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.00033360000000000003,
+ "response_text": "{\"repository_id\":1101863931,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片保守地描述了项目定位、开发状态和未核实事项；场景均标为 unverified，许可证也正确标为 pending。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"limited\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"项目类型标为 application，但现有 README 与仓库元数据只支持其宠物看护平台定位，未展示实现或运行方式；卡片已说明成熟度未知。\",\"仅有 README 和仓库元数据可审查，不能据此确认具体功能、实现状态或场景适用性。\",\"未发现许可证文件，许可证状态为 pending；本次不判断仓库是否获得开源授权。\"]}",
+ "review": {
+  "repository_id": 1101863931,
+  "verdict": "pass_with_limits",
+  "summary": "卡片保守地描述了项目定位、开发状态和未核实事项；场景均标为 unverified，许可证也正确标为 pending。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "limited",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "项目类型标为 application，但现有 README 与仓库元数据只支持其宠物看护平台定位，未展示实现或运行方式；卡片已说明成熟度未知。",
+   "仅有 README 和仓库元数据可审查，不能据此确认具体功能、实现状态或场景适用性。",
+   "未发现许可证文件，许可证状态为 pending；本次不判断仓库是否获得开源授权。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:40:36.519509+00:00",
+ "elapsed_seconds": 5.215
+}

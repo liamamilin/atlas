@@ -1,0 +1,82 @@
+{
+ "repository_id": 1053206350,
+ "domain": "23",
+ "input_sha256": "b74da2416d9d4ac254895080884eda53d7d504b273618eb7657fa0dcc738f6db",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:12:21.184468+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-d90fbd992745-130c9a",
+ "usage": {
+  "prompt_tokens": 2263,
+  "completion_tokens": 415,
+  "total_tokens": 2678,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00051319,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00051319,
+   "tokens": {
+    "input": 1751,
+    "output": 415,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1053206350,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片基本忠实于仓库描述与元数据：定位、功能、项目类型均有来源支持，许可保守标为 pending，家长门户场景标为 unverified 并写明条件，未把描述夸大为已核验实现。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"出勤汇总、缺勤跟踪与统计（据仓库描述）。\",\"source_id\":\"s1\",\"quote\":\"The system provides detailed summaries, absence tracking, and attendance statistics to improve monitoring and reporting.\",\"reason\":\"功能仅来自仓库描述，README 只有标题，无代码或文档佐证实际实现；卡片已用“据仓库描述”限定，属可接受的证据不足而非错误。\",\"suggested_correction\":\"保持“据仓库描述”限定，可补充“实现程度未核验”。\"},{\"field\":\"scope\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"学校教职工侧出勤管理；家长门户能力未说明。\",\"source_id\":\"s1\",\"quote\":\"It allows administrators and teachers to record, manage, and analyze student attendance efficiently.\",\"reason\":\"“家长门户能力未说明”是对缺失信息的推断，来源未提及家长侧，属合理保守表述，但无直接文字支持。\",\"suggested_correction\":\"改为“来源仅提及管理员与教师，未涉及家长侧”。\"}],\"limitations\":[\"仅 1 个 README 文件（30 字符，仅标题）与 GitHub 元数据可用，无源码、部署或实现细节。\",\"许可状态为 pending，未做许可全文核验。\",\"家长门户场景为 unverified，需核实家长查看与缺勤说明提交能力。\"]}",
+ "review": {
+  "repository_id": 1053206350,
+  "verdict": "pass_with_limits",
+  "summary": "卡片基本忠实于仓库描述与元数据：定位、功能、项目类型均有来源支持，许可保守标为 pending，家长门户场景标为 unverified 并写明条件，未把描述夸大为已核验实现。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "出勤汇总、缺勤跟踪与统计（据仓库描述）。",
+    "source_id": "s1",
+    "quote": "The system provides detailed summaries, absence tracking, and attendance statistics to improve monitoring and reporting.",
+    "reason": "功能仅来自仓库描述，README 只有标题，无代码或文档佐证实际实现；卡片已用“据仓库描述”限定，属可接受的证据不足而非错误。",
+    "suggested_correction": "保持“据仓库描述”限定，可补充“实现程度未核验”。"
+   },
+   {
+    "field": "scope",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "学校教职工侧出勤管理；家长门户能力未说明。",
+    "source_id": "s1",
+    "quote": "It allows administrators and teachers to record, manage, and analyze student attendance efficiently.",
+    "reason": "“家长门户能力未说明”是对缺失信息的推断，来源未提及家长侧，属合理保守表述，但无直接文字支持。",
+    "suggested_correction": "改为“来源仅提及管理员与教师，未涉及家长侧”。"
+   }
+  ],
+  "limitations": [
+   "仅 1 个 README 文件（30 字符，仅标题）与 GitHub 元数据可用，无源码、部署或实现细节。",
+   "许可状态为 pending，未做许可全文核验。",
+   "家长门户场景为 unverified，需核实家长查看与缺勤说明提交能力。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:12:28.826585+00:00",
+ "elapsed_seconds": 7.642
+}

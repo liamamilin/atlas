@@ -1,0 +1,82 @@
+{
+ "repository_id": 1255770445,
+ "domain": "10",
+ "input_sha256": "9cdd18713f1c86b802343b5981abb5f82f11daa0e1777dd09731885dfe72ca35",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:38:57.345599+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCChM7h3eucVSnefx03hqmoFiNgt",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 5544,
+  "completion_tokens": 566,
+  "total_tokens": 6110,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 5541,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0008374,
+ "response_text": "{\"repository_id\":1255770445,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体与 README 对项目的作品集定位及所述分析内容相符；场景均标为 conditional，并说明合成数据和非自动化限制。许可保持 pending 合理。材料仅含 README 与仓库元数据，不能据此核验工作簿及 Power BI 文件的实际内容。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-demand-planning-35f5da83b5\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"展示月度S&OP评审、异常清单与预测方法对比的报告结构，可作为流程参考\",\"source_id\":\"s0\",\"quote\":\"A monthly performance report was built covering the full year variance analysis, SKU-level breakdown, and six business insights written in plain language.\",\"reason\":\"该场景还要求结合促销与客户流失信息调整预测、保护关键调整并发布给补货与供应计划使用。README 支持报告、异常和方法对比，但未说明这些人工调整与发布流程；现有 conditional 限制降低了误导风险，宜明确其仅适合作为报告结构参考。\",\"suggested_correction\":\"保留流程参考的表述，并注明材料未显示预测调整留痕或向补货、供应计划发布的流程。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-demand-planning-52c6dd1bda\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"按SKU与区域计算MAPE、Bias并比较两种方法，与准确率复盘场景一致\",\"source_id\":\"s0\",\"quote\":\"Both models were scored using MAPE, Bias, and Forecast Accuracy percentage.\",\"reason\":\"README 支持按 SKU 比较两种方法及误差指标，但该场景还涉及已发布预测与实际需求的复盘、评估人工调整效果；来源未说明人工调整评估。卡片已标 conditional，且条件说明数据为合成、需在 Excel 操作。\",\"suggested_correction\":\"说明该项目展示模型基线准确率比较，不代表已实现人工调整效果评估或生产复盘流程。\"}],\"limitations\":[\"仅提供 README 与 GitHub 元数据，未提供工作簿、Power BI 文件或其他源码；无法独立核验文件内容及功能实现。\",\"README 原文完整可读，但本次不联网、不执行代码；许可状态按卡片所示 pending 保留，不据 README 内容推定全仓库许可。\"]}",
+ "review": {
+  "repository_id": 1255770445,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体与 README 对项目的作品集定位及所述分析内容相符；场景均标为 conditional，并说明合成数据和非自动化限制。许可保持 pending 合理。材料仅含 README 与仓库元数据，不能据此核验工作簿及 Power BI 文件的实际内容。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-demand-planning-35f5da83b5",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "展示月度S&OP评审、异常清单与预测方法对比的报告结构，可作为流程参考",
+    "source_id": "s0",
+    "quote": "A monthly performance report was built covering the full year variance analysis, SKU-level breakdown, and six business insights written in plain language.",
+    "reason": "该场景还要求结合促销与客户流失信息调整预测、保护关键调整并发布给补货与供应计划使用。README 支持报告、异常和方法对比，但未说明这些人工调整与发布流程；现有 conditional 限制降低了误导风险，宜明确其仅适合作为报告结构参考。",
+    "suggested_correction": "保留流程参考的表述，并注明材料未显示预测调整留痕或向补货、供应计划发布的流程。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-demand-planning-52c6dd1bda",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "按SKU与区域计算MAPE、Bias并比较两种方法，与准确率复盘场景一致",
+    "source_id": "s0",
+    "quote": "Both models were scored using MAPE, Bias, and Forecast Accuracy percentage.",
+    "reason": "README 支持按 SKU 比较两种方法及误差指标，但该场景还涉及已发布预测与实际需求的复盘、评估人工调整效果；来源未说明人工调整评估。卡片已标 conditional，且条件说明数据为合成、需在 Excel 操作。",
+    "suggested_correction": "说明该项目展示模型基线准确率比较，不代表已实现人工调整效果评估或生产复盘流程。"
+   }
+  ],
+  "limitations": [
+   "仅提供 README 与 GitHub 元数据，未提供工作簿、Power BI 文件或其他源码；无法独立核验文件内容及功能实现。",
+   "README 原文完整可读，但本次不联网、不执行代码；许可状态按卡片所示 pending 保留，不据 README 内容推定全仓库许可。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 0,
+   "reason": "quote_not_in_supplied_source"
+  },
+  {
+   "index": 1,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T04:39:05.633049+00:00",
+ "elapsed_seconds": 8.287
+}

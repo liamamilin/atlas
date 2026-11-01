@@ -1,0 +1,46 @@
+{
+  "at": "2026-10-29T03:27:59.792458+00:00",
+  "user_approved_restart": true,
+  "old_pid": 45453,
+  "new_pid": 80295,
+  "listeners": [
+    80295
+  ],
+  "health_ok": true,
+  "luna_adapter_loaded": true,
+  "default": {
+    "provider": "open-design",
+    "model": "deepseek-v4.1-flash"
+  },
+  "fallback": {
+    "enabled": true,
+    "from_provider": "open-design",
+    "provider": "openai",
+    "model": "gpt-6-luna",
+    "active": false,
+    "activated_at": null,
+    "reason": null
+  },
+  "luna_probe": {
+    "passed": true,
+    "credential_verified": true,
+    "model": "gpt-6-luna",
+    "expected_reply": "OK",
+    "max_completion_tokens": 32,
+    "method": "configure_openai_backup.py --apply"
+  },
+  "batch_jobs_unchanged": true,
+  "batch_job_count": 6,
+  "recovery": {
+    "pid": 80295,
+    "checked_at": "2026-10-29T03:27:55.694576+00:00",
+    "started": [],
+    "last_started": null,
+    "errors": []
+  },
+  "factory_worker_disabled": true,
+  "oss_model_concurrency": 4,
+  "new_collection_scope_started": false,
+  "env_private_mode": "0o600",
+  "deployment_passed": true
+}

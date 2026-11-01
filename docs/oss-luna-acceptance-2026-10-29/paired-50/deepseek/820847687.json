@@ -1,0 +1,59 @@
+{
+ "repository_id": 820847687,
+ "domain": "02",
+ "input_sha256": "0d95d473677775a230adc4ef6605f33fd7c65cde7a7ac383ef9d5f9ba8c36c60",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:00.409208+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-dda4d3d2f9ac-dab57",
+ "usage": {
+  "prompt_tokens": 4836,
+  "completion_tokens": 197,
+  "total_tokens": 5033,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00076834,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00076834,
+   "tokens": {
+    "input": 4324,
+    "output": 197,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":820847687,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片与 README 基本一致：定位为 Jetpack Compose Android 新闻聚合应用，功能、外部 API Key 依赖、路线图未实现项均如实标注；许可为 pending 且未把 README 的 MIT 徽章当作已核验许可，处理保守。两个场景均标 conditional 并写明前提，合理。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"仅 1 个 README 与 1 条 GitHub 元数据可用，未审源码、构建文件或 LICENSE 全文，无法独立核验功能实现程度与依赖版本\",\"许可状态为 pending，未做全文比对，不能确认 MIT 授权\",\"场景匹配基于 README 描述，未验证实际运行行为\"]}",
+ "review": {
+  "repository_id": 820847687,
+  "verdict": "pass_with_limits",
+  "summary": "卡片与 README 基本一致：定位为 Jetpack Compose Android 新闻聚合应用，功能、外部 API Key 依赖、路线图未实现项均如实标注；许可为 pending 且未把 README 的 MIT 徽章当作已核验许可，处理保守。两个场景均标 conditional 并写明前提，合理。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "仅 1 个 README 与 1 条 GitHub 元数据可用，未审源码、构建文件或 LICENSE 全文，无法独立核验功能实现程度与依赖版本",
+   "许可状态为 pending，未做全文比对，不能确认 MIT 授权",
+   "场景匹配基于 README 描述，未验证实际运行行为"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:11:05.864133+00:00",
+ "elapsed_seconds": 5.454
+}

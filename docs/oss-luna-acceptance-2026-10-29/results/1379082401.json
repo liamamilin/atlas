@@ -1,0 +1,52 @@
+{
+ "repository_id": 1379082401,
+ "domain": "05",
+ "input_sha256": "0c06bd8d677865bd9d6b24cdde9f353539742d8048a53ce82ccaf24f3da74125",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:38:36.063063+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCCMrffms26lF1JfIr6u5ja2dBSZ",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 3646,
+  "completion_tokens": 282,
+  "total_tokens": 3928,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 3643,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0005056,
+ "response_text": "{\n  \"repository_id\": 1379082401,\n  \"verdict\": \"pass_with_limits\",\n  \"summary\": \"卡片整体与 README 和仓库元数据相符，且如实标注了部署未验证、模拟支付及场景缺项。许可保持 pending 合理。场景匹配应按其已标注的条件和未验证状态理解；本次材料仅含 README 与元数据，不能据此核验实现细节。\",\n  \"checks\": {\n    \"facts\": \"supported\",\n    \"project_type\": \"supported\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"limited\"\n  },\n  \"issues\": [],\n  \"limitations\": [\n    \"仅提供 README 与 GitHub 元数据，未提供源码；功能实现细节无法独立核验。\",\n    \"README 未截断，但本次审查不访问链接或执行代码。\",\n    \"部署未实际应用、模拟支付、拣货路径优化基于模拟数据，以及场景中的扫码、称重、面单和渠道回传等缺项，均已在卡片中标注或说明。\",\n    \"仓库未发现许可证文件，卡片将许可标为 pending；本次不据 README 或第三方依赖推定全仓库许可。\"\n  ]\n}",
+ "review": {
+  "repository_id": 1379082401,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体与 README 和仓库元数据相符，且如实标注了部署未验证、模拟支付及场景缺项。许可保持 pending 合理。场景匹配应按其已标注的条件和未验证状态理解；本次材料仅含 README 与元数据，不能据此核验实现细节。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [],
+  "limitations": [
+   "仅提供 README 与 GitHub 元数据，未提供源码；功能实现细节无法独立核验。",
+   "README 未截断，但本次审查不访问链接或执行代码。",
+   "部署未实际应用、模拟支付、拣货路径优化基于模拟数据，以及场景中的扫码、称重、面单和渠道回传等缺项，均已在卡片中标注或说明。",
+   "仓库未发现许可证文件，卡片将许可标为 pending；本次不据 README 或第三方依赖推定全仓库许可。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:38:41.635482+00:00",
+ "elapsed_seconds": 5.572
+}

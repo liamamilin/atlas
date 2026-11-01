@@ -1,0 +1,115 @@
+{
+ "repository_id": 900063322,
+ "domain": "20",
+ "input_sha256": "2af6d5d7feb1601c6b5ed855dd1a136209bf49279e5f5d3576f91bf98ad90363",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:12:09.332350+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-dda4d3d2f9ac-dc011",
+ "usage": {
+  "prompt_tokens": 2702,
+  "completion_tokens": 822,
+  "total_tokens": 3524,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00082324,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00082324,
+   "tokens": {
+    "input": 2190,
+    "output": 822,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":900063322,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体保守：定位与范围来自仓库描述，README 仅为 Angular CLI 默认说明，功能未核实、许可 pending 均如实标注；三条场景均为 unverified 且附条件，未把描述当作已实现能力。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"positioning\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"GoldMine 矿山管理系统前端，宣称覆盖地质数据、生产、设备与成本管理。\",\"source_id\":\"s1\",\"quote\":\"From managing geological data to overseeing production, equipment, cost, and more\",\"reason\":\"该覆盖范围仅来自仓库描述（宣传性文字），README 无任何功能实现说明；卡片用“宣称”已作限定，但定位仍可能被读作已实现能力。\",\"suggested_correction\":\"保留“宣称”措辞，并明确标注为仓库描述、未经代码或文档核实。\"},{\"field\":\"scope\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"矿山综合管理的前端界面，具体范围待核实。\",\"source_id\":\"s0\",\"quote\":\"This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.9.\",\"reason\":\"README 仅为 Angular CLI 默认模板，无法确认任何业务模块范围；卡片已写“待核实”，属如实保留，但范围描述仍偏宽。\",\"suggested_correction\":\"改为“仅确认是 Angular 前端项目，业务范围无来源支持”。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-mining-operations-management-dfd09c74d1\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"描述提及地质数据管理，但未说明料堆库存与质量平衡。\",\"source_id\":\"s1\",\"quote\":\"From managing geological data to overseeing production, equipment, cost, and more\",\"reason\":\"场景相关性仅基于仓库描述中的“geological data”，无料堆库存或品位平衡证据；applicability 已标 unverified，属如实。\",\"suggested_correction\":\"保持 unverified，并注明相关性仅来自仓库描述关键词。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-mining-operations-management-f386d92246\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"描述提及地质数据与生产，但未说明与矿山计划的执行比对。\",\"source_id\":\"s1\",\"quote\":\"From managing geological data to overseeing production, equipment, cost, and more\",\"reason\":\"无计划比对或地质模型比对证据，仅描述性关键词；unverified 标签恰当。\",\"suggested_correction\":\"保持 unverified，条件中明确需代码或文档证据。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-mining-operations-management-f61b72dc6e\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"描述提及生产管理，但无对账与差异追溯的实现说明。\",\"source_id\":\"s1\",\"quote\":\"From managing geological data to overseeing production, equipment, cost, and more\",\"reason\":\"对账与差异追溯无任何来源支持，仅凭“production”关键词；unverified 标签恰当。\",\"suggested_correction\":\"保持 unverified，不提升为 direct 或 partial。\"}],\"limitations\":[\"仅提供 README（Angular CLI 默认模板）与 GitHub 元数据，无源码文件，无法核实任何功能实现。\",\"许可状态为 pending，未做许可全文比对，不能凭 README 或元数据判定开源授权。\",\"三条场景匹配均基于仓库描述关键词，属未验证关联。\"]}",
+ "review": {
+  "repository_id": 900063322,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体保守：定位与范围来自仓库描述，README 仅为 Angular CLI 默认说明，功能未核实、许可 pending 均如实标注；三条场景均为 unverified 且附条件，未把描述当作已实现能力。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "positioning",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "GoldMine 矿山管理系统前端，宣称覆盖地质数据、生产、设备与成本管理。",
+    "source_id": "s1",
+    "quote": "From managing geological data to overseeing production, equipment, cost, and more",
+    "reason": "该覆盖范围仅来自仓库描述（宣传性文字），README 无任何功能实现说明；卡片用“宣称”已作限定，但定位仍可能被读作已实现能力。",
+    "suggested_correction": "保留“宣称”措辞，并明确标注为仓库描述、未经代码或文档核实。"
+   },
+   {
+    "field": "scope",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "矿山综合管理的前端界面，具体范围待核实。",
+    "source_id": "s0",
+    "quote": "This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.9.",
+    "reason": "README 仅为 Angular CLI 默认模板，无法确认任何业务模块范围；卡片已写“待核实”，属如实保留，但范围描述仍偏宽。",
+    "suggested_correction": "改为“仅确认是 Angular 前端项目，业务范围无来源支持”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-mining-operations-management-dfd09c74d1",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "描述提及地质数据管理，但未说明料堆库存与质量平衡。",
+    "source_id": "s1",
+    "quote": "From managing geological data to overseeing production, equipment, cost, and more",
+    "reason": "场景相关性仅基于仓库描述中的“geological data”，无料堆库存或品位平衡证据；applicability 已标 unverified，属如实。",
+    "suggested_correction": "保持 unverified，并注明相关性仅来自仓库描述关键词。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-mining-operations-management-f386d92246",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "描述提及地质数据与生产，但未说明与矿山计划的执行比对。",
+    "source_id": "s1",
+    "quote": "From managing geological data to overseeing production, equipment, cost, and more",
+    "reason": "无计划比对或地质模型比对证据，仅描述性关键词；unverified 标签恰当。",
+    "suggested_correction": "保持 unverified，条件中明确需代码或文档证据。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-mining-operations-management-f61b72dc6e",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "描述提及生产管理，但无对账与差异追溯的实现说明。",
+    "source_id": "s1",
+    "quote": "From managing geological data to overseeing production, equipment, cost, and more",
+    "reason": "对账与差异追溯无任何来源支持，仅凭“production”关键词；unverified 标签恰当。",
+    "suggested_correction": "保持 unverified，不提升为 direct 或 partial。"
+   }
+  ],
+  "limitations": [
+   "仅提供 README（Angular CLI 默认模板）与 GitHub 元数据，无源码文件，无法核实任何功能实现。",
+   "许可状态为 pending，未做许可全文比对，不能凭 README 或元数据判定开源授权。",
+   "三条场景匹配均基于仓库描述关键词，属未验证关联。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:12:21.183421+00:00",
+ "elapsed_seconds": 11.851
+}

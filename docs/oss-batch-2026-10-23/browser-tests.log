@@ -1,0 +1,23 @@
+
+> test:e2e:catalog
+> playwright test --config playwright.catalog.config.ts
+
+[WebServer] (node:67067) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 10 tests using 1 worker
+
+(node:67069) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/catalog-tests/batch.spec.ts:9:3 › feed-reader: real saved cards, scenario gaps and source links (1.4s)
+  ✓   2 e2e/catalog-tests/batch.spec.ts:9:3 › diagramming-application: real saved cards, scenario gaps and source links (1.3s)
+  ✓   3 e2e/catalog-tests/batch.spec.ts:9:3 › password-manager: real saved cards, scenario gaps and source links (1.3s)
+  ✓   4 e2e/catalog-tests/batch.spec.ts:38:1 › leaf selection, repository search and restricted licenses persist in URL (1.7s)
+  ✓   5 e2e/catalog-tests/batch.spec.ts:59:1 › review exclusions stay unpublished and batch mobile cards fit the viewport (1.1s)
+  ✓   6 e2e/catalog-tests/catalog.spec.ts:4:1 › home leads to the real repository pilot and factory remains in history (1.0s)
+  ✓   7 e2e/catalog-tests/catalog.spec.ts:20:1 › scenario filters, evidence, license and upstream links are usable (2.4s)
+  ✓   8 e2e/catalog-tests/catalog.spec.ts:36:1 › search includes repository facts and favorites survive reload (2.1s)
+  ✓   9 e2e/catalog-tests/catalog.spec.ts:55:1 › API rejects cross-site writes and unsupported leaves (17ms)
+  ✓  10 e2e/catalog-tests/catalog.spec.ts:66:1 › mobile layout has no horizontal overflow and an untouched leaf stays browsable (2.1s)
+
+  10 passed (16.2s)

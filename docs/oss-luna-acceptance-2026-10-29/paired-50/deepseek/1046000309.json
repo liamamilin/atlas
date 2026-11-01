@@ -1,0 +1,91 @@
+{
+ "repository_id": 1046000309,
+ "domain": "18",
+ "input_sha256": "52b5489623090271c9a449cd5ca14d484bff6457e28ae02e2f93946e96aa0161",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:12:00.241959+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-d90fbd992745-13063a",
+ "usage": {
+  "prompt_tokens": 4287,
+  "completion_tokens": 449,
+  "total_tokens": 4736,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00083719,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00083719,
+   "tokens": {
+    "input": 3775,
+    "output": 449,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1046000309,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片对 README 的功能、技术栈、部署依赖与许可待定状态的描述基本有据；停车场景已如实标为 unverified 并说明缺少月租计费能力，属保守标注。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"管理员仪表盘查看数据\",\"source_id\":\"s0\",\"quote\":\"Admin Dashboard: View, manage, and analyze all data\",\"reason\":\"README 仅以功能列表宣称仪表盘可查看、管理、分析数据，未给出实现细节或验证；卡片将其表述为已实现功能，证据强度有限，但非明显虚构。\",\"suggested_correction\":\"保留但注明依据为 README 功能列表，未独立核验实现。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-parking-management-platform-9b884b2e3d\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"需核实是否支持长期许可与计费\",\"source_id\":\"s0\",\"quote\":\"Parking Permit Management: Vehicle registration system with 1-hour parking limit\",\"reason\":\"场景要求月租资格审核、按月计费续期与到期提醒；README 仅描述 1 小时访客停车许可，卡片已标 unverified 并说明缺项，条件表述可更明确指向月租/计费/续期均无来源。\",\"suggested_correction\":\"将条件细化为“需核实月租资格审核、按月计费续期与到期提醒是否实现”，保持 unverified。\"}],\"limitations\":[\"仅覆盖 1 个 README 与 GitHub 元数据，未审源码、SETUP.md 等文件，无法验证功能实现细节。\",\"许可状态为 pending，未做许可全文比对，不能判定开源授权。\",\"场景匹配仅基于 README 文字，未运行或检查代码。\"]}",
+ "review": {
+  "repository_id": 1046000309,
+  "verdict": "pass_with_limits",
+  "summary": "卡片对 README 的功能、技术栈、部署依赖与许可待定状态的描述基本有据；停车场景已如实标为 unverified 并说明缺少月租计费能力，属保守标注。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "管理员仪表盘查看数据",
+    "source_id": "s0",
+    "quote": "Admin Dashboard: View, manage, and analyze all data",
+    "reason": "README 仅以功能列表宣称仪表盘可查看、管理、分析数据，未给出实现细节或验证；卡片将其表述为已实现功能，证据强度有限，但非明显虚构。",
+    "suggested_correction": "保留但注明依据为 README 功能列表，未独立核验实现。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-parking-management-platform-9b884b2e3d",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "需核实是否支持长期许可与计费",
+    "source_id": "s0",
+    "quote": "Parking Permit Management: Vehicle registration system with 1-hour parking limit",
+    "reason": "场景要求月租资格审核、按月计费续期与到期提醒；README 仅描述 1 小时访客停车许可，卡片已标 unverified 并说明缺项，条件表述可更明确指向月租/计费/续期均无来源。",
+    "suggested_correction": "将条件细化为“需核实月租资格审核、按月计费续期与到期提醒是否实现”，保持 unverified。"
+   }
+  ],
+  "limitations": [
+   "仅覆盖 1 个 README 与 GitHub 元数据，未审源码、SETUP.md 等文件，无法验证功能实现细节。",
+   "许可状态为 pending，未做许可全文比对，不能判定开源授权。",
+   "场景匹配仅基于 README 文字，未运行或检查代码。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 0,
+   "reason": "quote_not_in_supplied_source"
+  },
+  {
+   "index": 1,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T05:12:08.826427+00:00",
+ "elapsed_seconds": 8.584
+}

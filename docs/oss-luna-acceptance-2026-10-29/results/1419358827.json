@@ -1,0 +1,63 @@
+{
+ "repository_id": 1419358827,
+ "domain": "15",
+ "input_sha256": "6fc7e48b9220c4ffb8f0e2ef83b305d2812e9b341aac27656555165f8fbdf416",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:28.838839+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDECFjgAoOxv10A5kELU7Tzh7ff",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 11871,
+  "completion_tokens": 489,
+  "total_tokens": 12360,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 11868,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0014316,
+ "response_text": "{\n  \"repository_id\": 1419358827,\n  \"verdict\": \"pass_with_limits\",\n  \"summary\": \"卡片整体将仓库定位为网络实验设计资源而非完整平台，主要功能与 README 相符，许可证也保守标为 pending。场景匹配均保留了条件或未验证标记；但有一条场景理由把微隔离扩大为用户到应用层授权，来源不足以支持该表述。\",\n  \"checks\": {\n    \"facts\": \"supported\",\n    \"project_type\": \"supported\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"limited\"\n  },\n  \"issues\": [\n    {\n      \"field\": \"scenario_match\",\n      \"scenario_id\": \"auto-sase-sse-platform-9960c82574\",\n      \"severity\": \"minor\",\n      \"kind\": \"unsupported_claim\",\n      \"claim\": \"微隔离策略限制用户到应用层访问。\",\n      \"source_id\": \"s0\",\n      \"quote\": \"Direct access from Users (PC1-4, Win) or WAN (port1) to the Database Tier (DB) is DENIED.\",\n      \"reason\": \"来源明确描述用户或 WAN 到数据库层被拒绝，以及 Web→API→DB 的分层策略；没有说明按应用授权的远程访问策略。该场景理由将网络分段控制概括成应用层授权，证据不足。场景本身已标为 conditional，且条件说明了设备与非云端限制。\",\n      \"suggested_correction\": \"将理由收紧为仓库描述了 SSL-VPN 远程接入及对 HQ Web Server 的访问限制；保留 conditional，并避免声称微隔离实现了按应用授权。\"\n    }\n  ],\n  \"limitations\": [\n    \"审查依据为提供的 README 全文及 GitHub 元数据；未独立核验仓库文件、配置实际运行结果或外部依赖。\",\n    \"许可证状态为 pending，卡片明确注明未发现许可证文件；本次不据此推断仓库已获开源授权。\",\n    \"其余两条场景分别标为 conditional 与 unverified，卡片已披露相关前提或未说明事项。\"\n  ]\n}",
+ "review": {
+  "repository_id": 1419358827,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体将仓库定位为网络实验设计资源而非完整平台，主要功能与 README 相符，许可证也保守标为 pending。场景匹配均保留了条件或未验证标记；但有一条场景理由把微隔离扩大为用户到应用层授权，来源不足以支持该表述。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-sase-sse-platform-9960c82574",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "微隔离策略限制用户到应用层访问。",
+    "source_id": "s0",
+    "quote": "Direct access from Users (PC1-4, Win) or WAN (port1) to the Database Tier (DB) is DENIED.",
+    "reason": "来源明确描述用户或 WAN 到数据库层被拒绝，以及 Web→API→DB 的分层策略；没有说明按应用授权的远程访问策略。该场景理由将网络分段控制概括成应用层授权，证据不足。场景本身已标为 conditional，且条件说明了设备与非云端限制。",
+    "suggested_correction": "将理由收紧为仓库描述了 SSL-VPN 远程接入及对 HQ Web Server 的访问限制；保留 conditional，并避免声称微隔离实现了按应用授权。"
+   }
+  ],
+  "limitations": [
+   "审查依据为提供的 README 全文及 GitHub 元数据；未独立核验仓库文件、配置实际运行结果或外部依赖。",
+   "许可证状态为 pending，卡片明确注明未发现许可证文件；本次不据此推断仓库已获开源授权。",
+   "其余两条场景分别标为 conditional 与 unverified，卡片已披露相关前提或未说明事项。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:36.980504+00:00",
+ "elapsed_seconds": 8.142
+}

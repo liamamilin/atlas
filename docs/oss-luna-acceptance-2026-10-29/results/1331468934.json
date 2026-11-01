@@ -1,0 +1,83 @@
+{
+ "repository_id": 1331468934,
+ "domain": "08",
+ "input_sha256": "ccdf76178f787a1f87c9313ffef45dde197a213fe60ae422a5f77e567af176f1",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:38:46.222580+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCCW28rWv9qXyMVBDW8CxjncfDCJ",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 4510,
+  "completion_tokens": 522,
+  "total_tokens": 5032,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 4507,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.000712,
+ "response_text": "{\"repository_id\":1331468934,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片对项目的命令行记账定位及主要功能有来源支持；许可证保守标为 pending，年度报表场景也已标为 unverified 并注明待核实。少数场景的 direct 适用性略强于现有证据所能确认的范围。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-cli-accounting-tool-28aacd3b29\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"\\\"applicability\\\":\\\"direct\\\",\\\"conditions\\\":[]\",\"source_id\":\"s0\",\"quote\":\"\\\"policies/documents cover cost-basis method, account metadata, reconciliation against the bank, and printable output.\\\"\",\"reason\":\"来源支持存在对账命令及与银行对账，但场景还要求逐笔标记已清算交易并排查遗漏或金额错误；现有文字未明确这些具体工作流，因此 direct 且无条件略显确定。\",\"suggested_correction\":\"将适用性降为 partial，或注明具体清算标记与差异排查流程需核实。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-cli-accounting-tool-6c8892ef0b\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"\\\"applicability\\\":\\\"direct\\\",\\\"conditions\\\":[]\",\"source_id\":\"s0\",\"quote\":\"\\\"bkpr books                  # every line and where it posted\\\"\",\"reason\":\"来源支持命令驱动、账簿查询及纯文本复式记账，但未明确文本编辑器记录日常收支这一具体操作方式；direct 适用性可更审慎。\",\"suggested_correction\":\"将适用性标为 partial，或说明需确认是否支持场景所述的文本编辑器工作流。\"}],\"limitations\":[\"本次仅依据提供的 README 与 GitHub 元数据审查；README 未截断，但未提供其他文档内容。\",\"许可证状态为 pending，卡片已明确未发现许可证文件且不将公开仓库等同于开源授权；本次不作许可全文核验。\",\"小企业年度报表场景已标为 unverified，并列出资产负债表与试算平衡待核实，属于如实保留的限制。\"]}",
+ "review": {
+  "repository_id": 1331468934,
+  "verdict": "pass_with_limits",
+  "summary": "卡片对项目的命令行记账定位及主要功能有来源支持；许可证保守标为 pending，年度报表场景也已标为 unverified 并注明待核实。少数场景的 direct 适用性略强于现有证据所能确认的范围。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-cli-accounting-tool-28aacd3b29",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "\"applicability\":\"direct\",\"conditions\":[]",
+    "source_id": "s0",
+    "quote": "\"policies/documents cover cost-basis method, account metadata, reconciliation against the bank, and printable output.\"",
+    "reason": "来源支持存在对账命令及与银行对账，但场景还要求逐笔标记已清算交易并排查遗漏或金额错误；现有文字未明确这些具体工作流，因此 direct 且无条件略显确定。",
+    "suggested_correction": "将适用性降为 partial，或注明具体清算标记与差异排查流程需核实。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-cli-accounting-tool-6c8892ef0b",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "\"applicability\":\"direct\",\"conditions\":[]",
+    "source_id": "s0",
+    "quote": "\"bkpr books                  # every line and where it posted\"",
+    "reason": "来源支持命令驱动、账簿查询及纯文本复式记账，但未明确文本编辑器记录日常收支这一具体操作方式；direct 适用性可更审慎。",
+    "suggested_correction": "将适用性标为 partial，或说明需确认是否支持场景所述的文本编辑器工作流。"
+   }
+  ],
+  "limitations": [
+   "本次仅依据提供的 README 与 GitHub 元数据审查；README 未截断，但未提供其他文档内容。",
+   "许可证状态为 pending，卡片已明确未发现许可证文件且不将公开仓库等同于开源授权；本次不作许可全文核验。",
+   "小企业年度报表场景已标为 unverified，并列出资产负债表与试算平衡待核实，属于如实保留的限制。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 0,
+   "reason": "quote_not_in_supplied_source"
+  },
+  {
+   "index": 1,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T04:38:53.193303+00:00",
+ "elapsed_seconds": 6.971
+}

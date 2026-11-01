@@ -1,6 +1,15 @@
 # Application Atlas
 
-软件应用类型资料库及本地工作台。当前正式语料包含 1,805 个类型、29 个大域、270 个目录节点及 33 个产品实例。
+以场景为索引的开源项目知识库。沿用已有 1,805 个软件类型、29 个大域与 270 个目录节点，以真实仓库资料组织项目卡片。
+
+当前版本（2026-10-23）已完成“个人知识管理应用”试点：3 个场景、7 个真实项目、12 条多对多关联；支持来源/许可证核验、浏览搜索、收藏及增量更新。
+
+现有叶子均可指定批量采集，无叶子白名单或最低 Stars 要求。任务自动续批、保存进度、跳过失败并支持中断恢复；资料不全的真实项目先收录，标明缺项、条件适用和待核实推断。设置页支持 GitHub Token 的保存、测试和清除。见 [开放批量与三叶子队列验收](docs/oss-open-batch-2026-10-23/REPORT.md) 与 [上一轮记录](docs/oss-batch-v3-2026-10-23/REPORT.md)。
+
+- [新版范围与操作说明](docs/OSS_CATALOG.md)
+- [试点实际验收记录](docs/oss-catalog-2026-10-23/REPORT.md)
+- 启动本地 API 与前端后，打开 http://127.0.0.1:5188/discover 。
+- 模板工厂与 U17 已退出新版主入口；原地址和历史数据保留在“历史工作区”。下方旧版材料供追溯，不再作为当前交付目标。
 
 - `application-atlas-production-pack/applications/`：正式英文档案，内容真相源。
 - `application-atlas-production-pack/research/`：对应的研究笔记及边界依据。
@@ -9,7 +18,7 @@
 - `atlas-web/`：React + TypeScript + Vite 前端。
 - `application-atlas-production-pack/drafts_api.py`：本地草稿 API（127.0.0.1:5199）。
 
-## 模板工厂
+## 历史：模板工厂
 
 可先试用 [留存 · 个人收藏夹](examples/bookmark-trial/README.md)：在仓库根目录运行 `python3 examples/bookmark-trial/app/serve.py --port 5273 --demo`，打开 http://127.0.0.1:5273/ 。这是从 R8 准备模板导出标准开发包后，由 Codex 直接实现的辅助试用应用；不代表严格 G1/T08 通过。来源包与七条真实浏览器旅程见 [试用报告](docs/template-factory/bookmark-assisted-trial-2026-10-20/TRIAL_REPORT.md)。
 
@@ -36,7 +45,7 @@
 - [使用说明](docs/TEMPLATE_FACTORY_GUIDE.md)
 - [验证记录](docs/TEMPLATE_FACTORY_VALIDATION.md)
 
-## U17 设计与开发规划
+## 历史：U17 设计与开发规划
 
 U17 面向新想法和已有项目改进：搜索与阅读类型、应用资料，形成关联的开发文档，通过现有 agent 引擎执行并支持后续迭代。
 
@@ -135,6 +144,17 @@ npm run gen
 ## 模型与凭据
 
 阅读网页、导出、离线测试不需要模型凭据。语义检索需要本地 Ollama；分类、查重及翻译会使用外部模型 API。凭据按需从 `ATLAS_API_KEY` 环境变量读取，未设置时读取本机 OpenCode 的凭据。不要把凭据提交到仓库。
+
+OpenAI / Luna 备用模型使用仓库根目录的 `.env`（可从 `.env.example` 复制），填写 `OPENAI_API_KEY`，模型为 `gpt-6-luna`，官方接口为 `https://api.openai.com/v1`。`.env` 由导入脚本读取，服务不会自动加载它；密钥留在后端，不能使用 `VITE_` 前缀。
+
+```sh
+# 仅检查本机配置，不访问 OpenAI、不改变路由
+python3 application-atlas-production-pack/configure_openai_backup.py
+# 进行一次最多 32 输出 tokens 的真实验证，再保存备用路由
+python3 application-atlas-production-pack/configure_openai_backup.py --apply
+```
+
+当前只有一个自动备用槽位：导入会将其改为 OpenAI / Luna，保留主模型以及其他服务商凭据；仅在主模型明确额度耗尽时切换。验证失败时保留原路由。运行中的 API 必须先加载本次 Luna 参数适配，否则脚本会在写入前停止；脚本不会重启服务或创建采集任务。Luna 使用 `max_completion_tokens`；工具调用和关闭思考时使用 `reasoning_effort=none`，其他思考请求使用 `medium` 并省略温度参数。模型文档见 [OpenAI Docs](https://developers.openai.com/api/docs/models/gpt-6-luna)。
 
 网页「设置」页（`/settings`）可以在界面里配置模型服务：从 18 个常用 provider 预设中选择（Open Design、OpenCode Go/Zen、Command Code、OpenAI、Anthropic、Google Gemini、DeepSeek、Moonshot、Zhipu、DashScope、SiliconFlow、OpenRouter、Groq、xAI、Mistral、Ollama、LM Studio），填入凭据，测试连通性，并设定默认服务与模型。也可以用「从 OpenCode 导入凭据」把本机已有凭据一次性导入；导入会同时读取 `auth.json` 和 `opencode.db`，因为 OpenCode 把新加入的 provider 只写进后者。
 

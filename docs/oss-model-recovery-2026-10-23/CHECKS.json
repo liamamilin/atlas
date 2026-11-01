@@ -1,0 +1,32 @@
+{
+  "result": "passed",
+  "tests": [
+    {
+      "command": "python3 -m unittest discover -s application-atlas-production-pack/tests -p 'test_oss*.py' -v",
+      "passed": 60,
+      "new_recovery_tests_included": 9
+    },
+    {
+      "command": "python3 -m unittest discover -s application-atlas-production-pack/tests -p test_model_fallback.py -v",
+      "passed": 10
+    },
+    {
+      "command": "python3 -m unittest discover -s application-atlas-production-pack/tests -p test_github_settings.py -v",
+      "passed": 5
+    },
+    {
+      "cwd": "application-atlas-production-pack/tests",
+      "command": "python3 -m unittest test_reliability.ModelSettingsTests -v",
+      "passed": 20
+    }
+  ],
+  "total_tests": 95,
+  "ruff": "passed: atlas_model.py, oss_discovery.py, test_oss_model_recovery.py",
+  "git_diff_check": "passed",
+  "real_model_recovery": "LIVE_RECOVERY.json",
+  "credential_scan": {
+    "result": "passed",
+    "scope": "new recovery report artifacts",
+    "leaks": 0
+  }
+}

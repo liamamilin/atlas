@@ -1,0 +1,102 @@
+{
+ "repository_id": 1353567939,
+ "domain": "17",
+ "input_sha256": "f7046edb1a4a72a4ef96fe9ab9111d4f8231c083daccce95634f992b92be07ef",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:58.259003+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-de8de99b2c52-b913b",
+ "usage": {
+  "prompt_tokens": 11951,
+  "completion_tokens": 636,
+  "total_tokens": 12587,
+  "prompt_tokens_details": {
+   "cached_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00217425,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00217425,
+   "tokens": {
+    "input": 11951,
+    "output": 636,
+    "reasoning": 0,
+    "cache_read": 0,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1353567939,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片事实、项目类型与 Apache-2.0 许可标签均有来源支持；场景匹配基本成立，但场景描述中的土方量报告与横断面图输出未被 README 明确支持，且 README 明确说明土方仅按站报告挖填深度、不计算体积。\",\"checks\":{\"facts\":\"limited\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-civil-site-design-ff7123d628\",\"severity\":\"major\",\"kind\":\"unsupported_claim\",\"claim\":\"直接支持道路平纵线形、横断面模板与纵横断面输出\",\"source_id\":\"s0\",\"quote\":\"Earthwork is reported as cut and fill depth per station, not as volumes. Volumes need end-area computation across the full template, which this does not do yet.\",\"reason\":\"场景描述要求生成纵横断面图与土方量报告；README 明确土方仅按站报告挖填深度、尚不计算体积，卡片场景理由却称直接支持纵横断面输出，未说明土方量报告缺失这一前提。\",\"suggested_correction\":\"将场景适用性改为需条件：可支持线形、纵断面与横断面模板设计，但土方量报告不在当前能力内，仅提供按站挖填深度。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"基于实测地形的挖填读取与三维走廊视图\",\"source_id\":\"s0\",\"quote\":\"A station that falls outside the surveyed surface reports no ground, not a guess.\",\"reason\":\"功能本身有来源支持，但卡片未保留 README 明确标注的边界：超出实测地形范围的站点报告无地面而非推测值；作为功能描述可接受，但完整性上宜注明该限制。\",\"suggested_correction\":\"补充“超出实测地形范围时报告无地面数据，不做推测”的限制说明。\"},{\"field\":\"scope\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"适用于道路几何设计与准则检查、LandXML 交换；不覆盖排水管网设计，且交付需持证工程师签章。\",\"source_id\":\"s0\",\"quote\":\"The criteria defaults are illustrative, not an adopted standard.\",\"reason\":\"范围声明未提及准则默认值为示意性、非采纳的机构标准，这是影响准则检查适用性的重要前提。\",\"suggested_correction\":\"在范围中注明设计准则默认参数为示意值，需按项目采用标准替换。\"}],\"limitations\":[\"仅提供 README 与 LICENSE 两个文件，未审阅源码实现，功能实现程度无法独立核验。\",\"场景匹配仅依据 README 文字，未验证实际界面输出纵横断面图的能力。\",\"许可全文比对由确定性核验负责，本次仅确认标签与来源一致。\"]}",
+ "review": {
+  "repository_id": 1353567939,
+  "verdict": "pass_with_limits",
+  "summary": "卡片事实、项目类型与 Apache-2.0 许可标签均有来源支持；场景匹配基本成立，但场景描述中的土方量报告与横断面图输出未被 README 明确支持，且 README 明确说明土方仅按站报告挖填深度、不计算体积。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-civil-site-design-ff7123d628",
+    "severity": "major",
+    "kind": "unsupported_claim",
+    "claim": "直接支持道路平纵线形、横断面模板与纵横断面输出",
+    "source_id": "s0",
+    "quote": "Earthwork is reported as cut and fill depth per station, not as volumes. Volumes need end-area computation across the full template, which this does not do yet.",
+    "reason": "场景描述要求生成纵横断面图与土方量报告；README 明确土方仅按站报告挖填深度、尚不计算体积，卡片场景理由却称直接支持纵横断面输出，未说明土方量报告缺失这一前提。",
+    "suggested_correction": "将场景适用性改为需条件：可支持线形、纵断面与横断面模板设计，但土方量报告不在当前能力内，仅提供按站挖填深度。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "基于实测地形的挖填读取与三维走廊视图",
+    "source_id": "s0",
+    "quote": "A station that falls outside the surveyed surface reports no ground, not a guess.",
+    "reason": "功能本身有来源支持，但卡片未保留 README 明确标注的边界：超出实测地形范围的站点报告无地面而非推测值；作为功能描述可接受，但完整性上宜注明该限制。",
+    "suggested_correction": "补充“超出实测地形范围时报告无地面数据，不做推测”的限制说明。"
+   },
+   {
+    "field": "scope",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "适用于道路几何设计与准则检查、LandXML 交换；不覆盖排水管网设计，且交付需持证工程师签章。",
+    "source_id": "s0",
+    "quote": "The criteria defaults are illustrative, not an adopted standard.",
+    "reason": "范围声明未提及准则默认值为示意性、非采纳的机构标准，这是影响准则检查适用性的重要前提。",
+    "suggested_correction": "在范围中注明设计准则默认参数为示意值，需按项目采用标准替换。"
+   }
+  ],
+  "limitations": [
+   "仅提供 README 与 LICENSE 两个文件，未审阅源码实现，功能实现程度无法独立核验。",
+   "场景匹配仅依据 README 文字，未验证实际界面输出纵横断面图的能力。",
+   "许可全文比对由确定性核验负责，本次仅确认标签与来源一致。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 0,
+   "reason": "quote_not_in_supplied_source"
+  },
+  {
+   "index": 1,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T05:12:08.907371+00:00",
+ "elapsed_seconds": 10.648
+}

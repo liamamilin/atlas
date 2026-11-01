@@ -1,0 +1,90 @@
+{
+ "origin": {
+  "method": "fresh_bounded_model_request",
+  "receipts": [
+   {
+    "stage": "scenarios_open",
+    "input_sha256": "0ae9a24383568062a501723ad0789ad0819914652eee9530cfde914f129e43b9",
+    "cached": false,
+    "model": "gpt-6-luna",
+    "provider": "openai",
+    "usage": {
+     "prompt_tokens": 3019,
+     "completion_tokens": 146,
+     "total_tokens": 3165,
+     "cost": null
+    },
+    "created_at": "2026-10-29T03:50:09.558739+00:00",
+    "fallback": {
+     "from_provider": "open-design",
+     "reason": "quota_exhausted",
+     "activated_at": "2026-10-29T03:46:34Z"
+    }
+   }
+  ]
+ },
+ "original_response": {
+  "category_search_query": "investment portfolio management",
+  "scenarios": [
+   {
+    "name": "按模型组合再平衡",
+    "description": "投资组合经理查看账户持仓与模型目标的偏离，并生成经规则校验的再平衡交易指令。",
+    "search_queries": [
+     "portfolio rebalancing"
+    ]
+   },
+   {
+    "name": "检查拟议交易合规性",
+    "description": "合规人员针对投资组合的客户授权和内部限制，检查拟议交易是否违规。",
+    "search_queries": [
+     "pre trade compliance"
+    ]
+   },
+   {
+    "name": "管理组合现金需求",
+    "description": "投资组合经理查看组合现金余额与预期资金流，并据此生成现金部署交易指令。",
+    "search_queries": [
+     "portfolio cash management"
+    ]
+   }
+  ]
+ },
+ "validated_scenarios": [
+  {
+   "id": "auto-portfolio-management-system-56c699965d",
+   "name": "按模型组合再平衡",
+   "description": "投资组合经理查看账户持仓与模型目标的偏离，并生成经规则校验的再平衡交易指令。",
+   "search_queries": [
+    "portfolio rebalancing"
+   ],
+   "leaf": "portfolio-management-system",
+   "leaf_name": "Portfolio Management System",
+   "generation_method": "model_from_existing_leaf",
+   "generator_version": "atlas.discovery.v3"
+  },
+  {
+   "id": "auto-portfolio-management-system-5996eaadcb",
+   "name": "检查拟议交易合规性",
+   "description": "合规人员针对投资组合的客户授权和内部限制，检查拟议交易是否违规。",
+   "search_queries": [
+    "pre trade compliance"
+   ],
+   "leaf": "portfolio-management-system",
+   "leaf_name": "Portfolio Management System",
+   "generation_method": "model_from_existing_leaf",
+   "generator_version": "atlas.discovery.v3"
+  },
+  {
+   "id": "auto-portfolio-management-system-7f0b1e7893",
+   "name": "管理组合现金需求",
+   "description": "投资组合经理查看组合现金余额与预期资金流，并据此生成现金部署交易指令。",
+   "search_queries": [
+    "portfolio cash management"
+   ],
+   "leaf": "portfolio-management-system",
+   "leaf_name": "Portfolio Management System",
+   "generation_method": "model_from_existing_leaf",
+   "generator_version": "atlas.discovery.v3"
+  }
+ ]
+}

@@ -1,0 +1,51 @@
+{
+ "repository_id": 854075351,
+ "domain": "18",
+ "input_sha256": "74659f907d291fcda49591d576d56a4819c837db329e31eccecda4d84feb0707",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:43.245456+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDRzF0IbAbMuac4xyoV34jt9ILH",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 3013,
+  "completion_tokens": 194,
+  "total_tokens": 3207,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 3010,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.00039830000000000003,
+ "response_text": "{\"repository_id\":854075351,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片总体与 README 对项目的描述相符，许可证保守标为 pending；货运场景仅有有限参考性，且已标为 unverified。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[],\"limitations\":[\"仅依据提供的 README 与 GitHub 元数据审查；README 未截断，但未审查源码实现，不能据此确认功能实现细节或生产适用性。\",\"货运场景与 README 所述外卖、快递、打车派单有相邻之处，但货源、卡车实时状态及在途跟踪未获来源支持；该匹配已标为 unverified。\",\"未发现许可证文件，pending 标签及缺少许可证验证字段如实保留。\"]}",
+ "review": {
+  "repository_id": 854075351,
+  "verdict": "pass_with_limits",
+  "summary": "卡片总体与 README 对项目的描述相符，许可证保守标为 pending；货运场景仅有有限参考性，且已标为 unverified。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [],
+  "limitations": [
+   "仅依据提供的 README 与 GitHub 元数据审查；README 未截断，但未审查源码实现，不能据此确认功能实现细节或生产适用性。",
+   "货运场景与 README 所述外卖、快递、打车派单有相邻之处，但货源、卡车实时状态及在途跟踪未获来源支持；该匹配已标为 unverified。",
+   "未发现许可证文件，pending 标签及缺少许可证验证字段如实保留。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:47.612520+00:00",
+ "elapsed_seconds": 4.367
+}

@@ -1,0 +1,121 @@
+{
+ "repository_id": 1245035344,
+ "domain": "06",
+ "input_sha256": "75228be9c8efc7095e33f85840a84331d71f11041dec048edabc05d7642057b0",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:11.383174+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-df05291f03c0-ae205",
+ "usage": {
+  "prompt_tokens": 8767,
+  "completion_tokens": 772,
+  "total_tokens": 9539,
+  "prompt_tokens_details": {
+   "cached_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00177825,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00177825,
+   "tokens": {
+    "input": 8767,
+    "output": 772,
+    "reasoning": 0,
+    "cache_read": 0,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1245035344,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片事实、定位、范围与功能基本有 README 原文支持，MIT 许可有 LICENSE 全文佐证；项目类型标为 application 偏宽，实为 Claude Code 技能包/命令行工具。三条场景匹配均标为 unverified 或 conditional，与场景描述相符，未把能力误标为 direct。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"limited\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"project_type\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"wrong_type\",\"claim\":\"project_type: application\",\"source_id\":\"s0\",\"quote\":\"AI-powered restaurant marketing and operations audit for Claude Code.\",\"reason\":\"README 与元数据均表明这是 Claude Code 技能/子代理集合（14 skills、5 agents、install.sh、Python PDF 脚本），需宿主 CLI 运行，并非独立完整应用；标为 application 会高估其独立可用性。\",\"suggested_correction\":\"改为 skill/plugin 或 CLI 工具类，并在定位中保留“以 Claude Code 技能形式运行”的限定。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"多平台评论分析与回复生成\",\"source_id\":\"s0\",\"quote\":\"Multi-Platform Review Analysis | Google, Yelp, TripAdvisor, DoorDash sentiment + trend\",\"reason\":\"功能本身有来源支持，但 README 免责声明要求先核实评论平台服务条款再自动化抓取，卡片未提示该外部依赖与合规前提。\",\"suggested_correction\":\"在功能或限制中注明依赖公开平台信息且需遵守平台条款，属分析生成而非自动抓取发布。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-content-marketing-platform-0aac0b4271\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"可生成 30 天社交内容日历，但面向餐厅单店营销，非通用季度选题排期与负责人分配。\",\"source_id\":\"s0\",\"quote\":\"30-Day Social Calendar | Daily IG/TikTok/FB content with captions + hashtags\",\"reason\":\"条件已列“需安装 Claude Code CLI”“仅限餐厅营销场景”，但未说明输出为 30 天日历而非季度排期、且不含负责人分配，条件可再明确。\",\"suggested_correction\":\"在 conditions 中补充“仅生成 30 天日历，不含季度排期与负责人分配”。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-content-marketing-platform-d15bd2c360\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"提供评论回复与广告文案生成，但不含草稿评审、批准与定时发布流程。\",\"source_id\":\"s0\",\"quote\":\"Review Response Generator | Personalized HEART-framework replies for every review\",\"reason\":\"适用性标 unverified 合理，但未列明需 Claude Code CLI 及输出为文件而非发布渠道，条件为空。\",\"suggested_correction\":\"补充条件：需 Claude Code CLI，输出为本地 Markdown/PDF，不含评审批准与定时发布。\"}],\"limitations\":[\"仅提供 README、LICENSE 与 GitHub 元数据，未审阅 skills/agents 源码实现，功能实现程度无法逐项核验。\",\"场景匹配基于 README 描述推断，未在真实运行环境验证。\",\"许可仅依据 LICENSE 全文与元数据，未做 SPDX 全文确定性比对。\"]}",
+ "review": {
+  "repository_id": 1245035344,
+  "verdict": "pass_with_limits",
+  "summary": "卡片事实、定位、范围与功能基本有 README 原文支持，MIT 许可有 LICENSE 全文佐证；项目类型标为 application 偏宽，实为 Claude Code 技能包/命令行工具。三条场景匹配均标为 unverified 或 conditional，与场景描述相符，未把能力误标为 direct。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "limited",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "project_type",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "wrong_type",
+    "claim": "project_type: application",
+    "source_id": "s0",
+    "quote": "AI-powered restaurant marketing and operations audit for Claude Code.",
+    "reason": "README 与元数据均表明这是 Claude Code 技能/子代理集合（14 skills、5 agents、install.sh、Python PDF 脚本），需宿主 CLI 运行，并非独立完整应用；标为 application 会高估其独立可用性。",
+    "suggested_correction": "改为 skill/plugin 或 CLI 工具类，并在定位中保留“以 Claude Code 技能形式运行”的限定。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "多平台评论分析与回复生成",
+    "source_id": "s0",
+    "quote": "Multi-Platform Review Analysis | Google, Yelp, TripAdvisor, DoorDash sentiment + trend",
+    "reason": "功能本身有来源支持，但 README 免责声明要求先核实评论平台服务条款再自动化抓取，卡片未提示该外部依赖与合规前提。",
+    "suggested_correction": "在功能或限制中注明依赖公开平台信息且需遵守平台条款，属分析生成而非自动抓取发布。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-content-marketing-platform-0aac0b4271",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "可生成 30 天社交内容日历，但面向餐厅单店营销，非通用季度选题排期与负责人分配。",
+    "source_id": "s0",
+    "quote": "30-Day Social Calendar | Daily IG/TikTok/FB content with captions + hashtags",
+    "reason": "条件已列“需安装 Claude Code CLI”“仅限餐厅营销场景”，但未说明输出为 30 天日历而非季度排期、且不含负责人分配，条件可再明确。",
+    "suggested_correction": "在 conditions 中补充“仅生成 30 天日历，不含季度排期与负责人分配”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-content-marketing-platform-d15bd2c360",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "提供评论回复与广告文案生成，但不含草稿评审、批准与定时发布流程。",
+    "source_id": "s0",
+    "quote": "Review Response Generator | Personalized HEART-framework replies for every review",
+    "reason": "适用性标 unverified 合理，但未列明需 Claude Code CLI 及输出为文件而非发布渠道，条件为空。",
+    "suggested_correction": "补充条件：需 Claude Code CLI，输出为本地 Markdown/PDF，不含评审批准与定时发布。"
+   }
+  ],
+  "limitations": [
+   "仅提供 README、LICENSE 与 GitHub 元数据，未审阅 skills/agents 源码实现，功能实现程度无法逐项核验。",
+   "场景匹配基于 README 描述推断，未在真实运行环境验证。",
+   "许可仅依据 LICENSE 全文与元数据，未做 SPDX 全文确定性比对。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 0,
+   "reason": "quote_not_in_supplied_source"
+  },
+  {
+   "index": 1,
+   "reason": "quote_not_in_supplied_source"
+  },
+  {
+   "index": 2,
+   "reason": "quote_not_in_supplied_source"
+  },
+  {
+   "index": 3,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T05:11:23.509903+00:00",
+ "elapsed_seconds": 12.126
+}

@@ -1,0 +1,39 @@
+{
+  "checked_at": "2026-10-28T18:52:46.056626+00:00",
+  "api_health": {
+    "http_status": 200,
+    "ok": true
+  },
+  "job": {
+    "id": "batch_4812ef3db57543c3acc1871b8ea5ba6e",
+    "status": "partial",
+    "processed": 85231,
+    "total": 85231,
+    "finished_at": "2026-10-28T18:26:57.458016+00:00"
+  },
+  "model_route": {
+    "default": {
+      "provider": "open-design",
+      "model": "deepseek-v4.1-flash"
+    },
+    "resolved": {
+      "configured": true,
+      "provider": "opencode-go",
+      "provider_name": "OpenCode Go",
+      "model": "deepseek-v4.1-flash",
+      "source": "fallback",
+      "base_url": "https://opencode.ai/inference/go/openai/v1"
+    },
+    "fallback": {
+      "enabled": true,
+      "from_provider": "open-design",
+      "provider": "opencode-go",
+      "model": "deepseek-v4.1-flash",
+      "active": true,
+      "activated_at": "2026-10-28T02:48:44Z",
+      "reason": "quota_exhausted"
+    }
+  },
+  "api_process": "45453 /Users/milin/.pyenv/versions/3.10.13/bin/python3 -u /Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/drafts_api.py --port 5199",
+  "frontend_health": 200
+}

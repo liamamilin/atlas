@@ -1,0 +1,73 @@
+{
+ "repository_id": 1413430328,
+ "domain": "23",
+ "input_sha256": "6f3e63b3878f21e2b1bfcb9f528e0ee70f71f7fbb1648bc890877fd1a2c15498",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:02.802097+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDlFiEg21VzaWl7F0SYxhmBLEwE",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 2220,
+  "completion_tokens": 613,
+  "total_tokens": 2833,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 2217,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0005285,
+ "response_text": "{\n  \"repository_id\": 1413430328,\n  \"verdict\": \"pass_with_limits\",\n  \"summary\": \"卡片对项目定位、资源类型及许可证待核验状态的描述与现有材料基本一致。场景匹配已标为 conditional，且指出缺少创作与导出流程；但“需自行将HTML活动嵌入教学平台”没有来源支持，场景相关性也应谨慎看待。\",\n  \"checks\": {\n    \"facts\": \"limited\",\n    \"project_type\": \"supported\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"limited\"\n  },\n  \"issues\": [\n    {\n      \"field\": \"scenario_match\",\n      \"scenario_id\": \"auto-elearning-authoring-tool-0e728bfe82\",\n      \"severity\": \"minor\",\n      \"kind\": \"unsupported_claim\",\n      \"claim\": \"需自行将HTML活动嵌入教学平台\",\n      \"source_id\": \"\",\n      \"quote\": \"\",\n      \"reason\": \"来源只说明活动是自包含HTML文件，没有说明如何嵌入教学平台，也没有说明必须由用户自行嵌入。\",\n      \"suggested_correction\": \"删除该条件，或改为“来源未说明教学平台嵌入方式”。\"\n    },\n    {\n      \"field\": \"scenario_match\",\n      \"scenario_id\": \"auto-elearning-authoring-tool-0e728bfe82\",\n      \"severity\": \"minor\",\n      \"kind\": \"irrelevant_scenario\",\n      \"claim\": \"提供可嵌入网页的互动课堂活动，但无自定进度单元创作与导出流程。\",\n      \"source_id\": \"s0\",\n      \"quote\": \"A lightweight, touchscreen-friendly homepage for MRISB Grade 7 and Grade 8 English interactive classroom activities.\",\n      \"reason\": \"场景要求高校教师创作自定进度学习单元、加入指定题型并导出网页包；来源仅支持其为7、8年级英语课堂活动主页及活动文件，匹配度有限。卡片已明确指出缺少创作与导出流程，因此不应将该限制误判为已实现能力。\",\n      \"suggested_correction\": \"将相关性描述为有限或不匹配；如保留场景关联，应明确它仅是现成课堂活动资源，不支持场景所需的创作与导出工作流。\"\n    }\n  ],\n  \"limitations\": [\n    \"仅提供README与GitHub元数据，未审查HTML活动文件本身；不能据此核实活动内容、交互细节或发布配置。\",\n    \"README未截断，但材料未提供许可证文件；卡片将许可证标为pending并注明未发现许可证文件，属于保守且有依据的标注。\"\n  ]\n}",
+ "review": {
+  "repository_id": 1413430328,
+  "verdict": "pass_with_limits",
+  "summary": "卡片对项目定位、资源类型及许可证待核验状态的描述与现有材料基本一致。场景匹配已标为 conditional，且指出缺少创作与导出流程；但“需自行将HTML活动嵌入教学平台”没有来源支持，场景相关性也应谨慎看待。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-elearning-authoring-tool-0e728bfe82",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "需自行将HTML活动嵌入教学平台",
+    "source_id": "",
+    "quote": "",
+    "reason": "来源只说明活动是自包含HTML文件，没有说明如何嵌入教学平台，也没有说明必须由用户自行嵌入。",
+    "suggested_correction": "删除该条件，或改为“来源未说明教学平台嵌入方式”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-elearning-authoring-tool-0e728bfe82",
+    "severity": "minor",
+    "kind": "irrelevant_scenario",
+    "claim": "提供可嵌入网页的互动课堂活动，但无自定进度单元创作与导出流程。",
+    "source_id": "s0",
+    "quote": "A lightweight, touchscreen-friendly homepage for MRISB Grade 7 and Grade 8 English interactive classroom activities.",
+    "reason": "场景要求高校教师创作自定进度学习单元、加入指定题型并导出网页包；来源仅支持其为7、8年级英语课堂活动主页及活动文件，匹配度有限。卡片已明确指出缺少创作与导出流程，因此不应将该限制误判为已实现能力。",
+    "suggested_correction": "将相关性描述为有限或不匹配；如保留场景关联，应明确它仅是现成课堂活动资源，不支持场景所需的创作与导出工作流。"
+   }
+  ],
+  "limitations": [
+   "仅提供README与GitHub元数据，未审查HTML活动文件本身；不能据此核实活动内容、交互细节或发布配置。",
+   "README未截断，但材料未提供许可证文件；卡片将许可证标为pending并注明未发现许可证文件，属于保守且有依据的标注。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:40:11.174945+00:00",
+ "elapsed_seconds": 8.373
+}

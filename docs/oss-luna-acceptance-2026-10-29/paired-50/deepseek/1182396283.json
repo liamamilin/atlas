@@ -1,0 +1,59 @@
+{
+ "repository_id": 1182396283,
+ "domain": "15",
+ "input_sha256": "60b86f6476c8229fde1cf6b69ae1bcc37387e1e93fe156ae49ec3bc91cc0702f",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:51.984745+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-de8de99b2c52-b8f5f",
+ "usage": {
+  "prompt_tokens": 9775,
+  "completion_tokens": 220,
+  "total_tokens": 9995,
+  "prompt_tokens_details": {
+   "cached_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00159825,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00159825,
+   "tokens": {
+    "input": 9775,
+    "output": 220,
+    "reasoning": 0,
+    "cache_read": 0,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1182396283,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片与 README 和元数据基本一致：项目定位为桌面取证查看工作台，明确声明不是完整处理流水线，并列出无 carving、无日志分析、无快照、无 RAID 等限制；Apache-2.0 许可有完整正文支持。三个场景均标为 conditional，并写明缺少标记、报告、时间线等能力，与来源相符。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"仅提供 README、LICENSE 与 GitHub 元数据，未审源码实现，功能是否真实可用未独立验证\",\"场景匹配仅依据 README 描述的能力边界，未验证实际解析效果与格式覆盖细节\",\"第三方依赖（ewfprobe、qnxprobe、ccl_* 等）的许可仅见 README 致谢标注，未逐一核验\"]}",
+ "review": {
+  "repository_id": 1182396283,
+  "verdict": "pass_with_limits",
+  "summary": "卡片与 README 和元数据基本一致：项目定位为桌面取证查看工作台，明确声明不是完整处理流水线，并列出无 carving、无日志分析、无快照、无 RAID 等限制；Apache-2.0 许可有完整正文支持。三个场景均标为 conditional，并写明缺少标记、报告、时间线等能力，与来源相符。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "仅提供 README、LICENSE 与 GitHub 元数据，未审源码实现，功能是否真实可用未独立验证",
+   "场景匹配仅依据 README 描述的能力边界，未验证实际解析效果与格式覆盖细节",
+   "第三方依赖（ewfprobe、qnxprobe、ccl_* 等）的许可仅见 README 致谢标注，未逐一核验"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:11:58.257956+00:00",
+ "elapsed_seconds": 6.273
+}

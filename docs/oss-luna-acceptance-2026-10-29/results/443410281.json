@@ -1,0 +1,63 @@
+{
+ "repository_id": 443410281,
+ "domain": "14",
+ "input_sha256": "08fa3126675ebb1fbab89ad25942be09799218845b18eec3d4119aabdadc9680",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:19.864525+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCD4QGpcrJiRMyQ1gXbXMhJpn7vt",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 14275,
+  "completion_tokens": 353,
+  "total_tokens": 14628,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 14272,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.001604,
+ "response_text": "{\"repository_id\":443410281,\"verdict\":\"needs_review\",\"summary\":\"项目类型及资源合集描述有 README 支持；但卡片将仓库许可证标为 Apache-2.0，与 README 明示的 MIT/CC BY 4.0 不一致，需复核许可证标签。README 被截断，不能据此确认全文内容。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"issue\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"license\",\"scenario_id\":\"\",\"severity\":\"major\",\"kind\":\"license_overclaim\",\"claim\":\"\\\"spdx\\\":\\\"Apache-2.0\\\",\\\"status\\\":\\\"open_source\\\"\",\"source_id\":\"s0\",\"quote\":\"## License\\nMIT License & [cc](https://creativecommons.org/licenses/by/4.0/) license\",\"reason\":\"README 的许可证段落标示 MIT 与 CC BY 4.0，而卡片将仓库许可证标为 Apache-2.0。元数据也显示 Apache-2.0，但与 README 的明确文字冲突；仅凭现有材料无法消解该冲突，应复核标签及其适用范围。\",\"suggested_correction\":\"复核 LICENSE 文件与 README 所述内容的适用范围；在冲突解决前，不要将 Apache-2.0 作为已确认的仓库许可证。\"}],\"limitations\":[\"README 来源标记为截断，不能声称已核验其全文。\",\"没有提供场景匹配条目；本次无场景关联可评估。\",\"许可证来源之间存在冲突，本次仅作语义标签审查，不据此替代确定性许可证全文核验。\"]}",
+ "review": {
+  "repository_id": 443410281,
+  "verdict": "needs_review",
+  "summary": "项目类型及资源合集描述有 README 支持；但卡片将仓库许可证标为 Apache-2.0，与 README 明示的 MIT/CC BY 4.0 不一致，需复核许可证标签。README 被截断，不能据此确认全文内容。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "issue",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "license",
+    "scenario_id": "",
+    "severity": "major",
+    "kind": "license_overclaim",
+    "claim": "\"spdx\":\"Apache-2.0\",\"status\":\"open_source\"",
+    "source_id": "s0",
+    "quote": "## License\nMIT License & [cc](https://creativecommons.org/licenses/by/4.0/) license",
+    "reason": "README 的许可证段落标示 MIT 与 CC BY 4.0，而卡片将仓库许可证标为 Apache-2.0。元数据也显示 Apache-2.0，但与 README 的明确文字冲突；仅凭现有材料无法消解该冲突，应复核标签及其适用范围。",
+    "suggested_correction": "复核 LICENSE 文件与 README 所述内容的适用范围；在冲突解决前，不要将 Apache-2.0 作为已确认的仓库许可证。"
+   }
+  ],
+  "limitations": [
+   "README 来源标记为截断，不能声称已核验其全文。",
+   "没有提供场景匹配条目；本次无场景关联可评估。",
+   "许可证来源之间存在冲突，本次仅作语义标签审查，不据此替代确定性许可证全文核验。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:26.430589+00:00",
+ "elapsed_seconds": 6.566
+}

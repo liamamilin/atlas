@@ -1,0 +1,124 @@
+{
+ "id": "oss_258efe34cd8b44b8b4102685ae338554",
+ "leaf": "feed-reader",
+ "status": "partial",
+ "started_at": "2026-10-23T02:08:20.244881+00:00",
+ "created": 3,
+ "updated": 0,
+ "unchanged": 0,
+ "failed": 3,
+ "processed": 6,
+ "errors": [
+  {
+   "repo": "QuiteRSS/quiterss",
+   "error": "没有有依据的场景关联"
+  },
+  {
+   "repo": "newsboat/newsboat",
+   "error": "没有有依据的场景关联"
+  },
+  {
+   "repo": "spacecowboy/Feeder",
+   "error": "没有有依据的场景关联"
+  }
+ ],
+ "mode": "automatic",
+ "phase": "store",
+ "model_calls": 4,
+ "model_cache_hits": 1,
+ "rejected": 0,
+ "total": 6,
+ "model_receipts": [
+  {
+   "stage": "scenarios",
+   "input_sha256": "ecf5b48d6b90c34f881f54dd7bdb8fc7edf5b4b3ee7013e773fdc0436ca025fa",
+   "cached": true,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 2967,
+    "completion_tokens": 1576,
+    "total_tokens": 4543,
+    "cost": null
+   },
+   "created_at": "2026-10-23T02:05:41.742930+00:00"
+  },
+  {
+   "stage": "screen",
+   "input_sha256": "49290cedba8d6f555d641b217e8cf4003908b973ee6184acb49965994cdeda5a",
+   "cached": false,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 8496,
+    "completion_tokens": 4444,
+    "total_tokens": 12940,
+    "cost": null
+   },
+   "created_at": "2026-10-23T02:08:56.058818+00:00"
+  },
+  {
+   "stage": "extract",
+   "input_sha256": "b807b20931a157f0840920e30b0d53a402c23b6382a5d0ad2f4b3cc4b3f7506b",
+   "cached": false,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 4086,
+    "completion_tokens": 2879,
+    "total_tokens": 6965,
+    "cost": null
+   },
+   "created_at": "2026-10-23T02:09:14.267981+00:00"
+  },
+  {
+   "stage": "extract",
+   "input_sha256": "757c74241766a308b0e70fde08713d1bf2d5069d634654bd36f1f167954b2c83",
+   "cached": false,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 4823,
+    "completion_tokens": 4261,
+    "total_tokens": 9084,
+    "cost": null
+   },
+   "created_at": "2026-10-23T02:09:38.131218+00:00"
+  },
+  {
+   "stage": "extract",
+   "input_sha256": "28effba876d34178c04edfee57c7983bd5bea091ca5cf9fe429fd33bdc611ace",
+   "cached": false,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 5120,
+    "completion_tokens": 3627,
+    "total_tokens": 8747,
+    "cost": null
+   },
+   "created_at": "2026-10-23T02:09:58.891041+00:00"
+  }
+ ],
+ "discovered": 23,
+ "accepted": 3,
+ "gaps": [
+  {
+   "scenario": "清理多个订阅源的未读内容",
+   "projects": 2,
+   "target": 3
+  },
+  {
+   "scenario": "阅读摘要型订阅源的全文",
+   "projects": 1,
+   "target": 3
+  },
+  {
+   "scenario": "整理并精简订阅列表",
+   "projects": 1,
+   "target": 3
+  }
+ ],
+ "audit_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/runs/oss_258efe34cd8b44b8b4102685ae338554.json",
+ "finished_at": "2026-10-23T02:09:58.914966+00:00"
+}

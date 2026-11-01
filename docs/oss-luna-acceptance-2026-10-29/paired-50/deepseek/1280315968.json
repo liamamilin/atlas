@@ -1,0 +1,94 @@
+{
+ "repository_id": 1280315968,
+ "domain": "04",
+ "input_sha256": "77655c22b2badbe9e8a57ac85d239f7199ce9eabf9b867b7d32963cd0c1bc2dd",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:04.915856+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-de8de99b2c52-b81c4",
+ "usage": {
+  "prompt_tokens": 1545,
+  "completion_tokens": 572,
+  "total_tokens": 2117,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00049969,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00049969,
+   "tokens": {
+    "input": 1033,
+    "output": 572,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1280315968,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片仅依据 GitHub 元数据描述，将项目定位为待补充的候选项目，许可状态保守标为 pending，未虚构功能或场景；但 README 资源不可访问、无源码文件，项目类型与功能范围均无法核验，属证据受限而非错误。\",\"checks\":{\"facts\":\"limited\",\"project_type\":\"limited\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"project_type\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"project_type: unknown\",\"source_id\":\"s0\",\"quote\":\"\\\"language\\\":\\\"Python\\\"\",\"reason\":\"元数据仅显示主语言为 Python，无源码或 README 可判断是平台、库还是演示；标为 unknown 属保守处理，但项目类型实际未核验。\",\"suggested_correction\":\"保留 unknown，并在 limitations 中注明仅凭元数据无法判定项目类型。\"},{\"field\":\"scope\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"适用范围待补充；请查看官方项目资料。\",\"source_id\":\"s0\",\"quote\":\"\\\"description\\\":\\\"Kineton Cloud – Cloud-native virtual production platform.\",\"reason\":\"描述文字宣称云原生虚拟制作平台，但无源码/文档佐证其实际范围；卡片已标待补充，未把宣传语当作已实现范围，属如实保留。\",\"suggested_correction\":\"维持待补充表述，避免将描述性宣传语升级为已核验范围。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"features: []\",\"source_id\":\"s0\",\"quote\":\"Camera tracking, 3D rendering, real-time compositing, and broadcast distribution – all in the cloud.\",\"reason\":\"描述中列举了相机跟踪、3D 渲染、实时合成、广播分发等能力，但无源码或文档证明已实现；卡片未将其列为 features，属保守正确，但功能完全未核验。\",\"suggested_correction\":\"保持 features 为空，并在 limitations 说明描述中的能力未经代码验证。\"}],\"limitations\":[\"仅有 GitHub 元数据一项来源，files_available=0，无 README、源码或文档可核验功能、范围与项目类型。\",\"collection_notes 称 README 资源不存在或不再公开，无法确认仓库实际内容。\",\"许可状态为 pending，未发现许可证文件；本次不做许可全文比对。\",\"无场景关联数据，scenario_matches 为空，未评估任何场景相关性。\"]}",
+ "review": {
+  "repository_id": 1280315968,
+  "verdict": "pass_with_limits",
+  "summary": "卡片仅依据 GitHub 元数据描述，将项目定位为待补充的候选项目，许可状态保守标为 pending，未虚构功能或场景；但 README 资源不可访问、无源码文件，项目类型与功能范围均无法核验，属证据受限而非错误。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "limited",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "project_type",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "project_type: unknown",
+    "source_id": "s0",
+    "quote": "\"language\":\"Python\"",
+    "reason": "元数据仅显示主语言为 Python，无源码或 README 可判断是平台、库还是演示；标为 unknown 属保守处理，但项目类型实际未核验。",
+    "suggested_correction": "保留 unknown，并在 limitations 中注明仅凭元数据无法判定项目类型。"
+   },
+   {
+    "field": "scope",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "适用范围待补充；请查看官方项目资料。",
+    "source_id": "s0",
+    "quote": "\"description\":\"Kineton Cloud – Cloud-native virtual production platform.",
+    "reason": "描述文字宣称云原生虚拟制作平台，但无源码/文档佐证其实际范围；卡片已标待补充，未把宣传语当作已实现范围，属如实保留。",
+    "suggested_correction": "维持待补充表述，避免将描述性宣传语升级为已核验范围。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "features: []",
+    "source_id": "s0",
+    "quote": "Camera tracking, 3D rendering, real-time compositing, and broadcast distribution – all in the cloud.",
+    "reason": "描述中列举了相机跟踪、3D 渲染、实时合成、广播分发等能力，但无源码或文档证明已实现；卡片未将其列为 features，属保守正确，但功能完全未核验。",
+    "suggested_correction": "保持 features 为空，并在 limitations 说明描述中的能力未经代码验证。"
+   }
+  ],
+  "limitations": [
+   "仅有 GitHub 元数据一项来源，files_available=0，无 README、源码或文档可核验功能、范围与项目类型。",
+   "collection_notes 称 README 资源不存在或不再公开，无法确认仓库实际内容。",
+   "许可状态为 pending，未发现许可证文件；本次不做许可全文比对。",
+   "无场景关联数据，scenario_matches 为空，未评估任何场景相关性。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:11:13.375959+00:00",
+ "elapsed_seconds": 8.46
+}

@@ -1,0 +1,59 @@
+{
+ "repository_id": 1413430328,
+ "domain": "23",
+ "input_sha256": "6f3e63b3878f21e2b1bfcb9f528e0ee70f71f7fbb1648bc890877fd1a2c15498",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:12:23.641010+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-dda4d3d2f9ac-dc418",
+ "usage": {
+  "prompt_tokens": 2225,
+  "completion_tokens": 154,
+  "total_tokens": 2379,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00035089,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00035089,
+   "tokens": {
+    "input": 1713,
+    "output": 154,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1413430328,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片与 README 和元数据基本一致：静态 HTML 活动资源、7/8 年级、触屏友好、自包含无外部运行时依赖；许可为 pending 且已如实标注，场景匹配为 conditional 也合理。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"仅覆盖 README 与 GitHub 元数据，未核验实际 HTML 文件内容与活动数量\",\"许可状态为 pending，未做许可全文比对\",\"场景匹配为条件性适用，未验证嵌入教学平台的实际可行性\"]}",
+ "review": {
+  "repository_id": 1413430328,
+  "verdict": "pass_with_limits",
+  "summary": "卡片与 README 和元数据基本一致：静态 HTML 活动资源、7/8 年级、触屏友好、自包含无外部运行时依赖；许可为 pending 且已如实标注，场景匹配为 conditional 也合理。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "仅覆盖 README 与 GitHub 元数据，未核验实际 HTML 文件内容与活动数量",
+   "许可状态为 pending，未做许可全文比对",
+   "场景匹配为条件性适用，未验证嵌入教学平台的实际可行性"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:12:27.688515+00:00",
+ "elapsed_seconds": 4.047
+}

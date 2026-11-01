@@ -1,0 +1,74 @@
+{
+ "repository_id": 335412716,
+ "domain": "13",
+ "input_sha256": "c7e57e6d2a66e42c87bb18570d3f24f5125e45e5ecfcfc0efb4cbd6e6c1ccc90",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:15.317678+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCCzxpfKcVqxtA5b876srPHQw5Zo",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 2600,
+  "completion_tokens": 575,
+  "total_tokens": 3175,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 2597,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0005475,
+ "response_text": "{\"repository_id\":335412716,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片将项目定位为共享单车数据分析报告而非 BI 平台，且许可证明确标为 pending；场景也标为 unverified。现有来源支持其数据集、分析发现和展示内容，但不能据此核实卡片所述的具体分析流程及若干未提供功能的缺失情况。\",\"checks\":{\"facts\":\"limited\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"summary\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"对2019年2月Ford GoBike行程数据（约18万条记录）做探索性分析并整理汇报要点\",\"source_id\":\"s0\",\"quote\":\"The dataset is for all trips taken during February of 2019, with 16 features recorded, including: the duration, start and end time, start and end station plus their coordinates, user birth year, user gender, etc.. and 183412 records.\",\"reason\":\"来源支持数据集月份和记录数，也描述了分析发现及展示内容；但没有明确说明项目进行了“探索性分析”这一具体流程。该表述总体与报告内容相符，流程细节证据有限。\",\"suggested_correction\":\"可改为“围绕2019年2月Ford GoBike行程数据整理分析发现与展示要点”。\"},{\"field\":\"scope\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"不提供数据源连接、仪表板托管或权限管理。\",\"source_id\":\"s0\",\"quote\":\"For the presentation, I start with presenting a general understanding of the demographic of the users\",\"reason\":\"README描述了数据分析和展示内容，但没有说明数据源连接、仪表板托管或权限管理是否提供。卡片将这些未提及事项断言为不提供，现有材料不足以核实。\",\"suggested_correction\":\"改为“现有 README 描述数据分析与展示内容；未说明数据源连接、仪表板托管或权限管理能力”。\"}],\"limitations\":[\"仅有一份完整 README 和 GitHub 元数据；未提供代码、演示文件或其他文档，无法核实具体实现及未提及功能。\",\"许可证状态为 pending，来源元数据中的 license 为 null；本次不据此推断仓库已获开源授权。\",\"场景匹配明确标为 unverified；其与区域销售经理查看销售仪表板的需求不相符，卡片已说明项目是静态分析报告而非可筛选仪表板。\"]}",
+ "review": {
+  "repository_id": 335412716,
+  "verdict": "pass_with_limits",
+  "summary": "卡片将项目定位为共享单车数据分析报告而非 BI 平台，且许可证明确标为 pending；场景也标为 unverified。现有来源支持其数据集、分析发现和展示内容，但不能据此核实卡片所述的具体分析流程及若干未提供功能的缺失情况。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "summary",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "对2019年2月Ford GoBike行程数据（约18万条记录）做探索性分析并整理汇报要点",
+    "source_id": "s0",
+    "quote": "The dataset is for all trips taken during February of 2019, with 16 features recorded, including: the duration, start and end time, start and end station plus their coordinates, user birth year, user gender, etc.. and 183412 records.",
+    "reason": "来源支持数据集月份和记录数，也描述了分析发现及展示内容；但没有明确说明项目进行了“探索性分析”这一具体流程。该表述总体与报告内容相符，流程细节证据有限。",
+    "suggested_correction": "可改为“围绕2019年2月Ford GoBike行程数据整理分析发现与展示要点”。"
+   },
+   {
+    "field": "scope",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "不提供数据源连接、仪表板托管或权限管理。",
+    "source_id": "s0",
+    "quote": "For the presentation, I start with presenting a general understanding of the demographic of the users",
+    "reason": "README描述了数据分析和展示内容，但没有说明数据源连接、仪表板托管或权限管理是否提供。卡片将这些未提及事项断言为不提供，现有材料不足以核实。",
+    "suggested_correction": "改为“现有 README 描述数据分析与展示内容；未说明数据源连接、仪表板托管或权限管理能力”。"
+   }
+  ],
+  "limitations": [
+   "仅有一份完整 README 和 GitHub 元数据；未提供代码、演示文件或其他文档，无法核实具体实现及未提及功能。",
+   "许可证状态为 pending，来源元数据中的 license 为 null；本次不据此推断仓库已获开源授权。",
+   "场景匹配明确标为 unverified；其与区域销售经理查看销售仪表板的需求不相符，卡片已说明项目是静态分析报告而非可筛选仪表板。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:23.085780+00:00",
+ "elapsed_seconds": 7.768
+}

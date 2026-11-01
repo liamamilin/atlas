@@ -1,0 +1,51 @@
+{
+  "created_at": "2026-10-29T04:43:05.753090+00:00",
+  "scope": "100 approved samples only; no full run started",
+  "actual_api_requests": 100,
+  "successful_responses": 100,
+  "tokens": {
+    "prompt_tokens": 428036,
+    "completion_tokens": 32416,
+    "total_tokens": 460452
+  },
+  "estimated_sample_usd": 0.0590116,
+  "standard_prices_usd_per_million_tokens": {
+    "input": 0.1,
+    "cached_input": 0.01,
+    "output": 0.5
+  },
+  "official_price_source": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+  "population": 55651,
+  "projection_method": "Domain-stratified weighted mean; all 29 primary domains represented. Not a billing guarantee or statistical confidence interval.",
+  "estimated_full_standard_usd": 32.626728949999986,
+  "estimated_full_plus_25_percent_usd": 40.78341118749998,
+  "recommended_full_budget_cap_usd": 50,
+  "sample_api_wall_seconds": 154.115,
+  "estimated_full_api_hours_at_current_4_workers": 23.82403851388889,
+  "coverage": {
+    "sample_count": 100,
+    "domains": 29,
+    "with_readme": 86,
+    "with_any_official_file": 86,
+    "metadata_only": 14,
+    "truncated_source_projects": 6,
+    "omitted_match_projects": 0,
+    "model_suggestion_projects": 39,
+    "model_suggestions": 68
+  },
+  "full_run_started": false,
+  "production_data_modified": false,
+  "next_step_recommendation": [
+    "Calibrate false-positive rules and citation validation using the priority human triage before a full pass.",
+    "If the user authorizes a full pass, use a hard USD50 budget, fixed repository manifest, checkpoints and explicit OpenAI Luna route; stop at budget or authentication/quota failures.",
+    "Review missing/long-source cases and implementation claims separately; estimate covers the current bounded 60000-character source package and up to48 associations per project.",
+    "Human confirm suspected errors before any catalog edit; preserve candidates, relations and favorites."
+  ],
+  "additional_cost_exclusions": [
+    "Tax, account credits, provider billing adjustments",
+    "Additional source collection or full code/runtime testing",
+    "Extra model passes for long documents or disputed findings",
+    "Human review time"
+  ],
+  "human_triage_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-luna-acceptance-2026-10-29/HUMAN_TRIAGE.json"
+}

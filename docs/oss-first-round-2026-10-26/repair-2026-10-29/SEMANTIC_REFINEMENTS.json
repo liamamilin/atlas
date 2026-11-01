@@ -1,0 +1,81 @@
+{
+  "changes": [
+    {
+      "repository_id": 1372035849,
+      "repository": "Biswajit1999/pid-loop-lab",
+      "leaf": "distributed-control-system-dcs",
+      "before": {
+        "applicability": "direct",
+        "conditions": [],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/Biswajit1999/pid-loop-lab/git/blobs/53e434b2e883d05564aff46a1779ca48524c2fa6",
+          "source_kind": "readme",
+          "source_sha256": "74924b0577f524cf2342c53de130739b7f6febc05ee6fa09f8887f7ee2e2e5a7",
+          "source_url": "https://github.com/Biswajit1999/pid-loop-lab/blob/main/README.md",
+          "verification": "source_based"
+        },
+        "reason": "可用于离线 PID 调参学习和仿真比较，但不能在线调整或部署到运行中的 DCS。",
+        "scenario_id": "auto-distributed-control-system-dcs-855b211e08"
+      },
+      "after": {
+        "applicability": "conditional",
+        "conditions": [
+          "仅用于离线仿真、教学或初步分析；不能连接或在线调整运行中的 DCS，也不能直接部署整定结果。"
+        ],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/Biswajit1999/pid-loop-lab/git/blobs/53e434b2e883d05564aff46a1779ca48524c2fa6",
+          "source_kind": "readme",
+          "source_sha256": "74924b0577f524cf2342c53de130739b7f6febc05ee6fa09f8887f7ee2e2e5a7",
+          "source_url": "https://github.com/Biswajit1999/pid-loop-lab/blob/main/README.md",
+          "verification": "source_based"
+        },
+        "reason": "可用于离线 PID 调参学习和仿真比较，但不能在线调整或部署到运行中的 DCS。",
+        "scenario_id": "auto-distributed-control-system-dcs-855b211e08"
+      },
+      "reviewed_at": "2026-10-29T03:54:36.068296+00:00"
+    },
+    {
+      "repository_id": 146805863,
+      "repository": "RichardRG/LanAlert",
+      "leaf": "it-operations-management-itom",
+      "before": {
+        "applicability": "conditional",
+        "conditions": [
+          "需配置 Lansweeper、Slack bot 及用户邮箱；具体通知流程需核实。"
+        ],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/RichardRG/LanAlert/git/blobs/47dd61eaf3614a7f74c526006e0dcaaaa38a2c49",
+          "source_kind": "readme",
+          "source_sha256": "c382e71eac508d84cd9af7c9ecfda0554afa07aeb58a2788091f762f546e038c",
+          "source_url": "https://github.com/RichardRG/LanAlert/blob/master/README.md",
+          "verification": "source_based"
+        },
+        "reason": "涉及工单通知，但资料未说明工单创建、路由或状态回写。",
+        "scenario_id": "auto-it-operations-management-itom-a446e406e2"
+      },
+      "after": {
+        "applicability": "unverified",
+        "conditions": [
+          "已确认的功能仅为 Lansweeper 与 Slack 之间的工单通知；告警转工单、归属路由和关闭回写未获资料证实。"
+        ],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/RichardRG/LanAlert/git/blobs/47dd61eaf3614a7f74c526006e0dcaaaa38a2c49",
+          "source_kind": "readme",
+          "source_sha256": "c382e71eac508d84cd9af7c9ecfda0554afa07aeb58a2788091f762f546e038c",
+          "source_url": "https://github.com/RichardRG/LanAlert/blob/master/README.md",
+          "verification": "inferred"
+        },
+        "reason": "涉及工单通知，但资料未说明工单创建、路由或状态回写。",
+        "scenario_id": "auto-it-operations-management-itom-a446e406e2"
+      },
+      "reviewed_at": "2026-10-29T03:54:36.090658+00:00"
+    }
+  ],
+  "project_facts_changed": false,
+  "licenses_changed": false,
+  "deletions": 0
+}

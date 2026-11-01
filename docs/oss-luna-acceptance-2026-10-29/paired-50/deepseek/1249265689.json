@@ -1,0 +1,115 @@
+{
+ "repository_id": 1249265689,
+ "domain": "21",
+ "input_sha256": "c24fd5d9fe99f820965cb48a97c144a086f883ad177ab2d9b05737cc4cf59a58",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:12:11.174119+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-dd00737ebeca-e5202",
+ "usage": {
+  "prompt_tokens": 5946,
+  "completion_tokens": 869,
+  "total_tokens": 6815,
+  "prompt_tokens_details": {
+   "cached_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.0014133,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.0014133,
+   "tokens": {
+    "input": 5946,
+    "output": 869,
+    "reasoning": 0,
+    "cache_read": 0,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1249265689,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体与来源一致：正确标注为 API Evangelist 第三方 API 资料索引、非官方仓库、不含软件，许可为 pending，场景均标为 unverified/conditional。少量功能措辞与场景相关性需收紧。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"供应商自动分类与审计就绪排放报告（据资料描述）\",\"source_id\":\"s0\",\"quote\":\"auto-classifies suppliers, and produces audit-ready emissions reporting\",\"reason\":\"来源确实描述平台具备该能力，但这是对 Emitwise 商业平台的描述，不是本仓库功能；卡片已加“据资料描述”限定，仍易被读作仓库特性。\",\"suggested_correction\":\"明确标注为“所描述商业平台的能力，非本仓库实现”。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-carbon-accounting-platform-83925f1230\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"其描述的 API 涉及设施与活动数据文件，可作为对接商业平台清单编制的参考，但仓库本身不执行计算。\",\"source_id\":\"s0\",\"quote\":\"exposes facilities, projects, activity-data files, schema metadata, and aggregated supplier emissions data\",\"reason\":\"来源支持设施与活动数据文件，但未说明排放因子匹配或清单汇总能力；场景核心计算步骤无来源支持，仅能作为对接参考。\",\"suggested_correction\":\"保留 unverified，并明确“因子匹配与清单计算能力未在资料中说明”。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-greenhouse-gas-accounting-83925f1230\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"平台资料称支持按 GHG Protocol 的 Scope 1/2/3 生成排放报告\",\"source_id\":\"s0\",\"quote\":\"aligned with the GHG Protocol (Scope 1, 2, and 3)\",\"reason\":\"来源支持 GHG Protocol 对齐，但“生成排放报告”与多气体 CO2e 计算细节未明确；场景要求组织边界设定与因子匹配，资料未覆盖。\",\"suggested_correction\":\"将条件补充为“组织边界与因子匹配能力需以官方文档核实”。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-product-carbon-footprint-platform-3b35be84a7\",\"severity\":\"minor\",\"kind\":\"irrelevant_scenario\",\"claim\":\"平台涉及产品碳足迹与供应链排放，但资料未明确客户请求响应流程\",\"source_id\":\"s0\",\"quote\":\"measure, manage, and reduce their product carbon footprint (PCF)\",\"reason\":\"来源仅泛称 PCF 能力，未涉及供应商响应下游客户数据请求的流程；相关性弱，标 conditional 偏宽。\",\"suggested_correction\":\"改为 unverified，并说明缺少客户请求响应流程证据。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-product-carbon-footprint-platform-485a8f3e4f\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"资料称可生成审计就绪的排放报告，但未明确产品级客户报告格式\",\"source_id\":\"s0\",\"quote\":\"produces audit-ready emissions reporting\",\"reason\":\"来源的审计就绪报告指企业排放报告，未明确产品级客户报告格式与方法学说明；场景要求的方法学与数据质量说明无来源支持。\",\"suggested_correction\":\"保留 conditional 但补充“产品级报告格式与方法学披露未在资料中说明”。\"}],\"limitations\":[\"仅有 README 与 GitHub 元数据两份来源，未含 apis.yml、OpenAPI 等实际文件内容。\",\"许可状态为 pending，未做许可全文比对，不能据此判定开源授权。\",\"所有场景能力均来自第三方对商业平台的描述，未经官方文档核实。\"]}",
+ "review": {
+  "repository_id": 1249265689,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体与来源一致：正确标注为 API Evangelist 第三方 API 资料索引、非官方仓库、不含软件，许可为 pending，场景均标为 unverified/conditional。少量功能措辞与场景相关性需收紧。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "供应商自动分类与审计就绪排放报告（据资料描述）",
+    "source_id": "s0",
+    "quote": "auto-classifies suppliers, and produces audit-ready emissions reporting",
+    "reason": "来源确实描述平台具备该能力，但这是对 Emitwise 商业平台的描述，不是本仓库功能；卡片已加“据资料描述”限定，仍易被读作仓库特性。",
+    "suggested_correction": "明确标注为“所描述商业平台的能力，非本仓库实现”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-carbon-accounting-platform-83925f1230",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "其描述的 API 涉及设施与活动数据文件，可作为对接商业平台清单编制的参考，但仓库本身不执行计算。",
+    "source_id": "s0",
+    "quote": "exposes facilities, projects, activity-data files, schema metadata, and aggregated supplier emissions data",
+    "reason": "来源支持设施与活动数据文件，但未说明排放因子匹配或清单汇总能力；场景核心计算步骤无来源支持，仅能作为对接参考。",
+    "suggested_correction": "保留 unverified，并明确“因子匹配与清单计算能力未在资料中说明”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-greenhouse-gas-accounting-83925f1230",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "平台资料称支持按 GHG Protocol 的 Scope 1/2/3 生成排放报告",
+    "source_id": "s0",
+    "quote": "aligned with the GHG Protocol (Scope 1, 2, and 3)",
+    "reason": "来源支持 GHG Protocol 对齐，但“生成排放报告”与多气体 CO2e 计算细节未明确；场景要求组织边界设定与因子匹配，资料未覆盖。",
+    "suggested_correction": "将条件补充为“组织边界与因子匹配能力需以官方文档核实”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-product-carbon-footprint-platform-3b35be84a7",
+    "severity": "minor",
+    "kind": "irrelevant_scenario",
+    "claim": "平台涉及产品碳足迹与供应链排放，但资料未明确客户请求响应流程",
+    "source_id": "s0",
+    "quote": "measure, manage, and reduce their product carbon footprint (PCF)",
+    "reason": "来源仅泛称 PCF 能力，未涉及供应商响应下游客户数据请求的流程；相关性弱，标 conditional 偏宽。",
+    "suggested_correction": "改为 unverified，并说明缺少客户请求响应流程证据。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-product-carbon-footprint-platform-485a8f3e4f",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "资料称可生成审计就绪的排放报告，但未明确产品级客户报告格式",
+    "source_id": "s0",
+    "quote": "produces audit-ready emissions reporting",
+    "reason": "来源的审计就绪报告指企业排放报告，未明确产品级客户报告格式与方法学说明；场景要求的方法学与数据质量说明无来源支持。",
+    "suggested_correction": "保留 conditional 但补充“产品级报告格式与方法学披露未在资料中说明”。"
+   }
+  ],
+  "limitations": [
+   "仅有 README 与 GitHub 元数据两份来源，未含 apis.yml、OpenAPI 等实际文件内容。",
+   "许可状态为 pending，未做许可全文比对，不能据此判定开源授权。",
+   "所有场景能力均来自第三方对商业平台的描述，未经官方文档核实。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:12:24.023582+00:00",
+ "elapsed_seconds": 12.848
+}

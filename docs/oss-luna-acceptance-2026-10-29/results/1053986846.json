@@ -1,0 +1,62 @@
+{
+ "repository_id": 1053986846,
+ "domain": "02",
+ "input_sha256": "0ff9c81a7d1c3f64c1a9fccc5c208e1206da273fde0f3c07d55e4ef2516d4073",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:38:12.198992+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCC0xx6hQCcAiqVc2OC4ArPS14qV",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 7139,
+  "completion_tokens": 457,
+  "total_tokens": 7596,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 7136,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0009424000000000001,
+ "response_text": "{\n  \"repository_id\": 1053986846,\n  \"verdict\": \"pass_with_limits\",\n  \"summary\": \"卡片对项目类型、主要功能和 MIT 许可的描述有来源支持。场景与项目有部分关联，但项目比较的是 Octopus 内部电价，不覆盖场景所述的跨供应商比价、套餐筛选及代办切换。\",\n  \"checks\": {\n    \"facts\": \"supported\",\n    \"project_type\": \"supported\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"limited\"\n  },\n  \"issues\": [\n    {\n      \"field\": \"scenario_match\",\n      \"scenario_id\": \"auto-comparison-platform-6ba352a1be\",\n      \"severity\": \"minor\",\n      \"kind\": \"irrelevant_scenario\",\n      \"claim\": \"按用户实际用电量比较多种电价方案成本，属于能源资费比较，但仅限 Octopus 内部电价且不提供切换委托。\",\n      \"source_id\": \"s0\",\n      \"quote\": \"This Home Assistant integration compares electricity costs across different Octopus Energy smart tariffs based on your current day's usage.\",\n      \"reason\": \"项目确实能比较 Octopus 电价，但场景描述的是按邮编和年用量比较供应商套餐、筛选固定费率并委托切换；项目范围明显更窄。现有 conditional 和条件说明已如实标出限制，但该场景的核心任务仍不匹配。\",\n      \"suggested_correction\": \"将该场景标为 unverified 或降低相关性；若保留，明确其仅覆盖 Octopus 用户对自家智能电价的当日成本比较，不支持场景中的跨供应商年费比价或切换委托。\"\n    }\n  ],\n  \"limitations\": [\n    \"审查依据为提供的 README、许可证正文和 GitHub 元数据；未执行代码或独立核验运行行为。\",\n    \"README 明确说明成本为估算，实际费用可能因费率变化、电表准确性和账单周期而异。\"\n  ]\n}",
+ "review": {
+  "repository_id": 1053986846,
+  "verdict": "pass_with_limits",
+  "summary": "卡片对项目类型、主要功能和 MIT 许可的描述有来源支持。场景与项目有部分关联，但项目比较的是 Octopus 内部电价，不覆盖场景所述的跨供应商比价、套餐筛选及代办切换。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-comparison-platform-6ba352a1be",
+    "severity": "minor",
+    "kind": "irrelevant_scenario",
+    "claim": "按用户实际用电量比较多种电价方案成本，属于能源资费比较，但仅限 Octopus 内部电价且不提供切换委托。",
+    "source_id": "s0",
+    "quote": "This Home Assistant integration compares electricity costs across different Octopus Energy smart tariffs based on your current day's usage.",
+    "reason": "项目确实能比较 Octopus 电价，但场景描述的是按邮编和年用量比较供应商套餐、筛选固定费率并委托切换；项目范围明显更窄。现有 conditional 和条件说明已如实标出限制，但该场景的核心任务仍不匹配。",
+    "suggested_correction": "将该场景标为 unverified 或降低相关性；若保留，明确其仅覆盖 Octopus 用户对自家智能电价的当日成本比较，不支持场景中的跨供应商年费比价或切换委托。"
+   }
+  ],
+  "limitations": [
+   "审查依据为提供的 README、许可证正文和 GitHub 元数据；未执行代码或独立核验运行行为。",
+   "README 明确说明成本为估算，实际费用可能因费率变化、电表准确性和账单周期而异。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:38:21.742149+00:00",
+ "elapsed_seconds": 9.543
+}

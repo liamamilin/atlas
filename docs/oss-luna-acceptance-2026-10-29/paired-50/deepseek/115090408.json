@@ -1,0 +1,59 @@
+{
+ "repository_id": 115090408,
+ "domain": "05",
+ "input_sha256": "8b7eb745e6569d6fe9947aee286cdac4c275d3c456ff0e4cdd5d1e13824bb869",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:05.865624+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-dca22d282df9-b731c",
+ "usage": {
+  "prompt_tokens": 2868,
+  "completion_tokens": 231,
+  "total_tokens": 3099,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00049354,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00049354,
+   "tokens": {
+    "input": 2356,
+    "output": 231,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":115090408,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片内容基本与 README 和元数据一致：在线拍卖网站，卖家上传物品并设起拍价，买家竞价，记录出价，最高出价者成交；技术栈 Django/HTML/CSS/MySQL。项目类型标为 application 合理，许可状态 pending 保守如实。两个场景匹配均标为 conditional/unverified，并写明未覆盖的现场落槌、编目估价等条件，未把窄功能当作完整业务。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"仅提供 README 与 GitHub 元数据，未包含源码，无法核验功能实现程度与数据库结构。\",\"许可状态为 pending，未发现许可证文件；README 未声明许可，不能据此认定开源授权。\",\"场景匹配基于 README 描述推断，现场拍卖与委托编目能力均未在来源中说明，属证据不足而非已证实缺失。\"]}",
+ "review": {
+  "repository_id": 115090408,
+  "verdict": "pass_with_limits",
+  "summary": "卡片内容基本与 README 和元数据一致：在线拍卖网站，卖家上传物品并设起拍价，买家竞价，记录出价，最高出价者成交；技术栈 Django/HTML/CSS/MySQL。项目类型标为 application 合理，许可状态 pending 保守如实。两个场景匹配均标为 conditional/unverified，并写明未覆盖的现场落槌、编目估价等条件，未把窄功能当作完整业务。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "仅提供 README 与 GitHub 元数据，未包含源码，无法核验功能实现程度与数据库结构。",
+   "许可状态为 pending，未发现许可证文件；README 未声明许可，不能据此认定开源授权。",
+   "场景匹配基于 README 描述推断，现场拍卖与委托编目能力均未在来源中说明，属证据不足而非已证实缺失。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:11:11.382119+00:00",
+ "elapsed_seconds": 5.516
+}

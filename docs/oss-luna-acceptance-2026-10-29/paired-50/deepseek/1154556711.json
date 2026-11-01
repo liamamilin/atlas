@@ -1,0 +1,82 @@
+{
+ "repository_id": 1154556711,
+ "domain": "28",
+ "input_sha256": "10583e1ca6da5c9b1fba14d58e5e9667881e300f6dc6b082ae135ea98173b77a",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:12:41.414860+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-dca22d282df9-b87b0",
+ "usage": {
+  "prompt_tokens": 2973,
+  "completion_tokens": 432,
+  "total_tokens": 3405,
+  "prompt_tokens_details": {
+   "cached_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00070515,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00070515,
+   "tokens": {
+    "input": 2973,
+    "output": 432,
+    "reasoning": 0,
+    "cache_read": 0,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1154556711,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片与 README 基本一致：健身房会员管理应用，功能、技术栈与定位均有来源支持；许可为 pending 且未过度声明；场景匹配标为 unverified 并列出欠费/提醒待核实条件，属保守处理。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-sports-club-management-efa0c4ed48\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"可跟踪会员到期状态，辅助续费管理\",\"source_id\":\"s0\",\"quote\":\"Separate views for **Expired** and **Expiring (within 3 days)** accounts\",\"reason\":\"README 仅支持到期状态查看，未提及欠费标记、缴费跟踪或提醒发送；场景核心的欠费催缴能力无来源支持，卡片已标 unverified 并列条件，但 reason 措辞偏正面。\",\"suggested_correction\":\"将 reason 改为仅支持到期状态查看，欠费与提醒能力未在来源中体现，需核实。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"管理员仪表盘查看会员，区分已过期与3天内到期\",\"source_id\":\"s0\",\"quote\":\"Separate views for **Expired** and **Expiring (within 3 days)** accounts\",\"reason\":\"功能本身有来源支持，但未提及“仪表盘”统计视图，README 描述为分离视图与搜索过滤。\",\"suggested_correction\":\"改为“管理员视图区分已过期与3天内到期会员，支持搜索过滤”。\"}],\"limitations\":[\"仅提供 README 与 GitHub 元数据，未审源码实现细节。\",\"许可状态 pending，未做许可全文核验。\",\"场景匹配为 unverified，欠费与提醒能力缺乏来源证据。\"]}",
+ "review": {
+  "repository_id": 1154556711,
+  "verdict": "pass_with_limits",
+  "summary": "卡片与 README 基本一致：健身房会员管理应用，功能、技术栈与定位均有来源支持；许可为 pending 且未过度声明；场景匹配标为 unverified 并列出欠费/提醒待核实条件，属保守处理。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-sports-club-management-efa0c4ed48",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "可跟踪会员到期状态，辅助续费管理",
+    "source_id": "s0",
+    "quote": "Separate views for **Expired** and **Expiring (within 3 days)** accounts",
+    "reason": "README 仅支持到期状态查看，未提及欠费标记、缴费跟踪或提醒发送；场景核心的欠费催缴能力无来源支持，卡片已标 unverified 并列条件，但 reason 措辞偏正面。",
+    "suggested_correction": "将 reason 改为仅支持到期状态查看，欠费与提醒能力未在来源中体现，需核实。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "管理员仪表盘查看会员，区分已过期与3天内到期",
+    "source_id": "s0",
+    "quote": "Separate views for **Expired** and **Expiring (within 3 days)** accounts",
+    "reason": "功能本身有来源支持，但未提及“仪表盘”统计视图，README 描述为分离视图与搜索过滤。",
+    "suggested_correction": "改为“管理员视图区分已过期与3天内到期会员，支持搜索过滤”。"
+   }
+  ],
+  "limitations": [
+   "仅提供 README 与 GitHub 元数据，未审源码实现细节。",
+   "许可状态 pending，未做许可全文核验。",
+   "场景匹配为 unverified，欠费与提醒能力缺乏来源证据。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:12:49.791180+00:00",
+ "elapsed_seconds": 8.376
+}

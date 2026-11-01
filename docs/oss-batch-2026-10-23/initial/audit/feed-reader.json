@@ -1,0 +1,238 @@
+{
+ "schema": "atlas.discovery.v1",
+ "leaf": "feed-reader",
+ "run_id": "oss_72977ff2a1b148caad7713135727fa5a",
+ "started_at": "2026-10-23T02:02:01.423533+00:00",
+ "searches": [
+  {
+   "query": "rss reader unread in:name,description,topics archived:false fork:false stars:>=100",
+   "retrieved_at": "2026-10-23T02:02:10.761998+00:00",
+   "total_count": 0,
+   "repository_ids": [],
+   "results": []
+  },
+  {
+   "query": "podcast rss player in:name,description,topics archived:false fork:false stars:>=100",
+   "retrieved_at": "2026-10-23T02:02:12.359237+00:00",
+   "total_count": 5,
+   "repository_ids": [
+    382113082,
+    23906078,
+    754217830,
+    458983882,
+    108293181
+   ],
+   "results": [
+    {
+     "id": 382113082,
+     "full_name": "plenaryapp/awesome-rss-feeds",
+     "description": "Awesome RSS feeds - A curated list of RSS feeds (and OPML files) used in Recommended Feeds and local news sections of Plenary - an RSS reader, article downloader and a podcast player app for android",
+     "html_url": "https://github.com/plenaryapp/awesome-rss-feeds",
+     "license": {
+      "key": "cc0-1.0",
+      "name": "Creative Commons Zero v1.0 Universal",
+      "spdx_id": "CC0-1.0",
+      "url": "https://api.github.com/licenses/cc0-1.0",
+      "node_id": "MDc6TGljZW5zZTY="
+     }
+    },
+    {
+     "id": 23906078,
+     "full_name": "martinrotter/rssguard",
+     "description": "Feed reader (podcast player, basic XMPP client and also Gemini protocol client) which supports RSS/ATOM/JSON and many web-based feed services.",
+     "html_url": "https://github.com/martinrotter/rssguard",
+     "license": {
+      "key": "gpl-3.0",
+      "name": "GNU General Public License v3.0",
+      "spdx_id": "GPL-3.0",
+      "url": "https://api.github.com/licenses/gpl-3.0",
+      "node_id": "MDc6TGljZW5zZTk="
+     }
+    },
+    {
+     "id": 754217830,
+     "full_name": "SkyD666/PodAura",
+     "description": "All-in-on podcast app for RSS, media dl & play. MVI arch, Material You style. ⭐️ Star to support!",
+     "html_url": "https://github.com/SkyD666/PodAura",
+     "license": {
+      "key": "gpl-3.0",
+      "name": "GNU General Public License v3.0",
+      "spdx_id": "GPL-3.0",
+      "url": "https://api.github.com/licenses/gpl-3.0",
+      "node_id": "MDc6TGljZW5zZTk="
+     }
+    },
+    {
+     "id": 458983882,
+     "full_name": "Yetangitu/Spodcast",
+     "description": "Spodcast is a caching Spotify podcast to RSS proxy. Using Spodcast you can follow Spotify-hosted netcasts/podcasts using any player which supports RSS, thus enabling the use of older hardware which is not compatible with the Spotify (web) app.",
+     "html_url": "https://github.com/Yetangitu/Spodcast",
+     "license": {
+      "key": "gpl-3.0",
+      "name": "GNU General Public License v3.0",
+      "spdx_id": "GPL-3.0",
+      "url": "https://api.github.com/licenses/gpl-3.0",
+      "node_id": "MDc6TGljZW5zZTk="
+     }
+    },
+    {
+     "id": 108293181,
+     "full_name": "MrChuckomo/poddycast",
+     "description": "Podcast app made with Electron, lots of ❤️ and ☕️",
+     "html_url": "https://github.com/MrChuckomo/poddycast",
+     "license": {
+      "key": "gpl-3.0",
+      "name": "GNU General Public License v3.0",
+      "spdx_id": "GPL-3.0",
+      "url": "https://api.github.com/licenses/gpl-3.0",
+      "node_id": "MDc6TGljZW5zZTk="
+     }
+    }
+   ]
+  },
+  {
+   "query": "opml import export in:name,description,topics archived:false fork:false stars:>=100",
+   "retrieved_at": "2026-10-23T02:02:13.660979+00:00",
+   "total_count": 0,
+   "repository_ids": [],
+   "results": []
+  }
+ ],
+ "rejections": [],
+ "leaf_source_sha256": "b91e3b12c150b30bf7f6c5ae36b7e8086249a75b211c14347f67c6fd308df2a8",
+ "scenarios": [
+  {
+   "id": "auto-feed-reader-b308646523",
+   "name": "多源未读内容的日常清理",
+   "description": "关注了数十个博客与新闻站点的个人读者，打开阅读器查看各订阅源自上次以来新增的未读条目，用键盘逐条扫描标题、读完部分文章、其余批量标记为已读，并把值得回看的条目加星留存。",
+   "search_queries": [
+    "rss reader unread"
+   ],
+   "leaf": "feed-reader",
+   "leaf_name": "阅读器",
+   "generation_method": "model_from_existing_leaf",
+   "generator_version": "atlas.discovery.v1"
+  },
+  {
+   "id": "auto-feed-reader-8497d9ddb0",
+   "name": "播客与视频频道的订阅收听",
+   "description": "以音频和视频内容为主的听众，把常听的播客节目和视频频道加入同一份订阅列表，让新上架的单集或视频自动进入待听队列，在应用内直接播放并保留收听进度，未听完的留待下次继续。",
+   "search_queries": [
+    "podcast rss player"
+   ],
+   "leaf": "feed-reader",
+   "leaf_name": "阅读器",
+   "generation_method": "model_from_existing_leaf",
+   "generator_version": "atlas.discovery.v1"
+  },
+  {
+   "id": "auto-feed-reader-cd7a604a06",
+   "name": "订阅列表的迁移与清理",
+   "description": "长期使用阅读器的用户，在换设备或更换阅读工具时用 OPML 导入导出整份订阅列表，并定期检查长期没有新条目或抓取报错的来源，逐个决定保留还是删除，保持列表精简可用。",
+   "search_queries": [
+    "opml import export"
+   ],
+   "leaf": "feed-reader",
+   "leaf_name": "阅读器",
+   "generation_method": "model_from_existing_leaf",
+   "generator_version": "atlas.discovery.v1"
+  }
+ ],
+ "selected_ids": [
+  23906078,
+  108293181,
+  754217830
+ ],
+ "screen_rejections": [
+  {
+   "repository_id": 382113082,
+   "reason": "这是一个 RSS 订阅源/OPML 的 awesome 集合，不是可用的 Feed Reader 应用产品。"
+  },
+  {
+   "repository_id": 458983882,
+   "reason": "这是一个将 Spotify 播客转换为 RSS 的代理/生成器，属于基础设施工具，不是面向用户的订阅阅读应用。"
+  }
+ ],
+ "accepted_repository_ids": [
+  23906078,
+  108293181,
+  754217830
+ ],
+ "result": {
+  "id": "oss_72977ff2a1b148caad7713135727fa5a",
+  "leaf": "feed-reader",
+  "status": "completed",
+  "started_at": "2026-10-23T02:02:01.417057+00:00",
+  "created": 3,
+  "updated": 0,
+  "unchanged": 0,
+  "failed": 0,
+  "processed": 3,
+  "errors": [],
+  "mode": "automatic",
+  "phase": "store",
+  "model_calls": 3,
+  "model_cache_hits": 0,
+  "rejected": 0,
+  "total": 3,
+  "model_receipts": [
+   {
+    "stage": "scenarios",
+    "input_sha256": "66650274b174a11ac60b8e579006bb0a0e4c9fe055efe5eef5352fec48d42cdb",
+    "cached": false,
+    "model": "deepseek-flash",
+    "provider": "open-design",
+    "usage": {
+     "prompt_tokens": 2920,
+     "completion_tokens": 674,
+     "total_tokens": 3594,
+     "cost": null
+    },
+    "created_at": "2026-10-23T02:02:08.759413+00:00"
+   },
+   {
+    "stage": "screen",
+    "input_sha256": "7c7b92e72b72ea0c1fa3ced45b20bae4b66583abeb4707b87433ee0eaaaf3082",
+    "cached": false,
+    "model": "deepseek-flash",
+    "provider": "open-design",
+    "usage": {
+     "prompt_tokens": 3043,
+     "completion_tokens": 458,
+     "total_tokens": 3501,
+     "cost": null
+    },
+    "created_at": "2026-10-23T02:02:18.765440+00:00"
+   },
+   {
+    "stage": "extract",
+    "input_sha256": "99341b281cc6fd3745d203eb643f51b8c45a76401959732b02611e896c24280c",
+    "cached": false,
+    "model": "deepseek-flash",
+    "provider": "open-design",
+    "usage": {
+     "prompt_tokens": 5022,
+     "completion_tokens": 4134,
+     "total_tokens": 9156,
+     "cost": null
+    },
+    "created_at": "2026-10-23T02:02:50.726055+00:00"
+   }
+  ],
+  "discovered": 5,
+  "accepted": 3,
+  "gaps": [
+   {
+    "scenario": "多源未读内容的日常清理",
+    "projects": 1,
+    "target": 3
+   },
+   {
+    "scenario": "订阅列表的迁移与清理",
+    "projects": 2,
+    "target": 3
+   }
+  ]
+ },
+ "finished_at": "2026-10-23T02:03:03.193924+00:00"
+}

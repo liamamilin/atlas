@@ -1,0 +1,74 @@
+{
+ "repository_id": 897178056,
+ "domain": "22",
+ "input_sha256": "7f9499c041d03489d4b70b774dd5b33ccf13ffe08aff17e23589698c00c1edf5",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:55.748734+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDeFwHiUOe2PYhvHqBqbECjGebV",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 2870,
+  "completion_tokens": 499,
+  "total_tokens": 3369,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 2867,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0005365,
+ "response_text": "{\"repository_id\":897178056,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片将项目定位为 PHP 远程 API 客户端库，功能描述与 README 示例基本相符；许可保持 pending，场景也明确标为 conditional。README 仅提供示例，不能据此确认完整实现或药房发送能力。\",\"checks\":{\"facts\":\"limited\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"summary\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"README展示PHP类ElectronicPrescribingServer，通过构造参数（API地址、手机号、密码）调用远程接口\",\"source_id\":\"s0\",\"quote\":\"$obj=new ElectronicPrescribingServer('https://test-zxcf.gdsz101.com/api','13311111111','test123456');\",\"reason\":\"README 示例确实展示了构造调用，但材料未提供类实现或其他源码，不能确认其完整行为及参数语义；当前表述将示例概括为已实现的远程接口封装。\",\"suggested_correction\":\"改为“README 示例展示了 ElectronicPrescribingServer 的构造与若干方法调用；实现细节未由本次材料核验”。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-electronic-prescribing-bdf28f46e4\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"需确认该API是否支持向药房电子发送\",\"source_id\":\"s0\",\"quote\":\"$obj->createRxinfo([\",\"reason\":\"场景描述还要求选择患者偏好的药房、签名并电子发送；README 示例只展示创建处方调用，未说明这些环节。条件已指出需确认发送能力，但未明确药房选择与签名能力也未获证实。\",\"suggested_correction\":\"在条件中注明药房选择、签名及发送能力均未由现有资料确认；保留 conditional。\"}],\"limitations\":[\"仅有一份未截断的 README 和 GitHub 元数据；未提供实现源码或其他文档。\",\"README 中的示例凭据及测试 API 地址不构成对服务可用性或生产能力的验证。\",\"许可状态为 pending，未发现许可证文件；本次不据此推断开源授权。\"]}",
+ "review": {
+  "repository_id": 897178056,
+  "verdict": "pass_with_limits",
+  "summary": "卡片将项目定位为 PHP 远程 API 客户端库，功能描述与 README 示例基本相符；许可保持 pending，场景也明确标为 conditional。README 仅提供示例，不能据此确认完整实现或药房发送能力。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "summary",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "README展示PHP类ElectronicPrescribingServer，通过构造参数（API地址、手机号、密码）调用远程接口",
+    "source_id": "s0",
+    "quote": "$obj=new ElectronicPrescribingServer('https://test-zxcf.gdsz101.com/api','13311111111','test123456');",
+    "reason": "README 示例确实展示了构造调用，但材料未提供类实现或其他源码，不能确认其完整行为及参数语义；当前表述将示例概括为已实现的远程接口封装。",
+    "suggested_correction": "改为“README 示例展示了 ElectronicPrescribingServer 的构造与若干方法调用；实现细节未由本次材料核验”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-electronic-prescribing-bdf28f46e4",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "需确认该API是否支持向药房电子发送",
+    "source_id": "s0",
+    "quote": "$obj->createRxinfo([",
+    "reason": "场景描述还要求选择患者偏好的药房、签名并电子发送；README 示例只展示创建处方调用，未说明这些环节。条件已指出需确认发送能力，但未明确药房选择与签名能力也未获证实。",
+    "suggested_correction": "在条件中注明药房选择、签名及发送能力均未由现有资料确认；保留 conditional。"
+   }
+  ],
+  "limitations": [
+   "仅有一份未截断的 README 和 GitHub 元数据；未提供实现源码或其他文档。",
+   "README 中的示例凭据及测试 API 地址不构成对服务可用性或生产能力的验证。",
+   "许可状态为 pending，未发现许可证文件；本次不据此推断开源授权。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:40:02.799233+00:00",
+ "elapsed_seconds": 7.051
+}

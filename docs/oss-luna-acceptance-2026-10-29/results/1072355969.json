@@ -1,0 +1,62 @@
+{
+ "repository_id": 1072355969,
+ "domain": "15",
+ "input_sha256": "c939ce69b9dab862c5e285b0a1bc6ea0e367b8d8c98d13db0f8bf9296dff0957",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:25.360820+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCD9XbiWn0HLcCZkY7F5JS3Stdyn",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 3150,
+  "completion_tokens": 379,
+  "total_tokens": 3529,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 3147,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0005045,
+ "response_text": "{\"repository_id\":1072355969,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片将仓库描述为模拟教学材料而非可部署软件，且许可证保持 pending，整体与来源相符。场景匹配均明确标为 conditional 并说明限制；但现有材料只展示 POA&M 示例，不能支持其具备实际修复跟踪工作流的暗示。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-cloud-security-posture-management-cspm-8986d055c1\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"演示修复计划与状态跟踪的文档格式，非实际发现项工作流系统。\",\"source_id\":\"s0\",\"quote\":\"How to build structured, trackable remediation workflows\",\"reason\":\"README 提到学习构建可跟踪的修复工作流，但给出的内容仅展示 POA&M 表格示例；不足以确认它提供错误配置发现项分配、修复指引或复评关闭流程。卡片已标 conditional 并限定为文档模板参考，因此不应据此认定为实际工作流系统。\",\"suggested_correction\":\"保留 conditional 和文档模板限制；将理由收紧为来源展示 POA&M 示例，未证明支持发现项分配、复评或关闭。\"}],\"limitations\":[\"仅有 README 与仓库元数据；README 未截断，但未提供仓库其他文件内容，无法核验其引用的完整 POA&M 文件或实际实现。\",\"许可证状态为 pending，来源元数据未声明许可证；本次不据此推断开源授权。\"]}",
+ "review": {
+  "repository_id": 1072355969,
+  "verdict": "pass_with_limits",
+  "summary": "卡片将仓库描述为模拟教学材料而非可部署软件，且许可证保持 pending，整体与来源相符。场景匹配均明确标为 conditional 并说明限制；但现有材料只展示 POA&M 示例，不能支持其具备实际修复跟踪工作流的暗示。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-cloud-security-posture-management-cspm-8986d055c1",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "演示修复计划与状态跟踪的文档格式，非实际发现项工作流系统。",
+    "source_id": "s0",
+    "quote": "How to build structured, trackable remediation workflows",
+    "reason": "README 提到学习构建可跟踪的修复工作流，但给出的内容仅展示 POA&M 表格示例；不足以确认它提供错误配置发现项分配、修复指引或复评关闭流程。卡片已标 conditional 并限定为文档模板参考，因此不应据此认定为实际工作流系统。",
+    "suggested_correction": "保留 conditional 和文档模板限制；将理由收紧为来源展示 POA&M 示例，未证明支持发现项分配、复评或关闭。"
+   }
+  ],
+  "limitations": [
+   "仅有 README 与仓库元数据；README 未截断，但未提供仓库其他文件内容，无法核验其引用的完整 POA&M 文件或实际实现。",
+   "许可证状态为 pending，来源元数据未声明许可证；本次不据此推断开源授权。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:31.431114+00:00",
+ "elapsed_seconds": 6.07
+}

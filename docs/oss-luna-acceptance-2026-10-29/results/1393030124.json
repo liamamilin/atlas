@@ -1,0 +1,50 @@
+{
+ "repository_id": 1393030124,
+ "domain": "29",
+ "input_sha256": "fe5ac3e65c0ee400ca82a2ccf3be6c493355f4e29cdc66343c8371aab7c8b55d",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:34.274322+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCEGIgaDDRhtA9S3TJTEfcRoTcti",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 4309,
+  "completion_tokens": 156,
+  "total_tokens": 4465,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 4306,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0005089000000000001,
+ "response_text": "{\"repository_id\":1393030124,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片对项目类型、后端定位、主要功能和 MIT 许可的描述有来源支持；场景匹配已标注未验证或条件适用，并列出关键缺项。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[],\"limitations\":[\"功能依据为 README 自述，未独立核验实现或生产可用性；卡片已注明未见部署或生产验证说明。\",\"两个场景均非直接适用：一个标为 unverified，另一个标为 conditional，并明确列出未确认的场景能力。\"]}",
+ "review": {
+  "repository_id": 1393030124,
+  "verdict": "pass_with_limits",
+  "summary": "卡片对项目类型、后端定位、主要功能和 MIT 许可的描述有来源支持；场景匹配已标注未验证或条件适用，并列出关键缺项。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [],
+  "limitations": [
+   "功能依据为 README 自述，未独立核验实现或生产可用性；卡片已注明未见部署或生产验证说明。",
+   "两个场景均非直接适用：一个标为 unverified，另一个标为 conditional，并明确列出未确认的场景能力。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:40:38.464710+00:00",
+ "elapsed_seconds": 4.19
+}

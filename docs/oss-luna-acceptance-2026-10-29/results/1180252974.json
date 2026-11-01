@@ -1,0 +1,62 @@
+{
+ "repository_id": 1180252974,
+ "domain": "22",
+ "input_sha256": "83440b09eaf9e6256bbbf444c50ca6bea6a6b142187b1a0be309a7d7ae5ade68",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:57.382604+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDfohYMcK0t3p3yMFY8ZQ8hhmKW",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 2338,
+  "completion_tokens": 370,
+  "total_tokens": 2708,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 2335,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0004188,
+ "response_text": "{\"repository_id\":1180252974,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片基本忠实于 README 对移动药房应用及其功能的描述，并明确标注实现程度未知、许可证待核验。场景匹配仅属有限相关：药房续配请求不等同于场景所述诊所开方流程及状态查询。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-patient-portal-648a06c362\",\"severity\":\"minor\",\"kind\":\"irrelevant_scenario\",\"claim\":\"提供处方续配请求功能，但属药房应用而非诊所门户\",\"source_id\":\"s0\",\"quote\":\"mobile pharmacy app for Live Well Pharmacy enabling prescription refills, refill requests\",\"reason\":\"场景要求患者向诊所提交续配申请、进入诊所开方流程并在线查看处理状态；来源只描述药房应用及续配请求，未支持诊所流程或状态查询。卡片已指出应用并非诊所门户且标为 conditional，因此这是相关性有限，而非把能力标成直接适用。\",\"suggested_correction\":\"保留 conditional，并明确该应用仅与续配申请主题相关；场景所需的诊所开方流程和处理状态查询未获来源支持。\"}],\"limitations\":[\"材料仅含一段未截断的 README 描述及 GitHub 元数据；不能据此核验实际实现、HIPAA 合规性或完整仓库内容。\",\"许可证状态为 pending，且卡片注明未发现许可证文件；本次不据此推断仓库已获开源授权。\"]}",
+ "review": {
+  "repository_id": 1180252974,
+  "verdict": "pass_with_limits",
+  "summary": "卡片基本忠实于 README 对移动药房应用及其功能的描述，并明确标注实现程度未知、许可证待核验。场景匹配仅属有限相关：药房续配请求不等同于场景所述诊所开方流程及状态查询。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-patient-portal-648a06c362",
+    "severity": "minor",
+    "kind": "irrelevant_scenario",
+    "claim": "提供处方续配请求功能，但属药房应用而非诊所门户",
+    "source_id": "s0",
+    "quote": "mobile pharmacy app for Live Well Pharmacy enabling prescription refills, refill requests",
+    "reason": "场景要求患者向诊所提交续配申请、进入诊所开方流程并在线查看处理状态；来源只描述药房应用及续配请求，未支持诊所流程或状态查询。卡片已指出应用并非诊所门户且标为 conditional，因此这是相关性有限，而非把能力标成直接适用。",
+    "suggested_correction": "保留 conditional，并明确该应用仅与续配申请主题相关；场景所需的诊所开方流程和处理状态查询未获来源支持。"
+   }
+  ],
+  "limitations": [
+   "材料仅含一段未截断的 README 描述及 GitHub 元数据；不能据此核验实际实现、HIPAA 合规性或完整仓库内容。",
+   "许可证状态为 pending，且卡片注明未发现许可证文件；本次不据此推断仓库已获开源授权。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:40:03.353312+00:00",
+ "elapsed_seconds": 5.971
+}

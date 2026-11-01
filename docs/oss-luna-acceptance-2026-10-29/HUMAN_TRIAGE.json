@@ -1,0 +1,80 @@
+{
+  "reviewed_at": "2026-10-29T04:43:05.752856+00:00",
+  "human_review_cases": 6,
+  "priority_model_flags_reviewed": 5,
+  "remaining_model_suggestions_not_fully_triaged": true,
+  "scope": "All five needs_review cases plus one minor wording sample; not a complete human review of 100 projects.",
+  "production_writes": false,
+  "cases": [
+    {
+      "repository_id": 1275838307,
+      "repository_url": "https://github.com/AhadiCoDeR1v1/Smart-city-resource-management",
+      "disposition": "confirmed_fact_mismatch",
+      "field": "positioning",
+      "judgment": "归档 README 明确是 Java Swing 城市资源与公共服务模拟程序；卡片定位却写成物流车队运输运营管理并列出司机、行程维护，与来源及同卡 summary/scope 不一致。建议收紧定位；未修改生产库。",
+      "other_model_issue": "该项目的公交场景已标 unverified 且写明仅作模拟，不能把这条诚实待核关联直接当作误收录。",
+      "input_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-luna-acceptance-2026-10-29/inputs/1275838307.json",
+      "input_sha256": "9250c431c510324cfb4bf163e7980c66d0a35bdcc4a1b3ff4feddfc3c020e1db",
+      "result_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-luna-acceptance-2026-10-29/results/1275838307.json",
+      "result_sha256": "b5a9d9fbb5cdbbf73543425988ded5c223b569fc2322b05ad4054636ffc210ab"
+    },
+    {
+      "repository_id": 443410281,
+      "repository_url": "https://github.com/paulveillard/cybersecurity-incident-response",
+      "disposition": "confirmed_documentation_license_conflict",
+      "field": "license",
+      "judgment": "归档 LICENSE 是完整 Apache-2.0，原 SPDX 全文核验有依据；README 却写 MIT 与 CC BY 4.0。确认是官方文件间授权表述冲突，需要补冲突说明并复核适用范围，不能把模型意见当成许可裁决。",
+      "input_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-luna-acceptance-2026-10-29/inputs/443410281.json",
+      "input_sha256": "08fa3126675ebb1fbab89ad25942be09799218845b18eec3d4119aabdadc9680",
+      "result_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-luna-acceptance-2026-10-29/results/443410281.json",
+      "result_sha256": "eba4fdcda4522881ed50007272ed9ced15c005c5ef05aa05524911ff57c7bbd9"
+    },
+    {
+      "repository_id": 865480664,
+      "repository_url": "https://github.com/Cognitivemesh/burga",
+      "disposition": "not_confirmed_conservative_label_already_present",
+      "judgment": "定位已用“目标”表述，类型 unknown、范围未知，summary 明确只评价 README 未给实现细节。元数据的功能描述不是实现证据；模型提出的否定理由没有证明原卡失实。",
+      "input_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-luna-acceptance-2026-10-29/inputs/865480664.json",
+      "input_sha256": "82b3836382d3a1a629a0787ca95c57d7f6896d792b7fefd6a6199547b1a92c58",
+      "result_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-luna-acceptance-2026-10-29/results/865480664.json",
+      "result_sha256": "94e26854f08bca616a7b6a9668f2672f44e58f1b282f28263962dc64a660c03c"
+    },
+    {
+      "repository_id": 999135399,
+      "repository_url": "https://github.com/daniellajiddah/Blockchain-Based-Intellectual-Property-Portfolio-Management",
+      "disposition": "not_confirmed_runtime_validation_outside_this_review",
+      "judgment": "README 明确描述五类合约、函数与部署方式，卡片也指出路线图未完项，场景带需自行汇总/导出条件。不能仅因审核包没有源码就判 application 类型错误；README 来源审阅不等于运行功能验证。可增加“README 描述”归因措辞。",
+      "input_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-luna-acceptance-2026-10-29/inputs/999135399.json",
+      "input_sha256": "1f7b54547d8b2b8a33cb23974c2ac0e214bed91dca2cd96295cbcb4e1dccdc16",
+      "result_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-luna-acceptance-2026-10-29/results/999135399.json",
+      "result_sha256": "b21ef777159ab363b99f4f9569642fe0e412f938bf06a47214c80de8b528c254"
+    },
+    {
+      "repository_id": 1157656480,
+      "repository_url": "https://github.com/lincolncommercialsolutions/PawDash",
+      "disposition": "wording_refinement_not_license_misclassification",
+      "judgment": "README 自称 proprietary，卡片许可标签仍 pending，摘要已经区分未来 Stripe/WebSocket，且场景 reason 写明抢单非自主选择。许可句宜明确为“README 自称专有”；没有证据支持模型直接判已核验许可过度承诺。",
+      "input_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-luna-acceptance-2026-10-29/inputs/1157656480.json",
+      "input_sha256": "6cc0d75484519bf772c1775c756b5630d4d00921349954e153b35e2d8c808a55",
+      "result_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-luna-acceptance-2026-10-29/results/1157656480.json",
+      "result_sha256": "f29e526d6524f5b7212e4ba598bc043c18b6cdc68770419b851a7135644da8f2"
+    },
+    {
+      "repository_id": 1096079955,
+      "repository_url": "https://github.com/ecmr/class-meeting",
+      "disposition": "confirmed_minor_wording_overreach",
+      "field": "scope",
+      "judgment": "短 README 列出 Oracle Cloud Free Tier 数据库与信令技术，但没有规模测试或必须绑定该云的论证。scope 中“小规模”和强制“部署依赖”宜改为来源可证的技术说明；WebRTC 技术用途本身有 README 支持。",
+      "input_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-luna-acceptance-2026-10-29/inputs/1096079955.json",
+      "input_sha256": "44c64c07906a99ada33c8fe829f75fc23dae060a5285c9b147df7f5cf3d57940",
+      "result_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-luna-acceptance-2026-10-29/results/1096079955.json",
+      "result_sha256": "04452fe0cdf1454684cfbbc0369d58f030aed9bfcd097a2023879db2ee6897e3"
+    }
+  ],
+  "calibration_needed": [
+    "README-backed descriptions are source verification, not executable-code or business-process testing. Do not fail solely because source code is absent from the evidence package.",
+    "A clearly stated conditional/unverified gap is not itself an error or a reason to delete a candidate.",
+    "Require attributable quotes; 11 result files contained at least one non-verbatim model citation and need source recheck.",
+    "Report conflicts among README/LICENSE/metadata separately from exact license-text matching."
+  ]
+}

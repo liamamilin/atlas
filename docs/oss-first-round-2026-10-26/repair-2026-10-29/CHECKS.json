@@ -1,0 +1,17 @@
+{
+  "oss_tests_passed": 105,
+  "openai_backup_tests_passed": 6,
+  "methods": [
+    "python3 -m unittest discover -s tests -p test_oss*.py (103 tests before adding 2 repair campaign tests)",
+    "python3 -m unittest discover -s tests -p test_oss_repair_campaign.py (2 tests)",
+    "python3 -m unittest discover -s tests -p test_openai_backup.py (6 tests)"
+  ],
+  "critical_contracts": [
+    "同一搜索窗口100→50→25拆页，3MiB边界保留",
+    "I/O通用词接受、仓库选择器继续拒绝",
+    "已观察中文字段别名仍受类型和长度校验",
+    "空内容最多3次，失败不缓存为结果",
+    "旧候选状态/元数据及项目事实/许可/收藏不被修复覆盖",
+    "原0目标叶子补选最多60、重复接回不重复目标"
+  ]
+}

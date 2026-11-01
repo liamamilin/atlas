@@ -1,0 +1,45 @@
+{
+ "at": "2026-10-29T05:43:57.760235+00:00",
+ "offline_tests": {
+  "passed": 14,
+  "command": "python3 -m unittest test_full_audit test_review_sample test_compare_models"
+ },
+ "validated_existing_primary_receipts": 104,
+ "real_deployment_requests": {
+  "openai_gpt_6_luna": 4,
+  "go_deepseek_v4_1_flash": 2
+ },
+ "request_groups": [
+  {
+   "stage": "primary",
+   "provider": "openai",
+   "state": "settled",
+   "error_code": null,
+   "count": 4
+  },
+  {
+   "stage": "secondary",
+   "provider": "opencode-go",
+   "state": "settled",
+   "error_code": null,
+   "count": 2
+  }
+ ],
+ "budget": {
+  "charged_upper_micro": 183570,
+  "estimated_micro": 114274,
+  "reserved_micro": 10000,
+  "available_micro": 49806430,
+  "cap_micro": 50000000
+ },
+ "api_5199_http": 200,
+ "frontend_5188_http": 200,
+ "production_preserved": {
+  "project_keys": true,
+  "memberships": true,
+  "matches": true,
+  "favorites": true,
+  "jobs": true
+ },
+ "model_settings_preserved": true
+}

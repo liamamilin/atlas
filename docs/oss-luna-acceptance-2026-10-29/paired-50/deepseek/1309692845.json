@@ -1,0 +1,115 @@
+{
+ "repository_id": 1309692845,
+ "domain": "27",
+ "input_sha256": "3e2f6ef405db4bddc744d87063b2e4d32e92ca1d65fc964f92fd11afd88f8c5d",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:12:34.880049+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-d90fbd992745-13104a",
+ "usage": {
+  "prompt_tokens": 6062,
+  "completion_tokens": 974,
+  "total_tokens": 7036,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00141844,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00141844,
+   "tokens": {
+    "input": 5550,
+    "output": 974,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1309692845,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片事实、定位、范围、功能与项目类型基本有 README/元数据支持，MIT 许可有完整正文核验；场景匹配总体保守，但首轮拆解场景的 conditional 标签与“非分场拆解表”的说明需更明确。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-script-breakdown-application-905d7b83a0\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"可从剧本生成场景与元素拆解，但输出为视觉 deck，非分场拆解表\",\"source_id\":\"s0\",\"quote\":\"Scriptlook builds a first-pass deck with creative direction, scenes, casting, locations, props, storyboards, posters, and early production thinking.\",\"reason\":\"README 明确输出为 first-pass deck，且不处理预算/通告单/制片管理；场景要求生成分场拆解表作为排期与预算起点，卡片已标 conditional 并说明非拆解表，但条件中未写明“不能直接作为排期与预算起点”这一关键限制。\",\"suggested_correction\":\"在 conditions 中补充“输出为视觉 deck，不能直接作为排期与预算的分场拆解表”，保持 conditional。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-script-breakdown-application-b936d257d3\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"含道具、服装等类别内容，但无部门级跨场元素报告与确认流程\",\"source_id\":\"s0\",\"quote\":\"Locations, props, wardrobe, set requirements, continuity details, and practical risks all come from the same screenplay breakdown.\",\"reason\":\"README 只说明道具、服装等来自同一剧本拆解，未提及部门级跨场报告或逐条确认流程；标 unverified 合理，但“无确认流程”属于对缺失功能的推断，证据仅能支持“未见描述”。\",\"suggested_correction\":\"将理由改为“README 未描述部门级跨场元素报告与确认流程”，避免断言功能不存在。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-script-breakdown-application-dd0bddc30b\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"未见剧本修订对比与保留标记功能\",\"source_id\":\"s0\",\"quote\":\"Edit, regenerate, review, print, or share the deck from the browser.\",\"reason\":\"README 未描述修订版对比或保留标记，标 unverified 合理；但“未见”只能说明材料未覆盖，不能据此确认功能缺失。\",\"suggested_correction\":\"改为“README 未描述修订对比与保留标记，无法确认支持该场景”，保持 unverified。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"AI 生成场景、角色、地点、道具、服装与制作提示\",\"source_id\":\"s0\",\"quote\":\"Scriptlook uses your OpenAI or Claude key to turn the screenplay into structured scenes, characters, locations, props, themes, wardrobe, and production signals.\",\"reason\":\"README 支持用 OpenAI/Claude 生成结构化场景、角色、地点、道具、服装与制作信号，但卡片未写明需自备 OpenAI/Claude 密钥这一前提。\",\"suggested_correction\":\"在功能描述中补充“需自备 OpenAI 或 Claude 密钥”。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"可选 fal.ai 生成角色、地点、道具、故事板与海报图\",\"source_id\":\"s0\",\"quote\":\"Add a fal.ai key if you want to generate portraits, locations, props, storyboards, and poster concepts from the project's visual briefs.\",\"reason\":\"README 支持该功能且已标“可选”，但未说明需自备 fal.ai 密钥；卡片条件可更完整。\",\"suggested_correction\":\"补充“需自备 fal.ai 密钥”。\"}],\"limitations\":[\"仅审阅 README、LICENSE 与 GitHub 元数据，未执行代码或核验运行时行为。\",\"场景匹配基于 README 描述，未验证实际输出格式与部门协作流程。\",\"许可仅按给定 SPDX 精确文本核验结果采信，未独立比对全文。\"]}",
+ "review": {
+  "repository_id": 1309692845,
+  "verdict": "pass_with_limits",
+  "summary": "卡片事实、定位、范围、功能与项目类型基本有 README/元数据支持，MIT 许可有完整正文核验；场景匹配总体保守，但首轮拆解场景的 conditional 标签与“非分场拆解表”的说明需更明确。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-script-breakdown-application-905d7b83a0",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "可从剧本生成场景与元素拆解，但输出为视觉 deck，非分场拆解表",
+    "source_id": "s0",
+    "quote": "Scriptlook builds a first-pass deck with creative direction, scenes, casting, locations, props, storyboards, posters, and early production thinking.",
+    "reason": "README 明确输出为 first-pass deck，且不处理预算/通告单/制片管理；场景要求生成分场拆解表作为排期与预算起点，卡片已标 conditional 并说明非拆解表，但条件中未写明“不能直接作为排期与预算起点”这一关键限制。",
+    "suggested_correction": "在 conditions 中补充“输出为视觉 deck，不能直接作为排期与预算的分场拆解表”，保持 conditional。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-script-breakdown-application-b936d257d3",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "含道具、服装等类别内容，但无部门级跨场元素报告与确认流程",
+    "source_id": "s0",
+    "quote": "Locations, props, wardrobe, set requirements, continuity details, and practical risks all come from the same screenplay breakdown.",
+    "reason": "README 只说明道具、服装等来自同一剧本拆解，未提及部门级跨场报告或逐条确认流程；标 unverified 合理，但“无确认流程”属于对缺失功能的推断，证据仅能支持“未见描述”。",
+    "suggested_correction": "将理由改为“README 未描述部门级跨场元素报告与确认流程”，避免断言功能不存在。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-script-breakdown-application-dd0bddc30b",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "未见剧本修订对比与保留标记功能",
+    "source_id": "s0",
+    "quote": "Edit, regenerate, review, print, or share the deck from the browser.",
+    "reason": "README 未描述修订版对比或保留标记，标 unverified 合理；但“未见”只能说明材料未覆盖，不能据此确认功能缺失。",
+    "suggested_correction": "改为“README 未描述修订对比与保留标记，无法确认支持该场景”，保持 unverified。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "AI 生成场景、角色、地点、道具、服装与制作提示",
+    "source_id": "s0",
+    "quote": "Scriptlook uses your OpenAI or Claude key to turn the screenplay into structured scenes, characters, locations, props, themes, wardrobe, and production signals.",
+    "reason": "README 支持用 OpenAI/Claude 生成结构化场景、角色、地点、道具、服装与制作信号，但卡片未写明需自备 OpenAI/Claude 密钥这一前提。",
+    "suggested_correction": "在功能描述中补充“需自备 OpenAI 或 Claude 密钥”。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "可选 fal.ai 生成角色、地点、道具、故事板与海报图",
+    "source_id": "s0",
+    "quote": "Add a fal.ai key if you want to generate portraits, locations, props, storyboards, and poster concepts from the project's visual briefs.",
+    "reason": "README 支持该功能且已标“可选”，但未说明需自备 fal.ai 密钥；卡片条件可更完整。",
+    "suggested_correction": "补充“需自备 fal.ai 密钥”。"
+   }
+  ],
+  "limitations": [
+   "仅审阅 README、LICENSE 与 GitHub 元数据，未执行代码或核验运行时行为。",
+   "场景匹配基于 README 描述，未验证实际输出格式与部门协作流程。",
+   "许可仅按给定 SPDX 精确文本核验结果采信，未独立比对全文。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:12:48.454146+00:00",
+ "elapsed_seconds": 13.574
+}

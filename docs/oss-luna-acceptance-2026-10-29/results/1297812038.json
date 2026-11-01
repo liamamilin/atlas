@@ -1,0 +1,78 @@
+{
+ "repository_id": 1297812038,
+ "domain": "24",
+ "input_sha256": "80333dc2781467335592c6b7c6567678c497f01f67ae9d2fc159b55bb0a9ab49",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:09.099899+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDrXJq6t3kERGxjbiv6zaPobohF",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 3406,
+  "completion_tokens": 562,
+  "total_tokens": 3968,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 3403,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0006216,
+ "response_text": "{\"repository_id\":1297812038,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片总体准确地将仓库描述为基于 BPIC 2015 事件日志的过程挖掘笔记本资料，并明确标注了数据前提、模拟限制及场景未验证状态。许可保持 pending 合适。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-permit-management-d86861a3b4\",\"severity\":\"minor\",\"kind\":\"irrelevant_scenario\",\"claim\":\"涉及建筑许可申请流程的事件日志分析，与申请流程研究相关，但不提供在线申请或缴费功能\",\"source_id\":\"s0\",\"quote\":\"The project analyzes the control-flow and organizational structure of a Dutch municipality's building-permit process.\",\"reason\":\"场景描述的是住宅加建申请的在线提交、缴费和检查预约；仓库分析的是市政建筑许可流程事件日志，关联仅限流程研究，不能支持该场景的实际申请办理。卡片已将适用性标为 unverified 并说明不提供在线申请或缴费，故属于有限关联而非直接适用。\",\"suggested_correction\":\"保留 unverified，并将关联表述收紧为“可供建筑许可流程研究参考，不支持申请办理”。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-permit-management-f788c5c523\",\"severity\":\"minor\",\"kind\":\"irrelevant_scenario\",\"claim\":\"分析建筑许可流程中的多角色审查与工作交接，可作为流程研究参考，但不提供并行审查操作功能\",\"source_id\":\"s0\",\"quote\":\"hand-over-of-work network analysis;\",\"reason\":\"场景要求多部门在同一申请记录上并行审阅、标注和退回补正；来源只支持工作交接网络分析，没有证据表明仓库分析的是该类并行图纸审查。卡片已标 unverified 且明确不提供并行审查操作，宜避免让场景关联显得比流程研究参考更强。\",\"suggested_correction\":\"保留 unverified，并明确该关联仅为一般流程分析参考，不代表支持多部门并行图纸审查。\"}],\"limitations\":[\"材料包含完整 README 文本及 GitHub 元数据，但未提供笔记本正文或 requirements.txt 内容；本次未核验具体分析实现、依赖或执行结果。\",\"README 未列出许可证文件，卡片将许可标为 pending，未据此认定仓库已获开源授权。\"]}",
+ "review": {
+  "repository_id": 1297812038,
+  "verdict": "pass_with_limits",
+  "summary": "卡片总体准确地将仓库描述为基于 BPIC 2015 事件日志的过程挖掘笔记本资料，并明确标注了数据前提、模拟限制及场景未验证状态。许可保持 pending 合适。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-permit-management-d86861a3b4",
+    "severity": "minor",
+    "kind": "irrelevant_scenario",
+    "claim": "涉及建筑许可申请流程的事件日志分析，与申请流程研究相关，但不提供在线申请或缴费功能",
+    "source_id": "s0",
+    "quote": "The project analyzes the control-flow and organizational structure of a Dutch municipality's building-permit process.",
+    "reason": "场景描述的是住宅加建申请的在线提交、缴费和检查预约；仓库分析的是市政建筑许可流程事件日志，关联仅限流程研究，不能支持该场景的实际申请办理。卡片已将适用性标为 unverified 并说明不提供在线申请或缴费，故属于有限关联而非直接适用。",
+    "suggested_correction": "保留 unverified，并将关联表述收紧为“可供建筑许可流程研究参考，不支持申请办理”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-permit-management-f788c5c523",
+    "severity": "minor",
+    "kind": "irrelevant_scenario",
+    "claim": "分析建筑许可流程中的多角色审查与工作交接，可作为流程研究参考，但不提供并行审查操作功能",
+    "source_id": "s0",
+    "quote": "hand-over-of-work network analysis;",
+    "reason": "场景要求多部门在同一申请记录上并行审阅、标注和退回补正；来源只支持工作交接网络分析，没有证据表明仓库分析的是该类并行图纸审查。卡片已标 unverified 且明确不提供并行审查操作，宜避免让场景关联显得比流程研究参考更强。",
+    "suggested_correction": "保留 unverified，并明确该关联仅为一般流程分析参考，不代表支持多部门并行图纸审查。"
+   }
+  ],
+  "limitations": [
+   "材料包含完整 README 文本及 GitHub 元数据，但未提供笔记本正文或 requirements.txt 内容；本次未核验具体分析实现、依赖或执行结果。",
+   "README 未列出许可证文件，卡片将许可标为 pending，未据此认定仓库已获开源授权。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 1,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T04:40:17.242406+00:00",
+ "elapsed_seconds": 8.143
+}

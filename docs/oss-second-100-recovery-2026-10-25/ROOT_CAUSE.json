@@ -1,0 +1,15 @@
+{
+  "original_failed_run": "oss_646e2d892ec34a2ab00b113c23e1c0f6",
+  "reproduced_exception_type": "AssertionError",
+  "reproduced_phase": "read_sources",
+  "function": "HTMLParser._scan_name, via oss_catalog.plain_text",
+  "official_repository": "https://github.com/adrianhajdin/project_next_14_ai_prompt_sharing",
+  "source_url": "https://github.com/adrianhajdin/project_next_14_ai_prompt_sharing/blob/main/README.md",
+  "immutable_url": "https://api.github.com/repos/adrianhajdin/project_next_14_ai_prompt_sharing/git/blobs/83db013d3fe30dffd6283ddf69b717d13110aac2",
+  "source_sha256": "3dac67c1fceb0a151aca27a582951a7468cfdd8cfbb6b122bfa05301d60a449c",
+  "cause": "Markdown/代码中的正则负向后顾含 <! [ 的连续形式，HTMLParser 误判为 HTML 声明并断言失败；整个16项协调过程未将该异常归为可恢复中断。",
+  "original_exception_detail_was_not_saved": true,
+  "reproduced_from_archived_official_source": true,
+  "after_fix_cached_documents_parsed": 16,
+  "checked_at": "2026-10-25T14:52:06.990399+00:00"
+}

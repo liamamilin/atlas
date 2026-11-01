@@ -1,0 +1,62 @@
+{
+ "repository_id": 442096414,
+ "domain": "12",
+ "input_sha256": "45435cdb6782e033f39ca45cd404528e7ec1fc82ee2269982b3a97070176b8f6",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:06.161415+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCCqfZBdgl8S9AJKqKPinSOBC531",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 9271,
+  "completion_tokens": 377,
+  "total_tokens": 9648,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 9268,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0011156,
+ "response_text": "{\"repository_id\":442096414,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片的项目类型、主要定位与功能范围均有 README 支持，许可证标签也与所给 LICENSE 一致。场景匹配已标为 conditional 或 unverified，条件总体保守；但夜间执行场景的理由称可无人运行，来源未明确支持报告中的逐条判定、失败日志和截图等具体需求。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-test-automation-platform-f347876eb5\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"支持 Web 回归测试、并行执行与报告，可无人运行\",\"source_id\":\"s0\",\"quote\":\"**Runner Agent** - Executes tests across hundreds or thousands of parallel sessions to speed up validation\",\"reason\":\"README 支持并行执行及报告分析，但没有明确说明可配置夜间定时、无人值守运行，或提供场景描述所需的逐条判定、失败日志和截图。该匹配已标为 conditional，且条件提到需通过 CI/调度配置；问题仅在于理由把无人运行写成已支持能力。\",\"suggested_correction\":\"将理由收紧为 README 明确支持的 Web 回归测试、并行执行与报告；把定时无人值守及所需报告细节列为待核实条件。\"}],\"limitations\":[\"本次依据所给 README、LICENSE 与 GitHub 元数据审查；未执行代码，也未访问外部链接。\",\"README 明确列出产品能力，但本次材料不能独立验证这些能力在实际部署中的效果。\"]}",
+ "review": {
+  "repository_id": 442096414,
+  "verdict": "pass_with_limits",
+  "summary": "卡片的项目类型、主要定位与功能范围均有 README 支持，许可证标签也与所给 LICENSE 一致。场景匹配已标为 conditional 或 unverified，条件总体保守；但夜间执行场景的理由称可无人运行，来源未明确支持报告中的逐条判定、失败日志和截图等具体需求。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-test-automation-platform-f347876eb5",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "支持 Web 回归测试、并行执行与报告，可无人运行",
+    "source_id": "s0",
+    "quote": "**Runner Agent** - Executes tests across hundreds or thousands of parallel sessions to speed up validation",
+    "reason": "README 支持并行执行及报告分析，但没有明确说明可配置夜间定时、无人值守运行，或提供场景描述所需的逐条判定、失败日志和截图。该匹配已标为 conditional，且条件提到需通过 CI/调度配置；问题仅在于理由把无人运行写成已支持能力。",
+    "suggested_correction": "将理由收紧为 README 明确支持的 Web 回归测试、并行执行与报告；把定时无人值守及所需报告细节列为待核实条件。"
+   }
+  ],
+  "limitations": [
+   "本次依据所给 README、LICENSE 与 GitHub 元数据审查；未执行代码，也未访问外部链接。",
+   "README 明确列出产品能力，但本次材料不能独立验证这些能力在实际部署中的效果。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:12.724774+00:00",
+ "elapsed_seconds": 6.563
+}

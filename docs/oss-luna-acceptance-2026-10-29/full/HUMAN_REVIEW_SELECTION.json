@@ -1,0 +1,785 @@
+[
+ {
+  "domain": "01",
+  "rid": 11376574,
+  "index": 0,
+  "name": "open-lms-open-source/moodle-mod_hsuforum",
+  "issue": {
+   "field": "project_type",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "wrong_type",
+   "claim": "application",
+   "source_id": "s0",
+   "quote": "Extract the contents of the plugin into _/wwwroot/mod_ then visit `admin/upgrade.php` or use the CLI script to upgrade your site.",
+   "reason": "README 明确描述其为安装到 Moodle 的插件，而非独立应用；卡片的 positioning 和 scope 也将其描述为 Moodle 插件。",
+   "suggested_correction": "将 project_type 改为 Moodle 插件或活动插件。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 的安装说明明确要求把插件内容解压到 /wwwroot/mod 并运行 admin/upgrade.php 或 CLI 升级站点，说明它是 Moodle 插件/活动模块，而非独立应用；卡片 project_type 标为 application 确有错误。",
+   "source_id": "s0",
+   "quote": "Extract the contents of the plugin into _/wwwroot/mod_ then visit `admin/upgrade.php` or use the CLI script to upgrade your site.",
+   "suggested_correction": "将 project_type 由 application 改为 Moodle 插件（活动模块）。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "02",
+  "rid": 1143643,
+  "index": 0,
+  "name": "gartz/G-Lock-Double-Opt-in-Manager--Wordpress-Plugin-",
+  "issue": {
+   "field": "project_type",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "wrong_type",
+   "claim": "library",
+   "source_id": "s0",
+   "quote": "This mailing list management plugin allows the visitors of your blog subscribe to your mailing list using a double opt-in method.",
+   "reason": "README 明确将项目描述为邮件列表管理插件，并提供 WordPress 插件安装与启用步骤；将其归类为 library 与来源所述项目类型不符。",
+   "suggested_correction": "将 project_type 改为 WordPress 插件或应用插件类标签。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 明确称其为“mailing list management plugin”，并给出 WordPress 插件安装/启用语境；将其 project_type 标为 library 与来源描述不符，属于类型标签错误。",
+   "source_id": "s0",
+   "quote": "This mailing list management plugin allows the visitors of your blog subscribe to your mailing list using a double opt-in method.",
+   "suggested_correction": "将 project_type 从 library 收紧为 WordPress 插件（plugin）类标签。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "03",
+  "rid": 1127048,
+  "index": 0,
+  "name": "danielbeardsley/shared_list",
+  "issue": {
+   "field": "features",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "roadmap_as_fact",
+   "claim": "无“新建/保存”按钮，点击任意处编辑，支持方向键导航",
+   "source_id": "s0",
+   "quote": "The interface needs to be simple and completely intuitive (like Gmail Tasks). This means no \"New item\" button and no \"Save\" button. The interface must allow arrow key navigation as well as \"click anywhere to edit\".",
+   "reason": "来源将这些内容表述为界面需求（needs/must），而非已实现功能；卡片的 source_based 标签不能消除这一时态差异。",
+   "suggested_correction": "改为“README 将无新建/保存按钮、点击编辑和方向键导航列为界面目标”，或核实实现后再作为现有功能陈述。",
+   "citation_state": "whitespace_equivalent"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 原文位于“Goals”下，用 needs/must 表述界面需求，并未说明已实现；卡片把目标写成现有功能，属于把路线图当事实。",
+   "source_id": "s0",
+   "quote": "The interface needs to be simple and completely intuitive (like Gmail Tasks).",
+   "suggested_correction": "改为“README 将无新建/保存按钮、点击任意处编辑和方向键导航列为界面目标”。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "04",
+  "rid": 2056773,
+  "index": 0,
+  "name": "bovine/defish",
+  "issue": {
+   "field": "project_type",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "wrong_type",
+   "claim": "library",
+   "source_id": "s0",
+   "quote": "written in the style of a NetPBM graphics tool. It takes no command-line arguments, and reads the image from from stdin.",
+   "reason": "README描述的是以NetPBM工具风格运行、从stdin读取图像的工具；将项目类型标为library与该描述不符。",
+   "suggested_correction": "将project_type改为命令行工具或图像处理工具。",
+   "citation_state": "whitespace_equivalent"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README明确说明该程序不接受命令行参数、从stdin读取图像，并以NetPBM图形工具风格编写，属于命令行图像处理工具；卡片将project_type标为library与原文不符。",
+   "source_id": "s0",
+   "quote": "It takes no command-line arguments, and reads the image from from stdin.",
+   "suggested_correction": "将project_type由library改为命令行工具（图像处理工具）。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "05",
+  "rid": 131455697,
+  "index": 0,
+  "name": "spt3gntlmn/MySQL-Homework",
+  "issue": {
+   "field": "features",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "roadmap_as_fact",
+   "claim": "顾客下单并扣减库存，库存不足时拒绝订单",
+   "source_id": "s0",
+   "quote": "Create a Node application called bamazonCustomer.js. Running this application will first display all of the items available for sale.",
+   "reason": "来源将顾客下单、检查库存及更新数据库写在作业挑战要求中，而非对已实现功能的陈述。卡片把要求改写成现有能力。",
+   "suggested_correction": "标注为 README 作业要求或目标功能；若无实现证据，不要表述为已具备功能。",
+   "citation_state": "not_found"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 将顾客下单、检查库存、库存不足拒绝订单及更新数据库均写在 Challenge #1 的作业指令中，属要求而非已实现功能陈述；卡片 features 却以现有能力表述，且未标注目标/据描述。",
+   "source_id": "s0",
+   "quote": "Once the customer has placed the order, your application should check if your store has enough of the product to meet the customer's request.",
+   "suggested_correction": "将该 feature 标注为“README 作业要求/目标功能”，不表述为已实现。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "06",
+  "rid": 3954159,
+  "index": 0,
+  "name": "alobato/campagne",
+  "issue": {
+   "field": "project_type",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "wrong_type",
+   "claim": "application",
+   "source_id": "s0",
+   "quote": "Campagne is a simple Rails 3 engine gem.",
+   "reason": "来源明确将项目描述为 Rails 3 引擎 gem，而非独立应用；卡片的 project_type 与来源不符。",
+   "suggested_correction": "将 project_type 改为引擎、库或其他能表达 Rails 引擎 gem 的类型。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "来源明确写“Campagne is a simple Rails 3 engine gem.”，GitHub 元数据描述也为“A simple Rails 3 engine gem to manage and send newsletters and email marketing campaigns.”，而卡片 project_type 标为 application，与来源不符。",
+   "source_id": "s0",
+   "quote": "Campagne is a simple Rails 3 engine gem.",
+   "suggested_correction": "将 project_type 从 application 改为能表达 Rails 引擎 gem 的类型（如 library/engine）。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "07",
+  "rid": 84032246,
+  "index": 1,
+  "name": "honeybeeluv07/Deus-Vult-Ministries-Org",
+  "issue": {
+   "field": "license",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "license_overclaim",
+   "claim": "detected_spdx 为 BSD-3-Clause，status 为 pending，spdx 为 null。",
+   "source_id": "s1",
+   "quote": "BSD 3-Clause License",
+   "reason": "LICENSE 文件标题及正文标示 BSD 3-Clause，而 README 声称内容采用 CC BY-SA 3.0。pending 状态保守且可保留，但卡片未指出这项仓库内许可冲突；不能据此将任一许可认定为全仓库已核验许可。",
+   "suggested_correction": "保留 pending，并明确记录 README 的 CC BY-SA 3.0 声明与 LICENSE 的 BSD 3-Clause 文本冲突，待人工核实适用范围。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-1",
+   "disposition": "confirmed",
+   "reason": "s1的LICENSE标题与正文为BSD 3-Clause，s0的README声明CC BY-SA 3.0，卡片license字段虽保留pending且spdx为null，但未记录该仓库内官方文件冲突；可确认为需要说明的官方文件冲突，不作法律许可裁决。",
+   "source_id": "s1",
+   "quote": "BSD 3-Clause License",
+   "suggested_correction": "保留pending与spdx为null，并明确记录README的CC BY-SA 3.0声明与LICENSE的BSD 3-Clause文本冲突，待人工核实各自适用范围。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "08",
+  "rid": 33576301,
+  "index": 0,
+  "name": "claussian/hh-typology",
+  "issue": {
+   "field": "features",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "roadmap_as_fact",
+   "claim": "识别聚类与可视化变量并汇总",
+   "source_id": "s0",
+   "quote": "#First steps: data summary\n1. Identify variables appropriate for clustering, summarize\n2. Identify variables for visualization: balance sheet variables (secured/unsecured debt), summarize",
+   "reason": "README 将这些内容列在“First steps”下，表述为待开展的步骤，而非已完成的功能。",
+   "suggested_correction": "改为“计划识别并汇总适用于聚类和可视化的变量”。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 将“识别适用于聚类的变量并汇总”和“识别用于可视化的变量并汇总”列在“#First steps: data summary”下，属于待办步骤；卡片 features 却写成已完成的功能，属于把路线图当作事实。",
+   "source_id": "s0",
+   "quote": "#First steps: data summary\n1. Identify variables appropriate for clustering, summarize",
+   "suggested_correction": "改为“计划识别并汇总适用于聚类和可视化的变量”。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "09",
+  "rid": 8854010,
+  "index": 0,
+  "name": "memble/OpenPayroll",
+  "issue": {
+   "field": "summary",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "license_overclaim",
+   "claim": "采用 Apache 2.0 许可",
+   "source_id": "s0",
+   "quote": "Apache License 2.0 (Apache) http://www.apache.org/licenses/",
+   "reason": "README 确实作出 Apache 2.0 声明，但卡片同时标记 license.status 为 pending、spdx 为 null，并说明未发现许可证文件。摘要将 README 声明写成已确认采用的许可，与卡片的保守许可状态冲突；仅凭 README 不能提升为已核验许可。",
+   "suggested_correction": "将摘要改为“README 声明 Apache License 2.0；许可证文件未发现，许可状态待核实”，并保留 pending 标签。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 原文确有“Apache License 2.0 (Apache)”声明，但卡片 license.status 为 pending、spdx 为 null，并注明未发现许可证文件；摘要却写成“采用 Apache 2.0 许可”，把 README 声明表述为已确认许可，与卡片保守状态冲突。该问题属于需说明的官方文件/元数据冲突，不构成法律许可裁决。",
+   "source_id": "s0",
+   "quote": "Apache License 2.0 (Apache) http://www.apache.org/licenses/",
+   "suggested_correction": "将摘要改为“README 声明 Apache License 2.0；未发现许可证文件，许可状态待核实”，保留 pending 标签，不将 README 声明提升为已核验许可。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "10",
+  "rid": 83954416,
+  "index": 0,
+  "name": "apache/ofbiz-plugins",
+  "issue": {
+   "field": "project_type",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "wrong_type",
+   "claim": "application",
+   "source_id": "s0",
+   "quote": "The OFBiz plugins repository, that notably includes the E-Business/E-Commerce component, is complementary to the ofbiz-framework repository",
+   "reason": "README 将仓库描述为与 ofbiz-framework 互补的插件仓库，包含多个组件；将整个仓库归类为 application 不符合其集合/插件仓库定位。",
+   "suggested_correction": "将 project_type 改为插件集合或组件集合类，而非 application。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 明确称该仓库为与 ofbiz-framework 互补的插件仓库，包含非必需但增加重要功能的组件；将其整体 project_type 标为 application 与插件/组件集合定位不符，原卡确有类型归类错误。",
+   "source_id": "s0",
+   "quote": "The OFBiz plugins repository, that notably includes the E-Business/E-Commerce component, is complementary to the ofbiz-framework repository",
+   "suggested_correction": "将 project_type 从 application 收紧为“插件/组件集合”类标签，避免把仓库整体当作单一应用。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "11",
+  "rid": 569823356,
+  "index": 0,
+  "name": "aws-samples/audit-manager-custom-security-frameworks",
+  "issue": {
+   "field": "license",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "license_overclaim",
+   "claim": "README 声称 “This library is licensed under the MIT-0 License.”，而卡片将许可证标为 pending。",
+   "source_id": "s1",
+   "quote": "Licensed under the Apache License, Version 2.0 (the \"License\").",
+   "reason": "README 的 MIT-0 声明与 LICENSE 文件中的 Apache 2.0 文本冲突。卡片的 pending 标签没有擅自认定许可证，语义上保守；但冲突需要单独复核，不能仅凭 README 声明将全仓库标为 MIT-0。",
+   "suggested_correction": "保留 license.pending，并注明 README 的 MIT-0 声明与 LICENSE 文件文本不一致，待核验。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 末尾声明 MIT-0，而 LICENSE 原文为 Apache 2.0 文本，两者确实冲突；卡片将许可证标为 pending 并注明待核验，未擅自认定许可，但该官方文件冲突应在卡片中明确说明，故按“需要说明的官方文件冲突”确认，不作法律许可裁决。",
+   "source_id": "s1",
+   "quote": "Licensed under the Apache License, Version 2.0 (the \"License\").",
+   "suggested_correction": "保留 license.pending，并注明 README 的 MIT-0 声明与 LICENSE 文件中的 Apache 2.0 文本不一致，待核验。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "12",
+  "rid": 6973491,
+  "index": 0,
+  "name": "ben-manes/gradle-versions-plugin",
+  "issue": {
+   "field": "project_type",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "wrong_type",
+   "claim": "application",
+   "source_id": "s0",
+   "quote": "# Gradle Versions Plugin",
+   "reason": "README 明确将项目描述为 Gradle 插件，而非完整应用；元数据也称其为 “Gradle plugin to discover dependency updates”。",
+   "suggested_correction": "将 project_type 改为插件或开发工具类，而非 application。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 标题与正文明确称其为 Gradle 插件（“This plugin reports…”），GitHub 元数据描述也为“Gradle plugin to discover dependency updates”，而卡片 project_type 标为 application，确有类型标注错误。",
+   "source_id": "s0",
+   "quote": "# Gradle Versions Plugin",
+   "suggested_correction": "将 project_type 由 application 改为 plugin（Gradle 插件/开发工具类）。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "13",
+  "rid": 14650659,
+  "index": 0,
+  "name": "alexklaeser/imgAnnotation",
+  "issue": {
+   "field": "license",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "license_overclaim",
+   "claim": "未发现许可证文件；公开仓库不等于开源授权",
+   "source_id": "s0",
+   "quote": "This program is free software; you can redistribute it and/or\nmodify it under the terms of the GNU General Public License\nas published by the Free Software Foundation; either version 2\nof the License, or (at your option) any later version.",
+   "reason": "README 的 License conditions 明确声明 GPL 第 2 版或之后版本；卡片却称未发现许可证文件并将许可状态设为 pending。该来源是 README 而非许可证文件，不能据此声称 LICENSE 全文已核验，但卡片的“未发现许可证文件”与现有资料中的明确许可声明冲突。",
+   "suggested_correction": "保留未核验许可证文件这一限制，同时注明 README 声明 GPL-2.0-or-later；不要将 README 声明表述为已核验 LICENSE 文件。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "卡片称“未发现许可证文件；公开仓库不等于开源授权”并将许可状态设为 pending，但所给 README 的 License conditions 明确声明 GPL 第 2 版或之后版本，GitHub 元数据 license 为 null 仅表示未检测到许可证文件。原卡表述与 README 明确许可声明冲突，应作为“需要说明的官方文件冲突”确认，而非法律许可裁决。",
+   "source_id": "s0",
+   "quote": "This program is free software; you can redistribute it and/or\nmodify it under the terms of the GNU General Public License\nas published by the Free Software Foundation; either version 2\nof the License, or (at your option) any later version.",
+   "suggested_correction": "保留“未核验 LICENSE 文件”这一限制，同时注明 README 声明 GPL-2.0-or-later；不要将 README 声明表述为已核验 LICENSE 文件，也不要把许可状态直接定为已确认 SPDX。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "14",
+  "rid": 15012158,
+  "index": 0,
+  "name": "darron/frozen-cdn_fe",
+  "issue": {
+   "field": "features",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "roadmap_as_fact",
+   "claim": "按 API key 清除缓存",
+   "source_id": "s1",
+   "quote": "Add ability to clear contents of varnishes - using Resque.",
+   "reason": "归档文档将清除缓存能力列为待添加事项；卡片却将其表述为已实现功能。文档中的 API key 示例不足以证明该能力已完成。",
+   "suggested_correction": "删除该已实现功能表述，或明确标注为文档中的计划/待核实能力。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "卡片将“按 API key 清除缓存”列为已实现功能，但归档文档中该表述位于 DONE 列表，而 TODO 列表另有“Deal with admins clearing caches in API.”和“Display cache clearing result via AJAX.”，说明清除缓存能力仍有未完成部分；卡片未作限定，属把待办/未完成事项写成已实现。",
+   "source_id": "s1",
+   "quote": "Deal with admins clearing caches in API.",
+   "suggested_correction": "将“按 API key 清除缓存”改为“文档显示已有按 API key 清除缓存的接口雏形，但管理员清除与结果展示仍列为 TODO，需标注为部分实现/待核实”。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "15",
+  "rid": 110724331,
+  "index": 0,
+  "name": "netgroup-polito/verefoo",
+  "issue": {
+   "field": "summary",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "unsupported_claim",
+   "claim": "非流量路径上的内联执行点",
+   "source_id": "s0",
+   "quote": "Firewall &rarr; files regarding the actual application and deployment of produced configuration on the different types of firewalls (e.g., IPTables, OVS, etc...)",
+   "reason": "README 描述了将生成配置实际应用、部署到不同防火墙，并未支持“非流量路径上的内联执行点”这一绝对表述；该表述还可能与所述防火墙部署能力冲突。",
+   "suggested_correction": "删除该绝对判断，或限定为 VEREFOO 负责生成配置，实际流量处理由部署配置的防火墙完成。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "卡片 summary 断言 VEREFOO“非流量路径上的内联执行点”，但 README 明确其 Firewall 目录涉及将生成配置实际应用并部署到 IPTables、OVS 等防火墙，且整体定位是自动分配与配置包过滤防火墙的框架；该绝对否定表述缺乏来源支持，并与部署能力描述存在张力。",
+   "source_id": "s0",
+   "quote": "Firewall &rarr; files regarding the actual application and deployment of produced configuration on the different types of firewalls (e.g., IPTables, OVS, etc...)",
+   "suggested_correction": "删除“非流量路径上的内联执行点”的绝对判断，改为“VEREFOO 负责生成并部署防火墙配置，实际流量处理由所配置的防火墙完成”。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "16",
+  "rid": 9164756,
+  "index": 0,
+  "name": "Talengi/phase",
+  "issue": {
+   "field": "scenario_match",
+   "scenario_id": "auto-engineering-document-management-1fea13b2f8",
+   "severity": "major",
+   "kind": "unsupported_claim",
+   "claim": "具备文档版本管理与评审启停权限控制，可支撑修订与校审流转",
+   "source_id": "s2",
+   "quote": "TODO : Define phase usage",
+   "reason": "该场景理由称具备版本管理和评审流转能力，但唯一引用的 usage 文档将使用说明标为 TODO；其后只列出权限名称，不能据此确认这些流程已实现。入门文档虽概述文档版本管理，但未证明场景所需的 CAD 检出、批注、批准及旧版作废流程。卡片已将适用性标为 conditional 并列出核实条件，但理由仍把未证实能力写成既有事实。",
+   "suggested_correction": "将理由改为仅陈述文档明确支持的能力，并把评审流转及受控版本流程标为待核实；或在取得相应文档证据后再保留该能力表述。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "场景理由把“文档版本管理与评审启停权限控制”写成可支撑修订与校审流转的既有能力，但唯一引用的 usage 文档正文为“TODO : Define phase usage”，其后仅列出权限名称（含 can_start_stop_review），并未说明批准、批注、旧版作废等流程；入门文档只概述“Document and data versioning”。因此理由将未证实流程表述为事实，原卡确有过度推断。",
+   "source_id": "s2",
+   "quote": "TODO : Define phase usage",
+   "suggested_correction": "理由改为仅陈述文档明确支持的一般版本管理与存在评审启停权限名称，并将批准/作废状态模型及受控版本流转标为待核实。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "17",
+  "rid": 104389858,
+  "index": 0,
+  "name": "kunjadutta/Project-Risk-and-Cost-Management-using-Tableau-MS-Project-Baseline-and-Risk-Analysis",
+  "issue": {
+   "field": "summary",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "unsupported_claim",
+   "claim": "以 Tableau、MS Project 基线与风险分析为手段",
+   "source_id": "s0",
+   "quote": "This project provides an evaluation and analysis of the Point of Sales (POS) Initiative by Clothes ‘R’ Us",
+   "reason": "README 只说明这是对 POS 举措的评估与分析，没有提及 Tableau、MS Project、基线或风险分析。现有材料不足以支持这些具体方法。",
+   "suggested_correction": "删除未获来源支持的工具与分析方法描述，或明确标注为待核实。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "summary 声称“以 Tableau、MS Project 基线与风险分析为手段”，但 s0 README 正文只说明对 POS 举措进行评估与分析，未提及 Tableau、MS Project、基线或风险分析；仓库名虽含这些词，但正文未支持具体方法描述，原卡属超出正文的推断。",
+   "source_id": "s0",
+   "quote": "This project provides an evaluation and analysis of the Point of Sales (POS) Initiative by Clothes ‘R’ Us",
+   "suggested_correction": "将 summary 收窄为“对 Clothes ‘R’ Us POS 举措的评估与分析资料”，工具与方法描述标为待核实。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "18",
+  "rid": 54466417,
+  "index": 0,
+  "name": "ketansp/fuber",
+  "issue": {
+   "field": "features",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "roadmap_as_fact",
+   "claim": "按经纬度与勾股定理计算最近可用出租车",
+   "source_id": "s0",
+   "quote": "the distance between two points can be calculated by Pythagoras’ theorem.",
+   "reason": "README 是建模题说明，描述应如何计算距离，并未证明仓库已实现该功能；卡片的 feature 将题目要求写成现有能力。",
+   "suggested_correction": "改为“题目要求按经纬度与勾股定理计算最近出租车；实际实现情况未说明”。",
+   "citation_state": "not_found"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 原文只是建模题说明中的距离计算要求（“The distance between two points can be calculated by Pythagoras’ theorem.”），并未证明仓库已实现按经纬度与勾股定理计算最近可用出租车；卡片把题目要求写成现有 feature，属于 roadmap_as_fact。",
+   "source_id": "s0",
+   "quote": "The distance between two points can be calculated by Pythagoras’ theorem.",
+   "suggested_correction": "改为“题目要求按经纬度与勾股定理计算最近出租车；实际实现情况未说明”。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "19",
+  "rid": 125183707,
+  "index": 0,
+  "name": "mvandersteen/ha-jemenaoutlook",
+  "issue": {
+   "field": "features",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "roadmap_as_fact",
+   "claim": "抓取昨日/本周/本月及上一周期的用电与发电数据",
+   "source_id": "s0",
+   "quote": "The component will only retrieve Yesterdays usage, which will also retrieve the previous days if you wish do do some other comparisions. It could easily be extended to retrieve weekly, monthly or seasonal figures as well. (I haven't got that far yet)",
+   "reason": "README 明确说组件目前只抓取昨日及可选的前一日数据，周/月数据是尚未完成的扩展设想。卡片将其列为现有功能，与来源直接冲突。",
+   "suggested_correction": "将已实现范围收窄为昨日及可选前一日数据；如需提及周/月数据，应明确标为 README 所述的未实现扩展。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 明确称组件目前只抓取昨日（及可选前一日）数据，周/月/季节数据只是尚未实现的扩展设想；卡片把“昨日/本周/本月及上一周期”列为现有功能，与来源直接冲突。",
+   "source_id": "s0",
+   "quote": "The component will only retrieve Yesterdays usage, which will also retrieve the previous days if you wish do do some other comparisions. It could easily be extended to retrieve weekly, monthly or seasonal figures as well. (I haven't got that far yet)",
+   "suggested_correction": "将功能描述收窄为“抓取昨日及可选前一日数据”；周/月数据应标注为 README 所述未实现扩展。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "20",
+  "rid": 222361634,
+  "index": 0,
+  "name": "kamal153/IoT-based-Smart-Irrigation-System-using-Soil-Moisture-Sensor-and-ESP8266-NodeMCU",
+  "issue": {
+   "field": "scenario_match",
+   "scenario_id": "auto-agricultural-iot-platform-e2cdb7809c",
+   "severity": "major",
+   "kind": "irrelevant_scenario",
+   "claim": "具备土壤湿度监测与自动灌溉",
+   "source_id": "s0",
+   "quote": "The sensor data will be sent to ThingSpeak Server in defined interval of time so that it can be monitored from anywhere in the world.",
+   "reason": "场景要求灌溉经理结合多点土壤湿度、深层水分趋势和降雨记录决定灌溉时机；README 描述的是单一传感器阈值控制及远程查看，未支持这些决策所需的信息或多点能力。当前 conditional 条件只说明 ThingSpeak 账号和 WiFi 前提，未弥补场景能力不匹配。",
+   "suggested_correction": "将该场景标为不适用，或明确限定为单点土壤湿度监测与阈值自动灌溉，不覆盖多点、深层水分趋势或降雨辅助决策。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "场景要求多点土壤湿度、深层水分趋势与降雨记录辅助决策；README仅描述单一土壤湿度阈值（约50%-55%）自动控制水泵并将数据上传ThingSpeak远程查看，未支持多点、深层趋势或降雨决策能力。原卡将其标为conditional且条件仅为ThingSpeak账号与WiFi，未弥补能力不匹配，故该场景匹配判断确有错误。",
+   "source_id": "s0",
+   "quote": "So when the soil loses its moisture to less than 50% then Motor pump will turn on automatically to sprinkle the water and it will continue to sprinkle the water until the moisture goes upto 55% and after that the pump will be turned off.",
+   "suggested_correction": "将该场景标为不适用，或明确限定为单点土壤湿度阈值自动灌溉与ThingSpeak远程查看，不覆盖多点、深层水分趋势或降雨辅助决策。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "21",
+  "rid": 176388683,
+  "index": 0,
+  "name": "luangrezende/reciclatu-dotnet-final",
+  "issue": {
+   "field": "positioning",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "unsupported_claim",
+   "claim": "面向回收物收集的ASP.NET Core Web应用",
+   "source_id": "s0",
+   "quote": "**Backend:** [ASP.NET MVC com Razor](https://dotnet.microsoft.com/apps/aspnet/mvc), C#",
+   "reason": "README 明确列出 ASP.NET MVC；卡片写成 ASP.NET Core，框架表述与来源不符。元数据描述也提到 ASP.NET Core，但不能消除 README 中的冲突，需核实后再定。",
+   "suggested_correction": "改为“README 将其描述为 ASP.NET MVC Web 应用”，或在核实框架前避免写 ASP.NET Core。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 技术栈明确写“ASP.NET MVC com Razor”，而卡片定位写“ASP.NET Core Web应用”；虽然 GitHub 元数据描述提到 ASP.NET Core，但 README 与元数据存在框架表述冲突，原卡未说明该冲突，属需核实的表述问题。",
+   "source_id": "s0",
+   "quote": "**Backend:** [ASP.NET MVC com Razor](https://dotnet.microsoft.com/apps/aspnet/mvc), C#",
+   "suggested_correction": "改为“README 将其描述为 ASP.NET MVC Web 应用（元数据描述称 ASP.NET Core，存在表述冲突，待核实）”。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "22",
+  "rid": 127054182,
+  "index": 0,
+  "name": "ayrustogaru/Database-project",
+  "issue": {
+   "field": "license",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "license_overclaim",
+   "claim": "\"status\":\"open_source\"",
+   "source_id": "s2",
+   "quote": "Copyright (c) 2017 by Eric (https://codepen.io/ehermanson/pen/KwKWEv)",
+   "reason": "卡片将仓库标为 open_source，但所给 license.txt 正文被 HTML 注释包裹，且版权归属指向 CodePen 登录表单设计；现有材料不足以确认该许可适用于整个仓库。SPDX 文本匹配只说明正文与 MIT 模板匹配，不解决适用范围问题。",
+   "suggested_correction": "将仓库许可状态标为待核实，并说明仓库中的许可文本与 CodePen 设计相关；不要据此标注整个仓库为 open_source。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "卡片将许可状态标为 open_source，但所给 license.txt 正文整体位于 HTML 注释中，版权行指向 CodePen 登录表单设计（s1 亦为同一 CodePen 设计说明），GitHub 元数据许可为 NOASSERTION/Other。SPDX 文本匹配仅说明正文与 MIT 模板一致，不能证明该许可适用于整个仓库，故 open_source 标注缺乏材料支持，属需说明的官方文件冲突。",
+   "source_id": "s2",
+   "quote": "Copyright (c) 2017 by Eric (https://codepen.io/ehermanson/pen/KwKWEv)",
+   "suggested_correction": "将许可状态改为待核实/NOASSERTION，并注明 license.txt 正文被注释包裹且版权指向 CodePen 设计，不能据此认定整个仓库为 open_source；不作法律许可裁决。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "23",
+  "rid": 32017106,
+  "index": 0,
+  "name": "academic-moodle-cooperation/moodle-mod_publication",
+  "issue": {
+   "field": "project_type",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "wrong_type",
+   "claim": "library",
+   "source_id": "s0",
+   "quote": "This file is part of the mod_publication plugin for Moodle",
+   "reason": "来源明确称其为 Moodle 的 mod_publication 插件，并称其为 Student Folder activity；标为 library 与来源描述的项目类型不符。",
+   "suggested_correction": "将项目类型改为 Moodle 插件/活动插件。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 明确称其为 Moodle 的 mod_publication 插件，并标题为 Student Folder 活动；将项目类型标为 library 与来源描述不符，应改为 Moodle 活动插件。",
+   "source_id": "s0",
+   "quote": "This file is part of the mod_publication plugin for Moodle",
+   "suggested_correction": "将 project_type 改为 Moodle 活动插件（mod_publication）。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "24",
+  "rid": 3955881,
+  "index": 0,
+  "name": "geekdenz/civicrm",
+  "issue": {
+   "field": "summary",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "license_overclaim",
+   "claim": "采用 AGPL 3 许可。",
+   "source_id": "s1",
+   "quote": "It is an open source project, licensed under GNU AGPL 3",
+   "reason": "README 确实声称项目采用 GNU AGPL 3，但卡片的 license 字段明确为 pending，且注明未发现许可证文件、公开仓库不等于开源授权。摘要却将 README 声称写成确定许可，造成卡片内部许可标签冲突；不能据此提升为已核验许可。",
+   "suggested_correction": "摘要删除确定的许可表述，或明确归因于 README（如“README 声称采用 AGPL 3；许可待核验”）。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 原文确实声称“licensed under GNU AGPL 3”，但卡片 license 字段为 pending、detected_spdx 为 null，并注明未发现许可证文件、公开仓库不等于开源授权；摘要却写成确定的“采用 AGPL 3 许可”，与卡片自身许可状态冲突，属于需说明的官方文件与元数据冲突，而非法律许可裁决。",
+   "source_id": "s1",
+   "quote": "It is an open source project, licensed under GNU AGPL 3",
+   "suggested_correction": "摘要改为归因表述，如“README 声称采用 GNU AGPL 3；许可待核验”，与 license 字段的 pending 状态保持一致。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "25",
+  "rid": 131588847,
+  "index": 0,
+  "name": "ASCOMInitiative/ASCOMPlatform",
+  "issue": {
+   "field": "summary",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "unsupported_claim",
+   "claim": "面向天文设备互操作的接口标准实现与开发组件库，含 SOFA 库等源码集成与测试流程说明。",
+   "source_id": "s0",
+   "quote": "When a new SOFA release is available:",
+   "reason": "元数据支持 ASCOM 平台实现接口标准并提供开发与运行时组件；s0 仅说明如何更新 SOFA 源码、构建项目和运行测试，不能据此确认 SOFA 是整个仓库的组成范围或概括为该平台的源码集成与测试流程。",
+   "suggested_correction": "将平台概述归因于仓库元数据；SOFA 部分收窄为“文档包含 SOFA 更新、构建与测试说明”。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "summary 将 SOFA 描述为整个仓库的“源码集成与测试流程说明”，但 s0 仅描述 SOFA 新版本发布后的更新、构建与测试操作步骤，s2 元数据也未提及 SOFA；该概括超出材料支持范围。",
+   "source_id": "s0",
+   "quote": "When a new SOFA release is available:",
+   "suggested_correction": "将平台概述归因于仓库元数据 s2；SOFA 部分收窄为“文档包含 SOFA 更新、构建与测试说明”。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "26",
+  "rid": 29402883,
+  "index": 0,
+  "name": "DanMat/Restaurant-Management-System",
+  "issue": {
+   "field": "positioning",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "wrong_type",
+   "claim": "基于NimbusCMS重建的完整餐厅管理系统，含店内运营与公开在线点餐。",
+   "source_id": "s0",
+   "quote": "The app is a Nimbus **plugin**; a site consumes it via a Composer **path repository**",
+   "reason": "来源将当前重建版明确描述为 NimbusCMS 插件，需由 Nimbus 站点消费，并与 CRM 插件及主题组合；“完整餐厅管理系统”容易让人理解为可独立运行的完整应用，未体现这一部署前提。",
+   "suggested_correction": "改为“面向 NimbusCMS 站点的餐厅管理插件，组合 CRM 插件与主题后提供店内运营及公开在线点餐功能”。",
+   "citation_state": "whitespace_equivalent"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "来源明确说明当前重建版是位于本仓库 plugin/ 的 Nimbus 插件，需与官方 CRM 及主题组合后由 Nimbus 站点消费；原卡定位“完整餐厅管理系统”未体现插件与宿主部署前提，措辞确有误导性。",
+   "source_id": "s0",
+   "quote": "Nimbus **plugin co-located in this repo** (`plugin/`) composed with the official\nCRM (guests) and a theme (`theme/`)",
+   "suggested_correction": "改为“面向 NimbusCMS 站点的餐厅管理插件，组合 CRM 插件与主题后提供店内运营及公开在线点餐功能”。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "27",
+  "rid": 125462659,
+  "index": 0,
+  "name": "FAIMS/bmwhi-survey-2018",
+  "issue": {
+   "field": "license",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "license_overclaim",
+   "claim": "\"This module is licensed under an international Creative Commons Attribution 4.0 Licence (**CC BY 4.0**).\"（README 原文；卡片当前 license.status 为 pending）",
+   "source_id": "s0",
+   "quote": "This module is licensed under an international Creative Commons Attribution 4.0 Licence (**CC BY 4.0**).",
+   "reason": "README 明确称模块采用 CC BY 4.0，但 LICENSE 来源文本开头标为 GNU GENERAL PUBLIC LICENSE Version 3。卡片虽保留 pending，未呈现这项来源冲突；不能据此自行裁定模块实际授权。",
+   "suggested_correction": "保留 license.status=pending，并注明 README 声称 CC BY 4.0、LICENSE 文件为 GPL v3 文本，两者冲突，授权待核实。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 原文明确称模块采用 CC BY 4.0，而 LICENSE 来源文本开头为 GNU GPL v3，GitHub 元数据也标为 GPL-3.0；卡片 license.status 虽为 pending，但未呈现这一官方文件冲突。该 finding 仅要求保留 pending 并注明冲突，不裁定实际授权，符合材料。",
+   "source_id": "s0",
+   "quote": "This module is licensed under an international Creative Commons Attribution 4.0 Licence (**CC BY 4.0**).",
+   "suggested_correction": "保留 license.status=pending，并注明 README 声称 CC BY 4.0、LICENSE 文件为 GPL v3 文本，两者冲突，授权待核实。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "28",
+  "rid": 35279603,
+  "index": 0,
+  "name": "amonchakai/Workout",
+  "issue": {
+   "field": "summary",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "license_overclaim",
+   "claim": "采用 GPL 许可证",
+   "source_id": "s0",
+   "quote": "This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.",
+   "reason": "README 声称程序按 GPL 条款发布，但卡片明确记录未发现许可证文件、许可状态为 pending；摘要却将许可写成确定事实，造成卡片内部标签冲突。",
+   "suggested_correction": "删除摘要中的确定许可断言，或明确归因于 README，并保留许可状态为 pending、尚未核实。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 明确声明程序按 GPL 第3版或更高版本发布，但卡片 license 字段记录 detected_spdx 为 null、status 为 pending、未发现许可证文件；summary 却写成“采用 GPL 许可证”的确定事实，与卡片自身许可状态标签冲突。该问题属于卡片内部表述不一致，应改为归因于 README 的声明并保留待核实状态，而非对许可作出法律裁决。",
+   "source_id": "s0",
+   "quote": "This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.",
+   "suggested_correction": "将 summary 中的“采用 GPL 许可证”改为“README 声明按 GPLv3 或更高版本发布（许可文件未发现，状态待核实）”，与 license.status=pending 保持一致。",
+   "citation_state": "literal"
+  }
+ },
+ {
+  "domain": "29",
+  "rid": 99834648,
+  "index": 0,
+  "name": "ptcryan/Blynk-Home-Assistant",
+  "issue": {
+   "field": "license",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "license_overclaim",
+   "claim": "“status\":\"open_source\"；“spdx\":\"MIT\"",
+   "source_id": "s0",
+   "quote": "This project is licensed under the MIT License - see the LICENSE file for details",
+   "reason": "README 同时包含 MIT 声明和 CC BY-SA 4.0 声明，授权信息存在冲突。LICENSE 正文与 MIT 文本匹配这一事实不能消除 README 的冲突，也不能据此由本审阅自行裁定仓库整体授权。",
+   "suggested_correction": "保留 LICENSE 正文匹配 MIT 的核验记录，并将仓库整体许可标为需核实；单独记录 README 中的 CC BY-SA 4.0 声明及其与 MIT 声明的冲突。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 的 License 段同时出现 MIT 声明和 CC BY-SA 4.0 声明，LICENSE 正文为 MIT；卡片将许可直接标为 open_source/MIT 而未说明 README 冲突，属于需要说明的官方文件冲突。",
+   "source_id": "s0",
+   "quote": "This project is licensed under the MIT License - see the LICENSE file for details",
+   "suggested_correction": "保留 LICENSE 正文匹配 MIT 的核验记录，同时标注 README 中另有 CC BY-SA 4.0 声明，仓库整体许可需说明冲突，不作法律裁决。",
+   "citation_state": "literal"
+  }
+ }
+]

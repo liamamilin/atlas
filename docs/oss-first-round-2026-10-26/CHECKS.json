@@ -1,0 +1,53 @@
+{
+  "checked_at": "2026-10-26T04:42:33.051671+00:00",
+  "backend_oss_tests": 98,
+  "backend_result": "passed",
+  "lint": "passed",
+  "frontend_typecheck": "passed",
+  "frontend_unit_tests": 12,
+  "frontend_unit_result": "passed",
+  "browser_regressions": {
+    "legacy_batch_cases": 4,
+    "first_round_cases": 2,
+    "result": "passed",
+    "test_services": "isolated 5228/5229; production 5199 untouched"
+  },
+  "production_build": "passed",
+  "production_deployment": "passed",
+  "pilot_actual_acceptance": "passed",
+  "production_preservation": {
+    "catalog_candidates_matches_favorites_history": true,
+    "model_and_github_settings": true,
+    "factory_disabled": true
+  },
+  "live_browser": {
+    "desktop_and_mobile": 2,
+    "result": "passed",
+    "writes": 0,
+    "evidence": "BROWSER_START.json"
+  },
+  "automation": {
+    "id": "atlas-2",
+    "status": "ACTIVE",
+    "interval_minutes": 15,
+    "scope": "same finite 1598-leaf task; first20 actual acceptance and remaining1578 automatic continuation"
+  },
+  "null_push_time_regression": "passed",
+  "pilot_semantic_review": {
+    "projects": 27,
+    "domains": 20,
+    "source_based_refinements": 8,
+    "passed": true
+  },
+  "pilot_live_browser": {
+    "cases": 25,
+    "writes": 0,
+    "passed": true
+  },
+  "incremental_replay": {
+    "real_cards": 20,
+    "production_modified": false,
+    "passed": true
+  },
+  "continuation": "same job running after verified pilot"
+}

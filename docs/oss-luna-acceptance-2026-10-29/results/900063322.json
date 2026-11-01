@@ -1,0 +1,51 @@
+{
+ "repository_id": 900063322,
+ "domain": "20",
+ "input_sha256": "2af6d5d7feb1601c6b5ed855dd1a136209bf49279e5f5d3576f91bf98ad90363",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:47.613930+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDWnGks5cOpETasd6YgNTp6AyEr",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 2695,
+  "completion_tokens": 230,
+  "total_tokens": 2925,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 2692,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0003845,
+ "response_text": "{\n  \"repository_id\": 900063322,\n  \"verdict\": \"pass_with_limits\",\n  \"summary\": \"卡片如实区分了仓库描述与 README 所能确认的内容，并将三个场景标为未验证、附带核实条件；许可证保持 pending。现有材料不足以确认具体业务功能，但卡片没有把这些功能或场景写成已实现。\",\n  \"checks\": {\n    \"facts\": \"supported\",\n    \"project_type\": \"supported\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"supported\"\n  },\n  \"issues\": [],\n  \"limitations\": [\n    \"可用材料仅含 README 与 GitHub 元数据；README 是 Angular CLI 默认说明，未提供业务功能实现细节。\",\n    \"仓库元数据描述称其覆盖地质数据、生产、设备与成本管理，但这不能单独证明相应功能已实现。\",\n    \"许可证状态为 pending，材料未提供许可证文件；本次不据此判断仓库是否获得开源授权。\"\n  ]\n}",
+ "review": {
+  "repository_id": 900063322,
+  "verdict": "pass_with_limits",
+  "summary": "卡片如实区分了仓库描述与 README 所能确认的内容，并将三个场景标为未验证、附带核实条件；许可证保持 pending。现有材料不足以确认具体业务功能，但卡片没有把这些功能或场景写成已实现。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "可用材料仅含 README 与 GitHub 元数据；README 是 Angular CLI 默认说明，未提供业务功能实现细节。",
+   "仓库元数据描述称其覆盖地质数据、生产、设备与成本管理，但这不能单独证明相应功能已实现。",
+   "许可证状态为 pending，材料未提供许可证文件；本次不据此判断仓库是否获得开源授权。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:52.795378+00:00",
+ "elapsed_seconds": 5.181
+}

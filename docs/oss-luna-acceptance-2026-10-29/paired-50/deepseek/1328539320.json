@@ -1,0 +1,58 @@
+{
+ "repository_id": 1328539320,
+ "domain": "17",
+ "input_sha256": "f3da9671208e8cf1cab51291e930ac2f61204ad3268b1cd426d2319846e5ba69",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:58.549982+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-d90fbd992745-1305a9",
+ "usage": {
+  "prompt_tokens": 6269,
+  "completion_tokens": 178,
+  "total_tokens": 6447,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00097189,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00097189,
+   "tokens": {
+    "input": 5757,
+    "output": 178,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1328539320,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片内容与 README 和许可证原文基本一致：项目定位为离线、可防篡改的入住/退租照片证据包 CLI，功能、边界和 MIT 许可均有来源支持；两个场景均标为 conditional，并写明缺少移动端逐项评级、租户签字和损坏判定，标注保守合理。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"仅提供 README、LICENSE 与 GitHub 元数据，未覆盖 docs/ 下威胁模型、格式说明等文档，无法核验其细节。\",\"场景匹配基于 README 描述推断，未验证实际 CLI 行为或测试结果。\"]}",
+ "review": {
+  "repository_id": 1328539320,
+  "verdict": "pass_with_limits",
+  "summary": "卡片内容与 README 和许可证原文基本一致：项目定位为离线、可防篡改的入住/退租照片证据包 CLI，功能、边界和 MIT 许可均有来源支持；两个场景均标为 conditional，并写明缺少移动端逐项评级、租户签字和损坏判定，标注保守合理。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "仅提供 README、LICENSE 与 GitHub 元数据，未覆盖 docs/ 下威胁模型、格式说明等文档，无法核验其细节。",
+   "场景匹配基于 README 描述推断，未验证实际 CLI 行为或测试结果。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:12:03.399206+00:00",
+ "elapsed_seconds": 4.849
+}

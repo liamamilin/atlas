@@ -1,0 +1,82 @@
+{
+ "repository_id": 443410281,
+ "domain": "14",
+ "input_sha256": "08fa3126675ebb1fbab89ad25942be09799218845b18eec3d4119aabdadc9680",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:46.458219+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-df05291f03c0-aedb3",
+ "usage": {
+  "prompt_tokens": 14566,
+  "completion_tokens": 529,
+  "total_tokens": 15095,
+  "prompt_tokens_details": {
+   "cached_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.0025023,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.0025023,
+   "tokens": {
+    "input": 14566,
+    "output": 529,
+    "reasoning": 0,
+    "cache_read": 0,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":443410281,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片将该仓库定位为事件响应与取证资源合集，与 README 和元数据一致；许可证按 LICENSE 文件标为 Apache-2.0，与 README 末尾的 MIT/CC 声明不同，但卡片采用确定性核验结果，可保留。主要限制是 README 被截断，且没有场景匹配可审。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"license\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"license_overclaim\",\"claim\":\"license.status=open_source，detected_spdx=Apache-2.0\",\"source_id\":\"s0\",\"quote\":\"## License\\nMIT License & [cc](https://creativecommons.org/licenses/by/4.0/) license\",\"reason\":\"README 末尾声明 MIT 与 CC-BY-4.0，而 LICENSE 文件为 Apache-2.0 全文；卡片按 LICENSE 标 Apache-2.0 有确定性核验支持，但未说明 README 与 LICENSE 的许可表述不一致，读者可能误以为全仓库统一为 Apache-2.0。\",\"suggested_correction\":\"在 license 说明中注明 README 另有 MIT/CC 声明，卡片 SPDX 仅依据 LICENSE 文件，不推断全仓库统一许可。\"},{\"field\":\"summary\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"包含对手模拟、取证采集、日志与内存分析、事件管理工具等条目\",\"source_id\":\"s0\",\"quote\":\"[ARCHIVE TEXT OMITTED]\",\"reason\":\"README 原文在 Other Tools 段落后被截断，卡片列举的类别在可见部分有对应目录，但无法确认截断部分是否还有影响 summary 的内容；这属于材料覆盖限制，不是事实错误。\",\"suggested_correction\":\"保留现有措辞，并在 limitations 中说明 README 截断、未全文核验。\"}],\"limitations\":[\"README 原文被截断（truncated=true），无法核验 Other Tools 之后至 Playbooks 之间的完整内容。\",\"scenario_matches 为空，未提供场景名称或描述，无法评估场景相关性、适用性与条件。\",\"本次仅做语义与标签审查，许可全文比对以确定性核验为准，未独立复核 SPDX 文本。\"]}",
+ "review": {
+  "repository_id": 443410281,
+  "verdict": "pass_with_limits",
+  "summary": "卡片将该仓库定位为事件响应与取证资源合集，与 README 和元数据一致；许可证按 LICENSE 文件标为 Apache-2.0，与 README 末尾的 MIT/CC 声明不同，但卡片采用确定性核验结果，可保留。主要限制是 README 被截断，且没有场景匹配可审。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "license",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "license_overclaim",
+    "claim": "license.status=open_source，detected_spdx=Apache-2.0",
+    "source_id": "s0",
+    "quote": "## License\nMIT License & [cc](https://creativecommons.org/licenses/by/4.0/) license",
+    "reason": "README 末尾声明 MIT 与 CC-BY-4.0，而 LICENSE 文件为 Apache-2.0 全文；卡片按 LICENSE 标 Apache-2.0 有确定性核验支持，但未说明 README 与 LICENSE 的许可表述不一致，读者可能误以为全仓库统一为 Apache-2.0。",
+    "suggested_correction": "在 license 说明中注明 README 另有 MIT/CC 声明，卡片 SPDX 仅依据 LICENSE 文件，不推断全仓库统一许可。"
+   },
+   {
+    "field": "summary",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "包含对手模拟、取证采集、日志与内存分析、事件管理工具等条目",
+    "source_id": "s0",
+    "quote": "[ARCHIVE TEXT OMITTED]",
+    "reason": "README 原文在 Other Tools 段落后被截断，卡片列举的类别在可见部分有对应目录，但无法确认截断部分是否还有影响 summary 的内容；这属于材料覆盖限制，不是事实错误。",
+    "suggested_correction": "保留现有措辞，并在 limitations 中说明 README 截断、未全文核验。"
+   }
+  ],
+  "limitations": [
+   "README 原文被截断（truncated=true），无法核验 Other Tools 之后至 Playbooks 之间的完整内容。",
+   "scenario_matches 为空，未提供场景名称或描述，无法评估场景相关性、适用性与条件。",
+   "本次仅做语义与标签审查，许可全文比对以确定性核验为准，未独立复核 SPDX 文本。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:11:56.001580+00:00",
+ "elapsed_seconds": 9.543
+}

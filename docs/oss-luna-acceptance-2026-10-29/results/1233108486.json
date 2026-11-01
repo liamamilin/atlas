@@ -1,0 +1,63 @@
+{
+ "repository_id": 1233108486,
+ "domain": "26",
+ "input_sha256": "56638ed6bc03ffbbbb9c67a3a82fb8e90bae0511fa9a52df0216bb2d75456b49",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:16.203189+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDyheJMDEUcglEeoRpiI76lFaMD",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 4172,
+  "completion_tokens": 376,
+  "total_tokens": 4548,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 4169,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0006052000000000001,
+ "response_text": "{\n  \"repository_id\": 1233108486,\n  \"verdict\": \"pass_with_limits\",\n  \"summary\": \"卡片总体谨慎地区分了 ABP 启动解决方案与未说明的宴会业务能力，并将许可证标为 pending、场景标为 unverified，均与材料相符。项目类型可更精确地标为分层单体应用；现有场景匹配没有声称已支持具体业务流程。\",\n  \"checks\": {\n    \"facts\": \"supported\",\n    \"project_type\": \"limited\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"supported\"\n  },\n  \"issues\": [\n    {\n      \"field\": \"project_type\",\n      \"scenario_id\": \"\",\n      \"severity\": \"minor\",\n      \"kind\": \"wrong_type\",\n      \"claim\": \"application\",\n      \"source_id\": \"s0\",\n      \"quote\": \"This is a layered monolith application\",\n      \"reason\": \"来源明确称其为分层单体应用；仅标为 application 不算错误，但类型标签较宽泛，未体现仓库描述的具体形态。\",\n      \"suggested_correction\": \"如类型标签支持更细分类，可标为分层单体应用；否则保留 application 并在说明中注明其为启动解决方案。\"\n    }\n  ],\n  \"limitations\": [\n    \"审查依据为提供的 README 与 GitHub 元数据；未检查源码或 README 所链接的文档。\",\n    \"README 未描述宴会业务功能，因此业务实现情况无法据此确认；卡片已将其标为未知。\",\n    \"许可证状态为 pending，材料未提供许可证文件；本次不据此推断授权情况。\"\n  ]\n}",
+ "review": {
+  "repository_id": 1233108486,
+  "verdict": "pass_with_limits",
+  "summary": "卡片总体谨慎地区分了 ABP 启动解决方案与未说明的宴会业务能力，并将许可证标为 pending、场景标为 unverified，均与材料相符。项目类型可更精确地标为分层单体应用；现有场景匹配没有声称已支持具体业务流程。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "limited",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "project_type",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "wrong_type",
+    "claim": "application",
+    "source_id": "s0",
+    "quote": "This is a layered monolith application",
+    "reason": "来源明确称其为分层单体应用；仅标为 application 不算错误，但类型标签较宽泛，未体现仓库描述的具体形态。",
+    "suggested_correction": "如类型标签支持更细分类，可标为分层单体应用；否则保留 application 并在说明中注明其为启动解决方案。"
+   }
+  ],
+  "limitations": [
+   "审查依据为提供的 README 与 GitHub 元数据；未检查源码或 README 所链接的文档。",
+   "README 未描述宴会业务功能，因此业务实现情况无法据此确认；卡片已将其标为未知。",
+   "许可证状态为 pending，材料未提供许可证文件；本次不据此推断授权情况。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:40:22.342567+00:00",
+ "elapsed_seconds": 6.139
+}

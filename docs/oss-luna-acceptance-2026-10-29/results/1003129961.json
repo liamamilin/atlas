@@ -1,0 +1,62 @@
+{
+ "repository_id": 1003129961,
+ "domain": "11",
+ "input_sha256": "841621a5181e6d74898b883110d2a2a6229abdba7264e0ad27ed0021ddec79a0",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:01.742808+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCCm4J1I1l58UA4U4cnCXm37j8qX",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 11939,
+  "completion_tokens": 394,
+  "total_tokens": 12333,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 11936,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0013909,
+ "response_text": "{\"repository_id\":1003129961,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体与 README 对项目定位和主要功能的描述相符；路线图缺项及许可证待核验均已明确标注。场景匹配大多保留了适用条件或标为未验证，但有一条将多框架评估复用标为 direct，证据不足以支持该场景所需的控制映射与跨框架复用能力。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-security-program-management-9b81eec262\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"\\\"applicability\\\":\\\"direct\\\"\",\"source_id\":\"s0\",\"quote\":\"**Multi-Framework Support**: Evaluate controls against NIST CSF 2.0, ISO 27001, CIS Controls v8, and COBIT 2019 simultaneously.\",\"reason\":\"来源支持同时针对多个框架评估控制，但场景还要求将同一批控制映射到多个框架、复用一次评估结果并导出框架视图；引用文字未明确支持这些具体能力。标为 direct 过于确定。\",\"suggested_correction\":\"改为 conditional 或 unverified，并注明需确认跨框架控制映射及评估结果复用能力。\"}],\"limitations\":[\"README 来源完整；LICENSE 来源标记为截断，本次不据此核验许可证全文。卡片已将许可证状态保留为 pending，未将 README 徽章或元数据提升为已核验结论。\",\"本次仅依据提供的 README、许可证片段和 GitHub 元数据审查，未执行代码，也未核验仓库其他文件。\"]}",
+ "review": {
+  "repository_id": 1003129961,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体与 README 对项目定位和主要功能的描述相符；路线图缺项及许可证待核验均已明确标注。场景匹配大多保留了适用条件或标为未验证，但有一条将多框架评估复用标为 direct，证据不足以支持该场景所需的控制映射与跨框架复用能力。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-security-program-management-9b81eec262",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "\"applicability\":\"direct\"",
+    "source_id": "s0",
+    "quote": "**Multi-Framework Support**: Evaluate controls against NIST CSF 2.0, ISO 27001, CIS Controls v8, and COBIT 2019 simultaneously.",
+    "reason": "来源支持同时针对多个框架评估控制，但场景还要求将同一批控制映射到多个框架、复用一次评估结果并导出框架视图；引用文字未明确支持这些具体能力。标为 direct 过于确定。",
+    "suggested_correction": "改为 conditional 或 unverified，并注明需确认跨框架控制映射及评估结果复用能力。"
+   }
+  ],
+  "limitations": [
+   "README 来源完整；LICENSE 来源标记为截断，本次不据此核验许可证全文。卡片已将许可证状态保留为 pending，未将 README 徽章或元数据提升为已核验结论。",
+   "本次仅依据提供的 README、许可证片段和 GitHub 元数据审查，未执行代码，也未核验仓库其他文件。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:07.910831+00:00",
+ "elapsed_seconds": 6.168
+}

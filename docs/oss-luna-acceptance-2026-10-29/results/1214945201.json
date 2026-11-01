@@ -1,0 +1,67 @@
+{
+ "repository_id": 1214945201,
+ "domain": "28",
+ "input_sha256": "01094d0499616aa6df8c13d579be477311f233da4a1829b25fc92eab72cd500c",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:30.712298+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCECfSmU4qbsgxBPmgQ1kweQed06",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 3434,
+  "completion_tokens": 357,
+  "total_tokens": 3791,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 3431,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0005219000000000001,
+ "response_text": "{\"repository_id\":1214945201,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片对应用类型、训练记录功能及本地存储的描述有 README 支持；许可证明确标为 pending，未作开源授权断言。场景匹配均保留了条件或未验证标签，但第二个场景与所述功能关联较弱，宜复核。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-wearable-fitness-platform-b23a192a0d\",\"severity\":\"minor\",\"kind\":\"irrelevant_scenario\",\"claim\":\"保留完整历史用于渐进超负荷统计，但未描述睡眠/活动量趋势图\",\"source_id\":\"s0\",\"quote\":\"Full History: Completed sessions are never deleted, providing a rich dataset for future progressive overload statistics.\",\"reason\":\"场景要求查看睡眠、活动量和训练负荷的长期趋势并据此调整习惯。来源只支持保留训练会话历史以供渐进超负荷统计，没有支持趋势图或睡眠、活动量数据；标为 unverified 避免了直接声称已支持，但该匹配的关联仍较弱。\",\"suggested_correction\":\"保留 unverified，并说明仅有训练会话历史相关依据；若场景匹配要求实际支持趋势查看，可移除此匹配。\"}],\"limitations\":[\"仅依据所提供的 README 与 GitHub 元数据审查；未检查源码实现。\",\"许可证状态为 pending，来源未提供许可证文件；本次不据此推断授权。\"]}",
+ "review": {
+  "repository_id": 1214945201,
+  "verdict": "pass_with_limits",
+  "summary": "卡片对应用类型、训练记录功能及本地存储的描述有 README 支持；许可证明确标为 pending，未作开源授权断言。场景匹配均保留了条件或未验证标签，但第二个场景与所述功能关联较弱，宜复核。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-wearable-fitness-platform-b23a192a0d",
+    "severity": "minor",
+    "kind": "irrelevant_scenario",
+    "claim": "保留完整历史用于渐进超负荷统计，但未描述睡眠/活动量趋势图",
+    "source_id": "s0",
+    "quote": "Full History: Completed sessions are never deleted, providing a rich dataset for future progressive overload statistics.",
+    "reason": "场景要求查看睡眠、活动量和训练负荷的长期趋势并据此调整习惯。来源只支持保留训练会话历史以供渐进超负荷统计，没有支持趋势图或睡眠、活动量数据；标为 unverified 避免了直接声称已支持，但该匹配的关联仍较弱。",
+    "suggested_correction": "保留 unverified，并说明仅有训练会话历史相关依据；若场景匹配要求实际支持趋势查看，可移除此匹配。"
+   }
+  ],
+  "limitations": [
+   "仅依据所提供的 README 与 GitHub 元数据审查；未检查源码实现。",
+   "许可证状态为 pending，来源未提供许可证文件；本次不据此推断授权。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 0,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T04:40:36.572121+00:00",
+ "elapsed_seconds": 5.86
+}

@@ -1,0 +1,60 @@
+{
+  "completed_at": "2026-10-29T05:15:59.214509+00:00",
+  "method": "50 identical frozen inputs and prompts, two models, 100 comparison reviews. Luna receipts reused; DeepSeek supplement only.",
+  "domains": 29,
+  "metrics": {
+    "luna": {
+      "projects": 50,
+      "successful_reviews": 50,
+      "estimated_list_usd": 0.033339400000000005,
+      "reported_cost_usd": null,
+      "new_requests": 0,
+      "billing_sources": {
+        "not_reported": 50
+      },
+      "mean_request_seconds": 6.262079999999997,
+      "suggestions": 43,
+      "quoted_suggestions": 42,
+      "locatable_quotes_after_whitespace_normalization": 38,
+      "locatable_quote_rate": 0.9047619047619048,
+      "unlocatable_or_non_source_quotes": 4
+    },
+    "deepseek": {
+      "projects": 50,
+      "successful_reviews": 50,
+      "estimated_list_usd": 0.05100515999999999,
+      "reported_cost_usd": 0.05100529999999998,
+      "new_requests": 50,
+      "billing_sources": {
+        "balance": 50
+      },
+      "mean_request_seconds": 9.144480000000003,
+      "suggestions": 119,
+      "quoted_suggestions": 118,
+      "locatable_quotes_after_whitespace_normalization": 100,
+      "locatable_quote_rate": 0.847457627118644,
+      "unlocatable_or_non_source_quotes": 18
+    }
+  },
+  "additional_reported_go_cost_usd": 0.05100529999999998,
+  "open_design_first_request": "fresh quota_exhausted; failed receipt preserved; no production fallback setting changed",
+  "human_review": {
+    "cases": 12,
+    "known_cases": 6,
+    "exploratory_disagreements": 6,
+    "all_suggestions_adjudicated": false,
+    "semantic_winner": "not established",
+    "same_two_important_findings_detected_by_both": true,
+    "each_model_found_one_additional_confirmed_issue": true
+  },
+  "recommendation": "Use Luna as the default for cost/latency/citation quality in this sample, and DeepSeek for disputed or high-risk second review; preserve paired controls if testing a later batch. This pilot alone does not justify full-run accuracy claims.",
+  "limits": [
+    "Human review was not blinded and covered12 purposively selected cases, not all162 model suggestions.",
+    "Latency uses historical Luna receipts and a later DeepSeek run, not simultaneous identical server load.",
+    "Luna charge is estimated from official pricing; Go cost is provider-reported balance billing, not an independently reconciled invoice.",
+    "Fifty reused-control versus fifty supplement reviews do not mean the full55651-project audit has begun."
+  ],
+  "production_data_changed": false,
+  "model_config_changed": false,
+  "full_run_started": false
+}

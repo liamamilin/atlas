@@ -1,0 +1,120 @@
+{
+ "card": {
+  "repository_id": 1372674615,
+  "full_name": "2024puc/psis-cd-homework",
+  "github_url": "https://github.com/2024puc/psis-cd-homework",
+  "name": "psis-cd-homework",
+  "summary": "静态托管页面，安装到主屏后打开外部 Google Apps Script 作业跟踪器；本身仅含启动器与图标，实际功能依赖外部链接。",
+  "positioning": "面向 PSIS Chamkar Doung 家长/学生查看作业的 PWA 启动器。",
+  "scope": "特定学校家长/学生查看作业，非通用作业管理。",
+  "features": [
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/2024puc/psis-cd-homework/git/blobs/9cd9bb00c90a6ffc33175f92c7d3adf284da4795",
+     "source_kind": "readme",
+     "source_sha256": "9596f218c73f6c97463d09b89ae1bd391a0de409ab675887b36706d609483341",
+     "source_url": "https://github.com/2024puc/psis-cd-homework/blob/main/README.txt",
+     "verification": "source_based"
+    },
+    "text": "可安装 PWA 启动器"
+   },
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/2024puc/psis-cd-homework/git/blobs/9cd9bb00c90a6ffc33175f92c7d3adf284da4795",
+     "source_kind": "readme",
+     "source_sha256": "9596f218c73f6c97463d09b89ae1bd391a0de409ab675887b36706d609483341",
+     "source_url": "https://github.com/2024puc/psis-cd-homework/blob/main/README.txt",
+     "verification": "source_based"
+    },
+    "text": "跳转外部作业跟踪器"
+   }
+  ],
+  "project_type": "application",
+  "license": {
+   "detected_spdx": null,
+   "note": "未发现许可证文件；公开仓库不等于开源授权",
+   "source": null,
+   "spdx": null,
+   "status": "pending"
+  },
+  "missing_fields": [
+   "license_verification"
+  ],
+  "collection_notes": [],
+  "completeness": "partial",
+  "summary_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/2024puc/psis-cd-homework/git/blobs/9cd9bb00c90a6ffc33175f92c7d3adf284da4795",
+   "source_kind": "readme",
+   "source_sha256": "9596f218c73f6c97463d09b89ae1bd391a0de409ab675887b36706d609483341",
+   "source_url": "https://github.com/2024puc/psis-cd-homework/blob/main/README.txt",
+   "verification": "source_based"
+  },
+  "scope_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/2024puc/psis-cd-homework/git/blobs/9cd9bb00c90a6ffc33175f92c7d3adf284da4795",
+   "source_kind": "readme",
+   "source_sha256": "9596f218c73f6c97463d09b89ae1bd391a0de409ab675887b36706d609483341",
+   "source_url": "https://github.com/2024puc/psis-cd-homework/blob/main/README.txt",
+   "verification": "source_based"
+  },
+  "positioning_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/2024puc/psis-cd-homework/git/blobs/9cd9bb00c90a6ffc33175f92c7d3adf284da4795",
+   "source_kind": "readme",
+   "source_sha256": "9596f218c73f6c97463d09b89ae1bd391a0de409ab675887b36706d609483341",
+   "source_url": "https://github.com/2024puc/psis-cd-homework/blob/main/README.txt",
+   "verification": "source_based"
+  }
+ },
+ "scenario_matches": [
+  {
+   "applicability": "unverified",
+   "conditions": [
+    "依赖外部 Google Apps Script 跟踪器可用"
+   ],
+   "evidence": {
+    "excerpt": "",
+    "immutable_url": "https://api.github.com/repos/2024puc/psis-cd-homework/git/blobs/9cd9bb00c90a6ffc33175f92c7d3adf284da4795",
+    "source_kind": "readme",
+    "source_sha256": "9596f218c73f6c97463d09b89ae1bd391a0de409ab675887b36706d609483341",
+    "source_url": "https://github.com/2024puc/psis-cd-homework/blob/main/README.txt",
+    "verification": "source_based"
+   },
+   "reason": "面向家长查看作业，但仅启动器，提交跟踪与反馈功能在外部系统，未证实。",
+   "scenario_id": "auto-assignment-management-7617f41ee9",
+   "leaf": "assignment-management",
+   "leaf_name": "Assignment Management",
+   "scenario_name": "K-12 家庭作业跟踪",
+   "scenario_description": "中小学教师布置课堂作业并标记为纸质提交，系统按名单跟踪每位学生的提交与缺交状态，家长通过只读视图查看孩子作业完成情况与教师反馈。"
+  }
+ ],
+ "sources": [
+  {
+   "kind": "readme",
+   "immutable_url": "https://api.github.com/repos/2024puc/psis-cd-homework/git/blobs/9cd9bb00c90a6ffc33175f92c7d3adf284da4795",
+   "sha256": "9596f218c73f6c97463d09b89ae1bd391a0de409ab675887b36706d609483341",
+   "text": "PSIS CD Homework Launcher\n\nFiles:\n- index.html\n- manifest.webmanifest\n- sw.js\n- icon-192.png\n- icon-512.png\n\nPurpose:\nHost these files together on any HTTPS static website.\nOpen the hosted launcher page once on the phone and add it to the Home Screen.\nThe shortcut will use the PSIS icon and the name \"PSIS CD Homework\".\nAfter installation, tapping the icon opens the live Homework Tracker.\n\nLive tracker:\nhttps://script.google.com/macros/s/AKfycbyKu8R8uICJZ8A4puOPpU3XAJXftYLdU3b5et33LtX5TCQj5PdXMOn98VNWlkXDJ9qScQ/exec\n",
+   "id": "s0",
+   "original_chars": 521,
+   "truncated": false
+  },
+  {
+   "id": "s1",
+   "kind": "github_metadata",
+   "sha256": "89cade130e1e51b61c7207efc532eb75b556e809cff2f970ff40a4c5c04e6d94",
+   "text": "{\"archived\":false,\"description\":\"This app is for the parents/guardians/students of PSIS Chamkar Doung to track homework.\",\"full_name\":\"2024puc/psis-cd-homework\",\"html_url\":\"https://github.com/2024puc/psis-cd-homework\",\"id\":1372674615,\"language\":\"HTML\",\"license\":null,\"topics\":[]}\nThis app is for the parents/guardians/students of PSIS Chamkar Doung to track homework.",
+   "truncated": false
+  }
+ ],
+ "coverage": {
+  "total_campaign_matches": 1,
+  "matches_included": 1,
+  "files_available": 1,
+  "files_included": 1,
+  "omitted_files": 0,
+  "truncated_files": 0
+ }
+}

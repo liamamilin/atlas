@@ -1,0 +1,76 @@
+{
+ "repository_id": 1233108486,
+ "domain": "26",
+ "input_sha256": "56638ed6bc03ffbbbb9c67a3a82fb8e90bae0511fa9a52df0216bb2d75456b49",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:12:27.689751+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-d90fbd992745-130e2b",
+ "usage": {
+  "prompt_tokens": 4259,
+  "completion_tokens": 357,
+  "total_tokens": 4616,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00077779,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00077779,
+   "tokens": {
+    "input": 3747,
+    "output": 357,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1233108486,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片基本忠实于 README：定位为 ABP DDD 分层启动解决方案，明确说明业务能力未描述、业务实现未知，许可为 pending，三个宴会场景均标为 unverified 且理由为未描述相关功能。未发现把计划写成已实现或把窄功能当完整业务的问题。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"limited\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"project_type\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"wrong_type\",\"claim\":\"project_type: application\",\"source_id\":\"s0\",\"quote\":\"This is a layered startup solution based on Domain Driven Design (DDD) practises.\",\"reason\":\"README 自述为 ABP 启动模板/脚手架，且卡片自身 scope 与 summary 均称其为技术脚手架、业务能力未说明；标为 application 与来源措辞及卡片内部描述存在张力，但仓库确含 Angular、HttpApi.Host、DbMigrator 等可运行应用组件，故仅为轻微不一致。\",\"suggested_correction\":\"可改为 application（启动模板/脚手架）或在 project_type 旁注明其为 ABP 启动模板，避免暗示已具备宴会业务应用。\"}],\"limitations\":[\"仅提供 README 与 GitHub 元数据各一份，未审源码，无法核实业务实现、依赖与功能真实性。\",\"许可状态为 pending，未做许可全文比对，不能据此判定开源授权。\",\"三个场景均无 README 证据支持，标为 unverified 属如实保留，非错误。\"]}",
+ "review": {
+  "repository_id": 1233108486,
+  "verdict": "pass_with_limits",
+  "summary": "卡片基本忠实于 README：定位为 ABP DDD 分层启动解决方案，明确说明业务能力未描述、业务实现未知，许可为 pending，三个宴会场景均标为 unverified 且理由为未描述相关功能。未发现把计划写成已实现或把窄功能当完整业务的问题。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "limited",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "project_type",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "wrong_type",
+    "claim": "project_type: application",
+    "source_id": "s0",
+    "quote": "This is a layered startup solution based on Domain Driven Design (DDD) practises.",
+    "reason": "README 自述为 ABP 启动模板/脚手架，且卡片自身 scope 与 summary 均称其为技术脚手架、业务能力未说明；标为 application 与来源措辞及卡片内部描述存在张力，但仓库确含 Angular、HttpApi.Host、DbMigrator 等可运行应用组件，故仅为轻微不一致。",
+    "suggested_correction": "可改为 application（启动模板/脚手架）或在 project_type 旁注明其为 ABP 启动模板，避免暗示已具备宴会业务应用。"
+   }
+  ],
+  "limitations": [
+   "仅提供 README 与 GitHub 元数据各一份，未审源码，无法核实业务实现、依赖与功能真实性。",
+   "许可状态为 pending，未做许可全文比对，不能据此判定开源授权。",
+   "三个场景均无 README 证据支持，标为 unverified 属如实保留，非错误。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 0,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T05:12:34.878039+00:00",
+ "elapsed_seconds": 7.188
+}

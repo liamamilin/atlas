@@ -1,0 +1,66 @@
+{
+ "job_id": "batch_4812ef3db57543c3acc1871b8ea5ba6e",
+ "started_at": "2026-10-29T03:45:28.341396+00:00",
+ "cases": {
+  "log-management": {
+   "resolved": true,
+   "original_error": "GitHub 资源超过采集大小限制",
+   "run_id": "oss_04074e0c6f83463cbb2b6fa0bdb074eb",
+   "finished_at": "2026-10-29T03:45:48.562122+00:00",
+   "queries_recovered": 1,
+   "returned": 71,
+   "existing_60_targets_retained": true
+  },
+  "distributed-control-system-dcs": {
+   "resolved": true,
+   "original_error": "场景搜索必须使用通用任务关键词，不能指定仓库或作者",
+   "run_id": "oss_52770dbaef4148cba6fcfb1a7cb20cb5",
+   "finished_at": "2026-10-29T03:47:59.925265+00:00",
+   "selected": 60,
+   "processed_now": 60,
+   "published": 39,
+   "rejected": 21,
+   "valid_scenarios": 3,
+   "queries_recovered": 3
+  },
+  "it-operations-management-itom": {
+   "resolved": true,
+   "original_error": "模型返回的 场景名称 长度或类型无效",
+   "run_id": "oss_05b51a7d2d3946569e12e7f867055e66",
+   "finished_at": "2026-10-29T03:50:04.836363+00:00",
+   "selected": 60,
+   "processed_now": 60,
+   "published": 50,
+   "rejected": 10,
+   "valid_scenarios": 3,
+   "queries_recovered": 3
+  },
+  "portfolio-management-system": {
+   "resolved": true,
+   "original_error": "模型未返回有效 JSON；本次结果未入库",
+   "run_id": "oss_c20d3b7c68224715a93e7edeee63daa4",
+   "finished_at": "2026-10-29T03:53:05.218289+00:00",
+   "existing_cards_reviewed": 37,
+   "new_scenario_matches": 17,
+   "global_facts_and_licenses_preserved": true,
+   "old_matches_preserved": true,
+   "valid_scenarios": 3,
+   "queries_recovered": 3
+  }
+ },
+ "pid": 15879,
+ "state": "completed",
+ "recovery_history": [
+  {
+   "failed_at": "2026-10-29T03:50:28.206497+00:00",
+   "error_type": "ValueError",
+   "error": "原投资组合项目缺少归档来源，停止而不改写卡片"
+  }
+ ],
+ "finished_at": "2026-10-29T03:53:06.021310+00:00",
+ "job_status": "completed",
+ "processed": 85351,
+ "total": 85351,
+ "deferred_pending": 181823,
+ "unresolved_errors": 0
+}

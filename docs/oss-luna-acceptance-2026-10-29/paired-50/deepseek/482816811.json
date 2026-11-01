@@ -1,0 +1,93 @@
+{
+ "repository_id": 482816811,
+ "domain": "13",
+ "input_sha256": "9113445d0d7028424e1fbff8ef078f2c859d13f8703fbe6c6bd9fea0921bc022",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:39.352343+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-dca22d282df9-b7a5f",
+ "usage": {
+  "prompt_tokens": 2905,
+  "completion_tokens": 643,
+  "total_tokens": 3548,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00074629,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00074629,
+   "tokens": {
+    "input": 2393,
+    "output": 643,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":482816811,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体与来源一致：定位、项目类型、许可与场景匹配均保守标注，未把未列出的连接器或运行能力写成已实现。主要问题是功能条目把 README 中一段疑似安装示例的命令行片段当作已核验的 CLI 用法，证据偏弱。\",\"checks\":{\"facts\":\"limited\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"提供 source/destination 形式的连接器命令行用法\",\"source_id\":\"s0\",\"quote\":\"open-connector\\nsource-s3\\ndestination-s3\\n--extra-index-url=https://pypi.joffreybvn.be\",\"reason\":\"该片段位于安装说明的示例代码块中，且混入 pip 参数，无法确认是实际 CLI 调用语法；卡片将其表述为已提供的命令行用法，证据不足。\",\"suggested_correction\":\"改为“README 示例中出现 open-connector/source-s3/destination-s3 字样，具体 CLI 用法未在资料中说明”，或标注为未核验。\"},{\"field\":\"positioning\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"开源数据连接器库，用于从应用、API、数仓、数据湖和数据库抽取、同步与加载数据。\",\"source_id\":\"s2\",\"quote\":\"Open-source data connectors to extract, sync and load data from applications, APIs, warehouses, lakes and databases.\",\"reason\":\"该表述直接来自仓库描述，属元数据而非 README 正文；作为定位可接受，但不应视为已核验的功能清单。\",\"suggested_correction\":\"保留定位，但注明来源为仓库描述元数据，具体连接器未在 README 中列出。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-data-integration-platform-975e0d48f0\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"定位为多源连接器库，可能用于SaaS/数据湖接入，但输入资料未列出具体SaaS连接器\",\"source_id\":\"s0\",\"quote\":\"source-s3\\ndestination-s3\",\"reason\":\"README 仅出现 s3 相关字样，未出现 CRM、计费等 SaaS 连接器；applicability 已标 unverified，属如实保留，但 relevance 依据薄弱。\",\"suggested_correction\":\"维持 unverified，并明确“资料中仅见 S3 相关示例，SaaS 接入能力未证实”。\"}],\"limitations\":[\"仅提供 README 与 LICENSE 两个文件及仓库元数据，未覆盖代码、连接器目录与文档。\",\"README 内容简短且示例代码块语义不清，无法确认实际 CLI 与支持的系统。\",\"许可结论依赖确定性 SPDX 全文比对，本次仅审语义标签。\"]}",
+ "review": {
+  "repository_id": 482816811,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体与来源一致：定位、项目类型、许可与场景匹配均保守标注，未把未列出的连接器或运行能力写成已实现。主要问题是功能条目把 README 中一段疑似安装示例的命令行片段当作已核验的 CLI 用法，证据偏弱。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "提供 source/destination 形式的连接器命令行用法",
+    "source_id": "s0",
+    "quote": "open-connector\nsource-s3\ndestination-s3\n--extra-index-url=https://pypi.joffreybvn.be",
+    "reason": "该片段位于安装说明的示例代码块中，且混入 pip 参数，无法确认是实际 CLI 调用语法；卡片将其表述为已提供的命令行用法，证据不足。",
+    "suggested_correction": "改为“README 示例中出现 open-connector/source-s3/destination-s3 字样，具体 CLI 用法未在资料中说明”，或标注为未核验。"
+   },
+   {
+    "field": "positioning",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "开源数据连接器库，用于从应用、API、数仓、数据湖和数据库抽取、同步与加载数据。",
+    "source_id": "s2",
+    "quote": "Open-source data connectors to extract, sync and load data from applications, APIs, warehouses, lakes and databases.",
+    "reason": "该表述直接来自仓库描述，属元数据而非 README 正文；作为定位可接受，但不应视为已核验的功能清单。",
+    "suggested_correction": "保留定位，但注明来源为仓库描述元数据，具体连接器未在 README 中列出。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-data-integration-platform-975e0d48f0",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "定位为多源连接器库，可能用于SaaS/数据湖接入，但输入资料未列出具体SaaS连接器",
+    "source_id": "s0",
+    "quote": "source-s3\ndestination-s3",
+    "reason": "README 仅出现 s3 相关字样，未出现 CRM、计费等 SaaS 连接器；applicability 已标 unverified，属如实保留，但 relevance 依据薄弱。",
+    "suggested_correction": "维持 unverified，并明确“资料中仅见 S3 相关示例，SaaS 接入能力未证实”。"
+   }
+  ],
+  "limitations": [
+   "仅提供 README 与 LICENSE 两个文件及仓库元数据，未覆盖代码、连接器目录与文档。",
+   "README 内容简短且示例代码块语义不清，无法确认实际 CLI 与支持的系统。",
+   "许可结论依赖确定性 SPDX 全文比对，本次仅审语义标签。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:11:50.648636+00:00",
+ "elapsed_seconds": 11.296
+}

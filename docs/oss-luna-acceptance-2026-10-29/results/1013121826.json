@@ -1,0 +1,84 @@
+{
+ "repository_id": 1013121826,
+ "domain": "13",
+ "input_sha256": "e26522ecca273b39a91efe8da86bbd526f5dc20901711ec9de8e5ff3ee630fc7",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:12.062221+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCCw0Dttn5EGccUnA7YFu3Ue5Jta",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 3436,
+  "completion_tokens": 814,
+  "total_tokens": 4250,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 3433,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0007506,
+ "response_text": "{\n  \"repository_id\": 1013121826,\n  \"verdict\": \"pass_with_limits\",\n  \"summary\": \"卡片总体与 README 描述的 JIRA 支持团队 SLA 可视化项目相符，且许可保留待核验是审慎处理。README 未提供足够细节验证预测、实时性及部分具体指标；场景匹配也应保留条件性。\",\n  \"checks\": {\n    \"facts\": \"limited\",\n    \"project_type\": \"supported\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"limited\"\n  },\n  \"issues\": [\n    {\n      \"field\": \"summary\",\n      \"scenario_id\": \"\",\n      \"severity\": \"minor\",\n      \"kind\": \"unsupported_claim\",\n      \"claim\": \"用Plotly/Pandas读取JIRA API或CSV导出，生成SLA违约、工单趋势与团队绩效图表；README提供示例数据集，实际数据接入需自行配置。\",\n      \"source_id\": \"s0\",\n      \"quote\": \"Built using Plotly, Pandas & open APIs\",\n      \"reason\": \"README 支持 Plotly、Pandas、示例数据以及可连接 JIRA API 或上传 CSV，但没有明确说明工单趋势图表，也未明确说实际数据接入必须自行配置。摘要中的这些具体表述超出所引来源可确认的范围。\",\n      \"suggested_correction\": \"收紧为：README 描述了面向 JIRA 工作流的 SLA、团队绩效和历史趋势可视化，并称提供示例数据，可连接 JIRA API 或上传 CSV。\"\n    },\n    {\n      \"field\": \"features\",\n      \"scenario_id\": \"\",\n      \"severity\": \"minor\",\n      \"kind\": \"unsupported_claim\",\n      \"claim\": \"按坐席/类别的工单状态与团队绩效对比\",\n      \"source_id\": \"s0\",\n      \"quote\": \"Real-time ticket status per agent/category\",\n      \"reason\": \"来源支持按坐席/类别查看实时工单状态，也支持团队绩效对比，但没有明确说明绩效对比按坐席或类别进行。将两项合并成同一维度的对比功能缺少依据。\",\n      \"suggested_correction\": \"拆分为“按坐席/类别查看实时工单状态”和“团队绩效对比”。\"\n    },\n    {\n      \"field\": \"scenario_match\",\n      \"scenario_id\": \"auto-dashboard-platform-5426193d6c\",\n      \"severity\": \"minor\",\n      \"kind\": \"missing_condition\",\n      \"claim\": \"直接面向客服工单SLA与队列指标的可视化\",\n      \"source_id\": \"s0\",\n      \"quote\": \"You can connect your JIRA API or upload CSV export.\",\n      \"reason\": \"场景要求共享看板供全组成员按状态颜色处理积压；README 说明可运行脚本并接入 JIRA API 或 CSV，但没有说明共享、多用户访问或按颜色优先处理能力。卡片已标为 conditional 并列出运行及接入条件，适用性可保留，但理由中的“直接面向”容易让人误以为完整覆盖场景。\",\n      \"suggested_correction\": \"将理由改为：可用于生成客服工单 SLA 监控视图；共享给全组及按颜色协同处理需另行满足场景要求。\"\n    }\n  ],\n  \"limitations\": [\n    \"README 来源完整，但本次材料未包含实现源码；功能核验仅能依据 README 的自述。\",\n    \"许可证标签保留 pending/NOASSERTION，未将 README 徽章或 LICENSE 中的短文本提升为已核验许可。\"\n  ]\n}",
+ "review": {
+  "repository_id": 1013121826,
+  "verdict": "pass_with_limits",
+  "summary": "卡片总体与 README 描述的 JIRA 支持团队 SLA 可视化项目相符，且许可保留待核验是审慎处理。README 未提供足够细节验证预测、实时性及部分具体指标；场景匹配也应保留条件性。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "summary",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "用Plotly/Pandas读取JIRA API或CSV导出，生成SLA违约、工单趋势与团队绩效图表；README提供示例数据集，实际数据接入需自行配置。",
+    "source_id": "s0",
+    "quote": "Built using Plotly, Pandas & open APIs",
+    "reason": "README 支持 Plotly、Pandas、示例数据以及可连接 JIRA API 或上传 CSV，但没有明确说明工单趋势图表，也未明确说实际数据接入必须自行配置。摘要中的这些具体表述超出所引来源可确认的范围。",
+    "suggested_correction": "收紧为：README 描述了面向 JIRA 工作流的 SLA、团队绩效和历史趋势可视化，并称提供示例数据，可连接 JIRA API 或上传 CSV。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "按坐席/类别的工单状态与团队绩效对比",
+    "source_id": "s0",
+    "quote": "Real-time ticket status per agent/category",
+    "reason": "来源支持按坐席/类别查看实时工单状态，也支持团队绩效对比，但没有明确说明绩效对比按坐席或类别进行。将两项合并成同一维度的对比功能缺少依据。",
+    "suggested_correction": "拆分为“按坐席/类别查看实时工单状态”和“团队绩效对比”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-dashboard-platform-5426193d6c",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "直接面向客服工单SLA与队列指标的可视化",
+    "source_id": "s0",
+    "quote": "You can connect your JIRA API or upload CSV export.",
+    "reason": "场景要求共享看板供全组成员按状态颜色处理积压；README 说明可运行脚本并接入 JIRA API 或 CSV，但没有说明共享、多用户访问或按颜色优先处理能力。卡片已标为 conditional 并列出运行及接入条件，适用性可保留，但理由中的“直接面向”容易让人误以为完整覆盖场景。",
+    "suggested_correction": "将理由改为：可用于生成客服工单 SLA 监控视图；共享给全组及按颜色协同处理需另行满足场景要求。"
+   }
+  ],
+  "limitations": [
+   "README 来源完整，但本次材料未包含实现源码；功能核验仅能依据 README 的自述。",
+   "许可证标签保留 pending/NOASSERTION，未将 README 徽章或 LICENSE 中的短文本提升为已核验许可。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:21.634441+00:00",
+ "elapsed_seconds": 9.572
+}

@@ -1,0 +1,51 @@
+{
+ "repository_id": 1089712601,
+ "domain": "10",
+ "input_sha256": "c7ed3083f57c41929164ab1e9a778012e90b786d29d085579b56b64d730991e4",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:38:57.482256+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCChN5kQvLgWjRBI6lEdQ6fv0gOq",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 2177,
+  "completion_tokens": 181,
+  "total_tokens": 2358,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 2174,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.00030820000000000006,
+ "response_text": "{\"repository_id\":1089712601,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片保留了 README 内容极少、实现无法确认及许可证待核验等限制；贷款资格预测的描述有仓库元数据支持。场景均标为 unverified，且说明了尚未证实的能力，未将其写成已实现。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"README 仅包含标题；项目描述来自 GitHub 元数据，不能据此确认实现、可运行性或完成度。\",\"仓库元数据未提供许可证；pending 标签恰当地保留了许可未知状态。\",\"两个场景匹配均为 unverified，不能视为已验证的场景适用性。\"]}",
+ "review": {
+  "repository_id": 1089712601,
+  "verdict": "pass_with_limits",
+  "summary": "卡片保留了 README 内容极少、实现无法确认及许可证待核验等限制；贷款资格预测的描述有仓库元数据支持。场景均标为 unverified，且说明了尚未证实的能力，未将其写成已实现。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "README 仅包含标题；项目描述来自 GitHub 元数据，不能据此确认实现、可运行性或完成度。",
+   "仓库元数据未提供许可证；pending 标签恰当地保留了许可未知状态。",
+   "两个场景匹配均为 unverified，不能视为已验证的场景适用性。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:01.741726+00:00",
+ "elapsed_seconds": 4.259
+}

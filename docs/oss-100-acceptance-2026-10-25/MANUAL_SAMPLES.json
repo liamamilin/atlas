@@ -1,0 +1,1267 @@
+[
+  {
+    "leaf": "web-browser",
+    "repo": "qutebrowser/qutebrowser",
+    "repository_id": 21244505,
+    "summary": "qutebrowser 是一个以键盘操作为中心、GUI 极简的浏览器，使用 Python 与 Qt 构建，默认采用 QtWebEngine 呈现网页。",
+    "type": "application",
+    "features": [
+      "键盘聚焦、极简图形界面",
+      "类 Vim 的键盘浏览操作",
+      "基于 QtWebEngine（Chromium）呈现网页，可选 QtWebKit",
+      "支持 :view-source、:report 等命令",
+      "可选 adblock 扩展以增强广告拦截"
+    ],
+    "scope": "适用于希望以键盘为主进行网页浏览的桌面用户；运行依赖 Python 3.10+ 与 Qt 6/5 等环境。",
+    "completeness": "partial",
+    "missing_fields": [
+      "license_verification"
+    ],
+    "license": {
+      "detected_spdx": "GPL-3.0",
+      "note": "许可证原文已读取，但未通过官方模板精确匹配，保留待核验；不按公开仓库或标签推定为开源",
+      "source": {
+        "blob_sha": "f288702d2fa16d3cdf0035b15a9fcbc552cd88e7",
+        "immutable_url": "https://api.github.com/repos/qutebrowser/qutebrowser/git/blobs/f288702d2fa16d3cdf0035b15a9fcbc552cd88e7",
+        "kind": "license",
+        "path": "LICENSE",
+        "retrieved_at": "2026-10-23T09:59:48.613432+00:00",
+        "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "url": "https://github.com/qutebrowser/qutebrowser/blob/main/LICENSE"
+      },
+      "spdx": null,
+      "status": "pending"
+    },
+    "matches": [
+      {
+        "applicability": "direct",
+        "conditions": [],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/qutebrowser/qutebrowser/git/blobs/c07ce04b406f477cd7a091c753a08ed8e3c66cd9",
+          "source_kind": "readme",
+          "source_sha256": "0472f4bda2245de0ba350ad73817c356d8ca78945c14f1ddb22eca531b53a6d5",
+          "source_url": "https://github.com/qutebrowser/qutebrowser/blob/main/README.asciidoc",
+          "verification": "source_based"
+        },
+        "reason": "作为网页浏览器，支持按地址访问并阅读网页。",
+        "scenario_id": "auto-web-browser-a9104fc099"
+      },
+      {
+        "applicability": "unverified",
+        "conditions": [],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/qutebrowser/qutebrowser/git/blobs/c07ce04b406f477cd7a091c753a08ed8e3c66cd9",
+          "source_kind": "readme",
+          "source_sha256": "0472f4bda2245de0ba350ad73817c356d8ca78945c14f1ddb22eca531b53a6d5",
+          "source_url": "https://github.com/qutebrowser/qutebrowser/blob/main/README.asciidoc",
+          "verification": "source_based"
+        },
+        "reason": "浏览器通常具备地址/搜索入口，但 README 未明确说明地址栏搜索集成。",
+        "scenario_id": "auto-web-browser-a3627fdd34"
+      },
+      {
+        "applicability": "unverified",
+        "conditions": [],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/qutebrowser/qutebrowser/git/blobs/c07ce04b406f477cd7a091c753a08ed8e3c66cd9",
+          "source_kind": "readme",
+          "source_sha256": "0472f4bda2245de0ba350ad73817c356d8ca78945c14f1ddb22eca531b53a6d5",
+          "source_url": "https://github.com/qutebrowser/qutebrowser/blob/main/README.asciidoc",
+          "verification": "source_based"
+        },
+        "reason": "作为网页浏览器支持沿页面链接浏览与导航回退，但 README 未逐项说明前进/后退行为。",
+        "scenario_id": "auto-web-browser-42e38948e0"
+      }
+    ],
+    "scenarios": [
+      {
+        "description": "用户从地址栏输入网址，打开指定网页并阅读或操作当前页面内容，完成一次以地址为入口的访问。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-web-browser-a9104fc099",
+        "leaf": "web-browser",
+        "leaf_name": "Web Browser",
+        "name": "按地址打开并阅读网页",
+        "search_queries": [
+          "open web page"
+        ]
+      },
+      {
+        "description": "用户把查询词输入地址栏，查看搜索引擎返回的结果，并打开其中一个页面继续浏览。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-web-browser-a3627fdd34",
+        "leaf": "web-browser",
+        "leaf_name": "Web Browser",
+        "name": "输入查询并打开搜索结果",
+        "search_queries": [
+          "search web results"
+        ]
+      },
+      {
+        "description": "用户在当前页面点击链接继续访问，必要时使用后退和前进在访问序列中移动，保持浏览连续。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-web-browser-42e38948e0",
+        "leaf": "web-browser",
+        "leaf_name": "Web Browser",
+        "name": "沿页面链接浏览并回退",
+        "search_queries": [
+          "follow website links"
+        ]
+      }
+    ],
+    "documents": [
+      {
+        "url": "https://github.com/qutebrowser/qutebrowser/blob/main/README.asciidoc",
+        "path": "README.asciidoc",
+        "text": "// SPDX-License-Identifier: GPL-3.0-or-later\n\n// If you are reading this in plaintext or on PyPi:\n//\n// A rendered version is available at:\n// https://github.com/qutebrowser/qutebrowser/blob/main/README.asciidoc\n\nqutebrowser\n===========\n\n// QUTE_WEB_HIDE\nimage:qutebrowser/icons/qutebrowser-64x64.png[qutebrowser logo] *A keyboard-driven, vim-like browser based on Python and Qt.*\n\nimage:https://github.com/qutebrowser/qutebrowser/workflows/CI/badge.svg[\"Build Status\", link=\"https://github.com/qutebrowser/qutebrowser/actions?query=workflow%3ACI\"]\nimage:https://codecov.io/github/qutebrowser/qutebrowser/coverage.svg?branch=main[\"coverage badge\",link=\"https://codecov.io/github/qutebrowser/qutebrowser?branch=main\"]\n\nlink:https://www.qutebrowser.org[website] | link:https://blog.qutebrowser.org[blog] | https://github.com/qutebrowser/qutebrowser/blob/main/doc/faq.asciidoc[FAQ] | https://www.qutebrowser.org/doc/contributing.html[contributing] | link:https://github.com/qutebrowser/qutebrowser/releases[releases] | https://github.com/qutebrowser/qutebrowser/blob/main/doc/install.asciidoc[installing]\n// QUTE_WEB_HIDE_END\n\nqutebrowser is a keyboard-focused browser with a minimal GUI. It's based\non Python and Qt and free software, licensed under the GPL.\n\nIt was inspired by other browsers/addons like dwb and Vimperator/Pentadactyl.\n\n// QUTE_WEB_HIDE\n**qutebrowser's primary maintainer, The-Compiler, is currently working\npart-time on qutebrowser, funded by donations.** To sustain this for a long\ntime, your help is needed! See the\nhttps://github.com/sponsors/The-Compiler/[GitHub Sponsors page] or\nhttps://github.com/qutebrowser/qutebrowser/blob/main/README.asciidoc#donating[alternative donation methods]\nfor more information. Depending on your sign-up date and how\nlong you keep a certain level, you can get qutebrowser t-shirts, stickers and\nmore!\n// QUTE_WEB_HIDE_END\n\nScreenshots\n-----------\n\nimage:doc/img/main.png[\"screenshot 1\",width=300,link=\"doc/img/main.png\"]\nimage:doc/img/downloads.png[\"screenshot 2\",width=300,link=\"doc/img/downloads.png\"]\nimage:doc/img/completion.png[\"screenshot 3\",width=300,link=\"doc/img/completion.png\"]\nimage:doc/img/hints.png[\"screenshot 4\",width=300,link=\"doc/img/hints.png\"]\n\nDownloads\n---------\n\nSee the https://github.com/qutebrowser/qutebrowser/releases[GitHub releases\npage] for available downloads and the link:doc/install.asciidoc[INSTALL] file for\ndetailed instructions on how to get qutebrowser running on various platforms.\n\nDocumentation and getting help\n------------------------------\n\nPlease see the link:doc/help/index.asciidoc[help page] for available documentation\npages and support channels.\n\nContributions / Bugs\n--------------------\n\nYou want to contribute to qutebrowser? Awesome! Please read\nlink:doc/contributing.asciidoc[the contribution guidelines] for details and\nuseful hints.\n\nIf you found a bug or have a feature request, you can report it in several\nways:\n\n* Use the built-in `:report` command or the automatic crash dialog.\n* Open an issue in the Github issue tracker.\n* Write a mail to the\nhttps://listi.jpberlin.de/mailman/listinfo/qutebrowser[mailinglist] at\nmailto:qutebrowser@lists.qutebrowser.org[].\n\nPlease report security bugs to security@qutebrowser.org\n(or if GPG encryption is desired, contact me@the-compiler.org with GPG ID\nhttps://www.the-compiler.org/pubkey.asc[0x916EB0C8FD55A072]).\n\nAlternatively,\nhttps://github.com/qutebrowser/qutebrowser/security/advisories/new[report a vulnerability]\nvia GitHub's\nhttps://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing/privately-reporting-a-security-vulnerability[private reporting feature].\n\nRequirements\n------------\n\nThe following software and libraries are required to run qutebrowser:\n\n* https://www.python.org/[Python] 3.10 or newer\n* https://www.qt.io/[Qt], either 6.2.0 or newer, or 5.15.0 or newer, with the following modules:\n  - QtCore / qtbase\n  - QtQuick (part of qtbase or qtdeclarative in some distributions)\n  - QtSQL (part of qtbase in some distributions)\n  - QtDBus (part of qtbase in some distributions; note that a connection to DBus at\n    runtime is optional)\n  - QtOpenGL\n  - QtWebEngine (if using Qt 5, 5.15.2 or newer), or\n  - alternatively QtWebKit (5.212) - **This is not recommended** due to known security\n    issues in QtWebKit, you most likely want to use qutebrowser with the\n    default QtWebEngine backend (based on Chromium) instead. Quoting the\n    https://github.com/qtwebkit/qtwebkit/releases[QtWebKit releases page]:\n    _[The latest QtWebKit] release is based on [an] old WebKit revision with known\nunpatched vulnerabilities. Please use it carefully and avoid visiting untrusted\nwebsites and using it for transmission of sensitive data._\n* https://www.riverbankcomputing.com/software/pyqt/intro[PyQt] 6.2.2 or newer\n  (Qt 6) or 5.15.0 or newer (Qt 5)\n* https://palletsprojects.com/p/jinja/[jinja2]\n* https://github.com/yaml/pyyaml[PyYAML]\n\nOn macOS, the following libraries are also required:\n\n* https://pyobjc.readthedocs.io/en/latest/[pyobjc-core and pyobjc-framework-Cocoa]\n\nThe following libraries are optional:\n\n* https://pypi.org/project/adblock/[adblock] (for improved adblocking using ABP syntax)\n* https://pygments.org/[pygments] for syntax highlighting with `:view-source`\n  on QtWebKit, or when using `:view-source --pygments` with the (default)\n  QtWebEngine backend.\n* On Windows, https://pypi.python.org/pypi/colorama/[colorama] for colored log\n  output.\n* https://asciidoc.org/[asciidoc] to generate the documentation for the `:help`\n  command, when using the git repository (rather than a release).\n\nSee link:doc/install.asciidoc[the documentation] for directions on how to\ninstall qutebrowser and its dependencies.\n\nDonating\n--------\n\n**qutebrowser's primary maintainer, The-Compiler, is currently working\npart-time on qutebrowser, funded by donations.** To sustain this for a long\ntime, your help is needed! See the\nhttps://github.com/sponsors/The-Compiler/[GitHub Sponsors page] for more\ninformation. Depending on your sign-up date and how long you keep a certain\nlevel, you can get qutebrowser t-shirts, stickers and more!\n\nGitHub Sponsors allows for one-time donations (using the buttons next to \"Select a\ntier\") as well as custom amounts. **For currencies other than Euro or Swiss Francs, this\nis the preferred donation method.** GitHub uses https://stripe.com/[Stripe] to accept\npayment via credit cards without any fees. Billing via PayPal is available as well, with\nless fees than a direct PayPal transaction.\n\nAlternatively, the following donation methods are available -- note that\neligibility for swag (shirts/stickers/etc.) is handled on a case-by-case basis\nfor those, please mailto:mail@qutebrowser.org[get in touch] for details.\n\n* https://liberapay.com/The-Compiler[Liberapay], which can handle payments\n  via Credit Card, SEPA bank transfers, or Paypal. Payment fees are paid by me,\n  but they are https://liberapay.com/about/faq#fees[relatively low].\n* SEPA bank transfer inside Europe (**no fees**):\n  - Account holder: Freya Bruhin\n  - Country: Switzerland\n  - IBAN (EUR): CH13 0900 0000 9160 4094 6\n  - IBAN (other): CH80 0900 0000 8711 8587 3\n  - Bank: PostFinance AG, Mingerstrasse 20, 3030 Bern, Switzerland (BIC: POFICHBEXXX)\n  - If you need any other information: Contact me at mail@qutebrowser.org.\n  - If possible, **please consider yearly or semi-yearly donations**, because\n    of the additional overhead from many individual transactions for\n    bookkeeping/tax purposes.\n* PayPal:\n  https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=me%40the-compiler.org&item_name=qutebrowser&currency_code=CHF&source=url[CHF],\n  https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=me%40the-compiler.org&item_name=qutebrowser&currency_code=EUR&source=url[EUR],\n  https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=me%40the-compiler.org&item_name=qutebrowser&currency_code=USD&source=url[USD].\n  **Note: Fees can be very high (around 5-40%, depending on the donated amounts)** - consider\n  using GitHub Sponsors (credit card), Liberapay (credit cards, PayPal, or bank\n  transfer) or SEPA bank transfers instead.\n* Cryptocurrencies:\n  - Bitcoin: link:bitcoin:bc1q3ptyw8hxrcfz6ucfgmglphfvhqpy8xr6k25p00[bc1q3ptyw8hxrcfz6ucfgmglphfvhqpy8xr6k25p00]\n  - Bitcoin Cash: link:bitcoincash:1BnxUbnJ5MrEPeh5nuUMx83tbiRAvqJV3N[1BnxUbnJ5MrEPeh5nuUMx83tbiRAvqJV3N]\n  - Ethereum: link:ethereum:0x10c2425856F7a8799EBCaac4943026803b1089c6[0x10c2425856F7a8799EBCaac4943026803b1089c6]\n  - Litecoin: link:litecoin:MDt3YQciuCh6QyFmr8TiWNxB94PVzbnPm2[MDt3YQciuCh6QyFmr8TiWNxB94PVzbnPm2]\n  - Others: Please mailto:mail@qutebrowser.org[get in touch], I'd happily set up anything link:https://www.ledger.com/supported-crypto-assets[supported by Ledger Live]\n\nAuthors\n-------\n\nqutebrowser's primary author is Freya Bruhin (The Compiler), but qutebrowser\nwouldn't be what it is without the help of\nhttps://github.com/qutebrowser/qutebrowser/graphs/contributors[hundreds of contributors]!\n\nAdditionally, the following people have contributed graphics:\n\n* Jad/link:https://yelostudio.com[yelo] (new icon)\n* WOFall (original icon)\n* regines (key binding cheatsheet)\n\nAlso, thanks to everyone who contributed to one of qutebrowser's\nlink:doc/backers.asciidoc[crowdfunding campaigns]!\n\nSimilar projects\n----------------\n\nVarious projects with a similar goal like qutebrowser exist.\nMany of them were inspirations for qutebrowser in some way, thanks for that!\n\nActive\n~~~~~~\n\n* https://fanglingsu.github.io/vimb/[vimb] (C, GTK+ with WebKit2)\n* https://luakit.github.io/[luakit] (C/Lua, GTK+ with WebKit2)\n* https://nyxt.atlas.engineer/[Nyxt browser] (formerly \"Next browser\", Lisp, Emacs-like but also offers Vim bindings, QtWebEngine or GTK+/WebKit2 - note there was a https://jgkamat.gitlab.io/blog/next-rce.html[critical remote code execution in 2019] which was handled quite badly)\n* https://vieb.dev/[Vieb] (JavaScript, Electron)\n* https://surf.suckless.org/[surf] (C, GTK+ with WebKit1/WebKit2)\n* https://github.com/jun7/wyeb[wyeb] (C, GTK+ with WebKit2)\n* Chrome/Chromium addons:\n  https://vimium.github.io/[Vimium]\n* Firefox addons (based on WebExtensions):\n  https://tridactyl.xyz/[Tridactyl],\n  https://addons.mozilla.org/en-GB/firefox/addon/vimium-ff/[Vimium-FF]\n* Addons for Firefox and Chrome:\n  https://github.com/brookhong/Surfingkeys[Surfingkeys] (https://github.com/brookhong/Surfingkeys/issues/1796[somewhat sketchy]...),\n  https://lydell.github.io/LinkHints/[Link Hints] (hinting only),\n  https://github.com/ueokande/vimmatic[Vimmatic]\n\nInactive\n~~~~~~~~\n\n* https://bitbucket.org/portix/dwb[dwb] (C, GTK+ with WebKit1,\nhttps://bitbucket.org/portix/dwb/pull-requests/22/several-cleanups-to-increase-portability/diff[unmaintained] -\nmain inspiration for qutebrowser)\n* https://github.com/parkouss/webmacs/[webmacs] (Python, Emacs-like with\n  QtWebEngine, https://github.com/parkouss/webmacs/issues/137[unmaintained])\n* https://sourceforge.net/p/vimprobable/wiki/Home/[vimprobable] (C, GTK+ with\n  WebKit1)\n* https://pwmt.org/projects/jumanji/[jumanji] (C, GTK+ with WebKit1)\n* http://conkeror.org/[conkeror] (Javascript, Emacs-like, XULRunner/Gecko)\n* https://www.uzbl.org/[uzbl] (C, GTK+ with WebKit1/WebKit2)\n* https://github.com/conformal/xombrero[xombrero] (C, GTK+ with WebKit1)\n* https://github.com/linkdd/cream-browser[Cream Browser] (C, GTK+ with WebKit1)\n* Firefox addons (not based on WebExtensions or no recent activity):\n  http://www.vimperator.org/[Vimperator],\n  http://bug.5digits.org/pentadactyl/index[Pentadactyl],\n  https://github.com/akhodakivskiy/VimFx[VimFx] (seems to offer a\n  https://gir.st/blog/legacyfox.htm[hack] to run on modern Firefox releases),\n  https://github.com/shinglyu/QuantumVim[QuantumVim],\n  https://github.com/ueokande/vim-vixen[Vim Vixen],\n  https://github.com/amedama41/vvimpulation[VVimpulation],\n  https://krabby.netlify.app/[Krabby]\n* Chrome/Chromium addons:\n  https://github.com/k2nr/ViChrome/[ViChrome],\n  https://github.com/jinzhu/vrome[Vrome],\n  https://github.com/lusakasa/saka-key[Saka Key] (https://github.com/lusakasa/saka-key/issues/171[unmaintained]),\n  https://github.com/1995eaton/chromium-vim[cVim],\n  https://github.com/dcchambers/vb4c[vb4c] (fork of cVim, https://github.com/dcchambers/vb4c/issues/23#issuecomment-810694017[unmaintained]),\n  https://glee.github.io/[GleeBox]\n* Addons for Safari:\n  https://televator.net/vimari/[Vimari]\n\nLicense\n-------\n\nThis program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 3 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.\n\npdf.js\n------\n\nqutebrowser optionally uses https://github.com/mozilla/pdf.js/[pdf.js] to\ndisplay PDF files in the browser. Windows releases come with a bundled pdf.js.\n\npdf.js is distributed under the terms of the Apache License. You can\nfind a copy of the license in `qutebrowser/3rdparty/pdfjs/LICENSE` (in the\nWindows release or after running `scripts/dev/update_3rdparty.py`), or online\nhttps://www.apache.org/licenses/LICENSE-2.0.html[here].\n"
+      },
+      {
+        "url": "https://github.com/qutebrowser/qutebrowser/blob/main/misc/nsis/graphics/readme.txt",
+        "path": "misc/nsis/graphics/readme.txt",
+        "text": "These are modified versions of 'orange-install.ico', 'orange-uninstall.ico'\r\nand 'orange.bmp' graphics of the NSIS distribution."
+      }
+    ]
+  },
+  {
+    "leaf": "e-commerce-platform",
+    "repo": "medusajs/medusa",
+    "repository_id": 234739976,
+    "summary": "包含 Store/Admin API、管理后台与商务模块（产品、购物车、订单、定价、支付），可搭配 Next.js 起步店面，采用核心+企业版模式",
+    "type": "application",
+    "features": [
+      "商品、购物车、订单、定价、支付等商务模块",
+      "Medusa Admin 管理后台与 Store/Admin API",
+      "可选 Next.js Starter Storefront 起步店面",
+      "模块与工作流框架，支持自定义扩展"
+    ],
+    "scope": "面向开发者构建 B2B/DTC 商店等应用，店面可自建或使用起步模板",
+    "completeness": "partial",
+    "missing_fields": [
+      "license_verification"
+    ],
+    "license": {
+      "detected_spdx": "NOASSERTION",
+      "note": "许可证原文已读取，但未通过官方模板精确匹配，保留待核验；不按公开仓库或标签推定为开源",
+      "source": {
+        "blob_sha": "2bc747bf4b0a88864584b033fdeab86012a44c79",
+        "immutable_url": "https://api.github.com/repos/medusajs/medusa/git/blobs/2bc747bf4b0a88864584b033fdeab86012a44c79",
+        "kind": "license",
+        "path": "LICENSE",
+        "retrieved_at": "2026-10-23T11:59:42.420744+00:00",
+        "sha256": "cf67cc556c17e0b00dc0c74a3d71db8dec9aae98af747a2503803a640fba9bb5",
+        "url": "https://github.com/medusajs/medusa/blob/develop/LICENSE"
+      },
+      "spdx": null,
+      "status": "pending"
+    },
+    "matches": [
+      {
+        "applicability": "conditional",
+        "conditions": [
+          "需要 Node.js 与 PostgreSQL 环境",
+          "需自行部署或使用 Next.js 起步店面"
+        ],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/medusajs/medusa/git/blobs/75d40ef5f05566ccd7f58d9794e64181aa0125a4",
+          "source_kind": "readme",
+          "source_sha256": "8d7afe78e154a93fd79ac4d9bb3c60504cf2661c9f3a65ee4067daa606df7154",
+          "source_url": "https://github.com/medusajs/medusa/blob/develop/README.md",
+          "verification": "source_based"
+        },
+        "reason": "可搭建自有品牌商店，但需开发者配置或使用起步店面",
+        "scenario_id": "auto-e-commerce-platform-e0e3cce76b"
+      },
+      {
+        "applicability": "direct",
+        "conditions": [],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/medusajs/medusa/git/blobs/75d40ef5f05566ccd7f58d9794e64181aa0125a4",
+          "source_kind": "readme",
+          "source_sha256": "8d7afe78e154a93fd79ac4d9bb3c60504cf2661c9f3a65ee4067daa606df7154",
+          "source_url": "https://github.com/medusajs/medusa/blob/develop/README.md",
+          "verification": "source_based"
+        },
+        "reason": "产品模块与 Admin 后台支持目录维护",
+        "scenario_id": "auto-e-commerce-platform-3c2e85448c"
+      },
+      {
+        "applicability": "direct",
+        "conditions": [],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/medusajs/medusa/git/blobs/75d40ef5f05566ccd7f58d9794e64181aa0125a4",
+          "source_kind": "readme",
+          "source_sha256": "8d7afe78e154a93fd79ac4d9bb3c60504cf2661c9f3a65ee4067daa606df7154",
+          "source_url": "https://github.com/medusajs/medusa/blob/develop/README.md",
+          "verification": "source_based"
+        },
+        "reason": "订单模块与 Admin 后台支持订单处理",
+        "scenario_id": "auto-e-commerce-platform-aa791f36ec"
+      }
+    ],
+    "scenarios": [
+      {
+        "description": "商家在系统中建立自有品牌商店，录入首批商品并设置支付与配送，使店面可接受买家下单。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-e-commerce-platform-e0e3cce76b",
+        "leaf": "e-commerce-platform",
+        "leaf_name": "E-commerce Platform",
+        "name": "创建自有品牌网店",
+        "search_queries": [
+          "launch online store"
+        ]
+      },
+      {
+        "description": "商品运营人员在后台新增或编辑商品信息、价格、库存和分类，使店面目录保持可售且可浏览。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-e-commerce-platform-3c2e85448c",
+        "leaf": "e-commerce-platform",
+        "leaf_name": "E-commerce Platform",
+        "name": "维护商品目录",
+        "search_queries": [
+          "manage product catalog"
+        ]
+      },
+      {
+        "description": "履约人员查看待处理订单，确认收款后拣货发货并在系统中记录履约状态，通知买家。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-e-commerce-platform-aa791f36ec",
+        "leaf": "e-commerce-platform",
+        "leaf_name": "E-commerce Platform",
+        "name": "处理订单履约",
+        "search_queries": [
+          "fulfill customer orders"
+        ]
+      }
+    ],
+    "documents": [
+      {
+        "url": "https://github.com/medusajs/medusa/blob/develop/README.md",
+        "path": "README.md",
+        "text": "<p align=\"center\">\n  <a href=\"https://www.medusajs.com\">\n  <picture>\n    <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://user-images.githubusercontent.com/59018053/229103275-b5e482bb-4601-46e6-8142-244f531cebdb.svg\">\n    <source media=\"(prefers-color-scheme: light)\" srcset=\"https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg\">\n    <img alt=\"Medusa logo\" src=\"https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg\">\n    </picture>\n  </a>\n</p>\n<h1 align=\"center\">\n  Medusa\n</h1>\n\n<h4 align=\"center\">\n  <a href=\"https://docs.medusajs.com\">Documentation</a> |\n  <a href=\"https://www.medusajs.com\">Website</a>\n</h4>\n\n<p align=\"center\">\n  Building blocks for digital commerce\n</p>\n<p align=\"center\">\n  <a href=\"https://github.com/medusajs/medusa/blob/develop/LICENSE\">\n    <img src=\"https://img.shields.io/badge/license-open--core-blue.svg\" alt=\"Medusa uses an open-core licensing model.\" />\n  </a>\n  <a href=\"https://github.com/medusajs/medusa/blob/develop/CONTRIBUTING.md\">\n    <img src=\"https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat\" alt=\"PRs welcome!\" />\n  </a>\n  <a href=\"https://discord.gg/medusajs\">\n    <img src=\"https://img.shields.io/badge/chat-on%20discord-7289DA.svg\" alt=\"Discord Chat\" />\n  </a>\n  <a href=\"https://twitter.com/intent/follow?screen_name=medusajs\">\n    <img src=\"https://img.shields.io/twitter/follow/medusajs.svg?label=Follow%20@medusajs\" alt=\"Follow @medusajs\" />\n  </a>\n</p>\n\nMedusa is an open-source commerce platform with a built-in framework for customization. Use it to build B2B or DTC stores, marketplaces, distributor platforms, PoS systems, and other applications that need commerce primitives such as products, carts, orders, and payments, without reinventing core commerce logic.\n\n## Getting Started\n\nThe fastest way to get started is with [Medusa Cloud](https://medusajs.com/cloud/), a managed environment for Medusa applications with automated deployments, scaling, and maintenance. [Get started on Medusa Cloud](https://cloud.medusajs.com).\n\nTo create a Medusa application locally, you need Node.js v22.22.0 or later and a running PostgreSQL database. Then run:\n\n```bash\nnpx create-medusa-app@latest my-medusa-store\n```\n\nThis sets up the Medusa server and admin dashboard, and optionally the Next.js Starter Storefront. See the [installation guide](https://docs.medusajs.com/learn/installation) for all options, or [install with Docker](https://docs.medusajs.com/learn/installation/docker).\n\n## Repository structure\n\nThis is a Yarn workspaces monorepo. Every Medusa package published to npm lives under [`packages`](./packages).\n\n| Path | Contents |\n| --- | --- |\n| [`packages/medusa`](./packages/medusa) | `@medusajs/medusa`: the main package installed in Medusa applications. Holds the Store and Admin API routes, CLI commands, subscribers, and jobs, and re-exports the modules and `@medusajs/core-flows`. |\n| [`packages/core/*`](./packages/core) | Core libraries: the framework runtime (`framework`), types, utils, Workflows SDK, Modules SDK, predefined workflows (`core-flows`), Query, orchestration, and the JS SDK. |\n| [`packages/modules/*`](./packages/modules) | Commerce Modules (product, cart, order, pricing, payment, and more) and Infrastructure Modules (event bus, caching, file, locking, workflow engine, and more). |\n| [`packages/modules/providers/*`](./packages/modules/providers) | Module Providers, such as Stripe payments, S3 file storage, SendGrid notifications, Redis locking and caching, and auth providers for email/password, GitHub, Google, and OIDC. |\n| [`packages/admin/*`](./packages/admin) | The Medusa Admin dashboard and the SDK, Vite plugin, and bundler used to build and extend it. |\n| [`packages/design-system/*`](./packages/design-system) | Medusa UI: the React component library, icons, Tailwind preset, and a Figma import tool. |\n| [`packages/cli/*`](./packages/cli) | CLI tools: `create-medusa-app`, the `medusa` CLI, OpenAPI tooling, and the HTTP types generator. |\n| [`packages/plugins/*`](./packages/plugins) | Official plugins, such as draft orders and loyalty. |\n| [`integration-tests`](./integration-tests) | HTTP and module integration test suites run against a real PostgreSQL database. |\n| [`www`](./www) | The source of the [Medusa documentation](https://docs.medusajs.com) website. |\n\n## About Medusa\n\nMedusa's commerce modules are open-source and freely available on npm. Enterprise Edition features are identified separately in the repository.\n\nLearn more about [Medusa's architecture](https://docs.medusajs.com/learn/introduction/architecture) and [Commerce Modules](https://docs.medusajs.com/resources/commerce-modules) in the documentation.\n\n## Upgrades & Integrations\n\nFollow the [Release Notes](https://github.com/medusajs/medusa/releases) to keep your Medusa project up-to-date.\n\nCheck out all [available Medusa integrations](https://docs.medusajs.com/resources/integrations).\n\n## Community & Contributions\n\nThe core team is available in [GitHub Discussions](https://github.com/medusajs/medusa/discussions), where you can create issues, share ideas, and discuss the roadmap.\n\nThe [Contribution Guide](./CONTRIBUTING.md) describes how to contribute to the codebase and documentation.\n\nJoin the [Discord server](https://discord.gg/medusajs) to meet and discuss with other community members.\n\n## Other channels\n\n- [GitHub Issues](https://github.com/medusajs/medusa/issues)\n- [Community Discord](https://discord.gg/medusajs)\n- [Twitter](https://twitter.com/medusajs)\n- [LinkedIn](https://www.linkedin.com/company/medusajs)\n- [Medusa Blog](https://medusajs.com/blog/)\n\n## License\n\nMedusa uses an open-core model. The core is licensed under the [MIT License](./LICENSE). The RBAC-based Enterprise Edition materials identified in [ENTERPRISE-LICENSE.md](./ENTERPRISE-LICENSE.md) require a commercial agreement with MedusaJS, Inc.\n"
+      }
+    ]
+  },
+  {
+    "leaf": "mechanical-cad",
+    "repo": "seansackowitz/mcp-freecad",
+    "repository_id": 1228896681,
+    "summary": "通过MCP将FreeCAD能力暴露为约70个工具，覆盖文档、对象、Part、草图、PartDesign、表达式、电子表格、导入导出与视图操作。",
+    "type": "application",
+    "features": [
+      "草图创建、几何添加与约束管理。",
+      "PartDesign特征：Pad、Pocket、Revolution、Groove、Fillet、Chamfer、Pattern、Mirrored。",
+      "表达式绑定与电子表格驱动参数。",
+      "Part图元、布尔、扫掠、边操作与变换。",
+      "STEP/IGES/STL/OBJ导入导出。"
+    ],
+    "scope": "适用于FreeCAD 1.1或更高版本（需GUI）与Python 3.11+；MCP服务器通过XML-RPC连接FreeCAD插件。",
+    "completeness": "partial",
+    "missing_fields": [
+      "positioning"
+    ],
+    "license": {
+      "detected_spdx": "MIT",
+      "note": "许可证完整正文与 SPDX 官方文本规范化精确匹配；未忽略附加条款。",
+      "reviewed_at": "2026-10-23T02:02:53.829897+00:00",
+      "source": {
+        "blob_sha": "b8c73dce78cadad0f07e9a170e7a824f18810247",
+        "immutable_url": "https://api.github.com/repos/seansackowitz/mcp-freecad/git/blobs/b8c73dce78cadad0f07e9a170e7a824f18810247",
+        "kind": "license",
+        "path": "LICENSE",
+        "retrieved_at": "2026-10-24T04:21:51.775723+00:00",
+        "sha256": "53e74bdcf06a81dc93028c138ba8923694492cdd22a5f493151008cf501ef299",
+        "url": "https://github.com/seansackowitz/mcp-freecad/blob/main/LICENSE"
+      },
+      "spdx": "MIT",
+      "status": "open_source",
+      "verification": {
+        "method": "spdx_exact_text",
+        "osi_approved": true,
+        "template_sha256": "0c2b3c87a154a4aaac6bc6a735dd454dc29d9a78c23a85deedb080e0c65de1f8",
+        "template_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/json/details/MIT.json"
+      }
+    },
+    "matches": [
+      {
+        "applicability": "direct",
+        "conditions": [],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/seansackowitz/mcp-freecad/git/blobs/9d01d252fc59bad4a5a1673f0cf53030da22561f",
+          "source_kind": "readme",
+          "source_sha256": "7e6ddb1b5e135813b664391d32df364af4e2b267a5544d53f361e3cbdb171dd1",
+          "source_url": "https://github.com/seansackowitz/mcp-freecad/blob/main/README.md",
+          "verification": "source_based"
+        },
+        "reason": "提供草图、约束、PartDesign特征、表达式和电子表格参数等工具，可在FreeCAD中进行参数化建模与参数重算。",
+        "scenario_id": "auto-mechanical-cad-d79d062b26"
+      }
+    ],
+    "scenarios": [
+      {
+        "description": "机械工程师在草图中绘制轮廓并添加约束与尺寸，再用拉伸、旋转等特征定义零件几何，修改参数后模型自动重算。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-mechanical-cad-d79d062b26",
+        "leaf": "mechanical-cad",
+        "leaf_name": "Mechanical CAD",
+        "name": "零件参数化建模",
+        "search_queries": [
+          "parametric part modeling"
+        ]
+      },
+      {
+        "description": "设计人员将零件实例插入装配体，用配合约束确定相对位置与自由度，拖动检查机构运动是否合理。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-mechanical-cad-45716980b6",
+        "leaf": "mechanical-cad",
+        "leaf_name": "Mechanical CAD",
+        "name": "装配约束定位与运动检查",
+        "search_queries": [
+          "assembly constraint design"
+        ]
+      },
+      {
+        "description": "制图工程师基于三维模型放置投影视图与剖视图，添加尺寸、公差和注释，生成与模型关联的工程图。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-mechanical-cad-b2e0a9b0ca",
+        "leaf": "mechanical-cad",
+        "leaf_name": "Mechanical CAD",
+        "name": "工程图生成与标注",
+        "search_queries": [
+          "engineering drawing creation"
+        ]
+      }
+    ],
+    "documents": [
+      {
+        "url": "https://github.com/seansackowitz/mcp-freecad/blob/main/README.md",
+        "path": "README.md",
+        "text": "# mcp-freecad\n\nA Model Context Protocol server for FreeCAD. ~70 single-purpose tools across `doc/obj/part/sketch/pd/expr/sheet/io/view`, with screenshots returned only when explicitly requested. Designed for parametric modeling at low token cost.\n\n## Why this server\n\n- **Screenshots are a tool, not a side effect.** `view_screenshot` is the only tool that returns an image. Every other tool returns small, structured text — typically a few hundred bytes per call instead of an embedded PNG.\n- **One operation per tool, ~70 small tools** organized by namespace (`doc_*`, `obj_*`, `part_*`, `sketch_*`, `pd_*`, `expr_*`, `sheet_*`, `io_*`, `view_*`, `script_*`). The model only pays the schema cost for what it uses, and per-call payloads stay tiny.\n- **Parametric-first.** First-class tools for sketches, constraints, PartDesign features, expression bindings, and spreadsheet-driven parameters.\n- **Escape hatch.** `script_execute_python` runs arbitrary Python in FreeCAD's interpreter for anything not covered by a dedicated tool — so you're never blocked on missing surface area.\n\n## Architecture\n\n```\n┌──────────────────┐     stdio MCP      ┌──────────────────┐    XML-RPC     ┌────────────────────┐\n│  MCP client      │ ─────────────────▶ │  mcp-freecad     │ ─────────────▶ │ FreeCAD            │\n│  (Claude Desktop,│                    │  Python server   │  127.0.0.1:    │ + FreeCADMCP addon │\n│   Claude Code…)  │ ◀───────────────── │  (this package)  │  9876          │ (RPC server)       │\n└──────────────────┘                    └──────────────────┘                └────────────────────┘\n```\n\nTwo pieces:\n\n1. **`addon/FreeCADMCP/`** — a FreeCAD workbench that runs an XML-RPC server inside FreeCAD. Pure stdlib, no pip install into FreeCAD's Python.\n2. **`src/mcp_freecad/`** — the MCP server, runs in your normal Python env, proxies tool calls to the addon over XML-RPC.\n\n## Requirements\n\n- **FreeCAD 1.1 or later**, running with the GUI (the addon needs Qt's event loop for thread marshaling).\n- **Python 3.11+** for the MCP server side.\n- **[uv](https://docs.astral.sh/uv/)** is recommended. Install with: `curl -LsSf https://astral.sh/uv/install.sh | sh`\n\n## Installation\n\nThere are three steps: install the addon into FreeCAD, install the MCP server, and configure your MCP client.\n\n### 1. Install the FreeCAD addon\n\nCopy (or symlink) `addon/FreeCADMCP` into your FreeCAD Mod directory.\n\n> **FreeCAD 1.1+ uses versioned user-data directories** (`v1-1`, `v1-2`, …). Use the row matching your FreeCAD version. To verify the path your FreeCAD reports, open the Python console and run:\n> ```python\n> import FreeCAD\n> print(FreeCAD.ApplicationDirectories.getUserModDirectory())\n> ```\n\n| OS      | Mod directory (FreeCAD 1.1)                                          |\n|---------|----------------------------------------------------------------------|\n| macOS   | `~/Library/Application Support/FreeCAD/v1-1/Mod/`                    |\n| Linux   | `~/.local/share/FreeCAD/v1-1/Mod/`                                   |\n| Windows | `%APPDATA%\\FreeCAD\\v1-1\\Mod\\`                                        |\n\nFor FreeCAD 1.2 swap `v1-1` → `v1-2`, and so on.\n\n```bash\n# macOS — symlink so updates to this repo are picked up automatically\nln -s \"$PWD/addon/FreeCADMCP\" \\\n  \"$HOME/Library/Application Support/FreeCAD/v1-1/Mod/FreeCADMCP\"\n\n# Linux\nln -s \"$PWD/addon/FreeCADMCP\" \"$HOME/.local/share/FreeCAD/v1-1/Mod/FreeCADMCP\"\n\n# Windows (PowerShell, run as Administrator for symlink)\nNew-Item -ItemType SymbolicLink `\n  -Path  \"$env:APPDATA\\FreeCAD\\v1-1\\Mod\\FreeCADMCP\" `\n  -Value \"$PWD\\addon\\FreeCADMCP\"\n```\n\n> **Note:** if a directory named `FreeCADMCP` already exists at that path (from a previously installed FreeCAD MCP addon), rename or delete it before symlinking — otherwise `ln -s` will refuse or clobber. Rename example:\n> ```bash\n> mv \"$HOME/Library/Application Support/FreeCAD/v1-1/Mod/FreeCADMCP\" \\\n>    \"$HOME/Library/Application Support/FreeCAD/v1-1/Mod/FreeCADMCP.bak\"\n> ```\n\nThen **restart FreeCAD**. You should see this in FreeCAD's Report View:\n\n```\n[FreeCADMCP] RPC server listening on 127.0.0.1:9876\n```\n\nIf you don't see the workbench list a \"MCP\" entry, open *Tools → Customize… → Workbenches* and confirm `FreeCADMCPWorkbench` is enabled.\n\n### 2. Install the MCP server\n\nFrom the repo root:\n\n```bash\n# Install as a CLI tool (recommended)\nuv tool install .\n\n# This puts a `mcp-freecad` executable on your PATH.\nwhich mcp-freecad\n```\n\nAlternatively, run directly without installing:\n\n```bash\nuv run --from . mcp-freecad\n```\n\n### 3. Configure your MCP client\n\nThe server speaks MCP over stdio.\n\n#### Claude Desktop\n\nEdit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) / `%APPDATA%\\Claude\\claude_desktop_config.json` (Windows):\n\n```json\n{\n  \"mcpServers\": {\n    \"freecad\": {\n      \"command\": \"mcp-freecad\"\n    }\n  }\n}\n```\n\nIf `mcp-freecad` isn't on Claude Desktop's PATH, use the absolute path that `which mcp-freecad` printed.\n\n#### Claude Code\n\n```bash\nclaude mcp add freecad mcp-freecad\n```\n\nOr edit `~/.claude.json` directly:\n\n```json\n{\n  \"mcpServers\": {\n    \"freecad\": { \"command\": \"mcp-freecad\" }\n  }\n}\n```\n\n#### Other MCP clients\n\nAny client that can launch a stdio-based MCP server. Command: `mcp-freecad`. No arguments.\n\n### 4. Verify\n\nStart FreeCAD (with the addon installed). Then in your MCP client, ask the assistant to call `doc_list` — it should return an empty array (no documents open). Create one:\n\n> Create a FreeCAD document called \"test\", then make a 20×20×20 box.\n\nYou should see `doc_create` and `part_box` calls return small JSON blobs. No image bytes anywhere.\n\n## Configuration\n\nEnvironment variables (read by both the addon and the MCP server):\n\n| Variable                    | Default                       | Used by    | Purpose                          |\n|-----------------------------|-------------------------------|------------|----------------------------------|\n| `FREECAD_MCP_HOST`          | `127.0.0.1`                   | addon      | RPC server bind address          |\n| `FREECAD_MCP_PORT`          | `9876`                        | addon      | RPC server port                  |\n| `FREECAD_MCP_CALL_TIMEOUT`  | `60` (seconds)                | addon      | Per-call main-thread timeout     |\n| `FREECAD_MCP_RPC_URL`       | `http://127.0.0.1:9876/RPC2`  | MCP server | Where to find the addon's RPC    |\n\nTo set them for the addon, launch FreeCAD from a shell that has them exported. To set them for the MCP server, configure them in your MCP client config (most clients support an `env` map alongside `command`).\n\n## Tool catalog\n\nAll tool names use underscores (MCP convention). The original namespace is preserved in the prefix.\n\n### `doc_*` — document lifecycle (7)\n`doc_list`, `doc_create`, `doc_open`, `doc_save`, `doc_close`, `doc_set_active`, `doc_recompute`\n\n### `obj_*` — inspection and basic mutation (8)\n`obj_list`, `obj_get`, `obj_get_tree`, `obj_get_properties`, `obj_set_property`, `obj_delete`, `obj_set_placement`, `obj_set_label`\n\n### `part_*` — Part workbench (18)\nPrimitives: `part_box`, `part_cylinder`, `part_sphere`, `part_cone`, `part_torus`, `part_plane`\nSweeps: `part_extrude`, `part_revolve`, `part_loft`, `part_sweep`\nBooleans: `part_fuse`, `part_cut`, `part_common`\nEdge ops: `part_fillet`, `part_chamfer`\nTransforms: `part_mirror`, `part_pattern_linear`, `part_pattern_polar`\n\n### `sketch_*` — Sketcher (12)\n`sketch_create`, `sketch_add_line`, `sketch_add_circle`, `sketch_add_arc`, `sketch_add_point`, `sketch_add_polyline`, `sketch_add_constraint`, `sketch_set_constraint_value`, `sketch_list_geometry`, `sketch_list_constraints`, `sketch_delete_geometry`, `sketch_delete_constraint`\n\n### `pd_*` — PartDesign (10)\n`pd_create_body`, `pd_pad`, `pd_pocket`, `pd_revolution`, `pd_groove`, `pd_fillet`, `pd_chamfer`, `pd_pattern_linear`, `pd_pattern_polar`, `pd_mirrored`\n\n### `expr_*` — expression bindings (3)\n`expr_set`, `expr_get`, `expr_clear`\n\n### `sheet_*` — Spreadsheet (4)\n`sheet_create`, `sheet_set_cell`, `sheet_get_cell`, `sheet_set_alias`\n\n### `io_*` — import/export (6)\n`io_import_step`, `io_import_iges`, `io_export_step`, `io_export_iges`, `io_export_stl`, `io_export_obj`\n\n### `view_*` — view & screenshot (3)\n`view_screenshot` (the *only* tool that returns image data), `view_set_view`, `view_fit_all`\n\n### `script_*` — escape hatch (1)\n`script_execute_python` — run arbitrary Python in FreeCAD's interpreter when no dedicated tool fits.\n\n## Usage notes\n\n- **Sketches on a face.** `sketch_create` attaches to an existing object when you\n  pass `support`. Use an `\"Owner.Sub\"` reference for a real attachment —\n  `support=\"Box.Face6\"` maps `FlatFace`, `support=\"Body.Edge3\"` maps\n  `NormalToEdge`. A bare object name (`support=\"Box\"`) attaches to that object's\n  local XY plane (`ObjectXY`). Without `support`, pass a `plane` preset\n  (`xy`/`xz`/`yz`).\n\n- **PartDesign patterns & mirror take vectors.** `pd_pattern_linear(direction=…)`,\n  `pd_pattern_polar(axis=…)`, and `pd_mirrored(normal=…, base_point=…)` accept an\n  `[x, y, z]` vector. Axis-aligned vectors resolve to the body's Origin\n  axis/plane; any other vector creates a datum line/plane oriented along it. A\n  negative axis-aligned vector sets the feature's `Reversed` flag. (Mirror a base\n  feature, not another pattern — PartDesign can't mirror a transform result into a\n  single solid.)\n\n- **Expression bindings accept sub-property paths.** `expr_set` forwards `prop`\n  straight to FreeCAD's expression engine, so dotted paths work:\n  `expr_set(\"Box\", \"Placement.Base.x\", \"Params.offset_x\")` or\n  `expr_set(\"Sketch\", \"Constraints.width\", \"Params.width\")`, not just top-level\n  properties like `Length`.\n\n## Parametric example\n\nA 100×60 plate parameterized through a spreadsheet:\n\n```\nsheet_create(label=\"Params\")\nsheet_set_cell(\"Params\", \"A1\", \"100\");  sheet_set_alias(\"Params\", \"A1\", \"length\")\nsheet_set_cell(\"Params\", \"A2\", \"60\");   sheet_set_alias(\"Params\", \"A2\", \"width\")\nsheet_set_cell(\"Params\", \"A3\", \"5\");    sheet_set_alias(\"Params\", \"A3\", \"thickness\")\n\npd_create_body(label=\"Plate\")\nsketch_create(plane=\"xy\", label=\"Outline\")\nsketch_add_polyline(\"Outline\", [[0,0],[100,0],[100,60],[0,60]], closed=True)\n\npd_pad(body=\"Plate\", profile=\"Outline\", length=5, label=\"Body\")\n\nexpr_set(\"Body\",    \"Length\", \"Params.thickness\")\nexpr_set(\"Outline\", # later refine sketch dims through expressions on constraint values\n         \"Constraints.length\", \"Params.length\")\n```\n\nNow changing `Params.length` re-drives the whole model.\n\n## Troubleshooting\n\n**\"Could not reach FreeCAD addon at http://127.0.0.1:9876/RPC2\"**\nThe MCP server can't talk to FreeCAD. Check:\n1. Is FreeCAD running with the GUI?\n2. Did the addon load? Look in *View → Panels → Report view* for `[FreeCADMCP] RPC server listening`.\n3. If you set a non-default `FREECAD_MCP_PORT`, make sure both the addon and the MCP server see the same value.\n\n**The workbench loads but the server doesn't start**\nThe error appears in FreeCAD's Report view. Most common cause is a port conflict — set `FREECAD_MCP_PORT` to something free.\n\n**\"main-thread call exceeded 60s\"**\nA FreeCAD operation is taking longer than the per-call timeout. Increase `FREECAD_MCP_CALL_TIMEOUT` (e.g. `120`).\n\n**Tool returns `shape_valid: false`**\nThe geometry op produced an invalid shape (common with degenerate booleans, self-intersecting profiles, or zero-thickness extrusions). Inspect with `obj_get_properties` and `doc_recompute` to see the failure mode.\n\n**I need to do X and there's no tool for it**\nUse `script_execute_python`. The namespace has `App` (FreeCAD), `Gui`, `Part`, `Sketcher` pre-imported. If you find yourself reaching for it for something common, consider opening an issue or adding a dedicated tool.\n\n## Development\n\n```bash\n# Run the MCP server against a running FreeCAD instance\nuv run -m mcp_freecad\n\n# After changing the addon, restart FreeCAD (or call `from FreeCADMCP import server; server.stop(); server.start()` from FreeCAD's Python console).\n```\n\n## License\n\nMIT.\n"
+      }
+    ]
+  },
+  {
+    "leaf": "mechanical-cad",
+    "repo": "AadiJo/cadsense",
+    "repository_id": 1243087449,
+    "summary": "README 描述的是围绕代码代理的 GUI：持久会话、聊天、终端、diff 与源码管理；仓库简介称其为 FRC 队伍的 CAD 评审工具，但 README 未给出机械 CAD 建模、约束或出图能力说明",
+    "type": "application",
+    "features": [
+      "代理会话与持久对话、diff、终端",
+      "分支与变更文件等源码管理视图",
+      "早期 Onshape/CAD 查看与评审实验路径"
+    ],
+    "scope": "适用于代码代理工作流与早期 CAD 查看实验；不是机械 CAD 定义环境",
+    "completeness": "partial",
+    "missing_fields": [
+      "scenario_associations"
+    ],
+    "license": {
+      "detected_spdx": "MIT",
+      "note": "许可证完整正文与 SPDX 官方文本规范化精确匹配；未忽略附加条款。",
+      "reviewed_at": "2026-10-23T02:02:53.829897+00:00",
+      "source": {
+        "blob_sha": "983f0c3f499b5f095887523b2ab991fea685396f",
+        "immutable_url": "https://api.github.com/repos/AadiJo/cadsense/git/blobs/983f0c3f499b5f095887523b2ab991fea685396f",
+        "kind": "license",
+        "path": "LICENSE",
+        "retrieved_at": "2026-10-24T04:22:56.805321+00:00",
+        "sha256": "4b46cd9afbe5c75afbbe1a066b6d63e4237af6706182cbc9abd8242ab7876cab",
+        "url": "https://github.com/AadiJo/cadsense/blob/main/LICENSE"
+      },
+      "spdx": "MIT",
+      "status": "open_source",
+      "verification": {
+        "method": "spdx_exact_text",
+        "osi_approved": true,
+        "template_sha256": "0c2b3c87a154a4aaac6bc6a735dd454dc29d9a78c23a85deedb080e0c65de1f8",
+        "template_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/json/details/MIT.json"
+      }
+    },
+    "matches": [],
+    "scenarios": [
+      {
+        "description": "机械工程师在草图中绘制轮廓并添加约束与尺寸，再用拉伸、旋转等特征定义零件几何，修改参数后模型自动重算。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-mechanical-cad-d79d062b26",
+        "leaf": "mechanical-cad",
+        "leaf_name": "Mechanical CAD",
+        "name": "零件参数化建模",
+        "search_queries": [
+          "parametric part modeling"
+        ]
+      },
+      {
+        "description": "设计人员将零件实例插入装配体，用配合约束确定相对位置与自由度，拖动检查机构运动是否合理。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-mechanical-cad-45716980b6",
+        "leaf": "mechanical-cad",
+        "leaf_name": "Mechanical CAD",
+        "name": "装配约束定位与运动检查",
+        "search_queries": [
+          "assembly constraint design"
+        ]
+      },
+      {
+        "description": "制图工程师基于三维模型放置投影视图与剖视图，添加尺寸、公差和注释，生成与模型关联的工程图。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-mechanical-cad-b2e0a9b0ca",
+        "leaf": "mechanical-cad",
+        "leaf_name": "Mechanical CAD",
+        "name": "工程图生成与标注",
+        "search_queries": [
+          "engineering drawing creation"
+        ]
+      }
+    ],
+    "documents": [
+      {
+        "url": "https://github.com/AadiJo/cadsense/blob/main/README.md",
+        "path": "README.md",
+        "text": "# CadSense\n\n![CadSense product demo](./apps/marketing/public/demo.png)\n\nCadSense is a fast, local-first GUI for running coding agents against real projects.\n\nIt gives Codex and Claude Code a desktop/web workspace with persistent threads, project-aware chat, terminals,\ndiffs, source-control context, and the operational state you need to understand what the agent is\ndoing.\n\n> [!WARNING]\n> CadSense is alpha software. The core workflows are useful today, but the project is still moving\n> quickly. Expect rough edges, sharp logs, and occasional behavior changes.\n\n## The Point\n\nCodex is powerful in a terminal. CadSense is for the moments when you want a fuller workbench around\nit: project state, conversation history, live activity, changed files, terminals, and review context\nin one place.\n\nThe goal is not to hide the repo or abstract away the workflow. The goal is to make long-running\nagent work easier to steer, inspect, and recover from.\n\n## What It Does\n\n- **Agent sessions**: start, resume, and inspect Codex or Claude Code work without losing the underlying project\n  context.\n- **Agent-first chat**: persistent threads, model picking, streamed events, pending approvals,\n  plans, terminal context, and file attachments.\n- **Source-control workflow**: branch controls, changed-file trees, diff panels, pull-request\n  references, and project-aware git state.\n- **Desktop and web surfaces**: an Electron shell, a Vite web app, and a Node backend coordinating\n  the session lifecycle.\n- **CAD-aware experiments**: early Onshape/CAD viewing and review paths live in the app while the\n  product direction is still forming.\n\n## Repository Map\n\n| Path                               | Role                                                                                                                    |\n| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |\n| `apps/server`                      | Node WebSocket server, CLI, Codex sessions, persistence, orchestration, terminals, auth, and Codex app-server support.  |\n| `apps/web`                         | React/Vite client for chat, settings, diffs, CAD panels, provider controls, and environment connection state.           |\n| `apps/desktop`                     | Electron shell, desktop lifecycle, updates, native settings, SSH launch, and local backend management.                  |\n| `apps/marketing`                   | Public marketing/download site.                                                                                         |\n| `packages/contracts`               | Shared Effect Schema contracts for RPC, provider events, settings, git, auth, and orchestration. Schema-only by design. |\n| `packages/shared`                  | Shared runtime utilities with explicit subpath exports. No barrel index.                                                |\n| `packages/effect-codex-app-server` | Generated/typed Codex app-server protocol client helpers.                                                               |\n| `packages/effect-acp`              | Typed Agent Client Protocol support.                                                                                    |\n| `packages/ssh`                     | SSH command, auth, config, and tunnel helpers.                                                                          |\n| `packages/tailscale`               | Tailscale endpoint integration helpers.                                                                                 |\n| `oxlint-plugin-cadsense`           | Project-specific lint rules.                                                                                            |\n| `scripts`                          | Release, packaging, dev-runner, update-server, and build automation scripts.                                            |\n\n## Architecture Notes\n\nCadSense supports Codex and Claude Code sessions. Provider adapters normalize runtime activity and\npush domain events to the browser over WebSocket while preserving provider-native capabilities.\n\nImportant entry points:\n\n- `apps/server/src/provider/` owns provider adapters and session runtimes.\n- `apps/server/src/orchestration/` converts provider/runtime activity into app-level thread state.\n- `apps/server/src/cli/` owns server, project, auth, MCP, and config commands.\n- `apps/web/src/rpc/` owns browser-side WebSocket RPC and server-state handling.\n- `apps/web/src/components/chat/` owns the core chat experience.\n- `apps/desktop/src/` owns Electron lifecycle, native IPC, updates, SSH, and backend startup.\n\n## License\n\nMIT. See [LICENSE](./LICENSE).\n"
+      }
+    ]
+  },
+  {
+    "leaf": "identity-access-management-iam",
+    "repo": "OpenIdentityPlatform/OpenAM",
+    "repository_id": 99786834,
+    "summary": "OpenAM 是访问管理方案，提供身份认证、单点登录、授权、联邦和集中策略控制。",
+    "type": "application",
+    "features": [
+      "多种认证方式，包括密码、OTP、二维码等",
+      "基于角色、认证级别或属性的访问策略",
+      "跨域单点登录（CDSSO）",
+      "SAML 2.0、OAuth 2.0、OpenID Connect 联邦",
+      "可插拔认证模块与数据源扩展"
+    ],
+    "scope": "适用于保护 Web、移动和云应用，可集成传统、自定义与云应用，并可充当身份提供方或服务提供方。",
+    "completeness": "partial",
+    "missing_fields": [
+      "license_verification"
+    ],
+    "license": {
+      "detected_spdx": "NOASSERTION",
+      "note": "许可证原文已读取，但未通过官方模板精确匹配，保留待核验；不按公开仓库或标签推定为开源",
+      "source": {
+        "blob_sha": "c6391fd306a30901cf9d38d1786c4e7e6ab249a0",
+        "immutable_url": "https://api.github.com/repos/OpenIdentityPlatform/OpenAM/git/blobs/c6391fd306a30901cf9d38d1786c4e7e6ab249a0",
+        "kind": "license",
+        "path": "LICENSE.md",
+        "retrieved_at": "2026-10-24T03:59:35.801961+00:00",
+        "sha256": "cc091a8901b578ebb4373c8294a45a879ce75ec9c347ce3bf823ccac06ade80d",
+        "url": "https://github.com/OpenIdentityPlatform/OpenAM/blob/master/LICENSE.md"
+      },
+      "spdx": null,
+      "status": "pending"
+    },
+    "matches": [
+      {
+        "applicability": "direct",
+        "conditions": [],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/OpenIdentityPlatform/OpenAM/git/blobs/f9a6d0c76cd84dda451ef0f2633716db2d8b2294",
+          "source_kind": "readme",
+          "source_sha256": "4c017e24bd8d52b7b20d68059e3756de5b2323bdf9ddd7f6e907d890ced27425",
+          "source_url": "https://github.com/OpenIdentityPlatform/OpenAM/blob/master/README.md",
+          "verification": "source_based"
+        },
+        "reason": "文档明确单次认证后可访问 OpenAM 保护的所有资源，符合员工 SSO 应用场景",
+        "scenario_id": "auto-identity-access-management-iam-494ae7d070"
+      },
+      {
+        "applicability": "unverified",
+        "conditions": [
+          "需配置组织身份数据源",
+          "需由管理员创建身份并授予应用/策略访问"
+        ],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/OpenIdentityPlatform/OpenAM/git/blobs/f9a6d0c76cd84dda451ef0f2633716db2d8b2294",
+          "source_kind": "readme",
+          "source_sha256": "4c017e24bd8d52b7b20d68059e3756de5b2323bdf9ddd7f6e907d890ced27425",
+          "source_url": "https://github.com/OpenIdentityPlatform/OpenAM/blob/master/README.md",
+          "verification": "source_based"
+        },
+        "reason": "具备认证、授权和集中策略控制，可用于入职授权，但 README 未明确账号创建与组发放流程",
+        "scenario_id": "auto-identity-access-management-iam-9576176830"
+      },
+      {
+        "applicability": "unverified",
+        "conditions": [
+          "需确认管理员可禁用身份",
+          "需确认可撤销会话或使策略立即失效"
+        ],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/OpenIdentityPlatform/OpenAM/git/blobs/f9a6d0c76cd84dda451ef0f2633716db2d8b2294",
+          "source_kind": "readme",
+          "source_sha256": "4c017e24bd8d52b7b20d68059e3756de5b2323bdf9ddd7f6e907d890ced27425",
+          "source_url": "https://github.com/OpenIdentityPlatform/OpenAM/blob/master/README.md",
+          "verification": "source_based"
+        },
+        "reason": "具备认证与访问策略控制，可推断可撤销访问，但 README 未明确禁用账号与撤销活动会话",
+        "scenario_id": "auto-identity-access-management-iam-8187b097a7"
+      }
+    ],
+    "scenarios": [
+      {
+        "description": "IT管理员在新员工入职时创建身份记录、加入对应组并发放初始凭据，让员工按岗位获得应用访问。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-identity-access-management-iam-9576176830",
+        "leaf": "identity-access-management-iam",
+        "leaf_name": "Identity & Access Management / IAM",
+        "name": "新员工入职账号开通",
+        "search_queries": [
+          "employee onboarding provisioning"
+        ]
+      },
+      {
+        "description": "员工从应用门户使用企业账号登录，由系统完成身份验证并跳转到已获授权的业务应用，无需分别输入各应用密码。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-identity-access-management-iam-494ae7d070",
+        "leaf": "identity-access-management-iam",
+        "leaf_name": "Identity & Access Management / IAM",
+        "name": "员工单点登录应用",
+        "search_queries": [
+          "single sign-on access"
+        ]
+      },
+      {
+        "description": "员工离职时，管理员禁用其身份、撤销活动会话并移除访问授权，使其无法再登录任何受保护应用。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-identity-access-management-iam-8187b097a7",
+        "leaf": "identity-access-management-iam",
+        "leaf_name": "Identity & Access Management / IAM",
+        "name": "离职账号停用与访问撤销",
+        "search_queries": [
+          "user offboarding deprovisioning"
+        ]
+      }
+    ],
+    "documents": [
+      {
+        "url": "https://github.com/OpenIdentityPlatform/OpenAM/blob/master/README.md",
+        "path": "README.md",
+        "text": "## <img alt=\"OpenAM Logo\" src=\"https://github.com/OpenIdentityPlatform/OpenAM/raw/master/logo.png\" width=\"300\"/>\n[![Latest release](https://img.shields.io/github/release/OpenIdentityPlatform/OpenAM.svg)](https://github.com/OpenIdentityPlatform/OpenAM/releases)\n[![Build](https://github.com/OpenIdentityPlatform/OpenAM/actions/workflows/build.yml/badge.svg)](https://github.com/OpenIdentityPlatform/OpenAM/actions/workflows/build.yml)\n[![Deploy](https://github.com/OpenIdentityPlatform/OpenAM/actions/workflows/deploy.yml/badge.svg)](https://github.com/OpenIdentityPlatform/OpenAM/actions/workflows/deploy.yml)\n[![Issues](https://img.shields.io/github/issues/OpenIdentityPlatform/OpenAM.svg)](https://github.com/OpenIdentityPlatform/OpenAM/issues)\n[![Last commit](https://img.shields.io/github/last-commit/OpenIdentityPlatform/OpenAM.svg)](https://github.com/OpenIdentityPlatform/OpenAM/commits/master)\n[![License](https://img.shields.io/badge/license-CDDL-blue.svg)](https://github.com/OpenIdentityPlatform/OpenAM/blob/master/LICENSE.md)\n[![Downloads](https://img.shields.io/github/downloads/OpenIdentityPlatform/OpenAM/total.svg)](https://github.com/OpenIdentityPlatform/OpenAM/releases)\n[![Docker](https://img.shields.io/docker/pulls/openidentityplatform/openam.svg)](https://hub.docker.com/r/openidentityplatform/openam)\n[![Top language](https://img.shields.io/github/languages/top/OpenIdentityPlatform/OpenAM.svg)](https://github.com/OpenIdentityPlatform/OpenAM)\n[![Code size in bytes](https://img.shields.io/github/languages/code-size/OpenIdentityPlatform/OpenAM.svg)](https://github.com/OpenIdentityPlatform/OpenAM)\n\nOpen Access Management (OpenAM) is an access management solution that includes Authentication, SSO, Authorization, Federation, Entitlements, and Web Services Security.\n\nCross Domain Single Sign On (CDSSO), SAML 2.0, OAuth 2.0 & OpenID Connect ensure that OpenAM integrates easily with legacy, custom, and cloud applications without requiring any modifications. \nIt's a developer-friendly, open-source control solution that allows you to own and protect your user's digital identities.\n\n## Key Features\n### Authentication Management\nWith OpenAM you can set up complex authentication processes using various authentication methods,\nsuch as login and password, OTP, saved cookie, QR authentication, and more...\nOpenAM also supports third-party identity providers using SAML, OAuth2, NTLM, and Kerberos protocols.\n### Access Management\nIntegrations with [OpenIG](https://github.com/OpenIdentityPlatform/OpenIG) or OpenAM Policy Agent allow you to set up flexible access policies to your resources.\nThere could be role-based, authentication level-based, or attribute-based and, if you need flexible logic, you can script access policy.\n### Cross Domain Single Sign-On\nAfter a single authentication, a user gets access to all resources protected by OpenAM. So, there is no need to authenticate at other services.\n### Federation\nOpenAM supports OAuth2/OIDC and SAMLv2 Federation protocols, so OpenAM can act as both Identity and Service Provider.\n### Extensibility\nIf you have to extend OpenAM functionality, it is relatively easy to do. OpenAM pluggable architecture allows modification relatively easy.\nYou can implement your custom authentication module, user data source, session data source, post-authentication process logic, and more...\n\n## License\nThis project is licensed under the [Common Development and Distribution License (CDDL)](https://github.com/OpenIdentityPlatform/OpenAM/blob/master/LICENSE.md). \n\n## Downloads \n* [OpenAM Distribution Packages](https://github.com/OpenIdentityPlatform/OpenAM/releases) (All OS)\n* [OpenAM Docker Image](https://hub.docker.com/r/openidentityplatform/openam/) (All OS)\n\n### Download OpenAM Policy Agents:\n* [OpenIG gateway/reverse proxy/authorization endpoint](https://github.com/OpenIdentityPlatform/OpenIG/releases)\n* [OpenAM Java Policy Agent](https://github.com/OpenIdentityPlatform/OpenAM-JEE-Agents#downloads) (All OS)\n* [OpenAM .Net/Mono Policy Agents](https://github.com/OpenIdentityPlatform/OpenAM-.Net-Agent#install-binary-distribution) (Windows/Linux)\n* [OpenAM Web Policy Agent](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents)\n  * [Apache 2.2 x64](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents/releases)\n  * [Apache 2.4 x64](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents/releases) \n  * [IIS  Windows x32/x64](https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents/releases)\n\n## How-to Build OpenAM from Source\nTo build OpenAM from source you should use JDK 11 or higher\n\nFor Windows users before clone and build run the following command:\n```bash\ngit config --system core.longpaths true\n```\n\n```bash\ngit clone https://github.com/OpenIdentityPlatform/OpenAM.git\nmvn install -f OpenAM\n```\n\n## How-to Run After the Build\nAdd FQDN host name in `/etc/hosts` (Windows `c:\\windows\\systems32\\drivers\\etc\\hosts`) file: \n\n```bash\n127.0.0.1 login.domain.com\n```\n\nRun OpenAM from source:\n\n```bash\nmvn cargo:run -f OpenAM/openam-server\n```\n\nThe next step is then to go to [http://login.domain.com:8080/openam](http://login.domain.com:8080/openam) where you'll see the OpenAM welcome \n\n\n## Support\n* OpenAM Community [documentation](https://github.com/OpenIdentityPlatform/OpenAM/wiki)\n* OpenAM Community [discussions](https://github.com/OpenIdentityPlatform/OpenAM/discussions)\n* OpenAM Community [issues](https://github.com/OpenIdentityPlatform/OpenAM/issues)\n* OpenAM [commercial support](https://github.com/OpenIdentityPlatform/.github/wiki/Approved-Vendor-List)\n\n## Thanks 🥰\n* Sun Access Manager/OpenSSO\n* Oracle OpenSSO\n* Forgerock OpenAM\n\n## Contributing\nPlease, make [Pull request](https://github.com/OpenIdentityPlatform/OpenAM/pulls)\n\n<a href=\"https://opencollective.com/OpenAM/tiers\" target=\"_blank\">\n  <!--img src=\"https://contributors-img.web.app/image?repo=OpenIdentityPlatform/OpenAM\" /-->\n  <img src=\"https://opencollective.com/OpenAM/contributors.svg?width=890&button=true\" />\n</a>\n\n## Backers\nThank you to all our backers! [Become a backer 🙏](https://opencollective.com/OpenAM/tiers)\n\n<a href=\"https://opencollective.com/OpenAM/tiers\" target=\"_blank\">\n <img src=\"https://opencollective.com/OpenAM/backers.svg?width=890\">\n</a>\n\n## Sponsors\nSupport this project by becoming a sponsor. Your logo will show up here with a link to your website. [Become a sponsor ❤️](https://opencollective.com/OpenAM/tiers)\n\n<a href=\"https://opencollective.com/OpenAM/tiers\" target=\"_blank\">\n <img src=\"https://opencollective.com/OpenAM/sponsors.svg?width=890\">\n</a>\n"
+      }
+    ]
+  },
+  {
+    "leaf": "electronic-health-record-ehr",
+    "repo": "atishay2411/MedPilot",
+    "repository_id": 1201319673,
+    "summary": "通过FastAPI后端和React前端，将自然语言请求映射为OpenMRS REST/FHIR操作，覆盖患者、病历、医嘱与审计。",
+    "type": "application",
+    "features": [
+      "患者搜索、注册/更新与活动病历上下文切换",
+      "临床摘要、生命体征、问题、过敏、用药与就诊记录查看",
+      "确认后写入生命体征、问题、过敏、药物医嘱、就诊与临床笔记",
+      "基于角色的权限控制、写操作确认门与追加式审计日志",
+      "可选OpenAI/Anthropic/Ollama推理及Health Gorilla导入"
+    ],
+    "scope": "适用于已部署OpenMRS的临床工作流；可选LLM，无LLM时使用确定性分类。",
+    "completeness": "partial",
+    "missing_fields": [
+      "license_verification"
+    ],
+    "license": {
+      "detected_spdx": "GPL-3.0",
+      "note": "许可证原文已读取，但未通过官方模板精确匹配，保留待核验；不按公开仓库或标签推定为开源",
+      "source": {
+        "blob_sha": "f288702d2fa16d3cdf0035b15a9fcbc552cd88e7",
+        "immutable_url": "https://api.github.com/repos/atishay2411/MedPilot/git/blobs/f288702d2fa16d3cdf0035b15a9fcbc552cd88e7",
+        "kind": "license",
+        "path": "LICENSE",
+        "retrieved_at": "2026-10-24T05:41:18.936203+00:00",
+        "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "url": "https://github.com/atishay2411/MedPilot/blob/main/LICENSE"
+      },
+      "spdx": null,
+      "status": "pending"
+    },
+    "matches": [
+      {
+        "applicability": "conditional",
+        "conditions": [
+          "需连接可用的OpenMRS实例",
+          "需具备相应查看权限"
+        ],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/atishay2411/MedPilot/git/blobs/261279df42b37e4072e426737da75e706bf553ad",
+          "source_kind": "readme",
+          "source_sha256": "cee47218baba8706b3a5f8976d0baf6e7ccfb5d563cf4bfc91f5342fe9f64b6f",
+          "source_url": "https://github.com/atishay2411/MedPilot/blob/main/README.md",
+          "verification": "source_based"
+        },
+        "reason": "可汇总并查看患者生命体征、问题、过敏、用药和就诊记录",
+        "scenario_id": "auto-electronic-health-record-ehr-6975fb49f0"
+      },
+      {
+        "applicability": "conditional",
+        "conditions": [
+          "需连接OpenMRS",
+          "需具备写入权限并完成确认"
+        ],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/atishay2411/MedPilot/git/blobs/261279df42b37e4072e426737da75e706bf553ad",
+          "source_kind": "readme",
+          "source_sha256": "cee47218baba8706b3a5f8976d0baf6e7ccfb5d563cf4bfc91f5342fe9f64b6f",
+          "source_url": "https://github.com/atishay2411/MedPilot/blob/main/README.md",
+          "verification": "source_based"
+        },
+        "reason": "支持记录生命体征和观察数据，并在提交前要求确认",
+        "scenario_id": "auto-electronic-health-record-ehr-949743f32f"
+      },
+      {
+        "applicability": "conditional",
+        "conditions": [
+          "需连接OpenMRS",
+          "需具备开嘱/写入权限并完成确认",
+          "实际审方与执行流程取决于OpenMRS配置"
+        ],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/atishay2411/MedPilot/git/blobs/261279df42b37e4072e426737da75e706bf553ad",
+          "source_kind": "readme",
+          "source_sha256": "cee47218baba8706b3a5f8976d0baf6e7ccfb5d563cf4bfc91f5342fe9f64b6f",
+          "source_url": "https://github.com/atishay2411/MedPilot/blob/main/README.md",
+          "verification": "source_based"
+        },
+        "reason": "支持创建和更新药物医嘱，并可记录发药",
+        "scenario_id": "auto-electronic-health-record-ehr-2e02aedf02"
+      }
+    ],
+    "scenarios": [
+      {
+        "description": "门诊医生在接诊前打开患者病历，查看问题、用药和近期记录，为本次诊疗判断提供依据。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-electronic-health-record-ehr-6975fb49f0",
+        "leaf": "electronic-health-record-ehr",
+        "leaf_name": "Electronic Health Record / EHR",
+        "name": "查阅患者纵向病历",
+        "search_queries": [
+          "patient chart review"
+        ]
+      },
+      {
+        "description": "病房护士在当次就诊中录入体温、血压等生命体征和观察数据，形成可追溯的临床记录。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-electronic-health-record-ehr-949743f32f",
+        "leaf": "electronic-health-record-ehr",
+        "leaf_name": "Electronic Health Record / EHR",
+        "name": "记录生命体征观察",
+        "search_queries": [
+          "vital signs documentation"
+        ]
+      },
+      {
+        "description": "医生在门诊就诊中创建药物医嘱，记录药品、剂量、途径和频次，供后续调配与执行。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-electronic-health-record-ehr-2e02aedf02",
+        "leaf": "electronic-health-record-ehr",
+        "leaf_name": "Electronic Health Record / EHR",
+        "name": "开具药物医嘱",
+        "search_queries": [
+          "medication order entry"
+        ]
+      }
+    ],
+    "documents": [
+      {
+        "url": "https://github.com/atishay2411/MedPilot/blob/main/README.md",
+        "path": "README.md",
+        "text": "# MedPilot\n\n![MedPilot Overview](images/thumbnail.jpeg)\n\nMedPilot is a chat-first clinical copilot for OpenMRS. It combines a FastAPI backend, a React + Vite browser UI, deterministic intent routing, optional LLM reasoning, and direct OpenMRS REST/FHIR integrations so clinicians can search patients, review charts, record data, and safely prepare write actions from natural-language prompts.\n\n---\n\n## Why this project exists\n\nOpenMRS is powerful, but most clinical workflows still require multiple clicks, context-switching, and careful navigation between modules. MedPilot provides a single conversational workspace that can:\n\n- find the right patient quickly\n- hold chart context across follow-up prompts without repeating the patient name\n- summarise the chart from live data\n- prepare write operations safely before anything is submitted\n- expose OpenMRS capabilities through a discoverable, natural-language interface\n\n---\n\n## What is implemented\n\nMedPilot currently supports these workflow groups end-to-end:\n\n**Patient management**\n- Search by name, count patients, look up by identifier or UUID\n- Register a new patient, update demographics, delete/void a patient\n- Switch active chart context within a session\n- Patient intake workflow (register + chart data in one step)\n\n**Chart review (read)**\n- Clinical summary and analysis\n- Vitals and observations\n- Conditions / problem list\n- Allergies and intolerances\n- Medication orders and dispense history\n- Encounters and visit history\n- Program enrolments\n- Available encounter types, drugs, providers, and locations\n\n**Clinical writes (confirmation-gated)**\n- Record vitals and observations (height, weight, BP, SpO2, pulse, temperature, glucose, and more)\n- Add, update, and remove conditions\n- Add, update, and remove allergies\n- Prescribe and update medication orders, record medication dispenses\n- Create clinical encounters\n- Write clinical notes (note, chief complaint, clinical impression, assessment)\n\n**Safety and audit**\n- All write operations require explicit user confirmation before execution\n- Destructive deletes require typing `DELETE` to proceed\n- Role-based permission enforcement\n- Append-only audit log for every action\n\n**LLM reasoning (optional)**\n- Structured intent extraction and entity resolution\n- Multi-turn conversation with active patient context preserved\n- Clinical narrative summaries\n- Supports OpenAI, Anthropic, and Ollama; gracefully falls back to deterministic classification when no LLM is configured\n\n**Optional integrations**\n- Health Gorilla: patient/condition preview and import (requires a sandbox token)\n\n---\n\n## Architecture\n\n### Backend — FastAPI\n\n| Path | Role |\n|---|---|\n| `app/api/` | HTTP route handlers |\n| `app/services/` | Chat orchestration, domain workflows |\n| `app/clients/` | OpenMRS REST/FHIR client, Health Gorilla client |\n| `app/llm/` | Provider abstraction and implementations (OpenAI, Anthropic, Ollama) |\n| `app/models/` | Pydantic request/response/domain models |\n| `app/core/` | Audit logging, RBAC, confirmation gates, exceptions |\n| `app/main.py` | Application entry point |\n\n### Frontend — React + Vite + Tailwind\n\nThe UI lives in `frontend-react/`. During development the Vite dev server proxies all `/api` requests to the FastAPI backend at `localhost:8000`.\n\n![Main Screen](images/main_screen.jpeg)\n\n### External systems\n\n| System | Role |\n|---|---|\n| **OpenMRS** | Primary system of record (REST and FHIR2 APIs) |\n| **OpenAI / Anthropic / Ollama** | Optional LLM provider for reasoning |\n| **Health Gorilla** | Optional external patient/condition import |\n\n---\n\n## Repository structure\n\n```text\n.\n├── app/\n│   ├── api/              # FastAPI route handlers\n│   ├── clients/          # OpenMRS and Health Gorilla HTTP clients\n│   ├── core/             # Audit, RBAC, confirmation gates, exceptions\n│   ├── llm/              # LLM provider abstraction and implementations\n│   ├── models/           # Pydantic models (domain and API)\n│   ├── services/         # Chat agent and all clinical workflow services\n│   └── main.py           # Application entry point\n├── frontend-react/       # React + Vite + Tailwind CSS UI\n│   ├── src/\n│   │   └── App.jsx       # Single-page chat shell\n│   └── vite.config.js    # Dev server with /api proxy\n├── data/\n│   ├── audit/            # Append-only audit log output\n│   └── chat/             # Chat session storage\n├── Documentation/        # Supporting product and spec documentation\n├── openmrs/              # OpenMRS Docker Compose stack and assets\n├── tests/                # Python unit tests\n├── requirements.txt      # Python dependencies\n└── .env.example          # Environment variable template\n```\n\n---\n\n## Prerequisites\n\n- Python 3.10 or newer\n- Node.js 18 or newer (for the React frontend)\n- Docker and Docker Compose (if you want the included OpenMRS stack)\n- A running OpenMRS instance (local Docker or remote)\n- An LLM provider credential **or** Ollama running locally (optional — deterministic classification still works without one)\n\n---\n\n## Setup\n\n### 1. Python environment\n\n```bash\npython3 -m venv .venv\nsource .venv/bin/activate   # Windows: .venv\\Scripts\\activate\npip install -r requirements.txt\n```\n\n### 2. Environment variables\n\n```bash\ncp .env.example .env\n```\n\nEdit `.env`. The minimum required settings are:\n\n```env\nOPENMRS_BASE_URL=http://localhost:8080/openmrs\nOPENMRS_USERNAME=admin\nOPENMRS_PASSWORD=Admin123\n```\n\nAll other settings are optional. See the [LLM configuration](#llm-configuration) section below.\n\n### 3. Start OpenMRS\n\n**Option A — existing instance**: point `OPENMRS_BASE_URL` and credentials in `.env` at your running server.\n\n**Option B — included Docker stack**:\n\n```bash\ncd openmrs\ndocker compose up -d\n```\n\n> The provided `docker-compose.yml` expects a MySQL database named `openmrs` already reachable from the containers at `host.docker.internal` with username `root` / password `password`. If that database is not present, either adapt the compose file to include MySQL or use an existing OpenMRS instance.\n\nDefault ports after startup:\n- OpenMRS frontend: `http://localhost`\n- OpenMRS backend API: `http://localhost:8080/openmrs`\n\n### 4. Start the backend\n\n```bash\nuvicorn app.main:app --reload --host 127.0.0.1 --port 8000\n```\n\nInteractive API docs: `http://127.0.0.1:8000/docs`\n\n### 5. Start the frontend\n\n```bash\ncd frontend-react\nnpm install\nnpm run dev\n```\n\nOpen the UI at the URL printed by Vite (default `http://localhost:5173`).\n\n---\n\n## LLM configuration\n\nWithout an LLM provider, common patterned prompts work via the built-in deterministic classifier, but free-form intent extraction and clinical narrative summaries require a provider.\n\n### OpenAI\n\n```env\nMEDPILOT_LLM_PROVIDER=openai\nMEDPILOT_LLM_MODEL=gpt-4o-mini\nOPENAI_API_KEY=sk-...\n```\n\n### Anthropic\n\n```env\nMEDPILOT_LLM_PROVIDER=anthropic\nMEDPILOT_LLM_MODEL=claude-haiku-4-5\nANTHROPIC_API_KEY=sk-ant-...\n```\n\n### Ollama (local)\n\n```env\nMEDPILOT_LLM_PROVIDER=ollama\nMEDPILOT_LLM_MODEL=qwen2.5:14b\nOLLAMA_BASE_URL=http://localhost:11434/api\n```\n\n### Optional tuning knobs\n\n```env\nMEDPILOT_LLM_ENABLE_INTENT_REASONING=true\nMEDPILOT_LLM_ENABLE_SUMMARY_REASONING=true\nMEDPILOT_LLM_TIMEOUT_SECONDS=30\nMEDPILOT_LLM_MAX_OUTPUT_TOKENS=2000\nMEDPILOT_LLM_REASONING_EFFORT=medium\n```\n\n---\n\n## End-to-end walkthrough\n\n### 1. Confirm the app is healthy\n\n```bash\ncurl http://127.0.0.1:8000/api/health\ncurl http://127.0.0.1:8000/api/llm/status\n```\n\n### 2. Find and load a patient\n\n```\nFind patient Maria Santos\nFind patient with id 10001D\nList all patients\nHow many patients are there?\nOpen chart for John Doe\n```\n\n![List All Patients](images/list_all_patients.jpeg)\n\n### 3. Review the chart\n\n```\nSummarize this patient\nShow their vitals\nShow their conditions\nShow their allergies\nShow their medications\nShow encounters for this patient\nShow visits for this patient\n```\n\n### 4. Write to the chart (confirmation-gated)\n\nAll writes show a preview card with the exact payload. Click **Confirm & Execute** to apply.\n\n```\nRecord blood pressure 140/90 for this patient\nRecord height 172 cm for this patient\nRecord SpO2 98% and pulse rate 76 for this patient\nAdd condition Fever for this patient\nAdd penicillin allergy, moderate severity, reaction rash\nPrescribe paracetamol 500 mg oral twice daily for 5 days\nAdd note for this patient: Follow-up for chest pain\n```\n\nMedPilot guides you through multi-turn creation flows conversationally:\n\n![Create Patient Conversation](images/example_quries.jpeg)\n\nBefore any write is executed, MedPilot shows you the exact payload and waits for your confirmation:\n\n![Create Patient Confirmation](images/create_patient.jpeg)\n\n### 5. Inspect audit output\n\nEvery action is logged to `data/audit/audit.log`. Session artifacts are stored under `data/chat/sessions/`.\n\n---\n\n## API overview\n\nFastAPI exposes interactive docs at `/docs`. Key endpoints:\n\n| Method | Path | Description |\n|---|---|---|\n| `GET` | `/api/health` | App health check |\n| `GET` | `/api/llm/status` | Active LLM provider status |\n| `POST` | `/api/chat` | Primary chat endpoint (supports `patient_uuid`, `history`, optional file upload) |\n| `POST` | `/api/chat/confirm` | Confirm a pending write action |\n| `POST` | `/api/intent` | Direct intent classification |\n| `POST` | `/api/patients/search` | Patient search |\n| `GET` | `/api/patients/{uuid}/summary` | Structured patient summary |\n| `GET` | `/api/observations/{uuid}` | List patient observations |\n| `POST` | `/api/observations` | Create observation |\n| `PUT` | `/api/observations` | Update observation |\n| `DELETE` | `/api/observations/{id}` | Delete observation |\n| `GET` | `/api/conditions/{uuid}` | List conditions |\n| `POST` | `/api/conditions` | Create condition |\n| `PATCH` | `/api/conditions/{id}` | Update condition status |\n| `DELETE` | `/api/conditions/{id}` | Delete condition |\n| `GET` | `/api/allergies/{uuid}` | List allergies |\n| `POST` | `/api/allergies` | Create allergy |\n| `PATCH` | `/api/allergies/{id}` | Update allergy severity |\n| `DELETE` | `/api/allergies/{id}` | Delete allergy |\n| `GET` | `/api/medications/{uuid}` | List medication requests |\n| `POST` | `/api/medications` | Create medication order |\n| `PATCH` | `/api/medications/{id}` | Update medication status |\n| `GET` | `/api/medications/{uuid}/dispense` | List medication dispenses |\n| `POST` | `/api/medications/dispense` | Create medication dispense |\n| `POST` | `/api/encounters` | Create encounter |\n\n### Example chat request\n\n```bash\ncurl -X POST http://127.0.0.1:8000/api/chat \\\n  -F \"prompt=Find patient Maria Santos\"\n```\n\n---\n\n## Safety model\n\nMedPilot enforces safety at multiple layers:\n\n| Layer | Mechanism |\n|---|---|\n| **Permissions** | `app/core/security.py` checks the actor's role before every read and write |\n| **Confirmation gates** | Write actions return a pending payload; nothing is submitted until the user confirms |\n| **Destructive safeguard** | Delete operations require typing `DELETE` in the confirmation prompt |\n| **Audit logging** | Every action is recorded in an append-only log with field-level redaction |\n| **Patient context** | Active patient UUID is threaded through every request to prevent cross-patient writes |\n\n---\n\n## Testing\n\n```bash\nPYTHONPATH=. pytest -q\n```\n\nIf you see `ModuleNotFoundError: No module named 'app'` the repo root is not on `PYTHONPATH`.\n\nRun just the deterministic classifier smoke test:\n\n```bash\npython test_classifier.py\n```\n\n---\n\n## Useful commands\n\n```bash\n# Install Python dependencies\npip install -r requirements.txt\n\n# Start backend (hot-reload)\nuvicorn app.main:app --reload\n\n# Start frontend dev server\ncd frontend-react && npm run dev\n\n# Start OpenMRS Docker stack\ncd openmrs && docker compose up -d\n\n# Run tests\nPYTHONPATH=. pytest -q\n```\n\n---\n\n## Troubleshooting\n\n**UI shows \"Offline\" or \"LLM Not Configured\"**\nThe app started but the LLM provider is disabled or credentials are missing. Check `MEDPILOT_LLM_PROVIDER`, the corresponding API key, and `MEDPILOT_LLM_MODEL`. Common free options: Ollama running locally with `MEDPILOT_LLM_PROVIDER=ollama`.\n\n**OpenMRS requests fail**\nVerify `OPENMRS_BASE_URL`, username, and password. Confirm the OpenMRS server is reachable and that the FHIR2 and REST modules are enabled.\n\n**Docker OpenMRS starts but the backend container errors**\nThe bundled compose file assumes a host-side MySQL database named `openmrs`. Without it the OpenMRS WAR will not initialise. Either add MySQL to the compose file or point MedPilot at an existing OpenMRS instance.\n\n**Observation creation returns 400**\nConfirm the OpenMRS instance has the CIEL concept dictionary loaded. MedPilot references CIEL concept UUIDs for all standard vital signs.\n\n---\n\n## Development notes\n\n- Session state is file-backed (JSON under `data/chat/sessions/`), not database-backed.\n- Audit logs are append-only text records with basic field redaction.\n- The deterministic classifier in `app/services/deterministic_classifier.py` handles common phrases without an LLM round-trip.\n- All clinical writes go through the pending-action confirmation flow defined in `app/core/confirmation.py`.\n\n---\n\n## License\n\nDistributed under the GNU General Public License v3. See `LICENSE` for details.\n"
+      }
+    ]
+  },
+  {
+    "leaf": "crop-management",
+    "repo": "prateek3255/smartfarm",
+    "repository_id": 120770359,
+    "summary": "包含农户移动端和管理员Web端：采集农户与土地信息，展示适宜作物和需求，执行作物分配并发送短信，使用Firebase存储并用线性回归预测。",
+    "type": "application",
+    "features": [
+      "农户登记姓名、手机号、土地面积、区县和村庄等信息。",
+      "展示适合农户所在区域的作物及当前需求最高的作物。",
+      "点击分配后生成allot id，并发送短信通知农户。",
+      "管理端查看用户、作物需求和机器学习预测图。",
+      "Firebase存储用户与作物需求，分配时扣减相应需求。"
+    ],
+    "scope": "适用于按地区、土壤、降雨和土地面积向农户推荐和分配作物；README未说明作物季作业计划、田间作业记录或收获复盘。",
+    "completeness": "partial",
+    "missing_fields": [
+      "license_verification"
+    ],
+    "license": {
+      "detected_spdx": null,
+      "note": "未发现许可证文件；公开仓库不等于开源授权",
+      "source": null,
+      "spdx": null,
+      "status": "pending"
+    },
+    "matches": [
+      {
+        "applicability": "conditional",
+        "conditions": [
+          "需另用系统或人工制定季作业计划",
+          "推荐结果需结合实际农艺要求核实"
+        ],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/prateek3255/smartfarm/git/blobs/e302e54844009db424c1be5e4187c86726738336",
+          "source_kind": "readme",
+          "source_sha256": "91cc5729cf657dde72249c369f37203f7d77bc8420f8362bea4fd002256e348b",
+          "source_url": "https://github.com/prateek3255/smartfarm/blob/master/README.md",
+          "verification": "source_based"
+        },
+        "reason": "系统可按土地和区域推荐或分配作物，可用于选种；但未提供播种、施肥、植保等作业排期。",
+        "scenario_id": "auto-crop-management-d0785b9178"
+      }
+    ],
+    "scenarios": [
+      {
+        "description": "农场经理为下一季地块选择作物品种，安排播种、施肥和植保等作业日期，形成可执行的季计划。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-crop-management-d0785b9178",
+        "leaf": "crop-management",
+        "leaf_name": "Crop Management",
+        "name": "制定作物季作业计划",
+        "search_queries": [
+          "crop season planning"
+        ]
+      },
+      {
+        "description": "种植者或工人在田间用手机记录施肥、打药等作业的地块、日期、用量和执行人，形成可追溯记录。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-crop-management-dde61db782",
+        "leaf": "crop-management",
+        "leaf_name": "Crop Management",
+        "name": "记录田间作业执行",
+        "search_queries": [
+          "field activity logging"
+        ]
+      },
+      {
+        "description": "种植者按区块记录收获产量与品质，对比季初计划，保留本季历史供下一季参考。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-crop-management-75dddbfbfe",
+        "leaf": "crop-management",
+        "leaf_name": "Crop Management",
+        "name": "记录收获并复盘季末",
+        "search_queries": [
+          "harvest yield tracking"
+        ]
+      }
+    ],
+    "documents": [
+      {
+        "url": "https://github.com/prateek3255/smartfarm/blob/master/README.md",
+        "path": "README.md",
+        "text": "# SmartFarm\n<img src=\"https://drive.google.com/uc?id=1pz1j2jA8nPay6dg6FUP1jkTQQmzpPcxO\" alt=\"loading\"><br>\nSmart Farm is a crop management system that allots crops to farmers on the basis of the highest requirement crop predicted using machine learning from the crops that are suitable for their area according to the soil type, average rainfall etc. in their area, so that crops dont get wasted and, are produced accordingly. It consist of two apps a mobile app for the end-user i.e. the farmer, and a web-app for the admin.\n\n# Table of Contents\n* [Mobile app](#moblie-app)\n* [Web app](#web-app)\n* [Database](#database)\n* [Machine learning](#ml)\n* [Built with](#built-with)\n* [Authors](#author)\n\n\n# <a name=\"moblie-app\"></a>Mobile app\n  * In the mobile app the farmer will first need to enter all his details like name, aadhar no., mobile no., the land area he has in        hectares and his district and village.\n  * After he enters all these details he is guided to a page where there are three tabs, in the first tab he is shown the crop that is suited for his area and currently has maximum requirement.\n  * The second tab shows all the crops that can be grown in his area.\n  * The third tab shows the soil type, average rainfall, soil texture and soil color in his area.\n  * When the user presses the allot button he is alloted the given crop with an allotid and the requirement for that crop in the database is updated accordingly and, a sms is sent to him about the crop he is alloted with his allotid.\n  * Next time the user opens the app he will only be shown his allot id, crop alloted and the other two tabs.\n  \nMobile Application - <a href=\"https://play.google.com/store/apps/details?id=com.smartfarm.technetium\">Google Play Store</a>  \n<a href=\"https://github.com/prateek3255/smartfarm\">Github repository</a>     \n\n\n # <a name=\"web-app\"></a>Web app\nThe Web application is made up of three sections -\n  * <b>Users</b>- It consists of all the details of the users who have registeres and the crop which is alloted to them.\n  * <b>Crop requirement</b>- It consist of the current requirement of the crops in tonnes.\n  * <b>Prediction</b>- It consist of the interactable plots predicted using machine learning.\n  \nWeb application - <a href=\"https://smartfarm-18270.firebaseapp.com/\">Website</a><br/>\n<a href=\"https://github.com/prateek3255/smartFarmWebApp\">Github repository</a>\n    \n  \n# <a name=\"database\"></a>Database\n<p>The database is built on firebase and consist of two sections users and crops.\n\nThe users section consist of all the details the user enters when he registers, using aadhar no. as the key, whenever the user clicks the allot button, the alloted crop is also updated in his corresponding key.\n\nThe crops section consist of the requirement for all the crops in tonnes and whenever the user clicks allot button the amount of that crop that can be grown on his land area is subtracted from the requirement of that crop accordingly.</p> \n  \n# <a name=\"ml\"></a>Machine Learning\n<p>We used the data from <a href=\"https://data.gov.in/node/87630\">here</a> and used linear regression using year and area as features and the crop production as label.\n  \nThe data we got consisted of all the production of all the districts of all the states from 1997 - 2010 and we then added the production and area of the crops we wanted to plot of rajasthan using pandas and created a new data csv named final.csv.\n</p>\n  \nTo view the interactive plots click on prediction section <a href=\"https://smartfarm-18270.firebaseapp.com/\">here</a>.<br/>\n<a href=\"https://github.com/prateek3255/SmartFarm_MachineLearning\">Github repository</a>\n \n# <a name=\"built-with\"></a>Built with\n* <a href=\"https://angularjs.org/\">Angular JS</a> - Superheroic JavaScript MVW Framework\n* <a href=\"http://ionicframework.com/\">Ionic framework</a> - Build amazing native and hybrid mobile apps.\n* <a href=\"https://firebase.google.com/\">Firebase</a> - Used for Database, Storage and Hosting.\n* Programming languages used -  python, HTML5, CSS3, JavaScript\n* Python libraries used - <a href=\"https://pandas.pydata.org/\">pandas</a>,<a href=\"http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html\"> scikitLearn(LinearRegression)</a>, <a href=\"https://matplotlib.org/\">matplotlib</a>, <a href=\"http://mpld3.github.io/\">mpl3d</a>\n* SMS API used - <a href=\"https://www.garlicsms.com/\">Garlic SMS</a>\n* Training data - <a href=\"https://data.gov.in/node/87630\">data.gov.in</a>\n\n# <a name=\"author\"></a>Authors\n* <b>Prateek Surana   </b>\n<a href=\"mailto:prateeksurana3255@gmail.com\">Email</a>\n* <b>Ayush Gupta   </b>\n<a href=\"mailto:ayushgupta197@gmail.com\">Email</a>\n* <b>Vaibhav Sankhala   </b>\n<a href=\"mailto:Vaibhavrocks0501@gmail.com\">Email</a>\n"
+      }
+    ]
+  },
+  {
+    "leaf": "golf-course-management",
+    "repo": "aaronhorvat1/tee-time-booking-system",
+    "repository_id": 1091250673,
+    "summary": "使用 Next.js、Prisma、PostgreSQL 构建的球位预订系统，提供公开预订组件、管理面板与相关 API。",
+    "type": "application",
+    "features": [
+      "公开预订组件：选日期、1-4 人组、实时空位、15 分钟占位",
+      "管理面板：Google SSO、开球时间表管理、时段封锁、日期导航",
+      "API：可用时段查询、占位、取消、过期占位释放、管理员封锁时段",
+      "数据模型含球场、每日开球表、时段、预订、价格规则、封锁"
+    ],
+    "scope": "面向开球时间在线预订与后台时段管理；README 未说明会员计费、首发签到或收入报表。",
+    "completeness": "partial",
+    "missing_fields": [
+      "license_verification"
+    ],
+    "license": {
+      "detected_spdx": null,
+      "note": "未发现许可证文件；公开仓库不等于开源授权",
+      "source": null,
+      "spdx": null,
+      "status": "pending"
+    },
+    "matches": [
+      {
+        "applicability": "conditional",
+        "conditions": [
+          "需由员工在管理端或组件中代为操作",
+          "README 未说明预订来源记录与计费类别字段"
+        ],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/aaronhorvat1/tee-time-booking-system/git/blobs/e25806db28e022dc181855ec7d1bab66ca3ac2a9",
+          "source_kind": "readme",
+          "source_sha256": "2f038226b70534a1c277d44570c5b75488a0e82fa226fe864741629b5ed35f14",
+          "source_url": "https://github.com/aaronhorvat1/tee-time-booking-system/blob/main/README.md",
+          "verification": "source_based"
+        },
+        "reason": "提供空位查询与预订占位，可支撑电话预订登记流程",
+        "scenario_id": "auto-golf-course-management-ba56a65750"
+      },
+      {
+        "applicability": "unverified",
+        "conditions": [],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/aaronhorvat1/tee-time-booking-system/git/blobs/e25806db28e022dc181855ec7d1bab66ca3ac2a9",
+          "source_kind": "readme",
+          "source_sha256": "2f038226b70534a1c277d44570c5b75488a0e82fa226fe864741629b5ed35f14",
+          "source_url": "https://github.com/aaronhorvat1/tee-time-booking-system/blob/main/README.md",
+          "verification": "source_based"
+        },
+        "reason": "有开球时间表与预订状态，但未说明签到、付款核对与球车记录",
+        "scenario_id": "auto-golf-course-management-2d1bb0a26a"
+      },
+      {
+        "applicability": "unverified",
+        "conditions": [],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/aaronhorvat1/tee-time-booking-system/git/blobs/e25806db28e022dc181855ec7d1bab66ca3ac2a9",
+          "source_kind": "readme",
+          "source_sha256": "2f038226b70534a1c277d44570c5b75488a0e82fa226fe864741629b5ed35f14",
+          "source_url": "https://github.com/aaronhorvat1/tee-time-booking-system/blob/main/README.md",
+          "verification": "source_based"
+        },
+        "reason": "数据模型含预订与价格，但 README 未提供轮次与收入报表功能",
+        "scenario_id": "auto-golf-course-management-90e0f840e0"
+      }
+    ],
+    "scenarios": [
+      {
+        "description": "前台员工接到球手电话，在当日开球时间表上查找空档，登记同行人数与计费类别，确认预订并记录来源。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-golf-course-management-ba56a65750",
+        "leaf": "golf-course-management",
+        "leaf_name": "Golf Course Management",
+        "name": "电话预订开球时间",
+        "search_queries": [
+          "tee time booking"
+        ]
+      },
+      {
+        "description": "首发员查看当日开球时间表，核对各组的付款状态与球车，在第一洞签到并记录实际开球时间。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-golf-course-management-2d1bb0a26a",
+        "leaf": "golf-course-management",
+        "leaf_name": "Golf Course Management",
+        "name": "首发台签到与开球记录",
+        "search_queries": [
+          "golfer check in"
+        ]
+      },
+      {
+        "description": "财务或总经理按日期、预订渠道和球员类别汇总已打球轮次与果岭费、球车收入，用于经营分析。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-golf-course-management-90e0f840e0",
+        "leaf": "golf-course-management",
+        "leaf_name": "Golf Course Management",
+        "name": "按轮次与收入出报表",
+        "search_queries": [
+          "rounds revenue report"
+        ]
+      }
+    ],
+    "documents": [
+      {
+        "url": "https://github.com/aaronhorvat1/tee-time-booking-system/blob/main/README.md",
+        "path": "README.md",
+        "text": "# Tee Time Booking System\n\nA production-ready MVP tee-time booking system built with Next.js 14, TypeScript, Prisma, and PostgreSQL.\n\n## Tech Stack\n\n- **Next.js 14** (App Router) with TypeScript\n- **TailwindCSS** + **shadcn/ui** for UI components\n- **Prisma** + **PostgreSQL** (Supabase compatible)\n- **NextAuth** with Google provider for admin SSO\n- **Stripe** PaymentIntents (placeholder keys, webhook route)\n- **Resend** for email (stub)\n- **Vercel Cron**-ready routes\n\n## Setup\n\n1. **Install dependencies:**\n   ```bash\n   npm install\n   ```\n\n2. **Set up environment variables:**\n   ```bash\n   cp .env.example .env\n   ```\n   Then fill in your environment variables in `.env`:\n   - `DATABASE_URL`: Your PostgreSQL connection string\n   - `NEXTAUTH_URL`: Your app URL (e.g., `http://localhost:3000`)\n   - `NEXTAUTH_SECRET`: A random secret (generate with `openssl rand -base64 32`)\n   - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: From Google OAuth\n   - `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`: From Stripe (optional for MVP)\n   - `RESEND_API_KEY`: From Resend (optional for MVP)\n   - `APP_BASE_URL`: Your app base URL\n\n3. **Set up the database:**\n   ```bash\n   npm run db:push\n   npm run db:seed\n   ```\n\n4. **Run the development server:**\n   ```bash\n   npm run dev\n   ```\n\n5. **Open your browser:**\n   - Public booking widget: `http://localhost:3000/widget`\n   - Admin panel: `http://localhost:3000/admin`\n   - Home page: `http://localhost:3000`\n\n## Features\n\n### Public Booking Widget (`/widget`)\n- Date picker for selecting tee times\n- Party size selection (1-4 players)\n- Real-time slot availability\n- Hold creation with 15-minute expiration\n- Wix iframe-friendly with `postMessage` integration\n- Success notifications\n\n### Admin Panel (`/admin`)\n- Google SSO authentication\n- Tee sheet management\n- Slot blocking functionality\n- Date navigation\n- Real-time status updates\n\n### API Routes\n\n- `GET /api/availability` - Get available slots for a date\n- `POST /api/holds` - Create a hold on a time slot\n- `POST /api/cancel` - Cancel a reservation by code\n- `POST /api/stripe/webhook` - Stripe webhook handler (stub)\n- `GET /api/cron/release-holds` - Release expired holds (cron-ready)\n- `POST /api/admin/block` - Block a time slot (admin)\n\n## Database Schema\n\nThe system uses Prisma with the following main models:\n- **User**: User accounts with roles (USER, ADMIN)\n- **Course**: Golf courses\n- **TeeSheet**: Daily tee sheets\n- **TimeSlot**: Individual time slots with pricing\n- **Reservation**: Bookings with hold/booking status\n- **PriceRule**: Dynamic pricing rules\n- **Block**: Maintenance/league blocks\n\n## Development\n\n- `npm run dev` - Start development server\n- `npm run build` - Build for production\n- `npm run start` - Start production server\n- `npm run db:push` - Push Prisma schema to database\n- `npm run db:seed` - Seed database with demo data\n\n## Notes\n\n- Admin endpoints currently don't have role checks (add later)\n- Stripe webhook is stubbed (implement verification)\n- Email sending is stubbed (implement with Resend)\n- Prices are precomputed and stored on TimeSlot for MVP\n- Widget emits `postMessage` on booking success for Wix integration\n\n\n"
+      }
+    ]
+  },
+  {
+    "leaf": "vector-retrieval-platform",
+    "repo": "redis-developer/redis-product-search",
+    "repository_id": 502840954,
+    "summary": "用 Redis Stack、FastAPI、PyTorch 与 Huggingface 实现按图片和文本的向量相似度搜索演示",
+    "type": "application",
+    "features": [
+      "按图片和文本进行向量相似度搜索",
+      "支持 HNSW 与 Flat 两种向量索引类型",
+      "混合查询，可用标签作为向量搜索的预过滤条件",
+      "使用 PyTorch/Img2Vec 与 Sentence Transformers 生成向量嵌入"
+    ],
+    "scope": "演示 Redis Stack/Redis Enterprise 的向量搜索能力，含前端 SPA 与后端 API",
+    "completeness": "partial",
+    "missing_fields": [
+      "license_verification"
+    ],
+    "license": {
+      "detected_spdx": "BSD-3-Clause",
+      "note": "许可证原文已读取，但未通过官方模板精确匹配，保留待核验；不按公开仓库或标签推定为开源",
+      "source": {
+        "blob_sha": "8da67997b6406a5837074cc9003f2a3b9f663d2f",
+        "immutable_url": "https://api.github.com/repos/redis-developer/redis-product-search/git/blobs/8da67997b6406a5837074cc9003f2a3b9f663d2f",
+        "kind": "license",
+        "path": "LICENSE",
+        "retrieved_at": "2026-10-24T21:33:12.939134+00:00",
+        "sha256": "e5e773b0af567576db482826792757710fca625c6d24007a3083bd75ee287d7e",
+        "url": "https://github.com/redis-developer/redis-product-search/blob/master/LICENSE"
+      },
+      "spdx": null,
+      "status": "pending"
+    },
+    "matches": [
+      {
+        "applicability": "direct",
+        "conditions": [],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/redis-developer/redis-product-search/git/blobs/b04b41094fce5baed0baaebf2d2edb819fa74047",
+          "source_kind": "readme",
+          "source_sha256": "24552c6cee12b91271489baa1cde814e4ad1bbedf319d351fe8747a96e402f13",
+          "source_url": "https://github.com/redis-developer/redis-product-search/blob/master/README.md",
+          "verification": "source_based"
+        },
+        "reason": "演示按图片/文本向量相似度检索商品，与语义商品检索场景一致",
+        "scenario_id": "auto-vector-retrieval-platform-73632e1ca0"
+      },
+      {
+        "applicability": "unverified",
+        "conditions": [],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/redis-developer/redis-product-search/git/blobs/b04b41094fce5baed0baaebf2d2edb819fa74047",
+          "source_kind": "readme",
+          "source_sha256": "24552c6cee12b91271489baa1cde814e4ad1bbedf319d351fe8747a96e402f13",
+          "source_url": "https://github.com/redis-developer/redis-product-search/blob/master/README.md",
+          "verification": "source_based"
+        },
+        "reason": "具备向量相似度检索能力，但资料未明确以已有条目向量做相似内容推荐",
+        "scenario_id": "auto-vector-retrieval-platform-b8bae10d6d"
+      }
+    ],
+    "scenarios": [
+      {
+        "description": "电商后端开发者把商品描述与图片嵌入向量索引，用户搜索“适合海边婚礼的浅色长裙”时按语义相似度返回排序商品，而非仅关键词匹配。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-vector-retrieval-platform-73632e1ca0",
+        "leaf": "vector-retrieval-platform",
+        "leaf_name": "Vector Retrieval Platform",
+        "name": "语义商品检索",
+        "search_queries": [
+          "semantic product search"
+        ]
+      },
+      {
+        "description": "内容平台工程师以已发布文章或视频的向量作为查询，检索索引中最近邻条目，为读者生成“相似内容”推荐列表。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-vector-retrieval-platform-b8bae10d6d",
+        "leaf": "vector-retrieval-platform",
+        "leaf_name": "Vector Retrieval Platform",
+        "name": "相似内容推荐",
+        "search_queries": [
+          "find similar items"
+        ]
+      },
+      {
+        "description": "AI 工程师将内部文档切块嵌入并写入索引，RAG 应用在回答前调用检索接口取回语义最相关的文档片段作为上下文。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-vector-retrieval-platform-c38413ca46",
+        "leaf": "vector-retrieval-platform",
+        "leaf_name": "Vector Retrieval Platform",
+        "name": "知识库语义召回",
+        "search_queries": [
+          "semantic document retrieval"
+        ]
+      }
+    ],
+    "documents": [
+      {
+        "url": "https://github.com/redis-developer/redis-product-search/blob/master/README.md",
+        "path": "README.md",
+        "text": "\n<div align=\"center\">\n    <a href=\"https://github.com/spartee/redis-vector-search\"><img src=\"https://redis.io/wp-content/uploads/2024/04/Logotype.svg?raw=true\" width=\"30%\"><img></a>\n    <br />\n    <br />\n<div display=\"inline-block\">\n    <a href=\"https://ecommerce.redisvl.com/\"><b>Hosted Demo</b></a>&nbsp;&nbsp;&nbsp;\n    <a href=\"https://github.com/redis-developer/redis-product-search\"><b>Code</b></a>&nbsp;&nbsp;&nbsp;\n    <a href=\"https://redis.io/docs/stack/search/reference/vectors/\"><b>Redis VSS Documentation</b></a>&nbsp;&nbsp;&nbsp;\n  </div>\n    <br />\n    <br />\n</div>\n\n# Redis Vector Search Demo Application\n\nThis demo showcases the vector search similarity (VSS) capability within Redis Stack and Redis Enterprise.\nThrough the RediSearch module, vector types and indexes can be added to Redis. This turns Redis into\na highly performant vector database which can be used for all types of applications.\n\nThe following Redis Stack capabilities are available in this demo:\n   - **Vector Similarity Search**\n     - by image\n     - by text\n   - **Multiple vector indexing types**\n     - HNSW\n     - Flat (brute-force)\n   - **Hybrid Queries**\n     - Apply tags as pre-filter for vector search\n\n## Application\n\nThis app was built as a Single Page Application (SPA) with the following components:\n\n- **[Redis Stack](https://redis.io/docs/stack/)**: Vector database + JSON storage\n- **[RedisVL](https://redisvl.com)** for Python vector db client\n- **[FastAPI](https://fastapi.tiangolo.com/)** for backend API\n- **[Pydantic](https://pydantic-docs.helpmanual.io/)** for schema and validation\n- **[React](https://reactjs.org/)** (with Typescript)\n- **[Docker Compose](https://docs.docker.com/compose/)** for development\n- **[MaterialUI](https://material-ui.com/)** for some UI elements\n- **[React-Bootstrap](https://react-bootstrap.github.io/)** for some UI elements\n- **[Pytorch/Img2Vec](https://github.com/christiansafka/img2vec)** and **[Huggingface Sentence Transformers](https://huggingface.co/sentence-transformers)** for vector embedding creation\n\nSome inspiration was taken from this [Cookiecutter project](https://github.com/Buuntu/fastapi-react)\nand turned into a SPA application instead of a separate front-end server approach.\n\n### General Project Structure\n\nMuch inspiration taken from [tiangelo/full-stack-fastapi-template](https://github.com/tiangolo/full-stack-fastapi-template)\n\n```\n/backend\n    /productsearch\n        /api\n            /routes\n                product.py # primary API logic lives here\n        /db\n            load.py # seeds Redis DB\n            utils.py # redis util\n        /schema\n            # pydantic models for serialization/validation from API\n        /tests\n        /utils\n        config.py\n        spa.py # logic for serving compiled react project\n        main.py # entrypoint\n/frontend\n    /public\n        # index, manifest, logos, etc.\n    /src\n        /config\n        /styles\n        /views\n            # primary components live here\n\n        api.ts # logic for connecting with BE\n        App.tsx # project entry\n        Routes.tsk # route definitions\n        ...\n/data\n    # folder mounted as volume in Docker\n    # load script auto populates initial data from S3\n\n```\n\n### Datasets\n\nThe dataset was taken from the the following Kaggle links.\n\n- [Large Dataset](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset)\n- [Smaller Dataset](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-small)\n\nA formatted version is available for use with this demo at:\n\n\n## Running the App with docker-compose\nBefore running the app, install [Docker Desktop](https://www.docker.com/products/docker-desktop/).\n\n1. Copy .env file\n\n```bash\ncp .env.template .env\n```\n\n2. Run docker containers with `make`\n\n```bash\nmake build\n```\n\nNote: you can add `--build` and `--force-recreate` if caching old images.\n\n## Running local without docker-compose\n\n### Run frontend\n\n1. Install NPM packages\n    ```bash\n    $ cd frontend/\n    $ npm install\n    ````\n2. Use `npm` to serve the application from your machine\n    ```bash\n    $ npm run start\n    ```\n3. Navigate to `http://localhost:3000` in a browser.\n\nAll changes to your local code will be reflected in your display in semi realtime.\n\n### Run backend\nPre-step: install [poetry](https://python-poetry.org/).\n\n1. `cd backend`\n2. `poetry install` to get necessary python deps\n3. `poetry run start` to launch uvicorn server with FastAPI app\n\n### vscode debugger\n\nIncluded in the project is a `./vscode/launch.json` for local debugging purposes.\n\n### Troubleshooting\nSometimes you need to clear out some Docker cached artifacts. Run `docker system prune`, restart Docker Desktop, and try again.\n\nOpen an issue here on GitHub and we will try to be responsive to these. Additionally, please consider [contributing](CONTRIBUTING.md)."
+      }
+    ]
+  },
+  {
+    "leaf": "job-board",
+    "repo": "AbayTesfaye/Laravel-Jobs-Board",
+    "repository_id": 831861937,
+    "summary": "仓库描述称支持浏览、搜索、申请职位及雇主发布管理职位，但 README 主要为 Laravel 框架默认内容。",
+    "type": "application",
+    "features": [
+      "浏览、搜索并申请职位（据仓库描述）",
+      "雇主发布与管理职位（据仓库描述）"
+    ],
+    "scope": "资料不足，仅知为 Laravel 职位板项目。",
+    "completeness": "partial",
+    "missing_fields": [
+      "license_verification"
+    ],
+    "license": {
+      "detected_spdx": null,
+      "note": "未发现许可证文件；公开仓库不等于开源授权",
+      "source": null,
+      "spdx": null,
+      "status": "pending"
+    },
+    "matches": [
+      {
+        "applicability": "unverified",
+        "conditions": [],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/AbayTesfaye/Laravel-Jobs-Board/git/blobs/c87265c1de1ddf65fecfc769da8f0f99a30d42cf",
+          "source_kind": "readme",
+          "source_sha256": "c6c31bcd6b9f1f27ad64460bc4cd7883b8c544fc3b05a9e645cc26b6133b818e",
+          "source_url": "https://github.com/AbayTesfaye/Laravel-Jobs-Board/blob/main/README.md",
+          "verification": "source_based"
+        },
+        "reason": "仓库描述提及浏览、搜索与申请职位，细节未在 README 中说明。",
+        "scenario_id": "auto-job-board-f5051bf012"
+      }
+    ],
+    "scenarios": [
+      {
+        "description": "求职者用关键词和地点筛选浏览多家雇主的在招职位，比较后通过站内表单或跳转雇主页面提交申请。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-job-board-f5051bf012",
+        "leaf": "job-board",
+        "leaf_name": "Job Board",
+        "name": "跨雇主职位检索与投递",
+        "search_queries": [
+          "job search apply"
+        ]
+      },
+      {
+        "description": "招聘方创建带职责、地点、薪资的职位广告并设定推广预算，发布后查看浏览、点击和申请数据。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-job-board-51f08804dc",
+        "leaf": "job-board",
+        "leaf_name": "Job Board",
+        "name": "雇主发布与推广职位",
+        "search_queries": [
+          "post job listing"
+        ]
+      },
+      {
+        "description": "求职者保存常用搜索条件并开启提醒，当符合条件的新职位出现时收到通知并回访查看。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-job-board-744cd63284",
+        "leaf": "job-board",
+        "leaf_name": "Job Board",
+        "name": "保存搜索并接收新职位提醒",
+        "search_queries": [
+          "saved job alerts"
+        ]
+      }
+    ],
+    "documents": [
+      {
+        "url": "https://github.com/AbayTesfaye/Laravel-Jobs-Board/blob/main/README.md",
+        "path": "README.md",
+        "text": "<p align=\"center\"><a href=\"https://laravel.com\" target=\"_blank\"><img src=\"https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg\" width=\"400\" alt=\"Laravel Logo\"></a></p>\n\n<p align=\"center\">\n<a href=\"https://github.com/laravel/framework/actions\"><img src=\"https://github.com/laravel/framework/workflows/tests/badge.svg\" alt=\"Build Status\"></a>\n<a href=\"https://packagist.org/packages/laravel/framework\"><img src=\"https://img.shields.io/packagist/dt/laravel/framework\" alt=\"Total Downloads\"></a>\n<a href=\"https://packagist.org/packages/laravel/framework\"><img src=\"https://img.shields.io/packagist/v/laravel/framework\" alt=\"Latest Stable Version\"></a>\n<a href=\"https://packagist.org/packages/laravel/framework\"><img src=\"https://img.shields.io/packagist/l/laravel/framework\" alt=\"License\"></a>\n</p>\n\n## About Laravel\n\nLaravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:\n\n- [Simple, fast routing engine](https://laravel.com/docs/routing).\n- [Powerful dependency injection container](https://laravel.com/docs/container).\n- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.\n- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).\n- Database agnostic [schema migrations](https://laravel.com/docs/migrations).\n- [Robust background job processing](https://laravel.com/docs/queues).\n- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).\n\nLaravel is accessible, powerful, and provides tools required for large, robust applications.\n\n## Learning Laravel\n\nLaravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.\n\nYou may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.\n\nIf you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.\n\n## Contributing\n\nThank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).\n\n## Code of Conduct\n\nIn order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).\n\n## Security Vulnerabilities\n\nIf you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.\n\n## License\n\nThe Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).\n\"# Laravel-11-Jobs-Board\" \n"
+      }
+    ]
+  },
+  {
+    "leaf": "vector-retrieval-platform",
+    "repo": "330205812/NexusRAG",
+    "repository_id": 923379332,
+    "summary": "NexusRAG 支持知识库管理、文档上传与多模态 OCR 处理，并提供全文检索、语义检索、知识图谱查询及混合检索。",
+    "type": "application",
+    "features": [
+      "全文检索、语义检索、知识图谱查询与混合检索",
+      "文档上传处理与多模态 OCR",
+      "文档分段细粒度管理与处理状态跟踪",
+      "集成嵌入与重排模型，支持外部 OpenAI 格式 API"
+    ],
+    "scope": "面向企业知识检索与 GenAI 应用，依赖 Milvus、Elasticsearch 等组件。",
+    "completeness": "complete",
+    "missing_fields": [],
+    "license": {
+      "detected_spdx": "MIT",
+      "note": "许可证完整正文与 SPDX 官方文本规范化精确匹配；未忽略附加条款。",
+      "reviewed_at": "2026-10-23T02:02:53.829897+00:00",
+      "source": {
+        "blob_sha": "d11ec22f0be27f31db69b0bac5a84e47a876af4f",
+        "immutable_url": "https://api.github.com/repos/330205812/NexusRAG/git/blobs/d11ec22f0be27f31db69b0bac5a84e47a876af4f",
+        "kind": "license",
+        "path": "LICENSE",
+        "retrieved_at": "2026-10-24T21:34:20.348954+00:00",
+        "sha256": "45e3df0d1961616204bac4b7a320e3718e470c58544215b1e0304521e092e9b1",
+        "url": "https://github.com/330205812/NexusRAG/blob/main/LICENSE"
+      },
+      "spdx": "MIT",
+      "status": "open_source",
+      "verification": {
+        "method": "spdx_exact_text",
+        "osi_approved": true,
+        "template_sha256": "0c2b3c87a154a4aaac6bc6a735dd454dc29d9a78c23a85deedb080e0c65de1f8",
+        "template_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/json/details/MIT.json"
+      }
+    },
+    "matches": [
+      {
+        "applicability": "direct",
+        "conditions": [],
+        "evidence": {
+          "excerpt": "",
+          "immutable_url": "https://api.github.com/repos/330205812/NexusRAG/git/blobs/b984f1edab0a9a423abb773086071a42c1e1916c",
+          "source_kind": "readme",
+          "source_sha256": "f50d56d0957ec8d97768ad8734d4a00924587b9cd9b9c0990798a02e831300e2",
+          "source_url": "https://github.com/330205812/NexusRAG/blob/main/README.md",
+          "verification": "source_based"
+        },
+        "reason": "提供语义检索与 RAG 文档处理模块，可用于知识库语义召回",
+        "scenario_id": "auto-vector-retrieval-platform-c38413ca46"
+      }
+    ],
+    "scenarios": [
+      {
+        "description": "电商后端开发者把商品描述与图片嵌入向量索引，用户搜索“适合海边婚礼的浅色长裙”时按语义相似度返回排序商品，而非仅关键词匹配。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-vector-retrieval-platform-73632e1ca0",
+        "leaf": "vector-retrieval-platform",
+        "leaf_name": "Vector Retrieval Platform",
+        "name": "语义商品检索",
+        "search_queries": [
+          "semantic product search"
+        ]
+      },
+      {
+        "description": "内容平台工程师以已发布文章或视频的向量作为查询，检索索引中最近邻条目，为读者生成“相似内容”推荐列表。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-vector-retrieval-platform-b8bae10d6d",
+        "leaf": "vector-retrieval-platform",
+        "leaf_name": "Vector Retrieval Platform",
+        "name": "相似内容推荐",
+        "search_queries": [
+          "find similar items"
+        ]
+      },
+      {
+        "description": "AI 工程师将内部文档切块嵌入并写入索引，RAG 应用在回答前调用检索接口取回语义最相关的文档片段作为上下文。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-vector-retrieval-platform-c38413ca46",
+        "leaf": "vector-retrieval-platform",
+        "leaf_name": "Vector Retrieval Platform",
+        "name": "知识库语义召回",
+        "search_queries": [
+          "semantic document retrieval"
+        ]
+      }
+    ],
+    "documents": [
+      {
+        "url": "https://github.com/330205812/NexusRAG/blob/main/README.md",
+        "path": "README.md",
+        "text": "# 🚀 NexusRAG\nNexusRAG is a comprehensive knowledge base backend system designed for the implementation of Large Language Models (LLMs). \nIt provides ready-to-use modules for document processing and Retrieval-Augmented Generation (RAG), enabling rapid deployment of large-scale knowledge retrieval systems to your Generative AI (GenAI) applications. \nThese applications can include enterprise virtual employees, educational tools, or personalized assistants.\n\nThe system allows users to: \n- Create and manage personal knowledge bases\n- Automatically upload and process documents in personal knowledge bases (supports multimodal OCR)\n- Employ multiple search methods across knowledge bases (full-text search, semantic retrieval, and knowledge graph querying, or hybrid search)\n- Perform fine-grained management of document segments within knowledge bases\n- Track document processing status in real-time\n\n## Components\n\nBelow are the components you can use:\n\n| Type        |                                                                                          What Supported                                                                                          |          Where          |\n|:------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------------------:|\n| Embedding   |                                                       [`Sentence-transformers`](https://huggingface.co/GanymedeNil/text2vec-large-chinese)                                                       | /src/clients/embeddings |\n| Rerank      |                                                      - [`BCE`](https://huggingface.co/maidalun1020/bce-reranker-base_v1)<br>- BGE Reranker                                                       |  /src/clients/reranker  |\n| File Parser |                                                                        [`MinerU`](https://github.com/opendatalab/MinerU)                                                                         |     💡Pending merge     |\n| Store       |                                                                     [`milvus`](https://github.com/milvus-io/milvus) (Docker)                                                                     |                         |\n|             |                                                              [`elasticsearch`](https://github.com/elastic/elasticsearch)   (Docker)                                                              |                         |\n|             |                                                                         [`neo4j`](https://neo4j.com/)           (Docker)                                                                         |     💡Pending merge     |\n| Chunking    |                                                                                       MarkdownTextSplitter                                                                                       |        Built-in         |\n|             |                                                                                  RecursiveCharacterTextSplitter                                                                                  |        Built-in         |\n- **This project can integrate with external embedding and reranker APIs. Note that these external APIs must conform to the OpenAI API format standards.**\n- **\"Pending merge\" means \"Under final code review\"**\n- **Always welcome to contribute more components.**\n\n\n\n## 📌 Quick start\n\n### 1. Prepare Environment and Download Corresponding Model Files\n```bash\napt update\napt install python-dev libxml2-dev libxslt1-dev antiword unrtf poppler-utils pstotext tesseract-ocr flac ffmpeg lame libmad0 libsox-fmt-mp3 sox libjpeg-dev swig libpulse-dev\n```\nCreate volume directories under the `docker` directory：\n```bash\ncd docker\nmkdir -p volumes/elasticsearch\nmkdir -p volumes/etcd\nmkdir -p volumes/milvus\nmkdir -p volumes/minio\n```\nStart Services\n```bash\ndocker-compose up -d\n```\nThis command will download and start the following containers:\n\n- elasticsearch: For full-text search and document indexing\n- milvus: For vector similarity search\n- minio: For object storage\n- etcd: For distributed key-value storage\n- kibana: For elasticsearch visualization\n\nAll images will be downloaded to Docker's default image storage location (/var/lib/docker/). Total size ~2GB, may take 5-10 minutes depending on your network speed.\n\nIf the following words are displayed, it indicates that the download is complete.\n```\n[+] Running 6/6\n⠿ Network docker_default       Created\n⠿ Container elasticsearch      Started\n⠿ Container milvus-etcd        Started\n⠿ Container milvus-minio       Started\n⠿ Container milvus-standalone  Started\n⠿ Container kibana             Started\n```\nCheck the service operation status\n```bash\ndocker-compose ps\n```\nWhen you see output similar to this, all services have been successfully started, \nelasticsearch runs on port 9200, and milvus runs on port 19530:\n```\nNAME                COMMAND                  SERVICE             STATUS              PORTS\nelasticsearch       \"/bin/tini -- /usr/l…\"   elasticsearch       running             0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp, :::9200->9200/tcp, :::9300->9300/tcp\nkibana              \"/bin/tini -- /usr/l…\"   kibana              running             0.0.0.0:5601->5601/tcp, :::5601->5601/tcp\nmilvus-etcd         \"etcd -advertise-cli…\"   etcd                running             2379-2380/tcp\nmilvus-minio        \"/usr/bin/docker-ent…\"   minio               running (healthy)   9000/tcp\nmilvus-standalone   \"/tini -- milvus run…\"   standalone          running             0.0.0.0:9091->9091/tcp, 0.0.0.0:19530->19530/tcp, :::9091->9091/tcp, :::19530->19530/tcp\n```\n### 2. Modify the config.ini file.\n\n```\n[rag]\nknowledgebase_log_dir = /path/to/your/knowledgebase_server_log\nknowledgebase_bind_port = 1001\n\nembedding_model_path = /path/to/your/text2vec-large-chinese\nembedding_bind_port = 5003\n\nreranker_model_path = /path/to/your/bce-reranker-base_v1\nreranker_bind_port = 5001\n\nes_url = http://127.0.0.1:9200\nindex_name = test\nmilvus_url = 127.0.0.1:19530\n```\n### 3. Launch Service\n```\ncd src\n```\nLaunch Embedding Service\n```bash\npython ./clients/emdeddings/server.py --config_path ../config.ini --gpu_id 0\n```\nLaunch Reranker Service\n```bash\npython ./clients/reranker/server.py --config_path ../config.ini --gpu_id 0\n```\nLaunch Knowledge Base Service\n```bash\npython main.py --config_path ../config.ini --gpu_id 0\n```\n## 🔍 API endpoints introduction\n\n\n\n\n## 🔧 FAQ\nIf Elasticsearch fails to start successfully, enter the following in the docker directory within the container:\n```bash\nsudo chown -R 1000:0 ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/elasticsearch\n```\n"
+      }
+    ]
+  },
+  {
+    "leaf": "golf-course-management",
+    "repo": "4jwilliams25/golf-course-management-app",
+    "repository_id": 217149007,
+    "summary": "仓库已确认公开存在，项目介绍待补充。",
+    "type": "unknown",
+    "features": [],
+    "scope": "适用范围待补充；请查看官方项目资料。",
+    "completeness": "partial",
+    "missing_fields": [
+      "positioning",
+      "summary",
+      "scope",
+      "features",
+      "scenario_associations",
+      "license_verification"
+    ],
+    "license": {
+      "detected_spdx": null,
+      "note": "未发现许可证文件；公开仓库不等于开源授权",
+      "source": null,
+      "spdx": null,
+      "status": "pending"
+    },
+    "matches": [],
+    "scenarios": [
+      {
+        "description": "前台员工接到球手电话，在当日开球时间表上查找空档，登记同行人数与计费类别，确认预订并记录来源。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-golf-course-management-ba56a65750",
+        "leaf": "golf-course-management",
+        "leaf_name": "Golf Course Management",
+        "name": "电话预订开球时间",
+        "search_queries": [
+          "tee time booking"
+        ]
+      },
+      {
+        "description": "首发员查看当日开球时间表，核对各组的付款状态与球车，在第一洞签到并记录实际开球时间。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-golf-course-management-2d1bb0a26a",
+        "leaf": "golf-course-management",
+        "leaf_name": "Golf Course Management",
+        "name": "首发台签到与开球记录",
+        "search_queries": [
+          "golfer check in"
+        ]
+      },
+      {
+        "description": "财务或总经理按日期、预订渠道和球员类别汇总已打球轮次与果岭费、球车收入，用于经营分析。",
+        "generation_method": "model_from_existing_leaf",
+        "generator_version": "atlas.discovery.v3",
+        "id": "auto-golf-course-management-90e0f840e0",
+        "leaf": "golf-course-management",
+        "leaf_name": "Golf Course Management",
+        "name": "按轮次与收入出报表",
+        "search_queries": [
+          "rounds revenue report"
+        ]
+      }
+    ],
+    "documents": []
+  }
+]

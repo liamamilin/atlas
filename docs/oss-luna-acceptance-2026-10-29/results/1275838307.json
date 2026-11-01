@@ -1,0 +1,73 @@
+{
+ "repository_id": 1275838307,
+ "domain": "18",
+ "input_sha256": "9250c431c510324cfb4bf163e7980c66d0a35bdcc4a1b3ff4feddfc3c020e1db",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:42.374874+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDQ9KaxXesmAYJrURmk5ewZofeB",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 4372,
+  "completion_tokens": 602,
+  "total_tokens": 4974,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 4369,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0007382,
+ "response_text": "{\n  \"repository_id\": 1275838307,\n  \"verdict\": \"needs_review\",\n  \"summary\": \"项目类型、模拟用途和 MIT 标签有来源支持；但卡片的定位与仓库主题不符，且场景描述涉及真实调度干预，现有模拟能力不足以支持该场景。\",\n  \"checks\": {\n    \"facts\": \"supported\",\n    \"project_type\": \"supported\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"issue\"\n  },\n  \"issues\": [\n    {\n      \"field\": \"positioning\",\n      \"scenario_id\": \"\",\n      \"severity\": \"major\",\n      \"kind\": \"unsupported_claim\",\n      \"claim\": \"面向物流车队的运输运营管理平台，替代电子表格管理车辆、司机、行程与维护\",\n      \"source_id\": \"s0\",\n      \"quote\": \"A Java Swing GUI desktop simulation application designed to model, monitor, and manage city resources and public services in real time.\",\n      \"reason\": \"来源描述的是城市资源与公共服务模拟应用，没有提到物流车队、司机、行程维护或替代电子表格；定位与项目主题不符。\",\n      \"suggested_correction\": \"改为城市资源与公共服务的 Java Swing 桌面模拟应用。\"\n    },\n    {\n      \"field\": \"scenario_match\",\n      \"scenario_id\": \"auto-public-transit-operations-platform-2a20e00922\",\n      \"severity\": \"major\",\n      \"kind\": \"irrelevant_scenario\",\n      \"claim\": \"含公交模拟与故障事件，但为模拟演示，无真实车辆监控与调度干预记录\",\n      \"source_id\": \"s0\",\n      \"quote\": \"Simulates real-time public transit (Buses & Trains), dynamically updates route paths based on road closures/congestion, and randomizes breakdown events.\",\n      \"reason\": \"场景要求调度员监控早高峰车辆偏离、联系司机、调整发车并记录事件；来源只支持模拟公交/列车、路线更新和随机故障，不能支持真实运营中的人工干预流程。卡片已标为 unverified 并说明缺少真实监控与干预记录，但该场景仍不适合作为已匹配场景保留。\",\n      \"suggested_correction\": \"移除该场景匹配，或仅将其作为明确标注未验证的模拟类近似场景。\"\n    }\n  ],\n  \"limitations\": [\n    \"README 与元数据支持项目为模拟应用及所列功能；本次未执行代码，不能独立验证实现行为。\",\n    \"MIT 标签有 LICENSE 正文及元数据支持；未据此推断第三方依赖的许可状态。\"\n  ]\n}",
+ "review": {
+  "repository_id": 1275838307,
+  "verdict": "needs_review",
+  "summary": "项目类型、模拟用途和 MIT 标签有来源支持；但卡片的定位与仓库主题不符，且场景描述涉及真实调度干预，现有模拟能力不足以支持该场景。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "issue"
+  },
+  "issues": [
+   {
+    "field": "positioning",
+    "scenario_id": "",
+    "severity": "major",
+    "kind": "unsupported_claim",
+    "claim": "面向物流车队的运输运营管理平台，替代电子表格管理车辆、司机、行程与维护",
+    "source_id": "s0",
+    "quote": "A Java Swing GUI desktop simulation application designed to model, monitor, and manage city resources and public services in real time.",
+    "reason": "来源描述的是城市资源与公共服务模拟应用，没有提到物流车队、司机、行程维护或替代电子表格；定位与项目主题不符。",
+    "suggested_correction": "改为城市资源与公共服务的 Java Swing 桌面模拟应用。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-public-transit-operations-platform-2a20e00922",
+    "severity": "major",
+    "kind": "irrelevant_scenario",
+    "claim": "含公交模拟与故障事件，但为模拟演示，无真实车辆监控与调度干预记录",
+    "source_id": "s0",
+    "quote": "Simulates real-time public transit (Buses & Trains), dynamically updates route paths based on road closures/congestion, and randomizes breakdown events.",
+    "reason": "场景要求调度员监控早高峰车辆偏离、联系司机、调整发车并记录事件；来源只支持模拟公交/列车、路线更新和随机故障，不能支持真实运营中的人工干预流程。卡片已标为 unverified 并说明缺少真实监控与干预记录，但该场景仍不适合作为已匹配场景保留。",
+    "suggested_correction": "移除该场景匹配，或仅将其作为明确标注未验证的模拟类近似场景。"
+   }
+  ],
+  "limitations": [
+   "README 与元数据支持项目为模拟应用及所列功能；本次未执行代码，不能独立验证实现行为。",
+   "MIT 标签有 LICENSE 正文及元数据支持；未据此推断第三方依赖的许可状态。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:50.308708+00:00",
+ "elapsed_seconds": 7.934
+}

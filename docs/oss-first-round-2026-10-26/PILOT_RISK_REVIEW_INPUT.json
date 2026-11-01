@@ -1,0 +1,280 @@
+[
+  {
+    "leaf": "creator-tip-platform",
+    "repo": "Dezirae-Stark/anonymous-tip-platform",
+    "summary": "通过令牌化匿名链接让创作者接受比特币、闪电网络、门罗币及 Venmo/CashApp/PayPal 打赏，不暴露个人信息",
+    "scope": "适用于希望匿名接受打赏的创作者、隐私倡导者、加密爱好者；可自托管",
+    "type": "application",
+    "license": {
+      "status": "open_source",
+      "spdx": "MIT",
+      "note": "许可证完整正文与 SPDX 官方文本规范化精确匹配；未忽略附加条款。"
+    },
+    "partial": "complete",
+    "missing_fields": [],
+    "matches": [
+      {
+        "scenario_id": "auto-creator-tip-platform-b54ebc3f49",
+        "reason": "创作者可分享匿名打赏链接供观众付款",
+        "applicability": "conditional",
+        "conditions": [
+          "打赏提醒与直播内实时致谢未在资料中说明"
+        ]
+      },
+      {
+        "scenario_id": "auto-creator-tip-platform-c88dd59af7",
+        "reason": "读者可通过链接匿名一次性打赏，无需账号",
+        "applicability": "conditional",
+        "conditions": [
+          "留言功能在路线图中，尚未实现"
+        ]
+      },
+      {
+        "scenario_id": "auto-creator-tip-platform-72eafc6924",
+        "reason": "播客听众可通过打赏链接支持主播",
+        "applicability": "conditional",
+        "conditions": [
+          "收款记录与提现流程未在资料中说明"
+        ]
+      }
+    ],
+    "documents": [
+      {
+        "source_url": "https://github.com/Dezirae-Stark/anonymous-tip-platform/blob/main/README.md",
+        "archive": "application-atlas-production-pack/atlas/oss-discovery/sources/686a7332e48cf51fc954d4074a7a379f691556352d815d50a119e52ecc7d2246.json",
+        "plain_text": "# 🔒 Anonymous Tipping Platform **Privacy-first anonymous tipping platform for content creators** ![Version](https://img.shields.io/badge/version-1.0.1-blue) ![Platform](https://img.shields.io/badge/platform-Web%20%7C%20Android%20%7C%20iOS-green) ![License](https://img.shields.io/badge/license-MIT-orange) --- ## 👤 Author & Architect **Dezirae Stark** ([@Dezirae-Stark](https://github.com/Dezirae-Stark)) *Chief Architect & Developer* This entire platform was architecture designed upon request and created to solve the privacy problems inherent in traditional payment platforms like Venmo and Cash App. --- ## 🌟 The Problem This Solves Traditional tipping platforms expose your: - ❌ Real name - ❌ Username/handle - ❌ Transaction history - ❌ Profile pictures - ❌ Social connections **This platform provides complete anonymity** using token-based links and privacy-focused payment methods. --- ## ✨ Features ### 🔐 Complete Privacy - Zero tracking or analytics - No personal data collection - Anonymous token-based links - No IP logging - Secure headers enabled ### 💰 Multiple Payment Methods - **High Privacy**: Bitcoin, Lightning Network, Monero (XMR) - **Traditional**: Venmo, CashApp, PayPal (with privacy warnings) ### 📱 Cross-Platform - **Web App**: Create and share tip pages via browser - **Mobile Apps**: Native Android & iOS apps - **Token System**: Unique, secure, anonymous URLs ### 🎨 Beautiful UI - Modern dark theme - Responsive design - QR code generation for all payment methods - Intuitive user experience --- ## 🚀 Quick Start ### Web Application ```bash # Install dependencies npm install # Start server node server.js # Visit http://localhost:3000 ``` ### Mobile Apps ```bash cd mobile-app # Setup ./setup.sh # Start development npm start # Build Android APK ./build-android.sh # Build iOS app ./build-ios.sh ``` See [mobile-app/BUILD-GUIDE.md](mobile-app/BUILD-GUIDE.md) for detailed instructions. --- ## 📂 Project Structure ``` anonymous-tip-platform/ ├── 🌐 Web Application │ ├── server.js # Node.js backend │ ├── public/ # Frontend │ │ ├── setup.html # Create tip page │ │ ├── tip.html # View tip page │ │ └── index.html # Legacy page │ ├── data/ # Token storage │ └── config/ # Configuration │ ├── 📱 Mobile Apps (React Native) │ ├── App.js # Main app │ ├── screens/ # 5 app screens │ │ ├── HomeScreen.js │ │ ├── SetupScreen.js │ │ ├── TipPageScreen.js │ │ ├── ViewTipScreen.js │ │ └── MyLinksScreen.js │ ├── utils/api.js # Backend API │ ├── build-android.sh # Android build │ ├── build-ios.sh # iOS build │ └── BUILD-GUIDE.md # Build docs │ └── 📚 Documentation ├── README.md # This file ├── TOKEN-SYSTEM.md # Token architecture └── MOBILE-APP-COMPLETE.md # Mobile app docs ``` --- ## 🔐 How It Works ### 1. Create Tip Page User enters their payment details privately (display name + payment methods) ### 2. Generate Token System creates a unique 128-bit cryptographic token ### 3. Share Anonymous Link User gets a link like: `yoursite.com/tip/abc123xyz` ### 4. Complete Anonymity Visitors see ONLY payment methods - zero personal info --- ## 💻 Technology Stack ### Backend - Node.js - HTTP Module - Crypto (token generation) - File-based storage ### Frontend (Web) - Vanilla JavaScript - HTML5/CSS3 - QRCode.js ### Mobile Apps - React Native - Expo - React Navigation - Expo SecureStore - Axios --- ## 🎯 Use Cases ### Content Creators - Share anonymous tip links on X (Twitter) - Protect your identity while accepting tips - Support multiple payment methods ### Privacy Advocates - Maintain complete anonymity - No surveillance capitalism - Self-hosted solution ### Crypto Enthusiasts - Accept Bitcoin, Lightning, Monero - QR codes for easy payments - Privacy-focused by design --- ## 🛡️ Security Features ### What We DON'T Collect ❌ Personal information ❌ Analytics or tracking ❌ IP addresses ❌ Device fingerprints ❌ Usage statistics ### What We DO ✅ Secure token generation (crypto.randomBytes) ✅ HTTPS enforcement ✅ Secure headers (no XSS, clickjacking protection) ✅ No third-party scripts ✅ Encrypted storage (mobile) --- ## 📱 Mobile App Features - **5 Beautiful Screens** - Home, Setup, Tip Page, View Tip, My Links - **Secure Storage** - Encrypted credential storage - **QR Codes** - Generate QR for all payment methods - **Share Function** - Native sharing to any platform - **Offline Support** - Save and manage links locally - **Cross-Platform** - Same codebase for Android & iOS --- ## 🎨 Design Philosophy **Privacy First** - Every design decision prioritizes user privacy **Simplicity** - Easy to use, no technical knowledge required **Transparency** - Open source, auditable code **Self-Hosted** - You control your data --- ## 📦 Deployment ### Web App #### Local/Development ```bash node server.js ``` #### Production (with PM2) ```bash npm install -g pm2 pm2 start server.js --name \"anonymous-tips\" pm2 startup pm2 save ``` #### Cloud Platforms - **Vercel**: `vercel deploy` - **Railway**: Connect Git repo - **Render**: Auto-deploy from GitHub - **Your VPS**: Use PM2 or systemd ### Mobile Apps #### Android - Build APK with EAS Build - Distribute via Google Play Store - Or direct APK distribution #### iOS - Build with EAS Build - TestFlight for beta testing - Submit to App Store See [BUILD-GUIDE.md](mobile-app/BUILD-GUIDE.md) for complete instructions. --- ## 🌍 Payment Methods ### High Privacy 🟢 **Monero (XMR)** - 🏆 BEST PRIVACY - Completely anonymous by default - Untraceable transactions - No public ledger **Bitcoin (BTC)** - Good Privacy - Pseudonymous - Use new addresses for each payment - Compatible with privacy wallets **Lightning Network** - Fast & Private - Instant payments - Lower fees - Enhanced privacy ### Traditional Methods 🔴 **Venmo / CashApp / PayPal** - Lower Privacy - ⚠️ Exposes personal information - Convenience vs. privacy tradeoff - Clearly marked with warnings --- ## 📊 Comparison | Feature | Venmo/Cash App | This Platform | |---------|----------------|---------------| | Exposes real name | ❌ Yes | ✅ No | | Shows transaction history | ❌ Yes | ✅ No | | Requires account | ❌ Yes | ✅ No | | Tracks users | ❌ Yes | ✅ No | | Anonymous payments | ❌ No | ✅ Yes | | Self-hosted | ❌ No | ✅ Yes | | Multiple payment methods | ❌ Limited | ✅ Unlimited | | Mobile apps | ✅ Yes | ✅ Yes | --- ## 🛠️ API Documentation ### Create Tip Page ```http POST /api/create-tip-page Content-Type: application/json { \"displayName\": \"Anonymous Creator\", \"message\": \"Support my work\", \"paymentMethods\": { \"bitcoin\": { \"enabled\": true, \"address\": \"bc1...\" } } } Response: { \"success\": true, \"token\": \"abc123xyz...\" } ``` ### Get Tip Page Data ```http GET /api/tip/{token} Response: { \"success\": true, \"displayName\": \"Anonymous Creator\", \"message\": \"Support my work\", \"paymentMethods\": { ... } } ``` ### View Tip Page ```http GET /tip/{token} Returns: HTML tip page ``` --- ## 🚀 Roadmap ### v1.1 (In Progress) - [ ] Theme customization (dark/light) - [ ] Custom brand colors - [ ] Payment amount suggestions - [ ] Tipper messages ### v2.0 (Planned) - [ ] Multi-language support - [ ] Wallet integrations - [ ] Payment verification - [ ] Analytics dashboard (privacy-respecting) - [ ] Team accounts ### v3.0 (Future) - [ ] Browser extension - [ ] Desktop apps - [ ] API webhooks - [ ] Advanced customization --- ## 🤝 Contributing Contributions are welcome! This is an open-source project. ### How to Contribute 1. Fork the repository 2. Create a feature branch (`git checkout -b feature/amazing-feature`) 3. Commit your changes (`git commit -m 'Add amazing feature'`) 4. Push to the branch (`git push origin feature/amazing-feature`) 5. Open a Pull Request ### Development Guidelines - Follow existing code style - Add tests for new features - Update documentation - Respect privacy-first principles --- ## 📄 License MIT License - See [LICENSE](LICENSE) file for details Copyright (c) 2025 Dezirae Stark --- ## 🙏 Acknowledgments - Built with privacy as the top priority - Inspired by the need for anonymous tipping on social media - Designed to protect content creators' identities --- ## 📞 Contact & Support - **GitHub**: [@Dezirae-Stark](https://github.com/Dezirae-Stark) - **Issues**: [GitHub Issues](https://github.com/Dezirae-Stark/anonymous-tip-platform/issues) - **Discussions**: [GitHub Discussions](https://github.com/Dezirae-Stark/anonymous-tip-platform/discussions) --- ## ⭐ Star This Repo If you find this project useful, please consider giving it a star! It helps others discover this privacy-focused solution. --- ## 🔐 Privacy Commitment This platform was created with one mission: **Protect creator privacy** We believe that accepting tips should not require exposing your personal information to the world. This platform enables true anonymous tipping while giving you full control over your data. --- **Built with ❤️ by Dezirae Stark for privacy-conscious creators** 🔒"
+      }
+    ]
+  },
+  {
+    "leaf": "nonprofit-crowdfunding-platform",
+    "repo": "api-evangelist/donately",
+    "summary": "Donately 是面向非营利组织、教会和企业的在线捐赠与筹款平台，提供可嵌入捐款表单、活动与点对点筹款页、定期捐赠和捐赠人管理；本仓库为其 REST/JSON API 的公开资料整理。",
+    "scope": "覆盖账户、活动、捐赠、定期订阅、捐赠人、筹款人、表单和 webhook 等 API 面；托管 SaaS，非。",
+    "type": "resource",
+    "license": {
+      "status": "pending",
+      "spdx": null,
+      "note": "未发现许可证文件；公开仓库不等于开源授权"
+    },
+    "partial": "partial",
+    "missing_fields": [
+      "license_verification"
+    ],
+    "matches": [
+      {
+        "scenario_id": "auto-nonprofit-crowdfunding-platform-5613221b86",
+        "reason": "活动容器、公开捐款表单与捐赠记录可支撑紧急募捐流程",
+        "applicability": "conditional",
+        "conditions": [
+          "需有 Donately 账户并接入其托管服务",
+          "公开进度展示需核实其页面能力"
+        ]
+      },
+      {
+        "scenario_id": "auto-nonprofit-crowdfunding-platform-977275352e",
+        "reason": "活动含目标与设置，支持嵌入表单与定期捐赠",
+        "applicability": "conditional",
+        "conditions": [
+          "需使用 Donately 托管平台"
+        ]
+      },
+      {
+        "scenario_id": "auto-nonprofit-crowdfunding-platform-7fe2eee9bf",
+        "reason": "提供点对点筹款人页面，挂在活动下并有各自目标",
+        "applicability": "direct",
+        "conditions": []
+      }
+    ],
+    "documents": [
+      {
+        "source_url": "https://github.com/api-evangelist/donately/blob/main/README.md",
+        "archive": "application-atlas-production-pack/atlas/oss-discovery/sources/f4b4fc3386984e762640aed978cc9cbd47cbbd51c22b97ecb0a7294b03b27959.json",
+        "plain_text": "# Donately (donately) > ### About this repository > > **This is not our API.** This repository is an independent, third-party profile of a company's > **publicly available** API surface, maintained by [API Evangelist](https://apievangelist.com). > API Evangelist does not operate, host, resell, or support this company's APIs, and is not > affiliated with or endorsed by the company unless stated on the profile. > > **Where the information came from.** Everything here is assembled from material a member of the > public can reach with a browser and no credentials — the company's own website, developer portal > and documentation, the specifications it publishes for public use (OpenAPI, AsyncAPI, JSON Schema, > `apis.json`, `llms.txt` and similar), its public repositories, and its public status, pricing and > changelog pages. **Nothing here is obtained by breaching a system, defeating an access control, or > using credentials of any kind.** > > **The rating is an independent assessment.** The Kin Score and Agent Readiness rating are > independently calculated scores of a company's *public* API artifacts, produced by API Evangelist > against a published rubric. They are not certifications, endorsements, security assessments, or > audits, and they score published artifacts — not the quality, safety, or security of the software. > > **Corrections, re-scores, and removal are free.** No partnership, contract, or purchase is > required, and you do not need to justify the request. > > - **Something wrong?** Open an issue on this repository, or email > [info@apievangelist.com](mailto:info@apievangelist.com). > - **Published something new?** Ask for a re-score and we will re-run the rating. > - **Want the listing taken down?** Say so and we will honor it. The profile is reduced to your > company name, a factual description, and a link to your own site, and the company is recorded as > **unrated** — never scored zero for having asked. > > **Response times.** Acknowledgement within **one business day**; removal or restriction within > **two business days**; corrections and re-scores within **five business days**. > > **Not from the company, and here with a question?** You are welcome here — we would rather be the > front line and point you the right way than have a good report go nowhere. What this repository > can answer is narrow, though, so it is worth knowing who you are actually looking for: > > - **A question about how the API works, an account, billing, or a bug in the service** — that is > the company's own support, not us. We profile this API; we do not operate it and cannot see > your account. > - **A bug in an open-source project we only catalog** — file it on that project's own repository. > This has happened with a real and correct bug report that reached us instead of the people who > could fix it, which helped nobody. > - **Anything about this listing itself** — the description, the tags, the rating, a missing or > wrong artifact — is ours. Open an issue here. > - **Not sure, or something general about API Evangelist or APIs.io** — open an issue on the > [APIs.io Inbox](https://github.com/api-search/inbox) and we will route it. > > **This repository contains no software, and we will never ask you to download anything.** There is > no build, release, installer, or binary here — only text and machine-readable API descriptions, so > there is nothing here that can be \"corrupt\" or need \"repairing\". Any issue, comment, or email > claiming otherwise and offering a download link is not from us and is hostile. Do not follow the > link; it is a lure. Report it to GitHub and, if you like, tell us at > [info@apievangelist.com](mailto:info@apievangelist.com) so we can take it down. > > **On a security or compliance team?** Email > [info@apievangelist.com](mailto:info@apievangelist.com) with *security* in the subject line and > you will get a person, not a form. We will tell you exactly which public URLs this profile was > built from so your team can see the same surface we did, and we will take the listing down on > request while you work through it. > > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)** Donately is an online donation and fundraising platform for nonprofits, churches, and businesses. It provides embeddable donation forms, campaign and peer-to-peer fundraising pages, recurring giving, and donor management. Donately exposes a REST/JSON API at base `https://api.donately.com/v2` (API version 2019-03-15) covering accounts, campaigns, donations, recurring subscriptions, people (donors), fundraisers, forms, and webhooks. **APIs.json:** [https://raw.githubusercontent.com/api-evangelist/donately/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/donately/refs/heads/main/apis.yml) ## Access Model Donately is a hosted SaaS platform (not open source). Anyone with a Donately account can generate an **API token** from the dashboard (Settings → API, at `dash.donately.com/integrations/api`) and call the REST API. Authentication uses **HTTP Basic Auth**: the API token is supplied as the username with an empty password (the token is base64-encoded with a trailing colon). Most endpoints require an `account_id` parameter identifying which account to operate against. The `POST /donations` create endpoint can additionally be called **unauthenticated** for public campaign donations, which is how the embeddable donation form submits gifts from the browser. There is no separate fee for API access — Donately's cost model is a platform fee on processed donations (4% Standard, 2% Growth at $99/month, or 0% Scale for a $5,000 prepayment up to $1M raised), stacked on top of Stripe/PayPal payment processing fees. > **Note on grounding:** Donately's API reference (developer.donately.com/api) renders as a JavaScript single-page app that could not be fully crawled. Endpoints and behavior confirmed from documentation and third-party connectors (Tray, Pipedream) are marked **CONFIRMED**; the remaining CRUD endpoints follow Donately's Stripe-style REST conventions and are marked **MODELED** — verify exact paths and verbs against the live reference before relying on them. ## Tags - Fundraising - Donations - Nonprofit - Payments - Donor Management - Recurring Giving ## Timestamps - **Created:** 2026-07-05 - **Modified:** 2026-07-05 ## APIs ### Donately Donations API Create, list, retrieve, and refund donations against an account or campaign. The create endpoint accepts `donation_type` values of `cc`, `ach`, `cash`, and `paypal` and can be called unauthenticated from public embeddable forms. - **Human URL:** [https://developer.donately.com/api/](https://developer.donately.com/api/) - **Base URL:** `https://api.donately.com/v2` ### Donately People API Manage the people (donors and contacts) attached to an account — create, list, retrieve, and update person records including name, email, and associated giving history. - **Human URL:** [https://developer.donately.com/api/](https://developer.donately.com/api/) - **Base URL:** `https://api.donately.com/v2` ### Donately Campaigns API Create, list, retrieve, update, and delete campaigns — the fundraising pages with goals, titles, and settings that donations and fundraisers are organized under. - **Human URL:** [https://developer.donately.com/api/](https://developer.donately.com/api/) - **Base URL:** `https://api.donately.com/v2` ### Donately Fundraisers API Manage peer-to-peer fundraisers — individual or team fundraising pages created under a campaign, each with its own goal and personal messaging. - **Human URL:** [https://developer.donately.com/api/](https://developer.donately.com/api/) - **Base URL:** `https://api.donately.com/v2` ### Donately Subscriptions API Recurring donation schedules. List subscriptions for an account, retrieve a single subscription by ID, and cancel a subscription. Each subscription generates donations on its configured frequency. - **Human URL:** [https://developer.donately.com/api/](https://developer.donately.com/api/) - **Base URL:** `https://api.donately.com/v2` ### Donately Accounts API Retrieve and manage the accounts (organizations) a token has access to. Most other endpoints require an `account_id` parameter identifying which account to operate against. - **Human URL:** [https://developer.donately.com/api/](https://developer.donately.com/api/) - **Base URL:** `https://api.donately.com/v2` ## Common Properties - [GitHub Organization](https://github.com/donately) - [LinkedIn](https://www.linkedin.com/company/donately) - [Website](https://www.donately.com) - [Documentation](https://developer.donately.com/) - [Plans](plans/donately-plans-pricing.yml) - [Rate Limits](rate-limits/donately-rate-limits.yml) - [Fin Ops](finops/donately-finops.yml) ## Maintainers **FN:** Kin Lane **Email:** kin@apievangelist.com"
+      }
+    ]
+  },
+  {
+    "leaf": "disaster-recovery-platform",
+    "repo": "Matlaba-Machaka/Azure-Business-Continuity-Disaster-Recovery",
+    "summary": "将南非北部工作负载复制到西欧恢复区域，含 RTO/RPO 目标、测试故障转移与运行手册。",
+    "scope": "适用于 Azure 上需要跨区域灾备与恢复验证的工作负载。",
+    "type": "resource",
+    "license": {
+      "status": "pending",
+      "spdx": null,
+      "note": "未发现许可证文件；公开仓库不等于开源授权"
+    },
+    "partial": "partial",
+    "missing_fields": [
+      "license_verification"
+    ],
+    "matches": [
+      {
+        "scenario_id": "auto-disaster-recovery-platform-9011a9702c",
+        "reason": "记录测试故障转移成功且不影响生产",
+        "applicability": "direct",
+        "conditions": []
+      },
+      {
+        "scenario_id": "auto-disaster-recovery-platform-1f0a303db2",
+        "reason": "含复制健康检查与监控告警",
+        "applicability": "direct",
+        "conditions": []
+      },
+      {
+        "scenario_id": "auto-disaster-recovery-platform-40a092eca0",
+        "reason": "运行手册含故障转移与回切，但未明确计划内停机前切换流程",
+        "applicability": "unverified",
+        "conditions": []
+      }
+    ],
+    "documents": [
+      {
+        "source_url": "https://github.com/Matlaba-Machaka/Azure-Business-Continuity-Disaster-Recovery/blob/main/README.md",
+        "archive": "application-atlas-production-pack/atlas/oss-discovery/sources/62712830240c612c52cd575283b1c444243730d1a7f7a8223d8447d2e7d46934.json",
+        "plain_text": "# Azure Business Continuity & Disaster Recovery Platform ## Overview This project demonstrates the design, implementation, and validation of an Azure Business Continuity and Disaster Recovery (BCDR) solution. The solution replicates a workload hosted in South Africa North to a secondary recovery region in West Europe using Azure Site Recovery and Azure Backup. The objective was to ensure business continuity during a regional outage while meeting defined Recovery Time Objective (RTO) and Recovery Point Objective (RPO) requirements. ## Business Requirements The organization required: - Recovery Time Objective (RTO) ≤ 30 minutes - Recovery Point Objective (RPO) ≤ 15 minutes - Cross-region disaster recovery capability - Backup protection for production workloads - Monitoring and alerting - Recovery testing without impacting production ## Solution Architecture ![Architecture](screenshots/Architecture.png) ### Primary Region - South Africa North - VM-APP01 - IIS Workload - Azure Monitor - Log Analytics - Azure Backup ### Secondary Region - West Europe - Azure Site Recovery - VNet-DR - Recovery Services Vault ### Recovery Mechanism Azure Site Recovery continuously replicates the production workload from South Africa North to West Europe, allowing rapid recovery in the event of a regional outage. ## Azure Services Used - Azure Virtual Machines - Azure Site Recovery - Azure Backup - Recovery Services Vault - Azure Monitor - Log Analytics Workspace - Azure Alerts - Virtual Networks ## Test Results | Requirement | Target | Result | |------------|---------|---------| | RTO | ≤ 30 Minutes | Achieved | | RPO | ≤ 15 Minutes | ~1 Minute | | Replication Health | Healthy | Passed | | Test Failover | Successful | Passed | | Configuration Issues | None | Passed | Overall Result: PASS ## Validation Evidence ### Replication Health ![Replication Health](screenshots/replication-health.png) ### Test Failover ![Test-Failover Success](screenshots/Test-failover_Success.png) ![Test-Failover](screenshots/TestFailover.png) ![Complete Failover](screenshots/complete-failover.png) ### Disaster Recovery VM ![Complete Rep](screenshots/complete-failover.png) ![Complete Test VM](screenshots/TestFailover.png) # Business Requirements Scenario: A critical business application is hosted in South Africa North. The organization requires the ability to recover services in another Azure region in the event of: - Regional outage - Infrastructure failure - Service disruption Recovery objectives: - RTO ≤ 30 minutes - RPO ≤ 15 minutes # Disaster Recovery Runbook 1. Confirm regional outage. 2. Review latest recovery point. 3. Initiate failover. 4. Validate VM startup. 5. Validate application availability. 6. Monitor system health. 7. Notify stakeholders. 8. Continue operations from DR region. 9. Perform failback once primary region is available. # Test Failover Results Date: 2026-09-10 Source Region: South Africa North Recovery Region: West Europe Results: - Replication Health: Healthy - Agent Health: Healthy - Configuration Issues: None - Test Failover: Successful - Recovery VM Created: Yes - RPO: Approximately 1 Minute Outcome: PASS # Lessons Learned Key learnings from this project: - Azure Backup and Azure Site Recovery provide different capabilities. - Backups protect data whereas Site Recovery restores services. - Disaster recovery testing is essential to validate recovery objectives. - Monitoring and alerting should be integrated into BCDR solutions. - Recovery networking should be planned before failover scenarios occur."
+      }
+    ]
+  },
+  {
+    "leaf": "pcb-design",
+    "repo": "Jayaninadeera99/9v-to-5v-voltage-regulator",
+    "summary": "一个将 9V 直流输入降压为稳定 5V 输出的线性稳压电路项目，使用 LM7805T，包含反接保护和 LED 电源指示。",
+    "scope": "适用于简单线性稳压电路的原理图与 PCB 设计及 CAM 输出。",
+    "type": "application",
+    "license": {
+      "status": "pending",
+      "spdx": null,
+      "note": "未发现许可证文件；公开仓库不等于开源授权"
+    },
+    "partial": "partial",
+    "missing_fields": [
+      "license_verification"
+    ],
+    "matches": [
+      {
+        "scenario_id": "auto-pcb-design-c72fd37672",
+        "reason": "项目含原理图、PCB 布局与 Gerber/CAM 文件，覆盖从原理图到制板文件流程。",
+        "applicability": "direct",
+        "conditions": []
+      },
+      {
+        "scenario_id": "auto-pcb-design-8ca434b232",
+        "reason": "项目以原理图为起点，未说明无原理图直接布局流程。",
+        "applicability": "unverified",
+        "conditions": []
+      }
+    ],
+    "documents": [
+      {
+        "source_url": "https://github.com/Jayaninadeera99/9v-to-5v-voltage-regulator/blob/main/README.md",
+        "archive": "application-atlas-production-pack/atlas/oss-discovery/sources/c37a1576c603c05ca5079248e20e25e3eebd3667ebf3f28a1eabe8b8e16623e3.json",
+        "plain_text": "# 9v-to-5v-voltage-regulator 9V to 5V linear voltage regulator circuit designed in Altium Designer using LM7805T, with schematic, PCB layout, and Gerber/CAM files. # 9V to 5V Voltage Regulator (Altium Designer Project) A simple linear voltage regulator circuit that steps down a 9V input to a regulated 5V output, designed using Altium Designer 13.1. ## Overview This project converts a 9V DC input into a stable 5V DC output using the LM7805T linear voltage regulator. It includes reverse polarity protection and an LED power indicator. ## Circuit Description - **Input**: 9V DC (via 2-pin header, P1) - **D1 (1N4007)**: Reverse polarity protection diode - **C2 (100pF)**: Input decoupling capacitor - **U1 (LM7805T)**: Linear voltage regulator (INPUT / OUTPUT / GND) - **C1 (100pF)**: Output decoupling capacitor - **R1 (1kΩ)**: Current-limiting resistor for the LED indicator - **D2 (LED)**: Power-on indicator - **Output**: Regulated 5V DC (via 2-pin header, P2) ## Project Structure - `9v to 5v.SchDoc` — Schematic diagram - `9v to 5v.PcbDoc` — PCB layout - `CAMtastic1.Cam` / `CAMtastic2.Cam` — CAM/Gerber output files - `9v to 5v.PrjPcb` — Altium project file ## Tools Used - Altium Designer 13.1"
+      }
+    ]
+  },
+  {
+    "leaf": "webmail-application",
+    "repo": "ajay04323/cpanel_CPSP",
+    "summary": "Which of the following options best describes the role of Shared Hosting on a web server?    Providing hosting for a single website owned by different people on multiple servers.  Providing hosting for a single website owned by one person on one server.  Providing hosting for multiple websites owned by different people on one server.  Providing hosting for multiple websites owned by one person on one server.    3    Which of the following capabilities can a cPanel account user perform easily from within the cPanel account interface without the aid of a system administrator?    File and configuration management.  Relocating the physical server.  Upgrading server hardware and equipment.  Installing new database software.      1 File and configuration management.      Which of the following options best describes a core benefit to using cPan",
+    "scope": "适用范围待补充；请查看官方项目资料。",
+    "type": "unknown",
+    "license": {
+      "status": "pending",
+      "spdx": null,
+      "note": "未发现许可证文件；公开仓库不等于开源授权"
+    },
+    "partial": "partial",
+    "missing_fields": [
+      "positioning",
+      "summary",
+      "scope",
+      "features",
+      "scenario_associations",
+      "license_verification"
+    ],
+    "matches": [],
+    "documents": []
+  },
+  {
+    "leaf": "outside-counsel-management",
+    "repo": "legalopsconsulting/lops-outsidecounsel-skills",
+    "summary": "8 个技能编码计费指引、小组设计、律所选择、费用结构、案件指派、发票合规、绩效评分和小组审查的方法论。",
+    "scope": "适用于任何管理外部律师的内部法务团队，从 3 家到 50 家律所的小组。",
+    "type": "resource",
+    "license": {
+      "status": "open_source",
+      "spdx": "Apache-2.0",
+      "note": "许可证完整正文与 SPDX 官方文本规范化精确匹配；未忽略附加条款。"
+    },
+    "partial": "complete",
+    "missing_fields": [],
+    "matches": [
+      {
+        "scenario_id": "auto-outside-counsel-management-841d26d804",
+        "reason": "发票审查技能覆盖逐行核对计费指引、退回沟通和合规分析。",
+        "applicability": "direct",
+        "conditions": []
+      },
+      {
+        "scenario_id": "auto-outside-counsel-management-ea66a1cf3f",
+        "reason": "计费指引与案件指派技能涉及入职关卡和计费规则，但未明确费率表登记。",
+        "applicability": "conditional",
+        "conditions": [
+          "费率登记需结合费用结构技能使用"
+        ]
+      }
+    ],
+    "documents": [
+      {
+        "source_url": "https://github.com/legalopsconsulting/lops-outsidecounsel-skills/blob/main/README.md",
+        "archive": "application-atlas-production-pack/atlas/oss-discovery/sources/c5632c56f962068143e878163b237dc4a39858d3d37de4691070a17589425c71.json",
+        "plain_text": "# OCM Skills — Outside Counsel Management Plugin Methodology before platform. Process before procurement. ## What this is A complete plugin of 8 skills encoding how experienced legal operations managers actually manage outside counsel relationships — the operational methodology that usually lives in spreadsheets, email chains, and the heads of people who've done it before. These aren't billing templates or vendor evaluation checklists. They encode the judgment calls: when an OCG should be collaborative rather than directive, when a right-sourcing conversation is actually a relationship conversation, when a scope dispute is a fee arrangement failure, when a panel review recommendation needs an improvement plan before it can become an exit. The plugin covers the full outside counsel management lifecycle — from establishing billing rules through panel design, firm selection, fee structuring, matter instruction, invoice compliance, performance measurement, and panel review. Each skill handles a distinct phase. Together they form an integrated methodology where the output of one skill feeds the input of the next. ## The plugin 8 skills covering the full OCM lifecycle. Practice-area agnostic. Works for any in-house legal team managing external counsel, from a 3-firm panel to a 50-firm global programme. | # | Skill | Purpose | |---|-------|---------| | 1 | [engagement-terms-billing-guidelines](engagement-terms-billing-guidelines/) | Draft, review, and maintain outside counsel guidelines — the single document that defines how firms bill, staff, and deliver. 15-component framework, maturity-calibrated. | | 2 | [panel-design-selection](panel-design-selection/) | Design panel structures, define weighted selection criteria, run right-sourcing analysis (ABC tiering), and assess coverage gaps. | | 3 | [rfp-pitch-management](rfp-pitch-management/) | Draft legal services RFPs, evaluate firm responses against weighted criteria, produce shortlist recommendations, and design end-to-end selection processes. | | 4 | [fee-arrangement-structuring](fee-arrangement-structuring/) | Design AFAs (fixed, capped, collar, blended, phased, success), assess scope-to-fee fit, prepare negotiation positions, review existing arrangements, and assess out-of-scope claims. | | 5 | [matter-allocation-instruction](matter-allocation-instruction/) | Match matters to the right firm using right-sourcing logic, produce email-ready instructions, close onboarding gates (conflict, engagement letter, OCG, e-billing), and audit existing instructions for gaps. | | 6 | [invoice-review-compliance](invoice-review-compliance/) | Review invoices line-by-line against billing guidelines, draft rejection communications, build review checklists, analyse compliance patterns, and prepare billing conversations. | | 7 | [performance-scorecard](performance-scorecard/) | Design scorecard frameworks calibrated to maturity level, collect post-matter feedback, prepare QBR packs, and produce side-by-side firm comparisons. | | 8 | [panel-review-rationalisation](panel-review-rationalisation/) | Run annual panel health assessments, manage firm exits with transition plans, identify coverage gaps, and produce panel refresh briefs that feed back into the RFP process. | ## The OCM lifecycle The skills form a connected cycle. Each skill's output feeds the next skill's input. ``` ┌─────────────────────────────────────────────────────────────────────┐ │ │ │ 1. Billing Rules ──► 2. Panel Design ──► 3. Firm Selection │ │ │ │ │ │ │ │ │ ▼ │ │ │ │ 4. Fee Arrangement │ │ │ │ │ │ │ │ │ ▼ │ │ │ │ 5. Matter Instruction │ │ │ │ │ │ │ ▼ │ ▼ │ │ 6. Invoice Review ◄────────┘ (matter executes) │ │ │ │ │ │ ▼ │ │ │ 7. Performance Scorecard ◄──────────────────────┘ │ │ │ │ │ ▼ │ │ 8. Panel Review ──────────────────────► back to 2 or 3 │ │ │ └─────────────────────────────────────────────────────────────────────┘ ``` The cycle is not strictly linear. An in-house team can enter at any point — a team with no billing guidelines starts at Skill 1; a team running a panel refresh starts at Skill 8 and moves to Skill 3; a team that just needs to instruct a firm starts at Skill 5. The lifecycle diagram shows the logical flow, not a mandatory sequence. ## How to install **Via Claude Code (recommended):** ```bash /plugin marketplace add legalopsconsulting/lops-outsidecounsel-skills ``` **Manual install:** Clone the repo and point Claude Code at the plugin directory: ```bash git clone https://github.com/legalopsconsulting/lops-outsidecounsel-skills.git ``` Then in Claude Code: ```bash /plugin install ./lops-outsidecounsel-skills ``` All 8 skills install as a single plugin and are available immediately. Skills activate automatically based on context — no slash commands needed. Requires a Claude Pro, Max, Team, or Enterprise plan. ## Connected mode All skills support an optional connected mode when M365 or Google Workspace MCP connectors are enabled (Claude Team/Enterprise). In connected mode, skills search Outlook/Gmail, SharePoint/Drive, and e-billing data rather than relying on pasted input. Each skill's README documents what connected mode enables for that skill specifically. Skills work fully in manual mode without any connector. ## Design principles Built through iterative testing against realistic OCM scenarios by an experienced legal operations professional. A few principles that shape the architecture: **Methodology before platform.** Every skill works without an e-billing system, a matter management platform, or any technology beyond email and a word processor. The methodology is the value. Platforms accelerate it — they don't create it. **Two-layer output.** Every mode produces an operational document (the tool the user runs the process with) and a decision-maker document (the GC/leadership summary that drives approval or action). The user needs the tool and the internal case for using it. **Maturity calibration.** Output is calibrated to the team's maturity level — Early, Intermediate, or Advanced. An Early-stage team gets a concise, actionable starting point. An Advanced team gets a comprehensive framework. Start low. Escalating maturity is easier than retreating from provisions that didn't land. **Produce, don't ask.** Skills produce output from available information and flag gaps at the end. Missing inputs become placeholders — they don't block the output. **Build on the user's framing.** If the user says \"I need billing guidelines,\" produce them. Suggest improvements as additive steps, not corrections. Flag genuine risks briefly and specifically — don't lecture. **Named firms rule.** Firm names appear in chat responses and internal governance documents. They never appear in .docx outputs intended for external distribution. The distinction: chat is a conversation; documents are records. **Domain knowledge over instructions.** Over 50% of each skill spec is operational knowledge — facts, patterns, failure modes — not behavioural instructions. The knowledge is what makes output reliable. ## Companion plugin This plugin covers outside counsel management — the in-house legal team's relationship with external law firms. The companion [LPM Skills — Core Plugin](https://github.com/legalopsconsulting/lpm-skills) covers legal project management on the firm side — the operational methodology for running complex legal matters from intake through execution, financial management, and close. The two plugins share cross-references where the boundary matters: matter-allocation-instruction (OCM Skill 5) connects to matter-intake-scoping (LPM Core); fee-arrangement-structuring (OCM Skill 4) connects to budget-and-fee-manager (LPM Core). Different sides of the same engagement. ## Status All 8 skills complete and tested against realistic synthetic scenarios. Modes 3 and 4 of Skill 8 (panel-review-rationalisation) have documented failure modes — see that skill's README for details. All other modes across all skills are clean. v1 — feedback welcome, particularly the \"this doesn't work because...\" kind. ## About Built by [Scott Margetts](https://www.linkedin.com/in/scottmargetts/) — senior legal operations consultant, 14+ years in international law firms including leading Baker McKenzie's APAC legal project management function. The thesis behind this project: the knowledge needed to write good AI skills isn't only legal — it's operational. LPM is the discipline best placed to author AI skills because skills architecture (trigger conditions, sequential workflows, validation gates, quality checks, progressive disclosure) is project management methodology expressed as markdown. ## Disclaimer These skills encode general operational methodology for educational and experimental purposes. They do not constitute legal or professional advice. Use on live matters is at your own risk and should be validated by qualified professionals. ## Licence Apache 2.0 — see [LICENSE](LICENSE) for details. This version (v1) is released under the Apache 2.0 licence. You are free to use, adapt, and build on these skills, including for commercial purposes, subject to the attribution requirements in the NOTICE file. Future versions of this plugin will be released under AGPL-3.0. Any product built on top of those versions will be required to be open source under the same licence."
+      }
+    ]
+  },
+  {
+    "leaf": "collaborative-spreadsheet",
+    "repo": "SyncfusionExamples/Spreadsheet-Collaborative-Editing",
+    "summary": "基于 Syncfusion Spreadsheet 的协作编辑示例，使用 SignalR 实时通信与 Redis 管理协作状态，提供 Angular/JS/React/TS/Vue 客户端样例。",
+    "scope": "面向使用 Syncfusion Spreadsheet 构建协作编辑功能的开发者示例。",
+    "type": "application",
+    "license": {
+      "status": "pending",
+      "spdx": null,
+      "note": "许可证原文已读取，但未通过官方模板精确匹配，保留待核验；不按公开仓库或标签推定为开源"
+    },
+    "partial": "partial",
+    "missing_fields": [
+      "license_verification"
+    ],
+    "matches": [
+      {
+        "scenario_id": "auto-collaborative-spreadsheet-5e6fa72784",
+        "reason": "支持多用户同时编辑同一工作簿；资料未提及公式区锁定或权限分级",
+        "applicability": "unverified",
+        "conditions": []
+      },
+      {
+        "scenario_id": "auto-collaborative-spreadsheet-e285d3d96c",
+        "reason": "多用户实时同步编辑同一工作簿，可查看最新状态",
+        "applicability": "direct",
+        "conditions": []
+      },
+      {
+        "scenario_id": "auto-collaborative-spreadsheet-1417a47cef",
+        "reason": "资料未提及单元格批注或公式区保护功能",
+        "applicability": "unverified",
+        "conditions": []
+      }
+    ],
+    "documents": [
+      {
+        "source_url": "https://github.com/SyncfusionExamples/Spreadsheet-Collaborative-Editing/blob/master/README.md",
+        "archive": "application-atlas-production-pack/atlas/oss-discovery/sources/f4bc269042db9b34719093a60d88c9e6320aac90eade8097c5b380573dd2eb4b.json",
+        "plain_text": "# Spreadsheet Collaborative Editing This repository demonstrates real-time collaborative editing in the Syncfusion® Spreadsheet. Multiple users can edit the same workbook simultaneously, and supported changes are synchronized across all users connected to the same collaboration room. ## Features - Real-time multi-user Spreadsheet editing - Synchronization of supported Spreadsheet actions - Participant presence and selection indicators - SignalR-based real-time communication - Redis-backed collaboration state management - Client samples for Angular, JavaScript, React, TypeScript, and Vue ## Prerequisites - Node.js and npm - ASP.NET Core Collaboration Server - Redis Server or a hosted Redis service - A valid Syncfusion license key ## Repository structure ```text Spreadsheet-Collaborative-Editing/ |-- client/ | |-- angular/ | |-- javascript/ | |-- react/ | |-- typescript/ | `-- vue/ |-- server/ | `-- aspnet-core/ |-- README.md `-- license ``` ## Client samples - [Angular](./client/angular) - [JavaScript](./client/javascript) - [React](./client/react) - [TypeScript](./client/typescript) - [Vue](./client/vue) Refer to the README file inside each client folder for platform-specific installation, configuration, and run instructions. ## Collaboration Server The Collaboration Server uses SignalR for real-time communication and Redis to maintain collaboration sessions and synchronize workbook actions. Configure the Redis connection string in the server settings: ```json { \"ConnectionStrings\": { \"Redis\": \"YOUR_REDIS_CONNECTION_STRING\" } } ``` Refer to the README file inside the server folder for setup and run instructions. ## Configure the server URL In each client sample, replace the Collaboration Server URL placeholder with the URL of the running server: ```text YOUR_COLLABORATION_SERVER_URL ``` Users who connect to the same server and open a URL containing the same `id` query parameter join the same collaboration room. ## Test collaborative editing 1. Start Redis and the Collaboration Server. 2. Start any client sample. 3. Open the application in a browser. 4. Copy the complete URL containing the `id` query parameter. 5. Open the copied URL in another browser tab or window. 6. Edit the workbook and verify that supported changes are synchronized between both clients. ## Documentation - [Collaborative Editing Overview](https://help.syncfusion.com/document-processing/excel/spreadsheet/react/collaborative-editing/overview) - [Collaboration Client](https://help.syncfusion.com/document-processing/collaborator/collaboration-client) - [Collaboration Server](https://help.syncfusion.com/document-processing/collaborator/collaboration-server) ## Live demo Explore the [Collaborative Editing Live Demo](https://ej2.syncfusion.com/products/react/spreadsheet/collaborative-editing). ## License This project is licensed under the terms specified in the repository's license file."
+      }
+    ]
+  }
+]

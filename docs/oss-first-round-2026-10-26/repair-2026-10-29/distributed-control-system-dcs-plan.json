@@ -1,0 +1,73 @@
+{
+ "origin": {
+  "method": "revalidate_original_archived_response",
+  "path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/model-cache/d14a1f63900518dfa59dcc3f417324ee2dfbaf5fbb40f2db2df081b1a68fe93a.json",
+  "sha256": "14c3044b5ab67051c62d90ac22507b6e09d6553ebb095d5b637753f835ac0cc5",
+  "provider": "opencode-go",
+  "model": "deepseek-v4.1-flash"
+ },
+ "original_response": {
+  "category_search_query": "industrial process control system",
+  "scenarios": [
+   {
+    "name": "控制室操作员处理工艺报警",
+    "description": "流程工厂操作员在控制室通过工艺画面监视装置，收到带优先级的报警后确认、查看趋势与面板，调整设定值或切换回路自动/手动模式，使工艺恢复稳定。",
+    "search_queries": [
+     "process alarm response"
+    ]
+   },
+   {
+    "name": "控制工程师在线整定控制回路",
+    "description": "控制/自动化工程师在工程站查看运行中的控制策略，在线调整PID参数与回路组态，经受控变更流程部署到控制器，保证装置不停车情况下改善控制品质。",
+    "search_queries": [
+     "control loop tuning"
+    ]
+   },
+   {
+    "name": "仪表技师排查控制器与I/O故障",
+    "description": "仪表与控制技师利用系统诊断信息定位控制器、I/O或现场设备异常，配合现场校准与维修，必要时将相关回路切手动或旁路，修复后按规程恢复投运。",
+    "search_queries": [
+     "I/O diagnostics troubleshooting"
+    ]
+   }
+  ]
+ },
+ "validated_scenarios": [
+  {
+   "id": "auto-distributed-control-system-dcs-530545bc05",
+   "name": "控制室操作员处理工艺报警",
+   "description": "流程工厂操作员在控制室通过工艺画面监视装置，收到带优先级的报警后确认、查看趋势与面板，调整设定值或切换回路自动/手动模式，使工艺恢复稳定。",
+   "search_queries": [
+    "process alarm response"
+   ],
+   "leaf": "distributed-control-system-dcs",
+   "leaf_name": "Distributed Control System / DCS",
+   "generation_method": "model_from_existing_leaf",
+   "generator_version": "atlas.discovery.v3"
+  },
+  {
+   "id": "auto-distributed-control-system-dcs-855b211e08",
+   "name": "控制工程师在线整定控制回路",
+   "description": "控制/自动化工程师在工程站查看运行中的控制策略，在线调整PID参数与回路组态，经受控变更流程部署到控制器，保证装置不停车情况下改善控制品质。",
+   "search_queries": [
+    "control loop tuning"
+   ],
+   "leaf": "distributed-control-system-dcs",
+   "leaf_name": "Distributed Control System / DCS",
+   "generation_method": "model_from_existing_leaf",
+   "generator_version": "atlas.discovery.v3"
+  },
+  {
+   "id": "auto-distributed-control-system-dcs-0c4dceb02f",
+   "name": "仪表技师排查控制器与I/O故障",
+   "description": "仪表与控制技师利用系统诊断信息定位控制器、I/O或现场设备异常，配合现场校准与维修，必要时将相关回路切手动或旁路，修复后按规程恢复投运。",
+   "search_queries": [
+    "input output diagnostics troubleshooting"
+   ],
+   "leaf": "distributed-control-system-dcs",
+   "leaf_name": "Distributed Control System / DCS",
+   "generation_method": "model_from_existing_leaf",
+   "generator_version": "atlas.discovery.v3"
+  }
+ ]
+}

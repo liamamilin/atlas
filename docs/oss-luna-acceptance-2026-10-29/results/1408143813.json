@@ -1,0 +1,62 @@
+{
+ "repository_id": 1408143813,
+ "domain": "25",
+ "input_sha256": "12924437ef8aed75e20388ae082361b32ea18a83a33ff762fe1c0fc21ce210f1",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:15.742132+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDyRiXcx1gvSVUobEpG2I26XGma",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 4976,
+  "completion_tokens": 453,
+  "total_tokens": 5429,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 4973,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0007241,
+ "response_text": "{\n  \"repository_id\": 1408143813,\n  \"verdict\": \"pass_with_limits\",\n  \"summary\": \"卡片整体与 README 对项目能力、限制及 MIT 许可的描述相符。场景匹配均有一定依据，且对发布通知和自助替补的缺项作了条件说明；但“志愿者填写不可服侍日期”被标为 direct，实际材料描述的是协调人通过工具记录并在排班时校验，未证明志愿者可自行填写。\",\n  \"checks\": {\n    \"facts\": \"supported\",\n    \"project_type\": \"supported\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"limited\"\n  },\n  \"issues\": [\n    {\n      \"field\": \"scenario_match\",\n      \"scenario_id\": \"auto-ministry-scheduling-08f0a7221b\",\n      \"severity\": \"minor\",\n      \"kind\": \"missing_condition\",\n      \"claim\": \"“志愿者填写不可服侍日期”；applicability 为 “direct”，conditions 为空\",\n      \"source_id\": \"s0\",\n      \"quote\": \"Assignment writes reject overlaps, blockouts, inactive volunteers, missing membership and missing screening evidence where the team requires it.\",\n      \"reason\": \"来源支持系统记录并在排班写入时校验 blockouts，但没有说明志愿者可自行填写日期。该场景描述包含志愿者登记，直接适用性超出已证实能力。\",\n      \"suggested_correction\": \"将适用性改为 conditional，并注明需协调人通过命令录入或维护不可服侍日期；或将场景表述收窄为协调人记录并据此排班。\"\n    }\n  ],\n  \"limitations\": [\n    \"本次依据提供的 README、LICENSE 和 GitHub 元数据审查；未检查仓库其他文件或运行项目。\",\n    \"README 明确说明项目没有前端、移动自助及儿童签到，且共享部署需自行配置身份与数据库权限；这些限制与卡片描述一致。\"\n  ]\n}",
+ "review": {
+  "repository_id": 1408143813,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体与 README 对项目能力、限制及 MIT 许可的描述相符。场景匹配均有一定依据，且对发布通知和自助替补的缺项作了条件说明；但“志愿者填写不可服侍日期”被标为 direct，实际材料描述的是协调人通过工具记录并在排班时校验，未证明志愿者可自行填写。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-ministry-scheduling-08f0a7221b",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "“志愿者填写不可服侍日期”；applicability 为 “direct”，conditions 为空",
+    "source_id": "s0",
+    "quote": "Assignment writes reject overlaps, blockouts, inactive volunteers, missing membership and missing screening evidence where the team requires it.",
+    "reason": "来源支持系统记录并在排班写入时校验 blockouts，但没有说明志愿者可自行填写日期。该场景描述包含志愿者登记，直接适用性超出已证实能力。",
+    "suggested_correction": "将适用性改为 conditional，并注明需协调人通过命令录入或维护不可服侍日期；或将场景表述收窄为协调人记录并据此排班。"
+   }
+  ],
+  "limitations": [
+   "本次依据提供的 README、LICENSE 和 GitHub 元数据审查；未检查仓库其他文件或运行项目。",
+   "README 明确说明项目没有前端、移动自助及儿童签到，且共享部署需自行配置身份与数据库权限；这些限制与卡片描述一致。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:40:22.438647+00:00",
+ "elapsed_seconds": 6.697
+}

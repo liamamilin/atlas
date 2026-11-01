@@ -1,0 +1,127 @@
+{
+ "repository_id": 1273105861,
+ "domain": "05",
+ "input_sha256": "2749777432b635afb781318295179d8cc89fa3d72ed71571ca2e746d747eef9c",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:09.030883+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-dca22d282df9-b73dd",
+ "usage": {
+  "prompt_tokens": 4586,
+  "completion_tokens": 1158,
+  "total_tokens": 5744,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00130744,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00130744,
+   "tokens": {
+    "input": 4074,
+    "output": 1158,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1273105861,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片基本忠实于 README 与仓库元数据：定位为 MERN 零售 POS/库存系统，功能项均有 README 对应文字，许可保守标为 pending，三个跨渠道场景均标 unverified 并说明缺证。主要问题是 README 将多门店库存、Redis、Docker、CI/CD 等列入技术栈或功能，而未来增强又重复列出，卡片未完全区分已实现与计划；场景相关性偏弱但已如实标 unverified。\",\"checks\":{\"facts\":\"limited\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"roadmap_as_fact\",\"claim\":\"库存实时更新与低库存告警（features 中未区分多门店库存）\",\"source_id\":\"s0\",\"quote\":\"- Multi-store Inventory Support\",\"reason\":\"README 在 Inventory Management 下列出 Multi-store Inventory Support，但 Future Enhancements 又列 Multi-store Support，二者矛盾，无法确认多门店库存已实现；卡片 features 未提及多门店，summary 也未将其列为已实现，但 scope 与 positioning 的“全渠道”易被读作已具备跨店能力。\",\"suggested_correction\":\"在 summary 或 scope 中明确多门店库存支持在 README 中同时出现于功能与未来增强，状态未确认，不视为已实现。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"JWT 认证与管理员/经理/收银员角色\",\"source_id\":\"s0\",\"quote\":\"- JWT Authentication\\n- Role-Based Access Control (RBAC)\\n- Admin, Manager & Cashier Roles\",\"reason\":\"该功能有 README 明确支持，但卡片未说明这些是 README 声明而非代码核验；本次仅 1 个 README 文件，未审代码，功能实现程度未知。\",\"suggested_correction\":\"保留功能描述，但在 limitations 或 summary 中注明功能仅据 README 声明，未做代码级核验。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-omnichannel-pos-3238f27c82\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"未说明跨渠道退货与库存回写\",\"source_id\":\"s0\",\"quote\":\"- Order History\\n- Order Details\\n- Order Status Tracking\",\"reason\":\"README 只有订单历史与状态跟踪，未提退货、退款或库存回写流程；卡片标 unverified 合理，但 conditions 为空，未写明需具备线上订单来源与退货回写能力这一前提。\",\"suggested_correction\":\"conditions 补充：需确认系统能接入线上渠道订单并支持退货退款与库存回写，当前 README 未体现。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-omnichannel-pos-43fd4cd143\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"有库存查询与开单，但未说明代客下单及线上发货\",\"source_id\":\"s0\",\"quote\":\"- Fast Product Search\\n- Add to Cart\",\"reason\":\"POS 开单与库存查询有 README 支持，但代客下单缺货商品并由线上渠道发货涉及跨渠道库存共享与履约，README 未描述；conditions 为空，未写明该前提。\",\"suggested_correction\":\"conditions 补充：需共享线上库存并支持线上履约发货，README 未体现。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-omnichannel-pos-cee4d4a16f\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"有订单与库存管理，但未说明线上自提订单核销\",\"source_id\":\"s0\",\"quote\":\"- Order Status Tracking\",\"reason\":\"README 未描述线上自提、拣货备货或差额收取流程；标 unverified 合理，但 conditions 为空，未写明需线上订单接入与自提核销能力。\",\"suggested_correction\":\"conditions 补充：需支持线上自提订单接入与到店核销，README 未体现。\"},{\"field\":\"license\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"未发现许可证文件；公开仓库不等于开源授权\",\"source_id\":\"s1\",\"quote\":\"\\\"license\\\":null\",\"reason\":\"元数据 license 为 null，卡片标 pending 保守合理；但 README 未含许可声明，无法进一步核验，属证据不足而非错误。\",\"suggested_correction\":\"维持 pending，并在 limitations 注明仅据元数据与 README，未做许可全文比对。\"}],\"limitations\":[\"仅提供 1 个 README 与 1 份 GitHub 元数据，未审代码、package.json 或实际运行，功能实现程度无法核验。\",\"README 中技术栈（Redis、Docker、GitHub Actions、AWS/Vercel）与未来增强重复，无法区分已实现与计划。\",\"许可状态仅据元数据 license=null 与 README 无声明，未做许可全文比对。\",\"三个场景均无 README 直接支持，标 unverified 属如实保留，非错误。\"]}",
+ "review": {
+  "repository_id": 1273105861,
+  "verdict": "pass_with_limits",
+  "summary": "卡片基本忠实于 README 与仓库元数据：定位为 MERN 零售 POS/库存系统，功能项均有 README 对应文字，许可保守标为 pending，三个跨渠道场景均标 unverified 并说明缺证。主要问题是 README 将多门店库存、Redis、Docker、CI/CD 等列入技术栈或功能，而未来增强又重复列出，卡片未完全区分已实现与计划；场景相关性偏弱但已如实标 unverified。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "roadmap_as_fact",
+    "claim": "库存实时更新与低库存告警（features 中未区分多门店库存）",
+    "source_id": "s0",
+    "quote": "- Multi-store Inventory Support",
+    "reason": "README 在 Inventory Management 下列出 Multi-store Inventory Support，但 Future Enhancements 又列 Multi-store Support，二者矛盾，无法确认多门店库存已实现；卡片 features 未提及多门店，summary 也未将其列为已实现，但 scope 与 positioning 的“全渠道”易被读作已具备跨店能力。",
+    "suggested_correction": "在 summary 或 scope 中明确多门店库存支持在 README 中同时出现于功能与未来增强，状态未确认，不视为已实现。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "JWT 认证与管理员/经理/收银员角色",
+    "source_id": "s0",
+    "quote": "- JWT Authentication\n- Role-Based Access Control (RBAC)\n- Admin, Manager & Cashier Roles",
+    "reason": "该功能有 README 明确支持，但卡片未说明这些是 README 声明而非代码核验；本次仅 1 个 README 文件，未审代码，功能实现程度未知。",
+    "suggested_correction": "保留功能描述，但在 limitations 或 summary 中注明功能仅据 README 声明，未做代码级核验。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-omnichannel-pos-3238f27c82",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "未说明跨渠道退货与库存回写",
+    "source_id": "s0",
+    "quote": "- Order History\n- Order Details\n- Order Status Tracking",
+    "reason": "README 只有订单历史与状态跟踪，未提退货、退款或库存回写流程；卡片标 unverified 合理，但 conditions 为空，未写明需具备线上订单来源与退货回写能力这一前提。",
+    "suggested_correction": "conditions 补充：需确认系统能接入线上渠道订单并支持退货退款与库存回写，当前 README 未体现。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-omnichannel-pos-43fd4cd143",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "有库存查询与开单，但未说明代客下单及线上发货",
+    "source_id": "s0",
+    "quote": "- Fast Product Search\n- Add to Cart",
+    "reason": "POS 开单与库存查询有 README 支持，但代客下单缺货商品并由线上渠道发货涉及跨渠道库存共享与履约，README 未描述；conditions 为空，未写明该前提。",
+    "suggested_correction": "conditions 补充：需共享线上库存并支持线上履约发货，README 未体现。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-omnichannel-pos-cee4d4a16f",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "有订单与库存管理，但未说明线上自提订单核销",
+    "source_id": "s0",
+    "quote": "- Order Status Tracking",
+    "reason": "README 未描述线上自提、拣货备货或差额收取流程；标 unverified 合理，但 conditions 为空，未写明需线上订单接入与自提核销能力。",
+    "suggested_correction": "conditions 补充：需支持线上自提订单接入与到店核销，README 未体现。"
+   },
+   {
+    "field": "license",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "未发现许可证文件；公开仓库不等于开源授权",
+    "source_id": "s1",
+    "quote": "\"license\":null",
+    "reason": "元数据 license 为 null，卡片标 pending 保守合理；但 README 未含许可声明，无法进一步核验，属证据不足而非错误。",
+    "suggested_correction": "维持 pending，并在 limitations 注明仅据元数据与 README，未做许可全文比对。"
+   }
+  ],
+  "limitations": [
+   "仅提供 1 个 README 与 1 份 GitHub 元数据，未审代码、package.json 或实际运行，功能实现程度无法核验。",
+   "README 中技术栈（Redis、Docker、GitHub Actions、AWS/Vercel）与未来增强重复，无法区分已实现与计划。",
+   "许可状态仅据元数据 license=null 与 README 无声明，未做许可全文比对。",
+   "三个场景均无 README 直接支持，标 unverified 属如实保留，非错误。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:11:23.158499+00:00",
+ "elapsed_seconds": 14.127
+}

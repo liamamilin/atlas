@@ -1,0 +1,338 @@
+{
+  "job_id": "batch_4812ef3db57543c3acc1871b8ea5ba6e",
+  "reviewed_at": "2026-10-29T03:57:43.368133+00:00",
+  "semantic_review_passed": true,
+  "sample_count": 9,
+  "samples": [
+    {
+      "leaf": "distributed-control-system-dcs",
+      "repository_id": 1372035849,
+      "repository_url": "https://github.com/Biswajit1999/pid-loop-lab",
+      "coverage": "refined_conditional",
+      "official_archived_evidence": {
+        "path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/f958dc2b708a12294f103f2f23264a514dd390c7d946c27995d265e2291eac39.json",
+        "archive_sha256": "c80214b9818d60d0cb17bdd654377a7650dc1b3754c650b59f0523053fcb5f9e",
+        "readme_present": true,
+        "readme_sha256": "74924b0577f524cf2342c53de130739b7f6febc05ee6fa09f8887f7ee2e2e5a7",
+        "license_file_present": true
+      },
+      "reviewed_fields": [
+        "scenario_relevance",
+        "summary",
+        "project_type",
+        "applicability",
+        "license_label"
+      ],
+      "applicability": [
+        {
+          "scenario_id": "auto-distributed-control-system-dcs-855b211e08",
+          "applicability": "conditional"
+        },
+        {
+          "scenario_id": "auto-distributed-control-system-dcs-overview",
+          "applicability": "conditional"
+        }
+      ],
+      "license": {
+        "status": "open_source",
+        "spdx": "MIT"
+      },
+      "judgment": "仿真实验室README明确其为教育与初步工程软件，不能替代真实装置验证；介绍已写明不执行真实控制。原在线整定关联误标direct，已改为conditional并补充离线边界。",
+      "passed": true
+    },
+    {
+      "leaf": "distributed-control-system-dcs",
+      "repository_id": 1283271883,
+      "repository_url": "https://github.com/piyushshah-icet/temperature-pid-control-arduino",
+      "coverage": "conditional_hardware_resource",
+      "official_archived_evidence": {
+        "path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/dfe83f10357379c2bdbacdd4cb51d709fbc1bb99963967974ffa7d396a4d4fe6.json",
+        "archive_sha256": "40b611718f1ec0f3df5c910f331cfb4254f9989142690241b70d479d83a82ef0",
+        "readme_present": true,
+        "readme_sha256": "e55a654b10e0ad1f65280a64e20397a42119088e5c297293ab3316f14cb5cb61",
+        "license_file_present": true
+      },
+      "reviewed_fields": [
+        "scenario_relevance",
+        "summary",
+        "project_type",
+        "applicability",
+        "license_label"
+      ],
+      "applicability": [
+        {
+          "scenario_id": "auto-distributed-control-system-dcs-855b211e08",
+          "applicability": "conditional"
+        }
+      ],
+      "license": {
+        "status": "open_source",
+        "spdx": "MIT"
+      },
+      "judgment": "官方README列出Arduino、热敏电阻、MOSFET和加热器，并说明IMC/PI实验及手自动切换；标为硬件资源且注明不是集成DCS，条件适用与硬件前提一致。",
+      "passed": true
+    },
+    {
+      "leaf": "distributed-control-system-dcs",
+      "repository_id": 145943632,
+      "repository_url": "https://github.com/domwon/looptune",
+      "coverage": "metadata_only_unknown_license",
+      "official_archived_evidence": {
+        "path": null,
+        "archive_sha256": null,
+        "readme_present": false,
+        "readme_sha256": null,
+        "license_file_present": false,
+        "metadata_evidence_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-first-round-2026-10-26/repair-2026-10-29/SEMANTIC_METADATA.json"
+      },
+      "reviewed_fields": [
+        "scenario_relevance",
+        "summary",
+        "project_type",
+        "applicability",
+        "license_label"
+      ],
+      "applicability": [
+        {
+          "scenario_id": "auto-distributed-control-system-dcs-855b211e08",
+          "applicability": "unverified"
+        }
+      ],
+      "license": {
+        "status": "pending",
+        "spdx": null
+      },
+      "judgment": "仅有官方仓库元数据说明化工过程回路整定；未据此推定连接或在线调整DCS，关联维持unverified，许可维持pending。",
+      "passed": true
+    },
+    {
+      "leaf": "it-operations-management-itom",
+      "repository_id": 1200077753,
+      "repository_url": "https://github.com/balakrishnav171/04-rag-kubernetes-assistant",
+      "coverage": "conditional_external_services",
+      "official_archived_evidence": {
+        "path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/0896972871e7b14461d92b0ce808bf80e2adea96b552107fd1e8a7698ff53172.json",
+        "archive_sha256": "90d00b1449b1d7248317a148b32aff4cbb6349724c8d99ae3db48d0d93cfa642",
+        "readme_present": true,
+        "readme_sha256": "8fc4910ff6afb3723d51a204ba4d058d86faa6f18484d30659e9359772d90c9b",
+        "license_file_present": false
+      },
+      "reviewed_fields": [
+        "scenario_relevance",
+        "summary",
+        "project_type",
+        "applicability",
+        "license_label"
+      ],
+      "applicability": [
+        {
+          "scenario_id": "auto-it-operations-management-itom-79cd10c20e",
+          "applicability": "conditional"
+        },
+        {
+          "scenario_id": "auto-it-operations-management-itom-overview",
+          "applicability": "direct"
+        }
+      ],
+      "license": {
+        "status": "pending",
+        "spdx": null
+      },
+      "judgment": "README是Kubernetes RAG排障助手，依赖OpenAI及ChromaDB；介绍保留单一领域边界，跨域故障场景为conditional，未宣称跨域拓扑或自动修复。README的MIT标记未被当作完整许可核验。",
+      "passed": true
+    },
+    {
+      "leaf": "it-operations-management-itom",
+      "repository_id": 146805863,
+      "repository_url": "https://github.com/RichardRG/LanAlert",
+      "coverage": "refined_unverified",
+      "official_archived_evidence": {
+        "path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/4b4da3e3f26233c9a2052350f228fbc9c822044a3acd4e86bfc6e395ca1523b4.json",
+        "archive_sha256": "dd0655a4c8ccb0bb773ed2e7e842c66283ed9c3b471d501cd7593941bb2c9b37",
+        "readme_present": true,
+        "readme_sha256": "c382e71eac508d84cd9af7c9ecfda0554afa07aeb58a2788091f762f546e038c",
+        "license_file_present": true
+      },
+      "reviewed_fields": [
+        "scenario_relevance",
+        "summary",
+        "project_type",
+        "applicability",
+        "license_label"
+      ],
+      "applicability": [
+        {
+          "scenario_id": "auto-it-operations-management-itom-a446e406e2",
+          "applicability": "unverified"
+        }
+      ],
+      "license": {
+        "status": "pending",
+        "spdx": null
+      },
+      "judgment": "README只证明Lansweeper与Slack工单通知及配置前提，不证明告警转工单、归属路由及关闭回写；该完整场景已由conditional改为unverified。已读取的GPL文本仍按未匹配模板保留pending。",
+      "passed": true
+    },
+    {
+      "leaf": "it-operations-management-itom",
+      "repository_id": 992547875,
+      "repository_url": "https://github.com/SyedJawad07/OSTicket-Integration-With-Wazuh",
+      "coverage": "metadata_only_unknown_type",
+      "official_archived_evidence": {
+        "path": null,
+        "archive_sha256": null,
+        "readme_present": false,
+        "readme_sha256": null,
+        "license_file_present": false,
+        "metadata_evidence_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-first-round-2026-10-26/repair-2026-10-29/SEMANTIC_METADATA.json"
+      },
+      "reviewed_fields": [
+        "scenario_relevance",
+        "summary",
+        "project_type",
+        "applicability",
+        "license_label"
+      ],
+      "applicability": [
+        {
+          "scenario_id": "auto-it-operations-management-itom-a446e406e2",
+          "applicability": "unverified"
+        }
+      ],
+      "license": {
+        "status": "pending",
+        "spdx": null
+      },
+      "judgment": "未取得README；官方元数据只声称Wazuh告警到osTicket工单集成。介绍、关联及许可均保留未知/待核实边界，没有补写路由或回写能力。",
+      "passed": true
+    },
+    {
+      "leaf": "it-operations-management-itom",
+      "repository_id": 399938462,
+      "repository_url": "https://github.com/nayanex/azure-performance",
+      "coverage": "educational_resource",
+      "official_archived_evidence": {
+        "path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/9bb63a6f4e43697bd659f2550aff367069cafbb9bf7cb3426f9a9e39401453cc.json",
+        "archive_sha256": "de93389a657f678585f66c02b85c1215c4158b9fea6baf510ef367cbf1e2ee37",
+        "readme_present": true,
+        "readme_sha256": "d6a99051b6312d008de805871ccf0d3d390d61c7c71300f16eb455486ee05ace",
+        "license_file_present": true
+      },
+      "reviewed_fields": [
+        "scenario_relevance",
+        "summary",
+        "project_type",
+        "applicability",
+        "license_label"
+      ],
+      "applicability": [
+        {
+          "scenario_id": "auto-it-operations-management-itom-ba5f9312ab",
+          "applicability": "conditional"
+        }
+      ],
+      "license": {
+        "status": "pending",
+        "spdx": null
+      },
+      "judgment": "README明确是Azure Performance学习项目，要求使用者自行配置资源并完成TODO；标为resource，自动修复场景附Azure与Runbook配置条件，未宣称通用ITOM。Udacity教育许可没有提升为已核验开源。",
+      "passed": true
+    },
+    {
+      "leaf": "portfolio-management-system",
+      "repository_id": 382396844,
+      "repository_url": "https://github.com/Power-Portfolio-Analytics/Power-Portfolio-Analytics",
+      "coverage": "conditional_prototype_shared_repository",
+      "official_archived_evidence": {
+        "path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/4f28fa932075193242724dceb0530f7bdf285a4acd26d7e5251e413f33cfd273.json",
+        "archive_sha256": "d37df06d2bc5bd89b3858debfbc1dbdd56bf8b7e8cff0495da91cf7ff37787aa",
+        "readme_present": true,
+        "readme_sha256": "35ab95f9decc80891f0d6288cd2e1b2c61425966548e9bc21cdeaa4768353323",
+        "license_file_present": false
+      },
+      "reviewed_fields": [
+        "scenario_relevance",
+        "summary",
+        "project_type",
+        "applicability",
+        "license_label"
+      ],
+      "applicability": [
+        {
+          "scenario_id": "auto-portfolio-management-system-overview",
+          "applicability": "unverified"
+        },
+        {
+          "scenario_id": "auto-portfolio-management-system-56c699965d",
+          "applicability": "conditional"
+        }
+      ],
+      "license": {
+        "status": "pending",
+        "spdx": null
+      },
+      "judgment": "README是QuantConnect策略回测与PowerBI组合可视化原型，确有权重建议；新增关联仅在限定可视化/建议的条件下保留，明确账户持仓、规则校验及交易指令流程未获证实。旧介绍和许可未改。",
+      "passed": true
+    },
+    {
+      "leaf": "portfolio-management-system",
+      "repository_id": 1175837926,
+      "repository_url": "https://github.com/Adityatiwari1981/TradeSphere-Smart-Stock-Portfolio-Trading-Management-System",
+      "coverage": "roadmap_and_unverified_compliance",
+      "official_archived_evidence": {
+        "path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/1480071cb09fe2821a685455f70e95a775afbf80485e3fb0846d3997e7056767.json",
+        "archive_sha256": "cf189aed729f22d3d7abe94f320607adaf588fb98119918dfc141e06f64fe5f1",
+        "readme_present": true,
+        "readme_sha256": "20168dd9724c79ec189d158ad012b91b41d84daa13d6b330a28d657d373aea0d",
+        "license_file_present": false
+      },
+      "reviewed_fields": [
+        "scenario_relevance",
+        "summary",
+        "project_type",
+        "applicability",
+        "license_label"
+      ],
+      "applicability": [
+        {
+          "scenario_id": "auto-portfolio-management-system-overview",
+          "applicability": "conditional"
+        },
+        {
+          "scenario_id": "auto-portfolio-management-system-56c699965d",
+          "applicability": "conditional"
+        },
+        {
+          "scenario_id": "auto-portfolio-management-system-5996eaadcb",
+          "applicability": "unverified"
+        },
+        {
+          "scenario_id": "auto-portfolio-management-system-7f0b1e7893",
+          "applicability": "unverified"
+        }
+      ],
+      "license": {
+        "status": "pending",
+        "spdx": null
+      },
+      "judgment": "README区分已实现认证/仪表盘与计划中的盈亏、交易历史、Upstox。新场景没有将认证等同于投资合规，现金及合规均为unverified；模拟持仓再平衡保留补充条件，旧介绍和许可未改。",
+      "passed": true
+    }
+  ],
+  "log_search_review": {
+    "passed": true,
+    "path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-first-round-2026-10-26/repair-2026-10-29/log-management-search.json",
+    "query": "request id log search",
+    "actual_physical_requests": 3,
+    "same_logical_100_result_window": true,
+    "returned_repositories": 71,
+    "three_mib_limit_preserved": true,
+    "new_candidates_deferred_after_existing_60": true
+  },
+  "refinements_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-first-round-2026-10-26/repair-2026-10-29/SEMANTIC_REFINEMENTS.json",
+  "method": "实际阅读已归档官方README、许可摘录及元数据；对照当前介绍、场景条件与许可标签，未以计数或模型自评代替抽查。",
+  "limits": [
+    "未实测部署、工控设备或金融交易",
+    "资料、库、仿真与教程保留明确边界；未知许可及未实现功能不补写为已证实"
+  ]
+}

@@ -1,0 +1,104 @@
+{
+ "repository_id": 2503314,
+ "domain": "10",
+ "input_sha256": "05173d818965a99593f9ab7de49f1e122ab9bae6d0c909c44a3ed81289542e58",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:33.115665+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-de8de99b2c52-b8a15",
+ "usage": {
+  "prompt_tokens": 9045,
+  "completion_tokens": 839,
+  "total_tokens": 9884,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00178489,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00178489,
+   "tokens": {
+    "input": 8533,
+    "output": 839,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":2503314,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片的功能、定位、项目类型与场景匹配基本有 README 原文支持；许可证按 pending 保守标注，未把徽章或元数据当作已核验开源，符合要求。主要限制是 README 未说明线索表单、报价、在线收款、商品目录、库存、工时转发票等场景细节，相关场景均标 unverified 合理。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-business-management-suite-4b5833c28a\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"具备客户、联系人、账单与现金流功能，但资料未说明线索表单、报价与在线收款流程\",\"source_id\":\"s0\",\"quote\":\"With TNTConcept you can manage, in an integrated way, your customers, providers, contacts, business interactions, projects, week objectives, project time-tracking, bills, cash flow ...\",\"reason\":\"README 仅列出客户、联系人、账单、现金流等模块，未提及网页线索表单、报价、在线收款；卡片已如实标 unverified 并说明缺项，属保守标注而非错误。\",\"suggested_correction\":\"保留 unverified，可补充“仅模块级证据，端到端线索到收款流程未验证”。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-business-management-suite-c04bf269ae\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"资料未提及商品目录、销售订单与库存管理\",\"source_id\":\"s0\",\"quote\":\"With TNTConcept you can manage, in an integrated way, your customers, providers, contacts, business interactions, projects, week objectives, project time-tracking, bills, cash flow ...\",\"reason\":\"README 功能列表无商品目录、销售订单、库存；卡片标 unverified 合理，但该场景与已列功能关联较弱。\",\"suggested_correction\":\"保留 unverified，并注明该场景与现有功能列表关联度低。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-business-management-suite-ebf45afaee\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"具备项目、工时与账单功能，但工时转发票及客户在线付款未在资料中说明\",\"source_id\":\"s0\",\"quote\":\"projects, week objectives, project time-tracking, bills, cash flow\",\"reason\":\"README 有项目、工时、账单，但未说明工时转可计费项、生成发票、在线付款与盈亏查看；卡片标 unverified 合理。\",\"suggested_correction\":\"保留 unverified，明确“工时与账单为独立模块，转换与在线支付未验证”。\"},{\"field\":\"license\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"许可证原文已读取，但未通过官方模板精确匹配，保留待核验；不按公开仓库或标签推定为开源\",\"source_id\":\"s1\",\"quote\":\"GNU GENERAL PUBLIC LICENSE\\n                       Version 3, 29 June 2007\",\"reason\":\"LICENSE.txt 文本为 GPLv3 全文，但来源被截断（truncated:true），无法声称全文精确核验；卡片保守标 pending 符合要求，仅需说明截断限制。\",\"suggested_correction\":\"保留 pending，并注明许可证文件在本次材料中被截断，全文比对未完成。\"}],\"limitations\":[\"README 来源未截断，但 LICENSE.txt 来源被截断（truncated:true），无法声称许可证全文已核验。\",\"仅提供 README、LICENSE 与 GitHub 元数据，未覆盖源码、构建配置或运行验证。\",\"场景匹配均为 unverified，缺少端到端流程证据。\"]}",
+ "review": {
+  "repository_id": 2503314,
+  "verdict": "pass_with_limits",
+  "summary": "卡片的功能、定位、项目类型与场景匹配基本有 README 原文支持；许可证按 pending 保守标注，未把徽章或元数据当作已核验开源，符合要求。主要限制是 README 未说明线索表单、报价、在线收款、商品目录、库存、工时转发票等场景细节，相关场景均标 unverified 合理。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-business-management-suite-4b5833c28a",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "具备客户、联系人、账单与现金流功能，但资料未说明线索表单、报价与在线收款流程",
+    "source_id": "s0",
+    "quote": "With TNTConcept you can manage, in an integrated way, your customers, providers, contacts, business interactions, projects, week objectives, project time-tracking, bills, cash flow ...",
+    "reason": "README 仅列出客户、联系人、账单、现金流等模块，未提及网页线索表单、报价、在线收款；卡片已如实标 unverified 并说明缺项，属保守标注而非错误。",
+    "suggested_correction": "保留 unverified，可补充“仅模块级证据，端到端线索到收款流程未验证”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-business-management-suite-c04bf269ae",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "资料未提及商品目录、销售订单与库存管理",
+    "source_id": "s0",
+    "quote": "With TNTConcept you can manage, in an integrated way, your customers, providers, contacts, business interactions, projects, week objectives, project time-tracking, bills, cash flow ...",
+    "reason": "README 功能列表无商品目录、销售订单、库存；卡片标 unverified 合理，但该场景与已列功能关联较弱。",
+    "suggested_correction": "保留 unverified，并注明该场景与现有功能列表关联度低。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-business-management-suite-ebf45afaee",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "具备项目、工时与账单功能，但工时转发票及客户在线付款未在资料中说明",
+    "source_id": "s0",
+    "quote": "projects, week objectives, project time-tracking, bills, cash flow",
+    "reason": "README 有项目、工时、账单，但未说明工时转可计费项、生成发票、在线付款与盈亏查看；卡片标 unverified 合理。",
+    "suggested_correction": "保留 unverified，明确“工时与账单为独立模块，转换与在线支付未验证”。"
+   },
+   {
+    "field": "license",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "许可证原文已读取，但未通过官方模板精确匹配，保留待核验；不按公开仓库或标签推定为开源",
+    "source_id": "s1",
+    "quote": "GNU GENERAL PUBLIC LICENSE\n                       Version 3, 29 June 2007",
+    "reason": "LICENSE.txt 文本为 GPLv3 全文，但来源被截断（truncated:true），无法声称全文精确核验；卡片保守标 pending 符合要求，仅需说明截断限制。",
+    "suggested_correction": "保留 pending，并注明许可证文件在本次材料中被截断，全文比对未完成。"
+   }
+  ],
+  "limitations": [
+   "README 来源未截断，但 LICENSE.txt 来源被截断（truncated:true），无法声称许可证全文已核验。",
+   "仅提供 README、LICENSE 与 GitHub 元数据，未覆盖源码、构建配置或运行验证。",
+   "场景匹配均为 unverified，缺少端到端流程证据。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:11:46.456035+00:00",
+ "elapsed_seconds": 13.34
+}

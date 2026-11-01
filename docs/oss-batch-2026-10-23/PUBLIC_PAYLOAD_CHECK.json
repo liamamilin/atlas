@@ -1,0 +1,30 @@
+{
+  "model_destination": "https://amr-link.open-design.ai/v1/chat/completions",
+  "model": "deepseek-v4.1-flash",
+  "provider_source": "existing user configuration",
+  "payload_types": [
+    "verified public category text",
+    "public GitHub search metadata",
+    "public GitHub README excerpts"
+  ],
+  "checks": [
+    {
+      "leaf": "feed-reader",
+      "identical_to_public": true,
+      "sha256": "36ed17e1afb41887f59d80a71ca833b3ce27629bc52aa1b5c5e8fad42bc4fe74",
+      "public_source": "https://github.com/liamamilin/atlas/blob/codex/stabilize-atlas/application-atlas-production-pack/applications/feed-reader.md"
+    },
+    {
+      "leaf": "diagramming-application",
+      "identical_to_public": true,
+      "sha256": "5f3981a60fd164bc2cee2c7f580b1a0e24b3939c9d80095137f0c2837b7c837d",
+      "public_source": "https://github.com/liamamilin/atlas/blob/codex/stabilize-atlas/application-atlas-production-pack/applications/diagramming-application.md"
+    },
+    {
+      "leaf": "password-manager",
+      "identical_to_public": true,
+      "sha256": "07c48f72319efb58f580a0505537483f412a43112b1270658fdec4a99ba7e00d",
+      "public_source": "https://github.com/liamamilin/atlas/blob/codex/stabilize-atlas/application-atlas-production-pack/applications/password-manager.md"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+ "repository_id": 1328539320,
+ "domain": "17",
+ "input_sha256": "f3da9671208e8cf1cab51291e930ac2f61204ad3268b1cd426d2319846e5ba69",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:36.982798+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDMinfwh4LrFBIdcn4ZA71Dbba3",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 6066,
+  "completion_tokens": 206,
+  "total_tokens": 6272,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 6063,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0007096,
+ "response_text": "{\"repository_id\":1328539320,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片对项目功能、应用类型及 MIT 许可的描述有 README 和许可证正文支持。两个场景均标为 conditional，并明确列出关键缺项；适用性是有限的证据整理与比较支持，而非完整检查或押金裁决流程。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[],\"limitations\":[\"场景与项目仅部分匹配：README 明确说明不判断变化是否为损坏，也不提供法律意见；场景所需的移动端逐项评级、租户签字及损坏标注流程不在卡片所述范围内，卡片已标注相关条件。\",\"本次依据提供的完整 README、LICENSE 和 GitHub 元数据审查；未执行代码，也未独立验证运行行为或依赖。\"]}",
+ "review": {
+  "repository_id": 1328539320,
+  "verdict": "pass_with_limits",
+  "summary": "卡片对项目功能、应用类型及 MIT 许可的描述有 README 和许可证正文支持。两个场景均标为 conditional，并明确列出关键缺项；适用性是有限的证据整理与比较支持，而非完整检查或押金裁决流程。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [],
+  "limitations": [
+   "场景与项目仅部分匹配：README 明确说明不判断变化是否为损坏，也不提供法律意见；场景所需的移动端逐项评级、租户签字及损坏标注流程不在卡片所述范围内，卡片已标注相关条件。",
+   "本次依据提供的完整 README、LICENSE 和 GitHub 元数据审查；未执行代码，也未独立验证运行行为或依赖。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:43.241237+00:00",
+ "elapsed_seconds": 6.258
+}

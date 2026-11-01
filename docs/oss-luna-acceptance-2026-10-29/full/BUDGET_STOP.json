@@ -1,0 +1,55 @@
+{
+  "audit_id": "atlas-semantic-55651-2026-10-29",
+  "at": "2026-10-30T15:46:56.055965+00:00",
+  "stopped_at": "2026-10-30T15:44:13.558660+00:00",
+  "status": "budget_limit_reached",
+  "reason": "no_safe_reservation_available",
+  "scope_projects": 55651,
+  "primary": {
+    "done": 54923,
+    "failed": 1,
+    "pending": 727
+  },
+  "secondary": {
+    "done": 7266,
+    "failed": 58,
+    "none": 48326,
+    "pending": 1
+  },
+  "project_outcomes_model_only_not_human_confirmed": {
+    "cross_review_dismissed": 2952,
+    "cross_review_issue_candidate": 3910,
+    "cross_review_unresolved": 376,
+    "doubt_queued": 1,
+    "legacy_independent_cross_review": 28,
+    "pass": 1498,
+    "pass_with_limits": 46101,
+    "pending": 727,
+    "unresolved_secondary_failure": 58
+  },
+  "budget_cap_usd": 50,
+  "estimated_cost_usd": 39.327409,
+  "charged_upper_usd": 49.788276,
+  "uncertain_reserved_usd": 0.20837,
+  "conservative_total_usd": 49.996646,
+  "available_usd": 0.003354,
+  "historical_pilots_included": true,
+  "provider_final_bill_reconciled": false,
+  "pid": 71372,
+  "pid_absent": true,
+  "lock_free": true,
+  "active_reserved_requests": 0,
+  "last_success_at": "2026-10-30T15:44:11.476992+00:00",
+  "all_receipts_checkpoints_and_uncertain_reservations_preserved": true,
+  "final_semantic_acceptance_completed": false,
+  "monitor_retained": true,
+  "production_writes_reported_by_worker": false,
+  "api_restarted": false,
+  "required_action": "用户决定如何处理未完成验收；续审前需在原50美元上限内完成费用核对并确认可安全预留预算。不得提高上限、删除未知费用预留或将模型候选标成人工确认。",
+  "evidence": [
+    "PROGRESS.json",
+    "MANIFEST.json",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/audit.sqlite",
+    "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/worker.json"
+  ]
+}

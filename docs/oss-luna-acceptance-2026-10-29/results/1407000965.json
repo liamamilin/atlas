@@ -1,0 +1,62 @@
+{
+ "repository_id": 1407000965,
+ "domain": "08",
+ "input_sha256": "21731f7d1a12990cdfe419ab6e82371ca2acdff5bc7e22ef0ba81ae8890621cd",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:38:48.103915+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCCX8yGzOnvKM9SyFmpt3LCJ5lNR",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 3328,
+  "completion_tokens": 341,
+  "total_tokens": 3669,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 3325,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0005033,
+ "response_text": "{\"repository_id\":1407000965,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片总体与 README 对项目定位、流程和早期开发状态的描述一致；许可证保守标为 pending，场景也标为 conditional。需注意该项目明确不负责发票登记，且场景中的重复项核对能力没有来源支持。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-accounts-payable-automation-fa6a75a4f3\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"reason：发票接收、规则路由审批与回写会计系统\",\"source_id\":\"s0\",\"quote\":\"Vistato is a **pre-filter**: it never registers invoices and carries no tax responsibility.\",\"reason\":\"场景描述包含核对供应商与重复项；README 只支持发票接收、规则审批和回写，并明确不登记发票。当前 reason 未声称重复项核对，但该场景仅部分覆盖，不能据此理解为完整应付自动化。\",\"suggested_correction\":\"保留 conditional，并明确该项目覆盖审批与回写环节，不覆盖发票登记；不要暗示支持重复项核对。\"}],\"limitations\":[\"仅有 README 与 GitHub 元数据；未检查源码实现，README 标注项目处于 early development。\",\"README 明确说明不授予使用、复制、修改或分发许可；卡片的 pending 状态如实保留。\"]}",
+ "review": {
+  "repository_id": 1407000965,
+  "verdict": "pass_with_limits",
+  "summary": "卡片总体与 README 对项目定位、流程和早期开发状态的描述一致；许可证保守标为 pending，场景也标为 conditional。需注意该项目明确不负责发票登记，且场景中的重复项核对能力没有来源支持。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-accounts-payable-automation-fa6a75a4f3",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "reason：发票接收、规则路由审批与回写会计系统",
+    "source_id": "s0",
+    "quote": "Vistato is a **pre-filter**: it never registers invoices and carries no tax responsibility.",
+    "reason": "场景描述包含核对供应商与重复项；README 只支持发票接收、规则审批和回写，并明确不登记发票。当前 reason 未声称重复项核对，但该场景仅部分覆盖，不能据此理解为完整应付自动化。",
+    "suggested_correction": "保留 conditional，并明确该项目覆盖审批与回写环节，不覆盖发票登记；不要暗示支持重复项核对。"
+   }
+  ],
+  "limitations": [
+   "仅有 README 与 GitHub 元数据；未检查源码实现，README 标注项目处于 early development。",
+   "README 明确说明不授予使用、复制、修改或分发许可；卡片的 pending 状态如实保留。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:38:53.447071+00:00",
+ "elapsed_seconds": 5.343
+}

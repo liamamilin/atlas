@@ -1,0 +1,182 @@
+[
+ {
+  "stratum": "dismissed",
+  "rid": 22088,
+  "name": "bdainton/camptweet",
+  "domain": "01",
+  "index": 0,
+  "issue": {
+   "field": "features",
+   "scenario_id": "",
+   "severity": "minor",
+   "kind": "unsupported_claim",
+   "claim": "轮询 Summize 搜索结果与 RSS/Atom 条目",
+   "source_id": "s0",
+   "quote": "A simple daemon that polls for updated Twitter statuses and posts them to a Campfire room.",
+   "reason": "README 只描述轮询 Twitter 状态并发布到 Campfire；Summize 与 RSS/Atom 能力仅出现在 s2 的仓库元数据中，不能据此确认其为已实现功能。",
+   "suggested_correction": "将该能力明确归因于仓库元数据，或在取得 README 等项目文档佐证前移出已实现功能列表。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "dismissed",
+   "reason": "该功能文本与仓库元数据 s2 的描述逐字一致，且卡中证据标签为 source_based，允许 excerpt 为空；主审以 README 未提及为由判为无支持，但未考虑 s2 元数据本身即为来源，属合理限定已存在，不构成原卡错误。",
+   "source_id": "s2",
+   "quote": "A simple daemon that polls for updated Twitter statuses, Summize search results, and RSS/Atom feed items and posts them to a Campfire room.",
+   "suggested_correction": "可保留原文，但将证据来源标注为仓库元数据（s2）而非 README，以明确归因。",
+   "citation_state": "literal"
+  },
+  "coverage": {
+   "total_campaign_matches": 1,
+   "matches_included": 1,
+   "files_available": 2,
+   "files_included": 2,
+   "omitted_files": 0,
+   "truncated_files": 0
+  }
+ },
+ {
+  "stratum": "metadata_only",
+  "rid": 124713,
+  "name": "patmaddox/apress_daily_deal",
+  "domain": "05",
+  "index": 0,
+  "issue": {
+   "field": "project_type",
+   "scenario_id": "",
+   "severity": "minor",
+   "kind": "insufficient_evidence",
+   "claim": "application",
+   "source_id": "s0",
+   "quote": "An RSS feed generator for Apress Deal of the Day",
+   "reason": "元数据只说明这是 RSS feed generator，未说明其为完整应用；现有证据不足以确认 application 类型。",
+   "suggested_correction": "将类型标为待核实，或采用更贴近来源的 RSS feed generator 描述。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "dismissed",
+   "reason": "原卡将 project_type 标为 application，而来源描述为“An RSS feed generator for Apress Deal of the Day”，即一个 RSS 生成器程序；该描述本身可支持其为一个可运行的应用/工具，且原卡定位、范围、摘要均已用“待补充/请查看官方资料”等限定措辞，未把类型当作已验证事实。该 finding 的“证据不足”主张与原卡已有限定的表述并不构成原卡错误，故不成立。",
+   "source_id": "s0",
+   "quote": "An RSS feed generator for Apress Deal of the Day",
+   "suggested_correction": "无需修改；如进一步收紧，可将 project_type 标注为“据描述为 RSS 生成器应用，类型待核实”。",
+   "citation_state": "literal"
+  },
+  "coverage": {
+   "total_campaign_matches": 1,
+   "matches_included": 1,
+   "files_available": 0,
+   "files_included": 0,
+   "omitted_files": 0,
+   "truncated_files": 0
+  }
+ },
+ {
+  "stratum": "unresolved",
+  "rid": 671825,
+  "name": "Graylog2/graylog2-server",
+  "domain": "14",
+  "index": 1,
+  "issue": {
+   "field": "summary",
+   "scenario_id": "",
+   "severity": "minor",
+   "kind": "insufficient_evidence",
+   "claim": "提供集中式日志收集、存储与检索能力。",
+   "source_id": "s0",
+   "quote": "Graylog is a free and open log management platform.",
+   "reason": "可见 README 只明确称其为日志管理平台，没有在所给文字中说明集中式收集、存储和检索这些具体能力；来源材料不足以核实这些扩展描述。",
+   "suggested_correction": "收紧为“Graylog 是日志管理平台”，或将具体能力明确归因于其他可核验的仓库资料。",
+   "citation_state": "not_found"
+  },
+  "ad": {
+   "finding_id": "issue-1",
+   "disposition": "unresolved",
+   "reason": "所给 README 片段只称其为日志管理平台，未出现“集中式收集、存储与检索”的具体表述；但片段仅 1432 字符且卡片标注为 source_based 概括，现有材料不足以判定该扩展描述确属无据，也不足以证实。",
+   "source_id": "s0",
+   "quote": "Graylog is a free and open log management platform.",
+   "suggested_correction": "在获得更多官方文档前，可收紧为“日志管理平台”，或标注具体能力待官方文档核实。",
+   "citation_state": "not_found"
+  },
+  "coverage": {
+   "total_campaign_matches": 3,
+   "matches_included": 3,
+   "files_available": 2,
+   "files_included": 2,
+   "omitted_files": 0,
+   "truncated_files": 1
+  }
+ },
+ {
+  "stratum": "minor",
+  "rid": 727179,
+  "name": "bdwong-mirrors/mrbs",
+  "domain": "03",
+  "index": 0,
+  "issue": {
+   "field": "scenario_match",
+   "scenario_id": "auto-enterprise-resource-scheduling-platform-3a23ef4745",
+   "severity": "minor",
+   "kind": "missing_condition",
+   "claim": "\"applicability\":\"direct\",\"conditions\":[]",
+   "source_id": "s0",
+   "quote": "The (+) symbol means you can add new meetings by clicking there.",
+   "reason": "README 支持添加会议和会议室预订，但场景还要求按容量和位置查找空闲房间、自动检查冲突并确认；所引资料没有说明这些能力。将整个场景标为 direct 且不附条件，超出了来源支持范围。",
+   "suggested_correction": "将适用性改为 conditional 或 unverified，并注明资料未说明容量/位置筛选及自动冲突检查与确认。",
+   "citation_state": "whitespace_equivalent"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "原卡将场景适用性标为 direct 且无任何条件，但 README 仅支持会议室/区域登记、按时间段添加会议、共享日历视图与可配置认证；场景描述中的“按容量和位置查找空闲会议室”“系统自动检查冲突并确认”在给定 README 片段中均无对应说明，因此 direct 无条件的判定超出来源支持范围，原卡确有过度断言。",
+   "source_id": "s0",
+   "quote": "The (+) symbol means you can add new meetings by clicking there.",
+   "suggested_correction": "将 applicability 由 direct 收紧为 conditional 或 unverified，并在 conditions 中注明：资料未说明按容量/位置筛选空闲房间及自动冲突检查与确认。",
+   "citation_state": "whitespace_equivalent"
+  },
+  "coverage": {
+   "total_campaign_matches": 4,
+   "matches_included": 4,
+   "files_available": 2,
+   "files_included": 2,
+   "omitted_files": 0,
+   "truncated_files": 1
+  }
+ },
+ {
+  "stratum": "missing_condition",
+  "rid": 727179,
+  "name": "bdwong-mirrors/mrbs",
+  "domain": "03",
+  "index": 0,
+  "issue": {
+   "field": "scenario_match",
+   "scenario_id": "auto-enterprise-resource-scheduling-platform-3a23ef4745",
+   "severity": "minor",
+   "kind": "missing_condition",
+   "claim": "\"applicability\":\"direct\",\"conditions\":[]",
+   "source_id": "s0",
+   "quote": "The (+) symbol means you can add new meetings by clicking there.",
+   "reason": "README 支持添加会议和会议室预订，但场景还要求按容量和位置查找空闲房间、自动检查冲突并确认；所引资料没有说明这些能力。将整个场景标为 direct 且不附条件，超出了来源支持范围。",
+   "suggested_correction": "将适用性改为 conditional 或 unverified，并注明资料未说明容量/位置筛选及自动冲突检查与确认。",
+   "citation_state": "whitespace_equivalent"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "原卡将场景适用性标为 direct 且无任何条件，但 README 仅支持会议室/区域登记、按时间段添加会议、共享日历视图与可配置认证；场景描述中的“按容量和位置查找空闲会议室”“系统自动检查冲突并确认”在给定 README 片段中均无对应说明，因此 direct 无条件的判定超出来源支持范围，原卡确有过度断言。",
+   "source_id": "s0",
+   "quote": "The (+) symbol means you can add new meetings by clicking there.",
+   "suggested_correction": "将 applicability 由 direct 收紧为 conditional 或 unverified，并在 conditions 中注明：资料未说明按容量/位置筛选空闲房间及自动冲突检查与确认。",
+   "citation_state": "whitespace_equivalent"
+  },
+  "coverage": {
+   "total_campaign_matches": 4,
+   "matches_included": 4,
+   "files_available": 2,
+   "files_included": 2,
+   "omitted_files": 0,
+   "truncated_files": 1
+  }
+ }
+]

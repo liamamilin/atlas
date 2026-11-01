@@ -1,0 +1,80 @@
+{
+ "audit_id": "atlas-semantic-55651-2026-10-29",
+ "prepared_at": "2026-10-29T05:41:05.640894+00:00",
+ "job_id": "batch_4812ef3db57543c3acc1871b8ea5ba6e",
+ "projects": 55651,
+ "scope": "Only distinct accepted/partial repositories from the original1598-leaf frozen campaign; deferred candidates excluded.",
+ "primary": {
+  "provider": "openai",
+  "model": "gpt-6-luna",
+  "prompt_sha256": "45fe684ed43eac2d90622ae598bb2e5b40d31db01853a708b1a7d5bf4a3a4077"
+ },
+ "secondary": {
+  "provider": "opencode-go",
+  "model": "deepseek-v4.1-flash",
+  "prompt_sha256": "478f218c676e7f61dac1d41af9fa95a2b37588575120f7f0db0d8b919b830f59",
+  "selection": "All actionable primary issues, invalid quotes or unresolved primary judgments; ordinary labeled gaps alone do not trigger duplicate paid review.",
+  "route_basis": "Paired50 fresh OpenDesign quota_exhausted followed by50 successful Go DeepSeek receipts; no fallback to Luna inside the DeepSeek group."
+ },
+ "budget_cap_usd": 50,
+ "historical_pilot_cost_included": true,
+ "concurrency": 4,
+ "primary_group": 16,
+ "secondary_group": 4,
+ "primary_input_limits": {
+  "source_chars": 60000,
+  "scenario_associations": 48,
+  "output_tokens": 2400
+ },
+ "secondary_input_limits": "Relevant evidence excerpts plus source headers/tails and license text for license findings; omitted context stays unresolved.",
+ "snapshot_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/snapshot.sqlite",
+ "snapshot_sha256": "57588070e7606c8137defc879eccf2740635fc1f24aae9e172e2d7005105fd94",
+ "state_database": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/audit.sqlite",
+ "corpus_sha256": "92b45909ade327fd270803b2d0166710b2e836214c83cd9992234c762bb7b9ed",
+ "original_job_sha256": "b3a8cd79b7683d27df554a72e33896cdde2a9e3d477af35d881229661742d7d3",
+ "baseline": {
+  "project_keys": "b774734758443e6821fa758849c5a2c9d51655eabc753f856a0a5d07fb8a72c2",
+  "memberships": "8523648e92e8070b07f67e37d2cbfeb716118bcb9b2eca9f3d519f98e4225fce",
+  "matches": "596428144916c4c9f048e6f18f7c8267201bdfce02e14897c536d96cb4ccdf56",
+  "favorites": "15bf1d689d0502ba8eb3421cfcfeaf6667fbd4a8be74e05e9afb8ff9fadb085e",
+  "jobs": "f52ff42e3d0673076f370f9d7d3609193b58c3f270fc7b9e733a0d5c6e990dbf"
+ },
+ "settings_sha256": "cd438feb36e7bbff2884181078e984d696a335a6c1cdf0a1ef78c64c283493f5",
+ "legacy_primary_prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "version": "atlas.semantic.audit.v2",
+ "implementation_sha256": {
+  "full_audit.py": "61a457b0a83a2d5f1ffe01e458cb2538bda871d672d72b8f427aa235d7b708df",
+  "audit_ledger.py": "7b230f391b517398a3f7a2ac9b030ec9e5b002c82e4ea05d32dcaf31c58802dd",
+  "review_sample.py": "adc63ed593329d20277222e6e0fa2c3d3c26b8caefa6b2d93a68390da7705df0"
+ },
+ "automatic_catalog_writes": false,
+ "code_runtime_validation": false,
+ "limits": [
+  "Source review is not execution testing or a legal license opinion.",
+  "Missing, metadata-only, truncated or unresolved evidence remains labeled; full project coverage is not universal approval.",
+  "Model agreement is a review signal, not automatic human confirmation."
+ ],
+ "implementation_history": [
+  {
+   "at": "2026-10-29T05:43:58.771015+00:00",
+   "previous_sha256": {
+    "full_audit.py": "942118645520bd76adf29c68039358689fd22911a370e1934dc8d4676806920e",
+    "audit_ledger.py": "86519593ba8b9015b3ca2f854e9ef82c84f37164d186f8c48d80d42cd6ae8a4a",
+    "review_sample.py": "adc63ed593329d20277222e6e0fa2c3d3c26b8caefa6b2d93a68390da7705df0"
+   },
+   "reason": "Before full deployment: require substantive structured checks and retain archive provenance. Real paid receipts retained and all104 validated; prompts and frozen corpus unchanged."
+  },
+  {
+   "at": "2026-10-30T16:02:22.513550+00:00",
+   "previous_sha256": {
+    "full_audit.py": "61a457b0a83a2d5f1ffe01e458cb2538bda871d672d72b8f427aa235d7b708df",
+    "audit_ledger.py": "86519593ba8b9015b3ca2f854e9ef82c84f37164d186f8c48d80d42cd6ae8a4a",
+    "review_sample.py": "adc63ed593329d20277222e6e0fa2c3d3c26b8caefa6b2d93a68390da7705df0"
+   },
+   "reason": "User-authorized actual-cost reconciliation within existing USD50 cap. Settle verified Go balance request costs; include OpenAI cache-write tokens and long-context multipliers. All receipts, project checkpoints and unknown reserves preserved. Frozen scope, prompts, routes and cap unchanged.",
+   "previous_manifest": "cost-reconciliation-20261030/MANIFEST.json",
+   "checks": "cost-reconciliation-20261030/CHECKS.json",
+   "cost_reconciliation": "COST_RECONCILIATION.json"
+  }
+ ]
+}

@@ -1,0 +1,127 @@
+{
+  "reviewed_projects": 12,
+  "reviewed_leaves": 9,
+  "method": "人工对照采集时归档的官方 README/仓库资料，覆盖功能、使用场景、范围、依赖、许可状态与不足资料；不是逐项目部署测试。",
+  "result": "passed_after_one_narrowing_correction",
+  "reviews": [
+    {
+      "leaf": "web-browser",
+      "repo": "qutebrowser/qutebrowser",
+      "result": "passed_with_existing_labels",
+      "official_material": [
+        "https://github.com/qutebrowser/qutebrowser/blob/main/README.asciidoc",
+        "https://github.com/qutebrowser/qutebrowser/blob/main/misc/nsis/graphics/readme.txt"
+      ],
+      "repository_url": "https://github.com/qutebrowser/qutebrowser",
+      "notes": "键盘操作、Python/Qt、最小 GUI 与官方 README 一致；未从浏览器常识补写未说明的能力；关联中的待核实标签保留。"
+    },
+    {
+      "leaf": "e-commerce-platform",
+      "repo": "medusajs/medusa",
+      "result": "passed_with_existing_labels",
+      "official_material": [
+        "https://github.com/medusajs/medusa/blob/develop/README.md"
+      ],
+      "repository_url": "https://github.com/medusajs/medusa",
+      "notes": "商品、购物车、订单等 commerce modules 与 Store/Admin API 有官方说明；部署与组件依赖写入条件；open-core/enterprise 措辞未被当成全项目标准开源授权。"
+    },
+    {
+      "leaf": "mechanical-cad",
+      "repo": "seansackowitz/mcp-freecad",
+      "result": "passed_with_existing_labels",
+      "official_material": [
+        "https://github.com/seansackowitz/mcp-freecad/blob/main/README.md"
+      ],
+      "repository_url": "https://github.com/seansackowitz/mcp-freecad",
+      "notes": "MCP 工具、参数化建模、草图约束、表达式与官方资料一致；依赖 FreeCAD GUI、插件与 Python，并非独立机械 CAD。"
+    },
+    {
+      "leaf": "mechanical-cad",
+      "repo": "AadiJo/cadsense",
+      "result": "passed_with_existing_labels",
+      "official_material": [
+        "https://github.com/AadiJo/cadsense/blob/main/README.md"
+      ],
+      "repository_url": "https://github.com/AadiJo/cadsense",
+      "notes": "项目名称包含 CAD，但 README 当前主要是本地编码代理 GUI；卡片如实说明此差异，未强行建立机械 CAD 场景关联。"
+    },
+    {
+      "leaf": "identity-access-management-iam",
+      "repo": "OpenIdentityPlatform/OpenAM",
+      "result": "passed_with_existing_labels",
+      "official_material": [
+        "https://github.com/OpenIdentityPlatform/OpenAM/blob/master/README.md"
+      ],
+      "repository_url": "https://github.com/OpenIdentityPlatform/OpenAM",
+      "notes": "SSO、认证、授权和协议有 README 支持；账户全生命周期自动开通停用没有被直接宣称已实现；CDDL 未在当前验证集内，许可保留待核验。"
+    },
+    {
+      "leaf": "electronic-health-record-ehr",
+      "repo": "atishay2411/MedPilot",
+      "result": "passed_with_existing_labels",
+      "official_material": [
+        "https://github.com/atishay2411/MedPilot/blob/main/README.md"
+      ],
+      "repository_url": "https://github.com/atishay2411/MedPilot",
+      "notes": "患者资料、生命体征、医嘱、OpenMRS/FHIR/RBAC 和确认写入均有 README 支持；EHR 场景保留 OpenMRS 接入、权限及人工确认条件，未宣称临床认证。"
+    },
+    {
+      "leaf": "crop-management",
+      "repo": "prateek3255/smartfarm",
+      "result": "passed_with_existing_labels",
+      "official_material": [
+        "https://github.com/prateek3255/smartfarm/blob/master/README.md"
+      ],
+      "repository_url": "https://github.com/prateek3255/smartfarm",
+      "notes": "农田资料、区域作物推荐/分配、SMS 通知有官方说明；完整田间作业记录与收获管理未被编造成已实现；规划用途保留条件。"
+    },
+    {
+      "leaf": "golf-course-management",
+      "repo": "aaronhorvat1/tee-time-booking-system",
+      "result": "passed_with_existing_labels",
+      "official_material": [
+        "https://github.com/aaronhorvat1/tee-time-booking-system/blob/main/README.md"
+      ],
+      "repository_url": "https://github.com/aaronhorvat1/tee-time-booking-system",
+      "notes": "Next.js、Prisma/PostgreSQL、开球时间表、1–4 人预约与 15 分钟 hold 有 README 支持；电话预订需员工使用组件，签到/收入报表标待核实；未将支付、邮件 stub 写成完整能力。"
+    },
+    {
+      "leaf": "vector-retrieval-platform",
+      "repo": "redis-developer/redis-product-search",
+      "result": "passed_with_existing_labels",
+      "official_material": [
+        "https://github.com/redis-developer/redis-product-search/blob/master/README.md"
+      ],
+      "repository_url": "https://github.com/redis-developer/redis-product-search",
+      "notes": "图像/文本相似度、HNSW/Flat、标签预过滤及嵌入技术栈均有 README 支持；已有条目推荐场景标为待核实；许可证未精确匹配时保持 pending。"
+    },
+    {
+      "leaf": "job-board",
+      "repo": "AbayTesfaye/Laravel-Jobs-Board",
+      "result": "passed_with_existing_labels",
+      "official_material": [
+        "https://github.com/AbayTesfaye/Laravel-Jobs-Board/blob/main/README.md"
+      ],
+      "repository_url": "https://github.com/AbayTesfaye/Laravel-Jobs-Board",
+      "notes": "README 是 Laravel 默认介绍；卡片明确功能仅据仓库描述，未把 Laravel 框架能力当成招聘站已实现；场景待核实，模板中的 MIT 措辞未误用为本仓库许可。"
+    },
+    {
+      "leaf": "vector-retrieval-platform",
+      "repo": "330205812/NexusRAG",
+      "result": "passed_after_correction",
+      "official_material": [
+        "https://github.com/330205812/NexusRAG/blob/main/README.md"
+      ],
+      "repository_url": "https://github.com/330205812/NexusRAG",
+      "notes": "知识库、全文/语义/混合检索、分段管理、嵌入与重排 API 有 README 支持；本次人工补充 Neo4j/MinerU 在组件表中 Pending merge 的条件；MIT 全文模板核验通过。"
+    },
+    {
+      "leaf": "golf-course-management",
+      "repo": "4jwilliams25/golf-course-management-app",
+      "result": "passed_with_existing_labels",
+      "official_material": [],
+      "repository_url": "https://github.com/4jwilliams25/golf-course-management-app",
+      "notes": "仅有仓库公开存在的元数据，卡片仍为介绍待补充、类型待确认、许可证待核验，无凭名称编造功能或场景关联。"
+    }
+  ]
+}

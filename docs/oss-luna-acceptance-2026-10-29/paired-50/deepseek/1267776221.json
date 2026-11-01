@@ -1,0 +1,59 @@
+{
+ "repository_id": 1267776221,
+ "domain": "09",
+ "input_sha256": "9428655f4771c7c07b7532b99a938aaa94bb6a740454ef29490a5f85db0ce25f",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:28.101343+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-df05291f03c0-ae7b0",
+ "usage": {
+  "prompt_tokens": 4158,
+  "completion_tokens": 197,
+  "total_tokens": 4355,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00066664,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00066664,
+   "tokens": {
+    "input": 3646,
+    "output": 197,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1267776221,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片将仓库定位为 API Evangelist 维护的第三方 Lattice API 资料档案，与 README 和元数据一致；功能、定价限流、非官方定位均有来源支持。唯一场景为员工敬业度调查，卡片标为 conditional 并说明仓库仅为资料档案，判断合理。许可状态 pending 与元数据 license=null 一致，未过度声明。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"仅提供 README 与 GitHub 元数据，未核验 plans/rate-limits/finops 等被引用文件的实际内容\",\"许可全文未比对，license 状态保持 pending 属保守处理\",\"场景匹配仅一条，且为条件性适用，未覆盖其他潜在场景\"]}",
+ "review": {
+  "repository_id": 1267776221,
+  "verdict": "pass_with_limits",
+  "summary": "卡片将仓库定位为 API Evangelist 维护的第三方 Lattice API 资料档案，与 README 和元数据一致；功能、定价限流、非官方定位均有来源支持。唯一场景为员工敬业度调查，卡片标为 conditional 并说明仓库仅为资料档案，判断合理。许可状态 pending 与元数据 license=null 一致，未过度声明。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "仅提供 README 与 GitHub 元数据，未核验 plans/rate-limits/finops 等被引用文件的实际内容",
+   "许可全文未比对，license 状态保持 pending 属保守处理",
+   "场景匹配仅一条，且为条件性适用，未覆盖其他潜在场景"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:11:34.012255+00:00",
+ "elapsed_seconds": 5.911
+}

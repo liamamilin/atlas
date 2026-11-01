@@ -1,0 +1,93 @@
+{
+  "method": "助手逐项对照官方 README、仓库内文档与卡片；未执行部署或功能测试",
+  "sample_count": 9,
+  "reviews": [
+    {
+      "leaf": "bookmark-manager",
+      "repo": "ahmadfarhan1981/linkstash",
+      "source_urls": [
+        "https://github.com/ahmadfarhan1981/linkstash/blob/develop/README.md",
+        "https://github.com/ahmadfarhan1981/linkstash/blob/develop/apps/linkstash-website/docs/user-guide/adding_bookmarks.md",
+        "https://github.com/ahmadfarhan1981/linkstash/blob/develop/apps/linkstash-website/docs/user-guide/archiving.md"
+      ],
+      "result": "passed_with_existing_labels",
+      "review": "README 的自托管、离线与 REST API，官方添加书签文档的标签和 Bookmarklet 与卡片一致；全文搜索没有被冒称为已确认。"
+    },
+    {
+      "leaf": "bookmark-manager",
+      "repo": "go-shiori/shiori",
+      "source_urls": [
+        "https://github.com/go-shiori/shiori/blob/master/README.md",
+        "https://github.com/go-shiori/shiori/blob/master/docs/Usage.md"
+      ],
+      "result": "passed_with_existing_labels",
+      "review": "README 与 Usage 支持 CLI/Web、增删改查、标签搜索；BETA 扩展及未说明重复合并均写入适用条件。"
+    },
+    {
+      "leaf": "bookmark-manager",
+      "repo": "linkwarden/linkwarden",
+      "source_urls": [
+        "https://github.com/linkwarden/linkwarden/blob/main/README.md"
+      ],
+      "result": "passed_with_existing_labels",
+      "review": "README 支持截图/PDF、全文搜索、协作及移动客户端；许可仍待核验，没有因公开仓库而标成已核验开源。"
+    },
+    {
+      "leaf": "calendar-application",
+      "repo": "gpbl/react-day-picker",
+      "source_urls": [
+        "https://github.com/gpbl/react-day-picker/blob/main/README.md"
+      ],
+      "result": "passed_with_existing_labels",
+      "review": "README 是 React 日期选择组件；标为库/SDK，日程存储、周视图等宿主责任明确列为条件。"
+    },
+    {
+      "leaf": "calendar-application",
+      "repo": "lukevella/rallly",
+      "source_urls": [
+        "https://github.com/lukevella/rallly/blob/main/README.md"
+      ],
+      "result": "passed_with_existing_labels",
+      "review": "README 描述投票、可用性网格与自托管；关联会议安排时保留投票协调与完整日历功能的边界。"
+    },
+    {
+      "leaf": "calendar-application",
+      "repo": "pimutils/khal",
+      "source_urls": [
+        "https://github.com/pimutils/khal/blob/master/README.rst",
+        "https://github.com/pimutils/khal/blob/master/doc/source/usage.rst"
+      ],
+      "result": "passed_with_existing_labels",
+      "review": "README 描述终端、vdir/CalDAV 和事件编辑；卡片保留终端前提及暂不支持编辑时区的限制。"
+    },
+    {
+      "leaf": "expense-tracking-application",
+      "repo": "amrit-dash/Money-Matters",
+      "source_urls": [
+        "https://github.com/amrit-dash/Money-Matters/blob/main/README.md",
+        "https://github.com/amrit-dash/Money-Matters/blob/main/docs/FIREBASE-BUNDLE-ID.md",
+        "https://github.com/amrit-dash/Money-Matters/blob/main/docs/FIRESTORE-DATA-MODEL.md"
+      ],
+      "result": "passed_with_existing_labels",
+      "review": "README 明确 iOS 快捷指令、印度短信、自建 Firebase、周/月统计；卡片保留平台和地域模板条件。"
+    },
+    {
+      "leaf": "expense-tracking-application",
+      "repo": "floranguyen0/mmas-money-tracker",
+      "source_urls": [
+        "https://github.com/floranguyen0/mmas-money-tracker/blob/main/README.md"
+      ],
+      "result": "passed_with_existing_labels",
+      "review": "README 仅概括日常支出/财务管理；录入分类、月度汇总和预算能力均标为待核实，没有当成直接依据。"
+    },
+    {
+      "leaf": "expense-tracking-application",
+      "repo": "simplyvinay/vue-expenses",
+      "source_urls": [
+        "https://github.com/simplyvinay/vue-expenses/blob/master/README.md"
+      ],
+      "result": "passed_with_existing_labels",
+      "review": "README 的支出/统计页面、JWT、SQLite 与技术信息一致；未说明的逐笔分类与月度统计细节标为待核实。"
+    }
+  ]
+}

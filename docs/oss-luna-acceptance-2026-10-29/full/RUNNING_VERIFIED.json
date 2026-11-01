@@ -1,0 +1,100 @@
+{
+ "at": "2026-10-29T05:45:47.768457+00:00",
+ "audit_id": "atlas-semantic-55651-2026-10-29",
+ "pid": 63958,
+ "command_verified": true,
+ "exclusive_audit_lock_in_use": true,
+ "state_pid_matches": true,
+ "primary_done": 151,
+ "real_new_receipts": 65,
+ "new_request_states": [
+  {
+   "stage": "primary",
+   "provider": "openai",
+   "state": "reserved",
+   "error_code": null,
+   "n": 1
+  },
+  {
+   "stage": "primary",
+   "provider": "openai",
+   "state": "settled",
+   "error_code": null,
+   "n": 51
+  },
+  {
+   "stage": "secondary",
+   "provider": "opencode-go",
+   "state": "settled",
+   "error_code": null,
+   "n": 14
+  }
+ ],
+ "outcomes": {
+  "cross_review_dismissed": 8,
+  "cross_review_issue_candidate": 6,
+  "doubt_queued": 32,
+  "legacy_independent_cross_review": 28,
+  "pass": 1,
+  "pass_with_limits": 76,
+  "pending": 55500
+ },
+ "progress_snapshot": {
+  "audit_id": "atlas-semantic-55651-2026-10-29",
+  "at": "2026-10-29T05:45:42.508024+00:00",
+  "pid": 63958,
+  "status": "running",
+  "phase": "primary",
+  "reason": null,
+  "next_retry_at": null,
+  "started_at": "2026-10-29T05:44:22.206588+00:00",
+  "projects": 55651,
+  "primary": {
+   "done": 147,
+   "inflight": 4,
+   "pending": 55500
+  },
+  "secondary": {
+   "done": 42,
+   "none": 55579,
+   "pending": 30
+  },
+  "outcomes": {
+   "cross_review_dismissed": 8,
+   "cross_review_issue_candidate": 6,
+   "doubt_queued": 30,
+   "legacy_independent_cross_review": 28,
+   "pass": 1,
+   "pass_with_limits": 74,
+   "pending": 55504
+  },
+  "new_requests": {
+   "openai": 51,
+   "opencode-go": 14
+  },
+  "request_errors": {
+   "historical_402_no_usage": 1
+  },
+  "budget": {
+   "cap_usd": 50,
+   "estimated_cost_usd": 0.148023,
+   "charged_upper_usd": 0.231802,
+   "inflight_or_uncertain_reserved_usd": 0.034068,
+   "available_usd": 49.73413,
+   "historical_pilots_included": true
+  },
+  "production_writes": false,
+  "api_restarted": false,
+  "source_collection_started": false
+ },
+ "monitor": {
+  "automation_id": "atlas-55651",
+  "kind": "heartbeat",
+  "status": "ACTIVE",
+  "interval_minutes": 15,
+  "at": "2026-10-29T05:45:47.767772+00:00",
+  "scope": "atlas-semantic-55651-2026-10-29",
+  "healthy_progress_silent": true,
+  "deleted_or_paused_old_automations_restored": false
+ }
+}

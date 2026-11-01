@@ -1,0 +1,1023 @@
+{
+  "config": {
+    "argv": [
+      "/Users/milin/.nvm/versions/node/v22.21.1/bin/node",
+      "/Users/milin/2026/软件开发/application-atlas/atlas-web/node_modules/.bin/playwright",
+      "test",
+      "--config",
+      "playwright.live.config.ts"
+    ],
+    "configFile": "/Users/milin/2026/软件开发/application-atlas/atlas-web/playwright.live.config.ts",
+    "rootDir": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile",
+        "name": "mobile",
+        "testDir": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../docs/product-polish-2026-10-23/live-validation/BROWSER_RESULTS.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "main.spec.ts",
+      "file": "main.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "home uses the real lightweight coverage overview",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 477,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m950\u001b[39m\nReceived: \u001b[31m953\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m950\u001b[39m\nReceived: \u001b[31m953\u001b[39m\n    at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts:33:35",
+                    "location": {
+                      "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                      "column": 35,
+                      "line": 33
+                    },
+                    "snippet": "  31 |   const overview = await (await request.get(\"/api/oss/catalog?view=overview\")).json();\n  32 |   expect(overview.projects).toEqual([]);\n> 33 |   expect(overview.stats.projects).toBe(950);\n     |                                   ^\n  34 |   const response = page.waitForResponse(r => r.url().includes(\"/api/oss/catalog?\") && new URL(r.url()).searchParams.get(\"view\") === \"overview\");\n  35 |   await page.goto(\"/\");\n  36 |   expect((await (await response).json()).projects).toEqual([]);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                        "column": 35,
+                        "line": 33
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m950\u001b[39m\nReceived: \u001b[31m953\u001b[39m\n\n  31 |   const overview = await (await request.get(\"/api/oss/catalog?view=overview\")).json();\n  32 |   expect(overview.projects).toEqual([]);\n> 33 |   expect(overview.stats.projects).toBe(950);\n     |                                   ^\n  34 |   const response = page.waitForResponse(r => r.url().includes(\"/api/oss/catalog?\") && new URL(r.url()).searchParams.get(\"view\") === \"overview\");\n  35 |   await page.goto(\"/\");\n  36 |   expect((await (await response).json()).projects).toEqual([]);\n    at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts:33:35"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:18:24.496Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-home-uses-the-real-lightweight-coverage-overview-desktop/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-home-uses-the-real-lightweight-coverage-overview-desktop/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-home-uses-the-real-lightweight-coverage-overview-desktop/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                    "column": 35,
+                    "line": 33
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-549b8e8f6103e5d9a9ad",
+          "file": "main.spec.ts",
+          "line": 30,
+          "column": 1
+        },
+        {
+          "title": "taxonomy filters and opens a real type with a readable canonical source",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2093,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:18:26.656Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-d4a4212bac73b7517a3a",
+          "file": "main.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "real repository pagination stays bounded and survives reload",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 795,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m950\u001b[39m\nReceived: \u001b[31m953\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m950\u001b[39m\nReceived: \u001b[31m953\u001b[39m\n    at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts:59:34",
+                    "location": {
+                      "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                      "column": 34,
+                      "line": 59
+                    },
+                    "snippet": "  57 |   const first = await (await request.get(\"/api/oss/catalog?limit=24&offset=0\")).json();\n  58 |   const second = await (await request.get(\"/api/oss/catalog?limit=24&offset=24\")).json();\n> 59 |   expect(first.pagination.total).toBe(950);\n     |                                  ^\n  60 |   expect(second.projects).toHaveLength(24);\n  61 |   expect(first.projects.some((p: { repository_id: number }) => second.projects.some((q: { repository_id: number }) => p.repository_id === q.repository_id))).toBe(false);\n  62 |   await page.goto(\"/discover\");"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                        "column": 34,
+                        "line": 59
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m950\u001b[39m\nReceived: \u001b[31m953\u001b[39m\n\n  57 |   const first = await (await request.get(\"/api/oss/catalog?limit=24&offset=0\")).json();\n  58 |   const second = await (await request.get(\"/api/oss/catalog?limit=24&offset=24\")).json();\n> 59 |   expect(first.pagination.total).toBe(950);\n     |                                  ^\n  60 |   expect(second.projects).toHaveLength(24);\n  61 |   expect(first.projects.some((p: { repository_id: number }) => second.projects.some((q: { repository_id: number }) => p.repository_id === q.repository_id))).toBe(false);\n  62 |   await page.goto(\"/discover\");\n    at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts:59:34"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:18:28.900Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-real-repository-pagin-9137d-bounded-and-survives-reload-desktop/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-real-repository-pagin-9137d-bounded-and-survives-reload-desktop/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-real-repository-pagin-9137d-bounded-and-survives-reload-desktop/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                    "column": 34,
+                    "line": 59
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-9a04a541b214a15a1f20",
+          "file": "main.spec.ts",
+          "line": 56,
+          "column": 1
+        },
+        {
+          "title": "real project evidence, license and GitHub links expand correctly",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1932,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:18:31.093Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-e6e6bd036eebc3cf9c2a",
+          "file": "main.spec.ts",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "real type, scenario and license filters match API counts",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3194,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:18:33.177Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-da2e8dd8b520f17c4163",
+          "file": "main.spec.ts",
+          "line": 84,
+          "column": 1
+        },
+        {
+          "title": "favorites opens the existing personal state without changing it",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1106,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:18:36.396Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-fc7d18e90b055c8edde7",
+          "file": "main.spec.ts",
+          "line": 100,
+          "column": 1
+        },
+        {
+          "title": "search finds a real repository and taxonomy aliases",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2878,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:18:37.509Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-9234e438647de894656b",
+          "file": "main.spec.ts",
+          "line": 109,
+          "column": 1
+        },
+        {
+          "title": "paused collection progress and current type data remain available",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 11970,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('region', { name: '批量采集', exact: true }).getByRole('status')\nExpected substring: \u001b[32m\"136/395\"\u001b[39m\nReceived string:    \u001b[31m\"批量采集中 · 144/395Instant Messaging Application、Web Browser、Document Editor、Graphic Design Application、E-commerce Platform、Advertising Campaign Management、Lead Management Platform、Digital Banking Application、Applicant Tracking System / ATS、Professional Services Automation / PSA、Law Practice Management System、Code Editor、Vector Database Console、Cloud Management Platform、Identity & Access Management / IAM、Mechanical CAD、Site Selection Platform、Fleet Management System、Power Plant Management、Crop Management、Environmental Management System、Electronic Health Record / EHR、Student Information System / SIS、Government Digital Identity、Nonprofit Management Platform、Event Management Platform、Creator Media Kit Builder、Sports Facility Management、Painting Contractor Management、Group Messaging Application、Privacy-focused Browser、Collaborative Document Editor、Template-based Design Platform、Online Store Builder、Media Buying Platform、Sales Prospecting Platform、Mobile Banking Application、Recruiting Management Platform、Enterprise Request Management、Legal Matter Management、Integrated Development Environment / IDE、Search Platform、Infrastructure-as-Code Platform、Single Sign-on / SSO、Industrial Design Application、Property Listing Platform、Vehicle Telematics Platform、Renewable Energy Asset Management、Field Management、EHS / HSE Platform、Patient Scheduling、Higher Education Administration System、Government Licensing Management、Nonprofit CRM、Event Registration Platform、Creator Sponsorship Management、Sports Court Booking、Auto Repair Shop Management、Chat Room Application、Web Archive Viewer、Markdown Editor、Collaborative Design Platform、Headless Commerce Platform、Demand-side Platform / DSP、Contact Discovery Platform、Online Banking Portal、Job Board、Internal Knowledge Search、Legal Intake & Client Onboarding、Cloud IDE、Semantic Search Platform、Virtualization Management、Multi-factor Authentication / MFA、CAE / Engineering Simulation、Property Showing Platform、Driver Management、Solar Asset Management、Agronomy Management、Environmental Compliance Management、CPOE / Clinical Order Management、Admissions Management、Government Inspection Management、Donor Management System、Convention / Exhibition Management、Brand-Creator Marketplace、Golf Course Management、Collision Repair Management、Team Messaging Application、General Web Search Engine、Distraction-free Writing Application、Raster Image Editor、Mobile Commerce Application、Supply-side Platform / SSP、Sales Intelligence Platform、Payment Gateway、Career Site Platform、Intranet Platform、Litigation Management Platform、AI Coding Assistant、Vector Retrieval Platform · 当前：Instant Messaging Application已准备 1/100 个类型；每个类型搜索后固定本次队列，处理完成自动结束。\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('region', { name: '批量采集', exact: true }).getByRole('status') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('region', { name: '批量采集', exact: true }).getByRole('status')\u001b[22m\n\u001b[2m    24 × locator resolved to <div role=\"status\" class=\"mt-3 text-sm\">…</div>\u001b[22m\n\u001b[2m       - unexpected value \"批量采集中 · 144/395Instant Messaging Application、Web Browser、Document Editor、Graphic Design Application、E-commerce Platform、Advertising Campaign Management、Lead Management Platform、Digital Banking Application、Applicant Tracking System / ATS、Professional Services Automation / PSA、Law Practice Management System、Code Editor、Vector Database Console、Cloud Management Platform、Identity & Access Management / IAM、Mechanical CAD、Site Selection Platform、Fleet Management System、Power Plant Management、Crop Management、Environmental Management System、Electronic Health Record / EHR、Student Information System / SIS、Government Digital Identity、Nonprofit Management Platform、Event Management Platform、Creator Media Kit Builder、Sports Facility Management、Painting Contractor Management、Group Messaging Application、Privacy-focused Browser、Collaborative Document Editor、Template-based Design Platform、Online Store Builder、Media Buying Platform、Sales Prospecting Platform、Mobile Banking Application、Recruiting Management Platform、Enterprise Request Management、Legal Matter Management、Integrated Development Environment / IDE、Search Platform、Infrastructure-as-Code Platform、Single Sign-on / SSO、Industrial Design Application、Property Listing Platform、Vehicle Telematics Platform、Renewable Energy Asset Management、Field Management、EHS / HSE Platform、Patient Scheduling、Higher Education Administration System、Government Licensing Management、Nonprofit CRM、Event Registration Platform、Creator Sponsorship Management、Sports Court Booking、Auto Repair Shop Management、Chat Room Application、Web Archive Viewer、Markdown Editor、Collaborative Design Platform、Headless Commerce Platform、Demand-side Platform / DSP、Contact Discovery Platform、Online Banking Portal、Job Board、Internal Knowledge Search、Legal Intake & Client Onboarding、Cloud IDE、Semantic Search Platform、Virtualization Management、Multi-factor Authentication / MFA、CAE / Engineering Simulation、Property Showing Platform、Driver Management、Solar Asset Management、Agronomy Management、Environmental Compliance Management、CPOE / Clinical Order Management、Admissions Management、Government Inspection Management、Donor Management System、Convention / Exhibition Management、Brand-Creator Marketplace、Golf Course Management、Collision Repair Management、Team Messaging Application、General Web Search Engine、Distraction-free Writing Application、Raster Image Editor、Mobile Commerce Application、Supply-side Platform / SSP、Sales Intelligence Platform、Payment Gateway、Career Site Platform、Intranet Platform、Litigation Management Platform、AI Coding Assistant、Vector Retrieval Platform · 当前：Instant Messaging Application已准备 1/100 个类型；每个类型搜索后固定本次队列，处理完成自动结束。\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('region', { name: '批量采集', exact: true }).getByRole('status')\nExpected substring: \u001b[32m\"136/395\"\u001b[39m\nReceived string:    \u001b[31m\"批量采集中 · 144/395Instant Messaging Application、Web Browser、Document Editor、Graphic Design Application、E-commerce Platform、Advertising Campaign Management、Lead Management Platform、Digital Banking Application、Applicant Tracking System / ATS、Professional Services Automation / PSA、Law Practice Management System、Code Editor、Vector Database Console、Cloud Management Platform、Identity & Access Management / IAM、Mechanical CAD、Site Selection Platform、Fleet Management System、Power Plant Management、Crop Management、Environmental Management System、Electronic Health Record / EHR、Student Information System / SIS、Government Digital Identity、Nonprofit Management Platform、Event Management Platform、Creator Media Kit Builder、Sports Facility Management、Painting Contractor Management、Group Messaging Application、Privacy-focused Browser、Collaborative Document Editor、Template-based Design Platform、Online Store Builder、Media Buying Platform、Sales Prospecting Platform、Mobile Banking Application、Recruiting Management Platform、Enterprise Request Management、Legal Matter Management、Integrated Development Environment / IDE、Search Platform、Infrastructure-as-Code Platform、Single Sign-on / SSO、Industrial Design Application、Property Listing Platform、Vehicle Telematics Platform、Renewable Energy Asset Management、Field Management、EHS / HSE Platform、Patient Scheduling、Higher Education Administration System、Government Licensing Management、Nonprofit CRM、Event Registration Platform、Creator Sponsorship Management、Sports Court Booking、Auto Repair Shop Management、Chat Room Application、Web Archive Viewer、Markdown Editor、Collaborative Design Platform、Headless Commerce Platform、Demand-side Platform / DSP、Contact Discovery Platform、Online Banking Portal、Job Board、Internal Knowledge Search、Legal Intake & Client Onboarding、Cloud IDE、Semantic Search Platform、Virtualization Management、Multi-factor Authentication / MFA、CAE / Engineering Simulation、Property Showing Platform、Driver Management、Solar Asset Management、Agronomy Management、Environmental Compliance Management、CPOE / Clinical Order Management、Admissions Management、Government Inspection Management、Donor Management System、Convention / Exhibition Management、Brand-Creator Marketplace、Golf Course Management、Collision Repair Management、Team Messaging Application、General Web Search Engine、Distraction-free Writing Application、Raster Image Editor、Mobile Commerce Application、Supply-side Platform / SSP、Sales Intelligence Platform、Payment Gateway、Career Site Platform、Intranet Platform、Litigation Management Platform、AI Coding Assistant、Vector Retrieval Platform · 当前：Instant Messaging Application已准备 1/100 个类型；每个类型搜索后固定本次队列，处理完成自动结束。\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('region', { name: '批量采集', exact: true }).getByRole('status') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('region', { name: '批量采集', exact: true }).getByRole('status')\u001b[22m\n\u001b[2m    24 × locator resolved to <div role=\"status\" class=\"mt-3 text-sm\">…</div>\u001b[22m\n\u001b[2m       - unexpected value \"批量采集中 · 144/395Instant Messaging Application、Web Browser、Document Editor、Graphic Design Application、E-commerce Platform、Advertising Campaign Management、Lead Management Platform、Digital Banking Application、Applicant Tracking System / ATS、Professional Services Automation / PSA、Law Practice Management System、Code Editor、Vector Database Console、Cloud Management Platform、Identity & Access Management / IAM、Mechanical CAD、Site Selection Platform、Fleet Management System、Power Plant Management、Crop Management、Environmental Management System、Electronic Health Record / EHR、Student Information System / SIS、Government Digital Identity、Nonprofit Management Platform、Event Management Platform、Creator Media Kit Builder、Sports Facility Management、Painting Contractor Management、Group Messaging Application、Privacy-focused Browser、Collaborative Document Editor、Template-based Design Platform、Online Store Builder、Media Buying Platform、Sales Prospecting Platform、Mobile Banking Application、Recruiting Management Platform、Enterprise Request Management、Legal Matter Management、Integrated Development Environment / IDE、Search Platform、Infrastructure-as-Code Platform、Single Sign-on / SSO、Industrial Design Application、Property Listing Platform、Vehicle Telematics Platform、Renewable Energy Asset Management、Field Management、EHS / HSE Platform、Patient Scheduling、Higher Education Administration System、Government Licensing Management、Nonprofit CRM、Event Registration Platform、Creator Sponsorship Management、Sports Court Booking、Auto Repair Shop Management、Chat Room Application、Web Archive Viewer、Markdown Editor、Collaborative Design Platform、Headless Commerce Platform、Demand-side Platform / DSP、Contact Discovery Platform、Online Banking Portal、Job Board、Internal Knowledge Search、Legal Intake & Client Onboarding、Cloud IDE、Semantic Search Platform、Virtualization Management、Multi-factor Authentication / MFA、CAE / Engineering Simulation、Property Showing Platform、Driver Management、Solar Asset Management、Agronomy Management、Environmental Compliance Management、CPOE / Clinical Order Management、Admissions Management、Government Inspection Management、Donor Management System、Convention / Exhibition Management、Brand-Creator Marketplace、Golf Course Management、Collision Repair Management、Team Messaging Application、General Web Search Engine、Distraction-free Writing Application、Raster Image Editor、Mobile Commerce Application、Supply-side Platform / SSP、Sales Intelligence Platform、Payment Gateway、Career Site Platform、Intranet Platform、Litigation Management Platform、AI Coding Assistant、Vector Retrieval Platform · 当前：Instant Messaging Application已准备 1/100 个类型；每个类型搜索后固定本次队列，处理完成自动结束。\"\u001b[22m\n\n    at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts:124:43",
+                    "location": {
+                      "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                      "column": 43,
+                      "line": 124
+                    },
+                    "snippet": "  122 |   await expect(page.getByRole(\"article\")).toHaveCount(24);\n  123 |   const batch = page.getByRole(\"region\", { name: \"批量采集\", exact: true });\n> 124 |   await expect(batch.getByRole(\"status\")).toContainText(\"136/395\");\n      |                                           ^\n  125 |   await expect(batch.getByRole(\"button\", { name: \"继续批量任务\", exact: true })).toBeVisible();\n  126 |   await expect(batch.getByText(/provider_error/)).toBeVisible();\n  127 |   await screenshot(page, info, \"type-collection\");"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                        "column": 43,
+                        "line": 124
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('region', { name: '批量采集', exact: true }).getByRole('status')\nExpected substring: \u001b[32m\"136/395\"\u001b[39m\nReceived string:    \u001b[31m\"批量采集中 · 144/395Instant Messaging Application、Web Browser、Document Editor、Graphic Design Application、E-commerce Platform、Advertising Campaign Management、Lead Management Platform、Digital Banking Application、Applicant Tracking System / ATS、Professional Services Automation / PSA、Law Practice Management System、Code Editor、Vector Database Console、Cloud Management Platform、Identity & Access Management / IAM、Mechanical CAD、Site Selection Platform、Fleet Management System、Power Plant Management、Crop Management、Environmental Management System、Electronic Health Record / EHR、Student Information System / SIS、Government Digital Identity、Nonprofit Management Platform、Event Management Platform、Creator Media Kit Builder、Sports Facility Management、Painting Contractor Management、Group Messaging Application、Privacy-focused Browser、Collaborative Document Editor、Template-based Design Platform、Online Store Builder、Media Buying Platform、Sales Prospecting Platform、Mobile Banking Application、Recruiting Management Platform、Enterprise Request Management、Legal Matter Management、Integrated Development Environment / IDE、Search Platform、Infrastructure-as-Code Platform、Single Sign-on / SSO、Industrial Design Application、Property Listing Platform、Vehicle Telematics Platform、Renewable Energy Asset Management、Field Management、EHS / HSE Platform、Patient Scheduling、Higher Education Administration System、Government Licensing Management、Nonprofit CRM、Event Registration Platform、Creator Sponsorship Management、Sports Court Booking、Auto Repair Shop Management、Chat Room Application、Web Archive Viewer、Markdown Editor、Collaborative Design Platform、Headless Commerce Platform、Demand-side Platform / DSP、Contact Discovery Platform、Online Banking Portal、Job Board、Internal Knowledge Search、Legal Intake & Client Onboarding、Cloud IDE、Semantic Search Platform、Virtualization Management、Multi-factor Authentication / MFA、CAE / Engineering Simulation、Property Showing Platform、Driver Management、Solar Asset Management、Agronomy Management、Environmental Compliance Management、CPOE / Clinical Order Management、Admissions Management、Government Inspection Management、Donor Management System、Convention / Exhibition Management、Brand-Creator Marketplace、Golf Course Management、Collision Repair Management、Team Messaging Application、General Web Search Engine、Distraction-free Writing Application、Raster Image Editor、Mobile Commerce Application、Supply-side Platform / SSP、Sales Intelligence Platform、Payment Gateway、Career Site Platform、Intranet Platform、Litigation Management Platform、AI Coding Assistant、Vector Retrieval Platform · 当前：Instant Messaging Application已准备 1/100 个类型；每个类型搜索后固定本次队列，处理完成自动结束。\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('region', { name: '批量采集', exact: true }).getByRole('status') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('region', { name: '批量采集', exact: true }).getByRole('status')\u001b[22m\n\u001b[2m    24 × locator resolved to <div role=\"status\" class=\"mt-3 text-sm\">…</div>\u001b[22m\n\u001b[2m       - unexpected value \"批量采集中 · 144/395Instant Messaging Application、Web Browser、Document Editor、Graphic Design Application、E-commerce Platform、Advertising Campaign Management、Lead Management Platform、Digital Banking Application、Applicant Tracking System / ATS、Professional Services Automation / PSA、Law Practice Management System、Code Editor、Vector Database Console、Cloud Management Platform、Identity & Access Management / IAM、Mechanical CAD、Site Selection Platform、Fleet Management System、Power Plant Management、Crop Management、Environmental Management System、Electronic Health Record / EHR、Student Information System / SIS、Government Digital Identity、Nonprofit Management Platform、Event Management Platform、Creator Media Kit Builder、Sports Facility Management、Painting Contractor Management、Group Messaging Application、Privacy-focused Browser、Collaborative Document Editor、Template-based Design Platform、Online Store Builder、Media Buying Platform、Sales Prospecting Platform、Mobile Banking Application、Recruiting Management Platform、Enterprise Request Management、Legal Matter Management、Integrated Development Environment / IDE、Search Platform、Infrastructure-as-Code Platform、Single Sign-on / SSO、Industrial Design Application、Property Listing Platform、Vehicle Telematics Platform、Renewable Energy Asset Management、Field Management、EHS / HSE Platform、Patient Scheduling、Higher Education Administration System、Government Licensing Management、Nonprofit CRM、Event Registration Platform、Creator Sponsorship Management、Sports Court Booking、Auto Repair Shop Management、Chat Room Application、Web Archive Viewer、Markdown Editor、Collaborative Design Platform、Headless Commerce Platform、Demand-side Platform / DSP、Contact Discovery Platform、Online Banking Portal、Job Board、Internal Knowledge Search、Legal Intake & Client Onboarding、Cloud IDE、Semantic Search Platform、Virtualization Management、Multi-factor Authentication / MFA、CAE / Engineering Simulation、Property Showing Platform、Driver Management、Solar Asset Management、Agronomy Management、Environmental Compliance Management、CPOE / Clinical Order Management、Admissions Management、Government Inspection Management、Donor Management System、Convention / Exhibition Management、Brand-Creator Marketplace、Golf Course Management、Collision Repair Management、Team Messaging Application、General Web Search Engine、Distraction-free Writing Application、Raster Image Editor、Mobile Commerce Application、Supply-side Platform / SSP、Sales Intelligence Platform、Payment Gateway、Career Site Platform、Intranet Platform、Litigation Management Platform、AI Coding Assistant、Vector Retrieval Platform · 当前：Instant Messaging Application已准备 1/100 个类型；每个类型搜索后固定本次队列，处理完成自动结束。\"\u001b[22m\n\n\n  122 |   await expect(page.getByRole(\"article\")).toHaveCount(24);\n  123 |   const batch = page.getByRole(\"region\", { name: \"批量采集\", exact: true });\n> 124 |   await expect(batch.getByRole(\"status\")).toContainText(\"136/395\");\n      |                                           ^\n  125 |   await expect(batch.getByRole(\"button\", { name: \"继续批量任务\", exact: true })).toBeVisible();\n  126 |   await expect(batch.getByText(/provider_error/)).toBeVisible();\n  127 |   await screenshot(page, info, \"type-collection\");\n    at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts:124:43"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:18:40.394Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-paused-collection-pro-d8df1--type-data-remain-available-desktop/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-paused-collection-pro-d8df1--type-data-remain-available-desktop/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-paused-collection-pro-d8df1--type-data-remain-available-desktop/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                    "column": 43,
+                    "line": 124
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-27b1ed080ef3f565d103",
+          "file": "main.spec.ts",
+          "line": 119,
+          "column": 1
+        },
+        {
+          "title": "settings renders real provider and GitHub status without submitting credentials",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 688,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:18:53.011Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-37e7e6036e398330ea0c",
+          "file": "main.spec.ts",
+          "line": 130,
+          "column": 1
+        },
+        {
+          "title": "guide and historical entries remain navigable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1446,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:18:53.801Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-3536c7a95969b1a47c6b",
+          "file": "main.spec.ts",
+          "line": 138,
+          "column": 1
+        },
+        {
+          "title": "home uses the real lightweight coverage overview",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 371,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m950\u001b[39m\nReceived: \u001b[31m953\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m950\u001b[39m\nReceived: \u001b[31m953\u001b[39m\n    at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts:33:35",
+                    "location": {
+                      "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                      "column": 35,
+                      "line": 33
+                    },
+                    "snippet": "  31 |   const overview = await (await request.get(\"/api/oss/catalog?view=overview\")).json();\n  32 |   expect(overview.projects).toEqual([]);\n> 33 |   expect(overview.stats.projects).toBe(950);\n     |                                   ^\n  34 |   const response = page.waitForResponse(r => r.url().includes(\"/api/oss/catalog?\") && new URL(r.url()).searchParams.get(\"view\") === \"overview\");\n  35 |   await page.goto(\"/\");\n  36 |   expect((await (await response).json()).projects).toEqual([]);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                        "column": 35,
+                        "line": 33
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m950\u001b[39m\nReceived: \u001b[31m953\u001b[39m\n\n  31 |   const overview = await (await request.get(\"/api/oss/catalog?view=overview\")).json();\n  32 |   expect(overview.projects).toEqual([]);\n> 33 |   expect(overview.stats.projects).toBe(950);\n     |                                   ^\n  34 |   const response = page.waitForResponse(r => r.url().includes(\"/api/oss/catalog?\") && new URL(r.url()).searchParams.get(\"view\") === \"overview\");\n  35 |   await page.goto(\"/\");\n  36 |   expect((await (await response).json()).projects).toEqual([]);\n    at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts:33:35"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:18:55.589Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-home-uses-the-real-lightweight-coverage-overview-mobile/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-home-uses-the-real-lightweight-coverage-overview-mobile/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-home-uses-the-real-lightweight-coverage-overview-mobile/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                    "column": 35,
+                    "line": 33
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-d005b6aea5f255b575d1",
+          "file": "main.spec.ts",
+          "line": 30,
+          "column": 1
+        },
+        {
+          "title": "taxonomy filters and opens a real type with a readable canonical source",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2062,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:18:56.441Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-7547bb581a522e06cd0e",
+          "file": "main.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "real repository pagination stays bounded and survives reload",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 1470,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m950\u001b[39m\nReceived: \u001b[31m953\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m950\u001b[39m\nReceived: \u001b[31m953\u001b[39m\n    at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts:59:34",
+                    "location": {
+                      "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                      "column": 34,
+                      "line": 59
+                    },
+                    "snippet": "  57 |   const first = await (await request.get(\"/api/oss/catalog?limit=24&offset=0\")).json();\n  58 |   const second = await (await request.get(\"/api/oss/catalog?limit=24&offset=24\")).json();\n> 59 |   expect(first.pagination.total).toBe(950);\n     |                                  ^\n  60 |   expect(second.projects).toHaveLength(24);\n  61 |   expect(first.projects.some((p: { repository_id: number }) => second.projects.some((q: { repository_id: number }) => p.repository_id === q.repository_id))).toBe(false);\n  62 |   await page.goto(\"/discover\");"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                        "column": 34,
+                        "line": 59
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m950\u001b[39m\nReceived: \u001b[31m953\u001b[39m\n\n  57 |   const first = await (await request.get(\"/api/oss/catalog?limit=24&offset=0\")).json();\n  58 |   const second = await (await request.get(\"/api/oss/catalog?limit=24&offset=24\")).json();\n> 59 |   expect(first.pagination.total).toBe(950);\n     |                                  ^\n  60 |   expect(second.projects).toHaveLength(24);\n  61 |   expect(first.projects.some((p: { repository_id: number }) => second.projects.some((q: { repository_id: number }) => p.repository_id === q.repository_id))).toBe(false);\n  62 |   await page.goto(\"/discover\");\n    at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts:59:34"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:18:58.587Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-real-repository-pagin-9137d-bounded-and-survives-reload-mobile/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-real-repository-pagin-9137d-bounded-and-survives-reload-mobile/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-real-repository-pagin-9137d-bounded-and-survives-reload-mobile/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                    "column": 34,
+                    "line": 59
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-113d14fcd3e94ad9782e",
+          "file": "main.spec.ts",
+          "line": 56,
+          "column": 1
+        },
+        {
+          "title": "real project evidence, license and GitHub links expand correctly",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1362,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:19:00.369Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-9e783a074be98568b439",
+          "file": "main.spec.ts",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "real type, scenario and license filters match API counts",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3467,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:19:01.826Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-7e7765899f5ee25c1d28",
+          "file": "main.spec.ts",
+          "line": 84,
+          "column": 1
+        },
+        {
+          "title": "favorites opens the existing personal state without changing it",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 610,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:19:05.297Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-c4cd01b5bc335e80ae62",
+          "file": "main.spec.ts",
+          "line": 100,
+          "column": 1
+        },
+        {
+          "title": "search finds a real repository and taxonomy aliases",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2390,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:19:05.911Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-55beb9103ef387a7758a",
+          "file": "main.spec.ts",
+          "line": 109,
+          "column": 1
+        },
+        {
+          "title": "paused collection progress and current type data remain available",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 11110,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('region', { name: '批量采集', exact: true }).getByRole('status')\nExpected substring: \u001b[32m\"136/395\"\u001b[39m\nReceived string:    \u001b[31m\"批量采集中 · 148/395Instant Messaging Application、Web Browser、Document Editor、Graphic Design Application、E-commerce Platform、Advertising Campaign Management、Lead Management Platform、Digital Banking Application、Applicant Tracking System / ATS、Professional Services Automation / PSA、Law Practice Management System、Code Editor、Vector Database Console、Cloud Management Platform、Identity & Access Management / IAM、Mechanical CAD、Site Selection Platform、Fleet Management System、Power Plant Management、Crop Management、Environmental Management System、Electronic Health Record / EHR、Student Information System / SIS、Government Digital Identity、Nonprofit Management Platform、Event Management Platform、Creator Media Kit Builder、Sports Facility Management、Painting Contractor Management、Group Messaging Application、Privacy-focused Browser、Collaborative Document Editor、Template-based Design Platform、Online Store Builder、Media Buying Platform、Sales Prospecting Platform、Mobile Banking Application、Recruiting Management Platform、Enterprise Request Management、Legal Matter Management、Integrated Development Environment / IDE、Search Platform、Infrastructure-as-Code Platform、Single Sign-on / SSO、Industrial Design Application、Property Listing Platform、Vehicle Telematics Platform、Renewable Energy Asset Management、Field Management、EHS / HSE Platform、Patient Scheduling、Higher Education Administration System、Government Licensing Management、Nonprofit CRM、Event Registration Platform、Creator Sponsorship Management、Sports Court Booking、Auto Repair Shop Management、Chat Room Application、Web Archive Viewer、Markdown Editor、Collaborative Design Platform、Headless Commerce Platform、Demand-side Platform / DSP、Contact Discovery Platform、Online Banking Portal、Job Board、Internal Knowledge Search、Legal Intake & Client Onboarding、Cloud IDE、Semantic Search Platform、Virtualization Management、Multi-factor Authentication / MFA、CAE / Engineering Simulation、Property Showing Platform、Driver Management、Solar Asset Management、Agronomy Management、Environmental Compliance Management、CPOE / Clinical Order Management、Admissions Management、Government Inspection Management、Donor Management System、Convention / Exhibition Management、Brand-Creator Marketplace、Golf Course Management、Collision Repair Management、Team Messaging Application、General Web Search Engine、Distraction-free Writing Application、Raster Image Editor、Mobile Commerce Application、Supply-side Platform / SSP、Sales Intelligence Platform、Payment Gateway、Career Site Platform、Intranet Platform、Litigation Management Platform、AI Coding Assistant、Vector Retrieval Platform · 当前：Instant Messaging Application已准备 1/100 个类型；每个类型搜索后固定本次队列，处理完成自动结束。\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('region', { name: '批量采集', exact: true }).getByRole('status') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('region', { name: '批量采集', exact: true }).getByRole('status')\u001b[22m\n\u001b[2m    24 × locator resolved to <div role=\"status\" class=\"mt-3 text-sm\">…</div>\u001b[22m\n\u001b[2m       - unexpected value \"批量采集中 · 148/395Instant Messaging Application、Web Browser、Document Editor、Graphic Design Application、E-commerce Platform、Advertising Campaign Management、Lead Management Platform、Digital Banking Application、Applicant Tracking System / ATS、Professional Services Automation / PSA、Law Practice Management System、Code Editor、Vector Database Console、Cloud Management Platform、Identity & Access Management / IAM、Mechanical CAD、Site Selection Platform、Fleet Management System、Power Plant Management、Crop Management、Environmental Management System、Electronic Health Record / EHR、Student Information System / SIS、Government Digital Identity、Nonprofit Management Platform、Event Management Platform、Creator Media Kit Builder、Sports Facility Management、Painting Contractor Management、Group Messaging Application、Privacy-focused Browser、Collaborative Document Editor、Template-based Design Platform、Online Store Builder、Media Buying Platform、Sales Prospecting Platform、Mobile Banking Application、Recruiting Management Platform、Enterprise Request Management、Legal Matter Management、Integrated Development Environment / IDE、Search Platform、Infrastructure-as-Code Platform、Single Sign-on / SSO、Industrial Design Application、Property Listing Platform、Vehicle Telematics Platform、Renewable Energy Asset Management、Field Management、EHS / HSE Platform、Patient Scheduling、Higher Education Administration System、Government Licensing Management、Nonprofit CRM、Event Registration Platform、Creator Sponsorship Management、Sports Court Booking、Auto Repair Shop Management、Chat Room Application、Web Archive Viewer、Markdown Editor、Collaborative Design Platform、Headless Commerce Platform、Demand-side Platform / DSP、Contact Discovery Platform、Online Banking Portal、Job Board、Internal Knowledge Search、Legal Intake & Client Onboarding、Cloud IDE、Semantic Search Platform、Virtualization Management、Multi-factor Authentication / MFA、CAE / Engineering Simulation、Property Showing Platform、Driver Management、Solar Asset Management、Agronomy Management、Environmental Compliance Management、CPOE / Clinical Order Management、Admissions Management、Government Inspection Management、Donor Management System、Convention / Exhibition Management、Brand-Creator Marketplace、Golf Course Management、Collision Repair Management、Team Messaging Application、General Web Search Engine、Distraction-free Writing Application、Raster Image Editor、Mobile Commerce Application、Supply-side Platform / SSP、Sales Intelligence Platform、Payment Gateway、Career Site Platform、Intranet Platform、Litigation Management Platform、AI Coding Assistant、Vector Retrieval Platform · 当前：Instant Messaging Application已准备 1/100 个类型；每个类型搜索后固定本次队列，处理完成自动结束。\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('region', { name: '批量采集', exact: true }).getByRole('status')\nExpected substring: \u001b[32m\"136/395\"\u001b[39m\nReceived string:    \u001b[31m\"批量采集中 · 148/395Instant Messaging Application、Web Browser、Document Editor、Graphic Design Application、E-commerce Platform、Advertising Campaign Management、Lead Management Platform、Digital Banking Application、Applicant Tracking System / ATS、Professional Services Automation / PSA、Law Practice Management System、Code Editor、Vector Database Console、Cloud Management Platform、Identity & Access Management / IAM、Mechanical CAD、Site Selection Platform、Fleet Management System、Power Plant Management、Crop Management、Environmental Management System、Electronic Health Record / EHR、Student Information System / SIS、Government Digital Identity、Nonprofit Management Platform、Event Management Platform、Creator Media Kit Builder、Sports Facility Management、Painting Contractor Management、Group Messaging Application、Privacy-focused Browser、Collaborative Document Editor、Template-based Design Platform、Online Store Builder、Media Buying Platform、Sales Prospecting Platform、Mobile Banking Application、Recruiting Management Platform、Enterprise Request Management、Legal Matter Management、Integrated Development Environment / IDE、Search Platform、Infrastructure-as-Code Platform、Single Sign-on / SSO、Industrial Design Application、Property Listing Platform、Vehicle Telematics Platform、Renewable Energy Asset Management、Field Management、EHS / HSE Platform、Patient Scheduling、Higher Education Administration System、Government Licensing Management、Nonprofit CRM、Event Registration Platform、Creator Sponsorship Management、Sports Court Booking、Auto Repair Shop Management、Chat Room Application、Web Archive Viewer、Markdown Editor、Collaborative Design Platform、Headless Commerce Platform、Demand-side Platform / DSP、Contact Discovery Platform、Online Banking Portal、Job Board、Internal Knowledge Search、Legal Intake & Client Onboarding、Cloud IDE、Semantic Search Platform、Virtualization Management、Multi-factor Authentication / MFA、CAE / Engineering Simulation、Property Showing Platform、Driver Management、Solar Asset Management、Agronomy Management、Environmental Compliance Management、CPOE / Clinical Order Management、Admissions Management、Government Inspection Management、Donor Management System、Convention / Exhibition Management、Brand-Creator Marketplace、Golf Course Management、Collision Repair Management、Team Messaging Application、General Web Search Engine、Distraction-free Writing Application、Raster Image Editor、Mobile Commerce Application、Supply-side Platform / SSP、Sales Intelligence Platform、Payment Gateway、Career Site Platform、Intranet Platform、Litigation Management Platform、AI Coding Assistant、Vector Retrieval Platform · 当前：Instant Messaging Application已准备 1/100 个类型；每个类型搜索后固定本次队列，处理完成自动结束。\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('region', { name: '批量采集', exact: true }).getByRole('status') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('region', { name: '批量采集', exact: true }).getByRole('status')\u001b[22m\n\u001b[2m    24 × locator resolved to <div role=\"status\" class=\"mt-3 text-sm\">…</div>\u001b[22m\n\u001b[2m       - unexpected value \"批量采集中 · 148/395Instant Messaging Application、Web Browser、Document Editor、Graphic Design Application、E-commerce Platform、Advertising Campaign Management、Lead Management Platform、Digital Banking Application、Applicant Tracking System / ATS、Professional Services Automation / PSA、Law Practice Management System、Code Editor、Vector Database Console、Cloud Management Platform、Identity & Access Management / IAM、Mechanical CAD、Site Selection Platform、Fleet Management System、Power Plant Management、Crop Management、Environmental Management System、Electronic Health Record / EHR、Student Information System / SIS、Government Digital Identity、Nonprofit Management Platform、Event Management Platform、Creator Media Kit Builder、Sports Facility Management、Painting Contractor Management、Group Messaging Application、Privacy-focused Browser、Collaborative Document Editor、Template-based Design Platform、Online Store Builder、Media Buying Platform、Sales Prospecting Platform、Mobile Banking Application、Recruiting Management Platform、Enterprise Request Management、Legal Matter Management、Integrated Development Environment / IDE、Search Platform、Infrastructure-as-Code Platform、Single Sign-on / SSO、Industrial Design Application、Property Listing Platform、Vehicle Telematics Platform、Renewable Energy Asset Management、Field Management、EHS / HSE Platform、Patient Scheduling、Higher Education Administration System、Government Licensing Management、Nonprofit CRM、Event Registration Platform、Creator Sponsorship Management、Sports Court Booking、Auto Repair Shop Management、Chat Room Application、Web Archive Viewer、Markdown Editor、Collaborative Design Platform、Headless Commerce Platform、Demand-side Platform / DSP、Contact Discovery Platform、Online Banking Portal、Job Board、Internal Knowledge Search、Legal Intake & Client Onboarding、Cloud IDE、Semantic Search Platform、Virtualization Management、Multi-factor Authentication / MFA、CAE / Engineering Simulation、Property Showing Platform、Driver Management、Solar Asset Management、Agronomy Management、Environmental Compliance Management、CPOE / Clinical Order Management、Admissions Management、Government Inspection Management、Donor Management System、Convention / Exhibition Management、Brand-Creator Marketplace、Golf Course Management、Collision Repair Management、Team Messaging Application、General Web Search Engine、Distraction-free Writing Application、Raster Image Editor、Mobile Commerce Application、Supply-side Platform / SSP、Sales Intelligence Platform、Payment Gateway、Career Site Platform、Intranet Platform、Litigation Management Platform、AI Coding Assistant、Vector Retrieval Platform · 当前：Instant Messaging Application已准备 1/100 个类型；每个类型搜索后固定本次队列，处理完成自动结束。\"\u001b[22m\n\n    at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts:124:43",
+                    "location": {
+                      "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                      "column": 43,
+                      "line": 124
+                    },
+                    "snippet": "  122 |   await expect(page.getByRole(\"article\")).toHaveCount(24);\n  123 |   const batch = page.getByRole(\"region\", { name: \"批量采集\", exact: true });\n> 124 |   await expect(batch.getByRole(\"status\")).toContainText(\"136/395\");\n      |                                           ^\n  125 |   await expect(batch.getByRole(\"button\", { name: \"继续批量任务\", exact: true })).toBeVisible();\n  126 |   await expect(batch.getByText(/provider_error/)).toBeVisible();\n  127 |   await screenshot(page, info, \"type-collection\");"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                        "column": 43,
+                        "line": 124
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('region', { name: '批量采集', exact: true }).getByRole('status')\nExpected substring: \u001b[32m\"136/395\"\u001b[39m\nReceived string:    \u001b[31m\"批量采集中 · 148/395Instant Messaging Application、Web Browser、Document Editor、Graphic Design Application、E-commerce Platform、Advertising Campaign Management、Lead Management Platform、Digital Banking Application、Applicant Tracking System / ATS、Professional Services Automation / PSA、Law Practice Management System、Code Editor、Vector Database Console、Cloud Management Platform、Identity & Access Management / IAM、Mechanical CAD、Site Selection Platform、Fleet Management System、Power Plant Management、Crop Management、Environmental Management System、Electronic Health Record / EHR、Student Information System / SIS、Government Digital Identity、Nonprofit Management Platform、Event Management Platform、Creator Media Kit Builder、Sports Facility Management、Painting Contractor Management、Group Messaging Application、Privacy-focused Browser、Collaborative Document Editor、Template-based Design Platform、Online Store Builder、Media Buying Platform、Sales Prospecting Platform、Mobile Banking Application、Recruiting Management Platform、Enterprise Request Management、Legal Matter Management、Integrated Development Environment / IDE、Search Platform、Infrastructure-as-Code Platform、Single Sign-on / SSO、Industrial Design Application、Property Listing Platform、Vehicle Telematics Platform、Renewable Energy Asset Management、Field Management、EHS / HSE Platform、Patient Scheduling、Higher Education Administration System、Government Licensing Management、Nonprofit CRM、Event Registration Platform、Creator Sponsorship Management、Sports Court Booking、Auto Repair Shop Management、Chat Room Application、Web Archive Viewer、Markdown Editor、Collaborative Design Platform、Headless Commerce Platform、Demand-side Platform / DSP、Contact Discovery Platform、Online Banking Portal、Job Board、Internal Knowledge Search、Legal Intake & Client Onboarding、Cloud IDE、Semantic Search Platform、Virtualization Management、Multi-factor Authentication / MFA、CAE / Engineering Simulation、Property Showing Platform、Driver Management、Solar Asset Management、Agronomy Management、Environmental Compliance Management、CPOE / Clinical Order Management、Admissions Management、Government Inspection Management、Donor Management System、Convention / Exhibition Management、Brand-Creator Marketplace、Golf Course Management、Collision Repair Management、Team Messaging Application、General Web Search Engine、Distraction-free Writing Application、Raster Image Editor、Mobile Commerce Application、Supply-side Platform / SSP、Sales Intelligence Platform、Payment Gateway、Career Site Platform、Intranet Platform、Litigation Management Platform、AI Coding Assistant、Vector Retrieval Platform · 当前：Instant Messaging Application已准备 1/100 个类型；每个类型搜索后固定本次队列，处理完成自动结束。\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('region', { name: '批量采集', exact: true }).getByRole('status') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('region', { name: '批量采集', exact: true }).getByRole('status')\u001b[22m\n\u001b[2m    24 × locator resolved to <div role=\"status\" class=\"mt-3 text-sm\">…</div>\u001b[22m\n\u001b[2m       - unexpected value \"批量采集中 · 148/395Instant Messaging Application、Web Browser、Document Editor、Graphic Design Application、E-commerce Platform、Advertising Campaign Management、Lead Management Platform、Digital Banking Application、Applicant Tracking System / ATS、Professional Services Automation / PSA、Law Practice Management System、Code Editor、Vector Database Console、Cloud Management Platform、Identity & Access Management / IAM、Mechanical CAD、Site Selection Platform、Fleet Management System、Power Plant Management、Crop Management、Environmental Management System、Electronic Health Record / EHR、Student Information System / SIS、Government Digital Identity、Nonprofit Management Platform、Event Management Platform、Creator Media Kit Builder、Sports Facility Management、Painting Contractor Management、Group Messaging Application、Privacy-focused Browser、Collaborative Document Editor、Template-based Design Platform、Online Store Builder、Media Buying Platform、Sales Prospecting Platform、Mobile Banking Application、Recruiting Management Platform、Enterprise Request Management、Legal Matter Management、Integrated Development Environment / IDE、Search Platform、Infrastructure-as-Code Platform、Single Sign-on / SSO、Industrial Design Application、Property Listing Platform、Vehicle Telematics Platform、Renewable Energy Asset Management、Field Management、EHS / HSE Platform、Patient Scheduling、Higher Education Administration System、Government Licensing Management、Nonprofit CRM、Event Registration Platform、Creator Sponsorship Management、Sports Court Booking、Auto Repair Shop Management、Chat Room Application、Web Archive Viewer、Markdown Editor、Collaborative Design Platform、Headless Commerce Platform、Demand-side Platform / DSP、Contact Discovery Platform、Online Banking Portal、Job Board、Internal Knowledge Search、Legal Intake & Client Onboarding、Cloud IDE、Semantic Search Platform、Virtualization Management、Multi-factor Authentication / MFA、CAE / Engineering Simulation、Property Showing Platform、Driver Management、Solar Asset Management、Agronomy Management、Environmental Compliance Management、CPOE / Clinical Order Management、Admissions Management、Government Inspection Management、Donor Management System、Convention / Exhibition Management、Brand-Creator Marketplace、Golf Course Management、Collision Repair Management、Team Messaging Application、General Web Search Engine、Distraction-free Writing Application、Raster Image Editor、Mobile Commerce Application、Supply-side Platform / SSP、Sales Intelligence Platform、Payment Gateway、Career Site Platform、Intranet Platform、Litigation Management Platform、AI Coding Assistant、Vector Retrieval Platform · 当前：Instant Messaging Application已准备 1/100 个类型；每个类型搜索后固定本次队列，处理完成自动结束。\"\u001b[22m\n\n\n  122 |   await expect(page.getByRole(\"article\")).toHaveCount(24);\n  123 |   const batch = page.getByRole(\"region\", { name: \"批量采集\", exact: true });\n> 124 |   await expect(batch.getByRole(\"status\")).toContainText(\"136/395\");\n      |                                           ^\n  125 |   await expect(batch.getByRole(\"button\", { name: \"继续批量任务\", exact: true })).toBeVisible();\n  126 |   await expect(batch.getByText(/provider_error/)).toBeVisible();\n  127 |   await screenshot(page, info, \"type-collection\");\n    at /Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts:124:43"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:19:08.306Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-paused-collection-pro-d8df1--type-data-remain-available-mobile/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-paused-collection-pro-d8df1--type-data-remain-available-mobile/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/Users/milin/2026/软件开发/application-atlas/atlas-web/test-results-live/main-paused-collection-pro-d8df1--type-data-remain-available-mobile/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/milin/2026/软件开发/application-atlas/atlas-web/e2e/live-tests/main.spec.ts",
+                    "column": 43,
+                    "line": 124
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-7b0dd4543e5aca64a3f0",
+          "file": "main.spec.ts",
+          "line": 119,
+          "column": 1
+        },
+        {
+          "title": "settings renders real provider and GitHub status without submitting credentials",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 602,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:19:20.025Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-3bb19063ff48e04210a9",
+          "file": "main.spec.ts",
+          "line": 130,
+          "column": 1
+        },
+        {
+          "title": "guide and historical entries remain navigable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1375,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T09:19:20.717Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "81228c4c8886d566ba11-263b75a01b7165e1abc0",
+          "file": "main.spec.ts",
+          "line": 138,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-23T09:18:22.814Z",
+    "duration": 59308.299,
+    "expected": 14,
+    "skipped": 0,
+    "unexpected": 6,
+    "flaky": 0
+  }
+}

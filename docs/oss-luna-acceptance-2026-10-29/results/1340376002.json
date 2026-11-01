@@ -1,0 +1,51 @@
+{
+ "repository_id": 1340376002,
+ "domain": "20",
+ "input_sha256": "6848e366884670c109086042ac6984fd144f37a4e5012f6b60f00a1ad9ca8223",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:50.309662+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDYJFdDHTZFEW7fTlUUupQW4Qqg",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 7236,
+  "completion_tokens": 282,
+  "total_tokens": 7518,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 7233,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0008646,
+ "response_text": "{\n  \"repository_id\": 1340376002,\n  \"verdict\": \"pass_with_limits\",\n  \"summary\": \"卡片准确标明项目处于 P0 脚手架阶段，并将多项能力标为计划或未完成；Apache-2.0 标签有 LICENSE 来源支持。场景均标为 unverified，且理由指出了与场景的差异，未将其误报为已实现能力。由于 README 描述的是目标与规划，不能据此确认实际功能；本次判断限于所给材料。\",\n  \"checks\": {\n    \"facts\": \"supported\",\n    \"project_type\": \"limited\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"supported\"\n  },\n  \"issues\": [],\n  \"limitations\": [\n    \"README 明确称当前仓库状态为 P0 scaffold；其中端到端流程、规则引擎、生成器和训练流程包含目标或后续阶段规划，不能视为已实现。\",\n    \"所给材料包含 README、LICENSE 和 GitHub 元数据，未提供源码文件；无法独立核验应用实现或依赖。\",\n    \"场景匹配均为 unverified，卡片已如实标注；其适用性不能据此视为已验证。\"\n  ]\n}",
+ "review": {
+  "repository_id": 1340376002,
+  "verdict": "pass_with_limits",
+  "summary": "卡片准确标明项目处于 P0 脚手架阶段，并将多项能力标为计划或未完成；Apache-2.0 标签有 LICENSE 来源支持。场景均标为 unverified，且理由指出了与场景的差异，未将其误报为已实现能力。由于 README 描述的是目标与规划，不能据此确认实际功能；本次判断限于所给材料。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "limited",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "README 明确称当前仓库状态为 P0 scaffold；其中端到端流程、规则引擎、生成器和训练流程包含目标或后续阶段规划，不能视为已实现。",
+   "所给材料包含 README、LICENSE 和 GitHub 元数据，未提供源码文件；无法独立核验应用实现或依赖。",
+   "场景匹配均为 unverified，卡片已如实标注；其适用性不能据此视为已验证。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:55.747708+00:00",
+ "elapsed_seconds": 5.438
+}

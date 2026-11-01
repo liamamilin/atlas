@@ -1,0 +1,115 @@
+{
+ "repository_id": 1157656480,
+ "domain": "29",
+ "input_sha256": "6cc0d75484519bf772c1775c756b5630d4d00921349954e153b35e2d8c808a55",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:12:47.278127+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-df05291f03c0-b01cd",
+ "usage": {
+  "prompt_tokens": 4924,
+  "completion_tokens": 931,
+  "total_tokens": 5855,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00122194,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00122194,
+   "tokens": {
+    "input": 4412,
+    "output": 931,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1157656480,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体与 README 和元数据一致：项目定位、技术栈、派单/申请/AI 聊天/数据模型均有来源，支付与实时更新已如实标为未来增强，许可证保守标为 pending。主要问题是摘要把 GPS 追踪、保险、智能锁等安全功能写成已具备，而 README 未说明其实现状态；场景匹配多为条件性，基本合理。\",\"checks\":{\"facts\":\"limited\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"summary\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"README 列出 GPS 追踪、保险、智能锁等安全功能\",\"source_id\":\"s0\",\"quote\":\"- **Real-Time Tracking**: GPS tracking during walks\",\"reason\":\"README 仅在功能/安全清单中列出 GPS 追踪、智能锁、保险，未说明已实现或仅为规划；摘要以“列出”表述尚可，但易被读作已具备能力，且与“部分功能为路线图”的 scope 存在张力。\",\"suggested_correction\":\"改为“README 宣称/列出 GPS 追踪、保险、智能锁等安全功能，实现状态未说明”。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"ASAP 或预约遛狗与派单逻辑\",\"source_id\":\"s0\",\"quote\":\"- **Instant Dispatch**: ASAP or scheduled pet walks\",\"reason\":\"README 有该功能描述与 dispatch Lambda 目录，但未提供派单逻辑实现细节或验证；作为功能项可保留，宜标注为 README 声明。\",\"suggested_correction\":\"保留但注明“README 声明，未核验实现完整度”。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-dog-walking-platform-22e2ab5d25\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"有遛狗者资料与预约，但无行动不便者专属流程说明\",\"source_id\":\"s0\",\"quote\":\"- **Photo Report Cards**: Detailed post-service reports\",\"reason\":\"场景强调上门接送与行动不便者专属流程，README 未提及接送或无障碍流程；标 unverified 合理，但条件“需核实上门接送流程”应更明确为无来源支持。\",\"suggested_correction\":\"保持 unverified，条件改为“README 未说明上门接送/无障碍流程，需另行核实”。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-dog-walking-platform-3401f1df7d\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"支持预约与遛狗者资料，但派单为抢单模式，非主人自主选择\",\"source_id\":\"s0\",\"quote\":\"4. **Accept Jobs**: First-come-first-served dispatch\",\"reason\":\"抢单模式有来源支持，但场景要求比较评价后自主选择并预约固定工作日时段；README 未说明固定周期预约与评价比较功能，条件中“需核实固定周期预约支持”已部分覆盖，宜同时指出评价比较未证实。\",\"suggested_correction\":\"条件补充“评价比较与固定周期预约未见来源支持”。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-dog-walking-platform-dbdb8bcd62\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"支持按次预约遛狗\",\"source_id\":\"s0\",\"quote\":\"1. **Book a Walk**: Choose service type (15/30/60 min walks, sitting)\",\"reason\":\"按次预约有来源支持，但场景含“筛选可提供额外白天散步的遛狗者”，README 未说明按时间/需求筛选遛狗者能力；标 conditional 合理，条件可更具体。\",\"suggested_correction\":\"条件补充“按白天时段筛选遛狗者未见来源支持”。\"}],\"limitations\":[\"仅提供 README 与 GitHub 元数据各一份，未审代码实现，无法核验功能是否真正可用。\",\"许可证仅有 pending 状态，未做全文比对，不能判定开源或专有授权。\",\"场景匹配基于 README 文字推断，未验证实际部署与运行行为。\"]}",
+ "review": {
+  "repository_id": 1157656480,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体与 README 和元数据一致：项目定位、技术栈、派单/申请/AI 聊天/数据模型均有来源，支付与实时更新已如实标为未来增强，许可证保守标为 pending。主要问题是摘要把 GPS 追踪、保险、智能锁等安全功能写成已具备，而 README 未说明其实现状态；场景匹配多为条件性，基本合理。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "summary",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "README 列出 GPS 追踪、保险、智能锁等安全功能",
+    "source_id": "s0",
+    "quote": "- **Real-Time Tracking**: GPS tracking during walks",
+    "reason": "README 仅在功能/安全清单中列出 GPS 追踪、智能锁、保险，未说明已实现或仅为规划；摘要以“列出”表述尚可，但易被读作已具备能力，且与“部分功能为路线图”的 scope 存在张力。",
+    "suggested_correction": "改为“README 宣称/列出 GPS 追踪、保险、智能锁等安全功能，实现状态未说明”。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "ASAP 或预约遛狗与派单逻辑",
+    "source_id": "s0",
+    "quote": "- **Instant Dispatch**: ASAP or scheduled pet walks",
+    "reason": "README 有该功能描述与 dispatch Lambda 目录，但未提供派单逻辑实现细节或验证；作为功能项可保留，宜标注为 README 声明。",
+    "suggested_correction": "保留但注明“README 声明，未核验实现完整度”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-dog-walking-platform-22e2ab5d25",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "有遛狗者资料与预约，但无行动不便者专属流程说明",
+    "source_id": "s0",
+    "quote": "- **Photo Report Cards**: Detailed post-service reports",
+    "reason": "场景强调上门接送与行动不便者专属流程，README 未提及接送或无障碍流程；标 unverified 合理，但条件“需核实上门接送流程”应更明确为无来源支持。",
+    "suggested_correction": "保持 unverified，条件改为“README 未说明上门接送/无障碍流程，需另行核实”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-dog-walking-platform-3401f1df7d",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "支持预约与遛狗者资料，但派单为抢单模式，非主人自主选择",
+    "source_id": "s0",
+    "quote": "4. **Accept Jobs**: First-come-first-served dispatch",
+    "reason": "抢单模式有来源支持，但场景要求比较评价后自主选择并预约固定工作日时段；README 未说明固定周期预约与评价比较功能，条件中“需核实固定周期预约支持”已部分覆盖，宜同时指出评价比较未证实。",
+    "suggested_correction": "条件补充“评价比较与固定周期预约未见来源支持”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-dog-walking-platform-dbdb8bcd62",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "支持按次预约遛狗",
+    "source_id": "s0",
+    "quote": "1. **Book a Walk**: Choose service type (15/30/60 min walks, sitting)",
+    "reason": "按次预约有来源支持，但场景含“筛选可提供额外白天散步的遛狗者”，README 未说明按时间/需求筛选遛狗者能力；标 conditional 合理，条件可更具体。",
+    "suggested_correction": "条件补充“按白天时段筛选遛狗者未见来源支持”。"
+   }
+  ],
+  "limitations": [
+   "仅提供 README 与 GitHub 元数据各一份，未审代码实现，无法核验功能是否真正可用。",
+   "许可证仅有 pending 状态，未做全文比对，不能判定开源或专有授权。",
+   "场景匹配基于 README 文字推断，未验证实际部署与运行行为。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:13:00.352901+00:00",
+ "elapsed_seconds": 13.074
+}

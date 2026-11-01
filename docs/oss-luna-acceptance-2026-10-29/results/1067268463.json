@@ -1,0 +1,85 @@
+{
+ "repository_id": 1067268463,
+ "domain": "23",
+ "input_sha256": "0530c89e366e8ec14f7674fb4621958077bb58163858b8babf14ec34ec69f69d",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:01.239572+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDjJFqrfhU5S84SEfmEYsksvlOH",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 2418,
+  "completion_tokens": 662,
+  "total_tokens": 3080,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 2415,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0005727999999999999,
+ "response_text": "{\n  \"repository_id\": 1067268463,\n  \"verdict\": \"pass_with_limits\",\n  \"summary\": \"卡片对项目定位和功能的描述有 GitHub 元数据支持；README 实际是 React+Vite 模板说明，不能据此核实这些功能已实现。卡片已注明细节有限、场景未验证及许可证待核验，宜保留这些限制。\",\n  \"checks\": {\n    \"facts\": \"limited\",\n    \"project_type\": \"limited\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"limited\"\n  },\n  \"issues\": [\n    {\n      \"field\": \"features\",\n      \"scenario_id\": \"\",\n      \"severity\": \"minor\",\n      \"kind\": \"insufficient_evidence\",\n      \"claim\": \"动画时间线\",\n      \"source_id\": \"s1\",\n      \"quote\": \"with animated timeline\",\n      \"reason\": \"该功能仅由仓库元数据描述支持；README 是模板说明，未提供实现细节，不能据此确认功能已实现。卡片已说明具体功能细节有限。\",\n      \"suggested_correction\": \"明确标注为仓库元数据所描述的功能，避免表述为已核实实现。\"\n    },\n    {\n      \"field\": \"features\",\n      \"scenario_id\": \"\",\n      \"severity\": \"minor\",\n      \"kind\": \"insufficient_evidence\",\n      \"claim\": \"视差首屏与渐变联系区\",\n      \"source_id\": \"s1\",\n      \"quote\": \"parallax hero, and gradient contact section\",\n      \"reason\": \"元数据支持这些描述，但可用 README 未展示实现证据；不能确认功能已实现。\",\n      \"suggested_correction\": \"注明这些是元数据描述的功能，具体实现未由现有材料核实。\"\n    },\n    {\n      \"field\": \"project_type\",\n      \"scenario_id\": \"\",\n      \"severity\": \"minor\",\n      \"kind\": \"insufficient_evidence\",\n      \"claim\": \"application\",\n      \"source_id\": \"s1\",\n      \"quote\": \"A modern React portfolio\",\n      \"reason\": \"元数据将项目描述为作品集，但 README 仅说明 React+Vite 模板；现有材料不足以核实仓库实际内容是否构成完整应用。卡片已将完整性标为 partial。\",\n      \"suggested_correction\": \"保留 partial 限制，并将类型表述为元数据所称的作品集站点，注明实现未核实。\"\n    }\n  ],\n  \"limitations\": [\n    \"仅提供一份未截断的 README 和一条 GitHub 元数据；README 内容是 React+Vite 模板说明，未提供项目实现文件。\",\n    \"许可证状态为 pending，且已明确注明未发现许可证文件；本次材料不足以核验授权。\",\n    \"场景匹配已标为 unverified，且理由指出缺少证据库、反思与访问控制证据；不应视为已验证的完整 ePortfolio 平台。\"\n  ]\n}",
+ "review": {
+  "repository_id": 1067268463,
+  "verdict": "pass_with_limits",
+  "summary": "卡片对项目定位和功能的描述有 GitHub 元数据支持；README 实际是 React+Vite 模板说明，不能据此核实这些功能已实现。卡片已注明细节有限、场景未验证及许可证待核验，宜保留这些限制。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "limited",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "动画时间线",
+    "source_id": "s1",
+    "quote": "with animated timeline",
+    "reason": "该功能仅由仓库元数据描述支持；README 是模板说明，未提供实现细节，不能据此确认功能已实现。卡片已说明具体功能细节有限。",
+    "suggested_correction": "明确标注为仓库元数据所描述的功能，避免表述为已核实实现。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "视差首屏与渐变联系区",
+    "source_id": "s1",
+    "quote": "parallax hero, and gradient contact section",
+    "reason": "元数据支持这些描述，但可用 README 未展示实现证据；不能确认功能已实现。",
+    "suggested_correction": "注明这些是元数据描述的功能，具体实现未由现有材料核实。"
+   },
+   {
+    "field": "project_type",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "application",
+    "source_id": "s1",
+    "quote": "A modern React portfolio",
+    "reason": "元数据将项目描述为作品集，但 README 仅说明 React+Vite 模板；现有材料不足以核实仓库实际内容是否构成完整应用。卡片已将完整性标为 partial。",
+    "suggested_correction": "保留 partial 限制，并将类型表述为元数据所称的作品集站点，注明实现未核实。"
+   }
+  ],
+  "limitations": [
+   "仅提供一份未截断的 README 和一条 GitHub 元数据；README 内容是 React+Vite 模板说明，未提供项目实现文件。",
+   "许可证状态为 pending，且已明确注明未发现许可证文件；本次材料不足以核验授权。",
+   "场景匹配已标为 unverified，且理由指出缺少证据库、反思与访问控制证据；不应视为已验证的完整 ePortfolio 平台。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:40:09.098829+00:00",
+ "elapsed_seconds": 7.859
+}

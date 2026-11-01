@@ -1,0 +1,62 @@
+{
+ "repository_id": 1296271039,
+ "domain": "08",
+ "input_sha256": "de8fb3ffe55d889a61c08dc4b8d8ff3f196ada037912f5df4f0f1223b63e7afc",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:38:46.534661+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCCWUQoa4VASHPjsWQS0avaq72Jy",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 6982,
+  "completion_tokens": 405,
+  "total_tokens": 7387,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 6979,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0009007,
+ "response_text": "{\"repository_id\":1296271039,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片将仓库描述为充值指南类文章而非可部署软件，类型与范围基本符合 README；许可证保留 pending 也恰当。场景匹配已标为 conditional，但该场景描述的是交易所托管账户充值，与 PokePay 虚拟卡充值并不相同，相关性较弱。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"issue\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-cryptocurrency-exchange-238a882c8f\",\"severity\":\"minor\",\"kind\":\"irrelevant_scenario\",\"claim\":\"涉及向平台充值地址转入加密资产并选择网络，但对象是虚拟卡充值而非交易所托管账户\",\"source_id\":\"s0\",\"quote\":\"PokePay is a Hong Kong-issued Visa prepaid card platform built for people who hold crypto and want to spend it without manually converting to fiat first.\",\"reason\":\"场景描述要求向交易所生成的地址充值并计入托管账户余额；来源讲的是向 PokePay 虚拟卡平台充值。卡片已说明对象不同并设为 conditional，但这仍不足以使其成为该交易所场景的直接匹配。\",\"suggested_correction\":\"将该匹配标为 unverified 或移除；若保留，应明确仅有选择网络、链上转账这一表层相似性，不代表适用于交易所托管账户充值。\"}],\"limitations\":[\"本次依据提供的 README 全文及 GitHub 元数据审查；未独立核验文中关于 PokePay 产品、费用或第三方信息的准确性。\",\"许可证状态为 pending，来源元数据未提供许可证；本次不据此推定仓库已获开源授权。\"]}",
+ "review": {
+  "repository_id": 1296271039,
+  "verdict": "pass_with_limits",
+  "summary": "卡片将仓库描述为充值指南类文章而非可部署软件，类型与范围基本符合 README；许可证保留 pending 也恰当。场景匹配已标为 conditional，但该场景描述的是交易所托管账户充值，与 PokePay 虚拟卡充值并不相同，相关性较弱。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "issue"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-cryptocurrency-exchange-238a882c8f",
+    "severity": "minor",
+    "kind": "irrelevant_scenario",
+    "claim": "涉及向平台充值地址转入加密资产并选择网络，但对象是虚拟卡充值而非交易所托管账户",
+    "source_id": "s0",
+    "quote": "PokePay is a Hong Kong-issued Visa prepaid card platform built for people who hold crypto and want to spend it without manually converting to fiat first.",
+    "reason": "场景描述要求向交易所生成的地址充值并计入托管账户余额；来源讲的是向 PokePay 虚拟卡平台充值。卡片已说明对象不同并设为 conditional，但这仍不足以使其成为该交易所场景的直接匹配。",
+    "suggested_correction": "将该匹配标为 unverified 或移除；若保留，应明确仅有选择网络、链上转账这一表层相似性，不代表适用于交易所托管账户充值。"
+   }
+  ],
+  "limitations": [
+   "本次依据提供的 README 全文及 GitHub 元数据审查；未独立核验文中关于 PokePay 产品、费用或第三方信息的准确性。",
+   "许可证状态为 pending，来源元数据未提供许可证；本次不据此推定仓库已获开源授权。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:38:53.157160+00:00",
+ "elapsed_seconds": 6.622
+}

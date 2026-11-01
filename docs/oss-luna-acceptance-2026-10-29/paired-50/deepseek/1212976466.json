@@ -1,0 +1,104 @@
+{
+ "repository_id": 1212976466,
+ "domain": "06",
+ "input_sha256": "6e222f0202426d5178d3f7775f566369f24a4ea1acddaa537b1942a4405108ee",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:09.116749+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-d90fbd992745-12f728",
+ "usage": {
+  "prompt_tokens": 5142,
+  "completion_tokens": 849,
+  "total_tokens": 5991,
+  "prompt_tokens_details": {
+   "cached_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.0012807,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.0012807,
+   "tokens": {
+    "input": 5142,
+    "output": 849,
+    "reasoning": 0,
+    "cache_read": 0,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1212976466,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体与README和许可证正文一致：4个SKILL.md技能、npx安装、无需账号/API密钥、MIT许可均有来源支持；项目类型标为resource、范围限定为提示方法资源而非可部署软件，符合实际。场景匹配的conditional/unverified标注基本合理，但部分场景条件与来源证据的对应偏弱，需收紧。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-keyword-research-application-65dd2028fd\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"竞品审计技能可辅助客户竞品分析\",\"source_id\":\"s0\",\"quote\":\"Audits your top 5-7 competitors across SEO, content, and social media.\",\"reason\":\"来源仅说明竞品审计覆盖SEO/内容/社媒，未涉及客户网站周期性调研、竞品域名扩展查询或结果页竞争评估；卡片已标conditional，但条件未点明该场景核心的域名扩展与SERP竞争评估能力缺失。\",\"suggested_correction\":\"在conditions中补充：不提供竞品域名扩展查询与搜索结果页竞争度评估，仅覆盖SEO/内容/社媒层面的定性审计。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-keyword-research-application-a94a349438\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"关键词技能可产出按意图分类的关键词清单\",\"source_id\":\"s0\",\"quote\":\"Finds high-intent keywords people are searching on TikTok/Instagram for your niche. Categorizes by type (educational, problem-aware, tool comparison) and rates conversion potential.\",\"reason\":\"来源关键词技能面向TikTok/Instagram社交搜索并按意图分类，未提供搜索量与难度筛选；卡片conditions已提社交搜索与无量化数据，但未明确缺少“按搜索量和难度筛选长尾词”这一场景核心步骤。\",\"suggested_correction\":\"在conditions中明确：不提供搜索量与难度指标，无法按搜索量/难度筛选长尾词，仅按意图与转化潜力分类。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-keyword-research-application-a0a6574533\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"未提供CPC或广告竞争度数据\",\"source_id\":\"s0\",\"quote\":\"No API keys needed. No account required.\",\"reason\":\"来源未提及付费广告、CPC或广告竞争度，也无明确声明“不支持付费广告”；标unverified可接受，但“付费广告维度缺失”属推断而非来源明示，应表述为证据不足。\",\"suggested_correction\":\"将conditions改为“来源未涉及付费搜索/CPC/广告竞争度，是否适用未知”，保持unverified。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"/strategy生成营销策略与20+关键词及意图分类\",\"source_id\":\"s0\",\"quote\":\"Generates a full marketing strategy: core themes, content pillars, brand voice, 20+ keywords with intent categories, and a posting plan.\",\"reason\":\"来源支持20+关键词与意图分类，但卡片省略了核心主题、内容支柱、品牌语调与发布计划等已述产出，属不完整而非错误；建议补全以匹配来源。\",\"suggested_correction\":\"补充核心主题、内容支柱、品牌语调与发布计划等来源已列产出。\"}],\"limitations\":[\"仅提供README、LICENSE与GitHub元数据，未包含SKILL.md正文，无法核验各技能实际提示内容与输出质量。\",\"场景匹配基于README描述推断，未验证实际运行效果。\",\"许可仅做语义标签核对，全文精确比对由确定性核验另行完成。\"]}",
+ "review": {
+  "repository_id": 1212976466,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体与README和许可证正文一致：4个SKILL.md技能、npx安装、无需账号/API密钥、MIT许可均有来源支持；项目类型标为resource、范围限定为提示方法资源而非可部署软件，符合实际。场景匹配的conditional/unverified标注基本合理，但部分场景条件与来源证据的对应偏弱，需收紧。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-keyword-research-application-65dd2028fd",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "竞品审计技能可辅助客户竞品分析",
+    "source_id": "s0",
+    "quote": "Audits your top 5-7 competitors across SEO, content, and social media.",
+    "reason": "来源仅说明竞品审计覆盖SEO/内容/社媒，未涉及客户网站周期性调研、竞品域名扩展查询或结果页竞争评估；卡片已标conditional，但条件未点明该场景核心的域名扩展与SERP竞争评估能力缺失。",
+    "suggested_correction": "在conditions中补充：不提供竞品域名扩展查询与搜索结果页竞争度评估，仅覆盖SEO/内容/社媒层面的定性审计。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-keyword-research-application-a94a349438",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "关键词技能可产出按意图分类的关键词清单",
+    "source_id": "s0",
+    "quote": "Finds high-intent keywords people are searching on TikTok/Instagram for your niche. Categorizes by type (educational, problem-aware, tool comparison) and rates conversion potential.",
+    "reason": "来源关键词技能面向TikTok/Instagram社交搜索并按意图分类，未提供搜索量与难度筛选；卡片conditions已提社交搜索与无量化数据，但未明确缺少“按搜索量和难度筛选长尾词”这一场景核心步骤。",
+    "suggested_correction": "在conditions中明确：不提供搜索量与难度指标，无法按搜索量/难度筛选长尾词，仅按意图与转化潜力分类。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-keyword-research-application-a0a6574533",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "未提供CPC或广告竞争度数据",
+    "source_id": "s0",
+    "quote": "No API keys needed. No account required.",
+    "reason": "来源未提及付费广告、CPC或广告竞争度，也无明确声明“不支持付费广告”；标unverified可接受，但“付费广告维度缺失”属推断而非来源明示，应表述为证据不足。",
+    "suggested_correction": "将conditions改为“来源未涉及付费搜索/CPC/广告竞争度，是否适用未知”，保持unverified。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "/strategy生成营销策略与20+关键词及意图分类",
+    "source_id": "s0",
+    "quote": "Generates a full marketing strategy: core themes, content pillars, brand voice, 20+ keywords with intent categories, and a posting plan.",
+    "reason": "来源支持20+关键词与意图分类，但卡片省略了核心主题、内容支柱、品牌语调与发布计划等已述产出，属不完整而非错误；建议补全以匹配来源。",
+    "suggested_correction": "补充核心主题、内容支柱、品牌语调与发布计划等来源已列产出。"
+   }
+  ],
+  "limitations": [
+   "仅提供README、LICENSE与GitHub元数据，未包含SKILL.md正文，无法核验各技能实际提示内容与输出质量。",
+   "场景匹配基于README描述推断，未验证实际运行效果。",
+   "许可仅做语义标签核对，全文精确比对由确定性核验另行完成。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:11:21.039356+00:00",
+ "elapsed_seconds": 11.922
+}

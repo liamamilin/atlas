@@ -1,0 +1,51 @@
+{
+ "repository_id": 262335265,
+ "domain": "24",
+ "input_sha256": "7301978a43b25bdf1a4cb18f21b4c18854f003f700865df344a5bc93caa1ea51",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:08.636668+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDqV9dH8VbqF74q7kz6Pe3PPPw6",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 2989,
+  "completion_tokens": 191,
+  "total_tokens": 3180,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 2986,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.00039440000000000005,
+ "response_text": "{\"repository_id\":262335265,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片总体与 README 对项目的描述相符，且明确标注为演示、非警务记录系统；场景匹配也保留了 unverified。许可 pending 与来源一致。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"仅依据提供的 README 与 GitHub 元数据审查；未检查源码，不能据此确认功能实现细节或完整性。\",\"README 将项目描述为犯罪事件统计分析应用，并列出 Kafka 与 Spark Structured Streaming 的运行步骤；卡片将其限定为演示，未声称具备记录核验或报送流程。\",\"许可状态为 pending，来源显示仓库元数据 license 为 null；本次未核验许可全文。\"]}",
+ "review": {
+  "repository_id": 262335265,
+  "verdict": "pass_with_limits",
+  "summary": "卡片总体与 README 对项目的描述相符，且明确标注为演示、非警务记录系统；场景匹配也保留了 unverified。许可 pending 与来源一致。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "仅依据提供的 README 与 GitHub 元数据审查；未检查源码，不能据此确认功能实现细节或完整性。",
+   "README 将项目描述为犯罪事件统计分析应用，并列出 Kafka 与 Spark Structured Streaming 的运行步骤；卡片将其限定为演示，未声称具备记录核验或报送流程。",
+   "许可状态为 pending，来源显示仓库元数据 license 为 null；本次未核验许可全文。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:40:12.790892+00:00",
+ "elapsed_seconds": 4.154
+}

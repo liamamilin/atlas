@@ -1,0 +1,138 @@
+{
+ "id": "oss_be97d9e3c9a54097b0211b52b7ed4deb",
+ "leaf": "diagramming-application",
+ "status": "partial",
+ "started_at": "2026-10-23T03:06:55.970778+00:00",
+ "created": 0,
+ "updated": 1,
+ "unchanged": 2,
+ "failed": 1,
+ "processed": 8,
+ "errors": [
+  {
+   "repo": "Sfedfcv/redesigned-pancake",
+   "error": "GitHub 资源不存在或不再公开"
+  }
+ ],
+ "mode": "automatic",
+ "phase": "extract",
+ "model_calls": 0,
+ "model_cache_hits": 6,
+ "rejected": 4,
+ "total": 8,
+ "source_cache_hits": 7,
+ "source_fetches": 1,
+ "document_cache_hits": 2,
+ "document_fetches": 0,
+ "search_requests": 5,
+ "model_receipts": [
+  {
+   "stage": "scenarios",
+   "input_sha256": "d2107d9310d9528a9b1e783b1af0871d5751254bbb84a2a7170e7b6bda53f96f",
+   "cached": true,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 3499,
+    "completion_tokens": 596,
+    "total_tokens": 4095,
+    "cost": null
+   },
+   "created_at": "2026-10-23T02:50:21.751112+00:00"
+  },
+  {
+   "stage": "extract",
+   "input_sha256": "40e11c16372823d17c2e9232beb0267367784cec3820527d1ce99ea3e5759733",
+   "cached": true,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 12015,
+    "completion_tokens": 1002,
+    "total_tokens": 13017,
+    "cost": null
+   },
+   "created_at": "2026-10-23T03:01:43.790133+00:00"
+  },
+  {
+   "stage": "extract",
+   "input_sha256": "9e5e94e3ddf4bbb9671b264210f2ee9e15335ed2dccc73771dbece794ce76cc5",
+   "cached": true,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 10317,
+    "completion_tokens": 1287,
+    "total_tokens": 11604,
+    "cost": null
+   },
+   "created_at": "2026-10-23T03:03:01.824122+00:00"
+  },
+  {
+   "stage": "extract_repair",
+   "input_sha256": "36c093e7f8b65dee2eada14771fa34e7a389e6954e41addf71a6794871971177",
+   "cached": true,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 4508,
+    "completion_tokens": 772,
+    "total_tokens": 5280,
+    "cost": null
+   },
+   "created_at": "2026-10-23T03:03:09.674049+00:00"
+  },
+  {
+   "stage": "extract",
+   "input_sha256": "53a0fb7ae3bd5090456c8c27dd938f041c2008b59814913713b67cd135170150",
+   "cached": true,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 4956,
+    "completion_tokens": 10124,
+    "total_tokens": 15080,
+    "cost": null
+   },
+   "created_at": "2026-10-23T03:04:09.271451+00:00"
+  },
+  {
+   "stage": "extract",
+   "input_sha256": "05cbb7d09879245fff48523842a6076c6bd9955d4265f0310af4bd4058e30048",
+   "cached": true,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 5630,
+    "completion_tokens": 230,
+    "total_tokens": 5860,
+    "cost": null
+   },
+   "created_at": "2026-10-23T03:04:14.470442+00:00"
+  }
+ ],
+ "discovered": 61,
+ "recheck": true,
+ "selected_ids": [
+  1212769188,
+  667110339,
+  953521037,
+  838212912,
+  67508428,
+  223260063,
+  29011477,
+  367791811
+ ],
+ "repository_checks": 8,
+ "accepted": 3,
+ "candidate_counts": {
+  "pending": 53,
+  "accepted": 3,
+  "rejected": 4,
+  "needs_evidence": 0,
+  "failed": 1
+ },
+ "gaps": [],
+ "audit_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/runs/oss_be97d9e3c9a54097b0211b52b7ed4deb.json",
+ "finished_at": "2026-10-23T03:07:42.541277+00:00"
+}

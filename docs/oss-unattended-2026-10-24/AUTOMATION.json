@@ -1,0 +1,26 @@
+{
+  "created_with": "automation_update",
+  "id": "atlas-100",
+  "kind": "heartbeat",
+  "interval_minutes": 15,
+  "status": "ACTIVE",
+  "fixed_batch_id": "batch_cd8f7a777e3c4e6885de1cf3162e004c",
+  "local_metadata": [
+    {
+      "id": "atlas",
+      "name": "Atlas 全量辅助生产跟进",
+      "status": "PAUSED",
+      "rrule": "FREQ=HOURLY;INTERVAL=6",
+      "kind": "heartbeat",
+      "target_thread_id": "01a098b9-a81d-7fa1-80e9-18ea739c6ff0"
+    },
+    {
+      "id": "atlas-100",
+      "name": "Atlas 当前100叶子自动巡检",
+      "status": "ACTIVE",
+      "rrule": "FREQ=MINUTELY;INTERVAL=15",
+      "kind": "heartbeat",
+      "target_thread_id": "01a16454-fdc5-7da3-bafb-0b3b277fddc4"
+    }
+  ]
+}

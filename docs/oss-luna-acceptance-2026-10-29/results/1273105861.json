@@ -1,0 +1,51 @@
+{
+ "repository_id": 1273105861,
+ "domain": "05",
+ "input_sha256": "2749777432b635afb781318295179d8cc89fa3d72ed71571ca2e746d747eef9c",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:38:31.980910+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCCI85GMudA5lp9KL14DArjOash8",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 4448,
+  "completion_tokens": 185,
+  "total_tokens": 4633,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 4445,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0005373,
+ "response_text": "{\"repository_id\":1273105861,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片总体忠实于 README 的项目描述，并明确保留了许可证待核验及跨渠道场景未验证的限制。README 将项目称为全渠道系统，但没有描述这些具体跨渠道流程；卡片对此作了适当限定。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"仅依据提供的 README 与 GitHub 元数据审查；README 虽未截断，但未核验实现代码。\",\"许可证状态为 pending，不能据此确认仓库已获开源授权。\",\"三个场景均标为 unverified；README 未说明对应的跨渠道退货、缺货代客下单或门店自提核销流程。\"]}",
+ "review": {
+  "repository_id": 1273105861,
+  "verdict": "pass_with_limits",
+  "summary": "卡片总体忠实于 README 的项目描述，并明确保留了许可证待核验及跨渠道场景未验证的限制。README 将项目称为全渠道系统，但没有描述这些具体跨渠道流程；卡片对此作了适当限定。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "仅依据提供的 README 与 GitHub 元数据审查；README 虽未截断，但未核验实现代码。",
+   "许可证状态为 pending，不能据此确认仓库已获开源授权。",
+   "三个场景均标为 unverified；README 未说明对应的跨渠道退货、缺货代客下单或门店自提核销流程。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:38:36.967013+00:00",
+ "elapsed_seconds": 4.986
+}

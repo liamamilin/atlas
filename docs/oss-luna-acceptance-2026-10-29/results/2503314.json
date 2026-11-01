@@ -1,0 +1,84 @@
+{
+ "repository_id": 2503314,
+ "domain": "10",
+ "input_sha256": "05173d818965a99593f9ab7de49f1e122ab9bae6d0c909c44a3ed81289542e58",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:38:57.521615+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCChWuOWa9IDiJYXbILq5JUEaUpb",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 8769,
+  "completion_tokens": 751,
+  "total_tokens": 9520,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 8766,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0012524,
+ "response_text": "{\"repository_id\":2503314,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片对项目定位、主要功能、J2EE 技术栈及 Docker 配置要求有 README 支持；项目类型为应用也合理。许可证保留 pending 与卡片说明一致。场景均标为 unverified，且指出了关键流程缺项；但场景条件字段为空，建议明确记录这些适用限制。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-business-management-suite-4b5833c28a\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"\\\"conditions\\\":[]；reason 为“具备客户、联系人、账单与现金流功能，但资料未说明线索表单、报价与在线收款流程”\",\"source_id\":\"s0\",\"quote\":\"With TNTConcept you can manage, in an integrated way, your customers, providers, contacts, business interactions, projects, week objectives, project time-tracking, bills, cash flow ...\",\"reason\":\"场景标为 unverified 且 reason 已如实指出线索表单、报价和在线收款未获资料说明；但 conditions 为空，未将这些限制结构化列出。\",\"suggested_correction\":\"在 conditions 中列出线索表单、报价及在线收款流程未获资料证实，保留 unverified。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-business-management-suite-c04bf269ae\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"\\\"conditions\\\":[]；reason 为“资料未提及商品目录、销售订单与库存管理”\",\"source_id\":\"s0\",\"quote\":\"With TNTConcept you can manage, in an integrated way, your customers, providers, contacts, business interactions, projects, week objectives, project time-tracking, bills, cash flow ...\",\"reason\":\"场景标为 unverified，reason 也明确指出商品目录、订单和库存未见于资料；空 conditions 未体现这些适用限制。\",\"suggested_correction\":\"在 conditions 中注明商品目录、销售订单及库存管理未获资料证实，保留 unverified。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-business-management-suite-ebf45afaee\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"\\\"conditions\\\":[]；reason 为“具备项目、工时与账单功能，但工时转发票及客户在线付款未在资料中说明”\",\"source_id\":\"s0\",\"quote\":\"With TNTConcept you can manage, in an integrated way, your customers, providers, contacts, business interactions, projects, week objectives, project time-tracking, bills, cash flow ...\",\"reason\":\"场景标为 unverified，reason 已区分已提及的项目、工时、账单与未说明的工时转发票、在线付款；conditions 为空，未记录这些限制。\",\"suggested_correction\":\"在 conditions 中注明工时转可计费项/发票及客户在线付款未获资料证实，保留 unverified。\"}],\"limitations\":[\"README 来源完整；LICENSE 来源标记为截断，不能据此声称已核验许可证全文。卡片将许可证状态保留为 pending，且明确未按仓库标签推定，未发现许可标签过度声明。\",\"本次仅依据提供的 README、许可证片段及 GitHub 元数据审查；未执行代码或访问外部链接。\"]}",
+ "review": {
+  "repository_id": 2503314,
+  "verdict": "pass_with_limits",
+  "summary": "卡片对项目定位、主要功能、J2EE 技术栈及 Docker 配置要求有 README 支持；项目类型为应用也合理。许可证保留 pending 与卡片说明一致。场景均标为 unverified，且指出了关键流程缺项；但场景条件字段为空，建议明确记录这些适用限制。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-business-management-suite-4b5833c28a",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "\"conditions\":[]；reason 为“具备客户、联系人、账单与现金流功能，但资料未说明线索表单、报价与在线收款流程”",
+    "source_id": "s0",
+    "quote": "With TNTConcept you can manage, in an integrated way, your customers, providers, contacts, business interactions, projects, week objectives, project time-tracking, bills, cash flow ...",
+    "reason": "场景标为 unverified 且 reason 已如实指出线索表单、报价和在线收款未获资料说明；但 conditions 为空，未将这些限制结构化列出。",
+    "suggested_correction": "在 conditions 中列出线索表单、报价及在线收款流程未获资料证实，保留 unverified。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-business-management-suite-c04bf269ae",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "\"conditions\":[]；reason 为“资料未提及商品目录、销售订单与库存管理”",
+    "source_id": "s0",
+    "quote": "With TNTConcept you can manage, in an integrated way, your customers, providers, contacts, business interactions, projects, week objectives, project time-tracking, bills, cash flow ...",
+    "reason": "场景标为 unverified，reason 也明确指出商品目录、订单和库存未见于资料；空 conditions 未体现这些适用限制。",
+    "suggested_correction": "在 conditions 中注明商品目录、销售订单及库存管理未获资料证实，保留 unverified。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-business-management-suite-ebf45afaee",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "\"conditions\":[]；reason 为“具备项目、工时与账单功能，但工时转发票及客户在线付款未在资料中说明”",
+    "source_id": "s0",
+    "quote": "With TNTConcept you can manage, in an integrated way, your customers, providers, contacts, business interactions, projects, week objectives, project time-tracking, bills, cash flow ...",
+    "reason": "场景标为 unverified，reason 已区分已提及的项目、工时、账单与未说明的工时转发票、在线付款；conditions 为空，未记录这些限制。",
+    "suggested_correction": "在 conditions 中注明工时转可计费项/发票及客户在线付款未获资料证实，保留 unverified。"
+   }
+  ],
+  "limitations": [
+   "README 来源完整；LICENSE 来源标记为截断，不能据此声称已核验许可证全文。卡片将许可证状态保留为 pending，且明确未按仓库标签推定，未发现许可标签过度声明。",
+   "本次仅依据提供的 README、许可证片段及 GitHub 元数据审查；未执行代码或访问外部链接。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:06.158305+00:00",
+ "elapsed_seconds": 8.637
+}

@@ -1,0 +1,64 @@
+{
+ "repository_id": 1318641711,
+ "domain": "28",
+ "input_sha256": "cd19ece61909f6e297791800edf3882ec641acf3a47166f69289e426ea101d68",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:29.599315+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCEBzQIbA0rvOTogHodaZE6FxHSL",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 3929,
+  "completion_tokens": 480,
+  "total_tokens": 4409,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 3926,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0006329,
+ "response_text": "{\n  \"repository_id\": 1318641711,\n  \"verdict\": \"pass_with_limits\",\n  \"summary\": \"卡片准确区分了第三方 API 资料档案与 Naluri 的产品，并将许可证标为 pending；场景也均标为 unverified，且列出待核实条件。主要限制是 README 将该仓库明确描述为等待资料补充的 stub，卡片对档案内容的概括应避免让人误以为已有实质 API 资料。\",\n  \"checks\": {\n    \"facts\": \"limited\",\n    \"project_type\": \"supported\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"supported\"\n  },\n  \"issues\": [\n    {\n      \"field\": \"summary\",\n      \"scenario_id\": \"\",\n      \"severity\": \"minor\",\n      \"kind\": \"unsupported_claim\",\n      \"claim\": \"该仓库仅为公开信息汇编的 API 档案\",\n      \"source_id\": \"s0\",\n      \"quote\": \"This profile is a lead awaiting the enrichment pipeline.\",\n      \"reason\": \"来源说明该档案是等待 enrichment pipeline 的 lead/stub；虽说明资料档案的通用来源，但没有表明此仓库已汇编 Naluri 的公开 API 资料。卡片其余部分已说明 stub 状态，因此此处“公开信息汇编”容易夸大当前档案内容。\",\n      \"suggested_correction\": \"改为“该仓库是 API Evangelist 为 Naluri 建立的待补充资料档案（stub）”，并保留其非软件档案的说明。\"\n    }\n  ],\n  \"limitations\": [\n    \"仅有 README 与 GitHub 元数据；未提供其他仓库文件，不能据此核验是否存在额外 API 资料。\",\n    \"README 明确说明仓库不含软件；本次项目类型判断依据该说明及仓库元数据。\",\n    \"许可证状态为 pending，来源元数据未列许可证；未将其推断为已获开源授权。\",\n    \"三个场景均标为 unverified，且条件明确指出待核实能力；本次未将其视为已实现或直接适用。\"\n  ]\n}",
+ "review": {
+  "repository_id": 1318641711,
+  "verdict": "pass_with_limits",
+  "summary": "卡片准确区分了第三方 API 资料档案与 Naluri 的产品，并将许可证标为 pending；场景也均标为 unverified，且列出待核实条件。主要限制是 README 将该仓库明确描述为等待资料补充的 stub，卡片对档案内容的概括应避免让人误以为已有实质 API 资料。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "summary",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "该仓库仅为公开信息汇编的 API 档案",
+    "source_id": "s0",
+    "quote": "This profile is a lead awaiting the enrichment pipeline.",
+    "reason": "来源说明该档案是等待 enrichment pipeline 的 lead/stub；虽说明资料档案的通用来源，但没有表明此仓库已汇编 Naluri 的公开 API 资料。卡片其余部分已说明 stub 状态，因此此处“公开信息汇编”容易夸大当前档案内容。",
+    "suggested_correction": "改为“该仓库是 API Evangelist 为 Naluri 建立的待补充资料档案（stub）”，并保留其非软件档案的说明。"
+   }
+  ],
+  "limitations": [
+   "仅有 README 与 GitHub 元数据；未提供其他仓库文件，不能据此核验是否存在额外 API 资料。",
+   "README 明确说明仓库不含软件；本次项目类型判断依据该说明及仓库元数据。",
+   "许可证状态为 pending，来源元数据未列许可证；未将其推断为已获开源授权。",
+   "三个场景均标为 unverified，且条件明确指出待核实能力；本次未将其视为已实现或直接适用。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:40:36.896061+00:00",
+ "elapsed_seconds": 7.297
+}

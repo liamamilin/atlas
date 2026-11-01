@@ -1,0 +1,50 @@
+{
+ "audit_id": "atlas-semantic-55651-2026-10-29",
+ "at": "2026-10-30T16:02:19.105907+00:00",
+ "applied": true,
+ "before": {
+  "charged_upper_micro": 49788276,
+  "estimated_micro": 39327409,
+  "reserved_micro": 208370,
+  "available_micro": 3354,
+  "cap_micro": 50000000
+ },
+ "after": {
+  "charged_upper_micro": 45462030,
+  "estimated_micro": 45451889,
+  "reserved_micro": 208370,
+  "available_micro": 4329600,
+  "cap_micro": 50000000
+ },
+ "receipt_counts": {
+  "openai_long_context_requests": 3,
+  "openai_settled_usage_receipts": 54934,
+  "opencode-go_settled_usage_receipts": 7525,
+  "known_no_charge": 5
+ },
+ "exact_go_provider_reported_cost_usd": "7.71163261",
+ "changed_rows": 62295,
+ "protected_before": {
+  "projects": "54862c327504945813686335f8ef8f27b4da223e68f91c27997fb5173f825b40",
+  "request_receipts_and_states": "76e4448b88bcd9900dfc25b9351a87784d0b0e83c956518ffed960c42ab4433a",
+  "uncertain_requests": "b70259a62dcb24d2d94175ce6536240b948b3db282eff0ab06012cfc11746b8e"
+ },
+ "method": "Go settled balance usage.cost=list_cost replaces peak allowance, rounded upward per request; OpenAI cache writes replace ordinary input, including long-context multipliers; OpenAI upper bound and all unknown reservations retained.",
+ "sources": [
+  "https://developers.openai.com/api/docs/models/gpt-6-luna",
+  "https://developers.openai.com/api/docs/guides/prompt-caching",
+  "https://opencode.ai/v2/docs/console/go/"
+ ],
+ "provider_invoice_reconciled": false,
+ "invoice_limit": "Go uses provider-reported per-request cost. OpenAI uses measured token receipts at published rates, not a downloaded organization invoice; budget still uses its higher input bound. Unknown charges remain fully reserved.",
+ "offline_tests": {
+  "passed": 17,
+  "command": "python3 -m unittest test_full_audit test_review_sample test_compare_models"
+ },
+ "scope_prompts_routes_cap_unchanged": true,
+ "protected_after": {
+  "projects": "54862c327504945813686335f8ef8f27b4da223e68f91c27997fb5173f825b40",
+  "request_receipts_and_states": "76e4448b88bcd9900dfc25b9351a87784d0b0e83c956518ffed960c42ab4433a",
+  "uncertain_requests": "b70259a62dcb24d2d94175ce6536240b948b3db282eff0ab06012cfc11746b8e"
+ }
+}

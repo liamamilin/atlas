@@ -1,0 +1,185 @@
+{
+ "card": {
+  "repository_id": 1164604797,
+  "full_name": "andrew/gitgres",
+  "github_url": "https://github.com/andrew/gitgres",
+  "name": "gitgres",
+  "summary": "提供 PostgreSQL 扩展（表、PL/pgSQL 函数、物化视图、git_oid 类型）和基于 libgit2 的后端，使标准 git push/clone 通过数据库读写。属于存储层组件，非完整托管平台；README 提到 omni_git 在其上增加 HTTP 传输，Forgejo 集成仅为分析设想。",
+  "positioning": "将 Git 对象与引用存入 PostgreSQL 表的扩展及 libgit2 后端。",
+  "scope": "适用于希望用 PostgreSQL 作为 Git 对象存储后端的场景，需 PostgreSQL、pgcrypto、libgit2、libpq、OpenSSL。",
+  "features": [
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/andrew/gitgres/git/blobs/5b368a1e2faf726e7d1fbcad04203238e2493d10",
+     "source_kind": "readme",
+     "source_sha256": "176a848524298600e4b3b29d40b66e5d9657989f88167cbe6fa0dd02d614a8df",
+     "source_url": "https://github.com/andrew/gitgres/blob/main/README.md",
+     "verification": "source_based"
+    },
+    "text": "Git 对象与引用存入 PostgreSQL 表"
+   },
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/andrew/gitgres/git/blobs/5b368a1e2faf726e7d1fbcad04203238e2493d10",
+     "source_kind": "readme",
+     "source_sha256": "176a848524298600e4b3b29d40b66e5d9657989f88167cbe6fa0dd02d614a8df",
+     "source_url": "https://github.com/andrew/gitgres/blob/main/README.md",
+     "verification": "source_based"
+    },
+    "text": "libgit2 后端支持 git push/clone"
+   },
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/andrew/gitgres/git/blobs/5b368a1e2faf726e7d1fbcad04203238e2493d10",
+     "source_kind": "readme",
+     "source_sha256": "176a848524298600e4b3b29d40b66e5d9657989f88167cbe6fa0dd02d614a8df",
+     "source_url": "https://github.com/andrew/gitgres/blob/main/README.md",
+     "verification": "source_based"
+    },
+    "text": "SQL 查询提交与树条目（物化视图）"
+   },
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/andrew/gitgres/git/blobs/5b368a1e2faf726e7d1fbcad04203238e2493d10",
+     "source_kind": "readme",
+     "source_sha256": "176a848524298600e4b3b29d40b66e5d9657989f88167cbe6fa0dd02d614a8df",
+     "source_url": "https://github.com/andrew/gitgres/blob/main/README.md",
+     "verification": "source_based"
+    },
+    "text": "原生 git_oid 类型与 SHA1 哈希实现"
+   }
+  ],
+  "project_type": "library",
+  "license": {
+   "detected_spdx": "MIT",
+   "note": "许可证完整正文与 SPDX 官方文本规范化精确匹配；未忽略附加条款。",
+   "reviewed_at": "2026-10-23T02:02:53.829897+00:00",
+   "source": {
+    "blob_sha": "27cb057f63655d8570019b64d19f2b62cca9b250",
+    "immutable_url": "https://api.github.com/repos/andrew/gitgres/git/blobs/27cb057f63655d8570019b64d19f2b62cca9b250",
+    "kind": "license",
+    "path": "LICENSE",
+    "retrieved_at": "2026-10-28T05:49:56.566426+00:00",
+    "sha256": "616fc7fa5b4a51bfe0b5c76980ce2f478e1c1a53641cc4d5eb2bac3e814f7532",
+    "url": "https://github.com/andrew/gitgres/blob/main/LICENSE"
+   },
+   "spdx": "MIT",
+   "status": "open_source",
+   "verification": {
+    "method": "spdx_exact_text",
+    "osi_approved": true,
+    "template_sha256": "0c2b3c87a154a4aaac6bc6a735dd454dc29d9a78c23a85deedb080e0c65de1f8",
+    "template_url": "https://raw.githubusercontent.com/spdx/license-list-data/main/json/details/MIT.json"
+   }
+  },
+  "missing_fields": [],
+  "collection_notes": [],
+  "completeness": "partial",
+  "summary_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/andrew/gitgres/git/blobs/5b368a1e2faf726e7d1fbcad04203238e2493d10",
+   "source_kind": "readme",
+   "source_sha256": "176a848524298600e4b3b29d40b66e5d9657989f88167cbe6fa0dd02d614a8df",
+   "source_url": "https://github.com/andrew/gitgres/blob/main/README.md",
+   "verification": "source_based"
+  },
+  "scope_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/andrew/gitgres/git/blobs/5b368a1e2faf726e7d1fbcad04203238e2493d10",
+   "source_kind": "readme",
+   "source_sha256": "176a848524298600e4b3b29d40b66e5d9657989f88167cbe6fa0dd02d614a8df",
+   "source_url": "https://github.com/andrew/gitgres/blob/main/README.md",
+   "verification": "source_based"
+  },
+  "positioning_evidence": {
+   "excerpt": "Store git objects and refs in PostgreSQL tables.",
+   "immutable_url": "https://api.github.com/repos/andrew/gitgres/git/blobs/5b368a1e2faf726e7d1fbcad04203238e2493d10",
+   "source_kind": "readme",
+   "source_sha256": "176a848524298600e4b3b29d40b66e5d9657989f88167cbe6fa0dd02d614a8df",
+   "source_url": "https://github.com/andrew/gitgres/blob/main/README.md",
+   "verification": "quote_matched"
+  }
+ },
+ "scenario_matches": [
+  {
+   "applicability": "unverified",
+   "conditions": [
+    "访问控制需由上层平台实现"
+   ],
+   "evidence": {
+    "excerpt": "",
+    "immutable_url": "https://api.github.com/repos/andrew/gitgres/git/blobs/5b368a1e2faf726e7d1fbcad04203238e2493d10",
+    "source_kind": "readme",
+    "source_sha256": "176a848524298600e4b3b29d40b66e5d9657989f88167cbe6fa0dd02d614a8df",
+    "source_url": "https://github.com/andrew/gitgres/blob/main/README.md",
+    "verification": "source_based"
+   },
+   "reason": "仅提供存储层，不含可见性与角色权限管理",
+   "scenario_id": "auto-source-code-hosting-platform-27d984ad24",
+   "leaf": "source-code-hosting-platform",
+   "leaf_name": "Source Code Hosting Platform",
+   "scenario_name": "管理员配置仓库访问权限",
+   "scenario_description": "项目管理员为私有仓库设置可见性，按角色授予成员或团队读写与管理权限，并限制受保护分支的推送与合并。"
+  },
+  {
+   "applicability": "conditional",
+   "conditions": [
+    "需自行搭建 HTTP/SSH 传输层与平台应用面",
+    "需 PostgreSQL 及 libgit2 等依赖"
+   ],
+   "evidence": {
+    "excerpt": "",
+    "immutable_url": "https://api.github.com/repos/andrew/gitgres/git/blobs/5b368a1e2faf726e7d1fbcad04203238e2493d10",
+    "source_kind": "readme",
+    "source_sha256": "176a848524298600e4b3b29d40b66e5d9657989f88167cbe6fa0dd02d614a8df",
+    "source_url": "https://github.com/andrew/gitgres/blob/main/README.md",
+    "verification": "source_based"
+   },
+   "reason": "可作为托管平台的 Git 存储后端支撑推送与拉取",
+   "scenario_id": "auto-source-code-hosting-platform-c25d6d9183",
+   "leaf": "source-code-hosting-platform",
+   "leaf_name": "Source Code Hosting Platform",
+   "scenario_name": "团队日常推送与拉取代码",
+   "scenario_description": "开发者在本地克隆团队仓库，创建分支提交改动后推送回平台，其他成员拉取共享历史，平台作为团队代码的唯一权威副本。"
+  }
+ ],
+ "sources": [
+  {
+   "kind": "readme",
+   "immutable_url": "https://api.github.com/repos/andrew/gitgres/git/blobs/5b368a1e2faf726e7d1fbcad04203238e2493d10",
+   "sha256": "176a848524298600e4b3b29d40b66e5d9657989f88167cbe6fa0dd02d614a8df",
+   "text": "# Gitgres\n\nStore git objects and refs in PostgreSQL tables. Standard `git push`/`clone` work against the database through a libgit2-based backend.\n\nThe extension gives you everything: tables, PL/pgSQL functions, materialized views, plus a native `git_oid` type with fast C implementations of SHA1 hashing and tree parsing. A separate libgit2-based backend handles `git push`/`clone` through libpq.\n\nFor more on why you'd want git data in a database, see [Git in Postgres](https://nesbitt.io/2026/02/26/git-in-postgres.html).\n\n## Docker\n\nThe fastest way to try gitgres. Builds everything and starts Postgres with the extension loaded:\n\n```\ndocker build -t gitgres .\ndocker run --rm -it gitgres\n```\n\nFrom inside the container:\n\n```\n./backend/gitgres-backend init \"dbname=gitgres user=postgres\" myrepo\n./backend/gitgres-backend push \"dbname=gitgres user=postgres\" myrepo /path/to/repo\npsql -U postgres -d gitgres\n```\n\nTo run the tests inside the container:\n\n```\ndocker exec <container> bash -c \"cd /gitgres && make test\"\n```\n\n## Setup\n\nRequires PostgreSQL with pgcrypto, libgit2, libpq, and OpenSSL.\n\n```\nbrew install libgit2\n```\n\nBuild and install the extension:\n\n```\nmake ext\nmake -C ext install\n```\n\nCreate a database and enable the extension:\n\n```sql\nCREATE EXTENSION gitgres CASCADE;\n```\n\nThis creates all tables (repositories, objects, refs, reflog), functions, and materialized views. The `CASCADE` pulls in pgcrypto automatically.\n\nBuild the libgit2 backend (for push/clone support):\n\n```\nmake backend\n```\n\n## Usage\n\nInitialize a repository in the database:\n\n```\n./backend/gitgres-backend init \"dbname=gitgres\" myrepo\n```\n\nPush a local git repo into Postgres:\n\n```\n./backend/gitgres-backend push \"dbname=gitgres\" myrepo /path/to/repo\n```\n\nClone from Postgres back to disk:\n\n```\n./backend/gitgres-backend clone \"dbname=gitgres\" myrepo /path/to/dest\n```\n\nList refs stored in the database:\n\n```\n./backend/gitgres-backend ls-refs \"dbname=gitgres\" myrepo\n```\n\nImport a repo using the shell script (no compilation needed):\n\n```\n./import/gitgres-import.sh /path/to/repo \"dbname=gitgres\" myrepo\n```\n\n## Querying git data with SQL\n\nAfter importing or pushing a repo, refresh the materialized views:\n\n```sql\nREFRESH MATERIALIZED VIEW commits_view;\nREFRESH MATERIALIZED VIEW tree_entries_view;\n```\n\nThen query commits like a regular table:\n\n```sql\nSELECT sha, author_name, authored_at, message\nFROM commits_view\nORDER BY authored_at DESC;\n```\n\nWalk a tree:\n\n```sql\nSELECT path, mode, encode(oid, 'hex')\nFROM git_ls_tree_r(1, decode('abc123...', 'hex'));\n```\n\n## Tests\n\n```\nmake test\n```\n\nRuns 30 Minitest tests against a `gitgres_test` database. Each test runs in a transaction that rolls back on teardown. Tests cover object hashing (verified against `git hash-object`), object store CRUD, tree and commit parsing, ref compare-and-swap updates, and a full push/clone roundtrip.\n\n## How it works\n\nGit objects (commits, trees, blobs, tags) are stored in an `objects` table with their raw content and a SHA1 OID computed the same way git does: `SHA1(\"<type> <size>\\0<content>\")`. Refs live in a `refs` table with compare-and-swap updates for safe concurrent access.\n\nThe libgit2 backend implements `git_odb_backend` and `git_refdb_backend`, the two interfaces libgit2 needs to treat any storage system as a git repository. The backend reads and writes objects and refs through libpq. When receiving a push, it uses libgit2's packfile indexer to extract individual objects from the incoming pack, then stores each one in Postgres.\n\nThe extension provides a proper `git_oid` type (20-byte fixed binary with hex I/O and btree/hash indexing), C implementations of SHA1 hashing and tree parsing, and the full SQL layer: tables, PL/pgSQL functions for object I/O, tree walking, commit parsing, and ref management, plus materialized views for querying commits and tree entries. [omni_git](https://github.com/andrew/omni_git) builds on this to add HTTP transport and deploy-on-push.\n\n## Forgejo\n\nWith git data in Postgres, a git forge doesn't need filesystem storage at all. Forgejo already keeps everything except git repos in the database. Its entire git interaction goes through a single Go package (`modules/git`) that shells out to the `git` binary. Replace that package with SQL queries against the gitgres schema and the filesystem dependency disappears. One Postgres instance, one backup, one replication stream.\n\nSee [forgejo.md](forgejo.md) for a detailed analysis of Forgejo's git layer and what replacing it would involve.\n\n## Prior art\n\n[libgit2-backends](https://github.com/libgit2/libgit2-backends) -- the official collection of pluggable ODB backends for libgit2. Includes MySQL, SQLite, Redis, and Memcached implementations. No Postgres backend, which is what prompted this project.\n\n[gitbase](https://github.com/src-d/gitbase) -- a MySQL-compatible SQL interface for querying git repositories, built on [go-git](https://github.com/go-git/go-git). Reads from on-disk repos rather than storing objects in the database. The SQL query layer is the goal rather than the storage layer.\n\n[JGit DFS](https://archive.eclipse.org/jgit/docs/jgit-2.0.0.201206130900-r/apidocs/org/eclipse/jgit/storage/dfs/DfsRepository.html) -- JGit's abstract distributed file system storage. Defines the interface for storing git pack files on arbitrary backends. Google's internal git infrastructure builds on this. An earlier attempt (JGit DHT) tried storing objects directly in databases but was abandoned because no database could keep up with the access patterns.\n\n[Gitaly](https://gitlab.com/gitlab-org/gitaly) -- GitLab's git storage service. An RPC server that wraps git operations rather than replacing the storage layer. Still uses the filesystem for actual object storage.\n\n[Dolt](https://github.com/dolthub/dolt) -- a SQL database with git-style versioning (branch, merge, diff) built on [prolly trees](https://github.com/attic-labs/noms). Comes at the problem from the opposite direction: it's a database that borrowed git's semantics, not git storage backed by a database.\n",
+   "id": "s0",
+   "original_chars": 6062,
+   "truncated": false
+  },
+  {
+   "kind": "license",
+   "immutable_url": "https://api.github.com/repos/andrew/gitgres/git/blobs/27cb057f63655d8570019b64d19f2b62cca9b250",
+   "sha256": "616fc7fa5b4a51bfe0b5c76980ce2f478e1c1a53641cc4d5eb2bac3e814f7532",
+   "text": "MIT License\n\nCopyright (c) 2025 Andrew Nesbitt\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and\nassociated documentation files (the \"Software\"), to deal in the Software without restriction, including\nwithout limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the\nfollowing conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial\nportions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT\nLIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO\nEVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER\nIN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE\nUSE OR OTHER DEALINGS IN THE SOFTWARE.\n",
+   "id": "s1",
+   "original_chars": 1071,
+   "truncated": false
+  },
+  {
+   "id": "s2",
+   "kind": "github_metadata",
+   "sha256": "282e0a2e0487494e047b6ebc22b0edd7a018ca1b59926d6a6b187fbeb079a8ee",
+   "text": "{\"archived\":false,\"description\":\"Store git objects and refs in PostgreSQL tables. Standard git push/clone work against the database through a libgit2-based backend.\",\"full_name\":\"andrew/gitgres\",\"html_url\":\"https://github.com/andrew/gitgres\",\"id\":1164604797,\"language\":\"C\",\"license\":{\"key\":\"mit\",\"name\":\"MIT License\",\"node_id\":\"MDc6TGljZW5zZTEz\",\"spdx_id\":\"MIT\",\"url\":\"https://api.github.com/licenses/mit\"},\"topics\":[]}\nStore git objects and refs in PostgreSQL tables. Standard git push/clone work against the database through a libgit2-based backend.",
+   "truncated": false
+  }
+ ],
+ "coverage": {
+  "total_campaign_matches": 2,
+  "matches_included": 2,
+  "files_available": 2,
+  "files_included": 2,
+  "omitted_files": 0,
+  "truncated_files": 0
+ }
+}

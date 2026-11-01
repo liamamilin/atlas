@@ -1,0 +1,89 @@
+{
+ "repository_id": 1182396283,
+ "domain": "15",
+ "input_sha256": "60b86f6476c8229fde1cf6b69ae1bcc37387e1e93fe156ae49ec3bc91cc0702f",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:26.432236+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDBJVUuY8GrSF3zJz4RDTnnJ6xb",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 9456,
+  "completion_tokens": 875,
+  "total_tokens": 10331,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 9453,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0013831,
+ "response_text": "{\n  \"repository_id\": 1182396283,\n  \"verdict\": \"pass_with_limits\",\n  \"summary\": \"卡片整体与 README 和元数据相符：这是用于浏览证据源并查看文件内容的桌面取证工作台，且明确排除完整处理流水线。Apache-2.0 标签有 LICENSE 正文支持。场景均标为 conditional，并说明了关键缺项；但部分场景理由中的具体能力超出所给来源可核实的范围。\",\n  \"checks\": {\n    \"facts\": \"supported\",\n    \"project_type\": \"supported\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"limited\"\n  },\n  \"issues\": [\n    {\n      \"field\": \"scenario_match\",\n      \"scenario_id\": \"auto-digital-forensics-platform-450a387295\",\n      \"severity\": \"minor\",\n      \"kind\": \"insufficient_evidence\",\n      \"claim\": \"支持 iOS/Android 备份与 Cellebrite UFDR 浏览，可查看聊天/应用数据库\",\n      \"source_id\": \"s0\",\n      \"quote\": \"Mobile backups | iOS (iTunes/Finder) and Android (`adb backup`) — browsable as a file tree\",\n      \"reason\": \"来源支持浏览所列移动备份及 UFDR 文件树，也列出数据库查看器，但没有明确证明该场景所称的聊天记录解析能力；场景条件已说明标记与报告需其他工具，因此不构成把完整平台能力标为 direct。\",\n      \"suggested_correction\": \"将理由收紧为可浏览所列备份及查看支持的文件/数据库；避免未有来源明确支持的聊天解析表述。\"\n    },\n    {\n      \"field\": \"scenario_match\",\n      \"scenario_id\": \"auto-digital-forensics-platform-a0c4863506\",\n      \"severity\": \"minor\",\n      \"kind\": \"insufficient_evidence\",\n      \"claim\": \"可打开磁盘镜像并查看文件系统内容、解析数据库与日志\",\n      \"source_id\": \"s0\",\n      \"quote\": \"Disk images | Raw and forensic acquisitions (E01 and others) with common desktop, mobile and embedded/flash filesystems\",\n      \"reason\": \"来源明确支持打开磁盘镜像及多类文件系统，也列出数据库和日志查看器，但未明确说明数据库与日志解析适用于该场景中的磁盘镜像内容。条件已注明镜像获取、哈希校验及 carving/时间线需外部完成。\",\n      \"suggested_correction\": \"将理由限定为可打开支持的磁盘镜像并查看其中可识别的文件；数据库或日志解析能力仅在来源明确支持时再关联。\"\n    },\n    {\n      \"field\": \"scenario_match\",\n      \"scenario_id\": \"auto-digital-forensics-platform-e9840a3d9f\",\n      \"severity\": \"minor\",\n      \"kind\": \"insufficient_evidence\",\n      \"claim\": \"可解析浏览器/应用数据库、日志等终端证据\",\n      \"source_id\": \"s0\",\n      \"quote\": \"Run Analyzer — run curated modules ported from iLEAPP/ALEAPP against a directory; results as a sortable, searchable table.\",\n      \"reason\": \"README 支持数据库、日志查看器及对目录运行精选分析模块，但没有明确证明这些能力覆盖场景所称的浏览器与聊天记录解析。条件已说明需先取得证据副本，时间线和报告由外部工具完成。\",\n      \"suggested_correction\": \"将理由改为支持查看所列数据库、日志及对目录运行分析模块，不具体承诺浏览器或聊天记录解析。\"\n    }\n  ],\n  \"limitations\": [\n    \"审查依据为提供的 README、LICENSE 和 GitHub 元数据；未检查源码或 README 所链接的格式支持、功能参考等文档。\",\n    \"场景理由中超出 README 明确表述的具体解析能力只能判为证据不足，不能据此断言功能不存在。\"\n  ]\n}",
+ "review": {
+  "repository_id": 1182396283,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体与 README 和元数据相符：这是用于浏览证据源并查看文件内容的桌面取证工作台，且明确排除完整处理流水线。Apache-2.0 标签有 LICENSE 正文支持。场景均标为 conditional，并说明了关键缺项；但部分场景理由中的具体能力超出所给来源可核实的范围。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-digital-forensics-platform-450a387295",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "支持 iOS/Android 备份与 Cellebrite UFDR 浏览，可查看聊天/应用数据库",
+    "source_id": "s0",
+    "quote": "Mobile backups | iOS (iTunes/Finder) and Android (`adb backup`) — browsable as a file tree",
+    "reason": "来源支持浏览所列移动备份及 UFDR 文件树，也列出数据库查看器，但没有明确证明该场景所称的聊天记录解析能力；场景条件已说明标记与报告需其他工具，因此不构成把完整平台能力标为 direct。",
+    "suggested_correction": "将理由收紧为可浏览所列备份及查看支持的文件/数据库；避免未有来源明确支持的聊天解析表述。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-digital-forensics-platform-a0c4863506",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "可打开磁盘镜像并查看文件系统内容、解析数据库与日志",
+    "source_id": "s0",
+    "quote": "Disk images | Raw and forensic acquisitions (E01 and others) with common desktop, mobile and embedded/flash filesystems",
+    "reason": "来源明确支持打开磁盘镜像及多类文件系统，也列出数据库和日志查看器，但未明确说明数据库与日志解析适用于该场景中的磁盘镜像内容。条件已注明镜像获取、哈希校验及 carving/时间线需外部完成。",
+    "suggested_correction": "将理由限定为可打开支持的磁盘镜像并查看其中可识别的文件；数据库或日志解析能力仅在来源明确支持时再关联。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-digital-forensics-platform-e9840a3d9f",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "可解析浏览器/应用数据库、日志等终端证据",
+    "source_id": "s0",
+    "quote": "Run Analyzer — run curated modules ported from iLEAPP/ALEAPP against a directory; results as a sortable, searchable table.",
+    "reason": "README 支持数据库、日志查看器及对目录运行精选分析模块，但没有明确证明这些能力覆盖场景所称的浏览器与聊天记录解析。条件已说明需先取得证据副本，时间线和报告由外部工具完成。",
+    "suggested_correction": "将理由改为支持查看所列数据库、日志及对目录运行分析模块，不具体承诺浏览器或聊天记录解析。"
+   }
+  ],
+  "limitations": [
+   "审查依据为提供的 README、LICENSE 和 GitHub 元数据；未检查源码或 README 所链接的格式支持、功能参考等文档。",
+   "场景理由中超出 README 明确表述的具体解析能力只能判为证据不足，不能据此断言功能不存在。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 2,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T04:39:37.797450+00:00",
+ "elapsed_seconds": 11.365
+}

@@ -1,0 +1,91 @@
+{
+ "repository_id": 1340376002,
+ "domain": "20",
+ "input_sha256": "6848e366884670c109086042ac6984fd144f37a4e5012f6b60f00a1ad9ca8223",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:12:08.911870+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-df05291f03c0-af516",
+ "usage": {
+  "prompt_tokens": 7381,
+  "completion_tokens": 511,
+  "total_tokens": 7892,
+  "prompt_tokens_details": {
+   "cached_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00141375,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00141375,
+   "tokens": {
+    "input": 7381,
+    "output": 511,
+    "reasoning": 0,
+    "cache_read": 0,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1340376002,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体与README一致：定位为FDA食品标签合规审查的多模态模型微调项目，明确标注P0脚手架、规则引擎/生成器/训练未完成、仅审查辅助需人工签核，许可为Apache-2.0且正文精确匹配。主要问题是project_type标为application，而README显示当前仅为脚手架、核心功能未实现，宜标为项目/研究原型；两个场景均标unverified且理由合理。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"limited\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"project_type\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"wrong_type\",\"claim\":\"project_type: application\",\"source_id\":\"s0\",\"quote\":\"P0 scaffold + CONTRACTS (this repo state)\",\"reason\":\"README明确当前为P0脚手架，规则引擎、生成器、数据集与训练均未完成，尚不构成可用的完整应用；卡片summary已如实说明未完成，但类型标签偏强。\",\"suggested_correction\":\"将project_type调整为研究/原型项目或标注为脚手架阶段，待P1-P6实现后再标application。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"输出带违规类型、严重度、CFR引用的JSON报告（设计目标）\",\"source_id\":\"s0\",\"quote\":\"Emit verdict JSON: `PASS | FLAG`, list of `{violation_type, severity, cfr_citation, observed, expected, correction}`. Human signs off.\",\"reason\":\"该输出格式在README中作为流程第5步描述，但整体处于P0脚手架，属设计目标而非已实现功能；卡片已用“设计目标”限定，措辞可接受，但需确保不被读作已实现。\",\"suggested_correction\":\"保留“设计目标”限定，或明确标注为未实现的设计规格。\"}],\"limitations\":[\"仅提供README与LICENSE两个文件，未覆盖forge/model/cloud/eval等目录源码，无法核验功能实现程度。\",\"场景匹配均为unverified，未提供场景侧证据，仅依据README方向判断相关性。\",\"许可仅做SPDX正文精确匹配，未核验第三方依赖或模型权重许可。\"]}",
+ "review": {
+  "repository_id": 1340376002,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体与README一致：定位为FDA食品标签合规审查的多模态模型微调项目，明确标注P0脚手架、规则引擎/生成器/训练未完成、仅审查辅助需人工签核，许可为Apache-2.0且正文精确匹配。主要问题是project_type标为application，而README显示当前仅为脚手架、核心功能未实现，宜标为项目/研究原型；两个场景均标unverified且理由合理。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "limited",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "project_type",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "wrong_type",
+    "claim": "project_type: application",
+    "source_id": "s0",
+    "quote": "P0 scaffold + CONTRACTS (this repo state)",
+    "reason": "README明确当前为P0脚手架，规则引擎、生成器、数据集与训练均未完成，尚不构成可用的完整应用；卡片summary已如实说明未完成，但类型标签偏强。",
+    "suggested_correction": "将project_type调整为研究/原型项目或标注为脚手架阶段，待P1-P6实现后再标application。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "输出带违规类型、严重度、CFR引用的JSON报告（设计目标）",
+    "source_id": "s0",
+    "quote": "Emit verdict JSON: `PASS | FLAG`, list of `{violation_type, severity, cfr_citation, observed, expected, correction}`. Human signs off.",
+    "reason": "该输出格式在README中作为流程第5步描述，但整体处于P0脚手架，属设计目标而非已实现功能；卡片已用“设计目标”限定，措辞可接受，但需确保不被读作已实现。",
+    "suggested_correction": "保留“设计目标”限定，或明确标注为未实现的设计规格。"
+   }
+  ],
+  "limitations": [
+   "仅提供README与LICENSE两个文件，未覆盖forge/model/cloud/eval等目录源码，无法核验功能实现程度。",
+   "场景匹配均为unverified，未提供场景侧证据，仅依据README方向判断相关性。",
+   "许可仅做SPDX正文精确匹配，未核验第三方依赖或模型权重许可。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 0,
+   "reason": "quote_not_in_supplied_source"
+  },
+  {
+   "index": 1,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T05:12:19.284144+00:00",
+ "elapsed_seconds": 10.372
+}

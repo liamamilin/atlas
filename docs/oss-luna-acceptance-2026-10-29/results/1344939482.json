@@ -1,0 +1,51 @@
+{
+ "repository_id": 1344939482,
+ "domain": "27",
+ "input_sha256": "ef2c6933e3799f385aa8f95209ec08d6337aa5ece2a7eb5ea3c5b1b652d62be6",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:25.563167+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCE7mPMokLZvfnSXprV8YCZKZvPX",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 1400,
+  "completion_tokens": 159,
+  "total_tokens": 1559,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 1397,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0002195,
+ "response_text": "{\"repository_id\":1344939482,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片如实标注资料缺失、项目类型未知及许可证待核验；现有来源仅能确认仓库元数据，不能验证项目功能或完整内容。\",\"checks\":{\"facts\":\"limited\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"仅提供一条 GitHub 元数据来源；仓库文件不可用，无法核验项目介绍、功能、范围或完整性。\",\"许可证状态为 pending，符合未发现许可证信息的现状；不能据此确认开源授权。\",\"没有场景匹配记录，无法评估具体场景适用性。\"]}",
+ "review": {
+  "repository_id": 1344939482,
+  "verdict": "pass_with_limits",
+  "summary": "卡片如实标注资料缺失、项目类型未知及许可证待核验；现有来源仅能确认仓库元数据，不能验证项目功能或完整内容。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "仅提供一条 GitHub 元数据来源；仓库文件不可用，无法核验项目介绍、功能、范围或完整性。",
+   "许可证状态为 pending，符合未发现许可证信息的现状；不能据此确认开源授权。",
+   "没有场景匹配记录，无法评估具体场景适用性。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:40:29.597634+00:00",
+ "elapsed_seconds": 4.034
+}

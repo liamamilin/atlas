@@ -1,0 +1,29 @@
+{
+  "measured_at": "2026-10-23T16:53:08.241129+08:00",
+  "method": "Read-only SQLite backup into a temporary directory; CatalogStore.catalog called with bootstrap disabled. JSON measured without HTTP gzip or transport. Timings are observations, not latency guarantees.",
+  "measurements": [
+    {
+      "mode": "unpaginated",
+      "response_json_bytes_utf8": 6556133,
+      "catalog_method_seconds": 0.1258,
+      "projects_in_response": 950,
+      "matching_projects": 950
+    },
+    {
+      "mode": "home_overview",
+      "response_json_bytes_utf8": 16610,
+      "catalog_method_seconds": 0.0348,
+      "projects_in_response": 0,
+      "matching_projects": 950
+    },
+    {
+      "mode": "catalog_page_24",
+      "response_json_bytes_utf8": 726356,
+      "catalog_method_seconds": 0.0514,
+      "projects_in_response": 24,
+      "matching_projects": 950
+    }
+  ],
+  "overview_response_reduction_percent": 99.75,
+  "live_service": "Existing API and collection jobs were not restarted; backend optimization applies after API restart."
+}

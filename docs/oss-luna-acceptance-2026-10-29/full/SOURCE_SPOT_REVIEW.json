@@ -1,0 +1,1934 @@
+{
+ "audit_id": "atlas-semantic-55651-2026-10-29",
+ "at": "2026-10-30T16:21:21.917450+00:00",
+ "selection": "Purposive non-statistical source comparison: one new full-audit model-confirmed finding per primary domain plus minor/dismissed/unresolved/metadata/shared-repository strata. Pilot cases not counted as new cases.",
+ "reviewer": "Codex",
+ "human_user_confirmation_count": 0,
+ "records": [
+  {
+   "repository_id": 11376574,
+   "repository": "open-lms-open-source/moodle-mod_hsuforum",
+   "repository_url": "https://github.com/open-lms-open-source/moodle-mod_hsuforum",
+   "domain": "01",
+   "finding_id": "issue-0",
+   "field": "project_type",
+   "kind": "wrong_type",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "unresolved",
+   "category": "类型标签粒度待定",
+   "reason": "README确认是Moodle模块，但application是否涵盖宿主内业务应用缺少统一判据；卡片已称插件，不能只因非独立部署就确认类型错误。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 2,
+    "matches_included": 2,
+    "files_available": 1,
+    "files_included": 1,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/11376574.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/11376574.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/open-lms-open-source/moodle-mod_hsuforum/git/blobs/3f1a88fd0741339433c4393fbb0efba8455f6640",
+     "text_sha256": "ec162cda6527e1ca8f07db49d5eedd3eb091ee1858c9af7d476bb721b22e91ac",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/b7d2884aea666ec13c34115429a1a189679412a85e53c5893240c4788b60c980.json",
+     "archive_sha256": "0cf51f2488141149a47c76e22746b2733d8263b59da4bc40911acf82b4d87f01",
+     "original_chars": 2520,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 1143643,
+   "repository": "gartz/G-Lock-Double-Opt-in-Manager--Wordpress-Plugin-",
+   "repository_url": "https://github.com/gartz/G-Lock-Double-Opt-in-Manager--Wordpress-Plugin-",
+   "domain": "02",
+   "finding_id": "issue-0",
+   "field": "project_type",
+   "kind": "wrong_type",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "unresolved",
+   "category": "类型标签粒度待定",
+   "reason": "README确认WordPress邮件插件；现有粗分类中library可覆盖扩展组件，不能擅自新增plugin类型或据名称直接否决。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 1,
+    "files_included": 1,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/1143643.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/1143643.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/gartz/G-Lock-Double-Opt-in-Manager--Wordpress-Plugin-/git/blobs/15e79f0ac81a63a6b1bc4ec4e2e600a6794c63b5",
+     "text_sha256": "f5366fa37f530086cd14d9120632375e85e92cb145245ad6d3332495728860dd",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/af84509dab8c2b4454fde32ab159b2fdb36f38b1d8b60184d3e99d9aae63b371.json",
+     "archive_sha256": "34cab528a5d34101740d7b26a47b3845f83a2288599dcbc784768bb5763e312e",
+     "original_chars": 9834,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 1127048,
+   "repository": "danielbeardsley/shared_list",
+   "repository_url": "https://github.com/danielbeardsley/shared_list",
+   "domain": "03",
+   "finding_id": "issue-0",
+   "field": "features",
+   "kind": "roadmap_as_fact",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "corroborated",
+   "category": "计划写成现有功能",
+   "reason": "无新建/保存按钮及导航要求位于Goals，使用needs/must；功能字段未保留目标语气，应收紧为设计目标，未验证代码实现。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 1,
+    "files_included": 1,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/1127048.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/1127048.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/danielbeardsley/shared_list/git/blobs/726f38cf4cbc5a617cc2b1a380a6c6ae429d2a83",
+     "text_sha256": "09e7b7c420b7a79f3b0cf4c8d6349212dd39599638c2106a4f9ef707dce3222a",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/7f8addec9a5a23ba48a47f56681e2081a7f6698b712008c2d1cd3c93e871d817.json",
+     "archive_sha256": "ea1e50686a75897f30333aa6d273066a69f15ff434d8ad760a4b2bc3e7a0f654",
+     "original_chars": 1059,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 2056773,
+   "repository": "bovine/defish",
+   "repository_url": "https://github.com/bovine/defish",
+   "domain": "04",
+   "finding_id": "issue-0",
+   "field": "project_type",
+   "kind": "wrong_type",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "corroborated",
+   "category": "项目类型错位",
+   "reason": "README给出stdin和管道调用方式，属于可运行命令行图像工具；单标library缺少来源支持，应复核类型。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 1,
+    "files_included": 1,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/2056773.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/2056773.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/bovine/defish/git/blobs/28d8c04f413e04763adf4bf5240912ee20f5884f",
+     "text_sha256": "b9cc44869eb193f7338ec71728c64b3bdf1ed921c5c93edbe5dec4fb1e0c5755",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/42e6cceb469d5c1bbe17c4e906d85784fcd4202226f7438fa7a44cc9e70268f1.json",
+     "archive_sha256": "864ca26ba539fb4f5dad8544ace4ec0f5b4e3f8bd620e51d7033b04c6e8c34b2",
+     "original_chars": 1699,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 131455697,
+   "repository": "spt3gntlmn/MySQL-Homework",
+   "repository_url": "https://github.com/spt3gntlmn/MySQL-Homework",
+   "domain": "05",
+   "finding_id": "issue-0",
+   "field": "features",
+   "kind": "roadmap_as_fact",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "corroborated",
+   "category": "作业要求写成能力",
+   "reason": "Challenge要求应用检查库存和拒绝订单；功能字段直接写为已具备，来源层面应标为题目要求。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 1,
+    "files_included": 1,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/131455697.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/131455697.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/spt3gntlmn/MySQL-Homework/git/blobs/e97904bf4def9f20b46672b9122b6e08d6218d9f",
+     "text_sha256": "b89706e177410bf7ba82d1f8d8224cff60c62cfdc1bcd80698fd98185d239ec3",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/13ae2f772d127d5d4af673405fb5322b1b741f535acde7e5304f402bd1782126.json",
+     "archive_sha256": "03b925319efb32697033282f33cd715933d1c5bacebfd7a9e362f177ef4c7d27",
+     "original_chars": 7157,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      false,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 3954159,
+   "repository": "alobato/campagne",
+   "repository_url": "https://github.com/alobato/campagne",
+   "domain": "06",
+   "finding_id": "issue-0",
+   "field": "project_type",
+   "kind": "wrong_type",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "unresolved",
+   "category": "组件与应用分类粒度待定",
+   "reason": "README明确Rails 3 engine gem，但卡片定位已说明组件性质；与其他宿主插件一致，缺少统一类型规范时不直接判application标签错误。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 2,
+    "matches_included": 2,
+    "files_available": 1,
+    "files_included": 1,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/3954159.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/3954159.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/alobato/campagne/git/blobs/285635493a67b4dbc2667fd8e208f3c6c8fb67e5",
+     "text_sha256": "48a54e24b982103a0ac2854e03a0cf20eec5a523e814f1b6808c8aa2736402ab",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/6dc293cbe444e909cc6a24594345974681cc2dfe3180ea5c586a9d8d67bd78f3.json",
+     "archive_sha256": "153c4a1158674ca5801f609467e91ed4010122cbac6aea020280a00e747c8448",
+     "original_chars": 907,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 84032246,
+   "repository": "honeybeeluv07/Deus-Vult-Ministries-Org",
+   "repository_url": "https://github.com/honeybeeluv07/Deus-Vult-Ministries-Org",
+   "domain": "07",
+   "finding_id": "issue-1",
+   "field": "license",
+   "kind": "license_overclaim",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "dismissed",
+   "category": "第三方许可范围",
+   "reason": "README的CC BY-SA段明确提到these icons和Iconic，可能是第三方图标说明，不能直接推断与仓库BSD文件全局冲突；现有pending保守状态可保留。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 0,
+    "matches_included": 0,
+    "files_available": 2,
+    "files_included": 2,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/84032246.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/84032246.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/honeybeeluv07/Deus-Vult-Ministries-Org/git/blobs/6095e6d333d9948c04724f55a9d24d257666a4dc",
+     "text_sha256": "3205fdab77ec052fb8958c688143efaf35c26393844725faa236218e1162cb13",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/d474bfdb0f1bcc7a84bad1f802c4c0adbc4f5d2bbf059bdfe58e7ae12c6cd6e4.json",
+     "archive_sha256": "4d3c4a8b9d9719f3ab07be220616264a338bd57b676b7595df2b9bef956ab9f8",
+     "original_chars": 18685,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    },
+    {
+     "source_id": "s1",
+     "kind": "license",
+     "immutable_url": "https://api.github.com/repos/honeybeeluv07/Deus-Vult-Ministries-Org/git/blobs/b70cc3133df50ee9942d88765242c94e9160b524",
+     "text_sha256": "b387c3edaba53ada7a20d28068bd0e4f6c371173137cc2ef53c062c72573998b",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/d474bfdb0f1bcc7a84bad1f802c4c0adbc4f5d2bbf059bdfe58e7ae12c6cd6e4.json",
+     "archive_sha256": "4d3c4a8b9d9719f3ab07be220616264a338bd57b676b7595df2b9bef956ab9f8",
+     "original_chars": 1512,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 33576301,
+   "repository": "claussian/hh-typology",
+   "repository_url": "https://github.com/claussian/hh-typology",
+   "domain": "08",
+   "finding_id": "issue-0",
+   "field": "features",
+   "kind": "roadmap_as_fact",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "unresolved",
+   "category": "步骤与完成状态",
+   "reason": "First steps是步骤标题，缺少明确未完成标记；可见材料无法证明这些分析未实现，也无法证明实现，应保留限制。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 0,
+    "matches_included": 0,
+    "files_available": 1,
+    "files_included": 1,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/33576301.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/33576301.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/claussian/hh-typology/git/blobs/3cc8c03bfd6c90d9a49dee43552aecaa92535e08",
+     "text_sha256": "a1b50ec595885588fbc2f7854dd198427461bc363372f1bad1f81973d521c583",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/8f3e9c620aea8304c9da14ce75429d17f61535375ab29841be0a87a28c7034d9.json",
+     "archive_sha256": "37a354a2f8d02474e8402a09a3b980e554e5215ff785ad97b22569e3918cb100",
+     "original_chars": 727,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 8854010,
+   "repository": "memble/OpenPayroll",
+   "repository_url": "https://github.com/memble/OpenPayroll",
+   "domain": "09",
+   "finding_id": "issue-0",
+   "field": "summary",
+   "kind": "license_overclaim",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "corroborated",
+   "category": "许可声明归因",
+   "reason": "README有Apache声明，独立文件核验仍pending。摘要宜写README声明Apache以区分来源陈述与已核验授权；不判实际授权无效。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 1,
+    "files_included": 1,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/8854010.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/8854010.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/memble/OpenPayroll/git/blobs/b09d43470128e20c36ee0cff123e6cce9bfa6595",
+     "text_sha256": "32e2374f379c05a778117457dd2084fb84a01bd3a4dff602b82525d3dd8c0fc9",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/343051f88eb7686fac513de3c4d3fb9e61d1b9b95cdffdb8e031c42d27fe8af2.json",
+     "archive_sha256": "ede1d7cd77fb3993407cd4af56b487d5fe17c53bbcae18e1fdf450d045514e43",
+     "original_chars": 364,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 83954416,
+   "repository": "apache/ofbiz-plugins",
+   "repository_url": "https://github.com/apache/ofbiz-plugins",
+   "domain": "10",
+   "finding_id": "issue-0",
+   "field": "project_type",
+   "kind": "wrong_type",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "unresolved",
+   "category": "共享组件仓库分类",
+   "reason": "来源确认ofbiz-plugins是互补组件仓库；应统一application/collection标签规范后决定，不能因含插件就认定所有应用型组件为错误。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 0,
+    "matches_included": 0,
+    "files_available": 2,
+    "files_included": 2,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/83954416.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/83954416.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/apache/ofbiz-plugins/git/blobs/33e3c7f74f84d396e32050584754a2a4cbe2473f",
+     "text_sha256": "9887ba064cb04579ab386fb0aaa97fe1836198492e42e775a87bdf7a05ee1788",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/e81e6694ebb25f62ada1a683a6bc9f42c23789391e2b577b927554ac4a525af7.json",
+     "archive_sha256": "ce85d1cb542b3aea721d0b364e752b475166facc4668ff5419e129adc621138e",
+     "original_chars": 882,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    },
+    {
+     "source_id": "s1",
+     "kind": "license",
+     "immutable_url": "https://api.github.com/repos/apache/ofbiz-plugins/git/blobs/01f491f978de331b5390adf8190db415b3da5240",
+     "text_sha256": "5ff99954dbfd964d696bc7b4ec4a8f1aead3f6afa7c3f56ef90aa927bd47f640",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/e81e6694ebb25f62ada1a683a6bc9f42c23789391e2b577b927554ac4a525af7.json",
+     "archive_sha256": "ce85d1cb542b3aea721d0b364e752b475166facc4668ff5419e129adc621138e",
+     "original_chars": 12541,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 569823356,
+   "repository": "aws-samples/audit-manager-custom-security-frameworks",
+   "repository_url": "https://github.com/aws-samples/audit-manager-custom-security-frameworks",
+   "domain": "11",
+   "finding_id": "issue-0",
+   "field": "license",
+   "kind": "license_overclaim",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "corroborated",
+   "category": "官方文件许可不一致",
+   "reason": "实际比对README的MIT-0声明与LICENSE的Apache 2.0文本，二者表述不同；记录需解释的来源不一致，保留pending，不裁决授权。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 2,
+    "matches_included": 2,
+    "files_available": 2,
+    "files_included": 2,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/569823356.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/569823356.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/aws-samples/audit-manager-custom-security-frameworks/git/blobs/3a35c2cc059225041163d205eeedb8da55fe132b",
+     "text_sha256": "fa170ebc333c895e31fd2c5d84b2474db0696eb3ed7904c004ff4fa1e4bf17f7",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/a969b3d14eca6468d7ab814d532a816fe929ef858a5eba91b5d32b625982735f.json",
+     "archive_sha256": "3ffe5bb91dbf341442264c46005d92e402a291f7c8ac2d46af433950f1f4d7cd",
+     "original_chars": 6695,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    },
+    {
+     "source_id": "s1",
+     "kind": "license",
+     "immutable_url": "https://api.github.com/repos/aws-samples/audit-manager-custom-security-frameworks/git/blobs/ac0c2b4313613ecf4e65e05d0aa4099d9ae91926",
+     "text_sha256": "cd62a7ff8040ad44e87942a875216c6e4cb68037dfd445b90f794b4913854753",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/a969b3d14eca6468d7ab814d532a816fe929ef858a5eba91b5d32b625982735f.json",
+     "archive_sha256": "3ffe5bb91dbf341442264c46005d92e402a291f7c8ac2d46af433950f1f4d7cd",
+     "original_chars": 591,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 6973491,
+   "repository": "ben-manes/gradle-versions-plugin",
+   "repository_url": "https://github.com/ben-manes/gradle-versions-plugin",
+   "domain": "12",
+   "finding_id": "issue-0",
+   "field": "project_type",
+   "kind": "wrong_type",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "unresolved",
+   "category": "构建插件分类",
+   "reason": "确是Gradle插件，但application粗分类是否包含构建工具未约定；卡片定位已注明插件，不能按非独立应用一刀切。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 2,
+    "files_included": 2,
+    "omitted_files": 0,
+    "truncated_files": 1
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/6973491.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/6973491.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/ben-manes/gradle-versions-plugin/git/blobs/4e1a91928ac9efd1185306c8a7321e19101cf6a2",
+     "text_sha256": "05d45145bf3ac57de4b448d5eb2656270be76e77593079a1c075369fe31f52ac",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/54c222934137ba9855c50c1820b7979856bd3c9fa730098903929835f634c205.json",
+     "archive_sha256": "9225b9e9f1d57d6e083d7e59883547b802a2f36a21d8c2272fb229fd3ac03eb9",
+     "original_chars": 127054,
+     "packet_truncated": true,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    },
+    {
+     "source_id": "s1",
+     "kind": "license",
+     "immutable_url": "https://api.github.com/repos/ben-manes/gradle-versions-plugin/git/blobs/20e4bd85661f5fbc86e0a8aac3934ddabe776160",
+     "text_sha256": "c1b9df1275e769f3dbab000d1e457a2d4b0f28eb5da6c77e48dc37eeba202ed7",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/54c222934137ba9855c50c1820b7979856bd3c9fa730098903929835f634c205.json",
+     "archive_sha256": "9225b9e9f1d57d6e083d7e59883547b802a2f36a21d8c2272fb229fd3ac03eb9",
+     "original_chars": 11359,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 14650659,
+   "repository": "alexklaeser/imgAnnotation",
+   "repository_url": "https://github.com/alexklaeser/imgAnnotation",
+   "domain": "13",
+   "finding_id": "issue-0",
+   "field": "license",
+   "kind": "license_overclaim",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "dismissed",
+   "category": "README声明与文件核验混淆",
+   "reason": "README中的GPL声明不证明存在独立许可证文件；未发现许可证文件及pending并未否认README，双模型所谓冲突不成立。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 1,
+    "files_included": 1,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/14650659.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/14650659.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/alexklaeser/imgAnnotation/git/blobs/c3b514e25137bc7a9b51ed3ab797e6a97e5590a2",
+     "text_sha256": "919d0fad3729f164f42ade90ccad54fd05d7134d730a200ff4578dd56d762991",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/1dfdd64da9900ff78d3aa3313e9eb9c8e57c3fd53a020cb7fb89d958820794e7.json",
+     "archive_sha256": "a40f9dde5f06ce640e629bf29351bc78bffca1f61fa1cf9d34cd1220c73d5229",
+     "original_chars": 4884,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 15012158,
+   "repository": "darron/frozen-cdn_fe",
+   "repository_url": "https://github.com/darron/frozen-cdn_fe",
+   "domain": "14",
+   "finding_id": "issue-0",
+   "field": "features",
+   "kind": "roadmap_as_fact",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "unresolved",
+   "category": "局部TODO不能否定整个能力",
+   "reason": "TODO涉及管理员清缓存和AJAX结果，不能证明所有按API key清缓存均未实现；复核理由自身提及DONE，应查完整实现后判定。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 2,
+    "matches_included": 2,
+    "files_available": 3,
+    "files_included": 3,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/15012158.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/15012158.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/darron/frozen-cdn_fe/git/blobs/7831b35c97b2f6b2eb6ee813a65685bf8954e44c",
+     "text_sha256": "b42488323c604a597a30f0d8168471bb5caed7f68d5c569f7a26f08d324f8bab",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/d30daa34cd5f10faeb091708cbabffe3886fd9ed85ab4c51607e403231ac8eab.json",
+     "archive_sha256": "ffb61630c3105a3a160ae0ea368d86ede1ff346377bafd22509acb1a98be3ceb",
+     "original_chars": 376,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    },
+    {
+     "source_id": "s1",
+     "kind": "documentation",
+     "immutable_url": "https://api.github.com/repos/darron/frozen-cdn_fe/git/blobs/11874e1ddcf1e61ce433a1996e8375d0712ba595",
+     "text_sha256": "5c94f926ebf1bacaec6b538f378d0b0dce8fd4388e8a61ee50d483401909590d",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/documentation/d30daa34cd5f10faeb091708cbabffe3886fd9ed85ab4c51607e403231ac8eab.json",
+     "archive_sha256": "f81dd2de70dc671c9b654826a6480dbc52f8053f692c4bd18d92e5244419c03d",
+     "original_chars": 3895,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    },
+    {
+     "source_id": "s2",
+     "kind": "license",
+     "immutable_url": "https://api.github.com/repos/darron/frozen-cdn_fe/git/blobs/f65ff1d85c9de02740c8ff88c7a6c2bd12a846c7",
+     "text_sha256": "ecff42cbf0fe52f18653f488057807638d07a64acde67ea00aacb5a6ab7798f4",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/d30daa34cd5f10faeb091708cbabffe3886fd9ed85ab4c51607e403231ac8eab.json",
+     "archive_sha256": "ffb61630c3105a3a160ae0ea368d86ede1ff346377bafd22509acb1a98be3ceb",
+     "original_chars": 11343,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 110724331,
+   "repository": "netgroup-polito/verefoo",
+   "repository_url": "https://github.com/netgroup-polito/verefoo",
+   "domain": "15",
+   "finding_id": "issue-0",
+   "field": "summary",
+   "kind": "unsupported_claim",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "dismissed",
+   "category": "配置部署与流量执行混淆",
+   "reason": "README说将生成配置部署到IPTables/OVS，并不说明VEREFOO自身是内联流量执行点；卡片已明确生成配置需实际防火墙执行，模型反证不足。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 2,
+    "matches_included": 2,
+    "files_available": 2,
+    "files_included": 2,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/110724331.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/110724331.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/netgroup-polito/verefoo/git/blobs/c2c816629ad1b211cdb29f65046de80082808513",
+     "text_sha256": "0741db1bdbddcb44f910da17b6799e70d7db0486510064f4e573c59eb23e11a6",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/58207319e0c2e76927e2763ff3b0473119884c6f4885268f9de31d2ec2d82bea.json",
+     "archive_sha256": "edcde3f6ed36ca993b2599e67d7e2c75ef576591b12e1834f3713fe362ccd0d2",
+     "original_chars": 17785,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    },
+    {
+     "source_id": "s1",
+     "kind": "license",
+     "immutable_url": "https://api.github.com/repos/netgroup-polito/verefoo/git/blobs/bcde92ef92db311783765169485f8ce3ca9b8f67",
+     "text_sha256": "2ca64006022f5074808bed6332740ea403f58d34715b529af24c1f77e4d3a890",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/58207319e0c2e76927e2763ff3b0473119884c6f4885268f9de31d2ec2d82bea.json",
+     "archive_sha256": "edcde3f6ed36ca993b2599e67d7e2c75ef576591b12e1834f3713fe362ccd0d2",
+     "original_chars": 606,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 9164756,
+   "repository": "Talengi/phase",
+   "repository_url": "https://github.com/Talengi/phase",
+   "domain": "16",
+   "finding_id": "issue-0",
+   "field": "scenario_match",
+   "kind": "unsupported_claim",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "dismissed",
+   "category": "已有条件被忽略",
+   "reason": "完整场景理由已写批准/旧版作废未说明，并列需核实当前版本唯一性；权限列表支持评审启停，不能忽略这些条件再判完整CAD流程过度承诺。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 3,
+    "matches_included": 3,
+    "files_available": 4,
+    "files_included": 4,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/9164756.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/9164756.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/Talengi/phase/git/blobs/48931cb19044a64ff3136f1d517666d2f426e0bf",
+     "text_sha256": "68b8c43392e45409063a7eac4fa837db738207f6354c9b24645d61ee17177cb6",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/6ef4ec9db54ac057a92cdea523813fb166d6f7a7ba3f4437d15640d3438a5006.json",
+     "archive_sha256": "4e0b1c12e08912fc54e63d4c78ff705ef6e71721dc96350736933902d129956e",
+     "original_chars": 185,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    },
+    {
+     "source_id": "s1",
+     "kind": "documentation",
+     "immutable_url": "https://api.github.com/repos/Talengi/phase/git/blobs/8af23e0d7c27b66c8a9e9290218c6980d98be18b",
+     "text_sha256": "bfb835619c979c1e84df8aba5afce5acb903f8d937482dc4db54eadb81924664",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/documentation/6ef4ec9db54ac057a92cdea523813fb166d6f7a7ba3f4437d15640d3438a5006.json",
+     "archive_sha256": "1b24fdf5d3fe54e931b6ecbb59b26146ddea6181024d8fa5b713d194a052abbc",
+     "original_chars": 1464,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    },
+    {
+     "source_id": "s2",
+     "kind": "documentation",
+     "immutable_url": "https://api.github.com/repos/Talengi/phase/git/blobs/da3c2211da368790fb432e4173df09c02dcd9f98",
+     "text_sha256": "9021aa9cbf25e36e374fc1c10a459859beaaa6f820b8ec9518535ffc607fbcef",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/documentation/6ef4ec9db54ac057a92cdea523813fb166d6f7a7ba3f4437d15640d3438a5006.json",
+     "archive_sha256": "1b24fdf5d3fe54e931b6ecbb59b26146ddea6181024d8fa5b713d194a052abbc",
+     "original_chars": 426,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    },
+    {
+     "source_id": "s3",
+     "kind": "license",
+     "immutable_url": "https://api.github.com/repos/Talengi/phase/git/blobs/3611d971ebe90db273f50c8a8c7d0aae6897f4c0",
+     "text_sha256": "9062bcbc512345ff15e535ae569cd50986958705a37f8bfb366577c68259e2ff",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/6ef4ec9db54ac057a92cdea523813fb166d6f7a7ba3f4437d15640d3438a5006.json",
+     "archive_sha256": "4e0b1c12e08912fc54e63d4c78ff705ef6e71721dc96350736933902d129956e",
+     "original_chars": 1130,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 104389858,
+   "repository": "kunjadutta/Project-Risk-and-Cost-Management-using-Tableau-MS-Project-Baseline-and-Risk-Analysis",
+   "repository_url": "https://github.com/kunjadutta/Project-Risk-and-Cost-Management-using-Tableau-MS-Project-Baseline-and-Risk-Analysis",
+   "domain": "17",
+   "finding_id": "issue-0",
+   "field": "summary",
+   "kind": "unsupported_claim",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "dismissed",
+   "category": "标题证据被忽略",
+   "reason": "README标题本身明确Tableau、MS Project、Baseline、Risk Analysis，属于可见来源；不能仅因正文未重复而判无据。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 1,
+    "files_included": 1,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/104389858.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/104389858.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/kunjadutta/Project-Risk-and-Cost-Management-using-Tableau-MS-Project-Baseline-and-Risk-Analysis/git/blobs/b2419a8e8b7b58533e18f6c21679281b981f62dd",
+     "text_sha256": "6ca121824ab094c34f4d7709ea05ffd8d360717020b512cfc8a4205990a66a03",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/066accf18269ab3d20bd5ac0d252d5745193568f88be5755f90cf716a9246789.json",
+     "archive_sha256": "3ab00ae20d3b4f3d78f220e362c7db39c38856a5f970810fcc91c146f2c34c84",
+     "original_chars": 326,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 54466417,
+   "repository": "ketansp/fuber",
+   "repository_url": "https://github.com/ketansp/fuber",
+   "domain": "18",
+   "finding_id": "issue-0",
+   "field": "features",
+   "kind": "roadmap_as_fact",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "corroborated",
+   "category": "编程题要求写成能力",
+   "reason": "README使用build/expect及Extra Credit说明建模题；卡片把距离计算要求写为现有功能，应归因为题目说明。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 1,
+    "files_included": 1,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/54466417.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/54466417.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/ketansp/fuber/git/blobs/8f40640176ac23e36496f82917cd749bdc46ba06",
+     "text_sha256": "f546ca0d065a3c2c1c16a2311fca576811cd766e9edacd2f28b034d0a5638edb",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/790be489ccd53187e320648137409864c84f99ca28e885be90e80fd10f5aabaf.json",
+     "archive_sha256": "5470f903c8e7da0d17bd87d8fa38965c90861e9026320326ab37d289cade8fca",
+     "original_chars": 1328,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      false,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 125183707,
+   "repository": "mvandersteen/ha-jemenaoutlook",
+   "repository_url": "https://github.com/mvandersteen/ha-jemenaoutlook",
+   "domain": "19",
+   "finding_id": "issue-0",
+   "field": "features",
+   "kind": "roadmap_as_fact",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "corroborated",
+   "category": "明确未实现功能",
+   "reason": "README明确only yesterday及weekly/monthly尚未做到，功能卡却列本周/本月；这是直接可定位的文本错位。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 2,
+    "matches_included": 2,
+    "files_available": 1,
+    "files_included": 1,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/125183707.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/125183707.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/mvandersteen/ha-jemenaoutlook/git/blobs/cfa67b1239261d460ab4674757ce32ffc49ed6d6",
+     "text_sha256": "dbfb6ae9f2c75d8a80f89e296f2d1b7c622615dbdb070bb83743bf74a597180b",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/ef831f53345fc4b48125f7abc7e09baf2721c8471c9eb3d0d4544ef2b62fc451.json",
+     "archive_sha256": "bd2f9149a305a1b765e17b79600d84c3fc2ce98d79f2fcdf795a06f41b613484",
+     "original_chars": 9896,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 222361634,
+   "repository": "kamal153/IoT-based-Smart-Irrigation-System-using-Soil-Moisture-Sensor-and-ESP8266-NodeMCU",
+   "repository_url": "https://github.com/kamal153/IoT-based-Smart-Irrigation-System-using-Soil-Moisture-Sensor-and-ESP8266-NodeMCU",
+   "domain": "20",
+   "finding_id": "issue-0",
+   "field": "scenario_match",
+   "kind": "irrelevant_scenario",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "dismissed",
+   "category": "部分适用性与完整场景混淆",
+   "reason": "卡片scope已写单作物小规模演示，conditional理由只说湿度与自动灌溉且有ThingSpeak/WiFi条件；没有声称深层、多点、降雨全覆盖，不能仅因部分覆盖直接判错。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 1,
+    "files_included": 1,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/222361634.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/222361634.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/kamal153/IoT-based-Smart-Irrigation-System-using-Soil-Moisture-Sensor-and-ESP8266-NodeMCU/git/blobs/2eb23b121d956752b05cfbb15377f12e10423046",
+     "text_sha256": "8a6e615454f8e6c32562d12e8ef10e4dcea956f4e234575e127f458b8633507a",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/5a92a4307dcec768199fff8f644ee496be73a215915fc59445cbcd3f03d139ec.json",
+     "archive_sha256": "e755a3c6b1232e9e42fec4452e4cf48b7abc0d8d0c88aa5f7546a42ee3206cdb",
+     "original_chars": 1966,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 176388683,
+   "repository": "luangrezende/reciclatu-dotnet-final",
+   "repository_url": "https://github.com/luangrezende/reciclatu-dotnet-final",
+   "domain": "21",
+   "finding_id": "issue-0",
+   "field": "positioning",
+   "kind": "unsupported_claim",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "dismissed",
+   "category": "框架术语反证不足",
+   "reason": "ASP.NET MVC with Razor并不自动排斥ASP.NET Core，元数据又明确Core；仅凭这两句无法确认框架冲突。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 1,
+    "files_included": 1,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/176388683.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/176388683.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/luangrezende/reciclatu-dotnet-final/git/blobs/c1de0b277dbc6de474a1734e7ac8fdfb04f162af",
+     "text_sha256": "c4fa35a38bb38af2bdf85d91e6f1e0b18ca84a5192df62e60be5089cab4fdb1f",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/10c41713fb230ce9c03b19103b6c4319394f1b7bc419bc61a3331b790e386301.json",
+     "archive_sha256": "a41c7de8f55ab2dacd2de598ae3549175cc43fc437f846991a0a599384f220f8",
+     "original_chars": 1990,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 127054182,
+   "repository": "ayrustogaru/Database-project",
+   "repository_url": "https://github.com/ayrustogaru/Database-project",
+   "domain": "22",
+   "finding_id": "issue-0",
+   "field": "license",
+   "kind": "license_overclaim",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "corroborated",
+   "category": "许可证适用范围疑点",
+   "reason": "license.txt版权行指向CodePen登录表单设计，且有HTML注释包装；模板匹配可保留事实，但仓库整体授权范围需另核实，不据此裁定法律结论。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 3,
+    "files_included": 3,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/127054182.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/127054182.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/ayrustogaru/Database-project/git/blobs/13f989125566a7c9988d0b78922c10632de83ac2",
+     "text_sha256": "16d1d7fa1e18c9d2363a6d9f692c03332597fb95d02d1e82f3899b776bd46acb",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/abaf97955cb0fdd932f1da81c154a2d84ac06baa8592da08d4bd91ee1baedc20.json",
+     "archive_sha256": "0a2dac332184f852b6f0c3bc3ebeba9d18066df37fd4b6ab0087f3976afe1fa2",
+     "original_chars": 194,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    },
+    {
+     "source_id": "s1",
+     "kind": "documentation",
+     "immutable_url": "https://api.github.com/repos/ayrustogaru/Database-project/git/blobs/fbb09925985ad6f065df32cc9af21715c4c5e43f",
+     "text_sha256": "10d90db97426af7baa6b82829ba86ae15267039ba949d896bdc345b2273795b6",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/documentation/abaf97955cb0fdd932f1da81c154a2d84ac06baa8592da08d4bd91ee1baedc20.json",
+     "archive_sha256": "a985979729d37deb2712184871ffd1cf0b9320cba9095ccb45029441244f4936",
+     "original_chars": 168,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    },
+    {
+     "source_id": "s2",
+     "kind": "license",
+     "immutable_url": "https://api.github.com/repos/ayrustogaru/Database-project/git/blobs/1d6504fc9d07addda70553dc04f938282b80c727",
+     "text_sha256": "a608b1fcfa84e7bb12b63c8c7d28c2bba6d875b543a8c2a5501d3535044e604c",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/abaf97955cb0fdd932f1da81c154a2d84ac06baa8592da08d4bd91ee1baedc20.json",
+     "archive_sha256": "0a2dac332184f852b6f0c3bc3ebeba9d18066df37fd4b6ab0087f3976afe1fa2",
+     "original_chars": 1106,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 32017106,
+   "repository": "academic-moodle-cooperation/moodle-mod_publication",
+   "repository_url": "https://github.com/academic-moodle-cooperation/moodle-mod_publication",
+   "domain": "23",
+   "finding_id": "issue-0",
+   "field": "project_type",
+   "kind": "wrong_type",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "unresolved",
+   "category": "插件标签粒度待定",
+   "reason": "Moodle Student Folder活动插件事实清楚，library是否可涵盖插件组件缺少分类规范；保留类型线索。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 1,
+    "files_included": 1,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/32017106.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/32017106.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/academic-moodle-cooperation/moodle-mod_publication/git/blobs/b0ca73391ea48ee774a4fa9d4629a5348ce79587",
+     "text_sha256": "c9b5c1c8ccf0e64ee8688f804734fd36c10374acec4470634cd338f2db013e9a",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/d7dcf464172c3a7791d967cf4ff4cb59a89e0d0ffcd72b77e8960c4a644d367a.json",
+     "archive_sha256": "4862ce78316426c33d9e8d325684a07a984684ddd197c3783c695d6ae5dd4523",
+     "original_chars": 3852,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 3955881,
+   "repository": "geekdenz/civicrm",
+   "repository_url": "https://github.com/geekdenz/civicrm",
+   "domain": "24",
+   "finding_id": "issue-0",
+   "field": "summary",
+   "kind": "license_overclaim",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "corroborated",
+   "category": "许可声明归因",
+   "reason": "归档文档声称AGPL 3，但核验字段pending；摘要宜保留文档声明的归因，不能当作全文模板已核验。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 3,
+    "matches_included": 3,
+    "files_available": 2,
+    "files_included": 2,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/3955881.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/3955881.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "documentation",
+     "immutable_url": "https://api.github.com/repos/geekdenz/civicrm/git/blobs/7661786018227778717c6d5763c122967790aef2",
+     "text_sha256": "78f1e717db00c09e0589da979cba2ef2ece76d1b9cfef8e74c3ae693973d8ad0",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/documentation/3a02ae9baa74564aa88196c1c3cf95e32654c243e1d8e0143b67ed38e4f60404.json",
+     "archive_sha256": "b3f7639c0008abfb61b0142ad184b901655d1d2c044d4f29179a56c4b7b64c64",
+     "original_chars": 4001,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    },
+    {
+     "source_id": "s1",
+     "kind": "documentation",
+     "immutable_url": "https://api.github.com/repos/geekdenz/civicrm/git/blobs/c2553fe21edc58c583da41b30783417ac9480ead",
+     "text_sha256": "66f53498905fa78a2a892ebfc8eec235e3f490a9b4aaef346497ce00e448cf91",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/documentation/3a02ae9baa74564aa88196c1c3cf95e32654c243e1d8e0143b67ed38e4f60404.json",
+     "archive_sha256": "b3f7639c0008abfb61b0142ad184b901655d1d2c044d4f29179a56c4b7b64c64",
+     "original_chars": 1741,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 131588847,
+   "repository": "ASCOMInitiative/ASCOMPlatform",
+   "repository_url": "https://github.com/ASCOMInitiative/ASCOMPlatform",
+   "domain": "25",
+   "finding_id": "issue-0",
+   "field": "summary",
+   "kind": "unsupported_claim",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "dismissed",
+   "category": "集成说明被误当无支持",
+   "reason": "归档SOFA更新文档实际列出SOFA Library/Test Application项目、源码复制与构建测试步骤，支持卡片集成与测试流程的概括。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 0,
+    "matches_included": 0,
+    "files_available": 2,
+    "files_included": 2,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/131588847.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/131588847.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "documentation",
+     "immutable_url": "https://api.github.com/repos/ASCOMInitiative/ASCOMPlatform/git/blobs/071e5985bc95386415fca9609c4d30af412f21e1",
+     "text_sha256": "080a70883b9ea9711154c2661cc666deedf49cb45d22476736081482c979d73f",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/documentation/d90310858c61892a49d2ad41b100b5d6758adb6d7d2b08eec888e97626d2771a.json",
+     "archive_sha256": "31d37326cbfa5c302236a99291026d44986b173562347524b917fc417d317fdd",
+     "original_chars": 4159,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    },
+    {
+     "source_id": "s1",
+     "kind": "documentation",
+     "immutable_url": "https://api.github.com/repos/ASCOMInitiative/ASCOMPlatform/git/blobs/ca2e1594b0f460b12681be78bdd0383225381dd7",
+     "text_sha256": "295a7f4c800ca30c3ce84bdf2e69babe023873e57bcb92ac144059319260d6bf",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/documentation/d90310858c61892a49d2ad41b100b5d6758adb6d7d2b08eec888e97626d2771a.json",
+     "archive_sha256": "31d37326cbfa5c302236a99291026d44986b173562347524b917fc417d317fdd",
+     "original_chars": 2139,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 29402883,
+   "repository": "DanMat/Restaurant-Management-System",
+   "repository_url": "https://github.com/DanMat/Restaurant-Management-System",
+   "domain": "26",
+   "finding_id": "issue-0",
+   "field": "positioning",
+   "kind": "wrong_type",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "dismissed",
+   "category": "依赖宿主不否定业务完整性",
+   "reason": "README原文写runs a full restaurant并说明Nimbus插件；定位已写基于NimbusCMS，未声称无需宿主。完整业务范围与独立部署是不同命题。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 8,
+    "matches_included": 8,
+    "files_available": 3,
+    "files_included": 3,
+    "omitted_files": 0,
+    "truncated_files": 1
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/29402883.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/29402883.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/DanMat/Restaurant-Management-System/git/blobs/a1ff6cb6787ac6a50e44172a60026770810b9b21",
+     "text_sha256": "32dacdd33252bcc06f687db500926f7684978e513b70e09c6bfa5b9e6c19047d",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/cf605c984d7bf87d6d74ea6546fd109414a50cbdf31355c857a708d37bb8e08b.json",
+     "archive_sha256": "eeed00a31ded5db74eca02fe38b1987800c402d663f3377146d0fbc847202110",
+     "original_chars": 5866,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    },
+    {
+     "source_id": "s1",
+     "kind": "documentation",
+     "immutable_url": "https://api.github.com/repos/DanMat/Restaurant-Management-System/git/blobs/65e2019d8d628a05b210a1acd12e55d0ba834ba1",
+     "text_sha256": "72a88a199dfa1c48f182f4c1d01d97e62614b3cad850dddb3f5d46256330e06d",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/documentation/cf605c984d7bf87d6d74ea6546fd109414a50cbdf31355c857a708d37bb8e08b.json",
+     "archive_sha256": "ade5665a284a409b89d99e305a15420870dd68b90a8deeaf6134e12af30a48cd",
+     "original_chars": 7745,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    },
+    {
+     "source_id": "s2",
+     "kind": "documentation",
+     "immutable_url": "https://api.github.com/repos/DanMat/Restaurant-Management-System/git/blobs/e4fc8ed96bdb59d441cadc810232278251a9bfeb",
+     "text_sha256": "c0f2a5183b38056db42e6cfd25193905912b4a0d6a410990072b1a39d7b2bb18",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/documentation/cf605c984d7bf87d6d74ea6546fd109414a50cbdf31355c857a708d37bb8e08b.json",
+     "archive_sha256": "ade5665a284a409b89d99e305a15420870dd68b90a8deeaf6134e12af30a48cd",
+     "original_chars": 14876,
+     "packet_truncated": true,
+     "quoted_passages_locatable_in_original": []
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 125462659,
+   "repository": "FAIMS/bmwhi-survey-2018",
+   "repository_url": "https://github.com/FAIMS/bmwhi-survey-2018",
+   "domain": "27",
+   "finding_id": "issue-0",
+   "field": "license",
+   "kind": "license_overclaim",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "corroborated",
+   "category": "官方文件许可不一致",
+   "reason": "README说模块CC BY 4.0，而归档LICENSE为GPL v3；记录文件范围需解释，不擅自选择实际许可。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 2,
+    "files_included": 2,
+    "omitted_files": 0,
+    "truncated_files": 1
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/125462659.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/125462659.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/FAIMS/bmwhi-survey-2018/git/blobs/76eb2e9f0ec61ba84f1940bd12efe2a9502a8a5b",
+     "text_sha256": "f0192563a88b37cc12accab594e9add58a1ee1de683d774bfd368f89bf7b39ff",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/c9561665ade35cbe3c348fe53cbe9e248266db544e7fed08f3485b8b8224a0f3.json",
+     "archive_sha256": "07e3706b585401577ff1ad45a4901ca0187d88d63cbd58f2ed940d835f742131",
+     "original_chars": 3027,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    },
+    {
+     "source_id": "s1",
+     "kind": "license",
+     "immutable_url": "https://api.github.com/repos/FAIMS/bmwhi-survey-2018/git/blobs/94a9ed024d3859793618152ea559a168bbcbb5e2",
+     "text_sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/c9561665ade35cbe3c348fe53cbe9e248266db544e7fed08f3485b8b8224a0f3.json",
+     "archive_sha256": "07e3706b585401577ff1ad45a4901ca0187d88d63cbd58f2ed940d835f742131",
+     "original_chars": 35147,
+     "packet_truncated": true,
+     "quoted_passages_locatable_in_original": []
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 35279603,
+   "repository": "amonchakai/Workout",
+   "repository_url": "https://github.com/amonchakai/Workout",
+   "domain": "28",
+   "finding_id": "issue-0",
+   "field": "summary",
+   "kind": "license_overclaim",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "corroborated",
+   "category": "许可声明归因",
+   "reason": "README有GPL v3+声明，独立许可核验pending；摘要应保留来源归因，属于标签表达改进，不说明仓库实际侵权。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 1,
+    "files_included": 1,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/35279603.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/35279603.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/amonchakai/Workout/git/blobs/a6ad08dc1f0ead7871d8313aff488b1dcccd2c37",
+     "text_sha256": "114f07bdce479be270abdae834c3984b6ac227291ae64f20fa5805652615f283",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/201dc597757e470630cdcc090a3c0ee955c35c1e63f2a2195a6b02351f433c13.json",
+     "archive_sha256": "cd17e73249eeb90a6fefb93ecf75ba6148b2fb3f3fb1a3a820f6ac4dab445ccf",
+     "original_chars": 776,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 99834648,
+   "repository": "ptcryan/Blynk-Home-Assistant",
+   "repository_url": "https://github.com/ptcryan/Blynk-Home-Assistant",
+   "domain": "29",
+   "finding_id": "issue-0",
+   "field": "license",
+   "kind": "license_overclaim",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "corroborated",
+   "category": "官方文件许可范围未说明",
+   "reason": "同一README License节含MIT与CC BY-SA 4.0，LICENSE是MIT；应说明二者作用范围，不能从模型意见推翻MIT原文匹配。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "domain_coverage",
+   "coverage": {
+    "total_campaign_matches": 2,
+    "matches_included": 2,
+    "files_available": 2,
+    "files_included": 2,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/99834648.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/99834648.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/ptcryan/Blynk-Home-Assistant/git/blobs/19a49de3002bfa9b47701b029961bee8c5f55b39",
+     "text_sha256": "bb94bb91d49df01f6a3ad00790b7951d81f7d1408e16bcc443b09b905233c8b2",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/6617d0b51b860ac5d039f77a6a3f301be368bb3f2644ac01947f57eb3bd9a7ae.json",
+     "archive_sha256": "f8fd46727f0ac1a92b2c45d69a095c80b7acb8296501bd593d7db5d4a323f6cf",
+     "original_chars": 5710,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    },
+    {
+     "source_id": "s1",
+     "kind": "license",
+     "immutable_url": "https://api.github.com/repos/ptcryan/Blynk-Home-Assistant/git/blobs/ee9cdd6f3d719f407de31b6ce5ad98c25a9f18ae",
+     "text_sha256": "9da71e92e08c7b07b6aba7eb735d5e0a339b8efbde74dad761cb9528088815fe",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/6617d0b51b860ac5d039f77a6a3f301be368bb3f2644ac01947f57eb3bd9a7ae.json",
+     "archive_sha256": "f8fd46727f0ac1a92b2c45d69a095c80b7acb8296501bd593d7db5d4a323f6cf",
+     "original_chars": 1237,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 22088,
+   "repository": "bdainton/camptweet",
+   "repository_url": "https://github.com/bdainton/camptweet",
+   "domain": "01",
+   "finding_id": "issue-0",
+   "field": "features",
+   "kind": "unsupported_claim",
+   "severity": "minor",
+   "model_disposition": "dismissed",
+   "source_review_disposition": "dismissed",
+   "category": "元数据确为合法来源",
+   "reason": "GitHub公开描述明确Summize与RSS/Atom，source_based允许使用该资料；README未重复不是否定证据，保留元数据覆盖限制。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "dismissed",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 2,
+    "files_included": 2,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/22088.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/22088.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/bdainton/camptweet/git/blobs/9f2b786bcfed48251855bd09cd9ffed6c6fc9967",
+     "text_sha256": "93d4b2809c3a236bc187fd854da56f02460fbfb4533bec6e810b0e6c904a037e",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/ea791341fe31f51a001dd564028bc4724b1a181b6b92ee612f7c3e2b6850dc05.json",
+     "archive_sha256": "8aa5ccc187c593659ac8bd8c6fc304f8399ef70a01eb8ae142bd2fed44c98353",
+     "original_chars": 1845,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true
+     ]
+    },
+    {
+     "source_id": "s1",
+     "kind": "license",
+     "immutable_url": "https://api.github.com/repos/bdainton/camptweet/git/blobs/338557f82195fcb92e6f1d71aaafae45b171a934",
+     "text_sha256": "f4b780dcaab4d587e5c49eacf2874901b1cc7d444cd21e0c5910eccee1410045",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/ea791341fe31f51a001dd564028bc4724b1a181b6b92ee612f7c3e2b6850dc05.json",
+     "archive_sha256": "8aa5ccc187c593659ac8bd8c6fc304f8399ef70a01eb8ae142bd2fed44c98353",
+     "original_chars": 1073,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 124713,
+   "repository": "patmaddox/apress_daily_deal",
+   "repository_url": "https://github.com/patmaddox/apress_daily_deal",
+   "domain": "05",
+   "finding_id": "issue-0",
+   "field": "project_type",
+   "kind": "insufficient_evidence",
+   "severity": "minor",
+   "model_disposition": "dismissed",
+   "source_review_disposition": "dismissed",
+   "category": "元数据缺项已限定",
+   "reason": "公开描述为RSS feed generator，可支持程序/工具；卡片已待补充，未作完整业务能力保证，缺README属于限制。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "metadata_only",
+   "coverage": {
+    "total_campaign_matches": 1,
+    "matches_included": 1,
+    "files_available": 0,
+    "files_included": 0,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/124713.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/124713.json",
+   "original_archive_checks": [],
+   "metadata_only": true
+  },
+  {
+   "repository_id": 671825,
+   "repository": "Graylog2/graylog2-server",
+   "repository_url": "https://github.com/Graylog2/graylog2-server",
+   "domain": "14",
+   "finding_id": "issue-1",
+   "field": "summary",
+   "kind": "insufficient_evidence",
+   "severity": "minor",
+   "model_disposition": "unresolved",
+   "source_review_disposition": "unresolved",
+   "category": "资料不足",
+   "reason": "可见README概括日志管理平台，无法据此独立证实或推翻全部收集/存储/检索细节；保留未决而非真实错误。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "unresolved",
+   "coverage": {
+    "total_campaign_matches": 3,
+    "matches_included": 3,
+    "files_available": 2,
+    "files_included": 2,
+    "omitted_files": 0,
+    "truncated_files": 1
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/671825.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/671825.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/Graylog2/graylog2-server/git/blobs/4dfe648c918fdd3140a36e1a3f7c70dac6ef38c2",
+     "text_sha256": "abbf4e8417ba3dbac1727f629fc132df894ca0dae374e83a31839c398be8b0f3",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/21994a7e9d6582fb16adaec159e211e095a9531b76cc0069dee5c92841834deb.json",
+     "archive_sha256": "512d96c2b6d0a8f0613b562e0b736161912f92d7c615aa577c50229fc88dd9ef",
+     "original_chars": 1432,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      false,
+      false
+     ]
+    },
+    {
+     "source_id": "s1",
+     "kind": "license",
+     "immutable_url": "https://api.github.com/repos/Graylog2/graylog2-server/git/blobs/4e1383df1ee4c2e34d3c091e859408d5ed8d1574",
+     "text_sha256": "09d99ca61eb07873d5334077acba22c33e7f7d0a9fa08c92734e0ac8430d6e27",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/21994a7e9d6582fb16adaec159e211e095a9531b76cc0069dee5c92841834deb.json",
+     "archive_sha256": "512d96c2b6d0a8f0613b562e0b736161912f92d7c615aa577c50229fc88dd9ef",
+     "original_chars": 30451,
+     "packet_truncated": true,
+     "quoted_passages_locatable_in_original": []
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 727179,
+   "repository": "bdwong-mirrors/mrbs",
+   "repository_url": "https://github.com/bdwong-mirrors/mrbs",
+   "domain": "03",
+   "finding_id": "issue-0",
+   "field": "scenario_match",
+   "kind": "missing_condition",
+   "severity": "minor",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "unresolved",
+   "category": "无条件适用性尚待证据",
+   "reason": "direct无条件需要覆盖容量、位置、冲突，但主审包有截断；短引只证实可新增会议，不能证明其不支持其他功能，待进一步证据。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "minor",
+   "coverage": {
+    "total_campaign_matches": 4,
+    "matches_included": 4,
+    "files_available": 2,
+    "files_included": 2,
+    "omitted_files": 0,
+    "truncated_files": 1
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/727179.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/727179.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/bdwong-mirrors/mrbs/git/blobs/f83db0e2c24cb645eb31527828c05a8e9ea24e4a",
+     "text_sha256": "d46c0d1f7e3f43313df468eda0f331256fc063a99d64086c02169a7aeb0f95cd",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/052074ae97faacc1a1954af4cf3f0a4997a997e0109df3814b879304266354fa.json",
+     "archive_sha256": "5554ed2677a69f5015db6c1780fdd9c8eb88eeda1b1643e456fe97c38ad3aed7",
+     "original_chars": 3314,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    },
+    {
+     "source_id": "s1",
+     "kind": "license",
+     "immutable_url": "https://api.github.com/repos/bdwong-mirrors/mrbs/git/blobs/a43ea2126fb6b114bff5f8e003ee118e045dacf1",
+     "text_sha256": "91df39d1816bfb17a4dda2d3d2c83b1f6f2d38d53e53e41e8f97ad5ac46a0cad",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/052074ae97faacc1a1954af4cf3f0a4997a997e0109df3814b879304266354fa.json",
+     "archive_sha256": "5554ed2677a69f5015db6c1780fdd9c8eb88eeda1b1643e456fe97c38ad3aed7",
+     "original_chars": 17982,
+     "packet_truncated": true,
+     "quoted_passages_locatable_in_original": []
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 566780364,
+   "repository": "FaroukOyekunle/Inventory-Order-Management-System",
+   "repository_url": "https://github.com/FaroukOyekunle/Inventory-Order-Management-System",
+   "domain": "10",
+   "finding_id": "issue-0",
+   "field": "scenario_match",
+   "kind": "irrelevant_scenario",
+   "severity": "minor",
+   "model_disposition": "dismissed",
+   "source_review_disposition": "dismissed",
+   "category": "共享仓库逐场景判断",
+   "reason": "14条关联中，所抽CRM获客场景已unverified并列缺网页线索/跟进；README确有Customer、Sales Order、Invoice、Payment Receive，限定后的部分关联可保留。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "shared_repository_14_associations",
+   "coverage": {
+    "total_campaign_matches": 14,
+    "matches_included": 14,
+    "files_available": 2,
+    "files_included": 2,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/566780364.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/566780364.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/FaroukOyekunle/Inventory-Order-Management-System/git/blobs/cfd89508f152c37ce95a6f594a46577f85bb9655",
+     "text_sha256": "093e230015d27088468bd61d67d328e0c17fd1a7fe6a378c4951c0e9d6dd3950",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/ef9d2ae004f87eb228871c09e7cad141863d4f9efbcc580e184435936ed6a995.json",
+     "archive_sha256": "f7932bd6cd091e6aa1e6cdcce5a5c467bd0988fde9636570ddaf4c907d6541a3",
+     "original_chars": 961,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      false,
+      true
+     ]
+    },
+    {
+     "source_id": "s1",
+     "kind": "license",
+     "immutable_url": "https://api.github.com/repos/FaroukOyekunle/Inventory-Order-Management-System/git/blobs/2d2a6db7d0b153e060ad33235b19b9360d28e7d2",
+     "text_sha256": "9681471c9edfffe0982a93a7a40b7f244433c162f44627c861caf852dd6e79e8",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/ef9d2ae004f87eb228871c09e7cad141863d4f9efbcc580e184435936ed6a995.json",
+     "archive_sha256": "f7932bd6cd091e6aa1e6cdcce5a5c467bd0988fde9636570ddaf4c907d6541a3",
+     "original_chars": 1071,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 1432986134,
+   "repository": "MrS1mbaa/petwarden",
+   "repository_url": "https://github.com/MrS1mbaa/petwarden",
+   "domain": "29",
+   "finding_id": "issue-0",
+   "field": "scenario_match",
+   "kind": "missing_condition",
+   "severity": "minor",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "unresolved",
+   "category": "逐次给药证据待补",
+   "reason": "来源支持疗程、时间线、精确提醒和打卡，无法仅从未写明逐剂量功能确认不存在；direct场景的具体覆盖应进一步核实。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "remaining_727_after_cost_reconciliation",
+   "coverage": {
+    "total_campaign_matches": 3,
+    "matches_included": 3,
+    "files_available": 2,
+    "files_included": 2,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/1432986134.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/1432986134.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/MrS1mbaa/petwarden/git/blobs/0230ad993fc3535c0f5ac5b615d7f340c582d2e6",
+     "text_sha256": "e91d66113b648d5be498a599507367d278b745afcef8ef57d93b09959f287455",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/6ffb87f43887abd2bd9dc47f060dd13a343d52ded5d58916c75f8fe507f79981.json",
+     "archive_sha256": "260601f75d07afc276b5c60e74cd101737b863d1fd3c4549c49ee859778ff969",
+     "original_chars": 7895,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    },
+    {
+     "source_id": "s1",
+     "kind": "license",
+     "immutable_url": "https://api.github.com/repos/MrS1mbaa/petwarden/git/blobs/f9448a399d94600b4cf7c3b3cbc235d741a29308",
+     "text_sha256": "7c5070ab1d4af87824d036ba0b7d7822ecbcdbf708b0d0670ddbebb10d8454ff",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/6ffb87f43887abd2bd9dc47f060dd13a343d52ded5d58916c75f8fe507f79981.json",
+     "archive_sha256": "260601f75d07afc276b5c60e74cd101737b863d1fd3c4549c49ee859778ff969",
+     "original_chars": 1105,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 1432929974,
+   "repository": "ocakciomursel-pixel/bulk-spf-dmarc-mx-email-security-auditor",
+   "repository_url": "https://github.com/ocakciomursel-pixel/bulk-spf-dmarc-mx-email-security-auditor",
+   "domain": "15",
+   "finding_id": "issue-0",
+   "field": "summary",
+   "kind": "unsupported_claim",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "dismissed",
+   "category": "外部API使用不等于服务归属",
+   "reason": "README明确给出Cloud Actor选项，卡片已说依赖商业Apify与令牌，并未声称Actor归本仓库所有；不能仅因链接属另一账号而否定描述的运行依赖。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "remaining_727_after_cost_reconciliation",
+   "coverage": {
+    "total_campaign_matches": 2,
+    "matches_included": 2,
+    "files_available": 2,
+    "files_included": 2,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/1432929974.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/1432929974.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/ocakciomursel-pixel/bulk-spf-dmarc-mx-email-security-auditor/git/blobs/a94888ff91afdb4072e3d752f8309ffdd040361e",
+     "text_sha256": "9b924fbf64cc8ff55e3a3aa3bbdbdcde64699899676c0c3e316ee43a629b7181",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/34c5eed13ec154dd1610253609dc6c1143ec5e4142096e4a90f4d1af67030d2c.json",
+     "archive_sha256": "7a19ec1b314a54241adf435a0e7e9418a9c6802e93e40b78e76e05de3199e28e",
+     "original_chars": 9390,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    },
+    {
+     "source_id": "s1",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/ocakciomursel-pixel/bulk-spf-dmarc-mx-email-security-auditor/git/blobs/3d06e96a36566339e55be202ebf36494d0012ede",
+     "text_sha256": "8be5c5db41bf8e7d61734c2d03c14c453485144b056e319723b4d117fe63fc69",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/d40eeb8739bf7dc24a2954d641328cedf2a784f190cfb5bcfdeb471d47d05587.json",
+     "archive_sha256": "63595f4fc1a19ea07995eee6378ef2a322a66c46779c5d22a7c26cab4bcb83fc",
+     "original_chars": 2990,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      true,
+      true
+     ]
+    }
+   ],
+   "metadata_only": false
+  },
+  {
+   "repository_id": 1432864736,
+   "repository": "LuiccianDev/vulcan-mcp",
+   "repository_url": "https://github.com/LuiccianDev/vulcan-mcp",
+   "domain": "20",
+   "finding_id": "issue-0",
+   "field": "project_type",
+   "kind": "wrong_type",
+   "severity": "major",
+   "model_disposition": "confirmed",
+   "source_review_disposition": "unresolved",
+   "category": "MCP组件类型粒度",
+   "reason": "卡片定位已明确MCP服务器、商业Vulcan依赖和人工启动插件；library与application粗分类缺少统一判据，暂不把类型标签确认为错误。",
+   "reviewer": "Codex direct archive comparison; no additional paid model request",
+   "human_user_confirmed": false,
+   "stratum": "remaining_727_after_cost_reconciliation",
+   "coverage": {
+    "total_campaign_matches": 2,
+    "matches_included": 2,
+    "files_available": 2,
+    "files_included": 2,
+    "omitted_files": 0,
+    "truncated_files": 0
+   },
+   "evidence_packet": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/inputs/1432864736.json",
+   "provenance": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/quality-audit/atlas-semantic-55651-2026-10-29/provenance/1432864736.json",
+   "original_archive_checks": [
+    {
+     "source_id": "s0",
+     "kind": "readme",
+     "immutable_url": "https://api.github.com/repos/LuiccianDev/vulcan-mcp/git/blobs/6077e15c76fce555f9dcc48eb212dc8dc2db69b3",
+     "text_sha256": "5684694817b12be013db97586dbe012f51ffedc020c770b5b313908738bcf577",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/421e4e9a4bf089e900d03d41d5d882f6127b5d3883d5350fa8ed4ed2e77b3839.json",
+     "archive_sha256": "e863033896fbcaca430a9cb4abcf147d25274b6c9c2a95f3a9d17d9210070908",
+     "original_chars": 20176,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": [
+      false,
+      true
+     ]
+    },
+    {
+     "source_id": "s1",
+     "kind": "license",
+     "immutable_url": "https://api.github.com/repos/LuiccianDev/vulcan-mcp/git/blobs/83ca9fb5d7c8840658e236a6f99a7fa2f610b374",
+     "text_sha256": "5cb98dd515e12bc51252842ff0de8cdbe1504a04d6cf8827f4f353334b5490b8",
+     "archive_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/sources/421e4e9a4bf089e900d03d41d5d882f6127b5d3883d5350fa8ed4ed2e77b3839.json",
+     "archive_sha256": "e863033896fbcaca430a9cb4abcf147d25274b6c9c2a95f3a9d17d9210070908",
+     "original_chars": 10756,
+     "packet_truncated": false,
+     "quoted_passages_locatable_in_original": []
+    }
+   ],
+   "metadata_only": false
+  }
+ ],
+ "counts": {
+  "unresolved": 12,
+  "corroborated": 12,
+  "dismissed": 13
+ },
+ "domains": [
+  "01",
+  "02",
+  "03",
+  "04",
+  "05",
+  "06",
+  "07",
+  "08",
+  "09",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+  "19",
+  "20",
+  "21",
+  "22",
+  "23",
+  "24",
+  "25",
+  "26",
+  "27",
+  "28",
+  "29"
+ ],
+ "no_statistical_error_rate_inference": true,
+ "no_production_changes": true
+}

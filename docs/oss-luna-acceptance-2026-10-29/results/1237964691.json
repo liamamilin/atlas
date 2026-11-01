@@ -1,0 +1,52 @@
+{
+ "repository_id": 1237964691,
+ "domain": "21",
+ "input_sha256": "ef6e8e32045cd2a46ff34d1e5233cabca5add608d7187c65c0c2a0311ee5566a",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:52.796228+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDbPp1mH7PHSzIDmA7kvgZgbIzr",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 1815,
+  "completion_tokens": 197,
+  "total_tokens": 2012,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 1812,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.00028,
+ "response_text": "{\"repository_id\":1237964691,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片如实区分了仓库描述中的产品宣称与 README 可核实的内容，并将项目类型和许可保留为未知／待确认。当前材料没有场景匹配，也没有足够证据确认所述功能已实现。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"仅提供 README 与 GitHub 元数据；README 仅含 AI Studio 通用说明，未提供实现、功能或数据细节。\",\"元数据描述了产品能力，但不能据此确认这些能力已实现。\",\"没有提供场景匹配项，无法评估具体场景适用性。\",\"许可状态为 pending，材料未提供许可证文件；本次不据此判断仓库是否获得开源授权。\"]}",
+ "review": {
+  "repository_id": 1237964691,
+  "verdict": "pass_with_limits",
+  "summary": "卡片如实区分了仓库描述中的产品宣称与 README 可核实的内容，并将项目类型和许可保留为未知／待确认。当前材料没有场景匹配，也没有足够证据确认所述功能已实现。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "仅提供 README 与 GitHub 元数据；README 仅含 AI Studio 通用说明，未提供实现、功能或数据细节。",
+   "元数据描述了产品能力，但不能据此确认这些能力已实现。",
+   "没有提供场景匹配项，无法评估具体场景适用性。",
+   "许可状态为 pending，材料未提供许可证文件；本次不据此判断仓库是否获得开源授权。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:57.380111+00:00",
+ "elapsed_seconds": 4.584
+}

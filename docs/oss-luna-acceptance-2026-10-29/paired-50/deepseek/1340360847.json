@@ -1,0 +1,109 @@
+{
+ "repository_id": 1340360847,
+ "domain": "08",
+ "input_sha256": "3f46aed35111dcec76e6a3e9a052dfb35dce34f74cd80814231a09f863800432",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:21.855253+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-df05291f03c0-ae535",
+ "usage": {
+  "prompt_tokens": 5814,
+  "completion_tokens": 773,
+  "total_tokens": 6587,
+  "prompt_tokens_details": {
+   "cached_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.0013359,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.0013359,
+   "tokens": {
+    "input": 5814,
+    "output": 773,
+    "reasoning": 0,
+    "cache_read": 0,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1340360847,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体与 README 和元数据一致：项目定位为 MSTR/BTC 量化跟踪与决策应用，功能有来源支持，演示数据已标注为虚构，许可状态保守标为 pending。主要问题是场景匹配把基金会计场景标为 unverified 且条件偏弱，以及部分功能措辞略强于来源。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-investment-fund-accounting-00a390f313\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"有组合记账但无托管对账、费用计提与份额净值\",\"source_id\":\"s0\",\"quote\":\"Full double-entry accounting with Decimal precision (40-digit)\",\"reason\":\"来源确实提到复式记账，但未明确说明是否具备托管对账、费用计提或份额净值；卡片以否定式描述缺项，属于推断而非来源明示。场景本身已标 unverified，方向正确，但条件表述可更保守。\",\"suggested_correction\":\"将条件改为“来源未提及托管对账、费用计提与份额净值，需扩展后方可适用”，避免断言其完全缺失。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"BI JISDOR 汇率换算与公开数据导出\",\"source_id\":\"s0\",\"quote\":\"FX Conversion | IDR ↔ USD via Bank Indonesia JISDOR official rate\",\"reason\":\"来源支持 JISDOR 汇率换算与公开导出，但“公开数据导出”在来源中描述为 sanitized export，卡片措辞可接受；不过未说明导出为脱敏公开数据，可能让读者误以为导出完整数据。\",\"suggested_correction\":\"补充“脱敏公开导出”以贴合来源。\"},{\"field\":\"positioning\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"围绕 MSTR/BTC 的量化投资跟踪与决策引擎，含组合记账与 Telegram 机器人\",\"source_id\":\"s0\",\"quote\":\"A quantitative investment tracking system with AI-powered decision engine, real-time market data, portfolio accounting, and live thesis challenge\",\"reason\":\"来源称 AI-powered decision engine，卡片省略 AI 表述，属保守但未失真；定位整体有支持。\",\"suggested_correction\":\"可保留现状，或注明“AI 辅助评分”以更贴近来源。\"},{\"field\":\"license\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"license_overclaim\",\"claim\":\"未发现许可证文件；公开仓库不等于开源授权\",\"source_id\":\"s1\",\"quote\":\"\\\"license\\\":null\",\"reason\":\"元数据 license 为 null，README 声称 MIT，但卡片保守标 pending 合理；不过 README 的 MIT 声明未被提及，可能让读者忽略来源中的许可声明。\",\"suggested_correction\":\"在 note 中补充“README 声称 MIT，但仓库元数据无许可证文件，待核验”，保持 pending 状态。\"}],\"limitations\":[\"仅提供 README 与 GitHub 元数据各一份，未覆盖源码、测试与工作流文件，无法验证代码行数、测试覆盖与 CI 实际内容。\",\"许可全文未比对，仅依据元数据 license=null 与 README 声明，不能确认实际授权。\",\"场景匹配仅一条，且来源未明确基金会计相关能力，判断以 README 缺项推断为主。\"]}",
+ "review": {
+  "repository_id": 1340360847,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体与 README 和元数据一致：项目定位为 MSTR/BTC 量化跟踪与决策应用，功能有来源支持，演示数据已标注为虚构，许可状态保守标为 pending。主要问题是场景匹配把基金会计场景标为 unverified 且条件偏弱，以及部分功能措辞略强于来源。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-investment-fund-accounting-00a390f313",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "有组合记账但无托管对账、费用计提与份额净值",
+    "source_id": "s0",
+    "quote": "Full double-entry accounting with Decimal precision (40-digit)",
+    "reason": "来源确实提到复式记账，但未明确说明是否具备托管对账、费用计提或份额净值；卡片以否定式描述缺项，属于推断而非来源明示。场景本身已标 unverified，方向正确，但条件表述可更保守。",
+    "suggested_correction": "将条件改为“来源未提及托管对账、费用计提与份额净值，需扩展后方可适用”，避免断言其完全缺失。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "BI JISDOR 汇率换算与公开数据导出",
+    "source_id": "s0",
+    "quote": "FX Conversion | IDR ↔ USD via Bank Indonesia JISDOR official rate",
+    "reason": "来源支持 JISDOR 汇率换算与公开导出，但“公开数据导出”在来源中描述为 sanitized export，卡片措辞可接受；不过未说明导出为脱敏公开数据，可能让读者误以为导出完整数据。",
+    "suggested_correction": "补充“脱敏公开导出”以贴合来源。"
+   },
+   {
+    "field": "positioning",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "围绕 MSTR/BTC 的量化投资跟踪与决策引擎，含组合记账与 Telegram 机器人",
+    "source_id": "s0",
+    "quote": "A quantitative investment tracking system with AI-powered decision engine, real-time market data, portfolio accounting, and live thesis challenge",
+    "reason": "来源称 AI-powered decision engine，卡片省略 AI 表述，属保守但未失真；定位整体有支持。",
+    "suggested_correction": "可保留现状，或注明“AI 辅助评分”以更贴近来源。"
+   },
+   {
+    "field": "license",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "license_overclaim",
+    "claim": "未发现许可证文件；公开仓库不等于开源授权",
+    "source_id": "s1",
+    "quote": "\"license\":null",
+    "reason": "元数据 license 为 null，README 声称 MIT，但卡片保守标 pending 合理；不过 README 的 MIT 声明未被提及，可能让读者忽略来源中的许可声明。",
+    "suggested_correction": "在 note 中补充“README 声称 MIT，但仓库元数据无许可证文件，待核验”，保持 pending 状态。"
+   }
+  ],
+  "limitations": [
+   "仅提供 README 与 GitHub 元数据各一份，未覆盖源码、测试与工作流文件，无法验证代码行数、测试覆盖与 CI 实际内容。",
+   "许可全文未比对，仅依据元数据 license=null 与 README 声明，不能确认实际授权。",
+   "场景匹配仅一条，且来源未明确基金会计相关能力，判断以 README 缺项推断为主。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 1,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T05:11:34.013321+00:00",
+ "elapsed_seconds": 12.157
+}

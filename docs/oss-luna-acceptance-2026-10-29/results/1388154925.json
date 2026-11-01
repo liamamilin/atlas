@@ -1,0 +1,51 @@
+{
+ "repository_id": 1388154925,
+ "domain": "08",
+ "input_sha256": "71e042cb0019c08d4357a527c15d709efeafe8e685b378f04ee5c474f4dd4d33",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:38:53.158450+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCCdAKHgiq6eIyCBFynJXLqhlpkp",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 1586,
+  "completion_tokens": 204,
+  "total_tokens": 1790,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 1583,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.00026060000000000005,
+ "response_text": "{\"repository_id\":1388154925,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片明确标注资料缺失、项目类型未知、许可待核验，且场景适用性为未验证；现有描述仅支持项目名称所示的监管报送与模拟主题，不能确认具体功能或实现。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[],\"limitations\":[\"仅有一条仓库元数据来源，未提供 README、源码或其他项目文档；不能据此验证功能、实现状态或完整项目定位。\",\"场景匹配标为 unverified，理由也明确说明缺少功能与实现证据；不能确认其支持季度资本充足率报表编制、校验或报送流程。\",\"许可状态为 pending，且卡片说明未发现许可证文件；本次材料不足以核验许可。\"]}",
+ "review": {
+  "repository_id": 1388154925,
+  "verdict": "pass_with_limits",
+  "summary": "卡片明确标注资料缺失、项目类型未知、许可待核验，且场景适用性为未验证；现有描述仅支持项目名称所示的监管报送与模拟主题，不能确认具体功能或实现。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [],
+  "limitations": [
+   "仅有一条仓库元数据来源，未提供 README、源码或其他项目文档；不能据此验证功能、实现状态或完整项目定位。",
+   "场景匹配标为 unverified，理由也明确说明缺少功能与实现证据；不能确认其支持季度资本充足率报表编制、校验或报送流程。",
+   "许可状态为 pending，且卡片说明未发现许可证文件；本次材料不足以核验许可。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:38:57.480987+00:00",
+ "elapsed_seconds": 4.323
+}

@@ -1,0 +1,79 @@
+{
+ "repository_id": 886138381,
+ "domain": "26",
+ "input_sha256": "f16ac371a03daa14f493a5fd93fd4e029f96db8356793352dad1af8260afa342",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:17.244990+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDz9X5lO4xnUbtrjDXLaITteahf",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 1821,
+  "completion_tokens": 653,
+  "total_tokens": 2474,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 1818,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0005086,
+ "response_text": "{\n  \"repository_id\": 886138381,\n  \"verdict\": \"pass_with_limits\",\n  \"summary\": \"卡片对项目的描述与仓库元数据中的说明一致；许可证保持 pending，场景也明确标为 unverified。由于仅有元数据、没有仓库文件可审，不能据此确认实际实现或完整应用能力。\",\n  \"checks\": {\n    \"facts\": \"limited\",\n    \"project_type\": \"limited\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"limited\"\n  },\n  \"issues\": [\n    {\n      \"field\": \"project_type\",\n      \"scenario_id\": \"\",\n      \"severity\": \"minor\",\n      \"kind\": \"insufficient_evidence\",\n      \"claim\": \"application\",\n      \"source_id\": \"s0\",\n      \"quote\": \"\\\"description\\\":\\\"Hostel Booking System A web-based hostel booking platform that allows users to view available rooms, book their stay, and manage reservations. This project includes multiple web pages for features such as room selection, user authentication, booking confirmation, and admin management. Built with HTML,CSS.\\\"\",\n      \"reason\": \"元数据描述了一个预订平台及多个页面，但材料没有源码或文件清单，无法核实其是否为已实现的完整应用；现有证据不足以确认项目类型。\",\n      \"suggested_correction\": \"保留 application 作为候选分类并注明仅依据仓库描述，或待查看源码后确认。\"\n    },\n    {\n      \"field\": \"scenario_match\",\n      \"scenario_id\": \"auto-hostel-booking-platform-66e08429d0\",\n      \"severity\": \"minor\",\n      \"kind\": \"missing_condition\",\n      \"claim\": \"涉及旅舍房间预订，但无床位语义、多运营商目录或支付细节\",\n      \"source_id\": \"s0\",\n      \"quote\": \"\\\"description\\\":\\\"Hostel Booking System A web-based hostel booking platform that allows users to view available rooms, book their stay, and manage reservations.\\\"\",\n      \"reason\": \"场景要求背包客跨城市比较多人宿舍床位价格与评分、在线支付定金并收到确认。来源只提到房间查看、预订和预订确认；卡片已标 unverified 并指出床位、多运营商目录和支付细节未证实，因此不应将其视为直接适用。\",\n      \"suggested_correction\": \"保留 unverified，并明确该匹配仅基于一般旅舍房间预订描述，场景所需的床位比较、跨城目录及定金支付均未核实。\"\n    }\n  ],\n  \"limitations\": [\n    \"唯一来源是 GitHub 元数据及其描述；coverage 显示 files_available 为 0，不能核验源码、页面或实际功能。\",\n    \"来源描述支持卡片中的项目概述，但不等同于对功能实现的独立验证。\",\n    \"许可证状态为 pending，来源中的 license 为 null；本次材料不支持确认许可证。\"\n  ]\n}",
+ "review": {
+  "repository_id": 886138381,
+  "verdict": "pass_with_limits",
+  "summary": "卡片对项目的描述与仓库元数据中的说明一致；许可证保持 pending，场景也明确标为 unverified。由于仅有元数据、没有仓库文件可审，不能据此确认实际实现或完整应用能力。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "limited",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "project_type",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "application",
+    "source_id": "s0",
+    "quote": "\"description\":\"Hostel Booking System A web-based hostel booking platform that allows users to view available rooms, book their stay, and manage reservations. This project includes multiple web pages for features such as room selection, user authentication, booking confirmation, and admin management. Built with HTML,CSS.\"",
+    "reason": "元数据描述了一个预订平台及多个页面，但材料没有源码或文件清单，无法核实其是否为已实现的完整应用；现有证据不足以确认项目类型。",
+    "suggested_correction": "保留 application 作为候选分类并注明仅依据仓库描述，或待查看源码后确认。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-hostel-booking-platform-66e08429d0",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "涉及旅舍房间预订，但无床位语义、多运营商目录或支付细节",
+    "source_id": "s0",
+    "quote": "\"description\":\"Hostel Booking System A web-based hostel booking platform that allows users to view available rooms, book their stay, and manage reservations.\"",
+    "reason": "场景要求背包客跨城市比较多人宿舍床位价格与评分、在线支付定金并收到确认。来源只提到房间查看、预订和预订确认；卡片已标 unverified 并指出床位、多运营商目录和支付细节未证实，因此不应将其视为直接适用。",
+    "suggested_correction": "保留 unverified，并明确该匹配仅基于一般旅舍房间预订描述，场景所需的床位比较、跨城目录及定金支付均未核实。"
+   }
+  ],
+  "limitations": [
+   "唯一来源是 GitHub 元数据及其描述；coverage 显示 files_available 为 0，不能核验源码、页面或实际功能。",
+   "来源描述支持卡片中的项目概述，但不等同于对功能实现的独立验证。",
+   "许可证状态为 pending，来源中的 license 为 null；本次材料不支持确认许可证。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 1,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T04:40:25.560864+00:00",
+ "elapsed_seconds": 8.316
+}

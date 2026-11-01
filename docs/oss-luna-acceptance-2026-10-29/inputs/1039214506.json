@@ -1,0 +1,152 @@
+{
+ "card": {
+  "repository_id": 1039214506,
+  "full_name": "johnny-wiley/network-diagnostic-tool",
+  "github_url": "https://github.com/johnny-wiley/network-diagnostic-tool",
+  "name": "network-diagnostic-tool",
+  "summary": "该工具对 hosts.txt 中的主机执行 ping 延迟测试与 DNS 解析，标记不可达/未解析主机，并将带时间戳的结果保存到 network_report.csv；为一次性检查脚本，非持续监控。",
+  "positioning": "面向初学者的 Python 网络诊断工具，对主机列表做 ping 与 DNS 检查并输出 CSV",
+  "scope": "适用于小规模主机的连通性与 DNS 基础检查，不提供持续采集、健康状态评估或告警。",
+  "features": [
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/johnny-wiley/network-diagnostic-tool/git/blobs/89ae6b9428a7af6cbdb44b6be057744a392f123e",
+     "source_kind": "readme",
+     "source_sha256": "7e5c751dbf06ee6aec130b27ac9f7df8dac2cdafb21bcebf60b6004c957d3e47",
+     "source_url": "https://github.com/johnny-wiley/network-diagnostic-tool/blob/main/README.md",
+     "verification": "source_based"
+    },
+    "text": "对每个主机执行 ping 延迟测试"
+   },
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/johnny-wiley/network-diagnostic-tool/git/blobs/89ae6b9428a7af6cbdb44b6be057744a392f123e",
+     "source_kind": "readme",
+     "source_sha256": "7e5c751dbf06ee6aec130b27ac9f7df8dac2cdafb21bcebf60b6004c957d3e47",
+     "source_url": "https://github.com/johnny-wiley/network-diagnostic-tool/blob/main/README.md",
+     "verification": "source_based"
+    },
+    "text": "DNS 解析主机到 IP"
+   },
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/johnny-wiley/network-diagnostic-tool/git/blobs/89ae6b9428a7af6cbdb44b6be057744a392f123e",
+     "source_kind": "readme",
+     "source_sha256": "7e5c751dbf06ee6aec130b27ac9f7df8dac2cdafb21bcebf60b6004c957d3e47",
+     "source_url": "https://github.com/johnny-wiley/network-diagnostic-tool/blob/main/README.md",
+     "verification": "source_based"
+    },
+    "text": "标记不可达/未解析主机并输出 CSV"
+   }
+  ],
+  "project_type": "application",
+  "license": {
+   "detected_spdx": null,
+   "note": "未发现许可证文件；公开仓库不等于开源授权",
+   "source": null,
+   "spdx": null,
+   "status": "pending"
+  },
+  "missing_fields": [
+   "license_verification"
+  ],
+  "collection_notes": [],
+  "completeness": "partial",
+  "summary_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/johnny-wiley/network-diagnostic-tool/git/blobs/89ae6b9428a7af6cbdb44b6be057744a392f123e",
+   "source_kind": "readme",
+   "source_sha256": "7e5c751dbf06ee6aec130b27ac9f7df8dac2cdafb21bcebf60b6004c957d3e47",
+   "source_url": "https://github.com/johnny-wiley/network-diagnostic-tool/blob/main/README.md",
+   "verification": "source_based"
+  },
+  "scope_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/johnny-wiley/network-diagnostic-tool/git/blobs/89ae6b9428a7af6cbdb44b6be057744a392f123e",
+   "source_kind": "readme",
+   "source_sha256": "7e5c751dbf06ee6aec130b27ac9f7df8dac2cdafb21bcebf60b6004c957d3e47",
+   "source_url": "https://github.com/johnny-wiley/network-diagnostic-tool/blob/main/README.md",
+   "verification": "source_based"
+  },
+  "positioning_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/johnny-wiley/network-diagnostic-tool/git/blobs/89ae6b9428a7af6cbdb44b6be057744a392f123e",
+   "source_kind": "readme",
+   "source_sha256": "7e5c751dbf06ee6aec130b27ac9f7df8dac2cdafb21bcebf60b6004c957d3e47",
+   "source_url": "https://github.com/johnny-wiley/network-diagnostic-tool/blob/main/README.md",
+   "verification": "source_based"
+  }
+ },
+ "scenario_matches": [
+  {
+   "applicability": "conditional",
+   "conditions": [
+    "仅做检测，不查看区域记录或租约"
+   ],
+   "evidence": {
+    "excerpt": "",
+    "immutable_url": "https://api.github.com/repos/johnny-wiley/network-diagnostic-tool/git/blobs/89ae6b9428a7af6cbdb44b6be057744a392f123e",
+    "source_kind": "readme",
+    "source_sha256": "7e5c751dbf06ee6aec130b27ac9f7df8dac2cdafb21bcebf60b6004c957d3e47",
+    "source_url": "https://github.com/johnny-wiley/network-diagnostic-tool/blob/main/README.md",
+    "verification": "source_based"
+   },
+   "reason": "可批量验证主机名解析是否成功，辅助定位解析故障",
+   "scenario_id": "auto-dns-dhcp-management-3d5f011c31",
+   "leaf": "dns-dhcp-management",
+   "leaf_name": "DNS & DHCP Management",
+   "scenario_name": "名称解析故障排查",
+   "scenario_description": "运维人员接到某主机名无法解析的报告，查看区域记录与对应租约，确认记录缺失或地址未分配，定位问题后修正配置。"
+  },
+  {
+   "applicability": "conditional",
+   "conditions": [
+    "需手动维护主机列表并运行脚本",
+    "结果为单次快照，无历史与告警"
+   ],
+   "evidence": {
+    "excerpt": "",
+    "immutable_url": "https://api.github.com/repos/johnny-wiley/network-diagnostic-tool/git/blobs/89ae6b9428a7af6cbdb44b6be057744a392f123e",
+    "source_kind": "readme",
+    "source_sha256": "7e5c751dbf06ee6aec130b27ac9f7df8dac2cdafb21bcebf60b6004c957d3e47",
+    "source_url": "https://github.com/johnny-wiley/network-diagnostic-tool/blob/main/README.md",
+    "verification": "source_based"
+   },
+   "reason": "可对相关主机做延迟与 DNS 检查，辅助判断网络侧问题",
+   "scenario_id": "auto-network-monitoring-8cb0fc09fa",
+   "leaf": "network-monitoring",
+   "leaf_name": "Network Monitoring",
+   "scenario_name": "应用变慢排查",
+   "scenario_description": "应用团队反馈访问慢，网络管理员调取相关接口流量、延迟与丢包历史，判断网络是否为瓶颈并定位到具体链路或跳点。"
+  }
+ ],
+ "sources": [
+  {
+   "kind": "readme",
+   "immutable_url": "https://api.github.com/repos/johnny-wiley/network-diagnostic-tool/git/blobs/89ae6b9428a7af6cbdb44b6be057744a392f123e",
+   "sha256": "7e5c751dbf06ee6aec130b27ac9f7df8dac2cdafb21bcebf60b6004c957d3e47",
+   "text": "# Network Diagnostic Tool\n\nA beginner-friendly Python tool that performs basic network checks (ping, DNS lookup) on a list of hosts and saves results to CSV.\n\n## ✨ Features\n- Ping test for each host (latency in ms)\n- DNS resolution (host → IP address)\n- Marks unreachable/unresolved hosts\n- Saves results with timestamp to `network_report.csv`\n\n## 🚀 Quick Start\n1. Clone repo and install Python 3.9+\n2. Add hosts to `hosts.txt`\n3. Run:\n   ```bash\n   python main.py\n   ```\n4. Open `network_report.csv`\n\n## 🧪 Example Output\n| Host        | IP Address   | Latency (ms) | Timestamp           |\n|-------------|--------------|--------------|---------------------|\n| google.com  | 142.250.72.46| 22           | 2025-08-16 14:01:12 |\n| github.com  | 140.82.113.3 | 31           | 2025-08-16 14:01:13 |\n| 8.8.8.8     | 8.8.8.8      | 18           | 2025-08-16 14:01:14 |\n\n## 📄 License\nMIT\n",
+   "id": "s0",
+   "original_chars": 880,
+   "truncated": false
+  },
+  {
+   "id": "s1",
+   "kind": "github_metadata",
+   "sha256": "92e8d2471115de685b5fe34fe2e8f32843449b623f6cfa5d2963a938ea4cbc16",
+   "text": "{\"archived\":false,\"description\":\"Performs connectivity, latency, and DNS resolution checks to support troubleshooting.\",\"full_name\":\"johnny-wiley/network-diagnostic-tool\",\"html_url\":\"https://github.com/johnny-wiley/network-diagnostic-tool\",\"id\":1039214506,\"language\":\"Python\",\"license\":null,\"topics\":[\"automation\",\"dns\",\"networking\",\"ping\",\"portfolio\",\"python\",\"troubleshooting\"]}\nPerforms connectivity, latency, and DNS resolution checks to support troubleshooting.",
+   "truncated": false
+  }
+ ],
+ "coverage": {
+  "total_campaign_matches": 2,
+  "matches_included": 2,
+  "files_available": 1,
+  "files_included": 1,
+  "omitted_files": 0,
+  "truncated_files": 0
+ }
+}

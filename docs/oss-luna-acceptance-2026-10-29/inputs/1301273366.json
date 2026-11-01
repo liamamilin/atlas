@@ -1,0 +1,83 @@
+{
+ "card": {
+  "repository_id": 1301273366,
+  "full_name": "Lakshay-26/Simulation-Lab",
+  "github_url": "https://github.com/Lakshay-26/Simulation-Lab",
+  "name": "Simulation-Lab",
+  "summary": "Full-stack Red Team vs Blue Team cyber security simulation platform. Features dynamic vulnerability scanning, SQLi exploits, customizable firewall defense toggles, security header diagnostic audits, local file DB gateway fallback, JWT sessions, SVG vector UI branding, and publication-ready automated PDF compliance report generators.",
+  "positioning": "候选项目 · 定位待补充",
+  "scope": "适用范围待补充；请查看官方项目资料。",
+  "features": [],
+  "project_type": "unknown",
+  "license": {
+   "detected_spdx": null,
+   "note": "未发现许可证文件；公开仓库不等于开源授权",
+   "source": null,
+   "spdx": null,
+   "status": "pending"
+  },
+  "missing_fields": [
+   "positioning",
+   "summary",
+   "scope",
+   "features",
+   "scenario_associations",
+   "license_verification"
+  ],
+  "collection_notes": [
+   "介绍待补充：提取结果遗漏候选或包含未读取的项目"
+  ],
+  "completeness": "partial",
+  "summary_evidence": {
+   "excerpt": "Full-stack Red Team vs Blue Team cyber security simulation platform. Features dynamic vulnerability scanning, SQLi exploits, customizable firewall defense toggles, security header diagnostic audits, local file DB gateway fallback, JWT sessions, SVG vector UI branding, and publication-ready automated PDF compliance report generators.",
+   "immutable_url": "",
+   "source_kind": "repository",
+   "source_sha256": "4bb74be00b9b806d06e01bd1df24204b9a24190956dd7c10e54496aef4e0c0ec",
+   "source_url": "https://api.github.com/repos/Lakshay-26/Simulation-Lab",
+   "verification": "quote_matched"
+  },
+  "scope_evidence": {
+   "excerpt": "Full-stack Red Team vs Blue Team cyber security simulation platform. Features dynamic vulnerability scanning, SQLi exploits, customizable firewall defense toggles, security header diagnostic audits, local file DB gateway fallback, JWT sessions, SVG vector UI branding, and publication-ready automated PDF compliance report generators.",
+   "immutable_url": "",
+   "source_kind": "repository",
+   "source_sha256": "4bb74be00b9b806d06e01bd1df24204b9a24190956dd7c10e54496aef4e0c0ec",
+   "source_url": "https://api.github.com/repos/Lakshay-26/Simulation-Lab",
+   "verification": "quote_matched"
+  },
+  "positioning_evidence": {
+   "excerpt": "Full-stack Red Team vs Blue Team cyber security simulation platform. Features dynamic vulnerability scanning, SQLi exploits, customizable firewall defense toggles, security header diagnostic audits, local file DB gateway fallback, JWT sessions, SVG vector UI branding, and publication-ready automated PDF compliance report generators.",
+   "immutable_url": "",
+   "source_kind": "repository",
+   "source_sha256": "4bb74be00b9b806d06e01bd1df24204b9a24190956dd7c10e54496aef4e0c0ec",
+   "source_url": "https://api.github.com/repos/Lakshay-26/Simulation-Lab",
+   "verification": "quote_matched"
+  }
+ },
+ "scenario_matches": [],
+ "sources": [
+  {
+   "kind": "readme",
+   "immutable_url": "https://api.github.com/repos/Lakshay-26/Simulation-Lab/git/blobs/1162d96434c488b86af74d9ffa6c5d623e79e5b7",
+   "sha256": "accbd544f0095cfb033410461b143305d7c7a7d4071e0c0cc7a1ec15256dd843",
+   "text": "# 🛡️ RED TEAM vs BLUE TEAM - Security Simulation Lab\n\nA premium, full-stack cybersecurity simulation sandbox designed to demonstrate the dynamic relationship between application-layer exploits (Red Team) and code-level mitigations (Blue Team) in real-time.\n\n---\n\n## 💎 Core Features\n\n### ⚔️ Red Team (Attacking Console)\n* **Reconnaissance Engine**: Run DNS query lookups, port scans, and domain information queries.\n* **Exploit Laboratory**: Execute simulated SQL Injection (SQLi) and Cross-Site Scripting (XSS) payloads to observe system compromises.\n\n### 🛡️ Blue Team (Defensive Mitigations)\n* **Active Controls**: Switch defensive rules (e.g. Parameterized Queries, Input Sanitization, and Rate Limiting) on or off.\n* **Feedback Loop**: Toggling a defense immediately changes the outcome of the attack payloads, adjusting the dynamic safety score on the dashboard.\n\n### 📊 Security Header Analyzer\n* **Endpoint Diagnostics**: Audit and grade the security headers (e.g., CSP, HSTS, X-Frame-Options) of any external domain or local address with automated letter grades (A+ to F).\n\n### 📝 PDF Report Compiler\n* **Compliance Reports**: Input your credentials and export structured, multi-page security report sheets compiling current vulnerabilities and active defenses.\n\n### 🔌 Dual-DB Gateway Fallback\n* **Seamless Offline Capability**: Built with a smart connection manager. If a live MongoDB server is not detected, the backend transparently falls back to an asynchronous local JSON database file, allowing full CRUD operations.\n\n---\n\n## 🛠️ Technology Stack\n\n* **Frontend**: React 18, Vite, Tailwind CSS, Recharts (Analytical Graphs), Lucide React (Vector Icons)\n* **Backend**: Node.js, Express, JWT (Session Authentication), Helmet (HTTP Headers Protection), Cookie Parser, Multer, PDFKit (Vector PDF Compilation)\n* **Database**: MongoDB (Mongoose) + Local File-Based JSON Database Fallback\n\n---\n\n## 📁 Repository Directory Structure\n\n```text\n├── backend/\n│   ├── config/             # Connection configurations (db.js)\n│   ├── controllers/        # Business logic handlers (auth, simulation, reports, admin)\n│   ├── data/               # Fallback JSON database storage (history.json, users.json)\n│   ├── middleware/         # Session validation & security gateways\n│   ├── routes/             # API routing sockets\n│   ├── services/           # PDF compiler engine (pdfService.js)\n│   ├── utils/              # File database CRUD managers (jsonDb.js)\n│   └── index.js            # Express application root\n├── frontend/\n│   ├── public/             # Static favicon assets (logo.svg)\n│   ├── src/\n│   │   ├── assets/         # Cyberpunk and modern light mode background wallpapers\n│   │   ├── components/     # Reusable layout tools, toasts, sidebars, and logo SVGs\n│   │   ├── context/        # Session tokens and Light/Dark state machines\n│   │   ├── pages/          # Navigation views (Dashboard, RedTeam, BlueTeam, Reports)\n│   │   ├── App.jsx         # App router and layout bindings\n│   │   └── main.jsx        # Client entrypoint\n│   ├── index.html          # HTML frame\n│   ├── postcss.config.js   # Style processor rules\n│   └── tailwind.config.js  # Theme variables configuration\n├── package.json            # Unified execution scripts\n└── verify.js               # Pipeline verification script\n```\n\n---\n\n## 🏁 Quick Start Guide\n\n### Prerequisites\n* Node.js v22.12.0+ (already pre-bundled in your App Data folder)\n\n### 1. Installation\nIn the root directory, install all required dependencies for both directories:\n```bash\nnpm run install-all\n```\n\n### 2. Configure Environment variables\nConfigure your `.env` file in the `backend` folder:\n```env\nPORT=5000\nJWT_SECRET=your_production_secret_key\nJWT_EXPIRES_IN=7d\nMONGO_URI=mongodb://localhost:27017/simulation_lab\n```\n\n### 3. Running the App locally\nRun both frontend and backend development servers simultaneously:\n```bash\nnpm run dev\n```\n* **Frontend client**: `http://localhost:5173/`\n* **Backend API**: `http://localhost:5000/`\n\n---\n\n## 🧪 Verification & Audit Pipeline\nTo verify database CRUD handlers, fallbacks, and PDF compilations, run the automated verification script:\n```bash\nnode verify.js\n```",
+   "id": "s0",
+   "original_chars": 4161,
+   "truncated": false
+  },
+  {
+   "id": "s1",
+   "kind": "github_metadata",
+   "sha256": "4bb74be00b9b806d06e01bd1df24204b9a24190956dd7c10e54496aef4e0c0ec",
+   "text": "{\"archived\":false,\"description\":\"Full-stack Red Team vs Blue Team cyber security simulation platform. Features dynamic vulnerability scanning, SQLi exploits, customizable firewall defense toggles, security header diagnostic audits, local file DB gateway fallback, JWT sessions, SVG vector UI branding, and publication-ready automated PDF compliance report generators.\",\"full_name\":\"Lakshay-26/Simulation-Lab\",\"html_url\":\"https://github.com/Lakshay-26/Simulation-Lab\",\"id\":1301273366,\"language\":\"JavaScript\",\"license\":null,\"topics\":[]}\nFull-stack Red Team vs Blue Team cyber security simulation platform. Features dynamic vulnerability scanning, SQLi exploits, customizable firewall defense toggles, security header diagnostic audits, local file DB gateway fallback, JWT sessions, SVG vector UI branding, and publication-ready automated PDF compliance report generators.",
+   "truncated": false
+  }
+ ],
+ "coverage": {
+  "total_campaign_matches": 0,
+  "matches_included": 0,
+  "files_available": 1,
+  "files_included": 1,
+  "omitted_files": 0,
+  "truncated_files": 0
+ }
+}

@@ -1,0 +1,120 @@
+{
+ "repository_id": 1252108900,
+ "domain": "16",
+ "input_sha256": "26c0cb524b346476af3d42130c0a9876959469e83b11c58441af4429dd7e11e4",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:56.002994+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-dda4d3d2f9ac-dbc39",
+ "usage": {
+  "prompt_tokens": 7267,
+  "completion_tokens": 832,
+  "total_tokens": 8099,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00151399,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00151399,
+   "tokens": {
+    "input": 6755,
+    "output": 832,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1252108900,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片内容与 README 和元数据基本一致：项目是 Python/PyQt5 的二维逆运动学可视化桌面应用，MIT 许可有完整正文支持；但 README 的安装说明与徽章在 Python 版本上不一致，且卡片未提及该限制。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"2-DOF/3-DOF/4-DOF 模式切换与动画变形\",\"source_id\":\"s0\",\"quote\":\"During morphing, target input is temporarily paused.\",\"reason\":\"README 明确说明变形动画期间目标输入会暂停，卡片未记录这一交互限制；这属于已标注的限制，不是错误，但应保留。\",\"suggested_correction\":\"在功能描述中补充“模式变形期间目标输入暂停”的既有条件。\"},{\"field\":\"scope\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"适用于逆运动学教学演示与平面机械臂概念原型；仅二维平面模型，非工业控制器或离线编程平台。\",\"source_id\":\"s0\",\"quote\":\"If the target is outside the arm's reach, a red error message is shown and the arm does not move.\",\"reason\":\"README 说明目标超出可达范围时会报错且机械臂不动，卡片未提及该可达性限制；这是已写明的行为约束，应保留。\",\"suggested_correction\":\"在范围或功能中注明“目标超出可达范围时提示错误且不运动”。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"点击目标点实时求解逆运动学并动画运动\",\"source_id\":\"s0\",\"quote\":\"The 4-DOF mode evaluates up to 180 × 180 × 2 = 64,800 candidate configurations per click.\",\"reason\":\"3/4-DOF 采用角度扫描采样，解为近似解，残差受角分辨率限制；卡片未说明这是采样近似而非精确解。\",\"suggested_correction\":\"补充“3/4-DOF 为角度扫描近似解，残差受采样分辨率限制”。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"工作空间可视化与逐步计算报告导出\",\"source_id\":\"s0\",\"quote\":\"Changing a link length clears the current target and updates the workspace boundary.\",\"reason\":\"README 说明修改连杆长度会清除当前目标并更新工作空间边界，卡片未记录该联动行为。\",\"suggested_correction\":\"在功能描述中注明修改连杆长度会清除当前目标。\"},{\"field\":\"summary\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"用 Python 与 PyQt5 实现的 2/3/4 自由度平面机械臂逆运动学可视化工具。\",\"source_id\":\"s0\",\"quote\":\"Python 3.13+\",\"reason\":\"README 徽章写 Python 3.13+，安装章节写 Python 3.10 or later，二者不一致；卡片未涉及版本要求，但若后续补充运行环境需注意该矛盾。\",\"suggested_correction\":\"如补充运行环境，应如实标注 README 中 Python 版本说明存在不一致，而非择一断言。\"}],\"limitations\":[\"本次仅提供 README、LICENSE 与 GitHub 元数据，未包含源码文件，无法核验功能实现细节。\",\"coverage 显示 matches_included=0、scenario_matches 为空，未提供场景关联材料，无法评估场景匹配。\",\"许可结论依据确定性 SPDX 全文比对，本次仅审语义标签。\"]}",
+ "review": {
+  "repository_id": 1252108900,
+  "verdict": "pass_with_limits",
+  "summary": "卡片内容与 README 和元数据基本一致：项目是 Python/PyQt5 的二维逆运动学可视化桌面应用，MIT 许可有完整正文支持；但 README 的安装说明与徽章在 Python 版本上不一致，且卡片未提及该限制。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "2-DOF/3-DOF/4-DOF 模式切换与动画变形",
+    "source_id": "s0",
+    "quote": "During morphing, target input is temporarily paused.",
+    "reason": "README 明确说明变形动画期间目标输入会暂停，卡片未记录这一交互限制；这属于已标注的限制，不是错误，但应保留。",
+    "suggested_correction": "在功能描述中补充“模式变形期间目标输入暂停”的既有条件。"
+   },
+   {
+    "field": "scope",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "适用于逆运动学教学演示与平面机械臂概念原型；仅二维平面模型，非工业控制器或离线编程平台。",
+    "source_id": "s0",
+    "quote": "If the target is outside the arm's reach, a red error message is shown and the arm does not move.",
+    "reason": "README 说明目标超出可达范围时会报错且机械臂不动，卡片未提及该可达性限制；这是已写明的行为约束，应保留。",
+    "suggested_correction": "在范围或功能中注明“目标超出可达范围时提示错误且不运动”。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "点击目标点实时求解逆运动学并动画运动",
+    "source_id": "s0",
+    "quote": "The 4-DOF mode evaluates up to 180 × 180 × 2 = 64,800 candidate configurations per click.",
+    "reason": "3/4-DOF 采用角度扫描采样，解为近似解，残差受角分辨率限制；卡片未说明这是采样近似而非精确解。",
+    "suggested_correction": "补充“3/4-DOF 为角度扫描近似解，残差受采样分辨率限制”。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "工作空间可视化与逐步计算报告导出",
+    "source_id": "s0",
+    "quote": "Changing a link length clears the current target and updates the workspace boundary.",
+    "reason": "README 说明修改连杆长度会清除当前目标并更新工作空间边界，卡片未记录该联动行为。",
+    "suggested_correction": "在功能描述中注明修改连杆长度会清除当前目标。"
+   },
+   {
+    "field": "summary",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "用 Python 与 PyQt5 实现的 2/3/4 自由度平面机械臂逆运动学可视化工具。",
+    "source_id": "s0",
+    "quote": "Python 3.13+",
+    "reason": "README 徽章写 Python 3.13+，安装章节写 Python 3.10 or later，二者不一致；卡片未涉及版本要求，但若后续补充运行环境需注意该矛盾。",
+    "suggested_correction": "如补充运行环境，应如实标注 README 中 Python 版本说明存在不一致，而非择一断言。"
+   }
+  ],
+  "limitations": [
+   "本次仅提供 README、LICENSE 与 GitHub 元数据，未包含源码文件，无法核验功能实现细节。",
+   "coverage 显示 matches_included=0、scenario_matches 为空，未提供场景关联材料，无法评估场景匹配。",
+   "许可结论依据确定性 SPDX 全文比对，本次仅审语义标签。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 4,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T05:12:09.331161+00:00",
+ "elapsed_seconds": 13.328
+}

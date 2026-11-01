@@ -1,0 +1,62 @@
+{
+ "repository_id": 1129045921,
+ "domain": "14",
+ "input_sha256": "0988dcb9c573ab306369f5d5e3d7719a3b0eacac659d67ba2a5c77ee668256d1",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:21.636396+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCD5gTXe1rjo3rYwbNqufCjbdfHY",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 7323,
+  "completion_tokens": 353,
+  "total_tokens": 7676,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 7320,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0009088000000000001,
+ "response_text": "{\"repository_id\":1129045921,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片总体与 README 对项目功能、技术栈及通知限制的描述相符；许可证 pending 和场景 unverified/conditional 标签也较审慎。README 对无 Redis 时的轮询回退与 Bull 队列描述存在不一致，相关卡片表述宜保留为 README 所述而非视为已独立核实。\",\"checks\":{\"facts\":\"limited\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"Bull 队列实现定时升级，无 Redis 时回退轮询\",\"source_id\":\"s0\",\"quote\":\"- **Without Redis**: The system will work but escalations will fall back to polling\",\"reason\":\"README 同时称 Bull 队列升级已实现，并称无 Redis 时回退轮询；但其技术栈将 Redis 列为 Bull 队列依赖，未说明无 Redis 时具体如何运行。卡片复述了 README 的说法，但该回退机制无法从材料中进一步核实。\",\"suggested_correction\":\"可注明“README 称无 Redis 时升级回退轮询”，避免将该运行行为表述为已独立验证。\"}],\"limitations\":[\"仅依据提供的 README 与 GitHub 元数据审查，未检查源码或运行项目。\",\"README 未被截断，但其功能陈述未通过源码核验；许可证状态为 pending，不能据此认定仓库已获开源授权。\"]}",
+ "review": {
+  "repository_id": 1129045921,
+  "verdict": "pass_with_limits",
+  "summary": "卡片总体与 README 对项目功能、技术栈及通知限制的描述相符；许可证 pending 和场景 unverified/conditional 标签也较审慎。README 对无 Redis 时的轮询回退与 Bull 队列描述存在不一致，相关卡片表述宜保留为 README 所述而非视为已独立核实。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "Bull 队列实现定时升级，无 Redis 时回退轮询",
+    "source_id": "s0",
+    "quote": "- **Without Redis**: The system will work but escalations will fall back to polling",
+    "reason": "README 同时称 Bull 队列升级已实现，并称无 Redis 时回退轮询；但其技术栈将 Redis 列为 Bull 队列依赖，未说明无 Redis 时具体如何运行。卡片复述了 README 的说法，但该回退机制无法从材料中进一步核实。",
+    "suggested_correction": "可注明“README 称无 Redis 时升级回退轮询”，避免将该运行行为表述为已独立验证。"
+   }
+  ],
+  "limitations": [
+   "仅依据提供的 README 与 GitHub 元数据审查，未检查源码或运行项目。",
+   "README 未被截断，但其功能陈述未通过源码核验；许可证状态为 pending，不能据此认定仓库已获开源授权。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:27.813990+00:00",
+ "elapsed_seconds": 6.178
+}

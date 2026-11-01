@@ -1,0 +1,109 @@
+{
+ "id": "oss_5ceaed6bd0464bc7a09e1e577f80a01b",
+ "leaf": "feed-reader",
+ "status": "partial",
+ "started_at": "2026-10-23T02:22:54.807779+00:00",
+ "created": 0,
+ "updated": 0,
+ "unchanged": 4,
+ "failed": 1,
+ "processed": 6,
+ "errors": [
+  {
+   "repo": "martinrotter/rssguard",
+   "error": "介绍或场景关联的引文不在本次读取的 README 中"
+  }
+ ],
+ "mode": "automatic",
+ "phase": "store",
+ "model_calls": 0,
+ "model_cache_hits": 5,
+ "rejected": 1,
+ "total": 6,
+ "source_cache_hits": 6,
+ "source_fetches": 0,
+ "search_requests": 5,
+ "model_receipts": [
+  {
+   "stage": "scenarios",
+   "input_sha256": "f2457100dbd013eb7629f94023dd43f5c8de7cae1b686d8a06d33840dc70abf8",
+   "cached": true,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 3439,
+    "completion_tokens": 1755,
+    "total_tokens": 5194,
+    "cost": null
+   },
+   "created_at": "2026-10-23T02:11:31.224125+00:00"
+  },
+  {
+   "stage": "screen",
+   "input_sha256": "ee072018ae150a0253bdd3d64af2247fd398e6d70b9c79c89edb458f70ab93e5",
+   "cached": true,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 38164,
+    "completion_tokens": 5202,
+    "total_tokens": 43366,
+    "cost": null
+   },
+   "created_at": "2026-10-23T02:12:20.860874+00:00"
+  },
+  {
+   "stage": "extract",
+   "input_sha256": "962282d04f66ef1ffa269c13032f175b6fabf9a7cc253f0f867e90e64c68950f",
+   "cached": true,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 4519,
+    "completion_tokens": 5272,
+    "total_tokens": 9791,
+    "cost": null
+   },
+   "created_at": "2026-10-23T02:12:55.184011+00:00"
+  },
+  {
+   "stage": "extract",
+   "input_sha256": "a2b6b3ff061622c7b08ccbf347c9cc4cedc8ce63005da6d5e00bbdac53df6312",
+   "cached": true,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 6950,
+    "completion_tokens": 7999,
+    "total_tokens": 14949,
+    "cost": null
+   },
+   "created_at": "2026-10-23T02:13:42.279068+00:00"
+  },
+  {
+   "stage": "extract",
+   "input_sha256": "fdf1170352775923e4d13ca804f0631cd4c7445016441e2fcc16989855cf1156",
+   "cached": true,
+   "model": "deepseek-flash",
+   "provider": "open-design",
+   "usage": {
+    "prompt_tokens": 4677,
+    "completion_tokens": 8250,
+    "total_tokens": 12927,
+    "cost": null
+   },
+   "created_at": "2026-10-23T02:14:29.860307+00:00"
+  }
+ ],
+ "discovered": 20,
+ "accepted": 4,
+ "gaps": [
+  {
+   "scenario": "学术期刊目录跟踪",
+   "projects": 0,
+   "target": 3
+  }
+ ],
+ "audit_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/runs/oss_5ceaed6bd0464bc7a09e1e577f80a01b.json",
+ "finished_at": "2026-10-23T02:23:20.775233+00:00"
+}

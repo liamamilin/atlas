@@ -1,0 +1,241 @@
+{
+  "reviewed_at": "2026-10-29T05:15:59.214003+00:00",
+  "cases_reviewed": 12,
+  "pre_adjudicated_calibration_cases": 6,
+  "exploratory_cases": 6,
+  "exploratory_selection": "First six non-calibration project IDs in ascending order with DeepSeek suggestions but no Luna suggestions. Purposive disagreement review, not blind or a population-error-rate sample.",
+  "all_model_suggestions_manually_adjudicated": false,
+  "case_level_actionable_findings": {
+    "shared": [
+      "city-simulation positioning mismatch",
+      "README/LICENSE authorization wording conflict"
+    ],
+    "luna_only": [
+      "class-meeting unsupported scale/mandatory-cloud wording"
+    ],
+    "deepseek_only": [
+      "open-connector installation list misread as CLI command"
+    ]
+  },
+  "cases": [
+    {
+      "repository_id": 1275838307,
+      "repository_url": "https://github.com/AhadiCoDeR1v1/Smart-city-resource-management",
+      "preselected_calibration": true,
+      "disposition": "confirmed_fact_mismatch",
+      "comparison": "两者均检出",
+      "source_based_judgment": "归档 README 是 Java Swing 城市资源/公共服务模拟，定位却写物流车队、司机、行程维护，确认错位；该卡 unverified 公交关联的诚实限制本身不是错误。",
+      "confirmed_fields": [
+        "positioning"
+      ],
+      "input_sha256": "9250c431c510324cfb4bf163e7980c66d0a35bdcc4a1b3ff4feddfc3c020e1db",
+      "luna_receipt_sha256": "b5a9d9fbb5cdbbf73543425988ded5c223b569fc2322b05ad4054636ffc210ab",
+      "deepseek_receipt_sha256": "c2da3cf4cebfc64468cd9c6f47dd15d4a996f80fe5035a5eee5fb0b2c38c049e",
+      "production_change_applied": false,
+      "source_ids_in_review_bundle": [
+        "s0",
+        "s1",
+        "s2"
+      ]
+    },
+    {
+      "repository_id": 443410281,
+      "repository_url": "https://github.com/paulveillard/cybersecurity-incident-response",
+      "preselected_calibration": true,
+      "disposition": "confirmed_official_source_conflict",
+      "comparison": "两者均检出，DeepSeek 更精确",
+      "source_based_judgment": "LICENSE 为完整 Apache-2.0，README 写 MIT/CC BY。DeepSeek 保留 LICENSE 全文核验的有效性并建议说明范围；Luna 倾向暂停 Apache 结论，较激进。两者都发现真实文档冲突，不据此作法律许可裁决。",
+      "confirmed_fields": [
+        "license"
+      ],
+      "input_sha256": "08fa3126675ebb1fbab89ad25942be09799218845b18eec3d4119aabdadc9680",
+      "luna_receipt_sha256": "eba4fdcda4522881ed50007272ed9ced15c005c5ef05aa05524911ff57c7bbd9",
+      "deepseek_receipt_sha256": "82f13d238bcc59fb471b71eb59a4bbd2d2e2318b5934d8608002118a18e3efab",
+      "production_change_applied": false,
+      "source_ids_in_review_bundle": [
+        "s0",
+        "s1",
+        "s2"
+      ]
+    },
+    {
+      "repository_id": 1096079955,
+      "repository_url": "https://github.com/ecmr/class-meeting",
+      "preselected_calibration": true,
+      "disposition": "confirmed_minor_scope_overreach",
+      "comparison": "Luna 检出具体 scope 问题，DeepSeek 未列出",
+      "source_based_judgment": "短 README 未证实“小规模”及必须依赖 Oracle Cloud 的部署断言；Luna 对 scope 提醒有效。两者都把 WebRTC 技术说明当作缺乏运行验证而额外提醒，不能把这类提醒直接计为事实错误。",
+      "confirmed_fields": [
+        "scope"
+      ],
+      "input_sha256": "44c64c07906a99ada33c8fe829f75fc23dae060a5285c9b147df7f5cf3d57940",
+      "luna_receipt_sha256": "04452fe0cdf1454684cfbbc0369d58f030aed9bfcd097a2023879db2ee6897e3",
+      "deepseek_receipt_sha256": "96ed00cba3378277a5dde9116acba7f253eac11c32b0913c1115fd1a85dbf520",
+      "production_change_applied": false,
+      "source_ids_in_review_bundle": [
+        "s0",
+        "s1"
+      ]
+    },
+    {
+      "repository_id": 865480664,
+      "repository_url": "https://github.com/Cognitivemesh/burga",
+      "preselected_calibration": true,
+      "disposition": "existing_limits_not_confirmed_error",
+      "comparison": "两者均过度提醒；DeepSeek 结论更保守",
+      "source_based_judgment": "卡片已说目标、unknown 类型、范围未知及 README 未给实现细节。元数据功能描述不等于代码实现证明；不能因为未重复元数据宣传就判卡片错误。",
+      "confirmed_fields": [],
+      "input_sha256": "82b3836382d3a1a629a0787ca95c57d7f6896d792b7fefd6a6199547b1a92c58",
+      "luna_receipt_sha256": "94e26854f08bca616a7b6a9668f2672f44e58f1b282f28263962dc64a660c03c",
+      "deepseek_receipt_sha256": "fc1139d9c1754932cfe1d8b50b9ef80b77676a6ab2e07b30eb046ca77f1f6540",
+      "production_change_applied": false,
+      "source_ids_in_review_bundle": [
+        "s0",
+        "s1",
+        "s2"
+      ]
+    },
+    {
+      "repository_id": 999135399,
+      "repository_url": "https://github.com/daniellajiddah/Blockchain-Based-Intellectual-Property-Portfolio-Management",
+      "preselected_calibration": true,
+      "disposition": "existing_limits_runtime_review_out_of_scope",
+      "comparison": "两者均有冗余；Luna 判型依据不足",
+      "source_based_judgment": "README 明述五类合约、函数和部署方式，卡片保留未完成路线图与需自行汇总/导出的条件。仅因证据包没有源码就否定 application 不符合本轮资料审阅口径。DeepSeek 要求所有 source_based 字段必须逐字引文也超出既有合法证据类型；其建议 partial/不适用不是现有适用性枚举，不能自动应用。",
+      "confirmed_fields": [],
+      "input_sha256": "1f7b54547d8b2b8a33cb23974c2ac0e214bed91dca2cd96295cbcb4e1dccdc16",
+      "luna_receipt_sha256": "b21ef777159ab363b99f4f9569642fe0e412f938bf06a47214c80de8b528c254",
+      "deepseek_receipt_sha256": "b2efc3ed48ee7f16c39cf3a44c7fb8fbc5917ddd4cda6cd3377523fab50c0aff",
+      "production_change_applied": false,
+      "source_ids_in_review_bundle": [
+        "s0",
+        "s1"
+      ]
+    },
+    {
+      "repository_id": 1157656480,
+      "repository_url": "https://github.com/lincolncommercialsolutions/PawDash",
+      "preselected_calibration": true,
+      "disposition": "attribution_wording_optional_not_license_error",
+      "comparison": "两者均提出可选措辞；DeepSeek 结论更保守",
+      "source_based_judgment": "README 自称 proprietary，卡片实际许可为 pending 且区分未来 Stripe/WebSocket。可将摘要改为“README 自称专有”；不能直接判为已核验许可过度承诺。场景 reason 已写抢单而非自主选择。",
+      "confirmed_fields": [],
+      "input_sha256": "6cc0d75484519bf772c1775c756b5630d4d00921349954e153b35e2d8c808a55",
+      "luna_receipt_sha256": "f29e526d6524f5b7212e4ba598bc043c18b6cdc68770419b851a7135644da8f2",
+      "deepseek_receipt_sha256": "d4c34b2a814744607483c207e174ee17c842ada8d9ba64d8143ab44817e8a574",
+      "production_change_applied": false,
+      "source_ids_in_review_bundle": [
+        "s0",
+        "s1"
+      ]
+    },
+    {
+      "repository_id": 253124967,
+      "repository_url": "https://github.com/yangfreezy/tiny-planner",
+      "preselected_calibration": false,
+      "disposition": "optional_requirement_attribution_refinement",
+      "comparison": "DeepSeek 独有有价值提醒，未计确定错误",
+      "source_based_judgment": "README 是 React 作业要求；summary 已明确任务说明与实现未知，但功能列表可进一步标成需求条目。外部 Edamam 凭据条件也可更精确。属非阻断措辞改进，不等于已证明功能未实现。",
+      "confirmed_fields": [],
+      "input_sha256": "11214fd7c684d7d6181c4e27f08b119230a962872cbbcbc49fc6fc1c7127f29e",
+      "luna_receipt_sha256": "4f24dbf171e05546246f7484b5a45a34bf19c04713215e2351167e8073d3924c",
+      "deepseek_receipt_sha256": "90cabe2cdd4ae8f5189ac7ab6c6c7ad8815ff55254078bb16997242a8ce934f2",
+      "production_change_applied": false,
+      "source_ids_in_review_bundle": [
+        "s0",
+        "s1"
+      ]
+    },
+    {
+      "repository_id": 311664034,
+      "repository_url": "https://github.com/ARjunSNair/EmployeeReviewManager",
+      "preselected_calibration": false,
+      "disposition": "existing_metadata_limits_not_confirmed_error",
+      "comparison": "DeepSeek 独有冗余提醒",
+      "source_based_judgment": "功能已标“据仓库描述”，范围待核实，场景 unverified。README 只有脚手架说明不能证明功能为假；可以补实现未核验说明，不应只因未读代码而否决。",
+      "confirmed_fields": [],
+      "input_sha256": "f5c0e34d3e063910917cd2469ef951884860175bf0614c0d22e80ad3a6f92489",
+      "luna_receipt_sha256": "459d4410cf177638f60cf0fc151eec9bb2c071eaa38b406c4eb141dfa002ade2",
+      "deepseek_receipt_sha256": "e36d6def0632f374010bee31a176a8e976a763a61a1634ad487aba87d8fa848e",
+      "production_change_applied": false,
+      "source_ids_in_review_bundle": [
+        "s0",
+        "s1"
+      ]
+    },
+    {
+      "repository_id": 482816811,
+      "repository_url": "https://github.com/open-datalake/open-connector",
+      "preselected_calibration": false,
+      "disposition": "confirmed_installation_example_misread",
+      "comparison": "DeepSeek 独有检出，Luna 漏掉",
+      "source_based_judgment": "README 的示例在 Install libraries 段，含 open-connector、source-s3、destination-s3 与 pip extra-index 参数，表达依赖/安装方式。卡片却断言 source/destination CLI 用法并在摘要拼成调用命令，来源不足，需收紧为安装示例。",
+      "confirmed_fields": [
+        "features",
+        "summary"
+      ],
+      "input_sha256": "9113445d0d7028424e1fbff8ef078f2c859d13f8703fbe6c6bd9fea0921bc022",
+      "luna_receipt_sha256": "1d90a8e653276c48a18150fece403f30047194d864c5b3d9071e7bece1f21bec",
+      "deepseek_receipt_sha256": "4ca143224eaa989b0bb67f345bfd139074ae7b6274f60ebef971df2ff0c5f6da",
+      "production_change_applied": false,
+      "source_ids_in_review_bundle": [
+        "s0",
+        "s1",
+        "s2"
+      ]
+    },
+    {
+      "repository_id": 900063322,
+      "repository_url": "https://github.com/Likhithacodes/GoldMiningManagementSystem",
+      "preselected_calibration": false,
+      "disposition": "existing_metadata_limits_not_confirmed_error",
+      "comparison": "DeepSeek 独有冗余提醒",
+      "source_based_judgment": "卡片已有“仓库描述称”“宣称”“README 仅默认 Angular 说明”“无法确认能力”“具体范围待核实”；不能把保守占位再次算作明确错误。",
+      "confirmed_fields": [],
+      "input_sha256": "2af6d5d7feb1601c6b5ed855dd1a136209bf49279e5f5d3576f91bf98ad90363",
+      "luna_receipt_sha256": "58703a40c4ab7af12ca1cb9dbb37ad0b32a0ccd21a25852a64fb21ba3a419fde",
+      "deepseek_receipt_sha256": "e75ae804923c3bd846b05d918fbe73e4a9421b8b2f7dcd41591963b2e7a72f09",
+      "production_change_applied": false,
+      "source_ids_in_review_bundle": [
+        "s0",
+        "s1"
+      ]
+    },
+    {
+      "repository_id": 1046000309,
+      "repository_url": "https://github.com/Aanand058/qr-visitor-management-system",
+      "preselected_calibration": false,
+      "disposition": "source_backed_feature_and_unverified_scope_not_error",
+      "comparison": "DeepSeek 独有冗余提醒",
+      "source_based_judgment": "README 的 Admin Dashboard 功能列表支持该资料层面的功能描述。本轮不是部署运行测试；月租/计费场景已 unverified 且列出未见能力，细化条件是可选改进。",
+      "confirmed_fields": [],
+      "input_sha256": "52b5489623090271c9a449cd5ca14d484bff6457e28ae02e2f93946e96aa0161",
+      "luna_receipt_sha256": "eb4442c8cbcebae9d01619f02a940b28c0d50e9e20fd04b6b559b9b5287d72d1",
+      "deepseek_receipt_sha256": "2ca3f1ea57d5b58cc5958478d4474c4fc5eb88a57df78a60122edb16bb02dcce",
+      "production_change_applied": false,
+      "source_ids_in_review_bundle": [
+        "s0",
+        "s1"
+      ]
+    },
+    {
+      "repository_id": 1053206350,
+      "repository_url": "https://github.com/chryshalou/Attendance-Monitoring-System",
+      "preselected_calibration": false,
+      "disposition": "existing_attribution_not_confirmed_error",
+      "comparison": "DeepSeek 独有冗余提醒",
+      "source_based_judgment": "卡片已用“据仓库描述”“README仅标题”“实现程度未知”；家长门户能力未说明是诚实的缺项，不需要凭原文证明缺项不存在。",
+      "confirmed_fields": [],
+      "input_sha256": "b74da2416d9d4ac254895080884eda53d7d504b273618eb7657fa0dcc738f6db",
+      "luna_receipt_sha256": "540f5efc058ca6aa47576bf6e4f3b357922c59b698f3df252edd6af1cb3f74e5",
+      "deepseek_receipt_sha256": "e93d0ea2568dff88ada035dae80de6ea5320a7551aeefe9bf967630f2f1ecaae",
+      "production_change_applied": false,
+      "source_ids_in_review_bundle": [
+        "s0",
+        "s1"
+      ]
+    }
+  ],
+  "conclusion": "No decisive semantic-quality winner from this bounded comparison. Luna is cheaper/faster here and has fewer unlocatable citations; DeepSeek contributes a distinct valid finding but produces more redundant suggestions. Both require source verification; neither should automatically change licenses or reject explicitly labeled partial records.",
+  "manual_review_scope": "Relevant card claims and supplied archived passages for12 cases; not a complete code/runtime test or full reading of every source document."
+}

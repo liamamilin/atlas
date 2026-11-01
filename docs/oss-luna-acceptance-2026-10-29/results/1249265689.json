@@ -1,0 +1,84 @@
+{
+ "repository_id": 1249265689,
+ "domain": "21",
+ "input_sha256": "c24fd5d9fe99f820965cb48a97c144a086f883ad177ab2d9b05737cc4cf59a58",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:54.630181+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDcOjrcQKbhWvufCHi2RjaE91a7",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 5890,
+  "completion_tokens": 834,
+  "total_tokens": 6724,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 5887,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.001006,
+ "response_text": "{\"repository_id\":1249265689,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片准确区分了第三方 API 资料索引与 Emitwise 商业平台，并将许可标为 pending、场景标为未验证或有条件。主要限制是部分场景关联仅有宽泛的平台/API描述支持，不能据此确认具体工作流适用；仓库内容本身明确仅为文本和 API 描述。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-carbon-accounting-platform-83925f1230\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"其描述的 API 涉及设施与活动数据文件，可作为对接商业平台清单编制的参考，但仓库本身不执行计算。\",\"source_id\":\"s0\",\"quote\":\"The Emitwise REST API at api.emitwise.com lets enterprise customers manage facilities, sustainability projects, activity-data file uploads, schema metadata, and aggregated supplier (Scope 3) emissions.\",\"reason\":\"来源支持 API 涉及设施和活动数据文件，但场景还要求设定组织边界、匹配排放因子并汇总清单；仓库是索引而非执行系统，现有条件虽说明依赖商业平台，仍应明确该场景仅是 API 对接参考，不能据此确认完整清单编制适用性。\",\"suggested_correction\":\"保留 unverified，并明确仅可作为 API 对接参考；清单计算、因子匹配及报告能力需另行核实。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-greenhouse-gas-accounting-83925f1230\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"平台资料称支持按 GHG Protocol 的 Scope 1/2/3 生成排放报告，API 涉及活动数据与设施；但本仓库仅为第三方 API 档案，非可部署系统。\",\"source_id\":\"s0\",\"quote\":\"The platform ingests spend data, activity data, and supplier information, auto-classifies suppliers, and produces audit-ready emissions reporting aligned with the GHG Protocol (Scope 1, 2, and 3)\",\"reason\":\"来源确实描述商业平台的报告能力，但场景还要求组织边界、排放因子匹配和多气体 CO2e 清单；这些具体步骤未在所引资料中逐项说明。卡片已标 unverified，宜保留该限制而不将其视为已验证适用。\",\"suggested_correction\":\"保留 unverified，并将关联限定为商业平台/API 的潜在参考；具体清单流程需核实。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-product-carbon-footprint-platform-485a8f3e4f\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"资料称可生成审计就绪的排放报告，但未明确产品级客户报告格式\",\"source_id\":\"s0\",\"quote\":\"produces audit-ready emissions reporting aligned with the GHG Protocol (Scope 1, 2, and 3) and frameworks such as CDP and CSRD.\",\"reason\":\"来源支持一般排放报告描述，但没有明确支持该场景要求的产品级客户报告、方法学与数据质量说明。卡片已写明格式未明确，且 applicability 为 conditional，属于应保留的限制而非已证实能力。\",\"suggested_correction\":\"保留 conditional，并明确产品级客户报告及其格式、附带说明能力尚未由资料确认。\"}],\"limitations\":[\"仅依据提供的 README 全文和 GitHub 元数据审查；未访问外部链接或核验商业平台官方文档。\",\"许可状态 pending 与来源中未提供许可证信息相符；本次不作许可全文核验。\"]}",
+ "review": {
+  "repository_id": 1249265689,
+  "verdict": "pass_with_limits",
+  "summary": "卡片准确区分了第三方 API 资料索引与 Emitwise 商业平台，并将许可标为 pending、场景标为未验证或有条件。主要限制是部分场景关联仅有宽泛的平台/API描述支持，不能据此确认具体工作流适用；仓库内容本身明确仅为文本和 API 描述。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-carbon-accounting-platform-83925f1230",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "其描述的 API 涉及设施与活动数据文件，可作为对接商业平台清单编制的参考，但仓库本身不执行计算。",
+    "source_id": "s0",
+    "quote": "The Emitwise REST API at api.emitwise.com lets enterprise customers manage facilities, sustainability projects, activity-data file uploads, schema metadata, and aggregated supplier (Scope 3) emissions.",
+    "reason": "来源支持 API 涉及设施和活动数据文件，但场景还要求设定组织边界、匹配排放因子并汇总清单；仓库是索引而非执行系统，现有条件虽说明依赖商业平台，仍应明确该场景仅是 API 对接参考，不能据此确认完整清单编制适用性。",
+    "suggested_correction": "保留 unverified，并明确仅可作为 API 对接参考；清单计算、因子匹配及报告能力需另行核实。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-greenhouse-gas-accounting-83925f1230",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "平台资料称支持按 GHG Protocol 的 Scope 1/2/3 生成排放报告，API 涉及活动数据与设施；但本仓库仅为第三方 API 档案，非可部署系统。",
+    "source_id": "s0",
+    "quote": "The platform ingests spend data, activity data, and supplier information, auto-classifies suppliers, and produces audit-ready emissions reporting aligned with the GHG Protocol (Scope 1, 2, and 3)",
+    "reason": "来源确实描述商业平台的报告能力，但场景还要求组织边界、排放因子匹配和多气体 CO2e 清单；这些具体步骤未在所引资料中逐项说明。卡片已标 unverified，宜保留该限制而不将其视为已验证适用。",
+    "suggested_correction": "保留 unverified，并将关联限定为商业平台/API 的潜在参考；具体清单流程需核实。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-product-carbon-footprint-platform-485a8f3e4f",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "资料称可生成审计就绪的排放报告，但未明确产品级客户报告格式",
+    "source_id": "s0",
+    "quote": "produces audit-ready emissions reporting aligned with the GHG Protocol (Scope 1, 2, and 3) and frameworks such as CDP and CSRD.",
+    "reason": "来源支持一般排放报告描述，但没有明确支持该场景要求的产品级客户报告、方法学与数据质量说明。卡片已写明格式未明确，且 applicability 为 conditional，属于应保留的限制而非已证实能力。",
+    "suggested_correction": "保留 conditional，并明确产品级客户报告及其格式、附带说明能力尚未由资料确认。"
+   }
+  ],
+  "limitations": [
+   "仅依据提供的 README 全文和 GitHub 元数据审查；未访问外部链接或核验商业平台官方文档。",
+   "许可状态 pending 与来源中未提供许可证信息相符；本次不作许可全文核验。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:40:04.063244+00:00",
+ "elapsed_seconds": 9.433
+}

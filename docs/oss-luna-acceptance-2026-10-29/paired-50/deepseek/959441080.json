@@ -1,0 +1,113 @@
+{
+ "repository_id": 959441080,
+ "domain": "27",
+ "input_sha256": "1ff9e7f7205cf4b1352d8f85f86da5a8dfe5ef7d2058c9cce1a44ce79611a6f5",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:12:29.820384+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-dda4d3d2f9ac-dc5ec",
+ "usage": {
+  "prompt_tokens": 5343,
+  "completion_tokens": 792,
+  "total_tokens": 6135,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00120139,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00120139,
+   "tokens": {
+    "input": 4831,
+    "output": 792,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":959441080,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片事实基本有 README 与元数据支持，项目类型、BSD-3-Clause 许可标签与两条场景匹配总体成立；但“离线下载收听”在 README 正文中无直接描述，仅见于仓库元数据描述，且“从上次位置继续”等场景细节未被来源覆盖，需收紧表述。\",\"checks\":{\"facts\":\"limited\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"离线下载收听\",\"source_id\":\"s0\",\"quote\":\"You can download podcasts and listen to them offline\",\"reason\":\"该句实际出自 s2 的 github_metadata 描述，而非 s0 README 正文；README 未直接描述离线下载功能。证据存在但引用来源标注不准确，且功能细节有限。\",\"suggested_correction\":\"保留该功能，但将证据指向 s2 元数据描述，或注明“据仓库描述”而非 README 正文。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-podcast-platform-0bfdd52ec7\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"支持订阅、离线下载与播放\",\"source_id\":\"s0\",\"quote\":\"You can download podcasts and listen to them offline\",\"reason\":\"场景描述包含“从上次位置继续播放”，来源未提及播放进度记忆；离线下载仅由元数据描述支持，README 未展开。标为 direct 略强。\",\"suggested_correction\":\"将 applicability 降为 conditional 或补充条件：离线下载与续播能力需以实际应用行为验证。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-podcast-platform-d8296c9564\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"支持通过 anytimeplayer.app/subscribe?url= 深链接按订阅源地址添加节目\",\"source_id\":\"s0\",\"quote\":\"https://anytimeplayer.app/subscribe?url=www.example.com/myfeed.xml\",\"reason\":\"README 说明深链接可“open a feed within Anytime”，但未明确说明会加入订阅库并自动更新新一期；场景中“之后新一期自动出现在其库中”属推断。\",\"suggested_correction\":\"将条件写为“深链接可打开指定 feed；是否自动订阅并更新需实际验证”，applicability 可保留 direct 但补充条件。\"},{\"field\":\"scope\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"Android/iOS 移动端；Flutter 3.16.5+ 构建\",\"source_id\":\"s0\",\"quote\":\"Anytime is currently at v1.3.x and is built against Flutter 3.16.5+\",\"reason\":\"README 支持 Flutter 3.16.5+ 与 Android/iOS；但“移动端”范围表述与 README 中“could be extended to web and/or desktop in the future”不冲突，属可接受。仅提示版本为“当前”状态，非永久约束。\",\"suggested_correction\":\"可加“当前版本”限定，避免将版本要求视为永久范围。\"}],\"limitations\":[\"仅提供 README、LICENSE 与 GitHub 元数据，未包含源码、pubspec 或构建配置，无法核验功能实现细节。\",\"离线下载、续播等能力主要依赖元数据描述，README 正文未展开。\",\"许可全文比对由确定性核验负责，本次仅确认标签与来源一致。\"]}",
+ "review": {
+  "repository_id": 959441080,
+  "verdict": "pass_with_limits",
+  "summary": "卡片事实基本有 README 与元数据支持，项目类型、BSD-3-Clause 许可标签与两条场景匹配总体成立；但“离线下载收听”在 README 正文中无直接描述，仅见于仓库元数据描述，且“从上次位置继续”等场景细节未被来源覆盖，需收紧表述。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "离线下载收听",
+    "source_id": "s0",
+    "quote": "You can download podcasts and listen to them offline",
+    "reason": "该句实际出自 s2 的 github_metadata 描述，而非 s0 README 正文；README 未直接描述离线下载功能。证据存在但引用来源标注不准确，且功能细节有限。",
+    "suggested_correction": "保留该功能，但将证据指向 s2 元数据描述，或注明“据仓库描述”而非 README 正文。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-podcast-platform-0bfdd52ec7",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "支持订阅、离线下载与播放",
+    "source_id": "s0",
+    "quote": "You can download podcasts and listen to them offline",
+    "reason": "场景描述包含“从上次位置继续播放”，来源未提及播放进度记忆；离线下载仅由元数据描述支持，README 未展开。标为 direct 略强。",
+    "suggested_correction": "将 applicability 降为 conditional 或补充条件：离线下载与续播能力需以实际应用行为验证。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-podcast-platform-d8296c9564",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "支持通过 anytimeplayer.app/subscribe?url= 深链接按订阅源地址添加节目",
+    "source_id": "s0",
+    "quote": "https://anytimeplayer.app/subscribe?url=www.example.com/myfeed.xml",
+    "reason": "README 说明深链接可“open a feed within Anytime”，但未明确说明会加入订阅库并自动更新新一期；场景中“之后新一期自动出现在其库中”属推断。",
+    "suggested_correction": "将条件写为“深链接可打开指定 feed；是否自动订阅并更新需实际验证”，applicability 可保留 direct 但补充条件。"
+   },
+   {
+    "field": "scope",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "Android/iOS 移动端；Flutter 3.16.5+ 构建",
+    "source_id": "s0",
+    "quote": "Anytime is currently at v1.3.x and is built against Flutter 3.16.5+",
+    "reason": "README 支持 Flutter 3.16.5+ 与 Android/iOS；但“移动端”范围表述与 README 中“could be extended to web and/or desktop in the future”不冲突，属可接受。仅提示版本为“当前”状态，非永久约束。",
+    "suggested_correction": "可加“当前版本”限定，避免将版本要求视为永久范围。"
+   }
+  ],
+  "limitations": [
+   "仅提供 README、LICENSE 与 GitHub 元数据，未包含源码、pubspec 或构建配置，无法核验功能实现细节。",
+   "离线下载、续播等能力主要依赖元数据描述，README 正文未展开。",
+   "许可全文比对由确定性核验负责，本次仅确认标签与来源一致。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 0,
+   "reason": "quote_not_in_supplied_source"
+  },
+  {
+   "index": 1,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T05:12:41.412249+00:00",
+ "elapsed_seconds": 11.592
+}

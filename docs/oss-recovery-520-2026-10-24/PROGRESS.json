@@ -1,0 +1,138 @@
+{
+  "checked_at": "2026-10-24T11:07:01.227758+08:00",
+  "job": {
+    "id": "batch_cd8f7a777e3c4e6885de1cf3162e004c",
+    "status": "running",
+    "processed": 3366,
+    "total": 3516,
+    "current_leaf": "code-editor",
+    "updated_at": "2026-10-24T03:06:50.236770+00:00",
+    "pause_reason": null
+  },
+  "completed_leaves": 11,
+  "leaf_count": 100,
+  "recent_runs": [
+    {
+      "id": "oss_f4b586883a854901ab70f9bc5b4cd5ea",
+      "status": "completed",
+      "phase": "extract",
+      "started_at": "2026-10-24T03:06:14.616946+00:00",
+      "finished_at": "2026-10-24T03:06:50.216261+00:00",
+      "processed": 8,
+      "concurrency": {
+        "configured_model_workers": 2,
+        "model_workers": 2,
+        "source_workers": 4
+      },
+      "model_calls": 2,
+      "model_tasks": {
+        "0": {
+          "finished_at": "2026-10-24T03:06:49.909105+00:00",
+          "id": "oss_f4b586883a854901ab70f9bc5b4cd5ea",
+          "model_calls": 1,
+          "model_receipts": [
+            {
+              "cached": false,
+              "created_at": "2026-10-24T03:06:49.907311+00:00",
+              "input_sha256": "8d3e47ef45d44facfdbc106b942013bc02d962c129cc3c37398e9af3e846b4fe",
+              "model": "deepseek-flash",
+              "provider": "open-design",
+              "stage": "extract_open",
+              "usage": {
+                "completion_tokens": 3809,
+                "cost": null,
+                "prompt_tokens": 4590,
+                "total_tokens": 8399
+              }
+            }
+          ],
+          "model_retry_policy": {
+            "initial_backoff_seconds": 2,
+            "max_attempts": 3,
+            "max_wait_seconds": 60
+          },
+          "started_at": "2026-10-24T03:06:23.721406+00:00",
+          "state": "completed",
+          "task_id": "0"
+        },
+        "1": {
+          "finished_at": "2026-10-24T03:06:47.936121+00:00",
+          "id": "oss_f4b586883a854901ab70f9bc5b4cd5ea",
+          "model_calls": 1,
+          "model_receipts": [
+            {
+              "cached": false,
+              "created_at": "2026-10-24T03:06:47.933722+00:00",
+              "input_sha256": "73e0e5e37916810fe8ffec992f4befa26574dbef3e4732a8fcb30f7ed212e198",
+              "model": "deepseek-flash",
+              "provider": "open-design",
+              "stage": "extract_open",
+              "usage": {
+                "completion_tokens": 3676,
+                "cost": null,
+                "prompt_tokens": 12632,
+                "total_tokens": 16308
+              }
+            }
+          ],
+          "model_retry_policy": {
+            "initial_backoff_seconds": 2,
+            "max_attempts": 3,
+            "max_wait_seconds": 60
+          },
+          "started_at": "2026-10-24T03:06:23.721825+00:00",
+          "state": "completed",
+          "task_id": "1"
+        }
+      },
+      "model_receipts": [
+        {
+          "cached": false,
+          "created_at": "2026-10-24T03:06:47.933722+00:00",
+          "input_sha256": "73e0e5e37916810fe8ffec992f4befa26574dbef3e4732a8fcb30f7ed212e198",
+          "model": "deepseek-flash",
+          "provider": "open-design",
+          "stage": "extract_open",
+          "usage": {
+            "completion_tokens": 3676,
+            "cost": null,
+            "prompt_tokens": 12632,
+            "total_tokens": 16308
+          }
+        },
+        {
+          "cached": false,
+          "created_at": "2026-10-24T03:06:49.907311+00:00",
+          "input_sha256": "8d3e47ef45d44facfdbc106b942013bc02d962c129cc3c37398e9af3e846b4fe",
+          "model": "deepseek-flash",
+          "provider": "open-design",
+          "stage": "extract_open",
+          "usage": {
+            "completion_tokens": 3809,
+            "cost": null,
+            "prompt_tokens": 4590,
+            "total_tokens": 8399
+          }
+        }
+      ],
+      "source_cache_hits": 6,
+      "source_fetches": 2,
+      "errors": []
+    },
+    {
+      "id": "oss_370f9f7be2fe4ab78c13048478cf2463",
+      "status": "running",
+      "phase": "read_sources",
+      "started_at": "2026-10-24T03:06:50.236756+00:00",
+      "finished_at": null,
+      "processed": 0,
+      "concurrency": null,
+      "model_calls": null,
+      "model_tasks": null,
+      "model_receipts": null,
+      "source_cache_hits": 0,
+      "source_fetches": 0,
+      "errors": []
+    }
+  ]
+}

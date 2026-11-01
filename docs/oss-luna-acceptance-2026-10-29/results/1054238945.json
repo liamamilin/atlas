@@ -1,0 +1,51 @@
+{
+ "repository_id": 1054238945,
+ "domain": "03",
+ "input_sha256": "bce45083644c2bdb89a6af163f0c7546e445d4f8440bfb3690a418ac87c2712f",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:38:26.634148+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCCC8HXbO9aNeFePstQha3MyrO4b",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 4980,
+  "completion_tokens": 188,
+  "total_tokens": 5168,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 4977,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.000592,
+ "response_text": "{\"repository_id\":1054238945,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体与 README 对项目的作品集演示定位及演示模式限制相符；许可证 pending 标注恰当。场景均标为 unverified，且条件说明了关键缺项，未将其误作已验证适用。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"仅依据提供的 README 与 GitHub 元数据审查；未检查源码或其他文件。\",\"README 明确说明公开部署默认使用浏览器隔离的演示模式，但也描述了可选的私有 live-backend 模式；卡片已限定公开部署行为。\",\"README 的功能描述属于项目文档陈述，本次未通过源码独立验证其实现。\"]}",
+ "review": {
+  "repository_id": 1054238945,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体与 README 对项目的作品集演示定位及演示模式限制相符；许可证 pending 标注恰当。场景均标为 unverified，且条件说明了关键缺项，未将其误作已验证适用。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "仅依据提供的 README 与 GitHub 元数据审查；未检查源码或其他文件。",
+   "README 明确说明公开部署默认使用浏览器隔离的演示模式，但也描述了可选的私有 live-backend 模式；卡片已限定公开部署行为。",
+   "README 的功能描述属于项目文档陈述，本次未通过源码独立验证其实现。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:38:31.318330+00:00",
+ "elapsed_seconds": 4.684
+}

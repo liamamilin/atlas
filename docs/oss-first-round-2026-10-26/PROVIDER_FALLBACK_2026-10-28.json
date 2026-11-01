@@ -1,0 +1,87 @@
+{
+  "job_id": "batch_4812ef3db57543c3acc1871b8ea5ba6e",
+  "checked_at": "2026-10-28T02:54:15.800861+00:00",
+  "trigger": {
+    "from_provider": "open-design",
+    "provider": "opencode-go",
+    "model": "deepseek-v4.1-flash",
+    "activated_at": "2026-10-28T02:48:44Z",
+    "reason": "quota_exhausted",
+    "source": "GET /api/settings/model"
+  },
+  "configured_default": {
+    "provider": "open-design",
+    "model": "deepseek-v4.1-flash"
+  },
+  "new_activation_after_user_switch": true,
+  "authorization": "Existing fallback policy retained by latest user instruction; new explicit quota exhaustion uses Go with the same model.",
+  "actual_run_evidence": [
+    {
+      "run_id": "oss_846255a50385437e8f8f15f6d997ee9d",
+      "leaf": "research-grant-management",
+      "status": "running",
+      "started_at": "2026-10-28T02:53:53.433238+00:00",
+      "finished_at": null,
+      "error_count": 0,
+      "model_receipts": []
+    },
+    {
+      "run_id": "oss_b28efa352b3747ae8a56c31ad40d5414",
+      "leaf": "research-grant-management",
+      "status": "completed",
+      "started_at": "2026-10-28T02:53:13.590721+00:00",
+      "finished_at": "2026-10-28T02:53:53.414596+00:00",
+      "error_count": 0,
+      "model_receipts": [
+        {
+          "provider": "opencode-go",
+          "model": "deepseek-v4.1-flash",
+          "created_at": "2026-10-28T02:53:51.691770+00:00",
+          "cached": false
+        },
+        {
+          "provider": "opencode-go",
+          "model": "deepseek-v4.1-flash",
+          "created_at": "2026-10-28T02:53:51.694973+00:00",
+          "cached": false
+        },
+        {
+          "provider": "opencode-go",
+          "model": "deepseek-v4.1-flash",
+          "created_at": "2026-10-28T02:53:52.218338+00:00",
+          "cached": false
+        },
+        {
+          "provider": "opencode-go",
+          "model": "deepseek-v4.1-flash",
+          "created_at": "2026-10-28T02:53:53.053866+00:00",
+          "cached": false
+        }
+      ]
+    },
+    {
+      "run_id": "oss_d11e585fcd934171ad097336ce6b2bfa",
+      "leaf": "research-grant-management",
+      "status": "completed",
+      "started_at": "2026-10-28T02:52:47.423918+00:00",
+      "finished_at": "2026-10-28T02:53:13.461027+00:00",
+      "error_count": 0,
+      "model_receipts": [
+        {
+          "provider": "opencode-go",
+          "model": "deepseek-v4.1-flash",
+          "created_at": "2026-10-28T02:52:52.622125+00:00",
+          "cached": false
+        }
+      ]
+    }
+  ],
+  "completed_leaves": 1230,
+  "status": "running",
+  "worker_pid": 93781,
+  "api_pid": 45453,
+  "update_lock_held": true,
+  "service_restarted": false,
+  "new_job_created": false,
+  "requires_user_action": false
+}

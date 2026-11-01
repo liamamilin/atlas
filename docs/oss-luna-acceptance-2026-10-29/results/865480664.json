@@ -1,0 +1,74 @@
+{
+ "repository_id": 865480664,
+ "domain": "14",
+ "input_sha256": "82b3836382d3a1a629a0787ca95c57d7f6896d792b7fefd6a6199547b1a92c58",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:17.067192+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCD1mPnMfBzmW3CWgMM8p5C4OR41",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 2249,
+  "completion_tokens": 652,
+  "total_tokens": 2901,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 2246,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0005509,
+ "response_text": "{\n  \"repository_id\": 865480664,\n  \"verdict\": \"needs_review\",\n  \"summary\": \"README 支持项目以 Lean-Agile 平台为目标，但仓库元数据将其描述为 Scrum 团队容量规划测量与预测工具。现有材料不足以确认两者关系或具体实现；MIT 标签有许可证正文支持。\",\n  \"checks\": {\n    \"facts\": \"limited\",\n    \"project_type\": \"supported\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"supported\"\n  },\n  \"issues\": [\n    {\n      \"field\": \"positioning\",\n      \"scenario_id\": \"\",\n      \"severity\": \"minor\",\n      \"kind\": \"insufficient_evidence\",\n      \"claim\": \"名为 burga 的 Lean-Agile 平台项目，目标为协作设计、构建、发布与同行评审。\",\n      \"source_id\": \"s0\",\n      \"quote\": \"This platform could help us to collaborative design, build, releas and peer team review engagements.\",\n      \"reason\": \"README 支持这是平台的目标，但措辞是“could help”，不能据此确认这些能力已实现；元数据另称其用于 Scrum 团队容量规划测量与预测，材料未说明两种描述的关系。\",\n      \"suggested_correction\": \"保留为 README 所述目标，并明确具体功能实现尚未由所给材料证实；补充元数据描述以呈现定位差异。\"\n    },\n    {\n      \"field\": \"summary\",\n      \"scenario_id\": \"\",\n      \"severity\": \"minor\",\n      \"kind\": \"insufficient_evidence\",\n      \"claim\": \"README 仅说明其为基于 Lean-Agile 原则的个人项目，含大量 AI 生成代码，未提供具体功能、部署或容量管理实现细节。\",\n      \"source_id\": \"s2\",\n      \"quote\": \"Handle measurement and forecasting of capacity planning of your scrum team over Increment and sprints\",\n      \"reason\": \"README 确实说明个人项目、Lean-Agile 原则及大量 AI 生成代码，但“未提供容量管理实现细节”不能概括全部材料：GitHub 元数据明确给出容量规划测量与预测的描述。该元数据仍不足以证明功能已实现。\",\n      \"suggested_correction\": \"注明 README 未列出具体实现细节，并同时说明仓库元数据将项目描述为 Scrum 团队容量规划测量与预测工具；不要将元数据描述写成已实现功能。\"\n    }\n  ],\n  \"limitations\": [\n    \"本次仅审查所给 README、LICENSE 与 GitHub 元数据；未提供源码或其他文档，不能核实功能实现。\",\n    \"没有提供场景匹配条目，无法评估具体场景适用性。\",\n    \"许可证正文在所给材料中可见，MIT 标签有支持；这不代表已核验仓库中所有文件或第三方依赖的许可。\"\n  ]\n}",
+ "review": {
+  "repository_id": 865480664,
+  "verdict": "needs_review",
+  "summary": "README 支持项目以 Lean-Agile 平台为目标，但仓库元数据将其描述为 Scrum 团队容量规划测量与预测工具。现有材料不足以确认两者关系或具体实现；MIT 标签有许可证正文支持。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "positioning",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "名为 burga 的 Lean-Agile 平台项目，目标为协作设计、构建、发布与同行评审。",
+    "source_id": "s0",
+    "quote": "This platform could help us to collaborative design, build, releas and peer team review engagements.",
+    "reason": "README 支持这是平台的目标，但措辞是“could help”，不能据此确认这些能力已实现；元数据另称其用于 Scrum 团队容量规划测量与预测，材料未说明两种描述的关系。",
+    "suggested_correction": "保留为 README 所述目标，并明确具体功能实现尚未由所给材料证实；补充元数据描述以呈现定位差异。"
+   },
+   {
+    "field": "summary",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "README 仅说明其为基于 Lean-Agile 原则的个人项目，含大量 AI 生成代码，未提供具体功能、部署或容量管理实现细节。",
+    "source_id": "s2",
+    "quote": "Handle measurement and forecasting of capacity planning of your scrum team over Increment and sprints",
+    "reason": "README 确实说明个人项目、Lean-Agile 原则及大量 AI 生成代码，但“未提供容量管理实现细节”不能概括全部材料：GitHub 元数据明确给出容量规划测量与预测的描述。该元数据仍不足以证明功能已实现。",
+    "suggested_correction": "注明 README 未列出具体实现细节，并同时说明仓库元数据将项目描述为 Scrum 团队容量规划测量与预测工具；不要将元数据描述写成已实现功能。"
+   }
+  ],
+  "limitations": [
+   "本次仅审查所给 README、LICENSE 与 GitHub 元数据；未提供源码或其他文档，不能核实功能实现。",
+   "没有提供场景匹配条目，无法评估具体场景适用性。",
+   "许可证正文在所给材料中可见，MIT 标签有支持；这不代表已核验仓库中所有文件或第三方依赖的许可。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:25.359725+00:00",
+ "elapsed_seconds": 8.293
+}

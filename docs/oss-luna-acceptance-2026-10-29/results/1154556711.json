@@ -1,0 +1,63 @@
+{
+ "repository_id": 1154556711,
+ "domain": "28",
+ "input_sha256": "10583e1ca6da5c9b1fba14d58e5e9667881e300f6dc6b082ae135ea98173b77a",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:28.108187+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCEAHwl2zOU02wiidwwhO0Kv9zZn",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 2927,
+  "completion_tokens": 397,
+  "total_tokens": 3324,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 2924,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0004912,
+ "response_text": "{\"repository_id\":1154556711,\"verdict\":\"pass_with_limits\",\"summary\":\"README 将项目描述为全栈健身房会员管理 Web 应用，并列出会员登记、到期状态查看、批量操作和数据导出等功能；卡片保留了许可证待核验及场景未验证状态。场景与体育俱乐部续费催缴仅部分相关，不能据此认定支持欠费跟踪或提醒发送。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-sports-club-management-efa0c4ed48\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"可跟踪会员到期状态，辅助续费管理\",\"source_id\":\"s0\",\"quote\":\"Separate views for **Expired** and **Expiring (within 3 days)** accounts\",\"reason\":\"来源支持查看健身房会员已过期及即将到期状态，但场景还要求跟踪缴费/欠费并向未缴会员发送提醒。卡片已将适用性标为 unverified，并列出需核实欠费标记与提醒发送，因此不应把到期状态管理表述为足以覆盖该场景。\",\"suggested_correction\":\"保留 unverified，并明确目前仅有到期状态查看的来源依据；欠费跟踪和提醒发送仍待核实。\"}],\"limitations\":[\"仅提供 README 与 GitHub 元数据；未审查源码或其他文件，不能据此验证功能实现细节、部署与安全状况。\",\"README 未截断，但其功能描述本身不能证明实际运行行为。\",\"许可证状态为 pending，材料未提供许可证文件；本次不据此判断仓库是否获得开源授权。\"]}",
+ "review": {
+  "repository_id": 1154556711,
+  "verdict": "pass_with_limits",
+  "summary": "README 将项目描述为全栈健身房会员管理 Web 应用，并列出会员登记、到期状态查看、批量操作和数据导出等功能；卡片保留了许可证待核验及场景未验证状态。场景与体育俱乐部续费催缴仅部分相关，不能据此认定支持欠费跟踪或提醒发送。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-sports-club-management-efa0c4ed48",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "可跟踪会员到期状态，辅助续费管理",
+    "source_id": "s0",
+    "quote": "Separate views for **Expired** and **Expiring (within 3 days)** accounts",
+    "reason": "来源支持查看健身房会员已过期及即将到期状态，但场景还要求跟踪缴费/欠费并向未缴会员发送提醒。卡片已将适用性标为 unverified，并列出需核实欠费标记与提醒发送，因此不应把到期状态管理表述为足以覆盖该场景。",
+    "suggested_correction": "保留 unverified，并明确目前仅有到期状态查看的来源依据；欠费跟踪和提醒发送仍待核实。"
+   }
+  ],
+  "limitations": [
+   "仅提供 README 与 GitHub 元数据；未审查源码或其他文件，不能据此验证功能实现细节、部署与安全状况。",
+   "README 未截断，但其功能描述本身不能证明实际运行行为。",
+   "许可证状态为 pending，材料未提供许可证文件；本次不据此判断仓库是否获得开源授权。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:40:34.272295+00:00",
+ "elapsed_seconds": 6.164
+}

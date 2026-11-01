@@ -1,0 +1,52 @@
+{
+ "repository_id": 1418377361,
+ "domain": "07",
+ "input_sha256": "2d929d18383b1655bfe3de9ce431079e74e1629f2c8be7b676f44c0387090e5c",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:38:42.564256+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCCT9KwPmyea6tapxvfyxNfJE6BL",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 9081,
+  "completion_tokens": 242,
+  "total_tokens": 9323,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 9078,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0010290999999999998,
+ "response_text": "{\"repository_id\":1418377361,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片总体与 README 对演示应用的描述一致，明确保留了非生产 CRM、本地存储和许可证待核验等限制。CRM 场景仅条件适用，且已说明缺少历史交互时间线；不应将其理解为完整 CRM。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[],\"limitations\":[\"仅提供 README 与 GitHub 元数据；未审查源码，不能独立验证实现细节。\",\"README 完整提供且未标记截断，但其中关于代码、测试和运行行为的陈述未在本次独立核验。\",\"场景描述要求查看历史通话、邮件和会议记录；README 明确说明应用没有服务器数据库或多用户持久化，场景匹配应限于通话前准备辅助。\",\"许可证状态为 pending，且卡片注明未发现许可证文件；本次不据 README 徽章或其他信息推定全仓库许可。\"]}",
+ "review": {
+  "repository_id": 1418377361,
+  "verdict": "pass_with_limits",
+  "summary": "卡片总体与 README 对演示应用的描述一致，明确保留了非生产 CRM、本地存储和许可证待核验等限制。CRM 场景仅条件适用，且已说明缺少历史交互时间线；不应将其理解为完整 CRM。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [],
+  "limitations": [
+   "仅提供 README 与 GitHub 元数据；未审查源码，不能独立验证实现细节。",
+   "README 完整提供且未标记截断，但其中关于代码、测试和运行行为的陈述未在本次独立核验。",
+   "场景描述要求查看历史通话、邮件和会议记录；README 明确说明应用没有服务器数据库或多用户持久化，场景匹配应限于通话前准备辅助。",
+   "许可证状态为 pending，且卡片注明未发现许可证文件；本次不据 README 徽章或其他信息推定全仓库许可。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:38:48.102949+00:00",
+ "elapsed_seconds": 5.539
+}

@@ -1,0 +1,719 @@
+{
+ "audit_id": "atlas-semantic-55651-2026-10-29",
+ "validated_at": "2026-10-30T16:35:17.106556+00:00",
+ "finished_at": "2026-10-30T16:33:46.071113+00:00",
+ "launched_at": "2026-10-29T05:44:21.544051+00:00",
+ "elapsed_hours": 34.823479739444444,
+ "frozen_projects": 55651,
+ "scope_corpus_verified": true,
+ "model_processing_complete": true,
+ "primary": {
+  "done": 55650,
+  "failed": 1
+ },
+ "secondary": {
+  "done": 7348,
+  "none": 48244,
+  "failed": 59
+ },
+ "outcomes": {
+  "cross_review_dismissed": 2985,
+  "pass_with_limits": 46710,
+  "pass": 1534,
+  "cross_review_unresolved": 380,
+  "cross_review_issue_candidate": 3955,
+  "unresolved_secondary_failure": 59,
+  "legacy_independent_cross_review": 28
+ },
+ "domains": {
+  "01": 1392,
+  "06": 1882,
+  "03": 2034,
+  "29": 2448,
+  "12": 2386,
+  "23": 2322,
+  "11": 1186,
+  "19": 1048,
+  "27": 1843,
+  "05": 2186,
+  "02": 1343,
+  "25": 1523,
+  "07": 1686,
+  "20": 1648,
+  "21": 1380,
+  "04": 2143,
+  "14": 1923,
+  "10": 1608,
+  "24": 1484,
+  "15": 2590,
+  "08": 4021,
+  "16": 1523,
+  "26": 2560,
+  "28": 2058,
+  "18": 1705,
+  "13": 2269,
+  "09": 1914,
+  "22": 1904,
+  "17": 1642
+ },
+ "versions": {
+  "primary:atlas.semantic.audit.v2": 55550,
+  "secondary:atlas.semantic.audit.v2": 7320,
+  "secondary:None": 48303,
+  "primary:legacy-v1": 100,
+  "secondary:legacy-independent-v1": 28,
+  "primary:None": 1
+ },
+ "primary_issue_kinds": {
+  "unsupported_claim": 5327,
+  "insufficient_evidence": 968,
+  "missing_condition": 2212,
+  "irrelevant_scenario": 1869,
+  "wrong_type": 600,
+  "roadmap_as_fact": 950,
+  "license_overclaim": 327
+ },
+ "primary_issue_fields": {
+  "features": 1896,
+  "summary": 2694,
+  "project_type": 843,
+  "positioning": 842,
+  "scenario_match": 5033,
+  "scope": 634,
+  "license": 311
+ },
+ "primary_issue_severity": {
+  "minor": 7905,
+  "major": 4348
+ },
+ "focused_finding_dispositions": {
+  "dismissed": 5202,
+  "unresolved": 436,
+  "confirmed": 6586
+ },
+ "focused_dispositions_by_kind": {
+  "dismissed": {
+   "unsupported_claim": 1799,
+   "insufficient_evidence": 576,
+   "irrelevant_scenario": 1338,
+   "missing_condition": 1074,
+   "roadmap_as_fact": 201,
+   "wrong_type": 196,
+   "license_overclaim": 18
+  },
+  "unresolved": {
+   "insufficient_evidence": 36,
+   "unsupported_claim": 207,
+   "wrong_type": 23,
+   "roadmap_as_fact": 34,
+   "missing_condition": 105,
+   "irrelevant_scenario": 28,
+   "license_overclaim": 3
+  },
+  "confirmed": {
+   "missing_condition": 1018,
+   "unsupported_claim": 3292,
+   "wrong_type": 381,
+   "roadmap_as_fact": 712,
+   "insufficient_evidence": 384,
+   "irrelevant_scenario": 497,
+   "license_overclaim": 302
+  }
+ },
+ "citations": {
+  "primary": {
+   "literal": 10624,
+   "not_found": 1053,
+   "whitespace_equivalent": 443,
+   "no_quote": 124,
+   "non_source_marker": 5,
+   "invalid_reference": 4
+  },
+  "focused_secondary": {
+   "literal": 11492,
+   "not_found": 469,
+   "whitespace_equivalent": 176,
+   "no_quote": 28,
+   "invalid_reference": 57,
+   "non_source_marker": 2
+  },
+  "all_model_confirmed_focused_quotes_locatable": true
+ },
+ "coverage": {
+  "metadata_only_projects": 7407,
+  "projects_with_truncated_sources": 2580,
+  "projects_with_omitted_files": 15,
+  "truncated_source_files": 2664,
+  "omitted_source_files": 23,
+  "scenario_associations_available": 79779,
+  "scenario_associations_included": 79779,
+  "shared_repository_multiple_associations": 21336,
+  "primary_invalid_scenario_references": 3,
+  "secondary_confirmations_downgraded_for_citation": 266
+ },
+ "providers": {
+  "openai": {
+   "states": {
+    "settled": 55667,
+    "uncertain": 42
+   },
+   "returned_models": {
+    "gpt-6-luna": 55661
+   },
+   "billed_micro": 38263445,
+   "estimated_micro": 38253304,
+   "reserved_micro": 175332,
+   "reported_cost_usd": "0",
+   "token_priced_exact_usd": "38.224815490",
+   "usage_receipts": 55661,
+   "missing_response_id": 0,
+   "legacy_requests": 100,
+   "distinct_response_ids": 55661
+  },
+  "opencode-go": {
+   "states": {
+    "settled": 7611,
+    "uncertain": 3
+   },
+   "returned_models": {
+    "deepseek-v4.1-flash": 7611
+   },
+   "billed_micro": 7781756,
+   "estimated_micro": 7781756,
+   "reserved_micro": 31133,
+   "reported_cost_usd": "7.77793029",
+   "token_priced_exact_usd": "0",
+   "usage_receipts": 7611,
+   "missing_response_id": 0,
+   "legacy_requests": 50,
+   "distinct_response_ids": 7611
+  },
+  "open-design": {
+   "states": {
+    "uncertain": 1
+   },
+   "returned_models": {},
+   "billed_micro": 0,
+   "estimated_micro": 0,
+   "reserved_micro": 10000,
+   "reported_cost_usd": "0",
+   "token_priced_exact_usd": "0",
+   "usage_receipts": 0,
+   "missing_response_id": 0,
+   "legacy_requests": 1,
+   "distinct_response_ids": 0
+  }
+ },
+ "budget": {
+  "charged_upper_micro": 46045201,
+  "estimated_micro": 46035060,
+  "reserved_micro": 216465,
+  "available_micro": 3738334,
+  "cap_micro": 50000000
+ },
+ "failed_projects": [
+  {
+   "repository_id": 50477911,
+   "repository": "JimLynchCodes/Game-Sound-Effects",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 103429826,
+   "repository": "maisarissi/comunica-ifsp",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 106962579,
+   "repository": "Divyankitha/Android-MocMedicare",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 223971465,
+   "repository": "abhishek-shrm/visitor-management-system",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 248254311,
+   "repository": "Shivam1603/Integrated-HealthCare-Management",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 305743002,
+   "repository": "2apoorva5/Meetin---A-Video-Meeting-Conference-Application",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 327268525,
+   "repository": "nesfit/bonnet-ics-library",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 336157818,
+   "repository": "sanusanth/c-basic-programs",
+   "primary_status": "failed",
+   "secondary_status": "done",
+   "error_code": null
+  },
+  {
+   "repository_id": 427612628,
+   "repository": "ML9-FORCES/classroom-x",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 490940936,
+   "repository": "GraceWXT/Mealbot-LHL-Final",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 516725401,
+   "repository": "inovector/mixpost",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 623550916,
+   "repository": "dartmouth-climbing-gym/DartmouthClimbingGymSignin",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 651147818,
+   "repository": "victorharvey/Materials-Requirements-Planning",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 793414091,
+   "repository": "tradingstrategy-ai/getting-started",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 871855943,
+   "repository": "Himanshu-Udupa/Vide-Conference-App",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 881458615,
+   "repository": "browser-use/browser-use",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 948905428,
+   "repository": "logangray6714/SolidCAM",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 987147309,
+   "repository": "AhmedAlian7/DigitalWalletSystemV02",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 990714108,
+   "repository": "Beckybams/Sustainability-Impact-Estimator-for-Products-",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1036743729,
+   "repository": "pearlrubyththomasr/InteractionGuard",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1040796004,
+   "repository": "chhavi876/Hospital-Queue-Management-System",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1048948591,
+   "repository": "Charanvas/PropertyManagement",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1057759486,
+   "repository": "machadmuhiyadeen-cell/mpgs-checkout",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1062509373,
+   "repository": "MikolasFromm/RevolutManager",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1096724700,
+   "repository": "CREATORRADHEY/MedhaVerse-App",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1103431891,
+   "repository": "fanyang-888/IAI_flu_warning",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1109432446,
+   "repository": "joslat/maf-claims-fraud-guardian",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1131558026,
+   "repository": "a-raulet/realtime-clickstream-analytics",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1133795376,
+   "repository": "timborovkov/FounderEquityCalculator",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1147055119,
+   "repository": "Cyber-Shaikh/IT-ServiceDesk-SOPs",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1156070973,
+   "repository": "Prasad-Dalvi/MyEcosort",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1158898418,
+   "repository": "lcuper18/SG-Church",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1161267125,
+   "repository": "Saaduddin47/VMS",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1169572825,
+   "repository": "rfloros/Auction-Management-System",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1170621803,
+   "repository": "reypeC/teaching-materials",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1172203235,
+   "repository": "0xShun/Detection-Rule-Testing-Pipeline",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1201908982,
+   "repository": "KeaMokoena-codes/ahang-tech",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1214027253,
+   "repository": "rainbowlingjing-ship-it/PD-Model-Validation-Backtesting",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1254509036,
+   "repository": "valrose/Capacity-Planning-Calculator",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1262772029,
+   "repository": "Sagar16003/AI-CommercialRisk-Analysis",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1267601392,
+   "repository": "ALittell24/Military-Equipment-Maintenance-Tracker",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1268914031,
+   "repository": "SwaibaSohail/Rentwise",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1275660432,
+   "repository": "YuLeo926/tracelens",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1287147177,
+   "repository": "Phani3108/MaximusPrime",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1296928581,
+   "repository": "api-evangelist/turborater",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1313385780,
+   "repository": "api-evangelist/givecampus",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1317125261,
+   "repository": "akshayanilkumar1112-byte/smart_service_desk",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1317219316,
+   "repository": "api-evangelist/kobalt",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1318248315,
+   "repository": "api-evangelist/mealpal",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1318962074,
+   "repository": "api-evangelist/plus-simple",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1319989697,
+   "repository": "khaliqtaimoor6-codes/FeatureShift-Automated-Concept-Drift-Detection-for-Tabular-ML-Models-in-Production",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1340931350,
+   "repository": "Yashraj-sunilyadav/devstyle",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1343071583,
+   "repository": "Digital-Marketing-Co/keyword-research",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1354267833,
+   "repository": "Md-Rabbi-Sarkar1/my-contraction",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1368914918,
+   "repository": "ksfraser/ksf_FA_ExpenseReport",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1408107949,
+   "repository": "Adithya-Mallepally/ms-fitness",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1422694883,
+   "repository": "Fusion360-Engineering-Platform/.github",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1423325586,
+   "repository": "moohayz316-ctrl/RESEARCH-GRANT-MANAGEMENT-SYSTEM",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1425093993,
+   "repository": "aviatorandy/mealplannermacro",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  },
+  {
+   "repository_id": 1432488521,
+   "repository": "vedpemmadi611-afk/LPU-FIND-FRIENDS",
+   "primary_status": "done",
+   "secondary_status": "failed",
+   "error_code": "invalid_model_response"
+  }
+ ],
+ "unreviewed_pending_primary": 0,
+ "unreviewed_pending_secondary": 0,
+ "failed_receipt_validation_errors": {
+  "secondary:ValueError:secondary_coverage": 114,
+  "secondary:ValueError:secondary_schema": 4,
+  "primary:ValueError:truncated_response": 2
+ },
+ "production_baseline": {
+  "project_keys": {
+   "sha256": "b774734758443e6821fa758849c5a2c9d51655eabc753f856a0a5d07fb8a72c2",
+   "unchanged": true
+  },
+  "memberships": {
+   "sha256": "8523648e92e8070b07f67e37d2cbfeb716118bcb9b2eca9f3d519f98e4225fce",
+   "unchanged": true
+  },
+  "matches": {
+   "sha256": "596428144916c4c9f048e6f18f7c8267201bdfce02e14897c536d96cb4ccdf56",
+   "unchanged": true
+  },
+  "favorites": {
+   "sha256": "15bf1d689d0502ba8eb3421cfcfeaf6667fbd4a8be74e05e9afb8ff9fadb085e",
+   "unchanged": true
+  },
+  "jobs": {
+   "sha256": "f52ff42e3d0673076f370f9d7d3609193b58c3f270fc7b9e733a0d5c6e990dbf",
+   "unchanged": true
+  },
+  "frozen_project_data": {
+   "changed_repository_ids": [],
+   "unchanged": true
+  },
+  "original_collection_job": {
+   "sha256": "b3a8cd79b7683d27df554a72e33896cdde2a9e3d477af35d881229661742d7d3",
+   "unchanged": true
+  },
+  "model_settings": {
+   "sha256": "cd438feb36e7bbff2884181078e984d696a335a6c1cdf0a1ef78c64c283493f5",
+   "unchanged": true
+  }
+ },
+ "frozen_catalog_stats": {
+  "project_type": {
+   "application": 34417,
+   "collection": 1235,
+   "library": 2386,
+   "resource": 6946,
+   "unknown": 10667
+  },
+  "completeness": {
+   "complete": 4274,
+   "partial": 51377
+  },
+  "license.status": {
+   "open_source": 11571,
+   "pending": 44080
+  }
+ },
+ "issue_export_rows": 7372,
+ "issues_sha256": "bcb12608dbf8e620dcb8fcd093897c86616b49fc3d252579241d120e7ca14ddd",
+ "human_user_confirmed": 0,
+ "source_spot_review": {
+  "path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-luna-acceptance-2026-10-29/full/SOURCE_SPOT_REVIEW.json",
+  "reviewer": "Codex",
+  "cases": 37,
+  "domains": 29,
+  "dispositions": {
+   "unresolved": 12,
+   "corroborated": 12,
+   "dismissed": 13
+  },
+  "non_statistical": true
+ },
+ "provider_invoice_downloaded": false,
+ "catalog_unconditional_acceptance": false,
+ "audit_acceptance_complete": true,
+ "acceptance_status": "completed_with_limits_and_open_findings",
+ "acceptance_tool_sha256": {
+  "final_acceptance.py": "4daf5dc6a3815cc46b6c12b74be8620e661ea6651f726c98d46a562288f13b80",
+  "write_final_report.py": "fbf3a0e36f2ae28981a5bc797f6ad11be4150d6e4fa87892625211e9854d8527",
+  "reconcile_costs.py": "44942fbaf2298ad47d27dd56934ce7b801afcd8c0f110c3ac9c5edfbfb44bce0"
+ },
+ "source_spot_review_sha256": "e929bf9009abd692032bf83303de8b735b243dd86c919148368bc84c4a538400"
+}

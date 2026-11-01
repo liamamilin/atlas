@@ -1,0 +1,86 @@
+[
+ {
+  "rid": 1432986134,
+  "name": "MrS1mbaa/petwarden",
+  "domain": "29",
+  "index": 0,
+  "issue": {
+   "field": "scenario_match",
+   "scenario_id": "auto-pet-health-application-e5c50e19c8",
+   "severity": "minor",
+   "kind": "missing_condition",
+   "claim": "\"applicability\":\"direct\"；理由为“用药疗程与本地提醒、每日打卡”",
+   "source_id": "s0",
+   "quote": "**Health**: weight chart you can scrub with a finger, vaccines with due dates, vet visits, medication courses, allergies and notes.",
+   "reason": "README 支持用药疗程和本地提醒，但没有明确说明可记录每次给药、查看下一剂量是否到期。场景描述包含这些具体任务，因此标为 direct 超出了来源支持。",
+   "suggested_correction": "将适用性改为 conditional，并说明可用于用药疗程提醒与打卡；每次给药记录及下一剂量到期查看能力未由现有来源明确说明。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "原卡将场景适用性标为 direct，理由为“用药疗程与本地提醒、每日打卡”。但 README 仅说明 Health 含 medication courses、Planner 含 medication 时间线，以及本地精确提醒；并未明确支持“记录每次给药、查看下次剂量是否到期”这一场景核心任务。因此 direct 超出来源支持，应改为 conditional 并限定能力范围。",
+   "source_id": "s0",
+   "quote": "**Health**: weight chart you can scrub with a finger, vaccines with due dates, vet visits, medication courses, allergies and notes.",
+   "suggested_correction": "将 applicability 改为 conditional，并注明：可用于用药疗程与本地提醒/打卡；每次给药记录及下一剂量到期查看能力未由现有来源明确说明。",
+   "citation_state": "literal"
+  },
+  "stratum": "remaining_727_after_cost_reconciliation"
+ },
+ {
+  "rid": 1432929974,
+  "name": "ocakciomursel-pixel/bulk-spf-dmarc-mx-email-security-auditor",
+  "domain": "15",
+  "index": 0,
+  "issue": {
+   "field": "summary",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "unsupported_claim",
+   "claim": "通过 Apify 云 API 批量审计域名 DNS 安全配置",
+   "source_id": "s1",
+   "quote": "**1. Cloud Actor (Apify Store)** | Run 1,000 to 1,000,000+ domains in the cloud",
+   "reason": "README 将云端 Actor 列为 Apify Store 选项，但没有明确说明该 Actor 就是此仓库项目；链接指向 domain-cybersecurity-ssl-dns-vulnerability-auditor。另一份 README 指向 b2b-domain-contact-tech-enricher。卡片把这些外部服务直接表述为本仓库工具的运行方式，归属关系证据不足。",
+   "suggested_correction": "改为“README 宣传可通过外部 Apify Actor 进行云端审计”，并注明 Actor 与仓库项目的对应关系未核实。",
+   "citation_state": "literal"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "卡片 summary 将“通过 Apify 云 API 批量审计”表述为本仓库工具的运行方式，但 s1 中 Cloud Actor 链接指向 lucacelli/domain-cybersecurity-ssl-dns-vulnerability-auditor，s0 的 Apify 链接指向 lucacelli/b2b-domain-contact-tech-enricher，均未证明该 Actor 属于本仓库；原卡归属表述过强。",
+   "source_id": "s1",
+   "quote": "**1. Cloud Actor (Apify Store)**",
+   "suggested_correction": "改为“README 宣传可通过外部 Apify Actor 进行云端审计”，并注明 Actor 与仓库项目的对应关系未核实。",
+   "citation_state": "literal"
+  },
+  "stratum": "remaining_727_after_cost_reconciliation"
+ },
+ {
+  "rid": 1432864736,
+  "name": "LuiccianDev/vulcan-mcp",
+  "domain": "20",
+  "index": 0,
+  "issue": {
+   "field": "project_type",
+   "scenario_id": "",
+   "severity": "major",
+   "kind": "wrong_type",
+   "claim": "library",
+   "source_id": "s0",
+   "quote": "The 9 Master Tools exposed to AI agents",
+   "reason": "README 将项目描述为连接 Vulcan 与 AI 客户端的 MCP Server，并列出其对外暴露的工具；“library”不能准确表示该项目的主要类型。",
+   "suggested_correction": "将项目类型改为 MCP 服务器或相应的服务器应用类别。",
+   "citation_state": "not_found"
+  },
+  "ad": {
+   "finding_id": "issue-0",
+   "disposition": "confirmed",
+   "reason": "README 明确称其为 MCP Server（徽章“MCP_Server-Python_3.11+”、正文“Connect Vulcan 12 directly to AI assistants via MCP”及“src/vulcan_mcp/ External MCP Server”），并列出对外暴露的 9 个工具；卡片将 project_type 标为 library 与来源不符，属类型标注错误。",
+   "source_id": "s0",
+   "quote": "Connect **Vulcan 12 ** directly to Artificial Intelligence assistants",
+   "suggested_correction": "将 project_type 由 library 改为 MCP 服务器/服务器应用类别。",
+   "citation_state": "literal"
+  },
+  "stratum": "remaining_727_after_cost_reconciliation"
+ }
+]

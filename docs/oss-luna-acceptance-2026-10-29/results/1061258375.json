@@ -1,0 +1,49 @@
+{
+ "repository_id": 1061258375,
+ "domain": "16",
+ "input_sha256": "74049eaf93757c9f2d6260f4e308de00fd6f0e57c2317834e754e6d28385981d",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:31.432878+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDFBZksotnaWEp9nsYn56Vfxalg",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 3372,
+  "completion_tokens": 155,
+  "total_tokens": 3527,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 3369,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.00041470000000000005,
+ "response_text": "{\"repository_id\":1061258375,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片对项目类型、主要文件和安全限制的描述与 README 一致；MIT 许可有完整正文支持。场景匹配仅适合作为特定电源电路的参考工程，不应理解为通用设计流程或完整应用。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[],\"limitations\":[\"唯一场景匹配为 conditional，且条件限定于 KiCad 6 或更新版本及特定电源电路；项目是电源 PCB 工程，适用范围不等同于通用团队制板流程。\"]}",
+ "review": {
+  "repository_id": 1061258375,
+  "verdict": "pass_with_limits",
+  "summary": "卡片对项目类型、主要文件和安全限制的描述与 README 一致；MIT 许可有完整正文支持。场景匹配仅适合作为特定电源电路的参考工程，不应理解为通用设计流程或完整应用。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [],
+  "limitations": [
+   "唯一场景匹配为 conditional，且条件限定于 KiCad 6 或更新版本及特定电源电路；项目是电源 PCB 工程，适用范围不等同于通用团队制板流程。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:36.350200+00:00",
+ "elapsed_seconds": 4.917
+}

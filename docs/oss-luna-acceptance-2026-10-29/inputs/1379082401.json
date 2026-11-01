@@ -1,0 +1,165 @@
+{
+ "card": {
+  "repository_id": 1379082401,
+  "full_name": "binhho07/stockflow-e-commerce",
+  "github_url": "https://github.com/binhho07/stockflow-e-commerce",
+  "name": "stockflow-e-commerce",
+  "summary": "StockFlow 是茶店的订单、库存与履约平台，采用 React/Vite 前端、Express API、PostgreSQL、Redis 与 BullMQ worker。结账在同一事务内以行锁预留库存并写 outbox，再创建 Stripe PaymentIntent；worker 发布事件、创建拣货任务、发邮件并广播看板事件。无真实 Stripe 密钥时使用进程内桩，通过模拟支付接口完成结账。",
+  "positioning": "面向小型网店的自托管订单、库存与履约平台单体仓库，含预留库存、Stripe 结账、仓库拣货打包发货与实时管理看板。",
+  "scope": "适用于小型自营仓库的订单到发货流程；部署配置存在但未在本工作区实际应用。",
+  "features": [
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/binhho07/stockflow-e-commerce/git/blobs/15a65470f111902aa1c18e0a7c98f274a266ad78",
+     "source_kind": "readme",
+     "source_sha256": "be7b895dd3fcf38ffcdf64de4c7fdf0b4c2514fdf43e04fcbf186bbd5539c1c4",
+     "source_url": "https://github.com/binhho07/stockflow-e-commerce/blob/main/README.md",
+     "verification": "source_based"
+    },
+    "text": "事务内预留库存避免超卖，并写 outbox 事件"
+   },
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/binhho07/stockflow-e-commerce/git/blobs/15a65470f111902aa1c18e0a7c98f274a266ad78",
+     "source_kind": "readme",
+     "source_sha256": "be7b895dd3fcf38ffcdf64de4c7fdf0b4c2514fdf43e04fcbf186bbd5539c1c4",
+     "source_url": "https://github.com/binhho07/stockflow-e-commerce/blob/main/README.md",
+     "verification": "source_based"
+    },
+    "text": "Stripe 结账，无密钥时使用桩与模拟支付"
+   },
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/binhho07/stockflow-e-commerce/git/blobs/15a65470f111902aa1c18e0a7c98f274a266ad78",
+     "source_kind": "readme",
+     "source_sha256": "be7b895dd3fcf38ffcdf64de4c7fdf0b4c2514fdf43e04fcbf186bbd5539c1c4",
+     "source_url": "https://github.com/binhho07/stockflow-e-commerce/blob/main/README.md",
+     "verification": "source_based"
+    },
+    "text": "worker 创建拣货任务、发送邮件并广播看板事件"
+   },
+   {
+    "evidence": {
+     "excerpt": "",
+     "immutable_url": "https://api.github.com/repos/binhho07/stockflow-e-commerce/git/blobs/15a65470f111902aa1c18e0a7c98f274a266ad78",
+     "source_kind": "readme",
+     "source_sha256": "be7b895dd3fcf38ffcdf64de4c7fdf0b4c2514fdf43e04fcbf186bbd5539c1c4",
+     "source_url": "https://github.com/binhho07/stockflow-e-commerce/blob/main/README.md",
+     "verification": "source_based"
+    },
+    "text": "按货区排序的拣货路径优化，模拟测得约 8% 改善"
+   }
+  ],
+  "project_type": "application",
+  "license": {
+   "detected_spdx": null,
+   "note": "未发现许可证文件；公开仓库不等于开源授权",
+   "source": null,
+   "spdx": null,
+   "status": "pending"
+  },
+  "missing_fields": [
+   "license_verification"
+  ],
+  "collection_notes": [],
+  "completeness": "partial",
+  "summary_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/binhho07/stockflow-e-commerce/git/blobs/15a65470f111902aa1c18e0a7c98f274a266ad78",
+   "source_kind": "readme",
+   "source_sha256": "be7b895dd3fcf38ffcdf64de4c7fdf0b4c2514fdf43e04fcbf186bbd5539c1c4",
+   "source_url": "https://github.com/binhho07/stockflow-e-commerce/blob/main/README.md",
+   "verification": "source_based"
+  },
+  "scope_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/binhho07/stockflow-e-commerce/git/blobs/15a65470f111902aa1c18e0a7c98f274a266ad78",
+   "source_kind": "readme",
+   "source_sha256": "be7b895dd3fcf38ffcdf64de4c7fdf0b4c2514fdf43e04fcbf186bbd5539c1c4",
+   "source_url": "https://github.com/binhho07/stockflow-e-commerce/blob/main/README.md",
+   "verification": "source_based"
+  },
+  "positioning_evidence": {
+   "excerpt": "",
+   "immutable_url": "https://api.github.com/repos/binhho07/stockflow-e-commerce/git/blobs/15a65470f111902aa1c18e0a7c98f274a266ad78",
+   "source_kind": "readme",
+   "source_sha256": "be7b895dd3fcf38ffcdf64de4c7fdf0b4c2514fdf43e04fcbf186bbd5539c1c4",
+   "source_url": "https://github.com/binhho07/stockflow-e-commerce/blob/main/README.md",
+   "verification": "source_based"
+  }
+ },
+ "scenario_matches": [
+  {
+   "applicability": "conditional",
+   "conditions": [
+    "需 Node 20+ 与 Docker 环境",
+    "真实支付需 Stripe 测试密钥与 webhook 转发",
+    "部署配置未实际验证"
+   ],
+   "evidence": {
+    "excerpt": "",
+    "immutable_url": "https://api.github.com/repos/binhho07/stockflow-e-commerce/git/blobs/15a65470f111902aa1c18e0a7c98f274a266ad78",
+    "source_kind": "readme",
+    "source_sha256": "be7b895dd3fcf38ffcdf64de4c7fdf0b4c2514fdf43e04fcbf186bbd5539c1c4",
+    "source_url": "https://github.com/binhho07/stockflow-e-commerce/blob/main/README.md",
+    "verification": "source_based"
+   },
+   "reason": "覆盖订单接收、库存预留与发货流程，但渠道回传与异常处理需核实。",
+   "scenario_id": "auto-order-fulfillment-platform-c1a17c290e",
+   "leaf": "order-fulfillment-platform",
+   "leaf_name": "Order Fulfillment Platform",
+   "scenario_name": "每日订单队列处理与发货",
+   "scenario_description": "商家履约专员每天查看各销售渠道汇入的待处理订单，处理地址或支付异常，分配库存并生成面单发货，再把运单号回传渠道。"
+  },
+  {
+   "applicability": "unverified",
+   "conditions": [
+    "拣货路径优化基于模拟数据",
+    "扫码核对、称重复核与面单打印能力需核实"
+   ],
+   "evidence": {
+    "excerpt": "",
+    "immutable_url": "https://api.github.com/repos/binhho07/stockflow-e-commerce/git/blobs/15a65470f111902aa1c18e0a7c98f274a266ad78",
+    "source_kind": "readme",
+    "source_sha256": "be7b895dd3fcf38ffcdf64de4c7fdf0b4c2514fdf43e04fcbf186bbd5539c1c4",
+    "source_url": "https://github.com/binhho07/stockflow-e-commerce/blob/main/README.md",
+    "verification": "source_based"
+   },
+   "reason": "包含拣货任务生成与按货区排序的拣货路径，但扫码核对与面单打印未见说明。",
+   "scenario_id": "auto-order-fulfillment-platform-cde9311597",
+   "leaf": "order-fulfillment-platform",
+   "leaf_name": "Order Fulfillment Platform",
+   "scenario_name": "自有仓库拣货打包执行",
+   "scenario_description": "仓库拣货员按系统释放的拣货单在货架间取货并扫码核对，打包员复核重量后打印面单，异常订单转入例外处理。"
+  }
+ ],
+ "sources": [
+  {
+   "kind": "readme",
+   "immutable_url": "https://api.github.com/repos/binhho07/stockflow-e-commerce/git/blobs/15a65470f111902aa1c18e0a7c98f274a266ad78",
+   "sha256": "be7b895dd3fcf38ffcdf64de4c7fdf0b4c2514fdf43e04fcbf186bbd5539c1c4",
+   "text": "# StockFlow\n\nOrder, inventory, and fulfillment platform for a tea shop. Monorepo (npm workspaces).\n\n## Architecture\n\n```mermaid\nflowchart LR\n  Web[React / Vite] -->|REST + JWT| API[Express API]\n  Web -->|Socket.IO| API\n  API --> PG[(PostgreSQL 16)]\n  API --> Redis[(Redis 7)]\n  API -->|Outbox rows| PG\n  Worker[BullMQ worker] --> PG\n  Worker --> Redis\n  Worker -->|emails| Mailpit[Mailpit SMTP]\n  Stripe[Stripe test] -->|webhooks| API\n  Worker -->|Redis adapter| API\n```\n\nCheckout reserves stock with `SELECT … FOR UPDATE` in one transaction, writes an outbox row in the same transaction, then creates a Stripe PaymentIntent. The worker publishes outbox events to BullMQ; consumers create pick tasks, send mail, and broadcast dashboard events.\n\n## Setup\n\nRequires Node 20+ and Docker.\n\n```bash\ncp .env.example .env\nnpm install\nnpx prisma generate\ndocker compose up postgres redis mailpit -d\nnpx prisma migrate deploy\nnpm run db:seed\nnpm run dev:api      # terminal 2\nnpm run dev:worker   # terminal 3\nnpm run dev:web      # terminal 4\n```\n\nOr run the full stack:\n\n```bash\ndocker compose up --build\n```\n\n| Service | URL |\n| --- | --- |\n| Web | http://localhost:5173 |\n| API | http://localhost:3000/health |\n| Mailpit | http://localhost:8025 |\n\nDemo users (password `password123`):\n\n- `customer@stockflow.local`\n- `warehouse.nyc@stockflow.local`\n- `support@stockflow.local`\n- `admin@stockflow.local`\n\n## Scripts\n\n```bash\nnpm run lint\nnpm run typecheck\nnpm test\nnpx tsx scripts/simulate.ts --n 40 --seed 42\nk6 run load-tests/checkout.js\n```\n\n## Stripe\n\nWithout real `sk_test_…` keys the API uses an in-process stub. Checkout still creates orders; the web app calls `POST /api/v1/checkout/:orderId/simulate-payment`. Point `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` at Stripe test mode and use the Stripe CLI to forward webhooks for the real path.\n\n## Deploy\n\n- Render: `render.yaml` (API, worker, web, Postgres, Redis). Not applied in this workspace (no Render account).\n- Fly.io: `fly.toml` for the API. Same caveat.\n\nSet all variables from `.env.example` in the host. Run `prisma migrate deploy` as a release command.\n\n## Measured pick-path optimization\n\n`npx tsx scripts/simulate.ts --n 40 --seed 42` (real run, results in `scripts/results.json`):\n\n| | Avg walk+pick time PAID→ready-to-ship |\n| --- | --- |\n| Baseline (cart-line order) | **61.3 s** |\n| Zone-sorted pick list | **56.4 s** |\n| Improvement | **8.0%** |\n\n40 simulated orders, seed 42. Walk cost is a function of zone (A=8, B=14, C=22, D=30) plus 4s per pick.\n",
+   "id": "s0",
+   "original_chars": 2525,
+   "truncated": false
+  },
+  {
+   "id": "s1",
+   "kind": "github_metadata",
+   "sha256": "428628a300975cca229f3b1fe296f044d476bdc8e9cd00d68ac51697446693ea",
+   "text": "{\"archived\":false,\"description\":\"Order, inventory, and fulfillment platform for a small online tea shop — reservations that don’t oversell, Stripe checkout, warehouse pick/pack/ship, and a live admin dashboard.\",\"full_name\":\"binhho07/stockflow-e-commerce\",\"html_url\":\"https://github.com/binhho07/stockflow-e-commerce\",\"id\":1379082401,\"language\":\"TypeScript\",\"license\":null,\"topics\":[]}\nOrder, inventory, and fulfillment platform for a small online tea shop — reservations that don’t oversell, Stripe checkout, warehouse pick/pack/ship, and a live admin dashboard.",
+   "truncated": false
+  }
+ ],
+ "coverage": {
+  "total_campaign_matches": 2,
+  "matches_included": 2,
+  "files_available": 1,
+  "files_included": 1,
+  "omitted_files": 0,
+  "truncated_files": 0
+ }
+}

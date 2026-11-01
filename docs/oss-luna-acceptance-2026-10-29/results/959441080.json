@@ -1,0 +1,82 @@
+{
+ "repository_id": 959441080,
+ "domain": "27",
+ "input_sha256": "1ff9e7f7205cf4b1352d8f85f86da5a8dfe5ef7d2058c9cce1a44ce79611a6f5",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:22.440982+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCE4SdJ8G0PQg6PNobCjE12wf26x",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 5066,
+  "completion_tokens": 538,
+  "total_tokens": 5604,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 5063,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0007756,
+ "response_text": "{\"repository_id\":959441080,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片对应用类型、主要功能和 BSD-3-Clause 许可的描述有来源支持。离线收听场景相关，但场景描述中的续播位置未获材料支持；按订阅源添加场景也不应将自动出现新一期视为已证实。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-podcast-platform-0bfdd52ec7\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"\\\"applicability\\\":\\\"direct\\\",\\\"conditions\\\":[]；场景描述包含“在下次打开时从上次位置继续”。\",\"source_id\":\"s0\",\"quote\":\"Anytime supports deep linking from websites, allowing you to open a podcast within Anytime from a web url.\",\"reason\":\"来源支持离线下载收听（s2：“You can download podcasts and listen to them offline”），但提供的材料没有说明播放进度会保存并在下次打开时续播。场景整体相关，但续播这一环节未获支持，不能无条件标为 direct。\",\"suggested_correction\":\"将适用性改为 partial，或在 conditions 中注明续播能力未由现有材料确认。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-podcast-platform-d8296c9564\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"\\\"applicability\\\":\\\"direct\\\",\\\"conditions\\\":[]；reason 为“支持通过 anytimeplayer.app/subscribe?url= 深链接按订阅源地址添加节目”。\",\"source_id\":\"s0\",\"quote\":\"To open a feed within Anytime, you create a link to the Anytime website passing in the URL of the feed you wish to open.\",\"reason\":\"来源支持通过链接在应用中打开 feed，但没有说明私有订阅源的访问条件，也没有说明新一期会自动出现在用户库中。场景描述超出已证实的深链接能力。\",\"suggested_correction\":\"将适用性改为 partial，并注明材料仅确认可通过链接打开 feed；不要据此确认私有源访问或新一期自动更新。\"}],\"limitations\":[\"README 与元数据支持卡片所述主要功能；本次未执行代码，也未独立核验运行时行为。\",\"场景判断仅依据所提供的 README 和元数据；未确认续播、私有源访问及自动更新行为。\"]}",
+ "review": {
+  "repository_id": 959441080,
+  "verdict": "pass_with_limits",
+  "summary": "卡片对应用类型、主要功能和 BSD-3-Clause 许可的描述有来源支持。离线收听场景相关，但场景描述中的续播位置未获材料支持；按订阅源添加场景也不应将自动出现新一期视为已证实。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-podcast-platform-0bfdd52ec7",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "\"applicability\":\"direct\",\"conditions\":[]；场景描述包含“在下次打开时从上次位置继续”。",
+    "source_id": "s0",
+    "quote": "Anytime supports deep linking from websites, allowing you to open a podcast within Anytime from a web url.",
+    "reason": "来源支持离线下载收听（s2：“You can download podcasts and listen to them offline”），但提供的材料没有说明播放进度会保存并在下次打开时续播。场景整体相关，但续播这一环节未获支持，不能无条件标为 direct。",
+    "suggested_correction": "将适用性改为 partial，或在 conditions 中注明续播能力未由现有材料确认。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-podcast-platform-d8296c9564",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "\"applicability\":\"direct\",\"conditions\":[]；reason 为“支持通过 anytimeplayer.app/subscribe?url= 深链接按订阅源地址添加节目”。",
+    "source_id": "s0",
+    "quote": "To open a feed within Anytime, you create a link to the Anytime website passing in the URL of the feed you wish to open.",
+    "reason": "来源支持通过链接在应用中打开 feed，但没有说明私有订阅源的访问条件，也没有说明新一期会自动出现在用户库中。场景描述超出已证实的深链接能力。",
+    "suggested_correction": "将适用性改为 partial，并注明材料仅确认可通过链接打开 feed；不要据此确认私有源访问或新一期自动更新。"
+   }
+  ],
+  "limitations": [
+   "README 与元数据支持卡片所述主要功能；本次未执行代码，也未独立核验运行时行为。",
+   "场景判断仅依据所提供的 README 和元数据；未确认续播、私有源访问及自动更新行为。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 0,
+   "reason": "quote_not_in_supplied_source"
+  },
+  {
+   "index": 1,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T04:40:30.711386+00:00",
+ "elapsed_seconds": 8.27
+}

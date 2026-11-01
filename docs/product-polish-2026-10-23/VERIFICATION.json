@@ -1,0 +1,109 @@
+{
+  "verified_at": "2026-10-23T16:57:42.121271+08:00",
+  "scope": "Current Atlas taxonomy/scenario/repository product and shared shell across all routes; historical workflows preserved.",
+  "checks": [
+    {
+      "command": "npm run typecheck",
+      "status": "passed"
+    },
+    {
+      "command": "npm test",
+      "status": "passed",
+      "tests": 12
+    },
+    {
+      "command": "npm run build",
+      "status": "passed"
+    },
+    {
+      "command": "python3 -m unittest discover -s application-atlas-production-pack/tests -p 'test_oss*.py' -q",
+      "status": "passed",
+      "tests": 51
+    },
+    {
+      "command": "ATLAS_VISUAL_REVIEW=1 npm run test:e2e:catalog",
+      "status": "passed",
+      "tests": 28
+    },
+    {
+      "command": "ATLAS_E2E_API_PORT=5249 ATLAS_E2E_WEB_PORT=5248 npm run test:e2e",
+      "status": "passed",
+      "tests": 22
+    },
+    {
+      "command": "ATLAS_E2E_API_PORT=5249 ATLAS_E2E_WEB_PORT=5248 npm run test:e2e -- matrix.spec.ts",
+      "status": "passed",
+      "tests": 4,
+      "note": "Final layout recheck; included in the 22 core tests, not additional unique tests."
+    },
+    {
+      "command": "npm run test:e2e:factory -- product-polish-factory.spec.ts",
+      "status": "passed",
+      "tests": 4
+    },
+    {
+      "command": "npm run test:e2e:catalog -- --grep 'invalid or blocked'",
+      "status": "passed",
+      "tests": 1,
+      "note": "Final storage resilience recheck, including type details and project selection; included in the 28 catalog checks."
+    }
+  ],
+  "visual_review": {
+    "viewports": [
+      1280,
+      390
+    ],
+    "pages": [
+      "home",
+      "browse",
+      "discover",
+      "leaf",
+      "search",
+      "settings",
+      "guide",
+      "history"
+    ],
+    "screenshots": [
+      "browse-1280.png",
+      "browse-390.png",
+      "discover-1280.png",
+      "discover-390.png",
+      "guide-1280.png",
+      "guide-390.png",
+      "history-1280.png",
+      "history-390.png",
+      "home-1280.png",
+      "home-390.png",
+      "leaf-1280.png",
+      "leaf-390.png",
+      "search-1280.png",
+      "search-390.png",
+      "settings-1280.png",
+      "settings-390.png"
+    ],
+    "data": "Screenshots use an isolated API seeded with saved repository snapshots."
+  },
+  "performance": "PERFORMANCE.json records UTF-8 JSON sizes and CatalogStore method timings on a read-only backup of the live catalog.",
+  "runtime": {
+    "existing_api_restarted": false,
+    "existing_collection_interrupted": false,
+    "activation": "Backend pagination and overview response reduction take effect after the existing collection completes and the API is restarted. Frontend remains compatible with the running older API."
+  },
+  "limits": [
+    "No new collection jobs or external model calls were started by this task.",
+    "Historical execution/provider workflows were checked with existing local fixtures; no new runtime acceptance or release claim is made.",
+    "Existing unrelated working tree changes were preserved."
+  ],
+  "live_preview": {
+    "file": "live-home.png",
+    "url": "http://127.0.0.1:5188/",
+    "data": "Current running API, 950 projects visible at capture time; current service preserved."
+  },
+  "unique_check_counts": {
+    "browser": 54,
+    "unit_and_backend": 63,
+    "total": 117,
+    "note": "Includes one optional visual capture check. Focused reruns are not counted twice."
+  },
+  "follow_up_live_verification": "live-validation/SUMMARY.json"
+}

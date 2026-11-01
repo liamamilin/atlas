@@ -1,0 +1,93 @@
+{
+ "repository_id": 1096079955,
+ "domain": "01",
+ "input_sha256": "44c64c07906a99ada33c8fe829f75fc23dae060a5285c9b147df7f5cf3d57940",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:10:51.089845+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-d90fbd992745-12f1ac",
+ "usage": {
+  "prompt_tokens": 2576,
+  "completion_tokens": 691,
+  "total_tokens": 3267,
+  "prompt_tokens_details": {
+   "cached_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.000801,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.000801,
+   "tokens": {
+    "input": 2576,
+    "output": 691,
+    "reasoning": 0,
+    "cache_read": 0,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1096079955,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片基本忠实于 README：定位为在线课堂聊天应用，技术栈 Angular/ASP.NET Core 8/WebRTC/SignalR/Oracle Cloud Free Tier 均有原文支持；许可保守标为 pending，场景匹配标为 unverified 并列出未说明功能，符合证据边界。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"基于 WebRTC 的点对点或经信令服务器连接\",\"source_id\":\"s0\",\"quote\":\"WebRTC: para capturar vídeo + áudio no browser e estabelecer conexões peer-to-peer ou via servidor de sinalização\",\"reason\":\"原文描述的是 WebRTC 的用途/能力说明，未明确说明项目已实现可用的点对点连接；作为功能项略有把技术说明当作已实现能力的倾向。\",\"suggested_correction\":\"改为“README 说明使用 WebRTC 进行浏览器音视频采集并建立点对点或经信令服务器的连接”，保留为技术方案描述而非已验证功能。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-video-conferencing-application-a42b044a62\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"面向在线课堂，具备音视频采集与 WebRTC 连接基础\",\"source_id\":\"s0\",\"quote\":\"Chat para aulas online\",\"reason\":\"场景要求教师共享讲义、点名、聊天提问，README 仅称“在线课堂聊天”，未说明共享/点名/聊天实现程度；卡片已标 unverified 并列出条件，但 reason 中“具备…基础”措辞偏肯定。\",\"suggested_correction\":\"将 reason 改为“README 定位为在线课堂聊天并提及 WebRTC 音视频采集，具体互动功能未说明”，保持 unverified。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-virtual-meeting-platform-a642c7077b\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"定位为在线课堂聊天应用，具备浏览器音视频采集与实时连接能力\",\"source_id\":\"s0\",\"quote\":\"Frontend: Angular + TypeScript — para interface, captura de câmera/microfone, integração com WebRTC\",\"reason\":\"“实时连接能力”来自 README 的技术方案描述，未证明预约、链接邀请、课件共享、举手等场景要素已实现；卡片已列条件但 reason 表述偏强。\",\"suggested_correction\":\"reason 改为“README 描述在线课堂聊天与 WebRTC 音视频采集方案，预约/邀请/共享/举手未说明”，维持 unverified。\"}],\"limitations\":[\"仅有 README 与 GitHub 元数据两份材料，无源码、部署文档或功能演示，无法核实功能实现程度。\",\"许可状态为 pending，未做许可全文比对，不能据此判定开源授权。\",\"README 为葡萄牙语短文本，未提及会议预约、链接邀请、屏幕共享、点名等场景细节。\"]}",
+ "review": {
+  "repository_id": 1096079955,
+  "verdict": "pass_with_limits",
+  "summary": "卡片基本忠实于 README：定位为在线课堂聊天应用，技术栈 Angular/ASP.NET Core 8/WebRTC/SignalR/Oracle Cloud Free Tier 均有原文支持；许可保守标为 pending，场景匹配标为 unverified 并列出未说明功能，符合证据边界。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "基于 WebRTC 的点对点或经信令服务器连接",
+    "source_id": "s0",
+    "quote": "WebRTC: para capturar vídeo + áudio no browser e estabelecer conexões peer-to-peer ou via servidor de sinalização",
+    "reason": "原文描述的是 WebRTC 的用途/能力说明，未明确说明项目已实现可用的点对点连接；作为功能项略有把技术说明当作已实现能力的倾向。",
+    "suggested_correction": "改为“README 说明使用 WebRTC 进行浏览器音视频采集并建立点对点或经信令服务器的连接”，保留为技术方案描述而非已验证功能。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-video-conferencing-application-a42b044a62",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "面向在线课堂，具备音视频采集与 WebRTC 连接基础",
+    "source_id": "s0",
+    "quote": "Chat para aulas online",
+    "reason": "场景要求教师共享讲义、点名、聊天提问，README 仅称“在线课堂聊天”，未说明共享/点名/聊天实现程度；卡片已标 unverified 并列出条件，但 reason 中“具备…基础”措辞偏肯定。",
+    "suggested_correction": "将 reason 改为“README 定位为在线课堂聊天并提及 WebRTC 音视频采集，具体互动功能未说明”，保持 unverified。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-virtual-meeting-platform-a642c7077b",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "定位为在线课堂聊天应用，具备浏览器音视频采集与实时连接能力",
+    "source_id": "s0",
+    "quote": "Frontend: Angular + TypeScript — para interface, captura de câmera/microfone, integração com WebRTC",
+    "reason": "“实时连接能力”来自 README 的技术方案描述，未证明预约、链接邀请、课件共享、举手等场景要素已实现；卡片已列条件但 reason 表述偏强。",
+    "suggested_correction": "reason 改为“README 描述在线课堂聊天与 WebRTC 音视频采集方案，预约/邀请/共享/举手未说明”，维持 unverified。"
+   }
+  ],
+  "limitations": [
+   "仅有 README 与 GitHub 元数据两份材料，无源码、部署文档或功能演示，无法核实功能实现程度。",
+   "许可状态为 pending，未做许可全文比对，不能据此判定开源授权。",
+   "README 为葡萄牙语短文本，未提及会议预约、链接邀请、屏幕共享、点名等场景细节。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:11:00.406730+00:00",
+ "elapsed_seconds": 9.317
+}

@@ -1,0 +1,81 @@
+{
+ "repository_id": 1275838307,
+ "domain": "18",
+ "input_sha256": "9250c431c510324cfb4bf163e7980c66d0a35bdcc4a1b3ff4feddfc3c020e1db",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:12:03.400830+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-de8de99b2c52-b927b",
+ "usage": {
+  "prompt_tokens": 4522,
+  "completion_tokens": 463,
+  "total_tokens": 4985,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00088084,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00088084,
+   "tokens": {
+    "input": 4010,
+    "output": 463,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1275838307,\"verdict\":\"needs_review\",\"summary\":\"功能、项目类型、许可与场景匹配基本有来源支持，但 positioning 写成物流车队运输运营平台，与 README 描述的城市资源模拟系统明显不符，需修正。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"positioning\",\"scenario_id\":\"\",\"severity\":\"major\",\"kind\":\"unsupported_claim\",\"claim\":\"面向物流车队的运输运营管理平台，替代电子表格管理车辆、司机、行程与维护\",\"source_id\":\"s0\",\"quote\":\"A Java Swing GUI desktop simulation application designed to model, monitor, and manage city resources and public services in real time.\",\"reason\":\"README 与元数据均描述为城市资源/公共服务模拟系统，未提及物流车队、司机、行程或维护管理，定位与来源不符。\",\"suggested_correction\":\"改为与 README 一致的城市资源与公共交通模拟演示定位，删除物流车队与电子表格替代表述。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-public-transit-operations-platform-2a20e00922\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"含公交模拟与故障事件，但为模拟演示，无真实车辆监控与调度干预记录\",\"source_id\":\"s0\",\"quote\":\"Simulates real-time public transit (Buses & Trains), dynamically updates route paths based on road closures/congestion, and randomizes breakdown events.\",\"reason\":\"场景要求监控真实早高峰车辆、联系司机并记录事件；项目仅为模拟，卡片已标 unverified 并写明条件，但 applicability 标签与场景实际相关性仍偏弱，应保持非直接适用。\",\"suggested_correction\":\"保留 unverified/非直接适用，明确仅覆盖模拟公交与故障事件，不覆盖真实车辆监控、司机联络与事件记录。\"}],\"limitations\":[\"仅提供 README、LICENSE 与 GitHub 元数据，未审阅源码实现细节。\",\"场景匹配仅一条，且为模拟类项目对真实运营场景，相关性有限。\"]}",
+ "review": {
+  "repository_id": 1275838307,
+  "verdict": "needs_review",
+  "summary": "功能、项目类型、许可与场景匹配基本有来源支持，但 positioning 写成物流车队运输运营平台，与 README 描述的城市资源模拟系统明显不符，需修正。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "positioning",
+    "scenario_id": "",
+    "severity": "major",
+    "kind": "unsupported_claim",
+    "claim": "面向物流车队的运输运营管理平台，替代电子表格管理车辆、司机、行程与维护",
+    "source_id": "s0",
+    "quote": "A Java Swing GUI desktop simulation application designed to model, monitor, and manage city resources and public services in real time.",
+    "reason": "README 与元数据均描述为城市资源/公共服务模拟系统，未提及物流车队、司机、行程或维护管理，定位与来源不符。",
+    "suggested_correction": "改为与 README 一致的城市资源与公共交通模拟演示定位，删除物流车队与电子表格替代表述。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-public-transit-operations-platform-2a20e00922",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "含公交模拟与故障事件，但为模拟演示，无真实车辆监控与调度干预记录",
+    "source_id": "s0",
+    "quote": "Simulates real-time public transit (Buses & Trains), dynamically updates route paths based on road closures/congestion, and randomizes breakdown events.",
+    "reason": "场景要求监控真实早高峰车辆、联系司机并记录事件；项目仅为模拟，卡片已标 unverified 并写明条件，但 applicability 标签与场景实际相关性仍偏弱，应保持非直接适用。",
+    "suggested_correction": "保留 unverified/非直接适用，明确仅覆盖模拟公交与故障事件，不覆盖真实车辆监控、司机联络与事件记录。"
+   }
+  ],
+  "limitations": [
+   "仅提供 README、LICENSE 与 GitHub 元数据，未审阅源码实现细节。",
+   "场景匹配仅一条，且为模拟类项目对真实运营场景，相关性有限。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:12:11.172036+00:00",
+ "elapsed_seconds": 7.771
+}

@@ -1,0 +1,59 @@
+{
+ "repository_id": 395756791,
+ "domain": "15",
+ "input_sha256": "abe3491c9ce500b85c0933b65906525238a20738e2c3f7683a3b3972e0e84fd2",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:52.707174+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-dda4d3d2f9ac-dbb75",
+ "usage": {
+  "prompt_tokens": 4462,
+  "completion_tokens": 163,
+  "total_tokens": 4625,
+  "prompt_tokens_details": {
+   "cached_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.0007671,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.0007671,
+   "tokens": {
+    "input": 4462,
+    "output": 163,
+    "reasoning": 0,
+    "cache_read": 0,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":395756791,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片将仓库定位为M365高级狩猎KQL查询资源，与README和元数据一致；三个场景均标为conditional并写明前提，许可保留pending待核验，未发现明显无来源支持的功能或类型误标。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"仅提供README与LICENSE两个文件，未覆盖各查询子目录内容，无法核验具体查询数量与质量\",\"许可状态为pending，未做官方模板精确比对，本次不提升许可结论\",\"场景匹配基于README类别描述推断，未实际执行查询验证可用性\"]}",
+ "review": {
+  "repository_id": 395756791,
+  "verdict": "pass_with_limits",
+  "summary": "卡片将仓库定位为M365高级狩猎KQL查询资源，与README和元数据一致；三个场景均标为conditional并写明前提，许可保留pending待核验，未发现明显无来源支持的功能或类型误标。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "仅提供README与LICENSE两个文件，未覆盖各查询子目录内容，无法核验具体查询数量与质量",
+   "许可状态为pending，未做官方模板精确比对，本次不提升许可结论",
+   "场景匹配基于README类别描述推断，未实际执行查询验证可用性"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:11:58.548734+00:00",
+ "elapsed_seconds": 5.841
+}

@@ -1,0 +1,93 @@
+{
+ "repository_id": 253124967,
+ "domain": "28",
+ "input_sha256": "11214fd7c684d7d6181c4e27f08b119230a962872cbbcbc49fc6fc1c7127f29e",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:12:37.158718+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-dda4d3d2f9ac-dc810",
+ "usage": {
+  "prompt_tokens": 5082,
+  "completion_tokens": 630,
+  "total_tokens": 5712,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00106504,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00106504,
+   "tokens": {
+    "input": 4570,
+    "output": 630,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":253124967,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体忠实于 README 的任务说明与元数据：定位为练习/模板项目、依赖 Edamam API、许可状态 pending、场景匹配保守标注为 unverified/conditional。主要问题是 features 与 summary 把 README 中的任务要求表述为已实现功能，而资料未说明实际完成程度。\",\"checks\":{\"facts\":\"limited\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"roadmap_as_fact\",\"claim\":\"按饮食、健康限制、餐型、菜型、菜系和关键词搜索菜谱 / 将选中菜谱加入未来 7 天餐计划 / 按早餐、午餐、晚餐、加餐分组展示周计划与菜谱信息\",\"source_id\":\"s0\",\"quote\":\"Build a React app (using Typescript) using this template project that accomplishes the following:\",\"reason\":\"README 是任务说明（Instructions），三条功能均为要求而非已实现证据；卡片 summary 已注明需核实，但 features 列表未标注为待实现/未验证。\",\"suggested_correction\":\"在 features 中标注为 README 任务要求、实现状态未核实，或移入 scope/需求描述。\"},{\"field\":\"positioning\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"按模板要求实现搜索菜谱并加入未来 7 天计划\",\"reason\":\"README 仅提出要求，未提供实现证据；'实现'措辞略强于来源。\",\"source_id\":\"s0\",\"quote\":\"Build a React app (using Typescript) using this template project that accomplishes the following:\",\"suggested_correction\":\"改为'模板要求实现……，实际完成度未核实'。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-meal-planning-application-3bdf3b64bc\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"需自行申请 Edamam API 凭据\",\"source_id\":\"s0\",\"quote\":\"If for whatever reason this isn't working, you'll have to sign up for the Edamam API and use your own app id and key.\",\"reason\":\"来源表述为'若提供的凭据不可用则需自行申请'，卡片写成无条件'需自行申请'，条件略有偏差；且 applicability 已为 conditional，属可收紧。\",\"suggested_correction\":\"改为'若提供的 app id/key 不可用，需自行注册 Edamam 获取凭据'。\"}],\"limitations\":[\"仅覆盖 1 个 README 与 GitHub 元数据，无源码/package.json，无法核实功能实现、依赖与测试。\",\"许可状态为 pending，未做许可全文核验。\",\"README 为任务说明，非项目完成度说明。\"]}",
+ "review": {
+  "repository_id": 253124967,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体忠实于 README 的任务说明与元数据：定位为练习/模板项目、依赖 Edamam API、许可状态 pending、场景匹配保守标注为 unverified/conditional。主要问题是 features 与 summary 把 README 中的任务要求表述为已实现功能，而资料未说明实际完成程度。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "roadmap_as_fact",
+    "claim": "按饮食、健康限制、餐型、菜型、菜系和关键词搜索菜谱 / 将选中菜谱加入未来 7 天餐计划 / 按早餐、午餐、晚餐、加餐分组展示周计划与菜谱信息",
+    "source_id": "s0",
+    "quote": "Build a React app (using Typescript) using this template project that accomplishes the following:",
+    "reason": "README 是任务说明（Instructions），三条功能均为要求而非已实现证据；卡片 summary 已注明需核实，但 features 列表未标注为待实现/未验证。",
+    "suggested_correction": "在 features 中标注为 README 任务要求、实现状态未核实，或移入 scope/需求描述。"
+   },
+   {
+    "field": "positioning",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "按模板要求实现搜索菜谱并加入未来 7 天计划",
+    "reason": "README 仅提出要求，未提供实现证据；'实现'措辞略强于来源。",
+    "source_id": "s0",
+    "quote": "Build a React app (using Typescript) using this template project that accomplishes the following:",
+    "suggested_correction": "改为'模板要求实现……，实际完成度未核实'。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-meal-planning-application-3bdf3b64bc",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "需自行申请 Edamam API 凭据",
+    "source_id": "s0",
+    "quote": "If for whatever reason this isn't working, you'll have to sign up for the Edamam API and use your own app id and key.",
+    "reason": "来源表述为'若提供的凭据不可用则需自行申请'，卡片写成无条件'需自行申请'，条件略有偏差；且 applicability 已为 conditional，属可收紧。",
+    "suggested_correction": "改为'若提供的 app id/key 不可用，需自行注册 Edamam 获取凭据'。"
+   }
+  ],
+  "limitations": [
+   "仅覆盖 1 个 README 与 GitHub 元数据，无源码/package.json，无法核实功能实现、依赖与测试。",
+   "许可状态为 pending，未做许可全文核验。",
+   "README 为任务说明，非项目完成度说明。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:12:47.274496+00:00",
+ "elapsed_seconds": 10.116
+}

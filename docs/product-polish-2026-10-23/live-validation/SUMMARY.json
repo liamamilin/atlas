@@ -1,0 +1,98 @@
+{
+  "verified_at": "2026-10-23T17:23:35.930481+08:00",
+  "services": {
+    "api_url": "http://127.0.0.1:5199",
+    "web_url": "http://127.0.0.1:5188",
+    "api_pid": "32907",
+    "healthy": true,
+    "ready": true
+  },
+  "restart": "Idle API restarted at 17:15 with paused collection intact. Immediate before/after digests of all six catalog data groups matched; see DATA_INTEGRITY.json.",
+  "http_performance": {
+    "before_overview_bytes": 6519871,
+    "after_overview_bytes": 16610,
+    "reduction_percent": 99.75,
+    "page_projects": 24,
+    "page_bytes": 726356,
+    "measurement": "Actual HTTP response bodies from the running real API; no mock or fixture responses."
+  },
+  "browser": {
+    "passed": 20,
+    "failed": 0,
+    "viewports": [
+      "1280x900",
+      "390x844"
+    ],
+    "scope": [
+      "home",
+      "taxonomy",
+      "type detail and canonical source",
+      "repository catalog and pagination",
+      "scenario and license filtering",
+      "project evidence and upstream links",
+      "existing favorites",
+      "search",
+      "collection progress",
+      "settings",
+      "guide",
+      "history"
+    ],
+    "writes": "All API writes were blocked during page checks; no collection, credential or favorite mutations were submitted.",
+    "note": "Initial fixed-count assertions were updated after collection resumed during validation. Browser counts/progress are compared to the exact API response received by each page.",
+    "results": "BROWSER_RESULTS.json"
+  },
+  "pagination_snapshot": {
+    "source": "Consistent read-only backup of the real live catalog, not fixtures. Live collection continued during verification.",
+    "method": "The same CatalogStore.catalog implementation used by the API, over a fixed real-data snapshot.",
+    "pages": 41,
+    "projects": 966,
+    "duplicates": 0,
+    "missing": 0,
+    "seconds": 2.448,
+    "last_page_count": 6
+  },
+  "current_catalog": {
+    "projects": 977,
+    "scenarios": 33,
+    "leaves": 8,
+    "favorites": 0
+  },
+  "current_collection": {
+    "id": "batch_cd8f7a777e3c4e6885de1cf3162e004c",
+    "status": "running",
+    "processed": 184,
+    "total": 395,
+    "current_leaf": "instant-messaging-application",
+    "prepared": [
+      "instant-messaging-application"
+    ],
+    "resumed_at": "2026-10-23T09:17:38.163054+00:00",
+    "updated_at": "2026-10-23T09:23:31.659497+00:00",
+    "pause_reason": null
+  },
+  "collection_total_types": 100,
+  "collection_note": "The task retained the paused job and did not send a resume request. The stored resumed_at shows it resumed at 17:17:38 during read-only validation; current activity has been preserved.",
+  "screenshots": [
+    "discover-desktop.png",
+    "discover-mobile.png",
+    "favorites-desktop.png",
+    "favorites-mobile.png",
+    "guide-desktop.png",
+    "guide-mobile.png",
+    "history-desktop.png",
+    "history-mobile.png",
+    "home-desktop.png",
+    "home-mobile.png",
+    "live-browser-discover.png",
+    "project-evidence-desktop.png",
+    "project-evidence-mobile.png",
+    "search-desktop.png",
+    "search-mobile.png",
+    "settings-desktop.png",
+    "settings-mobile.png",
+    "type-collection-desktop.png",
+    "type-collection-mobile.png",
+    "type-source-desktop.png",
+    "type-source-mobile.png"
+  ]
+}

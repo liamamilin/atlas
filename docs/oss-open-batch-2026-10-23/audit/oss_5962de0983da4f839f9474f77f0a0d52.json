@@ -1,0 +1,113 @@
+{
+ "schema": "atlas.discovery.v4",
+ "leaf": "password-manager",
+ "run_id": "oss_5962de0983da4f839f9474f77f0a0d52",
+ "source_reads": [
+  {
+   "repository_id": 47782688,
+   "repo": "lesspass/lesspass",
+   "documents": [
+    {
+     "kind": "readme",
+     "url": "https://github.com/lesspass/lesspass/blob/main/README.md",
+     "immutable_url": "https://api.github.com/repos/lesspass/lesspass/git/blobs/d511d2222737a82135ae10d583d3fd5c7b11cbf5",
+     "path": "README.md",
+     "blob_sha": "d511d2222737a82135ae10d583d3fd5c7b11cbf5",
+     "sha256": "01ff5710487ba6762034a8065ae4caf32a21b3a02e8053f584b890727cd12e48",
+     "retrieved_at": "2026-10-23T02:55:47.618802+00:00"
+    }
+   ],
+   "warnings": []
+  },
+  {
+   "repository_id": 248599368,
+   "repo": "apple/password-manager-resources",
+   "documents": [
+    {
+     "kind": "readme",
+     "url": "https://github.com/apple/password-manager-resources/blob/main/README.md",
+     "immutable_url": "https://api.github.com/repos/apple/password-manager-resources/git/blobs/8fe262b8eeeed6b7806c0b5b585a5817ca92dd7f",
+     "path": "README.md",
+     "blob_sha": "8fe262b8eeeed6b7806c0b5b585a5817ca92dd7f",
+     "sha256": "8ef9ada425774e1abf9d438247a72058a946a5fa04878d051f89f26eaa99738d",
+     "retrieved_at": "2026-10-23T04:29:21.541862+00:00"
+    }
+   ],
+   "warnings": []
+  }
+ ],
+ "decisions": [
+  {
+   "repository_id": 47782688,
+   "repo": "lesspass/lesspass",
+   "status": "partial",
+   "reason": "已收录；资料待补充或关联待核实"
+  },
+  {
+   "repository_id": 248599368,
+   "repo": "apple/password-manager-resources",
+   "status": "partial",
+   "reason": "已收录；资料待补充或关联待核实"
+  }
+ ],
+ "searches": [],
+ "selected_ids": [
+  47782688,
+  248599368
+ ],
+ "result": {
+  "id": "oss_5962de0983da4f839f9474f77f0a0d52",
+  "leaf": "password-manager",
+  "status": "completed",
+  "started_at": "2026-10-23T04:29:16.688429+00:00",
+  "created": 2,
+  "updated": 0,
+  "unchanged": 0,
+  "failed": 0,
+  "processed": 2,
+  "errors": [],
+  "mode": "automatic",
+  "phase": "extract",
+  "source_cache_hits": 1,
+  "source_fetches": 1,
+  "document_cache_hits": 0,
+  "document_fetches": 0,
+  "search_requests": 0,
+  "partial": 2,
+  "rejected": 0,
+  "total": 2,
+  "selected_ids": [
+   47782688,
+   248599368
+  ],
+  "discovered": 31,
+  "repository_checks": 2,
+  "model_calls": 1,
+  "model_receipts": [
+   {
+    "stage": "extract_open",
+    "input_sha256": "b10e712c3f53efb3b45c0a8f33aaba5bded299cac8cc91a7f4b94a661468b6ae",
+    "cached": false,
+    "model": "deepseek-flash",
+    "provider": "open-design",
+    "usage": {
+     "prompt_tokens": 4955,
+     "completion_tokens": 3939,
+     "total_tokens": 8894,
+     "cost": null
+    },
+    "created_at": "2026-10-23T04:29:47.838387+00:00"
+   }
+  ],
+  "candidate_counts": {
+   "pending": 0,
+   "accepted": 8,
+   "partial": 22,
+   "rejected": 1,
+   "needs_evidence": 0,
+   "failed": 0
+  },
+  "finished_at": "2026-10-23T04:29:47.899271+00:00",
+  "audit_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/runs/oss_5962de0983da4f839f9474f77f0a0d52.json"
+ }
+}

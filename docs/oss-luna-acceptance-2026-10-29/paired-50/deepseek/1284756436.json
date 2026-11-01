@@ -1,0 +1,82 @@
+{
+ "repository_id": 1284756436,
+ "domain": "07",
+ "input_sha256": "6768ddbd4c1fb7f2ba8644ad30014adc0c06857efb831d0c99e9b0c5a043c08d",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:13.377400+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-d90fbd992745-12f871",
+ "usage": {
+  "prompt_tokens": 2419,
+  "completion_tokens": 458,
+  "total_tokens": 2877,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00056239,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00056239,
+   "tokens": {
+    "input": 1907,
+    "output": 458,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1284756436,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体保守：定位与范围有 README 和仓库描述支持，许可标为 pending 合理，两个场景均标 unverified 并列出待核实条件，未把描述中的功能写成已实现。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"positioning\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"AI 驱动的 LPG 客户投诉处理门户演示应用，基于 AI Studio 模板。\",\"source_id\":\"s0\",\"quote\":\"This contains everything you need to run your app locally.\",\"reason\":\"README 仅说明这是 AI Studio 应用的本地运行步骤，未直接说明其为“投诉处理门户演示应用”；该定位主要来自仓库描述（s1），措辞可更明确区分描述与 README 证据。\",\"suggested_correction\":\"注明定位依据为仓库描述，README 仅提供运行说明。\"},{\"field\":\"scope\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"仅可确认是需 Gemini API 密钥的本地演示应用；实际投诉流程、时限与升级机制未知。\",\"source_id\":\"s0\",\"quote\":\"Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key\",\"reason\":\"该范围表述与 README 一致且已如实标注未知项，但“演示应用”一词在 README 中无直接文字，属推断。\",\"suggested_correction\":\"保留未知项说明，将“演示应用”改为“AI Studio 应用（演示性质未在 README 明示）”。\"}],\"limitations\":[\"仅 1 个 README 文件与 1 条仓库元数据可用，未包含源码、功能文档或流程说明。\",\"许可状态为 pending，未做许可全文核验，不能据此判定开源授权。\",\"两个场景匹配均为 unverified，缺少投诉记录、时限时钟与升级路径配置的直接证据。\"]}",
+ "review": {
+  "repository_id": 1284756436,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体保守：定位与范围有 README 和仓库描述支持，许可标为 pending 合理，两个场景均标 unverified 并列出待核实条件，未把描述中的功能写成已实现。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "positioning",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "AI 驱动的 LPG 客户投诉处理门户演示应用，基于 AI Studio 模板。",
+    "source_id": "s0",
+    "quote": "This contains everything you need to run your app locally.",
+    "reason": "README 仅说明这是 AI Studio 应用的本地运行步骤，未直接说明其为“投诉处理门户演示应用”；该定位主要来自仓库描述（s1），措辞可更明确区分描述与 README 证据。",
+    "suggested_correction": "注明定位依据为仓库描述，README 仅提供运行说明。"
+   },
+   {
+    "field": "scope",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "仅可确认是需 Gemini API 密钥的本地演示应用；实际投诉流程、时限与升级机制未知。",
+    "source_id": "s0",
+    "quote": "Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key",
+    "reason": "该范围表述与 README 一致且已如实标注未知项，但“演示应用”一词在 README 中无直接文字，属推断。",
+    "suggested_correction": "保留未知项说明，将“演示应用”改为“AI Studio 应用（演示性质未在 README 明示）”。"
+   }
+  ],
+  "limitations": [
+   "仅 1 个 README 文件与 1 条仓库元数据可用，未包含源码、功能文档或流程说明。",
+   "许可状态为 pending，未做许可全文核验，不能据此判定开源授权。",
+   "两个场景匹配均为 unverified，缺少投诉记录、时限时钟与升级路径配置的直接证据。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:11:21.853614+00:00",
+ "elapsed_seconds": 8.476
+}

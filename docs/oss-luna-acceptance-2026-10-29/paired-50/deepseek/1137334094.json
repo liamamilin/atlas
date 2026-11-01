@@ -1,0 +1,60 @@
+{
+ "repository_id": 1137334094,
+ "domain": "22",
+ "input_sha256": "def6384490381303add6968141aa584fa47040800c823d4303aeaf727ef7af81",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:12:19.285335+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-dda4d3d2f9ac-dc2d0",
+ "usage": {
+  "prompt_tokens": 1539,
+  "completion_tokens": 179,
+  "total_tokens": 1718,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00026299,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00026299,
+   "tokens": {
+    "input": 1027,
+    "output": 179,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":1137334094,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体保守：仅依据 GitHub 元数据确认仓库公开存在，定位、范围、功能均标为待补充，许可为 pending，场景标为 unverified，未发现无来源支持的功能或过度断言。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"仅有 GitHub 元数据（s0），无 README、源码或文档，无法核实项目功能、定位与适用范围\",\"仓库描述为 null、topics 为空，项目类型只能保持 unknown\",\"未发现许可证文件，许可状态 pending 属保守标注，未做全文核验\",\"场景匹配仅凭仓库名称推断，applicability 已如实标为 unverified\"]}",
+ "review": {
+  "repository_id": 1137334094,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体保守：仅依据 GitHub 元数据确认仓库公开存在，定位、范围、功能均标为待补充，许可为 pending，场景标为 unverified，未发现无来源支持的功能或过度断言。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "仅有 GitHub 元数据（s0），无 README、源码或文档，无法核实项目功能、定位与适用范围",
+   "仓库描述为 null、topics 为空，项目类型只能保持 unknown",
+   "未发现许可证文件，许可状态 pending 属保守标注，未做全文核验",
+   "场景匹配仅凭仓库名称推断，applicability 已如实标为 unverified"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:12:23.640243+00:00",
+ "elapsed_seconds": 4.354
+}

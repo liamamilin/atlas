@@ -1,0 +1,93 @@
+{
+ "repository_id": 865480664,
+ "domain": "14",
+ "input_sha256": "82b3836382d3a1a629a0787ca95c57d7f6896d792b7fefd6a6199547b1a92c58",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:50.649894+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-dda4d3d2f9ac-dbaa1",
+ "usage": {
+  "prompt_tokens": 2314,
+  "completion_tokens": 714,
+  "total_tokens": 3028,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00070024,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00070024,
+   "tokens": {
+    "input": 1802,
+    "output": 714,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":865480664,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体保守：项目类型标为 unknown、范围标为未知、功能为空，与仅有的 README 和元数据相符；MIT 许可有 LICENSE 全文支持。定位与摘要中的“协作设计、构建、发布与同行评审”来自 README 的目标表述，但 README 未说明这些能力已实现，卡片也未声称已实现，可保留但宜注明为目标。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"positioning\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"名为 burga 的 Lean-Agile 平台项目，目标为协作设计、构建、发布与同行评审。\",\"source_id\":\"s0\",\"quote\":\"The objective of \\\"burga\\\" product is to produce a Lean Agile platform. This platform could help us to collaborative design, build, releas and peer team review engagements.\",\"reason\":\"README 用 objective/could help 表述愿景，未说明平台已具备这些能力；卡片措辞基本保留“目标”限定，但“平台项目”易被读作已成型产品，且 positioning_evidence.excerpt 为空。\",\"suggested_correction\":\"改为“README 称其目标为构建 Lean-Agile 平台，用于协作设计、构建、发布与同行评审；未说明实现状态”，并补上实际引文。\"},{\"field\":\"summary\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"README 仅说明其为基于 Lean-Agile 原则的个人项目，含大量 AI 生成代码，未提供具体功能、部署或容量管理实现细节。\",\"source_id\":\"s2\",\"quote\":\"Handle measurement and forecasting of capacity planning of your scrum team over Increment and sprints\",\"reason\":\"GitHub 元数据描述提到容量规划与预测，卡片摘要称“未提供……容量管理实现细节”尚可，但完全未提及该元数据描述，信息覆盖不完整；summary_evidence.excerpt 也为空。\",\"suggested_correction\":\"在摘要中补充“仓库描述称用于 Scrum 团队跨增量与冲刺的容量规划测量与预测，但 README 未给出实现细节”。\"},{\"field\":\"scope\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"未知。\",\"source_id\":\"s0\",\"quote\":\"This platform is built based on the Lean-Agile principles.\",\"reason\":\"范围标为未知属保守可接受，但 README 与元数据已给出可引用的范围线索（Lean-Agile 平台、容量规划预测），scope_evidence.excerpt 为空，未体现已有证据。\",\"suggested_correction\":\"保留“范围未明确”，同时引用 README 目标句与元数据描述作为有限范围线索。\"}],\"limitations\":[\"仅提供 README、LICENSE 与 GitHub 元数据，共 2 个文件，无源码或文档，无法核验功能实现、依赖或部署情况。\",\"无场景关联（scenario_matches 为空），无法评估场景相关性。\",\"许可仅按卡片所述确定性核验结果采信，本次未做全文比对。\"]}",
+ "review": {
+  "repository_id": 865480664,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体保守：项目类型标为 unknown、范围标为未知、功能为空，与仅有的 README 和元数据相符；MIT 许可有 LICENSE 全文支持。定位与摘要中的“协作设计、构建、发布与同行评审”来自 README 的目标表述，但 README 未说明这些能力已实现，卡片也未声称已实现，可保留但宜注明为目标。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "positioning",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "名为 burga 的 Lean-Agile 平台项目，目标为协作设计、构建、发布与同行评审。",
+    "source_id": "s0",
+    "quote": "The objective of \"burga\" product is to produce a Lean Agile platform. This platform could help us to collaborative design, build, releas and peer team review engagements.",
+    "reason": "README 用 objective/could help 表述愿景，未说明平台已具备这些能力；卡片措辞基本保留“目标”限定，但“平台项目”易被读作已成型产品，且 positioning_evidence.excerpt 为空。",
+    "suggested_correction": "改为“README 称其目标为构建 Lean-Agile 平台，用于协作设计、构建、发布与同行评审；未说明实现状态”，并补上实际引文。"
+   },
+   {
+    "field": "summary",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "README 仅说明其为基于 Lean-Agile 原则的个人项目，含大量 AI 生成代码，未提供具体功能、部署或容量管理实现细节。",
+    "source_id": "s2",
+    "quote": "Handle measurement and forecasting of capacity planning of your scrum team over Increment and sprints",
+    "reason": "GitHub 元数据描述提到容量规划与预测，卡片摘要称“未提供……容量管理实现细节”尚可，但完全未提及该元数据描述，信息覆盖不完整；summary_evidence.excerpt 也为空。",
+    "suggested_correction": "在摘要中补充“仓库描述称用于 Scrum 团队跨增量与冲刺的容量规划测量与预测，但 README 未给出实现细节”。"
+   },
+   {
+    "field": "scope",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "未知。",
+    "source_id": "s0",
+    "quote": "This platform is built based on the Lean-Agile principles.",
+    "reason": "范围标为未知属保守可接受，但 README 与元数据已给出可引用的范围线索（Lean-Agile 平台、容量规划预测），scope_evidence.excerpt 为空，未体现已有证据。",
+    "suggested_correction": "保留“范围未明确”，同时引用 README 目标句与元数据描述作为有限范围线索。"
+   }
+  ],
+  "limitations": [
+   "仅提供 README、LICENSE 与 GitHub 元数据，共 2 个文件，无源码或文档，无法核验功能实现、依赖或部署情况。",
+   "无场景关联（scenario_matches 为空），无法评估场景相关性。",
+   "许可仅按卡片所述确定性核验结果采信，本次未做全文比对。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:12:00.240951+00:00",
+ "elapsed_seconds": 9.591
+}

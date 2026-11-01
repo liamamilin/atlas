@@ -1,0 +1,28 @@
+{
+  "checked_at": "2026-10-26T05:09:29.189286+00:00",
+  "job_id": "batch_4812ef3db57543c3acc1871b8ea5ba6e",
+  "affected_leaf": "data-management-platform-dmp",
+  "cause": "GitHub permits pushed_at=null; ranking assumed a string and raised AttributeError before freezing the leaf queue",
+  "normal_supervisor_retried_but_same_input_failed": true,
+  "fix": "Unknown/malformed/missing push time contributes zero activity; candidates retained",
+  "first_round_tests": 12,
+  "all_oss_tests": 98,
+  "actual_candidate_replay": {
+    "null_push_time_candidates": 1,
+    "selected": 60,
+    "passed": true
+  },
+  "api_restarted": false,
+  "api_pid_unchanged": 45453,
+  "existing_job_worker_pid": 60126,
+  "execution": "Existing BatchJobs.resume using current code, original database and exclusive update lock; no new job or service",
+  "actual_resume_proof": {
+    "at": "2026-10-26T05:09:36.233099+00:00",
+    "processed_before": 240,
+    "processed_after": 256,
+    "current_leaf": "data-management-platform-dmp",
+    "model_workers": 4,
+    "lock_owner_pid": 60126,
+    "api_pid_still": 45453
+  }
+}

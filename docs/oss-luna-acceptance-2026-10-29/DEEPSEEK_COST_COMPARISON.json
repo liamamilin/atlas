@@ -1,0 +1,47 @@
+{
+  "estimated_at": "2026-10-29T04:46:27.000781+00:00",
+  "purpose": "Price comparison only; no new model requests or route changes",
+  "basis_summary_path": "/Users/milin/2026/软件开发/application-atlas/docs/oss-luna-acceptance-2026-10-29/SUMMARY.json",
+  "basis_summary_sha256": "f83b9578dfdec8a7a75f6ffc0c5ab5d59b6f8f6e2cd2cf2a811fdbf43b6ecd18",
+  "projected_input_tokens": 236589669.08333337,
+  "projected_output_tokens": 17935524.08333333,
+  "scenarios": [
+    {
+      "route": "OpenAI Luna standard",
+      "usd_per_million_input_uncached": 0.1,
+      "usd_per_million_output": 0.5,
+      "100_sample_token_equivalent_usd": 0.059011600000000004,
+      "projected_55651_project_usd": 32.62672895,
+      "with_25_percent_allowance_usd": 40.7834111875
+    },
+    {
+      "route": "DeepSeek V4.1 Flash off-peak",
+      "usd_per_million_input_uncached": 0.15,
+      "usd_per_million_output": 0.6,
+      "100_sample_token_equivalent_usd": 0.083655,
+      "projected_55651_project_usd": 46.2497648125,
+      "with_25_percent_allowance_usd": 57.812206015624994
+    },
+    {
+      "route": "DeepSeek V4.1 Flash peak",
+      "usd_per_million_input_uncached": 0.3,
+      "usd_per_million_output": 1.2,
+      "100_sample_token_equivalent_usd": 0.16731,
+      "projected_55651_project_usd": 92.499529625,
+      "with_25_percent_allowance_usd": 115.62441203124999
+    }
+  ],
+  "official_sources": {
+    "deepseek": "https://api-docs.deepseek.com/quick_start/pricing/",
+    "openai": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+    "opencode_go": "https://opencode.ai/v2/docs/console/go/",
+    "open_design": "https://open-design.ai/pricing/"
+  },
+  "assumptions": [
+    "Reuses Luna token counts for comparable costing; DeepSeek tokenization, output length, retry rate and audit quality are not measured.",
+    "No cache hits assumed. Same bounded evidence package and non-thinking review as pilot.",
+    "DeepSeek peak hours Monday-Friday 09:00-12:00 and14:00-18:00 Asia/Shanghai, except Chinese public holidays; other periods off-peak.",
+    "Official direct-API price is not an OpenDesign or Go subscription cash invoice. Remaining account allowance has not been inspected.",
+    "No new paid model requests made; no production catalog, settings or services changed."
+  ]
+}

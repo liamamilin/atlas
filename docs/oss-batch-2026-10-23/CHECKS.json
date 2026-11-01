@@ -1,0 +1,28 @@
+{
+  "backend": {
+    "command": "python3 -m unittest discover -s application-atlas-production-pack/tests -p 'test_oss*.py' -v",
+    "passed": 22
+  },
+  "frontend": {
+    "command": "npm test",
+    "passed": 9
+  },
+  "browser": {
+    "command": "npm run test:e2e:catalog",
+    "passed": 10
+  },
+  "typecheck": {
+    "command": "npm run typecheck",
+    "exit_code": 0
+  },
+  "build": {
+    "command": "npm run build",
+    "exit_code": 0
+  },
+  "ruff": {
+    "status": "passed"
+  },
+  "published_projects": 15,
+  "source_quotes_checked": 66,
+  "scope_decision": "keep_three_leaf_trial_do_not_expand"
+}

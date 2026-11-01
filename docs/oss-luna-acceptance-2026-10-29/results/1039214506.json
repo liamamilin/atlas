@@ -1,0 +1,62 @@
+{
+ "repository_id": 1039214506,
+ "domain": "14",
+ "input_sha256": "7ddc8a3d48a0e2f5a1ce164e16999affa5c8da13fc84b37576b48e46866a6fc7",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:23.086741+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCD6Dd3kYZuGmAkagbOOEwrIZRqQ",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 2813,
+  "completion_tokens": 426,
+  "total_tokens": 3239,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 2810,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0004943,
+ "response_text": "{\n  \"repository_id\": 1039214506,\n  \"verdict\": \"pass_with_limits\",\n  \"summary\": \"卡片对工具的基础功能和未核验许可证状态描述基本有据；场景匹配均标为 conditional，但网络监控场景与其单次主机检查能力差距较大，建议进一步收窄。\",\n  \"checks\": {\n    \"facts\": \"supported\",\n    \"project_type\": \"supported\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"limited\"\n  },\n  \"issues\": [\n    {\n      \"field\": \"scenario_match\",\n      \"scenario_id\": \"auto-network-monitoring-8cb0fc09fa\",\n      \"severity\": \"minor\",\n      \"kind\": \"irrelevant_scenario\",\n      \"claim\": \"可对相关主机做延迟与 DNS 检查，辅助判断网络侧问题\",\n      \"source_id\": \"s0\",\n      \"quote\": \"Ping test for each host (latency in ms)\",\n      \"reason\": \"来源支持逐主机 ping 延迟和 DNS 检查，但场景描述要求调取接口流量、延迟与丢包历史，并定位具体链路或跳点。卡片已注明单次快照、无历史与告警，仍不足以覆盖该场景的核心排查需求。\",\n      \"suggested_correction\": \"将该匹配限定为对预先列出的主机做一次性连通性辅助检查，并明确不支持接口流量、历史趋势或链路定位；若场景要求这些能力，可移除此匹配。\"\n    }\n  ],\n  \"limitations\": [\n    \"仅提供 README 与 GitHub 元数据，未提供源码；功能实现细节无法独立核验。\",\n    \"README 标注 MIT，但仓库元数据未检测到许可证文件；卡片将许可证标为 pending，未将 README 标注提升为全仓库许可证核验。\"\n  ]\n}",
+ "review": {
+  "repository_id": 1039214506,
+  "verdict": "pass_with_limits",
+  "summary": "卡片对工具的基础功能和未核验许可证状态描述基本有据；场景匹配均标为 conditional，但网络监控场景与其单次主机检查能力差距较大，建议进一步收窄。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-network-monitoring-8cb0fc09fa",
+    "severity": "minor",
+    "kind": "irrelevant_scenario",
+    "claim": "可对相关主机做延迟与 DNS 检查，辅助判断网络侧问题",
+    "source_id": "s0",
+    "quote": "Ping test for each host (latency in ms)",
+    "reason": "来源支持逐主机 ping 延迟和 DNS 检查，但场景描述要求调取接口流量、延迟与丢包历史，并定位具体链路或跳点。卡片已注明单次快照、无历史与告警，仍不足以覆盖该场景的核心排查需求。",
+    "suggested_correction": "将该匹配限定为对预先列出的主机做一次性连通性辅助检查，并明确不支持接口流量、历史趋势或链路定位；若场景要求这些能力，可移除此匹配。"
+   }
+  ],
+  "limitations": [
+   "仅提供 README 与 GitHub 元数据，未提供源码；功能实现细节无法独立核验。",
+   "README 标注 MIT，但仓库元数据未检测到许可证文件；卡片将许可证标为 pending，未将 README 标注提升为全仓库许可证核验。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:28.836356+00:00",
+ "elapsed_seconds": 5.75
+}

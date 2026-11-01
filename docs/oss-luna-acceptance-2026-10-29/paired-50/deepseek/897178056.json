@@ -1,0 +1,82 @@
+{
+ "repository_id": 897178056,
+ "domain": "22",
+ "input_sha256": "7f9499c041d03489d4b70b774dd5b33ccf13ffe08aff17e23589698c00c1edf5",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:12:18.382739+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-d90fbd992745-130b54",
+ "usage": {
+  "prompt_tokens": 2885,
+  "completion_tokens": 439,
+  "total_tokens": 3324,
+  "prompt_tokens_details": {
+   "cached_tokens": 512
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.00062089,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.00062089,
+   "tokens": {
+    "input": 2373,
+    "output": 439,
+    "reasoning": 0,
+    "cache_read": 512,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":897178056,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片将仓库定位为PHP客户端SDK，功能与README示例一致，场景匹配标为conditional并写明外部API依赖，许可保持pending，整体保守合理。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-electronic-prescribing-bdf28f46e4\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"提供创建处方接口，可提交患者与药品明细，但电子发送至药房依赖外部API，资料未说明。\",\"source_id\":\"s0\",\"quote\":\"$obj->createRxinfo([\",\"reason\":\"README仅展示createRxinfo提交患者与药品JSON，未出现签名、药房选择或电子发送字段；卡片已如实标注依赖外部API且资料未说明，属已标缺项，但场景描述中的签名与药房发送能力无来源支持，应更明确标为未覆盖。\",\"suggested_correction\":\"在conditions中明确“签名与药房电子发送能力未在README中体现，需另行确认”。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"查询处方信息分页\",\"source_id\":\"s0\",\"quote\":\"$a= $obj->queryRxInfoHisPage();\",\"reason\":\"README仅给出方法调用示例，未说明分页参数或返回结构；功能名可保留，但“分页”细节仅有方法名暗示，证据有限。\",\"suggested_correction\":\"改为“调用queryRxInfoHisPage查询处方信息（分页语义仅由方法名体现）”。\"}],\"limitations\":[\"仅1个README与1条GitHub元数据，无源码文件，无法核验实现细节与依赖。\",\"许可状态为pending，未做许可全文比对。\",\"README为示例代码，未说明API返回、错误处理与药房对接流程。\"]}",
+ "review": {
+  "repository_id": 897178056,
+  "verdict": "pass_with_limits",
+  "summary": "卡片将仓库定位为PHP客户端SDK，功能与README示例一致，场景匹配标为conditional并写明外部API依赖，许可保持pending，整体保守合理。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-electronic-prescribing-bdf28f46e4",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "提供创建处方接口，可提交患者与药品明细，但电子发送至药房依赖外部API，资料未说明。",
+    "source_id": "s0",
+    "quote": "$obj->createRxinfo([",
+    "reason": "README仅展示createRxinfo提交患者与药品JSON，未出现签名、药房选择或电子发送字段；卡片已如实标注依赖外部API且资料未说明，属已标缺项，但场景描述中的签名与药房发送能力无来源支持，应更明确标为未覆盖。",
+    "suggested_correction": "在conditions中明确“签名与药房电子发送能力未在README中体现，需另行确认”。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "查询处方信息分页",
+    "source_id": "s0",
+    "quote": "$a= $obj->queryRxInfoHisPage();",
+    "reason": "README仅给出方法调用示例，未说明分页参数或返回结构；功能名可保留，但“分页”细节仅有方法名暗示，证据有限。",
+    "suggested_correction": "改为“调用queryRxInfoHisPage查询处方信息（分页语义仅由方法名体现）”。"
+   }
+  ],
+  "limitations": [
+   "仅1个README与1条GitHub元数据，无源码文件，无法核验实现细节与依赖。",
+   "许可状态为pending，未做许可全文比对。",
+   "README为示例代码，未说明API返回、错误处理与药房对接流程。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T05:12:25.575578+00:00",
+ "elapsed_seconds": 7.192
+}

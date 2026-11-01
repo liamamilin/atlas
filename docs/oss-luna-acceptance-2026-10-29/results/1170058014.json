@@ -1,0 +1,78 @@
+{
+ "repository_id": 1170058014,
+ "domain": "24",
+ "input_sha256": "253fc91905d678be6423ff738142dc5870fdbfecd875e7e8f3cd7bf75016a721",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:08.484463+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDruerr11JVEKUT52C9kRSZVuli",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 14929,
+  "completion_tokens": 496,
+  "total_tokens": 15425,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 14926,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0017409,
+ "response_text": "{\"repository_id\":1170058014,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片总体有来源支持，项目是内部EHS应用，且许可证保守标为待核验；场景均标为 unverified 并说明了不匹配处。需收紧一处把配置后同步描述为现成能力的措辞，并注意文档存在截断及明确列出的后续实现项。\",\"checks\":{\"facts\":\"limited\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[{\"field\":\"summary\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"记录同步至Notion\",\"source_id\":\"s0\",\"quote\":\"Notion sync, email, Slack, and AI features degrade gracefully when their environment variables are absent.\",\"reason\":\"Notion同步依赖配置；卡片虽注明依赖外部SaaS与配置，但摘要中的同步表述未带条件，容易被理解为开箱即用。\",\"suggested_correction\":\"改为“配置Notion后可同步记录”，并保留无应用数据库、依赖外部服务的说明。\"},{\"field\":\"features\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"roadmap_as_fact\",\"claim\":\"离线优先，记录本地存储并同步Notion\",\"source_id\":\"s3\",\"quote\":\"My follow-up code changes (once the schema exists):\\n1. Expand the sync mapper to populate the ⏳ columns (email, dates, counts, etc.).\\n2. Upload signature/photo blobs to Vercel Blob on save and attach the URLs to the\\n   Notion `Signatures` / `Photos` columns — so the signed artifact lives off-device.\",\"reason\":\"基础记录同步有文档支持，但部分字段映射及签名/照片上传明确列为后续代码变更；当前特征概括未区分已实现与待补部分。\",\"suggested_correction\":\"注明Notion同步需配置，且签名/照片云端上传及部分字段映射仍待后续实现。\"}],\"limitations\":[\"README来源s0完整；文档s2被截断，不能据此核验其全文。\",\"本次仅按提供的来源审查语义与标签，未执行代码或联网验证实际部署状态。\"]}",
+ "review": {
+  "repository_id": 1170058014,
+  "verdict": "pass_with_limits",
+  "summary": "卡片总体有来源支持，项目是内部EHS应用，且许可证保守标为待核验；场景均标为 unverified 并说明了不匹配处。需收紧一处把配置后同步描述为现成能力的措辞，并注意文档存在截断及明确列出的后续实现项。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [
+   {
+    "field": "summary",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "记录同步至Notion",
+    "source_id": "s0",
+    "quote": "Notion sync, email, Slack, and AI features degrade gracefully when their environment variables are absent.",
+    "reason": "Notion同步依赖配置；卡片虽注明依赖外部SaaS与配置，但摘要中的同步表述未带条件，容易被理解为开箱即用。",
+    "suggested_correction": "改为“配置Notion后可同步记录”，并保留无应用数据库、依赖外部服务的说明。"
+   },
+   {
+    "field": "features",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "roadmap_as_fact",
+    "claim": "离线优先，记录本地存储并同步Notion",
+    "source_id": "s3",
+    "quote": "My follow-up code changes (once the schema exists):\n1. Expand the sync mapper to populate the ⏳ columns (email, dates, counts, etc.).\n2. Upload signature/photo blobs to Vercel Blob on save and attach the URLs to the\n   Notion `Signatures` / `Photos` columns — so the signed artifact lives off-device.",
+    "reason": "基础记录同步有文档支持，但部分字段映射及签名/照片上传明确列为后续代码变更；当前特征概括未区分已实现与待补部分。",
+    "suggested_correction": "注明Notion同步需配置，且签名/照片云端上传及部分字段映射仍待后续实现。"
+   }
+  ],
+  "limitations": [
+   "README来源s0完整；文档s2被截断，不能据此核验其全文。",
+   "本次仅按提供的来源审查语义与标签，未执行代码或联网验证实际部署状态。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 1,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T04:40:16.201793+00:00",
+ "elapsed_seconds": 7.717
+}

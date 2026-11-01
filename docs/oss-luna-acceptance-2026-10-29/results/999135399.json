@@ -1,0 +1,85 @@
+{
+ "repository_id": 999135399,
+ "domain": "11",
+ "input_sha256": "1f7b54547d8b2b8a33cb23974c2ac0e214bed91dca2cd96295cbcb4e1dccdc16",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:00.060313+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCCkHBq5BZfz8YQlS6oaEOCnDWUs",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 4187,
+  "completion_tokens": 865,
+  "total_tokens": 5052,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 4184,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0008512000000000001,
+ "response_text": "{\n  \"repository_id\": 999135399,\n  \"verdict\": \"needs_review\",\n  \"summary\": \"README 支持该项目定位为 Stacks/Clarity 智能合约项目，并列出五类合约及相关功能；但现有材料只有 README 和元数据，无法核实这些功能是否已实现。卡片将其标为完整应用类型且把 README 的 MIT 声明与待核验许可并列，需收紧或复核。场景匹配有条件且相关，但报告能力应保持条件性。\",\n  \"checks\": {\n    \"facts\": \"limited\",\n    \"project_type\": \"issue\",\n    \"license_label\": \"supported\",\n    \"scenario_matches\": \"limited\"\n  },\n  \"issues\": [\n    {\n      \"field\": \"summary\",\n      \"scenario_id\": \"\",\n      \"severity\": \"minor\",\n      \"kind\": \"insufficient_evidence\",\n      \"claim\": \"包含部门验证、资产清单、估值管理、策略制定与竞争分析五类合约\",\n      \"source_id\": \"s0\",\n      \"quote\": \"## Smart Contracts\\n\\n### 1. IP Department Verification (`ip-department-verification.clar`)\",\n      \"reason\": \"README 确实列出五类合约及功能，但提供的材料没有合约源码，不能据此确认这些功能已实现；卡片的“包含”容易被理解为已实现。\",\n      \"suggested_correction\": \"改为“README 描述了五类合约及其预期功能；本次材料未包含源码，未核实实现情况”。\"\n    },\n    {\n      \"field\": \"project_type\",\n      \"scenario_id\": \"\",\n      \"severity\": \"major\",\n      \"kind\": \"insufficient_evidence\",\n      \"claim\": \"application\",\n      \"source_id\": \"s0\",\n      \"quote\": \"A comprehensive smart contract system for managing intellectual property portfolios on the blockchain, built with Clarity for the Stacks blockchain.\",\n      \"reason\": \"README 将其描述为智能合约系统，但现有材料没有源码或其他证据证明它是完整可用的应用。仅凭 README 的概述不足以确认 application 类型。\",\n      \"suggested_correction\": \"在实现情况未核实前，改标为智能合约项目/系统，或将项目类型标为待核验。\"\n    },\n    {\n      \"field\": \"scenario_match\",\n      \"scenario_id\": \"auto-intellectual-property-management-f4675590fc\",\n      \"severity\": \"minor\",\n      \"kind\": \"missing_condition\",\n      \"claim\": \"可记录资产状态与估值，但高级分析与报告在路线图中未完成\",\n      \"source_id\": \"s0\",\n      \"quote\": \"- [ ] Advanced analytics and reporting\",\n      \"reason\": \"场景要求按业务单元汇总在审与已授权专利的状态和费用，并导出定期报告。README 提到资产状态和估值数据，但没有说明按业务单元汇总、费用汇总或报告导出已具备；卡片的条件列提到自行实现汇总与导出，方向合理，但适用性应明确受这些缺项限制。\",\n      \"suggested_correction\": \"保留 conditional，并明确该项目仅可能支持资产状态与估值记录；业务单元汇总、费用汇总及报告导出需另行实现或核实。\"\n    }\n  ],\n  \"limitations\": [\n    \"材料仅含一份未截断的 README 和 GitHub 元数据，没有合约源码、测试文件或部署验证；README 中的功能描述不能视为实现已核实。\",\n    \"README 声称 MIT 许可，但卡片将许可状态标为 pending 且未发现许可证文件；保守的 pending 标签可保留，本次不据 README 声明提升为已核验许可。\",\n    \"场景匹配仅能依据 README 的描述判断，不能验证实际合约行为或报告能力。\"\n  ]\n}",
+ "review": {
+  "repository_id": 999135399,
+  "verdict": "needs_review",
+  "summary": "README 支持该项目定位为 Stacks/Clarity 智能合约项目，并列出五类合约及相关功能；但现有材料只有 README 和元数据，无法核实这些功能是否已实现。卡片将其标为完整应用类型且把 README 的 MIT 声明与待核验许可并列，需收紧或复核。场景匹配有条件且相关，但报告能力应保持条件性。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "issue",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "summary",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "包含部门验证、资产清单、估值管理、策略制定与竞争分析五类合约",
+    "source_id": "s0",
+    "quote": "## Smart Contracts\n\n### 1. IP Department Verification (`ip-department-verification.clar`)",
+    "reason": "README 确实列出五类合约及功能，但提供的材料没有合约源码，不能据此确认这些功能已实现；卡片的“包含”容易被理解为已实现。",
+    "suggested_correction": "改为“README 描述了五类合约及其预期功能；本次材料未包含源码，未核实实现情况”。"
+   },
+   {
+    "field": "project_type",
+    "scenario_id": "",
+    "severity": "major",
+    "kind": "insufficient_evidence",
+    "claim": "application",
+    "source_id": "s0",
+    "quote": "A comprehensive smart contract system for managing intellectual property portfolios on the blockchain, built with Clarity for the Stacks blockchain.",
+    "reason": "README 将其描述为智能合约系统，但现有材料没有源码或其他证据证明它是完整可用的应用。仅凭 README 的概述不足以确认 application 类型。",
+    "suggested_correction": "在实现情况未核实前，改标为智能合约项目/系统，或将项目类型标为待核验。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-intellectual-property-management-f4675590fc",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "可记录资产状态与估值，但高级分析与报告在路线图中未完成",
+    "source_id": "s0",
+    "quote": "- [ ] Advanced analytics and reporting",
+    "reason": "场景要求按业务单元汇总在审与已授权专利的状态和费用，并导出定期报告。README 提到资产状态和估值数据，但没有说明按业务单元汇总、费用汇总或报告导出已具备；卡片的条件列提到自行实现汇总与导出，方向合理，但适用性应明确受这些缺项限制。",
+    "suggested_correction": "保留 conditional，并明确该项目仅可能支持资产状态与估值记录；业务单元汇总、费用汇总及报告导出需另行实现或核实。"
+   }
+  ],
+  "limitations": [
+   "材料仅含一份未截断的 README 和 GitHub 元数据，没有合约源码、测试文件或部署验证；README 中的功能描述不能视为实现已核实。",
+   "README 声称 MIT 许可，但卡片将许可状态标为 pending 且未发现许可证文件；保守的 pending 标签可保留，本次不据 README 声明提升为已核验许可。",
+   "场景匹配仅能依据 README 的描述判断，不能验证实际合约行为或报告能力。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:10.349101+00:00",
+ "elapsed_seconds": 10.289
+}

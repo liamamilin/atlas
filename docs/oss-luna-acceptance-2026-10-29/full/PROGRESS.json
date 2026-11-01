@@ -1,0 +1,51 @@
+{
+ "audit_id": "atlas-semantic-55651-2026-10-29",
+ "at": "2026-10-30T16:33:46.471564+00:00",
+ "pid": 78600,
+ "status": "completed",
+ "phase": "export",
+ "reason": null,
+ "next_retry_at": null,
+ "started_at": "2026-10-30T16:26:22.636396+00:00",
+ "projects": 55651,
+ "primary": {
+  "done": 55650,
+  "failed": 1
+ },
+ "secondary": {
+  "done": 7348,
+  "failed": 59,
+  "none": 48244
+ },
+ "outcomes": {
+  "cross_review_dismissed": 2985,
+  "cross_review_issue_candidate": 3955,
+  "cross_review_unresolved": 380,
+  "legacy_independent_cross_review": 28,
+  "pass": 1534,
+  "pass_with_limits": 46710,
+  "unresolved_secondary_failure": 59
+ },
+ "new_requests": {
+  "openai": 55609,
+  "opencode-go": 7564
+ },
+ "request_errors": {
+  "historical_402_no_usage": 1,
+  "invalid_model_response": 252,
+  "provider_error": 1,
+  "timeout": 1,
+  "unreachable": 43
+ },
+ "budget": {
+  "cap_usd": 50,
+  "estimated_cost_usd": 46.03506,
+  "charged_upper_usd": 46.045201,
+  "inflight_or_uncertain_reserved_usd": 0.216465,
+  "available_usd": 3.738334,
+  "historical_pilots_included": true
+ },
+ "production_writes": false,
+ "api_restarted": false,
+ "source_collection_started": false
+}

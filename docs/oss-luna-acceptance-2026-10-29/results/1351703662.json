@@ -1,0 +1,51 @@
+{
+ "repository_id": 1351703662,
+ "domain": "12",
+ "input_sha256": "236e9b236d9b696996b63723fb724572ba9143737255308d3fba27b8405a8a86",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:07.913011+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCCrHFV0cl7K2T7rjTHbSxcFha5i",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 1536,
+  "completion_tokens": 176,
+  "total_tokens": 1712,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 1533,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.00024160000000000002,
+ "response_text": "{\"repository_id\":1351703662,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片如实保留了项目定位、功能和许可信息不足的限制；场景仅标为未验证，未将其描述为已确认适用。\",\"checks\":{\"facts\":\"limited\",\"project_type\":\"limited\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[],\"limitations\":[\"仅提供一条 GitHub 元数据来源，描述在“each source file's”处截断；无法核实完整功能、项目类型细节或实际可用性。\",\"仓库文件不可用（files_available 为 0），本次不能据此验证 README、源码或完整许可信息。\",\"场景匹配为 inferred 且 applicability 标为 unverified；只能视为待复核线索。\"]}",
+ "review": {
+  "repository_id": 1351703662,
+  "verdict": "pass_with_limits",
+  "summary": "卡片如实保留了项目定位、功能和许可信息不足的限制；场景仅标为未验证，未将其描述为已确认适用。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "limited",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [],
+  "limitations": [
+   "仅提供一条 GitHub 元数据来源，描述在“each source file's”处截断；无法核实完整功能、项目类型细节或实际可用性。",
+   "仓库文件不可用（files_available 为 0），本次不能据此验证 README、源码或完整许可信息。",
+   "场景匹配为 inferred 且 applicability 标为 unverified；只能视为待复核线索。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:39:12.060418+00:00",
+ "elapsed_seconds": 4.147
+}

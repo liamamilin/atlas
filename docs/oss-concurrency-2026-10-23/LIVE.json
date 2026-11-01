@@ -1,0 +1,161 @@
+{
+  "checked_at": "2026-10-23T12:05:36.615580+00:00",
+  "job": {
+    "id": "batch_cd8f7a777e3c4e6885de1cf3162e004c",
+    "status": "running",
+    "processed": 1471,
+    "total": 1759,
+    "current_leaf": "e-commerce-platform",
+    "updated_at": "2026-10-23T12:04:53.851303+00:00",
+    "pause_reason": null
+  },
+  "observed_group_overlap_seconds": 12.565083,
+  "completed_chunk_seconds": 32.377919,
+  "run": {
+    "audit_path": "/Users/milin/2026/软件开发/application-atlas/application-atlas-production-pack/atlas/oss-discovery/runs/oss_e8f33a56f04e44a08b50626994808b6b.json",
+    "candidate_counts": {
+      "accepted": 9,
+      "failed": 0,
+      "needs_evidence": 0,
+      "partial": 74,
+      "pending": 296,
+      "rejected": 21
+    },
+    "concurrency": {
+      "configured_model_workers": 2,
+      "model_workers": 2,
+      "source_workers": 4
+    },
+    "created": 4,
+    "discovered": 400,
+    "document_cache_hits": 2,
+    "document_fetches": 2,
+    "errors": [],
+    "failed": 0,
+    "finished_at": "2026-10-23T12:04:03.619343+00:00",
+    "id": "oss_e8f33a56f04e44a08b50626994808b6b",
+    "leaf": "e-commerce-platform",
+    "mode": "automatic",
+    "model_cache_hits": 0,
+    "model_calls": 2,
+    "model_errors": [],
+    "model_receipts": [
+      {
+        "cached": false,
+        "created_at": "2026-10-23T12:04:01.408646+00:00",
+        "input_sha256": "a376ea17c1a9b673ec3bcdff6aa9bd4ae43afab0ce1995902db68577c505417e",
+        "model": "deepseek-flash",
+        "provider": "open-design",
+        "stage": "extract_open",
+        "usage": {
+          "completion_tokens": 1812,
+          "cost": null,
+          "prompt_tokens": 5608,
+          "total_tokens": 7420
+        }
+      },
+      {
+        "cached": false,
+        "created_at": "2026-10-23T12:04:03.410807+00:00",
+        "input_sha256": "27f5d3ad2111fb3b74716a46573ad2d20cc1d02b800c9bff413969003bb8e3ea",
+        "model": "deepseek-flash",
+        "provider": "open-design",
+        "stage": "extract_open",
+        "usage": {
+          "completion_tokens": 2060,
+          "cost": null,
+          "prompt_tokens": 5977,
+          "total_tokens": 8037
+        }
+      }
+    ],
+    "model_retry_policy": {
+      "initial_backoff_seconds": 2,
+      "max_attempts": 3,
+      "max_wait_seconds": 60
+    },
+    "model_tasks": {
+      "0": {
+        "finished_at": "2026-10-23T12:04:01.409698+00:00",
+        "id": "oss_e8f33a56f04e44a08b50626994808b6b",
+        "model_calls": 1,
+        "model_receipts": [
+          {
+            "cached": false,
+            "created_at": "2026-10-23T12:04:01.408646+00:00",
+            "input_sha256": "a376ea17c1a9b673ec3bcdff6aa9bd4ae43afab0ce1995902db68577c505417e",
+            "model": "deepseek-flash",
+            "provider": "open-design",
+            "stage": "extract_open",
+            "usage": {
+              "completion_tokens": 1812,
+              "cost": null,
+              "prompt_tokens": 5608,
+              "total_tokens": 7420
+            }
+          }
+        ],
+        "model_retry_policy": {
+          "initial_backoff_seconds": 2,
+          "max_attempts": 3,
+          "max_wait_seconds": 60
+        },
+        "started_at": "2026-10-23T12:03:48.841560+00:00",
+        "state": "completed",
+        "task_id": "0"
+      },
+      "1": {
+        "finished_at": "2026-10-23T12:04:03.411481+00:00",
+        "id": "oss_e8f33a56f04e44a08b50626994808b6b",
+        "model_calls": 1,
+        "model_receipts": [
+          {
+            "cached": false,
+            "created_at": "2026-10-23T12:04:03.410807+00:00",
+            "input_sha256": "27f5d3ad2111fb3b74716a46573ad2d20cc1d02b800c9bff413969003bb8e3ea",
+            "model": "deepseek-flash",
+            "provider": "open-design",
+            "stage": "extract_open",
+            "usage": {
+              "completion_tokens": 2060,
+              "cost": null,
+              "prompt_tokens": 5977,
+              "total_tokens": 8037
+            }
+          }
+        ],
+        "model_retry_policy": {
+          "initial_backoff_seconds": 2,
+          "max_attempts": 3,
+          "max_wait_seconds": 60
+        },
+        "started_at": "2026-10-23T12:03:48.844615+00:00",
+        "state": "completed",
+        "task_id": "1"
+      }
+    },
+    "partial": 4,
+    "phase": "extract",
+    "processed": 8,
+    "rejected": 4,
+    "repository_checks": 8,
+    "search_requests": 0,
+    "selected_ids": [
+      341900953,
+      343237462,
+      344536199,
+      345634228,
+      351292150,
+      353967911,
+      354541023,
+      355161766
+    ],
+    "source_cache_hits": 1,
+    "source_fetches": 7,
+    "started_at": "2026-10-23T12:03:31.241424+00:00",
+    "status": "completed",
+    "total": 8,
+    "unchanged": 0,
+    "updated": 0
+  }
+}

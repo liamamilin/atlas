@@ -1,0 +1,51 @@
+{
+ "repository_id": 1372674615,
+ "domain": "23",
+ "input_sha256": "5873819d9f6b2a80188e8c5449cacc04fd0bbab118804952713428603aa7793b",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:03.355657+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDlXRzYxTXqvLxDfi8bhbK5CzHz",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 2285,
+  "completion_tokens": 227,
+  "total_tokens": 2512,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 2282,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.000342,
+ "response_text": "{\"repository_id\":1372674615,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片准确说明该仓库是依赖外部跟踪器的 PWA 启动器，并将许可证保留为 pending。场景匹配已标为 unverified，且指出核心跟踪功能未证实；材料仅含 README 与元数据，不能据此核验实现细节。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"supported\"},\"issues\":[],\"limitations\":[\"仅提供 README 与 GitHub 元数据，未提供 index.html、manifest、service worker 等文件，无法独立核验 PWA 安装行为或启动器实现。\",\"README 明确说明安装后点击图标会打开实时作业跟踪器，但未说明该外部跟踪器的功能；场景中的提交状态跟踪和教师反馈未获证实。\",\"未发现许可证文件，license pending 标签如实保留；本次不据此判断仓库是否获得开源授权。\"]}",
+ "review": {
+  "repository_id": 1372674615,
+  "verdict": "pass_with_limits",
+  "summary": "卡片准确说明该仓库是依赖外部跟踪器的 PWA 启动器，并将许可证保留为 pending。场景匹配已标为 unverified，且指出核心跟踪功能未证实；材料仅含 README 与元数据，不能据此核验实现细节。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "supported"
+  },
+  "issues": [],
+  "limitations": [
+   "仅提供 README 与 GitHub 元数据，未提供 index.html、manifest、service worker 等文件，无法独立核验 PWA 安装行为或启动器实现。",
+   "README 明确说明安装后点击图标会打开实时作业跟踪器，但未说明该外部跟踪器的功能；场景中的提交状态跟踪和教师反馈未获证实。",
+   "未发现许可证文件，license pending 标签如实保留；本次不据此判断仓库是否获得开源授权。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:40:08.482684+00:00",
+ "elapsed_seconds": 5.127
+}

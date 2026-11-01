@@ -1,0 +1,78 @@
+{
+ "repository_id": 1353567939,
+ "domain": "17",
+ "input_sha256": "f7046edb1a4a72a4ef96fe9ab9111d4f8231c083daccce95634f992b92be07ef",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:39:38.018278+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCDMLQU61z7daGajBBUH2TD9uRa5",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 11872,
+  "completion_tokens": 545,
+  "total_tokens": 12417,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 11869,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0014597,
+ "response_text": "{\"repository_id\":1353567939,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片整体有 README 支持：这是带 WebMCP 的道路设计应用，Apache-2.0 标签有许可证来源支持，场景也与道路设计相关。需收紧“所有 agent 修改需人工确认后才可导出”的表述：README 说明写工具默认预览，但可传 commit:true；人工确认门槛针对 LandXML 交付，且放样 CSV 也受确认门控。场景描述中的土方量报告超出项目明确列出的能力。\",\"checks\":{\"facts\":\"limited\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"summary\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"所有 agent 修改需人工在界面确认后才可导出\",\"source_id\":\"s0\",\"quote\":\"Every write tool computes the consequence and changes nothing unless you pass `commit: true`.\",\"reason\":\"README 区分写工具的预览与提交：传入 commit:true 可提交变更；人工确认门槛明确用于 LandXML 交付，不能概括为所有修改都必须先经界面确认才可导出。\",\"suggested_correction\":\"改为：写工具默认预览，提交需显式 commit；LandXML 与放样 CSV 导出受人工确认门控。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-civil-site-design-ff7123d628\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"直接支持道路平纵线形、横断面模板与纵横断面输出\",\"source_id\":\"s0\",\"quote\":\"Earthwork is reported as cut and fill depth per station, not as volumes.\",\"reason\":\"场景描述还要求生成土方量报告；README 明确说明只报告逐桩挖填深度，不计算土方体积。该场景匹配应标注此限制，不能无条件标为 direct。\",\"suggested_correction\":\"将 applicability 调为 conditional 或在 conditions 中注明：可做道路线形与断面设计，但不计算土方体积；交付需持证工程师审查签章。\"}],\"limitations\":[\"README 与许可证全文均已提供且未截断；本次仅依据所给材料审查，不执行代码或联网验证。\",\"场景描述包含土方量报告要求，而项目明确不计算土方体积；其余场景要素与 README 所述能力相符。\"]}",
+ "review": {
+  "repository_id": 1353567939,
+  "verdict": "pass_with_limits",
+  "summary": "卡片整体有 README 支持：这是带 WebMCP 的道路设计应用，Apache-2.0 标签有许可证来源支持，场景也与道路设计相关。需收紧“所有 agent 修改需人工确认后才可导出”的表述：README 说明写工具默认预览，但可传 commit:true；人工确认门槛针对 LandXML 交付，且放样 CSV 也受确认门控。场景描述中的土方量报告超出项目明确列出的能力。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "summary",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "所有 agent 修改需人工在界面确认后才可导出",
+    "source_id": "s0",
+    "quote": "Every write tool computes the consequence and changes nothing unless you pass `commit: true`.",
+    "reason": "README 区分写工具的预览与提交：传入 commit:true 可提交变更；人工确认门槛明确用于 LandXML 交付，不能概括为所有修改都必须先经界面确认才可导出。",
+    "suggested_correction": "改为：写工具默认预览，提交需显式 commit；LandXML 与放样 CSV 导出受人工确认门控。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-civil-site-design-ff7123d628",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "直接支持道路平纵线形、横断面模板与纵横断面输出",
+    "source_id": "s0",
+    "quote": "Earthwork is reported as cut and fill depth per station, not as volumes.",
+    "reason": "场景描述还要求生成土方量报告；README 明确说明只报告逐桩挖填深度，不计算土方体积。该场景匹配应标注此限制，不能无条件标为 direct。",
+    "suggested_correction": "将 applicability 调为 conditional 或在 conditions 中注明：可做道路线形与断面设计，但不计算土方体积；交付需持证工程师审查签章。"
+   }
+  ],
+  "limitations": [
+   "README 与许可证全文均已提供且未截断；本次仅依据所给材料审查，不执行代码或联网验证。",
+   "场景描述包含土方量报告要求，而项目明确不计算土方体积；其余场景要素与 README 所述能力相符。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 0,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T04:39:46.284540+00:00",
+ "elapsed_seconds": 8.266
+}

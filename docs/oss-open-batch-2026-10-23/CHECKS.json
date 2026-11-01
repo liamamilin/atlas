@@ -1,0 +1,223 @@
+{
+  "status": "passed",
+  "backend": {
+    "passed": 72,
+    "catalog_and_batch": 44,
+    "github_credentials": 5,
+    "existing_request_and_model_settings": 23,
+    "logs": [
+      "backend-tests.log",
+      "settings-regression.log"
+    ]
+  },
+  "browser": {
+    "passed": 14,
+    "log": "browser-tests.log"
+  },
+  "frontend_unit": {
+    "passed": 9,
+    "log": "frontend-tests.log"
+  },
+  "typecheck": {
+    "status": "passed",
+    "log": "typecheck.log"
+  },
+  "production_build": {
+    "status": "passed",
+    "log": "build.log"
+  },
+  "ruff": {
+    "status": "passed",
+    "log": "ruff.log"
+  },
+  "live_browser": {
+    "checks": {
+      "search": true,
+      "inferred_features_and_associations": true,
+      "restricted_license": true,
+      "batch_controls_and_idempotent_resume": true,
+      "non_pilot_leaf_open": true,
+      "token_write_only": true,
+      "mobile": true
+    },
+    "leaves": {
+      "feed-reader": {
+        "projects": 59,
+        "candidates": 63,
+        "counts": {
+          "pending": 0,
+          "accepted": 22,
+          "partial": 37,
+          "rejected": 4,
+          "needs_evidence": 0,
+          "failed": 0
+        }
+      },
+      "diagramming-application": {
+        "projects": 57,
+        "candidates": 61,
+        "counts": {
+          "pending": 0,
+          "accepted": 31,
+          "partial": 26,
+          "rejected": 4,
+          "needs_evidence": 0,
+          "failed": 0
+        }
+      },
+      "password-manager": {
+        "projects": 30,
+        "candidates": 31,
+        "counts": {
+          "pending": 0,
+          "accepted": 8,
+          "partial": 22,
+          "rejected": 1,
+          "needs_evidence": 0,
+          "failed": 0
+        }
+      }
+    },
+    "page_errors": [],
+    "status": "passed"
+  },
+  "actual_resume": {
+    "completed_before_resume": 36,
+    "completed_targets_replayed_in_same_job": 0,
+    "original_scope_unchanged": true,
+    "main_processed": 133,
+    "main_total": 133
+  },
+  "final_data": [
+    {
+      "leaf": "feed-reader",
+      "scenarios": 6,
+      "projects": 59,
+      "unassociated_projects": 6,
+      "partial_cards": 36,
+      "associations": 226,
+      "candidate_total": 63,
+      "candidate_counts": {
+        "pending": 0,
+        "accepted": 22,
+        "partial": 37,
+        "rejected": 4,
+        "needs_evidence": 0,
+        "failed": 0
+      },
+      "licenses": {
+        "open_source": 31,
+        "source_available": 1,
+        "pending": 27
+      },
+      "empty_scenarios": []
+    },
+    {
+      "leaf": "diagramming-application",
+      "scenarios": 6,
+      "projects": 57,
+      "unassociated_projects": 6,
+      "partial_cards": 26,
+      "associations": 150,
+      "candidate_total": 61,
+      "candidate_counts": {
+        "pending": 0,
+        "accepted": 31,
+        "partial": 26,
+        "rejected": 4,
+        "needs_evidence": 0,
+        "failed": 0
+      },
+      "licenses": {
+        "open_source": 38,
+        "source_available": 1,
+        "pending": 18
+      },
+      "empty_scenarios": []
+    },
+    {
+      "leaf": "password-manager",
+      "scenarios": 6,
+      "projects": 30,
+      "unassociated_projects": 8,
+      "partial_cards": 21,
+      "associations": 45,
+      "candidate_total": 31,
+      "candidate_counts": {
+        "pending": 0,
+        "accepted": 8,
+        "partial": 22,
+        "rejected": 1,
+        "needs_evidence": 0,
+        "failed": 0
+      },
+      "licenses": {
+        "open_source": 15,
+        "source_available": 1,
+        "pending": 14
+      },
+      "empty_scenarios": []
+    }
+  ],
+  "sources": {
+    "projects": 146,
+    "literal_excerpts": 264,
+    "all_bindings_checked": true
+  },
+  "secret_boundary": {
+    "configured": true,
+    "source": "local",
+    "file_mode": "0o600",
+    "checked_files": 2666,
+    "github_and_model_credentials_found_in_artifacts": false,
+    "scopes": [
+      "validation artifacts",
+      "catalog snapshots",
+      "source and model caches",
+      "frontend production bundle"
+    ],
+    "api_never_returns_token": true
+  },
+  "preservation": {
+    "api_pid": 12267,
+    "supported_leaves": 1805,
+    "projects": 153,
+    "scenarios": 21,
+    "pilot_fact_and_association_rows_unchanged": 7,
+    "derived_membership_normalized": true,
+    "favorites_preserved": 28,
+    "historical_executions": {
+      "completed": 31,
+      "failed": 2,
+      "stopped": 4
+    },
+    "candidate_counts": {
+      "pending": 0,
+      "accepted": 61,
+      "partial": 85,
+      "rejected": 9,
+      "needs_evidence": 0,
+      "failed": 0
+    },
+    "health": {
+      "ok": true,
+      "generating": [],
+      "promoting": [],
+      "recovery": {
+        "status": "completed",
+        "executions_interrupted": 0,
+        "generations_interrupted": 0,
+        "applications_requiring_review": 0,
+        "errors": 0
+      }
+    }
+  },
+  "commands": {
+    "backend": "python3 -m unittest discover -s application-atlas-production-pack/tests -p 'test_oss*.py' -v",
+    "browser": "npm run test:e2e:catalog",
+    "typescript": "npm run typecheck",
+    "build": "npm run build",
+    "frontend_unit": "npm test",
+    "whitespace": "git diff --check"
+  }
+}

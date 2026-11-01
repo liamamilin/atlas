@@ -1,0 +1,74 @@
+{
+ "repository_id": 1383995771,
+ "domain": "01",
+ "input_sha256": "224e01ec150cb459b7f31309e67f7bcc5a21a74ec35fec9a2e0e561e932e61f5",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:38:12.198423+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCC0XqH0TNGmutrNAaRj9VVqRsxF",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 1513,
+  "completion_tokens": 400,
+  "total_tokens": 1913,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 1510,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.00035130000000000003,
+ "response_text": "{\"repository_id\":1383995771,\"verdict\":\"pass_with_limits\",\"summary\":\"现有元数据仅支持其描述为移动端编辑软件；项目资料不可用，功能与适用范围无法核实。许可证标为 pending 恰当，场景匹配也已标为 unverified。\",\"checks\":{\"facts\":\"limited\",\"project_type\":\"limited\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"project_type\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"application\",\"source_id\":\"s0\",\"quote\":\"\\\"description\\\":\\\"mobile editing software\\\"\",\"reason\":\"元数据只描述为移动端编辑软件，未提供足以确认其为完整应用的项目资料；仓库文件不可用。\",\"suggested_correction\":\"将项目类型标为待核实，或注明仅依据仓库描述推断。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-short-form-video-social-platform-4345efb42f\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"移动视频编辑可能覆盖拍摄后的剪辑环节，但发布与个人主页功能未知。\",\"source_id\":\"s0\",\"quote\":\"mobile editing software\",\"reason\":\"来源未说明拍摄、剪辑、滤镜、配乐或发布能力；该匹配已标为 unverified 并列出待核实条件，因此不能视为已证实的场景适用性。\",\"suggested_correction\":\"保留 unverified，并明确该关联仅为待核实的可能性。\"}],\"limitations\":[\"仅有一条仓库元数据描述；coverage 显示可用文件数为 0。\",\"不能据此核实具体功能、项目完整性或场景适用性。\",\"许可证状态为 pending，且来源中的 license 为 null；本次不据此推断许可。\"]}",
+ "review": {
+  "repository_id": 1383995771,
+  "verdict": "pass_with_limits",
+  "summary": "现有元数据仅支持其描述为移动端编辑软件；项目资料不可用，功能与适用范围无法核实。许可证标为 pending 恰当，场景匹配也已标为 unverified。",
+  "checks": {
+   "facts": "limited",
+   "project_type": "limited",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "project_type",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "application",
+    "source_id": "s0",
+    "quote": "\"description\":\"mobile editing software\"",
+    "reason": "元数据只描述为移动端编辑软件，未提供足以确认其为完整应用的项目资料；仓库文件不可用。",
+    "suggested_correction": "将项目类型标为待核实，或注明仅依据仓库描述推断。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-short-form-video-social-platform-4345efb42f",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "移动视频编辑可能覆盖拍摄后的剪辑环节，但发布与个人主页功能未知。",
+    "source_id": "s0",
+    "quote": "mobile editing software",
+    "reason": "来源未说明拍摄、剪辑、滤镜、配乐或发布能力；该匹配已标为 unverified 并列出待核实条件，因此不能视为已证实的场景适用性。",
+    "suggested_correction": "保留 unverified，并明确该关联仅为待核实的可能性。"
+   }
+  ],
+  "limitations": [
+   "仅有一条仓库元数据描述；coverage 显示可用文件数为 0。",
+   "不能据此核实具体功能、项目完整性或场景适用性。",
+   "许可证状态为 pending，且来源中的 license 为 null；本次不据此推断许可。"
+  ]
+ },
+ "invalid_citations": [],
+ "finished_at": "2026-10-29T04:38:21.204573+00:00",
+ "elapsed_seconds": 9.006
+}

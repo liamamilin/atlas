@@ -1,0 +1,89 @@
+{
+ "repository_id": 1157656480,
+ "domain": "29",
+ "input_sha256": "6cc0d75484519bf772c1775c756b5630d4d00921349954e153b35e2d8c808a55",
+ "requested_model": "gpt-6-luna",
+ "started_at": "2026-10-29T04:40:36.522908+00:00",
+ "status": "reviewed",
+ "provider": "openai",
+ "returned_model": "gpt-6-luna",
+ "response_id": "chatcmpl-EeCEIWADFg3KHTTcrvXs1u2xvdjcp",
+ "service_tier": "default",
+ "usage": {
+  "prompt_tokens": 4847,
+  "completion_tokens": 804,
+  "total_tokens": 5651,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 4844,
+   "audio_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "audio_tokens": 0,
+   "accepted_prediction_tokens": 0,
+   "rejected_prediction_tokens": 0
+  }
+ },
+ "finish_reason": "stop",
+ "estimated_standard_usd": 0.0008867,
+ "response_text": "{\n  \"repository_id\": 1157656480,\n  \"verdict\": \"needs_review\",\n  \"summary\": \"README 将 PawDash 描述为宠物遛狗与看护平台，并列出应用结构、技术栈和多项服务能力；但部分功能仅有 README 声明，不能据此确认已实现。卡片把许可证标为专有，与 README 的文字一致，但仓库元数据未检测到许可证，宜保留未核验限制。\",\n  \"checks\": {\n    \"facts\": \"issue\",\n    \"project_type\": \"supported\",\n    \"license_label\": \"limited\",\n    \"scenario_matches\": \"limited\"\n  },\n  \"issues\": [\n    {\n      \"field\": \"summary\",\n      \"scenario_id\": \"\",\n      \"severity\": \"major\",\n      \"kind\": \"unsupported_claim\",\n      \"claim\": \"含派单、遛狗者申请、AI 聊天助手；README 列出 GPS 追踪、保险、智能锁等安全功能\",\n      \"source_id\": \"s0\",\n      \"quote\": \"- **Real-Time Tracking**: GPS tracking during walks\\n- **Fully Insured**: Comprehensive coverage for all services\",\n      \"reason\": \"README 确实列出这些能力，但提供的材料只有 README 与元数据，不能确认它们已实现；尤其智能锁仅在安全清单中提及，不能据此当作已集成能力。卡片将其作为应用现有功能陈述，超出证据可确认范围。\",\n      \"suggested_correction\": \"改为“README 声称支持/列出……”，并将未能从材料确认实现的能力标为待核实。\"\n    },\n    {\n      \"field\": \"summary\",\n      \"scenario_id\": \"\",\n      \"severity\": \"minor\",\n      \"kind\": \"license_overclaim\",\n      \"claim\": \"许可证为专有\",\n      \"source_id\": \"s0\",\n      \"quote\": \"This project is proprietary.\",\n      \"reason\": \"README 明确自称专有，但元数据 license 为 null，卡片也记录未发现许可证文件及 pending 状态。将其直接写成已核验的许可证结论，容易混淆项目自述与仓库许可证核验结果。\",\n      \"suggested_correction\": \"表述为“README 自称专有；仓库许可证文件未核验/未发现，授权状态 pending”。\"\n    },\n    {\n      \"field\": \"scenario_match\",\n      \"scenario_id\": \"auto-dog-walking-platform-3401f1df7d\",\n      \"severity\": \"minor\",\n      \"kind\": \"missing_condition\",\n      \"claim\": \"reason：支持预约与遛狗者资料，但派单为抢单模式，非主人自主选择\",\n      \"source_id\": \"s0\",\n      \"quote\": \"First-come-first-served dispatch\",\n      \"reason\": \"场景要求比较资料与评价后预约固定工作日时段。卡片已注明需核实固定周期预约，但未将“非主人自主选择”这一与场景核心流程的差异列为适用条件；README 只说明抢单派单，不能支持主人自主挑选遛狗者。\",\n      \"suggested_correction\": \"保留 conditional，并明确该场景依赖主人能否选择特定遛狗者及固定周期预约；否则仅部分适用。\"\n    }\n  ],\n  \"limitations\": [\n    \"本次仅依据提供的完整 README 文本和 GitHub 元数据审查，未检查源码或实际运行行为。\",\n    \"README 中的功能描述不能单独证明功能已实现；许可证全文及仓库文件未在材料中提供。\"\n  ]\n}",
+ "review": {
+  "repository_id": 1157656480,
+  "verdict": "needs_review",
+  "summary": "README 将 PawDash 描述为宠物遛狗与看护平台，并列出应用结构、技术栈和多项服务能力；但部分功能仅有 README 声明，不能据此确认已实现。卡片把许可证标为专有，与 README 的文字一致，但仓库元数据未检测到许可证，宜保留未核验限制。",
+  "checks": {
+   "facts": "issue",
+   "project_type": "supported",
+   "license_label": "limited",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "summary",
+    "scenario_id": "",
+    "severity": "major",
+    "kind": "unsupported_claim",
+    "claim": "含派单、遛狗者申请、AI 聊天助手；README 列出 GPS 追踪、保险、智能锁等安全功能",
+    "source_id": "s0",
+    "quote": "- **Real-Time Tracking**: GPS tracking during walks\n- **Fully Insured**: Comprehensive coverage for all services",
+    "reason": "README 确实列出这些能力，但提供的材料只有 README 与元数据，不能确认它们已实现；尤其智能锁仅在安全清单中提及，不能据此当作已集成能力。卡片将其作为应用现有功能陈述，超出证据可确认范围。",
+    "suggested_correction": "改为“README 声称支持/列出……”，并将未能从材料确认实现的能力标为待核实。"
+   },
+   {
+    "field": "summary",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "license_overclaim",
+    "claim": "许可证为专有",
+    "source_id": "s0",
+    "quote": "This project is proprietary.",
+    "reason": "README 明确自称专有，但元数据 license 为 null，卡片也记录未发现许可证文件及 pending 状态。将其直接写成已核验的许可证结论，容易混淆项目自述与仓库许可证核验结果。",
+    "suggested_correction": "表述为“README 自称专有；仓库许可证文件未核验/未发现，授权状态 pending”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-dog-walking-platform-3401f1df7d",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "reason：支持预约与遛狗者资料，但派单为抢单模式，非主人自主选择",
+    "source_id": "s0",
+    "quote": "First-come-first-served dispatch",
+    "reason": "场景要求比较资料与评价后预约固定工作日时段。卡片已注明需核实固定周期预约，但未将“非主人自主选择”这一与场景核心流程的差异列为适用条件；README 只说明抢单派单，不能支持主人自主挑选遛狗者。",
+    "suggested_correction": "保留 conditional，并明确该场景依赖主人能否选择特定遛狗者及固定周期预约；否则仅部分适用。"
+   }
+  ],
+  "limitations": [
+   "本次仅依据提供的完整 README 文本和 GitHub 元数据审查，未检查源码或实际运行行为。",
+   "README 中的功能描述不能单独证明功能已实现；许可证全文及仓库文件未在材料中提供。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 0,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T04:40:46.310122+00:00",
+ "elapsed_seconds": 9.787
+}

@@ -1,0 +1,113 @@
+{
+ "repository_id": 442096414,
+ "domain": "12",
+ "input_sha256": "45435cdb6782e033f39ca45cd404528e7ec1fc82ee2269982b3a97070176b8f6",
+ "prompt_sha256": "6917cf3733406a024da3bff7e595625cd6e371699d9b411e5b4b3ad1c51009c2",
+ "provider": "opencode-go",
+ "requested_model": "deepseek-v4.1-flash",
+ "started_at": "2026-10-29T05:11:36.982459+00:00",
+ "status": "reviewed",
+ "attempts": [],
+ "returned_model": "deepseek-v4.1-flash",
+ "response_id": "gw-dca22d282df9-b79ec",
+ "usage": {
+  "prompt_tokens": 9690,
+  "completion_tokens": 913,
+  "total_tokens": 10603,
+  "prompt_tokens_details": {
+   "cached_tokens": 0
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "cost": 0.0020013,
+  "opencode": {
+   "billing_source": "balance",
+   "list_cost": 0.0020013,
+   "tokens": {
+    "input": 9690,
+    "output": 913,
+    "reasoning": 0,
+    "cache_read": 0,
+    "cache_write_5m": 0,
+    "cache_write_1h": 0
+   }
+  }
+ },
+ "finish_reason": "stop",
+ "response_text": "{\"repository_id\":442096414,\"verdict\":\"pass_with_limits\",\"summary\":\"卡片核心事实与 README 和许可证来源基本一致：无代码测试自动化、跨平台、AI 代理、CI/CD 集成、Apache-2.0 均有原文支持。主要问题是 summary 中“Salesforce/SAP 等企业应用”被写成具体产品名，而 README 只写 ERP 与 Salesforce/SAP 举例，尚可接受；场景匹配的 applicability 与 conditions 大体保守，但部分条件（如缺陷系统推送、命令行运行器）在给定来源中无直接证据，应保留为待核实。\",\"checks\":{\"facts\":\"supported\",\"project_type\":\"supported\",\"license_label\":\"supported\",\"scenario_matches\":\"limited\"},\"issues\":[{\"field\":\"scenario_match\",\"scenario_id\":\"auto-test-automation-platform-5237dd17b3\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"缺陷系统推送需配置集成；命令行/流水线调用方式需核实\",\"source_id\":\"s0\",\"quote\":\"Testsigma integrates natively with more than 30 popular tools and technologies used by QA teams, including CI/CD, bug reporting, real device labs, project management and collaboration tools.\",\"reason\":\"README 只泛称集成 CI/CD 与 bug reporting，未给出命令行运行器或缺陷系统推送的具体实现证据；卡片已标 conditional 并列出待核实条件，属保守处理，但条件本身缺直接来源。\",\"suggested_correction\":\"保留 conditional，并将“命令行运行器”明确标为待核实，不写成已支持能力。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-test-automation-platform-f347876eb5\",\"severity\":\"minor\",\"kind\":\"missing_condition\",\"claim\":\"夜间定时需通过 CI/调度配置；部分 AI 能力依赖其云服务\",\"source_id\":\"s0\",\"quote\":\"Requiring near-zero initial setup cost and training time, Testsigma enables anyone in the QA team to instantly write automated tests 10X faster using Testsigma Copilot and run them on thousands of devices available on the public cloud or your own private cloud.\",\"reason\":\"README 提到云部署与私有云，但未明确“部分 AI 能力依赖其云服务”；该条件为推断，应标为待核实而非既定前提。\",\"suggested_correction\":\"将“部分 AI 能力依赖其云服务”改为“AI 能力的具体部署依赖需核实”。\"},{\"field\":\"scenario_match\",\"scenario_id\":\"auto-test-automation-platform-37c15e5dbe\",\"severity\":\"minor\",\"kind\":\"insufficient_evidence\",\"claim\":\"宣称 AI 自愈可自动适应 UI 变化，减少元素定位维护\",\"source_id\":\"s0\",\"quote\":\"Healer / Maintenance Agent - Detects and auto-adapts to UI changes, minimizing manual repair effort\",\"reason\":\"README 支持自愈宣称，但场景要求“在元素仓库中修正一次定位规则并传播到所有引用测试”，该集中修复机制在给定来源中无直接描述；卡片已标 unverified，处理保守。\",\"suggested_correction\":\"保留 unverified，并注明“集中元素仓库传播机制未在来源中说明”。\"},{\"field\":\"summary\",\"scenario_id\":\"\",\"severity\":\"minor\",\"kind\":\"unsupported_claim\",\"claim\":\"支持 Web、移动、桌面、API 及 Salesforce/SAP 等企业应用\",\"source_id\":\"s0\",\"quote\":\"Cross-Platform Support - Web, mobile (iOS/Android), API, desktop, and ERP systems\",\"reason\":\"README 的跨平台列表写 ERP 系统，Salesforce/SAP 仅出现在概述举例中；summary 将举例产品与平台类别并列，略有拔高。\",\"suggested_correction\":\"改为“Web、移动、API、桌面及 ERP 系统（如 Salesforce、SAP）”。\"}],\"limitations\":[\"仅审阅 README、LICENSE 与 GitHub 元数据，未覆盖源码、文档站与第三方依赖许可。\",\"场景匹配的 applicability 与 conditions 多基于 README 概述，具体集成与调度能力未在给定材料中逐项验证。\",\"许可证仅按卡片提供的 SPDX 精确文本核验结果采信，未独立比对全文。\"]}",
+ "review": {
+  "repository_id": 442096414,
+  "verdict": "pass_with_limits",
+  "summary": "卡片核心事实与 README 和许可证来源基本一致：无代码测试自动化、跨平台、AI 代理、CI/CD 集成、Apache-2.0 均有原文支持。主要问题是 summary 中“Salesforce/SAP 等企业应用”被写成具体产品名，而 README 只写 ERP 与 Salesforce/SAP 举例，尚可接受；场景匹配的 applicability 与 conditions 大体保守，但部分条件（如缺陷系统推送、命令行运行器）在给定来源中无直接证据，应保留为待核实。",
+  "checks": {
+   "facts": "supported",
+   "project_type": "supported",
+   "license_label": "supported",
+   "scenario_matches": "limited"
+  },
+  "issues": [
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-test-automation-platform-5237dd17b3",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "缺陷系统推送需配置集成；命令行/流水线调用方式需核实",
+    "source_id": "s0",
+    "quote": "Testsigma integrates natively with more than 30 popular tools and technologies used by QA teams, including CI/CD, bug reporting, real device labs, project management and collaboration tools.",
+    "reason": "README 只泛称集成 CI/CD 与 bug reporting，未给出命令行运行器或缺陷系统推送的具体实现证据；卡片已标 conditional 并列出待核实条件，属保守处理，但条件本身缺直接来源。",
+    "suggested_correction": "保留 conditional，并将“命令行运行器”明确标为待核实，不写成已支持能力。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-test-automation-platform-f347876eb5",
+    "severity": "minor",
+    "kind": "missing_condition",
+    "claim": "夜间定时需通过 CI/调度配置；部分 AI 能力依赖其云服务",
+    "source_id": "s0",
+    "quote": "Requiring near-zero initial setup cost and training time, Testsigma enables anyone in the QA team to instantly write automated tests 10X faster using Testsigma Copilot and run them on thousands of devices available on the public cloud or your own private cloud.",
+    "reason": "README 提到云部署与私有云，但未明确“部分 AI 能力依赖其云服务”；该条件为推断，应标为待核实而非既定前提。",
+    "suggested_correction": "将“部分 AI 能力依赖其云服务”改为“AI 能力的具体部署依赖需核实”。"
+   },
+   {
+    "field": "scenario_match",
+    "scenario_id": "auto-test-automation-platform-37c15e5dbe",
+    "severity": "minor",
+    "kind": "insufficient_evidence",
+    "claim": "宣称 AI 自愈可自动适应 UI 变化，减少元素定位维护",
+    "source_id": "s0",
+    "quote": "Healer / Maintenance Agent - Detects and auto-adapts to UI changes, minimizing manual repair effort",
+    "reason": "README 支持自愈宣称，但场景要求“在元素仓库中修正一次定位规则并传播到所有引用测试”，该集中修复机制在给定来源中无直接描述；卡片已标 unverified，处理保守。",
+    "suggested_correction": "保留 unverified，并注明“集中元素仓库传播机制未在来源中说明”。"
+   },
+   {
+    "field": "summary",
+    "scenario_id": "",
+    "severity": "minor",
+    "kind": "unsupported_claim",
+    "claim": "支持 Web、移动、桌面、API 及 Salesforce/SAP 等企业应用",
+    "source_id": "s0",
+    "quote": "Cross-Platform Support - Web, mobile (iOS/Android), API, desktop, and ERP systems",
+    "reason": "README 的跨平台列表写 ERP 系统，Salesforce/SAP 仅出现在概述举例中；summary 将举例产品与平台类别并列，略有拔高。",
+    "suggested_correction": "改为“Web、移动、API、桌面及 ERP 系统（如 Salesforce、SAP）”。"
+   }
+  ],
+  "limitations": [
+   "仅审阅 README、LICENSE 与 GitHub 元数据，未覆盖源码、文档站与第三方依赖许可。",
+   "场景匹配的 applicability 与 conditions 多基于 README 概述，具体集成与调度能力未在给定材料中逐项验证。",
+   "许可证仅按卡片提供的 SPDX 精确文本核验结果采信，未独立比对全文。"
+  ]
+ },
+ "invalid_citations": [
+  {
+   "index": 2,
+   "reason": "quote_not_in_supplied_source"
+  },
+  {
+   "index": 3,
+   "reason": "quote_not_in_supplied_source"
+  }
+ ],
+ "finished_at": "2026-10-29T05:11:51.983370+00:00",
+ "elapsed_seconds": 15.001
+}
