@@ -3,7 +3,27 @@ on: [push, pull_request]
 permissions:
   contents: read
 jobs:
+  scope:
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.select.outputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify conservative CI selection
+        run: python -m unittest discover -s .github -p 'test_ci_scope.py' -v
+      - name: Select affected checks
+        id: select
+        env:
+          SCOPE_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          SCOPE_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: python .github/ci_scope.py --base "$SCOPE_BASE" --head "$SCOPE_HEAD" --output "$GITHUB_OUTPUT"
   check:
+    needs: scope
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,11 +36,27 @@ jobs:
       - run: pip install -r requirements.txt
       - run: python -m pip install pip-audit==2.10.1 ruff==0.15.17
       - run: pip-audit -r requirements.txt
+      - name: Product reference checks (no models, browser, Docker or application execution)
+        if: needs.scope.outputs.mode == 'reference'
+        env:
+          PYTHONPATH: application-atlas-production-pack:examples/assisted-trials
+        run: |
+          python -m unittest discover -s application-atlas-production-pack/tests -p 'test*reference*.py' -v
+          python -m unittest discover -s application-atlas-production-pack/tests -p 'test_factory_budget*.py' -v
+          python -m unittest discover -s examples/assisted-trials/tests -p '*reference*.py' -v
       - name: Lint critical Python paths
         run: >-
           ruff check
+          .github/ci_scope.py
+          .github/test_ci_scope.py
           application-atlas-production-pack/privacy.py
           application-atlas-production-pack/drafts_api.py
+          application-atlas-production-pack/oss_catalog.py
+          application-atlas-production-pack/oss_discovery.py
+          application-atlas-production-pack/oss_workflow.py
+          application-atlas-production-pack/oss_batch.py
+          application-atlas-production-pack/oss_sources.py
+          application-atlas-production-pack/github_settings.py
           application-atlas-production-pack/drafts_engines/__init__.py
           application-atlas-production-pack/mcp_atlas.py
           application-atlas-production-pack/execution_service.py
@@ -38,50 +74,73 @@ jobs:
           application-atlas-production-pack/template_factory
           atlas-web/scripts/gen-data.py
           atlas-web/scripts/verify-web-data.py
-      - run: python -m unittest discover -s application-atlas-production-pack/tests -v
+      - if: needs.scope.outputs.mode == 'full'
+        run: python -m unittest discover -s application-atlas-production-pack/tests -v
       - name: Verify assisted bookmark trial regressions
+        if: needs.scope.outputs.mode == 'full'
         run: python -m unittest discover -s examples/bookmark-trial/tests -v
       - name: Verify assisted budget trial regressions
+        if: needs.scope.outputs.mode == 'full'
         run: python -m unittest discover -s examples/budget-trial/tests -v
       - name: Verify assisted meetings trial regressions
+        if: needs.scope.outputs.mode == 'full'
         run: python -m unittest discover -s examples/meetings-trial/tests -v
       - name: Verify assisted inventory trial regressions
+        if: needs.scope.outputs.mode == 'full'
         run: python -m unittest discover -s examples/home-inventory-trial/tests -v
       - name: Verify assisted meal trial regressions
+        if: needs.scope.outputs.mode == 'full'
         run: |
           python -m unittest discover -s examples/meal-plan-trial/tests -v
           python examples/meal-plan-trial/acceptance/probe.py --case A04 --app-root examples/meal-plan-trial
       - name: Verify assisted polling trial regressions
+        if: needs.scope.outputs.mode == 'full'
         run: |
           python -m unittest discover -s examples/dinner-poll-trial/tests -v
           python examples/dinner-poll-trial/consumed-package/blueprint/acceptance/probe.py --case A04 --app-root examples/dinner-poll-trial
       - name: Verify assisted export input identity
+        if: needs.scope.outputs.mode == 'full'
         run: python -m unittest discover -s examples/assisted-trials/tests -v
       - uses: actions/setup-node@v4
+        if: needs.scope.outputs.mode == 'full'
         with:
           node-version: '22'
           cache: npm
           cache-dependency-path: atlas-web/package-lock.json
       - run: npm ci --registry=https://registry.npmjs.org --replace-registry-host=always
+        if: needs.scope.outputs.mode == 'full'
         working-directory: atlas-web
       - run: python application-atlas-production-pack/export_atlas.py
+        if: needs.scope.outputs.mode == 'full'
       - run: npm run gen && npm run verify-data
+        if: needs.scope.outputs.mode == 'full'
         working-directory: atlas-web
       - run: npx playwright install --with-deps chromium
+        if: needs.scope.outputs.mode == 'full'
         working-directory: atlas-web
       - name: Verify independent executor contracts and browser negative controls
+        if: needs.scope.outputs.mode == 'full'
         run: |
           python -m unittest discover -s docs/template-factory/v1-2026-10-19/independent -p '*fixture_test.py' -v
           node docs/template-factory/v1-2026-10-19/independent/bookmark_contract_fixture_test.cjs
           node docs/template-factory/v1-2026-10-19/independent/ui_contract_fixture_test.cjs
       - run: npm audit --registry=https://registry.npmjs.org --audit-level=high
+        if: needs.scope.outputs.mode == 'full'
         working-directory: atlas-web
       - run: npm run typecheck && npm test && npm run build && npm run test:e2e
+        if: needs.scope.outputs.mode == 'full'
         working-directory: atlas-web
       - name: Run template factory Playwright suite
+        if: needs.scope.outputs.mode == 'full'
         run: npm run test:e2e:factory -- --reporter=line
         working-directory: atlas-web
+      - name: Run scenario repository catalog Playwright suite
+        if: needs.scope.outputs.mode == 'full'
+        run: npm run test:e2e:catalog
+        working-directory: atlas-web
   docker-integration:
+    needs: scope
+    if: needs.scope.outputs.mode == 'full'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
