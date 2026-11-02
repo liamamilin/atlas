@@ -66,16 +66,54 @@ class AssistantTests(unittest.TestCase):
             ("POST", "/api/settings/github"),
             ("GET", "/api/ask/threads"),
             ("POST", "/api/assistant/threads"),
-            ("POST", "/api/promote"),
+            ("POST", "/api/factory/v1/anything"),
             ("GET", "http://example.com/api/projects"),
             ("GET", "/api/projects/../settings/model"),
         ]:
             with self.subTest(path=path), self.assertRaises(AssistantError):
                 atlas_assistant.check_request(method, path)
 
+    def test_settings_allow_model_choice_but_never_credentials(self):
+        for method, path in [
+            ("POST", "/api/settings/model/providers"),
+            ("DELETE", "/api/settings/model/providers/openai"),
+            ("POST", "/api/settings/model/import"),
+            ("POST", "/api/settings/model/embedding"),
+            ("POST", "/api/settings/github/test"),
+        ]:
+            with self.subTest(path=path), self.assertRaises(AssistantError):
+                atlas_assistant.check_request(method, path)
+        for path in ["/api/settings/model/default", "/api/settings/model/fallback",
+                     "/api/settings/model/providers/openai/test"]:
+            self.assertEqual(atlas_assistant.check_request("POST", path)[2]["risk"], "write")
+
+    def test_every_write_route_has_a_body_hint_and_known_risk(self):
+        for route in atlas_assistant.ROUTES:
+            if route["method"] == "GET":
+                self.assertEqual(route["risk"], "read")
+            else:
+                self.assertIn(route["risk"], {"write", "destructive"}, route["pattern"])
+                self.assertIn("body", route, route["pattern"])
+            if route["risk"] == "destructive":
+                self.assertTrue(route.get("typed"), route["pattern"])
+
+    def test_constant_confirmation_is_typed_by_the_operator(self):
+        path = "/api/projects/prj_abc/backups/20261101T010203Z-0a1b2c3d.zip/restore"
+        model = FakeModel(reply(calls=[call("call_api", {
+            "method": "POST", "path": path,
+            "body": {"restore_id": "restore_" + "1" * 32, "confirm": "restore_to_new_store"}})]))
+        thread = self.run_turn(model)
+        pending = thread["pending"]
+        self.assertEqual(pending["body"], {"restore_id": "restore_" + "1" * 32})
+        self.assertEqual(pending["confirm_text"], "restore_to_new_store")
+        with patch.object(atlas_assistant.atlas_model, "chat", FakeModel(reply("已恢复"))):
+            atlas_assistant.decide(thread["id"], pending["id"], "approve", "restore_to_new_store")
+        self.assertEqual(self.requests[-1][3], {"restore_id": "restore_" + "1" * 32,
+                                               "confirm": "restore_to_new_store"})
+
     def test_encoded_paths_are_decoded_before_matching(self):
         with self.assertRaises(AssistantError):
-            atlas_assistant.check_request("POST", "/api/settings%2Fmodel/default")
+            atlas_assistant.check_request("POST", "/api/settings%2Fmodel/providers")
         with self.assertRaises(AssistantError):
             atlas_assistant.check_request("GET", "/api/%61sk/threads")
         path, _, route = atlas_assistant.check_request("POST", "/api/oss/projects/12/favorite")
