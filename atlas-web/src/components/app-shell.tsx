@@ -1,10 +1,11 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation, useNavigationType } from "react-router-dom";
 import { Bookmark, Compass, House, Layers3, Search, Settings2, ArrowUpRight, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLang, t } from "@/lib/lang";
 import { ServiceStatus } from "@/components/service-status";
 import { PageBoundary } from "@/components/page-boundary";
+import { AssistantPanel } from "@/components/assistant-panel";
 
 const historical = /^\/(history|factory|projects|apps|drafts|ask|tutorial)(\/|$)/;
 const pageNames: Record<string, [string, string]> = {
@@ -21,6 +22,8 @@ export function AppShell() {
   const location = useLocation(); const navigation = useNavigationType();
   const favorites = location.pathname === "/discover" && new URLSearchParams(location.search).get("favorites") === "1";
   const content = useRef<HTMLDivElement>(null);
+  // Bumped after the assistant changes data, so the open page reloads it.
+  const [dataVersion, setDataVersion] = useState(0);
   const positions = useRef(new Map<string, number>());
   const previousPath = useRef(location.pathname);
   useLayoutEffect(() => {
@@ -101,7 +104,7 @@ export function AppShell() {
     <ServiceStatus />
     {historical.test(location.pathname) && location.pathname !== "/history" && <div className="border-b border-border bg-bg-elevated"><div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-2.5 text-xs text-muted"><Link to="/history" className="hover:text-primary">← {zh ? "历史工作区" : "Historical workspaces"}</Link><Link to="/discover" className="inline-flex items-center gap-1 text-primary">{zh ? "前往当前项目库" : "Open the current catalog"}<ArrowUpRight className="size-3.5" /></Link></div></div>}
     <div ref={content} id="main-content" tabIndex={-1} className="min-w-0 flex-1 outline-none">
-      <PageBoundary key={location.pathname} zh={zh}><Outlet /></PageBoundary>
+      <PageBoundary key={`${location.pathname}:${dataVersion}`} zh={zh}><Outlet /></PageBoundary>
     </div>
     <footer className="mt-16 border-t border-border bg-bg-elevated">
       <div className="mx-auto flex max-w-6xl flex-wrap items-start justify-between gap-6 px-4 py-8">
@@ -113,5 +116,6 @@ export function AppShell() {
         </nav>
       </div>
     </footer>
+    <AssistantPanel onDataChanged={() => setDataVersion(value => value + 1)} />
   </div>;
 }
