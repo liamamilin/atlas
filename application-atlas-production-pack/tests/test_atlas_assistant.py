@@ -10,6 +10,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import atlas_assistant  # noqa: E402
 from atlas_assistant import AssistantError  # noqa: E402
 
+REAL_REQUEST = atlas_assistant._request
+
 
 def call(name, arguments, call_id="c1"):
     return {"id": call_id, "type": "function",
@@ -172,6 +174,47 @@ class AssistantTests(unittest.TestCase):
         with patch.object(atlas_assistant, "_request", big):
             result = atlas_assistant.execute("GET", "/api/projects", "", None)
         self.assertTrue(result["result"]["truncated"])
+
+    def test_request_line_is_ascii_encoded(self):
+        sent = {}
+
+        class Connection:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            def request(self, method, target, body=None, headers=None):
+                target.encode("ascii")
+                sent.update(method=method, target=target, headers=headers)
+
+            def getresponse(self):
+                class Response:
+                    status = 200
+                    def read(self, _):
+                        return b"{}"
+                    def getheader(self, _):
+                        return "application/json"
+                return Response()
+
+            def close(self):
+                pass
+
+        with patch.object(atlas_assistant, "_request", REAL_REQUEST), \
+                patch.object(atlas_assistant.http.client, "HTTPConnection", Connection):
+            result = atlas_assistant.execute("GET", "/api/oss/catalog", "q=笔记&limit=1", None)
+            self.assertTrue(result["ok"])
+            self.assertEqual(sent["target"], "/api/oss/catalog?q=%E7%AC%94%E8%AE%B0&limit=1")
+            atlas_assistant.execute("POST", "/api/oss/refresh", "", {})
+            self.assertEqual(sent["headers"]["Content-Type"], "application/json")
+
+    def test_old_conversations_are_pruned_at_the_limit(self):
+        with patch.object(atlas_assistant, "MAX_THREADS", 2):
+            first = atlas_assistant.create_thread()["id"]
+            os.utime(atlas_assistant.ROOT / f"{first}.json", (1, 1))
+            atlas_assistant.create_thread()
+            atlas_assistant.create_thread()
+        self.assertEqual(len(atlas_assistant.list_threads()), 2)
+        with self.assertRaises(AssistantError):
+            atlas_assistant.read_thread(first)
 
     def test_routes_list_by_area(self):
         routes = atlas_assistant.list_routes("projects")["routes"]

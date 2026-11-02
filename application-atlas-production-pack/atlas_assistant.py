@@ -33,7 +33,7 @@ import threading
 import time
 import uuid
 from pathlib import Path
-from urllib.parse import unquote, urlencode, urlparse
+from urllib.parse import parse_qsl, quote, unquote, urlencode, urlparse
 
 import atlas_model
 import atlas_tools
@@ -110,11 +110,11 @@ ROUTES: list[dict] = [
     {"area": "projects", "method": "POST", "pattern": rf"/api/projects/{P}/references",
      "summary": "把类型正文或研究笔记固定为项目资料", "body": '{"kind": "application"|"research", "slug", "section"?, "note"?}', "risk": "write"},
     {"area": "projects", "method": "POST", "pattern": rf"/api/projects/{P}/requirements",
-     "summary": "添加需求", "body": '{"content", "recommended_scope"?: "undecided"|"now"|"later"|"no", "acceptance_conditions"?: [str]}', "risk": "write"},
+     "summary": "添加需求", "body": '{"content", "recommended_scope"?: "current"|"later"|"excluded", "acceptance_conditions"?: [str]}', "risk": "write"},
     {"area": "projects", "method": "PATCH", "pattern": rf"/api/projects/{P}/requirements/req_[A-Za-z0-9]+",
      "summary": "修改需求", "body": '{"content"?, "recommended_scope"?, "acceptance_conditions"?}', "risk": "write"},
     {"area": "projects", "method": "POST", "pattern": rf"/api/projects/{P}/requirements/req_[A-Za-z0-9]+/confirm",
-     "summary": "确认需求范围", "body": '{"scope": "now"|"later"|"no"|"undecided", "reason", "expected_revision": int}', "risk": "write"},
+     "summary": "确认需求范围", "body": '{"scope": "current"|"later"|"excluded", "reason", "expected_revision": int}', "risk": "write"},
     {"area": "projects", "method": "POST", "pattern": rf"/api/projects/{P}/decisions",
      "summary": "记录决定", "body": '{"statement", "rationale"}', "risk": "write"},
     {"area": "projects", "method": "POST", "pattern": rf"/api/projects/{P}/export",
@@ -125,13 +125,13 @@ ROUTES: list[dict] = [
      "summary": "项目备份列表"},
     # Documents and generation
     {"area": "documents", "method": "POST", "pattern": rf"/api/projects/{P}/generation-runs",
-     "summary": "启动 AI 生成（后台运行）", "body": '{"mode": "analysis"|"value"|"documents"|"improvement"|"revision", "document_kinds"?: ["analysis"|"product_requirements"|"interaction_design"|"technical_plan"|"development_plan"|"acceptance_plan"], "improvement_goal"?, "document_id"?, "section_heading"?, "revision_instruction"?}', "risk": "write"},
+     "summary": "启动 AI 生成（后台运行）", "body": '{"mode": "analysis"|"value"|"documents"|"improvement"|"revision", "document_kinds"?: ["analysis"|"product-requirements"|"interaction"|"technical-plan"|"development-plan"|"acceptance-plan"], "improvement_goal"?, "document_id"?, "section_heading"?, "revision_instruction"?}', "risk": "write"},
     {"area": "documents", "method": "GET", "pattern": rf"/api/projects/{P}/generation-runs(/gen_[A-Za-z0-9]+)?",
      "summary": "生成记录列表或单次生成结果"},
     {"area": "documents", "method": "POST", "pattern": rf"/api/projects/{P}/generation-runs/gen_[A-Za-z0-9]+/apply",
      "summary": "采用生成结果中的一条需求或一份文档", "body": '{"item_kind": "requirement"|"document", "index": int}', "risk": "write"},
     {"area": "documents", "method": "POST", "pattern": rf"/api/projects/{P}/documents",
-     "summary": "新建文档", "body": '{"kind", "title", "content"}', "risk": "write"},
+     "summary": "新建文档", "body": '{"kind": "analysis"|"product-requirements"|"interaction"|"technical-plan"|"development-plan"|"acceptance-plan"|"current-state", "title", "content"}', "risk": "write"},
     {"area": "documents", "method": "POST", "pattern": rf"/api/projects/{P}/documents/doc_[A-Za-z0-9]+/versions",
      "summary": "保存文档新版本", "body": '{"content", "expected_current_version": int, "change_summary"}', "risk": "write"},
     {"area": "documents", "method": "POST", "pattern": rf"/api/projects/{P}/documents/doc_[A-Za-z0-9]+/review",
@@ -255,13 +255,16 @@ def list_routes(area: str = "") -> dict:
 # ---------------------------------------------------------------------------
 
 def _request(method: str, path: str, query: str, body) -> tuple[int, object]:
-    target = path + (f"?{query}" if query else "")
+    # The request line must be ASCII; Chinese search words are common.
+    query = urlencode(parse_qsl(query, keep_blank_values=True)) if query else ""
+    target = quote(path, safe="/") + (f"?{query}" if query else "")
     headers = {"Host": f"127.0.0.1:{_PORT}", "Accept": "application/json"}
     data = None
     if method in WRITE_METHODS:
         data = json.dumps(body if isinstance(body, dict) else {}, ensure_ascii=False).encode()
         headers["Content-Type"] = "application/json"
-    connection = http.client.HTTPConnection("127.0.0.1", _PORT, timeout=60)
+    timeout = 300 if method in WRITE_METHODS else 60
+    connection = http.client.HTTPConnection("127.0.0.1", _PORT, timeout=timeout)
     try:
         connection.request(method, target, body=data, headers=headers)
         response = connection.getresponse()
@@ -294,6 +297,12 @@ def _clip(payload) -> object:
 def execute(method: str, path: str, query: str, body) -> dict:
     try:
         status, payload = _request(method, path, query, body)
+    except TimeoutError:
+        if method in WRITE_METHODS:
+            # The server may still finish the write; retrying could repeat it.
+            return {"status": 504, "ok": False, "result": {
+                "error": "outcome unknown: the request timed out; check the current state before retrying"}}
+        return {"status": 504, "ok": False, "result": {"error": "the request timed out"}}
     except (OSError, http.client.HTTPException) as error:
         return {"status": 503, "ok": False, "result": {"error": f"API unreachable: {error}"}}
     return {"status": status, "ok": 200 <= status < 300, "result": _redact_payload(_clip(payload))}
@@ -347,8 +356,11 @@ def _public(thread: dict) -> dict:
 
 
 def create_thread(title: str = "") -> dict:
-    if len(list(_root().glob("ast_*.json"))) >= MAX_THREADS:
-        raise AssistantError("too many conversations; delete some first", code="limit", status=409)
+    # Keep the newest conversations; there is no list UI to prune by hand.
+    existing = sorted(_root().glob("ast_*.json"), key=lambda item: item.stat().st_mtime)
+    for old in existing[:max(0, len(existing) - MAX_THREADS + 1)]:
+        if old.stem not in _RUNNING:
+            old.unlink(missing_ok=True)
     now = _now()
     thread = {"id": f"ast_{uuid.uuid4().hex}", "title": str(title or "")[:120],
               "created_at": now, "updated_at": now, "messages": [], "pending": None}
