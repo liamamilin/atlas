@@ -134,6 +134,7 @@ from project_baseline import (
 from opencode_cli_adapter import HarnessCompatibilityError, preflight as opencode_preflight
 import atlas_model
 import atlas_ask
+import atlas_assistant
 import oss_catalog
 from template_factory import api as factory_api
 from template_factory.store import FactoryError
@@ -1526,6 +1527,21 @@ class Handler(BaseHTTPRequestHandler):
     def _boundary_error(self, error: RequestBoundaryError):
         return self._json({"error": str(error)}, error.status_code)
 
+    def _assistant(self, method: str, path: str):
+        """The app assistant: conversations, messages and write approvals."""
+        try:
+            body = self._body() if method != "GET" else None
+            result, status = atlas_assistant.dispatch(method, path, body)
+            return self._json(result, status)
+        except RequestBoundaryError as error:
+            return self._boundary_error(error)
+        except atlas_assistant.AssistantError as error:
+            return self._json({"error": str(error), "code": error.code}, error.status)
+        except (ValueError, json.JSONDecodeError) as error:
+            return self._json(_api_error(error, "invalid_request"), 400)
+        except Exception as error:
+            return self._json(_api_error(error, "service_unavailable", True), 500)
+
     def _ask_post(self, path: str):
         """Conversation creation and question submission."""
         try:
@@ -1623,6 +1639,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(_api_error(error, "service_unavailable", True), 500)
         if path.startswith("/api/settings/github"):
             return self._settings_github("GET", path)
+        if path.startswith("/api/assistant/"):
+            return self._assistant("GET", path)
         if path == "/api/ask/threads":
             try:
                 return self._json(atlas_ask.list_threads())
@@ -1855,6 +1873,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._settings_model_post(path)
         if path.startswith("/api/settings/github"):
             return self._settings_github("POST", path)
+        if path.startswith("/api/assistant/"):
+            return self._assistant("POST", path)
         if path.startswith("/api/ask/"):
             return self._ask_post(path)
         m = re.match(
@@ -2460,6 +2480,8 @@ class Handler(BaseHTTPRequestHandler):
         except RequestBoundaryError as error:
             return self._boundary_error(error)
         path = unquote(urlparse(self.path).path)
+        if path.startswith("/api/assistant/"):
+            return self._assistant("DELETE", path)
         m = re.match(r"^/api/ask/threads/(ask_[0-9a-f]{32})$", path)
         if m:
             try:
@@ -2543,6 +2565,7 @@ if __name__ == "__main__":
                 recovery["applications_requiring_review"]),
         }, sort_keys=True))
     print(f"drafts API on :{args.port}  (drafts dir: {DRAFTS})")
+    atlas_assistant.configure(args.port)
     server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
     from oss_batch import BatchRecoveryService
     batch_recovery = BatchRecoveryService().start()
