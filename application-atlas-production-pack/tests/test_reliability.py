@@ -3705,6 +3705,31 @@ class ExecutionServiceTests(unittest.TestCase):
         self.assertEqual(replaced['application_state']['reason'],
                          'replaced_by_new_execution')
 
+    def test_long_runs_still_finish_when_the_prompt_leaves_the_window(self):
+        execution = start_execution(
+            self.store, self.project['id'], self.task['id'], {}, self.client)
+        self.client.mode = 'completed'
+        inner = self.client
+
+        class LongRunClient:
+            def reconcile(self, session_id, message_limit=20):
+                full = inner.reconcile(session_id)
+                user, final = full['messages'][-2], full['messages'][-1]
+                steps = [{'info': {'id': f'msg_step{i}', 'role': 'assistant',
+                                   'parentID': user['info']['id'], 'finish': 'tool-calls'},
+                          'parts': []} for i in range(30)]
+                messages = [user, *steps, final]
+                if len(messages) > message_limit:
+                    # OpenCode v2 messages carry no parent; outside the window
+                    # the prompt cannot be linked.
+                    messages = [{**item, 'info': {**item['info'], 'parentID': None}}
+                                for item in messages[-message_limit:]]
+                return {**full, 'messages': messages}
+
+        finished = reconcile_execution(
+            self.store, self.project['id'], execution['id'], LongRunClient())
+        self.assertEqual(finished['status'], 'completed')
+
     def test_missing_session_can_be_closed_as_a_stopped_execution(self):
         execution = start_execution(
             self.store, self.project['id'], self.task['id'], {}, self.client)

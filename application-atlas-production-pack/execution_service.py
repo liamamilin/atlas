@@ -382,8 +382,15 @@ def reconcile_execution(store, project_id: str, execution_id: str,
     try:
         current = engine.reconcile(execution["engine_session_id"])
         messages = current.get("messages") or []
-        message_id = execution.get("engine_message_id") or _task_message_id(
-            messages, execution_id)
+        anchor = execution.get("engine_message_id")
+        if anchor and messages and not any(
+                (item.get("info") or {}).get("id") == anchor for item in messages):
+            # Long runs push the task prompt out of the newest-messages window;
+            # without it no reply can be tied to this task and the run never ends.
+            current = engine.reconcile(
+                execution["engine_session_id"], message_limit=RECONCILE_WINDOW_MAX)
+            messages = current.get("messages") or []
+        message_id = anchor or _task_message_id(messages, execution_id)
         if not message_id:
             prior_ids = set((execution.get("input_state") or {}).get(
                 "session_user_message_ids_before") or [])
@@ -1616,6 +1623,9 @@ def _permission_action(request: dict) -> str:
         if isinstance(value, str):
             return value.strip().lower().replace("-", "_")
     return ""
+
+
+RECONCILE_WINDOW_MAX = 200  # OpenCode v2 rejects larger message pages
 
 
 def _tools(kind: str) -> dict:
