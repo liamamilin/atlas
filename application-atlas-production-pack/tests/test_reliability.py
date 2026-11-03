@@ -831,6 +831,47 @@ class ProjectStoreTests(unittest.TestCase):
                             baseline['content_fingerprint'])
         self.assertTrue(local_change['changes']['git_worktree_state_changed'])
 
+    def _git_repo(self, root, *paths):
+        for args in (['init'], ['config', 'user.name', 'Atlas Test'],
+                     ['config', 'user.email', 'atlas@example.test']):
+            subprocess.run(['git', *args], cwd=root, check=True, capture_output=True)
+        subprocess.run(['git', 'add', *paths], cwd=root, check=True)
+        subprocess.run(['git', 'commit', '-m', 'baseline'], cwd=root,
+                       check=True, capture_output=True)
+
+    def test_parent_repository_commits_do_not_move_a_nested_workspace(self):
+        workspace = Path(self.project['workspace'])
+        workspace.mkdir(parents=True, exist_ok=True)
+        (self.root / '.gitignore').write_text('workspace/\n')
+        (self.root / 'atlas.py').write_text('one\n')
+        self._git_repo(self.root, '.gitignore', 'atlas.py')
+        baseline = capture_project_baseline(self.store, self.project['id'])
+
+        (self.root / 'atlas.py').write_text('two\n')
+        subprocess.run(['git', 'commit', '-am', 'elsewhere'], cwd=self.root,
+                       check=True, capture_output=True)
+        checked = check_project_changes(self.store, self.project['id'])
+
+        self.assertNotEqual(checked['current']['git']['head'], baseline['git']['head'])
+        self.assertEqual(checked['current']['content_fingerprint'],
+                         baseline['content_fingerprint'])
+        self.assertFalse(checked['changes']['git_revision_changed'])
+
+    def test_workspace_repository_commits_still_count(self):
+        workspace = Path(self.project['workspace'])
+        workspace.mkdir(parents=True, exist_ok=True)
+        (workspace / 'app.py').write_text('one\n')
+        self._git_repo(workspace, 'app.py')
+        baseline = capture_project_baseline(self.store, self.project['id'])
+
+        subprocess.run(['git', 'commit', '--allow-empty', '-m', 'next'], cwd=workspace,
+                       check=True, capture_output=True)
+        checked = check_project_changes(self.store, self.project['id'])
+
+        self.assertNotEqual(checked['current']['content_fingerprint'],
+                            baseline['content_fingerprint'])
+        self.assertTrue(checked['changes']['git_revision_changed'])
+
     def test_outside_scope_change_is_visible_without_forcing_focus_review(self):
         workspace = self.root / 'workspace'
         (workspace / 'src').mkdir(parents=True)

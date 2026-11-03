@@ -124,7 +124,8 @@ def compare_project_manifests(before: dict, after: dict) -> dict:
     reviewed = [path for path in changed_paths
                 if path in read_paths or any(_matches(path, value) for value in focus)]
     outside = [path for path in changed_paths if path not in set(reviewed)]
-    git_before, git_after = before.get("git") or {}, after.get("git") or {}
+    git_before = _workspace_git(before.get("git") or {}, before.get("root"))
+    git_after = _workspace_git(after.get("git") or {}, after.get("root"))
     git_revision_changed = any(git_before.get(key) != git_after.get(key)
                                for key in ("repository", "root", "head", "branch"))
     git_worktree_state_changed = any(git_before.get(key) != git_after.get(key)
@@ -444,8 +445,22 @@ def _fingerprint(value) -> str:
         value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
+def _workspace_git(git: dict, root) -> dict:
+    """Git state that belongs to the workspace itself.
+
+    When the workspace is a subdirectory of a larger repository, commits
+    elsewhere in that repository move HEAD without touching the workspace.
+    File hashes and the workspace-scoped status already cover its content.
+    """
+    top = git.get("root") if git.get("repository") else None
+    if top and root and Path(top).resolve() != Path(root).resolve():
+        return {key: value for key, value in git.items() if key not in {"head", "branch"}}
+    return git
+
+
 def _content_fingerprint(manifest: dict) -> str:
     return _fingerprint({
         "root": manifest["root"], "files": manifest["files"],
-        "errors": manifest.get("errors") or [], "git": manifest["git"],
+        "errors": manifest.get("errors") or [],
+        "git": _workspace_git(manifest["git"], manifest["root"]),
     })
