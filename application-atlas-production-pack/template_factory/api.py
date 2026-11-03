@@ -35,13 +35,15 @@ def _initialized_store(root, pack):
     return FactoryStore(root, pack)
 
 
+def factory_root() -> str:
+    return os.environ.get("ATLAS_FACTORY_ROOT", str(PACK / "atlas/template-factory"))
+
+
 def get_store():
     # lru_cache may compute the same miss concurrently. Historical leaf panels
     # request several endpoints at once; serialize the initial schema/WAL setup.
     with _STORE_INIT_LOCK:
-        return _initialized_store(
-            os.environ.get("ATLAS_FACTORY_ROOT", str(PACK / "atlas/template-factory")), str(PACK)
-        )
+        return _initialized_store(factory_root(), str(PACK))
 
 
 def artifact(store, artifact_id):

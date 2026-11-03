@@ -1055,6 +1055,48 @@ def _generation_source_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
+_SQLITE_SIDECARS = ("-wal", "-shm", "-journal")
+# Atlas-owned run records next to the project store; project workspaces stay checked.
+_PROJECT_RUNTIME_DIRS = (
+    "generation-runs", "execution-evidence", "execution-workspaces", "exports",
+    "backups", "runtime",
+)
+
+
+def _sqlite_files(path: Path) -> list[Path]:
+    return [path, *(path.with_name(path.name + suffix) for suffix in _SQLITE_SIDECARS)]
+
+
+def _server_state_roots(directory: Path) -> tuple[Path, ...]:
+    """State the running API server writes on its own during a generation.
+
+    The containment check compares the source tree before and after the
+    provider runs, so these paths would otherwise be reported as provider
+    writes. Everything else, including credentials and the corpus, stays
+    checked. Paths come from the owning modules so they cannot drift.
+    """
+    import atlas_ask
+    import atlas_assistant
+    import atlas_model
+    import oss_catalog
+    import oss_discovery
+    from template_factory import api as factory_api
+
+    catalog = oss_catalog.store_path()
+    roots = [
+        Path(atlas_ask.ASK_ROOT), Path(atlas_assistant.ROOT), Path(oss_discovery.ROOT),
+        Path(factory_api.factory_root()), atlas_model._fallback_state_path(),
+        *_sqlite_files(catalog), catalog.with_suffix(".recovery.json"),
+        catalog.with_suffix(".refresh.lock"),
+    ]
+    # directory is <store dir>/generation-runs/<project>/<run>.
+    store_dir = Path(directory).resolve().parents[2]
+    roots += [store_dir / name for name in _PROJECT_RUNTIME_DIRS]
+    for database in store_dir.glob("*.sqlite"):
+        roots += _sqlite_files(database)
+    return tuple(roots)
+
+
 def _path_in_roots(path: Path, roots: tuple[Path, ...]) -> bool:
     return any(path == root or root in path.parents for root in roots)
 
@@ -1069,7 +1111,9 @@ def _snapshot_entry(path: Path, root: Path):
     if stat.S_ISLNK(info.st_mode):
         return relative, ("symlink", os.readlink(path))
     if stat.S_ISDIR(info.st_mode):
-        return relative, ("directory", mode, info.st_mtime_ns)
+        # Directory mtimes move whenever an excluded child changes; every
+        # checked child is compared on its own.
+        return relative, ("directory", mode)
     if not stat.S_ISREG(info.st_mode):
         return relative, ("other", mode, info.st_mtime_ns)
     digest = ""
@@ -1223,7 +1267,8 @@ def _run_opencode(directory: Path, run: dict) -> tuple[dict, dict]:
         environment["PWD"] = str(runtime)
         source_root = _generation_source_root()
         trusted_roots = (
-            directory.resolve(), workspace.resolve(), runtime.resolve())
+            directory.resolve(), workspace.resolve(), runtime.resolve(),
+            *_server_state_roots(directory))
         source_before = _snapshot_source_tree(source_root, trusted_roots)
         process = None
         timeout_error = None

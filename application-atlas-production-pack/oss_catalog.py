@@ -375,9 +375,13 @@ def content_digest(card):
     return digest(canonical(stable(card)))
 
 
+def store_path() -> Path:
+    return Path(os.environ.get("ATLAS_OSS_STORE", PACK / "atlas/oss-catalog.sqlite"))
+
+
 class CatalogStore:
     def __init__(self, path=None, bootstrap=True):
-        self.path = Path(path or os.environ.get("ATLAS_OSS_STORE", PACK / "atlas/oss-catalog.sqlite"))
+        self.path = Path(path or store_path())
         self.path.parent.mkdir(parents=True, exist_ok=True)
         # The API builds a store per request; schema checks, association backfill
         # and snapshot bootstrap only need to run once per database file.
