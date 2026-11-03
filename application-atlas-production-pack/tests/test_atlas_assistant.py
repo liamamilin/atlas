@@ -254,6 +254,59 @@ class AssistantTests(unittest.TestCase):
         with self.assertRaises(AssistantError):
             atlas_assistant.read_thread(first)
 
+    def test_select_returns_parts_and_large_results_carry_an_outline(self):
+        payload = {"result": {"requirements": [{"key": "a"}, {"key": "b"}], "documents": [{"title": "t" * 9000}]}}
+        with patch.object(atlas_assistant, "_request", lambda *a: (200, payload)):
+            picked = atlas_assistant.execute("GET", "/api/x", "", None, ["result.requirements.1.key", "result.nope"])
+            whole = atlas_assistant.execute("GET", "/api/x", "", None)
+        self.assertEqual(picked["result"]["result.requirements.1.key"], "b")
+        self.assertIn("error", picked["result"]["result.nope"])
+        self.assertTrue(whole["result"]["truncated"])
+        self.assertEqual(whole["result"]["outline"]["result"]["requirements"], "list(2)")
+
+    def test_approval_note_names_the_exact_request(self):
+        model = FakeModel(reply(calls=[call("call_api", {
+            "method": "POST", "path": "/api/oss/projects/7/favorite", "body": {"favorite": True}})]))
+        thread = self.run_turn(model)
+        follow = FakeModel(reply("好"))
+        with patch.object(atlas_assistant.atlas_model, "chat", follow):
+            atlas_assistant.decide(thread["id"], thread["pending"]["id"], "approve")
+        self.assertIn('{"favorite": true}', follow.seen[0][-1]["content"])
+
+    def test_only_the_newest_action_result_is_replayed(self):
+        thread = atlas_assistant.create_thread()
+        stored = atlas_assistant._read(thread["id"])
+        action = {"id": "act_x", "method": "POST", "path": "/api/a", "body": {"n": 1}, "summary": "s"}
+        for marker in ("FIRST-RESULT", "SECOND-RESULT"):
+            stored["messages"].append({"id": marker, "role": "action", "action": action, "decision": "approve",
+                                       "outcome": {"ok": True, "status": 201, "result": marker}})
+        history = "\n".join(m["content"] for m in atlas_assistant._history(stored))
+        self.assertNotIn("FIRST-RESULT", history)
+        self.assertIn("SECOND-RESULT", history)
+
+    def test_repeated_reads_in_one_run_are_not_refetched(self):
+        get = {"method": "GET", "path": "/api/projects"}
+        model = FakeModel(reply(calls=[call("call_api", get)]), reply(calls=[call("call_api", get, "c2")]), reply("好"))
+        self.run_turn(model)
+        self.assertEqual(len(self.requests), 1)
+        self.assertIn("same request as step 1", model.seen[2][-1]["content"])
+
+    def test_claimed_proposal_without_a_tool_call_is_flagged(self):
+        thread = self.run_turn(FakeModel(reply("已提交第 5 条需求，请批准。")))
+        self.assertIn("没有生成待确认的操作", thread["messages"][-1]["content"])
+        self.assertIsNone(thread["pending"])
+
+    def test_an_approved_write_cannot_be_proposed_again(self):
+        write = {"method": "POST", "path": "/api/oss/projects/7/favorite", "body": {"favorite": True}}
+        thread = self.run_turn(FakeModel(reply(calls=[call("call_api", write)])))
+        repeat = FakeModel(reply("已收藏", calls=[call("call_api", write, "c2")]), reply("都完成了"))
+        with patch.object(atlas_assistant.atlas_model, "chat", repeat):
+            atlas_assistant.decide(thread["id"], thread["pending"]["id"], "approve")
+        thread = atlas_assistant.read_thread(thread["id"])
+        self.assertIsNone(thread["pending"])
+        self.assertTrue(thread["messages"][-1]["steps"][0]["error"])
+        self.assertEqual(len([r for r in self.requests if r[0] == "POST"]), 1)
+
     def test_routes_list_by_area(self):
         routes = atlas_assistant.list_routes("projects")["routes"]
         self.assertTrue(routes)
