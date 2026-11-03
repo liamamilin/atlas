@@ -577,6 +577,7 @@ export interface ProjectExecution {
     evidence?: {
       message_ids?: string[];
       assistant_text?: string;
+      error_detail?: string;
       engine_diff?: unknown[];
       filesystem?: ExecutionFilesystemEvidence;
       verification?: {

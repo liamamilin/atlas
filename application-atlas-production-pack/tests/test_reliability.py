@@ -597,6 +597,12 @@ class ExecutionStateTests(unittest.TestCase):
         self.assertEqual(project_execution(base, 'msg_user')['state'], 'stopped')
         base['messages'][0]['info']['error'] = {'name': 'ProviderError'}
         self.assertEqual(project_execution(base, 'msg_user')['state'], 'failed')
+        base['messages'][0]['info']['error'] = {
+            'name': 'provider.invalid-request',
+            'data': {'message': 'Model mimo-v2.5 has been deprecated. Use mimo-v2.6-flash instead.'}}
+        evidence = project_execution(base, 'msg_user')['evidence']
+        self.assertEqual(evidence['error'], 'provider.invalid-request')
+        self.assertIn('deprecated', evidence['error_detail'])
 
     def test_unrelated_permission_does_not_capture_task(self):
         result = project_execution({

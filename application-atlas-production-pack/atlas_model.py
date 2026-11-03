@@ -59,7 +59,7 @@ PRESETS: dict[str, dict] = {
     "opencode-go": {
         "name": "OpenCode Go", "style": "openai",
         "base_url": "https://opencode.ai/inference/go/openai/v1",
-        "models": ["deepseek-v4.1-flash", "mimo-v2.5", "step-5-preview"],
+        "models": ["deepseek-v4.1-flash", "mimo-v2.6-flash", "step-5-preview"],
     },
     "opencode": {
         "name": "OpenCode Zen", "style": "openai",

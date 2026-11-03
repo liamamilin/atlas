@@ -6,6 +6,8 @@ after a disconnect.
 """
 from __future__ import annotations
 
+from privacy import redact_text
+
 
 STATES = {
     "queued",
@@ -49,6 +51,11 @@ def project_execution(reconcile: dict, task_message_id: str | None = None) -> di
     if error:
         name = error.get("name") or error.get("type") or "UnknownError"
         state = "stopped" if name == "MessageAbortedError" else "failed"
+        data = error.get("data") if isinstance(error.get("data"), dict) else {}
+        detail = error.get("message") or data.get("message") or ""
+        if isinstance(detail, str) and detail.strip():
+            return _result(state, engine_status, relevant, error=name,
+                           error_detail=redact_text(detail.strip())[:500])
         return _result(state, engine_status, relevant, error=name)
 
     if engine_status in {"busy", "retry"}:
