@@ -307,6 +307,15 @@ class AssistantTests(unittest.TestCase):
         self.assertTrue(thread["messages"][-1]["steps"][0]["error"])
         self.assertEqual(len([r for r in self.requests if r[0] == "POST"]), 1)
 
+    def test_operator_can_retry_an_earlier_approved_write(self):
+        write = {"method": "POST", "path": "/api/oss/projects/7/favorite", "body": {"favorite": True}}
+        thread = self.run_turn(FakeModel(reply(calls=[call("call_api", write)])))
+        with patch.object(atlas_assistant.atlas_model, "chat", FakeModel(reply("已收藏"))):
+            atlas_assistant.decide(thread["id"], thread["pending"]["id"], "approve")
+        with patch.object(atlas_assistant.atlas_model, "chat", FakeModel(reply(calls=[call("call_api", write, "c3")]))):
+            atlas_assistant.send_message(thread["id"], "后台失败了，再试一次")
+        self.assertIsNotNone(atlas_assistant.read_thread(thread["id"])["pending"])
+
     def test_routes_list_by_area(self):
         routes = atlas_assistant.list_routes("projects")["routes"]
         self.assertTrue(routes)

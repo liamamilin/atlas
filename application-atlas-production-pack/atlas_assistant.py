@@ -145,7 +145,7 @@ ROUTES: list[dict] = [
      "summary": "补齐旧验收记录的元数据", "body": "{}", "risk": "destructive",
      "typed": "backfill_legacy_acceptance_metadata", "field": "confirm"},
     {"area": "projects", "method": "POST", "pattern": rf"/api/projects/{P}/open-items/resolve",
-     "summary": "处理生成结果中的待决问题", "body": '{"run_id", "item_kind", "item_index": int, "item_key", "status", "note"?, "convert"?: "decision"|"requirement"}', "risk": "write"},
+     "summary": "处理生成结果中的待决问题", "body": '{"run_id", "item_kind": "question"|"conflict"|"suggestion", "item_index": int, "item_key", "status": question 用 answered|deferred|dismissed，conflict 用 resolved|deferred|dismissed，suggestion 用 accepted|deferred|dismissed, "note", "convert"?: "decision"|"requirement"}；四个定位字段必须原样取自 GET /api/projects/<id>/workspace 的 open_items[]（kind→item_kind, index→item_index, key→item_key，可用 select=["open_items"]）', "risk": "write"},
     {"area": "projects", "method": "PATCH", "pattern": rf"/api/projects/{P}/references/ref_[A-Za-z0-9]+",
      "summary": "修改资料的备注或阅读状态", "body": '{"note"?, "read_status"?}', "risk": "write"},
     # Documents and generation
@@ -193,7 +193,7 @@ ROUTES: list[dict] = [
     {"area": "execution", "method": "POST", "pattern": rf"/api/projects/{P}/workspace-baselines",
      "summary": "检查工作区变化或记录新基线", "body": '{"action": "check"} 或 {"action": "capture", "focus_paths": []}', "risk": "write"},
     {"area": "execution", "method": "GET", "pattern": rf"/api/projects/{P}/(workspace|workspace-baselines|harness/preflight)",
-     "summary": "工作区状态、基线列表、OpenCode 预检"},
+     "summary": "workspace：项目全貌，含 requirements、decisions、documents、iterations、tasks、executions 和 open_items（待决问题）；workspace-baselines：基线列表；harness/preflight：OpenCode 预检"},
     # Type drafts
     {"area": "drafts", "method": "GET", "pattern": r"/api/drafts(/[\w-]+)?",
      "summary": "分类草稿列表或单个草稿"},
@@ -356,23 +356,25 @@ def _outline(value, depth: int = 0):
     return value
 
 
+def _pick(value, parts: list[str]):
+    if not parts:
+        return value
+    part, rest = parts[0], parts[1:]
+    if part == "*" and isinstance(value, list):
+        return [_pick(item, rest) for item in value]
+    if isinstance(value, list) and part.isdigit() and int(part) < len(value):
+        return _pick(value[int(part)], rest)
+    if isinstance(value, dict) and part in value:
+        return _pick(value[part], rest)
+    return {"error": f"no {part!r} here"}
+
+
 def _select(payload, paths) -> dict:
-    """Pick parts of a response by dotted path, e.g. result.requirements.0."""
-    picked = {}
-    for path in paths[:20]:
-        value = payload
-        for part in str(path).split("."):
-            if isinstance(value, list) and part.isdigit() and int(part) < len(value):
-                value = value[int(part)]
-            elif isinstance(value, list) and part == "*":
-                continue
-            elif isinstance(value, dict) and part in value:
-                value = value[part]
-            else:
-                value = {"error": f"no {part!r} at {path}"}
-                break
-        picked[str(path)] = value
-    return picked
+    """Pick parts of a response by dotted path; * maps over a list.
+
+    e.g. requirements.*.id lists every requirement id in one call.
+    """
+    return {str(path): _pick(payload, str(path).split(".")) for path in paths[:20]}
 
 
 def _clip(payload) -> object:
@@ -504,7 +506,8 @@ _SYSTEM_PROMPT = """你是 Application Atlas 的应用助手。操作者可以�
 - 语料工具（search_atlas、get_leaf 等）读取软件类型资料。
 - list_routes(area) 列出应用接口；先查看对应领域，再用 call_api 调用。领域：{areas}。
 - call_api(method, path, query, body, select) 调用应用接口。响应很大时会被截断并附上结构概览，\
-用 select 只取需要的部分（例如 select=["result.requirements"]），不要重复整页读取。GET 立即返回结果；写操作不会立即执行，\
+用 select 只取需要的部分（例如 select=["requirements.*.id", "requirements.*.content"]，* 表示列表里的每一项），\
+一次取齐需要的字段，不要反复读取同一个接口。GET 立即返回结果；写操作不会立即执行，\
 而是交给操作者确认，确认后你会在下一轮看到执行结果。一次只提出一个写操作，提出后停止并说明你准备做什么。
 - navigate(path) 为操作者打开页面，例如 /projects/prj_x、/types/<slug>、/repos/<id>、/settings。
 
@@ -533,7 +536,7 @@ _TOOLS = [
             "path": {"type": "string", "description": "API path starting with /api/"},
             "query": {"type": "object", "description": "Query parameters for GET"},
             "select": {"type": "array", "items": {"type": "string"},
-                       "description": "GET only: dotted paths to return instead of the whole response, e.g. [\"requirements\", \"documents.0.title\"]"},
+                       "description": "GET only: dotted paths to return instead of the whole response, * maps over a list, e.g. [\"requirements.*.id\", \"requirements.*.content\", \"documents.0.title\"]"},
             "body": {"type": "object", "description": "JSON body for writes"}},
             "required": ["method", "path"]}}},
     {"type": "function", "function": {
@@ -586,8 +589,8 @@ def _run_tool(name: str, arguments: dict, state: dict) -> dict:
         if method != "GET":
             signature = json.dumps([method, path, arguments.get("body") or {}], sort_keys=True, ensure_ascii=False)
             if signature in state.get("approved", set()):
-                return {"error": "this exact request was already approved and executed in this conversation; "
-                                 "do not repeat it. Report what is done, or propose the next different step."}
+                return {"error": "this exact request was just approved and executed; do not repeat it. "
+                                 "Report what is done, or propose the next different step."}
         if method == "GET":
             key = json.dumps([path, query, arguments.get("select")], ensure_ascii=False)
             seen = state.setdefault("reads", {})
@@ -646,21 +649,36 @@ def _history(thread: dict) -> list[dict]:
                         f"请求体 {sent}），执行{'成功' if outcome.get('ok') else '失败'}（{outcome.get('status')}）。")
                 if index == last_action:
                     note += ("如果原请求还有未完成的步骤，现在就调用工具提出下一步（回复里顺带一句这一步的结果），"
-                             "不要只说「我会继续」；如果已经全部完成，用一两句话报告结果。不要重复已完成的操作。"
+                             "不要只说「我会继续」；如果已经全部完成，直接用一两句话报告结果，执行结果已经在下面，不需要再查询核实。不要重复已完成的操作。"
                              "\n执行结果：\n" + _fence(outcome))
             history.append({"role": "user", "content": note})
     return history
+
+
+def _recent_approvals(thread: dict) -> set[str]:
+    """Writes approved since the operator last spoke.
+
+    Repeating one of these is the model echoing its own last step. Once the
+    operator sends a new message, the same request may be a deliberate retry,
+    for example after a background job failed.
+    """
+    approved: set[str] = set()
+    for message in thread.get("messages") or []:
+        if message.get("role") == "user":
+            approved.clear()
+        elif (message.get("role") == "action" and message.get("decision") == "approve"
+              and (message.get("outcome") or {}).get("ok")):
+            action = message["action"]
+            approved.add(json.dumps([action["method"], action["path"], action.get("body") or {}],
+                                    sort_keys=True, ensure_ascii=False))
+    return approved
 
 
 def _run(thread_id: str) -> None:
     thread = _read(thread_id)
     history = _history(thread)
     steps: list[dict] = []
-    state: dict = {"approved": {
-        json.dumps([m["action"]["method"], m["action"]["path"], m["action"].get("body") or {}],
-                   sort_keys=True, ensure_ascii=False)
-        for m in thread.get("messages") or []
-        if m.get("role") == "action" and m.get("decision") == "approve" and (m.get("outcome") or {}).get("ok")}}
+    state: dict = {"approved": _recent_approvals(thread)}
     usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
     deadline = time.monotonic() + MAX_SECONDS
     status, answer = "completed", ""
