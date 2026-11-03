@@ -1644,7 +1644,7 @@ def _model(value) -> str:
     model = (value or "").strip() if isinstance(value, str) else ""
     if not model:
         model = os.environ.get(
-            "ATLAS_EXECUTION_MODEL", "opencode-go/mimo-v2.6-flash").strip()
+            "ATLAS_EXECUTION_MODEL", "opencode-go/deepseek-v4.1-flash").strip()
     if "/" not in model or not all(part for part in model.split("/", 1)):
         raise ValueError("model must use provider/model format")
     return model

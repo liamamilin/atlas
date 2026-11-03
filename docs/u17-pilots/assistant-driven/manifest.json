@@ -1,0 +1,27 @@
+{
+  "case_id": "assistant-driven",
+  "title": "全程通过应用助手驱动的新想法试点（命令行番茄钟）",
+  "started_at": "2026-11-03T01:39:04Z",
+  "finished_at": "2026-11-03T04:22:00Z",
+  "atlas_branch": "codex/stabilize-atlas",
+  "atlas_head_at_start": "01dcadd8",
+  "operator": "开发者模拟操作者，只通过助手对话和确认卡片操作，不直接调用写接口",
+  "assistant": {
+    "thread_id": "ast_be854b43c63f4cfaa1dded4e98e6630b",
+    "model": "open-design/deepseek-v4.1-flash（默认）"
+  },
+  "project": {
+    "id": "prj_5ba9e546ac8643b8b56a7eef799c59a6",
+    "name": "M5 助手试点 · 命令行番茄钟",
+    "reference": "focus-timer",
+    "workspace": "application-atlas-production-pack/projects/workspaces/prj_5ba9e546ac8643b8b56a7eef799c59a6"
+  },
+  "iteration_id": "itr_65c82e3a777a4540abf4aa8f5453319c",
+  "task_id": "tsk_1d2f91114ff843c88ae11db3868d2c19",
+  "executions": [
+    {"id": "exe_0f543f79ba0348489bb063af41aa7761", "model": "opencode-go/mimo-v2.5", "status": "failed", "reason": "provider 已下线该模型"},
+    {"id": "exe_93a35d2fdd3a4e58884326e28f50c935", "model": "opencode-go/mimo-v2.6-flash", "status": "stopped", "reason": "模型流在第二步挂起约 20 分钟"},
+    {"id": "exe_580cd679906747529084376904fc9cba", "model": "opencode-go/deepseek-v4.1-flash", "status": "completed", "application_status": "applied"}
+  ],
+  "credentials_recorded": false
+}
