@@ -594,7 +594,7 @@ def _run_tool(name: str, arguments: dict, state: dict) -> dict:
                 return {"error": "this exact request was just approved and executed; do not repeat it. "
                                  "Report what is done, or propose the next different step."}
         if route and route["risk"] == "sync":
-            # Pulls state from the execution engine; changes nothing the operator owns.
+            # Same sync the task page runs unattended every 1.5s, so no approval card.
             return execute(method, path, query, {}, arguments.get("select"))
         if method == "GET":
             key = json.dumps([path, query, arguments.get("select")], ensure_ascii=False)
