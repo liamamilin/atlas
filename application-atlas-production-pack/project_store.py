@@ -1099,7 +1099,9 @@ class ProjectStore:
             if expected_conditions:
                 if condition_results is None:
                     raise ProjectStoreError(
-                        "acceptance requires a result for every pinned condition")
+                        "acceptance requires a result for every pinned condition; send "
+                        "condition_results with one {requirement_id, revision, condition, result} "
+                        "per condition in the task's requirement_snapshots")
                 provided = {}
                 for item in condition_results:
                     key = (item["requirement_id"], item["revision"], item["condition"].strip())

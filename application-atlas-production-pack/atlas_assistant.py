@@ -173,7 +173,7 @@ ROUTES: list[dict] = [
     {"area": "execution", "method": "POST", "pattern": rf"/api/projects/{P}/tasks/tsk_[A-Za-z0-9]+/executions",
      "summary": "用 OpenCode 执行任务（后台运行）", "body": '{"model"?}', "risk": "write"},
     {"area": "execution", "method": "POST", "pattern": rf"/api/projects/{P}/tasks/tsk_[A-Za-z0-9]+/acceptance",
-     "summary": "记录任务验收", "body": '{"status": "passed"|"failed"|"waived", "evidence": [{"kind", "summary"}]}', "risk": "write"},
+     "summary": "记录任务验收", "body": '{"status": "passed"|"failed"|"waived", "evidence": [{"kind", "summary"}], "condition_results": [{"requirement_id", "revision", "condition", "result": "passed"|"failed"|"waived", "note"?}]}；代码和文档任务必须给 task.requirement_snapshots 里每条 acceptance_conditions 各一个结果，condition 原文照抄，revision 用快照里的整数；passed 要求每条都 passed，waived 要求每条都 waived，failed 至少一条 failed', "risk": "write"},
     {"area": "execution", "method": "GET", "pattern": rf"/api/projects/{P}/executions/exe_[A-Za-z0-9]+",
      "summary": "执行详情（只读快照，不会推进状态；查进度请用 reconcile）"},
     {"area": "execution", "method": "POST", "pattern": rf"/api/projects/{P}/executions/exe_[A-Za-z0-9]+/reconcile",
@@ -647,6 +647,11 @@ def _history(thread: dict) -> list[dict]:
             action = message["action"]
             if message["decision"] != "approve":
                 note = f"[操作记录] 操作者拒绝了「{action['summary']}」（{action['method']} {action['path']}），未执行。"
+                if index == last_action and action.get("body"):
+                    # Lets the model amend what the operator corrected instead
+                    # of re-deriving a large body from scratch.
+                    note += ("如果操作者要求修改后重提，以下面的请求体为底稿，只改操作者指出的部分。"
+                             "\n被拒绝的请求体：\n" + _fence(action["body"]))
             else:
                 outcome = message.get("outcome") or {}
                 sent = json.dumps(action.get("body") or {}, ensure_ascii=False)[:500]

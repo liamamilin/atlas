@@ -208,6 +208,17 @@ class AssistantTests(unittest.TestCase):
         self.assertIsNone(thread["pending"])
         self.assertEqual(self.requests, [])
 
+    def test_superseded_proposal_body_is_kept_for_amendment(self):
+        model = FakeModel(reply(calls=[call("call_api", {
+            "method": "POST", "path": "/api/oss/projects/7/favorite", "body": {"favorite": True}})]))
+        thread = self.run_turn(model)
+        follow = FakeModel(reply("好"))
+        with patch.object(atlas_assistant.atlas_model, "chat", follow):
+            atlas_assistant.send_message(thread["id"], "改成取消收藏")
+        notes = [m["content"] for m in follow.seen[0] if m["role"] == "user"]
+        self.assertIn('"favorite": true', notes[-2])
+        self.assertEqual(notes[-1], "改成取消收藏")
+
     def test_navigate_accepts_app_pages_only(self):
         model = FakeModel(reply(calls=[call("navigate", {"path": "https://example.com"}),
                                        call("navigate", {"path": "/repos/42"}, "c2")]),
