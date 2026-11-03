@@ -92,7 +92,7 @@ class AssistantTests(unittest.TestCase):
             if route["method"] == "GET":
                 self.assertEqual(route["risk"], "read")
             else:
-                self.assertIn(route["risk"], {"write", "destructive"}, route["pattern"])
+                self.assertIn(route["risk"], {"write", "destructive", "sync"}, route["pattern"])
                 self.assertIn("body", route, route["pattern"])
             if route["risk"] == "destructive":
                 self.assertTrue(route.get("typed"), route["pattern"])
@@ -119,6 +119,17 @@ class AssistantTests(unittest.TestCase):
         path, _, route = atlas_assistant.check_request("POST", "/api/oss/projects/12/favorite")
         self.assertEqual(route["risk"], "write")
         self.assertEqual(path, "/api/oss/projects/12/favorite")
+
+    def test_execution_reconcile_syncs_without_approval(self):
+        path = "/api/projects/prj_1/executions/exe_1/reconcile"
+        self.assertEqual(atlas_assistant.check_request("POST", path)[2]["risk"], "sync")
+        self.assertEqual(atlas_assistant.check_request(
+            "POST", "/api/projects/prj_1/executions/exe_1/stop")[2]["risk"], "write")
+        model = FakeModel(reply(calls=[call("call_api", {"method": "POST", "path": path})]),
+                          reply("执行仍在运行。"))
+        thread = self.run_turn(model)
+        self.assertEqual(self.requests, [("POST", path, "", {})])
+        self.assertIsNone(thread["pending"])
 
     def test_reads_run_immediately_and_writes_wait_for_approval(self):
         model = FakeModel(

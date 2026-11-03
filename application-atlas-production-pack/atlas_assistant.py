@@ -165,19 +165,21 @@ ROUTES: list[dict] = [
      "summary": "文档版本历史或差异"},
     # Iterations, tasks, executions
     {"area": "execution", "method": "POST", "pattern": rf"/api/projects/{P}/iterations",
-     "summary": "创建迭代", "body": '{"title", "objective", "input_document_versions": [版本id], "requirement_ids": [需求id], "activate"?: bool}', "risk": "write"},
+     "summary": "创建迭代", "body": '{"title", "objective", "input_document_versions": ["dver_…"], "requirement_ids": ["req_…"], "activate"?: bool}；input_document_versions 是文档当前版本的 version_id（workspace 的 documents.*.version_id），不是 doc_ id', "risk": "write"},
     {"area": "execution", "method": "POST", "pattern": rf"/api/projects/{P}/iterations/itr_[A-Za-z0-9]+/status",
      "summary": "更改迭代状态", "body": '{"status": "active"|"completed"|"abandoned"}', "risk": "write"},
     {"area": "execution", "method": "POST", "pattern": rf"/api/projects/{P}/tasks",
-     "summary": "创建任务", "body": '{"iteration_id", "kind": "analysis"|"document"|"code", "title", "objective", "input_document_versions": [], "requirement_ids": [], "write_paths": [], "verification_commands": []}', "risk": "write"},
+     "summary": "创建任务", "body": '{"iteration_id", "kind": "analysis"|"document"|"code", "title", "objective", "input_document_versions": ["dver_…"], "requirement_ids": ["req_…"], "write_paths": [], "verification_commands": []}；版本用 documents.*.version_id，且应属于该迭代的输入', "risk": "write"},
     {"area": "execution", "method": "POST", "pattern": rf"/api/projects/{P}/tasks/tsk_[A-Za-z0-9]+/executions",
      "summary": "用 OpenCode 执行任务（后台运行）", "body": '{"model"?}', "risk": "write"},
     {"area": "execution", "method": "POST", "pattern": rf"/api/projects/{P}/tasks/tsk_[A-Za-z0-9]+/acceptance",
      "summary": "记录任务验收", "body": '{"status": "passed"|"failed"|"waived", "evidence": [{"kind", "summary"}]}', "risk": "write"},
     {"area": "execution", "method": "GET", "pattern": rf"/api/projects/{P}/executions/exe_[A-Za-z0-9]+",
-     "summary": "执行详情"},
-    {"area": "execution", "method": "POST", "pattern": rf"/api/projects/{P}/executions/exe_[A-Za-z0-9]+/(stop|reconcile|cleanup)",
-     "summary": "停止执行 / 核对执行状态 / 清理工作副本", "body": "{}", "risk": "write"},
+     "summary": "执行详情（只读快照，不会推进状态；查进度请用 reconcile）"},
+    {"area": "execution", "method": "POST", "pattern": rf"/api/projects/{P}/executions/exe_[A-Za-z0-9]+/reconcile",
+     "summary": "从执行引擎同步执行状态（查进度用这个，无需确认）", "body": "{}", "risk": "sync"},
+    {"area": "execution", "method": "POST", "pattern": rf"/api/projects/{P}/executions/exe_[A-Za-z0-9]+/(stop|cleanup)",
+     "summary": "停止执行 / 清理工作副本", "body": "{}", "risk": "write"},
     {"area": "execution", "method": "POST", "pattern": rf"/api/projects/{P}/executions/exe_[A-Za-z0-9]+/apply",
      "summary": "把执行结果写回源项目", "body": "{}", "risk": "write"},
     {"area": "execution", "method": "POST", "pattern": rf"/api/projects/{P}/executions/exe_[A-Za-z0-9]+/continue",
@@ -591,6 +593,9 @@ def _run_tool(name: str, arguments: dict, state: dict) -> dict:
             if signature in state.get("approved", set()):
                 return {"error": "this exact request was just approved and executed; do not repeat it. "
                                  "Report what is done, or propose the next different step."}
+        if route and route["risk"] == "sync":
+            # Pulls state from the execution engine; changes nothing the operator owns.
+            return execute(method, path, query, {}, arguments.get("select"))
         if method == "GET":
             key = json.dumps([path, query, arguments.get("select")], ensure_ascii=False)
             seen = state.setdefault("reads", {})
