@@ -1,0 +1,504 @@
+{
+  "generated_on": "2026-11-05",
+  "timezone": "Asia/Shanghai",
+  "branch": "codex/stabilize-atlas",
+  "skill": {
+    "version": "v0.5",
+    "requested_commit": "59c4fc4",
+    "path": ".agents/skills/possibility-mapping/SKILL.md",
+    "resolved_commit": "59c4fc42cc67011100859b6f793e02d1ba21849a",
+    "git_blob": "0a886d2b8c60febcfe2a3f27f519b037b49fd67e",
+    "sha256": "e74d4853c6d75e0c3632a2b2f15191c7ca8da2c4a31a6659ffb36d46c7a49bd3"
+  },
+  "case": {
+    "slug": "e-commerce-platform",
+    "section": "05.01",
+    "scope": "单一商家面向消费者的商城；本轮不重新生成个人任务管理"
+  },
+  "sources": [
+    {
+      "id": "A1",
+      "title": "ATLAS E-commerce Platform",
+      "path": "application-atlas-production-pack/applications/e-commerce-platform.md",
+      "family": "ATLAS local type",
+      "read_on": "2026-11-05",
+      "access_method": "local file read",
+      "sha256": "0f2984b4e087a05d51c5f6890266e18172ba072f2c067f000e862a8355110d9c"
+    },
+    {
+      "id": "A2",
+      "title": "ATLAS E-commerce Platform research",
+      "path": "application-atlas-production-pack/research/e-commerce-platform.md",
+      "family": "ATLAS local research",
+      "read_on": "2026-11-05",
+      "access_method": "local file read",
+      "sha256": "0d6b939efe1f35753aee40b96e81c0f3f4f5729e723c03c15a8b3c64ca810a82"
+    },
+    {
+      "id": "W1",
+      "title": "WooCommerce Product Search blocks",
+      "url": "https://woocommerce.com/document/woocommerce-product-search/blocks/",
+      "family": "WooCommerce Product Search extension",
+      "read_scope": "商品属性筛选；扩展",
+      "access_method": "web open and earlier search excerpts; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W2",
+      "title": "WooCommerce Adding and Managing Products",
+      "url": "https://woocommerce.com/document/managing-products/",
+      "family": "WooCommerce",
+      "read_scope": "商品类型",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W3",
+      "title": "WooCommerce Variable Products",
+      "url": "https://woocommerce.com/document/variable-product/",
+      "family": "WooCommerce",
+      "read_scope": "规格价格、库存与缺货预订",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W4",
+      "title": "WooCommerce Product Reviews",
+      "url": "https://woocommerce.com/document/product-reviews/",
+      "family": "WooCommerce",
+      "read_scope": "评论审核",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W5",
+      "title": "WooCommerce Managing Coupons",
+      "url": "https://woocommerce.com/document/coupon-management/",
+      "family": "WooCommerce",
+      "read_scope": "优惠券限制与金额",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W6",
+      "title": "WooCommerce Cart block",
+      "url": "https://woocommerce.com/document/woocommerce-store-editing/customizing-cart-and-checkout/cart-block/",
+      "family": "WooCommerce",
+      "read_scope": "购物车修改",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W7",
+      "title": "WooCommerce Checkout block",
+      "url": "https://woocommerce.com/document/woocommerce-store-editing/customizing-cart-and-checkout/checkout-block/",
+      "family": "WooCommerce",
+      "read_scope": "结算摘要与条款",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W8",
+      "title": "WooCommerce Shipping zones",
+      "url": "https://woocommerce.com/document/setting-up-shipping-zones/",
+      "family": "WooCommerce",
+      "read_scope": "配送区域",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W9",
+      "title": "WooCommerce Taxes",
+      "url": "https://woocommerce.com/document/setting-up-taxes-in-woocommerce/",
+      "family": "WooCommerce",
+      "read_scope": "税费计算设置",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W10",
+      "title": "WooCommerce Managing orders",
+      "url": "https://woocommerce.com/document/managing-orders/",
+      "family": "WooCommerce",
+      "read_scope": "订单记录",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W11",
+      "title": "WooCommerce Order statuses",
+      "url": "https://woocommerce.com/document/managing-orders/order-statuses/",
+      "family": "WooCommerce",
+      "read_scope": "订单与付款状态",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W12",
+      "title": "WooCommerce Refunding orders",
+      "url": "https://woocommerce.com/document/woocommerce-refunds/",
+      "family": "WooCommerce",
+      "read_scope": "退款记账与网关退款",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W13",
+      "title": "WooCommerce Digital/Downloadable Product Guide",
+      "url": "https://woocommerce.com/document/digital-downloadable-product-handling/",
+      "family": "WooCommerce",
+      "read_scope": "授权时点与撤销",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W14",
+      "title": "WooCommerce Accounts and Privacy Settings",
+      "url": "https://woocommerce.com/document/configuring-woocommerce-settings/accounts-and-privacy/",
+      "family": "WooCommerce",
+      "read_scope": "账号、游客与数据选项",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W15",
+      "title": "WooCommerce Analytics and Sales Reports",
+      "url": "https://woocommerce.com/document/woocommerce-analytics/",
+      "family": "WooCommerce",
+      "read_scope": "统计定义与日期口径",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W16",
+      "title": "WooCommerce Roles and Capabilities",
+      "url": "https://woocommerce.com/document/roles-capabilities/",
+      "family": "WooCommerce",
+      "read_scope": "默认角色权限",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W17",
+      "title": "WooPayments Payout schedule",
+      "url": "https://woocommerce.com/document/woopayments/payouts/payout-schedule/",
+      "family": "WooPayments extension",
+      "read_scope": "待结算余额与可出款余额",
+      "access_method": "web open and earlier search excerpts; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W18",
+      "title": "WooPayments Managing money",
+      "url": "https://woocommerce.com/document/woopayments/managing-money/",
+      "family": "WooPayments extension",
+      "read_scope": "出款与争议状态",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W19",
+      "title": "WooPayments Managing disputes",
+      "url": "https://woocommerce.com/document/woopayments/fraud-and-disputes/managing-disputes/",
+      "family": "WooPayments extension",
+      "read_scope": "争议提交与发卡行决定",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "W20",
+      "title": "WooCommerce Removing personal data from orders",
+      "url": "https://woocommerce.com/document/managing-orders/removing-personal-data-from-orders/",
+      "family": "WooCommerce",
+      "read_scope": "匿名化而保留订单",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "P1",
+      "title": "PrestaShop 9 Search parameters",
+      "url": "https://docs.prestashop-project.org/v.9-documentation/user-guide/configuring-shop/shop-parameters/search/search-parameters.md",
+      "family": "PrestaShop 9 documentation",
+      "read_scope": "别名与搜索索引",
+      "access_method": "web open",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "P2",
+      "title": "PrestaShop 8 Shopping carts",
+      "url": "https://github.com/PrestaShop/user-documentation-v8-en/blob/main/user-guide/selling/managing-orders/shopping-carts.md",
+      "family": "PrestaShop 8 official documentation repository",
+      "read_scope": "未转订单购物车",
+      "access_method": "GitHub fetch_file; relevant excerpts read",
+      "read_on": "2026-11-05",
+      "blob_sha": "1c5cac0d01c31189c61780141a446672a950700c",
+      "immutable_blob_url": "https://api.github.com/repos/PrestaShop/user-documentation-v8-en/git/blobs/1c5cac0d01c31189c61780141a446672a950700c"
+    },
+    {
+      "id": "P3",
+      "title": "PrestaShop 8 Merchandise Returns",
+      "url": "https://github.com/PrestaShop/user-documentation-v8-en/blob/main/user-guide/selling/managing-customer-service/merchandise-returns.md",
+      "family": "PrestaShop 8 official documentation repository",
+      "read_scope": "申请条件与包裹接收",
+      "access_method": "GitHub fetch_file; relevant excerpts read",
+      "read_on": "2026-11-05",
+      "blob_sha": "53ec3d640a12367acb9d758cc76f816df8955c48",
+      "immutable_blob_url": "https://api.github.com/repos/PrestaShop/user-documentation-v8-en/git/blobs/53ec3d640a12367acb9d758cc76f816df8955c48"
+    },
+    {
+      "id": "P4",
+      "title": "PrestaShop 8 Customer Service",
+      "url": "https://github.com/PrestaShop/user-documentation-v8-en/blob/main/user-guide/selling/managing-customer-service/customer-service.md",
+      "family": "PrestaShop 8 official documentation repository",
+      "read_scope": "消息留存与会话状态",
+      "access_method": "GitHub fetch_file; relevant excerpts read",
+      "read_on": "2026-11-05",
+      "blob_sha": "4730d145bf891abae768cdd840ad691299da8c5a",
+      "immutable_blob_url": "https://api.github.com/repos/PrestaShop/user-documentation-v8-en/git/blobs/4730d145bf891abae768cdd840ad691299da8c5a"
+    },
+    {
+      "id": "P5",
+      "title": "PrestaShop 8 Your customers",
+      "url": "https://github.com/PrestaShop/user-documentation-v8-en/blob/main/user-guide/selling/managing-customers/your-customers.md",
+      "family": "PrestaShop 8 official documentation repository",
+      "read_scope": "客户详情与订阅标记",
+      "access_method": "GitHub fetch_file; relevant excerpts read",
+      "read_on": "2026-11-05",
+      "blob_sha": "f25d9e96f43d799a90e5460047122b1160f7757b",
+      "immutable_blob_url": "https://api.github.com/repos/PrestaShop/user-documentation-v8-en/git/blobs/f25d9e96f43d799a90e5460047122b1160f7757b"
+    },
+    {
+      "id": "P6",
+      "title": "PrestaShop 8 Groups",
+      "url": "https://github.com/PrestaShop/user-documentation-v8-en/blob/main/user-guide/configuring-shop/shop-parameters/customer-settings/groups.md",
+      "family": "PrestaShop 8 official documentation repository",
+      "read_scope": "客户组折扣",
+      "access_method": "GitHub fetch_file; relevant excerpts read",
+      "read_on": "2026-11-05",
+      "blob_sha": "02eb896474ab27c8cbf5151b589cbace55f74125",
+      "immutable_blob_url": "https://api.github.com/repos/PrestaShop/user-documentation-v8-en/git/blobs/02eb896474ab27c8cbf5151b589cbace55f74125"
+    },
+    {
+      "id": "P7",
+      "title": "PrestaShop 8 Permissions",
+      "url": "https://github.com/PrestaShop/user-documentation-v8-en/blob/main/user-guide/configuring-shop/advanced-parameters/team/permissions.md",
+      "family": "PrestaShop 8 official documentation repository",
+      "read_scope": "查看/编辑权限",
+      "access_method": "GitHub fetch_file; relevant excerpts read",
+      "read_on": "2026-11-05",
+      "blob_sha": "cde716ad7f08c1579af37610ba30e85538b52f7b",
+      "immutable_blob_url": "https://api.github.com/repos/PrestaShop/user-documentation-v8-en/git/blobs/cde716ad7f08c1579af37610ba30e85538b52f7b"
+    },
+    {
+      "id": "P8",
+      "title": "PrestaShop 8 Multistore sample usages",
+      "url": "https://github.com/PrestaShop/user-documentation-v8-en/blob/main/user-guide/managing-multiple-stores/sample-usages-and-specifics.md",
+      "family": "PrestaShop 8 official documentation repository",
+      "read_scope": "店面关联",
+      "access_method": "GitHub fetch_file; relevant excerpts read",
+      "read_on": "2026-11-05",
+      "blob_sha": "5cecca23b496da040ece9b46a1a4d33bb1971d1e",
+      "immutable_blob_url": "https://api.github.com/repos/PrestaShop/user-documentation-v8-en/git/blobs/5cecca23b496da040ece9b46a1a4d33bb1971d1e"
+    },
+    {
+      "id": "P9",
+      "title": "PrestaShop 8 Currencies",
+      "url": "https://github.com/PrestaShop/user-documentation-v8-en/blob/main/user-guide/improving-shop/going-international/localization/currencies.md",
+      "family": "PrestaShop 8 official documentation repository",
+      "read_scope": "币种配置与换算",
+      "access_method": "GitHub fetch_file; relevant excerpts read",
+      "read_on": "2026-11-05",
+      "blob_sha": "742d4541381b792bf4e8638d0913b1a28393ea5c",
+      "immutable_blob_url": "https://api.github.com/repos/PrestaShop/user-documentation-v8-en/git/blobs/742d4541381b792bf4e8638d0913b1a28393ea5c"
+    },
+    {
+      "id": "P10",
+      "title": "PrestaShop 8 Languages",
+      "url": "https://github.com/PrestaShop/user-documentation-v8-en/blob/main/user-guide/improving-shop/going-international/localization/languages.md",
+      "family": "PrestaShop 8 official documentation repository",
+      "read_scope": "启用语言与前台选择",
+      "access_method": "GitHub fetch_file; relevant excerpts read",
+      "read_on": "2026-11-05",
+      "blob_sha": "e8acb1078ddbaa77cb3400ec91295596a48c0ac8",
+      "immutable_blob_url": "https://api.github.com/repos/PrestaShop/user-documentation-v8-en/git/blobs/e8acb1078ddbaa77cb3400ec91295596a48c0ac8"
+    },
+    {
+      "id": "M1",
+      "title": "Adobe Commerce Source algorithms and reservations",
+      "url": "https://experienceleague.adobe.com/en/docs/commerce-admin/inventory/basics/selection-reservations",
+      "family": "Adobe Commerce documentation",
+      "read_scope": "下单预留、取消补偿与多源发运",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "M2",
+      "title": "Adobe Commerce Order status and reservations",
+      "url": "https://experienceleague.adobe.com/en/docs/commerce-admin/inventory/basics/order-status",
+      "family": "Adobe Commerce documentation",
+      "read_scope": "源库存扣减与部分发运",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    },
+    {
+      "id": "M3",
+      "title": "Adobe Commerce Returns",
+      "url": "https://experienceleague.adobe.com/en/docs/commerce-admin/stores-sales/order-management/returns/returns",
+      "family": "Adobe Commerce documentation",
+      "read_scope": "RMA 部分授权及产品范围",
+      "access_method": "web open/find; relevant sections read",
+      "read_on": "2026-11-05"
+    }
+  ],
+  "source_conditions": {
+    "new_domain_research": true,
+    "same_domain_source_set_as_v0_4": false,
+    "external_bodies_archived": false,
+    "reference_products_executed": false,
+    "primary_sources_only_for_new_domain_claims": true
+  },
+  "retrieval_limits": [
+    "若干 PrestaShop 9 GitBook 页面无法读取，未将其记为已读证据；相应主题改读 PrestaShop 官方版本 8 文档仓库。",
+    "PrestaShop 与当前 ATLAS 叶子的关联通过本地目录只读查询确认；WooCommerce/Magento2 本轮未确认直接叶子关联，不据此排除其官方资料。"
+  ],
+  "baseline_preservation": {
+    "compared_to_commit": "e92911575d81f8ed02aae0360e97ca9035a34491",
+    "all_bytes_unchanged": true,
+    "files": [
+      {
+        "path": "docs/possibility-mapping-pilot-2026-11-05/e-commerce-platform.md",
+        "sha256": "988e7016aabf3dda8ece42f7a95e86fd008ababfd14ad322bbfc65339f2128e4"
+      },
+      {
+        "path": "docs/possibility-mapping-pilot-2026-11-05/task-management-application.md",
+        "sha256": "6aea578bed621b6aa1b7df431e97cfe29fb93b7d229031513ac895e3a72a6522"
+      },
+      {
+        "path": "docs/possibility-mapping-pilot-2026-11-05/v0.2/COMPARISON.md",
+        "sha256": "738478a424bfd40a6b16b5d3237bf4e02a5c0e031651abd140f0cba6051983f8"
+      },
+      {
+        "path": "docs/possibility-mapping-pilot-2026-11-05/v0.2/INPUTS.json",
+        "sha256": "2d02008fda6952187c3a1d4286caa8d26a7f7dc7c52d2119d1837a72c3e8a04f"
+      },
+      {
+        "path": "docs/possibility-mapping-pilot-2026-11-05/v0.2/e-commerce-platform.md",
+        "sha256": "1951a5115dea42bf0e249f7cdfc2c01708696e38d03f7ac0c11273560d45251b"
+      },
+      {
+        "path": "docs/possibility-mapping-pilot-2026-11-05/v0.2/task-management-application.md",
+        "sha256": "a25807e67d2e043709cc71546f62c8b746db8a23512faaad247cc1988be53620"
+      },
+      {
+        "path": "docs/possibility-mapping-pilot-2026-11-05/v0.3/COMPARISON.md",
+        "sha256": "d9827ec70cccfc744155531d9a39d7e9b0a18f6818f9c541365eca725795469d"
+      },
+      {
+        "path": "docs/possibility-mapping-pilot-2026-11-05/v0.3/INPUTS.json",
+        "sha256": "76de7003f2be04a1eb348429ecc536f70a05ad5db4b7d7cb07cfa6fe3791de87"
+      },
+      {
+        "path": "docs/possibility-mapping-pilot-2026-11-05/v0.3/e-commerce-platform.md",
+        "sha256": "bda858dea5d214e62027257d21caeb800f3b1f0396935970bb5d1b5660aed4c6"
+      },
+      {
+        "path": "docs/possibility-mapping-pilot-2026-11-05/v0.3/task-management-application.md",
+        "sha256": "192a6ef36c02c95de82ab4ab0686588f6ce57b1770a63a527496f30067de5278"
+      },
+      {
+        "path": "docs/possibility-mapping-pilot-2026-11-05/v0.4/INPUTS.json",
+        "sha256": "7945eea29eb42d189e0a1153126af5adc300cbc1821b44847459ff37f07d69a3"
+      },
+      {
+        "path": "docs/possibility-mapping-pilot-2026-11-05/v0.4/LANGUAGE_REVIEW.md",
+        "sha256": "fa3118a5a8ff23ac5dc5050158579c37ba1bac1cb4a12bd20d8cddab3e48c50d"
+      },
+      {
+        "path": "docs/possibility-mapping-pilot-2026-11-05/v0.4/e-commerce-platform.md",
+        "sha256": "93b1b79e68fd6d9eebe611c4b8f838858ae85a3ba907dfdb4ce59ee0fa5e469f"
+      },
+      {
+        "path": "docs/possibility-mapping-pilot-2026-11-05/v0.4/task-management-application.md",
+        "sha256": "75586bb8e795f97c03637901db59bea8c8ca2b88f51ec94986bb893bd4dc9010"
+      }
+    ]
+  },
+  "catalog_lookup": {
+    "access": "read-only SQLite query",
+    "slug": "e-commerce-platform",
+    "confirmed_direct_project": "PrestaShop/PrestaShop",
+    "record_checked_at": "2026-10-23",
+    "readme_blob_sha": "dc9da0328582549d48ae22bf7f84cbd225c99724",
+    "other_direct_links_not_confirmed": [
+      "woocommerce/woocommerce",
+      "magento/magento2"
+    ]
+  },
+  "quality_gates": {
+    "coverage": {
+      "author_review": "pass_for_documented_scope_with_explicit_gaps",
+      "evidence_file": "COVERAGE.md",
+      "full_type_completion_claimed": false
+    },
+    "language_precision": {
+      "author_review": "pass_for_retained_statements",
+      "evidence_file": "RESEARCH_AND_REVIEW.md",
+      "all_paired_rows_reviewed": true,
+      "headings_overview_relationships_and_gaps_reviewed": true
+    },
+    "independent_human_review": "pending",
+    "runtime_validation": "not_performed",
+    "artifact_status": "research_draft_for_human_review"
+  },
+  "static_checks": {
+    "status": "passed",
+    "source_ids_unique": true,
+    "source_count": 35,
+    "coverage_domains_with_content_or_gap": 18,
+    "paired_rows_matched_to_individual_review": 46,
+    "paired_rows_by_domain": {
+      "18": 4,
+      "1": 2,
+      "2": 3,
+      "3": 2,
+      "4": 2,
+      "5": 2,
+      "6": 1,
+      "7": 1,
+      "8": 2,
+      "9": 4,
+      "10": 3,
+      "11": 2,
+      "12": 2,
+      "13": 7,
+      "14": 3,
+      "15": 2,
+      "16": 2,
+      "17": 2
+    },
+    "local_links_resolved": 35,
+    "source_references_defined": true,
+    "skill_matches_requested_commit": true,
+    "prior_samples_byte_identical": true,
+    "counts_are_quality_scores": false,
+    "semantic_validation_by_script": false
+  },
+  "output_files": [
+    {
+      "path": "docs/possibility-mapping-pilot-2026-11-05/v0.5/COVERAGE.md",
+      "sha256": "44850f532b5b96043bf8f3adf60467d209335c32db6edb98d1e5a5f42f9c930b"
+    },
+    {
+      "path": "docs/possibility-mapping-pilot-2026-11-05/v0.5/e-commerce-platform.md",
+      "sha256": "4a166b1cdc6771d81102043fe770160702999f3c4e9f12ae005afd64565af6a6"
+    },
+    {
+      "path": "docs/possibility-mapping-pilot-2026-11-05/v0.5/RESEARCH_AND_REVIEW.md",
+      "sha256": "2ebc4b92e392c01a2a7d168d62b48dbf69cb820c07a23c05cc27e5f51eb34014"
+    }
+  ],
+  "indexes_updated": [
+    "docs/possibility-mapping-pilot-2026-11-05/README.md",
+    "docs/README.md"
+  ]
+}
