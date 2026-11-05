@@ -2,7 +2,7 @@
 
 本目录只把当前决策、下一步计划和仍会继续更新的验证记录放在顶层。已经完成的阶段记录移入 `archive/`，保留证据但不再作为当前任务入口。
 
-- [可能性图谱两类型试点](possibility-mapping-pilot-2026-11-05/README.md)：保留历次基线，新增 [B2C 电商 v0.6 图谱](possibility-mapping-pilot-2026-11-05/v0.6/e-commerce-platform.md)及[三项门禁审查](possibility-mapping-pilot-2026-11-05/v0.6/READABILITY_REVIEW.md)，重点检查专业内容能否被新读者理解。
+- [可能性图谱两类型试点](possibility-mapping-pilot-2026-11-05/README.md)：保留历次基线，新增 [B2C 电商 v0.7 图谱](possibility-mapping-pilot-2026-11-05/v0.7/e-commerce-platform.md)及[关联认知检查](possibility-mapping-pilot-2026-11-05/v0.7/RELATIONSHIP_REVIEW.md)，用同一交易解释订单、付款、库存、交付与售后的联系。
 - [现有产品逐页走查与修复](product-review-2026-10-22/REPORT.md)：问答与案例状态、工厂导航、设置错误恢复及手机布局、教程和中文内容校正；包含页面对照、逻辑梳理、回归与旧数据保护。模板生产保持暂停；并行的首页/发现项目改版单独验证。
 
 ## 当前主线：场景与真实项目
