@@ -1,5 +1,18 @@
 # 可能性图谱 · 两类型试点
 
+## v0.2 对照稿（2026-11-05）
+
+依据技能提交 `5260567e`，保留下方两份 v0.1 原稿，在同一资料集合上重新生成：
+
+- [B2C 电商商城 v0.2](v0.2/e-commerce-platform.md)
+- [个人任务管理软件 v0.2](v0.2/task-management-application.md)
+- [新旧版本比较](v0.2/COMPARISON.md)：逐项区分新增整体关系、既有内容深化、重新组织及相邻类型边界。
+- [输入版本与校验记录](v0.2/INPUTS.json)
+
+作者内容复核认为两份新稿补出了整体形态、组合关系与能力变化，电商增量更明显；这不是盲评或用户认知效果的实验结论。两份 v0.2 均仍待人工内容审查。
+
+## v0.1 基线
+
 生成日期：2026-11-05。工作分支：`codex/stabilize-atlas`。
 
 依据用户指定分支上的 [possibility-mapping 技能](https://github.com/liamamilin/atlas/blob/codex/stabilize-atlas/.agents/skills/possibility-mapping/SKILL.md)，先选择其“第一批验证”指定的两类，并映射到 ATLAS 已有叶子。
